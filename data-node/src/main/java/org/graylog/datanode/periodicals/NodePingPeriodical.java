@@ -28,7 +28,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
+
+import jakarta.inject.Inject;
+
 import java.net.URI;
 import java.util.function.Supplier;
 
@@ -39,6 +41,7 @@ public class NodePingPeriodical extends Periodical {
     private final NodeId nodeId;
     private final Supplier<URI> opensearchBaseUri;
     private final Supplier<String> opensearchClusterUri;
+    private final Supplier<String> datanodeRestApiUri;
     private final Supplier<Boolean> isLeader;
     private final Configuration configuration;
     private final Supplier<ProcessState> processState;
@@ -46,7 +49,16 @@ public class NodePingPeriodical extends Periodical {
 
     @Inject
     public NodePingPeriodical(NodeService<DataNodeDto> nodeService, NodeId nodeId, Configuration configuration, OpensearchProcess managedOpenSearch) {
-        this(nodeService, nodeId, configuration, managedOpenSearch::getOpensearchBaseUrl, managedOpenSearch::getOpensearchClusterUrl, managedOpenSearch::isLeaderNode, () -> managedOpenSearch.processInfo().state());
+        this(
+                nodeService,
+                nodeId,
+                configuration,
+                managedOpenSearch::getOpensearchBaseUrl,
+                managedOpenSearch::getOpensearchClusterUrl,
+                managedOpenSearch::getDatanodeRestApiUrl,
+                managedOpenSearch::isLeaderNode,
+                () -> managedOpenSearch.processInfo().state()
+        );
     }
 
     NodePingPeriodical(
@@ -55,6 +67,7 @@ public class NodePingPeriodical extends Periodical {
             Configuration configuration,
             Supplier<URI> opensearchBaseUri,
             Supplier<String> opensearchClusterUri,
+            Supplier<String> datanodeRestApiUri,
             Supplier<Boolean> isLeader,
             Supplier<ProcessState> processState
     ) {
@@ -62,6 +75,7 @@ public class NodePingPeriodical extends Periodical {
         this.nodeId = nodeId;
         this.opensearchBaseUri = opensearchBaseUri;
         this.opensearchClusterUri = opensearchClusterUri;
+        this.datanodeRestApiUri = datanodeRestApiUri;
         this.isLeader = isLeader;
         this.configuration = configuration;
         this.processState = processState;
@@ -117,6 +131,7 @@ public class NodePingPeriodical extends Periodical {
                 .setClusterAddress(opensearchClusterUri.get())
                 .setDataNodeStatus(processState.get().getDataNodeStatus())
                 .setHostname(configuration.getHostname())
+                .setRestApiAddress(datanodeRestApiUri.get())
                 .build();
 
         nodeService.ping(dto);

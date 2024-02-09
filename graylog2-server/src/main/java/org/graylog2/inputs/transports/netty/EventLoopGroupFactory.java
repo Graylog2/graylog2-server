@@ -27,7 +27,8 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import org.graylog2.inputs.transports.NettyTransportConfiguration;
 import org.graylog2.plugin.LocalMetricRegistry;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

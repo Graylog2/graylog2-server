@@ -27,8 +27,10 @@ import memoize from 'lodash/memoize';
 import max from 'lodash/max';
 import union from 'lodash/union';
 import moment from 'moment';
+import { OrderedMap } from 'immutable';
 
-import { MultiSelect, TimeUnitInput } from 'components/common';
+import Store from 'logic/local-storage/Store';
+import { MultiSelect, TimeUnitInput, SearchFiltersFormControls } from 'components/common';
 import connect from 'stores/connect';
 import Query from 'views/logic/queries/Query';
 import Search from 'views/logic/search/Search';
@@ -49,6 +51,7 @@ import withLocation from 'routing/withLocation';
 import EditQueryParameterModal from '../event-definition-form/EditQueryParameterModal';
 import commonStyles from '../common/commonStyles.css';
 
+export const PLUGGABLE_CONTROLS_HIDDEN_KEY = 'pluggableSearchBarControlsAreHidden';
 export const TIME_UNITS = ['HOURS', 'MINUTES', 'SECONDS'];
 
 const LOOKUP_PERMISSIONS = [
@@ -84,7 +87,7 @@ class FilterForm extends React.Component {
     (streamIds) => streamIds.join('-'),
   );
 
-  _parseQuery = debounce((queryString) => {
+  _parseQuery = debounce((queryString, searchFilters = new OrderedMap()) => {
     if (!this._userCanViewLookupTables()) {
       return;
     }
@@ -95,6 +98,7 @@ class FilterForm extends React.Component {
       .id(queryId)
       .query({ type: 'elasticsearch', query_string: queryString })
       .timerange({ type: 'relative', range: 1000 })
+      .filters(searchFilters.toList())
       .searchTypes([{
         id: searchTypeId,
         type: 'messages',
@@ -139,6 +143,7 @@ class FilterForm extends React.Component {
       queryId: generateId(),
       searchTypeId: generateId(),
       queryParameterStash: {}, // keep already defined parameters around to ease editing
+      searchFiltersHidden: false,
     };
   }
 
@@ -151,7 +156,6 @@ class FilterForm extends React.Component {
   propagateChange = (key, value) => {
     const { eventDefinition, onChange } = this.props;
     const config = cloneDeep(eventDefinition.config);
-
     config[key] = value;
     onChange('config', config);
   };
@@ -199,6 +203,19 @@ class FilterForm extends React.Component {
   handleQueryChange = (event) => {
     this._parseQuery(event.target.value);
     this.handleConfigChange(event);
+  };
+
+  handleSearchFiltersChange = (searchFilters) => {
+    const { query } = this.props.eventDefinition.config;
+
+    this._parseQuery(query, searchFilters);
+
+    this.propagateChange('filters', searchFilters.toArray());
+  };
+
+  hideFiltersPreview = (value) => {
+    Store.set(PLUGGABLE_CONTROLS_HIDDEN_KEY, value);
+    this.setState({ searchFiltersHidden: value });
   };
 
   handleConfigChange = (event) => {
@@ -315,6 +332,8 @@ class FilterForm extends React.Component {
     const { eventDefinition, streams, validation } = this.props;
     const { searchWithinMsDuration, searchWithinMsUnit, executeEveryMsDuration, executeEveryMsUnit } = this.state;
 
+    const onlyFilters = eventDefinition._scope === 'ILLUMINATE';
+
     // Ensure deleted streams are still displayed in select
     const allStreamIds = union(streams.map((s) => s.id), defaultTo(eventDefinition.config.streams, []));
     const formattedStreams = this.formatStreamIds(allStreamIds);
@@ -323,63 +342,80 @@ class FilterForm extends React.Component {
       <fieldset>
         <h2 className={commonStyles.title}>Filter</h2>
         <p>Add information to filter the log messages that are relevant for this Event Definition.</p>
-        <Input id="filter-query"
-               name="query"
-               label="Search Query"
-               type="text"
-               help={(
-                 <span>
-                   Search query that Messages should match. You can use the same syntax as in the Search page,
-                   including declaring Query Parameters from Lookup Tables by using the <code>$newParameter$</code> syntax.
-                 </span>
-               )}
-               value={defaultTo(eventDefinition.config.query, '')}
-               onChange={this.handleQueryChange} />
+        {onlyFilters || (
+          <Input id="filter-query"
+                 name="query"
+                 label="Search Query"
+                 type="text"
+                 help={(
+                   <span>
+                     Search query that Messages should match. You can use the same syntax as in the Search page,
+                     including declaring Query Parameters from Lookup Tables by using the <code>$newParameter$</code> syntax.
+                   </span>
+                 )}
+                 value={defaultTo(eventDefinition.config.query, '')}
+                 onChange={this.handleQueryChange} />
+        )}
 
-        {this.renderQueryParameters()}
+        {onlyFilters || this.renderQueryParameters()}
 
-        <FormGroup controlId="filter-streams">
-          <ControlLabel>Streams <small className="text-muted">(Optional)</small></ControlLabel>
-          <MultiSelect id="filter-streams"
-                       matchProp="label"
-                       onChange={(selected) => this.handleStreamsChange(selected === '' ? [] : selected.split(','))}
-                       options={formattedStreams}
-                       value={defaultTo(eventDefinition.config.streams, []).join(',')} />
-          <HelpBlock>Select streams the search should include. Searches in all streams if empty.</HelpBlock>
-        </FormGroup>
+        {!this.state.searchFiltersHidden && (
+          <FormGroup controlId="search-filters">
+            <ControlLabel>Search Filters <small className="text-muted">(Optional)</small></ControlLabel>
+            <div style={{ maring: '16px 0' }}>
+              <SearchFiltersFormControls filters={eventDefinition.config.filters}
+                                         onChange={this.handleSearchFiltersChange}
+                                         hideFiltersPreview={this.hideFiltersPreview} />
+            </div>
+          </FormGroup>
+        )}
 
-        <FormGroup controlId="search-within" validationState={validation.errors.search_within_ms ? 'error' : null}>
-          <TimeUnitInput label="Search within the last"
-                         update={this.handleTimeRangeChange('search_within_ms')}
-                         value={searchWithinMsDuration}
-                         unit={searchWithinMsUnit}
-                         units={TIME_UNITS}
-                         clearable
-                         required />
-          {validation.errors.search_within_ms && (
-            <HelpBlock>{get(validation, 'errors.search_within_ms[0]')}</HelpBlock>
-          )}
-        </FormGroup>
+        {onlyFilters || (
+          <>
+            <FormGroup controlId="filter-streams">
+              <ControlLabel>Streams <small className="text-muted">(Optional)</small></ControlLabel>
+              <MultiSelect id="filter-streams"
+                           matchProp="label"
+                           onChange={(selected) => this.handleStreamsChange(selected === '' ? [] : selected.split(','))}
+                           options={formattedStreams}
+                           value={defaultTo(eventDefinition.config.streams, []).join(',')} />
+              <HelpBlock>Select streams the search should include. Searches in all streams if empty.</HelpBlock>
+            </FormGroup>
 
-        <FormGroup controlId="execute-every" validationState={validation.errors.execute_every_ms ? 'error' : null}>
-          <TimeUnitInput label="Execute search every"
-                         update={this.handleTimeRangeChange('execute_every_ms')}
-                         value={executeEveryMsDuration}
-                         unit={executeEveryMsUnit}
-                         units={TIME_UNITS}
-                         clearable
-                         required />
-          {validation.errors.execute_every_ms && (
-            <HelpBlock>{get(validation, 'errors.execute_every_ms[0]')}</HelpBlock>
-          )}
-        </FormGroup>
-        <Input id="schedule-checkbox"
-               type="checkbox"
-               name="_is_scheduled"
-               label="Enable"
-               help="Should this event definition be executed automatically?"
-               checked={defaultTo(eventDefinition.config._is_scheduled, true)}
-               onChange={this.handleConfigChange} />
+            <FormGroup controlId="search-within" validationState={validation.errors.search_within_ms ? 'error' : null}>
+              <TimeUnitInput label="Search within the last"
+                             update={this.handleTimeRangeChange('search_within_ms')}
+                             value={searchWithinMsDuration}
+                             unit={searchWithinMsUnit}
+                             units={TIME_UNITS}
+                             clearable
+                             required />
+              {validation.errors.search_within_ms && (
+                <HelpBlock>{get(validation, 'errors.search_within_ms[0]')}</HelpBlock>
+              )}
+            </FormGroup>
+
+            <FormGroup controlId="execute-every" validationState={validation.errors.execute_every_ms ? 'error' : null}>
+              <TimeUnitInput label="Execute search every"
+                             update={this.handleTimeRangeChange('execute_every_ms')}
+                             value={executeEveryMsDuration}
+                             unit={executeEveryMsUnit}
+                             units={TIME_UNITS}
+                             clearable
+                             required />
+              {validation.errors.execute_every_ms && (
+                <HelpBlock>{get(validation, 'errors.execute_every_ms[0]')}</HelpBlock>
+              )}
+            </FormGroup>
+            <Input id="schedule-checkbox"
+                   type="checkbox"
+                   name="_is_scheduled"
+                   label="Enable"
+                   help="Should this event definition be executed automatically?"
+                   checked={defaultTo(eventDefinition.config._is_scheduled, true)}
+                   onChange={this.handleConfigChange} />
+          </>
+        )}
       </fieldset>
     );
   }

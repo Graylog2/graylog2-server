@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import { act, render, screen, waitFor } from 'wrappedTestingLibrary';
 import { List } from 'immutable';
 import selectEvent from 'react-select-event';
 
@@ -36,18 +36,21 @@ describe('FieldSortSelect', () => {
   const fields = List([fieldTypeMapping1, fieldTypeMapping2]);
   const sort = [new SortConfig('pivot', 'http_method', Direction.Ascending)];
 
-  it('should display current sort as selected option', () => {
+  it('should display current sort as selected option', async () => {
     render(<FieldSortSelect fields={fields} onChange={() => {}} sort={sort} />);
 
-    expect(screen.getByText('http_method')).not.toBeNull();
+    expect(await screen.findByText('http_method')).not.toBeNull();
   });
 
   it('should select field and update sort', async () => {
     const onChangeStub = jest.fn();
     render(<FieldSortSelect fields={fields} onChange={onChangeStub} sort={sort} />);
 
-    const fieldSelect = screen.getByLabelText('Select field for sorting');
-    await selectEvent.openMenu(fieldSelect);
+    const fieldSelect = await screen.findByLabelText('Select field for sorting');
+
+    await act(async () => {
+      await selectEvent.openMenu(fieldSelect);
+    });
 
     await selectEvent.select(fieldSelect, 'date');
 

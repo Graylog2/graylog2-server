@@ -144,9 +144,11 @@ const DashboardActionsMenu = () => {
                      disabledInfo={isNewView && 'Only saved dashboards can be shared.'} />
       )}
       {showDropDownButton && (
-        <DropdownButton title={<Icon name="ellipsis-h" title="More Actions" />}
+        <DropdownButton title={<Icon name="ellipsis-h" />}
                         id="query-tab-actions-dropdown"
                         pullRight
+                        keepMounted
+                        buttonTitle="More Actions"
                         noCaret>
           {dashboardActions.length > 0 && (
             <>

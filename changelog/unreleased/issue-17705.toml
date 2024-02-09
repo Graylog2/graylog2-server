@@ -1,0 +1,5 @@
+type = "fixed"
+message = "added actions on datanode datails page"
+
+issues = ["17705"]
+pulls = ["17840"]

@@ -25,7 +25,8 @@ import org.graylog.shaded.opensearch2.org.apache.lucene.store.Directory;
 import org.graylog.shaded.opensearch2.org.apache.lucene.store.FSDirectory;
 import org.graylog.shaded.opensearch2.org.apache.lucene.util.Version;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
+
 import java.io.IOException;
 import java.nio.file.Path;
 

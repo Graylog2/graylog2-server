@@ -17,6 +17,7 @@
 package org.graylog.events.search;
 
 import com.google.auto.value.AutoValue;
+import jakarta.inject.Inject;
 import org.graylog.events.processor.EventProcessorException;
 import org.graylog.plugins.views.search.IndexRangeContainsOneOfStreams;
 import org.graylog.plugins.views.search.Parameter;
@@ -24,6 +25,7 @@ import org.graylog.plugins.views.search.ParameterProvider;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.errors.EmptyParameterError;
 import org.graylog.plugins.views.search.errors.SearchException;
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
@@ -35,7 +37,6 @@ import org.graylog2.streams.StreamService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -88,6 +89,15 @@ public class MoreSearch {
         final String queryString = parameters.query().trim();
         final Set<String> affectedIndices = getAffectedIndices(eventStreams, parameters.timerange());
 
+        if (affectedIndices == null || affectedIndices.isEmpty()) {
+            return Result.builder()
+                    .resultsCount(0)
+                    .results(List.of())
+                    .usedIndexNames(Set.of())
+                    .duration(0)
+                    .executedQuery(queryString)
+                    .build();
+        }
         return moreSearchAdapter.eventSearch(queryString, parameters.timerange(), affectedIndices, sorting, parameters.page(), parameters.perPage(), eventStreams, filterString, forbiddenSourceStreams);
     }
 
@@ -122,11 +132,14 @@ public class MoreSearch {
      *
      * @param queryString    the search query string
      * @param streams        the set of streams to search in
+     * @param filters        the set of search filters to search with
      * @param timeRange      the time range for the search
      * @param batchSize      the number of documents to retrieve at once
      * @param resultCallback the callback that gets executed for each batch
      */
-    public void scrollQuery(String queryString, Set<String> streams, Set<Parameter> queryParameters, TimeRange timeRange, int batchSize, ScrollCallback resultCallback) throws EventProcessorException {
+    public void scrollQuery(String queryString, Set<String> streams, List<UsedSearchFilter> filters,
+                            Set<Parameter> queryParameters, TimeRange timeRange, int batchSize,
+                            ScrollCallback resultCallback) throws EventProcessorException {
         final Set<String> affectedIndices = getAffectedIndices(streams, timeRange);
 
         try {
@@ -139,7 +152,7 @@ public class MoreSearch {
             throw e;
         }
 
-        moreSearchAdapter.scrollEvents(queryString, timeRange, affectedIndices, streams, batchSize, resultCallback::call);
+        moreSearchAdapter.scrollEvents(queryString, timeRange, affectedIndices, streams, filters, batchSize, resultCallback::call);
     }
 
     public Set<Stream> loadStreams(Set<String> streamIds) {
@@ -167,6 +180,7 @@ public class MoreSearch {
 
     /**
      * Helper to perform basic Lucene escaping of query string values
+     *
      * @param searchString search string which may contain unescaped reserved characters
      * @return String where those characters that Lucene expects to be escaped are escaped by a
      * preceding <code>\</code>

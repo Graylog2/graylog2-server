@@ -18,6 +18,7 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import { defaultUser } from 'defaultMockValues';
+import userEvent from '@testing-library/user-event';
 
 import { asMock } from 'helpers/mocking';
 import { adminUser } from 'fixtures/users';
@@ -137,9 +138,9 @@ describe('EventDefinitionEntry', () => {
 
     render(renderSUT('DEFAULT'));
 
-    await waitFor(() => {
-      expect(screen.getAllByTestId('delete-button')[0]).toBeVisible();
-    });
+    await userEvent.click((await screen.findAllByRole('button', { name: 'More' }))[0]);
+
+    await screen.findByRole('menuitem', { name: /delete/i });
   });
 
   it('hides "delete" button for immutable definitions', async () => {

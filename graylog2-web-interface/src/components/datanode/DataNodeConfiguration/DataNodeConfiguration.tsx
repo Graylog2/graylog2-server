@@ -18,7 +18,6 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 import CertificateRenewalPolicyConfig from './CertificateRenewalPolicyConfig';
-import CertificateRenewal from './CertificateRenewal';
 
 const Container = styled.div`
   display: flex;
@@ -29,7 +28,6 @@ const Container = styled.div`
 const DataNodeConfiguration = () => (
   <Container>
     <CertificateRenewalPolicyConfig />
-    <CertificateRenewal />
   </Container>
 );
 

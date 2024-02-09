@@ -29,7 +29,7 @@ import { execute, setGlobalOverride } from 'views/logic/slices/searchExecutionSl
 
 import OriginalDashboardSearchBar from './DashboardSearchBar';
 
-jest.mock('views/components/searchbar/queryinput/QueryInput', () => ({ value = '' }: { value: string }) => <span>{value}</span>);
+jest.mock('views/components/searchbar/queryinput/QueryInput');
 jest.mock('views/components/DashboardActionsMenu', () => () => <span>View Actions</span>);
 
 jest.mock('views/hooks/useAutoRefresh', () => () => ({

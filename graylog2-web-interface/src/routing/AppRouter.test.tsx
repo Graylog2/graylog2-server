@@ -30,6 +30,7 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import AppConfig from 'util/AppConfig';
 import GlobalContextProviders from 'contexts/GlobalContextProviders';
 import HotkeysProvider from 'contexts/HotkeysProvider';
+import { defaultPerspective } from 'fixtures/perspectives';
 
 import AppRouter from './AppRouter';
 
@@ -86,14 +87,7 @@ const mockRoutes = (routes: PluginExports['routes']) => {
 
 describe('AppRouter', () => {
   const defaultPlugins = {
-    perspectives: [
-      {
-        id: 'default',
-        title: 'Default Perspective',
-        brandComponent: () => <div />,
-        brandLink: '',
-      },
-    ],
+    perspectives: [defaultPerspective],
   };
 
   beforeEach(() => {

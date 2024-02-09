@@ -18,18 +18,19 @@ package org.graylog2.inputs.codecs;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
-import com.fasterxml.jackson.databind.node.NumericNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.BooleanNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.NumericNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import com.jayway.jsonpath.JsonPath;
+import jakarta.inject.Inject;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -47,12 +48,10 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import java.io.IOException;
-import java.util.Map;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 @Codec(name = "jsonpath", displayName = "JSON Path")
 public class JsonPathCodec extends AbstractCodec {
@@ -177,6 +176,7 @@ public class JsonPathCodec extends AbstractCodec {
             throw new JsonFlattenException("Warning: JSON contains type not supported by the flatten method. JsonNode: " + jsonNode);
         }
     }
+
     public static class JsonFlattenException extends Exception {
         public JsonFlattenException(String errorMessage) {
             super(errorMessage);
@@ -230,7 +230,8 @@ public class JsonPathCodec extends AbstractCodec {
                     "If set, the whole JSON will be flattened and returned as message fields."
             ));
 
-            return r;        }
+            return r;
+        }
 
         @Override
         public void overrideDefaultValues(@Nonnull ConfigurationRequest cr) {

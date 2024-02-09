@@ -73,6 +73,18 @@ public class CustomFieldMappings extends HashSet<CustomFieldMapping> {
         return new CustomFieldMappings(modifiedMappings);
     }
 
+    public CustomFieldMappings mergeWith(final CustomFieldMappings changedMappings) {
+        if (changedMappings == null || changedMappings.isEmpty()) {
+            return this;
+        }
+        final Set<CustomFieldMapping> modifiedMappings = new HashSet<>(this);
+        for (CustomFieldMapping changedMapping : changedMappings) {
+            modifiedMappings.removeIf(m -> changedMapping.fieldName().equals(m.fieldName()));
+            modifiedMappings.add(changedMapping);
+        }
+        return new CustomFieldMappings(modifiedMappings);
+    }
+
     public boolean containsCustomMappingForField(final String fieldName) {
         return stream().anyMatch(m -> m.fieldName().equals(fieldName));
     }

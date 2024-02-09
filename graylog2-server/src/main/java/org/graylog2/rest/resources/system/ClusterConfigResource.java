@@ -19,11 +19,25 @@ package org.graylog2.rest.resources.system;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
-import com.fasterxml.jackson.module.jsonSchema.factories.SchemaFactoryWrapper;
+import com.fasterxml.jackson.module.jsonSchema.jakarta.JsonSchema;
+import com.fasterxml.jackson.module.jsonSchema.jakarta.factories.SchemaFactoryWrapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.InternalServerErrorException;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.AuditEventTypes;
@@ -33,28 +47,17 @@ import org.graylog2.plugin.validate.ClusterConfigValidatorService;
 import org.graylog2.plugin.validate.ConfigValidationException;
 import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.rest.models.system.config.ClusterConfigList;
-import org.graylog2.shared.plugins.ChainingClassLoader;
+import org.graylog2.security.RestrictedChainingClassLoader;
+import org.graylog2.security.UnsafeClassLoadingAttemptException;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.InternalServerErrorException;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+
+import jakarta.inject.Inject;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
@@ -71,13 +74,13 @@ public class ClusterConfigResource extends RestResource {
     public static final String NO_CLASS_MSG = "Couldn't find configuration class  '%s'";
 
     private final ClusterConfigService clusterConfigService;
-    private final ChainingClassLoader chainingClassLoader;
+    private final RestrictedChainingClassLoader chainingClassLoader;
     private final ObjectMapper objectMapper;
     private final ClusterConfigValidatorService clusterConfigValidatorService;
 
     @Inject
     public ClusterConfigResource(ClusterConfigService clusterConfigService,
-                                 ChainingClassLoader chainingClassLoader,
+                                 RestrictedChainingClassLoader chainingClassLoader,
                                  ObjectMapper objectMapper,
                                  ClusterConfigValidatorService clusterConfigValidatorService) {
         this.clusterConfigService = requireNonNull(clusterConfigService);
@@ -207,9 +210,11 @@ public class ClusterConfigResource extends RestResource {
     @Nullable
     private Class<?> classFromName(String className) {
         try {
-            return chainingClassLoader.loadClass(className);
+            return chainingClassLoader.loadClassSafely(className);
         } catch (ClassNotFoundException e) {
             return null;
+        } catch (UnsafeClassLoadingAttemptException e) {
+            throw new BadRequestException(e.getLocalizedMessage());
         }
     }
 

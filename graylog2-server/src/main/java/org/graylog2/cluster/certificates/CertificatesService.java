@@ -30,7 +30,8 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.security.encryption.EncryptedValueService;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Optional;
 
 import static com.mongodb.client.model.Filters.eq;

@@ -58,6 +58,7 @@ public abstract class WaitingRestOperation extends RestOperation {
                 .retryIfException(input -> input instanceof NoHttpResponseException)
                 .retryIfException(input -> input instanceof SocketException)
                 .retryIfException(input -> input instanceof SSLHandshakeException) // may happen before SSL is configured properly
+                .retryIfResult(r -> r.extract().statusCode() != 200)
                 .retryIfResult(input -> !input.extract().contentType().startsWith("application/json"))
                 .withRetryListener(new RetryListener() {
                     @Override

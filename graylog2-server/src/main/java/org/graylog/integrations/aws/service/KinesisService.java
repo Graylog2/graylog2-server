@@ -69,8 +69,10 @@ import software.amazon.awssdk.services.kinesis.model.ShardIteratorType;
 import software.amazon.awssdk.services.kinesis.model.StreamDescription;
 import software.amazon.awssdk.services.kinesis.model.StreamStatus;
 
-import javax.inject.Inject;
-import javax.ws.rs.BadRequestException;
+import jakarta.inject.Inject;
+
+import jakarta.ws.rs.BadRequestException;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -143,7 +145,7 @@ public class KinesisService {
 
         // Check if Kinesis stream exists
         final boolean streamExists = kinesisStreamNames.streams().stream()
-                                                       .anyMatch(streamName -> streamName.equals(request.streamName()));
+                .anyMatch(streamName -> streamName.equals(request.streamName()));
         if (!streamExists) {
             throw new BadRequestException(String.format(Locale.ROOT, "The requested stream [%s] was not found.", request.streamName()));
         }
@@ -190,8 +192,8 @@ public class KinesisService {
                     LOG.debug("Requesting streams...");
                     final String lastStreamName = streamNames.get(streamNames.size() - 1);
                     final ListStreamsRequest moreStreamsRequest = ListStreamsRequest.builder()
-                                                                                    .exclusiveStartStreamName(lastStreamName)
-                                                                                    .limit(KINESIS_LIST_STREAMS_LIMIT).build();
+                            .exclusiveStartStreamName(lastStreamName)
+                            .limit(KINESIS_LIST_STREAMS_LIMIT).build();
                     final ListStreamsResponse moreSteamsResponse = kinesisClient.listStreams(moreStreamsRequest);
                     streamNames.addAll(moreSteamsResponse.streamNames());
 
@@ -238,7 +240,7 @@ public class KinesisService {
         CloudWatchLogEvent logEntry = logEntryOptional.get();
         DateTime timestamp = new DateTime(logEntry.timestamp(), DateTimeZone.UTC);
         return detectAndParseMessage(logEntry.message(), timestamp,
-                                     request.streamName(), data.logGroup(), data.logStream(), true);
+                request.streamName(), data.logGroup(), data.logStream(), true);
     }
 
     /**
@@ -261,10 +263,10 @@ public class KinesisService {
             final String shardId = shard.shardId();
             final GetShardIteratorRequest getShardIteratorRequest =
                     GetShardIteratorRequest.builder()
-                                           .shardId(shardId)
-                                           .streamName(kinesisStream)
-                                           .shardIteratorType(ShardIteratorType.TRIM_HORIZON)
-                                           .build();
+                            .shardId(shardId)
+                            .streamName(kinesisStream)
+                            .shardIteratorType(ShardIteratorType.TRIM_HORIZON)
+                            .build();
             String shardIterator = kinesisClient.getShardIterator(getShardIteratorRequest).shardIterator();
             boolean stayOnCurrentShard = true;
             LOG.debug("Retrieved shard id: [{}] with shard iterator: [{}]", shardId, shardIterator);
@@ -330,7 +332,7 @@ public class KinesisService {
                                                              String logGroupName, String logStreamName, boolean compressed) {
 
         LOG.debug("Attempting to detect the type of log message. message [{}] stream [{}] log group [{}].",
-                  logMessage, kinesisStreamName, logGroupName);
+                logMessage, kinesisStreamName, logGroupName);
 
         final AWSLogMessage awsLogMessage = new AWSLogMessage(logMessage);
         AWSMessageType awsMessageType = awsLogMessage.detectLogMessageType(compressed);
@@ -340,7 +342,7 @@ public class KinesisService {
         final String responseMessage = String.format(Locale.ROOT, "Success. The message is a %s message.", awsMessageType.getLabel());
 
         final KinesisLogEntry logEvent = KinesisLogEntry.create(kinesisStreamName, logGroupName, logStreamName,
-                                                                timestamp, logMessage);
+                timestamp, logMessage);
 
         final Codec.Factory<? extends Codec> codecFactory = this.availableCodecs.get(awsMessageType.getCodecName());
         if (codecFactory == null) {
@@ -407,11 +409,11 @@ public class KinesisService {
 
         LOG.debug("Creating new Kinesis stream request [{}].", request.streamName());
         final CreateStreamRequest createStreamRequest = CreateStreamRequest.builder()
-                                                                           .streamName(request.streamName())
-                                                                           .shardCount(SHARD_COUNT)
-                                                                           .build();
+                .streamName(request.streamName())
+                .shardCount(SHARD_COUNT)
+                .build();
         LOG.debug("Sending request to create new Kinesis stream [{}] with [{}] shards.",
-                  request.streamName(), SHARD_COUNT);
+                request.streamName(), SHARD_COUNT);
 
         StreamDescription streamDescription;
         try {
@@ -439,8 +441,8 @@ public class KinesisService {
                     request.streamName(), streamArn, SHARD_COUNT);
 
             return KinesisNewStreamResponse.create(createStreamRequest.streamName(),
-                                                   streamArn,
-                                                   responseMessage);
+                    streamArn,
+                    responseMessage);
         } catch (Exception e) {
             final String specificError = ExceptionUtils.formatMessageCause(e);
             final String responseMessage = String.format(Locale.ROOT, "Attempt to create [%s] new Kinesis stream " +
@@ -483,14 +485,14 @@ public class KinesisService {
     private static void setPermissionsForKinesisAutoSetupRole(IamClient iam, String roleName, String streamArn) {
         String rolePolicy =
                 "{\n" +
-                "  \"Statement\": [\n" +
-                "    {\n" +
-                "      \"Effect\": \"Allow\",\n" +
-                "      \"Action\": \"kinesis:PutRecord\",\n" +
-                "      \"Resource\": \"" + streamArn + "\"\n" +
-                "    }\n" +
-                "  ]\n" +
-                "}";
+                        "  \"Statement\": [\n" +
+                        "    {\n" +
+                        "      \"Effect\": \"Allow\",\n" +
+                        "      \"Action\": \"kinesis:PutRecord\",\n" +
+                        "      \"Resource\": \"" + streamArn + "\"\n" +
+                        "    }\n" +
+                        "  ]\n" +
+                        "}";
 
         final String rolePolicyName = String.format(Locale.ROOT, ROLE_POLICY_NAME_FORMAT, DateTime.now(DateTimeZone.UTC).toString(UNIQUE_ROLE_DATE_FORMAT));
         LOG.debug("Attaching [{}] policy to [{}] role", rolePolicyName, roleName);
@@ -511,14 +513,14 @@ public class KinesisService {
         LOG.debug("Create Kinesis Auto Setup Role [{}] to region [{}]", roleName, region);
         String assumeRolePolicy =
                 "{\n" +
-                "  \"Statement\": [\n" +
-                "    {\n" +
-                "      \"Effect\": \"Allow\",\n" +
-                "      \"Principal\": { \"Service\": \"logs." + region + ".amazonaws.com\" },\n" +
-                "      \"Action\": \"sts:AssumeRole\"\n" +
-                "    }\n" +
-                "  ]\n" +
-                "}";
+                        "  \"Statement\": [\n" +
+                        "    {\n" +
+                        "      \"Effect\": \"Allow\",\n" +
+                        "      \"Principal\": { \"Service\": \"logs." + region + ".amazonaws.com\" },\n" +
+                        "      \"Action\": \"sts:AssumeRole\"\n" +
+                        "    }\n" +
+                        "  ]\n" +
+                        "}";
         // TODO optimize checking if the role exists first
         LOG.debug("Role [{}] was created.", roleName);
         try {

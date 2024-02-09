@@ -25,7 +25,8 @@ import org.graylog.plugins.views.search.validation.ValidationMessage;
 import org.graylog.plugins.views.search.validation.ValidationStatus;
 import org.graylog.plugins.views.search.validation.ValidationType;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;

@@ -14,12 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState, useCallback, useMemo, useRef } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import styled, { css } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { IfPermitted, ShareButton } from 'components/common';
-import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
+import UserNotification from 'util/UserNotification';
+import { ShareButton } from 'components/common';
 import { MenuItem } from 'components/bootstrap';
 import type View from 'views/logic/views/View';
 import EntityShareModal from 'components/permissions/EntityShareModal';
@@ -28,10 +28,19 @@ import iterateConfirmationHooks from 'views/hooks/IterateConfirmationHooks';
 import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import usePluginEntities from 'hooks/usePluginEntities';
-import { MORE_ACTIONS_TITLE, MORE_ACTIONS_HOVER_TITLE } from 'components/common/EntityDataTable/Constants';
+import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
+import type FetchError from 'logic/errors/FetchError';
+import { isAnyPermitted } from 'util/PermissionsMixin';
+import useCurrentUser from 'hooks/useCurrentUser';
+import MoreActions from 'components/common/EntityDataTable/MoreActions';
 
 // eslint-disable-next-line no-alert
 const defaultDashboardDeletionHook = async (view: View) => window.confirm(`Are you sure you want to delete "${view.title}"?`);
+
+const _extractErrorMessage = (error: FetchError) => ((error
+  && error.additional
+  && error.additional.body
+  && error.additional.body.message) ? error.additional.body.message : error);
 
 type Props = {
   dashboard: View,
@@ -42,19 +51,32 @@ const DeleteItem = styled.span(({ theme }) => css`
   color: ${theme.colors.variant.danger};
 `);
 
-const DashboardActions = ({ dashboard, refetchDashboards }: Props) => {
-  const [showShareModal, setShowShareModal] = useState(false);
-  const paginationQueryParameter = usePaginationQueryParameter();
-  const pluggableDashboardActions = usePluginEntities('views.components.dashboardActions');
+const usePluggableDashboardActions = (dashboard: View) => {
   const modalRefs = useRef({});
-  const dashboardActions = useMemo(() => pluggableDashboardActions.map(({ component: PluggableDashboardAction, key }) => (
-    <PluggableDashboardAction key={`dashboard-action-${key}`} dashboard={dashboard} modalRef={() => modalRefs.current[key]} />
-  )), [pluggableDashboardActions, dashboard]);
-  const dashboardActionModals = useMemo(() => pluggableDashboardActions
+  const pluggableActions = usePluginEntities('views.components.dashboardActions');
+  const availableActions = pluggableActions.filter(
+    (perspective) => (perspective.useCondition ? !!perspective.useCondition() : true),
+  );
+  const actions = availableActions.map(({ component: PluggableDashboardAction, key }) => (
+    <PluggableDashboardAction key={`dashboard-action-${key}`}
+                              dashboard={dashboard}
+                              modalRef={() => modalRefs.current[key]} />
+  ));
+
+  const actionModals = availableActions
     .filter(({ modal }) => !!modal)
     .map(({ modal: ActionModal, key }) => (
-      <ActionModal key={`dashboard-action-modal-${key}`} dashboard={dashboard} ref={(r) => { modalRefs.current[key] = r; }} />
-    )), [pluggableDashboardActions, dashboard]);
+      <ActionModal key={`dashboard-action-modal-${key}`}
+                   dashboard={dashboard}
+                   ref={(r) => { modalRefs.current[key] = r; }} />
+    ));
+
+  return ({ actions, actionModals });
+};
+
+const DashboardDeleteAction = ({ dashboard, refetchDashboards }: { dashboard: View, refetchDashboards: () => void }) => {
+  const { deselectEntity } = useSelectedEntities();
+  const paginationQueryParameter = usePaginationQueryParameter();
 
   const onDashboardDelete = useCallback(async () => {
     const pluginDashboardDeletionHooks = PluginStore.exports('views.hooks.confirmDeletingDashboard');
@@ -62,11 +84,36 @@ const DashboardActions = ({ dashboard, refetchDashboards }: Props) => {
     const result = await iterateConfirmationHooks([...pluginDashboardDeletionHooks, defaultDashboardDeletionHook], dashboard);
 
     if (result) {
-      await ViewManagementActions.delete(dashboard);
-      refetchDashboards();
-      paginationQueryParameter.resetPage();
+      ViewManagementActions.delete(dashboard).then(() => {
+        UserNotification.success(`Deleting dashboard "${dashboard.title}" was successful!`, 'Success!');
+        deselectEntity(dashboard.id);
+        refetchDashboards();
+        paginationQueryParameter.resetPage();
+      }).catch((error) => {
+        UserNotification.error(`Deleting dashboard failed: ${_extractErrorMessage(error)}`, 'Error!');
+      });
     }
-  }, [dashboard, refetchDashboards, paginationQueryParameter]);
+  }, [dashboard, deselectEntity, refetchDashboards, paginationQueryParameter]);
+
+  return (
+    <MenuItem onClick={onDashboardDelete}>
+      <DeleteItem role="button">Delete</DeleteItem>
+    </MenuItem>
+  );
+};
+
+const DashboardActions = ({ dashboard, refetchDashboards }: Props) => {
+  const [showShareModal, setShowShareModal] = useState(false);
+  const { actions: pluggableActions, actionModals: pluggableActionModals } = usePluggableDashboardActions(dashboard);
+  const currentUser = useCurrentUser();
+
+  const moreActions = [
+    pluggableActions.length ? pluggableActions : null,
+    pluggableActions.length ? <MenuItem divider key="divider" /> : null,
+    isAnyPermitted(currentUser.permissions, [`view:edit:${dashboard.id}`, 'view:edit'])
+      ? <DashboardDeleteAction dashboard={dashboard} refetchDashboards={refetchDashboards} key="delete-action" />
+      : null,
+  ].filter(Boolean);
 
   return (
     <>
@@ -74,19 +121,11 @@ const DashboardActions = ({ dashboard, refetchDashboards }: Props) => {
                    entityId={dashboard.id}
                    entityType="dashboard"
                    onClick={() => setShowShareModal(true)} />
-      <OverlayDropdownButton bsSize="xsmall" title={MORE_ACTIONS_TITLE} buttonTitle={MORE_ACTIONS_HOVER_TITLE}>
-        {dashboardActions.length > 0 ? (
-          <>
-            {dashboardActions}
-            <MenuItem divider />
-          </>
-        ) : null}
-        <IfPermitted permissions={[`view:edit:${dashboard.id}`, 'view:edit']} anyPermissions>
-          <MenuItem onClick={onDashboardDelete}>
-            <DeleteItem role="button">Delete</DeleteItem>
-          </MenuItem>
-        </IfPermitted>
-      </OverlayDropdownButton>
+      {!!moreActions.length && (
+        <MoreActions>
+          {moreActions}
+        </MoreActions>
+      )}
       {showShareModal && (
         <EntityShareModal entityId={dashboard.id}
                           entityType="dashboard"
@@ -94,7 +133,7 @@ const DashboardActions = ({ dashboard, refetchDashboards }: Props) => {
                           entityTitle={dashboard.title}
                           onClose={() => setShowShareModal(false)} />
       )}
-      {dashboardActionModals}
+      {pluggableActionModals}
     </>
   );
 };

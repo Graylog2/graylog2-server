@@ -18,7 +18,8 @@ package org.graylog.plugins.pipelineprocessor.parser;
 
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Collectors;

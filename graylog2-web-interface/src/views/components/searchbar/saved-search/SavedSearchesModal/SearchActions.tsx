@@ -22,8 +22,15 @@ import { Button } from 'components/bootstrap';
 import { IfPermitted, ShareButton } from 'components/common';
 import type View from 'views/logic/views/View';
 import EntityShareModal from 'components/permissions/EntityShareModal';
+import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 
-const onDelete = (e: React.MouseEvent<HTMLButtonElement>, savedSearch: View, deleteSavedSearch: (search: View) => Promise<View>, activeSavedSearchId: string, refetch: () => void) => {
+const onDelete = (
+  e: React.MouseEvent<HTMLButtonElement>,
+  savedSearch: View,
+  deleteSavedSearch: (search: View) => Promise<View>,
+  activeSavedSearchId: string, refetch: () => void,
+  deselectEntity: (searchId: string) => void,
+) => {
   e.stopPropagation();
 
   // eslint-disable-next-line no-alert
@@ -32,6 +39,8 @@ const onDelete = (e: React.MouseEvent<HTMLButtonElement>, savedSearch: View, del
       if (savedSearch.id !== activeSavedSearchId) {
         refetch();
       }
+
+      deselectEntity(savedSearch.id);
     });
   }
 };
@@ -44,6 +53,7 @@ type Props = {
 }
 
 const SearchActions = ({ search, onDeleteSavedSearch, activeSavedSearchId, refetch }: Props) => {
+  const { deselectEntity } = useSelectedEntities();
   const [showShareModal, setShowShareModal] = useState(false);
   const toggleEntityShareModal = useCallback(() => {
     setShowShareModal((cur) => !cur);
@@ -56,7 +66,7 @@ const SearchActions = ({ search, onDeleteSavedSearch, activeSavedSearchId, refet
                    entityType="search"
                    onClick={() => setShowShareModal(true)} />
       <IfPermitted permissions={[`view:edit:${search.id}`, 'view:edit']} anyPermissions>
-        <Button onClick={(e) => onDelete(e, search, onDeleteSavedSearch, activeSavedSearchId, refetch)}
+        <Button onClick={(e) => onDelete(e, search, onDeleteSavedSearch, activeSavedSearchId, refetch, deselectEntity)}
                 role="button"
                 bsSize="xsmall"
                 bsStyle="danger"

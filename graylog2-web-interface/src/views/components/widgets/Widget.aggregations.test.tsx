@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import * as Immutable from 'immutable';
-import { render, waitFor, fireEvent, screen, within } from 'wrappedTestingLibrary';
+import { render, waitFor, screen, within, act } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
@@ -29,7 +29,7 @@ import WidgetModel from 'views/logic/widgets/Widget';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import View from 'views/logic/views/View';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
-import DataTable from 'views/components/datatable/DataTable';
+import DataTable from 'views/components/datatable';
 import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/DataTableVisualizationConfig';
 import { asMock } from 'helpers/mocking';
 import useViewType from 'views/hooks/useViewType';
@@ -130,9 +130,14 @@ describe('Aggregation Widget', () => {
 
   const findWidgetConfigSubmitButton = () => screen.findByRole('button', { name: /update preview/i });
 
-  const submitWidgetChanges = () => {
-    const saveButton = screen.getByRole('button', { name: /update widget/i });
-    fireEvent.click(saveButton);
+  const submitWidgetChanges = async () => {
+    const saveButton = await screen.findByRole('button', { name: /update widget/i });
+
+    await waitFor(() => {
+      expect(saveButton).not.toBeDisabled();
+    });
+
+    await userEvent.click(saveButton);
   };
 
   describe('on a dashboard', () => {
@@ -155,27 +160,39 @@ describe('Aggregation Widget', () => {
 
       // Change widget aggregation elements
       const addMetricButton = await screen.findByRole('button', { name: 'Add a Metric' });
-      fireEvent.click(addMetricButton);
+      await userEvent.click(addMetricButton);
 
       const nameInput = await screen.findByLabelText(/Name/);
-      userEvent.type(nameInput, 'Metric name');
+      await userEvent.type(nameInput, 'Metric name');
 
       const metricFieldSelect = await screen.findByLabelText('Select a function');
-      await selectEvent.openMenu(metricFieldSelect);
-      await selectEvent.select(metricFieldSelect, 'Count', selectEventConfig);
+
+      await act(async () => {
+        await selectEvent.openMenu(metricFieldSelect);
+      });
+
+      await act(async () => {
+        await selectEvent.select(metricFieldSelect, 'Count', selectEventConfig);
+      });
 
       await findWidgetConfigSubmitButton();
 
       // Change widget search controls
       const streamsSelect = await screen.findByLabelText('Select streams the search should include. Searches in all streams if empty.');
-      await selectEvent.openMenu(streamsSelect);
-      await selectEvent.select(streamsSelect, 'Stream 1', selectEventConfig);
+
+      await act(async () => {
+        await selectEvent.openMenu(streamsSelect);
+      });
+
+      await act(async () => {
+        await selectEvent.select(streamsSelect, 'Stream 1', selectEventConfig);
+      });
 
       await screen.findByRole('button', {
         name: /perform search \(changes were made after last search execution\)/i,
       });
 
-      submitWidgetChanges();
+      await submitWidgetChanges();
 
       await waitFor(() => expect(updateWidget).toHaveBeenCalledWith(expect.any(String), updatedWidget));
     }, testTimeout);
@@ -195,19 +212,20 @@ describe('Aggregation Widget', () => {
 
       // Change widget time range
       const timeRangePickerButton = await screen.findByLabelText('Open Time Range Selector');
-      userEvent.click(timeRangePickerButton);
+      await userEvent.click(timeRangePickerButton);
 
       const absoluteTabButton = await screen.findByRole('tab', { name: /absolute/i });
-      userEvent.click(absoluteTabButton);
+      jest.setSystemTime(mockedUnixTime);
+      await userEvent.click(absoluteTabButton);
 
       const applyTimeRangeChangesButton = await screen.findByRole('button', { name: 'Update time range' });
-      userEvent.click(applyTimeRangeChangesButton);
+      await userEvent.click(applyTimeRangeChangesButton);
 
       const timeRangeDisplay = await screen.findByLabelText('Search Time Range, Opens Time Range Selector On Click');
       await within(timeRangeDisplay).findByText('2020-01-01 00:55:00.000');
 
       // Submit all changes
-      submitWidgetChanges();
+      await submitWidgetChanges();
 
       await waitFor(() => expect(updateWidget).toHaveBeenCalledWith(expect.any(String), updatedWidget));
     }, testTimeout);
@@ -228,18 +246,24 @@ describe('Aggregation Widget', () => {
 
       // Change widget aggregation elements
       const addMetricButton = await screen.findByRole('button', { name: 'Add a Metric' });
-      fireEvent.click(addMetricButton);
+      await userEvent.click(addMetricButton);
 
       const nameInput = await screen.findByLabelText(/Name/);
-      userEvent.type(nameInput, 'Metric name');
+      await userEvent.type(nameInput, 'Metric name');
 
-      const metricFieldSelect = screen.getByLabelText('Select a function');
-      await selectEvent.openMenu(metricFieldSelect);
-      await selectEvent.select(metricFieldSelect, 'Count', selectEventConfig);
+      const metricFieldSelect = await screen.findByLabelText('Select a function');
+
+      await act(async () => {
+        await selectEvent.openMenu(metricFieldSelect);
+      });
+
+      await act(async () => {
+        await selectEvent.select(metricFieldSelect, 'Count', selectEventConfig);
+      });
 
       await findWidgetConfigSubmitButton();
 
-      submitWidgetChanges();
+      await submitWidgetChanges();
 
       await waitFor(() => expect(updateWidget).toHaveBeenCalledWith(expect.any(String), updatedWidget));
     }, testTimeout);

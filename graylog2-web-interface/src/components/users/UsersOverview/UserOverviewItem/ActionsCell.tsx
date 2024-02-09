@@ -22,7 +22,7 @@ import { LinkContainer } from 'components/common/router';
 import type UserOverview from 'logic/users/UserOverview';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import Routes from 'routing/Routes';
-import { Button, Tooltip, DropdownButton, MenuItem, ButtonToolbar } from 'components/bootstrap';
+import { Button, DropdownButton, MenuItem, ButtonToolbar } from 'components/bootstrap';
 import { OverlayTrigger, IfPermitted } from 'components/common';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -56,14 +56,14 @@ const EditTokensAction = ({
 
 const ReadOnlyActions = ({ user }: { user: UserOverview }) => {
   const tooltip = (
-    <Tooltip id="system-user">System users can only be modified in the Graylog configuration
-      file.
-    </Tooltip>
+    <>
+      System users can only be modified in the Graylog configuration file.
+    </>
   );
 
   return (
     <>
-      <OverlayTrigger placement="left" overlay={tooltip}>
+      <OverlayTrigger placement="left" overlay={tooltip} trigger={['hover']}>
         <Button bsSize="xs" bsStyle="info" disabled>System user</Button>
       </OverlayTrigger>
       <EditTokensAction user={user} wrapperComponent={Button} />

@@ -20,11 +20,12 @@ import { useCallback, useMemo } from 'react';
 
 import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
 
+import useSelectedEntities from './hooks/useSelectedEntities';
 import TableCell from './TableCell';
 import type { ColumnRenderersByAttribute, Column, EntityBase } from './types';
 import RowCheckbox from './RowCheckbox';
 
-const ActionsCell = styled.th`
+const ActionsCell = styled.td`
   float: right;
   text-align: right;
 
@@ -45,12 +46,9 @@ type Props<Entity extends EntityBase> = {
   displayActions: boolean,
   entity: Entity,
   index: number,
-  isSelected: boolean,
-  onToggleEntitySelect: (entityId: string) => void,
-  rowActions?: (entity: Entity, setSelectedEntities: React.Dispatch<React.SetStateAction<Array<string>>>) => React.ReactNode,
+  rowActions?: (entity: Entity) => React.ReactNode,
   entityAttributesAreCamelCase: boolean,
-  isEntitySelectable: (entity: Entity) => boolean
-  setSelectedEntities: React.Dispatch<React.SetStateAction<Array<string>>>
+  isEntitySelectable: (entity: Entity) => boolean,
 };
 
 const TableRow = <Entity extends EntityBase>({
@@ -59,21 +57,25 @@ const TableRow = <Entity extends EntityBase>({
   displaySelect,
   displayActions,
   entity,
-  isSelected,
-  onToggleEntitySelect,
   rowActions,
   index,
   actionsRef,
   entityAttributesAreCamelCase,
   isEntitySelectable,
-  setSelectedEntities,
 }: Props<Entity>) => {
-  const toggleRowSelect = useCallback(
-    () => onToggleEntitySelect(entity.id),
-    [entity.id, onToggleEntitySelect],
-  );
+  const { selectedEntities, setSelectedEntities } = useSelectedEntities();
+  const isSelected = !!selectedEntities?.includes(entity.id);
+  const toggleRowSelect = useCallback(() => {
+    setSelectedEntities(((cur) => {
+      if (cur.includes(entity.id)) {
+        return cur.filter((id) => id !== entity.id);
+      }
 
-  const actionButtons = displayActions ? <ButtonToolbar>{rowActions(entity, setSelectedEntities)}</ButtonToolbar> : null;
+      return [...cur, entity.id];
+    }));
+  }, [entity.id, setSelectedEntities]);
+
+  const actionButtons = displayActions ? <ButtonToolbar>{rowActions(entity)}</ButtonToolbar> : null;
 
   const isSelectDisabled = useMemo(() => !(displaySelect && isEntitySelectable(entity)), [displaySelect, entity, isEntitySelectable]);
 

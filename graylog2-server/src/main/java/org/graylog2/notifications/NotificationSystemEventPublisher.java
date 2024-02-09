@@ -26,9 +26,10 @@ import org.graylog.events.processor.systemnotification.SystemNotificationRenderS
 import org.graylog.events.processor.systemnotification.SystemNotificationRenderService.RenderResponse;
 import org.slf4j.Logger;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
+
 import java.time.Duration;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;

@@ -14,8 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { DropdownButton } from 'components/bootstrap';
 
 export type SelectCallback = (eventKey: any) => void;
-export type Sizes = React.ComponentProps<typeof DropdownButton>['bsSize'];
-export type BsSize = Sizes;
+export type BsSize = 'xs' | 'xsmall' | 'sm' | 'small' | 'medium' | 'lg' | 'large';

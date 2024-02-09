@@ -21,8 +21,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -44,20 +46,20 @@ public class DecoratorResolver {
 
     public List<SearchResponseDecorator> searchResponseDecoratorsForStream(String streamId) {
         return this.decoratorService.findForStream(streamId)
-            .stream()
-            .sorted()
-            .map(this::instantiateSearchResponseDecorator)
-            .filter(Objects::nonNull)
-            .collect(Collectors.toList());
+                .stream()
+                .sorted()
+                .map(this::instantiateSearchResponseDecorator)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     public List<SearchResponseDecorator> searchResponseDecoratorsForGlobal() {
         return this.decoratorService.findForGlobal()
-            .stream()
-            .sorted()
-            .map(this::instantiateSearchResponseDecorator)
-            .filter(Objects::nonNull)
-            .collect(Collectors.toList());
+                .stream()
+                .sorted()
+                .map(this::instantiateSearchResponseDecorator)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     @Nullable
@@ -66,7 +68,7 @@ public class DecoratorResolver {
         if (factory != null) {
             try {
                 return factory.create(decorator);
-            } catch(Exception e) {
+            } catch (Exception e) {
                 LOG.error("Unable to create <{}> decorator", factory.getDescriptor().getName(), e);
             }
         }

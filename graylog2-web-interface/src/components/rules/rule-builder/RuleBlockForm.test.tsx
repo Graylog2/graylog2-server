@@ -62,7 +62,7 @@ describe('RuleBlockForm', () => {
   it('renders a select with all functions as options', async () => {
     render(comp());
 
-    const select = screen.getByRole('combobox');
+    const select = await screen.findByRole('combobox');
 
     await selectEvent.openMenu(select);
 
@@ -72,7 +72,7 @@ describe('RuleBlockForm', () => {
   it('calls onSelect handler when selecting an option', async () => {
     render(comp());
 
-    const select = screen.getByRole('combobox');
+    const select = await screen.findByRole('combobox');
 
     await selectEvent.openMenu(select);
     await selectEvent.select(select, 'set_field');

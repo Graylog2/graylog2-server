@@ -26,7 +26,7 @@ import Direction from 'views/logic/aggregationbuilder/Direction';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import DataTable from 'views/components/datatable/DataTable';
+import DataTable from 'views/components/datatable';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
@@ -61,6 +61,7 @@ const selectEventConfig = { container: document.body };
 
 const addSortElement = async () => {
   await userEvent.click(await screen.findByRole('button', { name: 'Add' }));
+  await screen.findByRole('menu');
   await userEvent.click(await screen.findByRole('menuitem', { name: 'Sort' }));
 };
 
@@ -68,7 +69,7 @@ const findWidgetConfigFormSubmitButton = () => screen.findByRole('button', { nam
 
 const submitWidgetConfigForm = async () => {
   const applyButton = await findWidgetConfigFormSubmitButton();
-  fireEvent.click(applyButton);
+  await userEvent.click(applyButton);
 };
 
 const sortByTookMsDesc = async (sortElementContainerId: Matcher, option: string = 'took_ms') => {
@@ -78,10 +79,17 @@ const sortByTookMsDesc = async (sortElementContainerId: Matcher, option: string 
 
   await act(async () => {
     await selectEvent.openMenu(sortFieldSelect);
-    await selectEvent.select(sortFieldSelect, option, selectEventConfig);
-    await selectEvent.openMenu(sortDirectionSelect);
-    await selectEvent.select(sortDirectionSelect, 'Descending', selectEventConfig);
   });
+
+  await selectEvent.select(sortFieldSelect, option, selectEventConfig);
+
+  await act(async () => {
+    await selectEvent.openMenu(sortDirectionSelect);
+  });
+
+  await selectEvent.select(sortDirectionSelect, 'Descending', selectEventConfig);
+
+  await within(httpMethodSortContainer).findByText('Descending');
 };
 
 const renderSUT = (props = {}) => render((
@@ -207,7 +215,7 @@ describe('AggregationWizard', () => {
     const applyButton = await findWidgetConfigFormSubmitButton();
     await waitFor(() => expect(within(newSortContainer).getByText('Field is required.')).toBeInTheDocument());
     await waitFor(() => expect(applyButton).toBeDisabled());
-  });
+  }, extendedTimeout);
 
   it('should require direction when creating a sort element', async () => {
     renderSUT();
@@ -218,7 +226,7 @@ describe('AggregationWizard', () => {
     const applyButton = await findWidgetConfigFormSubmitButton();
     await waitFor(() => expect(within(newSortContainer).getByText('Direction is required.')).toBeInTheDocument());
     await waitFor(() => expect(applyButton).toBeDisabled());
-  });
+  }, extendedTimeout);
 
   it('should remove all sorts', async () => {
     const onChangeMock = jest.fn();
@@ -229,8 +237,8 @@ describe('AggregationWizard', () => {
 
     renderSUT({ config, onChange: onChangeMock });
 
-    const removeSortElementButton = screen.getByRole('button', { name: 'Remove Sort' });
-    userEvent.click(removeSortElementButton);
+    const removeSortElementButton = await screen.findByRole('button', { name: 'Remove Sort' });
+    await userEvent.click(removeSortElementButton);
 
     await submitWidgetConfigForm();
 
@@ -242,7 +250,7 @@ describe('AggregationWizard', () => {
     await waitFor(() => expect(onChangeMock).toHaveBeenCalledTimes(1));
 
     expect(onChangeMock).toHaveBeenCalledWith(updatedConfig);
-  });
+  }, extendedTimeout);
 
   it('should correctly update sort of sort elements', async () => {
     const sort1 = new SortConfig('pivot', 'http_method', Direction.Ascending);

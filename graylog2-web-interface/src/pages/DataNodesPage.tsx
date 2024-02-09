@@ -18,11 +18,15 @@ import React from 'react';
 
 import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
+import DataNodesPageNavigation from 'components/datanode/DataNodePageNavigation';
+import DataNodeList from 'components/datanode/DataNodeList/DataNodeList';
+import { IndexerClusterHealth } from 'components/indexers';
+import HideOnCloud from 'util/conditional/HideOnCloud';
 import DocsHelper from 'util/DocsHelper';
-import DataNodeConfiguration from 'components/datanode/DataNodeConfiguration/DataNodeConfiguration';
 
 const DataNodesPage = () => (
   <DocumentTitle title="Data Nodes">
+    <DataNodesPageNavigation />
     <PageHeader title="Data Nodes"
                 documentationLink={{
                   title: 'Data Nodes documentation',
@@ -32,9 +36,12 @@ const DataNodesPage = () => (
         Graylog data nodes offer a better integration with Graylog and simplify future updates. They allow you to index and search through all the messages in your Graylog message database.
       </span>
     </PageHeader>
+    <HideOnCloud>
+      <IndexerClusterHealth minimal />
+    </HideOnCloud>
     <Row className="content">
       <Col md={12}>
-        <DataNodeConfiguration />
+        <DataNodeList />
       </Col>
     </Row>
   </DocumentTitle>

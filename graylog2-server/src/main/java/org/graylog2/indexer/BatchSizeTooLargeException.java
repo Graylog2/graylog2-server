@@ -16,10 +16,6 @@
  */
 package org.graylog2.indexer;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
 public class BatchSizeTooLargeException extends ElasticsearchException {
     public BatchSizeTooLargeException(String errorMessage) {
         super(errorMessage);
