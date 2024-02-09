@@ -40,6 +40,7 @@ const TargetContainer = styled.div`
 const StyledTable = styled(Table)<{ $stickyHeader: boolean }>(({ theme }) => css`
   margin-bottom: 0;
   background-color: transparent;
+
   > tbody td {
     background-color: ${theme.colors.global.contentBackground};
     color: ${theme.utils.contrastingColor(theme.colors.global.contentBackground)};
