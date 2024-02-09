@@ -60,7 +60,7 @@ import static org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.Qu
 
 public class MoreSearchAdapterES7 implements MoreSearchAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(MoreSearchAdapterES7.class);
-    public static final IndicesOptions INDICES_OPTIONS = IndicesOptions.fromOptions(false, false, true, false);
+    public static final IndicesOptions INDICES_OPTIONS = IndicesOptions.LENIENT_EXPAND_OPEN;
     private final ElasticsearchClient client;
     private final Boolean allowLeadingWildcard;
     private final SortOrderMapper sortOrderMapper;
@@ -114,7 +114,7 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Query:\n{}", searchSourceBuilder.toString(new ToXContent.MapParams(Collections.singletonMap("pretty", "true"))));
-            LOG.debug("Execute search: {}", searchRequest.toString());
+            LOG.debug("Execute search: {}", searchRequest);
         }
 
         final SearchResponse searchResult = client.search(searchRequest, "Unable to perform search query");

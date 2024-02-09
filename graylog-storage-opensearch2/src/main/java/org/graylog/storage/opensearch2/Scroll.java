@@ -18,6 +18,7 @@ package org.graylog.storage.opensearch2;
 
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.action.support.IndicesOptions;
 import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
 import org.graylog2.indexer.results.ChunkedResult;
 import org.graylog2.indexer.results.MultiChunkResultRetriever;
@@ -53,6 +54,7 @@ public class Scroll implements MultiChunkResultRetriever {
     private SearchRequest scrollBuilder(SearchSourceBuilder query, Set<String> indices) {
         return new SearchRequest(indices.toArray(new String[0]))
                 .source(query)
-                .scroll(DEFAULT_SCROLLTIME);
+                .scroll(DEFAULT_SCROLLTIME)
+                .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN);
     }
 }
