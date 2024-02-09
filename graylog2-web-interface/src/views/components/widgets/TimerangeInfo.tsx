@@ -41,8 +41,12 @@ const Wrapper = styled.div(({ theme }) => css`
   display: flex;
   gap: 5px;
   align-items: center;
+  margin-right: 10px;
 `);
 
+const StyledIcon = styled(Icon)(({ theme }) => css`
+  color: ${theme.colors.gray[60]}
+`);
 const getEffectiveWidgetTimerange = (result, activeQuery, searchTypeId) => result?.results?.[activeQuery]?.searchTypes[searchTypeId]?.effective_timerange;
 
 const TimerangeInfo = ({ className, widget, activeQuery, widgetId }: Props) => {
@@ -70,7 +74,7 @@ const TimerangeInfo = ({ className, widget, activeQuery, widgetId }: Props) => {
         <TextOverflowEllipsis titleOverride={effectiveTimerangeString}>
           {globalTimerangeString || configuredTimerange}
         </TextOverflowEllipsis>
-        <Icon name="question-circle" />
+        <StyledIcon name="question-circle" />
       </Wrapper>
     </SearchQueryExecutionInfoHelper>
   );

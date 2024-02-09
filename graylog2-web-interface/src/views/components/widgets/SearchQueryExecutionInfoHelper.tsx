@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import type { PropsWithChildren } from 'react';
 import { useCallback, useMemo, useState } from 'react';
 import numeral from 'numeral';
@@ -37,9 +37,14 @@ const TargetContainer = styled.div`
   cursor: pointer;
 `;
 
-const StyledTable = styled(Table)`
-  margin-bottom: 0
-`;
+const StyledTable = styled(Table)<{ $stickyHeader: boolean }>(({ theme }) => css`
+  margin-bottom: 0;
+  background-color: transparent;
+  > tbody td {
+    background-color: ${theme.colors.global.contentBackground};
+    color: ${theme.utils.contrastingColor(theme.colors.global.contentBackground)};
+  }
+`);
 
 type WidgetExecutionData = {
   total: number,
