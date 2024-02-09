@@ -49,10 +49,10 @@ const StyledIcon = styled(Icon)<{ $type: Type, $displayLeftMargin: boolean }>(({
 const iconName = (type: Type) => {
   switch (type) {
     case 'error':
-      return 'circle-exclamation';
+      return 'error';
     case 'info':
     default:
-      return 'question-circle';
+      return 'help';
   }
 };
 

@@ -54,14 +54,14 @@ const stepIcon = (stepKey: ConfigurationStep, activeStepKey: ConfigurationStep, 
 
   if (stepIndex < activeStepIndex || activeStepKey === CONFIGURATION_STEPS.CONFIGURATION_FINISHED.key) {
     return {
-      name: 'circle-check',
+      name: 'check_circle',
       color: theme.colors.variant.success,
     };
   }
 
   if (stepKey === activeStepKey) {
     return {
-      name: 'circle-exclamation',
+      name: 'error',
       color: theme.colors.variant.info,
     };
   }

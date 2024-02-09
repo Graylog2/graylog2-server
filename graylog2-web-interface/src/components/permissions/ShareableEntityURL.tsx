@@ -72,7 +72,7 @@ const ShareableEntityURL = ({ entityGRN }: Props) => {
             <InputGroupAddon>
               <StyledClipboardButton text={entityUrl}
                                      buttonTitle="Copy parameter to clipboard"
-                                     title={<Icon name="copy" fixedWidth />} />
+                                     title={<Icon name="content_copy" fixedWidth />} />
             </InputGroupAddon>
           </InputGroup>
         </FormGroup>

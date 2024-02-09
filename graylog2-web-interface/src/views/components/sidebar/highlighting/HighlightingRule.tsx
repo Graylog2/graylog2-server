@@ -150,11 +150,11 @@ const HighlightingRule = forwardRef<HTMLDivElement, Props>(({
           <strong>{field}</strong> {ConditionLabelMap[condition]} <i>&quot;{String(value)}&quot;</i>.
         </RuleContainer>
         <ButtonContainer>
-          <IconButton title="Edit this Highlighting Rule" name="edit" onClick={() => setShowForm(true)} />
-          <IconButton title="Remove this Highlighting Rule" name="trash-alt" onClick={_onDelete} />
+          <IconButton title="Edit this Highlighting Rule" name="edit_square" onClick={() => setShowForm(true)} />
+          <IconButton title="Remove this Highlighting Rule" name="delete" onClick={_onDelete} />
           {dragHandleProps && (
             <DragHandle {...dragHandleProps}>
-              <Icon name="bars" />
+              <Icon name="drag_handle" />
             </DragHandle>
           )}
         </ButtonContainer>

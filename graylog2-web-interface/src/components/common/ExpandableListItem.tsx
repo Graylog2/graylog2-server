@@ -244,7 +244,7 @@ class ExpandableListItem extends React.Component<Props, State> {
             <Toggle>
               <IconStack className="fa-stack" tabIndex={0} onClick={this._toggleExpand}>
                 <Icon name="circle" className="fa-stack-1x" />
-                <Icon name={`angle-${expanded ? 'down' : 'up'}`} className="fa-stack-1x" />
+                <Icon name={`keyboard_arrow_${expanded ? 'down' : 'up'}`} className="fa-stack-1x" />
               </IconStack>
             </Toggle>
           )}

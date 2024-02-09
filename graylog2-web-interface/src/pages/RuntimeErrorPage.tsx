@@ -67,7 +67,7 @@ const RuntimeErrorPage = ({ error, componentStack }: Props) => {
         <dt>
           <pre className="content" id="render-error">
             <div className="pull-right">
-              <ClipboardButton title={<Icon name="copy" fixedWidth />}
+              <ClipboardButton title={<Icon name="content_copy" fixedWidth />}
                                bsSize="sm"
                                text={`${error.message}\n${errorDetails}`}
                                buttonTitle="Copy error details to clipboard" />

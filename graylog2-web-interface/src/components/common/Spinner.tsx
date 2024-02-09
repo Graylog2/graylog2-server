@@ -52,7 +52,7 @@ Spinner.propTypes = {
 };
 
 Spinner.defaultProps = {
-  name: 'spinner',
+  name: 'progress_activity',
   text: 'Loading...',
   delay: 200,
 };

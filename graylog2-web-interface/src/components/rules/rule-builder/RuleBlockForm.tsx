@@ -208,7 +208,7 @@ const RuleBlockForm = ({
                                         width={700}
                                         overlay={<RuleHelperTable entries={[selectedBlockDict]} expanded={{ [selectedBlockDict.name]: true }} />}>
                           <Button bsStyle="link">
-                            <Icon name="question-circle"
+                            <Icon name="help"
                                   fixedWidth
                                   title="Function Syntax Help"
                                   data-testid="funcSyntaxHelpIcon" />

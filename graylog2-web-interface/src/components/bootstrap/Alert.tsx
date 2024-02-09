@@ -39,11 +39,11 @@ const iconNameForType = (bsStyle: ColorVariant) => {
   switch (bsStyle) {
     case 'warning':
     case 'danger':
-      return 'exclamation-triangle';
+      return 'error';
     case 'success':
-      return 'circle-check';
+      return 'check_circle';
     default:
-      return 'info-circle';
+      return 'info';
   }
 };
 

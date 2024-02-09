@@ -39,10 +39,10 @@ const AggregationConditionsFormSummary = (props) => {
     <div>
       <StyledPanel header="Condition summary">
         {expressionValidation.isValid
-          ? <p className="text-success"><Icon name="check-square" />&nbsp;Condition is valid</p>
+          ? <p className="text-success"><Icon name="check_box" />&nbsp;Condition is valid</p>
           : (
             <p className="text-danger">
-              <Icon name="exclamation-triangle" />&nbsp;Condition is not valid
+              <Icon name="warning" />&nbsp;Condition is not valid
               <StyledButton bsSize="xsmall" onClick={toggleShowValidation}>
                 {showInlineValidation ? 'Hide errors' : 'Show errors'}
               </StyledButton>

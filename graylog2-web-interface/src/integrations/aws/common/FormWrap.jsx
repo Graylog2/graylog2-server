@@ -30,7 +30,7 @@ export const ErrorMessage = ({ fullMessage, niceMessage }) => {
       {niceMessage
         && (
           <ErrorToggleInfo onClick={() => toggleExpanded(!expanded)} expanded={expanded}>
-            More Info <i className="fa fa-chevron-right" />
+            More Info <i className="fa fa-keyboard_arrow_right" />
           </ErrorToggleInfo>
         )}
     </>

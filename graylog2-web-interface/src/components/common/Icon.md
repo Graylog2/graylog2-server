@@ -4,9 +4,9 @@ Examples:
 
 <p><strong>Spinning:</strong> <Icon name="sync" spin /></p>
 
-<p><strong>Pulsing:</strong> <Icon name="spinner" pulse /></p>
+<p><strong>Pulsing:</strong> <Icon name="progress_activity" pulse /></p>
 
-<p><strong>Rotate:</strong> <Icon name="bars" rotate="90" /></p>
+<p><strong>Rotate:</strong> <Icon name="drag_handle" rotate="90" /></p>
 
 <p>
   <strong>Sizeable:</strong>{' '}

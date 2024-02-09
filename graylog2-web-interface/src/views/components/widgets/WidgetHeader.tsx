@@ -62,7 +62,7 @@ type Props = {
 const WidgetHeader = ({ children, onRename, hideDragHandle, title, loading }: Props) => (
   <Container>
     <Col>
-      {hideDragHandle || <span className="widget-drag-handle" title={`Drag handle for ${title}`}><WidgetDragHandle name="bars" /></span>}
+      {hideDragHandle || <span className="widget-drag-handle" title={`Drag handle for ${title}`}><WidgetDragHandle name="drag_handle" /></span>}
       <EditableTitle key={title} disabled={!onRename} value={title} onChange={onRename} />
       {loading && <LoadingSpinner text="" delay={0} />}
     </Col>

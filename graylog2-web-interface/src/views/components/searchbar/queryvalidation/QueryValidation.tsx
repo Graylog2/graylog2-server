@@ -207,7 +207,7 @@ const QueryValidation = () => {
                                 $clickable
                                 tabIndex={0}
                                 type="button">
-              <ErrorIcon $status={status} name="exclamation-circle" />
+              <ErrorIcon $status={status} name="error" />
             </ExplanationTrigger>
           ) : (
             <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}

@@ -96,12 +96,12 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(({
       {!isEditing && (
         <>
           <DragHandle {...dragHandleProps} data-testid={`${testIdPrefix}-drag-handle`}>
-            <Icon name="bars" />
+            <Icon name="drag_handle" />
           </DragHandle>
           <FieldTitle>{item.title}</FieldTitle>
           <div>
-            <IconButton name="edit" title={`Edit ${item.title} field`} onClick={() => setIsEditing(true)} />
-            <IconButton name="trash-alt" title={`Remove ${item.title} field`} onClick={onRemove} />
+            <IconButton name="edit_square" title={`Edit ${item.title} field`} onClick={() => setIsEditing(true)} />
+            <IconButton name="delete" title={`Remove ${item.title} field`} onClick={onRemove} />
           </div>
         </>
       )}

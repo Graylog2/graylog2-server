@@ -59,7 +59,7 @@ const matchIcon = (os: string) => {
   }
 
   return {
-    iconName: 'question-circle',
+    iconName: 'help',
     iconType: 'solid',
   } as const;
 };

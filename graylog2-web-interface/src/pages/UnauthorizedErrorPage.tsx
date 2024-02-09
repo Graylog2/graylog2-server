@@ -58,7 +58,7 @@ const UnauthorizedErrorPage = ({ error, errorDetails, title, description, locati
         <dd>
           <pre className="content">
             <div className="pull-right">
-              <ClipboardButton title={<Icon name="copy" fixedWidth />}
+              <ClipboardButton title={<Icon name="content_copy" fixedWidth />}
                                bsSize="sm"
                                text={errorMessageString}
                                buttonTitle="Copy error details to clipboard" />

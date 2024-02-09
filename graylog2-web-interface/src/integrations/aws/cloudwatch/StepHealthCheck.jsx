@@ -96,7 +96,7 @@ const StepHealthCheck = ({ onChange, onSubmit }) => {
   }
 
   const knownLog = logData.type === DEFAULT_KINESIS_LOG_TYPE;
-  const iconClass = knownLog ? 'check' : 'exclamation-triangle';
+  const iconClass = knownLog ? 'check_circle' : 'exclamation-triangle';
   const acknowledgment = knownLog ? 'Awesome!' : 'Drats!';
   const bsStyle = knownLog ? 'success' : 'warning';
   const logTypeLabel = KINESIS_LOG_TYPES.find((type) => type.value === logData.type).label;

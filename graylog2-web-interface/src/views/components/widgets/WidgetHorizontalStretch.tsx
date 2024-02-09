@@ -66,7 +66,7 @@ const WidgetHorizontalStretch = ({ onStretch, position, widgetId, widgetType }: 
 
   const { width } = position;
   const stretched = width === Infinity;
-  const icon = stretched ? 'compress' : 'arrows-alt-h';
+  const icon = stretched ? 'compress' : 'width';
   const title = stretched ? 'Compress width' : 'Stretch width';
 
   return (

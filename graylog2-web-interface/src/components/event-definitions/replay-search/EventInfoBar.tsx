@@ -77,7 +77,7 @@ const EventInfoBar = () => {
     <FlatContentRow>
       <Header>
         <Button bsStyle="link" className="btn-text" bsSize="xsmall" onClick={toggleOpen}>
-          <Icon name={`caret-${open ? 'down' : 'right'}`} />&nbsp;
+          <Icon name={`arrow_${open ? 'drop_down' : 'right'}`} />&nbsp;
           {open ? `Hide ${currentTypeText} details` : `Show ${currentTypeText} details`}
         </Button>
       </Header>

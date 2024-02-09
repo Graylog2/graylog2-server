@@ -106,7 +106,7 @@ const UltimatePagination = createUltimatePagination({
 
       return (
         <BootstrapPagination.Ellipsis disabled={isActive} onClick={onClick} title={title} aria-label={title}>
-          <Icon name="ellipsis-h" />
+          <Icon name="more_horiz" />
         </BootstrapPagination.Ellipsis>
       );
     },
@@ -115,7 +115,7 @@ const UltimatePagination = createUltimatePagination({
 
       return (
         <BootstrapPagination.First disabled={isActive} onClick={onClick} title={title} aria-label={title}>
-          <Icon name="angle-double-left" />
+          <Icon name="keyboard_double_arrow_left" />
         </BootstrapPagination.First>
       );
     },
@@ -124,7 +124,7 @@ const UltimatePagination = createUltimatePagination({
 
       return (
         <BootstrapPagination.Prev disabled={isActive} onClick={onClick} title={title} aria-label={title}>
-          <Icon name="angle-left" />
+          <Icon name="keyboard_arrow_left" />
         </BootstrapPagination.Prev>
       );
     },
@@ -133,7 +133,7 @@ const UltimatePagination = createUltimatePagination({
 
       return (
         <BootstrapPagination.Next disabled={isActive} onClick={onClick} title={title} aria-label={title}>
-          <Icon name="angle-right" />
+          <Icon name="keyboard_arrow_right" />
         </BootstrapPagination.Next>
       );
     },
@@ -142,7 +142,7 @@ const UltimatePagination = createUltimatePagination({
 
       return (
         <BootstrapPagination.Last disabled={isActive} onClick={onClick} title={title} aria-label={title}>
-          <Icon name="angle-double-right" />
+          <Icon name="keyboard_double_arrow_right" />
         </BootstrapPagination.Last>
       );
     },

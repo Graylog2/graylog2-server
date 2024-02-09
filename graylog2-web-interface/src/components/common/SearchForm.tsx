@@ -216,7 +216,7 @@ const SearchForm = ({
                          $feedbackContainerWidth={inputFeedbackContainer.current?.scrollWidth} />
             <InputFeedback ref={inputFeedbackContainer}>
               {isLoading && <Spinner text="" />}
-              {(query && typeof onReset === 'function') && <IconButton name="xmark" title="Reset search" onClick={handleReset} />}
+              {(query && typeof onReset === 'function') && <IconButton name="close" title="Reset search" onClick={handleReset} />}
               {queryHelpComponent}
             </InputFeedback>
           </InputContainer>

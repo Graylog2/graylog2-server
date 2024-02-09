@@ -233,7 +233,7 @@ const WidgetActionsMenu = ({
                               parameters={parameters} />
         </IfDashboard>
         {isFocused && (
-          <IconButton name="compress-arrows-alt"
+          <IconButton name="adjust"
                       title="Un-focus widget"
                       onClick={unsetWidgetFocusing} />
         )}
@@ -243,13 +243,13 @@ const WidgetActionsMenu = ({
                                      widgetType={widget.type}
                                      onStretch={onPositionsChange}
                                      position={position} />
-            <IconButton name="expand-arrows-alt"
+            <IconButton name="center_focus_strong"
                         title="Focus this widget"
                         onClick={focusWidget} />
           </>
         )}
 
-        <IconButton name="edit"
+        <IconButton name="edit_square"
                     title="Edit"
                     onClick={toggleEdit} />
 
