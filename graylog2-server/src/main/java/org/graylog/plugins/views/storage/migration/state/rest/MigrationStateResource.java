@@ -31,7 +31,6 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog.plugins.views.storage.migration.state.actions.MigrationActionContext;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachine;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.shared.security.RestPermissions;
@@ -57,12 +56,8 @@ public class MigrationStateResource {
     @ApiOperation(value = "trigger migration step")
     public CurrentStateInformation migrate(@ApiParam(name = "request") @NotNull MigrationStepRequest request,
                                            @Context Response response) {
-        final MigrationActionContext newState = stateMachine.triggerWithContext(request.step(), request.args());
-        return Response.fromResponse(response)
-                .status(newState.hasErrors() ? Response.Status.INTERNAL_SERVER_ERROR : Response.Status.OK)
-                .entity(newState.getResultState())
-                .build()
-                .readEntity(CurrentStateInformation.class);
+        final CurrentStateInformation newState = stateMachine.triggerWithContext(request.step(), request.args());
+        return newState;
     }
 
     @GET

@@ -16,13 +16,13 @@
  */
 package org.graylog.plugins.views.storage.migration.state.machine;
 
-import org.graylog.plugins.views.storage.migration.state.actions.MigrationActionContext;
+import org.graylog.plugins.views.storage.migration.state.rest.CurrentStateInformation;
 
 import java.util.List;
 import java.util.Map;
 
 public interface MigrationStateMachine {
-    MigrationActionContext triggerWithContext(MigrationStep step, Map<String, Object> args);
+    CurrentStateInformation triggerWithContext(MigrationStep step, Map<String, Object> args);
 
     MigrationState trigger(MigrationStep step, Map<String, Object> args);
     MigrationState getState();

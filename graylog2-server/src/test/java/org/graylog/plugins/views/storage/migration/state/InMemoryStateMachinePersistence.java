@@ -16,9 +16,8 @@
  */
 package org.graylog.plugins.views.storage.migration.state;
 
-import com.github.oxo42.stateless4j.delegates.Trace;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationState;
-import org.graylog.plugins.views.storage.migration.state.machine.MigrationStep;
+import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachineContext;
 import org.graylog.plugins.views.storage.migration.state.persistence.DatanodeMigrationConfiguration;
 import org.graylog.plugins.views.storage.migration.state.persistence.DatanodeMigrationPersistence;
 
@@ -27,6 +26,7 @@ import java.util.Optional;
 public class InMemoryStateMachinePersistence implements DatanodeMigrationPersistence {
 
     private MigrationState currentState = MigrationState.NEW;
+    private MigrationStateMachineContext context = MigrationStateMachineContext.create();
 
     @Override
     public Optional<DatanodeMigrationConfiguration> getConfiguration() {
@@ -36,5 +36,15 @@ public class InMemoryStateMachinePersistence implements DatanodeMigrationPersist
     @Override
     public void saveConfiguration(DatanodeMigrationConfiguration configuration) {
         this.currentState = configuration.currentState();
+    }
+
+    @Override
+    public Optional<MigrationStateMachineContext> getStateMachineContext() {
+        return Optional.of(context);
+    }
+
+    @Override
+    public void saveStateMachineContext(MigrationStateMachineContext context) {
+        this.context = context;
     }
 }

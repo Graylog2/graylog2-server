@@ -21,7 +21,7 @@ import org.graylog.plugins.views.storage.migration.state.machine.MigrationStep;
 
 import java.util.List;
 
-public record CurrentStateInformation(MigrationState state, List<MigrationStep> nextSteps, List<String> errors) {
+public record CurrentStateInformation(MigrationState state, List<MigrationStep> nextSteps, String errorMessage) {
 
     public CurrentStateInformation(MigrationState state, List<MigrationStep> nextSteps) {
         this(state, nextSteps, null);
