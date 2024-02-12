@@ -23,6 +23,13 @@ type Props = {
 };
 
 const ExistingDataMigrationQuestion = ({ onStepComplete }: Props) => (
-  <Button bsStyle="primary" bsSize="small" onClick={() => onStepComplete()}>Next</Button>
+  <>
+    Do you want to migrate your existing data?
+    <br />
+    <br />
+    <Button bsStyle="primary" bsSize="small" onClick={() => onStepComplete()}>Migrate Existing Data</Button>&nbsp;&nbsp;
+    <Button bsStyle="primary" bsSize="small" onClick={() => onStepComplete()}>Skip</Button>
+  </>
 );
+
 export default ExistingDataMigrationQuestion;

@@ -31,7 +31,7 @@ const Welcome = ({ onStepComplete } : Props) => {
   return (
     <>
       <h3>Welcome</h3>
-      <p>Using the Remote Re-Indexing will allow you to move the datanode by reindexing the data in your existing cluster to the datanode cluster.</p>
+      <p>Using the Remote Reindexing will allow you to move the datanode by reindexing the data in your existing cluster to the datanode cluster.</p>
       <p>To start please install Data node on every OS/ES node from you previous setup. You can fing more information on how to download and install the data node  <DocumentationLink page="graylog-data-node" text="here" />.</p>
       <MigrationDatanodeList dataNodes={dataNodes} />
       <Button bsStyle="primary" disabled={!dataNodes} bsSize="small" onClick={() => onStepComplete()}>Next</Button>
