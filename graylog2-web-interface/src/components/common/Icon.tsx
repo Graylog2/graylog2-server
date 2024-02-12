@@ -17,9 +17,8 @@
 
 import React from 'react';
 import find from 'lodash/find';
-import type { SizeProp, RotateProp } from '@fortawesome/fontawesome-svg-core';
-
-import 'material-symbols/outlined.css';
+import type { RotateProp } from '@fortawesome/fontawesome-svg-core';
+import styled, { css } from 'styled-components';
 
 import deprecationNotice from 'util/deprecationNotice';
 import loadAsync from 'routing/loadAsync';
@@ -3237,6 +3236,8 @@ export type IconName = 'tamper_detection_off' |
   'pin_invoke' |
   'cleaning';
 
+export type SizeProp = 'xs' | 'sm' | 'lg' | 'xl' | '2x' | '3x' | '4x' | '5x'
+
 const CustomFontAwesomeIcon = loadAsync(() => import('./CustomFontAwesomeIcon'));
 
 type IconTypes = 'brand' | 'regular' | 'solid';
@@ -3275,6 +3276,22 @@ const getPrefixForType = (type: IconTypes) => {
       return 'fas';
   }
 };
+
+const sizeMap = {
+  xs: '.75em',
+  sm: '.875em',
+  lg: '1.25em',
+  xl: '1.5em',
+  '2x': '2em',
+  '3x': '3em',
+  '4x': '4em',
+  '5x': '5em',
+};
+
+const StyledSpan = styled.span<{ $size: string }>(({ theme, $size }) => css`
+  font-variation-settings: 'opsz' 48, 'wght' 700;
+  font-size: ${sizeMap[$size] ?? 'inherit'};
+`);
 
 type Props = {
   className?: string,
@@ -3330,7 +3347,14 @@ const Icon = ({
   const iconName = cleanIconName(name, type);
   const prefix = getPrefixForType(type);
 
-  return <span className={`material-symbols-outlined ${className}`}>{iconName}</span>;
+  return (
+    <StyledSpan className={`material-symbols-outlined ${className}`}
+                data-testid={testId}
+                $size={size}
+                style={style}>
+      {iconName}
+    </StyledSpan>
+  );
 
   return (
     <CustomFontAwesomeIcon className={className}
