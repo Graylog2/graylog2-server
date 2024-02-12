@@ -16,8 +16,6 @@
  */
 package org.graylog.plugins.views.storage.migration.state.actions;
 
-import java.util.Map;
-
 /**
  * Set of callbacks used during the migration in different states.
  */
@@ -42,5 +40,11 @@ public interface MigrationActions extends WithArgs {
     boolean caDoesNotExist();
     boolean removalPolicyDoesNotExist();
     boolean caAndRemovalPolicyExist();
+
+    void provisionDataNodes();
+
+    boolean provisioningFinished();
+
     void resetMigration();
+
 }
