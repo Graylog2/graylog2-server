@@ -261,6 +261,14 @@ public class MigrationStateMachineBuilderTest {
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.FINISHED);
     }
 
+    @Test
+    public void testOnEntryAction() {
+        StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.MIGRATE_EXISTING_DATA);
+        stateMachine.fireInitialTransition();
+        verify(migrationActions).reindexOldData();
+        assertThat(stateMachine.getState()).isEqualTo(MigrationState.MIGRATE_EXISTING_DATA);
+    }
+
     @NotNull
     private StateMachine<MigrationState, MigrationStep> getStateMachine(MigrationState initialState) {
         return MigrationStateMachineBuilder.buildWithTestState(initialState, migrationActions);
