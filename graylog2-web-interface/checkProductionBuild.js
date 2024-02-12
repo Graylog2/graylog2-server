@@ -146,9 +146,11 @@ const pageErrors = [];
 const consoleLogs = [];
 
 const trackEvent = (evt, arr) => {
-  console.error(evt);
-  arr.push(evt);
+  const msg = { type: evt.type(), message: evt.text(), stack: evt.stackTrace() };
+  arr.push(msg);
 };
+
+const formatLog = (msg) => `${msg.type}: ${msg.message}`;
 
 const pagePromise = loadPage(url, (msg) => trackEvent(msg, pageErrors), (msg) => trackEvent(msg, consoleLogs));
 
@@ -162,12 +164,12 @@ pagePromise
 
     if (pageErrors.length > 0) {
       console.log('Errors:');
-      console.log(pageErrors);
+      console.log(pageErrors.map(formatLog).join('\n'));
     }
 
     if (consoleLogs.length > 0) {
       console.log('Console Logs:');
-      console.log(consoleLogs);
+      console.log(consoleLogs.map(formatLog).join('\n'));
     }
 
     console.log(`\n${isSuccess ? 'Success' : 'Failure'}: Encountered ${pageErrors.length} errors and ${consoleLogs.length} messages on the console during loading.`);
