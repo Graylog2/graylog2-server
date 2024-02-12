@@ -88,7 +88,7 @@ const Icon = ({
   title,
 }: Props) => {
   return (
-    <StyledSpan className={`material-symbols-outlined ${className}`}
+    <StyledSpan className={`material-symbols-outlined ${className ?? ''}`}
                 data-testid={testId}
                 $size={size}
                 style={style}>

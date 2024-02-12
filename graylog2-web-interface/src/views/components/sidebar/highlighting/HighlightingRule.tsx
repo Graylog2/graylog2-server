@@ -154,7 +154,7 @@ const HighlightingRule = forwardRef<HTMLDivElement, Props>(({
           <IconButton title="Remove this Highlighting Rule" name="delete" onClick={_onDelete} />
           {dragHandleProps && (
             <DragHandle {...dragHandleProps}>
-              <Icon name="drag_handle" />
+              <Icon name="drag_indicator" />
             </DragHandle>
           )}
         </ButtonContainer>

@@ -6,7 +6,7 @@ Examples:
 
 <p><strong>Pulsing:</strong> <Icon name="progress_activity" pulse /></p>
 
-<p><strong>Rotate:</strong> <Icon name="drag_handle" rotate="90" /></p>
+<p><strong>Rotate:</strong> <Icon name="drag_indicator" rotate="90" /></p>
 
 <p>
   <strong>Sizeable:</strong>{' '}

@@ -41,6 +41,7 @@ const StyledPopover = styled.span(({ theme }) => css`
 `);
 
 const StyledIcon = styled(Icon)<{ $type: Type, $displayLeftMargin: boolean }>(({ theme, $type, $displayLeftMargin }) => css`
+  display: inline-flex;
   color: ${$type === 'error' ? theme.colors.variant.danger : 'inherit'};
   margin: 0;
   margin-left: ${$displayLeftMargin ? '0.3em' : 0};

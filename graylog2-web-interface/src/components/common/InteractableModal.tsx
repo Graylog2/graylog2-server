@@ -225,7 +225,7 @@ const InteractableModal = ({
                  className={className}
                  bounds="window">
         <Header ref={dragHandleRef}>
-          <Title><DragBars name="drag_handle" />{title}</Title>
+          <Title><DragBars name="drag_indicator" />{title}</Title>
 
           <CloseButton bsStyle="link" onClick={onClose} bsSize="small" title="Close">
             <Icon name="close" size="lg" />

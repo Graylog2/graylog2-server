@@ -96,7 +96,7 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(({
       {!isEditing && (
         <>
           <DragHandle {...dragHandleProps} data-testid={`${testIdPrefix}-drag-handle`}>
-            <Icon name="drag_handle" />
+            <Icon name="drag_indicator" />
           </DragHandle>
           <FieldTitle>{item.title}</FieldTitle>
           <div>
