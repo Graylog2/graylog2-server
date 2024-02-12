@@ -87,4 +87,9 @@ public class MigrationActionsAdapter implements MigrationActions {
     @Override
     public void provisionDataNodes() {
     }
+
+    @Override
+    public boolean provisioningFinished() {
+        return false;
+    }
 }
