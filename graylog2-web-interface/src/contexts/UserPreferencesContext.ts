@@ -17,7 +17,7 @@
 import * as React from 'react';
 import type { ColorScheme } from '@graylog/sawmill';
 
-import { DEFAULT_THEME_MODE, PREFERENCES_THEME_MODE } from 'theme/constants';
+import type { PREFERENCES_THEME_MODE } from 'theme/constants';
 
 import { singleton } from '../logic/singleton';
 
@@ -26,7 +26,7 @@ export type UserPreferences = {
   updateUnfocussed: boolean,
   searchSidebarIsPinned?: boolean,
   dashboardSidebarIsPinned?: boolean,
-  [PREFERENCES_THEME_MODE]: ColorScheme,
+  [PREFERENCES_THEME_MODE]?: ColorScheme,
 };
 
 export const defaultUserPreferences = {
@@ -34,7 +34,6 @@ export const defaultUserPreferences = {
   updateUnfocussed: false,
   searchSidebarIsPinned: false,
   dashboardSidebarIsPinned: false,
-  [PREFERENCES_THEME_MODE]: DEFAULT_THEME_MODE,
 };
 
 const UserPreferencesContext = React.createContext<UserPreferences>(defaultUserPreferences);
