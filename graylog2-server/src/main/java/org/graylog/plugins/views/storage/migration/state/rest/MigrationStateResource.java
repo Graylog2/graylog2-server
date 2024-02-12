@@ -29,7 +29,6 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachine;
@@ -59,7 +58,7 @@ public class MigrationStateResource {
                                            @Context Response response) {
         final CurrentStateInformation newState = stateMachine.trigger(request.step(), request.args());
         return Response.fromResponse(response)
-                .status(StringUtils.isEmpty(newState.errorMessage()) ? Response.Status.OK : Response.Status.INTERNAL_SERVER_ERROR)
+                .status(newState.hasErrors() ? Response.Status.INTERNAL_SERVER_ERROR : Response.Status.OK)
                 .entity(newState)
                 .build()
                 .readEntity(CurrentStateInformation.class);
