@@ -49,7 +49,9 @@ class MigrationStateMachineTest {
 
             @Override
             public boolean runDirectoryCompatibilityCheck() {
-                //capturedArgs.set(args());
+                String key = "foo";
+                String value = getStateMachineContext().getActionArgument(key, String.class);
+                capturedArgs.set(Map.of(key, value));
                 return true;
             }
 

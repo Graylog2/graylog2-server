@@ -19,6 +19,13 @@ package org.graylog.plugins.views.storage.migration.state.machine;
 import org.graylog.plugins.views.storage.migration.state.actions.MigrationActions;
 
 public class MigrationActionsAdapter implements MigrationActions {
+
+    MigrationStateMachineContext context;
+
+    public MigrationActionsAdapter() {
+        this.context = new MigrationStateMachineContext();
+    }
+
     @Override
     public void resetMigration() {
 
@@ -26,12 +33,12 @@ public class MigrationActionsAdapter implements MigrationActions {
 
     @Override
     public void setStateMachineContext(MigrationStateMachineContext context) {
-
+        this.context = context;
     }
 
     @Override
     public MigrationStateMachineContext getStateMachineContext() {
-        return null;
+        return context;
     }
 
     @Override

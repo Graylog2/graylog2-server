@@ -34,10 +34,9 @@ public class MigrationStateMachineBuilder {
     @NotNull
     private static StateMachineConfig<MigrationState, MigrationStep> configureStates(MigrationActions migrationActions) {
 
-        // All actions should be performed on transaction to make sure that there is no state change on error.
+        // All actions which can fail should be performed on transaction to make sure that there is no state change on error.
         // For async tasks, the task should be triggered in the transition with a following intermediary step which
         // has a guard to continue only on task completion.
-
 
         StateMachineConfig<MigrationState, MigrationStep> config = new StateMachineConfig<>();
 
@@ -123,6 +122,7 @@ public class MigrationStateMachineBuilder {
     private static StateMachine<MigrationState, MigrationStep> fromState(MigrationState state, Trace<MigrationState, MigrationStep> persistence, MigrationActions migrationActions) {
         final StateMachineConfig<MigrationState, MigrationStep> config = configureStates(migrationActions);
         final StateMachine<MigrationState, MigrationStep> stateMachine = new StateMachine<>(state, config);
+        stateMachine.fireInitialTransition(); // asserts that onEntry will be performed when loading persisted state
         stateMachine.setTrace(persistence);
         return stateMachine;
     }

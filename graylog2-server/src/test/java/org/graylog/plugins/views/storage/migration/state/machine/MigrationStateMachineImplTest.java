@@ -110,7 +110,7 @@ class MigrationStateMachineImplTest {
         migrationStateMachine = new MigrationStateMachineImpl(stateMachine, migrationActions, persistenceService);
         CurrentStateInformation context = migrationStateMachine.trigger(MIGRATION_STEP, Map.of("k1", "v1"));
         assertThat(context.hasErrors()).isTrue();
-        assertThat(context.errorMessage()).isEqualTo("Missing argument away for step SELECT_MIGRATION");
+        assertThat(context.errorMessage()).isEqualTo("Argument k1 must be of type class java.lang.Integer");
     }
 
     @Test
@@ -150,7 +150,7 @@ class MigrationStateMachineImplTest {
     private static class TestMigrationActions extends MigrationActionsImpl {
 
         public TestMigrationActions() {
-            super(null, null);
+            super(null, null, null, null);
         }
 
         public void runTestFunction(Consumer<MigrationStateMachineContext> testFunction) {
