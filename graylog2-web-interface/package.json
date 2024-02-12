@@ -57,7 +57,7 @@
     "@openfonts/ubuntu-mono_latin": "^1.44.1",
     "@react-bootstrap/pagination": "^1.0.0",
     "@react-hook/resize-observer": "^1.2.5",
-    "@reduxjs/toolkit": "^1.9.1",
+    "@reduxjs/toolkit": "^2.1.0",
     "@tanstack/query-sync-storage-persister": "^4.33.0",
     "@tanstack/react-query-persist-client": "^4.33.0",
     "ace-builds": "1.32.3",
