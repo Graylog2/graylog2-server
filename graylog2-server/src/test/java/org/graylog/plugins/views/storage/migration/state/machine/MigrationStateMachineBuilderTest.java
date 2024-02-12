@@ -46,10 +46,9 @@ public class MigrationStateMachineBuilderTest {
 
     @Test
     public void testWelcomePage() {
-        StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.NEW);
-        stateMachine.fire(MigrationStep.SELECT_MIGRATION);
+        StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.MIGRATION_WELCOME_PAGE);
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.MIGRATION_WELCOME_PAGE);
-        assertThat(stateMachine.getPermittedTriggers()).containsExactly(MigrationStep.SHOW_DIRECTORY_COMPATIBILITY_CHECK);
+        assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SHOW_DIRECTORY_COMPATIBILITY_CHECK, MigrationStep.SKIP_DIRECTORY_COMPATIBILITY_CHECK);
         verifyNoMoreInteractions(migrationActions);
     }
 
@@ -60,11 +59,11 @@ public class MigrationStateMachineBuilderTest {
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.DIRECTORY_COMPATIBILITY_CHECK_PAGE);
         verify(migrationActions).runDirectoryCompatibilityCheck();
         assertThat(stateMachine.getPermittedTriggers()).isEmpty();
-        verify(migrationActions, times(2)).directoryCompatibilityCheckOk();
+        verify(migrationActions, times(1)).directoryCompatibilityCheckOk();
         reset(migrationActions);
         when(migrationActions.directoryCompatibilityCheckOk()).thenReturn(true);
-        assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SHOW_CA_CREATION, MigrationStep.SHOW_RENEWAL_POLICY_CREATION);
-        verify(migrationActions, times(2)).directoryCompatibilityCheckOk();
+        assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SHOW_CA_CREATION);
+        verify(migrationActions, times(1)).directoryCompatibilityCheckOk();
         verifyNoMoreInteractions(migrationActions);
     }
 
@@ -75,18 +74,18 @@ public class MigrationStateMachineBuilderTest {
         stateMachine.fire(MigrationStep.SHOW_CA_CREATION);
         verify(migrationActions).directoryCompatibilityCheckOk();
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.CA_CREATION_PAGE);
+        when(migrationActions.caDoesNotExist()).thenReturn(true);
         assertThat(stateMachine.getPermittedTriggers()).isEmpty();
         verify(migrationActions, times(1)).caDoesNotExist();
         verify(migrationActions, times(1)).caAndRemovalPolicyExist();
         reset(migrationActions);
-        when(migrationActions.caDoesNotExist()).thenReturn(true);
         assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SHOW_RENEWAL_POLICY_CREATION);
         verify(migrationActions, times(1)).caDoesNotExist();
         verify(migrationActions, times(1)).caAndRemovalPolicyExist();
         reset(migrationActions);
         when(migrationActions.caDoesNotExist()).thenReturn(false);
         when(migrationActions.caAndRemovalPolicyExist()).thenReturn(true);
-        assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SHOW_MIGRATION_SELECTION);
+        assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SHOW_RENEWAL_POLICY_CREATION, MigrationStep.SHOW_MIGRATION_SELECTION);
         verify(migrationActions, times(1)).caDoesNotExist();
         verify(migrationActions, times(1)).caAndRemovalPolicyExist();
         verifyNoMoreInteractions(migrationActions);
@@ -94,24 +93,16 @@ public class MigrationStateMachineBuilderTest {
 
     @Test
     public void testRenewalPolicyCreationPage() {
-        when(migrationActions.directoryCompatibilityCheckOk()).thenReturn(true);
-        StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.DIRECTORY_COMPATIBILITY_CHECK_PAGE);
+        when(migrationActions.caDoesNotExist()).thenReturn(false);
+        StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.CA_CREATION_PAGE);
         stateMachine.fire(MigrationStep.SHOW_RENEWAL_POLICY_CREATION);
-        verify(migrationActions).directoryCompatibilityCheckOk();
+        verify(migrationActions).caDoesNotExist();
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.RENEWAL_POLICY_CREATION_PAGE);
         assertThat(stateMachine.getPermittedTriggers()).isEmpty();
-        verify(migrationActions, times(1)).removalPolicyDoesNotExist();
         verify(migrationActions, times(1)).caAndRemovalPolicyExist();
         reset(migrationActions);
-        when(migrationActions.removalPolicyDoesNotExist()).thenReturn(true);
-        assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SHOW_CA_CREATION);
-        verify(migrationActions, times(1)).removalPolicyDoesNotExist();
-        verify(migrationActions, times(1)).caAndRemovalPolicyExist();
-        reset(migrationActions);
-        when(migrationActions.removalPolicyDoesNotExist()).thenReturn(false);
         when(migrationActions.caAndRemovalPolicyExist()).thenReturn(true);
         assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SHOW_MIGRATION_SELECTION);
-        verify(migrationActions, times(1)).removalPolicyDoesNotExist();
         verify(migrationActions, times(1)).caAndRemovalPolicyExist();
         verifyNoMoreInteractions(migrationActions);
     }
@@ -143,14 +134,28 @@ public class MigrationStateMachineBuilderTest {
         StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.REMOTE_REINDEX_WELCOME_PAGE);
         stateMachine.fire(MigrationStep.DISCOVER_NEW_DATANODES);
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.PROVISION_DATANODE_CERTIFICATES_PAGE);
+        assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.PROVISION_DATANODE_CERTIFICATES);
+        verifyNoMoreInteractions(migrationActions);
+    }
+
+    @Test
+    public void testProvisionDatanodeCertificatesRunning() {
+        StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.PROVISION_DATANODE_CERTIFICATES_PAGE);
+        stateMachine.fire(MigrationStep.PROVISION_DATANODE_CERTIFICATES);
+        verify(migrationActions, times(1)).provisionDataNodes();
+        assertThat(stateMachine.getState()).isEqualTo(MigrationState.PROVISION_DATANODE_CERTIFICATES_RUNNING);
+        assertThat(stateMachine.getPermittedTriggers()).isEmpty();
+        verify(migrationActions, times(1)).provisioningFinished();
+        reset(migrationActions);
+        when(migrationActions.provisioningFinished()).thenReturn(true);
         assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SHOW_DATA_MIGRATION_QUESTION);
+        verify(migrationActions, times(1)).provisioningFinished();
         verifyNoMoreInteractions(migrationActions);
     }
 
     @Test
     public void testExistingDataMigrationQuestionPage() {
-        StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.PROVISION_DATANODE_CERTIFICATES_PAGE);
-        stateMachine.fire(MigrationStep.SHOW_DATA_MIGRATION_QUESTION);
+        StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.EXISTING_DATA_MIGRATION_QUESTION_PAGE);
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.EXISTING_DATA_MIGRATION_QUESTION_PAGE);
         assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SHOW_MIGRATE_EXISTING_DATA, MigrationStep.SKIP_EXISTING_DATA_MIGRATION);
         verifyNoMoreInteractions(migrationActions);
@@ -212,6 +217,7 @@ public class MigrationStateMachineBuilderTest {
         stateMachine.fire(MigrationStep.CALCULATE_JOURNAL_SIZE);
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.JOURNAL_SIZE_DOWNTIME_WARNING);
         assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SHOW_STOP_PROCESSING_PAGE);
+        verify(migrationActions, times(1)).provisionDataNodes();
         verifyNoMoreInteractions(migrationActions);
     }
 
@@ -259,14 +265,6 @@ public class MigrationStateMachineBuilderTest {
         assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.CONFIRM_OLD_CONNECTION_STRING_FROM_CONFIG_REMOVED);
         stateMachine.fire(MigrationStep.CONFIRM_OLD_CONNECTION_STRING_FROM_CONFIG_REMOVED);
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.FINISHED);
-    }
-
-    @Test
-    public void testOnEntryAction() {
-        StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.MIGRATE_EXISTING_DATA);
-        stateMachine.fireInitialTransition();
-        verify(migrationActions).reindexOldData();
-        assertThat(stateMachine.getState()).isEqualTo(MigrationState.MIGRATE_EXISTING_DATA);
     }
 
     @NotNull
