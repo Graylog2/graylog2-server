@@ -14,28 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import { forwardRef } from 'react';
+package org.graylog2.bindings;
 
-import Badge from 'components/bootstrap/Badge';
-
-type Props = {
-  children: React.ReactNode;
-  onClick?: () => void,
-  className?: string,
-  title?: string,
-};
-
-const CountBadge = forwardRef<HTMLDivElement, Props>(({ children, onClick, className, title }: Props, ref) => (
-  <Badge bsStyle="info" className={className} onClick={onClick} ref={ref} title={title}>
-    {children}
-  </Badge>
-));
-
-CountBadge.defaultProps = {
-  onClick: undefined,
-  className: '',
-  title: undefined,
-};
-
-export default CountBadge;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+/**
+ * Annotation to override named bindings of a configuration parameter in a configuration bean
+ * which is used in {@link NamedConfigParametersOverrideModule}
+ *
+ */
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface NamedBindingOverride {
+    String value();
+}

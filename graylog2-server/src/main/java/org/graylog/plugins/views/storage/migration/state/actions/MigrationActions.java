@@ -42,6 +42,11 @@ public interface MigrationActions {
     boolean caDoesNotExist();
     boolean removalPolicyDoesNotExist();
     boolean caAndRemovalPolicyExist();
+
+    void provisionDataNodes();
+
+    boolean provisioningFinished();
+
     void resetMigration();
 
     void setStateMachineContext(MigrationStateMachineContext context);

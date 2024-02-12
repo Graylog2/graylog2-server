@@ -41,7 +41,7 @@ export type PreferencesUpdateMap = {
   updateUnfocussed: boolean | BooleanString,
   dashboardSidebarIsPinned?: boolean | BooleanString,
   searchSidebarIsPinned?: boolean | BooleanString,
-  [PREFERENCES_THEME_MODE]: ColorScheme,
+  [PREFERENCES_THEME_MODE]?: ColorScheme,
 };
 
 export type PreferencesMap = {
