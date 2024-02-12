@@ -17,9 +17,9 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
-import type { SizeProp } from '@fortawesome/fontawesome-svg-core';
 
 import { OverlayTrigger } from 'components/common';
+import type { SizeProp } from 'components/common/Icon';
 import Icon from 'components/common/Icon';
 
 const StyledPopover = styled.span(({ theme }) => css`

@@ -43,7 +43,7 @@ const _entityItemHeader = (entity) => {
     return <><HeaderIcon name="archive" className={style.contentPackEntity} />{' '}<span>{entity.title}</span></>;
   }
 
-  return <><HeaderIcon name="server" />{' '}<HeaderText>{entity.title}</HeaderText></>;
+  return <><HeaderIcon name="dns" />{' '}<HeaderText>{entity.title}</HeaderText></>;
 };
 
 class ContentPackSelection extends React.Component {
