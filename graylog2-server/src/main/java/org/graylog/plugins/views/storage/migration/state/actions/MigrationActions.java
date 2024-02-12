@@ -16,8 +16,6 @@
  */
 package org.graylog.plugins.views.storage.migration.state.actions;
 
-import java.util.Map;
-
 /**
  * Set of callbacks used during the migration in different states.
  */
@@ -45,5 +43,8 @@ public interface MigrationActions extends WithArgs {
 
     void provisionDataNodes();
 
+    boolean provisioningFinished();
+
     void resetMigration();
+
 }
