@@ -167,7 +167,7 @@
         <shiro.version>1.13.0</shiro.version>
         <snakeyaml.version>2.2</snakeyaml.version>
         <snappy-java.version>1.1.10.5</snappy-java.version>
-        <oshi.version>6.4.11</oshi.version>
+        <oshi.version>6.4.12</oshi.version>
         <siv-mode.version>1.5.0</siv-mode.version>
         <slf4j.version>2.0.12</slf4j.version>
         <streamex.version>0.8.2</streamex.version>
