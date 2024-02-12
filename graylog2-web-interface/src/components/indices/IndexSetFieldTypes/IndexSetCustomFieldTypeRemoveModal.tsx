@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { useStore } from 'stores/connect';
 import type { IndexSet, IndexSetsStoreState } from 'stores/indices/IndexSetsStore';
@@ -41,11 +41,7 @@ const StyledLabel = styled.h5`
   margin-bottom: 5px;
 `;
 
-const RedBadge = styled(Badge)(({ theme }) => css`
-  background-color: ${theme.colors.variant.light.danger};
-`);
-
-const BetaBadge = () => <RedBadge>Beta Feature</RedBadge>;
+const BetaBadge = () => <Badge bsStyle="danger">Beta Feature</Badge>;
 
 type Props = {
   show: boolean,

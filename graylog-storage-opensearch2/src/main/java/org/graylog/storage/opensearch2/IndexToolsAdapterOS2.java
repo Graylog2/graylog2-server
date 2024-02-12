@@ -18,6 +18,7 @@ package org.graylog.storage.opensearch2;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import jakarta.inject.Inject;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.support.IndicesOptions;
@@ -37,8 +38,6 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-
-import jakarta.inject.Inject;
 
 import java.time.ZonedDateTime;
 import java.util.HashMap;
@@ -115,7 +114,7 @@ public class IndexToolsAdapterOS2 implements IndexToolsAdapter {
     @Override
     public long count(Set<String> indices, Optional<Set<String>> includedStreams) {
         final CountRequest request = new CountRequest(indices.toArray(new String[0]), buildStreamIdFilter(includedStreams))
-                .indicesOptions(IndicesOptions.fromOptions(true, false, true, false));
+                .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN);
 
         final CountResponse result = client.execute((c, requestOptions) -> c.count(request, requestOptions), "Unable to count documents of index.");
 

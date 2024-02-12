@@ -22,7 +22,7 @@ import { ProgressBar, LinkToNode, RelativeTime, Icon } from 'components/common';
 import { Button } from 'components/bootstrap';
 import { SystemJobsActions } from 'stores/systemjobs/SystemJobsStore';
 import UserNotification from 'util/UserNotification';
-import { StyledBadge } from 'components/bootstrap/Badge';
+import Badge from 'components/bootstrap/Badge';
 
 enum JobStatus {
   Cancelled = 'cancelled',
@@ -33,7 +33,7 @@ enum JobStatus {
   Running = 'running',
 }
 
-const StatusBadge = styled(StyledBadge)<{ status: string }>(({ status, theme }) => {
+const StatusBadge = styled(Badge)<{ status: string }>(({ status, theme }) => {
   const {
     primary,
     success,

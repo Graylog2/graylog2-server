@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import * as Immutable from 'immutable';
-import { render, fireEvent, waitFor, screen, act } from 'wrappedTestingLibrary';
+import { render, waitFor, screen, act } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
@@ -81,11 +81,12 @@ describe('<UserCreate />', () => {
     const passwordRepeatInput = await findByPlaceholderText('Repeat password');
     const submitButton = await findSubmitButton();
 
-    fireEvent.change(usernameInput, { target: { value: 'The username' } });
-    fireEvent.change(firstNameInput, { target: { value: 'The first name' } });
-    fireEvent.change(lastNameInput, { target: { value: 'The last name' } });
-    fireEvent.change(emailInput, { target: { value: 'username@example.org' } });
-    fireEvent.change(timeoutAmountInput, { target: { value: '40' } });
+    await userEvent.type(usernameInput, 'The username');
+    await userEvent.type(firstNameInput, 'The first name');
+    await userEvent.type(lastNameInput, 'The last name');
+    await userEvent.type(emailInput, 'username@example.org');
+    await userEvent.clear(timeoutAmountInput);
+    await userEvent.type(timeoutAmountInput, '40');
 
     // await selectEvent.openMenu(timeoutUnitSelect);
     // await act(async () => { await selectEvent.select(timeoutUnitSelect, 'Seconds'); });
@@ -105,10 +106,10 @@ describe('<UserCreate />', () => {
       await selectEvent.select(roleSelect, 'Manager');
     });
 
-    fireEvent.change(passwordInput, { target: { value: 'thepassword' } });
-    fireEvent.change(passwordRepeatInput, { target: { value: 'thepassword' } });
+    userEvent.type(passwordInput, 'thepassword');
+    userEvent.type(passwordRepeatInput, 'thepassword');
 
-    fireEvent.click(submitButton);
+    userEvent.click(submitButton);
 
     await waitFor(() => expect(UsersActions.create).toHaveBeenCalledWith({
       username: 'The username',
@@ -134,14 +135,14 @@ describe('<UserCreate />', () => {
     const passwordRepeatInput = await findByPlaceholderText('Repeat password');
     const submitButton = await findSubmitButton();
 
-    fireEvent.change(usernameInput, { target: { value: '   username   ' } });
-    fireEvent.change(firstNameInput, { target: { value: 'The first name' } });
-    fireEvent.change(lastNameInput, { target: { value: 'The last name' } });
-    fireEvent.change(emailInput, { target: { value: 'username@example.org' } });
-    fireEvent.change(passwordInput, { target: { value: 'thepassword' } });
-    fireEvent.change(passwordRepeatInput, { target: { value: 'thepassword' } });
+    await userEvent.type(usernameInput, '   username   ');
+    await userEvent.type(firstNameInput, 'The first name');
+    await userEvent.type(lastNameInput, 'The last name');
+    await userEvent.type(emailInput, 'username@example.org');
+    await userEvent.type(passwordInput, 'thepassword');
+    await userEvent.type(passwordRepeatInput, 'thepassword');
 
-    fireEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await waitFor(() => expect(UsersActions.create).toHaveBeenCalledWith({
       username: 'username',
@@ -154,14 +155,13 @@ describe('<UserCreate />', () => {
     }));
   }, extendedTimeout);
 
-  // The following tests will work when we use @testing-library/user-event instead of fireEvent
   it('should display warning if username is already taken', async () => {
     const { findByLabelText, findByText } = render(<UserCreate />);
 
     const usernameInput = await findByLabelText('Username');
 
     await userEvent.type(usernameInput, existingUser.username);
-    fireEvent.blur(usernameInput);
+    await userEvent.tab();
 
     await findByText(/Username is already taken/);
   }, extendedTimeout);
@@ -174,7 +174,7 @@ describe('<UserCreate />', () => {
 
     await userEvent.type(passwordInput, 'thepassword');
     await userEvent.type(passwordRepeatInput, 'notthepassword');
-    fireEvent.blur(passwordRepeatInput);
+    await userEvent.tab();
 
     await findByText(/Passwords do not match/);
   }, extendedTimeout);

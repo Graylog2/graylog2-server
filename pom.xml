@@ -150,7 +150,7 @@
         <lucene.version>9.9.2</lucene.version>
         <metrics.version>4.1.9</metrics.version>
         <mongodb-driver.version>4.11.1</mongodb-driver.version>
-        <mongojack.version>4.8.1</mongojack.version>
+        <mongojack.version>4.8.2</mongojack.version>
         <natty.version>0.13</natty.version>
         <netty.version>4.1.106.Final</netty.version>
         <netty-tcnative-boringssl-static.version>2.0.62.Final</netty-tcnative-boringssl-static.version>
@@ -195,7 +195,7 @@
         <mockito.version>5.10.0</mockito.version>
         <restassured.version>5.4.0</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
-        <testcontainers.version>1.19.4</testcontainers.version>
+        <testcontainers.version>1.19.5</testcontainers.version>
         <testcontainers.opensearch.version>2.0.1</testcontainers.opensearch.version>
 
         <!-- Nodejs dependencies -->
