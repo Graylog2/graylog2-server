@@ -34,7 +34,7 @@ public class MigrationStateMachineBuilder {
     @NotNull
     private static StateMachineConfig<MigrationState, MigrationStep> configureStates(MigrationActions migrationActions) {
 
-        // All actions which can fail should be performed on transaction to make sure that there is no state change on error.
+        // All actions which can fail should be performed on transition to make sure that there is no state change on error.
         // For async tasks, the task should be triggered in the transition with a following intermediary step which
         // has a guard to continue only on task completion.
 
