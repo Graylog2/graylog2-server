@@ -38,19 +38,18 @@ public class MigrationStateMachineBuilder {
                 .permit(MigrationStep.SELECT_MIGRATION, MigrationState.MIGRATION_WELCOME_PAGE, () -> LOG.info("Migration selected in menu, show welcome page"));
 
         config.configure(MigrationState.MIGRATION_WELCOME_PAGE)
-                .permit(MigrationStep.SHOW_DIRECTORY_COMPATIBILITY_CHECK, MigrationState.DIRECTORY_COMPATIBILITY_CHECK_PAGE, () -> LOG.info("Showing directory compatibility check page"));
+                .permit(MigrationStep.SHOW_DIRECTORY_COMPATIBILITY_CHECK, MigrationState.DIRECTORY_COMPATIBILITY_CHECK_PAGE, () -> LOG.info("Showing directory compatibility check page"))
+                .permit(MigrationStep.SKIP_DIRECTORY_COMPATIBILITY_CHECK, MigrationState.CA_CREATION_PAGE);
 
         config.configure(MigrationState.DIRECTORY_COMPATIBILITY_CHECK_PAGE)
                 .onEntry(migrationActions::runDirectoryCompatibilityCheck)
-                .permitIf(MigrationStep.SHOW_CA_CREATION, MigrationState.CA_CREATION_PAGE, migrationActions::directoryCompatibilityCheckOk)
-                .permitIf(MigrationStep.SHOW_RENEWAL_POLICY_CREATION, MigrationState.RENEWAL_POLICY_CREATION_PAGE, migrationActions::directoryCompatibilityCheckOk);
+                .permitIf(MigrationStep.SHOW_CA_CREATION, MigrationState.CA_CREATION_PAGE, migrationActions::directoryCompatibilityCheckOk);
 
         config.configure(MigrationState.CA_CREATION_PAGE)
-                .permitIf(MigrationStep.SHOW_RENEWAL_POLICY_CREATION, MigrationState.RENEWAL_POLICY_CREATION_PAGE, migrationActions::caDoesNotExist)
+                .permitIf(MigrationStep.SHOW_RENEWAL_POLICY_CREATION, MigrationState.RENEWAL_POLICY_CREATION_PAGE, () -> !migrationActions.caDoesNotExist())
                 .permitIf(MigrationStep.SHOW_MIGRATION_SELECTION, MigrationState.MIGRATION_SELECTION_PAGE, migrationActions::caAndRemovalPolicyExist);
 
         config.configure(MigrationState.RENEWAL_POLICY_CREATION_PAGE)
-                .permitIf(MigrationStep.SHOW_CA_CREATION, MigrationState.CA_CREATION_PAGE, migrationActions::removalPolicyDoesNotExist)
                 .permitIf(MigrationStep.SHOW_MIGRATION_SELECTION, MigrationState.MIGRATION_SELECTION_PAGE, migrationActions::caAndRemovalPolicyExist);
 
         // Major decision - remote reindexing or rolling upgrade(in-place)?
@@ -65,7 +64,10 @@ public class MigrationStateMachineBuilder {
                 });
 
         config.configure(MigrationState.PROVISION_DATANODE_CERTIFICATES_PAGE)
-                .permit(MigrationStep.SHOW_DATA_MIGRATION_QUESTION, MigrationState.EXISTING_DATA_MIGRATION_QUESTION_PAGE);
+                .permit(MigrationStep.PROVISION_DATANODE_CERTIFICATES, MigrationState.PROVISION_DATANODE_CERTIFICATES_RUNNING, migrationActions::provisionDataNodes);
+
+        config.configure(MigrationState.PROVISION_DATANODE_CERTIFICATES_RUNNING)
+                .permitIf(MigrationStep.SHOW_DATA_MIGRATION_QUESTION, MigrationState.EXISTING_DATA_MIGRATION_QUESTION_PAGE, migrationActions::provisioningFinished);
 
         config.configure(MigrationState.EXISTING_DATA_MIGRATION_QUESTION_PAGE)
                 .permit(MigrationStep.SHOW_MIGRATE_EXISTING_DATA, MigrationState.MIGRATE_EXISTING_DATA)
@@ -83,7 +85,7 @@ public class MigrationStateMachineBuilder {
                 .permit(MigrationStep.SHOW_PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES, MigrationState.PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES, migrationActions::directoryCompatibilityCheckOk);
 
         config.configure(MigrationState.PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES)
-                .permit(MigrationStep.CALCULATE_JOURNAL_SIZE, MigrationState.JOURNAL_SIZE_DOWNTIME_WARNING);
+                .permit(MigrationStep.CALCULATE_JOURNAL_SIZE, MigrationState.JOURNAL_SIZE_DOWNTIME_WARNING, migrationActions::provisionDataNodes);
 
         config.configure(MigrationState.JOURNAL_SIZE_DOWNTIME_WARNING)
                 .permit(MigrationStep.SHOW_STOP_PROCESSING_PAGE, MigrationState.MESSAGE_PROCESSING_STOP_REPLACE_CLUSTER_AND_MP_RESTART);

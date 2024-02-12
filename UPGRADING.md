@@ -2,7 +2,7 @@ Upgrading to Graylog 6.0.x
 ==========================
 
 ## Breaking Changes
-
+- Default value for `data_dir` configuration option has been removed and must be specified in `graylog.conf`.
 ### Changed default number of process-buffer and output-buffer processors
 
 The default values for the configuration settings `processbuffer_processors` and `outputbuffer_processors` have been

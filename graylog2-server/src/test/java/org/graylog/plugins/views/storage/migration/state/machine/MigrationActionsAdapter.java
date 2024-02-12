@@ -83,4 +83,13 @@ public class MigrationActionsAdapter implements MigrationActions {
     public boolean caAndRemovalPolicyExist() {
         return false;
     }
+
+    @Override
+    public void provisionDataNodes() {
+    }
+
+    @Override
+    public boolean provisioningFinished() {
+        return false;
+    }
 }
