@@ -1,0 +1,4 @@
+type = "fixed"
+message = "More restrictive file permissions for support bundle files."
+
+pulls = ["18174"]

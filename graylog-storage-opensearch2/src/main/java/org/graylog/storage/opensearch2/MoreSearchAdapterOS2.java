@@ -18,6 +18,8 @@ package org.graylog.storage.opensearch2;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Streams;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.EventProcessorException;
 import org.graylog.events.search.MoreSearch;
@@ -41,9 +43,6 @@ import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Collections;
@@ -62,7 +61,7 @@ import static org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBui
 
 public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(MoreSearchAdapterOS2.class);
-    public static final IndicesOptions INDICES_OPTIONS = IndicesOptions.fromOptions(false, false, true, false);
+    public static final IndicesOptions INDICES_OPTIONS = IndicesOptions.LENIENT_EXPAND_OPEN;
     private final OpenSearchClient client;
     private final Boolean allowLeadingWildcard;
     private final SortOrderMapper sortOrderMapper;
@@ -116,7 +115,7 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Query:\n{}", searchSourceBuilder.toString(new ToXContent.MapParams(Collections.singletonMap("pretty", "true"))));
-            LOG.debug("Execute search: {}", searchRequest.toString());
+            LOG.debug("Execute search: {}", searchRequest);
         }
 
         final SearchResponse searchResult = client.search(searchRequest, "Unable to perform search query");
@@ -144,7 +143,6 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
         final ChunkedResult chunkedResult = multiChunkResultRetriever.retrieveChunkedResult(chunkCommand);
 
         final AtomicBoolean continueScrolling = new AtomicBoolean(true);
-
         final Stopwatch stopwatch = Stopwatch.createStarted();
         try {
             ResultChunk resultChunk = chunkedResult.nextChunk();

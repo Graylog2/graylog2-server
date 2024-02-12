@@ -23,13 +23,13 @@ import { alice as exampleUser } from 'fixtures/users';
 import TeamsSection from './TeamsSection';
 
 describe('<TeamsSection />', () => {
-  it('should display info if license is not present', () => {
+  it('should display info if license is not present', async () => {
     render(<TeamsSection user={exampleUser} />);
 
-    expect(screen.getByText('Enterprise Feature')).toBeInTheDocument();
+    expect(await screen.findByText('Enterprise Feature')).toBeInTheDocument();
   });
 
-  it('should display enterprise user teams assignment plugin', () => {
+  it('should display enterprise user teams assignment plugin', async () => {
     PluginStore.register(new PluginManifest({}, {
       teams: {
         UserTeamsAssignment: () => <>UserTeamsAssignment</>,
@@ -38,6 +38,6 @@ describe('<TeamsSection />', () => {
 
     render(<TeamsSection user={exampleUser} />);
 
-    expect(screen.getByText('UserTeamsAssignment')).toBeInTheDocument();
+    expect(await screen.findByText('UserTeamsAssignment')).toBeInTheDocument();
   });
 });

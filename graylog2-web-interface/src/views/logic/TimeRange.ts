@@ -31,7 +31,7 @@ type RelativeRangeWithEndQueryParameter = {
 
 type RelativeRangeQueryParameter = RelativeRangeStartOnlyQueryParameter | RelativeRangeWithEndQueryParameter;
 
-type AbsoluteRangeQueryParameter = {
+export type AbsoluteRangeQueryParameter = {
   rangetype: 'absolute',
   from: string,
   to: string,

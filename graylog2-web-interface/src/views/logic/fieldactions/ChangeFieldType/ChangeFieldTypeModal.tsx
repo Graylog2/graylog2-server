@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo, useCallback, useState, useEffect } from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import mapValues from 'lodash/mapValues';
 
 import { Badge, BootstrapModalForm, Alert, Input } from 'components/bootstrap';
@@ -50,11 +50,7 @@ const StyledLabel = styled.h5`
   margin-bottom: 5px;
 `;
 
-const RedBadge = styled(Badge)(({ theme }) => css`
-  background-color: ${theme.colors.variant.light.danger};
-`);
-
-const BetaBadge = () => <RedBadge>Beta Feature</RedBadge>;
+const BetaBadge = () => <Badge bsStyle="danger">Beta Feature</Badge>;
 
 const failureStreamId = '000000000000000000000004';
 

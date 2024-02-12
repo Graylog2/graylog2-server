@@ -121,6 +121,7 @@ public class NodeContainerFactory {
         GenericContainer<?> container = new GenericContainer<>(image)
                 .withFileSystemBind(property("server_jar"), GRAYLOG_HOME + "/graylog.jar", BindMode.READ_ONLY)
                 .withNetwork(config.network)
+                .withEnv("GRAYLOG_DATA_DIR", "data")
                 .withEnv("GRAYLOG_MONGODB_URI", config.mongoDbUri)
                 .withEnv("GRAYLOG_ELASTICSEARCH_HOSTS", config.elasticsearchUri)
                 // TODO: should we set this override search version or let graylog server to detect it from the search server itself?
