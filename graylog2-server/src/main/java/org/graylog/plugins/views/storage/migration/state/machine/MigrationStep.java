@@ -19,6 +19,7 @@ package org.graylog.plugins.views.storage.migration.state.machine;
 public enum MigrationStep {
     SELECT_MIGRATION,
     SHOW_DIRECTORY_COMPATIBILITY_CHECK,
+    SKIP_DIRECTORY_COMPATIBILITY_CHECK,
     SHOW_CA_CREATION,
     SHOW_RENEWAL_POLICY_CREATION,
     SHOW_MIGRATION_SELECTION,
