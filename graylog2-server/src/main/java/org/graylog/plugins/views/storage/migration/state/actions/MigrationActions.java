@@ -16,12 +16,12 @@
  */
 package org.graylog.plugins.views.storage.migration.state.actions;
 
-import java.util.Map;
+import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachineContext;
 
 /**
  * Set of callbacks used during the migration in different states.
  */
-public interface MigrationActions extends WithArgs {
+public interface MigrationActions {
     boolean runDirectoryCompatibilityCheck();
 
     boolean isOldClusterStopped();
@@ -43,4 +43,8 @@ public interface MigrationActions extends WithArgs {
     boolean removalPolicyDoesNotExist();
     boolean caAndRemovalPolicyExist();
     void resetMigration();
+
+    void setStateMachineContext(MigrationStateMachineContext context);
+
+    MigrationStateMachineContext getStateMachineContext();
 }

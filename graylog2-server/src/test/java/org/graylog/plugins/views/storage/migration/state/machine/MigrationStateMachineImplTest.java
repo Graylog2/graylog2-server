@@ -18,16 +18,18 @@ package org.graylog.plugins.views.storage.migration.state.machine;
 
 import com.github.oxo42.stateless4j.StateMachine;
 import com.github.oxo42.stateless4j.StateMachineConfig;
-import com.github.oxo42.stateless4j.delegates.Action;
-import com.github.oxo42.stateless4j.triggers.TriggerWithParameters1;
 import org.graylog.plugins.views.storage.migration.state.InMemoryStateMachinePersistence;
-import org.graylog.plugins.views.storage.migration.state.actions.MigrationActionContext;
 import org.graylog.plugins.views.storage.migration.state.actions.MigrationActions;
+import org.graylog.plugins.views.storage.migration.state.actions.MigrationActionsImpl;
 import org.graylog.plugins.views.storage.migration.state.rest.CurrentStateInformation;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 
 import java.util.Map;
+import java.util.function.Consumer;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
 
 class MigrationStateMachineImplTest {
 
@@ -35,82 +37,125 @@ class MigrationStateMachineImplTest {
     MigrationState RESULT_STATE = MigrationState.MIGRATION_WELCOME_PAGE;
     MigrationStep MIGRATION_STEP = MigrationStep.SELECT_MIGRATION;
 
-    @Mock
-    MigrationActions migrationActions; //todo: could be removed if context can be used
-    @Mock
+    MigrationActions migrationActions;
     InMemoryStateMachinePersistence persistenceService = new InMemoryStateMachinePersistence();
     MigrationStateMachine migrationStateMachine;
 
-    @Test
-    public void contextFieldsSet() {
-        StateMachine<MigrationState, MigrationStep> stateMachine = testStateMachineWithAction(() -> {});
-        migrationStateMachine = new MigrationStateMachineImpl(stateMachine, migrationActions, persistenceService);
-        Map<String, Object> args = Map.of("k1", "v1");
-        CurrentStateInformation context = migrationStateMachine.triggerWithContext(MIGRATION_STEP, args);
+    @BeforeEach
+    public void setUp() {
+        migrationActions = new TestMigrationActions();
     }
 
-//    @Test
-//    public void smReturnsResultState() {
-//        StateMachine<MigrationState, MigrationStep> stateMachine = testStateMachineWithAction((context) -> {});
-//        migrationStateMachine = new MigrationStateMachineImpl(stateMachine, migrationActions, persistenceService);
-//        MigrationActionContext context = migrationStateMachine.triggerWithContext(MIGRATION_STEP, Map.of());
-//        assertFalse(context.hasErrors());
-//        assertEquals(RESULT_STATE, context.getResultState().state());
-//    }
-//
-//    @Test
-//    public void smPassesArgumentsToAction() {
-//        StateMachine<MigrationState, MigrationStep> stateMachine = testStateMachineWithAction((context) -> {
-//            assertEquals("v1", context.getArgs().get("arg1"));
-//            assertEquals(2, context.getArgs().get("arg2"));
-//        });
-//        migrationStateMachine = new MigrationStateMachineImpl(stateMachine, migrationActions, persistenceService);
-//        MigrationActionContext context = migrationStateMachine.triggerWithContext(MIGRATION_STEP, Map.of(
-//                "arg1", "v1", "arg2", 2
-//        ));
-//    }
-//
-//    @Test
-//    public void smCallsActionOnTransition() {
-//        MigrationAction action = mock(MigrationAction.class);
-//        StateMachine<MigrationState, MigrationStep> stateMachine = testStateMachineWithAction(action);
-//        migrationStateMachine = new MigrationStateMachineImpl(stateMachine, migrationActions, persistenceService);
-//        verifyNoInteractions(action);
-//        migrationStateMachine.triggerWithContext(MIGRATION_STEP, Map.of());
-//        verify(action, times(1)).doIt(any());
-//    }
-//
-//    @Test
-//    public void smSetsErrorOnExceptionInAction() {
-//        String errorMessage = "Error 40: Insufficient Coffee.";
-//        StateMachine<MigrationState, MigrationStep> stateMachine = testStateMachineWithAction((context) -> {
-//            throw new RuntimeException(errorMessage);
-//        });
-//        migrationStateMachine = new MigrationStateMachineImpl(stateMachine, migrationActions, persistenceService);
-//        MigrationActionContext context = migrationStateMachine.triggerWithContext(MIGRATION_STEP, Map.of());
-//        assertTrue(context.hasErrors());
-//        assertEquals(errorMessage, context.getErrors().get(0));
-//    }
-//
-//    @Test
-//    public void smStateUnchangedOnExceptionInAction() {
-//        StateMachine<MigrationState, MigrationStep> stateMachine = testStateMachineWithAction((context) -> {
-//            throw new RuntimeException();
-//        });
-//        migrationStateMachine = new MigrationStateMachineImpl(stateMachine, migrationActions, persistenceService);
-//        MigrationActionContext context = migrationStateMachine.triggerWithContext(MIGRATION_STEP, Map.of());
-//        assertEquals(context.getPreviousState(), context.getResultState().state());
-//    }
+    @Test
+    public void smReturnsResultState() {
+        StateMachine<MigrationState, MigrationStep> stateMachine = testStateMachineWithAction((context) -> {});
+        migrationStateMachine = new MigrationStateMachineImpl(stateMachine, migrationActions, persistenceService);
+        CurrentStateInformation context = migrationStateMachine.trigger(MIGRATION_STEP, Map.of());
+        assertThat(context.hasErrors()).isFalse();
+        assertThat(context.state()).isEqualTo(RESULT_STATE);
+    }
 
-    private StateMachine<MigrationState, MigrationStep> testStateMachineWithAction(Action action) {
+    @Test
+    public void smPassesArgumentsToAction() {
+        StateMachine<MigrationState, MigrationStep> stateMachine = testStateMachineWithAction((context) -> {
+            assertThat(context.getActionArgument("arg1", String.class)).isEqualTo("v1");
+            assertThat(context.getActionArgument("arg2", Integer.class)).isEqualTo(2);
+        });
+        migrationStateMachine = new MigrationStateMachineImpl(stateMachine, migrationActions, persistenceService);
+        CurrentStateInformation context = migrationStateMachine.trigger(MIGRATION_STEP, Map.of(
+                "arg1", "v1", "arg2", 2
+        ));
+        assertThat(context.hasErrors()).isFalse();
+    }
+
+    @Test
+    public void smActionCanSetExtendedState() {
+        StateMachine<MigrationState, MigrationStep> stateMachine = testStateMachineWithAction((context) -> {
+            int i = context.getActionArgument("k1", Integer.class);
+            context.addExtendedState("r1", ++i);
+        });
+        migrationStateMachine = new MigrationStateMachineImpl(stateMachine, migrationActions, persistenceService);
+        CurrentStateInformation context = migrationStateMachine.trigger(MIGRATION_STEP, Map.of("k1", 1));
+        assertThat(context.hasErrors()).isFalse();
+        assertThat(migrationStateMachine.getContext().getExtendedState("r1")).isEqualTo(2);
+    }
+
+    @Test
+    public void smThrowsErrorOnNoArguments() {
+        StateMachine<MigrationState, MigrationStep> stateMachine = testStateMachineWithAction((context) -> {
+            context.getActionArgument("away", String.class);
+        });
+        migrationStateMachine = new MigrationStateMachineImpl(stateMachine, migrationActions, persistenceService);
+        CurrentStateInformation context = migrationStateMachine.trigger(MIGRATION_STEP, null);
+        assertThat(context.hasErrors()).isTrue();
+        assertThat(context.errorMessage()).isEqualTo("Missing arguments for step SELECT_MIGRATION");
+    }
+
+    @Test
+    public void smThrowsErrorOnMissingArgument() {
+        StateMachine<MigrationState, MigrationStep> stateMachine = testStateMachineWithAction((context) -> {
+            context.getActionArgument("away", String.class);
+        });
+        migrationStateMachine = new MigrationStateMachineImpl(stateMachine, migrationActions, persistenceService);
+        CurrentStateInformation context = migrationStateMachine.trigger(MIGRATION_STEP, Map.of("k1", "v1"));
+        assertThat(context.hasErrors()).isTrue();
+        assertThat(context.errorMessage()).isEqualTo("Missing argument away for step SELECT_MIGRATION");
+    }
+
+    @Test
+    public void smThrowsErrorOnWrongArgumentType() {
+        StateMachine<MigrationState, MigrationStep> stateMachine = testStateMachineWithAction((context) -> {
+            context.getActionArgument("k1", Integer.class);
+        });
+        migrationStateMachine = new MigrationStateMachineImpl(stateMachine, migrationActions, persistenceService);
+        CurrentStateInformation context = migrationStateMachine.trigger(MIGRATION_STEP, Map.of("k1", "v1"));
+        assertThat(context.hasErrors()).isTrue();
+        assertThat(context.errorMessage()).isEqualTo("Missing argument away for step SELECT_MIGRATION");
+    }
+
+    @Test
+    public void smSetsErrorOnExceptionInAction() {
+        String errorMessage = "Error 40: Insufficient Coffee.";
+        StateMachine<MigrationState, MigrationStep> stateMachine = testStateMachineWithAction((context) -> {
+            throw new RuntimeException(errorMessage);
+        });
+        migrationStateMachine = new MigrationStateMachineImpl(stateMachine, migrationActions, persistenceService);
+        CurrentStateInformation context = migrationStateMachine.trigger(MIGRATION_STEP, Map.of());
+        assertThat(context.hasErrors()).isTrue();
+        assertThat(context.errorMessage()).isEqualTo(errorMessage);
+    }
+
+    @Test
+    public void smStateUnchangedOnExceptionInAction() {
+        StateMachine<MigrationState, MigrationStep> stateMachine = testStateMachineWithAction((context) -> {
+            throw new RuntimeException();
+        });
+        migrationStateMachine = new MigrationStateMachineImpl(stateMachine, migrationActions, persistenceService);
+        CurrentStateInformation context = migrationStateMachine.trigger(MIGRATION_STEP, Map.of());
+        assertThat(context.hasErrors()).isTrue();
+        assertThat(context.state()).isEqualTo(INITIAL_STATE);
+    }
+
+    private StateMachine<MigrationState, MigrationStep> testStateMachineWithAction(Consumer<MigrationStateMachineContext> action) {
         StateMachineConfig<MigrationState, MigrationStep> config = new StateMachineConfig<>();
         config.configure(INITIAL_STATE)
-                .permit(MIGRATION_STEP, RESULT_STATE, action);
+                .permit(MIGRATION_STEP, RESULT_STATE, () -> {
+                    TestMigrationActions testMigrationActions = (TestMigrationActions) migrationActions;
+                    testMigrationActions.runTestFunction(action);
+                });
         return new StateMachine<>(INITIAL_STATE, config);
     }
 
-    private TriggerWithParameters1<MigrationActionContext, MigrationStep> createDynamicTrigger(MigrationStep step) {
-        return new TriggerWithParameters1<>(step, MigrationActionContext.class);
+
+    private static class TestMigrationActions extends MigrationActionsImpl {
+
+        public TestMigrationActions() {
+            super(null, null);
+        }
+
+        public void runTestFunction(Consumer<MigrationStateMachineContext> testFunction) {
+            testFunction.accept(getStateMachineContext());
+        }
 
     }
 

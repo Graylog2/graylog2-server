@@ -38,34 +38,30 @@ public class MigrationStateMachineImpl implements MigrationStateMachine {
         this.stateMachine = stateMachine;
         this.migrationActions = migrationActions;
         this.persistenceService = persistenceService;
-        this.context = persistenceService.getStateMachineContext().orElse(MigrationStateMachineContext.create());
+        this.context = persistenceService.getStateMachineContext().orElse(new MigrationStateMachineContext());
     }
 
     @Override
-    public CurrentStateInformation triggerWithContext(MigrationStep step, Map<String, Object> args) {
+    public CurrentStateInformation trigger(MigrationStep step, Map<String, Object> args) {
+        context.setCurrentStep(step);
         if (Objects.nonNull(args) && !args.isEmpty()) {
-            this.context = context.withArguments(step, args);
-            persistenceService.saveStateMachineContext(context);
+            context.addActionArguments(step, args);
         }
+        migrationActions.setStateMachineContext(context);
         String errorMessage = null;
         try {
             stateMachine.fire(step);
         } catch (Exception e) {
             errorMessage = Objects.nonNull(e.getMessage()) ? e.getMessage() : e.toString();
         }
+        context = migrationActions.getStateMachineContext();
+        persistenceService.saveStateMachineContext(context);
         return new CurrentStateInformation(getState(), nextSteps(), errorMessage);
     }
 
-
     @Override
-    public MigrationState trigger(MigrationStep step, Map<String, Object> args) {
-        try {
-            migrationActions.setArgs(args);
-            stateMachine.fire(step);
-        } finally {
-            migrationActions.clearArgs();
-        }
-        return stateMachine.getState();
+    public MigrationStateMachineContext getContext() {
+        return context;
     }
 
     @Override

@@ -26,7 +26,7 @@ import java.util.Optional;
 public class InMemoryStateMachinePersistence implements DatanodeMigrationPersistence {
 
     private MigrationState currentState = MigrationState.NEW;
-    private MigrationStateMachineContext context = MigrationStateMachineContext.create();
+    private MigrationStateMachineContext context = new MigrationStateMachineContext();
 
     @Override
     public Optional<DatanodeMigrationConfiguration> getConfiguration() {

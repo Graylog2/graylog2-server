@@ -16,44 +16,57 @@
  */
 package org.graylog.plugins.views.storage.migration.state.machine;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
-@AutoValue
-public abstract class MigrationStateMachineContext {
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.PROTECTED_AND_PUBLIC)
+public class MigrationStateMachineContext {
 
-    @JsonProperty("action_arguments")
-    public abstract Map<MigrationStep, Object> actionArguments();
+    @JsonProperty
+    protected MigrationStep currentStep;
+    @JsonProperty
+    protected Map<MigrationStep, Map<String, Object>> actionArguments;
+    @JsonProperty
+    protected Map<String, Object> extendedState;
 
-    public abstract Builder toBuilder();
-
-    public MigrationStateMachineContext withArguments(MigrationStep step, Object args) {
-        Map<MigrationStep, Object> currentArgs = actionArguments();
-        currentArgs.put(step, args);
-        return toBuilder().actionArguments(currentArgs).build();
+    public MigrationStateMachineContext() {
+        this.actionArguments = new HashMap<>();
+        this.extendedState = new HashMap<>();
     }
 
-    @JsonCreator
-    public static MigrationStateMachineContext create() {
-        return builder()
-                .actionArguments(new HashMap<>())
-                .build();
+    public void setCurrentStep(MigrationStep currentStep) {
+        this.currentStep = currentStep;
     }
 
-    public static Builder builder() {
-        return new AutoValue_MigrationStateMachineContext.Builder();
+    public <T> T getActionArgument(String name, Class<T> type) {
+        Map<String, Object> args = this.actionArguments.get(currentStep);
+        if (Objects.isNull(args)) {
+            throw new IllegalArgumentException("Missing arguments for step " + currentStep);
+        }
+        if (!args.containsKey(name)) {
+            throw new IllegalArgumentException("Missing argument " + name + " for step " + currentStep);
+        }
+        Object arg = args.get(name);
+        if (!type.isInstance(arg)) {
+            throw new IllegalArgumentException("Argument " + name + " must be of type " + type);
+        }
+        return (T) arg;
     }
 
-
-    @AutoValue.Builder
-    public abstract static class Builder {
-        @JsonProperty("action_arguments")
-        public abstract Builder actionArguments(Map<MigrationStep, Object> actionArguments);
-
-        public abstract MigrationStateMachineContext build();
+    public void addActionArguments(MigrationStep step, Map<String, Object> args) {
+        this.actionArguments.put(step, args);
     }
+
+    public void addExtendedState(String key, Object value) {
+        this.extendedState.put(key, value);
+    }
+
+    public Object getExtendedState(String key) {
+        return this.extendedState.get(key);
+    }
+
 }

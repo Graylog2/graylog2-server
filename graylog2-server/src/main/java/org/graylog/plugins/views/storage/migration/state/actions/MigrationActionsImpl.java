@@ -17,16 +17,20 @@
 package org.graylog.plugins.views.storage.migration.state.actions;
 
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachineContext;
 import org.graylog.plugins.views.storage.migration.state.persistence.DatanodeMigrationConfiguration;
 import org.graylog.security.certutil.CaService;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 
+@Singleton
 public class MigrationActionsImpl implements MigrationActions {
 
     private final ClusterConfigService clusterConfigService;
     private final CaService caService;
+    private MigrationStateMachineContext stateMachineContext;
 
     @Inject
     public MigrationActionsImpl(final ClusterConfigService clusterConfigService,
@@ -108,4 +112,15 @@ public class MigrationActionsImpl implements MigrationActions {
     public boolean caAndRemovalPolicyExist() {
         return !caDoesNotExist() && !removalPolicyDoesNotExist();
     }
+
+    @Override
+    public void setStateMachineContext(MigrationStateMachineContext context) {
+        this.stateMachineContext = context;
+    }
+
+    @Override
+    public MigrationStateMachineContext getStateMachineContext() {
+        return stateMachineContext;
+    }
+
 }

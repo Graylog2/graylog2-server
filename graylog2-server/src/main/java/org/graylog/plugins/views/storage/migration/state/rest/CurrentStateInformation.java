@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.storage.migration.state.rest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationState;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStep;
 
@@ -25,6 +26,10 @@ public record CurrentStateInformation(MigrationState state, List<MigrationStep> 
 
     public CurrentStateInformation(MigrationState state, List<MigrationStep> nextSteps) {
         this(state, nextSteps, null);
+    }
+
+    public boolean hasErrors() {
+        return StringUtils.isNotBlank(errorMessage);
     }
 
 }

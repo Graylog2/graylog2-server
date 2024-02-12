@@ -22,12 +22,14 @@ import java.util.List;
 import java.util.Map;
 
 public interface MigrationStateMachine {
-    CurrentStateInformation triggerWithContext(MigrationStep step, Map<String, Object> args);
 
-    MigrationState trigger(MigrationStep step, Map<String, Object> args);
+    CurrentStateInformation trigger(MigrationStep step, Map<String, Object> args);
+
     MigrationState getState();
 
     List<MigrationStep> nextSteps();
+
+    MigrationStateMachineContext getContext();
 
     String serialize();
 }

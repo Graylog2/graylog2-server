@@ -25,6 +25,16 @@ public class MigrationActionsAdapter implements MigrationActions {
     }
 
     @Override
+    public void setStateMachineContext(MigrationStateMachineContext context) {
+
+    }
+
+    @Override
+    public MigrationStateMachineContext getStateMachineContext() {
+        return null;
+    }
+
+    @Override
     public boolean runDirectoryCompatibilityCheck() {
         return false;
     }
