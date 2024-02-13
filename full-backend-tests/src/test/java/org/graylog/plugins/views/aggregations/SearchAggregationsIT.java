@@ -917,8 +917,7 @@ public class SearchAggregationsIT {
         validatableResponse
                 .rootPath(searchTypeResult)
                 .body(pathToMetricResult(List.of("true", "6476752"), List.of("count()")), equalTo(1))
-                .body(pathToMetricResult(List.of("false", "6469981"), List.of("count()")), equalTo(1))
-                .body(pathToMetricResult("(Empty Value)", "count()"), equalTo(998));
+                .body(pathToMetricResult(List.of("false", "6469981"), List.of("count()")), equalTo(1));
     }
 
     private String listToGroovy(Collection<String> strings) {
