@@ -21,7 +21,6 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import com.lmax.disruptor.WorkHandler;
 import de.huxhorn.sulky.ulid.ULID;
 import org.graylog.failure.FailureSubmissionService;
 import org.graylog2.buffers.OutputBuffer;
@@ -33,13 +32,16 @@ import org.graylog2.plugin.buffers.MessageEvent;
 import org.graylog2.plugin.messageprocessors.MessageProcessor;
 import org.graylog2.plugin.streams.DefaultStream;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.shared.buffers.WorkHandler;
 import org.graylog2.streams.StreamMetrics;
 import org.graylog2.system.processing.ProcessingStatusRecorder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import javax.inject.Provider;
+
+import jakarta.inject.Provider;
+
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Optional;
@@ -181,7 +183,7 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
             message.setProcessingTime(Tools.nowUTC());
             processingStatusRecorder.updatePostProcessingReceiveTime(message.getReceiveTime());
 
-            if(failureSubmissionService.submitProcessingErrors(message)) {
+            if (failureSubmissionService.submitProcessingErrors(message)) {
                 outputBuffer.insertBlocking(message);
             }
         }

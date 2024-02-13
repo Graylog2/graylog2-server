@@ -16,37 +16,29 @@
  */
 package org.graylog.storage.opensearch2;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
 import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog2.shared.utilities.StringUtils;
 import org.graylog2.storage.SearchVersion;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Optional;
 
 public class NodeAdapterOS2 implements NodeAdapter {
-    private final PlainJsonApi jsonApi;
+    private final OpenSearchClient client;
 
     @Inject
-    public NodeAdapterOS2(OpenSearchClient client, ObjectMapper objectMapper) {
-        this.jsonApi = new PlainJsonApi(objectMapper, client);
-    }
-
-    NodeAdapterOS2(final PlainJsonApi jsonApi) {
-        this.jsonApi = jsonApi;
+    public NodeAdapterOS2(OpenSearchClient client) {
+        this.client = client;
     }
 
     @Override
     public Optional<SearchVersion> version() {
+        var info = client.execute(c -> c.info());
 
-        final Request request = new Request("GET", "/?filter_path=version.number,version.distribution");
-        final Optional<JsonNode> resp = Optional.of(jsonApi.perform(request, "Unable to retrieve cluster information"));
+        final Optional<String> version = Optional.ofNullable(info.version().number());
 
-        final Optional<String> version = resp.map(r -> r.path("version")).map(r -> r.path("number")).map(JsonNode::textValue);
-
-        final SearchVersion.Distribution distribution = resp.map(r -> r.path("version")).map(r -> r.path("distribution")).map(JsonNode::textValue)
+        final SearchVersion.Distribution distribution = Optional.ofNullable(info.version().distribution())
                 .map(StringUtils::toUpperCase)
                 .map(SearchVersion.Distribution::valueOf)
                 .orElse(SearchVersion.Distribution.ELASTICSEARCH);

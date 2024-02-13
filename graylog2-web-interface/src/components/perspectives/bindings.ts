@@ -24,7 +24,7 @@ const perspectivesBindings = {
     {
       id: 'default',
       title: 'General',
-      brandLink: Routes.WELCOME,
+      welcomeRoute: Routes.WELCOME,
       brandComponent: DefaultBrand,
     },
   ],

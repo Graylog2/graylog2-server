@@ -19,6 +19,9 @@ package org.graylog2.indexer.fieldtypes.utils;
 import org.graylog2.indexer.fieldtypes.FieldTypeDTO;
 import org.graylog2.indexer.indexset.CustomFieldMapping;
 import org.graylog2.indexer.indexset.CustomFieldMappings;
+import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile;
+import org.graylog2.rest.resources.system.indexer.responses.FieldTypeOrigin;
+import org.graylog2.rest.resources.system.indexer.responses.IndexSetFieldType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -38,77 +41,94 @@ class FieldTypeDTOsMergerTest {
 
     @Test
     void fieldDTOsFromNewerIndexOverrideFieldDTOsFromOlderIndex() {
-        final Collection<FieldTypeDTO> merged = toTest.merge(
+        final Collection<IndexSetFieldType> merged = toTest.merge(
                 List.of(
                         FieldTypeDTO.create("changed_field", "long")
                 ),
                 List.of(
-                        FieldTypeDTO.create("changed_field", "text")
+                        FieldTypeDTO.create("changed_field", "date")
                 ),
-                new CustomFieldMappings()
+                new CustomFieldMappings(),
+                new IndexFieldTypeProfile("id", "name", "descr", new CustomFieldMappings())
         );
 
         assertThat(merged)
                 .isNotNull()
                 .hasSize(1)
-                .contains(FieldTypeDTO.create("changed_field", "long"));
+                .contains(new IndexSetFieldType("changed_field", "long", FieldTypeOrigin.INDEX, false));
     }
 
     @Test
     void customMappingsOverrideEverything() {
-        final Collection<FieldTypeDTO> merged = toTest.merge(
+        final Collection<IndexSetFieldType> merged = toTest.merge(
                 List.of(
                         FieldTypeDTO.create("changed_field", "long")
                 ),
                 List.of(
-                        FieldTypeDTO.create("changed_field", "text")
+                        FieldTypeDTO.create("changed_field", "date")
                 ),
                 new CustomFieldMappings(
                         List.of(new CustomFieldMapping("changed_field", "ip"))
-                )
+                ),
+                new IndexFieldTypeProfile("id", "name", "descr", new CustomFieldMappings(
+                        List.of(new CustomFieldMapping("changed_field", "double"))
+                ))
         );
 
         assertThat(merged)
                 .isNotNull()
                 .hasSize(1)
-                .contains(FieldTypeDTO.create("changed_field", "ip"));
+                .contains(new IndexSetFieldType("changed_field", "ip", FieldTypeOrigin.OVERRIDDEN_PROFILE, false));
     }
 
     @Test
     void complexMergeScenario() {
-        final Collection<FieldTypeDTO> merged = toTest.merge(
+        final Collection<IndexSetFieldType> merged = toTest.merge(
                 List.of(
                         FieldTypeDTO.create("unique_in_new", "long"),
                         FieldTypeDTO.create("present_everywhere", "long"),
                         FieldTypeDTO.create("present_new_and_old", "long"),
-                        FieldTypeDTO.create("present_custom_and_new", "long")
+                        FieldTypeDTO.create("present_custom_and_new", "long"),
+                        FieldTypeDTO.create("present_profile_and_new", "long")
                 ),
                 List.of(
-                        FieldTypeDTO.create("unique_in_old", "text"),
-                        FieldTypeDTO.create("present_everywhere", "text"),
-                        FieldTypeDTO.create("present_new_and_old", "text"),
-                        FieldTypeDTO.create("present_custom_and_old", "text")
+                        FieldTypeDTO.create("unique_in_old", "date"),
+                        FieldTypeDTO.create("present_everywhere", "date"),
+                        FieldTypeDTO.create("present_new_and_old", "date"),
+                        FieldTypeDTO.create("present_custom_and_old", "date")
                 ),
                 new CustomFieldMappings(
                         List.of(
                                 new CustomFieldMapping("unique_in_custom", "ip"),
                                 new CustomFieldMapping("present_everywhere", "ip"),
                                 new CustomFieldMapping("present_custom_and_new", "ip"),
-                                new CustomFieldMapping("present_custom_and_old", "ip")
+                                new CustomFieldMapping("present_custom_and_old", "ip"),
+                                new CustomFieldMapping("present_custom_and_profile", "ip")
                         )
-                )
+                ),
+                new IndexFieldTypeProfile("id", "name", "descr", new CustomFieldMappings(
+                        List.of(
+                                new CustomFieldMapping("present_everywhere", "double"),
+                                new CustomFieldMapping("unique_in_profile", "double"),
+                                new CustomFieldMapping("present_custom_and_profile", "double"),
+                                new CustomFieldMapping("present_profile_and_new", "double")
+                        )
+                ))
         );
 
         assertThat(merged)
                 .isNotNull()
-                .hasSize(7)
-                .contains(FieldTypeDTO.create("present_everywhere", "ip"))
-                .contains(FieldTypeDTO.create("unique_in_custom", "ip"))
-                .contains(FieldTypeDTO.create("present_custom_and_new", "ip"))
-                .contains(FieldTypeDTO.create("present_custom_and_old", "ip"))
-                .contains(FieldTypeDTO.create("unique_in_new", "long"))
-                .contains(FieldTypeDTO.create("present_new_and_old", "long"))
-                .contains(FieldTypeDTO.create("unique_in_old", "text"));
+                .hasSize(10)
+                .contains(new IndexSetFieldType("present_everywhere", "ip", FieldTypeOrigin.OVERRIDDEN_PROFILE, false))
+                .contains(new IndexSetFieldType("unique_in_custom", "ip", FieldTypeOrigin.OVERRIDDEN_INDEX, false))
+                .contains(new IndexSetFieldType("present_custom_and_new", "ip", FieldTypeOrigin.OVERRIDDEN_INDEX, false))
+                .contains(new IndexSetFieldType("present_custom_and_old", "ip", FieldTypeOrigin.OVERRIDDEN_INDEX, false))
+                .contains(new IndexSetFieldType("present_custom_and_profile", "ip", FieldTypeOrigin.OVERRIDDEN_PROFILE, false))
+                .contains(new IndexSetFieldType("unique_in_profile", "double", FieldTypeOrigin.PROFILE, false))
+                .contains(new IndexSetFieldType("present_profile_and_new", "double", FieldTypeOrigin.PROFILE, false))
+                .contains(new IndexSetFieldType("unique_in_new", "long", FieldTypeOrigin.INDEX, false))
+                .contains(new IndexSetFieldType("present_new_and_old", "long", FieldTypeOrigin.INDEX, false))
+                .contains(new IndexSetFieldType("unique_in_old", "date", FieldTypeOrigin.INDEX, false));
 
     }
 }

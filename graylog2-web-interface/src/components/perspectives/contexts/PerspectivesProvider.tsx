@@ -24,8 +24,15 @@ import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import UserPreferencesContext from 'contexts/UserPreferencesContext';
 import { PreferencesStore } from 'stores/users/PreferencesStore';
 import Store from 'logic/local-storage/Store';
+import type { Perspective } from 'components/perspectives/types';
 
 import PerspectivesContext from './PerspectivesContext';
+
+const DEFAULT_PERSPECTIVE = 'default';
+
+const findPerspective = (perspectives: Array<Perspective>, perspectiveId: string) => (
+  perspectives.find(({ id }) => id === perspectiveId)
+);
 
 const usePersistedSetting = (settingKey: string) => {
   const { userIsReadOnly, username } = useStore(CurrentUserStore, (userStore) => ({
@@ -51,23 +58,33 @@ const usePersistedSetting = (settingKey: string) => {
   return useMemo(() => [setting, setSetting], [setSetting, setting]);
 };
 
-const PerspectivesProvider = ({ children }: PropsWithChildren) => {
+const useActivePerspectiveState = (availablePerspectives: Array<Perspective>) => {
   const [persistedPerspective, setPersistedPerspective] = usePersistedSetting('perspective');
-  const [activePerspective, setActivePerspective] = useState(persistedPerspective ?? 'default');
+  const [activePerspective, setActivePerspective] = useState<string>(
+    findPerspective(availablePerspectives, persistedPerspective) ? persistedPerspective : DEFAULT_PERSPECTIVE,
+  );
   const setActivePerspectiveWithPersistence = useCallback((newPerspective: string) => {
     setActivePerspective(newPerspective);
 
     return setPersistedPerspective(newPerspective);
   }, [setPersistedPerspective]);
+
+  return {
+    activePerspective: findPerspective(availablePerspectives, activePerspective),
+    setActivePerspective: setActivePerspectiveWithPersistence,
+  };
+};
+
+const PerspectivesProvider = ({ children }: PropsWithChildren) => {
   const allPerspectives = usePluginEntities('perspectives');
   const availablePerspectives = allPerspectives
     .filter((perspective) => (perspective.useCondition ? !!perspective.useCondition() : true));
-
+  const { activePerspective, setActivePerspective } = useActivePerspectiveState(availablePerspectives);
   const contextValue = useMemo(() => ({
     activePerspective,
     availablePerspectives,
-    setActivePerspective: setActivePerspectiveWithPersistence,
-  }), [activePerspective, availablePerspectives, setActivePerspectiveWithPersistence]);
+    setActivePerspective,
+  }), [activePerspective, availablePerspectives, setActivePerspective]);
 
   return (
     <PerspectivesContext.Provider value={contextValue}>

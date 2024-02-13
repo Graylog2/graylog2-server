@@ -19,31 +19,18 @@ import { useQuery } from '@tanstack/react-query';
 import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
-import type { Attribute, SearchParams } from 'stores/PaginationTypes';
+import type { SearchParams } from 'stores/PaginationTypes';
 import PaginationURL from 'util/PaginationURL';
 import FiltersForQueryParams from 'components/common/EntityFilters/FiltersForQueryParams';
+import type { IndexSetFieldTypeJson, IndexSetFieldTypesQueryData } from 'components/indices/IndexSetFieldTypes/types';
 
 const INITIAL_DATA = {
   pagination: { total: 0 },
   list: [],
   attributes: [],
 };
-export type IndexSetFieldTypeJson = {
-    field_name: string,
-    type: string,
-    is_custom: boolean,
-    is_reserved: boolean,
-}
 
-export type IndexSetFieldType = {
-    id: string,
-    fieldName: string,
-    isCustom: boolean,
-    isReserved: boolean,
-    type: string,
-}
-
-const fetchIndexSetFieldTypes = async (indexSetId: string, searchParams: SearchParams) => {
+export const fetchIndexSetFieldTypes = async (indexSetId: string, searchParams: SearchParams): Promise<IndexSetFieldTypesQueryData> => {
   const indexSetFieldTypeUrl = qualifyUrl(`/system/indices/index_sets/types/${indexSetId}`);
   const url = PaginationURL(
     indexSetFieldTypeUrl,
@@ -58,7 +45,7 @@ const fetchIndexSetFieldTypes = async (indexSetId: string, searchParams: SearchP
         id: fieldType.field_name,
         fieldName: fieldType.field_name,
         type: fieldType.type,
-        isCustom: fieldType.is_custom,
+        origin: fieldType.origin,
         isReserved: fieldType.is_reserved,
       })),
       pagination: { total },
@@ -67,11 +54,7 @@ const fetchIndexSetFieldTypes = async (indexSetId: string, searchParams: SearchP
 };
 
 const useIndexSetFieldTypes = (indexSetId: string, searchParams: SearchParams, { enabled }): {
-  data: {
-    list: Readonly<Array<IndexSetFieldType>>,
-    pagination: { total: number },
-    attributes: Array<Attribute>
-  },
+  data: IndexSetFieldTypesQueryData,
   isLoading: boolean,
   refetch: () => void,
 } => {

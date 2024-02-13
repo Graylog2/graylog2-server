@@ -15,18 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { asElement, fireEvent, render } from 'wrappedTestingLibrary';
+import { asElement, fireEvent, render, screen } from 'wrappedTestingLibrary';
 
 import DrilldownContext from 'views/components/contexts/DrilldownContext';
 
 import SurroundingSearchButton from './SurroundingSearchButton';
 
-const getOption = (optionText, getByText) => {
-  const button = getByText('Show surrounding messages');
+const getOption = (optionText) => {
+  const button = screen.getByRole('button', { name: /show surrounding messages/i });
 
   fireEvent.click(button);
 
-  return getByText(optionText);
+  return screen.getByRole('menuitem', { name: new RegExp(optionText, 'i') });
 };
 
 describe('SurroundingSearchButton', () => {
@@ -51,25 +51,25 @@ describe('SurroundingSearchButton', () => {
   const renderButton = (props: Partial<React.ComponentProps<typeof SurroundingSearchButton>> = {}) => render(<TestComponent {...props} />);
 
   it('renders a button with a "Show surrounding messages" caption', () => {
-    const { getByText } = renderButton();
+    renderButton();
 
-    expect(getByText('Show surrounding messages')).toBeTruthy();
+    expect(screen.getByText('Show surrounding messages')).toBeTruthy();
   });
 
   it('shows a dropdown after clicking the button', () => {
-    const { getByText } = renderButton();
-    const button = getByText('Show surrounding messages');
+    renderButton();
+    const button = screen.getByText('Show surrounding messages');
 
     fireEvent.click(button);
 
-    expect(getByText('Only a minute')).toBeTruthy();
-    expect(getByText('1 second')).toBeTruthy();
+    expect(screen.getByText('Only a minute')).toBeTruthy();
+    expect(screen.getByText('1 second')).toBeTruthy();
   });
 
   it('one second option has a valid url', () => {
-    const { getByText } = renderButton();
+    renderButton();
 
-    const oneSecond = getOption('1 second', getByText);
+    const oneSecond = getOption('1 second');
 
     expect(asElement(oneSecond, HTMLAnchorElement).href).toEqual(
       'http://localhost/search?rangetype=absolute&from=2020-02-28T09%3A45%3A30.123Z&to=2020-02-28T09%3A45%3A32.123Z&highlightMessage=foo-bar',
@@ -77,9 +77,9 @@ describe('SurroundingSearchButton', () => {
   });
 
   it('"Only a minute" option has a valid url', () => {
-    const { getByText } = renderButton();
+    renderButton();
 
-    const onlyAMinute = asElement(getOption('Only a minute', getByText), HTMLAnchorElement);
+    const onlyAMinute = asElement(getOption('Only a minute'), HTMLAnchorElement);
 
     expect(onlyAMinute.href).toEqual(
       'http://localhost/search?rangetype=absolute&from=2020-02-28T09%3A44%3A31.123Z&to=2020-02-28T09%3A46%3A31.123Z&highlightMessage=foo-bar',
@@ -87,38 +87,39 @@ describe('SurroundingSearchButton', () => {
   });
 
   it('the option opens the link in a new page', () => {
-    const { getByText } = renderButton();
+    renderButton();
 
-    const option = asElement(getOption('1 second', getByText), HTMLAnchorElement);
+    const option = asElement(getOption('1 second'), HTMLAnchorElement);
 
     expect(option.target).toEqual('_blank');
     expect(option.rel).toEqual('noopener noreferrer');
   });
 
   it('the "1 second" option has a valid url', () => {
-    const { getByText } = renderButton({
+    renderButton({
       messageFields: {
         somefield: '42',
       },
     });
 
-    const option = asElement(getOption('1 second', getByText), HTMLAnchorElement);
+    const option = asElement(getOption('1 second'), HTMLAnchorElement);
 
     expect(option.href).toContain('q=somefield%3A%2242%22');
     expect(option.href).not.toContain('someotherfield');
   });
 
   it('adds a query parameter for highlighting the id of the current message', () => {
-    const { getByText } = renderButton();
+    renderButton();
 
-    const option = asElement(getOption('1 second', getByText), HTMLAnchorElement);
+    const option = asElement(getOption('1 second'), HTMLAnchorElement);
 
     expect(option.href).toContain('highlightMessage=foo-bar');
   });
 
   it('includes current set of streams in generated urls', () => {
     const streams = ['000000000000000000000001', '5c2e07eeba33a9681ad6070a', '5d2d9649e117dc4df84cf83c'];
-    const { getByText } = render((
+
+    render((
       <DrilldownContext.Consumer>
         {(drilldown) => (
           <DrilldownContext.Provider value={{ ...drilldown, streams }}>
@@ -128,15 +129,15 @@ describe('SurroundingSearchButton', () => {
       </DrilldownContext.Consumer>
     ));
 
-    const option = asElement(getOption('1 second', getByText), HTMLAnchorElement);
+    const option = asElement(getOption('1 second'), HTMLAnchorElement);
 
     expect(option.href).toContain('streams=000000000000000000000001%2C5c2e07eeba33a9681ad6070a%2C5d2d9649e117dc4df84cf83c');
   });
 
   it('does not include a `streams` key in generated urls if none are selected', () => {
-    const { getByText } = renderButton();
+    renderButton();
 
-    const option = asElement(getOption('1 second', getByText), HTMLAnchorElement);
+    const option = asElement(getOption('1 second'), HTMLAnchorElement);
 
     expect(option.href).not.toContain('streams=');
   });

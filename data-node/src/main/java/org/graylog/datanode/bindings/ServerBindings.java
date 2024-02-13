@@ -21,6 +21,8 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.multibindings.OptionalBinder;
 import org.graylog.datanode.Configuration;
+import org.graylog.datanode.process.ProcessStateMachine;
+import org.graylog.datanode.process.ProcessStateMachineProvider;
 import org.graylog.datanode.shared.system.activities.DataNodeActivityWriter;
 import org.graylog.security.certutil.keystore.storage.KeystoreContentMover;
 import org.graylog.security.certutil.keystore.storage.SinglePasswordKeystoreContentMover;
@@ -38,8 +40,8 @@ import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.shared.bindings.providers.EventBusProvider;
 import org.graylog2.shared.system.activities.ActivityWriter;
 
-import javax.ws.rs.container.DynamicFeature;
-import javax.ws.rs.ext.ExceptionMapper;
+import jakarta.ws.rs.container.DynamicFeature;
+import jakarta.ws.rs.ext.ExceptionMapper;
 
 public class ServerBindings extends Graylog2Module {
     private final Configuration configuration;
@@ -69,6 +71,7 @@ public class ServerBindings extends Graylog2Module {
         bind(ClusterEventBus.class).toProvider(ClusterEventBusProvider.class).asEagerSingleton();
         bind(EventBus.class).toProvider(EventBusProvider.class).asEagerSingleton();
         bind(InputConfigurationBeanDeserializerModifier.class).toInstance(InputConfigurationBeanDeserializerModifier.withoutConfig());
+        bind(ProcessStateMachine.class).toProvider(ProcessStateMachineProvider.class).asEagerSingleton();
     }
 
     private void bindFactoryModules() {

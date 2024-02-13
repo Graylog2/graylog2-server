@@ -22,11 +22,18 @@ import org.graylog.events.search.MoreSearchAdapter;
 import org.graylog.plugins.views.migrations.V20200730000000_AddGl2MessageIdFieldAliasForEvents;
 import org.graylog.plugins.views.search.engine.GeneratedQueryContext;
 import org.graylog.plugins.views.search.engine.QueryBackend;
+import org.graylog.plugins.views.search.engine.QueryExecutionStats;
+import org.graylog.plugins.views.search.engine.monitoring.collection.InMemoryCappedStatsCollector;
+import org.graylog.plugins.views.search.engine.monitoring.collection.NoOpStatsCollector;
+import org.graylog.plugins.views.search.engine.monitoring.collection.StatsCollector;
+import org.graylog2.Configuration;
 import org.graylog2.indexer.IndexToolsAdapter;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog2.indexer.counts.CountsAdapter;
 import org.graylog2.indexer.datanode.ProxyRequestAdapter;
+import org.graylog2.indexer.datastream.DataStreamAdapter;
+import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerAdapter;
 import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.StreamsForFieldRetriever;
 import org.graylog2.indexer.indices.IndicesAdapter;
@@ -36,6 +43,7 @@ import org.graylog2.indexer.searches.SearchesAdapter;
 import org.graylog2.migrations.V20170607164210_MigrateReopenedIndicesToAliases;
 import org.graylog2.storage.providers.ClusterAdapterProvider;
 import org.graylog2.storage.providers.CountsAdapterProvider;
+import org.graylog2.storage.providers.DataStreamAdapterProvider;
 import org.graylog2.storage.providers.ElasticsearchBackendProvider;
 import org.graylog2.storage.providers.IndexFieldTypePollerAdapterProvider;
 import org.graylog2.storage.providers.IndexToolsAdapterProvider;
@@ -45,6 +53,7 @@ import org.graylog2.storage.providers.MoreSearchAdapterProvider;
 import org.graylog2.storage.providers.MultiChunkResultRetrieverProvider;
 import org.graylog2.storage.providers.NodeAdapterProvider;
 import org.graylog2.storage.providers.ProxyRequestAdapterProvider;
+import org.graylog2.storage.providers.RemoteReindexingMigrationAdapterProvider;
 import org.graylog2.storage.providers.SearchesAdapterProvider;
 import org.graylog2.storage.providers.StreamsForFieldRetrieverProvider;
 import org.graylog2.storage.providers.V20170607164210_MigrateReopenedIndicesToAliasesClusterStateAdapterProvider;
@@ -52,11 +61,19 @@ import org.graylog2.storage.providers.V20200730000000_AddGl2MessageIdFieldAliasF
 
 
 public class VersionAwareStorageModule extends AbstractModule {
+
+    private final Configuration configuration;
+
+    public VersionAwareStorageModule(Configuration configuration) {
+        this.configuration = configuration;
+    }
+
     @Override
     protected void configure() {
         bind(StreamsForFieldRetriever.class).toProvider(StreamsForFieldRetrieverProvider.class);
         bind(CountsAdapter.class).toProvider(CountsAdapterProvider.class);
         bind(IndicesAdapter.class).toProvider(IndicesAdapterProvider.class);
+        bind(DataStreamAdapter.class).toProvider(DataStreamAdapterProvider.class);
         bind(SearchesAdapter.class).toProvider(SearchesAdapterProvider.class);
         bind(MultiChunkResultRetriever.class).toProvider(MultiChunkResultRetrieverProvider.class);
         bind(MoreSearchAdapter.class).toProvider(MoreSearchAdapterProvider.class);
@@ -70,11 +87,19 @@ public class VersionAwareStorageModule extends AbstractModule {
         bind(V20200730000000_AddGl2MessageIdFieldAliasForEvents.ElasticsearchAdapter.class)
                 .toProvider(V20200730000000_AddGl2MessageIdFieldAliasForEventsElasticsearchAdapterProvider.class);
         bind(ProxyRequestAdapter.class).toProvider(ProxyRequestAdapterProvider.class);
+        bind(RemoteReindexingMigrationAdapter.class).toProvider(RemoteReindexingMigrationAdapterProvider.class);
 
         bindQueryBackend();
     }
 
     private void bindQueryBackend() {
+        if (configuration.isQueryLatencyMonitoringEnabled() && configuration.getQueryLatencyMonitoringWindowSize() > 0) {
+            bind(new TypeLiteral<StatsCollector<QueryExecutionStats>>() {})
+                    .toInstance(new InMemoryCappedStatsCollector<>(configuration.getQueryLatencyMonitoringWindowSize()));
+        } else {
+            bind(new TypeLiteral<StatsCollector<QueryExecutionStats>>() {})
+                    .toInstance(new NoOpStatsCollector<>());
+        }
         bind(new TypeLiteral<QueryBackend<? extends GeneratedQueryContext>>() {})
                 .toProvider(ElasticsearchBackendProvider.class);
     }

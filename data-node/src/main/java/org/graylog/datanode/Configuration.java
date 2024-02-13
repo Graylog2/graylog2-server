@@ -23,6 +23,7 @@ import com.github.joschi.jadconfig.Validator;
 import com.github.joschi.jadconfig.ValidatorMethod;
 import com.github.joschi.jadconfig.converters.IntegerConverter;
 import com.github.joschi.jadconfig.converters.StringListConverter;
+import com.github.joschi.jadconfig.converters.StringSetConverter;
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
@@ -31,6 +32,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.net.InetAddresses;
 import org.graylog.datanode.configuration.BaseConfiguration;
 import org.graylog.datanode.configuration.DatanodeDirectories;
+import org.graylog2.Configuration.SafeClassesValidator;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.SuppressForbidden;
 import org.joda.time.DateTimeZone;
@@ -50,6 +52,7 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Helper class to hold configuration of Graylog
@@ -213,6 +216,30 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "http_allow_embedding")
     private boolean httpAllowEmbedding = false;
 
+    /**
+     * Classes considered safe to load by name. A set of prefixes matched against the fully qualified class name.
+     */
+    @Parameter(value = org.graylog2.Configuration.SAFE_CLASSES, converter = StringSetConverter.class, validators = SafeClassesValidator.class)
+    private Set<String> safeClasses = Set.of("org.graylog.", "org.graylog2.");
+
+    @Parameter(value = "metrics_timestamp")
+    private String metricsTimestamp = "timestamp";
+
+    @Parameter(value = "metrics_stream")
+    private String metricsStream = "gl-datanode-metrics";
+
+    @Parameter(value = "metrics_retention")
+    private String metricsRetention = "14d";
+
+    @Parameter(value = "metrics_daily_retention")
+    private String metricsDailyRetention = "365d";
+
+    @Parameter(value = "metrics_daily_index")
+    private String metricsDailyIndex = "gl-datanode-metrics-daily";
+
+    @Parameter(value = "metrics_policy")
+    private String metricsPolicy = "gl-datanode-metrics-ism";
+
     public boolean isInsecureStartup() {
         return insecureStartup;
     }
@@ -359,6 +386,31 @@ public class Configuration extends BaseConfiguration {
 
     public String getClustername() {
         return clustername;
+    }
+
+
+    public String getMetricsTimestamp() {
+        return metricsTimestamp;
+    }
+
+    public String getMetricsStream() {
+        return metricsStream;
+    }
+
+    public String getMetricsRetention() {
+        return metricsRetention;
+    }
+
+    public String getMetricsDailyRetention() {
+        return metricsDailyRetention;
+    }
+
+    public String getMetricsDailyIndex() {
+        return metricsDailyIndex;
+    }
+
+    public String getMetricsPolicy() {
+        return metricsPolicy;
     }
 
     public static class NodeIdFileValidator implements Validator<String> {
@@ -582,4 +634,5 @@ public class Configuration extends BaseConfiguration {
     public String getRootPasswordSha2() {
         return rootPasswordSha2;
     }
+
 }

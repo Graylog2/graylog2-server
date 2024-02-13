@@ -15,107 +15,130 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { mount } from 'wrappedEnzyme';
-import type { ReactWrapper } from 'enzyme';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import { MenuItem } from 'components/bootstrap';
 
 import ActionDropdown from './ActionDropdown';
 
 describe('ActionDropdown', () => {
-  const findLink = (wrapper: ReactWrapper, text: string) => wrapper.findWhere((node) => node.type() === 'a' && node.text() === text);
-
-  it('opens menu when trigger element is clicked', () => {
-    const wrapper = mount((
+  it('opens menu when trigger element is clicked', async () => {
+    render((
       <ActionDropdown element={<div className="my-trigger-element">Trigger!</div>}>
         <MenuItem>Foo</MenuItem>
       </ActionDropdown>
     ));
 
-    expect(wrapper).not.toContainMatchingElement('ul.dropdown-menu');
+    const triggerButton = await screen.findByText('Trigger!');
 
-    const trigger = wrapper.find('ActionToggle');
+    expect(screen.queryByText('Foo')).not.toBeInTheDocument();
 
-    expect(trigger).toContainMatchingElement('div.my-trigger-element');
+    await userEvent.click(triggerButton);
 
-    trigger.simulate('click');
-
-    expect(wrapper).toContainMatchingElement('ul.dropdown-menu');
+    await screen.findByRole('menuitem', { name: 'Foo' });
   });
 
-  it('stops event when trigger element is clicked', () => {
-    const onClick = jest.fn();
-    const wrapper = mount((
+  it('stops event when trigger element is clicked', async () => {
+    const onClick = jest.fn((e) => e.persist());
+
+    render((
       <button type="button" onClick={onClick}>
         <ActionDropdown element={<div className="my-trigger-element">Trigger!</div>}>
           <MenuItem>Foo</MenuItem>
         </ActionDropdown>
       </button>
     ));
-    const trigger = wrapper.find('ActionToggle');
 
-    trigger.simulate('click');
+    const triggerButton = await screen.findByText('Trigger!');
+
+    expect(screen.queryByText('Foo')).not.toBeInTheDocument();
+
+    await userEvent.click(triggerButton);
+
+    await screen.findByRole('menuitem', { name: 'Foo' });
 
     expect(onClick).not.toHaveBeenCalled();
   });
 
-  it('closes menu when MenuItem is clicked', () => {
+  it('closes menu when MenuItem is clicked', async () => {
     const onSelect = jest.fn();
-    const wrapper = mount((
+
+    render((
       <ActionDropdown element={<div>Trigger!</div>}>
         <MenuItem onSelect={onSelect}>Foo</MenuItem>
       </ActionDropdown>
     ));
-    const trigger = wrapper.find('ActionToggle');
 
-    trigger.simulate('click');
+    const triggerButton = await screen.findByText('Trigger!');
 
-    const menuItem = findLink(wrapper, 'Foo');
+    await userEvent.click(triggerButton);
 
-    menuItem.simulate('click');
+    const menuItem = await screen.findByRole('menuitem', { name: 'Foo' });
+    await userEvent.click(menuItem);
 
-    expect(onSelect).toHaveBeenCalled();
-    expect(wrapper).not.toContainMatchingElement('ul.dropdown-menu');
+    await waitFor(() => {
+      expect(onSelect).toHaveBeenCalled();
+    });
+
+    await waitFor(() => {
+      expect(screen.queryByRole('menuitem', { name: 'Foo' })).not.toBeInTheDocument();
+    });
   });
 
-  it('closes menu when MenuItem with a parent element is clicked', () => {
+  it('closes menu when MenuItem with a parent element is clicked', async () => {
     const onSelect = jest.fn();
-    const wrapper = mount((
+
+    render((
       <ActionDropdown element={<div>Trigger!</div>}>
         <div>
           <MenuItem onSelect={onSelect}>Foo</MenuItem>
         </div>
       </ActionDropdown>
     ));
-    const trigger = wrapper.find('ActionToggle');
 
-    trigger.simulate('click');
+    const triggerButton = await screen.findByText('Trigger!');
 
-    const menuItem = findLink(wrapper, 'Foo');
+    await userEvent.click(triggerButton);
 
-    menuItem.simulate('click');
+    const menuItem = await screen.findByRole('menuitem', { name: 'Foo' });
+    await userEvent.click(menuItem);
 
-    expect(onSelect).toHaveBeenCalled();
-    expect(wrapper).not.toContainMatchingElement('ul.dropdown-menu');
+    await waitFor(() => {
+      expect(onSelect).toHaveBeenCalled();
+    });
+
+    await waitFor(() => {
+      expect(screen.queryByRole('menuitem', { name: 'Foo' })).not.toBeInTheDocument();
+    });
   });
 
-  it('stops click event when MenuItem is clicked', () => {
+  it('stops click event when MenuItem is clicked', async () => {
     const onClick = jest.fn();
     const onSelect = jest.fn();
-    const wrapper = mount((
+
+    render((
       <button type="button" onClick={onClick}>
         <ActionDropdown element={<div>Trigger!</div>}>
           <MenuItem onSelect={onSelect}>Foo</MenuItem>
         </ActionDropdown>
       </button>
     ));
-    const trigger = wrapper.find('ActionToggle');
 
-    trigger.simulate('click');
+    const triggerButton = await screen.findByText('Trigger!');
 
-    const menuItem = findLink(wrapper, 'Foo');
+    await userEvent.click(triggerButton);
 
-    menuItem.simulate('click');
+    const menuItem = await screen.findByRole('menuitem', { name: 'Foo' });
+    await userEvent.click(menuItem);
+
+    await waitFor(() => {
+      expect(onSelect).toHaveBeenCalled();
+    });
+
+    await waitFor(() => {
+      expect(screen.queryByRole('menuitem', { name: 'Foo' })).not.toBeInTheDocument();
+    });
 
     expect(onClick).not.toHaveBeenCalled();
   });

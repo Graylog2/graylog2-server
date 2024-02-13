@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { useStore } from 'stores/connect';
 import type { IndexSet, IndexSetsStoreState } from 'stores/indices/IndexSetsStore';
@@ -32,17 +32,16 @@ import type {
 import useRemoveCustomFieldTypeMutation from 'components/indices/IndexSetFieldTypes/hooks/useRemoveCustomFieldTypeMutation';
 import IndexSetsRemovalErrorAlert from 'components/indices/IndexSetFieldTypes/IndexSetsRemovalErrorAlert';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
+import { Link } from 'components/common/router';
+import Routes from 'routing/Routes';
+import useIndexProfileWithMappingsByField from 'components/indices/IndexSetFieldTypes/hooks/useIndexProfileWithMappingsByField';
 
 const StyledLabel = styled.h5`
   font-weight: bold;
   margin-bottom: 5px;
 `;
 
-const RedBadge = styled(Badge)(({ theme }) => css`
-  background-color: ${theme.colors.variant.light.danger};
-`);
-
-const BetaBadge = () => <RedBadge>Beta Feature</RedBadge>;
+const BetaBadge = () => <Badge bsStyle="danger">Beta Feature</Badge>;
 
 type Props = {
   show: boolean,
@@ -65,14 +64,47 @@ const indexSetsStoreMapper = ({ indexSets }: IndexSetsStoreState): Record<string
   return Object.fromEntries(indexSets.map((indexSet) => ([indexSet.id, indexSet])));
 };
 
+const OverriddenProfilesFieldsWithTypeList = ({ overriddenProfilesFieldsWithType }: {overriddenProfilesFieldsWithType: Array<{ field: string, type: string }>}) => (
+  <>
+    {overriddenProfilesFieldsWithType.map(({ field, type }, index) => {
+      const isLast = index === overriddenProfilesFieldsWithType.length - 1;
+
+      return (
+        <span key={`${field}-${type}`}>
+          <b>{field}:</b> <i>{type}</i>{isLast ? '' : ', '}
+        </span>
+      );
+    })}
+  </>
+);
+
 const IndexSetCustomFieldTypeRemoveContent = ({ fields, indexSets, setRotated, rotated, indexSetIds }: ContentProps) => {
   const fieldsStr = fields.join(', ');
   const indexSetsStr = indexSetIds.map((id) => indexSets[id].title).join(', ');
+  const { customFieldMappingsByField, name: profileName, id: profileId } = useIndexProfileWithMappingsByField();
+  const overriddenIndexFieldsStr = useMemo(() => fields.filter((field) => !customFieldMappingsByField[field]).join(', '), [customFieldMappingsByField, fields]);
+  const overriddenProfilesFieldsWithType = useMemo(() => fields.filter((field) => customFieldMappingsByField[field])
+    .map((field) => ({ field, type: customFieldMappingsByField[field] })), [customFieldMappingsByField, fields]);
 
   return (
     <div>
       <Alert>
-        After removing the custom field type for <b>{fieldsStr}</b> in <b>{indexSetsStr}</b> the settings of your search engine will be used
+        After removing the overridden field type for <b>{fieldsStr}</b> in <b>{indexSetsStr}</b>
+        {overriddenIndexFieldsStr && (
+          <>, the settings of your <i>search engine</i> will be applied for
+            fields: <b>{overriddenIndexFieldsStr}</b>
+          </>
+        )}
+        {!!overriddenProfilesFieldsWithType.length && (
+          <>
+            {', '}
+            the settings from <Link to={Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.edit(profileId)}>{profileName}</Link> (
+            namely <OverriddenProfilesFieldsWithTypeList overriddenProfilesFieldsWithType={overriddenProfilesFieldsWithType} />
+            )
+            {' '}
+            will be applied.
+          </>
+        )}
       </Alert>
       <StyledLabel>Select Rotation Strategy</StyledLabel>
       <p>
@@ -93,15 +125,18 @@ const IndexSetCustomFieldTypeRemoveModal = ({ show, fields, onClose, indexSetIds
   const indexSets = useStore(IndexSetsStore, indexSetsStoreMapper);
   const [removalResponse, setRemovalResponse] = useState<RemovalResponse>(null);
   const [rotated, setRotated] = useState(true);
-  const onErrorHandler = useCallback((response: RemovalResponse) => {
-    const failedFields = response.flatMap(((indexSet) => indexSet.failures.map(({ entityId }) => entityId)));
-    setSelectedEntities(failedFields);
-    setRemovalResponse(response);
+  const removeSucceededFieldsFromSelected = useCallback((response: RemovalResponse) => {
+    const succeededFields = new Set(Object.values(response).flatMap(((indexSet) => indexSet.succeeded.map(({ fieldName }) => fieldName))));
+    setSelectedEntities((cur) => cur.filter((field) => !succeededFields.has(field)));
   }, [setSelectedEntities]);
-  const onSuccessHandler = useCallback(() => {
+  const onErrorHandler = useCallback((response: RemovalResponse) => {
+    removeSucceededFieldsFromSelected(response);
+    setRemovalResponse(response);
+  }, [removeSucceededFieldsFromSelected]);
+  const onSuccessHandler = useCallback((response: RemovalResponse) => {
+    removeSucceededFieldsFromSelected(response);
     onClose();
-    setSelectedEntities([]);
-  }, [onClose, setSelectedEntities]);
+  }, [onClose, removeSucceededFieldsFromSelected]);
   const { removeCustomFieldTypeMutation } = useRemoveCustomFieldTypeMutation({ onErrorHandler, onSuccessHandler });
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
@@ -115,10 +150,10 @@ const IndexSetCustomFieldTypeRemoveModal = ({ show, fields, onClose, indexSetIds
         sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_FIELD_VALUE_ACTION.REMOVE_CUSTOM_FIELD_TYPE_REMOVED, {
           app_pathname: telemetryPathName,
           app_action_value:
-                        {
-                          value: 'removed-custom-field-type',
-                          rotated,
-                        },
+            {
+              value: 'removed-custom-field-type',
+              rotated,
+            },
         });
       });
   }, [fields, indexSetIds, removeCustomFieldTypeMutation, rotated, sendTelemetry, telemetryPathName]);
@@ -134,8 +169,8 @@ const IndexSetCustomFieldTypeRemoveModal = ({ show, fields, onClose, indexSetIds
   }, [sendTelemetry, telemetryPathName]);
 
   return (
-    <BootstrapModalForm title={<span>Remove Custom Field Type <BetaBadge /></span>}
-                        submitButtonText="Remove custom field type"
+    <BootstrapModalForm title={<span>Remove Field Type Overrides <BetaBadge /></span>}
+                        submitButtonText="Remove field type overrides"
                         onSubmitForm={onSubmit}
                         onCancel={onCancel}
                         show={show}

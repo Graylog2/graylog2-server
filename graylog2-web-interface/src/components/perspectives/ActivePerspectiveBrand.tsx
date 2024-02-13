@@ -21,7 +21,6 @@ import styled from 'styled-components';
 import { Link } from 'components/common/router';
 import { NAV_ITEM_HEIGHT } from 'theme/constants';
 import useActivePerspective from 'components/perspectives/hooks/useActivePerspective';
-import usePerspectives from 'components/perspectives/hooks/usePerspectives';
 
 const BrandContainer = styled.div`
   display: flex;
@@ -35,9 +34,7 @@ const BrandLink = styled(Link)`
 `;
 
 const ActivePerspectiveBrand = ({ children, className }: PropsWithChildren<{ className?: string }>) => {
-  const perspectives = usePerspectives();
-  const { activePerspective: activePerspectiveId } = useActivePerspective();
-  const activePerspective = perspectives.find(({ id }) => id === activePerspectiveId);
+  const { activePerspective } = useActivePerspective();
   const ActiveBrandComponent = activePerspective?.brandComponent;
 
   if (!ActiveBrandComponent) {
@@ -46,7 +43,7 @@ const ActivePerspectiveBrand = ({ children, className }: PropsWithChildren<{ cla
 
   return (
     <BrandContainer className={className}>
-      <BrandLink to={activePerspective.brandLink}>
+      <BrandLink to={activePerspective.welcomeRoute}>
         <ActiveBrandComponent />
       </BrandLink>
       {children}

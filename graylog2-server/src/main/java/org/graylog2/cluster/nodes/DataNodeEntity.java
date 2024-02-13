@@ -19,8 +19,10 @@ package org.graylog2.cluster.nodes;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import org.bson.types.ObjectId;
 import org.graylog2.database.DbEntity;
+import org.graylog2.datanode.DataNodeLifecycleTrigger;
 
 import java.util.Map;
+import java.util.Objects;
 
 @DbEntity(collection = "datanodes", titleField = "node_id")
 public class DataNodeEntity extends AbstractNode<DataNodeDto> {
@@ -36,6 +38,17 @@ public class DataNodeEntity extends AbstractNode<DataNodeDto> {
 
     public String getClusterAddress() {
         return (String) fields.get("cluster_address");
+    }
+
+    public String getRestApiAddress() {
+        return (String) fields.get("rest_api_address");
+    }
+
+    public DataNodeLifecycleTrigger getActionQueue() {
+        if (!fields.containsKey("action_queue") || Objects.isNull(fields.get("action_queue"))) {
+            return null;
+        }
+        return DataNodeLifecycleTrigger.valueOf(fields.get("action_queue").toString());
     }
 
     public DataNodeStatus getDataNodeStatus() {
@@ -56,6 +69,8 @@ public class DataNodeEntity extends AbstractNode<DataNodeDto> {
                 .setLeader(this.isLeader())
                 .setClusterAddress(this.getClusterAddress())
                 .setDataNodeStatus(this.getDataNodeStatus())
+                .setRestApiAddress(this.getRestApiAddress())
+                .setActionQueue(this.getActionQueue())
                 .build();
     }
 

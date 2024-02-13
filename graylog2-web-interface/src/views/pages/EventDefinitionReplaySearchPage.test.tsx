@@ -109,8 +109,10 @@ describe('EventDefinitionReplaySearchPage', () => {
       onErrorHandler,
     }));
 
-    await expect(UseCreateViewForEventDefinition).toHaveBeenCalledWith({
-      eventDefinition: mockEventDefinitionTwoAggregations, aggregations: mockedMappedAggregation,
+    await waitFor(() => {
+      expect(UseCreateViewForEventDefinition).toHaveBeenCalledWith({
+        eventDefinition: mockEventDefinitionTwoAggregations, aggregations: mockedMappedAggregation,
+      });
     });
   });
 });

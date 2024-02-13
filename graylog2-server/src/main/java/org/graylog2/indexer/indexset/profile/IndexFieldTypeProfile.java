@@ -21,12 +21,16 @@ import org.graylog2.indexer.indexset.CustomFieldMappings;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+/**
+ * Represents profile as it is stored in Mongo.
+ */
 public record IndexFieldTypeProfile(@JsonProperty(ID_FIELD_NAME) @Nullable @Id @ObjectId String id,
                                     @JsonProperty(NAME_FIELD_NAME) String name,
                                     @JsonProperty(DESCRIPTION_FIELD_NAME) String description,
-                                    @JsonProperty(CUSTOM_MAPPINGS_FIELD_NAME) CustomFieldMappings customFieldMappings) {
+                                    @JsonProperty(CUSTOM_MAPPINGS_FIELD_NAME) @Nonnull CustomFieldMappings customFieldMappings) {
 
     public static final String ID_FIELD_NAME = "id";
     public static final String NAME_FIELD_NAME = "name";

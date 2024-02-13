@@ -15,12 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
 import { forwardRef } from 'react';
 
-const Badge = styled.span(({ theme }) => `
-  background-color: ${theme.colors.variant.light.info};
-`);
+import Badge from 'components/bootstrap/Badge';
 
 type Props = {
   children: React.ReactNode;
@@ -29,8 +26,8 @@ type Props = {
   title?: string,
 };
 
-const CountBadge = forwardRef<HTMLElement, Props>(({ children, onClick, className, title }: Props, ref) => (
-  <Badge className={`badge ${className}`} onClick={onClick} ref={ref} title={title}>
+const CountBadge = forwardRef<HTMLDivElement, Props>(({ children, onClick, className, title }: Props, ref) => (
+  <Badge bsStyle="info" className={className} onClick={onClick} ref={ref} title={title}>
     {children}
   </Badge>
 ));

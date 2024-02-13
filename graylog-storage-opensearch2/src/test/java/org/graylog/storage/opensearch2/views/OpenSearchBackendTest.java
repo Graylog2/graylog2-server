@@ -27,6 +27,7 @@ import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
+import org.graylog.plugins.views.search.engine.monitoring.collection.NoOpStatsCollector;
 import org.graylog.plugins.views.search.searchfilters.db.UsedSearchFiltersToQueryStringsMapper;
 import org.graylog.plugins.views.search.searchfilters.model.InlineQueryStringSearchFilter;
 import org.graylog.plugins.views.search.searchfilters.model.ReferencedQueryStringSearchFilter;
@@ -42,7 +43,8 @@ import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.inject.Provider;
+import jakarta.inject.Provider;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -69,6 +71,7 @@ public class OpenSearchBackendTest {
                 mock(IndexLookup.class),
                 (elasticsearchBackend, ssb, errors) -> new OSGeneratedQueryContext(elasticsearchBackend, ssb, errors, fieldTypesLookup),
                 usedSearchFiltersToQueryStringsMapper,
+                new NoOpStatsCollector<>(),
                 false);
     }
 

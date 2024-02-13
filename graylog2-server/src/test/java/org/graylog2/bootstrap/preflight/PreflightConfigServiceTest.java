@@ -28,7 +28,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 class PreflightConfigServiceTest {
 
     @RegisterExtension
-    static MongoDBExtension mongodbExtension = MongoDBExtension.create(MongodbServer.MONGO5);
+    static MongoDBExtension mongodbExtension = MongoDBExtension.create(MongodbServer.DEFAULT_VERSION);
     private PreflightConfigService preflightConfigService;
 
 

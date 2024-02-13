@@ -21,6 +21,7 @@ import com.mongodb.AggregationOptions;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.WriteResult;
+import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
 import org.graylog2.Configuration;
 import org.graylog2.cluster.Node;
@@ -31,7 +32,6 @@ import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Iterator;
@@ -227,4 +227,12 @@ public abstract class AbstractNodeService<T extends AbstractNode<? extends NodeD
             LOG.warn("Caught exception during node ping.", e);
         }
     }
+
+    @Override
+    public void update(NodeDto dto) {
+        BasicDBObject query = new BasicDBObject("node_id", dto.getNodeId());
+        final BasicDBObject update = new BasicDBObject(Map.of("$set", dto.toEntityParameters()));
+        super.collection(nodeClass).update(query, update);
+    }
+
 }

@@ -144,8 +144,9 @@ describe('DashboardActionsMenu', () => {
   });
 
   it('should open edit dashboard meta information modal', async () => {
-    const { getByText, findByText } = render(<SUT />);
-    const editMenuItem = getByText(/Edit metadata/i);
+    const { findByText } = render(<SUT />);
+    userEvent.click(await screen.findByRole('button', { name: /more actions/i }));
+    const editMenuItem = await screen.findByText(/Edit metadata/i);
 
     userEvent.click(editMenuItem);
 
@@ -167,7 +168,7 @@ describe('DashboardActionsMenu', () => {
     await findByTitle(/Save dashboard/);
     await findByTitle(/Save as new dashboard/);
     await findByTitle(/Share/);
-    await findByRole(/^menu$/);
+    await findByRole('button', { name: /more actions/i });
   });
 
   it('should only render "Save As" button in SAVE_COPY layout option', async () => {
@@ -175,7 +176,7 @@ describe('DashboardActionsMenu', () => {
 
     const saveButton = queryByTitle(/Save dashboard/);
     const shareButton = queryByTitle(/Share/);
-    const extrasButton = queryByRole(/^menu$/);
+    const extrasButton = queryByRole('menu');
 
     expect(saveButton).not.toBeInTheDocument();
     expect(shareButton).not.toBeInTheDocument();
@@ -190,7 +191,7 @@ describe('DashboardActionsMenu', () => {
     const saveButton = queryByTitle(/Save dashboard/);
     const saveAsButton = queryByTitle(/Save as new dashboard/);
     const shareButton = queryByTitle(/Share/);
-    const extrasButton = queryByRole(/^menu$/);
+    const extrasButton = queryByRole('menu');
 
     expect(saveButton).not.toBeInTheDocument();
     expect(saveAsButton).not.toBeInTheDocument();

@@ -109,6 +109,7 @@ public class RestPermissions implements PluginPermissions {
     public static final String METRICS_READALL = "metrics:readall";
     public static final String METRICS_READHISTORY = "metrics:readhistory";
     @Deprecated public static final String NODE_SHUTDOWN = "node:shutdown";
+    public static final String MONITORING_READ = "monitoring:read";
     public static final String NOTIFICATIONS_DELETE = "notifications:delete";
     public static final String NOTIFICATIONS_READ = "notifications:read";
     public static final String OUTPUTS_CREATE = "outputs:create";
@@ -149,6 +150,10 @@ public class RestPermissions implements PluginPermissions {
     public static final String TYPE_MAPPINGS_DELETE = "typemappings:delete";
     public static final String TYPE_MAPPINGS_EDIT = "typemappings:edit";
     public static final String TYPE_MAPPINGS_READ = "typemappings:read";
+    public static final String MAPPING_PROFILES_CREATE = "mappingprofiles:create";
+    public static final String MAPPING_PROFILES_DELETE = "mappingprofiles:delete";
+    public static final String MAPPING_PROFILES_EDIT = "mappingprofiles:edit";
+    public static final String MAPPING_PROFILES_READ = "mappingprofiles:read";
     public static final String URL_WHITELIST_READ = "urlwhitelist:read";
     public static final String URL_WHITELIST_WRITE = "urlwhitelist:write";
     public static final String USERS_CREATE = "users:create";
@@ -166,6 +171,7 @@ public class RestPermissions implements PluginPermissions {
     public static final String DATANODE_RESET = "datanode:reset";
     public static final String DATANODE_STOP = "datanode:stop";
     public static final String DATANODE_START = "datanode:start";
+    public static final String DATANODE_MIGRATION = "datanode:migration";
 
     // This is a special permission that ONLY works with GRNs as ID/target
     // TODO does this belong here?
@@ -198,6 +204,7 @@ public class RestPermissions implements PluginPermissions {
             .add(create(DATANODE_RESET, ""))
             .add(create(DATANODE_STOP, ""))
             .add(create(DATANODE_START, ""))
+            .add(create(DATANODE_MIGRATION, ""))
             .add(create(DECORATORS_CREATE, ""))
             .add(create(DECORATORS_EDIT, ""))
             .add(create(DECORATORS_READ, ""))
@@ -299,6 +306,14 @@ public class RestPermissions implements PluginPermissions {
             .add(create(SEARCH_FILTERS_READ, ""))
             .add(create(SEARCH_FILTERS_EDIT, ""))
             .add(create(SEARCH_FILTERS_DELETE, ""))
+            .add(create(TYPE_MAPPINGS_CREATE, ""))
+            .add(create(TYPE_MAPPINGS_DELETE, ""))
+            .add(create(TYPE_MAPPINGS_EDIT, ""))
+            .add(create(TYPE_MAPPINGS_READ, ""))
+            .add(create(MAPPING_PROFILES_CREATE, ""))
+            .add(create(MAPPING_PROFILES_DELETE, ""))
+            .add(create(MAPPING_PROFILES_EDIT, ""))
+            .add(create(MAPPING_PROFILES_READ, ""))
             .build();
 
     // Standard set of PERMISSIONS of readers.

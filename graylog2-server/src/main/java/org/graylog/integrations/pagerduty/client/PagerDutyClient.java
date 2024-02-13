@@ -27,11 +27,12 @@ import org.graylog.integrations.pagerduty.dto.PagerDutyResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.io.IOException;
 import java.util.Locale;
 
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 
 /**
  * The Pager Duty REST client implementation class compatible with events V2. For more information
@@ -108,13 +109,17 @@ public class PagerDutyClient {
         public PermanentPagerDutyClientException(String msg) {
             super(msg);
         }
-        public PermanentPagerDutyClientException(String msg, Throwable cause) { super(msg, cause); }
+
+        public PermanentPagerDutyClientException(String msg, Throwable cause) {
+            super(msg, cause);
+        }
     }
 
     public static class TemporaryPagerDutyClientException extends Exception {
         public TemporaryPagerDutyClientException(String msg) {
             super(msg);
         }
+
         public TemporaryPagerDutyClientException(String msg, Throwable cause) {
             super(msg, cause);
         }

@@ -21,8 +21,9 @@ import org.graylog.grn.GRN;
 import org.graylog2.contentpacks.ContentPackService;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;

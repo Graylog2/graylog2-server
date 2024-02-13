@@ -28,7 +28,7 @@ import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.inputs.MessageInput;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import static org.graylog2.inputs.transports.HttpPollTransport.CK_CONTENT_TYPE;
 import static org.graylog2.inputs.transports.HttpPollTransport.CK_HTTP_BODY;
@@ -49,7 +49,7 @@ public class JsonPathInput extends MessageInput {
                          MetricRegistry metricRegistry,
                          LocalMetricRegistry localRegistry, Config config, Descriptor descriptor, ServerStatus serverStatus) {
         super(metricRegistry, configuration, transport.create(configuration), localRegistry, codec.create(configuration), config,
-              descriptor, serverStatus);
+                descriptor, serverStatus);
         this.configuration = configuration;
     }
 

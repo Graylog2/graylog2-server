@@ -24,9 +24,11 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.security.certutil.CertRenewalService;
+import org.graylog2.datanode.DataNodeLifecycleTrigger;
 
 import javax.annotation.Nullable;
 import java.util.Map;
+import java.util.Objects;
 
 @AutoValue
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -38,8 +40,16 @@ public abstract class DataNodeDto extends NodeDto {
     @JsonProperty("cluster_address")
     public abstract String getClusterAddress();
 
+    @Nullable
+    @JsonProperty("rest_api_address")
+    public abstract String getRestApiAddress();
+
     @JsonProperty("data_node_status")
     public abstract DataNodeStatus getDataNodeStatus();
+
+    @Nullable
+    @JsonProperty("action_queue")
+    public abstract DataNodeLifecycleTrigger getActionQueue();
 
     @Nullable
     @JsonUnwrapped
@@ -48,8 +58,22 @@ public abstract class DataNodeDto extends NodeDto {
     @Override
     public Map<String, Object> toEntityParameters() {
         final Map<String, Object> params = super.toEntityParameters();
-        params.put("cluster_address", getClusterAddress());
-        params.put("datanode_status", getDataNodeStatus());
+        if (Objects.nonNull(getClusterAddress())) {
+            params.put("cluster_address", getClusterAddress());
+        }
+        if (Objects.nonNull(getRestApiAddress())) {
+            params.put("rest_api_address", getRestApiAddress());
+        }
+        if (Objects.nonNull(getDataNodeStatus())) {
+            params.put("datanode_status", getDataNodeStatus());
+        }
+        if (Objects.nonNull(getActionQueue())) {
+            if (getActionQueue() == DataNodeLifecycleTrigger.CLEAR) {
+                params.put("action_queue", null);
+            } else {
+                params.put("action_queue", getActionQueue());
+            }
+        }
         return params;
     }
 
@@ -67,12 +91,20 @@ public abstract class DataNodeDto extends NodeDto {
         @JsonProperty("cluster_address")
         public abstract Builder setClusterAddress(String clusterAddress);
 
+        @JsonProperty("rest_api_address")
+        public abstract Builder setRestApiAddress(String restApiAddress);
+
         @JsonProperty("datanode_status")
         public abstract Builder setDataNodeStatus(DataNodeStatus dataNodeStatus);
 
+        @JsonProperty("action_queue")
+        public abstract Builder setActionQueue(DataNodeLifecycleTrigger trigger);
+
         public abstract Builder setProvisioningInformation(CertRenewalService.ProvisioningInformation provisioningInformation);
 
+
         public abstract DataNodeDto build();
+
 
     }
 }

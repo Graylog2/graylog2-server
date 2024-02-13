@@ -21,12 +21,14 @@ import org.apache.shiro.subject.Subject;
 import org.graylog2.rest.models.system.sessions.responses.SessionResponseFactory;
 import org.graylog2.shared.security.ShiroPrincipal;
 
-import javax.inject.Inject;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerResponseContext;
-import javax.ws.rs.container.ContainerResponseFilter;
-import javax.ws.rs.core.NewCookie;
-import javax.ws.rs.core.SecurityContext;
+import jakarta.inject.Inject;
+
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerResponseContext;
+import jakarta.ws.rs.container.ContainerResponseFilter;
+import jakarta.ws.rs.core.NewCookie;
+import jakarta.ws.rs.core.SecurityContext;
+
 import java.io.IOException;
 import java.util.Optional;
 

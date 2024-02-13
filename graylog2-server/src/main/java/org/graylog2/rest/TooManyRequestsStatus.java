@@ -16,7 +16,7 @@
  */
 package org.graylog2.rest;
 
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
 
 /**
  * A {@link Response.StatusType} for HTTP status 429 (Too many requests).

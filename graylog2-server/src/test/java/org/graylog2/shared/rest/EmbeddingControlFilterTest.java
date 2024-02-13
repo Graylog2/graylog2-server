@@ -21,9 +21,10 @@ import org.glassfish.jersey.server.ContainerRequest;
 import org.glassfish.jersey.server.ContainerResponse;
 import org.junit.jupiter.api.Test;
 
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.container.ContainerResponseContext;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.HttpMethod;
+import jakarta.ws.rs.container.ContainerResponseContext;
+import jakarta.ws.rs.core.Response;
+
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collections;
