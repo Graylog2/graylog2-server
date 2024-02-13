@@ -60,9 +60,7 @@ const validateExpressionTree = (expression, series, validationTree = {}) => {
           || selectedSeries?.type === 'sum'
           || selectedSeries?.type === 'sumofsquares'
           || selectedSeries?.type === 'variance'))
-      {
-         return { message: 'Field must be set' };
-      }
+      { return { message: 'Field must be set' }; }
 
       return (selectedSeries?.type ? {} : error);
       /* eslint-enable no-case-declarations */
