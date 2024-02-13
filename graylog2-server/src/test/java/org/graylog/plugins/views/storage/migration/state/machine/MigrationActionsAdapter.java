@@ -33,6 +33,7 @@ public class MigrationActionsAdapter implements MigrationActions {
 
     @Override
     public void setAuthorizationToken(String authorizationToken) {
+    }
 
     public void setStateMachineContext(MigrationStateMachineContext context) {
         this.context = context;
