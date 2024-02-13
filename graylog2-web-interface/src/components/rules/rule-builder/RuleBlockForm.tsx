@@ -178,8 +178,8 @@ const RuleBlockForm = ({
     <Row>
       <Col md={12}>
         <Formik enableReinitialize onSubmit={onSubmit} initialValues={initialValues}>
-          {({ resetForm, setFieldValue, isValid, handleSubmit, handleReset }) => (
-            <NestedForm onSubmit={handleSubmit} onReset={handleReset}>
+          {({ resetForm, setFieldValue, isValid }) => (
+            <NestedForm>
               <SelectRow>
                 <Col md={12}>
                   <Select id={`existingBlock-select-${type}`}

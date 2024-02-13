@@ -222,12 +222,12 @@ const TimeRangePicker = ({
                                            validate={_validateTimeRange}
                                            onSubmit={onSubmit}
                                            validateOnMount>
-          {(({ isValid, submitForm, handleSubmit, handleReset }) => (
+          {(({ isValid, submitForm }) => (
             <KeyCapture shortcuts={[
               { actionKey: 'submit-form', callback: submitForm, scope: 'general', options: { displayInOverview: false } },
               { actionKey: 'close-modal', callback: handleCancel, scope: 'general', options: { displayInOverview: false } },
             ]}>
-              <NestedForm onSubmit={handleSubmit} onReset={handleReset}>
+              <NestedForm>
                 <Row>
                   <Col md={12}>
                     <TimeRangePresetRow />

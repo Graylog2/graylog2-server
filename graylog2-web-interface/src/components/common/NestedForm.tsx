@@ -14,32 +14,33 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { useFormikContext } from 'formik';
 import * as React from 'react';
 import { useCallback } from 'react';
 
-type Props = React.PropsWithChildren<{
-  onSubmit: (event: React.FormEvent) => void,
-  onReset?: (event: React.FormEvent) => void,
-}>
+/**
+ * Renders a html form, which can be used inside other forms.
+ * Please note that nested forms are not valid DOM and should be avoided if possible.
+ * Consider displaying the inner form in a portal instead.
+ */
 
-const NestedForm = ({ onSubmit, onReset, children }: Props) => {
-  const handleSubmit = useCallback((e) => {
+const NestedForm = ({ children }: React.PropsWithChildren) => {
+  const { handleSubmit, handleReset } = useFormikContext();
+  const onSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    onSubmit(e);
-  }, [onSubmit]);
+    handleSubmit(e);
+  }, [handleSubmit]);
 
-  const handleReset = useCallback((e) => {
-    if (typeof onReset === 'function') {
-      e.preventDefault();
-      e.stopPropagation();
-      onReset(e);
-    }
-  }, [onReset]);
+  const onReset = useCallback((e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    handleReset(e);
+  }, [handleReset]);
 
   return (
-    <form onSubmitCapture={handleSubmit}
-          onResetCapture={handleReset}>
+    <form onSubmitCapture={onSubmit}
+          onResetCapture={onReset}>
       {children}
     </form>
   );

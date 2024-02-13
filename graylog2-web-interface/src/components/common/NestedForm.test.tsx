@@ -15,8 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, screen } from 'wrappedTestingLibrary';
+import { render, screen, act } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+import { Form, Formik } from 'formik';
 
 import NestedForm from './NestedForm';
 
@@ -45,13 +46,21 @@ describe('NestedForm', () => {
     const onSubmit = jest.fn();
 
     render(
-      <form onSubmit={onSubmitParentForm}>
-        <NestedForm onSubmit={onSubmit}>
-          <button type="submit">Submit</button>
-        </NestedForm>
-      </form>);
+      <Formik onSubmit={onSubmitParentForm} initialValues={{}}>
+        <Form>
+          <Formik onSubmit={onSubmit} initialValues={{}}>
+            <NestedForm>
+              <button type="submit">Submit</button>
+            </NestedForm>
+          </Formik>
+        </Form>
+      </Formik>,
+    );
 
-    userEvent.click(await screen.findByRole('button', { name: /submit/i }));
+    // eslint-disable-next-line testing-library/no-unnecessary-act
+    await act(async () => {
+      await userEvent.click(await screen.findByRole('button', { name: /submit/i }));
+    });
 
     expect(onSubmit).toHaveBeenCalledTimes(1);
     expect(onSubmitParentForm).not.toHaveBeenCalled();
@@ -62,11 +71,16 @@ describe('NestedForm', () => {
     const onReset = jest.fn();
 
     render(
-      <form onSubmit={() => {}} onReset={onResetParentForm}>
-        <NestedForm onSubmit={() => {}} onReset={onReset}>
-          <input type="reset" />
-        </NestedForm>
-      </form>);
+      <Formik onSubmit={(() => {})} onReset={onResetParentForm} initialValues={{}}>
+        <Form>
+          <Formik onSubmit={() => {}} onReset={onReset} initialValues={{}}>
+            <NestedForm>
+              <input type="reset" />
+            </NestedForm>
+          </Formik>
+        </Form>
+      </Formik>,
+    );
 
     userEvent.click(await screen.findByRole('button', { name: /reset/i }));
 
