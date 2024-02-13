@@ -14,22 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.storage.migration.state.machine;
+package org.graylog.schema;
 
-import org.graylog.plugins.views.storage.migration.state.rest.CurrentStateInformation;
+public class SecurityFields {
+    public static final String FIELD_ASSOCIATED_ASSETS = "associated_assets";
+    public static final String FIELD_ASSET_CATEGORIES = "associated_asset_categories";
 
-import java.util.List;
-import java.util.Map;
-
-public interface MigrationStateMachine {
-
-    CurrentStateInformation trigger(MigrationStep step, Map<String, Object> args);
-
-    MigrationState getState();
-
-    List<MigrationStep> nextSteps();
-
-    MigrationStateMachineContext getContext();
-
-    String serialize();
 }

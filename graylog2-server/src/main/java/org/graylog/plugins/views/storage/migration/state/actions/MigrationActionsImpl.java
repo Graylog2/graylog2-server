@@ -17,6 +17,8 @@
 package org.graylog.plugins.views.storage.migration.state.actions;
 
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachineContext;
 import org.graylog.plugins.views.storage.migration.state.persistence.DatanodeMigrationConfiguration;
 import org.graylog.security.certutil.CaService;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
@@ -30,11 +32,13 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 
 import java.util.Map;
 
+@Singleton
 public class MigrationActionsImpl implements MigrationActions {
 
     private final ClusterConfigService clusterConfigService;
     private final NodeService<DataNodeDto> nodeService;
     private final CaService caService;
+    private MigrationStateMachineContext stateMachineContext;
     private final DataNodeProvisioningService dataNodeProvisioningService;
 
     @Inject
@@ -130,4 +134,15 @@ public class MigrationActionsImpl implements MigrationActions {
     public boolean provisioningFinished() {
         return nodeService.allActive().values().stream().allMatch(node -> node.getDataNodeStatus() == DataNodeStatus.AVAILABLE);
     }
+
+    @Override
+    public void setStateMachineContext(MigrationStateMachineContext context) {
+        this.stateMachineContext = context;
+    }
+
+    @Override
+    public MigrationStateMachineContext getStateMachineContext() {
+        return stateMachineContext;
+    }
+
 }

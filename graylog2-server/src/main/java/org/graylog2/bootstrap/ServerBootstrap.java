@@ -307,6 +307,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
         LOG.info("Deployment: {}", configuration.getInstallationSource());
         LOG.info("OS: {}", os.getPlatformName());
         LOG.info("Arch: {}", os.getArch());
+        LOG.info("Node ID: {}", nodeId);
 
         try {
             if (configuration.isLeader() && configuration.runMigrations()) {
