@@ -19,7 +19,7 @@ import PropTypes from 'prop-types';
 import { Formik } from 'formik';
 import styled, { css } from 'styled-components';
 
-import { FormSubmit, Icon, OverlayTrigger, Select } from 'components/common';
+import { FormSubmit, Icon, OverlayTrigger, Select, NestedForm } from 'components/common';
 import { Button, Col, Row } from 'components/bootstrap';
 import RuleBlockFormField from 'components/rules/rule-builder/RuleBlockFormField';
 import { getPathnameWithoutId } from 'util/URLUtils';
@@ -179,7 +179,7 @@ const RuleBlockForm = ({
       <Col md={12}>
         <Formik enableReinitialize onSubmit={onSubmit} initialValues={initialValues}>
           {({ resetForm, setFieldValue, isValid, handleSubmit, handleReset }) => (
-            <form onSubmitCapture={handleSubmit} onResetCapture={handleReset}>
+            <NestedForm onSubmit={handleSubmit} onReset={handleReset}>
               <SelectRow>
                 <Col md={12}>
                   <Select id={`existingBlock-select-${type}`}
@@ -244,7 +244,7 @@ const RuleBlockForm = ({
 
                 </SelectedBlock>
               )}
-            </form>
+            </NestedForm>
           )}
         </Formik>
       </Col>

@@ -22,7 +22,7 @@ import moment from 'moment';
 
 import { Button, Col, Row } from 'components/bootstrap';
 import Popover from 'components/common/Popover';
-import { Icon, KeyCapture, ModalSubmit } from 'components/common';
+import { Icon, KeyCapture, ModalSubmit, NestedForm } from 'components/common';
 import type {
   AbsoluteTimeRange,
   KeywordTimeRange,
@@ -227,7 +227,7 @@ const TimeRangePicker = ({
               { actionKey: 'submit-form', callback: submitForm, scope: 'general', options: { displayInOverview: false } },
               { actionKey: 'close-modal', callback: handleCancel, scope: 'general', options: { displayInOverview: false } },
             ]}>
-              <form onSubmitCapture={handleSubmit} onResetCapture={handleReset}>
+              <NestedForm onSubmit={handleSubmit} onReset={handleReset}>
                 <Row>
                   <Col md={12}>
                     <TimeRangePresetRow />
@@ -248,7 +248,7 @@ const TimeRangePicker = ({
                                  submitButtonText="Update time range" />
                   </Col>
                 </Row>
-              </form>
+              </NestedForm>
             </KeyCapture>
           ))}
         </Formik>
