@@ -16,14 +16,19 @@
  */
 package org.graylog.events.processor.aggregation;
 
+import com.github.rholder.retry.RetryException;
 import org.assertj.core.api.Assertions;
 import org.graylog.testing.completebackend.Lifecycle;
+import org.graylog.testing.completebackend.WebhookRequest;
 import org.graylog.testing.completebackend.WebhookServerInstance;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.junit.jupiter.api.BeforeEach;
+
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 @ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, searchVersions = {SearchServer.DATANODE_DEV}, withWebhookServerEnabled = true)
 public class EventNotificationsResourceIT {
@@ -41,19 +46,17 @@ public class EventNotificationsResourceIT {
     }
 
     @ContainerMatrixTest
-    void testNotificationTestTrigger() {
+    void testNotificationTestTrigger() throws ExecutionException, RetryException {
 
         final String httpNotificationID = graylogApis.eventsNotifications().createHttpNotification(webhookTester.getContainerizedCollectorURI());
 
         // now trigger the test of the notification, we should immediately see one recorded webhook afterward
         graylogApis.post("/events/notifications/" + httpNotificationID + "/test", "", 200);
 
-        Assertions.assertThat(webhookTester.allRequests())
-                .hasSize(1)
-                .allSatisfy((req) -> {
-                    Assertions.assertThat(req.body()).contains("TEST_NOTIFICATION_ID");
-                });
+        // wait for the just triggered notification
+        webhookTester.waitForRequests(webhookRequest -> webhookRequest.body().contains("TEST_NOTIFICATION_ID"));
 
+        // the wait succeeded, cleanup
         graylogApis.eventsNotifications().deleteNotification(httpNotificationID);
 
     }
