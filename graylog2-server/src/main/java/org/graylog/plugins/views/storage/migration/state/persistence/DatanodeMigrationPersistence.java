@@ -16,9 +16,17 @@
  */
 package org.graylog.plugins.views.storage.migration.state.persistence;
 
+import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachineContext;
+
 import java.util.Optional;
 
 public interface DatanodeMigrationPersistence {
+
     Optional<DatanodeMigrationConfiguration> getConfiguration();
+
     void saveConfiguration(DatanodeMigrationConfiguration configuration);
+
+    Optional<MigrationStateMachineContext> getStateMachineContext();
+
+    void saveStateMachineContext(MigrationStateMachineContext context);
 }
