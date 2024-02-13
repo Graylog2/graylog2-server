@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "@graylog/sawmill": "2.0.11",
-    "@tanstack/react-query": "4.36.1",
+    "@tanstack/react-query": "5.20.2",
     "@types/create-react-class": "15.6.7",
     "@types/jquery": "3.5.29",
     "@types/react": "18.2.55",
