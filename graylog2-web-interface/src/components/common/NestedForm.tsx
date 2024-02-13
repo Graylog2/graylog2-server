@@ -33,9 +33,8 @@ const NestedForm = ({ onSubmit, onReset, children }: Props) => {
     if (typeof onReset === 'function') {
       e.preventDefault();
       e.stopPropagation();
+      onReset(e);
     }
-
-    onReset(e);
   }, [onReset]);
 
   return (
