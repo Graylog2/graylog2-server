@@ -45,7 +45,7 @@ jest.mock('components/datanode/hooks/useCompatibilityCheck', () => jest.fn(() =>
 
 describe('CompatibilityCheckStep', () => {
   it('should render CompatibilityCheckStep', async () => {
-    render(<CompatibilityCheckStep onStepComplete={() => {}} />);
+    render(<CompatibilityCheckStep onTriggerStep={() => {}} nextSteps={[]} />);
 
     await screen.findByRole('heading', {
       name: /your existing opensearch data can be migrated to datanode\./i,
@@ -65,7 +65,7 @@ describe('CompatibilityCheckStep', () => {
       error: undefined,
     });
 
-    render(<CompatibilityCheckStep onStepComplete={() => {}} />);
+    render(<CompatibilityCheckStep onTriggerStep={() => {}} nextSteps={[]} />);
 
     await screen.findByRole('heading', {
       name: /your existing opensearch data cannot be migrated to datanode\./i,
