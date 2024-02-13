@@ -26,7 +26,6 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
@@ -54,14 +53,12 @@ public class MigrationStateResource {
     @NoAuditEvent("No Audit Event needed") // TODO: do we need audit log here?
     @RequiresPermissions(RestPermissions.DATANODE_MIGRATION)
     @ApiOperation(value = "trigger migration step")
-    public CurrentStateInformation migrate(@ApiParam(name = "request") @NotNull MigrationStepRequest request,
-                                           @Context Response response) {
+    public Response migrate(@ApiParam(name = "request") @NotNull MigrationStepRequest request) {
         final CurrentStateInformation newState = stateMachine.trigger(request.step(), request.args());
-        return Response.fromResponse(response)
+        return Response
                 .status(newState.hasErrors() ? Response.Status.INTERNAL_SERVER_ERROR : Response.Status.OK)
                 .entity(newState)
-                .build()
-                .readEntity(CurrentStateInformation.class);
+                .build();
     }
 
     @GET
