@@ -22,7 +22,8 @@ import { Row } from 'components/bootstrap';
 
 const NAV_ITEMS = [
   { title: 'Data Nodes', path: Routes.SYSTEM.DATANODES.LIST, exactPathMatch: true },
-  { title: 'Cluster', path: Routes.SYSTEM.DATANODES.CLUSTER },
+  { title: 'Cluster Management', path: Routes.SYSTEM.DATANODES.CLUSTER },
+  { title: 'Configuration', path: Routes.SYSTEM.DATANODES.CONFIGURATION },
   { title: 'Migration', path: Routes.SYSTEM.DATANODES.MIGRATION },
 ];
 

@@ -18,13 +18,10 @@ package org.graylog2.database;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.MongoCollection;
-import org.bson.UuidRepresentation;
-import org.graylog.shaded.mongojack4.org.mongojack.JacksonMongoCollection;
-import org.graylog.shaded.mongojack4.org.mongojack.internal.MongoJackModule;
-import org.graylog2.bindings.providers.CommonMongoJackObjectMapperProvider;
-
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.jackson.CustomJacksonCodecRegistry;
 
 @Singleton
 public class MongoCollections {
@@ -33,24 +30,19 @@ public class MongoCollections {
     private final MongoConnection mongoConnection;
 
     @Inject
-    public MongoCollections(CommonMongoJackObjectMapperProvider objectMapperProvider, MongoConnection mongoConnection) {
+    public MongoCollections(MongoJackObjectMapperProvider objectMapperProvider, MongoConnection mongoConnection) {
         this.objectMapper = objectMapperProvider.get();
         this.mongoConnection = mongoConnection;
-
-        MongoJackModule.configure(this.objectMapper);
     }
 
     /**
-     * Get a MongoCollection configured to use Mongojack for serialization/deserialization of objects.
-     * <p>
-     * <b>
-     * To encourage usage of the mongodb driver API, we are intentionally not returning a {@link JacksonMongoCollection}
-     * but rather the generic {@link MongoCollection} interface here.
-     * </b>
+     * Get a MongoCollection configured to use Jackson for serialization/deserialization of objects.
      */
     public <T> MongoCollection<T> get(String collectionName, Class<T> valueType) {
-        return JacksonMongoCollection.builder()
-                .withObjectMapper(objectMapper)
-                .build(mongoConnection.getMongoDatabase(), collectionName, valueType, UuidRepresentation.UNSPECIFIED);
+        final MongoCollection<T> collection = mongoConnection.getMongoDatabase().getCollection(collectionName, valueType);
+        final CustomJacksonCodecRegistry jacksonCodecRegistry = new CustomJacksonCodecRegistry(this.objectMapper,
+                collection.getCodecRegistry());
+        jacksonCodecRegistry.addCodecForClass(valueType);
+        return collection.withCodecRegistry(jacksonCodecRegistry);
     }
 }

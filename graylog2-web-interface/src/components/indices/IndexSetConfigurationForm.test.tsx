@@ -20,6 +20,7 @@ import { render, screen } from 'wrappedTestingLibrary';
 import asMock from 'helpers/mocking/AsMock';
 import useProfileOptions from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileOptions';
 import useIndexDefaults from 'components/indices/hooks/useIndexDefaults';
+import { DATA_TIERING_TYPE } from 'components/indices/data-tiering';
 
 import IndexSetConfigurationForm from './IndexSetConfigurationForm';
 
@@ -51,6 +52,7 @@ const indexSet = {
   writable: true,
   default: false,
 };
+
 const retentionStrategies = [
   {
     type: 'org.graylog.plugins.archive.indexer.retention.strategies.ArchiveRetentionStrategy',
@@ -138,9 +140,11 @@ const retentionStrategies = [
     },
   },
 ];
+
 const retentionStrategiesContext = {
   max_index_retention_period: 'P1D',
 };
+
 const rotationStrategies = [
   {
     type: 'org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy',
@@ -229,6 +233,11 @@ const indexDefaultsConfig = {
     max_number_of_indices: 10,
     index_action: 'foo',
   },
+  data_tiering: {
+    type: DATA_TIERING_TYPE.HOT_ONLY,
+    index_lifetime_min: '10',
+    index_lifetime_max: '30',
+  },
 };
 
 jest.mock('components/indices/IndexSetFieldTypeProfiles/hooks/useProfileOptions', () => jest.fn());
@@ -254,18 +263,18 @@ describe('IndexSetConfigurationForm', () => {
                                {...props} />
   );
 
-  it('Should render IndexSetConfigurationForm', () => {
+  it('Should render IndexSetConfigurationForm', async () => {
     render(<SUT indexSet={indexSet} />);
 
-    const titleText = screen.getByDisplayValue(/Foo Title/i);
+    const titleText = await screen.findByDisplayValue(/Foo Title/i);
 
     expect(titleText).toBeInTheDocument();
   });
 
-  it('Should render create IndexSetConfigurationForm', () => {
+  it('Should render create IndexSetConfigurationForm', async () => {
     render(<SUT create />);
 
-    const indexPrefix = screen.getByDisplayValue(/default_index_prefix/i);
+    const indexPrefix = await screen.findByDisplayValue(/default_index_prefix/i);
 
     expect(indexPrefix).toBeInTheDocument();
   });

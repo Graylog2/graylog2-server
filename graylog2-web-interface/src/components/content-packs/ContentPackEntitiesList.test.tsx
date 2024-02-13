@@ -14,9 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { mount } from 'wrappedEnzyme';
+import * as React from 'react';
+import { act, render, screen, waitFor } from 'wrappedTestingLibrary';
 import 'helpers/mocking/react-dom_mock';
+import userEvent from '@testing-library/user-event';
 
 import ContentPack from 'logic/content-packs/ContentPack';
 import ContentPackEntitiesList from 'components/content-packs/ContentPackEntitiesList';
@@ -71,37 +72,40 @@ describe('<ContentPackEntitiesList />', () => {
     .parameters([parameter])
     .build();
 
-  it('should render with empty entities', () => {
+  it('should render with empty entities', async () => {
     const emptyContentPack = { entities: [] };
-    const wrapper = mount(<ContentPackEntitiesList contentPack={emptyContentPack} readOnly />);
+    render(<ContentPackEntitiesList contentPack={emptyContentPack} readOnly />);
 
-    expect(wrapper).toExist();
+    await screen.findByRole('heading', { name: 'Entity list' });
   });
 
-  it('should render with entities and parameters without readOnly', () => {
+  it('should render with entities and parameters without readOnly', async () => {
     const appliedParameter = { '111-beef': [{ configKey: 'title', paramName: 'A parameter name' }] };
 
-    const wrapper = mount(<ContentPackEntitiesList contentPack={contentPack}
-                                                   appliedParameter={appliedParameter} />);
+    render(<ContentPackEntitiesList contentPack={contentPack}
+                                    appliedParameter={appliedParameter} />);
 
-    expect(wrapper).toExist();
+    await screen.findByText('test');
   });
 
-  it('should filter entities', () => {
-    const wrapper = mount(<ContentPackEntitiesList contentPack={contentPack} />);
+  it('should filter entities', async () => {
+    render(<ContentPackEntitiesList contentPack={contentPack} />);
 
-    expect(wrapper.find('td[children=\'test\']').exists()).toBe(true);
+    await screen.findByText('test');
 
-    wrapper.find('input').simulate('change', { target: { value: 'Bad' } });
+    const searchInput = await screen.findByPlaceholderText('Enter search query...');
+    await userEvent.type(searchInput, 'Bad');
 
-    jest.advanceTimersByTime(SEARCH_DEBOUNCE_THRESHOLD);
+    act(() => {
+      jest.advanceTimersByTime(SEARCH_DEBOUNCE_THRESHOLD);
+    });
 
-    wrapper.update();
+    await waitFor(() => {
+      expect(screen.queryByText('test')).not.toBeInTheDocument();
+    });
 
-    expect(wrapper.find('td[children=\'test\']').exists()).toBe(false);
+    await userEvent.click(await screen.findByRole('button', { name: 'Reset search' }));
 
-    wrapper.find('button[title=\'Reset search\']').simulate('click');
-
-    expect(wrapper.find('td[children=\'test\']').exists()).toBe(true);
+    await screen.findByText('test');
   });
 });

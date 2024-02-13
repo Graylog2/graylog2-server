@@ -19,9 +19,26 @@ package org.graylog.plugins.views.storage.migration.state.machine;
 import org.graylog.plugins.views.storage.migration.state.actions.MigrationActions;
 
 public class MigrationActionsAdapter implements MigrationActions {
+
+    MigrationStateMachineContext context;
+
+    public MigrationActionsAdapter() {
+        this.context = new MigrationStateMachineContext();
+    }
+
     @Override
     public void resetMigration() {
 
+    }
+
+    @Override
+    public void setStateMachineContext(MigrationStateMachineContext context) {
+        this.context = context;
+    }
+
+    @Override
+    public MigrationStateMachineContext getStateMachineContext() {
+        return context;
     }
 
     @Override
@@ -81,6 +98,15 @@ public class MigrationActionsAdapter implements MigrationActions {
 
     @Override
     public boolean caAndRemovalPolicyExist() {
+        return false;
+    }
+
+    @Override
+    public void provisionDataNodes() {
+    }
+
+    @Override
+    public boolean provisioningFinished() {
         return false;
     }
 }

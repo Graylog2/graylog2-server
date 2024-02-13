@@ -15,10 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { render, screen } from 'wrappedTestingLibrary';
+import selectEvent from 'react-select-event';
+import userEvent from '@testing-library/user-event';
 
 import { AdditionalContext } from 'views/logic/ActionContext';
-import Select from 'components/common/Select';
 
 import SelectExtractorType from './SelectExtractorType';
 
@@ -42,34 +43,28 @@ describe('SelectExtractorType', () => {
     index: 'message-index',
   };
 
-  it('should render', () => {
-    const wrapper = mount(
+  it('should render', async () => {
+    render(
       <AdditionalContext.Provider key="message-key" value={{ message }}>
         <SelectExtractorType onClose={() => {}} value={value} field={field} queryId="foo" type={FieldType.Unknown} />
       </AdditionalContext.Provider>,
     );
-    const bootstrapModalForm = wrapper.find('BootstrapModalForm');
 
-    expect(bootstrapModalForm).toExist();
-    expect(bootstrapModalForm).toHaveProp('show', true);
+    await screen.findByRole('heading', { name: /select extractor type/i, hidden: true });
   });
 
-  it('should select a extractor and open a new window', () => {
-    const wrapper = mount(
+  it('should select a extractor and open a new window', async () => {
+    render(
       <AdditionalContext.Provider key="message-key" value={{ message }}>
         <SelectExtractorType onClose={() => {}} value={value} field={field} queryId="foo" type={FieldType.Unknown} />
       </AdditionalContext.Provider>,
     );
-    const select = wrapper.find(Select);
-    const { onChange }: { onChange?: React.ComponentProps<typeof Select>['onChange']} = select.at(0).props();
 
-    const form = wrapper.find('form');
+    const extractorType = (await screen.findAllByText(/select extractor type/i))[1];
+    await selectEvent.openMenu(extractorType);
+    await selectEvent.select(extractorType, 'Grok pattern');
 
-    expect(select).toExist();
-    expect(select.at(0)).toHaveProp('placeholder', 'Select extractor type');
-
-    onChange('grok');
-    form.simulate('submit');
+    await userEvent.click(await screen.findByRole('button', { name: /submit/i, hidden: true }));
 
     expect(window.open).toHaveBeenCalled();
     expect(focus).toHaveBeenCalled();
