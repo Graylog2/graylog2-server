@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback, useContext, useMemo, useState } from 'react';
-import { Form, Formik } from 'formik';
+import { Formik } from 'formik';
 import styled, { css } from 'styled-components';
 import moment from 'moment';
 
@@ -170,7 +170,7 @@ const TimeRangePicker = ({
     });
   }, [location.pathname, sendTelemetry, toggleDropdownShow]);
 
-  const handleSubmit = useCallback(({ timeRangeTabs, activeTab }: TimeRangePickerFormValues) => {
+  const onSubmit = useCallback(({ timeRangeTabs, activeTab }: TimeRangePickerFormValues) => {
     const normalizedTimeRange = normalizeFromPickerForSearchBar(timeRangeTabs[activeTab]);
 
     setCurrentTimeRange(normalizedTimeRange);
@@ -220,14 +220,14 @@ const TimeRangePicker = ({
       <Popover.Dropdown title={title}>
         <Formik<TimeRangePickerFormValues> initialValues={initialValues}
                                            validate={_validateTimeRange}
-                                           onSubmit={handleSubmit}
+                                           onSubmit={onSubmit}
                                            validateOnMount>
-          {(({ isValid, submitForm }) => (
+          {(({ isValid, submitForm, handleSubmit, handleReset }) => (
             <KeyCapture shortcuts={[
               { actionKey: 'submit-form', callback: submitForm, scope: 'general', options: { displayInOverview: false } },
               { actionKey: 'close-modal', callback: handleCancel, scope: 'general', options: { displayInOverview: false } },
             ]}>
-              <Form>
+              <form onSubmitCapture={handleSubmit} onResetCapture={handleReset}>
                 <Row>
                   <Col md={12}>
                     <TimeRangePresetRow />
@@ -248,7 +248,7 @@ const TimeRangePicker = ({
                                  submitButtonText="Update time range" />
                   </Col>
                 </Row>
-              </Form>
+              </form>
             </KeyCapture>
           ))}
         </Formik>
