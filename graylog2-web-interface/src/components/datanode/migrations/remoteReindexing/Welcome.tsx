@@ -16,16 +16,14 @@
  */
 import * as React from 'react';
 
-import { Button } from 'components/bootstrap';
 import { DocumentationLink } from 'components/support';
 import MigrationDatanodeList from 'components/datanode/migrations/MigrationDatanodeList';
 import useDataNodes from 'components/datanode/hooks/useDataNodes';
 
-type Props = {
-    onStepComplete: () => void,
-};
+import MigrationStepTriggerButtonToolbar from '../common/MigrationStepTriggerButtonToolbar';
+import type { MigrationStepComponentProps } from '../../Types';
 
-const Welcome = ({ onStepComplete } : Props) => {
+const Welcome = ({ nextSteps, onTriggerStep } : MigrationStepComponentProps) => {
   const { data: dataNodes } = useDataNodes();
 
   return (
@@ -34,7 +32,7 @@ const Welcome = ({ onStepComplete } : Props) => {
       <p>Using the Remote Reindexing will allow you to move the datanode by reindexing the data in your existing cluster to the datanode cluster.</p>
       <p>To start please install Data node on every OS/ES node from you previous setup. You can fing more information on how to download and install the data node  <DocumentationLink page="graylog-data-node" text="here" />.</p>
       <MigrationDatanodeList dataNodes={dataNodes} />
-      <Button bsStyle="primary" disabled={!dataNodes} bsSize="small" onClick={() => onStepComplete()}>Next</Button>
+      <MigrationStepTriggerButtonToolbar disabled={!dataNodes} nextSteps={nextSteps} onTriggerStep={onTriggerStep} />
     </>
   );
 };

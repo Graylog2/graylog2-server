@@ -22,12 +22,10 @@ import { Input, Button, ButtonToolbar } from 'components/bootstrap';
 
 import type { RemoteReindexRequest } from '../../hooks/useRemoteReindexMigrationStatus';
 import { remoteReindex } from '../../hooks/useRemoteReindexMigrationStatus';
+import type { MigrationStepComponentProps } from '../../Types';
+import MigrationStepTriggerButtonToolbar from '../common/MigrationStepTriggerButtonToolbar';
 
-type Props = {
-  onStepComplete: () => void,
-};
-
-const ExistingDataMigrationQuestion = ({ onStepComplete }: Props) => {
+const ExistingDataMigrationQuestion = ({ nextSteps, onTriggerStep }: MigrationStepComponentProps) => {
   const initialValues: RemoteReindexRequest = {
     hostname: '',
     user: '',
@@ -37,7 +35,11 @@ const ExistingDataMigrationQuestion = ({ onStepComplete }: Props) => {
   };
 
   const onSubmit = (values: RemoteReindexRequest, formikHelpers: FormikHelpers<RemoteReindexRequest>) => {
-    remoteReindex(values, onStepComplete);
+    const onSuccess = () => {
+      onTriggerStep(nextSteps[0], {});
+    };
+
+    remoteReindex(values, onSuccess);
     formikHelpers.setSubmitting(false);
   };
 
@@ -75,7 +77,7 @@ const ExistingDataMigrationQuestion = ({ onStepComplete }: Props) => {
                     bsSize="small">
               {isSubmitting ? 'Submitting...' : 'Migrate Existing Data'}
             </Button>
-            <Button bsStyle="primary" bsSize="small" onClick={() => onStepComplete()}>Skip</Button>
+            <MigrationStepTriggerButtonToolbar nextSteps={nextSteps} onTriggerStep={onTriggerStep} />
           </ButtonToolbar>
         </Form>
       )}

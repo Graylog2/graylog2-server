@@ -19,15 +19,18 @@ import * as React from 'react';
 import { ProgressBar } from 'components/common';
 
 import useRemoteReindexMigrationStatus from '../../hooks/useRemoteReindexMigrationStatus';
+import type { MigrationStepComponentProps } from '../../Types';
+import MigrationStepTriggerButtonToolbar from '../common/MigrationStepTriggerButtonToolbar';
 
-type Props = {
-  onStepComplete: () => void,
-};
-
-const MigrationWithDowntimeQuestion = ({ onStepComplete }: Props) => {
+const MigrationWithDowntimeQuestion = ({ nextSteps, onTriggerStep }: MigrationStepComponentProps) => {
   const migrationID = '';
   const roundedPercentage = 50;
-  const { data, error } = useRemoteReindexMigrationStatus(migrationID, onStepComplete);
+
+  const onSuccess = () => {
+    onTriggerStep(nextSteps[0], {});
+  };
+
+  const { data, error } = useRemoteReindexMigrationStatus(migrationID, onSuccess);
   console.log(data, error);
 
   return (
@@ -43,6 +46,7 @@ const MigrationWithDowntimeQuestion = ({ onStepComplete }: Props) => {
         bsStyle: 'info',
         label: data?.status,
       }]} />
+      <MigrationStepTriggerButtonToolbar hidden nextSteps={nextSteps} onTriggerStep={onTriggerStep} />
     </>
   );
 };

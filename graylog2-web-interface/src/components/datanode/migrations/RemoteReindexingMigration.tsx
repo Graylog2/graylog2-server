@@ -26,9 +26,9 @@ import {
 import type { MigrationActions, StepArgs, MigrationState } from 'components/datanode/Types';
 
 import Welcome from './remoteReindexing/Welcome';
-import CertificatesProvisioning from './remoteReindexing/CertificatesProvisioning';
 import ExistingDataMigrationQuestion from './remoteReindexing/ExistingDataMigrationQuestion';
 import MigrationWithDowntimeQuestion from './remoteReindexing/MigrationWithDowntimeQuestion';
+import CertificatesProvisioning from './rollingUpgrade/CertificatesProvisioning';
 
 const StyledTitle = styled.h3`
   margin-bottom: 10px;
@@ -65,25 +65,30 @@ type Props = {
   onTriggerNextStep: (step: MigrationActions, args: StepArgs) => void,
 }
 
-const RemoteReindexingMigration = ({ onTriggerNextStep }: Props) => {
+const RemoteReindexingMigration = ({ currentStep, onTriggerNextStep }: Props) => {
   const [activeStep, setActiveStep] = useState();
+  const { next_steps: nextSteps } = currentStep;
+
+  const onStepComplete = (step: MigrationActions, args: StepArgs = {}) => {
+    onTriggerNextStep(step, args);
+  };
 
   const steps = [
     {
       key: MIGRATION_STATE.REMOTE_REINDEX_WELCOME.key,
-      component: <Welcome onStepComplete={onTriggerNextStep} />,
+      component: <Welcome nextSteps={nextSteps} onTriggerStep={onStepComplete} />,
     },
     {
       key: MIGRATION_STATE.PROVISION_DATANODE_CERTIFICATES.key,
-      component: <CertificatesProvisioning onStepComplete={onTriggerNextStep} />,
+      component: <CertificatesProvisioning nextSteps={nextSteps} onTriggerStep={onStepComplete} />,
     },
     {
       key: MIGRATION_STATE.EXISTING_DATA_MIGRATION_QUESTION.key,
-      component: <ExistingDataMigrationQuestion onStepComplete={onTriggerNextStep} />,
+      component: <ExistingDataMigrationQuestion nextSteps={nextSteps} onTriggerStep={onStepComplete} />,
     },
     {
       key: MIGRATION_STATE.MIGRATE_WITH_DOWNTIME_QUESTION.key,
-      component: <MigrationWithDowntimeQuestion onStepComplete={onTriggerNextStep} />,
+      component: <MigrationWithDowntimeQuestion nextSteps={nextSteps} onTriggerStep={onStepComplete} />,
     },
   ];
 
@@ -98,7 +103,7 @@ const RemoteReindexingMigration = ({ onTriggerNextStep }: Props) => {
           const { description } = MIGRATION_STATE[remoteReindexingStep];
 
           return (
-            <Panel eventKey={remoteReindexingStep}>
+            <Panel key={remoteReindexingStep} eventKey={remoteReindexingStep}>
               <Panel.Heading>
                 <Panel.Title>
                   <Panel.Toggle tabIndex={index}>{`${index}. ${description}`}</Panel.Toggle>

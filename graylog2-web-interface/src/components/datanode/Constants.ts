@@ -165,5 +165,13 @@ export const MIGRATION_ACTIONS = {
     key: 'SHOW_MIGRATION_SELECTION',
     label: 'Go to migration steps',
   },
+  SHOW_MIGRATE_EXISTING_DATA: {
+    key: 'SHOW_MIGRATE_EXISTING_DATA',
+    label: 'Migrate existing data',
+  },
+  SKIP_EXISTING_DATA_MIGRATION: {
+    key: 'SKIP_EXISTING_DATA_MIGRATION',
+    label: 'Skip existing data migration',
+  },
 };
 export default MIGRATION_STEP;
