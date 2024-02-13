@@ -14,11 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch2.ism.policy;
+package org.graylog2.indexer.datastream.policy;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.graylog.storage.opensearch2.ism.policy.actions.Action;
+import org.graylog2.indexer.datastream.policy.actions.Action;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

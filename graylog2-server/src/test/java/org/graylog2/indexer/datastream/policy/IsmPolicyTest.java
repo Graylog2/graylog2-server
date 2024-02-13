@@ -14,14 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch2.ism.policy;
+package org.graylog2.indexer.datastream.policy;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
-import org.graylog.storage.opensearch2.ism.policy.actions.Action;
-import org.graylog.storage.opensearch2.ism.policy.actions.DeleteAction;
-import org.graylog.storage.opensearch2.ism.policy.actions.Retry;
+import org.graylog2.indexer.datastream.policy.actions.Action;
+import org.graylog2.indexer.datastream.policy.actions.DeleteAction;
+import org.graylog2.indexer.datastream.policy.actions.Retry;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Test;
 
