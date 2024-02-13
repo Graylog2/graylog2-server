@@ -22,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -207,13 +208,15 @@ public class MigrationStateMachineBuilderTest {
         stateMachine.fire(MigrationStep.SHOW_PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES);
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES);
         verify(migrationActions, times(1)).directoryCompatibilityCheckOk();
-        assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.CALCULATE_JOURNAL_SIZE);
+        assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.PROVISION_DATANODE_CERTIFICATES);
         verifyNoMoreInteractions(migrationActions);
     }
 
     @Test
     public void testJournalSizeDowntimeWarning() {
         StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES);
+        stateMachine.fire(MigrationStep.PROVISION_DATANODE_CERTIFICATES);
+        Mockito.when(migrationActions.provisioningFinished()).thenReturn(true);
         stateMachine.fire(MigrationStep.CALCULATE_JOURNAL_SIZE);
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.JOURNAL_SIZE_DOWNTIME_WARNING);
         assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SHOW_STOP_PROCESSING_PAGE);
