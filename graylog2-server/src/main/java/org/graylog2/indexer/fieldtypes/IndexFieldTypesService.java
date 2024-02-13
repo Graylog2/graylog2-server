@@ -194,4 +194,8 @@ public class IndexFieldTypesService {
     public IndexFieldTypesDTO findOneByIndexName(final String indexName) {
         return db.findOne(DBQuery.is(FIELD_INDEX_NAME, indexName));
     }
+
+    public List<IndexFieldTypesDTO> findByIndexNames(final Collection<String> indexNames) {
+        return db.find(DBQuery.in(FIELD_INDEX_NAME, indexNames)).toArray();
+    }
 }

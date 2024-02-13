@@ -33,6 +33,7 @@ import {
   LEGACY_COLOR_SCHEME_LIGHT,
   PREFERENCES_THEME_MODE,
 } from '../constants';
+import type { UserPreferences } from '../../contexts/UserPreferencesContext';
 import UserPreferencesContext from '../../contexts/UserPreferencesContext';
 
 const fromLegacyColorSchemeName = (legacyColorScheme: LegacyColorScheme): ColorScheme => {
@@ -47,12 +48,16 @@ const fromLegacyColorSchemeName = (legacyColorScheme: LegacyColorScheme): ColorS
   return legacyColorScheme;
 };
 
-const getInitialThemeMode = (userPreferences: Record<typeof PREFERENCES_THEME_MODE, ColorScheme>, browserThemePreference: ColorScheme, initialThemeModeOverride: ColorScheme) => {
+const getInitialThemeMode = (
+  userPreferencesThemeMode: UserPreferences[typeof PREFERENCES_THEME_MODE],
+  browserThemePreference: ColorScheme,
+  initialThemeModeOverride: ColorScheme,
+) => {
   if (initialThemeModeOverride) {
     return initialThemeModeOverride;
   }
 
-  const userThemePreference = userPreferences[PREFERENCES_THEME_MODE] ?? fromLegacyColorSchemeName(Store.get(PREFERENCES_THEME_MODE));
+  const userThemePreference = userPreferencesThemeMode ?? fromLegacyColorSchemeName(Store.get(PREFERENCES_THEME_MODE));
 
   return userThemePreference ?? browserThemePreference ?? DEFAULT_THEME_MODE;
 };
@@ -66,8 +71,9 @@ const usePreferredColorScheme = (initialThemeModeOverride: ColorScheme): [ColorS
   }));
 
   const userPreferences = useContext(UserPreferencesContext);
-  const initialThemeMode = getInitialThemeMode(userPreferences, browserThemePreference, initialThemeModeOverride);
-  const [currentThemeMode, setCurrentThemeMode] = useState<ColorScheme>(initialThemeMode);
+  const [currentThemeMode, setCurrentThemeMode] = useState<ColorScheme>(
+    () => getInitialThemeMode(userPreferences[PREFERENCES_THEME_MODE], browserThemePreference, initialThemeModeOverride),
+  );
 
   const changeCurrentThemeMode = useCallback((newThemeMode: ColorScheme) => {
     setCurrentThemeMode(newThemeMode);

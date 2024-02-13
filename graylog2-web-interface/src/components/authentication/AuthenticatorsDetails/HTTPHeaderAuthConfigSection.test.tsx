@@ -18,6 +18,8 @@ import React from 'react';
 import { render, screen, act } from 'wrappedTestingLibrary';
 
 import HTTPHeaderAuthConfig from 'logic/authentication/HTTPHeaderAuthConfig';
+import { HTTPHeaderAuthConfigActions } from 'stores/authentication/HTTPHeaderAuthConfigStore';
+import asMock from 'helpers/mocking/AsMock';
 
 import HTTPHeaderAuthConfigSection from './HTTPHeaderAuthConfigSection';
 
@@ -28,7 +30,7 @@ const mockHTTPHeaderAuthConfig = HTTPHeaderAuthConfig.builder()
 
 jest.mock('stores/authentication/HTTPHeaderAuthConfigStore', () => ({
   HTTPHeaderAuthConfigActions: {
-    load: jest.fn(() => Promise.resolve(mockHTTPHeaderAuthConfig)),
+    load: jest.fn(),
   },
 }));
 
@@ -36,6 +38,7 @@ describe('<HTTPHeaderAuthConfigSection />', () => {
   afterEach(() => jest.useRealTimers());
 
   it('should display loading indicator while loading', async () => {
+    asMock(HTTPHeaderAuthConfigActions.load).mockImplementation(() => new Promise(() => {}));
     jest.useFakeTimers();
     render(<HTTPHeaderAuthConfigSection />);
 
@@ -47,6 +50,8 @@ describe('<HTTPHeaderAuthConfigSection />', () => {
   });
 
   it('should load and display HTTP header auth config details', async () => {
+    asMock(HTTPHeaderAuthConfigActions.load).mockResolvedValue(mockHTTPHeaderAuthConfig);
+
     render(<HTTPHeaderAuthConfigSection />);
 
     await screen.findByText('Enabled');

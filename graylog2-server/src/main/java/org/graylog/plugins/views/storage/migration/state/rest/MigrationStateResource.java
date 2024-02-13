@@ -29,9 +29,9 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog.plugins.views.storage.migration.state.machine.MigrationState;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachine;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.shared.rest.resources.ProxiedResource;
@@ -58,9 +58,14 @@ public class MigrationStateResource {
     @NoAuditEvent("No Audit Event needed") // TODO: do we need audit log here?
     @RequiresPermissions(RestPermissions.DATANODE_MIGRATION)
     @ApiOperation(value = "trigger migration step")
-    public CurrentStateInformation migrate(@ApiParam(name = "request") @NotNull MigrationStepRequest request) {
-        final MigrationState newState = stateMachine.trigger(request.step(), request.args());
-        return new CurrentStateInformation(newState, stateMachine.nextSteps());
+    public CurrentStateInformation migrate(@ApiParam(name = "request") @NotNull MigrationStepRequest request,
+                                           @Context Response response) {
+        final CurrentStateInformation newState = stateMachine.trigger(request.step(), request.args());
+        return Response.fromResponse(response)
+                .status(newState.hasErrors() ? Response.Status.INTERNAL_SERVER_ERROR : Response.Status.OK)
+                .entity(newState)
+                .build()
+                .readEntity(CurrentStateInformation.class);
     }
 
     @GET

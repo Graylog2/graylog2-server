@@ -39,23 +39,9 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import type { IndexSetsDefaultConfiguration } from 'stores/indices/IndexSetsStore';
 
 import FormikInput from '../common/FormikInput';
-
-export type IndexConfig = {
-  index_prefix: string,
-  index_analyzer: string,
-  shards: number,
-  replicas: number,
-  index_optimization_max_num_segments: number,
-  index_optimization_disabled: boolean,
-  field_type_refresh_interval: number,
-  field_type_refresh_interval_unit: 'seconds' | 'minutes',
-  rotation_strategy_config: RotationStrategyConfig,
-  rotation_strategy_class: string,
-  retention_strategy_config: RetentionStrategyConfig,
-  retention_strategy_class: string,
-}
 
 const TIME_UNITS = ['SECONDS', 'MINUTES'];
 
@@ -70,13 +56,13 @@ const StyledDefList = styled.dl.attrs({ className: 'deflist' })(({ theme }) => c
 
 const IndexSetsDefaultsConfig = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
-  const [viewConfig, setViewConfig] = useState<IndexConfig | undefined>(undefined);
-  const [formConfig, setFormConfig] = useState<IndexConfig | undefined>(undefined);
+  const [viewConfig, setViewConfig] = useState<IndexSetsDefaultConfiguration | undefined>(undefined);
+  const [formConfig, setFormConfig] = useState<IndexSetsDefaultConfiguration | undefined>(undefined);
   const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
   const [rotationStrategies, setRotationStrategies] = useState<MaintenanceOptions>();
   const [retentionStrategies, setRetentionStrategies] = useState<MaintenanceOptions>();
 
-  const handleSaveConfig = async (configToSave: IndexConfig) => (
+  const handleSaveConfig = async (configToSave: IndexSetsDefaultConfiguration) => (
     ConfigurationsActions.updateIndexSetDefaults(ConfigurationType.INDEX_SETS_DEFAULTS_CONFIG, configToSave)
   );
 

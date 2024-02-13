@@ -25,7 +25,6 @@ import com.github.joschi.jadconfig.Repository;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.guava.GuavaConverterFactory;
-import com.github.joschi.jadconfig.guice.NamedConfigParametersModule;
 import com.github.joschi.jadconfig.jodatime.JodaTimeConverterFactory;
 import com.github.joschi.jadconfig.repositories.EnvironmentRepository;
 import com.github.joschi.jadconfig.repositories.PropertiesRepository;
@@ -37,6 +36,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.google.inject.AbstractModule;
 import com.google.inject.Binder;
 import com.google.inject.CreationException;
 import com.google.inject.Guice;
@@ -54,6 +54,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.graylog2.Configuration;
+import org.graylog2.bindings.NamedConfigParametersOverrideModule;
 import org.graylog2.bootstrap.commands.MigrateCmd;
 import org.graylog2.configuration.PathConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
@@ -315,7 +316,7 @@ public abstract class CmdLineTool implements CliCommand {
 
         injector = setupInjector(
                 new IsDevelopmentBindings(),
-                new NamedConfigParametersModule(jadConfig.getConfigurationBeans()),
+                new NamedConfigParametersOverrideModule(jadConfig.getConfigurationBeans()),
                 new PluginBindings(plugins),
                 binder -> binder.bind(MetricRegistry.class).toInstance(metricRegistry)
         );
@@ -541,8 +542,8 @@ public abstract class CmdLineTool implements CliCommand {
      * It can be used to look up configuration values in modules at binding time.
      */
     protected Injector setupBootstrapConfigInjector() {
-        final NamedConfigParametersModule configModule =
-                new NamedConfigParametersModule(jadConfig.getConfigurationBeans());
+        final AbstractModule configModule =
+                new NamedConfigParametersOverrideModule(jadConfig.getConfigurationBeans());
 
         Injector bootstrapConfigInjector = null;
         try {

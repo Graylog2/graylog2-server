@@ -61,6 +61,18 @@ export const hotKeysCollections: HotkeyCollections = {
       'save-as': { keys: 'mod+shift+s', description: 'Save dashboard as' },
     },
   },
+  'query-input': {
+    title: 'Query Input',
+    description: 'Keyboard shortcuts for query input in search bar, available when input is focussed.',
+    // Please note, any changes to keybindings also need to be made in the query input component.
+    actions: {
+      'submit-search': { keys: 'return', description: 'Execute the search' },
+      'insert-newline': { keys: 'shift+return', description: 'Create a new line' },
+      'create-search-filter': { keys: 'alt+return', description: 'Create search filter based on current query' },
+      'show-suggestions': { keys: 'alt+space', description: 'Show suggestions, displays query history when input is empty' },
+      'show-history': { keys: 'alt+shift+h', description: 'View your search query history' },
+    },
+  },
   scratchpad: {
     title: 'Scratchpad',
     description: 'Scratchpad shortcuts',

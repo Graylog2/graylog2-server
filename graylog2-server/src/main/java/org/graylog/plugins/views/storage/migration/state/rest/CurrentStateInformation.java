@@ -16,10 +16,20 @@
  */
 package org.graylog.plugins.views.storage.migration.state.rest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationState;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStep;
 
 import java.util.List;
 
-public record CurrentStateInformation(MigrationState state, List<MigrationStep> nextSteps) {
+public record CurrentStateInformation(MigrationState state, List<MigrationStep> nextSteps, String errorMessage) {
+
+    public CurrentStateInformation(MigrationState state, List<MigrationStep> nextSteps) {
+        this(state, nextSteps, null);
+    }
+
+    public boolean hasErrors() {
+        return StringUtils.isNotBlank(errorMessage);
+    }
+
 }

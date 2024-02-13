@@ -1,0 +1,1209 @@
+{
+  "id": "aa96e05c21259f3d24e21341",
+  "type": "DASHBOARD",
+  "title": "Data Nodes",
+  "summary": "Metrics dashboard for Data Nodes",
+  "description": "Metrics dashboard for Data Nodes",
+  "search_id": "65b3cbd220753c0e0fc18424",
+  "properties": [],
+  "requires": {},
+  "state": {
+    "05864639-f434-4d63-9f1a-bc0024f79f8b": {
+      "selected_fields": null,
+      "static_message_list_id": null,
+      "titles": {
+        "widget": {
+          "a6e3d286-5efb-470e-a0a0-a5b3898f147c": "Search Latency (ms)",
+          "ed454696-6d2c-4613-86d7-0cf7b5da1382": "Write Thread Pool",
+          "51b95d99-0aff-405f-b80a-cae2bb7dc725": "Free Memory (MB)",
+          "b41a8a9e-5ac3-485f-9e6b-9b22a92e1a9c": "CPU Usage (%) (copy)",
+          "27927645-c3a6-47c2-80df-991edb6303be": "Number of Shards",
+          "a7c7f94f-71b3-4bbe-864c-5812d65f71ca": "Merge Thread Pool",
+          "d7d52d4c-5f38-4169-bdda-de252894d547": "Heap Memory Used (%)",
+          "fa8339ad-d069-42c3-b531-941426aec526": "All Messages",
+          "d02e752d-f324-4e0d-a9fd-19a7192518e0": "Message Count",
+          "4057ca77-e5e7-47bc-8b97-def6b6915542": "Free Disk Space (gb)",
+          "9cdd9c0f-277d-4ed1-b117-b36b0c2e1f30": "Indexing Rate",
+          "ec14deeb-2dba-4a93-bc16-fe0a2b020797": "Index Latency (ms)",
+          "dd635ef7-d899-4837-90e0-a79a7140054d": "Search Thread Pool",
+          "df0c1860-6351-4e30-afea-c3e5598e5421": "Indexed Documents",
+          "532b816d-2dc9-43ad-81bc-104476554605": "Search Rate",
+          "e0133cb1-018e-456e-bd5c-7c460a0b7a36": "CPU Usage (%)"
+        },
+        "tab": {
+          "title": "OpenSearch Metrics"
+        }
+      },
+      "widgets": [
+        {
+          "id": "ec14deeb-2dba-4a93-bc16-fe0a2b020797",
+          "type": "aggregation",
+          "filter": null,
+          "filters": [],
+          "timerange": {
+            "from": 7200,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "NOT(_exists_:node)"
+          },
+          "streams": [
+            "datastream:gl-datanode-metrics"
+          ],
+          "config": {
+            "row_pivots": [
+              {
+                "fields": [
+                  "timestamp"
+                ],
+                "type": "time",
+                "config": {
+                  "interval": {
+                    "type": "timeunit",
+                    "value": 1,
+                    "unit": "minutes"
+                  }
+                }
+              }
+            ],
+            "column_pivots": [],
+            "series": [
+              {
+                "config": {
+                  "name": "Index Latency"
+                },
+                "function": "avg(index_latency_rate)"
+              }
+            ],
+            "sort": [],
+            "visualization": "line",
+            "visualization_config": {
+              "interpolation": "linear",
+              "axis_type": "linear"
+            },
+            "formatting_settings": null,
+            "rollup": false,
+            "event_annotation": false,
+            "row_limit": null,
+            "column_limit": null
+          }
+        },
+        {
+          "id": "a6e3d286-5efb-470e-a0a0-a5b3898f147c",
+          "type": "aggregation",
+          "filter": null,
+          "filters": [],
+          "timerange": {
+            "from": 7200,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "NOT(_exists_:node)"
+          },
+          "streams": [
+            "datastream:gl-datanode-metrics"
+          ],
+          "config": {
+            "row_pivots": [
+              {
+                "fields": [
+                  "timestamp"
+                ],
+                "type": "time",
+                "config": {
+                  "interval": {
+                    "type": "timeunit",
+                    "value": 1,
+                    "unit": "minutes"
+                  }
+                }
+              }
+            ],
+            "column_pivots": [],
+            "series": [
+              {
+                "config": {
+                  "name": "Search Latency"
+                },
+                "function": "avg(search_latency_rate)"
+              }
+            ],
+            "sort": [],
+            "visualization": "line",
+            "visualization_config": {
+              "interpolation": "linear",
+              "axis_type": "linear"
+            },
+            "formatting_settings": null,
+            "rollup": false,
+            "event_annotation": false,
+            "row_limit": null,
+            "column_limit": null
+          }
+        },
+        {
+          "id": "27927645-c3a6-47c2-80df-991edb6303be",
+          "type": "aggregation",
+          "filter": null,
+          "filters": [],
+          "timerange": {
+            "from": 7200,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": ""
+          },
+          "streams": [
+            "datastream:gl-datanode-metrics"
+          ],
+          "config": {
+            "row_pivots": [
+              {
+                "fields": [
+                  "timestamp"
+                ],
+                "type": "time",
+                "config": {
+                  "interval": {
+                    "type": "timeunit",
+                    "value": 1,
+                    "unit": "minutes"
+                  }
+                }
+              }
+            ],
+            "column_pivots": [],
+            "series": [
+              {
+                "config": {
+                  "name": "Total"
+                },
+                "function": "avg(shards_total)"
+              },
+              {
+                "config": {
+                  "name": "Successful"
+                },
+                "function": "avg(shards_successful)"
+              },
+              {
+                "config": {
+                  "name": "Failed"
+                },
+                "function": "avg(shards_failed)"
+              }
+            ],
+            "sort": [],
+            "visualization": "line",
+            "visualization_config": {
+              "interpolation": "linear",
+              "axis_type": "linear"
+            },
+            "formatting_settings": null,
+            "rollup": false,
+            "event_annotation": false,
+            "row_limit": null,
+            "column_limit": null
+          }
+        },
+        {
+          "id": "d7d52d4c-5f38-4169-bdda-de252894d547",
+          "type": "aggregation",
+          "filter": null,
+          "filters": [],
+          "timerange": {
+            "from": 18000,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": ""
+          },
+          "streams": [
+            "datastream:gl-datanode-metrics"
+          ],
+          "config": {
+            "row_pivots": [
+              {
+                "fields": [
+                  "timestamp"
+                ],
+                "type": "time",
+                "config": {
+                  "interval": {
+                    "type": "timeunit",
+                    "value": 1,
+                    "unit": "minutes"
+                  }
+                }
+              }
+            ],
+            "column_pivots": [
+              {
+                "fields": [
+                  "node"
+                ],
+                "type": "values",
+                "config": {
+                  "limit": 15,
+                  "skip_empty_values": true
+                }
+              }
+            ],
+            "series": [
+              {
+                "config": {
+                  "name": "Heap Memory used (%)"
+                },
+                "function": "avg(mem_heap_used)"
+              }
+            ],
+            "sort": [],
+            "visualization": "line",
+            "visualization_config": {
+              "interpolation": "linear",
+              "axis_type": "linear"
+            },
+            "formatting_settings": null,
+            "rollup": false,
+            "event_annotation": false,
+            "row_limit": null,
+            "column_limit": 15
+          }
+        },
+        {
+          "id": "532b816d-2dc9-43ad-81bc-104476554605",
+          "type": "aggregation",
+          "filter": null,
+          "filters": [],
+          "timerange": {
+            "from": 7200,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": ""
+          },
+          "streams": [
+            "datastream:gl-datanode-metrics"
+          ],
+          "config": {
+            "row_pivots": [
+              {
+                "fields": [
+                  "timestamp"
+                ],
+                "type": "time",
+                "config": {
+                  "interval": {
+                    "type": "timeunit",
+                    "value": 1,
+                    "unit": "minutes"
+                  }
+                }
+              }
+            ],
+            "column_pivots": [],
+            "series": [
+              {
+                "config": {
+                  "name": "Search Rate"
+                },
+                "function": "avg(search_ops_rate)"
+              }
+            ],
+            "sort": [],
+            "visualization": "line",
+            "visualization_config": {
+              "interpolation": "linear",
+              "axis_type": "linear"
+            },
+            "formatting_settings": null,
+            "rollup": false,
+            "event_annotation": false,
+            "row_limit": null,
+            "column_limit": null
+          }
+        },
+        {
+          "id": "e0133cb1-018e-456e-bd5c-7c460a0b7a36",
+          "type": "aggregation",
+          "filter": null,
+          "filters": [],
+          "timerange": {
+            "from": 18000,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": ""
+          },
+          "streams": [
+            "datastream:gl-datanode-metrics"
+          ],
+          "config": {
+            "row_pivots": [
+              {
+                "fields": [
+                  "timestamp"
+                ],
+                "type": "time",
+                "config": {
+                  "interval": {
+                    "type": "timeunit",
+                    "value": 1,
+                    "unit": "minutes"
+                  }
+                }
+              }
+            ],
+            "column_pivots": [
+              {
+                "fields": [
+                  "node"
+                ],
+                "type": "values",
+                "config": {
+                  "limit": 15,
+                  "skip_empty_values": true
+                }
+              }
+            ],
+            "series": [
+              {
+                "config": {
+                  "name": "CPU Load (%)"
+                },
+                "function": "avg(cpu_load)"
+              }
+            ],
+            "sort": [],
+            "visualization": "line",
+            "visualization_config": {
+              "interpolation": "linear",
+              "axis_type": "linear"
+            },
+            "formatting_settings": null,
+            "rollup": false,
+            "event_annotation": false,
+            "row_limit": null,
+            "column_limit": 15
+          }
+        },
+        {
+          "id": "9cdd9c0f-277d-4ed1-b117-b36b0c2e1f30",
+          "type": "aggregation",
+          "filter": null,
+          "filters": [],
+          "timerange": {
+            "from": 7200,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": ""
+          },
+          "streams": [
+            "datastream:gl-datanode-metrics"
+          ],
+          "config": {
+            "row_pivots": [
+              {
+                "fields": [
+                  "timestamp"
+                ],
+                "type": "time",
+                "config": {
+                  "interval": {
+                    "type": "timeunit",
+                    "value": 1,
+                    "unit": "minutes"
+                  }
+                }
+              }
+            ],
+            "column_pivots": [],
+            "series": [
+              {
+                "config": {
+                  "name": "Indexing Rate"
+                },
+                "function": "avg(index_ops_rate)"
+              }
+            ],
+            "sort": [],
+            "visualization": "line",
+            "visualization_config": {
+              "interpolation": "linear",
+              "axis_type": "linear"
+            },
+            "formatting_settings": null,
+            "rollup": false,
+            "event_annotation": false,
+            "row_limit": null,
+            "column_limit": null
+          }
+        },
+        {
+          "id": "ed454696-6d2c-4613-86d7-0cf7b5da1382",
+          "type": "aggregation",
+          "filter": null,
+          "filters": [],
+          "timerange": {
+            "from": 18000,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": ""
+          },
+          "streams": [
+            "datastream:gl-datanode-metrics"
+          ],
+          "config": {
+            "row_pivots": [
+              {
+                "fields": [
+                  "timestamp"
+                ],
+                "type": "time",
+                "config": {
+                  "interval": {
+                    "type": "timeunit",
+                    "value": 1,
+                    "unit": "minutes"
+                  }
+                }
+              }
+            ],
+            "column_pivots": [
+              {
+                "fields": [
+                  "node"
+                ],
+                "type": "values",
+                "config": {
+                  "limit": 15,
+                  "skip_empty_values": true
+                }
+              }
+            ],
+            "series": [
+              {
+                "config": {
+                  "name": "Threads"
+                },
+                "function": "avg(thread_pool_write_threads)"
+              },
+              {
+                "config": {
+                  "name": "Queue"
+                },
+                "function": "avg(thread_pool_write_queue)"
+              },
+              {
+                "config": {
+                  "name": "Rejected Count"
+                },
+                "function": "avg(thread_pool_write_rejected)"
+              }
+            ],
+            "sort": [],
+            "visualization": "line",
+            "visualization_config": {
+              "interpolation": "linear",
+              "axis_type": "linear"
+            },
+            "formatting_settings": null,
+            "rollup": false,
+            "event_annotation": false,
+            "row_limit": null,
+            "column_limit": 15
+          }
+        },
+        {
+          "id": "dd635ef7-d899-4837-90e0-a79a7140054d",
+          "type": "aggregation",
+          "filter": null,
+          "filters": [],
+          "timerange": {
+            "from": 18000,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": ""
+          },
+          "streams": [
+            "datastream:gl-datanode-metrics"
+          ],
+          "config": {
+            "row_pivots": [
+              {
+                "fields": [
+                  "timestamp"
+                ],
+                "type": "time",
+                "config": {
+                  "interval": {
+                    "type": "timeunit",
+                    "value": 1,
+                    "unit": "minutes"
+                  }
+                }
+              }
+            ],
+            "column_pivots": [
+              {
+                "fields": [
+                  "node"
+                ],
+                "type": "values",
+                "config": {
+                  "limit": 15,
+                  "skip_empty_values": true
+                }
+              }
+            ],
+            "series": [
+              {
+                "config": {
+                  "name": "Threads"
+                },
+                "function": "avg(thread_pool_search_threads)"
+              },
+              {
+                "config": {
+                  "name": "Queue"
+                },
+                "function": "avg(thread_pool_search_queue)"
+              },
+              {
+                "config": {
+                  "name": "Rejected Count"
+                },
+                "function": "avg(thread_pool_search_rejected)"
+              }
+            ],
+            "sort": [],
+            "visualization": "line",
+            "visualization_config": {
+              "interpolation": "linear",
+              "axis_type": "linear"
+            },
+            "formatting_settings": null,
+            "rollup": false,
+            "event_annotation": false,
+            "row_limit": null,
+            "column_limit": 15
+          }
+        },
+        {
+          "id": "a7c7f94f-71b3-4bbe-864c-5812d65f71ca",
+          "type": "aggregation",
+          "filter": null,
+          "filters": [],
+          "timerange": {
+            "from": 18000,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": ""
+          },
+          "streams": [
+            "datastream:gl-datanode-metrics"
+          ],
+          "config": {
+            "row_pivots": [
+              {
+                "fields": [
+                  "timestamp"
+                ],
+                "type": "time",
+                "config": {
+                  "interval": {
+                    "type": "timeunit",
+                    "value": 1,
+                    "unit": "minutes"
+                  }
+                }
+              }
+            ],
+            "column_pivots": [
+              {
+                "fields": [
+                  "node"
+                ],
+                "type": "values",
+                "config": {
+                  "limit": 15,
+                  "skip_empty_values": true
+                }
+              }
+            ],
+            "series": [
+              {
+                "config": {
+                  "name": "Threads"
+                },
+                "function": "avg(thread_pool_merge_threads)"
+              },
+              {
+                "config": {
+                  "name": "Queue"
+                },
+                "function": "avg(thread_pool_merge_queue)"
+              },
+              {
+                "config": {
+                  "name": "Rejected Count"
+                },
+                "function": "avg(thread_pool_merge_rejected)"
+              }
+            ],
+            "sort": [],
+            "visualization": "line",
+            "visualization_config": {
+              "interpolation": "linear",
+              "axis_type": "linear"
+            },
+            "formatting_settings": null,
+            "rollup": false,
+            "event_annotation": false,
+            "row_limit": null,
+            "column_limit": 15
+          }
+        },
+        {
+          "id": "4057ca77-e5e7-47bc-8b97-def6b6915542",
+          "type": "aggregation",
+          "filter": null,
+          "filters": [],
+          "timerange": {
+            "from": 60,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": ""
+          },
+          "streams": [
+            "datastream:gl-datanode-metrics"
+          ],
+          "config": {
+            "row_pivots": [],
+            "column_pivots": [
+              {
+                "fields": [
+                  "node"
+                ],
+                "type": "values",
+                "config": {
+                  "limit": 15,
+                  "skip_empty_values": true
+                }
+              }
+            ],
+            "series": [
+              {
+                "config": {
+                  "name": "Free disk space (%)"
+                },
+                "function": "latest(disk_free)"
+              }
+            ],
+            "sort": [],
+            "visualization": "bar",
+            "visualization_config": {
+              "barmode": "group",
+              "axis_type": "linear"
+            },
+            "formatting_settings": null,
+            "rollup": false,
+            "event_annotation": false,
+            "row_limit": null,
+            "column_limit": 15
+          }
+        },
+        {
+          "id": "df0c1860-6351-4e30-afea-c3e5598e5421",
+          "type": "aggregation",
+          "filter": null,
+          "filters": [],
+          "timerange": {
+            "from": 18000,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": ""
+          },
+          "streams": [
+            "datastream:gl-datanode-metrics"
+          ],
+          "config": {
+            "row_pivots": [],
+            "column_pivots": [],
+            "series": [
+              {
+                "config": {
+                  "name": "Indexed Documents"
+                },
+                "function": "latest(doc_count)"
+              }
+            ],
+            "sort": [],
+            "visualization": "numeric",
+            "visualization_config": {
+              "trend": false,
+              "trend_preference": "NEUTRAL"
+            },
+            "formatting_settings": null,
+            "rollup": false,
+            "event_annotation": false,
+            "row_limit": null,
+            "column_limit": null
+          }
+        }
+      ],
+      "widget_mapping": {
+        "a6e3d286-5efb-470e-a0a0-a5b3898f147c": [
+          "cda87d95-f63a-4b34-a9a4-74aec9f8272c"
+        ],
+        "ed454696-6d2c-4613-86d7-0cf7b5da1382": [
+          "bf7e6a6d-282c-4994-876c-7c38757c6721"
+        ],
+        "27927645-c3a6-47c2-80df-991edb6303be": [
+          "4bd49e29-1292-44f5-91d0-0e48ce8656e7"
+        ],
+        "a7c7f94f-71b3-4bbe-864c-5812d65f71ca": [
+          "83c000b2-f27b-43cd-afc3-865b35957ce6"
+        ],
+        "d7d52d4c-5f38-4169-bdda-de252894d547": [
+          "5a1854ce-c49a-445c-b817-cfda5307757c"
+        ],
+        "4057ca77-e5e7-47bc-8b97-def6b6915542": [
+          "4cf919f9-8f5d-4445-9921-790aae8f5730"
+        ],
+        "9cdd9c0f-277d-4ed1-b117-b36b0c2e1f30": [
+          "e6998f76-980b-414e-980a-8c5f9799e89f"
+        ],
+        "ec14deeb-2dba-4a93-bc16-fe0a2b020797": [
+          "c0adee78-6ad0-4ac9-b6c7-df6f23224418"
+        ],
+        "dd635ef7-d899-4837-90e0-a79a7140054d": [
+          "5834d88f-790e-43a6-8758-00418dac460c"
+        ],
+        "df0c1860-6351-4e30-afea-c3e5598e5421": [
+          "d219df39-73cb-4309-a54a-2f8fa1af4f83"
+        ],
+        "532b816d-2dc9-43ad-81bc-104476554605": [
+          "2ecc9350-e2ed-4a3a-a8b8-38e2a9842ec2"
+        ],
+        "e0133cb1-018e-456e-bd5c-7c460a0b7a36": [
+          "c39b63e1-ec0a-483c-94a7-f1ce6d349024"
+        ]
+      },
+      "positions": {
+        "a6e3d286-5efb-470e-a0a0-a5b3898f147c": {
+          "col": 5,
+          "row": 5,
+          "height": 4,
+          "width": 4
+        },
+        "ed454696-6d2c-4613-86d7-0cf7b5da1382": {
+          "col": 1,
+          "row": 13,
+          "height": 4,
+          "width": "Infinity"
+        },
+        "27927645-c3a6-47c2-80df-991edb6303be": {
+          "col": 9,
+          "row": 9,
+          "height": 4,
+          "width": 4
+        },
+        "a7c7f94f-71b3-4bbe-864c-5812d65f71ca": {
+          "col": 1,
+          "row": 21,
+          "height": 4,
+          "width": "Infinity"
+        },
+        "d7d52d4c-5f38-4169-bdda-de252894d547": {
+          "col": 5,
+          "row": 9,
+          "height": 4,
+          "width": 4
+        },
+        "4057ca77-e5e7-47bc-8b97-def6b6915542": {
+          "col": 9,
+          "row": 5,
+          "height": 4,
+          "width": 4
+        },
+        "9cdd9c0f-277d-4ed1-b117-b36b0c2e1f30": {
+          "col": 1,
+          "row": 1,
+          "height": 4,
+          "width": 4
+        },
+        "ec14deeb-2dba-4a93-bc16-fe0a2b020797": {
+          "col": 5,
+          "row": 1,
+          "height": 4,
+          "width": 4
+        },
+        "dd635ef7-d899-4837-90e0-a79a7140054d": {
+          "col": 1,
+          "row": 17,
+          "height": 4,
+          "width": "Infinity"
+        },
+        "df0c1860-6351-4e30-afea-c3e5598e5421": {
+          "col": 9,
+          "row": 1,
+          "height": 4,
+          "width": 4
+        },
+        "532b816d-2dc9-43ad-81bc-104476554605": {
+          "col": 1,
+          "row": 5,
+          "height": 4,
+          "width": 4
+        },
+        "e0133cb1-018e-456e-bd5c-7c460a0b7a36": {
+          "col": 1,
+          "row": 9,
+          "height": 4,
+          "width": 4
+        }
+      },
+      "formatting": {
+        "highlighting": []
+      },
+      "display_mode_settings": {
+        "positions": {}
+      }
+    },
+    "d3c5d315-959c-4b20-9fc4-52baa593db3b": {
+      "selected_fields": null,
+      "static_message_list_id": null,
+      "titles": {
+        "widget": {
+          "undefined": "CPU Usage (%) (copy)",
+          "59b137cb-e454-401b-bd41-6e872e68459d": "Heap Memory Used (%)",
+          "3f25116d-3c10-4ffa-ad6f-4d0956e5bc27": "CPU Usage (%)",
+          "0763b9ec-5cc2-4706-abb9-a4315c093416": "Heap Memory Used (%)",
+          "8cfd78cc-caf7-452e-971f-c5c81fd59175": "Non Heap Memory Used (%)",
+          "9c6517e3-b90e-4599-ba21-15a82db52692": "Number of CPUs",
+          "9eab774e-817c-4df3-9644-f67798fba0c3": "Number of Threads",
+          "afc840e2-449b-4c67-a164-b82a18a44e4d": "Garbage Collection Time (ms)"
+        },
+        "tab": {
+          "title": "Data Node Metrics"
+        }
+      },
+      "widgets": [
+        {
+          "id": "9eab774e-817c-4df3-9644-f67798fba0c3",
+          "type": "aggregation",
+          "filter": null,
+          "filters": [],
+          "timerange": {
+            "from": 3600,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": ""
+          },
+          "streams": [
+            "datastream:gl-datanode-metrics"
+          ],
+          "config": {
+            "row_pivots": [
+              {
+                "fields": [
+                  "timestamp"
+                ],
+                "type": "time",
+                "config": {
+                  "interval": {
+                    "type": "timeunit",
+                    "value": 1,
+                    "unit": "minutes"
+                  }
+                }
+              }
+            ],
+            "column_pivots": [
+              {
+                "fields": [
+                  "node"
+                ],
+                "type": "values",
+                "config": {
+                  "limit": 15,
+                  "skip_empty_values": true
+                }
+              }
+            ],
+            "series": [
+              {
+                "config": {
+                  "name": "Heap Memory Used (%)"
+                },
+                "function": "avg(dn_thread_count)"
+              }
+            ],
+            "sort": [],
+            "visualization": "line",
+            "visualization_config": {
+              "interpolation": "linear",
+              "axis_type": "linear"
+            },
+            "formatting_settings": null,
+            "rollup": false,
+            "event_annotation": false,
+            "row_limit": null,
+            "column_limit": 15
+          }
+        },
+        {
+          "id": "9c6517e3-b90e-4599-ba21-15a82db52692",
+          "type": "aggregation",
+          "filter": null,
+          "filters": [],
+          "timerange": {
+            "from": 3600,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": ""
+          },
+          "streams": [
+            "datastream:gl-datanode-metrics"
+          ],
+          "config": {
+            "row_pivots": [],
+            "column_pivots": [
+              {
+                "fields": [
+                  "node"
+                ],
+                "type": "values",
+                "config": {
+                  "limit": 15,
+                  "skip_empty_values": true
+                }
+              }
+            ],
+            "series": [
+              {
+                "config": {
+                  "name": "Number of Processors"
+                },
+                "function": "latest(dn_processors)"
+              }
+            ],
+            "sort": [],
+            "visualization": "bar",
+            "visualization_config": {
+              "barmode": "group",
+              "axis_type": "linear"
+            },
+            "formatting_settings": null,
+            "rollup": false,
+            "event_annotation": false,
+            "row_limit": null,
+            "column_limit": 15
+          }
+        },
+        {
+          "id": "59b137cb-e454-401b-bd41-6e872e68459d",
+          "type": "aggregation",
+          "filter": null,
+          "filters": [],
+          "timerange": {
+            "from": 3600,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": ""
+          },
+          "streams": [
+            "datastream:gl-datanode-metrics"
+          ],
+          "config": {
+            "row_pivots": [
+              {
+                "fields": [
+                  "timestamp"
+                ],
+                "type": "time",
+                "config": {
+                  "interval": {
+                    "type": "timeunit",
+                    "value": 1,
+                    "unit": "minutes"
+                  }
+                }
+              }
+            ],
+            "column_pivots": [
+              {
+                "fields": [
+                  "node"
+                ],
+                "type": "values",
+                "config": {
+                  "limit": 15,
+                  "skip_empty_values": true
+                }
+              }
+            ],
+            "series": [
+              {
+                "config": {
+                  "name": "Heap Memory Used (%)"
+                },
+                "function": "avg(dn_heap_usage)"
+              }
+            ],
+            "sort": [],
+            "visualization": "bar",
+            "visualization_config": {
+              "barmode": "group",
+              "axis_type": "linear"
+            },
+            "formatting_settings": null,
+            "rollup": false,
+            "event_annotation": false,
+            "row_limit": null,
+            "column_limit": 15
+          }
+        },
+        {
+          "id": "afc840e2-449b-4c67-a164-b82a18a44e4d",
+          "type": "aggregation",
+          "filter": null,
+          "filters": [],
+          "timerange": {
+            "from": 3600,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": ""
+          },
+          "streams": [
+            "datastream:gl-datanode-metrics"
+          ],
+          "config": {
+            "row_pivots": [
+              {
+                "fields": [
+                  "timestamp"
+                ],
+                "type": "time",
+                "config": {
+                  "interval": {
+                    "type": "timeunit",
+                    "value": 1,
+                    "unit": "minutes"
+                  }
+                }
+              }
+            ],
+            "column_pivots": [
+              {
+                "fields": [
+                  "node"
+                ],
+                "type": "values",
+                "config": {
+                  "limit": 15,
+                  "skip_empty_values": true
+                }
+              }
+            ],
+            "series": [
+              {
+                "config": {
+                  "name": "Heap Memory Used (%)"
+                },
+                "function": "avg(dn_gc_time)"
+              }
+            ],
+            "sort": [],
+            "visualization": "line",
+            "visualization_config": {
+              "interpolation": "linear",
+              "axis_type": "linear"
+            },
+            "formatting_settings": null,
+            "rollup": false,
+            "event_annotation": false,
+            "row_limit": null,
+            "column_limit": 15
+          }
+        }
+      ],
+      "widget_mapping": {
+        "9eab774e-817c-4df3-9644-f67798fba0c3": [
+          "ecc94d84-1309-4c8b-92cc-db170a8d61de"
+        ],
+        "9c6517e3-b90e-4599-ba21-15a82db52692": [
+          "0754e55c-2974-4001-b5cf-8dd81a4b0d2f"
+        ],
+        "59b137cb-e454-401b-bd41-6e872e68459d": [
+          "98179000-b7e4-4073-9ffb-940593d4ea96"
+        ],
+        "afc840e2-449b-4c67-a164-b82a18a44e4d": [
+          "40144c75-59c3-465d-b260-8f2cf93ca5c7"
+        ]
+      },
+      "positions": {
+        "59b137cb-e454-401b-bd41-6e872e68459d": {
+          "col": 1,
+          "row": 1,
+          "height": 4,
+          "width": 4
+        },
+        "9c6517e3-b90e-4599-ba21-15a82db52692": {
+          "col": 9,
+          "row": 1,
+          "height": 4,
+          "width": 4
+        },
+        "9eab774e-817c-4df3-9644-f67798fba0c3": {
+          "col": 5,
+          "row": 1,
+          "height": 4,
+          "width": 4
+        },
+        "afc840e2-449b-4c67-a164-b82a18a44e4d": {
+          "col": 1,
+          "row": 5,
+          "height": 4,
+          "width": "Infinity"
+        }
+      },
+      "formatting": {
+        "highlighting": []
+      },
+      "display_mode_settings": {
+        "positions": {}
+      }
+    }
+  },
+  "owner": "admin",
+  "created_at": "2024-01-04T16:40:19.327Z",
+  "favorite": false
+}
