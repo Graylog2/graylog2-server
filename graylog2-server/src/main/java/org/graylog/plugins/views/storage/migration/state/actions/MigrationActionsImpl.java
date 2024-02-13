@@ -16,10 +16,10 @@
  */
 package org.graylog.plugins.views.storage.migration.state.actions;
 
-import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
 import org.graylog.plugins.views.storage.migration.state.persistence.DatanodeMigrationConfiguration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.system.processing.control.ClusterProcessingControl;
 import org.graylog2.system.processing.control.ClusterProcessingControlFactory;
 
 public class MigrationActionsImpl implements MigrationActions {
@@ -78,13 +78,13 @@ public class MigrationActionsImpl implements MigrationActions {
 
     @Override
     public void stopMessageProcessing() {
-        final ClusterProcessingControlFactory.ClusterProcessingControl control = clusterProcessingControlFactory.create(authorizationToken);
+        final ClusterProcessingControl control = clusterProcessingControlFactory.create(authorizationToken);
         control.pauseProcessing();
     }
 
     @Override
     public void startMessageProcessing() {
-        final ClusterProcessingControlFactory.ClusterProcessingControl control = clusterProcessingControlFactory.create(authorizationToken);
+        final ClusterProcessingControl control = clusterProcessingControlFactory.create(authorizationToken);
         control.resumeGraylogMessageProcessing();
     }
 

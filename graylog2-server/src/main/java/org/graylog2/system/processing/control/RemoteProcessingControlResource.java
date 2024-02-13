@@ -23,7 +23,7 @@ import retrofit2.http.Path;
 
 import java.util.HashMap;
 
-public interface RemoteProcessingControlResource extends ControlResource {
+public interface RemoteProcessingControlResource {
     @PUT("system/processing/pause")
     Call<Void> pauseProcessing();
 
