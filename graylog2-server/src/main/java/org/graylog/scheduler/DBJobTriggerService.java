@@ -23,6 +23,7 @@ import com.mongodb.BasicDBObject;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import one.util.streamex.StreamEx;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog.scheduler.capabilities.SchedulerCapabilitiesService;
 import org.graylog.scheduler.clock.JobSchedulerClock;
@@ -54,6 +55,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static com.mongodb.client.model.Sorts.ascending;
+import static com.mongodb.client.model.Sorts.descending;
+import static com.mongodb.client.model.Sorts.orderBy;
 import static java.util.Objects.requireNonNull;
 import static org.graylog.scheduler.JobSchedulerConfiguration.LOCK_EXPIRATION_DURATION;
 
@@ -75,6 +79,7 @@ public class DBJobTriggerService {
     private static final String FIELD_SCHEDULE = JobTriggerDto.FIELD_SCHEDULE;
     private static final String FIELD_DATA = JobTriggerDto.FIELD_DATA;
     private static final String FIELD_UPDATED_AT = JobTriggerDto.FIELD_UPDATED_AT;
+    private static final String FIELD_TIMES_RESCHEDULED = JobTriggerDto.FIELD_TIMES_RESCHEDULED;
     private static final String FIELD_TRIGGERED_AT = JobTriggerDto.FIELD_TRIGGERED_AT;
     private static final String FIELD_CONSTRAINTS = JobTriggerDto.FIELD_CONSTRAINTS;
     private static final String FIELD_LAST_EXECUTION_TIME = JobTriggerDto.FIELD_EXECUTION_DURATION;
@@ -243,7 +248,8 @@ public class DBJobTriggerService {
                 .set(FIELD_START_TIME, trigger.startTime())
                 .set(FIELD_NEXT_TIME, trigger.nextTime())
                 .set(FIELD_DATA, trigger.data())
-                .set(FIELD_UPDATED_AT, clock.nowUTC());
+                .set(FIELD_UPDATED_AT, clock.nowUTC())
+                .set(FIELD_TIMES_RESCHEDULED, trigger.timesRescheduled());
 
         if (trigger.endTime().isPresent()) {
             update.set(FIELD_END_TIME, trigger.endTime());
@@ -355,8 +361,8 @@ public class DBJobTriggerService {
                         constraintsQuery,
                         DBQuery.lessThan(FIELD_LAST_LOCK_TIME, now.minus(lockExpirationDuration.toMilliseconds())))
         );
-        // We want to lock the trigger with the oldest next time
-        final DBSort.SortBuilder sort = DBSort.asc(FIELD_NEXT_TIME);
+        // We want to lock the trigger with the oldest next time, but prioritise rescheduled jobs
+        final Bson sort = orderBy(ascending(FIELD_NEXT_TIME), descending(FIELD_TIMES_RESCHEDULED));
 
         final DBUpdate.Builder lockUpdate = DBUpdate.set(FIELD_LOCK_OWNER, nodeId)
                 .set(FIELD_LAST_LOCK_OWNER, nodeId)
@@ -383,9 +389,10 @@ public class DBJobTriggerService {
      *
      * @param trigger       trigger that should be released
      * @param triggerUpdate update to apply to the trigger
+     * @param isRescheduled indicates whether trigger is rescheduled due to e.g. unavailable lock
      * @return true if the trigger has been modified, false otherwise
      */
-    public boolean releaseTrigger(JobTriggerDto trigger, JobTriggerUpdate triggerUpdate) {
+    public boolean releaseTrigger(JobTriggerDto trigger, JobTriggerUpdate triggerUpdate, boolean isRescheduled) {
         requireNonNull(trigger, "trigger cannot be null");
         requireNonNull(triggerUpdate, "triggerUpdate cannot be null");
 
@@ -401,6 +408,12 @@ public class DBJobTriggerService {
                 DBQuery.is(FIELD_STATUS, JobTriggerStatus.RUNNING)
         );
         final DBUpdate.Builder update = DBUpdate.unset(FIELD_LOCK_OWNER);
+
+        if (isRescheduled) {
+            update.set(FIELD_TIMES_RESCHEDULED, trigger.timesRescheduled() + 1);
+        } else {
+            update.set(FIELD_TIMES_RESCHEDULED, 0);
+        }
 
         // An empty next time indicates that this trigger should not be fired anymore. (e.g. for "once" schedules)
         if (triggerUpdate.nextTime().isPresent()) {
@@ -427,6 +440,10 @@ public class DBJobTriggerService {
             throw new IllegalStateException("Expected to release only one trigger (id=" + trigger.id() + ") but database query modified " + changedDocs);
         }
         return changedDocs == 1;
+    }
+
+    public boolean releaseTrigger(JobTriggerDto trigger, JobTriggerUpdate triggerUpdate) {
+        return releaseTrigger(trigger, triggerUpdate, false);
     }
 
     /**

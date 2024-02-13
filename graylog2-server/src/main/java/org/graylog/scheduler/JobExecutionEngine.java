@@ -20,6 +20,7 @@ import com.codahale.metrics.Counter;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.assistedinject.Assisted;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
@@ -47,6 +48,7 @@ import static org.graylog.tracing.GraylogSemanticAttributes.SCHEDULER_JOB_DEFINI
  * The job execution engine checks runnable triggers and starts job execution in the given worker pool.
  */
 public class JobExecutionEngine {
+    private static final long DEFAULT_BACKOFF = 5000L;
 
 
     public interface Factory {
@@ -64,7 +66,7 @@ public class JobExecutionEngine {
     private final JobWorkerPool workerPool;
     private final RefreshingLockServiceFactory refreshingLockServiceFactory;
     private final Map<String, Integer> maxConcurrencyMap;
-    private org.joda.time.Duration backoffDuration = org.joda.time.Duration.millis(5000);
+    private final long backoffMillis;
 
     private final Counter executionSuccessful;
     private final Counter executionFailed;
@@ -85,6 +87,22 @@ public class JobExecutionEngine {
                               @Assisted JobWorkerPool workerPool,
                               JobSchedulerConfig schedulerConfig,
                               MetricRegistry metricRegistry) {
+        this(jobTriggerService, jobDefinitionService, eventBus, scheduleStrategies, jobTriggerUpdatesFactory,
+                refreshingLockServiceFactory, jobFactory, workerPool, schedulerConfig, metricRegistry, DEFAULT_BACKOFF);
+    }
+
+    @VisibleForTesting
+    public JobExecutionEngine(DBJobTriggerService jobTriggerService,
+                              DBJobDefinitionService jobDefinitionService,
+                              JobSchedulerEventBus eventBus,
+                              JobScheduleStrategies scheduleStrategies,
+                              JobTriggerUpdates.Factory jobTriggerUpdatesFactory,
+                              RefreshingLockServiceFactory refreshingLockServiceFactory,
+                              Map<String, Job.Factory> jobFactory,
+                              @Assisted JobWorkerPool workerPool,
+                              JobSchedulerConfig schedulerConfig,
+                              MetricRegistry metricRegistry,
+                              long backoffMillis) {
         this.jobTriggerService = jobTriggerService;
         this.jobDefinitionService = jobDefinitionService;
         this.eventBus = eventBus;
@@ -98,6 +116,7 @@ public class JobExecutionEngine {
         this.executionFailed = metricRegistry.counter(MetricRegistry.name(getClass(), "executions", "failed"));
         this.executionTime = metricRegistry.timer(MetricRegistry.name(getClass(), "executions", "time"));
         this.executionDenyRate = metricRegistry.meter(MetricRegistry.name(getClass(), "executions", "deny-rate"));
+        this.backoffMillis = backoffMillis;
     }
 
     /**
@@ -140,7 +159,7 @@ public class JobExecutionEngine {
 
                 if (!workerPool.execute(() -> handleTriggerWithConcurrencyLimit(trigger))) {
                     // The job couldn't be executed so we have to release the trigger again with the same nextTime
-                    jobTriggerService.releaseTrigger(trigger, JobTriggerUpdate.withNextTime(trigger.nextTime()));
+                    jobTriggerService.releaseTrigger(trigger, JobTriggerUpdate.withNextTime(trigger.nextTime()), true);
                     executionDenyRate.mark();
                     return false;
                 }
@@ -162,10 +181,6 @@ public class JobExecutionEngine {
         }
     }
 
-    public void setBackoffDuration(Duration backoffDuration) {
-        this.backoffDuration = backoffDuration;
-    }
-
     private void handleTriggerWithConcurrencyLimit(JobTriggerDto trigger) {
         if (hasConcurrencyLimit(trigger)) {
             try (RefreshingLockService refreshingLockService = refreshingLockServiceFactory.create()) {
@@ -174,16 +189,27 @@ public class JobExecutionEngine {
                             trigger.jobDefinitionType(), maxConcurrencyMap.get(trigger.jobDefinitionType()));
                     handleTrigger(trigger);
                 } catch (AlreadyLockedException e) {
-                    // Avoid endlessly retrying the same trigger (e.g. when concurrency limit is too low)
-                    // TODO: Consider smarter backoff strategy, e.g. counting number of consecutive failed attempts
-                    final DateTime nextTime = DateTime.now(DateTimeZone.UTC).plus(backoffDuration);
-                    jobTriggerService.releaseTrigger(trigger, JobTriggerUpdate.withNextTime(nextTime));
+                    final DateTime nextTime = DateTime.now(DateTimeZone.UTC).plus(slidingBackoff(trigger));
+                    jobTriggerService.releaseTrigger(trigger, JobTriggerUpdate.withNextTime(nextTime), true);
                     executionDenyRate.mark();
                 }
             }
         } else {
             handleTrigger(trigger);
         }
+    }
+
+    /**
+     * Progressively reduce backoff from 100% to 20% based on how many times rescheduled
+     */
+    private Duration slidingBackoff(JobTriggerDto trigger) {
+        long slidingBackoffMillis;
+        if (trigger.timesRescheduled() < 1) {
+            slidingBackoffMillis = backoffMillis;
+        } else {
+            slidingBackoffMillis = backoffMillis / Math.min(trigger.timesRescheduled(), 5);
+        }
+        return Duration.millis(slidingBackoffMillis);
     }
 
     private void handleTrigger(JobTriggerDto trigger) {
@@ -205,9 +231,9 @@ public class JobExecutionEngine {
         } catch (Exception e) {
             // The trigger cannot be handled because of an unknown error, retry in a few seconds
             // TODO: Check if we need to implement a max-retry after which the trigger is set to ERROR
-            final DateTime nextTime = DateTime.now(DateTimeZone.UTC).plus(backoffDuration);
+            final DateTime nextTime = DateTime.now(DateTimeZone.UTC).plus(slidingBackoff(trigger));
             LOG.error("Couldn't handle trigger {} - retrying at {}", trigger.id(), nextTime, e);
-            jobTriggerService.releaseTrigger(trigger, JobTriggerUpdate.withNextTime(nextTime));
+            jobTriggerService.releaseTrigger(trigger, JobTriggerUpdate.withNextTime(nextTime), true);
         } finally {
             eventBus.post(JobCompletedEvent.INSTANCE);
         }
@@ -233,12 +259,12 @@ public class JobExecutionEngine {
             executionSuccessful.inc();
 
             LOG.trace("Update trigger: trigger={} update={}", trigger.id(), triggerUpdate);
-            jobTriggerService.releaseTrigger(trigger, triggerUpdate);
+            jobTriggerService.releaseTrigger(trigger, triggerUpdate, false);
         } catch (JobExecutionException e) {
             LOG.error("Job execution error - trigger={} job={}", trigger.id(), jobDefinition.id(), e);
             executionFailed.inc();
 
-            jobTriggerService.releaseTrigger(e.getTrigger(), e.getUpdate());
+            jobTriggerService.releaseTrigger(e.getTrigger(), e.getUpdate(), false);
         } catch (Exception e) {
             executionFailed.inc();
             // This is an unhandled job execution error so we mark the trigger as defective
@@ -248,7 +274,7 @@ public class JobExecutionEngine {
             // don't know what happened and we also got no instructions from the job. (no JobExecutionException)
             final DateTime nextFutureTime = scheduleStrategies.nextFutureTime(trigger).orElse(null);
 
-            jobTriggerService.releaseTrigger(trigger, JobTriggerUpdate.withNextTime(nextFutureTime));
+            jobTriggerService.releaseTrigger(trigger, JobTriggerUpdate.withNextTime(nextFutureTime), false);
         }
     }
 }

@@ -44,6 +44,7 @@ import org.mongojack.DBQuery;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -53,6 +54,7 @@ import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -77,7 +79,7 @@ public class DBJobTriggerServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        when(schedulerCapabilitiesService.getNodeCapabilities()).thenReturn(ImmutableSet.of());
+        lenient().when(schedulerCapabilitiesService.getNodeCapabilities()).thenReturn(ImmutableSet.of());
 
         ObjectMapper objectMapper = new ObjectMapperProvider().get();
         objectMapper.registerSubtypes(new NamedType(IntervalJobSchedule.class, IntervalJobSchedule.TYPE_NAME));
@@ -112,8 +114,8 @@ public class DBJobTriggerServiceTest {
 
             assertThat(dto.lock().owner()).isNull();
             assertThat(dto.lock().lastLockTime()).isNull();
-            assertThat(dto.lock().clock()).isEqualTo(0L);
-            assertThat(dto.lock().progress()).isEqualTo(0);
+            assertThat(dto.lock().clock()).isZero();
+            assertThat(dto.lock().progress()).isZero();
 
             assertThat(dto.schedule().type()).isEqualTo("interval");
             assertThat(dto.schedule()).isInstanceOf(IntervalJobSchedule.class);
@@ -136,8 +138,8 @@ public class DBJobTriggerServiceTest {
 
             assertThat(dto.lock().owner()).isNull();
             assertThat(dto.lock().lastLockTime()).isNull();
-            assertThat(dto.lock().clock()).isEqualTo(0L);
-            assertThat(dto.lock().progress()).isEqualTo(0);
+            assertThat(dto.lock().clock()).isZero();
+            assertThat(dto.lock().progress()).isZero();
 
             assertThat(dto.schedule().type()).isEqualTo("interval");
             assertThat(dto.schedule()).isInstanceOf(IntervalJobSchedule.class);
@@ -147,7 +149,7 @@ public class DBJobTriggerServiceTest {
             assertThat(dto.data()).isPresent().get().satisfies(data -> {
                 assertThat(data.type()).isEqualTo("__test_job_trigger_data__");
                 assertThat(data).isInstanceOf(TestJobTriggerData.class);
-                assertThat(((TestJobTriggerData) data).map().get("hello")).isEqualTo("world");
+                assertThat(((TestJobTriggerData) data).map()).containsEntry("hello", "world");
             });
         });
 
@@ -175,7 +177,7 @@ public class DBJobTriggerServiceTest {
             assertThat(dto.data()).isPresent().get().satisfies(data -> {
                 assertThat(data.type()).isEqualTo("__test_job_trigger_data__");
                 assertThat(data).isInstanceOf(TestJobTriggerData.class);
-                assertThat(((TestJobTriggerData) data).map().get("hello")).isEqualTo("world");
+                assertThat(((TestJobTriggerData) data).map()).containsEntry("hello", "world");
             });
         });
     }
@@ -320,6 +322,7 @@ public class DBJobTriggerServiceTest {
                 .createdAt(now)
                 .updatedAt(now)
                 .triggeredAt(now)
+                .timesRescheduled(99)
                 .status(JobTriggerStatus.ERROR)
                 .lock(JobTriggerLock.builder()
                         .owner("yolo")
@@ -346,6 +349,7 @@ public class DBJobTriggerServiceTest {
                     assertThat(dto.endTime()).isEqualTo(updatedTrigger.endTime());
                     assertThat(dto.updatedAt()).isEqualTo(updatedTrigger.updatedAt());
                     assertThat(dto.schedule()).isEqualTo(updatedTrigger.schedule());
+                    assertThat(dto.timesRescheduled()).isEqualTo(updatedTrigger.timesRescheduled());
                 });
 
         assertThatCode(() -> dbJobTriggerService.update(null))
@@ -467,48 +471,15 @@ public class DBJobTriggerServiceTest {
         clock.plus(20, TimeUnit.SECONDS);
 
         // Now the next time is in the past and we must get a locked trigger
-        assertThat(dbJobTriggerService.nextRunnableTrigger())
-                .isNotEmpty()
-                .get()
-                .satisfies(trigger -> {
-                    assertThat(trigger.id())
-                            .withFailMessage("We expected the following trigger to be locked because its the first one: %s", trigger2)
-                            .isEqualTo(trigger2.id());
-                    assertThat(trigger.status()).isEqualTo(JobTriggerStatus.RUNNING);
-                    assertThat(trigger.triggeredAt()).isPresent().get().isEqualTo(clock.nowUTC());
-                    assertThat(trigger.lock().owner()).isEqualTo(NODE_ID);
-                    assertThat(trigger.lock().lastLockTime()).isEqualTo(clock.nowUTC());
-                });
+        assertNextTrigger(dbJobTriggerService.nextRunnableTrigger(), trigger2);
 
         // The second call should return the second trigger
-        assertThat(dbJobTriggerService.nextRunnableTrigger())
-                .isNotEmpty()
-                .get()
-                .satisfies(trigger -> {
-                    assertThat(trigger.id())
-                            .withFailMessage("We expected the following trigger to be locked because its the second one: %s", trigger1)
-                            .isEqualTo(trigger1.id());
-                    assertThat(trigger.status()).isEqualTo(JobTriggerStatus.RUNNING);
-                    assertThat(trigger.triggeredAt()).isPresent().get().isEqualTo(clock.nowUTC());
-                    assertThat(trigger.lock().owner()).isEqualTo(NODE_ID);
-                    assertThat(trigger.lock().lastLockTime()).isEqualTo(clock.nowUTC());
-                });
+        assertNextTrigger(dbJobTriggerService.nextRunnableTrigger(), trigger1);
 
         clock.plus(20, TimeUnit.SECONDS);
 
         // The third call should return the third trigger
-        assertThat(dbJobTriggerService.nextRunnableTrigger())
-                .isNotEmpty()
-                .get()
-                .satisfies(trigger -> {
-                    assertThat(trigger.id())
-                            .withFailMessage("We expected the following trigger to be locked because its the third one: %s", trigger3)
-                            .isEqualTo(trigger3.id());
-                    assertThat(trigger.status()).isEqualTo(JobTriggerStatus.RUNNING);
-                    assertThat(trigger.triggeredAt()).isPresent().get().isEqualTo(clock.nowUTC());
-                    assertThat(trigger.lock().owner()).isEqualTo(NODE_ID);
-                    assertThat(trigger.lock().lastLockTime()).isEqualTo(clock.nowUTC());
-                });
+        assertNextTrigger(dbJobTriggerService.nextRunnableTrigger(), trigger3);
 
         // No trigger left because trigger4's startTime is still in the future
         assertThat(dbJobTriggerService.nextRunnableTrigger()).isEmpty();
@@ -516,18 +487,7 @@ public class DBJobTriggerServiceTest {
         clock.plus(20, TimeUnit.SECONDS);
 
         // The fourth call should return the third trigger
-        assertThat(dbJobTriggerService.nextRunnableTrigger())
-                .isNotEmpty()
-                .get()
-                .satisfies(trigger -> {
-                    assertThat(trigger.id())
-                            .withFailMessage("We expected the following trigger to be locked because its the only one left: %s", trigger4)
-                            .isEqualTo(trigger4.id());
-                    assertThat(trigger.status()).isEqualTo(JobTriggerStatus.RUNNING);
-                    assertThat(trigger.triggeredAt()).isPresent().get().isEqualTo(clock.nowUTC());
-                    assertThat(trigger.lock().owner()).isEqualTo(NODE_ID);
-                    assertThat(trigger.lock().lastLockTime()).isEqualTo(clock.nowUTC());
-                });
+        assertNextTrigger(dbJobTriggerService.nextRunnableTrigger(), trigger4);
 
         // No trigger left
         assertThat(dbJobTriggerService.nextRunnableTrigger()).isEmpty();
@@ -560,6 +520,76 @@ public class DBJobTriggerServiceTest {
 
         // We shouldn't get trigger 54e3deadbeefdeadbeef0001 because of its endTime
         assertThat(service.nextRunnableTrigger()).isEmpty();
+    }
+
+    @Test
+    public void nextRunnableTriggerRescheduled() {
+        // No triggers yet
+        assertThat(dbJobTriggerService.nextRunnableTrigger()).isEmpty();
+
+        final JobTriggerDto trigger1 = dbJobTriggerService.create(JobTriggerDto.Builder.create(clock)
+                .jobDefinitionId("abc-1")
+                .jobDefinitionType("event-processor-execution-v1")
+                .nextTime(clock.nowUTC().plusSeconds(10))
+                .schedule(IntervalJobSchedule.builder()
+                        .interval(1)
+                        .unit(TimeUnit.SECONDS)
+                        .build())
+                .build());
+
+        final JobTriggerDto trigger2 = dbJobTriggerService.create(JobTriggerDto.Builder.create(clock)
+                .jobDefinitionId("abc-2")
+                .jobDefinitionType("event-processor-execution-v1")
+                .timesRescheduled(1)
+                .nextTime(clock.nowUTC().plusSeconds(11))
+                .schedule(IntervalJobSchedule.builder()
+                        .interval(1)
+                        .unit(TimeUnit.SECONDS)
+                        .build())
+                .build());
+
+        final JobTriggerDto trigger3 = dbJobTriggerService.create(JobTriggerDto.Builder.create(clock)
+                .jobDefinitionId("abc-3")
+                .jobDefinitionType("event-processor-execution-v1")
+                .timesRescheduled(2)
+                .nextTime(clock.nowUTC().plusSeconds(11))
+                .schedule(IntervalJobSchedule.builder()
+                        .interval(1)
+                        .unit(TimeUnit.SECONDS)
+                        .build())
+                .build());
+
+        // First try is empty because the next time of the trigger is in the future
+        assertThat(dbJobTriggerService.nextRunnableTrigger()).isEmpty();
+
+        clock.plus(20, TimeUnit.SECONDS);
+
+        // First expecting trigger1, since it has lowest nextTime
+        assertNextTrigger(dbJobTriggerService.nextRunnableTrigger(), trigger1);
+
+        // Expecting trigger3, since it has been rescheduled more
+        assertNextTrigger(dbJobTriggerService.nextRunnableTrigger(), trigger3);
+
+        // Expecting last trigger
+        assertNextTrigger(dbJobTriggerService.nextRunnableTrigger(), trigger2);
+
+        // No trigger left
+        assertThat(dbJobTriggerService.nextRunnableTrigger()).isEmpty();
+    }
+
+    private void assertNextTrigger(Optional<JobTriggerDto> trigger, JobTriggerDto expected) {
+        assertThat(trigger)
+                .isNotEmpty()
+                .get()
+                .satisfies(t -> {
+                    assertThat(t.id())
+                            .withFailMessage("We expected the following trigger to be locked: %s", expected)
+                            .isEqualTo(expected.id());
+                    assertThat(t.status()).isEqualTo(JobTriggerStatus.RUNNING);
+                    assertThat(t.triggeredAt()).isPresent().get().isEqualTo(clock.nowUTC());
+                    assertThat(t.lock().owner()).isEqualTo(NODE_ID);
+                    assertThat(t.lock().lastLockTime()).isEqualTo(clock.nowUTC());
+                });
     }
 
     @Test
@@ -743,7 +773,7 @@ public class DBJobTriggerServiceTest {
     @MongoDBFixtures("job-triggers.json")
     public void deleteCompleted() {
         assertThat(dbJobTriggerService.deleteCompletedOnceSchedulesOlderThan(1, TimeUnit.DAYS)).isEqualTo(1);
-        assertThat(dbJobTriggerService.get("54e3deadbeefdeadbeef0003").isPresent()).isFalse();
+        assertThat(dbJobTriggerService.get("54e3deadbeefdeadbeef0003")).isNotPresent();
 
 
     }
@@ -754,7 +784,7 @@ public class DBJobTriggerServiceTest {
         final JobTriggerDto trigger = dbJobTriggerService.get("54e3deadbeefdeadbeef0003").orElseThrow(AssertionError::new);
         // sets updated_at to recent timestamp
         dbJobTriggerService.update(trigger);
-        assertThat(dbJobTriggerService.deleteCompletedOnceSchedulesOlderThan(1, TimeUnit.DAYS)).isEqualTo(0);
+        assertThat(dbJobTriggerService.deleteCompletedOnceSchedulesOlderThan(1, TimeUnit.DAYS)).isZero();
 
     }
 

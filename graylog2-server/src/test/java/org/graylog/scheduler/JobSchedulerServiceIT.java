@@ -43,6 +43,7 @@ import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.system.shutdown.GracefulShutdownService;
+import org.junit.After;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
@@ -151,8 +152,8 @@ class JobSchedulerServiceIT {
                     jobFactories,
                     workerPool,
                     schedulerConfig,
-                    metricRegistry);
-            engine.setBackoffDuration(org.joda.time.Duration.millis(100));
+                    metricRegistry,
+                    200);
             return engine;
         };
 
@@ -162,6 +163,11 @@ class JobSchedulerServiceIT {
         final Duration loopSleepDuration = Duration.milliseconds(200);
 
         jobSchedulerService = new JobSchedulerService(executionEnginFactory, workerPoolFactory, schedulerConfig, clock, eventBus, serverStatus, loopSleepDuration);
+    }
+
+    @After
+    public void cleanUp() {
+        jobSchedulerService.triggerShutdown();
     }
 
     @Test
@@ -178,7 +184,7 @@ class JobSchedulerServiceIT {
             maxConcurrentExecutions.compute(jobType, (k, v) -> Math.max(runningJobs, v == null ? 0 : v));
             //System.out.println(f("%s %s %d %d", now(), jobType, runningJobs, outstandingJobs.getCount()));
 
-            Uninterruptibles.sleepUninterruptibly(30, TimeUnit.MILLISECONDS);
+            Uninterruptibles.sleepUninterruptibly(50, TimeUnit.MILLISECONDS);
             concurrentExecutions.compute(jobType, (k, v) -> v == null ? 0 : v - 1);
             outstandingJobs.countDown();
             return JobTriggerUpdate.withoutNextTime();
