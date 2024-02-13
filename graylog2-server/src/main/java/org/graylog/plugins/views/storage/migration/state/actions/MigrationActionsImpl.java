@@ -147,6 +147,7 @@ public class MigrationActionsImpl implements MigrationActions {
     @Override
     public void setAuthorizationToken(String authorizationToken) {
         this.authorizationToken = authorizationToken;
+    }
 
     public void setStateMachineContext(MigrationStateMachineContext context) {
         this.stateMachineContext = context;
