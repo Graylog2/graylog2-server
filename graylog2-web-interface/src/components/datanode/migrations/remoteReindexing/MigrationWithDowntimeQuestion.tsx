@@ -15,13 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { FormikHelpers } from 'formik';
-import { Formik, Form } from 'formik';
 
-import { Input, Button, ButtonToolbar } from 'components/bootstrap';
+import { ProgressBar } from 'components/common';
 
-import type { RemoteReindexRequest } from '../../hooks/useRemoteReindexMigrationStatus';
-import useRemoteReindexMigrationStatus, { remoteReindex } from '../../hooks/useRemoteReindexMigrationStatus';
+import useRemoteReindexMigrationStatus from '../../hooks/useRemoteReindexMigrationStatus';
 
 type Props = {
   onStepComplete: () => void,
@@ -29,59 +26,24 @@ type Props = {
 
 const MigrationWithDowntimeQuestion = ({ onStepComplete }: Props) => {
   const migrationID = '';
-  useRemoteReindexMigrationStatus(migrationID);
-
-  const initialValues: RemoteReindexRequest = {
-    hostname: '',
-    user: '',
-    password: '',
-    synchronous: false,
-    indices: [],
-  };
-
-  const onSubmit = (values: RemoteReindexRequest, _formikHelpers: FormikHelpers<RemoteReindexRequest>) => {
-    remoteReindex(values);
-  };
+  const roundedPercentage = 50;
+  const { data, error } = useRemoteReindexMigrationStatus(migrationID, onStepComplete);
+  console.log(data, error);
 
   return (
-    <Formik initialValues={initialValues} onSubmit={onSubmit}>
-      {({
-        values,
-        handleChange,
-        isSubmitting,
-      }) => (
-        <Form role="form">
-          <Input id="hostname"
-                 name="hostname"
-                 label="Hostname"
-                 type="text"
-                 value={values.hostname}
-                 onChange={handleChange}
-                 required />
-          <Input id="user"
-                 name="user"
-                 label="User"
-                 type="text"
-                 value={values.user}
-                 onChange={handleChange} />
-          <Input id="password"
-                 name="password"
-                 label="Password"
-                 type="password"
-                 value={values.password}
-                 onChange={handleChange} />
-          <ButtonToolbar>
-            <Button type="submit"
-                    disabled={isSubmitting}
-                    bsStyle="primary"
-                    bsSize="small"
-                    onClick={() => onStepComplete()}>
-              {isSubmitting ? 'Loading...' : 'Next'}
-            </Button>
-          </ButtonToolbar>
-        </Form>
-      )}
-    </Formik>
+    <>
+      We are currently migrating your existing data asynchronically,
+      once the data migration is finished you will be automatically transitioned to the next step.
+      <br />
+      <br />
+      <ProgressBar bars={[{
+        animated: true,
+        striped: true,
+        value: roundedPercentage,
+        bsStyle: 'info',
+        label: data?.status,
+      }]} />
+    </>
   );
 };
 

@@ -46,11 +46,12 @@ export type RemoteReindexRequest = {
   user: string,
 }
 
-export const remoteReindex = async (request: RemoteReindexRequest) => {
+export const remoteReindex = async (request: RemoteReindexRequest, onSuccess: () => void) => {
   try {
     const result = await fetch('POST', qualifyUrl('/remote-reindex-migration/remoteReindex'), request);
 
     UserNotification.success('Successful Remote Reindexing.');
+    onSuccess();
 
     return result;
   } catch (errorThrown) {
@@ -62,7 +63,7 @@ export const remoteReindex = async (request: RemoteReindexRequest) => {
 
 const fetchRemoteReindexStatus = async (migrationID: string) => fetch('GET', qualifyUrl(`/remote-reindex-migration/status/${migrationID}`));
 
-const useRemoteReindexMigrationStatus = (migrationID: string) : {
+const useRemoteReindexMigrationStatus = (migrationID: string, onSuccess: () => void) : {
   data: RemoteReindexMigration,
   refetch: () => void,
   isInitialLoading: boolean,
@@ -75,6 +76,11 @@ const useRemoteReindexMigrationStatus = (migrationID: string) : {
       onError: (errorThrown) => {
         UserNotification.error(`Loading Remote Reindex Migration Status failed with status: ${errorThrown}`,
           'Could not load Remote Reindex Migration Status');
+      },
+      onSuccess: (currentData) => {
+        if (currentData.status === 'FINISHED') {
+          onSuccess();
+        }
       },
       notifyOnChangeProps: ['data', 'error'],
       refetchInterval: 5000,
