@@ -50,7 +50,7 @@ const validateExpressionTree = (expression, series, validationTree = {}) => {
         return { message: 'Field must be set' };
       }
 
-      if ((selectedSeries?.type === 'avg'
+      if (!selectedSeries?.field && (selectedSeries?.type === 'avg'
           || selectedSeries?.type === 'card'
           || selectedSeries?.type === 'latest'
           || selectedSeries?.type === 'max'
@@ -59,10 +59,9 @@ const validateExpressionTree = (expression, series, validationTree = {}) => {
           || selectedSeries?.type === 'stddev'
           || selectedSeries?.type === 'sum'
           || selectedSeries?.type === 'sumofsquares'
-          || selectedSeries?.type === 'variance'
-        )
-        && !selectedSeries?.field) {
-        return { message: 'Field must be set' };
+          || selectedSeries?.type === 'variance'))
+      {
+         return { message: 'Field must be set' };
       }
 
       return (selectedSeries?.type ? {} : error);
