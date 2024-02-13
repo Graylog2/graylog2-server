@@ -21,8 +21,6 @@ import type SearchMetadata from 'views/logic/search/SearchMetadata';
 import type { AppDispatch } from 'stores/useAppDispatch';
 import type Search from 'views/logic/search/Search';
 
-import _parseSearch from './parseSearch';
-
 const searchMetadataSlice = createSlice({
   name: 'searchMetadata',
   initialState: {
@@ -47,9 +45,11 @@ const { finishedLoading, loading } = searchMetadataSlice.actions;
 
 export const searchMetadataSliceReducer = searchMetadataSlice.reducer;
 
-export const parseSearch = (search: Search) => async (dispatch: AppDispatch) => {
+export type SearchParser = (search: Search) => Promise<SearchMetadata>;
+
+export const parseSearch = (search: Search, parse: SearchParser) => async (dispatch: AppDispatch) => {
   dispatch(loading());
 
-  return _parseSearch(search)
+  return parse(search)
     .then((result) => dispatch(finishedLoading(result)));
 };

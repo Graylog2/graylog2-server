@@ -25,6 +25,7 @@ import org.testcontainers.containers.Network;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class NodeContainerConfig {
@@ -46,6 +47,7 @@ public class NodeContainerConfig {
     public final MavenProjectDirProvider mavenProjectDirProvider;
     private final List<String> enabledFeatureFlags;
     public final Optional<String> proxiedRequestsTimeout;
+    public final Map<String, String> configParams;
 
     public NodeContainerConfig(Network network,
                                String mongoDbUri,
@@ -56,7 +58,8 @@ public class NodeContainerConfig {
                                int[] extraPorts,
                                PluginJarsProvider pluginJarsProvider,
                                MavenProjectDirProvider mavenProjectDirProvider,
-                               List<String> enabledFeatureFlags) {
+                               List<String> enabledFeatureFlags,
+                               Map<String, String> configParams) {
         this.network = network;
         this.mongoDbUri = mongoDbUri;
         this.passwordSecret = passwordSecret;
@@ -70,6 +73,7 @@ public class NodeContainerConfig {
         this.mavenProjectDirProvider = mavenProjectDirProvider;
         this.enabledFeatureFlags = enabledFeatureFlags == null ? Collections.emptyList() : enabledFeatureFlags;
         this.proxiedRequestsTimeout = stringFromEnvVar("GRAYLOG_IT_PROXIED_REQUESTS_TIMEOUT");
+        this.configParams = configParams;
     }
 
     private static boolean flagFromEnvVar(String flagName) {

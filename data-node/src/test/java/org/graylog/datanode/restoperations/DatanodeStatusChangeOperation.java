@@ -17,7 +17,7 @@
 package org.graylog.datanode.restoperations;
 
 
-import javax.ws.rs.HttpMethod;
+import jakarta.ws.rs.HttpMethod;
 
 public class DatanodeStatusChangeOperation extends RestOperation {
 
@@ -28,6 +28,20 @@ public class DatanodeStatusChangeOperation extends RestOperation {
     public void triggerNodeRemoval() {
         validatedResponse("/management", HttpMethod.DELETE, null,
                 "Could not trigger node removal",
+                r -> r.extract().statusCode() < 300
+        );
+    }
+
+    public void triggerNodeStop() {
+        validatedResponse("/management/stop", HttpMethod.POST, "",
+                "Could not trigger node stop",
+                r -> r.extract().statusCode() < 300
+        );
+    }
+
+    public void triggerNodeStart() {
+        validatedResponse("/management/start", HttpMethod.POST, "",
+                "Could not trigger node start",
                 r -> r.extract().statusCode() < 300
         );
     }

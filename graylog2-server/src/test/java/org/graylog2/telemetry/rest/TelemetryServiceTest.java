@@ -17,7 +17,7 @@
 package org.graylog2.telemetry.rest;
 
 import com.google.common.eventbus.EventBus;
-import org.graylog2.cluster.NodeService;
+import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.database.users.User;

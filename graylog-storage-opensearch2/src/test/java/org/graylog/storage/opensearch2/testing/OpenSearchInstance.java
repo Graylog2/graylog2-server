@@ -29,7 +29,13 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutComposableIndexTemplateRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.ComposableIndexTemplate;
+import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.Template;
+import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
 import org.graylog.storage.opensearch2.OpenSearchClient;
+import org.graylog.storage.opensearch2.OpenSearchClientProvider;
+import org.graylog.storage.opensearch2.RestClientProvider;
 import org.graylog.storage.opensearch2.RestHighLevelClientProvider;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.elasticsearch.Adapters;
@@ -39,6 +45,7 @@ import org.graylog.testing.elasticsearch.TestableSearchServerInstance;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.system.shutdown.GracefulShutdownService;
+import org.opensearch.client.RestClient;
 import org.opensearch.testcontainers.OpensearchContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,16 +83,44 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
     @Override
     public OpenSearchInstance init() {
         super.init();
-        RestHighLevelClient restHighLevelClient = buildRestClient();
-        this.openSearchClient = new OpenSearchClient(restHighLevelClient, false, new ObjectMapperProvider().get());
+        RestHighLevelClient restHighLevelClient = buildRestHighLevelClient();
+        final var objectMapper = new ObjectMapperProvider().get();
+        final var restClient = buildRestClient();
+        this.openSearchClient = new OpenSearchClient(restHighLevelClient, new OpenSearchClientProvider(restClient, objectMapper).get(), objectMapper);
         this.client = new ClientOS2(this.openSearchClient, featureFlags);
         this.fixtureImporter = new FixtureImporterOS2(this.openSearchClient);
         adapters = new AdaptersOS2(openSearchClient);
         Runtime.getRuntime().addShutdownHook(new Thread(this::close));
-        if(isFirstContainerStart) {
+        if (isFirstContainerStart) {
             afterContainerCreated();
         }
         return this;
+    }
+
+    private RestClient buildRestClient() {
+        return new RestClientProvider(
+                new GracefulShutdownService(),
+                ImmutableList.of(URI.create("http://" + this.getHttpHostAddress())),
+                Duration.seconds(60),
+                Duration.seconds(60),
+                Duration.seconds(60),
+                1,
+                1,
+                1,
+                false,
+                false,
+                null,
+                Duration.seconds(60),
+                "http",
+                false,
+                false,
+                false,
+                new org.apache.http.impl.client.BasicCredentialsProvider(),
+                null,
+                false,
+                false,
+                null)
+                .get();
     }
 
     public static OpenSearchInstance create() {
@@ -96,6 +131,18 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
         if (version().satisfies(SearchVersion.Distribution.OPENSEARCH, "2.9.0")) {
             fixNumberOfReplicaForMlPlugin();
         }
+        if (version().isOpenSearch()) {
+            fixDefaultNumberOfReplicasForIsmConfigs();
+        }
+    }
+
+    private void fixDefaultNumberOfReplicasForIsmConfigs() {
+        PutComposableIndexTemplateRequest request = new PutComposableIndexTemplateRequest();
+        request.name("ism-zero-replica-template");
+        request.indexTemplate(new ComposableIndexTemplate(List.of(".opendistro-ism-config"),
+                new Template(Settings.builder().put("number_of_replicas", 0).build(), null, null),
+                null, Long.MAX_VALUE, null, null));
+        openSearchClient().execute((client, requestOptions) -> client.indices().putIndexTemplate(request, requestOptions));
     }
 
     /**
@@ -144,7 +191,7 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
         return OPENSEARCH_VERSION;
     }
 
-    private RestHighLevelClient buildRestClient() {
+    private RestHighLevelClient buildRestHighLevelClient() {
         return new RestHighLevelClientProvider(
                 new GracefulShutdownService(),
                 ImmutableList.of(URI.create("http://" + this.getHttpHostAddress())),
@@ -187,7 +234,7 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
     public GenericContainer<?> buildContainer(String image, Network network) {
         var container = new OpensearchContainer(DockerImageName.parse(image))
                 // Avoids reuse warning on Jenkins (we don't want reuse in our CI environment)
-                .withReuse(isNull(System.getenv("BUILD_ID")))
+                .withReuse(isNull(System.getenv("CI")))
                 .withEnv("OPENSEARCH_JAVA_OPTS", getEsJavaOpts())
                 .withEnv("cluster.info.update.interval", "10s")
                 .withEnv("cluster.routing.allocation.disk.reroute_interval", "5s")
@@ -199,7 +246,7 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
 
         // disabling the performance plugin in 2.0.1 consistently created errors during CI runs, but keeping it running
         // in later versions sometimes created errors on CI, too.
-        if(version().satisfies(SearchVersion.Distribution.OPENSEARCH, "^2.7.0")) {
+        if (version().satisfies(SearchVersion.Distribution.OPENSEARCH, "^2.7.0")) {
             return container.withCommand("sh", "-c", "opensearch-plugin remove opensearch-performance-analyzer && ./opensearch-docker-entrypoint.sh");
         } else {
             return container;

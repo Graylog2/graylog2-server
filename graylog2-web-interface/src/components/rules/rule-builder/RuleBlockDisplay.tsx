@@ -59,7 +59,8 @@ const StyledRow = styled(Row)<{ $hovered: boolean }>(({ theme, $hovered }) => cs
   border-left: solid 1px ${theme.colors.gray[80]};
 `);
 
-const NegationButton = styled(Button)<{ $negate: boolean }>(({ theme, $negate }) => css`
+type NegationButtonProps = React.ComponentProps<typeof Button> & { $negate: boolean };
+const NegationButton: React.ComponentType<NegationButtonProps> = styled(Button)<{ $negate: boolean }>(({ theme, $negate }) => css`
   opacity: ${$negate ? '1' : '0.3'};
   margin-right: ${theme.spacings.sm};
 `);
@@ -91,7 +92,13 @@ const EditIconButton = styled(IconButton)(({ theme }) => css`
 
 const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate, onDuplicate, onInsertAbove, onInsertBelow, returnType, type } : Props) => {
   const [showActions, setShowActions] = useState<boolean>(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const [highlightedOutput, setHighlightedOutput] = useRuleBuilder().useHighlightedOutput;
+
+  const handleDropdownToggle = () => {
+    setIsDropdownOpen((prev) => !prev);
+    setShowActions(!isDropdownOpen);
+  };
 
   const readableReturnType = (_type: RuleBuilderTypes): string | undefined => {
     switch (_type) {
@@ -128,14 +135,14 @@ const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate, onDupl
 
   return (
     <StyledRow onMouseEnter={() => setShowActions(true)}
-               onMouseLeave={() => setShowActions(false)}
+               onMouseLeave={!isDropdownOpen ? () => setShowActions(false) : undefined}
                $hovered={showActions}>
       <Col xs={9} md={10}>
         <Row>
           <Col xs={10} md={9}>
             <BlockTitle title={block?.step_title}>
               {negatable
-              && <NegationButton bsStyle="primary" bsSize="xs" $negate={block?.negate ? 1 : 0} onClick={(e) => { e.target.blur(); onNegate(); }}>Not</NegationButton>}
+              && <NegationButton bsStyle="primary" bsSize="xs" $negate={block?.negate} onClick={(e) => { e.target.blur(); onNegate(); }}>Not</NegationButton>}
               {highlightedOutput ? (
                 highlightedRuleTitle(highlightedOutput, block?.step_title)
               ) : block?.step_title}
@@ -173,37 +180,20 @@ const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate, onDupl
             <OverlayDropdownButton title={MORE_ACTIONS_TITLE}
                                    buttonTitle={MORE_ACTIONS_HOVER_TITLE}
                                    bsSize="xsmall"
-                                   closeOnSelect={false}
+                                   onToggle={handleDropdownToggle}
                                    dropdownZIndex={1000}>
-              {({ toggleDropdown }) => (
-                <>
-                  <MenuItem onClick={onEdit}>Edit</MenuItem>
-                  <MenuItem onClick={() => {
-                    onDuplicate();
-                    toggleDropdown();
-                    setShowActions(false);
-                  }}>
-                    Duplicate
-                  </MenuItem>
-                  <MenuItem divider />
-                  <MenuItem onClick={() => {
-                    onInsertAbove();
-                    toggleDropdown();
-                    setShowActions(false);
-                  }}>
-                    Insert above
-                  </MenuItem>
-                  <MenuItem onClick={() => {
-                    onInsertBelow();
-                    toggleDropdown();
-                    setShowActions(false);
-                  }}>
-                    Insert below
-                  </MenuItem>
-                  <MenuItem divider />
-                  <MenuItem onClick={onDelete}>Delete</MenuItem>
-                </>
-              )}
+              <MenuItem onClick={onEdit}>Edit</MenuItem>
+              <MenuItem onClick={() => {
+                onDuplicate();
+                handleDropdownToggle();
+              }}>
+                Duplicate
+              </MenuItem>
+              <MenuItem divider />
+              <MenuItem onClick={onInsertAbove}>Insert above</MenuItem>
+              <MenuItem onClick={onInsertBelow}>Insert below</MenuItem>
+              <MenuItem divider />
+              <MenuItem onClick={onDelete}>Delete</MenuItem>
             </OverlayDropdownButton>
           </ActionsContainer>
         )}

@@ -36,7 +36,8 @@ import org.graylog.security.certutil.cert.storage.CertChainStorage;
 import org.graylog.security.certutil.csr.CsrSigner;
 import org.graylog.security.certutil.csr.storage.CsrMongoStorage;
 import org.graylog2.Configuration;
-import org.graylog2.cluster.NodeService;
+import org.graylog2.cluster.nodes.DataNodeDto;
+import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.cluster.preflight.DataNodeProvisioningService;
 import org.graylog2.notifications.Notification;
@@ -50,9 +51,10 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
+
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
@@ -87,7 +89,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
     private static final String ERROR_MESSAGE_PREFIX = "Error trying to connect to data node ";
 
     private final DataNodeProvisioningService dataNodeProvisioningService;
-    private final NodeService nodeService;
+    private final NodeService<DataNodeDto> nodeService;
 
     private final CaConfiguration configuration;
     private final CsrMongoStorage csrStorage;
@@ -108,7 +110,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                                                     final CertChainMongoStorage certMongoStorage,
                                                     final CaService caService,
                                                     final Configuration configuration,
-                                                    final NodeService nodeService,
+                                                    final NodeService<DataNodeDto> nodeService,
                                                     final CsrSigner csrSigner,
                                                     final ClusterConfigService clusterConfigService,
                                                     final @Named("password_secret") String passwordSecret,
@@ -157,7 +159,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
         try {
             // only load nodes that are in a state that need sth done
             final var nodes = dataNodeProvisioningService.findAllNodesThatNeedAttention();
-            if(!nodes.isEmpty()) {
+            if (!nodes.isEmpty()) {
 
                 final var password = configuration.configuredCaExists()
                         ? configuration.getCaPassword().toCharArray()
@@ -220,7 +222,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                     });
                 }
 
-                nodesByState.getOrDefault(DataNodeProvisioningConfig.State.STORED, List.of())
+                nodesByState.getOrDefault(DataNodeProvisioningConfig.State.STARTUP_REQUESTED, List.of())
                         .forEach(c -> {
                             dataNodeProvisioningService.save(c.asConnecting());
                             executor.submit(() -> checkConnectivity(c));

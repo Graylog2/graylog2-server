@@ -18,25 +18,18 @@ package org.graylog.plugins.sidecar.rest.models;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import java.nio.charset.StandardCharsets;
-import java.util.Set;
-import java.util.zip.CRC32;
-import java.util.zip.Checksum;
 
 @AutoValue
 @JsonAutoDetect
+@JsonIgnoreProperties({"default_template_crc"})
 public abstract class Collector {
-    private static final Logger LOG = LoggerFactory.getLogger(Collector.class);
-
     public static final String FIELD_ID = "id";
     public static final String FIELD_NAME = "name";
     public static final String FIELD_SERVICE_TYPE = "service_type";
@@ -45,30 +38,6 @@ public abstract class Collector {
     public static final String FIELD_EXECUTE_PARAMETERS = "execute_parameters";
     public static final String FIELD_VALIDATION_PARAMETERS = "validation_parameters";
     public static final String FIELD_DEFAULT_TEMPLATE = "default_template";
-    public static final String FIELD_DEFAULT_TEMPLATE_CRC = "default_template_crc";
-
-    // Set of prior version CRCs for back-compat
-    private static final Set<Long> INITIAL_CRC = java.util.Set.of(
-            3280545580L, // 5.2 filebeat linux
-            3396210381L, // 5.2 filebeat darwin
-            3013497446L, // 5.2 filebeat freebsd
-            4009863009L, // 5.2 winlogbeat windows
-            2023247173L, // 5.2 nxlog linux
-            2491201449L, // 5.2 nxlog windows
-            2487909285L, // 5.2 auditbeat windows
-
-            4049210961L, // 5.1 and 5.0 filebeat linux/darwin/freebsd
-            2306685777L, // 5.1 and 5.0 winlogbeat windows
-            639836274L,  // 5.1 and 5.0 nxlog linux
-            2157898695L, // 5.1 and 5.0 nxlog windows
-            1490581247L, // 5.1 and 5.0 filebeat windows
-
-            1256873081L, // 4.3 filebeat linux
-            3852098581L, // 4.3 winlogbeat windows
-            3676599312L, // 4.3 nxlog linux
-            4293222217L, // 4.3 nxlog windows
-            2559816928L  // 4.3 filebeat windows
-    );
 
     @Id
     @ObjectId
@@ -101,35 +70,6 @@ public abstract class Collector {
     @Nullable
     public abstract String defaultTemplate();
 
-    @JsonProperty(FIELD_DEFAULT_TEMPLATE_CRC)
-    @Nullable
-    public abstract Long defaultTemplateCRC();
-
-    @JsonIgnore
-    public boolean defaultTemplateUpdated() {
-        if (defaultTemplate() == null) {
-            return false;
-        }
-
-        long crc = checksum(defaultTemplate().getBytes(StandardCharsets.UTF_8));
-        if (defaultTemplateCRC() == null) {
-            if (INITIAL_CRC.contains(crc)) {
-                return false; // known old version
-            } else {
-                LOG.info("{} collector default template on {} is an unrecognized version - not updating automatically.", name(), nodeOperatingSystem());
-                return true;  // changed or really old standard default template
-            }
-        }
-        return (crc != defaultTemplateCRC());
-    }
-
-    @JsonIgnore
-    public static long checksum(byte[] bytes) {
-        Checksum crc32 = new CRC32();
-        crc32.update(bytes, 0, bytes.length);
-        return crc32.getValue();
-    }
-
     public static Builder builder() {
         return new AutoValue_Collector.Builder();
     }
@@ -146,7 +86,6 @@ public abstract class Collector {
         public abstract Builder executeParameters(String executeParameters);
         public abstract Builder validationParameters(String validationParameters);
         public abstract Builder defaultTemplate(String defaultTemplate);
-        public abstract Builder defaultTemplateCRC(Long checksum);
         public abstract Collector build();
     }
 
@@ -158,8 +97,7 @@ public abstract class Collector {
                                    @JsonProperty(FIELD_EXECUTABLE_PATH) String executablePath,
                                    @JsonProperty(FIELD_EXECUTE_PARAMETERS) @Nullable String executeParameters,
                                    @JsonProperty(FIELD_VALIDATION_PARAMETERS) @Nullable String validationParameters,
-                                   @JsonProperty(FIELD_DEFAULT_TEMPLATE) @Nullable String defaultTemplate,
-                                   @JsonProperty(FIELD_DEFAULT_TEMPLATE_CRC) @Nullable Long defaultTemplateCRC) {
+                                   @JsonProperty(FIELD_DEFAULT_TEMPLATE) @Nullable String defaultTemplate) {
         return builder()
                 .id(id)
                 .name(name)
@@ -169,7 +107,6 @@ public abstract class Collector {
                 .executeParameters(executeParameters)
                 .validationParameters(validationParameters)
                 .defaultTemplate(defaultTemplate)
-                .defaultTemplateCRC(defaultTemplateCRC)
                 .build();
     }
 }

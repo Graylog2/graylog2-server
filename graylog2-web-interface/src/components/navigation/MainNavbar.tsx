@@ -29,6 +29,7 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import AppConfig from 'util/AppConfig';
 import { appPrefixed } from 'util/URLUtils';
 import isActiveRoute from 'components/navigation/util/isActiveRoute';
+import { navigation as securityNavigation } from 'components/security/bindings';
 
 import NavigationLink from './NavigationLink';
 
@@ -131,6 +132,7 @@ const mergeDuplicateDropdowns = (navigationItems: Array<PluginNavigation>): Arra
   if (existingDropdownItemIndex >= 0) {
     const existingDropdownItem = result[existingDropdownItemIndex];
     const newDropdownItem = {
+      ...current,
       ...existingDropdownItem,
       children: [
         ...existingDropdownItem.children,
@@ -187,13 +189,10 @@ const useNavigationItems = () => {
 
     if (securityMenuIsMissing && isPermittedToEnterpriseOrSecurity) {
       // no security plugin menu, so we will add one
-      navigationItems.push({
-        path: Routes.SECURITY,
-        description: SECURITY_ROUTE_DESCRIPTION,
-      });
+      navigationItems.push(securityNavigation);
     }
 
-    const itemsForActivePerspective = filterByPerspective(navigationItems, activePerspective);
+    const itemsForActivePerspective = filterByPerspective(navigationItems, activePerspective?.id);
 
     return sortItemsByPosition(itemsForActivePerspective);
   }, [activePerspective, allNavigationItems, permissions]);

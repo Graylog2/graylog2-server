@@ -19,7 +19,7 @@ import { useQuery } from '@tanstack/react-query';
 import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
-import type { IndexSetFieldTypeJson } from 'hooks/useIndexSetFieldType';
+import type { IndexSetFieldTypeJson } from 'components/indices/IndexSetFieldTypes/types';
 
 export type FieldOptions = Array<{ value: string, label: string, disabled: boolean }>;
 export type CurrentTypes = Record<string, string>;
@@ -29,9 +29,9 @@ const INITIAL_DATA = {
 };
 
 const fetchIndexSetFieldTypesAll = async (indexSetId: string) => {
-  const indexSetFiledTypeAllUrl = qualifyUrl(`/system/indices/index_sets/types/${indexSetId}/all`);
+  const indexSetFieldTypeAllUrl = qualifyUrl(`/system/indices/index_sets/types/${indexSetId}/all`);
 
-  return fetch('GET', indexSetFiledTypeAllUrl).then(
+  return fetch('GET', indexSetFieldTypeAllUrl).then(
     (elements) => ({
       currentTypes: Object.fromEntries(elements.map((fieldType: IndexSetFieldTypeJson) => ([fieldType.field_name, fieldType.type]))),
       options: elements.map((fieldType: IndexSetFieldTypeJson) => ({

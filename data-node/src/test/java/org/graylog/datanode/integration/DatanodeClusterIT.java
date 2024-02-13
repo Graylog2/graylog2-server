@@ -39,7 +39,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -83,7 +84,7 @@ public class DatanodeClusterIT {
         final KeystoreInformation httpNodeA = DatanodeSecurityTestUtils.generateHttpCert(tempDir, ca, hostnameNodeA);
 
         this.network = Network.newNetwork();
-        this.mongoDBTestService = MongoDBTestService.create(MongodbServer.MONGO5, network);
+        this.mongoDBTestService = MongoDBTestService.create(MongodbServer.DEFAULT_VERSION, network);
         this.mongoDBTestService.start();
 
         nodeA = createDatanodeContainer(

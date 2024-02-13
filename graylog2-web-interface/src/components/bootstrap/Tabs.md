@@ -55,13 +55,13 @@ const TabExample = () => {
 ```js
 import { Row, Col, Nav, NavItem, NavDropdown, MenuItem, Tab } from 'components/bootstrap';
 
-<Tab.Container defaultActiveKey="first">
+<Tab.Container defaultActiveKey="first" id="drodown-tab-example">
   <Row className="clearfix">
     <Col sm={12}>
       <Nav bsStyle="tabs">
-        <NavItem eventKey="first" id="dropdown-tab-1">Tab 1</NavItem>
-        <NavItem eventKey="second" id="dropdown-tab-2">Tab 2</NavItem>
-        <NavDropdown eventKey="3" title="Dropdown" id="nav-dropdown-within-tab">
+        <NavItem eventKey="first">Tab 1</NavItem>
+        <NavItem eventKey="second">Tab 2</NavItem>
+        <NavDropdown eventKey="3" title="Dropdown">
           <MenuItem eventKey="3.1">Action</MenuItem>
           <MenuItem eventKey="3.2">Another action</MenuItem>
           <MenuItem eventKey="3.3">Something else here</MenuItem>

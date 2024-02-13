@@ -66,7 +66,7 @@ public class DatanodeInstance extends OpenSearchInstance {
         return new GenericContainer<>(DockerImageName.parse(image))
                 .withImagePullPolicy(PullPolicy.alwaysPull())
                 // Avoids reuse warning on Jenkins (we don't want reuse in our CI environment)
-                .withReuse(isNull(System.getenv("BUILD_ID")))
+                .withReuse(isNull(System.getenv("CI")))
                 .withEnv("OPENSEARCH_JAVA_OPTS", getEsJavaOpts())
                 .withEnv("GRAYLOG_DATANODE_PASSWORD_SECRET", passwordSecret)
                 .withEnv("GRAYLOG_DATANODE_ROOT_PASSWORD_SHA2", rootPasswordSha2)

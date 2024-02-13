@@ -17,21 +17,14 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import {
-  OverlayTrigger,
-  PaginatedList,
-  SearchForm,
-  Spinner,
-  Icon,
-  NoSearchResult,
-  NoEntitiesExist,
-} from 'components/common';
-import { Row, Col, Table, Popover, Button } from 'components/bootstrap';
+import { PaginatedList, SearchForm, Spinner, NoSearchResult, NoEntitiesExist } from 'components/common';
+import { Row, Col, Table } from 'components/bootstrap';
 import CacheTableEntry from 'components/lookup-tables/CacheTableEntry';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 import { LookupTableCachesActions } from 'stores/lookup-tables/LookupTableCachesStore';
 import type { LookupTableCache, PaginationType } from 'logic/lookup-tables/types';
 import type { PaginationQueryParameterResult } from 'hooks/usePaginationQueryParameter';
+import QueryHelper from 'components/common/QueryHelper';
 
 import Styles from './Overview.css';
 
@@ -39,38 +32,8 @@ const ScrollContainer = styled.div`
   overflow-x: auto;
 `;
 
-const buildHelpPopover = () => (
-  <Popover id="search-query-help"
-           className={Styles.popoverWide}
-           title="Search Syntax Help">
-    <p><strong>Available search fields</strong></p>
-    <Table condensed>
-      <thead>
-        <tr>
-          <th>Field</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>id</td>
-          <td>Cache ID</td>
-        </tr>
-        <tr>
-          <td>title</td>
-          <td>The title of the cache</td>
-        </tr>
-        <tr>
-          <td>name</td>
-          <td>The reference name of the cache</td>
-        </tr>
-        <tr>
-          <td>description</td>
-          <td>The description of cache</td>
-        </tr>
-      </tbody>
-    </Table>
-    <p><strong>Examples</strong></p>
+const queryExamples = (
+  <>
     <p>
       Find caches by parts of their names:<br />
       <kbd>name:guava</kbd><br />
@@ -81,7 +44,7 @@ const buildHelpPopover = () => (
       <kbd>guava</kbd> <br />is the same as<br />
       <kbd>title:guava</kbd>
     </p>
-  </Popover>
+  </>
 );
 
 const NoResults = ({ query }: { query: string }) => (
@@ -114,12 +77,7 @@ type Props = {
 };
 
 const queryHelpComponent = (
-  <OverlayTrigger trigger="click" rootClose placement="right" overlay={buildHelpPopover()}>
-    <Button bsStyle="link"
-            className={Styles.searchHelpButton}>
-      <Icon name="question-circle" fixedWidth />
-    </Button>
-  </OverlayTrigger>
+  <QueryHelper entityName="cache" example={queryExamples} commonFields={['id', 'title', 'name', 'description']} />
 );
 
 const CachesOverview = ({ caches, pagination, paginationQueryParameter }: Props) => {

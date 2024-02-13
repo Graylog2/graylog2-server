@@ -20,10 +20,9 @@ import styled, { css } from 'styled-components';
 import type { SizeProp } from '@fortawesome/fontawesome-svg-core';
 
 import { OverlayTrigger } from 'components/common';
-import { Popover } from 'components/bootstrap';
 import Icon from 'components/common/Icon';
 
-const StyledPopover = styled(Popover)(({ theme }) => css`
+const StyledPopover = styled.span(({ theme }) => css`
   ul {
     padding-left: 0;
   }
@@ -43,6 +42,7 @@ const StyledPopover = styled(Popover)(({ theme }) => css`
 
 const StyledIcon = styled(Icon)<{ $type: Type, $displayLeftMargin: boolean }>(({ theme, $type, $displayLeftMargin }) => css`
   color: ${$type === 'error' ? theme.colors.variant.danger : 'inherit'};
+  margin: 0;
   margin-left: ${$displayLeftMargin ? '0.3em' : 0};
 `);
 
@@ -87,7 +87,8 @@ const HoverForHelp = ({
 }: Props) => (
   <OverlayTrigger trigger={trigger}
                   placement={placement}
-                  overlay={<StyledPopover title={title} id={id}>{children}</StyledPopover>}
+                  overlay={<StyledPopover id={id}>{children}</StyledPopover>}
+                  title={title}
                   testId={testId}>
     <StyledIcon className={`${className} ${pullRight ? 'pull-right' : ''}`}
                 name={iconName(type)}

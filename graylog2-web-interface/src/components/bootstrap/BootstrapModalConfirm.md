@@ -24,7 +24,7 @@ const BootstrapModalConfirmExample = createReactClass({
   },
 
   render() {
-    const { confirmed } = this.state;
+    const { confirmed, showModal } = this.state;
     return (
       <div>
         <p className={confirmed ? 'bg-success' : 'bg-danger'}>

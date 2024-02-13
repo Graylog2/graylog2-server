@@ -28,15 +28,16 @@ import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog2.bootstrap.preflight.PreflightConfigResult;
 import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.cluster.Node;
-import org.graylog2.cluster.NodeService;
+import org.graylog2.cluster.nodes.DataNodeDto;
+import org.graylog2.cluster.nodes.NodeService;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.util.List;
 import java.util.Optional;
@@ -50,7 +51,7 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
     private final InSecureConfiguration inSecureConfiguration;
     private final DatanodeConfiguration datanodeConfiguration;
     private final byte[] signingKey;
-    private final NodeService nodeService;
+    private final NodeService<DataNodeDto> nodeService;
     private final PreflightConfigService preflightConfigService;
 
     @Inject
@@ -59,7 +60,7 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
                                            final UploadedCertFilesSecureConfiguration uploadedCertFilesSecureConfiguration,
                                            final MongoCertSecureConfiguration mongoCertSecureConfiguration,
                                            final InSecureConfiguration inSecureConfiguration,
-                                           final NodeService nodeService,
+                                           final NodeService<DataNodeDto> nodeService,
                                            final PreflightConfigService preflightConfigService,
                                            final @Named("password_secret") String passwordSecret) {
         this.localConfiguration = localConfiguration;
@@ -98,7 +99,7 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
             if (localConfiguration.getInitialManagerNodes() != null && !localConfiguration.getInitialManagerNodes().isBlank()) {
                 opensearchProperties.put("cluster.initial_master_nodes", localConfiguration.getInitialManagerNodes());
             } else if (isPreflight()) {
-                final var nodeList = String.join(",", nodeService.allActive(Node.Type.DATANODE).values().stream().map(Node::getHostname).collect(Collectors.toSet()));
+                final var nodeList = String.join(",", nodeService.allActive().values().stream().map(Node::getHostname).collect(Collectors.toSet()));
                 opensearchProperties.put("cluster.initial_master_nodes", nodeList);
             }
             opensearchProperties.putAll(commonOpensearchConfig(localConfiguration));

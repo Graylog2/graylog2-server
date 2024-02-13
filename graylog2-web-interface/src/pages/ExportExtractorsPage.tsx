@@ -43,7 +43,7 @@ const ExportExtractorsPage = () => {
             or sharing in <a href="https://marketplace.graylog.org/" rel="noopener noreferrer" target="_blank">the Graylog Marketplace</a>.
           </span>
         </PageHeader>
-        <ExportExtractors input={input} />
+        <ExportExtractors id={input.id} />
       </div>
     </DocumentTitle>
   );

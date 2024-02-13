@@ -100,7 +100,7 @@ describe('LinkContainer', () => {
       </LinkContainer>,
     );
 
-    const button = await screen.findByText('Alerts');
+    const button = await screen.findByRole('link', { name: 'Alerts' });
 
     expect(hasHref(button) ? button.href : null).toEqual('http://localhost/alerts');
   });

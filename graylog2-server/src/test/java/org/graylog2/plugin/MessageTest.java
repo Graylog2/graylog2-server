@@ -171,48 +171,6 @@ public class MessageTest {
     }
 
     @Test
-    @SuppressWarnings("deprecation")
-    public void testAddStringFields() throws Exception {
-        final Map<String, String> map = Maps.newHashMap();
-
-        map.put("field1", "Foo");
-        map.put("field2", "Bar");
-
-        message.addStringFields(map);
-
-        assertEquals("Foo", message.getField("field1"));
-        assertEquals("Bar", message.getField("field2"));
-    }
-
-    @Test
-    @SuppressWarnings("deprecation")
-    public void testAddLongFields() throws Exception {
-        final Map<String, Long> map = Maps.newHashMap();
-
-        map.put("field1", 10L);
-        map.put("field2", 230L);
-
-        message.addLongFields(map);
-
-        assertEquals(10L, message.getField("field1"));
-        assertEquals(230L, message.getField("field2"));
-    }
-
-    @Test
-    @SuppressWarnings("deprecation")
-    public void testAddDoubleFields() throws Exception {
-        final Map<String, Double> map = Maps.newHashMap();
-
-        map.put("field1", 10.0d);
-        map.put("field2", 230.2d);
-
-        message.addDoubleFields(map);
-
-        assertEquals(10.0d, message.getField("field1"));
-        assertEquals(230.2d, message.getField("field2"));
-    }
-
-    @Test
     public void testRemoveField() throws Exception {
         message.addField("foo", "bar");
 
@@ -527,22 +485,6 @@ public class MessageTest {
 
         message = new Message(null, "source", Tools.nowUTC());
         assertFalse(message.isComplete());
-    }
-
-    @Test
-    @SuppressWarnings("deprecation")
-    public void testGetValidationErrorsWithEmptyMessage() throws Exception {
-        final Message message = new Message("", "source", Tools.nowUTC());
-
-        assertEquals("message is empty, ", message.getValidationErrors());
-    }
-
-    @Test
-    @SuppressWarnings("deprecation")
-    public void testGetValidationErrorsWithNullMessage() throws Exception {
-        final Message message = new Message(null, "source", Tools.nowUTC());
-
-        assertEquals("message is missing, ", message.getValidationErrors());
     }
 
     @Test

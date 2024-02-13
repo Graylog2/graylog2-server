@@ -20,7 +20,7 @@ import com.amazonaws.ClientConfiguration;
 import com.amazonaws.ClientConfigurationFactory;
 import okhttp3.HttpUrl;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 public class Proxy {
 

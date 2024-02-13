@@ -19,8 +19,8 @@ package org.graylog2.telemetry.rest;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.hash.HashCode;
-import org.graylog2.cluster.Node;
-import org.graylog2.cluster.NodeService;
+import org.graylog2.cluster.nodes.DataNodeDto;
+import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.database.users.User;
@@ -40,8 +40,9 @@ import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -67,7 +68,7 @@ public class TelemetryService {
     private final boolean isTelemetryEnabled;
     private final TelemetryClusterService telemetryClusterService;
     private final String installationSource;
-    private final NodeService nodeService;
+    private final NodeService<DataNodeDto> nodeService;
 
     @Inject
     public TelemetryService(
@@ -83,7 +84,7 @@ public class TelemetryService {
             EventBus eventBus,
             TelemetryClusterService telemetryClusterService,
             @Named("installation_source") String installationSource,
-            NodeService nodeService) {
+            NodeService<DataNodeDto> nodeService) {
         this.isTelemetryEnabled = isTelemetryEnabled;
         this.trafficCounterService = trafficCounterService;
         this.enterpriseDataProvider = enterpriseDataProvider;
@@ -213,7 +214,7 @@ public class TelemetryService {
     }
 
     private Map<String, Object> getDataNodeInfo() {
-        final var dataNodes = nodeService.allActive(Node.Type.DATANODE);
+        final var dataNodes = nodeService.allActive();
         return Map.of(
                 "data_nodes_count", dataNodes.size()
         );

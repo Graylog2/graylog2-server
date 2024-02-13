@@ -32,9 +32,11 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -50,6 +52,7 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
     private final Set<URL> mongoDBFixtures = Collections.synchronizedSet(new HashSet<>());
     private final Set<String> enabledFeatureFlags = Collections.synchronizedSet(new HashSet<>());
     private final boolean withMailServerEnabled;
+    private final Map<String, String> additionalConfigurationParameters;
 
     public ContainerMatrixTestsDescriptor(TestDescriptor parent,
                                           Lifecycle lifecycle,
@@ -61,10 +64,11 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
                                           MongodbServer mongoVersion,
                                           Set<Integer> extraPorts,
                                           List<URL> mongoDBFixtures,
-                                          List<String> enabledFeatureFlags, boolean withMailServerEnabled) {
+                                          List<String> enabledFeatureFlags, boolean withMailServerEnabled,
+                                          Map<String, String> additionalConfigurationParameters) {
         super(parent.getUniqueId().append(SEGMENT_TYPE,
-                        createKey(lifecycle, mavenProjectDirProviderId, pluginJarsProviderId, esVersion, mongoVersion, withMailServerEnabled)),
-                createKey(lifecycle, mavenProjectDirProviderId, pluginJarsProviderId, esVersion, mongoVersion, withMailServerEnabled));
+                        createKey(lifecycle, mavenProjectDirProviderId, pluginJarsProviderId, esVersion, mongoVersion, withMailServerEnabled, additionalConfigurationParameters)),
+                createKey(lifecycle, mavenProjectDirProviderId, pluginJarsProviderId, esVersion, mongoVersion, withMailServerEnabled, additionalConfigurationParameters));
         setParent(parent);
         this.lifecycle = lifecycle;
         this.mavenProjectDirProvider = mavenProjectDirProvider;
@@ -75,6 +79,7 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
         this.mongoDBFixtures.addAll(mongoDBFixtures);
         this.enabledFeatureFlags.addAll(enabledFeatureFlags);
         this.withMailServerEnabled = withMailServerEnabled;
+        this.additionalConfigurationParameters = additionalConfigurationParameters;
     }
 
     public ContainerMatrixTestsDescriptor(TestDescriptor parent,
@@ -93,9 +98,11 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
         this.extraPorts.addAll(extraPorts);
         this.mongoDBFixtures.addAll(mongoDBFixtures);
         this.withMailServerEnabled = false;
+        this.additionalConfigurationParameters = new HashMap<>();
     }
 
-    protected static String createKey(Lifecycle lifecycle, String mavenProjectDirProvider, String pluginJarsProvider, SearchVersion searchVersion, MongodbServer mongoVersion, boolean withMailServerEnabled) {
+    protected static String createKey(Lifecycle lifecycle, String mavenProjectDirProvider, String pluginJarsProvider, SearchVersion searchVersion,
+                                      MongodbServer mongoVersion, boolean withMailServerEnabled, Map<String, String> additionalConfigurationParameters) {
         final ImmutableMap.Builder<String, Object> values = ImmutableMap.<String, Object>builder()
                 .put("Lifecycle", lifecycle.name())
                 .put("MavenProjectDirProvider", mavenProjectDirProvider)
@@ -106,6 +113,8 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
         if(withMailServerEnabled) {
             values.put("Mailserver", "enabled");
         }
+
+        values.putAll(additionalConfigurationParameters);
 
         return values.build().entrySet().stream().map(pair -> String.format(Locale.ROOT, "%s: %s", pair.getKey(), pair.getValue()))
                 .collect(Collectors.joining(", "));
@@ -154,5 +163,9 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
 
     public boolean withEnabledMailServer() {
         return withMailServerEnabled;
+    }
+
+    public Map<String, String> getAdditionalConfigurationParameters() {
+        return additionalConfigurationParameters;
     }
 }

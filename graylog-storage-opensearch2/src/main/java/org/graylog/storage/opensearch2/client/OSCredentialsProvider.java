@@ -18,16 +18,18 @@ package org.graylog.storage.opensearch2.client;
 
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
-import org.graylog.shaded.opensearch2.org.apache.http.auth.AuthScope;
-import org.graylog.shaded.opensearch2.org.apache.http.auth.UsernamePasswordCredentials;
-import org.graylog.shaded.opensearch2.org.apache.http.client.CredentialsProvider;
-import org.graylog.shaded.opensearch2.org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.graylog2.configuration.IndexerHosts;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Provider;
+
 import java.net.URI;
 import java.util.Iterator;
 import java.util.List;

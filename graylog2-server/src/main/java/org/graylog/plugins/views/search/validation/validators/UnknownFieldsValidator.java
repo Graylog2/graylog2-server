@@ -26,12 +26,14 @@ import org.graylog.plugins.views.search.validation.ValidationStatus;
 import org.graylog.plugins.views.search.validation.ValidationType;
 import org.graylog.plugins.views.search.validation.validators.util.UnknownFieldsListLimiter;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.graylog2.plugin.Message.RESERVED_SETTABLE_FIELDS;
 import static org.graylog2.plugin.Message.SEARCHABLE_ES_FIELDS;
 
 @Singleton
@@ -65,6 +67,7 @@ public class UnknownFieldsValidator implements QueryValidator {
         final Map<String, List<ParsedTerm>> groupedByField = terms.stream()
                 .filter(t -> !t.isDefaultField())
                 .filter(term -> !SEARCHABLE_ES_FIELDS.contains(term.getRealFieldName()))
+                .filter(term -> !RESERVED_SETTABLE_FIELDS.contains(term.getRealFieldName()))
                 .filter(term -> !availableFields.contains(term.getRealFieldName()))
                 .distinct()
                 .collect(Collectors.groupingBy(ParsedTerm::getRealFieldName));

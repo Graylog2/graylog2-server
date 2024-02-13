@@ -14,8 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { PluginRegistration } from 'graylog-web-plugin/plugin';
-import { PluginStore } from 'graylog-web-plugin/plugin';
+import type { PluginRegistration, PluginExports } from 'graylog-web-plugin/plugin';
+import { PluginStore, PluginManifest } from 'graylog-web-plugin/plugin';
 
 export const loadPlugin = (plugin: PluginRegistration) => PluginStore.register(plugin);
 export const unloadPlugin = (plugin: PluginRegistration) => PluginStore.unregister(plugin);
@@ -24,3 +24,5 @@ export const usePlugin = (plugin: PluginRegistration) => {
   beforeAll(() => loadPlugin(plugin));
   afterAll(() => unloadPlugin(plugin));
 };
+
+export const usePluginExports = (exports: PluginExports) => usePlugin(new PluginManifest({}, exports));

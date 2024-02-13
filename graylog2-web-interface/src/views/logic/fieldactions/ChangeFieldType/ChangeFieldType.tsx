@@ -23,14 +23,13 @@ import type User from 'logic/users/User';
 import AppConfig from 'util/AppConfig';
 import isReservedField from 'views/logic/IsReservedField';
 import useInitialSelection from 'views/logic/fieldactions/ChangeFieldType/hooks/useInitialSelection';
-import useFieldTypes from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypes';
+import { isPermitted } from 'util/PermissionsMixin';
 
 const ChangeFieldType = ({
   field,
   onClose,
 }: ActionComponentProps) => {
   const [show, setShow] = useState(true);
-  const { data: { fieldTypes }, isLoading: isOptionsLoading } = useFieldTypes();
   const handleOnClose = useCallback(() => {
     setShow(false);
     onClose();
@@ -38,10 +37,15 @@ const ChangeFieldType = ({
 
   const initialSelection = useInitialSelection();
 
-  return show ? <ChangeFieldTypeModal fieldTypes={fieldTypes} isOptionsLoading={isOptionsLoading} initialSelectedIndexSets={initialSelection} field={field} onClose={handleOnClose} show={show} /> : null;
+  return show ? (
+    <ChangeFieldTypeModal initialSelectedIndexSets={initialSelection}
+                          onClose={handleOnClose}
+                          initialData={{ fieldName: field }}
+                          show />
+  ) : null;
 };
 
-const hasMappingPermission = (currentUser: User) => currentUser.permissions.includes('typemappings:edit') || currentUser.permissions.includes('*');
+const hasMappingPermission = (currentUser: User) => isPermitted(currentUser?.permissions, 'typemappings:edit');
 
 export const isChangeFieldTypeEnabled = ({ field, type, contexts }: ActionHandlerArguments) => {
   const { currentUser } = contexts;

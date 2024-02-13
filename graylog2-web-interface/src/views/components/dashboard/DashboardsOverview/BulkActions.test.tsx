@@ -21,10 +21,12 @@ import userEvent from '@testing-library/user-event';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import { asMock } from 'helpers/mocking';
+import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 
 import BulkActions from './BulkActions';
 
 jest.mock('logic/rest/FetchProvider', () => jest.fn());
+jest.mock('components/common/EntityDataTable/hooks/useSelectedEntities');
 
 jest.mock('util/UserNotification', () => ({
   error: jest.fn(),
@@ -32,26 +34,43 @@ jest.mock('util/UserNotification', () => ({
 }));
 
 describe('DashboardsOverview BulkActionsRow', () => {
+  const useSelectedEntitiesResponse = {
+    selectedEntities: [],
+    setSelectedEntities: () => {},
+    selectEntity: () => {},
+    deselectEntity: () => {},
+  };
+
   const openActionsDropdown = async () => {
-    await screen.findByRole('button', {
+    userEvent.click(await screen.findByRole('button', {
       name: /bulk actions/i,
-    });
+    }));
+
+    await screen.findByRole('menu');
   };
 
   const deleteDashboards = async () => {
     userEvent.click(await screen.findByRole('menuitem', { name: /delete/i }));
+    await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument());
   };
 
   beforeEach(() => {
     window.confirm = jest.fn(() => true);
+
+    asMock(useSelectedEntities).mockReturnValue(useSelectedEntitiesResponse);
   });
 
   it('should delete selected dashboards', async () => {
     asMock(fetch).mockReturnValue(Promise.resolve({ failures: [] }));
-    const setSelectedDashboardIds = jest.fn();
+    const setSelectedEntities = jest.fn();
 
-    render(<BulkActions selectedDashboardIds={['dashboard-id-1', 'dashboard-id-2']}
-                        setSelectedDashboardIds={setSelectedDashboardIds} />);
+    asMock(useSelectedEntities).mockReturnValue({
+      ...useSelectedEntitiesResponse,
+      selectedEntities: ['dashboard-id-1', 'dashboard-id-2'],
+      setSelectedEntities,
+    });
+
+    render(<BulkActions />);
 
     await openActionsDropdown();
     await deleteDashboards();
@@ -65,7 +84,7 @@ describe('DashboardsOverview BulkActionsRow', () => {
     ));
 
     expect(UserNotification.success).toHaveBeenCalledWith('2 dashboards were deleted successfully.', 'Success');
-    expect(setSelectedDashboardIds).toHaveBeenCalledWith([]);
+    expect(setSelectedEntities).toHaveBeenCalledWith([]);
   });
 
   it('should display warning and not reset dashboards which could not be deleted', async () => {
@@ -75,10 +94,15 @@ describe('DashboardsOverview BulkActionsRow', () => {
       ],
     }));
 
-    const setSelectedDashboardIds = jest.fn();
+    const setSelectedEntities = jest.fn();
 
-    render(<BulkActions selectedDashboardIds={['dashboard-id-1', 'dashboard-id-2']}
-                        setSelectedDashboardIds={setSelectedDashboardIds} />);
+    asMock(useSelectedEntities).mockReturnValue({
+      ...useSelectedEntitiesResponse,
+      selectedEntities: ['dashboard-id-1', 'dashboard-id-2'],
+      setSelectedEntities,
+    });
+
+    render(<BulkActions />);
 
     await openActionsDropdown();
     await deleteDashboards();
@@ -92,6 +116,6 @@ describe('DashboardsOverview BulkActionsRow', () => {
     ));
 
     expect(UserNotification.error).toHaveBeenCalledWith('1 out of 2 selected dashboards could not be deleted.');
-    expect(setSelectedDashboardIds).toHaveBeenCalledWith(['dashboard-id-1']);
+    expect(setSelectedEntities).toHaveBeenCalledWith(['dashboard-id-1']);
   });
 });

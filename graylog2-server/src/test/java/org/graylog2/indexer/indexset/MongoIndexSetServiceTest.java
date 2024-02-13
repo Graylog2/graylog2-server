@@ -34,6 +34,8 @@ import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConf
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
+import org.graylog2.security.RestrictedChainingClassLoader;
+import org.graylog2.security.SafeClasses;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.plugins.ChainingClassLoader;
 import org.graylog2.streams.StreamService;
@@ -78,7 +80,9 @@ public class MongoIndexSetServiceTest {
     public void setUp() throws Exception {
         clusterEventBus = new ClusterEventBus();
         clusterConfigService = new ClusterConfigServiceImpl(objectMapperProvider, mongodb.mongoConnection(),
-                nodeId, new ChainingClassLoader(getClass().getClassLoader()), clusterEventBus);
+                nodeId, new RestrictedChainingClassLoader(
+                new ChainingClassLoader(getClass().getClassLoader()), SafeClasses.allGraylogInternal()),
+                clusterEventBus);
         indexSetService = new MongoIndexSetService(mongodb.mongoConnection(), objectMapperProvider, streamService, clusterConfigService, clusterEventBus);
     }
 

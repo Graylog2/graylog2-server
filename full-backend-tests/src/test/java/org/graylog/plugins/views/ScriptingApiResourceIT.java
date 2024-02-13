@@ -38,7 +38,8 @@ import org.joda.time.DateTime;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MediaType;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -56,7 +57,7 @@ import static org.graylog.testing.completebackend.Lifecycle.CLASS;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.hasEntry;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = CLASS, mongoVersions = MongodbServer.MONGO5,
+@ContainerMatrixTestsConfiguration(serverLifecycle = CLASS,
                                    searchVersions = {SearchServer.ES7, SearchServer.OS2},
                                    enabledFeatureFlags = ScriptingApiModule.FEATURE_FLAG)
 public class ScriptingApiResourceIT {

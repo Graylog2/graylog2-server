@@ -15,11 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
+import { fireEvent, render, screen, waitFor, waitForElementToBeRemoved } from 'wrappedTestingLibrary';
 import debounce from 'lodash/debounce';
 // eslint-disable-next-line no-restricted-imports
 import type { DebouncedFunc } from 'lodash';
-import { Form, Formik } from 'formik';
+import { Formik } from 'formik';
 
 import { StoreMock as MockStore, asMock } from 'helpers/mocking';
 import mockSearchClusterConfig from 'fixtures/searchClusterConfig';
@@ -52,9 +52,7 @@ jest.mock('stores/configurations/ConfigurationsStore', () => {
 describe('SaveTimeRangeAsPresetButton', () => {
   const SUT = ({ timeRange }: { timeRange: TimeRange }) => (
     <Formik initialValues={{ timeRangeTabs: { [timeRange.type]: timeRange }, activeTab: timeRange.type }} onSubmit={() => {}}>
-      <Form>
-        <SaveTimeRangeAsPresetButton />
-      </Form>
+      <SaveTimeRangeAsPresetButton />
     </Formik>
   );
 
@@ -98,7 +96,9 @@ describe('SaveTimeRangeAsPresetButton', () => {
 
     fireEvent.click(buttonIcon);
 
-    await expect(screen.queryByText('You already have similar time range in')).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByText('You already have similar time range in')).not.toBeInTheDocument();
+    });
   });
 
   it('shows alert about duplication when there is similar time range', async () => {
@@ -154,6 +154,8 @@ describe('SaveTimeRangeAsPresetButton', () => {
           ],
         },
       ));
+
+    await waitForElementToBeRemoved(submitButton);
   });
 
   it('not runs action to update config on submitting form when description is empty', async () => {

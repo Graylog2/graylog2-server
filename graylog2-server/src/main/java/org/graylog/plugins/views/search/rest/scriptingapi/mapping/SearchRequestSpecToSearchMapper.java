@@ -28,7 +28,8 @@ import org.graylog.plugins.views.search.rest.scriptingapi.request.SearchRequestS
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Function;
@@ -51,7 +52,7 @@ public class SearchRequestSpecToSearchMapper {
         return mapToSearch(messagesRequestSpec, searchUser, messageListCreator);
     }
 
-    public  Search mapToSearch(AggregationRequestSpec aggregationRequestSpec, SearchUser searchUser) {
+    public Search mapToSearch(AggregationRequestSpec aggregationRequestSpec, SearchUser searchUser) {
         return mapToSearch(aggregationRequestSpec, searchUser, pivotCreator);
     }
 

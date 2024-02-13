@@ -79,7 +79,7 @@ const ContentPacksPage = () => {
     <DocumentTitle title="Content Packs">
       <span>
         <PageHeader title="Content Packs"
-                    topActions={<Button bsStyle="info" active>Content Packs</Button>}
+                    topActions={<Button bsStyle="info">Content Packs</Button>}
                     actions={(
                       <ButtonToolbar>
                         <ContentPackUploadControls />

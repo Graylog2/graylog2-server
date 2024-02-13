@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useRef } from 'react';
 import styled, { css } from 'styled-components';
 
 import { ClipboardButton, Icon } from 'components/common';
@@ -58,7 +57,6 @@ type Props = {
 };
 
 const ShareableEntityURL = ({ entityGRN }: Props) => {
-  const container = useRef();
   const entityRoute = useShowRouteFromGRN(entityGRN);
   const entityUrl = `${window.location.origin.toString()}${entityRoute}`;
 
@@ -72,14 +70,9 @@ const ShareableEntityURL = ({ entityGRN }: Props) => {
           <InputGroup>
             <StyledFormControl type="text" value={entityUrl} readOnly />
             <InputGroupAddon>
-              <span ref={container}>
-                {container.current && (
-                  <StyledClipboardButton text={entityUrl}
-                                         container={container.current}
-                                         buttonTitle="Copy parameter to clipboard"
-                                         title={<Icon name="copy" fixedWidth />} />
-                )}
-              </span>
+              <StyledClipboardButton text={entityUrl}
+                                     buttonTitle="Copy parameter to clipboard"
+                                     title={<Icon name="copy" fixedWidth />} />
             </InputGroupAddon>
           </InputGroup>
         </FormGroup>

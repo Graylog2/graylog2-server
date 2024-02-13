@@ -28,11 +28,12 @@ import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.Response;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;

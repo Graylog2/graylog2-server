@@ -22,52 +22,95 @@ import org.graylog2.indexer.indexset.CustomFieldMappings;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indexset.MongoIndexSetService;
+import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile;
+import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
 import org.graylog2.rest.bulk.model.BulkOperationFailure;
 import org.graylog2.rest.bulk.model.BulkOperationResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.NotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.graylog2.plugin.Message.RESERVED_SETTABLE_FIELDS;
+import static org.graylog2.plugin.Message.FIELDS_UNCHANGEABLE_BY_CUSTOM_MAPPINGS;
 
 public class FieldTypeMappingsService {
 
     private static final Logger LOG = LoggerFactory.getLogger(FieldTypeMappingsService.class);
 
-    public static final Set<String> BLACKLISTED_FIELDS = RESERVED_SETTABLE_FIELDS;
-
     private final IndexSetService indexSetService;
     private final MongoIndexSet.Factory mongoIndexSetFactory;
     private final MongoIndexSetService mongoIndexSetService;
 
+    private final IndexFieldTypeProfileService profileService;
+
     @Inject
     public FieldTypeMappingsService(final IndexSetService indexSetService,
                                     final MongoIndexSet.Factory mongoIndexSetFactory,
-                                    final MongoIndexSetService mongoIndexSetService) {
+                                    final MongoIndexSetService mongoIndexSetService,
+                                    final IndexFieldTypeProfileService profileService) {
         this.indexSetService = indexSetService;
         this.mongoIndexSetFactory = mongoIndexSetFactory;
         this.mongoIndexSetService = mongoIndexSetService;
+        this.profileService = profileService;
     }
 
     public void changeFieldType(final CustomFieldMapping customMapping,
                                 final Set<String> indexSetsIds,
                                 final boolean rotateImmediately) {
-        if (BLACKLISTED_FIELDS.contains(customMapping.fieldName())) {
-            throw new IllegalArgumentException("Changing field type of " + customMapping.fieldName() + " is not allowed.");
-        }
+        checkFieldTypeCanBeChanged(customMapping.fieldName());
+        checkType(customMapping);
+
         for (String indexSetId : indexSetsIds) {
             try {
                 indexSetService.get(indexSetId).ifPresent(indexSetConfig -> {
                     var updatedIndexSetConfig = storeMapping(customMapping, indexSetConfig);
+                    if (rotateImmediately) {
+                        updatedIndexSetConfig.ifPresent(this::cycleIndexSet);
+                    }
+                });
+            } catch (Exception ex) {
+                LOG.error("Failed to update field type in index set : " + indexSetId, ex);
+                throw ex;
+            }
+        }
+    }
+
+    public void setProfile(final Set<String> indexSetsIds,
+                           final String profileId,
+                           final boolean rotateImmediately) {
+        checkProfile(profileId);
+        for (String indexSetId : indexSetsIds) {
+            try {
+                indexSetService.get(indexSetId).ifPresent(indexSetConfig -> {
+                    var updatedIndexSetConfig = setProfileForIndexSet(profileId, indexSetConfig);
+                    if (rotateImmediately) {
+                        updatedIndexSetConfig.ifPresent(this::cycleIndexSet);
+                    }
+                });
+            } catch (Exception ex) {
+                LOG.error("Failed to update field type in index set : " + indexSetId, ex);
+                throw ex;
+            }
+        }
+    }
+
+    public void removeProfileFromIndexSets(final Set<String> indexSetsIds,
+                                           final boolean rotateImmediately) {
+        for (String indexSetId : indexSetsIds) {
+            try {
+                indexSetService.get(indexSetId).ifPresent(indexSetConfig -> {
+                    var updatedIndexSetConfig = removeProfileFromIndexSet(indexSetConfig);
                     if (rotateImmediately) {
                         updatedIndexSetConfig.ifPresent(this::cycleIndexSet);
                     }
@@ -145,8 +188,53 @@ public class FieldTypeMappingsService {
         ));
     }
 
+    private Optional<IndexSetConfig> setProfileForIndexSet(final String profileId,
+                                                           final IndexSetConfig indexSetConfig) {
+        if (Objects.equals(indexSetConfig.fieldTypeProfile(), profileId)) {
+            return Optional.empty();
+        }
+        return Optional.of(mongoIndexSetService.save(
+                indexSetConfig.toBuilder()
+                        .fieldTypeProfile(profileId)
+                        .build()
+        ));
+    }
+
+    private Optional<IndexSetConfig> removeProfileFromIndexSet(final IndexSetConfig indexSetConfig) {
+        if (indexSetConfig.fieldTypeProfile() == null) {
+            return Optional.empty();
+        }
+        return Optional.of(mongoIndexSetService.save(
+                indexSetConfig.toBuilder()
+                        .fieldTypeProfile(null)
+                        .build()
+        ));
+    }
+
     private void cycleIndexSet(final IndexSetConfig indexSetConfig) {
         final MongoIndexSet mongoIndexSet = mongoIndexSetFactory.create(indexSetConfig);
         mongoIndexSet.cycle();
+    }
+
+    private void checkType(final CustomFieldMapping customMapping) {
+        var type = CustomFieldMappings.AVAILABLE_TYPES.get(customMapping.type());
+        if (type == null) {
+            throw new BadRequestException("Invalid type provided: " + customMapping.type() + " - available types: " + CustomFieldMappings.AVAILABLE_TYPES.keySet());
+        }
+    }
+
+    private void checkProfile(final String profileId) {
+        final Optional<IndexFieldTypeProfile> fieldTypeProfile = profileService.get(profileId);
+        if (fieldTypeProfile.isPresent()) {
+            fieldTypeProfile.get().customFieldMappings().forEach(mapping -> checkFieldTypeCanBeChanged(mapping.fieldName()));
+        } else {
+            throw new NotFoundException("No profile with id : " + profileId);
+        }
+    }
+
+    private void checkFieldTypeCanBeChanged(final String fieldName) {
+        if (FIELDS_UNCHANGEABLE_BY_CUSTOM_MAPPINGS.contains(fieldName)) {
+            throw new BadRequestException("Unable to change field type of " + fieldName + ", not allowed to change type of these fields: " + FIELDS_UNCHANGEABLE_BY_CUSTOM_MAPPINGS);
+        }
     }
 }

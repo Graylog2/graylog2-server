@@ -22,7 +22,8 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuil
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog2.indexer.counts.CountsAdapter;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.List;
 
 public class CountsAdapterES7 implements CountsAdapter {

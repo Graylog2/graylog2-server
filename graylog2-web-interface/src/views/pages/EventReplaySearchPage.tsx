@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 
 import useParams from 'routing/useParams';
 import useEventById from 'hooks/useEventById';
@@ -29,18 +29,21 @@ import EventInfoBar from 'components/event-definitions/replay-search/EventInfoBa
 import { createFromFetchError } from 'logic/errors/ReportedErrors';
 import ErrorsActions from 'actions/errors/ErrorsActions';
 import useCreateSearch from 'views/hooks/useCreateSearch';
+import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
 
 const EventView = () => {
   const { eventData, eventDefinition, aggregations } = useAlertAndEventDefinitionData();
   const _view = useCreateViewForEvent({ eventData, eventDefinition, aggregations });
   const view = useCreateSearch(_view);
+  const searchPageLayout = useMemo(() => ({
+    infoBar: { component: EventInfoBar },
+  }), []);
 
   return (
-    <SearchPage view={view}
-                isNew
-                SearchComponentSlots={{
-                  InfoBarSlot: EventInfoBar,
-                }} />
+    <SearchPageLayoutProvider value={searchPageLayout}>
+      <SearchPage view={view}
+                  isNew />
+    </SearchPageLayoutProvider>
   );
 };
 

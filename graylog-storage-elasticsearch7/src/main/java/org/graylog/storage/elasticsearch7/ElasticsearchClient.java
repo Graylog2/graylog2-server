@@ -18,6 +18,7 @@ package org.graylog.storage.elasticsearch7;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Streams;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import org.graylog.shaded.elasticsearch7.org.apache.http.ContentTooLongException;
@@ -39,8 +40,11 @@ import org.graylog2.indexer.MasterNotDiscoveredException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import javax.annotation.Nullable;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -57,15 +61,26 @@ public class ElasticsearchClient {
 
     private final RestHighLevelClient client;
     private final boolean compressionEnabled;
+    private final Optional<Integer> indexerMaxConcurrentSearches;
+    private final Optional<Integer> indexerMaxConcurrentShardRequests;
     private final ObjectMapper objectMapper;
 
     @Inject
     public ElasticsearchClient(RestHighLevelClient client,
                                @Named("elasticsearch_compression_enabled") boolean compressionEnabled,
+                               @Named("indexer_max_concurrent_searches") @Nullable Integer indexerMaxConcurrentSearches,
+                               @Named("indexer_max_concurrent_shard_requests") @Nullable Integer indexerMaxConcurrentShardRequests,
                                ObjectMapper objectMapper) {
         this.client = client;
         this.compressionEnabled = compressionEnabled;
+        this.indexerMaxConcurrentSearches = Optional.ofNullable(indexerMaxConcurrentSearches);
+        this.indexerMaxConcurrentShardRequests = Optional.ofNullable(indexerMaxConcurrentShardRequests);
         this.objectMapper = objectMapper;
+    }
+
+    @VisibleForTesting
+    public ElasticsearchClient(RestHighLevelClient client, ObjectMapper objectMapper) {
+        this(client, false, null, null, objectMapper);
     }
 
     public SearchResponse search(SearchRequest searchRequest, String errorMessage) {
@@ -83,6 +98,10 @@ public class ElasticsearchClient {
 
     public List<MultiSearchResponse.Item> msearch(List<SearchRequest> searchRequests, String errorMessage) {
         final MultiSearchRequest multiSearchRequest = new MultiSearchRequest();
+
+        indexerMaxConcurrentSearches.ifPresent(multiSearchRequest::maxConcurrentSearchRequests);
+        indexerMaxConcurrentShardRequests.ifPresent(maxShardRequests -> searchRequests
+                .forEach(request -> request.setMaxConcurrentShardRequests(maxShardRequests)));
 
         searchRequests.forEach(multiSearchRequest::add);
 

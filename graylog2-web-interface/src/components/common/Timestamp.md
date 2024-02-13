@@ -24,15 +24,19 @@ import { DATE_TIME_FORMATS } from 'util/DateTime';
 
 
 <table cellPadding="10">
-  <tr>
-    <th style={{ width: '150px' }}>Format</th>
-    <th>Output</th>
-  </tr>
-  {Object.keys(DATE_TIME_FORMATS).map((format) => (
+  <thead>
     <tr>
-      <td>{format}</td>
-      <td><Timestamp dateTime="2010-07-30T16:03:25.000Z" format={format}/></td>
+      <th style={{ width: '150px' }}>Format</th>
+      <th>Output</th>
     </tr>
-  ))}
+  </thead>
+  <tbody>
+    {Object.keys(DATE_TIME_FORMATS).map((format) => (
+      <tr key={format}>
+        <td>{format}</td>
+        <td><Timestamp dateTime="2010-07-30T16:03:25.000Z" format={format}/></td>
+      </tr>
+    ))}
+  </tbody>
 </table>
 ```

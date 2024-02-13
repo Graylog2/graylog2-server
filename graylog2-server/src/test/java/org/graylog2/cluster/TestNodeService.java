@@ -16,6 +16,7 @@
  */
 package org.graylog2.cluster;
 
+import org.graylog2.cluster.nodes.DataNodeStatus;
 import org.graylog2.plugin.system.NodeId;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -35,21 +36,11 @@ import java.util.stream.Collectors;
  */
 public class TestNodeService implements NodeService {
 
-    private final Node.Type type;
     private final List<Node> nodes = new LinkedList<>();
-
-    public TestNodeService(Node.Type type) {
-        this.type = type;
-    }
-
-    @Override
-    public Node.Type type() {
-        return type;
-    }
 
     @Override
     public boolean registerServer(String nodeId, boolean isLeader, URI httpPublishUri, String clusterUri, String hostname) {
-        return nodes.add(new NodeRecord(type, nodeId, isLeader, httpPublishUri.toString(), clusterUri, hostname, DateTime.now(DateTimeZone.UTC)));
+        return nodes.add(new NodeRecord(nodeId, isLeader, httpPublishUri.toString(), hostname, DateTime.now(DateTimeZone.UTC)));
     }
 
     @Override
@@ -68,14 +59,8 @@ public class TestNodeService implements NodeService {
     }
 
     @Override
-    public Map<String, Node> allActive(Node.Type type) {
-        return nodes.stream().filter(n -> n.getType().equals(type)).collect(Collectors.toMap(Node::getNodeId, Function.identity()));
-    }
-
-    @Deprecated
-    @Override
     public Map<String, Node> allActive() {
-        return allActive(type);
+        return nodes.stream().collect(Collectors.toMap(Node::getNodeId, Function.identity()));
     }
 
     @Override
@@ -83,22 +68,8 @@ public class TestNodeService implements NodeService {
         return nodes.stream().anyMatch(Node::isLeader);
     }
 
-    @Override
-    public boolean isOnlyLeader(NodeId nodeId) {
-        return nodes.stream().filter(n -> !Objects.equals(n.getNodeId(), nodeId.getNodeId())).noneMatch(Node::isLeader);
-    }
-
-    @Override
-    public void dropOutdated() {
-        throw new UnsupportedOperationException("Unsupported operation");
-    }
-
-    @Override
-    public void markAsAlive(NodeId node, boolean isLeader, URI restTransportAddress, String clusterAddress) {
-        throw new UnsupportedOperationException("Unsupported operation");
-    }
-
-    record NodeRecord(Type type, String nodeId, boolean isLeader, String transportAddress, String clusterAddress, String hostname, DateTime lastSeen) implements Node {
+    record NodeRecord(String nodeId, boolean isLeader, String transportAddress,
+                      String hostname, DateTime lastSeen) implements Node {
 
         @Override
         public String getNodeId() {
@@ -116,23 +87,14 @@ public class TestNodeService implements NodeService {
         }
 
         @Override
-        public String getClusterAddress() {
-            return clusterAddress;
-        }
-
-        @Override
         public DateTime getLastSeen() {
             return lastSeen;
-        }
-
-        @Override
-        public Type getType() {
-            return type;
         }
 
         @Override
         public String getHostname() {
             return hostname;
         }
+
     }
 }
