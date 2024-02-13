@@ -25,7 +25,6 @@ import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
@@ -250,7 +249,7 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
 
         //Empty buckets verification
         //We have only one entry with missing first name {(...)"lastName": "Cooper","age": 60(...)}, so both empty buckets will have the same values
-        validatableResponse.body(".rows.find{ it.key == ['" + MISSING_BUCKET_NAME + "'] }.values.value", hasItems(1, 60.0f));
+        validatableResponse.body(".rows.find{ it.key == ['" + MISSING_BUCKET_NAME + "', 'Cooper'] }.values.value", hasItems(1, 60.0f));
     }
 
     @ContainerMatrixTest
