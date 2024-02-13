@@ -19,17 +19,18 @@ import styled from 'styled-components';
 
 import { Col, Panel, PanelGroup } from 'components/bootstrap';
 import { MIGRATION_STATE, ROLLING_UPGRADE_MIGRATION_STEPS } from 'components/datanode/Constants';
-import type { MigrationActions, MigrationState } from 'components/datanode/Types';
+import type { MigrationActions, MigrationState, StepArgs } from 'components/datanode/Types';
 import Welcome from 'components/datanode/migrations/rollingUpgrade/Welcome';
 import CertificatesProvisioning from 'components/datanode/migrations/rollingUpgrade/CertificatesProvisioning';
 import JournalDowntimeWarning from 'components/datanode/migrations/rollingUpgrade/JournalDowntimeWarning';
-import ConnectionStringRemovalStep from 'components/datanode/migrations/ConnectionStringRemovalStep';
+// import ConnectionStringRemovalStep from 'components/datanode/migrations/ConnectionStringRemovalStep';
 import MigrateActions from 'components/datanode/migrations/rollingUpgrade/MigrateActions';
 import CompatibilityCheckStep from 'components/datanode/migrations/CompatibilityCheckStep';
+// import CompatibilityCheckStep from 'components/datanode/migrations/CompatibilityCheckStep';
 
 type Props = {
     currentStep: MigrationState,
-    onTriggerNextStep: (step:{step: MigrationActions}) => void,
+    onTriggerNextStep: (step: MigrationActions, args: StepArgs) => void,
 }
 const StyledTitle = styled.h3`
   margin-bottom: 10px;
@@ -61,40 +62,39 @@ const StyledPanelGroup = styled(PanelGroup)`
   }
 `;
 
-const MigrateExistingCluster = ({ currentStep, onTriggerNextStep }: Props) => {
+const RollingUpgradeMigration = ({ currentStep, onTriggerNextStep }: Props) => {
   const { next_steps: nextSteps, state: activeStep } = currentStep;
 
-  const onStepComplete = () => {
-    onTriggerNextStep({ step: nextSteps[0] });
+  const onStepComplete = (step: MigrationActions, args: StepArgs = {}) => {
+    onTriggerNextStep(step, args);
   };
 
   const steps = [
     {
       key: MIGRATION_STATE.ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE.key,
-      component: <Welcome onStepComplete={onStepComplete} />,
+      component: <Welcome nextSteps={nextSteps} onTriggerStep={onStepComplete} />,
     },
     {
       key: MIGRATION_STATE.DIRECTORY_COMPATIBILITY_CHECK_PAGE2.key,
-      component: <CompatibilityCheckStep onStepComplete={onStepComplete} canSkip={false} />,
+      component: <CompatibilityCheckStep nextSteps={nextSteps} onTriggerStep={onStepComplete} />,
     },
     {
       key: MIGRATION_STATE.PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES.key,
-      component: <CertificatesProvisioning onStepComplete={onStepComplete} />,
+      component: <CertificatesProvisioning nextSteps={nextSteps} onTriggerStep={onStepComplete} />,
+    },
+    {
+      key: MIGRATION_STATE.PROVISION_ROLLING_UPGRADE_NODES_RUNNING.key,
+      component: <CertificatesProvisioning nextSteps={nextSteps} onTriggerStep={onStepComplete} />,
     },
     {
       key: MIGRATION_STATE.JOURNAL_SIZE_DOWNTIME_WARNING.key,
-      component: <JournalDowntimeWarning onStepComplete={onStepComplete} />,
+      component: <JournalDowntimeWarning nextSteps={nextSteps} onTriggerStep={onStepComplete} />,
     },
     {
       key: MIGRATION_STATE.MESSAGE_PROCESSING_STOP_REPLACE_CLUSTER_AND_MP_RESTART.key,
-      component: <MigrateActions onStepComplete={onStepComplete} />,
-    },
-    {
-      key: MIGRATION_STATE.MANUALLY_REMOVE_OLD_CONNECTION_STRING_FROM_CONFIG.key,
-      component: <ConnectionStringRemovalStep onStepComplete={onStepComplete} />,
+      component: <MigrateActions nextSteps={nextSteps} onTriggerStep={onStepComplete} />,
     },
   ];
-  console.log(currentStep);
 
   return (
     <Col>
@@ -128,4 +128,4 @@ const MigrateExistingCluster = ({ currentStep, onTriggerNextStep }: Props) => {
   );
 };
 
-export default MigrateExistingCluster;
+export default RollingUpgradeMigration;

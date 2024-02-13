@@ -19,9 +19,9 @@ import * as React from 'react';
 
 import { Col, Input } from 'components/bootstrap';
 import { Select } from 'components/common';
-import MigrateExistingCluster from 'components/datanode/migrations/MigrateExistingCluster';
+import RollingUpgradeMigration from 'components/datanode/migrations/RollingUpgradeMigration';
 import useMigrationState from 'components/datanode/hooks/useMigrationState';
-import type { MigrationActions } from 'components/datanode/Types';
+import type { MigrationActions, StepArgs } from 'components/datanode/Types';
 import useTriggerMigrationState from 'components/datanode/hooks/useTriggerMigrationState';
 import {
   MIGRATION_STATE,
@@ -30,21 +30,21 @@ import {
 } from 'components/datanode/Constants';
 import RemoteReindexingMigration from 'components/datanode/migrations/RemoteReindexingMigration';
 
-type MigrationTypeSteps = Extract<MigrationActions, 'SELECT_ROLLING_UPGRADE_MIGRATION'|'SELECT_REMOTE_REINDEX_MIGRATION'>
-
 const ManualMigrationStep = () => {
   const migrationTypeOptions = [{ label: 'Rolling upgrade migration', value: 'SELECT_ROLLING_UPGRADE_MIGRATION' }, { label: 'Remote Re-indexing Migration', value: 'SELECT_REMOTE_REINDEX_MIGRATION' }];
   const { currentStep } = useMigrationState();
   const { onTriggerNextState } = useTriggerMigrationState();
 
-  const onMigrationStepChange = async (type: MigrationTypeSteps) => {
-    await onTriggerNextState({ step: type });
+  const onMigrationStepChange = (step: MigrationActions, args: StepArgs = {}) => {
+    onTriggerNextState({ step, args });
   };
+
+  console.log(currentStep);
 
   return (
     <>
       {currentStep?.state === MIGRATION_STATE.MIGRATION_SELECTION_PAGE.key && (
-        <Col md={8}>
+        <Col md={8} data-testid="datanode-migration-select">
           <form className="form form-horizontal" onSubmit={() => {}}>
             <Input id="datanode-migration-type-select"
                    label="Migration type"
@@ -55,6 +55,7 @@ const ManualMigrationStep = () => {
                    wrapperClassName="col-sm-9">
               <Select placeholder="Select migration type"
                       clearable={false}
+                      inputId="datanode-migration-type-select"
                       options={migrationTypeOptions}
                       matchProp="label"
                       onChange={onMigrationStepChange}
@@ -63,8 +64,8 @@ const ManualMigrationStep = () => {
           </form>
         </Col>
       )}
-      {(currentStep && ROLLING_UPGRADE_MIGRATION_STEPS.includes(currentStep.state)) && <MigrateExistingCluster onTriggerNextStep={onTriggerNextState} currentStep={currentStep} />}
-      {(currentStep && REMOTE_REINDEXING_MIGRATION_STEPS.includes(currentStep.state)) && <RemoteReindexingMigration onTriggerNextStep={() => onTriggerNextState({ step: currentStep.next_steps[0] })} />}
+      {(currentStep && ROLLING_UPGRADE_MIGRATION_STEPS.includes(currentStep.state)) && <RollingUpgradeMigration onTriggerNextStep={onMigrationStepChange} currentStep={currentStep} />}
+      {(currentStep && REMOTE_REINDEXING_MIGRATION_STEPS.includes(currentStep.state)) && <RemoteReindexingMigration onTriggerNextStep={onMigrationStepChange} currentStep={currentStep} />}
     </>
   );
 };

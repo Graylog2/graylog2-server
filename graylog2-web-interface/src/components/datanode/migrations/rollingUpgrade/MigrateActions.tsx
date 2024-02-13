@@ -16,16 +16,13 @@
  */
 import * as React from 'react';
 
-import { Button } from 'components/bootstrap';
+import MigrationStepTriggerButtonToolbar from 'components/datanode/migrations/common/MigrationStepTriggerButtonToolbar';
+import type { MigrationStepComponentProps } from 'components/datanode/Types';
 
-type Props = {
-  onStepComplete: () => void,
-};
-
-const MigrateActions = ({ onStepComplete }: Props) => (
+const MigrateActions = ({ nextSteps, onTriggerStep }: MigrationStepComponentProps) => (
   <>
     Migrations Steps
-    <Button bsStyle="primary" bsSize="small" onClick={() => onStepComplete()}>Next</Button>
+    <MigrationStepTriggerButtonToolbar nextSteps={nextSteps} onTriggerStep={onTriggerStep} />
   </>
 
 );

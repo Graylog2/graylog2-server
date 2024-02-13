@@ -17,18 +17,15 @@
 import * as React from 'react';
 
 import CAConfiguration from 'components/datanode/DataNodeConfiguration/CAConfiguration';
-import { Button } from 'components/bootstrap';
+import { Space } from 'preflight/components/common';
+import type { MigrationStepComponentProps } from 'components/datanode/Types';
+import MigrationStepTriggerButtonToolbar from 'components/datanode/migrations/common/MigrationStepTriggerButtonToolbar';
 
-type Props = {
-  onStepComplete: () => void,
-};
-
-const CaStep = ({ onStepComplete }: Props) => (
+const CaStep = ({ nextSteps, onTriggerStep }: MigrationStepComponentProps) => (
   <>
     <CAConfiguration />
-    <Button bsStyle="success" onClick={() => onStepComplete()}>
-      Next
-    </Button>
+    <Space h="xs" />
+    <MigrationStepTriggerButtonToolbar nextSteps={nextSteps} onTriggerStep={onTriggerStep} />
   </>
 );
 export default CaStep;

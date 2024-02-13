@@ -35,13 +35,13 @@ const MigrationDatanodeList = ({ dataNodes } : Props) => (
       <>
         <p><StyledIcon name="info-circle" />There are no data nodes found.</p>
         <Alert bsStyle="warning" title="No data nodes found">
-          Please start at least a datanode to continue the migration process. You can find more information on how to start a data nodes in our <DocumentationLink page="graylog-data-node" text="documentation" />.
+          Please start at least a data node to continue the migration process. You can find more information on how to start a data nodes in our <DocumentationLink page="graylog-data-node" text="documentation" />.
         </Alert>
         <p><Spinner text="Looking for data nodes..." /></p>
       </>
     ) : (
       <>
-        <h4>Datanodes found:</h4>
+        <h4>Data nodes found:</h4>
         <br />
         <Table bordered condensed striped hover>
           <thead>

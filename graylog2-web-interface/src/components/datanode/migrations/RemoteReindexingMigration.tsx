@@ -23,6 +23,7 @@ import {
   MIGRATION_STATE,
   REMOTE_REINDEXING_MIGRATION_STEPS,
 } from 'components/datanode/Constants';
+import type { MigrationActions, StepArgs, MigrationState } from 'components/datanode/Types';
 
 import Welcome from './remoteReindexing/Welcome';
 import CertificatesProvisioning from './remoteReindexing/CertificatesProvisioning';
@@ -60,7 +61,8 @@ const StyledPanelGroup = styled(PanelGroup)`
 `;
 
 type Props = {
-  onTriggerNextStep: () => void,
+  currentStep: MigrationState,
+  onTriggerNextStep: (step: MigrationActions, args: StepArgs) => void,
 }
 
 const RemoteReindexingMigration = ({ onTriggerNextStep }: Props) => {

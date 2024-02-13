@@ -17,18 +17,16 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
-import { Alert, Button } from 'components/bootstrap';
-
-type Props = {
-  onStepComplete: () => void,
-};
+import { Alert } from 'components/bootstrap';
+import type { MigrationStepComponentProps } from 'components/datanode/Types';
+import MigrationStepTriggerButtonToolbar from 'components/datanode/migrations/common/MigrationStepTriggerButtonToolbar';
 
 const DownsizeWarning = styled(Alert)`
   margin-top: 10px;
   margin-bottom: 5px;
 `;
 
-const JournalDowntimeWarning = ({ onStepComplete }: Props) => (
+const JournalDowntimeWarning = ({ nextSteps, onTriggerStep }: MigrationStepComponentProps) => (
   <>
     <DownsizeWarning bsStyle="danger">
       <h4>During the next step the journal size will increase because of stopping the processing.</h4>
@@ -40,7 +38,7 @@ const JournalDowntimeWarning = ({ onStepComplete }: Props) => (
       </ul>
       <p>Please increase you journal volume size before proceeding.</p>
     </DownsizeWarning>
-    <Button bsStyle="primary" bsSize="small" onClick={() => onStepComplete()}>Next</Button>
+    <MigrationStepTriggerButtonToolbar nextSteps={nextSteps} onTriggerStep={onTriggerStep} />
   </>
 );
 export default JournalDowntimeWarning;

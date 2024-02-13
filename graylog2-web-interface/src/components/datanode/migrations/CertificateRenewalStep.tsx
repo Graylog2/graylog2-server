@@ -16,18 +16,16 @@
  */
 import * as React from 'react';
 
-import { Button } from 'components/bootstrap';
 import CertificateRenewalPolicyConfig from 'components/datanode/DataNodeConfiguration/CertificateRenewalPolicyConfig';
+import { Space } from 'preflight/components/common';
+import type { MigrationStepComponentProps } from 'components/datanode/Types';
+import MigrationStepTriggerButtonToolbar from 'components/datanode/migrations/common/MigrationStepTriggerButtonToolbar';
 
-type Props = {
-  onStepComplete: () => void,
-};
-const CertificateRenewalStep = ({ onStepComplete }: Props) => (
+const CertificateRenewalStep = ({ nextSteps, onTriggerStep }: MigrationStepComponentProps) => (
   <>
     <CertificateRenewalPolicyConfig />
-    <Button bsStyle="success" onClick={() => onStepComplete()}>
-      Next
-    </Button>
+    <Space h="xs" />
+    <MigrationStepTriggerButtonToolbar nextSteps={nextSteps} onTriggerStep={onTriggerStep} />
   </>
 
 );

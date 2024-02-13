@@ -22,7 +22,7 @@ import CAStep from 'components/datanode/migrations/CAStep';
 import ManualMigrationStep from 'components/datanode/migrations/ManualMigrationStep';
 import { MIGRATION_STATE } from 'components/datanode/Constants';
 import useTriggerMigrationState from 'components/datanode/hooks/useTriggerMigrationState';
-import type { MigrationActions } from 'components/datanode/Types';
+import type { MigrationActions, StepArgs } from 'components/datanode/Types';
 import useMigrationWizardStep from 'components/datanode/hooks/useMigrationWizardStep';
 import MigrationWelcomeStep from 'components/datanode/migrations/MigrationWelcomeStep';
 import CertificateRenewalStep from 'components/datanode/migrations/CertificateRenewalStep';
@@ -38,33 +38,33 @@ const MigrationWizard = () => {
     return <Spinner text="Loading ..." />;
   }
 
-  const onWizardStepChange = (step: MigrationActions) => {
-    onTriggerNextState({ step, args: {} });
+  const onTriggerStep = (step: MigrationActions, args: StepArgs = {}) => {
+    onTriggerNextState({ step, args });
   };
 
   const { state: activeStep, next_steps: nextSteps } = currentStep;
+  console.log(currentStep);
 
   const steps = [
     {
       key: MIGRATION_STATE.MIGRATION_WELCOME_PAGE.key,
       title: MIGRATION_STATE.MIGRATION_WELCOME_PAGE.description,
-      component: <MigrationWelcomeStep onStepComplete={() => onWizardStepChange(nextSteps[0])}
-                                       onSkipCompatibilityCheck={() => onWizardStepChange(nextSteps[1])} />,
+      component: <MigrationWelcomeStep nextSteps={nextSteps} onTriggerStep={onTriggerStep} />,
     },
     {
       key: MIGRATION_STATE.DIRECTORY_COMPATIBILITY_CHECK_PAGE.key,
       title: MIGRATION_STATE.DIRECTORY_COMPATIBILITY_CHECK_PAGE.description,
-      component: <CompatibilityCheckStep onStepComplete={() => onWizardStepChange(nextSteps[0])} />,
+      component: <CompatibilityCheckStep nextSteps={nextSteps} onTriggerStep={onTriggerStep} />,
     },
     {
       key: MIGRATION_STATE.CA_CREATION_PAGE.key,
       title: MIGRATION_STATE.CA_CREATION_PAGE.description,
-      component: <CAStep onStepComplete={() => onWizardStepChange(nextSteps[0])} />,
+      component: <CAStep nextSteps={nextSteps} onTriggerStep={onTriggerStep} />,
     },
     {
       key: MIGRATION_STATE.RENEWAL_POLICY_CREATION_PAGE.key,
       title: MIGRATION_STATE.RENEWAL_POLICY_CREATION_PAGE.description,
-      component: <CertificateRenewalStep onStepComplete={() => onWizardStepChange(nextSteps[0])} />,
+      component: <CertificateRenewalStep nextSteps={nextSteps} onTriggerStep={onTriggerStep} />,
     },
     {
       key: MIGRATION_STATE.MIGRATION_SELECTION_PAGE.key,
@@ -74,12 +74,12 @@ const MigrationWizard = () => {
     {
       key: MIGRATION_STATE.ASK_TO_SHUTDOWN_OLD_CLUSTER.key,
       title: MIGRATION_STATE.ASK_TO_SHUTDOWN_OLD_CLUSTER.description,
-      component: <ShutdownClusterStep onStepComplete={() => onWizardStepChange(nextSteps[0])} />,
+      component: <ShutdownClusterStep nextSteps={nextSteps} onTriggerStep={onTriggerStep} />,
     },
     {
       key: MIGRATION_STATE.MANUALLY_REMOVE_OLD_CONNECTION_STRING_FROM_CONFIG.key,
       title: MIGRATION_STATE.MANUALLY_REMOVE_OLD_CONNECTION_STRING_FROM_CONFIG.description,
-      component: <ConnectionStringRemovalStep onStepComplete={() => onWizardStepChange(nextSteps[0])} />,
+      component: <ConnectionStringRemovalStep nextSteps={nextSteps} onTriggerStep={onTriggerStep} />,
     },
     {
       key: MIGRATION_STATE.FINISHED.key,

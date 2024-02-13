@@ -16,15 +16,13 @@
  */
 import * as React from 'react';
 
-import { Button } from 'components/bootstrap';
+import MigrationStepTriggerButtonToolbar from 'components/datanode/migrations/common/MigrationStepTriggerButtonToolbar';
+import type { MigrationStepComponentProps } from 'components/datanode/Types';
 
-type Props = {
-  onStepComplete: () => void,
-};
-const ShutdownClusterStep = ({ onStepComplete }: Props) => (
+const ShutdownClusterStep = ({ nextSteps, onTriggerStep }: MigrationStepComponentProps) => (
   <>
     <p>Please shut down you <code>Opensearch</code> before continuing. </p>
-    <Button bsStyle="success" onClick={() => onStepComplete()}>Next</Button>
+    <MigrationStepTriggerButtonToolbar nextSteps={nextSteps} onTriggerStep={onTriggerStep} />
   </>
 
 );

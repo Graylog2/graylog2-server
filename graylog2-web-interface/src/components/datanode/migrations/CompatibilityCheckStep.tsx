@@ -17,21 +17,19 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
-import { Alert, Button } from 'components/bootstrap';
+import { Alert } from 'components/bootstrap';
 import useCompatibilityCheck from 'components/datanode/hooks/useCompatibilityCheck';
 import { Spinner } from 'components/common';
 import CompatibilityStatus from 'components/datanode/migrations/CompatibilityStatus';
+import MigrationStepTriggerButtonToolbar from 'components/datanode/migrations/common/MigrationStepTriggerButtonToolbar';
+import type { MigrationStepComponentProps } from 'components/datanode/Types';
 
-type Props = {
-  onStepComplete: () => void,
-  canSkip?: boolean,
-};
 const CompatibilityAlert = styled(Alert)`
   margin-top: 10px;
   margin-bottom: 5px;
 `;
 
-const CompatibilityCheckStep = ({ onStepComplete, canSkip }: Props) => {
+const CompatibilityCheckStep = ({ nextSteps, onTriggerStep }: MigrationStepComponentProps) => {
   const { error: requestError, data, isInitialLoading, isError } = useCompatibilityCheck();
 
   if (isInitialLoading) {
@@ -61,9 +59,8 @@ const CompatibilityCheckStep = ({ onStepComplete, canSkip }: Props) => {
       </CompatibilityAlert>
       {!isCompatible && (<p>Your Opensearch cluster cannot be migrated to this datanode version because it&apos;s not compatible</p>)}
       {isCompatible && <CompatibilityStatus opensearchVersion={data.opensearch_version} nodeInfo={data.info} />}
-      <Button bsStyle="success" disabled={canSkip ? false : !isCompatible} onClick={() => onStepComplete()}>
-        Next
-      </Button>
+
+      <MigrationStepTriggerButtonToolbar nextSteps={nextSteps} onTriggerStep={onTriggerStep} />
     </>
   );
 };

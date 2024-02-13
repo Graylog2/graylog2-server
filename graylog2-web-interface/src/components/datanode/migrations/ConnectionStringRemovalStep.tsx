@@ -16,17 +16,14 @@
  */
 import * as React from 'react';
 
-import { Button } from 'components/bootstrap';
+import type { MigrationStepComponentProps } from 'components/datanode/Types';
+import MigrationStepTriggerButtonToolbar from 'components/datanode/migrations/common/MigrationStepTriggerButtonToolbar';
 
-type Props = {
-  onStepComplete: () => void,
-};
-
-const ConnectionStringRemovalStep = ({ onStepComplete }: Props) => (
+const ConnectionStringRemovalStep = ({ nextSteps, onTriggerStep }: MigrationStepComponentProps) => (
   <>
     <p>Please remove the <code>elasticsearch_hosts</code> line from you graylog</p>
     <p>Ex. <code>elasticsearch_hosts = https://admin:admin@opensearch1:9200,https://admin:admin@opensearch2:9200,https://admin:admin@opensearch3:9200</code></p>
-    <Button bsStyle="primary" bsSize="small" onClick={() => onStepComplete()}>Next</Button>
+    <MigrationStepTriggerButtonToolbar nextSteps={nextSteps} onTriggerStep={onTriggerStep} />
   </>
 );
 export default ConnectionStringRemovalStep;

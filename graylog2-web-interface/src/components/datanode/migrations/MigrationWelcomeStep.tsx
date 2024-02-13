@@ -17,15 +17,17 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { Button, Col, Row, Panel, ButtonToolbar } from 'components/bootstrap';
+import { Col, Row, Panel } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import { DocumentationLink } from 'components/support';
 import MigrationDatanodeList from 'components/datanode/migrations/MigrationDatanodeList';
 import useDataNodes from 'components/datanode/hooks/useDataNodes';
+import MigrationStepTriggerButtonToolbar from 'components/datanode/migrations/common/MigrationStepTriggerButtonToolbar';
+import type { MigrationActions, OnTriggerStepFunction } from 'components/datanode/Types';
 
 type Props = {
-  onStepComplete: () => void,
-  onSkipCompatibilityCheck: () => void,
+  nextSteps: Array<MigrationActions>,
+  onTriggerStep: OnTriggerStepFunction,
 };
 
 const Headline = styled.h2`
@@ -46,7 +48,7 @@ const StyledHelpPanel = styled(StyledPanel)`
   margin-top: 30px;
 `;
 
-const MigrationWelcomeStep = ({ onStepComplete, onSkipCompatibilityCheck }: Props) => {
+const MigrationWelcomeStep = ({ nextSteps, onTriggerStep }: Props) => {
   const { data: dataNodes } = useDataNodes();
 
   return (
@@ -59,14 +61,11 @@ const MigrationWelcomeStep = ({ onStepComplete, onSkipCompatibilityCheck }: Prop
         <p>
           Using this migration tool you can check the compatibility and follow the steps to migrate your exsisting Opensearch data to a Datanode.<br />
         </p>
-        <p>Migrating to datanode require some step the are performed using the UI in this wizard, but it also require some additional step that should be performed on the OS, you current OS/ES cluster and you config files</p>
+        <p>Migrating to data node require some step the are performed using the UI in this wizard, but it also require some additional step that should be performed on the OS, you current OS/ES cluster and you config files</p>
         <p>You can get more information on the Data node migration <DocumentationLink page="graylog-data-node" text="documentation" /></p>
         <br />
         <MigrationDatanodeList dataNodes={dataNodes} />
-        <ButtonToolbar>
-          <Button bsStyle="success" disabled={!dataNodes?.elements && dataNodes.elements.length > 0} onClick={() => onStepComplete()}>Check Compatibility</Button>
-          <Button bsStyle="success" onClick={() => onSkipCompatibilityCheck()}>Skip Compatibility check</Button>
-        </ButtonToolbar>
+        <MigrationStepTriggerButtonToolbar nextSteps={nextSteps} onTriggerStep={onTriggerStep} />
       </Col>
       <Col md={6}>
         <StyledHelpPanel bsStyle="info">
