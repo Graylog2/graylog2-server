@@ -19,7 +19,7 @@ import React from 'react';
 import type { RotateProp } from '@fortawesome/fontawesome-svg-core';
 import styled, { css } from 'styled-components';
 
-import type { IconName, SizeProp } from './types';
+import type { SizeProp, IconName } from './types';
 
 type IconTypes = 'brand' | 'regular' | 'solid';
 
