@@ -437,6 +437,11 @@
             <artifactId>rest-assured</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.graylog2</groupId>
@@ -445,6 +450,7 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
+
 
     </dependencies>
 

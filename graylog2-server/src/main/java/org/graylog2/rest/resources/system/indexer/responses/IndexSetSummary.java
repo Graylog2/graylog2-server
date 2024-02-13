@@ -20,6 +20,10 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.datatiering.DataTieringConfig;
 import org.graylog2.indexer.indexset.IndexSetConfig;
@@ -29,12 +33,6 @@ import org.graylog2.validation.SizeInBytes;
 import org.joda.time.Duration;
 
 import javax.annotation.Nullable;
-
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-
 import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.Optional;
@@ -74,7 +72,7 @@ public abstract class IndexSetSummary {
                                          @JsonProperty("index_template_type") @Nullable String templateType,
                                          @JsonProperty(FIELD_PROFILE_ID) @Nullable String fieldTypeProfile,
                                          @JsonProperty(FIELD_DATA_TIERING) @Nullable DataTieringConfig dataTiering,
-                                         @JsonProperty(FIELD_USE_LEGACY_ROTATION) Boolean userLegacyRotation) {
+                                         @JsonProperty(FIELD_USE_LEGACY_ROTATION) @Nullable Boolean useLegacyRotation) {
         if (Objects.isNull(creationDate)) {
             creationDate = ZonedDateTime.now();
         }
@@ -82,7 +80,7 @@ public abstract class IndexSetSummary {
                 isWritable, indexPrefix, shards, replicas,
                 rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate,
                 indexAnalyzer, indexOptimizationMaxNumSegments, indexOptimizationDisabled, fieldTypeRefreshInterval,
-                Optional.ofNullable(templateType), fieldTypeProfile, dataTiering, userLegacyRotation);
+                Optional.ofNullable(templateType), fieldTypeProfile, dataTiering, useLegacyRotation);
     }
 
     public static IndexSetSummary fromIndexSetConfig(IndexSetConfig indexSet, boolean isDefault) {
@@ -191,6 +189,7 @@ public abstract class IndexSetSummary {
     @JsonProperty(FIELD_DATA_TIERING)
     public abstract DataTieringConfig dataTiering();
 
+    @Nullable
     @JsonProperty(FIELD_USE_LEGACY_ROTATION)
     public abstract Boolean useLegacyRotation();
 
