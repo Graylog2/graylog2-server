@@ -21,7 +21,6 @@ import org.graylog.scheduler.eventbus.JobSchedulerEventBus;
 import org.graylog.scheduler.worker.JobWorkerPool;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -46,17 +45,21 @@ class JobExecutionEngineTest {
     @Mock
     private JobTriggerUpdates.Factory jobTriggerUpdatesFactory;
     @Mock
+    private RefreshingLockServiceFactory refreshingLockServiceFactory;
+    @Mock
     private Map<String, Job.Factory> jobFactory;
+    @Mock
+    private JobSchedulerConfig jobSchedulerConfig;
     @Mock
     private JobWorkerPool workerPool;
     @Spy
     private MetricRegistry metricRegistry = new MetricRegistry();
 
-    @InjectMocks
-    private JobExecutionEngine underTest;
-
     @Test
     void updateLockedJobsOnlyIfSomeJobWorkersRun() {
+        JobExecutionEngine underTest = new JobExecutionEngine(jobTriggerService, jobDefinitionService, eventBus, scheduleStrategies, jobTriggerUpdatesFactory,
+                refreshingLockServiceFactory, jobFactory, workerPool, jobSchedulerConfig, metricRegistry);
+
         underTest.updateLockedJobs();
         given(workerPool.anySlotsUsed()).willReturn(true);
         underTest.updateLockedJobs();
