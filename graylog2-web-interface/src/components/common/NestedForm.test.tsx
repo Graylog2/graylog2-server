@@ -56,4 +56,21 @@ describe('NestedForm', () => {
     expect(onSubmit).toHaveBeenCalledTimes(1);
     expect(onSubmitParentForm).not.toHaveBeenCalled();
   });
+
+  it('should not reset parent form', async () => {
+    const onResetParentForm = jest.fn();
+    const onReset = jest.fn();
+
+    render(
+      <form onSubmit={() => {}} onReset={onResetParentForm}>
+        <NestedForm onSubmit={() => {}} onReset={onReset}>
+          <input type="reset" />
+        </NestedForm>
+      </form>);
+
+    userEvent.click(await screen.findByRole('button', { name: /reset/i }));
+
+    expect(onReset).toHaveBeenCalledTimes(1);
+    expect(onResetParentForm).not.toHaveBeenCalled();
+  });
 });

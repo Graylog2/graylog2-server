@@ -18,8 +18,8 @@ import * as React from 'react';
 import { useCallback } from 'react';
 
 type Props = React.PropsWithChildren<{
-  onSubmit: (event: React.FormEvent<HTMLFormElement>) => void,
-  onReset?: () => void,
+  onSubmit: (event: React.FormEvent) => void,
+  onReset?: (event: React.FormEvent) => void,
 }>
 
 const NestedForm = ({ onSubmit, onReset, children }: Props) => {
@@ -29,9 +29,18 @@ const NestedForm = ({ onSubmit, onReset, children }: Props) => {
     onSubmit(e);
   }, [onSubmit]);
 
+  const handleReset = useCallback((e) => {
+    if (typeof onReset === 'function') {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    onReset(e);
+  }, [onReset]);
+
   return (
     <form onSubmitCapture={handleSubmit}
-          onResetCapture={onReset}>
+          onResetCapture={handleReset}>
       {children}
     </form>
   );
