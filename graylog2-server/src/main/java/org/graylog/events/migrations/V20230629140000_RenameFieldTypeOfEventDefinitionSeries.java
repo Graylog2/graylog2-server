@@ -103,7 +103,17 @@ public class V20230629140000_RenameFieldTypeOfEventDefinitionSeries extends Migr
                 s.remove("function");
 
                 if (s.containsKey("field") && s.get("field") == null
-                        && (s.get("type").equals("card") || s.get("type").equals("max") || s.get("type").equals("percentile"))) {
+                        && (s.get("type").equals("avg")
+                        || s.get("type").equals("card")
+                        || s.get("type").equals("latest")
+                        || s.get("type").equals("max")
+                        || s.get("type").equals("min")
+                        || s.get("type").equals("percentile")
+                        || s.get("type").equals("stddev")
+                        || s.get("type").equals("sum")
+                        || s.get("type").equals("sumofsquares")
+                        || s.get("type").equals("variance")
+                )) {
                     invalidSeries = true;
                 } else {
                     newSeries.add(s);
