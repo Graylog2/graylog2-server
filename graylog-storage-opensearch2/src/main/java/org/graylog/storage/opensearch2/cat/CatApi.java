@@ -28,6 +28,7 @@ import jakarta.inject.Inject;
 import org.graylog2.indexer.indices.ShardsInfo;
 
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -95,8 +96,18 @@ public class CatApi {
     }
 
     public List<ShardsInfo> getShardsInfo(String indexName) {
+        return requestShardsInfo(indexName).stream().map(jsonNode -> {
+            try {
+                return ShardsInfo.create(jsonNode);
+            } catch (UnknownHostException e) {
+                throw new RuntimeException(e);
+            }
+        }).toList();
+    }
+
+    private List<JsonNode> requestShardsInfo(String indexName) {
         final Request request = request("GET", "shards/" + indexName);
-        return perform(request, new TypeReference<List<ShardsInfo>>() {}, "Unable to retrieve index shards");
+        return perform(request, new TypeReference<List<JsonNode>>() {}, "Unable to retrieve index shards");
     }
 
     private JsonNode requestIndices(String indexName, String errorMessage) {

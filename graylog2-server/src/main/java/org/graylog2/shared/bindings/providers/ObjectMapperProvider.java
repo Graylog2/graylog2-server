@@ -131,7 +131,6 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
                 // Starting from Jackson 2.16, the default for INCLUDE_SOURCE_IN_LOCATION was changed to `disabled`.
                 // We are explicitly enabling it again to get verbose output that helps with troubleshooting.
                 .enable(JsonParser.Feature.INCLUDE_SOURCE_IN_LOCATION)
-                .enable(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE)
                 .setPropertyNamingStrategy(new PropertyNamingStrategies.SnakeCaseStrategy())
                 .setSubtypeResolver(subtypeResolver)
                 .setTypeFactory(typeFactory)
