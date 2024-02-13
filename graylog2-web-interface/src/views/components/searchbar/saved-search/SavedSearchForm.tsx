@@ -54,7 +54,7 @@ const SavedSearchForm = ({ children, show, isCreateNew, saveSearch, saveAsSearch
   const _saveAsSearch = useCallback(() => saveAsSearch(title), [saveAsSearch, title]);
 
   return (
-    <Popover position="left" opened={show} withArrow>
+    <Popover position="left" opened={show} withArrow withinPortal>
       <Popover.Target>
         {children}
       </Popover.Target>
