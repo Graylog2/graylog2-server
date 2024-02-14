@@ -31,6 +31,7 @@ import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.system.processing.control.ClusterProcessingControl;
 import org.graylog2.system.processing.control.ClusterProcessingControlFactory;
+import org.graylog2.system.processing.control.RemoteProcessingControlResource;
 
 import java.util.Map;
 
@@ -44,7 +45,6 @@ public class MigrationActionsImpl implements MigrationActions {
     private final DataNodeProvisioningService dataNodeProvisioningService;
 
     private MigrationStateMachineContext stateMachineContext;
-    private String authorizationToken;
 
     @Inject
     public MigrationActionsImpl(final ClusterConfigService clusterConfigService, NodeService<DataNodeDto> nodeService,
@@ -104,13 +104,15 @@ public class MigrationActionsImpl implements MigrationActions {
 
     @Override
     public void stopMessageProcessing() {
-        final ClusterProcessingControl control = clusterProcessingControlFactory.create(authorizationToken);
+        final String authToken = (String)stateMachineContext.getExtendedState(MigrationStateMachineContext.AUTH_TOKEN_KEY);
+        final ClusterProcessingControl<RemoteProcessingControlResource> control = clusterProcessingControlFactory.create(authToken);
         control.pauseProcessing();
     }
 
     @Override
     public void startMessageProcessing() {
-        final ClusterProcessingControl control = clusterProcessingControlFactory.create(authorizationToken);
+        final String authToken = (String)stateMachineContext.getExtendedState(MigrationStateMachineContext.AUTH_TOKEN_KEY);
+        final ClusterProcessingControl<RemoteProcessingControlResource> control = clusterProcessingControlFactory.create(authToken);
         control.resumeGraylogMessageProcessing();
     }
 
@@ -142,11 +144,6 @@ public class MigrationActionsImpl implements MigrationActions {
     @Override
     public boolean provisioningFinished() {
         return nodeService.allActive().values().stream().allMatch(node -> node.getDataNodeStatus() == DataNodeStatus.AVAILABLE);
-    }
-
-    @Override
-    public void setAuthorizationToken(String authorizationToken) {
-        this.authorizationToken = authorizationToken;
     }
 
     public void setStateMachineContext(MigrationStateMachineContext context) {

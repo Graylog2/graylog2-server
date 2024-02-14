@@ -32,6 +32,4 @@ public interface MigrationStateMachine {
     MigrationStateMachineContext getContext();
 
     String serialize();
-
-    void setAuthorizationToken(String authorizationToken);
 }

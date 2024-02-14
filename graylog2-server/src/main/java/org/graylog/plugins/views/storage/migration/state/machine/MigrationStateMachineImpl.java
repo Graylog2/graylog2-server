@@ -84,9 +84,4 @@ public class MigrationStateMachineImpl implements MigrationStateMachine {
             throw new RuntimeException("Failed to serialize state map", e);
         }
     }
-
-    @Override
-    public void setAuthorizationToken(String authenticationToken) {
-        migrationActions.setAuthorizationToken(authenticationToken);
-    }
 }

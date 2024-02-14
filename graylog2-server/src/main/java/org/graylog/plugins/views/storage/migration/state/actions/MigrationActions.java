@@ -49,8 +49,6 @@ public interface MigrationActions {
 
     void resetMigration();
 
-    void setAuthorizationToken(String authorizationToken);
-
     void setStateMachineContext(MigrationStateMachineContext context);
 
     MigrationStateMachineContext getStateMachineContext();
