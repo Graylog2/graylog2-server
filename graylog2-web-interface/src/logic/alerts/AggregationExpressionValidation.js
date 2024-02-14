@@ -50,12 +50,16 @@ const validateExpressionTree = (expression, series, validationTree = {}) => {
         return { message: 'Field must be set' };
       }
 
-      if ((selectedSeries?.type === 'percentile'
-        || selectedSeries?.type === 'max'
-        || selectedSeries?.type === 'card')
-        && !selectedSeries?.field) {
-        return { message: 'Field must be set' };
-      }
+      if (!selectedSeries?.field && (selectedSeries?.type === 'avg'
+          || selectedSeries?.type === 'card'
+          || selectedSeries?.type === 'latest'
+          || selectedSeries?.type === 'max'
+          || selectedSeries?.type === 'min'
+          || selectedSeries?.type === 'percentile'
+          || selectedSeries?.type === 'stddev'
+          || selectedSeries?.type === 'sum'
+          || selectedSeries?.type === 'sumofsquares'
+          || selectedSeries?.type === 'variance')) { return { message: 'Field must be set' }; }
 
       return (selectedSeries?.type ? {} : error);
       /* eslint-enable no-case-declarations */

@@ -46,7 +46,7 @@
           {
             "id" : "avg-",
             "type" : "avg",
-            "field" : null
+            "field" : "x"
           },
           {
             "id" : "percentage-nf_bytes",
