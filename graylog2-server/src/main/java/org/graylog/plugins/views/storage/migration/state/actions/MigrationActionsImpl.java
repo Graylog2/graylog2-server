@@ -106,13 +106,19 @@ public class MigrationActionsImpl implements MigrationActions {
     public void stopMessageProcessing() {
         final String authToken = (String)stateMachineContext.getExtendedState(MigrationStateMachineContext.AUTH_TOKEN_KEY);
         final ClusterProcessingControl<RemoteProcessingControlResource> control = clusterProcessingControlFactory.create(authToken);
+        LOG.info("Attempting to pause processing on all nodes...");
         control.pauseProcessing();
+        LOG.info("Done pausing processing on all nodes.");
+        LOG.info("Waiting for output buffer to drain on all nodes...");
+        control.waitForEmptyBuffers();
+        LOG.info("Done waiting for output buffer to drain on all nodes.");
     }
 
     @Override
     public void startMessageProcessing() {
         final String authToken = (String)stateMachineContext.getExtendedState(MigrationStateMachineContext.AUTH_TOKEN_KEY);
         final ClusterProcessingControl<RemoteProcessingControlResource> control = clusterProcessingControlFactory.create(authToken);
+        LOG.info("Resuming message processing.");
         control.resumeGraylogMessageProcessing();
     }
 
