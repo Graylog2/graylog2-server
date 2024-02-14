@@ -14,11 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 
 import { Col, Panel, PanelGroup } from 'components/bootstrap';
-import type { SelectCallback } from 'components/bootstrap/types';
 import {
   MIGRATION_STATE,
   REMOTE_REINDEXING_MIGRATION_STEPS,
@@ -66,8 +65,7 @@ type Props = {
 }
 
 const RemoteReindexingMigration = ({ currentStep, onTriggerNextStep }: Props) => {
-  const [activeStep, setActiveStep] = useState();
-  const { next_steps: nextSteps } = currentStep;
+  const { next_steps: nextSteps, state: activeStep } = currentStep;
 
   const onStepComplete = (step: MigrationActions, args: StepArgs = {}) => {
     onTriggerNextStep(step, args);
@@ -98,7 +96,7 @@ const RemoteReindexingMigration = ({ currentStep, onTriggerNextStep }: Props) =>
       <p>Follow these steps to migrate your existing migrating an existing OpenSearch 2.x or 1.3.x cluster to Data
         Node.
       </p>
-      <StyledPanelGroup accordion id="first" activeKey={activeStep} onSelect={setActiveStep as SelectCallback}>
+      <StyledPanelGroup accordion id="first" activeKey={activeStep}>
         {REMOTE_REINDEXING_MIGRATION_STEPS.map((remoteReindexingStep, index) => {
           const { description } = MIGRATION_STATE[remoteReindexingStep];
 

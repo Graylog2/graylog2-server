@@ -53,14 +53,14 @@ const ExistingDataMigrationQuestion = ({ nextSteps, onTriggerStep }: MigrationSt
         <Form role="form">
           <Input id="hostname"
                  name="hostname"
-                 label="Hostname"
+                 label="Cluster URI"
                  type="text"
                  value={values.hostname}
                  onChange={handleChange}
                  required />
           <Input id="user"
                  name="user"
-                 label="User"
+                 label="Username"
                  type="text"
                  value={values.user}
                  onChange={handleChange} />
@@ -77,8 +77,8 @@ const ExistingDataMigrationQuestion = ({ nextSteps, onTriggerStep }: MigrationSt
                     bsSize="small">
               {isSubmitting ? 'Submitting...' : 'Migrate Existing Data'}
             </Button>
-            <MigrationStepTriggerButtonToolbar nextSteps={nextSteps} onTriggerStep={onTriggerStep} />
           </ButtonToolbar>
+          <MigrationStepTriggerButtonToolbar nextSteps={nextSteps} onTriggerStep={onTriggerStep} />
         </Form>
       )}
     </Formik>
