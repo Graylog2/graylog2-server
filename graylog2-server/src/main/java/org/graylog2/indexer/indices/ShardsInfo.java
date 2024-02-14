@@ -21,22 +21,31 @@ import org.apache.commons.lang3.EnumUtils;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Locale;
+import java.util.function.Function;
 
 public record ShardsInfo(String index, int shard, ShardType shardType, State state, long docs, String store, InetAddress ip, String node ) {
 
     public static ShardsInfo create(JsonNode jsonNode) throws UnknownHostException {
 
         String index = jsonNode.get("index").asText();
-        String store = jsonNode.has("store") ? jsonNode.get("store").asText() : null;
-        String node = jsonNode.has("node") ? jsonNode.get("node").asText() : null;
-        InetAddress ip = jsonNode.has("ip") ? InetAddress.getByName(jsonNode.get("ip").asText()) : null;
         int shard =jsonNode.get("shard").asInt();
-        int docs = jsonNode.has("docs") ? jsonNode.get("docs").asInt() : 0;
+
+        String ipString = getValueOrDefault(jsonNode, "ip", JsonNode::asText, null);
+        InetAddress ip = ipString != null ? InetAddress.getByName(ipString) : null;
+
+        String store = getValueOrDefault(jsonNode, "store", JsonNode::asText, null);
+        String node = getValueOrDefault(jsonNode, "node", JsonNode::asText, null);
+        long docs = getValueOrDefault(jsonNode, "docs", JsonNode::asLong, 0L);
 
         State state = EnumUtils.getEnumIgnoreCase(State.class, jsonNode.get("state").asText(), State.UNKNOWN);
         ShardType shardType = ShardType.fromString(jsonNode.get("prirep").asText());
 
         return new ShardsInfo(index, shard, shardType, state, docs, store, ip, node);
+    }
+
+    private static <T> T getValueOrDefault(JsonNode jsonNode, String nodeName, Function<JsonNode, T> valueConverter, T defaultValue) {
+        return jsonNode.hasNonNull(nodeName) ? valueConverter.apply(jsonNode) :  defaultValue;
     }
 
     public enum State {
@@ -52,9 +61,9 @@ public record ShardsInfo(String index, int shard, ShardType shardType, State sta
         REPLICA,
         UNKNOWN;
         public static ShardType fromString(String value) {
-            return switch (value) {
-                case "R" -> REPLICA;
-                case "P" -> PRIMARY;
+            return switch (value.toLowerCase(Locale.ENGLISH)) {
+                case "r" -> REPLICA;
+                case "p" -> PRIMARY;
                 default -> UNKNOWN;
             };
         }
