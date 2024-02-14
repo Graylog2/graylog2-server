@@ -25,7 +25,8 @@ import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import org.graylog2.cluster.Node;
-import org.graylog2.cluster.NodeService;
+import org.graylog2.cluster.nodes.NodeService;
+import org.graylog2.cluster.nodes.ServerNodeDto;
 import org.graylog2.rest.RemoteInterfaceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,12 +57,12 @@ public class ClusterProcessingControl <F extends RemoteProcessingControlResource
 
     protected final String authorizationToken;
     protected final RemoteInterfaceProvider remoteInterfaceProvider;
-    protected final NodeService nodeService;
+    protected final NodeService<ServerNodeDto> nodeService;
     protected final Duration connectionTimeout;
     private final Duration bufferDrainInterval;
     private final int maxBufferDrainRetries;
 
-    public ClusterProcessingControl(String authorizationToken, RemoteInterfaceProvider remoteInterfaceProvider, NodeService nodeService, Duration connectionTimeout, Duration bufferDrainInterval, int maxBufferDrainRetries) {
+    public ClusterProcessingControl(String authorizationToken, RemoteInterfaceProvider remoteInterfaceProvider, NodeService<ServerNodeDto> nodeService, Duration connectionTimeout, Duration bufferDrainInterval, int maxBufferDrainRetries) {
         this.authorizationToken = authorizationToken;
         this.remoteInterfaceProvider = remoteInterfaceProvider;
         this.nodeService = nodeService;
@@ -120,7 +121,7 @@ public class ClusterProcessingControl <F extends RemoteProcessingControlResource
         return result;
     }
 
-    protected <R> Response<R> getrResponse(Function<F, Call<R>> callRemoteResource, Map.Entry<String, Node> entry) throws IOException {
+    protected <R> Response<R> getrResponse(Function<F, Call<R>> callRemoteResource, Map.Entry<String, ServerNodeDto> entry) throws IOException {
         var remoteProcessingControlResource = remoteInterfaceProvider.get(entry.getValue(),
                 this.authorizationToken, RemoteProcessingControlResource.class,
                 java.time.Duration.ofSeconds(connectionTimeout.toSeconds()));

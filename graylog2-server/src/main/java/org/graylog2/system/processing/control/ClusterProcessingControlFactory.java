@@ -19,7 +19,8 @@ package org.graylog2.system.processing.control;
 import com.github.joschi.jadconfig.util.Duration;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-import org.graylog2.cluster.NodeService;
+import org.graylog2.cluster.nodes.NodeService;
+import org.graylog2.cluster.nodes.ServerNodeDto;
 import org.graylog2.rest.RemoteInterfaceProvider;
 
 import static org.graylog2.Configuration.INSTALL_HTTP_CONNECTION_TIMEOUT;
@@ -28,14 +29,14 @@ import static org.graylog2.Configuration.INSTALL_OUTPUT_BUFFER_DRAINING_MAX_RETR
 
 public class ClusterProcessingControlFactory {
     protected final RemoteInterfaceProvider remoteInterfaceProvider;
-    protected final NodeService nodeService;
+    protected final NodeService<ServerNodeDto> nodeService;
     protected final Duration connectionTimeout;
     private final Duration bufferDrainInterval;
     private final int maxBufferDrainRetries;
 
     @Inject
     public ClusterProcessingControlFactory(final RemoteInterfaceProvider remoteInterfaceProvider,
-                                           final NodeService nodeService,
+                                           final NodeService<ServerNodeDto> nodeService,
                                            @Named(INSTALL_HTTP_CONNECTION_TIMEOUT) final Duration connectionTimeout,
                                            @Named(INSTALL_OUTPUT_BUFFER_DRAINING_INTERVAL) final Duration bufferDrainInterval,
                                            @Named(INSTALL_OUTPUT_BUFFER_DRAINING_MAX_RETRIES) final int maxBufferDrainRetries) {
