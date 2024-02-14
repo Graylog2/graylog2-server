@@ -73,7 +73,7 @@ public class MigrationStateResourceTest {
     @Test
     public void requestReturns500OnError() {
         CurrentStateInformation state =
-                new CurrentStateInformation(MigrationState.NEW, List.of(MigrationStep.SELECT_MIGRATION), "Error");
+                new CurrentStateInformation(MigrationState.NEW, List.of(MigrationStep.SELECT_MIGRATION), "Error", null);
         when(stateMachine.trigger(any(), anyMap())).thenReturn(state);
         try (Response response = migrationStateResource.migrate(new MigrationStepRequest(MigrationStep.SELECT_MIGRATION, Map.of()))) {
             assertThat(response.getStatus()).isEqualTo(500);

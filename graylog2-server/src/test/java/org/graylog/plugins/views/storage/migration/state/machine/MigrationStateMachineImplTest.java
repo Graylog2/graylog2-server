@@ -150,7 +150,7 @@ class MigrationStateMachineImplTest {
     private static class TestMigrationActions extends MigrationActionsImpl {
 
         public TestMigrationActions() {
-            super(null, null, null, null, null, null);
+            super(null, null, null, null, null, null, null);
         }
 
         public void runTestFunction(Consumer<MigrationStateMachineContext> testFunction) {

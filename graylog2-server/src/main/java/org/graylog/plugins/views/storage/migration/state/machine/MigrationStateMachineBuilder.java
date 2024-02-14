@@ -80,9 +80,16 @@ public class MigrationStateMachineBuilder {
                 .permit(MigrationStep.SHOW_MIGRATE_EXISTING_DATA, MigrationState.MIGRATE_EXISTING_DATA)
                 .permit(MigrationStep.SKIP_EXISTING_DATA_MIGRATION, MigrationState.ASK_TO_SHUTDOWN_OLD_CLUSTER);
 
-        config.configure(MigrationState.MIGRATE_EXISTING_DATA)
-                .onEntry(migrationActions::reindexOldData)
-                .permitIf(MigrationStep.SHOW_ASK_TO_SHUTDOWN_OLD_CLUSTER, MigrationState.ASK_TO_SHUTDOWN_OLD_CLUSTER, migrationActions::reindexingFinished);
+        // we now have enough information in the context to start the remote reindex migration. This will move us to the
+        // next state that will be active as long as the migration is running and will provide status information to the FE
+        config.configure(MigrationState.MIGRATE_EXISTING_DATA) // this state and screen has to request username, password and url of the old cluster
+                        .permit(MigrationStep.START_REMOTE_REINDEX_MIGRATION, MigrationState.REMOTE_REINDEX_RUNNING, migrationActions::startRemoteReindex);
+
+        // the state machine will stay in this state till the migration is finished or fails. It should provide
+        // current migration status every time we trigger MigrationStep.REQUEST_MIGRATION_STATUS.
+        config.configure(MigrationState.REMOTE_REINDEX_RUNNING)
+                .permitReentry(MigrationStep.REQUEST_MIGRATION_STATUS, migrationActions::requestMigrationStatus)
+                .permitIf(MigrationStep.SHOW_ASK_TO_SHUTDOWN_OLD_CLUSTER, MigrationState.ASK_TO_SHUTDOWN_OLD_CLUSTER, migrationActions::isRemoteReindexingFinished);
 
         config.configure(MigrationState.ASK_TO_SHUTDOWN_OLD_CLUSTER)
                 .permitIf(MigrationStep.CONFIRM_OLD_CLUSTER_STOPPED, MigrationState.MANUALLY_REMOVE_OLD_CONNECTION_STRING_FROM_CONFIG, migrationActions::isOldClusterStopped);

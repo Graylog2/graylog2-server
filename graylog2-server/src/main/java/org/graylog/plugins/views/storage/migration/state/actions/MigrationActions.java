@@ -32,7 +32,7 @@ public interface MigrationActions {
 
     void reindexUpgradeSelected();
 
-    boolean reindexingFinished();
+    boolean isRemoteReindexingFinished();
 
     void reindexOldData();
 
@@ -58,5 +58,9 @@ public interface MigrationActions {
     void setStateMachineContext(MigrationStateMachineContext context);
 
     MigrationStateMachineContext getStateMachineContext();
+
+    void startRemoteReindex();
+
+    void requestMigrationStatus();
 
 }

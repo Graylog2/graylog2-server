@@ -46,6 +46,16 @@ public class MigrationActionsAdapter implements MigrationActions {
     }
 
     @Override
+    public void startRemoteReindex() {
+
+    }
+
+    @Override
+    public void requestMigrationStatus() {
+
+    }
+
+    @Override
     public boolean runDirectoryCompatibilityCheck() {
         return false;
     }
@@ -71,7 +81,7 @@ public class MigrationActionsAdapter implements MigrationActions {
     }
 
     @Override
-    public boolean reindexingFinished() {
+    public boolean isRemoteReindexingFinished() {
         return false;
     }
 
