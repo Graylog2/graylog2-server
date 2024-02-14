@@ -188,7 +188,7 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     public Map<String, Object> getIndexMetaData(@Nonnull String index) {
         final GetMappingsRequest request = new GetMappingsRequest()
                 .indices(index)
-                .indicesOptions(IndicesOptions.fromOptions(true, true, true, false));
+                .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN);
 
         final GetMappingsResponse result = client.execute((c, requestOptions) -> c.indices().getMapping(request, requestOptions),
                 "Couldn't read mapping of index " + index);
@@ -221,7 +221,7 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     public Optional<DateTime> indexCreationDate(String index) {
         final GetSettingsRequest request = new GetSettingsRequest()
                 .indices(index)
-                .indicesOptions(IndicesOptions.fromOptions(true, true, true, false));
+                .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN);
 
         final GetSettingsResponse result = client.execute((c, requestOptions) -> c.indices().getSettings(request, requestOptions),
                 "Couldn't read settings of index " + index);
@@ -317,7 +317,7 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
 
     private GetSettingsResponse settingsFor(String indexOrAlias) {
         final GetSettingsRequest request = new GetSettingsRequest().indices(indexOrAlias)
-                .indicesOptions(IndicesOptions.fromOptions(true, true, true, true));
+                .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN_CLOSED);
         return client.execute((c, requestOptions) -> c.indices().getSettings(request, requestOptions),
                 "Unable to retrieve settings for index/alias " + indexOrAlias);
     }
@@ -576,7 +576,7 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     @Override
     public String getIndexId(String index) {
         final GetSettingsRequest request = new GetSettingsRequest().indices(index)
-                .indicesOptions(IndicesOptions.fromOptions(true, true, true, true));
+                .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN_CLOSED);
         final GetSettingsResponse response = client.execute((c, requestOptions) -> c.indices().getSettings(request, requestOptions),
                 "Unable to retrieve settings for index/alias " + index);
         return response.getSetting(index, "index.uuid");

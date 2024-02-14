@@ -238,7 +238,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                     return new SearchRequest()
                             .source(searchTypeQueries.get(searchTypeId))
                             .indices(indices.toArray(new String[0]))
-                            .indicesOptions(IndicesOptions.fromOptions(false, false, true, false));
+                            .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN);
                 })
                 .collect(Collectors.toList());
 

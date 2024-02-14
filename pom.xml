@@ -30,7 +30,7 @@
 
     <groupId>org.graylog</groupId>
     <artifactId>graylog-parent</artifactId>
-    <version>5.2.4-SNAPSHOT</version>
+    <version>5.2.5-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Graylog Parent POM</name>
@@ -753,6 +753,7 @@
                             com.google.inject.Singleton
                             com.google.inject.Provider
                             com.google.inject.name.Named
+                            jakarta.inject.**
                         ]]>
                     </signatures>
                 </configuration>

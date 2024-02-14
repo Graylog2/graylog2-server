@@ -29,6 +29,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -81,6 +82,23 @@ public abstract class MoreSearchAdapterIT extends ElasticsearchBaseTest {
     public void eventSearchReturnsNoMessagesIfTheyDoNotMatchQueryString() {
         final MoreSearch.Result result = toTest.eventSearch("message:moin", RelativeRange.allTime(), Set.of(INDEX_NAME), Sorting.DEFAULT, 1, 10, ALL_STREAMS, "", Set.of());
         assertThat(result.results()).isEmpty();
+    }
+
+    @Test
+    public void eventSearchNoExceptionIfIndexUnavailable() {
+        final MoreSearch.Result result = toTest.eventSearch("*", RelativeRange.allTime(), Set.of("unavailable"), Sorting.DEFAULT, 1, 10, ALL_STREAMS, "", Set.of());
+        assertThat(result.results()).isEmpty();
+    }
+
+    @Test
+    public void eventSearchPartiallyAvailable() {
+        int expectedNumberOfMessages = 7;
+
+        final MoreSearch.Result result = toTest.eventSearch("*", RelativeRange.allTime(), Set.of("unavailable", INDEX_NAME), Sorting.DEFAULT, 1, 10, ALL_STREAMS, "", Set.of());
+        assertThat(result.results()).hasSize(expectedNumberOfMessages);
+        for (int i = 0; i < expectedNumberOfMessages; i++) {
+            verifyResult(result, i, expectedNumberOfMessages - i);
+        }
     }
 
     @Test
@@ -167,6 +185,18 @@ public abstract class MoreSearchAdapterIT extends ElasticsearchBaseTest {
 
         assertThat(count).hasValue(0);
 
+        assertThat(allResults).isEmpty();
+    }
+
+    @Test
+    public void scrollEventsNoExceptionIfIndexUnavailable() throws Exception {
+        int expectedNumberOfMessages = 7;
+        int batchSize = 2;
+        final AtomicInteger count = new AtomicInteger(0);
+        final List<ResultMessage> allResults = new ArrayList<>(expectedNumberOfMessages);
+
+        toTest.scrollEvents("*", RelativeRange.allTime(), Set.of("unavailable"), ALL_STREAMS, batchSize,
+                getCountingAndCollectingScrollEventsCallback(count, allResults));
         assertThat(allResults).isEmpty();
     }
 

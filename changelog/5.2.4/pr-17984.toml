@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Propagate proxied request body to opensearch."
+
+pulls = ["17984"]

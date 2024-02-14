@@ -23,6 +23,7 @@ import com.github.joschi.jadconfig.Validator;
 import com.github.joschi.jadconfig.ValidatorMethod;
 import com.github.joschi.jadconfig.converters.IntegerConverter;
 import com.github.joschi.jadconfig.converters.StringListConverter;
+import com.github.joschi.jadconfig.converters.StringSetConverter;
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.jadconfig.validators.DirectoryPathReadableValidator;
 import com.github.joschi.jadconfig.validators.DirectoryPathWritableValidator;
@@ -33,6 +34,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.net.InetAddresses;
 import org.graylog.datanode.configuration.BaseConfiguration;
 import org.graylog.datanode.configuration.DatanodeDirectories;
+import org.graylog2.Configuration.SafeClassesValidator;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.SuppressForbidden;
 import org.joda.time.DateTimeZone;
@@ -52,6 +54,7 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Helper class to hold configuration of Graylog
@@ -212,6 +215,12 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "http_allow_embedding")
     private boolean httpAllowEmbedding = false;
 
+    /**
+     * Classes considered safe to load by name. A set of prefixes matched against the fully qualified class name.
+     */
+    @Parameter(value = org.graylog2.Configuration.SAFE_CLASSES, converter = StringSetConverter.class, validators = SafeClassesValidator.class)
+    private Set<String> safeClasses = Set.of("org.graylog.", "org.graylog2.");
+
     public boolean isInsecureStartup() {
         return insecureStartup;
     }
@@ -288,8 +297,8 @@ public class Configuration extends BaseConfiguration {
     @ValidatorMethod
     @SuppressWarnings("unused")
     public void validatePasswordSecret() throws ValidationException {
-        if (passwordSecret == null || passwordSecret.length() < 16) {
-            throw new ValidationException("The minimum length for \"password_secret\" is 16 characters.");
+        if (passwordSecret == null || passwordSecret.length() < 64) {
+            throw new ValidationException("The minimum length for \"password_secret\" is 64 characters.");
         }
     }
 
