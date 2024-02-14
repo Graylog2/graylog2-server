@@ -17,7 +17,6 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { DateUtils } from 'react-day-picker';
-import moment from 'moment';
 
 import { DatePicker } from 'components/common';
 import { toUTCFromTz, toDateObject } from 'util/DateTime';
@@ -40,7 +39,7 @@ const AbsoluteDatePicker = ({ dateTime, onChange, startDate }: Props) => {
     }
 
     const selectedDateObject = toDateObject(selectedDate);
-    const validInitialDateTime = initialDateTime.isValid() ? initialDateTime : moment().tz(userTimezone);
+    const validInitialDateTime = initialDateTime.isValid() ? initialDateTime : toUTCFromTz(undefined, userTimezone);
     const newDate = validInitialDateTime.set({
       year: selectedDateObject.year(),
       month: selectedDateObject.month(),
