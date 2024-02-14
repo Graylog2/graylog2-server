@@ -167,7 +167,7 @@
     "node-fetch": "^2.6.1",
     "puppeteer": "^21.0.3",
     "react-bootstrap": "0.33.1",
-    "style-loader": "3.3.3",
+    "style-loader": "3.3.4",
     "stylelint-config-graylog": "file:packages/stylelint-config-graylog",
     "trace-unhandled": "^2.0.1",
     "ts-node": "^10.2.1",
