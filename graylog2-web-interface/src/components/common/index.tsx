@@ -48,7 +48,6 @@ export { default as NoSearchResult } from './NoSearchResult';
 export { default as EnterprisePluginNotFound } from './EnterprisePluginNotFound';
 export { default as EntityList } from './EntityList';
 export { default as EntityListItem } from './EntityListItem';
-export { default as Error } from './Error';
 export { default as ErrorAlert } from './ErrorAlert';
 export { default as ExpandableList } from './ExpandableList';
 export { default as ExpandableListItem } from './ExpandableListItem';
