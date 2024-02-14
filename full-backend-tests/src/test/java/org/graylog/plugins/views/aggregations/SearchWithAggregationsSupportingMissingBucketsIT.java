@@ -250,7 +250,7 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
 
         //Empty buckets verification
         //We have only one entry with missing first name {(...)"lastName": "Cooper","age": 60(...)}, so both empty buckets will have the same values
-        validatableResponse.body(".rows.find{ it.key == ['" + MISSING_BUCKET_NAME + "'] }.values.value", hasItems(1, 60.0f));
+        validatableResponse.body(".rows.find{ it.key == ['" + MISSING_BUCKET_NAME + "', 'Cooper'] }.values.value", hasItems(1, 60.0f));
     }
 
     @ContainerMatrixTest
