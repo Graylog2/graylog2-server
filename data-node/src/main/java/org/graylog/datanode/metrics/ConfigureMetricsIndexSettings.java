@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.management.OpensearchProcess;
+import org.graylog.datanode.periodicals.MetricsCollector;
 import org.graylog.datanode.process.ProcessEvent;
 import org.graylog.datanode.process.ProcessState;
 import org.graylog.datanode.process.StateMachineTracer;
@@ -39,9 +40,11 @@ import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ConfigureMetricsIndexSettings implements StateMachineTracer {
 
@@ -86,6 +89,24 @@ public class ConfigureMetricsIndexSettings implements StateMachineTracer {
     private Map<String, Map<String, String>> createMappings() {
         Map<String, Map<String, String>> mappings = new HashMap<>();
         mappings.put("node", ImmutableMap.of("type", "keyword"));
+
+        mappings.putAll(MetricsCollector.getDatanodeMetrics());
+
+        mappings.putAll(
+                Arrays.stream(NodeStatMetrics.values()).collect(Collectors.toMap(
+                        NodeStatMetrics::getFieldName, metric -> ImmutableMap.of("type", metric.getMappingType())
+                ))
+        );
+        mappings.putAll(
+                Arrays.stream(ClusterStatMetrics.values()).collect(Collectors.toMap(
+                        ClusterStatMetrics::getFieldName, metric -> ImmutableMap.of("type", metric.getMappingType())
+                ))
+        );
+        mappings.putAll(
+                Arrays.stream(ClusterStatMetrics.values()).filter(ClusterStatMetrics::isRateMetric).collect(Collectors.toMap(
+                        ClusterStatMetrics::getRateFieldName, metric -> ImmutableMap.of("type", metric.getMappingType())
+                ))
+        );
         return mappings;
     }
 
@@ -117,6 +138,12 @@ public class ConfigureMetricsIndexSettings implements StateMachineTracer {
     }
 
     private Policy.State ismRollupState(String nextState, Configuration configuration) {
+        List<RollupAction.IsmRollup.Metric> rollupFields = Arrays.stream(NodeStatMetrics.values())
+                .map(metric -> new RollupAction.IsmRollup.Metric(metric.getFieldName(), ImmutableList.of(metric.getAggregationMetric())))
+                .collect(Collectors.toList());
+        rollupFields.addAll(Arrays.stream(ClusterStatMetrics.values())
+                .map(metric -> new RollupAction.IsmRollup.Metric(metric.getFieldName(), ImmutableList.of(metric.getAggregationMetric())))
+                .toList());
 
         final RollupAction.IsmRollup ismRollup = new RollupAction.IsmRollup(
                 configuration.getMetricsDailyIndex(),
@@ -127,12 +154,7 @@ public class ConfigureMetricsIndexSettings implements StateMachineTracer {
                                 configuration.getMetricsTimestamp(),
                                 "60m", "UTC")
                 ),
-                ImmutableList.of( //TODO dynamically rollup all configured metrics
-                        new RollupAction.IsmRollup.Metric(
-                                "jvm_heap",
-                                ImmutableList.of(new RollupAction.IsmRollup.AvgMetric())
-                        )
-                )
+                rollupFields
         );
         RollupAction rollupAction = new RollupAction(ismRollup);
         final List<Action> actions = ImmutableList.of(new Action(rollupAction));

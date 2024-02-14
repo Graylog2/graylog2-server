@@ -79,6 +79,7 @@ export { default as Markdown } from './Markdown';
 export { default as MessageDetailsDefinitionList } from './MessageDetailsDefinitionList';
 export { default as ModalSubmit } from './ModalSubmit';
 export { default as MultiSelect } from './MultiSelect';
+export { default as NestedForm } from './NestedForm';
 export { default as OverlayTrigger } from './OverlayTrigger';
 export { default as PageErrorOverview } from './PageErrorOverview';
 export { default as PageHeader } from './PageHeader';

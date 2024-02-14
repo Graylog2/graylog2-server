@@ -24,7 +24,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import AppConfig from 'util/AppConfig';
 import { FormikFormGroup, FormikInput, FormSubmit, Spinner, TimeUnitInput } from 'components/common';
-import useIndexDefaults from 'pages/useIndexDefaults';
+import useIndexDefaults from 'components/indices/hooks/useIndexDefaults';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import { Col, Row, Input, SegmentedControl } from 'components/bootstrap';
 import IndexMaintenanceStrategiesConfiguration from 'components/indices/IndexMaintenanceStrategiesConfiguration';
@@ -43,11 +43,12 @@ import IndexRetentionProvider from 'components/indices/contexts/IndexRetentionPr
 import useHistory from 'routing/useHistory';
 import IndexSetProfileConfiguration from 'components/indices/IndexSetProfileConfiguration';
 import useFeature from 'hooks/useFeature';
+import useIndexSet from 'components/indices/hooks/useIndexSet';
 
 type Props = {
   cancelLink: string,
   create?: boolean,
-  indexSet: IndexSet,
+  indexSet?: IndexSet,
   onUpdate: (indexSet: IndexSet) => void,
   retentionStrategies: Strategies,
   retentionStrategiesContext: RetentionStrategyContext,
@@ -175,7 +176,7 @@ const ReadOnlyConfig = () => {
 };
 
 const IndexSetConfigurationForm = ({
-  indexSet,
+  indexSet: initialIndexSet,
   rotationStrategies,
   retentionStrategies,
   retentionStrategiesContext,
@@ -186,16 +187,18 @@ const IndexSetConfigurationForm = ({
   submitLoadingText,
 } : Props) => {
   const history = useHistory();
-  const [indexSetState] = useState<IndexSet>(indexSet);
+
   const [fieldTypeRefreshIntervalUnit, setFieldTypeRefreshIntervalUnit] = useState<Unit>('seconds');
   const { loadingIndexDefaultsConfig, indexDefaultsConfig } = useIndexDefaults();
+  const [indexSet] = useIndexSet(initialIndexSet);
+
   const retentionConfigSegments: Array<{value: RetentionConfigSegment, label: string}> = [
     { value: 'data_tiering', label: 'Data Tiering' },
     { value: 'legacy', label: 'Legacy (Deprecated)' },
   ];
 
   const initialSegment = () : RetentionConfigSegment => {
-    if (indexSet.use_legacy_rotation) return 'legacy';
+    if (indexSet?.use_legacy_rotation) return 'legacy';
 
     return 'data_tiering';
   };
@@ -204,7 +207,7 @@ const IndexSetConfigurationForm = ({
 
   const prepareRetentionConfigBeforeSubmit = useCallback((values: IndexSetFormValues) : IndexSet => {
     if (selectedRetentionSegment === 'legacy') {
-      return { ...values, data_tiering: undefined, use_legacy_rotation: true };
+      return { ...values, data_tiering: indexDefaultsConfig.data_tiering, use_legacy_rotation: true };
     }
 
     const configWithDataTiering = prepareDataTieringConfig(values, PluginStore);
@@ -234,6 +237,10 @@ const IndexSetConfigurationForm = ({
     setFieldTypeRefreshIntervalUnit(unit);
   };
 
+  const enableDataTieringCloud = useFeature('data_tiering_cloud');
+
+  if (!indexSet) return null;
+
   const {
     rotation_strategy: indexSetRotationStrategy,
     rotation_strategy_class: indexSetRotationStrategyClass,
@@ -244,12 +251,14 @@ const IndexSetConfigurationForm = ({
   const onCancel = () => history.push(cancelLink);
 
   const isCloud = AppConfig.isCloud();
-  const enableDataTieringCloud = useFeature('data_tiering_cloud');
+
+  if (loadingIndexDefaultsConfig) return (<Spinner />);
 
   return (
     <Row>
       <Col md={8}>
         <Formik onSubmit={saveConfiguration}
+                enableReinitialize
                 initialValues={prepareDataTieringInitialValues(indexSet)}>
           {({ isValid, setFieldValue, isSubmitting, values }) => (
             <IndexRetentionProvider>
@@ -318,8 +327,8 @@ const IndexSetConfigurationForm = ({
                 </Row>
                 {isCloud && !enableDataTieringCloud ? (
                   <>
-                    {indexSetState.writable && <RotationStrategies rotationStrategies={rotationStrategies} indexSetRotationStrategy={indexSetRotationStrategy} indexSetRotationStrategyClass={indexSetRotationStrategyClass} />}
-                    {indexSetState.writable && <RetentionConfig retentionStrategies={retentionStrategies} retentionStrategiesContext={retentionStrategiesContext} indexSetRetentionStrategy={indexSetRetentionStrategy} IndexSetRetentionStrategyClass={IndexSetRetentionStrategyClass} />}
+                    {indexSet.writable && <RotationStrategies rotationStrategies={rotationStrategies} indexSetRotationStrategy={indexSetRotationStrategy} indexSetRotationStrategyClass={indexSetRotationStrategyClass} />}
+                    {indexSet.writable && <RetentionConfig retentionStrategies={retentionStrategies} retentionStrategiesContext={retentionStrategiesContext} indexSetRetentionStrategy={indexSetRetentionStrategy} IndexSetRetentionStrategyClass={IndexSetRetentionStrategyClass} />}
                   </>
                 ) : (
                   <>
@@ -341,8 +350,8 @@ const IndexSetConfigurationForm = ({
                     )
                       : (
                         <ConfigSegment>
-                          {indexSetState.writable && <RotationStrategies rotationStrategies={rotationStrategies} indexSetRotationStrategy={indexSetRotationStrategy} indexSetRotationStrategyClass={indexSetRotationStrategyClass} />}
-                          {indexSetState.writable && <RetentionConfig retentionStrategies={retentionStrategies} retentionStrategiesContext={retentionStrategiesContext} indexSetRetentionStrategy={indexSetRetentionStrategy} IndexSetRetentionStrategyClass={IndexSetRetentionStrategyClass} />}
+                          {indexSet.writable && <RotationStrategies rotationStrategies={rotationStrategies} indexSetRotationStrategy={indexSetRotationStrategy} indexSetRotationStrategyClass={indexSetRotationStrategyClass} />}
+                          {indexSet.writable && <RetentionConfig retentionStrategies={retentionStrategies} retentionStrategiesContext={retentionStrategiesContext} indexSetRetentionStrategy={indexSetRetentionStrategy} IndexSetRetentionStrategyClass={IndexSetRetentionStrategyClass} />}
                         </ConfigSegment>
                       )}
 
@@ -379,7 +388,7 @@ const IndexSetConfigurationForm = ({
 };
 
 IndexSetConfigurationForm.propTypes = {
-  indexSet: IndexSetPropType.isRequired,
+  indexSet: IndexSetPropType,
   rotationStrategies: PropTypes.array.isRequired,
   retentionStrategies: PropTypes.array.isRequired,
   retentionStrategiesContext: PropTypes.shape({
@@ -394,6 +403,7 @@ IndexSetConfigurationForm.propTypes = {
 
 IndexSetConfigurationForm.defaultProps = {
   create: false,
+  indexSet: undefined,
 };
 
 export default IndexSetConfigurationForm;

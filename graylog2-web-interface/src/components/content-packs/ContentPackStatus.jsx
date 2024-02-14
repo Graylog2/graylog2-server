@@ -18,11 +18,11 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { StyledBadge } from 'components/bootstrap/Badge';
+import Badge from 'components/bootstrap/Badge';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 
-const StatusBadge = styled(StyledBadge)(({ status, theme }) => {
+const StatusBadge = styled(Badge)(({ status, theme }) => {
   const { success, info, warning, danger } = theme.colors.variant.dark;
   const statuses = {
     installed: success,

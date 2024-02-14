@@ -33,7 +33,10 @@ export const isExistsOperator = (token: Token | undefined) => isTypeKeyword(toke
 
 export const isCompleteFieldName = (token: Token | undefined) => !!(isTypeKeyword(token) && token?.value.endsWith(':'));
 
-export const isSpace = (currentToken: Token | undefined) => isTypeText(currentToken) && currentToken?.value === ' ';
+export const isSpace = (token: Token | undefined) => isTypeText(token) && token?.value === ' ';
+
+export const isLeftParen = (token: Token | undefined) => token?.type === 'paren.lparen';
+export const isRightParen = (token: Token | undefined) => token?.type === 'paren.rparen';
 
 export const getFieldNameForFieldValueInBrackets = (tokens: Array<Token>, currentTokenIndex: number) => {
   if (!tokens?.length) {
@@ -43,7 +46,7 @@ export const getFieldNameForFieldValueInBrackets = (tokens: Array<Token>, curren
   const currentToken = tokens[currentTokenIndex];
   const prevToken = tokens[currentTokenIndex - 1] ?? null;
 
-  if (prevToken?.type === 'keyword' && prevToken?.value.endsWith(':') && currentToken.type === 'paren.lparen') {
+  if (prevToken?.type === 'keyword' && prevToken?.value.endsWith(':') && isLeftParen(currentToken)) {
     return removeFinalColon(prevToken.value);
   }
 
@@ -52,15 +55,15 @@ export const getFieldNameForFieldValueInBrackets = (tokens: Array<Token>, curren
   let closingBracketsCount = 0;
 
   for (let i = 0; i < currentTokenIndex; i += 1) {
-    if (tokens[i].type === 'keyword' && tokens[i].value.endsWith(':') && tokens[i + 1].type === 'paren.lparen') {
+    if (tokens[i].type === 'keyword' && tokens[i].value.endsWith(':') && isLeftParen(tokens[i + 1])) {
       fieldNameIndex = i;
     }
 
-    if (fieldNameIndex !== null && tokens[i].type === 'paren.lparen') {
+    if (fieldNameIndex !== null && isLeftParen(tokens[i])) {
       openingBracketsCount += 1;
     }
 
-    if (fieldNameIndex !== null && tokens[i].type === 'paren.rparen') {
+    if (fieldNameIndex !== null && isRightParen(tokens[i])) {
       closingBracketsCount += 1;
     }
 

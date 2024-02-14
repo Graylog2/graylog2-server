@@ -21,6 +21,7 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Projections;
 import jakarta.inject.Inject;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.MongoIndexSetService;
@@ -45,6 +46,9 @@ public class IndexFieldTypeProfileUsagesService {
     }
 
     public Set<String> usagesOfProfile(final String profileId) {
+        if (!ObjectId.isValid(profileId)) {
+            return Set.of();
+        }
         Set<String> usagesInIndexSet = new HashSet<>();
         indexSetsCollection
                 .find(Filters.eq(IndexSetConfig.FIELD_PROFILE_ID, profileId))
@@ -58,7 +62,10 @@ public class IndexFieldTypeProfileUsagesService {
         Map<String, Set<String>> usagesInIndexSet = new HashMap<>();
         profilesIds.forEach(profId -> usagesInIndexSet.put(profId, new HashSet<>()));
         indexSetsCollection
-                .find(Filters.in(IndexSetConfig.FIELD_PROFILE_ID, profilesIds))
+                .find(Filters.in(IndexSetConfig.FIELD_PROFILE_ID,
+                        profilesIds.stream()
+                                .filter(ObjectId::isValid)
+                                .toList()))
                 .projection(Projections.include(INDEX_SET_ID, IndexSetConfig.FIELD_PROFILE_ID))
                 .forEach(document -> {
                     final String indexSetId = document.getObjectId(INDEX_SET_ID).toString();

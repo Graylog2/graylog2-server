@@ -1,0 +1,11 @@
+type = "changed"
+message = "Remove dependency to Mongojack 2"
+
+pulls = ["18016"]
+
+details.user = """
+The Java dependency on the Mongojack 2 library was removed and replaced with a
+compatibility layer. Plugins that interact with MongoDB might need to be
+modified if they use Mongojack functionality that is not commonly used
+throughout the Graylog core code base.
+"""
