@@ -32,11 +32,14 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.system.processing.control.ClusterProcessingControl;
 import org.graylog2.system.processing.control.ClusterProcessingControlFactory;
 import org.graylog2.system.processing.control.RemoteProcessingControlResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
 @Singleton
 public class MigrationActionsImpl implements MigrationActions {
+    private static final Logger LOG = LoggerFactory.getLogger(MigrationActionsImpl.class);
 
     private final ClusterConfigService clusterConfigService;
     private final ClusterProcessingControlFactory clusterProcessingControlFactory;
