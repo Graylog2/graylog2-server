@@ -17,21 +17,14 @@
 package org.graylog2.indexer.cluster;
 
 import com.github.joschi.jadconfig.util.Duration;
-import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
-import org.graylog2.audit.NullAuditEventSender;
-import org.graylog2.indexer.IndexMappingFactory;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.cluster.health.ClusterAllocationDiskSettings;
 import org.graylog2.indexer.cluster.health.NodeDiskUsageStats;
 import org.graylog2.indexer.cluster.health.NodeFileDescriptorStats;
 import org.graylog2.indexer.cluster.health.WatermarkSettings;
-import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
 import org.graylog2.indexer.indices.HealthStatus;
-import org.graylog2.indexer.indices.Indices;
-import org.graylog2.indexer.indices.ShardsInfo;
-import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.rest.models.system.indexer.responses.ClusterHealth;
 import org.junit.Before;
 import org.junit.Rule;
@@ -40,7 +33,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Executors;
@@ -58,15 +50,8 @@ public abstract class ClusterIT extends ElasticsearchBaseTest {
 
     @Mock
     private IndexSetRegistry indexSetRegistry;
-    @Mock
-    private IndexMappingFactory indexMappingFactory;
-    @Mock
-    private EventBus eventBus;
-    @Mock
-    private IndexFieldTypeProfileService indexFieldTypeProfileService;
 
     protected Cluster cluster;
-    protected Indices indices;
 
     protected abstract ClusterAdapter clusterAdapter(Duration timeout);
 
@@ -85,12 +70,6 @@ public abstract class ClusterIT extends ElasticsearchBaseTest {
         );
         final Duration requestTimeout = Duration.seconds(1L);
         cluster = new Cluster(indexSetRegistry, scheduler, requestTimeout, clusterAdapter(requestTimeout));
-        indices = new Indices(indexMappingFactory,
-                new SimpleNodeId("123456"),
-                new NullAuditEventSender(),
-                eventBus,
-                searchServer().adapters().indicesAdapter(),
-                indexFieldTypeProfileService);
     }
 
     @Test
@@ -246,20 +225,5 @@ public abstract class ClusterIT extends ElasticsearchBaseTest {
         assertThat(clusterAllocationDiskSettings.watermarkSettings().low()).isEqualTo(85D);
         assertThat(clusterAllocationDiskSettings.watermarkSettings().high()).isEqualTo(90D);
         assertThat(clusterAllocationDiskSettings.watermarkSettings().floodStage()).isEqualTo(95D);
-    }
-
-    @Test
-    public void getIndexShardsInfo() {
-        client().createIndex("1shard1replica", 1, 1);
-        List<ShardsInfo> shardsInfo = indices.getShardsInfo("1shard1replica");
-        assertThat(shardsInfo.size()).isEqualTo(2);
-        assertThat(shardsInfo.stream()
-                .filter(info -> info.shardType() == ShardsInfo.ShardType.PRIMARY)
-                .findFirst())
-                .isNotEmpty();
-        assertThat(shardsInfo.stream()
-                .filter(info -> info.shardType() == ShardsInfo.ShardType.REPLICA)
-                .findFirst())
-                .isNotEmpty();
     }
 }
