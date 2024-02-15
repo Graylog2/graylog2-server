@@ -26,6 +26,8 @@ import java.util.Objects;
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.PROTECTED_AND_PUBLIC)
 public class MigrationStateMachineContext {
 
+    public static final String AUTH_TOKEN_KEY = "authToken";
+
     @JsonProperty
     protected MigrationStep currentStep;
     @JsonProperty

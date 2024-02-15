@@ -46,6 +46,9 @@
         "type" : "date",
         "format" : "uuuu-MM-dd HH:mm:ss.SSS"
       },
+      "gl2_processing_duration_ms": {
+        "type": "integer"
+      },
       "gl2_message_id" : {
         "type" : "keyword"
       },

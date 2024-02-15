@@ -121,15 +121,13 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
 
             final Stream<PivotBucket> bucketStream = extractTermsBuckets(previousKeys, reorderKeys, termsAggregation, values.skipEmptyValues());
 
-            return otherBucket.getDocCount() > 0
-                    ? Stream.concat(bucketStream, Stream.of(PivotBucket.create(
-                    ImmutableList.<String>builder()
-                            .addAll(previousKeys)
-                            .addAll(MISSING_BUCKET_KEYS)
-                            .build(),
-                    otherBucket
-            )))
-                    : bucketStream;
+            if (otherBucket.getDocCount() > 0) {
+                final MultiBucketsAggregation otherTermsAggregations = otherBucket.getAggregations().get(AGG_NAME);
+                final var otherStream = extractTermsBuckets(previousKeys, reorderKeys, otherTermsAggregations, values.skipEmptyValues());
+                return Stream.concat(bucketStream, otherStream);
+            } else {
+                return bucketStream;
+            }
         }
     }
 

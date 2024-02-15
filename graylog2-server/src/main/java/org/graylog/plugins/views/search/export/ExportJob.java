@@ -20,8 +20,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.joda.time.DateTime;
+import org.mongojack.Id;
+import org.mongojack.ObjectId;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = ExportJob.FIELD_TYPE)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = ExportJob.FIELD_TYPE)
 @JsonSubTypes({
         @JsonSubTypes.Type(value = MessagesRequestExportJob.class, name = MessagesRequestExportJob.TYPE),
         @JsonSubTypes.Type(value = SearchExportJob.class, name = SearchExportJob.TYPE),
@@ -31,6 +33,10 @@ public interface ExportJob {
     String FIELD_TYPE = "type";
     String FIELD_ID = "_id";
     String FIELD_CREATED_AT = "created_at";
+
+    @Id
+    @ObjectId
+    @JsonProperty(FIELD_ID)
     String id();
 
     @JsonProperty
