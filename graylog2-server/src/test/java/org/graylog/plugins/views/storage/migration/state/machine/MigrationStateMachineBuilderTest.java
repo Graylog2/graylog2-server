@@ -146,11 +146,11 @@ public class MigrationStateMachineBuilderTest {
         verify(migrationActions, times(1)).provisionDataNodes();
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.PROVISION_DATANODE_CERTIFICATES_RUNNING);
         assertThat(stateMachine.getPermittedTriggers()).isEmpty();
-        verify(migrationActions, times(1)).provisioningFinished();
+        verify(migrationActions, times(1)).dataNodeStartupFinished();
         reset(migrationActions);
-        when(migrationActions.provisioningFinished()).thenReturn(true);
+        when(migrationActions.dataNodeStartupFinished()).thenReturn(true);
         assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SHOW_DATA_MIGRATION_QUESTION);
-        verify(migrationActions, times(1)).provisioningFinished();
+        verify(migrationActions, times(1)).dataNodeStartupFinished();
         verifyNoMoreInteractions(migrationActions);
     }
 
