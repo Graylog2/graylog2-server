@@ -41,8 +41,8 @@
     </issueManagement>
 
     <ciManagement>
-        <system>Travis CI</system>
-        <url>https://travis-ci.org/Graylog2/graylog2-server</url>
+        <system>Github Actions</system>
+        <url>https://github.com/Graylog2/graylog2-server/actions</url>
     </ciManagement>
 
     <mailingLists>
