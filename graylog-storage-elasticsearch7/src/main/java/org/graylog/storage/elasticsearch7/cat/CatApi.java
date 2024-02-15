@@ -20,7 +20,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Streams;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.index.IndexResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Request;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Response;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
@@ -29,7 +28,6 @@ import jakarta.inject.Inject;
 import org.graylog2.indexer.indices.ShardsInfo;
 
 import java.io.IOException;
-import java.net.UnknownHostException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -97,13 +95,7 @@ public class CatApi {
     }
 
     public List<ShardsInfo> getShardsInfo(String indexName) {
-        return requestShardsInfo(indexName).stream().map(jsonNode -> {
-            try {
-                return ShardsInfo.create(jsonNode);
-            } catch (UnknownHostException e) {
-                throw new RuntimeException(e);
-            }
-        }).toList();
+        return requestShardsInfo(indexName).stream().map(ShardsInfo::create).toList();
     }
 
     private List<JsonNode> requestShardsInfo(String indexName) {

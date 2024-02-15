@@ -19,20 +19,16 @@ package org.graylog2.indexer.indices;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.commons.lang3.EnumUtils;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Locale;
 import java.util.function.Function;
 
-public record ShardsInfo(String index, int shard, ShardType shardType, State state, long docs, String store, InetAddress ip, String node ) {
+public record ShardsInfo(String index, int shard, ShardType shardType, State state, long docs, String store, String ip, String node ) {
 
-    public static ShardsInfo create(JsonNode jsonNode) throws UnknownHostException {
+    public static ShardsInfo create(JsonNode jsonNode) {
 
         String index = jsonNode.get("index").asText();
-        int shard =jsonNode.get("shard").asInt();
-
-        String ipString = getValueOrDefault(jsonNode, "ip", JsonNode::asText, null);
-        InetAddress ip = ipString != null ? InetAddress.getByName(ipString) : null;
+        int shard = jsonNode.get("shard").asInt();
+        String ip = getValueOrDefault(jsonNode, "ip", JsonNode::asText, null);
 
         String store = getValueOrDefault(jsonNode, "store", JsonNode::asText, null);
         String node = getValueOrDefault(jsonNode, "node", JsonNode::asText, null);
