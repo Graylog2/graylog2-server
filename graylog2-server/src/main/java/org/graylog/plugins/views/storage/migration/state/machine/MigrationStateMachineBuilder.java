@@ -89,6 +89,7 @@ public class MigrationStateMachineBuilder {
         // current migration status every time we trigger MigrationStep.REQUEST_MIGRATION_STATUS.
         config.configure(MigrationState.REMOTE_REINDEX_RUNNING)
                 .permitReentry(MigrationStep.REQUEST_MIGRATION_STATUS, migrationActions::requestMigrationStatus)
+                .permit(MigrationStep.RETRY_MIGRATE_EXISTING_DATA, MigrationState.MIGRATE_EXISTING_DATA) // allow one step back in case the migration fails
                 .permitIf(MigrationStep.SHOW_ASK_TO_SHUTDOWN_OLD_CLUSTER, MigrationState.ASK_TO_SHUTDOWN_OLD_CLUSTER, migrationActions::isRemoteReindexingFinished);
 
         config.configure(MigrationState.ASK_TO_SHUTDOWN_OLD_CLUSTER)
