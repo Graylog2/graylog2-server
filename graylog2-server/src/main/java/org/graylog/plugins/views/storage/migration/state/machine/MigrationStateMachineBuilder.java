@@ -84,6 +84,9 @@ public class MigrationStateMachineBuilder {
                 .onEntry(migrationActions::reindexOldData)
                 .permitIf(MigrationStep.SHOW_ASK_TO_SHUTDOWN_OLD_CLUSTER, MigrationState.ASK_TO_SHUTDOWN_OLD_CLUSTER, migrationActions::reindexingFinished);
 
+        config.configure(MigrationState.ASK_TO_SHUTDOWN_OLD_CLUSTER)
+                .permitIf(MigrationStep.CONFIRM_OLD_CLUSTER_STOPPED, MigrationState.MANUALLY_REMOVE_OLD_CONNECTION_STRING_FROM_CONFIG, migrationActions::isOldClusterStopped);
+
         // in place / rolling upgrade branch of the migration
         config.configure(MigrationState.ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE)
                 .onEntry(migrationActions::rollingUpgradeSelected)
@@ -103,19 +106,15 @@ public class MigrationStateMachineBuilder {
 
         config.configure(MigrationState.MESSAGE_PROCESSING_STOP)
                 .onEntry(migrationActions::stopMessageProcessing)
-                .permit(MigrationStep.SHOW_ASK_TO_START_DATANODE_AND_REPlACE_CLUSTER, MigrationState.REPLACE_CLUSTER, migrationActions::startDataNodes);
+                .permit(MigrationStep.SHOW_ROLLING_UPGRADE_ASK_TO_SHUTDOWN_OLD_CLUSTER, MigrationState.REPLACE_CLUSTER, migrationActions::startDataNodes);
 
         config.configure(MigrationState.REPLACE_CLUSTER)
-                .permit(MigrationStep.SHOW_ASK_TO_RESTART_MESSAGE_PROCESSING, MigrationState.MESSAGE_PROCESSING_RESTART);
+                .permit(MigrationStep.SHOW_ASK_TO_RESTART_MESSAGE_PROCESSING, MigrationState.MESSAGE_PROCESSING_RESTART, migrationActions::startMessageProcessing);
 
         config.configure(MigrationState.MESSAGE_PROCESSING_RESTART)
-                .onEntry(migrationActions::startMessageProcessing)
-                .permit(MigrationStep.SHOW_ASK_TO_SHUTDOWN_OLD_CLUSTER, MigrationState.ASK_TO_SHUTDOWN_OLD_CLUSTER);
+                .permit(MigrationStep.CONFIRM_ROLLING_UPGRADE_OLD_CLUSTER_STOPPED, MigrationState.MANUALLY_REMOVE_OLD_CONNECTION_STRING_FROM_CONFIG, migrationActions::isOldClusterStopped);
 
         // common cleanup steps
-        config.configure(MigrationState.ASK_TO_SHUTDOWN_OLD_CLUSTER)
-                .permitIf(MigrationStep.CONFIRM_OLD_CLUSTER_STOPPED, MigrationState.MANUALLY_REMOVE_OLD_CONNECTION_STRING_FROM_CONFIG, migrationActions::isOldClusterStopped);
-
         config.configure(MigrationState.MANUALLY_REMOVE_OLD_CONNECTION_STRING_FROM_CONFIG)
                 .permit(MigrationStep.CONFIRM_OLD_CONNECTION_STRING_FROM_CONFIG_REMOVED, MigrationState.FINISHED);
 
