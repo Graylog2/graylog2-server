@@ -60,7 +60,7 @@ const StyleGuideWrapper = ({ children }: Props) => {
     element: (
       <CurrentUserContext.Provider value={adminUser}>
         <UserDateTimeProvider>
-          <GraylogThemeProvider initialThemeModeOverride="light">
+          <GraylogThemeProvider initialThemeModeOverride="light" userIsLoggedIn={false}>
             <StyleGuideStyles />
             {children}
           </GraylogThemeProvider>

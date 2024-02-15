@@ -357,6 +357,10 @@ public class Indices {
         return indicesAdapter.indicesStats(indices);
     }
 
+    public List<ShardsInfo> getShardsInfo(String indexName) {
+        return indicesAdapter.getShardsInfo(indexName);
+    }
+
     public void cycleAlias(String aliasName, String targetIndex) {
         indicesAdapter.cycleAlias(aliasName, targetIndex);
     }

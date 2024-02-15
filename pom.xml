@@ -101,13 +101,13 @@
         <aws-java-sdk-1.version>1.12.607</aws-java-sdk-1.version>
         <aws-java-sdk-2.version>2.23.4</aws-java-sdk-2.version>
         <aws-kinesis-client.version>2.2.10</aws-kinesis-client.version>
-        <aws-msk-iam-auth.version>2.0.2</aws-msk-iam-auth.version>
+        <aws-msk-iam-auth.version>2.0.3</aws-msk-iam-auth.version>
         <bouncycastle.version>1.77</bouncycastle.version>
         <byte-buddy.version>1.14.11</byte-buddy.version>
         <caffeine.version>3.1.8</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
         <classgraph.version>4.8.165</classgraph.version>
-        <commons-codec.version>1.16.0</commons-codec.version>
+        <commons-codec.version>1.16.1</commons-codec.version>
         <commons-csv.version>1.10.0</commons-csv.version>
         <commons-email.version>1.6.0</commons-email.version>
         <commons-lang3.version>3.14.0</commons-lang3.version>

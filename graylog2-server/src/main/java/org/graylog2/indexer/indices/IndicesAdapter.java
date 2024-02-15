@@ -97,6 +97,8 @@ public interface IndicesAdapter {
 
     JsonNode getIndexStats(Collection<String> index);
 
+    List<ShardsInfo> getShardsInfo(String indexName);
+
     IndicesBlockStatus getIndicesBlocksStatus(List<String> indices);
 
     boolean exists(String indexName) throws IOException;
