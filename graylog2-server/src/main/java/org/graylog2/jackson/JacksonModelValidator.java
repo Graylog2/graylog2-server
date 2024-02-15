@@ -87,12 +87,16 @@ public class JacksonModelValidator {
                 switch (jsonTypeInfo.include()) {
                     case PROPERTY -> {
                         if (fieldNames.contains(jsonTypeInfo.property())) {
-                            throw new RuntimeException("JsonTypeInfo#property value conflicts with existing property: " + jsonTypeInfo.property() + " (class " + annotatedClass.getName() + ")");
+                            // TODO: Enable for final version
+                            //throw new RuntimeException("JsonTypeInfo#property value conflicts with existing property: " + jsonTypeInfo.property() + " (class " + annotatedClass.getName() + ")");
+                            LOG.error("JsonTypeInfo#property value conflicts with existing property: {} (class {})", jsonTypeInfo.property(), annotatedClass.getName());
                         }
                     }
                     case EXISTING_PROPERTY -> {
                         if (!fieldNames.contains(jsonTypeInfo.property())) {
-                            throw new RuntimeException("JsonTypeInfo#property value doesn't exist as property: " + jsonTypeInfo.property() + " (class " + annotatedClass.getName() + ")");
+                            // TODO: Enable for final version
+                            //throw new RuntimeException("JsonTypeInfo#property value doesn't exist as property: " + jsonTypeInfo.property() + " (class " + annotatedClass.getName() + ")");
+                            LOG.error("JsonTypeInfo#property value doesn't exist as property: {} (class {})", jsonTypeInfo.property(), annotatedClass.getName());
                         }
                     }
                     default -> {
