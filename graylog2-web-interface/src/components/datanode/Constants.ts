@@ -63,18 +63,6 @@ export const MIGRATION_STATE = {
     key: 'ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE',
     description: 'Welcome to Rolling upgrade migration',
   },
-  PROVISION_DATANODE_CERTIFICATES: {
-    key: 'PROVISION_DATANODE_CERTIFICATES',
-    description: 'Provision data node with certificates',
-  },
-  EXISTING_DATA_MIGRATION_QUESTION: {
-    key: 'EXISTING_DATA_MIGRATION_QUESTION',
-    description: 'Migrate existing data',
-  },
-  MIGRATE_WITH_DOWNTIME_QUESTION: {
-    key: 'MIGRATE_WITH_DOWNTIME_QUESTION',
-    description: 'Migrate with downtime',
-  },
   ASK_TO_SHUTDOWN_OLD_CLUSTER: {
     key: 'ASK_TO_SHUTDOWN_OLD_CLUSTER',
     description: 'Shut down old cluster',
@@ -87,9 +75,29 @@ export const MIGRATION_STATE = {
     key: 'MESSAGE_PROCESSING_STOP_REPLACE_CLUSTER_AND_MP_RESTART',
     description: 'Message processing and datanode actions',
   },
-  REMOTE_REINDEX_WELCOME: {
-    key: 'REMOTE_REINDEX_WELCOME',
+  REMOTE_REINDEX_WELCOME_PAGE: {
+    key: 'REMOTE_REINDEX_WELCOME_PAGE',
     description: 'Remote reindexing migration',
+  },
+  PROVISION_DATANODE_CERTIFICATES_PAGE: {
+    key: 'PROVISION_DATANODE_CERTIFICATES_PAGE',
+    description: 'Provision data node with certificates',
+  },
+  PROVISION_DATANODE_CERTIFICATES_RUNNING: {
+    key: 'PROVISION_DATANODE_CERTIFICATES_RUNNING',
+    description: 'Provision data node with certificates running',
+  },
+  EXISTING_DATA_MIGRATION_QUESTION_PAGE: {
+    key: 'EXISTING_DATA_MIGRATION_QUESTION_PAGE',
+    description: 'Migrate existing data question',
+  },
+  MIGRATE_EXISTING_DATA: {
+    key: 'MIGRATE_EXISTING_DATA',
+    description: 'Migrate existing data',
+  },
+  REMOTE_REINDEX_RUNNING: {
+    key: 'MIGRATE_EXISTING_DATA',
+    description: 'Remote reindexing migration running',
   },
   DIRECTORY_COMPATIBILITY_CHECK_PAGE: {
     key: 'DIRECTORY_COMPATIBILITY_CHECK_PAGE',
@@ -133,10 +141,12 @@ export const ROLLING_UPGRADE_MIGRATION_INTERMEDIARY_STEPS = [
   MIGRATION_STATE.PROVISION_ROLLING_UPGRADE_NODES_RUNNING.key,
 ];
 export const REMOTE_REINDEXING_MIGRATION_STEPS = [
-  MIGRATION_STATE.REMOTE_REINDEX_WELCOME.key,
-  MIGRATION_STATE.PROVISION_DATANODE_CERTIFICATES.key,
-  MIGRATION_STATE.EXISTING_DATA_MIGRATION_QUESTION.key,
-  MIGRATION_STATE.MIGRATE_WITH_DOWNTIME_QUESTION.key,
+  MIGRATION_STATE.REMOTE_REINDEX_WELCOME_PAGE.key,
+  MIGRATION_STATE.PROVISION_DATANODE_CERTIFICATES_PAGE.key,
+  MIGRATION_STATE.PROVISION_DATANODE_CERTIFICATES_RUNNING.key,
+  MIGRATION_STATE.EXISTING_DATA_MIGRATION_QUESTION_PAGE.key,
+  MIGRATION_STATE.MIGRATE_EXISTING_DATA.key,
+  MIGRATION_STATE.REMOTE_REINDEX_RUNNING.key,
 ];
 
 export const MIGRATION_WIZARD_STEPS = [
@@ -168,6 +178,10 @@ export const MIGRATION_ACTIONS = {
     key: 'SHOW_MIGRATION_SELECTION',
     label: 'Go to migration steps',
   },
+  PROVISION_DATANODE_CERTIFICATES: {
+    key: 'PROVISION_DATANODE_CERTIFICATES',
+    label: 'Provision data nodes with certificates',
+  },
   SHOW_MIGRATE_EXISTING_DATA: {
     key: 'SHOW_MIGRATE_EXISTING_DATA',
     label: 'Migrate existing data',
@@ -176,9 +190,13 @@ export const MIGRATION_ACTIONS = {
     key: 'SKIP_EXISTING_DATA_MIGRATION',
     label: 'Skip existing data migration',
   },
-  PROVISION_DATANODE_CERTIFICATES: {
-    key: 'PROVISION_DATANODE_CERTIFICATES',
-    label: 'Provision data nodes with certificates',
+  REQUEST_MIGRATION_STATUS: {
+    key: 'REQUEST_MIGRATION_STATUS',
+    label: 'Request migration status',
+  },
+  RETRY_MIGRATE_EXISTING_DATA: {
+    key: 'RETRY_MIGRATE_EXISTING_DATA',
+    label: 'Retry migrate existing data',
   },
 };
 export default MIGRATION_STEP;

@@ -26,8 +26,9 @@ import type { MigrationActions, StepArgs, MigrationState } from 'components/data
 
 import Welcome from './remoteReindexing/Welcome';
 import ExistingDataMigrationQuestion from './remoteReindexing/ExistingDataMigrationQuestion';
-import MigrationWithDowntimeQuestion from './remoteReindexing/MigrationWithDowntimeQuestion';
+import RemoteReindexRunning from './remoteReindexing/RemoteReindexRunning';
 import CertificatesProvisioning from './rollingUpgrade/CertificatesProvisioning';
+import MigrateExistingData from './remoteReindexing/MigrateExistingData';
 
 const StyledTitle = styled.h3`
   margin-bottom: 10px;
@@ -73,20 +74,28 @@ const RemoteReindexingMigration = ({ currentStep, onTriggerNextStep }: Props) =>
 
   const steps = [
     {
-      key: MIGRATION_STATE.REMOTE_REINDEX_WELCOME.key,
+      key: MIGRATION_STATE.REMOTE_REINDEX_WELCOME_PAGE.key,
       component: <Welcome nextSteps={nextSteps} onTriggerStep={onStepComplete} />,
     },
     {
-      key: MIGRATION_STATE.PROVISION_DATANODE_CERTIFICATES.key,
+      key: MIGRATION_STATE.PROVISION_DATANODE_CERTIFICATES_PAGE.key,
       component: <CertificatesProvisioning nextSteps={nextSteps} onTriggerStep={onStepComplete} />,
     },
     {
-      key: MIGRATION_STATE.EXISTING_DATA_MIGRATION_QUESTION.key,
+      key: MIGRATION_STATE.PROVISION_DATANODE_CERTIFICATES_RUNNING.key,
+      component: <CertificatesProvisioning nextSteps={nextSteps} onTriggerStep={onStepComplete} />,
+    },
+    {
+      key: MIGRATION_STATE.EXISTING_DATA_MIGRATION_QUESTION_PAGE.key,
       component: <ExistingDataMigrationQuestion nextSteps={nextSteps} onTriggerStep={onStepComplete} />,
     },
     {
-      key: MIGRATION_STATE.MIGRATE_WITH_DOWNTIME_QUESTION.key,
-      component: <MigrationWithDowntimeQuestion nextSteps={nextSteps} onTriggerStep={onStepComplete} />,
+      key: MIGRATION_STATE.MIGRATE_EXISTING_DATA.key,
+      component: <MigrateExistingData nextSteps={nextSteps} onTriggerStep={onStepComplete} />,
+    },
+    {
+      key: MIGRATION_STATE.REMOTE_REINDEX_RUNNING.key,
+      component: <RemoteReindexRunning nextSteps={nextSteps} onTriggerStep={onStepComplete} />,
     },
   ];
 

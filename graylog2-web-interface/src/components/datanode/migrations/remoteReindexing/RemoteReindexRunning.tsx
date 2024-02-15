@@ -22,7 +22,7 @@ import useRemoteReindexMigrationStatus from '../../hooks/useRemoteReindexMigrati
 import type { MigrationStepComponentProps } from '../../Types';
 import MigrationStepTriggerButtonToolbar from '../common/MigrationStepTriggerButtonToolbar';
 
-const MigrationWithDowntimeQuestion = ({ nextSteps, onTriggerStep }: MigrationStepComponentProps) => {
+const RemoteReindexRunning = ({ nextSteps, onTriggerStep }: MigrationStepComponentProps) => {
   const migrationID = '';
   const roundedPercentage = 50;
 
@@ -51,4 +51,4 @@ const MigrationWithDowntimeQuestion = ({ nextSteps, onTriggerStep }: MigrationSt
   );
 };
 
-export default MigrationWithDowntimeQuestion;
+export default RemoteReindexRunning;
