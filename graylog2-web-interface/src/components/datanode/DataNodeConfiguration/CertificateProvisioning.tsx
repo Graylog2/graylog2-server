@@ -27,7 +27,7 @@ import useDataNodes from 'components/datanode/hooks/useDataNodes';
 
 const onProvisionCertificate = () => fetch(
   'POST',
-  URLUtils.qualifyUrl('datanode/generate'),
+  URLUtils.qualifyUrl('datanode/provision/generate'),
   undefined,
   false,
 );

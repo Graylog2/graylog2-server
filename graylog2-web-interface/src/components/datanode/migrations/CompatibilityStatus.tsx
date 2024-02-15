@@ -42,7 +42,7 @@ const StyledSpan = styled.span`
 
 const CompatibilityStatus = ({ opensearchVersion, nodeInfo }: Props) => {
   const { opensearch_data_location: opensearchLocation, nodes } = nodeInfo;
-  const [activeAccordion, setActiveAccordion] = useState<string | undefined>(`Node: 1, Version: ${nodes[0].node_version}, ${nodes[0].indices.length} indices`);
+  const [activeAccordion, setActiveAccordion] = useState<string | undefined>(`Node: 1, Version: ${nodes[0]?.node_version}, ${nodes[0]?.indices.length} indices`);
 
   const handleSelect = (nextKey: string | undefined) => {
     setActiveAccordion(nextKey ?? activeAccordion);

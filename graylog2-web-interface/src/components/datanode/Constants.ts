@@ -101,11 +101,11 @@ export const MIGRATION_STATE = {
   },
   PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES: {
     key: 'PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES',
-    description: 'Provision upgrade nodes with certificates',
+    description: 'Certificate provisioning overview',
   },
   PROVISION_ROLLING_UPGRADE_NODES_RUNNING: {
     key: 'PROVISION_ROLLING_UPGRADE_NODES_RUNNING',
-    description: 'Provisionning data nodes with certificate.',
+    description: 'Provisionning data nodes certificate.',
   },
   JOURNAL_SIZE_DOWNTIME_WARNING: {
     key: 'JOURNAL_SIZE_DOWNTIME_WARNING',
@@ -128,6 +128,9 @@ export const ROLLING_UPGRADE_MIGRATION_STEPS = [
   MIGRATION_STATE.PROVISION_ROLLING_UPGRADE_NODES_RUNNING.key,
   MIGRATION_STATE.JOURNAL_SIZE_DOWNTIME_WARNING.key,
   MIGRATION_STATE.MESSAGE_PROCESSING_STOP_REPLACE_CLUSTER_AND_MP_RESTART.key,
+];
+export const ROLLING_UPGRADE_MIGRATION_INTERMEDIARY_STEPS = [
+  MIGRATION_STATE.PROVISION_ROLLING_UPGRADE_NODES_RUNNING.key,
 ];
 export const REMOTE_REINDEXING_MIGRATION_STEPS = [
   MIGRATION_STATE.REMOTE_REINDEX_WELCOME.key,
@@ -172,6 +175,10 @@ export const MIGRATION_ACTIONS = {
   SKIP_EXISTING_DATA_MIGRATION: {
     key: 'SKIP_EXISTING_DATA_MIGRATION',
     label: 'Skip existing data migration',
+  },
+  PROVISION_DATANODE_CERTIFICATES: {
+    key: 'PROVISION_DATANODE_CERTIFICATES',
+    label: 'Provision data nodes with certificates',
   },
 };
 export default MIGRATION_STEP;

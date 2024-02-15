@@ -19,14 +19,12 @@ import styled from 'styled-components';
 
 import { Col, Panel, PanelGroup } from 'components/bootstrap';
 import { MIGRATION_STATE, ROLLING_UPGRADE_MIGRATION_STEPS } from 'components/datanode/Constants';
-import type { MigrationActions, MigrationState, StepArgs } from 'components/datanode/Types';
+import type { MigrationActions, MigrationState, StepArgs, MigrationStateItem } from 'components/datanode/Types';
 import Welcome from 'components/datanode/migrations/rollingUpgrade/Welcome';
 import CertificatesProvisioning from 'components/datanode/migrations/rollingUpgrade/CertificatesProvisioning';
 import JournalDowntimeWarning from 'components/datanode/migrations/rollingUpgrade/JournalDowntimeWarning';
-// import ConnectionStringRemovalStep from 'components/datanode/migrations/ConnectionStringRemovalStep';
 import MigrateActions from 'components/datanode/migrations/rollingUpgrade/MigrateActions';
 import CompatibilityCheckStep from 'components/datanode/migrations/CompatibilityCheckStep';
-// import CompatibilityCheckStep from 'components/datanode/migrations/CompatibilityCheckStep';
 
 type Props = {
     currentStep: MigrationState,
@@ -69,32 +67,23 @@ const RollingUpgradeMigration = ({ currentStep, onTriggerNextStep }: Props) => {
     onTriggerNextStep(step, args);
   };
 
-  const steps = [
-    {
-      key: MIGRATION_STATE.ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE.key,
-      component: <Welcome nextSteps={nextSteps} onTriggerStep={onStepComplete} />,
-    },
-    {
-      key: MIGRATION_STATE.DIRECTORY_COMPATIBILITY_CHECK_PAGE2.key,
-      component: <CompatibilityCheckStep nextSteps={nextSteps} onTriggerStep={onStepComplete} />,
-    },
-    {
-      key: MIGRATION_STATE.PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES.key,
-      component: <CertificatesProvisioning nextSteps={nextSteps} onTriggerStep={onStepComplete} />,
-    },
-    {
-      key: MIGRATION_STATE.PROVISION_ROLLING_UPGRADE_NODES_RUNNING.key,
-      component: <CertificatesProvisioning nextSteps={nextSteps} onTriggerStep={onStepComplete} />,
-    },
-    {
-      key: MIGRATION_STATE.JOURNAL_SIZE_DOWNTIME_WARNING.key,
-      component: <JournalDowntimeWarning nextSteps={nextSteps} onTriggerStep={onStepComplete} />,
-    },
-    {
-      key: MIGRATION_STATE.MESSAGE_PROCESSING_STOP_REPLACE_CLUSTER_AND_MP_RESTART.key,
-      component: <MigrateActions nextSteps={nextSteps} onTriggerStep={onStepComplete} />,
-    },
-  ];
+  const getStepComponent = (step: MigrationStateItem) => {
+    switch (step) {
+      case MIGRATION_STATE.ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE.key:
+        return <Welcome nextSteps={nextSteps} onTriggerStep={onStepComplete} />;
+      case MIGRATION_STATE.DIRECTORY_COMPATIBILITY_CHECK_PAGE2.key:
+        return <CompatibilityCheckStep nextSteps={nextSteps} onTriggerStep={onStepComplete} />;
+      case MIGRATION_STATE.PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES.key:
+      case MIGRATION_STATE.PROVISION_ROLLING_UPGRADE_NODES_RUNNING.key:
+        return <CertificatesProvisioning nextSteps={nextSteps} onTriggerStep={onStepComplete} currentStep={step} />;
+      case MIGRATION_STATE.JOURNAL_SIZE_DOWNTIME_WARNING.key:
+        return <JournalDowntimeWarning nextSteps={nextSteps} onTriggerStep={onStepComplete} />;
+      case MIGRATION_STATE.MESSAGE_PROCESSING_STOP_REPLACE_CLUSTER_AND_MP_RESTART.key:
+        return <MigrateActions nextSteps={nextSteps} onTriggerStep={onStepComplete} />;
+      default:
+        return <Welcome nextSteps={nextSteps} onTriggerStep={onStepComplete} />;
+    }
+  };
 
   return (
     <Col>
@@ -115,8 +104,7 @@ const RollingUpgradeMigration = ({ currentStep, onTriggerNextStep }: Props) => {
               </Panel.Heading>
               <Panel.Collapse>
                 <Panel.Body>
-                  {steps.filter((step) => (step.key === rollingUpgradeStep))
-                    .map((item) => item)[0]?.component}
+                  {getStepComponent(rollingUpgradeStep)}
                 </Panel.Body>
               </Panel.Collapse>
             </Panel>

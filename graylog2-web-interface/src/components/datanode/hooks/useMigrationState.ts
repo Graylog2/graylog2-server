@@ -23,7 +23,7 @@ import type { MigrationState } from 'components/datanode/Types';
 
 export const MIGRATION_STATE_QUERY_KEY = ['migration-state'];
 
-const useMigrationState = () : {
+const useMigrationState = (refetchInterval : number | false = false) : {
   currentStep: MigrationState,
   isLoading: boolean,
 } => {
@@ -33,6 +33,7 @@ const useMigrationState = () : {
     {
       onError: (error: Error) => UserNotification.error(error.message),
       retry: 2,
+      refetchInterval,
     },
   );
 

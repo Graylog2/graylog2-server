@@ -24,6 +24,7 @@ import UserNotification from 'util/UserNotification';
 import { FormikInput } from 'components/common';
 import { Button } from 'components/bootstrap';
 import { QUERY_KEY as DATA_NODES_CA_QUERY_KEY } from 'components/datanode/hooks/useDataNodesCA';
+import { MIGRATION_STATE_QUERY_KEY } from 'components/datanode/hooks/useMigrationState';
 
 type FormValues = {}
 
@@ -41,6 +42,7 @@ const CaCreateForm = () => {
     onSuccess: () => {
       UserNotification.success('CA created successfully');
       queryClient.invalidateQueries(DATA_NODES_CA_QUERY_KEY);
+      queryClient.invalidateQueries(MIGRATION_STATE_QUERY_KEY);
     },
     onError: (error) => {
       UserNotification.error(`CA creation failed with error: ${error}`);
