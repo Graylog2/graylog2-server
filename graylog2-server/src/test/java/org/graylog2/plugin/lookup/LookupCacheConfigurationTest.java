@@ -17,11 +17,12 @@
 package org.graylog2.plugin.lookup;
 
 import com.fasterxml.jackson.databind.jsontype.NamedType;
-import org.graylog.testing.jackson.JacksonSubtypesAssertions;
 import org.graylog2.lookup.caches.CaffeineLookupCache;
 import org.graylog2.lookup.caches.NullCache;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.Test;
+
+import static org.graylog.testing.jackson.JacksonSubtypesAssertions.assertThatDto;
 
 class LookupCacheConfigurationTest {
     @Test
@@ -44,12 +45,12 @@ class LookupCacheConfigurationTest {
                 .type(NullCache.NAME)
                 .build();
 
-        JacksonSubtypesAssertions.assertThatDto(caffeineCacheConfig)
+        assertThatDto(caffeineCacheConfig)
                 .withObjectMapper(objectMapper)
                 .deserializesWhenGivenSupertype(LookupCacheConfiguration.class)
                 .doesNotSerializeWithDuplicateFields();
 
-        JacksonSubtypesAssertions.assertThatDto(nullCacheConfig)
+        assertThatDto(nullCacheConfig)
                 .withObjectMapper(objectMapper)
                 .deserializesWhenGivenSupertype(LookupCacheConfiguration.class)
                 .doesNotSerializeWithDuplicateFields();

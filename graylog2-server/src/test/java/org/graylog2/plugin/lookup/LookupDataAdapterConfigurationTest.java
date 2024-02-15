@@ -18,10 +18,11 @@ package org.graylog2.plugin.lookup;
 
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import org.graylog.plugins.threatintel.whois.ip.WhoisDataAdapter;
-import org.graylog.testing.jackson.JacksonSubtypesAssertions;
 import org.graylog2.lookup.adapters.HTTPJSONPathDataAdapter;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.Test;
+
+import static org.graylog.testing.jackson.JacksonSubtypesAssertions.assertThatDto;
 
 class LookupDataAdapterConfigurationTest {
     @Test
@@ -45,11 +46,11 @@ class LookupDataAdapterConfigurationTest {
                 .readTimeout(1)
                 .build();
 
-        JacksonSubtypesAssertions.assertThatDto(httpConfig)
+        assertThatDto(httpConfig)
                 .withObjectMapper(objectMapper)
                 .deserializesWhenGivenSupertype(LookupDataAdapterConfiguration.class)
                 .doesNotSerializeWithDuplicateFields();
-        JacksonSubtypesAssertions.assertThatDto(whoisConfig)
+        assertThatDto(whoisConfig)
                 .withObjectMapper(objectMapper)
                 .deserializesWhenGivenSupertype(LookupDataAdapterConfiguration.class)
                 .doesNotSerializeWithDuplicateFields();
