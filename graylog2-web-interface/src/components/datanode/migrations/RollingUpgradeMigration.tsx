@@ -75,7 +75,7 @@ const RollingUpgradeMigration = ({ currentStep, onTriggerNextStep }: Props) => {
         return <CompatibilityCheckStep nextSteps={nextSteps} onTriggerStep={onStepComplete} />;
       case MIGRATION_STATE.PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES.key:
       case MIGRATION_STATE.PROVISION_ROLLING_UPGRADE_NODES_RUNNING.key:
-        return <CertificatesProvisioning nextSteps={nextSteps} onTriggerStep={onStepComplete} currentStep={step} />;
+        return <CertificatesProvisioning nextSteps={nextSteps} onTriggerStep={onStepComplete} />;
       case MIGRATION_STATE.JOURNAL_SIZE_DOWNTIME_WARNING.key:
         return <JournalDowntimeWarning nextSteps={nextSteps} onTriggerStep={onStepComplete} />;
       case MIGRATION_STATE.MESSAGE_PROCESSING_STOP_REPLACE_CLUSTER_AND_MP_RESTART.key:

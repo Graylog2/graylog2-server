@@ -28,6 +28,7 @@ const DownsizeWarning = styled(Alert)`
 
 const JournalDowntimeWarning = ({ nextSteps, onTriggerStep }: MigrationStepComponentProps) => (
   <>
+    <h3>Journal downtime size warning</h3>
     <DownsizeWarning bsStyle="danger">
       <h4>During the next step the journal size will increase because of stopping the processing.</h4>
       <ul>

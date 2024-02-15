@@ -17,30 +17,34 @@
 import * as React from 'react';
 
 import MigrationStepTriggerButtonToolbar from 'components/datanode/migrations/common/MigrationStepTriggerButtonToolbar';
-import type { MigrationStepComponentProps, MigrationStateItem } from 'components/datanode/Types';
+import type { MigrationStepComponentProps } from 'components/datanode/Types';
 import { MIGRATION_STATE } from 'components/datanode/Constants';
 import { Spinner } from 'components/common';
 import useMigrationState from 'components/datanode/hooks/useMigrationState';
 import MigrationDatanodeList from 'components/datanode/migrations/MigrationDatanodeList';
+import { Alert } from 'components/bootstrap';
 
-type Props = MigrationStepComponentProps & {
-    currentStep: MigrationStateItem,
-}
+const CertificatesProvisioning = ({ nextSteps, onTriggerStep }: MigrationStepComponentProps) => {
+  const { currentStep: step, isLoading } = useMigrationState(3000);
 
-const CertificatesProvisioning = ({ nextSteps, onTriggerStep, currentStep }: Props) => {
-  const { currentStep: step } = useMigrationState(3000);
+  if (isLoading) {
+    return <Spinner text="Loading migration state." />;
+  }
 
   return (
     <>
-      {currentStep === MIGRATION_STATE.PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES.key && (
+      {step.state === MIGRATION_STATE.PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES.key && (
       <p>
         Certificate authority has been configured successfully.<br />
         You can now provision certificate for your data nodes.
       </p>
       )}
-      {(currentStep === MIGRATION_STATE.PROVISION_ROLLING_UPGRADE_NODES_RUNNING.key
+      {(step.state === MIGRATION_STATE.PROVISION_ROLLING_UPGRADE_NODES_RUNNING.key
          && step?.next_steps?.length === 0) && (
          <Spinner text="Provisioning certificate" />
+      )}
+      {step?.next_steps?.length > 0 && (
+      <Alert bsStyle="success">Provisioning the data node finished.</Alert>
       )}
       <MigrationDatanodeList />
       <br />
