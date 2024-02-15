@@ -101,7 +101,7 @@ public class MoreSearch {
         return moreSearchAdapter.eventSearch(queryString, parameters.timerange(), affectedIndices, sorting, parameters.page(), parameters.perPage(), eventStreams, filterString, forbiddenSourceStreams);
     }
 
-    private Set<String> getAffectedIndices(Set<String> streamIds, TimeRange timeRange) {
+    public Set<String> getAffectedIndices(Set<String> streamIds, TimeRange timeRange) {
         final SortedSet<IndexRange> indexRanges = indexRangeService.find(timeRange.getFrom(), timeRange.getTo());
 
         // We support an empty streams list and return all affected indices in that case.

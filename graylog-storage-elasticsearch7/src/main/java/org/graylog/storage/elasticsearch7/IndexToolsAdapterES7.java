@@ -27,6 +27,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.core.CountRequ
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.core.CountResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.RangeQueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.filter.Filter;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
@@ -38,6 +39,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.m
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog2.indexer.IndexToolsAdapter;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -52,14 +54,17 @@ import java.util.Set;
 import static org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders.existsQuery;
 import static org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
+import static org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 import static org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders.termsQuery;
 
 public class IndexToolsAdapterES7 implements IndexToolsAdapter {
+    public static final String TIME = "time";
     private static final String AGG_DATE_HISTOGRAM = "source_date_histogram";
     private static final String AGG_MESSAGE_FIELD = "message_field";
     private static final String AGG_FILTER = "message_filter";
-    public static final String AGG_MAX = "agg_max";
-    public static final String AGG_MIN = "agg_min";
+    private static final String AGG_MAX = "agg_max";
+    private static final String AGG_MIN = "agg_min";
+    private static final String RANGE_QUERY = "range_query";
     private final ElasticsearchClient client;
 
     @Inject
@@ -127,10 +132,11 @@ public class IndexToolsAdapterES7 implements IndexToolsAdapter {
     }
 
     @Override
-    public ImmutablePair<Double, Double> max(String fieldName, Set<String> indices, Optional<Set<String>> includedStreams) {
-        final BoolQueryBuilder queryBuilder = buildStreamIdFilter(includedStreams);
+    public ImmutablePair<Double, Double> minMax(TimeRange timeRange, String fieldName, Set<String> indices, Optional<Set<String>> includedStreams) {
+        final RangeQueryBuilder rangeFilter = rangeQuery(RANGE_QUERY).from(timeRange.getFrom()).to(timeRange.getTo());
+        final BoolQueryBuilder streamAndRangeFilter = buildStreamIdFilter(includedStreams).filter(rangeFilter);
         final FilterAggregationBuilder filter = AggregationBuilders
-                .filter(AGG_FILTER, queryBuilder)
+                .filter(AGG_FILTER, streamAndRangeFilter)
                 .subAggregation(AggregationBuilders.max(AGG_MAX).field(fieldName))
                 .subAggregation(AggregationBuilders.min(AGG_MIN).field(fieldName));
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
@@ -144,7 +150,7 @@ public class IndexToolsAdapterES7 implements IndexToolsAdapter {
         Max aggMax = searchResult.getAggregations().get(AGG_MAX);
         Min aggMin = searchResult.getAggregations().get(AGG_MIN);
 
-        return new ImmutablePair<Double, Double>(aggMin.getValue(), aggMax.getValue());
+        return new ImmutablePair<>(aggMin.getValue(), aggMax.getValue());
     }
 
     private BoolQueryBuilder buildStreamIdFilter(Optional<Set<String>> includedStreams) {
