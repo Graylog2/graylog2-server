@@ -19,6 +19,7 @@ package org.graylog.storage.opensearch2;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import jakarta.inject.Inject;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.support.IndicesOptions;
@@ -32,6 +33,8 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.histogram.ParsedDateHistogram;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.terms.Terms;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Max;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Min;
 import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
 import org.graylog2.indexer.IndexToolsAdapter;
 import org.graylog2.plugin.Message;
@@ -55,6 +58,8 @@ public class IndexToolsAdapterOS2 implements IndexToolsAdapter {
     private static final String AGG_DATE_HISTOGRAM = "source_date_histogram";
     private static final String AGG_MESSAGE_FIELD = "message_field";
     private static final String AGG_FILTER = "message_filter";
+    public static final String AGG_MAX = "agg_max";
+    public static final String AGG_MIN = "agg_min";
     private final OpenSearchClient client;
 
     @Inject
@@ -119,6 +124,27 @@ public class IndexToolsAdapterOS2 implements IndexToolsAdapter {
         final CountResponse result = client.execute((c, requestOptions) -> c.count(request, requestOptions), "Unable to count documents of index.");
 
         return result.getCount();
+    }
+
+    @Override
+    public ImmutablePair<Double, Double> max(String fieldName, Set<String> indices, Optional<Set<String>> includedStreams) {
+        final BoolQueryBuilder queryBuilder = buildStreamIdFilter(includedStreams);
+        final FilterAggregationBuilder filter = AggregationBuilders
+                .filter(AGG_FILTER, queryBuilder)
+                .subAggregation(AggregationBuilders.max(AGG_MAX).field(fieldName))
+                .subAggregation(AggregationBuilders.min(AGG_MIN).field(fieldName));
+        final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
+                .query(QueryBuilders.matchAllQuery())
+                .aggregation(filter);
+        final SearchRequest searchRequest = new SearchRequest()
+                .source(searchSourceBuilder)
+                .indices(indices.toArray(new String[0]));
+        final SearchResponse searchResult = client.search(searchRequest, "Unable to retrieve min/max aggregation");
+
+        Max aggMax = searchResult.getAggregations().get(AGG_MAX);
+        Min aggMin = searchResult.getAggregations().get(AGG_MIN);
+
+        return new ImmutablePair<Double, Double>(aggMin.getValue(), aggMax.getValue());
     }
 
     private BoolQueryBuilder buildStreamIdFilter(Optional<Set<String>> includedStreams) {

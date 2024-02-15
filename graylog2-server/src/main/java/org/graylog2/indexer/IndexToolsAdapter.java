@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.joda.time.DateTime;
 
 import java.util.Map;
@@ -26,4 +27,6 @@ public interface IndexToolsAdapter {
     Map<DateTime, Map<String, Long>> fieldHistogram(String fieldName, Set<String> indices, Optional<Set<String>> includedStreams, long interval);
 
     long count(Set<String> indices, Optional<Set<String>> includedStreams);
+
+    ImmutablePair<Double, Double> max(String fieldName, Set<String> indices, Optional<Set<String>> includedStreams);
 }
