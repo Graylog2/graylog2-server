@@ -87,7 +87,7 @@
         <maven.compiler.useIncrementalCompilation>false</maven.compiler.useIncrementalCompilation>
 
         <!-- Dependencies -->
-        <opensearch.shaded.version>2.11.0-1</opensearch.shaded.version>
+        <opensearch.shaded.version>2.11.1-1</opensearch.shaded.version>
         <airline.version>3.0.0</airline.version>
         <amqp-client.version>5.20.0</amqp-client.version>
         <antlr.version>4.13.1</antlr.version>
@@ -101,7 +101,7 @@
         <aws-java-sdk-1.version>1.12.607</aws-java-sdk-1.version>
         <aws-java-sdk-2.version>2.24.3</aws-java-sdk-2.version>
         <aws-kinesis-client.version>2.2.10</aws-kinesis-client.version>
-        <aws-msk-iam-auth.version>2.0.2</aws-msk-iam-auth.version>
+        <aws-msk-iam-auth.version>2.0.3</aws-msk-iam-auth.version>
         <bouncycastle.version>1.77</bouncycastle.version>
         <byte-buddy.version>1.14.11</byte-buddy.version>
         <caffeine.version>3.1.8</caffeine.version>
