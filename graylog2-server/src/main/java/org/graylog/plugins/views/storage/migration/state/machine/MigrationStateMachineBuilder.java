@@ -74,7 +74,7 @@ public class MigrationStateMachineBuilder {
                 .permit(MigrationStep.PROVISION_DATANODE_CERTIFICATES, MigrationState.PROVISION_DATANODE_CERTIFICATES_RUNNING, migrationActions::provisionDataNodes);
 
         config.configure(MigrationState.PROVISION_DATANODE_CERTIFICATES_RUNNING)
-                .permitIf(MigrationStep.SHOW_DATA_MIGRATION_QUESTION, MigrationState.EXISTING_DATA_MIGRATION_QUESTION_PAGE, migrationActions::provisioningFinished);
+                .permitIf(MigrationStep.SHOW_DATA_MIGRATION_QUESTION, MigrationState.EXISTING_DATA_MIGRATION_QUESTION_PAGE, migrationActions::dataNodeStartupFinished);
 
         config.configure(MigrationState.EXISTING_DATA_MIGRATION_QUESTION_PAGE)
                 .permit(MigrationStep.SHOW_MIGRATE_EXISTING_DATA, MigrationState.MIGRATE_EXISTING_DATA)
