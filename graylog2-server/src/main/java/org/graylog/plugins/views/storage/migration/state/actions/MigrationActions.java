@@ -45,6 +45,8 @@ public interface MigrationActions {
 
     void provisionDataNodes();
 
+    void provisionAndStartDataNodes();
+
     boolean provisioningFinished();
 
     void startDataNodes();

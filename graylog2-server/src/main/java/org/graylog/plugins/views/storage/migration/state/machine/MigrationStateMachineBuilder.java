@@ -71,7 +71,7 @@ public class MigrationStateMachineBuilder {
                 });
 
         config.configure(MigrationState.PROVISION_DATANODE_CERTIFICATES_PAGE)
-                .permit(MigrationStep.PROVISION_DATANODE_CERTIFICATES, MigrationState.PROVISION_DATANODE_CERTIFICATES_RUNNING, migrationActions::provisionDataNodes);
+                .permit(MigrationStep.PROVISION_DATANODE_CERTIFICATES, MigrationState.PROVISION_DATANODE_CERTIFICATES_RUNNING, migrationActions::provisionAndStartDataNodes);
 
         config.configure(MigrationState.PROVISION_DATANODE_CERTIFICATES_RUNNING)
                 .permitIf(MigrationStep.SHOW_DATA_MIGRATION_QUESTION, MigrationState.EXISTING_DATA_MIGRATION_QUESTION_PAGE, migrationActions::dataNodeStartupFinished);

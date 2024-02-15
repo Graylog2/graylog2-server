@@ -143,7 +143,7 @@ public class MigrationStateMachineBuilderTest {
     public void testProvisionDatanodeCertificatesRunning() {
         StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.PROVISION_DATANODE_CERTIFICATES_PAGE);
         stateMachine.fire(MigrationStep.PROVISION_DATANODE_CERTIFICATES);
-        verify(migrationActions, times(1)).provisionDataNodes();
+        verify(migrationActions, times(1)).provisionAndStartDataNodes();
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.PROVISION_DATANODE_CERTIFICATES_RUNNING);
         assertThat(stateMachine.getPermittedTriggers()).isEmpty();
         verify(migrationActions, times(1)).dataNodeStartupFinished();

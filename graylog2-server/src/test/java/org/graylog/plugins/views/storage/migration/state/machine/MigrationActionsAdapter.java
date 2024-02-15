@@ -110,6 +110,10 @@ public class MigrationActionsAdapter implements MigrationActions {
     }
 
     @Override
+    public void provisionAndStartDataNodes() {
+    }
+
+    @Override
     public boolean provisioningFinished() {
         return false;
     }

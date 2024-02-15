@@ -161,6 +161,12 @@ public class MigrationActionsImpl implements MigrationActions {
     }
 
     @Override
+    public void provisionAndStartDataNodes() {
+        final Map<String, DataNodeDto> activeDataNodes = nodeService.allActive();
+        activeDataNodes.values().forEach(node -> dataNodeProvisioningService.changeState(node.getNodeId(), DataNodeProvisioningConfig.State.CONFIGURED));
+    }
+
+    @Override
     public boolean provisioningFinished() {
         return nodeService.allActive().values().stream().allMatch(node -> node.getDataNodeStatus() == DataNodeStatus.PREPARED);
     }
