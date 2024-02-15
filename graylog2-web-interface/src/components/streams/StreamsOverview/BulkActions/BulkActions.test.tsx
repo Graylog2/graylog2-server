@@ -63,7 +63,11 @@ describe('StreamsOverview BulkActionsRow', () => {
     });
 
     const indexSetSelect = await screen.findByLabelText('Index Set');
-    selectEvent.openMenu(indexSetSelect);
+
+    await act(async () => {
+      await selectEvent.openMenu(indexSetSelect);
+    });
+
     await selectEvent.select(indexSetSelect, 'Example Index Set');
 
     const document = screen.getByRole('document', { hidden: true });
@@ -93,9 +97,7 @@ describe('StreamsOverview BulkActionsRow', () => {
 
       await openActionsDropdown();
 
-      await act(async () => {
-        await assignIndexSet();
-      });
+      await assignIndexSet();
 
       await waitFor(() => expect(Streams.assignToIndexSet).toHaveBeenCalledWith('index-set-id-2', ['stream-id-1', 'stream-id-2']));
 
@@ -114,9 +116,7 @@ describe('StreamsOverview BulkActionsRow', () => {
 
       await openActionsDropdown();
 
-      await act(async () => {
-        await assignIndexSet();
-      });
+      await assignIndexSet();
 
       await waitFor(() => expect(UserNotification.error).toHaveBeenCalledWith('Assigning index set failed with status: Error: Unexpected error!', 'Error'));
     });

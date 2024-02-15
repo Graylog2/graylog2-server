@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, waitFor, act } from 'wrappedTestingLibrary';
+import { render, screen, waitFor, act, within } from 'wrappedTestingLibrary';
 
 import { MockStore, asMock } from 'helpers/mocking';
 import { NotificationsActions, NotificationsStore } from 'stores/notifications/NotificationsStore';
@@ -72,7 +72,7 @@ describe('NotificationBadge', () => {
     await screen.findByTestId(BADGE_ID);
     const badge = await screen.findByTestId(BADGE_ID);
 
-    expect(badge.innerHTML).toEqual('42');
+    expect(within(badge).getByText(42)).toBeInTheDocument();
   });
 
   it('updates notification count when triggered by store', async () => {
@@ -82,7 +82,7 @@ describe('NotificationBadge', () => {
 
     const badgeBefore = await screen.findByTestId(BADGE_ID);
 
-    expect(badgeBefore.innerHTML).toEqual('42');
+    expect(within(badgeBefore).getByText(42)).toBeInTheDocument();
 
     const cb = asMock(NotificationsStore.listen).mock.calls[0][0];
 
@@ -92,6 +92,8 @@ describe('NotificationBadge', () => {
 
     const badgeAfter = await screen.findByTestId(BADGE_ID);
 
-    await waitFor(() => { expect(badgeAfter.innerHTML).toEqual('23'); });
+    await waitFor(() => {
+      expect(within(badgeAfter).getByText(23)).toBeInTheDocument();
+    });
   });
 });

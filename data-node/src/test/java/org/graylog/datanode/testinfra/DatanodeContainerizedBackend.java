@@ -50,7 +50,7 @@ public class DatanodeContainerizedBackend {
     public DatanodeContainerizedBackend(final String nodeName, DatanodeDockerHooks hooks) {
 
         this.network = Network.newNetwork();
-        this.mongoDBTestService = MongoDBTestService.create(MongodbServer.MONGO5, this.network);
+        this.mongoDBTestService = MongoDBTestService.create(MongodbServer.DEFAULT_VERSION, this.network);
         this.mongoDBTestService.start();
 
         // we have created these resources, we have to close them.

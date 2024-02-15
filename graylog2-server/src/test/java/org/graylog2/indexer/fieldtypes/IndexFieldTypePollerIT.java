@@ -252,6 +252,7 @@ public abstract class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
                 FieldTypeDTO.builder().fieldName("full_message").physicalType("text").build(),
                 FieldTypeDTO.builder().fieldName("gl2_receive_timestamp").physicalType("date").build(),
                 FieldTypeDTO.builder().fieldName("gl2_processing_timestamp").physicalType("date").build(),
+                FieldTypeDTO.builder().fieldName("gl2_processing_duration_ms").physicalType("integer").build(),
                 FieldTypeDTO.builder().fieldName("gl2_message_id").physicalType("keyword").build(),
                 FieldTypeDTO.builder().fieldName("gl2_accounted_message_size").physicalType("long").build()
         );

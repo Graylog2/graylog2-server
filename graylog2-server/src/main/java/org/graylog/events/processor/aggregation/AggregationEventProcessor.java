@@ -248,6 +248,7 @@ public class AggregationEventProcessor implements EventProcessor {
                         .timerangeEnd(parameters.timerange().getTo())
                         .query(config.query())
                         .streams(event.getSourceStreams())
+                        .filters(config.filters())
                         .build());
 
                 eventsWithContext.add(EventWithContext.create(event, msg));
@@ -341,6 +342,7 @@ public class AggregationEventProcessor implements EventProcessor {
                     .timerangeEnd(event.getTimerangeEnd())
                     .query(config.query())
                     .streams(sourceStreams)
+                    .filters(config.filters())
                     .build());
             sourceStreams.forEach(event::addSourceStream);
 

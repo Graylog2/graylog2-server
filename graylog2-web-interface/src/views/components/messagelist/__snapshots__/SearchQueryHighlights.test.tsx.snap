@@ -26,7 +26,6 @@ exports[`SearchQueryHighlights highlights remainder of string if length of range
   >
     bar
   </span>
-  
 </div>
 `;
 
@@ -56,7 +55,6 @@ exports[`SearchQueryHighlights highlights string for multiple highlight ranges w
   >
     brown
   </span>
-  
   <span
     style="background-color: rgb(255, 236, 61); color: rgb(81, 75, 19); padding: 0px 1px;"
   />
@@ -72,7 +70,6 @@ exports[`SearchQueryHighlights highlights string for multiple, overlapping highl
   >
     brown
   </span>
-  
   <span
     style="background-color: rgb(255, 236, 61); color: rgb(81, 75, 19); padding: 0px 1px;"
   >
@@ -96,8 +93,4 @@ exports[`SearchQueryHighlights returns unmodified string without ranges 1`] = `
 </div>
 `;
 
-exports[`SearchQueryHighlights works for empty field & value 1`] = `
-<div>
-  
-</div>
-`;
+exports[`SearchQueryHighlights works for empty field & value 1`] = `<div />`;
