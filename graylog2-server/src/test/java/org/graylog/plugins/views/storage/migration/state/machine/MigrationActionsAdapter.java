@@ -86,11 +86,6 @@ public class MigrationActionsAdapter implements MigrationActions {
     }
 
     @Override
-    public void reindexOldData() {
-
-    }
-
-    @Override
     public void stopMessageProcessing() {
 
     }

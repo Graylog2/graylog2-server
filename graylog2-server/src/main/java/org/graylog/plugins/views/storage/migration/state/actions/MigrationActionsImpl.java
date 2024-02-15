@@ -110,11 +110,6 @@ public class MigrationActionsImpl implements MigrationActions {
     }
 
     @Override
-    public void reindexOldData() {
-
-    }
-
-    @Override
     public void stopMessageProcessing() {
         final String authToken = (String) stateMachineContext.getExtendedState(MigrationStateMachineContext.AUTH_TOKEN_KEY);
         final ClusterProcessingControl<RemoteProcessingControlResource> control = clusterProcessingControlFactory.create(authToken);

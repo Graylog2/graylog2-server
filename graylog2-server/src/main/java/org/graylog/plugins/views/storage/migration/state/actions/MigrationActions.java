@@ -34,8 +34,6 @@ public interface MigrationActions {
 
     boolean isRemoteReindexingFinished();
 
-    void reindexOldData();
-
     void stopMessageProcessing();
 
     void startMessageProcessing();
