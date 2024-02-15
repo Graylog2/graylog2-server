@@ -31,6 +31,11 @@ public class MigrationActionsAdapter implements MigrationActions {
 
     }
 
+    @Override
+    public boolean dataNodeStartupFinished() {
+        return false;
+    }
+
     public void setStateMachineContext(MigrationStateMachineContext context) {
         this.context = context;
     }
@@ -107,5 +112,10 @@ public class MigrationActionsAdapter implements MigrationActions {
     @Override
     public boolean provisioningFinished() {
         return false;
+    }
+
+    @Override
+    public void startDataNodes() {
+
     }
 }

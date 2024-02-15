@@ -47,9 +47,14 @@ public interface MigrationActions {
 
     boolean provisioningFinished();
 
+    void startDataNodes();
+
     void resetMigration();
+
+    boolean dataNodeStartupFinished();
 
     void setStateMachineContext(MigrationStateMachineContext context);
 
     MigrationStateMachineContext getStateMachineContext();
+
 }

@@ -228,12 +228,30 @@ public class MigrationStateMachineBuilderTest {
     public void testMessageProcessingStopReplaceClusterAndMpRestart() {
         StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.JOURNAL_SIZE_DOWNTIME_WARNING);
         stateMachine.fire(MigrationStep.SHOW_STOP_PROCESSING_PAGE);
-        assertThat(stateMachine.getState()).isEqualTo(MigrationState.MESSAGE_PROCESSING_STOP_REPLACE_CLUSTER_AND_MP_RESTART);
+        assertThat(stateMachine.getState()).isEqualTo(MigrationState.MESSAGE_PROCESSING_STOP);
         verify(migrationActions).stopMessageProcessing();
-        assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SHOW_ASK_TO_SHUTDOWN_OLD_CLUSTER);
+        assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SHOW_ASK_TO_START_DATANODE_AND_REPlACE_CLUSTER);
         verifyNoMoreInteractions(migrationActions);
-        stateMachine.fire(MigrationStep.SHOW_ASK_TO_SHUTDOWN_OLD_CLUSTER);
+        stateMachine.fire(MigrationStep.SHOW_ASK_TO_START_DATANODE_AND_REPlACE_CLUSTER);
+    }
+
+    @Test
+    public void testDataNodeClusterStart() {
+        StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.MESSAGE_PROCESSING_STOP);
+        stateMachine.fire(MigrationStep.SHOW_ASK_TO_START_DATANODE_AND_REPlACE_CLUSTER);
+        assertThat(stateMachine.getState()).isEqualTo(MigrationState.REPLACE_CLUSTER);
+        assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SHOW_ASK_TO_RESTART_MESSAGE_PROCESSING);
+        stateMachine.fire(MigrationStep.SHOW_ASK_TO_RESTART_MESSAGE_PROCESSING);
+    }
+
+    @Test
+    public void testMessageProcessingRestart() {
+        StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.REPLACE_CLUSTER);
+        stateMachine.fire(MigrationStep.SHOW_ASK_TO_RESTART_MESSAGE_PROCESSING);
+        assertThat(stateMachine.getState()).isEqualTo(MigrationState.MESSAGE_PROCESSING_RESTART);
         verify(migrationActions).startMessageProcessing();
+        assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SHOW_ASK_TO_SHUTDOWN_OLD_CLUSTER);
+        stateMachine.fire(MigrationStep.SHOW_ASK_TO_SHUTDOWN_OLD_CLUSTER);
         verifyNoMoreInteractions(migrationActions);
     }
 

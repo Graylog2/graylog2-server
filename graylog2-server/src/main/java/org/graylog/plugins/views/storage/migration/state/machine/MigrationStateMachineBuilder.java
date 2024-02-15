@@ -99,11 +99,17 @@ public class MigrationStateMachineBuilder {
                 .permitIf(MigrationStep.CALCULATE_JOURNAL_SIZE, MigrationState.JOURNAL_SIZE_DOWNTIME_WARNING, migrationActions::provisioningFinished);
 
         config.configure(MigrationState.JOURNAL_SIZE_DOWNTIME_WARNING)
-                .permit(MigrationStep.SHOW_STOP_PROCESSING_PAGE, MigrationState.MESSAGE_PROCESSING_STOP_REPLACE_CLUSTER_AND_MP_RESTART);
+                .permit(MigrationStep.SHOW_STOP_PROCESSING_PAGE, MigrationState.MESSAGE_PROCESSING_STOP);
 
-        config.configure(MigrationState.MESSAGE_PROCESSING_STOP_REPLACE_CLUSTER_AND_MP_RESTART)
+        config.configure(MigrationState.MESSAGE_PROCESSING_STOP)
                 .onEntry(migrationActions::stopMessageProcessing)
-                .onExit(migrationActions::startMessageProcessing)
+                .permit(MigrationStep.SHOW_ASK_TO_START_DATANODE_AND_REPlACE_CLUSTER, MigrationState.REPLACE_CLUSTER, migrationActions::startDataNodes);
+
+        config.configure(MigrationState.REPLACE_CLUSTER)
+                .permit(MigrationStep.SHOW_ASK_TO_RESTART_MESSAGE_PROCESSING, MigrationState.MESSAGE_PROCESSING_RESTART);
+
+        config.configure(MigrationState.MESSAGE_PROCESSING_RESTART)
+                .onEntry(migrationActions::startMessageProcessing)
                 .permit(MigrationStep.SHOW_ASK_TO_SHUTDOWN_OLD_CLUSTER, MigrationState.ASK_TO_SHUTDOWN_OLD_CLUSTER);
 
         // common cleanup steps
