@@ -200,7 +200,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                     // if we're running through preflight and reach "STARTUP_PREPARED", we want to request STARTUP of OpenSearch
                     var preparedNodes = nodesByState.getOrDefault(DataNodeProvisioningConfig.State.STARTUP_PREPARED, List.of());
                     if(!preparedNodes.isEmpty()) {
-                        preparedNodes.forEach(c -> dataNodeProvisioningService.save(c.asStartupRequested()));
+                        preparedNodes.forEach(c -> dataNodeProvisioningService.save(c.asStartupTrigger()));
                         // waiting one iteration after writing the new state, so we return from execution here and skip the rest of the periodical
                         return;
                     }
