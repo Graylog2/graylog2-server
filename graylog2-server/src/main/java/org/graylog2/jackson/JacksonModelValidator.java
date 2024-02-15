@@ -30,24 +30,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.UncheckedIOException;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class JacksonModelValidator {
     private static final Logger LOG = LoggerFactory.getLogger(JacksonModelValidator.class);
 
     public static void check(String collectionName, ObjectMapper objectMapper, Class<?> clazz) {
-        check(collectionName, objectMapper, clazz, new HashSet<>());
-    }
-
-    public static void check(String collectionName, ObjectMapper objectMapper, Class<?> clazz, Set<Class<?>> seen) {
-        LOG.info("CHECK [{}] {}", collectionName, clazz.getCanonicalName());
-
-        if (seen.contains(clazz)) {
-            LOG.info("    SKIPPED [{}] {}", collectionName, clazz.getCanonicalName());
-            return;
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("CHECK [{}] {}", collectionName, clazz.getCanonicalName());
         }
 
         final var config = objectMapper.getSerializationConfig();
@@ -59,14 +50,20 @@ public class JacksonModelValidator {
         } catch (JsonMappingException e) {
             throw new UncheckedIOException(e);
         }
-        seen.add(clazz);
 
-        if (beanDesc.getClassInfo().hasAnnotation(JsonSubTypes.class)) {
+        // AnnotationIntrospector#findSubtypes finds all subtypes going back up the parent class chain. That can lead
+        // to recursion, so we only try to find subtypes for classes that are annotated with JsonSubTypes.
+        if (beanDesc.getBeanClass().isAnnotationPresent(JsonSubTypes.class)) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("ITERATE SUBTYPES [{}] {}", collectionName, clazz.getCanonicalName());
+            }
             final List<NamedType> subtypes = ai.findSubtypes(beanDesc.getClassInfo());
             if (subtypes != null) {
                 for (NamedType subtype : subtypes) {
-                    LOG.info("  CHECK SUBTYPE [{}] {}", collectionName, subtype.getType().getCanonicalName());
-                    check(collectionName, objectMapper, subtype.getType(), seen);
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("CHECK SUBTYPE [{}] {} -> {}", collectionName, clazz.getCanonicalName(), subtype.getType().getCanonicalName());
+                    }
+                    check(collectionName, objectMapper, subtype.getType());
                 }
             }
         }
@@ -99,7 +96,7 @@ public class JacksonModelValidator {
                         }
                     }
                     default -> {
-                        // Nothing
+                        // Nothing to do
                     }
                 }
             }
