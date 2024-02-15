@@ -124,16 +124,13 @@ public class ESValuesHandler extends ESPivotBucketSpecHandler<Values> {
 
             final Stream<PivotBucket> bucketStream = extractTermsBuckets(previousKeys, reorderKeys, termsAggregation);
 
-            return otherBucket.getDocCount() > 0
-                    ? Stream.concat(bucketStream, Stream.of(PivotBucket.create(
-                    ImmutableList.<String>builder()
-                            .addAll(previousKeys)
-                            .addAll(MISSING_BUCKET_KEYS)
-                            .build(),
-                    otherBucket,
-                    true
-            )))
-                    : bucketStream;
+            if (otherBucket.getDocCount() > 0) {
+                final MultiBucketsAggregation otherTermsAggregations = otherBucket.getAggregations().get(AGG_NAME);
+                final var otherStream = extractTermsBuckets(previousKeys, reorderKeys, otherTermsAggregations);
+                return Stream.concat(bucketStream, otherStream);
+            } else {
+                return bucketStream;
+            }
         }
     }
 

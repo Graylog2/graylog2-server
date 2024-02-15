@@ -31,7 +31,6 @@ public class MigrationActionsAdapter implements MigrationActions {
 
     }
 
-    @Override
     public void setStateMachineContext(MigrationStateMachineContext context) {
         this.context = context;
     }

@@ -87,7 +87,7 @@
         <maven.compiler.useIncrementalCompilation>false</maven.compiler.useIncrementalCompilation>
 
         <!-- Dependencies -->
-        <opensearch.shaded.version>2.11.0-1</opensearch.shaded.version>
+        <opensearch.shaded.version>2.11.1-1</opensearch.shaded.version>
         <airline.version>3.0.0</airline.version>
         <amqp-client.version>5.20.0</amqp-client.version>
         <antlr.version>4.13.1</antlr.version>
@@ -101,13 +101,13 @@
         <aws-java-sdk-1.version>1.12.607</aws-java-sdk-1.version>
         <aws-java-sdk-2.version>2.23.4</aws-java-sdk-2.version>
         <aws-kinesis-client.version>2.2.10</aws-kinesis-client.version>
-        <aws-msk-iam-auth.version>2.0.2</aws-msk-iam-auth.version>
+        <aws-msk-iam-auth.version>2.0.3</aws-msk-iam-auth.version>
         <bouncycastle.version>1.77</bouncycastle.version>
         <byte-buddy.version>1.14.11</byte-buddy.version>
         <caffeine.version>3.1.8</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
         <classgraph.version>4.8.165</classgraph.version>
-        <commons-codec.version>1.16.0</commons-codec.version>
+        <commons-codec.version>1.16.1</commons-codec.version>
         <commons-csv.version>1.10.0</commons-csv.version>
         <commons-email.version>1.6.0</commons-email.version>
         <commons-lang3.version>3.14.0</commons-lang3.version>
@@ -152,7 +152,7 @@
         <mongodb-driver.version>4.11.1</mongodb-driver.version>
         <mongojack.version>4.8.2</mongojack.version>
         <natty.version>0.13</natty.version>
-        <netty.version>4.1.106.Final</netty.version>
+        <netty.version>4.1.107.Final</netty.version>
         <netty-tcnative-boringssl-static.version>2.0.62.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>4.12.0</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
