@@ -19,9 +19,25 @@ package org.graylog.plugins.views.storage.migration.state.machine;
 import org.graylog.plugins.views.storage.migration.state.actions.MigrationActions;
 
 public class MigrationActionsAdapter implements MigrationActions {
+
+    MigrationStateMachineContext context;
+
+    public MigrationActionsAdapter() {
+        this.context = new MigrationStateMachineContext();
+    }
+
     @Override
     public void resetMigration() {
 
+    }
+
+    public void setStateMachineContext(MigrationStateMachineContext context) {
+        this.context = context;
+    }
+
+    @Override
+    public MigrationStateMachineContext getStateMachineContext() {
+        return context;
     }
 
     @Override

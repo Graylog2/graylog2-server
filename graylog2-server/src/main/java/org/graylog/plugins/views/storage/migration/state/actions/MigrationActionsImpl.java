@@ -17,6 +17,8 @@
 package org.graylog.plugins.views.storage.migration.state.actions;
 
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachineContext;
 import org.graylog.plugins.views.storage.migration.state.persistence.DatanodeMigrationConfiguration;
 import org.graylog.security.certutil.CaService;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
@@ -27,23 +29,35 @@ import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.cluster.preflight.DataNodeProvisioningService;
 import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.system.processing.control.ClusterProcessingControl;
+import org.graylog2.system.processing.control.ClusterProcessingControlFactory;
+import org.graylog2.system.processing.control.RemoteProcessingControlResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
+@Singleton
 public class MigrationActionsImpl implements MigrationActions {
+    private static final Logger LOG = LoggerFactory.getLogger(MigrationActionsImpl.class);
 
     private final ClusterConfigService clusterConfigService;
+    private final ClusterProcessingControlFactory clusterProcessingControlFactory;
     private final NodeService<DataNodeDto> nodeService;
     private final CaService caService;
     private final DataNodeProvisioningService dataNodeProvisioningService;
 
+    private MigrationStateMachineContext stateMachineContext;
+
     @Inject
     public MigrationActionsImpl(final ClusterConfigService clusterConfigService, NodeService<DataNodeDto> nodeService,
-                                final CaService caService, DataNodeProvisioningService dataNodeProvisioningService) {
+                                final CaService caService, DataNodeProvisioningService dataNodeProvisioningService,
+                                final ClusterProcessingControlFactory clusterProcessingControlFactory) {
         this.clusterConfigService = clusterConfigService;
         this.nodeService = nodeService;
         this.caService = caService;
         this.dataNodeProvisioningService = dataNodeProvisioningService;
+      this.clusterProcessingControlFactory = clusterProcessingControlFactory;
     }
 
     @Override
@@ -93,12 +107,22 @@ public class MigrationActionsImpl implements MigrationActions {
 
     @Override
     public void stopMessageProcessing() {
-
+        final String authToken = (String)stateMachineContext.getExtendedState(MigrationStateMachineContext.AUTH_TOKEN_KEY);
+        final ClusterProcessingControl<RemoteProcessingControlResource> control = clusterProcessingControlFactory.create(authToken);
+        LOG.info("Attempting to pause processing on all nodes...");
+        control.pauseProcessing();
+        LOG.info("Done pausing processing on all nodes.");
+        LOG.info("Waiting for output buffer to drain on all nodes...");
+        control.waitForEmptyBuffers();
+        LOG.info("Done waiting for output buffer to drain on all nodes.");
     }
 
     @Override
     public void startMessageProcessing() {
-
+        final String authToken = (String)stateMachineContext.getExtendedState(MigrationStateMachineContext.AUTH_TOKEN_KEY);
+        final ClusterProcessingControl<RemoteProcessingControlResource> control = clusterProcessingControlFactory.create(authToken);
+        LOG.info("Resuming message processing.");
+        control.resumeGraylogMessageProcessing();
     }
 
     @Override
@@ -130,4 +154,14 @@ public class MigrationActionsImpl implements MigrationActions {
     public boolean provisioningFinished() {
         return nodeService.allActive().values().stream().allMatch(node -> node.getDataNodeStatus() == DataNodeStatus.AVAILABLE);
     }
+
+    public void setStateMachineContext(MigrationStateMachineContext context) {
+        this.stateMachineContext = context;
+    }
+
+    @Override
+    public MigrationStateMachineContext getStateMachineContext() {
+        return stateMachineContext;
+    }
+
 }

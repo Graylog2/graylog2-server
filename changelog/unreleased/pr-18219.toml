@@ -1,0 +1,4 @@
+type = "f"
+message = "Avoid logging Graylog node ID multiple times during server startup."
+
+pulls = ["18219"]
