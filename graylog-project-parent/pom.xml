@@ -689,25 +689,5 @@
                 </plugins>
             </build>
         </profile>
-        <profile>
-            <id>travis</id>
-            <activation>
-                <property>
-                    <name>env.TRAVIS</name>
-                    <value>true</value>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <configuration>
-                            <forkCount>2</forkCount>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
     </profiles>
 </project>

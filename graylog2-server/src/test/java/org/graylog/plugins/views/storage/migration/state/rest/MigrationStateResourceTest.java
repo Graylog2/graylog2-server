@@ -16,13 +16,15 @@
  */
 package org.graylog.plugins.views.storage.migration.state.rest;
 
+import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.Response;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationState;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachine;
+import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachineContext;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStep;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -37,10 +39,26 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class MigrationStateResourceTest {
 
+    public static final String AUTHORIZATION = "MyAuthorization";
     @Mock
     MigrationStateMachine stateMachine;
-    @InjectMocks
+    @Mock
+    HttpHeaders httpHeaders;
+    MigrationStateMachineContext stateMachineContext;
     MigrationStateResource migrationStateResource;
+
+    @BeforeEach
+    public void setUp() {
+        stateMachineContext = new MigrationStateMachineContext();
+        when(stateMachine.getContext()).thenReturn(stateMachineContext);
+        when(httpHeaders.getRequestHeader(HttpHeaders.AUTHORIZATION)).thenReturn(List.of(AUTHORIZATION));
+        migrationStateResource = new MigrationStateResource(stateMachine, httpHeaders);
+    }
+
+    @Test
+    public void authenticationTokenSetToStateMachineContext() {
+        assertThat(stateMachineContext.getExtendedState(MigrationStateMachineContext.AUTH_TOKEN_KEY)).isEqualTo(AUTHORIZATION);
+    }
 
     @Test
     public void requestReturnsSuccessfulResult() {

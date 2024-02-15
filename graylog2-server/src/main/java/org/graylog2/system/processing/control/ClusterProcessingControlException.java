@@ -14,20 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.rest.models.system.responses;
+package org.graylog2.system.processing.control;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+public class ClusterProcessingControlException extends RuntimeException {
 
-@JsonAutoDetect
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = DeflectorConfigResponse.TYPE_FIELD, visible = true)
-public interface DeflectorConfigResponse {
-    String TYPE_FIELD = "type";
+    public ClusterProcessingControlException(String message) {
+        super(message);
+    }
 
-    @JsonProperty(TYPE_FIELD)
-    String type();
-
-    @JsonProperty("max_number_of_indices")
-    int maxNumberOfIndices();
+    public ClusterProcessingControlException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

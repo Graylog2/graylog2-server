@@ -2737,9 +2737,9 @@
   integrity sha512-Qk7Pfu8BSarKGqILj4x7bCSZ1pjuAPZ+qmRwH5S7mDS91VSbVVsJSrW4qA+GPrro8t69gFYVMWb1Zc4yFmPiVg==
 
 "@reduxjs/toolkit@^2.2.0":
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/@reduxjs/toolkit/-/toolkit-2.2.0.tgz#69b7d7933ea3e7f0cbbe182caa4850e09ea643ae"
-  integrity sha512-ZvPYKfu4kDnAqPhJ1bsis8QFbiQRz3Q2HxW3tw9tVGusPzYKRG7ju1FA+34PGcwCoemjGGv+f/7fEygcRZIwmA==
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/@reduxjs/toolkit/-/toolkit-2.2.1.tgz#3dce4906fb33da9e0122468ef21438dd7f2277a9"
+  integrity sha512-8CREoqJovQW/5I4yvvijm/emUiCCmcs4Ev4XPWd4mizSO+dD3g5G6w34QK5AGeNrSH7qM8Fl66j4vuV7dpOdkw==
   dependencies:
     immer "^10.0.3"
     redux "^5.0.1"
@@ -12130,9 +12130,9 @@ postcss@^8.4.31, postcss@^8.4.33:
     source-map-js "^1.0.2"
 
 posthog-js@^1.52.0:
-  version "1.104.2"
-  resolved "https://registry.yarnpkg.com/posthog-js/-/posthog-js-1.104.2.tgz#9e4b8d041464f1a9a59ec09c76ea97c66a229d0e"
-  integrity sha512-sTvGorJG5fz7CCLWhJqCnGulhJbG5sWWRnmb4EWmMu/8GfX8uSsQktTmIobT5E3wfgCfevTFcIivdDlzlGP5fg==
+  version "1.105.9"
+  resolved "https://registry.yarnpkg.com/posthog-js/-/posthog-js-1.105.9.tgz#4fea34135a163721725214862a7a1e5259670e82"
+  integrity sha512-i9DnfyXDktugF5E9x0ejihQ8Xdh1kdVnVh7GdL7+PvFtULGMoN/b4pDmWBCwmH+ciubmqTCImVuNrZYy8+eTbw==
   dependencies:
     fflate "^0.4.8"
     preact "^10.19.3"
@@ -15179,9 +15179,9 @@ utila@~0.4:
   integrity sha1-ihagXURWV6Oupe7MWxKk+lN5dyw=
 
 utility-types@^3.10.0:
-  version "3.10.0"
-  resolved "https://registry.yarnpkg.com/utility-types/-/utility-types-3.10.0.tgz#ea4148f9a741015f05ed74fd615e1d20e6bed82b"
-  integrity sha512-O11mqxmi7wMKCo6HKFt5AhO4BwY3VV68YU07tgxfz8zJTIxr4BpsezN49Ffwy9j3ZpwwJp4fkRwjRzq3uWE6Rg==
+  version "3.11.0"
+  resolved "https://registry.yarnpkg.com/utility-types/-/utility-types-3.11.0.tgz#607c40edb4f258915e901ea7995607fdf319424c"
+  integrity sha512-6Z7Ma2aVEWisaL6TvBCy7P8rm2LQoPv6dJ7ecIaIixHcwfbJ0x7mWdbcwlIM5IGQxPZSFYeqRCqlOOeKoJYMkw==
 
 utils-merge@1.0.1:
   version "1.0.1"
