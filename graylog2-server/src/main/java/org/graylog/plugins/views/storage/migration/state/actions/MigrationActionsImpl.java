@@ -43,7 +43,7 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.Objects;
 
 @Singleton
 public class MigrationActionsImpl implements MigrationActions {
@@ -188,19 +188,18 @@ public class MigrationActionsImpl implements MigrationActions {
 
     @Override
     public void startRemoteReindex() {
-        final URI hostname = URI.create(getStateMachineContext().getActionArgument("hostname", String.class));
-        final String user = getStateMachineContext().getActionArgument("user", String.class);
-        final String password = getStateMachineContext().getActionArgument("password", String.class);
-        final List<String> indicesNames = Collections.emptyList(); // empty means all available indices
-        final RemoteReindexMigration migration = migrationService.start(hostname, user, password, indicesNames, false);
+        final URI hostname = Objects.requireNonNull(URI.create(getStateMachineContext().getActionArgument("hostname", String.class)), "hostname has to be provided");
+        final String user = getStateMachineContext().getActionArgumentOpt("user", String.class).orElse(null);
+        final String password = getStateMachineContext().getActionArgumentOpt("password", String.class).orElse(null);
+        final List<String> indices = getStateMachineContext().getActionArgumentOpt("indices", List.class).orElse(Collections.emptyList()); // todo: generics!
+        final RemoteReindexMigration migration = migrationService.start(hostname, user, password, indices, false);
         final String migrationID = migration.id();
         getStateMachineContext().addExtendedState(MigrationStateMachineContext.KEY_MIGRATION_ID, migrationID);
     }
 
     @Override
     public void requestMigrationStatus() {
-        final Optional<String> migrationState = getStateMachineContext().getExtendedState(MigrationStateMachineContext.KEY_MIGRATION_ID, String.class);
-        migrationState
+        getStateMachineContext().getExtendedState(MigrationStateMachineContext.KEY_MIGRATION_ID, String.class)
                 .map(migrationService::status)
                 .ifPresent(status -> getStateMachineContext().setResponse(status));
     }

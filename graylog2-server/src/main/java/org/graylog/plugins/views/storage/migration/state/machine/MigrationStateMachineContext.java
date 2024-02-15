@@ -66,6 +66,18 @@ public class MigrationStateMachineContext {
         return (T) arg;
     }
 
+    public <T> Optional<T> getActionArgumentOpt(String name, Class<T> type) {
+        Map<String, Object> args = this.actionArguments.get(currentStep);
+        return Optional.ofNullable(args)
+                .map(arg -> arg.get(name))
+                .map(arg -> {
+                    if (!type.isInstance(arg)) {
+                        throw new IllegalArgumentException("Argument " + name + " must be of type " + type);
+                    }
+                    return (T) arg;
+                });
+    }
+
     public void addActionArguments(MigrationStep step, Map<String, Object> args) {
         this.actionArguments.put(step, args);
     }
