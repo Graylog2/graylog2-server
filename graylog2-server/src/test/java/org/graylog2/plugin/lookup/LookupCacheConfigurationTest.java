@@ -44,12 +44,12 @@ class LookupCacheConfigurationTest {
                 .type(NullCache.NAME)
                 .build();
 
-        JacksonSubtypesAssertions.assertThat(caffeineCacheConfig)
+        JacksonSubtypesAssertions.assertThatDto(caffeineCacheConfig)
                 .withObjectMapper(objectMapper)
                 .deserializesWhenGivenSupertype(LookupCacheConfiguration.class)
                 .doesNotSerializeWithDuplicateFields();
 
-        JacksonSubtypesAssertions.assertThat(nullCacheConfig)
+        JacksonSubtypesAssertions.assertThatDto(nullCacheConfig)
                 .withObjectMapper(objectMapper)
                 .deserializesWhenGivenSupertype(LookupCacheConfiguration.class)
                 .doesNotSerializeWithDuplicateFields();

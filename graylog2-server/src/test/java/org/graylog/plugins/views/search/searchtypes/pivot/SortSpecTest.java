@@ -18,10 +18,11 @@ package org.graylog.plugins.views.search.searchtypes.pivot;
 
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import org.assertj.core.api.Assertions;
-import org.graylog.testing.jackson.JacksonSubtypesAssertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+
+import static org.graylog.testing.jackson.JacksonSubtypesAssertions.assertThatDto;
 
 class SortSpecTest {
 
@@ -46,12 +47,12 @@ class SortSpecTest {
 
     @Test
     void subtypes() {
-        JacksonSubtypesAssertions.assertThat(PivotSort.create("field", SortSpec.Direction.Ascending))
+        assertThatDto(PivotSort.create("field", SortSpec.Direction.Ascending))
                 .withRegisteredSubtypes(List.of(new NamedType(PivotSort.class, PivotSort.Type)))
                 .doesNotSerializeWithDuplicateFields()
                 .deserializesWhenGivenSupertype(SortSpec.class);
 
-        JacksonSubtypesAssertions.assertThat(SeriesSort.create("field", SortSpec.Direction.Ascending))
+        assertThatDto(SeriesSort.create("field", SortSpec.Direction.Ascending))
                 .withRegisteredSubtypes(List.of(new NamedType(SeriesSort.class, SeriesSort.Type)))
                 .doesNotSerializeWithDuplicateFields()
                 .deserializesWhenGivenSupertype(SortSpec.class);

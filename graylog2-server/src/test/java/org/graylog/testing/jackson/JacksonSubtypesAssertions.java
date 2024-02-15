@@ -37,7 +37,7 @@ public class JacksonSubtypesAssertions<T> extends AbstractAssert<JacksonSubtypes
      *
      * @param actual The object to assert
      */
-    public static <T> JacksonSubtypesAssertions<T> assertThat(T actual) {
+    public static <T> JacksonSubtypesAssertions<T> assertThatDto(T actual) {
         return new JacksonSubtypesAssertions<>(actual);
     }
 

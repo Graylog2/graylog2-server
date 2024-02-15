@@ -45,11 +45,11 @@ class LookupDataAdapterConfigurationTest {
                 .readTimeout(1)
                 .build();
 
-        JacksonSubtypesAssertions.assertThat(httpConfig)
+        JacksonSubtypesAssertions.assertThatDto(httpConfig)
                 .withObjectMapper(objectMapper)
                 .deserializesWhenGivenSupertype(LookupDataAdapterConfiguration.class)
                 .doesNotSerializeWithDuplicateFields();
-        JacksonSubtypesAssertions.assertThat(whoisConfig)
+        JacksonSubtypesAssertions.assertThatDto(whoisConfig)
                 .withObjectMapper(objectMapper)
                 .deserializesWhenGivenSupertype(LookupDataAdapterConfiguration.class)
                 .doesNotSerializeWithDuplicateFields();
