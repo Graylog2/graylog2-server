@@ -19,11 +19,11 @@ import * as React from 'react';
 import MigrationStepTriggerButtonToolbar from 'components/datanode/migrations/common/MigrationStepTriggerButtonToolbar';
 import type { MigrationStepComponentProps } from 'components/datanode/Types';
 
-const MigrateActions = ({ nextSteps, onTriggerStep }: MigrationStepComponentProps) => (
+const StopMessageProcessing = ({ nextSteps, onTriggerStep }: MigrationStepComponentProps) => (
   <>
     Migrations Steps
     <MigrationStepTriggerButtonToolbar nextSteps={nextSteps} onTriggerStep={onTriggerStep} />
   </>
 
 );
-export default MigrateActions;
+export default StopMessageProcessing;

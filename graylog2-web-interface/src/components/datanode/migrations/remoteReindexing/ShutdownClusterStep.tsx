@@ -18,10 +18,13 @@ import * as React from 'react';
 
 import MigrationStepTriggerButtonToolbar from 'components/datanode/migrations/common/MigrationStepTriggerButtonToolbar';
 import type { MigrationStepComponentProps } from 'components/datanode/Types';
+import { Space } from 'preflight/components/common';
 
 const ShutdownClusterStep = ({ nextSteps, onTriggerStep }: MigrationStepComponentProps) => (
   <>
-    <p>Please shut down you <code>Opensearch</code> before continuing. </p>
+    <p>The migration from your current <code>Opensearch</code> to the data node is almost done.</p>
+    <p>to finish please shut down your <code>Opensearch</code> cluster before continuing.</p>
+    <Space h="md" />
     <MigrationStepTriggerButtonToolbar nextSteps={nextSteps} onTriggerStep={onTriggerStep} />
   </>
 

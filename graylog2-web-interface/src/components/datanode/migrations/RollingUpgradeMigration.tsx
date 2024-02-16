@@ -23,8 +23,9 @@ import type { MigrationActions, MigrationState, StepArgs, MigrationStateItem } f
 import Welcome from 'components/datanode/migrations/rollingUpgrade/Welcome';
 import CertificatesProvisioning from 'components/datanode/migrations/rollingUpgrade/CertificatesProvisioning';
 import JournalDowntimeWarning from 'components/datanode/migrations/rollingUpgrade/JournalDowntimeWarning';
-import MigrateActions from 'components/datanode/migrations/rollingUpgrade/MigrateActions';
+import StopMessageProcessing from 'components/datanode/migrations/rollingUpgrade/StopMessageProcessing';
 import CompatibilityCheckStep from 'components/datanode/migrations/CompatibilityCheckStep';
+import ReplaceCluster from 'components/datanode/migrations/rollingUpgrade/ReplaceCluster';
 
 type Props = {
     currentStep: MigrationState,
@@ -78,8 +79,10 @@ const RollingUpgradeMigration = ({ currentStep, onTriggerNextStep }: Props) => {
         return <CertificatesProvisioning nextSteps={nextSteps} onTriggerStep={onStepComplete} />;
       case MIGRATION_STATE.JOURNAL_SIZE_DOWNTIME_WARNING.key:
         return <JournalDowntimeWarning nextSteps={nextSteps} onTriggerStep={onStepComplete} />;
-      case MIGRATION_STATE.MESSAGE_PROCESSING_STOP_REPLACE_CLUSTER_AND_MP_RESTART.key:
-        return <MigrateActions nextSteps={nextSteps} onTriggerStep={onStepComplete} />;
+      case MIGRATION_STATE.MESSAGE_PROCESSING_STOP.key:
+        return <StopMessageProcessing nextSteps={nextSteps} onTriggerStep={onStepComplete} />;
+      case MIGRATION_STATE.REPLACE_CLUSTER.key:
+        return <ReplaceCluster nextSteps={nextSteps} onTriggerStep={onStepComplete} />;
       default:
         return <Welcome nextSteps={nextSteps} onTriggerStep={onStepComplete} />;
     }
@@ -93,6 +96,8 @@ const RollingUpgradeMigration = ({ currentStep, onTriggerNextStep }: Props) => {
       </p>
       <StyledPanelGroup accordion id="first" activeKey={activeStep} onSelect={() => {}}>
         {ROLLING_UPGRADE_MIGRATION_STEPS.map((rollingUpgradeStep, index) => {
+          console.log(rollingUpgradeStep);
+
           const { description } = MIGRATION_STATE[rollingUpgradeStep];
 
           return (

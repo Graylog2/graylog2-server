@@ -42,10 +42,10 @@ const CompatibilityCheckStep = ({ nextSteps, onTriggerStep }: MigrationStepCompo
     <>
       <h3>Directory compatibility check</h3>
       <CompatibilityAlert bsStyle={(!isError && isCompatible) ? 'success' : 'danger'}>
-        {isCompatible && <h4>Your existing opensearch data can be migrated to Datanode.</h4>}
+        {isCompatible && <h4>Your existing opensearch data can be migrated to data node.</h4>}
         {!isError && !isCompatible && (
           <>
-            <h4>Your existing opensearch data cannot be migrated to Datanode.</h4>
+            <h4>Your existing opensearch data cannot be migrated to data node.</h4>
             <br />
             Error: {data?.compatibility_errors.map((error) => <dd key={error}>{error}</dd>)}
           </>
@@ -57,7 +57,7 @@ const CompatibilityCheckStep = ({ nextSteps, onTriggerStep }: MigrationStepCompo
           </>
         )}
       </CompatibilityAlert>
-      {!isCompatible && (<p>Your Opensearch cluster cannot be migrated to this datanode version because it&apos;s not compatible</p>)}
+      {!isCompatible && (<p>Your Opensearch cluster cannot be migrated to this data node version because it&apos;s not compatible</p>)}
       {isCompatible && <CompatibilityStatus opensearchVersion={data.opensearch_version} nodeInfo={data.info} />}
 
       <MigrationStepTriggerButtonToolbar nextSteps={nextSteps} onTriggerStep={onTriggerStep} />

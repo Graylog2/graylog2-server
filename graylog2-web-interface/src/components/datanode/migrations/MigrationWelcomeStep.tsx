@@ -50,12 +50,12 @@ const StyledHelpPanel = styled(StyledPanel)`
 const MigrationWelcomeStep = ({ nextSteps, onTriggerStep }: Props) => (
   <Row>
     <Col md={6}>
-      <Headline>Migration to Datanode !</Headline>
+      <Headline>Migration to Data node !</Headline>
       <p>
         It looks like you updated Graylog and want to configure a data node. Data nodes allow you to index and search through all the messages in your Graylog message database.
       </p>
       <p>
-        Using this migration tool you can check the compatibility and follow the steps to migrate your exsisting Opensearch data to a Datanode.<br />
+        Using this migration tool you can check the compatibility and follow the steps to migrate your exsisting Opensearch data to a Data node.<br />
       </p>
       <p>Migrating to data node require some step the are performed using the UI in this wizard, but it also require some additional step that should be performed on the OS, you current OS/ES cluster and you config files</p>
       <p>You can get more information on the Data node migration <DocumentationLink page="graylog-data-node" text="documentation" /></p>
@@ -73,10 +73,6 @@ const MigrationWelcomeStep = ({ nextSteps, onTriggerStep }: Props) => (
             authentication.
             So you have to first migrate to OpenSearch before running the update of the security information. Look at
             the supplied <code>es710-docker-compose.yml</code> as an example.
-          </p>
-          <p>Please note that except for the servicename, I changed the cluster name and hostnames etc. to opensearch.
-            In a regular setting, it would be the other way around and you would have to pull the elasticsearch names
-            through the whole process into the DataNode.
           </p>
         </Panel.Body>
       </StyledHelpPanel>
