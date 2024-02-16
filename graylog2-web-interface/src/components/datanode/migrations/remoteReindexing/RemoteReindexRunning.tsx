@@ -30,8 +30,7 @@ const RemoteReindexRunning = ({ nextSteps, onTriggerStep }: MigrationStepCompone
     onTriggerStep(nextSteps[0], {});
   };
 
-  const { data, error } = useRemoteReindexMigrationStatus(migrationID, onSuccess);
-  console.log(data, error);
+  const { data } = useRemoteReindexMigrationStatus(migrationID, onSuccess);
 
   return (
     <>

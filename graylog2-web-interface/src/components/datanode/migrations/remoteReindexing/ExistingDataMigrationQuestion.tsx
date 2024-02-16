@@ -19,16 +19,13 @@ import * as React from 'react';
 import type { MigrationStepComponentProps } from '../../Types';
 import MigrationStepTriggerButtonToolbar from '../common/MigrationStepTriggerButtonToolbar';
 
-const ExistingDataMigrationQuestion = ({ nextSteps, onTriggerStep }: MigrationStepComponentProps) => {
-
-  return (
-    <>
-      Do you want to migrate your existing data?
-      <br />
-      <br />
-      <MigrationStepTriggerButtonToolbar nextSteps={nextSteps} onTriggerStep={onTriggerStep} />
-    </>
-  );
-};
+const ExistingDataMigrationQuestion = ({ nextSteps, onTriggerStep }: MigrationStepComponentProps) => (
+  <>
+    Do you want to migrate your existing data?
+    <br />
+    <br />
+    <MigrationStepTriggerButtonToolbar nextSteps={nextSteps} onTriggerStep={onTriggerStep} />
+  </>
+);
 
 export default ExistingDataMigrationQuestion;
