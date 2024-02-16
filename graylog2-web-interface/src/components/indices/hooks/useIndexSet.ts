@@ -53,7 +53,8 @@ const useIndexSet = (initialIndexSet?: IndexSet) :[IndexSet, Dispatch<SetStateAc
     };
 
     if (initialIndexSet) {
-      setIndexSet({ ...defaultIndexSet, ...initialIndexSet });
+      const initialIndexWithoutNullValues = Object.fromEntries(Object.entries(initialIndexSet).filter(([_, v]) => v != null));
+      setIndexSet({ ...defaultIndexSet, ...initialIndexWithoutNullValues });
     } else {
       setIndexSet({ ...defaultIndexSet });
     }
