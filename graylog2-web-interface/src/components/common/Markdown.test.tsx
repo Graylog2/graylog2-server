@@ -21,6 +21,7 @@ import Markdown from './Markdown';
 
 describe('Markdown', () => {
   // We are skipping this test, until we can implement a headless theme provider from @mantine/core
+  // eslint-disable-next-line jest/no-disabled-tests
   it.skip('renders `undefined`', () => {
     const { container } = render(<Markdown text={undefined} />);
 
@@ -32,6 +33,7 @@ describe('Markdown', () => {
   });
 
   // We are skipping this test, until we can implement a headless theme provider from @mantine/core
+  // eslint-disable-next-line jest/no-disabled-tests
   it.skip('renders empty string', () => {
     const { container } = render(<Markdown text="" />);
 
