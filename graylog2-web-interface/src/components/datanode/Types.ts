@@ -86,6 +86,8 @@ export type MigrationStateItem = ExtractKeyValues<typeof MIGRATION_STATE>
 export type MigrationState = {
   state: MigrationStateItem,
   next_steps: Array<MigrationActions>,
+  error_message?: string|null,
+  response?: { [_key: string]: unknown },
 }
 
 export type MigrationStepRequest = {
