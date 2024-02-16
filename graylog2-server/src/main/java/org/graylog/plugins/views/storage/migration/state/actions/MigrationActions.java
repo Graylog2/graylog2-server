@@ -45,11 +45,18 @@ public interface MigrationActions {
 
     void provisionDataNodes();
 
+    void provisionAndStartDataNodes();
+
     boolean provisioningFinished();
 
+    void startDataNodes();
+
     void resetMigration();
+
+    boolean dataNodeStartupFinished();
 
     void setStateMachineContext(MigrationStateMachineContext context);
 
     MigrationStateMachineContext getStateMachineContext();
+
 }

@@ -22,6 +22,8 @@ import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateM
 import org.graylog.plugins.views.storage.migration.state.persistence.DatanodeMigrationConfiguration;
 import org.graylog.security.certutil.CaService;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
+import org.graylog2.bootstrap.preflight.PreflightConfigResult;
+import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.DataNodeStatus;
 import org.graylog2.cluster.nodes.NodeService;
@@ -46,18 +48,21 @@ public class MigrationActionsImpl implements MigrationActions {
     private final NodeService<DataNodeDto> nodeService;
     private final CaService caService;
     private final DataNodeProvisioningService dataNodeProvisioningService;
+    private final PreflightConfigService preflightConfigService;
 
     private MigrationStateMachineContext stateMachineContext;
 
     @Inject
     public MigrationActionsImpl(final ClusterConfigService clusterConfigService, NodeService<DataNodeDto> nodeService,
                                 final CaService caService, DataNodeProvisioningService dataNodeProvisioningService,
-                                final ClusterProcessingControlFactory clusterProcessingControlFactory) {
+                                final ClusterProcessingControlFactory clusterProcessingControlFactory,
+                                final PreflightConfigService preflightConfigService) {
         this.clusterConfigService = clusterConfigService;
         this.nodeService = nodeService;
         this.caService = caService;
         this.dataNodeProvisioningService = dataNodeProvisioningService;
-      this.clusterProcessingControlFactory = clusterProcessingControlFactory;
+        this.clusterProcessingControlFactory = clusterProcessingControlFactory;
+        this.preflightConfigService = preflightConfigService;
     }
 
     @Override
@@ -146,12 +151,34 @@ public class MigrationActionsImpl implements MigrationActions {
 
     @Override
     public void provisionDataNodes() {
+        // if we start provisioning DataNodes via the migration, Preflight is definitely done/no option anymore
+        var preflight = preflightConfigService.getPreflightConfigResult();
+        if(preflight == null || !preflight.equals(PreflightConfigResult.FINISHED)) {
+            preflightConfigService.setConfigResult(PreflightConfigResult.FINISHED);
+        }
+        final Map<String, DataNodeDto> activeDataNodes = nodeService.allActive();
+        activeDataNodes.values().forEach(node -> dataNodeProvisioningService.changeState(node.getNodeId(), DataNodeProvisioningConfig.State.CONFIGURED));
+    }
+
+    @Override
+    public void provisionAndStartDataNodes() {
         final Map<String, DataNodeDto> activeDataNodes = nodeService.allActive();
         activeDataNodes.values().forEach(node -> dataNodeProvisioningService.changeState(node.getNodeId(), DataNodeProvisioningConfig.State.CONFIGURED));
     }
 
     @Override
     public boolean provisioningFinished() {
+        return nodeService.allActive().values().stream().allMatch(node -> node.getDataNodeStatus() == DataNodeStatus.PREPARED);
+    }
+
+    @Override
+    public void startDataNodes() {
+        final Map<String, DataNodeDto> activeDataNodes = nodeService.allActive();
+        activeDataNodes.values().forEach(node -> dataNodeProvisioningService.changeState(node.getNodeId(), DataNodeProvisioningConfig.State.STARTUP_REQUESTED));
+    }
+
+    @Override
+    public boolean dataNodeStartupFinished() {
         return nodeService.allActive().values().stream().allMatch(node -> node.getDataNodeStatus() == DataNodeStatus.AVAILABLE);
     }
 

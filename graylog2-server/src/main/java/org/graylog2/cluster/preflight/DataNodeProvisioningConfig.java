@@ -38,6 +38,7 @@ public abstract class DataNodeProvisioningConfig {
         SIGNED, // Graylog CA signed the CSR
         STORED, // Certificate is combined with private key and stored in Mongo
         STARTUP_PREPARED, // All configuration has been written
+        STARTUP_TRIGGER, // Startup of the OpenSearch process requested from Graylog
         STARTUP_REQUESTED, // Startup of the OpenSearch process requested
         CONNECTING, // connectivity check running until error or connected
         CONNECTED, // DataNode started with the certificate
@@ -108,6 +109,10 @@ public abstract class DataNodeProvisioningConfig {
 
     public DataNodeProvisioningConfig asStartupRequested() {
         return toBuilder().state(State.STARTUP_REQUESTED).errorMsg(null).build();
+    }
+
+    public DataNodeProvisioningConfig asStartupTrigger() {
+        return toBuilder().state(State.STARTUP_TRIGGER).errorMsg(null).build();
     }
 
     public abstract Builder toBuilder();
