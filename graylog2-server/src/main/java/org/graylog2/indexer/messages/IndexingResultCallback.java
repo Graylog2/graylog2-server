@@ -16,12 +16,7 @@
  */
 package org.graylog2.indexer.messages;
 
-public interface IndexingResult {
-    Indexable message();
+import java.util.function.Consumer;
 
-    String index();
-
-    default boolean isSuccess() {
-        return this instanceof IndexingSuccess;
-    }
+public interface IndexingResultCallback extends Consumer<IndexingResult> {
 }

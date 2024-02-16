@@ -21,6 +21,8 @@ import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.messages.IndexingResults;
@@ -31,9 +33,6 @@ import org.graylog2.shared.journal.Journal;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -145,12 +144,25 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput {
     }
 
     protected IndexingResults indexMessageBatch(List<MessageWithIndex> messages) throws Exception {
+        IndexingResults indexingResults;
         try (Timer.Context ignored = processTime.time()) {
             lastFlushTime.set(System.nanoTime());
-            final IndexingResults indexingResults = writeMessageEntries(messages);
+            indexingResults = writeMessageEntries(messages);
             batchSize.update(messages.size());
             bufferFlushes.mark();
-            return indexingResults;
+        }
+
+        runIndexingResultCallbacks(messages, indexingResults);
+
+        return indexingResults;
+    }
+
+    // TODO not the ideal place for this
+    private static void runIndexingResultCallbacks(List<MessageWithIndex> messages, IndexingResults indexingResults) {
+        if (messages.stream().anyMatch(m -> m.message().hasIndexingResultCallback())) {
+            final var resultMap = indexingResults.allResults().stream().collect(Collectors.toMap(r -> r.message().getMessageId(), r -> r, (a, b) -> a));
+
+            messages.forEach(m -> m.message().runIndexingResultCallback(resultMap.get(m.message().getMessageId())));
         }
     }
 

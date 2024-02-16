@@ -56,6 +56,10 @@ public abstract class Buffer implements EventBuffer {
         return (long) ringBuffer.getBufferSize() - ringBuffer.remainingCapacity();
     }
 
+    public int getUsagePercent() {
+        return (int) (getUsage() * 100 / getRingBufferSize());
+    }
+
     protected void insert(Message message) {
         long sequence = ringBuffer.next();
         MessageEvent event = ringBuffer.get(sequence);
@@ -78,7 +82,7 @@ public abstract class Buffer implements EventBuffer {
                 return new BusySpinWaitStrategy();
             default:
                 log.warn("Invalid setting for [{}]:"
-                                + " Falling back to default: BlockingWaitStrategy.", configOptionName);
+                        + " Falling back to default: BlockingWaitStrategy.", configOptionName);
                 return new BlockingWaitStrategy();
         }
     }
@@ -91,7 +95,7 @@ public abstract class Buffer implements EventBuffer {
         long lo = hi - (length - 1);
         for (long sequence = lo; sequence <= hi; sequence++) {
             MessageEvent event = ringBuffer.get(sequence);
-            event.setMessage(messages[(int)(sequence - lo)]);
+            event.setMessage(messages[(int) (sequence - lo)]);
         }
         ringBuffer.publish(lo, hi);
         afterInsert(length);
