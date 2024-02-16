@@ -18,7 +18,6 @@ package org.graylog2.indexer.migration;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import org.assertj.core.api.Assertions;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
@@ -27,7 +26,6 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
-import java.util.List;
 
 class RemoteReindexMigrationTest {
 
@@ -62,7 +60,7 @@ class RemoteReindexMigrationTest {
     @Test
     void testProgressNoIndex() {
         final RemoteReindexMigration migration = withIndices();
-        Assertions.assertThat(migration.progress()).isEqualTo(0);
+        Assertions.assertThat(migration.progress()).isEqualTo(100);
     }
 
     @Test

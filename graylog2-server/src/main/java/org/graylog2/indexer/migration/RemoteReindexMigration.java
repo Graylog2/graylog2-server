@@ -108,7 +108,7 @@ public class RemoteReindexMigration {
         final int countOfIndices = indices.size();
 
         if(indices.isEmpty()) {
-            return 0; // avoid division by zero
+            return 100; // avoid division by zero. No indices == migration is immediately done
         }
 
         final int done = (int) indices.stream().map(RemoteReindexIndex::getStatus).filter(i -> i == Status.FINISHED || i == Status.ERROR).count();
