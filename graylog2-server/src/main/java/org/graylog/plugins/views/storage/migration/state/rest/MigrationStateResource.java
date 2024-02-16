@@ -33,11 +33,10 @@ import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachine;
+import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachineContext;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.shared.rest.resources.ProxiedResource;
 import org.graylog2.shared.security.RestPermissions;
-
-import static org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachineContext.AUTH_TOKEN_KEY;
 
 @Path("/migration")
 @RequiresAuthentication
@@ -49,10 +48,9 @@ public class MigrationStateResource {
     private final MigrationStateMachine stateMachine;
 
     @Inject
-    public MigrationStateResource(MigrationStateMachine stateMachine,
-                                  @Context HttpHeaders httpHeaders) {
+    public MigrationStateResource(MigrationStateMachine stateMachine, @Context HttpHeaders httpHeaders) {
         this.stateMachine = stateMachine;
-        this.stateMachine.getContext().addExtendedState(AUTH_TOKEN_KEY, ProxiedResource.authenticationToken(httpHeaders));
+        this.stateMachine.getContext().addExtendedState(MigrationStateMachineContext.AUTH_TOKEN_KEY, ProxiedResource.authenticationToken(httpHeaders));
     }
 
     @POST
@@ -60,11 +58,10 @@ public class MigrationStateResource {
     @NoAuditEvent("No Audit Event needed") // TODO: do we need audit log here?
     @RequiresPermissions(RestPermissions.DATANODE_MIGRATION)
     @ApiOperation(value = "trigger migration step")
-    public Response migrate(@ApiParam(name = "request") @NotNull MigrationStepRequest request) {
+    public Response trigger(@ApiParam(name = "request") @NotNull MigrationStepRequest request) {
         final CurrentStateInformation newState = stateMachine.trigger(request.step(), request.args());
-        return Response
-                .status(newState.hasErrors() ? Response.Status.INTERNAL_SERVER_ERROR : Response.Status.OK)
-                .entity(newState)
+        Response.ResponseBuilder response = newState.hasErrors() ? Response.serverError() : Response.ok();
+        return response.entity(newState)
                 .build();
     }
 
