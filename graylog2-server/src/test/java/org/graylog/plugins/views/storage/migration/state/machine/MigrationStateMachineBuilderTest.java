@@ -240,6 +240,8 @@ public class MigrationStateMachineBuilderTest {
         StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.MESSAGE_PROCESSING_STOP);
         stateMachine.fire(MigrationStep.SHOW_ROLLING_UPGRADE_ASK_TO_SHUTDOWN_OLD_CLUSTER);
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.RESTART_GRAYLOG);
+        assertThat(stateMachine.getPermittedTriggers()).isEmpty();
+        when(migrationActions.dataNodeStartupFinished()).thenReturn(true);
         assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.CONFIRM_OLD_CONNECTION_STRING_FROM_CONFIG_REMOVED_AND_GRAYLOG_RESTARTED);
         stateMachine.fire(MigrationStep.CONFIRM_OLD_CONNECTION_STRING_FROM_CONFIG_REMOVED_AND_GRAYLOG_RESTARTED);
     }
@@ -247,6 +249,7 @@ public class MigrationStateMachineBuilderTest {
     @Test
     public void testFinishRollingMigration() {
         StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.RESTART_GRAYLOG);
+        when(migrationActions.dataNodeStartupFinished()).thenReturn(true);
         stateMachine.fire(MigrationStep.CONFIRM_OLD_CONNECTION_STRING_FROM_CONFIG_REMOVED_AND_GRAYLOG_RESTARTED);
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.FINISHED);
     }
@@ -278,9 +281,6 @@ public class MigrationStateMachineBuilderTest {
         StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.ASK_TO_SHUTDOWN_OLD_CLUSTER);
         when(migrationActions.isOldClusterStopped()).thenReturn(true);
         stateMachine.fire(MigrationStep.CONFIRM_OLD_CLUSTER_STOPPED);
-        assertThat(stateMachine.getState()).isEqualTo(MigrationState.MANUALLY_REMOVE_OLD_CONNECTION_STRING_FROM_CONFIG);
-        assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.CONFIRM_OLD_CONNECTION_STRING_FROM_CONFIG_REMOVED);
-        stateMachine.fire(MigrationStep.CONFIRM_OLD_CONNECTION_STRING_FROM_CONFIG_REMOVED);
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.FINISHED);
     }
 

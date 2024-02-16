@@ -94,10 +94,7 @@ public class MigrationStateMachineBuilder {
                 .permitIf(MigrationStep.SHOW_ASK_TO_SHUTDOWN_OLD_CLUSTER, MigrationState.ASK_TO_SHUTDOWN_OLD_CLUSTER, migrationActions::isRemoteReindexingFinished);
 
         config.configure(MigrationState.ASK_TO_SHUTDOWN_OLD_CLUSTER)
-                .permitIf(MigrationStep.CONFIRM_OLD_CLUSTER_STOPPED, MigrationState.MANUALLY_REMOVE_OLD_CONNECTION_STRING_FROM_CONFIG, migrationActions::isOldClusterStopped);
-
-        config.configure(MigrationState.MANUALLY_REMOVE_OLD_CONNECTION_STRING_FROM_CONFIG)
-                .permit(MigrationStep.CONFIRM_OLD_CONNECTION_STRING_FROM_CONFIG_REMOVED, MigrationState.FINISHED);
+                .permitIf(MigrationStep.CONFIRM_OLD_CLUSTER_STOPPED, MigrationState.FINISHED, migrationActions::isOldClusterStopped);
 
         // in place / rolling upgrade branch of the migration
         config.configure(MigrationState.ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE)
@@ -121,7 +118,7 @@ public class MigrationStateMachineBuilder {
 
         // shows the "remove connection string, restart graylog"
         config.configure(MigrationState.RESTART_GRAYLOG)
-                .permit(MigrationStep.CONFIRM_OLD_CONNECTION_STRING_FROM_CONFIG_REMOVED_AND_GRAYLOG_RESTARTED, MigrationState.FINISHED);
+                .permitIf(MigrationStep.CONFIRM_OLD_CONNECTION_STRING_FROM_CONFIG_REMOVED_AND_GRAYLOG_RESTARTED, MigrationState.FINISHED, migrationActions::dataNodeStartupFinished);
 
         return config;
     }
