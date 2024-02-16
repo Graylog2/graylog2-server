@@ -28,7 +28,7 @@ const useTriggerMigrationState = (): {
   error: Error,
 } => {
   const queryClient = useQueryClient();
-  const { mutateAsync: onTriggerNextState, isLoading: isLoadingNextMigrationState, error, isError } = useMutation(Migration.migrate, {
+  const { mutateAsync: onTriggerNextState, isLoading: isLoadingNextMigrationState, error, isError } = useMutation(Migration.trigger, {
     onSuccess: () => {
       queryClient.invalidateQueries(MIGRATION_STATE_QUERY_KEY);
     },
