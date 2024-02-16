@@ -26,7 +26,6 @@ import type { MigrationActions, StepArgs } from 'components/datanode/Types';
 import useMigrationWizardStep from 'components/datanode/hooks/useMigrationWizardStep';
 import MigrationWelcomeStep from 'components/datanode/migrations/MigrationWelcomeStep';
 import CertificateRenewalStep from 'components/datanode/migrations/CertificateRenewalStep';
-import ShutdownClusterStep from 'components/datanode/migrations/ShutdownClusterStep';
 import MigrationFinishedStep from 'components/datanode/migrations/MigrationFinishedStep';
 import ConnectionStringRemovalStep from 'components/datanode/migrations/ConnectionStringRemovalStep';
 
@@ -69,11 +68,6 @@ const MigrationWizard = () => {
       key: MIGRATION_STATE.MIGRATION_SELECTION_PAGE.key,
       title: MIGRATION_STATE.MIGRATION_SELECTION_PAGE.description,
       component: <ManualMigrationStep />,
-    },
-    {
-      key: MIGRATION_STATE.ASK_TO_SHUTDOWN_OLD_CLUSTER.key,
-      title: MIGRATION_STATE.ASK_TO_SHUTDOWN_OLD_CLUSTER.description,
-      component: <ShutdownClusterStep nextSteps={nextSteps} onTriggerStep={onTriggerStep} />,
     },
     {
       key: MIGRATION_STATE.MANUALLY_REMOVE_OLD_CONNECTION_STRING_FROM_CONFIG.key,

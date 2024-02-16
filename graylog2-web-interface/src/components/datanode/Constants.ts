@@ -96,7 +96,7 @@ export const MIGRATION_STATE = {
     description: 'Migrate existing data',
   },
   REMOTE_REINDEX_RUNNING: {
-    key: 'MIGRATE_EXISTING_DATA',
+    key: 'REMOTE_REINDEX_RUNNING',
     description: 'Remote reindexing migration running',
   },
   DIRECTORY_COMPATIBILITY_CHECK_PAGE: {
@@ -147,6 +147,7 @@ export const REMOTE_REINDEXING_MIGRATION_STEPS = [
   MIGRATION_STATE.EXISTING_DATA_MIGRATION_QUESTION_PAGE.key,
   MIGRATION_STATE.MIGRATE_EXISTING_DATA.key,
   MIGRATION_STATE.REMOTE_REINDEX_RUNNING.key,
+  MIGRATION_STATE.ASK_TO_SHUTDOWN_OLD_CLUSTER.key,
 ];
 
 export const MIGRATION_WIZARD_STEPS = [
@@ -197,6 +198,10 @@ export const MIGRATION_ACTIONS = {
   RETRY_MIGRATE_EXISTING_DATA: {
     key: 'RETRY_MIGRATE_EXISTING_DATA',
     label: 'Retry migrate existing data',
+  },
+  SHOW_ASK_TO_SHUTDOWN_OLD_CLUSTER: {
+    key: 'SHOW_ASK_TO_SHUTDOWN_OLD_CLUSTER',
+    label: 'Shut down old cluster',
   },
 };
 export default MIGRATION_STEP;

@@ -22,13 +22,14 @@ import {
   MIGRATION_STATE,
   REMOTE_REINDEXING_MIGRATION_STEPS,
 } from 'components/datanode/Constants';
-import type { MigrationActions, StepArgs, MigrationState } from 'components/datanode/Types';
+import type { MigrationActions, StepArgs, MigrationState, MigrationStateItem } from 'components/datanode/Types';
 
 import Welcome from './remoteReindexing/Welcome';
 import ExistingDataMigrationQuestion from './remoteReindexing/ExistingDataMigrationQuestion';
 import RemoteReindexRunning from './remoteReindexing/RemoteReindexRunning';
 import CertificatesProvisioning from './rollingUpgrade/CertificatesProvisioning';
 import MigrateExistingData from './remoteReindexing/MigrateExistingData';
+import ShutdownClusterStep from './remoteReindexing/ShutdownClusterStep';
 
 const StyledTitle = styled.h3`
   margin-bottom: 10px;
@@ -72,32 +73,25 @@ const RemoteReindexingMigration = ({ currentStep, onTriggerNextStep }: Props) =>
     onTriggerNextStep(step, args);
   };
 
-  const steps = [
-    {
-      key: MIGRATION_STATE.REMOTE_REINDEX_WELCOME_PAGE.key,
-      component: <Welcome nextSteps={nextSteps} onTriggerStep={onStepComplete} />,
-    },
-    {
-      key: MIGRATION_STATE.PROVISION_DATANODE_CERTIFICATES_PAGE.key,
-      component: <CertificatesProvisioning nextSteps={nextSteps} onTriggerStep={onStepComplete} />,
-    },
-    {
-      key: MIGRATION_STATE.PROVISION_DATANODE_CERTIFICATES_RUNNING.key,
-      component: <CertificatesProvisioning nextSteps={nextSteps} onTriggerStep={onStepComplete} />,
-    },
-    {
-      key: MIGRATION_STATE.EXISTING_DATA_MIGRATION_QUESTION_PAGE.key,
-      component: <ExistingDataMigrationQuestion nextSteps={nextSteps} onTriggerStep={onStepComplete} />,
-    },
-    {
-      key: MIGRATION_STATE.MIGRATE_EXISTING_DATA.key,
-      component: <MigrateExistingData nextSteps={nextSteps} onTriggerStep={onStepComplete} />,
-    },
-    {
-      key: MIGRATION_STATE.REMOTE_REINDEX_RUNNING.key,
-      component: <RemoteReindexRunning nextSteps={nextSteps} onTriggerStep={onStepComplete} />,
-    },
-  ];
+  const getStepComponent = (step: MigrationStateItem) => {
+    switch (step) {
+      case MIGRATION_STATE.REMOTE_REINDEX_WELCOME_PAGE.key:
+        return <Welcome nextSteps={nextSteps} onTriggerStep={onStepComplete} />;
+      case MIGRATION_STATE.PROVISION_DATANODE_CERTIFICATES_PAGE.key:
+      case MIGRATION_STATE.PROVISION_DATANODE_CERTIFICATES_RUNNING.key:
+        return <CertificatesProvisioning nextSteps={nextSteps} onTriggerStep={onStepComplete} />;
+      case MIGRATION_STATE.EXISTING_DATA_MIGRATION_QUESTION_PAGE.key:
+        return <ExistingDataMigrationQuestion nextSteps={nextSteps} onTriggerStep={onStepComplete} />;
+      case MIGRATION_STATE.MIGRATE_EXISTING_DATA.key:
+        return <MigrateExistingData nextSteps={nextSteps} onTriggerStep={onStepComplete} />;
+      case MIGRATION_STATE.REMOTE_REINDEX_RUNNING.key:
+        return <RemoteReindexRunning nextSteps={nextSteps} onTriggerStep={onStepComplete} />;
+      case MIGRATION_STATE.ASK_TO_SHUTDOWN_OLD_CLUSTER.key:
+        return <ShutdownClusterStep nextSteps={nextSteps} onTriggerStep={onStepComplete} />;
+      default:
+        return <Welcome nextSteps={nextSteps} onTriggerStep={onStepComplete} />;
+    }
+  };
 
   return (
     <Col md={6}>
@@ -110,15 +104,14 @@ const RemoteReindexingMigration = ({ currentStep, onTriggerNextStep }: Props) =>
           const { description } = MIGRATION_STATE[remoteReindexingStep];
 
           return (
-            <Panel key={remoteReindexingStep} eventKey={remoteReindexingStep}>
+            <Panel key={remoteReindexingStep} eventKey={remoteReindexingStep} collapsible={false}>
               <Panel.Heading>
                 <Panel.Title>
-                  <Panel.Toggle tabIndex={index}>{`${index}. ${description}`}</Panel.Toggle>
+                  <Panel.Toggle tabIndex={index}>{`${index + 1}. ${description}`}</Panel.Toggle>
                 </Panel.Title>
               </Panel.Heading>
               <Panel.Body collapsible>
-                {steps.filter((step) => (step.key === remoteReindexingStep))
-                  .map((item) => item)[0]?.component}
+                {getStepComponent(remoteReindexingStep)}
               </Panel.Body>
             </Panel>
           );
