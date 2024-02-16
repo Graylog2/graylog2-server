@@ -15,50 +15,67 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
 
 import ProgressBar from './ProgressBar';
 
 describe('<ProgressBar />', () => {
-  it('properly renders with no props', () => {
-    const { container } = render(<ProgressBar />);
+  it('properly renders with no props', async () => {
+    render(<ProgressBar />);
 
-    expect(container).toMatchSnapshot();
+    const progressBar = await screen.findByRole('progressbar');
+
+    expect(progressBar.getAttribute('value')).toBe('0');
   });
 
-  it('properly renders with one bar', () => {
-    const { container } = render(<ProgressBar bars={[{ value: 35 }]} />);
+  it('properly renders with one bar', async () => {
+    render(<ProgressBar bars={[{ value: 35 }]} />);
 
-    expect(container).toMatchSnapshot();
+    const progressBar = await screen.findByRole('progressbar');
+
+    expect(progressBar.getAttribute('value')).toBe('35');
   });
 
-  it('properly renders with multiple bars', () => {
-    const { container } = render(<ProgressBar bars={[{ value: 35 }, { value: 55 }]} />);
+  it('properly renders with multiple bars', async () => {
+    render(<ProgressBar bars={[{ value: 35 }, { value: 55 }]} />);
 
-    expect(container).toMatchSnapshot();
+    const progressBars = await screen.findAllByRole('progressbar');
+
+    expect((progressBars[0]).getAttribute('value')).toBe('35');
+    expect((progressBars[1]).getAttribute('value')).toBe('55');
   });
 
-  it('properly renders with label', () => {
-    const { container } = render(<ProgressBar bars={[{ value: 23, label: 'Example ProgressBar' }]} />);
+  it('properly renders with label', async () => {
+    render(<ProgressBar bars={[{ value: 23, label: 'Example ProgressBar' }]} />);
 
-    expect(container).toMatchSnapshot();
+    const progressBar = await screen.findByRole('progressbar');
+
+    expect(progressBar.getAttribute('value')).toBe('23');
+
+    await screen.findByText('Example ProgressBar');
   });
 
-  it('properly renders with animated', () => {
-    const { container } = render(<ProgressBar bars={[{ value: 45, animated: true }]} />);
+  it('properly renders with animated', async () => {
+    render(<ProgressBar bars={[{ value: 45, animated: true }]} />);
 
-    expect(container).toMatchSnapshot();
+    const progressBar = await screen.findByRole('progressbar');
+
+    expect(progressBar.getAttribute('value')).toBe('45');
   });
 
-  it('properly renders with striped', () => {
-    const { container } = render(<ProgressBar bars={[{ value: 56, striped: true }]} />);
+  it('properly renders with striped', async () => {
+    render(<ProgressBar bars={[{ value: 56, striped: true }]} />);
 
-    expect(container).toMatchSnapshot();
+    const progressBar = await screen.findByRole('progressbar');
+
+    expect(progressBar.getAttribute('value')).toBe('56');
   });
 
-  it('properly renders with bsStyle variant', () => {
-    const { container } = render(<ProgressBar bars={[{ value: 67, bsStyle: 'danger' }]} />);
+  it('properly renders with bsStyle variant', async () => {
+    render(<ProgressBar bars={[{ value: 67, bsStyle: 'danger' }]} />);
 
-    expect(container).toMatchSnapshot();
+    const progressBar = await screen.findByRole('progressbar');
+
+    expect(progressBar.getAttribute('value')).toBe('67');
   });
 });
