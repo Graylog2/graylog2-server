@@ -239,19 +239,16 @@ public class MigrationStateMachineBuilderTest {
     public void testDataNodeClusterStart() {
         StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.MESSAGE_PROCESSING_STOP);
         stateMachine.fire(MigrationStep.SHOW_ROLLING_UPGRADE_ASK_TO_SHUTDOWN_OLD_CLUSTER);
-        assertThat(stateMachine.getState()).isEqualTo(MigrationState.REPLACE_CLUSTER);
-        assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SHOW_ASK_TO_RESTART_MESSAGE_PROCESSING);
-        stateMachine.fire(MigrationStep.SHOW_ASK_TO_RESTART_MESSAGE_PROCESSING);
+        assertThat(stateMachine.getState()).isEqualTo(MigrationState.RESTART_GRAYLOG);
+        assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.CONFIRM_OLD_CONNECTION_STRING_FROM_CONFIG_REMOVED_AND_GRAYLOG_RESTARTED);
+        stateMachine.fire(MigrationStep.CONFIRM_OLD_CONNECTION_STRING_FROM_CONFIG_REMOVED_AND_GRAYLOG_RESTARTED);
     }
 
     @Test
-    public void testMessageProcessingRestart() {
-        StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.REPLACE_CLUSTER);
-        stateMachine.fire(MigrationStep.SHOW_ASK_TO_RESTART_MESSAGE_PROCESSING);
-        assertThat(stateMachine.getState()).isEqualTo(MigrationState.MESSAGE_PROCESSING_RESTART);
-        verify(migrationActions).startMessageProcessing();
-        assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.CONFIRM_ROLLING_UPGRADE_OLD_CLUSTER_STOPPED);
-        stateMachine.fire(MigrationStep.CONFIRM_ROLLING_UPGRADE_OLD_CLUSTER_STOPPED);
+    public void testFinishRollingMigration() {
+        StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.RESTART_GRAYLOG);
+        stateMachine.fire(MigrationStep.CONFIRM_OLD_CONNECTION_STRING_FROM_CONFIG_REMOVED_AND_GRAYLOG_RESTARTED);
+        assertThat(stateMachine.getState()).isEqualTo(MigrationState.FINISHED);
     }
 
     @Test
