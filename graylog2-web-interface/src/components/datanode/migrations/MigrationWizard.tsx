@@ -27,7 +27,6 @@ import useMigrationWizardStep from 'components/datanode/hooks/useMigrationWizard
 import MigrationWelcomeStep from 'components/datanode/migrations/MigrationWelcomeStep';
 import CertificateRenewalStep from 'components/datanode/migrations/CertificateRenewalStep';
 import MigrationFinishedStep from 'components/datanode/migrations/MigrationFinishedStep';
-import ConnectionStringRemovalStep from 'components/datanode/migrations/ConnectionStringRemovalStep';
 
 const MigrationWizard = () => {
   const { step: currentStep, isLoading } = useMigrationWizardStep();
@@ -68,11 +67,6 @@ const MigrationWizard = () => {
       key: MIGRATION_STATE.MIGRATION_SELECTION_PAGE.key,
       title: MIGRATION_STATE.MIGRATION_SELECTION_PAGE.description,
       component: <ManualMigrationStep />,
-    },
-    {
-      key: MIGRATION_STATE.MANUALLY_REMOVE_OLD_CONNECTION_STRING_FROM_CONFIG.key,
-      title: MIGRATION_STATE.MANUALLY_REMOVE_OLD_CONNECTION_STRING_FROM_CONFIG.description,
-      component: <ConnectionStringRemovalStep nextSteps={nextSteps} onTriggerStep={onTriggerStep} />,
     },
     {
       key: MIGRATION_STATE.FINISHED.key,

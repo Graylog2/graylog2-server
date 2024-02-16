@@ -30,6 +30,7 @@ import RemoteReindexRunning from './remoteReindexing/RemoteReindexRunning';
 import CertificatesProvisioning from './rollingUpgrade/CertificatesProvisioning';
 import MigrateExistingData from './remoteReindexing/MigrateExistingData';
 import ShutdownClusterStep from './remoteReindexing/ShutdownClusterStep';
+import ConnectionStringRemovalStep from './remoteReindexing/ConnectionStringRemovalStep';
 
 const StyledTitle = styled.h3`
   margin-bottom: 10px;
@@ -88,6 +89,8 @@ const RemoteReindexingMigration = ({ currentStep, onTriggerNextStep }: Props) =>
         return <RemoteReindexRunning nextSteps={nextSteps} onTriggerStep={onStepComplete} />;
       case MIGRATION_STATE.ASK_TO_SHUTDOWN_OLD_CLUSTER.key:
         return <ShutdownClusterStep nextSteps={nextSteps} onTriggerStep={onStepComplete} />;
+      case MIGRATION_STATE.MANUALLY_REMOVE_OLD_CONNECTION_STRING_FROM_CONFIG.key:
+        return <ConnectionStringRemovalStep nextSteps={nextSteps} onTriggerStep={onStepComplete} />;
       default:
         return <Welcome nextSteps={nextSteps} onTriggerStep={onStepComplete} />;
     }
