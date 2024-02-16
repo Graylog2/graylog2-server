@@ -14,18 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch2.ism.policy.actions;
+package org.graylog2.indexer.datastream.policy.actions;
 
-import javax.annotation.Nonnull;
-
-public record RolloverAction(@Nonnull String minIndexAge, boolean copyAlias) implements WrappedAction {
-
-    public RolloverAction(@Nonnull String minIndexAge) {
-        this(minIndexAge, false);
-    }
-
-    @Override
-    public Type getType() {
-        return Type.ROLLOVER;
-    }
+public record Retry(int count, String backoff, String delay) {
 }

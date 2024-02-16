@@ -14,20 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.rest.models.system.responses;
+package org.graylog2.indexer.datastream.policy.actions;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-@JsonAutoDetect
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = DeflectorConfigResponse.TYPE_FIELD, visible = true)
-public interface DeflectorConfigResponse {
-    String TYPE_FIELD = "type";
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
-    @JsonProperty(TYPE_FIELD)
-    String type();
+@JsonSerialize(using = ActionSerializer.class)
+@JsonDeserialize(using = ActionDeserializer.class)
+public record Action(@Nullable Retry retry, @Nonnull WrappedAction action) {
+    public Action(@Nonnull WrappedAction action) {
+        this(null, action);
+    }
 
-    @JsonProperty("max_number_of_indices")
-    int maxNumberOfIndices();
 }

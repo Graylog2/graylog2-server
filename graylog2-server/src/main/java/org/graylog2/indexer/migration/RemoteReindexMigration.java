@@ -89,6 +89,9 @@ public class RemoteReindexMigration {
         return this;
     }
 
+    public Status status() {
+        return status;
+    }
 
     public void finish() {
         if(finishCallback != null) {

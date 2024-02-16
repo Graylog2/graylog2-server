@@ -71,18 +71,29 @@ public class MigrationStateMachineBuilder {
                 });
 
         config.configure(MigrationState.PROVISION_DATANODE_CERTIFICATES_PAGE)
-                .permit(MigrationStep.PROVISION_DATANODE_CERTIFICATES, MigrationState.PROVISION_DATANODE_CERTIFICATES_RUNNING, migrationActions::provisionDataNodes);
+                .permit(MigrationStep.PROVISION_DATANODE_CERTIFICATES, MigrationState.PROVISION_DATANODE_CERTIFICATES_RUNNING, migrationActions::provisionAndStartDataNodes);
 
         config.configure(MigrationState.PROVISION_DATANODE_CERTIFICATES_RUNNING)
-                .permitIf(MigrationStep.SHOW_DATA_MIGRATION_QUESTION, MigrationState.EXISTING_DATA_MIGRATION_QUESTION_PAGE, migrationActions::provisioningFinished);
+                .permitIf(MigrationStep.SHOW_DATA_MIGRATION_QUESTION, MigrationState.EXISTING_DATA_MIGRATION_QUESTION_PAGE, migrationActions::dataNodeStartupFinished);
 
         config.configure(MigrationState.EXISTING_DATA_MIGRATION_QUESTION_PAGE)
                 .permit(MigrationStep.SHOW_MIGRATE_EXISTING_DATA, MigrationState.MIGRATE_EXISTING_DATA)
                 .permit(MigrationStep.SKIP_EXISTING_DATA_MIGRATION, MigrationState.ASK_TO_SHUTDOWN_OLD_CLUSTER);
 
-        config.configure(MigrationState.MIGRATE_EXISTING_DATA)
-                .onEntry(migrationActions::reindexOldData)
-                .permitIf(MigrationStep.SHOW_ASK_TO_SHUTDOWN_OLD_CLUSTER, MigrationState.ASK_TO_SHUTDOWN_OLD_CLUSTER, migrationActions::reindexingFinished);
+        // we now have enough information in the context to start the remote reindex migration. This will move us to the
+        // next state that will be active as long as the migration is running and will provide status information to the FE
+        config.configure(MigrationState.MIGRATE_EXISTING_DATA) // this state and screen has to request username, password and url of the old cluster
+                        .permit(MigrationStep.START_REMOTE_REINDEX_MIGRATION, MigrationState.REMOTE_REINDEX_RUNNING, migrationActions::startRemoteReindex);
+
+        // the state machine will stay in this state till the migration is finished or fails. It should provide
+        // current migration status every time we trigger MigrationStep.REQUEST_MIGRATION_STATUS.
+        config.configure(MigrationState.REMOTE_REINDEX_RUNNING)
+                .permitReentry(MigrationStep.REQUEST_MIGRATION_STATUS, migrationActions::requestMigrationStatus)
+                .permit(MigrationStep.RETRY_MIGRATE_EXISTING_DATA, MigrationState.MIGRATE_EXISTING_DATA) // allow one step back in case the migration fails
+                .permitIf(MigrationStep.SHOW_ASK_TO_SHUTDOWN_OLD_CLUSTER, MigrationState.ASK_TO_SHUTDOWN_OLD_CLUSTER, migrationActions::isRemoteReindexingFinished);
+
+        config.configure(MigrationState.ASK_TO_SHUTDOWN_OLD_CLUSTER)
+                .permitIf(MigrationStep.CONFIRM_OLD_CLUSTER_STOPPED, MigrationState.MANUALLY_REMOVE_OLD_CONNECTION_STRING_FROM_CONFIG, migrationActions::isOldClusterStopped);
 
         // in place / rolling upgrade branch of the migration
         config.configure(MigrationState.ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE)
@@ -99,17 +110,19 @@ public class MigrationStateMachineBuilder {
                 .permitIf(MigrationStep.CALCULATE_JOURNAL_SIZE, MigrationState.JOURNAL_SIZE_DOWNTIME_WARNING, migrationActions::provisioningFinished);
 
         config.configure(MigrationState.JOURNAL_SIZE_DOWNTIME_WARNING)
-                .permit(MigrationStep.SHOW_STOP_PROCESSING_PAGE, MigrationState.MESSAGE_PROCESSING_STOP_REPLACE_CLUSTER_AND_MP_RESTART);
+                .permit(MigrationStep.SHOW_STOP_PROCESSING_PAGE, MigrationState.MESSAGE_PROCESSING_STOP);
 
-        config.configure(MigrationState.MESSAGE_PROCESSING_STOP_REPLACE_CLUSTER_AND_MP_RESTART)
+        config.configure(MigrationState.MESSAGE_PROCESSING_STOP)
                 .onEntry(migrationActions::stopMessageProcessing)
-                .onExit(migrationActions::startMessageProcessing)
-                .permit(MigrationStep.SHOW_ASK_TO_SHUTDOWN_OLD_CLUSTER, MigrationState.ASK_TO_SHUTDOWN_OLD_CLUSTER);
+                .permit(MigrationStep.SHOW_ROLLING_UPGRADE_ASK_TO_SHUTDOWN_OLD_CLUSTER, MigrationState.REPLACE_CLUSTER, migrationActions::startDataNodes);
+
+        config.configure(MigrationState.REPLACE_CLUSTER)
+                .permit(MigrationStep.SHOW_ASK_TO_RESTART_MESSAGE_PROCESSING, MigrationState.MESSAGE_PROCESSING_RESTART, migrationActions::startMessageProcessing);
+
+        config.configure(MigrationState.MESSAGE_PROCESSING_RESTART)
+                .permit(MigrationStep.CONFIRM_ROLLING_UPGRADE_OLD_CLUSTER_STOPPED, MigrationState.MANUALLY_REMOVE_OLD_CONNECTION_STRING_FROM_CONFIG, migrationActions::isOldClusterStopped);
 
         // common cleanup steps
-        config.configure(MigrationState.ASK_TO_SHUTDOWN_OLD_CLUSTER)
-                .permitIf(MigrationStep.CONFIRM_OLD_CLUSTER_STOPPED, MigrationState.MANUALLY_REMOVE_OLD_CONNECTION_STRING_FROM_CONFIG, migrationActions::isOldClusterStopped);
-
         config.configure(MigrationState.MANUALLY_REMOVE_OLD_CONNECTION_STRING_FROM_CONFIG)
                 .permit(MigrationStep.CONFIRM_OLD_CONNECTION_STRING_FROM_CONFIG_REMOVED, MigrationState.FINISHED);
 

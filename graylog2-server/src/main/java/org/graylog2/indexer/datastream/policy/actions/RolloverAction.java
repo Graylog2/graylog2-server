@@ -14,19 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch2.ism.policy.actions;
-
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+package org.graylog2.indexer.datastream.policy.actions;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
-@JsonSerialize(using = ActionSerializer.class)
-@JsonDeserialize(using = ActionDeserializer.class)
-public record Action(@Nullable Retry retry, @Nonnull WrappedAction action) {
-    public Action(@Nonnull WrappedAction action) {
-        this(null, action);
+public record RolloverAction(@Nonnull String minIndexAge, boolean copyAlias) implements WrappedAction {
+
+    public RolloverAction(@Nonnull String minIndexAge) {
+        this(minIndexAge, false);
     }
 
+    @Override
+    public Type getType() {
+        return Type.ROLLOVER;
+    }
 }
