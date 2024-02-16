@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch2.ism.policy.actions;
+package org.graylog2.indexer.datastream.policy.actions;
 
 public record Retry(int count, String backoff, String delay) {
 }

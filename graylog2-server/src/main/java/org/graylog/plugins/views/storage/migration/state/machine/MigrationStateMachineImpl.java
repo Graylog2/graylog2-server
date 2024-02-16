@@ -56,7 +56,7 @@ public class MigrationStateMachineImpl implements MigrationStateMachine {
         }
         context = migrationActions.getStateMachineContext();
         persistenceService.saveStateMachineContext(context);
-        return new CurrentStateInformation(getState(), nextSteps(), errorMessage);
+        return new CurrentStateInformation(getState(), nextSteps(), errorMessage, context.getResponse());
     }
 
     @Override
