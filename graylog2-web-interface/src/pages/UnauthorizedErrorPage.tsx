@@ -42,7 +42,7 @@ type Props = {
 };
 
 const UnauthorizedErrorPage = ({ error, errorDetails, title, description, location: { pathname } }: Props) => {
-  const errorMessage = error?.message || JSON.stringify(error);
+  const errorMessage = error?.message ?? JSON.stringify(error);
   const pageDetails = `The permissions check for the following request failed,\nwhile trying to access ${pathname}.`;
   const defaultDescription = (
     <>
