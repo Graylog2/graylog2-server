@@ -18,6 +18,7 @@ package org.graylog2.plugin.buffers;
 
 import com.google.common.base.MoreObjects;
 import com.lmax.disruptor.EventFactory;
+import org.graylog2.indexer.messages.MessageWithIndex;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.journal.RawMessage;
 
@@ -32,14 +33,14 @@ public class MessageEvent {
 
     public final static EventFactory<MessageEvent> EVENT_FACTORY = new EventFactory<MessageEvent>() {
         @Override
-        public MessageEvent newInstance()
-        {
+        public MessageEvent newInstance() {
             return new MessageEvent();
         }
     };
 
     private RawMessage raw;
     private Message msg;
+    private MessageWithIndex msgWithIndex;
     private Collection<Message> messages;
 
     public boolean isSingleMessage() {
@@ -47,14 +48,25 @@ public class MessageEvent {
     }
 
     @Nullable
-    public Message getMessage()
-    {
+    public Message getMessage() {
         return msg;
     }
 
-    public void setMessage(@Nullable final Message msg)
-    {
+    public void setMessage(@Nullable final Message msg) {
         this.msg = msg;
+    }
+
+    public boolean isMessageWithIndex() {
+        return msgWithIndex != null;
+    }
+
+    @Nullable
+    public MessageWithIndex getMessageWithIndex() {
+        return msgWithIndex;
+    }
+
+    public void setMessageWithIndex(MessageWithIndex messageWithIndex) {
+        this.msgWithIndex = messageWithIndex;
     }
 
     @Nullable
@@ -68,6 +80,7 @@ public class MessageEvent {
 
     public void clearMessages() {
         setMessage(null);
+        setMessageWithIndex(null);
         setMessages(null);
     }
 

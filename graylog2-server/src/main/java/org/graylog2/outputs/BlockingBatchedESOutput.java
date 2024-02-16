@@ -21,6 +21,8 @@ import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.messages.IndexingResults;
@@ -31,9 +33,6 @@ import org.graylog2.shared.journal.Journal;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -99,6 +98,11 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput {
         for (IndexSet indexSet : message.getIndexSets()) {
             writeMessageEntry(new MessageWithIndex(message, indexSet));
         }
+    }
+
+    @Override
+    public void write(MessageWithIndex messageWithIndex) throws Exception {
+        writeMessageEntry(messageWithIndex);
     }
 
     public void writeMessageEntry(MessageWithIndex entry) throws Exception {

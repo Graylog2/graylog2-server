@@ -22,6 +22,7 @@ import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.SleepingWaitStrategy;
 import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.YieldingWaitStrategy;
+import org.graylog2.indexer.messages.MessageWithIndex;
 import org.graylog2.plugin.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,6 +67,15 @@ public abstract class Buffer implements EventBuffer {
 
     }
 
+    public void insertBlocking(MessageWithIndex messageWithIndex) {
+        long sequence = ringBuffer.next();
+        MessageEvent event = ringBuffer.get(sequence);
+        event.setMessageWithIndex(messageWithIndex);
+        ringBuffer.publish(sequence);
+
+        //afterInsert(1);
+    }
+
     protected WaitStrategy getWaitStrategy(String waitStrategyName, String configOptionName) {
         switch (waitStrategyName) {
             case "sleeping":
@@ -78,7 +88,7 @@ public abstract class Buffer implements EventBuffer {
                 return new BusySpinWaitStrategy();
             default:
                 log.warn("Invalid setting for [{}]:"
-                                + " Falling back to default: BlockingWaitStrategy.", configOptionName);
+                        + " Falling back to default: BlockingWaitStrategy.", configOptionName);
                 return new BlockingWaitStrategy();
         }
     }
@@ -91,7 +101,7 @@ public abstract class Buffer implements EventBuffer {
         long lo = hi - (length - 1);
         for (long sequence = lo; sequence <= hi; sequence++) {
             MessageEvent event = ringBuffer.get(sequence);
-            event.setMessage(messages[(int)(sequence - lo)]);
+            event.setMessage(messages[(int) (sequence - lo)]);
         }
         ringBuffer.publish(lo, hi);
         afterInsert(length);

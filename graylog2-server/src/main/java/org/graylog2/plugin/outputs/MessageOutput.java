@@ -16,6 +16,7 @@
  */
 package org.graylog2.plugin.outputs;
 
+import org.graylog2.indexer.messages.MessageWithIndex;
 import org.graylog2.plugin.AbstractDescriptor;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Stoppable;
@@ -32,7 +33,9 @@ public interface MessageOutput extends Stoppable {
     // It can be removed once we decide to stop supporting old plugins.
     interface Factory<T> {
         T create(Stream stream, Configuration configuration);
+
         Config getConfig();
+
         Descriptor getDescriptor();
     }
 
@@ -40,7 +43,9 @@ public interface MessageOutput extends Stoppable {
     // The only change compared to Factory is that it also takes the Output instance parameter.
     interface Factory2<T> {
         T create(Output output, Stream stream, Configuration configuration);
+
         Config getConfig();
+
         Descriptor getDescriptor();
     }
 
@@ -70,6 +75,10 @@ public interface MessageOutput extends Stoppable {
     boolean isRunning();
 
     void write(Message message) throws Exception;
+
+    default void write(MessageWithIndex messageWithIndex) throws Exception {
+        throw new UnsupportedOperationException("Not implemented for this output");
+    }
 
     void write(List<Message> messages) throws Exception;
 

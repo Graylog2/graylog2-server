@@ -24,7 +24,9 @@ import com.codahale.metrics.Timer;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.common.util.concurrent.Uninterruptibles;
+import jakarta.inject.Inject;
 import org.graylog2.Configuration;
+import org.graylog2.indexer.messages.MessageWithIndex;
 import org.graylog2.outputs.DefaultMessageOutput;
 import org.graylog2.outputs.OutputRouter;
 import org.graylog2.plugin.GlobalMetricNames;
@@ -36,8 +38,7 @@ import org.graylog2.shared.buffers.WorkHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-
+import javax.annotation.Nullable;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -119,6 +120,17 @@ public class OutputBufferProcessor implements WorkHandler<MessageEvent> {
     public void onEvent(MessageEvent event) throws Exception {
         incomingMessages.mark();
 
+        if (event.isMessageWithIndex()) {
+            final Future<?> defaultOutputCompletion = processMessage(null, event.getMessageWithIndex(), defaultMessageOutput);
+            if (defaultOutputCompletion != null) {
+                Uninterruptibles.getUninterruptibly(defaultOutputCompletion);
+            } else {
+                LOG.error("The default output future was null, this is a bug!");
+            }
+            event.clearMessages();
+            return;
+        }
+
         final Message msg = event.getMessage();
         if (msg == null) {
             LOG.debug("Skipping null message.");
@@ -129,11 +141,11 @@ public class OutputBufferProcessor implements WorkHandler<MessageEvent> {
         final Set<MessageOutput> messageOutputs = outputRouter.getStreamOutputsForMessage(msg);
         msg.recordCounter(serverStatus, "matched-outputs", messageOutputs.size());
 
-        final Future<?> defaultOutputCompletion = processMessage(msg, defaultMessageOutput);
+        final Future<?> defaultOutputCompletion = processMessage(msg, null, defaultMessageOutput);
 
         final CountDownLatch streamOutputsDoneSignal = new CountDownLatch(messageOutputs.size());
         for (final MessageOutput output : messageOutputs) {
-            processMessage(msg, output, streamOutputsDoneSignal);
+            processMessage(msg, null, output, streamOutputsDoneSignal);
         }
 
         // Wait until all writer threads for stream outputs have finished or timeout is reached.
@@ -161,11 +173,11 @@ public class OutputBufferProcessor implements WorkHandler<MessageEvent> {
         event.clearMessages();
     }
 
-    private Future<?> processMessage(final Message msg, final MessageOutput defaultMessageOutput) {
-        return processMessage(msg, defaultMessageOutput, new CountDownLatch(0));
+    private Future<?> processMessage(@Nullable final Message msg, @Nullable final MessageWithIndex messageWithIndex, final MessageOutput defaultMessageOutput) {
+        return processMessage(msg, messageWithIndex, defaultMessageOutput, new CountDownLatch(0));
     }
 
-    private Future<?> processMessage(final Message msg, final MessageOutput output, final CountDownLatch doneSignal) {
+    private Future<?> processMessage(@Nullable final Message msg, @Nullable final MessageWithIndex messageWithIndex, final MessageOutput output, final CountDownLatch doneSignal) {
         if (output == null) {
             LOG.error("Output was null!");
             doneSignal.countDown();
@@ -181,13 +193,17 @@ public class OutputBufferProcessor implements WorkHandler<MessageEvent> {
         try {
             LOG.debug("Writing message to [{}].", output.getClass());
             if (LOG.isTraceEnabled()) {
-                LOG.trace("Message id for [{}]: <{}>", output.getClass(), msg.getId());
+                LOG.trace("Message id for [{}]: <{}>", output.getClass(), msg != null ? msg.getId() : messageWithIndex.message().getId());
             }
             future = executor.submit(new Runnable() {
                 @Override
                 public void run() {
                     try (Timer.Context ignored = processTime.time()) {
-                        output.write(msg);
+                        if (messageWithIndex != null) {
+                            output.write(messageWithIndex);
+                        } else {
+                            output.write(msg);
+                        }
                     } catch (Exception e) {
                         LOG.error("Error in output [" + output.getClass() + "].", e);
                     } finally {
