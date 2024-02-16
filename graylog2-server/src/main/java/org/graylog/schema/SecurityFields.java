@@ -14,20 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.rest.models.system.responses;
+package org.graylog.schema;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+public class SecurityFields {
+    public static final String FIELD_ASSOCIATED_ASSETS = "associated_assets";
+    public static final String FIELD_ASSET_CATEGORIES = "associated_asset_categories";
 
-@JsonAutoDetect
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = DeflectorConfigResponse.TYPE_FIELD, visible = true)
-public interface DeflectorConfigResponse {
-    String TYPE_FIELD = "type";
-
-    @JsonProperty(TYPE_FIELD)
-    String type();
-
-    @JsonProperty("max_number_of_indices")
-    int maxNumberOfIndices();
 }

@@ -32,6 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.graylog.plugins.views.search.engine.suggestions.FieldValueSuggestionMode;
 import org.graylog.plugins.views.search.engine.suggestions.FieldValueSuggestionModeConverter;
 import org.graylog.security.certutil.CaConfiguration;
+import org.graylog2.bindings.NamedBindingOverride;
 import org.graylog2.cluster.leader.AutomaticLeaderElectionService;
 import org.graylog2.cluster.leader.LeaderElectionMode;
 import org.graylog2.cluster.leader.LeaderElectionService;
@@ -49,6 +50,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
@@ -60,6 +62,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 public class Configuration extends CaConfiguration {
     public static final String SAFE_CLASSES = "safe_classes";
 
+    public static final String CONTENT_PACKS_DIR = "content_packs_dir";
     /**
      * Deprecated! Use isLeader() instead.
      */
@@ -168,8 +171,8 @@ public class Configuration extends CaConfiguration {
     @Parameter(value = "content_packs_loader_enabled")
     private boolean contentPacksLoaderEnabled = false;
 
-    @Parameter(value = "content_packs_dir")
-    private Path contentPacksDir = DEFAULT_DATA_DIR.resolve("contentpacks");
+    @Parameter(value = CONTENT_PACKS_DIR)
+    private Path contentPacksDir;
 
     @Parameter(value = "content_packs_auto_install", converter = TrimmedStringSetConverter.class)
     private Set<String> contentPacksAutoInstall = Collections.emptySet();
@@ -243,6 +246,24 @@ public class Configuration extends CaConfiguration {
 
     @Parameter(value = "field_value_suggestion_mode", required = true, converter = FieldValueSuggestionModeConverter.class)
     private FieldValueSuggestionMode fieldValueSuggestionMode = FieldValueSuggestionMode.ON;
+
+    public static final String INSTALL_HTTP_CONNECTION_TIMEOUT = "install_http_connection_timeout";
+    public static final String INSTALL_OUTPUT_BUFFER_DRAINING_INTERVAL = "install_output_buffer_drain_interval";
+    public static final String INSTALL_OUTPUT_BUFFER_DRAINING_MAX_RETRIES = "install_output_buffer_max_retries";
+
+    private static final int DEFAULT_INSTALL_RETRIES = 150;
+    private static final Duration DEFAULT_INSTALL_SECONDS = Duration.seconds(2);
+
+    @Parameter(value = INSTALL_HTTP_CONNECTION_TIMEOUT, validators = PositiveDurationValidator.class)
+    private Duration installHttpConnectionTimeout = Duration.seconds(10L);
+
+    @Parameter(value = INSTALL_OUTPUT_BUFFER_DRAINING_INTERVAL, validators = PositiveDurationValidator.class)
+    private Duration installOutputBufferDrainingInterval = DEFAULT_INSTALL_SECONDS;
+
+    // The maximum number of times to check if buffers have drained during Illuminate restarts on all
+    // nodes before giving up
+    @Parameter(value = INSTALL_OUTPUT_BUFFER_DRAINING_MAX_RETRIES, validators = PositiveIntegerValidator.class)
+    private int installOutputBufferDrainingMaxRetries = DEFAULT_INSTALL_RETRIES;
 
     public boolean maintainsStreamAwareFieldTypes() {
         return streamAwareFieldTypes;
@@ -430,8 +451,9 @@ public class Configuration extends CaConfiguration {
         return contentPacksLoaderEnabled;
     }
 
+    @NamedBindingOverride(value = CONTENT_PACKS_DIR)
     public Path getContentPacksDir() {
-        return contentPacksDir;
+        return Optional.ofNullable(contentPacksDir).orElse(getDataDir().resolve("contentpacks"));
     }
 
     public Set<String> getContentPacksAutoInstall() {

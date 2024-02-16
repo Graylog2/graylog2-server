@@ -75,7 +75,6 @@
             <directory></directory>
             <includes>
                 <include>.gitignore</include>
-                <include>.travis.yml</include>
                 <include>README.md</include>
                 <include>GETTING-STARTED.md</include>
                 <include>package.json</include>

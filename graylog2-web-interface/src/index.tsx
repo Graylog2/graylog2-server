@@ -23,13 +23,11 @@ import Reflux from 'reflux';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import AppFacade from 'routing/AppFacade';
-import GraylogThemeProvider from 'theme/GraylogThemeProvider';
 import CustomizationProvider from 'contexts/CustomizationProvider';
 import ViewsBindings from 'views/bindings';
 import ThreatIntelBindings from 'threatintel/bindings';
 import AwsBindings from 'aws/bindings';
 import IntegrationsBindings from 'integrations/bindings';
-import GlobalThemeStyles from 'theme/GlobalThemeStyles';
 import CancellablePromise from 'logic/rest/CancellablePromise';
 import TelemetryInit from 'logic/telemetry/TelemetryInit';
 import LoginQueryClientProvider from 'contexts/LoginQueryClientProvider';
@@ -54,10 +52,7 @@ root.render((
   <CustomizationProvider>
     <TelemetryInit>
       <LoginQueryClientProvider>
-        <GraylogThemeProvider>
-          <GlobalThemeStyles />
-          <AppFacade />
-        </GraylogThemeProvider>
+        <AppFacade />
       </LoginQueryClientProvider>
     </TelemetryInit>
   </CustomizationProvider>

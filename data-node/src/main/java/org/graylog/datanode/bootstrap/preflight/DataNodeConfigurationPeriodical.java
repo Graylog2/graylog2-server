@@ -112,6 +112,7 @@ public class DataNodeConfigurationPeriodical extends Periodical {
             switch (state) {
                 case CONFIGURED -> writeCsr(c);
                 case SIGNED -> readSignedCertificate(c);
+                case STARTUP_TRIGGER ->  dataNodeProvisioningService.changeState(nodeId.getNodeId(), DataNodeProvisioningConfig.State.STARTUP_REQUESTED);
             }
         });
     }

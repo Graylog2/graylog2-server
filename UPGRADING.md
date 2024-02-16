@@ -2,7 +2,7 @@ Upgrading to Graylog 6.0.x
 ==========================
 
 ## Breaking Changes
-
+- Default value for `data_dir` configuration option has been removed and must be specified in `graylog.conf`.
 ### Changed default number of process-buffer and output-buffer processors
 
 The default values for the configuration settings `processbuffer_processors` and `outputbuffer_processors` have been
@@ -143,6 +143,16 @@ Removed fields:
 - `log_level`
 - `service`
 - `vendor_event_description`
+
+## Newly Stored Message Fields
+
+The following fields will be added to every Message.
+The data of the fields is *not* accounted as outgoing traffic.
+
+ - `gl2_receive_timestamp` - The time the Message was received
+ - `gl2_processing_timestamp` - The time the Message was processed and will be sent to an Output
+ - `gl2_processing_duration_ms` - The duration between the receive and processing times
+
 
 ## Java API Changes
 

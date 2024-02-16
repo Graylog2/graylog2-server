@@ -56,6 +56,7 @@ import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.junit.Test;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -641,6 +642,21 @@ public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
         indices.cycleAlias(deflector, index2, index1);
 
         assertThat(indices.exists(index1)).isTrue();
+    }
+
+    @ContainerMatrixTest
+    public void getIndexShardsInfo() {
+        client().createIndex("1shard1replica", 1, 1);
+        List<ShardsInfo> shardsInfo = indices.getShardsInfo("1shard1replica");
+        assertThat(shardsInfo.size()).isEqualTo(2);
+        assertThat(shardsInfo.stream()
+                .filter(info -> info.shardType() == ShardsInfo.ShardType.PRIMARY)
+                .findFirst())
+                .isNotEmpty();
+        assertThat(shardsInfo.stream()
+                .filter(info -> info.shardType() == ShardsInfo.ShardType.REPLICA)
+                .findFirst())
+                .isNotEmpty();
     }
 
     public static final class IndicesEventListener {

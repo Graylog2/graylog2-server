@@ -125,7 +125,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
             case STARTUP_REQUESTED -> startUp();
             case STORED -> {
                 configure();
-                dataNodeProvisioningService.changeState(event.nodeId(), DataNodeProvisioningConfig.State.STARTUP_REQUESTED);
+                dataNodeProvisioningService.changeState(event.nodeId(), DataNodeProvisioningConfig.State.STARTUP_PREPARED);
             }
         }
     }

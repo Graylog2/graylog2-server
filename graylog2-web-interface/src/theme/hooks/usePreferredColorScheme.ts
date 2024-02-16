@@ -21,6 +21,8 @@ import { useStore } from 'stores/connect';
 import Store from 'logic/local-storage/Store';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import { PreferencesStore } from 'stores/users/PreferencesStore';
+import type { UserPreferences } from 'contexts/UserPreferencesContext';
+import UserPreferencesContext from 'contexts/UserPreferencesContext';
 
 import useBrowserColorSchemePreference from './useBrowserColorSchemePreference';
 
@@ -33,7 +35,6 @@ import {
   LEGACY_COLOR_SCHEME_LIGHT,
   PREFERENCES_THEME_MODE,
 } from '../constants';
-import UserPreferencesContext from '../../contexts/UserPreferencesContext';
 
 const fromLegacyColorSchemeName = (legacyColorScheme: LegacyColorScheme): ColorScheme => {
   if (legacyColorScheme === LEGACY_COLOR_SCHEME_LIGHT) {
@@ -47,17 +48,33 @@ const fromLegacyColorSchemeName = (legacyColorScheme: LegacyColorScheme): ColorS
   return legacyColorScheme;
 };
 
-const getInitialThemeMode = (userPreferences: Record<typeof PREFERENCES_THEME_MODE, ColorScheme>, browserThemePreference: ColorScheme, initialThemeModeOverride: ColorScheme) => {
+const getInitialThemeMode = (
+  {
+    userPreferencesThemeMode,
+    browserThemePreference,
+    initialThemeModeOverride,
+    userIsLoggedIn,
+  }: {
+    userPreferencesThemeMode: UserPreferences[typeof PREFERENCES_THEME_MODE],
+    browserThemePreference: ColorScheme,
+    initialThemeModeOverride: ColorScheme,
+    userIsLoggedIn: boolean,
+  },
+) => {
   if (initialThemeModeOverride) {
     return initialThemeModeOverride;
   }
 
-  const userThemePreference = userPreferences[PREFERENCES_THEME_MODE] ?? fromLegacyColorSchemeName(Store.get(PREFERENCES_THEME_MODE));
+  if (!userIsLoggedIn) {
+    return DEFAULT_THEME_MODE;
+  }
+
+  const userThemePreference = userPreferencesThemeMode ?? fromLegacyColorSchemeName(Store.get(PREFERENCES_THEME_MODE));
 
   return userThemePreference ?? browserThemePreference ?? DEFAULT_THEME_MODE;
 };
 
-const usePreferredColorScheme = (initialThemeModeOverride: ColorScheme): [ColorScheme, (newThemeMode: ColorScheme) => void] => {
+const usePreferredColorScheme = (initialThemeModeOverride: ColorScheme, userIsLoggedIn: boolean): [ColorScheme, (newThemeMode: ColorScheme) => void] => {
   const browserThemePreference = useBrowserColorSchemePreference();
 
   const { userIsReadOnly, username } = useStore(CurrentUserStore, (userStore) => ({
@@ -66,19 +83,28 @@ const usePreferredColorScheme = (initialThemeModeOverride: ColorScheme): [ColorS
   }));
 
   const userPreferences = useContext(UserPreferencesContext);
-  const initialThemeMode = getInitialThemeMode(userPreferences, browserThemePreference, initialThemeModeOverride);
-  const [currentThemeMode, setCurrentThemeMode] = useState<ColorScheme>(initialThemeMode);
+  const [currentThemeMode, setCurrentThemeMode] = useState<ColorScheme>(
+    () => getInitialThemeMode({
+      userPreferencesThemeMode: userPreferences[PREFERENCES_THEME_MODE],
+      browserThemePreference,
+      initialThemeModeOverride,
+      userIsLoggedIn,
+    }),
+  );
 
   const changeCurrentThemeMode = useCallback((newThemeMode: ColorScheme) => {
     setCurrentThemeMode(newThemeMode);
-    Store.set(PREFERENCES_THEME_MODE, newThemeMode);
 
-    if (!userIsReadOnly) {
-      const nextPreferences = { ...userPreferences, [PREFERENCES_THEME_MODE]: newThemeMode };
+    if (userIsLoggedIn) {
+      Store.set(PREFERENCES_THEME_MODE, newThemeMode);
 
-      PreferencesStore.saveUserPreferences(username, nextPreferences);
+      if (!userIsReadOnly) {
+        const nextPreferences = { ...userPreferences, [PREFERENCES_THEME_MODE]: newThemeMode };
+
+        PreferencesStore.saveUserPreferences(username, nextPreferences);
+      }
     }
-  }, [userIsReadOnly, userPreferences, username]);
+  }, [userIsLoggedIn, userIsReadOnly, userPreferences, username]);
 
   return [currentThemeMode, changeCurrentThemeMode];
 };

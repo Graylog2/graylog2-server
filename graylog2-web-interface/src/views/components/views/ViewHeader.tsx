@@ -33,6 +33,7 @@ import useAlertAndEventDefinitionData from 'hooks/useAlertAndEventDefinitionData
 import { updateView } from 'views/logic/slices/viewSlice';
 import useIsNew from 'views/hooks/useIsNew';
 import { createGRN } from 'logic/permissions/GRN';
+import ExecutionInfo from 'views/components/views/ExecutionInfo';
 
 const links = {
   [View.Type.Dashboard]: ({ id, title }) => [{
@@ -83,6 +84,10 @@ const Content = styled.div(({ theme }) => css`
   margin-bottom: ${theme.spacings.xs};
   gap: 4px;
 `);
+
+const ExecutionInfoContainer = styled.div`
+  margin-left: auto;
+`;
 
 const EditButton = styled.div(({ theme }) => css`
   color: ${theme.colors.gray[60]};
@@ -141,6 +146,8 @@ const ViewHeader = () => {
     return links[view.type]({ id: view.id, title });
   }, [alertId, definitionId, definitionTitle, isAlert, isEvent, isEventDefinition, view, title]);
 
+  const showExecutionInfo = view.type === 'SEARCH';
+
   return (
     <Row>
       <Content>
@@ -175,6 +182,7 @@ const ViewHeader = () => {
                              onSave={_onSaveView}
                              submitButtonText={`Save ${typeText}`} />
         )}
+        {showExecutionInfo && <ExecutionInfoContainer><ExecutionInfo /></ExecutionInfoContainer>}
       </Content>
     </Row>
   );

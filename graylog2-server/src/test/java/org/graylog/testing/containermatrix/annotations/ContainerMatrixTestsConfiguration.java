@@ -100,4 +100,5 @@ public @interface ContainerMatrixTestsConfiguration {
 
     ConfigurationParameter[] additionalConfigurationParameters() default {};
 
+    boolean withWebhookServerEnabled() default false;
 }

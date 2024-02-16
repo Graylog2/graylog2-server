@@ -70,6 +70,7 @@ import org.graylog2.indexer.indices.IndexMoveResult;
 import org.graylog2.indexer.indices.IndexSettings;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.IndicesAdapter;
+import org.graylog2.indexer.indices.ShardsInfo;
 import org.graylog2.indexer.indices.Template;
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
@@ -382,6 +383,11 @@ public class IndicesAdapterES7 implements IndicesAdapter {
     @Override
     public JsonNode getIndexStats(Collection<String> indices) {
         return statsApi.indexStatsWithDocsAndStore(indices);
+    }
+
+    @Override
+    public List<ShardsInfo> getShardsInfo(String indexName) {
+        return catApi.getShardsInfo(indexName);
     }
 
     @Override
