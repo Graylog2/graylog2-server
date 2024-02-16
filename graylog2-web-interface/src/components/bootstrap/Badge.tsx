@@ -20,15 +20,13 @@ import { Badge as MantineBadge } from '@mantine/core';
 import styled, { css } from 'styled-components';
 
 const StyledBadge = styled(MantineBadge)<{ color: ColorVariant }>(({ theme, color }) => css`
-    color: ${theme.mantine.other.colors.contrast[color]};
-    text-transform: none;
+  color: ${theme.mantine.other.colors.contrast[color]};
+  text-transform: none;
 
-    .mantine-Badge-label {
-      font-size: ${theme.mantine.fontSizes.sm};
-    }
-
-  ,
-  `);
+  .mantine-Badge-label {
+    font-size: ${theme.mantine.fontSizes.sm};
+  }
+`);
 
 type Props = React.PropsWithChildren<{
   bsStyle?: ColorVariant,
