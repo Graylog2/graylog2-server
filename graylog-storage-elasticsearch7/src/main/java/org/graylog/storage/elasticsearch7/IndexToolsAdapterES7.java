@@ -44,6 +44,7 @@ import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import javax.annotation.Nonnull;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -54,7 +55,6 @@ import java.util.Set;
 import static org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders.existsQuery;
 import static org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
-import static org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders.rangeQuery;
 import static org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders.termsQuery;
 
 public class IndexToolsAdapterES7 implements IndexToolsAdapter {
@@ -132,8 +132,9 @@ public class IndexToolsAdapterES7 implements IndexToolsAdapter {
     }
 
     @Override
+    @Nonnull
     public ImmutablePair<Double, Double> minMax(TimeRange timeRange, String fieldName, Set<String> indices, Optional<Set<String>> includedStreams) {
-        final RangeQueryBuilder rangeFilter = rangeQuery(RANGE_QUERY).from(timeRange.getFrom()).to(timeRange.getTo());
+        final RangeQueryBuilder rangeFilter = TimeRangeQueryFactory.create(timeRange);
         final BoolQueryBuilder streamAndRangeFilter = buildStreamIdFilter(includedStreams).filter(rangeFilter);
         final FilterAggregationBuilder filter = AggregationBuilders
                 .filter(AGG_FILTER, streamAndRangeFilter)
@@ -150,7 +151,7 @@ public class IndexToolsAdapterES7 implements IndexToolsAdapter {
         Max aggMax = searchResult.getAggregations().get(AGG_MAX);
         Min aggMin = searchResult.getAggregations().get(AGG_MIN);
 
-        return new ImmutablePair<>(aggMin.getValue(), aggMax.getValue());
+        return new ImmutablePair<>(aggMin == null ? 0 : aggMin.getValue(), aggMax == null ? 0 : aggMax.getValue());
     }
 
     private BoolQueryBuilder buildStreamIdFilter(Optional<Set<String>> includedStreams) {

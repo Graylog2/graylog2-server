@@ -20,6 +20,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.joda.time.DateTime;
 
+import javax.annotation.Nonnull;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -29,5 +30,6 @@ public interface IndexToolsAdapter {
 
     long count(Set<String> indices, Optional<Set<String>> includedStreams);
 
+    @Nonnull
     ImmutablePair<Double, Double> minMax(TimeRange timeRange, String fieldName, Set<String> indices, Optional<Set<String>> includedStreams);
 }
