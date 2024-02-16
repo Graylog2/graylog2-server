@@ -20,13 +20,15 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import org.graylog.plugins.views.search.timeranges.OffsetRange;
 import org.joda.time.DateTime;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = false)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type")
 @JsonSubTypes({
         @JsonSubTypes.Type(name = AbsoluteRange.ABSOLUTE, value = AbsoluteRange.class),
         @JsonSubTypes.Type(name = RelativeRange.RELATIVE, value = RelativeRange.class),
-        @JsonSubTypes.Type(name = KeywordRange.KEYWORD, value = KeywordRange.class)
+        @JsonSubTypes.Type(name = KeywordRange.KEYWORD, value = KeywordRange.class),
+        @JsonSubTypes.Type(name = OffsetRange.OFFSET, value = OffsetRange.class)
 })
 public abstract class TimeRange {
 
