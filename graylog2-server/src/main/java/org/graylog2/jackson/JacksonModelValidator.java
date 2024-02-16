@@ -95,7 +95,9 @@ public class JacksonModelValidator {
                             //throw new RuntimeException("JsonTypeInfo#property value conflicts with existing property: " + jsonTypeInfo.property() + " (class " + annotatedClass.getName() + ")");
                             LOG.error("JsonTypeInfo#property value conflicts with existing property: {} (class {})", jsonTypeInfo.property(), annotatedClass.getName());
                         }
-                        if (annotatedClass.hasAnnotation(JsonSubTypes.class) && !annotatedClass.hasAnnotation(JsonTypeIdResolver.class)) {
+                        if (jsonTypeInfo.use() == JsonTypeInfo.Id.NAME
+                                && annotatedClass.hasAnnotation(JsonSubTypes.class)
+                                && !annotatedClass.hasAnnotation(JsonTypeIdResolver.class)) {
                             // When using abstract classes that don't have a @JsonTypeName annotation as the value
                             // for @JsonSubTypes.Type annotations, Jackson cannot look up the "name" value for the
                             // subtype and will use the class name as a fallback. (e.g., {"type": "AutoValue_ClassName"})
