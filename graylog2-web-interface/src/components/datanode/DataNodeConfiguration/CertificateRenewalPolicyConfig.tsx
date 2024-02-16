@@ -34,6 +34,7 @@ import Select from 'components/common/Select';
 import useLocation from 'routing/useLocation';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import { MIGRATION_STATE_QUERY_KEY } from 'components/datanode/hooks/useMigrationState';
 
 type RenewalPolicy = {
   mode: 'AUTOMATIC' | 'MANUAL',
@@ -124,6 +125,7 @@ const CertificateRenewalPolicyConfig = ({ className }: Props) => {
   const { mutateAsync: updateConfig } = useMutation(handleSaveConfig, {
     onSuccess: () => {
       queryClient.invalidateQueries(queryKey);
+      queryClient.invalidateQueries(MIGRATION_STATE_QUERY_KEY);
       setShowModal(false);
     },
     onError: (err: Error) => {

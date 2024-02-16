@@ -40,7 +40,7 @@ const Welcome = ({ nextSteps, onTriggerStep }: MigrationStepComponentProps) => {
           <JournalSizeWarning />
         </Col>
       </Row>
-      <MigrationStepTriggerButtonToolbar disabled={!dataNodes} nextSteps={nextSteps} onTriggerStep={onTriggerStep} />
+      <MigrationStepTriggerButtonToolbar disabled={dataNodes?.elements?.length <= 0} nextSteps={nextSteps} onTriggerStep={onTriggerStep} />
     </>
   );
 };

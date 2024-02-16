@@ -20,6 +20,7 @@ import styled from 'styled-components';
 import { Alert } from 'components/bootstrap';
 import type { MigrationStepComponentProps } from 'components/datanode/Types';
 import MigrationStepTriggerButtonToolbar from 'components/datanode/migrations/common/MigrationStepTriggerButtonToolbar';
+import JournalSizeWarning from 'components/datanode/migrations/rollingUpgrade/JournalSizeWarning';
 
 const DownsizeWarning = styled(Alert)`
   margin-top: 10px;
@@ -29,15 +30,9 @@ const DownsizeWarning = styled(Alert)`
 const JournalDowntimeWarning = ({ nextSteps, onTriggerStep }: MigrationStepComponentProps) => (
   <>
     <h3>Journal downtime size warning</h3>
+    <JournalSizeWarning />
     <DownsizeWarning bsStyle="danger">
-      <h4>During the next step the journal size will increase because of stopping the processing.</h4>
-      <ul>
-        <li>Current journal size: 1Go</li>
-        <li>Messages: 10 000</li>
-        <li>Volume size:  2Go</li>
-        <li><b>Estimated down time: 5mn</b></li>
-      </ul>
-      <p>Please increase you journal volume size before proceeding.</p>
+      <p>Please make sure your journal volume size is enough before proceeding.</p>
     </DownsizeWarning>
     <MigrationStepTriggerButtonToolbar nextSteps={nextSteps} onTriggerStep={onTriggerStep} />
   </>

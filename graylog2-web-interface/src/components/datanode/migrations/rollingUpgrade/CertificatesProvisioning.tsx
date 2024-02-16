@@ -31,19 +31,22 @@ const CertificatesProvisioning = ({ nextSteps, onTriggerStep }: MigrationStepCom
     return <Spinner text="Loading migration state." />;
   }
 
+  const isProvisioningOverview = step.state === MIGRATION_STATE.PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES.key;
+  const isProvisioningRunning = step.state === MIGRATION_STATE.PROVISION_ROLLING_UPGRADE_NODES_RUNNING.key;
+  const haveNextStep = step?.next_steps?.length > 0;
+
   return (
     <>
-      {step.state === MIGRATION_STATE.PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES.key && (
+      {isProvisioningOverview && (
       <p>
         Certificate authority has been configured successfully.<br />
         You can now provision certificate for your data nodes.
       </p>
       )}
-      {(step.state === MIGRATION_STATE.PROVISION_ROLLING_UPGRADE_NODES_RUNNING.key
-         && step?.next_steps?.length === 0) && (
-         <Spinner text="Provisioning certificate" />
+      {(isProvisioningRunning && !haveNextStep) && (
+      <Spinner text="Provisioning certificate" />
       )}
-      {step?.next_steps?.length > 0 && (
+      {(isProvisioningRunning && haveNextStep) && (
       <Alert bsStyle="success">Provisioning the data node finished.</Alert>
       )}
       <MigrationDatanodeList />
