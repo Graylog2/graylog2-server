@@ -96,8 +96,6 @@ const RollingUpgradeMigration = ({ currentStep, onTriggerNextStep }: Props) => {
       </p>
       <StyledPanelGroup accordion id="first" activeKey={activeStep} onSelect={() => {}}>
         {ROLLING_UPGRADE_MIGRATION_STEPS.map((rollingUpgradeStep, index) => {
-          console.log(rollingUpgradeStep);
-
           const { description } = MIGRATION_STATE[rollingUpgradeStep];
 
           return (
