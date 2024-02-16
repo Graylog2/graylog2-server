@@ -18,18 +18,15 @@ import * as React from 'react';
 
 import { ProgressBar } from 'components/common';
 
-import useRemoteReindexMigrationStatus from '../../hooks/useRemoteReindexMigrationStatus';
+import type { RemoteReindexMigration } from '../../hooks/useRemoteReindexMigrationStatus';
 import type { MigrationStepComponentProps } from '../../Types';
+import MigrationStepTriggerButtonToolbar from '../common/MigrationStepTriggerButtonToolbar';
+import useMigrationState from '../../hooks/useMigrationState';
 
 const RemoteReindexRunning = ({ nextSteps, onTriggerStep }: MigrationStepComponentProps) => {
-  const migrationID = '';
-  const roundedPercentage = 50;
+  const { currentStep: { response } }: any = useMigrationState(3000);
 
-  const onSuccess = () => {
-    onTriggerStep(nextSteps[0], {});
-  };
-
-  const { data } = useRemoteReindexMigrationStatus(migrationID, onSuccess);
+  const remoteReindexMigration: RemoteReindexMigration = response;
 
   return (
     <>
@@ -40,10 +37,11 @@ const RemoteReindexRunning = ({ nextSteps, onTriggerStep }: MigrationStepCompone
       <ProgressBar bars={[{
         animated: true,
         striped: true,
-        value: roundedPercentage,
+        value: remoteReindexMigration?.progress || 0,
         bsStyle: 'info',
-        label: data?.status,
+        label: remoteReindexMigration?.status,
       }]} />
+      <MigrationStepTriggerButtonToolbar nextSteps={nextSteps} onTriggerStep={onTriggerStep} />
     </>
   );
 };

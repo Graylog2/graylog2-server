@@ -36,6 +36,7 @@ export type RemoteReindexMigration = {
   id: string,
   error: string,
   status: MigrationStatus,
+  progress: number,
 }
 
 export type RemoteReindexRequest = {
