@@ -18,10 +18,13 @@ package org.graylog2.jackson;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.BeanDescription;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationConfig;
+import com.fasterxml.jackson.databind.annotation.JsonTypeIdResolver;
 import com.fasterxml.jackson.databind.introspect.BeanPropertyDefinition;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
@@ -30,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.UncheckedIOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -90,6 +94,25 @@ public class JacksonModelValidator {
                             // TODO: Enable for final version
                             //throw new RuntimeException("JsonTypeInfo#property value conflicts with existing property: " + jsonTypeInfo.property() + " (class " + annotatedClass.getName() + ")");
                             LOG.error("JsonTypeInfo#property value conflicts with existing property: {} (class {})", jsonTypeInfo.property(), annotatedClass.getName());
+                        }
+                        if (annotatedClass.hasAnnotation(JsonSubTypes.class) && !annotatedClass.hasAnnotation(JsonTypeIdResolver.class)) {
+                            // When using abstract classes that don't have a @JsonTypeName annotation as the value
+                            // for @JsonSubTypes.Type annotations, Jackson cannot look up the "name" value for the
+                            // subtype and will use the class name as a fallback. (e.g., {"type": "AutoValue_ClassName"})
+                            // This is not an issue when a custom @JsonTypeIdResolver is present on the superclass.
+                            final var invalidClasses = Arrays.stream(annotatedClass.getAnnotation(JsonSubTypes.class).value())
+                                    .map(JsonSubTypes.Type::value)
+                                    .map(config::constructType)
+                                    .filter(JavaType::isAbstract)
+                                    .map(JavaType::getRawClass)
+                                    .filter(clazz -> !clazz.isAnnotationPresent(JsonTypeName.class))
+                                    .map(Class::getCanonicalName)
+                                    .toList();
+
+                            if (!invalidClasses.isEmpty()) {
+//                                throw new RuntimeException("@JsonSubTypes.Type values that are abstract classes (e.g., auto-value) must have a @JsonTypeName annotation or a custom @JsonTypeIdResolver. Affected classes: " + invalidClasses);
+                                LOG.error("@JsonSubTypes.Type values that are abstract classes (e.g., auto-value) must have a @JsonTypeName annotation or a custom @JsonTypeIdResolver. Affected classes: {}", invalidClasses);
+                            }
                         }
                     }
                     case EXISTING_PROPERTY -> {
