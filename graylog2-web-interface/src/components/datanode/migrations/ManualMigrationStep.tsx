@@ -39,8 +39,6 @@ const ManualMigrationStep = () => {
     onTriggerNextState({ step, args });
   };
 
-  console.log(currentStep);
-
   return (
     <>
       {currentStep?.state === MIGRATION_STATE.MIGRATION_SELECTION_PAGE.key && (

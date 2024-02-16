@@ -43,7 +43,6 @@ const MigrationWizard = () => {
   };
 
   const { state: activeStep, next_steps: nextSteps } = currentStep;
-  console.log(currentStep);
 
   const steps = [
     {
