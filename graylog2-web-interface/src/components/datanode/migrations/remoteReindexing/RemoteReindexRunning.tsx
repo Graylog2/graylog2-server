@@ -20,7 +20,6 @@ import { ProgressBar } from 'components/common';
 
 import useRemoteReindexMigrationStatus from '../../hooks/useRemoteReindexMigrationStatus';
 import type { MigrationStepComponentProps } from '../../Types';
-import MigrationStepTriggerButtonToolbar from '../common/MigrationStepTriggerButtonToolbar';
 
 const RemoteReindexRunning = ({ nextSteps, onTriggerStep }: MigrationStepComponentProps) => {
   const migrationID = '';
@@ -45,7 +44,6 @@ const RemoteReindexRunning = ({ nextSteps, onTriggerStep }: MigrationStepCompone
         bsStyle: 'info',
         label: data?.status,
       }]} />
-      <MigrationStepTriggerButtonToolbar hidden nextSteps={nextSteps} onTriggerStep={onTriggerStep} />
     </>
   );
 };

@@ -46,12 +46,11 @@ export type RemoteReindexRequest = {
   user: string,
 }
 
-export const remoteReindex = async (request: RemoteReindexRequest, onSuccess: () => void) => {
+export const remoteReindex = async (request: RemoteReindexRequest) => {
   try {
     const result = await fetch('POST', qualifyUrl('/remote-reindex-migration/remoteReindex'), request);
 
     UserNotification.success('Successful Remote Reindexing.');
-    onSuccess();
 
     return result;
   } catch (errorThrown) {
