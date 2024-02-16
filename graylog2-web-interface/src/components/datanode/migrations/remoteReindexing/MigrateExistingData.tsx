@@ -15,13 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { FormikHelpers } from 'formik';
 import { Formik, Form } from 'formik';
 
 import { Input } from 'components/bootstrap';
 
 import type { RemoteReindexRequest } from '../../hooks/useRemoteReindexMigrationStatus';
-import { remoteReindex } from '../../hooks/useRemoteReindexMigrationStatus';
 import type { MigrationStepComponentProps } from '../../Types';
 import MigrationStepTriggerButtonToolbar from '../common/MigrationStepTriggerButtonToolbar';
 
@@ -34,17 +32,8 @@ const MigrateExistingData = ({ nextSteps, onTriggerStep }: MigrationStepComponen
     indices: [],
   };
 
-  const onSubmit = (values: RemoteReindexRequest, formikHelpers: FormikHelpers<RemoteReindexRequest>) => {
-    const onSuccess = () => {
-      onTriggerStep(nextSteps[0], {});
-    };
-
-    remoteReindex(values, onSuccess);
-    formikHelpers.setSubmitting(false);
-  };
-
   return (
-    <Formik initialValues={initialValues} onSubmit={onSubmit}>
+    <Formik initialValues={initialValues} onSubmit={() => {}}>
       {({
         values,
         handleChange,
@@ -69,7 +58,7 @@ const MigrateExistingData = ({ nextSteps, onTriggerStep }: MigrationStepComponen
                  type="password"
                  value={values.password}
                  onChange={handleChange} />
-          <MigrationStepTriggerButtonToolbar nextSteps={nextSteps} onTriggerStep={onTriggerStep} />
+          <MigrationStepTriggerButtonToolbar nextSteps={nextSteps} onTriggerStep={onTriggerStep} args={values} />
         </Form>
       )}
     </Formik>
