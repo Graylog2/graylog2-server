@@ -147,11 +147,7 @@ class MigrationStateMachineImplTest {
     }
 
 
-    private static class TestMigrationActions extends MigrationActionsImpl {
-
-        public TestMigrationActions() {
-            super(null, null, null, null, null, null, null);
-        }
+    private static class TestMigrationActions extends MigrationActionsAdapter {
 
         public void runTestFunction(Consumer<MigrationStateMachineContext> testFunction) {
             testFunction.accept(getStateMachineContext());
