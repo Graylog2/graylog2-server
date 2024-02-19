@@ -76,7 +76,7 @@
     "interactjs": "^1.4.0-rc.13",
     "leaflet": "^1.5.1",
     "lodash": "^4.17.4",
-    "marked": "^11.0.0",
+    "marked": "^12.0.0",
     "md5": "^2.2.1",
     "moment-duration-format": "2.3.2",
     "moment-precise-range-plugin": "^1.3.0",
