@@ -105,6 +105,19 @@ public class JacksonModelValidator {
                 switch (jsonTypeInfo.include()) {
                     case PROPERTY -> {
                         if (fieldNames.contains(jsonTypeInfo.property())) {
+                            // When the property for the subtype conflicts with an existing field in the class,
+                            // Jackson will generate the field twice.
+                            //
+                            // Example: {"type": "foo", "type": "foo"}
+                            //
+                            // This is not an issue if both fields have the same value, but it can become
+                            // problematic when the values differ. Specifically, when using abstract classes
+                            // (auto-value) for the JsonSubType.Type values, Jackson might generate two different
+                            // values.
+                            //
+                            // Example: {"type": "AutoValue_Foo", "type": "foo"}
+                            //
+                            // (see below where we check for existing type name annotations and abstract classes)
                             throw new RuntimeException(f("JsonTypeInfo#property value conflicts with existing property: %s (class %s)", jsonTypeInfo.property(), annotatedClass.getName()));
                         }
                         if (jsonTypeInfo.use() == JsonTypeInfo.Id.NAME
@@ -130,6 +143,8 @@ public class JacksonModelValidator {
                     }
                     case EXISTING_PROPERTY -> {
                         if (!fieldNames.contains(jsonTypeInfo.property())) {
+                            // Jackson cannot deserialize values where the existing property is not present.
+                            // This check helps to detect this on serialization already.
                             throw new RuntimeException(f("JsonTypeInfo#property value doesn't exist as property: %s (class %s)", jsonTypeInfo.property(), annotatedClass.getName()));
                         }
                     }
