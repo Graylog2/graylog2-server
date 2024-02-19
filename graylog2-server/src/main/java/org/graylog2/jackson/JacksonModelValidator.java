@@ -39,9 +39,21 @@ import java.util.stream.Collectors;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
+/**
+ * Validates model or DTO objects for correct annotation usage. It mainly checks if the configured annotations
+ * for subtypes use the correct settings.
+ */
 public class JacksonModelValidator {
     private static final Logger LOG = LoggerFactory.getLogger(JacksonModelValidator.class);
 
+    /**
+     * Validates a class by inspecting its Jackson specific annotations. Can be used to validate classes on
+     * application startup. The bean serializer modifier only runs when the first object serialization happens.
+     *
+     * @param collectionName the collection name that the given class is stored in
+     * @param objectMapper   the Jackson object mapper
+     * @param clazz          the class that should be validated
+     */
     public static void check(String collectionName, ObjectMapper objectMapper, Class<?> clazz) {
         if (LOG.isDebugEnabled()) {
             LOG.debug("CHECK [{}] {}", collectionName, clazz.getCanonicalName());
