@@ -15,14 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
 
 import InteractableModal from './InteractableModal';
 
 describe('<InteractableModal />', () => {
-  it('properly renders', () => {
-    const { firstChild } = render(<InteractableModal><div /></InteractableModal>);
+  it('properly renders', async () => {
+    render(<InteractableModal><div>This is the modal</div></InteractableModal>);
 
-    expect(firstChild).toMatchSnapshot();
+    await screen.findByText('This is the modal');
   });
 });
