@@ -15,10 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import styled from 'styled-components';
 
 import type { MigrationActions, OnTriggerStepFunction, StepArgs } from 'components/datanode/Types';
 import { Button, ButtonToolbar } from 'components/bootstrap';
 import { MIGRATION_ACTIONS } from 'components/datanode/Constants';
+
+const StyledButtonToolbar = styled(ButtonToolbar)`
+  flex-wrap: wrap;
+`;
 
 type Props = {
     nextSteps?: Array<MigrationActions>,
@@ -34,9 +39,9 @@ const MigrationStepTriggerButtonToolbar = ({ nextSteps, disabled, onTriggerStep,
   }
 
   return (
-    <ButtonToolbar>
-      {nextSteps.map((step) => <Button key={step} bsStyle="success" disabled={disabled} onClick={() => onTriggerStep(step, args)}>{MIGRATION_ACTIONS[step]?.label || 'Next'}</Button>)}
-    </ButtonToolbar>
+    <StyledButtonToolbar>
+      {nextSteps.map((step) => <Button key={step} bsStyle="success" bsSize="small" disabled={disabled} onClick={() => onTriggerStep(step, args)}>{MIGRATION_ACTIONS[step]?.label || 'Next'}</Button>)}
+    </StyledButtonToolbar>
   );
 };
 
