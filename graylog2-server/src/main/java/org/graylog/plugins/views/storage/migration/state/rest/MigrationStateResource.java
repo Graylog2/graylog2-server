@@ -26,12 +26,16 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog.plugins.views.storage.migration.state.machine.MigrationState;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachine;
+import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachineContext;
 import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.shared.rest.resources.ProxiedResource;
 import org.graylog2.shared.security.RestPermissions;
 
 @Path("/migration")
@@ -44,8 +48,9 @@ public class MigrationStateResource {
     private final MigrationStateMachine stateMachine;
 
     @Inject
-    public MigrationStateResource(MigrationStateMachine stateMachine) {
+    public MigrationStateResource(MigrationStateMachine stateMachine, @Context HttpHeaders httpHeaders) {
         this.stateMachine = stateMachine;
+        this.stateMachine.getContext().addExtendedState(MigrationStateMachineContext.AUTH_TOKEN_KEY, ProxiedResource.authenticationToken(httpHeaders));
     }
 
     @POST
@@ -53,9 +58,11 @@ public class MigrationStateResource {
     @NoAuditEvent("No Audit Event needed") // TODO: do we need audit log here?
     @RequiresPermissions(RestPermissions.DATANODE_MIGRATION)
     @ApiOperation(value = "trigger migration step")
-    public CurrentStateInformation migrate(@ApiParam(name = "request") @NotNull MigrationStepRequest request) {
-        final MigrationState newState = stateMachine.trigger(request.step(), request.args());
-        return new CurrentStateInformation(newState, stateMachine.nextSteps());
+    public Response trigger(@ApiParam(name = "request") @NotNull MigrationStepRequest request) {
+        final CurrentStateInformation newState = stateMachine.trigger(request.step(), request.args());
+        Response.ResponseBuilder response = newState.hasErrors() ? Response.serverError() : Response.ok();
+        return response.entity(newState)
+                .build();
     }
 
     @GET
@@ -74,7 +81,7 @@ public class MigrationStateResource {
     @Produces(MediaType.TEXT_PLAIN)
     @ApiOperation(value = "Serialize", notes = "Serialize migration graph as graphviz source")
     public String serialize() {
-        // you can use https://dreampuf.github.io/GraphvizOnline/ to vizualize the result
+        // you can use https://dreampuf.github.io/GraphvizOnline/ to visualize the result
         return stateMachine.serialize();
     }
 }

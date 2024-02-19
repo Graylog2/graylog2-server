@@ -58,7 +58,7 @@ public class FilePersistedNodeIdProvider implements Provider<NodeId> {
                 return generate(filename);
             }
 
-            LOG.info("Node ID: {}", read);
+            LOG.debug("Node ID: {}", read);
             return read;
         } catch (FileNotFoundException | NoSuchFileException e) {
             return generate(filename);

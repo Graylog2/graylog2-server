@@ -18,31 +18,50 @@ package org.graylog.plugins.views.storage.migration.state.machine;
 
 import com.github.oxo42.stateless4j.StateMachine;
 import org.graylog.plugins.views.storage.migration.state.actions.MigrationActions;
+import org.graylog.plugins.views.storage.migration.state.persistence.DatanodeMigrationPersistence;
+import org.graylog.plugins.views.storage.migration.state.rest.CurrentStateInformation;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class MigrationStateMachineImpl implements MigrationStateMachine {
     private final StateMachine<MigrationState, MigrationStep> stateMachine;
     private final MigrationActions migrationActions;
+    private final DatanodeMigrationPersistence persistenceService;
+    private MigrationStateMachineContext context;
 
-    public MigrationStateMachineImpl(StateMachine<MigrationState, MigrationStep> stateMachine, MigrationActions migrationActions) {
+    public MigrationStateMachineImpl(StateMachine<MigrationState, MigrationStep> stateMachine, MigrationActions migrationActions, DatanodeMigrationPersistence persistenceService) {
         this.stateMachine = stateMachine;
         this.migrationActions = migrationActions;
+        this.persistenceService = persistenceService;
+        this.context = persistenceService.getStateMachineContext().orElse(new MigrationStateMachineContext());
     }
 
     @Override
-    public MigrationState trigger(MigrationStep step, Map<String, Object> args) {
-        try {
-            migrationActions.setArgs(args);
-            stateMachine.fire(step);
-        } finally {
-            migrationActions.clearArgs();
+    public CurrentStateInformation trigger(MigrationStep step, Map<String, Object> args) {
+        context.setCurrentStep(step);
+        if (Objects.nonNull(args) && !args.isEmpty()) {
+            context.addActionArguments(step, args);
         }
-        return stateMachine.getState();
+        migrationActions.setStateMachineContext(context);
+        String errorMessage = null;
+        try {
+            stateMachine.fire(step);
+        } catch (Exception e) {
+            errorMessage = Objects.nonNull(e.getMessage()) ? e.getMessage() : e.toString();
+        }
+        context = migrationActions.getStateMachineContext();
+        persistenceService.saveStateMachineContext(context);
+        return new CurrentStateInformation(getState(), nextSteps(), errorMessage, context.getResponse());
+    }
+
+    @Override
+    public MigrationStateMachineContext getContext() {
+        return context;
     }
 
     @Override
