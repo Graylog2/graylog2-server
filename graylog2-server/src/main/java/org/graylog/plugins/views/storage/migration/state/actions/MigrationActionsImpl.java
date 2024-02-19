@@ -178,7 +178,14 @@ public class MigrationActionsImpl implements MigrationActions {
 
     @Override
     public boolean dataNodeStartupFinished() {
-        return nodeService.allActive().values().stream().allMatch(node -> node.getDataNodeStatus() == DataNodeStatus.AVAILABLE);
+        boolean dataNodesAvailable = nodeService.allActive().values().stream().allMatch(node -> node.getDataNodeStatus() == DataNodeStatus.AVAILABLE);
+        if (dataNodesAvailable) { // set preflight config once more to FINISHED to be sure that a Graylog restart will connect to the data nodes
+            var preflight = preflightConfigService.getPreflightConfigResult();
+            if (preflight == null || !preflight.equals(PreflightConfigResult.FINISHED)) {
+                preflightConfigService.setConfigResult(PreflightConfigResult.FINISHED);
+            }
+        }
+        return dataNodesAvailable;
     }
 
     @Override
