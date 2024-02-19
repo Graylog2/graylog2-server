@@ -138,8 +138,8 @@ public class IndexToolsAdapterES7 implements IndexToolsAdapter {
         final RangeQueryBuilder rangeFilter = TimeRangeQueryFactory.create(timeRange);
         final BoolQueryBuilder streamRangeQuery = buildStreamIdFilter(includedStreams).filter(rangeFilter);
         final FilterAggregationBuilder filterAgg = AggregationBuilders.filter(AGG_FILTER, streamRangeQuery);
-        final MaxAggregationBuilder maxAgg = AggregationBuilders.max(AGG_MAX).field("scores.raw_risk");
-        final MinAggregationBuilder minAgg = AggregationBuilders.min(AGG_MIN).field("scores.raw_risk");
+        final MaxAggregationBuilder maxAgg = AggregationBuilders.max(AGG_MAX).field(fieldName);
+        final MinAggregationBuilder minAgg = AggregationBuilders.min(AGG_MIN).field(fieldName);
         final FilterAggregationBuilder complexAgg = filterAgg.subAggregation(maxAgg).subAggregation(minAgg);
 
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
