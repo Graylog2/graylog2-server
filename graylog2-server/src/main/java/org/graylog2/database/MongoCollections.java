@@ -22,7 +22,6 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.jackson.CustomJacksonCodecRegistry;
-import org.graylog2.jackson.JacksonModelValidator;
 
 @Singleton
 public class MongoCollections {
@@ -40,8 +39,6 @@ public class MongoCollections {
      * Get a MongoCollection configured to use Jackson for serialization/deserialization of objects.
      */
     public <T> MongoCollection<T> get(String collectionName, Class<T> valueType) {
-        JacksonModelValidator.check(collectionName, objectMapper, valueType);
-
         final MongoCollection<T> collection = mongoConnection.getMongoDatabase().getCollection(collectionName, valueType);
         final CustomJacksonCodecRegistry jacksonCodecRegistry = new CustomJacksonCodecRegistry(this.objectMapper,
                 collection.getCodecRegistry());

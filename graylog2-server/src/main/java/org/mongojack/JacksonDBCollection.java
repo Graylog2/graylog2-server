@@ -49,7 +49,6 @@ import org.graylog2.database.jackson.legacy.LegacyInsertManyResult;
 import org.graylog2.database.jackson.legacy.LegacyInsertOneResult;
 import org.graylog2.database.jackson.legacy.LegacyUpdateOneResult;
 import org.graylog2.database.jackson.legacy.LegacyUpdateResult;
-import org.graylog2.jackson.JacksonModelValidator;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -74,7 +73,6 @@ public class JacksonDBCollection<T, K> {
     public static <T, K> JacksonDBCollection<T, K> wrap(
             DBCollection dbCollection, Class<T> type, Class<K> keyType,
             ObjectMapper objectMapper) {
-        JacksonModelValidator.check(dbCollection.getName(), objectMapper, type);
 
         return new JacksonDBCollection<>(dbCollection, type, keyType, objectMapper);
     }
