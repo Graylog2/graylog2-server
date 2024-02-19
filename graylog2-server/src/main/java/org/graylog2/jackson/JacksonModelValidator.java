@@ -37,6 +37,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.graylog2.shared.utilities.StringUtils.f;
+
 public class JacksonModelValidator {
     private static final Logger LOG = LoggerFactory.getLogger(JacksonModelValidator.class);
 
@@ -91,9 +93,7 @@ public class JacksonModelValidator {
                 switch (jsonTypeInfo.include()) {
                     case PROPERTY -> {
                         if (fieldNames.contains(jsonTypeInfo.property())) {
-                            // TODO: Enable for final version
-                            //throw new RuntimeException("JsonTypeInfo#property value conflicts with existing property: " + jsonTypeInfo.property() + " (class " + annotatedClass.getName() + ")");
-                            LOG.error("JsonTypeInfo#property value conflicts with existing property: {} (class {})", jsonTypeInfo.property(), annotatedClass.getName());
+                            throw new RuntimeException(f("JsonTypeInfo#property value conflicts with existing property: %s (class %s)", jsonTypeInfo.property(), annotatedClass.getName()));
                         }
                         if (jsonTypeInfo.use() == JsonTypeInfo.Id.NAME
                                 && annotatedClass.hasAnnotation(JsonSubTypes.class)
@@ -112,16 +112,13 @@ public class JacksonModelValidator {
                                     .toList();
 
                             if (!invalidClasses.isEmpty()) {
-//                                throw new RuntimeException("@JsonSubTypes.Type values that are abstract classes (e.g., auto-value) must have a @JsonTypeName annotation or a custom @JsonTypeIdResolver. Affected classes: " + invalidClasses);
-                                LOG.error("@JsonSubTypes.Type values that are abstract classes (e.g., auto-value) must have a @JsonTypeName annotation or a custom @JsonTypeIdResolver. Affected classes: {}", invalidClasses);
+                                throw new RuntimeException(f("@JsonSubTypes.Type values that are abstract classes (e.g., auto-value) must have a @JsonTypeName annotation or a custom @JsonTypeIdResolver. Affected classes: %s", invalidClasses));
                             }
                         }
                     }
                     case EXISTING_PROPERTY -> {
                         if (!fieldNames.contains(jsonTypeInfo.property())) {
-                            // TODO: Enable for final version
-                            //throw new RuntimeException("JsonTypeInfo#property value doesn't exist as property: " + jsonTypeInfo.property() + " (class " + annotatedClass.getName() + ")");
-                            LOG.error("JsonTypeInfo#property value doesn't exist as property: {} (class {})", jsonTypeInfo.property(), annotatedClass.getName());
+                            throw new RuntimeException(f("JsonTypeInfo#property value doesn't exist as property: %s (class %s)", jsonTypeInfo.property(), annotatedClass.getName()));
                         }
                     }
                     default -> {
