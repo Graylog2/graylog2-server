@@ -47,6 +47,7 @@ function bootstrapExpress(buildDir, config, pluginMounts, indexHtml = '<html><bo
   const app = express();
   app.get('/', (req, res) => res.send(indexHtml));
   app.get('/assets/config.js', (req, res) => res.send(config));
+  app.use('/favicon.ico', express.static('public/images/favicon.png'));
   app.use('/assets', express.static(buildDir));
 
   Object.entries(pluginMounts)
@@ -146,11 +147,11 @@ const pageErrors = [];
 const consoleLogs = [];
 
 const trackEvent = (evt, arr) => {
-  const msg = { type: evt.type(), message: evt.text(), stack: evt.stackTrace() };
+  const msg = { type: evt?.type(), message: evt?.text(), stack: JSON.stringify(evt?.stackTrace(), null, 2) };
   arr.push(msg);
 };
 
-const formatLog = (msg) => `${msg.type}: ${msg.message}`;
+const formatLog = (msg) => `${msg.type}: ${msg.message}\n${msg.stack}`;
 
 const pagePromise = loadPage(url, (msg) => trackEvent(msg, pageErrors), (msg) => trackEvent(msg, consoleLogs));
 
