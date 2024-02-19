@@ -21,7 +21,8 @@ import type { MigrationStepComponentProps } from 'components/datanode/Types';
 
 const StopMessageProcessing = ({ nextSteps, onTriggerStep }: MigrationStepComponentProps) => (
   <>
-    Migrations Steps
+    <p>Graylog processing is stopped.</p>
+    <p />
     <MigrationStepTriggerButtonToolbar nextSteps={nextSteps} onTriggerStep={onTriggerStep} />
   </>
 

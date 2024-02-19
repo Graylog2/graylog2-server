@@ -25,7 +25,7 @@ import CertificatesProvisioning from 'components/datanode/migrations/rollingUpgr
 import JournalDowntimeWarning from 'components/datanode/migrations/rollingUpgrade/JournalDowntimeWarning';
 import StopMessageProcessing from 'components/datanode/migrations/rollingUpgrade/StopMessageProcessing';
 import CompatibilityCheckStep from 'components/datanode/migrations/CompatibilityCheckStep';
-import ReplaceCluster from 'components/datanode/migrations/rollingUpgrade/ReplaceCluster';
+import RestartGraylog from 'components/datanode/migrations/rollingUpgrade/RestartGraylog';
 
 type Props = {
     currentStep: MigrationState,
@@ -81,8 +81,8 @@ const RollingUpgradeMigration = ({ currentStep, onTriggerNextStep }: Props) => {
         return <JournalDowntimeWarning nextSteps={nextSteps} onTriggerStep={onStepComplete} />;
       case MIGRATION_STATE.MESSAGE_PROCESSING_STOP.key:
         return <StopMessageProcessing nextSteps={nextSteps} onTriggerStep={onStepComplete} />;
-      case MIGRATION_STATE.REPLACE_CLUSTER.key:
-        return <ReplaceCluster nextSteps={nextSteps} onTriggerStep={onStepComplete} />;
+      case MIGRATION_STATE.RESTART_GRAYLOG.key:
+        return <RestartGraylog nextSteps={nextSteps} onTriggerStep={onStepComplete} />;
       default:
         return <Welcome nextSteps={nextSteps} onTriggerStep={onStepComplete} />;
     }
