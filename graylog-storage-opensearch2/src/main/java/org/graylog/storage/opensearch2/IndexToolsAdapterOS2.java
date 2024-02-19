@@ -31,11 +31,14 @@ import org.graylog.shaded.opensearch2.org.opensearch.index.query.RangeQueryBuild
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.filter.Filter;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.filter.ParsedFilter;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.histogram.ParsedDateHistogram;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.terms.Terms;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Max;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.MaxAggregationBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Min;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.MinAggregationBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
 import org.graylog2.indexer.IndexToolsAdapter;
 import org.graylog2.plugin.Message;
@@ -63,7 +66,6 @@ public class IndexToolsAdapterOS2 implements IndexToolsAdapter {
     private static final String AGG_FILTER = "message_filter";
     private static final String AGG_MAX = "agg_max";
     private static final String AGG_MIN = "agg_min";
-    private static final String RANGE_QUERY = "range_query";
 
     private final OpenSearchClient client;
 
@@ -76,7 +78,7 @@ public class IndexToolsAdapterOS2 implements IndexToolsAdapter {
     public Map<DateTime, Map<String, Long>> fieldHistogram(String fieldName, Set<String> indices, Optional<Set<String>> includedStreams, long interval) {
         final BoolQueryBuilder queryBuilder = buildStreamIdFilter(includedStreams);
 
-        final FilterAggregationBuilder the_filter = AggregationBuilders.filter(AGG_FILTER, queryBuilder)
+        final FilterAggregationBuilder theFilter = AggregationBuilders.filter(AGG_FILTER, queryBuilder)
                 .subAggregation(AggregationBuilders.dateHistogram(AGG_DATE_HISTOGRAM)
                         .field("timestamp")
                         .subAggregation(AggregationBuilders.terms(AGG_MESSAGE_FIELD).field(fieldName))
@@ -88,7 +90,7 @@ public class IndexToolsAdapterOS2 implements IndexToolsAdapter {
 
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
                 .query(QueryBuilders.matchAllQuery())
-                .aggregation(the_filter);
+                .aggregation(theFilter);
 
         final SearchRequest searchRequest = new SearchRequest()
                 .source(searchSourceBuilder)
@@ -134,22 +136,23 @@ public class IndexToolsAdapterOS2 implements IndexToolsAdapter {
     @Override
     @Nonnull
     public ImmutablePair<Double, Double> minMax(TimeRange timeRange, String fieldName, Set<String> indices, Optional<Set<String>> includedStreams) {
-        final RangeQueryBuilder rangeFilter = TimeRangeQueryFactory.create(timeRange);
-        final BoolQueryBuilder streamAndRangeFilter = buildStreamIdFilter(includedStreams).filter(rangeFilter);
-        final FilterAggregationBuilder filter = AggregationBuilders
-                .filter(AGG_FILTER, streamAndRangeFilter)
-                .subAggregation(AggregationBuilders.max(AGG_MAX).field(fieldName))
-                .subAggregation(AggregationBuilders.min(AGG_MIN).field(fieldName));
+        final RangeQueryBuilder rangeQuery = TimeRangeQueryFactory.create(timeRange);
+        final BoolQueryBuilder streamRangeQuery = buildStreamIdFilter(includedStreams).filter(rangeQuery);
+        final FilterAggregationBuilder filterAgg = AggregationBuilders.filter(AGG_FILTER, streamRangeQuery);
+        final MaxAggregationBuilder maxAgg = AggregationBuilders.max(AGG_MAX).field("scores.raw_risk");
+        final MinAggregationBuilder minAgg = AggregationBuilders.min(AGG_MIN).field("scores.raw_risk");
+        final FilterAggregationBuilder complexAgg = filterAgg.subAggregation(maxAgg).subAggregation(minAgg);
+
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
                 .query(QueryBuilders.matchAllQuery())
-                .aggregation(filter);
+                .aggregation(complexAgg);
         final SearchRequest searchRequest = new SearchRequest()
                 .source(searchSourceBuilder)
                 .indices(indices.toArray(new String[0]));
-        final SearchResponse searchResult = client.search(searchRequest, "Unable to retrieve min/max aggregation");
+        final SearchResponse searchResponse = client.search(searchRequest, "Unable to retrieve min/max aggregation");
 
-        Max aggMax = searchResult.getAggregations().get(AGG_MAX);
-        Min aggMin = searchResult.getAggregations().get(AGG_MIN);
+        Max aggMax = ((ParsedFilter) searchResponse.getAggregations().getAsMap().get(AGG_FILTER)).getAggregations().get(AGG_MAX);
+        Min aggMin = ((ParsedFilter) searchResponse.getAggregations().getAsMap().get(AGG_FILTER)).getAggregations().get(AGG_MIN);
 
         return new ImmutablePair<>(aggMin == null ? 0 : aggMin.getValue(), aggMax == null ? 0 : aggMax.getValue());
     }
