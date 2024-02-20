@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
 import { act } from 'react-dom/test-utils';
 
 import Spinner from 'components/common/Spinner';
@@ -23,26 +23,26 @@ import Spinner from 'components/common/Spinner';
 jest.useFakeTimers();
 
 describe('<Spinner />', () => {
-  it('should render without props', () => {
-    const { getByText } = render(<Spinner delay={0} />);
+  it('should render without props', async () => {
+    render(<Spinner delay={0} />);
 
-    expect(getByText('Loading...')).not.toBeNull();
+    await screen.findByText('Loading...');
   });
 
-  it('should render with a different text string', () => {
+  it('should render with a different text string', async () => {
     const text = 'Hello world!';
-    const { getByText } = render(<Spinner text={text} delay={0} />);
+    render(<Spinner text={text} delay={0} />);
 
-    expect(getByText(text)).not.toBeNull();
+    await screen.findByText(text);
   });
 
-  it('should not be visible initially', () => {
-    const { queryByText } = render(<Spinner />);
+  it('should not be visible initially', async () => {
+    render(<Spinner />);
 
-    expect(queryByText('Loading ...')).toBeNull();
+    expect(screen.queryByText('Loading ...')).toBeNull();
   });
 
-  it('should be visible after when delay is completed', () => {
+  it('should be visible after when delay is completed', async () => {
     const { container } = render(<Spinner />);
 
     act(() => {

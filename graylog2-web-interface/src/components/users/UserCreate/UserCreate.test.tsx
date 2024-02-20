@@ -61,6 +61,8 @@ jest.mock('stores/roles/AuthzRolesStore', () => ({
   },
 }));
 
+jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
+
 const extendedTimeout = applyTimeoutMultiplier(15000);
 
 describe('<UserCreate />', () => {
@@ -74,22 +76,23 @@ describe('<UserCreate />', () => {
     const lastNameInput = await findByLabelText('Last Name');
     const emailInput = await findByLabelText('E-Mail Address');
     const timeoutAmountInput = await findByPlaceholderText('Timeout amount');
-    // const timeoutUnitSelect = getByTestId('Timeout unit');
     const timezoneSelect = await findByLabelText('Time Zone');
     const roleSelect = await findByText(/search for roles/i);
     const passwordInput = await findByPlaceholderText('Password');
     const passwordRepeatInput = await findByPlaceholderText('Repeat password');
     const submitButton = await findSubmitButton();
-
     await userEvent.type(usernameInput, 'The username');
-    await userEvent.type(firstNameInput, 'The first name');
+
+    // eslint-disable-next-line testing-library/no-unnecessary-act
+    await act(async () => {
+      await userEvent.type(firstNameInput, 'The first name');
+    });
+
     await userEvent.type(lastNameInput, 'The last name');
     await userEvent.type(emailInput, 'username@example.org');
     await userEvent.clear(timeoutAmountInput);
     await userEvent.type(timeoutAmountInput, '40');
 
-    // await selectEvent.openMenu(timeoutUnitSelect);
-    // await act(async () => { await selectEvent.select(timeoutUnitSelect, 'Seconds'); });
     await act(async () => {
       await selectEvent.openMenu(timezoneSelect);
     });
@@ -106,10 +109,10 @@ describe('<UserCreate />', () => {
       await selectEvent.select(roleSelect, 'Manager');
     });
 
-    userEvent.type(passwordInput, 'thepassword');
-    userEvent.type(passwordRepeatInput, 'thepassword');
+    await userEvent.type(passwordInput, 'thepassword');
+    await userEvent.type(passwordRepeatInput, 'thepassword');
 
-    userEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await waitFor(() => expect(UsersActions.create).toHaveBeenCalledWith({
       username: 'The username',
@@ -137,7 +140,12 @@ describe('<UserCreate />', () => {
 
     await userEvent.type(usernameInput, '   username   ');
     await userEvent.type(firstNameInput, 'The first name');
-    await userEvent.type(lastNameInput, 'The last name');
+
+    // eslint-disable-next-line testing-library/no-unnecessary-act
+    await act(async () => {
+      await userEvent.type(lastNameInput, 'The last name');
+    });
+
     await userEvent.type(emailInput, 'username@example.org');
     await userEvent.type(passwordInput, 'thepassword');
     await userEvent.type(passwordRepeatInput, 'thepassword');
@@ -161,6 +169,7 @@ describe('<UserCreate />', () => {
     const usernameInput = await findByLabelText('Username');
 
     await userEvent.type(usernameInput, existingUser.username);
+
     await userEvent.tab();
 
     await findByText(/Username is already taken/);

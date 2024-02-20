@@ -93,6 +93,22 @@ const CloseButton = styled(Button)(({ theme }) => css`
  * Can be controlled or uncontrolled, using [`react-rnd`](https://github.com/bokuweb/react-rnd) under the hood
  */
 
+type Coords = { x: number, y: number };
+type Size = { width: string, height: string };
+
+type Props = {
+  className?: string,
+  minHeight?: number,
+  minWidth?: number,
+  onClose: () => void,
+  onDrag: (newCoords: Coords) => void,
+  onResize: (newSize: Size) => void,
+  position: Coords,
+  size: Size,
+  title: string,
+  wrapperClassName?: string,
+};
+
 const InteractableModal = ({
   children,
   className,
@@ -105,19 +121,19 @@ const InteractableModal = ({
   size,
   title,
   wrapperClassName,
-}) => {
+}: React.PropsWithChildren<Props>) => {
   const dragHandleRef = useRef(null);
   const [dragHandleClassName, setDragHandleClassName] = useState(null);
   const [dragPosition, setDragPosition] = useState(position);
   const [resizeSize, setResizeSize] = useState(size);
 
-  const handleDragStop = (event, { x, y }) => {
+  const handleDragStop = (_event, { x, y }: Coords) => {
     setDragPosition({ x, y });
     onDrag({ x, y });
   };
 
-  const handleResizeStop = (event, direction, ref) => {
-    const newSize = {
+  const handleResizeStop = (_event, direction, ref) => {
+    const newSize: Size = {
       width: ref.style.width,
       height: ref.style.height,
     };
@@ -171,12 +187,13 @@ const InteractableModal = ({
       right: parseFloat(width),
     };
 
-    const newCoords = {};
     const modalXWithNewWidth = innerWidth - boundingBox.right;
     const modalYWithNewHeight = innerHeight - boundingBox.bottom;
 
-    newCoords.x = Math.max(Math.min(modalXWithNewWidth, currentX), boundingBox.left);
-    newCoords.y = Math.max(Math.min(modalYWithNewHeight, currentY), boundingBox.top);
+    const newCoords = {
+      x: Math.max(Math.min(modalXWithNewWidth, currentX), boundingBox.left),
+      y: Math.max(Math.min(modalYWithNewHeight, currentY), boundingBox.top),
+    };
 
     handleDragStop(null, newCoords);
   }, 150);
