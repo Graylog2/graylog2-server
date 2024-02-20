@@ -161,7 +161,7 @@ class SystemNotificationRenderServiceTest {
         String title = "Test: <%s>".formatted("dummy");
         notification = new NotificationImpl()
                 .addNode("node")
-                .addType(Notification.Type.GENERIC_PLAINTEXT)
+                .addType(Notification.Type.GENERIC)
                 .addDetail("title", title)
                 .addDetail("description", "description")
                 .addTimestamp(DateTime.now(DateTimeZone.UTC));

@@ -82,7 +82,6 @@ public interface Notification extends Persisted {
         INDEX_RANGES_RECALCULATION,
         GENERIC,
         GENERIC_WITH_LINK,
-        GENERIC_PLAINTEXT,
         ES_INDEX_BLOCKED,
         ES_NODE_DISK_WATERMARK_LOW,
         ES_NODE_DISK_WATERMARK_HIGH,
