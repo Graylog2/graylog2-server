@@ -19,7 +19,6 @@ package org.graylog.plugins.views.storage.migration.state.actions;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachineContext;
-import org.graylog.plugins.views.storage.migration.state.persistence.DatanodeMigrationConfiguration;
 import org.graylog.security.certutil.CaService;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog2.bootstrap.preflight.PreflightConfigResult;
@@ -73,11 +72,6 @@ public class MigrationActionsImpl implements MigrationActions {
         this.clusterProcessingControlFactory = clusterProcessingControlFactory;
         this.migrationService = migrationService;
         this.preflightConfigService = preflightConfigService;
-    }
-
-    @Override
-    public void resetMigration() {
-        clusterConfigService.remove(DatanodeMigrationConfiguration.class);
     }
 
 
