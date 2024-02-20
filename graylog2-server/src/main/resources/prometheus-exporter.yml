@@ -831,13 +831,6 @@ metric_mappings:
   - metric_name: "output_buffer_executor_service_submitted"
     match_pattern: "org.graylog2.buffers.processors.OutputBufferProcessor.executor-service.submitted"
 
-  - metric_name: "output_buffer_processors_executor_service"
-    match_pattern: "org.graylog2.buffers.processors.OutputBufferProcessor.*.executor-service.*.*"
-    wildcard_extract_labels:
-      - "processor"
-      - "resource"
-      - "metric"
-
   - metric_name: "buffer_processor_incoming_messages"
     match_pattern: "org.graylog2.buffers.processors.OutputBufferProcessor.incomingMessages"
     additional_labels:
