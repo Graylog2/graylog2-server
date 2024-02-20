@@ -41,8 +41,8 @@
     </issueManagement>
 
     <ciManagement>
-        <system>Travis CI</system>
-        <url>https://travis-ci.org/Graylog2/graylog2-server</url>
+        <system>Github Actions</system>
+        <url>https://github.com/Graylog2/graylog2-server/actions</url>
     </ciManagement>
 
     <mailingLists>
@@ -144,13 +144,8 @@
         </dependency>
 
         <dependency>
-            <groupId>org.graylog.repackaged.mongojack</groupId>
+            <groupId>org.mongojack</groupId>
             <artifactId>mongojack</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.graylog.shaded</groupId>
-            <artifactId>mongojack4</artifactId>
         </dependency>
 
         <dependency>
@@ -599,6 +594,10 @@
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java-util</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
         </dependency>
         <dependency>
             <groupId>jakarta.validation</groupId>

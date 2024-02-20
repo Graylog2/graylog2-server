@@ -131,6 +131,10 @@ const EventDefinitionForm = ({
     currentUser,
   };
 
+  const canEditCondition = React.useMemo(() => (
+    canEdit || eventDefinition._scope.toUpperCase() === 'ILLUMINATE'
+  ), [canEdit, eventDefinition._scope]);
+
   const eventDefinitionType = getConditionPlugin(eventDefinition.config.type);
 
   const steps = [
@@ -142,7 +146,7 @@ const EventDefinitionForm = ({
     {
       key: STEP_KEYS[1],
       title: defaultTo(eventDefinitionType.displayName, 'Condition'),
-      component: <EventConditionForm {...defaultStepProps} canEdit={canEdit} />,
+      component: <EventConditionForm {...defaultStepProps} canEdit={canEditCondition} />,
     },
     {
       key: STEP_KEYS[2],

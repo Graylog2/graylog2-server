@@ -63,6 +63,8 @@ import useHandlerContext from 'views/components/useHandlerContext';
 import useView from 'views/hooks/useView';
 import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
 import { normalizeFromSearchBarForBackend } from 'views/logic/queries/NormalizeTimeRange';
+import QueryHistoryButton from 'views/components/searchbar/QueryHistoryButton';
+import type { Editor } from 'views/components/searchbar/queryinput/ace-types';
 
 import TimeRangeOverrideInfo from './searchbar/WidgetTimeRangeOverride';
 import TimeRangeFilter from './searchbar/time-range-filter';
@@ -159,6 +161,7 @@ const _validateQueryString = (values: SearchBarFormValues, globalOverride: Globa
 };
 
 const WidgetQueryControls = ({ availableStreams }: Props) => {
+  const editorRef = useRef<Editor>(null);
   const view = useView();
   const globalOverride = useGlobalOverride();
   const widget = useContext(WidgetContext);
@@ -202,8 +205,7 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
                                    limitDuration={limitDuration}
                                    onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
                                    value={values?.timerange}
-                                   hasErrorOnMount={!!errors.timerange}
-                                   position="right" />
+                                   hasErrorOnMount={!!errors.timerange} />
                 )}
                 {hasTimeRangeOverride && (
                   <TimeRangeOverrideInfo value={globalOverride?.timerange}
@@ -236,6 +238,7 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
                                           streams={values?.streams}
                                           placeholder={'Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'}
                                           error={error}
+                                          ref={editorRef}
                                           disableExecution={disableSearchSubmit}
                                           isValidating={isValidatingQuery}
                                           warning={warnings.queryString}
@@ -252,6 +255,7 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
                   </Field>
 
                   <QueryValidation />
+                  <QueryHistoryButton editorRef={editorRef} />
                 </SearchInputAndValidation>
 
                 {hasQueryOverride && (

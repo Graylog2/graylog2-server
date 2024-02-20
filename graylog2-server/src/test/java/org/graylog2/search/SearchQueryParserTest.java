@@ -26,9 +26,9 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.Test;
 import org.mongojack.DBQuery;
+import org.mongojack.QueryCondition;
 import org.mongojack.internal.query.CollectionQueryCondition;
 import org.mongojack.internal.query.CompoundQueryCondition;
-import org.mongojack.internal.query.QueryCondition;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;

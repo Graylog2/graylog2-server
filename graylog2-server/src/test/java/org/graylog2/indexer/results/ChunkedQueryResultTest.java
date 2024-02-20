@@ -17,7 +17,9 @@
 package org.graylog2.indexer.results;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +27,7 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.indexer.results.ChunkedQueryResultTest.ServerlessChunkedQueryResultSimulation.BACKING_RESULT_LIST;
+import static org.mockito.Mockito.doReturn;
 
 
 public class ChunkedQueryResultTest {
@@ -32,6 +35,21 @@ public class ChunkedQueryResultTest {
     private static final String INDEX_NAME = "graylog_0";
 
     private ServerlessChunkedQueryResultSimulation toTest;
+
+    @Test
+    void emptyResultWhenNextSearchResultReturnsNull() throws Exception {
+        toTest = Mockito.spy(new ServerlessChunkedQueryResultSimulation("Client",
+                List.of(),
+                "",
+                List.of("name"),
+                100,
+                20
+        ));
+        doReturn(null).when(toTest).nextSearchResult();
+
+        final ResultChunk resultChunk = toTest.nextChunk();
+        assertThat(resultChunk).isNull();
+    }
 
     @Test
     void emptyResultWhenLimitIsZero() throws Exception {
@@ -198,6 +216,7 @@ public class ChunkedQueryResultTest {
         }
 
         @Override
+        @Nullable
         protected List<String> nextSearchResult() throws IOException {
             final int toIndex = Math.min(fromIndex + batchSize, BACKING_RESULT_LIST.size());
             if (fromIndex >= toIndex) {

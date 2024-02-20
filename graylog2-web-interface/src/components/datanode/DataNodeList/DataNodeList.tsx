@@ -32,6 +32,7 @@ import useTableEventHandlers from 'hooks/useTableEventHandlers';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 
+import DataNodeBulkActions from './DataNodeBulkActions';
 import DataNodeActions from './DataNodeActions';
 import DataNodeStatusCell from './DataNodeStatusCell';
 
@@ -40,7 +41,7 @@ import useDataNodes from '../hooks/useDataNodes';
 const ENTITY_TABLE_ID = 'datanodes';
 const DEFAULT_LAYOUT = {
   pageSize: 10,
-  sort: { attributeId: 'title', direction: 'asc' } as Sort,
+  sort: { attributeId: 'hostname', direction: 'asc' } as Sort,
   displayedColumns: ['hostname', 'transport_address', 'status', 'is_leader', 'cert_valid_until'],
   columnsOrder: ['hostname', 'transport_address', 'status', 'is_leader', 'cert_valid_until'],
 };
@@ -149,7 +150,7 @@ const DataNodeList = () => {
                                      onSortChange={onSortChange}
                                      onPageSizeChange={onPageSizeChange}
                                      pageSize={layoutConfig.pageSize}
-                                     bulkSelection={{}}
+                                     bulkSelection={{ actions: <DataNodeBulkActions /> }}
                                      activeSort={layoutConfig.sort}
                                      rowActions={entityActions}
                                      actionsCellWidth={160}

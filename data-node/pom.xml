@@ -120,7 +120,7 @@
             <artifactId>mongodb-driver-legacy</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.graylog.repackaged.mongojack</groupId>
+            <groupId>org.mongojack</groupId>
             <artifactId>mongojack</artifactId>
         </dependency>
         <dependency>
@@ -394,7 +394,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-exec</artifactId>
-            <version>1.3</version>
+            <version>1.4.0</version>
         </dependency>
 
 
@@ -437,6 +437,11 @@
             <artifactId>rest-assured</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.graylog2</groupId>
@@ -445,6 +450,7 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
+
 
     </dependencies>
 

@@ -17,14 +17,12 @@
 package org.graylog.plugins.views.storage.migration.state;
 
 import org.assertj.core.api.Assertions;
-import org.graylog.plugins.views.storage.migration.state.actions.MigrationActions;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationActionsAdapter;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationState;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachine;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachineProvider;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStep;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +49,9 @@ class MigrationStateMachineTest {
 
             @Override
             public boolean runDirectoryCompatibilityCheck() {
-                capturedArgs.set(args());
+                String key = "foo";
+                String value = getStateMachineContext().getActionArgument(key, String.class);
+                capturedArgs.set(Map.of(key, value));
                 return true;
             }
 
@@ -84,6 +84,22 @@ class MigrationStateMachineTest {
         Assertions.assertThat(capturedArgs.get())
                 .isNotNull()
                 .containsEntry("foo", "bar");
+    }
+
+    @Test
+    void testReset() {
+        final InMemoryStateMachinePersistence persistence = new InMemoryStateMachinePersistence();
+        final MigrationStateMachineProvider provider = new MigrationStateMachineProvider(persistence, new MigrationActionsAdapter());
+        final MigrationStateMachine sm = provider.get();
+        sm.trigger(MigrationStep.SELECT_MIGRATION, Collections.emptyMap());
+        sm.trigger(MigrationStep.SKIP_DIRECTORY_COMPATIBILITY_CHECK, Collections.emptyMap());
+
+        Assertions.assertThat(sm.getState()).isEqualTo(MigrationState.CA_CREATION_PAGE);
+
+        sm.reset();
+
+        Assertions.assertThat(sm.getState()).isEqualTo(MigrationState.NEW);
+
     }
 
     @Test

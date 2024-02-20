@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import jakarta.inject.Inject;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.alias.IndicesAliasesRequest;
@@ -69,6 +70,7 @@ import org.graylog2.indexer.indices.IndexMoveResult;
 import org.graylog2.indexer.indices.IndexSettings;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.IndicesAdapter;
+import org.graylog2.indexer.indices.ShardsInfo;
 import org.graylog2.indexer.indices.Template;
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
@@ -80,9 +82,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-
-import jakarta.inject.Inject;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -192,7 +191,7 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     public Map<String, Object> getIndexMetaData(@Nonnull String index) {
         final GetMappingsRequest request = new GetMappingsRequest()
                 .indices(index)
-                .indicesOptions(IndicesOptions.fromOptions(true, true, true, false));
+                .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN);
 
         final GetMappingsResponse result = client.execute((c, requestOptions) -> c.indices().getMapping(request, requestOptions),
                 "Couldn't read mapping of index " + index);
@@ -225,7 +224,7 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     public Optional<DateTime> indexCreationDate(String index) {
         final GetSettingsRequest request = new GetSettingsRequest()
                 .indices(index)
-                .indicesOptions(IndicesOptions.fromOptions(true, true, true, false));
+                .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN);
 
         final GetSettingsResponse result = client.execute((c, requestOptions) -> c.indices().getSettings(request, requestOptions),
                 "Couldn't read settings of index " + index);
@@ -321,7 +320,7 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
 
     private GetSettingsResponse settingsFor(String indexOrAlias) {
         final GetSettingsRequest request = new GetSettingsRequest().indices(indexOrAlias)
-                .indicesOptions(IndicesOptions.fromOptions(true, true, true, true));
+                .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN_CLOSED);
         return client.execute((c, requestOptions) -> c.indices().getSettings(request, requestOptions),
                 "Unable to retrieve settings for index/alias " + indexOrAlias);
     }
@@ -383,6 +382,11 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     @Override
     public JsonNode getIndexStats(Collection<String> indices) {
         return statsApi.indexStatsWithDocsAndStore(indices);
+    }
+
+    @Override
+    public List<ShardsInfo> getShardsInfo(String indexName) {
+        return catApi.getShardsInfo(indexName);
     }
 
     @Override
@@ -580,7 +584,7 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     @Override
     public String getIndexId(String index) {
         final GetSettingsRequest request = new GetSettingsRequest().indices(index)
-                .indicesOptions(IndicesOptions.fromOptions(true, true, true, true));
+                .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN_CLOSED);
         final GetSettingsResponse response = client.execute((c, requestOptions) -> c.indices().getSettings(request, requestOptions),
                 "Unable to retrieve settings for index/alias " + index);
         return response.getSetting(index, "index.uuid");

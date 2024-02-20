@@ -21,6 +21,7 @@ import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import { qualifyUrl } from 'util/URLUtils';
 import useRemoveCustomFieldTypeMutation from 'components/indices/IndexSetFieldTypes/hooks/useRemoveCustomFieldTypeMutation';
+import { overriddenIndexField, overriddenIndexFieldJson } from 'fixtures/indexSetFieldTypes';
 
 const urlPrefix = '/system/indices/mappings/remove_mapping';
 
@@ -57,7 +58,15 @@ describe('useRemoveCustomFieldTypeMutation', () => {
     };
 
     it('should run fetch and display UserNotification', async () => {
-      asMock(fetch).mockImplementation(() => Promise.resolve({}));
+      asMock(fetch).mockImplementation(() => Promise.resolve({
+        '001': {
+          succeeded: [overriddenIndexFieldJson],
+          failures: [],
+          successfully_performed: 1,
+          errors: [],
+        },
+      }));
+
       const { result, waitFor } = renderHook(() => useRemoveCustomFieldTypeMutation({
         onSuccessHandler: mockOnSuccessHandler,
         onErrorHandler: mockOnErrorHandler,
@@ -69,7 +78,18 @@ describe('useRemoveCustomFieldTypeMutation', () => {
 
       await waitFor(() => expect(fetch).toHaveBeenCalledWith('PUT', putUrl, requestBodyJSON));
 
-      await waitFor(() => expect(mockOnSuccessHandler).toHaveBeenCalledWith());
+      await waitFor(() => expect(mockOnSuccessHandler).toHaveBeenCalledWith(
+        {
+          '001': {
+            indexSetId: '001',
+            succeeded: [overriddenIndexField],
+            failures: [],
+            errors: [],
+            successfullyPerformed: 1,
+          },
+        },
+      ));
+
       await waitFor(() => expect(UserNotification.success).toHaveBeenCalledWith('Custom field type removed successfully', 'Success!'));
     });
 
@@ -95,6 +115,7 @@ describe('useRemoveCustomFieldTypeMutation', () => {
         '001': {
           successfully_performed: 0,
           failures: [{ entity_id: 'field', failure_explanation: 'field has error' }],
+          succeeded: [],
           errors: ['Some error'],
         },
       }));
@@ -108,12 +129,15 @@ describe('useRemoveCustomFieldTypeMutation', () => {
         result.current.removeCustomFieldTypeMutation(requestBody);
       });
 
-      await waitFor(() => expect(mockOnErrorHandler).toHaveBeenCalledWith([{
-        indexSetId: '001',
-        failures: [{ entityId: 'field', failureExplanation: 'field has error' }],
-        errors: ['Some error'],
-        successfullyPerformed: 0,
-      }]));
+      await waitFor(() => expect(mockOnErrorHandler).toHaveBeenCalledWith({
+        '001': {
+          indexSetId: '001',
+          succeeded: [],
+          failures: [{ entityId: 'field', failureExplanation: 'field has error' }],
+          errors: ['Some error'],
+          successfullyPerformed: 0,
+        },
+      }));
     });
   });
 });

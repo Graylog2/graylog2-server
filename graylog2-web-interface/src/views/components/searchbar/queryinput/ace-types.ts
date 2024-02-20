@@ -33,6 +33,7 @@ type EventCallback = {
 };
 
 export type Session = {
+  curOp: { args: unknown },
   getLength: () => number,
   getTokens: (no: number) => Array<Token>,
   getTokenAt: (no: number, idx: number) => Token | undefined | null,
@@ -82,10 +83,12 @@ export type Completer = {
 };
 
 export type Editor = {
+  container: HTMLElement | undefined,
   commands: Commands,
   completer: Completer,
   completers: Array<AutoCompleter>,
-  execCommand: (command: string) => void,
+  execCommand: (command: string, args?: Record<string, unknown>) => void,
+  focus: () => void,
   session: Session,
   renderer: Renderer,
   setFontSize: (newFontSize: number) => void,
@@ -96,10 +99,10 @@ export type Editor = {
 };
 
 export type CompletionResult = {
-  name: string,
+  name?: string,
   value: string,
   score: number,
-  meta: any,
+  meta?: any,
   caption?: string,
 };
 

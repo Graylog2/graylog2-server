@@ -16,9 +16,8 @@
  */
 import React from 'react';
 import * as Immutable from 'immutable';
-import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
+import { render, waitFor, screen, act } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
-import { act } from 'react-dom/test-utils';
 import userEvent from '@testing-library/user-event';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
@@ -62,6 +61,8 @@ jest.mock('stores/roles/AuthzRolesStore', () => ({
   },
 }));
 
+jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
+
 const extendedTimeout = applyTimeoutMultiplier(15000);
 
 describe('<UserCreate />', () => {
@@ -75,28 +76,43 @@ describe('<UserCreate />', () => {
     const lastNameInput = await findByLabelText('Last Name');
     const emailInput = await findByLabelText('E-Mail Address');
     const timeoutAmountInput = await findByPlaceholderText('Timeout amount');
-    // const timeoutUnitSelect = getByTestId('Timeout unit');
     const timezoneSelect = await findByLabelText('Time Zone');
     const roleSelect = await findByText(/search for roles/i);
     const passwordInput = await findByPlaceholderText('Password');
     const passwordRepeatInput = await findByPlaceholderText('Repeat password');
     const submitButton = await findSubmitButton();
+    await userEvent.type(usernameInput, 'The username');
 
-    fireEvent.change(usernameInput, { target: { value: 'The username' } });
-    fireEvent.change(firstNameInput, { target: { value: 'The first name' } });
-    fireEvent.change(lastNameInput, { target: { value: 'The last name' } });
-    fireEvent.change(emailInput, { target: { value: 'username@example.org' } });
-    fireEvent.change(timeoutAmountInput, { target: { value: '40' } });
-    // await selectEvent.openMenu(timeoutUnitSelect);
-    // await act(async () => { await selectEvent.select(timeoutUnitSelect, 'Seconds'); });
-    await selectEvent.openMenu(timezoneSelect);
-    await act(async () => { await selectEvent.select(timezoneSelect, 'Berlin'); });
-    await selectEvent.openMenu(roleSelect);
-    await act(async () => { await selectEvent.select(roleSelect, 'Manager'); });
-    fireEvent.change(passwordInput, { target: { value: 'thepassword' } });
-    fireEvent.change(passwordRepeatInput, { target: { value: 'thepassword' } });
+    // eslint-disable-next-line testing-library/no-unnecessary-act
+    await act(async () => {
+      await userEvent.type(firstNameInput, 'The first name');
+    });
 
-    fireEvent.click(submitButton);
+    await userEvent.type(lastNameInput, 'The last name');
+    await userEvent.type(emailInput, 'username@example.org');
+    await userEvent.clear(timeoutAmountInput);
+    await userEvent.type(timeoutAmountInput, '40');
+
+    await act(async () => {
+      await selectEvent.openMenu(timezoneSelect);
+    });
+
+    await act(async () => {
+      await selectEvent.select(timezoneSelect, 'Berlin');
+    });
+
+    await act(async () => {
+      await selectEvent.openMenu(roleSelect);
+    });
+
+    await act(async () => {
+      await selectEvent.select(roleSelect, 'Manager');
+    });
+
+    await userEvent.type(passwordInput, 'thepassword');
+    await userEvent.type(passwordRepeatInput, 'thepassword');
+
+    await userEvent.click(submitButton);
 
     await waitFor(() => expect(UsersActions.create).toHaveBeenCalledWith({
       username: 'The username',
@@ -122,14 +138,19 @@ describe('<UserCreate />', () => {
     const passwordRepeatInput = await findByPlaceholderText('Repeat password');
     const submitButton = await findSubmitButton();
 
-    fireEvent.change(usernameInput, { target: { value: '   username   ' } });
-    fireEvent.change(firstNameInput, { target: { value: 'The first name' } });
-    fireEvent.change(lastNameInput, { target: { value: 'The last name' } });
-    fireEvent.change(emailInput, { target: { value: 'username@example.org' } });
-    fireEvent.change(passwordInput, { target: { value: 'thepassword' } });
-    fireEvent.change(passwordRepeatInput, { target: { value: 'thepassword' } });
+    await userEvent.type(usernameInput, '   username   ');
+    await userEvent.type(firstNameInput, 'The first name');
 
-    fireEvent.click(submitButton);
+    // eslint-disable-next-line testing-library/no-unnecessary-act
+    await act(async () => {
+      await userEvent.type(lastNameInput, 'The last name');
+    });
+
+    await userEvent.type(emailInput, 'username@example.org');
+    await userEvent.type(passwordInput, 'thepassword');
+    await userEvent.type(passwordRepeatInput, 'thepassword');
+
+    await userEvent.click(submitButton);
 
     await waitFor(() => expect(UsersActions.create).toHaveBeenCalledWith({
       username: 'username',
@@ -142,14 +163,14 @@ describe('<UserCreate />', () => {
     }));
   }, extendedTimeout);
 
-  // The following tests will work when we use @testing-library/user-event instead of fireEvent
   it('should display warning if username is already taken', async () => {
     const { findByLabelText, findByText } = render(<UserCreate />);
 
     const usernameInput = await findByLabelText('Username');
 
     await userEvent.type(usernameInput, existingUser.username);
-    fireEvent.blur(usernameInput);
+
+    await userEvent.tab();
 
     await findByText(/Username is already taken/);
   }, extendedTimeout);
@@ -162,7 +183,7 @@ describe('<UserCreate />', () => {
 
     await userEvent.type(passwordInput, 'thepassword');
     await userEvent.type(passwordRepeatInput, 'notthepassword');
-    fireEvent.blur(passwordRepeatInput);
+    await userEvent.tab();
 
     await findByText(/Passwords do not match/);
   }, extendedTimeout);

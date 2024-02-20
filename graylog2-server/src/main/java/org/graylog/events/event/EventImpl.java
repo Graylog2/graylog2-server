@@ -32,8 +32,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.OptionalDouble;
 import java.util.stream.Collectors;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
 import static org.graylog2.plugin.Tools.buildElasticSearchTimeFormat;
 import static org.joda.time.DateTimeZone.UTC;
@@ -54,10 +56,10 @@ public class EventImpl implements Event {
     private String source;
     private ImmutableList<String> keyTuple = ImmutableList.of();
     private long priority;
-    private long riskScore;
     private boolean alert;
     private Map<String, FieldValue> fields = new HashMap<>();
     private Map<String, FieldValue> groupByFields = new HashMap<>();
+    private final Map<String, Double> scores = new HashMap<>();
     private EventReplayInfo replayInfo;
 
     EventImpl(String eventId,
@@ -240,13 +242,17 @@ public class EventImpl implements Event {
     }
 
     @Override
-    public long getRiskScore() {
-        return riskScore;
+    public OptionalDouble getScore(String name) {
+        final Double value = scores.get(name);
+        return value == null ? OptionalDouble.empty() : OptionalDouble.of(value);
     }
 
     @Override
-    public void setRiskScore(long riskScore) {
-        this.riskScore = riskScore;
+    public void setScore(String name, double riskScore) {
+        if (isNullOrEmpty(name)) {
+            throw new IllegalArgumentException("Score name cannot be null or empty");
+        }
+        this.scores.put(name, riskScore);
     }
 
     @Override
@@ -327,7 +333,7 @@ public class EventImpl implements Event {
                 .keyTuple(getKeyTuple())
                 .key(String.join("|", getKeyTuple()))
                 .priority(getPriority())
-                .riskScore(getRiskScore())
+                .scores(ImmutableMap.copyOf(scores))
                 .alert(getAlert())
                 .fields(ImmutableMap.copyOf(fields))
                 .groupByFields(ImmutableMap.copyOf(groupByFields))
@@ -384,6 +390,7 @@ public class EventImpl implements Event {
                 Objects.equals(keyTuple, event.keyTuple) &&
                 Objects.equals(fields, event.fields) &&
                 Objects.equals(groupByFields, event.groupByFields) &&
+                Objects.equals(scores, event.scores) &&
                 Objects.equals(replayInfo, event.replayInfo);
     }
 
@@ -391,7 +398,7 @@ public class EventImpl implements Event {
     public int hashCode() {
         return Objects.hash(eventId, eventDefinitionType, eventDefinitionId, originContext, eventTimestamp,
                 processingTimestamp, timerangeStart, timerangeEnd, streams, sourceStreams, message, source,
-                keyTuple, priority, alert, fields, groupByFields, replayInfo);
+                keyTuple, priority, alert, fields, groupByFields, scores, replayInfo);
     }
 
     @Override
@@ -415,6 +422,7 @@ public class EventImpl implements Event {
                 .add("fields", fields)
                 .add("groupByFields", groupByFields)
                 .add("replayInfo", replayInfo)
+                .add("scores", scores)
                 .toString();
     }
 

@@ -1,0 +1,5 @@
+type = "c"
+message = "Suppress index_not_found_exception when there is a race between querying and deleting an index."
+
+issues = ["18127"]
+pulls = ["18146"]

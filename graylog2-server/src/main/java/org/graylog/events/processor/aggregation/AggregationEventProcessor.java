@@ -31,7 +31,6 @@ import org.graylog.events.event.EventFactory;
 import org.graylog.events.event.EventOriginContext;
 import org.graylog.events.event.EventReplayInfo;
 import org.graylog.events.event.EventWithContext;
-import org.graylog.events.event.RiskScoreCalculator;
 import org.graylog.events.processor.DBEventProcessorStateService;
 import org.graylog.events.processor.EventConsumer;
 import org.graylog.events.processor.EventDefinition;
@@ -96,7 +95,6 @@ public class AggregationEventProcessor implements EventProcessor {
     private final Messages messages;
     private final NotificationService notificationService;
     private final PermittedStreams permittedStreams;
-    private final RiskScoreCalculator riskScoreCalculator;
 
     @Inject
     public AggregationEventProcessor(@Assisted EventDefinition eventDefinition,
@@ -106,8 +104,7 @@ public class AggregationEventProcessor implements EventProcessor {
                                      MoreSearch moreSearch,
                                      EventStreamService eventStreamService,
                                      Messages messages, NotificationService notificationService,
-                                     PermittedStreams permittedStreams,
-                                     RiskScoreCalculator riskScoreCalculator) {
+                                     PermittedStreams permittedStreams) {
         this.eventDefinition = eventDefinition;
         this.config = (AggregationEventProcessorConfig) eventDefinition.config();
         this.aggregationSearchFactory = aggregationSearchFactory;
@@ -118,7 +115,6 @@ public class AggregationEventProcessor implements EventProcessor {
         this.messages = messages;
         this.notificationService = notificationService;
         this.permittedStreams = permittedStreams;
-        this.riskScoreCalculator = riskScoreCalculator;
     }
 
     @Override
@@ -252,9 +248,9 @@ public class AggregationEventProcessor implements EventProcessor {
                         .timerangeEnd(parameters.timerange().getTo())
                         .query(config.query())
                         .streams(event.getSourceStreams())
+                        .filters(config.filters())
                         .build());
 
-                riskScoreCalculator.assignRiskScore(event);
                 eventsWithContext.add(EventWithContext.create(event, msg));
                 if (config.eventLimit() != 0) {
                     if (messageCount.incrementAndGet() >= config.eventLimit()) {
@@ -346,6 +342,7 @@ public class AggregationEventProcessor implements EventProcessor {
                     .timerangeEnd(event.getTimerangeEnd())
                     .query(config.query())
                     .streams(sourceStreams)
+                    .filters(config.filters())
                     .build());
             sourceStreams.forEach(event::addSourceStream);
 
@@ -398,8 +395,6 @@ public class AggregationEventProcessor implements EventProcessor {
             // TODO: Can we find a useful source value?
             final Message message = new Message(eventMessage, "", result.effectiveTimerange().to());
             message.addFields(fields);
-
-            riskScoreCalculator.assignRiskScore(event);
 
             LOG.debug("Creating event {}/{} - {} {} ({})", eventDefinition.title(), eventDefinition.id(), keyResult.key(), seriesString(keyResult), fields);
             eventsWithContext.add(EventWithContext.create(event, message));

@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
 import org.graylog.events.configuration.EventsConfigurationProvider;
 import org.graylog.events.processor.EventDefinition;
 import org.graylog.events.processor.EventProcessorException;
@@ -59,8 +60,6 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -448,30 +447,29 @@ public class PivotAggregationSearch implements AggregationSearch {
         // The first bucket must be the date range!
         groupBy.add(dateRangeBucket);
 
-        if (!config.groupBy().isEmpty()) {
-            // Then we add the configured groups
-            groupBy.addAll(config.groupBy().stream()
-                    .map(field -> Values.builder()
-                            // The pivot search type (as of Graylog 3.1.0) is using the "terms" aggregation under
-                            // the hood. The "terms" aggregation is meant to return the "top" terms and does not allow
-                            // and efficient retrieval and pagination over all terms.
-                            // Using Integer.MAX_VALUE as a limit can be very expensive with high cardinality grouping.
-                            // The ES documentation recommends to use the "Composite" aggregation instead.
-                            //
-                            // See the ES documentation for more details:
-                            //   https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-terms-aggregation.html#search-aggregations-bucket-terms-aggregation-size
-                            //   https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-composite-aggregation.html
-                            //
-                            // The "Composite" aggregation is only available since ES version 6.1, unfortunately.
-                            //
-                            // TODO: Either find a way to use the composite aggregation when the ES version in use is
-                            //       recent enough, and/or use a more conservative limit here and make it configurable
-                            //       by the user.
-                            .limit(Integer.MAX_VALUE)
-                            .field(field)
-                            .build())
-                    .toList());
-        }
+         if (!config.groupBy().isEmpty()) {
+             final Values values = Values.builder().fields(config.groupBy())
+                     .limit(Integer.MAX_VALUE)
+                     .build();
+             groupBy.add(values);
+
+             // The pivot search type (as of Graylog 3.1.0) is using the "terms" aggregation under
+             // the hood. The "terms" aggregation is meant to return the "top" terms and does not allow
+             // and efficient retrieval and pagination over all terms.
+             // Using Integer.MAX_VALUE as a limit can be very expensive with high cardinality grouping.
+             // The ES documentation recommends to use the "Composite" aggregation instead.
+             //
+             // See the ES documentation for more details:
+             //   https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-terms-aggregation.html#search-aggregations-bucket-terms-aggregation-size
+             //   https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-composite-aggregation.html
+             //
+             // The "Composite" aggregation is only available since ES version 6.1, unfortunately.
+             //
+             // TODO: Either find a way to use the composite aggregation when the ES version in use is
+             //       recent enough, and/or use a more conservative limit here and make it configurable
+             //       by the user.
+
+         }
 
         // We always have row groups because of the date range buckets
         pivotBuilder.rowGroups(groupBy);
