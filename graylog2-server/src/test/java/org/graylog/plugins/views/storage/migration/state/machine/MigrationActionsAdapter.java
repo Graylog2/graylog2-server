@@ -27,11 +27,6 @@ public class MigrationActionsAdapter implements MigrationActions {
     }
 
     @Override
-    public void resetMigration() {
-
-    }
-
-    @Override
     public boolean dataNodeStartupFinished() {
         return false;
     }
