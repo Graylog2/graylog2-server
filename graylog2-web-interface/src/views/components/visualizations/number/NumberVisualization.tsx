@@ -81,15 +81,14 @@ const _extractValueAndField = (rows: Rows) => {
 const _extractFirstSeriesName = (config) => {
   const { series = [] } = config;
 
-  return series.length === 0
-    ? undefined
-    : series[0].function;
+  return series.length === 0 ? undefined : series[0].function;
 };
 
 const NumberVisualization = ({ config, fields, data }: VisualizationComponentProps) => {
   const targetRef = useRef();
   const onRenderComplete = useContext(RenderCompletionCallback);
-  const visualizationConfig = (config.visualizationConfig as NumberVisualizationConfig) ?? NumberVisualizationConfig.create();
+  const visualizationConfig =
+    (config.visualizationConfig as NumberVisualizationConfig) ?? NumberVisualizationConfig.create();
 
   const field = _extractFirstSeriesName(config);
 
@@ -111,10 +110,7 @@ const NumberVisualization = ({ config, fields, data }: VisualizationComponentPro
         {({ height, width }) => (
           <AutoFontSizer height={height} width={width} center>
             <CustomHighlighting field={field} value={value}>
-              <Value field={field}
-                     type={fieldTypeFor(field, fields)}
-                     value={value}
-                     render={DecoratedValue} />
+              <Value field={field} type={fieldTypeFor(field, fields)} value={value} render={DecoratedValue} />
             </CustomHighlighting>
           </AutoFontSizer>
         )}
@@ -123,10 +119,12 @@ const NumberVisualization = ({ config, fields, data }: VisualizationComponentPro
         <TrendBox>
           {({ height, width }) => (
             <AutoFontSizer height={height} width={width} target={targetRef}>
-              <Trend ref={targetRef}
-                     current={value}
-                     previous={previousValue}
-                     trendPreference={visualizationConfig.trendPreference} />
+              <Trend
+                ref={targetRef}
+                current={value}
+                previous={previousValue}
+                trendPreference={visualizationConfig.trendPreference}
+              />
             </AutoFontSizer>
           )}
         </TrendBox>

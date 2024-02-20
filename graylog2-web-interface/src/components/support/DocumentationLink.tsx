@@ -35,8 +35,8 @@ type Props = {
   page: string;
   text: ReactNode;
   title?: string;
-  displayIcon?: boolean
-}
+  displayIcon?: boolean;
+};
 
 const DocumentationLink = ({ page, title = '', text, displayIcon }: Props) => (
   <Container href={DocsHelper.toString(page)} title={title} target="_blank">

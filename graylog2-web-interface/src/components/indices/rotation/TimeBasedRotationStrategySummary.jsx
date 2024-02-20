@@ -37,7 +37,9 @@ class TimeBasedRotationStrategySummary extends React.Component {
           <dt>Index rotation strategy:</dt>
           <dd>Index Time</dd>
           <dt>Rotation period:</dt>
-          <dd>{this.props.config.rotation_period} ({this._humanizedPeriod()})</dd>
+          <dd>
+            {this.props.config.rotation_period} ({this._humanizedPeriod()})
+          </dd>
           <dt>Rotate empty index set:</dt>
           <dd>{this.props.config.rotate_empty_index_set ? 'Yes' : 'No'}</dd>
         </dl>

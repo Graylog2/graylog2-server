@@ -60,12 +60,7 @@ export default class Grantee {
   static fromJSON(value: ActiveShareType): Grantee {
     const { grant, grantee, capability } = value;
 
-    return Grantee
-      .builder()
-      .grant(grant)
-      .grantee(grantee)
-      .capability(capability)
-      .build();
+    return Grantee.builder().grant(grant).grantee(grantee).capability(capability).build();
   }
 
   static builder(): Builder {

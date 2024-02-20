@@ -25,12 +25,12 @@ import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 import styles from './SavedSearchForm.css';
 
 type Props = React.PropsWithChildren<{
-  show: boolean,
-  saveSearch: (newTitle: string) => void,
-  saveAsSearch: (newTitle: string) => void,
-  toggleModal: () => void,
-  isCreateNew: boolean,
-  value: string,
+  show: boolean;
+  saveSearch: (newTitle: string) => void;
+  saveAsSearch: (newTitle: string) => void;
+  toggleModal: () => void;
+  isCreateNew: boolean;
+  value: string;
 }>;
 
 const StyledForm = styled.form`
@@ -44,7 +44,10 @@ const stopEvent = (e) => {
 
 const SavedSearchForm = ({ children, show, isCreateNew, saveSearch, saveAsSearch, toggleModal, value }: Props) => {
   const [title, setTitle] = useState(value);
-  const onChangeTitle = useCallback((e: React.FormEvent<unknown>) => setTitle((e.target as HTMLInputElement).value), []);
+  const onChangeTitle = useCallback(
+    (e: React.FormEvent<unknown>) => setTitle((e.target as HTMLInputElement).value),
+    [],
+  );
 
   const trimmedTitle = (title ?? '').trim();
   const disableSaveAs = trimmedTitle === '' || (!isCreateNew && trimmedTitle === value);
@@ -55,43 +58,33 @@ const SavedSearchForm = ({ children, show, isCreateNew, saveSearch, saveAsSearch
 
   return (
     <Popover position="left" opened={show} withArrow withinPortal>
-      <Popover.Target>
-        {children}
-      </Popover.Target>
-      <Popover.Dropdown title="Name of search"
-                        id="saved-search-popover">
+      <Popover.Target>{children}</Popover.Target>
+      <Popover.Dropdown title="Name of search" id="saved-search-popover">
         <StyledForm onSubmit={stopEvent}>
           <FormGroup>
             <ControlLabel htmlFor="title">Title</ControlLabel>
-            <FormControl type="text"
-                         value={title}
-                         id="title"
-                         placeholder="Enter title"
-                         onChange={onChangeTitle} />
+            <FormControl type="text" value={title} id="title" placeholder="Enter title" onChange={onChangeTitle} />
           </FormGroup>
-          {pluggableSaveViewControls?.map(({ component: Component, id }) => (Component
-              && <Component key={id} disabledViewCreation={disableSaveAs} />))}
+          {pluggableSaveViewControls?.map(
+            ({ component: Component, id }) => Component && <Component key={id} disabledViewCreation={disableSaveAs} />,
+          )}
           <ButtonToolbar>
             {!isCreateNew && (
-            <Button bsStyle="primary"
-                    className={styles.button}
-                    type="submit"
-                    bsSize="sm"
-                    onClick={_saveSearch}>
-              Save
-            </Button>
+              <Button bsStyle="primary" className={styles.button} type="submit" bsSize="sm" onClick={_saveSearch}>
+                Save
+              </Button>
             )}
-            <Button disabled={disableSaveAs}
-                    bsStyle="info"
-                    className={styles.button}
-                    type="submit"
-                    bsSize="sm"
-                    onClick={_saveAsSearch}>
+            <Button
+              disabled={disableSaveAs}
+              bsStyle="info"
+              className={styles.button}
+              type="submit"
+              bsSize="sm"
+              onClick={_saveAsSearch}
+            >
               {createNewTitle}
             </Button>
-            <Button className={styles.button}
-                    onClick={toggleModal}
-                    bsSize="sm">
+            <Button className={styles.button} onClick={toggleModal} bsSize="sm">
               Cancel
             </Button>
           </ButtonToolbar>

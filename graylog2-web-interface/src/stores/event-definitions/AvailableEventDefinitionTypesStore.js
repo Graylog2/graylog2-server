@@ -20,16 +20,14 @@ import * as URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
 
-export const AvailableEventDefinitionTypesActions = singletonActions(
-  'core.AvailableEventDefinitionTypes',
-  () => Reflux.createActions({
+export const AvailableEventDefinitionTypesActions = singletonActions('core.AvailableEventDefinitionTypes', () =>
+  Reflux.createActions({
     get: { asyncResult: true },
   }),
 );
 
-export const AvailableEventDefinitionTypesStore = singletonStore(
-  'core.AvailableEventDefinitionTypes',
-  () => Reflux.createStore({
+export const AvailableEventDefinitionTypesStore = singletonStore('core.AvailableEventDefinitionTypes', () =>
+  Reflux.createStore({
     listenables: [AvailableEventDefinitionTypesActions],
     sourceUrl: '/events/entity_types',
     entityTypes: undefined,

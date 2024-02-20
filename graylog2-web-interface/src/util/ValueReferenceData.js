@@ -130,9 +130,12 @@ export default class ValueReferenceData {
         // We handle ValueReference data objects as leaf nodes
         this.addPath(parentPath);
       } else {
-        data.keySeq().toJS().forEach((key) => {
-          this.walkPaths(parentPath.concat([key]));
-        });
+        data
+          .keySeq()
+          .toJS()
+          .forEach((key) => {
+            this.walkPaths(parentPath.concat([key]));
+          });
       }
     } else if (List.isList(data)) {
       data.toArray().forEach((value, idx) => {
@@ -198,10 +201,13 @@ export default class ValueReferenceData {
   pathParameterSetter(path) {
     return (name) => {
       if (ValueRefHelper.dataIsValueRef(this.data.getIn(path))) {
-        this.data = this.data.setIn(path, Map({
-          [ValueRefHelper.VALUE_REF_VALUE_FIELD]: name,
-          [ValueRefHelper.VALUE_REF_TYPE_FIELD]: ValueRefHelper.VALUE_REF_PARAMETER_VALUE,
-        }));
+        this.data = this.data.setIn(
+          path,
+          Map({
+            [ValueRefHelper.VALUE_REF_VALUE_FIELD]: name,
+            [ValueRefHelper.VALUE_REF_TYPE_FIELD]: ValueRefHelper.VALUE_REF_PARAMETER_VALUE,
+          }),
+        );
       } else {
         throw new Error(`Cannot set parameter on non-value-reference field: ${path.join('.')}`);
       }
@@ -220,7 +226,7 @@ export default class ValueReferenceData {
         return this.data.getIn(path.concat(ValueRefHelper.VALUE_REF_TYPE_FIELD));
       }
 
-      return (typeof data);
+      return typeof data;
     };
   }
 }

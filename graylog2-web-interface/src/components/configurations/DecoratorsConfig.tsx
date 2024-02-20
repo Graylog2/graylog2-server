@@ -35,22 +35,36 @@ import DecoratorsUpdater from './decorators/DecoratorsUpdater';
 import formatDecorator from './decorators/FormatDecorator';
 
 const DecoratorsConfig = () => {
-  const { data: streams, isLoading: streamsLoading } = useQuery<Array<Stream>>(['streamsMap'], StreamsActions.listStreams);
-  const { data: types, isLoading: typesLoading } = useQuery<{ [key: string]: DecoratorType }>(['decorators', 'types'], DecoratorsActions.available);
-  const { data: decorators, isLoading: decoratorsLoading, refetch: refetchDecorators } = useQuery<Array<Decorator>>(['decorators', 'available'], DecoratorsActions.list);
+  const { data: streams, isLoading: streamsLoading } = useQuery<Array<Stream>>(
+    ['streamsMap'],
+    StreamsActions.listStreams,
+  );
+  const { data: types, isLoading: typesLoading } = useQuery<{ [key: string]: DecoratorType }>(
+    ['decorators', 'types'],
+    DecoratorsActions.available,
+  );
+  const {
+    data: decorators,
+    isLoading: decoratorsLoading,
+    refetch: refetchDecorators,
+  } = useQuery<Array<Decorator>>(['decorators', 'available'], DecoratorsActions.list);
   const [showConfigModal, setShowConfigModal] = useState(false);
   const streamsMap = useMemo(() => Object.fromEntries(streams?.map((s) => [s.id, s] as const) ?? []), [streams]);
 
   const openModal = useCallback(() => setShowConfigModal(true), []);
   const closeModal = useCallback(() => setShowConfigModal(false), []);
 
-  const onSave = useCallback((newDecorators: Array<Decorator>) => DecoratorsUpdater(newDecorators, decorators)
-    .then(
-      () => UserNotification.success('Updated decorators configuration.', 'Success!'),
-      (error) => UserNotification.error(`Unable to save new decorators: ${error}`, 'Saving decorators failed'),
-    )
-    .then(refetchDecorators)
-    .then(closeModal), [closeModal, decorators, refetchDecorators]);
+  const onSave = useCallback(
+    (newDecorators: Array<Decorator>) =>
+      DecoratorsUpdater(newDecorators, decorators)
+        .then(
+          () => UserNotification.success('Updated decorators configuration.', 'Success!'),
+          (error) => UserNotification.error(`Unable to save new decorators: ${error}`, 'Saving decorators failed'),
+        )
+        .then(refetchDecorators)
+        .then(closeModal),
+    [closeModal, decorators, refetchDecorators],
+  );
 
   const decoratorMap = useMemo(() => {
     if (typesLoading || decoratorsLoading) {
@@ -61,18 +75,25 @@ const DecoratorsConfig = () => {
       return <i>No decorators currently configured.</i>;
     }
 
-    const decoratorsGroupedByStream = groupBy(decorators, (decorator) => (decorator.stream || DEFAULT_SEARCH_ID));
+    const decoratorsGroupedByStream = groupBy(decorators, (decorator) => decorator.stream || DEFAULT_SEARCH_ID);
 
     return Object.entries(decoratorsGroupedByStream)
-      .map(([id, _decorators]) => [
-        streamsMap[id]?.title ?? id,
-        _decorators.sort((d1, d2) => d1.order - d2.order).map((decorator) => formatDecorator(decorator, _decorators, types)),
-      ] as const)
+      .map(
+        ([id, _decorators]) =>
+          [
+            streamsMap[id]?.title ?? id,
+            _decorators
+              .sort((d1, d2) => d1.order - d2.order)
+              .map((decorator) => formatDecorator(decorator, _decorators, types)),
+          ] as const,
+      )
       .sort((entry1, entry2) => defaultCompare(entry1[0], entry2[0]))
       .map(([streamName, _decorators]) => (
         <>
           <dt>{streamName}</dt>
-          <dd><DecoratorList decorators={_decorators} disableDragging /></dd>
+          <dd>
+            <DecoratorList decorators={_decorators} disableDragging />
+          </dd>
         </>
       ));
   }, [decorators, decoratorsLoading, streamsMap, types, typesLoading]);
@@ -85,18 +106,20 @@ const DecoratorsConfig = () => {
     <div>
       <h2>Decorators Configuration</h2>
       <p>These are the currently configured decorators grouped by stream:</p>
-      <p>
-        {decoratorMap}
-      </p>
+      <p>{decoratorMap}</p>
       <IfPermitted permissions="decorators:edit">
-        <Button bsStyle="info" bsSize="xs" onClick={openModal}>Edit configuration</Button>
+        <Button bsStyle="info" bsSize="xs" onClick={openModal}>
+          Edit configuration
+        </Button>
       </IfPermitted>
-      <DecoratorsConfigUpdate show={showConfigModal}
-                              streams={streams}
-                              decorators={decorators}
-                              onCancel={closeModal}
-                              onSave={onSave}
-                              types={types} />
+      <DecoratorsConfigUpdate
+        show={showConfigModal}
+        streams={streams}
+        decorators={decorators}
+        onCancel={closeModal}
+        onSave={onSave}
+        types={types}
+      />
     </div>
   );
 };

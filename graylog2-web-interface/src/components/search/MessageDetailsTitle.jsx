@@ -17,21 +17,21 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-const Title = styled.h3(({ theme }) => css`
-  a {
-    color: ${theme.colors.global.textDefault};
-  }
+const Title = styled.h3(
+  ({ theme }) => css`
+    a {
+      color: ${theme.colors.global.textDefault};
+    }
 
-  .label {
-    font-size: ${theme.fonts.size.tiny};
-    line-height: 200%;
-    margin-left: 5px;
-    vertical-align: bottom;
-  }
-`);
-
-const MessageDetailsTitle = (props) => (
-  <Title {...props} />
+    .label {
+      font-size: ${theme.fonts.size.tiny};
+      line-height: 200%;
+      margin-left: 5px;
+      vertical-align: bottom;
+    }
+  `,
 );
+
+const MessageDetailsTitle = (props) => <Title {...props} />;
 
 export default MessageDetailsTitle;

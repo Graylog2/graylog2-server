@@ -25,27 +25,33 @@ import NavigationBrand from './NavigationBrand';
 import ThemeModeToggle from './ThemeModeToggle';
 
 type StyledMantineTextProps = TextProps & {
-  children: React.ReactNode,
+  children: React.ReactNode;
 };
-const GraylogHeader = styled(Header)(({ theme }) => css`
-  background-color: ${theme.colors.global.contentBackground};
-  border: 1px solid ${theme.colors.variant.lighter.default};
-  padding: ${theme.spacings.md};
-`);
+const GraylogHeader = styled(Header)(
+  ({ theme }) => css`
+    background-color: ${theme.colors.global.contentBackground};
+    border: 1px solid ${theme.colors.variant.lighter.default};
+    padding: ${theme.spacings.md};
+  `,
+);
 const NavigationContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
 `;
-const StyledText = styled(Text)<StyledMantineTextProps>(({ theme }) => css`
-  color: ${theme.mode === 'light' ? theme.colors.brand.concrete : 'white'};
-`);
+const StyledText = styled(Text)<StyledMantineTextProps>(
+  ({ theme }) => css`
+    color: ${theme.mode === 'light' ? theme.colors.brand.concrete : 'white'};
+  `,
+);
 const Navigation = () => (
   <GraylogHeader height={80}>
     <NavigationContainer>
       <Group position="left" spacing="xs">
         <NavigationBrand />
-        <StyledText weight={700} size="lg" mr={1}>Graylog Initial Setup</StyledText>
+        <StyledText weight={700} size="lg" mr={1}>
+          Graylog Initial Setup
+        </StyledText>
       </Group>
       <Group position="right">
         <HelpMenu />

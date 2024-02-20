@@ -1,21 +1,21 @@
 :local(.deflist) {
-    margin-top: 10px;
+  margin-top: 10px;
 }
 
 :local(.deflist) dt {
-    float: left;
-    clear: left;
+  float: left;
+  clear: left;
 }
 
 :local(.deflist) dd {
-    margin-left: 160px;
+  margin-left: 160px;
 }
 
 :local(.topMargin) {
-    margin-top: 10px;
+  margin-top: 10px;
 }
 
 :local(.greyedOut) {
-    opacity: 0.5;
-    z-index: 20;
+  opacity: 0.5;
+  z-index: 20;
 }

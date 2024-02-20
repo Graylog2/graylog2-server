@@ -23,18 +23,18 @@ import AddWidgetButton from './create/AddWidgetButton';
 import HighlightingRules from './highlighting/HighlightingRules';
 
 export type SidebarSectionProps = {
-  sidebarChildren: React.ReactElement,
-  sidebarIsPinned: boolean,
-  queryId: string,
-  results: any,
-  toggleSidebar: () => void
+  sidebarChildren: React.ReactElement;
+  sidebarIsPinned: boolean;
+  queryId: string;
+  results: any;
+  toggleSidebar: () => void;
 };
 
 export type SidebarSection = {
-  key: string,
-  title: string,
-  icon: IconName,
-  content: React.ComponentType<SidebarSectionProps>,
+  key: string;
+  title: string;
+  icon: IconName;
+  content: React.ComponentType<SidebarSectionProps>;
 };
 
 const sidebarSections: Array<SidebarSection> = [

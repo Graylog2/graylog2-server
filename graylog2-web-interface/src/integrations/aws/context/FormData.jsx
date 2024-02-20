@@ -40,11 +40,7 @@ export const FormDataProvider = ({ initialFormData, children }) => {
     }
   };
 
-  return (
-    <FormDataContext.Provider value={{ formData, setFormData, clearField }}>
-      {children}
-    </FormDataContext.Provider>
-  );
+  return <FormDataContext.Provider value={{ formData, setFormData, clearField }}>{children}</FormDataContext.Provider>;
 };
 
 FormDataProvider.propTypes = {

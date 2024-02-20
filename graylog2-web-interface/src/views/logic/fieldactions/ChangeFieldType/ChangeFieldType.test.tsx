@@ -27,7 +27,7 @@ import useFieldTypeUsages from 'views/logic/fieldactions/ChangeFieldType/hooks/u
 
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useInitialSelection', () => jest.fn());
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages', () => jest.fn());
-const paginatedFieldUsage = ({
+const paginatedFieldUsage = {
   data: {
     list: [],
     pagination: {
@@ -41,18 +41,19 @@ const paginatedFieldUsage = ({
   refetch: () => {},
   isInitialLoading: false,
   isLoading: false,
-});
+};
 const onClose = jest.fn();
 const renderChangeTypeAction = ({
   queryId = 'query-id',
   field = 'field',
   type = FieldType.create('STRING'),
   value = 'value',
-}) => render(
-  <TestStoreProvider>
-    <ChangeFieldType onClose={onClose} queryId={queryId} field={field} type={type} value={value} />
-  </TestStoreProvider>,
-);
+}) =>
+  render(
+    <TestStoreProvider>
+      <ChangeFieldType onClose={onClose} queryId={queryId} field={field} type={type} value={value} />
+    </TestStoreProvider>,
+  );
 
 describe('ChangeFieldType', () => {
   beforeAll(() => {

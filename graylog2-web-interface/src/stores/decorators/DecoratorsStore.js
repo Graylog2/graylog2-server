@@ -21,9 +21,8 @@ import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
 
-export const DecoratorsActions = singletonActions(
-  'core.Decorators',
-  () => Reflux.createActions({
+export const DecoratorsActions = singletonActions('core.Decorators', () =>
+  Reflux.createActions({
     available: { asyncResult: true },
     create: { asyncResult: true },
     list: { asyncResult: true },
@@ -32,9 +31,8 @@ export const DecoratorsActions = singletonActions(
   }),
 );
 
-export const DecoratorsStore = singletonStore(
-  'core.Decorators',
-  () => Reflux.createStore({
+export const DecoratorsStore = singletonStore('core.Decorators', () =>
+  Reflux.createStore({
     listenables: [DecoratorsActions],
     state: {},
     getInitialState() {

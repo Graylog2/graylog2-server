@@ -57,10 +57,9 @@ class ConfigurationVariablesHelper extends React.Component {
   }
 
   _reloadVariables = () => {
-    ConfigurationVariableActions.all()
-      .then((configurationVariables) => {
-        this.setState({ configurationVariables: configurationVariables });
-      });
+    ConfigurationVariableActions.all().then((configurationVariables) => {
+      this.setState({ configurationVariables: configurationVariables });
+    });
   };
 
   _openErrorModal = () => {
@@ -78,8 +77,9 @@ class ConfigurationVariablesHelper extends React.Component {
   _handleDeleteConfirm = () => {
     const { variableToDelete } = this.state;
 
-    ConfigurationVariableActions.delete(variableToDelete)
-      .then(() => this._onSuccessfulUpdate(() => this._closeErrorModal()));
+    ConfigurationVariableActions.delete(variableToDelete).then(() =>
+      this._onSuccessfulUpdate(() => this._closeErrorModal()),
+    );
   };
 
   _handleDeleteCheck = (configVar) => () => {
@@ -106,19 +106,23 @@ class ConfigurationVariablesHelper extends React.Component {
 
       variableRows.push(
         <tr key={configVar.id}>
-          <td><code>{escapedName}</code></td>
+          <td>
+            <code>{escapedName}</code>
+          </td>
           <td>{configVar.description}</td>
           <td>
             <Button bsStyle="primary" bsSize="xsmall" onClick={this._handleDeleteCheck(configVar)}>
               Delete
             </Button>
             &nbsp;
-            <EditConfigurationVariableModal id={configVar.id}
-                                            name={configVar.name}
-                                            description={configVar.description}
-                                            content={configVar.content}
-                                            create={false}
-                                            saveConfigurationVariable={this._saveConfigurationVariable} />
+            <EditConfigurationVariableModal
+              id={configVar.id}
+              name={configVar.name}
+              description={configVar.description}
+              content={configVar.content}
+              create={false}
+              saveConfigurationVariable={this._saveConfigurationVariable}
+            />
           </td>
         </tr>,
       );
@@ -136,11 +140,12 @@ class ConfigurationVariablesHelper extends React.Component {
   _saveConfigurationVariable = (configurationVariable, oldName, callback) => {
     const { onVariableRename } = this.props;
 
-    ConfigurationVariableActions.save.triggerPromise(configurationVariable)
-      .then(() => this._onSuccessfulUpdate(() => {
+    ConfigurationVariableActions.save.triggerPromise(configurationVariable).then(() =>
+      this._onSuccessfulUpdate(() => {
         onVariableRename(oldName, configurationVariable.name);
         callback();
-      }));
+      }),
+    );
   };
 
   _onSuccessfulUpdate = (callback) => {
@@ -160,8 +165,7 @@ class ConfigurationVariablesHelper extends React.Component {
 
     return (
       <div>
-        <EditConfigurationVariableModal create
-                                        saveConfigurationVariable={this._saveConfigurationVariable} />
+        <EditConfigurationVariableModal create saveConfigurationVariable={this._saveConfigurationVariable} />
         <div className="clearfix" />
         <div className={`table-responsive ${ConfigurationHelperStyle.tableMaxHeight}`}>
           <Table responsive>
@@ -172,24 +176,21 @@ class ConfigurationVariablesHelper extends React.Component {
                 <th className={ConfigurationHelperStyle.actionsColumn}>Actions</th>
               </tr>
             </thead>
-            <tbody>
-              {this._configurationVariableListBuilder()}
-            </tbody>
+            <tbody>{this._configurationVariableListBuilder()}</tbody>
           </Table>
         </div>
 
-        <BootstrapModalWrapper showModal={showModal}
-                               onHide={this._closeErrorModal}>
+        <BootstrapModalWrapper showModal={showModal} onHide={this._closeErrorModal}>
           <Modal.Header>
-            <Modal.Title>Error deleting configuration
-              variable <strong>$&#123;user.{variableToDelete.name}&#125;</strong>
+            <Modal.Title>
+              Error deleting configuration variable <strong>$&#123;user.{variableToDelete.name}&#125;</strong>
             </Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <Alert bsStyle="warning">
               <p>
-                Cannot delete this configuration variable as it is still in use. Please remove the variable from
-                the following configurations and try again.
+                Cannot delete this configuration variable as it is still in use. Please remove the variable from the
+                following configurations and try again.
                 {errorModalContent}
               </p>
             </Alert>
@@ -199,11 +200,15 @@ class ConfigurationVariablesHelper extends React.Component {
           </Modal.Footer>
         </BootstrapModalWrapper>
 
-        <BootstrapModalConfirm showModal={showConfirmModal}
-                               title="Delete Configuration Variable?"
-                               onConfirm={this._handleDeleteConfirm}
-                               onCancel={this._closeErrorModal}>
-          <p>Are you sure you want to remove the configuration variable <strong>{variableToDelete.name}</strong>?</p>
+        <BootstrapModalConfirm
+          showModal={showConfirmModal}
+          title="Delete Configuration Variable?"
+          onConfirm={this._handleDeleteConfirm}
+          onCancel={this._closeErrorModal}
+        >
+          <p>
+            Are you sure you want to remove the configuration variable <strong>{variableToDelete.name}</strong>?
+          </p>
         </BootstrapModalConfirm>
       </div>
     );

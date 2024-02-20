@@ -31,24 +31,24 @@ const getOption = (optionText) => {
 
 describe('SurroundingSearchButton', () => {
   const searchConfig = {
-    surrounding_filter_fields: [
-      'somefield',
-      'someotherfield',
-    ],
+    surrounding_filter_fields: ['somefield', 'someotherfield'],
     surrounding_timerange_options: {
       PT1S: '1 second',
       PT1M: 'Only a minute',
     },
   };
   const TestComponent = (props: Partial<React.ComponentProps<typeof SurroundingSearchButton>>) => (
-    <SurroundingSearchButton searchConfig={searchConfig}
-                             timestamp="2020-02-28T09:45:31.123Z"
-                             id="foo-bar"
-                             messageFields={{}}
-                             {...props} />
+    <SurroundingSearchButton
+      searchConfig={searchConfig}
+      timestamp="2020-02-28T09:45:31.123Z"
+      id="foo-bar"
+      messageFields={{}}
+      {...props}
+    />
   );
 
-  const renderButton = (props: Partial<React.ComponentProps<typeof SurroundingSearchButton>> = {}) => render(<TestComponent {...props} />);
+  const renderButton = (props: Partial<React.ComponentProps<typeof SurroundingSearchButton>> = {}) =>
+    render(<TestComponent {...props} />);
 
   it('renders a button with a "Show surrounding messages" caption', () => {
     renderButton();
@@ -119,19 +119,21 @@ describe('SurroundingSearchButton', () => {
   it('includes current set of streams in generated urls', () => {
     const streams = ['000000000000000000000001', '5c2e07eeba33a9681ad6070a', '5d2d9649e117dc4df84cf83c'];
 
-    render((
+    render(
       <DrilldownContext.Consumer>
         {(drilldown) => (
           <DrilldownContext.Provider value={{ ...drilldown, streams }}>
             <TestComponent />
           </DrilldownContext.Provider>
         )}
-      </DrilldownContext.Consumer>
-    ));
+      </DrilldownContext.Consumer>,
+    );
 
     const option = asElement(getOption('1 second'), HTMLAnchorElement);
 
-    expect(option.href).toContain('streams=000000000000000000000001%2C5c2e07eeba33a9681ad6070a%2C5d2d9649e117dc4df84cf83c');
+    expect(option.href).toContain(
+      'streams=000000000000000000000001%2C5c2e07eeba33a9681ad6070a%2C5d2d9649e117dc4df84cf83c',
+    );
   });
 
   it('does not include a `streams` key in generated urls if none are selected', () => {

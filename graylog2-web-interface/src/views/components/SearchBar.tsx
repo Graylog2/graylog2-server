@@ -83,12 +83,23 @@ const StreamsAndRefresh = styled.div`
   flex: 1.5;
 `;
 
-const defaultOnSubmit = async (dispatch: AppDispatch, values: SearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>, currentQuery: Query) => {
+const defaultOnSubmit = async (
+  dispatch: AppDispatch,
+  values: SearchBarFormValues,
+  pluggableSearchBarControls: Array<() => SearchBarControl>,
+  currentQuery: Query,
+) => {
   const { timerange, streams, queryString } = values;
 
-  const queryWithPluginData = await executePluggableSubmitHandler(dispatch, values, pluggableSearchBarControls, currentQuery);
+  const queryWithPluginData = await executePluggableSubmitHandler(
+    dispatch,
+    values,
+    pluggableSearchBarControls,
+    currentQuery,
+  );
 
-  const newQuery = queryWithPluginData.toBuilder()
+  const newQuery = queryWithPluginData
+    .toBuilder()
     .timerange(timerange)
     .filter(filtersForQuery(streams))
     .query(createElasticsearchQueryString(queryString))
@@ -107,19 +118,27 @@ const defaultProps = {
 
 const debouncedValidateQuery = debounceWithPromise(validateQuery, 350);
 
-const useInitialFormValues = ({ currentQuery, queryFilters }: {
-  currentQuery: Query | undefined,
-  queryFilters: Immutable.Map<QueryId, FilterType>
+const useInitialFormValues = ({
+  currentQuery,
+  queryFilters,
+}: {
+  currentQuery: Query | undefined;
+  queryFilters: Immutable.Map<QueryId, FilterType>;
 }) => {
   const { id, query, timerange } = currentQuery ?? {};
   const { query_string: queryString } = query ?? {};
   const initialValuesFromPlugins = usePluggableInitialValues(currentQuery);
   const streams = filtersToStreamSet(queryFilters.get(id, Immutable.Map())).toJS();
 
-  return ({ timerange, streams, queryString, ...initialValuesFromPlugins });
+  return { timerange, streams, queryString, ...initialValuesFromPlugins };
 };
 
-const _validateQueryString = (values: SearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>, userTimezone: string, context: HandlerContext) => {
+const _validateQueryString = (
+  values: SearchBarFormValues,
+  pluggableSearchBarControls: Array<() => SearchBarControl>,
+  userTimezone: string,
+  context: HandlerContext,
+) => {
   const request = {
     timeRange: values?.timerange,
     streams: values?.streams,
@@ -131,16 +150,23 @@ const _validateQueryString = (values: SearchBarFormValues, pluggableSearchBarCon
 };
 
 type Props = {
-  onSubmit?: (dispatch: AppDispatch, update: SearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>, query: Query) => Promise<any>
+  onSubmit?: (
+    dispatch: AppDispatch,
+    update: SearchBarFormValues,
+    pluggableSearchBarControls: Array<() => SearchBarControl>,
+    query: Query,
+  ) => Promise<any>;
 };
 
 const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
   const editorRef = useRef<Editor>(null);
   const view = useView();
-  const availableStreams = useStore(StreamsStore, ({ streams }) => streams.map((stream) => ({
-    key: stream.title,
-    value: stream.id,
-  })));
+  const availableStreams = useStore(StreamsStore, ({ streams }) =>
+    streams.map((stream) => ({
+      key: stream.title,
+      value: stream.id,
+    })),
+  );
   const { searchesClusterConfig: config } = useStore(SearchConfigStore);
   const { userTimezone } = useUserDateTime();
   const { parameters } = useParameters();
@@ -149,8 +175,10 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
   const initialValues = useInitialFormValues({ queryFilters, currentQuery });
   const dispatch = useAppDispatch();
-  const _onSubmit = useCallback((values: SearchBarFormValues) => onSubmit(dispatch, values, pluggableSearchBarControls, currentQuery),
-    [currentQuery, dispatch, onSubmit, pluggableSearchBarControls]);
+  const _onSubmit = useCallback(
+    (values: SearchBarFormValues) => onSubmit(dispatch, values, pluggableSearchBarControls, currentQuery),
+    [currentQuery, dispatch, onSubmit, pluggableSearchBarControls],
+  );
   const handlerContext = useHandlerContext();
 
   if (!currentQuery || !config) {
@@ -165,10 +193,14 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
       {({ focusedWidget: { editing } = { editing: false } }) => (
         <ScrollToHint value={query.query_string}>
           <FormWarningsProvider>
-            <SearchBarForm initialValues={initialValues}
-                           limitDuration={limitDuration}
-                           onSubmit={_onSubmit}
-                           validateQueryString={(values) => _validateQueryString(values, pluggableSearchBarControls, userTimezone, handlerContext)}>
+            <SearchBarForm
+              initialValues={initialValues}
+              limitDuration={limitDuration}
+              onSubmit={_onSubmit}
+              validateQueryString={(values) =>
+                _validateQueryString(values, pluggableSearchBarControls, userTimezone, handlerContext)
+              }
+            >
               {({
                 dirty,
                 errors,
@@ -187,21 +219,27 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
                     <ValidateOnParameterChange parameters={parameters} />
                     <SearchBarContainer>
                       <TimeRangeRow>
-                        <TimeRangeFilter limitDuration={limitDuration}
-                                         onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
-                                         value={values?.timerange}
-                                         hasErrorOnMount={!!errors.timerange} />
+                        <TimeRangeFilter
+                          limitDuration={limitDuration}
+                          onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
+                          value={values?.timerange}
+                          hasErrorOnMount={!!errors.timerange}
+                        />
                         <StreamsAndRefresh>
                           <Field name="streams">
                             {({ field: { name, value, onChange } }) => (
-                              <StreamsFilter value={value}
-                                             streams={availableStreams}
-                                             onChange={(newStreams) => onChange({
-                                               target: {
-                                                 value: newStreams,
-                                                 name,
-                                               },
-                                             })} />
+                              <StreamsFilter
+                                value={value}
+                                streams={availableStreams}
+                                onChange={(newStreams) =>
+                                  onChange({
+                                    target: {
+                                      value: newStreams,
+                                      name,
+                                    },
+                                  })
+                                }
+                              />
                             )}
                           </Field>
 
@@ -210,9 +248,7 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
                       </TimeRangeRow>
                       <SearchQueryRow>
                         <SearchButtonAndQuery>
-                          <SearchButton disabled={disableSearchSubmit}
-                                        dirty={dirty}
-                                        displaySpinner={isSubmitting} />
+                          <SearchButton disabled={disableSearchSubmit} dirty={dirty} displaySpinner={isSubmitting} />
                           <SearchInputAndValidationContainer>
                             <Field name="queryString">
                               {({ field: { name, value, onChange }, meta: { error } }) => (
@@ -220,21 +256,23 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
                                   {({ warnings }) => (
                                     <PluggableCommands usage="search_query">
                                       {(customCommands) => (
-                                        <QueryInput value={value}
-                                                    ref={editorRef}
-                                                    view={view}
-                                                    timeRange={values.timerange}
-                                                    streams={values.streams}
-                                                    name={name}
-                                                    onChange={onChange}
-                                                    placeholder='Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'
-                                                    error={error}
-                                                    isValidating={isValidating}
-                                                    warning={warnings.queryString}
-                                                    disableExecution={disableSearchSubmit}
-                                                    validate={validateForm}
-                                                    onExecute={handleSubmit as () => void}
-                                                    commands={customCommands} />
+                                        <QueryInput
+                                          value={value}
+                                          ref={editorRef}
+                                          view={view}
+                                          timeRange={values.timerange}
+                                          streams={values.streams}
+                                          name={name}
+                                          onChange={onChange}
+                                          placeholder='Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'
+                                          error={error}
+                                          isValidating={isValidating}
+                                          warning={warnings.queryString}
+                                          disableExecution={disableSearchSubmit}
+                                          validate={validateForm}
+                                          onExecute={handleSubmit as () => void}
+                                          commands={customCommands}
+                                        />
                                       )}
                                     </PluggableCommands>
                                   )}

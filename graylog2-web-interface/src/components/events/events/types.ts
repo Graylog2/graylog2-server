@@ -16,29 +16,29 @@
  */
 
 export type EventReplayInfo = {
-  timerange_start: string,
-  timerange_end: string,
-  query: string,
-  streams: string[],
+  timerange_start: string;
+  timerange_end: string;
+  query: string;
+  streams: string[];
 };
 
 export type Event = {
-  id: string,
-  event_definition_id: string,
-  event_definition_type: string,
-  priority: string,
-  timestamp: string,
-  timerange_start: string,
-  timerange_end: string,
-  key: string,
-  fields: Object[],
-  group_by_fields: {[key: string]: string},
-  source_streams: string[],
-  replay_info: EventReplayInfo | undefined,
-  alert: boolean | undefined,
+  id: string;
+  event_definition_id: string;
+  event_definition_type: string;
+  priority: string;
+  timestamp: string;
+  timerange_start: string;
+  timerange_end: string;
+  key: string;
+  fields: Object[];
+  group_by_fields: { [key: string]: string };
+  source_streams: string[];
+  replay_info: EventReplayInfo | undefined;
+  alert: boolean | undefined;
 };
 
 export type EventDefinitionContext = {
-  id: string,
-  title: string,
+  id: string;
+  title: string;
 };

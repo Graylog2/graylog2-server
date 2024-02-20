@@ -38,15 +38,16 @@ const IndexSetFieldTypeProfileCreatePage = () => {
   return (
     <DocumentTitle title="Create Index Set Field Type Profile">
       <IndicesPageNavigation />
-      <PageHeader title="Create Index Set Field Type Profile"
-                  documentationLink={{
-                    title: 'Index model documentation',
-                    path: DocsHelper.PAGES.INDEX_MODEL,
-                  }}>
+      <PageHeader
+        title="Create Index Set Field Type Profile"
+        documentationLink={{
+          title: 'Index model documentation',
+          path: DocsHelper.PAGES.INDEX_MODEL,
+        }}
+      >
         <span>
-          With index set field type profiles you can bundle up custom field types into profiles.
-          Then you can assign this profile to any index set.
-          On this page you can create a new profile.
+          With index set field type profiles you can bundle up custom field types into profiles. Then you can assign
+          this profile to any index set. On this page you can create a new profile.
         </span>
       </PageHeader>
       <Row className="content">

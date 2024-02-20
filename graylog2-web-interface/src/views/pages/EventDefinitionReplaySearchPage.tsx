@@ -34,14 +34,16 @@ const EventView = () => {
   const { eventDefinition, aggregations } = useAlertAndEventDefinitionData();
   const _view = useCreateViewForEventDefinition({ eventDefinition, aggregations });
   const view = useCreateSearch(_view);
-  const searchPageLayout = useMemo(() => ({
-    infoBar: { component: EventInfoBar },
-  }), []);
+  const searchPageLayout = useMemo(
+    () => ({
+      infoBar: { component: EventInfoBar },
+    }),
+    [],
+  );
 
   return (
     <SearchPageLayoutProvider value={searchPageLayout}>
-      <SearchPage view={view}
-                  isNew />
+      <SearchPage view={view} isNew />
     </SearchPageLayoutProvider>
   );
 };

@@ -39,7 +39,8 @@ const ApiRoutes = {
       },
       KINESIS_AUTO_SETUP: {
         CREATE_STREAM: '/plugins/org.graylog.integrations/aws/kinesis/auto_setup/create_stream',
-        CREATE_SUBSCRIPTION_POLICY: '/plugins/org.graylog.integrations/aws/kinesis/auto_setup/create_subscription_policy',
+        CREATE_SUBSCRIPTION_POLICY:
+          '/plugins/org.graylog.integrations/aws/kinesis/auto_setup/create_subscription_policy',
         CREATE_SUBSCRIPTION: '/plugins/org.graylog.integrations/aws/kinesis/auto_setup/create_subscription',
       },
     },

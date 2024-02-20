@@ -18,9 +18,14 @@ import URI from 'urijs';
 
 export type AdditionalQueries = { [key: string]: any };
 
-export default (destUrl: string, page: number, perPage: number, query?: string, additional: AdditionalQueries = {}): string => {
-  let uri = new URI(destUrl).addSearch('page', page)
-    .addSearch('per_page', perPage);
+export default (
+  destUrl: string,
+  page: number,
+  perPage: number,
+  query?: string,
+  additional: AdditionalQueries = {},
+): string => {
+  let uri = new URI(destUrl).addSearch('page', page).addSearch('per_page', perPage);
 
   if (additional) {
     Object.keys(additional).forEach((field) => {

@@ -29,17 +29,20 @@ const DEFAULT_DATA = {
 };
 
 type SearchParams = {
-  page: number,
-  pageSize: number,
-  query: string,
-}
+  page: number;
+  pageSize: number;
+  query: string;
+};
 
 type PaginatedSuggestions = {
-  pagination: { total: number }
-  suggestions: Array<{ id: string, value: string }>,
-}
+  pagination: { total: number };
+  suggestions: Array<{ id: string; value: string }>;
+};
 
-const fetchFilterValueSuggestions = async (collection: string, { query, page, pageSize }: SearchParams): Promise<PaginatedSuggestions | undefined> => {
+const fetchFilterValueSuggestions = async (
+  collection: string,
+  { query, page, pageSize }: SearchParams,
+): Promise<PaginatedSuggestions | undefined> => {
   const additional = {
     collection,
     column: 'title',
@@ -54,21 +57,27 @@ const useFilterValueSuggestions = (
   collection: string,
   searchParams: SearchParams,
 ): {
-  data: PaginatedSuggestions | undefined
-  isInitialLoading: boolean
+  data: PaginatedSuggestions | undefined;
+  isInitialLoading: boolean;
 } => {
   if (!collection) {
     throw Error(`Attribute meta data for attribute "${attributeId}" is missing related collection.`);
   }
 
-  const { data, isInitialLoading } = useQuery(['filters', 'suggestions', searchParams], () => fetchFilterValueSuggestions(collection, searchParams), {
-    onError: (errorThrown) => {
-      UserNotification.error(`Loading suggestions for filter failed with status: ${errorThrown}`,
-        'Could not load filter suggestions');
+  const { data, isInitialLoading } = useQuery(
+    ['filters', 'suggestions', searchParams],
+    () => fetchFilterValueSuggestions(collection, searchParams),
+    {
+      onError: (errorThrown) => {
+        UserNotification.error(
+          `Loading suggestions for filter failed with status: ${errorThrown}`,
+          'Could not load filter suggestions',
+        );
+      },
+      retry: 0,
+      keepPreviousData: true,
     },
-    retry: 0,
-    keepPreviousData: true,
-  });
+  );
 
   return {
     data: data ?? DEFAULT_DATA,

@@ -19,4 +19,5 @@ import { createSelector } from '@reduxjs/toolkit';
 import { selectActiveViewState, selectViewState } from 'views/logic/slices/viewSelectors';
 
 export const selectCurrentTitles = createSelector(selectActiveViewState, (viewState) => viewState.titles);
-export const selectTitles = (queryId: string) => createSelector(selectViewState(queryId), (viewState) => viewState.titles);
+export const selectTitles = (queryId: string) =>
+  createSelector(selectViewState(queryId), (viewState) => viewState.titles);

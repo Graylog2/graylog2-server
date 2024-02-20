@@ -25,12 +25,12 @@ import type View from 'views/logic/views/View';
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 
 type Props = {
-  onClose: () => void,
-  onSave: (view: View) => void,
-  show: boolean
-  submitButtonText: string,
-  title: string,
-  view: View,
+  onClose: () => void;
+  onSave: (view: View) => void;
+  show: boolean;
+  submitButtonText: string;
+  title: string;
+  view: View;
 };
 
 const DashboardPropertiesModal = ({ onClose, onSave, show, view, title: modalTitle, submitButtonText }: Props) => {
@@ -67,37 +67,45 @@ const DashboardPropertiesModal = ({ onClose, onSave, show, view, title: modalTit
   };
 
   return (
-    <BootstrapModalForm show={show}
-                        title={modalTitle}
-                        data-telemetry-title="Dashboard Properties"
-                        onCancel={onClose}
-                        onSubmitForm={_onSave}
-                        submitButtonText={submitButtonText}
-                        bsSize="large">
+    <BootstrapModalForm
+      show={show}
+      title={modalTitle}
+      data-telemetry-title="Dashboard Properties"
+      onCancel={onClose}
+      onSubmitForm={_onSave}
+      submitButtonText={submitButtonText}
+      bsSize="large"
+    >
       <>
-        <Input id="title"
-               type="text"
-               name="title"
-               label="Title"
-               help="The title of the dashboard."
-               required
-               onChange={_onChange}
-               value={updatedDashboard.title} />
-        <Input id="summary"
-               type="text"
-               name="summary"
-               label="Summary"
-               help="A helpful summary of the dashboard."
-               onChange={_onChange}
-               value={updatedDashboard.summary} />
-        <Input id="description"
-               type="textarea"
-               name="description"
-               label="Description"
-               help="A longer, helpful description of the dashboard and its functionality."
-               onChange={_onChange}
-               value={updatedDashboard.description} />
-        {pluggableFormComponents?.map(({ component: Component, id }) => (Component && <Component key={id} />))}
+        <Input
+          id="title"
+          type="text"
+          name="title"
+          label="Title"
+          help="The title of the dashboard."
+          required
+          onChange={_onChange}
+          value={updatedDashboard.title}
+        />
+        <Input
+          id="summary"
+          type="text"
+          name="summary"
+          label="Summary"
+          help="A helpful summary of the dashboard."
+          onChange={_onChange}
+          value={updatedDashboard.summary}
+        />
+        <Input
+          id="description"
+          type="textarea"
+          name="description"
+          label="Description"
+          help="A longer, helpful description of the dashboard and its functionality."
+          onChange={_onChange}
+          value={updatedDashboard.description}
+        />
+        {pluggableFormComponents?.map(({ component: Component, id }) => Component && <Component key={id} />)}
       </>
     </BootstrapModalForm>
   );

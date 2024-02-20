@@ -19,9 +19,7 @@ import React, { useEffect, useState } from 'react';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import { Spinner, ReadOnlyFormGroup } from 'components/common';
 import type { UserTelemetrySettings } from 'stores/telemetry/TelemetrySettingsStore';
-import {
-  TelemetrySettingsActions,
-} from 'stores/telemetry/TelemetrySettingsStore';
+import { TelemetrySettingsActions } from 'stores/telemetry/TelemetrySettingsStore';
 import TelemetryInfoText from 'logic/telemetry/TelemetryInfoText';
 
 const TelemetrySettingsDetails = () => {

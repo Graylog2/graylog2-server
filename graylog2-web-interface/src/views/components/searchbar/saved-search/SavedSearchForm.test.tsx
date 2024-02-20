@@ -50,8 +50,7 @@ describe('SavedSearchForm', () => {
 
   describe('render the SavedSearchForm', () => {
     it('should render create new', async () => {
-      render(<SavedSearchForm {...props}
-                              isCreateNew />);
+      render(<SavedSearchForm {...props} isCreateNew />);
 
       await findByHeadline();
     });
@@ -75,8 +74,7 @@ describe('SavedSearchForm', () => {
     it('should handle toggleModal', async () => {
       const onToggleModal = jest.fn();
 
-      render(<SavedSearchForm {...props}
-                              toggleModal={onToggleModal} />);
+      render(<SavedSearchForm {...props} toggleModal={onToggleModal} />);
 
       const cancelButton = await screen.findByRole('button', { name: /cancel/i });
       userEvent.click(cancelButton);
@@ -87,8 +85,7 @@ describe('SavedSearchForm', () => {
     it('should handle saveSearch', async () => {
       const onSave = jest.fn();
 
-      render(<SavedSearchForm {...props}
-                              saveSearch={onSave} />);
+      render(<SavedSearchForm {...props} saveSearch={onSave} />);
 
       const saveButton = await screen.findByRole('button', { name: 'Save' });
       userEvent.click(saveButton);
@@ -99,8 +96,7 @@ describe('SavedSearchForm', () => {
     it('should handle saveAsSearch', async () => {
       const onSaveAs = jest.fn();
 
-      render(<SavedSearchForm {...props}
-                              saveAsSearch={onSaveAs} />);
+      render(<SavedSearchForm {...props} saveAsSearch={onSaveAs} />);
 
       userEvent.type(await findTitleInput(), ' and further title');
       const saveAsButton = await screen.findByRole('button', { name: 'Save as' });
@@ -112,8 +108,7 @@ describe('SavedSearchForm', () => {
     it('should not handle saveAsSearch if disabled', async () => {
       const onSaveAs = jest.fn();
 
-      render(<SavedSearchForm {...props}
-                              saveAsSearch={onSaveAs} />);
+      render(<SavedSearchForm {...props} saveAsSearch={onSaveAs} />);
 
       const saveAsButton = await screen.findByRole('button', { name: 'Save as' });
       userEvent.click(saveAsButton);
@@ -124,9 +119,7 @@ describe('SavedSearchForm', () => {
     it('should handle create new', async () => {
       const onSaveAs = jest.fn();
 
-      render(<SavedSearchForm {...props}
-                              saveAsSearch={onSaveAs}
-                              isCreateNew />);
+      render(<SavedSearchForm {...props} saveAsSearch={onSaveAs} isCreateNew />);
 
       userEvent.type(await findTitleInput(), ' and further title');
       const createNewButton = await screen.findByRole('button', { name: /create new/i });
@@ -137,7 +130,9 @@ describe('SavedSearchForm', () => {
   });
 
   it('should render pluggable components', async () => {
-    asMock(useSaveViewFormControls).mockReturnValue([{ component: () => <div>Pluggable component!</div>, id: 'example-plugin-component' }]);
+    asMock(useSaveViewFormControls).mockReturnValue([
+      { component: () => <div>Pluggable component!</div>, id: 'example-plugin-component' },
+    ]);
 
     render(<SavedSearchForm {...props} />);
 

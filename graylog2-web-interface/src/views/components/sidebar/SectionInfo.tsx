@@ -16,9 +16,11 @@
  */
 import styled, { css } from 'styled-components';
 
-const Title = styled.p(({ theme }) => css`
-  color: ${theme.colors.global.textDefault};
-  margin-bottom: 15px;
-`);
+const Title = styled.p(
+  ({ theme }) => css`
+    color: ${theme.colors.global.textDefault};
+    margin-bottom: 15px;
+  `,
+);
 
 export default Title;

@@ -20,10 +20,8 @@ import viewTitle from 'views/logic/views/ViewTitle';
 import useAppSelector from 'stores/useAppSelector';
 import { selectView, selectViewType } from 'views/logic/slices/viewSelectors';
 
-const selectViewTitle = createSelector(
-  selectView,
-  selectViewType,
-  (view, viewType) => viewTitle(view?.title, viewType),
+const selectViewTitle = createSelector(selectView, selectViewType, (view, viewType) =>
+  viewTitle(view?.title, viewType),
 );
 const useViewTitle = () => useAppSelector(selectViewTitle);
 

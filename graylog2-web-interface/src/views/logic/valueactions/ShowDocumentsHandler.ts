@@ -32,47 +32,52 @@ import { createElasticsearchQueryString } from '../queries/Query';
 import duplicateCommonWidgetSettings from '../fieldactions/DuplicateCommonWidgetSettings';
 
 type Contexts = {
-  valuePath: ValuePath,
-  widget: Widget,
+  valuePath: ValuePath;
+  widget: Widget;
 };
 
 type Arguments = {
   contexts: Contexts;
 };
 
-const extractFieldsFromValuePath = (valuePath: ValuePath): Array<string> => valuePath.map((item) => Object.entries(item)
-  .map(([key, value]: [string, string]) => (
-    key === '_exists_' ? value : key)))
-  .reduce((prev, cur) => [...prev, ...cur], [])
-  .reduce((prev, cur) => (prev.includes(cur) ? prev : [...prev, cur]), []);
+const extractFieldsFromValuePath = (valuePath: ValuePath): Array<string> =>
+  valuePath
+    .map((item) => Object.entries(item).map(([key, value]: [string, string]) => (key === '_exists_' ? value : key)))
+    .reduce((prev, cur) => [...prev, ...cur], [])
+    .reduce((prev, cur) => (prev.includes(cur) ? prev : [...prev, cur]), []);
 
-const ShowDocumentsHandler = ({
-  contexts: { valuePath, widget },
-}: Arguments) => (dispatch: AppDispatch, getState: GetState) => {
-  const activeQuery = selectActiveQuery(getState());
-  const mergedObject = Object.fromEntries(valuePath.flatMap(Object.entries));
-  const widgetQuery = widget && widget.query ? widget.query.query_string : '';
-  const valuePathQuery = Object.entries(mergedObject)
-    .map(([k, v]) => (v === MISSING_BUCKET_NAME ? `NOT _exists_:${k}` : `${k}:${escape(String(v))}`))
-    .reduce((prev: string, next: string) => addToQuery(prev, next), '');
-  const query = addToQuery(widgetQuery, valuePathQuery);
-  const valuePathFields = extractFieldsFromValuePath(valuePath);
-  const messageListFields = new Set<string>([...DEFAULT_MESSAGE_FIELDS, ...valuePathFields]);
-  const newWidget = duplicateCommonWidgetSettings(MessagesWidget.builder(), widget)
-    .query(createElasticsearchQueryString(query))
-    .newId()
-    .config(MessagesWidgetConfig.builder()
-      // @ts-ignore
-      .fields([...messageListFields])
-      .showMessageRow(true).build())
-    .build();
+const ShowDocumentsHandler =
+  ({ contexts: { valuePath, widget } }: Arguments) =>
+  (dispatch: AppDispatch, getState: GetState) => {
+    const activeQuery = selectActiveQuery(getState());
+    const mergedObject = Object.fromEntries(valuePath.flatMap(Object.entries));
+    const widgetQuery = widget && widget.query ? widget.query.query_string : '';
+    const valuePathQuery = Object.entries(mergedObject)
+      .map(([k, v]) => (v === MISSING_BUCKET_NAME ? `NOT _exists_:${k}` : `${k}:${escape(String(v))}`))
+      .reduce((prev: string, next: string) => addToQuery(prev, next), '');
+    const query = addToQuery(widgetQuery, valuePathQuery);
+    const valuePathFields = extractFieldsFromValuePath(valuePath);
+    const messageListFields = new Set<string>([...DEFAULT_MESSAGE_FIELDS, ...valuePathFields]);
+    const newWidget = duplicateCommonWidgetSettings(MessagesWidget.builder(), widget)
+      .query(createElasticsearchQueryString(query))
+      .newId()
+      .config(
+        MessagesWidgetConfig.builder()
+          // @ts-ignore
+          .fields([...messageListFields])
+          .showMessageRow(true)
+          .build(),
+      )
+      .build();
 
-  const title = `Messages for ${valuePathQuery}`;
+    const title = `Messages for ${valuePathQuery}`;
 
-  return dispatch(addWidget(newWidget))
-    .then(() => dispatch(setTitle(activeQuery, TitleTypes.Widget, newWidget.id, title)));
-};
+    return dispatch(addWidget(newWidget)).then(() =>
+      dispatch(setTitle(activeQuery, TitleTypes.Widget, newWidget.id, title)),
+    );
+  };
 
-ShowDocumentsHandler.isEnabled = ({ contexts: { valuePath, widget } }) => (valuePath !== undefined && widget !== undefined);
+ShowDocumentsHandler.isEnabled = ({ contexts: { valuePath, widget } }) =>
+  valuePath !== undefined && widget !== undefined;
 
 export default ShowDocumentsHandler;

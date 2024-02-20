@@ -24,27 +24,22 @@ import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 
 export const QUERY_KEY = ['data-nodes', 'ca-status'];
-const fetchDataNodesCA = (): Promise<DataNodesCA> => (
-  fetch('GET', qualifyUrl('/api/ca'), undefined, false)
-);
+const fetchDataNodesCA = (): Promise<DataNodesCA> => fetch('GET', qualifyUrl('/api/ca'), undefined, false);
 
 const useDataNodesCA = (): {
-  data: DataNodesCA,
-  isFetching: boolean,
-  error: FetchError,
-  isInitialLoading: boolean
+  data: DataNodesCA;
+  isFetching: boolean;
+  error: FetchError;
+  isInitialLoading: boolean;
 } => {
   const [metaData, setMetaData] = useState<{
-    error: FetchError | null,
-    isInitialLoading: boolean,
+    error: FetchError | null;
+    isInitialLoading: boolean;
   }>({
     error: null,
     isInitialLoading: false,
   });
-  const {
-    data,
-    isFetching,
-  } = useQuery<DataNodesCA, FetchError>({
+  const { data, isFetching } = useQuery<DataNodesCA, FetchError>({
     queryKey: QUERY_KEY,
     queryFn: fetchDataNodesCA,
     initialData: undefined,

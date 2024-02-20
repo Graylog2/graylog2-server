@@ -57,18 +57,12 @@ describe('XYPlot', () => {
     const view = defaultView
       .toBuilder()
       .type(View.Type.Search)
-      .search(defaultView.search
-        .toBuilder()
-        .queries([currentQuery])
-        .build())
+      .search(defaultView.search.toBuilder().queries([currentQuery]).build())
       .build();
 
     return (
       <TestStoreProvider view={view} initialQuery={currentQuery.id}>
-        <XYPlot chartData={chartData}
-                config={config}
-                setChartColor={setChartColor}
-                {...props} />
+        <XYPlot chartData={chartData} config={config} setChartColor={setChartColor} {...props} />
       </TestStoreProvider>
     );
   };
@@ -111,9 +105,12 @@ describe('XYPlot', () => {
     const wrapper = mount(<SimpleXYPlot effectiveTimerange={timerange} />);
     const genericPlot = wrapper.find('GenericPlot');
 
-    expect(genericPlot).toHaveProp('layout', expect.objectContaining({
-      xaxis: { range: ['2018-10-12T04:04:21.723+02:00', '2018-10-12T12:04:21.723+02:00'], type: 'date' },
-    }));
+    expect(genericPlot).toHaveProp(
+      'layout',
+      expect.objectContaining({
+        xaxis: { range: ['2018-10-12T04:04:21.723+02:00', '2018-10-12T12:04:21.723+02:00'], type: 'date' },
+      }),
+    );
 
     genericPlot.get(0).props.onZoom('2018-10-12T04:04:21.723Z', '2018-10-12T08:04:21.723Z');
 
@@ -127,39 +124,50 @@ describe('XYPlot', () => {
   it('uses effective time range from pivot result if all messages are selected', () => {
     const timerange = { from: '2018-10-12T02:04:21.723Z', to: '2018-10-12T10:04:21.723Z', type: 'absolute' };
     const currentQueryForAllMessages = defaultCurrentQuery.toBuilder().timerange(ALL_MESSAGES_TIMERANGE).build();
-    const wrapper = mount(<SimpleXYPlot effectiveTimerange={timerange}
-                                        currentQuery={currentQueryForAllMessages} />);
+    const wrapper = mount(<SimpleXYPlot effectiveTimerange={timerange} currentQuery={currentQueryForAllMessages} />);
     const genericPlot = wrapper.find('GenericPlot');
 
-    expect(genericPlot).toHaveProp('layout', expect.objectContaining({
-      xaxis: { range: ['2018-10-12T04:04:21.723+02:00', '2018-10-12T12:04:21.723+02:00'], type: 'date' },
-    }));
+    expect(genericPlot).toHaveProp(
+      'layout',
+      expect.objectContaining({
+        xaxis: { range: ['2018-10-12T04:04:21.723+02:00', '2018-10-12T12:04:21.723+02:00'], type: 'date' },
+      }),
+    );
   });
 
   it('sets correct plot legend position for small containers', () => {
     const wrapper = mount(<SimpleXYPlot height={140} />);
     const genericPlot = wrapper.find('GenericPlot');
 
-    expect(genericPlot).toHaveProp('layout', expect.objectContaining({
-      legend: { y: -0.6 },
-    }));
+    expect(genericPlot).toHaveProp(
+      'layout',
+      expect.objectContaining({
+        legend: { y: -0.6 },
+      }),
+    );
   });
 
   it('sets correct plot legend position for containers with medium height', () => {
     const wrapper = mount(<SimpleXYPlot height={350} />);
     const genericPlot = wrapper.find('GenericPlot');
 
-    expect(genericPlot).toHaveProp('layout', expect.objectContaining({
-      legend: { y: -0.2 },
-    }));
+    expect(genericPlot).toHaveProp(
+      'layout',
+      expect.objectContaining({
+        legend: { y: -0.2 },
+      }),
+    );
   });
 
   it('sets correct plot legend position for containers with huge height', () => {
     const wrapper = mount(<SimpleXYPlot height={700} />);
     const genericPlot = wrapper.find('GenericPlot');
 
-    expect(genericPlot).toHaveProp('layout', expect.objectContaining({
-      legend: { y: -0.14 },
-    }));
+    expect(genericPlot).toHaveProp(
+      'layout',
+      expect.objectContaining({
+        legend: { y: -0.14 },
+      }),
+    );
   });
 });

@@ -25,17 +25,17 @@ import Modal from './Modal';
 import BootstrapModalWrapper from './BootstrapModalWrapper';
 
 type Props = {
-  backdrop: boolean | 'static' | undefined,
-  submitButtonDisabled: boolean,
-  formProps: object,
-  bsSize: 'lg' | 'large' | 'sm' | 'small',
-  show: boolean,
-  submitButtonText: string,
-  onSubmitForm: (event) => void,
-  onCancel: () => void,
-  title: string | React.ReactNode,
-  children: React.ReactNode,
-  modalTitle?: string | undefined,
+  backdrop: boolean | 'static' | undefined;
+  submitButtonDisabled: boolean;
+  formProps: object;
+  bsSize: 'lg' | 'large' | 'sm' | 'small';
+  show: boolean;
+  submitButtonText: string;
+  onSubmitForm: (event) => void;
+  onCancel: () => void;
+  title: string | React.ReactNode;
+  children: React.ReactNode;
+  modalTitle?: string | undefined;
 };
 
 /**
@@ -62,8 +62,10 @@ const BootstrapModalForm = ({
     const formDOMNode = form.current;
     const $formDOMNode = $(formDOMNode) as any;
 
-    if ((typeof formDOMNode.checkValidity === 'function' && !formDOMNode.checkValidity())
-      || (typeof $formDOMNode.checkValidity === 'function' && !$formDOMNode.checkValidity())) {
+    if (
+      (typeof formDOMNode.checkValidity === 'function' && !formDOMNode.checkValidity()) ||
+      (typeof $formDOMNode.checkValidity === 'function' && !$formDOMNode.checkValidity())
+    ) {
       event.preventDefault();
 
       return;
@@ -75,35 +77,26 @@ const BootstrapModalForm = ({
     }
   };
 
-  const body = (
-    <div className="container-fluid">
-      {children}
-    </div>
-  );
+  const body = <div className="container-fluid">{children}</div>;
 
   const _title = useMemo<string | undefined>(() => (isString(title) ? title : modalTitle), [modalTitle, title]);
 
   return (
-    <BootstrapModalWrapper bsSize={bsSize}
-                           showModal={show}
-                           backdrop={backdrop}
-                           onHide={onCancel}
-                           title={_title}
-                           {...restProps}>
+    <BootstrapModalWrapper
+      bsSize={bsSize}
+      showModal={show}
+      backdrop={backdrop}
+      onHide={onCancel}
+      title={_title}
+      {...restProps}
+    >
       <Modal.Header closeButton>
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
-      <form ref={form}
-            onSubmit={submit}
-            {...formProps}
-            data-testid="modal-form">
-        <Modal.Body>
-          {body}
-        </Modal.Body>
+      <form ref={form} onSubmit={submit} {...formProps} data-testid="modal-form">
+        <Modal.Body>{body}</Modal.Body>
         <Modal.Footer>
-          <ModalSubmit disabledSubmit={submitButtonDisabled}
-                       onCancel={onCancel}
-                       submitButtonText={submitButtonText} />
+          <ModalSubmit disabledSubmit={submitButtonDisabled} onCancel={onCancel} submitButtonText={submitButtonText} />
         </Modal.Footer>
       </form>
     </BootstrapModalWrapper>
@@ -116,10 +109,7 @@ BootstrapModalForm.propTypes = {
   /* Modal title */
   title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
   /* Form contents, included in the modal body */
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.element),
-    PropTypes.element,
-  ]).isRequired,
+  children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.element), PropTypes.element]).isRequired,
   onSubmitForm: PropTypes.func,
   onCancel: PropTypes.func.isRequired,
   /* Object with additional props to pass to the form */

@@ -27,7 +27,15 @@ import type { WidgetState } from './Widget';
 import type { QueryString, TimeRange } from '../queries/Query';
 
 export default class MessagesWidget extends Widget {
-  constructor(id: string, config: any, filter: string | undefined | null, timerange: TimeRange | undefined | null, query: QueryString | undefined | null, streams: Array<string>, filters?: FiltersType) {
+  constructor(
+    id: string,
+    config: any,
+    filter: string | undefined | null,
+    timerange: TimeRange | undefined | null,
+    query: QueryString | undefined | null,
+    streams: Array<string>,
+    filters?: FiltersType,
+  ) {
     super(id, MessagesWidget.type, config, filter, timerange, query, streams, filters);
   }
 
@@ -48,7 +56,9 @@ export default class MessagesWidget extends Widget {
 
   equals(other: any) {
     if (other instanceof MessagesWidget) {
-      return ['id', 'config', 'filter', 'timerange', 'query', 'streams', 'filters'].every((key) => isDeepEqual(this._value[key], other[key]));
+      return ['id', 'config', 'filter', 'timerange', 'query', 'streams', 'filters'].every((key) =>
+        isDeepEqual(this._value[key], other[key]),
+      );
     }
 
     return false;
@@ -60,7 +70,9 @@ export default class MessagesWidget extends Widget {
 
   equalsForSearch(other: any) {
     if (other instanceof MessagesWidget) {
-      return ['id', 'config', 'filter', 'timerange', 'query', 'streams', 'filters'].every((key) => isEqualForSearch(this._value[key], other[key]));
+      return ['id', 'config', 'filter', 'timerange', 'query', 'streams', 'filters'].every((key) =>
+        isEqualForSearch(this._value[key], other[key]),
+      );
     }
 
     return false;

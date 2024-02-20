@@ -23,9 +23,8 @@ import fetch from 'logic/rest/FetchProvider';
 import { singletonStore } from 'logic/singleton';
 
 // eslint-disable-next-line import/prefer-default-export
-export const StartpageStore = singletonStore(
-  'core.Startpage',
-  () => Reflux.createStore({
+export const StartpageStore = singletonStore('core.Startpage', () =>
+  Reflux.createStore({
     listenables: [],
 
     set(userId, type, id) {
@@ -37,16 +36,19 @@ export const StartpageStore = singletonStore(
         payload.id = id;
       }
 
-      return fetch('PUT', url, { startpage: payload })
-        .then(
-          (response) => {
-            this.trigger();
-            UserNotification.success('Your start page was changed successfully');
+      return fetch('PUT', url, { startpage: payload }).then(
+        (response) => {
+          this.trigger();
+          UserNotification.success('Your start page was changed successfully');
 
-            return response;
-          },
-          (error) => UserNotification.error(`Changing your start page failed with error: ${error}`, 'Could not change your start page'),
-        );
+          return response;
+        },
+        (error) =>
+          UserNotification.error(
+            `Changing your start page failed with error: ${error}`,
+            'Could not change your start page',
+          ),
+      );
     },
   }),
 );

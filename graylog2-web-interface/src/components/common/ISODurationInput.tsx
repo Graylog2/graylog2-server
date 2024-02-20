@@ -24,20 +24,20 @@ import * as ISODurationUtils from 'util/ISODurationUtils';
  * Displays an `Input` component for ISO8601 durations.
  */
 type Props = {
-  id: string,
-  duration: string,
-  update: (newDuration: string) => void,
-  label: string,
-  help: string,
-  validator?: (newDuration: number) => boolean,
-  errorText?: string,
-  autoFocus?: boolean,
-  required?: boolean,
-  disabled?: boolean,
-}
+  id: string;
+  duration: string;
+  update: (newDuration: string) => void;
+  label: string;
+  help: string;
+  validator?: (newDuration: number) => boolean;
+  errorText?: string;
+  autoFocus?: boolean;
+  required?: boolean;
+  disabled?: boolean;
+};
 type State = {
-  duration: string,
-}
+  duration: string;
+};
 
 interface DurationInput {
   getValue(): string;
@@ -108,18 +108,22 @@ class ISODurationInput extends React.Component<Props, State> {
 
   render() {
     return (
-      <Input id={this.props.id}
-             type="text"
-             ref={(isoDuration: DurationInput) => { this.isoDuration = isoDuration; }}
-             label={this.props.label}
-             onChange={this._onUpdate}
-             value={this.state.duration}
-             help={this.props.help}
-             addonAfter={ISODurationUtils.humanizeDuration(this.state.duration, this.props.validator, this.props.errorText)}
-             bsStyle={ISODurationUtils.durationStyle(this.state.duration, this.props.validator)}
-             autoFocus={this.props.autoFocus}
-             required={this.props.required}
-             disabled={this.props.disabled} />
+      <Input
+        id={this.props.id}
+        type="text"
+        ref={(isoDuration: DurationInput) => {
+          this.isoDuration = isoDuration;
+        }}
+        label={this.props.label}
+        onChange={this._onUpdate}
+        value={this.state.duration}
+        help={this.props.help}
+        addonAfter={ISODurationUtils.humanizeDuration(this.state.duration, this.props.validator, this.props.errorText)}
+        bsStyle={ISODurationUtils.durationStyle(this.state.duration, this.props.validator)}
+        autoFocus={this.props.autoFocus}
+        required={this.props.required}
+        disabled={this.props.disabled}
+      />
     );
   }
 }

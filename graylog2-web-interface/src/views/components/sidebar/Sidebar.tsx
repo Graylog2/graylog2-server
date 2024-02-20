@@ -39,11 +39,11 @@ import sidebarActions from './sidebarActions';
 import CustomPropTypes from '../CustomPropTypes';
 
 type Props = {
-  children: React.ReactElement,
-  results: QueryResult,
-  searchPageLayout?: SearchPreferencesLayout,
-  sections?: Array<SidebarSection>,
-  actions?: Array<SidebarAction>,
+  children: React.ReactElement;
+  results: QueryResult;
+  searchPageLayout?: SearchPreferencesLayout;
+  sections?: Array<SidebarSection>;
+  actions?: Array<SidebarAction>;
 };
 
 const Container = styled.div`
@@ -52,14 +52,20 @@ const Container = styled.div`
   width: min-content;
 `;
 
-const ContentOverlay = styled.div(({ theme }) => css`
-  position: fixed;
-  inset: 0 0 0 50px;
-  background: ${chroma(theme.colors.brand.tertiary).alpha(0.25).css()};
-  z-index: 5;
-`);
+const ContentOverlay = styled.div(
+  ({ theme }) => css`
+    position: fixed;
+    inset: 0 0 0 50px;
+    background: ${chroma(theme.colors.brand.tertiary).alpha(0.25).css()};
+    z-index: 5;
+  `,
+);
 
-const _toggleSidebar = (initialSectionKey: string, activeSectionKey: string | undefined | null, setActiveSectionKey) => {
+const _toggleSidebar = (
+  initialSectionKey: string,
+  activeSectionKey: string | undefined | null,
+  setActiveSectionKey,
+) => {
   if (activeSectionKey) {
     setActiveSectionKey(null);
 
@@ -85,7 +91,9 @@ const Sidebar = ({ searchPageLayout, results, children, sections, actions }: Pro
   const queryId = useActiveQueryId();
   const sidebarIsPinned = searchPageLayout?.config.sidebar.isPinned ?? false;
   const initialSectionKey = sections[0].key;
-  const [activeSectionKey, setActiveSectionKey] = useState<string | undefined>(sidebarIsPinned ? initialSectionKey : null);
+  const [activeSectionKey, setActiveSectionKey] = useState<string | undefined>(
+    sidebarIsPinned ? initialSectionKey : null,
+  );
   const activeSection = sections.find((section) => section.key === activeSectionKey);
 
   const toggleSidebar = () => {
@@ -99,30 +107,35 @@ const Sidebar = ({ searchPageLayout, results, children, sections, actions }: Pro
     _toggleSidebar(initialSectionKey, activeSectionKey, setActiveSectionKey);
   };
 
-  const selectSidebarSection = (sectionKey: string) => _selectSidebarSection(sectionKey, activeSectionKey, setActiveSectionKey, toggleSidebar);
+  const selectSidebarSection = (sectionKey: string) =>
+    _selectSidebarSection(sectionKey, activeSectionKey, setActiveSectionKey, toggleSidebar);
   const SectionContent = activeSection?.content;
 
   return (
     <Container>
-      <SidebarNavigation activeSection={activeSection}
-                         selectSidebarSection={selectSidebarSection}
-                         sections={sections}
-                         sidebarIsPinned={sidebarIsPinned}
-                         actions={actions} />
+      <SidebarNavigation
+        activeSection={activeSection}
+        selectSidebarSection={selectSidebarSection}
+        sections={sections}
+        sidebarIsPinned={sidebarIsPinned}
+        actions={actions}
+      />
       {activeSection && !!SectionContent && (
-        <ContentColumn closeSidebar={toggleSidebar}
-                       searchPageLayout={searchPageLayout}
-                       sectionTitle={activeSection.title}>
-          <SectionContent results={results}
-                          queryId={queryId}
-                          sidebarChildren={children}
-                          sidebarIsPinned={sidebarIsPinned}
-                          toggleSidebar={toggleSidebar} />
+        <ContentColumn
+          closeSidebar={toggleSidebar}
+          searchPageLayout={searchPageLayout}
+          sectionTitle={activeSection.title}
+        >
+          <SectionContent
+            results={results}
+            queryId={queryId}
+            sidebarChildren={children}
+            sidebarIsPinned={sidebarIsPinned}
+            toggleSidebar={toggleSidebar}
+          />
         </ContentColumn>
       )}
-      {(activeSection && !sidebarIsPinned) && (
-        <ContentOverlay onClick={toggleSidebar} />
-      )}
+      {activeSection && !sidebarIsPinned && <ContentOverlay onClick={toggleSidebar} />}
     </Container>
   );
 };
@@ -142,7 +155,11 @@ Sidebar.defaultProps = {
 
 const SidebarWithContext = ({ children, ...props }: React.ComponentProps<typeof Sidebar>) => (
   <SearchPagePreferencesContext.Consumer>
-    {(searchPageLayout) => <Sidebar {...props} searchPageLayout={searchPageLayout}>{children}</Sidebar>}
+    {(searchPageLayout) => (
+      <Sidebar {...props} searchPageLayout={searchPageLayout}>
+        {children}
+      </Sidebar>
+    )}
   </SearchPagePreferencesContext.Consumer>
 );
 

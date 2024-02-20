@@ -26,15 +26,16 @@ const useCreateSavedSearch = ({
   timeRange,
   queryString,
   parameters,
-}:{
-  streamId?: string | string[],
-  timeRange?: TimeRange,
-  queryString?: ElasticsearchQueryString,
-  parameters?: Array<Parameter>,
-}) => useMemo(
-  () => ViewGenerator({ type: View.Type.Search, streamId, timeRange, queryString, parameters }),
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  [],
-);
+}: {
+  streamId?: string | string[];
+  timeRange?: TimeRange;
+  queryString?: ElasticsearchQueryString;
+  parameters?: Array<Parameter>;
+}) =>
+  useMemo(
+    () => ViewGenerator({ type: View.Type.Search, streamId, timeRange, queryString, parameters }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
 
 export default useCreateSavedSearch;

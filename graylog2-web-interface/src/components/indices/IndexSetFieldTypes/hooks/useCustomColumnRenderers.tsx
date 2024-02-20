@@ -25,33 +25,38 @@ import type { Attribute } from 'stores/PaginationTypes';
 import OriginBadge from 'components/indices/IndexSetFieldTypes/originBadges/OriginBadge';
 
 const useCustomColumnRenderers = (attributes: Array<Attribute>) => {
-  const { data: { fieldTypes } } = useFieldTypesForMappings();
+  const {
+    data: { fieldTypes },
+  } = useFieldTypesForMappings();
   const normalizedOrigin = useMemo(() => {
     const originOptions = attributes?.find(({ id }) => id === 'origin')?.filter_options;
 
     return keyBy(originOptions, 'value');
   }, [attributes]);
 
-  return useMemo(() => ({
-    attributes: {
-      type: {
-        renderCell: (item: string) => <span>{fieldTypes[item]}</span>,
+  return useMemo(
+    () => ({
+      attributes: {
+        type: {
+          renderCell: (item: string) => <span>{fieldTypes[item]}</span>,
+        },
+        origin: {
+          renderCell: (origin: FieldTypeOrigin, { id }) => (
+            <ExpandedRowToggleWrapper id={id}>
+              <OriginBadge origin={origin} title={normalizedOrigin?.[origin]?.title} />
+            </ExpandedRowToggleWrapper>
+          ),
+          staticWidth: 200,
+        },
+        is_reserved: {
+          renderCell: (isReserved: boolean) =>
+            isReserved ? <Icon title="Field has reserved field type" name="check" /> : null,
+          staticWidth: 120,
+        },
       },
-      origin: {
-        renderCell: (origin: FieldTypeOrigin, { id }) => (
-          <ExpandedRowToggleWrapper id={id}>
-            <OriginBadge origin={origin} title={normalizedOrigin?.[origin]?.title} />
-          </ExpandedRowToggleWrapper>
-        ),
-        staticWidth: 200,
-      },
-      is_reserved: {
-        renderCell: (isReserved: boolean) => (isReserved
-          ? <Icon title="Field has reserved field type" name="check" /> : null),
-        staticWidth: 120,
-      },
-    },
-  }), [fieldTypes, normalizedOrigin]);
+    }),
+    [fieldTypes, normalizedOrigin],
+  );
 };
 
 export default useCustomColumnRenderers;

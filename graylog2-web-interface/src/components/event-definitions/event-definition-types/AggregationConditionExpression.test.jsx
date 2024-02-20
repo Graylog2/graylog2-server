@@ -66,12 +66,14 @@ describe('AggregationConditionExpression', () => {
       };
 
       render(
-        <AggregationConditionExpression eventDefinition={eventDefinition}
-                                        validation={{ errors: {} }}
-                                        formattedFields={[]}
-                                        aggregationFunctions={[]}
-                                        onChange={() => { }}
-                                        expression={getComparisonExpression()} />,
+        <AggregationConditionExpression
+          eventDefinition={eventDefinition}
+          validation={{ errors: {} }}
+          formattedFields={[]}
+          aggregationFunctions={[]}
+          onChange={() => {}}
+          expression={getComparisonExpression()}
+        />,
       );
 
       await screen.findByText(/Messages must meet/);
@@ -79,12 +81,14 @@ describe('AggregationConditionExpression', () => {
 
     it('should render simple comparison expression', async () => {
       render(
-        <AggregationConditionExpression eventDefinition={defaultEventDefinition}
-                                        validation={{ errors: {} }}
-                                        formattedFields={[]}
-                                        aggregationFunctions={[]}
-                                        onChange={() => { }}
-                                        expression={getComparisonExpression('<', 12)} />,
+        <AggregationConditionExpression
+          eventDefinition={defaultEventDefinition}
+          validation={{ errors: {} }}
+          formattedFields={[]}
+          aggregationFunctions={[]}
+          onChange={() => {}}
+          expression={getComparisonExpression('<', 12)}
+        />,
       );
 
       await screen.findByText(/Messages must meet/);
@@ -94,12 +98,14 @@ describe('AggregationConditionExpression', () => {
       const expression = getBooleanExpression('&&');
 
       render(
-        <AggregationConditionExpression eventDefinition={defaultEventDefinition}
-                                        validation={{ errors: {} }}
-                                        formattedFields={[]}
-                                        aggregationFunctions={[]}
-                                        onChange={() => {}}
-                                        expression={expression} />,
+        <AggregationConditionExpression
+          eventDefinition={defaultEventDefinition}
+          validation={{ errors: {} }}
+          formattedFields={[]}
+          aggregationFunctions={[]}
+          onChange={() => {}}
+          expression={expression}
+        />,
       );
 
       await screen.findByText(/Messages must meet/);
@@ -109,12 +115,14 @@ describe('AggregationConditionExpression', () => {
       const expression = getGroupExpression('&&');
 
       render(
-        <AggregationConditionExpression eventDefinition={defaultEventDefinition}
-                                        validation={{ errors: {} }}
-                                        formattedFields={[]}
-                                        aggregationFunctions={[]}
-                                        onChange={() => { }}
-                                        expression={expression} />,
+        <AggregationConditionExpression
+          eventDefinition={defaultEventDefinition}
+          validation={{ errors: {} }}
+          formattedFields={[]}
+          aggregationFunctions={[]}
+          onChange={() => {}}
+          expression={expression}
+        />,
       );
 
       await screen.findByText(/all/);
@@ -124,12 +132,14 @@ describe('AggregationConditionExpression', () => {
       const expression = getBooleanExpression('&&', getComparisonExpression(), getGroupExpression('&&'));
 
       render(
-        <AggregationConditionExpression eventDefinition={defaultEventDefinition}
-                                        validation={{ errors: {} }}
-                                        formattedFields={[]}
-                                        aggregationFunctions={[]}
-                                        onChange={() => { }}
-                                        expression={expression} />,
+        <AggregationConditionExpression
+          eventDefinition={defaultEventDefinition}
+          validation={{ errors: {} }}
+          formattedFields={[]}
+          aggregationFunctions={[]}
+          onChange={() => {}}
+          expression={expression}
+        />,
       );
 
       expect(await screen.findAllByText(/all/)).toHaveLength(2);
@@ -146,12 +156,14 @@ describe('AggregationConditionExpression', () => {
       });
 
       render(
-        <AggregationConditionExpression eventDefinition={defaultEventDefinition}
-                                        validation={{ errors: {} }}
-                                        formattedFields={[]}
-                                        aggregationFunctions={[]}
-                                        onChange={onChange}
-                                        expression={expression} />,
+        <AggregationConditionExpression
+          eventDefinition={defaultEventDefinition}
+          validation={{ errors: {} }}
+          formattedFields={[]}
+          aggregationFunctions={[]}
+          onChange={onChange}
+          expression={expression}
+        />,
       );
 
       const addConditionButton = await screen.findByTitle('Add Expression');
@@ -172,12 +184,14 @@ describe('AggregationConditionExpression', () => {
       });
 
       render(
-        <AggregationConditionExpression eventDefinition={defaultEventDefinition}
-                                        validation={{ errors: {} }}
-                                        formattedFields={[]}
-                                        aggregationFunctions={[]}
-                                        onChange={onChange}
-                                        expression={expression} />,
+        <AggregationConditionExpression
+          eventDefinition={defaultEventDefinition}
+          validation={{ errors: {} }}
+          formattedFields={[]}
+          aggregationFunctions={[]}
+          onChange={onChange}
+          expression={expression}
+        />,
       );
 
       const removeConditionButton = await screen.findAllByTitle('Delete Expression');
@@ -199,12 +213,14 @@ describe('AggregationConditionExpression', () => {
       });
 
       render(
-        <AggregationConditionExpression eventDefinition={defaultEventDefinition}
-                                        validation={{ errors: {} }}
-                                        formattedFields={[]}
-                                        aggregationFunctions={[]}
-                                        onChange={onChange}
-                                        expression={expression} />,
+        <AggregationConditionExpression
+          eventDefinition={defaultEventDefinition}
+          validation={{ errors: {} }}
+          formattedFields={[]}
+          aggregationFunctions={[]}
+          onChange={onChange}
+          expression={expression}
+        />,
       );
 
       const removeConditionButton = await screen.findByTitle('Delete Expression');
@@ -229,12 +245,14 @@ describe('AggregationConditionExpression', () => {
       });
 
       render(
-        <AggregationConditionExpression eventDefinition={defaultEventDefinition}
-                                        validation={{ errors: {} }}
-                                        formattedFields={[]}
-                                        aggregationFunctions={[]}
-                                        onChange={onChange}
-                                        expression={expression} />,
+        <AggregationConditionExpression
+          eventDefinition={defaultEventDefinition}
+          validation={{ errors: {} }}
+          formattedFields={[]}
+          aggregationFunctions={[]}
+          onChange={onChange}
+          expression={expression}
+        />,
       );
 
       const addGroupButton = await screen.findByRole('button', { name: 'Add Group' });
@@ -255,12 +273,14 @@ describe('AggregationConditionExpression', () => {
       });
 
       render(
-        <AggregationConditionExpression eventDefinition={defaultEventDefinition}
-                                        validation={{ errors: {} }}
-                                        formattedFields={[]}
-                                        aggregationFunctions={[]}
-                                        onChange={onChange}
-                                        expression={expression} />,
+        <AggregationConditionExpression
+          eventDefinition={defaultEventDefinition}
+          validation={{ errors: {} }}
+          formattedFields={[]}
+          aggregationFunctions={[]}
+          onChange={onChange}
+          expression={expression}
+        />,
       );
 
       const deleteConditionButton = await screen.findAllByTitle('Delete Expression');
@@ -296,12 +316,14 @@ describe('AggregationConditionExpression', () => {
       });
 
       render(
-        <AggregationConditionExpression eventDefinition={defaultEventDefinition}
-                                        validation={{ errors: {} }}
-                                        formattedFields={[]}
-                                        aggregationFunctions={[]}
-                                        onChange={onChange}
-                                        expression={expression} />,
+        <AggregationConditionExpression
+          eventDefinition={defaultEventDefinition}
+          validation={{ errors: {} }}
+          formattedFields={[]}
+          aggregationFunctions={[]}
+          onChange={onChange}
+          expression={expression}
+        />,
       );
 
       const addConditionButton = await screen.findAllByTitle('Add Expression');
@@ -326,12 +348,14 @@ describe('AggregationConditionExpression', () => {
       });
 
       render(
-        <AggregationConditionExpression eventDefinition={defaultEventDefinition}
-                                        validation={{ errors: {} }}
-                                        formattedFields={[]}
-                                        aggregationFunctions={[]}
-                                        onChange={onChange}
-                                        expression={expression} />,
+        <AggregationConditionExpression
+          eventDefinition={defaultEventDefinition}
+          validation={{ errors: {} }}
+          formattedFields={[]}
+          aggregationFunctions={[]}
+          onChange={onChange}
+          expression={expression}
+        />,
       );
 
       const deleteConditionButton = await screen.findAllByTitle('Delete Expression');
@@ -368,12 +392,14 @@ describe('AggregationConditionExpression', () => {
       });
 
       render(
-        <AggregationConditionExpression eventDefinition={defaultEventDefinition}
-                                        validation={{ errors: {} }}
-                                        formattedFields={[]}
-                                        aggregationFunctions={[]}
-                                        onChange={onChange}
-                                        expression={expression} />,
+        <AggregationConditionExpression
+          eventDefinition={defaultEventDefinition}
+          validation={{ errors: {} }}
+          formattedFields={[]}
+          aggregationFunctions={[]}
+          onChange={onChange}
+          expression={expression}
+        />,
       );
 
       const select = (await screen.findAllByLabelText('Boolean Operator'))[1];
@@ -411,12 +437,14 @@ describe('AggregationConditionExpression', () => {
       });
 
       render(
-        <AggregationConditionExpression eventDefinition={defaultEventDefinition}
-                                        validation={{ errors: {} }}
-                                        formattedFields={[]}
-                                        aggregationFunctions={[]}
-                                        onChange={onChange}
-                                        expression={expression} />,
+        <AggregationConditionExpression
+          eventDefinition={defaultEventDefinition}
+          validation={{ errors: {} }}
+          formattedFields={[]}
+          aggregationFunctions={[]}
+          onChange={onChange}
+          expression={expression}
+        />,
       );
 
       const select = (await screen.findAllByLabelText('Boolean Operator'))[0];
@@ -433,12 +461,14 @@ describe('AggregationConditionExpression', () => {
       const expression = getBooleanExpression('||');
 
       render(
-        <AggregationConditionExpression eventDefinition={defaultEventDefinition}
-                                        validation={{ errors: {} }}
-                                        formattedFields={[]}
-                                        aggregationFunctions={[]}
-                                        onChange={() => {}}
-                                        expression={expression} />,
+        <AggregationConditionExpression
+          eventDefinition={defaultEventDefinition}
+          validation={{ errors: {} }}
+          formattedFields={[]}
+          aggregationFunctions={[]}
+          onChange={() => {}}
+          expression={expression}
+        />,
       );
 
       const select = (await screen.findAllByLabelText('Boolean Operator'))[0];

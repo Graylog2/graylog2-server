@@ -21,39 +21,41 @@ import styled, { css } from 'styled-components';
 
 import Icon from 'components/common/Icon';
 
-const StyledLink = styled(NavLink)(({ theme }) => css`
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  align-items: center;
-  gap: 0.6rem;
-  transition: all 0.33s ease-in-out;
-  padding: 5px 7px;
-  margin: 16px 10px;
-  border-radius: 5px;
-  color: ${theme.colors.gray[30]};
+const StyledLink = styled(NavLink)(
+  ({ theme }) => css`
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 0.6rem;
+    transition: all 0.33s ease-in-out;
+    padding: 5px 7px;
+    margin: 16px 10px;
+    border-radius: 5px;
+    color: ${theme.colors.gray[30]};
 
-  & > svg {
-    width: 20px;
-  }
+    & > svg {
+      width: 20px;
+    }
 
-  &:hover {
-    background: ${theme.colors.global.contentBackground};
-    text-decoration: none;
-    color: ${theme.colors.global.textDefault};
-  }
+    &:hover {
+      background: ${theme.colors.global.contentBackground};
+      text-decoration: none;
+      color: ${theme.colors.global.textDefault};
+    }
 
-  &.active {
-    background: ${theme.colors.global.contentBackground};
-    color: ${theme.colors.brand.primary};
-  }
-`);
+    &.active {
+      background: ${theme.colors.global.contentBackground};
+      color: ${theme.colors.brand.primary};
+    }
+  `,
+);
 
 type Props = React.PropsWithChildren<{
-  linkTarget: string,
-  linkEnd?: boolean,
-  iconName: IconName,
-}>
+  linkTarget: string;
+  linkEnd?: boolean;
+  iconName: IconName;
+}>;
 
 const SideNavItem = ({ children, linkTarget, linkEnd, iconName }: Props) => (
   <li>

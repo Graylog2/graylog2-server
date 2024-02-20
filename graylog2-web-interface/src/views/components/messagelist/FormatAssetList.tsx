@@ -29,16 +29,21 @@ const handleAddToQuery = (dispatch: AppDispatch, queryId: string, id: string, fi
   return dispatch(AddToQueryHandler({ queryId, field, value: id, type: fieldType }));
 };
 
-const FormatAssetList = ({ associated_assets, fieldType }: { associated_assets: string[], fieldType: FieldType }) => {
+const FormatAssetList = ({ associated_assets, fieldType }: { associated_assets: string[]; fieldType: FieldType }) => {
   const pluggableAssetListComponent = usePluginEntities('views.components.assetInformationActions');
   const queryId = useActiveQueryId();
   const dispatch = useAppDispatch();
 
-  const assetsList = React.useMemo(() => pluggableAssetListComponent.map(
-    ({ component: PluggableAssetListItem }) => (
-      <PluggableAssetListItem identifiers={associated_assets} addToQuery={(id) => handleAddToQuery(dispatch, queryId, id, fieldType)} />
-    ),
-  ), [pluggableAssetListComponent, associated_assets, dispatch, queryId, fieldType]);
+  const assetsList = React.useMemo(
+    () =>
+      pluggableAssetListComponent.map(({ component: PluggableAssetListItem }) => (
+        <PluggableAssetListItem
+          identifiers={associated_assets}
+          addToQuery={(id) => handleAddToQuery(dispatch, queryId, id, fieldType)}
+        />
+      )),
+    [pluggableAssetListComponent, associated_assets, dispatch, queryId, fieldType],
+  );
 
   if (associated_assets.length === 0) {
     return null;
@@ -48,9 +53,7 @@ const FormatAssetList = ({ associated_assets, fieldType }: { associated_assets: 
     <div>
       <dt>Associated Assets</dt>
       {assetsList.map((assetElement) => (
-        <div key={assetElement.props.identifiers[0]}>
-          {assetElement}
-        </div>
+        <div key={assetElement.props.identifiers[0]}>{assetElement}</div>
       ))}
     </div>
   );

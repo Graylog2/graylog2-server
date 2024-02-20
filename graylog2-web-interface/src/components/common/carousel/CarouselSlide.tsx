@@ -26,17 +26,15 @@ export interface CarouselSlideProps extends React.ComponentPropsWithoutRef<'div'
   gap?: number;
 }
 
-const StyledSlide = styled.div<{ $size?: string | number, $gap?: number }>(({ $size, $gap, theme }: {
-  theme: DefaultTheme,
-  $size: string | number,
-  $gap: number
-}) => css`
-  flex: 0 0 ${$size ?? '24%'};
-  min-width: 0;
-  min-height: 100px;
-  margin-right: ${$gap ?? theme.spacings.sm};
-  position: relative;
-`);
+const StyledSlide = styled.div<{ $size?: string | number; $gap?: number }>(
+  ({ $size, $gap, theme }: { theme: DefaultTheme; $size: string | number; $gap: number }) => css`
+    flex: 0 0 ${$size ?? '24%'};
+    min-width: 0;
+    min-height: 100px;
+    margin-right: ${$gap ?? theme.spacings.sm};
+    position: relative;
+  `,
+);
 
 const CarouselSlide = ({ children, size, gap }: CarouselSlideProps) => (
   <StyledSlide $size={size} $gap={gap}>

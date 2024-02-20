@@ -36,10 +36,12 @@ const Headline = styled.h3`
   margin-bottom: 5px;
 `;
 
-const KeywordInput = styled(FormControl)(({ theme }) => css`
-  min-height: 34px;
-  font-size: ${theme.fonts.size.large};
-`);
+const KeywordInput = styled(FormControl)(
+  ({ theme }) => css`
+    min-height: 34px;
+    font-size: ${theme.fonts.size.large};
+  `,
+);
 
 const EffectiveTimeRangeTable = styled.table`
   margin-bottom: 5px;
@@ -49,7 +51,10 @@ const EffectiveTimeRangeTable = styled.table`
   }
 `;
 
-const _parseKeywordPreview = (data: Pick<KeywordTimeRange, 'from' | 'to' | 'timezone'>, formatTime: (dateTime: string, format: string) => string) => {
+const _parseKeywordPreview = (
+  data: Pick<KeywordTimeRange, 'from' | 'to' | 'timezone'>,
+  formatTime: (dateTime: string, format: string) => string,
+) => {
   const { timezone } = data;
 
   return {
@@ -60,9 +65,9 @@ const _parseKeywordPreview = (data: Pick<KeywordTimeRange, 'from' | 'to' | 'time
 };
 
 type Props = {
-  defaultValue: string,
-  disabled: boolean,
-  setValidatingKeyword: (boolean) => void
+  defaultValue: string;
+  disabled: boolean;
+  setValidatingKeyword: (boolean) => void;
 };
 
 const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: Props) => {
@@ -72,12 +77,14 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
   const keywordRef = useRef<string>();
   const [keywordPreview, setKeywordPreview] = useState({ from: '', to: '', timezone: '' });
 
-  const _setSuccessfulPreview = useCallback((response: { from: string, to: string, timezone: string }) => {
-    setValidatingKeyword(false);
+  const _setSuccessfulPreview = useCallback(
+    (response: { from: string; to: string; timezone: string }) => {
+      setValidatingKeyword(false);
 
-    return setKeywordPreview(_parseKeywordPreview(response, formatTime));
-  },
-  [setValidatingKeyword, formatTime]);
+      return setKeywordPreview(_parseKeywordPreview(response, formatTime));
+    },
+    [setValidatingKeyword, formatTime],
+  );
 
   const _setFailedPreview = useCallback(() => {
     setKeywordPreview({ from: EMPTY_RANGE, to: EMPTY_RANGE, timezone: userTimezone });
@@ -85,31 +92,37 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
     return 'Unable to parse keyword.';
   }, [userTimezone]);
 
-  const _validateKeyword = useCallback((keyword: string) => {
-    if (keyword === undefined) {
+  const _validateKeyword = useCallback(
+    (keyword: string) => {
+      if (keyword === undefined) {
+        return undefined;
+      }
+
+      if (keywordRef.current !== keyword) {
+        keywordRef.current = keyword;
+
+        setValidatingKeyword(true);
+
+        return trim(keyword) === ''
+          ? Promise.resolve('Keyword must not be empty!')
+          : ToolsStore.testNaturalDate(keyword, userTimezone)
+              .then((response) => {
+                if (mounted.current) _setSuccessfulPreview(response);
+              })
+              .catch(_setFailedPreview);
+      }
+
       return undefined;
-    }
+    },
+    [_setFailedPreview, _setSuccessfulPreview, setValidatingKeyword, userTimezone],
+  );
 
-    if (keywordRef.current !== keyword) {
-      keywordRef.current = keyword;
-
-      setValidatingKeyword(true);
-
-      return trim(keyword) === ''
-        ? Promise.resolve('Keyword must not be empty!')
-        : ToolsStore.testNaturalDate(keyword, userTimezone)
-          .then((response) => {
-            if (mounted.current) _setSuccessfulPreview(response);
-          })
-          .catch(_setFailedPreview);
-    }
-
-    return undefined;
-  }, [_setFailedPreview, _setSuccessfulPreview, setValidatingKeyword, userTimezone]);
-
-  useEffect(() => () => {
-    mounted.current = false;
-  }, []);
+  useEffect(
+    () => () => {
+      mounted.current = false;
+    },
+    [],
+  );
 
   useEffect(() => {
     _validateKeyword(keywordRef.current);
@@ -136,19 +149,23 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
         <Headline>Time range:</Headline>
         <Field name="timeRangeTabs.keyword.keyword" validate={_validateKeyword}>
           {({ field: { name, value, onChange }, meta: { error } }) => (
-            <FormGroup controlId="form-inline-keyword"
-                       style={{ marginRight: 5, width: '100%', marginBottom: 0 }}
-                       validationState={error ? 'error' : null}>
-              <KeywordInput type="text"
-                            className="input-sm mousetrap"
-                            name={name}
-                            disabled={disabled}
-                            placeholder="Last week"
-                            title="Keyword input"
-                            aria-label="Keyword input"
-                            onChange={onChange}
-                            required
-                            value={value || defaultValue} />
+            <FormGroup
+              controlId="form-inline-keyword"
+              style={{ marginRight: 5, width: '100%', marginBottom: 0 }}
+              validationState={error ? 'error' : null}
+            >
+              <KeywordInput
+                type="text"
+                className="input-sm mousetrap"
+                name={name}
+                disabled={disabled}
+                placeholder="Last week"
+                title="Keyword input"
+                aria-label="Keyword input"
+                onChange={onChange}
+                required
+                value={value || defaultValue}
+              />
 
               <InputDescription error={error} help="Specify the time frame for the search in natural language." />
             </FormGroup>
@@ -173,17 +190,31 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
       <Col sm={7}>
         <Panel>
           <Panel.Body>
-            <p><code>last month</code> searches between one month ago and now</p>
+            <p>
+              <code>last month</code> searches between one month ago and now
+            </p>
 
-            <p><code>4 hours ago</code> searches between four hours ago and now</p>
+            <p>
+              <code>4 hours ago</code> searches between four hours ago and now
+            </p>
 
-            <p><code>1st of april to 2 days ago</code> searches between 1st of April and 2 days ago</p>
+            <p>
+              <code>1st of april to 2 days ago</code> searches between 1st of April and 2 days ago
+            </p>
 
-            <p><code>yesterday midnight +0200 to today midnight +0200</code> searches between yesterday midnight and today midnight in timezone +0200 - will be 22:00 in UTC</p>
+            <p>
+              <code>yesterday midnight +0200 to today midnight +0200</code> searches between yesterday midnight and
+              today midnight in timezone +0200 - will be 22:00 in UTC
+            </p>
 
-            <p>Please consult the <DocumentationLink page={DocsHelper.PAGES.TIME_FRAME_SELECTOR}
-                                                     title="Keyword Time Range Documentation"
-                                                     text="documentation" /> for more details.
+            <p>
+              Please consult the{' '}
+              <DocumentationLink
+                page={DocsHelper.PAGES.TIME_FRAME_SELECTOR}
+                title="Keyword Time Range Documentation"
+                text="documentation"
+              />{' '}
+              for more details.
             </p>
           </Panel.Body>
         </Panel>

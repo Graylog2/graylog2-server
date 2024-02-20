@@ -33,18 +33,22 @@ import StreamSelect, { DEFAULT_SEARCH_ID, DEFAULT_STREAM_ID } from './StreamSele
 import formatDecorator from './FormatDecorator';
 
 type Props = {
-  streams: Array<Stream>,
-  decorators: Array<Decorator>,
-  types: { [key: string]: any },
+  streams: Array<Stream>;
+  decorators: Array<Decorator>;
+  types: { [key: string]: any };
   // eslint-disable-next-line react/require-default-props
-  show?: boolean,
-  onCancel: () => void,
-  onSave: (newDecorators: Array<Decorator>) => unknown,
+  show?: boolean;
+  onCancel: () => void;
+  onSave: (newDecorators: Array<Decorator>) => unknown;
 };
 
-const _updateOrder = (orderedDecorators: Array<{
-  id: string
-}>, decorators: Array<Decorator>, onChange: (decorators: Array<Decorator>) => void) => {
+const _updateOrder = (
+  orderedDecorators: Array<{
+    id: string;
+  }>,
+  decorators: Array<Decorator>,
+  onChange: (decorators: Array<Decorator>) => void,
+) => {
   const newDecorators = cloneDeep(decorators);
 
   orderedDecorators.forEach((item, idx) => {
@@ -65,16 +69,22 @@ const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCa
   const { pathname } = useLocation();
 
   const onCreate = useCallback(
-    ({ stream, ...rest }: Decorator) => setModifiedDecorators([...modifiedDecorators, {
-      ...rest,
-      stream: stream === DEFAULT_SEARCH_ID ? null : stream,
-    }]),
+    ({ stream, ...rest }: Decorator) =>
+      setModifiedDecorators([
+        ...modifiedDecorators,
+        {
+          ...rest,
+          stream: stream === DEFAULT_SEARCH_ID ? null : stream,
+        },
+      ]),
     [modifiedDecorators, setModifiedDecorators],
   );
   const onReorder = useCallback(
-    (orderedDecorators: Array<{
-      id: string
-    }>) => _updateOrder(orderedDecorators, modifiedDecorators, setModifiedDecorators),
+    (
+      orderedDecorators: Array<{
+        id: string;
+      }>,
+    ) => _updateOrder(orderedDecorators, modifiedDecorators, setModifiedDecorators),
     [modifiedDecorators, setModifiedDecorators],
   );
   const onSubmit = useCallback(() => {
@@ -87,7 +97,9 @@ const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCa
     });
   }, [onSave, modifiedDecorators, sendTelemetry, pathname]);
 
-  const currentDecorators = modifiedDecorators.filter((decorator) => (decorator.stream || DEFAULT_SEARCH_ID) === currentStream);
+  const currentDecorators = modifiedDecorators.filter(
+    (decorator) => (decorator.stream || DEFAULT_SEARCH_ID) === currentStream,
+  );
   const decoratorItems = currentDecorators
     .sort((d1, d2) => d1.order - d2.order)
     .map((decorator) => formatDecorator(decorator, modifiedDecorators, types, setModifiedDecorators));
@@ -102,8 +114,7 @@ const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCa
   const modalTitle = 'Update Default Decorators Configuration';
 
   return (
-    <BootstrapModalWrapper showModal={show}
-                           onHide={_onCancel}>
+    <BootstrapModalWrapper showModal={show} onHide={_onCancel}>
       <Modal.Header closeButton>
         <Modal.Title>{modalTitle}</Modal.Title>
       </Modal.Header>
@@ -113,11 +124,13 @@ const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCa
 
         <IfPermitted permissions="decorators:create">
           <p>Select the type to create a new decorator for this stream:</p>
-          <AddDecoratorButton stream={currentStream}
-                              nextOrder={nextOrder}
-                              decoratorTypes={types}
-                              onCreate={onCreate}
-                              showHelp={false} />
+          <AddDecoratorButton
+            stream={currentStream}
+            nextOrder={nextOrder}
+            decoratorTypes={types}
+            onCreate={onCreate}
+            showHelp={false}
+          />
         </IfPermitted>
 
         <p>Use drag and drop to change the execution order of the decorators.</p>

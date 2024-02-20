@@ -22,18 +22,17 @@ import EditPatternModal from 'components/grok-patterns/EditPatternModal';
 
 describe('<EditPatternModal />', () => {
   it('should render a modal button with as edit', () => {
-    const wrapper = mount(<EditPatternModal savePattern={() => {}}
-                                            testPattern={() => {}}
-                                            validPatternName={() => {}} />);
+    const wrapper = mount(
+      <EditPatternModal savePattern={() => {}} testPattern={() => {}} validPatternName={() => {}} />,
+    );
 
     expect(wrapper).toExist();
   });
 
   it('should render a modal button with as create', () => {
-    const wrapper = mount(<EditPatternModal create
-                                            savePattern={() => {}}
-                                            testPattern={() => {}}
-                                            validPatternName={() => {}} />);
+    const wrapper = mount(
+      <EditPatternModal create savePattern={() => {}} testPattern={() => {}} validPatternName={() => {}} />,
+    );
 
     expect(wrapper).toExist();
   });

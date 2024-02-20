@@ -36,48 +36,52 @@ import './webpack-resolver';
 import './ace/theme-graylog';
 
 type ContainerProps = {
-  $resizable: boolean
-}
-const SourceCodeContainer = styled.div<ContainerProps>(({ $resizable, theme }) => css`
-  .react-resizable-handle {
-    z-index: 100; /* Ensure resize handle is over text editor */
-    display: ${$resizable ? 'block' : 'none'};
-  }
-
-  ${theme.components.aceEditor}
-`);
-
-const Toolbar = styled.div(({ theme }) => css`
-  background: ${theme.colors.global.contentBackground};
-  border: 1px solid ${theme.colors.gray[80]};
-  border-bottom: 0;
-  border-radius: 5px 5px 0 0;
-
-  .btn-link {
-    color: ${theme.colors.variant.dark.info};
-
-    &:hover {
-      color: ${theme.colors.variant.darkest.info};
-      background-color: ${theme.colors.variant.lightest.info};
+  $resizable: boolean;
+};
+const SourceCodeContainer = styled.div<ContainerProps>(
+  ({ $resizable, theme }) => css`
+    .react-resizable-handle {
+      z-index: 100; /* Ensure resize handle is over text editor */
+      display: ${$resizable ? 'block' : 'none'};
     }
 
-    &.disabled,
-    &[disabled] {
-      color: ${theme.colors.variant.light.default};
+    ${theme.components.aceEditor}
+  `,
+);
+
+const Toolbar = styled.div(
+  ({ theme }) => css`
+    background: ${theme.colors.global.contentBackground};
+    border: 1px solid ${theme.colors.gray[80]};
+    border-bottom: 0;
+    border-radius: 5px 5px 0 0;
+
+    .btn-link {
+      color: ${theme.colors.variant.dark.info};
 
       &:hover {
+        color: ${theme.colors.variant.darkest.info};
+        background-color: ${theme.colors.variant.lightest.info};
+      }
+
+      &.disabled,
+      &[disabled] {
         color: ${theme.colors.variant.light.default};
+
+        &:hover {
+          color: ${theme.colors.variant.light.default};
+        }
       }
     }
-  }
 
-  & + ${SourceCodeContainer} {
-    /* Do not add border radius if code editor comes after toolbar */
-    .ace_editor {
-      border-radius: 0 0 5px 5px;
+    & + ${SourceCodeContainer} {
+      /* Do not add border radius if code editor comes after toolbar */
+      .ace_editor {
+        border-radius: 0 0 5px 5px;
+      }
     }
-  }
-`);
+  `,
+);
 
 const availableModes = ['json', 'lua', 'markdown', 'text', 'yaml', 'pipeline'] as const;
 
@@ -89,29 +93,29 @@ const availableModes = ['json', 'lua', 'markdown', 'text', 'yaml', 'pipeline'] a
  * Letting the component handle its own internal state may lead to weird errors while typing.
  */
 type Props = {
-  annotations: Array<IAnnotation>,
-  focus?: boolean,
-  fontSize?: number,
-  height?: number,
-  width?: number,
-  id: string,
-  innerRef?: React.MutableRefObject<AceEditor>,
-  mode: typeof availableModes[number],
-  onLoad: () => void,
-  onChange: () => void,
-  onBlur: () => void,
-  readOnly?: boolean,
-  resizable?: boolean,
-  toolbar?: boolean,
-  value?: string,
-  wrapEnabled?: boolean,
-}
+  annotations: Array<IAnnotation>;
+  focus?: boolean;
+  fontSize?: number;
+  height?: number;
+  width?: number;
+  id: string;
+  innerRef?: React.MutableRefObject<AceEditor>;
+  mode: (typeof availableModes)[number];
+  onLoad: () => void;
+  onChange: () => void;
+  onBlur: () => void;
+  readOnly?: boolean;
+  resizable?: boolean;
+  toolbar?: boolean;
+  value?: string;
+  wrapEnabled?: boolean;
+};
 
 type State = {
-  height?: number,
-  width?: number,
-  selectedText?: string,
-}
+  height?: number;
+  width?: number;
+  selectedText?: string;
+};
 
 class SourceCodeEditor extends React.Component<Props, State> {
   static propTypes = {
@@ -130,10 +134,7 @@ class SourceCodeEditor extends React.Component<Props, State> {
     /** Specifies a unique ID for the source code editor. */
     id: PropTypes.string.isRequired,
     /** Provides a ref associated to AceEditor component */
-    innerRef: PropTypes.oneOfType([
-      PropTypes.func,
-      PropTypes.shape({ current: PropTypes.any }),
-    ]),
+    innerRef: PropTypes.oneOfType([PropTypes.func, PropTypes.shape({ current: PropTypes.any })]),
     /** Specifies the mode to use in the editor. This is used for highlighting and auto-completion. */
     mode: PropTypes.oneOf(availableModes),
     /** Function called on editor load. The first argument is the instance of the editor. */
@@ -235,9 +236,11 @@ class SourceCodeEditor extends React.Component<Props, State> {
 
   isPasteDisabled = () => this.props.readOnly;
 
-  isRedoDisabled = () => this.props.readOnly || !this.reactAce || !this.reactAce.editor.getSession().getUndoManager().hasRedo();
+  isRedoDisabled = () =>
+    this.props.readOnly || !this.reactAce || !this.reactAce.editor.getSession().getUndoManager().hasRedo();
 
-  isUndoDisabled = () => this.props.readOnly || !this.reactAce || !this.reactAce.editor.getSession().getUndoManager().hasUndo();
+  isUndoDisabled = () =>
+    this.props.readOnly || !this.reactAce || !this.reactAce.editor.getSession().getUndoManager().hasUndo();
 
   handleRedo = () => {
     this.reactAce.editor.redo();
@@ -284,75 +287,87 @@ class SourceCodeEditor extends React.Component<Props, State> {
       wrapEnabled,
     } = this.props;
     const validCssWidth = isFinite(width) ? width : '100%';
-    const overlay = <>Press Ctrl+V (&#8984;V in macOS) or select Edit&thinsp;&rarr;&thinsp;Paste to paste from clipboard.</>;
+    const overlay = (
+      <>Press Ctrl+V (&#8984;V in macOS) or select Edit&thinsp;&rarr;&thinsp;Paste to paste from clipboard.</>
+    );
 
     return (
       <div className="source-code-editor">
-        {toolbar
-          && (
+        {toolbar && (
           <Toolbar style={{ width: validCssWidth }}>
             <ButtonToolbar>
               <ButtonGroup ref={this.overlayContainerRef}>
-                <ClipboardButton title={<Icon name="copy" fixedWidth />}
-                                 bsStyle="link"
-                                 bsSize="sm"
-                                 onSuccess={this.focusEditor}
-                                 text={selectedText}
-                                 buttonTitle="Copy (Ctrl+C / &#8984;C)"
-                                 disabled={this.isCopyDisabled()} />
+                <ClipboardButton
+                  title={<Icon name="copy" fixedWidth />}
+                  bsStyle="link"
+                  bsSize="sm"
+                  onSuccess={this.focusEditor}
+                  text={selectedText}
+                  buttonTitle="Copy (Ctrl+C / &#8984;C)"
+                  disabled={this.isCopyDisabled()}
+                />
                 <OverlayTrigger placement="top" trigger="click" overlay={overlay} rootClose width={250}>
-                  <Button bsStyle="link" bsSize="sm" title="Paste (Ctrl+V / &#8984;V)" disabled={this.isPasteDisabled()}>
+                  <Button
+                    bsStyle="link"
+                    bsSize="sm"
+                    title="Paste (Ctrl+V / &#8984;V)"
+                    disabled={this.isPasteDisabled()}
+                  >
                     <Icon name="clipboard" fixedWidth />
                   </Button>
                 </OverlayTrigger>
               </ButtonGroup>
               <ButtonGroup>
-                <Button bsStyle="link"
-                        bsSize="sm"
-                        onClick={this.handleUndo}
-                        title="Undo (Ctrl+Z / &#8984;Z)"
-                        disabled={this.isUndoDisabled()}>
+                <Button
+                  bsStyle="link"
+                  bsSize="sm"
+                  onClick={this.handleUndo}
+                  title="Undo (Ctrl+Z / &#8984;Z)"
+                  disabled={this.isUndoDisabled()}
+                >
                   <Icon name="undo" fixedWidth />
                 </Button>
-                <Button bsStyle="link"
-                        bsSize="sm"
-                        onClick={this.handleRedo}
-                        title="Redo (Ctrl+Shift+Z / &#8984;&#8679;Z)"
-                        disabled={this.isRedoDisabled()}>
+                <Button
+                  bsStyle="link"
+                  bsSize="sm"
+                  onClick={this.handleRedo}
+                  title="Redo (Ctrl+Shift+Z / &#8984;&#8679;Z)"
+                  disabled={this.isRedoDisabled()}
+                >
                   <Icon name="redo" fixedWidth />
                 </Button>
               </ButtonGroup>
             </ButtonToolbar>
           </Toolbar>
-          )}
-        <Resizable height={height}
-                   width={width}
-                   minConstraints={[200, 200]}
-                   onResize={this.handleResize}>
-          <SourceCodeContainer style={{ height: height, width: validCssWidth }}
-                               $resizable={resizable}>
-            <AceEditor ref={(c) => {
-              this.reactAce = c;
-              if (innerRef) { innerRef.current = c; }
-            }}
-                       annotations={annotations}
-                       // Convert Windows line breaks to Unix. See issue #7889
-                       // @ts-expect-error
-                       setOptions={{ newLineMode: 'unix' }}
-                       focus={focus}
-                       fontSize={fontSize}
-                       mode={mode}
-                       theme="graylog"
-                       name={id}
-                       height="100%"
-                       onLoad={onLoad}
-                       onChange={onChange}
-                       onBlur={onBlur}
-                       onSelectionChange={this.handleSelectionChange}
-                       readOnly={readOnly}
-                       value={value}
-                       width="100%"
-                       wrapEnabled={wrapEnabled} />
+        )}
+        <Resizable height={height} width={width} minConstraints={[200, 200]} onResize={this.handleResize}>
+          <SourceCodeContainer style={{ height: height, width: validCssWidth }} $resizable={resizable}>
+            <AceEditor
+              ref={(c) => {
+                this.reactAce = c;
+                if (innerRef) {
+                  innerRef.current = c;
+                }
+              }}
+              annotations={annotations}
+              // Convert Windows line breaks to Unix. See issue #7889
+              // @ts-expect-error
+              setOptions={{ newLineMode: 'unix' }}
+              focus={focus}
+              fontSize={fontSize}
+              mode={mode}
+              theme="graylog"
+              name={id}
+              height="100%"
+              onLoad={onLoad}
+              onChange={onChange}
+              onBlur={onBlur}
+              onSelectionChange={this.handleSelectionChange}
+              readOnly={readOnly}
+              value={value}
+              width="100%"
+              wrapEnabled={wrapEnabled}
+            />
           </SourceCodeContainer>
         </Resizable>
       </div>

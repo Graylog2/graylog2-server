@@ -21,28 +21,19 @@ import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
 
-export const LoggersActions = singletonActions(
-  'core.Loggers',
-  () => Reflux.createActions({
+export const LoggersActions = singletonActions('core.Loggers', () =>
+  Reflux.createActions({
     loggers: { asyncResult: true },
     subsystems: { asyncResult: true },
     setSubsystemLoggerLevel: { asyncResult: true },
   }),
 );
 
-export const LoggersStore = singletonStore(
-  'core.Loggers',
-  () => Reflux.createStore({
+export const LoggersStore = singletonStore('core.Loggers', () =>
+  Reflux.createStore({
     listenables: [LoggersActions],
     state: {
-      availableLoglevels: [
-        'fatal',
-        'error',
-        'warn',
-        'info',
-        'debug',
-        'trace',
-      ],
+      availableLoglevels: ['fatal', 'error', 'warn', 'info', 'debug', 'trace'],
     },
     init() {
       this.loggers();
@@ -74,7 +65,9 @@ export const LoggersStore = singletonStore(
       LoggersActions.loggers.promise(promise);
     },
     setSubsystemLoggerLevel(nodeId, subsystem, level) {
-      const url = URLUtils.qualifyUrl(ApiRoutes.ClusterLoggersResource.setSubsystemLoggerLevel(nodeId, subsystem, level).url);
+      const url = URLUtils.qualifyUrl(
+        ApiRoutes.ClusterLoggersResource.setSubsystemLoggerLevel(nodeId, subsystem, level).url,
+      );
       const promise = fetch('PUT', url);
 
       promise.then(() => {

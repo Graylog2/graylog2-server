@@ -27,27 +27,28 @@ import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import Select from 'components/common/Select';
 
 type Props = {
-  fields: Immutable.List<FieldTypeMapping>,
-  onChange: (newSort: Array<SortConfig>) => void,
-  sort: Array<SortConfig>,
+  fields: Immutable.List<FieldTypeMapping>;
+  onChange: (newSort: Array<SortConfig>) => void;
+  sort: Array<SortConfig>;
 };
 
 type Option = {
-  label: string,
-  value: number,
+  label: string;
+  value: number;
 };
 
 const findOptionByLabel = (options: Array<Option>, label: string) => options.find((option) => option.label === label);
 
 const findOptionByValue = (options: Array<Option>, value: number) => options.find((option) => option.value === value);
 
-const currentValue = (sort: Array<SortConfig>, options: Array<Option>) => sort && sort.length > 0 && findOptionByLabel(options, sort[0].field)?.value;
+const currentValue = (sort: Array<SortConfig>, options: Array<Option>) =>
+  sort && sort.length > 0 && findOptionByLabel(options, sort[0].field)?.value;
 
-const sortedOptions = (fields: Immutable.List<FieldTypeMapping>): Array<Option> => fields.sort(
-  (field1, field2) => defaultCompare(field1.name, field2.name),
-).map(
-  (field, idx) => ({ label: field.name, value: idx }),
-).toArray();
+const sortedOptions = (fields: Immutable.List<FieldTypeMapping>): Array<Option> =>
+  fields
+    .sort((field1, field2) => defaultCompare(field1.name, field2.name))
+    .map((field, idx) => ({ label: field.name, value: idx }))
+    .toArray();
 
 const onOptionChange = (options: Array<Option>, onChange, value) => {
   const option = findOptionByValue(options, value);
@@ -65,12 +66,14 @@ const FieldSortSelect = ({ fields, onChange, sort }: Props) => {
   const options = useMemo(() => sortedOptions(fields), [fields]);
 
   return (
-    <Select placeholder="None: click to add fields"
-            onChange={(newValue) => onOptionChange(options, onChange, newValue)}
-            options={options}
-            clearable={false}
-            aria-label="Select field for sorting"
-            value={currentValue(sort, options)} />
+    <Select
+      placeholder="None: click to add fields"
+      onChange={(newValue) => onOptionChange(options, onChange, newValue)}
+      options={options}
+      clearable={false}
+      aria-label="Select field for sorting"
+      value={currentValue(sort, options)}
+    />
   );
 };
 

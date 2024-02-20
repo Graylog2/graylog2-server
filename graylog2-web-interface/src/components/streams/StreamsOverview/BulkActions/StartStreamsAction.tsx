@@ -25,11 +25,11 @@ import UserNotification from 'util/UserNotification';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 
 type Props = {
-  descriptor: string,
-  handleFailures: (failures: Array<{ entity_id: string }>, actionPastTense: string) => void,
-  onSelect?: () => void,
-  refetchStreams: () => void,
-}
+  descriptor: string;
+  handleFailures: (failures: Array<{ entity_id: string }>, actionPastTense: string) => void;
+  onSelect?: () => void;
+  refetchStreams: () => void;
+};
 
 const StartStreamsActions = ({ handleFailures, refetchStreams, descriptor, onSelect }: Props) => {
   const { selectedEntities } = useSelectedEntities();
@@ -38,11 +38,8 @@ const StartStreamsActions = ({ handleFailures, refetchStreams, descriptor, onSel
       onSelect();
     }
 
-    fetch(
-      'POST',
-      qualifyUrl(ApiRoutes.StreamsApiController.bulk_resume().url),
-      { entity_ids: selectedEntities },
-    ).then(({ failures }) => handleFailures(failures, 'started'))
+    fetch('POST', qualifyUrl(ApiRoutes.StreamsApiController.bulk_resume().url), { entity_ids: selectedEntities })
+      .then(({ failures }) => handleFailures(failures, 'started'))
       .catch((error) => {
         UserNotification.error(`An error occurred while starting streams. ${error}`);
       })
@@ -51,9 +48,7 @@ const StartStreamsActions = ({ handleFailures, refetchStreams, descriptor, onSel
       });
   }, [handleFailures, onSelect, refetchStreams, selectedEntities]);
 
-  return (
-    <MenuItem onSelect={onStartStreams}>Start {descriptor}</MenuItem>
-  );
+  return <MenuItem onSelect={onStartStreams}>Start {descriptor}</MenuItem>;
 };
 
 StartStreamsActions.defaultProps = {

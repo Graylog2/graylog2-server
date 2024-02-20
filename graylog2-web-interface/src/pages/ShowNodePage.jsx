@@ -62,8 +62,9 @@ const ShowNodePage = createReactClass({
 
   UNSAFE_componentWillMount() {
     Promise.all([
-      ClusterOverviewStore.jvm(this.props.params.nodeId)
-        .then((jvmInformation) => this.setState({ jvmInformation: jvmInformation })),
+      ClusterOverviewStore.jvm(this.props.params.nodeId).then((jvmInformation) =>
+        this.setState({ jvmInformation: jvmInformation }),
+      ),
       PluginsStore.list(this.props.params.nodeId).then((plugins) => this.setState({ plugins: plugins })),
       InputStatesStore.list().then((inputStates) => {
         // We only want the input states for the current node
@@ -80,7 +81,10 @@ const ShowNodePage = createReactClass({
 
         this.setState({ inputStates: filteredInputStates });
       }),
-    ]).then(() => {}, (errors) => this.setState({ errors: errors }));
+    ]).then(
+      () => {},
+      (errors) => this.setState({ errors: errors }),
+    );
   },
 
   _isLoading() {
@@ -97,23 +101,36 @@ const ShowNodePage = createReactClass({
     }
 
     const { node } = this.state;
-    const title = <span>Node {node.short_node_id} / {node.hostname}</span>;
+    const title = (
+      <span>
+        Node {node.short_node_id} / {node.hostname}
+      </span>
+    );
 
     return (
       <DocumentTitle title={`Node ${node.short_node_id} / ${node.hostname}`}>
         <div>
           <PageHeader title={title} actions={<NodeMaintenanceDropdown node={node} />}>
             <span>
-              This page shows details of a Graylog server node that is active and reachable in your cluster.<br />
-              {node.is_leader ? <span>This is the leader node.</span> : <span>This is <em>not</em> the leader node.</span>}
+              This page shows details of a Graylog server node that is active and reachable in your cluster.
+              <br />
+              {node.is_leader ? (
+                <span>This is the leader node.</span>
+              ) : (
+                <span>
+                  This is <em>not</em> the leader node.
+                </span>
+              )}
             </span>
           </PageHeader>
-          <NodeOverview node={node}
-                        systemOverview={this.state.systemOverview}
-                        jvmInformation={this.state.jvmInformation}
-                        plugins={this.state.plugins}
-                        inputStates={this.state.inputStates}
-                        inputDescriptions={this.state.inputDescriptions} />
+          <NodeOverview
+            node={node}
+            systemOverview={this.state.systemOverview}
+            jvmInformation={this.state.jvmInformation}
+            plugins={this.state.plugins}
+            inputStates={this.state.inputStates}
+            inputDescriptions={this.state.inputDescriptions}
+          />
         </div>
       </DocumentTitle>
     );

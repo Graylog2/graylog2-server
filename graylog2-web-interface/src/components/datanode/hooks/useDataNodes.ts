@@ -23,47 +23,70 @@ import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import type { Attribute, PaginatedListJSON, SearchParams } from 'stores/PaginationTypes';
 
-export const bulkRemoveDataNode = async (entity_ids: string[], selectBackFailedEntities: (entity_ids: string[]) => void) => {
+export const bulkRemoveDataNode = async (
+  entity_ids: string[],
+  selectBackFailedEntities: (entity_ids: string[]) => void,
+) => {
   try {
-    const { failures, successfully_performed } = await fetch('POST', qualifyUrl('/datanode/bulk_remove'), { entity_ids });
+    const { failures, successfully_performed } = await fetch('POST', qualifyUrl('/datanode/bulk_remove'), {
+      entity_ids,
+    });
 
     if (failures?.length) {
       selectBackFailedEntities(failures.map(({ entity_id }) => entity_id));
     }
 
     if (failures?.length === entity_ids.length) {
-      UserNotification.error(`Removing Data Node failed with status: ${JSON.stringify(failures)}`, 'Could not remove Data Nodes.');
+      UserNotification.error(
+        `Removing Data Node failed with status: ${JSON.stringify(failures)}`,
+        'Could not remove Data Nodes.',
+      );
     }
 
     if (successfully_performed) {
-      UserNotification.success(`${successfully_performed} Data Node${successfully_performed > 1 ? 's' : ''} removed successfully.`);
+      UserNotification.success(
+        `${successfully_performed} Data Node${successfully_performed > 1 ? 's' : ''} removed successfully.`,
+      );
     }
   } catch (errorThrown) {
     UserNotification.error(`Removing Data Node failed with status: ${errorThrown}`, 'Could not remove Data Nodes.');
   }
 };
 
-export const bulkStartDataNode = async (entity_ids: string[], selectBackFailedEntities: (entity_ids: string[]) => void) => {
+export const bulkStartDataNode = async (
+  entity_ids: string[],
+  selectBackFailedEntities: (entity_ids: string[]) => void,
+) => {
   try {
-    const { failures, successfully_performed } = await fetch('POST', qualifyUrl('/datanode/bulk_start'), { entity_ids });
+    const { failures, successfully_performed } = await fetch('POST', qualifyUrl('/datanode/bulk_start'), {
+      entity_ids,
+    });
 
     if (failures?.length) {
       selectBackFailedEntities(failures.map(({ entity_id }) => entity_id));
     }
 
     if (failures?.length === entity_ids.length) {
-      UserNotification.error(`Starting Data Node failed with status: ${JSON.stringify(failures)}`, 'Could not start Data Nodes.');
+      UserNotification.error(
+        `Starting Data Node failed with status: ${JSON.stringify(failures)}`,
+        'Could not start Data Nodes.',
+      );
     }
 
     if (successfully_performed) {
-      UserNotification.success(`${successfully_performed} Data Node${successfully_performed > 1 ? 's' : ''} started successfully.`);
+      UserNotification.success(
+        `${successfully_performed} Data Node${successfully_performed > 1 ? 's' : ''} started successfully.`,
+      );
     }
   } catch (errorThrown) {
     UserNotification.error(`Starting Data Node failed with status: ${errorThrown}`, 'Could not start Data Nodes.');
   }
 };
 
-export const bulkStopDataNode = async (entity_ids: string[], selectBackFailedEntities: (entity_ids: string[]) => void) => {
+export const bulkStopDataNode = async (
+  entity_ids: string[],
+  selectBackFailedEntities: (entity_ids: string[]) => void,
+) => {
   try {
     const { failures, successfully_performed } = await fetch('POST', qualifyUrl('/datanode/bulk_stop'), { entity_ids });
 
@@ -72,11 +95,16 @@ export const bulkStopDataNode = async (entity_ids: string[], selectBackFailedEnt
     }
 
     if (failures?.length === entity_ids.length) {
-      UserNotification.error(`Stopping Data Node failed with status: ${JSON.stringify(failures)}`, 'Could not stop Data Nodes.');
+      UserNotification.error(
+        `Stopping Data Node failed with status: ${JSON.stringify(failures)}`,
+        'Could not stop Data Nodes.',
+      );
     }
 
     if (successfully_performed) {
-      UserNotification.success(`${successfully_performed} Data Node${successfully_performed > 1 ? 's' : ''} stopped successfully.`);
+      UserNotification.success(
+        `${successfully_performed} Data Node${successfully_performed > 1 ? 's' : ''} stopped successfully.`,
+      );
     }
   } catch (errorThrown) {
     UserNotification.error(`Stopping Data Node failed with status: ${errorThrown}`, 'Could not stop Data Nodes.');
@@ -124,47 +152,49 @@ export const rejoinDataNode = async (datanodeId: string) => {
 };
 
 type Options = {
-  enabled: boolean,
-}
+  enabled: boolean;
+};
 
-export const renewDatanodeCertificate = (nodeId: string) => fetch('POST', qualifyUrl(`/certrenewal/${nodeId}`))
-  .then(() => {
-    UserNotification.success('Certificate renewed successfully.');
-  })
-  .catch((error) => {
-    UserNotification.error(`Certificate renewal failed with error: ${error}`);
-  });
+export const renewDatanodeCertificate = (nodeId: string) =>
+  fetch('POST', qualifyUrl(`/certrenewal/${nodeId}`))
+    .then(() => {
+      UserNotification.success('Certificate renewed successfully.');
+    })
+    .catch((error) => {
+      UserNotification.error(`Certificate renewal failed with error: ${error}`);
+    });
 
 const fetchDataNodes = async (params?: SearchParams) => {
-  const url = PaginationURL('/system/cluster/datanodes', params?.page, params?.pageSize, params?.query, { sort: params?.sort?.attributeId, order: params?.sort?.direction });
+  const url = PaginationURL('/system/cluster/datanodes', params?.page, params?.pageSize, params?.query, {
+    sort: params?.sort?.attributeId,
+    order: params?.sort?.direction,
+  });
 
   return fetch('GET', qualifyUrl(url));
 };
 
-const useDataNodes = (params: SearchParams, { enabled }: Options = { enabled: true }) : {
+const useDataNodes = (
+  params: SearchParams,
+  { enabled }: Options = { enabled: true },
+): {
   data: {
-    elements: Array<DataNode>,
-    pagination: PaginatedListJSON,
-    attributes: Array<Attribute>
-  },
-  refetch: () => void,
-  isInitialLoading: boolean,
+    elements: Array<DataNode>;
+    pagination: PaginatedListJSON;
+    attributes: Array<Attribute>;
+  };
+  refetch: () => void;
+  isInitialLoading: boolean;
 } => {
-  const { data, refetch, isInitialLoading } = useQuery(
-    ['datanodes'],
-    () => fetchDataNodes(params),
-    {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading Data Nodes failed with status: ${errorThrown}`,
-          'Could not load Data Nodes.');
-      },
-      notifyOnChangeProps: ['data', 'error'],
-      refetchInterval: 5000,
-      enabled,
+  const { data, refetch, isInitialLoading } = useQuery(['datanodes'], () => fetchDataNodes(params), {
+    onError: (errorThrown) => {
+      UserNotification.error(`Loading Data Nodes failed with status: ${errorThrown}`, 'Could not load Data Nodes.');
     },
-  );
+    notifyOnChangeProps: ['data', 'error'],
+    refetchInterval: 5000,
+    enabled,
+  });
 
-  return ({
+  return {
     data: data || {
       attributes: [],
       elements: [],
@@ -172,7 +202,7 @@ const useDataNodes = (params: SearchParams, { enabled }: Options = { enabled: tr
     },
     refetch,
     isInitialLoading,
-  });
+  };
 };
 
 export default useDataNodes;

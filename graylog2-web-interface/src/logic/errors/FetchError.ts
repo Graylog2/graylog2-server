@@ -18,13 +18,13 @@ import isString from 'lodash/isString';
 
 type Res = {
   text?: string;
-}
+};
 
 type Additional = {
   status: number;
   body?: any;
   res?: Res;
-}
+};
 
 export default class FetchError extends Error {
   name: 'FetchError';
@@ -39,7 +39,7 @@ export default class FetchError extends Error {
     super(message);
     this.name = 'FetchError';
 
-    const details = isString(additional) ? additional : (additional?.message ?? 'Not available');
+    const details = isString(additional) ? additional : additional?.message ?? 'Not available';
     this.message = `There was an error fetching a resource: ${message}. Additional information: ${details}`;
 
     this.responseMessage = additional?.message ?? undefined;

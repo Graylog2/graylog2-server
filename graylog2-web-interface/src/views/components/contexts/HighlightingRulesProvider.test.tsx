@@ -33,15 +33,13 @@ describe('HighlightingRulesProvider', () => {
   const renderSUT = (view: View = createSearch()) => {
     const consume = jest.fn();
 
-    render((
+    render(
       <TestStoreProvider view={view}>
         <HighlightingRulesProvider>
-          <HighlightingRulesContext.Consumer>
-            {consume}
-          </HighlightingRulesContext.Consumer>
+          <HighlightingRulesContext.Consumer>{consume}</HighlightingRulesContext.Consumer>
         </HighlightingRulesProvider>
-      </TestStoreProvider>
-    ));
+      </TestStoreProvider>,
+    );
 
     return consume;
   };
@@ -65,10 +63,7 @@ describe('HighlightingRulesProvider', () => {
     const viewState = ViewState.builder()
       .formatting(FormattingSettings.create([rule]))
       .build();
-    const view = createSearch()
-      .toBuilder()
-      .state({ 'query-id-1': viewState })
-      .build();
+    const view = createSearch().toBuilder().state({ 'query-id-1': viewState }).build();
 
     const consume = renderSUT(view);
 

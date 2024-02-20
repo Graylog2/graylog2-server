@@ -23,12 +23,16 @@ import QueryHelper from 'components/common/QueryHelper';
 const queryExamples = (
   <>
     <p>
-      Find sidecars that did not communicate with Graylog since a date:<br />
-      <kbd>{'last_seen:<=2018-04-10'}</kbd><br />
+      Find sidecars that did not communicate with Graylog since a date:
+      <br />
+      <kbd>{'last_seen:<=2018-04-10'}</kbd>
+      <br />
     </p>
     <p>
-      Find sidecars with <code>failing</code> or <code>unknown</code> status:<br />
-      <kbd>status:failing status:unknown</kbd><br />
+      Find sidecars with <code>failing</code> or <code>unknown</code> status:
+      <br />
+      <kbd>status:failing status:unknown</kbd>
+      <br />
     </p>
   </>
 );
@@ -46,19 +50,21 @@ const queryHelp = (
 );
 
 type Props = React.PropsWithChildren<{
-  query: string,
-  onSearch: (query: string) => void,
-  onReset: () => void,
+  query: string;
+  onSearch: (query: string) => void;
+  onReset: () => void;
 }>;
 
 const SidecarSearchForm = ({ query, onSearch, onReset, children }: Props) => (
-  <SearchForm query={query}
-              onSearch={onSearch}
-              onReset={onReset}
-              placeholder="Find sidecars"
-              queryHelpComponent={queryHelp}
-              topMargin={0}
-              useLoadingState>
+  <SearchForm
+    query={query}
+    onSearch={onSearch}
+    onReset={onReset}
+    placeholder="Find sidecars"
+    queryHelpComponent={queryHelp}
+    topMargin={0}
+    useLoadingState
+  >
     {children}
   </SearchForm>
 );

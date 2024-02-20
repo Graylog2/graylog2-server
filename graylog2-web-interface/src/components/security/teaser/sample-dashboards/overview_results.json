@@ -176,9 +176,7 @@
             "row_groups": [
               {
                 "type": "time",
-                "fields": [
-                  "timestamp"
-                ],
+                "fields": ["timestamp"],
                 "interval": {
                   "type": "auto",
                   "scaling": 1
@@ -214,9 +212,7 @@
             "row_groups": [
               {
                 "type": "values",
-                "fields": [
-                  "event_source"
-                ],
+                "fields": ["event_source"],
                 "limit": 15,
                 "skip_empty_values": false
               }
@@ -250,9 +246,7 @@
             "row_groups": [
               {
                 "type": "values",
-                "fields": [
-                  "event_source_product"
-                ],
+                "fields": ["event_source_product"],
                 "limit": 15,
                 "skip_empty_values": false
               }
@@ -260,9 +254,7 @@
             "column_groups": [
               {
                 "type": "values",
-                "fields": [
-                  "event_outcome"
-                ],
+                "fields": ["event_outcome"],
                 "limit": 15,
                 "skip_empty_values": false
               }
@@ -295,9 +287,7 @@
             "row_groups": [
               {
                 "type": "values",
-                "fields": [
-                  "user_name"
-                ],
+                "fields": ["user_name"],
                 "limit": 15,
                 "skip_empty_values": false
               }
@@ -331,9 +321,7 @@
             "row_groups": [
               {
                 "type": "values",
-                "fields": [
-                  "gim_event_subcategory"
-                ],
+                "fields": ["gim_event_subcategory"],
                 "limit": 15,
                 "skip_empty_values": false
               }
@@ -421,9 +409,7 @@
             "row_groups": [
               {
                 "type": "values",
-                "fields": [
-                  "event_source"
-                ],
+                "fields": ["event_source"],
                 "limit": 15,
                 "skip_empty_values": false
               }
@@ -457,9 +443,7 @@
             "row_groups": [
               {
                 "type": "values",
-                "fields": [
-                  "event_source_product"
-                ],
+                "fields": ["event_source_product"],
                 "limit": 15,
                 "skip_empty_values": false
               }
@@ -520,9 +504,7 @@
             "row_groups": [
               {
                 "type": "values",
-                "fields": [
-                  "alert_signature"
-                ],
+                "fields": ["alert_signature"],
                 "limit": 15,
                 "skip_empty_values": false
               }
@@ -556,9 +538,7 @@
             "row_groups": [
               {
                 "type": "values",
-                "fields": [
-                  "event_source_product"
-                ],
+                "fields": ["event_source_product"],
                 "limit": 15,
                 "skip_empty_values": false
               }
@@ -587,9 +567,7 @@
               "key": [],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 2834,
                   "rollup": true,
                   "source": "row-leaf"
@@ -611,14 +589,10 @@
           "id": "c89d6eca-ea11-43cd-b931-8d3b96e43226",
           "rows": [
             {
-              "key": [
-                "2023-11-28T13:30:00.000Z"
-              ],
+              "key": ["2023-11-28T13:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 1041,
                   "rollup": true,
                   "source": "row-leaf"
@@ -627,14 +601,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-28T14:00:00.000Z"
-              ],
+              "key": ["2023-11-28T14:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 17581,
                   "rollup": true,
                   "source": "row-leaf"
@@ -643,14 +613,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-28T14:30:00.000Z"
-              ],
+              "key": ["2023-11-28T14:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 17657,
                   "rollup": true,
                   "source": "row-leaf"
@@ -659,14 +625,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-28T15:00:00.000Z"
-              ],
+              "key": ["2023-11-28T15:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 14704,
                   "rollup": true,
                   "source": "row-leaf"
@@ -675,14 +637,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-28T15:30:00.000Z"
-              ],
+              "key": ["2023-11-28T15:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 14697,
                   "rollup": true,
                   "source": "row-leaf"
@@ -691,14 +649,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-28T16:00:00.000Z"
-              ],
+              "key": ["2023-11-28T16:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 10316,
                   "rollup": true,
                   "source": "row-leaf"
@@ -707,14 +661,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-28T16:30:00.000Z"
-              ],
+              "key": ["2023-11-28T16:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 29576,
                   "rollup": true,
                   "source": "row-leaf"
@@ -723,14 +673,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-28T17:00:00.000Z"
-              ],
+              "key": ["2023-11-28T17:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 17636,
                   "rollup": true,
                   "source": "row-leaf"
@@ -739,14 +685,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-28T17:30:00.000Z"
-              ],
+              "key": ["2023-11-28T17:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 17570,
                   "rollup": true,
                   "source": "row-leaf"
@@ -755,14 +697,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-28T18:00:00.000Z"
-              ],
+              "key": ["2023-11-28T18:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 14678,
                   "rollup": true,
                   "source": "row-leaf"
@@ -771,14 +709,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-28T18:30:00.000Z"
-              ],
+              "key": ["2023-11-28T18:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 14676,
                   "rollup": true,
                   "source": "row-leaf"
@@ -787,14 +721,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-28T19:00:00.000Z"
-              ],
+              "key": ["2023-11-28T19:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 14661,
                   "rollup": true,
                   "source": "row-leaf"
@@ -803,14 +733,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-28T19:30:00.000Z"
-              ],
+              "key": ["2023-11-28T19:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 14695,
                   "rollup": true,
                   "source": "row-leaf"
@@ -819,14 +745,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-28T20:00:00.000Z"
-              ],
+              "key": ["2023-11-28T20:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 14577,
                   "rollup": true,
                   "source": "row-leaf"
@@ -835,14 +757,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-28T20:30:00.000Z"
-              ],
+              "key": ["2023-11-28T20:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 14696,
                   "rollup": true,
                   "source": "row-leaf"
@@ -851,14 +769,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-28T21:00:00.000Z"
-              ],
+              "key": ["2023-11-28T21:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 14632,
                   "rollup": true,
                   "source": "row-leaf"
@@ -867,14 +781,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-28T21:30:00.000Z"
-              ],
+              "key": ["2023-11-28T21:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 14626,
                   "rollup": true,
                   "source": "row-leaf"
@@ -883,14 +793,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-28T22:00:00.000Z"
-              ],
+              "key": ["2023-11-28T22:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 14699,
                   "rollup": true,
                   "source": "row-leaf"
@@ -899,14 +805,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-28T22:30:00.000Z"
-              ],
+              "key": ["2023-11-28T22:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 14691,
                   "rollup": true,
                   "source": "row-leaf"
@@ -915,14 +817,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-28T23:00:00.000Z"
-              ],
+              "key": ["2023-11-28T23:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 14683,
                   "rollup": true,
                   "source": "row-leaf"
@@ -931,14 +829,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-28T23:30:00.000Z"
-              ],
+              "key": ["2023-11-28T23:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 14704,
                   "rollup": true,
                   "source": "row-leaf"
@@ -947,14 +841,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T00:00:00.000Z"
-              ],
+              "key": ["2023-11-29T00:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 14722,
                   "rollup": true,
                   "source": "row-leaf"
@@ -963,14 +853,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T00:30:00.000Z"
-              ],
+              "key": ["2023-11-29T00:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 14620,
                   "rollup": true,
                   "source": "row-leaf"
@@ -979,14 +865,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T01:00:00.000Z"
-              ],
+              "key": ["2023-11-29T01:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 14658,
                   "rollup": true,
                   "source": "row-leaf"
@@ -995,14 +877,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T01:30:00.000Z"
-              ],
+              "key": ["2023-11-29T01:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 14685,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1011,14 +889,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T02:00:00.000Z"
-              ],
+              "key": ["2023-11-29T02:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 14685,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1027,14 +901,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T02:30:00.000Z"
-              ],
+              "key": ["2023-11-29T02:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 14626,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1043,14 +913,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T03:00:00.000Z"
-              ],
+              "key": ["2023-11-29T03:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 14691,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1059,14 +925,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T03:30:00.000Z"
-              ],
+              "key": ["2023-11-29T03:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 14650,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1075,14 +937,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T04:00:00.000Z"
-              ],
+              "key": ["2023-11-29T04:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 14647,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1091,14 +949,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T04:30:00.000Z"
-              ],
+              "key": ["2023-11-29T04:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 14753,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1107,14 +961,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T05:00:00.000Z"
-              ],
+              "key": ["2023-11-29T05:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 14700,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1123,14 +973,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T05:30:00.000Z"
-              ],
+              "key": ["2023-11-29T05:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 14662,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1139,14 +985,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T06:00:00.000Z"
-              ],
+              "key": ["2023-11-29T06:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 14696,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1155,14 +997,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T06:30:00.000Z"
-              ],
+              "key": ["2023-11-29T06:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 14686,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1171,14 +1009,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T07:00:00.000Z"
-              ],
+              "key": ["2023-11-29T07:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 14692,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1187,14 +1021,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T07:30:00.000Z"
-              ],
+              "key": ["2023-11-29T07:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 14637,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1203,14 +1033,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T08:00:00.000Z"
-              ],
+              "key": ["2023-11-29T08:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 16187,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1219,14 +1045,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T08:30:00.000Z"
-              ],
+              "key": ["2023-11-29T08:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 16179,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1235,14 +1057,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T09:00:00.000Z"
-              ],
+              "key": ["2023-11-29T09:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 19065,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1251,14 +1069,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T09:30:00.000Z"
-              ],
+              "key": ["2023-11-29T09:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 19059,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1267,14 +1081,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T10:00:00.000Z"
-              ],
+              "key": ["2023-11-29T10:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 19017,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1283,14 +1093,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T10:30:00.000Z"
-              ],
+              "key": ["2023-11-29T10:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 19068,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1299,14 +1105,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T11:00:00.000Z"
-              ],
+              "key": ["2023-11-29T11:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 16129,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1315,14 +1117,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T11:30:00.000Z"
-              ],
+              "key": ["2023-11-29T11:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 16129,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1331,14 +1129,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T12:00:00.000Z"
-              ],
+              "key": ["2023-11-29T12:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 10219,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1347,14 +1141,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T12:30:00.000Z"
-              ],
+              "key": ["2023-11-29T12:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 10295,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1363,14 +1153,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T13:00:00.000Z"
-              ],
+              "key": ["2023-11-29T13:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 13214,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1379,14 +1165,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T13:30:00.000Z"
-              ],
+              "key": ["2023-11-29T13:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 12137,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1398,9 +1180,7 @@
               "key": [],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 738304,
                   "rollup": true,
                   "source": "row-inner"
@@ -1425,9 +1205,7 @@
               "key": [],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 62902,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1449,24 +1227,16 @@
           "id": "6ffb5cda-7534-4eaf-b9fe-5aba76a720dc",
           "rows": [
             {
-              "key": [
-                "windows"
-              ],
+              "key": ["windows"],
               "values": [
                 {
-                  "key": [
-                    "success",
-                    "count()"
-                  ],
+                  "key": ["success", "count()"],
                   "value": 53372,
                   "rollup": false,
                   "source": "col-leaf"
                 },
                 {
-                  "key": [
-                    "failure",
-                    "count()"
-                  ],
+                  "key": ["failure", "count()"],
                   "value": 748,
                   "rollup": false,
                   "source": "col-leaf"
@@ -1475,24 +1245,16 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "PAN"
-              ],
+              "key": ["PAN"],
               "values": [
                 {
-                  "key": [
-                    "success",
-                    "count()"
-                  ],
+                  "key": ["success", "count()"],
                   "value": 5200,
                   "rollup": false,
                   "source": "col-leaf"
                 },
                 {
-                  "key": [
-                    "failure",
-                    "count()"
-                  ],
+                  "key": ["failure", "count()"],
                   "value": 1032,
                   "rollup": false,
                   "source": "col-leaf"
@@ -1501,24 +1263,16 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "CISCO-ASA"
-              ],
+              "key": ["CISCO-ASA"],
               "values": [
                 {
-                  "key": [
-                    "success",
-                    "count()"
-                  ],
+                  "key": ["success", "count()"],
                   "value": 1478,
                   "rollup": false,
                   "source": "col-leaf"
                 },
                 {
-                  "key": [
-                    "failure",
-                    "count()"
-                  ],
+                  "key": ["failure", "count()"],
                   "value": 1031,
                   "rollup": false,
                   "source": "col-leaf"
@@ -1527,24 +1281,16 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "watchguard_firebox"
-              ],
+              "key": ["watchguard_firebox"],
               "values": [
                 {
-                  "key": [
-                    "failure",
-                    "count()"
-                  ],
+                  "key": ["failure", "count()"],
                   "value": 23,
                   "rollup": false,
                   "source": "col-leaf"
                 },
                 {
-                  "key": [
-                    "success",
-                    "count()"
-                  ],
+                  "key": ["success", "count()"],
                   "value": 18,
                   "rollup": false,
                   "source": "col-leaf"
@@ -1566,14 +1312,10 @@
           "id": "55b21db0-c39a-4824-a791-419c62d7c0de",
           "rows": [
             {
-              "key": [
-                "Fortigate"
-              ],
+              "key": ["Fortigate"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 235911,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1582,14 +1324,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "CISCO-ASA"
-              ],
+              "key": ["CISCO-ASA"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 175880,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1598,14 +1336,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "PAN"
-              ],
+              "key": ["PAN"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 175871,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1614,14 +1348,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "windows"
-              ],
+              "key": ["windows"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 150561,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1630,14 +1360,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "watchguard_firebox"
-              ],
+              "key": ["watchguard_firebox"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 41,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1649,9 +1375,7 @@
               "key": [],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 738264,
                   "rollup": true,
                   "source": "row-inner"
@@ -1673,14 +1397,10 @@
           "id": "7d34455e-9680-47b7-b781-7fe648461fa3",
           "rows": [
             {
-              "key": [
-                "URL blocked by malicious-url-list"
-              ],
+              "key": ["URL blocked by malicious-url-list"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 516,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1689,14 +1409,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "W32_EMAILADDRESSPRO_A"
-              ],
+              "key": ["W32_EMAILADDRESSPRO_A"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 206,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1705,14 +1421,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "EICAR_TEST_FILE"
-              ],
+              "key": ["EICAR_TEST_FILE"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 167,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1721,14 +1433,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "MSIL_EMAIL_GQ_TR"
-              ],
+              "key": ["MSIL_EMAIL_GQ_TR"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 159,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1740,9 +1448,7 @@
               "key": [],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 1048,
                   "rollup": true,
                   "source": "row-inner"
@@ -1764,14 +1470,10 @@
           "id": "3a78178a-18c7-48ad-9cfc-b55f4bb3cd73",
           "rows": [
             {
-              "key": [
-                "DEV01"
-              ],
+              "key": ["DEV01"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 235395,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1780,14 +1482,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "acme-vpn-fw1"
-              ],
+              "key": ["acme-vpn-fw1"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 35269,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1796,14 +1494,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "acme-dmzouter-fw2"
-              ],
+              "key": ["acme-dmzouter-fw2"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 35250,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1812,14 +1506,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "acme-dmzinner-fw2"
-              ],
+              "key": ["acme-dmzinner-fw2"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 35187,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1828,14 +1518,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "acme-dmzinner-fw1"
-              ],
+              "key": ["acme-dmzinner-fw1"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 35153,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1844,14 +1530,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "acme-dmzouter-fw1"
-              ],
+              "key": ["acme-dmzouter-fw1"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 35021,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1860,14 +1542,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "DC01.acme.local"
-              ],
+              "key": ["DC01.acme.local"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 10619,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1876,14 +1554,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "DC02.acme.local"
-              ],
+              "key": ["DC02.acme.local"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 10528,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1892,14 +1566,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "DC03.acme.local"
-              ],
+              "key": ["DC03.acme.local"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 10507,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1908,14 +1578,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "DESKTOP-HMVU4PF.testlab.internal"
-              ],
+              "key": ["DESKTOP-HMVU4PF.testlab.internal"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 8820,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1924,14 +1590,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "lbusby-dsktp"
-              ],
+              "key": ["lbusby-dsktp"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 6550,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1940,14 +1602,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "hkline-dsktp"
-              ],
+              "key": ["hkline-dsktp"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 6544,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1956,14 +1614,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "tfarley-dsktp"
-              ],
+              "key": ["tfarley-dsktp"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 6542,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1972,14 +1626,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "abritt-dsktp"
-              ],
+              "key": ["abritt-dsktp"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 6500,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1988,14 +1638,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "tlott-dsktp"
-              ],
+              "key": ["tlott-dsktp"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 6426,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2007,9 +1653,7 @@
               "key": [],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 568625,
                   "rollup": true,
                   "source": "row-inner"
@@ -2031,14 +1675,10 @@
           "id": "de1e5a85-4947-48e2-b8a2-88c99e6133e5",
           "rows": [
             {
-              "key": [
-                "DEV01"
-              ],
+              "key": ["DEV01"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 532,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2047,14 +1687,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "DSD2934LKJH234"
-              ],
+              "key": ["DSD2934LKJH234"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 516,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2063,14 +1699,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "acme-dmzinner-fw2"
-              ],
+              "key": ["acme-dmzinner-fw2"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 114,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2079,14 +1711,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "acme-dmzouter-fw1"
-              ],
+              "key": ["acme-dmzouter-fw1"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 111,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2095,14 +1723,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "acme-dmzinner-fw1"
-              ],
+              "key": ["acme-dmzinner-fw1"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 104,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2111,14 +1735,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "acme-vpn-fw1"
-              ],
+              "key": ["acme-vpn-fw1"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 100,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2127,14 +1747,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "acme-dmzouter-fw2"
-              ],
+              "key": ["acme-dmzouter-fw2"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 86,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2146,9 +1762,7 @@
               "key": [],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 1563,
                   "rollup": true,
                   "source": "row-inner"
@@ -2170,14 +1784,10 @@
           "id": "1af3fa21-0856-4e40-b6bb-d3770c7b405f",
           "rows": [
             {
-              "key": [
-                "lbates"
-              ],
+              "key": ["lbates"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 22,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2186,14 +1796,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "mgray"
-              ],
+              "key": ["mgray"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 22,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2202,14 +1808,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "jduffield"
-              ],
+              "key": ["jduffield"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 21,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2218,14 +1820,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "abritt"
-              ],
+              "key": ["abritt"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 20,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2234,14 +1832,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "dmiranda"
-              ],
+              "key": ["dmiranda"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 20,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2250,14 +1844,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "dbenitez"
-              ],
+              "key": ["dbenitez"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 18,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2266,14 +1856,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "ecantrell"
-              ],
+              "key": ["ecantrell"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 18,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2282,14 +1868,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "hguerra"
-              ],
+              "key": ["hguerra"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 18,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2298,14 +1880,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "tfry"
-              ],
+              "key": ["tfry"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 18,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2314,14 +1892,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "adelarosa"
-              ],
+              "key": ["adelarosa"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 17,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2330,14 +1904,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "lbusby"
-              ],
+              "key": ["lbusby"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 17,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2346,14 +1916,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "amcarthur"
-              ],
+              "key": ["amcarthur"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 16,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2362,14 +1928,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "jdawson"
-              ],
+              "key": ["jdawson"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 16,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2378,14 +1940,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "mcottrell"
-              ],
+              "key": ["mcottrell"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 16,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2394,14 +1952,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "cmcknight"
-              ],
+              "key": ["cmcknight"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 15,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2413,9 +1967,7 @@
               "key": [],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 515,
                   "rollup": true,
                   "source": "row-inner"
@@ -2437,14 +1989,10 @@
           "id": "e8bd4945-b4dd-49ef-83aa-479e638b0957",
           "rows": [
             {
-              "key": [
-                "message"
-              ],
+              "key": ["message"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 248385,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2453,14 +2001,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "network.network connection"
-              ],
+              "key": ["network.network connection"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 177033,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2469,14 +2013,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "authentication.kerberos request"
-              ],
+              "key": ["authentication.kerberos request"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 76474,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2485,14 +2025,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "authentication.logon"
-              ],
+              "key": ["authentication.logon"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 62911,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2501,14 +2037,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "network.default"
-              ],
+              "key": ["network.default"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 60247,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2517,14 +2049,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "network.close"
-              ],
+              "key": ["network.close"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 52228,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2533,14 +2061,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "network.open"
-              ],
+              "key": ["network.open"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 52198,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2549,14 +2073,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "iam.object modify"
-              ],
+              "key": ["iam.object modify"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 35331,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2565,14 +2085,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "authentication.credential validation"
-              ],
+              "key": ["authentication.credential validation"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 10076,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2581,14 +2097,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "authentication.access notice"
-              ],
+              "key": ["authentication.access notice"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 4091,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2597,14 +2109,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "authentication.logoff"
-              ],
+              "key": ["authentication.logoff"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 937,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2613,14 +2121,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "iam.object enable"
-              ],
+              "key": ["iam.object enable"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 736,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2629,14 +2133,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "alert.default"
-              ],
+              "key": ["alert.default"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 532,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2645,14 +2145,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "alert.network alert"
-              ],
+              "key": ["alert.network alert"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 516,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2661,14 +2157,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "process.execute"
-              ],
+              "key": ["process.execute"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 123,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2680,9 +2172,7 @@
               "key": [],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 738264,
                   "rollup": true,
                   "source": "row-inner"
@@ -2707,9 +2197,7 @@
               "key": [],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 1563,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2734,9 +2222,7 @@
               "key": [],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 2959,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2761,9 +2247,7 @@
               "key": [],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 61975,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2788,9 +2272,7 @@
               "key": [],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 1655,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2812,14 +2294,10 @@
           "id": "4a6d4d7e-0cce-48a9-89cb-f2d1fd822c91",
           "rows": [
             {
-              "key": [
-                "Fortigate"
-              ],
+              "key": ["Fortigate"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 1048,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2828,14 +2306,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "CISCO-ASA"
-              ],
+              "key": ["CISCO-ASA"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 515,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2847,9 +2321,7 @@
               "key": [],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 1563,
                   "rollup": true,
                   "source": "row-inner"

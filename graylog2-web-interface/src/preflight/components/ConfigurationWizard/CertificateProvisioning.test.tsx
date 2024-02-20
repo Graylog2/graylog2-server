@@ -61,12 +61,9 @@ describe('CertificateProvisioning', () => {
 
     userEvent.click(await screen.findByRole('button', { name: /provision certificate and continue/i }));
 
-    await waitFor(() => expect(fetch).toHaveBeenCalledWith(
-      'POST',
-      expect.stringContaining('/api/generate'),
-      undefined,
-      false,
-    ));
+    await waitFor(() =>
+      expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/api/generate'), undefined, false),
+    );
 
     expect(UserNotification.success).toHaveBeenCalledWith('Started certificate provisioning successfully');
 
@@ -84,14 +81,13 @@ describe('CertificateProvisioning', () => {
 
     userEvent.click(await screen.findByRole('button', { name: /provision certificate and continue/i }));
 
-    await waitFor(() => expect(fetch).toHaveBeenCalledWith(
-      'POST',
-      expect.stringContaining('/api/generate'),
-      undefined,
-      false,
-    ));
+    await waitFor(() =>
+      expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/api/generate'), undefined, false),
+    );
 
-    expect(UserNotification.error).toHaveBeenCalledWith('Starting certificate provisioning failed with error: Error: Error');
+    expect(UserNotification.error).toHaveBeenCalledWith(
+      'Starting certificate provisioning failed with error: Error: Error',
+    );
 
     await screen.findByRole('button', { name: /provision certificate and continue/i });
   });

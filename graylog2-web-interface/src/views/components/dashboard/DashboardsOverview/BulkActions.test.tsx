@@ -42,9 +42,11 @@ describe('DashboardsOverview BulkActionsRow', () => {
   };
 
   const openActionsDropdown = async () => {
-    userEvent.click(await screen.findByRole('button', {
-      name: /bulk actions/i,
-    }));
+    userEvent.click(
+      await screen.findByRole('button', {
+        name: /bulk actions/i,
+      }),
+    );
 
     await screen.findByRole('menu');
   };
@@ -77,22 +79,22 @@ describe('DashboardsOverview BulkActionsRow', () => {
 
     expect(window.confirm).toHaveBeenCalledWith('Do you really want to remove 2 dashboards?');
 
-    await waitFor(() => expect(fetch).toHaveBeenCalledWith(
-      'POST',
-      expect.stringContaining('/views/bulk_delete'),
-      { entity_ids: ['dashboard-id-1', 'dashboard-id-2'] },
-    ));
+    await waitFor(() =>
+      expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/views/bulk_delete'), {
+        entity_ids: ['dashboard-id-1', 'dashboard-id-2'],
+      }),
+    );
 
     expect(UserNotification.success).toHaveBeenCalledWith('2 dashboards were deleted successfully.', 'Success');
     expect(setSelectedEntities).toHaveBeenCalledWith([]);
   });
 
   it('should display warning and not reset dashboards which could not be deleted', async () => {
-    asMock(fetch).mockReturnValue(Promise.resolve({
-      failures: [
-        { entity_id: 'dashboard-id-1', failure_explanation: 'The dashboard cannot be deleted.' },
-      ],
-    }));
+    asMock(fetch).mockReturnValue(
+      Promise.resolve({
+        failures: [{ entity_id: 'dashboard-id-1', failure_explanation: 'The dashboard cannot be deleted.' }],
+      }),
+    );
 
     const setSelectedEntities = jest.fn();
 
@@ -109,11 +111,11 @@ describe('DashboardsOverview BulkActionsRow', () => {
 
     expect(window.confirm).toHaveBeenCalledWith('Do you really want to remove 2 dashboards?');
 
-    await waitFor(() => expect(fetch).toHaveBeenCalledWith(
-      'POST',
-      expect.stringContaining('/views/bulk_delete'),
-      { entity_ids: ['dashboard-id-1', 'dashboard-id-2'] },
-    ));
+    await waitFor(() =>
+      expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/views/bulk_delete'), {
+        entity_ids: ['dashboard-id-1', 'dashboard-id-2'],
+      }),
+    );
 
     expect(UserNotification.error).toHaveBeenCalledWith('1 out of 2 selected dashboards could not be deleted.');
     expect(setSelectedEntities).toHaveBeenCalledWith(['dashboard-id-1']);

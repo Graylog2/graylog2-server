@@ -21,7 +21,7 @@ import type { Moment } from 'moment';
 import { relativeDifference, adjustFormat } from 'util/DateTime';
 
 type Props = {
-  dateTime?: string | number | Date | Moment,
+  dateTime?: string | number | Date | Moment;
 };
 
 /**

@@ -22,34 +22,34 @@ import { Field, useFormikContext } from 'formik';
 import { Input } from 'components/bootstrap';
 
 type BaseProps = {
-  autoComplete?: string,
-  bsSize?: 'large' | 'small' | 'xsmall',
-  buttonAfter?: React.ReactElement | string,
-  children?: React.ReactNode,
-  disabled?: boolean,
-  error?: React.ReactElement | string,
-  formGroupClassName?: string,
-  help?: React.ReactElement | string,
-  id: string,
-  label?: React.ReactElement | string,
-  labelClassName?: string,
-  maxLength?: number,
-  min?: number,
-  max?: number,
-  minLength?: number,
-  name: string,
-  onChange?: (event: SyntheticEvent<Input>) => void,
-  placeholder?: string,
-  required?: boolean,
-  type?: string,
-  validate?: (arg: string) => string | undefined | null,
-  wrapperClassName?: string,
-  autoFocus?: boolean,
+  autoComplete?: string;
+  bsSize?: 'large' | 'small' | 'xsmall';
+  buttonAfter?: React.ReactElement | string;
+  children?: React.ReactNode;
+  disabled?: boolean;
+  error?: React.ReactElement | string;
+  formGroupClassName?: string;
+  help?: React.ReactElement | string;
+  id: string;
+  label?: React.ReactElement | string;
+  labelClassName?: string;
+  maxLength?: number;
+  min?: number;
+  max?: number;
+  minLength?: number;
+  name: string;
+  onChange?: (event: SyntheticEvent<Input>) => void;
+  placeholder?: string;
+  required?: boolean;
+  type?: string;
+  validate?: (arg: string) => string | undefined | null;
+  wrapperClassName?: string;
+  autoFocus?: boolean;
 };
 
 type TextareaProps = BaseProps & {
-  type: 'textarea',
-  rows?: number
+  type: 'textarea';
+  rows?: number;
 };
 type Props = BaseProps | TextareaProps;
 
@@ -77,14 +77,16 @@ const FormikInput = ({ name, type, help, validate, onChange: propagateOnChange, 
         };
 
         return (
-          <Input {...rest}
-                 {...typeSpecificProps}
-                 onBlur={onBlur}
-                 help={help}
-                 id={name}
-                 error={error}
-                 onChange={_handleChange}
-                 type={type} />
+          <Input
+            {...rest}
+            {...typeSpecificProps}
+            onBlur={onBlur}
+            help={help}
+            id={name}
+            error={error}
+            onChange={_handleChange}
+            type={type}
+          />
         );
       }}
     </Field>
@@ -95,10 +97,7 @@ FormikInput.propTypes = {
   autoComplete: PropTypes.string,
   bsSize: PropTypes.string,
   buttonAfter: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
-  children: PropTypes.oneOfType([
-    PropTypes.array,
-    PropTypes.element,
-  ]),
+  children: PropTypes.oneOfType([PropTypes.array, PropTypes.element]),
   disabled: PropTypes.bool,
   error: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
   formGroupClassName: PropTypes.string,

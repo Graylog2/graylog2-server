@@ -34,29 +34,40 @@ import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldSelect from '../FieldSelect';
 
 type Props = {
-  index: number,
-}
+  index: number;
+};
 
 const Wrapper = styled.div``;
 
-const sortByLabel = ({ label: label1 }: { label: string }, { label: label2 }: { label: string }) => defaultCompare(label1, label2);
+const sortByLabel = ({ label: label1 }: { label: string }, { label: label2 }: { label: string }) =>
+  defaultCompare(label1, label2);
 
 const hasProperty = (fieldType: FieldTypeMapping, properties: Array<Property>) => {
   const fieldProperties = fieldType?.type?.properties ?? Immutable.Set();
 
-  return properties
-    .map((property) => fieldProperties.contains(property))
-    .find((result) => result === false) === undefined;
+  return (
+    properties.map((property) => fieldProperties.contains(property)).find((result) => result === false) === undefined
+  );
 };
 
 const Metric = ({ index }: Props) => {
   const metricFieldSelectRef = useRef(null);
   const { data: functions, isLoading } = useAggregationFunctions();
-  const functionOptions = useMemo(() => (isLoading ? [] : Object.values(functions)
-    .map(({ type, description }) => ({ label: description, value: type }))
-    .sort(sortByLabel)), [functions, isLoading]);
+  const functionOptions = useMemo(
+    () =>
+      isLoading
+        ? []
+        : Object.values(functions)
+            .map(({ type, description }) => ({ label: description, value: type }))
+            .sort(sortByLabel),
+    [functions, isLoading],
+  );
 
-  const { values: { metrics }, errors: { metrics: metricsError }, setFieldValue } = useFormikContext<WidgetConfigFormValues>();
+  const {
+    values: { metrics },
+    errors: { metrics: metricsError },
+    setFieldValue,
+  } = useFormikContext<WidgetConfigFormValues>();
   const currentMetric = metrics[index];
   const currentFunction = currentMetric.function;
 
@@ -65,21 +76,29 @@ const Metric = ({ index }: Props) => {
 
   const isPercentile = currentFunction === 'percentile';
   const isPercentage = currentFunction === 'percentage';
-  const requiresNumericField = (isPercentage && currentMetric.strategy === 'SUM') || !['card', 'count', 'latest', 'percentage'].includes(currentFunction);
+  const requiresNumericField =
+    (isPercentage && currentMetric.strategy === 'SUM') ||
+    !['card', 'count', 'latest', 'percentage'].includes(currentFunction);
 
-  const isFieldQualified = useCallback((field: FieldTypeMapping) => {
-    if (!requiresNumericField) {
-      return true;
-    }
+  const isFieldQualified = useCallback(
+    (field: FieldTypeMapping) => {
+      if (!requiresNumericField) {
+        return true;
+      }
 
-    return hasProperty(field, [Properties.Numeric]);
-  }, [requiresNumericField]);
+      return hasProperty(field, [Properties.Numeric]);
+    },
+    [requiresNumericField],
+  );
 
   const [functionIsSettled, setFunctionIsSettled] = useState<boolean>(false);
-  const onFunctionChange = useCallback((newValue) => {
-    setFieldValue(`metrics.${index}.function`, newValue);
-    setFunctionIsSettled(true);
-  }, [setFieldValue, index]);
+  const onFunctionChange = useCallback(
+    (newValue) => {
+      setFieldValue(`metrics.${index}.function`, newValue);
+      setFunctionIsSettled(true);
+    },
+    [setFieldValue, index],
+  );
 
   useEffect(() => {
     const metricError = getIn(metricsError?.[index], 'field');
@@ -93,59 +112,65 @@ const Metric = ({ index }: Props) => {
     <Wrapper data-testid={`metric-${index}`}>
       <Field name={`metrics.${index}.function`}>
         {({ field: { name, value }, meta: { error } }) => (
-          <Input id="metric-function-select"
-                 label="Function"
-                 error={error}
-                 labelClassName="col-sm-3"
-                 wrapperClassName="col-sm-9">
-            <Select options={functionOptions}
-                    clearable={false}
-                    name={name}
-                    value={value}
-                    aria-label="Select a function"
-                    size="small"
-                    menuPortalTarget={document.body}
-                    onChange={onFunctionChange} />
+          <Input
+            id="metric-function-select"
+            label="Function"
+            error={error}
+            labelClassName="col-sm-3"
+            wrapperClassName="col-sm-9"
+          >
+            <Select
+              options={functionOptions}
+              clearable={false}
+              name={name}
+              value={value}
+              aria-label="Select a function"
+              size="small"
+              menuPortalTarget={document.body}
+              onChange={onFunctionChange}
+            />
           </Input>
         )}
       </Field>
       {hasFieldOption && (
-      <Field name={`metrics.${index}.field`}>
-        {({ field: { name, value, onChange }, meta: { error } }) => (
-          <Input id="metric-field"
-                 label="Field"
-                 error={error}
-                 labelClassName="col-sm-3"
-                 wrapperClassName="col-sm-9">
-            <FieldSelect id="metric-field-select"
-                         selectRef={metricFieldSelectRef}
-                         menuPortalTarget={document.body}
-                         onChange={(fieldName) => onChange({ target: { name, value: fieldName } })}
-                         clearable={!isFieldRequired}
-                         isFieldQualified={isFieldQualified}
-                         name={name}
-                         value={value}
-                         ariaLabel="Select a field" />
-          </Input>
-        )}
-      </Field>
+        <Field name={`metrics.${index}.field`}>
+          {({ field: { name, value, onChange }, meta: { error } }) => (
+            <Input id="metric-field" label="Field" error={error} labelClassName="col-sm-3" wrapperClassName="col-sm-9">
+              <FieldSelect
+                id="metric-field-select"
+                selectRef={metricFieldSelectRef}
+                menuPortalTarget={document.body}
+                onChange={(fieldName) => onChange({ target: { name, value: fieldName } })}
+                clearable={!isFieldRequired}
+                isFieldQualified={isFieldQualified}
+                name={name}
+                value={value}
+                ariaLabel="Select a field"
+              />
+            </Input>
+          )}
+        </Field>
       )}
       {isPercentile && (
         <Field name={`metrics.${index}.percentile`}>
           {({ field: { name, value, onChange }, meta: { error } }) => (
-            <Input id="metric-percentile-select"
-                   label="Percentile"
-                   error={error}
-                   labelClassName="col-sm-3"
-                   wrapperClassName="col-sm-9">
-              <Select options={percentileOptions}
-                      clearable={false}
-                      name={name}
-                      value={value}
-                      aria-label="Select percentile"
-                      size="small"
-                      menuPortalTarget={document.body}
-                      onChange={(newValue) => onChange({ target: { name, value: newValue } })} />
+            <Input
+              id="metric-percentile-select"
+              label="Percentile"
+              error={error}
+              labelClassName="col-sm-3"
+              wrapperClassName="col-sm-9"
+            >
+              <Select
+                options={percentileOptions}
+                clearable={false}
+                name={name}
+                value={value}
+                aria-label="Select percentile"
+                size="small"
+                menuPortalTarget={document.body}
+                onChange={(newValue) => onChange({ target: { name, value: newValue } })}
+              />
             </Input>
           )}
         </Field>
@@ -154,50 +179,64 @@ const Metric = ({ index }: Props) => {
         <>
           <Field name={`metrics.${index}.strategy`}>
             {({ field: { name, value, onChange }, meta: { error } }) => (
-              <Input id="metric-percentage-strategy-select"
-                     label="Strategy"
-                     error={error}
-                     labelClassName="col-sm-3"
-                     wrapperClassName="col-sm-9">
-                <Select options={percentageStrategyOptions}
-                        clearable={false}
-                        name={name}
-                        value={value ?? 'COUNT'}
-                        aria-label="Select strategy"
-                        size="small"
-                        menuPortalTarget={document.body}
-                        onChange={(newValue) => onChange({ target: { name, value: newValue } })} />
+              <Input
+                id="metric-percentage-strategy-select"
+                label="Strategy"
+                error={error}
+                labelClassName="col-sm-3"
+                wrapperClassName="col-sm-9"
+              >
+                <Select
+                  options={percentageStrategyOptions}
+                  clearable={false}
+                  name={name}
+                  value={value ?? 'COUNT'}
+                  aria-label="Select strategy"
+                  size="small"
+                  menuPortalTarget={document.body}
+                  onChange={(newValue) => onChange({ target: { name, value: newValue } })}
+                />
               </Input>
             )}
           </Field>
           <Field name={`metrics.${index}.field`}>
             {({ field: { name, value, onChange }, meta: { error } }) => (
-              <Input id="metric-field"
-                     label="Field"
-                     error={error}
-                     labelClassName="col-sm-3"
-                     wrapperClassName="col-sm-9">
-                <FieldSelect id="metric-field-select"
-                             selectRef={metricFieldSelectRef}
-                             onChange={(fieldName) => onChange({ target: { name, value: fieldName } })}
-                             clearable={!isFieldRequired}
-                             isFieldQualified={isFieldQualified}
-                             name={name}
-                             value={value}
-                             menuPortalTarget={document.body}
-                             ariaLabel="Select a field" />
+              <Input
+                id="metric-field"
+                label="Field"
+                error={error}
+                labelClassName="col-sm-3"
+                wrapperClassName="col-sm-9"
+              >
+                <FieldSelect
+                  id="metric-field-select"
+                  selectRef={metricFieldSelectRef}
+                  onChange={(fieldName) => onChange({ target: { name, value: fieldName } })}
+                  clearable={!isFieldRequired}
+                  isFieldQualified={isFieldQualified}
+                  name={name}
+                  value={value}
+                  menuPortalTarget={document.body}
+                  ariaLabel="Select a field"
+                />
               </Input>
             )}
           </Field>
         </>
       )}
-      <FormikInput id="name"
-                   label={<>Name <Opt /></>}
-                   bsSize="small"
-                   placeholder="Specify display name"
-                   name={`metrics.${index}.name`}
-                   labelClassName="col-sm-3"
-                   wrapperClassName="col-sm-9" />
+      <FormikInput
+        id="name"
+        label={
+          <>
+            Name <Opt />
+          </>
+        }
+        bsSize="small"
+        placeholder="Specify display name"
+        name={`metrics.${index}.name`}
+        labelClassName="col-sm-3"
+        wrapperClassName="col-sm-9"
+      />
     </Wrapper>
   );
 };

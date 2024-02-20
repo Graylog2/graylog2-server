@@ -30,23 +30,23 @@ import { defaultCompare } from 'logic/DefaultCompare';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 
 type Props = {
-  field: FieldTypeMapping,
+  field: FieldTypeMapping;
 };
 
 type ColorPickerProps = {
-  type: string,
+  type: string;
 };
 
 export type StaticColorObject = {
-  type: 'static',
-  color: string,
+  type: 'static';
+  color: string;
 };
 
 export type GradientColorObject = {
-  type: 'gradient',
-  gradient: string,
-  upper: number,
-  lower: number,
+  type: 'gradient';
+  gradient: string;
+  upper: number;
+  lower: number;
 };
 
 export type ColorType = StaticColorObject['type'] | GradientColorObject['type'];
@@ -54,18 +54,18 @@ export type ColorType = StaticColorObject['type'] | GradientColorObject['type'];
 const StaticColorPicker = () => (
   <Field name="color.color">
     {({ field: { name, value, onChange }, meta }) => (
-      <Input id={name}
-             error={meta?.error}
-             label="Color">
-        <ColorPickerPopover id="formatting-rule-color"
-                            placement="right"
-                            color={value}
-                            colors={DEFAULT_CUSTOM_HIGHLIGHT_RANGE.map((c) => [c])}
-                            triggerNode={<ColorPreview color={StaticColor.create(value)} />}
-                            onChange={(newColor, _, hidePopover) => {
-                              hidePopover();
-                              onChange({ target: { name, value: newColor } });
-                            }} />
+      <Input id={name} error={meta?.error} label="Color">
+        <ColorPickerPopover
+          id="formatting-rule-color"
+          placement="right"
+          color={value}
+          colors={DEFAULT_CUSTOM_HIGHLIGHT_RANGE.map((c) => [c])}
+          triggerNode={<ColorPreview color={StaticColor.create(value)} />}
+          onChange={(newColor, _, hidePopover) => {
+            hidePopover();
+            onChange({ target: { name, value: newColor } });
+          }}
+        />
       </Input>
     )}
   </Field>
@@ -74,7 +74,15 @@ const StaticColorPicker = () => (
 const OptionContainer = styled.div`
   display: flex;
 `;
-const createOption = (name) => ({ label: <OptionContainer><GradientColorPreview $gradient={name} />{name}</OptionContainer>, value: name });
+const createOption = (name) => ({
+  label: (
+    <OptionContainer>
+      <GradientColorPreview $gradient={name} />
+      {name}
+    </OptionContainer>
+  ),
+  value: name,
+});
 
 const GRADIENTS = [...COLORSCALES].sort(defaultCompare).map(createOption);
 
@@ -116,40 +124,44 @@ const GradientColorPicker = () => (
       <>
         <Field name="color.gradient">
           {({ field: { name, value, onChange }, meta }) => (
-            <Input id={`${name}-name`}
-                   error={meta?.error}
-                   label="Gradient Name">
-              <Select options={GRADIENTS}
-                      inputProps={{ 'aria-label': 'Select gradient colors' }}
-                      value={value}
-                      onChange={(newGradient) => onChange({ target: { name, value: newGradient } })} />
+            <Input id={`${name}-name`} error={meta?.error} label="Gradient Name">
+              <Select
+                options={GRADIENTS}
+                inputProps={{ 'aria-label': 'Select gradient colors' }}
+                value={value}
+                onChange={(newGradient) => onChange({ target: { name, value: newGradient } })}
+              />
             </Input>
           )}
         </Field>
         <Field name="color.lower">
           {({ field: { name, value, onChange }, meta }) => (
-            <Input id={name}
-                   aria-label="Specify lowest value"
-                   label="Lowest Value"
-                   type="number"
-                   value={value}
-                   error={meta?.error}
-                   onChange={onChange}
-                   help="The lowest value expected in the field/series."
-                   required />
+            <Input
+              id={name}
+              aria-label="Specify lowest value"
+              label="Lowest Value"
+              type="number"
+              value={value}
+              error={meta?.error}
+              onChange={onChange}
+              help="The lowest value expected in the field/series."
+              required
+            />
           )}
         </Field>
         <Field name="color.upper">
           {({ field: { name, value, onChange }, meta }) => (
-            <Input id={name}
-                   aria-label="Specify highest value"
-                   label="Highest Value"
-                   type="number"
-                   value={value}
-                   error={meta?.error}
-                   onChange={onChange}
-                   help="The highest value expected in the field/series."
-                   required />
+            <Input
+              id={name}
+              aria-label="Specify highest value"
+              label="Highest Value"
+              type="number"
+              value={value}
+              error={meta?.error}
+              onChange={onChange}
+              help="The highest value expected in the field/series."
+              required
+            />
           )}
         </Field>
       </>
@@ -159,9 +171,12 @@ const GradientColorPicker = () => (
 
 const ColorForm = ({ type }: ColorPickerProps) => {
   switch (type) {
-    case 'static': return <StaticColorPicker />;
-    case 'gradient': return <GradientColorPicker />;
-    default: return null;
+    case 'static':
+      return <StaticColorPicker />;
+    case 'gradient':
+      return <GradientColorPicker />;
+    default:
+      return null;
   }
 };
 
@@ -169,9 +184,8 @@ const Container = styled.div`
   margin-left: 10px;
 `;
 
-const randomColor = () => DEFAULT_CUSTOM_HIGHLIGHT_RANGE[
-  Math.floor(Math.random() * DEFAULT_CUSTOM_HIGHLIGHT_RANGE.length)
-];
+const randomColor = () =>
+  DEFAULT_CUSTOM_HIGHLIGHT_RANGE[Math.floor(Math.random() * DEFAULT_CUSTOM_HIGHLIGHT_RANGE.length)];
 
 export const createNewColor = (newType: ColorType): StaticColorObject | GradientColorObject => {
   if (newType === 'static') {
@@ -210,34 +224,41 @@ const HighlightingColorForm = ({ field }: Props) => {
 
   const { setFieldValue } = useFormikContext();
 
-  const onChangeType = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const { target: { value: newType } } = e;
-    setFieldValue('color', createNewColor(newType as ColorType));
-  }, [setFieldValue]);
+  const onChangeType = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const {
+        target: { value: newType },
+      } = e;
+      setFieldValue('color', createNewColor(newType as ColorType));
+    },
+    [setFieldValue],
+  );
 
   return (
     <Field name="color.type" validate={(value) => validateColoringType(value, isNumeric)}>
       {({ field: { name, value }, meta }) => (
         <>
-          <Input id={`${name}-coloring`}
-                 label="Coloring"
-                 error={meta?.error}>
+          <Input id={`${name}-coloring`} label="Coloring" error={meta?.error}>
             <Container>
-              <Input checked={value === 'static'}
-                     formGroupClassName=""
-                     id={name}
-                     label="Static Color"
-                     onChange={onChangeType}
-                     type="radio"
-                     value="static" />
-              <Input checked={value === 'gradient'}
-                     formGroupClassName=""
-                     id={name}
-                     disabled={!isNumeric}
-                     label="Gradient"
-                     onChange={onChangeType}
-                     type="radio"
-                     value="gradient" />
+              <Input
+                checked={value === 'static'}
+                formGroupClassName=""
+                id={name}
+                label="Static Color"
+                onChange={onChangeType}
+                type="radio"
+                value="static"
+              />
+              <Input
+                checked={value === 'gradient'}
+                formGroupClassName=""
+                id={name}
+                disabled={!isNumeric}
+                label="Gradient"
+                onChange={onChangeType}
+                type="radio"
+                value="gradient"
+              />
             </Container>
           </Input>
           {value && <ColorForm type={value} />}

@@ -31,34 +31,39 @@ const StyledSelect = styled(Select)`
 `;
 
 type Props = {
-  indexSetId: string,
-  onFieldChange: (param: {
-    fieldName: string,
-    type: string
-  }) => void,
-  field: string,
-}
+  indexSetId: string;
+  onFieldChange: (param: { fieldName: string; type: string }) => void;
+  field: string;
+};
 
 const FieldSelect = ({ indexSetId, onFieldChange, field }: Props) => {
-  const { data: { options, currentTypes }, isLoading } = useIndexSetFieldTypesAll(indexSetId);
+  const {
+    data: { options, currentTypes },
+    isLoading,
+  } = useIndexSetFieldTypesAll(indexSetId);
 
-  const _onFieldChange = useCallback((value: string) => {
-    onFieldChange({ fieldName: value, type: currentTypes?.[value] });
-  }, [currentTypes, onFieldChange]);
+  const _onFieldChange = useCallback(
+    (value: string) => {
+      onFieldChange({ fieldName: value, type: currentTypes?.[value] });
+    },
+    [currentTypes, onFieldChange],
+  );
 
   return (
     <>
       <StyledLabel>Select Field</StyledLabel>
       <Input id="field">
-        <StyledSelect inputId="field"
-                      options={options}
-                      value={field}
-                      onChange={_onFieldChange}
-                      placeholder="Select or type the field"
-                      disabled={isLoading}
-                      inputProps={{ 'aria-label': 'Select Field' }}
-                      required
-                      allowCreate />
+        <StyledSelect
+          inputId="field"
+          options={options}
+          value={field}
+          onChange={_onFieldChange}
+          placeholder="Select or type the field"
+          disabled={isLoading}
+          inputProps={{ 'aria-label': 'Select Field' }}
+          required
+          allowCreate
+        />
       </Input>
     </>
   );

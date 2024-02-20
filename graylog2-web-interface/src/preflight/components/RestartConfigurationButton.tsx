@@ -24,10 +24,10 @@ import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'preflight/util/UserNotification';
 
 type Props = {
-  variant?: string,
-  compact?: boolean,
-  color?: string
-}
+  variant?: string;
+  compact?: boolean;
+  color?: string;
+};
 
 const ResumeStartupButton = ({ variant, compact, color }: Props) => {
   const [isRestartingConfiguration, setIsRestartingConfiguration] = useState(false);
@@ -39,8 +39,7 @@ const ResumeStartupButton = ({ variant, compact, color }: Props) => {
           setIsRestartingConfiguration(true);
         })
         .catch((error) => {
-          UserNotification.error(`Resuming startup failed with error: ${error}`,
-            'Could not resume startup');
+          UserNotification.error(`Resuming startup failed with error: ${error}`, 'Could not resume startup');
         })
         .finally(() => {
           setIsRestartingConfiguration(false);
@@ -49,11 +48,7 @@ const ResumeStartupButton = ({ variant, compact, color }: Props) => {
   }, [setIsRestartingConfiguration]);
 
   return (
-    <Button variant={variant}
-            compact={compact}
-            size="xs"
-            color={color}
-            onClick={onResumeStartup}>
+    <Button variant={variant} compact={compact} size="xs" color={color} onClick={onResumeStartup}>
       {isRestartingConfiguration ? 'restarting...' : 'restart'}
     </Button>
   );

@@ -24,11 +24,13 @@ import { ButtonToolbar } from 'components/bootstrap';
 import type { EntityBase, ExpandedSectionRenderer } from './types';
 import ExpandedEntitiesSectionsContext from './contexts/ExpandedSectionsContext';
 
-const Container = styled.tr(({ theme }) => css`
-  &&&& {
-    background-color: ${theme.colors.global.contentBackground};
-  }
-`);
+const Container = styled.tr(
+  ({ theme }) => css`
+    &&&& {
+      background-color: ${theme.colors.global.contentBackground};
+    }
+  `,
+);
 
 const Header = styled.div`
   display: flex;
@@ -49,10 +51,12 @@ const ExpandedSections = <Entity extends EntityBase>({
   expandedSectionsRenderer,
   entity,
 }: {
-  expandedSectionsRenderer: {
-    [sectionName: string]: ExpandedSectionRenderer<Entity>
-  } | undefined,
-  entity: Entity
+  expandedSectionsRenderer:
+    | {
+        [sectionName: string]: ExpandedSectionRenderer<Entity>;
+      }
+    | undefined;
+  entity: Entity;
 }) => {
   const { expandedSections, toggleSection } = useContext(ExpandedEntitiesSectionsContext);
   const expandedEntitySections = expandedSections?.[entity.id];

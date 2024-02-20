@@ -55,64 +55,78 @@ class EditExtractorConfiguration extends React.Component {
         break;
       case ExtractorUtils.ExtractorTypes.GROK:
         extractorConfiguration = (
-          <GrokExtractorConfiguration configuration={this.props.configuration}
-                                      exampleMessage={this.props.exampleMessage}
-                                      onChange={this.props.onChange}
-                                      onExtractorPreviewLoad={this._onExtractorPreviewLoad} />
+          <GrokExtractorConfiguration
+            configuration={this.props.configuration}
+            exampleMessage={this.props.exampleMessage}
+            onChange={this.props.onChange}
+            onExtractorPreviewLoad={this._onExtractorPreviewLoad}
+          />
         );
 
         break;
       case ExtractorUtils.ExtractorTypes.JSON:
         extractorConfiguration = (
-          <JSONExtractorConfiguration configuration={this.props.configuration}
-                                      exampleMessage={this.props.exampleMessage}
-                                      onChange={this.props.onChange}
-                                      onExtractorPreviewLoad={this._onExtractorPreviewLoad} />
+          <JSONExtractorConfiguration
+            configuration={this.props.configuration}
+            exampleMessage={this.props.exampleMessage}
+            onChange={this.props.onChange}
+            onExtractorPreviewLoad={this._onExtractorPreviewLoad}
+          />
         );
 
         break;
       case ExtractorUtils.ExtractorTypes.REGEX:
         extractorConfiguration = (
-          <RegexExtractorConfiguration configuration={this.props.configuration}
-                                       exampleMessage={this.props.exampleMessage}
-                                       onChange={this.props.onChange}
-                                       onExtractorPreviewLoad={this._onExtractorPreviewLoad} />
+          <RegexExtractorConfiguration
+            configuration={this.props.configuration}
+            exampleMessage={this.props.exampleMessage}
+            onChange={this.props.onChange}
+            onExtractorPreviewLoad={this._onExtractorPreviewLoad}
+          />
         );
 
         break;
       case ExtractorUtils.ExtractorTypes.REGEX_REPLACE:
         extractorConfiguration = (
-          <RegexReplaceExtractorConfiguration configuration={this.props.configuration}
-                                              exampleMessage={this.props.exampleMessage}
-                                              onChange={this.props.onChange}
-                                              onExtractorPreviewLoad={this._onExtractorPreviewLoad} />
+          <RegexReplaceExtractorConfiguration
+            configuration={this.props.configuration}
+            exampleMessage={this.props.exampleMessage}
+            onChange={this.props.onChange}
+            onExtractorPreviewLoad={this._onExtractorPreviewLoad}
+          />
         );
 
         break;
       case ExtractorUtils.ExtractorTypes.SUBSTRING:
         extractorConfiguration = (
-          <SubstringExtractorConfiguration configuration={this.props.configuration}
-                                           exampleMessage={this.props.exampleMessage}
-                                           onChange={this.props.onChange}
-                                           onExtractorPreviewLoad={this._onExtractorPreviewLoad} />
+          <SubstringExtractorConfiguration
+            configuration={this.props.configuration}
+            exampleMessage={this.props.exampleMessage}
+            onChange={this.props.onChange}
+            onExtractorPreviewLoad={this._onExtractorPreviewLoad}
+          />
         );
 
         break;
       case ExtractorUtils.ExtractorTypes.SPLIT_AND_INDEX:
         extractorConfiguration = (
-          <SplitAndIndexExtractorConfiguration configuration={this.props.configuration}
-                                               exampleMessage={this.props.exampleMessage}
-                                               onChange={this.props.onChange}
-                                               onExtractorPreviewLoad={this._onExtractorPreviewLoad} />
+          <SplitAndIndexExtractorConfiguration
+            configuration={this.props.configuration}
+            exampleMessage={this.props.exampleMessage}
+            onChange={this.props.onChange}
+            onExtractorPreviewLoad={this._onExtractorPreviewLoad}
+          />
         );
 
         break;
       case ExtractorUtils.ExtractorTypes.LOOKUP_TABLE:
         extractorConfiguration = (
-          <LookupTableExtractorConfiguration configuration={this.props.configuration}
-                                             exampleMessage={this.props.exampleMessage}
-                                             onChange={this.props.onChange}
-                                             onExtractorPreviewLoad={this._onExtractorPreviewLoad} />
+          <LookupTableExtractorConfiguration
+            configuration={this.props.configuration}
+            exampleMessage={this.props.exampleMessage}
+            onChange={this.props.onChange}
+            onExtractorPreviewLoad={this._onExtractorPreviewLoad}
+          />
         );
 
         break;

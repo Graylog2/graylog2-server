@@ -70,7 +70,9 @@ const JournalDetails = createReactClass({
     const { nodeId } = this.props;
 
     if (this.metricNames) {
-      Object.keys(this.metricNames).forEach((metricShortName) => MetricsActions.remove(nodeId, this.metricNames[metricShortName]));
+      Object.keys(this.metricNames).forEach((metricShortName) =>
+        MetricsActions.remove(nodeId, this.metricNames[metricShortName]),
+      );
     }
   },
 
@@ -89,7 +91,9 @@ const JournalDetails = createReactClass({
         oldestSegment: 'org.graylog2.journal.oldest-segment',
       };
 
-      Object.keys(this.metricNames).forEach((metricShortName) => MetricsActions.add(nodeId, this.metricNames[metricShortName]));
+      Object.keys(this.metricNames).forEach((metricShortName) =>
+        MetricsActions.add(nodeId, this.metricNames[metricShortName]),
+      );
     }
   },
 
@@ -110,21 +114,13 @@ const JournalDetails = createReactClass({
     const { journalInformation } = this.state;
 
     if (!journalInformation.enabled) {
-      return (
-        <Alert bsStyle="warning">
-          The disk journal is disabled on this node.
-        </Alert>
-      );
+      return <Alert bsStyle="warning">The disk journal is disabled on this node.</Alert>;
     }
 
     const metrics = this.metricNames ? MetricsExtractor.getValuesForNode(nodeMetrics, this.metricNames) : {};
 
     if (Object.keys(metrics).length === 0) {
-      return (
-        <Alert bsStyle="warning">
-          Journal metrics unavailable.
-        </Alert>
-      );
+      return <Alert bsStyle="warning">Journal metrics unavailable.</Alert>;
     }
 
     const oldestSegment = moment(metrics.oldestSegment);
@@ -133,8 +129,9 @@ const JournalDetails = createReactClass({
     if (metrics.utilizationRatio >= 1) {
       overcommittedWarning = (
         <span>
-          <strong>Warning!</strong> The journal utilization is exceeding the maximum size defined.
-          {' '}<Link to={Routes.SYSTEM.OVERVIEW}>Click here</Link> for more information.<br />
+          <strong>Warning!</strong> The journal utilization is exceeding the maximum size defined.{' '}
+          <Link to={Routes.SYSTEM.OVERVIEW}>Click here</Link> for more information.
+          <br />
         </span>
       );
     }
@@ -147,32 +144,37 @@ const JournalDetails = createReactClass({
             <dt>Path:</dt>
             <dd>{journalInformation.journal_config.directory}</dd>
             <dt>Earliest entry:</dt>
-            <dd><RelativeTime dateTime={oldestSegment} /></dd>
+            <dd>
+              <RelativeTime dateTime={oldestSegment} />
+            </dd>
             <dt>Maximum size:</dt>
             <dd>{NumberUtils.formatBytes(journalInformation.journal_config.max_size)}</dd>
             <dt>Maximum age:</dt>
-            <dd>{moment.duration(journalInformation.journal_config.max_age).format('d [days] h [hours] m [minutes]')}</dd>
+            <dd>
+              {moment.duration(journalInformation.journal_config.max_age).format('d [days] h [hours] m [minutes]')}
+            </dd>
             <dt>Flush policy:</dt>
             <dd>
-              Every {numeral(journalInformation.journal_config.flush_interval).format('0,0')} messages
-              {' '}or {moment.duration(journalInformation.journal_config.flush_age).format('h [hours] m [minutes] s [seconds]')}
+              Every {numeral(journalInformation.journal_config.flush_interval).format('0,0')} messages or{' '}
+              {moment.duration(journalInformation.journal_config.flush_age).format('h [hours] m [minutes] s [seconds]')}
             </dd>
           </dl>
         </Col>
         <Col md={6}>
           <h3>Utilization</h3>
-
-          <JournalUsageProgressBar bars={[{
-            value: metrics.utilizationRatio * 100,
-            label: NumberUtils.formatPercentage(metrics.utilizationRatio),
-          }]} />
-
+          <JournalUsageProgressBar
+            bars={[
+              {
+                value: metrics.utilizationRatio * 100,
+                label: NumberUtils.formatPercentage(metrics.utilizationRatio),
+              },
+            ]}
+          />
           {overcommittedWarning}
-
-          <strong>{numeral(metrics.entriesUncommitted).format('0,0')} unprocessed messages</strong>
-          {' '}are currently in the journal, in {metrics.segments} segments.<br />
-          <strong>{numeral(metrics.append).format('0,0')} messages</strong>
-          {' '}have been appended in the last second,{' '}
+          <strong>{numeral(metrics.entriesUncommitted).format('0,0')} unprocessed messages</strong> are currently in the
+          journal, in {metrics.segments} segments.
+          <br />
+          <strong>{numeral(metrics.append).format('0,0')} messages</strong> have been appended in the last second,{' '}
           <strong>{numeral(metrics.read).format('0,0')} messages</strong> have been read in the last second.
         </Col>
       </Row>

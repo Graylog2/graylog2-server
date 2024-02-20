@@ -77,31 +77,41 @@ class EventsSearchBar extends React.Component {
       <div className={styles.eventsSearchBar}>
         <div>
           <div className={styles.searchForm}>
-            <SearchForm query={parameters.query}
-                        onSearch={onQueryChange}
-                        placeholder="Find Events"
-                        topMargin={0}
-                        useLoadingState>
+            <SearchForm
+              query={parameters.query}
+              onSearch={onQueryChange}
+              placeholder="Find Events"
+              topMargin={0}
+              useLoadingState
+            >
               <Button onClick={this.handleSearchReload} disabled={isReloadingResults}>
                 <Icon name="sync" spin={isReloadingResults} />
               </Button>
             </SearchForm>
           </div>
 
-          <TimeUnitInput id="event-timerange-selector"
-                         update={this.updateSearchTimeRange}
-                         units={TIME_UNITS}
-                         unit={timeRangeUnit}
-                         value={timeRangeDuration}
-                         clearable
-                         pullRight
-                         required />
+          <TimeUnitInput
+            id="event-timerange-selector"
+            update={this.updateSearchTimeRange}
+            units={TIME_UNITS}
+            unit={timeRangeUnit}
+            value={timeRangeDuration}
+            clearable
+            pullRight
+            required
+          />
         </div>
         <div>
           <ButtonGroup>
-            <Button active={filterAlerts === 'only'} onClick={onAlertFilterChange('only')}>Alerts</Button>
-            <Button active={filterAlerts === 'exclude'} onClick={onAlertFilterChange('exclude')}>Events</Button>
-            <Button active={filterAlerts === 'include'} onClick={onAlertFilterChange('include')}>Both</Button>
+            <Button active={filterAlerts === 'only'} onClick={onAlertFilterChange('only')}>
+              Alerts
+            </Button>
+            <Button active={filterAlerts === 'exclude'} onClick={onAlertFilterChange('exclude')}>
+              Events
+            </Button>
+            <Button active={filterAlerts === 'include'} onClick={onAlertFilterChange('include')}>
+              Both
+            </Button>
           </ButtonGroup>
         </div>
       </div>

@@ -65,29 +65,29 @@ const getPrefixForType = (type: IconTypes) => {
 };
 
 type Props = {
-  className?: string,
-  'data-testid'?: string,
+  className?: string;
+  'data-testid'?: string;
   /** Name of Font Awesome 5 Icon without `fa-` prefix */
-  name: IconName,
-  rotation?: RotateProp,
-  size?: SizeProp,
-  spin?: boolean,
+  name: IconName;
+  rotation?: RotateProp;
+  size?: SizeProp;
+  spin?: boolean;
   /**
    * Name of icon type, the brand type is needed for all brand icons.
    * The type regular is needed to outlined icon.
    * Not all icons can be outlined.
    * */
-  type?: IconTypes,
-  fixedWidth?: boolean,
-  inverse?: boolean,
-  style?: React.CSSProperties,
-  onClick?: (event: React.MouseEvent<SVGSVGElement>) => void,
-  onMouseEnter?: (event: React.MouseEvent<SVGSVGElement>) => void,
-  onMouseLeave?: (event: React.MouseEvent<SVGSVGElement>) => void,
-  onFocus?: (event: React.FocusEvent<SVGSVGElement>) => void,
-  tabIndex?: number,
-  title?: string,
-}
+  type?: IconTypes;
+  fixedWidth?: boolean;
+  inverse?: boolean;
+  style?: React.CSSProperties;
+  onClick?: (event: React.MouseEvent<SVGSVGElement>) => void;
+  onMouseEnter?: (event: React.MouseEvent<SVGSVGElement>) => void;
+  onMouseLeave?: (event: React.MouseEvent<SVGSVGElement>) => void;
+  onFocus?: (event: React.FocusEvent<SVGSVGElement>) => void;
+  tabIndex?: number;
+  title?: string;
+};
 
 /**
  * Component that renders an icon or glyph.
@@ -119,21 +119,23 @@ const Icon = ({
   const prefix = getPrefixForType(type);
 
   return (
-    <CustomFontAwesomeIcon className={className}
-                           data-testid={testId}
-                           fixedWidth={fixedWidth}
-                           icon={{ prefix, iconName }}
-                           inverse={inverse}
-                           rotation={rotation}
-                           size={size}
-                           spin={spin}
-                           style={style}
-                           onClick={onClick}
-                           onMouseEnter={onMouseEnter}
-                           onMouseLeave={onMouseLeave}
-                           tabIndex={tabIndex}
-                           title={title}
-                           onFocus={onFocus} />
+    <CustomFontAwesomeIcon
+      className={className}
+      data-testid={testId}
+      fixedWidth={fixedWidth}
+      icon={{ prefix, iconName }}
+      inverse={inverse}
+      rotation={rotation}
+      size={size}
+      spin={spin}
+      style={style}
+      onClick={onClick}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+      tabIndex={tabIndex}
+      title={title}
+      onFocus={onFocus}
+    />
   );
 };
 

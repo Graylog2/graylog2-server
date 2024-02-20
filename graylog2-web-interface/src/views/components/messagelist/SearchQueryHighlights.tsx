@@ -23,17 +23,19 @@ import { DEFAULT_HIGHLIGHT_COLOR } from 'views/Constants';
 import PossiblyHighlight from '../highlighting/PossiblyHighlight';
 
 type Props = {
-  field: string,
-  value: any,
+  field: string;
+  value: any;
 };
 
 const SearchQueryHighlights = ({ field, value }: Props) => (
   <AdditionalContext.Consumer>
     {({ message }) => (
-      <PossiblyHighlight field={field}
-                         color={DEFAULT_HIGHLIGHT_COLOR}
-                         value={value}
-                         highlightRanges={message?.highlight_ranges} />
+      <PossiblyHighlight
+        field={field}
+        color={DEFAULT_HIGHLIGHT_COLOR}
+        value={value}
+        highlightRanges={message?.highlight_ranges}
+      />
     )}
   </AdditionalContext.Consumer>
 );

@@ -22,23 +22,25 @@ import { Well } from 'components/bootstrap';
 
 import type { TeamsNotificationSummaryType } from '../types';
 
-const NewExampleWell = styled(Well)(({ theme }) => css`
-  margin-bottom: 5px;
-  font-family: ${theme.fonts.family.monospace};
-  font-size: ${theme.fonts.size.body};
-  white-space: pre-wrap;
-  word-wrap: break-word;
-`);
+const NewExampleWell = styled(Well)(
+  ({ theme }) => css`
+    margin-bottom: 5px;
+    font-family: ${theme.fonts.family.monospace};
+    font-size: ${theme.fonts.size.body};
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  `,
+);
 
 const TeamsNotificationDetails: React.FC<TeamsNotificationSummaryType> = ({ notification }) => (
   <>
     <ReadOnlyFormGroup label="Webhook URL" value={notification.config.webhook_url} />
-    <ReadOnlyFormGroup label="Custom Message Template "
-                       value={(
-                         <NewExampleWell bsSize="small">
-                           {notification.config.custom_message || <em>Empty body</em>}
-                         </NewExampleWell>
-                       )} />
+    <ReadOnlyFormGroup
+      label="Custom Message Template "
+      value={
+        <NewExampleWell bsSize="small">{notification.config.custom_message || <em>Empty body</em>}</NewExampleWell>
+      }
+    />
     <ReadOnlyFormGroup label="Message Backlog Limit" value={notification.config.backlog_size} />
     <ReadOnlyFormGroup label="Icon URL" value={notification.config.icon_url} />
     <ReadOnlyFormGroup label="Time Zone" value={notification.config.time_zone} />

@@ -22,18 +22,16 @@ import UserNotification from 'util/UserNotification';
 import { fetchPeriodically } from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
 
-export const SidecarsAdministrationActions = singletonActions(
-  'core.SidecarsAdministration',
-  () => Reflux.createActions({
+export const SidecarsAdministrationActions = singletonActions('core.SidecarsAdministration', () =>
+  Reflux.createActions({
     list: { asyncResult: true },
     refreshList: { asyncResult: true },
     setAction: { asyncResult: true },
   }),
 );
 
-export const SidecarsAdministrationStore = singletonStore(
-  'core.SidecarsAdministration',
-  () => Reflux.createStore({
+export const SidecarsAdministrationStore = singletonStore('core.SidecarsAdministration', () =>
+  Reflux.createStore({
     listenables: [SidecarsAdministrationActions],
     sourceUrl: '/sidecar',
     sidecars: undefined,
@@ -92,8 +90,10 @@ export const SidecarsAdministrationStore = singletonStore(
           return response;
         },
         (error) => {
-          UserNotification.error(error.status === 400 ? error.responseMessage : `Fetching Sidecars failed with status: ${error.message}`,
-            'Could not retrieve Sidecars');
+          UserNotification.error(
+            error.status === 400 ? error.responseMessage : `Fetching Sidecars failed with status: ${error.message}`,
+            'Could not retrieve Sidecars',
+          );
         },
       );
 
@@ -101,7 +101,12 @@ export const SidecarsAdministrationStore = singletonStore(
     },
 
     refreshList() {
-      this.list({ query: this.query, page: this.pagination.page, pageSize: this.pagination.pageSize, filters: this.filters });
+      this.list({
+        query: this.query,
+        page: this.pagination.page,
+        pageSize: this.pagination.pageSize,
+        filters: this.filters,
+      });
     },
 
     setAction(action, collectors) {
@@ -124,8 +129,7 @@ export const SidecarsAdministrationStore = singletonStore(
           return response;
         },
         (error) => {
-          UserNotification.error(`Requesting ${action} failed with status: ${error}`,
-            `Could not ${action} collectors`);
+          UserNotification.error(`Requesting ${action} failed with status: ${error}`, `Could not ${action} collectors`);
         },
       );
 

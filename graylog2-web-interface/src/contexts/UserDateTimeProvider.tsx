@@ -24,8 +24,8 @@ import type { DateTime, DateTimeFormats } from 'util/DateTime';
 import { DATE_TIME_FORMATS, getBrowserTimezone, toDateObject } from 'util/DateTime';
 
 type Props = {
-  children: React.ReactNode,
-  tz?: string,
+  children: React.ReactNode;
+  tz?: string;
 };
 
 const getUserTimezone = (userTimezone: string, tzOverride?: string) => {
@@ -49,43 +49,32 @@ const getUserTimezone = (userTimezone: string, tzOverride?: string) => {
 const StaticTimezoneProvider = ({ children, tz }: Required<Props>) => {
   const toUserTimezone = useCallback((time: DateTime) => toDateObject(time, undefined, tz), [tz]);
 
-  const formatTime = useCallback((time: DateTime, format: DateTimeFormats = 'default') => toUserTimezone(time).format(DATE_TIME_FORMATS[format]), [toUserTimezone]);
+  const formatTime = useCallback(
+    (time: DateTime, format: DateTimeFormats = 'default') => toUserTimezone(time).format(DATE_TIME_FORMATS[format]),
+    [toUserTimezone],
+  );
 
   const contextValue = useMemo(
     () => ({ toUserTimezone, formatTime, userTimezone: tz }),
     [toUserTimezone, formatTime, tz],
   );
 
-  return (
-    <UserDateTimeContext.Provider value={contextValue}>
-      {children}
-    </UserDateTimeContext.Provider>
-  );
+  return <UserDateTimeContext.Provider value={contextValue}>{children}</UserDateTimeContext.Provider>;
 };
 
 const CurrentUserDateTimeProvider = ({ children }: Omit<Props, 'tz'>) => {
   const currentUser = useCurrentUser();
   const userTimezone = useMemo(() => getUserTimezone(currentUser?.timezone), [currentUser?.timezone]);
 
-  return (
-    <StaticTimezoneProvider tz={userTimezone}>
-      {children}
-    </StaticTimezoneProvider>
-  );
+  return <StaticTimezoneProvider tz={userTimezone}>{children}</StaticTimezoneProvider>;
 };
 
-const UserDateTimeProvider = ({ children, tz: tzOverride }: Props) => (tzOverride
-  ? (
-    <StaticTimezoneProvider tz={tzOverride}>
-      {children}
-    </StaticTimezoneProvider>
-  )
-  : (
-    <CurrentUserDateTimeProvider>
-      {children}
-    </CurrentUserDateTimeProvider>
-  )
-);
+const UserDateTimeProvider = ({ children, tz: tzOverride }: Props) =>
+  tzOverride ? (
+    <StaticTimezoneProvider tz={tzOverride}>{children}</StaticTimezoneProvider>
+  ) : (
+    <CurrentUserDateTimeProvider>{children}</CurrentUserDateTimeProvider>
+  );
 
 UserDateTimeProvider.defaultProps = {
   tz: undefined,

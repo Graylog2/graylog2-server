@@ -24,34 +24,38 @@ import { Input } from 'components/bootstrap';
 import { Select } from 'components/common';
 
 type Props = {
-  dataAdapters: LookupTableAdapter[],
-}
+  dataAdapters: LookupTableAdapter[];
+};
 
-const DataAdapterPicker = ({
-  dataAdapters,
-}: Props) => {
+const DataAdapterPicker = ({ dataAdapters }: Props) => {
   const [, { value, touched, error }, { setTouched, setValue }] = useField('data_adapter_id');
-  const sortedAdapters = dataAdapters.map((adapter: LookupTableAdapter) => ({ value: adapter.id, label: `${adapter.title} (${adapter.name})` })).sort((a, b) => naturalSort(a.label.toLowerCase(), b.label.toLowerCase()));
+  const sortedAdapters = dataAdapters
+    .map((adapter: LookupTableAdapter) => ({ value: adapter.id, label: `${adapter.title} (${adapter.name})` }))
+    .sort((a, b) => naturalSort(a.label.toLowerCase(), b.label.toLowerCase()));
 
   const errorMessage = touched ? error : '';
 
   return (
     <fieldset>
-      <Input id="data-adapter-select"
-             label="Data Adapter"
-             required
-             autoFocus
-             bsStyle={errorMessage ? 'error' : undefined}
-             help={errorMessage || 'Select an existing data adapter'}
-             labelClassName="col-sm-3"
-             wrapperClassName="col-sm-9">
-        <Select placeholder="Select a data adapter"
-                clearable={false}
-                options={sortedAdapters}
-                matchProp="label"
-                onBlur={() => setTouched(true)}
-                onChange={setValue}
-                value={value} />
+      <Input
+        id="data-adapter-select"
+        label="Data Adapter"
+        required
+        autoFocus
+        bsStyle={errorMessage ? 'error' : undefined}
+        help={errorMessage || 'Select an existing data adapter'}
+        labelClassName="col-sm-3"
+        wrapperClassName="col-sm-9"
+      >
+        <Select
+          placeholder="Select a data adapter"
+          clearable={false}
+          options={sortedAdapters}
+          matchProp="label"
+          onBlur={() => setTouched(true)}
+          onChange={setValue}
+          value={value}
+        />
       </Input>
     </fieldset>
   );

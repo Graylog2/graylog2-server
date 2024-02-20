@@ -32,9 +32,8 @@ const ExecutionInfo = () => {
 
   return (
     <i>
-      Query executed in{' '}
-      {numeral(result?.duration).format('0,0')}ms at <Timestamp dateTime={result?.timestamp} />
-      {' '}Total results: {numeral(total).format('0,0')}
+      Query executed in {numeral(result?.duration).format('0,0')}ms at <Timestamp dateTime={result?.timestamp} /> Total
+      results: {numeral(total).format('0,0')}
     </i>
   );
 };

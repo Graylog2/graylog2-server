@@ -41,8 +41,7 @@ const extendedTimeout = applyTimeoutMultiplier(15000);
 
 jest.mock('views/hooks/useActiveQueryId');
 
-const widgetConfig = AggregationWidgetConfig
-  .builder()
+const widgetConfig = AggregationWidgetConfig.builder()
   .visualization(DataTable.type)
   .visualizationConfig(DataTableVisualizationConfig.empty())
   .build();
@@ -85,26 +84,30 @@ const expectedPivotConfig = { skip_empty_values: undefined, limit: 15 };
 describe('AggregationWizard', () => {
   type Props = Partial<React.ComponentProps<typeof AggregationWizard>> & {
     fieldTypesList?: {
-      all: FieldTypeMappingsList
-      queryFields: Map<string, FieldTypeMappingsList>,
-    }
-  }
+      all: FieldTypeMappingsList;
+      queryFields: Map<string, FieldTypeMappingsList>;
+    };
+  };
 
-  const renderSUT = ({ fieldTypesList = fieldTypes, ...props }: Props = {}) => render(
-    <FieldTypesContext.Provider value={fieldTypesList}>
-      <AggregationWizard config={widgetConfig}
-                         editing
-                         id="widget-id"
-                         type="AGGREGATION"
-                         onSubmit={() => {}}
-                         onCancel={() => {}}
-                         fields={Immutable.List([])}
-                         onChange={() => {}}
-                         {...props}>
-        <span>The Visualization</span>
-      </AggregationWizard>,
-    </FieldTypesContext.Provider>,
-  );
+  const renderSUT = ({ fieldTypesList = fieldTypes, ...props }: Props = {}) =>
+    render(
+      <FieldTypesContext.Provider value={fieldTypesList}>
+        <AggregationWizard
+          config={widgetConfig}
+          editing
+          id="widget-id"
+          type="AGGREGATION"
+          onSubmit={() => {}}
+          onCancel={() => {}}
+          fields={Immutable.List([])}
+          onChange={() => {}}
+          {...props}
+        >
+          <span>The Visualization</span>
+        </AggregationWizard>
+        ,
+      </FieldTypesContext.Provider>,
+    );
 
   beforeAll(() => PluginStore.register(plugin));
 
@@ -114,304 +117,307 @@ describe('AggregationWizard', () => {
     asMock(useActiveQueryId).mockReturnValue('queryId');
   });
 
-  it('should require group by function when adding a group by element', async () => {
-    renderSUT();
+  it(
+    'should require group by function when adding a group by element',
+    async () => {
+      renderSUT();
+
+      await addElement('Grouping');
+
+      await screen.findByText('Field is required.');
+    },
+    extendedTimeout,
+  );
+
+  it(
+    'should add pivot to widget config',
+    async () => {
+      const onChange = jest.fn();
+      renderSUT({ onChange });
+
+      await addElement('Grouping');
+      await selectField('took_ms');
 
-    await addElement('Grouping');
+      await screen.findByText('took_ms');
+      await submitWidgetConfigForm();
 
-    await screen.findByText('Field is required.');
-  }, extendedTimeout);
+      const pivot = Pivot.createValues(['took_ms'], expectedPivotConfig);
+      const updatedConfig = widgetConfig.toBuilder().rowPivots([pivot]).build();
 
-  it('should add pivot to widget config', async () => {
-    const onChange = jest.fn();
-    renderSUT({ onChange });
+      await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1));
 
-    await addElement('Grouping');
-    await selectField('took_ms');
+      expect(onChange).toHaveBeenCalledWith(updatedConfig);
+    },
+    extendedTimeout,
+  );
+
+  it(
+    'should update config, even when field only exists for current query',
+    async () => {
+      const onChange = jest.fn();
+      const queryFieldTypeMapping = new FieldTypeMapping('status_code', fieldType);
+      const queryFields = Immutable.List([queryFieldTypeMapping]);
+      renderSUT({ onChange, fieldTypesList: { all: fields, queryFields: Immutable.Map({ queryId: queryFields }) } });
+
+      await addElement('Grouping');
+      await selectField('status_code');
+      await screen.findByText('status_code');
+      await submitWidgetConfigForm();
 
-    await screen.findByText('took_ms');
-    await submitWidgetConfigForm();
+      const pivot = Pivot.createValues(['status_code'], expectedPivotConfig);
+      const updatedConfig = widgetConfig.toBuilder().rowPivots([pivot]).build();
 
-    const pivot = Pivot.createValues(['took_ms'], expectedPivotConfig);
-    const updatedConfig = widgetConfig
-      .toBuilder()
-      .rowPivots([pivot])
-      .build();
+      await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1));
 
-    await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1));
+      expect(onChange).toHaveBeenCalledWith(updatedConfig);
+    },
+    extendedTimeout,
+  );
 
-    expect(onChange).toHaveBeenCalledWith(updatedConfig);
-  }, extendedTimeout);
+  it(
+    'should not throw an error when field in config no longer exists in field types list.',
+    async () => {
+      const onChange = jest.fn();
+      const pivot = Pivot.createValues(['status_code']);
+      const initialConfig = widgetConfig.toBuilder().rowPivots([pivot]).build();
 
-  it('should update config, even when field only exists for current query', async () => {
-    const onChange = jest.fn();
-    const queryFieldTypeMapping = new FieldTypeMapping('status_code', fieldType);
-    const queryFields = Immutable.List([queryFieldTypeMapping]);
-    renderSUT({ onChange, fieldTypesList: { all: fields, queryFields: Immutable.Map({ queryId: queryFields }) } });
+      renderSUT({
+        onChange,
+        fieldTypesList: { all: Immutable.List([]), queryFields: Immutable.Map({ queryId: Immutable.List([]) }) },
+        config: initialConfig,
+      });
 
-    await addElement('Grouping');
-    await selectField('status_code');
-    await screen.findByText('status_code');
-    await submitWidgetConfigForm();
+      await screen.findByRole('button', { name: /update preview/i });
+    },
+    extendedTimeout,
+  );
 
-    const pivot = Pivot.createValues(['status_code'], expectedPivotConfig);
-    const updatedConfig = widgetConfig
-      .toBuilder()
-      .rowPivots([pivot])
-      .build();
+  it(
+    'should add multiple pivots to widget',
+    async () => {
+      const onChange = jest.fn();
+      renderSUT({ onChange });
 
-    await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1));
+      await addElement('Grouping');
+      await selectField('timestamp');
+      await addElement('Grouping');
+      await selectField('took_ms', 1);
 
-    expect(onChange).toHaveBeenCalledWith(updatedConfig);
-  }, extendedTimeout);
+      await screen.findByRole('checkbox', { name: 'Auto' });
 
-  it('should not throw an error when field in config no longer exists in field types list.', async () => {
-    const onChange = jest.fn();
-    const pivot = Pivot.createValues(['status_code']);
-    const initialConfig = widgetConfig
-      .toBuilder()
-      .rowPivots([pivot])
-      .build();
+      await submitWidgetConfigForm();
 
-    renderSUT({
-      onChange,
-      fieldTypesList: { all: Immutable.List([]), queryFields: Immutable.Map({ queryId: Immutable.List([]) }) },
-      config: initialConfig,
-    });
+      const pivot0 = Pivot.create(['timestamp'], 'time', { interval: { type: 'auto', scaling: 1 } });
+      const pivot1 = Pivot.createValues(['took_ms'], expectedPivotConfig);
+      const updatedConfig = widgetConfig.toBuilder().rowPivots([pivot0, pivot1]).build();
 
-    await screen.findByRole('button', { name: /update preview/i });
-  }, extendedTimeout);
+      await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1));
 
-  it('should add multiple pivots to widget', async () => {
-    const onChange = jest.fn();
-    renderSUT({ onChange });
+      expect(onChange).toHaveBeenCalledWith(updatedConfig);
+    },
+    extendedTimeout,
+  );
 
-    await addElement('Grouping');
-    await selectField('timestamp');
-    await addElement('Grouping');
-    await selectField('took_ms', 1);
+  it(
+    'should add pivot with type "date" to widget when adding time field',
+    async () => {
+      const pivot = Pivot.create(['timestamp'], 'time', { interval: { type: 'timeunit', unit: 'minutes', value: 1 } });
+      const onChange = jest.fn();
+      renderSUT({ onChange });
 
-    await screen.findByRole('checkbox', { name: 'Auto' });
+      await addElement('Grouping');
+      await selectField('timestamp');
 
-    await submitWidgetConfigForm();
+      const autoCheckbox = await screen.findByRole('checkbox', { name: 'Auto' });
+      await screen.findByRole('slider', { name: /interval/i });
 
-    const pivot0 = Pivot.create(['timestamp'], 'time', { interval: { type: 'auto', scaling: 1 } });
-    const pivot1 = Pivot.createValues(['took_ms'], expectedPivotConfig);
-    const updatedConfig = widgetConfig
-      .toBuilder()
-      .rowPivots([pivot0, pivot1])
-      .build();
+      await userEvent.click(autoCheckbox);
 
-    await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1));
+      await screen.findByRole('button', { name: /minutes/i });
 
-    expect(onChange).toHaveBeenCalledWith(updatedConfig);
-  }, extendedTimeout);
+      await submitWidgetConfigForm();
 
-  it('should add pivot with type "date" to widget when adding time field', async () => {
-    const pivot = Pivot.create(['timestamp'], 'time', { interval: { type: 'timeunit', unit: 'minutes', value: 1 } });
-    const onChange = jest.fn();
-    renderSUT({ onChange });
+      const updatedConfig = widgetConfig.toBuilder().rowPivots([pivot]).build();
 
-    await addElement('Grouping');
-    await selectField('timestamp');
+      await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1));
 
-    const autoCheckbox = await screen.findByRole('checkbox', { name: 'Auto' });
-    await screen.findByRole('slider', { name: /interval/i });
+      expect(onChange).toHaveBeenCalledWith(updatedConfig);
+    },
+    extendedTimeout,
+  );
 
-    await userEvent.click(autoCheckbox);
+  it(
+    'should add multiple fields to one pivot',
+    async () => {
+      const initialPivot = Pivot.createValues(['took_ms']);
+      const updatedPivot = Pivot.createValues(['took_ms', 'http_method']);
+      const config = widgetConfig.toBuilder().rowPivots([initialPivot]).build();
 
-    await screen.findByRole('button', { name: /minutes/i });
+      const onChange = jest.fn();
+      renderSUT({ onChange, config });
 
-    await submitWidgetConfigForm();
+      await screen.findByText('took_ms');
+      await selectField('http_method', 0, 'Add another field');
+      await submitWidgetConfigForm();
 
-    const updatedConfig = widgetConfig
-      .toBuilder()
-      .rowPivots([pivot])
-      .build();
+      const updatedConfig = widgetConfig.toBuilder().rowPivots([updatedPivot]).build();
 
-    await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1));
+      await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1));
 
-    expect(onChange).toHaveBeenCalledWith(updatedConfig);
-  }, extendedTimeout);
+      expect(onChange).toHaveBeenCalledWith(updatedConfig);
+    },
+    extendedTimeout,
+  );
 
-  it('should add multiple fields to one pivot', async () => {
-    const initialPivot = Pivot.createValues(['took_ms']);
-    const updatedPivot = Pivot.createValues(['took_ms', 'http_method']);
-    const config = widgetConfig
-      .toBuilder()
-      .rowPivots([initialPivot])
-      .build();
+  it(
+    'should save pivot with type "values" when adding date and values field',
+    async () => {
+      const initialPivot = Pivot.createValues(['took_ms']);
+      const updatedPivot = Pivot.createValues(['took_ms', 'timestamp']);
+      const config = widgetConfig.toBuilder().rowPivots([initialPivot]).build();
 
-    const onChange = jest.fn();
-    renderSUT({ onChange, config });
+      const onChange = jest.fn();
+      renderSUT({ onChange, config });
 
-    await screen.findByText('took_ms');
-    await selectField('http_method', 0, 'Add another field');
-    await submitWidgetConfigForm();
+      await screen.findByText('took_ms');
+      await selectField('timestamp', 0, 'Add another field');
+      await submitWidgetConfigForm();
 
-    const updatedConfig = widgetConfig
-      .toBuilder()
-      .rowPivots([updatedPivot])
-      .build();
+      const updatedConfig = widgetConfig.toBuilder().rowPivots([updatedPivot]).build();
 
-    await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1));
+      await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1));
 
-    expect(onChange).toHaveBeenCalledWith(updatedConfig);
-  }, extendedTimeout);
+      expect(onChange).toHaveBeenCalledWith(updatedConfig);
+    },
+    extendedTimeout,
+  );
 
-  it('should save pivot with type "values" when adding date and values field', async () => {
-    const initialPivot = Pivot.createValues(['took_ms']);
-    const updatedPivot = Pivot.createValues(['took_ms', 'timestamp']);
-    const config = widgetConfig
-      .toBuilder()
-      .rowPivots([initialPivot])
-      .build();
+  it(
+    'should display limit field when all fields of a grouping have been removed',
+    async () => {
+      const pivot = Pivot.create(['timestamp'], 'time', { interval: { type: 'timeunit', unit: 'minutes', value: 1 } });
+      const config = widgetConfig.toBuilder().rowPivots([pivot]).build();
+      renderSUT({ config });
 
-    const onChange = jest.fn();
-    renderSUT({ onChange, config });
+      const deleteFieldButton = await screen.findByRole('button', { name: /remove timestamp field/i });
 
-    await screen.findByText('took_ms');
-    await selectField('timestamp', 0, 'Add another field');
-    await submitWidgetConfigForm();
+      userEvent.click(deleteFieldButton);
 
-    const updatedConfig = widgetConfig
-      .toBuilder()
-      .rowPivots([updatedPivot])
-      .build();
+      await screen.findByLabelText('Limit');
+    },
+    extendedTimeout,
+  );
 
-    await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1));
+  it(
+    'should display groupings with values from config',
+    async () => {
+      const pivot0 = Pivot.create(['timestamp'], 'time', { interval: { type: 'auto', scaling: 1 } });
+      const pivot1 = Pivot.createValues(['took_ms']);
+      const config = widgetConfig.toBuilder().rowPivots([pivot0, pivot1]).build();
 
-    expect(onChange).toHaveBeenCalledWith(updatedConfig);
-  }, extendedTimeout);
+      renderSUT({ config });
 
-  it('should display limit field when all fields of a grouping have been removed', async () => {
-    const pivot = Pivot.create(['timestamp'], 'time', { interval: { type: 'timeunit', unit: 'minutes', value: 1 } });
-    const config = widgetConfig
-      .toBuilder()
-      .rowPivots([pivot])
-      .build();
-    renderSUT({ config });
+      await screen.findByText('took_ms');
+      await screen.findByText('timestamp');
+    },
+    extendedTimeout,
+  );
 
-    const deleteFieldButton = await screen.findByRole('button', { name: /remove timestamp field/i });
+  it(
+    'should remove all groupings',
+    async () => {
+      const pivot = Pivot.createValues(['took_ms']);
+      const config = widgetConfig.toBuilder().rowPivots([pivot]).build();
+      const onChangeMock = jest.fn();
+      renderSUT({ config, onChange: onChangeMock });
 
-    userEvent.click(deleteFieldButton);
+      const removeGroupingElementButton = screen.getByRole('button', { name: 'Remove Grouping' });
+      userEvent.click(removeGroupingElementButton);
 
-    await screen.findByLabelText('Limit');
-  }, extendedTimeout);
+      await submitWidgetConfigForm();
 
-  it('should display groupings with values from config', async () => {
-    const pivot0 = Pivot.create(['timestamp'], 'time', { interval: { type: 'auto', scaling: 1 } });
-    const pivot1 = Pivot.createValues(['took_ms']);
-    const config = widgetConfig
-      .toBuilder()
-      .rowPivots([pivot0, pivot1])
-      .build();
+      const updatedConfig = widgetConfig.toBuilder().rowPivots([]).build();
 
-    renderSUT({ config });
+      await waitFor(() => expect(onChangeMock).toHaveBeenCalledTimes(1));
 
-    await screen.findByText('took_ms');
-    await screen.findByText('timestamp');
-  }, extendedTimeout);
+      expect(onChangeMock).toHaveBeenCalledWith(updatedConfig);
+    },
+    extendedTimeout,
+  );
 
-  it('should remove all groupings', async () => {
-    const pivot = Pivot.createValues(['took_ms']);
-    const config = widgetConfig
-      .toBuilder()
-      .rowPivots([pivot])
-      .build();
-    const onChangeMock = jest.fn();
-    renderSUT({ config, onChange: onChangeMock });
+  it(
+    'should display group by section even if config has no pivots',
+    async () => {
+      const config = widgetConfig.toBuilder().build();
 
-    const removeGroupingElementButton = screen.getByRole('button', { name: 'Remove Grouping' });
-    userEvent.click(removeGroupingElementButton);
+      renderSUT({ config });
 
-    await submitWidgetConfigForm();
+      const configureElementsSection = await screen.findByTestId('configure-elements-section');
 
-    const updatedConfig = widgetConfig
-      .toBuilder()
-      .rowPivots([])
-      .build();
+      expect(within(configureElementsSection).getByText('Group By')).toBeInTheDocument();
+    },
+    extendedTimeout,
+  );
 
-    await waitFor(() => expect(onChangeMock).toHaveBeenCalledTimes(1));
+  it(
+    'should correctly update sort of groupings',
+    async () => {
+      const pivot0 = Pivot.create(['timestamp'], 'time', { interval: { type: 'auto', scaling: 1 } });
+      const pivot1 = Pivot.createValues(['took_ms']);
+      const config = widgetConfig.toBuilder().rowPivots([pivot0, pivot1]).build();
 
-    expect(onChangeMock).toHaveBeenCalledWith(updatedConfig);
-  }, extendedTimeout);
+      const onChange = jest.fn();
+      renderSUT({ onChange, config });
 
-  it('should display group by section even if config has no pivots', async () => {
-    const config = widgetConfig
-      .toBuilder()
-      .build();
+      const groupBySection = await screen.findByTestId('Group By-section');
 
-    renderSUT({ config });
+      const firstItem = within(groupBySection).getByTestId('grouping-0-drag-handle');
+      fireEvent.keyDown(firstItem, { key: 'Space', keyCode: 32 });
+      await screen.findByText(/You have lifted an item/i);
+      fireEvent.keyDown(firstItem, { key: 'ArrowDown', keyCode: 40 });
+      await screen.findByText(/You have moved the item/i);
+      fireEvent.keyDown(firstItem, { key: 'Space', keyCode: 32 });
+      await screen.findByText(/You have dropped the item/i);
 
-    const configureElementsSection = await screen.findByTestId('configure-elements-section');
+      await submitWidgetConfigForm();
 
-    expect(within(configureElementsSection).getByText('Group By')).toBeInTheDocument();
-  }, extendedTimeout);
+      const updatedConfig = widgetConfig.toBuilder().rowPivots([pivot1, pivot0]).build();
 
-  it('should correctly update sort of groupings', async () => {
-    const pivot0 = Pivot.create(['timestamp'], 'time', { interval: { type: 'auto', scaling: 1 } });
-    const pivot1 = Pivot.createValues(['took_ms']);
-    const config = widgetConfig
-      .toBuilder()
-      .rowPivots([pivot0, pivot1])
-      .build();
+      await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1));
 
-    const onChange = jest.fn();
-    renderSUT({ onChange, config });
+      expect(onChange).toHaveBeenCalledWith(updatedConfig);
+    },
+    extendedTimeout,
+  );
 
-    const groupBySection = await screen.findByTestId('Group By-section');
+  it(
+    'should correctly update sort of grouping fields',
+    async () => {
+      const initialPivot = Pivot.createValues(['http_method', 'took_ms']);
+      const updatedPivot = Pivot.createValues(['took_ms', 'http_method']);
+      const config = widgetConfig.toBuilder().rowPivots([initialPivot]).build();
 
-    const firstItem = within(groupBySection).getByTestId('grouping-0-drag-handle');
-    fireEvent.keyDown(firstItem, { key: 'Space', keyCode: 32 });
-    await screen.findByText(/You have lifted an item/i);
-    fireEvent.keyDown(firstItem, { key: 'ArrowDown', keyCode: 40 });
-    await screen.findByText(/You have moved the item/i);
-    fireEvent.keyDown(firstItem, { key: 'Space', keyCode: 32 });
-    await screen.findByText(/You have dropped the item/i);
+      const onChange = jest.fn();
+      renderSUT({ onChange, config });
 
-    await submitWidgetConfigForm();
+      const groupBySection = await screen.findByTestId('Group By-section');
 
-    const updatedConfig = widgetConfig
-      .toBuilder()
-      .rowPivots([pivot1, pivot0])
-      .build();
+      const firstItem = within(groupBySection).getByTestId('grouping-0-field-0-drag-handle');
+      fireEvent.keyDown(firstItem, { key: 'Space', keyCode: 32 });
+      await screen.findByText(/You have lifted an item/i);
+      fireEvent.keyDown(firstItem, { key: 'ArrowDown', keyCode: 40 });
+      await screen.findByText(/You have moved the item/i);
+      fireEvent.keyDown(firstItem, { key: 'Space', keyCode: 32 });
+      await screen.findByText(/You have dropped the item/i);
 
-    await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1));
+      await submitWidgetConfigForm();
 
-    expect(onChange).toHaveBeenCalledWith(updatedConfig);
-  }, extendedTimeout);
+      const updatedConfig = widgetConfig.toBuilder().rowPivots([updatedPivot]).build();
 
-  it('should correctly update sort of grouping fields', async () => {
-    const initialPivot = Pivot.createValues(['http_method', 'took_ms']);
-    const updatedPivot = Pivot.createValues(['took_ms', 'http_method']);
-    const config = widgetConfig
-      .toBuilder()
-      .rowPivots([initialPivot])
-      .build();
+      await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1));
 
-    const onChange = jest.fn();
-    renderSUT({ onChange, config });
-
-    const groupBySection = await screen.findByTestId('Group By-section');
-
-    const firstItem = within(groupBySection).getByTestId('grouping-0-field-0-drag-handle');
-    fireEvent.keyDown(firstItem, { key: 'Space', keyCode: 32 });
-    await screen.findByText(/You have lifted an item/i);
-    fireEvent.keyDown(firstItem, { key: 'ArrowDown', keyCode: 40 });
-    await screen.findByText(/You have moved the item/i);
-    fireEvent.keyDown(firstItem, { key: 'Space', keyCode: 32 });
-    await screen.findByText(/You have dropped the item/i);
-
-    await submitWidgetConfigForm();
-
-    const updatedConfig = widgetConfig
-      .toBuilder()
-      .rowPivots([updatedPivot])
-      .build();
-
-    await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1));
-
-    expect(onChange).toHaveBeenCalledWith(updatedConfig);
-  }, extendedTimeout);
+      expect(onChange).toHaveBeenCalledWith(updatedConfig);
+    },
+    extendedTimeout,
+  );
 });

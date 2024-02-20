@@ -42,17 +42,11 @@ describe('emit', () => {
                   type: {
                     type: 'enum' as const,
                     name: 'string' as const,
-                    options: [
-                      'ABORT_ON_CONFLICT',
-                      'REPLACE_ON_CONFLICT',
-                      'DROP_ALL_EXISTING',
-                    ],
+                    options: ['ABORT_ON_CONFLICT', 'REPLACE_ON_CONFLICT', 'DROP_ALL_EXISTING'],
                   },
                 },
               ],
-              produces: [
-                'application/json' as const,
-              ],
+              produces: ['application/json' as const],
             },
           ],
         },
@@ -100,9 +94,7 @@ export function bulkUpdatePatternsFromTextFile(importStrategy?: 'ABORT_ON_CONFLI
                 optional: false,
               },
               parameters: [],
-              produces: [
-                'application/json' as const,
-              ],
+              produces: ['application/json' as const],
             },
           ],
         },

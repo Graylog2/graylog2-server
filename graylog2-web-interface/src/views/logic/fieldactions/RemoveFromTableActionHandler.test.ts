@@ -41,9 +41,7 @@ describe('RemoveFromTableActionHandler.condition', () => {
   });
 
   it('enables action if field is presented in message table', () => {
-    const widget = MessagesWidget.builder()
-      .config(MessagesWidgetConfig.builder().build())
-      .build();
+    const widget = MessagesWidget.builder().config(MessagesWidgetConfig.builder().build()).build();
     const contexts = { widget };
 
     const result = RemoveFromTableActionHandler.isEnabled({ ...actionArgs, contexts });

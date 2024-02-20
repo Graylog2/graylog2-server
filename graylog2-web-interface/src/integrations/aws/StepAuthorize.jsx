@@ -58,9 +58,17 @@ const StepAuthorize = ({ onChange, onSubmit, sidebarComponent }) => {
       const noStreams = /No Kinesis streams/g;
 
       if (fetchStreamsStatus.error.match(badKey)) {
-        setFormError({ full_message: fetchStreamsStatus.error, nice_message: 'Invalid AWS Key, check out your AWS account for the 20-character long, alphanumeric string that usually starts with the letters "AK"' });
+        setFormError({
+          full_message: fetchStreamsStatus.error,
+          nice_message:
+            'Invalid AWS Key, check out your AWS account for the 20-character long, alphanumeric string that usually starts with the letters "AK"',
+        });
       } else if (fetchStreamsStatus.error.match(badSecret)) {
-        setFormError({ full_message: fetchStreamsStatus.error, nice_message: 'Invalid AWS Secret, it is usually a 40-character long, base-64 encoded string, but you only get to view it once when you create the Key' });
+        setFormError({
+          full_message: fetchStreamsStatus.error,
+          nice_message:
+            'Invalid AWS Secret, it is usually a 40-character long, base-64 encoded string, but you only get to view it once when you create the Key',
+        });
       } else if (fetchStreamsStatus.error.match(noStreams)) {
         // NOTE: If no streams are present we want to move to the KinesisSetup screen
         setStreams({ streams: [] });
@@ -90,43 +98,51 @@ const StepAuthorize = ({ onChange, onSubmit, sidebarComponent }) => {
   }, []);
 
   const authType = formData.awsAuthenticationType && formData.awsAuthenticationType.value;
-  const isFormValid = formValidation.isFormValid([
-    'awsCloudWatchName',
-    'awsCloudWatchAwsRegion',
-    ...authType !== AWS_AUTH_TYPES.automatic ? ['awsCloudWatchAwsKey', 'awsCloudWatchAwsSecret'] : [],
-  ], formData);
+  const isFormValid = formValidation.isFormValid(
+    [
+      'awsCloudWatchName',
+      'awsCloudWatchAwsRegion',
+      ...(authType !== AWS_AUTH_TYPES.automatic ? ['awsCloudWatchAwsKey', 'awsCloudWatchAwsSecret'] : []),
+    ],
+    formData,
+  );
 
   return (
-    <FormWrap onSubmit={handleSubmit}
-              buttonContent="Authorize &amp; Choose Stream"
-              loading={fetchRegionsStatus.loading || fetchStreamsStatus.loading}
-              disabled={isFormValid}
-              error={formError}
-              title="Create Input &amp; Authorize AWS"
-              description="This integration allows Graylog to read messages directly from a Kinesis stream. CloudWatch messages can optionally be forwarded to Kinesis via CloudWatch subscriptions and then read by Graylog.">
-
+    <FormWrap
+      onSubmit={handleSubmit}
+      buttonContent="Authorize &amp; Choose Stream"
+      loading={fetchRegionsStatus.loading || fetchStreamsStatus.loading}
+      disabled={isFormValid}
+      error={formError}
+      title="Create Input &amp; Authorize AWS"
+      description="This integration allows Graylog to read messages directly from a Kinesis stream. CloudWatch messages can optionally be forwarded to Kinesis via CloudWatch subscriptions and then read by Graylog."
+    >
       <DisappearingInput id="name" type="text" />
       <DisappearingInput id="password" type="password" />
 
-      <ValidatedInput id="awsCloudWatchName"
-                      type="text"
-                      fieldData={formData.awsCloudWatchName}
-                      onChange={onChange}
-                      placeholder="Graylog Input Name"
-                      label="Graylog Input Name"
-                      autoComplete="off"
-                      required />
+      <ValidatedInput
+        id="awsCloudWatchName"
+        type="text"
+        fieldData={formData.awsCloudWatchName}
+        onChange={onChange}
+        placeholder="Graylog Input Name"
+        label="Graylog Input Name"
+        autoComplete="off"
+        required
+      />
 
       <AWSAuthenticationTypes onChange={onChange} />
 
-      <ValidatedInput id="awsCloudWatchAwsRegion"
-                      type="select"
-                      fieldData={formData.awsCloudWatchAwsRegion}
-                      onChange={onChange}
-                      label="AWS Region"
-                      help="The AWS Region your service is running in."
-                      disabled={fetchRegionsStatus.loading}
-                      required>
+      <ValidatedInput
+        id="awsCloudWatchAwsRegion"
+        type="select"
+        fieldData={formData.awsCloudWatchAwsRegion}
+        onChange={onChange}
+        label="AWS Region"
+        help="The AWS Region your service is running in."
+        disabled={fetchRegionsStatus.loading}
+        required
+      >
         {renderOptions(availableRegions, 'Choose AWS Region', fetchRegionsStatus.loading)}
       </ValidatedInput>
 

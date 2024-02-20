@@ -49,7 +49,11 @@ const ButtonLabel = () => {
     return <>Not updating</>;
   }
 
-  return <>Every <ReadableDuration duration={refreshConfig.interval} /></>;
+  return (
+    <>
+      Every <ReadableDuration duration={refreshConfig.interval} />
+    </>
+  );
 };
 
 const useDisableOnFormChange = () => {
@@ -66,16 +70,19 @@ const useDisableOnFormChange = () => {
 const durationToMS = (duration: string) => moment.duration(duration).asMilliseconds();
 
 const useDefaultInterval = () => {
-  const { config: { auto_refresh_timerange_options: autoRefreshTimerangeOptions, default_auto_refresh_option: defaultAutoRefreshInterval } } = useSearchConfiguration();
+  const {
+    config: {
+      auto_refresh_timerange_options: autoRefreshTimerangeOptions,
+      default_auto_refresh_option: defaultAutoRefreshInterval,
+    },
+  } = useSearchConfiguration();
   const { data: minimumInterval } = useMinimumRefreshInterval();
   const minimumIntervalInMS = durationToMS(minimumInterval);
 
   if (durationToMS(defaultAutoRefreshInterval) < minimumIntervalInMS) {
     const availableIntervals = Object.entries(autoRefreshTimerangeOptions)
       .filter(([interval]) => durationToMS(interval) >= minimumIntervalInMS)
-      .sort(([interval1], [interval2]) => (
-        durationToMS(interval1) > durationToMS(interval2) ? 1 : -1
-      ));
+      .sort(([interval1], [interval2]) => (durationToMS(interval1) > durationToMS(interval2) ? 1 : -1));
 
     return availableIntervals.length ? availableIntervals[0][0] : null;
   }
@@ -87,7 +94,9 @@ const RefreshControls = () => {
   const { dirty, submitForm } = useFormikContext();
   const location = useLocation();
   const sendTelemetry = useSendTelemetry();
-  const { config: { auto_refresh_timerange_options: autoRefreshTimerangeOptions } } = useSearchConfiguration();
+  const {
+    config: { auto_refresh_timerange_options: autoRefreshTimerangeOptions },
+  } = useSearchConfiguration();
   const { data: minimumRefreshInterval, isInitialLoading: isLoadingMinimumInterval } = useMinimumRefreshInterval();
   const intervalOptions = Object.entries(autoRefreshTimerangeOptions);
   const { refreshConfig, startAutoRefresh, stopAutoRefresh } = useAutoRefresh();
@@ -95,20 +104,23 @@ const RefreshControls = () => {
 
   useDisableOnFormChange();
 
-  const selectInterval = useCallback((interval: string) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_REFRESH_CONTROL_PRESET_SELECTED, {
-      app_pathname: getPathnameWithoutId(location.pathname),
-      app_section: 'search-bar',
-      app_action_value: 'refresh-search-control-dropdown',
-      event_details: { interval: interval },
-    });
+  const selectInterval = useCallback(
+    (interval: string) => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_REFRESH_CONTROL_PRESET_SELECTED, {
+        app_pathname: getPathnameWithoutId(location.pathname),
+        app_section: 'search-bar',
+        app_action_value: 'refresh-search-control-dropdown',
+        event_details: { interval: interval },
+      });
 
-    startAutoRefresh(durationToMS(interval));
+      startAutoRefresh(durationToMS(interval));
 
-    if (dirty) {
-      submitForm();
-    }
-  }, [dirty, location.pathname, sendTelemetry, startAutoRefresh, submitForm]);
+      if (dirty) {
+        submitForm();
+      }
+    },
+    [dirty, location.pathname, sendTelemetry, startAutoRefresh, submitForm],
+  );
 
   const toggleEnable = useCallback(() => {
     if (!defaultInterval && !refreshConfig?.interval) {
@@ -131,33 +143,49 @@ const RefreshControls = () => {
 
       startAutoRefresh(refreshConfig?.interval ?? durationToMS(defaultInterval));
     }
-  }, [defaultInterval, dirty, refreshConfig?.enabled, refreshConfig?.interval, sendTelemetry, startAutoRefresh, stopAutoRefresh, submitForm]);
+  }, [
+    defaultInterval,
+    dirty,
+    refreshConfig?.enabled,
+    refreshConfig?.interval,
+    sendTelemetry,
+    startAutoRefresh,
+    stopAutoRefresh,
+    submitForm,
+  ]);
 
   return (
     <FlexibleButtonGroup aria-label="Refresh Search Controls">
-      <Button onClick={toggleEnable} title={refreshConfig?.enabled ? 'Pause Refresh' : 'Start Refresh'} disabled={isLoadingMinimumInterval || !defaultInterval}>
+      <Button
+        onClick={toggleEnable}
+        title={refreshConfig?.enabled ? 'Pause Refresh' : 'Start Refresh'}
+        disabled={isLoadingMinimumInterval || !defaultInterval}
+      >
         <Icon name={refreshConfig?.enabled ? 'pause' : 'play'} />
       </Button>
 
-      <DropdownButton title={<ButtonLabel />}
-                      id="refresh-options-dropdown">
+      <DropdownButton title={<ButtonLabel />} id="refresh-options-dropdown">
         {isLoadingMinimumInterval && <Spinner />}
-        {!isLoadingMinimumInterval && intervalOptions.map(([interval, label]) => {
-          const isBelowMinimum = durationToMS(interval) < durationToMS(minimumRefreshInterval);
+        {!isLoadingMinimumInterval &&
+          intervalOptions.map(([interval, label]) => {
+            const isBelowMinimum = durationToMS(interval) < durationToMS(minimumRefreshInterval);
 
-          return (
-            <MenuItem key={`RefreshControls-${label}`}
-                      onClick={() => selectInterval(interval)}
-                      disabled={isBelowMinimum}>
-              {label}
-              {isBelowMinimum && (
-                <HoverForHelp displayLeftMargin>
-                  Interval of <ReadableDuration duration={interval} /> ({interval}) is below configured minimum interval of <ReadableDuration duration={minimumRefreshInterval} /> ({minimumRefreshInterval}).
-                </HoverForHelp>
-              )}
-            </MenuItem>
-          );
-        })}
+            return (
+              <MenuItem
+                key={`RefreshControls-${label}`}
+                onClick={() => selectInterval(interval)}
+                disabled={isBelowMinimum}
+              >
+                {label}
+                {isBelowMinimum && (
+                  <HoverForHelp displayLeftMargin>
+                    Interval of <ReadableDuration duration={interval} /> ({interval}) is below configured minimum
+                    interval of <ReadableDuration duration={minimumRefreshInterval} /> ({minimumRefreshInterval}).
+                  </HoverForHelp>
+                )}
+              </MenuItem>
+            );
+          })}
       </DropdownButton>
     </FlexibleButtonGroup>
   );

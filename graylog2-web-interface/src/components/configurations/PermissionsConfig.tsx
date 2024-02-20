@@ -34,19 +34,23 @@ import useLocation from 'routing/useLocation';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
-const StyledDefList = styled.dl.attrs({ className: 'deflist' })(({ theme }) => css`
-  &&.deflist {
-    dd {
-      padding-left: ${theme.spacings.md};
-      margin-left: 200px;
+const StyledDefList = styled.dl.attrs({ className: 'deflist' })(
+  ({ theme }) => css`
+    &&.deflist {
+      dd {
+        padding-left: ${theme.spacings.md};
+        margin-left: 200px;
+      }
     }
-  }
-`);
+  `,
+);
 
-const LabelSpan = styled.span(({ theme }) => css`
-  margin-left: ${theme.spacings.sm};
-  font-weight: bold;
-`);
+const LabelSpan = styled.span(
+  ({ theme }) => css`
+    margin-left: ${theme.spacings.sm};
+    font-weight: bold;
+  `,
+);
 
 const PermissionsConfig = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -85,7 +89,9 @@ const PermissionsConfig = () => {
       <h2>Permissions Configuration</h2>
       <p>These settings can be used to control which entity sharing options are available.</p>
 
-      {!config ? <Spinner /> : (
+      {!config ? (
+        <Spinner />
+      ) : (
         <>
           <StyledDefList>
             <dt>Share with everyone:</dt>
@@ -96,23 +102,21 @@ const PermissionsConfig = () => {
 
           <IfPermitted permissions="clusterconfigentry:edit">
             <p>
-              <Button type="button"
-                      bsSize="xs"
-                      bsStyle="info"
-                      onClick={() => {
-                        setShowModal(true);
-                      }}>
+              <Button
+                type="button"
+                bsSize="xs"
+                bsStyle="info"
+                onClick={() => {
+                  setShowModal(true);
+                }}
+              >
                 Edit configuration
               </Button>
             </p>
           </IfPermitted>
 
-          <Modal show={showModal}
-                 onHide={resetConfig}
-                 aria-modal="true"
-                 aria-labelledby="dialog_label">
+          <Modal show={showModal} onHide={resetConfig} aria-modal="true" aria-labelledby="dialog_label">
             <Formik onSubmit={saveConfig} initialValues={config}>
-
               {({ isSubmitting }) => (
                 <Form>
                   <Modal.Header closeButton>
@@ -123,38 +127,38 @@ const PermissionsConfig = () => {
                     <div>
                       <Row>
                         <Col sm={12}>
-                          <FormikInput type="checkbox"
-                                       name="allow_sharing_with_everyone"
-                                       id="shareWithEveryone"
-                                       label={(
-                                         <LabelSpan>Share with everyone</LabelSpan>
-                                       )} />
+                          <FormikInput
+                            type="checkbox"
+                            name="allow_sharing_with_everyone"
+                            id="shareWithEveryone"
+                            label={<LabelSpan>Share with everyone</LabelSpan>}
+                          />
                           <InputDescription help="Control whether it is possible to share with everyone." />
                         </Col>
                         <Col sm={12}>
-                          <FormikInput type="checkbox"
-                                       name="allow_sharing_with_users"
-                                       id="shareWithUsers"
-                                       label={(
-                                         <LabelSpan>Share with users</LabelSpan>
-                                       )} />
+                          <FormikInput
+                            type="checkbox"
+                            name="allow_sharing_with_users"
+                            id="shareWithUsers"
+                            label={<LabelSpan>Share with users</LabelSpan>}
+                          />
                           <InputDescription help="Control whether it is possible to share with single users." />
                         </Col>
-
                       </Row>
                     </div>
                   </Modal.Body>
 
                   <Modal.Footer>
-                    <ModalSubmit onCancel={resetConfig}
-                                 isSubmitting={isSubmitting}
-                                 isAsyncSubmit
-                                 submitLoadingText="Update configuration"
-                                 submitButtonText="Update configuration" />
+                    <ModalSubmit
+                      onCancel={resetConfig}
+                      isSubmitting={isSubmitting}
+                      isAsyncSubmit
+                      submitLoadingText="Update configuration"
+                      submitButtonText="Update configuration"
+                    />
                   </Modal.Footer>
                 </Form>
               )}
-
             </Formik>
           </Modal>
         </>

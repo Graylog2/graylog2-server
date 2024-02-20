@@ -31,51 +31,63 @@ import { keySeparator, humanSeparator } from 'views/Constants';
 import type { Generator } from '../ChartData';
 import XYPlot from '../XYPlot';
 
-const LineVisualization = makeVisualization(({
-  config,
-  data,
-  effectiveTimerange,
-  height,
-}: VisualizationComponentProps) => {
-  const visualizationConfig = (config.visualizationConfig ?? LineVisualizationConfig.empty()) as LineVisualizationConfig;
-  const { interpolation = 'linear', axisType = DEFAULT_AXIS_TYPE } = visualizationConfig;
-  const mapKeys = useMapKeys();
-  const rowPivotFields = useMemo(() => config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [], [config?.rowPivots]);
-  const _mapKeys = useCallback((labels: string[]) => labels
-    .map((label) => label.split(keySeparator)
-      .map((l, i) => mapKeys(l, rowPivotFields[i]))
-      .join(humanSeparator),
-    ), [mapKeys, rowPivotFields]);
-  const chartGenerator: Generator = useCallback(({ type, name, labels, values, originalName }) => ({
-    type,
-    name,
-    x: _mapKeys(labels),
-    y: values,
-    originalName,
-    line: { shape: toPlotly(interpolation) },
-  }), [_mapKeys, interpolation]);
+const LineVisualization = makeVisualization(
+  ({ config, data, effectiveTimerange, height }: VisualizationComponentProps) => {
+    const visualizationConfig = (config.visualizationConfig ??
+      LineVisualizationConfig.empty()) as LineVisualizationConfig;
+    const { interpolation = 'linear', axisType = DEFAULT_AXIS_TYPE } = visualizationConfig;
+    const mapKeys = useMapKeys();
+    const rowPivotFields = useMemo(
+      () => config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [],
+      [config?.rowPivots],
+    );
+    const _mapKeys = useCallback(
+      (labels: string[]) =>
+        labels.map((label) =>
+          label
+            .split(keySeparator)
+            .map((l, i) => mapKeys(l, rowPivotFields[i]))
+            .join(humanSeparator),
+        ),
+      [mapKeys, rowPivotFields],
+    );
+    const chartGenerator: Generator = useCallback(
+      ({ type, name, labels, values, originalName }) => ({
+        type,
+        name,
+        x: _mapKeys(labels),
+        y: values,
+        originalName,
+        line: { shape: toPlotly(interpolation) },
+      }),
+      [_mapKeys, interpolation],
+    );
 
-  const rows = useMemo(() => retrieveChartData(data), [data]);
-  const _chartDataResult = useChartData(rows, {
-    widgetConfig: config,
-    chartType: 'scatter',
-    generator: chartGenerator,
-  });
+    const rows = useMemo(() => retrieveChartData(data), [data]);
+    const _chartDataResult = useChartData(rows, {
+      widgetConfig: config,
+      chartType: 'scatter',
+      generator: chartGenerator,
+    });
 
-  const { eventChartData, shapes } = useEvents(config, data.events);
+    const { eventChartData, shapes } = useEvents(config, data.events);
 
-  const chartDataResult = eventChartData ? [..._chartDataResult, eventChartData] : _chartDataResult;
-  const layout = shapes ? { shapes } : {};
+    const chartDataResult = eventChartData ? [..._chartDataResult, eventChartData] : _chartDataResult;
+    const layout = shapes ? { shapes } : {};
 
-  return (
-    <XYPlot config={config}
-            plotLayout={layout}
-            axisType={axisType}
-            effectiveTimerange={effectiveTimerange}
-            height={height}
-            chartData={chartDataResult} />
-  );
-}, 'line');
+    return (
+      <XYPlot
+        config={config}
+        plotLayout={layout}
+        axisType={axisType}
+        effectiveTimerange={effectiveTimerange}
+        height={height}
+        chartData={chartDataResult}
+      />
+    );
+  },
+  'line',
+);
 
 LineVisualization.propTypes = {
   config: AggregationType.isRequired,

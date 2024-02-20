@@ -28,13 +28,17 @@ describe('ConfigurationForm', () => {
 
     return (
       <>
-        <ConfigurationForm submitAction={submitAction}
-                           title="Edit entity"
-                           titleValue="Entity title"
-                           ref={formRef}
-                           submitButtonText="Update entity"
-                           typeName="placeholder" />
-        <button type="button" onClick={openForm}>Open modal</button>
+        <ConfigurationForm
+          submitAction={submitAction}
+          title="Edit entity"
+          titleValue="Entity title"
+          ref={formRef}
+          submitButtonText="Update entity"
+          typeName="placeholder"
+        />
+        <button type="button" onClick={openForm}>
+          Open modal
+        </button>
       </>
     );
   };
@@ -44,25 +48,33 @@ describe('ConfigurationForm', () => {
 
     render(<SUT submitAction={submitAction} />);
 
-    userEvent.click(await screen.findByRole('button', {
-      name: /open modal/i,
-    }));
+    userEvent.click(
+      await screen.findByRole('button', {
+        name: /open modal/i,
+      }),
+    );
 
     await screen.findByRole('heading', {
       name: /edit entity/i,
       hidden: true,
     });
 
-    userEvent.click(await screen.findByRole('button', {
-      name: /update entity/i,
-      hidden: true,
-    }));
+    userEvent.click(
+      await screen.findByRole('button', {
+        name: /update entity/i,
+        hidden: true,
+      }),
+    );
 
     await waitFor(() => expect(submitAction).toHaveBeenCalledTimes(1));
 
-    await waitFor(() => expect(screen.queryByRole('heading', {
-      name: /edit entity/i,
-      hidden: true,
-    })).not.toBeInTheDocument());
+    await waitFor(() =>
+      expect(
+        screen.queryByRole('heading', {
+          name: /edit entity/i,
+          hidden: true,
+        }),
+      ).not.toBeInTheDocument(),
+    );
   });
 });

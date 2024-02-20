@@ -29,31 +29,33 @@ import InlineForm from './InlineForm';
 import PopoverHelp from './PopoverHelp';
 import DecoratorStyles from './decoratorStyles.css';
 
-const ConfigurationFormContainer = styled.div(({ theme }) => css`
-  margin-bottom: 10px;
-  margin-top: 10px;
-  margin-left: 5px;
-  display: inline-block;
-  border-style: solid;
-  border-color: ${theme.colors.gray[80]};
-  border-radius: 5px;
-  border-width: 1px;
-  padding: 10px;
-  background: ${theme.colors.global.background};
-`);
+const ConfigurationFormContainer = styled.div(
+  ({ theme }) => css`
+    margin-bottom: 10px;
+    margin-top: 10px;
+    margin-left: 5px;
+    display: inline-block;
+    border-style: solid;
+    border-color: ${theme.colors.gray[80]};
+    border-radius: 5px;
+    border-width: 1px;
+    padding: 10px;
+    background: ${theme.colors.global.background};
+  `,
+);
 
 type Props = {
-  disabled?: boolean,
-  decoratorTypes: { [key: string]: DecoratorType },
-  nextOrder: number,
-  stream?: string,
-  onCreate: (newDecorator: Decorator) => void,
-  showHelp?: boolean,
+  disabled?: boolean;
+  decoratorTypes: { [key: string]: DecoratorType };
+  nextOrder: number;
+  stream?: string;
+  onCreate: (newDecorator: Decorator) => void;
+  showHelp?: boolean;
 };
 
 type State = {
-  typeDefinition?: DecoratorType,
-  typeName?: string,
+  typeDefinition?: DecoratorType;
+  typeName?: string;
 };
 
 class AddDecoratorButton extends React.Component<Props, State> {
@@ -83,7 +85,10 @@ class AddDecoratorButton extends React.Component<Props, State> {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  _formatDecoratorType = (typeDefinition: DecoratorType, typeName: string) => ({ value: typeName, label: typeDefinition.name });
+  _formatDecoratorType = (typeDefinition: DecoratorType, typeName: string) => ({
+    value: typeName,
+    label: typeDefinition.name,
+  });
 
   _handleCancel = () => this.setState({ typeName: undefined, typeDefinition: undefined });
 
@@ -123,29 +128,33 @@ class AddDecoratorButton extends React.Component<Props, State> {
 
     const decoratorTypeOptions = jQuery.map(decoratorTypes, this._formatDecoratorType);
     const wrapperComponent = InlineForm();
-    const configurationForm = (typeName !== undefined
-      ? (
-        <ConfigurationForm<Decorator['config']> ref={this.configurationForm}
-                                                key="configuration-form-output"
-                                                configFields={typeDefinition.requested_configuration}
-                                                title={`Create new ${typeDefinition.name}`}
-                                                typeName={typeName}
-                                                includeTitleField={false}
-                                                wrapperComponent={wrapperComponent}
-                                                submitAction={this._handleSubmit}
-                                                cancelAction={this._handleCancel} />
-      ) : null);
+    const configurationForm =
+      typeName !== undefined ? (
+        <ConfigurationForm<Decorator['config']>
+          ref={this.configurationForm}
+          key="configuration-form-output"
+          configFields={typeDefinition.requested_configuration}
+          title={`Create new ${typeDefinition.name}`}
+          typeName={typeName}
+          includeTitleField={false}
+          wrapperComponent={wrapperComponent}
+          submitAction={this._handleSubmit}
+          cancelAction={this._handleCancel}
+        />
+      ) : null;
 
     return (
       <>
         <div className={`${DecoratorStyles.decoratorBox} ${DecoratorStyles.addDecoratorButtonContainer}`}>
           <div className={DecoratorStyles.addDecoratorSelect}>
-            <Select placeholder="Select decorator"
-                    onChange={this._onTypeChange}
-                    options={decoratorTypeOptions}
-                    matchProp="label"
-                    disabled={disabled}
-                    value={typeName} />
+            <Select
+              placeholder="Select decorator"
+              onChange={this._onTypeChange}
+              options={decoratorTypeOptions}
+              matchProp="label"
+              disabled={disabled}
+              value={typeName}
+            />
           </div>
         </div>
         {showHelp && <PopoverHelp />}

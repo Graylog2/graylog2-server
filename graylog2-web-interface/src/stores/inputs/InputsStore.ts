@@ -24,21 +24,20 @@ import { InputStaticFieldsStore } from 'stores/inputs/InputStaticFieldsStore';
 import type { Input } from 'components/messageloaders/Types';
 
 type InputsActionsType = {
-  list: () => Promise<{ inputs: Array<Input>, total: number }>,
-  get: (id: string) => Promise<Input>,
-  getOptional: (id: string, showError: boolean) => Promise<Input>,
-  create: (input: Input) => Promise<void>,
-  delete: (input: Input) => Promise<void>,
-  update: (id: string, input: Input) => Promise<void>,
-}
+  list: () => Promise<{ inputs: Array<Input>; total: number }>;
+  get: (id: string) => Promise<Input>;
+  getOptional: (id: string, showError: boolean) => Promise<Input>;
+  create: (input: Input) => Promise<void>;
+  delete: (input: Input) => Promise<void>;
+  update: (id: string, input: Input) => Promise<void>;
+};
 
 type InputsStoreState = {
-  input?: Input | undefined,
-  inputs: Array<Input> | undefined,
-}
-export const InputsActions = singletonActions(
-  'core.Inputs',
-  () => Reflux.createActions<InputsActionsType>({
+  input?: Input | undefined;
+  inputs: Array<Input> | undefined;
+};
+export const InputsActions = singletonActions('core.Inputs', () =>
+  Reflux.createActions<InputsActionsType>({
     list: { asyncResult: true },
     get: { asyncResult: true },
     getOptional: { asyncResult: true },
@@ -48,9 +47,8 @@ export const InputsActions = singletonActions(
   }),
 );
 
-export const InputsStore = singletonStore(
-  'core.Inputs',
-  () => Reflux.createStore<InputsStoreState>({
+export const InputsStore = singletonStore('core.Inputs', () =>
+  Reflux.createStore<InputsStoreState>({
     listenables: [InputsActions],
     sourceUrl: '/system/inputs',
     inputs: undefined,
@@ -72,19 +70,17 @@ export const InputsStore = singletonStore(
     list() {
       const promise = fetch('GET', URLUtils.qualifyUrl(this.sourceUrl));
 
-      promise
-        .then(
-          (response) => {
-            this.inputs = response.inputs;
-            this.trigger(this._state());
+      promise.then(
+        (response) => {
+          this.inputs = response.inputs;
+          this.trigger(this._state());
 
-            return this.inputs;
-          },
-          (error) => {
-            UserNotification.error(`Fetching Inputs failed with status: ${error}`,
-              'Could not retrieve Inputs');
-          },
-        );
+          return this.inputs;
+        },
+        (error) => {
+          UserNotification.error(`Fetching Inputs failed with status: ${error}`, 'Could not retrieve Inputs');
+        },
+      );
 
       InputsActions.list.promise(promise);
     },
@@ -96,23 +92,24 @@ export const InputsStore = singletonStore(
     getOptional(inputId, showError) {
       const promise = fetch('GET', URLUtils.qualifyUrl(`${this.sourceUrl}/${inputId}`));
 
-      promise
-        .then(
-          (response) => {
-            this.input = response;
-            this.trigger(this._state());
+      promise.then(
+        (response) => {
+          this.input = response;
+          this.trigger(this._state());
 
-            return this.input;
-          },
-          (error) => {
-            if (showError) {
-              UserNotification.error(`Fetching input ${inputId} failed with status: ${error}`,
-                'Could not retrieve input');
-            } else {
-              this.trigger(this._state());
-            }
-          },
-        );
+          return this.input;
+        },
+        (error) => {
+          if (showError) {
+            UserNotification.error(
+              `Fetching input ${inputId} failed with status: ${error}`,
+              'Could not retrieve input',
+            );
+          } else {
+            this.trigger(this._state());
+          }
+        },
+      );
 
       InputsActions.get.promise(promise);
     },
@@ -120,17 +117,18 @@ export const InputsStore = singletonStore(
     create(input) {
       const promise = fetch('POST', URLUtils.qualifyUrl(this.sourceUrl), input);
 
-      promise
-        .then(
-          () => {
-            UserNotification.success(`Input '${input.title}' launched successfully`);
-            InputsActions.list();
-          },
-          (error) => {
-            UserNotification.error(`Launching input '${input.title}' failed with status: ${error}`,
-              'Could not launch input');
-          },
-        );
+      promise.then(
+        () => {
+          UserNotification.success(`Input '${input.title}' launched successfully`);
+          InputsActions.list();
+        },
+        (error) => {
+          UserNotification.error(
+            `Launching input '${input.title}' failed with status: ${error}`,
+            'Could not launch input',
+          );
+        },
+      );
 
       InputsActions.create.promise(promise);
     },
@@ -141,17 +139,18 @@ export const InputsStore = singletonStore(
 
       const promise = fetch('DELETE', URLUtils.qualifyUrl(`${this.sourceUrl}/${inputId}`));
 
-      promise
-        .then(
-          () => {
-            UserNotification.success(`Input '${inputTitle}' deleted successfully`);
-            InputsActions.list();
-          },
-          (error) => {
-            UserNotification.error(`Deleting input '${inputTitle}' failed with status: ${error}`,
-              'Could not delete input');
-          },
-        );
+      promise.then(
+        () => {
+          UserNotification.success(`Input '${inputTitle}' deleted successfully`);
+          InputsActions.list();
+        },
+        (error) => {
+          UserNotification.error(
+            `Deleting input '${inputTitle}' failed with status: ${error}`,
+            'Could not delete input',
+          );
+        },
+      );
 
       InputsActions.delete.promise(promise);
     },
@@ -159,17 +158,18 @@ export const InputsStore = singletonStore(
     update(id, input) {
       const promise = fetch('PUT', URLUtils.qualifyUrl(`${this.sourceUrl}/${id}`), input);
 
-      promise
-        .then(
-          () => {
-            UserNotification.success(`Input '${input.title}' updated successfully`);
-            InputsActions.list();
-          },
-          (error) => {
-            UserNotification.error(`Updating input '${input.title}' failed with status: ${error}`,
-              'Could not update input');
-          },
-        );
+      promise.then(
+        () => {
+          UserNotification.success(`Input '${input.title}' updated successfully`);
+          InputsActions.list();
+        },
+        (error) => {
+          UserNotification.error(
+            `Updating input '${input.title}' failed with status: ${error}`,
+            'Could not update input',
+          );
+        },
+      );
 
       InputsActions.update.promise(promise);
     },

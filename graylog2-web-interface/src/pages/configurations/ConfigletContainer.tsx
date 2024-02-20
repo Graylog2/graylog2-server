@@ -21,9 +21,9 @@ import { Col } from 'components/bootstrap';
 
 type ErrorFallbackProps = {
   error: {
-    message: string,
-  },
-  title: string,
+    message: string;
+  };
+  title: string;
 };
 
 const ErrorFallback = ({ error, title }: ErrorFallbackProps) => (
@@ -35,22 +35,18 @@ const ErrorFallback = ({ error, title }: ErrorFallbackProps) => (
 );
 
 type BoundaryProps = {
-  children: React.ReactNode,
-  title: string,
-}
+  children: React.ReactNode;
+  title: string;
+};
 
 const Boundary = ({ children, title }: BoundaryProps) => (
   // eslint-disable-next-line react/no-unstable-nested-components
-  <ErrorBoundary FallbackComponent={(props) => <ErrorFallback title={title} {...props} />}>
-    {children}
-  </ErrorBoundary>
+  <ErrorBoundary FallbackComponent={(props) => <ErrorFallback title={title} {...props} />}>{children}</ErrorBoundary>
 );
 
 const ConfigletContainer = ({ children, title }: BoundaryProps) => (
   <Col md={12}>
-    <Boundary title={title}>
-      {children}
-    </Boundary>
+    <Boundary title={title}>{children}</Boundary>
   </Col>
 );
 

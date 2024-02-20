@@ -15,27 +15,27 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 export type Message = {
-  id: string,
-  index: string,
-  fields: { [key: string]: any },
-  formatted_fields?: { [key: string]: any },
-  highlight_ranges?: { [key: string]: any },
+  id: string;
+  index: string;
+  fields: { [key: string]: any };
+  formatted_fields?: { [key: string]: any };
+  highlight_ranges?: { [key: string]: any };
   decoration_stats?: {
-    added_fields: { [key: string]: any },
-    changed_fields: { [key: string]: any },
-    removed_fields: { [key: string]: any },
-  },
+    added_fields: { [key: string]: any };
+    changed_fields: { [key: string]: any };
+    removed_fields: { [key: string]: any };
+  };
 };
 
 export type BackendMessage = {
-  index: string,
+  index: string;
   message: { _id: string } & {
-    [key: string]: unknown,
-  },
-  highlight_ranges?: { [key: string]: any },
+    [key: string]: unknown;
+  };
+  highlight_ranges?: { [key: string]: any };
   decoration_stats?: {
-    added_fields: { [key: string]: any },
-    changed_fields: { [key: string]: any },
-    removed_fields: { [key: string]: any },
-  },
+    added_fields: { [key: string]: any };
+    changed_fields: { [key: string]: any };
+    removed_fields: { [key: string]: any };
+  };
 };

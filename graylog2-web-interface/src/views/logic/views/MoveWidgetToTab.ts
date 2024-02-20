@@ -50,14 +50,16 @@ const _removeWidgetFromTab = (widgetId: WidgetId, queryId: QueryId, dashboard: V
   delete widgetPositions[widgetId];
   const { widgetMapping } = viewState;
   const newWidgetMapping = widgetMapping.remove(widgetId);
-  const newViewState = viewState.toBuilder()
+  const newViewState = viewState
+    .toBuilder()
     .widgets(viewState.widgets.delete(widgetIndex))
     .widgetMapping(newWidgetMapping)
     .titles(newTitles)
     .widgetPositions(widgetPositions)
     .build();
 
-  return dashboard.toBuilder()
+  return dashboard
+    .toBuilder()
     .state(dashboard.state.set(queryId, normalizeViewState(newViewState)))
     .build();
 };
@@ -73,29 +75,43 @@ const _setWidgetTitle = (titlesMap: TitlesMap, widgetID: WidgetId, newTitle: str
   return titlesMap.set('widget', newWidgetTitleMap);
 };
 
-const _addWidgetToTab = (widget: Widget, targetQueryId: QueryId, dashboard: View, widgetTitle: string | undefined | null, oldPosition: WidgetPosition): View => {
+const _addWidgetToTab = (
+  widget: Widget,
+  targetQueryId: QueryId,
+  dashboard: View,
+  widgetTitle: string | undefined | null,
+  oldPosition: WidgetPosition,
+): View => {
   const viewState = dashboard.state.get(targetQueryId);
   const newWidget = widget?.id ? widget : widget.toBuilder().newId().build();
   const newWidgets = viewState.widgets.push(newWidget);
   const { widgetPositions } = viewState;
   const newWidgetPositions = oldPosition
-    ? ConcatPositions(Immutable.Map({ [newWidget.id]: oldPosition.toBuilder().row(1).col(1).build() }), Immutable.Map(widgetPositions))
+    ? ConcatPositions(
+        Immutable.Map({ [newWidget.id]: oldPosition.toBuilder().row(1).col(1).build() }),
+        Immutable.Map(widgetPositions),
+      )
     : Immutable.Map(widgetPositions);
   const newTitleMap = _setWidgetTitle(viewState.titles, newWidget.id, widgetTitle);
-  const newViewState = viewState.toBuilder()
+  const newViewState = viewState
+    .toBuilder()
     .widgets(newWidgets)
     .titles(newTitleMap)
     .widgetPositions(newWidgetPositions)
     .build();
 
-  return dashboard.toBuilder()
-    .state(dashboard.state.set(targetQueryId, newViewState))
-    .build();
+  return dashboard.toBuilder().state(dashboard.state.set(targetQueryId, newViewState)).build();
 };
 
-const _getWidgetTitle = (widgetId: WidgetId, queryId: QueryId, view: View): string | undefined | null => view.state.get(queryId).titles.getIn(['widget', widgetId]);
+const _getWidgetTitle = (widgetId: WidgetId, queryId: QueryId, view: View): string | undefined | null =>
+  view.state.get(queryId).titles.getIn(['widget', widgetId]);
 
-const MoveWidgetToTab = (widgetId: WidgetId, targetQueryId: QueryId, dashboard: View, copy: boolean = false): View | undefined | null => {
+const MoveWidgetToTab = (
+  widgetId: WidgetId,
+  targetQueryId: QueryId,
+  dashboard: View,
+  copy: boolean = false,
+): View | undefined | null => {
   if (dashboard.type !== View.Type.Dashboard) {
     throw new Error(`Unexpected type ${dashboard.type} expected ${View.Type.Dashboard}`);
   }

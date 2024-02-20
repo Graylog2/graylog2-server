@@ -25,7 +25,9 @@ const useRoutePattern = () => {
 
   return useMemo(() => {
     if (dataRouterContext?.router?.routes) {
-      const { router: { routes } } = dataRouterContext;
+      const {
+        router: { routes },
+      } = dataRouterContext;
       const matches = matchRoutes(routes, location.pathname);
       const { route } = matches.at(-1);
 

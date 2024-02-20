@@ -23,20 +23,26 @@ import { Input } from 'components/bootstrap';
 import { Select, TimeUnitInput } from 'components/common';
 
 export type Config = {
-  path: string,
-  database_type: string,
-  check_interval: number,
-  check_interval_unit: string,
+  path: string;
+  database_type: string;
+  check_interval: number;
+  check_interval_unit: string;
 };
 type MaxmindAdapterFieldSetProps = {
   config: Config;
-  updateConfig: (newConfig: object) => void,
+  updateConfig: (newConfig: object) => void;
   handleFormEvent: (e: { target: { name: string; value?: string } }) => void;
-  validationState: (key: string) => string | undefined,
-  validationMessage: (key: string, message: string) => string | undefined,
+  validationState: (key: string) => string | undefined;
+  validationMessage: (key: string, message: string) => string | undefined;
 };
 
-const MaxmindAdapterFieldSet = ({ config, updateConfig, handleFormEvent, validationState, validationMessage }: MaxmindAdapterFieldSetProps) => {
+const MaxmindAdapterFieldSet = ({
+  config,
+  updateConfig,
+  handleFormEvent,
+  validationState,
+  validationMessage,
+}: MaxmindAdapterFieldSetProps) => {
   const isCloud = AppConfig.isCloud();
 
   const pathsForCloud = {
@@ -87,41 +93,49 @@ const MaxmindAdapterFieldSet = ({ config, updateConfig, handleFormEvent, validat
   return (
     <fieldset>
       {!isCloud && (
-      <Input type="text"
-             id="path"
-             name="path"
-             label="File path"
-             autoFocus
-             required
-             onChange={handleFormEvent}
-             help={validationMessage('path', 'The path to the database file.')}
-             bsStyle={validationState('path')}
-             value={config.path}
-             labelClassName="col-sm-3"
-             wrapperClassName="col-sm-9" />
+        <Input
+          type="text"
+          id="path"
+          name="path"
+          label="File path"
+          autoFocus
+          required
+          onChange={handleFormEvent}
+          help={validationMessage('path', 'The path to the database file.')}
+          bsStyle={validationState('path')}
+          value={config.path}
+          labelClassName="col-sm-3"
+          wrapperClassName="col-sm-9"
+        />
       )}
-      <Input id="database-type-select"
-             label="Database type"
-             required
-             autoFocus
-             help="Select the type of the database file"
-             labelClassName="col-sm-3"
-             wrapperClassName="col-sm-9">
-        <Select placeholder="Select the type of database file"
-                clearable={false}
-                options={databaseTypes}
-                matchProp="label"
-                onChange={onDbTypeSelect}
-                value={config.database_type} />
+      <Input
+        id="database-type-select"
+        label="Database type"
+        required
+        autoFocus
+        help="Select the type of the database file"
+        labelClassName="col-sm-3"
+        wrapperClassName="col-sm-9"
+      >
+        <Select
+          placeholder="Select the type of database file"
+          clearable={false}
+          options={databaseTypes}
+          matchProp="label"
+          onChange={onDbTypeSelect}
+          value={config.database_type}
+        />
       </Input>
-      <TimeUnitInput label="Refresh file"
-                     help="If enabled, the database file is checked for modifications and refreshed when it changed on disk."
-                     update={updateCheckInterval}
-                     value={config.check_interval}
-                     unit={config.check_interval_unit || 'MINUTES'}
-                     defaultEnabled={config.check_interval > 0}
-                     labelClassName="col-sm-3"
-                     wrapperClassName="col-sm-9" />
+      <TimeUnitInput
+        label="Refresh file"
+        help="If enabled, the database file is checked for modifications and refreshed when it changed on disk."
+        update={updateCheckInterval}
+        value={config.check_interval}
+        unit={config.check_interval_unit || 'MINUTES'}
+        defaultEnabled={config.check_interval > 0}
+        labelClassName="col-sm-3"
+        wrapperClassName="col-sm-9"
+      />
     </fieldset>
   );
 };

@@ -27,20 +27,23 @@ import { blockDictPropType } from '../rule-builder/types';
 import type { BlockDict } from '../rule-builder/types';
 
 type Props = {
-  entries: Array<BlockDict>,
-  expanded?: {[key: string] : boolean},
-  onFunctionClick?: (functionName: string) => void
-}
+  entries: Array<BlockDict>;
+  expanded?: { [key: string]: boolean };
+  onFunctionClick?: (functionName: string) => void;
+};
 
-const RuleHelperTable = ({ entries, expanded, onFunctionClick } : Props) => {
-  const parameters = (descriptor: BlockDict) => descriptor.params.map((p) => (
-    <tr key={p.name}>
-      <td className={RuleHelperStyle.adjustedTableCellWidth}>{p.name}</td>
-      <td className={RuleHelperStyle.adjustedTableCellWidth}>{niceType(p.type)}</td>
-      <td className={`${RuleHelperStyle.adjustedTableCellWidth} text-centered`}>{p.optional ? null : <Icon name="check" />}</td>
-      <td>{p.description}</td>
-    </tr>
-  ));
+const RuleHelperTable = ({ entries, expanded, onFunctionClick }: Props) => {
+  const parameters = (descriptor: BlockDict) =>
+    descriptor.params.map((p) => (
+      <tr key={p.name}>
+        <td className={RuleHelperStyle.adjustedTableCellWidth}>{p.name}</td>
+        <td className={RuleHelperStyle.adjustedTableCellWidth}>{niceType(p.type)}</td>
+        <td className={`${RuleHelperStyle.adjustedTableCellWidth} text-centered`}>
+          {p.optional ? null : <Icon name="check" />}
+        </td>
+        <td>{p.description}</td>
+      </tr>
+    ));
 
   const renderFunctions = (descriptors: Array<BlockDict>) => {
     if (!descriptors) {
@@ -63,9 +66,7 @@ const RuleHelperTable = ({ entries, expanded, onFunctionClick } : Props) => {
                     <th>Description</th>
                   </tr>
                 </thead>
-                <tbody>
-                  {parameters(d)}
-                </tbody>
+                <tbody>{parameters(d)}</tbody>
               </Table>
             </td>
           </tr>
@@ -76,12 +77,16 @@ const RuleHelperTable = ({ entries, expanded, onFunctionClick } : Props) => {
         <tbody key={d.name}>
           {onFunctionClick ? (
             <tr onClick={() => onFunctionClick(d.name)} className={RuleHelperStyle.clickableRow}>
-              <td className={RuleHelperStyle.functionTableCell}><code>{functionSignature(d)}</code></td>
+              <td className={RuleHelperStyle.functionTableCell}>
+                <code>{functionSignature(d)}</code>
+              </td>
               <td>{d.description}</td>
             </tr>
           ) : (
             <tr>
-              <td className={RuleHelperStyle.functionTableCell}><code>{functionSignature(d)}</code></td>
+              <td className={RuleHelperStyle.functionTableCell}>
+                <code>{functionSignature(d)}</code>
+              </td>
               <td>{d.description}</td>
             </tr>
           )}

@@ -32,40 +32,42 @@ import GranteeIcon from './GranteeIcon';
 import CapabilitySelect from './CapabilitySelect';
 
 export type SelectionRequest = {
-  granteeId: $PropertyType<Grantee, 'id'>,
-  capabilityId: $PropertyType<Capability, 'id'>,
+  granteeId: $PropertyType<Grantee, 'id'>;
+  capabilityId: $PropertyType<Capability, 'id'>;
 };
 
 export type FormValues = {
-  granteeId: $PropertyType<Grantee, 'id'> | undefined,
-  capabilityId: $PropertyType<Capability, 'id'>,
-}
+  granteeId: $PropertyType<Grantee, 'id'> | undefined;
+  capabilityId: $PropertyType<Capability, 'id'>;
+};
 
 type Props = {
-  availableGrantees: GranteesList,
-  availableCapabilities: CapabilitiesList,
-  className?: string,
-  formRef?: React.Ref<FormikProps<FormValues>>,
-  onSubmit: (req: SelectionRequest) => Promise<EntityShareState | null | undefined>,
+  availableGrantees: GranteesList;
+  availableCapabilities: CapabilitiesList;
+  className?: string;
+  formRef?: React.Ref<FormikProps<FormValues>>;
+  onSubmit: (req: SelectionRequest) => Promise<EntityShareState | null | undefined>;
 };
 
 const FormElements = styled.div`
   display: flex;
 `;
 
-const Errors = styled.div(({ theme }) => css`
-  width: 100%;
-  margin-top: 3px;
-  color: ${theme.colors.variant.danger};
+const Errors = styled.div(
+  ({ theme }) => css`
+    width: 100%;
+    margin-top: 3px;
+    color: ${theme.colors.variant.danger};
 
-  > * {
-    margin-right: 5px;
+    > * {
+      margin-right: 5px;
 
-    &:last-child {
-      margin-right: 0;
+      &:last-child {
+        margin-right: 0;
+      }
     }
-  }
-`);
+  `,
+);
 
 const GranteesSelect = styled(Select)`
   flex: 1;
@@ -92,9 +94,8 @@ const SubmitButton = styled(Button)`
   margin-left: 15px;
 `;
 
-const _granteesOptions = (grantees: GranteesList) => grantees.map((grantee) => (
-  { label: grantee.title, value: grantee.id, granteeType: grantee.type }
-)).toJS();
+const _granteesOptions = (grantees: GranteesList) =>
+  grantees.map((grantee) => ({ label: grantee.title, value: grantee.id, granteeType: grantee.type })).toJS();
 
 const _initialCapabilityId = (capabilities: CapabilitiesList) => {
   const initialCapabilityTitle = 'Viewer';
@@ -104,7 +105,13 @@ const _initialCapabilityId = (capabilities: CapabilitiesList) => {
 
 const _isRequired = (field) => (value) => (!value ? `The ${field} is required` : undefined);
 
-const _renderGranteesSelectOption = ({ label, granteeType }: {label: string, granteeType: $PropertyType<Grantee, 'type'> }) => (
+const _renderGranteesSelectOption = ({
+  label,
+  granteeType,
+}: {
+  label: string;
+  granteeType: $PropertyType<Grantee, 'type'>;
+}) => (
   <GranteesSelectOption>
     <StyledGranteeIcon type={granteeType} />
     {label}
@@ -116,34 +123,42 @@ const GranteesSelector = ({ availableGrantees, availableCapabilities, className,
   const initialCapabilityId = _initialCapabilityId(availableCapabilities);
 
   const _handelSubmit = (data, resetForm) => {
-    onSubmit(data).then(() => { resetForm(); });
+    onSubmit(data).then(() => {
+      resetForm();
+    });
   };
 
   return (
     <div className={className}>
-      <Formik onSubmit={(data, { resetForm }) => _handelSubmit(data, resetForm)}
-              innerRef={formRef}
-              initialValues={{ granteeId: undefined, capabilityId: initialCapabilityId }}>
+      <Formik
+        onSubmit={(data, { resetForm }) => _handelSubmit(data, resetForm)}
+        innerRef={formRef}
+        initialValues={{ granteeId: undefined, capabilityId: initialCapabilityId }}
+      >
         {({ isSubmitting, isValid, errors }) => (
           <Form>
             <FormElements>
               <StyledSelectGroup>
                 <Field name="granteeId" validate={_isRequired('grantee')}>
                   {({ field: { name, value, onChange } }) => (
-                    <GranteesSelect inputProps={{ 'aria-label': 'Search for users and teams' }}
-                                    onChange={(granteeId) => onChange({ target: { value: granteeId, name } })}
-                                    optionRenderer={_renderGranteesSelectOption}
-                                    options={granteesOptions}
-                                    placeholder="Search for users and teams"
-                                    value={value} />
+                    <GranteesSelect
+                      inputProps={{ 'aria-label': 'Search for users and teams' }}
+                      onChange={(granteeId) => onChange({ target: { value: granteeId, name } })}
+                      optionRenderer={_renderGranteesSelectOption}
+                      options={granteesOptions}
+                      placeholder="Search for users and teams"
+                      value={value}
+                    />
                   )}
                 </Field>
                 <CapabilitySelect capabilities={availableCapabilities} />
               </StyledSelectGroup>
-              <SubmitButton bsStyle="success"
-                            disabled={isSubmitting || !isValid}
-                            title="Add Collaborator"
-                            type="submit">
+              <SubmitButton
+                bsStyle="success"
+                disabled={isSubmitting || !isValid}
+                title="Add Collaborator"
+                type="submit"
+              >
                 Add Collaborator
               </SubmitButton>
             </FormElements>

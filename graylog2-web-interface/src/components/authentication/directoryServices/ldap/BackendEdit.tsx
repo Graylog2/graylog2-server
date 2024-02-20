@@ -28,26 +28,22 @@ import BackendWizard from '../BackendWizard';
 import handleUpdate from '../HandleUpdate';
 
 type Props = {
-  authenticationBackend: DirectoryServiceBackend,
-  initialStepKey: string | null | undefined,
+  authenticationBackend: DirectoryServiceBackend;
+  initialStepKey: string | null | undefined;
 };
 
 const _optionalWizardProps = (initialStepKey: string | null | undefined) => ({ initialStepKey });
 
 const BackendEdit = ({ authenticationBackend, initialStepKey }: Props) => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
-  const {
-    help: groupSyncHelp = {},
-    initialValues: initialGroupSyncValues = {},
-  } = enterpriseGroupSyncPlugin?.wizardConfig?.ldap ?? {};
+  const { help: groupSyncHelp = {}, initialValues: initialGroupSyncValues = {} } =
+    enterpriseGroupSyncPlugin?.wizardConfig?.ldap ?? {};
   const help = { ...HELP, ...groupSyncHelp };
   let initialValues = prepareInitialWizardValues(authenticationBackend);
 
   if (enterpriseGroupSyncPlugin) {
-    const {
-      formValues: groupSyncFormValues,
-      finishedLoading,
-    } = enterpriseGroupSyncPlugin.hooks.useInitialGroupSyncValues(authenticationBackend.id, initialGroupSyncValues);
+    const { formValues: groupSyncFormValues, finishedLoading } =
+      enterpriseGroupSyncPlugin.hooks.useInitialGroupSyncValues(authenticationBackend.id, initialGroupSyncValues);
 
     if (!finishedLoading) {
       return <Spinner />;
@@ -62,28 +58,26 @@ const BackendEdit = ({ authenticationBackend, initialStepKey }: Props) => {
     backendHasPassword: authenticationBackend.config.systemUserPassword.isSet,
     backendGroupSyncIsActive: !!initialValues.synchronizeGroups,
   };
-  const _handleSubmit = (
-    payload,
-    formValues,
-    serviceType,
-    shouldUpdateGroupSync,
-  ) => handleUpdate(
-    payload,
-    formValues,
-    authenticationBackend.id,
-    !!initialValues.synchronizeGroups,
-    serviceType,
-    shouldUpdateGroupSync,
-  );
+  const _handleSubmit = (payload, formValues, serviceType, shouldUpdateGroupSync) =>
+    handleUpdate(
+      payload,
+      formValues,
+      authenticationBackend.id,
+      !!initialValues.synchronizeGroups,
+      serviceType,
+      shouldUpdateGroupSync,
+    );
 
   return (
     <DocumentTitle title="Edit LDAP Authentication Service">
       <WizardPageHeader authenticationBackend={authenticationBackend} />
-      <BackendWizard {..._optionalWizardProps(initialStepKey)}
-                     help={help}
-                     authBackendMeta={authBackendMeta}
-                     initialValues={initialValues}
-                     onSubmit={_handleSubmit} />
+      <BackendWizard
+        {..._optionalWizardProps(initialStepKey)}
+        help={help}
+        authBackendMeta={authBackendMeta}
+        initialValues={initialValues}
+        onSubmit={_handleSubmit}
+      />
     </DocumentTitle>
   );
 };

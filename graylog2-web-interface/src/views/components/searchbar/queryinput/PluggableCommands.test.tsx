@@ -23,19 +23,23 @@ import PluggableCommands from './PluggableCommands';
 
 describe('PluggableCommands', () => {
   const plugin: PluginExports = {
-    'views.queryInput.commands': [{
-      name: 'Testcommand',
-      bindKey: {
-        mac: 'Ctrl+Enter',
-        win: 'Ctrl+Enter',
+    'views.queryInput.commands': [
+      {
+        name: 'Testcommand',
+        bindKey: {
+          mac: 'Ctrl+Enter',
+          win: 'Ctrl+Enter',
+        },
+        usages: ['search_query'],
+        exec: (editor, context) => ({ editor, context }),
       },
-      usages: ['search_query'],
-      exec: (editor, context) => ({ editor, context }),
-    }],
-    'views.queryInput.commandContextProviders': [{
-      key: 'foo',
-      provider: () => 42,
-    }],
+    ],
+    'views.queryInput.commandContextProviders': [
+      {
+        key: 'foo',
+        provider: () => 42,
+      },
+    ],
   };
 
   const manifest = new PluginManifest({}, plugin);
@@ -49,31 +53,31 @@ describe('PluggableCommands', () => {
   });
 
   it('retrieves commands from plugins for current scope', () => {
-    render((
+    render(
       <PluggableCommands usage="search_query">
         {(commands) => {
           expect(commands.length).not.toBe(0);
 
           return null;
         }}
-      </PluggableCommands>
-    ));
+      </PluggableCommands>,
+    );
   });
 
   it('ignores commands from plugins for other scopes', () => {
-    render((
+    render(
       <PluggableCommands usage="global_override_query">
         {(commands) => {
           expect(commands.length).toBe(0);
 
           return null;
         }}
-      </PluggableCommands>
-    ));
+      </PluggableCommands>,
+    );
   });
 
   it('extends context with values from providers', () => {
-    render((
+    render(
       <PluggableCommands usage="search_query">
         {(commands) => {
           const [command] = commands;
@@ -87,7 +91,7 @@ describe('PluggableCommands', () => {
 
           return null;
         }}
-      </PluggableCommands>
-    ));
+      </PluggableCommands>,
+    );
   });
 });

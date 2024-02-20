@@ -21,7 +21,7 @@ import ActionDropdown from 'views/components/common/ActionDropdown';
 import IconButton from 'components/common/IconButton';
 
 type Props = {
-  children: React.ReactElement | React.ReactElement[],
+  children: React.ReactElement | React.ReactElement[];
 };
 
 const QueryActionDropdown = ({ children }: Props) => (

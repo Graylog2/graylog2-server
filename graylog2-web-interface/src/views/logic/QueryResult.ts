@@ -24,47 +24,49 @@ import type { SearchErrorResponse } from './SearchError';
 import SearchError from './SearchError';
 
 type Results = {
-  searchTypes: SearchTypeResults,
+  searchTypes: SearchTypeResults;
 };
 
-const _findMessages = (results: Results): (MessageResult | undefined) => Object.keys(results.searchTypes)
-  .map((id) => results.searchTypes[id])
-  .find((searchType) => searchType.type.toLowerCase() === 'messages') as MessageResult;
+const _findMessages = (results: Results): MessageResult | undefined =>
+  Object.keys(results.searchTypes)
+    .map((id) => results.searchTypes[id])
+    .find((searchType) => searchType.type.toLowerCase() === 'messages') as MessageResult;
 
 const _searchTypePlugin = (type: string) => {
   const typeDefinition = searchTypeDefinition(type);
 
-  return typeDefinition && typeDefinition.handler ? searchTypeDefinition(type).handler
+  return typeDefinition && typeDefinition.handler
+    ? searchTypeDefinition(type).handler
     : {
-      convert: (result) => {
-        // eslint-disable-next-line no-console
-        console.log(`No search type handler for type '${type}' result:`, result);
+        convert: (result) => {
+          // eslint-disable-next-line no-console
+          console.log(`No search type handler for type '${type}' result:`, result);
 
-        return result;
-      },
-    };
+          return result;
+        },
+      };
 };
 
 type State = {
-  query: any,
-  errors: Array<SearchError>,
-  duration: number,
-  timestamp: string,
-  effectiveTimerange: AbsoluteTimeRange,
-  searchTypes: SearchTypeResults,
+  query: any;
+  errors: Array<SearchError>;
+  duration: number;
+  timestamp: string;
+  effectiveTimerange: AbsoluteTimeRange;
+  searchTypes: SearchTypeResults;
 };
 
 type QueryResultResponse = {
   execution_stats: {
-    duration: number,
-    timestamp: string,
-    effective_timerange: AbsoluteTimeRange,
-  },
-  query: any,
-  errors: Array<SearchErrorResponse>,
+    duration: number;
+    timestamp: string;
+    effective_timerange: AbsoluteTimeRange;
+  };
+  query: any;
+  errors: Array<SearchErrorResponse>;
   search_types: {
-    [id: string]: { type: string },
-  },
+    [id: string]: { type: string };
+  };
 };
 
 export default class QueryResult {
@@ -79,10 +81,10 @@ export default class QueryResult {
       duration,
       timestamp,
       effectiveTimerange: effective_timerange,
-      searchTypes: mapValues(queryResult.search_types, (searchType) => (
+      searchTypes: mapValues(queryResult.search_types, (searchType) =>
         // each search type has a custom data structure attached to it, let the plugin convert the value
-        _searchTypePlugin(searchType.type).convert(searchType)
-      )),
+        _searchTypePlugin(searchType.type).convert(searchType),
+      ),
     };
   }
 
@@ -92,19 +94,31 @@ export default class QueryResult {
     return messages ? messages.total : 0;
   }
 
-  get duration() { return this._state.duration; }
+  get duration() {
+    return this._state.duration;
+  }
 
-  get effectiveTimerange() { return this._state.effectiveTimerange; }
+  get effectiveTimerange() {
+    return this._state.effectiveTimerange;
+  }
 
-  get errors() { return this._state.errors; }
+  get errors() {
+    return this._state.errors;
+  }
 
   get messages() {
     return _findMessages(this);
   }
 
-  get query() { return this._state.query; }
+  get query() {
+    return this._state.query;
+  }
 
-  get searchTypes() { return this._state.searchTypes; }
+  get searchTypes() {
+    return this._state.searchTypes;
+  }
 
-  get timestamp() { return this._state.timestamp; }
+  get timestamp() {
+    return this._state.timestamp;
+  }
 }

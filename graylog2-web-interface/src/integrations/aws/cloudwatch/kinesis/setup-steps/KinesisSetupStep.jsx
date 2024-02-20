@@ -38,9 +38,7 @@ const KinesisSetupStep = ({ label, progress }) => {
       <Content>
         <StepHeader>Create {label}</StepHeader>
 
-        <StepDetails>
-          {defaultText}
-        </StepDetails>
+        <StepDetails>{defaultText}</StepDetails>
       </Content>
     </StepItem>
   );

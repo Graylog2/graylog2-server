@@ -17,21 +17,21 @@ const ControlledTableListExample = createReactClass({
   },
 
   formatItems(items) {
-    return items.map(item => {
+    return items.map((item) => {
       return (
         <ControlledTableList.Item key={item.id}>
           <Row className="row-sm">
             <Col md={12}>
-              <h5>{item.title} <small>{item.description}</small></h5>
+              <h5>
+                {item.title} <small>{item.description}</small>
+              </h5>
             </Col>
           </Row>
           <Row className="row-sm">
-            <Col md={12}>
-              #{item.id}
-            </Col>
+            <Col md={12}>#{item.id}</Col>
           </Row>
         </ControlledTableList.Item>
-      )
+      );
     });
   },
 
@@ -40,14 +40,12 @@ const ControlledTableListExample = createReactClass({
 
     return (
       <ControlledTableList>
-        <ControlledTableList.Header>
-          Numbers
-        </ControlledTableList.Header>
+        <ControlledTableList.Header>Numbers</ControlledTableList.Header>
         {this.formatItems(items)}
       </ControlledTableList>
     );
   },
 });
 
-<ControlledTableListExample />
+<ControlledTableListExample />;
 ```

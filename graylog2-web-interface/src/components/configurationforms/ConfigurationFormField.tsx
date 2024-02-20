@@ -29,82 +29,102 @@ import {
 import type { ConfigurationField, FieldValue, EncryptedFieldValue } from 'components/configurationforms/types';
 
 type Props = {
-  typeName: string,
-  configField: ConfigurationField,
-  configKey: string,
-  configValue: FieldValue | EncryptedFieldValue<FieldValue>,
-  dirty: boolean,
-  autoFocus: boolean,
-  onChange: (field: string, value: FieldValue | EncryptedFieldValue<FieldValue>, dirty?: boolean) => void,
+  typeName: string;
+  configField: ConfigurationField;
+  configKey: string;
+  configValue: FieldValue | EncryptedFieldValue<FieldValue>;
+  dirty: boolean;
+  autoFocus: boolean;
+  onChange: (field: string, value: FieldValue | EncryptedFieldValue<FieldValue>, dirty?: boolean) => void;
 };
 
-const ConfigurationFormField = ({ typeName, configField, configKey, configValue, dirty, autoFocus, onChange }: Props) => {
+const ConfigurationFormField = ({
+  typeName,
+  configField,
+  configKey,
+  configValue,
+  dirty,
+  autoFocus,
+  onChange,
+}: Props) => {
   const elementKey = `${typeName}-${configKey}`;
 
   switch (configField.type) {
     case 'text':
       return (
-        <TextField key={elementKey}
-                   typeName={typeName}
-                   title={configKey}
-                   field={configField}
-                   value={configValue as string | EncryptedFieldValue<string>}
-                   dirty={dirty}
-                   onChange={onChange}
-                   autoFocus={autoFocus} />
+        <TextField
+          key={elementKey}
+          typeName={typeName}
+          title={configKey}
+          field={configField}
+          value={configValue as string | EncryptedFieldValue<string>}
+          dirty={dirty}
+          onChange={onChange}
+          autoFocus={autoFocus}
+        />
       );
     case 'number':
       return (
-        <NumberField key={elementKey}
-                     typeName={typeName}
-                     title={configKey}
-                     field={configField}
-                     value={configValue as number}
-                     onChange={onChange}
-                     autoFocus={autoFocus} />
+        <NumberField
+          key={elementKey}
+          typeName={typeName}
+          title={configKey}
+          field={configField}
+          value={configValue as number}
+          onChange={onChange}
+          autoFocus={autoFocus}
+        />
       );
     case 'boolean':
       return (
-        <BooleanField key={elementKey}
-                      typeName={typeName}
-                      title={configKey}
-                      field={configField}
-                      value={configValue as boolean}
-                      onChange={onChange}
-                      autoFocus={autoFocus} />
+        <BooleanField
+          key={elementKey}
+          typeName={typeName}
+          title={configKey}
+          field={configField}
+          value={configValue as boolean}
+          onChange={onChange}
+          autoFocus={autoFocus}
+        />
       );
     case 'dropdown':
       return (
-        <DropdownField key={elementKey}
-                       typeName={typeName}
-                       title={configKey}
-                       field={configField}
-                       value={configValue as string}
-                       onChange={onChange}
-                       autoFocus={autoFocus}
-                       addPlaceholder />
+        <DropdownField
+          key={elementKey}
+          typeName={typeName}
+          title={configKey}
+          field={configField}
+          value={configValue as string}
+          onChange={onChange}
+          autoFocus={autoFocus}
+          addPlaceholder
+        />
       );
     case 'list':
       return (
-        <ListField key={elementKey}
-                   typeName={typeName}
-                   title={configKey}
-                   field={configField}
-                   value={configValue as Array<string> | string}
-                   onChange={onChange}
-                   autoFocus={autoFocus} />
+        <ListField
+          key={elementKey}
+          typeName={typeName}
+          title={configKey}
+          field={configField}
+          value={configValue as Array<string> | string}
+          onChange={onChange}
+          autoFocus={autoFocus}
+        />
       );
     case 'inline_binary':
       if (configField.is_encrypted) {
         return (
-          <EncryptedInlineBinaryField key={elementKey}
-                                      typeName={typeName}
-                                      title={configKey}
-                                      field={configField}
-                                      value={configValue as EncryptedFieldValue<string>}
-                                      dirty={dirty}
-                                      onChange={onChange}
-                                      autoFocus={autoFocus} />
+          <EncryptedInlineBinaryField
+            key={elementKey}
+            typeName={typeName}
+            title={configKey}
+            field={configField}
+            value={configValue as EncryptedFieldValue<string>}
+            dirty={dirty}
+            onChange={onChange}
+            autoFocus={autoFocus}
+          />
         );
       }
 

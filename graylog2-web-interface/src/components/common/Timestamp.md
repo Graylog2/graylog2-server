@@ -11,7 +11,7 @@ The component displays the date time in the default format for date times in the
 
 #### Specific timezone
 
-In this example we are displaying the provided time as UTC. 
+In this example we are displaying the provided time as UTC.
 
 ```tsx
 <Timestamp dateTime="2010-07-30T16:03:25.000Z" tz="UTC" />
@@ -21,7 +21,6 @@ In this example we are displaying the provided time as UTC.
 
 ```tsx
 import { DATE_TIME_FORMATS } from 'util/DateTime';
-
 
 <table cellPadding="10">
   <thead>
@@ -34,9 +33,11 @@ import { DATE_TIME_FORMATS } from 'util/DateTime';
     {Object.keys(DATE_TIME_FORMATS).map((format) => (
       <tr key={format}>
         <td>{format}</td>
-        <td><Timestamp dateTime="2010-07-30T16:03:25.000Z" format={format}/></td>
+        <td>
+          <Timestamp dateTime="2010-07-30T16:03:25.000Z" format={format} />
+        </td>
       </tr>
     ))}
   </tbody>
-</table>
+</table>;
 ```

@@ -1,7 +1,7 @@
 ### Default
 
 ```js
-import {Nav, NavItem, NavDropdown, MenuItem} from 'components/bootstrap';
+import { Nav, NavItem, NavDropdown, MenuItem } from 'components/bootstrap';
 
 <Navbar>
   <Nav activeKey={1}>
@@ -22,13 +22,13 @@ import {Nav, NavItem, NavDropdown, MenuItem} from 'components/bootstrap';
       <MenuItem eventKey="4.4">Separated link</MenuItem>
     </NavDropdown>
   </Nav>
-</Navbar>
+</Navbar>;
 ```
 
 ### Inversed
 
 ```js
-import {Nav, NavItem, NavDropdown, MenuItem} from 'components/bootstrap';
+import { Nav, NavItem, NavDropdown, MenuItem } from 'components/bootstrap';
 
 <Navbar inverse>
   <Nav activeKey={1}>
@@ -49,5 +49,5 @@ import {Nav, NavItem, NavDropdown, MenuItem} from 'components/bootstrap';
       <MenuItem eventKey="4.4">Separated link</MenuItem>
     </NavDropdown>
   </Nav>
-</Navbar>
+</Navbar>;
 ```

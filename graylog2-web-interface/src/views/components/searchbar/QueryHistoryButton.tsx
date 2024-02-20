@@ -31,22 +31,27 @@ const ButtonContainer = styled.div`
   margin-left: 6px;
 `;
 
-const fetchQueryHistoryCompletions = () => SearchSuggestions.suggestQueryStrings(QUERY_HISTORY_LIMIT).then((response) => (
-  response.sort((
-    { last_used: lastUsedA }, { last_used: lastUsedB }) => new Date(lastUsedB).getTime() - new Date(lastUsedA).getTime(),
-  ).map((entry, index) => ({
-    value: entry.query,
-    meta: 'history',
-    score: index,
-    completer: {
-      insertMatch: (
-        editor: { setValue: (value: string, cursorPosition?: number) => void },
-        data: { value: string },
-      ) => {
-        editor.setValue(data.value, 1);
-      },
-    },
-  }))));
+const fetchQueryHistoryCompletions = () =>
+  SearchSuggestions.suggestQueryStrings(QUERY_HISTORY_LIMIT).then((response) =>
+    response
+      .sort(
+        ({ last_used: lastUsedA }, { last_used: lastUsedB }) =>
+          new Date(lastUsedB).getTime() - new Date(lastUsedA).getTime(),
+      )
+      .map((entry, index) => ({
+        value: entry.query,
+        meta: 'history',
+        score: index,
+        completer: {
+          insertMatch: (
+            editor: { setValue: (value: string, cursorPosition?: number) => void },
+            data: { value: string },
+          ) => {
+            editor.setValue(data.value, 1);
+          },
+        },
+      })),
+  );
 
 export const displayHistoryCompletions = async (editor: Editor) => {
   const historyCompletions = await fetchQueryHistoryCompletions();
@@ -57,8 +62,8 @@ export const displayHistoryCompletions = async (editor: Editor) => {
 };
 
 type Props = {
-  editorRef: React.MutableRefObject<Editor>
-}
+  editorRef: React.MutableRefObject<Editor>;
+};
 
 const QueryHistoryButton = ({ editorRef }: Props) => {
   const showQueryHistory = async () => {

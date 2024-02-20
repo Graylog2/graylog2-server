@@ -21,7 +21,7 @@ export type Configuration = {
   name: string;
   id: string;
   tags: string[];
-}
+};
 
 export type Collector = {
   service_type: string;
@@ -32,7 +32,7 @@ export type Collector = {
   execute_parameters: string;
   default_template: string;
   id: string;
-}
+};
 
 export type CollectorStatus = {
   verbose_message: string;
@@ -40,20 +40,20 @@ export type CollectorStatus = {
   message: string;
   configuration_id: string;
   status: number;
-}
+};
 
 export type ConfigurationAssignment = {
   assigned_from_tags: string[];
   collector_id: string;
   configuration_id: string;
-}
+};
 
 export type NodeLogFile = {
   path: string;
   mod_time: string;
   size: number;
   is_dir: boolean;
-}
+};
 
 export type SidecarSummary = {
   node_details: NodeDetails;
@@ -64,19 +64,19 @@ export type SidecarSummary = {
   node_name: string;
   active: boolean;
   node_id: string;
-}
+};
 
 export type NodeMetrics = {
   cpu_idle: number;
   disks_75: string[];
   load_1: number;
-}
+};
 
 export type CollectorStatusList = {
   collectors: CollectorStatus[];
   message: string;
   status: number;
-}
+};
 
 export type NodeDetails = {
   ip: string;
@@ -86,24 +86,24 @@ export type NodeDetails = {
   log_file_list: NodeLogFile[];
   status: CollectorStatusList;
   tags: string[];
-}
+};
 
 export type ConfigurationSidecarsResponse = {
   sidecar_ids: string[];
   configuration_id: string;
-}
+};
 
 export type SidecarCollectorPairType = {
   collector: Collector;
   sidecar: SidecarSummary;
-}
+};
 
 export type PaginationInfo = {
   per_page: number;
   total: number;
   count: number;
   page: number;
-}
+};
 
 export type SidecarListResponse = {
   sidecars: SidecarSummary[];
@@ -112,8 +112,8 @@ export type SidecarListResponse = {
   query: string;
   sort: string;
   filters: {
-      [_key: string]: string;
+    [_key: string]: string;
   };
   only_active: boolean;
   order: string;
-}
+};

@@ -105,34 +105,46 @@ class KeyValueTable extends React.Component {
           customStyle.width = 75;
         }
 
-        return <th key={header} style={customStyle}>{header}</th>;
+        return (
+          <th key={header} style={customStyle}>
+            {header}
+          </th>
+        );
       })}
     </tr>
   );
 
-  _formattedRows = (pairs) => Object.keys(pairs).sort().map((key) => {
-    let actionsColumn;
+  _formattedRows = (pairs) =>
+    Object.keys(pairs)
+      .sort()
+      .map((key) => {
+        let actionsColumn;
 
-    if (this.props.editable) {
-      const actions = [];
+        if (this.props.editable) {
+          const actions = [];
 
-      actions.push(
-        <Button key={`delete-${key}`} bsStyle="danger" bsSize={this.props.actionsSize} onClick={this._deleteRow(key)}>
-          Delete
-        </Button>,
-      );
+          actions.push(
+            <Button
+              key={`delete-${key}`}
+              bsStyle="danger"
+              bsSize={this.props.actionsSize}
+              onClick={this._deleteRow(key)}
+            >
+              Delete
+            </Button>,
+          );
 
-      actionsColumn = <td>{actions}</td>;
-    }
+          actionsColumn = <td>{actions}</td>;
+        }
 
-    return (
-      <tr key={key}>
-        <td>{key}</td>
-        <td>{pairs[key]}</td>
-        {actionsColumn}
-      </tr>
-    );
-  });
+        return (
+          <tr key={key}>
+            <td>{key}</td>
+            <td>{pairs[key]}</td>
+            {actionsColumn}
+          </tr>
+        );
+      });
 
   _newRow = () => {
     if (!this.props.editable) {
@@ -145,30 +157,36 @@ class KeyValueTable extends React.Component {
       <tr>
         <td>
           <StyledDiv>
-            <Input type="text"
-                   name="newKey"
-                   id="newKey"
-                   data-testid="newKey"
-                   bsSize="small"
-                   placeholder={this.props.headers[0]}
-                   value={this.state.newKey}
-                   onChange={this._bindValue} />
+            <Input
+              type="text"
+              name="newKey"
+              id="newKey"
+              data-testid="newKey"
+              bsSize="small"
+              placeholder={this.props.headers[0]}
+              value={this.state.newKey}
+              onChange={this._bindValue}
+            />
           </StyledDiv>
         </td>
         <td>
           <StyledDiv>
-            <Input type="text"
-                   name="newValue"
-                   id="newValue"
-                   data-testid="newValue"
-                   bsSize="small"
-                   placeholder={this.props.headers[1]}
-                   value={this.state.newValue}
-                   onChange={this._bindValue} />
+            <Input
+              type="text"
+              name="newValue"
+              id="newValue"
+              data-testid="newValue"
+              bsSize="small"
+              placeholder={this.props.headers[1]}
+              value={this.state.newValue}
+              onChange={this._bindValue}
+            />
           </StyledDiv>
         </td>
         <td>
-          <Button bsStyle="success" bsSize="small" onClick={this._addRow} disabled={addRowDisabled}>Add</Button>
+          <Button bsStyle="success" bsSize="small" onClick={this._addRow} disabled={addRowDisabled}>
+            Add
+          </Button>
         </td>
       </tr>
     );

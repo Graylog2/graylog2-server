@@ -30,10 +30,10 @@ import type { SearchExecutors } from 'views/logic/slices/searchExecutionSlice';
 import SearchMetadata from 'views/logic/search/SearchMetadata';
 
 type Props = {
-  searchJson: Partial<SearchJson>,
-  viewJson: any,
-  searchJobResult: Partial<SearchJobResult>,
-}
+  searchJson: Partial<SearchJson>;
+  viewJson: any;
+  searchJobResult: Partial<SearchJobResult>;
+};
 const searchMetadata = SearchMetadata.empty();
 
 const StaticSearch = ({ searchJson, viewJson, searchJobResult }: Props) => {
@@ -46,16 +46,22 @@ const StaticSearch = ({ searchJson, viewJson, searchJobResult }: Props) => {
       .build();
   }, [searchJson, viewJson]);
 
-  const searchResult = useMemo(() => ({
-    result: new SearchResult(searchJobResult as SearchJobResult),
-    widgetMapping: view.widgetMapping,
-  }), [searchJobResult, view.widgetMapping]);
+  const searchResult = useMemo(
+    () => ({
+      result: new SearchResult(searchJobResult as SearchJobResult),
+      widgetMapping: view.widgetMapping,
+    }),
+    [searchJobResult, view.widgetMapping],
+  );
 
-  const searchExecutors: SearchExecutors = useMemo(() => ({
-    execute: async () => searchResult,
-    parse: async () => searchMetadata,
-    resultMapper: (result) => result,
-  }), [searchResult]);
+  const searchExecutors: SearchExecutors = useMemo(
+    () => ({
+      execute: async () => searchResult,
+      parse: async () => searchMetadata,
+      resultMapper: (result) => result,
+    }),
+    [searchResult],
+  );
 
   return (
     <SearchExecutorsContext.Provider value={searchExecutors}>

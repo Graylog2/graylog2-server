@@ -21,8 +21,8 @@ import PropTypes from 'prop-types';
 import UIUtils from 'util/UIUtils';
 
 type Props = {
-  children: React.ReactNode,
-  value: any,
+  children: React.ReactNode;
+  value: any;
 };
 
 const ScrollToHint = ({ children, value }: Props) => {
@@ -32,11 +32,7 @@ const ScrollToHint = ({ children, value }: Props) => {
     UIUtils.scrollToHint(spanRef.current);
   }, [value]);
 
-  return (
-    <span ref={spanRef}>
-      {children}
-    </span>
-  );
+  return <span ref={spanRef}>{children}</span>;
 };
 
 ScrollToHint.propTypes = {

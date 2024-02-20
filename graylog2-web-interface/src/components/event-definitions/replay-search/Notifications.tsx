@@ -27,19 +27,25 @@ import NoAttributeProvided from 'components/event-definitions/replay-search/NoAt
 const Notifications = () => {
   const { eventDefinition } = useAlertAndEventDefinitionData();
 
-  const allNotifications = useStore(EventNotificationsStore, ({ all }) => all.reduce((res, cur) => {
-    res[cur.id] = cur;
+  const allNotifications = useStore(EventNotificationsStore, ({ all }) =>
+    all.reduce((res, cur) => {
+      res[cur.id] = cur;
 
-    return res;
-  }, {}));
+      return res;
+    }, {}),
+  );
 
-  const notificationList = useMemo(() => eventDefinition.notifications.reduce((res, cur) => {
-    if (allNotifications[cur.notification_id]) {
-      res.push((allNotifications[cur.notification_id]));
-    }
+  const notificationList = useMemo(
+    () =>
+      eventDefinition.notifications.reduce((res, cur) => {
+        if (allNotifications[cur.notification_id]) {
+          res.push(allNotifications[cur.notification_id]);
+        }
 
-    return res;
-  }, []), [eventDefinition, allNotifications]);
+        return res;
+      }, []),
+    [eventDefinition, allNotifications],
+  );
 
   return notificationList.length ? (
     <>
@@ -49,12 +55,16 @@ const Notifications = () => {
         return (
           <span key={id}>
             {prefix}
-            <Link target="_blank" to={Routes.ALERTS.NOTIFICATIONS.show(id)}>{title}</Link>
+            <Link target="_blank" to={Routes.ALERTS.NOTIFICATIONS.show(id)}>
+              {title}
+            </Link>
           </span>
         );
       })}
     </>
-  ) : <NoAttributeProvided name="Notifications" />;
+  ) : (
+    <NoAttributeProvided name="Notifications" />
+  );
 };
 
 export default Notifications;

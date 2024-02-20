@@ -50,17 +50,19 @@ export const ApiProvider = ({ children }) => {
   };
 
   return (
-    <ApiContext.Provider value={{
-      availableStreams,
-      setStreams,
-      availableRegions,
-      setRegions,
-      logData,
-      setLogData,
-      clearLogData,
-      availableGroups,
-      setGroups,
-    }}>
+    <ApiContext.Provider
+      value={{
+        availableStreams,
+        setStreams,
+        availableRegions,
+        setRegions,
+        logData,
+        setLogData,
+        clearLogData,
+        availableGroups,
+        setGroups,
+      }}
+    >
       {children}
     </ApiContext.Provider>
   );

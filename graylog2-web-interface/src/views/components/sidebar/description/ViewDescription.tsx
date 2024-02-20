@@ -29,7 +29,7 @@ import SectionInfo from '../SectionInfo';
 import SectionSubheadline from '../SectionSubheadline';
 
 type Props = {
-  results: QueryResult,
+  results: QueryResult;
 };
 
 const ViewDescription = ({ results }: Props) => {
@@ -40,9 +40,7 @@ const ViewDescription = ({ results }: Props) => {
 
   const resultsSection = (
     <>
-      <SectionSubheadline>
-        Execution
-      </SectionSubheadline>
+      <SectionSubheadline>Execution</SectionSubheadline>
 
       <SearchResultOverview results={results} />
     </>
@@ -61,19 +59,14 @@ const ViewDescription = ({ results }: Props) => {
     <>
       {(!viewMetadata.summary || !viewMetadata.description) && (
         <SectionInfo>
-          To add a description and summary for this {viewTypeLabel} click on the <Icon name="ellipsis-h" /> icon in the search bar to open its action menu. The action menu includes the option &quot;Edit metadata&quot;.
+          To add a description and summary for this {viewTypeLabel} click on the <Icon name="ellipsis-h" /> icon in the
+          search bar to open its action menu. The action menu includes the option &quot;Edit metadata&quot;.
         </SectionInfo>
       )}
       {resultsSection}
-      <SectionSubheadline>
-        Search
-      </SectionSubheadline>
-      <p>
-        {viewMetadata.summary || <i>This {viewTypeLabel} has no summary.</i>}
-      </p>
-      <p>
-        {viewMetadata.description || <i>This {viewTypeLabel} has no description.</i>}
-      </p>
+      <SectionSubheadline>Search</SectionSubheadline>
+      <p>{viewMetadata.summary || <i>This {viewTypeLabel} has no summary.</i>}</p>
+      <p>{viewMetadata.description || <i>This {viewTypeLabel} has no description.</i>}</p>
     </>
   );
 };

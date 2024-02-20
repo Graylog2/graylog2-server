@@ -66,27 +66,36 @@ const StepHealthCheck = ({ onChange, onSubmit }) => {
 
   if (!logData) {
     return (
-      <Panel bsStyle="warning"
-             header={(
-               <Notice><i className="fa fa-exclamation-triangle fa-2x" />
-                 <span>We haven&apos;t received a response back from Amazon yet.</span>
-               </Notice>
-            )}>
-        <p>Hang out for a few moments while we keep checking your AWS stream for logs. Amazon&apos;s servers parse logs every 10 minutes, so grab a cup of coffee because this may take some time!</p>
+      <Panel
+        bsStyle="warning"
+        header={
+          <Notice>
+            <i className="fa fa-exclamation-triangle fa-2x" />
+            <span>We haven&apos;t received a response back from Amazon yet.</span>
+          </Notice>
+        }
+      >
+        <p>
+          Hang out for a few moments while we keep checking your AWS stream for logs. Amazon&apos;s servers parse logs
+          every 10 minutes, so grab a cup of coffee because this may take some time!
+        </p>
 
         <CheckAgain>
-          <strong>Checking again in: <Countdown timeInSeconds={120} callback={checkForLogs} paused={pauseCountdown} /></strong>
+          <strong>
+            Checking again in: <Countdown timeInSeconds={120} callback={checkForLogs} paused={pauseCountdown} />
+          </strong>
 
-          <Button type="button"
-                  bsStyle="success"
-                  bsSize="sm"
-                  onClick={checkForLogs}
-                  disabled={logDataProgress.loading}>
+          <Button type="button" bsStyle="success" bsSize="sm" onClick={checkForLogs} disabled={logDataProgress.loading}>
             {logDataProgress.loading ? 'Checking...' : 'Check Now'}
           </Button>
         </CheckAgain>
 
-        <p><em>Do not refresh your browser, we are continually checking for your logs and this page will automatically refresh when your logs are available.</em></p>
+        <p>
+          <em>
+            Do not refresh your browser, we are continually checking for your logs and this page will automatically
+            refresh when your logs are available.
+          </em>
+        </p>
 
         <div>
           <SkipHealthCheck onSubmit={onSubmit} onChange={onChange} />
@@ -108,27 +117,42 @@ const StepHealthCheck = ({ onChange, onSubmit }) => {
   };
 
   return (
-    <FormWrap onSubmit={handleSubmit}
-              buttonContent="Review &amp; Finalize"
-              disabled={false}
-              title="Create Kinesis Stream"
-              description={<p>We are going to attempt to parse a single log to help you out! If we are unable to, or you would like it parsed differently, head on over to <a href="/system/pipelines">Pipeline Rules</a> to set up your own parser!</p>}>
-
-      <Panel bsStyle={bsStyle}
-             header={(
-               <Notice><i className={`fa fa-${iconClass} fa-2x`} />
-                 <span>{acknowledgment} looks like <em>{logType}</em> message type.</span>
-               </Notice>
-             )}>
-        {knownLog ? 'Take a look at what we have parsed so far and you can create Pipeline Rules to handle even more!' : 'Not to worry, Graylog can still read in these log messages. We have parsed what we could and you can build Pipeline Rules to do the rest!'}
+    <FormWrap
+      onSubmit={handleSubmit}
+      buttonContent="Review &amp; Finalize"
+      disabled={false}
+      title="Create Kinesis Stream"
+      description={
+        <p>
+          We are going to attempt to parse a single log to help you out! If we are unable to, or you would like it
+          parsed differently, head on over to <a href="/system/pipelines">Pipeline Rules</a> to set up your own parser!
+        </p>
+      }
+    >
+      <Panel
+        bsStyle={bsStyle}
+        header={
+          <Notice>
+            <i className={`fa fa-${iconClass} fa-2x`} />
+            <span>
+              {acknowledgment} looks like <em>{logType}</em> message type.
+            </span>
+          </Notice>
+        }
+      >
+        {knownLog
+          ? 'Take a look at what we have parsed so far and you can create Pipeline Rules to handle even more!'
+          : 'Not to worry, Graylog can still read in these log messages. We have parsed what we could and you can build Pipeline Rules to do the rest!'}
       </Panel>
 
-      <Input id="awsCloudWatchLog"
-             type="textarea"
-             label="Formatted Log Message"
-             value={logData.message}
-             rows={10}
-             disabled />
+      <Input
+        id="awsCloudWatchLog"
+        type="textarea"
+        label="Formatted Log Message"
+        value={logData.message}
+        rows={10}
+        disabled
+      />
     </FormWrap>
   );
 };

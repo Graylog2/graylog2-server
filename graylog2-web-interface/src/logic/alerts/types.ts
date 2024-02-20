@@ -19,38 +19,38 @@ import type { ParameterJson } from 'views/logic/parameters/Parameter';
 import type { SearchFilter } from 'components/event-definitions/event-definitions-types';
 
 export type EventDefinition = {
-  _scope: string,
-  id: string,
-  title: string,
-  description: string,
-  priority: number,
-  alert: boolean,
+  _scope: string;
+  id: string;
+  title: string;
+  description: string;
+  priority: number;
+  alert: boolean;
   config: {
-    type: string,
-    query: string,
-    query_parameters: ParameterJson[],
-    filters: SearchFilter[],
-    streams: string[],
-    group_by: string[],
-    series: Array<{field: string, id: string, type: string}>,
+    type: string;
+    query: string;
+    query_parameters: ParameterJson[];
+    filters: SearchFilter[];
+    streams: string[];
+    group_by: string[];
+    series: Array<{ field: string; id: string; type: string }>;
     conditions: {
-      expression: string | null | {},
-    },
-    search_within_ms: number,
-    execute_every_ms: number,
-  },
-  field_spec: {},
-  key_spec: string[],
+      expression: string | null | {};
+    };
+    search_within_ms: number;
+    execute_every_ms: number;
+  };
+  field_spec: {};
+  key_spec: string[];
   notification_settings: {
-    grace_period_ms: number,
-    backlog_size: number,
-  },
-  notifications: Array<{ notification_id: string, notification_parameters: string}>,
+    grace_period_ms: number;
+    backlog_size: number;
+  };
+  notifications: Array<{ notification_id: string; notification_parameters: string }>;
   storage: [
     {
-      type: string,
-      streams: number[] | string[],
-    }
-  ],
-  updated_at: string | null
-}
+      type: string;
+      streams: number[] | string[];
+    },
+  ];
+  updated_at: string | null;
+};

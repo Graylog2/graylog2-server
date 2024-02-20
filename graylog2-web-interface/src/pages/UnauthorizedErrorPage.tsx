@@ -23,7 +23,11 @@ import ErrorPage from 'components/errors/ErrorPage';
 import withLocation from 'routing/withLocation';
 import type { Location } from 'routing/withLocation';
 
-const createErrorMessageString = (errorDetails: string | null | undefined, pageDetails: string, errorMessage: string) => {
+const createErrorMessageString = (
+  errorDetails: string | null | undefined,
+  pageDetails: string,
+  errorMessage: string,
+) => {
   const defaultText = `${pageDetails}\n${errorMessage}`;
 
   if (errorDetails) {
@@ -34,11 +38,11 @@ const createErrorMessageString = (errorDetails: string | null | undefined, pageD
 };
 
 type Props = {
-  description?: React.ReactNode,
-  error: FetchError,
-  errorDetails?: string,
-  location: Location,
-  title?: string,
+  description?: React.ReactNode;
+  error: FetchError;
+  errorDetails?: string;
+  location: Location;
+  title?: string;
 };
 
 const UnauthorizedErrorPage = ({ error, errorDetails, title, description, location: { pathname } }: Props) => {
@@ -58,22 +62,16 @@ const UnauthorizedErrorPage = ({ error, errorDetails, title, description, locati
         <dd>
           <pre className="content">
             <div className="pull-right">
-              <ClipboardButton title={<Icon name="copy" fixedWidth />}
-                               bsSize="sm"
-                               text={errorMessageString}
-                               buttonTitle="Copy error details to clipboard" />
+              <ClipboardButton
+                title={<Icon name="copy" fixedWidth />}
+                bsSize="sm"
+                text={errorMessageString}
+                buttonTitle="Copy error details to clipboard"
+              />
             </div>
-            {errorDetails && (
-              <p>
-                {errorDetails}
-              </p>
-            )}
-            <p>
-              {pageDetails}
-            </p>
-            <p>
-              {errorMessage}
-            </p>
+            {errorDetails && <p>{errorDetails}</p>}
+            <p>{pageDetails}</p>
+            <p>{errorMessage}</p>
           </pre>
         </dd>
       </dl>

@@ -41,10 +41,12 @@ class LookupTableCreate extends React.Component {
       <div>
         <Row className="content">
           <Col lg={8}>
-            <LookupTableForm saved={this.props.saved}
-                             create
-                             validate={this.props.validate}
-                             validationErrors={this.props.validationErrors} />
+            <LookupTableForm
+              saved={this.props.saved}
+              create
+              validate={this.props.validate}
+              validationErrors={this.props.validationErrors}
+            />
           </Col>
         </Row>
       </div>

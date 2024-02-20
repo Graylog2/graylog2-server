@@ -25,13 +25,11 @@ import CustomizationContext from './CustomizationContext';
 const CustomizationProvider = ({ children }) => {
   const customization = useStore(CustomizationsStore, (state) => state.customization);
 
-  return customization
-    ? (
-      <CustomizationContext.Provider value={customization}>
-        {children}
-      </CustomizationContext.Provider>
-    )
-    : children;
+  return customization ? (
+    <CustomizationContext.Provider value={customization}>{children}</CustomizationContext.Provider>
+  ) : (
+    children
+  );
 };
 
 CustomizationProvider.propTypes = {

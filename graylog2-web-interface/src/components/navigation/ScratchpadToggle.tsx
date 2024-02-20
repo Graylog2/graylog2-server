@@ -33,15 +33,16 @@ const ScratchpadToggle = () => {
 
   return (
     <li role="presentation">
-      <Toggle bsStyle="link"
-              type="button"
-              aria-label="Scratchpad"
-              id="scratchpad-toggle"
-              onClick={toggleScratchpadVisibility}>
+      <Toggle
+        bsStyle="link"
+        type="button"
+        aria-label="Scratchpad"
+        id="scratchpad-toggle"
+        onClick={toggleScratchpadVisibility}
+      >
         <Icon name="edit" size="lg" fixedWidth title="Scratchpad" />
       </Toggle>
     </li>
-
   );
 };
 

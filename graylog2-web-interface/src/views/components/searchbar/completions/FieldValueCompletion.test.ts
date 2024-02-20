@@ -64,7 +64,12 @@ describe('FieldValueCompletion', () => {
     { name: 'POST', value: 'POST', caption: 'POST', score: 300, meta: '300 hits' },
     { name: 'PUT', value: 'PUT', caption: 'PUT', score: 400, meta: '400 hits' },
   ];
-  const createCurrentToken = (type: string, value: string, index: number, start: number) => ({ type, value, index, start });
+  const createCurrentToken = (type: string, value: string, index: number, start: number) => ({
+    type,
+    value,
+    index,
+    start,
+  });
   const createKeywordToken = (value: string) => createCurrentToken('keyword', value, 0, 0);
 
   beforeEach(() => {
@@ -90,9 +95,11 @@ describe('FieldValueCompletion', () => {
     it('returns empty list if inputs are empty', () => {
       const completer = new FieldValueCompletion();
 
-      expect(completer.getCompletions({
-        ...requestDefaults,
-      })).toEqual([]);
+      expect(
+        completer.getCompletions({
+          ...requestDefaults,
+        }),
+      ).toEqual([]);
     });
 
     it('returns suggestions, when current token is a keyword', async () => {
@@ -238,9 +245,7 @@ describe('FieldValueCompletion', () => {
         field: 'http_method',
         input: 'PSOT',
         sum_other_docs_count: 0,
-        suggestions: [
-          { value: 'POST', occurrence: 300, title: undefined },
-        ],
+        suggestions: [{ value: 'POST', occurrence: 300, title: undefined }],
         error: undefined,
       };
       const currentToken = createCurrentToken('term', 'PSOT', 1, 12);
@@ -273,9 +278,7 @@ describe('FieldValueCompletion', () => {
         field: 'process',
         input: '',
         sum_other_docs_count: 0,
-        suggestions: [
-          { value: 'C:\\Windows\\System32\\lsass.exe', occurrence: 300, title: undefined },
-        ],
+        suggestions: [{ value: 'C:\\Windows\\System32\\lsass.exe', occurrence: 300, title: undefined }],
         error: undefined,
       };
       const currentToken = createCurrentToken('term', '', 1, 12);
@@ -400,5 +403,5 @@ describe('FieldValueCompletion', () => {
         expect(secondSuggestions).toEqual(expectedFirstSuggestions);
       });
     });
-  });/**/
+  }); /**/
 });

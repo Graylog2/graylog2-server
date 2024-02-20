@@ -26,22 +26,18 @@ import type { Input } from 'components/messageloaders/Types';
 import { useStore } from 'stores/connect';
 
 type Props = {
-  input: Input,
-}
+  input: Input;
+};
 
 const comparator = new InputStateComparator();
 
 type InputState = {
-  count: number,
-  state:
-    | 'RUNNING'
-    | 'FAILED'
-    | 'STOPPED'
-    | 'STARTING'
-}
+  count: number;
+  state: 'RUNNING' | 'FAILED' | 'STOPPED' | 'STARTING';
+};
 type InputStates = {
-  [inputId: string]: InputState,
-}
+  [inputId: string]: InputState;
+};
 
 const InputStateBadge = ({ input }: Props) => {
   const { inputStates } = useStore(InputStatesStore) as { inputStates: InputStates };
@@ -69,9 +65,8 @@ const InputStateBadge = ({ input }: Props) => {
     }
   };
 
-  const _textForState = (sortedStates) => (input.global
-    ? sortedStates.map((state) => `${state.count} ${state.state}`).join(', ')
-    : sortedStates[0].state);
+  const _textForState = (sortedStates) =>
+    input.global ? sortedStates.map((state) => `${state.count} ${state.state}`).join(', ') : sortedStates[0].state;
 
   const isLoading = !(inputStates && nodes);
 
@@ -94,23 +89,38 @@ const InputStateBadge = ({ input }: Props) => {
     });
   }
 
-  const sorted = Object.keys(sortedInputStates).sort(comparator.compare.bind(comparator)).map((state) => ({
-    state: state,
-    count: sortedInputStates[state].length,
-  }));
+  const sorted = Object.keys(sortedInputStates)
+    .sort(comparator.compare.bind(comparator))
+    .map((state) => ({
+      state: state,
+      count: sortedInputStates[state].length,
+    }));
 
   if (sorted.length > 0) {
-    const popOverText = sorted.map((state) => sortedInputStates[state.state].map((node) => (
-      <small><LinkToNode nodeId={node} />: {state.state}<br />
-      </small>
-    )));
+    const popOverText = sorted.map((state) =>
+      sortedInputStates[state.state].map((node) => (
+        <small>
+          <LinkToNode nodeId={node} />: {state.state}
+          <br />
+        </small>
+      )),
+    );
 
     return (
-      <OverlayTrigger trigger="click" placement="bottom" overlay={popOverText} rootClose title={`Input States for ${input.title}`}>
-        <Label bsStyle={_labelClassForState(sorted)}
-               title="Click to show details"
-               bsSize="xsmall"
-               style={{ cursor: 'pointer' }}>{_textForState(sorted)}
+      <OverlayTrigger
+        trigger="click"
+        placement="bottom"
+        overlay={popOverText}
+        rootClose
+        title={`Input States for ${input.title}`}
+      >
+        <Label
+          bsStyle={_labelClassForState(sorted)}
+          title="Click to show details"
+          bsSize="xsmall"
+          style={{ cursor: 'pointer' }}
+        >
+          {_textForState(sorted)}
         </Label>
       </OverlayTrigger>
     );
@@ -119,7 +129,9 @@ const InputStateBadge = ({ input }: Props) => {
   const text = input.global || input.node === undefined ? '0 RUNNING' : 'NOT RUNNING';
 
   return (
-    <Label bsStyle="warning" bsSize="xsmall">{text}</Label>
+    <Label bsStyle="warning" bsSize="xsmall">
+      {text}
+    </Label>
   );
 };
 

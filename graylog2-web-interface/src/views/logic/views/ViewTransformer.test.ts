@@ -39,20 +39,11 @@ const readFixture = (fixtureName: string) => readJsonFixture(__dirname, fixtureN
 describe('ViewTransformer', () => {
   describe('transform with missing attributes', () => {
     it('should change the type', () => {
-      const query = Query.builder()
-        .id('query-id')
-        .timerange({ type: 'relative', range: 365 })
-        .build();
+      const query = Query.builder().id('query-id').timerange({ type: 'relative', range: 365 }).build();
 
-      const search = Search.builder()
-        .id('search-id')
-        .queries([query])
-        .build();
+      const search = Search.builder().id('search-id').queries([query]).build();
 
-      const searchView = View.builder()
-        .type(View.Type.Search)
-        .search(search)
-        .build();
+      const searchView = View.builder().type(View.Type.Search).search(search).build();
 
       const dashboardView = viewTransformer(searchView);
 
@@ -60,22 +51,11 @@ describe('ViewTransformer', () => {
     });
 
     it('should change the id', () => {
-      const query = Query.builder()
-        .id('query-id')
-        .timerange({ type: 'relative', range: 365 })
-        .build();
+      const query = Query.builder().id('query-id').timerange({ type: 'relative', range: 365 }).build();
 
-      const search = Search.builder()
-        .id('search-id')
-        .queries([query])
-        .build();
+      const search = Search.builder().id('search-id').queries([query]).build();
 
-      const searchView = View.builder()
-        .id('dead-beef')
-        .title('Breq')
-        .search(search)
-        .type(View.Type.Search)
-        .build();
+      const searchView = View.builder().id('dead-beef').title('Breq').search(search).type(View.Type.Search).build();
 
       const dashboardView = viewTransformer(searchView);
 
@@ -83,24 +63,14 @@ describe('ViewTransformer', () => {
     });
 
     it('should add the timerange to the widget', async () => {
-      const query = Query.builder()
-        .id('query-id')
-        .timerange({ type: 'relative', range: 365 })
-        .build();
+      const query = Query.builder().id('query-id').timerange({ type: 'relative', range: 365 }).build();
 
-      const search = Search.builder()
-        .id('search-id')
-        .queries([query])
-        .build();
+      const search = Search.builder().id('search-id').queries([query]).build();
 
       const viewState: ViewState = await ViewStateGenerator(View.Type.Search);
 
       const viewStateMap: ViewStateMap = Map({ 'query-id': viewState });
-      const searchView = View.builder()
-        .type(View.Type.Search)
-        .state(viewStateMap)
-        .search(search)
-        .build();
+      const searchView = View.builder().type(View.Type.Search).state(viewStateMap).search(search).build();
       const dashboardView = viewTransformer(searchView);
 
       expect(dashboardView.state.get('query-id').widgets.first().timerange).toBe(query.timerange);
@@ -114,19 +84,12 @@ describe('ViewTransformer', () => {
         .query({ type: 'elasticsearch', query_string: 'author: "Karl Marx"' })
         .build();
 
-      const search = Search.builder()
-        .id('search-id')
-        .queries([query])
-        .build();
+      const search = Search.builder().id('search-id').queries([query]).build();
 
       const viewState: ViewState = await ViewStateGenerator(View.Type.Search);
 
       const viewStateMap: ViewStateMap = Map({ 'query-id': viewState });
-      const searchView = View.builder()
-        .type(View.Type.Search)
-        .state(viewStateMap)
-        .search(search)
-        .build();
+      const searchView = View.builder().type(View.Type.Search).state(viewStateMap).search(search).build();
       const dashboardView = viewTransformer(searchView);
 
       expect(dashboardView.state.get('query-id').widgets.first().timerange).toBeUndefined();
@@ -140,19 +103,12 @@ describe('ViewTransformer', () => {
         .filter(Map({ type: 'or', filters: List([Map({ type: 'stream', id: '1234-abcd' })]) }))
         .build();
 
-      const search = Search.builder()
-        .id('search-id')
-        .queries([query])
-        .build();
+      const search = Search.builder().id('search-id').queries([query]).build();
 
       const viewState: ViewState = await ViewStateGenerator(View.Type.Search);
 
       const viewStateMap: ViewStateMap = Map({ 'query-id': viewState });
-      const searchView = View.builder()
-        .type(View.Type.Search)
-        .state(viewStateMap)
-        .search(search)
-        .build();
+      const searchView = View.builder().type(View.Type.Search).state(viewStateMap).search(search).build();
       const dashboardView = viewTransformer(searchView);
 
       expect(dashboardView.state.get('query-id').widgets.first().timerange).toBeUndefined();
@@ -166,15 +122,9 @@ describe('ViewTransformer', () => {
         .query({ type: 'elasticsearch', query_string: 'author: "Karl Marx"' })
         .build();
 
-      const search = Search.builder()
-        .id('search-id')
-        .queries([query])
-        .build();
+      const search = Search.builder().id('search-id').queries([query]).build();
 
-      const searchView = View.builder()
-        .type(View.Type.Search)
-        .search(search)
-        .build();
+      const searchView = View.builder().type(View.Type.Search).search(search).build();
 
       const dashboardView = viewTransformer(searchView);
 
@@ -186,9 +136,7 @@ describe('ViewTransformer', () => {
     it('should transform a view with search from a json fixture', () => {
       const viewFixture = View.fromJSON(readFixture('./ViewTransformer.view.fixture.json'));
       const searchFixture = Search.fromJSON(readFixture('./ViewTransformer.search.fixture.json'));
-      const searchView = viewFixture.toBuilder()
-        .search(searchFixture)
-        .build();
+      const searchView = viewFixture.toBuilder().search(searchFixture).build();
       const dashboardView = viewTransformer(searchView);
 
       expect(dashboardView).toMatchSnapshot({

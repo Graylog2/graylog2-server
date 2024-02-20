@@ -33,7 +33,9 @@ const hasExternalURI = (nodes: { [nodeId: string]: NodeInfo }) => {
   const nodeVals = Object.values(nodes);
   const publishURI = URLUtils.qualifyUrl('/');
 
-  return (nodeVals.findIndex((node) => new URI(node.transport_address).normalizePathname().toString() !== publishURI) >= 0);
+  return (
+    nodeVals.findIndex((node) => new URI(node.transport_address).normalizePathname().toString() !== publishURI) >= 0
+  );
 };
 
 const GlobalAPIButton = ({ nodes }: { nodes: { [nodeId: string]: NodeInfo } }) => {
@@ -65,10 +67,10 @@ const NodesPage = () => {
       <div>
         <PageHeader title="Nodes" actions={<GlobalAPIButton nodes={nodes} />}>
           <span>
-            This page provides a real-time overview of the nodes in your Graylog cluster.
-            You can pause message processing at any time. The process buffers will not accept any new messages until
-            you resume it. If the message journal is enabled for a node, which it is by default, incoming messages
-            will be persisted to disk, even when processing is disabled.
+            This page provides a real-time overview of the nodes in your Graylog cluster. You can pause message
+            processing at any time. The process buffers will not accept any new messages until you resume it. If the
+            message journal is enabled for a node, which it is by default, incoming messages will be persisted to disk,
+            even when processing is disabled.
           </span>
         </PageHeader>
         <NodesList permissions={currentUser.permissions} nodes={nodes} />

@@ -36,8 +36,7 @@ import useActiveQueryId from 'views/hooks/useActiveQueryId';
 
 import AggregationWizard from '../AggregationWizard';
 
-const widgetConfig = AggregationWidgetConfig
-  .builder()
+const widgetConfig = AggregationWidgetConfig.builder()
   .visualization(DataTable.type)
   .visualizationConfig(DataTableVisualizationConfig.empty())
   .build();
@@ -92,22 +91,25 @@ const selectMetric = async (functionName, fieldName, elementIndex = 0) => {
 const extendedTimeout = applyTimeoutMultiplier(30000);
 
 describe('AggregationWizard', () => {
-  const renderSUT = (props = {}) => render(
-    <FieldTypesContext.Provider value={fieldTypes}>
-      <AggregationWizard onChange={() => {}}
-                         onSubmit={() => {}}
-                         onCancel={() => {}}
-                         config={widgetConfig}
-                         editing
-                         id="widget-id"
-                         type="AGGREGATION"
-                         fields={Immutable.List([])}
-                         {...props}>
-        {/* eslint-disable-next-line react/jsx-no-useless-fragment */}
-        <>The Visualization</>
-      </AggregationWizard>
-    </FieldTypesContext.Provider>,
-  );
+  const renderSUT = (props = {}) =>
+    render(
+      <FieldTypesContext.Provider value={fieldTypes}>
+        <AggregationWizard
+          onChange={() => {}}
+          onSubmit={() => {}}
+          onCancel={() => {}}
+          config={widgetConfig}
+          editing
+          id="widget-id"
+          type="AGGREGATION"
+          fields={Immutable.List([])}
+          {...props}
+        >
+          {/* eslint-disable-next-line react/jsx-no-useless-fragment */}
+          <>The Visualization</>
+        </AggregationWizard>
+      </FieldTypesContext.Provider>,
+    );
 
   beforeAll(() => PluginStore.register(plugin));
 
@@ -117,171 +119,201 @@ describe('AggregationWizard', () => {
     asMock(useActiveQueryId).mockReturnValue('queryId');
   });
 
-  it('should require metric function when adding a metric element', async () => {
-    renderSUT();
+  it(
+    'should require metric function when adding a metric element',
+    async () => {
+      renderSUT();
 
-    await addElement('Metric');
+      await addElement('Metric');
 
-    await screen.findByText('Function is required.');
-  }, extendedTimeout);
+      await screen.findByText('Function is required.');
+    },
+    extendedTimeout,
+  );
 
-  it('should require metric field when metric function is not count', async () => {
-    renderSUT();
+  it(
+    'should require metric field when metric function is not count',
+    async () => {
+      renderSUT();
 
-    await addElement('Metric');
+      await addElement('Metric');
 
-    const functionSelect = await screen.findByLabelText('Select a function');
-    await selectEvent.openMenu(functionSelect);
-    await selectEvent.select(functionSelect, 'Minimum', selectEventConfig);
+      const functionSelect = await screen.findByLabelText('Select a function');
+      await selectEvent.openMenu(functionSelect);
+      await selectEvent.select(functionSelect, 'Minimum', selectEventConfig);
 
-    await screen.findByText('Field is required for function min.');
-  }, extendedTimeout);
+      await screen.findByText('Field is required for function min.');
+    },
+    extendedTimeout,
+  );
 
-  it('should not require metric field when metric function count', async () => {
-    const config = widgetConfig
-      .toBuilder()
-      .series([Series.create('count')])
-      .build();
-    renderSUT({ config });
+  it(
+    'should not require metric field when metric function count',
+    async () => {
+      const config = widgetConfig
+        .toBuilder()
+        .series([Series.create('count')])
+        .build();
+      renderSUT({ config });
 
-    await waitFor(() => expect(screen.queryByText('Field is required for function min.')).not.toBeInTheDocument());
-  }, extendedTimeout);
+      await waitFor(() => expect(screen.queryByText('Field is required for function min.')).not.toBeInTheDocument());
+    },
+    extendedTimeout,
+  );
 
-  it('should display metric form with values from config', async () => {
-    const updatedSeriesConfig = SeriesConfig.empty().toBuilder().name('Metric name').build();
-    const config = AggregationWidgetConfig
-      .builder()
-      .visualization(DataTable.type)
-      .series([Series.create('max', 'took_ms').toBuilder().config(updatedSeriesConfig).build()])
-      .build();
+  it(
+    'should display metric form with values from config',
+    async () => {
+      const updatedSeriesConfig = SeriesConfig.empty().toBuilder().name('Metric name').build();
+      const config = AggregationWidgetConfig.builder()
+        .visualization(DataTable.type)
+        .series([Series.create('max', 'took_ms').toBuilder().config(updatedSeriesConfig).build()])
+        .build();
 
-    renderSUT({ config });
+      renderSUT({ config });
 
-    await screen.findByDisplayValue('Metric name');
+      await screen.findByDisplayValue('Metric name');
 
-    expect(screen.getByDisplayValue('took_ms')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('max')).toBeInTheDocument();
-  }, extendedTimeout);
+      expect(screen.getByDisplayValue('took_ms')).toBeInTheDocument();
+      expect(screen.getByDisplayValue('max')).toBeInTheDocument();
+    },
+    extendedTimeout,
+  );
 
-  it('should update config with updated metric', async () => {
-    const onChangeMock = jest.fn();
-    const config = widgetConfig
-      .toBuilder()
-      .series([Series.create('count')])
-      .build();
+  it(
+    'should update config with updated metric',
+    async () => {
+      const onChangeMock = jest.fn();
+      const config = widgetConfig
+        .toBuilder()
+        .series([Series.create('count')])
+        .build();
 
-    renderSUT({ config, onChange: onChangeMock });
+      renderSUT({ config, onChange: onChangeMock });
 
-    const nameInput = await screen.findByLabelText(/Name/);
+      const nameInput = await screen.findByLabelText(/Name/);
 
-    await userEvent.type(nameInput, 'New name');
+      await userEvent.type(nameInput, 'New name');
 
-    await selectMetric('Count', 'http_method');
+      await selectMetric('Count', 'http_method');
 
-    await submitWidgetConfigForm();
-
-    const updatedSeriesConfig = SeriesConfig.empty().toBuilder().name('New name').build();
-    const updatedConfig = widgetConfig
-      .toBuilder()
-      .series([Series.create('count', 'http_method').toBuilder().config(updatedSeriesConfig).build()])
-      .build();
-
-    await waitFor(() => expect(onChangeMock).toHaveBeenCalledTimes(1));
-
-    expect(onChangeMock).toHaveBeenCalledWith(updatedConfig);
-  }, extendedTimeout);
-
-  it('should update config with percentile metric function', async () => {
-    const onChangeMock = jest.fn();
-    const config = widgetConfig
-      .toBuilder()
-      .series([Series.create('count')])
-      .build();
-
-    renderSUT({ config, onChange: onChangeMock });
-
-    await selectMetric('Percentile', 'http_method');
-    const percentileInput = await screen.findByLabelText('Select percentile');
-
-    expect(screen.getByText('Percentile is required.')).toBeInTheDocument();
-
-    await act(async () => {
-      await selectEvent.openMenu(percentileInput);
-    });
-
-    await act(async () => {
-      await selectEvent.select(percentileInput, '50', selectEventConfig);
-    });
-
-    await submitWidgetConfigForm();
-
-    const updatedConfig = widgetConfig
-      .toBuilder()
-      .series([Series.create('percentile', 'http_method', 50.0)])
-      .build();
-
-    await waitFor(() => expect(onChangeMock).toHaveBeenCalledTimes(1));
-
-    expect(onChangeMock).toHaveBeenCalledWith(updatedConfig);
-  }, extendedTimeout);
-
-  it('should configure metric with multiple functions', async () => {
-    const onChangeMock = jest.fn();
-    const config = widgetConfig
-      .toBuilder()
-      .series([Series.create('max', 'took_ms')])
-      .build();
-    renderSUT({ config, onChange: onChangeMock });
-
-    const addMetricButton = await screen.findByRole('button', { name: 'Add a Metric' });
-
-    await userEvent.click(addMetricButton);
-
-    await waitFor(async () => expect(await screen.findAllByLabelText('Select a function')).toHaveLength(2));
-    const newNameInput = screen.getAllByLabelText(/Name/)[1];
-
-    await userEvent.type(newNameInput, 'New function');
-
-    await selectMetric('Minimum', 'http_method', 1);
-
-    await act(async () => {
       await submitWidgetConfigForm();
-    });
 
-    const updatedConfig = config.toBuilder()
-      .series([
-        Series.create('max', 'took_ms'),
-        Series.create('min', 'http_method').toBuilder()
-          .config(SeriesConfig.empty().toBuilder().name('New function').build())
-          .build(),
-      ])
-      .build();
+      const updatedSeriesConfig = SeriesConfig.empty().toBuilder().name('New name').build();
+      const updatedConfig = widgetConfig
+        .toBuilder()
+        .series([Series.create('count', 'http_method').toBuilder().config(updatedSeriesConfig).build()])
+        .build();
 
-    await waitFor(() => expect(onChangeMock).toHaveBeenCalledTimes(1));
+      await waitFor(() => expect(onChangeMock).toHaveBeenCalledTimes(1));
 
-    expect(onChangeMock).toHaveBeenCalledWith(updatedConfig);
-  }, extendedTimeout);
+      expect(onChangeMock).toHaveBeenCalledWith(updatedConfig);
+    },
+    extendedTimeout,
+  );
 
-  it('should remove all metrics', async () => {
-    const onChangeMock = jest.fn();
-    const config = widgetConfig
-      .toBuilder()
-      .series([Series.create('count')])
-      .build();
-    renderSUT({ config, onChange: onChangeMock });
+  it(
+    'should update config with percentile metric function',
+    async () => {
+      const onChangeMock = jest.fn();
+      const config = widgetConfig
+        .toBuilder()
+        .series([Series.create('count')])
+        .build();
 
-    const removeMetricElementButton = screen.getByRole('button', { name: 'Remove Metric' });
-    await userEvent.click(removeMetricElementButton);
+      renderSUT({ config, onChange: onChangeMock });
 
-    await submitWidgetConfigForm();
+      await selectMetric('Percentile', 'http_method');
+      const percentileInput = await screen.findByLabelText('Select percentile');
 
-    const updatedConfig = widgetConfig
-      .toBuilder()
-      .series([])
-      .build();
+      expect(screen.getByText('Percentile is required.')).toBeInTheDocument();
 
-    await waitFor(() => expect(onChangeMock).toHaveBeenCalledTimes(1));
+      await act(async () => {
+        await selectEvent.openMenu(percentileInput);
+      });
 
-    expect(onChangeMock).toHaveBeenCalledWith(updatedConfig);
-  }, extendedTimeout);
+      await act(async () => {
+        await selectEvent.select(percentileInput, '50', selectEventConfig);
+      });
+
+      await submitWidgetConfigForm();
+
+      const updatedConfig = widgetConfig
+        .toBuilder()
+        .series([Series.create('percentile', 'http_method', 50.0)])
+        .build();
+
+      await waitFor(() => expect(onChangeMock).toHaveBeenCalledTimes(1));
+
+      expect(onChangeMock).toHaveBeenCalledWith(updatedConfig);
+    },
+    extendedTimeout,
+  );
+
+  it(
+    'should configure metric with multiple functions',
+    async () => {
+      const onChangeMock = jest.fn();
+      const config = widgetConfig
+        .toBuilder()
+        .series([Series.create('max', 'took_ms')])
+        .build();
+      renderSUT({ config, onChange: onChangeMock });
+
+      const addMetricButton = await screen.findByRole('button', { name: 'Add a Metric' });
+
+      await userEvent.click(addMetricButton);
+
+      await waitFor(async () => expect(await screen.findAllByLabelText('Select a function')).toHaveLength(2));
+      const newNameInput = screen.getAllByLabelText(/Name/)[1];
+
+      await userEvent.type(newNameInput, 'New function');
+
+      await selectMetric('Minimum', 'http_method', 1);
+
+      await act(async () => {
+        await submitWidgetConfigForm();
+      });
+
+      const updatedConfig = config
+        .toBuilder()
+        .series([
+          Series.create('max', 'took_ms'),
+          Series.create('min', 'http_method')
+            .toBuilder()
+            .config(SeriesConfig.empty().toBuilder().name('New function').build())
+            .build(),
+        ])
+        .build();
+
+      await waitFor(() => expect(onChangeMock).toHaveBeenCalledTimes(1));
+
+      expect(onChangeMock).toHaveBeenCalledWith(updatedConfig);
+    },
+    extendedTimeout,
+  );
+
+  it(
+    'should remove all metrics',
+    async () => {
+      const onChangeMock = jest.fn();
+      const config = widgetConfig
+        .toBuilder()
+        .series([Series.create('count')])
+        .build();
+      renderSUT({ config, onChange: onChangeMock });
+
+      const removeMetricElementButton = screen.getByRole('button', { name: 'Remove Metric' });
+      await userEvent.click(removeMetricElementButton);
+
+      await submitWidgetConfigForm();
+
+      const updatedConfig = widgetConfig.toBuilder().series([]).build();
+
+      await waitFor(() => expect(onChangeMock).toHaveBeenCalledTimes(1));
+
+      expect(onChangeMock).toHaveBeenCalledWith(updatedConfig);
+    },
+    extendedTimeout,
+  );
 });

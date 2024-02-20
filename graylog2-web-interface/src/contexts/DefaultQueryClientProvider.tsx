@@ -21,8 +21,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import merge from 'lodash/merge';
 
 type Props = {
-  children: React.ReactNode,
-  options?: QueryClientConfig
+  children: React.ReactNode;
+  options?: QueryClientConfig;
 };
 
 const defaultOptions = {
@@ -38,11 +38,7 @@ const DefaultQueryClientProvider = ({ children, options: optionsProp }: Props) =
   const options = optionsProp ? merge({}, defaultOptions, optionsProp) : defaultOptions;
   const queryClient = useMemo(() => new QueryClient(options), [options]);
 
-  return (
-    <QueryClientProvider client={queryClient}>
-      {children}
-    </QueryClientProvider>
-  );
+  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
 };
 
 DefaultQueryClientProvider.defaultProps = {

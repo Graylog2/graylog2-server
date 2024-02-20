@@ -38,10 +38,12 @@ import { StreamRulesInputsStore, StreamRulesInputsActions } from 'stores/inputs/
 import STREAM_RULE_TYPES from 'logic/streams/streamRuleTypes';
 import useStreamRuleTypes from 'components/streams/hooks/useStreamRuleTypes';
 
-type FormValues = Partial<Pick<StreamRule, 'type' | 'field' | 'description' | 'value' | 'inverted'>>
+type FormValues = Partial<Pick<StreamRule, 'type' | 'field' | 'description' | 'value' | 'inverted'>>;
 
-const shouldDisplayValueInput = (type: number) => type !== STREAM_RULE_TYPES.FIELD_PRESENCE && type !== STREAM_RULE_TYPES.ALWAYS_MATCHES;
-const shouldDisplayFieldInput = (type: number) => type !== STREAM_RULE_TYPES.ALWAYS_MATCHES && type !== STREAM_RULE_TYPES.MATCH_INPUT;
+const shouldDisplayValueInput = (type: number) =>
+  type !== STREAM_RULE_TYPES.FIELD_PRESENCE && type !== STREAM_RULE_TYPES.ALWAYS_MATCHES;
+const shouldDisplayFieldInput = (type: number) =>
+  type !== STREAM_RULE_TYPES.ALWAYS_MATCHES && type !== STREAM_RULE_TYPES.MATCH_INPUT;
 
 const validate = (values: FormValues) => {
   let errors = {};
@@ -62,22 +64,15 @@ const validate = (values: FormValues) => {
 };
 
 type Props = {
-  onSubmit: (streamRuleId: string | undefined | null, currentStreamRule: FormValues) => Promise<void>,
-  initialValues?: Partial<StreamRule>,
-  title: string,
-  onClose: () => void,
-  submitButtonText: string
-  submitLoadingText: string
+  onSubmit: (streamRuleId: string | undefined | null, currentStreamRule: FormValues) => Promise<void>;
+  initialValues?: Partial<StreamRule>;
+  title: string;
+  onClose: () => void;
+  submitButtonText: string;
+  submitLoadingText: string;
 };
 
-const StreamRuleModal = ({
-  title,
-  onClose,
-  submitButtonText,
-  submitLoadingText,
-  onSubmit,
-  initialValues,
-}: Props) => {
+const StreamRuleModal = ({ title, onClose, submitButtonText, submitLoadingText, onSubmit, initialValues }: Props) => {
   const { inputs } = useStore(StreamRulesInputsStore);
   const { data: streamRuleTypes } = useStreamRuleTypes();
 
@@ -91,10 +86,11 @@ const StreamRuleModal = ({
   );
 
   const streamRuleTypesOptions = useMemo(
-    () => streamRuleTypes?.map(({ id, short_desc }) => ({
-      value: id,
-      label: short_desc,
-    })),
+    () =>
+      streamRuleTypes?.map(({ id, short_desc }) => ({
+        value: id,
+        label: short_desc,
+      })),
 
     [streamRuleTypes],
   );
@@ -105,9 +101,7 @@ const StreamRuleModal = ({
   );
 
   return (
-    <Modal title={title}
-           onHide={onClose}
-           show>
+    <Modal title={title} onHide={onClose} show>
       <Formik<FormValues> initialValues={initialValues} onSubmit={_onSubmit} validate={validate}>
         {({ values, setFieldValue, isSubmitting, isValidating }) => (
           <Form>
@@ -115,113 +109,131 @@ const StreamRuleModal = ({
               <Modal.Title>{title}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-              {(!streamRuleTypes?.length) ? <Spinner /> : (
+              {!streamRuleTypes?.length ? (
+                <Spinner />
+              ) : (
                 <Row>
                   <Col md={8}>
                     {shouldDisplayFieldInput(values.type) && (
                       <Field name="field">
                         {({ field: { name, value, onChange, onBlur }, meta: { error, touched } }) => (
-                          <TypeAheadFieldInput id={name}
-                                               onBlur={onBlur}
-                                               type="text"
-                                               label="Field"
-                                               name={name}
-                                               error={(error && touched) ? error : undefined}
-                                               defaultValue={value}
-                                               onChange={onChange} />
+                          <TypeAheadFieldInput
+                            id={name}
+                            onBlur={onBlur}
+                            type="text"
+                            label="Field"
+                            name={name}
+                            error={error && touched ? error : undefined}
+                            defaultValue={value}
+                            onChange={onChange}
+                          />
                         )}
                       </Field>
                     )}
 
                     <Field name="type">
                       {({ field: { name, value, onChange, onBlur }, meta: { error, touched } }) => (
-                        <Input label="Type"
-                               id="type"
-                               error={(error && touched) ? error : undefined}>
-                          <Select onBlur={onBlur}
-                                  onChange={(newValue: number) => {
-                                    if (newValue === STREAM_RULE_TYPES.MATCH_INPUT || newValue === STREAM_RULE_TYPES.ALWAYS_MATCHES) {
-                                      setFieldValue('value', '');
-                                      setFieldValue('field', '');
-                                    }
+                        <Input label="Type" id="type" error={error && touched ? error : undefined}>
+                          <Select
+                            onBlur={onBlur}
+                            onChange={(newValue: number) => {
+                              if (
+                                newValue === STREAM_RULE_TYPES.MATCH_INPUT ||
+                                newValue === STREAM_RULE_TYPES.ALWAYS_MATCHES
+                              ) {
+                                setFieldValue('value', '');
+                                setFieldValue('field', '');
+                              }
 
-                                    return onChange({
-                                      target: { value: newValue, name },
-                                    });
-                                  }}
-                                  options={streamRuleTypesOptions}
-                                  inputId={name}
-                                  placeholder="Select a type"
-                                  inputProps={{ 'aria-label': 'Select a type' }}
-                                  value={value} />
+                              return onChange({
+                                target: { value: newValue, name },
+                              });
+                            }}
+                            options={streamRuleTypesOptions}
+                            inputId={name}
+                            placeholder="Select a type"
+                            inputProps={{ 'aria-label': 'Select a type' }}
+                            value={value}
+                          />
                         </Input>
                       )}
                     </Field>
 
-                    {shouldDisplayValueInput(values.type) && (
-                      values.type === STREAM_RULE_TYPES.MATCH_INPUT
-                        ? (
-                          <Field name="value">
-                            {({ field: { name, value, onChange, onBlur }, meta: { error, touched } }) => (
-                              <Input id="value"
-                                     label="Input"
-                                     error={(error && touched) ? error : undefined}>
-                                <Select onBlur={onBlur}
-                                        onChange={(newValue: string) => {
-                                          onChange({ target: { value: newValue, name } });
-                                        }}
-                                        options={inputOptions}
-                                        inputId={name}
-                                        placeholder="Select an input"
-                                        inputProps={{ 'aria-label': 'Select an input' }}
-                                        value={value} />
-                              </Input>
-                            )}
-                          </Field>
-                        )
-                        : <FormikInput id="value" label="Value" name="value" />
-                    )}
+                    {shouldDisplayValueInput(values.type) &&
+                      (values.type === STREAM_RULE_TYPES.MATCH_INPUT ? (
+                        <Field name="value">
+                          {({ field: { name, value, onChange, onBlur }, meta: { error, touched } }) => (
+                            <Input id="value" label="Input" error={error && touched ? error : undefined}>
+                              <Select
+                                onBlur={onBlur}
+                                onChange={(newValue: string) => {
+                                  onChange({ target: { value: newValue, name } });
+                                }}
+                                options={inputOptions}
+                                inputId={name}
+                                placeholder="Select an input"
+                                inputProps={{ 'aria-label': 'Select an input' }}
+                                value={value}
+                              />
+                            </Input>
+                          )}
+                        </Field>
+                      ) : (
+                        <FormikInput id="value" label="Value" name="value" />
+                      ))}
 
                     <FormikInput id="inverted" label="Inverted" name="inverted" type="checkbox" />
-                    <FormikInput id="description"
-                                 label={<>Description <InputOptionalInfo /></>}
-                                 name="description"
-                                 type="textarea" />
+                    <FormikInput
+                      id="description"
+                      label={
+                        <>
+                          Description <InputOptionalInfo />
+                        </>
+                      }
+                      name="description"
+                      type="textarea"
+                    />
 
                     <p>
-                      <strong>Result:</strong>
-                      {' '}
-                      <HumanReadableStreamRule streamRule={values} inputs={inputs} />
+                      <strong>Result:</strong> <HumanReadableStreamRule streamRule={values} inputs={inputs} />
                     </p>
                   </Col>
                   <Col md={4}>
                     <Well bsSize="small" className="matcher-github">
                       The server will try to convert to strings or numbers based on the matcher type as well as it can.
-
-                      <br /><br />
-                      <Icon name="github" type="brand" />&nbsp;
-                      <a href={`https://github.com/Graylog2/graylog2-server/tree/${Version.getMajorAndMinorVersion()}/graylog2-server/src/main/java/org/graylog2/streams/matchers`}
-                         target="_blank"
-                         rel="noopener noreferrer"> Take a look at the matcher code on GitHub
+                      <br />
+                      <br />
+                      <Icon name="github" type="brand" />
+                      &nbsp;
+                      <a
+                        href={`https://github.com/Graylog2/graylog2-server/tree/${Version.getMajorAndMinorVersion()}/graylog2-server/src/main/java/org/graylog2/streams/matchers`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {' '}
+                        Take a look at the matcher code on GitHub
                       </a>
-                      <br /><br />
-                      Regular expressions use Java syntax. <DocumentationLink page={DocsHelper.PAGES.STREAMS}
-                                                                              title="More information"
-                                                                              text={(
-                                                                                <Icon name="lightbulb"
-                                                                                      type="regular" />
-                                                                              )} />
+                      <br />
+                      <br />
+                      Regular expressions use Java syntax.{' '}
+                      <DocumentationLink
+                        page={DocsHelper.PAGES.STREAMS}
+                        title="More information"
+                        text={<Icon name="lightbulb" type="regular" />}
+                      />
                     </Well>
                   </Col>
                 </Row>
               )}
             </Modal.Body>
             <Modal.Footer>
-              <ModalSubmit submitButtonText={submitButtonText}
-                           submitLoadingText={submitLoadingText}
-                           onCancel={onClose}
-                           disabledSubmit={isValidating}
-                           isSubmitting={isSubmitting} />
+              <ModalSubmit
+                submitButtonText={submitButtonText}
+                submitLoadingText={submitLoadingText}
+                onCancel={onClose}
+                disabledSubmit={isValidating}
+                isSubmitting={isSubmitting}
+              />
             </Modal.Footer>
           </Form>
         )}

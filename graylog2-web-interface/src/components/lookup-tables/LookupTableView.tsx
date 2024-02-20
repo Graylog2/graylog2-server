@@ -25,12 +25,12 @@ import useScopePermissions from 'hooks/useScopePermissions';
 import type { LookupTable, LookupTableCache, LookupTableAdapter } from 'logic/lookup-tables/types';
 
 type Props = {
-  table: LookupTable,
-  cache: LookupTableCache,
-  dataAdapter: LookupTableAdapter,
+  table: LookupTable;
+  cache: LookupTableCache;
+  dataAdapter: LookupTableAdapter;
 };
 
-type InputType = { value: string, valid: boolean };
+type InputType = { value: string; valid: boolean };
 const INIT_INPUT = { value: '', valid: false };
 
 const LookupTableView = ({ table, cache, dataAdapter }: Props) => {
@@ -47,8 +47,7 @@ const LookupTableView = ({ table, cache, dataAdapter }: Props) => {
   const handleInputOnChange = (event: React.BaseSyntheticEvent) => {
     const newValue = event.target.name === 'purgekey' ? { ...purgeKey } : { ...lookupKey };
 
-    newValue.valid = event.target.value
-                  && event.target.value.replace(/\s/g, '').length > 0;
+    newValue.valid = event.target.value && event.target.value.replace(/\s/g, '').length > 0;
 
     newValue.value = event.target.value;
 
@@ -99,29 +98,28 @@ const LookupTableView = ({ table, cache, dataAdapter }: Props) => {
         <dl>
           <dt>Data adapter</dt>
           <dd>
-            <Link to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(dataAdapter.name)}>
-              {dataAdapter.title}
-            </Link>
+            <Link to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(dataAdapter.name)}>{dataAdapter.title}</Link>
           </dd>
           <dt>Cache</dt>
           <dd>
             <Link to={Routes.SYSTEM.LOOKUPTABLES.CACHES.show(cache.name)}>{cache.title}</Link>
           </dd>
         </dl>
-        {(!loadingScopePermissions && scopePermissions?.is_mutable) && (
-          <Button bsStyle="success"
-                  onClick={handleEdit(table.name)}
-                  role="button"
-                  name="edit">
+        {!loadingScopePermissions && scopePermissions?.is_mutable && (
+          <Button bsStyle="success" onClick={handleEdit(table.name)} role="button" name="edit">
             Edit
           </Button>
         )}
         {(table.default_single_value || table.default_multi_value) && (
           <dl>
             <dt>Default single value</dt>
-            <dd><code>{table.default_single_value}</code>{' '}({table.default_single_value_type.toLowerCase()})</dd>
+            <dd>
+              <code>{table.default_single_value}</code> ({table.default_single_value_type.toLowerCase()})
+            </dd>
             <dt>Default multi value</dt>
-            <dd><code>{table.default_multi_value}</code>{' '}({table.default_multi_value_type.toLowerCase()})</dd>
+            <dd>
+              <code>{table.default_multi_value}</code> ({table.default_multi_value_type.toLowerCase()})
+            </dd>
           </dl>
         )}
         <hr />
@@ -129,37 +127,49 @@ const LookupTableView = ({ table, cache, dataAdapter }: Props) => {
         <p>You can purge the complete cache for this lookup table or only the cache entry for a single key.</p>
         <form onSubmit={handlePurgeKey}>
           <fieldset>
-            <Input type="text"
-                   id="purge-key"
-                   name="purgekey"
-                   placeholder="Insert key which should be purged"
-                   label="Key"
-                   onChange={handleInputOnChange}
-                   help="Key to purge from cache"
-                   required
-                   value={purgeKey.value} />
+            <Input
+              type="text"
+              id="purge-key"
+              name="purgekey"
+              placeholder="Insert key which should be purged"
+              label="Key"
+              onChange={handleInputOnChange}
+              help="Key to purge from cache"
+              required
+              value={purgeKey.value}
+            />
             <ButtonToolbar>
-              <Button type="submit" bsStyle="success" disabled={!purgeKey.valid}>Purge key</Button>
-              <Button type="button" bsStyle="info" onClick={hadlePurgeAll}>Purge all</Button>
+              <Button type="submit" bsStyle="success" disabled={!purgeKey.valid}>
+                Purge key
+              </Button>
+              <Button type="button" bsStyle="info" onClick={hadlePurgeAll}>
+                Purge all
+              </Button>
             </ButtonToolbar>
           </fieldset>
         </form>
       </Col>
       <Col md={6}>
         <h2>Test lookup</h2>
-        <p>You can manually query the lookup table using this form. The data will be cached as configured by Graylog.</p>
+        <p>
+          You can manually query the lookup table using this form. The data will be cached as configured by Graylog.
+        </p>
         <form onSubmit={handleLookupKey}>
           <fieldset>
-            <Input type="text"
-                   id="key"
-                   name="lookupkey"
-                   placeholder="Insert key that should be looked up"
-                   label="Key"
-                   required
-                   onChange={handleInputOnChange}
-                   help="Key to look up a value for."
-                   value={lookupKey.value} />
-            <Button type="submit" name="lookupbutton" bsStyle="success" disabled={!lookupKey.valid}>Look up</Button>
+            <Input
+              type="text"
+              id="key"
+              name="lookupkey"
+              placeholder="Insert key that should be looked up"
+              label="Key"
+              required
+              onChange={handleInputOnChange}
+              help="Key to look up a value for."
+              value={lookupKey.value}
+            />
+            <Button type="submit" name="lookupbutton" bsStyle="success" disabled={!lookupKey.valid}>
+              Look up
+            </Button>
           </fieldset>
         </form>
         {lookupResult && (

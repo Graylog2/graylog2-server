@@ -27,14 +27,16 @@ const LoadingSpinner = styled(Spinner)`
   margin-left: 10px;
 `;
 
-const Container = styled.div(({ theme }) => css`
-  font-size: ${theme.fonts.size.large};
-  text-overflow: ellipsis;
-  margin-bottom: 5px;
-  display: grid;
-  grid-template-columns: minmax(35px, 1fr) max-content;
-  align-items: center;
-`);
+const Container = styled.div(
+  ({ theme }) => css`
+    font-size: ${theme.fonts.size.large};
+    text-overflow: ellipsis;
+    margin-bottom: 5px;
+    display: grid;
+    grid-template-columns: minmax(35px, 1fr) max-content;
+    align-items: center;
+  `,
+);
 
 const Col = styled.div`
   display: flex;
@@ -52,23 +54,25 @@ const WidgetActionDropdown = styled.span`
 `;
 
 type Props = {
-  children: React.ReactNode,
-  onRename: (newTitle: string) => unknown,
-  hideDragHandle: boolean,
-  title: string,
-  loading: boolean,
+  children: React.ReactNode;
+  onRename: (newTitle: string) => unknown;
+  hideDragHandle: boolean;
+  title: string;
+  loading: boolean;
 };
 
 const WidgetHeader = ({ children, onRename, hideDragHandle, title, loading }: Props) => (
   <Container>
     <Col>
-      {hideDragHandle || <span className="widget-drag-handle" title={`Drag handle for ${title}`}><WidgetDragHandle name="bars" /></span>}
+      {hideDragHandle || (
+        <span className="widget-drag-handle" title={`Drag handle for ${title}`}>
+          <WidgetDragHandle name="bars" />
+        </span>
+      )}
       <EditableTitle key={title} disabled={!onRename} value={title} onChange={onRename} />
       {loading && <LoadingSpinner text="" delay={0} />}
     </Col>
-    <WidgetActionDropdown>
-      {children}
-    </WidgetActionDropdown>
+    <WidgetActionDropdown>{children}</WidgetActionDropdown>
   </Container>
 );
 

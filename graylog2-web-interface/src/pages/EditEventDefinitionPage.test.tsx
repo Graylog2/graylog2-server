@@ -52,16 +52,22 @@ jest.mock('react-router-dom', () => ({
 
 jest.mock('stores/event-definitions/EventDefinitionsStore', () => ({
   EventDefinitionsActions: {
-    get: mockAction(jest.fn(() => Promise.resolve({
-      event_definition: mockEventDefinition,
-      context: { scheduler: { is_scheduled: true } },
-    }))),
+    get: mockAction(
+      jest.fn(() =>
+        Promise.resolve({
+          event_definition: mockEventDefinition,
+          context: { scheduler: { is_scheduled: true } },
+        }),
+      ),
+    ),
   },
 }));
 
 jest.mock('hooks/useScopePermissions', () => jest.fn());
 jest.mock('hooks/useCurrentUser');
-jest.mock('components/event-definitions/event-definition-form/EventDefinitionFormContainer', () => mockComponent('EventDefinitionFormContainer'));
+jest.mock('components/event-definitions/event-definition-form/EventDefinitionFormContainer', () =>
+  mockComponent('EventDefinitionFormContainer'),
+);
 
 describe('<EditEventDefinitionPage />', () => {
   beforeEach(() => {
@@ -71,9 +77,12 @@ describe('<EditEventDefinitionPage />', () => {
   it('should display the event definition to edit', async () => {
     asMock(useGetPermissionsByScope).mockReturnValue(exampleEntityScopeMutable);
 
-    asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder()
-      .permissions(Immutable.List(['eventdefinitions:edit:event-definition-1-id', 'streams:read:stream-id-1']))
-      .build());
+    asMock(useCurrentUser).mockReturnValue(
+      adminUser
+        .toBuilder()
+        .permissions(Immutable.List(['eventdefinitions:edit:event-definition-1-id', 'streams:read:stream-id-1']))
+        .build(),
+    );
 
     render(<EditEventDefinitionPage />);
 

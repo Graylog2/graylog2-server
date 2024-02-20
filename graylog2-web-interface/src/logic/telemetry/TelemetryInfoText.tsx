@@ -20,16 +20,15 @@ import { ExternalLink } from 'components/common';
 import { Alert } from 'components/bootstrap';
 
 type Props = {
-  showProfile?: boolean
-}
+  showProfile?: boolean;
+};
 
 const TelemetryInfoText = ({ showProfile }: Props) => (
   <Alert bsStyle="info">
-    We would like to collect anonymous usage data to help us prioritize improvements
-    and make Graylog better in the future.
+    We would like to collect anonymous usage data to help us prioritize improvements and make Graylog better in the
+    future.
     <br />
-    We do not collect personal data, sensitive information, or content such as logs in your
-    instances.
+    We do not collect personal data, sensitive information, or content such as logs in your instances.
     <br />
     Learn more on our <ExternalLink href="https://www.graylog.org/privacy-policy/">Privacy Policy</ExternalLink>.
     <br />

@@ -26,7 +26,7 @@ import { bulkRemoveDataNode, bulkStartDataNode, bulkStopDataNode } from '../hook
 
 const DataNodeBulkActions = () => {
   const { selectedEntities, setSelectedEntities } = useSelectedEntities();
-  const [showDialogType, setShowDialogType] = useState<'REMOVE'|'STOP'|null>(null);
+  const [showDialogType, setShowDialogType] = useState<'REMOVE' | 'STOP' | null>(null);
 
   const CONFIRM_DIALOG = {
     REMOVE: {
@@ -55,12 +55,14 @@ const DataNodeBulkActions = () => {
         <MenuItem onSelect={() => setShowDialogType('REMOVE')}>Remove</MenuItem>
       </BulkActionsDropdown>
       {showDialogType && (
-      <ConfirmDialog title={CONFIRM_DIALOG[showDialogType].dialogTitle}
-                     show
-                     onConfirm={CONFIRM_DIALOG[showDialogType].handleConfirm}
-                     onCancel={() => setShowDialogType(null)}>
-        {CONFIRM_DIALOG[showDialogType].dialogBody}
-      </ConfirmDialog>
+        <ConfirmDialog
+          title={CONFIRM_DIALOG[showDialogType].dialogTitle}
+          show
+          onConfirm={CONFIRM_DIALOG[showDialogType].handleConfirm}
+          onCancel={() => setShowDialogType(null)}
+        >
+          {CONFIRM_DIALOG[showDialogType].dialogBody}
+        </ConfirmDialog>
       )}
     </>
   );

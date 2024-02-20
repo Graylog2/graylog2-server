@@ -39,16 +39,16 @@ const ActionsRef = styled.div`
 `;
 
 type Props<Entity extends EntityBase> = {
-  actionsRef: React.RefObject<HTMLDivElement>
-  columns: Array<Column>,
-  columnRenderersByAttribute: ColumnRenderersByAttribute<Entity>,
-  displaySelect: boolean,
-  displayActions: boolean,
-  entity: Entity,
-  index: number,
-  rowActions?: (entity: Entity) => React.ReactNode,
-  entityAttributesAreCamelCase: boolean,
-  isEntitySelectable: (entity: Entity) => boolean,
+  actionsRef: React.RefObject<HTMLDivElement>;
+  columns: Array<Column>;
+  columnRenderersByAttribute: ColumnRenderersByAttribute<Entity>;
+  displaySelect: boolean;
+  displayActions: boolean;
+  entity: Entity;
+  index: number;
+  rowActions?: (entity: Entity) => React.ReactNode;
+  entityAttributesAreCamelCase: boolean;
+  isEntitySelectable: (entity: Entity) => boolean;
 };
 
 const TableRow = <Entity extends EntityBase>({
@@ -66,18 +66,21 @@ const TableRow = <Entity extends EntityBase>({
   const { selectedEntities, setSelectedEntities } = useSelectedEntities();
   const isSelected = !!selectedEntities?.includes(entity.id);
   const toggleRowSelect = useCallback(() => {
-    setSelectedEntities(((cur) => {
+    setSelectedEntities((cur) => {
       if (cur.includes(entity.id)) {
         return cur.filter((id) => id !== entity.id);
       }
 
       return [...cur, entity.id];
-    }));
+    });
   }, [entity.id, setSelectedEntities]);
 
   const actionButtons = displayActions ? <ButtonToolbar>{rowActions(entity)}</ButtonToolbar> : null;
 
-  const isSelectDisabled = useMemo(() => !(displaySelect && isEntitySelectable(entity)), [displaySelect, entity, isEntitySelectable]);
+  const isSelectDisabled = useMemo(
+    () => !(displaySelect && isEntitySelectable(entity)),
+    [displaySelect, entity, isEntitySelectable],
+  );
 
   const title = `${isSelected ? 'Deselect' : 'Select'} entity`;
 
@@ -85,22 +88,26 @@ const TableRow = <Entity extends EntityBase>({
     <tr>
       {displaySelect && (
         <td aria-label="Select cell">
-          <RowCheckbox onChange={toggleRowSelect}
-                       title={title}
-                       checked={isSelected}
-                       disabled={isSelectDisabled}
-                       aria-label={title} />
+          <RowCheckbox
+            onChange={toggleRowSelect}
+            title={title}
+            checked={isSelected}
+            disabled={isSelectDisabled}
+            aria-label={title}
+          />
         </td>
       )}
       {columns.map((column) => {
         const columnRenderer = columnRenderersByAttribute[column.id];
 
         return (
-          <TableCell columnRenderer={columnRenderer}
-                     entityAttributesAreCamelCase={entityAttributesAreCamelCase}
-                     entity={entity}
-                     column={column}
-                     key={`${entity.id}-${column.id}`} />
+          <TableCell
+            columnRenderer={columnRenderer}
+            entityAttributesAreCamelCase={entityAttributesAreCamelCase}
+            entity={entity}
+            column={column}
+            key={`${entity.id}-${column.id}`}
+          />
         );
       })}
       {displayActions ? (

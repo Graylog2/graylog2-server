@@ -32,9 +32,9 @@ jest.mock('@graylog/server-api', () => ({
 }));
 
 type Props = {
-  onSubmit: (v: SearchBarFormValues) => Promise<void>,
-  values: SearchBarFormValues,
-}
+  onSubmit: (v: SearchBarFormValues) => Promise<void>;
+  values: SearchBarFormValues;
+};
 
 const initialValues: SearchBarFormValues = {
   queryString: 'action:login',
@@ -45,7 +45,11 @@ const initialValues: SearchBarFormValues = {
 const Wrapper = ({ onSubmit, values }: Props) => {
   const { onSubmit: _onSubmit, enableReinitialize } = useSearchBarSubmit(initialValues, onSubmit);
 
-  return <button type="button" onClick={() => _onSubmit(values)}>{enableReinitialize ? 'submit' : 'busy'}</button>;
+  return (
+    <button type="button" onClick={() => _onSubmit(values)}>
+      {enableReinitialize ? 'submit' : 'busy'}
+    </button>
+  );
 };
 
 const clickSubmit = async () => userEvent.click(await screen.findByRole('button', { name: 'submit' }));

@@ -31,55 +31,60 @@ import { keySeparator, humanSeparator } from 'views/Constants';
 
 import XYPlot from '../XYPlot';
 
-const seriesGenerator = (mapKeys: (labels: string[]) => string[]): Generator => ({
-  type,
-  name,
-  labels,
-  values,
-  originalName,
-}) => ({
-  type,
-  name,
-  x: mapKeys(labels),
-  y: values,
-  mode: 'markers',
-  originalName,
-});
-
-const ScatterVisualization = makeVisualization(({
-  config,
-  data,
-  effectiveTimerange,
-  height,
-}: VisualizationComponentProps) => {
-  const visualizationConfig = (config.visualizationConfig ?? ScatterVisualizationConfig.empty()) as ScatterVisualizationConfig;
-  const mapKeys = useMapKeys();
-  const rowPivotFields = useMemo(() => config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [], [config?.rowPivots]);
-  const _mapKeys = useCallback((labels: string[]) => labels
-    .map((label) => label.split(keySeparator)
-      .map((l, i) => mapKeys(l, rowPivotFields[i]))
-      .join(humanSeparator),
-    ), [mapKeys, rowPivotFields]);
-  const rows = useMemo(() => retrieveChartData(data), [data]);
-  const _chartDataResult = useChartData(rows, {
-    widgetConfig: config,
-    chartType: 'scatter',
-    generator: seriesGenerator(_mapKeys),
+const seriesGenerator =
+  (mapKeys: (labels: string[]) => string[]): Generator =>
+  ({ type, name, labels, values, originalName }) => ({
+    type,
+    name,
+    x: mapKeys(labels),
+    y: values,
+    mode: 'markers',
+    originalName,
   });
-  const { eventChartData, shapes } = useEvents(config, data.events);
 
-  const chartDataResult = eventChartData ? [..._chartDataResult, eventChartData] : _chartDataResult;
-  const layout: { shapes?: Shapes } = shapes ? { shapes } : {};
+const ScatterVisualization = makeVisualization(
+  ({ config, data, effectiveTimerange, height }: VisualizationComponentProps) => {
+    const visualizationConfig = (config.visualizationConfig ??
+      ScatterVisualizationConfig.empty()) as ScatterVisualizationConfig;
+    const mapKeys = useMapKeys();
+    const rowPivotFields = useMemo(
+      () => config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [],
+      [config?.rowPivots],
+    );
+    const _mapKeys = useCallback(
+      (labels: string[]) =>
+        labels.map((label) =>
+          label
+            .split(keySeparator)
+            .map((l, i) => mapKeys(l, rowPivotFields[i]))
+            .join(humanSeparator),
+        ),
+      [mapKeys, rowPivotFields],
+    );
+    const rows = useMemo(() => retrieveChartData(data), [data]);
+    const _chartDataResult = useChartData(rows, {
+      widgetConfig: config,
+      chartType: 'scatter',
+      generator: seriesGenerator(_mapKeys),
+    });
+    const { eventChartData, shapes } = useEvents(config, data.events);
 
-  return (
-    <XYPlot config={config}
-            axisType={visualizationConfig.axisType}
-            chartData={chartDataResult}
-            plotLayout={layout}
-            height={height}
-            effectiveTimerange={effectiveTimerange} />
-  );
-}, 'scatter');
+    const chartDataResult = eventChartData ? [..._chartDataResult, eventChartData] : _chartDataResult;
+    const layout: { shapes?: Shapes } = shapes ? { shapes } : {};
+
+    return (
+      <XYPlot
+        config={config}
+        axisType={visualizationConfig.axisType}
+        chartData={chartDataResult}
+        plotLayout={layout}
+        height={height}
+        effectiveTimerange={effectiveTimerange}
+      />
+    );
+  },
+  'scatter',
+);
 
 ScatterVisualization.propTypes = {
   config: AggregationType.isRequired,

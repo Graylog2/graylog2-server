@@ -24,9 +24,7 @@ const TableListExample = createReactClass({
 
   bulkActionsFactory(selectedNumbers) {
     return (
-      <Button bsStyle="info"
-              bsSize="xsmall"
-              onClick={this.action(selectedNumbers.join(', '))}>
+      <Button bsStyle="info" bsSize="xsmall" onClick={this.action(selectedNumbers.join(', '))}>
         Bulk-operation
       </Button>
     );
@@ -34,9 +32,7 @@ const TableListExample = createReactClass({
 
   itemActionsFactory(selectedNumber) {
     return (
-      <Button bsStyle="primary"
-              bsSize="xsmall"
-              onClick={this.action(JSON.stringify(selectedNumber))}>
+      <Button bsStyle="primary" bsSize="xsmall" onClick={this.action(JSON.stringify(selectedNumber))}>
         Do something
       </Button>
     );
@@ -46,15 +42,17 @@ const TableListExample = createReactClass({
     const { items } = this.state;
 
     return (
-      <TableList items={items}
-                 filterKeys={['title', 'secret_key']}
-                 bulkActionsFactory={this.bulkActionsFactory}
-                 itemActionsFactory={this.itemActionsFactory} />
+      <TableList
+        items={items}
+        filterKeys={['title', 'secret_key']}
+        bulkActionsFactory={this.bulkActionsFactory}
+        itemActionsFactory={this.itemActionsFactory}
+      />
     );
   },
 });
 
-<TableListExample />
+<TableListExample />;
 ```
 
 ```js
@@ -82,26 +80,26 @@ const TableListExampleNoBulkActions = createReactClass({
   },
 
   itemActionsFactory(selectedNumber) {
-      return (
-        <Button bsStyle="primary"
-                bsSize="xsmall"
-                onClick={this.action(JSON.stringify(selectedNumber))}>
-          Do something
-        </Button>
-      );
-    },
+    return (
+      <Button bsStyle="primary" bsSize="xsmall" onClick={this.action(JSON.stringify(selectedNumber))}>
+        Do something
+      </Button>
+    );
+  },
 
   render() {
     const { items } = this.state;
 
     return (
-      <TableList items={items}
-                 enableFilter={false}
-                 enableBulkActions={false}
-                 itemActionsFactory={this.itemActionsFactory} />
+      <TableList
+        items={items}
+        enableFilter={false}
+        enableBulkActions={false}
+        itemActionsFactory={this.itemActionsFactory}
+      />
     );
   },
 });
 
-<TableListExampleNoBulkActions />
+<TableListExampleNoBulkActions />;
 ```

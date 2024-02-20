@@ -21,10 +21,10 @@ import styled, { css } from 'styled-components';
 import Panel from '../bootstrap/Panel';
 
 type Props = {
-  children: React.ReactNode,
-  name: string,
-  id?: string,
-}
+  children: React.ReactNode;
+  name: string;
+  id?: string;
+};
 
 const StyledPanel = styled(Panel)`
   border: 0;
@@ -32,32 +32,38 @@ const StyledPanel = styled(Panel)`
   box-shadow: none;
 `;
 
-const PanelHeading = styled(Panel.Heading)(({ theme }) => css`
-  && {
-    padding: 0;
-    border-radius: 0;
-    background-color: ${theme.colors.variant.lightest.default};
-  }
-`);
+const PanelHeading = styled(Panel.Heading)(
+  ({ theme }) => css`
+    && {
+      padding: 0;
+      border-radius: 0;
+      background-color: ${theme.colors.variant.lightest.default};
+    }
+  `,
+);
 
-const PanelTitle = styled(Panel.Title)(({ theme }) => css`
-  font-size: ${theme.fonts.size.small};
-  color: ${theme.colors.global.link};
-  
-  > a {
-    padding: 3px 9px;
-    display: block;
-  }
-`);
+const PanelTitle = styled(Panel.Title)(
+  ({ theme }) => css`
+    font-size: ${theme.fonts.size.small};
+    color: ${theme.colors.global.link};
 
-const PanelBody = styled(Panel.Body)(({ theme }) => css`
-  ${StyledPanel} > ${PanelHeading} + .panel-collapse > & {
-    background-color: ${theme.colors.global.contentBackground};
-    border-top-color: ${theme.colors.variant.lighter.default};
-    border-bottom-width: 0;
-    color: ${theme.colors.variant.darkest.default};
-  }
-`);
+    > a {
+      padding: 3px 9px;
+      display: block;
+    }
+  `,
+);
+
+const PanelBody = styled(Panel.Body)(
+  ({ theme }) => css`
+    ${StyledPanel} > ${PanelHeading} + .panel-collapse > & {
+      background-color: ${theme.colors.global.contentBackground};
+      border-top-color: ${theme.colors.variant.lighter.default};
+      border-bottom-width: 0;
+      color: ${theme.colors.variant.darkest.default};
+    }
+  `,
+);
 
 const AccordionItem = ({ children, name, id, ...restProps }: Props) => {
   const eventKey = id ?? name.replace(/[^0-9a-zA-Z]/g, '-').toLowerCase();
@@ -65,14 +71,10 @@ const AccordionItem = ({ children, name, id, ...restProps }: Props) => {
   return (
     <StyledPanel {...restProps} id={id} eventKey={eventKey}>
       <PanelHeading>
-        <PanelTitle toggle>
-          {name}
-        </PanelTitle>
+        <PanelTitle toggle>{name}</PanelTitle>
       </PanelHeading>
       <Panel.Collapse>
-        <PanelBody>
-          {children}
-        </PanelBody>
+        <PanelBody>{children}</PanelBody>
       </Panel.Collapse>
     </StyledPanel>
   );

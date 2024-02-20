@@ -28,7 +28,7 @@ export type PaginationQueryParameterResult = {
   page: number;
   resetPage: () => void;
   pageSize: number;
-  setPagination: (payload: { page?: number, pageSize?: number }) => void;
+  setPagination: (payload: { page?: number; pageSize?: number }) => void;
 };
 
 const usePaginationQueryParameter = (
@@ -41,7 +41,10 @@ const usePaginationQueryParameter = (
   const { search, pathname } = useLocation();
   const query = pathname + search;
   const pageQueryParameterAsNumber = Number(pageQueryParameter);
-  const page = (Number.isInteger(pageQueryParameterAsNumber) && pageQueryParameterAsNumber > 0) ? pageQueryParameterAsNumber : DEFAULT_PAGE;
+  const page =
+    Number.isInteger(pageQueryParameterAsNumber) && pageQueryParameterAsNumber > 0
+      ? pageQueryParameterAsNumber
+      : DEFAULT_PAGE;
 
   const pageSizeQueryParameterAsNumber = Number(pageSizeQueryParameter);
 
@@ -50,15 +53,23 @@ const usePaginationQueryParameter = (
       return propsPageSize;
     }
 
-    return (Number.isInteger(pageSizeQueryParameterAsNumber) && PAGE_SIZES?.includes(pageSizeQueryParameterAsNumber)) ? pageSizeQueryParameterAsNumber : propsPageSize;
+    return Number.isInteger(pageSizeQueryParameterAsNumber) && PAGE_SIZES?.includes(pageSizeQueryParameterAsNumber)
+      ? pageSizeQueryParameterAsNumber
+      : propsPageSize;
   };
 
   const pageSize = determinePageSize();
 
-  const setPagination = useCallback(({ page: newPage = page, pageSize: newPageSize = pageSize }: { page?: number, pageSize?: number }) => {
-    const uri = new URI(query).setSearch({ page: newPage, pageSize: syncPageSizeFromQuery ? String(newPageSize) : undefined });
-    navigate(uri.toString());
-  }, [navigate, page, pageSize, query, syncPageSizeFromQuery]);
+  const setPagination = useCallback(
+    ({ page: newPage = page, pageSize: newPageSize = pageSize }: { page?: number; pageSize?: number }) => {
+      const uri = new URI(query).setSearch({
+        page: newPage,
+        pageSize: syncPageSizeFromQuery ? String(newPageSize) : undefined,
+      });
+      navigate(uri.toString());
+    },
+    [navigate, page, pageSize, query, syncPageSizeFromQuery],
+  );
 
   const resetPage = useCallback(() => {
     setPagination({ page: DEFAULT_PAGE });

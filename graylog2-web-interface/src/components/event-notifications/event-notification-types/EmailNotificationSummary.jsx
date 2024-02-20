@@ -40,13 +40,12 @@ const EmailNotificationSummary = ({ notification, ...otherProps }) => (
             <td>{notification.config.sender_lut_key}</td>
           </tr>
         </>
-      )
-        : (
-          <tr>
-            <td>Sender</td>
-            <td>{notification.config.sender}</td>
-          </tr>
-        )}
+      ) : (
+        <tr>
+          <td>Sender</td>
+          <td>{notification.config.sender}</td>
+        </tr>
+      )}
       <tr>
         <td>Subject</td>
         <td>{notification.config.subject}</td>
@@ -66,13 +65,12 @@ const EmailNotificationSummary = ({ notification, ...otherProps }) => (
             <td>{notification.config.reply_to_lut_key}</td>
           </tr>
         </>
-      )
-        : (
-          <tr>
-            <td>Reply-To</td>
-            <td>{notification.config.reply_to}</td>
-          </tr>
-        )}
+      ) : (
+        <tr>
+          <td>Reply-To</td>
+          <td>{notification.config.reply_to}</td>
+        </tr>
+      )}
 
       <tr>
         <td>User Recipients</td>
@@ -93,15 +91,15 @@ const EmailNotificationSummary = ({ notification, ...otherProps }) => (
             <td>{notification.config.recipients_lut_key}</td>
           </tr>
         </>
-      )
-        : (
-          <tr>
-            <td>Email Recipients</td>
-            <td>
-              {notification.config.email_recipients.join(', ') || 'No email addresses are configured to receive this notification.'}
-            </td>
-          </tr>
-        )}
+      ) : (
+        <tr>
+          <td>Email Recipients</td>
+          <td>
+            {notification.config.email_recipients.join(', ') ||
+              'No email addresses are configured to receive this notification.'}
+          </td>
+        </tr>
+      )}
       <tr>
         <td>Email Body</td>
         <td>

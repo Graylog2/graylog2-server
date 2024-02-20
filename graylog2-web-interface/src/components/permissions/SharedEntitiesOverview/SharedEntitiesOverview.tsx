@@ -34,9 +34,9 @@ const DEFAULT_PAGINATION = {
 };
 
 type Props = {
-  entityType: string,
-  searchPaginated: (pagination: Pagination) => Promise<PaginatedEntityShares>,
-  setLoading: (loading: boolean) => void,
+  entityType: string;
+  searchPaginated: (pagination: Pagination) => Promise<PaginatedEntityShares>;
+  setLoading: (loading: boolean) => void;
 };
 
 const StyledPaginatedList = styled(PaginatedList)`
@@ -67,10 +67,14 @@ const SharedEntitiesOverview = ({ entityType, searchPaginated, setLoading }: Pro
   const { list, context, pagination: { total } = { total: 0 } } = paginatedEntityShares || {};
   const { page, query, additionalQueries } = pagination;
 
-  useEffect(() => _loadSharedEntities(pagination, searchPaginated, setPaginatedEntityShares, setLoading), [pagination, searchPaginated, setLoading]);
+  useEffect(
+    () => _loadSharedEntities(pagination, searchPaginated, setPaginatedEntityShares, setLoading),
+    [pagination, searchPaginated, setLoading],
+  );
 
   const _handleSearch = (newQuery: string) => setPagination({ ...pagination, query: newQuery });
-  const _handleFilter = (param: string, value: string) => setPagination({ ...pagination, query, additionalQueries: { ...additionalQueries, [param]: value } });
+  const _handleFilter = (param: string, value: string) =>
+    setPagination({ ...pagination, query, additionalQueries: { ...additionalQueries, [param]: value } });
 
   if (!paginatedEntityShares) {
     return <Spinner />;
@@ -81,23 +85,24 @@ const SharedEntitiesOverview = ({ entityType, searchPaginated, setLoading }: Pro
       <p className="description">
         Found {total} entities which are shared with the {entityType}.
       </p>
-      <StyledPaginatedList activePage={page}
-                           totalItems={total}
-                           onChange={(newPage, newPerPage) => setPagination({ ...pagination, page: newPage, perPage: newPerPage })}
-                           useQueryParameter={false}>
-        <DataTable className="table-hover"
-                   customFilter={(
-                     <SharedEntitiesFilter onSearch={_handleSearch}
-                                           onFilter={_handleFilter} />
-                   )}
-                   dataRowFormatter={(sharedEntity) => _sharedEntityOverviewItem(sharedEntity, context)}
-                   filterKeys={[]}
-                   noDataText={<NoSearchResult>No shared entities have been found.</NoSearchResult>}
-                   headers={TABLE_HEADERS}
-                   id="shared-entities"
-                   rowClassName="no-bm"
-                   rows={list.toJS()}
-                   sortByKey="type" />
+      <StyledPaginatedList
+        activePage={page}
+        totalItems={total}
+        onChange={(newPage, newPerPage) => setPagination({ ...pagination, page: newPage, perPage: newPerPage })}
+        useQueryParameter={false}
+      >
+        <DataTable
+          className="table-hover"
+          customFilter={<SharedEntitiesFilter onSearch={_handleSearch} onFilter={_handleFilter} />}
+          dataRowFormatter={(sharedEntity) => _sharedEntityOverviewItem(sharedEntity, context)}
+          filterKeys={[]}
+          noDataText={<NoSearchResult>No shared entities have been found.</NoSearchResult>}
+          headers={TABLE_HEADERS}
+          id="shared-entities"
+          rowClassName="no-bm"
+          rows={list.toJS()}
+          sortByKey="type"
+        />
       </StyledPaginatedList>
     </>
   );

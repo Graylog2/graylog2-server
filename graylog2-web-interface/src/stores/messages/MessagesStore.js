@@ -24,18 +24,16 @@ import UserNotification from 'util/UserNotification';
 import StringUtils from 'util/StringUtils';
 import { singletonStore, singletonActions } from 'logic/singleton';
 
-export const MessagesActions = singletonActions(
-  'core.Messages',
-  () => Reflux.createActions({
+export const MessagesActions = singletonActions('core.Messages', () =>
+  Reflux.createActions({
     loadMessage: { asyncResult: true },
     fieldTerms: { asyncResult: true },
     loadRawMessage: { asyncResult: true },
   }),
 );
 
-export const MessagesStore = singletonStore(
-  'core.Messages',
-  () => Reflux.createStore({
+export const MessagesStore = singletonStore('core.Messages', () =>
+  Reflux.createStore({
     listenables: [MessagesActions],
     sourceUrl: '',
 
@@ -45,28 +43,27 @@ export const MessagesStore = singletonStore(
 
     loadMessage(index, messageId) {
       const { url } = ApiRoutes.MessagesController.single(index.trim(), messageId.trim());
-      const promise = fetch('GET', URLUtils.qualifyUrl(url))
-        .then(
-          (response) => MessageFormatter.formatResultMessage(response),
-          (errorThrown) => {
-            UserNotification.error(`Loading message information failed with status: ${errorThrown}`,
-              'Could not load message information');
-          },
-        );
+      const promise = fetch('GET', URLUtils.qualifyUrl(url)).then(
+        (response) => MessageFormatter.formatResultMessage(response),
+        (errorThrown) => {
+          UserNotification.error(
+            `Loading message information failed with status: ${errorThrown}`,
+            'Could not load message information',
+          );
+        },
+      );
 
       MessagesActions.loadMessage.promise(promise);
     },
 
     fieldTerms(index, string) {
       const { url } = ApiRoutes.MessagesController.analyze(index, encodeURIComponent(StringUtils.stringify(string)));
-      const promise = fetch('GET', URLUtils.qualifyUrl(url))
-        .then(
-          (response) => response.tokens,
-          (error) => {
-            UserNotification.error(`Loading field terms failed with status: ${error}`,
-              'Could not load field terms.');
-          },
-        );
+      const promise = fetch('GET', URLUtils.qualifyUrl(url)).then(
+        (response) => response.tokens,
+        (error) => {
+          UserNotification.error(`Loading field terms failed with status: ${error}`, 'Could not load field terms.');
+        },
+      );
 
       MessagesActions.fieldTerms.promise(promise);
     },
@@ -80,21 +77,22 @@ export const MessagesStore = singletonStore(
         configuration: codecConfiguration,
       };
 
-      const promise = fetch('POST', URLUtils.qualifyUrl(url), payload)
-        .then(
-          (response) => MessageFormatter.formatResultMessage(response),
-          (error) => {
-            if (error.additional && error.additional.status === 400) {
-              UserNotification.error('Please ensure the selected codec and its configuration are right. '
-              + 'Check your server logs for more information.', 'Could not load raw message');
+      const promise = fetch('POST', URLUtils.qualifyUrl(url), payload).then(
+        (response) => MessageFormatter.formatResultMessage(response),
+        (error) => {
+          if (error.additional && error.additional.status === 400) {
+            UserNotification.error(
+              'Please ensure the selected codec and its configuration are right. ' +
+                'Check your server logs for more information.',
+              'Could not load raw message',
+            );
 
-              return;
-            }
+            return;
+          }
 
-            UserNotification.error(`Loading raw message failed with status: ${error}`,
-              'Could not load raw message');
-          },
-        );
+          UserNotification.error(`Loading raw message failed with status: ${error}`, 'Could not load raw message');
+        },
+      );
 
       MessagesActions.loadRawMessage.promise(promise);
     },

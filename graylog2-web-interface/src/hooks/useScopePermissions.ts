@@ -23,15 +23,15 @@ import UserNotification from 'util/UserNotification';
 import type { GenericEntityType } from 'logic/lookup-tables/types';
 
 type ScopeParams = {
-  is_mutable: boolean,
-}
+  is_mutable: boolean;
+};
 
 type ScopeName = 'DEFAULT' | 'ILLUMINATE';
 
 type EntityScopeRecord = Record<ScopeName, ScopeParams>;
 
 type EntityScopeType = {
-  entity_scopes: EntityScopeRecord,
+  entity_scopes: EntityScopeRecord;
 };
 
 function fetchScopePermissions() {
@@ -39,16 +39,12 @@ function fetchScopePermissions() {
 }
 
 const useGetPermissionsByScope = (entity: Partial<GenericEntityType>) => {
-  const { data, isLoading, error } = useQuery<EntityScopeType, Error>(
-    ['scope-permissions'],
-    fetchScopePermissions,
-    {
-      onError: () => UserNotification.error(error.message),
-      retry: 1,
-      cacheTime: 1000 * 60 * 60 * 3, // cache for 3 hours
-      staleTime: 1000 * 60 * 60 * 3, // data is valid for 3 hours
-    },
-  );
+  const { data, isLoading, error } = useQuery<EntityScopeType, Error>(['scope-permissions'], fetchScopePermissions, {
+    onError: () => UserNotification.error(error.message),
+    retry: 1,
+    cacheTime: 1000 * 60 * 60 * 3, // cache for 3 hours
+    staleTime: 1000 * 60 * 60 * 3, // data is valid for 3 hours
+  });
 
   const scope = entity?._scope?.toUpperCase() || 'DEFAULT';
   const permissions: ScopeParams = isLoading ? { is_mutable: false } : data.entity_scopes[scope];

@@ -29,14 +29,15 @@ const defaultProps = {
   },
 } as const;
 
-const renderWithForm = (element) => render((
-  <Formik initialValues={{ timeRangeTabs: { absolute: defaultProps.timeRange }, activeTab: 'absolute' }}
-          onSubmit={() => {}}>
-    <Form>
-      {element}
-    </Form>
-  </Formik>
-));
+const renderWithForm = (element) =>
+  render(
+    <Formik
+      initialValues={{ timeRangeTabs: { absolute: defaultProps.timeRange }, activeTab: 'absolute' }}
+      onSubmit={() => {}}
+    >
+      <Form>{element}</Form>
+    </Formik>,
+  );
 
 describe('AbsoluteCalendar', () => {
   it('renders `from` date', () => {

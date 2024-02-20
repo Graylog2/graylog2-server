@@ -30,90 +30,95 @@ import type { UserOverviewJSON } from 'logic/users/UserOverview';
 import UserOverview from 'logic/users/UserOverview';
 
 export type AuthenticationBackendCreate = {
-  title: AuthenticationBackendJSON['title'],
-  description: AuthenticationBackendJSON['description'],
+  title: AuthenticationBackendJSON['title'];
+  description: AuthenticationBackendJSON['description'];
   config: {
-    type: string,
-  },
+    type: string;
+  };
 };
 
 export type AuthenticationBackendUpdate = {
-  id: AuthenticationBackendJSON['id'],
-  title: AuthenticationBackendJSON['title'],
-  description: AuthenticationBackendJSON['description'],
+  id: AuthenticationBackendJSON['id'];
+  title: AuthenticationBackendJSON['title'];
+  description: AuthenticationBackendJSON['description'];
   config: {
-    type: string,
-  },
+    type: string;
+  };
 };
 
 export type PaginatedBackends = PaginatedList<AuthenticationBackend> & {
   context: {
-    activeBackend: AuthenticationBackendJSON | undefined | null,
-  },
+    activeBackend: AuthenticationBackendJSON | undefined | null;
+  };
 };
 
 export type ConnectionTestPayload = {
-  backend_configuration: AuthenticationBackendCreate,
-  backend_id: string | undefined | null,
+  backend_configuration: AuthenticationBackendCreate;
+  backend_id: string | undefined | null;
 };
 export type ConnectionTestResult = {
-  success: boolean,
-  message: string,
-  errors: Array<string>,
+  success: boolean;
+  message: string;
+  errors: Array<string>;
 };
 export type LoginTestPayload = {
-  backend_id: string | undefined | null,
-  backend_configuration: AuthenticationBackendCreate,
+  backend_id: string | undefined | null;
+  backend_configuration: AuthenticationBackendCreate;
   user_login: {
-    username: string,
-    password: string,
-  },
+    username: string;
+    password: string;
+  };
 };
 
 export type LoginTestResult = {
-  success: boolean,
-  message: string,
-  errors: Array<string>,
+  success: boolean;
+  message: string;
+  errors: Array<string>;
   result: {
-    user_exists: boolean,
-    login_success: boolean,
+    user_exists: boolean;
+    login_success: boolean;
     user_details: {
-      dn: string,
-      entryUUID: string,
-      uid: string,
-      cn: string,
-      email: string,
-    },
-  },
+      dn: string;
+      entryUUID: string;
+      uid: string;
+      cn: string;
+      email: string;
+    };
+  };
 };
 
 export type LoadResponse = {
-  backend: AuthenticationBackend | undefined | null,
+  backend: AuthenticationBackend | undefined | null;
 };
 
 export type LoadActiveResponse = LoadResponse & {
   context: {
-    backendsTotal: number,
-  },
+    backendsTotal: number;
+  };
 };
 
 export type ActionsType = {
-  create: (AuthenticationBackendCreate) => Promise<LoadResponse>,
-  delete: (authBackendId: AuthenticationBackend['id'] | undefined | null, authBackendTitle: AuthenticationBackend['title']) => Promise<void>,
-  load: (id: string) => Promise<LoadResponse>,
-  loadActive: () => Promise<LoadActiveResponse>,
-  loadBackendsPaginated: (pagination: Pagination) => Promise<PaginatedBackends>,
-  loadUsersPaginated: (authBackendId: string, pagination: Pagination) => Promise<PaginatedUsers>,
-  loadActiveBackendType: () => Promise<string | undefined>,
-  setActiveBackend: (authBackendId: AuthenticationBackend['id'] | undefined | null, authBackendTitle: AuthenticationBackend['title']) => Promise<void>,
-  testConnection: (payload: ConnectionTestPayload) => Promise<ConnectionTestResult>,
-  testLogin: (payload: LoginTestPayload) => Promise<LoginTestResult>,
-  update: (id: string, AuthenticationBackendUpdate) => Promise<LoadResponse>,
+  create: (AuthenticationBackendCreate) => Promise<LoadResponse>;
+  delete: (
+    authBackendId: AuthenticationBackend['id'] | undefined | null,
+    authBackendTitle: AuthenticationBackend['title'],
+  ) => Promise<void>;
+  load: (id: string) => Promise<LoadResponse>;
+  loadActive: () => Promise<LoadActiveResponse>;
+  loadBackendsPaginated: (pagination: Pagination) => Promise<PaginatedBackends>;
+  loadUsersPaginated: (authBackendId: string, pagination: Pagination) => Promise<PaginatedUsers>;
+  loadActiveBackendType: () => Promise<string | undefined>;
+  setActiveBackend: (
+    authBackendId: AuthenticationBackend['id'] | undefined | null,
+    authBackendTitle: AuthenticationBackend['title'],
+  ) => Promise<void>;
+  testConnection: (payload: ConnectionTestPayload) => Promise<ConnectionTestResult>;
+  testLogin: (payload: LoginTestPayload) => Promise<LoginTestResult>;
+  update: (id: string, AuthenticationBackendUpdate) => Promise<LoadResponse>;
 };
 
-export const AuthenticationActions = singletonActions(
-  'Authentication',
-  () => Reflux.createActions<ActionsType>({
+export const AuthenticationActions = singletonActions('Authentication', () =>
+  Reflux.createActions<ActionsType>({
     create: { asyncResult: true },
     delete: { asyncResult: true },
     load: { asyncResult: true },
@@ -130,18 +135,17 @@ export const AuthenticationActions = singletonActions(
 
 type PaginatedBackendsResponse = PaginatedResponseType & {
   context: {
-    active_backend: AuthenticationBackendJSON | null | undefined,
-  },
-  backends: Array<AuthenticationBackendJSON>,
+    active_backend: AuthenticationBackendJSON | null | undefined;
+  };
+  backends: Array<AuthenticationBackendJSON>;
 };
 
 type PaginatedUsersResponse = PaginatedResponseType & {
-  users: Array<UserOverviewJSON>,
+  users: Array<UserOverviewJSON>;
 };
 
-export const AuthenticationStore = singletonStore(
-  'Authentication',
-  () => Reflux.createStore<{ authenticators: any }>({
+export const AuthenticationStore = singletonStore('Authentication', () =>
+  Reflux.createStore<{ authenticators: any }>({
     listenables: [AuthenticationActions],
 
     getInitialState() {
@@ -152,9 +156,13 @@ export const AuthenticationStore = singletonStore(
 
     create(authBackend: AuthenticationBackendCreate): Promise<LoadResponse> {
       const url = qualifyUrl(ApiRoutes.AuthenticationController.create().url);
-      const promise = fetch('POST', url, authBackend).then((result) => (result ? {
-        backend: AuthenticationBackend.fromJSON(result.backend),
-      } : null));
+      const promise = fetch('POST', url, authBackend).then((result) =>
+        result
+          ? {
+              backend: AuthenticationBackend.fromJSON(result.backend),
+            }
+          : null,
+      );
       AuthenticationActions.create.promise(promise);
 
       return promise;
@@ -162,9 +170,13 @@ export const AuthenticationStore = singletonStore(
 
     load(backendId: string): Promise<LoadResponse> {
       const url = qualifyUrl(ApiRoutes.AuthenticationController.load(encodeURIComponent(backendId)).url);
-      const promise = fetch('GET', url).then((result) => (result ? {
-        backend: AuthenticationBackend.fromJSON(result.backend),
-      } : null));
+      const promise = fetch('GET', url).then((result) =>
+        result
+          ? {
+              backend: AuthenticationBackend.fromJSON(result.backend),
+            }
+          : null,
+      );
 
       AuthenticationActions.load.promise(promise);
 
@@ -173,21 +185,32 @@ export const AuthenticationStore = singletonStore(
 
     loadActive(): Promise<LoadActiveResponse> {
       const url = qualifyUrl(ApiRoutes.AuthenticationController.loadActive().url);
-      const promise = fetch('GET', url).then((result) => (result ? {
-        backend: result.backend ? AuthenticationBackend.fromJSON(result.backend) : null,
-        context: { backendsTotal: result.context.backends_total },
-      } : null));
+      const promise = fetch('GET', url).then((result) =>
+        result
+          ? {
+              backend: result.backend ? AuthenticationBackend.fromJSON(result.backend) : null,
+              context: { backendsTotal: result.context.backends_total },
+            }
+          : null,
+      );
 
       AuthenticationActions.loadActive.promise(promise);
 
       return promise;
     },
 
-    update(backendId: null | undefined | AuthenticationBackend['id'], payload: AuthenticationBackendUpdate): Promise<LoadResponse> {
+    update(
+      backendId: null | undefined | AuthenticationBackend['id'],
+      payload: AuthenticationBackendUpdate,
+    ): Promise<LoadResponse> {
       const url = qualifyUrl(ApiRoutes.AuthenticationController.update(backendId).url);
-      const promise = fetch('PUT', url, payload).then((result) => (result ? {
-        backend: AuthenticationBackend.fromJSON(result.backend),
-      } : null));
+      const promise = fetch('PUT', url, payload).then((result) =>
+        result
+          ? {
+              backend: AuthenticationBackend.fromJSON(result.backend),
+            }
+          : null,
+      );
 
       AuthenticationActions.update.promise(promise);
 
@@ -228,20 +251,21 @@ export const AuthenticationStore = singletonStore(
 
     loadBackendsPaginated({ page, perPage, query }: Pagination): Promise<PaginatedBackends> {
       const url = PaginationURL(ApiRoutes.AuthenticationController.servicesPaginated().url, page, perPage, query);
-      const promise = fetch('GET', qualifyUrl(url))
-        .then((response: PaginatedBackendsResponse) => ({
-          context: {
-            activeBackend: response.context.active_backend,
-          },
-          list: Immutable.List<AuthenticationBackend>(response.backends.map((backend) => AuthenticationBackend.fromJSON(backend))),
-          pagination: {
-            page: response.page,
-            perPage: response.per_page,
-            query: response.query,
-            count: response.count,
-            total: response.total,
-          },
-        }));
+      const promise = fetch('GET', qualifyUrl(url)).then((response: PaginatedBackendsResponse) => ({
+        context: {
+          activeBackend: response.context.active_backend,
+        },
+        list: Immutable.List<AuthenticationBackend>(
+          response.backends.map((backend) => AuthenticationBackend.fromJSON(backend)),
+        ),
+        pagination: {
+          page: response.page,
+          perPage: response.per_page,
+          query: response.query,
+          count: response.count,
+          total: response.total,
+        },
+      }));
 
       AuthenticationActions.loadBackendsPaginated.promise(promise);
 
@@ -249,20 +273,24 @@ export const AuthenticationStore = singletonStore(
     },
 
     loadUsersPaginated(authBackendId, { page, perPage, query }: Pagination): Promise<PaginatedUsers> {
-      const url = PaginationURL(ApiRoutes.AuthenticationController.loadUsersPaginated(authBackendId).url, page, perPage, query);
+      const url = PaginationURL(
+        ApiRoutes.AuthenticationController.loadUsersPaginated(authBackendId).url,
+        page,
+        perPage,
+        query,
+      );
 
-      const promise = fetch('GET', qualifyUrl(url))
-        .then((response: PaginatedUsersResponse) => ({
-          list: Immutable.List<UserOverview>(response.users.map((user) => UserOverview.fromJSON(user))),
-          pagination: {
-            page: response.page,
-            perPage: response.per_page,
-            query: response.query,
-            count: response.count,
-            total: response.total,
-          },
-          adminUser: undefined,
-        }));
+      const promise = fetch('GET', qualifyUrl(url)).then((response: PaginatedUsersResponse) => ({
+        list: Immutable.List<UserOverview>(response.users.map((user) => UserOverview.fromJSON(user))),
+        pagination: {
+          page: response.page,
+          perPage: response.per_page,
+          query: response.query,
+          count: response.count,
+          total: response.total,
+        },
+        adminUser: undefined,
+      }));
 
       AuthenticationActions.loadUsersPaginated.promise(promise);
 

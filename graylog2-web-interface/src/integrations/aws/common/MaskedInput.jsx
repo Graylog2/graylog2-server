@@ -39,10 +39,7 @@ const MaskedInput = ({ className, label, ...props }) => {
 };
 
 MaskedInput.propTypes = {
-  label: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.node,
-  ]).isRequired,
+  label: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
   className: PropTypes.string,
 };
 

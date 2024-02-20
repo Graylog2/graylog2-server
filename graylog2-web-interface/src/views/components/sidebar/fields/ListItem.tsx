@@ -24,17 +24,19 @@ import Field from 'views/components/Field';
 import FieldTypeIcon from './FieldTypeIcon';
 
 type Props = {
-  activeQueryFields: List<FieldTypeMapping>,
-  fieldType: FieldTypeMapping,
-  selectedQuery: string,
-  style: React.CSSProperties,
+  activeQueryFields: List<FieldTypeMapping>;
+  fieldType: FieldTypeMapping;
+  selectedQuery: string;
+  style: React.CSSProperties;
 };
 
-const StyledListItem = styled.li(({ theme }) => css`
-  font-size: ${theme.fonts.size.body};
-  display: table-row;
-  white-space: nowrap;
-`);
+const StyledListItem = styled.li(
+  ({ theme }) => css`
+    font-size: ${theme.fonts.size.body};
+    display: table-row;
+    white-space: nowrap;
+  `,
+);
 
 const ListItem = ({ activeQueryFields, fieldType, selectedQuery, style }: Props) => {
   const { name, type } = fieldType;
@@ -42,12 +44,8 @@ const ListItem = ({ activeQueryFields, fieldType, selectedQuery, style }: Props)
 
   return (
     <StyledListItem style={style}>
-      <FieldTypeIcon type={type} />
-      {' '}
-      <Field queryId={selectedQuery}
-             disabled={disabled}
-             name={name}
-             type={type}>
+      <FieldTypeIcon type={type} />{' '}
+      <Field queryId={selectedQuery} disabled={disabled} name={name} type={type}>
         {name}
       </Field>
     </StyledListItem>

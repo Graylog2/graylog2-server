@@ -22,59 +22,57 @@ import { fetchPeriodically } from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
 
 type IndexerOverviewActionsType = {
-  list: (indexSetId: string) => Promise<unknown>,
-}
-export const IndexerOverviewActions = singletonActions(
-  'core.IndexerOverview',
-  () => Reflux.createActions<IndexerOverviewActionsType>({
+  list: (indexSetId: string) => Promise<unknown>;
+};
+export const IndexerOverviewActions = singletonActions('core.IndexerOverview', () =>
+  Reflux.createActions<IndexerOverviewActionsType>({
     list: { asyncResult: true },
   }),
 );
 
 export type IndexSummary = {
   size: {
-    events: number,
-    deleted: number,
-    bytes: number,
-  },
+    events: number;
+    deleted: number;
+    bytes: number;
+  };
   range: {
-    index_name: string,
-    begin: string,
-    end: string,
-    calculated_at: string,
-    took_ms: number,
-  },
-  is_deflector: boolean,
-  is_closed: boolean,
-  is_reopened: boolean,
+    index_name: string;
+    begin: string;
+    end: string;
+    calculated_at: string;
+    took_ms: number;
+  };
+  is_deflector: boolean;
+  is_closed: boolean;
+  is_reopened: boolean;
 };
 
 export type IndexerOverview = {
   deflector: {
-    current_target: string,
-    is_up: boolean,
-  },
+    current_target: string;
+    is_up: boolean;
+  };
   indexer_cluster: {
     health: {
-      status: string,
-      name: string,
+      status: string;
+      name: string;
       shards: {
-        active: number,
-        initializing: number,
-        relocating: number,
-        unassigned: number,
-      },
-    },
-  },
+        active: number;
+        initializing: number;
+        relocating: number;
+        unassigned: number;
+      };
+    };
+  };
   counts: {
-    [key: string]: number,
-  },
-  indices: Array<IndexSummary>,
+    [key: string]: number;
+  };
+  indices: Array<IndexSummary>;
 };
 
-export const IndexerOverviewStore = singletonStore(
-  'core.IndexerOverview',
-  () => Reflux.createStore({
+export const IndexerOverviewStore = singletonStore('core.IndexerOverview', () =>
+  Reflux.createStore({
     listenables: [IndexerOverviewActions],
     indexerOverview: undefined,
     indexerOverviewError: undefined,
@@ -96,9 +94,10 @@ export const IndexerOverviewStore = singletonStore(
         },
         (error) => {
           if (error.additional && error.additional.status === 503) {
-            const errorMessage = (error.additional.body && error.additional.body.message
-              ? error.additional.body.message
-              : 'Elasticsearch is unavailable. Check your configuration and logs for more information.');
+            const errorMessage =
+              error.additional.body && error.additional.body.message
+                ? error.additional.body.message
+                : 'Elasticsearch is unavailable. Check your configuration and logs for more information.';
 
             this.trigger({ indexerOverviewError: errorMessage });
           }

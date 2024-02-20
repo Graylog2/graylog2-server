@@ -24,11 +24,11 @@ import DropdownButton from './DropdownButton';
 
 describe('DropdownButton', () => {
   it('opens upon click on trigger element', async () => {
-    render((
+    render(
       <DropdownButton title="Click me!">
         <MenuItem>Hey there!</MenuItem>
-      </DropdownButton>
-    ));
+      </DropdownButton>,
+    );
 
     const button = await screen.findByRole('button', { name: 'Click me!' });
     await userEvent.click(button);
@@ -39,11 +39,11 @@ describe('DropdownButton', () => {
   it('click on menu item triggers onClick and closes menu', async () => {
     const onClick = jest.fn();
 
-    render((
+    render(
       <DropdownButton title="Click me!">
         <MenuItem onClick={onClick}>Hey there!</MenuItem>
-      </DropdownButton>
-    ));
+      </DropdownButton>,
+    );
 
     const button = await screen.findByRole('button', { name: 'Click me!' });
     await userEvent.click(button);

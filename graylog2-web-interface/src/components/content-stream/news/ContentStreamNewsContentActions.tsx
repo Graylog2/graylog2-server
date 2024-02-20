@@ -46,8 +46,12 @@ const ContentStreamNewsContentActions = () => {
 
   return (
     <>
-      <Button onClick={() => handlePrev()}><Icon name="arrow-left" /></Button>
-      <Button onClick={() => handleNext()}><Icon name="arrow-right" /></Button>
+      <Button onClick={() => handlePrev()}>
+        <Icon name="arrow-left" />
+      </Button>
+      <Button onClick={() => handleNext()}>
+        <Icon name="arrow-right" />
+      </Button>
     </>
   );
 };

@@ -24,23 +24,31 @@ import { getValueFromInput } from 'util/FormsUtils';
 import type { TextField as TextFieldType, EncryptedFieldValue } from './types';
 
 type Props = {
-  autoFocus: boolean,
-  field: TextFieldType,
-  dirty: boolean,
-  onChange: (title: string, value: string | EncryptedFieldValue<string>, dirty?: boolean) => void,
-  title: string,
-  typeName: string,
-  value?: string | EncryptedFieldValue<string>,
+  autoFocus: boolean;
+  field: TextFieldType;
+  dirty: boolean;
+  onChange: (title: string, value: string | EncryptedFieldValue<string>, dirty?: boolean) => void;
+  title: string;
+  typeName: string;
+  value?: string | EncryptedFieldValue<string>;
 };
 
 const TextField = ({ field, title, typeName, dirty, onChange, value, autoFocus }: Props) => {
   const isRequired = !field.is_optional;
   const showReadOnlyEncrypted = field.is_encrypted && !dirty && typeof value !== 'string' && value.is_set;
-  const fieldType = (!hasAttribute(field.attributes, 'textarea') && (hasAttribute(field.attributes, 'is_password') || showReadOnlyEncrypted) ? 'password' : 'text');
+  const fieldType =
+    !hasAttribute(field.attributes, 'textarea') &&
+    (hasAttribute(field.attributes, 'is_password') || showReadOnlyEncrypted)
+      ? 'password'
+      : 'text';
   const fieldId = `${typeName}-${title}`;
   const [isResetted, setIsResetted] = useState<boolean>(false);
 
-  const labelContent = <>{field.human_name} {optionalMarker(field)}</>;
+  const labelContent = (
+    <>
+      {field.human_name} {optionalMarker(field)}
+    </>
+  );
 
   const getFieldValue = () => {
     if (showReadOnlyEncrypted) return 'encrypted placeholder';
@@ -96,31 +104,35 @@ const TextField = ({ field, title, typeName, dirty, onChange, value, autoFocus }
 
   if (hasAttribute(field.attributes, 'textarea')) {
     return (
-      <Input id={fieldId}
-             type="textarea"
-             rows={10}
-             label={labelContent}
-             name={`configuration[${title}]`}
-             required={isRequired}
-             help={field.description}
-             value={getFieldValue()}
-             onChange={handleChange}
-             autoFocus={autoFocus} />
+      <Input
+        id={fieldId}
+        type="textarea"
+        rows={10}
+        label={labelContent}
+        name={`configuration[${title}]`}
+        required={isRequired}
+        help={field.description}
+        value={getFieldValue()}
+        onChange={handleChange}
+        autoFocus={autoFocus}
+      />
     );
   }
 
   return (
-    <Input id={fieldId}
-           type={fieldType}
-           name={`configuration[${title}]`}
-           label={labelContent}
-           required={isRequired}
-           help={field.description}
-           value={getFieldValue()}
-           readOnly={showReadOnlyEncrypted}
-           onChange={handleChange}
-           buttonAfter={buttonAfter()}
-           autoFocus={autoFocus} />
+    <Input
+      id={fieldId}
+      type={fieldType}
+      name={`configuration[${title}]`}
+      label={labelContent}
+      required={isRequired}
+      help={field.description}
+      value={getFieldValue()}
+      readOnly={showReadOnlyEncrypted}
+      onChange={handleChange}
+      buttonAfter={buttonAfter()}
+      autoFocus={autoFocus}
+    />
   );
 };
 

@@ -21,7 +21,7 @@ import { Alert } from 'components/bootstrap';
 import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
 
 type Props = {
-  widgetClassName: string,
+  widgetClassName: string;
 };
 
 const WidgetVisualizationNotFound = ({ widgetClassName }: Props) => {
@@ -31,8 +31,8 @@ const WidgetVisualizationNotFound = ({ widgetClassName }: Props) => {
 
   return (
     <Alert bsStyle="danger">
-      Widget Visualization (<i>{widgetClassName}</i>) not found.
-      It looks like the plugin supplying this widget is not loaded.
+      Widget Visualization (<i>{widgetClassName}</i>) not found. It looks like the plugin supplying this widget is not
+      loaded.
     </Alert>
   );
 };

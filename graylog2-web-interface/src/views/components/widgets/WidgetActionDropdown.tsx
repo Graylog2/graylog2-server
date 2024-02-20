@@ -20,13 +20,11 @@ import ActionDropdown from 'views/components/common/ActionDropdown';
 import { IconButton } from 'components/common';
 
 const WidgetActionDropdown = ({ children }: React.PropsWithChildren) => {
-  const widgetActionDropdownCaret = <IconButton data-testid="widgetActionDropDown" name="chevron-down" title="Open actions dropdown" />;
-
-  return (
-    <ActionDropdown element={widgetActionDropdownCaret}>
-      {children}
-    </ActionDropdown>
+  const widgetActionDropdownCaret = (
+    <IconButton data-testid="widgetActionDropDown" name="chevron-down" title="Open actions dropdown" />
   );
+
+  return <ActionDropdown element={widgetActionDropdownCaret}>{children}</ActionDropdown>;
 };
 
 export default WidgetActionDropdown;

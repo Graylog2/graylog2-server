@@ -27,7 +27,7 @@ const StatusLabel = styled(Label)`
 `;
 
 type Props = {
-  dataNode: DataNode,
+  dataNode: DataNode;
 };
 
 const DataNodeStatusCell = ({ dataNode }: Props) => {
@@ -35,15 +35,16 @@ const DataNodeStatusCell = ({ dataNode }: Props) => {
 
   return (
     <>
-      <StatusLabel bsStyle={datanodeDisabled ? 'warning' : 'success'}
-                   title={dataNode.data_node_status}
-                   aria-label={dataNode.data_node_status}>
+      <StatusLabel
+        bsStyle={datanodeDisabled ? 'warning' : 'success'}
+        title={dataNode.data_node_status}
+        aria-label={dataNode.data_node_status}
+      >
         {dataNode.data_node_status}
-      </StatusLabel>&nbsp;
+      </StatusLabel>
+      &nbsp;
       {dataNode.action_queue && (
-        <StatusLabel bsStyle="warning"
-                     title={dataNode.data_node_status}
-                     aria-label={dataNode.data_node_status}>
+        <StatusLabel bsStyle="warning" title={dataNode.data_node_status} aria-label={dataNode.data_node_status}>
           queued for {dataNode.action_queue}
         </StatusLabel>
       )}

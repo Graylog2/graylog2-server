@@ -23,18 +23,13 @@ import { Spinner } from 'components/common';
 import { ListGroup, ListGroupItem } from 'components/bootstrap';
 
 type Props = {
-  matchData: MatchData,
-  onDelete: (ruleId: string) => void,
-  onSubmit: (ruleId: string, data: unknown) => void,
-  stream: Stream | undefined,
-}
+  matchData: MatchData;
+  onDelete: (ruleId: string) => void;
+  onSubmit: (ruleId: string, data: unknown) => void;
+  stream: Stream | undefined;
+};
 
-const StreamRuleList = ({
-  matchData,
-  onDelete,
-  onSubmit,
-  stream,
-}: Props) => {
+const StreamRuleList = ({ matchData, onDelete, onSubmit, stream }: Props) => {
   if (!stream) {
     return <Spinner />;
   }
@@ -43,14 +38,17 @@ const StreamRuleList = ({
 
   return (
     <ListGroup componentClass="ul">
-      {hasStreamRules && stream.rules.map((streamRule) => (
-        <StreamRule key={streamRule.id}
-                    matchData={matchData}
-                    onSubmit={onSubmit}
-                    onDelete={onDelete}
-                    stream={stream}
-                    streamRule={streamRule} />
-      ))}
+      {hasStreamRules &&
+        stream.rules.map((streamRule) => (
+          <StreamRule
+            key={streamRule.id}
+            matchData={matchData}
+            onSubmit={onSubmit}
+            onDelete={onDelete}
+            stream={stream}
+            streamRule={streamRule}
+          />
+        ))}
 
       {!hasStreamRules && <ListGroupItem>No rules defined.</ListGroupItem>}
     </ListGroup>

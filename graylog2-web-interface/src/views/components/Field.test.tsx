@@ -24,23 +24,21 @@ import InteractiveContext from './contexts/InteractiveContext';
 
 describe('Field', () => {
   describe('handles value action menu depending on interactive context', () => {
-    const component = (interactive) => ({ children, ...props }: React.ComponentProps<typeof Field>) => (
-      <InteractiveContext.Provider value={interactive}>
-        <Field {...props}>
-          {children}
-        </Field>
-      </InteractiveContext.Provider>
-    );
+    const component =
+      (interactive) =>
+      ({ children, ...props }: React.ComponentProps<typeof Field>) => (
+        <InteractiveContext.Provider value={interactive}>
+          <Field {...props}>{children}</Field>
+        </InteractiveContext.Provider>
+      );
 
     it('does not show value actions if interactive context is `false`', () => {
       const NoninteractiveComponent = component(false);
-      const wrapper = mount((
-        <NoninteractiveComponent name="foo"
-                                 queryId="someQueryId"
-                                 type={FieldType.Unknown}>
+      const wrapper = mount(
+        <NoninteractiveComponent name="foo" queryId="someQueryId" type={FieldType.Unknown}>
           Foo
-        </NoninteractiveComponent>
-      ));
+        </NoninteractiveComponent>,
+      );
       const fieldActions = wrapper.find('FieldActions');
 
       expect(fieldActions).not.toExist();
@@ -49,13 +47,11 @@ describe('Field', () => {
 
     it('shows value actions if interactive context is `true`', () => {
       const InteractiveComponent = component(true);
-      const wrapper = mount((
-        <InteractiveComponent name="foo"
-                              queryId="someQueryId"
-                              type={FieldType.Unknown}>
+      const wrapper = mount(
+        <InteractiveComponent name="foo" queryId="someQueryId" type={FieldType.Unknown}>
           Foo
-        </InteractiveComponent>
-      ));
+        </InteractiveComponent>,
+      );
       const fieldActions = wrapper.find('FieldActions');
 
       expect(fieldActions).toExist();

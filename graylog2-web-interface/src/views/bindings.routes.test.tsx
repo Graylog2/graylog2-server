@@ -27,7 +27,7 @@ jest.mock('util/AppConfig', () => ({
 
 describe('bindings.routes', () => {
   it('Stream search route must be unqualified', () => {
-    const streamSearchPageRoute = bindings.routes.find(({ component }) => (component === StreamSearchPage));
+    const streamSearchPageRoute = bindings.routes.find(({ component }) => component === StreamSearchPage);
 
     if (!streamSearchPageRoute) {
       throw new Error('Stream search page route was not registered.');

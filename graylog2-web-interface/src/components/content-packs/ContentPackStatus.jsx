@@ -35,7 +35,7 @@ const StatusBadge = styled(Badge)(({ status, theme }) => {
     margin-left: 4px;
     background-color: ${statuses[status]};
     color: ${theme.utils.readableColor(statuses[status])};
-`;
+  `;
 });
 
 const ContentPackStatus = ({ contentPackId, states }) => {
@@ -45,11 +45,7 @@ const ContentPackStatus = ({ contentPackId, states }) => {
     </Link>
   ));
 
-  return (
-    <span>
-      {badges}
-    </span>
-  );
+  return <span>{badges}</span>;
 };
 
 ContentPackStatus.propTypes = {

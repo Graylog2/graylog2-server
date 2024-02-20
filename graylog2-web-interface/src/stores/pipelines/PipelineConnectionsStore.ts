@@ -23,13 +23,12 @@ import fetch from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
 
 type PipelineConnectionsActionsType = {
-  list: () => Promise<unknown>,
-  connectToStream: () => Promise<unknown>,
-  connectToPipeline: () => Promise<unknown>,
-}
-export const PipelineConnectionsActions = singletonActions(
-  'core.PipelineConnections',
-  () => Reflux.createActions<PipelineConnectionsActionsType>({
+  list: () => Promise<unknown>;
+  connectToStream: () => Promise<unknown>;
+  connectToPipeline: () => Promise<unknown>;
+};
+export const PipelineConnectionsActions = singletonActions('core.PipelineConnections', () =>
+  Reflux.createActions<PipelineConnectionsActionsType>({
     list: { asyncResult: true },
     connectToStream: { asyncResult: true },
     connectToPipeline: { asyncResult: true },
@@ -37,22 +36,21 @@ export const PipelineConnectionsActions = singletonActions(
 );
 
 export type PipelineConnectionsType = {
-  id?: string,
-  stream_id: string,
-  pipeline_ids: string[],
+  id?: string;
+  stream_id: string;
+  pipeline_ids: string[];
 };
 
 type PipelineReverseConnectionsType = {
-  pipeline_id: string,
-  stream_ids: string[],
+  pipeline_id: string;
+  stream_ids: string[];
 };
 
 type PipelineConnectionsStoreState = {
-  connections: any,
-}
-export const PipelineConnectionsStore = singletonStore(
-  'core.PipelineConnections',
-  () => Reflux.createStore<PipelineConnectionsStoreState>({
+  connections: any;
+};
+export const PipelineConnectionsStore = singletonStore('core.PipelineConnections', () =>
+  Reflux.createStore<PipelineConnectionsStoreState>({
     listenables: [PipelineConnectionsActions],
     connections: undefined,
 
@@ -62,8 +60,10 @@ export const PipelineConnectionsStore = singletonStore(
 
     list() {
       const failCallback = (error) => {
-        UserNotification.error(`Fetching pipeline connections failed with status: ${error.message}`,
-          'Could not retrieve pipeline connections');
+        UserNotification.error(
+          `Fetching pipeline connections failed with status: ${error.message}`,
+          'Could not retrieve pipeline connections',
+        );
       };
 
       const url = qualifyUrl(ApiRoutes.ConnectionsController.list().url);
@@ -83,19 +83,16 @@ export const PipelineConnectionsStore = singletonStore(
       };
       const promise = fetch('POST', url, updatedConnection);
 
-      promise.then(
-        (response) => {
-          if (this.connections.filter((c) => c.stream_id === response.stream_id)[0]) {
-            this.connections = this.connections.map((c) => (c.stream_id === response.stream_id ? response : c));
-          } else {
-            this.connections.push(response);
-          }
+      promise.then((response) => {
+        if (this.connections.filter((c) => c.stream_id === response.stream_id)[0]) {
+          this.connections = this.connections.map((c) => (c.stream_id === response.stream_id ? response : c));
+        } else {
+          this.connections.push(response);
+        }
 
-          this.trigger({ connections: this.connections });
-          UserNotification.success('Pipeline connections updated successfully');
-        },
-        this._failUpdateCallback,
-      );
+        this.trigger({ connections: this.connections });
+        UserNotification.success('Pipeline connections updated successfully');
+      }, this._failUpdateCallback);
     },
 
     connectToPipeline(reverseConnection) {
@@ -106,26 +103,25 @@ export const PipelineConnectionsStore = singletonStore(
       };
       const promise = fetch('POST', url, updatedConnection);
 
-      promise.then(
-        (response) => {
-          response.forEach((connection) => {
-            if (this.connections.filter((c) => c.stream_id === connection.stream_id)[0]) {
-              this.connections = this.connections.map((c) => (c.stream_id === connection.stream_id ? connection : c));
-            } else {
-              this.connections.push(connection);
-            }
-          });
+      promise.then((response) => {
+        response.forEach((connection) => {
+          if (this.connections.filter((c) => c.stream_id === connection.stream_id)[0]) {
+            this.connections = this.connections.map((c) => (c.stream_id === connection.stream_id ? connection : c));
+          } else {
+            this.connections.push(connection);
+          }
+        });
 
-          this.trigger({ connections: this.connections });
-          UserNotification.success('Pipeline connections updated successfully');
-        },
-        this._failUpdateCallback,
-      );
+        this.trigger({ connections: this.connections });
+        UserNotification.success('Pipeline connections updated successfully');
+      }, this._failUpdateCallback);
     },
 
     _failUpdateCallback(error) {
-      UserNotification.error(`Updating pipeline connections failed with status: ${error.message}`,
-        'Could not update pipeline connections');
+      UserNotification.error(
+        `Updating pipeline connections failed with status: ${error.message}`,
+        'Could not update pipeline connections',
+      );
     },
   }),
 );

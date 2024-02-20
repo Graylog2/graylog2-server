@@ -18,12 +18,14 @@
 import { HelpBlock as BootstrapHelpBlock } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
 
-const HelpBlock = styled(BootstrapHelpBlock)(({ theme }) => css`
-  display: block;
-  margin-top: 5px;
-  margin-bottom: 10px;
-  color: ${theme.colors.gray[50]};
-`);
+const HelpBlock = styled(BootstrapHelpBlock)(
+  ({ theme }) => css`
+    display: block;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    color: ${theme.colors.gray[50]};
+  `,
+);
 
 /** @component */
 export default HelpBlock;

@@ -22,12 +22,12 @@ import { createReactError } from 'logic/errors/ReportedErrors';
 import { Section } from 'preflight/components/common';
 
 type Props = {
-  children: React.ReactNode | Array<React.ReactNode>
-}
+  children: React.ReactNode | Array<React.ReactNode>;
+};
 
 type State = {
-  error: ReportedError | undefined,
-}
+  error: ReportedError | undefined;
+};
 
 class ErrorBoundary extends React.Component<Props, State> {
   constructor(props) {
@@ -50,7 +50,10 @@ class ErrorBoundary extends React.Component<Props, State> {
       return (
         <div>
           <Section title="Something went wrong" titleOrder={1}>
-            <p>An unknown error has occurred. Please have a look at the following message and the graylog server log for more information.</p>
+            <p>
+              An unknown error has occurred. Please have a look at the following message and the graylog server log for
+              more information.
+            </p>
             <pre className="content">
               {error.error.message}
               <br />

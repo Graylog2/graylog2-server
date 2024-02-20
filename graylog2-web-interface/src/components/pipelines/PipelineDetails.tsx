@@ -46,10 +46,10 @@ const PipelineDl = styled.dl`
 `;
 
 type Props = {
-  pipeline?: PipelineType,
-  create?: boolean,
-  onChange: (event) => void,
-  onCancel?: () => void,
+  pipeline?: PipelineType;
+  create?: boolean;
+  onChange: (event) => void;
+  onCancel?: () => void;
 };
 
 const PipelineDetails = ({ pipeline, create, onChange, onCancel }: Props) => {
@@ -71,9 +71,13 @@ const PipelineDetails = ({ pipeline, create, onChange, onCancel }: Props) => {
             <dt>Description</dt>
             <dd>{pipeline.description}</dd>
             <dt>Created</dt>
-            <dd><RelativeTime dateTime={pipeline.created_at} /></dd>
+            <dd>
+              <RelativeTime dateTime={pipeline.created_at} />
+            </dd>
             <dt>Last modified</dt>
-            <dd><RelativeTime dateTime={pipeline.modified_at} /></dd>
+            <dd>
+              <RelativeTime dateTime={pipeline.modified_at} />
+            </dd>
             <dt>Current throughput</dt>
             <dd>
               <MetricContainer name={`org.graylog.plugins.pipelineprocessor.ast.Pipeline.${pipeline.id}.executed`}>

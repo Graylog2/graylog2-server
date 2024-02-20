@@ -35,38 +35,53 @@ const Container = styled.div`
 const _sortConfiguredElements = (
   values: WidgetConfigFormValues,
   aggregationElementsByKey: { [k: string]: AggregationElement<keyof WidgetConfigFormValues> },
-) => Object.keys(aggregationElementsByKey)
-  .map((elementKey: keyof WidgetConfigFormValues) => [elementKey, values[aggregationElementsByKey[elementKey].key]] as [keyof WidgetConfigFormValues, WidgetConfigFormValues[keyof WidgetConfigFormValues]])
-  .sort(
-    ([elementKey1], [elementKey2]) => (
-      aggregationElementsByKey[elementKey1].order - aggregationElementsByKey[elementKey2].order
-    ),
-  );
+) =>
+  Object.keys(aggregationElementsByKey)
+    .map(
+      (elementKey: keyof WidgetConfigFormValues) =>
+        [elementKey, values[aggregationElementsByKey[elementKey].key]] as [
+          keyof WidgetConfigFormValues,
+          WidgetConfigFormValues[keyof WidgetConfigFormValues],
+        ],
+    )
+    .sort(
+      ([elementKey1], [elementKey2]) =>
+        aggregationElementsByKey[elementKey1].order - aggregationElementsByKey[elementKey2].order,
+    );
 
 type Props = {
-  aggregationElementsByKey: { [k: string]: AggregationElement<keyof WidgetConfigFormValues> },
-  config: AggregationWidgetConfig,
-  onConfigChange: (config: AggregationWidgetConfig) => void,
+  aggregationElementsByKey: { [k: string]: AggregationElement<keyof WidgetConfigFormValues> };
+  config: AggregationWidgetConfig;
+  onConfigChange: (config: AggregationWidgetConfig) => void;
   onCreate: (
     elementKey: string,
     values: WidgetConfigFormValues,
     setValues: (formValues: WidgetConfigFormValues) => void,
-  ) => void,
-  onSubmit: () => void,
-  onCancel: () => void,
-}
+  ) => void;
+  onSubmit: () => void;
+  onCancel: () => void;
+};
 
-const ElementsConfiguration = ({ aggregationElementsByKey, config, onConfigChange, onCreate, onSubmit, onCancel }: Props) => {
+const ElementsConfiguration = ({
+  aggregationElementsByKey,
+  config,
+  onConfigChange,
+  onCreate,
+  onSubmit,
+  onCancel,
+}: Props) => {
   const { values, setValues } = useFormikContext<WidgetConfigFormValues>();
 
   return (
     <Container>
-      <StickyBottomActions actions={(
-        <>
-          <ElementsConfigurationActions />
-          <SaveOrCancelButtons onCancel={onCancel} onSubmit={onSubmit} />
-        </>
-      )}>
+      <StickyBottomActions
+        actions={
+          <>
+            <ElementsConfigurationActions />
+            <SaveOrCancelButtons onCancel={onCancel} onSubmit={onSubmit} />
+          </>
+        }
+      >
         <div>
           {_sortConfiguredElements(values, aggregationElementsByKey).map(([elementKey, elementFormValues]) => {
             const aggregationElement = aggregationElementsByKey[elementKey];
@@ -79,12 +94,14 @@ const ElementsConfiguration = ({ aggregationElementsByKey, config, onConfigChang
             const empty = isEmpty(elementFormValues);
 
             return (
-              <ElementConfigurationSection allowCreate={aggregationElement.allowCreate(values)}
-                                           isEmpty={empty}
-                                           onCreate={() => onCreate(aggregationElement.key, values, setValues)}
-                                           elementTitle={aggregationElement.title}
-                                           sectionTitle={aggregationElement.sectionTitle}
-                                           key={aggregationElement.key}>
+              <ElementConfigurationSection
+                allowCreate={aggregationElement.allowCreate(values)}
+                isEmpty={empty}
+                onCreate={() => onCreate(aggregationElement.key, values, setValues)}
+                elementTitle={aggregationElement.title}
+                sectionTitle={aggregationElement.sectionTitle}
+                key={aggregationElement.key}
+              >
                 <ConfigurationSection config={config} onConfigChange={onConfigChange} />
               </ElementConfigurationSection>
             );

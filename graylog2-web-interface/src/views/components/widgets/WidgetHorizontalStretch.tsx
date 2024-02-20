@@ -28,18 +28,18 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 type PositionType = {
-  col: number,
-  row: number,
-  height: number,
-  width: number,
+  col: number;
+  row: number;
+  height: number;
+  width: number;
 };
 
 type Props = {
-  onStretch: (args: { id: string } & PositionType) => void,
-  position: PositionType,
-  widgetId: string,
-  widgetType: string,
-}
+  onStretch: (args: { id: string } & PositionType) => void;
+  position: PositionType;
+  widgetId: string;
+  widgetType: string;
+};
 
 const WidgetHorizontalStretch = ({ onStretch, position, widgetId, widgetType }: Props) => {
   const sendTelemetry = useSendTelemetry();
@@ -50,7 +50,11 @@ const WidgetHorizontalStretch = ({ onStretch, position, widgetId, widgetType }: 
     const { defaultWidth } = widgetDefinition(widgetType);
 
     onStretch({
-      id: widgetId, col, row, height, width: width === Infinity ? defaultWidth : Infinity,
+      id: widgetId,
+      col,
+      row,
+      height,
+      width: width === Infinity ? defaultWidth : Infinity,
     });
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.SEARCH_WIDGET_HORIZONTAL_STRETCH, {
@@ -69,9 +73,7 @@ const WidgetHorizontalStretch = ({ onStretch, position, widgetId, widgetType }: 
   const icon = stretched ? 'compress' : 'arrows-alt-h';
   const title = stretched ? 'Compress width' : 'Stretch width';
 
-  return (
-    <IconButton onClick={onClick} name={icon} title={title} />
-  );
+  return <IconButton onClick={onClick} name={icon} title={title} />;
 };
 
 WidgetHorizontalStretch.propTypes = {

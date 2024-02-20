@@ -23,89 +23,91 @@ import { singletonStore, singletonActions } from 'logic/singleton';
 
 export const TIME_BASED_ROTATION_STRATEGY = 'org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy';
 export const NOOP_RETENTION_STRATEGY = 'org.graylog2.indexer.retention.strategies.NoopRetentionStrategy';
-export const TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY = 'org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategy';
-export const ARCHIVE_RETENTION_STRATEGY = 'org.graylog.plugins.archive.indexer.retention.strategies.ArchiveRetentionStrategy';
-export const TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY_TYPE = 'org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig';
+export const TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY =
+  'org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategy';
+export const ARCHIVE_RETENTION_STRATEGY =
+  'org.graylog.plugins.archive.indexer.retention.strategies.ArchiveRetentionStrategy';
+export const TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY_TYPE =
+  'org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig';
 export const RETENTION = 'retention';
 
 export type IndexTimeAndTotalStats = {
-  total: number,
-  time_seconds: number,
+  total: number;
+  time_seconds: number;
 };
 
 export type IndexShardRouting = {
-  id: number,
-  state: string,
-  active: boolean,
-  primary: boolean,
-  node_id: string,
-  node_name: string,
-  node_hostname: string,
-  relocating_to: string | null,
+  id: number;
+  state: string;
+  active: boolean;
+  primary: boolean;
+  node_id: string;
+  node_name: string;
+  node_hostname: string;
+  relocating_to: string | null;
 };
 
 export type IndexInfo = {
-  index_name: string,
+  index_name: string;
   primary_shards: {
-    flush: IndexTimeAndTotalStats,
-    get: IndexTimeAndTotalStats,
-    index: IndexTimeAndTotalStats,
-    merge: IndexTimeAndTotalStats,
-    refresh: IndexTimeAndTotalStats,
-    search_query: IndexTimeAndTotalStats,
-    search_fetch: IndexTimeAndTotalStats,
-    open_search_contexts: number,
-    store_size_bytes: number,
-    segments: number,
+    flush: IndexTimeAndTotalStats;
+    get: IndexTimeAndTotalStats;
+    index: IndexTimeAndTotalStats;
+    merge: IndexTimeAndTotalStats;
+    refresh: IndexTimeAndTotalStats;
+    search_query: IndexTimeAndTotalStats;
+    search_fetch: IndexTimeAndTotalStats;
+    open_search_contexts: number;
+    store_size_bytes: number;
+    segments: number;
     documents: {
-      count: number,
-      deleted: number,
-    },
-  },
+      count: number;
+      deleted: number;
+    };
+  };
   all_shards: {
-    flush: IndexTimeAndTotalStats,
-    get: IndexTimeAndTotalStats,
-    index: IndexTimeAndTotalStats,
-    merge: IndexTimeAndTotalStats,
-    refresh: IndexTimeAndTotalStats,
-    search_query: IndexTimeAndTotalStats,
-    search_fetch: IndexTimeAndTotalStats,
-    open_search_contexts: number,
-    store_size_bytes: number,
-    segments: number,
+    flush: IndexTimeAndTotalStats;
+    get: IndexTimeAndTotalStats;
+    index: IndexTimeAndTotalStats;
+    merge: IndexTimeAndTotalStats;
+    refresh: IndexTimeAndTotalStats;
+    search_query: IndexTimeAndTotalStats;
+    search_fetch: IndexTimeAndTotalStats;
+    open_search_contexts: number;
+    store_size_bytes: number;
+    segments: number;
     documents: {
-      count: number,
-      deleted: number,
-    },
-  },
-  routing: Array<IndexShardRouting>,
-  reopened: boolean,
+      count: number;
+      deleted: number;
+    };
+  };
+  routing: Array<IndexShardRouting>;
+  reopened: boolean;
 };
 
-export type Indices = Array<IndexInfo>
+export type Indices = Array<IndexInfo>;
 
 type IndicesListResponse = {
   all: {
-    indices: Indices,
-  },
+    indices: Indices;
+  };
   closed: {
-    indices: Indices,
-  },
+    indices: Indices;
+  };
 };
 
 type IndicesActionsType = {
-  list: (indexSetId: string) => Promise<unknown>,
-  listAll: () => Promise<unknown>,
-  close: (indexName: string) => Promise<unknown>,
-  delete: (indexName: string) => Promise<unknown>,
-  multiple: () => Promise<unknown>,
-  reopen: () => Promise<unknown>,
-  subscribe: (indexName: string) => Promise<unknown>,
-  unsubscribe: (indexName: string) => Promise<unknown>,
-}
-export const IndicesActions = singletonActions(
-  'core.Indices',
-  () => Reflux.createActions<IndicesActionsType>({
+  list: (indexSetId: string) => Promise<unknown>;
+  listAll: () => Promise<unknown>;
+  close: (indexName: string) => Promise<unknown>;
+  delete: (indexName: string) => Promise<unknown>;
+  multiple: () => Promise<unknown>;
+  reopen: () => Promise<unknown>;
+  subscribe: (indexName: string) => Promise<unknown>;
+  unsubscribe: (indexName: string) => Promise<unknown>;
+};
+export const IndicesActions = singletonActions('core.Indices', () =>
+  Reflux.createActions<IndicesActionsType>({
     list: { asyncResult: true },
     listAll: { asyncResult: true },
     close: { asyncResult: true },
@@ -116,9 +118,8 @@ export const IndicesActions = singletonActions(
     unsubscribe: { asyncResult: false },
   }),
 );
-export const IndicesStore = singletonStore(
-  'core.Indices',
-  () => Reflux.createStore({
+export const IndicesStore = singletonStore('core.Indices', () =>
+  Reflux.createStore({
     listenables: [IndicesActions],
     indices: undefined,
     closedIndices: undefined,

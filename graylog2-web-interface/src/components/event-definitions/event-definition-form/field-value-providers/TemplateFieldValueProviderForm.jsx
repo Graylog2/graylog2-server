@@ -37,9 +37,7 @@ class TemplateFieldValueProviderForm extends React.Component {
     template: '',
   };
 
-  static requiredFields = [
-    'template',
-  ];
+  static requiredFields = ['template'];
 
   handleChange = (event) => {
     const { config, onChange } = this.props;
@@ -59,30 +57,32 @@ class TemplateFieldValueProviderForm extends React.Component {
     const helpText = (
       <span>
         Type a literal text to set to this Field or use{' '}
-        <ExternalLink href="https://cdn.rawgit.com/DJCordhose/jmte/master/doc/index.html">
-          JMTE syntax
-        </ExternalLink>
-        {' '}to add a dynamic Value.
+        <ExternalLink href="https://cdn.rawgit.com/DJCordhose/jmte/master/doc/index.html">JMTE syntax</ExternalLink> to
+        add a dynamic Value.
       </span>
     );
 
     return (
       <Row className="row-sm">
         <Col md={7} lg={6}>
-          <Input id="template-provider-template"
-                 name="template"
-                 type="text"
-                 label="Template"
-                 onChange={this.handleChange}
-                 value={provider.template || ''}
-                 bsStyle={validation.errors.template ? 'error' : null}
-                 help={validation.errors.template || helpText} />
+          <Input
+            id="template-provider-template"
+            name="template"
+            type="text"
+            label="Template"
+            onChange={this.handleChange}
+            value={provider.template || ''}
+            bsStyle={validation.errors.template ? 'error' : null}
+            help={validation.errors.template || helpText}
+          />
 
           <FormGroup>
-            <Checkbox id="lookup-message-require-values"
-                      name="require_values"
-                      checked={provider.require_values}
-                      onChange={this.handleChange}>
+            <Checkbox
+              id="lookup-message-require-values"
+              name="require_values"
+              checked={provider.require_values}
+              onChange={this.handleChange}
+            >
               Require all template values to be set
             </Checkbox>
             <HelpBlock>Check this option to validate that all variables used in the Template have values.</HelpBlock>

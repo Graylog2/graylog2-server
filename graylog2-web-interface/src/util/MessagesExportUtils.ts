@@ -22,12 +22,12 @@ import type { QueryString, TimeRange } from 'views/logic/queries/Query';
 import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
 
 export type ExportPayload = {
-  timerange?: TimeRange | undefined | null,
-  query_string?: QueryString,
-  streams?: string[],
-  fields_in_order: string[] | undefined | null,
-  execution_state?: SearchExecutionState,
-  limit?: number,
+  timerange?: TimeRange | undefined | null;
+  query_string?: QueryString;
+  streams?: string[];
+  fields_in_order: string[] | undefined | null;
+  execution_state?: SearchExecutionState;
+  limit?: number;
 };
 
 const downloadFile = (exportJobId: string, filename: string) => {
@@ -39,7 +39,12 @@ const downloadFile = (exportJobId: string, filename: string) => {
   document.body.removeChild(link);
 };
 
-export const exportSearchMessages = (exportPayload: ExportPayload, searchId: string, mimeType: string, filename?: string) => {
+export const exportSearchMessages = (
+  exportPayload: ExportPayload,
+  searchId: string,
+  mimeType: string,
+  filename?: string,
+) => {
   const { url } = ApiRoutes.ExportJobsController.exportSearch(searchId);
 
   return fetchFile('POST', qualifyUrl(url), exportPayload, mimeType)
@@ -49,7 +54,13 @@ export const exportSearchMessages = (exportPayload: ExportPayload, searchId: str
     });
 };
 
-export const exportSearchTypeMessages = (exportPayload: ExportPayload, searchId: string, searchTypeId: string, mimeType: string, filename?: string) => {
+export const exportSearchTypeMessages = (
+  exportPayload: ExportPayload,
+  searchId: string,
+  searchTypeId: string,
+  mimeType: string,
+  filename?: string,
+) => {
   const { url } = ApiRoutes.ExportJobsController.exportSearchType(searchId, searchTypeId);
 
   return fetchFile('POST', qualifyUrl(url), exportPayload, mimeType)

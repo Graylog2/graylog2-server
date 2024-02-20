@@ -61,17 +61,12 @@ const TeaserPageLayout = ({ children }: PropsWithChildren) => {
     <Container>
       <SideNav isOpen={showSideBar} toggleIsOpen={() => setShowSideBar((cur) => !cur)}>
         {navItems.map((route) => (
-          <SideNavItem key={route.title}
-                       iconName={route.iconName}
-                       linkTarget={route.path}
-                       linkEnd={route.end}>
+          <SideNavItem key={route.title} iconName={route.iconName} linkTarget={route.path} linkEnd={route.end}>
             {route.title}
           </SideNavItem>
         ))}
       </SideNav>
-      <ContentArea $sideNavIsOpen={showSideBar}>
-        {children}
-      </ContentArea>
+      <ContentArea $sideNavIsOpen={showSideBar}>{children}</ContentArea>
     </Container>
   );
 };

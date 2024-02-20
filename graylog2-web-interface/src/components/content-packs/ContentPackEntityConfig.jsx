@@ -49,8 +49,8 @@ class ContentPackEntityConfig extends React.Component {
   _configKeyRowFormatter = (paths) => (configKey) => {
     const path = paths[configKey];
     const parameter = this._getParameterForConfigKey(configKey);
-    const type = parameter ? (<b>{`parameter (${parameter.type})`}</b>) : path.getValueType();
-    const value = parameter ? (<b>{parameter.name}</b>) : path.getValue();
+    const type = parameter ? <b>{`parameter (${parameter.type})`}</b> : path.getValueType();
+    const value = parameter ? <b>{parameter.name}</b> : path.getValue();
 
     return (
       <tr key={configKey}>
@@ -68,11 +68,13 @@ class ContentPackEntityConfig extends React.Component {
 
     return (
       <div>
-        <DataTable id="entiy-config-list"
-                   headers={['Config Key', 'Type', 'Value']}
-                   filterKeys={[]}
-                   rows={configKeys}
-                   dataRowFormatter={this._configKeyRowFormatter(configPaths)} />
+        <DataTable
+          id="entiy-config-list"
+          headers={['Config Key', 'Type', 'Value']}
+          filterKeys={[]}
+          rows={configKeys}
+          dataRowFormatter={this._configKeyRowFormatter(configPaths)}
+        />
       </div>
     );
   }

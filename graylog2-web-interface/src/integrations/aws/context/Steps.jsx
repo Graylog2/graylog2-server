@@ -37,15 +37,17 @@ export const StepsProvider = ({ children }) => {
   };
 
   return (
-    <StepsContext.Provider value={{
-      availableSteps,
-      currentStep,
-      enabledSteps,
-      isDisabledStep,
-      setAvailableStep,
-      setCurrentStep,
-      setEnabledStep,
-    }}>
+    <StepsContext.Provider
+      value={{
+        availableSteps,
+        currentStep,
+        enabledSteps,
+        isDisabledStep,
+        setAvailableStep,
+        setCurrentStep,
+        setEnabledStep,
+      }}
+    >
       {children}
     </StepsContext.Provider>
   );

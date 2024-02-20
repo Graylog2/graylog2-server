@@ -1,4 +1,5 @@
 ### Uncontrolled
+
 ```js
 import { Tab } from 'components/bootstrap';
 
@@ -12,7 +13,7 @@ import { Tab } from 'components/bootstrap';
   <Tab eventKey={3} title="Tab 3" disabled>
     Tab 3 content
   </Tab>
-</Tabs>
+</Tabs>;
 ```
 
 ### Controlled
@@ -26,14 +27,10 @@ const TabExample = () => {
   const handleSetActive = (key) => {
     alert(`Switching to Tab ${key}`);
     setActiveTab(key);
-  }
+  };
 
   return (
-    <Tabs
-      activeKey={activeTab}
-      onSelect={handleSetActive}
-      id="controlled-tab-example"
-    >
+    <Tabs activeKey={activeTab} onSelect={handleSetActive} id="controlled-tab-example">
       <Tab eventKey={1} title="Tab 1">
         Tab 1 content
       </Tab>
@@ -44,10 +41,10 @@ const TabExample = () => {
         Tab 3 content
       </Tab>
     </Tabs>
-  )
-}
+  );
+};
 
-<TabExample />
+<TabExample />;
 ```
 
 ### Tabs with Dropdown
@@ -81,5 +78,5 @@ import { Row, Col, Nav, NavItem, NavDropdown, MenuItem, Tab } from 'components/b
       </Tab.Content>
     </Col>
   </Row>
-</Tab.Container>
+</Tab.Container>;
 ```

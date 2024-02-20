@@ -34,8 +34,12 @@ const DSVHTTPAdapterDocumentation = () => {
 
       <Alert style={{ marginBottom: 10 }} bsStyle="info" title="CSV file requirements">
         <ul className="no-padding">
-          <li>The file uses <strong>utf-8</strong> encoding</li>
-          <li>The file is accessible using the same URL by <strong>every</strong> Graylog server node</li>
+          <li>
+            The file uses <strong>utf-8</strong> encoding
+          </li>
+          <li>
+            The file is accessible using the same URL by <strong>every</strong> Graylog server node
+          </li>
         </ul>
       </Alert>
 
@@ -45,8 +49,10 @@ const DSVHTTPAdapterDocumentation = () => {
 
       <h5 style={{ marginBottom: 10 }}>Configuration</h5>
       <p style={{ marginBottom: 10, padding: 0 }}>
-        Separator: <code>,</code><br />
-        Quote character: <code>"</code><br />
+        Separator: <code>,</code>
+        <br />
+        Quote character: <code>"</code>
+        <br />
       </p>
 
       <h5 style={{ marginBottom: 10 }}>DSV File</h5>
@@ -56,8 +62,10 @@ const DSVHTTPAdapterDocumentation = () => {
 
       <h5 style={{ marginBottom: 10 }}>Configuration</h5>
       <p style={{ marginBottom: 10, padding: 0 }}>
-        Separator: <code>;</code><br />
-        Quote character: <code>'</code><br />
+        Separator: <code>;</code>
+        <br />
+        Quote character: <code>'</code>
+        <br />
       </p>
 
       <h5 style={{ marginBottom: 10 }}>DSV File</h5>

@@ -57,17 +57,17 @@ const NotificationBadge = () => {
     };
   }, []);
 
-  return total
-    ? (
-      <StyledNav navbar>
-        <LinkContainer to={Routes.SYSTEM.OVERVIEW}>
-          <StyledInactiveNavItem>
-            <Badge bsStyle="danger" data-testid="notification-badge" title="Notifications">{total}</Badge>
-          </StyledInactiveNavItem>
-        </LinkContainer>
-      </StyledNav>
-    )
-    : null;
+  return total ? (
+    <StyledNav navbar>
+      <LinkContainer to={Routes.SYSTEM.OVERVIEW}>
+        <StyledInactiveNavItem>
+          <Badge bsStyle="danger" data-testid="notification-badge" title="Notifications">
+            {total}
+          </Badge>
+        </StyledInactiveNavItem>
+      </LinkContainer>
+    </StyledNav>
+  ) : null;
 };
 
 export default NotificationBadge;

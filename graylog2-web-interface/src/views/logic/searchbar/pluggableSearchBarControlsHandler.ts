@@ -23,7 +23,11 @@ import type Widget from 'views/logic/widgets/Widget';
 import type Query from 'views/logic/queries/Query';
 import type { AppDispatch } from 'stores/useAppDispatch';
 
-const executeSafely = <T extends () => ReturnType<T>>(fn: T, errorMessage: string, fallbackResult?: ReturnType<T>): ReturnType<T> => {
+const executeSafely = <T extends () => ReturnType<T>>(
+  fn: T,
+  errorMessage: string,
+  fallbackResult?: ReturnType<T>,
+): ReturnType<T> => {
   try {
     return fn();
   } catch (e) {
@@ -35,32 +39,42 @@ const executeSafely = <T extends () => ReturnType<T>>(fn: T, errorMessage: strin
   return fallbackResult;
 };
 
-const initialValues = <T>(currentQuery: T, initialValuesHandler: Array<(entity: T) => ({ [key: string]: any })>) => {
-  const _initialValues = initialValuesHandler.map((useInitialValues) => executeSafely(
-
-    () => useInitialValues(currentQuery),
-    'An error occurred when collecting initial search bar form values from a plugin',
-    {},
-  ));
+const initialValues = <T>(currentQuery: T, initialValuesHandler: Array<(entity: T) => { [key: string]: any }>) => {
+  const _initialValues = initialValuesHandler.map((useInitialValues) =>
+    executeSafely(
+      () => useInitialValues(currentQuery),
+      'An error occurred when collecting initial search bar form values from a plugin',
+      {},
+    ),
+  );
 
   return merge({}, ..._initialValues);
 };
 
 export const useInitialSearchValues = (currentQuery?: Query) => {
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar') ?? [];
-  const initialValuesHandler = pluggableSearchBarControls?.map((pluginFn) => pluginFn()?.useInitialSearchValues).filter((useInitialValues) => !!useInitialValues);
+  const initialValuesHandler = pluggableSearchBarControls
+    ?.map((pluginFn) => pluginFn()?.useInitialSearchValues)
+    .filter((useInitialValues) => !!useInitialValues);
 
   return initialValues(currentQuery, initialValuesHandler);
 };
 
 export const useInitialDashboardWidgetValues = (currentWidget: Widget) => {
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar') ?? [];
-  const initialValuesHandler = pluggableSearchBarControls?.map((pluginFn) => pluginFn()?.useInitialDashboardWidgetValues).filter((useInitialValues) => !!useInitialValues);
+  const initialValuesHandler = pluggableSearchBarControls
+    ?.map((pluginFn) => pluginFn()?.useInitialDashboardWidgetValues)
+    .filter((useInitialValues) => !!useInitialValues);
 
   return initialValues(currentWidget, initialValuesHandler);
 };
 
-const executeSubmitHandler = async <T>(dispatch: AppDispatch, values: CombinedSearchBarFormValues, submitHandlers: Array<(values: CombinedSearchBarFormValues, dispatch: AppDispatch, entity?: T) => Promise<T>>, currentEntity?: T): Promise<T> => {
+const executeSubmitHandler = async <T>(
+  dispatch: AppDispatch,
+  values: CombinedSearchBarFormValues,
+  submitHandlers: Array<(values: CombinedSearchBarFormValues, dispatch: AppDispatch, entity?: T) => Promise<T>>,
+  currentEntity?: T,
+): Promise<T> => {
   let updatedEntity = currentEntity;
 
   // eslint-disable-next-line no-restricted-syntax
@@ -83,37 +97,67 @@ const executeSubmitHandler = async <T>(dispatch: AppDispatch, values: CombinedSe
   return updatedEntity;
 };
 
-export const executeSearchSubmitHandler = (dispatch: AppDispatch, values: CombinedSearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>, currentQuery?: Query) => {
-  const pluginSubmitHandlers = pluggableSearchBarControls?.map((pluginFn) => pluginFn()?.onSearchSubmit).filter((pluginData) => !!pluginData);
+export const executeSearchSubmitHandler = (
+  dispatch: AppDispatch,
+  values: CombinedSearchBarFormValues,
+  pluggableSearchBarControls: Array<() => SearchBarControl>,
+  currentQuery?: Query,
+) => {
+  const pluginSubmitHandlers = pluggableSearchBarControls
+    ?.map((pluginFn) => pluginFn()?.onSearchSubmit)
+    .filter((pluginData) => !!pluginData);
 
   return executeSubmitHandler(dispatch, values, pluginSubmitHandlers, currentQuery);
 };
 
-export const executeDashboardWidgetSubmitHandler = (dispatch: AppDispatch, values: CombinedSearchBarFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>, currentWidget: Widget) => {
-  const pluginSubmitHandlers = pluggableSearchBarControls?.map((pluginFn) => pluginFn()?.onDashboardWidgetSubmit).filter((pluginData) => !!pluginData);
+export const executeDashboardWidgetSubmitHandler = (
+  dispatch: AppDispatch,
+  values: CombinedSearchBarFormValues,
+  pluggableSearchBarControls: Array<() => SearchBarControl>,
+  currentWidget: Widget,
+) => {
+  const pluginSubmitHandlers = pluggableSearchBarControls
+    ?.map((pluginFn) => pluginFn()?.onDashboardWidgetSubmit)
+    .filter((pluginData) => !!pluginData);
 
   return executeSubmitHandler(dispatch, values, pluginSubmitHandlers, currentWidget);
 };
 
-export const pluggableValidationPayload = (values: CombinedSearchBarFormValues, context: HandlerContext, pluggableSearchBarControls: Array<() => SearchBarControl> = []) => {
-  const validationPayloadHandler = pluggableSearchBarControls.map((pluginFn) => pluginFn()?.validationPayload).filter((validationPayloadFn) => !!validationPayloadFn);
-  const validationPayload: Array<{ [key: string ]: any }> = validationPayloadHandler.map((validationPayloadFn) => executeSafely(
-    () => validationPayloadFn(values, context),
-    'An error occurred when preparing search bar validation for a plugin',
-    {},
-  ));
+export const pluggableValidationPayload = (
+  values: CombinedSearchBarFormValues,
+  context: HandlerContext,
+  pluggableSearchBarControls: Array<() => SearchBarControl> = [],
+) => {
+  const validationPayloadHandler = pluggableSearchBarControls
+    .map((pluginFn) => pluginFn()?.validationPayload)
+    .filter((validationPayloadFn) => !!validationPayloadFn);
+  const validationPayload: Array<{ [key: string]: any }> = validationPayloadHandler.map((validationPayloadFn) =>
+    executeSafely(
+      () => validationPayloadFn(values, context),
+      'An error occurred when preparing search bar validation for a plugin',
+      {},
+    ),
+  );
 
   return merge({}, ...validationPayload);
 };
 
-export const validatePluggableValues = (values: CombinedSearchBarFormValues, context: HandlerContext, pluggableSearchBarControls: Array<() => SearchBarControl> = []) => {
-  const validationHandler = pluggableSearchBarControls.map((pluginFn) => pluginFn()?.onValidate).filter((onValidate) => !!onValidate);
+export const validatePluggableValues = (
+  values: CombinedSearchBarFormValues,
+  context: HandlerContext,
+  pluggableSearchBarControls: Array<() => SearchBarControl> = [],
+) => {
+  const validationHandler = pluggableSearchBarControls
+    .map((pluginFn) => pluginFn()?.onValidate)
+    .filter((onValidate) => !!onValidate);
 
-  const errors = validationHandler.map((onValidate) => executeSafely(
-    () => onValidate(values, context),
-    'An error occurred when validating search bar values from a plugin',
-    {},
-  ));
+  const errors = validationHandler.map((onValidate) =>
+    executeSafely(
+      () => onValidate(values, context),
+      'An error occurred when validating search bar values from a plugin',
+      {},
+    ),
+  );
 
   return merge({}, ...errors);
 };

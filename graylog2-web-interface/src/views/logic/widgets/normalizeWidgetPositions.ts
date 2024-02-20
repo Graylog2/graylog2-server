@@ -32,36 +32,34 @@ const layoutItemToPosition = ({ i, x, y, w, h }: LayoutItem) => ({
   height: h,
   width: w,
 });
-export const layoutToPositions = (layout: Layout): Position[] => layout
-  .map(layoutItemToPosition);
+export const layoutToPositions = (layout: Layout): Position[] => layout.map(layoutItemToPosition);
 
 const positionItemToLayout = ([id, position]: [string, WidgetPosition]) => {
   const { col, row, height, width } = position;
 
-  return ({
+  return {
     i: id,
     x: col ? Math.max(col - 1, 0) : 0,
-    y: (row === undefined || row <= 0 ? Infinity : row - 1),
+    y: row === undefined || row <= 0 ? Infinity : row - 1,
     h: height || 1,
     w: width || 1,
-  });
+  };
 };
 
-export const positionsToLayout = (widgetPositions: { [key: string]: WidgetPosition }) => Object.entries(widgetPositions).map(positionItemToLayout);
+export const positionsToLayout = (widgetPositions: { [key: string]: WidgetPosition }) =>
+  Object.entries(widgetPositions).map(positionItemToLayout);
 
-export const normalizeWidgetPositions = (widgetPositions: { [key: string]: WidgetPosition }, widgetById: {[name: string]: Widget}): { [key: string]: WidgetPosition } => {
+export const normalizeWidgetPositions = (
+  widgetPositions: { [key: string]: WidgetPosition },
+  widgetById: { [name: string]: Widget },
+): { [key: string]: WidgetPosition } => {
   const filtratedWidgetPositions = omitBy(widgetPositions, (_, id) => !widgetById[id]);
   const layout = positionsToLayout(filtratedWidgetPositions);
   const compactedLayout = utils.compact(layout, 'vertical', 12);
 
   const positions = keyBy(layoutToPositions(compactedLayout), 'id');
 
-  return mapValues(positions, ({ col, row, width, height }) => WidgetPosition
-    .builder()
-    .row(row)
-    .col(col)
-    .width(width)
-    .height(height)
-    .build(),
+  return mapValues(positions, ({ col, row, width, height }) =>
+    WidgetPosition.builder().row(row).col(col).width(width).height(height).build(),
   );
 };

@@ -33,67 +33,79 @@ const FilterCreation = styled.div`
   height: ${ROW_MIN_HEIGHT}px;
   align-items: center;
   margin-left: 5px;
-  
+
   && {
     margin-right: 10px;
   }
 `;
 
 type Props = {
-  attributes: Attributes,
+  attributes: Attributes;
 
-  urlQueryFilters: UrlQueryFilters | undefined,
-  setUrlQueryFilters: (urlQueryFilters: UrlQueryFilters) => void,
+  urlQueryFilters: UrlQueryFilters | undefined;
+  setUrlQueryFilters: (urlQueryFilters: UrlQueryFilters) => void;
   filterValueRenderers?: { [attributeId: string]: (value: Filter['value'], title: string) => React.ReactNode };
-}
+};
 
 const EntityFilters = ({ attributes = [], filterValueRenderers, urlQueryFilters, setUrlQueryFilters }: Props) => {
-  const {
-    data: activeFilters,
-    onChange: onChangeFiltersWithTitle,
-  } = useFiltersWithTitle(
+  const { data: activeFilters, onChange: onChangeFiltersWithTitle } = useFiltersWithTitle(
     urlQueryFilters,
     attributes,
     !!attributes,
   );
 
-  const filterableAttributes = attributes.filter(({ filterable, type }) => filterable && SUPPORTED_ATTRIBUTE_TYPES.includes(type));
+  const filterableAttributes = attributes.filter(
+    ({ filterable, type }) => filterable && SUPPORTED_ATTRIBUTE_TYPES.includes(type),
+  );
 
-  const onChangeFilters = useCallback((newFilters: Filters) => {
-    const newUrlQueryFilters = newFilters.entrySeq().reduce((col, [attributeId, filterCol]) => (
-      col.set(attributeId, [...col.get(attributeId) ?? [], ...filterCol.map(({ value }) => value)])
-    ), OrderedMap<string, Array<string>>());
+  const onChangeFilters = useCallback(
+    (newFilters: Filters) => {
+      const newUrlQueryFilters = newFilters
+        .entrySeq()
+        .reduce(
+          (col, [attributeId, filterCol]) =>
+            col.set(attributeId, [...(col.get(attributeId) ?? []), ...filterCol.map(({ value }) => value)]),
+          OrderedMap<string, Array<string>>(),
+        );
 
-    onChangeFiltersWithTitle(newFilters, newUrlQueryFilters);
-    setUrlQueryFilters(newUrlQueryFilters);
-  }, [onChangeFiltersWithTitle, setUrlQueryFilters]);
+      onChangeFiltersWithTitle(newFilters, newUrlQueryFilters);
+      setUrlQueryFilters(newUrlQueryFilters);
+    },
+    [onChangeFiltersWithTitle, setUrlQueryFilters],
+  );
 
-  const onCreateFilter = useCallback((attributeId: string, filter: Filter) => {
-    onChangeFilters(OrderedMap(activeFilters).set(
-      attributeId,
-      [...(activeFilters?.get(attributeId) ?? []), filter],
-    ));
-  }, [activeFilters, onChangeFilters]);
+  const onCreateFilter = useCallback(
+    (attributeId: string, filter: Filter) => {
+      onChangeFilters(OrderedMap(activeFilters).set(attributeId, [...(activeFilters?.get(attributeId) ?? []), filter]));
+    },
+    [activeFilters, onChangeFilters],
+  );
 
-  const onDeleteFilter = useCallback((attributeId: string, filterId: string) => {
-    const filterGroup = activeFilters.get(attributeId);
-    const updatedFilterGroup = filterGroup.filter(({ value }) => value !== filterId);
+  const onDeleteFilter = useCallback(
+    (attributeId: string, filterId: string) => {
+      const filterGroup = activeFilters.get(attributeId);
+      const updatedFilterGroup = filterGroup.filter(({ value }) => value !== filterId);
 
-    if (updatedFilterGroup.length) {
-      return onChangeFilters(activeFilters.set(attributeId, updatedFilterGroup));
-    }
+      if (updatedFilterGroup.length) {
+        return onChangeFilters(activeFilters.set(attributeId, updatedFilterGroup));
+      }
 
-    return onChangeFilters(activeFilters.remove(attributeId));
-  }, [activeFilters, onChangeFilters]);
+      return onChangeFilters(activeFilters.remove(attributeId));
+    },
+    [activeFilters, onChangeFilters],
+  );
 
-  const onChangeFilter = useCallback((attributeId: string, prevValue: string, newFilter: Filter) => {
-    const filterGroup = activeFilters.get(attributeId);
-    const targetFilterIndex = filterGroup.findIndex(({ value }) => value === prevValue);
-    const updatedFilterGroup = [...filterGroup];
-    updatedFilterGroup[targetFilterIndex] = newFilter;
+  const onChangeFilter = useCallback(
+    (attributeId: string, prevValue: string, newFilter: Filter) => {
+      const filterGroup = activeFilters.get(attributeId);
+      const targetFilterIndex = filterGroup.findIndex(({ value }) => value === prevValue);
+      const updatedFilterGroup = [...filterGroup];
+      updatedFilterGroup[targetFilterIndex] = newFilter;
 
-    onChangeFilters(activeFilters.set(attributeId, updatedFilterGroup));
-  }, [activeFilters, onChangeFilters]);
+      onChangeFilters(activeFilters.set(attributeId, updatedFilterGroup));
+    },
+    [activeFilters, onChangeFilters],
+  );
 
   if (!filterableAttributes.length) {
     return null;
@@ -103,18 +115,21 @@ const EntityFilters = ({ attributes = [], filterValueRenderers, urlQueryFilters,
     <>
       <FilterCreation>
         Filters
-        <CreateFilterDropdown filterableAttributes={filterableAttributes}
-                              onCreateFilter={onCreateFilter}
-                              activeFilters={activeFilters}
-                              filterValueRenderers={filterValueRenderers} />
-
+        <CreateFilterDropdown
+          filterableAttributes={filterableAttributes}
+          onCreateFilter={onCreateFilter}
+          activeFilters={activeFilters}
+          filterValueRenderers={filterValueRenderers}
+        />
       </FilterCreation>
       {activeFilters && (
-        <ActiveFilters filters={activeFilters}
-                       attributes={attributes}
-                       onChangeFilter={onChangeFilter}
-                       onDeleteFilter={onDeleteFilter}
-                       filterValueRenderers={filterValueRenderers} />
+        <ActiveFilters
+          filters={activeFilters}
+          attributes={attributes}
+          onChangeFilter={onChangeFilter}
+          onDeleteFilter={onDeleteFilter}
+          filterValueRenderers={filterValueRenderers}
+        />
       )}
     </>
   );

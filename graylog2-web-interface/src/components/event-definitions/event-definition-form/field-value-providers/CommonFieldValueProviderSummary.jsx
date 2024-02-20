@@ -49,7 +49,8 @@ class CommonFieldValueProviderSummary extends React.Component {
         <dt>{fieldName}</dt>
         <dd>
           <Button bsStyle="link" className="btn-text" bsSize="xsmall" onClick={this.toggleDisplayDetails}>
-            <Icon name={`caret-${displayDetails ? 'down' : 'right'}`} />&nbsp;
+            <Icon name={`caret-${displayDetails ? 'down' : 'right'}`} />
+            &nbsp;
             {displayDetails ? 'Less details' : 'More details'}
           </Button>
           {displayDetails && (

@@ -19,9 +19,4 @@ import MetricElement from './metric';
 import SortElement from './sort';
 import VisualizationElement from './visualization';
 
-export default [
-  GroupingElement,
-  MetricElement,
-  SortElement,
-  VisualizationElement,
-];
+export default [GroupingElement, MetricElement, SortElement, VisualizationElement];

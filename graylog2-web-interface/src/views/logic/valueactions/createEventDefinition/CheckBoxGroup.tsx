@@ -27,11 +27,11 @@ const CHECKBOX_STATES = {
 };
 
 type Props = {
-  groupLabel: string,
-  checked: Checked,
-  labels: { [name: string]: JSX.Element }
-  onChange: (Checked) => void
-}
+  groupLabel: string;
+  checked: Checked;
+  labels: { [name: string]: JSX.Element };
+  onChange: (Checked) => void;
+};
 
 const CheckBoxGroup = ({ groupLabel, checked, onChange, labels }: Props) => {
   const value = useMemo(() => {
@@ -59,31 +59,36 @@ const CheckBoxGroup = ({ groupLabel, checked, onChange, labels }: Props) => {
     }
   }, [checked, onChange, value]);
 
-  const itemOnChange = useCallback((key: string | number, _?: React.SyntheticEvent) => {
-    onChange({
-      ...checked,
-      [key]: !checked[key],
-    });
-  }, [checked, onChange]);
+  const itemOnChange = useCallback(
+    (key: string | number, _?: React.SyntheticEvent) => {
+      onChange({
+        ...checked,
+        [key]: !checked[key],
+      });
+    },
+    [checked, onChange],
+  );
 
   return (
-    <ExpandableListItem header={groupLabel}
-                        expanded
-                        padded={false}
-                        checked={value === CHECKBOX_STATES.Checked}
-                        indetermined={value === CHECKBOX_STATES.Indeterminate}
-                        onChange={groupOnChange}>
+    <ExpandableListItem
+      header={groupLabel}
+      expanded
+      padded={false}
+      checked={value === CHECKBOX_STATES.Checked}
+      indetermined={value === CHECKBOX_STATES.Indeterminate}
+      onChange={groupOnChange}
+    >
       <ExpandableList>
-        {
-            Object.entries(checked).map(([key, isChecked]) => (
-              <ExpandableListItem expandable={false}
-                                  header={labels[key]}
-                                  padded={false}
-                                  key={key}
-                                  checked={isChecked}
-                                  onChange={(e) => itemOnChange(key, e)} />
-            ))
-          }
+        {Object.entries(checked).map(([key, isChecked]) => (
+          <ExpandableListItem
+            expandable={false}
+            header={labels[key]}
+            padded={false}
+            key={key}
+            checked={isChecked}
+            onChange={(e) => itemOnChange(key, e)}
+          />
+        ))}
       </ExpandableList>
     </ExpandableListItem>
   );

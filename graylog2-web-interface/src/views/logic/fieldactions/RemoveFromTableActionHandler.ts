@@ -24,17 +24,14 @@ import type { FieldActionHandlerCondition } from './FieldActionHandler';
 
 type Contexts = { widget: Widget };
 
-const RemoveFromTableActionHandler = ({
-  field,
-  contexts: { widget },
-}: ActionHandlerArguments<Contexts>) => (dispatch: AppDispatch) => {
-  const newFields = widget.config.fields.filter((f) => (f !== field));
-  const newConfig = widget.config.toBuilder()
-    .fields(newFields)
-    .build();
+const RemoveFromTableActionHandler =
+  ({ field, contexts: { widget } }: ActionHandlerArguments<Contexts>) =>
+  (dispatch: AppDispatch) => {
+    const newFields = widget.config.fields.filter((f) => f !== field);
+    const newConfig = widget.config.toBuilder().fields(newFields).build();
 
-  return dispatch(updateWidgetConfig(widget.id, newConfig));
-};
+    return dispatch(updateWidgetConfig(widget.id, newConfig));
+  };
 
 const isEnabled: FieldActionHandlerCondition<Contexts> = ({ contexts: { widget }, field }) => {
   if (MessagesWidget.isMessagesWidget(widget) && widget.config) {

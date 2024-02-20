@@ -21,7 +21,8 @@ import type { Filters, Filter } from 'components/common/EntityFilters/types';
 import MenuItem from 'components/bootstrap/MenuItem';
 import {
   isAttributeWithFilterOptions,
-  isAttributeWithRelatedCollection, isDateAttribute,
+  isAttributeWithRelatedCollection,
+  isDateAttribute,
 } from 'components/common/EntityFilters/helpers/AttributeIdentification';
 
 import StaticOptionsList from './StaticOptionsList';
@@ -29,39 +30,36 @@ import SuggestionsList from './SuggestionsList';
 import DateRangeForm from './DateRangeForm';
 
 type Props = {
-  attribute: Attribute,
-  filter?: Filter,
-  filterValueRenderer: (value: Filter['value'], title: string) => React.ReactNode | undefined,
-  onSubmit: (filter: { title: string, value: string }, closeDropdown?: boolean) => void,
-  allActiveFilters: Filters | undefined,
-}
+  attribute: Attribute;
+  filter?: Filter;
+  filterValueRenderer: (value: Filter['value'], title: string) => React.ReactNode | undefined;
+  onSubmit: (filter: { title: string; value: string }, closeDropdown?: boolean) => void;
+  allActiveFilters: Filters | undefined;
+};
 
-export const FilterConfiguration = ({
-  allActiveFilters,
-  attribute,
-  filter,
-  filterValueRenderer,
-  onSubmit,
-}: Props) => (
+export const FilterConfiguration = ({ allActiveFilters, attribute, filter, filterValueRenderer, onSubmit }: Props) => (
   <>
-    <MenuItem header>{filter ? 'Edit' : 'Create'} {attribute.title.toLowerCase()} filter</MenuItem>
+    <MenuItem header>
+      {filter ? 'Edit' : 'Create'} {attribute.title.toLowerCase()} filter
+    </MenuItem>
     {isAttributeWithFilterOptions(attribute) && (
-      <StaticOptionsList attribute={attribute}
-                         filterValueRenderer={filterValueRenderer}
-                         onSubmit={onSubmit}
-                         allActiveFilters={allActiveFilters} />
+      <StaticOptionsList
+        attribute={attribute}
+        filterValueRenderer={filterValueRenderer}
+        onSubmit={onSubmit}
+        allActiveFilters={allActiveFilters}
+      />
     )}
     {isAttributeWithRelatedCollection(attribute) && (
-      <SuggestionsList attribute={attribute}
-                       filterValueRenderer={filterValueRenderer}
-                       onSubmit={onSubmit}
-                       allActiveFilters={allActiveFilters}
-                       filter={filter} />
+      <SuggestionsList
+        attribute={attribute}
+        filterValueRenderer={filterValueRenderer}
+        onSubmit={onSubmit}
+        allActiveFilters={allActiveFilters}
+        filter={filter}
+      />
     )}
-    {isDateAttribute(attribute) && (
-      <DateRangeForm onSubmit={onSubmit}
-                     filter={filter} />
-    )}
+    {isDateAttribute(attribute) && <DateRangeForm onSubmit={onSubmit} filter={filter} />}
   </>
 );
 

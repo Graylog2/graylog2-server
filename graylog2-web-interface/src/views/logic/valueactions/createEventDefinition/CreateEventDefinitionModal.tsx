@@ -26,14 +26,12 @@ import { Modal, Button } from 'components/bootstrap';
 import type {
   ItemKey,
   Checked,
-  ModalData, MappedData, StrategyId,
+  ModalData,
+  MappedData,
+  StrategyId,
 } from 'views/logic/valueactions/createEventDefinition/types';
 import CheckBoxGroup from 'views/logic/valueactions/createEventDefinition/CheckBoxGroup';
-import {
-  aggregationGroup,
-  searchGroup,
-  labels,
-} from 'views/logic/valueactions/createEventDefinition/Constants';
+import { aggregationGroup, searchGroup, labels } from 'views/logic/valueactions/createEventDefinition/Constants';
 import RadioSection from 'views/logic/valueactions/createEventDefinition/RadioSection';
 import { ExpandableList, ExpandableListItem, Icon, LinkButton } from 'components/common';
 import useLocalStorageConfigData from 'views/logic/valueactions/createEventDefinition/hooks/useLocalStorageConfigData';
@@ -44,26 +42,42 @@ import generateId from 'logic/generateId';
 const Container = styled.div`
   margin-top: 10px;
 `;
-const CheckboxLabel = ({ itemKey, value }: { itemKey: ItemKey, value: string | number}) => (
+const CheckboxLabel = ({ itemKey, value }: { itemKey: ItemKey; value: string | number }) => (
   <span>
     <i>{`${labels[itemKey]}: `}</i>
     <b>{value}</b>
   </span>
 );
 
-const CreateEventDefinitionModal = ({ modalData, mappedData, show, onClose }: { mappedData: MappedData, modalData: ModalData, show: boolean, onClose: () => void }) => {
+const CreateEventDefinitionModal = ({
+  modalData,
+  mappedData,
+  show,
+  onClose,
+}: {
+  mappedData: MappedData;
+  modalData: ModalData;
+  show: boolean;
+  onClose: () => void;
+}) => {
   const [{ strategy, checked, showDetails }, dispatchWithData] = useModalReducer(modalData);
   const localStorageConfig = useLocalStorageConfigData({ mappedData, checked });
   const sessionId = useMemo(() => `cedfv-${generateId()}`, []);
   const eventDefinitionCreationUrl = `${Routes.ALERTS.DEFINITIONS.CREATE}?step=condition&session-id=${sessionId}`;
 
-  const onCheckboxChange = useCallback((updates) => {
-    dispatchWithData({ type: 'UPDATE_CHECKED_ITEMS', payload: updates });
-  }, [dispatchWithData]);
+  const onCheckboxChange = useCallback(
+    (updates) => {
+      dispatchWithData({ type: 'UPDATE_CHECKED_ITEMS', payload: updates });
+    },
+    [dispatchWithData],
+  );
 
-  const onStrategyChange = useCallback((e) => {
-    dispatchWithData({ type: `SET_${e.target.value}_STRATEGY` });
-  }, [dispatchWithData]);
+  const onStrategyChange = useCallback(
+    (e) => {
+      dispatchWithData({ type: `SET_${e.target.value}_STRATEGY` });
+    },
+    [dispatchWithData],
+  );
   const toggleDetailsOpen = useCallback(() => {
     dispatchWithData({ type: 'TOGGLE_SHOW_DETAILS' });
   }, [dispatchWithData]);
@@ -72,22 +86,37 @@ const CreateEventDefinitionModal = ({ modalData, mappedData, show, onClose }: { 
   const searchChecks = useMemo<Partial<Checked>>(() => pick(checked, searchGroup), [checked]);
   const restChecks = useMemo<Partial<Checked>>(() => omit(checked, [...searchGroup, ...aggregationGroup]), [checked]);
 
-  const aggregationLabels = useMemo<{ [name: string]: JSX.Element }>(() => mapValues(pick(modalData, aggregationGroup), (value, key: ItemKey) => <CheckboxLabel itemKey={key} value={value} />), [modalData]);
-  const searchLabels = useMemo<{ [name: string]: JSX.Element }>(() => mapValues(pick(modalData, searchGroup), (value, key: ItemKey) => (
-    <CheckboxLabel itemKey={key} value={value} />
-  )), [modalData]);
+  const aggregationLabels = useMemo<{ [name: string]: JSX.Element }>(
+    () =>
+      mapValues(pick(modalData, aggregationGroup), (value, key: ItemKey) => (
+        <CheckboxLabel itemKey={key} value={value} />
+      )),
+    [modalData],
+  );
+  const searchLabels = useMemo<{ [name: string]: JSX.Element }>(
+    () =>
+      mapValues(pick(modalData, searchGroup), (value, key: ItemKey) => <CheckboxLabel itemKey={key} value={value} />),
+    [modalData],
+  );
 
-  const restLabels = useMemo<{ [name: string]: JSX.Element }>(() => mapValues(omit(modalData, [...aggregationGroup, ...searchGroup]), (value, key: ItemKey) => (
-    <CheckboxLabel itemKey={key} value={value} />
-  )), [modalData]);
+  const restLabels = useMemo<{ [name: string]: JSX.Element }>(
+    () =>
+      mapValues(omit(modalData, [...aggregationGroup, ...searchGroup]), (value, key: ItemKey) => (
+        <CheckboxLabel itemKey={key} value={value} />
+      )),
+    [modalData],
+  );
 
-  const strategyAvailabilities = useMemo<{[name in StrategyId]: boolean}>(() => ({
-    ALL: true,
-    ROW: !!mappedData?.rowValuePath?.length,
-    COL: !!mappedData?.columnValuePath?.length,
-    CUSTOM: true,
-    EXACT: true,
-  }), [mappedData?.columnValuePath?.length, mappedData?.rowValuePath?.length]);
+  const strategyAvailabilities = useMemo<{ [name in StrategyId]: boolean }>(
+    () => ({
+      ALL: true,
+      ROW: !!mappedData?.rowValuePath?.length,
+      COL: !!mappedData?.columnValuePath?.length,
+      CUSTOM: true,
+      EXACT: true,
+    }),
+    [mappedData?.columnValuePath?.length, mappedData?.rowValuePath?.length],
+  );
 
   const onContinueConfigurationClick = useCallback(() => {
     Store.set(sessionId, localStorageConfig);
@@ -102,42 +131,52 @@ const CreateEventDefinitionModal = ({ modalData, mappedData, show, onClose }: { 
       <Modal.Body>
         <RadioSection strategyAvailabilities={strategyAvailabilities} strategy={strategy} onChange={onStrategyChange} />
         <Button bsStyle="link" className="btn-text" bsSize="xsmall" onClick={toggleDetailsOpen}>
-          <Icon name={`caret-${showDetails ? 'down' : 'right'}`} />&nbsp;
+          <Icon name={`caret-${showDetails ? 'down' : 'right'}`} />
+          &nbsp;
           {showDetails ? 'Hide strategy details' : 'Show strategy details'}
         </Button>
-        {
-          showDetails && (
+        {showDetails && (
           <Container>
             <ExpandableList>
               {!isEmpty(aggregationChecks) && (
-                <CheckBoxGroup onChange={onCheckboxChange}
-                               groupLabel="Aggregation"
-                               checked={aggregationChecks}
-                               labels={aggregationLabels} />
+                <CheckBoxGroup
+                  onChange={onCheckboxChange}
+                  groupLabel="Aggregation"
+                  checked={aggregationChecks}
+                  labels={aggregationLabels}
+                />
               )}
               {!isEmpty(searchChecks) && (
-                <CheckBoxGroup onChange={onCheckboxChange}
-                               groupLabel="Search query"
-                               checked={searchChecks}
-                               labels={searchLabels} />
+                <CheckBoxGroup
+                  onChange={onCheckboxChange}
+                  groupLabel="Search query"
+                  checked={searchChecks}
+                  labels={searchLabels}
+                />
               )}
-              {
-              Object.entries(restChecks).map(([key, isChecked]) => (
-                <ExpandableListItem key={key}
-                                    checked={isChecked}
-                                    onChange={() => onCheckboxChange({ [key]: !isChecked })}
-                                    header={restLabels[key]}
-                                    padded={false}
-                                    expandable={false} />
-              ))
-            }
+              {Object.entries(restChecks).map(([key, isChecked]) => (
+                <ExpandableListItem
+                  key={key}
+                  checked={isChecked}
+                  onChange={() => onCheckboxChange({ [key]: !isChecked })}
+                  header={restLabels[key]}
+                  padded={false}
+                  expandable={false}
+                />
+              ))}
             </ExpandableList>
           </Container>
-          )
-        }
+        )}
       </Modal.Body>
       <Modal.Footer>
-        <LinkButton bsStyle="primary" onClick={onContinueConfigurationClick} to={eventDefinitionCreationUrl} target="_blank">Continue configuration</LinkButton>
+        <LinkButton
+          bsStyle="primary"
+          onClick={onContinueConfigurationClick}
+          to={eventDefinitionCreationUrl}
+          target="_blank"
+        >
+          Continue configuration
+        </LinkButton>
       </Modal.Footer>
     </Modal>
   );

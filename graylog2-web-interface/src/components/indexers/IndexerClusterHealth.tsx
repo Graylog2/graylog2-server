@@ -55,8 +55,20 @@ const getIndexerClusterName = () => {
 const useLoadHealthAndName = (enabled: boolean) => {
   const options = { refetchInterval: 5000, retry: 0, enabled };
   const [
-    { data: healthData, isFetching: healthIsFetching, error: healthError, isSuccess: healthIsSuccess, isRefetching: healthIsRefetching },
-    { data: nameData, isFetching: nameIsFetching, error: nameError, isSuccess: nameIsSuccess, isRefetching: nameIsRefetching },
+    {
+      data: healthData,
+      isFetching: healthIsFetching,
+      error: healthError,
+      isSuccess: healthIsSuccess,
+      isRefetching: healthIsRefetching,
+    },
+    {
+      data: nameData,
+      isFetching: nameIsFetching,
+      error: nameError,
+      isSuccess: nameIsSuccess,
+      isRefetching: nameIsRefetching,
+    },
   ] = useQueries({
     queries: [
       { queryKey: [GET_INDEXER_CLUSTER_HEALTH], queryFn: getIndexerClusterHealth, ...options },
@@ -64,17 +76,17 @@ const useLoadHealthAndName = (enabled: boolean) => {
     ],
   });
 
-  return ({
+  return {
     health: healthData,
     name: nameData,
     error: (healthError || nameError) as FetchError,
     loading: (healthIsFetching || nameIsFetching) && !healthIsRefetching && !nameIsRefetching,
     isSuccess: healthIsSuccess && nameIsSuccess,
-  });
+  };
 };
 
 type Props = {
-  minimal?: boolean,
+  minimal?: boolean;
 };
 
 const IndexerClusterHealth = ({ minimal }: Props) => {
@@ -92,12 +104,20 @@ const IndexerClusterHealth = ({ minimal }: Props) => {
         {!minimal && (
           <Header>
             <h2>Elasticsearch cluster</h2>
-            <DocumentationLink page={DocsHelper.PAGES.CONFIGURING_ES} text="Elasticsearch setup documentation" displayIcon />
+            <DocumentationLink
+              page={DocsHelper.PAGES.CONFIGURING_ES}
+              text="Elasticsearch setup documentation"
+              displayIcon
+            />
           </Header>
         )}
 
         {isSuccess && <IndexerClusterHealthSummary health={health} name={name} />}
-        {loading && <p><Spinner /></p>}
+        {loading && (
+          <p>
+            <Spinner />
+          </p>
+        )}
         {error && <IndexerClusterHealthError error={error} />}
       </Col>
     </Row>

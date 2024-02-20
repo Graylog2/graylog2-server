@@ -39,15 +39,17 @@ export const StyledLabel = styled(Label)`
   display: block;
 `;
 
-const LastOpenedTime = styled.i(({ theme }: { theme: DefaultTheme }) => css`
-  color: ${theme.colors.gray[60]};
-`);
+const LastOpenedTime = styled.i(
+  ({ theme }: { theme: DefaultTheme }) => css`
+    color: ${theme.colors.gray[60]};
+  `,
+);
 
 type Props = {
-  title: string,
-  timestamp?: string,
-  grn: string,
-}
+  title: string;
+  timestamp?: string;
+  grn: string;
+};
 
 const EntityItem = ({ title, grn, timestamp }: Props) => {
   const { id, type } = getValuesFromGRN(grn);
@@ -60,10 +62,12 @@ const EntityItem = ({ title, grn, timestamp }: Props) => {
   return (
     <StyledListGroupItem>
       <StyledLabel bsStyle="info">{entityTypeTitle}</StyledLabel>
-      {!showLink
-        ? <i>{entityTitle}</i>
-        : <Link to={entityLink}>{entityTitle}</Link>}
-      {timestamp ? <LastOpenedTime><RelativeTime dateTime={timestamp} /></LastOpenedTime> : null}
+      {!showLink ? <i>{entityTitle}</i> : <Link to={entityLink}>{entityTitle}</Link>}
+      {timestamp ? (
+        <LastOpenedTime>
+          <RelativeTime dateTime={timestamp} />
+        </LastOpenedTime>
+      ) : null}
     </StyledListGroupItem>
   );
 };

@@ -20,13 +20,17 @@ import { Icon } from 'components/common';
 import type { StepKey } from 'components/common/Wizard';
 
 type Props = {
-  invalidStepKeys: Array<StepKey>,
-  stepKey: string,
+  invalidStepKeys: Array<StepKey>;
+  stepKey: string;
 };
 
 const StepTitleWarning = ({ invalidStepKeys = [], stepKey }: Props) => {
   if (invalidStepKeys.includes(stepKey)) {
-    return <><Icon name="exclamation-triangle" />{' '}</>;
+    return (
+      <>
+        <Icon name="exclamation-triangle" />{' '}
+      </>
+    );
   }
 
   return null;

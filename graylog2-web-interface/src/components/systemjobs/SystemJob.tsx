@@ -34,13 +34,7 @@ enum JobStatus {
 }
 
 const StatusBadge = styled(Badge)<{ status: string }>(({ status, theme }) => {
-  const {
-    primary,
-    success,
-    info,
-    warning,
-    danger,
-  } = theme.colors.variant.dark;
+  const { primary, success, info, warning, danger } = theme.colors.variant.dark;
   const statuses = {
     cancelled: warning,
     complete: success,
@@ -54,7 +48,7 @@ const StatusBadge = styled(Badge)<{ status: string }>(({ status, theme }) => {
     margin-left: 4px;
     background-color: ${color};
     color: ${theme.utils.readableColor(color)};
-`;
+  `;
 });
 
 const StyledProgressBar = styled(ProgressBar)`
@@ -66,21 +60,24 @@ const JobWrap = styled.div`
   margin-bottom: 5px;
 `;
 
-const AcknowledgeButton = styled(Button)(({ theme }) => css`
-  && {
-    color: ${theme.colors.variant.light.default};
-    
-    &:hover {
-      color: ${theme.colors.variant.default};
+const AcknowledgeButton = styled(Button)(
+  ({ theme }) => css`
+    && {
+      color: ${theme.colors.variant.light.default};
+
+      &:hover {
+        color: ${theme.colors.variant.default};
+      }
     }
-  }
-`);
+  `,
+);
 
 const SystemJob = ({ job }) => {
-  const jobIsOver = job.job_status === JobStatus.Complete
-                    || job.percent_complete === 100
-                    || job.job_status === JobStatus.Cancelled
-                    || job.job_status === JobStatus.Error;
+  const jobIsOver =
+    job.job_status === JobStatus.Complete ||
+    job.percent_complete === 100 ||
+    job.job_status === JobStatus.Cancelled ||
+    job.job_status === JobStatus.Error;
   const mappedJobStatus = job.job_status === JobStatus.Runnable ? 'queued' : job.job_status;
 
   const _onAcknowledge = () => (e) => {
@@ -106,15 +103,29 @@ const SystemJob = ({ job }) => {
     <div>
       <JobWrap>
         <Icon name="cog" />{' '}
-        <span data-toggle="tooltip" title={job.name}>{job.info}</span>{' '}
-        - on <LinkToNode nodeId={job.node_id} />{' '}
-        <RelativeTime dateTime={job.started_at} />{' '}
+        <span data-toggle="tooltip" title={job.name}>
+          {job.info}
+        </span>{' '}
+        - on <LinkToNode nodeId={job.node_id} /> <RelativeTime dateTime={job.started_at} />{' '}
         <span data-toggle="tooltip" title={`runtime: ${job.execution_duration}`}>
           <StatusBadge status={mappedJobStatus}>{mappedJobStatus}</StatusBadge>
         </span>
-        {!jobIsOver && job.is_cancelable
-          ? (<Button type="button" bsSize="xs" bsStyle="primary" className="pull-right" onClick={_onCancel()}>Cancel</Button>)
-          : (<AcknowledgeButton type="button" bsStyle="link" onClick={_onAcknowledge()} bsSize="xs" className="pull-right" title="Acknowledge"><Icon name="x" /></AcknowledgeButton>)}
+        {!jobIsOver && job.is_cancelable ? (
+          <Button type="button" bsSize="xs" bsStyle="primary" className="pull-right" onClick={_onCancel()}>
+            Cancel
+          </Button>
+        ) : (
+          <AcknowledgeButton
+            type="button"
+            bsStyle="link"
+            onClick={_onAcknowledge()}
+            bsSize="xs"
+            className="pull-right"
+            title="Acknowledge"
+          >
+            <Icon name="x" />
+          </AcknowledgeButton>
+        )}
       </JobWrap>
 
       {!jobIsOver && <StyledProgressBar bars={[{ value: job.percent_complete, bsStyle: 'info', animated: true }]} />}

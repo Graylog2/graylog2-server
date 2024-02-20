@@ -21,7 +21,7 @@ import Routes from 'routing/Routes';
 import type { Stream } from 'views/stores/StreamsStore';
 
 type Props = {
-  stream: Stream,
+  stream: Stream;
 };
 
 const StreamLink = ({ stream }: Props) => {

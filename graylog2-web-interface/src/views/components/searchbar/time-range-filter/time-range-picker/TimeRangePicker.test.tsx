@@ -34,11 +34,10 @@ jest.mock('views/stores/SearchConfigStore', () => ({
   SearchConfigActions: {
     refresh: jest.fn(() => Promise.resolve()),
   },
-  SearchConfigStore: MockStore(
-    'get',
-    'refresh',
-    ['getInitialState', () => ({ searchesClusterConfig: mockSearchClusterConfig })],
-  ),
+  SearchConfigStore: MockStore('get', 'refresh', [
+    'getInitialState',
+    () => ({ searchesClusterConfig: mockSearchClusterConfig }),
+  ]),
 }));
 
 jest.mock('stores/tools/ToolsStore', () => ({
@@ -66,11 +65,13 @@ const TimeRangePicker = (props: React.ComponentProps<typeof OriginalTimeRangePic
 
 describe('TimeRangePicker', () => {
   beforeEach(() => {
-    asMock(ToolsStore.testNaturalDate).mockImplementation(() => Promise.resolve({
-      from: '2018-11-14 13:52:38',
-      to: '2018-11-14 13:57:38',
-      timezone: 'Asia/Tokyo',
-    }));
+    asMock(ToolsStore.testNaturalDate).mockImplementation(() =>
+      Promise.resolve({
+        from: '2018-11-14 13:52:38',
+        to: '2018-11-14 13:57:38',
+        timezone: 'Asia/Tokyo',
+      }),
+    );
 
     asMock(useCurrentUser).mockReturnValue(defaultUser);
   });
@@ -91,10 +92,12 @@ describe('TimeRangePicker', () => {
 
     await waitFor(() => expect(defaultProps.setCurrentTimeRange).toHaveBeenCalled());
 
-    await waitFor(() => expect(defaultProps.setCurrentTimeRange).toHaveBeenCalledWith({
-      type: 'relative',
-      from: 300,
-    }));
+    await waitFor(() =>
+      expect(defaultProps.setCurrentTimeRange).toHaveBeenCalledWith({
+        type: 'relative',
+        from: 300,
+      }),
+    );
   });
 
   it('Limit duration is shown when setup', async () => {
@@ -117,21 +120,30 @@ describe('TimeRangePicker', () => {
     expect(keywordTabButton).toBeInTheDocument();
   });
 
-  it('Absolute tab has Accordion', async () => {
-    render(<TimeRangePicker {...defaultProps} currentTimeRange={{ type: 'absolute', from: '1955-05-11 06:15:00', to: '1985-10-25 08:18:00' }} />);
+  it(
+    'Absolute tab has Accordion',
+    async () => {
+      render(
+        <TimeRangePicker
+          {...defaultProps}
+          currentTimeRange={{ type: 'absolute', from: '1955-05-11 06:15:00', to: '1985-10-25 08:18:00' }}
+        />,
+      );
 
-    const calendarButton = await screen.findByRole('button', { name: /calendar/i });
-    const timestampButton = screen.getByRole('button', { name: /timestamp/i });
+      const calendarButton = await screen.findByRole('button', { name: /calendar/i });
+      const timestampButton = screen.getByRole('button', { name: /timestamp/i });
 
-    expect(calendarButton).toBeInTheDocument();
-    expect(timestampButton).toBeInTheDocument();
+      expect(calendarButton).toBeInTheDocument();
+      expect(timestampButton).toBeInTheDocument();
 
-    fireEvent.click(timestampButton);
+      fireEvent.click(timestampButton);
 
-    const timestampContent = await screen.findByText(/Date should be formatted as/i);
+      const timestampContent = await screen.findByText(/Date should be formatted as/i);
 
-    expect(timestampContent).toBeInTheDocument();
-  }, applyTimeoutMultiplier(15000));
+      expect(timestampContent).toBeInTheDocument();
+    },
+    applyTimeoutMultiplier(15000),
+  );
 
   it('Renders No Override Tab for Dashboard', async () => {
     render(<TimeRangePicker {...defaultProps} currentTimeRange={{}} noOverride />);
@@ -146,9 +158,13 @@ describe('TimeRangePicker', () => {
   it('Should not change keyword time range after submitting without changes', async () => {
     const setCurrentTimeRange = jest.fn();
 
-    render(<TimeRangePicker {...defaultProps}
-                            currentTimeRange={{ type: 'keyword', keyword: 'yesterday', timezone: 'Asia/Tokyo' }}
-                            setCurrentTimeRange={setCurrentTimeRange} />);
+    render(
+      <TimeRangePicker
+        {...defaultProps}
+        currentTimeRange={{ type: 'keyword', keyword: 'yesterday', timezone: 'Asia/Tokyo' }}
+        setCurrentTimeRange={setCurrentTimeRange}
+      />,
+    );
 
     const submitButton = await screen.findByRole('button', {
       name: /update time range/i,

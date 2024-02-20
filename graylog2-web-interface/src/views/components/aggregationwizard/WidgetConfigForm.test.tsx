@@ -24,12 +24,17 @@ import DisableSubmissionStateProvider from '../contexts/DisableSubmissionStatePr
 import DisableSubmissionStateContext from '../contexts/DisableSubmissionStateContext';
 
 describe('WidgetConfigForm', () => {
-  const WidgetConfigFormWithValidationState = ({ validate }: { validate: () => ({ [key: string]: string })}) => (
+  const WidgetConfigFormWithValidationState = ({ validate }: { validate: () => { [key: string]: string } }) => (
     <DisableSubmissionStateProvider>
       <DisableSubmissionStateContext.Consumer>
         {({ disabled }) => (
           <>
-            <WidgetConfigForm initialValues={{}} onSubmit={() => {}} validate={validate} config={AggregationWidgetConfig.builder().build()}>
+            <WidgetConfigForm
+              initialValues={{}}
+              onSubmit={() => {}}
+              validate={validate}
+              config={AggregationWidgetConfig.builder().build()}
+            >
               <span>Hello world!</span>
             </WidgetConfigForm>
             <span>{disabled ? 'Form submission is disabled' : 'Form submission is not disabled'}</span>

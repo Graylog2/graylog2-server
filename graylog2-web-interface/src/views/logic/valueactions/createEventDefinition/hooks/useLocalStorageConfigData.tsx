@@ -23,62 +23,69 @@ import { concatQueryStrings } from 'views/logic/queries/QueryHelper';
 
 const concatQuery = (queryParts: Array<string>) => concatQueryStrings(queryParts.filter((queryPart) => !!queryPart));
 
-const useLocalStorageConfigData = ({ mappedData, checked }: { mappedData: MappedData, checked: Checked }) => useMemo<EventDefinitionLocalStorageConfig>(() => {
-  const {
-    queryWithReplacedParams,
-    searchFilterQuery,
-    searchFromValue,
-    columnValuePath,
-    rowValuePath,
-    lutParameters,
-    searchWithinMs,
-    streams,
-    aggValue,
-    aggFunction,
-    aggField,
-    columnGroupBy,
-    rowGroupBy,
-  } = mappedData;
+const useLocalStorageConfigData = ({ mappedData, checked }: { mappedData: MappedData; checked: Checked }) =>
+  useMemo<EventDefinitionLocalStorageConfig>(() => {
+    const {
+      queryWithReplacedParams,
+      searchFilterQuery,
+      searchFromValue,
+      columnValuePath,
+      rowValuePath,
+      lutParameters,
+      searchWithinMs,
+      streams,
+      aggValue,
+      aggFunction,
+      aggField,
+      columnGroupBy,
+      rowGroupBy,
+    } = mappedData;
 
-  const queries: Array<string> = Object.entries({
-    queryWithReplacedParams, searchFilterQuery, searchFromValue, columnValuePath, rowValuePath,
-  }).filter(([key]) => checked[key]).map(([_, search]) => search);
+    const queries: Array<string> = Object.entries({
+      queryWithReplacedParams,
+      searchFilterQuery,
+      searchFromValue,
+      columnValuePath,
+      rowValuePath,
+    })
+      .filter(([key]) => checked[key])
+      .map(([_, search]) => search);
 
-  const getAggregations = (): Partial<EventDefinitionLocalStorageConfig> => {
-    const res: Partial<EventDefinitionLocalStorageConfig> = {};
+    const getAggregations = (): Partial<EventDefinitionLocalStorageConfig> => {
+      const res: Partial<EventDefinitionLocalStorageConfig> = {};
 
-    if (checked.aggCondition) {
-      res.agg_field = aggField;
-      res.agg_value = aggValue;
-      res.agg_function = aggFunction;
-    }
+      if (checked.aggCondition) {
+        res.agg_field = aggField;
+        res.agg_value = aggValue;
+        res.agg_function = aggFunction;
+      }
 
-    if (checked.columnGroupBy) {
-      res.group_by = columnGroupBy;
-    }
+      if (checked.columnGroupBy) {
+        res.group_by = columnGroupBy;
+      }
 
-    if (checked.rowGroupBy) {
-      res.group_by = (rowGroupBy || []).concat(res.group_by || []);
-    }
+      if (checked.rowGroupBy) {
+        res.group_by = (rowGroupBy || []).concat(res.group_by || []);
+      }
 
-    return res;
-  };
+      return res;
+    };
 
-  const getRest = () => {
-    const res: Partial<EventDefinitionLocalStorageConfig> = {};
-    if (checked.lutParameters && lutParameters && lutParameters.length) res.loc_query_parameters = lutParameters;
-    if (checked.searchWithinMs && searchWithinMs) res.search_within_ms = searchWithinMs;
-    if (checked.streams && streams && streams.length) res.streams = streams;
+    const getRest = () => {
+      const res: Partial<EventDefinitionLocalStorageConfig> = {};
+      if (checked.lutParameters && lutParameters && lutParameters.length) res.loc_query_parameters = lutParameters;
+      if (checked.searchWithinMs && searchWithinMs) res.search_within_ms = searchWithinMs;
+      if (checked.streams && streams && streams.length) res.streams = streams;
 
-    return res;
-  };
+      return res;
+    };
 
-  return ({
-    type: 'aggregation-v1',
-    query: concatQuery(queries),
-    ...getAggregations(),
-    ...getRest(),
-  });
-}, [checked, mappedData]);
+    return {
+      type: 'aggregation-v1',
+      query: concatQuery(queries),
+      ...getAggregations(),
+      ...getRest(),
+    };
+  }, [checked, mappedData]);
 
 export default useLocalStorageConfigData;

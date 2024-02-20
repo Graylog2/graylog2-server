@@ -43,13 +43,15 @@ describe('MessageTableEntry', () => {
 
     render(
       <table>
-        <MessageTableEntry expandAllRenderAsync
-                           toggleDetail={() => {}}
-                           fields={Immutable.List()}
-                           message={message}
-                           config={MessagesWidgetConfig.builder().build()}
-                           selectedFields={Immutable.OrderedSet(['message', 'notexisting'])}
-                           expanded={false} />
+        <MessageTableEntry
+          expandAllRenderAsync
+          toggleDetail={() => {}}
+          fields={Immutable.List()}
+          message={message}
+          config={MessagesWidgetConfig.builder().build()}
+          selectedFields={Immutable.OrderedSet(['message', 'notexisting'])}
+          expanded={false}
+        />
       </table>,
     );
 

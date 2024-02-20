@@ -25,7 +25,8 @@ import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
 
 import RolesSection from './RolesSection';
 
-const exampleUser = alice.toBuilder()
+const exampleUser = alice
+  .toBuilder()
   .roles(Immutable.Set([assignedRole1.name]))
   .build();
 const mockRolesForUserPromise = Promise.resolve({
@@ -85,7 +86,8 @@ describe('<RolesSection />', () => {
   });
 
   it('should unassign a role', async () => {
-    const newExampleUser = alice.toBuilder()
+    const newExampleUser = alice
+      .toBuilder()
       .roles(Immutable.Set([assignedRole1.name, assignedRole2.name]))
       .build();
 

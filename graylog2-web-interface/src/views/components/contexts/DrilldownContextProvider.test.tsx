@@ -36,7 +36,7 @@ jest.mock('views/logic/queries/useCurrentQuery');
 jest.mock('views/hooks/useGlobalOverride');
 
 describe('DrilldownContextProvider', () => {
-  const Consumer = (_props: { streams: Array<string>, timerange: TimeRange, query: ElasticsearchQueryString }) => null;
+  const Consumer = (_props: { streams: Array<string>; timerange: TimeRange; query: ElasticsearchQueryString }) => null;
 
   const TestComponent = () => {
     const { streams, timerange, query } = useContext(DrilldownContext);
@@ -70,27 +70,32 @@ describe('DrilldownContextProvider', () => {
       asMock(useViewType).mockReturnValue(View.Type.Dashboard);
       const wrapper = mount(<SUT />);
 
-      expectDrilldown(['stream1', 'stream2'],
+      expectDrilldown(
+        ['stream1', 'stream2'],
         { type: 'relative', range: 1800 },
         { type: 'elasticsearch', query_string: 'foo:42' },
-        wrapper);
+        wrapper,
+      );
     });
 
     it('passes timerange of global override, streams of widget and combined query of global override and widget', () => {
       asMock(useViewType).mockReturnValue(View.Type.Dashboard);
 
-      asMock(useGlobalOverride)
-        .mockReturnValue(GlobalOverride.create(
+      asMock(useGlobalOverride).mockReturnValue(
+        GlobalOverride.create(
           { type: 'absolute', from: '2020-01-10T13:23:42.000Z', to: '2020-01-10T14:23:42.000Z' },
           createElasticsearchQueryString('something:"else"'),
-        ));
+        ),
+      );
 
       const wrapper = mount(<SUT />);
 
-      expectDrilldown(['stream1', 'stream2'],
+      expectDrilldown(
+        ['stream1', 'stream2'],
         { type: 'absolute', from: '2020-01-10T13:23:42.000Z', to: '2020-01-10T14:23:42.000Z' },
         { type: 'elasticsearch', query_string: '(foo:42) AND (something:"else")' },
-        wrapper);
+        wrapper,
+      );
     });
   });
 
@@ -99,10 +104,7 @@ describe('DrilldownContextProvider', () => {
       asMock(useViewType).mockReturnValue(View.Type.Search);
       const wrapper = mount(<SUT />);
 
-      expectDrilldown([],
-        { type: 'relative', from: 300 },
-        { type: 'elasticsearch', query_string: '' },
-        wrapper);
+      expectDrilldown([], { type: 'relative', from: 300 }, { type: 'elasticsearch', query_string: '' }, wrapper);
     });
 
     it('passes values from current query if present', () => {
@@ -116,10 +118,12 @@ describe('DrilldownContextProvider', () => {
       asMock(useViewType).mockReturnValue(View.Type.Search);
       const wrapper = mount(<SUT />);
 
-      expectDrilldown(['onestream', 'anotherstream'],
+      expectDrilldown(
+        ['onestream', 'anotherstream'],
         { type: 'keyword', keyword: 'last year' },
         { type: 'elasticsearch', query_string: 'foo:"bar"' },
-        wrapper);
+        wrapper,
+      );
     });
   });
 });

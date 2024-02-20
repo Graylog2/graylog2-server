@@ -23,23 +23,33 @@ import { Col, Row } from 'components/bootstrap';
 import type { ObjectWithErrors } from './types';
 
 type Props = {
-  objectWithErrors: ObjectWithErrors,
-}
+  objectWithErrors: ObjectWithErrors;
+};
 
-const ErrorsContainer = styled(Row)(({ theme }) => css`
-  margin-top: ${theme.spacings.xs};
-`);
+const ErrorsContainer = styled(Row)(
+  ({ theme }) => css`
+    margin-top: ${theme.spacings.xs};
+  `,
+);
 
-const Error = styled.p(({ theme }) => css`
-  color: ${theme.colors.variant.danger};
-  margin-top: ${theme.spacings.xs};
-  margin-bottom: ${theme.spacings.xs};
-`);
+const Error = styled.p(
+  ({ theme }) => css`
+    color: ${theme.colors.variant.danger};
+    margin-top: ${theme.spacings.xs};
+    margin-bottom: ${theme.spacings.xs};
+  `,
+);
 
-const Errors = ({ objectWithErrors } : Props) => {
-  if (!objectWithErrors) { return null; }
-  if (!objectWithErrors.errors) { return null; }
-  if (!(objectWithErrors.errors.length > 0)) { return null; }
+const Errors = ({ objectWithErrors }: Props) => {
+  if (!objectWithErrors) {
+    return null;
+  }
+  if (!objectWithErrors.errors) {
+    return null;
+  }
+  if (!(objectWithErrors.errors.length > 0)) {
+    return null;
+  }
 
   return (
     <ErrorsContainer>

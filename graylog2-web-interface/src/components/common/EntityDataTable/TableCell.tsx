@@ -30,16 +30,19 @@ const TableCell = <Entity extends EntityBase>({
   entity,
   entityAttributesAreCamelCase,
 }: {
-  column: Column
-  columnRenderer: ColumnRenderer<Entity> | undefined,
-  entity: Entity,
-  entityAttributesAreCamelCase: boolean,
+  column: Column;
+  columnRenderer: ColumnRenderer<Entity> | undefined;
+  entity: Entity;
+  entityAttributesAreCamelCase: boolean;
 }) => {
   const attributeKey = entityAttributesAreCamelCase ? camelCase(column.id) : column.id;
   const attributeValue = entity[attributeKey];
-  const content = typeof columnRenderer?.renderCell === 'function' ? columnRenderer.renderCell(attributeValue, entity, column) : attributeValue;
+  const content =
+    typeof columnRenderer?.renderCell === 'function'
+      ? columnRenderer.renderCell(attributeValue, entity, column)
+      : attributeValue;
 
-  return (<Td>{content}</Td>);
+  return <Td>{content}</Td>;
 };
 
 export default TableCell;

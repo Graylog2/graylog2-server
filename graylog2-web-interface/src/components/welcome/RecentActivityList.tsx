@@ -29,12 +29,15 @@ import { getValuesFromGRN } from 'logic/permissions/GRN';
 import useHasEntityPermissionByGRN from 'hooks/useHasEntityPermissionByGRN';
 import useShowRouteFromGRN from 'routing/hooks/useShowRouteFromGRN';
 
-type Props = { itemGrn: string, activityType: RecentActivityType, itemTitle: string, userName?: string };
+type Props = { itemGrn: string; activityType: RecentActivityType; itemTitle: string; userName?: string };
 
 const ActionItem = ({ itemGrn, activityType, itemTitle, userName }: Props) => {
   const hasReadPermission = useHasEntityPermissionByGRN(itemGrn, 'read');
   const { id: itemId, type: itemType } = getValuesFromGRN(itemGrn);
-  const entityTypeTitle = useMemo(() => getTitleForEntityType(itemType, false) ?? `(unsupported type ${itemType})`, [itemType]);
+  const entityTypeTitle = useMemo(
+    () => getTitleForEntityType(itemType, false) ?? `(unsupported type ${itemType})`,
+    [itemType],
+  );
   const entityLink = useShowRouteFromGRN(itemGrn);
   const entityTitle = itemTitle || itemId;
   const showLink = activityType !== 'delete' && !!entityLink && hasReadPermission;
@@ -42,9 +45,13 @@ const ActionItem = ({ itemGrn, activityType, itemTitle, userName }: Props) => {
   return (
     <div>
       {`The ${entityTypeTitle} `}
-      {!showLink
-        ? <i>{entityTitle}</i>
-        : <Link target="_blank" to={entityLink}>{entityTitle}</Link>}
+      {!showLink ? (
+        <i>{entityTitle}</i>
+      ) : (
+        <Link target="_blank" to={entityLink}>
+          {entityTitle}
+        </Link>
+      )}
       {' was '}
       {`${activityType}d`}
       {userName ? ` by ${userName}` : ''}
@@ -58,10 +65,16 @@ ActionItem.defaultProps = {
 
 const RecentActivityList = () => {
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
-  const { data: { recentActivity, total }, isFetching } = useRecentActivity(pagination);
-  const onPageChange = useCallback((newPage) => {
-    setPagination((cur) => ({ ...cur, page: newPage }));
-  }, [setPagination]);
+  const {
+    data: { recentActivity, total },
+    isFetching,
+  } = useRecentActivity(pagination);
+  const onPageChange = useCallback(
+    (newPage) => {
+      setPagination((cur) => ({ ...cur, page: newPage }));
+    },
+    [setPagination],
+  );
 
   if (isFetching) return <Spinner />;
 
@@ -70,30 +83,37 @@ const RecentActivityList = () => {
       <NoSearchResult>
         There is no recent activity yet.
         <p>
-          Whenever any other user will update content you have access to, or share new content with you, it will show up here.
+          Whenever any other user will update content you have access to, or share new content with you, it will show up
+          here.
         </p>
       </NoSearchResult>
     );
   }
 
   return (
-    <PaginatedList onChange={onPageChange} useQueryParameter={false} activePage={pagination.page} totalItems={total} pageSize={pagination.per_page} showPageSizeSelect={false} hideFirstAndLastPageLinks>
+    <PaginatedList
+      onChange={onPageChange}
+      useQueryParameter={false}
+      activePage={pagination.page}
+      totalItems={total}
+      pageSize={pagination.per_page}
+      showPageSizeSelect={false}
+      hideFirstAndLastPageLinks
+    >
       <Table striped>
         <tbody>
-          {
-            recentActivity.map(({ id, timestamp, activityType, itemGrn, itemTitle, userName }) => (
-              <tr key={id}>
-                <td style={{ width: 110 }}>
-                  <StyledLabel bsStyle="primary">
-                    <RelativeTime dateTime={timestamp} />
-                  </StyledLabel>
-                </td>
-                <td>
-                  <ActionItem itemGrn={itemGrn} activityType={activityType} itemTitle={itemTitle} userName={userName} />
-                </td>
-              </tr>
-            ))
-          }
+          {recentActivity.map(({ id, timestamp, activityType, itemGrn, itemTitle, userName }) => (
+            <tr key={id}>
+              <td style={{ width: 110 }}>
+                <StyledLabel bsStyle="primary">
+                  <RelativeTime dateTime={timestamp} />
+                </StyledLabel>
+              </td>
+              <td>
+                <ActionItem itemGrn={itemGrn} activityType={activityType} itemTitle={itemTitle} userName={userName} />
+              </td>
+            </tr>
+          ))}
         </tbody>
       </Table>
     </PaginatedList>

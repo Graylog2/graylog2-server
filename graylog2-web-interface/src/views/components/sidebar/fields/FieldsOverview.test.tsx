@@ -89,7 +89,9 @@ describe('<FieldsOverview />', () => {
 
     expect(wrapper).not.toContainReact(hint);
 
-    wrapper.find('input#common-search-form-query-input').simulate('change', { target: { value: 'non_existing_field' } });
+    wrapper
+      .find('input#common-search-form-query-input')
+      .simulate('change', { target: { value: 'non_existing_field' } });
 
     expect(wrapper.find('span.field-element').length).toBe(0);
     expect(wrapper).toContainReact(hint);

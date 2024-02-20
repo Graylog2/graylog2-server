@@ -18,28 +18,28 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
-const StyledDescriptionBox = styled.div(({ theme }) => css`
-  background-color: ${theme.colors.variant.lightest.default};
-  border: 1px solid ${theme.colors.variant.lighter.default};
-  padding: 10px;
-  margin: 5px;
-  border-radius: 6px;
+const StyledDescriptionBox = styled.div(
+  ({ theme }) => css`
+    background-color: ${theme.colors.variant.lightest.default};
+    border: 1px solid ${theme.colors.variant.lighter.default};
+    padding: 10px;
+    margin: 5px;
+    border-radius: 6px;
 
-  .description {
-    padding-bottom: 5px;
-    text-transform: uppercase;
-  }
-`);
+    .description {
+      padding-bottom: 5px;
+      text-transform: uppercase;
+    }
+  `,
+);
 
 type Props = React.PropsWithChildren<{
-  description: React.ReactNode,
+  description: React.ReactNode;
 }>;
 
 const DescriptionBox = ({ description, children }: Props) => (
   <StyledDescriptionBox>
-    <div className="description">
-      {description}
-    </div>
+    <div className="description">{description}</div>
     {children}
   </StyledDescriptionBox>
 );

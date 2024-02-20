@@ -57,7 +57,8 @@ describe('ShowViewPage', () => {
     owner: 'admin',
     requires: {},
     favorite: false,
-  }).toBuilder()
+  })
+    .toBuilder()
     .search(Search.create().toBuilder().parameters([]).build())
     .build();
   const SimpleShowViewPage = () => (
@@ -73,7 +74,11 @@ describe('ShowViewPage', () => {
   beforeEach(() => {
     asMock(useQuery).mockReturnValue({});
     asMock(useParams).mockReturnValue({ viewId: 'foo' });
-    asMock(useProcessHooksForView).mockReturnValue({ status: 'loaded', view, executionState: SearchExecutionState.empty() });
+    asMock(useProcessHooksForView).mockReturnValue({
+      status: 'loaded',
+      view,
+      executionState: SearchExecutionState.empty(),
+    });
     asMock(useFetchView).mockResolvedValue(view);
   });
 

@@ -58,9 +58,7 @@ const Icon = ({ name, type, ...props }: Props) => {
   const prefix = getPrefixForType(type);
   const iconLookup: IconLookup = { prefix, iconName: name };
 
-  return (
-    <FontAwesomeIcon {...props} icon={iconLookup} />
-  );
+  return <FontAwesomeIcon {...props} icon={iconLookup} />;
 };
 
 Icon.propTypes = {

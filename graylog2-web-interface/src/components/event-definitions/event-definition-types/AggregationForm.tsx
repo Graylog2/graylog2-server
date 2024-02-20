@@ -35,52 +35,62 @@ import AggregationConditionsForm from './AggregationConditionsForm';
 import commonStyles from '../common/commonStyles.css';
 
 type EventDefinitionConfig = {
-  group_by: Array<string>,
-  streams: Array<string>,
+  group_by: Array<string>;
+  streams: Array<string>;
 };
 
 type EventDefinition = {
-  config: EventDefinitionConfig,
+  config: EventDefinitionConfig;
 };
 
 type Props = {
-  eventDefinition: EventDefinition,
-  validation: {},
-  aggregationFunctions: Array<{}>,
-  onChange: (key: string, newValue: any) => void,
+  eventDefinition: EventDefinition;
+  validation: {};
+  aggregationFunctions: Array<{}>;
+  onChange: (key: string, newValue: any) => void;
 };
 
 const AggregationForm = ({ aggregationFunctions, eventDefinition, validation, onChange }: Props) => {
   const { data: allFieldTypes } = useFieldTypes(eventDefinition?.config?.streams ?? [], ALL_MESSAGES_TIMERANGE);
   // Memoize function to only format fields when they change. Use joined fieldNames as cache key.
-  const formattedFields = useMemo(() => (allFieldTypes ?? [])
-    .sort((ftA, ftB) => defaultCompare(ftA.name, ftB.name))
-    .map((fieldType) => ({
-      label: `${fieldType.name} – ${fieldType.value.type.type}`,
-      value: fieldType.name,
-    })), [allFieldTypes]);
+  const formattedFields = useMemo(
+    () =>
+      (allFieldTypes ?? [])
+        .sort((ftA, ftB) => defaultCompare(ftA.name, ftB.name))
+        .map((fieldType) => ({
+          label: `${fieldType.name} – ${fieldType.value.type.type}`,
+          value: fieldType.name,
+        })),
+    [allFieldTypes],
+  );
 
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
 
-  const propagateConfigChange = useCallback((update: Partial<EventDefinitionConfig>) => {
-    const nextConfig = { ...eventDefinition.config, ...update };
+  const propagateConfigChange = useCallback(
+    (update: Partial<EventDefinitionConfig>) => {
+      const nextConfig = { ...eventDefinition.config, ...update };
 
-    onChange('config', nextConfig);
-  }, [eventDefinition.config, onChange]);
+      onChange('config', nextConfig);
+    },
+    [eventDefinition.config, onChange],
+  );
 
-  const handleGroupByChange = useCallback((selected: string) => {
-    const nextValue = selected === '' ? [] : selected.split(',');
+  const handleGroupByChange = useCallback(
+    (selected: string) => {
+      const nextValue = selected === '' ? [] : selected.split(',');
 
-    sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.AGGREGATION_GROUP_BY_FIELD_SELECTED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'event-definition-condition',
-      app_action_value: 'group-by-field-select',
-      selection_count: nextValue.length,
-    });
+      sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.AGGREGATION_GROUP_BY_FIELD_SELECTED, {
+        app_pathname: getPathnameWithoutId(pathname),
+        app_section: 'event-definition-condition',
+        app_action_value: 'group-by-field-select',
+        selection_count: nextValue.length,
+      });
 
-    propagateConfigChange({ group_by: nextValue });
-  }, [pathname, propagateConfigChange, sendTelemetry]);
+      propagateConfigChange({ group_by: nextValue });
+    },
+    [pathname, propagateConfigChange, sendTelemetry],
+  );
 
   return (
     <fieldset>
@@ -92,21 +102,29 @@ const AggregationForm = ({ aggregationFunctions, eventDefinition, validation, on
       <Row>
         <Col lg={7}>
           <FormGroup controlId="group-by">
-            <ControlLabel>Group by Field(s) <small className="text-muted">(Optional)</small></ControlLabel>
-            <MultiSelect id="group-by"
-                         matchProp="label"
-                         onChange={handleGroupByChange}
-                         options={formattedFields}
-                         ignoreAccents={false}
-                         value={defaultTo(eventDefinition.config.group_by, []).join(',')}
-                         allowCreate />
+            <ControlLabel>
+              Group by Field(s) <small className="text-muted">(Optional)</small>
+            </ControlLabel>
+            <MultiSelect
+              id="group-by"
+              matchProp="label"
+              onChange={handleGroupByChange}
+              options={formattedFields}
+              ignoreAccents={false}
+              value={defaultTo(eventDefinition.config.group_by, []).join(',')}
+              allowCreate
+            />
             <HelpBlock>
-              Select Fields that Graylog should use to group Filter results when they have identical values.
-              {' '}<b>Example:</b><br />
+              Select Fields that Graylog should use to group Filter results when they have identical values.{' '}
+              <b>Example:</b>
+              <br />
               Assuming you created a Filter with all failed log-in attempts in your network, Graylog could alert you
               when there are more than 5 failed log-in attempts overall. Now, add <code>username</code> as Group by
-              Field and Graylog will alert you <em>for each <code>username</code></em> with more than 5 failed
-              log-in attempts.
+              Field and Graylog will alert you{' '}
+              <em>
+                for each <code>username</code>
+              </em>{' '}
+              with more than 5 failed log-in attempts.
             </HelpBlock>
           </FormGroup>
         </Col>
@@ -114,11 +132,13 @@ const AggregationForm = ({ aggregationFunctions, eventDefinition, validation, on
 
       <hr />
 
-      <AggregationConditionsForm eventDefinition={eventDefinition}
-                                 validation={validation}
-                                 formattedFields={formattedFields}
-                                 aggregationFunctions={aggregationFunctions}
-                                 onChange={propagateConfigChange} />
+      <AggregationConditionsForm
+        eventDefinition={eventDefinition}
+        validation={validation}
+        formattedFields={formattedFields}
+        aggregationFunctions={aggregationFunctions}
+        onChange={propagateConfigChange}
+      />
     </fieldset>
   );
 };

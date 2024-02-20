@@ -18,22 +18,24 @@
 import type { SearchBarControl } from 'views/types';
 
 interface EventDefinitionType {
-  type: string,
-  displayName: string,
-  sortOrder: number,
-  description: string,
-  defaultConfig: EventDefinition['config'],
-  formComponent: React.ComponentType<React.ComponentProps<{
-    eventDefinition: EventDefinition,
-    currentUser: UserJSON,
-    validation: { errors: { [key: string]: Array<string> } },
-    onChange: (name: string, newConfig: EventDefinition['config']) => void,
-    action: string,
-  }>>
+  type: string;
+  displayName: string;
+  sortOrder: number;
+  description: string;
+  defaultConfig: EventDefinition['config'];
+  formComponent: React.ComponentType<
+    React.ComponentProps<{
+      eventDefinition: EventDefinition;
+      currentUser: UserJSON;
+      validation: { errors: { [key: string]: Array<string> } };
+      onChange: (name: string, newConfig: EventDefinition['config']) => void;
+      action: string;
+    }>
+  >;
 }
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {
     'eventDefinitionTypes'?: Array<EventDefinitionType>;
-    'eventDefinitions.components.searchForm'?: Array<() => SearchBarControl | null>
+    'eventDefinitions.components.searchForm'?: Array<() => SearchBarControl | null>;
   }
 }

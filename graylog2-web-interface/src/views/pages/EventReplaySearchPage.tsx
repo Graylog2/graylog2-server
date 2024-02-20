@@ -35,14 +35,16 @@ const EventView = () => {
   const { eventData, eventDefinition, aggregations } = useAlertAndEventDefinitionData();
   const _view = useCreateViewForEvent({ eventData, eventDefinition, aggregations });
   const view = useCreateSearch(_view);
-  const searchPageLayout = useMemo(() => ({
-    infoBar: { component: EventInfoBar },
-  }), []);
+  const searchPageLayout = useMemo(
+    () => ({
+      infoBar: { component: EventInfoBar },
+    }),
+    [],
+  );
 
   return (
     <SearchPageLayoutProvider value={searchPageLayout}>
-      <SearchPage view={view}
-                  isNew />
+      <SearchPage view={view} isNew />
     </SearchPageLayoutProvider>
   );
 };
@@ -56,7 +58,11 @@ export const onErrorHandler = (error) => {
 const EventReplaySearchPage = () => {
   const [isNotificationLoaded, setIsNotificationLoaded] = useState(false);
   const { alertId } = useParams<{ alertId?: string }>();
-  const { data: eventData, isLoading: eventIsLoading, isFetched: eventIsFetched } = useEventById(alertId, { onErrorHandler });
+  const {
+    data: eventData,
+    isLoading: eventIsLoading,
+    isFetched: eventIsFetched,
+  } = useEventById(alertId, { onErrorHandler });
   const { isLoading: EDIsLoading, isFetched: EDIsFetched } = useEventDefinition(eventData?.event_definition_id);
 
   useEffect(() => {

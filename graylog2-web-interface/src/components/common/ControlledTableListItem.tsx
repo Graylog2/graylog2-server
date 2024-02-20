@@ -19,10 +19,8 @@ import PropTypes from 'prop-types';
 
 import { ListGroupItem } from 'components/bootstrap';
 
-const ControlledTableListItem = ({ className, children }: { className?: string, children: React.ReactNode }) => (
-  <ListGroupItem className={className}>
-    {children}
-  </ListGroupItem>
+const ControlledTableListItem = ({ className, children }: { className?: string; children: React.ReactNode }) => (
+  <ListGroupItem className={className}>{children}</ListGroupItem>
 );
 
 ControlledTableListItem.propTypes = {

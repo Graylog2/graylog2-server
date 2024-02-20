@@ -22,49 +22,49 @@ import type { SearchFilter } from 'views/types';
 import type { ElasticsearchQueryString, TimeRange } from './Query';
 
 type AutoInterval = {
-  type: 'auto',
-  scaling?: number,
+  type: 'auto';
+  scaling?: number;
 };
 
 type TimeUnitInterval = {
-  type: 'timeunit',
-  value: number,
-  unit: string,
+  type: 'timeunit';
+  value: number;
+  unit: string;
 };
 
 type Interval = AutoInterval | TimeUnitInterval;
 
 type SearchTypePivot = {
-  type: string,
-  field: string,
-  limit?: number,
-  interval?: Interval,
+  type: string;
+  field: string;
+  limit?: number;
+  interval?: Interval;
 };
 
 type SearchTypeBase = {
-  filter: string | undefined | null,
-  filters: Array<SearchFilter> | undefined,
-  id: string,
-  name: string | undefined | null,
-  query: ElasticsearchQueryString | undefined | null,
-  timerange: TimeRange | undefined | null,
-  type: string,
-  streams: Array<string>,
+  filter: string | undefined | null;
+  filters: Array<SearchFilter> | undefined;
+  id: string;
+  name: string | undefined | null;
+  query: ElasticsearchQueryString | undefined | null;
+  timerange: TimeRange | undefined | null;
+  type: string;
+  streams: Array<string>;
 };
 
 export type AggregationSearchType = SearchTypeBase & {
-  sort: Array<SortConfig>,
-  series: Array<{ id: string, type: string, field: string }>,
-  column_groups: Array<SearchTypePivot>,
-  row_groups: Array<SearchTypePivot>,
-  rollup: boolean,
+  sort: Array<SortConfig>;
+  series: Array<{ id: string; type: string; field: string }>;
+  column_groups: Array<SearchTypePivot>;
+  row_groups: Array<SearchTypePivot>;
+  rollup: boolean;
 };
 
 export type MessagesSearchType = SearchTypeBase & {
-  sort: Array<MessageSortConfig>,
-  decorators: Array<Decorator>,
-  limit: number,
-  offset: number,
+  sort: Array<MessageSortConfig>;
+  decorators: Array<Decorator>;
+  limit: number;
+  offset: number;
 };
 
 export type SearchType = AggregationSearchType | MessagesSearchType;

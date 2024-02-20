@@ -39,11 +39,25 @@ const gray = ['#263238', '#4c575d', '#758085', '#a1abb0', '#cfd8dc'];
 const black = ['#000000', '#3b3b3b', '#777777', '#b9b9b9', '#ffffff'];
 
 export const colors = [
-  reds, pinks, purples, darkpurples,
-  darkblues, blues, lightblues, cyans,
-  darkgreens, greens, lightgreens, dirtyyellow,
-  lightorange, orange, darkorange, darkred,
-  brown, gray, black,
+  reds,
+  pinks,
+  purples,
+  darkpurples,
+  darkblues,
+  blues,
+  lightblues,
+  cyans,
+  darkgreens,
+  greens,
+  lightgreens,
+  dirtyyellow,
+  lightorange,
+  orange,
+  darkorange,
+  darkred,
+  brown,
+  gray,
+  black,
 ];
 
 export const defaultChartColors = [

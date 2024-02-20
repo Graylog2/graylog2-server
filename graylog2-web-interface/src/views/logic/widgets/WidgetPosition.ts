@@ -19,17 +19,17 @@ import { Map } from 'immutable';
 import { singleton } from 'logic/singleton';
 
 type State = {
-  col: number,
-  row: number,
-  height: number,
-  width: number,
+  col: number;
+  row: number;
+  height: number;
+  width: number;
 };
 
 export type WidgetPositionJSON = {
-  col: number | 'Infinity',
-  row: number | 'Infinity',
-  height: number | 'Infinity',
-  width: number | 'Infinity',
+  col: number | 'Infinity';
+  row: number | 'Infinity';
+  height: number | 'Infinity';
+  width: number | 'Infinity';
 };
 
 class WidgetPosition {
@@ -93,7 +93,9 @@ class WidgetPosition {
 
   equals(other: any) {
     if (other instanceof WidgetPosition) {
-      return this.col === other.col && this.row === other.row && this.height === other.height && this.width === other.width;
+      return (
+        this.col === other.col && this.row === other.row && this.height === other.height && this.width === other.width
+      );
     }
 
     return false;

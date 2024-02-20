@@ -21,7 +21,7 @@ import { createReactError } from 'logic/errors/ReportedErrors';
 import ErrorsActions from 'actions/errors/ErrorsActions';
 
 type Props = {
-  children: React.ReactNode,
+  children: React.ReactNode;
 };
 
 class RuntimeErrorBoundary extends React.Component<Props> {

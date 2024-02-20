@@ -60,8 +60,8 @@ const IconWrapper = styled.div`
 `;
 
 type Props = {
-  type: FieldType,
-  monospace: boolean,
+  type: FieldType;
+  monospace: boolean;
 };
 
 const FieldTypeIcon = ({ type, monospace }: Props) => {

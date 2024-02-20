@@ -25,15 +25,15 @@ import DocsHelper from 'util/DocsHelper';
 const AuthenticatorsPage = () => (
   <DocumentTitle title="Authenticators Details">
     <AuthenticationPageNavigation />
-    <PageHeader title="Authenticators Details"
-                actions={<AuthenticatorActionLinks />}
-                documentationLink={{
-                  title: 'Authenticators documentation',
-                  path: DocsHelper.PAGES.AUTHENTICATORS,
-                }}>
-      <span>
-        Configure the trusted header authentication.
-      </span>
+    <PageHeader
+      title="Authenticators Details"
+      actions={<AuthenticatorActionLinks />}
+      documentationLink={{
+        title: 'Authenticators documentation',
+        path: DocsHelper.PAGES.AUTHENTICATORS,
+      }}
+    >
+      <span>Configure the trusted header authentication.</span>
     </PageHeader>
 
     <AuthenticatorsDetails />

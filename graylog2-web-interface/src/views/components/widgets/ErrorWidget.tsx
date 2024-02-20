@@ -24,12 +24,12 @@ import { WidgetErrorsList } from './WidgetPropTypes';
 import styles from './MessageWidgets.css';
 
 type WidgetError = {
-  description: string,
+  description: string;
 };
 
 type Props = {
-  errors: Array<WidgetError>,
-  title?: string,
+  errors: Array<WidgetError>;
+  title?: string;
 };
 
 const Description = styled.div`
@@ -56,7 +56,11 @@ const ErrorWidget = ({ errors, title }: Props) => (
         <strong>{title}</strong>
       </Row>
       <ErrorList>
-        {errors.map((e) => <Row as="li" key={e.description}>{e.description}</Row>)}
+        {errors.map((e) => (
+          <Row as="li" key={e.description}>
+            {e.description}
+          </Row>
+        ))}
       </ErrorList>
     </Description>
   </Center>

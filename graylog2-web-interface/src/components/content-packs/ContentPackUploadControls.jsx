@@ -55,25 +55,25 @@ class ContentPackUploadControls extends React.Component {
     reader.onload = (evt) => {
       const request = evt.target.result;
 
-      ContentPacksActions.create.triggerPromise(request)
-        .then(
-          () => {
-            UserNotification.success('Content pack imported successfully', 'Success!');
-            ContentPacksActions.list();
-          },
-          (response) => {
-            const message = 'Error importing content pack, please ensure it is a valid JSON file. Check your '
-              + 'Graylog logs for more information.';
-            const title = 'Could not import content pack';
-            let smallMessage = '';
+      ContentPacksActions.create.triggerPromise(request).then(
+        () => {
+          UserNotification.success('Content pack imported successfully', 'Success!');
+          ContentPacksActions.list();
+        },
+        (response) => {
+          const message =
+            'Error importing content pack, please ensure it is a valid JSON file. Check your ' +
+            'Graylog logs for more information.';
+          const title = 'Could not import content pack';
+          let smallMessage = '';
 
-            if (response.additional && response.additional.body && response.additional.body.message) {
-              smallMessage = `<br /><small>${response.additional.body.message}</small>`;
-            }
+          if (response.additional && response.additional.body && response.additional.body.message) {
+            smallMessage = `<br /><small>${response.additional.body.message}</small>`;
+          }
 
-            UserNotification.error(message + smallMessage, title);
-          },
-        );
+          UserNotification.error(message + smallMessage, title);
+        },
+      );
     };
 
     reader.readAsText(this.uploadInput.getInputDOMNode().files[0]);
@@ -85,22 +85,31 @@ class ContentPackUploadControls extends React.Component {
 
     return (
       <span>
-        <Button className={style.button}
-                active={isOpen}
-                id="upload-content-pack-button"
-                bsStyle="info"
-                onClick={this._openModal}>Upload
+        <Button
+          className={style.button}
+          active={isOpen}
+          id="upload-content-pack-button"
+          bsStyle="info"
+          onClick={this._openModal}
+        >
+          Upload
         </Button>
-        <BootstrapModalForm onCancel={this._closeModal}
-                            show={isOpen}
-                            onSubmitForm={this._save}
-                            title="Upload Content Pack"
-                            submitButtonText="Upload">
-          <Input ref={(node) => { this.uploadInput = node; }}
-                 id="upload-content-pack"
-                 label="Choose File"
-                 type="file"
-                 help="Choose Content Pack from disk" />
+        <BootstrapModalForm
+          onCancel={this._closeModal}
+          show={isOpen}
+          onSubmitForm={this._save}
+          title="Upload Content Pack"
+          submitButtonText="Upload"
+        >
+          <Input
+            ref={(node) => {
+              this.uploadInput = node;
+            }}
+            id="upload-content-pack"
+            label="Choose File"
+            type="file"
+            help="Choose Content Pack from disk"
+          />
         </BootstrapModalForm>
       </span>
     );

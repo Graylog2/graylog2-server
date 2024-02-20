@@ -23,31 +23,28 @@ import fetch from 'logic/rest/FetchProvider';
 
 const fetchDataNode = async (datanodeId: string) => fetch('GET', qualifyUrl(`/datanode/${datanodeId}`));
 
-const useDataNode = (datanodeId: string) : {
-  data: DataNode,
-  refetch: () => void,
-  isInitialLoading: boolean,
-  error: any,
+const useDataNode = (
+  datanodeId: string,
+): {
+  data: DataNode;
+  refetch: () => void;
+  isInitialLoading: boolean;
+  error: any;
 } => {
-  const { data, refetch, isInitialLoading, error } = useQuery(
-    ['datanode'],
-    () => fetchDataNode(datanodeId),
-    {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading Data Node failed with status: ${errorThrown}`,
-          'Could not load Data Node');
-      },
-      notifyOnChangeProps: ['data', 'error'],
-      refetchInterval: 5000,
+  const { data, refetch, isInitialLoading, error } = useQuery(['datanode'], () => fetchDataNode(datanodeId), {
+    onError: (errorThrown) => {
+      UserNotification.error(`Loading Data Node failed with status: ${errorThrown}`, 'Could not load Data Node');
     },
-  );
+    notifyOnChangeProps: ['data', 'error'],
+    refetchInterval: 5000,
+  });
 
-  return ({
+  return {
     data,
     refetch,
     isInitialLoading,
     error,
-  });
+  };
 };
 
 export default useDataNode;

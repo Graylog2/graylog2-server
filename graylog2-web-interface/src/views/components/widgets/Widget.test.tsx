@@ -40,7 +40,12 @@ import FieldTypesContext from '../contexts/FieldTypesContext';
 
 jest.mock('../searchbar/queryinput/QueryInput');
 jest.mock('./WidgetHeader', () => 'widget-header');
-jest.mock('./WidgetColorContext', () => ({ children }) => children);
+jest.mock(
+  './WidgetColorContext',
+  () =>
+    ({ children }) =>
+      children,
+);
 
 jest.mock('views/components/useWidgetResults');
 
@@ -65,7 +70,11 @@ const pluginManifest: PluginRegistration = {
         displayName: 'Some Dummy Visualization',
         visualizationComponent: () => <>dummy-visualization</>,
 
-        editComponent: ({ onChange }) => <button type="button" onClick={() => onChange({ foo: 23 })}>Click me</button>,
+        editComponent: ({ onChange }) => (
+          <button type="button" onClick={() => onChange({ foo: 23 })}>
+            Click me
+          </button>
+        ),
         needsControlledHeight: () => true,
         searchTypes: () => [],
       },
@@ -84,10 +93,7 @@ describe('<Widget />', () => {
   usePlugin(pluginManifest);
   useViewsPlugin();
 
-  const widget = WidgetModel.builder().newId()
-    .type('dummy')
-    .config({ queryId: 'query-id-1' })
-    .build();
+  const widget = WidgetModel.builder().newId().type('dummy').config({ queryId: 'query-id-1' }).build();
 
   const fieldTypes = {
     all: Immutable.List<FieldTypeMapping>(),
@@ -95,12 +101,12 @@ describe('<Widget />', () => {
   };
 
   type DummyWidgetProps = Partial<WidgetComponentProps> & {
-    focusedWidget?: WidgetFocusContextType['focusedWidget'],
-    setWidgetFocusing?: WidgetFocusContextType['setWidgetFocusing'],
-    setWidgetEditing?: WidgetFocusContextType['setWidgetEditing'],
-    unsetWidgetFocusing?: WidgetFocusContextType['unsetWidgetFocusing'],
-    unsetWidgetEditing?: WidgetFocusContextType['unsetWidgetEditing'],
-  }
+    focusedWidget?: WidgetFocusContextType['focusedWidget'];
+    setWidgetFocusing?: WidgetFocusContextType['setWidgetFocusing'];
+    setWidgetEditing?: WidgetFocusContextType['setWidgetEditing'];
+    unsetWidgetFocusing?: WidgetFocusContextType['unsetWidgetFocusing'];
+    unsetWidgetEditing?: WidgetFocusContextType['unsetWidgetEditing'];
+  };
 
   const DummyWidget = ({
     widget: propsWidget = widget,
@@ -114,14 +120,18 @@ describe('<Widget />', () => {
     <TestStoreProvider>
       <FieldTypesContext.Provider value={fieldTypes}>
         {}
-        <WidgetFocusContext.Provider value={{ focusedWidget, setWidgetFocusing, setWidgetEditing, unsetWidgetFocusing, unsetWidgetEditing }}>
+        <WidgetFocusContext.Provider
+          value={{ focusedWidget, setWidgetFocusing, setWidgetEditing, unsetWidgetFocusing, unsetWidgetEditing }}
+        >
           <WidgetContext.Provider value={propsWidget}>
-            <Widget widget={propsWidget}
-                    id="widgetId"
-                    onPositionsChange={() => {}}
-                    title="Widget Title"
-                    position={new WidgetPosition(1, 1, 1, 1)}
-                    {...props} />
+            <Widget
+              widget={propsWidget}
+              id="widgetId"
+              onPositionsChange={() => {}}
+              title="Widget Title"
+              position={new WidgetPosition(1, 1, 1, 1)}
+              {...props}
+            />
           </WidgetContext.Provider>
         </WidgetFocusContext.Provider>
       </FieldTypesContext.Provider>
@@ -153,7 +163,8 @@ describe('<Widget />', () => {
           search_type_id: 'search_type_id-2',
           type: 'query',
           backtrace: '',
-        })],
+        }),
+      ],
       widgetData: undefined,
     });
 
@@ -200,54 +211,45 @@ describe('<Widget />', () => {
 
   it('renders placeholder if widget type is unknown', async () => {
     asMock(useWidgetResults).mockReturnValue({ widgetData: {}, error: [] });
-    const unknownWidget = WidgetModel.builder()
-      .id('widgetId')
-      .type('i-dont-know-this-widget-type')
-      .config({})
-      .build();
+    const unknownWidget = WidgetModel.builder().id('widgetId').type('i-dont-know-this-widget-type').config({}).build();
     const UnknownWidget = (props) => (
-      <DummyWidget widget={unknownWidget}
-                   id="widgetId"
-                   onPositionsChange={() => {}}
-                   onSizeChange={() => {}}
-                   title="Widget Title"
-                   position={new WidgetPosition(1, 1, 1, 1)}
-                   {...props} />
-
+      <DummyWidget
+        widget={unknownWidget}
+        id="widgetId"
+        onPositionsChange={() => {}}
+        onSizeChange={() => {}}
+        title="Widget Title"
+        position={new WidgetPosition(1, 1, 1, 1)}
+        {...props}
+      />
     );
 
-    render(
-      <UnknownWidget data={[]} />,
-    );
+    render(<UnknownWidget data={[]} />);
 
     await screen.findByText('Unknown widget');
   });
 
   it('renders placeholder in edit mode if widget type is unknown', async () => {
-    const unknownWidget = WidgetModel.builder()
-      .newId()
-      .type('i-dont-know-this-widget-type')
-      .config({})
-      .build();
+    const unknownWidget = WidgetModel.builder().newId().type('i-dont-know-this-widget-type').config({}).build();
     const UnknownWidget = (props: Partial<React.ComponentProps<typeof Widget>>) => (
       <FieldTypesContext.Provider value={fieldTypes}>
         <TestStoreProvider>
           <WidgetContext.Provider value={unknownWidget}>
-            <Widget widget={unknownWidget}
-                    editing
-                    id="widgetId"
-                    onPositionsChange={() => {}}
-                    title="Widget Title"
-                    position={new WidgetPosition(1, 1, 1, 1)}
-                    {...props} />
+            <Widget
+              widget={unknownWidget}
+              editing
+              id="widgetId"
+              onPositionsChange={() => {}}
+              title="Widget Title"
+              position={new WidgetPosition(1, 1, 1, 1)}
+              {...props}
+            />
           </WidgetContext.Provider>
         </TestStoreProvider>
       </FieldTypesContext.Provider>
     );
 
-    render(
-      <UnknownWidget />,
-    );
+    render(<UnknownWidget />);
 
     await screen.findByText('Unknown widget in edit mode');
   });
@@ -276,7 +278,9 @@ describe('<Widget />', () => {
     const cancel = await screen.findByText('Cancel');
     fireEvent.click(cancel);
 
-    await waitFor(() => { expect(mockUnsetWidgetEditing).toHaveBeenCalledTimes(1); });
+    await waitFor(() => {
+      expect(mockUnsetWidgetEditing).toHaveBeenCalledTimes(1);
+    });
   });
 
   it('updates focus mode, on widget edit save', async () => {
@@ -301,11 +305,7 @@ describe('<Widget />', () => {
   });
 
   it('restores original state of widget config when clicking cancel after changes were made', () => {
-    const widgetWithConfig = WidgetModel.builder()
-      .id('widgetId')
-      .type('dummy')
-      .config({ foo: 42 })
-      .build();
+    const widgetWithConfig = WidgetModel.builder().id('widgetId').type('dummy').config({ foo: 42 }).build();
     render(<DummyWidget editing widget={widgetWithConfig} />);
 
     const onChangeBtn = screen.getByText('Click me');
@@ -322,11 +322,7 @@ describe('<Widget />', () => {
   });
 
   it('does not restore original state of widget config when clicking "Update widget"', async () => {
-    const widgetWithConfig = WidgetModel.builder()
-      .id('widgetId')
-      .type('dummy')
-      .config({ foo: 42 })
-      .build();
+    const widgetWithConfig = WidgetModel.builder().id('widgetId').type('dummy').config({ foo: 42 }).build();
     render(<DummyWidget editing widget={widgetWithConfig} />);
 
     const onChangeBtn = screen.getByText('Click me');

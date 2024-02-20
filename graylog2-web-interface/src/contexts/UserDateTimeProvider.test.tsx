@@ -28,14 +28,14 @@ import { asMock } from 'helpers/mocking';
 
 const mockedUnixTime = 1577836800000; // 2020-01-01 00:00:00.000
 
-jest.useFakeTimers()
-  .setSystemTime(mockedUnixTime);
+jest.useFakeTimers().setSystemTime(mockedUnixTime);
 
 jest.mock('hooks/useCurrentUser');
 
 describe('DateTimeProvider', () => {
   const invalidDate = '2020-00-00T04:00:00.000Z';
-  const expectErrorForInvalidDate = () => expect(console.error).toHaveBeenCalledWith(`Date time ${invalidDate} is not valid.`);
+  const expectErrorForInvalidDate = () =>
+    expect(console.error).toHaveBeenCalledWith(`Date time ${invalidDate} is not valid.`);
 
   const renderSUT = (tzOverride = undefined) => {
     let contextValue;

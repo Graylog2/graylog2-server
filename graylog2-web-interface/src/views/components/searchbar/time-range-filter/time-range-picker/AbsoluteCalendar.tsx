@@ -25,18 +25,20 @@ import AbsoluteDatePicker from './AbsoluteDatePicker';
 import AbsoluteTimeInput from './AbsoluteTimeInput';
 
 type Props = {
-  startDate?: Date,
-  range: 'to' | 'from',
-  timeRange: AbsoluteTimeRange,
+  startDate?: Date;
+  range: 'to' | 'from';
+  timeRange: AbsoluteTimeRange;
 };
 
-const ErrorMessage = styled.span(({ theme }) => css`
-  color: ${theme.colors.variant.dark.danger};
-  font-size: ${theme.fonts.size.small};
-  font-style: italic;
-  padding: 3px 3px 9px;
-  height: 1.5em;
-`);
+const ErrorMessage = styled.span(
+  ({ theme }) => css`
+    color: ${theme.colors.variant.dark.danger};
+    font-size: ${theme.fonts.size.small};
+    font-style: italic;
+    padding: 3px 3px 9px;
+    height: 1.5em;
+  `,
+);
 
 const AbsoluteCalendar = ({ startDate, timeRange, range }: Props) => (
   <Field name={`timeRangeTabs.absolute.${range}`}>
@@ -46,13 +48,9 @@ const AbsoluteCalendar = ({ startDate, timeRange, range }: Props) => (
 
       return (
         <>
-          <AbsoluteDatePicker onChange={_onChange}
-                              startDate={startDate}
-                              dateTime={dateTime} />
+          <AbsoluteDatePicker onChange={_onChange} startDate={startDate} dateTime={dateTime} />
 
-          <AbsoluteTimeInput onChange={_onChange}
-                             range={range}
-                             dateTime={dateTime} />
+          <AbsoluteTimeInput onChange={_onChange} range={range} dateTime={dateTime} />
 
           <ErrorMessage>{error}</ErrorMessage>
         </>

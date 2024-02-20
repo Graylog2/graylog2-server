@@ -33,8 +33,8 @@ import { isValidURL } from 'util/URLUtils';
 import generateId from 'logic/generateId';
 
 type ValidationResult = {
-  title: { valid: boolean },
-  value: { valid: boolean },
+  title: { valid: boolean };
+  value: { valid: boolean };
 };
 
 const StyledTable = styled(Table)`
@@ -69,16 +69,19 @@ const validateUrlEntry = async (idx: number, entry: Url, callback?: (...any) => 
 const debouncedValidateUrlEntry = debounce(validateUrlEntry, 200);
 
 type Props = {
-  urls: Array<Url>,
-  disabled: boolean,
-  onUpdate: (config: WhiteListConfig, valid: boolean) => void,
-  newEntryId?: string,
+  urls: Array<Url>;
+  disabled: boolean;
+  onUpdate: (config: WhiteListConfig, valid: boolean) => void;
+  newEntryId?: string;
 };
 
 const UrlWhiteListForm = ({ urls, onUpdate, disabled, newEntryId }: Props) => {
   const literal = 'literal';
   const regex = 'regex';
-  const options = [{ value: literal, label: 'Exact match' }, { value: regex, label: 'Regex' }];
+  const options = [
+    { value: literal, label: 'Exact match' },
+    { value: regex, label: 'Regex' },
+  ];
   // eslint-disable-next-line prefer-const
   let inputs = {};
   const [config, setConfig] = useState<WhiteListConfig>({ entries: urls, disabled });
@@ -105,9 +108,12 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled, newEntryId }: Props) => {
   const hasValidationErrors = useCallback(() => {
     let isValid = true;
 
-    if (validationState.errors.length > 0
-      && validationState.errors.find(((el) => (el && el.title && el.title.valid) === false
-        || (el && el.value && el.value.valid === false)))) {
+    if (
+      validationState.errors.length > 0 &&
+      validationState.errors.find(
+        (el) => (el && el.title && el.title.valid) === false || (el && el.value && el.value.valid === false),
+      )
+    ) {
       isValid = false;
     }
 
@@ -144,53 +150,87 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled, newEntryId }: Props) => {
     _validate('type', idx, type);
   };
 
-  const _getErrorMessage = (type: string) => (type === regex ? 'Not a valid Java regular expression' : 'Not a valid URL');
+  const _getErrorMessage = (type: string) =>
+    type === regex ? 'Not a valid Java regular expression' : 'Not a valid URL';
 
-  const _getSummary = () => (config.entries.map((url, idx) => (
-    <tr key={url.id}>
-      <td style={{ verticalAlign: 'middle', textAlign: 'center' }}>{idx + 1}</td>
-      <td>
-        <Input type="text"
-               id={`title-input${idx}`}
-               ref={(elem) => { inputs[`title${idx}`] = elem; }}
-               help={validationState.errors[idx] && validationState.errors[idx].title && !validationState.errors[idx].title.valid ? 'Required field' : null}
-               name="title"
-               bsStyle={validationState.errors[idx] && validationState.errors[idx].title && !validationState.errors[idx].title.valid ? 'error' : null}
-               onChange={(event) => _onInputChange(event, idx)}
-               defaultValue={url.title}
-               required />
-      </td>
-      <td>
-        <Input type="text"
-               id={`value-input${idx}`}
-               ref={(elem) => { inputs[`value${idx}`] = elem; }}
-               help={validationState.errors[idx] && validationState.errors[idx].value && !validationState.errors[idx].value.valid ? _getErrorMessage(url.type) : null}
-               name="value"
-               bsStyle={validationState.errors[idx] && validationState.errors[idx].value && !validationState.errors[idx].value.valid ? 'error' : null}
-               onChange={(event) => _onInputChange(event, idx)}
-               defaultValue={url.value}
-               required />
-      </td>
-      <td>
-        <Input id={`url-input-type-${idx}`}
-               required
-               autoFocus>
-          <Select clearable={false}
-                  options={options}
-                  matchProp="label"
-                  placeholder="Select url type"
-                  onChange={(option: string) => _onUpdateType(idx, option)}
-                  value={url.type} />
-        </Input>
-      </td>
-      <td>
-        <Button onClick={(event) => _onRemove(event, idx)}>
-          <Icon name="trash-alt" />
-          <span className="sr-only">Delete entry</span>
-        </Button>
-      </td>
-    </tr>
-  )));
+  const _getSummary = () =>
+    config.entries.map((url, idx) => (
+      <tr key={url.id}>
+        <td style={{ verticalAlign: 'middle', textAlign: 'center' }}>{idx + 1}</td>
+        <td>
+          <Input
+            type="text"
+            id={`title-input${idx}`}
+            ref={(elem) => {
+              inputs[`title${idx}`] = elem;
+            }}
+            help={
+              validationState.errors[idx] &&
+              validationState.errors[idx].title &&
+              !validationState.errors[idx].title.valid
+                ? 'Required field'
+                : null
+            }
+            name="title"
+            bsStyle={
+              validationState.errors[idx] &&
+              validationState.errors[idx].title &&
+              !validationState.errors[idx].title.valid
+                ? 'error'
+                : null
+            }
+            onChange={(event) => _onInputChange(event, idx)}
+            defaultValue={url.title}
+            required
+          />
+        </td>
+        <td>
+          <Input
+            type="text"
+            id={`value-input${idx}`}
+            ref={(elem) => {
+              inputs[`value${idx}`] = elem;
+            }}
+            help={
+              validationState.errors[idx] &&
+              validationState.errors[idx].value &&
+              !validationState.errors[idx].value.valid
+                ? _getErrorMessage(url.type)
+                : null
+            }
+            name="value"
+            bsStyle={
+              validationState.errors[idx] &&
+              validationState.errors[idx].value &&
+              !validationState.errors[idx].value.valid
+                ? 'error'
+                : null
+            }
+            onChange={(event) => _onInputChange(event, idx)}
+            defaultValue={url.value}
+            required
+          />
+        </td>
+        <td>
+          <Input id={`url-input-type-${idx}`} required autoFocus>
+            <Select
+              clearable={false}
+              options={options}
+              matchProp="label"
+              placeholder="Select url type"
+              onChange={(option: string) => _onUpdateType(idx, option)}
+              value={url.type}
+            />
+          </Input>
+        </td>
+        <td>
+          <Button onClick={(event) => _onRemove(event, idx)}>
+            <Icon name="trash-alt" />
+            <span className="sr-only">Delete entry</span>
+          </Button>
+        </td>
+      </tr>
+    ));
 
   useEffect(() => {
     const isNewEntryValid = async () => {
@@ -221,13 +261,17 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled, newEntryId }: Props) => {
 
   return (
     <>
-      <Input type="checkbox"
-             id="whitelist-disabled"
-             label="Disable Whitelist"
-             checked={config.disabled}
-             onChange={() => setConfig({ ...config, disabled: !config.disabled })}
-             help="Disable the whitelist functionality. Warning: Disabling this option will allow users to enter any URL in Graylog entities, which may pose a security risk." />
-      <Button bsSize="sm" onClick={(event) => _onAdd(event)}>Add Url</Button>
+      <Input
+        type="checkbox"
+        id="whitelist-disabled"
+        label="Disable Whitelist"
+        checked={config.disabled}
+        onChange={() => setConfig({ ...config, disabled: !config.disabled })}
+        help="Disable the whitelist functionality. Warning: Disabling this option will allow users to enter any URL in Graylog entities, which may pose a security risk."
+      />
+      <Button bsSize="sm" onClick={(event) => _onAdd(event)}>
+        Add Url
+      </Button>
       <StyledTable striped bordered>
         <thead>
           <tr>
@@ -238,11 +282,11 @@ const UrlWhiteListForm = ({ urls, onUpdate, disabled, newEntryId }: Props) => {
             <th>Actions</th>
           </tr>
         </thead>
-        <tbody>
-          {_getSummary()}
-        </tbody>
+        <tbody>{_getSummary()}</tbody>
       </StyledTable>
-      <Button bsSize="sm" onClick={(event) => _onAdd(event)}>Add Url</Button>
+      <Button bsSize="sm" onClick={(event) => _onAdd(event)}>
+        Add Url
+      </Button>
     </>
   );
 };

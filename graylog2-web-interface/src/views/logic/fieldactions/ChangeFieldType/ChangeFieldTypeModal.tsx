@@ -33,10 +33,7 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
 import FieldSelect from 'views/logic/fieldactions/ChangeFieldType/FieldSelect';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
-import type {
-  FieldTypePutResponse,
-  FieldTypePutResponseJson,
-} from 'views/logic/fieldactions/ChangeFieldType/types';
+import type { FieldTypePutResponse, FieldTypePutResponseJson } from 'views/logic/fieldactions/ChangeFieldType/types';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 
@@ -55,26 +52,37 @@ const BetaBadge = () => <Badge bsStyle="danger">Beta Feature</Badge>;
 const failureStreamId = '000000000000000000000004';
 
 type Props = {
-  show: boolean,
-  onClose: () => void,
-  onSubmitCallback?: (params: FieldTypePutResponse) => void,
-  initialSelectedIndexSets: Array<string>,
-  showSelectionTable?: boolean,
-  showFieldSelect?: boolean,
+  show: boolean;
+  onClose: () => void;
+  onSubmitCallback?: (params: FieldTypePutResponse) => void;
+  initialSelectedIndexSets: Array<string>;
+  showSelectionTable?: boolean;
+  showFieldSelect?: boolean;
   initialData?: {
-    type?: string,
-    fieldName?: string
-  }
-}
+    type?: string;
+    fieldName?: string;
+  };
+};
 
 const FailureStreamLink = () => {
-  const { data: failureStream, isFetching: isFetchingFailureStream, isError: isErrorFailureStream } = useStream(failureStreamId);
+  const {
+    data: failureStream,
+    isFetching: isFetchingFailureStream,
+    isError: isErrorFailureStream,
+  } = useStream(failureStreamId);
   if (isFetchingFailureStream) return <Spinner />;
 
   return (
     <span>
-      <StreamLink stream={isErrorFailureStream ? { id: failureStreamId, title: 'Processing and Indexing Failures' } : failureStream} />
-      <i> (<Link to={Routes.SYSTEM.ENTERPRISE}>Enterprise Plugin</Link> required)</i>
+      <StreamLink
+        stream={
+          isErrorFailureStream ? { id: failureStreamId, title: 'Processing and Indexing Failures' } : failureStream
+        }
+      />
+      <i>
+        {' '}
+        (<Link to={Routes.SYSTEM.ENTERPRISE}>Enterprise Plugin</Link> required)
+      </i>
     </span>
   );
 };
@@ -88,16 +96,23 @@ const ChangeFieldTypeModal = ({
   showFieldSelect,
   initialData,
 }: Props) => {
-  const [{ fieldName, type }, setModalData] = useState<{ fieldName?: string, type?: string }>(initialData);
-  const { data: { fieldTypes }, isLoading: isLoadingFieldTypes } = useFieldTypesForMappings();
+  const [{ fieldName, type }, setModalData] = useState<{ fieldName?: string; type?: string }>(initialData);
+  const {
+    data: { fieldTypes },
+    isLoading: isLoadingFieldTypes,
+  } = useFieldTypesForMappings();
   const sendTelemetry = useSendTelemetry();
   const [rotated, setRotated] = useState(true);
-  const fieldTypeOptions = useMemo(() => Object.entries(fieldTypes)
-    .sort(([, label1], [, label2]) => defaultCompare(label1, label2))
-    .map(([value, label]) => ({
-      value,
-      label,
-    })), [fieldTypes]);
+  const fieldTypeOptions = useMemo(
+    () =>
+      Object.entries(fieldTypes)
+        .sort(([, label1], [, label2]) => defaultCompare(label1, label2))
+        .map(([value, label]) => ({
+          value,
+          label,
+        })),
+    [fieldTypes],
+  );
 
   const [indexSetSelection, setIndexSetSelection] = useState<Array<string>>();
 
@@ -105,49 +120,70 @@ const ChangeFieldTypeModal = ({
 
   const { pathname } = useLocation();
   const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
-  const onSubmit = useCallback((e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
 
-    putFieldTypeMutation({
+      putFieldTypeMutation({
+        indexSetSelection,
+        newFieldType: type,
+        rotated,
+        field: fieldName,
+      })
+        .then((responseJson: FieldTypePutResponseJson) => {
+          sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_FIELD_VALUE_ACTION.CHANGE_FIELD_TYPE_CHANGED, {
+            app_pathname: telemetryPathName,
+            app_action_value: {
+              value: 'change-field-type',
+              rotated,
+              isAllIndexesSelected: indexSetSelection.length === initialSelectedIndexSets.length,
+            },
+          });
+
+          if (onSubmitCallback) {
+            const response: FieldTypePutResponse = mapValues(responseJson, (fieldType) => ({
+              id: fieldType.field_name,
+              origin: fieldType.origin,
+              fieldName: fieldType.field_name,
+              type: fieldType.type,
+              isReserved: fieldType.is_reserved,
+            }));
+
+            onSubmitCallback(response);
+          }
+        })
+        .then(() => onClose());
+    },
+    [
+      fieldName,
       indexSetSelection,
-      newFieldType: type,
+      initialSelectedIndexSets.length,
+      onClose,
+      onSubmitCallback,
+      putFieldTypeMutation,
       rotated,
-      field: fieldName,
-    }).then((responseJson: FieldTypePutResponseJson) => {
-      sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_FIELD_VALUE_ACTION.CHANGE_FIELD_TYPE_CHANGED, {
-        app_pathname: telemetryPathName,
-        app_action_value:
-          {
-            value: 'change-field-type',
-            rotated,
-            isAllIndexesSelected: indexSetSelection.length === initialSelectedIndexSets.length,
-          },
-      });
-
-      if (onSubmitCallback) {
-        const response: FieldTypePutResponse = mapValues(responseJson, (fieldType) => ({
-          id: fieldType.field_name,
-          origin: fieldType.origin,
-          fieldName: fieldType.field_name,
-          type: fieldType.type,
-          isReserved: fieldType.is_reserved,
-        }));
-
-        onSubmitCallback(response);
-      }
-    }).then(() => onClose());
-  }, [fieldName, indexSetSelection, initialSelectedIndexSets.length, onClose, onSubmitCallback, putFieldTypeMutation, rotated, sendTelemetry, telemetryPathName, type]);
+      sendTelemetry,
+      telemetryPathName,
+      type,
+    ],
+  );
 
   const onChangeFieldType = useCallback((value: string) => {
     setModalData((cur) => ({ ...cur, type: value }));
   }, []);
 
   useEffect(() => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_FIELD_VALUE_ACTION.CHANGE_FIELD_TYPE_OPENED, { app_pathname: telemetryPathName, app_action_value: 'change-field-type-opened' });
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_FIELD_VALUE_ACTION.CHANGE_FIELD_TYPE_OPENED, {
+      app_pathname: telemetryPathName,
+      app_action_value: 'change-field-type-opened',
+    });
   }, [sendTelemetry, telemetryPathName]);
 
   const onCancel = useCallback(() => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_FIELD_VALUE_ACTION.CHANGE_FIELD_TYPE_CLOSED, { app_pathname: telemetryPathName, app_action_value: 'change-field-type-closed' });
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_FIELD_VALUE_ACTION.CHANGE_FIELD_TYPE_CLOSED, {
+      app_pathname: telemetryPathName,
+      app_action_value: 'change-field-type-closed',
+    });
     onClose();
   }, [onClose, sendTelemetry, telemetryPathName]);
 
@@ -156,57 +192,81 @@ const ChangeFieldTypeModal = ({
   }, [initialSelectedIndexSets, setIndexSetSelection]);
 
   return (
-    <BootstrapModalForm title={<span>Change {fieldName} Field Type <BetaBadge /></span>}
-                        submitButtonText={fieldTypeMutationIsLading ? 'Changing field type...' : 'Change field type'}
-                        onSubmitForm={onSubmit}
-                        onCancel={onCancel}
-                        show={show}
-                        bsSize="large"
-                        submitButtonDisabled={fieldTypeMutationIsLading}>
+    <BootstrapModalForm
+      title={
+        <span>
+          Change {fieldName} Field Type <BetaBadge />
+        </span>
+      }
+      submitButtonText={fieldTypeMutationIsLading ? 'Changing field type...' : 'Change field type'}
+      onSubmitForm={onSubmit}
+      onCancel={onCancel}
+      show={show}
+      bsSize="large"
+      submitButtonDisabled={fieldTypeMutationIsLading}
+    >
       <div>
         {showFieldSelect && (
-          <FieldSelect indexSetId={initialSelectedIndexSets[0]}
-                       onFieldChange={setModalData}
-                       field={fieldName} />
+          <FieldSelect indexSetId={initialSelectedIndexSets[0]} onFieldChange={setModalData} field={fieldName} />
         )}
         <Alert bsStyle="warning">
-          Changing the type of the field <b>{fieldName}</b> can have a significant impact on the ingestion of future log messages.
-          If you declare a field to have a type which is incompatible with the logs you are ingesting, it can lead to
-          ingestion errors. It is recommended to enable <DocumentationLink page={DocsHelper.PAGES.INDEXER_FAILURES} displayIcon text="Failure Processing" /> and watch
+          Changing the type of the field <b>{fieldName}</b> can have a significant impact on the ingestion of future log
+          messages. If you declare a field to have a type which is incompatible with the logs you are ingesting, it can
+          lead to ingestion errors. It is recommended to enable{' '}
+          <DocumentationLink page={DocsHelper.PAGES.INDEXER_FAILURES} displayIcon text="Failure Processing" /> and watch
           the <FailureStreamLink /> stream closely afterwards.
         </Alert>
         <StyledLabel>{`Select Field Type For ${fieldName || 'Field'}`}</StyledLabel>
         <Input id="field_type">
-          <StyledSelect inputId="field_type"
-                        options={fieldTypeOptions}
-                        value={type}
-                        onChange={onChangeFieldType}
-                        placeholder="Select field type"
-                        disabled={isLoadingFieldTypes}
-                        inputProps={{ 'aria-label': 'Select Field Type For Field' }}
-                        required />
+          <StyledSelect
+            inputId="field_type"
+            options={fieldTypeOptions}
+            value={type}
+            onChange={onChangeFieldType}
+            placeholder="Select field type"
+            disabled={isLoadingFieldTypes}
+            inputProps={{ 'aria-label': 'Select Field Type For Field' }}
+            required
+          />
         </Input>
-        {
-          showSelectionTable && (
+        {showSelectionTable && (
           <>
             <StyledLabel>Select Targeted Index Sets</StyledLabel>
             <p>
-              By default the {type ? <b>{type}</b> : 'selected'} field type will be set for the <b>{fieldName}</b> field in all index sets of the current message/search. You can select for which index sets you would like to make the change.
+              By default the {type ? <b>{type}</b> : 'selected'} field type will be set for the <b>{fieldName}</b> field
+              in all index sets of the current message/search. You can select for which index sets you would like to
+              make the change.
             </p>
-            <IndexSetsTable field={fieldName} setIndexSetSelection={setIndexSetSelection} fieldTypes={fieldTypes} initialSelection={initialSelectedIndexSets} />
+            <IndexSetsTable
+              field={fieldName}
+              setIndexSetSelection={setIndexSetSelection}
+              fieldTypes={fieldTypes}
+              initialSelection={initialSelectedIndexSets}
+            />
           </>
-          )
-        }
+        )}
         <StyledLabel>Select Rotation Strategy</StyledLabel>
         <p>
-          To see and use the {type ? <b>{type}</b> : 'selected field type'} as a field type{fieldName ? <> for <b>{fieldName}</b></> : ''}, you have to rotate indices. You can automatically rotate affected indices after submitting this form or do that manually later.
+          To see and use the {type ? <b>{type}</b> : 'selected field type'} as a field type
+          {fieldName ? (
+            <>
+              {' '}
+              for <b>{fieldName}</b>
+            </>
+          ) : (
+            ''
+          )}
+          , you have to rotate indices. You can automatically rotate affected indices after submitting this form or do
+          that manually later.
         </p>
-        <Input type="checkbox"
-               id="rotate"
-               name="rotate"
-               label="Rotate affected indices after change"
-               onChange={() => setRotated((cur) => !cur)}
-               checked={rotated} />
+        <Input
+          type="checkbox"
+          id="rotate"
+          name="rotate"
+          label="Rotate affected indices after change"
+          onChange={() => setRotated((cur) => !cur)}
+          checked={rotated}
+        />
       </div>
     </BootstrapModalForm>
   );

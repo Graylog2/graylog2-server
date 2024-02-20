@@ -19,9 +19,11 @@ import { createSelector } from '@reduxjs/toolkit';
 import useAppSelector from 'stores/useAppSelector';
 import { selectViewStates } from 'views/logic/slices/viewSelectors';
 
-const selectQueryTitles = createSelector(
-  selectViewStates,
-  (viewStates) => viewStates.map((viewState) => viewState.titles.getIn(['tab', 'title']) as string).filter((v) => v !== undefined).toMap(),
+const selectQueryTitles = createSelector(selectViewStates, (viewStates) =>
+  viewStates
+    .map((viewState) => viewState.titles.getIn(['tab', 'title']) as string)
+    .filter((v) => v !== undefined)
+    .toMap(),
 );
 
 const useQueryTitles = () => useAppSelector(selectQueryTitles);

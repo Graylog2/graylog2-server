@@ -30,28 +30,28 @@ const keySeparator = '\u2E31';
 const humanSeparator = '-';
 
 export type ChartDefinition = {
-  type: string,
-  name: string,
-  x?: Array<string>,
-  y?: Array<any>,
-  z?: Array<Array<any>>,
-  fill?: string,
-  line?: { shape: string },
-  hovertemplate?: string,
-  mode?: string,
-  opacity?: number,
-  text?: string[],
+  type: string;
+  name: string;
+  x?: Array<string>;
+  y?: Array<any>;
+  z?: Array<Array<any>>;
+  fill?: string;
+  line?: { shape: string };
+  hovertemplate?: string;
+  mode?: string;
+  opacity?: number;
+  text?: string[];
   marker?: {
-    size: number,
-    color: string,
-  },
-  customdata?: any,
-  colorscale?: string,
-  colorbar?: { tickfont: { color: string } },
-  reversescale?: boolean,
-  zmin?: number,
-  zmax?: number,
-  originalName: string,
+    size: number;
+    color: string;
+  };
+  customdata?: any;
+  colorscale?: string;
+  colorbar?: { tickfont: { color: string } };
+  reversescale?: boolean;
+  zmin?: number;
+  zmax?: number;
+  originalName: string;
 };
 
 export type ChartData = [any, Array<Key>, Array<any>, Array<Array<any>>];
@@ -61,15 +61,15 @@ export type ValuesBySeries = { [key: string]: Array<number> };
 export type KeyJoiner = (keys: Array<any>) => string;
 
 type ChartInput = {
-  type: string,
-  name: string,
-  originalName: string,
-  labels: Array<string>,
-  values: Array<any>,
-  data: Array<Array<any>>,
-  idx: number,
-  total: number,
-  config: AggregationWidgetConfig
+  type: string;
+  name: string;
+  originalName: string;
+  labels: Array<string>;
+  values: Array<any>;
+  data: Array<Array<any>>;
+  idx: number;
+  total: number;
+  config: AggregationWidgetConfig;
 };
 export type Generator = (chartInput: ChartInput) => ChartDefinition;
 
@@ -83,41 +83,44 @@ const _defaultChartGenerator = ({ type, name, labels, values, originalName }: Ch
   originalName,
 });
 
-export const flattenLeafs = (leafs: Array<Leaf>, matcher: (value: Value) => boolean = ({ source }) => source.endsWith('leaf')): Array<any> => flatten(leafs.map((l) => l.values.filter((value) => matcher(value)).map((v) => [l.key, v])));
+export const flattenLeafs = (
+  leafs: Array<Leaf>,
+  matcher: (value: Value) => boolean = ({ source }) => source.endsWith('leaf'),
+): Array<any> => flatten(leafs.map((l) => l.values.filter((value) => matcher(value)).map((v) => [l.key, v])));
 
 export const formatSeries = ({
   valuesBySeries = {},
   xLabels = [],
-}: { valuesBySeries: ValuesBySeries, xLabels: Array<any> }): ExtractedSeries => Object.keys(valuesBySeries).map((value) => [
-  value,
-  xLabels,
-  valuesBySeries[value],
-  [],
-]);
+}: {
+  valuesBySeries: ValuesBySeries;
+  xLabels: Array<any>;
+}): ExtractedSeries => Object.keys(valuesBySeries).map((value) => [value, xLabels, valuesBySeries[value], []]);
 
-const isLeaf = (row: Row): row is Leaf => (row.source === 'leaf');
+const isLeaf = (row: Row): row is Leaf => row.source === 'leaf';
 
 export const getLeafsFromRows = (rows: Rows): Array<Leaf> => rows.filter(isLeaf);
 
 export const getXLabelsFromLeafs = (leafs: Array<Leaf>): Array<Array<Key>> => leafs.map(({ key }) => key);
 
-export const extractSeries = (keyJoiner: KeyJoiner = _defaultKeyJoiner, leafValueMatcher: (value: Value) => boolean = undefined) => (results: Rows) => {
-  const leafs = getLeafsFromRows(results);
-  const xLabels = getXLabelsFromLeafs(leafs);
-  const flatLeafs = flattenLeafs(leafs, leafValueMatcher);
-  const valuesBySeries = {};
+export const extractSeries =
+  (keyJoiner: KeyJoiner = _defaultKeyJoiner, leafValueMatcher: (value: Value) => boolean = undefined) =>
+  (results: Rows) => {
+    const leafs = getLeafsFromRows(results);
+    const xLabels = getXLabelsFromLeafs(leafs);
+    const flatLeafs = flattenLeafs(leafs, leafValueMatcher);
+    const valuesBySeries = {};
 
-  flatLeafs.forEach(([key, value]) => {
-    const joinedKey = keyJoiner(value.key);
-    const targetIdx = xLabels.findIndex((l) => isEqual(l, key));
+    flatLeafs.forEach(([key, value]) => {
+      const joinedKey = keyJoiner(value.key);
+      const targetIdx = xLabels.findIndex((l) => isEqual(l, key));
 
-    if (value.value !== null && value.value !== undefined) {
-      set(valuesBySeries, [joinedKey, targetIdx], value.value);
-    }
-  });
+      if (value.value !== null && value.value !== undefined) {
+        set(valuesBySeries, [joinedKey, targetIdx], value.value);
+      }
+    });
 
-  return { valuesBySeries, xLabels };
-};
+    return { valuesBySeries, xLabels };
+  };
 
 export const generateChart = (
   chartType: string,
@@ -130,7 +133,10 @@ export const generateChart = (
   return (results: ExtractedSeries) => {
     const allCharts = results.map(([value, x, values, z]) => ({
       type: chartType,
-      name: value.split(keySeparator).map((key, idx) => (columnFields[idx] ? mapKeys(key, columnFields[idx]) : key)).join(humanSeparator),
+      name: value
+        .split(keySeparator)
+        .map((key, idx) => (columnFields[idx] ? mapKeys(key, columnFields[idx]) : key))
+        .join(humanSeparator),
       labels: x.map((key) => key.join(keySeparator)),
       values,
       data: z,
@@ -141,24 +147,29 @@ export const generateChart = (
   };
 };
 
-export const removeNulls = (): ((series: ExtractedSeries) => ExtractedSeries) => (results: ExtractedSeries) => results.map(([name, keys, values, z]) => {
-  const nullIndices = Array.from(values).reduce((indices, value, index) => ((value === null || value === undefined) ? [...indices, index] : indices), []);
-  const newKeys = keys.filter((_, idx) => !nullIndices.includes(idx));
-  const newValues = values.filter((_, idx) => !nullIndices.includes(idx));
+export const removeNulls = (): ((series: ExtractedSeries) => ExtractedSeries) => (results: ExtractedSeries) =>
+  results.map(([name, keys, values, z]) => {
+    const nullIndices = Array.from(values).reduce(
+      (indices, value, index) => (value === null || value === undefined ? [...indices, index] : indices),
+      [],
+    );
+    const newKeys = keys.filter((_, idx) => !nullIndices.includes(idx));
+    const newValues = values.filter((_, idx) => !nullIndices.includes(idx));
 
-  return [name, newKeys, newValues, z];
-});
+    return [name, newKeys, newValues, z];
+  });
 
-const doNotSuffixTraceForSingleSeries = (keys: Array<Key>) => (keys.length > 1 ? keys.slice(0, -1).join(keySeparator) : keys[0]);
+const doNotSuffixTraceForSingleSeries = (keys: Array<Key>) =>
+  keys.length > 1 ? keys.slice(0, -1).join(keySeparator) : keys[0];
 
 export type ChartDataConfig = {
-  widgetConfig: AggregationWidgetConfig,
-  chartType: string,
-  generator?: Generator,
-  seriesFormatter?: (values: { valuesBySeries: ValuesBySeries, xLabels: Array<any> }) => ExtractedSeries,
-  leafValueMatcher?: (value: Value) => boolean,
-  formatTime: (time: DateTime, format?: DateTimeFormats) => string,
-  mapKeys?: (key: Key, field: string) => Key,
+  widgetConfig: AggregationWidgetConfig;
+  chartType: string;
+  generator?: Generator;
+  seriesFormatter?: (values: { valuesBySeries: ValuesBySeries; xLabels: Array<any> }) => ExtractedSeries;
+  leafValueMatcher?: (value: Value) => boolean;
+  formatTime: (time: DateTime, format?: DateTimeFormats) => string;
+  mapKeys?: (key: Key, field: string) => Key;
 };
 
 export const chartData = (

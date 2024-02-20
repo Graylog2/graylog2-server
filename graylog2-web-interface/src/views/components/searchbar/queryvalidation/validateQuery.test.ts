@@ -58,10 +58,13 @@ describe('validateQuery', () => {
   });
 
   it('normalizes absolute time ranges', async () => {
-    await validateQuery({
-      ...validationInput,
-      timeRange: { type: 'absolute', from: '2021-01-01 16:00:00.000', to: '2021-01-01 17:00:00.000' },
-    }, userTimezone);
+    await validateQuery(
+      {
+        ...validationInput,
+        timeRange: { type: 'absolute', from: '2021-01-01 16:00:00.000', to: '2021-01-01 17:00:00.000' },
+      },
+      userTimezone,
+    );
 
     await waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
 
@@ -80,12 +83,17 @@ describe('validateQuery', () => {
   it('should display user notification and return status OK on server error', async () => {
     asMock(fetch).mockImplementation(() => Promise.reject(new Error('Unexpected error')));
 
-    const result = await validateQuery({
-      ...validationInput,
-      timeRange: { type: 'absolute', from: '2021-01-01 16:00:00.000', to: '2021-01-01 17:00:00.000' },
-    }, userTimezone);
+    const result = await validateQuery(
+      {
+        ...validationInput,
+        timeRange: { type: 'absolute', from: '2021-01-01 16:00:00.000', to: '2021-01-01 17:00:00.000' },
+      },
+      userTimezone,
+    );
 
-    expect(UserNotification.error).toHaveBeenCalledWith('Validating search query failed with status: Error: Unexpected error');
+    expect(UserNotification.error).toHaveBeenCalledWith(
+      'Validating search query failed with status: Error: Unexpected error',
+    );
     expect(result).toEqual({ status: 'OK', explanations: [] });
   });
 });

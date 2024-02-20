@@ -67,13 +67,15 @@ class MessageShow extends React.Component {
     return (
       <Row className="content">
         <Col md={12}>
-          <MessageDetail {...this.props}
-                         message={message}
-                         inputs={inputs}
-                         streams={streams}
-                         nodes={nodes}
-                         renderForDisplay={this.renderForDisplay}
-                         showTimestamp />
+          <MessageDetail
+            {...this.props}
+            message={message}
+            inputs={inputs}
+            streams={streams}
+            nodes={nodes}
+            renderForDisplay={this.renderForDisplay}
+            showTimestamp
+          />
         </Col>
       </Row>
     );

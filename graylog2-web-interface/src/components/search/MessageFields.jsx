@@ -31,14 +31,10 @@ class MessageFields extends React.Component {
     customFieldActions: undefined,
   };
 
-  _formatFields = (fields) => Object.keys(fields)
-    .sort()
-    .map((key) => (
-      <MessageField key={key}
-                    {...this.props}
-                    fieldName={key}
-                    value={fields[key]} />
-    ));
+  _formatFields = (fields) =>
+    Object.keys(fields)
+      .sort()
+      .map((key) => <MessageField key={key} {...this.props} fieldName={key} value={fields[key]} />);
 
   render() {
     const { message } = this.props;
@@ -47,11 +43,7 @@ class MessageFields extends React.Component {
     const formattedFields = message.formatted_fields || formatted_fields;
     const fields = this._formatFields(formattedFields);
 
-    return (
-      <MessageDetailsDefinitionList className="message-details-fields">
-        {fields}
-      </MessageDetailsDefinitionList>
-    );
+    return <MessageDetailsDefinitionList className="message-details-fields">{fields}</MessageDetailsDefinitionList>;
   }
 }
 

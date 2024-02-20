@@ -29,45 +29,43 @@ const INITIAL_DATA = {
 };
 
 type Options = {
-  enabled: boolean,
-}
+  enabled: boolean;
+};
 
-const useStreams = (searchParams: SearchParams, { enabled }: Options = { enabled: true }): {
+const useStreams = (
+  searchParams: SearchParams,
+  { enabled }: Options = { enabled: true },
+): {
   data: {
-    elements: Array<Stream>,
-    pagination: { total: number }
-    attributes: Array<Attribute>
-  },
-  refetch: () => void,
-  isInitialLoading: boolean,
+    elements: Array<Stream>;
+    pagination: { total: number };
+    attributes: Array<Attribute>;
+  };
+  refetch: () => void;
+  isInitialLoading: boolean;
 } => {
   const { data, refetch, isInitialLoading } = useQuery(
     ['streams', 'overview', searchParams],
-    () => StreamsStore.searchPaginated(
-      searchParams.page,
-      searchParams.pageSize,
-      searchParams.query,
-      {
+    () =>
+      StreamsStore.searchPaginated(searchParams.page, searchParams.pageSize, searchParams.query, {
         sort: searchParams?.sort.attributeId,
         order: searchParams?.sort.direction,
         filters: FiltersForQueryParams(searchParams.filters),
-      },
-    ),
+      }),
     {
       onError: (errorThrown) => {
-        UserNotification.error(`Loading streams failed with status: ${errorThrown}`,
-          'Could not load streams');
+        UserNotification.error(`Loading streams failed with status: ${errorThrown}`, 'Could not load streams');
       },
       keepPreviousData: true,
       enabled,
     },
   );
 
-  return ({
+  return {
     data: data ?? INITIAL_DATA,
     refetch,
     isInitialLoading,
-  });
+  };
 };
 
 export default useStreams;

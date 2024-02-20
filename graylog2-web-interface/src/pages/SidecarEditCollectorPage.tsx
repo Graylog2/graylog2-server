@@ -53,14 +53,14 @@ const SidecarEditCollectorPage = () => {
   return (
     <DocumentTitle title="Log Collector">
       <SidecarsPageNavigation />
-      <PageHeader title="Log Collector"
-                  documentationLink={{
-                    title: 'Sidecar documentation',
-                    path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
-                  }}>
-        <span>
-          Some words about log collectors.
-        </span>
+      <PageHeader
+        title="Log Collector"
+        documentationLink={{
+          title: 'Sidecar documentation',
+          path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
+        }}
+      >
+        <span>Some words about log collectors.</span>
       </PageHeader>
 
       <Row className="content">

@@ -33,25 +33,38 @@ import { concatQueryStrings, escape } from 'views/logic/queries/QueryHelper';
 export const getStreams = (filter: FilterType): Array<string> => {
   if (!filter) return [];
 
-  return filter.get('filters')
+  return filter
+    .get('filters')
     .filter((curFilter) => curFilter.get('type') === 'stream')
     .map((curFilter) => curFilter.get('id'))
     .toArray();
 };
 
-export const transformValuePathToQuery = (valuePath: Array<{ [name: string]: string}>) => concatQueryStrings(valuePath.filter((path) => {
-  const key = Object.keys(path)[0];
+export const transformValuePathToQuery = (valuePath: Array<{ [name: string]: string }>) =>
+  concatQueryStrings(
+    valuePath
+      .filter((path) => {
+        const key = Object.keys(path)[0];
 
-  return key !== '_exists_';
-}).map((path) => {
-  const [field, value] = Object.entries(path)[0];
+        return key !== '_exists_';
+      })
+      .map((path) => {
+        const [field, value] = Object.entries(path)[0];
 
-  return `${field}:${escape(value)}`;
-}), { withBrackets: false });
+        return `${field}:${escape(value)}`;
+      }),
+    { withBrackets: false },
+  );
 
 export const getFlattenPivots = (pivots: Array<Pivot>): Set<string> => new Set(pivots.flatMap(({ fields }) => fields));
 
-export const filtratePathsByPivot = ({ flattenPivots, valuePath }: {flattenPivots: Set<string>, valuePath: Array<{ [name: string]: string }>}): Array<{[name:string]: string}> => {
+export const filtratePathsByPivot = ({
+  flattenPivots,
+  valuePath,
+}: {
+  flattenPivots: Set<string>;
+  valuePath: Array<{ [name: string]: string }>;
+}): Array<{ [name: string]: string }> => {
   if (!valuePath) return [];
   const map = valuePath.reduce((res, cur) => {
     const key = Object.keys(cur)[0];
@@ -61,7 +74,7 @@ export const filtratePathsByPivot = ({ flattenPivots, valuePath }: {flattenPivot
     }
 
     return res;
-  }, new Map([])) as Map<string, {[name:string]: string}>;
+  }, new Map([])) as Map<string, { [name: string]: string }>;
 
   return Array.from(map.values());
 };
@@ -77,7 +90,7 @@ export const aggregationMetricValueHandler: AggregationHandler = ({ widget, valu
   const rowValuePath = transformValuePathToQuery(rowPaths);
   const columnValuePath = transformValuePathToQuery(columnPaths);
 
-  return ({
+  return {
     aggField: agg_field,
     aggFunction: agg_function,
     aggValue: value,
@@ -85,7 +98,7 @@ export const aggregationMetricValueHandler: AggregationHandler = ({ widget, valu
     columnGroupBy: Array.from(flattenColumnPivots),
     rowValuePath,
     columnValuePath,
-  });
+  };
 };
 
 export const aggregationValueHandler: AggregationHandler = ({ widget, value, field, valuePath }) => {
@@ -94,10 +107,10 @@ export const aggregationValueHandler: AggregationHandler = ({ widget, value, fie
   const rowPaths = filtratePathsByPivot({ flattenPivots: flattenRowPivots, valuePath });
   const rowValuePath = transformValuePathToQuery(rowPaths);
 
-  return ({
+  return {
     searchFromValue: `${field}:${escape(value)}`,
     rowValuePath,
-  });
+  };
 };
 
 export const messagesValueHandler: AggregationHandler = ({ value, field }) => ({
@@ -108,7 +121,7 @@ export const logsValueHandler: AggregationHandler = ({ value, field }) => ({
   searchFromValue: `${field}:${escape(value)}`,
 });
 
-export const getAggregationHandler = ({ widget, field }: { widget: Widget, field: string }): AggregationHandler => {
+export const getAggregationHandler = ({ widget, field }: { widget: Widget; field: string }): AggregationHandler => {
   if (widget.type === 'AGGREGATION') {
     const isMetrics = !!widget.config.series.find((series) => series.function === field);
 
@@ -121,36 +134,49 @@ export const getAggregationHandler = ({ widget, field }: { widget: Widget, field
   throw new Error('This widget type has incorrect type or no handler');
 };
 
-export const getLutParameters = (parameters: Immutable.Set<Parameter>) => parameters.reduce((res, cur) => {
-  if (cur.type === 'lut-parameter-v1') {
-    const paramJSON = cur.toJSON();
-    res.push(paramJSON);
-  }
+export const getLutParameters = (parameters: Immutable.Set<Parameter>) =>
+  parameters.reduce((res, cur) => {
+    if (cur.type === 'lut-parameter-v1') {
+      const paramJSON = cur.toJSON();
+      res.push(paramJSON);
+    }
 
-  return res;
-}, []);
+    return res;
+  }, []);
 
-export const getRestParameterValues = (
-  { parameters, parameterBindings }:
-    { parameters: Immutable.Set<ValueParameter | LookupTableParameter>, parameterBindings?: Immutable.Map<string, ParameterBinding>},
-) => parameters.reduce((res, cur) => {
-  if (cur.type !== 'lut-parameter-v1') {
-    const paramJSON = cur.toJSON();
-    const { name } = paramJSON;
-    const bindingValue = parameterBindings?.get(name)?.value;
-    res[name] = bindingValue ?? paramJSON?.default_value;
-  }
+export const getRestParameterValues = ({
+  parameters,
+  parameterBindings,
+}: {
+  parameters: Immutable.Set<ValueParameter | LookupTableParameter>;
+  parameterBindings?: Immutable.Map<string, ParameterBinding>;
+}) =>
+  parameters.reduce((res, cur) => {
+    if (cur.type !== 'lut-parameter-v1') {
+      const paramJSON = cur.toJSON();
+      const { name } = paramJSON;
+      const bindingValue = parameterBindings?.get(name)?.value;
+      res[name] = bindingValue ?? paramJSON?.default_value;
+    }
 
-  return res;
-}, {});
+    return res;
+  }, {});
 
-export const transformSearchFiltersToQuery = (filters: FiltersType = Immutable.List([])) => concatQueryStrings(filters
-  .filter((filter) => (filter.queryString && !filter.disabled))
-  .map((filter) => `${filter.negation ? 'NOT' : ''}(${filter.queryString})`).toArray(), { withBrackets: false });
+export const transformSearchFiltersToQuery = (filters: FiltersType = Immutable.List([])) =>
+  concatQueryStrings(
+    filters
+      .filter((filter) => filter.queryString && !filter.disabled)
+      .map((filter) => `${filter.negation ? 'NOT' : ''}(${filter.queryString})`)
+      .toArray(),
+    { withBrackets: false },
+  );
 
-export const replaceParametersInQueryString = ({ query, restParameterValues }: {
-  query: string,
-  restParameterValues: { [name: string]: string | number }
+export const replaceParametersInQueryString = ({
+  query,
+  restParameterValues,
+}: {
+  query: string;
+  restParameterValues: { [name: string]: string | number };
 }) => {
   let curQuery = query;
 

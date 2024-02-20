@@ -25,22 +25,21 @@ import Search from 'views/logic/search/Search';
 import SearchResult from 'views/logic/SearchResult';
 import { singletonStore, singletonActions } from 'logic/singleton';
 
-export const FilterPreviewActions = singletonActions(
-  'core.FilterPreview',
-  () => Reflux.createActions({
+export const FilterPreviewActions = singletonActions('core.FilterPreview', () =>
+  Reflux.createActions({
     create: { asyncResult: true },
     execute: { asyncResult: true },
     search: { asyncResult: true },
   }),
 );
 
-const delay = (ms) => new Promise((resolve) => {
-  setTimeout(resolve, ms);
-});
+const delay = (ms) =>
+  new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
 
-export const FilterPreviewStore = singletonStore(
-  'core.FilterPreview',
-  () => Reflux.createStore({
+export const FilterPreviewStore = singletonStore('core.FilterPreview', () =>
+  Reflux.createStore({
     listenables: [FilterPreviewActions],
     sourceUrl: '/views/search',
     searchJob: undefined,
@@ -72,13 +71,11 @@ export const FilterPreviewStore = singletonStore(
     },
 
     /**
-   * Method that creates a search query in the backend. This method does not execute the search, please call
-   * `execute()` once the response of `create()` is resolved to execute the search.
-   */
+     * Method that creates a search query in the backend. This method does not execute the search, please call
+     * `execute()` once the response of `create()` is resolved to execute the search.
+     */
     create(searchRequest) {
-      const newSearch = searchRequest.toBuilder()
-        .newId()
-        .build();
+      const newSearch = searchRequest.toBuilder().newId().build();
       const promise = fetch('POST', this.resourceUrl({}), JSON.stringify(newSearch));
 
       promise.then((response) => {
@@ -97,9 +94,11 @@ export const FilterPreviewStore = singletonStore(
         if (job && job.execution.done) {
           resolve(new SearchResult(job));
         } else {
-          resolve(delay(250)
-            .then(() => this.jobStatus(job.id))
-            .then((jobStatus) => this.trackJobStatus(jobStatus, search)));
+          resolve(
+            delay(250)
+              .then(() => this.jobStatus(job.id))
+              .then((jobStatus) => this.trackJobStatus(jobStatus, search)),
+          );
         }
       });
     },
@@ -117,26 +116,25 @@ export const FilterPreviewStore = singletonStore(
     },
 
     /**
-   * Method that executes a search in the backend and wait until its results are ready.
-   * Take into account that you need to create the search before you execute it.
-   */
+     * Method that executes a search in the backend and wait until its results are ready.
+     * Take into account that you need to create the search before you execute it.
+     */
     execute(executionState) {
       if (this.executePromise) {
         this.executePromise.cancel();
       }
 
       if (this.searchJob) {
-        this.executePromise = this.trackJob(this.searchJob, executionState)
-          .then(
-            (result) => {
-              this.result = result;
-              this.executePromise = undefined;
-              this.propagateChanges();
+        this.executePromise = this.trackJob(this.searchJob, executionState).then(
+          (result) => {
+            this.result = result;
+            this.executePromise = undefined;
+            this.propagateChanges();
 
-              return result;
-            },
-            () => UserNotification.error('Could not execute search'),
-          );
+            return result;
+          },
+          () => UserNotification.error('Could not execute search'),
+        );
 
         FilterPreviewActions.execute.promise(this.executePromise);
 
@@ -147,8 +145,7 @@ export const FilterPreviewStore = singletonStore(
     },
 
     search(searchRequest, executionState) {
-      FilterPreviewActions.create(searchRequest)
-        .then(() => FilterPreviewActions.execute(executionState));
+      FilterPreviewActions.create(searchRequest).then(() => FilterPreviewActions.execute(executionState));
     },
   }),
 );

@@ -35,8 +35,8 @@ const Headline = styled.h2`
 `;
 
 type Props = {
-  children: React.ReactNode,
-  title: string,
+  children: React.ReactNode;
+  title: string;
 };
 
 /**
@@ -52,10 +52,7 @@ const EmptyEntity = ({ children, title }: Props) => (
 
 EmptyEntity.propTypes = {
   /** Text or node to be rendered as title. */
-  title: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.node,
-  ]),
+  title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
   /**
    * Any other content the component should display below the title. This may include a description and button
    * or link to easily create a new entity.

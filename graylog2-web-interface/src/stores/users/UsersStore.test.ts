@@ -57,13 +57,15 @@ describe('UsersStore', () => {
     it('should load paginated json users and return result with value classes', async () => {
       const jsonList = userOverviewList.map((u) => u.toJSON()).toArray();
 
-      asMock(fetch).mockReturnValueOnce(Promise.resolve({
-        context: {
-          admin_user: admin.toJSON(),
-        },
-        users: jsonList,
-        ...paginationJSON,
-      }));
+      asMock(fetch).mockReturnValueOnce(
+        Promise.resolve({
+          context: {
+            admin_user: admin.toJSON(),
+          },
+          users: jsonList,
+          ...paginationJSON,
+        }),
+      );
 
       const result = await UsersActions.loadUsersPaginated(pagination);
 
@@ -73,13 +75,15 @@ describe('UsersStore', () => {
     it('should load paginated json users without root admin and return result with value classes', async () => {
       const jsonList = userOverviewList.map((u) => u.toJSON()).toArray();
 
-      asMock(fetch).mockReturnValueOnce(Promise.resolve({
-        context: {
-          admin_user: null,
-        },
-        users: jsonList,
-        ...paginationJSON,
-      }));
+      asMock(fetch).mockReturnValueOnce(
+        Promise.resolve({
+          context: {
+            admin_user: null,
+          },
+          users: jsonList,
+          ...paginationJSON,
+        }),
+      );
 
       const result = await UsersActions.loadUsersPaginated(pagination);
 

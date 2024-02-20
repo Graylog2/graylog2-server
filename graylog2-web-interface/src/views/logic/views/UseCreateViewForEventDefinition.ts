@@ -22,12 +22,13 @@ import type { EventDefinitionAggregation } from 'hooks/useEventDefinition';
 import type { ElasticsearchQueryString, RelativeTimeRangeStartOnly } from 'views/logic/queries/Query';
 import { ViewGenerator } from 'views/logic/views/UseCreateViewForEvent';
 
-const useCreateViewForEventDefinition = (
-  {
-    eventDefinition,
-    aggregations,
-  }: { eventDefinition: EventDefinition, aggregations: Array<EventDefinitionAggregation> },
-) => {
+const useCreateViewForEventDefinition = ({
+  eventDefinition,
+  aggregations,
+}: {
+  eventDefinition: EventDefinition;
+  aggregations: Array<EventDefinitionAggregation>;
+}) => {
   const streams = eventDefinition?.config?.streams ?? [];
   const timeRange: RelativeTimeRangeStartOnly = {
     type: 'relative',

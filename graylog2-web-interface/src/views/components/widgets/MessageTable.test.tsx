@@ -54,21 +54,22 @@ const messages = [
       timestamp: '2018-09-26T12:42:49.234Z',
     },
   },
-
 ];
 const fields = [new FieldTypeMapping('file_name', new FieldType('string', ['full-text-search'], []))];
 const config = MessagesWidgetConfig.builder().fields(['file_name']).build();
 const activeQueryId = 'some-query-id';
 
 const SimpleMessageTable = (props) => (
-  <MessageTable activeQueryId={activeQueryId}
-                config={config}
-                fields={Immutable.List(fields)}
-                messages={messages}
-                onSortChange={() => Promise.resolve()}
-                selectedFields={Immutable.Set()}
-                setLoadingState={() => {}}
-                {...props} />
+  <MessageTable
+    activeQueryId={activeQueryId}
+    config={config}
+    fields={Immutable.List(fields)}
+    messages={messages}
+    onSortChange={() => Promise.resolve()}
+    selectedFields={Immutable.Set()}
+    setLoadingState={() => {}}
+    {...props}
+  />
 );
 
 describe('MessageTable', () => {
@@ -97,7 +98,18 @@ describe('MessageTable', () => {
   });
 
   it('renders config fields in table head with correct order', () => {
-    const configFields = ['gl2_receive_timestamp', 'user_id', 'gl2_source_input', 'gl2_message_id', 'ingest_time', 'http_method', 'action', 'source', 'ingest_time_hour', 'ingest_time_epoch'];
+    const configFields = [
+      'gl2_receive_timestamp',
+      'user_id',
+      'gl2_source_input',
+      'gl2_message_id',
+      'ingest_time',
+      'http_method',
+      'action',
+      'source',
+      'ingest_time_hour',
+      'ingest_time_epoch',
+    ];
     const configWithFields = MessagesWidgetConfig.builder().fields(configFields).build();
     const wrapper = mount(<SimpleMessageTable config={configWithFields} />);
 
@@ -121,11 +133,11 @@ describe('MessageTable', () => {
   });
 
   it('highlights message with id passed in `HighlightMessageContext`', () => {
-    const wrapper = mount((
+    const wrapper = mount(
       <HighlightMessageContext.Provider value="message-id-1">
         <SimpleMessageTable />
-      </HighlightMessageContext.Provider>
-    ));
+      </HighlightMessageContext.Provider>,
+    );
 
     const highlightedMessage = wrapper.find(TableBody);
 
@@ -133,11 +145,11 @@ describe('MessageTable', () => {
   });
 
   it('does not highlight non-existing message id', () => {
-    const wrapper = mount((
+    const wrapper = mount(
       <HighlightMessageContext.Provider value="message-id-42">
         <SimpleMessageTable />
-      </HighlightMessageContext.Provider>
-    ));
+      </HighlightMessageContext.Provider>,
+    );
 
     const highlightedMessage = wrapper.find(TableBody);
 
@@ -153,11 +165,11 @@ describe('MessageTable', () => {
   });
 
   it('does not show sort icons in non-interactive context', () => {
-    const wrapper = mount((
+    const wrapper = mount(
       <InteractiveContext.Provider value={false}>
         <SimpleMessageTable />
-      </InteractiveContext.Provider>
-    ));
+      </InteractiveContext.Provider>,
+    );
 
     const fieldHeader = wrapper.find('th');
 

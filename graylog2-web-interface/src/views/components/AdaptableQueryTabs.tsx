@@ -53,19 +53,19 @@ import useIsNew from 'views/hooks/useIsNew';
 import type { QueryTabsProps } from './QueryTabs';
 
 interface Props extends QueryTabsProps {
-  maxWidth: number,
+  maxWidth: number;
 
-  queryTitleEditModal: React.RefObject<QueryTitleEditModal>
+  queryTitleEditModal: React.RefObject<QueryTitleEditModal>;
 }
 
 interface TabsTypes {
-  navItems: OrderedSet<ReactNode>,
+  navItems: OrderedSet<ReactNode>;
 
-  menuItems: OrderedSet<ReactNode>,
+  menuItems: OrderedSet<ReactNode>;
 
-  lockedItems: OrderedSet<ReactNode>,
+  lockedItems: OrderedSet<ReactNode>;
 
-  queriesList: OrderedSet<{ id: string, title: string }>,
+  queriesList: OrderedSet<{ id: string; title: string }>;
 }
 
 const CLASS_HIDDEN = 'hidden';
@@ -83,58 +83,59 @@ const Container = styled.div`
   align-items: center;
 `;
 
-const StyledQueryNav = styled(Nav)(({ theme }) => css`
-  &.nav.nav-tabs {
-    border-bottom: 0;
-    display: flex;
-    white-space: nowrap;
-    position: relative;
-    padding-left: ${NAV_PADDING}px;
+const StyledQueryNav = styled(Nav)(
+  ({ theme }) => css`
+    &.nav.nav-tabs {
+      border-bottom: 0;
+      display: flex;
+      white-space: nowrap;
+      position: relative;
+      padding-left: ${NAV_PADDING}px;
 
-    > li {
-      > a {
-        color: ${theme.colors.variant.dark.default};
-        border: none;
+      > li {
+        > a {
+          color: ${theme.colors.variant.dark.default};
+          border: none;
 
-        &:hover,
-        &:active,
-        &:focus {
-          transition: color 150ms ease-in-out;
-          background: transparent;
-          color: ${theme.colors.variant.dark.primary};
+          &:hover,
+          &:active,
+          &:focus {
+            transition: color 150ms ease-in-out;
+            background: transparent;
+            color: ${theme.colors.variant.dark.primary};
+          }
         }
       }
-    }
 
-    > li.active {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-bottom: -3px;
+      > li.active {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: -3px;
 
-      > a {
-        padding: 9px 15px;
-        border: 1px solid ${theme.colors.variant.lighter.default};
-        border-bottom: none;
-        background-color: ${theme.colors.global.contentBackground};
-        color: ${theme.colors.variant.darkest.primary};
-
-        &:hover,
-        &:active,
-        &:focus {
+        > a {
+          padding: 9px 15px;
           border: 1px solid ${theme.colors.variant.lighter.default};
           border-bottom: none;
+          background-color: ${theme.colors.global.contentBackground};
           color: ${theme.colors.variant.darkest.primary};
+
+          &:hover,
+          &:active,
+          &:focus {
+            border: 1px solid ${theme.colors.variant.lighter.default};
+            border-bottom: none;
+            color: ${theme.colors.variant.darkest.primary};
+          }
         }
       }
-    }
 
-    > li.${MORE_TABS_BUTTON_CLASS},
-    > li.${MORE_TABS_BUTTON_CLASS} a {
-      cursor: pointer;
+      > li.${MORE_TABS_BUTTON_CLASS}, > li.${MORE_TABS_BUTTON_CLASS} a {
+        cursor: pointer;
+      }
     }
-  }
-`);
+  `,
+);
 
 const QueryTab = styled(NavItem)`
   &&&&.active > a {
@@ -144,14 +145,16 @@ const QueryTab = styled(NavItem)`
 
 const MoreTabsLi = ({ menuItems }: { menuItems: OrderedSet<React.ReactNode> }) => (
   <li className={MORE_TABS_LI_CLASS}>
-    <DropdownButton title={<Icon name="ellipsis-h" />}
-                    className={MORE_TABS_BUTTON_CLASS}
-                    id="query-tabs-more"
-                    aria-label="More Dashboard Pages"
-                    noCaret
-                    bsStyle="link"
-                    keepMounted
-                    pullRight>
+    <DropdownButton
+      title={<Icon name="ellipsis-h" />}
+      className={MORE_TABS_BUTTON_CLASS}
+      id="query-tabs-more"
+      aria-label="More Dashboard Pages"
+      noCaret
+      bsStyle="link"
+      keepMounted
+      pullRight
+    >
       {menuItems.toArray()}
     </DropdownButton>
   </li>
@@ -164,8 +167,12 @@ const adjustTabsVisibility = (
   queriesConfigBtn: HTMLElement | null,
 ) => {
   const dashboardTabs = document.querySelector('#dashboard-tabs') as HTMLElement;
-  const tabItems = dashboardTabs.querySelectorAll(`:scope > li:not(.${MORE_TABS_LI_CLASS}):not(.${NEW_TAB_BUTTON_CLASS})`) as NodeListOf<HTMLElement>;
-  const moreItems = dashboardTabs.querySelectorAll(`li.${MORE_TABS_LI_CLASS} [role="menu"] a.${TAB_MENU_ITEM_CLASS}`) as NodeListOf<HTMLElement>;
+  const tabItems = dashboardTabs.querySelectorAll(
+    `:scope > li:not(.${MORE_TABS_LI_CLASS}):not(.${NEW_TAB_BUTTON_CLASS})`,
+  ) as NodeListOf<HTMLElement>;
+  const moreItems = dashboardTabs.querySelectorAll(
+    `li.${MORE_TABS_LI_CLASS} [role="menu"] a.${TAB_MENU_ITEM_CLASS}`,
+  ) as NodeListOf<HTMLElement>;
   const moreBtn = dashboardTabs.querySelector(`.${MORE_TABS_BUTTON_CLASS}`) as HTMLElement;
   const newBtn = dashboardTabs.querySelector(`.${NEW_TAB_BUTTON_CLASS}`) as HTMLElement;
   const hiddenItems = [];
@@ -228,42 +235,46 @@ const _updateDashboardWithNewSearch = (dashboard: View, newSearch: Search) => {
   return ViewManagementActions.update(newDashboard);
 };
 
-const addPageToDashboard = (targetDashboard: View, activeView: View, queryId: string) => async (searchJson: SearchJson) => {
-  const search = Search.fromJSON(searchJson);
-  const newDashboard = CopyPageToDashboard(queryId, activeView, targetDashboard.toBuilder().search(search).build());
+const addPageToDashboard =
+  (targetDashboard: View, activeView: View, queryId: string) => async (searchJson: SearchJson) => {
+    const search = Search.fromJSON(searchJson);
+    const newDashboard = CopyPageToDashboard(queryId, activeView, targetDashboard.toBuilder().search(search).build());
 
-  if (!newDashboard || !newDashboard.search) {
-    throw Error('Copying the dashboard page failed.');
-  }
+    if (!newDashboard || !newDashboard.search) {
+      throw Error('Copying the dashboard page failed.');
+    }
 
-  const newQueryId = newDashboard.search.queries.last().id;
+    const newQueryId = newDashboard.search.queries.last().id;
 
-  const newSearch = await createSearch(newDashboard.search);
+    const newSearch = await createSearch(newDashboard.search);
 
-  await _updateDashboardWithNewSearch(newDashboard, newSearch);
+    await _updateDashboardWithNewSearch(newDashboard, newSearch);
 
-  return [newDashboard, newQueryId] as const;
-};
+    return [newDashboard, newQueryId] as const;
+  };
 
-const _onCopyToDashboard = (selectedDashboardId: string | undefined | null) => async (_dispatch: AppDispatch, getState: GetState) => {
-  const view = selectView(getState());
-  const queryId = selectActiveQuery(getState());
+const _onCopyToDashboard =
+  (selectedDashboardId: string | undefined | null) => async (_dispatch: AppDispatch, getState: GetState) => {
+    const view = selectView(getState());
+    const queryId = selectActiveQuery(getState());
 
-  const dashboardJson = await ViewManagementActions.get(selectedDashboardId);
-  const targetDashboard = View.fromJSON(dashboardJson);
+    const dashboardJson = await ViewManagementActions.get(selectedDashboardId);
+    const targetDashboard = View.fromJSON(dashboardJson);
 
-  return fetchSearch(dashboardJson.search_id)
-    .then(addPageToDashboard(targetDashboard, view, queryId));
-};
+    return fetchSearch(dashboardJson.search_id).then(addPageToDashboard(targetDashboard, view, queryId));
+  };
 
 const _onCreateNewDashboard = async (view: View, queryId: string, history: HistoryFunction) => {
-  const newDashboard = CopyPageToDashboard(queryId, view, View
-    .create()
-    .toBuilder()
-    .state({})
-    .type(View.Type.Dashboard)
-    .search(Search.create().toBuilder().queries([]).build())
-    .build());
+  const newDashboard = CopyPageToDashboard(
+    queryId,
+    view,
+    View.create()
+      .toBuilder()
+      .state({})
+      .type(View.Type.Dashboard)
+      .search(Search.create().toBuilder().queries([]).build())
+      .build(),
+  );
 
   loadAsDashboard(history, newDashboard);
 };
@@ -292,73 +303,88 @@ const AdaptableQueryTabs = ({
     setShowCopyToDashboardModal((cur) => !cur);
   }, []);
 
-  const onCopyToDashboard = useCallback((selectedDashboardId: string) => dispatch(_onCopyToDashboard(selectedDashboardId))
-    .then(([newDashboard, newQueryId]) => loadDashboard(history, newDashboard.id, newQueryId))
-    .catch((error) => {
-      UserNotification.error(`Copying dashboard page failed with error ${error}`);
-    }), [dispatch, history]);
+  const onCopyToDashboard = useCallback(
+    (selectedDashboardId: string) =>
+      dispatch(_onCopyToDashboard(selectedDashboardId))
+        .then(([newDashboard, newQueryId]) => loadDashboard(history, newDashboard.id, newQueryId))
+        .catch((error) => {
+          UserNotification.error(`Copying dashboard page failed with error ${error}`);
+        }),
+    [dispatch, history],
+  );
 
   const onCreateNewDashboard = () => _onCreateNewDashboard(view, activeQueryId, history);
 
-  const openTitleEditModal = useCallback((activeQueryTitle: string) => {
-    if (queryTitleEditModal) {
-      queryTitleEditModal.current.open(activeQueryTitle);
-    }
-  }, [queryTitleEditModal]);
+  const openTitleEditModal = useCallback(
+    (activeQueryTitle: string) => {
+      if (queryTitleEditModal) {
+        queryTitleEditModal.current.open(activeQueryTitle);
+      }
+    },
+    [queryTitleEditModal],
+  );
 
   const currentTabs = useMemo((): TabsTypes => {
     let navItems = OrderedSet<React.ReactNode>();
     let menuItems = OrderedSet<React.ReactNode>();
     let lockedItems = OrderedSet<React.ReactNode>();
-    let queriesList = OrderedSet<{ id: string, title: string }>();
+    let queriesList = OrderedSet<{ id: string; title: string }>();
 
     queries.keySeq().forEach((id, idx) => {
       const title = titles.get(id, `Page#${idx + 1}`);
       const tabTitle = (
-        <QueryTitle active={id === activeQueryId}
-                    id={id}
-                    onRemove={() => onRemove(id)}
-                    openEditModal={openTitleEditModal}
-                    openCopyToDashboardModal={toggleCopyToDashboardModal}
-                    allowsClosing={queries.size > 1}
-                    title={title} />
+        <QueryTitle
+          active={id === activeQueryId}
+          id={id}
+          onRemove={() => onRemove(id)}
+          openEditModal={openTitleEditModal}
+          openCopyToDashboardModal={toggleCopyToDashboardModal}
+          allowsClosing={queries.size > 1}
+          title={title}
+        />
       );
 
-      navItems = navItems.add(lockedTab === id ? null : (
-        <QueryTab eventKey={id}
-                  key={id}
-                  data-tab-id={id}
-                  onClick={() => {
-                    setLockedTab(undefined);
-                    onSelect(id);
-                  }}>
-          {tabTitle}
-        </QueryTab>
-      ));
+      navItems = navItems.add(
+        lockedTab === id ? null : (
+          <QueryTab
+            eventKey={id}
+            key={id}
+            data-tab-id={id}
+            onClick={() => {
+              setLockedTab(undefined);
+              onSelect(id);
+            }}
+          >
+            {tabTitle}
+          </QueryTab>
+        ),
+      );
 
-      menuItems = menuItems.add(lockedTab === id ? null : (
-        <MenuItem eventKey={id}
-                  key={id}
-                  component="a"
-                  className={`${TAB_MENU_ITEM_CLASS} ${activeQueryId === id ? CLASS_ACTIVE : ''}`}
-                  data-tab-id={id}
-                  onClick={() => {
-                    setLockedTab(id);
-                    onSelect(id);
-                  }}>
-          {tabTitle}
-        </MenuItem>
-      ));
+      menuItems = menuItems.add(
+        lockedTab === id ? null : (
+          <MenuItem
+            eventKey={id}
+            key={id}
+            component="a"
+            className={`${TAB_MENU_ITEM_CLASS} ${activeQueryId === id ? CLASS_ACTIVE : ''}`}
+            data-tab-id={id}
+            onClick={() => {
+              setLockedTab(id);
+              onSelect(id);
+            }}
+          >
+            {tabTitle}
+          </MenuItem>
+        ),
+      );
 
-      lockedItems = lockedItems.add(lockedTab !== id ? null : (
-        <QueryTab eventKey={id}
-                  key={id}
-                  data-tab-id={id}
-                  onClick={() => onSelect(id)}
-                  className={CLASS_LOCKED}>
-          {tabTitle}
-        </QueryTab>
-      ));
+      lockedItems = lockedItems.add(
+        lockedTab !== id ? null : (
+          <QueryTab eventKey={id} key={id} data-tab-id={id} onClick={() => onSelect(id)} className={CLASS_LOCKED}>
+            {tabTitle}
+          </QueryTab>
+        ),
+      );
 
       queriesList = queriesList.add({ id, title });
     });
@@ -379,49 +405,57 @@ const AdaptableQueryTabs = ({
 
         {currentTabs.lockedItems.toArray()}
 
-        <QueryTab key="new"
-                  eventKey="new"
-                  title="Create New Page"
-                  onClick={() => {
-                    sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_CREATE_PAGE, {
-                      app_pathname: 'dashboard',
-                      app_section: 'dashboard',
-                      app_action_value: 'dashboard-create-page-button',
-                    });
+        <QueryTab
+          key="new"
+          eventKey="new"
+          title="Create New Page"
+          onClick={() => {
+            sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_CREATE_PAGE, {
+              app_pathname: 'dashboard',
+              app_section: 'dashboard',
+              app_action_value: 'dashboard-create-page-button',
+            });
 
-                    onSelect('new');
-                  }}
-                  className={NEW_TAB_BUTTON_CLASS}>
+            onSelect('new');
+          }}
+          className={NEW_TAB_BUTTON_CLASS}
+        >
           <Icon name="plus" />
         </QueryTab>
       </StyledQueryNav>
-      <IconButton title="Open pages configuration"
-                  name="cog"
-                  ref={queriesConfigBtn}
-                  className="query-config-btn"
-                  onClick={() => {
-                    sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_PAGE_CONFIGURATION, {
-                      app_pathname: 'dashboard',
-                      app_section: 'dashboard',
-                      app_action_value: 'dashboard-page-configuration-button',
-                    });
+      <IconButton
+        title="Open pages configuration"
+        name="cog"
+        ref={queriesConfigBtn}
+        className="query-config-btn"
+        onClick={() => {
+          sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_PAGE_CONFIGURATION, {
+            app_pathname: 'dashboard',
+            app_section: 'dashboard',
+            app_action_value: 'dashboard-page-configuration-button',
+          });
 
-                    setShowConfigurationModal(true);
-                  }} />
+          setShowConfigurationModal(true);
+        }}
+      />
       {showConfigurationModal && (
-        <AdaptableQueryTabsConfiguration show={showConfigurationModal}
-                                         setShow={setShowConfigurationModal}
-                                         dashboardId={dashboardId}
-                                         queriesList={currentTabs.queriesList}
-                                         activeQueryId={activeQueryId} />
+        <AdaptableQueryTabsConfiguration
+          show={showConfigurationModal}
+          setShow={setShowConfigurationModal}
+          dashboardId={dashboardId}
+          queriesList={currentTabs.queriesList}
+          activeQueryId={activeQueryId}
+        />
       )}
       {showCopyToDashboardModal && (
-        <CopyToDashboardForm onCopyToDashboard={(selectedDashboardId) => onCopyToDashboard(selectedDashboardId)}
-                             onCreateNewDashboard={isNew ? undefined : onCreateNewDashboard}
-                             onCancel={toggleCopyToDashboardModal}
-                             activeDashboardId={dashboardId}
-                             submitButtonText="Copy page"
-                             submitLoadingText="Copying page..." />
+        <CopyToDashboardForm
+          onCopyToDashboard={(selectedDashboardId) => onCopyToDashboard(selectedDashboardId)}
+          onCreateNewDashboard={isNew ? undefined : onCreateNewDashboard}
+          onCancel={toggleCopyToDashboardModal}
+          activeDashboardId={dashboardId}
+          submitButtonText="Copy page"
+          submitLoadingText="Copying page..."
+        />
       )}
     </Container>
   );
@@ -433,10 +467,7 @@ AdaptableQueryTabs.propTypes = {
   titles: PropTypes.object.isRequired,
   onRemove: PropTypes.func.isRequired,
   onSelect: PropTypes.func.isRequired,
-  queryTitleEditModal: PropTypes.oneOfType([
-    PropTypes.func,
-    PropTypes.shape({ current: PropTypes.object }),
-  ]).isRequired,
+  queryTitleEditModal: PropTypes.oneOfType([PropTypes.func, PropTypes.shape({ current: PropTypes.object })]).isRequired,
 };
 
 export default AdaptableQueryTabs;

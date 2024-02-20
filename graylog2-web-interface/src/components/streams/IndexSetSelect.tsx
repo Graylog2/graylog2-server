@@ -23,37 +23,39 @@ import { Input } from 'components/bootstrap';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 
 type Props = {
-  indexSets: Array<IndexSet>
-  help?: string,
-}
+  indexSets: Array<IndexSet>;
+  help?: string;
+};
 
 const IndexSetSelect = ({ indexSets, help }: Props) => {
   const indexSetOptions = useMemo(
-    () => indexSets
-      .filter((indexSet) => indexSet.can_be_default)
-      .map(({ id, title }) => ({
-        value: id,
-        label: title,
-      })),
+    () =>
+      indexSets
+        .filter((indexSet) => indexSet.can_be_default)
+        .map(({ id, title }) => ({
+          value: id,
+          label: title,
+        })),
     [indexSets],
   );
 
   return (
     <Field name="index_set_id">
       {({ field: { name, value, onChange, onBlur }, meta: { error, touched } }) => (
-        <Input label="Index Set"
-               help={help}
-               id={name}
-               error={(error && touched) ? error : undefined}>
-          <Select onBlur={onBlur}
-                  onChange={(newValue: number) => onChange({
-                    target: { value: newValue, name },
-                  })}
-                  options={indexSetOptions}
-                  inputId={name}
-                  placeholder="Select an index set"
-                  inputProps={{ 'aria-label': 'Select an index set' }}
-                  value={value} />
+        <Input label="Index Set" help={help} id={name} error={error && touched ? error : undefined}>
+          <Select
+            onBlur={onBlur}
+            onChange={(newValue: number) =>
+              onChange({
+                target: { value: newValue, name },
+              })
+            }
+            options={indexSetOptions}
+            inputId={name}
+            placeholder="Select an index set"
+            inputProps={{ 'aria-label': 'Select an index set' }}
+            value={value}
+          />
         </Input>
       )}
     </Field>

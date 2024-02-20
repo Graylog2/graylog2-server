@@ -30,9 +30,7 @@ import View from 'views/logic/views/View';
 import type User from 'logic/users/User';
 import useCurrentUser from 'hooks/useCurrentUser';
 import EntityShareModal from 'components/permissions/EntityShareModal';
-import {
-  executePluggableDashboardDuplicationHandler as executePluggableDuplicationHandler,
-} from 'views/logic/views/pluggableSaveViewFormHandler';
+import { executePluggableDashboardDuplicationHandler as executePluggableDuplicationHandler } from 'views/logic/views/pluggableSaveViewFormHandler';
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 import useView from 'views/hooks/useView';
 import useIsNew from 'views/hooks/useIsNew';
@@ -47,8 +45,9 @@ import SaveAsDashboardButton from 'views/components/searchbar/SaveAsDashboardBut
 import DashboardPropertiesModal from './dashboard/DashboardPropertiesModal';
 import BigDisplayModeConfiguration from './dashboard/BigDisplayModeConfiguration';
 
-const _isAllowedToEdit = (view: View, currentUser: User | undefined | null) => isPermitted(currentUser?.permissions, [ViewPermissions.View.Edit(view.id)])
-  || (view.type === View.Type.Dashboard && isPermitted(currentUser?.permissions, [`dashboards:edit:${view.id}`]));
+const _isAllowedToEdit = (view: View, currentUser: User | undefined | null) =>
+  isPermitted(currentUser?.permissions, [ViewPermissions.View.Edit(view.id)]) ||
+  (view.type === View.Type.Dashboard && isPermitted(currentUser?.permissions, [`dashboards:edit:${view.id}`]));
 
 const DashboardActionsMenu = () => {
   const view = useView();
@@ -83,73 +82,103 @@ const DashboardActionsMenu = () => {
   const history = useHistory();
   const pluggableDashboardActions = usePluginEntities('views.components.dashboardActions');
   const modalRefs = useRef({});
-  const dashboardActions = useMemo(() => pluggableDashboardActions.map(({ component: PluggableDashboardAction, key }) => (
-    <PluggableDashboardAction key={`dashboard-action-${key}`}
-                              dashboard={view}
-                              modalRef={() => modalRefs.current[key]} />
-  )), [pluggableDashboardActions, view]);
-  const dashboardActionModals = useMemo(() => pluggableDashboardActions
-    .filter(({ modal }) => !!modal)
-    .map(({ modal: ActionModal, key }) => (
-      <ActionModal key={`dashboard-action-modal-${key}`}
-                   dashboard={view}
-                   ref={(r) => {
-                     modalRefs.current[key] = r;
-                   }} />
-    )), [pluggableDashboardActions, view]);
+  const dashboardActions = useMemo(
+    () =>
+      pluggableDashboardActions.map(({ component: PluggableDashboardAction, key }) => (
+        <PluggableDashboardAction
+          key={`dashboard-action-${key}`}
+          dashboard={view}
+          modalRef={() => modalRefs.current[key]}
+        />
+      )),
+    [pluggableDashboardActions, view],
+  );
+  const dashboardActionModals = useMemo(
+    () =>
+      pluggableDashboardActions
+        .filter(({ modal }) => !!modal)
+        .map(({ modal: ActionModal, key }) => (
+          <ActionModal
+            key={`dashboard-action-modal-${key}`}
+            dashboard={view}
+            ref={(r) => {
+              modalRefs.current[key] = r;
+            }}
+          />
+        )),
+    [pluggableDashboardActions, view],
+  );
 
-  const _onSaveNewDashboard = useCallback(async (newDashboard: View) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_NEW_SAVED, {
-      app_pathname: 'dashboard',
-      app_section: 'dashboard',
-      app_action_value: 'dashboard-save-new',
-    });
+  const _onSaveNewDashboard = useCallback(
+    async (newDashboard: View) => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_NEW_SAVED, {
+        app_pathname: 'dashboard',
+        app_section: 'dashboard',
+        app_action_value: 'dashboard-save-new',
+      });
 
-    const isViewDuplication = !!view.id;
+      const isViewDuplication = !!view.id;
 
-    if (isViewDuplication) {
-      const dashboardWithPluginData = await executePluggableDuplicationHandler(newDashboard, currentUser.permissions, pluggableSaveViewControls);
+      if (isViewDuplication) {
+        const dashboardWithPluginData = await executePluggableDuplicationHandler(
+          newDashboard,
+          currentUser.permissions,
+          pluggableSaveViewControls,
+        );
 
-      return dispatch(onSaveNewDashboard(dashboardWithPluginData, history));
-    }
+        return dispatch(onSaveNewDashboard(dashboardWithPluginData, history));
+      }
 
-    return dispatch(onSaveNewDashboard(newDashboard, history));
-  }, [currentUser.permissions, dispatch, history, pluggableSaveViewControls, sendTelemetry, view.id]);
+      return dispatch(onSaveNewDashboard(newDashboard, history));
+    },
+    [currentUser.permissions, dispatch, history, pluggableSaveViewControls, sendTelemetry, view.id],
+  );
 
-  const _onUpdateView = useCallback((updatedView) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_UPDATED, {
-      app_pathname: 'dashboard',
-      app_section: 'dashboard',
-      app_action_value: 'dashboard-update',
-    });
+  const _onUpdateView = useCallback(
+    (updatedView) => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_UPDATED, {
+        app_pathname: 'dashboard',
+        app_section: 'dashboard',
+        app_action_value: 'dashboard-update',
+      });
 
-    return dispatch(updateView(updatedView));
-  }, [dispatch, sendTelemetry]);
+      return dispatch(updateView(updatedView));
+    },
+    [dispatch, sendTelemetry],
+  );
 
   return (
     <ButtonGroup>
       {showSaveButton && (
-        <SaveDashboardButton userIsAllowedToEdit={allowedToEdit}
-                             openSaveAsModal={() => setSaveNewDashboardOpen(true)} />
+        <SaveDashboardButton
+          userIsAllowedToEdit={allowedToEdit}
+          openSaveAsModal={() => setSaveNewDashboardOpen(true)}
+        />
       )}
       {showSaveNewButton && (
-        <SaveAsDashboardButton onClick={() => setSaveNewDashboardOpen(true)}
-                               openSaveAsModal={() => setSaveNewDashboardOpen(true)} />
+        <SaveAsDashboardButton
+          onClick={() => setSaveNewDashboardOpen(true)}
+          openSaveAsModal={() => setSaveNewDashboardOpen(true)}
+        />
       )}
       {showShareButton && (
-        <ShareButton entityType="dashboard"
-                     entityId={view.id}
-                     onClick={() => setShareViewOpen(true)}
-                     bsStyle="default"
-                     disabledInfo={isNewView && 'Only saved dashboards can be shared.'} />
+        <ShareButton
+          entityType="dashboard"
+          entityId={view.id}
+          onClick={() => setShareViewOpen(true)}
+          bsStyle="default"
+          disabledInfo={isNewView && 'Only saved dashboards can be shared.'}
+        />
       )}
       {showDropDownButton && (
-        <DropdownButton title={<Icon name="ellipsis-h" />}
-                        id="query-tab-actions-dropdown"
-                        pullRight
-                        keepMounted
-                        buttonTitle="More Actions"
-                        noCaret>
+        <DropdownButton
+          title={<Icon name="ellipsis-h" />}
+          id="query-tab-actions-dropdown"
+          pullRight
+          keepMounted
+          buttonTitle="More Actions"
+          noCaret
+        >
           {dashboardActions.length > 0 && (
             <>
               {dashboardActions}
@@ -159,7 +188,9 @@ const DashboardActionsMenu = () => {
           <MenuItem onSelect={() => setEditDashboardOpen(true)} disabled={isNewView || !allowedToEdit} icon="edit">
             Edit metadata
           </MenuItem>
-          <MenuItem onSelect={() => setExportOpen(true)} icon="cloud-download-alt">Export</MenuItem>
+          <MenuItem onSelect={() => setExportOpen(true)} icon="cloud-download-alt">
+            Export
+          </MenuItem>
           {debugOverlay}
           <MenuItem divider />
           <BigDisplayModeConfiguration view={view} disabled={isNewView} />
@@ -167,28 +198,34 @@ const DashboardActionsMenu = () => {
       )}
       {debugOpen && <DebugOverlay show onClose={() => setDebugOpen(false)} />}
       {saveNewDashboardOpen && (
-        <DashboardPropertiesModal show
-                                  view={view.toBuilder().newId().build()}
-                                  title="Save new dashboard"
-                                  submitButtonText="Create dashboard"
-                                  onClose={() => setSaveNewDashboardOpen(false)}
-                                  onSave={(newDashboard) => _onSaveNewDashboard(newDashboard)} />
+        <DashboardPropertiesModal
+          show
+          view={view.toBuilder().newId().build()}
+          title="Save new dashboard"
+          submitButtonText="Create dashboard"
+          onClose={() => setSaveNewDashboardOpen(false)}
+          onSave={(newDashboard) => _onSaveNewDashboard(newDashboard)}
+        />
       )}
       {editDashboardOpen && (
-        <DashboardPropertiesModal show
-                                  view={view}
-                                  title="Editing dashboard"
-                                  submitButtonText="Update dashboard"
-                                  onClose={() => setEditDashboardOpen(false)}
-                                  onSave={_onUpdateView} />
+        <DashboardPropertiesModal
+          show
+          view={view}
+          title="Editing dashboard"
+          submitButtonText="Update dashboard"
+          onClose={() => setEditDashboardOpen(false)}
+          onSave={_onUpdateView}
+        />
       )}
 
       {shareDashboardOpen && (
-        <EntityShareModal entityId={view.id}
-                          entityType="dashboard"
-                          entityTitle={view.title}
-                          description="Search for a User or Team to add as collaborator on this dashboard."
-                          onClose={() => setShareViewOpen(false)} />
+        <EntityShareModal
+          entityId={view.id}
+          entityType="dashboard"
+          entityTitle={view.title}
+          description="Search for a User or Team to add as collaborator on this dashboard."
+          onClose={() => setShareViewOpen(false)}
+        />
       )}
       {exportOpen && <ExportModal view={view} closeModal={() => setExportOpen(false)} />}
       {dashboardActionModals}

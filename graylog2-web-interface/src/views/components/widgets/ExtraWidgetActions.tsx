@@ -28,7 +28,7 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
 
 type Props = {
-  widget: Widget,
+  widget: Widget;
 };
 
 const ExtraWidgetActions = ({ widget }: Props) => {
@@ -37,31 +37,36 @@ const ExtraWidgetActions = ({ widget }: Props) => {
   const dispatch = useAppDispatch();
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
-  const extraWidgetActions = useMemo(() => pluginWidgetActions
-    .filter(({ isHidden = () => false }) => !isHidden(widget))
-    .map(({ title, action, type, disabled = () => false }) => {
-      const _onSelect = () => {
-        sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.SEARCH_WIDGET_EXTRA_ACTION, {
-          app_pathname: getPathnameWithoutId(pathname),
-          app_section: 'search-widget',
-          app_action_value: type,
-        });
+  const extraWidgetActions = useMemo(
+    () =>
+      pluginWidgetActions
+        .filter(({ isHidden = () => false }) => !isHidden(widget))
+        .map(({ title, action, type, disabled = () => false }) => {
+          const _onSelect = () => {
+            sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.SEARCH_WIDGET_EXTRA_ACTION, {
+              app_pathname: getPathnameWithoutId(pathname),
+              app_section: 'search-widget',
+              app_action_value: type,
+            });
 
-        dispatch(action(widget, { widgetFocusContext }));
-      };
+            dispatch(action(widget, { widgetFocusContext }));
+          };
 
-      return (
-        <MenuItem key={`${type}-${widget.id}`} disabled={disabled()} onSelect={_onSelect}>{title(widget)}</MenuItem>);
-    }), [dispatch, pathname, pluginWidgetActions, sendTelemetry, widget, widgetFocusContext]);
+          return (
+            <MenuItem key={`${type}-${widget.id}`} disabled={disabled()} onSelect={_onSelect}>
+              {title(widget)}
+            </MenuItem>
+          );
+        }),
+    [dispatch, pathname, pluginWidgetActions, sendTelemetry, widget, widgetFocusContext],
+  );
 
-  return extraWidgetActions.length > 0
-    ? (
-      <>
-        <MenuItem divider />
-        {extraWidgetActions}
-      </>
-    )
-    : null;
+  return extraWidgetActions.length > 0 ? (
+    <>
+      <MenuItem divider />
+      {extraWidgetActions}
+    </>
+  ) : null;
 };
 
 export default ExtraWidgetActions;

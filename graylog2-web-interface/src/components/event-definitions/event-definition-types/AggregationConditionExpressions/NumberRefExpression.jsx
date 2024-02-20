@@ -26,9 +26,8 @@ import { numberRefNodePropType } from 'logic/alerts/AggregationExpressionTypes';
 
 import { percentileOptions, percentageStrategyOptions } from '../../../../views/Constants';
 
-const formatFunctions = (functions) => functions
-  .sort(naturalSort)
-  .map((fn) => ({ label: `${fn.toLowerCase()}()`, value: fn }));
+const formatFunctions = (functions) =>
+  functions.sort(naturalSort).map((fn) => ({ label: `${fn.toLowerCase()}()`, value: fn }));
 
 const getSeriesId = (currentSeries) => `${currentSeries.type}-${currentSeries.field ?? ''}`;
 
@@ -41,56 +40,68 @@ const NumberRefExpression = ({
   renderLabel,
   validation,
 }) => {
-  const getSeries = useCallback((seriesId) => eventDefinition?.config?.series?.find((series) => series.id === seriesId), [eventDefinition?.config?.series]);
+  const getSeries = useCallback(
+    (seriesId) => eventDefinition?.config?.series?.find((series) => series.id === seriesId),
+    [eventDefinition?.config?.series],
+  );
 
   const createSeries = useCallback(() => ({ id: expression.ref }), [expression.ref]);
 
   const getOrCreateSeries = useCallback((seriesId) => getSeries(seriesId) || createSeries(), [createSeries, getSeries]);
 
-  const handleFieldChange = useCallback((key, value) => {
-    const series = cloneDeep(eventDefinition?.config?.series);
-    const nextSeries = cloneDeep(getOrCreateSeries(expression.ref));
+  const handleFieldChange = useCallback(
+    (key, value) => {
+      const series = cloneDeep(eventDefinition?.config?.series);
+      const nextSeries = cloneDeep(getOrCreateSeries(expression.ref));
 
-    if (value !== undefined) {
-      nextSeries[key] = value;
-    }
+      if (value !== undefined) {
+        nextSeries[key] = value;
+      }
 
-    if (key === 'type' && value !== 'percentage') {
-      delete nextSeries.strategy;
-    }
+      if (key === 'type' && value !== 'percentage') {
+        delete nextSeries.strategy;
+      }
 
-    if (key === 'type' && value !== 'percentage') {
-      delete nextSeries.percentile;
-    }
+      if (key === 'type' && value !== 'percentage') {
+        delete nextSeries.percentile;
+      }
 
-    const nextSeriesId = getSeriesId(nextSeries);
-    nextSeries.id = nextSeriesId;
+      const nextSeriesId = getSeriesId(nextSeries);
+      nextSeries.id = nextSeriesId;
 
-    const seriesIndex = series.findIndex((s) => s.id === nextSeries.id);
+      const seriesIndex = series.findIndex((s) => s.id === nextSeries.id);
 
-    if (seriesIndex >= 0) {
-      series[seriesIndex] = nextSeries;
-    } else {
-      series.push(nextSeries);
-    }
+      if (seriesIndex >= 0) {
+        series[seriesIndex] = nextSeries;
+      } else {
+        series.push(nextSeries);
+      }
 
-    const nextExpression = cloneDeep(expression);
+      const nextExpression = cloneDeep(expression);
 
-    nextExpression.ref = nextSeriesId;
+      nextExpression.ref = nextSeriesId;
 
-    onChange({
-      series: series,
-      conditions: nextExpression,
-    });
-  }, [eventDefinition?.config?.series, expression, getOrCreateSeries, onChange]);
+      onChange({
+        series: series,
+        conditions: nextExpression,
+      });
+    },
+    [eventDefinition?.config?.series, expression, getOrCreateSeries, onChange],
+  );
 
-  const handleAggregationFunctionChange = useCallback((nextFunction) => {
-    handleFieldChange('type', nextFunction);
-  }, [handleFieldChange]);
+  const handleAggregationFunctionChange = useCallback(
+    (nextFunction) => {
+      handleFieldChange('type', nextFunction);
+    },
+    [handleFieldChange],
+  );
 
-  const handleAggregationFieldChange = useCallback((nextField) => {
-    handleFieldChange('field', nextField);
-  }, [handleFieldChange]);
+  const handleAggregationFieldChange = useCallback(
+    (nextField) => {
+      handleFieldChange('field', nextField);
+    },
+    [handleFieldChange],
+  );
 
   const series = getSeries(expression.ref) || {};
 
@@ -102,41 +113,49 @@ const NumberRefExpression = ({
         {renderLabel && <ControlLabel>If</ControlLabel>}
         <Row className="row-sm">
           <Col md={12 / elements}>
-            <Select className="aggregation-function"
-                    matchProp="label"
-                    placeholder="Select Function"
-                    onChange={handleAggregationFunctionChange}
-                    options={formatFunctions(aggregationFunctions)}
-                    clearable={false}
-                    value={series.type} />
+            <Select
+              className="aggregation-function"
+              matchProp="label"
+              placeholder="Select Function"
+              onChange={handleAggregationFunctionChange}
+              options={formatFunctions(aggregationFunctions)}
+              clearable={false}
+              value={series.type}
+            />
           </Col>
           {series.type === 'percentage' && (
             <Col md={12 / elements}>
-              <Select className="aggregation-function-strategy"
-                      matchProp="label"
-                      placeholder="Select Strategy (Optional)"
-                      onChange={(newValue) => handleFieldChange('strategy', newValue)}
-                      options={percentageStrategyOptions}
-                      value={series.strategy} />
+              <Select
+                className="aggregation-function-strategy"
+                matchProp="label"
+                placeholder="Select Strategy (Optional)"
+                onChange={(newValue) => handleFieldChange('strategy', newValue)}
+                options={percentageStrategyOptions}
+                value={series.strategy}
+              />
             </Col>
           )}
           <Col md={12 / elements}>
-            <Select className="aggregation-function-field"
-                    ignoreAccents={false}
-                    matchProp="label"
-                    placeholder="Select Field (Optional)"
-                    onChange={handleAggregationFieldChange}
-                    options={formattedFields}
-                    value={series.field}
-                    allowCreate />
+            <Select
+              className="aggregation-function-field"
+              ignoreAccents={false}
+              matchProp="label"
+              placeholder="Select Field (Optional)"
+              onChange={handleAggregationFieldChange}
+              options={formattedFields}
+              value={series.field}
+              allowCreate
+            />
           </Col>
           {series.type === 'percentile' && (
             <Col md={12 / elements}>
-              <Select className="aggregation-function-percentile"
-                      placeholder="Select Percentile"
-                      onChange={(newValue) => handleFieldChange('percentile', newValue)}
-                      options={percentileOptions}
-                      value={series.percentile} />
+              <Select
+                className="aggregation-function-percentile"
+                placeholder="Select Percentile"
+                onChange={(newValue) => handleFieldChange('percentile', newValue)}
+                options={percentileOptions}
+                value={series.percentile}
+              />
             </Col>
           )}
         </Row>

@@ -32,14 +32,18 @@ const rangeLimitError = 'Range is outside limit duration.';
 const dateLimitError = 'Date is outside limit duration.';
 const timeRangeError = 'The "Until" date must come after the "From" date.';
 
-const exceedsDuration = (timeRange: TimeRange, limitDuration, formatTime: (dateTime: DateTime, format: string) => string) => {
+const exceedsDuration = (
+  timeRange: TimeRange,
+  limitDuration,
+  formatTime: (dateTime: DateTime, format: string) => string,
+) => {
   if (limitDuration === 0) {
     return false;
   }
 
   switch (timeRange?.type) {
     case 'absolute':
-    case 'keyword': { // eslint-disable-line padding-line-between-statements
+    case 'keyword': {
       const durationFrom = timeRange.from;
 
       const durationLimit = formatTime(toDateObject(new Date()).subtract(Number(limitDuration), 'seconds'), 'complete');
@@ -52,10 +56,14 @@ const exceedsDuration = (timeRange: TimeRange, limitDuration, formatTime: (dateT
   }
 };
 
-const validateAbsoluteTimeRange = (timeRange: AbsoluteTimeRange, limitDuration: number, formatTime: (dateTime: DateTime, format: string) => string) => {
+const validateAbsoluteTimeRange = (
+  timeRange: AbsoluteTimeRange,
+  limitDuration: number,
+  formatTime: (dateTime: DateTime, format: string) => string,
+) => {
   let errors: {
-    from?: string,
-    to?: string,
+    from?: string;
+    to?: string;
   } = {};
 
   if (!isValidDate(timeRange.from)) {
@@ -78,7 +86,7 @@ const validateAbsoluteTimeRange = (timeRange: AbsoluteTimeRange, limitDuration: 
 };
 
 const validateRelativeTimeRangeWithEnd = (timeRange: RelativeTimeRangeWithEnd, limitDuration: number) => {
-  let errors: { from?: string, to?: string } = {};
+  let errors: { from?: string; to?: string } = {};
 
   if (limitDuration > 0) {
     if (timeRange.from > limitDuration || !timeRange.from) {
@@ -105,7 +113,11 @@ const validateRelativeTimeRangeWithEnd = (timeRange: RelativeTimeRangeWithEnd, l
   return errors;
 };
 
-const validateKeywordTimeRange = (timeRange: KeywordTimeRange, limitDuration: number, formatTime: (dateTime: DateTime, format: string) => string) => {
+const validateKeywordTimeRange = (
+  timeRange: KeywordTimeRange,
+  limitDuration: number,
+  formatTime: (dateTime: DateTime, format: string) => string,
+) => {
   let errors: { keyword?: string } = {};
 
   if (exceedsDuration(timeRange, limitDuration, formatTime)) {
@@ -115,7 +127,11 @@ const validateKeywordTimeRange = (timeRange: KeywordTimeRange, limitDuration: nu
   return errors;
 };
 
-const validateTimeRange = (timeRange: TimeRange | NoTimeRangeOverride, limitDuration: number, formatTime: (dateTime: DateTime, format: string) => string) => {
+const validateTimeRange = (
+  timeRange: TimeRange | NoTimeRangeOverride,
+  limitDuration: number,
+  formatTime: (dateTime: DateTime, format: string) => string,
+) => {
   if (isTypeKeyword(timeRange)) {
     return validateKeywordTimeRange(timeRange, limitDuration, formatTime);
   }

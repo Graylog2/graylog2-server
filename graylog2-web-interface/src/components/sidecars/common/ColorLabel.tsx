@@ -29,14 +29,14 @@ const ColorLabelWrap = styled.span<{ $size: Size }>(({ $size, theme }) => {
   return css`
     vertical-align: middle;
     font-size: ${$size === 'xsmall' ? tiny : fontSize};
-`;
+  `;
 });
 
 type Props = {
-  color: string,
-  size?: Size,
-  text?: string | React.ReactNode,
-}
+  color: string;
+  size?: Size;
+  text?: string | React.ReactNode;
+};
 
 const ColorLabel = ({ color, size, text }: Props) => {
   const theme = useTheme();
@@ -45,16 +45,18 @@ const ColorLabel = ({ color, size, text }: Props) => {
 
   return (
     <ColorLabelWrap $size={size} className="color-label-wrapper">
-      <Label style={{
-        backgroundColor: color,
-        border: `1px solid ${borderColor}`,
-        color: textColor,
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        maxWidth: '128px',
-        marginRight: '4px',
-        marginBottom: '4px',
-      }}>
+      <Label
+        style={{
+          backgroundColor: color,
+          border: `1px solid ${borderColor}`,
+          color: textColor,
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          maxWidth: '128px',
+          marginRight: '4px',
+          marginBottom: '4px',
+        }}
+      >
         {text}
       </Label>
     </ColorLabelWrap>

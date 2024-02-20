@@ -32,39 +32,44 @@ import HttpNotificationDetails from '../event-notification-details/HttpNotificat
 import LegacyNotificationDetails from '../event-notification-details/LegacyNotificationDetails';
 import HttpNotificationDetailsV2 from '../event-notification-details/HttpNotificationDetailsV2';
 
-PluginStore.register(new PluginManifest({}, {
-  eventNotificationTypes: [
+PluginStore.register(
+  new PluginManifest(
+    {},
     {
-      type: 'email-notification-v1',
-      displayName: 'Email Notification',
-      formComponent: EmailNotificationFormContainer,
-      summaryComponent: EmailNotificationSummary,
-      detailsComponent: EmailNotificationDetails,
-      defaultConfig: EmailNotificationForm.defaultConfig,
+      eventNotificationTypes: [
+        {
+          type: 'email-notification-v1',
+          displayName: 'Email Notification',
+          formComponent: EmailNotificationFormContainer,
+          summaryComponent: EmailNotificationSummary,
+          detailsComponent: EmailNotificationDetails,
+          defaultConfig: EmailNotificationForm.defaultConfig,
+        },
+        {
+          type: 'http-notification-v1',
+          displayName: 'HTTP Notification',
+          formComponent: HttpNotificationForm,
+          summaryComponent: HttpNotificationSummary,
+          detailsComponent: HttpNotificationDetails,
+          defaultConfig: HttpNotificationForm.defaultConfig,
+        },
+        {
+          type: 'http-notification-v2',
+          displayName: 'Custom HTTP Notification',
+          formComponent: HttpNotificationFormV2,
+          summaryComponent: HttpNotificationSummaryV2,
+          detailsComponent: HttpNotificationDetailsV2,
+          defaultConfig: HttpNotificationFormV2.defaultConfig,
+        },
+        {
+          type: 'legacy-alarm-callback-notification-v1',
+          displayName: 'Legacy Alarm Callbacks',
+          formComponent: LegacyNotificationFormContainer,
+          summaryComponent: LegacyNotificationSummaryContainer,
+          detailsComponent: LegacyNotificationDetails,
+          defaultConfig: LegacyNotificationForm.defaultConfig,
+        },
+      ],
     },
-    {
-      type: 'http-notification-v1',
-      displayName: 'HTTP Notification',
-      formComponent: HttpNotificationForm,
-      summaryComponent: HttpNotificationSummary,
-      detailsComponent: HttpNotificationDetails,
-      defaultConfig: HttpNotificationForm.defaultConfig,
-    },
-    {
-      type: 'http-notification-v2',
-      displayName: 'Custom HTTP Notification',
-      formComponent: HttpNotificationFormV2,
-      summaryComponent: HttpNotificationSummaryV2,
-      detailsComponent: HttpNotificationDetailsV2,
-      defaultConfig: HttpNotificationFormV2.defaultConfig,
-    },
-    {
-      type: 'legacy-alarm-callback-notification-v1',
-      displayName: 'Legacy Alarm Callbacks',
-      formComponent: LegacyNotificationFormContainer,
-      summaryComponent: LegacyNotificationSummaryContainer,
-      detailsComponent: LegacyNotificationDetails,
-      defaultConfig: LegacyNotificationForm.defaultConfig,
-    },
-  ],
-}));
+  ),
+);

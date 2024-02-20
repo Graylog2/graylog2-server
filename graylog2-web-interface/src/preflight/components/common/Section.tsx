@@ -25,7 +25,7 @@ import Row from 'preflight/components/common/Row';
 import { Title } from 'preflight/components/common';
 
 type ContainerType = BoxProps & {
-  theme: DefaultTheme,
+  theme: DefaultTheme;
   component: any;
 };
 
@@ -34,22 +34,26 @@ const TitleActionContainer = styled(Box)`
   justify-content: flex-end;
   gap: 5px;
 `;
-const SubsectionContainer = styled(Box)<React.PropsWithChildren<ContainerType>>(({ theme }: ContainerType) => css`
-  padding: ${theme.spacings.md};
-  margin-bottom: ${theme.spacings.xs};
-`);
+const SubsectionContainer = styled(Box)<React.PropsWithChildren<ContainerType>>(
+  ({ theme }: ContainerType) => css`
+    padding: ${theme.spacings.md};
+    margin-bottom: ${theme.spacings.xs};
+  `,
+);
 
-const SectionContainer = styled(SubsectionContainer)(({ theme }: ContainerType) => css`
-  background-color: ${theme.colors.global.contentBackground};
-  border: 1px solid ${theme.colors.variant.lighter.default};
-  border-radius: 4px;
-`);
+const SectionContainer = styled(SubsectionContainer)(
+  ({ theme }: ContainerType) => css`
+    background-color: ${theme.colors.global.contentBackground};
+    border: 1px solid ${theme.colors.variant.lighter.default};
+    border-radius: 4px;
+  `,
+);
 
 type Props = {
-  title: React.ReactNode,
-  actions?: React.ReactNode,
-  titleOrder?: TitleOrder
-  dataTestid?: string,
+  title: React.ReactNode;
+  actions?: React.ReactNode;
+  titleOrder?: TitleOrder;
+  dataTestid?: string;
 };
 
 const SectionHeader = ({ title, actions, titleOrder }: Props) => (

@@ -22,8 +22,8 @@ import RedoNavItem from 'views/components/sidebar/redo/RedoNavItem';
 export type SidebarActionsProps = { sidebarIsPinned: boolean };
 
 export type SidebarAction = {
-  key: string,
-  Component: React.ComponentType<SidebarActionsProps>
+  key: string;
+  Component: React.ComponentType<SidebarActionsProps>;
 };
 
 const sidebarSections: Array<SidebarAction> = [

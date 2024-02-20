@@ -28,12 +28,14 @@ const MessageField = ({ message, value, fieldName, customFieldActions, renderFor
   return (
     <span>
       <dt key={`${fieldName}Title`}>{fieldName}</dt>
-      <MessageFieldDescription key={`${fieldName}Description`}
-                               message={message}
-                               fieldName={fieldName}
-                               fieldValue={innerValue}
-                               renderForDisplay={renderForDisplay}
-                               customFieldActions={customFieldActions} />
+      <MessageFieldDescription
+        key={`${fieldName}Description`}
+        message={message}
+        fieldName={fieldName}
+        fieldValue={innerValue}
+        renderForDisplay={renderForDisplay}
+        customFieldActions={customFieldActions}
+      />
     </span>
   );
 };

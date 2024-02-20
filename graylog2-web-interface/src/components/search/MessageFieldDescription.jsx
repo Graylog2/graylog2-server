@@ -22,10 +22,12 @@ import styled, { css } from 'styled-components';
 import { Alert } from 'components/bootstrap';
 import { FULL_MESSAGE_FIELD, MESSAGE_FIELD } from 'views/Constants';
 
-const MessageTerms = styled.span(({ theme }) => css`
-  margin-right: 8px;
-  font-family: ${theme.fonts.family.monospace};
-`);
+const MessageTerms = styled.span(
+  ({ theme }) => css`
+    margin-right: 8px;
+    font-family: ${theme.fonts.family.monospace};
+  `,
+);
 
 class MessageFieldDescription extends React.Component {
   static propTypes = {
@@ -73,11 +75,10 @@ class MessageFieldDescription extends React.Component {
       <dd className={className} key={`${fieldName}dd`}>
         {this._getFormattedFieldActions()}
         <div className="field-value">{renderForDisplay(fieldName)}</div>
-        {this._shouldShowTerms()
-        && (
-        <Alert bsStyle="info" onDismiss={() => this.setState({ messageTerms: Immutable.Map() })}>
-          Field terms: &nbsp;{this._getFormattedTerms()}
-        </Alert>
+        {this._shouldShowTerms() && (
+          <Alert bsStyle="info" onDismiss={() => this.setState({ messageTerms: Immutable.Map() })}>
+            Field terms: &nbsp;{this._getFormattedTerms()}
+          </Alert>
         )}
       </dd>
     );

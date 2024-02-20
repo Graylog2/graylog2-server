@@ -22,16 +22,14 @@ import * as URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import { singletonStore, singletonActions } from 'logic/singleton';
 
-export const CodecTypesActions = singletonActions(
-  'core.CodecTypes',
-  () => Reflux.createActions({
+export const CodecTypesActions = singletonActions('core.CodecTypes', () =>
+  Reflux.createActions({
     list: { asyncResult: true },
   }),
 );
 
-export const CodecTypesStore = singletonStore(
-  'core.CodecTypes',
-  () => Reflux.createStore({
+export const CodecTypesStore = singletonStore('core.CodecTypes', () =>
+  Reflux.createStore({
     listenables: [CodecTypesActions],
     codecTypes: undefined,
 
@@ -48,8 +46,7 @@ export const CodecTypesStore = singletonStore(
           this.trigger(this.getInitialState());
         },
         (error) => {
-          UserNotification.error(`Fetching codec types failed with status: ${error}`,
-            'Could not retrieve codec types');
+          UserNotification.error(`Fetching codec types failed with status: ${error}`, 'Could not retrieve codec types');
         },
       );
 

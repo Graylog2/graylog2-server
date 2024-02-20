@@ -34,19 +34,27 @@ import SectionInfo from '../SectionInfo';
 import SectionSubheadline from '../SectionSubheadline';
 
 type SortableHighlightingRuleProps = {
-  item: { id: string, rule: HighlightingRuleType },
-  draggableProps: DraggableProvidedDraggableProps,
-  dragHandleProps: DraggableProvidedDragHandleProps,
-  className?: string,
-  ref: React.Ref<HTMLDivElement>
-}
-const SortableHighlightingRule = ({ item: { id, rule }, draggableProps, dragHandleProps, className, ref }: SortableHighlightingRuleProps) => (
-  <HighlightingRule key={id}
-                    rule={rule}
-                    dragHandleProps={dragHandleProps}
-                    draggableProps={draggableProps}
-                    className={className}
-                    ref={ref} />
+  item: { id: string; rule: HighlightingRuleType };
+  draggableProps: DraggableProvidedDraggableProps;
+  dragHandleProps: DraggableProvidedDragHandleProps;
+  className?: string;
+  ref: React.Ref<HTMLDivElement>;
+};
+const SortableHighlightingRule = ({
+  item: { id, rule },
+  draggableProps,
+  dragHandleProps,
+  className,
+  ref,
+}: SortableHighlightingRuleProps) => (
+  <HighlightingRule
+    key={id}
+    rule={rule}
+    dragHandleProps={dragHandleProps}
+    draggableProps={draggableProps}
+    className={className}
+    ref={ref}
+  />
 );
 
 SortableHighlightingRule.defaultProps = {
@@ -56,31 +64,38 @@ SortableHighlightingRule.defaultProps = {
 const HighlightingRules = () => {
   const [showForm, setShowForm] = useState(false);
   const rules = useContext(HighlightingRulesContext) ?? [];
-  const rulesWithId = rules.map((rule) => ({ rule, id: `${rule.field}-${rule.value}-${rule.color}-${rule.condition}` }));
+  const rulesWithId = rules.map((rule) => ({
+    rule,
+    id: `${rule.field}-${rule.value}-${rule.color}-${rule.condition}`,
+  }));
   const dispatch = useAppDispatch();
 
-  const updateRules = useCallback((newRulesWithId: Array<{ id: string, rule: HighlightingRuleType }>) => {
-    const newRules = newRulesWithId.map(({ rule }) => rule);
+  const updateRules = useCallback(
+    (newRulesWithId: Array<{ id: string; rule: HighlightingRuleType }>) => {
+      const newRules = newRulesWithId.map(({ rule }) => rule);
 
-    return dispatch(updateHighlightingRules(newRules));
-  }, [dispatch]);
+      return dispatch(updateHighlightingRules(newRules));
+    },
+    [dispatch],
+  );
 
   return (
     <>
       <SectionInfo>
-        Search terms and field values can be highlighted. Highlighting your search query in the results can be enabled/disabled in the graylog server config.
-        Any field value can be highlighted by clicking on the value and selecting &quot;Highlight this value&quot;.
-        If a term or a value has more than one rule, the first matching rule is used.
+        Search terms and field values can be highlighted. Highlighting your search query in the results can be
+        enabled/disabled in the graylog server config. Any field value can be highlighted by clicking on the value and
+        selecting &quot;Highlight this value&quot;. If a term or a value has more than one rule, the first matching rule
+        is used.
       </SectionInfo>
-      <SectionSubheadline>Active highlights <IconButton className="pull-right" name="plus" onClick={() => setShowForm(!showForm)} /> </SectionSubheadline>
+      <SectionSubheadline>
+        Active highlights <IconButton className="pull-right" name="plus" onClick={() => setShowForm(!showForm)} />{' '}
+      </SectionSubheadline>
       {showForm && <HighlightForm onClose={() => setShowForm(false)} />}
       <Container $displayBorder={!!rulesWithId?.length}>
         <ColorPreview color={DEFAULT_HIGHLIGHT_COLOR} />
         <RuleContainer>Search terms</RuleContainer>
       </Container>
-      <SortableList items={rulesWithId}
-                    onMoveItem={updateRules}
-                    customListItemRender={SortableHighlightingRule} />
+      <SortableList items={rulesWithId} onMoveItem={updateRules} customListItemRender={SortableHighlightingRule} />
     </>
   );
 };

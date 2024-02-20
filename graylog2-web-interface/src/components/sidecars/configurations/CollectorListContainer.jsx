@@ -44,10 +44,9 @@ class CollectorListContainer extends React.Component {
       app_section: 'configuration',
     });
 
-    CollectorsActions.copy(collector, name)
-      .then(() => {
-        callback();
-      });
+    CollectorsActions.copy(collector, name).then(() => {
+      callback();
+    });
   };
 
   handleDelete = async (collector) => {
@@ -81,15 +80,17 @@ class CollectorListContainer extends React.Component {
     }
 
     return (
-      <CollectorList collectors={collectors.paginatedCollectors}
-                     pagination={collectors.pagination}
-                     query={collectors.query}
-                     total={collectors.total}
-                     onPageChange={this.handlePageChange}
-                     onQueryChange={this.handleQueryChange}
-                     onClone={this.handleClone}
-                     onDelete={this.handleDelete}
-                     validateCollector={validateCollector} />
+      <CollectorList
+        collectors={collectors.paginatedCollectors}
+        pagination={collectors.pagination}
+        query={collectors.query}
+        total={collectors.total}
+        onPageChange={this.handlePageChange}
+        onQueryChange={this.handleQueryChange}
+        onClone={this.handleClone}
+        onDelete={this.handleDelete}
+        validateCollector={validateCollector}
+      />
     );
   }
 }

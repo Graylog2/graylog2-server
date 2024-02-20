@@ -32,7 +32,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 type Props = {
-  cache: LookupTableCache,
+  cache: LookupTableCache;
 };
 
 const Actions = styled(ButtonToolbar)`
@@ -58,9 +58,11 @@ const CacheTableEntry = ({ cache }: Props) => {
   };
 
   const computeEntriesMetrics = (metrics: any) => {
-    const total = Object.keys(metrics).reduce((acc: number, nodeId: string) => (
-      acc + (Number.isNaN(metrics[nodeId].count.metric.value) ? 0 : metrics[nodeId].count.metric.value)
-    ), 0);
+    const total = Object.keys(metrics).reduce(
+      (acc: number, nodeId: string) =>
+        acc + (Number.isNaN(metrics[nodeId].count.metric.value) ? 0 : metrics[nodeId].count.metric.value),
+      0,
+    );
 
     if (total < 0) return 'N/A';
 
@@ -68,13 +70,17 @@ const CacheTableEntry = ({ cache }: Props) => {
   };
 
   const computeCountMetrics = (metrics: any) => {
-    const totalHits = Object.keys(metrics).reduce((acc: number, nodeId: string) => (
-      acc + (Number.isNaN(metrics[nodeId].hits.metric.rate.total) ? 0 : metrics[nodeId].hits.metric.rate.total)
-    ), 0);
+    const totalHits = Object.keys(metrics).reduce(
+      (acc: number, nodeId: string) =>
+        acc + (Number.isNaN(metrics[nodeId].hits.metric.rate.total) ? 0 : metrics[nodeId].hits.metric.rate.total),
+      0,
+    );
 
-    const totalMisses = Object.keys(metrics).reduce((acc: number, nodeId: string) => (
-      acc + (Number.isNaN(metrics[nodeId].misses.metric.rate.total) ? 0 : metrics[nodeId].misses.metric.rate.total)
-    ), 0);
+    const totalMisses = Object.keys(metrics).reduce(
+      (acc: number, nodeId: string) =>
+        acc + (Number.isNaN(metrics[nodeId].misses.metric.rate.total) ? 0 : metrics[nodeId].misses.metric.rate.total),
+      0,
+    );
 
     const total = totalHits + totalMisses;
     if (total < 1) return 'N/A';
@@ -123,22 +129,19 @@ const CacheTableEntry = ({ cache }: Props) => {
           </MetricContainer>
         </td>
         <td>
-          {loadingScopePermissions ? <Spinner /> : scopePermissions.is_mutable && (
-            <Actions>
-              <Button bsSize="xsmall"
-                      onClick={handleEdit}
-                      role="button"
-                      name="edit">
-                Edit
-              </Button>
-              <Button bsSize="xsmall"
-                      bsStyle="danger"
-                      onClick={handleDelete}
-                      role="button"
-                      name="delete">
-                Delete
-              </Button>
-            </Actions>
+          {loadingScopePermissions ? (
+            <Spinner />
+          ) : (
+            scopePermissions.is_mutable && (
+              <Actions>
+                <Button bsSize="xsmall" onClick={handleEdit} role="button" name="edit">
+                  Edit
+                </Button>
+                <Button bsSize="xsmall" bsStyle="danger" onClick={handleDelete} role="button" name="delete">
+                  Delete
+                </Button>
+              </Actions>
+            )
           )}
         </td>
       </tr>

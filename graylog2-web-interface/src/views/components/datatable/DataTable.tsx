@@ -45,37 +45,49 @@ import type { VisualizationComponentProps } from '../aggregationbuilder/Aggregat
 import { makeVisualization, retrieveChartData } from '../aggregationbuilder/AggregationBuilder';
 
 type Props = VisualizationComponentProps & {
-  data: { [key: string]: Rows } & { events?: Events },
-  striped?: boolean,
-  bordered?: boolean,
-  borderedHeader?: boolean,
-  stickyHeader?: boolean,
-  condensed?: boolean,
+  data: { [key: string]: Rows } & { events?: Events };
+  striped?: boolean;
+  bordered?: boolean;
+  borderedHeader?: boolean;
+  stickyHeader?: boolean;
+  condensed?: boolean;
 };
 
-const getStylesForPinnedColumns = (tag: 'th'|'td', stickyLeftMarginsByColumnIndex: Array<{index: number, column: string, leftMargin: number}>) => stickyLeftMarginsByColumnIndex.map(({ index, leftMargin }) => `
+const getStylesForPinnedColumns = (
+  tag: 'th' | 'td',
+  stickyLeftMarginsByColumnIndex: Array<{ index: number; column: string; leftMargin: number }>,
+) =>
+  stickyLeftMarginsByColumnIndex
+    .map(
+      ({ index, leftMargin }) => `
     ${tag}:nth-child(${index + 1}) {
         position: sticky!important;
         left: ${leftMargin}px;
         z-index: 1;
     }
-  `).concat((' ; '));
+  `,
+    )
+    .concat(' ; ');
 
 const THead = styled.thead<{
-    $stickyLeftMarginsByColumnIndex: Array<{index: number, column: string, leftMargin: number}>
-}>(({ $stickyLeftMarginsByColumnIndex }) => css`
+  $stickyLeftMarginsByColumnIndex: Array<{ index: number; column: string; leftMargin: number }>;
+}>(
+  ({ $stickyLeftMarginsByColumnIndex }) => css`
   & tr.pivot-header-row {
     & ${getStylesForPinnedColumns('th', $stickyLeftMarginsByColumnIndex)}
   }
-`);
+`,
+);
 
 const TBody = styled.tbody<{
-  $stickyLeftMarginsByColumnIndex: Array<{index: number, column: string, leftMargin: number}>
-}>(({ $stickyLeftMarginsByColumnIndex }) => css`
+  $stickyLeftMarginsByColumnIndex: Array<{ index: number; column: string; leftMargin: number }>;
+}>(
+  ({ $stickyLeftMarginsByColumnIndex }) => css`
   & tr {
     & ${getStylesForPinnedColumns('td', $stickyLeftMarginsByColumnIndex)}
   }
-`);
+`,
+);
 
 const _compareArray = (ary1, ary2) => {
   if (ary1 === undefined) {
@@ -94,7 +106,7 @@ const _compareArray = (ary1, ary2) => {
     return -1;
   }
 
-  const diffIdx = ary1.findIndex((v, idx) => (defaultCompare(v, ary2[idx]) !== 0));
+  const diffIdx = ary1.findIndex((v, idx) => defaultCompare(v, ary2[idx]) !== 0);
 
   if (diffIdx === -1) {
     return 0;
@@ -105,11 +117,7 @@ const _compareArray = (ary1, ary2) => {
 
 const _extractColumnPivotValues = (rows): Array<Array<string>> => {
   const uniqRows = uniqWith(
-    flatten(
-      rows
-        .filter(({ source }) => (source === 'leaf' || source === 'non-leaf'))
-        .map(({ values }) => values),
-    )
+    flatten(rows.filter(({ source }) => source === 'leaf' || source === 'non-leaf').map(({ values }) => values))
       .filter(({ rollup }) => !rollup)
       .map(({ key }) => key.slice(0, -1)),
     isEqual,
@@ -136,63 +144,71 @@ const DataTable = ({
   const [rowPivotColumnsWidth, setRowPivotColumnsWidth] = useState<{ [key: string]: number }>({});
   const dispatch = useAppDispatch();
 
-  const onSetColumnsWidth = useCallback(({ field, offsetWidth }: { field: string, offsetWidth: number}) => {
-    setRowPivotColumnsWidth((cur) => {
-      const copy = { ...cur };
-      copy[field] = offsetWidth;
+  const onSetColumnsWidth = useCallback(
+    ({ field, offsetWidth }: { field: string; offsetWidth: number }) => {
+      setRowPivotColumnsWidth((cur) => {
+        const copy = { ...cur };
+        copy[field] = offsetWidth;
 
-      return copy;
-    });
-  }, [setRowPivotColumnsWidth]);
-  const _onSortChange = useCallback((newSort: Array<SortConfig>) => {
-    const dirty = formContext?.dirty;
-    const updateWidget = () => dispatch(updateWidgetConfig(widget.id, config.toBuilder().sort(newSort).build()));
+        return copy;
+      });
+    },
+    [setRowPivotColumnsWidth],
+  );
+  const _onSortChange = useCallback(
+    (newSort: Array<SortConfig>) => {
+      const dirty = formContext?.dirty;
+      const updateWidget = () => dispatch(updateWidgetConfig(widget.id, config.toBuilder().sort(newSort).build()));
 
-    if (!editing || (editing && !dirty)) {
-      return updateWidget();
-    }
+      if (!editing || (editing && !dirty)) {
+        return updateWidget();
+      }
 
-    // eslint-disable-next-line no-alert
-    if (window.confirm('You have unsaved changes in configuration form. This action will rollback them')) {
-      return updateWidget();
-    }
+      // eslint-disable-next-line no-alert
+      if (window.confirm('You have unsaved changes in configuration form. This action will rollback them')) {
+        return updateWidget();
+      }
 
-    return Promise.reject();
-  }, [formContext?.dirty, editing, dispatch, widget?.id, config]);
+      return Promise.reject();
+    },
+    [formContext?.dirty, editing, dispatch, widget?.id, config],
+  );
 
-  const togglePin = useCallback((field: string) => {
-    const dirty = formContext?.dirty;
+  const togglePin = useCallback(
+    (field: string) => {
+      const dirty = formContext?.dirty;
 
-    const updateWidget = () => {
-      const curVisualizationConfig = widget.config.visualizationConfig ?? DataTableVisualizationConfig.create([]).toBuilder().build();
-      const pinnedColumns = curVisualizationConfig?.pinnedColumns?.has(field)
-        ? curVisualizationConfig.pinnedColumns.delete(field)
-        : curVisualizationConfig.pinnedColumns.add(field);
+      const updateWidget = () => {
+        const curVisualizationConfig =
+          widget.config.visualizationConfig ?? DataTableVisualizationConfig.create([]).toBuilder().build();
+        const pinnedColumns = curVisualizationConfig?.pinnedColumns?.has(field)
+          ? curVisualizationConfig.pinnedColumns.delete(field)
+          : curVisualizationConfig.pinnedColumns.add(field);
 
-      return dispatch(updateWidgetConfig(
-        widget.id,
-        widget
-          .config
-          .toBuilder()
-          .visualizationConfig(
-            curVisualizationConfig
+        return dispatch(
+          updateWidgetConfig(
+            widget.id,
+            widget.config
               .toBuilder()
-              .pinnedColumns(pinnedColumns.toJS())
-              .build())
-          .build()));
-    };
+              .visualizationConfig(curVisualizationConfig.toBuilder().pinnedColumns(pinnedColumns.toJS()).build())
+              .build(),
+          ),
+        );
+      };
 
-    if (!editing || (editing && !dirty)) {
-      return updateWidget();
-    }
+      if (!editing || (editing && !dirty)) {
+        return updateWidget();
+      }
 
-    // eslint-disable-next-line no-alert
-    if (window.confirm('You have unsaved changes in configuration form. This action will rollback them')) {
-      return updateWidget();
-    }
+      // eslint-disable-next-line no-alert
+      if (window.confirm('You have unsaved changes in configuration form. This action will rollback them')) {
+        return updateWidget();
+      }
 
-    return Promise.reject();
-  }, [formContext?.dirty, editing, widget?.config, widget?.id, dispatch]);
+      return Promise.reject();
+    },
+    [formContext?.dirty, editing, widget?.config, widget?.id, dispatch],
+  );
 
   const { columnPivots, rowPivots, series, rollupForBackendQuery: rollup } = config;
 
@@ -202,13 +218,21 @@ const DataTable = ({
   const columnFieldNames = columnPivots.flatMap((pivot) => pivot.fields);
 
   const seriesToMerge = rollup ? series : [];
-  const effectiveFields = Immutable.OrderedSet(rowFieldNames.map((field) => ({ field, source: field })))
-    .merge(seriesToMerge.map((s) => ({ field: s.effectiveName, source: s.function })));
+  const effectiveFields = Immutable.OrderedSet(rowFieldNames.map((field) => ({ field, source: field }))).merge(
+    seriesToMerge.map((s) => ({ field: s.effectiveName, source: s.function })),
+  );
 
-  const expandedRows = expandRows(rowFieldNames.slice(), columnFieldNames.slice(), rows.filter((r): r is Leaf => r.source === 'leaf'));
+  const expandedRows = expandRows(
+    rowFieldNames.slice(),
+    columnFieldNames.slice(),
+    rows.filter((r): r is Leaf => r.source === 'leaf'),
+  );
 
   const actualColumnPivotFields = _extractColumnPivotValues(rows);
-  const pinnedColumns = useMemo(() => widget?.config?.visualizationConfig?.pinnedColumns || Immutable.Set(), [widget?.config?.visualizationConfig?.pinnedColumns]);
+  const pinnedColumns = useMemo(
+    () => widget?.config?.visualizationConfig?.pinnedColumns || Immutable.Set(),
+    [widget?.config?.visualizationConfig?.pinnedColumns],
+  );
 
   const stickyLeftMarginsByColumnIndex = useMemo(() => {
     let prev = 0;
@@ -239,46 +263,45 @@ const DataTable = ({
     const key = `datatableentry-${idx}`;
 
     return (
-
-      (
-        <DataTableEntry key={key}
-                        fields={effectiveFields}
-                        item={reducedItem}
-                        valuePath={valuePath}
-                        columnPivots={columnFieldNames}
-                        columnPivotValues={actualColumnPivotFields}
-                        types={fields}
-                        series={series} />
-      )
+      <DataTableEntry
+        key={key}
+        fields={effectiveFields}
+        item={reducedItem}
+        valuePath={valuePath}
+        columnPivots={columnFieldNames}
+        columnPivotValues={actualColumnPivotFields}
+        types={fields}
+        series={series}
+      />
     );
   });
 
-  const sortConfigMap = useMemo<OrderedMap<string, SortConfig>>(() => Immutable.OrderedMap(config.sort.map((sort) => [sort.field, sort])), [config]);
+  const sortConfigMap = useMemo<OrderedMap<string, SortConfig>>(
+    () => Immutable.OrderedMap(config.sort.map((sort) => [sort.field, sort])),
+    [config],
+  );
 
   return (
     <div className={styles.container}>
       <div className={styles.scrollContainer}>
-        <MessagesTable striped={striped}
-                       bordered={bordered}
-                       stickyHeader={stickyHeader}
-                       condensed={condensed}>
+        <MessagesTable striped={striped} bordered={bordered} stickyHeader={stickyHeader} condensed={condensed}>
           <THead $stickyLeftMarginsByColumnIndex={stickyLeftMarginsByColumnIndex}>
-            <Headers actualColumnPivotFields={actualColumnPivotFields}
-                     borderedHeader={borderedHeader}
-                     columnPivots={columnPivots}
-                     fields={fields}
-                     rollup={rollup}
-                     rowPivots={rowPivots}
-                     series={series}
-                     onSortChange={_onSortChange}
-                     sortConfigMap={sortConfigMap}
-                     onSetColumnsWidth={onSetColumnsWidth}
-                     pinnedColumns={pinnedColumns}
-                     togglePin={togglePin} />
+            <Headers
+              actualColumnPivotFields={actualColumnPivotFields}
+              borderedHeader={borderedHeader}
+              columnPivots={columnPivots}
+              fields={fields}
+              rollup={rollup}
+              rowPivots={rowPivots}
+              series={series}
+              onSortChange={_onSortChange}
+              sortConfigMap={sortConfigMap}
+              onSetColumnsWidth={onSetColumnsWidth}
+              pinnedColumns={pinnedColumns}
+              togglePin={togglePin}
+            />
           </THead>
-          <TBody $stickyLeftMarginsByColumnIndex={stickyLeftMarginsByColumnIndex}>
-            {formattedRows}
-          </TBody>
+          <TBody $stickyLeftMarginsByColumnIndex={stickyLeftMarginsByColumnIndex}>{formattedRows}</TBody>
         </MessagesTable>
       </div>
     </div>

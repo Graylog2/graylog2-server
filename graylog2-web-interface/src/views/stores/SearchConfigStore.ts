@@ -25,9 +25,8 @@ type SearchConfigActionsType = {
   refresh: () => Promise<void>;
 };
 
-export const SearchConfigActions = singletonActions(
-  'views.SearchConfig',
-  () => Reflux.createActions<SearchConfigActionsType>({
+export const SearchConfigActions = singletonActions('views.SearchConfig', () =>
+  Reflux.createActions<SearchConfigActionsType>({
     refresh: { asyncResult: true },
   }),
 );
@@ -36,9 +35,8 @@ export type SearchConfigStoreState = {
   searchesClusterConfig: SearchesConfig;
 };
 
-export const SearchConfigStore: Store<SearchConfigStoreState> = singletonStore(
-  'views.SearchConfig',
-  () => Reflux.createStore({
+export const SearchConfigStore: Store<SearchConfigStoreState> = singletonStore('views.SearchConfig', () =>
+  Reflux.createStore({
     listenables: [SearchConfigActions],
 
     init() {

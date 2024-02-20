@@ -22,41 +22,47 @@ import type { EventDefinition } from 'components/event-definitions/event-definit
 import { EventDefinitionsStore } from 'stores/event-definitions/EventDefinitionsStore';
 
 type Options = {
-  enabled: boolean,
-}
+  enabled: boolean;
+};
 
-const useEventDefinitions = (searchParams: SearchParams, { enabled }: Options = { enabled: true }): {
-  data: {
-    elements: Array<EventDefinition>,
-    pagination: { total: number }
-    attributes: Array<{ id: string, title: string, sortable: boolean }>
-  } | undefined,
-  refetch: () => void,
-  isInitialLoading: boolean,
+const useEventDefinitions = (
+  searchParams: SearchParams,
+  { enabled }: Options = { enabled: true },
+): {
+  data:
+    | {
+        elements: Array<EventDefinition>;
+        pagination: { total: number };
+        attributes: Array<{ id: string; title: string; sortable: boolean }>;
+      }
+    | undefined;
+  refetch: () => void;
+  isInitialLoading: boolean;
 } => {
   const { data, refetch, isInitialLoading } = useQuery(
     ['eventDefinition', 'overview', searchParams],
-    () => EventDefinitionsStore.searchPaginated(
-      searchParams.page,
-      searchParams.pageSize,
-      searchParams.query,
-      { sort: searchParams?.sort.attributeId, order: searchParams?.sort.direction },
-    ),
+    () =>
+      EventDefinitionsStore.searchPaginated(searchParams.page, searchParams.pageSize, searchParams.query, {
+        sort: searchParams?.sort.attributeId,
+        order: searchParams?.sort.direction,
+      }),
     {
       onError: (errorThrown) => {
-        UserNotification.error(`Loading Event Definitions failed with status: ${errorThrown}`,
-          'Could not load Event definition');
+        UserNotification.error(
+          `Loading Event Definitions failed with status: ${errorThrown}`,
+          'Could not load Event definition',
+        );
       },
       keepPreviousData: true,
       enabled,
     },
   );
 
-  return ({
+  return {
     data,
     refetch,
     isInitialLoading,
-  });
+  };
 };
 
 export default useEventDefinitions;

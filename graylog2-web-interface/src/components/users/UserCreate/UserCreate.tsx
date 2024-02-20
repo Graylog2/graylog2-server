@@ -77,9 +77,12 @@ const _onSubmit = (history: HistoryFunction, formData, roles, setSubmitError) =>
 
   setSubmitError(null);
 
-  return UsersDomain.create(data).then(() => {
-    history.push(Routes.SYSTEM.USERS.OVERVIEW);
-  }, (error) => setSubmitError(error));
+  return UsersDomain.create(data).then(
+    () => {
+      history.push(Routes.SYSTEM.USERS.OVERVIEW);
+    },
+    (error) => setSubmitError(error),
+  );
 };
 
 const _validateUsername = async (errors: { [name: string]: string }, username: string) => {
@@ -89,8 +92,7 @@ const _validateUsername = async (errors: { [name: string]: string }, username: s
     await UsersActions.loadByUsername(username);
     newErrors.username = 'Username is already taken';
     // eslint-disable-next-line no-empty
-  } catch (error) {
-  }
+  } catch (error) {}
 
   return newErrors;
 };
@@ -108,7 +110,9 @@ const _validate = async (values) => {
   }
 
   if (isCloud && oktaUserForm) {
-    const { validations: { password: validateCloudPasswords } } = oktaUserForm;
+    const {
+      validations: { password: validateCloudPasswords },
+    } = oktaUserForm;
 
     errors = validateCloudPasswords(errors, password, passwordRepeat);
   } else {
@@ -122,7 +126,9 @@ type RequestError = { additional: { res: { text: string } } };
 
 const PasswordGroup = () => {
   if (isCloud && oktaUserForm) {
-    const { fields: { password: CloudPasswordFormGroup } } = oktaUserForm;
+    const {
+      fields: { password: CloudPasswordFormGroup },
+    } = oktaUserForm;
 
     return <CloudPasswordFormGroup />;
   }
@@ -132,26 +138,26 @@ const PasswordGroup = () => {
 
 const UserNameGroup = () => {
   if (isCloud && oktaUserForm) {
-    const { fields: { username: CloudUserNameFormGroup } } = oktaUserForm;
+    const {
+      fields: { username: CloudUserNameFormGroup },
+    } = oktaUserForm;
 
     return CloudUserNameFormGroup && <CloudUserNameFormGroup />;
   }
 
-  return (
-    <UsernameFormGroup />
-  );
+  return <UsernameFormGroup />;
 };
 
 const EmailGroup = () => {
   if (isCloud && oktaUserForm) {
-    const { fields: { email: CloudEmailFormGroup } } = oktaUserForm;
+    const {
+      fields: { email: CloudEmailFormGroup },
+    } = oktaUserForm;
 
     return CloudEmailFormGroup && <CloudEmailFormGroup />;
   }
 
-  return (
-    <EmailFormGroup />
-  );
+  return <EmailFormGroup />;
 };
 
 const UserCreate = () => {
@@ -160,7 +166,12 @@ const UserCreate = () => {
     description: 'Grants basic permissions for every Graylog user (built-in)',
     id: '',
   };
-  const [user, setUser] = useState(User.empty().toBuilder().roles(Immutable.Set([initialRole.name])).build());
+  const [user, setUser] = useState(
+    User.empty()
+      .toBuilder()
+      .roles(Immutable.Set([initialRole.name]))
+      .build(),
+  );
   const [submitError, setSubmitError] = useState<RequestError | undefined>();
   const [selectedRoles, setSelectedRoles] = useState<Immutable.Set<DescriptiveItem>>(Immutable.Set([initialRole]));
   const history = useHistory();
@@ -172,9 +183,7 @@ const UserCreate = () => {
     setSelectedRoles(selectedRoles.union(roles));
     const roleNames = roles.map((r) => r.name);
 
-    return Promise.resolve(
-      setUser(user.toBuilder().roles(user.roles.union(roleNames)).build()),
-    );
+    return Promise.resolve(setUser(user.toBuilder().roles(user.roles.union(roleNames)).build()));
   };
 
   const _onUnassignRole = (role: DescriptiveItem) => {
@@ -183,7 +192,8 @@ const UserCreate = () => {
   };
 
   const _handleCancel = () => history.push(Routes.SYSTEM.USERS.OVERVIEW);
-  const hasValidRole = selectedRoles.size > 0 && selectedRoles.filter((role) => role.name === 'Reader' || role.name === 'Admin');
+  const hasValidRole =
+    selectedRoles.size > 0 && selectedRoles.filter((role) => role.name === 'Reader' || role.name === 'Admin');
 
   const showSubmitError = (errors) => {
     if (isCloud && oktaUserForm) {
@@ -207,9 +217,7 @@ const UserCreate = () => {
   return (
     <Row className="content">
       <Col lg={8}>
-        <Formik onSubmit={onSubmit}
-                validate={_validate}
-                initialValues={{}}>
+        <Formik onSubmit={onSubmit} validate={_validate} initialValues={{}}>
           {({ isSubmitting, isValid }) => (
             <Form className="form form-horizontal">
               <div>
@@ -222,17 +230,18 @@ const UserCreate = () => {
               <div>
                 <Headline>Settings</Headline>
                 {isGlobalTimeoutEnabled ? (
-                  <GlobalTimeoutMessage label="Sessions Timeout"
-                                        value={(
-                                          <NoSearchResult>User session timeout is not editable because
-                                            the
-                                            <IfPermitted permissions={['clusterconfigentry:read']}>
-                                              <Link to={Routes.SYSTEM.CONFIGURATIONS}>
-                                                global session timeout
-                                              </Link>
-                                            </IfPermitted> is enabled.
-                                          </NoSearchResult>
-                                        )} />
+                  <GlobalTimeoutMessage
+                    label="Sessions Timeout"
+                    value={
+                      <NoSearchResult>
+                        User session timeout is not editable because the
+                        <IfPermitted permissions={['clusterconfigentry:read']}>
+                          <Link to={Routes.SYSTEM.CONFIGURATIONS}>global session timeout</Link>
+                        </IfPermitted>{' '}
+                        is enabled.
+                      </NoSearchResult>
+                    }
+                  />
                 ) : (
                   <TimeoutFormGroup />
                 )}
@@ -241,30 +250,33 @@ const UserCreate = () => {
               </div>
               <div>
                 <Headline>Roles</Headline>
-                <Input id="roles-selector-input"
-                       labelClassName="col-sm-3"
-                       wrapperClassName="col-sm-9"
-                       label="Assign Roles">
-                  <RolesSelector onSubmit={_onAssignRole}
-                                 assignedRolesIds={user.roles}
-                                 identifier={(role) => role.name}
-                                 submitOnSelect />
+                <Input
+                  id="roles-selector-input"
+                  labelClassName="col-sm-3"
+                  wrapperClassName="col-sm-9"
+                  label="Assign Roles"
+                >
+                  <RolesSelector
+                    onSubmit={_onAssignRole}
+                    assignedRolesIds={user.roles}
+                    identifier={(role) => role.name}
+                    submitOnSelect
+                  />
                 </Input>
 
-                <Input id="selected-roles-overview"
-                       labelClassName="col-sm-3"
-                       wrapperClassName="col-sm-9"
-                       label="Selected Roles">
+                <Input
+                  id="selected-roles-overview"
+                  labelClassName="col-sm-3"
+                  wrapperClassName="col-sm-9"
+                  label="Selected Roles"
+                >
                   <>
                     {selectedRoles.map((role) => (
-                      <PaginatedItem item={role}
-                                     onDeleteItem={(data) => _onUnassignRole(data)}
-                                     key={role.id} />
+                      <PaginatedItem item={role} onDeleteItem={(data) => _onUnassignRole(data)} key={role.id} />
                     ))}
                     {!hasValidRole && (
                       <Alert bsStyle="danger">
-                        You need to select at least one of
-                        the <em>Reader</em> or <em>Admin</em> roles.
+                        You need to select at least one of the <em>Reader</em> or <em>Admin</em> roles.
                       </Alert>
                     )}
                   </>
@@ -285,12 +297,14 @@ const UserCreate = () => {
               )}
               <Row>
                 <Col md={9} mdOffset={3}>
-                  <FormSubmit disabledSubmit={!isValid || !hasValidRole}
-                              submitButtonText="Create user"
-                              submitLoadingText="Creating user..."
-                              isSubmitting={isSubmitting}
-                              isAsyncSubmit
-                              onCancel={_handleCancel} />
+                  <FormSubmit
+                    disabledSubmit={!isValid || !hasValidRole}
+                    submitButtonText="Create user"
+                    submitLoadingText="Creating user..."
+                    isSubmitting={isSubmitting}
+                    isAsyncSubmit
+                    onCancel={_handleCancel}
+                  />
                 </Col>
               </Row>
             </Form>

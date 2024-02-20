@@ -27,12 +27,11 @@ export const ErrorMessage = ({ fullMessage, niceMessage }) => {
     <>
       <ErrorOutputStyle />
       <ErrorOutput>{niceMessage || fullMessage}</ErrorOutput>
-      {niceMessage
-        && (
-          <ErrorToggleInfo onClick={() => toggleExpanded(!expanded)} expanded={expanded}>
-            More Info <i className="fa fa-chevron-right" />
-          </ErrorToggleInfo>
-        )}
+      {niceMessage && (
+        <ErrorToggleInfo onClick={() => toggleExpanded(!expanded)} expanded={expanded}>
+          More Info <i className="fa fa-chevron-right" />
+        </ErrorToggleInfo>
+      )}
     </>
   );
 
@@ -41,38 +40,23 @@ export const ErrorMessage = ({ fullMessage, niceMessage }) => {
   }
 
   return (
-    <Panel header={Header}
-           bsStyle="danger"
-           collapsible
-           expanded={expanded}>
-      <strong>Additional Information: </strong>{fullMessage}
+    <Panel header={Header} bsStyle="danger" collapsible expanded={expanded}>
+      <strong>Additional Information: </strong>
+      {fullMessage}
     </Panel>
   );
 };
 
 ErrorMessage.propTypes = {
   fullMessage: PropTypes.string.isRequired,
-  niceMessage: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.node,
-  ]),
+  niceMessage: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
 };
 
 ErrorMessage.defaultProps = {
   niceMessage: null,
 };
 
-const FormWrap = ({
-  buttonContent,
-  children,
-  className,
-  disabled,
-  description,
-  error,
-  loading,
-  onSubmit,
-  title,
-}) => {
+const FormWrap = ({ buttonContent, children, className, disabled, description, error, loading, onSubmit, title }) => {
   const formRef = useRef();
   const [disabledButton, setDisabledButton] = useState(disabled);
 
@@ -87,26 +71,17 @@ const FormWrap = ({
   }, [loading, disabled]);
 
   return (
-    <form onSubmit={prevent}
-          autoComplete="off"
-          noValidate
-          className={className}
-          ref={formRef}>
-
-      {title && ((typeof (title) === 'string') ? <h2>{title}</h2> : title)}
-      {description && ((typeof (description) === 'string') ? <p>{description}</p> : description)}
+    <form onSubmit={prevent} autoComplete="off" noValidate className={className} ref={formRef}>
+      {title && (typeof title === 'string' ? <h2>{title}</h2> : title)}
+      {description && (typeof description === 'string' ? <p>{description}</p> : description)}
 
       {error && error.full_message && (
-        <ErrorMessage fullMessage={error.full_message}
-                      niceMessage={error.nice_message} />
+        <ErrorMessage fullMessage={error.full_message} niceMessage={error.nice_message} />
       )}
 
       {children}
 
-      <Button type="button"
-              onClick={disabledButton ? null : onSubmit}
-              bsStyle="primary"
-              disabled={disabledButton}>
+      <Button type="button" onClick={disabledButton ? null : onSubmit} bsStyle="primary" disabled={disabledButton}>
         {loading ? 'Loading...' : buttonContent}
       </Button>
     </form>
@@ -114,29 +89,17 @@ const FormWrap = ({
 };
 
 FormWrap.propTypes = {
-  buttonContent: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.node,
-  ]),
+  buttonContent: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
   children: PropTypes.any.isRequired,
   disabled: PropTypes.bool,
   error: PropTypes.shape({
     full_message: PropTypes.string.isRequired,
-    nice_message: PropTypes.oneOfType([
-      PropTypes.string,
-      PropTypes.node,
-    ]),
+    nice_message: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
   }),
-  description: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.node,
-  ]),
+  description: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
   loading: PropTypes.bool,
   onSubmit: PropTypes.func,
-  title: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.node,
-  ]),
+  title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
   className: PropTypes.string,
 };
 

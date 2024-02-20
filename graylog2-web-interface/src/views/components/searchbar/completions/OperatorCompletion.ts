@@ -50,26 +50,36 @@ const operators: Array<CompletionResult> = [
   },
 ];
 
-const _matchesFieldName = (prefix) => (field) => (field.name.indexOf(prefix) >= 0);
+const _matchesFieldName = (prefix) => (field) => field.name.indexOf(prefix) >= 0;
 
-const _lastNonEmptyToken = (tokens: Array<Token>, currentTokenIdx: number): Token | undefined | null => tokens.slice(0, currentTokenIdx).reverse().find((token) => (token.type !== 'text' || trim(token.value) !== ''));
+const _lastNonEmptyToken = (tokens: Array<Token>, currentTokenIdx: number): Token | undefined | null =>
+  tokens
+    .slice(0, currentTokenIdx)
+    .reverse()
+    .find((token) => token.type !== 'text' || trim(token.value) !== '');
 
 class OperatorCompletion implements Completer {
   // eslint-disable-next-line class-methods-use-this
-  getCompletions = ({ currentToken, prevToken, prefix, tokens, currentTokenIdx }: CompleterContext): Array<CompletionResult> => {
+  getCompletions = ({
+    currentToken,
+    prevToken,
+    prefix,
+    tokens,
+    currentTokenIdx,
+  }: CompleterContext): Array<CompletionResult> => {
     if (
-      isTypeKeyword(currentToken)
-      || isTypeString(currentToken)
-      || !tokens?.length
-      || !prefix
-      || (isKeywordOperator(prevToken) && prevToken.value === 'NOT')
+      isTypeKeyword(currentToken) ||
+      isTypeString(currentToken) ||
+      !tokens?.length ||
+      !prefix ||
+      (isKeywordOperator(prevToken) && prevToken.value === 'NOT')
     ) {
       return [];
     }
 
     const lastNonEmptyToken = _lastNonEmptyToken(tokens, currentTokenIdx);
 
-    if (!lastNonEmptyToken || (lastNonEmptyToken && (lastNonEmptyToken.type === 'keyword.operator'))) {
+    if (!lastNonEmptyToken || (lastNonEmptyToken && lastNonEmptyToken.type === 'keyword.operator')) {
       const matchesFieldName = _matchesFieldName(prefix);
 
       return operators.filter(matchesFieldName);

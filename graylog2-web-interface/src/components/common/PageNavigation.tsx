@@ -29,7 +29,8 @@ const Container = styled(ButtonToolbar)`
   margin-bottom: 10px;
 `;
 
-const StyledButton = styled(Button)(({ theme }) => css`
+const StyledButton = styled(Button)(
+  ({ theme }) => css`
   font-family: ${theme.fonts.family.navigation};
   font-size: ${theme.fonts.size.navigation};
   color: ${theme.colors.variant.darker.default};
@@ -54,7 +55,8 @@ const StyledButton = styled(Button)(({ theme }) => css`
     &:focus {
       ${activeIndicatorStyles(theme)}
     }
-`);
+`,
+);
 
 StyledButton.displayName = 'Button';
 
@@ -65,12 +67,12 @@ type Props = {
    * If you only want to display an item as active only when its path matches exactly, set `exactPathMatch` to true.
    */
   items: Array<{
-    title: string,
-    path: string,
-    permissions?: string | Array<string>
-    exactPathMatch?: boolean,
-  }>
-}
+    title: string;
+    path: string;
+    permissions?: string | Array<string>;
+    exactPathMatch?: boolean;
+  }>;
+};
 
 /**
  * Simple tab navigation to allow navigating to subareas of a page.
@@ -86,9 +88,7 @@ const PageNavigation = ({ items }: Props) => (
         <IfPermitted permissions={permissions ?? []} key={path}>
           <LinkContainer to={path} relativeActive={!exactPathMatch}>
             <StyledButton bsStyle="link">
-              <NavItemStateIndicator>
-                {title}
-              </NavItemStateIndicator>
+              <NavItemStateIndicator>{title}</NavItemStateIndicator>
             </StyledButton>
           </LinkContainer>
         </IfPermitted>

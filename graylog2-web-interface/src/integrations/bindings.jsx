@@ -31,13 +31,10 @@ import TeamsNotificationSummary from './event-notifications/event-notification-t
 import GreyNoiseAdapterFieldSet from './dataadapters/GreyNoiseAdapterFieldSet';
 import GreyNoiseAdapterSummary from './dataadapters/GreyNoiseAdapterSummary';
 import GreyNoiseAdapterDocumentation from './dataadapters/GreyNoiseAdapterDocumentation';
-import GreyNoiseCommunityIpLookupAdapterDocumentation
-  from './dataadapters/GreyNoiseCommunityIpLookupAdapterDocumentation';
+import GreyNoiseCommunityIpLookupAdapterDocumentation from './dataadapters/GreyNoiseCommunityIpLookupAdapterDocumentation';
 
 const bindings = {
-  routes: [
-    { path: Routes.INTEGRATIONS.AWS.CLOUDWATCH.index, component: AWSCloudWatchApp },
-  ],
+  routes: [{ path: Routes.INTEGRATIONS.AWS.CLOUDWATCH.index, component: AWSCloudWatchApp }],
   inputConfiguration: [
     {
       type: 'org.graylog.integrations.aws.inputs.AWSInput',

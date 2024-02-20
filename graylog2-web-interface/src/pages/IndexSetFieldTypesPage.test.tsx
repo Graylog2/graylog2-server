@@ -30,23 +30,23 @@ import IndexSetFieldTypesPage from 'pages/IndexSetFieldTypesPage';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
 import { overriddenIndexField, defaultField, attributes } from 'fixtures/indexSetFieldTypes';
 
-const getData = (list = [defaultField]) => (
-  {
-    list,
-    pagination: {
-      total: 1,
-    },
-    attributes,
-  }
-);
+const getData = (list = [defaultField]) => ({
+  list,
+  pagination: {
+    total: 1,
+  },
+  attributes,
+});
 
-const renderIndexSetFieldTypesPage = () => render(
-  <QueryParamProvider adapter={ReactRouter6Adapter}>
-    <TestStoreProvider>
-      <IndexSetFieldTypesPage />
-    </TestStoreProvider>,
-  </QueryParamProvider>,
-);
+const renderIndexSetFieldTypesPage = () =>
+  render(
+    <QueryParamProvider adapter={ReactRouter6Adapter}>
+      <TestStoreProvider>
+        <IndexSetFieldTypesPage />
+      </TestStoreProvider>
+      ,
+    </QueryParamProvider>,
+  );
 
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings', () => jest.fn());
 jest.mock('components/indices/IndexSetFieldTypes/hooks/useIndexSetFieldType', () => jest.fn());
@@ -63,12 +63,13 @@ jest.mock('stores/indices/IndexSetsStore', () => ({
     list: jest.fn(),
     get: jest.fn(),
   },
-  IndexSetsStore: MockStore(['getInitialState', () => ({
-    indexSets: [
-      { id: '111', title: 'index set title', field_type_profile: null },
-    ],
-    indexSet: { id: '111', title: 'index set title', field_type_profile: null },
-  })]),
+  IndexSetsStore: MockStore([
+    'getInitialState',
+    () => ({
+      indexSets: [{ id: '111', title: 'index set title', field_type_profile: null }],
+      indexSet: { id: '111', title: 'index set title', field_type_profile: null },
+    }),
+  ]),
 }));
 
 describe('IndexSetFieldTypesList', () => {
@@ -80,10 +81,7 @@ describe('IndexSetFieldTypesList', () => {
     asMock(useUserLayoutPreferences).mockReturnValue({
       data: {
         ...layoutPreferences,
-        displayedAttributes: ['field_name',
-          'origin',
-          'is_reserved',
-          'type'],
+        displayedAttributes: ['field_name', 'origin', 'is_reserved', 'type'],
       },
       isInitialLoading: false,
     });
@@ -99,7 +97,7 @@ describe('IndexSetFieldTypesList', () => {
       isLoading: false,
     });
 
-    asMock(useQueryParam).mockImplementation(() => ([undefined, () => {}]));
+    asMock(useQueryParam).mockImplementation(() => [undefined, () => {}]);
   });
 
   it('Shows modal on edit click', async () => {
@@ -107,7 +105,6 @@ describe('IndexSetFieldTypesList', () => {
       isLoading: false,
       refetch: () => {},
       data: getData([overriddenIndexField]),
-
     });
 
     renderIndexSetFieldTypesPage();

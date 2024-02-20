@@ -36,7 +36,7 @@ const _arrayMove = (array: Array<{ field: string }> | undefined, from: number, t
 };
 
 const _onSortEnd = (
-  { oldIndex, newIndex }: { oldIndex: number, newIndex: number },
+  { oldIndex, newIndex }: { oldIndex: number; newIndex: number },
   onChange: (newOptions: Array<string>) => void,
   values: Array<{ field: string }> | undefined,
 ) => {
@@ -45,28 +45,42 @@ const _onSortEnd = (
   onChange(newItems.map(({ field }) => field));
 };
 
-const _defaultValueTransformer = (values: Array<{ field: string }> | undefined) => values.map(({ field }) => field).join();
+const _defaultValueTransformer = (values: Array<{ field: string }> | undefined) =>
+  values.map(({ field }) => field).join();
 
 type Props = {
-  allowOptionCreation?: boolean,
-  inputId?: string,
-  onChange: (newOptions: Array<string>) => void,
-  options: Array<{ label: string, value: string }>,
-  value: Array<{ field: string }> | undefined,
-  valueComponent: React.ComponentType<any>,
-  valueTransformer?: (value: Array<{ field: string }>) => Array<{ value: any, label: string }>,
-}
-const SortableMultiValue = SortableElement<{ innerProps: { title: string }}>(Components.MultiValue);
+  allowOptionCreation?: boolean;
+  inputId?: string;
+  onChange: (newOptions: Array<string>) => void;
+  options: Array<{ label: string; value: string }>;
+  value: Array<{ field: string }> | undefined;
+  valueComponent: React.ComponentType<any>;
+  valueTransformer?: (value: Array<{ field: string }>) => Array<{ value: any; label: string }>;
+};
+const SortableMultiValue = SortableElement<{ innerProps: { title: string } }>(Components.MultiValue);
 
-const SortableSelect = ({ onChange, value, valueComponent, valueTransformer, inputId, allowOptionCreation, options }: Props) => {
+const SortableSelect = ({
+  onChange,
+  value,
+  valueComponent,
+  valueTransformer,
+  inputId,
+  allowOptionCreation,
+  options,
+}: Props) => {
   const values = valueTransformer(value);
 
-  const Item = useCallback((itemProps: { data: { value: string }}) => {
-    const { data: { value: itemValue } } = itemProps;
-    const index = findIndex(value, (v) => v.field === itemValue);
+  const Item = useCallback(
+    (itemProps: { data: { value: string } }) => {
+      const {
+        data: { value: itemValue },
+      } = itemProps;
+      const index = findIndex(value, (v) => v.field === itemValue);
 
-    return <SortableMultiValue index={index} {...itemProps} innerProps={{ title: itemValue }} />;
-  }, [value]);
+      return <SortableMultiValue index={index} {...itemProps} innerProps={{ title: itemValue }} />;
+    },
+    [value],
+  );
 
   const _components = {
     MultiValueLabel: valueComponent,
@@ -74,19 +88,21 @@ const SortableSelect = ({ onChange, value, valueComponent, valueTransformer, inp
   };
 
   return (
-    <SortableSelectContainer allowCreate={allowOptionCreation}
-                             axis="x"
-                             components={_components}
-                             helperClass={`Select--multi has-value is-clearable is-searchable ${styles.draggedElement}`}
-                             inputId={inputId}
-                             multi
-                             onChange={(newValue: string = '') => {
-                               onChange(newValue.split(','));
-                             }}
-                             onSortEnd={(v) => _onSortEnd(v, onChange, value)}
-                             options={options}
-                             pressDelay={200}
-                             value={values} />
+    <SortableSelectContainer
+      allowCreate={allowOptionCreation}
+      axis="x"
+      components={_components}
+      helperClass={`Select--multi has-value is-clearable is-searchable ${styles.draggedElement}`}
+      inputId={inputId}
+      multi
+      onChange={(newValue: string = '') => {
+        onChange(newValue.split(','));
+      }}
+      onSortEnd={(v) => _onSortEnd(v, onChange, value)}
+      options={options}
+      pressDelay={200}
+      value={values}
+    />
   );
 };
 

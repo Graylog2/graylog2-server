@@ -36,11 +36,7 @@ describe('CustomMenuList', () => {
   };
 
   it('Should render AsyncCustomMenuList', () => {
-    render(
-      <AsyncCustomMenuList selectProps={mockSelectProps}>
-        {getChildrenList(50)}
-      </AsyncCustomMenuList>,
-    );
+    render(<AsyncCustomMenuList selectProps={mockSelectProps}>{getChildrenList(50)}</AsyncCustomMenuList>);
 
     const list = screen.getAllByTestId('react-window-list-item');
 
@@ -48,11 +44,7 @@ describe('CustomMenuList', () => {
   });
 
   it('Should load more items on scrool', async () => {
-    render(
-      <AsyncCustomMenuList selectProps={mockSelectProps}>
-        {getChildrenList(5)}
-      </AsyncCustomMenuList>,
-    );
+    render(<AsyncCustomMenuList selectProps={mockSelectProps}>{getChildrenList(5)}</AsyncCustomMenuList>);
 
     const list = screen.getByTestId('infinite-loader-container').firstChild;
 

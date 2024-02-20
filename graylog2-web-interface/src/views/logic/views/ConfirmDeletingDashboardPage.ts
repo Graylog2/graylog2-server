@@ -22,11 +22,20 @@ import iterateConfirmationHooks from 'views/hooks/IterateConfirmationHooks';
 // eslint-disable-next-line no-alert
 const defaultConfirm = async () => window.confirm('Do you really want to delete this dashboard page?');
 
-const ConfirmDeletingDashboardPage = async (dashboardId: string, activeQueryId: string, widgetIds: Map<string, List<string>>) => {
+const ConfirmDeletingDashboardPage = async (
+  dashboardId: string,
+  activeQueryId: string,
+  widgetIds: Map<string, List<string>>,
+) => {
   const _widgetIds = widgetIds.map((ids) => ids.toArray()).toObject();
   const deletingDashboardPageHooks = PluginStore.exports('views.hooks.confirmDeletingDashboardPage');
 
-  return iterateConfirmationHooks([...deletingDashboardPageHooks, defaultConfirm], dashboardId, activeQueryId, _widgetIds);
+  return iterateConfirmationHooks(
+    [...deletingDashboardPageHooks, defaultConfirm],
+    dashboardId,
+    activeQueryId,
+    _widgetIds,
+  );
 };
 
 export default ConfirmDeletingDashboardPage;

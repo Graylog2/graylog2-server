@@ -33,48 +33,52 @@ const hotspotExpand = keyframes`
   }
 `;
 
-const HotspotTrigger = styled.button(({ theme }) => css`
-  && {
-    border-radius: 50%;
-    height: ${HOTSPOT_HEIGHT}px;
-    width: ${HOTSPOT_HEIGHT}px;
-    background: ${theme.colors.variant.warning};
-    color: ${theme.utils.contrastingColor(theme.colors.variant.warning)};
-    border: 0;
-    font-size: ${theme.fonts.size.huge};
-
-    &:hover {
+const HotspotTrigger = styled.button(
+  ({ theme }) => css`
+    && {
+      border-radius: 50%;
+      height: ${HOTSPOT_HEIGHT}px;
+      width: ${HOTSPOT_HEIGHT}px;
       background: ${theme.colors.variant.warning};
       color: ${theme.utils.contrastingColor(theme.colors.variant.warning)};
-    }
-  }
-  
-  &::before {
-    background: ${theme.colors.variant.warning};
-    content: "";
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    z-index: -1;
-    opacity: 0;
-    animation: ${hotspotExpand} 2s infinite;
-    border-radius: 50%;
-    left: 0;
-    top: 0;
-  }
-`);
+      border: 0;
+      font-size: ${theme.fonts.size.huge};
 
-const HotspotContainer = styled.div<{ $positionX: string, $positionY: string }>(({ $positionX, $positionY }) => css`
-  position: absolute;
-  top: ${$positionY};
-  left: calc(${$positionX} - ${HOTSPOT_HEIGHT / 2}px);
-`);
+      &:hover {
+        background: ${theme.colors.variant.warning};
+        color: ${theme.utils.contrastingColor(theme.colors.variant.warning)};
+      }
+    }
+
+    &::before {
+      background: ${theme.colors.variant.warning};
+      content: '';
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      z-index: -1;
+      opacity: 0;
+      animation: ${hotspotExpand} 2s infinite;
+      border-radius: 50%;
+      left: 0;
+      top: 0;
+    }
+  `,
+);
+
+const HotspotContainer = styled.div<{ $positionX: string; $positionY: string }>(
+  ({ $positionX, $positionY }) => css`
+    position: absolute;
+    top: ${$positionY};
+    left: calc(${$positionX} - ${HOTSPOT_HEIGHT / 2}px);
+  `,
+);
 
 type TooltipProps = React.PropsWithChildren<{
-  positionX: string,
-  positionY: string,
-  index: number,
-}>
+  positionX: string;
+  positionY: string;
+  index: number;
+}>;
 
 const Hotspot = ({ children, positionX, positionY, index }: TooltipProps) => {
   const [show, setShow] = useState(false);
@@ -85,20 +89,19 @@ const Hotspot = ({ children, positionX, positionY, index }: TooltipProps) => {
 
   return (
     <HotspotContainer $positionX={positionX} $positionY={positionY} ref={container}>
-
       <Popover opened={show} position="bottom" id="session-badge-details" width={275}>
         <Popover.Target>
-          <HotspotTrigger onMouseOver={showPopover}
-                          onMouseOut={hidePopover}
-                          onFocus={showPopover}
-                          onBlur={hidePopover}
-                          ref={target}>
+          <HotspotTrigger
+            onMouseOver={showPopover}
+            onMouseOut={hidePopover}
+            onFocus={showPopover}
+            onBlur={hidePopover}
+            ref={target}
+          >
             {index + 1}
           </HotspotTrigger>
         </Popover.Target>
-        <Popover.Dropdown>
-          {children}
-        </Popover.Dropdown>
+        <Popover.Dropdown>{children}</Popover.Dropdown>
       </Popover>
     </HotspotContainer>
   );

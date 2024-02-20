@@ -21,11 +21,12 @@ import type { Stream } from 'views/stores/StreamsStore';
 import { StreamsStore } from 'views/stores/StreamsStore';
 import useCurrentStream from 'views/logic/fieldactions/ChangeFieldType/hooks/useCurrentStream';
 
-const streamsMapper = ({ streams }) => streams.map((stream: Stream) => ({ indexSet: stream.index_set_id, id: stream.id }));
+const streamsMapper = ({ streams }) =>
+  streams.map((stream: Stream) => ({ indexSet: stream.index_set_id, id: stream.id }));
 
 const useInitialSelection = () => {
   const currentStreams = useCurrentStream();
-  const availableStreams: Array<{ indexSet: string, id: string }> = useStore(StreamsStore, streamsMapper);
+  const availableStreams: Array<{ indexSet: string; id: string }> = useStore(StreamsStore, streamsMapper);
 
   return useMemo(() => {
     const currentStreamSet = new Set(currentStreams);

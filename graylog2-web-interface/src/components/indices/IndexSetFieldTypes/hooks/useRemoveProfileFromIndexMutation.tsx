@@ -26,10 +26,7 @@ import type {
 
 export const urlPrefix = '/system/indices/mappings/remove_profile_from';
 
-const putRemoveProfileFromIndex = async ({
-  indexSetId,
-  rotated,
-}: RemoveProfileFromIndexSetBody) => {
+const putRemoveProfileFromIndex = async ({ indexSetId, rotated }: RemoveProfileFromIndexSetBody) => {
   const url = qualifyUrl(urlPrefix);
   const body: RemoveProfileFromIndexSetBodyJson = {
     index_sets: [indexSetId],
@@ -44,8 +41,10 @@ const useRemoveProfileFromIndexMutation = () => {
 
   const put = useMutation(putRemoveProfileFromIndex, {
     onError: (errorThrown) => {
-      UserNotification.error(`Removing profile from index failed with status: ${errorThrown}`,
-        'Could not remove profile from index');
+      UserNotification.error(
+        `Removing profile from index failed with status: ${errorThrown}`,
+        'Could not remove profile from index',
+      );
     },
     onSuccess: () => {
       UserNotification.success('Removed profile from index successfully', 'Success!');

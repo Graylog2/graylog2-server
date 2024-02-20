@@ -31,11 +31,12 @@ const fieldTypesUrl = qualifyUrl('/views/fields');
 type FieldTypesResponse = Array<FieldTypeMappingJSON>;
 
 type FieldTypesRequest = {
-  streams?: Array<string>,
-  timerange?: TimeRange,
+  streams?: Array<string>;
+  timerange?: TimeRange;
 };
 
-const _deserializeFieldTypes = (response: FieldTypesResponse) => response.map((fieldTypeMapping) => FieldTypeMapping.fromJSON(fieldTypeMapping));
+const _deserializeFieldTypes = (response: FieldTypesResponse) =>
+  response.map((fieldTypeMapping) => FieldTypeMapping.fromJSON(fieldTypeMapping));
 
 const createFieldTypeRequest = (streams: Array<string>, timerange: TimeRange): FieldTypesRequest => {
   let request: FieldTypesRequest = {};
@@ -51,10 +52,8 @@ const createFieldTypeRequest = (streams: Array<string>, timerange: TimeRange): F
   return request;
 };
 
-const fetchAllFieldTypes = (streams: Array<string>, timerange: TimeRange): Promise<Array<FieldTypeMapping>> => fetch(
-  'POST', fieldTypesUrl, createFieldTypeRequest(streams, timerange),
-)
-  .then(_deserializeFieldTypes);
+const fetchAllFieldTypes = (streams: Array<string>, timerange: TimeRange): Promise<Array<FieldTypeMapping>> =>
+  fetch('POST', fieldTypesUrl, createFieldTypeRequest(streams, timerange)).then(_deserializeFieldTypes);
 
 const normalizeTimeRange = (timerange: TimeRange, userTz: string): TimeRange => {
   switch (timerange?.type) {
@@ -69,15 +68,18 @@ const normalizeTimeRange = (timerange: TimeRange, userTz: string): TimeRange => 
   }
 };
 
-const useFieldTypes = (streams: Array<string>, timerange: TimeRange): { data: FieldTypeMapping[], refetch: () => void, isLoading?: boolean } => {
+const useFieldTypes = (
+  streams: Array<string>,
+  timerange: TimeRange,
+): { data: FieldTypeMapping[]; refetch: () => void; isLoading?: boolean } => {
   const { userTimezone } = useUserDateTime();
   const _timerange = useMemo(() => normalizeTimeRange(timerange, userTimezone), [timerange, userTimezone]);
 
-  return useQuery(
-    ['fieldTypes', streams, _timerange],
-    () => fetchAllFieldTypes(streams, _timerange),
-    { staleTime: 30000, refetchOnWindowFocus: false, cacheTime: 0 },
-  );
+  return useQuery(['fieldTypes', streams, _timerange], () => fetchAllFieldTypes(streams, _timerange), {
+    staleTime: 30000,
+    refetchOnWindowFocus: false,
+    cacheTime: 0,
+  });
 };
 
 export default singleton('hooks.useFieldTypes', () => useFieldTypes);

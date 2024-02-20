@@ -23,10 +23,10 @@ import { toUTCFromTz, toDateObject } from 'util/DateTime';
 import useUserDateTime from 'hooks/useUserDateTime';
 
 type Props = {
-  dateTime: string,
-  onChange?: (string) => void,
-  startDate?: Date,
-}
+  dateTime: string;
+  onChange?: (string) => void;
+  startDate?: Date;
+};
 
 const AbsoluteDatePicker = ({ dateTime, onChange, startDate }: Props) => {
   const { userTimezone, formatTime } = useUserDateTime();
@@ -48,11 +48,7 @@ const AbsoluteDatePicker = ({ dateTime, onChange, startDate }: Props) => {
     return onChange(formatTime(newDate, 'default'));
   };
 
-  return (
-    <DatePicker date={initialDate}
-                onChange={_onDatePicked}
-                fromDate={startDate} />
-  );
+  return <DatePicker date={initialDate} onChange={_onDatePicked} fromDate={startDate} />;
 };
 
 AbsoluteDatePicker.propTypes = {

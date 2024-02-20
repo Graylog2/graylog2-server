@@ -28,9 +28,16 @@ import { profile1 } from 'fixtures/indexSetFieldTypeProfiles';
 
 const mockSubmit = jest.fn();
 const mockCancel = jest.fn();
-const renderProfileForm = ({ initialValues }) => render(
-  <ProfileForm onCancel={mockCancel} onSubmit={mockSubmit} submitLoadingText="Submitting..." submitButtonText="Submit" initialValues={initialValues} />,
-);
+const renderProfileForm = ({ initialValues }) =>
+  render(
+    <ProfileForm
+      onCancel={mockCancel}
+      onSubmit={mockSubmit}
+      submitLoadingText="Submitting..."
+      submitButtonText="Submit"
+      initialValues={initialValues}
+    />,
+  );
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings', () => jest.fn());
 
 jest.mock('views/logic/fieldtypes/useFieldTypes', () => jest.fn());
@@ -60,9 +67,7 @@ describe('IndexSetFieldTypesList', () => {
       isLoading: false,
     });
 
-    asMock(useFieldTypes).mockImplementation(() => (
-      { data: simpleFields().toArray(), refetch: jest.fn() }
-    ));
+    asMock(useFieldTypes).mockImplementation(() => ({ data: simpleFields().toArray(), refetch: jest.fn() }));
   });
 
   it('Do not run onSubmit when has empty name', async () => {
@@ -83,9 +88,7 @@ describe('IndexSetFieldTypesList', () => {
     renderProfileForm({
       initialValues: {
         ...profile1,
-        customFieldMappings: [
-          { field: 'http_method', type: 'string' },
-        ],
+        customFieldMappings: [{ field: 'http_method', type: 'string' }],
       },
     });
 
@@ -111,9 +114,7 @@ describe('IndexSetFieldTypesList', () => {
     renderProfileForm({
       initialValues: {
         ...profile1,
-        customFieldMappings: [
-          { field: 'http_method', type: 'string' },
-        ],
+        customFieldMappings: [{ field: 'http_method', type: 'string' }],
       },
     });
 

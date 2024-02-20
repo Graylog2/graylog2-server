@@ -26,10 +26,16 @@ import isEmpty from 'lodash/isEmpty';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 import { Spinner } from 'components/common';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
-import { CollectorConfigurationsActions, CollectorConfigurationsStore } from 'stores/sidecars/CollectorConfigurationsStore';
+import {
+  CollectorConfigurationsActions,
+  CollectorConfigurationsStore,
+} from 'stores/sidecars/CollectorConfigurationsStore';
 import { CollectorsActions, CollectorsStore } from 'stores/sidecars/CollectorsStore';
 import { SidecarsActions } from 'stores/sidecars/SidecarsStore';
-import { SidecarsAdministrationActions, SidecarsAdministrationStore } from 'stores/sidecars/SidecarsAdministrationStore';
+import {
+  SidecarsAdministrationActions,
+  SidecarsAdministrationStore,
+} from 'stores/sidecars/SidecarsAdministrationStore';
 
 import CollectorsAdministration, { PAGE_SIZES } from './CollectorsAdministration';
 
@@ -40,7 +46,11 @@ const CollectorsAdministrationContainer = createReactClass({
     paginationQueryParameter: PropTypes.object.isRequired,
   },
 
-  mixins: [Reflux.connect(CollectorsStore, 'collectors'), Reflux.connect(SidecarsAdministrationStore, 'sidecars'), Reflux.connect(CollectorConfigurationsStore, 'configurations')],
+  mixins: [
+    Reflux.connect(CollectorsStore, 'collectors'),
+    Reflux.connect(SidecarsAdministrationStore, 'sidecars'),
+    Reflux.connect(CollectorConfigurationsStore, 'configurations'),
+  ],
 
   getDefaultProps() {
     return {
@@ -136,7 +146,14 @@ const CollectorsAdministrationContainer = createReactClass({
   render() {
     const { collectors, configurations, sidecars } = this.state;
 
-    if (!collectors || !collectors.collectors || !sidecars || !sidecars.sidecars || !configurations || !configurations.configurations) {
+    if (
+      !collectors ||
+      !collectors.collectors ||
+      !sidecars ||
+      !sidecars.sidecars ||
+      !configurations ||
+      !configurations.configurations
+    ) {
       return <Spinner text="Loading collector list..." />;
     }
 
@@ -161,17 +178,19 @@ const CollectorsAdministrationContainer = createReactClass({
       });
 
     return (
-      <CollectorsAdministration sidecarCollectorPairs={sidecarCollectors}
-                                collectors={collectors.collectors}
-                                configurations={configurations.configurations}
-                                pagination={sidecars.pagination}
-                                query={sidecars.query}
-                                filters={sidecars.filters}
-                                onPageChange={this.handlePageChange}
-                                onFilter={this.handleFilter}
-                                onQueryChange={this.handleQueryChange}
-                                onConfigurationChange={this.handleConfigurationChange}
-                                onProcessAction={this.handleProcessAction} />
+      <CollectorsAdministration
+        sidecarCollectorPairs={sidecarCollectors}
+        collectors={collectors.collectors}
+        configurations={configurations.configurations}
+        pagination={sidecars.pagination}
+        query={sidecars.query}
+        filters={sidecars.filters}
+        onPageChange={this.handlePageChange}
+        onFilter={this.handleFilter}
+        onQueryChange={this.handleQueryChange}
+        onConfigurationChange={this.handleConfigurationChange}
+        onProcessAction={this.handleProcessAction}
+      />
     );
   },
 });

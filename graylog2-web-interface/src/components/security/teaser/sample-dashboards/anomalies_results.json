@@ -117,9 +117,7 @@
             "row_groups": [
               {
                 "type": "time",
-                "fields": [
-                  "timestamp"
-                ],
+                "fields": ["timestamp"],
                 "interval": {
                   "type": "auto",
                   "scaling": 1
@@ -129,9 +127,7 @@
             "column_groups": [
               {
                 "type": "values",
-                "fields": [
-                  "anomaly_detector_name"
-                ],
+                "fields": ["anomaly_detector_name"],
                 "limit": 15,
                 "skip_empty_values": false
               }
@@ -164,9 +160,7 @@
             "row_groups": [
               {
                 "type": "values",
-                "fields": [
-                  "anomaly_detector_name"
-                ],
+                "fields": ["anomaly_detector_name"],
                 "limit": 15,
                 "skip_empty_values": false
               }
@@ -256,9 +250,7 @@
             "row_groups": [
               {
                 "type": "time",
-                "fields": [
-                  "timestamp"
-                ],
+                "fields": ["timestamp"],
                 "interval": {
                   "type": "auto",
                   "scaling": 1
@@ -268,9 +260,7 @@
             "column_groups": [
               {
                 "type": "values",
-                "fields": [
-                  "user_name"
-                ],
+                "fields": ["user_name"],
                 "limit": 15,
                 "skip_empty_values": false
               }
@@ -330,9 +320,7 @@
             "row_groups": [
               {
                 "type": "values",
-                "fields": [
-                  "user_name"
-                ],
+                "fields": ["user_name"],
                 "limit": 15,
                 "skip_empty_values": false
               }
@@ -395,9 +383,7 @@
             "row_groups": [
               {
                 "type": "time",
-                "fields": [
-                  "timestamp"
-                ],
+                "fields": ["timestamp"],
                 "interval": {
                   "type": "auto",
                   "scaling": 1
@@ -516,9 +502,7 @@
             "row_groups": [
               {
                 "type": "time",
-                "fields": [
-                  "timestamp"
-                ],
+                "fields": ["timestamp"],
                 "interval": {
                   "type": "auto",
                   "scaling": 1
@@ -528,9 +512,7 @@
             "column_groups": [
               {
                 "type": "values",
-                "fields": [
-                  "anomaly_detector_name"
-                ],
+                "fields": ["anomaly_detector_name"],
                 "limit": 15,
                 "skip_empty_values": false
               }
@@ -555,15 +537,10 @@
           "id": "773fee94-65f4-49d4-9fc3-43c26f51eee7",
           "rows": [
             {
-              "key": [
-                "2023-11-29T18:00:00.000Z"
-              ],
+              "key": ["2023-11-29T18:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "kpearson-dkstp$",
-                    "count()"
-                  ],
+                  "key": ["kpearson-dkstp$", "count()"],
                   "value": 1,
                   "rollup": false,
                   "source": "col-leaf"
@@ -572,22 +549,15 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T18:30:00.000Z"
-              ],
+              "key": ["2023-11-29T18:30:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T19:00:00.000Z"
-              ],
+              "key": ["2023-11-29T19:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "abritt",
-                    "count()"
-                  ],
+                  "key": ["abritt", "count()"],
                   "value": 1,
                   "rollup": false,
                   "source": "col-leaf"
@@ -596,15 +566,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T19:30:00.000Z"
-              ],
+              "key": ["2023-11-29T19:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "abritt",
-                    "count()"
-                  ],
+                  "key": ["abritt", "count()"],
                   "value": 1,
                   "rollup": false,
                   "source": "col-leaf"
@@ -613,15 +578,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T20:00:00.000Z"
-              ],
+              "key": ["2023-11-29T20:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "abritt",
-                    "count()"
-                  ],
+                  "key": ["abritt", "count()"],
                   "value": 1,
                   "rollup": false,
                   "source": "col-leaf"
@@ -630,24 +590,16 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T20:30:00.000Z"
-              ],
+              "key": ["2023-11-29T20:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "dbenitez-dkstp$",
-                    "count()"
-                  ],
+                  "key": ["dbenitez-dkstp$", "count()"],
                   "value": 1,
                   "rollup": false,
                   "source": "col-leaf"
                 },
                 {
-                  "key": [
-                    "tlott",
-                    "count()"
-                  ],
+                  "key": ["tlott", "count()"],
                   "value": 1,
                   "rollup": false,
                   "source": "col-leaf"
@@ -656,15 +608,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T21:00:00.000Z"
-              ],
+              "key": ["2023-11-29T21:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "dmiranda-dkstp$",
-                    "count()"
-                  ],
+                  "key": ["dmiranda-dkstp$", "count()"],
                   "value": 1,
                   "rollup": false,
                   "source": "col-leaf"
@@ -673,22 +620,15 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T21:30:00.000Z"
-              ],
+              "key": ["2023-11-29T21:30:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T22:00:00.000Z"
-              ],
+              "key": ["2023-11-29T22:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "tfarley-dkstp$",
-                    "count()"
-                  ],
+                  "key": ["tfarley-dkstp$", "count()"],
                   "value": 1,
                   "rollup": false,
                   "source": "col-leaf"
@@ -697,43 +637,30 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T22:30:00.000Z"
-              ],
+              "key": ["2023-11-29T22:30:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T23:00:00.000Z"
-              ],
+              "key": ["2023-11-29T23:00:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T23:30:00.000Z"
-              ],
+              "key": ["2023-11-29T23:30:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T00:00:00.000Z"
-              ],
+              "key": ["2023-11-30T00:00:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T00:30:00.000Z"
-              ],
+              "key": ["2023-11-30T00:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "cmcknight-dkstp$",
-                    "count()"
-                  ],
+                  "key": ["cmcknight-dkstp$", "count()"],
                   "value": 1,
                   "rollup": false,
                   "source": "col-leaf"
@@ -742,43 +669,30 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T01:00:00.000Z"
-              ],
+              "key": ["2023-11-30T01:00:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T01:30:00.000Z"
-              ],
+              "key": ["2023-11-30T01:30:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T02:00:00.000Z"
-              ],
+              "key": ["2023-11-30T02:00:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T02:30:00.000Z"
-              ],
+              "key": ["2023-11-30T02:30:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T03:00:00.000Z"
-              ],
+              "key": ["2023-11-30T03:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "lbusby",
-                    "count()"
-                  ],
+                  "key": ["lbusby", "count()"],
                   "value": 1,
                   "rollup": false,
                   "source": "col-leaf"
@@ -787,22 +701,15 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T03:30:00.000Z"
-              ],
+              "key": ["2023-11-30T03:30:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T04:00:00.000Z"
-              ],
+              "key": ["2023-11-30T04:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "lbusby",
-                    "count()"
-                  ],
+                  "key": ["lbusby", "count()"],
                   "value": 1,
                   "rollup": false,
                   "source": "col-leaf"
@@ -811,29 +718,20 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T04:30:00.000Z"
-              ],
+              "key": ["2023-11-30T04:30:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T05:00:00.000Z"
-              ],
+              "key": ["2023-11-30T05:00:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T05:30:00.000Z"
-              ],
+              "key": ["2023-11-30T05:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "kpearson-dkstp$",
-                    "count()"
-                  ],
+                  "key": ["kpearson-dkstp$", "count()"],
                   "value": 1,
                   "rollup": false,
                   "source": "col-leaf"
@@ -842,36 +740,25 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T06:00:00.000Z"
-              ],
+              "key": ["2023-11-30T06:00:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T06:30:00.000Z"
-              ],
+              "key": ["2023-11-30T06:30:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T07:00:00.000Z"
-              ],
+              "key": ["2023-11-30T07:00:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T07:30:00.000Z"
-              ],
+              "key": ["2023-11-30T07:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "tfarley",
-                    "count()"
-                  ],
+                  "key": ["tfarley", "count()"],
                   "value": 1,
                   "rollup": false,
                   "source": "col-leaf"
@@ -880,71 +767,50 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T08:00:00.000Z"
-              ],
+              "key": ["2023-11-30T08:00:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T08:30:00.000Z"
-              ],
+              "key": ["2023-11-30T08:30:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T09:00:00.000Z"
-              ],
+              "key": ["2023-11-30T09:00:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T09:30:00.000Z"
-              ],
+              "key": ["2023-11-30T09:30:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T10:00:00.000Z"
-              ],
+              "key": ["2023-11-30T10:00:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T10:30:00.000Z"
-              ],
+              "key": ["2023-11-30T10:30:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T11:00:00.000Z"
-              ],
+              "key": ["2023-11-30T11:00:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T11:30:00.000Z"
-              ],
+              "key": ["2023-11-30T11:30:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T12:00:00.000Z"
-              ],
+              "key": ["2023-11-30T12:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "lbusby",
-                    "count()"
-                  ],
+                  "key": ["lbusby", "count()"],
                   "value": 1,
                   "rollup": false,
                   "source": "col-leaf"
@@ -953,29 +819,20 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T12:30:00.000Z"
-              ],
+              "key": ["2023-11-30T12:30:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T13:00:00.000Z"
-              ],
+              "key": ["2023-11-30T13:00:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T13:30:00.000Z"
-              ],
+              "key": ["2023-11-30T13:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "tfarley",
-                    "count()"
-                  ],
+                  "key": ["tfarley", "count()"],
                   "value": 1,
                   "rollup": false,
                   "source": "col-leaf"
@@ -984,15 +841,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T14:00:00.000Z"
-              ],
+              "key": ["2023-11-30T14:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "mgray",
-                    "count()"
-                  ],
+                  "key": ["mgray", "count()"],
                   "value": 1,
                   "rollup": false,
                   "source": "col-leaf"
@@ -1017,9 +869,7 @@
               "key": [],
               "values": [
                 {
-                  "key": [
-                    "card(user_name)"
-                  ],
+                  "key": ["card(user_name)"],
                   "value": 10,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1041,14 +891,10 @@
           "id": "1fa3fbfe-0d41-42d1-86b1-d666cdcd6273",
           "rows": [
             {
-              "key": [
-                "abritt"
-              ],
+              "key": ["abritt"],
               "values": [
                 {
-                  "key": [
-                    "Average anomaly_grade"
-                  ],
+                  "key": ["Average anomaly_grade"],
                   "value": 0.11666666716337204,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1057,14 +903,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "lbusby"
-              ],
+              "key": ["lbusby"],
               "values": [
                 {
-                  "key": [
-                    "Average anomaly_grade"
-                  ],
+                  "key": ["Average anomaly_grade"],
                   "value": 0.14333333323399225,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1073,14 +915,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "kpearson-dkstp$"
-              ],
+              "key": ["kpearson-dkstp$"],
               "values": [
                 {
-                  "key": [
-                    "Average anomaly_grade"
-                  ],
+                  "key": ["Average anomaly_grade"],
                   "value": 0.1599999964237213,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1089,14 +927,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "tfarley"
-              ],
+              "key": ["tfarley"],
               "values": [
                 {
-                  "key": [
-                    "Average anomaly_grade"
-                  ],
+                  "key": ["Average anomaly_grade"],
                   "value": 0.11999999731779099,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1105,14 +939,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "cmcknight-dkstp$"
-              ],
+              "key": ["cmcknight-dkstp$"],
               "values": [
                 {
-                  "key": [
-                    "Average anomaly_grade"
-                  ],
+                  "key": ["Average anomaly_grade"],
                   "value": 0.1599999964237213,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1121,14 +951,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "dbenitez-dkstp$"
-              ],
+              "key": ["dbenitez-dkstp$"],
               "values": [
                 {
-                  "key": [
-                    "Average anomaly_grade"
-                  ],
+                  "key": ["Average anomaly_grade"],
                   "value": 0.019999999552965164,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1137,14 +963,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "dmiranda-dkstp$"
-              ],
+              "key": ["dmiranda-dkstp$"],
               "values": [
                 {
-                  "key": [
-                    "Average anomaly_grade"
-                  ],
+                  "key": ["Average anomaly_grade"],
                   "value": 0.12999999523162842,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1153,14 +975,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "mgray"
-              ],
+              "key": ["mgray"],
               "values": [
                 {
-                  "key": [
-                    "Average anomaly_grade"
-                  ],
+                  "key": ["Average anomaly_grade"],
                   "value": 0.15000000596046448,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1169,14 +987,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "tfarley-dkstp$"
-              ],
+              "key": ["tfarley-dkstp$"],
               "values": [
                 {
-                  "key": [
-                    "Average anomaly_grade"
-                  ],
+                  "key": ["Average anomaly_grade"],
                   "value": 0.09000000357627869,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1185,14 +999,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "tlott"
-              ],
+              "key": ["tlott"],
               "values": [
                 {
-                  "key": [
-                    "Average anomaly_grade"
-                  ],
+                  "key": ["Average anomaly_grade"],
                   "value": 0.07999999821186066,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1204,9 +1014,7 @@
               "key": [],
               "values": [
                 {
-                  "key": [
-                    "Average anomaly_grade"
-                  ],
+                  "key": ["Average anomaly_grade"],
                   "value": 0.12312499922700226,
                   "rollup": true,
                   "source": "row-inner"
@@ -1231,9 +1039,7 @@
               "key": [],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 0,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1255,15 +1061,10 @@
           "id": "0f79f847-f210-4333-86c2-71e58ee8230d",
           "rows": [
             {
-              "key": [
-                "2023-11-29T15:30:00.000Z"
-              ],
+              "key": ["2023-11-29T15:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "Cisco ASA - Unusual Data Transfer",
-                    "avg(anomaly_confidence)"
-                  ],
+                  "key": ["Cisco ASA - Unusual Data Transfer", "avg(anomaly_confidence)"],
                   "value": 0.8250000178813934,
                   "rollup": false,
                   "source": "col-leaf"
@@ -1272,29 +1073,20 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T16:00:00.000Z"
-              ],
+              "key": ["2023-11-29T16:00:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T16:30:00.000Z"
-              ],
+              "key": ["2023-11-29T16:30:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T17:00:00.000Z"
-              ],
+              "key": ["2023-11-29T17:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "Cisco ASA - Unusual Data Transfer",
-                    "avg(anomaly_confidence)"
-                  ],
+                  "key": ["Cisco ASA - Unusual Data Transfer", "avg(anomaly_confidence)"],
                   "value": 0.8199999928474426,
                   "rollup": false,
                   "source": "col-leaf"
@@ -1303,31 +1095,21 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T17:30:00.000Z"
-              ],
+              "key": ["2023-11-29T17:30:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T18:00:00.000Z"
-              ],
+              "key": ["2023-11-29T18:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "Cisco ASA - Unusual Data Transfer",
-                    "avg(anomaly_confidence)"
-                  ],
+                  "key": ["Cisco ASA - Unusual Data Transfer", "avg(anomaly_confidence)"],
                   "value": 0.75,
                   "rollup": false,
                   "source": "col-leaf"
                 },
                 {
-                  "key": [
-                    "Windows Security Event Log - Failed Authentication",
-                    "avg(anomaly_confidence)"
-                  ],
+                  "key": ["Windows Security Event Log - Failed Authentication", "avg(anomaly_confidence)"],
                   "value": 0.550000011920929,
                   "rollup": false,
                   "source": "col-leaf"
@@ -1336,15 +1118,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T18:30:00.000Z"
-              ],
+              "key": ["2023-11-29T18:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "Cisco ASA - Unusual Data Transfer",
-                    "avg(anomaly_confidence)"
-                  ],
+                  "key": ["Cisco ASA - Unusual Data Transfer", "avg(anomaly_confidence)"],
                   "value": 0.5899999737739563,
                   "rollup": false,
                   "source": "col-leaf"
@@ -1353,24 +1130,16 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T19:00:00.000Z"
-              ],
+              "key": ["2023-11-29T19:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "Cisco ASA - Unusual Data Transfer",
-                    "avg(anomaly_confidence)"
-                  ],
+                  "key": ["Cisco ASA - Unusual Data Transfer", "avg(anomaly_confidence)"],
                   "value": 0.6200000047683716,
                   "rollup": false,
                   "source": "col-leaf"
                 },
                 {
-                  "key": [
-                    "Windows Security Event Log - Failed Authentication",
-                    "avg(anomaly_confidence)"
-                  ],
+                  "key": ["Windows Security Event Log - Failed Authentication", "avg(anomaly_confidence)"],
                   "value": 0.6600000262260437,
                   "rollup": false,
                   "source": "col-leaf"
@@ -1379,24 +1148,16 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T19:30:00.000Z"
-              ],
+              "key": ["2023-11-29T19:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "Cisco ASA - Unusual Data Transfer",
-                    "avg(anomaly_confidence)"
-                  ],
+                  "key": ["Cisco ASA - Unusual Data Transfer", "avg(anomaly_confidence)"],
                   "value": 0.5099999904632568,
                   "rollup": false,
                   "source": "col-leaf"
                 },
                 {
-                  "key": [
-                    "Windows Security Event Log - Failed Authentication",
-                    "avg(anomaly_confidence)"
-                  ],
+                  "key": ["Windows Security Event Log - Failed Authentication", "avg(anomaly_confidence)"],
                   "value": 0.7200000286102295,
                   "rollup": false,
                   "source": "col-leaf"
@@ -1405,15 +1166,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T20:00:00.000Z"
-              ],
+              "key": ["2023-11-29T20:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "Windows Security Event Log - Failed Authentication",
-                    "avg(anomaly_confidence)"
-                  ],
+                  "key": ["Windows Security Event Log - Failed Authentication", "avg(anomaly_confidence)"],
                   "value": 0.6800000071525574,
                   "rollup": false,
                   "source": "col-leaf"
@@ -1422,15 +1178,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T20:30:00.000Z"
-              ],
+              "key": ["2023-11-29T20:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "Windows Security Event Log - Failed Authentication",
-                    "avg(anomaly_confidence)"
-                  ],
+                  "key": ["Windows Security Event Log - Failed Authentication", "avg(anomaly_confidence)"],
                   "value": 0.6650000214576721,
                   "rollup": false,
                   "source": "col-leaf"
@@ -1439,24 +1190,16 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T21:00:00.000Z"
-              ],
+              "key": ["2023-11-29T21:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "Cisco ASA - Unusual Data Transfer",
-                    "avg(anomaly_confidence)"
-                  ],
+                  "key": ["Cisco ASA - Unusual Data Transfer", "avg(anomaly_confidence)"],
                   "value": 0.8899999856948853,
                   "rollup": false,
                   "source": "col-leaf"
                 },
                 {
-                  "key": [
-                    "Windows Security Event Log - Failed Authentication",
-                    "avg(anomaly_confidence)"
-                  ],
+                  "key": ["Windows Security Event Log - Failed Authentication", "avg(anomaly_confidence)"],
                   "value": 0.7400000095367432,
                   "rollup": false,
                   "source": "col-leaf"
@@ -1465,22 +1208,15 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T21:30:00.000Z"
-              ],
+              "key": ["2023-11-29T21:30:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T22:00:00.000Z"
-              ],
+              "key": ["2023-11-29T22:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "Windows Security Event Log - Failed Authentication",
-                    "avg(anomaly_confidence)"
-                  ],
+                  "key": ["Windows Security Event Log - Failed Authentication", "avg(anomaly_confidence)"],
                   "value": 0.5699999928474426,
                   "rollup": false,
                   "source": "col-leaf"
@@ -1489,15 +1225,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T22:30:00.000Z"
-              ],
+              "key": ["2023-11-29T22:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "Cisco ASA - Unusual Data Transfer",
-                    "avg(anomaly_confidence)"
-                  ],
+                  "key": ["Cisco ASA - Unusual Data Transfer", "avg(anomaly_confidence)"],
                   "value": 0.6200000047683716,
                   "rollup": false,
                   "source": "col-leaf"
@@ -1506,29 +1237,20 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T23:00:00.000Z"
-              ],
+              "key": ["2023-11-29T23:00:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T23:30:00.000Z"
-              ],
+              "key": ["2023-11-29T23:30:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T00:00:00.000Z"
-              ],
+              "key": ["2023-11-30T00:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "Cisco ASA - Unusual Data Transfer",
-                    "avg(anomaly_confidence)"
-                  ],
+                  "key": ["Cisco ASA - Unusual Data Transfer", "avg(anomaly_confidence)"],
                   "value": 0.550000011920929,
                   "rollup": false,
                   "source": "col-leaf"
@@ -1537,15 +1259,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T00:30:00.000Z"
-              ],
+              "key": ["2023-11-30T00:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "Windows Security Event Log - Failed Authentication",
-                    "avg(anomaly_confidence)"
-                  ],
+                  "key": ["Windows Security Event Log - Failed Authentication", "avg(anomaly_confidence)"],
                   "value": 0.699999988079071,
                   "rollup": false,
                   "source": "col-leaf"
@@ -1554,43 +1271,30 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T01:00:00.000Z"
-              ],
+              "key": ["2023-11-30T01:00:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T01:30:00.000Z"
-              ],
+              "key": ["2023-11-30T01:30:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T02:00:00.000Z"
-              ],
+              "key": ["2023-11-30T02:00:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T02:30:00.000Z"
-              ],
+              "key": ["2023-11-30T02:30:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T03:00:00.000Z"
-              ],
+              "key": ["2023-11-30T03:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "Windows Security Event Log - Failed Authentication",
-                    "avg(anomaly_confidence)"
-                  ],
+                  "key": ["Windows Security Event Log - Failed Authentication", "avg(anomaly_confidence)"],
                   "value": 0.699999988079071,
                   "rollup": false,
                   "source": "col-leaf"
@@ -1599,31 +1303,21 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T03:30:00.000Z"
-              ],
+              "key": ["2023-11-30T03:30:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T04:00:00.000Z"
-              ],
+              "key": ["2023-11-30T04:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "Cisco ASA - Unusual Data Transfer",
-                    "avg(anomaly_confidence)"
-                  ],
+                  "key": ["Cisco ASA - Unusual Data Transfer", "avg(anomaly_confidence)"],
                   "value": 0.6200000047683716,
                   "rollup": false,
                   "source": "col-leaf"
                 },
                 {
-                  "key": [
-                    "Windows Security Event Log - Failed Authentication",
-                    "avg(anomaly_confidence)"
-                  ],
+                  "key": ["Windows Security Event Log - Failed Authentication", "avg(anomaly_confidence)"],
                   "value": 0.9399999976158142,
                   "rollup": false,
                   "source": "col-leaf"
@@ -1632,38 +1326,26 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T04:30:00.000Z"
-              ],
+              "key": ["2023-11-30T04:30:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T05:00:00.000Z"
-              ],
+              "key": ["2023-11-30T05:00:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T05:30:00.000Z"
-              ],
+              "key": ["2023-11-30T05:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "Cisco ASA - Unusual Data Transfer",
-                    "avg(anomaly_confidence)"
-                  ],
+                  "key": ["Cisco ASA - Unusual Data Transfer", "avg(anomaly_confidence)"],
                   "value": 0.5299999713897705,
                   "rollup": false,
                   "source": "col-leaf"
                 },
                 {
-                  "key": [
-                    "Windows Security Event Log - Failed Authentication",
-                    "avg(anomaly_confidence)"
-                  ],
+                  "key": ["Windows Security Event Log - Failed Authentication", "avg(anomaly_confidence)"],
                   "value": 0.6000000238418579,
                   "rollup": false,
                   "source": "col-leaf"
@@ -1672,36 +1354,25 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T06:00:00.000Z"
-              ],
+              "key": ["2023-11-30T06:00:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T06:30:00.000Z"
-              ],
+              "key": ["2023-11-30T06:30:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T07:00:00.000Z"
-              ],
+              "key": ["2023-11-30T07:00:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T07:30:00.000Z"
-              ],
+              "key": ["2023-11-30T07:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "Windows Security Event Log - Failed Authentication",
-                    "avg(anomaly_confidence)"
-                  ],
+                  "key": ["Windows Security Event Log - Failed Authentication", "avg(anomaly_confidence)"],
                   "value": 0.7099999785423279,
                   "rollup": false,
                   "source": "col-leaf"
@@ -1710,71 +1381,50 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T08:00:00.000Z"
-              ],
+              "key": ["2023-11-30T08:00:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T08:30:00.000Z"
-              ],
+              "key": ["2023-11-30T08:30:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T09:00:00.000Z"
-              ],
+              "key": ["2023-11-30T09:00:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T09:30:00.000Z"
-              ],
+              "key": ["2023-11-30T09:30:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T10:00:00.000Z"
-              ],
+              "key": ["2023-11-30T10:00:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T10:30:00.000Z"
-              ],
+              "key": ["2023-11-30T10:30:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T11:00:00.000Z"
-              ],
+              "key": ["2023-11-30T11:00:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T11:30:00.000Z"
-              ],
+              "key": ["2023-11-30T11:30:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T12:00:00.000Z"
-              ],
+              "key": ["2023-11-30T12:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "Windows Security Event Log - Failed Authentication",
-                    "avg(anomaly_confidence)"
-                  ],
+                  "key": ["Windows Security Event Log - Failed Authentication", "avg(anomaly_confidence)"],
                   "value": 0.8399999737739563,
                   "rollup": false,
                   "source": "col-leaf"
@@ -1783,15 +1433,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T12:30:00.000Z"
-              ],
+              "key": ["2023-11-30T12:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "Cisco ASA - Unusual Data Transfer",
-                    "avg(anomaly_confidence)"
-                  ],
+                  "key": ["Cisco ASA - Unusual Data Transfer", "avg(anomaly_confidence)"],
                   "value": 0.8700000047683716,
                   "rollup": false,
                   "source": "col-leaf"
@@ -1800,22 +1445,15 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T13:00:00.000Z"
-              ],
+              "key": ["2023-11-30T13:00:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T13:30:00.000Z"
-              ],
+              "key": ["2023-11-30T13:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "Windows Security Event Log - Failed Authentication",
-                    "avg(anomaly_confidence)"
-                  ],
+                  "key": ["Windows Security Event Log - Failed Authentication", "avg(anomaly_confidence)"],
                   "value": 0.9300000071525574,
                   "rollup": false,
                   "source": "col-leaf"
@@ -1824,24 +1462,16 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T14:00:00.000Z"
-              ],
+              "key": ["2023-11-30T14:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "Cisco ASA - Unusual Data Transfer",
-                    "avg(anomaly_confidence)"
-                  ],
+                  "key": ["Cisco ASA - Unusual Data Transfer", "avg(anomaly_confidence)"],
                   "value": 0.9700000286102295,
                   "rollup": false,
                   "source": "col-leaf"
                 },
                 {
-                  "key": [
-                    "Windows Security Event Log - Failed Authentication",
-                    "avg(anomaly_confidence)"
-                  ],
+                  "key": ["Windows Security Event Log - Failed Authentication", "avg(anomaly_confidence)"],
                   "value": 0.8100000023841858,
                   "rollup": false,
                   "source": "col-leaf"
@@ -1866,9 +1496,7 @@
               "key": [],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 0,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1890,14 +1518,10 @@
           "id": "12aad469-7450-4615-becb-f8b85734c77b",
           "rows": [
             {
-              "key": [
-                "Cisco ASA - Unusual Data Transfer"
-              ],
+              "key": ["Cisco ASA - Unusual Data Transfer"],
               "values": [
                 {
-                  "key": [
-                    "Average anomaly_grade"
-                  ],
+                  "key": ["Average anomaly_grade"],
                   "value": 0.1112500000745058,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1906,14 +1530,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "Windows Security Event Log - Failed Authentication"
-              ],
+              "key": ["Windows Security Event Log - Failed Authentication"],
               "values": [
                 {
-                  "key": [
-                    "Average anomaly_grade"
-                  ],
+                  "key": ["Average anomaly_grade"],
                   "value": 0.12312499922700226,
                   "rollup": true,
                   "source": "row-leaf"
@@ -1925,9 +1545,7 @@
               "key": [],
               "values": [
                 {
-                  "key": [
-                    "Average anomaly_grade"
-                  ],
+                  "key": ["Average anomaly_grade"],
                   "value": 0.11718749965075403,
                   "rollup": true,
                   "source": "row-inner"
@@ -1949,15 +1567,10 @@
           "id": "21f587b5-01dc-41e4-8e2a-7e8b81c3cc29",
           "rows": [
             {
-              "key": [
-                "2023-11-29T15:30:00.000Z"
-              ],
+              "key": ["2023-11-29T15:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "Cisco ASA - Unusual Data Transfer",
-                    "count()"
-                  ],
+                  "key": ["Cisco ASA - Unusual Data Transfer", "count()"],
                   "value": 2,
                   "rollup": false,
                   "source": "col-leaf"
@@ -1966,29 +1579,20 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T16:00:00.000Z"
-              ],
+              "key": ["2023-11-29T16:00:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T16:30:00.000Z"
-              ],
+              "key": ["2023-11-29T16:30:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T17:00:00.000Z"
-              ],
+              "key": ["2023-11-29T17:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "Cisco ASA - Unusual Data Transfer",
-                    "count()"
-                  ],
+                  "key": ["Cisco ASA - Unusual Data Transfer", "count()"],
                   "value": 2,
                   "rollup": false,
                   "source": "col-leaf"
@@ -1997,31 +1601,21 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T17:30:00.000Z"
-              ],
+              "key": ["2023-11-29T17:30:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T18:00:00.000Z"
-              ],
+              "key": ["2023-11-29T18:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "Cisco ASA - Unusual Data Transfer",
-                    "count()"
-                  ],
+                  "key": ["Cisco ASA - Unusual Data Transfer", "count()"],
                   "value": 2,
                   "rollup": false,
                   "source": "col-leaf"
                 },
                 {
-                  "key": [
-                    "Windows Security Event Log - Failed Authentication",
-                    "count()"
-                  ],
+                  "key": ["Windows Security Event Log - Failed Authentication", "count()"],
                   "value": 1,
                   "rollup": false,
                   "source": "col-leaf"
@@ -2030,15 +1624,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T18:30:00.000Z"
-              ],
+              "key": ["2023-11-29T18:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "Cisco ASA - Unusual Data Transfer",
-                    "count()"
-                  ],
+                  "key": ["Cisco ASA - Unusual Data Transfer", "count()"],
                   "value": 1,
                   "rollup": false,
                   "source": "col-leaf"
@@ -2047,24 +1636,16 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T19:00:00.000Z"
-              ],
+              "key": ["2023-11-29T19:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "Cisco ASA - Unusual Data Transfer",
-                    "count()"
-                  ],
+                  "key": ["Cisco ASA - Unusual Data Transfer", "count()"],
                   "value": 1,
                   "rollup": false,
                   "source": "col-leaf"
                 },
                 {
-                  "key": [
-                    "Windows Security Event Log - Failed Authentication",
-                    "count()"
-                  ],
+                  "key": ["Windows Security Event Log - Failed Authentication", "count()"],
                   "value": 1,
                   "rollup": false,
                   "source": "col-leaf"
@@ -2073,24 +1654,16 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T19:30:00.000Z"
-              ],
+              "key": ["2023-11-29T19:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "Cisco ASA - Unusual Data Transfer",
-                    "count()"
-                  ],
+                  "key": ["Cisco ASA - Unusual Data Transfer", "count()"],
                   "value": 1,
                   "rollup": false,
                   "source": "col-leaf"
                 },
                 {
-                  "key": [
-                    "Windows Security Event Log - Failed Authentication",
-                    "count()"
-                  ],
+                  "key": ["Windows Security Event Log - Failed Authentication", "count()"],
                   "value": 1,
                   "rollup": false,
                   "source": "col-leaf"
@@ -2099,15 +1672,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T20:00:00.000Z"
-              ],
+              "key": ["2023-11-29T20:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "Windows Security Event Log - Failed Authentication",
-                    "count()"
-                  ],
+                  "key": ["Windows Security Event Log - Failed Authentication", "count()"],
                   "value": 1,
                   "rollup": false,
                   "source": "col-leaf"
@@ -2116,15 +1684,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T20:30:00.000Z"
-              ],
+              "key": ["2023-11-29T20:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "Windows Security Event Log - Failed Authentication",
-                    "count()"
-                  ],
+                  "key": ["Windows Security Event Log - Failed Authentication", "count()"],
                   "value": 2,
                   "rollup": false,
                   "source": "col-leaf"
@@ -2133,24 +1696,16 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T21:00:00.000Z"
-              ],
+              "key": ["2023-11-29T21:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "Cisco ASA - Unusual Data Transfer",
-                    "count()"
-                  ],
+                  "key": ["Cisco ASA - Unusual Data Transfer", "count()"],
                   "value": 1,
                   "rollup": false,
                   "source": "col-leaf"
                 },
                 {
-                  "key": [
-                    "Windows Security Event Log - Failed Authentication",
-                    "count()"
-                  ],
+                  "key": ["Windows Security Event Log - Failed Authentication", "count()"],
                   "value": 1,
                   "rollup": false,
                   "source": "col-leaf"
@@ -2159,22 +1714,15 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T21:30:00.000Z"
-              ],
+              "key": ["2023-11-29T21:30:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T22:00:00.000Z"
-              ],
+              "key": ["2023-11-29T22:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "Windows Security Event Log - Failed Authentication",
-                    "count()"
-                  ],
+                  "key": ["Windows Security Event Log - Failed Authentication", "count()"],
                   "value": 1,
                   "rollup": false,
                   "source": "col-leaf"
@@ -2183,15 +1731,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T22:30:00.000Z"
-              ],
+              "key": ["2023-11-29T22:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "Cisco ASA - Unusual Data Transfer",
-                    "count()"
-                  ],
+                  "key": ["Cisco ASA - Unusual Data Transfer", "count()"],
                   "value": 1,
                   "rollup": false,
                   "source": "col-leaf"
@@ -2200,29 +1743,20 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T23:00:00.000Z"
-              ],
+              "key": ["2023-11-29T23:00:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T23:30:00.000Z"
-              ],
+              "key": ["2023-11-29T23:30:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T00:00:00.000Z"
-              ],
+              "key": ["2023-11-30T00:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "Cisco ASA - Unusual Data Transfer",
-                    "count()"
-                  ],
+                  "key": ["Cisco ASA - Unusual Data Transfer", "count()"],
                   "value": 1,
                   "rollup": false,
                   "source": "col-leaf"
@@ -2231,15 +1765,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T00:30:00.000Z"
-              ],
+              "key": ["2023-11-30T00:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "Windows Security Event Log - Failed Authentication",
-                    "count()"
-                  ],
+                  "key": ["Windows Security Event Log - Failed Authentication", "count()"],
                   "value": 1,
                   "rollup": false,
                   "source": "col-leaf"
@@ -2248,43 +1777,30 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T01:00:00.000Z"
-              ],
+              "key": ["2023-11-30T01:00:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T01:30:00.000Z"
-              ],
+              "key": ["2023-11-30T01:30:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T02:00:00.000Z"
-              ],
+              "key": ["2023-11-30T02:00:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T02:30:00.000Z"
-              ],
+              "key": ["2023-11-30T02:30:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T03:00:00.000Z"
-              ],
+              "key": ["2023-11-30T03:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "Windows Security Event Log - Failed Authentication",
-                    "count()"
-                  ],
+                  "key": ["Windows Security Event Log - Failed Authentication", "count()"],
                   "value": 1,
                   "rollup": false,
                   "source": "col-leaf"
@@ -2293,31 +1809,21 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T03:30:00.000Z"
-              ],
+              "key": ["2023-11-30T03:30:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T04:00:00.000Z"
-              ],
+              "key": ["2023-11-30T04:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "Cisco ASA - Unusual Data Transfer",
-                    "count()"
-                  ],
+                  "key": ["Cisco ASA - Unusual Data Transfer", "count()"],
                   "value": 1,
                   "rollup": false,
                   "source": "col-leaf"
                 },
                 {
-                  "key": [
-                    "Windows Security Event Log - Failed Authentication",
-                    "count()"
-                  ],
+                  "key": ["Windows Security Event Log - Failed Authentication", "count()"],
                   "value": 1,
                   "rollup": false,
                   "source": "col-leaf"
@@ -2326,38 +1832,26 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T04:30:00.000Z"
-              ],
+              "key": ["2023-11-30T04:30:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T05:00:00.000Z"
-              ],
+              "key": ["2023-11-30T05:00:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T05:30:00.000Z"
-              ],
+              "key": ["2023-11-30T05:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "Cisco ASA - Unusual Data Transfer",
-                    "count()"
-                  ],
+                  "key": ["Cisco ASA - Unusual Data Transfer", "count()"],
                   "value": 1,
                   "rollup": false,
                   "source": "col-leaf"
                 },
                 {
-                  "key": [
-                    "Windows Security Event Log - Failed Authentication",
-                    "count()"
-                  ],
+                  "key": ["Windows Security Event Log - Failed Authentication", "count()"],
                   "value": 1,
                   "rollup": false,
                   "source": "col-leaf"
@@ -2366,36 +1860,25 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T06:00:00.000Z"
-              ],
+              "key": ["2023-11-30T06:00:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T06:30:00.000Z"
-              ],
+              "key": ["2023-11-30T06:30:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T07:00:00.000Z"
-              ],
+              "key": ["2023-11-30T07:00:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T07:30:00.000Z"
-              ],
+              "key": ["2023-11-30T07:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "Windows Security Event Log - Failed Authentication",
-                    "count()"
-                  ],
+                  "key": ["Windows Security Event Log - Failed Authentication", "count()"],
                   "value": 1,
                   "rollup": false,
                   "source": "col-leaf"
@@ -2404,71 +1887,50 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T08:00:00.000Z"
-              ],
+              "key": ["2023-11-30T08:00:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T08:30:00.000Z"
-              ],
+              "key": ["2023-11-30T08:30:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T09:00:00.000Z"
-              ],
+              "key": ["2023-11-30T09:00:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T09:30:00.000Z"
-              ],
+              "key": ["2023-11-30T09:30:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T10:00:00.000Z"
-              ],
+              "key": ["2023-11-30T10:00:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T10:30:00.000Z"
-              ],
+              "key": ["2023-11-30T10:30:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T11:00:00.000Z"
-              ],
+              "key": ["2023-11-30T11:00:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T11:30:00.000Z"
-              ],
+              "key": ["2023-11-30T11:30:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T12:00:00.000Z"
-              ],
+              "key": ["2023-11-30T12:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "Windows Security Event Log - Failed Authentication",
-                    "count()"
-                  ],
+                  "key": ["Windows Security Event Log - Failed Authentication", "count()"],
                   "value": 1,
                   "rollup": false,
                   "source": "col-leaf"
@@ -2477,15 +1939,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T12:30:00.000Z"
-              ],
+              "key": ["2023-11-30T12:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "Cisco ASA - Unusual Data Transfer",
-                    "count()"
-                  ],
+                  "key": ["Cisco ASA - Unusual Data Transfer", "count()"],
                   "value": 1,
                   "rollup": false,
                   "source": "col-leaf"
@@ -2494,22 +1951,15 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T13:00:00.000Z"
-              ],
+              "key": ["2023-11-30T13:00:00.000Z"],
               "values": [],
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T13:30:00.000Z"
-              ],
+              "key": ["2023-11-30T13:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "Windows Security Event Log - Failed Authentication",
-                    "count()"
-                  ],
+                  "key": ["Windows Security Event Log - Failed Authentication", "count()"],
                   "value": 1,
                   "rollup": false,
                   "source": "col-leaf"
@@ -2518,24 +1968,16 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T14:00:00.000Z"
-              ],
+              "key": ["2023-11-30T14:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "Cisco ASA - Unusual Data Transfer",
-                    "count()"
-                  ],
+                  "key": ["Cisco ASA - Unusual Data Transfer", "count()"],
                   "value": 1,
                   "rollup": false,
                   "source": "col-leaf"
                 },
                 {
-                  "key": [
-                    "Windows Security Event Log - Failed Authentication",
-                    "count()"
-                  ],
+                  "key": ["Windows Security Event Log - Failed Authentication", "count()"],
                   "value": 1,
                   "rollup": false,
                   "source": "col-leaf"
@@ -2560,9 +2002,7 @@
               "key": [],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 32,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2587,9 +2027,7 @@
               "key": [],
               "values": [
                 {
-                  "key": [
-                    "card(user_name)"
-                  ],
+                  "key": ["card(user_name)"],
                   "value": 12,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2614,9 +2052,7 @@
               "key": [],
               "values": [
                 {
-                  "key": [
-                    "card(anomaly_detector_name)"
-                  ],
+                  "key": ["card(anomaly_detector_name)"],
                   "value": 2,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2641,9 +2077,7 @@
               "key": [],
               "values": [
                 {
-                  "key": [
-                    "card(anomaly_detector_name)"
-                  ],
+                  "key": ["card(anomaly_detector_name)"],
                   "value": 2,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2665,14 +2099,10 @@
           "id": "d78463c2-70c3-449d-bc54-9f9c751b8541",
           "rows": [
             {
-              "key": [
-                "2023-11-29T15:30:00.000Z"
-              ],
+              "key": ["2023-11-29T15:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 2,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2681,14 +2111,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T16:00:00.000Z"
-              ],
+              "key": ["2023-11-29T16:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 0,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2697,14 +2123,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T16:30:00.000Z"
-              ],
+              "key": ["2023-11-29T16:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 0,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2713,14 +2135,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T17:00:00.000Z"
-              ],
+              "key": ["2023-11-29T17:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 2,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2729,14 +2147,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T17:30:00.000Z"
-              ],
+              "key": ["2023-11-29T17:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 0,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2745,14 +2159,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T18:00:00.000Z"
-              ],
+              "key": ["2023-11-29T18:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 3,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2761,14 +2171,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T18:30:00.000Z"
-              ],
+              "key": ["2023-11-29T18:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 1,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2777,14 +2183,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T19:00:00.000Z"
-              ],
+              "key": ["2023-11-29T19:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 2,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2793,14 +2195,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T19:30:00.000Z"
-              ],
+              "key": ["2023-11-29T19:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 2,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2809,14 +2207,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T20:00:00.000Z"
-              ],
+              "key": ["2023-11-29T20:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 1,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2825,14 +2219,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T20:30:00.000Z"
-              ],
+              "key": ["2023-11-29T20:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 2,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2841,14 +2231,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T21:00:00.000Z"
-              ],
+              "key": ["2023-11-29T21:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 2,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2857,14 +2243,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T21:30:00.000Z"
-              ],
+              "key": ["2023-11-29T21:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 0,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2873,14 +2255,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T22:00:00.000Z"
-              ],
+              "key": ["2023-11-29T22:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 1,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2889,14 +2267,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T22:30:00.000Z"
-              ],
+              "key": ["2023-11-29T22:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 1,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2905,14 +2279,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T23:00:00.000Z"
-              ],
+              "key": ["2023-11-29T23:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 0,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2921,14 +2291,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-29T23:30:00.000Z"
-              ],
+              "key": ["2023-11-29T23:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 0,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2937,14 +2303,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T00:00:00.000Z"
-              ],
+              "key": ["2023-11-30T00:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 1,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2953,14 +2315,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T00:30:00.000Z"
-              ],
+              "key": ["2023-11-30T00:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 1,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2969,14 +2327,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T01:00:00.000Z"
-              ],
+              "key": ["2023-11-30T01:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 0,
                   "rollup": true,
                   "source": "row-leaf"
@@ -2985,14 +2339,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T01:30:00.000Z"
-              ],
+              "key": ["2023-11-30T01:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 0,
                   "rollup": true,
                   "source": "row-leaf"
@@ -3001,14 +2351,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T02:00:00.000Z"
-              ],
+              "key": ["2023-11-30T02:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 0,
                   "rollup": true,
                   "source": "row-leaf"
@@ -3017,14 +2363,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T02:30:00.000Z"
-              ],
+              "key": ["2023-11-30T02:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 0,
                   "rollup": true,
                   "source": "row-leaf"
@@ -3033,14 +2375,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T03:00:00.000Z"
-              ],
+              "key": ["2023-11-30T03:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 1,
                   "rollup": true,
                   "source": "row-leaf"
@@ -3049,14 +2387,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T03:30:00.000Z"
-              ],
+              "key": ["2023-11-30T03:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 0,
                   "rollup": true,
                   "source": "row-leaf"
@@ -3065,14 +2399,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T04:00:00.000Z"
-              ],
+              "key": ["2023-11-30T04:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 2,
                   "rollup": true,
                   "source": "row-leaf"
@@ -3081,14 +2411,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T04:30:00.000Z"
-              ],
+              "key": ["2023-11-30T04:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 0,
                   "rollup": true,
                   "source": "row-leaf"
@@ -3097,14 +2423,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T05:00:00.000Z"
-              ],
+              "key": ["2023-11-30T05:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 0,
                   "rollup": true,
                   "source": "row-leaf"
@@ -3113,14 +2435,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T05:30:00.000Z"
-              ],
+              "key": ["2023-11-30T05:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 2,
                   "rollup": true,
                   "source": "row-leaf"
@@ -3129,14 +2447,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T06:00:00.000Z"
-              ],
+              "key": ["2023-11-30T06:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 0,
                   "rollup": true,
                   "source": "row-leaf"
@@ -3145,14 +2459,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T06:30:00.000Z"
-              ],
+              "key": ["2023-11-30T06:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 0,
                   "rollup": true,
                   "source": "row-leaf"
@@ -3161,14 +2471,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T07:00:00.000Z"
-              ],
+              "key": ["2023-11-30T07:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 0,
                   "rollup": true,
                   "source": "row-leaf"
@@ -3177,14 +2483,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T07:30:00.000Z"
-              ],
+              "key": ["2023-11-30T07:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 1,
                   "rollup": true,
                   "source": "row-leaf"
@@ -3193,14 +2495,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T08:00:00.000Z"
-              ],
+              "key": ["2023-11-30T08:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 0,
                   "rollup": true,
                   "source": "row-leaf"
@@ -3209,14 +2507,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T08:30:00.000Z"
-              ],
+              "key": ["2023-11-30T08:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 0,
                   "rollup": true,
                   "source": "row-leaf"
@@ -3225,14 +2519,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T09:00:00.000Z"
-              ],
+              "key": ["2023-11-30T09:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 0,
                   "rollup": true,
                   "source": "row-leaf"
@@ -3241,14 +2531,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T09:30:00.000Z"
-              ],
+              "key": ["2023-11-30T09:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 0,
                   "rollup": true,
                   "source": "row-leaf"
@@ -3257,14 +2543,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T10:00:00.000Z"
-              ],
+              "key": ["2023-11-30T10:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 0,
                   "rollup": true,
                   "source": "row-leaf"
@@ -3273,14 +2555,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T10:30:00.000Z"
-              ],
+              "key": ["2023-11-30T10:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 0,
                   "rollup": true,
                   "source": "row-leaf"
@@ -3289,14 +2567,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T11:00:00.000Z"
-              ],
+              "key": ["2023-11-30T11:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 0,
                   "rollup": true,
                   "source": "row-leaf"
@@ -3305,14 +2579,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T11:30:00.000Z"
-              ],
+              "key": ["2023-11-30T11:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 0,
                   "rollup": true,
                   "source": "row-leaf"
@@ -3321,14 +2591,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T12:00:00.000Z"
-              ],
+              "key": ["2023-11-30T12:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 1,
                   "rollup": true,
                   "source": "row-leaf"
@@ -3337,14 +2603,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T12:30:00.000Z"
-              ],
+              "key": ["2023-11-30T12:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 1,
                   "rollup": true,
                   "source": "row-leaf"
@@ -3353,14 +2615,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T13:00:00.000Z"
-              ],
+              "key": ["2023-11-30T13:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 0,
                   "rollup": true,
                   "source": "row-leaf"
@@ -3369,14 +2627,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T13:30:00.000Z"
-              ],
+              "key": ["2023-11-30T13:30:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 1,
                   "rollup": true,
                   "source": "row-leaf"
@@ -3385,14 +2639,10 @@
               "source": "leaf"
             },
             {
-              "key": [
-                "2023-11-30T14:00:00.000Z"
-              ],
+              "key": ["2023-11-30T14:00:00.000Z"],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 2,
                   "rollup": true,
                   "source": "row-leaf"
@@ -3404,9 +2654,7 @@
               "key": [],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 32,
                   "rollup": true,
                   "source": "row-inner"
@@ -3431,9 +2679,7 @@
               "key": [],
               "values": [
                 {
-                  "key": [
-                    "count()"
-                  ],
+                  "key": ["count()"],
                   "value": 42,
                   "rollup": true,
                   "source": "row-leaf"

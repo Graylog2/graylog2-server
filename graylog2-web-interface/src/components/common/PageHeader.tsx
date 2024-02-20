@@ -30,34 +30,40 @@ const Container = styled.div`
   flex-direction: column;
 `;
 
-const FlexRow = styled.div(({ theme }) => css`
-  display: flex;
-  justify-content: space-between;
-  gap: 5px;
+const FlexRow = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    justify-content: space-between;
+    gap: 5px;
 
-  @media (max-width: ${theme.breakpoints.max.md}) {
-    flex-wrap: wrap;
-  }
-`);
+    @media (max-width: ${theme.breakpoints.max.md}) {
+      flex-wrap: wrap;
+    }
+  `,
+);
 
-const LifecycleIndicatorContainer = styled.span(({ theme }) => css`
-  cursor: help;
-  margin-left: 5px;
-  font-size: ${theme.fonts.size.body};
-  line-height: 20px;
-  vertical-align: text-top;
-`);
+const LifecycleIndicatorContainer = styled.span(
+  ({ theme }) => css`
+    cursor: help;
+    margin-left: 5px;
+    font-size: ${theme.fonts.size.body};
+    line-height: 20px;
+    vertical-align: text-top;
+  `,
+);
 
-const TopActions = styled.div<{ $hasMultipleChildren: boolean }>(({ $hasMultipleChildren }) => css`
-  display: flex;
-  gap: 10px;
-  align-items: ${$hasMultipleChildren ? 'center' : 'flex-start'};
-`);
+const TopActions = styled.div<{ $hasMultipleChildren: boolean }>(
+  ({ $hasMultipleChildren }) => css`
+    display: flex;
+    gap: 10px;
+    align-items: ${$hasMultipleChildren ? 'center' : 'flex-start'};
+  `,
+);
 
 const Actions = styled.div`
   display: flex !important;
   align-items: flex-end;
-  
+
   .btn-toolbar {
     display: flex;
   }
@@ -78,15 +84,16 @@ const LifecycleIndicator = ({
   lifecycle,
   lifecycleMessage,
 }: {
-  lifecycle: 'experimental' | 'legacy' | undefined,
-  lifecycleMessage: React.ReactNode | undefined
+  lifecycle: 'experimental' | 'legacy' | undefined;
+  lifecycleMessage: React.ReactNode | undefined;
 }) => {
   if (lifecycle === undefined) {
     return null;
   }
 
   const label = upperFirst(lifecycle);
-  const defaultMessage = lifecycle === 'experimental' ? LIFECYCLE_DEFAULT_MESSAGES.experimental : LIFECYCLE_DEFAULT_MESSAGES.legacy;
+  const defaultMessage =
+    lifecycle === 'experimental' ? LIFECYCLE_DEFAULT_MESSAGES.experimental : LIFECYCLE_DEFAULT_MESSAGES.legacy;
   const tooltip = <Tooltip id={lifecycle}>{lifecycleMessage || defaultMessage}</Tooltip>;
 
   return (
@@ -99,14 +106,14 @@ const LifecycleIndicator = ({
 };
 
 type Props = {
-  title: React.ReactNode,
-  children: React.ReactElement | Array<React.ReactElement>,
-  actions?: React.ReactElement,
-  topActions?: React.ReactElement,
-  lifecycle?: 'experimental' | 'legacy',
-  lifecycleMessage?: React.ReactNode,
-  subpage: boolean,
-  documentationLink?: { title: string, path: string }
+  title: React.ReactNode;
+  children: React.ReactElement | Array<React.ReactElement>;
+  actions?: React.ReactElement;
+  topActions?: React.ReactElement;
+  lifecycle?: 'experimental' | 'legacy';
+  lifecycleMessage?: React.ReactNode;
+  subpage: boolean;
+  documentationLink?: { title: string; path: string };
 };
 
 /**
@@ -114,7 +121,16 @@ type Props = {
  * This ensures all pages look and feel the same way across the product, so
  * please use it in your pages.
  */
-const PageHeader = ({ children, subpage, title, actions, topActions, lifecycle, lifecycleMessage, documentationLink }: Props) => {
+const PageHeader = ({
+  children,
+  subpage,
+  title,
+  actions,
+  topActions,
+  lifecycle,
+  lifecycleMessage,
+  documentationLink,
+}: Props) => {
   const topLevelClassNames = subpage ? '' : 'content';
 
   return (
@@ -123,28 +139,25 @@ const PageHeader = ({ children, subpage, title, actions, topActions, lifecycle, 
         <Container>
           <FlexRow>
             <h1>
-              {title} <small><LifecycleIndicator lifecycle={lifecycle} lifecycleMessage={lifecycleMessage} /></small>
+              {title}{' '}
+              <small>
+                <LifecycleIndicator lifecycle={lifecycle} lifecycleMessage={lifecycleMessage} />
+              </small>
             </h1>
             {(documentationLink || topActions) && (
               <TopActions $hasMultipleChildren={!!documentationLink && !!topActions}>
-                {documentationLink && <DocumentationLink text={documentationLink.title} page={documentationLink.path} displayIcon />}
+                {documentationLink && (
+                  <DocumentationLink text={documentationLink.title} page={documentationLink.path} displayIcon />
+                )}
                 {topActions}
               </TopActions>
             )}
           </FlexRow>
 
           <FlexRow>
-            {children && (
-              <Description className="description no-bm">
-                  {children}
-              </Description>
-            )}
+            {children && <Description className="description no-bm">{children}</Description>}
 
-            {actions && (
-              <Actions>
-                {actions}
-              </Actions>
-            )}
+            {actions && <Actions>{actions}</Actions>}
           </FlexRow>
         </Container>
       </Col>

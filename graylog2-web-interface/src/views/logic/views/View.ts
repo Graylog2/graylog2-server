@@ -32,8 +32,8 @@ import type { QueryId } from '../queries/Query';
 export type Properties = Immutable.List<any>;
 
 export type PluginMetadata = {
-  name: string,
-  url: string,
+  name: string;
+  url: string;
 };
 export type Requirements = { [key: string]: PluginMetadata } | {};
 export type ViewStateMap = Immutable.Map<QueryId, ViewState>;
@@ -43,33 +43,33 @@ export type DashboardType = 'DASHBOARD';
 export type ViewType = SearchType | DashboardType;
 
 type InternalState = {
-  id: string,
-  type: ViewType,
-  title: string,
-  summary: string,
-  description: string,
-  search: Search,
-  properties: Properties,
-  state: ViewStateMap,
-  createdAt: Date,
-  owner: string,
-  requires: Requirements,
-  favorite: boolean,
+  id: string;
+  type: ViewType;
+  title: string;
+  summary: string;
+  description: string;
+  search: Search;
+  properties: Properties;
+  state: ViewStateMap;
+  createdAt: Date;
+  owner: string;
+  requires: Requirements;
+  favorite: boolean;
 };
 
 export type ViewJson = {
-  id: string,
-  type: ViewType,
-  title: string,
-  summary: string,
-  description: string,
-  search_id: string,
-  properties: Properties,
-  state: { [key: string]: ViewStateJson },
-  created_at: string,
-  owner: string,
-  requires: Requirements,
-  favorite: boolean,
+  id: string;
+  type: ViewType;
+  title: string;
+  summary: string;
+  description: string;
+  search_id: string;
+  properties: Properties;
+  state: { [key: string]: ViewStateJson };
+  created_at: string;
+  owner: string;
+  requires: Requirements;
+  favorite: boolean;
 };
 
 export default class View {
@@ -80,7 +80,8 @@ export default class View {
 
   _value: InternalState;
 
-  constructor(id: string,
+  constructor(
+    id: string,
     type: ViewType,
     title: string,
     summary: string,
@@ -151,7 +152,10 @@ export default class View {
   }
 
   get widgetMapping(): WidgetMapping {
-    return (this.state || Immutable.Map()).valueSeq().map((s) => s.widgetMapping).reduce((prev, cur) => Immutable.fromJS(prev).merge(Immutable.fromJS(cur)));
+    return (this.state || Immutable.Map())
+      .valueSeq()
+      .map((s) => s.widgetMapping)
+      .reduce((prev, cur) => Immutable.fromJS(prev).merge(Immutable.fromJS(cur)));
   }
 
   get owner(): string {
@@ -187,23 +191,26 @@ export default class View {
   }
 
   toBuilder(): Builder {
-    const { id, title, summary, description, search, properties, state, createdAt, owner, requires, type, favorite } = this._value;
+    const { id, title, summary, description, search, properties, state, createdAt, owner, requires, type, favorite } =
+      this._value;
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return new Builder(Immutable.Map({
-      id,
-      title,
-      summary,
-      description,
-      search,
-      properties,
-      state,
-      createdAt,
-      owner,
-      requires,
-      type,
-      favorite,
-    }));
+    return new Builder(
+      Immutable.Map({
+        id,
+        title,
+        summary,
+        description,
+        search,
+        properties,
+        state,
+        createdAt,
+        owner,
+        requires,
+        type,
+        favorite,
+      }),
+    );
   }
 
   toJSON() {
@@ -295,7 +302,7 @@ class Builder {
     return new Builder(this.value.set('properties', value));
   }
 
-  state(value: (ViewStateMap | { [key: string]: ViewState })): Builder {
+  state(value: ViewStateMap | { [key: string]: ViewState }): Builder {
     return new Builder(this.value.set('state', Immutable.Map(value)));
   }
 
@@ -316,8 +323,22 @@ class Builder {
   }
 
   build(): View {
-    const { id, type, title, summary, description, search, properties, state, createdAt, owner, requires, favorite } = this.value.toObject();
+    const { id, type, title, summary, description, search, properties, state, createdAt, owner, requires, favorite } =
+      this.value.toObject();
 
-    return new View(id, type, title, summary, description, search, properties, state, createdAt, owner, requires, favorite);
+    return new View(
+      id,
+      type,
+      title,
+      summary,
+      description,
+      search,
+      properties,
+      state,
+      createdAt,
+      owner,
+      requires,
+      favorite,
+    );
   }
 }

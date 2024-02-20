@@ -23,21 +23,24 @@ import { Button } from 'components/bootstrap';
 type ButtonProps = React.ComponentProps<typeof Button>;
 
 type Props = Omit<ButtonProps, 'target'> & {
-  to: string,
-  target?: '_blank' | '_self' | '_parent' | '_top' | 'framename',
-}
+  to: string;
+  target?: '_blank' | '_self' | '_parent' | '_top' | 'framename';
+};
 
 const LinkButton = ({ to, target, onClick, ...restButtonProps }: Props) => {
   const navigate = useNavigate();
-  const handleOnClick = useCallback((e) => {
-    if (target === '_self') {
-      navigate(to);
-    } else {
-      window.open(to, target);
-    }
+  const handleOnClick = useCallback(
+    (e) => {
+      if (target === '_self') {
+        navigate(to);
+      } else {
+        window.open(to, target);
+      }
 
-    if (onClick) onClick(e);
-  }, [target, onClick, navigate, to]);
+      if (onClick) onClick(e);
+    },
+    [target, onClick, navigate, to],
+  );
 
   return <Button onClick={handleOnClick} {...restButtonProps} />;
 };

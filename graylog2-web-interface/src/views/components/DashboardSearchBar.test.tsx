@@ -50,10 +50,14 @@ jest.mock('views/stores/SearchConfigStore', () => ({
   },
 }));
 
-jest.mock('views/components/searchbar/queryvalidation/validateQuery', () => () => Promise.resolve({
-  status: 'OK',
-  explanations: [],
-}));
+jest.mock(
+  'views/components/searchbar/queryvalidation/validateQuery',
+  () => () =>
+    Promise.resolve({
+      status: 'OK',
+      explanations: [],
+    }),
+);
 
 jest.mock('views/logic/slices/searchExecutionSlice', () => ({
   ...jest.requireActual('views/logic/slices/searchExecutionSlice'),
@@ -103,26 +107,30 @@ describe('DashboardSearchBar', () => {
     await waitFor(() => expect(execute).toHaveBeenCalledTimes(1));
   });
 
-  it('should call trigger search execution and set global override on submit when there are changes', async () => {
-    render(<DashboardSearchBar />);
+  it(
+    'should call trigger search execution and set global override on submit when there are changes',
+    async () => {
+      render(<DashboardSearchBar />);
 
-    const timeRangeFilter = await screen.findByText(/no override/i);
+      const timeRangeFilter = await screen.findByText(/no override/i);
 
-    userEvent.click(timeRangeFilter);
-    userEvent.click(await screen.findByRole('tab', { name: 'Relative' }));
-    userEvent.click(await screen.findByRole('button', { name: 'Update time range' }));
+      userEvent.click(timeRangeFilter);
+      userEvent.click(await screen.findByRole('tab', { name: 'Relative' }));
+      userEvent.click(await screen.findByRole('button', { name: 'Update time range' }));
 
-    const searchButton = await screen.findByRole('button', {
-      name: /perform search \(changes were made after last search execution\)/i,
-    });
+      const searchButton = await screen.findByRole('button', {
+        name: /perform search \(changes were made after last search execution\)/i,
+      });
 
-    await waitFor(() => expect(searchButton.classList).not.toContain('disabled'));
+      await waitFor(() => expect(searchButton.classList).not.toContain('disabled'));
 
-    userEvent.click(searchButton);
+      userEvent.click(searchButton);
 
-    await waitFor(() => expect(setGlobalOverride).toHaveBeenCalledWith('', { type: 'relative', from: 300 }));
-    await waitFor(() => expect(execute).toHaveBeenCalledTimes(1));
-  }, applyTimeoutMultiplier(10000));
+      await waitFor(() => expect(setGlobalOverride).toHaveBeenCalledWith('', { type: 'relative', from: 300 }));
+      await waitFor(() => expect(execute).toHaveBeenCalledTimes(1));
+    },
+    applyTimeoutMultiplier(10000),
+  );
 
   it('should hide the save and load controls if a widget is being edited', async () => {
     const focusedWidget: WidgetEditingState = { id: 'foo', editing: true, focusing: true };

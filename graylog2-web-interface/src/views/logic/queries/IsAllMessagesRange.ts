@@ -19,6 +19,8 @@ import { RELATIVE_ALL_TIME } from 'views/Constants';
 import { isTypeRelativeWithEnd, isTypeRelativeWithStartOnly } from 'views/typeGuards/timeRange';
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 
-const isAllMessagesRange = (timeRange: TimeRange | NoTimeRangeOverride) => (isTypeRelativeWithEnd(timeRange) && timeRange.from === RELATIVE_ALL_TIME) || (isTypeRelativeWithStartOnly(timeRange) && timeRange.range === RELATIVE_ALL_TIME);
+const isAllMessagesRange = (timeRange: TimeRange | NoTimeRangeOverride) =>
+  (isTypeRelativeWithEnd(timeRange) && timeRange.from === RELATIVE_ALL_TIME) ||
+  (isTypeRelativeWithStartOnly(timeRange) && timeRange.range === RELATIVE_ALL_TIME);
 
 export default isAllMessagesRange;

@@ -24,9 +24,11 @@ import type { Sort } from 'stores/PaginationTypes';
 import BulkSelectHead from './BulkSelectHead';
 import type { Column, ColumnRenderer, EntityBase, ColumnRenderersByAttribute } from './types';
 
-const Th = styled.th<{ $width: number | undefined }>(({ $width }) => css`
-  width: ${$width ? `${$width}px` : 'auto'};
-`);
+const Th = styled.th<{ $width: number | undefined }>(
+  ({ $width }) => css`
+    width: ${$width ? `${$width}px` : 'auto'};
+  `,
+);
 
 const TableHeader = <Entity extends EntityBase>({
   activeSort,
@@ -35,11 +37,11 @@ const TableHeader = <Entity extends EntityBase>({
   onSortChange,
   colWidth,
 }: {
-  activeSort: Sort,
-  column: Column
-  columnRenderer: ColumnRenderer<Entity> | undefined
-  onSortChange: (newSort: Sort) => void,
-  colWidth: number
+  activeSort: Sort;
+  column: Column;
+  columnRenderer: ColumnRenderer<Entity> | undefined;
+  onSortChange: (newSort: Sort) => void;
+  colWidth: number;
 }) => {
   const content = useMemo(
     () => (typeof columnRenderer?.renderHeader === 'function' ? columnRenderer.renderHeader(column) : column.title),
@@ -50,19 +52,17 @@ const TableHeader = <Entity extends EntityBase>({
     <Th $width={colWidth}>
       {content}
 
-      {column.sortable && (
-        <SortIcon onChange={onSortChange}
-                  column={column}
-                  activeSort={activeSort} />
-      )}
+      {column.sortable && <SortIcon onChange={onSortChange} column={column} activeSort={activeSort} />}
     </Th>
   );
 };
 
-const ActionsHead = styled.th<{ $width: number | undefined }>(({ $width }) => css`
-  text-align: right;
-  width: ${$width ? `${$width}px` : 'auto'};
-`);
+const ActionsHead = styled.th<{ $width: number | undefined }>(
+  ({ $width }) => css`
+    text-align: right;
+    width: ${$width ? `${$width}px` : 'auto'};
+  `,
+);
 
 const TableHead = <Entity extends EntityBase>({
   actionsColWidth,
@@ -76,16 +76,16 @@ const TableHead = <Entity extends EntityBase>({
   displayBulkSelectCol,
   onSortChange,
 }: {
-  actionsColWidth: number | undefined,
-  activeSort: Sort,
-  columns: Array<Column>,
-  columnsWidths: { [columnId: string]: number },
-  columnsOrder: Array<string>,
-  columnRenderersByAttribute: ColumnRenderersByAttribute<Entity>,
-  data: Readonly<Array<Entity>>,
-  displayActionsCol: boolean,
-  displayBulkSelectCol: boolean,
-  onSortChange: (newSort: Sort) => void,
+  actionsColWidth: number | undefined;
+  activeSort: Sort;
+  columns: Array<Column>;
+  columnsWidths: { [columnId: string]: number };
+  columnsOrder: Array<string>;
+  columnRenderersByAttribute: ColumnRenderersByAttribute<Entity>;
+  data: Readonly<Array<Entity>>;
+  displayActionsCol: boolean;
+  displayBulkSelectCol: boolean;
+  onSortChange: (newSort: Sort) => void;
 }) => {
   const sortedColumns = useMemo(
     () => columns.sort((col1, col2) => columnsOrder.indexOf(col1.id) - columnsOrder.indexOf(col2.id)),
@@ -100,12 +100,14 @@ const TableHead = <Entity extends EntityBase>({
           const columnRenderer = columnRenderersByAttribute[column.id];
 
           return (
-            <TableHeader<Entity> columnRenderer={columnRenderer}
-                                 column={column}
-                                 colWidth={columnsWidths[column.id]}
-                                 onSortChange={onSortChange}
-                                 activeSort={activeSort}
-                                 key={column.title} />
+            <TableHeader<Entity>
+              columnRenderer={columnRenderer}
+              column={column}
+              colWidth={columnsWidths[column.id]}
+              onSortChange={onSortChange}
+              activeSort={activeSort}
+              key={column.title}
+            />
           );
         })}
         {displayActionsCol ? <ActionsHead $width={actionsColWidth}>Actions</ActionsHead> : null}

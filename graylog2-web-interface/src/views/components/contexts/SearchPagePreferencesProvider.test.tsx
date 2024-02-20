@@ -63,13 +63,11 @@ describe('SearchPagePreferencesProvider', () => {
 
   const view = createSearch().toBuilder().type(View.Type.Search).build();
 
-  const SimpleProvider = ({ children }: { children: (value: SearchPreferencesLayout) => React.ReactNode}) => (
+  const SimpleProvider = ({ children }: { children: (value: SearchPreferencesLayout) => React.ReactNode }) => (
     <TestStoreProvider view={view}>
       <CurrentUserPreferencesProvider>
         <SearchPagePreferencesProvider>
-          <SearchPagePreferencesContext.Consumer>
-            {children}
-          </SearchPagePreferencesContext.Consumer>
+          <SearchPagePreferencesContext.Consumer>{children}</SearchPagePreferencesContext.Consumer>
         </SearchPagePreferencesProvider>
       </CurrentUserPreferencesProvider>
     </TestStoreProvider>
@@ -79,9 +77,15 @@ describe('SearchPagePreferencesProvider', () => {
     <SimpleProvider>
       {(searchPagePreferences) => {
         if (!searchPagePreferences) return '';
-        const { actions: { toggleSidebarPinning } } = searchPagePreferences;
+        const {
+          actions: { toggleSidebarPinning },
+        } = searchPagePreferences;
 
-        return (<button type="button" onClick={() => toggleSidebarPinning()}>Toggle sidebar pinning</button>);
+        return (
+          <button type="button" onClick={() => toggleSidebarPinning()}>
+            Toggle sidebar pinning
+          </button>
+        );
       }}
     </SimpleProvider>
   );
@@ -89,11 +93,7 @@ describe('SearchPagePreferencesProvider', () => {
   const renderSUT = () => {
     const consume = jest.fn();
 
-    render(
-      <SimpleProvider>
-        {consume}
-      </SimpleProvider>,
-    );
+    render(<SimpleProvider>{consume}</SimpleProvider>);
 
     return consume;
   };
@@ -101,32 +101,58 @@ describe('SearchPagePreferencesProvider', () => {
   it('provides default search page preference state with empty preference store', () => {
     const consume = renderSUT();
 
-    expect(consume).toHaveBeenCalledWith(expect.objectContaining({ config: expect.objectContaining({ sidebar: expect.objectContaining({ isPinned: false }) }) }));
+    expect(consume).toHaveBeenCalledWith(
+      expect.objectContaining({
+        config: expect.objectContaining({ sidebar: expect.objectContaining({ isPinned: false }) }),
+      }),
+    );
   });
 
   it('provides default search page preference state if user does not exists', () => {
     asMock(useCurrentUser).mockReturnValue({} as User);
     const consume = renderSUT();
 
-    expect(consume).toHaveBeenCalledWith(expect.objectContaining({ config: expect.objectContaining({ sidebar: expect.objectContaining({ isPinned: false }) }) }));
+    expect(consume).toHaveBeenCalledWith(
+      expect.objectContaining({
+        config: expect.objectContaining({ sidebar: expect.objectContaining({ isPinned: false }) }),
+      }),
+    );
   });
 
   it('provides default search page preference state if user has no preferences', () => {
-    asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder().preferences({} as PreferencesMap).build());
+    asMock(useCurrentUser).mockReturnValue(
+      adminUser
+        .toBuilder()
+        .preferences({} as PreferencesMap)
+        .build(),
+    );
 
     const consume = renderSUT();
 
-    expect(consume).toHaveBeenCalledWith(expect.objectContaining({ config: expect.objectContaining({ sidebar: expect.objectContaining({ isPinned: false }) }) }));
+    expect(consume).toHaveBeenCalledWith(
+      expect.objectContaining({
+        config: expect.objectContaining({ sidebar: expect.objectContaining({ isPinned: false }) }),
+      }),
+    );
   });
 
   it('provides search page preferences based on user preferences', () => {
-    asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder().preferences({
-      searchSidebarIsPinned: true,
-    } as PreferencesMap).build());
+    asMock(useCurrentUser).mockReturnValue(
+      adminUser
+        .toBuilder()
+        .preferences({
+          searchSidebarIsPinned: true,
+        } as PreferencesMap)
+        .build(),
+    );
 
     const consume = renderSUT();
 
-    expect(consume).toHaveBeenCalledWith(expect.objectContaining({ config: expect.objectContaining({ sidebar: expect.objectContaining({ isPinned: true }) }) }));
+    expect(consume).toHaveBeenCalledWith(
+      expect.objectContaining({
+        config: expect.objectContaining({ sidebar: expect.objectContaining({ isPinned: true }) }),
+      }),
+    );
   });
 
   it('provides search page preference state based on local storage for system admin', () => {
@@ -140,7 +166,11 @@ describe('SearchPagePreferencesProvider', () => {
 
     const consume = renderSUT();
 
-    expect(consume).toHaveBeenCalledWith(expect.objectContaining({ config: expect.objectContaining({ sidebar: expect.objectContaining({ isPinned: true }) }) }));
+    expect(consume).toHaveBeenCalledWith(
+      expect.objectContaining({
+        config: expect.objectContaining({ sidebar: expect.objectContaining({ isPinned: true }) }),
+      }),
+    );
   });
 
   it('should update user preferences on state change', () => {

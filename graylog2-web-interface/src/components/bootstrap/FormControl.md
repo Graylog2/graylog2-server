@@ -8,7 +8,7 @@ class FormExample extends React.Component {
     this.handleChange = this.handleChange.bind(this);
 
     this.state = {
-      value: ''
+      value: '',
     };
   }
 
@@ -27,17 +27,9 @@ class FormExample extends React.Component {
   render() {
     return (
       <form>
-        <FormGroup
-          controlId="formBasicText"
-          validationState={this.getValidationState()}
-        >
+        <FormGroup controlId="formBasicText" validationState={this.getValidationState()}>
           <ControlLabel>Working example with validation</ControlLabel>
-          <FormControl
-            type="text"
-            value={this.state.value}
-            placeholder="Enter text"
-            onChange={this.handleChange}
-          />
+          <FormControl type="text" value={this.state.value} placeholder="Enter text" onChange={this.handleChange} />
           <FormControl.Feedback />
           <HelpBlock>Validation is based on string length.</HelpBlock>
         </FormGroup>
@@ -46,5 +38,5 @@ class FormExample extends React.Component {
   }
 }
 
-<FormExample />
+<FormExample />;
 ```

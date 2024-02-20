@@ -35,7 +35,7 @@ const CurrentView = PropTypes.exact({
 });
 
 export type CurrentViewType = {
-  activeQuery: string,
+  activeQuery: string;
 };
 
 const BackendMessage = PropTypes.exact({
@@ -58,14 +58,8 @@ const Message = PropTypes.exact({
   }),
 });
 
-const ValidElements = PropTypes.oneOfType([
-  PropTypes.element,
-  PropTypes.string,
-]);
-const OneOrMoreChildren = PropTypes.oneOfType([
-  ValidElements,
-  PropTypes.arrayOf(ValidElements),
-]);
+const ValidElements = PropTypes.oneOfType([PropTypes.element, PropTypes.string]);
+const OneOrMoreChildren = PropTypes.oneOfType([ValidElements, PropTypes.arrayOf(ValidElements)]);
 
 const prototypesOf = (target) => {
   let i = target;
@@ -93,7 +87,9 @@ const createInstanceOf = (expectedClass, required = false) => {
 
     if (!value) {
       return required
-        ? new Error(`Invalid prop ${propName} supplied to ${componentName}: expected to be instance of ${expectedConstructorName} but found ${value} instead`)
+        ? new Error(
+            `Invalid prop ${propName} supplied to ${componentName}: expected to be instance of ${expectedConstructorName} but found ${value} instead`,
+          )
         : undefined;
     }
 
@@ -103,19 +99,19 @@ const createInstanceOf = (expectedClass, required = false) => {
       .filter((name) => name !== undefined);
 
     if (!constructorNames.includes(expectedConstructorName)) {
-      return new Error(`Invalid prop ${propName} supplied to ${componentName}: ${valueConstructorName} expected to be instance of ${expectedConstructorName}`);
+      return new Error(
+        `Invalid prop ${propName} supplied to ${componentName}: ${valueConstructorName} expected to be instance of ${expectedConstructorName}`,
+      );
     }
 
     return undefined;
   };
 };
 
-const instanceOf = (expected) => Object.assign(
-  createInstanceOf(expected, false),
-  { isRequired: createInstanceOf(expected, true) },
-);
+const instanceOf = (expected) =>
+  Object.assign(createInstanceOf(expected, false), { isRequired: createInstanceOf(expected, true) });
 
-export default ({
+export default {
   ...PropTypes,
   BackendMessage,
   Message,
@@ -126,4 +122,4 @@ export default ({
   TimeRangeType,
   instanceOf,
   ValidElements,
-});
+};

@@ -28,64 +28,63 @@ import type FetchError from 'logic/errors/FetchError';
 import type { RuleBuilderType } from 'components/rules/rule-builder/types';
 
 export type RuleType = {
-  id?: string,
-  source: string,
-  title: string,
-  description: string,
-  created_at: string,
-  modified_at: string,
-  rule_builder: RuleBuilderType,
-  errors?: [],
-  simulator_message?: string,
+  id?: string;
+  source: string;
+  title: string;
+  description: string;
+  created_at: string;
+  modified_at: string;
+  rule_builder: RuleBuilderType;
+  errors?: [];
+  simulator_message?: string;
 };
 export type MetricsConfigType = {
-  metrics_enabled: boolean,
+  metrics_enabled: boolean;
 };
 export type PipelineSummary = {
-  id: string,
-  title: string,
+  id: string;
+  title: string;
 };
 export type RulesContext = {
   used_in_pipelines: {
-    [id: string]: Array<PipelineSummary>,
-  }
+    [id: string]: Array<PipelineSummary>;
+  };
 };
 export type PaginatedRulesResponse = PaginatedListJSON & {
-  rules: Array<RuleType>,
-  context: RulesContext,
+  rules: Array<RuleType>;
+  context: RulesContext;
 };
 
 export type PaginatedRules = {
-  list: Array<RuleType>,
-  context: RulesContext,
-  pagination: ListPagination,
+  list: Array<RuleType>;
+  context: RulesContext;
+  pagination: ListPagination;
 };
 
 export type RulesStoreState = {
-  rules: Array<RuleType>,
-  rulesContext: RulesContext,
-  functionDescriptors: any,
-  metricsConfig: MetricsConfigType | undefined,
+  rules: Array<RuleType>;
+  rulesContext: RulesContext;
+  functionDescriptors: any;
+  metricsConfig: MetricsConfigType | undefined;
 };
 
 type RulesActionsType = {
-  delete: (rule: RuleType) => Promise<unknown>,
-  list: () => Promise<unknown>,
-  get: (ruleId: string) => Promise<unknown>,
-  save: (rule: RuleType) => Promise<unknown>,
-  update: (rule: RuleType) => Promise<unknown>,
-  parse: (rule: RuleType, callback: () => void) => Promise<unknown>,
-  simulate: (messageString: string, rule: RuleType, callback: React.Dispatch<any> | (() => void)) => Promise<unknown>,
-  multiple: () => Promise<unknown>,
-  loadFunctions: () => Promise<unknown>,
-  loadMetricsConfig: () => Promise<unknown>,
-  updateMetricsConfig: () => Promise<unknown>,
-  listPaginated: (pagination: Pagination) => Promise<PaginatedRules>,
+  delete: (rule: RuleType) => Promise<unknown>;
+  list: () => Promise<unknown>;
+  get: (ruleId: string) => Promise<unknown>;
+  save: (rule: RuleType) => Promise<unknown>;
+  update: (rule: RuleType) => Promise<unknown>;
+  parse: (rule: RuleType, callback: () => void) => Promise<unknown>;
+  simulate: (messageString: string, rule: RuleType, callback: React.Dispatch<any> | (() => void)) => Promise<unknown>;
+  multiple: () => Promise<unknown>;
+  loadFunctions: () => Promise<unknown>;
+  loadMetricsConfig: () => Promise<unknown>;
+  updateMetricsConfig: () => Promise<unknown>;
+  listPaginated: (pagination: Pagination) => Promise<PaginatedRules>;
 };
 
-export const RulesActions = singletonActions(
-  'core.Rules',
-  () => Reflux.createActions<RulesActionsType>({
+export const RulesActions = singletonActions('core.Rules', () =>
+  Reflux.createActions<RulesActionsType>({
     delete: { asyncResult: true },
     list: { asyncResult: true },
     get: { asyncResult: true },
@@ -101,9 +100,8 @@ export const RulesActions = singletonActions(
   }),
 );
 
-export const RulesStore = singletonStore(
-  'core.Rules',
-  () => Reflux.createStore<{ rules: RuleType[] }>({
+export const RulesStore = singletonStore('core.Rules', () =>
+  Reflux.createStore<{ rules: RuleType[] }>({
     listenables: [RulesActions],
     rules: undefined,
     rulesContext: undefined,
@@ -145,8 +143,10 @@ export const RulesStore = singletonStore(
 
     list() {
       const failCallback = (error: Error) => {
-        UserNotification.error(`Fetching rules failed with status: ${error.message}`,
-          'Could not retrieve processing rules');
+        UserNotification.error(
+          `Fetching rules failed with status: ${error.message}`,
+          'Could not retrieve processing rules',
+        );
       };
 
       const url = qualifyUrl(ApiRoutes.RulesController.list().url);
@@ -159,18 +159,17 @@ export const RulesStore = singletonStore(
 
     listPaginated({ page, perPage, query }: Pagination): Promise<PaginatedRules> {
       const url = PaginationURL(ApiRoutes.RulesController.paginatedList().url, page, perPage, query);
-      const promise = fetch('GET', qualifyUrl(url))
-        .then((response: PaginatedRulesResponse) => ({
-          list: response.rules,
-          context: response.context,
-          pagination: {
-            count: response.count,
-            total: response.total,
-            page: response.page,
-            perPage: response.per_page,
-            query: response.query,
-          },
-        }));
+      const promise = fetch('GET', qualifyUrl(url)).then((response: PaginatedRulesResponse) => ({
+        list: response.rules,
+        context: response.context,
+        pagination: {
+          count: response.count,
+          total: response.total,
+          page: response.page,
+          perPage: response.per_page,
+          query: response.query,
+        },
+      }));
 
       promise.catch((error: FetchError) => {
         if (!error.additional || error.additional.status !== 404) {
@@ -185,8 +184,10 @@ export const RulesStore = singletonStore(
 
     get(ruleId: string) {
       const failCallback = (error: Error) => {
-        UserNotification.error(`Fetching rule "${ruleId}" failed with status: ${error.message}`,
-          `Could not retrieve processing rule "${ruleId}"`);
+        UserNotification.error(
+          `Fetching rule "${ruleId}" failed with status: ${error.message}`,
+          `Could not retrieve processing rule "${ruleId}"`,
+        );
       };
 
       const url = qualifyUrl(ApiRoutes.RulesController.get(ruleId).url);
@@ -200,8 +201,10 @@ export const RulesStore = singletonStore(
 
     save(ruleSource: RuleType) {
       const failCallback = (error: Error) => {
-        UserNotification.error(`Saving rule "${ruleSource.title}" failed with status: ${error.message}`,
-          `Could not save processing rule "${ruleSource.title}"`);
+        UserNotification.error(
+          `Saving rule "${ruleSource.title}" failed with status: ${error.message}`,
+          `Could not save processing rule "${ruleSource.title}"`,
+        );
       };
 
       const url = qualifyUrl(ApiRoutes.RulesController.create().url);
@@ -227,8 +230,10 @@ export const RulesStore = singletonStore(
 
     update(ruleSource: RuleType) {
       const failCallback = (error) => {
-        UserNotification.error(`Updating rule "${ruleSource.title}" failed with status: ${error.message}`,
-          `Could not update processing rule "${ruleSource.title}"`);
+        UserNotification.error(
+          `Updating rule "${ruleSource.title}" failed with status: ${error.message}`,
+          `Could not update processing rule "${ruleSource.title}"`,
+        );
       };
 
       const url = qualifyUrl(ApiRoutes.RulesController.update(ruleSource.id).url);
@@ -254,8 +259,10 @@ export const RulesStore = singletonStore(
     },
     delete(rule) {
       const failCallback = (error: Error) => {
-        UserNotification.error(`Deleting rule "${rule.title}" failed with status: ${error.message}`,
-          `Could not delete processing rule "${rule.title}"`);
+        UserNotification.error(
+          `Deleting rule "${rule.title}" failed with status: ${error.message}`,
+          `Could not delete processing rule "${rule.title}"`,
+        );
       };
 
       const url = qualifyUrl(ApiRoutes.RulesController.delete(rule.id).url);
@@ -280,13 +287,13 @@ export const RulesStore = singletonStore(
 
       return fetch('POST', url, rule).then(
         (response) => {
-        // call to clear the errors, the parsing was successful
+          // call to clear the errors, the parsing was successful
           callback([]);
 
           return response;
         },
         (error) => {
-        // a Bad Request indicates a parse error, set all the returned errors in the editor
+          // a Bad Request indicates a parse error, set all the returned errors in the editor
           if (error.status === 400) {
             callback(error.additional.body);
           }
@@ -294,7 +301,11 @@ export const RulesStore = singletonStore(
       );
     },
     simulate(message, ruleToSimulate, callback) {
-      const url = qualifyUrl(ruleToSimulate?.rule_builder ? ApiRoutes.RuleBuilderController.simulate().url : ApiRoutes.RulesController.simulate().url);
+      const url = qualifyUrl(
+        ruleToSimulate?.rule_builder
+          ? ApiRoutes.RuleBuilderController.simulate().url
+          : ApiRoutes.RulesController.simulate().url,
+      );
       const rule = {
         message,
         rule_source: undefined,
@@ -335,8 +346,7 @@ export const RulesStore = singletonStore(
 
       const url = qualifyUrl(ApiRoutes.RulesController.functions().url);
 
-      return fetch('GET', url)
-        .then(this._updateFunctionDescriptors);
+      return fetch('GET', url).then(this._updateFunctionDescriptors);
     },
     loadMetricsConfig() {
       const url = qualifyUrl(ApiRoutes.RulesController.metricsConfig().url);
@@ -345,10 +355,17 @@ export const RulesStore = singletonStore(
       promise.then(
         (response: MetricsConfigType) => {
           this.metricsConfig = response;
-          this.trigger({ rules: this.rules, functionDescriptors: this.functionDescriptors, metricsConfig: this.metricsConfig });
+          this.trigger({
+            rules: this.rules,
+            functionDescriptors: this.functionDescriptors,
+            metricsConfig: this.metricsConfig,
+          });
         },
         (error) => {
-          UserNotification.error(`Couldn't load rule metrics config: ${error.message}`, "Couldn't load rule metrics config");
+          UserNotification.error(
+            `Couldn't load rule metrics config: ${error.message}`,
+            "Couldn't load rule metrics config",
+          );
         },
       );
 
@@ -361,11 +378,18 @@ export const RulesStore = singletonStore(
       promise.then(
         (response) => {
           this.metricsConfig = response;
-          this.trigger({ rules: this.rules, functionDescriptors: this.functionDescriptors, metricsConfig: this.metricsConfig });
+          this.trigger({
+            rules: this.rules,
+            functionDescriptors: this.functionDescriptors,
+            metricsConfig: this.metricsConfig,
+          });
           UserNotification.success('Successfully updated rule metrics config');
         },
         (error) => {
-          UserNotification.error(`Couldn't update rule metrics config: ${error.message}`, "Couldn't update rule metrics config");
+          UserNotification.error(
+            `Couldn't update rule metrics config: ${error.message}`,
+            "Couldn't update rule metrics config",
+          );
         },
       );
 

@@ -55,7 +55,11 @@ const KinesisSetup = ({ onChange, onSubmit, toggleSetup }) => {
       if (groupNamesStatus.error.match(noGroups)) {
         setFormError({
           full_message: groupNamesStatus.error,
-          nice_message: <span>We&apos;re unable to find any groups in your chosen region. Please try selecting a different region.</span>,
+          nice_message: (
+            <span>
+              We&apos;re unable to find any groups in your chosen region. Please try selecting a different region.
+            </span>
+          ),
         });
 
         setDisabledGroups(true);
@@ -87,19 +91,29 @@ const KinesisSetup = ({ onChange, onSubmit, toggleSetup }) => {
   };
 
   return (
-    <FormWrap onSubmit={handleFormSubmit}
-              buttonContent="Begin Automated Setup"
-              disabled={formValidation.isFormValid([
-                'awsCloudWatchKinesisStream',
-                'awsCloudWatchAwsGroupName',
-              ], formData) || disabledForm}
-              loading={groupNamesStatus.loading}
-              error={formError}
-              title="Set Up Kinesis Automatically"
-              description="">
-
+    <FormWrap
+      onSubmit={handleFormSubmit}
+      buttonContent="Begin Automated Setup"
+      disabled={
+        formValidation.isFormValid(['awsCloudWatchKinesisStream', 'awsCloudWatchAwsGroupName'], formData) ||
+        disabledForm
+      }
+      loading={groupNamesStatus.loading}
+      error={formError}
+      title="Set Up Kinesis Automatically"
+      description=""
+    >
       <p>
-        Complete the fields below and Graylog will perform the automated Kinesis setup, which performs the following operations within your AWS account. See <a target="_blank" rel="noopener noreferrer" href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/SubscriptionFilters.html">Using CloudWatch Logs Subscription Filters</a> in the AWS documentation for more information.
+        Complete the fields below and Graylog will perform the automated Kinesis setup, which performs the following
+        operations within your AWS account. See{' '}
+        <a
+          target="_blank"
+          rel="noopener noreferrer"
+          href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/SubscriptionFilters.html"
+        >
+          Using CloudWatch Logs Subscription Filters
+        </a>{' '}
+        in the AWS documentation for more information.
       </p>
 
       <ol>
@@ -108,42 +122,44 @@ const KinesisSetup = ({ onChange, onSubmit, toggleSetup }) => {
         <li>Subscribe the new Kinesis stream to the Log Group.</li>
       </ol>
 
-      <ValidatedInput id="awsCloudWatchKinesisStream"
-                      type="text"
-                      label="Kinesis Stream Name"
-                      placeholder="Stream Name"
-                      onChange={onChange}
-                      fieldData={formData.awsCloudWatchKinesisStream}
-                      disabled={disabledForm}
-                      pattern="[a-zA-Z0-9_.-]{1,128}$"
-                      help="1-128 alphanumeric characters and special characters underscore (_), period (.), and hyphen (-)."
-                      required />
+      <ValidatedInput
+        id="awsCloudWatchKinesisStream"
+        type="text"
+        label="Kinesis Stream Name"
+        placeholder="Stream Name"
+        onChange={onChange}
+        fieldData={formData.awsCloudWatchKinesisStream}
+        disabled={disabledForm}
+        pattern="[a-zA-Z0-9_.-]{1,128}$"
+        help="1-128 alphanumeric characters and special characters underscore (_), period (.), and hyphen (-)."
+        required
+      />
 
-      <ValidatedInput id="awsCloudWatchAwsGroupName"
-                      type="select"
-                      fieldData={formData.awsCloudWatchAwsGroupName}
-                      onChange={onChange}
-                      label="CloudWatch Group Name"
-                      required
-                      disabled={groupNamesStatus.loading || disabledGroups || disabledForm}>
-
+      <ValidatedInput
+        id="awsCloudWatchAwsGroupName"
+        type="select"
+        fieldData={formData.awsCloudWatchAwsGroupName}
+        onChange={onChange}
+        label="CloudWatch Group Name"
+        required
+        disabled={groupNamesStatus.loading || disabledGroups || disabledForm}
+      >
         {renderOptions(availableGroups, 'Choose CloudWatch Group', groupNamesStatus.loading)}
       </ValidatedInput>
 
-      {toggleSetup
-        && (
-        <BackButton onClick={toggleSetup}
-                    type="button"
-                    disabled={disabledForm}>
+      {toggleSetup && (
+        <BackButton onClick={toggleSetup} type="button" disabled={disabledForm}>
           Back to stream Selection
         </BackButton>
-        )}
+      )}
 
       {showTOS && (
-      <SetupModal onSubmit={handleAgreeSubmit}
-                  onCancel={handleAgreeCancel}
-                  groupName={formData.awsCloudWatchAwsGroupName.value}
-                  streamName={formData.awsCloudWatchKinesisStream.value} />
+        <SetupModal
+          onSubmit={handleAgreeSubmit}
+          onCancel={handleAgreeCancel}
+          groupName={formData.awsCloudWatchAwsGroupName.value}
+          streamName={formData.awsCloudWatchKinesisStream.value}
+        />
       )}
     </FormWrap>
   );

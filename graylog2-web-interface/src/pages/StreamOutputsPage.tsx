@@ -40,22 +40,24 @@ const StreamOutputsPage = () => {
       <div>
         <ContentHeadRow className="content">
           <Col md={10}>
-            <h1>
-              Outputs for Stream &raquo;{stream.title}&laquo;
-            </h1>
+            <h1>Outputs for Stream &raquo;{stream.title}&laquo;</h1>
 
             <p className="description">
-              Graylog nodes can forward messages of streams via outputs. Launch or terminate as many outputs as you want here.
-              You can also reuse outputs that are already running for other streams.
-
-              A global view of all configured outputs is available <Link to={Routes.SYSTEM.OUTPUTS}>here</Link>.
-              You can find output plugins on <a href="https://marketplace.graylog.org/" rel="noopener noreferrer" target="_blank">the Graylog Marketplace</a>.
+              Graylog nodes can forward messages of streams via outputs. Launch or terminate as many outputs as you want
+              here. You can also reuse outputs that are already running for other streams. A global view of all
+              configured outputs is available <Link to={Routes.SYSTEM.OUTPUTS}>here</Link>. You can find output plugins
+              on{' '}
+              <a href="https://marketplace.graylog.org/" rel="noopener noreferrer" target="_blank">
+                the Graylog Marketplace
+              </a>
+              .
             </p>
 
             <SupportLink>
-              <i>Removing</i> an output removes it from this stream but it will still be in the list of available outputs.
-              Deleting an output <i>globally</i> will remove it from this and all other streams and terminate it.
-              You can see all defined outputs in details at the {' '} <Link to={Routes.SYSTEM.OUTPUTS}>global output list</Link>.
+              <i>Removing</i> an output removes it from this stream but it will still be in the list of available
+              outputs. Deleting an output <i>globally</i> will remove it from this and all other streams and terminate
+              it. You can see all defined outputs in details at the{' '}
+              <Link to={Routes.SYSTEM.OUTPUTS}>global output list</Link>.
             </SupportLink>
           </Col>
         </ContentHeadRow>

@@ -35,16 +35,20 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
-const Toolbar = styled(Row)(({ theme }) => css`
-  border-bottom: 1px solid ${theme.colors.gray[90]};
-  padding-bottom: ${theme.spacings.sm};
-`);
+const Toolbar = styled(Row)(
+  ({ theme }) => css`
+    border-bottom: 1px solid ${theme.colors.gray[90]};
+    padding-bottom: ${theme.spacings.sm};
+  `,
+);
 
-const GlobalStatsCol = styled(Col)(({ theme }) => css`
-  display: flex;
-  align-items: center;
-  gap: ${theme.spacings.xs};
-`);
+const GlobalStatsCol = styled(Col)(
+  ({ theme }) => css`
+    display: flex;
+    align-items: center;
+    gap: ${theme.spacings.xs};
+  `,
+);
 
 const GlobalStats = styled.p`
   margin-bottom: 0;
@@ -70,7 +74,8 @@ const IndexSetsComponent = () => {
   const DEFAULT_PAGE_NUMBER = 1;
   const DEFAULT_PAGE_SIZE = 10;
   const SEARCH_MIN_TERM_LENGTH = 3;
-  const { indexSetsCount, indexSets, indexSetStats, globalIndexSetStats } = useStore<IndexSetsStoreState>(IndexSetsStore);
+  const { indexSetsCount, indexSets, indexSetStats, globalIndexSetStats } =
+    useStore<IndexSetsStoreState>(IndexSetsStore);
   const { page, resetPage }: PaginationQueryParameterResult = usePaginationQueryParameter();
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
@@ -78,15 +83,18 @@ const IndexSetsComponent = () => {
   const [statsEnabled, setStatsEnabled] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>(undefined);
 
-  const formsRef = useRef<{ [key: string]: { open:() => void } }>();
+  const formsRef = useRef<{ [key: string]: { open: () => void } }>();
 
-  const loadData = useCallback((pageNumber: number = DEFAULT_PAGE_NUMBER, limit: number = DEFAULT_PAGE_SIZE) => {
-    if (searchTerm) {
-      IndexSetsActions.searchPaginated(searchTerm, (pageNumber - 1) * limit, limit, statsEnabled);
-    } else {
-      IndexSetsActions.listPaginated((pageNumber - 1) * limit, limit, statsEnabled);
-    }
-  }, [statsEnabled, searchTerm]);
+  const loadData = useCallback(
+    (pageNumber: number = DEFAULT_PAGE_NUMBER, limit: number = DEFAULT_PAGE_SIZE) => {
+      if (searchTerm) {
+        IndexSetsActions.searchPaginated(searchTerm, (pageNumber - 1) * limit, limit, statsEnabled);
+      } else {
+        IndexSetsActions.listPaginated((pageNumber - 1) * limit, limit, statsEnabled);
+      }
+    },
+    [statsEnabled, searchTerm],
+  );
 
   useEffect(() => {
     loadData(page);
@@ -152,8 +160,8 @@ const IndexSetsComponent = () => {
           <Button>Edit</Button>
         </LinkContainer>
         <DropdownButton title="More Actions" id={`index-set-dropdown-${indexSet.id}`} pullRight>
-          <MenuItem onSelect={onSetDefault(indexSet)}
-                    disabled={!indexSet.can_be_default || indexSet.default}>Set as default
+          <MenuItem onSelect={onSetDefault(indexSet)} disabled={!indexSet.can_be_default || indexSet.default}>
+            Set as default
           </MenuItem>
           <MenuItem divider />
           <MenuItem onSelect={onDelete(indexSet)}>Delete</MenuItem>
@@ -165,26 +173,32 @@ const IndexSetsComponent = () => {
       <Col md={12}>
         <IndexSetDetails indexSet={indexSet} />
 
-        <IndexSetDeletionForm ref={
-          (elem) => {
+        <IndexSetDeletionForm
+          ref={(elem) => {
             formsRef.current = { ...formsRef.current, [`index-set-deletion-form-${indexSet.id}`]: elem };
-          }
-        }
-                              indexSet={indexSet}
-                              onDelete={deleteIndexSet} />
+          }}
+          indexSet={indexSet}
+          onDelete={deleteIndexSet}
+        />
       </Col>
     );
 
-    const indexSetTitle = (
-      <Link to={Routes.SYSTEM.INDEX_SETS.SHOW(indexSet.id)}>
-        {indexSet.title}
-      </Link>
-    );
+    const indexSetTitle = <Link to={Routes.SYSTEM.INDEX_SETS.SHOW(indexSet.id)}>{indexSet.title}</Link>;
 
-    const isDefault = indexSet.default
-      ? <Label key={`index-set-${indexSet.id}-default-label`} bsStyle="primary">default</Label> : '';
-    const isReadOnly = !indexSet.writable
-      ? <Label key={`index-set-${indexSet.id}-readOnly-label`} bsStyle="info">read only</Label> : '';
+    const isDefault = indexSet.default ? (
+      <Label key={`index-set-${indexSet.id}-default-label`} bsStyle="primary">
+        default
+      </Label>
+    ) : (
+      ''
+    );
+    const isReadOnly = !indexSet.writable ? (
+      <Label key={`index-set-${indexSet.id}-readOnly-label`} bsStyle="info">
+        read only
+      </Label>
+    ) : (
+      ''
+    );
     let { description } = indexSet;
 
     if (indexSet.default) {
@@ -199,16 +213,18 @@ const IndexSetsComponent = () => {
     }
 
     return (
-      <EntityListItem key={`index-set-${indexSet.id}`}
-                      title={indexSetTitle}
-                      titleSuffix={(
-                        <span>{statsEnabled ? statsString
-                          : <StatsInfoText>{statsDisabledText}</StatsInfoText>} {isDefault} {isReadOnly}
-                        </span>
-                      )}
-                      description={description}
-                      actions={actions}
-                      contentRow={content} />
+      <EntityListItem
+        key={`index-set-${indexSet.id}`}
+        title={indexSetTitle}
+        titleSuffix={
+          <span>
+            {statsEnabled ? statsString : <StatsInfoText>{statsDisabledText}</StatsInfoText>} {isDefault} {isReadOnly}
+          </span>
+        }
+        description={description}
+        actions={actions}
+        contentRow={content}
+      />
     );
   };
 
@@ -218,19 +234,21 @@ const IndexSetsComponent = () => {
     <>
       <Row>
         <Col md={12}>
-          <SearchForm onSearch={onSearch}
-                      queryWidth={300}
-                      wrapperClass="has-bm"
-                      onReset={onSearchReset}
-                      query={searchTerm}
-                      placeholder="Find index sets" />
+          <SearchForm
+            onSearch={onSearch}
+            queryWidth={300}
+            wrapperClass="has-bm"
+            onReset={onSearchReset}
+            query={searchTerm}
+            placeholder="Find index sets"
+          />
         </Col>
       </Row>
       <Toolbar>
         <GlobalStatsCol md={3}>
-          <GlobalStats><strong>Stats for all indices:</strong> {statsEnabled
-            ? formatStatsString(globalIndexSetStats)
-            : <StatsInfoText>{statsDisabledText}</StatsInfoText>}
+          <GlobalStats>
+            <strong>Stats for all indices:</strong>{' '}
+            {statsEnabled ? formatStatsString(globalIndexSetStats) : <StatsInfoText>{statsDisabledText}</StatsInfoText>}
           </GlobalStats>
           <Button onClick={onToggleStats}>{statsEnabled ? 'Disable stats' : 'Enable stats'}</Button>
         </GlobalStatsCol>
@@ -238,17 +256,17 @@ const IndexSetsComponent = () => {
 
       <Row>
         <Col md={12}>
-          {isLoading
-            ? <Spinner /> : (
-
-              <PaginatedList pageSize={DEFAULT_PAGE_SIZE}
-                             totalItems={indexSetsCount}
-                             showPageSizeSelect={false}>
-                <EntityList bsNoItemsStyle="info"
-                            noItemsText="There are no index sets to display"
-                            items={indexSets.map((indexSet) => formatIndexSet(indexSet))} />
-              </PaginatedList>
-            )}
+          {isLoading ? (
+            <Spinner />
+          ) : (
+            <PaginatedList pageSize={DEFAULT_PAGE_SIZE} totalItems={indexSetsCount} showPageSizeSelect={false}>
+              <EntityList
+                bsNoItemsStyle="info"
+                noItemsText="There are no index sets to display"
+                items={indexSets.map((indexSet) => formatIndexSet(indexSet))}
+              />
+            </PaginatedList>
+          )}
         </Col>
       </Row>
     </>

@@ -30,24 +30,29 @@ const SelectContainer = styled.div`
 `;
 
 type Props = {
-  onChange: (newValue: string) => void,
-  value: string,
-  streams: Array<Stream>,
+  onChange: (newValue: string) => void;
+  value: string;
+  streams: Array<Stream>;
 };
 
 const StreamSelect = ({ onChange, value, streams }: Props) => {
-  const options = [{ label: 'Default Search', value: DEFAULT_SEARCH_ID }, ...streams
-    .sort(({ title: key1 }, { title: key2 }) => defaultCompare(key1, key2))
-    .map(({ title, id }) => ({ label: title, value: id }))];
+  const options = [
+    { label: 'Default Search', value: DEFAULT_SEARCH_ID },
+    ...streams
+      .sort(({ title: key1 }, { title: key2 }) => defaultCompare(key1, key2))
+      .map(({ title, id }) => ({ label: title, value: id })),
+  ];
 
   return (
     <SelectContainer>
-      <Select inputId="streams-filter"
-              onChange={onChange}
-              options={options}
-              clearable={false}
-              placeholder="There are no decorators configured for any stream."
-              value={value} />
+      <Select
+        inputId="streams-filter"
+        onChange={onChange}
+        options={options}
+        clearable={false}
+        placeholder="There are no decorators configured for any stream."
+        value={value}
+      />
     </SelectContainer>
   );
 };

@@ -77,13 +77,14 @@ const NodeLoggers = createReactClass({
   render() {
     const { nodeId, subsystems, sendTelemetry } = this.props;
     const { showDetails } = this.state;
-    const subsystemKeys = Object.keys(subsystems)
-      .map((subsystem) => (
-        <LoggingSubsystem name={subsystem}
-                          nodeId={nodeId}
-                          key={`logging-subsystem-${nodeId}-${subsystem}`}
-                          subsystem={subsystems[subsystem]} />
-      ));
+    const subsystemKeys = Object.keys(subsystems).map((subsystem) => (
+      <LoggingSubsystem
+        name={subsystem}
+        nodeId={nodeId}
+        key={`logging-subsystem-${nodeId}-${subsystem}`}
+        subsystem={subsystems[subsystem]}
+      />
+    ));
 
     const logLevelMetrics = <LogLevelMetricsOverview nodeId={nodeId} />;
 
@@ -93,21 +94,22 @@ const NodeLoggers = createReactClass({
           <IfPermitted permissions="loggers:read">
             <div style={{ marginBottom: '20' }}>
               <div className="pull-right">
-                <Button bsSize="sm"
-                        bsStyle="primary"
-                        className="trigger-log-level-metrics"
-                        onClick={() => {
-                          this.setState({ showDetails: !showDetails });
+                <Button
+                  bsSize="sm"
+                  bsStyle="primary"
+                  className="trigger-log-level-metrics"
+                  onClick={() => {
+                    this.setState({ showDetails: !showDetails });
 
-                          sendTelemetry(TELEMETRY_EVENT_TYPE.LOGGING.SHOW_LOG_LEVEL_METRICS_TOGGLED, {
-                            app_pathname: getPathnameWithoutId(this.props.location.pathname),
-                            app_section: 'log-level',
-                            app_action_value: 'show-metrics',
-                            event_details: { showing: !showDetails },
-                          });
-                        }}>
-                  <Icon name="tachometer-alt" />{' '}
-                  {showDetails ? 'Hide' : 'Show'} log level metrics
+                    sendTelemetry(TELEMETRY_EVENT_TYPE.LOGGING.SHOW_LOG_LEVEL_METRICS_TOGGLED, {
+                      app_pathname: getPathnameWithoutId(this.props.location.pathname),
+                      app_section: 'log-level',
+                      app_action_value: 'show-metrics',
+                      event_details: { showing: !showDetails },
+                    });
+                  }}
+                >
+                  <Icon name="tachometer-alt" /> {showDetails ? 'Hide' : 'Show'} log level metrics
                 </Button>
               </div>
               <h2>
@@ -117,9 +119,7 @@ const NodeLoggers = createReactClass({
                 </small>
               </h2>
             </div>
-            <div className="subsystems">
-              {subsystemKeys}
-            </div>
+            <div className="subsystems">{subsystemKeys}</div>
             {showDetails && logLevelMetrics}
           </IfPermitted>
         </Col>

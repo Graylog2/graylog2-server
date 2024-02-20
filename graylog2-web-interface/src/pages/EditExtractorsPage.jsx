@@ -48,14 +48,19 @@ const EditExtractorsPage = createReactClass({
     InputsActions.get.triggerPromise(params.inputId);
     ExtractorsActions.get.triggerPromise(params.inputId, params.extractorId);
 
-    UniversalSearchStore.search('relative', `gl2_source_input:${params.inputId} OR gl2_source_radio_input:${params.inputId}`, { relative: 3600 }, undefined, 1)
-      .then((response) => {
-        if (response.total_results > 0) {
-          this.setState({ exampleMessage: response.messages[0] });
-        } else {
-          this.setState({ exampleMessage: {} });
-        }
-      });
+    UniversalSearchStore.search(
+      'relative',
+      `gl2_source_input:${params.inputId} OR gl2_source_radio_input:${params.inputId}`,
+      { relative: 3600 },
+      undefined,
+      1,
+    ).then((response) => {
+      if (response.total_results > 0) {
+        this.setState({ exampleMessage: response.messages[0] });
+      } else {
+        this.setState({ exampleMessage: {} });
+      }
+    });
   },
 
   _isLoading() {
@@ -89,22 +94,29 @@ const EditExtractorsPage = createReactClass({
 
     return (
       <DocumentTitle title={`Edit extractor ${extractor.title}`}>
-        <PageHeader title={<span>Edit extractor <em>{extractor.title}</em> for input <em>{input.title}</em></span>}
-                    documentationLink={{
-                      title: 'Extractors documentation',
-                      path: DocsHelper.PAGES.EXTRACTORS,
-                    }}>
+        <PageHeader
+          title={
+            <span>
+              Edit extractor <em>{extractor.title}</em> for input <em>{input.title}</em>
+            </span>
+          }
+          documentationLink={{
+            title: 'Extractors documentation',
+            path: DocsHelper.PAGES.EXTRACTORS,
+          }}
+        >
           <span>
-            Extractors are applied on every message that is received by an input. Use them to extract and transform{' '}
-            any text data into fields that allow you easy filtering and analysis later on.
+            Extractors are applied on every message that is received by an input. Use them to extract and transform any
+            text data into fields that allow you easy filtering and analysis later on.
           </span>
         </PageHeader>
-        <EditExtractor action="edit"
-                       extractor={extractor}
-                       inputId={input.id}
-                       exampleMessage={exampleMessage.fields ? exampleMessage.fields[extractor.source_field] : undefined}
-                       onSave={this._extractorSaved} />
-
+        <EditExtractor
+          action="edit"
+          extractor={extractor}
+          inputId={input.id}
+          exampleMessage={exampleMessage.fields ? exampleMessage.fields[extractor.source_field] : undefined}
+          onSave={this._extractorSaved}
+        />
       </DocumentTitle>
     );
   },

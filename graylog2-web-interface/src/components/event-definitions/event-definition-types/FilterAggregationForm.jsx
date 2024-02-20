@@ -69,8 +69,8 @@ class FilterAggregationForm extends React.Component {
 
     const { group_by, series, conditions } = props.eventDefinition.config;
     const expression = get(conditions, 'expression', {});
-    const defaultConditionType = (isEmpty(group_by) && isEmpty(series) && isEmpty(expression)
-      ? conditionTypes.FILTER : conditionTypes.AGGREGATION);
+    const defaultConditionType =
+      isEmpty(group_by) && isEmpty(series) && isEmpty(expression) ? conditionTypes.FILTER : conditionTypes.AGGREGATION;
 
     this.state = {
       conditionType: defaultConditionType,
@@ -135,43 +135,51 @@ class FilterAggregationForm extends React.Component {
       <>
         <Row>
           <Col md={7} lg={6}>
-            <FilterForm eventDefinition={eventDefinition}
-                        validation={validation}
-                        streams={streams.filter((s) => s.is_editable)}
-                        currentUser={currentUser}
-                        onChange={this.props.onChange} />
+            <FilterForm
+              eventDefinition={eventDefinition}
+              validation={validation}
+              streams={streams.filter((s) => s.is_editable)}
+              currentUser={currentUser}
+              onChange={this.props.onChange}
+            />
 
             {onlyFilters || (
               <FormGroup>
                 <ControlLabel>Create Events for Definition if...</ControlLabel>
-                <Radio id="filter-type"
-                       name="conditionType"
-                       value={conditionTypes.FILTER}
-                       checked={conditionType === conditionTypes.FILTER}
-                       onChange={this.handleTypeChange}>
+                <Radio
+                  id="filter-type"
+                  name="conditionType"
+                  value={conditionTypes.FILTER}
+                  checked={conditionType === conditionTypes.FILTER}
+                  onChange={this.handleTypeChange}
+                >
                   Filter has results
                 </Radio>
-                <Radio id="aggregation-type"
-                       name="conditionType"
-                       value={conditionTypes.AGGREGATION}
-                       checked={conditionType === conditionTypes.AGGREGATION}
-                       onChange={this.handleTypeChange}>
+                <Radio
+                  id="aggregation-type"
+                  name="conditionType"
+                  value={conditionTypes.AGGREGATION}
+                  checked={conditionType === conditionTypes.AGGREGATION}
+                  onChange={this.handleTypeChange}
+                >
                   Aggregation of results reaches a threshold
                 </Radio>
               </FormGroup>
             )}
-            {(conditionType === conditionTypes.FILTER && !onlyFilters) && (
+            {conditionType === conditionTypes.FILTER && !onlyFilters && (
               <Row>
                 <Col md={12}>
-                  <Input id="event-limit"
-                         name="event_limit"
-                         label="Event Limit"
-                         type="number"
-                         bsStyle={validation.errors.event_limit ? 'error' : null}
-                         help={get(validation, 'errors.event_limit', 'Maximum number of events to be created.')}
-                         value={eventDefinition.config.event_limit}
-                         onChange={this.handleConfigChange}
-                         required />
+                  <Input
+                    id="event-limit"
+                    name="event_limit"
+                    label="Event Limit"
+                    type="number"
+                    bsStyle={validation.errors.event_limit ? 'error' : null}
+                    help={get(validation, 'errors.event_limit', 'Maximum number of events to be created.')}
+                    value={eventDefinition.config.event_limit}
+                    onChange={this.handleConfigChange}
+                    required
+                  />
                 </Col>
               </Row>
             )}
@@ -180,13 +188,15 @@ class FilterAggregationForm extends React.Component {
             <FilterPreviewContainer eventDefinition={eventDefinition} />
           </Col>
         </Row>
-        {(conditionType === conditionTypes.AGGREGATION && !onlyFilters) && (
+        {conditionType === conditionTypes.AGGREGATION && !onlyFilters && (
           <Row>
             <Col md={12}>
-              <AggregationForm eventDefinition={eventDefinition}
-                               validation={validation}
-                               aggregationFunctions={entityTypes.aggregation_functions}
-                               onChange={this.props.onChange} />
+              <AggregationForm
+                eventDefinition={eventDefinition}
+                validation={validation}
+                aggregationFunctions={entityTypes.aggregation_functions}
+                onChange={this.props.onChange}
+              />
             </Col>
           </Row>
         )}

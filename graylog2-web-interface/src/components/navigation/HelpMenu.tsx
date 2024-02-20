@@ -34,22 +34,13 @@ const HelpMenu = () => {
   const { setShowHotkeysModal } = useHotkeysContext();
 
   return (
-    <NavDropdown title={<Icon name="question-circle" size="lg" />}
-                 hoverTitle="Help"
-                 noCaret>
+    <NavDropdown title={<Icon name="question-circle" size="lg" />} hoverTitle="Help" noCaret>
+      <HelpMenuLinkItem href={DocsHelper.versionedDocsHomePage()}>Documentation</HelpMenuLinkItem>
 
-      <HelpMenuLinkItem href={DocsHelper.versionedDocsHomePage()}>
-        Documentation
-      </HelpMenuLinkItem>
-
-      <Menu.Item onClick={() => setShowHotkeysModal(true)}>
-        Keyboard Shortcuts
-      </Menu.Item>
+      <Menu.Item onClick={() => setShowHotkeysModal(true)}>Keyboard Shortcuts</Menu.Item>
 
       {AppConfig.isCloud() && (
-      <HelpMenuLinkItem href={Routes.global_api_browser()}>
-        Cluster Global API browser
-      </HelpMenuLinkItem>
+        <HelpMenuLinkItem href={Routes.global_api_browser()}>Cluster Global API browser</HelpMenuLinkItem>
       )}
     </NavDropdown>
   );

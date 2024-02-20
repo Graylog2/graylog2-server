@@ -42,12 +42,8 @@ const rule = HighlightingRule.builder()
   .value('noob')
   .build();
 
-const ruleWithValueFalse = rule.toBuilder()
-  .value(false)
-  .build();
-const ruleWithValueZero = rule.toBuilder()
-  .value(0)
-  .build();
+const ruleWithValueFalse = rule.toBuilder().value(false).build();
+const ruleWithValueZero = rule.toBuilder().value(0).build();
 
 describe('HighlightForm', () => {
   const fieldTypes: FieldTypes = {
@@ -103,8 +99,14 @@ describe('HighlightForm', () => {
 
     await triggerSaveButtonClick();
 
-    await waitFor(() => expect(updateHighlightingRule)
-      .toHaveBeenCalledWith(rule, { field: rule.field, value: rule.value, condition: rule.condition, color: rule.color }));
+    await waitFor(() =>
+      expect(updateHighlightingRule).toHaveBeenCalledWith(rule, {
+        field: rule.field,
+        value: rule.value,
+        condition: rule.condition,
+        color: rule.color,
+      }),
+    );
   });
 
   it('assigns a new static color when type is selected', async () => {
@@ -114,10 +116,14 @@ describe('HighlightForm', () => {
 
     await triggerSaveButtonClick();
 
-    await waitFor(() => expect(updateHighlightingRule)
-      .toHaveBeenCalledWith(rule, expect.objectContaining({
-        color: expect.objectContaining({ type: 'static', color: expect.any(String) }),
-      })));
+    await waitFor(() =>
+      expect(updateHighlightingRule).toHaveBeenCalledWith(
+        rule,
+        expect.objectContaining({
+          color: expect.objectContaining({ type: 'static', color: expect.any(String) }),
+        }),
+      ),
+    );
   });
 
   it('creates a new gradient when type is selected', async () => {
@@ -131,10 +137,14 @@ describe('HighlightForm', () => {
 
     await triggerSaveButtonClick();
 
-    await waitFor(() => expect(updateHighlightingRule)
-      .toHaveBeenCalledWith(rule, expect.objectContaining({
-        color: expect.objectContaining({ gradient: 'Viridis' }),
-      })));
+    await waitFor(() =>
+      expect(updateHighlightingRule).toHaveBeenCalledWith(
+        rule,
+        expect.objectContaining({
+          color: expect.objectContaining({ gradient: 'Viridis' }),
+        }),
+      ),
+    );
   });
 
   it('should be able to click submit when has value 0 with type number', async () => {
@@ -142,8 +152,14 @@ describe('HighlightForm', () => {
 
     await triggerSaveButtonClick();
 
-    await waitFor(() => expect(updateHighlightingRule)
-      .toHaveBeenCalledWith(ruleWithValueZero, { field: ruleWithValueZero.field, value: '0', condition: ruleWithValueZero.condition, color: ruleWithValueZero.color }));
+    await waitFor(() =>
+      expect(updateHighlightingRule).toHaveBeenCalledWith(ruleWithValueZero, {
+        field: ruleWithValueZero.field,
+        value: '0',
+        condition: ruleWithValueZero.condition,
+        color: ruleWithValueZero.color,
+      }),
+    );
   });
 
   it('should be able to click submit when has value false  with type boolean', async () => {
@@ -151,7 +167,13 @@ describe('HighlightForm', () => {
 
     await triggerSaveButtonClick();
 
-    await waitFor(() => expect(updateHighlightingRule)
-      .toHaveBeenCalledWith(ruleWithValueFalse, { field: ruleWithValueFalse.field, value: 'false', condition: ruleWithValueFalse.condition, color: ruleWithValueFalse.color }));
+    await waitFor(() =>
+      expect(updateHighlightingRule).toHaveBeenCalledWith(ruleWithValueFalse, {
+        field: ruleWithValueFalse.field,
+        value: 'false',
+        condition: ruleWithValueFalse.condition,
+        color: ruleWithValueFalse.color,
+      }),
+    );
   });
 });

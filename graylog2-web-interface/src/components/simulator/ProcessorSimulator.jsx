@@ -51,16 +51,14 @@ class ProcessorSimulator extends React.Component {
   _onMessageLoad = (message, options) => {
     this.setState({ message: message, simulation: undefined, loading: true, error: undefined });
 
-    SimulatorActions.simulate
-      .triggerPromise(this.state.stream, message.fields, options.inputId)
-      .then(
-        (response) => {
-          this.setState({ simulation: response, loading: false });
-        },
-        (error) => {
-          this.setState({ loading: false, error: error });
-        },
-      );
+    SimulatorActions.simulate.triggerPromise(this.state.stream, message.fields, options.inputId).then(
+      (response) => {
+        this.setState({ simulation: response, loading: false });
+      },
+      (error) => {
+        this.setState({ loading: false, error: error });
+      },
+    );
   };
 
   _getFormattedStreams = (streams) => {
@@ -87,8 +85,8 @@ class ProcessorSimulator extends React.Component {
             <Col md={8} mdOffset={2}>
               <Panel bsStyle="danger" header="No streams found">
                 Pipelines operate on streams, but your system currently has no streams. Please{' '}
-                <Link to={Routes.STREAMS}>create a stream</Link>{' '}
-                and come back here later to test pipelines processing messages in your new stream.
+                <Link to={Routes.STREAMS}>create a stream</Link> and come back here later to test pipelines processing
+                messages in your new stream.
               </Panel>
             </Col>
           </Row>
@@ -109,19 +107,22 @@ class ProcessorSimulator extends React.Component {
             <h1>Load a message</h1>
             <p>
               Build an example message that will be used in the simulation.{' '}
-              <strong>No real messages stored in Graylog will be changed. All actions are purely simulated on the
-                temporary input you provide below.
+              <strong>
+                No real messages stored in Graylog will be changed. All actions are purely simulated on the temporary
+                input you provide below.
               </strong>
             </p>
             <Row className="row-sm">
               <Col md={7}>
                 <FormGroup id="streamSelectorSimulation">
                   <ControlLabel>Stream</ControlLabel>
-                  <Select options={this._getFormattedStreams(this.props.streams)}
-                          onChange={this._onStreamSelect}
-                          value={this.state.stream.id}
-                          required
-                          clearable={false} />
+                  <Select
+                    options={this._getFormattedStreams(this.props.streams)}
+                    onChange={this._onStreamSelect}
+                    value={this.state.stream.id}
+                    required
+                    clearable={false}
+                  />
                   <HelpBlock>{streamHelp}</HelpBlock>
                 </FormGroup>
               </Col>
@@ -129,11 +130,13 @@ class ProcessorSimulator extends React.Component {
             <RawMessageLoader onMessageLoaded={this._onMessageLoad} inputIdSelector />
           </Col>
         </Row>
-        <SimulationResults stream={this.state.stream}
-                           originalMessage={this.state.message}
-                           simulationResults={this.state.simulation}
-                           isLoading={this.state.loading}
-                           error={this.state.error} />
+        <SimulationResults
+          stream={this.state.stream}
+          originalMessage={this.state.message}
+          simulationResults={this.state.simulation}
+          isLoading={this.state.loading}
+          error={this.state.error}
+        />
       </div>
     );
   }

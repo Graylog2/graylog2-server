@@ -34,20 +34,16 @@ const FullName = styled.span`
 
 const UserMenu = () => {
   const { fullName, readOnly, id: userId } = useCurrentUser();
-  const route = readOnly
-    ? Routes.SYSTEM.USERS.show(userId)
-    : Routes.SYSTEM.USERS.edit(userId);
-  const label = readOnly
-    ? 'Show profile'
-    : 'Edit profile';
+  const route = readOnly ? Routes.SYSTEM.USERS.show(userId) : Routes.SYSTEM.USERS.edit(userId);
+  const label = readOnly ? 'Show profile' : 'Edit profile';
 
   const onLogoutClicked = useLogout();
 
   return (
-    <NavDropdown title={<Icon name="user" size="lg" />}
-                 hoverTitle={`User Menu for ${fullName}`}
-                 noCaret>
-      <Menu.Label><FullName>{fullName}</FullName></Menu.Label>
+    <NavDropdown title={<Icon name="user" size="lg" />} hoverTitle={`User Menu for ${fullName}`} noCaret>
+      <Menu.Label>
+        <FullName>{fullName}</FullName>
+      </Menu.Label>
       <Menu.Divider />
       <Menu.Label>
         <ThemeModeToggle />
@@ -56,7 +52,9 @@ const UserMenu = () => {
       <LinkContainer to={route}>
         <Menu.Item>{label}</Menu.Item>
       </LinkContainer>
-      <Menu.Item onClick={onLogoutClicked} icon={<Icon name="sign-out-alt" />}>Log out</Menu.Item>
+      <Menu.Item onClick={onLogoutClicked} icon={<Icon name="sign-out-alt" />}>
+        Log out
+      </Menu.Item>
     </NavDropdown>
   );
 };

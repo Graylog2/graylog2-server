@@ -20,9 +20,9 @@ import styled from 'styled-components';
 import { OverlayTrigger, Icon } from 'components/common';
 
 type Props = {
-  errorText: string,
-  title: string,
-  placement: 'bottom' | 'top' | 'right' | 'left',
+  errorText: string;
+  title: string;
+  placement: 'bottom' | 'top' | 'right' | 'left';
 };
 
 const StyledSpan = styled.span`

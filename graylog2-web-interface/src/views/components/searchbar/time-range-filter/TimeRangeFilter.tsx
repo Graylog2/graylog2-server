@@ -23,9 +23,7 @@ import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import { SEARCH_BAR_GAP } from 'views/components/searchbar/SearchBarLayout';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import TimeRangeFilterSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
-import type {
-  SupportedTimeRangeType,
-} from 'views/components/searchbar/time-range-filter/time-range-picker/TimeRangePicker';
+import type { SupportedTimeRangeType } from 'views/components/searchbar/time-range-filter/time-range-picker/TimeRangePicker';
 import TimeRangePicker from 'views/components/searchbar/time-range-filter/time-range-picker/index';
 import { NO_TIMERANGE_OVERRIDE } from 'views/Constants';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -46,17 +44,17 @@ const FlexContainer = styled.div`
 `;
 
 type Props = {
-  className?: string,
-  disabled?: boolean,
-  hasErrorOnMount?: boolean,
-  limitDuration: number,
-  noOverride?: boolean,
-  onChange: (timeRange: TimeRange | NoTimeRangeOverride) => void,
-  position?: 'bottom' | 'right',
-  showPresetDropdown?: boolean,
-  validTypes?: Array<SupportedTimeRangeType>,
-  value: TimeRange | NoTimeRangeOverride,
-  withinPortal?: boolean,
+  className?: string;
+  disabled?: boolean;
+  hasErrorOnMount?: boolean;
+  limitDuration: number;
+  noOverride?: boolean;
+  onChange: (timeRange: TimeRange | NoTimeRangeOverride) => void;
+  position?: 'bottom' | 'right';
+  showPresetDropdown?: boolean;
+  validTypes?: Array<SupportedTimeRangeType>;
+  value: TimeRange | NoTimeRangeOverride;
+  withinPortal?: boolean;
 };
 
 const TimeRangeFilter = ({
@@ -98,23 +96,27 @@ const TimeRangeFilter = ({
   const hideTimeRangeDropDown = () => show && toggleShow();
 
   return (
-    <TimeRangePicker show={show}
-                     currentTimeRange={value}
-                     limitDuration={limitDuration}
-                     noOverride={noOverride}
-                     setCurrentTimeRange={onChange}
-                     toggleDropdownShow={toggleShow}
-                     validTypes={validTypes}
-                     position={position}
-                     withinPortal={withinPortal}>
+    <TimeRangePicker
+      show={show}
+      currentTimeRange={value}
+      limitDuration={limitDuration}
+      noOverride={noOverride}
+      setCurrentTimeRange={onChange}
+      toggleDropdownShow={toggleShow}
+      validTypes={validTypes}
+      position={position}
+      withinPortal={withinPortal}
+    >
       <FlexContainer className={className} ref={containerRef}>
         {showDropdownButton && (
-        <TimeRangeFilterButtons disabled={disabled}
-                                toggleShow={toggleShow}
-                                onPresetSelectOpen={hideTimeRangeDropDown}
-                                setCurrentTimeRange={onChange}
-                                showPresetDropdown={showPresetDropdown}
-                                hasErrorOnMount={hasErrorOnMount} />
+          <TimeRangeFilterButtons
+            disabled={disabled}
+            toggleShow={toggleShow}
+            onPresetSelectOpen={hideTimeRangeDropDown}
+            setCurrentTimeRange={onChange}
+            showPresetDropdown={showPresetDropdown}
+            hasErrorOnMount={hasErrorOnMount}
+          />
         )}
         <TimeRangeDisplay timerange={value} toggleDropdownShow={toggleShow} />
       </FlexContainer>

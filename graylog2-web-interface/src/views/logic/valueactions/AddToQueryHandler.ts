@@ -32,28 +32,26 @@ const formatTimestampForES = (value: string | number) => {
 };
 
 const formatNewQuery = (oldQuery: string, field: string, value: string | number, type: FieldType) => {
-  const predicateValue = type.type === 'date'
-    ? formatTimestampForES(value)
-    : escape(value);
-  const fieldPredicate = value === MISSING_BUCKET_NAME
-    ? `NOT _exists_:${field}`
-    : `${field}:${predicateValue}`;
+  const predicateValue = type.type === 'date' ? formatTimestampForES(value) : escape(value);
+  const fieldPredicate = value === MISSING_BUCKET_NAME ? `NOT _exists_:${field}` : `${field}:${predicateValue}`;
 
   return addToQuery(oldQuery, fieldPredicate);
 };
 
 type Arguments = {
-  queryId: string,
-  field: string,
-  value?: string | number,
-  type: FieldType,
+  queryId: string;
+  field: string;
+  value?: string | number;
+  type: FieldType;
 };
 
-const AddToQueryHandler = ({ queryId, field, value = '', type }: Arguments) => async (dispatch: AppDispatch, getState: () => RootState) => {
-  const oldQuery = selectQueryString(queryId)(getState());
-  const newQuery = formatNewQuery(oldQuery, field, value, type);
+const AddToQueryHandler =
+  ({ queryId, field, value = '', type }: Arguments) =>
+  async (dispatch: AppDispatch, getState: () => RootState) => {
+    const oldQuery = selectQueryString(queryId)(getState());
+    const newQuery = formatNewQuery(oldQuery, field, value, type);
 
-  return dispatch(updateQueryString(queryId, newQuery));
-};
+    return dispatch(updateQueryString(queryId, newQuery));
+  };
 
 export default AddToQueryHandler;

@@ -24,21 +24,23 @@ import { MetricsList } from 'components/metrics';
 import SearchForm from 'components/common/SearchForm';
 import type { Metric } from 'stores/metrics/MetricsStore';
 
-const StyledWarningDiv = styled.div(({ theme }) => `
+const StyledWarningDiv = styled.div(
+  ({ theme }) => `
   height: 20px;
   margin-bottom: 5px;
   color: ${theme.colors.variant.dark.danger};
-`);
+`,
+);
 
 type Props = {
-  names: Array<Metric>,
-  namespace: string,
-  nodeId: string,
-  filter?: string,
+  names: Array<Metric>;
+  namespace: string;
+  nodeId: string;
+  filter?: string;
   error?: {
-    responseMessage: string,
-    status: number,
-  }
+    responseMessage: string;
+    status: number;
+  };
 };
 
 const safelyFilterNames = (filter: string, names: Array<Metric>) => {
@@ -52,8 +54,8 @@ const safelyFilterNames = (filter: string, names: Array<Metric>) => {
 };
 
 type State = {
-  filter: string,
-}
+  filter: string;
+};
 
 const MetricsListContainer = styled.div`
   padding-top: 10px;
@@ -104,13 +106,13 @@ class MetricsComponent extends React.Component<Props, State> {
             <Alert bsStyle="danger">
               {error ? (
                 <span>
-                  Could not fetch metrics from node: server returned <em>{error.responseMessage || ''}</em>{' '}
-                  with a {error.status} status code.
+                  Could not fetch metrics from node: server returned <em>{error.responseMessage || ''}</em> with a{' '}
+                  {error.status} status code.
                 </span>
               ) : (
                 <span>There was a problem fetching node metrics.</span>
-              )}
-              {' '}Graylog will keep trying to get them in the background.
+              )}{' '}
+              Graylog will keep trying to get them in the background.
             </Alert>
           </Col>
         </Row>
@@ -125,16 +127,18 @@ class MetricsComponent extends React.Component<Props, State> {
           <StyledWarningDiv className="text-warning">
             {error && (
               <>
-                <Icon name="exclamation-triangle" />&nbsp;
-                Could not fetch metrics from node: server returned <em>{error.responseMessage || ''}</em>{' '}
-                with a {error.status} status code. Displaying last metrics available.
+                <Icon name="exclamation-triangle" />
+                &nbsp; Could not fetch metrics from node: server returned <em>{error.responseMessage || ''}</em> with a{' '}
+                {error.status} status code. Displaying last metrics available.
               </>
             )}
           </StyledWarningDiv>
-          <SearchForm query={filter}
-                      onSearch={this.onFilterChange}
-                      queryWidth={300}
-                      placeholder="Type a metric name to filter&hellip;">
+          <SearchForm
+            query={filter}
+            onSearch={this.onFilterChange}
+            queryWidth={300}
+            placeholder="Type a metric name to filter&hellip;"
+          >
             <MetricsListContainer>
               <MetricsList names={filteredNames} namespace={this.props.namespace} nodeId={this.props.nodeId} />
             </MetricsListContainer>

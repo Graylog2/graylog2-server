@@ -22,21 +22,14 @@ import { useFormikContext } from 'formik';
 
 import { availableTimeRangeTypes } from 'views/Constants';
 import { Tab, Tabs } from 'components/bootstrap';
-import type {
-  AbsoluteTimeRange,
-  KeywordTimeRange,
-  RelativeTimeRange,
-} from 'views/logic/queries/Query';
+import type { AbsoluteTimeRange, KeywordTimeRange, RelativeTimeRange } from 'views/logic/queries/Query';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { isTimeRange } from 'views/typeGuards/timeRange';
-import migrateTimeRangeToNewType
-  from 'views/components/searchbar/time-range-filter/time-range-picker/migrateTimeRangeToNewType';
+import migrateTimeRangeToNewType from 'views/components/searchbar/time-range-filter/time-range-picker/migrateTimeRangeToNewType';
 import useUserDateTime from 'hooks/useUserDateTime';
 import type { DateTime, DateTimeFormats } from 'util/DateTime';
 import { toDateObject } from 'util/DateTime';
-import {
-  RELATIVE_CLASSIFIED_ALL_TIME_RANGE,
-} from 'views/components/searchbar/time-range-filter/time-range-picker/RelativeTimeRangeClassifiedHelper';
+import { RELATIVE_CLASSIFIED_ALL_TIME_RANGE } from 'views/components/searchbar/time-range-filter/time-range-picker/RelativeTimeRangeClassifiedHelper';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -55,39 +48,35 @@ export const timeRangePickerTabs = {
 };
 
 type TimeRangeTabsArguments = {
-  activeTab: SupportedTimeRangeType,
-  limitDuration: number,
-  setValidatingKeyword: (status: boolean) => void,
-  tabs: Array<SupportedTimeRangeType>,
-}
+  activeTab: SupportedTimeRangeType;
+  limitDuration: number;
+  setValidatingKeyword: (status: boolean) => void;
+  tabs: Array<SupportedTimeRangeType>;
+};
 
 const StyledTabs = styled(Tabs)`
   margin-top: 1px;
   margin-bottom: 9px;
 `;
 
-const timeRangeTypeTabs = ({
-  activeTab,
-  limitDuration,
-  setValidatingKeyword,
-  tabs,
-}: TimeRangeTabsArguments) => availableTimeRangeTypes
-  .filter(({ type }) => tabs.includes(type))
-  .map(({ type, name }) => {
-    const TimeRangeTypeTab = timeRangePickerTabs[type];
+const timeRangeTypeTabs = ({ activeTab, limitDuration, setValidatingKeyword, tabs }: TimeRangeTabsArguments) =>
+  availableTimeRangeTypes
+    .filter(({ type }) => tabs.includes(type))
+    .map(({ type, name }) => {
+      const TimeRangeTypeTab = timeRangePickerTabs[type];
 
-    return (
-      <Tab title={name}
-           key={`time-range-type-selector-${type}`}
-           eventKey={type}>
-        {type === activeTab && (
-          <TimeRangeTypeTab disabled={false}
-                            limitDuration={limitDuration}
-                            setValidatingKeyword={type === 'keyword' ? setValidatingKeyword : undefined} />
-        )}
-      </Tab>
-    );
-  });
+      return (
+        <Tab title={name} key={`time-range-type-selector-${type}`} eventKey={type}>
+          {type === activeTab && (
+            <TimeRangeTypeTab
+              disabled={false}
+              limitDuration={limitDuration}
+              setValidatingKeyword={type === 'keyword' ? setValidatingKeyword : undefined}
+            />
+          )}
+        </Tab>
+      );
+    });
 
 const createDefaultRanges = (formatTime: (time: DateTime, format: DateTimeFormats) => string) => ({
   absolute: {
@@ -112,9 +101,9 @@ const createDefaultRanges = (formatTime: (time: DateTime, format: DateTimeFormat
 });
 
 type Props = {
-  limitDuration: number,
-  validTypes: Array<'absolute' | 'relative' | 'keyword'>,
-  setValidatingKeyword: (validating: boolean) => void,
+  limitDuration: number;
+  validTypes: Array<'absolute' | 'relative' | 'keyword'>;
+  setValidatingKeyword: (validating: boolean) => void;
 };
 
 const newTabTimeRange = ({
@@ -124,11 +113,11 @@ const newTabTimeRange = ({
   formatTime,
   defaultRanges,
 }: {
-  activeTab: TimeRangePickerFormValues['activeTab'],
-  nextTab: TimeRangePickerFormValues['activeTab'],
-  timeRangeTabs: TimeRangePickerFormValues['timeRangeTabs'],
-  formatTime: (time: DateTime, format: DateTimeFormats) => string,
-  defaultRanges: ReturnType<typeof createDefaultRanges>,
+  activeTab: TimeRangePickerFormValues['activeTab'];
+  nextTab: TimeRangePickerFormValues['activeTab'];
+  timeRangeTabs: TimeRangePickerFormValues['timeRangeTabs'];
+  formatTime: (time: DateTime, format: DateTimeFormats) => string;
+  defaultRanges: ReturnType<typeof createDefaultRanges>;
 }) => {
   if (timeRangeTabs[nextTab]) {
     return timeRangeTabs[nextTab];
@@ -141,57 +130,65 @@ const newTabTimeRange = ({
   return defaultRanges[nextTab];
 };
 
-const TimeRangeTabs = ({
-  limitDuration,
-  validTypes,
-  setValidatingKeyword,
-}: Props) => {
+const TimeRangeTabs = ({ limitDuration, validTypes, setValidatingKeyword }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const location = useLocation();
   const { formatTime } = useUserDateTime();
-  const { setValues, values: { activeTab, timeRangeTabs } } = useFormikContext<TimeRangePickerFormValues>();
+  const {
+    setValues,
+    values: { activeTab, timeRangeTabs },
+  } = useFormikContext<TimeRangePickerFormValues>();
   const defaultRanges = useMemo(() => createDefaultRanges(formatTime), [formatTime]);
 
-  const onSelect = useCallback((nextTab: AbsoluteTimeRange['type'] | RelativeTimeRange['type'] | KeywordTimeRange['type']) => {
-    setValues({
-      timeRangeTabs: {
-        ...timeRangeTabs,
-        [nextTab]: newTabTimeRange({
-          activeTab,
-          nextTab,
-          timeRangeTabs,
-          formatTime,
-          defaultRanges,
-        }),
-      },
-      activeTab: nextTab,
-    });
+  const onSelect = useCallback(
+    (nextTab: AbsoluteTimeRange['type'] | RelativeTimeRange['type'] | KeywordTimeRange['type']) => {
+      setValues({
+        timeRangeTabs: {
+          ...timeRangeTabs,
+          [nextTab]: newTabTimeRange({
+            activeTab,
+            nextTab,
+            timeRangeTabs,
+            formatTime,
+            defaultRanges,
+          }),
+        },
+        activeTab: nextTab,
+      });
 
-    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_TIMERANGE_PICKER_TAB_SELECTED, {
-      app_pathname: getPathnameWithoutId(location.pathname),
-      app_section: 'search-bar',
-      app_action_value: 'search-time-range',
-      event_details: {
-        tab: nextTab,
-      },
-    });
-  }, [activeTab, defaultRanges, formatTime, location.pathname, sendTelemetry, setValues, timeRangeTabs]);
+      sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_TIMERANGE_PICKER_TAB_SELECTED, {
+        app_pathname: getPathnameWithoutId(location.pathname),
+        app_section: 'search-bar',
+        app_action_value: 'search-time-range',
+        event_details: {
+          tab: nextTab,
+        },
+      });
+    },
+    [activeTab, defaultRanges, formatTime, location.pathname, sendTelemetry, setValues, timeRangeTabs],
+  );
 
-  const tabs = useMemo(() => timeRangeTypeTabs({
-    activeTab,
-    limitDuration,
-    setValidatingKeyword,
-    tabs: validTypes,
-  }), [activeTab, limitDuration, setValidatingKeyword, validTypes]);
+  const tabs = useMemo(
+    () =>
+      timeRangeTypeTabs({
+        activeTab,
+        limitDuration,
+        setValidatingKeyword,
+        tabs: validTypes,
+      }),
+    [activeTab, limitDuration, setValidatingKeyword, validTypes],
+  );
 
   return (
-    <StyledTabs id="dateTimeTypes"
-                defaultActiveKey={availableTimeRangeTypes[0].type}
-                activeKey={activeTab ?? -1}
-                onSelect={onSelect as SelectCallback}
-                animation={false}>
+    <StyledTabs
+      id="dateTimeTypes"
+      defaultActiveKey={availableTimeRangeTypes[0].type}
+      activeKey={activeTab ?? -1}
+      onSelect={onSelect as SelectCallback}
+      animation={false}
+    >
       {tabs}
-      {!activeTab && (<TabDisabledTimeRange />)}
+      {!activeTab && <TabDisabledTimeRange />}
     </StyledTabs>
   );
 };

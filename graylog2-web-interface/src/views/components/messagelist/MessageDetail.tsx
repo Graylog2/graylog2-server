@@ -48,12 +48,14 @@ import MessageMetadata from './MessageMetadata';
 
 const _formatMessageTitle = (index, id) => {
   if (index) {
-    return (
-      <Link to={Routes.message_show(index, id)}>{id}</Link>
-    );
+    return <Link to={Routes.message_show(index, id)}>{id}</Link>;
   }
 
-  return <span>{id} <Label bsStyle="warning">Not stored</Label></span>;
+  return (
+    <span>
+      {id} <Label bsStyle="warning">Not stored</Label>
+    </span>
+  );
 };
 
 const Header = styled.div`
@@ -64,16 +66,16 @@ const Header = styled.div`
 `;
 
 type Props = {
-  allStreams?: Immutable.List<Stream>,
-  disableMessageActions?: boolean,
-  disableSurroundingSearch?: boolean,
-  disableTestAgainstStream?: boolean,
-  expandAllRenderAsync?: boolean,
-  fields: FieldTypeMappingsList,
-  inputs?: Immutable.Map<string, Input>,
-  message: Message,
-  showTimestamp?: boolean,
-  streams?: Immutable.Map<string, Stream>,
+  allStreams?: Immutable.List<Stream>;
+  disableMessageActions?: boolean;
+  disableSurroundingSearch?: boolean;
+  disableTestAgainstStream?: boolean;
+  expandAllRenderAsync?: boolean;
+  fields: FieldTypeMappingsList;
+  inputs?: Immutable.Map<string, Input>;
+  message: Message;
+  showTimestamp?: boolean;
+  streams?: Immutable.Map<string, Stream>;
 };
 
 const MessageDetail = ({
@@ -114,15 +116,21 @@ const MessageDetail = ({
   }
 
   const streamIds = Immutable.Set(fields.streams as Array<string>);
-  const streamsListItems = streamIds.map((streamId) => {
-    const stream = streams.get(streamId);
+  const streamsListItems = streamIds
+    .map((streamId) => {
+      const stream = streams.get(streamId);
 
-    if (stream !== undefined) {
-      return <li key={stream.id}><StreamLink stream={stream} /></li>;
-    }
+      if (stream !== undefined) {
+        return (
+          <li key={stream.id}>
+            <StreamLink stream={stream} />
+          </li>
+        );
+      }
 
-    return null;
-  }).toSet();
+      return null;
+    })
+    .toSet();
 
   let timestamp = null;
 
@@ -131,7 +139,11 @@ const MessageDetail = ({
     const rawTimestamp = fields.timestamp;
 
     timestamp.push(<dt key={`dt-${rawTimestamp}`}>Timestamp</dt>);
-    timestamp.push(<dd key={`dd-${rawTimestamp}`}><Timestamp dateTime={rawTimestamp} format="complete" /></dd>);
+    timestamp.push(
+      <dd key={`dd-${rawTimestamp}`}>
+        <Timestamp dateTime={rawTimestamp} format="complete" />
+      </dd>,
+    );
   }
 
   const messageTitle = _formatMessageTitle(index, id);
@@ -144,42 +156,54 @@ const MessageDetail = ({
             <Col md={12}>
               <Header>
                 <MessageDetailsTitle>
-                  <Icon name="envelope" />&nbsp;{messageTitle}
+                  <Icon name="envelope" />
+                  &nbsp;{messageTitle}
                 </MessageDetailsTitle>
-                <MessageActions index={index}
-                                id={id}
-                                fields={fields}
-                                decorationStats={decorationStats}
-                                disabled={disableMessageActions}
-                                disableSurroundingSearch={disableSurroundingSearch}
-                                disableTestAgainstStream={disableTestAgainstStream}
-                                showOriginal={showOriginal}
-                                toggleShowOriginal={_toggleShowOriginal}
-                                searchConfig={searchesClusterConfig}
-                                streams={allStreams} />
-
+                <MessageActions
+                  index={index}
+                  id={id}
+                  fields={fields}
+                  decorationStats={decorationStats}
+                  disabled={disableMessageActions}
+                  disableSurroundingSearch={disableSurroundingSearch}
+                  disableTestAgainstStream={disableTestAgainstStream}
+                  showOriginal={showOriginal}
+                  toggleShowOriginal={_toggleShowOriginal}
+                  searchConfig={searchesClusterConfig}
+                  streams={allStreams}
+                />
               </Header>
             </Col>
           </Row>
           <Row id={`sticky-augmentations-boundary-${message.id}`}>
             <Col md={3}>
-              <MessageMetadata timestamp={timestamp}
-                               index={index}
-                               receivedBy={(
-                                 <FormatReceivedBy isLocalNode={isLocalNode}
-                                                   inputs={inputs}
-                                                   sourceNodeId={gl2_source_node}
-                                                   sourceInputId={gl2_source_input} />
-                               )}
-                               streams={streamsListItems}
-                               assets={associated_assets ? (
-                                 <FormatAssetList associated_assets={associated_assets} fieldType={findFieldType('associated_assets')?.type} />
-                               ) : <div />} />
+              <MessageMetadata
+                timestamp={timestamp}
+                index={index}
+                receivedBy={
+                  <FormatReceivedBy
+                    isLocalNode={isLocalNode}
+                    inputs={inputs}
+                    sourceNodeId={gl2_source_node}
+                    sourceInputId={gl2_source_input}
+                  />
+                }
+                streams={streamsListItems}
+                assets={
+                  associated_assets ? (
+                    <FormatAssetList
+                      associated_assets={associated_assets}
+                      fieldType={findFieldType('associated_assets')?.type}
+                    />
+                  ) : (
+                    <div />
+                  )
+                }
+              />
               <MessageAugmentations message={message} />
             </Col>
             <Col md={9}>
-              <MessageFields message={message}
-                             fields={messageFields} />
+              <MessageFields message={message} fields={messageFields} />
             </Col>
           </Row>
         </>

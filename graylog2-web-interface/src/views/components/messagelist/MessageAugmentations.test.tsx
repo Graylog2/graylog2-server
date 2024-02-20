@@ -46,7 +46,9 @@ describe('MessageAugmentations', () => {
         component: () => <div>The Second Augmentation</div>,
       },
     ];
-    asMock(usePluginEntities).mockImplementation((entityKey) => ({ messageAugmentations: simpleAugmentations }[entityKey]));
+    asMock(usePluginEntities).mockImplementation(
+      (entityKey) => ({ messageAugmentations: simpleAugmentations })[entityKey],
+    );
 
     render(<SimpleMessageAugmentation />);
 

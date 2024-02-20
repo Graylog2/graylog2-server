@@ -21,9 +21,9 @@ import Badge from 'components/bootstrap/Badge';
 
 type Props = {
   children: React.ReactNode;
-  onClick?: () => void,
-  className?: string,
-  title?: string,
+  onClick?: () => void;
+  className?: string;
+  title?: string;
 };
 
 const CountBadge = forwardRef<HTMLDivElement, Props>(({ children, onClick, className, title }: Props, ref) => (

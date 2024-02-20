@@ -19,7 +19,9 @@ import { createSelector } from '@reduxjs/toolkit';
 import useAppSelector from 'stores/useAppSelector';
 import { selectViewStates } from 'views/logic/slices/viewSelectors';
 
-const selectWidgetIdsByQuery = createSelector(selectViewStates, (viewState) => viewState.map((state) => state.widgets.map((widget) => widget.id).toList()).toMap());
+const selectWidgetIdsByQuery = createSelector(selectViewStates, (viewState) =>
+  viewState.map((state) => state.widgets.map((widget) => widget.id).toList()).toMap(),
+);
 const useWidgetIds = () => useAppSelector(selectWidgetIdsByQuery);
 
 export default useWidgetIds;

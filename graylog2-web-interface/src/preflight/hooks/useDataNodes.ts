@@ -25,46 +25,40 @@ import type FetchError from 'logic/errors/FetchError';
 
 const DEFAULT_DATA = [];
 export const DATA_NODES_OVERVIEW_QUERY_KEY = ['data-nodes', 'overview'];
-const fetchDataNodes = () => (
-  fetch('GET', qualifyUrl('/api/data_nodes'), undefined, false)
-);
+const fetchDataNodes = () => fetch('GET', qualifyUrl('/api/data_nodes'), undefined, false);
 
 const useDataNodes = (): {
-  data: DataNodes,
-  isFetching: boolean,
-  isInitialLoading: boolean,
-  error: FetchError
+  data: DataNodes;
+  isFetching: boolean;
+  isInitialLoading: boolean;
+  error: FetchError;
 } => {
   const [metaData, setMetaData] = useState<{
-    error: FetchError | null,
-    isInitialLoading: boolean,
+    error: FetchError | null;
+    isInitialLoading: boolean;
   }>({
     error: null,
     isInitialLoading: false,
   });
-  const {
-    data,
-    isFetching,
-  } = useQuery<DataNodes, FetchError>(
-    {
-      queryKey: DATA_NODES_OVERVIEW_QUERY_KEY,
-      queryFn: fetchDataNodes,
-      refetchInterval: 3000,
-      keepPreviousData: true,
-      onError: (newError) => {
-        setMetaData({
-          error: newError,
-          isInitialLoading: false,
-        });
-      },
-      onSuccess: () => {
-        setMetaData({
-          error: null,
-          isInitialLoading: false,
-        });
-      },
-      retry: false,
-    });
+  const { data, isFetching } = useQuery<DataNodes, FetchError>({
+    queryKey: DATA_NODES_OVERVIEW_QUERY_KEY,
+    queryFn: fetchDataNodes,
+    refetchInterval: 3000,
+    keepPreviousData: true,
+    onError: (newError) => {
+      setMetaData({
+        error: newError,
+        isInitialLoading: false,
+      });
+    },
+    onSuccess: () => {
+      setMetaData({
+        error: null,
+        isInitialLoading: false,
+      });
+    },
+    retry: false,
+  });
 
   return {
     data: data ?? DEFAULT_DATA,

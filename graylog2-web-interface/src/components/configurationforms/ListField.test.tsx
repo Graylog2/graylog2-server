@@ -24,12 +24,14 @@ import ListField from './ListField';
 
 describe('<ListField>', () => {
   const SUT = (props: Partial<React.ComponentProps<typeof ListField>>) => (
-    <ListField field={listField}
-               onChange={() => {}}
-               title="example_list_field"
-               typeName="list"
-               autoFocus={false}
-               {...props} />
+    <ListField
+      field={listField}
+      onChange={() => {}}
+      title="example_list_field"
+      typeName="list"
+      autoFocus={false}
+      {...props}
+    />
   );
 
   afterEach(() => {
@@ -83,10 +85,7 @@ describe('<ListField>', () => {
   it('should call onChange when clearing values', async () => {
     const updateFunction = jest.fn();
 
-    render(
-      <SUT onChange={updateFunction}
-           value={['one']} />,
-    );
+    render(<SUT onChange={updateFunction} value={['one']} />);
 
     const select = screen.getByLabelText(listField.human_name, { exact: false });
 
@@ -97,10 +96,7 @@ describe('<ListField>', () => {
   it('should create new values when allow_create is set', async () => {
     const updateFunction = jest.fn();
 
-    render(
-      <SUT field={creatableListField}
-           onChange={updateFunction} />,
-    );
+    render(<SUT field={creatableListField} onChange={updateFunction} />);
 
     const select = screen.getByLabelText(listField.human_name, { exact: false });
 

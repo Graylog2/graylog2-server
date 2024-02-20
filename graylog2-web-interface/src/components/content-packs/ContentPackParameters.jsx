@@ -112,10 +112,14 @@ class ContentPackParameters extends React.Component {
   };
 
   _confirmationModal = () => (
-    <BootstrapModalConfirm showModal={this.state.showParameterModal}
-                           title="Confirm deletion"
-                           onConfirm={() => { this._deleteParameter(this.state.parameterToDelete); }}
-                           onCancel={this._closeConfirmModal}>
+    <BootstrapModalConfirm
+      showModal={this.state.showParameterModal}
+      title="Confirm deletion"
+      onConfirm={() => {
+        this._deleteParameter(this.state.parameterToDelete);
+      }}
+      onCancel={this._closeConfirmModal}
+    >
       {`Are you sure you want to do delete this parameter: ${(this.state.parameterToDelete || {}).title}?`}
     </BootstrapModalConfirm>
   );
@@ -133,19 +137,23 @@ class ContentPackParameters extends React.Component {
       <div>
         <Row>
           <Col smOffset={1} sm={9}>
-            <ContentPackParameterList contentPack={this.props.contentPack}
-                                      onAddParameter={this._addNewParameter}
-                                      onDeleteParameter={this._openConfirmModal}
-                                      appliedParameter={this.props.appliedParameter} />
+            <ContentPackParameterList
+              contentPack={this.props.contentPack}
+              onAddParameter={this._addNewParameter}
+              onDeleteParameter={this._openConfirmModal}
+              appliedParameter={this.props.appliedParameter}
+            />
             {this._confirmationModal()}
           </Col>
         </Row>
         <Row>
           <Col smOffset={1} sm={9}>
-            <ContentPackEntitiesList contentPack={this.props.contentPack}
-                                     onParameterClear={this._onParameterClear}
-                                     onParameterApply={this._onParameterApply}
-                                     appliedParameter={this.props.appliedParameter} />
+            <ContentPackEntitiesList
+              contentPack={this.props.contentPack}
+              onParameterClear={this._onParameterClear}
+              onParameterApply={this._onParameterApply}
+              appliedParameter={this.props.appliedParameter}
+            />
           </Col>
         </Row>
       </div>

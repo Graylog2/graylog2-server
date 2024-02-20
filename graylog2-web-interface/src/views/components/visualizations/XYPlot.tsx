@@ -34,17 +34,17 @@ import OnZoom from './OnZoom';
 import CustomPropTypes from '../CustomPropTypes';
 
 export type Props = {
-  axisType?: AxisType,
-  config: AggregationWidgetConfig,
-  chartData: any,
+  axisType?: AxisType;
+  config: AggregationWidgetConfig;
+  chartData: any;
   effectiveTimerange?: {
-    from: string,
-    to: string,
-  },
+    from: string;
+    to: string;
+  };
   height?: number;
-  setChartColor?: (config: ChartConfig, color: ColorMapper) => ChartColor,
-  plotLayout?: any,
-  onZoom?: (from: string, to: string, userTimezone: string) => boolean,
+  setChartColor?: (config: ChartConfig, color: ColorMapper) => ChartColor;
+  plotLayout?: any;
+  onZoom?: (from: string, to: string, userTimezone: string) => boolean;
 };
 
 const yLegendPosition = (containerHeight: number) => {
@@ -60,21 +60,26 @@ const yLegendPosition = (containerHeight: number) => {
 };
 
 type Layout = {
-  yaxis: { fixedrange?: boolean },
-  legend?: { y?: number },
-  showlegend?: boolean,
-  hovermode: 'x',
+  yaxis: { fixedrange?: boolean };
+  legend?: { y?: number };
+  showlegend?: boolean;
+  hovermode: 'x';
 };
 
 const mapAxisType = (axisType: AxisType): 'linear' | 'log' => {
   switch (axisType) {
-    case 'linear': return 'linear';
-    case 'logarithmic': return 'log';
-    default: return assertUnreachable(axisType, 'Unable to parse axis type: ');
+    case 'linear':
+      return 'linear';
+    case 'logarithmic':
+      return 'log';
+    default:
+      return assertUnreachable(axisType, 'Unable to parse axis type: ');
   }
 };
 
-const defaultSetColor = (chart: ChartConfig, colors: ColorMapper) => ({ line: { color: colors.get(chart.originalName ?? chart.name) } });
+const defaultSetColor = (chart: ChartConfig, colors: ColorMapper) => ({
+  line: { color: colors.get(chart.originalName ?? chart.name) },
+});
 
 const XYPlot = ({
   axisType,
@@ -100,9 +105,13 @@ const XYPlot = ({
   const layout = { ...defaultLayout, ...plotLayout };
   const dispatch = useAppDispatch();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const _onZoom = useCallback(config.isTimeline
-    ? (from: string, to: string) => (onZoom ? onZoom(from, to, userTimezone) : dispatch(OnZoom(from, to, userTimezone)))
-    : () => true, [config.isTimeline, onZoom]);
+  const _onZoom = useCallback(
+    config.isTimeline
+      ? (from: string, to: string) =>
+          onZoom ? onZoom(from, to, userTimezone) : dispatch(OnZoom(from, to, userTimezone))
+      : () => true,
+    [config.isTimeline, onZoom],
+  );
 
   if (config.isTimeline && effectiveTimerange) {
     const normalizedFrom = formatTime(effectiveTimerange.from, 'internal');
@@ -122,10 +131,7 @@ const XYPlot = ({
 
   return (
     <PlotLegend config={config} chartData={chartData}>
-      <GenericPlot chartData={chartData}
-                   layout={layout}
-                   onZoom={_onZoom}
-                   setChartColor={setChartColor} />
+      <GenericPlot chartData={chartData} layout={layout} onZoom={_onZoom} setChartColor={setChartColor} />
     </PlotLegend>
   );
 };
@@ -135,7 +141,6 @@ XYPlot.propTypes = {
   chartData: PropTypes.array.isRequired,
   config: CustomPropTypes.instanceOf(AggregationWidgetConfig).isRequired,
   effectiveTimerange: PropTypes.exact({
-
     type: PropTypes.string.isRequired,
     from: PropTypes.string.isRequired,
     to: PropTypes.string.isRequired,

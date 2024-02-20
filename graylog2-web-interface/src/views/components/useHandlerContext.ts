@@ -20,11 +20,10 @@ import { selectView } from 'views/logic/slices/viewSelectors';
 import { selectSearchExecutionState } from 'views/logic/slices/searchExecutionSelectors';
 import useAppSelector from 'stores/useAppSelector';
 
-const selectHandlerContext = createSelector(
-  selectView,
-  selectSearchExecutionState,
-  (view, executionState) => ({ view, executionState }),
-);
+const selectHandlerContext = createSelector(selectView, selectSearchExecutionState, (view, executionState) => ({
+  view,
+  executionState,
+}));
 
 const useHandlerContext = () => useAppSelector(selectHandlerContext);
 export default useHandlerContext;

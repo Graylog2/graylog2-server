@@ -49,7 +49,10 @@ const OrderedList = styled.ol`
   list-style: decimal inside none;
 `;
 
-const UnknownWidget: React.ComponentType<WidgetComponentProps & EditWidgetComponentProps> = ({ config, type }: WidgetComponentProps & EditWidgetComponentProps) => (
+const UnknownWidget: React.ComponentType<WidgetComponentProps & EditWidgetComponentProps> = ({
+  config,
+  type,
+}: WidgetComponentProps & EditWidgetComponentProps) => (
   <Container>
     <IconContainer>
       <Icon name="question" size="3x" />
@@ -59,8 +62,8 @@ const UnknownWidget: React.ComponentType<WidgetComponentProps & EditWidgetCompon
         <strong>Unknown Widget: {type}</strong>
       </Row>
       <Row>
-        Unfortunately we are not able to render this widget, because we do not know how to handle widgets of
-        type <strong>{type}</strong>. This might be caused by one of these situations:
+        Unfortunately we are not able to render this widget, because we do not know how to handle widgets of type{' '}
+        <strong>{type}</strong>. This might be caused by one of these situations:
       </Row>
 
       <Row>
@@ -75,8 +78,12 @@ const UnknownWidget: React.ComponentType<WidgetComponentProps & EditWidgetCompon
         works with Graylog 3.2+, or remove the widget if you do not need it anymore.
       </Row>
       <Row>
-        Either way, you can copy the widget&rsquo;s config to the
-        clipboard: <ClipboardButton title={<Icon name="copy" size="sm" />} text={JSON.stringify(config, null, 2)} bsSize="xsmall" />
+        Either way, you can copy the widget&rsquo;s config to the clipboard:{' '}
+        <ClipboardButton
+          title={<Icon name="copy" size="sm" />}
+          text={JSON.stringify(config, null, 2)}
+          bsSize="xsmall"
+        />
       </Row>
     </Description>
   </Container>

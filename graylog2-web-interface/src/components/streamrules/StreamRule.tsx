@@ -38,14 +38,14 @@ const ActionButtonsWrap = styled.span`
 
 type Props = {
   matchData: {
-    matches: boolean,
-    rules: { [id: string]: false },
-  },
-  stream: Stream,
-  onDelete: (ruleId: string) => void,
-  onSubmit: (ruleId: string, data: unknown) => void,
-  streamRule: StreamRuleTypeDefinition
-}
+    matches: boolean;
+    rules: { [id: string]: false };
+  };
+  stream: Stream;
+  onDelete: (ruleId: string) => void;
+  onSubmit: (ruleId: string, data: unknown) => void;
+  streamRule: StreamRuleTypeDefinition;
+};
 
 const StreamRule = ({ matchData, stream, streamRule, onSubmit, onDelete }: Props) => {
   const { permissions } = useCurrentUser();
@@ -77,26 +77,21 @@ const StreamRule = ({ matchData, stream, streamRule, onSubmit, onDelete }: Props
     }
   };
 
-  const _onSubmit = (streamRuleId, data) => StreamRulesStore.update(stream.id, streamRuleId, data, () => {
-    if (onSubmit) {
-      onSubmit(streamRuleId, data);
-    }
+  const _onSubmit = (streamRuleId, data) =>
+    StreamRulesStore.update(stream.id, streamRuleId, data, () => {
+      if (onSubmit) {
+        onSubmit(streamRuleId, data);
+      }
 
-    UserNotification.success('Stream rule has been successfully updated.', 'Success');
-  });
+      UserNotification.success('Stream rule has been successfully updated.', 'Success');
+    });
 
   const _formatActionItems = () => (
     <ActionButtonsWrap>
-      <Button bsStyle="link"
-              bsSize="xsmall"
-              onClick={_onDelete}
-              title="Delete stream rule">
+      <Button bsStyle="link" bsSize="xsmall" onClick={_onDelete} title="Delete stream rule">
         <Icon name="trash-alt" type="regular" />
       </Button>
-      <Button bsStyle="link"
-              bsSize="xsmall"
-              onClick={_onEdit}
-              title="Edit stream rule">
+      <Button bsStyle="link" bsSize="xsmall" onClick={_onEdit} title="Edit stream rule">
         <Icon name="edit" />
       </Button>
     </ActionButtonsWrap>
@@ -104,7 +99,7 @@ const StreamRule = ({ matchData, stream, streamRule, onSubmit, onDelete }: Props
 
   const matchDataStyle = () => (matchData.rules[streamRule.id] ? 'success' : 'danger');
   const actionItems = isPermitted(permissions, [`streams:edit:${stream.id}`]) ? _formatActionItems() : null;
-  const description = streamRule.description ? <small>{' '}({streamRule.description})</small> : null;
+  const description = streamRule.description ? <small> ({streamRule.description})</small> : null;
   const listGroupStyle = !isEmpty(matchData) ? matchDataStyle() : null;
 
   return (
@@ -112,12 +107,14 @@ const StreamRule = ({ matchData, stream, streamRule, onSubmit, onDelete }: Props
       {actionItems}
       <HumanReadableStreamRule streamRule={streamRule} inputs={inputs} />
       {showStreamRuleForm && (
-        <StreamRuleModal initialValues={streamRule}
-                         onClose={() => setShowStreamRuleForm(false)}
-                         title="Edit Stream Rule"
-                         submitButtonText="Update Rule"
-                         submitLoadingText="Updating Rule..."
-                         onSubmit={_onSubmit} />
+        <StreamRuleModal
+          initialValues={streamRule}
+          onClose={() => setShowStreamRuleForm(false)}
+          title="Edit Stream Rule"
+          submitButtonText="Update Rule"
+          submitLoadingText="Updating Rule..."
+          onSubmit={_onSubmit}
+        />
       )}
       {description}
     </ListGroupItem>

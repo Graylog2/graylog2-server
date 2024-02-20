@@ -47,7 +47,7 @@ const LoggedOutThemeProvider = ({ children }: React.PropsWithChildren) => (
 const AppFacade = () => {
   const currentUser = useStore(CurrentUserStore as Store<CurrentUserStoreState>, (state) => state?.currentUser);
   const server = useStore(ServerAvailabilityStore, (state) => state?.server);
-  const username = useStore(SessionStore as Store<SessionStoreState>, (state) => (state?.username ?? ''));
+  const username = useStore(SessionStore as Store<SessionStoreState>, (state) => state?.username ?? '');
 
   useEffect(() => {
     const interval = setInterval(ServerAvailabilityStore.ping, SERVER_PING_TIMEOUT);

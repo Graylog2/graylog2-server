@@ -25,13 +25,11 @@ const CurrentUserPreferencesProvider = ({ children }: { children: React.ReactEle
   const currentUser = useCurrentUser();
   const preferences = currentUser?.preferences;
 
-  return preferences
-    ? (
-      <UserPreferencesContext.Provider value={preferences}>
-        {children}
-      </UserPreferencesContext.Provider>
-    )
-    : children;
+  return preferences ? (
+    <UserPreferencesContext.Provider value={preferences}>{children}</UserPreferencesContext.Provider>
+  ) : (
+    children
+  );
 };
 
 CurrentUserPreferencesProvider.propTypes = {

@@ -39,12 +39,16 @@ const StyledInputDropdown = styled(Input)`
 const PLACEHOLDER = 'placeholder';
 
 type InputType = {
-  id: string,
-  title: string,
-  type: string,
+  id: string;
+  title: string;
+  type: string;
 };
 
-const _formatInput = ({ id, title, type }: InputType) => <option key={id} value={id}>{title} ({type})</option>;
+const _formatInput = ({ id, title, type }: InputType) => (
+  <option key={id} value={id}>
+    {title} ({type})
+  </option>
+);
 
 const _sortByTitle = (input1: InputType, input2: InputType) => input1.title.localeCompare(input2.title);
 
@@ -55,11 +59,11 @@ const StaticInput = ({ input: { type, title } }: { input: InputType }) => (
 );
 
 type Props = {
-  disabled?: boolean,
-  inputs: Immutable.Map<string, InputType>,
-  preselectedInputId?: string,
-  onLoadMessage: (inputId: string) => any,
-  title: string,
+  disabled?: boolean;
+  inputs: Immutable.Map<string, InputType>;
+  preselectedInputId?: string;
+  onLoadMessage: (inputId: string) => any;
+  title: string;
 };
 
 const InputDropdown = ({ disabled, inputs, onLoadMessage, preselectedInputId, title }: Props) => {
@@ -74,9 +78,7 @@ const InputDropdown = ({ disabled, inputs, onLoadMessage, preselectedInputId, ti
       <LoaderContainer>
         <StaticInput input={preselectedInput} />
 
-        <Button bsStyle="info"
-                disabled={selectedInput === PLACEHOLDER}
-                onClick={_onLoadMessage}>
+        <Button bsStyle="info" disabled={selectedInput === PLACEHOLDER} onClick={_onLoadMessage}>
           {title}
         </Button>
       </LoaderContainer>
@@ -88,19 +90,19 @@ const InputDropdown = ({ disabled, inputs, onLoadMessage, preselectedInputId, ti
 
     return (
       <LoaderContainer>
-        <StyledInputDropdown id="placeholder-select"
-                             type="select"
-                             aria-label="server input select"
-                             value={selectedInput}
-                             onChange={onSelectedInputChange}
-                             placeholder={PLACEHOLDER}>
+        <StyledInputDropdown
+          id="placeholder-select"
+          type="select"
+          aria-label="server input select"
+          value={selectedInput}
+          onChange={onSelectedInputChange}
+          placeholder={PLACEHOLDER}
+        >
           <option value={PLACEHOLDER}>Select an Input</option>
           {inputOptions.toArray()}
         </StyledInputDropdown>
 
-        <Button bsStyle="info"
-                disabled={disabled || selectedInput === PLACEHOLDER}
-                onClick={_onLoadMessage}>
+        <Button bsStyle="info" disabled={disabled || selectedInput === PLACEHOLDER} onClick={_onLoadMessage}>
           {title}
         </Button>
       </LoaderContainer>

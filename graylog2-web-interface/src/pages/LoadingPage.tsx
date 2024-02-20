@@ -22,7 +22,7 @@ import Spinner from 'components/common/Spinner';
 import LoginChrome from 'components/login/LoginChrome';
 
 type Props = {
-  text: string,
+  text: string;
 };
 
 const LoadingPage = ({ text }: Props) => (

@@ -21,14 +21,14 @@ import FilterAggregationForm from './FilterAggregationForm';
 import withStreams from './withStreams';
 
 type Props = {
-  action: 'create' | 'edit',
-  validation: {},
-  eventDefinition: {},
-  fieldTypes: {},
-  onChange: () => void,
+  action: 'create' | 'edit';
+  validation: {};
+  eventDefinition: {};
+  fieldTypes: {};
+  onChange: () => void;
   currentUser: {
-    permissions: Array<string>,
-  }
+    permissions: Array<string>;
+  };
 };
 
 const FilterAggregationFormContainer = (props: Props) => <FilterAggregationForm {...props} />;

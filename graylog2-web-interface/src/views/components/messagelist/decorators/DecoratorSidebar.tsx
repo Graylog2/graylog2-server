@@ -29,9 +29,9 @@ import DecoratorList from './DecoratorList';
 import DecoratorStyles from './decoratorStyles.css';
 
 type Props = {
-  decorators: Array<Decorator>,
-  decoratorTypes: {},
-  onChange: (decorators: Array<Decorator>) => void,
+  decorators: Array<Decorator>;
+  decoratorTypes: {};
+  onChange: (decorators: Array<Decorator>) => void;
 };
 
 class DecoratorSidebar extends React.Component<Props> {
@@ -52,17 +52,22 @@ class DecoratorSidebar extends React.Component<Props> {
       name: `Unknown type: ${decorator.type}`,
     };
     const deleteDecorator = (decoratorId) => onChange(decorators.filter((_decorator) => _decorator.id !== decoratorId));
-    const updateDecorator = (id, updatedDecorator) => onChange(decorators.map((_decorator) => (_decorator.id === id ? updatedDecorator : _decorator)));
+    const updateDecorator = (id, updatedDecorator) =>
+      onChange(decorators.map((_decorator) => (_decorator.id === id ? updatedDecorator : _decorator)));
 
-    return ({
+    return {
       id: decorator.id,
-      title: <DecoratorSummary key={`decorator-${decorator.id}`}
-                               decorator={decorator}
-                               decoratorTypes={decoratorTypes}
-                               onDelete={deleteDecorator}
-                               onUpdate={updateDecorator}
-                               typeDefinition={typeDefinition} />,
-    });
+      title: (
+        <DecoratorSummary
+          key={`decorator-${decorator.id}`}
+          decorator={decorator}
+          decoratorTypes={decoratorTypes}
+          onDelete={deleteDecorator}
+          onUpdate={updateDecorator}
+          typeDefinition={typeDefinition}
+        />
+      ),
+    };
   };
 
   _updateOrder = (orderedDecorators: Array<Decorator>) => {
@@ -84,9 +89,9 @@ class DecoratorSidebar extends React.Component<Props> {
       return <Spinner />;
     }
 
-    const sortedDecorators = decorators
-      .sort((d1, d2) => d1.order - d2.order);
-    const nextDecoratorOrder = sortedDecorators.length > 0 ? sortedDecorators[sortedDecorators.length - 1].order + 1 : 0;
+    const sortedDecorators = decorators.sort((d1, d2) => d1.order - d2.order);
+    const nextDecoratorOrder =
+      sortedDecorators.length > 0 ? sortedDecorators[sortedDecorators.length - 1].order + 1 : 0;
     const decoratorItems = sortedDecorators.map(this._formatDecorator);
 
     const addDecorator = (decorator: Decorator) => onChange([...decorators, decorator]);
@@ -103,10 +108,12 @@ class DecoratorSidebar extends React.Component<Props> {
 }
 
 type DecoratorsStoreState = {
-  decorators: Array<Decorator>,
-  types: {},
+  decorators: Array<Decorator>;
+  types: {};
 };
 
-export default connect(DecoratorSidebar,
+export default connect(
+  DecoratorSidebar,
   { decoratorStore: DecoratorsStore as Store<DecoratorsStoreState> },
-  ({ decoratorStore: { types = {} } = {} }) => ({ decoratorTypes: types }));
+  ({ decoratorStore: { types = {} } = {} }) => ({ decoratorTypes: types }),
+);

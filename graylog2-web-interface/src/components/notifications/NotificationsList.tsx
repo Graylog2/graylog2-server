@@ -33,13 +33,19 @@ const _formatNotificationCount = (count: number) => {
 
 const getTitle = (count) => (count === 0 ? 'No notifications' : `There ${_formatNotificationCount(count)}`);
 
-const getContent = (count: number, notificationsList: Array<NotificationType>) => (count === 0 ? (
-  <Alert bsStyle="success" className="notifications-none">
-    No notifications
-  </Alert>
-) : (
-  notificationsList?.map((notification) => <Notification key={`${notification.type}-${notification?.key}-${notification.timestamp}`} notification={notification} />)
-));
+const getContent = (count: number, notificationsList: Array<NotificationType>) =>
+  count === 0 ? (
+    <Alert bsStyle="success" className="notifications-none">
+      No notifications
+    </Alert>
+  ) : (
+    notificationsList?.map((notification) => (
+      <Notification
+        key={`${notification.type}-${notification?.key}-${notification.timestamp}`}
+        notification={notification}
+      />
+    ))
+  );
 
 const NotificationsList = () => {
   const { notifications, total } = useStore(NotificationsStore);
@@ -53,8 +59,8 @@ const NotificationsList = () => {
       <Col md={12}>
         <h2>{getTitle(total)}</h2>
         <p className="description">
-          Notifications are triggered by Graylog and indicate a situation you should act upon. Many notification
-          types will also provide a link to the Graylog documentation if you need more information or assistance.
+          Notifications are triggered by Graylog and indicate a situation you should act upon. Many notification types
+          will also provide a link to the Graylog documentation if you need more information or assistance.
         </p>
 
         {getContent(total, notifications)}

@@ -60,8 +60,7 @@ const Metrics = ({ metrics }) => {
   if (metrics.total.rate) {
     totalRate = (
       <div className="meter" style={{ marginBottom: 10 }}>
-        {numeral(metrics.total.rate.total).format('0,0')} total invocations since boot,{' '}
-        averages:{' '}
+        {numeral(metrics.total.rate.total).format('0,0')} total invocations since boot, averages:{' '}
         {numeral(metrics.total.rate.one_minute).format('0,0.[00]')},{' '}
         {numeral(metrics.total.rate.five_minute).format('0,0.[00]')},{' '}
         {numeral(metrics.total.rate.fifteen_minute).format('0,0.[00]')}.
@@ -71,8 +70,7 @@ const Metrics = ({ metrics }) => {
 
   const conditionCounts = (
     <div className="meter" style={{ marginBottom: 10 }}>
-      {metrics.condition_hits} hits,{' '}
-      {metrics.condition_misses} misses
+      {metrics.condition_hits} hits, {metrics.condition_misses} misses
     </div>
   );
 
@@ -114,19 +112,23 @@ const Metrics = ({ metrics }) => {
       {conditionCounts}
       <Row>
         <Col md={6}>
-          <h4 style={{ display: 'inline' }}>Total time</h4><br />
+          <h4 style={{ display: 'inline' }}>Total time</h4>
+          <br />
           {totalTime}
         </Col>
         <Col md={6}>
-          <h4 style={{ display: 'inline' }}>Condition time</h4><br />
+          <h4 style={{ display: 'inline' }}>Condition time</h4>
+          <br />
           {conditionTime}
         </Col>
         <Col md={6}>
-          <h4 style={{ display: 'inline' }}>Execution time</h4><br />
+          <h4 style={{ display: 'inline' }}>Execution time</h4>
+          <br />
           {executionTime}
         </Col>
         <Col md={6}>
-          <h4 style={{ display: 'inline' }}>Converter time</h4><br />
+          <h4 style={{ display: 'inline' }}>Converter time</h4>
+          <br />
           {convertersTime}
         </Col>
       </Row>
@@ -173,10 +175,8 @@ class ExtractorsListItem extends React.Component {
 
     return (
       <span>
-        Trying to extract data from <em>{extractor.source_field}</em> into{' '}
-        <em>{extractor.target_field}</em>,{' '}
-        {extractor.cursor_strategy === 'cut' && 'not'}{' '}
-        leaving the original intact.
+        Trying to extract data from <em>{extractor.source_field}</em> into <em>{extractor.target_field}</em>,{' '}
+        {extractor.cursor_strategy === 'cut' && 'not'} leaving the original intact.
       </span>
     );
   };
@@ -213,13 +213,19 @@ class ExtractorsListItem extends React.Component {
     );
 
     actions.push(
-      <LinkContainer key={`edit-extractor-${extractor.id}`}
-                     to={Routes.edit_input_extractor(nodeId, inputId, extractor.id)}>
+      <LinkContainer
+        key={`edit-extractor-${extractor.id}`}
+        to={Routes.edit_input_extractor(nodeId, inputId, extractor.id)}
+      >
         <Button>Edit</Button>
       </LinkContainer>,
     );
 
-    actions.push(<Button key="delete-extractor-" bsStyle="danger" onClick={this._deleteExtractor}>Delete</Button>);
+    actions.push(
+      <Button key="delete-extractor-" bsStyle="danger" onClick={this._deleteExtractor}>
+        Delete
+      </Button>,
+    );
 
     return actions;
   };
@@ -229,7 +235,11 @@ class ExtractorsListItem extends React.Component {
 
     const attributes = Object.keys(options);
 
-    return attributes.map((attribute) => <li key={`${attribute}-${extractor.id}`}>{attribute}: {options[attribute]}</li>);
+    return attributes.map((attribute) => (
+      <li key={`${attribute}-${extractor.id}`}>
+        {attribute}: {options[attribute]}
+      </li>
+    ));
   };
 
   _formatConfiguration = (extractorConfig) => {
@@ -242,9 +252,7 @@ class ExtractorsListItem extends React.Component {
     return (
       <div className="configuration-section">
         <h4>Configuration</h4>
-        <ul>
-          {formattedOptions}
-        </ul>
+        <ul>{formattedOptions}</ul>
       </div>
     );
   };
@@ -258,7 +266,9 @@ class ExtractorsListItem extends React.Component {
 
   _formatConverters = (converters) => {
     const converterKeys = Object.keys(converters);
-    const formattedConverters = converterKeys.map((converterKey) => this._formatConverter(converterKey, converters[converterKey]));
+    const formattedConverters = converterKeys.map((converterKey) =>
+      this._formatConverter(converterKey, converters[converterKey]),
+    );
 
     if (formattedConverters.length === 0) {
       return <div />;
@@ -267,9 +277,7 @@ class ExtractorsListItem extends React.Component {
     return (
       <div className="configuration-section">
         <h4>Converters</h4>
-        <ul>
-          {formattedConverters}
-        </ul>
+        <ul>{formattedConverters}</ul>
       </div>
     );
   };
@@ -301,12 +309,14 @@ class ExtractorsListItem extends React.Component {
     const { showDetails } = this.state;
 
     return (
-      <EntityListItem key={`entry-list-${extractor.id}`}
-                      title={extractor.title}
-                      titleSuffix={ExtractorUtils.getReadableExtractorTypeName(extractor.type)}
-                      description={this._formatExtractorSubtitle()}
-                      actions={this._formatActions()}
-                      contentRow={showDetails ? this._formatDetails() : null} />
+      <EntityListItem
+        key={`entry-list-${extractor.id}`}
+        title={extractor.title}
+        titleSuffix={ExtractorUtils.getReadableExtractorTypeName(extractor.type)}
+        description={this._formatExtractorSubtitle()}
+        actions={this._formatActions()}
+        contentRow={showDetails ? this._formatDetails() : null}
+      />
     );
   }
 }

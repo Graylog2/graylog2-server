@@ -144,9 +144,12 @@ export const TELEMETRY_EVENT_TYPE = {
     CORRELATION_ADD_EVENT_CLICKED: 'EventDefinition Condition Correlation Add Event Clicked',
     CORRELATION_REMOVE_EVENT_CLICKED: 'EventDefinition Condition Correlation Remove Event Clicked',
     CORRELATION_OCCURRENCE_TIME_CHANGED: 'EventDefinition Condition Correlation Occurrence Time Changed',
-    CORRELATION_NO_OCCURRENCE_FOLLOWED_BY_EVENT_SELECTED: 'EventDefinition Condition Correlation No Occurrence Followed By Event Selected',
-    CORRELATION_NO_OCCURRENCE_IN_THE_NEXT_SELECTED: 'EventDefinition Condition Correlation No Occurrence In The Next Selected',
-    CORRELATION_NO_OCCURRENCE_IN_THE_NEXT_UNIT_CHANGED: 'EventDefinition Condition Correlation No Occurrence In The Next Unit Changed',
+    CORRELATION_NO_OCCURRENCE_FOLLOWED_BY_EVENT_SELECTED:
+      'EventDefinition Condition Correlation No Occurrence Followed By Event Selected',
+    CORRELATION_NO_OCCURRENCE_IN_THE_NEXT_SELECTED:
+      'EventDefinition Condition Correlation No Occurrence In The Next Selected',
+    CORRELATION_NO_OCCURRENCE_IN_THE_NEXT_UNIT_CHANGED:
+      'EventDefinition Condition Correlation No Occurrence In The Next Unit Changed',
   },
   EVENTDEFINITION_FIELDS: {
     STEP_CLICKED: 'EventDefinition Fields Step Clicked',

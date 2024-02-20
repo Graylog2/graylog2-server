@@ -17,8 +17,7 @@
 import React, { useState } from 'react';
 import { styled } from 'styled-components';
 
-import useIndexProfileWithMappingsByField
-  from 'components/indices/IndexSetFieldTypes/hooks/useIndexProfileWithMappingsByField';
+import useIndexProfileWithMappingsByField from 'components/indices/IndexSetFieldTypes/hooks/useIndexProfileWithMappingsByField';
 import { IconButton } from 'components/common';
 import SetProfileModal from 'components/indices/IndexSetFieldTypes/SetProfileModal';
 import { Link } from 'components/common/router';
@@ -39,7 +38,13 @@ const IndexSetProfile = () => {
   return (
     <Container title={title}>
       <b>Field type mapping profile:</b>
-      {id ? <Link target="_blank" to={Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.edit(id)}>{name}</Link> : <i>Not set</i>}
+      {id ? (
+        <Link target="_blank" to={Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.edit(id)}>
+          {name}
+        </Link>
+      ) : (
+        <i>Not set</i>
+      )}
       <IconButton name="edit" onClick={toggleModal} title="Set field type profile" />
       {showSetModal && <SetProfileModal show={showSetModal} onClose={toggleModal} currentProfile={id} />}
     </Container>

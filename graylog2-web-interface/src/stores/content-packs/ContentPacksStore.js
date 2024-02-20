@@ -22,9 +22,8 @@ import fetch from 'logic/rest/FetchProvider';
 import ContentPackRevisions from 'logic/content-packs/ContentPackRevisions';
 import { singletonStore, singletonActions } from 'logic/singleton';
 
-export const ContentPacksActions = singletonActions(
-  'core.ContentPacks',
-  () => Reflux.createActions({
+export const ContentPacksActions = singletonActions('core.ContentPacks', () =>
+  Reflux.createActions({
     create: { asyncResult: true },
     list: { asyncResult: true },
     get: { asyncResult: true },
@@ -38,61 +37,57 @@ export const ContentPacksActions = singletonActions(
   }),
 );
 
-export const ContentPacksStore = singletonStore(
-  'core.ContentPacks',
-  () => Reflux.createStore({
+export const ContentPacksStore = singletonStore('core.ContentPacks', () =>
+  Reflux.createStore({
     listenables: [ContentPacksActions],
 
     getInitialState() {
-      return ({
+      return {
         contentPack: undefined,
         contentPackMetadata: undefined,
         contentPacks: undefined,
         installations: undefined,
         uninstallEntities: undefined,
-      });
+      };
     },
 
     get(contentPackId) {
       const url = URLUtils.qualifyUrl(ApiRoutes.ContentPacksController.get(contentPackId).url);
-      const promise = fetch('GET', url)
-        .then((response) => {
-          const contentPackRevision = new ContentPackRevisions(response.content_pack_revisions);
-          const constraints = response.constraints_result;
-          const result = {
-            contentPackRevisions: contentPackRevision,
-            selectedVersion: contentPackRevision.latestRevision,
-            constraints: constraints,
-          };
+      const promise = fetch('GET', url).then((response) => {
+        const contentPackRevision = new ContentPackRevisions(response.content_pack_revisions);
+        const constraints = response.constraints_result;
+        const result = {
+          contentPackRevisions: contentPackRevision,
+          selectedVersion: contentPackRevision.latestRevision,
+          constraints: constraints,
+        };
 
-          this.trigger(result);
+        this.trigger(result);
 
-          return result;
-        });
+        return result;
+      });
 
       ContentPacksActions.get.promise(promise);
     },
 
     getRev(contentPackId, contentPackRev) {
       const url = URLUtils.qualifyUrl(ApiRoutes.ContentPacksController.getRev(contentPackId, contentPackRev).url);
-      const promise = fetch('GET', url)
-        .then((result) => {
-          this.trigger({ contentPack: result.content_pack });
+      const promise = fetch('GET', url).then((result) => {
+        this.trigger({ contentPack: result.content_pack });
 
-          return result;
-        });
+        return result;
+      });
 
       ContentPacksActions.getRev.promise(promise);
     },
 
     list() {
       const url = URLUtils.qualifyUrl(ApiRoutes.ContentPacksController.list().url);
-      const promise = fetch('GET', url)
-        .then((result) => {
-          this.trigger({ contentPacks: result.content_packs, contentPackMetadata: result.content_packs_metadata });
+      const promise = fetch('GET', url).then((result) => {
+        this.trigger({ contentPacks: result.content_packs, contentPackMetadata: result.content_packs_metadata });
 
-          return result;
-        });
+        return result;
+      });
 
       ContentPacksActions.list.promise(promise);
     },
@@ -110,40 +105,48 @@ export const ContentPacksStore = singletonStore(
     },
 
     deleteRev(contentPackId, revision) {
-      const promise = fetch('DELETE', URLUtils.qualifyUrl(ApiRoutes.ContentPacksController.deleteRev(contentPackId, revision).url));
+      const promise = fetch(
+        'DELETE',
+        URLUtils.qualifyUrl(ApiRoutes.ContentPacksController.deleteRev(contentPackId, revision).url),
+      );
 
       ContentPacksActions.deleteRev.promise(promise);
     },
 
     install(contentPackId, revision, parameters) {
-      const promise = fetch('POST', URLUtils.qualifyUrl(ApiRoutes.ContentPacksController.install(contentPackId, revision).url), parameters);
+      const promise = fetch(
+        'POST',
+        URLUtils.qualifyUrl(ApiRoutes.ContentPacksController.install(contentPackId, revision).url),
+        parameters,
+      );
 
       ContentPacksActions.install.promise(promise);
     },
     installList(contentPackId) {
       const url = URLUtils.qualifyUrl(ApiRoutes.ContentPacksController.installList(contentPackId).url);
-      const promise = fetch('GET', url)
-        .then((result) => {
-          this.trigger({ installations: result.installations });
+      const promise = fetch('GET', url).then((result) => {
+        this.trigger({ installations: result.installations });
 
-          return result;
-        });
+        return result;
+      });
 
       ContentPacksActions.installList.promise(promise);
     },
     uninstall(contentPackId, installId) {
-      const promise = fetch('DELETE', URLUtils.qualifyUrl(ApiRoutes.ContentPacksController.uninstall(contentPackId, installId).url));
+      const promise = fetch(
+        'DELETE',
+        URLUtils.qualifyUrl(ApiRoutes.ContentPacksController.uninstall(contentPackId, installId).url),
+      );
 
       ContentPacksActions.uninstall.promise(promise);
     },
     uninstallDetails(contentPackId, installId) {
       const url = URLUtils.qualifyUrl(ApiRoutes.ContentPacksController.uninstallDetails(contentPackId, installId).url);
-      const promise = fetch('GET', url)
-        .then((result) => {
-          this.trigger({ uninstallEntities: result.entities });
+      const promise = fetch('GET', url).then((result) => {
+        this.trigger({ uninstallEntities: result.entities });
 
-          return result;
-        });
+        return result;
+      });
 
       ContentPacksActions.uninstallDetails.promise(promise);
     },

@@ -19,18 +19,21 @@ import type { QueryId } from './Query';
 import type View from '../views/View';
 import ViewState from '../views/ViewState';
 
-const queryTitle = (view: View, queryId: QueryId): string | undefined | null => (view && view.search && view.search.queries
-  ? view.search.queries.keySeq()
-    .map((q, idx) => {
-      if (queryId !== undefined && q.id !== undefined && queryId === q.id) {
-        return view.state
-          ? view.state.getIn([q.id], ViewState.create()).titles.getIn(['tab', 'title'], `Page#${idx + 1}`)
-          : `Page#${idx + 1}`;
-      }
+const queryTitle = (view: View, queryId: QueryId): string | undefined | null =>
+  view && view.search && view.search.queries
+    ? view.search.queries
+        .keySeq()
+        .map((q, idx) => {
+          if (queryId !== undefined && q.id !== undefined && queryId === q.id) {
+            return view.state
+              ? view.state.getIn([q.id], ViewState.create()).titles.getIn(['tab', 'title'], `Page#${idx + 1}`)
+              : `Page#${idx + 1}`;
+          }
 
-      return undefined;
-    }).filter((title) => title !== undefined)
-    .first()
-  : undefined);
+          return undefined;
+        })
+        .filter((title) => title !== undefined)
+        .first()
+    : undefined;
 
 export default queryTitle;

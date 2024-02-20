@@ -47,11 +47,15 @@ const NodeThroughput = createReactClass({
       totalOut: 'org.graylog2.throughput.output.1-sec-rate',
     };
 
-    Object.keys(this.metricNames).forEach((metricShortName) => MetricsActions.add(this.props.nodeId, this.metricNames[metricShortName]));
+    Object.keys(this.metricNames).forEach((metricShortName) =>
+      MetricsActions.add(this.props.nodeId, this.metricNames[metricShortName]),
+    );
   },
 
   componentWillUnmount() {
-    Object.keys(this.metricNames).forEach((metricShortName) => MetricsActions.remove(this.props.nodeId, this.metricNames[metricShortName]));
+    Object.keys(this.metricNames).forEach((metricShortName) =>
+      MetricsActions.remove(this.props.nodeId, this.metricNames[metricShortName]),
+    );
   },
 
   _isLoading() {
@@ -62,9 +66,8 @@ const NodeThroughput = createReactClass({
     if (this.props.longFormat) {
       return (
         <span>
-          Processing <strong>{numeral(metrics.totalIn).format('0,0')}</strong> incoming and <strong>
-            {numeral(metrics.totalOut).format('0,0')}
-                                                                                            </strong> outgoing msg/s.
+          Processing <strong>{numeral(metrics.totalIn).format('0,0')}</strong> incoming and{' '}
+          <strong>{numeral(metrics.totalOut).format('0,0')}</strong> outgoing msg/s.
         </span>
       );
     }
@@ -86,7 +89,7 @@ const NodeThroughput = createReactClass({
     const metrics = MetricsExtractor.getValuesForNode(nodeMetrics, this.metricNames);
 
     if (Object.keys(metrics).length === 0) {
-      return (<span>Unable to load throughput.</span>);
+      return <span>Unable to load throughput.</span>;
     }
 
     return this._formatThroughput(metrics);

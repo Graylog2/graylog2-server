@@ -27,9 +27,9 @@ import WidgetPosition from '../widgets/WidgetPosition';
 import type Widget from '../widgets/Widget';
 
 type Result = {
-  titles: { widget: { [key: string]: string } },
-  widgets: Array<Widget>,
-  positions: { [key: string]: WidgetPosition },
+  titles: { widget: { [key: string]: string } };
+  widgets: Array<Widget>;
+  positions: { [key: string]: WidgetPosition };
 };
 
 type ViewCreator = (streamId: string | string[] | undefined | null) => Promise<Result>;
@@ -56,10 +56,7 @@ const _defaultWidgets: DefaultWidgets = {
     const streamDecorators = decorators ? decorators.filter(byStreamId) : [];
     const histogram = resultHistogram();
     const messageTable = allMessagesTable(undefined, streamDecorators);
-    const widgets = [
-      histogram,
-      messageTable,
-    ];
+    const widgets = [histogram, messageTable];
 
     const titles = {
       widget: {

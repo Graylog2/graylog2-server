@@ -67,29 +67,38 @@ import type { DashboardFormValues } from './DashboardSearchBarForm';
 import DashboardSearchForm from './DashboardSearchBarForm';
 import PluggableSearchBarControls from './searchbar/PluggableSearchBarControls';
 
-const TimeRangeRow = styled.div(({ theme }) => css`
-  display: flex;
-  justify-content: space-between;
-  gap: ${SEARCH_BAR_GAP};
+const TimeRangeRow = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    justify-content: space-between;
+    gap: ${SEARCH_BAR_GAP};
 
-  @media (max-width: ${theme.breakpoints.max.sm}) {
-    flex-direction: column;
-  }
-`);
+    @media (max-width: ${theme.breakpoints.max.sm}) {
+      flex-direction: column;
+    }
+  `,
+);
 
-const StyledTimeRangeFilter = styled(TimeRangeFilter)(({ theme }) => css`
-  flex: 0.2;
-  flex-basis: 380px;
-  
-  @media (max-width: ${theme.breakpoints.max.sm}) {
-    flex: 1;
-    flex-basis: auto;
-  }
-`);
+const StyledTimeRangeFilter = styled(TimeRangeFilter)(
+  ({ theme }) => css`
+    flex: 0.2;
+    flex-basis: 380px;
+
+    @media (max-width: ${theme.breakpoints.max.sm}) {
+      flex: 1;
+      flex-basis: auto;
+    }
+  `,
+);
 
 const debouncedValidateQuery = debounceWithPromise(validateQuery, 350);
 
-const _validateQueryString = (values: DashboardFormValues, pluggableSearchBarControls: Array<() => SearchBarControl>, userTimezone: string, context: HandlerContext) => {
+const _validateQueryString = (
+  values: DashboardFormValues,
+  pluggableSearchBarControls: Array<() => SearchBarControl>,
+  userTimezone: string,
+  context: HandlerContext,
+) => {
   const request = {
     timeRange: isNoTimeRangeOverride(values?.timerange) ? undefined : values?.timerange,
     queryString: values?.queryString,
@@ -102,7 +111,10 @@ const _validateQueryString = (values: DashboardFormValues, pluggableSearchBarCon
 const useInitialFormValues = (timerange: TimeRange, queryString: string) => {
   const initialValuesFromPlugins = usePluggableInitialValues();
 
-  return useMemo(() => ({ timerange, queryString, ...initialValuesFromPlugins }), [queryString, timerange, initialValuesFromPlugins]);
+  return useMemo(
+    () => ({ timerange, queryString, ...initialValuesFromPlugins }),
+    [queryString, timerange, initialValuesFromPlugins],
+  );
 };
 
 const DashboardSearchBar = () => {
@@ -115,13 +127,16 @@ const DashboardSearchBar = () => {
   const dispatch = useAppDispatch();
   const handlerContext = useHandlerContext();
 
-  const submitForm = useCallback(async (values) => {
-    const { timerange: newTimerange, queryString: newQueryString } = values;
-    await executePluggableSubmitHandler(dispatch, values, pluggableSearchBarControls);
+  const submitForm = useCallback(
+    async (values) => {
+      const { timerange: newTimerange, queryString: newQueryString } = values;
+      await executePluggableSubmitHandler(dispatch, values, pluggableSearchBarControls);
 
-    dispatch(setGlobalOverride(newQueryString, newTimerange));
-    dispatch(execute());
-  }, [dispatch, pluggableSearchBarControls]);
+      dispatch(setGlobalOverride(newQueryString, newTimerange));
+      dispatch(execute());
+    },
+    [dispatch, pluggableSearchBarControls],
+  );
 
   const { parameters } = useParameters();
   const initialValues = useInitialFormValues(timerange, queryString);
@@ -137,31 +152,49 @@ const DashboardSearchBar = () => {
       {({ focusedWidget: { editing } = { editing: false } }) => (
         <ScrollToHint value={queryString}>
           <FormWarningsProvider>
-            <DashboardSearchForm initialValues={initialValues}
-                                 limitDuration={limitDuration}
-                                 onSubmit={submitForm}
-                                 validateQueryString={(values) => _validateQueryString(values, pluggableSearchBarControls, userTimezone, handlerContext)}>
-              {({ dirty, errors, isSubmitting, isValid, isValidating, handleSubmit, values, setFieldValue, validateForm }) => {
+            <DashboardSearchForm
+              initialValues={initialValues}
+              limitDuration={limitDuration}
+              onSubmit={submitForm}
+              validateQueryString={(values) =>
+                _validateQueryString(values, pluggableSearchBarControls, userTimezone, handlerContext)
+              }
+            >
+              {({
+                dirty,
+                errors,
+                isSubmitting,
+                isValid,
+                isValidating,
+                handleSubmit,
+                values,
+                setFieldValue,
+                validateForm,
+              }) => {
                 const disableSearchSubmit = isSubmitting || isValidating || !isValid;
 
                 return (
                   <SearchBarContainer>
                     <ValidateOnParameterChange parameters={parameters} />
                     <TimeRangeRow>
-                      <StyledTimeRangeFilter onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
-                                             value={values?.timerange}
-                                             limitDuration={limitDuration}
-                                             hasErrorOnMount={!!errors.timerange}
-                                             noOverride />
+                      <StyledTimeRangeFilter
+                        onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
+                        value={values?.timerange}
+                        limitDuration={limitDuration}
+                        hasErrorOnMount={!!errors.timerange}
+                        noOverride
+                      />
                       <RefreshControls />
                     </TimeRangeRow>
 
                     <SearchQueryRow>
                       <SearchButtonAndQuery>
-                        <SearchButton disabled={disableSearchSubmit}
-                                      glyph="filter"
-                                      displaySpinner={isSubmitting}
-                                      dirty={dirty} />
+                        <SearchButton
+                          disabled={disableSearchSubmit}
+                          glyph="filter"
+                          displaySpinner={isSubmitting}
+                          dirty={dirty}
+                        />
                         <SearchInputAndValidationContainer>
                           <Field name="queryString">
                             {({ field: { name, value, onChange }, meta: { error } }) => (
@@ -169,20 +202,22 @@ const DashboardSearchBar = () => {
                                 {({ warnings }) => (
                                   <PluggableCommands usage="global_override_query">
                                     {(customCommands) => (
-                                      <QueryInput value={value}
-                                                  view={view}
-                                                  timeRange={values?.timerange}
-                                                  placeholder="Apply filter to all widgets"
-                                                  name={name}
-                                                  onChange={onChange}
-                                                  disableExecution={disableSearchSubmit}
-                                                  error={error}
-                                                  isValidating={isValidating}
-                                                  validate={validateForm}
-                                                  warning={warnings.queryString}
-                                                  ref={editorRef}
-                                                  onExecute={handleSubmit as () => void}
-                                                  commands={customCommands} />
+                                      <QueryInput
+                                        value={value}
+                                        view={view}
+                                        timeRange={values?.timerange}
+                                        placeholder="Apply filter to all widgets"
+                                        name={name}
+                                        onChange={onChange}
+                                        disableExecution={disableSearchSubmit}
+                                        error={error}
+                                        isValidating={isValidating}
+                                        validate={validateForm}
+                                        warning={warnings.queryString}
+                                        ref={editorRef}
+                                        onExecute={handleSubmit as () => void}
+                                        commands={customCommands}
+                                      />
                                     )}
                                   </PluggableCommands>
                                 )}

@@ -25,46 +25,45 @@ import { singletonStore, singletonActions } from 'logic/singleton';
 import PaginationURL from 'util/PaginationURL';
 
 export type TestResult = {
-  isLoading: boolean,
-  id?: string,
-  error?: boolean,
-  message?: string,
+  isLoading: boolean;
+  id?: string;
+  error?: boolean;
+  message?: string;
 };
 
-export type TestResults ={
-    [key: string]: TestResult
+export type TestResults = {
+  [key: string]: TestResult;
 };
 
 export type EventNotification = {
-  id: string,
-  title: string,
-  description: string,
+  id: string;
+  title: string;
+  description: string;
   config: {
-    type?: string
-  },
+    type?: string;
+  };
 };
 
 export type LegacyEventNotification = {
-  name: string,
-  configuration: {}
+  name: string;
+  configuration: {};
 };
 
 type EventNotificationsActionsType = {
-  listAll: () => Promise<{ notifications: Array<EventNotification> }>,
-  listAllLegacyTypes: () => Promise<{ types: { [key: string]: LegacyEventNotification } }>,
-  listPaginated: () => Promise<{ notifications: Array<EventNotification> }>,
-  searchPaginated: () => Promise<{ elements: Array<EventNotification> }>,
-  get: (id: string) => Promise<EventNotification>,
-  create: (eventNotification: EventNotification) => Promise<void>,
-  update: (id: string, eventNotification: EventNotification) => Promise<void>,
-  delete: (eventNotification: EventNotification) => Promise<void>,
-  test: (eventNotification: EventNotification) => Promise<void>,
-  testPersisted: (eventNotification: EventNotification) => Promise<void>,
+  listAll: () => Promise<{ notifications: Array<EventNotification> }>;
+  listAllLegacyTypes: () => Promise<{ types: { [key: string]: LegacyEventNotification } }>;
+  listPaginated: () => Promise<{ notifications: Array<EventNotification> }>;
+  searchPaginated: () => Promise<{ elements: Array<EventNotification> }>;
+  get: (id: string) => Promise<EventNotification>;
+  create: (eventNotification: EventNotification) => Promise<void>;
+  update: (id: string, eventNotification: EventNotification) => Promise<void>;
+  delete: (eventNotification: EventNotification) => Promise<void>;
+  test: (eventNotification: EventNotification) => Promise<void>;
+  testPersisted: (eventNotification: EventNotification) => Promise<void>;
 };
 
-export const EventNotificationsActions = singletonActions(
-  'core.EventNotifications',
-  () => Reflux.createActions<EventNotificationsActionsType>({
+export const EventNotificationsActions = singletonActions('core.EventNotifications', () =>
+  Reflux.createActions<EventNotificationsActionsType>({
     listAll: { asyncResult: true },
     listAllLegacyTypes: { asyncResult: true },
     listPaginated: { asyncResult: true },
@@ -79,22 +78,21 @@ export const EventNotificationsActions = singletonActions(
 );
 
 type EventNotificationsStoreState = {
-  all: Array<EventNotification>,
-  allLegacyTypes: { [key: string]: LegacyEventNotification },
-  notifications: Array<EventNotification>,
-  query: string,
+  all: Array<EventNotification>;
+  allLegacyTypes: { [key: string]: LegacyEventNotification };
+  notifications: Array<EventNotification>;
+  query: string;
   pagination: {
-    count: number,
-    page: number,
-    pageSize: number,
-    total: number,
-    grandTotal: number,
-  }
+    count: number;
+    page: number;
+    pageSize: number;
+    total: number;
+    grandTotal: number;
+  };
 };
 
-export const EventNotificationsStore = singletonStore(
-  'core.EventNotifications',
-  () => Reflux.createStore<EventNotificationsStoreState>({
+export const EventNotificationsStore = singletonStore('core.EventNotifications', () =>
+  Reflux.createStore<EventNotificationsStoreState>({
     listenables: [EventNotificationsActions],
     sourceUrl: '/events/notifications',
     all: undefined,
@@ -165,13 +163,16 @@ export const EventNotificationsStore = singletonStore(
     },
 
     listPaginated({ query = '', page = 1, pageSize = 10 }) {
-      const promise = fetch('GET', this.eventNotificationsUrl({
-        query: {
-          query: query,
-          page: page,
-          per_page: pageSize,
-        },
-      }));
+      const promise = fetch(
+        'GET',
+        this.eventNotificationsUrl({
+          query: {
+            query: query,
+            page: page,
+            per_page: pageSize,
+          },
+        }),
+      );
 
       promise.then((response) => {
         this.notifications = response.notifications;
@@ -195,32 +196,26 @@ export const EventNotificationsStore = singletonStore(
     searchPaginated(newPage, newPerPage, newQuery, additional) {
       const url = PaginationURL(`${this.sourceUrl}/paginated`, newPage, newPerPage, newQuery, additional);
 
-      const promise = fetch('GET', URLUtils.qualifyUrl(url))
-        .then((response) => {
-          const {
-            elements,
-            query,
-            attributes,
-            pagination: {
-              count,
-              total,
-              page,
-              per_page: perPage,
-            },
-          } = response;
+      const promise = fetch('GET', URLUtils.qualifyUrl(url)).then((response) => {
+        const {
+          elements,
+          query,
+          attributes,
+          pagination: { count, total, page, per_page: perPage },
+        } = response;
 
-          return {
-            elements,
-            attributes,
-            pagination: {
-              count,
-              total,
-              page,
-              perPage,
-              query,
-            },
-          };
-        });
+        return {
+          elements,
+          attributes,
+          pagination: {
+            count,
+            total,
+            page,
+            perPage,
+            query,
+          },
+        };
+      });
 
       EventNotificationsActions.searchPaginated.promise(promise);
 
@@ -231,8 +226,10 @@ export const EventNotificationsStore = singletonStore(
 
       promise.catch((error) => {
         if (error.status === 404) {
-          UserNotification.error(`Unable to find Event Notification with id <${notificationId}>, please ensure it wasn't deleted.`,
-            'Could not retrieve Event Notification');
+          UserNotification.error(
+            `Unable to find Event Notification with id <${notificationId}>, please ensure it wasn't deleted.`,
+            'Could not retrieve Event Notification',
+          );
         }
       });
 
@@ -244,15 +241,20 @@ export const EventNotificationsStore = singletonStore(
 
       promise.then(
         (response) => {
-          UserNotification.success('Notification created successfully', `Notification "${notification.title}" was created successfully.`);
+          UserNotification.success(
+            'Notification created successfully',
+            `Notification "${notification.title}" was created successfully.`,
+          );
           this.refresh();
 
           return response;
         },
         (error) => {
           if (error.status !== 400 || !error.additional.body || !error.additional.body.failed) {
-            UserNotification.error(`Creating Notification "${notification.title}" failed with status: ${error}`,
-              'Could not save Notification');
+            UserNotification.error(
+              `Creating Notification "${notification.title}" failed with status: ${error}`,
+              'Could not save Notification',
+            );
           }
         },
       );
@@ -265,15 +267,20 @@ export const EventNotificationsStore = singletonStore(
 
       promise.then(
         (response) => {
-          UserNotification.success('Notification updated successfully', `Notification "${notification.title}" was updated successfully.`);
+          UserNotification.success(
+            'Notification updated successfully',
+            `Notification "${notification.title}" was updated successfully.`,
+          );
           this.refresh();
 
           return response;
         },
         (error) => {
           if (error.status !== 400 || !error.additional.body || !error.additional.body.failed) {
-            UserNotification.error(`Updating Notification "${notification.title}" failed with status: ${error}`,
-              'Could not update Notification');
+            UserNotification.error(
+              `Updating Notification "${notification.title}" failed with status: ${error}`,
+              'Could not update Notification',
+            );
           }
         },
       );
@@ -286,12 +293,17 @@ export const EventNotificationsStore = singletonStore(
 
       promise.then(
         () => {
-          UserNotification.success('Notification deleted successfully', `Notification "${notification.title}" was deleted successfully.`);
+          UserNotification.success(
+            'Notification deleted successfully',
+            `Notification "${notification.title}" was deleted successfully.`,
+          );
           this.refresh();
         },
         (error) => {
-          UserNotification.error(`Deleting Notification "${notification.title}" failed with status: ${error}`,
-            'Could not delete Notification');
+          UserNotification.error(
+            `Deleting Notification "${notification.title}" failed with status: ${error}`,
+            'Could not delete Notification',
+          );
         },
       );
 

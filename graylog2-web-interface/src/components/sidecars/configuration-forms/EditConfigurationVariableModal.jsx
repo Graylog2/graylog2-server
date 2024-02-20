@@ -162,51 +162,69 @@ class EditConfigurationVariableModal extends React.Component {
 
     return (
       <>
-        <Button onClick={this.openModal}
-                bsStyle={create ? 'success' : 'info'}
-                bsSize={create ? 'small' : 'xsmall'}
-                className={create ? 'pull-right' : ''}>
+        <Button
+          onClick={this.openModal}
+          bsStyle={create ? 'success' : 'info'}
+          bsSize={create ? 'small' : 'xsmall'}
+          className={create ? 'pull-right' : ''}
+        >
           {triggerButtonContent}
         </Button>
-        <BootstrapModalForm show={showModal}
-                            title={<>{create ? 'Create' : 'Edit'} Variable $&#123;user.{formData.name}&#125;</>}
-                            data-telemetry-title={`${create ? 'Create' : 'Edit'} Variable user`}
-                            onSubmitForm={this._save}
-                            onCancel={this.closeModal}
-                            submitButtonDisabled={this._hasErrors()}
-                            submitButtonText="Save">
+        <BootstrapModalForm
+          show={showModal}
+          title={
+            <>
+              {create ? 'Create' : 'Edit'} Variable $&#123;user.{formData.name}&#125;
+            </>
+          }
+          data-telemetry-title={`${create ? 'Create' : 'Edit'} Variable user`}
+          onSubmitForm={this._save}
+          onCancel={this.closeModal}
+          submitButtonDisabled={this._hasErrors()}
+          submitButtonText="Save"
+        >
           <fieldset>
-            <Input type="text"
-                   id={this._getId('variable-name')}
-                   label="Name"
-                   name="name"
-                   defaultValue={formData.name}
-                   onChange={this._handleInputChange}
-                   bsStyle={this._validationState('name')}
-                   help={this._formatValidationMessage('name', 'Type a name for this variable')}
-                   autoFocus
-                   spellCheck={false}
-                   required />
-            <Input type="text"
-                   id={this._getId('variable-description')}
-                   label={<span>Description <small className="text-muted">(Optional)</small></span>}
-                   name="description"
-                   defaultValue={formData.description}
-                   onChange={this._handleInputChange}
-                   help="Type a description for this variable"
-                   spellCheck={false} />
-            <Input type="textarea"
-                   id={this._getId('variable-content')}
-                   label="Content"
-                   name="content"
-                   rows="10"
-                   className={ConfigurationHelperStyle.monoSpaceFont}
-                   defaultValue={formData.content}
-                   onChange={this._handleInputChange}
-                   bsStyle={this._validationState('content')}
-                   help={this._formatValidationMessage('content', 'Write your variable content')}
-                   spellCheck={false}
-                   required />
+            <Input
+              type="text"
+              id={this._getId('variable-name')}
+              label="Name"
+              name="name"
+              defaultValue={formData.name}
+              onChange={this._handleInputChange}
+              bsStyle={this._validationState('name')}
+              help={this._formatValidationMessage('name', 'Type a name for this variable')}
+              autoFocus
+              spellCheck={false}
+              required
+            />
+            <Input
+              type="text"
+              id={this._getId('variable-description')}
+              label={
+                <span>
+                  Description <small className="text-muted">(Optional)</small>
+                </span>
+              }
+              name="description"
+              defaultValue={formData.description}
+              onChange={this._handleInputChange}
+              help="Type a description for this variable"
+              spellCheck={false}
+            />
+            <Input
+              type="textarea"
+              id={this._getId('variable-content')}
+              label="Content"
+              name="content"
+              rows="10"
+              className={ConfigurationHelperStyle.monoSpaceFont}
+              defaultValue={formData.content}
+              onChange={this._handleInputChange}
+              bsStyle={this._validationState('content')}
+              help={this._formatValidationMessage('content', 'Write your variable content')}
+              spellCheck={false}
+              required
+            />
           </fieldset>
         </BootstrapModalForm>
       </>

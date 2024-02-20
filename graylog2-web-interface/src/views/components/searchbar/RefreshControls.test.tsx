@@ -43,7 +43,7 @@ const autoRefreshOptions = {
 };
 
 describe('RefreshControls', () => {
-  const SUT = ({ onSubmit, children }: { onSubmit?: () => void, children?: React.ReactNode }) => (
+  const SUT = ({ onSubmit, children }: { onSubmit?: () => void; children?: React.ReactNode }) => (
     <Formik initialValues={{}} onSubmit={onSubmit}>
       <Form>
         <RefreshControls />
@@ -63,9 +63,7 @@ describe('RefreshControls', () => {
     return (
       <>
         Current value is: {values['example-field']}
-        <Button onClick={() => setFieldValue('example-field', 'example-value')}>
-          Change form field value
-        </Button>
+        <Button onClick={() => setFieldValue('example-field', 'example-value')}>Change form field value</Button>
       </>
     );
   };
@@ -95,17 +93,17 @@ describe('RefreshControls', () => {
 
   describe('rendering', () => {
     it.each`
-    enabled      | interval
-    ${true}      | ${1000}
-    ${true}      | ${2000}
-    ${true}      | ${5000}
-    ${true}      | ${10000}
-    ${true}      | ${30000}
-    ${true}      | ${60000}
-    ${true}      | ${300000}
-    ${false}     | ${300000}
-    ${false}     | ${1000}
-  `('renders refresh controls with enabled: $enabled and interval: $interval', async ({ enabled, interval }) => {
+      enabled  | interval
+      ${true}  | ${1000}
+      ${true}  | ${2000}
+      ${true}  | ${5000}
+      ${true}  | ${10000}
+      ${true}  | ${30000}
+      ${true}  | ${60000}
+      ${true}  | ${300000}
+      ${false} | ${300000}
+      ${false} | ${1000}
+    `('renders refresh controls with enabled: $enabled and interval: $interval', async ({ enabled, interval }) => {
       asMock(useAutoRefresh).mockReturnValue({
         ...autoRefreshContextValue,
         refreshConfig: { enabled, interval },
@@ -173,11 +171,11 @@ describe('RefreshControls', () => {
       refreshConfig: { enabled: true, interval: 5000 },
     });
 
-    render((
+    render(
       <SUT>
         <TriggerFormChangeButton />
-      </SUT>
-    ));
+      </SUT>,
+    );
 
     await userEvent.click(await screen.findByRole('button', { name: /change form field value/i }));
 

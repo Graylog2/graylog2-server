@@ -54,12 +54,14 @@ describe('CACreateForm', () => {
 
     await submitForm();
 
-    await waitFor(() => expect(fetch).toHaveBeenCalledWith(
-      'POST',
-      expect.stringContaining('/api/ca/create'),
-      { organization: 'Graylog CA' },
-      false,
-    ));
+    await waitFor(() =>
+      expect(fetch).toHaveBeenCalledWith(
+        'POST',
+        expect.stringContaining('/api/ca/create'),
+        { organization: 'Graylog CA' },
+        false,
+      ),
+    );
 
     expect(UserNotification.success).toHaveBeenCalledWith('CA created successfully');
   });
@@ -67,20 +69,22 @@ describe('CACreateForm', () => {
   it('should show error when CA creation fails', async () => {
     asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
 
-    renderPreflight((
+    renderPreflight(
       <DefaultQueryClientProvider options={{ logger }}>
         <CACreateForm />
-      </DefaultQueryClientProvider>
-    ));
+      </DefaultQueryClientProvider>,
+    );
 
     await submitForm();
 
-    await waitFor(() => expect(fetch).toHaveBeenCalledWith(
-      'POST',
-      expect.stringContaining('/api/ca/create'),
-      { organization: 'Graylog CA' },
-      false,
-    ));
+    await waitFor(() =>
+      expect(fetch).toHaveBeenCalledWith(
+        'POST',
+        expect.stringContaining('/api/ca/create'),
+        { organization: 'Graylog CA' },
+        false,
+      ),
+    );
 
     expect(UserNotification.error).toHaveBeenCalledWith('CA creation failed with error: Error: Error');
   });

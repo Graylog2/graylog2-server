@@ -27,7 +27,7 @@ import DataTableEntry from './DataTableEntry';
 
 import EmptyValue from '../EmptyValue';
 
-const f = (source: string, field: string = source): { field: string, source: string } => ({ field, source });
+const f = (source: string, field: string = source): { field: string; source: string } => ({ field, source });
 const createFields = (fields: Array<string>) => OrderedSet(fields.map((field) => f(field)));
 const fields = createFields(['nf_dst_address', 'count()', 'max(timestamp)', 'card(timestamp)']);
 const item = {
@@ -54,13 +54,8 @@ const series = [
 
 const valuePath = [{ nf_dst_address: '192.168.1.24' }];
 
-const seriesWithName = (fn, name) => Series.forFunction(fn)
-  .toBuilder()
-  .config(SeriesConfig.empty()
-    .toBuilder()
-    .name(name)
-    .build())
-  .build();
+const seriesWithName = (fn, name) =>
+  Series.forFunction(fn).toBuilder().config(SeriesConfig.empty().toBuilder().name(name).build()).build();
 
 jest.mock('views/hooks/useActiveQueryId', () => () => 'foobar');
 
@@ -68,23 +63,23 @@ describe('DataTableEntry', () => {
   const SUT = (props) => (
     <table>
       <tbody>
-        <DataTableEntry columnPivots={columnPivots}
-                        columnPivotValues={columnPivotValues}
-                        currentView={currentView}
-                        fields={fields}
-                        item={item}
-                        series={series}
-                        types={List([])}
-                        valuePath={valuePath}
-                        {...props} />
+        <DataTableEntry
+          columnPivots={columnPivots}
+          columnPivotValues={columnPivotValues}
+          currentView={currentView}
+          fields={fields}
+          item={item}
+          series={series}
+          types={List([])}
+          valuePath={valuePath}
+          {...props}
+        />
       </tbody>
     </table>
   );
 
   it('does not fail without types', () => {
-    const wrapper = mount((
-      <SUT />
-    ));
+    const wrapper = mount(<SUT />);
 
     expect(wrapper).not.toBeEmptyRender();
     expect(wrapper).toExist();
@@ -96,9 +91,7 @@ describe('DataTableEntry', () => {
       FieldTypeMapping.create('nf_dst_address', FieldTypes.STRING()),
     ];
 
-    const wrapper = mount((
-      <SUT types={List(types)} />
-    ));
+    const wrapper = mount(<SUT types={List(types)} />);
 
     const fieldTypeFor = (fieldName) => wrapper.find(`Value[field="${fieldName}"]`).first().props().type;
 
@@ -111,10 +104,12 @@ describe('DataTableEntry', () => {
   it('provides valuePath in context for each value', () => {
     const wrapper = mount(<SUT />);
 
-    expect(wrapper.find('Provider')
-      .map((p) => p.props().value as {})
-      .filter((value) => ('valuePath' in value)))
-      .toMatchSnapshot();
+    expect(
+      wrapper
+        .find('Provider')
+        .map((p) => p.props().value as {})
+        .filter((value) => 'valuePath' in value),
+    ).toMatchSnapshot();
   });
 
   it('does not render `Empty Value` for deduplicated values', () => {
@@ -122,10 +117,7 @@ describe('DataTableEntry', () => {
     const itemWithDeduplicatedValues = {
       nf_dst_port: 443,
     };
-    const wrapper = mount((
-      <SUT fields={fieldsWithDeduplicatedValues}
-           item={itemWithDeduplicatedValues} />
-    ));
+    const wrapper = mount(<SUT fields={fieldsWithDeduplicatedValues} item={itemWithDeduplicatedValues} />);
 
     expect(wrapper).not.toContainReact(<EmptyValue />);
   });
@@ -134,9 +126,7 @@ describe('DataTableEntry', () => {
     const timestampTypeMapping = FieldTypeMapping.create('timestamp', FieldTypes.DATE());
 
     it('for non-renamed functions', () => {
-      const wrapper = mount((
-        <SUT types={List([timestampTypeMapping])} />
-      ));
+      const wrapper = mount(<SUT types={List([timestampTypeMapping])} />);
       const valueFields = wrapper.find('Value[field="max(timestamp)"]');
 
       valueFields.forEach((field) => expect(field).toHaveProp('type', timestampTypeMapping.type));
@@ -149,15 +139,17 @@ describe('DataTableEntry', () => {
       };
       const fieldsWithRenamedSeries = OrderedSet([f('max(timestamp)', 'Last Timestamp')]);
 
-      const wrapper = mount((
-        <SUT columnPivots={[]}
-             columnPivotValues={[]}
-             fields={fieldsWithRenamedSeries}
-             item={itemWithRenamedSeries}
-             series={renamedSeries}
-             types={List([timestampTypeMapping])}
-             valuePath={[]} />
-      ));
+      const wrapper = mount(
+        <SUT
+          columnPivots={[]}
+          columnPivotValues={[]}
+          fields={fieldsWithRenamedSeries}
+          item={itemWithRenamedSeries}
+          series={renamedSeries}
+          types={List([timestampTypeMapping])}
+          valuePath={[]}
+        />,
+      );
       const valueFields = wrapper.find('Value[field="max(timestamp)"]');
 
       expect(valueFields).toHaveLength(1);
@@ -188,12 +180,14 @@ describe('DataTableEntry', () => {
         f('card(timestamp)'),
       ]);
 
-      const wrapper = mount((
-        <SUT fields={fieldsWithRenamedSeries}
-             item={itemWithRenamedSeries}
-             series={renamedSeries}
-             types={List([timestampTypeMapping])} />
-      ));
+      const wrapper = mount(
+        <SUT
+          fields={fieldsWithRenamedSeries}
+          item={itemWithRenamedSeries}
+          series={renamedSeries}
+          types={List([timestampTypeMapping])}
+        />,
+      );
       const valueFields = wrapper.find('Value[field="max(timestamp)"]');
 
       expect(valueFields).toHaveLength(3);

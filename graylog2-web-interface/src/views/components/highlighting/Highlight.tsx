@@ -17,16 +17,20 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
-const BackgroundColor = styled.span<{ $color: string }>(({ theme, $color }) => css`
-  background-color: ${$color};
-  color: ${theme.utils.contrastingColor($color)};
-  width: fit-content;
-`);
+const BackgroundColor = styled.span<{ $color: string }>(
+  ({ theme, $color }) => css`
+    background-color: ${$color};
+    color: ${theme.utils.contrastingColor($color)};
+    width: fit-content;
+  `,
+);
 
 type Props = {
-  color: string,
+  color: string;
 };
 
-const Highlight = ({ children, color }: React.PropsWithChildren<Props>) => <BackgroundColor $color={color}>{children}</BackgroundColor>;
+const Highlight = ({ children, color }: React.PropsWithChildren<Props>) => (
+  <BackgroundColor $color={color}>{children}</BackgroundColor>
+);
 
 export default Highlight;

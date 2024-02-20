@@ -35,8 +35,8 @@ jest.mock('views/logic/slices/widgetActions', () => ({
 }));
 
 type ContainerProps = {
-  colors: ChartColorMap,
-  setColor: ChangeColorFunction,
+  colors: ChartColorMap;
+  setColor: ChangeColorFunction;
 };
 
 const Container: React.FC<ContainerProps> = () => <div>Hello!</div>;
@@ -55,15 +55,13 @@ describe('WidgetColorContext', () => {
   });
 
   const container = () => {
-    const wrapper = mount((
+    const wrapper = mount(
       <WidgetColorContext id="deadbeef">
         <ChartColorContext.Consumer>
-          {({ colors, setColor }) => (
-            <Container colors={colors} setColor={setColor} />
-          )}
+          {({ colors, setColor }) => <Container colors={colors} setColor={setColor} />}
         </ChartColorContext.Consumer>
-      </WidgetColorContext>
-    ));
+      </WidgetColorContext>,
+    );
 
     return wrapper.find(Container);
   };

@@ -24,57 +24,57 @@ import useContentStreamSettings from 'components/content-stream/hook/useContentS
 
 export type FeedMediaContent = {
   'media:title'?: {
-    '#text'?: string,
-    attr_type?: string,
-  },
+    '#text'?: string;
+    attr_type?: string;
+  };
   'media:thumbnail'?: {
-    attr_url?: string,
-    attr_width?: string,
-    attr_height?: string,
-  },
-  'media:copyright'?: string,
-  attr_url?: string,
-  attr_type?: string,
-  attr_medium?: string,
-  attr_width?: string,
-  attr_height?: string,
+    attr_url?: string;
+    attr_width?: string;
+    attr_height?: string;
+  };
+  'media:copyright'?: string;
+  attr_url?: string;
+  attr_type?: string;
+  attr_medium?: string;
+  attr_width?: string;
+  attr_height?: string;
 };
 export type FeedItem = {
-  title?: string,
-  link?: string,
-  comments?: string,
-  'dc:creator'?: string,
-  pubDate?: string,
-  category?: Array<string>
+  title?: string;
+  link?: string;
+  comments?: string;
+  'dc:creator'?: string;
+  pubDate?: string;
+  category?: Array<string>;
   guid?: {
-    '#text'?: string,
-    attr_isPermaLink?: string,
-  },
-  description?: string,
-  'content:encoded'?: string,
-  'wfw:commentRss'?: string,
-  'slash:comments'?: number,
-  'media:content'?: Array<FeedMediaContent> | FeedMediaContent
-}
+    '#text'?: string;
+    attr_isPermaLink?: string;
+  };
+  description?: string;
+  'content:encoded'?: string;
+  'wfw:commentRss'?: string;
+  'slash:comments'?: number;
+  'media:content'?: Array<FeedMediaContent> | FeedMediaContent;
+};
 
 type RssFeed = {
   rss: {
     channel: {
-      'atom:link': string,
-      description: string
-      generator: string,
-      image: string
-      item: Array<FeedItem> | FeedItem,
-      language: string
-      lastBuildDate: string,
-      link: string
-      site: number
-      'sy:updateFrequency': number
-      'sy:updatePeriod': string
-      title: string
-    }
-  }
-}
+      'atom:link': string;
+      description: string;
+      generator: string;
+      image: string;
+      item: Array<FeedItem> | FeedItem;
+      language: string;
+      lastBuildDate: string;
+      link: string;
+      site: number;
+      'sy:updateFrequency': number;
+      'sy:updatePeriod': string;
+      title: string;
+    };
+  };
+};
 
 const parseXML = (text: string): Array<FeedItem> => {
   const options = {
@@ -85,19 +85,28 @@ const parseXML = (text: string): Array<FeedItem> => {
 
   const parsed = parser.parse(text);
 
-  const { rss: { channel: { item: items = undefined } } } = parsed as RssFeed;
+  const {
+    rss: {
+      channel: { item: items = undefined },
+    },
+  } = parsed as RssFeed;
 
   return Array.isArray(items) ? items : [items];
 };
 
-export const fetchNewsFeed = (rssUrl: string) => rssUrl && window.fetch(rssUrl, { method: 'GET' })
-  .then((response) => response.text())
-  .then(parseXML)
-  .catch((error) => error);
+export const fetchNewsFeed = (rssUrl: string) =>
+  rssUrl &&
+  window
+    .fetch(rssUrl, { method: 'GET' })
+    .then((response) => response.text())
+    .then(parseXML)
+    .catch((error) => error);
 export const CONTENT_STREAM_CONTENT_KEY = ['content-stream', 'content'];
 
-const useContentStream = (path?: string): { isLoadingFeed: boolean, feedList: Array<FeedItem>, error: Error } => {
-  const { contenStreamTags: { currentTag, isLoadingTags, contentStreamTagError } } = useContentStreamSettings();
+const useContentStream = (path?: string): { isLoadingFeed: boolean; feedList: Array<FeedItem>; error: Error } => {
+  const {
+    contenStreamTags: { currentTag, isLoadingTags, contentStreamTagError },
+  } = useContentStreamSettings();
   const { rss_url } = AppConfig.contentStream() || {};
 
   const getDefaultTag = useCallback(() => {
@@ -114,13 +123,13 @@ const useContentStream = (path?: string): { isLoadingFeed: boolean, feedList: Ar
 
   const rssUrl = rss_url && `${rss_url}/${getDefaultTag()}/feed`;
 
-  const {
-    data,
-    isLoading,
-    error,
-  } = useQuery<Array<FeedItem>, Error>([...CONTENT_STREAM_CONTENT_KEY, rssUrl], () => fetchNewsFeed(rssUrl), {
-    initialData: [],
-  });
+  const { data, isLoading, error } = useQuery<Array<FeedItem>, Error>(
+    [...CONTENT_STREAM_CONTENT_KEY, rssUrl],
+    () => fetchNewsFeed(rssUrl),
+    {
+      initialData: [],
+    },
+  );
 
   return {
     error,

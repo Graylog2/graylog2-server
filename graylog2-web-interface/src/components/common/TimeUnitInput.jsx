@@ -48,15 +48,7 @@ const unitValues = [
   'MONTHS',
   'YEARS',
 ];
-const defaultUnits = [
-  'NANOSECONDS',
-  'MICROSECONDS',
-  'MILLISECONDS',
-  'SECONDS',
-  'MINUTES',
-  'HOURS',
-  'DAYS',
-];
+const defaultUnits = ['NANOSECONDS', 'MICROSECONDS', 'MILLISECONDS', 'SECONDS', 'MINUTES', 'HOURS', 'DAYS'];
 const unitType = PropTypes.oneOf(unitValues);
 
 const StyledInputGroup = styled(InputGroup)`
@@ -78,11 +70,12 @@ export const extractDurationAndUnit = (duration, timeUnits) => {
   }
 
   const momentDuration = moment.duration(duration);
-  const timeUnit = timeUnits.find((unit) => {
-    const durationInUnit = momentDuration.as(unit);
+  const timeUnit =
+    timeUnits.find((unit) => {
+      const durationInUnit = momentDuration.as(unit);
 
-    return isInteger(durationInUnit) && durationInUnit !== 0;
-  }) || last(timeUnits);
+      return isInteger(durationInUnit) && durationInUnit !== 0;
+    }) || last(timeUnits);
   const durationInUnit = momentDuration.as(timeUnit);
 
   return {
@@ -246,9 +239,7 @@ const TimeUnitInput = createReactClass({
     const { label, wrapperClassName, help, labelClassName, unit, required, hideCheckbox, pullRight } = this.props;
 
     const options = unitOptions.map((o) => (
-      <MenuItem key={o.value}
-                onSelect={() => this._onUnitSelect(o.value)}
-                active={unit === o.value}>
+      <MenuItem key={o.value} onSelect={() => this._onUnitSelect(o.value)} active={unit === o.value}>
         {o.label}
       </MenuItem>
     ));
@@ -264,19 +255,23 @@ const TimeUnitInput = createReactClass({
         {label && <ControlLabel className={labelClassName}>{label}</ControlLabel>}
         <InputWrapper className={wrapperClassName}>
           <StyledInputGroup>
-            {(!required && !hideCheckbox) && checkbox}
-            <FormControl type="number"
-                         name={this.props.name}
-                         disabled={!this._isChecked()}
-                         aria-label={label || 'Time unit input'}
-                         onChange={this._onUpdate}
-                         value={defaultTo(this._getEffectiveValue(), '')} />
-            <DropdownButton componentClass={InputGroup.Button}
-                            id="input-dropdown-addon"
-                            name={this.props.unitName}
-                            pullRight={pullRight}
-                            title={unitOptions.filter((o) => o.value === unit)[0].label}
-                            disabled={!this._isChecked()}>
+            {!required && !hideCheckbox && checkbox}
+            <FormControl
+              type="number"
+              name={this.props.name}
+              disabled={!this._isChecked()}
+              aria-label={label || 'Time unit input'}
+              onChange={this._onUpdate}
+              value={defaultTo(this._getEffectiveValue(), '')}
+            />
+            <DropdownButton
+              componentClass={InputGroup.Button}
+              id="input-dropdown-addon"
+              name={this.props.unitName}
+              pullRight={pullRight}
+              title={unitOptions.filter((o) => o.value === unit)[0].label}
+              disabled={!this._isChecked()}
+            >
               {options}
             </DropdownButton>
           </StyledInputGroup>

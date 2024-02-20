@@ -26,7 +26,7 @@ import ConfigurationRow from './ConfigurationRow';
 import style from './ConfigurationList.css';
 
 const _headerCellFormatter = (header) => {
-  const className = (header === 'Actions' ? style.actionsColumn : '');
+  const className = header === 'Actions' ? style.actionsColumn : '';
 
   return <th className={className}>{header}</th>;
 };
@@ -50,12 +50,14 @@ class ConfigurationList extends React.Component {
     const configurationCollector = collectors.find((collector) => collector.id === configuration.collector_id);
 
     return (
-      <ConfigurationRow key={configuration.id}
-                        configuration={configuration}
-                        collector={configurationCollector}
-                        onCopy={onClone}
-                        validateConfiguration={validateConfiguration}
-                        onDelete={onDelete} />
+      <ConfigurationRow
+        key={configuration.id}
+        configuration={configuration}
+        collector={configurationCollector}
+        onCopy={onClone}
+        validateConfiguration={validateConfiguration}
+        onDelete={onDelete}
+      />
     );
   };
 
@@ -69,47 +71,57 @@ class ConfigurationList extends React.Component {
           <Col md={12}>
             <div className="pull-right">
               <LinkContainer to={Routes.SYSTEM.SIDECARS.NEW_CONFIGURATION}>
-                <Button onClick={this.openModal} bsStyle="success" bsSize="small">Create Configuration</Button>
+                <Button onClick={this.openModal} bsStyle="success" bsSize="small">
+                  Create Configuration
+                </Button>
               </LinkContainer>
             </div>
-            <h2>Configurations <small>{total} total</small></h2>
+            <h2>
+              Configurations <small>{total} total</small>
+            </h2>
           </Col>
           <Col md={12}>
             <p>
-              These are the Configurations to use in your Collectors. Remember to apply new configurations to
-              Collectors in the Administration page.
+              These are the Configurations to use in your Collectors. Remember to apply new configurations to Collectors
+              in the Administration page.
             </p>
           </Col>
         </Row>
 
         <Row className={`row-sm ${style.configurationRow}`}>
           <Col md={12}>
-            <SearchForm query={query}
-                        onSearch={onQueryChange}
-                        onReset={onQueryChange}
-                        placeholder="Find configurations"
-                        wrapperClass={style.inline}
-                        topMargin={0}
-                        useLoadingState />
+            <SearchForm
+              query={query}
+              onSearch={onQueryChange}
+              onReset={onQueryChange}
+              placeholder="Find configurations"
+              wrapperClass={style.inline}
+              topMargin={0}
+              useLoadingState
+            />
 
-            <PaginatedList activePage={pagination.page}
-                           pageSize={pagination.pageSize}
-                           pageSizes={[10, 25]}
-                           totalItems={pagination.total}
-                           onChange={onPageChange}
-                           useQueryParameter={false}>
+            <PaginatedList
+              activePage={pagination.page}
+              pageSize={pagination.pageSize}
+              pageSizes={[10, 25]}
+              totalItems={pagination.total}
+              onChange={onPageChange}
+              useQueryParameter={false}
+            >
               <div className={style.configurationTable}>
-                <DataTable id="collector-configurations-list"
-                           className="table-hover"
-                           headers={headers}
-                           headerCellFormatter={_headerCellFormatter}
-                           rows={configurations}
-                           rowClassName="row-sm"
-                           dataRowFormatter={this._collectorConfigurationFormatter}
-                           noDataText="There are no configurations to display, try creating one or changing your query."
-                           filterLabel=""
-                           filterKeys={[]}
-                           useResponsiveTable={false} />
+                <DataTable
+                  id="collector-configurations-list"
+                  className="table-hover"
+                  headers={headers}
+                  headerCellFormatter={_headerCellFormatter}
+                  rows={configurations}
+                  rowClassName="row-sm"
+                  dataRowFormatter={this._collectorConfigurationFormatter}
+                  noDataText="There are no configurations to display, try creating one or changing your query."
+                  filterLabel=""
+                  filterKeys={[]}
+                  useResponsiveTable={false}
+                />
               </div>
             </PaginatedList>
           </Col>

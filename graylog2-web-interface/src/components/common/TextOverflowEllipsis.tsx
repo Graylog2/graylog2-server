@@ -24,9 +24,9 @@ const Wrapper = styled.div`
 `;
 
 type Props = {
-  className?: string,
-  children: string,
-  titleOverride?: string,
+  className?: string;
+  children: string;
+  titleOverride?: string;
 };
 
 /**

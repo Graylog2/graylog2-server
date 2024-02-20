@@ -1,23 +1,23 @@
 :local(.clickableRow) {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 :local(.functionTableCell) {
-    width: 300px;
+  width: 300px;
 }
 
 :local(.marginQuickReferenceText) {
-    margin-top: 5px;
+  margin-top: 5px;
 }
 
 :local(.marginTab) {
-    margin-top: 10px;
+  margin-top: 10px;
 }
 
 :local(.exampleFunction) {
-    white-space: pre-wrap;
+  white-space: pre-wrap;
 }
 
 :local(.adjustedTableCellWidth) {
-    width: 1%;
+  width: 1%;
 }

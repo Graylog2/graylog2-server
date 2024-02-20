@@ -31,7 +31,7 @@ class ContentPackEditParameter extends React.Component {
   };
 
   static defaultProps = {
-    onUpdateParameter: () => { },
+    onUpdateParameter: () => {},
     parameters: [],
     parameterToEdit: undefined,
   };
@@ -65,8 +65,10 @@ class ContentPackEditParameter extends React.Component {
       return;
     }
 
-    const realDefaultValue = ContentPackUtils.convertValue(this.state.newParameter.type,
-      this.state.newParameter.default_value);
+    const realDefaultValue = ContentPackUtils.convertValue(
+      this.state.newParameter.type,
+      this.state.newParameter.default_value,
+    );
     const updatedParameter = ObjectUtils.clone(this.state.newParameter);
 
     updatedParameter.default_value = realDefaultValue;
@@ -126,8 +128,10 @@ class ContentPackEditParameter extends React.Component {
       return false;
     }
 
-    if ((this.props.parameterToEdit || {}).name !== value
-      && this.props.parameters.findIndex((parameter) => parameter.name === value) >= 0) {
+    if (
+      (this.props.parameterToEdit || {}).name !== value &&
+      this.props.parameters.findIndex((parameter) => parameter.name === value) >= 0
+    ) {
       this.setState({ nameError: 'The parameter name must be unique.' });
 
       return false;
@@ -193,64 +197,84 @@ class ContentPackEditParameter extends React.Component {
         <br />
         <form className="parameter-form" id="parameter-form" onSubmit={this.addNewParameter}>
           <fieldset>
-            <Input ref={(node) => { this.titleInput = node; }}
-                   name="title"
-                   id="title"
-                   type="text"
-                   maxLength={250}
-                   value={this.state.newParameter.title}
-                   onChange={this._bindValue}
-                   bsStyle={this.state.titleError ? 'error' : null}
-                   label="Title"
-                   help={this.state.titleError ? this.state.titleError
-                     : 'Give a descriptive title for this content pack.'}
-                   required />
-            <Input name="name"
-                   id="name"
-                   type="text"
-                   maxLength={250}
-                   bsStyle={this.state.nameError ? 'error' : null}
-                   value={this.state.newParameter.name}
-                   onChange={this._bindValue}
-                   label="Name"
-                   help={this.state.nameError ? this.state.nameError
-                     : 'This is used as the parameter reference and must not contain a space.'}
-                   required />
-            <Input name="description"
-                   id="description"
-                   type="text"
-                   bsStyle={this.state.descrError ? 'error' : null}
-                   maxLength={250}
-                   value={this.state.newParameter.description}
-                   onChange={this._bindValue}
-                   label="Description"
-                   help={this.state.descrError ? this.state.descrError
-                     : 'Give a description explaining what will be done with this parameter.'}
-                   required />
-            <Input name="type"
-                   id="type"
-                   type="select"
-                   disabled={disableType}
-                   value={this.state.newParameter.type}
-                   onChange={this._bindValue}
-                   label="Value Type"
-                   help="Give the type of the parameter."
-                   required>
+            <Input
+              ref={(node) => {
+                this.titleInput = node;
+              }}
+              name="title"
+              id="title"
+              type="text"
+              maxLength={250}
+              value={this.state.newParameter.title}
+              onChange={this._bindValue}
+              bsStyle={this.state.titleError ? 'error' : null}
+              label="Title"
+              help={this.state.titleError ? this.state.titleError : 'Give a descriptive title for this content pack.'}
+              required
+            />
+            <Input
+              name="name"
+              id="name"
+              type="text"
+              maxLength={250}
+              bsStyle={this.state.nameError ? 'error' : null}
+              value={this.state.newParameter.name}
+              onChange={this._bindValue}
+              label="Name"
+              help={
+                this.state.nameError
+                  ? this.state.nameError
+                  : 'This is used as the parameter reference and must not contain a space.'
+              }
+              required
+            />
+            <Input
+              name="description"
+              id="description"
+              type="text"
+              bsStyle={this.state.descrError ? 'error' : null}
+              maxLength={250}
+              value={this.state.newParameter.description}
+              onChange={this._bindValue}
+              label="Description"
+              help={
+                this.state.descrError
+                  ? this.state.descrError
+                  : 'Give a description explaining what will be done with this parameter.'
+              }
+              required
+            />
+            <Input
+              name="type"
+              id="type"
+              type="select"
+              disabled={disableType}
+              value={this.state.newParameter.type}
+              onChange={this._bindValue}
+              label="Value Type"
+              help="Give the type of the parameter."
+              required
+            >
               <option value="string">String</option>
               <option value="integer">Integer</option>
               <option value="double">Double</option>
               <option value="boolean">Boolean</option>
             </Input>
-            <Input name="default_value"
-                   id="default_value"
-                   type="text"
-                   maxLength={250}
-                   bsStyle={this.state.defaultValueError ? 'error' : null}
-                   value={this.state.newParameter.default_value}
-                   onChange={this._bindValue}
-                   label="Default value"
-                   help={this.state.defaultValueError ? this.state.defaultValueError
-                     : 'Give a default value if the parameter is not optional.'} />
+            <Input
+              name="default_value"
+              id="default_value"
+              type="text"
+              maxLength={250}
+              bsStyle={this.state.defaultValueError ? 'error' : null}
+              value={this.state.newParameter.default_value}
+              onChange={this._bindValue}
+              label="Default value"
+              help={
+                this.state.defaultValueError
+                  ? this.state.defaultValueError
+                  : 'Give a default value if the parameter is not optional.'
+              }
+            />
           </fieldset>
         </form>
       </div>

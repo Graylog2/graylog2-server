@@ -44,7 +44,10 @@ class LookupTableConverterConfiguration extends React.Component {
     });
   }
 
-  _getConverterObject = (configuration) => ({ type: this.props.type, config: configuration || this.props.configuration });
+  _getConverterObject = (configuration) => ({
+    type: this.props.type,
+    config: configuration || this.props.configuration,
+  });
 
   _toggleConverter = (event) => {
     let converter;
@@ -82,29 +85,37 @@ class LookupTableConverterConfiguration extends React.Component {
 
     return (
       <div className="xtrc-converter">
-        <Input type="checkbox"
-               ref={(converterEnabled) => { this.converterEnabled = converterEnabled; }}
-               id={`enable-${this.props.type}-converter`}
-               label="Convert value by using lookup table"
-               wrapperClassName="col-md-offset-2 col-md-10"
-               defaultChecked
-               onChange={this._toggleConverter} />
+        <Input
+          type="checkbox"
+          ref={(converterEnabled) => {
+            this.converterEnabled = converterEnabled;
+          }}
+          id={`enable-${this.props.type}-converter`}
+          label="Convert value by using lookup table"
+          wrapperClassName="col-md-offset-2 col-md-10"
+          defaultChecked
+          onChange={this._toggleConverter}
+        />
 
         <Row className="row-sm">
           <Col md={9} mdOffset={2}>
             <div className="xtrc-converter-subfields">
-              <Input id="lookup_table_name"
-                     label="Lookup Table"
-                     labelClassName="col-md-3"
-                     wrapperClassName="col-md-9"
-                     required={this.converterEnabled && this.converterEnabled.getChecked()}
-                     help={helpMessage}>
-                <Select placeholder="Select a lookup table"
-                        clearable={false}
-                        options={lookupTables}
-                        matchProp="label"
-                        onChange={this._onSelect('lookup_table_name')}
-                        value={this.props.configuration.lookup_table_name} />
+              <Input
+                id="lookup_table_name"
+                label="Lookup Table"
+                labelClassName="col-md-3"
+                wrapperClassName="col-md-9"
+                required={this.converterEnabled && this.converterEnabled.getChecked()}
+                help={helpMessage}
+              >
+                <Select
+                  placeholder="Select a lookup table"
+                  clearable={false}
+                  options={lookupTables}
+                  matchProp="label"
+                  onChange={this._onSelect('lookup_table_name')}
+                  value={this.props.configuration.lookup_table_name}
+                />
               </Input>
             </div>
           </Col>

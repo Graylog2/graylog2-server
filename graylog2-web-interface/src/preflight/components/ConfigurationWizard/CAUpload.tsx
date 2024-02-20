@@ -28,9 +28,9 @@ import { QUERY_KEY as DATA_NODES_CA_QUERY_KEY } from 'preflight/hooks/useDataNod
 import UnsecureConnectionAlert from 'preflight/components/ConfigurationWizard/UnsecureConnectionAlert';
 
 type FormValues = {
-  files?: Array<File>,
-  password?: string,
-}
+  files?: Array<File>;
+  password?: string;
+};
 
 const CADropzone = styled(Dropzone)`
   height: 120px;
@@ -57,7 +57,7 @@ const File = styled.div`
   align-items: center;
 `;
 
-const DeleteIcon: React.ComponentType<{ name: 'xmark', onClick: () => void }> = styled(Icon)`
+const DeleteIcon: React.ComponentType<{ name: 'xmark'; onClick: () => void }> = styled(Icon)`
   cursor: pointer;
 `;
 
@@ -107,7 +107,10 @@ const CAUpload = () => {
     },
   });
 
-  const onSubmit = useCallback((formValues: FormValues) => onProcessUpload(formValues).catch(() => {}), [onProcessUpload]);
+  const onSubmit = useCallback(
+    (formValues: FormValues) => onProcessUpload(formValues).catch(() => {}),
+    [onProcessUpload],
+  );
 
   return (
     <Formik<FormValues> initialValues={{}} onSubmit={onSubmit} validate={validate}>
@@ -115,17 +118,21 @@ const CAUpload = () => {
         <Form>
           <Explanation>
             Here you can upload your existing CA. You need to upload a single file containing both private key
-            (encrypted or unencrypted), the CA certificate as well as any intermediate certificates. The file can be in PEM
-            or in PKCS#12 format. If your private key is encrypted, you also need to supply its password.
+            (encrypted or unencrypted), the CA certificate as well as any intermediate certificates. The file can be in
+            PEM or in PKCS#12 format. If your private key is encrypted, you also need to supply its password.
           </Explanation>
           <Field name="files">
             {({ field: { name, onChange, value }, meta: { error } }) => (
               <>
-                <Input.Label required htmlFor="ca-dropzone">Certificate Authority</Input.Label>
-                <CADropzone onDrop={(files) => onChange({ target: { name, value: files } })}
-                            onReject={onRejectUpload}
-                            data-testid="upload-dropzone"
-                            loading={isLoading}>
+                <Input.Label required htmlFor="ca-dropzone">
+                  Certificate Authority
+                </Input.Label>
+                <CADropzone
+                  onDrop={(files) => onChange({ target: { name, value: files } })}
+                  onReject={onRejectUpload}
+                  data-testid="upload-dropzone"
+                  loading={isLoading}
+                >
                   <DropzoneInner>
                     <Dropzone.Accept>
                       <Icon name="file" type="solid" size="2x" />
@@ -136,31 +143,31 @@ const CAUpload = () => {
                     <Dropzone.Idle>
                       <Icon name="file" type="regular" size="2x" />
                     </Dropzone.Idle>
-                    <div>
-                      Drag CA here or click to select file
-                    </div>
+                    <div>Drag CA here or click to select file</div>
                   </DropzoneInner>
                 </CADropzone>
                 <Files>
-                  {value?.filter((file) => !!file).map(({ name: fileName }, index) => (
-                    <File key={fileName}>
-                      <Icon name="file" /> {fileName} <DeleteIcon name="xmark"
-                                                                  onClick={() => {
-                                                                    const newValue = value.filter((_ignored, idx) => idx !== index);
-                                                                    onChange({ target: { name, value: newValue } });
-                                                                  }} />
-                    </File>
-                  ))}
+                  {value
+                    ?.filter((file) => !!file)
+                    .map(({ name: fileName }, index) => (
+                      <File key={fileName}>
+                        <Icon name="file" /> {fileName}{' '}
+                        <DeleteIcon
+                          name="xmark"
+                          onClick={() => {
+                            const newValue = value.filter((_ignored, idx) => idx !== index);
+                            onChange({ target: { name, value: newValue } });
+                          }}
+                        />
+                      </File>
+                    ))}
                 </Files>
                 {error && <Input.Error>{error}</Input.Error>}
               </>
             )}
           </Field>
 
-          <FormikInput placeholder="Password"
-                       name="password"
-                       type="password"
-                       label="Password" />
+          <FormikInput placeholder="Password" name="password" type="password" label="Password" />
           <UnsecureConnectionAlert renderIfSecure={<Space h="md" />} />
           <Button disabled={!isValid} type="submit">
             {isSubmitting ? 'Uploading CA...' : 'Upload CA'}

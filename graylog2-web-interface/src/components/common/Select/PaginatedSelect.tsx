@@ -24,9 +24,7 @@ type Props = React.ComponentProps<typeof Select>;
 const PaginatedSelect = (props: Props) => {
   const selectRef = useRef();
 
-  return (
-    <Select ref={selectRef} async {...props} />
-  );
+  return <Select ref={selectRef} async {...props} />;
 };
 
 PaginatedSelect.propTypes = Select.propTypes;

@@ -24,9 +24,9 @@ import SearchFilterBanner from 'views/components/searchbar/SearchFilterBanner';
 import type { SearchFilter } from 'components/event-definitions/event-definitions-types';
 
 type Props = {
-  filters: SearchFilter[],
-  onChange: (filters: SearchFilter[]) => void,
-  hideFiltersPreview?: (val: boolean) => void,
+  filters: SearchFilter[];
+  onChange: (filters: SearchFilter[]) => void;
+  hideFiltersPreview?: (val: boolean) => void;
 };
 
 function SearchFiltersFormControls({ filters, onChange, hideFiltersPreview }: Props) {
@@ -37,15 +37,15 @@ function SearchFiltersFormControls({ filters, onChange, hideFiltersPreview }: Pr
   React.useEffect(() => hideFiltersPreview(!pluggableControls.length), []);
 
   const initialFilters = React.useMemo(() => {
-    const searchFilters = OrderedMap(filters.map((filter) => ([
-      filter.id || uuidv4(),
-      { frontendId: filter.id || uuidv4(), ...filter },
-    ])));
+    const searchFilters = OrderedMap(
+      filters.map((filter) => [filter.id || uuidv4(), { frontendId: filter.id || uuidv4(), ...filter }]),
+    );
 
     return { searchFilters };
   }, [filters]);
 
-  if (!pluggableControls.length) return <SearchFilterBanner onHide={() => hideFiltersPreview(true)} pluggableControls={pluggableControls} />;
+  if (!pluggableControls.length)
+    return <SearchFilterBanner onHide={() => hideFiltersPreview(true)} pluggableControls={pluggableControls} />;
 
   const SearchFiltersComponent = pluggableControls[0].component;
 

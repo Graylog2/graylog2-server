@@ -36,15 +36,27 @@ class IndexSummary extends React.Component {
     const labels = [];
 
     if (index.is_deflector) {
-      labels.push(<Label key={`${this.props.name}-deflector-label`} bsStyle="primary">active write index</Label>);
+      labels.push(
+        <Label key={`${this.props.name}-deflector-label`} bsStyle="primary">
+          active write index
+        </Label>,
+      );
     }
 
     if (index.is_closed) {
-      labels.push(<Label key={`${this.props.name}-closed-label`} bsStyle="warning">closed</Label>);
+      labels.push(
+        <Label key={`${this.props.name}-closed-label`} bsStyle="warning">
+          closed
+        </Label>,
+      );
     }
 
     if (index.is_reopened) {
-      labels.push(<Label key={`${this.props.name}-reopened-label`} bsStyle="success">reopened</Label>);
+      labels.push(
+        <Label key={`${this.props.name}-reopened-label`} bsStyle="success">
+          reopened
+        </Label>,
+      );
     }
 
     return <span className="index-label">{labels}</span>;
@@ -52,7 +64,11 @@ class IndexSummary extends React.Component {
 
   _formatIndexRange = () => {
     if (this.props.isDeflector) {
-      return <span>Contains messages up to <RelativeTime dateTime={new Date()} /></span>;
+      return (
+        <span>
+          Contains messages up to <RelativeTime dateTime={new Date()} />
+        </span>
+      );
     }
 
     const sizes = this.props.index.size;
@@ -71,7 +87,11 @@ class IndexSummary extends React.Component {
     }
 
     if (this.props.indexRange.begin === 0) {
-      return <span>Contains messages up to <RelativeTime dateTime={this.props.indexRange.end} /></span>;
+      return (
+        <span>
+          Contains messages up to <RelativeTime dateTime={this.props.indexRange.end} />
+        </span>
+      );
     }
 
     return (
@@ -84,10 +104,18 @@ class IndexSummary extends React.Component {
 
   _formatShowDetailsLink = () => {
     if (this.state.showDetails) {
-      return <span className="index-more-actions"><Icon name="caret-down" /> Hide Details / Actions</span>;
+      return (
+        <span className="index-more-actions">
+          <Icon name="caret-down" /> Hide Details / Actions
+        </span>
+      );
     }
 
-    return <span className="index-more-actions"><Icon name="caret-right" /> Show Details / Actions</span>;
+    return (
+      <span className="index-more-actions">
+        <Icon name="caret-right" /> Show Details / Actions
+      </span>
+    );
   };
 
   _toggleShowDetails = (event) => {
@@ -102,20 +130,15 @@ class IndexSummary extends React.Component {
       <span>
         <h2>
           {this.props.name}{' '}
-
           <small>
-            {this._formatLabels(index)}{' '}
-            {this._formatIndexRange(index)}{' '}
-
-            <IndexSizeSummary index={index} />
-
-            <a onClick={this._toggleShowDetails} href="#">{this._formatShowDetailsLink()}</a>
+            {this._formatLabels(index)} {this._formatIndexRange(index)} <IndexSizeSummary index={index} />
+            <a onClick={this._toggleShowDetails} href="#">
+              {this._formatShowDetailsLink()}
+            </a>
           </small>
         </h2>
 
-        <div className="index-info-holder">
-          {this.state.showDetails && this.props.children}
-        </div>
+        <div className="index-info-holder">{this.state.showDetails && this.props.children}</div>
       </span>
     );
   }

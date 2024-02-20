@@ -38,25 +38,25 @@ const AsyncCustomMenuList = ({
   children,
   selectProps: { loadOptions, total },
 }: {
-  children: Array<React.ReactNode>,
-  selectProps: { loadOptions: () => void, total: number }
+  children: Array<React.ReactNode>;
+  selectProps: { loadOptions: () => void; total: number };
 }) => {
   const items = children?.length ? children : [getNoOptionMessage()];
 
   return (
-    <InfiniteLoader isItemLoaded={(index: number) => index < children.length}
-                    itemCount={total}
-                    threshold={30}
-                    minimumBatchSize={50}
-                    loadMoreItems={loadOptions}>
+    <InfiniteLoader
+      isItemLoaded={(index: number) => index < children.length}
+      itemCount={total}
+      threshold={30}
+      minimumBatchSize={50}
+      loadMoreItems={loadOptions}
+    >
       {({ onItemsRendered, ref }) => (
-        <WindowList listRef={ref}
-                    onItemsRendered={onItemsRendered}>
+        <WindowList listRef={ref} onItemsRendered={onItemsRendered}>
           {items}
         </WindowList>
       )}
     </InfiniteLoader>
-
   );
 };
 

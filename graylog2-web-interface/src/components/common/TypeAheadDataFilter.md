@@ -27,14 +27,16 @@ const TypeAheadDataFilterExample = createReactClass({
 
     return (
       <div>
-        <TypeAheadDataFilter id="awesome-filter"
-                             label="Filter list"
-                             data={list}
-                             displayKey="title"
-                             filterBy="tag"
-                             filterSuggestions={suggestions}
-                             searchInKeys={['title', 'description']}
-                             onDataFiltered={this.onDataFiltered} />
+        <TypeAheadDataFilter
+          id="awesome-filter"
+          label="Filter list"
+          data={list}
+          displayKey="title"
+          filterBy="tag"
+          filterSuggestions={suggestions}
+          searchInKeys={['title', 'description']}
+          onDataFiltered={this.onDataFiltered}
+        />
         <div>
           <dl>
             {filteredList.map((item) => [
@@ -48,5 +50,5 @@ const TypeAheadDataFilterExample = createReactClass({
   },
 });
 
-<TypeAheadDataFilterExample />
+<TypeAheadDataFilterExample />;
 ```

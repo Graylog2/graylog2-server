@@ -29,10 +29,7 @@ class Pluralize extends React.Component {
     /** Plural form of the word. */
     plural: PropTypes.string.isRequired,
     /** Value to use to decide which form will be rendered. */
-    value: PropTypes.oneOfType([
-      PropTypes.number,
-      PropTypes.string,
-    ]).isRequired,
+    value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   };
 
   render() {

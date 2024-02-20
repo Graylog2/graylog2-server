@@ -28,10 +28,10 @@ import { Button } from 'components/bootstrap';
 import { Select, Spinner, ErrorAlert } from 'components/common';
 
 type Props = {
-  assignedRolesIds: Immutable.Set<string>,
-  identifier: (role: Role) => string,
-  onSubmit: (role: Immutable.Set<Role>) => Promise<void>,
-  submitOnSelect?: boolean,
+  assignedRolesIds: Immutable.Set<string>;
+  identifier: (role: Role) => string;
+  onSubmit: (role: Immutable.Set<Role>) => Promise<void>;
+  submitOnSelect?: boolean;
 };
 
 const SubmitButton = styled(Button)`
@@ -51,14 +51,13 @@ const StyledSelect = styled(Select)`
   flex: 1;
 `;
 
-const _renderRoleOption = ({ label }: { label: string }) => (
-  <RoleSelectOption>{label}</RoleSelectOption>
-);
+const _renderRoleOption = ({ label }: { label: string }) => <RoleSelectOption>{label}</RoleSelectOption>;
 
-const _options = (roles, assignedRolesIds, identifier) => roles
-  .filter((role) => !assignedRolesIds.includes(identifier(role)))
-  .toArray()
-  .map((r) => ({ label: r.name, value: r.name, role: r }));
+const _options = (roles, assignedRolesIds, identifier) =>
+  roles
+    .filter((role) => !assignedRolesIds.includes(identifier(role)))
+    .toArray()
+    .map((r) => ({ label: r.name, value: r.name, role: r }));
 
 const _assignRole = (selectedRoleNames, roles, onSubmit, setselectedRoleNames, setIsSubmitting, setError) => {
   if (!selectedRoleNames) {
@@ -67,7 +66,9 @@ const _assignRole = (selectedRoleNames, roles, onSubmit, setselectedRoleNames, s
 
   const selectedRoleNameList = selectedRoleNames.split(',');
 
-  const selectedRoles = Immutable.Set(compact(selectedRoleNameList.map((selection) => roles.find((r) => r.name === selection))));
+  const selectedRoles = Immutable.Set(
+    compact(selectedRoleNameList.map((selection) => roles.find((r) => r.name === selection))),
+  );
 
   if (selectedRoles.size <= 0) {
     setError(`Role assignment failed, because the roles ${selectedRoleNames ?? '(undefined)'} does not exist`);
@@ -102,7 +103,14 @@ const RolesSelector = ({ assignedRolesIds, onSubmit, identifier, submitOnSelect 
     const newselectedRoleNameList = items;
 
     if (submitOnSelect) {
-      _assignRole(newselectedRoleNameList, paginatedRoles.list, onSubmit, setselectedRoleNames, setIsSubmitting, setError);
+      _assignRole(
+        newselectedRoleNameList,
+        paginatedRoles.list,
+        onSubmit,
+        setselectedRoleNames,
+        setIsSubmitting,
+        setError,
+      );
     }
 
     setselectedRoleNames(items);
@@ -112,29 +120,33 @@ const RolesSelector = ({ assignedRolesIds, onSubmit, identifier, submitOnSelect 
     return <Spinner />;
   }
 
-  const _onSubmit = () => _assignRole(selectedRoleNames, paginatedRoles.list, onSubmit, setselectedRoleNames, setIsSubmitting, setError);
+  const _onSubmit = () =>
+    _assignRole(selectedRoleNames, paginatedRoles.list, onSubmit, setselectedRoleNames, setIsSubmitting, setError);
   const options = _options(paginatedRoles.list, assignedRolesIds, identifier);
 
   return (
     <div>
       <FormElements>
-        <StyledSelect inputProps={{ 'aria-label': 'Search for roles' }}
-                      onChange={onChange}
-                      optionRenderer={_renderRoleOption}
-                      options={options}
-                      placeholder="Search for roles"
-                      multi
-                      value={selectedRoleNames} />
+        <StyledSelect
+          inputProps={{ 'aria-label': 'Search for roles' }}
+          onChange={onChange}
+          optionRenderer={_renderRoleOption}
+          options={options}
+          placeholder="Search for roles"
+          multi
+          value={selectedRoleNames}
+        />
         {!submitOnSelect && (
-        <SubmitButton bsStyle="success"
-                      onClick={_onSubmit}
-                      disabled={isSubmitting || !selectedRoleNames}
-                      title="Assign Role"
-                      type="button">
-          Assign Role
-        </SubmitButton>
+          <SubmitButton
+            bsStyle="success"
+            onClick={_onSubmit}
+            disabled={isSubmitting || !selectedRoleNames}
+            title="Assign Role"
+            type="button"
+          >
+            Assign Role
+          </SubmitButton>
         )}
-
       </FormElements>
       <ErrorAlert runtimeError onClose={setError}>
         {error}

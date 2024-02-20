@@ -27,8 +27,10 @@ const useMinimumRefreshInterval = () => {
     () => fetch('GET', qualifyUrl('/system/configuration/minimum_auto_refresh_interval')),
     {
       onError: (errorThrown) => {
-        UserNotification.error(`Loading system configuration "minimum_auto_refresh_interval" failed with status: ${errorThrown}`,
-          'Could not configuration option');
+        UserNotification.error(
+          `Loading system configuration "minimum_auto_refresh_interval" failed with status: ${errorThrown}`,
+          'Could not configuration option',
+        );
       },
       keepPreviousData: true,
     },

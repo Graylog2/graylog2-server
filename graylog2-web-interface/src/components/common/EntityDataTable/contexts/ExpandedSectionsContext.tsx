@@ -18,10 +18,12 @@ import * as React from 'react';
 
 import { singleton } from 'logic/singleton';
 
-type ContextValue = {
-  expandedSections: { [entityId: string]: Array<string> },
-  toggleSection: (entityId: string, sectionName: string) => void
-} | undefined
+type ContextValue =
+  | {
+      expandedSections: { [entityId: string]: Array<string> };
+      toggleSection: (entityId: string, sectionName: string) => void;
+    }
+  | undefined;
 
 const ExpandedSectionsContext = React.createContext<ContextValue>(undefined);
 

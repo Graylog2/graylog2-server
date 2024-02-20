@@ -20,16 +20,16 @@ import createReactClass from 'create-react-class';
 import Reflux from 'reflux';
 
 import { Spinner } from 'components/common';
-import { LookupTableDataAdaptersActions, LookupTableDataAdaptersStore } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
+import {
+  LookupTableDataAdaptersActions,
+  LookupTableDataAdaptersStore,
+} from 'stores/lookup-tables/LookupTableDataAdaptersStore';
 
 const DataAdaptersContainer = createReactClass({
   displayName: 'DataAdaptersContainer',
 
   propTypes: {
-    children: PropTypes.oneOfType([
-      PropTypes.arrayOf(PropTypes.node),
-      PropTypes.node,
-    ]),
+    children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]),
   },
 
   mixins: [Reflux.connect(LookupTableDataAdaptersStore)],
@@ -50,9 +50,9 @@ const DataAdaptersContainer = createReactClass({
       return <Spinner />;
     }
 
-    const childrenWithProps = React.Children.map(this.props.children,
-      (child) => React.cloneElement(child,
-        { dataAdapters: this.state.dataAdapters, pagination: this.state.pagination }));
+    const childrenWithProps = React.Children.map(this.props.children, (child) =>
+      React.cloneElement(child, { dataAdapters: this.state.dataAdapters, pagination: this.state.pagination }),
+    );
 
     return <div>{childrenWithProps}</div>;
   },

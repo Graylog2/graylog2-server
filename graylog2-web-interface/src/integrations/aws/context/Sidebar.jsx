@@ -26,11 +26,7 @@ export const SidebarProvider = ({ children }) => {
     setSidebar(<></>);
   };
 
-  return (
-    <SidebarContext.Provider value={{ sidebar, clearSidebar, setSidebar }}>
-      {children}
-    </SidebarContext.Provider>
-  );
+  return <SidebarContext.Provider value={{ sidebar, clearSidebar, setSidebar }}>{children}</SidebarContext.Provider>;
 };
 
 SidebarProvider.propTypes = {

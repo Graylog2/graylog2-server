@@ -43,7 +43,8 @@ describe('DashboardsPage', () => {
     render(
       <QueryParamProvider adapter={ReactRouter6Adapter}>
         <DashboardsPage />
-      </QueryParamProvider>);
+      </QueryParamProvider>,
+    );
 
     await screen.findByRole('heading', { name: /dashboards/i });
     await screen.findByText('No dashboards have been created yet.');

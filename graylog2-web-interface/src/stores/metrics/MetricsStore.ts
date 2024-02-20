@@ -25,18 +25,17 @@ import { NodesStore } from 'stores/nodes/NodesStore';
 import { SessionActions, SessionStore } from 'stores/sessions/SessionStore';
 
 type MetricsActionsType = {
-  add: (nodeId: string, metricName: string) => Promise<unknown>,
-  addGlobal: (name: string) => Promise<unknown>,
-  clear: () => Promise<unknown>,
-  filter: () => Promise<unknown>,
-  list: () => Promise<unknown>,
-  names: () => Promise<unknown>,
-  remove: (nodeId: string, metricName: string) => Promise<unknown>,
-  removeGlobal: (name: string) => Promise<unknown>,
-}
-export const MetricsActions = singletonActions(
-  'core.Metrics',
-  () => Reflux.createActions<MetricsActionsType>({
+  add: (nodeId: string, metricName: string) => Promise<unknown>;
+  addGlobal: (name: string) => Promise<unknown>;
+  clear: () => Promise<unknown>;
+  filter: () => Promise<unknown>;
+  list: () => Promise<unknown>;
+  names: () => Promise<unknown>;
+  remove: (nodeId: string, metricName: string) => Promise<unknown>;
+  removeGlobal: (name: string) => Promise<unknown>;
+};
+export const MetricsActions = singletonActions('core.Metrics', () =>
+  Reflux.createActions<MetricsActionsType>({
     add: { asyncResult: true },
     addGlobal: { asyncResult: true },
     clear: { asyncResult: true },
@@ -50,84 +49,84 @@ export const MetricsActions = singletonActions(
 
 export type CounterMetric = {
   metric: {
-    count: number,
-  },
-  type: 'counter',
+    count: number;
+  };
+  type: 'counter';
 };
 
 export type GaugeMetric = {
   metric: {
-    value: number,
-  },
-  type: 'gauge',
+    value: number;
+  };
+  type: 'gauge';
 };
 
 type Rate = {
   rate: {
-    total: number,
-    mean: number,
-    one_minute: number,
-    five_minute: number,
-    fifteen_minute: number,
-  },
-  rate_unit: string,
+    total: number;
+    mean: number;
+    one_minute: number;
+    five_minute: number;
+    fifteen_minute: number;
+  };
+  rate_unit: string;
 };
 
 export type MeterMetric = {
-  metric: Rate,
-  type: 'meter',
+  metric: Rate;
+  type: 'meter';
 };
 
 type Timing = {
-  '95th_percentile': number,
-  '98th_percentile': number,
-  '99th_percentile': number,
-  'std_dev': number,
-  mean: number,
-  min: number,
-  max: number,
+  '95th_percentile': number;
+  '98th_percentile': number;
+  '99th_percentile': number;
+  'std_dev': number;
+  mean: number;
+  min: number;
+  max: number;
 };
 
 export type TimerMetric = {
   metric: Rate & {
-    time: Timing,
-  },
-  type: 'timer',
+    time: Timing;
+  };
+  type: 'timer';
 };
 
 export type HistogramMetric = {
   metric: {
-    time: Timing,
-    count: number,
-  }
-  type: 'histogram',
-}
+    time: Timing;
+    count: number;
+  };
+  type: 'histogram';
+};
 
 type BaseMetric<T> = {
-  full_name: string,
-  name: string,
+  full_name: string;
+  name: string;
 } & T;
 
-export type Metric = BaseMetric<CounterMetric>
+export type Metric =
+  | BaseMetric<CounterMetric>
   | BaseMetric<GaugeMetric>
   | BaseMetric<MeterMetric>
   | BaseMetric<TimerMetric>
   | BaseMetric<HistogramMetric>;
 
 export type NodeMetric = {
-  [metricName: string]: Metric,
+  [metricName: string]: Metric;
 };
 
 export type ClusterMetric = {
-  [nodeId: string]: NodeMetric,
+  [nodeId: string]: NodeMetric;
 };
 
 type MetricsStoreState = {
-  metrics: ClusterMetric,
-}
-export const MetricsStore = singletonStore(
-  'core.Metrics',
-  () => Reflux.createStore<MetricsStoreState>({
+  metrics: ClusterMetric;
+};
+export const MetricsStore = singletonStore('core.Metrics', () =>
+  Reflux.createStore<MetricsStoreState>({
     listenables: [MetricsActions, SessionActions],
     namespace: 'org',
     registrations: {},
@@ -148,7 +147,12 @@ export const MetricsStore = singletonStore(
       let result = Promise.resolve(null);
 
       promises.forEach((promise) => {
-        result = result.then(() => promise).then((value) => accumulator.push(value), (error) => accumulator.push(error));
+        result = result
+          .then(() => promise)
+          .then(
+            (value) => accumulator.push(value),
+            (error) => accumulator.push(error),
+          );
       });
 
       return result.then(() => accumulator);
@@ -179,20 +183,19 @@ export const MetricsStore = singletonStore(
     _buildMetricsFromResponse(response) {
       const metrics = {};
 
-      Object.keys(response)
-        .forEach((nodeId) => {
-          const nodeMetrics = {};
+      Object.keys(response).forEach((nodeId) => {
+        const nodeMetrics = {};
 
-          if (!response[nodeId]) {
-            return;
-          }
+        if (!response[nodeId]) {
+          return;
+        }
 
-          response[nodeId].metrics.forEach((metric) => {
-            nodeMetrics[metric.full_name] = metric;
-          });
-
-          metrics[nodeId] = nodeMetrics;
+        response[nodeId].metrics.forEach((metric) => {
+          nodeMetrics[metric.full_name] = metric;
         });
+
+        metrics[nodeId] = nodeMetrics;
+      });
 
       return metrics;
     },
@@ -205,8 +208,9 @@ export const MetricsStore = singletonStore(
       const url = URLUtils.qualifyUrl(ApiRoutes.ClusterMetricsApiController.multipleAllNodes().url);
 
       if (!this.promises.list) {
-        const promise = fetchPeriodically('POST', url, { metrics: Object.keys(metricsToFetch) })
-          .finally(() => delete this.promises.list);
+        const promise = fetchPeriodically('POST', url, { metrics: Object.keys(metricsToFetch) }).finally(
+          () => delete this.promises.list,
+        );
 
         promise.then((response) => {
           this.metrics = this._buildMetricsFromResponse(response);
@@ -231,15 +235,19 @@ export const MetricsStore = singletonStore(
         return;
       }
 
-      const promise = this._allResults(Object.keys(this.nodes).map((nodeId) => {
-        const url = URLUtils.qualifyUrl(ApiRoutes.ClusterMetricsApiController.byNamespace(nodeId, this.namespace).url);
+      const promise = this._allResults(
+        Object.keys(this.nodes).map((nodeId) => {
+          const url = URLUtils.qualifyUrl(
+            ApiRoutes.ClusterMetricsApiController.byNamespace(nodeId, this.namespace).url,
+          );
 
-        return fetch('GET', url).then(
-          (response) => ({ nodeId: nodeId, names: response.metrics }),
-          // When fetching metrics fails, keep previous available metrics around, letting user see them
-          (error) => ({ nodeId: nodeId, names: this.metricsNames[nodeId], error: error }),
-        );
-      })).then((responses) => {
+          return fetch('GET', url).then(
+            (response) => ({ nodeId: nodeId, names: response.metrics }),
+            // When fetching metrics fails, keep previous available metrics around, letting user see them
+            (error) => ({ nodeId: nodeId, names: this.metricsNames[nodeId], error: error }),
+          );
+        }),
+      ).then((responses) => {
         const metricsNames = {};
         const metricsErrors = {};
 
@@ -263,7 +271,9 @@ export const MetricsStore = singletonStore(
         this.registrations[nodeId] = {};
       }
 
-      this.registrations[nodeId][metricName] = this.registrations[nodeId][metricName] ? this.registrations[nodeId][metricName] + 1 : 1;
+      this.registrations[nodeId][metricName] = this.registrations[nodeId][metricName]
+        ? this.registrations[nodeId][metricName] + 1
+        : 1;
     },
     addGlobal(metricName) {
       if (!this.globalRegistrations[metricName]) {
@@ -277,7 +287,8 @@ export const MetricsStore = singletonStore(
         return;
       }
 
-      this.registrations[nodeId][metricName] = this.registrations[nodeId][metricName] > 0 ? this.registrations[nodeId][metricName] - 1 : 0;
+      this.registrations[nodeId][metricName] =
+        this.registrations[nodeId][metricName] > 0 ? this.registrations[nodeId][metricName] - 1 : 0;
 
       if (this.registrations[nodeId][metricName] === 0) {
         delete this.registrations[nodeId][metricName];
@@ -288,7 +299,8 @@ export const MetricsStore = singletonStore(
         return;
       }
 
-      this.globalRegistrations[metricName] = this.globalRegistrations[metricName] > 0 ? this.globalRegistrations[metricName] - 1 : 0;
+      this.globalRegistrations[metricName] =
+        this.globalRegistrations[metricName] > 0 ? this.globalRegistrations[metricName] - 1 : 0;
 
       if (this.globalRegistrations[metricName] === 0) {
         delete this.globalRegistrations[metricName];

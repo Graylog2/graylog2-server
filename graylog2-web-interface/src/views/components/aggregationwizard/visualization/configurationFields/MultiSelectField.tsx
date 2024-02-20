@@ -23,8 +23,9 @@ import Select from 'components/common/Select';
 
 import type { FieldComponentProps } from '../VisualizationConfigurationOptions';
 
-const makeOptions = (options: ReadonlyArray<string | [string, any]>):
-  [Array<{ key: string, value: string}>, Set<string>] => {
+const makeOptions = (
+  options: ReadonlyArray<string | [string, any]>,
+): [Array<{ key: string; value: string }>, Set<string>] => {
   const optionsSet = new Set<string>();
   const mappedOptions = options.map((option) => {
     if (typeof option === 'string') {
@@ -42,9 +43,10 @@ const makeOptions = (options: ReadonlyArray<string | [string, any]>):
   return [mappedOptions, optionsSet];
 };
 
-const createEvent = (name: string, value: any) => (({
-  target: { name, value },
-}) as React.ChangeEvent<any>);
+const createEvent = (name: string, value: any) =>
+  ({
+    target: { name, value },
+  }) as React.ChangeEvent<any>;
 
 const MultiSelectField = ({ name, field, title, error, value, onChange, values }: FieldComponentProps) => {
   if (field.type !== 'multi-select') {
@@ -57,7 +59,10 @@ const MultiSelectField = ({ name, field, title, error, value, onChange, values }
     return makeOptions(field.options);
   }, [values, field]);
 
-  const onSelect = useCallback((newValue: string) => onChange(createEvent(name, newValue === '' ? [] : newValue.split(','))), [name, onChange]);
+  const onSelect = useCallback(
+    (newValue: string) => onChange(createEvent(name, newValue === '' ? [] : newValue.split(','))),
+    [name, onChange],
+  );
   const selectedValue = useMemo(() => value.join(','), [value]);
 
   useEffect(() => {
@@ -69,20 +74,18 @@ const MultiSelectField = ({ name, field, title, error, value, onChange, values }
   }, [optionsSet, value, onSelect, selectedValue]);
 
   return (
-    <Input id={`${name}-select`}
-           label={title}
-           error={error}
-           labelClassName="col-sm-3"
-           wrapperClassName="col-sm-9">
-      <Select options={selectOption}
-              name={name}
-              value={selectedValue}
-              multi
-              menuPortalTarget={document.body}
-              onChange={onSelect}
-              inputProps={{ 'aria-label': `Select ${field.title}` }}
-              displayKey="key"
-              inputId="multi-select-visualization" />
+    <Input id={`${name}-select`} label={title} error={error} labelClassName="col-sm-3" wrapperClassName="col-sm-9">
+      <Select
+        options={selectOption}
+        name={name}
+        value={selectedValue}
+        multi
+        menuPortalTarget={document.body}
+        onChange={onSelect}
+        inputProps={{ 'aria-label': `Select ${field.title}` }}
+        displayKey="key"
+        inputId="multi-select-visualization"
+      />
     </Input>
   );
 };

@@ -29,59 +29,71 @@ import { carol, sam } from 'fixtures/users';
 
 jest.mock('components/content-stream/ContentStreamSection', () => 'content-stream-section');
 
-jest.mock('components/welcome/hooks/useLastOpened', () => jest.fn(() => ({
-  data: {
-    lastOpened: [{ grn: 'grn::::dashboard:1', title: 'Title 1' }, {
-      grn: 'grn::::search:2',
-      title: 'Title 2',
-    }],
-    per_page: 5,
-    page: 1,
-    count: 0,
-    total: 0,
-  },
-  isFetching: false,
-})));
+jest.mock('components/welcome/hooks/useLastOpened', () =>
+  jest.fn(() => ({
+    data: {
+      lastOpened: [
+        { grn: 'grn::::dashboard:1', title: 'Title 1' },
+        {
+          grn: 'grn::::search:2',
+          title: 'Title 2',
+        },
+      ],
+      per_page: 5,
+      page: 1,
+      count: 0,
+      total: 0,
+    },
+    isFetching: false,
+  })),
+);
 
-jest.mock('components/welcome/hooks/useFavoriteItems', () => jest.fn(() => ({
-  data: {
-    favorites: [{ grn: 'grn::::dashboard:4', title: 'Title 4' }, {
-      grn: 'grn::::dashboard:3',
-      title: 'Title 3',
-    }],
-    per_page: 5,
-    page: 1,
-    count: 0,
-    total: 0,
-  },
-  isFetching: false,
-})));
+jest.mock('components/welcome/hooks/useFavoriteItems', () =>
+  jest.fn(() => ({
+    data: {
+      favorites: [
+        { grn: 'grn::::dashboard:4', title: 'Title 4' },
+        {
+          grn: 'grn::::dashboard:3',
+          title: 'Title 3',
+        },
+      ],
+      per_page: 5,
+      page: 1,
+      count: 0,
+      total: 0,
+    },
+    isFetching: false,
+  })),
+);
 
-jest.mock('components/welcome/hooks/useRecentActivity', () => jest.fn(() => ({
-  data: {
-    recentActivity: [
-      {
-        id: '5',
-        activityType: 'share',
-        itemGrn: 'grn::::dashboard:5',
-        itemTitle: 'Title 5',
-        timestamp: '2022-01-01',
-      },
-      {
-        id: '6',
-        activityType: 'deleted',
-        itemGrn: 'grn::::search:6',
-        itemTitle: 'Title 6',
-        timestamp: '2022-01-03',
-      },
-    ],
-    per_page: 5,
-    page: 1,
-    count: 0,
-    total: 0,
-  },
-  isFetching: false,
-})));
+jest.mock('components/welcome/hooks/useRecentActivity', () =>
+  jest.fn(() => ({
+    data: {
+      recentActivity: [
+        {
+          id: '5',
+          activityType: 'share',
+          itemGrn: 'grn::::dashboard:5',
+          itemTitle: 'Title 5',
+          timestamp: '2022-01-01',
+        },
+        {
+          id: '6',
+          activityType: 'deleted',
+          itemGrn: 'grn::::search:6',
+          itemTitle: 'Title 6',
+          timestamp: '2022-01-03',
+        },
+      ],
+      per_page: 5,
+      page: 1,
+      count: 0,
+      total: 0,
+    },
+    isFetching: false,
+  })),
+);
 
 jest.mock('routing/Routes', () => ({
   pluginRoute: (x) => x,
@@ -106,7 +118,9 @@ describe('Welcome', () => {
     it('Shows link to edit profile in case user is not readOnly and has no defined starting page', async () => {
       render(<Welcome />);
 
-      await screen.findByText('This is your personal start page, allowing easy access to the content most relevant for you.');
+      await screen.findByText(
+        'This is your personal start page, allowing easy access to the content most relevant for you.',
+      );
       const linkToEditProfile = await screen.findByText('edit profile');
 
       expect(linkToEditProfile).toHaveAttribute('href', '/edit-profile-page');

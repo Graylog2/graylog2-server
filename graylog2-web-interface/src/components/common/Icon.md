@@ -1,4 +1,5 @@
 Examples:
+
 ```js
 <p><strong>Default:</strong> <Icon name="pencil-alt" /></p>
 

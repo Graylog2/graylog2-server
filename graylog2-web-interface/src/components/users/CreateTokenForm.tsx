@@ -34,8 +34,8 @@ const StyledForm = styled.form`
 `;
 
 type Props = {
-  creatingToken: boolean,
-  onCreate: (tokenName: string) => void,
+  creatingToken: boolean;
+  onCreate: (tokenName: string) => void;
 };
 
 const CreateTokenForm = ({ creatingToken, onCreate }: Props) => {
@@ -51,16 +51,15 @@ const CreateTokenForm = ({ creatingToken, onCreate }: Props) => {
     <StyledForm className="form-inline" onSubmit={createToken}>
       <FormGroup controlId="create-token-input">
         <ControlLabel>Token Name</ControlLabel>
-        <FormControl type="text"
-                     placeholder="What is this token for?"
-                     value={tokenName}
-                     onChange={(event) => setTokenName((event.target as HTMLInputElement).value)} />
+        <FormControl
+          type="text"
+          placeholder="What is this token for?"
+          value={tokenName}
+          onChange={(event) => setTokenName((event.target as HTMLInputElement).value)}
+        />
       </FormGroup>
-      <Button id="create-token"
-              disabled={tokenName === '' || creatingToken}
-              type="submit"
-              bsStyle="primary">
-        {(creatingToken ? <Spinner text="Creating..." /> : 'Create Token')}
+      <Button id="create-token" disabled={tokenName === '' || creatingToken} type="submit" bsStyle="primary">
+        {creatingToken ? <Spinner text="Creating..." /> : 'Create Token'}
       </Button>
     </StyledForm>
   );

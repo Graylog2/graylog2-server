@@ -25,31 +25,36 @@ import TimeBasedRotationStrategySummary from './TimeBasedRotationStrategySummary
 import TimeBasedSizeOptimizingStrategyConfiguration from './TimeBasedSizeOptimizingStrategyConfiguration';
 import TimeBasedSizeOptimizingStrategySummary from './TimeBasedSizeOptimizingStrategySummary';
 
-PluginStore.register(new PluginManifest({}, {
-  indexRotationConfig: [
+PluginStore.register(
+  new PluginManifest(
+    {},
     {
-      type: 'org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy',
-      displayName: 'Index Message Count',
-      configComponent: MessageCountRotationStrategyConfiguration,
-      summaryComponent: MessageCountRotationStrategySummary,
+      indexRotationConfig: [
+        {
+          type: 'org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy',
+          displayName: 'Index Message Count',
+          configComponent: MessageCountRotationStrategyConfiguration,
+          summaryComponent: MessageCountRotationStrategySummary,
+        },
+        {
+          type: 'org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategy',
+          displayName: 'Index Size',
+          configComponent: SizeBasedRotationStrategyConfiguration,
+          summaryComponent: SizeBasedRotationStrategySummary,
+        },
+        {
+          type: 'org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy',
+          displayName: 'Index Time',
+          configComponent: TimeBasedRotationStrategyConfiguration,
+          summaryComponent: TimeBasedRotationStrategySummary,
+        },
+        {
+          type: 'org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategy',
+          displayName: 'Index Time Size Optimizing',
+          configComponent: TimeBasedSizeOptimizingStrategyConfiguration,
+          summaryComponent: TimeBasedSizeOptimizingStrategySummary,
+        },
+      ],
     },
-    {
-      type: 'org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategy',
-      displayName: 'Index Size',
-      configComponent: SizeBasedRotationStrategyConfiguration,
-      summaryComponent: SizeBasedRotationStrategySummary,
-    },
-    {
-      type: 'org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy',
-      displayName: 'Index Time',
-      configComponent: TimeBasedRotationStrategyConfiguration,
-      summaryComponent: TimeBasedRotationStrategySummary,
-    },
-    {
-      type: 'org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategy',
-      displayName: 'Index Time Size Optimizing',
-      configComponent: TimeBasedSizeOptimizingStrategyConfiguration,
-      summaryComponent: TimeBasedSizeOptimizingStrategySummary,
-    },
-  ],
-}));
+  ),
+);

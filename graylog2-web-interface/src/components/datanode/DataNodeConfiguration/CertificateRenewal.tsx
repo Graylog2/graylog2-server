@@ -36,7 +36,7 @@ import DataNodeBadge from '../DataNodeList/DataNodeBadge';
 
 const StyledList = styled(ListGroup)`
   max-width: fit-content;
-  
+
   .list-group-item {
     display: flex;
     justify-content: space-between;
@@ -61,18 +61,16 @@ const useDataNodes = () => {
     queryKey: ['data-nodes', 'overview'],
     queryFn: fetchDataNodes,
     onError: (errorThrown) => {
-      UserNotification.error(`Loading data nodes failed with status: ${errorThrown}`,
-        'Could not load streams');
+      UserNotification.error(`Loading data nodes failed with status: ${errorThrown}`, 'Could not load streams');
     },
     keepPreviousData: true,
     refetchInterval: 3000,
-
   });
 
-  return ({
+  return {
     data,
     isInitialLoading,
-  });
+  };
 };
 
 const RightCol = styled.div`
@@ -99,18 +97,12 @@ const provisioningWording = {
   buttonStyle: 'success',
 } as const;
 
-export const CertRenewalButton = ({ nodeId, status }: { nodeId: string, status: DataNode['status'] }) => {
+export const CertRenewalButton = ({ nodeId, status }: { nodeId: string; status: DataNode['status'] }) => {
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
   const [isRenewing, setIsRenewing] = useState(false);
-  const {
-    buttonTitle,
-    buttonLoadingTitle,
-    successActionTitle,
-    errorActionTitle,
-    telemetryAppSection,
-    buttonStyle,
-  } = status === 'UNCONFIGURED' ? provisioningWording : renewalWording;
+  const { buttonTitle, buttonLoadingTitle, successActionTitle, errorActionTitle, telemetryAppSection, buttonStyle } =
+    status === 'UNCONFIGURED' ? provisioningWording : renewalWording;
 
   const onCertificateRenewal = () => {
     setIsRenewing(true);
@@ -143,7 +135,11 @@ export const CertRenewalButton = ({ nodeId, status }: { nodeId: string, status: 
 const ErrorBadge = styled(Badge)`
   margin-left: 5px;
 `;
-const Error = ({ message }: { message: string }) => <ErrorBadge title={message} color="red">{message}</ErrorBadge>;
+const Error = ({ message }: { message: string }) => (
+  <ErrorBadge title={message} color="red">
+    {message}
+  </ErrorBadge>
+);
 
 const CertificateRenewal = () => {
   const { data: dataNodes, isInitialLoading: isInitialLoadingDataNodes } = useDataNodes();
@@ -153,46 +149,39 @@ const CertificateRenewal = () => {
     <div>
       <h2>Certificate Renewal & Provisioning</h2>
       <p>
-        Here you can manually trigger the certificate renewal or provisioning for Graylog data nodes.
-        It is only necessary to manually provision certificates when the renewal policy mode &quot;Manual&quot; is configured and
+        Here you can manually trigger the certificate renewal or provisioning for Graylog data nodes. It is only
+        necessary to manually provision certificates when the renewal policy mode &quot;Manual&quot; is configured and
         data nodes have been started after the initial certificate provisioning.
       </p>
 
       {!!sortedDataNodes?.length && (
         <StyledList>
-            {sortedDataNodes.map(({
-              node_id,
-              hostname,
-              transport_address,
-              short_node_id,
-              cert_valid_until,
-              status,
-              error_msg,
-            }) => (
+          {sortedDataNodes.map(
+            ({ node_id, hostname, transport_address, short_node_id, cert_valid_until, status, error_msg }) => (
               <ListGroupItem key={short_node_id}>
                 <NodeIdColumn>
                   <DataNodeBadge status={status} nodeId={short_node_id} transportAddress={transport_address} />
                 </NodeIdColumn>
                 <DataNodeInfos>
-                  <span title="Transport address">{transport_address}</span>{' – '}
+                  <span title="Transport address">{transport_address}</span>
+                  {' – '}
                   <span title="Hostname">{hostname}</span>
                   {error_msg && <Error message={error_msg} />}
                 </DataNodeInfos>
                 <RightCol>
-                  {cert_valid_until && (<span title={cert_valid_until}>valid until {moment(cert_valid_until).from(moment())}{' '}</span>)}
+                  {cert_valid_until && (
+                    <span title={cert_valid_until}>valid until {moment(cert_valid_until).from(moment())} </span>
+                  )}
                   <CertRenewalButton nodeId={node_id} status={status} />
                 </RightCol>
               </ListGroupItem>
-            ))}
+            ),
+          )}
         </StyledList>
       )}
 
       {isInitialLoadingDataNodes && <Spinner />}
-      {(!sortedDataNodes?.length && !isInitialLoadingDataNodes) && (
-        <Alert>
-          No data nodes have been found.
-        </Alert>
-      )}
+      {!sortedDataNodes?.length && !isInitialLoadingDataNodes && <Alert>No data nodes have been found.</Alert>}
     </div>
   );
 };

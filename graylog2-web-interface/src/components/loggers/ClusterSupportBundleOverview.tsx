@@ -45,10 +45,12 @@ const DownloadButton = styled(Button)`
   margin-right: 6px;
 `;
 
-const LoadingSpinner = styled(Spinner)(({ theme }) => `
+const LoadingSpinner = styled(Spinner)(
+  ({ theme }) => `
   margin-left: 6px;
   font-size: ${theme.fonts.size.h5};
-`);
+`,
+);
 
 const ClusterSupportBundleOverview = () => {
   const { list, isCreating, onCreate, onDelete, onDownload } = useClusterSupportBundle();
@@ -56,20 +58,14 @@ const ClusterSupportBundleOverview = () => {
 
   const renderRow = (bundle: BundleFile) => (
     <tr key={bundle.file_name}>
-      <td>
-        {bundle.file_name}
-      </td>
+      <td>{bundle.file_name}</td>
+      <AlignRightCell>{bundle.size}</AlignRightCell>
       <AlignRightCell>
-        {bundle.size}
-      </AlignRightCell>
-      <AlignRightCell>
-        <DownloadButton bsSize="xsmall"
-                        bsStyle="info"
-                        onClick={() => onDownload(bundle.file_name)}>Download
+        <DownloadButton bsSize="xsmall" bsStyle="info" onClick={() => onDownload(bundle.file_name)}>
+          Download
         </DownloadButton>
-        <Button bsSize="xsmall"
-                bsStyle="default"
-                onClick={() => setBundleNameToDelete(bundle.file_name)}>Delete
+        <Button bsSize="xsmall" bsStyle="default" onClick={() => setBundleNameToDelete(bundle.file_name)}>
+          Delete
         </Button>
       </AlignRightCell>
     </tr>
@@ -87,7 +83,7 @@ const ClusterSupportBundleOverview = () => {
             </Button>
           </Header>
           <ClusterSupportBundleInfo />
-          {(list.length > 0) ? (
+          {list.length > 0 ? (
             <Table className="table-striped table-condensed table-hover">
               <colgroup>
                 <FilenameCol />
@@ -98,25 +94,25 @@ const ClusterSupportBundleOverview = () => {
                   <AlignRightHeadCell>Size</AlignRightHeadCell>
                 </tr>
               </thead>
-              <tbody>
-                {list.map(renderRow)}
-              </tbody>
+              <tbody>{list.map(renderRow)}</tbody>
             </Table>
           ) : (
-            <NoSearchResult>
-              No Support Bundles have been found.
-            </NoSearchResult>
+            <NoSearchResult>No Support Bundles have been found.</NoSearchResult>
           )}
         </Col>
       </Row>
-      <ConfirmDialog title="Delete Support Bundle"
-                     show={Boolean(bundleNameToDelete)}
-                     onConfirm={() => {
-                       onDelete(bundleNameToDelete);
-                       setBundleNameToDelete(null);
-                     }}
-                     onCancel={() => setBundleNameToDelete(null)}>
-        <>Are you sure you want to delete <strong>{bundleNameToDelete}</strong>?</>
+      <ConfirmDialog
+        title="Delete Support Bundle"
+        show={Boolean(bundleNameToDelete)}
+        onConfirm={() => {
+          onDelete(bundleNameToDelete);
+          setBundleNameToDelete(null);
+        }}
+        onCancel={() => setBundleNameToDelete(null)}
+      >
+        <>
+          Are you sure you want to delete <strong>{bundleNameToDelete}</strong>?
+        </>
       </ConfirmDialog>
     </div>
   );

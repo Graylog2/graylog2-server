@@ -22,15 +22,18 @@ import type { AppDispatch } from 'stores/useAppDispatch';
 import type { GetState } from 'views/types';
 
 export type Contexts = {
-  widgetFocusContext: WidgetFocusContextType,
+  widgetFocusContext: WidgetFocusContextType;
 };
 
-export type WidgetAction = (w: Widget, contexts: Contexts) => (dispatch: AppDispatch, getState: GetState) => Promise<unknown>;
+export type WidgetAction = (
+  w: Widget,
+  contexts: Contexts,
+) => (dispatch: AppDispatch, getState: GetState) => Promise<unknown>;
 
 export type WidgetActionType = {
-  type: string,
-  title: (w: Widget) => React.ReactNode,
-  isHidden?: (w: Widget) => boolean,
-  action: WidgetAction,
-  disabled?: () => boolean,
+  type: string;
+  title: (w: Widget) => React.ReactNode;
+  isHidden?: (w: Widget) => boolean;
+  action: WidgetAction;
+  disabled?: () => boolean;
 };

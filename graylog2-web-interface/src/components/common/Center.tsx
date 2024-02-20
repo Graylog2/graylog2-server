@@ -17,26 +17,24 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
-const Container = styled.div<{ $fullHeight: boolean }>(({ $fullHeight }) => `
+const Container = styled.div<{ $fullHeight: boolean }>(
+  ({ $fullHeight }) => `
   display: flex;
   height: ${$fullHeight ? '100%' : 'auto'};
   justify-content: center;
   align-items: center;
-`);
+`,
+);
 
 type Props = {
-  children: React.ReactNode,
-  fullHeight?: boolean,
+  children: React.ReactNode;
+  fullHeight?: boolean;
 };
 
 /**
  * This component centers its children horizontally and vertically.
  */
-const Center = ({ children, fullHeight }: Props) => (
-  <Container $fullHeight={fullHeight}>
-    {children}
-  </Container>
-);
+const Center = ({ children, fullHeight }: Props) => <Container $fullHeight={fullHeight}>{children}</Container>;
 
 Center.defaultProps = {
   fullHeight: true,

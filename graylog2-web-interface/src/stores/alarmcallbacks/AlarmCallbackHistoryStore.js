@@ -41,19 +41,20 @@ export const AlarmCallbackHistoryStore = singletonStore(
 
     list(streamId, alertId) {
       const url = URLUtils.qualifyUrl(ApiRoutes.AlarmCallbackHistoryApiController.list(streamId, alertId).url);
-      const promise = fetch('GET', url)
-        .then(
-          (response) => {
-            this.histories = response.histories;
-            this.trigger({ histories: this.histories });
+      const promise = fetch('GET', url).then(
+        (response) => {
+          this.histories = response.histories;
+          this.trigger({ histories: this.histories });
 
-            return this.histories;
-          },
-          (error) => {
-            UserNotification.error(`Fetching notification history for alert '${alertId}' failed with status: ${error}`,
-              'Could not retrieve notification history.');
-          },
-        );
+          return this.histories;
+        },
+        (error) => {
+          UserNotification.error(
+            `Fetching notification history for alert '${alertId}' failed with status: ${error}`,
+            'Could not retrieve notification history.',
+          );
+        },
+      );
 
       AlarmCallbackHistoryActions.list.promise(promise);
     },

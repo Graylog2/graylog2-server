@@ -63,7 +63,10 @@ class ContentPackPreview extends React.Component {
         </Row>
         <Row>
           <Col sm={6}>
-            <Button id="create" bsStyle="primary" onClick={this.props.onSave}>Create</Button>&nbsp;
+            <Button id="create" bsStyle="primary" onClick={this.props.onSave}>
+              Create
+            </Button>
+            &nbsp;
             {this._renderDownload()}
           </Col>
         </Row>

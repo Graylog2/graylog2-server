@@ -22,7 +22,7 @@ import { Icon, Tooltip } from 'components/common';
 import { Button } from 'components/bootstrap';
 
 type Props = {
-  title: string,
+  title: string;
 };
 
 const IconWithHelp = styled(Icon)`
@@ -35,9 +35,11 @@ const ClientAddressHead = ({ title }: Props) => {
   return (
     <th>
       {title}
-      <Tooltip opened={opened}
-               withArrow
-               label="The address of the client used to initially establish the session, not necessarily its current address.">
+      <Tooltip
+        opened={opened}
+        withArrow
+        label="The address of the client used to initially establish the session, not necessarily its current address."
+      >
         <Button bsStyle="link" onClick={toggle}>
           <IconWithHelp name="question-circle" fixedWidth />
         </Button>

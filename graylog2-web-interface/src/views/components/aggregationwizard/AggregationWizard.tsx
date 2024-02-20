@@ -28,10 +28,14 @@ import VisualizationContainer from './VisualizationContainer';
 
 const aggregationElementsByKey = Object.fromEntries(aggregationElements.map((element) => [element.key, element]));
 
-const _initialFormValues = (config: AggregationWidgetConfig) => aggregationElements.reduce((formValues, element) => ({
-  ...formValues,
-  ...(element.fromConfig ? element.fromConfig(config) : {}),
-}), {});
+const _initialFormValues = (config: AggregationWidgetConfig) =>
+  aggregationElements.reduce(
+    (formValues, element) => ({
+      ...formValues,
+      ...(element.fromConfig ? element.fromConfig(config) : {}),
+    }),
+    {},
+  );
 
 const Controls = styled.div`
   height: 100%;
@@ -62,66 +66,82 @@ const onCreateElement = (
   } else {
     setValues({
       ...values,
-      [elementKey]: [
-        ...(values[elementKey] ?? []),
-        {},
-      ],
+      [elementKey]: [...(values[elementKey] ?? []), {}],
     });
   }
 };
 
-export const updateWidgetAggregationElements = (formValues: WidgetConfigFormValues, oldConfig = AggregationWidgetConfig.builder().build()) => {
+export const updateWidgetAggregationElements = (
+  formValues: WidgetConfigFormValues,
+  oldConfig = AggregationWidgetConfig.builder().build(),
+) => {
   const toConfigByKey = Object.fromEntries(aggregationElements.map(({ key, toConfig }) => [key, toConfig]));
 
-  const newConfig = Object.keys(formValues).map((key) => {
-    const toConfig = toConfigByKey[key] ?? ((_values, prevConfig) => prevConfig);
+  const newConfig = Object.keys(formValues)
+    .map((key) => {
+      const toConfig = toConfigByKey[key] ?? ((_values, prevConfig) => prevConfig);
 
-    if (!toConfig) {
-      throw new Error(`Aggregation element with key ${key} is missing toConfig.`);
-    }
+      if (!toConfig) {
+        throw new Error(`Aggregation element with key ${key} is missing toConfig.`);
+      }
 
-    return toConfig;
-  }).reduce((prevConfig, toConfig) => toConfig(formValues, prevConfig), oldConfig.toBuilder());
+      return toConfig;
+    })
+    .reduce((prevConfig, toConfig) => toConfig(formValues, prevConfig), oldConfig.toBuilder());
 
   return newConfig.build();
 };
 
-const _onSubmit = (formValues: WidgetConfigFormValues, onConfigChange: (newConfig: AggregationWidgetConfig) => void, oldConfig: AggregationWidgetConfig) => {
+const _onSubmit = (
+  formValues: WidgetConfigFormValues,
+  onConfigChange: (newConfig: AggregationWidgetConfig) => void,
+  oldConfig: AggregationWidgetConfig,
+) => {
   const newConfig = updateWidgetAggregationElements(formValues, oldConfig);
 
   return onConfigChange(newConfig);
 };
 
 const validateForm = (formValues: WidgetConfigFormValues) => {
-  const elementValidations = aggregationElements.map((element) => element.validate ?? (() => (({}) as WidgetConfigValidationErrors)));
+  const elementValidations = aggregationElements.map(
+    (element) => element.validate ?? (() => ({}) as WidgetConfigValidationErrors),
+  );
 
   const elementValidationResults = elementValidations.map((validate) => validate(formValues));
 
   return elementValidationResults.reduce((prev, cur) => ({ ...prev, ...cur }), {});
 };
 
-const AggregationWizard = ({ onChange, config, children, onSubmit, onCancel }: EditWidgetComponentProps<AggregationWidgetConfig> & { children: React.ReactElement }) => {
+const AggregationWizard = ({
+  onChange,
+  config,
+  children,
+  onSubmit,
+  onCancel,
+}: EditWidgetComponentProps<AggregationWidgetConfig> & { children: React.ReactElement }) => {
   const initialFormValues = _initialFormValues(config);
 
   return (
-    <WidgetConfigForm onSubmit={(formValues: WidgetConfigFormValues) => _onSubmit(formValues, onChange, config)}
-                      initialValues={initialFormValues}
-                      config={config}
-                      validate={validateForm}>
+    <WidgetConfigForm
+      onSubmit={(formValues: WidgetConfigFormValues) => _onSubmit(formValues, onChange, config)}
+      initialValues={initialFormValues}
+      config={config}
+      validate={validateForm}
+    >
       <>
         <Controls>
           <Section data-testid="configure-elements-section">
-            <ElementsConfiguration aggregationElementsByKey={aggregationElementsByKey}
-                                   config={config}
-                                   onCreate={onCreateElement}
-                                   onSubmit={onSubmit}
-                                   onCancel={onCancel}
-                                   onConfigChange={onChange} />
+            <ElementsConfiguration
+              aggregationElementsByKey={aggregationElementsByKey}
+              config={config}
+              onCreate={onCreateElement}
+              onSubmit={onSubmit}
+              onCancel={onCancel}
+              onConfigChange={onChange}
+            />
           </Section>
         </Controls>
-        <VisualizationContainer>
-          {children}
-        </VisualizationContainer>
+        <VisualizationContainer>{children}</VisualizationContainer>
       </>
     </WidgetConfigForm>
   );

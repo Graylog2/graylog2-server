@@ -90,7 +90,8 @@ class AggregationConditionsForm extends React.Component {
       // Keep series up-to-date with changes in conditions
       const seriesReferences = extractSeriesReferences(nextConditions);
 
-      nextSeries = (changes.series || eventDefinition?.config?.series)?.filter((s) => seriesReferences.includes(s.id)) || [];
+      nextSeries =
+        (changes.series || eventDefinition?.config?.series)?.filter((s) => seriesReferences.includes(s.id)) || [];
     } else {
       nextSeries = [];
     }
@@ -118,17 +119,21 @@ class AggregationConditionsForm extends React.Component {
         )}
 
         <Row>
-          <AggregationConditionExpression expression={expression}
-                                          {...this.props}
-                                          validation={showInlineValidation ? expressionValidation.validationTree : {}}
-                                          onChange={this.handleChange} />
+          <AggregationConditionExpression
+            expression={expression}
+            {...this.props}
+            validation={showInlineValidation ? expressionValidation.validationTree : {}}
+            onChange={this.handleChange}
+          />
         </Row>
 
-        <AggregationConditionsFormSummary conditions={eventDefinition?.config?.conditions || {}}
-                                          series={eventDefinition?.config?.series || []}
-                                          expressionValidation={expressionValidation}
-                                          showInlineValidation={showInlineValidation}
-                                          toggleShowValidation={this.toggleShowInlineValidation} />
+        <AggregationConditionsFormSummary
+          conditions={eventDefinition?.config?.conditions || {}}
+          series={eventDefinition?.config?.series || []}
+          expressionValidation={expressionValidation}
+          showInlineValidation={showInlineValidation}
+          toggleShowValidation={this.toggleShowInlineValidation}
+        />
       </>
     );
   }

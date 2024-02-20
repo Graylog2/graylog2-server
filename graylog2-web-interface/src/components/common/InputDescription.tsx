@@ -20,18 +20,22 @@ import styled, { css } from 'styled-components';
 
 import { HelpBlock } from 'components/bootstrap';
 
-const ErrorMessage = styled.span(({ theme }) => css`
-  color: ${theme.colors.variant.danger};
-`);
+const ErrorMessage = styled.span(
+  ({ theme }) => css`
+    color: ${theme.colors.variant.danger};
+  `,
+);
 
-const HelpMessage = styled.span<{ $hasError: boolean }>(({ theme, $hasError }) => css`
-  color: ${$hasError ? theme.colors.gray[50] : 'inherit'};
-`);
+const HelpMessage = styled.span<{ $hasError: boolean }>(
+  ({ theme, $hasError }) => css`
+    color: ${$hasError ? theme.colors.gray[50] : 'inherit'};
+  `,
+);
 
 type Props = {
-  className?: string,
-  error?: React.ReactNode,
-  help?: React.ReactNode,
+  className?: string;
+  error?: React.ReactNode;
+  help?: React.ReactNode;
 };
 
 /**
@@ -45,31 +49,17 @@ const InputDescription = ({ className, error, help }: Props) => {
 
   return (
     <HelpBlock className={`${className ?? ''} input-description`}>
-      {error && (
-        <ErrorMessage>
-          {error}
-        </ErrorMessage>
-      )}
-      {(!!error && !!help) && <br />}
-      {help && (
-        <HelpMessage $hasError={!!error}>
-          {help}
-        </HelpMessage>
-      )}
+      {error && <ErrorMessage>{error}</ErrorMessage>}
+      {!!error && !!help && <br />}
+      {help && <HelpMessage $hasError={!!error}>{help}</HelpMessage>}
     </HelpBlock>
   );
 };
 
 InputDescription.propTypes = {
   className: PropTypes.string,
-  error: PropTypes.oneOfType([
-    PropTypes.element,
-    PropTypes.string,
-  ]),
-  help: PropTypes.oneOfType([
-    PropTypes.element,
-    PropTypes.string,
-  ]),
+  error: PropTypes.oneOfType([PropTypes.element, PropTypes.string]),
+  help: PropTypes.oneOfType([PropTypes.element, PropTypes.string]),
 };
 
 InputDescription.defaultProps = {

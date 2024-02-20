@@ -56,7 +56,10 @@ const PipelineDetailsPage = createReactClass({
     params: PropTypes.object.isRequired,
   },
 
-  mixins: [Reflux.connectFilter(PipelinesStore, 'pipeline', filterPipeline), Reflux.connectFilter(PipelineConnectionsStore, 'connections', filterConnections)],
+  mixins: [
+    Reflux.connectFilter(PipelinesStore, 'pipeline', filterPipeline),
+    Reflux.connectFilter(PipelineConnectionsStore, 'connections', filterConnections),
+  ],
 
   componentDidMount() {
     const { params } = this.props;
@@ -138,7 +141,11 @@ const PipelineDetailsPage = createReactClass({
     if (this._isNewPipeline(params.pipelineId)) {
       title = 'New pipeline';
     } else {
-      title = <span>Pipeline <em>{pipeline.title}</em></span>;
+      title = (
+        <span>
+          Pipeline <em>{pipeline.title}</em>
+        </span>
+      );
     }
 
     let content;
@@ -147,40 +154,42 @@ const PipelineDetailsPage = createReactClass({
       content = <NewPipeline onChange={this._savePipeline} />;
     } else {
       content = (
-        <Pipeline pipeline={pipeline}
-                  connections={connections}
-                  streams={streams}
-                  rules={rules}
-                  onConnectionsChange={this._onConnectionsChange}
-                  onStagesChange={this._onStagesChange}
-                  onPipelineChange={this._savePipeline} />
+        <Pipeline
+          pipeline={pipeline}
+          connections={connections}
+          streams={streams}
+          rules={rules}
+          onConnectionsChange={this._onConnectionsChange}
+          onStagesChange={this._onStagesChange}
+          onPipelineChange={this._savePipeline}
+        />
       );
     }
 
-    const pageTitle = (this._isNewPipeline(params.pipelineId) ? 'New pipeline' : `Pipeline ${pipeline.title}`);
+    const pageTitle = this._isNewPipeline(params.pipelineId) ? 'New pipeline' : `Pipeline ${pipeline.title}`;
 
     return (
       <DocumentTitle title={pageTitle}>
         <div>
           <PipelinesPageNavigation />
-          <PageHeader title={title}
-                      documentationLink={{
-                        title: 'Pipelines documentation',
-                        path: DocsHelper.PAGES.PIPELINES,
-                      }}>
+          <PageHeader
+            title={title}
+            documentationLink={{
+              title: 'Pipelines documentation',
+              path: DocsHelper.PAGES.PIPELINES,
+            }}
+          >
             <span>
               Pipelines let you transform and process messages coming from streams. Pipelines consist of stages where
               rules are evaluated and applied. Messages can go through one or more stages.
               <br />
-              After each stage is completed, you can decide if messages matching all or one of the rules continue to
-              the next stage.
+              After each stage is completed, you can decide if messages matching all or one of the rules continue to the
+              next stage.
             </span>
           </PageHeader>
 
           <Row className="content">
-            <Col md={12}>
-              {content}
-            </Col>
+            <Col md={12}>{content}</Col>
           </Row>
         </div>
       </DocumentTitle>

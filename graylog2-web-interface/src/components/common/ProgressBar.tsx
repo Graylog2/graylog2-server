@@ -21,22 +21,22 @@ import chroma from 'chroma-js';
 import type { ColorVariant } from '@graylog/sawmill';
 
 type StyledBarProps = {
-  $animated?: boolean,
-  $striped?: boolean,
-  $bsStyle?: ColorVariant,
-  value: number,
-  label?: string,
+  $animated?: boolean;
+  $striped?: boolean;
+  $bsStyle?: ColorVariant;
+  value: number;
+  label?: string;
 };
 
 type ProgressBarProps = {
   bars: Array<{
-    animated?: boolean,
-    striped?: boolean,
-    bsStyle?: ColorVariant,
-    value: number,
-    label?: string,
-  }>,
-  className?: string,
+    animated?: boolean;
+    striped?: boolean;
+    bsStyle?: ColorVariant;
+    value: number;
+    label?: string;
+  }>;
+  className?: string;
 };
 
 const DEFAULT_BAR = {
@@ -69,19 +69,21 @@ const progressBarVariants = css<StyledBarProps>(({ $bsStyle, theme }) => {
   return css`
     background-color: ${theme.colors.variant[$bsStyle]};
     color: ${theme.utils.readableColor(theme.colors.variant[$bsStyle])};
-`;
+  `;
 });
 
-const ProgressWrap = styled.div(({ theme }) => css`
-  height: 20px;
-  margin-bottom: 20px;
-  overflow: hidden;
-  background-color: ${theme.colors.gray[90]};
-  border-radius: 4px;
-  ${boxShadow('inset 0 1px 2px')}
-  display: flex;
-  align-items: center;
-`);
+const ProgressWrap = styled.div(
+  ({ theme }) => css`
+    height: 20px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    background-color: ${theme.colors.gray[90]};
+    border-radius: 4px;
+    ${boxShadow('inset 0 1px 2px')}
+    display: flex;
+    align-items: center;
+  `,
+);
 
 const Bar = styled.div<StyledBarProps>(({ $animated, $striped, theme, value }) => {
   const defaultStripColor = chroma(theme.colors.global.contentBackground).alpha(0.25).css();
@@ -94,8 +96,11 @@ const Bar = styled.div<StyledBarProps>(({ $animated, $striped, theme, value }) =
     transition: width 500ms ease-in-out;
     width: ${value}%;
     max-width: 100%;
-    text-shadow: 0 1px 2px ${chroma(theme.colors.gray[10]).alpha(0.4).css()}, 2px -1px 3px ${chroma(theme.colors.gray[100]).alpha(0.5).css()};
-    ${($animated || $striped) && css`
+    text-shadow:
+      0 1px 2px ${chroma(theme.colors.gray[10]).alpha(0.4).css()},
+      2px -1px 3px ${chroma(theme.colors.gray[100]).alpha(0.5).css()};
+    ${($animated || $striped) &&
+    css`
       background-image: linear-gradient(
         45deg,
         ${defaultStripColor} 25%,
@@ -107,12 +112,13 @@ const Bar = styled.div<StyledBarProps>(({ $animated, $striped, theme, value }) =
         transparent
       );
       background-size: 40px 40px;
-`}
-    ${$animated && css`
+    `}
+    ${$animated &&
+    css`
       animation: ${animatedStripes} 2s linear infinite;
-`}
+    `}
     ${progressBarVariants}
-`;
+  `;
 });
 
 const ProgressBar = ({ bars, className }: ProgressBarProps) => (
@@ -121,16 +127,18 @@ const ProgressBar = ({ bars, className }: ProgressBarProps) => (
       const { label, animated, bsStyle, striped, value } = { ...DEFAULT_BAR, ...bar };
 
       return (
-        <Bar role="progressbar"
-             aria-valuenow={value}
-             aria-valuemin={0}
-             aria-valuemax={100}
-             aria-valuetext={label}
-             key={`bar-${index}`} // eslint-disable-line react/no-array-index-key
-             $animated={animated}
-             $bsStyle={bsStyle}
-             $striped={striped}
-             value={value}>
+        <Bar
+          role="progressbar"
+          aria-valuenow={value}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuetext={label}
+          key={`bar-${index}`} // eslint-disable-line react/no-array-index-key
+          $animated={animated}
+          $bsStyle={bsStyle}
+          $striped={striped}
+          value={value}
+        >
           {label}
         </Bar>
       );
@@ -139,13 +147,15 @@ const ProgressBar = ({ bars, className }: ProgressBarProps) => (
 );
 
 ProgressBar.propTypes = {
-  bars: PropTypes.arrayOf(PropTypes.shape({
-    animated: PropTypes.bool,
-    bsStyle: PropTypes.string,
-    label: PropTypes.string,
-    striped: PropTypes.bool,
-    value: PropTypes.number,
-  })),
+  bars: PropTypes.arrayOf(
+    PropTypes.shape({
+      animated: PropTypes.bool,
+      bsStyle: PropTypes.string,
+      label: PropTypes.string,
+      striped: PropTypes.bool,
+      value: PropTypes.number,
+    }),
+  ),
   className: PropTypes.string,
 };
 

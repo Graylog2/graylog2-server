@@ -64,7 +64,8 @@ const CreateExtractorsPage = createReactClass({
     InputsActions.get.triggerPromise(params.inputId);
     const { exampleIndex, exampleId } = this.state;
 
-    MessagesActions.loadMessage.triggerPromise(exampleIndex, exampleId)
+    MessagesActions.loadMessage
+      .triggerPromise(exampleIndex, exampleId)
       .then((message) => this.setState({ exampleMessage: message }));
   },
 
@@ -99,21 +100,29 @@ const CreateExtractorsPage = createReactClass({
     return (
       <DocumentTitle title={`New extractor for input ${input.title}`}>
         <div>
-          <PageHeader title={<span>New extractor for input <em>{input.title}</em></span>}
-                      documentationLink={{
-                        title: 'Extractors documentation',
-                        path: DocsHelper.PAGES.EXTRACTORS,
-                      }}>
+          <PageHeader
+            title={
+              <span>
+                New extractor for input <em>{input.title}</em>
+              </span>
+            }
+            documentationLink={{
+              title: 'Extractors documentation',
+              path: DocsHelper.PAGES.EXTRACTORS,
+            }}
+          >
             <span>
-              Extractors are applied on every message that is received by an input. Use them to extract and
-              transform any text data into fields that allow you easy filtering and analysis later on.
+              Extractors are applied on every message that is received by an input. Use them to extract and transform
+              any text data into fields that allow you easy filtering and analysis later on.
             </span>
           </PageHeader>
-          <EditExtractor action="create"
-                         extractor={extractor}
-                         inputId={input.id}
-                         exampleMessage={stringifiedExampleMessage}
-                         onSave={this._extractorSaved} />
+          <EditExtractor
+            action="create"
+            extractor={extractor}
+            inputId={input.id}
+            exampleMessage={stringifiedExampleMessage}
+            onSave={this._extractorSaved}
+          />
         </div>
       </DocumentTitle>
     );

@@ -20,8 +20,8 @@ import PropTypes from 'prop-types';
 import ErrorPage from 'components/errors/ErrorPage';
 
 type Props = {
-  displayPageLayout?: boolean,
-}
+  displayPageLayout?: boolean;
+};
 
 const NotFoundPage = ({ displayPageLayout }: Props) => {
   const description = (
@@ -31,7 +31,7 @@ const NotFoundPage = ({ displayPageLayout }: Props) => {
     </>
   );
 
-  return (<ErrorPage title="Page not found" description={description} displayPageLayout={displayPageLayout} />);
+  return <ErrorPage title="Page not found" description={description} displayPageLayout={displayPageLayout} />;
 };
 
 NotFoundPage.propTypes = {

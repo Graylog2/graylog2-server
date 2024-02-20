@@ -174,7 +174,8 @@ class EventNotificationFormContainer extends React.Component {
             testResult.message = 'Validation failed, please correct any errors in the form before continuing.';
             this.setState({ validation: body });
           } else {
-            testResult.message = errorResponse.responseMessage || 'Unknown error, please check your Graylog server logs.';
+            testResult.message =
+              errorResponse.responseMessage || 'Unknown error, please check your Graylog server logs.';
           }
         },
       )
@@ -193,16 +194,18 @@ class EventNotificationFormContainer extends React.Component {
         {!embedded && isDirty && (
           <ConfirmLeaveDialog question="Do you really want to abandon this page and lose your changes? This action cannot be undone." />
         )}
-        <EventNotificationForm action={action}
-                               notification={notification}
-                               validation={validation}
-                               testResult={testResult}
-                               formId={formId}
-                               embedded={embedded}
-                               onChange={this.handleChange}
-                               onCancel={this.handleCancel}
-                               onSubmit={this.handleSubmit}
-                               onTest={this.handleTest} />
+        <EventNotificationForm
+          action={action}
+          notification={notification}
+          validation={validation}
+          testResult={testResult}
+          formId={formId}
+          embedded={embedded}
+          onChange={this.handleChange}
+          onCancel={this.handleCancel}
+          onSubmit={this.handleSubmit}
+          onTest={this.handleTest}
+        />
       </>
     );
   }

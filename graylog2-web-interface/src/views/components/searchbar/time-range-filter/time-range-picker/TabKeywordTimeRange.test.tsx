@@ -28,24 +28,31 @@ jest.mock('stores/tools/ToolsStore', () => ({
   testNaturalDate: jest.fn(),
 }));
 
-const TabKeywordTimeRange = ({ defaultValue, ...props }: { defaultValue: string } & React.ComponentProps<typeof TabKeywordTimeRange>) => (
-  <Formik initialValues={{ timeRangeTabs: { keyword: { type: 'keyword', keyword: defaultValue } }, activeTab: 'keyword' }}
-          onSubmit={() => {}}
-          validateOnMount>
+const TabKeywordTimeRange = ({
+  defaultValue,
+  ...props
+}: { defaultValue: string } & React.ComponentProps<typeof TabKeywordTimeRange>) => (
+  <Formik
+    initialValues={{ timeRangeTabs: { keyword: { type: 'keyword', keyword: defaultValue } }, activeTab: 'keyword' }}
+    onSubmit={() => {}}
+    validateOnMount
+  >
     <Form>
-      <OriginalTabKeywordTimeRange {...props as React.ComponentProps<typeof TabKeywordTimeRange>} />
+      <OriginalTabKeywordTimeRange {...(props as React.ComponentProps<typeof TabKeywordTimeRange>)} />
     </Form>
   </Formik>
 );
 
 describe('TabKeywordTimeRange', () => {
   beforeEach(() => {
-    asMock(ToolsStore.testNaturalDate).mockImplementation(() => Promise.resolve({
-      type: 'absolute',
-      from: '2018-11-14 13:52:38',
-      to: '2018-11-14 13:57:38',
-      timezone: 'Europe/Berlin',
-    }));
+    asMock(ToolsStore.testNaturalDate).mockImplementation(() =>
+      Promise.resolve({
+        type: 'absolute',
+        from: '2018-11-14 13:52:38',
+        to: '2018-11-14 13:57:38',
+        timezone: 'Europe/Berlin',
+      }),
+    );
 
     asMock(ToolsStore.testNaturalDate).mockClear();
   });
@@ -53,23 +60,24 @@ describe('TabKeywordTimeRange', () => {
   const findValidationState = (container) => {
     const formGroup = container.querySelector('.form-group');
 
-    return formGroup && formGroup.className.includes('has-error')
-      ? 'error'
-      : null;
+    return formGroup && formGroup.className.includes('has-error') ? 'error' : null;
   };
 
-  // eslint-disable-next-line testing-library/no-unnecessary-act
-  const changeInput = async (input, value) => act(async () => {
-    const { name } = asElement(input, HTMLInputElement);
+  const changeInput = async (input, value) =>
+    // eslint-disable-next-line testing-library/no-unnecessary-act
+    act(async () => {
+      const { name } = asElement(input, HTMLInputElement);
 
-    fireEvent.change(input, { target: { value, name } });
-  });
+      fireEvent.change(input, { target: { value, name } });
+    });
 
   const asyncRender = async (element) => {
     let wrapper;
 
     // eslint-disable-next-line testing-library/no-unnecessary-act
-    await act(async () => { wrapper = render(element); });
+    await act(async () => {
+      wrapper = render(element);
+    });
 
     if (!wrapper) {
       throw new Error('Render returned `null`.');

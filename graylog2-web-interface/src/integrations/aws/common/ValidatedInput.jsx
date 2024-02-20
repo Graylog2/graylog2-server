@@ -26,7 +26,9 @@ const Label = ({ label, error }) => {
     return (
       <ErrorContainer>
         {label}
-        <Error><i className="fa fa-exclamation-triangle" /> {error}</Error>
+        <Error>
+          <i className="fa fa-exclamation-triangle" /> {error}
+        </Error>
       </ErrorContainer>
     );
   }
@@ -46,17 +48,19 @@ const ValidatedInput = ({ className, help, onChange, id, label, fieldData, type,
   };
 
   return (
-    <Input {...restProps}
-           id={id}
-           type={type}
-           onChange={onChange}
-           onBlur={checkValidity}
-           className={className}
-           bsStyle={(error && dirty && 'error') || undefined}
-           defaultValue={(type !== 'select' && value) || undefined}
-           value={(type === 'select' && value) || undefined}
-           label={<Label label={label} error={error} />}
-           help={help} />
+    <Input
+      {...restProps}
+      id={id}
+      type={type}
+      onChange={onChange}
+      onBlur={checkValidity}
+      className={className}
+      bsStyle={(error && dirty && 'error') || undefined}
+      defaultValue={(type !== 'select' && value) || undefined}
+      value={(type === 'select' && value) || undefined}
+      label={<Label label={label} error={error} />}
+      help={help}
+    />
   );
 };
 
@@ -68,10 +72,7 @@ ValidatedInput.propTypes = {
     value: PropTypes.string,
   }),
   help: PropTypes.string,
-  label: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.node,
-  ]).isRequired,
+  label: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
   id: PropTypes.string.isRequired,
   onChange: PropTypes.func,
   required: PropTypes.bool,

@@ -28,26 +28,32 @@ const extractDecorators = ({
   fieldValue,
   highlightingRules = [],
 }: {
-  fieldName: string,
-  fieldValue: any,
-  highlightingRules: Array<HighlightingRule>
-}) => highlightingRules.filter((rule) => rule.field === fieldName)
-  .find((rule) => rule.conditionFunc(fieldValue, rule.value));
+  fieldName: string;
+  fieldValue: any;
+  highlightingRules: Array<HighlightingRule>;
+}) =>
+  highlightingRules
+    .filter((rule) => rule.field === fieldName)
+    .find((rule) => rule.conditionFunc(fieldValue, rule.value));
 
 type Props = {
-  children?: React.ReactElement,
-  field: string,
-  value?: any,
+  children?: React.ReactElement;
+  field: string;
+  value?: any;
 };
 
 const CustomHighlighting = ({ children, field: fieldName, value: fieldValue }: Props) => {
   const highlightingRules = useContext(HighlightingRulesContext);
 
-  const matchingRule = useMemo(() => extractDecorators(({
-    fieldName,
-    fieldValue,
-    highlightingRules,
-  })), [fieldName, fieldValue, highlightingRules]);
+  const matchingRule = useMemo(
+    () =>
+      extractDecorators({
+        fieldName,
+        fieldValue,
+        highlightingRules,
+      }),
+    [fieldName, fieldValue, highlightingRules],
+  );
 
   return matchingRule ? <Highlight color={matchingRule.color.colorFor(fieldValue)}>{children}</Highlight> : children;
 };

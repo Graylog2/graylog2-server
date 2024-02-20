@@ -30,54 +30,70 @@ import type { SearchTypeIds } from 'views/logic/views/types';
 import Popover from 'components/common/Popover';
 
 type Props = PropsWithChildren & {
-  currentWidgetMapping: SearchTypeIds,
+  currentWidgetMapping: SearchTypeIds;
 };
 
 const TargetContainer = styled.div`
   cursor: pointer;
 `;
 
-const StyledTable = styled(Table)<{ $stickyHeader: boolean }>(({ theme }) => css`
-  margin-bottom: 0;
-  background-color: transparent;
+const StyledTable = styled(Table)<{ $stickyHeader: boolean }>(
+  ({ theme }) => css`
+    margin-bottom: 0;
+    background-color: transparent;
 
-  > tbody td {
-    background-color: ${theme.colors.global.contentBackground};
-    color: ${theme.utils.contrastingColor(theme.colors.global.contentBackground)};
-  }
-`);
+    > tbody td {
+      background-color: ${theme.colors.global.contentBackground};
+      color: ${theme.utils.contrastingColor(theme.colors.global.contentBackground)};
+    }
+  `,
+);
 
 type WidgetExecutionData = {
-  total: number,
-  duration: number,
-  timestamp: string,
-  effectiveTimerange: SearchTypeResult['effective_timerange'] | MessageResult['effectiveTimerange']
-}
+  total: number;
+  duration: number;
+  timestamp: string;
+  effectiveTimerange: SearchTypeResult['effective_timerange'] | MessageResult['effectiveTimerange'];
+};
 
-const HelpPopover = ({ widgetExecutionData }: { widgetExecutionData: WidgetExecutionData}) => (
+const HelpPopover = ({ widgetExecutionData }: { widgetExecutionData: WidgetExecutionData }) => (
   <StyledTable condensed>
     <tbody>
       <tr>
-        <td><i>Executed at:</i></td>
-        <td aria-label="Executed at"><Timestamp dateTime={widgetExecutionData?.timestamp} /></td>
+        <td>
+          <i>Executed at:</i>
+        </td>
+        <td aria-label="Executed at">
+          <Timestamp dateTime={widgetExecutionData?.timestamp} />
+        </td>
       </tr>
       <tr>
-        <td><i>Executed in:</i> </td>
+        <td>
+          <i>Executed in:</i>{' '}
+        </td>
         <td>{numeral(widgetExecutionData?.duration).format('0,0')}ms</td>
       </tr>
       <tr>
-        <td colSpan={2}><i>Effective time range:</i></td>
+        <td colSpan={2}>
+          <i>Effective time range:</i>
+        </td>
       </tr>
       <tr>
         <td>From</td>
-        <td aria-label="Effective time range from"><Timestamp dateTime={widgetExecutionData?.effectiveTimerange?.from} format="complete" /></td>
+        <td aria-label="Effective time range from">
+          <Timestamp dateTime={widgetExecutionData?.effectiveTimerange?.from} format="complete" />
+        </td>
       </tr>
       <tr>
         <td>To</td>
-        <td aria-label="Effective time range to"><Timestamp dateTime={widgetExecutionData?.effectiveTimerange?.to} format="complete" /></td>
+        <td aria-label="Effective time range to">
+          <Timestamp dateTime={widgetExecutionData?.effectiveTimerange?.to} format="complete" />
+        </td>
       </tr>
       <tr>
-        <td><i>Total results:</i></td>
+        <td>
+          <i>Total results:</i>
+        </td>
         <td>{numeral(widgetExecutionData?.total).format('0,0')}</td>
       </tr>
     </tbody>
@@ -93,13 +109,17 @@ const SearchQueryExecutionInfoHelper = ({ currentWidgetMapping, children }: Prop
     return result?.searchTypes?.[searchTypeId];
   }, [currentWidgetMapping, result?.searchTypes]);
 
-  const widgetExecutionData = useMemo<WidgetExecutionData>(() => ({
-    effectiveTimerange: (currentWidgetSearchType as MessageResult)?.effectiveTimerange || (currentWidgetSearchType as SearchTypeResult)?.effective_timerange,
-    total: currentWidgetSearchType?.total,
-    duration: result?.duration,
-    timestamp: result?.timestamp,
-
-  }), [currentWidgetSearchType, result?.duration, result?.timestamp]);
+  const widgetExecutionData = useMemo<WidgetExecutionData>(
+    () => ({
+      effectiveTimerange:
+        (currentWidgetSearchType as MessageResult)?.effectiveTimerange ||
+        (currentWidgetSearchType as SearchTypeResult)?.effective_timerange,
+      total: currentWidgetSearchType?.total,
+      duration: result?.duration,
+      timestamp: result?.timestamp,
+    }),
+    [currentWidgetSearchType, result?.duration, result?.timestamp],
+  );
 
   const onClose = useCallback(() => {
     setOpen(false);
@@ -112,7 +132,9 @@ const SearchQueryExecutionInfoHelper = ({ currentWidgetMapping, children }: Prop
   return (
     <Popover position="bottom" opened={open} onClose={onClose} closeOnClickOutside>
       <Popover.Target>
-        <TargetContainer role="presentation" onClick={onToggle}>{children}</TargetContainer>
+        <TargetContainer role="presentation" onClick={onToggle}>
+          {children}
+        </TargetContainer>
       </Popover.Target>
       <Popover.Dropdown title="Execution Info">
         {isEmpty(result) ? <i>No query executed yet.</i> : <HelpPopover widgetExecutionData={widgetExecutionData} />}

@@ -50,11 +50,10 @@ const CollectorRow = createReactClass({
 
     return (
       <tr>
+        <td>{collector.name}</td>
         <td>
-          {collector.name}
-        </td>
-        <td>
-          <OperatingSystemIcon operatingSystem={collector.node_operating_system} /> {upperFirst(collector.node_operating_system)}
+          <OperatingSystemIcon operatingSystem={collector.node_operating_system} />{' '}
+          {upperFirst(collector.node_operating_system)}
         </td>
         <td>
           <ButtonToolbar>
@@ -62,9 +61,7 @@ const CollectorRow = createReactClass({
               <Button bsSize="xsmall">Edit</Button>
             </LinkContainer>
             <DropdownButton id={`more-actions-${collector.id}`} title="More actions" bsSize="xsmall" pullRight>
-              <CopyCollectorModal collector={collector}
-                                  validateCollector={validateCollector}
-                                  copyCollector={onClone} />
+              <CopyCollectorModal collector={collector} validateCollector={validateCollector} copyCollector={onClone} />
               <MenuItem divider />
               <MenuItem onSelect={this.handleDelete}>Delete</MenuItem>
             </DropdownButton>

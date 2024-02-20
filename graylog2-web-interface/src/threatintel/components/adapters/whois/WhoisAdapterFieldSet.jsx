@@ -35,28 +35,32 @@ class WhoisAdapterFieldSet extends React.Component {
 
     return (
       <fieldset>
-        <Input type="number"
-               id="connect_timeout"
-               name="connect_timeout"
-               label="Connect timeout"
-               required
-               onChange={this.props.handleFormEvent}
-               help={this.props.validationMessage('connect_timeout', 'WHOIS connection timeout in milliseconds.')}
-               bsStyle={this.props.validationState('connect_timeout')}
-               value={config.connect_timeout}
-               labelClassName="col-sm-3"
-               wrapperClassName="col-sm-9" />
-        <Input type="number"
-               id="read_timeout"
-               name="read_timeout"
-               label="Read timeout"
-               required
-               onChange={this.props.handleFormEvent}
-               help={this.props.validationMessage('read_timeout', 'WHOIS connection read timeout in milliseconds.')}
-               bsStyle={this.props.validationState('read_timeout')}
-               value={config.read_timeout}
-               labelClassName="col-sm-3"
-               wrapperClassName="col-sm-9" />
+        <Input
+          type="number"
+          id="connect_timeout"
+          name="connect_timeout"
+          label="Connect timeout"
+          required
+          onChange={this.props.handleFormEvent}
+          help={this.props.validationMessage('connect_timeout', 'WHOIS connection timeout in milliseconds.')}
+          bsStyle={this.props.validationState('connect_timeout')}
+          value={config.connect_timeout}
+          labelClassName="col-sm-3"
+          wrapperClassName="col-sm-9"
+        />
+        <Input
+          type="number"
+          id="read_timeout"
+          name="read_timeout"
+          label="Read timeout"
+          required
+          onChange={this.props.handleFormEvent}
+          help={this.props.validationMessage('read_timeout', 'WHOIS connection read timeout in milliseconds.')}
+          bsStyle={this.props.validationState('read_timeout')}
+          value={config.read_timeout}
+          labelClassName="col-sm-3"
+          wrapperClassName="col-sm-9"
+        />
       </fieldset>
     );
   }

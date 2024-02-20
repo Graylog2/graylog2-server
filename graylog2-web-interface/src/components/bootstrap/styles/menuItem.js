@@ -16,49 +16,51 @@
  */
 import { css } from 'styled-components';
 
-const menuItemStyles = css(({ theme }) => css`
-  .dropdown-menu {
-    background-color: ${theme.colors.global.contentBackground};
-    box-shadow: 0 3px 3px ${theme.colors.global.navigationBoxShadow};
-    
-    .dropdown-header {
-      padding: 3px 10px;
-    }
-    
-    > li > a {
-      padding: 3px 10px;
-      display: flex;
-      color: ${theme.colors.global.textDefault};
+const menuItemStyles = css(
+  ({ theme }) => css`
+    .dropdown-menu {
+      background-color: ${theme.colors.global.contentBackground};
+      box-shadow: 0 3px 3px ${theme.colors.global.navigationBoxShadow};
 
-      &:hover,
-      &:focus {
+      .dropdown-header {
+        padding: 3px 10px;
+      }
+
+      > li > a {
+        padding: 3px 10px;
+        display: flex;
+        color: ${theme.colors.global.textDefault};
+
+        &:hover,
+        &:focus {
+          color: ${theme.colors.variant.darker.default};
+          background-color: ${theme.colors.variant.lightest.default};
+        }
+      }
+
+      > .active > a {
         color: ${theme.colors.variant.darker.default};
         background-color: ${theme.colors.variant.lightest.default};
+
+        &:hover,
+        &:focus {
+          color: ${theme.colors.variant.darkest.default};
+          background-color: ${theme.colors.variant.lighter.default};
+        }
       }
-    }
 
-    > .active > a {
-      color: ${theme.colors.variant.darker.default};
-      background-color: ${theme.colors.variant.lightest.default};
-
-      &:hover,
-      &:focus {
-        color: ${theme.colors.variant.darkest.default};
-        background-color: ${theme.colors.variant.lighter.default};
-      }
-    }
-
-    > .disabled > a {
-      color: ${theme.colors.variant.dark.default};
-      background-color: ${theme.colors.variant.lightest.default};
-
-      &:hover,
-      &:focus {
+      > .disabled > a {
         color: ${theme.colors.variant.dark.default};
         background-color: ${theme.colors.variant.lightest.default};
+
+        &:hover,
+        &:focus {
+          color: ${theme.colors.variant.dark.default};
+          background-color: ${theme.colors.variant.lightest.default};
+        }
       }
     }
-  }
-`);
+  `,
+);
 
 export default menuItemStyles;

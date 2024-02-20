@@ -20,37 +20,41 @@ import styled, { css } from 'styled-components';
 
 import styles from './EditableTitle.css';
 
-const StyledStaticSpan = styled.span(({ theme }) => css`
-  border: 1px solid ${theme.colors.global.contentBackground};
-  font-size: ${theme.fonts.size.large};
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
-`);
+const StyledStaticSpan = styled.span(
+  ({ theme }) => css`
+    border: 1px solid ${theme.colors.global.contentBackground};
+    font-size: ${theme.fonts.size.large};
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  `,
+);
 
-const StyledInput = styled.input(({ theme }) => css`
-  border: 1px solid ${theme.colors.input.border};
-  background-color: ${theme.colors.input.background};
-  color: ${theme.colors.input.color};
-  border-radius: 4px;
-  padding: 2px 3px;
-  font-size: ${theme.fonts.size.large};
-  
-  &:focus {
-    border-color: ${theme.colors.input.borderFocus};
-    outline: none;
-  }
-`);
+const StyledInput = styled.input(
+  ({ theme }) => css`
+    border: 1px solid ${theme.colors.input.border};
+    background-color: ${theme.colors.input.background};
+    color: ${theme.colors.input.color};
+    border-radius: 4px;
+    padding: 2px 3px;
+    font-size: ${theme.fonts.size.large};
+
+    &:focus {
+      border-color: ${theme.colors.input.borderFocus};
+      outline: none;
+    }
+  `,
+);
 
 type Props = {
-  disabled?: boolean,
-  onChange: (newTitle: string) => void,
-  value: string,
+  disabled?: boolean;
+  onChange: (newTitle: string) => void;
+  value: string;
 };
 
 type State = {
-  editing: boolean,
-  value: string,
+  editing: boolean;
+  value: string;
 };
 
 export default class EditableTitle extends React.Component<Props, State> {
@@ -118,14 +122,20 @@ export default class EditableTitle extends React.Component<Props, State> {
       <span>
         <form onSubmit={this._onSubmit} className={styles.inlineForm}>
           {}
-          <StyledInput autoFocus
-                       type="text"
-                       value={value}
-                       onBlur={this._onBlur}
-                       title="Edit title"
-                       onChange={this._onChange} />
+          <StyledInput
+            autoFocus
+            type="text"
+            value={value}
+            onBlur={this._onBlur}
+            title="Edit title"
+            onChange={this._onChange}
+          />
         </form>
       </span>
-    ) : <StyledStaticSpan onDoubleClick={this._toggleEditing} title={`${value} - Double click the title to edit it.`}>{value}</StyledStaticSpan>;
+    ) : (
+      <StyledStaticSpan onDoubleClick={this._toggleEditing} title={`${value} - Double click the title to edit it.`}>
+        {value}
+      </StyledStaticSpan>
+    );
   }
 }

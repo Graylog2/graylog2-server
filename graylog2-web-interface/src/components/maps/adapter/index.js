@@ -20,14 +20,19 @@ import MaxmindAdapterFieldSet from 'components/maps/adapter/MaxmindAdapterFieldS
 import MaxmindAdapterSummary from 'components/maps/adapter/MaxmindAdapterSummary';
 import MaxmindAdapterDocumentation from 'components/maps/adapter/MaxmindAdapterDocumentation';
 
-PluginStore.register(new PluginManifest({}, {
-  lookupTableAdapters: [
+PluginStore.register(
+  new PluginManifest(
+    {},
     {
-      type: 'maxmind_geoip',
-      displayName: 'Geo IP - MaxMind\u2122 or IPinfo Databases',
-      formComponent: MaxmindAdapterFieldSet,
-      summaryComponent: MaxmindAdapterSummary,
-      documentationComponent: MaxmindAdapterDocumentation,
+      lookupTableAdapters: [
+        {
+          type: 'maxmind_geoip',
+          displayName: 'Geo IP - MaxMind\u2122 or IPinfo Databases',
+          formComponent: MaxmindAdapterFieldSet,
+          summaryComponent: MaxmindAdapterSummary,
+          documentationComponent: MaxmindAdapterDocumentation,
+        },
+      ],
     },
-  ],
-}));
+  ),
+);

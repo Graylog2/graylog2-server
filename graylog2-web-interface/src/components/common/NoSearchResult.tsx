@@ -19,18 +19,16 @@ import * as React from 'react';
 import { Alert } from 'components/bootstrap';
 
 type Props = {
-  children: React.ReactNode,
-  className?: string,
+  children: React.ReactNode;
+  className?: string;
 };
 
 /**
  * Component used to display a simple alert message for a search that returned no matching results.
  * Usage should include utilizing the `children` props to supply the user with a descriptive message.
-*/
+ */
 const NoSearchResult = ({ children, className }: Props) => (
-  <Alert className={`${className ?? ''} no-bm`}>
-    {children || 'No data available.'}
-  </Alert>
+  <Alert className={`${className ?? ''} no-bm`}>{children || 'No data available.'}</Alert>
 );
 
 NoSearchResult.defaultProps = {

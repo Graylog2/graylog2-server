@@ -19,8 +19,8 @@ import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 
 type Props = {
-  children: Array<React.ReactElement | string> | React.ReactElement,
-  delay: number,
+  children: Array<React.ReactElement | string> | React.ReactElement;
+  delay: number;
 };
 
 const Delayed = ({ children, delay }: Props) => {

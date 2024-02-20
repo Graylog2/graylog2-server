@@ -24,15 +24,21 @@ import { IndexRangesActions } from 'stores/indices/IndexRangesStore';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 
 const _onRecalculateIndexRange = (indexSetId: string) => {
-  // eslint-disable-next-line no-alert
-  if (window.confirm('This will recalculate index ranges for this index set using a background system job. Do you want to proceed?')) {
+  if (
+    // eslint-disable-next-line no-alert
+    window.confirm(
+      'This will recalculate index ranges for this index set using a background system job. Do you want to proceed?',
+    )
+  ) {
     IndexRangesActions.recalculate(indexSetId);
   }
 };
 
 const _onCycleDeflector = (indexSetId: string) => {
-  // eslint-disable-next-line no-alert
-  if (window.confirm('This will manually cycle the current active write index on this index set. Do you want to proceed?')) {
+  if (
+    // eslint-disable-next-line no-alert
+    window.confirm('This will manually cycle the current active write index on this index set. Do you want to proceed?')
+  ) {
     DeflectorActions.cycle(indexSetId).then(() => {
       DeflectorActions.list(indexSetId);
     });
@@ -40,19 +46,29 @@ const _onCycleDeflector = (indexSetId: string) => {
 };
 
 type Props = {
-  indexSet: IndexSet,
-  indexSetId: string,
+  indexSet: IndexSet;
+  indexSetId: string;
 };
 
 const IndicesMaintenanceDropdown = ({ indexSet, indexSetId }: Props) => {
   const onCycleDeflector = useCallback(() => _onCycleDeflector(indexSetId), [indexSetId]);
   const onRecalculateIndexRange = useCallback(() => _onRecalculateIndexRange(indexSetId), [indexSetId]);
-  const cycleButton = useMemo(() => (indexSet?.writable ? <MenuItem eventKey="2" onClick={onCycleDeflector}>Rotate active write index</MenuItem> : null), [indexSet?.writable, onCycleDeflector]);
+  const cycleButton = useMemo(
+    () =>
+      indexSet?.writable ? (
+        <MenuItem eventKey="2" onClick={onCycleDeflector}>
+          Rotate active write index
+        </MenuItem>
+      ) : null,
+    [indexSet?.writable, onCycleDeflector],
+  );
 
   return (
     <ButtonGroup>
       <DropdownButton bsStyle="info" title="Maintenance" id="indices-maintenance-actions" pullRight>
-        <MenuItem eventKey="1" onClick={onRecalculateIndexRange}>Recalculate index ranges</MenuItem>
+        <MenuItem eventKey="1" onClick={onRecalculateIndexRange}>
+          Recalculate index ranges
+        </MenuItem>
         {cycleButton}
       </DropdownButton>
     </ButtonGroup>

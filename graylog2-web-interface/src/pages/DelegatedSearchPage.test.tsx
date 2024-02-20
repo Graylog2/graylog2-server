@@ -28,15 +28,20 @@ describe('DelegatedSearchPage', () => {
   it('Renders other components if registered', async () => {
     const SimpleComponent = () => <div>Hello!</div>;
 
-    PluginStore.register(new PluginManifest({}, {
-      pages: {
-        search: { component: SimpleComponent },
-      },
-      'views.reducers': [
-        { key: 'view', reducer: viewSliceReducer },
-        { key: 'searchExecution', reducer: searchExecutionSliceReducer },
-      ],
-    }));
+    PluginStore.register(
+      new PluginManifest(
+        {},
+        {
+          pages: {
+            search: { component: SimpleComponent },
+          },
+          'views.reducers': [
+            { key: 'view', reducer: viewSliceReducer },
+            { key: 'searchExecution', reducer: searchExecutionSliceReducer },
+          ],
+        },
+      ),
+    );
 
     render(
       <TestStoreProvider>

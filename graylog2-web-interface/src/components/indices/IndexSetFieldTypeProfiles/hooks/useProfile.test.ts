@@ -68,6 +68,7 @@ describe('useProfiles custom hook', () => {
 
     expect(UserNotification.error).toHaveBeenCalledWith(
       'Loading index field type profile failed with status: Error: Error',
-      'Could not load index field type profile');
+      'Could not load index field type profile',
+    );
   });
 });

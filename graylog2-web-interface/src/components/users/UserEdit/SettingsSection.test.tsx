@@ -25,13 +25,11 @@ import Grantee from 'logic/permissions/Grantee';
 
 import SettingsSection from './SettingsSection';
 
-const sharedEntity = SharedEntity
-  .builder()
+const sharedEntity = SharedEntity.builder()
   .id('grn::::dashboard:57bc9188e62a2373778d9e03')
   .type('dashboard')
   .title('Security Data')
-  .owners(List([Grantee.builder().id('foo-id').title('alice').type('user')
-    .build()]))
+  .owners(List([Grantee.builder().id('foo-id').title('alice').type('user').build()]))
   .build();
 
 const mockList = Promise.resolve({ list: List.of(sharedEntity) });
@@ -42,10 +40,7 @@ jest.mock('stores/permissions/EntityShareStore', () => ({
   },
 }));
 
-const exampleUser = alice.toBuilder()
-  .sessionTimeoutMs(36000000)
-  .timezone('Europe/Berlin')
-  .build();
+const exampleUser = alice.toBuilder().sessionTimeoutMs(36000000).timezone('Europe/Berlin').build();
 
 describe('<SettingsSection />', () => {
   it('should use user settings as initial values', async () => {

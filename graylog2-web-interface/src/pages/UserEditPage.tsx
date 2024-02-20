@@ -29,17 +29,18 @@ import type User from 'logic/users/User';
 
 type Props = {
   params: {
-    userId: string,
-  },
+    userId: string;
+  };
 };
 
 const PageTitle = ({ fullName }: { fullName: string | null | undefined }) => (
   <>
-    Edit User {fullName && (
+    Edit User{' '}
+    {fullName && (
       <>
         - <i>{fullName}</i>
       </>
-  )}
+    )}
   </>
 );
 
@@ -64,18 +65,15 @@ const UserEditPage = ({ params }: Props) => {
   return (
     <DocumentTitle title={`Edit User ${fullName}`}>
       <UsersPageNavigation />
-      <PageHeader title={<PageTitle fullName={fullName} />}
-                  actions={(
-                    <UserActionLinks userId={userId}
-                                     userIsReadOnly={readOnly} />
-                  )}
-                  documentationLink={{
-                    title: 'Permissions documentation',
-                    path: DocsHelper.PAGES.USERS_ROLES,
-                  }}>
-        <span>
-          You can change the user details and password here and assign roles and teams.
-        </span>
+      <PageHeader
+        title={<PageTitle fullName={fullName} />}
+        actions={<UserActionLinks userId={userId} userIsReadOnly={readOnly} />}
+        documentationLink={{
+          title: 'Permissions documentation',
+          path: DocsHelper.PAGES.USERS_ROLES,
+        }}
+      >
+        <span>You can change the user details and password here and assign roles and teams.</span>
       </PageHeader>
       <UserEdit user={userToEdit} />
     </DocumentTitle>

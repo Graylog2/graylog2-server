@@ -54,17 +54,18 @@ const loadDashboardsResponse = (count = 1) => {
   if (count > 0) {
     // eslint-disable-next-line no-plusplus
     for (let i = 0; i < count; i++) {
-      const simpleView = (): View => View.builder()
-        .type('DASHBOARD')
-        .id(`search-id-${i}`)
-        .title(`search-title-${i}`)
-        .description('desc')
-        .owner('Bob')
-        .createdAt(new Date())
-        .requires({})
-        .search(Search.builder().id('search.id').build())
-        .favorite(true)
-        .build();
+      const simpleView = (): View =>
+        View.builder()
+          .type('DASHBOARD')
+          .id(`search-id-${i}`)
+          .title(`search-title-${i}`)
+          .description('desc')
+          .owner('Bob')
+          .createdAt(new Date())
+          .requires({})
+          .search(Search.builder().id('search.id').build())
+          .favorite(true)
+          .build();
       dashboards.push(simpleView());
     }
   }
@@ -106,7 +107,7 @@ describe('DashboardsOverview', () => {
   beforeEach(() => {
     asMock(useUserLayoutPreferences).mockReturnValue({ data: layoutPreferences, isInitialLoading: false });
     asMock(useDashboards).mockReturnValue(loadDashboardsResponse(0));
-    asMock(useQueryParam).mockImplementation(() => ([undefined, () => {}]));
+    asMock(useQueryParam).mockImplementation(() => [undefined, () => {}]);
   });
 
   it('should render empty', async () => {

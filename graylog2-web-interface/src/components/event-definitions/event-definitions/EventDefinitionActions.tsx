@@ -19,15 +19,8 @@ import { useState } from 'react';
 
 import Routes from 'routing/Routes';
 import { LinkContainer } from 'components/common/router';
-import {
-  IfPermitted,
-  ShareButton,
-  ConfirmDialog,
-} from 'components/common';
-import {
-  ButtonToolbar,
-  MenuItem,
-} from 'components/bootstrap';
+import { IfPermitted, ShareButton, ConfirmDialog } from 'components/common';
+import { ButtonToolbar, MenuItem } from 'components/bootstrap';
 import useGetPermissionsByScope from 'hooks/useScopePermissions';
 import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
 import EntityShareModal from 'components/permissions/EntityShareModal';
@@ -42,9 +35,9 @@ import MoreActions from 'components/common/EntityDataTable/MoreActions';
 import type { EventDefinition } from '../event-definitions-types';
 
 type Props = {
-  eventDefinition: EventDefinition,
-  refetchEventDefinitions: () => void,
-}
+  eventDefinition: EventDefinition;
+  refetchEventDefinitions: () => void;
+};
 
 const DIALOG_TYPES = {
   COPY: 'copy',
@@ -166,22 +159,28 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
 
         break;
       case 'delete':
-        EventDefinitionsActions.delete(currentDefinition).then(
-          () => {
-            deselectEntity(currentDefinition.id);
+        EventDefinitionsActions.delete(currentDefinition)
+          .then(
+            () => {
+              deselectEntity(currentDefinition.id);
 
-            UserNotification.success('Event Definition deleted successfully',
-              `Event Definition "${eventDefinition.title}" was deleted successfully.`);
-          },
-          (error) => {
-            const errorStatus = error?.additional?.body?.errors?.dependency.join(' ') || error;
+              UserNotification.success(
+                'Event Definition deleted successfully',
+                `Event Definition "${eventDefinition.title}" was deleted successfully.`,
+              );
+            },
+            (error) => {
+              const errorStatus = error?.additional?.body?.errors?.dependency.join(' ') || error;
 
-            UserNotification.error(`Deleting Event Definition "${eventDefinition.title}" failed with status: ${errorStatus}`,
-              'Could not delete Event Definition');
-          },
-        ).finally(() => {
-          handleClearState();
-        });
+              UserNotification.error(
+                `Deleting Event Definition "${eventDefinition.title}" failed with status: ${errorStatus}`,
+                'Could not delete Event Definition',
+              );
+            },
+          )
+          .finally(() => {
+            handleClearState();
+          });
 
         break;
       case 'enable':
@@ -206,68 +205,78 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
   return (
     <>
       <ButtonToolbar key={`actions-${eventDefinition.id}`}>
-        <ShareButton entityId={eventDefinition.id}
-                     entityType="event_definition"
-                     onClick={handleShare}
-                     bsSize="xsmall" />
+        <ShareButton
+          entityId={eventDefinition.id}
+          entityType="event_definition"
+          onClick={handleShare}
+          bsSize="xsmall"
+        />
         <MoreActions>
           <IfPermitted permissions={`eventdefinitions:edit:${eventDefinition.id}`}>
             <LinkContainer to={Routes.ALERTS.DEFINITIONS.edit(eventDefinition.id)}>
-              <MenuItem data-testid="edit-button">
-                Edit
-              </MenuItem>
+              <MenuItem data-testid="edit-button">Edit</MenuItem>
             </LinkContainer>
           </IfPermitted>
           {!isSystemEventDefinition() && (
             <MenuItem onClick={() => handleAction(DIALOG_TYPES.COPY, eventDefinition)}>Duplicate</MenuItem>
           )}
           <MenuItem divider />
-          <MenuItem disabled={isSystemEventDefinition()}
-                    title={isSystemEventDefinition() ? 'System Event Definition cannot be disabled' : undefined}
-                    onClick={isSystemEventDefinition() ? undefined : () => handleAction(isEnabled ? DIALOG_TYPES.DISABLE : DIALOG_TYPES.ENABLE, eventDefinition)}>
+          <MenuItem
+            disabled={isSystemEventDefinition()}
+            title={isSystemEventDefinition() ? 'System Event Definition cannot be disabled' : undefined}
+            onClick={
+              isSystemEventDefinition()
+                ? undefined
+                : () => handleAction(isEnabled ? DIALOG_TYPES.DISABLE : DIALOG_TYPES.ENABLE, eventDefinition)
+            }
+          >
             {isEnabled ? 'Disable' : 'Enable'}
           </MenuItem>
 
           {showActions() && (
             <IfPermitted permissions={`eventdefinitions:delete:${eventDefinition.id}`}>
               <MenuItem divider />
-              <MenuItem disabled={isSystemEventDefinition()}
-                        title={isSystemEventDefinition() ? 'System Event Definition cannot be deleted' : undefined}
-                        onClick={isSystemEventDefinition() ? undefined : () => handleAction(DIALOG_TYPES.DELETE, eventDefinition)}
-                        data-testid="delete-button">Delete
+              <MenuItem
+                disabled={isSystemEventDefinition()}
+                title={isSystemEventDefinition() ? 'System Event Definition cannot be deleted' : undefined}
+                onClick={
+                  isSystemEventDefinition() ? undefined : () => handleAction(DIALOG_TYPES.DELETE, eventDefinition)
+                }
+                data-testid="delete-button"
+              >
+                Delete
               </MenuItem>
             </IfPermitted>
           )}
-          {
-            isAggregationEventDefinition() && (
-              <>
-                <MenuItem divider />
-                <LinkContainer to={Routes.ALERTS.DEFINITIONS.replay_search(eventDefinition.id)}>
-                  <MenuItem>
-                    Replay search
-                  </MenuItem>
-                </LinkContainer>
-
-              </>
-            )
-          }
+          {isAggregationEventDefinition() && (
+            <>
+              <MenuItem divider />
+              <LinkContainer to={Routes.ALERTS.DEFINITIONS.replay_search(eventDefinition.id)}>
+                <MenuItem>Replay search</MenuItem>
+              </LinkContainer>
+            </>
+          )}
         </MoreActions>
       </ButtonToolbar>
       {showDialog && (
-        <ConfirmDialog title={DIALOG_TEXT[dialogType].dialogTitle}
-                       show
-                       onConfirm={handleConfirm}
-                       onCancel={handleClearState}>
+        <ConfirmDialog
+          title={DIALOG_TEXT[dialogType].dialogTitle}
+          show
+          onConfirm={handleConfirm}
+          onCancel={handleClearState}
+        >
           {DIALOG_TEXT[dialogType].dialogBody(currentDefinition.title)}
         </ConfirmDialog>
       )}
       {showEntityShareModal && (
-        <EntityShareModal entityId={eventDefinition.id}
-                          entityType="event_definition"
-                          entityTypeTitle="event definition"
-                          entityTitle={eventDefinition.title}
-                          description="Search for a User or Team to add as collaborator on this event definition."
-                          onClose={() => setShowEntityShareModal(false)} />
+        <EntityShareModal
+          entityId={eventDefinition.id}
+          entityType="event_definition"
+          entityTypeTitle="event definition"
+          entityTitle={eventDefinition.title}
+          description="Search for a User or Team to add as collaborator on this event definition."
+          onClose={() => setShowEntityShareModal(false)}
+        />
       )}
     </>
   );

@@ -47,11 +47,14 @@ const mockConfig = {
 };
 
 jest.mock('stores/configurations/ConfigurationsStore', () => ({
-  ConfigurationsStore: MockStore(['getInitialState', () => ({
-    configuration: {
-      'org.graylog2.system.urlwhitelist.UrlWhitelist': mockConfig,
-    },
-  })]),
+  ConfigurationsStore: MockStore([
+    'getInitialState',
+    () => ({
+      configuration: {
+        'org.graylog2.system.urlwhitelist.UrlWhitelist': mockConfig,
+      },
+    }),
+  ]),
   ConfigurationsActions: {
     list: jest.fn(() => Promise.resolve()),
   },

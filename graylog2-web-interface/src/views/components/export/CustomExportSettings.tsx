@@ -21,11 +21,12 @@ import type Widget from 'views/logic/widgets/Widget';
 import { widgetDefinition } from 'views/logic/Widgets';
 
 type Props = {
-  widget: Widget,
-}
+  widget: Widget;
+};
 
 const CustomExportSettings = ({ widget }: Props) => {
-  const { exportComponent: ExportComponent = () => null } = useMemo(() => (widget?.type && widgetDefinition(widget.type)), [widget]) ?? {};
+  const { exportComponent: ExportComponent = () => null } =
+    useMemo(() => widget?.type && widgetDefinition(widget.type), [widget]) ?? {};
 
   return <ExportComponent widget={widget} />;
 };

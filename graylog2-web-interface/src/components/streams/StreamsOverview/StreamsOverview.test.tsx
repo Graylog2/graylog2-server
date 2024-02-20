@@ -39,11 +39,12 @@ jest.mock('stores/inputs/StreamRulesInputsStore', () => ({
   StreamRulesInputsActions: {
     list: jest.fn(),
   },
-  StreamRulesInputsStore: MockStore(['getInitialState', () => ({
-    inputs: [
-      { id: 'my-id', title: 'input title', name: 'name' },
-    ],
-  })]),
+  StreamRulesInputsStore: MockStore([
+    'getInitialState',
+    () => ({
+      inputs: [{ id: 'my-id', title: 'input title', name: 'name' }],
+    }),
+  ]),
 }));
 
 const attributes = [
@@ -75,11 +76,12 @@ const paginatedStreams = (exampleStream = stream) => ({
 });
 
 describe('StreamsOverview', () => {
-  const renderSut = () => render(
-    <QueryParamProvider adapter={ReactRouter6Adapter}>
-      <StreamsOverview indexSets={indexSets} />
-    </QueryParamProvider>,
-  );
+  const renderSut = () =>
+    render(
+      <QueryParamProvider adapter={ReactRouter6Adapter}>
+        <StreamsOverview indexSets={indexSets} />
+      </QueryParamProvider>,
+    );
 
   beforeEach(() => {
     asMock(useUserLayoutPreferences).mockReturnValue({
@@ -91,7 +93,7 @@ describe('StreamsOverview', () => {
   });
 
   it('should render empty', async () => {
-    const emptyPaginatedStreams = ({
+    const emptyPaginatedStreams = {
       data: {
         pagination: {
           total: 0,
@@ -104,7 +106,7 @@ describe('StreamsOverview', () => {
       },
       refetch: () => {},
       isInitialLoading: false,
-    });
+    };
     asMock(useStreams).mockReturnValue(emptyPaginatedStreams);
 
     renderSut();

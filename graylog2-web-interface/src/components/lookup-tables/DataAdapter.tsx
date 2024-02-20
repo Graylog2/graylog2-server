@@ -29,7 +29,7 @@ import type { DataAdapterPluginType } from './types';
 import ConfigSummaryDefinitionListWrapper from './ConfigSummaryDefinitionListWrapper';
 
 type Props = {
-  dataAdapter: LookupTableAdapter,
+  dataAdapter: LookupTableAdapter;
 };
 
 const DataAdapter = ({ dataAdapter }: Props) => {
@@ -49,7 +49,9 @@ const DataAdapter = ({ dataAdapter }: Props) => {
     });
   };
 
-  const plugin = usePluginEntities('lookupTableAdapters').find((p: DataAdapterPluginType) => p.type === dataAdapter.config?.type);
+  const plugin = usePluginEntities('lookupTableAdapters').find(
+    (p: DataAdapterPluginType) => p.type === dataAdapter.config?.type,
+  );
 
   if (!plugin) {
     return <p>Unknown data adapter type {dataAdapter.config.type}. Is the plugin missing?</p>;
@@ -62,9 +64,7 @@ const DataAdapter = ({ dataAdapter }: Props) => {
     <Row className="content">
       <Col md={6}>
         <h2>
-          {adapterTitle}
-          {' '}
-          <small>({plugin.displayName})</small>
+          {adapterTitle} <small>({plugin.displayName})</small>
         </h2>
         <ConfigSummaryDefinitionListWrapper>
           <dl>
@@ -76,9 +76,11 @@ const DataAdapter = ({ dataAdapter }: Props) => {
         <ConfigSummaryDefinitionListWrapper>
           {React.createElement(summary, { dataAdapter: dataAdapter })}
         </ConfigSummaryDefinitionListWrapper>
-        {(!loadingScopePermissions && scopePermissions?.is_mutable) && (
+        {!loadingScopePermissions && scopePermissions?.is_mutable && (
           <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(adapterName)}>
-            <Button bsStyle="success" role="button" name="edit">Edit</Button>
+            <Button bsStyle="success" role="button" name="edit">
+              Edit
+            </Button>
           </LinkContainer>
         )}
       </Col>
@@ -87,15 +89,19 @@ const DataAdapter = ({ dataAdapter }: Props) => {
         <p>You can manually trigger the data adapter using this form. The data will be not cached.</p>
         <form onSubmit={_lookupKey}>
           <fieldset>
-            <Input type="text"
-                   id="key"
-                   name="key"
-                   label="Key"
-                   required
-                   onChange={_onChange}
-                   help="Key to look up a value for."
-                   value={lookupKey} />
-            <Button type="submit" bsStyle="success">Look up</Button>
+            <Input
+              type="text"
+              id="key"
+              name="key"
+              label="Key"
+              required
+              onChange={_onChange}
+              help="Key to look up a value for."
+              value={lookupKey}
+            />
+            <Button type="submit" bsStyle="success">
+              Look up
+            </Button>
           </fieldset>
         </form>
         {lookupResult && (

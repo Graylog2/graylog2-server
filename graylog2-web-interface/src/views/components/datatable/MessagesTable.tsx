@@ -24,129 +24,129 @@ const MessagesContainer = styled.div`
   width: 100%;
 `;
 
-const StyledTable = styled(Table)<{ $stickyHeader: boolean }>(({ theme, $stickyHeader }) => css`
-  position: relative;
-  font-size: ${theme.fonts.size.small};
-  margin: 0;
-  border-collapse: collapse;
-  width: 100%;
-  word-break: break-all;
-  
-  thead {
-    ${$stickyHeader
-    ? `position: sticky;
+const StyledTable = styled(Table)<{ $stickyHeader: boolean }>(
+  ({ theme, $stickyHeader }) => css`
+    position: relative;
+    font-size: ${theme.fonts.size.small};
+    margin: 0;
+    border-collapse: collapse;
+    width: 100%;
+    word-break: break-all;
+
+    thead {
+      ${$stickyHeader
+        ? `position: sticky;
     top: 0;
-    z-index: 2` : ''}
-  }
-  
-  thead > tr {
-    color: ${theme.colors.global.textAlt};
-  }
-  
-  td,
-  th {
-    position: relative;
-  }
-
-  > tbody td {
-    background-color: ${theme.colors.global.contentBackground};
-    color: ${theme.utils.contrastingColor(theme.colors.global.contentBackground)};
-  }
-
-  &.table-striped > tbody > tr:nth-of-type(odd) > td {
-    background-color: ${theme.colors.global.contentBackground};
-  }
-
-  &.table-striped > tbody > tr:nth-of-type(even) > td {
-    background-color: ${theme.colors.table.background};
-  }
-
-  tr {
-    border: 0 !important;
-  }
-
-  tr.message-group {
-    border-top: 0;
-  }
-
-  tbody.message-group-toggled {
-    border-left: 7px solid ${theme.colors.variant.light.info};
-  }
-
-  tbody.message-highlight {
-    border-left: 7px solid ${theme.colors.variant.light.success};
-  }
-
-  tr.fields-row {
-    cursor: pointer;
-
-    td {
-      min-width: 50px;
-      padding-top: 10px;
+    z-index: 2`
+        : ''}
     }
-  }
 
-  tr.message-row td {
-    border-top: 0;
-    padding-top: 0;
-    padding-bottom: 5px;
-    font-family: ${theme.fonts.family.monospace};
-    color: ${theme.colors.variant.dark.info};
-  }
+    thead > tr {
+      color: ${theme.colors.global.textAlt};
+    }
 
-  tr.message-row {
-    margin-bottom: 5px;
-    cursor: pointer;
-  }
+    td,
+    th {
+      position: relative;
+    }
 
-  tr.message-detail-row {
-    display: none;
-  }
+    > tbody td {
+      background-color: ${theme.colors.global.contentBackground};
+      color: ${theme.utils.contrastingColor(theme.colors.global.contentBackground)};
+    }
 
-  tr.message-detail-row td {
-    padding-top: 5px;
-    border-top: 0;
-  }
+    &.table-striped > tbody > tr:nth-of-type(odd) > td {
+      background-color: ${theme.colors.global.contentBackground};
+    }
 
-  tr.message-detail-row .row {
-    margin-right: 0;
-  }
+    &.table-striped > tbody > tr:nth-of-type(even) > td {
+      background-color: ${theme.colors.table.background};
+    }
 
-  tr.message-detail-row div[class*='col-'] {
-    padding-right: 0;
-  }
+    tr {
+      border: 0 !important;
+    }
 
-  th i.sort-order-desc {
-    position: relative;
-    top: -1px;
-  }
+    tr.message-group {
+      border-top: 0;
+    }
 
-  th i.sort-order-item {
-    margin-right: 2px;
-    color: ${theme.colors.gray[10]};
-    visibility: hidden;
-  }
+    tbody.message-group-toggled {
+      border-left: 7px solid ${theme.colors.variant.light.info};
+    }
 
-  th i.sort-order-active,
-  th:hover i.sort-order-item {
-    color: ${theme.colors.global.textAlt};
-  }
-`);
+    tbody.message-highlight {
+      border-left: 7px solid ${theme.colors.variant.light.success};
+    }
+
+    tr.fields-row {
+      cursor: pointer;
+
+      td {
+        min-width: 50px;
+        padding-top: 10px;
+      }
+    }
+
+    tr.message-row td {
+      border-top: 0;
+      padding-top: 0;
+      padding-bottom: 5px;
+      font-family: ${theme.fonts.family.monospace};
+      color: ${theme.colors.variant.dark.info};
+    }
+
+    tr.message-row {
+      margin-bottom: 5px;
+      cursor: pointer;
+    }
+
+    tr.message-detail-row {
+      display: none;
+    }
+
+    tr.message-detail-row td {
+      padding-top: 5px;
+      border-top: 0;
+    }
+
+    tr.message-detail-row .row {
+      margin-right: 0;
+    }
+
+    tr.message-detail-row div[class*='col-'] {
+      padding-right: 0;
+    }
+
+    th i.sort-order-desc {
+      position: relative;
+      top: -1px;
+    }
+
+    th i.sort-order-item {
+      margin-right: 2px;
+      color: ${theme.colors.gray[10]};
+      visibility: hidden;
+    }
+
+    th i.sort-order-active,
+    th:hover i.sort-order-item {
+      color: ${theme.colors.global.textAlt};
+    }
+  `,
+);
 
 type Props = {
-  children: React.ReactNode,
-  striped?: boolean,
-  bordered?: boolean,
-  stickyHeader?: boolean,
-  condensed?: boolean,
+  children: React.ReactNode;
+  striped?: boolean;
+  bordered?: boolean;
+  stickyHeader?: boolean;
+  condensed?: boolean;
 };
 
 const MessagesTable = ({ children, condensed, striped, bordered, stickyHeader }: Props) => (
   <MessagesContainer>
-    <StyledTable condensed={condensed}
-                 striped={striped}
-                 bordered={bordered}
-                 $stickyHeader={stickyHeader}>
+    <StyledTable condensed={condensed} striped={striped} bordered={bordered} $stickyHeader={stickyHeader}>
       {children}
     </StyledTable>
   </MessagesContainer>

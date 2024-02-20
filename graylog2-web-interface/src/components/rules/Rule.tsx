@@ -34,9 +34,9 @@ import RuleHelper from './rule-helper/RuleHelper';
 import PipelinesPageNavigation from '../pipelines/PipelinesPageNavigation';
 
 type Props = {
-  create: boolean,
-  title: string,
-  isRuleBuilder: boolean,
+  create: boolean;
+  title: string;
+  isRuleBuilder: boolean;
 };
 
 const Rule = ({ create, title, isRuleBuilder }: Props) => {
@@ -51,36 +51,46 @@ const Rule = ({ create, title, isRuleBuilder }: Props) => {
   if (create) {
     pageTitle = 'Create pipeline rule';
   } else {
-    pageTitle = <span>Pipeline rule <em>{title}</em></span>;
+    pageTitle = (
+      <span>
+        Pipeline rule <em>{title}</em>
+      </span>
+    );
   }
 
   return (
     <div>
       <PipelinesPageNavigation />
-      <PageHeader title={pageTitle}
-                  actions={(isRuleBuilder && create) ? (
-                    <Button bsStyle="success"
-                            bsSize="small"
-                            onClick={() => {
-                              sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.USE_SOURCE_CODE_EDITOR_CLICKED, {
-                                app_pathname: getPathnameWithoutId(pathname),
-                                app_section: 'pipeline-rules',
-                                app_action_value: 'source-code-editor-button',
-                              });
+      <PageHeader
+        title={pageTitle}
+        actions={
+          isRuleBuilder && create ? (
+            <Button
+              bsStyle="success"
+              bsSize="small"
+              onClick={() => {
+                sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.USE_SOURCE_CODE_EDITOR_CLICKED, {
+                  app_pathname: getPathnameWithoutId(pathname),
+                  app_section: 'pipeline-rules',
+                  app_action_value: 'source-code-editor-button',
+                });
 
-                              setShowConfirmSourceCodeEditor(true);
-                            }}>
-                      Use Source Code Editor
-                    </Button>
-                  ) : undefined}
-                  documentationLink={{
-                    title: 'Pipeline rules documentation',
-                    path: DocsHelper.PAGES.PIPELINE_RULES,
-                  }}>
+                setShowConfirmSourceCodeEditor(true);
+              }}
+            >
+              Use Source Code Editor
+            </Button>
+          ) : undefined
+        }
+        documentationLink={{
+          title: 'Pipeline rules documentation',
+          path: DocsHelper.PAGES.PIPELINE_RULES,
+        }}
+      >
         <span>
-          Rules are a way of applying changes to messages in Graylog. A rule consists of a condition and a list{' '}
-          of actions.{' '}
-          Graylog evaluates the condition against a message and executes the actions if the condition is satisfied.
+          Rules are a way of applying changes to messages in Graylog. A rule consists of a condition and a list of
+          actions. Graylog evaluates the condition against a message and executes the actions if the condition is
+          satisfied.
         </span>
       </PageHeader>
 
@@ -98,27 +108,29 @@ const Rule = ({ create, title, isRuleBuilder }: Props) => {
       )}
 
       {showConfirmSourceCodeEditor && (
-        <BootstrapModalConfirm showModal
-                               title="Switch to Source Code Editor"
-                               onConfirm={() => {
-                                 sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.SWITCH_TO_SOURCE_CODE_EDITOR_CONFIRM_CLICKED, {
-                                   app_pathname: getPathnameWithoutId(pathname),
-                                   app_section: 'pipeline-rules',
-                                   app_action_value: 'confirm-button',
-                                 });
+        <BootstrapModalConfirm
+          showModal
+          title="Switch to Source Code Editor"
+          onConfirm={() => {
+            sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.SWITCH_TO_SOURCE_CODE_EDITOR_CONFIRM_CLICKED, {
+              app_pathname: getPathnameWithoutId(pathname),
+              app_section: 'pipeline-rules',
+              app_action_value: 'confirm-button',
+            });
 
-                                 history.push(Routes.SYSTEM.PIPELINES.RULE('new'));
-                                 setShowConfirmSourceCodeEditor(false);
-                               }}
-                               onCancel={() => {
-                                 sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.SWITCH_TO_SOURCE_CODE_EDITOR_CANCEL_CLICKED, {
-                                   app_pathname: getPathnameWithoutId(pathname),
-                                   app_section: 'pipeline-rules',
-                                   app_action_value: 'cancel-button',
-                                 });
+            history.push(Routes.SYSTEM.PIPELINES.RULE('new'));
+            setShowConfirmSourceCodeEditor(false);
+          }}
+          onCancel={() => {
+            sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.SWITCH_TO_SOURCE_CODE_EDITOR_CANCEL_CLICKED, {
+              app_pathname: getPathnameWithoutId(pathname),
+              app_section: 'pipeline-rules',
+              app_action_value: 'cancel-button',
+            });
 
-                                 setShowConfirmSourceCodeEditor(false);
-                               }}>
+            setShowConfirmSourceCodeEditor(false);
+          }}
+        >
           <div>You are about to leave this page and go to the Source Code Editor.</div>
           <div>Make sure you have no unsaved changes.</div>
         </BootstrapModalConfirm>

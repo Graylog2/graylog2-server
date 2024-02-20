@@ -36,8 +36,8 @@ const STATUS_COPIED = 'Copied!';
 const STATUS_AUTOSAVED = 'Auto saved.';
 const STATUS_DEFAULT = '';
 
-type Position = { x: number, y: number };
-type ScratchpadSize = { width: string, height: string }
+type Position = { x: number; y: number };
+type ScratchpadSize = { width: string; height: string };
 
 const ContentArea = styled.div`
   display: flex;
@@ -45,23 +45,28 @@ const ContentArea = styled.div`
   height: 100%;
 `;
 
-const Textarea = styled.textarea<{ $copied: boolean }>(({ $copied, theme }) => css`
-  width: 100%;
-  padding: 3px;
-  resize: none;
-  flex: 1;
-  margin: 15px 0 7px;
-  border: 1px solid ${$copied ? theme.colors.variant.success : theme.colors.variant.lighter.default};
-  box-shadow: inset 1px 1px 1px rgb(0 0 0 / 7.5%)${$copied && `, 0 0 8px ${chroma(theme.colors.variant.success).alpha(0.4).css()}`};
-  transition: border 150ms ease-in-out, box-shadow 150ms ease-in-out;
-  font-family: ${theme.fonts.family.monospace};
-  font-size: ${theme.fonts.size.body};
+const Textarea = styled.textarea<{ $copied: boolean }>(
+  ({ $copied, theme }) => css`
+    width: 100%;
+    padding: 3px;
+    resize: none;
+    flex: 1;
+    margin: 15px 0 7px;
+    border: 1px solid ${$copied ? theme.colors.variant.success : theme.colors.variant.lighter.default};
+    box-shadow: inset 1px 1px 1px rgb(0 0 0 / 7.5%)
+      ${$copied && `, 0 0 8px ${chroma(theme.colors.variant.success).alpha(0.4).css()}`};
+    transition:
+      border 150ms ease-in-out,
+      box-shadow 150ms ease-in-out;
+    font-family: ${theme.fonts.family.monospace};
+    font-size: ${theme.fonts.size.body};
 
-  &:focus {
-    border-color: ${theme.colors.variant.light.info};
-    outline: none;
-  }
-`);
+    &:focus {
+      border-color: ${theme.colors.variant.light.info};
+      outline: none;
+    }
+  `,
+);
 
 const StyledAlert = styled(Alert)`
   && {
@@ -77,20 +82,24 @@ const AlertNote = styled.em`
   flex: 1;
 `;
 
-const Footer = styled.footer(({ theme }) => css`
-  display: flex;
-  align-items: center;
-  padding: 7px 0 9px;
-  border-top: 1px solid ${theme.colors.gray[80]};
-`);
+const Footer = styled.footer(
+  ({ theme }) => css`
+    display: flex;
+    align-items: center;
+    padding: 7px 0 9px;
+    border-top: 1px solid ${theme.colors.gray[80]};
+  `,
+);
 
-const StatusMessage = styled.span<{ $visible: boolean }>(({ theme, $visible }) => css`
-  flex: 1;
-  color: ${theme.colors.variant.success};
-  font-style: italic;
-  opacity: ${$visible ? '1' : '0'};
-  transition: opacity 150ms ease-in-out;
-`);
+const StatusMessage = styled.span<{ $visible: boolean }>(
+  ({ theme, $visible }) => css`
+    flex: 1;
+    color: ${theme.colors.variant.success};
+    font-style: italic;
+    opacity: ${$visible ? '1' : '0'};
+    transition: opacity 150ms ease-in-out;
+  `,
+);
 
 const Scratchpad = () => {
   const clipboard = useRef<ClipboardJS>();
@@ -98,7 +107,9 @@ const Scratchpad = () => {
   const statusTimeout = useRef<ReturnType<typeof setTimeout>>();
   const { setScratchpadVisibility, localStorageItem } = useContext(ScratchpadContext);
   const scratchpadStore = Store.get(localStorageItem) || {};
-  const [isSecurityWarningConfirmed, setSecurityWarningConfirmed] = useState<boolean>(scratchpadStore.securityConfirmed || false);
+  const [isSecurityWarningConfirmed, setSecurityWarningConfirmed] = useState<boolean>(
+    scratchpadStore.securityConfirmed || false,
+  );
   const [scratchData, setScratchData] = useState<string>(scratchpadStore.value || DEFAULT_SCRATCHDATA);
   const [size, setSize] = useState<ScratchpadSize | undefined>(scratchpadStore.size || undefined);
   const [position, setPosition] = useState<Position | undefined>(scratchpadStore.position || undefined);
@@ -208,39 +219,46 @@ const Scratchpad = () => {
   });
 
   return (
-    <InteractableModal title="Scratchpad"
-                       onClose={() => setScratchpadVisibility(false)}
-                       onDrag={handleDrag}
-                       onResize={handleSize}
-                       size={size}
-                       position={position}>
+    <InteractableModal
+      title="Scratchpad"
+      onClose={() => setScratchpadVisibility(false)}
+      onDrag={handleDrag}
+      onResize={handleSize}
+      size={size}
+      position={position}
+    >
       <ContentArea>
         {!isSecurityWarningConfirmed && (
           <StyledAlert bsStyle="warning">
             <AlertNote>
-              We recommend you do <strong>not</strong> store any sensitive information, such as passwords, in
-              this area.
+              We recommend you do <strong>not</strong> store any sensitive information, such as passwords, in this area.
             </AlertNote>
-            <Button bsStyle="link" bsSize="sm" onClick={handleGotIt}>Got It!</Button>
+            <Button bsStyle="link" bsSize="sm" onClick={handleGotIt}>
+              Got It!
+            </Button>
           </StyledAlert>
         )}
 
-        <Textarea ref={textareaRef}
-                  onChange={handleChange}
-                  id={TEXTAREA_ID}
-                  $copied={statusMessage === STATUS_COPIED}
-                  spellCheck={false} />
+        <Textarea
+          ref={textareaRef}
+          onChange={handleChange}
+          id={TEXTAREA_ID}
+          $copied={statusMessage === STATUS_COPIED}
+          spellCheck={false}
+        />
 
         <Footer>
-          <OverlayTrigger placement="right"
-                          trigger={['hover', 'focus']}
-                          overlay={(
-                            <>
-                              You can use this space to store personal notes and other information while interacting with
-                              Graylog, without leaving your browser window. For example, store timestamps, user IDs, or IP
-                              addresses you need in various investigations.
-                            </>
-                          )}>
+          <OverlayTrigger
+            placement="right"
+            trigger={['hover', 'focus']}
+            overlay={
+              <>
+                You can use this space to store personal notes and other information while interacting with Graylog,
+                without leaving your browser window. For example, store timestamps, user IDs, or IP addresses you need
+                in various investigations.
+              </>
+            }
+          >
             <Button bsStyle="link">
               <Icon name="question-circle" />
             </Button>
@@ -251,25 +269,27 @@ const Scratchpad = () => {
           </StatusMessage>
 
           <ButtonGroup>
-            <Button data-clipboard-button
-                    data-clipboard-target={`#${TEXTAREA_ID}`}
-                    id="scratchpad-actions"
-                    title="Copy">
+            <Button
+              data-clipboard-button
+              data-clipboard-target={`#${TEXTAREA_ID}`}
+              id="scratchpad-actions"
+              title="Copy"
+            >
               <Icon name="copy" />
             </Button>
             <Button onClick={openConfirmClear} title="Clear">
               <Icon name="trash-alt" />
             </Button>
           </ButtonGroup>
-
         </Footer>
-
       </ContentArea>
 
-      <BootstrapModalConfirm showModal={showModal}
-                             title="Are you sure?"
-                             onConfirm={handleClearText}
-                             onCancel={handleCancelClear}>
+      <BootstrapModalConfirm
+        showModal={showModal}
+        title="Are you sure?"
+        onConfirm={handleClearText}
+        onCancel={handleCancelClear}
+      >
         This will clear out your Scratchpad content, do you wish to proceed?
       </BootstrapModalConfirm>
     </InteractableModal>

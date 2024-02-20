@@ -28,14 +28,16 @@ describe('SortConfiguration', () => {
     const validate = jest.fn();
     const config = AggregationWidgetConfig.builder().build();
 
-    render((
-      <WidgetConfigForm initialValues={{ sort: [{ id: 'foobar' }] }}
-                        onSubmit={onSubmit}
-                        validate={validate}
-                        config={config}>
+    render(
+      <WidgetConfigForm
+        initialValues={{ sort: [{ id: 'foobar' }] }}
+        onSubmit={onSubmit}
+        validate={validate}
+        config={config}
+      >
         <SortConfiguration index={0} />
-      </WidgetConfigForm>
-    ));
+      </WidgetConfigForm>,
+    );
 
     await screen.findByLabelText('Select field for sorting');
 

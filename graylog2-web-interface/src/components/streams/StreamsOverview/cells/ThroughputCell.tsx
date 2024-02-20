@@ -23,7 +23,7 @@ import { Spinner } from 'components/common';
 import { useStore } from 'stores/connect';
 
 type Props = {
-  stream: Stream,
+  stream: Stream;
 };
 
 const ThroughputCell = ({ stream }: Props) => {
@@ -46,11 +46,11 @@ const ThroughputCell = ({ stream }: Props) => {
     .map((nodeId) => {
       const metricDefinition = metrics[nodeId]?.[metricName];
 
-      return (metricDefinition?.metric && 'value' in metricDefinition.metric) ? metricDefinition.metric.value : 0;
+      return metricDefinition?.metric && 'value' in metricDefinition.metric ? metricDefinition.metric.value : 0;
     })
     .reduce((throughput1, throughput2) => throughput1 + throughput2, 0);
 
-  return (<>{throughput} msg/s</>);
+  return <>{throughput} msg/s</>;
 };
 
 export default ThroughputCell;

@@ -25,15 +25,15 @@ import AuthenticationPageNavigation from 'components/authentication/Authenticati
 const AuthenticatorsEditPage = () => (
   <DocumentTitle title="Edit Authenticators">
     <AuthenticationPageNavigation />
-    <PageHeader title="Edit Authenticators"
-                actions={<AuthenticatorActionLinks />}
-                documentationLink={{
-                  title: 'Authenticators documentation',
-                  path: DocsHelper.PAGES.AUTHENTICATORS,
-                }}>
-      <span>
-        Configure the trusted header authentication.
-      </span>
+    <PageHeader
+      title="Edit Authenticators"
+      actions={<AuthenticatorActionLinks />}
+      documentationLink={{
+        title: 'Authenticators documentation',
+        path: DocsHelper.PAGES.AUTHENTICATORS,
+      }}
+    >
+      <span>Configure the trusted header authentication.</span>
     </PageHeader>
 
     <AuthenticatorsEdit />

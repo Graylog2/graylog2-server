@@ -31,22 +31,20 @@ const INITIAL_DATA = {
 };
 
 type PaginatedSearchesResponse = PaginatedListJSON & {
-  elements: Array<ViewJson>,
-  attributes: Array<Attribute>
+  elements: Array<ViewJson>;
+  attributes: Array<Attribute>;
 };
 
 type Options = {
-  enabled: boolean,
-}
+  enabled: boolean;
+};
 const savedSearchesUrl = qualifyUrl('/search/saved');
 
 const fetchSavedSearches = (searchParams: SearchParams) => {
-  const url = PaginationURL(
-    savedSearchesUrl,
-    searchParams.page,
-    searchParams.pageSize,
-    searchParams.query,
-    { sort: searchParams.sort.attributeId, order: searchParams.sort.direction });
+  const url = PaginationURL(savedSearchesUrl, searchParams.page, searchParams.pageSize, searchParams.query, {
+    sort: searchParams.sort.attributeId,
+    order: searchParams.sort.direction,
+  });
 
   return fetch<PaginatedSearchesResponse>('GET', qualifyUrl(url)).then(
     ({ elements, attributes, total, count, page, per_page: perPage }) => ({
@@ -57,33 +55,38 @@ const fetchSavedSearches = (searchParams: SearchParams) => {
   );
 };
 
-const useSavedSearches = (searchParams: SearchParams, { enabled }: Options = { enabled: true }): {
+const useSavedSearches = (
+  searchParams: SearchParams,
+  { enabled }: Options = { enabled: true },
+): {
   data: {
-    list: Readonly<Array<View>>,
-    pagination: { total: number },
-    attributes: Array<Attribute>,
-  },
-  refetch: () => void,
-  isInitialLoading: boolean,
+    list: Readonly<Array<View>>;
+    pagination: { total: number };
+    attributes: Array<Attribute>;
+  };
+  refetch: () => void;
+  isInitialLoading: boolean;
 } => {
   const { data, refetch, isInitialLoading } = useQuery(
     ['saved-searches', 'overview', searchParams],
     () => fetchSavedSearches(searchParams),
     {
       onError: (errorThrown) => {
-        UserNotification.error(`Loading saved searches failed with status: ${errorThrown}`,
-          'Could not load saved searches');
+        UserNotification.error(
+          `Loading saved searches failed with status: ${errorThrown}`,
+          'Could not load saved searches',
+        );
       },
       keepPreviousData: true,
       enabled,
     },
   );
 
-  return ({
+  return {
     data: data ?? INITIAL_DATA,
     refetch,
     isInitialLoading,
-  });
+  };
 };
 
 export default useSavedSearches;

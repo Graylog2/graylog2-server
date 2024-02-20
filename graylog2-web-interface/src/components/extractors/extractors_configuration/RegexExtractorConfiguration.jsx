@@ -63,7 +63,7 @@ class RegexExtractorConfiguration extends React.Component {
         return;
       }
 
-      const preview = (result.match.match ? <samp>{result.match.match}</samp> : '');
+      const preview = result.match.match ? <samp>{result.match.match}</samp> : '';
 
       this.props.onExtractorPreviewLoad(preview);
     });
@@ -76,27 +76,31 @@ class RegexExtractorConfiguration extends React.Component {
   render() {
     const helpMessage = (
       <span>
-        The regular expression used for extraction. First matcher group is used.{' '}
-        Learn more in the <DocumentationLink page={DocsHelper.PAGES.EXTRACTORS} text="documentation" />.
+        The regular expression used for extraction. First matcher group is used. Learn more in the{' '}
+        <DocumentationLink page={DocsHelper.PAGES.EXTRACTORS} text="documentation" />.
       </span>
     );
 
     return (
       <div>
-        <Input id="regex-value-input"
-               label="Regular expression"
-               labelClassName="col-md-2"
-               wrapperClassName="col-md-10"
-               help={helpMessage}>
+        <Input
+          id="regex-value-input"
+          label="Regular expression"
+          labelClassName="col-md-2"
+          wrapperClassName="col-md-10"
+          help={helpMessage}
+        >
           <Row className="row-sm">
             <Col md={11}>
-              <input type="text"
-                     id="regex_value"
-                     className="form-control"
-                     defaultValue={this.props.configuration.regex_value}
-                     placeholder="^.*string(.+)$"
-                     onChange={this._onChange('regex_value')}
-                     required />
+              <input
+                type="text"
+                id="regex_value"
+                className="form-control"
+                defaultValue={this.props.configuration.regex_value}
+                placeholder="^.*string(.+)$"
+                onChange={this._onChange('regex_value')}
+                required
+              />
             </Col>
             <Col md={1} className="text-right">
               <Button bsStyle="info" onClick={this._onTryClick} disabled={this._isTryButtonDisabled()}>

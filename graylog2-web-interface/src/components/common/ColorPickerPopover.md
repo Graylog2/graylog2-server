@@ -20,15 +20,17 @@ const ColorPickerOverlayExample = createReactClass({
     return (
       <div>
         <p>{color ? `You picked ${color}.` : 'Pick a color'}</p>
-        <ColorPickerPopover id="example-color-picker"
-                            placement="right"
-                            color={color}
-                            triggerNode={<Button bsStyle="primary">Toggle color picker</Button>}
-                            onChange={this.handleColorChange} />
+        <ColorPickerPopover
+          id="example-color-picker"
+          placement="right"
+          color={color}
+          triggerNode={<Button bsStyle="primary">Toggle color picker</Button>}
+          onChange={this.handleColorChange}
+        />
       </div>
     );
   },
 });
 
-<ColorPickerOverlayExample />
+<ColorPickerOverlayExample />;
 ```

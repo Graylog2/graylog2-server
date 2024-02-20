@@ -59,7 +59,8 @@ describe('ExpandRows', () => {
         'count()': 3680,
         'sum(took_ms)': 327284,
         timestamp: '2018-05-24T14:03:00.000Z',
-      }, {
+      },
+      {
         'count()': 4490,
         'sum(took_ms)': 384742,
         timestamp: '2018-05-24T14:03:00.000Z',
@@ -91,12 +92,14 @@ describe('ExpandRows', () => {
 
     expect(result).toHaveLength(1);
 
-    expect(result).toEqual([{
-      'avg(took_ms)': 80.65076335877863,
-      'min(took_ms)': 36,
-      'max(took_ms)': 5850,
-      'sum(took_ms)': 3465402,
-      'stddev(took_ms)': 331.44857900293187,
-    }]);
+    expect(result).toEqual([
+      {
+        'avg(took_ms)': 80.65076335877863,
+        'min(took_ms)': 36,
+        'max(took_ms)': 5850,
+        'sum(took_ms)': 3465402,
+        'stddev(took_ms)': 331.44857900293187,
+      },
+    ]);
   });
 });

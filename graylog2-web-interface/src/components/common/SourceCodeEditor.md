@@ -1,4 +1,5 @@
 Light-themed editor:
+
 ```js
 import createReactClass from 'create-react-class';
 
@@ -21,11 +22,7 @@ const MarkdownSourceEditor = createReactClass({
     const { code } = this.state;
     return (
       <div>
-        <SourceCodeEditor id="editor-1"
-                          mode="markdown"
-                          theme="light"
-                          value={code}
-                          onChange={this.handleChange} />
+        <SourceCodeEditor id="editor-1" mode="markdown" theme="light" value={code} onChange={this.handleChange} />
         <p>Preview:</p>
         <pre>{code}</pre>
       </div>
@@ -33,10 +30,11 @@ const MarkdownSourceEditor = createReactClass({
   },
 });
 
-<MarkdownSourceEditor />
+<MarkdownSourceEditor />;
 ```
 
 Read-only dark-themed editor:
+
 ```js
 import createReactClass from 'create-react-class';
 
@@ -62,20 +60,16 @@ const TextSourceEditor = createReactClass({
       { row: 3, column: -1, text: 'info!', type: 'info' },
     ];
     return (
-        <SourceCodeEditor id="editor-2"
-                          annotations={annotations}
-                          resizable={false}
-                          readOnly
-                          theme="dark"
-                          value={code} />
+      <SourceCodeEditor id="editor-2" annotations={annotations} resizable={false} readOnly theme="dark" value={code} />
     );
   },
 });
 
-<TextSourceEditor />
+<TextSourceEditor />;
 ```
 
 Non-resizable editor without toolbar and with custom height and width:
+
 ```js
 import createReactClass from 'create-react-class';
 
@@ -100,17 +94,19 @@ const JsonSourceEditor = createReactClass({
   render() {
     const { code } = this.state;
     return (
-      <SourceCodeEditor id="editor-2"
-                      height={100}
-                      mode="json"
-                      onChange={this.handleChange}
-                      resizable={false}
-                      toolbar={false}
-                      width={400}
-                      value={code} />
-      );
+      <SourceCodeEditor
+        id="editor-2"
+        height={100}
+        mode="json"
+        onChange={this.handleChange}
+        resizable={false}
+        toolbar={false}
+        width={400}
+        value={code}
+      />
+    );
   },
 });
 
-<JsonSourceEditor />
+<JsonSourceEditor />;
 ```

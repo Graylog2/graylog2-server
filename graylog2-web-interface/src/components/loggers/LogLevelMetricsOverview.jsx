@@ -33,14 +33,11 @@ const LogLevelMetricsOverview = createReactClass({
 
   render() {
     const { nodeId } = this.props;
-    const logLevelMetrics = this.state.availableLoglevels
-      .map((loglevel) => <LogLevelMetrics key={`loglevel-metrics-${nodeId}-${loglevel}`} nodeId={nodeId} loglevel={loglevel} />);
+    const logLevelMetrics = this.state.availableLoglevels.map((loglevel) => (
+      <LogLevelMetrics key={`loglevel-metrics-${nodeId}-${loglevel}`} nodeId={nodeId} loglevel={loglevel} />
+    ));
 
-    return (
-      <div className="loglevel-metrics">
-        {logLevelMetrics}
-      </div>
-    );
+    return <div className="loglevel-metrics">{logLevelMetrics}</div>;
   },
 });
 

@@ -22,9 +22,10 @@ const FiltersForQueryParams = (filters: UrlQueryFilters) => {
     return undefined;
   }
 
-  return filters.entrySeq().flatMap(([attributeId, filterValues]) => (
-    filterValues.map((value) => `${attributeId}:${value}`)
-  )).toArray();
+  return filters
+    .entrySeq()
+    .flatMap(([attributeId, filterValues]) => filterValues.map((value) => `${attributeId}:${value}`))
+    .toArray();
 };
 
 export default FiltersForQueryParams;

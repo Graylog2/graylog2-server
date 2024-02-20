@@ -28,15 +28,20 @@ import Cache from './Cache';
 
 jest.mock('hooks/useScopePermissions');
 
-PluginStore.register(new PluginManifest({}, {
-  lookupTableCaches: [
+PluginStore.register(
+  new PluginManifest(
+    {},
     {
-      type: 'guava_cache',
-      displayName: 'Node-local, in-memory cache',
-      summaryComponent: CaffeineCacheSummary,
+      lookupTableCaches: [
+        {
+          type: 'guava_cache',
+          displayName: 'Node-local, in-memory cache',
+          summaryComponent: CaffeineCacheSummary,
+        },
+      ],
     },
-  ],
-}));
+  ),
+);
 
 const renderedCache = (scope: string) => {
   const cache = createLookupTableCache(1, { _scope: scope });
@@ -46,19 +51,17 @@ const renderedCache = (scope: string) => {
 
 describe('Cache', () => {
   beforeAll(() => {
-    asMock(useScopePermissions).mockImplementation(
-      (entity: GenericEntityType) => {
-        const scopes = {
-          ILLUMINATE: { is_mutable: false },
-          DEFAULT: { is_mutable: true },
-        };
+    asMock(useScopePermissions).mockImplementation((entity: GenericEntityType) => {
+      const scopes = {
+        ILLUMINATE: { is_mutable: false },
+        DEFAULT: { is_mutable: true },
+      };
 
-        return {
-          loadingScopePermissions: false,
-          scopePermissions: scopes[entity._scope],
-        };
-      },
-    );
+      return {
+        loadingScopePermissions: false,
+        scopePermissions: scopes[entity._scope],
+      };
+    });
   });
 
   it('should show "edit" button', async () => {

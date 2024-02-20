@@ -26,20 +26,22 @@ import type { RuleType, PipelineSummary } from 'stores/rules/RulesStore';
 import StringUtils from 'util/StringUtils';
 
 type Props = {
-  rule: RuleType,
-  usingPipelines: Array<PipelineSummary>
-  onDelete: (rule: RuleType) => () => void,
-}
+  rule: RuleType;
+  usingPipelines: Array<PipelineSummary>;
+  onDelete: (rule: RuleType) => () => void;
+};
 const STRING_SIZE_LIMIT = 30;
 
-const LimitedTd = styled.td(({ theme }) => css`
-  max-width: 250px;
-  min-width: 250px;
-  
-  @media screen and (max-width: ${theme.breakpoints.max.md}) {
-    white-space: normal !important;
-  }
-`);
+const LimitedTd = styled.td(
+  ({ theme }) => css`
+    max-width: 250px;
+    min-width: 250px;
+
+    @media screen and (max-width: ${theme.breakpoints.max.md}) {
+      white-space: normal !important;
+    }
+  `,
+);
 
 const RuleListEntry = ({ rule, onDelete, usingPipelines }: Props) => {
   const { id, title, description, created_at, modified_at } = rule;
@@ -56,33 +58,34 @@ const RuleListEntry = ({ rule, onDelete, usingPipelines }: Props) => {
     </ButtonToolbar>
   );
 
-  const _showPipelines = (pipelines: Array<PipelineSummary>) => pipelines.map(({ id: pipelineId, title: pipelineTitle }, index) => (
-    <React.Fragment key={pipelineId}>
-      {pipelineTitle.length > STRING_SIZE_LIMIT ? (
-        <OverlayTrigger placement="top" trigger="hover" overlay={pipelineTitle} rootClose>
-          <Link to={Routes.SYSTEM.PIPELINES.PIPELINE(pipelineId)}>
-            {StringUtils.truncateWithEllipses(pipelineTitle, STRING_SIZE_LIMIT)}
-          </Link>
-        </OverlayTrigger>
-      ) : (
-        <Link to={Routes.SYSTEM.PIPELINES.PIPELINE(pipelineId)}>
-          {pipelineTitle}
-        </Link>
-      )}
-      {index < (pipelinesLength - 1) && ',  '}
-    </React.Fragment>
-  ));
+  const _showPipelines = (pipelines: Array<PipelineSummary>) =>
+    pipelines.map(({ id: pipelineId, title: pipelineTitle }, index) => (
+      <React.Fragment key={pipelineId}>
+        {pipelineTitle.length > STRING_SIZE_LIMIT ? (
+          <OverlayTrigger placement="top" trigger="hover" overlay={pipelineTitle} rootClose>
+            <Link to={Routes.SYSTEM.PIPELINES.PIPELINE(pipelineId)}>
+              {StringUtils.truncateWithEllipses(pipelineTitle, STRING_SIZE_LIMIT)}
+            </Link>
+          </OverlayTrigger>
+        ) : (
+          <Link to={Routes.SYSTEM.PIPELINES.PIPELINE(pipelineId)}>{pipelineTitle}</Link>
+        )}
+        {index < pipelinesLength - 1 && ',  '}
+      </React.Fragment>
+    ));
 
   return (
     <tr key={title}>
       <td>
-        <Link to={`${Routes.SYSTEM.PIPELINES.RULE(id)}${isRuleBuilder}`}>
-          {title}
-        </Link>
+        <Link to={`${Routes.SYSTEM.PIPELINES.RULE(id)}${isRuleBuilder}`}>{title}</Link>
       </td>
       <td className="limited">{description}</td>
-      <td className="limited"><RelativeTime dateTime={created_at} /></td>
-      <td className="limited"><RelativeTime dateTime={modified_at} /></td>
+      <td className="limited">
+        <RelativeTime dateTime={created_at} />
+      </td>
+      <td className="limited">
+        <RelativeTime dateTime={modified_at} />
+      </td>
       <td>
         <MetricContainer name={`org.graylog.plugins.pipelineprocessor.ast.Rule.${id}.executed`} zeroOnMissing>
           <CounterRate suffix="msg/s" />
@@ -94,9 +97,7 @@ const RuleListEntry = ({ rule, onDelete, usingPipelines }: Props) => {
         </MetricContainer>
       </td>
       <LimitedTd>
-        <CountBadge>{pipelinesLength}</CountBadge>
-        {' '}
-        {_showPipelines(usingPipelines)}
+        <CountBadge>{pipelinesLength}</CountBadge> {_showPipelines(usingPipelines)}
       </LimitedTd>
       <td className="actions">{actions}</td>
     </tr>

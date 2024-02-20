@@ -29,8 +29,7 @@ jest.mock('routing/useLocation', () => jest.fn(() => ({ search: '' })));
 describe('PaginatedList', () => {
   it('should display Pagination', () => {
     const { getByText } = render(
-      <PaginatedList totalItems={100}
-                     onChange={() => {}}>
+      <PaginatedList totalItems={100} onChange={() => {}}>
         <div>The list</div>
       </PaginatedList>,
     );
@@ -41,9 +40,7 @@ describe('PaginatedList', () => {
 
   it('should not dived by 0 if pageSize is 0 Pagination', () => {
     const { getByText } = render(
-      <PaginatedList totalItems={100}
-                     pageSize={0}
-                     onChange={() => {}}>
+      <PaginatedList totalItems={100} pageSize={0} onChange={() => {}}>
         <div>The list</div>
       </PaginatedList>,
     );
@@ -56,7 +53,8 @@ describe('PaginatedList', () => {
       <InteractiveContext.Provider value={false}>
         <PaginatedList totalItems={100} onChange={() => {}}>
           <div>The list</div>
-        </PaginatedList>,
+        </PaginatedList>
+        ,
       </InteractiveContext.Provider>,
     );
 
@@ -66,15 +64,16 @@ describe('PaginatedList', () => {
   it('should reset current page on page size change', async () => {
     const onChangeStub = jest.fn();
     const { getByRole } = render(
-      <PaginatedList totalItems={200}
-                     onChange={onChangeStub}
-                     activePage={3}>
+      <PaginatedList totalItems={200} onChange={onChangeStub} activePage={3}>
         <div>The list</div>
-      </PaginatedList>);
+      </PaginatedList>,
+    );
 
-    fireEvent.click(getByRole('button', {
-      name: /configure page size/i,
-    }));
+    fireEvent.click(
+      getByRole('button', {
+        name: /configure page size/i,
+      }),
+    );
 
     fireEvent.click(screen.getByRole('menuitem', { name: /100/ }));
 
@@ -94,11 +93,10 @@ describe('PaginatedList', () => {
       } as Location);
 
       const { findByTestId } = render(
-        <PaginatedList totalItems={200}
-                       onChange={() => {}}
-                       activePage={3}>
+        <PaginatedList totalItems={200} onChange={() => {}} activePage={3}>
           <div>The list</div>
-        </PaginatedList>);
+        </PaginatedList>,
+      );
 
       const graylogPagination = await findByTestId('graylog-pagination');
       const activePageElement = graylogPagination.getElementsByClassName('active');
@@ -111,12 +109,10 @@ describe('PaginatedList', () => {
   describe('with internal state', () => {
     it('should update active page, when prop changes', async () => {
       const { findByTestId, rerender } = render(
-        <PaginatedList totalItems={200}
-                       onChange={() => {}}
-                       activePage={3}
-                       useQueryParameter={false}>
+        <PaginatedList totalItems={200} onChange={() => {}} activePage={3} useQueryParameter={false}>
           <div>The list</div>
-        </PaginatedList>);
+        </PaginatedList>,
+      );
 
       const graylogPagination = await findByTestId('graylog-pagination');
       const activePageElement = graylogPagination.getElementsByClassName('active');
@@ -124,10 +120,7 @@ describe('PaginatedList', () => {
       expect(activePageElement[0].textContent).toContain('3');
 
       rerender(
-        <PaginatedList totalItems={200}
-                       onChange={() => {}}
-                       activePage={1}
-                       useQueryParameter={false}>
+        <PaginatedList totalItems={200} onChange={() => {}} activePage={1} useQueryParameter={false}>
           <div>The list</div>
         </PaginatedList>,
       );

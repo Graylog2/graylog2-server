@@ -35,19 +35,24 @@ const HeaderIcon = styled(Icon)`
 `;
 
 type Props = {
-  featureName: string,
-  wrapperClassName: string | null | undefined,
+  featureName: string;
+  wrapperClassName: string | null | undefined;
 };
 
 const EnterprisePluginNotFound = ({ featureName, wrapperClassName }: Props) => (
   <Panel bsStyle="info" className={wrapperClassName}>
     <Panel.Heading>
       <Header>
-        <HeaderIcon name="crown" />Enterprise Feature
+        <HeaderIcon name="crown" />
+        Enterprise Feature
       </Header>
     </Panel.Heading>
     <Panel.Body>
-      To use the <b>{featureName}</b> functionality you need the <a href="https://www.graylog.org/products/enterprise" rel="noopener noreferrer" target="_blank">Graylog Enterprise license</a> and the <DocumentationLink page={DocsHelper.PAGES.ENTERPRISE_SETUP} text="Graylog Enterprise plugin" />.
+      To use the <b>{featureName}</b> functionality you need the{' '}
+      <a href="https://www.graylog.org/products/enterprise" rel="noopener noreferrer" target="_blank">
+        Graylog Enterprise license
+      </a>{' '}
+      and the <DocumentationLink page={DocsHelper.PAGES.ENTERPRISE_SETUP} text="Graylog Enterprise plugin" />.
     </Panel.Body>
   </Panel>
 );

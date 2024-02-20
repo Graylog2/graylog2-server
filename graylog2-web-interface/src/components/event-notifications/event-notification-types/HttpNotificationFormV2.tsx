@@ -34,10 +34,10 @@ const StyledButton = styled(Button)`
 `;
 
 type Props = {
-  config: HttpNotificationConfigV2,
-  validation: HttpNotificationValidationV2
-  onChange: any,
-  setIsSubmitEnabled: any,
+  config: HttpNotificationConfigV2;
+  validation: HttpNotificationValidationV2;
+  onChange: any;
+  setIsSubmitEnabled: any;
 };
 
 // Only populate the new template if no changes have been made to the existing body or it is empty
@@ -160,7 +160,7 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
     onChange(nextConfig);
   };
 
-  handleSecretInputChange = (event: { target: { name: string }}) => {
+  handleSecretInputChange = (event: { target: { name: string } }) => {
     const { name } = event.target;
     const inputValue = FormsUtils.getValueFromInput(event.target);
     const value = inputValue.length === 0 ? { delete_value: true } : { set_value: inputValue };
@@ -198,24 +198,44 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
     const { api_secret, basic_auth } = config;
     const { reset } = this.state;
 
-    const httpMethods = [{ value: 'POST', label: 'POST' }, { value: 'GET', label: 'GET' }, { value: 'PUT', label: 'PUT' }];
-    const contentTypes = [{ value: 'JSON', label: 'application/json' }, { value: 'FORM_DATA', label: 'application/x-www-form-urlencoded' }, { value: 'PLAIN_TEXT', label: 'text/plain' }];
+    const httpMethods = [
+      { value: 'POST', label: 'POST' },
+      { value: 'GET', label: 'GET' },
+      { value: 'PUT', label: 'PUT' },
+    ];
+    const contentTypes = [
+      { value: 'JSON', label: 'application/json' },
+      { value: 'FORM_DATA', label: 'application/x-www-form-urlencoded' },
+      { value: 'PLAIN_TEXT', label: 'text/plain' },
+    ];
     const docsUrl = 'https://docs.graylog.org/docs/alerts#notifications';
-    const helpElement = <p>Custom POST/PUT body. See <a href={docsUrl} rel="noopener noreferrer" target="_blank">docs </a>for more details. An empty POST/PUT body will send the full event details.</p>;
+    const helpElement = (
+      <p>
+        Custom POST/PUT body. See{' '}
+        <a href={docsUrl} rel="noopener noreferrer" target="_blank">
+          docs{' '}
+        </a>
+        for more details. An empty POST/PUT body will send the full event details.
+      </p>
+    );
 
     return (
       <>
-        <URLWhiteListInput label="URL"
-                           onChange={this.handleUrlChange}
-                           validationState={validation.errors.url ? 'error' : null}
-                           validationMessage={get(validation, 'errors.url[0]', 'The URL to POST to when an Event occurs')}
-                           onValidationChange={this.onValidationChange}
-                           url={config.url}
-                           autofocus={false} />
-        <Checkbox id="skip_tls_verification"
-                  name="skip_tls_verification"
-                  onChange={this.handleChange}
-                  checked={config.skip_tls_verification}>
+        <URLWhiteListInput
+          label="URL"
+          onChange={this.handleUrlChange}
+          validationState={validation.errors.url ? 'error' : null}
+          validationMessage={get(validation, 'errors.url[0]', 'The URL to POST to when an Event occurs')}
+          onValidationChange={this.onValidationChange}
+          url={config.url}
+          autofocus={false}
+        />
+        <Checkbox
+          id="skip_tls_verification"
+          name="skip_tls_verification"
+          onChange={this.handleChange}
+          checked={config.skip_tls_verification}
+        >
           Skip TLS verification
         </Checkbox>
         <Row>
@@ -223,40 +243,67 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
             {basic_auth?.keep_value ? (
               <>
                 <ControlLabel>Basic authentication</ControlLabel>
-                <StyledButton bsStyle="default" type="button" onClick={() => { this.resetSecret('basic_auth'); }}>
+                <StyledButton
+                  bsStyle="default"
+                  type="button"
+                  onClick={() => {
+                    this.resetSecret('basic_auth');
+                  }}
+                >
                   Reset Secret
                 </StyledButton>
               </>
             ) : (
-              <Input id="basicAuth"
-                     label={<span>Basic authentication <small className="text-muted">(Optional)</small></span>}
-                     name="basic_auth"
-                     type="password"
-                     onChange={this.handleSecretInputChange}
-                     value={this.state.basic_auth || ''}
-                     help="The Basic authentication string needs to follow this format: '<username>:<password>'"
-                     buttonAfter={reset.basic_auth ? (
-                       <Button type="button" onClick={() => { this.undoResetSecret('basic_auth'); }}>
-                         Undo Reset
-                       </Button>
-                     ) : undefined} />
+              <Input
+                id="basicAuth"
+                label={
+                  <span>
+                    Basic authentication <small className="text-muted">(Optional)</small>
+                  </span>
+                }
+                name="basic_auth"
+                type="password"
+                onChange={this.handleSecretInputChange}
+                value={this.state.basic_auth || ''}
+                help="The Basic authentication string needs to follow this format: '<username>:<password>'"
+                buttonAfter={
+                  reset.basic_auth ? (
+                    <Button
+                      type="button"
+                      onClick={() => {
+                        this.undoResetSecret('basic_auth');
+                      }}
+                    >
+                      Undo Reset
+                    </Button>
+                  ) : undefined
+                }
+              />
             )}
           </Col>
         </Row>
         <Row>
           <Col md={6}>
-            <Input id="api_key"
-                   name="api_key"
-                   label={<span>API Key <small className="text-muted">(Optional)</small></span>}
-                   type="text"
-                   onChange={this.handleChange}
-                   bsStyle={validation.errors.api_key ? 'error' : null}
-                   help={get(validation, 'errors.api_key[0]', 'Must be set if an API secret is set')}
-                   value={config.api_key} />
-            <Checkbox id="api_key_as_header"
-                      name="api_key_as_header"
-                      onChange={this.handleChange}
-                      checked={config.api_key_as_header}>
+            <Input
+              id="api_key"
+              name="api_key"
+              label={
+                <span>
+                  API Key <small className="text-muted">(Optional)</small>
+                </span>
+              }
+              type="text"
+              onChange={this.handleChange}
+              bsStyle={validation.errors.api_key ? 'error' : null}
+              help={get(validation, 'errors.api_key[0]', 'Must be set if an API secret is set')}
+              value={config.api_key}
+            />
+            <Checkbox
+              id="api_key_as_header"
+              name="api_key_as_header"
+              onChange={this.handleChange}
+              checked={config.api_key_as_header}
+            >
               Send API Key/Secret as Header
             </Checkbox>
           </Col>
@@ -264,96 +311,135 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
             {api_secret?.keep_value ? (
               <>
                 <ControlLabel>API Secret</ControlLabel>
-                <StyledButton bsStyle="default" type="button" onClick={() => { this.resetSecret('api_secret'); }}>
+                <StyledButton
+                  bsStyle="default"
+                  type="button"
+                  onClick={() => {
+                    this.resetSecret('api_secret');
+                  }}
+                >
                   Reset Secret
                 </StyledButton>
               </>
             ) : (
-              <Input id="apiSecret"
-                     label={<span>API Secret <small className="text-muted">(Optional)</small></span>}
-                     name="api_secret"
-                     type="password"
-                     onChange={this.handleSecretInputChange}
-                     bsStyle={validation.errors.api_secret ? 'error' : null}
-                     help={get(validation, 'errors.api_secret[0]', 'Must be set if an API key is set')}
-                     value={this.state.api_secret || ''}
-                     buttonAfter={reset.api_secret ? (
-                       <Button type="button" onClick={() => { this.undoResetSecret('api_secret'); }}>
-                         Undo Reset
-                       </Button>
-                     ) : undefined} />
+              <Input
+                id="apiSecret"
+                label={
+                  <span>
+                    API Secret <small className="text-muted">(Optional)</small>
+                  </span>
+                }
+                name="api_secret"
+                type="password"
+                onChange={this.handleSecretInputChange}
+                bsStyle={validation.errors.api_secret ? 'error' : null}
+                help={get(validation, 'errors.api_secret[0]', 'Must be set if an API key is set')}
+                value={this.state.api_secret || ''}
+                buttonAfter={
+                  reset.api_secret ? (
+                    <Button
+                      type="button"
+                      onClick={() => {
+                        this.undoResetSecret('api_secret');
+                      }}
+                    >
+                      Undo Reset
+                    </Button>
+                  ) : undefined
+                }
+              />
             )}
           </Col>
         </Row>
         <Row>
           <Col md={12}>
-            <Input id="headers"
-                   name="headers"
-                   label={<span>Headers <small className="text-muted">(Optional)</small></span>}
-                   type="text"
-                   onChange={this.handleChange}
-                   bsStyle={validation.errors.headers ? 'error' : null}
-                   help={get(validation, 'errors.headers[0]', 'Semicolon delimited list of HTTP headers to add to the notification')}
-                   value={config.headers} />
+            <Input
+              id="headers"
+              name="headers"
+              label={
+                <span>
+                  Headers <small className="text-muted">(Optional)</small>
+                </span>
+              }
+              type="text"
+              onChange={this.handleChange}
+              bsStyle={validation.errors.headers ? 'error' : null}
+              help={get(
+                validation,
+                'errors.headers[0]',
+                'Semicolon delimited list of HTTP headers to add to the notification',
+              )}
+              value={config.headers}
+            />
           </Col>
         </Row>
         <Row>
           <Col md={4}>
-            <Input help="HTTP method used for the notification"
-                   id="notification-method"
-                   label="HTTP Method">
-              <Select id="method"
-                      name="method"
-                      clearable={false}
-                      options={httpMethods}
-                      matchProp="label"
-                      onChange={this.handleMethodChange}
-                      value={config.method} />
+            <Input help="HTTP method used for the notification" id="notification-method" label="HTTP Method">
+              <Select
+                id="method"
+                name="method"
+                clearable={false}
+                options={httpMethods}
+                matchProp="label"
+                onChange={this.handleMethodChange}
+                value={config.method}
+              />
             </Input>
           </Col>
           <Col md={4}>
-            <Input help="HTTP content type used for POST/PUT notifications"
-                   id="notification-content-type"
-                   label="Content Type">
-              <Select id="content-type"
-                      name="content-type"
-                      options={contentTypes}
-                      matchProp="label"
-                      disabled={config.method === 'GET'}
-                      onChange={this.handleContentTypeChange}
-                      clearable={false}
-                      value={config.content_type} />
+            <Input
+              help="HTTP content type used for POST/PUT notifications"
+              id="notification-content-type"
+              label="Content Type"
+            >
+              <Select
+                id="content-type"
+                name="content-type"
+                options={contentTypes}
+                matchProp="label"
+                disabled={config.method === 'GET'}
+                onChange={this.handleContentTypeChange}
+                clearable={false}
+                value={config.content_type}
+              />
             </Input>
           </Col>
           <Col md={4}>
-            <Input id="notification-time-zone"
-                   help="Time zone used for timestamps in the notification body"
-                   label={<>Time zone for date/time values</>}>
-              <TimezoneSelect className="timezone-select"
-                              name="time_zone"
-                              disabled={config.method === 'GET'}
-                              value={config.time_zone}
-                              clearable={false}
-                              onChange={this.handleTimeZoneChange} />
+            <Input
+              id="notification-time-zone"
+              help="Time zone used for timestamps in the notification body"
+              label={<>Time zone for date/time values</>}
+            >
+              <TimezoneSelect
+                className="timezone-select"
+                name="time_zone"
+                disabled={config.method === 'GET'}
+                value={config.time_zone}
+                clearable={false}
+                onChange={this.handleTimeZoneChange}
+              />
             </Input>
           </Col>
         </Row>
         <Row>
           <Col md={12}>
             {config.method !== 'GET' && (
-            <FormGroup controlId="notification-body-template"
-                       validationState={validation.errors.body_template ? 'error' : null}>
-              <ControlLabel>Body Template</ControlLabel>
-              <SourceCodeEditor id="notification-body-template"
-                                mode="text"
-                                theme="light"
-                                value={config.body_template || ''}
-                                wrapEnabled
-                                onChange={this.handleJsonBodyTemplateChange} />
-              <HelpBlock>
-                {get(validation, 'errors.body_template[0]', helpElement)}
-              </HelpBlock>
-            </FormGroup>
+              <FormGroup
+                controlId="notification-body-template"
+                validationState={validation.errors.body_template ? 'error' : null}
+              >
+                <ControlLabel>Body Template</ControlLabel>
+                <SourceCodeEditor
+                  id="notification-body-template"
+                  mode="text"
+                  theme="light"
+                  value={config.body_template || ''}
+                  wrapEnabled
+                  onChange={this.handleJsonBodyTemplateChange}
+                />
+                <HelpBlock>{get(validation, 'errors.body_template[0]', helpElement)}</HelpBlock>
+              </FormGroup>
             )}
           </Col>
         </Row>

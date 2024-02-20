@@ -39,19 +39,23 @@ const Container = styled.div`
   justify-content: center;
 `;
 
-const ExplanationTrigger = styled.button<{ $clickable?: boolean }>(({ $clickable }) => css`
-  padding: 0;
-  background: transparent;
-  border: 0;
-  display: flex;
-  align-items: center;
-  cursor: ${$clickable ? 'pointer' : 'default'};
-`);
+const ExplanationTrigger = styled.button<{ $clickable?: boolean }>(
+  ({ $clickable }) => css`
+    padding: 0;
+    background: transparent;
+    border: 0;
+    display: flex;
+    align-items: center;
+    cursor: ${$clickable ? 'pointer' : 'default'};
+  `,
+);
 
-const ErrorIcon = styled(Icon)<{ $status: string }>(({ theme, $status }) => css`
-  color: ${$status === 'ERROR' ? theme.colors.variant.danger : theme.colors.variant.warning};
-  font-size: 22px;
-`);
+const ErrorIcon = styled(Icon)<{ $status: string }>(
+  ({ theme, $status }) => css`
+    color: ${$status === 'ERROR' ? theme.colors.variant.danger : theme.colors.variant.warning};
+    font-size: 22px;
+  `,
+);
 
 const DocumentationIcon = styled(Icon)`
   margin-left: 5px;
@@ -95,17 +99,19 @@ const shakeAnimation = keyframes`
 `;
 
 type ExtraProps = {
-  $shaking: boolean,
-}
-const StyledPopoverDropdown = styled(Popover.Dropdown)<ExtraProps>(({ $shaking }) => css`
-  animation: ${$shaking ? css`${shakeAnimation} 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both` : 'none'};
-`);
-
-const ExplanationTitle = ({ title }: { title: string }) => (
-  <Title>
-    {title}
-  </Title>
+  $shaking: boolean;
+};
+const StyledPopoverDropdown = styled(Popover.Dropdown)<ExtraProps>(
+  ({ $shaking }) => css`
+    animation: ${$shaking
+      ? css`
+          ${shakeAnimation} 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both
+        `
+      : 'none'};
+  `,
 );
+
+const ExplanationTitle = ({ title }: { title: string }) => <Title>{title}</Title>;
 
 const useShakeTemporarily = () => {
   const [shouldShake, setShake] = useState(false);
@@ -157,7 +163,7 @@ const getErrorDocumentationLink = (errorType: string) => {
 };
 
 type QueryForm = {
-  queryString: QueryValidationState,
+  queryString: QueryValidationState;
 };
 
 type Explanations = QueryValidationState['explanations'];
@@ -167,17 +173,23 @@ const deduplicateExplanations = (explanations: Explanations | undefined): Explan
     return [];
   }
 
-  const [deduplicated] = explanations.reduce(([prevExplanations, seen]: [Explanations, Array<string>], cur) => {
-    if (cur.errorType === 'UNKNOWN_FIELD') {
-      if (cur.relatedProperty !== undefined && !seen.includes(cur.relatedProperty)) {
-        return [[...prevExplanations, cur], [...seen, cur.relatedProperty]];
+  const [deduplicated] = explanations.reduce(
+    ([prevExplanations, seen]: [Explanations, Array<string>], cur) => {
+      if (cur.errorType === 'UNKNOWN_FIELD') {
+        if (cur.relatedProperty !== undefined && !seen.includes(cur.relatedProperty)) {
+          return [
+            [...prevExplanations, cur],
+            [...seen, cur.relatedProperty],
+          ];
+        }
+
+        return [prevExplanations, seen];
       }
 
-      return [prevExplanations, seen];
-    }
-
-    return [[...prevExplanations, cur], seen];
-  }, [[], []]);
+      return [[...prevExplanations, cur], seen];
+    },
+    [[], []],
+  );
 
   return deduplicated;
 };
@@ -188,7 +200,9 @@ const QueryValidation = () => {
   const [showExplanation, toggleShow] = useTriggerIfErrorsPersist(shake);
 
   const explanationTriggerRef = useRef(undefined);
-  const { errors: { queryString: queryStringErrors } } = useFormikContext<QueryForm>();
+  const {
+    errors: { queryString: queryStringErrors },
+  } = useFormikContext<QueryForm>();
   const { warnings } = useContext(FormWarningsContext);
 
   const validationState = (queryStringErrors ?? warnings?.queryString) as QueryValidationState;
@@ -202,37 +216,47 @@ const QueryValidation = () => {
       <Popover.Target>
         <Container ref={explanationTriggerRef}>
           {hasExplanations ? (
-            <ExplanationTrigger title="Toggle validation error explanation"
-                                onClick={toggleShow}
-                                $clickable
-                                tabIndex={0}
-                                type="button">
+            <ExplanationTrigger
+              title="Toggle validation error explanation"
+              onClick={toggleShow}
+              $clickable
+              tabIndex={0}
+              type="button"
+            >
               <ErrorIcon $status={status} name="exclamation-circle" />
             </ExplanationTrigger>
           ) : (
-            <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
-                               title="Search query syntax documentation"
-                               text={<Icon name="lightbulb" />} />
+            <DocumentationLink
+              page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
+              title="Search query syntax documentation"
+              text={<Icon name="lightbulb" />}
+            />
           )}
         </Container>
       </Popover.Target>
       {hasExplanations && showExplanation && (
-        <StyledPopoverDropdown id="query-validation-error-explanation"
-                               title={<ExplanationTitle title={StringUtils.capitalizeFirstLetter(status.toLocaleLowerCase())} />}
-                               $shaking={shakingPopover}>
+        <StyledPopoverDropdown
+          id="query-validation-error-explanation"
+          title={<ExplanationTitle title={StringUtils.capitalizeFirstLetter(status.toLocaleLowerCase())} />}
+          $shaking={shakingPopover}
+        >
           <div role="alert">
             {deduplicatedExplanations.map(({ errorType, errorTitle, errorMessage, id }) => (
               <Explanation key={id}>
-                <span><b>{errorTitle}</b>: {errorMessage}</span>
-                <DocumentationLink page={getErrorDocumentationLink(errorType)}
-                                   title={`${errorTitle} documentation`}
-                                   text={<DocumentationIcon name="lightbulb" />} />
+                <span>
+                  <b>{errorTitle}</b>: {errorMessage}
+                </span>
+                <DocumentationLink
+                  page={getErrorDocumentationLink(errorType)}
+                  title={`${errorTitle} documentation`}
+                  text={<DocumentationIcon name="lightbulb" />}
+                />
               </Explanation>
             ))}
             {plugableValidationExplanation?.map((PlugableExplanation, index) => (
               // eslint-disable-next-line react/no-array-index-key
-              (<PlugableExplanation validationState={validationState} key={index} />)),
-            )}
+              <PlugableExplanation validationState={validationState} key={index} />
+            ))}
           </div>
         </StyledPopoverDropdown>
       )}

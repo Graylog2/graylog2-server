@@ -37,9 +37,9 @@ describe('WaitingForStartup', () => {
   });
 
   beforeEach(() => {
-    asMock(useServerAvailability).mockReturnValue(({
+    asMock(useServerAvailability).mockReturnValue({
       data: false,
-    }));
+    });
   });
 
   afterAll(() => {
@@ -55,9 +55,9 @@ describe('WaitingForStartup', () => {
   });
 
   it('should reload page after server started', async () => {
-    asMock(useServerAvailability).mockReturnValue(({
+    asMock(useServerAvailability).mockReturnValue({
       data: true,
-    }));
+    });
 
     renderPreflight(<WaitingForStartup />);
 

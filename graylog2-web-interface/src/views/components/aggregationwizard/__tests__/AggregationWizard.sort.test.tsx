@@ -50,8 +50,7 @@ const fieldTypes = { all: fields, queryFields: Immutable.Map({ queryId: fields }
 const pivot0 = Pivot.createValues([fieldTypeMapping1.name]);
 const pivot1 = Pivot.createValues([fieldTypeMapping2.name]);
 
-const widgetConfig = AggregationWidgetConfig
-  .builder()
+const widgetConfig = AggregationWidgetConfig.builder()
   .visualization(DataTable.type)
   .rowPivots([pivot0, pivot1])
   .visualizationConfig(DataTableVisualizationConfig.empty())
@@ -92,23 +91,26 @@ const sortByTookMsDesc = async (sortElementContainerId: Matcher, option: string 
   await within(httpMethodSortContainer).findByText('Descending');
 };
 
-const renderSUT = (props = {}) => render((
-  <TestStoreProvider>
-    <FieldTypesContext.Provider value={fieldTypes}>
-      <AggregationWizard onChange={() => {}}
-                         onSubmit={() => {}}
-                         onCancel={() => {}}
-                         config={widgetConfig}
-                         editing
-                         id="widget-id"
-                         type="AGGREGATION"
-                         fields={Immutable.List([])}
-                         {...props}>
-        <span>The Visualization</span>
-      </AggregationWizard>
-    </FieldTypesContext.Provider>
-  </TestStoreProvider>
-));
+const renderSUT = (props = {}) =>
+  render(
+    <TestStoreProvider>
+      <FieldTypesContext.Provider value={fieldTypes}>
+        <AggregationWizard
+          onChange={() => {}}
+          onSubmit={() => {}}
+          onCancel={() => {}}
+          config={widgetConfig}
+          editing
+          id="widget-id"
+          type="AGGREGATION"
+          fields={Immutable.List([])}
+          {...props}
+        >
+          <span>The Visualization</span>
+        </AggregationWizard>
+      </FieldTypesContext.Provider>
+    </TestStoreProvider>,
+  );
 
 describe('AggregationWizard', () => {
   useViewsPlugin();
@@ -149,141 +151,147 @@ describe('AggregationWizard', () => {
     expect(onChangeMock).toHaveBeenCalledWith(updatedConfig);
   });
 
-  it('should configure new sort element', async () => {
-    const onChangeMock = jest.fn();
-    const config = widgetConfig
-      .toBuilder()
-      .sort([])
-      .build();
+  it(
+    'should configure new sort element',
+    async () => {
+      const onChangeMock = jest.fn();
+      const config = widgetConfig.toBuilder().sort([]).build();
 
-    renderSUT({ config, onChange: onChangeMock });
+      renderSUT({ config, onChange: onChangeMock });
 
-    await addSortElement();
-    await sortByTookMsDesc('sort-element-0');
-    await submitWidgetConfigForm();
+      await addSortElement();
+      await sortByTookMsDesc('sort-element-0');
+      await submitWidgetConfigForm();
 
-    const updatedConfig = widgetConfig
-      .toBuilder()
-      .sort([
-        new SortConfig('pivot', 'took_ms', Direction.Descending),
-      ])
-      .build();
+      const updatedConfig = widgetConfig
+        .toBuilder()
+        .sort([new SortConfig('pivot', 'took_ms', Direction.Descending)])
+        .build();
 
-    await waitFor(() => expect(onChangeMock).toHaveBeenCalledTimes(1));
+      await waitFor(() => expect(onChangeMock).toHaveBeenCalledTimes(1));
 
-    expect(onChangeMock).toHaveBeenCalledWith(updatedConfig);
-  }, extendedTimeout);
+      expect(onChangeMock).toHaveBeenCalledWith(updatedConfig);
+    },
+    extendedTimeout,
+  );
 
-  it('should configure another sort element', async () => {
-    const onChangeMock = jest.fn();
-    const series1 = Series.forFunction('count()');
-    const series2 = Series.forFunction('max(took_ms)');
-    const config = widgetConfig
-      .toBuilder()
-      .series([series1, series2])
-      .sort([SortConfig.fromSeries(series1)])
-      .build();
+  it(
+    'should configure another sort element',
+    async () => {
+      const onChangeMock = jest.fn();
+      const series1 = Series.forFunction('count()');
+      const series2 = Series.forFunction('max(took_ms)');
+      const config = widgetConfig
+        .toBuilder()
+        .series([series1, series2])
+        .sort([SortConfig.fromSeries(series1)])
+        .build();
 
-    renderSUT({ config, onChange: onChangeMock });
+      renderSUT({ config, onChange: onChangeMock });
 
-    const addSortButton = await screen.findByRole('button', { name: 'Add a Sort' });
-    userEvent.click(addSortButton);
+      const addSortButton = await screen.findByRole('button', { name: 'Add a Sort' });
+      userEvent.click(addSortButton);
 
-    await sortByTookMsDesc('sort-element-1', 'max(took_ms)');
-    await submitWidgetConfigForm();
+      await sortByTookMsDesc('sort-element-1', 'max(took_ms)');
+      await submitWidgetConfigForm();
 
-    const updatedConfig = widgetConfig
-      .toBuilder()
-      .series([series1, series2])
-      .sort([
-        SortConfig.fromSeries(series1),
-        SortConfig.fromSeries(series2),
-      ])
-      .build();
+      const updatedConfig = widgetConfig
+        .toBuilder()
+        .series([series1, series2])
+        .sort([SortConfig.fromSeries(series1), SortConfig.fromSeries(series2)])
+        .build();
 
-    await waitFor(() => expect(onChangeMock).toHaveBeenCalledTimes(1));
+      await waitFor(() => expect(onChangeMock).toHaveBeenCalledTimes(1));
 
-    expect(onChangeMock).toHaveBeenCalledWith(updatedConfig);
-  }, extendedTimeout);
+      expect(onChangeMock).toHaveBeenCalledWith(updatedConfig);
+    },
+    extendedTimeout,
+  );
 
-  it('should require field when creating a sort element', async () => {
-    renderSUT();
+  it(
+    'should require field when creating a sort element',
+    async () => {
+      renderSUT();
 
-    await addSortElement();
+      await addSortElement();
 
-    const newSortContainer = await screen.findByTestId('sort-element-0');
-    const applyButton = await findWidgetConfigFormSubmitButton();
-    await waitFor(() => expect(within(newSortContainer).getByText('Field is required.')).toBeInTheDocument());
-    await waitFor(() => expect(applyButton).toBeDisabled());
-  }, extendedTimeout);
+      const newSortContainer = await screen.findByTestId('sort-element-0');
+      const applyButton = await findWidgetConfigFormSubmitButton();
+      await waitFor(() => expect(within(newSortContainer).getByText('Field is required.')).toBeInTheDocument());
+      await waitFor(() => expect(applyButton).toBeDisabled());
+    },
+    extendedTimeout,
+  );
 
-  it('should require direction when creating a sort element', async () => {
-    renderSUT();
+  it(
+    'should require direction when creating a sort element',
+    async () => {
+      renderSUT();
 
-    await addSortElement();
+      await addSortElement();
 
-    const newSortContainer = await screen.findByTestId('sort-element-0');
-    const applyButton = await findWidgetConfigFormSubmitButton();
-    await waitFor(() => expect(within(newSortContainer).getByText('Direction is required.')).toBeInTheDocument());
-    await waitFor(() => expect(applyButton).toBeDisabled());
-  }, extendedTimeout);
+      const newSortContainer = await screen.findByTestId('sort-element-0');
+      const applyButton = await findWidgetConfigFormSubmitButton();
+      await waitFor(() => expect(within(newSortContainer).getByText('Direction is required.')).toBeInTheDocument());
+      await waitFor(() => expect(applyButton).toBeDisabled());
+    },
+    extendedTimeout,
+  );
 
-  it('should remove all sorts', async () => {
-    const onChangeMock = jest.fn();
-    const config = widgetConfig
-      .toBuilder()
-      .sort([new SortConfig('pivot', 'http_method', Direction.Ascending)])
-      .build();
+  it(
+    'should remove all sorts',
+    async () => {
+      const onChangeMock = jest.fn();
+      const config = widgetConfig
+        .toBuilder()
+        .sort([new SortConfig('pivot', 'http_method', Direction.Ascending)])
+        .build();
 
-    renderSUT({ config, onChange: onChangeMock });
+      renderSUT({ config, onChange: onChangeMock });
 
-    const removeSortElementButton = await screen.findByRole('button', { name: 'Remove Sort' });
-    await userEvent.click(removeSortElementButton);
+      const removeSortElementButton = await screen.findByRole('button', { name: 'Remove Sort' });
+      await userEvent.click(removeSortElementButton);
 
-    await submitWidgetConfigForm();
+      await submitWidgetConfigForm();
 
-    const updatedConfig = widgetConfig
-      .toBuilder()
-      .sort([])
-      .build();
+      const updatedConfig = widgetConfig.toBuilder().sort([]).build();
 
-    await waitFor(() => expect(onChangeMock).toHaveBeenCalledTimes(1));
+      await waitFor(() => expect(onChangeMock).toHaveBeenCalledTimes(1));
 
-    expect(onChangeMock).toHaveBeenCalledWith(updatedConfig);
-  }, extendedTimeout);
+      expect(onChangeMock).toHaveBeenCalledWith(updatedConfig);
+    },
+    extendedTimeout,
+  );
 
-  it('should correctly update sort of sort elements', async () => {
-    const sort1 = new SortConfig('pivot', 'http_method', Direction.Ascending);
-    const sort2 = new SortConfig('pivot', 'took_ms', Direction.Descending);
+  it(
+    'should correctly update sort of sort elements',
+    async () => {
+      const sort1 = new SortConfig('pivot', 'http_method', Direction.Ascending);
+      const sort2 = new SortConfig('pivot', 'took_ms', Direction.Descending);
 
-    const config = widgetConfig
-      .toBuilder()
-      .rowPivots([pivot0, pivot1])
-      .sort([sort1, sort2])
-      .build();
+      const config = widgetConfig.toBuilder().rowPivots([pivot0, pivot1]).sort([sort1, sort2]).build();
 
-    const onChange = jest.fn();
-    renderSUT({ onChange, config });
+      const onChange = jest.fn();
+      renderSUT({ onChange, config });
 
-    const sortSection = await screen.findByTestId('Sort-section');
+      const sortSection = await screen.findByTestId('Sort-section');
 
-    const firstItem = within(sortSection).getByTestId('sort-0-drag-handle');
-    fireEvent.keyDown(firstItem, { key: 'Space', keyCode: 32 });
-    await screen.findByText(/You have lifted an item/i);
-    fireEvent.keyDown(firstItem, { key: 'ArrowDown', keyCode: 40 });
-    await screen.findByText(/You have moved the item/i);
-    fireEvent.keyDown(firstItem, { key: 'Space', keyCode: 32 });
-    await screen.findByText(/You have dropped the item/i);
+      const firstItem = within(sortSection).getByTestId('sort-0-drag-handle');
+      fireEvent.keyDown(firstItem, { key: 'Space', keyCode: 32 });
+      await screen.findByText(/You have lifted an item/i);
+      fireEvent.keyDown(firstItem, { key: 'ArrowDown', keyCode: 40 });
+      await screen.findByText(/You have moved the item/i);
+      fireEvent.keyDown(firstItem, { key: 'Space', keyCode: 32 });
+      await screen.findByText(/You have dropped the item/i);
 
-    await submitWidgetConfigForm();
+      await submitWidgetConfigForm();
 
-    const updatedConfig = config
-      .toBuilder()
-      .sort([sort2, sort1])
-      .build();
+      const updatedConfig = config.toBuilder().sort([sort2, sort1]).build();
 
-    await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1));
+      await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1));
 
-    expect(onChange).toHaveBeenCalledWith(updatedConfig);
-  }, extendedTimeout);
+      expect(onChange).toHaveBeenCalledWith(updatedConfig);
+    },
+    extendedTimeout,
+  );
 });

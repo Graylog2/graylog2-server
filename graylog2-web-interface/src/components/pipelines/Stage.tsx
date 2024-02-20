@@ -31,30 +31,34 @@ import StageForm from './StageForm';
 import StageRules from './StageRules';
 
 type Props = {
-  stage: StageType,
-  pipeline: PipelineType,
-  isLastStage: boolean,
-  onUpdate: (nextStage: StageType, callback: () => void) => void,
-  onDelete: () => void,
+  stage: StageType;
+  pipeline: PipelineType;
+  isLastStage: boolean;
+  onUpdate: (nextStage: StageType, callback: () => void) => void;
+  onDelete: () => void;
 };
 
 const Stage = ({ stage, pipeline, isLastStage, onUpdate, onDelete }: Props) => {
   const currentUser = useCurrentUser();
   const { rules: allRules }: { rules: RuleType[] } = useStore(RulesStore);
 
-  const suffix = `Contains ${(stage.rules.length === 1 ? '1 rule' : `${stage.rules.length} rules`)}`;
+  const suffix = `Contains ${stage.rules.length === 1 ? '1 rule' : `${stage.rules.length} rules`}`;
 
   const throughput = (
-    <MetricContainer name={`org.graylog.plugins.pipelineprocessor.ast.Pipeline.${pipeline.id}.stage.${stage.stage}.executed`}>
+    <MetricContainer
+      name={`org.graylog.plugins.pipelineprocessor.ast.Pipeline.${pipeline.id}.stage.${stage.stage}.executed`}
+    >
       <CounterRate showTotal={false} prefix="Throughput: " suffix="msg/s" />
     </MetricContainer>
   );
 
   const actions = [
-    <Button disabled={!isPermitted(currentUser.permissions, 'pipeline:edit')}
-            key={`delete-stage-${stage}`}
-            bsStyle="danger"
-            onClick={onDelete}>
+    <Button
+      disabled={!isPermitted(currentUser.permissions, 'pipeline:edit')}
+      key={`delete-stage-${stage}`}
+      bsStyle="danger"
+      onClick={onDelete}
+    >
       Delete
     </Button>,
     <StageForm key={`edit-stage-${stage}`} pipeline={pipeline} stage={stage} save={onUpdate} />,
@@ -63,7 +67,8 @@ const Stage = ({ stage, pipeline, isLastStage, onUpdate, onDelete }: Props) => {
   let description;
 
   if (isLastStage) {
-    description = 'There are no further stages in this pipeline. Once rules in this stage are applied, the pipeline will have finished processing.';
+    description =
+      'There are no further stages in this pipeline. Once rules in this stage are applied, the pipeline will have finished processing.';
   } else {
     let matchText;
 
@@ -84,8 +89,7 @@ const Stage = ({ stage, pipeline, isLastStage, onUpdate, onDelete }: Props) => {
 
     description = (
       <span>
-        Messages satisfying <strong>{matchText}</strong>{' '}
-        in this stage, will continue to the next stage.
+        Messages satisfying <strong>{matchText}</strong> in this stage, will continue to the next stage.
       </span>
     );
   }
@@ -98,20 +102,24 @@ const Stage = ({ stage, pipeline, isLastStage, onUpdate, onDelete }: Props) => {
     </span>
   );
 
-  const content = (allRules
-    ? (
-      <StageRules pipeline={pipeline}
-                  stage={stage}
-                  rules={stage.rules.map((name) => allRules.filter((r) => r.title === name)[0])} />
-    )
-    : <Spinner />);
+  const content = allRules ? (
+    <StageRules
+      pipeline={pipeline}
+      stage={stage}
+      rules={stage.rules.map((name) => allRules.filter((r) => r.title === name)[0])}
+    />
+  ) : (
+    <Spinner />
+  );
 
   return (
-    <EntityListItem title={`Stage ${stage.stage}`}
-                    titleSuffix={suffix}
-                    actions={actions}
-                    description={block}
-                    contentRow={<Col md={12}>{content}</Col>} />
+    <EntityListItem
+      title={`Stage ${stage.stage}`}
+      titleSuffix={suffix}
+      actions={actions}
+      description={block}
+      contentRow={<Col md={12}>{content}</Col>}
+    />
   );
 };
 

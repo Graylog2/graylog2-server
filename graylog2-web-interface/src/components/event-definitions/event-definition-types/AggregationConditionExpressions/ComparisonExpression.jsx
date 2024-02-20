@@ -38,38 +38,44 @@ const ComparisonExpression = (props) => {
   return (
     <Col md={10}>
       <Row className="row-sm">
-        <AggregationConditionExpression {...props}
-                                        expression={expression.left}
-                                        validation={validation.left}
-                                        parent={expression}
-                                        onChange={onChildChange('left')}
-                                        level={level + 1} />
+        <AggregationConditionExpression
+          {...props}
+          expression={expression.left}
+          validation={validation.left}
+          parent={expression}
+          onChange={onChildChange('left')}
+          level={level + 1}
+        />
 
         <Col md={3}>
           <FormGroup controlId="aggregation-condition" validationState={validation.message ? 'error' : null}>
             {renderLabel && <ControlLabel>Is</ControlLabel>}
-            <Select id="aggregation-condition"
-                    matchProp="label"
-                    placeholder="Select Condition"
-                    onChange={handleExpressionOperatorChange}
-                    options={[
-                      { label: '<', value: '<' },
-                      { label: '<=', value: '<=' },
-                      { label: '>', value: '>' },
-                      { label: '>=', value: '>=' },
-                      { label: '=', value: '==' },
-                    ]}
-                    value={expression.expr}
-                    clearable={false} />
+            <Select
+              id="aggregation-condition"
+              matchProp="label"
+              placeholder="Select Condition"
+              onChange={handleExpressionOperatorChange}
+              options={[
+                { label: '<', value: '<' },
+                { label: '<=', value: '<=' },
+                { label: '>', value: '>' },
+                { label: '>=', value: '>=' },
+                { label: '=', value: '==' },
+              ]}
+              value={expression.expr}
+              clearable={false}
+            />
             {validation.message && <HelpBlock>{validation.message}</HelpBlock>}
           </FormGroup>
         </Col>
-        <AggregationConditionExpression {...props}
-                                        expression={expression.right}
-                                        validation={validation.right}
-                                        parent={expression}
-                                        onChange={onChildChange('right')}
-                                        level={level + 1} />
+        <AggregationConditionExpression
+          {...props}
+          expression={expression.right}
+          validation={validation.right}
+          parent={expression}
+          onChange={onChildChange('right')}
+          level={level + 1}
+        />
       </Row>
     </Col>
   );

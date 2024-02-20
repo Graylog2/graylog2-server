@@ -32,8 +32,8 @@ import type AuthenticationBackend from 'logic/authentication/AuthenticationBacke
 
 type Props = {
   params: {
-    backendId: string,
-  },
+    backendId: string;
+  };
 };
 
 const _pageTitle = (authBackendTitle, returnString = false) => {
@@ -44,7 +44,11 @@ const _pageTitle = (authBackendTitle, returnString = false) => {
     return `${pageName} - ${backendTitle}`;
   }
 
-  return <>{pageName} - <i>{backendTitle}</i></>;
+  return (
+    <>
+      {pageName} - <i>{backendTitle}</i>
+    </>
+  );
 };
 
 const AuthenticationBackendDetailsPage = ({ params: { backendId } }: Props) => {
@@ -61,19 +65,20 @@ const AuthenticationBackendDetailsPage = ({ params: { backendId } }: Props) => {
   return (
     <DocumentTitle title={_pageTitle(authBackend.title, true)}>
       <AuthenticationPageNavigation />
-      <PageHeader title={_pageTitle(authBackend.title)}
-                  actions={(
-                    <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.BACKENDS.edit(authBackend?.id)}>
-                      <Button bsStyle="success"
-                              type="button">
-                        Edit Service
-                      </Button>
-                    </LinkContainer>
-                  )}
-                  documentationLink={{
-                    title: 'Authentication documentation',
-                    path: DocsHelper.PAGES.USERS_ROLES,
-                  }}>
+      <PageHeader
+        title={_pageTitle(authBackend.title)}
+        actions={
+          <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.BACKENDS.edit(authBackend?.id)}>
+            <Button bsStyle="success" type="button">
+              Edit Service
+            </Button>
+          </LinkContainer>
+        }
+        documentationLink={{
+          title: 'Authentication documentation',
+          path: DocsHelper.PAGES.USERS_ROLES,
+        }}
+      >
         <span>Configure Graylog&apos;s authentication services of this Graylog cluster.</span>
       </PageHeader>
       <BackendDetails authenticationBackend={authBackend} />

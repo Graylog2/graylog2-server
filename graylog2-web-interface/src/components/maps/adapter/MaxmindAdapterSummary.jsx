@@ -41,7 +41,9 @@ class MaxmindAdapterSummary extends React.Component {
         <dt>Database type</dt>
         <dd>{databaseTypes[config.database_type]}</dd>
         <dt>Check interval</dt>
-        <dd><TimeUnit value={config.check_interval} unit={config.check_interval_unit} /></dd>
+        <dd>
+          <TimeUnit value={config.check_interval} unit={config.check_interval_unit} />
+        </dd>
       </dl>
     );
   }

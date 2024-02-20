@@ -19,24 +19,28 @@ import Qs from 'qs';
 import type { TimeRange } from 'views/logic/queries/Query';
 
 type SearchQueryString = {
-  query: string,
-  limit?: number,
-  offset?: number,
-  sort?: `${string}:${'asc' | 'desc'}`,
-  decorate?: boolean,
-  fields?: string,
-  filter?: string,
+  query: string;
+  limit?: number;
+  offset?: number;
+  sort?: `${string}:${'asc' | 'desc'}`;
+  decorate?: boolean;
+  fields?: string;
+  filter?: string;
 } & Partial<TimeRange>;
 
 const ApiRoutes = {
   AlarmCallbacksApiController: {
     available: () => ({ url: '/alerts/callbacks/types' }),
     create: (streamId: string) => ({ url: `/streams/${streamId}/alarmcallbacks` }),
-    delete: (streamId: string, alarmCallbackId: string) => ({ url: `/streams/${streamId}/alarmcallbacks/${alarmCallbackId}` }),
+    delete: (streamId: string, alarmCallbackId: string) => ({
+      url: `/streams/${streamId}/alarmcallbacks/${alarmCallbackId}`,
+    }),
     listAll: () => ({ url: '/alerts/callbacks' }),
     list: (streamId: string) => ({ url: `/streams/${streamId}/alarmcallbacks` }),
     testAlert: (alarmCallbackId: string) => ({ url: `/alerts/callbacks/${alarmCallbackId}/test` }),
-    update: (streamId: string, alarmCallbackId: string) => ({ url: `/streams/${streamId}/alarmcallbacks/${alarmCallbackId}` }),
+    update: (streamId: string, alarmCallbackId: string) => ({
+      url: `/streams/${streamId}/alarmcallbacks/${alarmCallbackId}`,
+    }),
   },
   AlarmCallbackHistoryApiController: {
     list: (streamId: string, alertId: string) => ({ url: `/streams/${streamId}/alerts/${alertId}/history` }),
@@ -48,7 +52,9 @@ const ApiRoutes = {
     enableUser: (userId: string) => ({ url: `/system/authentication/users/${userId}/enable` }),
     load: (serviceId: string) => ({ url: `/system/authentication/services/backends/${serviceId}` }),
     loadActive: () => ({ url: '/system/authentication/services/active-backend' }),
-    loadUsersPaginated: (authBackendId: string) => ({ url: `/system/authentication/services/backends/${authBackendId}/users` }),
+    loadUsersPaginated: (authBackendId: string) => ({
+      url: `/system/authentication/services/backends/${authBackendId}/users`,
+    }),
     loadActiveBackendType: () => ({ url: '/system/authentication/services/backends/active-backend/type' }),
     servicesPaginated: () => ({ url: '/system/authentication/services/backends' }),
     testConnection: () => ({ url: '/system/authentication/services/test/backend/connection' }),
@@ -75,15 +81,27 @@ const ApiRoutes = {
   ContentPacksController: {
     list: () => ({ url: '/system/content_packs/latest' }),
     get: (contentPackId: string) => ({ url: `/system/content_packs/${contentPackId}` }),
-    getRev: (contentPackId: string, revision: string) => ({ url: `/system/content_packs/${contentPackId}/${revision}` }),
-    downloadRev: (contentPackId: string, revision: number) => ({ url: `/system/content_packs/${contentPackId}/${revision}/download` }),
+    getRev: (contentPackId: string, revision: string) => ({
+      url: `/system/content_packs/${contentPackId}/${revision}`,
+    }),
+    downloadRev: (contentPackId: string, revision: number) => ({
+      url: `/system/content_packs/${contentPackId}/${revision}/download`,
+    }),
     create: () => ({ url: '/system/content_packs' }),
     delete: (contentPackId: string) => ({ url: `/system/content_packs/${contentPackId}` }),
-    deleteRev: (contentPackId: string, revision: string) => ({ url: `/system/content_packs/${contentPackId}/${revision}` }),
-    install: (contentPackId: string, revision: string) => ({ url: `/system/content_packs/${contentPackId}/${revision}/installations` }),
+    deleteRev: (contentPackId: string, revision: string) => ({
+      url: `/system/content_packs/${contentPackId}/${revision}`,
+    }),
+    install: (contentPackId: string, revision: string) => ({
+      url: `/system/content_packs/${contentPackId}/${revision}/installations`,
+    }),
     installList: (contentPackId: string) => ({ url: `/system/content_packs/${contentPackId}/installations` }),
-    uninstall: (contentPackId: string, installId: string) => ({ url: `/system/content_packs/${contentPackId}/installations/${installId}` }),
-    uninstallDetails: (contentPackId: string, installId: string) => ({ url: `/system/content_packs/${contentPackId}/installations/${installId}/uninstall_details` }),
+    uninstall: (contentPackId: string, installId: string) => ({
+      url: `/system/content_packs/${contentPackId}/installations/${installId}`,
+    }),
+    uninstallDetails: (contentPackId: string, installId: string) => ({
+      url: `/system/content_packs/${contentPackId}/installations/${installId}/uninstall_details`,
+    }),
   },
   CountsApiController: {
     total: () => ({ url: '/count/total' }),
@@ -108,10 +126,16 @@ const ApiRoutes = {
     delete: (id) => ({ url: `/dashboards/${id}` }),
     update: (id) => ({ url: `/dashboards/${id}` }),
     addWidget: (id) => ({ url: `/dashboards/${id}/widgets` }),
-    removeWidget: (dashboardId: string, widgetId: string) => ({ url: `/dashboards/${dashboardId}/widgets/${widgetId}` }),
+    removeWidget: (dashboardId: string, widgetId: string) => ({
+      url: `/dashboards/${dashboardId}/widgets/${widgetId}`,
+    }),
     widget: (dashboardId: string, widgetId: string) => ({ url: `/dashboards/${dashboardId}/widgets/${widgetId}` }),
-    updateWidget: (dashboardId: string, widgetId: string) => ({ url: `/dashboards/${dashboardId}/widgets/${widgetId}` }),
-    widgetValue: (dashboardId: string, widgetId: string) => ({ url: `/dashboards/${dashboardId}/widgets/${widgetId}/value` }),
+    updateWidget: (dashboardId: string, widgetId: string) => ({
+      url: `/dashboards/${dashboardId}/widgets/${widgetId}`,
+    }),
+    widgetValue: (dashboardId: string, widgetId: string) => ({
+      url: `/dashboards/${dashboardId}/widgets/${widgetId}/value`,
+    }),
     updatePositions: (dashboardId: string) => ({ url: `/dashboards/${dashboardId}/positions` }),
   },
   DecoratorsResource: {
@@ -178,11 +202,17 @@ const ApiRoutes = {
   },
   IndexSetsApiController: {
     list: (stats) => ({ url: `/system/indices/index_sets?stats=${stats}` }),
-    listPaginated: (skip, limit, stats) => ({ url: `/system/indices/index_sets?skip=${skip}&limit=${limit}&stats=${stats}` }),
+    listPaginated: (skip, limit, stats) => ({
+      url: `/system/indices/index_sets?skip=${skip}&limit=${limit}&stats=${stats}`,
+    }),
     get: (indexSetId: string) => ({ url: `/system/indices/index_sets/${indexSetId}` }),
     create: () => ({ url: '/system/indices/index_sets' }),
-    delete: (indexSetId: string, deleteIndices) => ({ url: `/system/indices/index_sets/${indexSetId}?delete_indices=${deleteIndices}` }),
-    searchPaginated: (searchTerm, skip, limit, stats) => ({ url: `/system/indices/index_sets/search?searchTitle=${searchTerm}&skip=${skip}&limit=${limit}&stats=${stats}` }),
+    delete: (indexSetId: string, deleteIndices) => ({
+      url: `/system/indices/index_sets/${indexSetId}?delete_indices=${deleteIndices}`,
+    }),
+    searchPaginated: (searchTerm, skip, limit, stats) => ({
+      url: `/system/indices/index_sets/search?searchTitle=${searchTerm}&skip=${skip}&limit=${limit}&stats=${stats}`,
+    }),
     setDefault: (indexSetId: string) => ({ url: `/system/indices/index_sets/${indexSetId}/default` }),
     stats: () => ({ url: '/system/indices/index_sets/stats' }),
   },
@@ -212,7 +242,9 @@ const ApiRoutes = {
   ClusterLoggersResource: {
     loggers: () => ({ url: '/cluster/system/loggers' }),
     subsystems: () => ({ url: '/cluster/system/loggers/subsystems' }),
-    setSubsystemLoggerLevel: (nodeId: string, subsystem: string, loglevel: string) => ({ url: `/cluster/system/loggers/${nodeId}/subsystems/${subsystem}/level/${loglevel}` }),
+    setSubsystemLoggerLevel: (nodeId: string, subsystem: string, loglevel: string) => ({
+      url: `/cluster/system/loggers/${nodeId}/subsystems/${subsystem}/level/${loglevel}`,
+    }),
   },
   ClusterSupportBundleController: {
     delete: (filename: string) => ({ url: `/cluster/debug/support/bundle/${filename}` }),
@@ -238,7 +270,9 @@ const ApiRoutes = {
     deleteWithKey: (type: string, key: string) => ({ url: `/system/notifications/${type}/${key}` }),
     list: () => ({ url: '/system/notifications' }),
     getHtmlMessage: (type: string) => ({ url: `/system/notification/message/html/${type.toLocaleUpperCase()}` }),
-    getHtmlMessageWithKey: (type: string, key: string) => ({ url: `/system/notification/message/html/${type.toLocaleUpperCase()}/${key}` }),
+    getHtmlMessageWithKey: (type: string, key: string) => ({
+      url: `/system/notification/message/html/${type.toLocaleUpperCase()}/${key}`,
+    }),
   },
   OutputsApiController: {
     index: () => ({ url: '/system/outputs' }),
@@ -304,12 +338,16 @@ const ApiRoutes = {
     all: (page: number) => ({ url: `/system/messages?page=${page}` }),
   },
   SystemSearchVersionApiController: {
-    satisfiesVersion: (distribution: 'opensearch' | 'elasticsearch', version?: string) => ({ url: `/system/searchVersion/satisfiesVersion/${distribution}${version ? `?version=${version}` : ''}` }),
+    satisfiesVersion: (distribution: 'opensearch' | 'elasticsearch', version?: string) => ({
+      url: `/system/searchVersion/satisfiesVersion/${distribution}${version ? `?version=${version}` : ''}`,
+    }),
   },
   ToolsApiController: {
     grokTest: () => ({ url: '/tools/grok_tester' }),
     jsonTest: () => ({ url: '/tools/json_tester' }),
-    naturalDateTest: (string, timezone) => ({ url: `/tools/natural_date_tester?string=${string}&timezone=${timezone}` }),
+    naturalDateTest: (string, timezone) => ({
+      url: `/tools/natural_date_tester?string=${string}&timezone=${timezone}`,
+    }),
     regexTest: () => ({ url: '/tools/regex_tester' }),
     regexValidate: (regex: string) => ({ url: `/tools/regex_tester/validate?regex=${regex}` }),
     regexReplaceTest: () => ({ url: '/tools/regex_replace_tester' }),
@@ -326,7 +364,7 @@ const ApiRoutes = {
   },
   UniversalSearchApiController: {
     _streamFilter(streamId: string) {
-      return (streamId ? { filter: `streams:${streamId}` } : {});
+      return streamId ? { filter: `streams:${streamId}` } : {};
     },
     _buildBaseQueryString(query: string, timerange: TimeRange, streamId): SearchQueryString {
       const queryString: Partial<SearchQueryString> = {};
@@ -348,7 +386,17 @@ const ApiRoutes = {
     _buildUrl(url: string, queryString: SearchQueryString) {
       return `${url}?${Qs.stringify(queryString)}`;
     },
-    search(type: string, query: string, timerange: TimeRange, streamId: string, limit: number, offset: number, sortField: string, sortOrder: 'asc' | 'desc', decorate: boolean) {
+    search(
+      type: string,
+      query: string,
+      timerange: TimeRange,
+      streamId: string,
+      limit: number,
+      offset: number,
+      sortField: string,
+      sortOrder: 'asc' | 'desc',
+      decorate: boolean,
+    ) {
       const url = `/search/universal/${type}`;
       const queryString = this._buildBaseQueryString(query, timerange, streamId);
 
@@ -370,7 +418,15 @@ const ApiRoutes = {
 
       return { url: this._buildUrl(url, queryString) };
     },
-    export(type: string, query: string, timerange: TimeRange, streamId: string, limit: number, offset: number, fields: Array<string>) {
+    export(
+      type: string,
+      query: string,
+      timerange: TimeRange,
+      streamId: string,
+      limit: number,
+      offset: number,
+      fields: Array<string>,
+    ) {
       const url = `/search/universal/${type}/export`;
       const queryString = this._buildBaseQueryString(query, timerange, streamId);
 
@@ -416,13 +472,19 @@ const ApiRoutes = {
     analyze: (index: string, string: string) => ({ url: `/messages/${index}/analyze?string=${string}` }),
     parse: () => ({ url: '/messages/parse' }),
     single: (index: string, messageId: string) => ({ url: `/messages/${index}/${messageId}` }),
-    exportSearch: ((searchId: string) => ({ url: `/views/search/messages/${searchId}` })),
-    exportSearchType: ((searchId: string, searchTypeId: string) => ({ url: `/views/search/messages/${searchId}/${searchTypeId}` })),
-    jobResults: ((exportJobId: string, filename: string) => ({ url: `/views/search/messages/job/${exportJobId}/${filename}` })),
+    exportSearch: (searchId: string) => ({ url: `/views/search/messages/${searchId}` }),
+    exportSearchType: (searchId: string, searchTypeId: string) => ({
+      url: `/views/search/messages/${searchId}/${searchTypeId}`,
+    }),
+    jobResults: (exportJobId: string, filename: string) => ({
+      url: `/views/search/messages/job/${exportJobId}/${filename}`,
+    }),
   },
   ExportJobsController: {
-    exportSearch: ((searchId: string) => ({ url: `/views/export/${searchId}` })),
-    exportSearchType: ((searchId: string, searchTypeId: string) => ({ url: `/views/export/${searchId}/${searchTypeId}` })),
+    exportSearch: (searchId: string) => ({ url: `/views/export/${searchId}` }),
+    exportSearchType: (searchId: string, searchTypeId: string) => ({
+      url: `/views/export/${searchId}/${searchTypeId}`,
+    }),
   },
   MapDataController: {
     search: () => ({ url: '/search/mapdata' }),

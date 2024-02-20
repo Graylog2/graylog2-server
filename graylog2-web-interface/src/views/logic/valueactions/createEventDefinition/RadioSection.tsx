@@ -28,10 +28,10 @@ const Container = styled.div`
 `;
 
 type Props = {
-  strategy: StrategyId,
-  onChange: (e: React.FormEvent<Radio>) => void,
-  strategyAvailabilities: {[name in StrategyId]: boolean}
-}
+  strategy: StrategyId;
+  onChange: (e: React.FormEvent<Radio>) => void;
+  strategyAvailabilities: { [name in StrategyId]: boolean };
+};
 
 const RadioSection = ({ strategy, onChange, strategyAvailabilities }: Props) => {
   const { description } = strategiesLabels[strategy];
@@ -40,25 +40,26 @@ const RadioSection = ({ strategy, onChange, strategyAvailabilities }: Props) => 
     <>
       <b>Strategy by:</b>
       <Container>
-        {
-      Object.entries(strategiesLabels).map(([curStrategy, { label }]) => {
-        if (!strategyAvailabilities[curStrategy]) return null;
+        {Object.entries(strategiesLabels).map(([curStrategy, { label }]) => {
+          if (!strategyAvailabilities[curStrategy]) return null;
 
-        return (
-          <Radio id={curStrategy}
-                 key={curStrategy}
-                 name="strategy"
-                 value={curStrategy}
-                 checked={curStrategy === strategy}
-                 onChange={onChange}>
-            {label}
-          </Radio>
-        );
-      })
-    }
+          return (
+            <Radio
+              id={curStrategy}
+              key={curStrategy}
+              name="strategy"
+              value={curStrategy}
+              checked={curStrategy === strategy}
+              onChange={onChange}
+            >
+              {label}
+            </Radio>
+          );
+        })}
       </Container>
       <p>
-        <b>Description: </b><i>{description}</i>
+        <b>Description: </b>
+        <i>{description}</i>
       </p>
     </>
   );

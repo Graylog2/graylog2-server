@@ -21,7 +21,16 @@ import { act } from 'react-dom/test-utils';
 import selectEvent from 'react-select-event';
 
 import asMock from 'helpers/mocking/AsMock';
-import mockEntityShareState, { failedEntityShareState, john, jane, everyone, security, viewer, owner, manager } from 'fixtures/entityShareState';
+import mockEntityShareState, {
+  failedEntityShareState,
+  john,
+  jane,
+  everyone,
+  security,
+  viewer,
+  owner,
+  manager,
+} from 'fixtures/entityShareState';
 import ActiveShare from 'logic/permissions/ActiveShare';
 import { EntityShareStore, EntityShareActions } from 'stores/permissions/EntityShareStore';
 
@@ -57,12 +66,14 @@ describe('EntityShareModal', () => {
   });
 
   const SimpleEntityShareModal = ({ ...props }) => (
-    <EntityShareModal description="The description"
-                      entityId="dashboard-id"
-                      entityType="dashboard"
-                      onClose={() => {}}
-                      entityTitle="The title"
-                      {...props} />
+    <EntityShareModal
+      description="The description"
+      entityId="dashboard-id"
+      entityType="dashboard"
+      onClose={() => {}}
+      entityTitle="The title"
+      {...props}
+    />
   );
 
   const getModalSubmitButton = () => screen.queryByRole('button', { name: /update sharing/i, hidden: true });
@@ -108,7 +119,9 @@ describe('EntityShareModal', () => {
       asMock(EntityShareStore.getInitialState).mockReturnValue(mockEmptyStore);
       render(<SimpleEntityShareModal />);
 
-      act(() => { jest.advanceTimersByTime(200); });
+      act(() => {
+        jest.advanceTimersByTime(200);
+      });
 
       expect(await screen.findByText('Loading...')).not.toBeNull();
     });
@@ -134,7 +147,9 @@ describe('EntityShareModal', () => {
       // sharable urls
       expect(await screen.findByDisplayValue('http://localhost/dashboards/dashboard-id')).not.toBeNull();
       // missing dependencies warning
-      expect(await screen.findByText('There are missing dependencies for the current set of collaborators')).not.toBeNull();
+      expect(
+        await screen.findByText('There are missing dependencies for the current set of collaborators'),
+      ).not.toBeNull();
       expect(await screen.findByText(/needs access to/)).not.toBeNull();
     });
   });
@@ -173,7 +188,9 @@ describe('EntityShareModal', () => {
           await selectEvent.openMenu(capabilitySelect);
         });
 
-        await act(async () => { await selectEvent.select(capabilitySelect, capability.title); });
+        await act(async () => {
+          await selectEvent.select(capabilitySelect, capability.title);
+        });
 
         // Submit form
         const submitButton = await screen.findByText('Add Collaborator');
@@ -181,9 +198,16 @@ describe('EntityShareModal', () => {
         fireEvent.click(submitButton);
 
         await waitFor(() => {
-          expect(EntityShareActions.prepare).toHaveBeenCalledWith('dashboard', 'The title', mockEntityShareState.entity, {
-            selected_grantee_capabilities: mockEntityShareState.selectedGranteeCapabilities.merge({ [newGrantee.id]: capability.id }),
-          });
+          expect(EntityShareActions.prepare).toHaveBeenCalledWith(
+            'dashboard',
+            'The title',
+            mockEntityShareState.entity,
+            {
+              selected_grantee_capabilities: mockEntityShareState.selectedGranteeCapabilities.merge({
+                [newGrantee.id]: capability.id,
+              }),
+            },
+          );
         });
       };
 
@@ -209,7 +233,9 @@ describe('EntityShareModal', () => {
       fireEvent.click(await screen.findByRole('button', { name: /update sharing/i, hidden: true }));
 
       await waitFor(() => {
-        expect(window.confirm).toHaveBeenCalledWith(`"${john.title}" got selected but was never added as a collaborator. Do you want to continue anyway?`);
+        expect(window.confirm).toHaveBeenCalledWith(
+          `"${john.title}" got selected but was never added as a collaborator. Do you want to continue anyway?`,
+        );
       });
     });
   });
@@ -232,7 +258,9 @@ describe('EntityShareModal', () => {
         await selectEvent.openMenu(capabilitySelect);
       });
 
-      await act(async () => { await selectEvent.select(capabilitySelect, viewer.title); });
+      await act(async () => {
+        await selectEvent.select(capabilitySelect, viewer.title);
+      });
 
       await waitFor(() => {
         expect(screen.queryAllByText(viewer.title)).toHaveLength(2);
@@ -240,27 +268,22 @@ describe('EntityShareModal', () => {
 
       await waitFor(() => {
         expect(EntityShareActions.prepare).toHaveBeenCalledWith('dashboard', 'The title', mockEntityShareState.entity, {
-          selected_grantee_capabilities: mockEntityShareState.selectedGranteeCapabilities.merge({ [jane.id]: viewer.id }),
+          selected_grantee_capabilities: mockEntityShareState.selectedGranteeCapabilities.merge({
+            [jane.id]: viewer.id,
+          }),
         });
       });
     });
 
     describe('allows deleting a grantee', () => {
       // active shares
-      const janeIsOwner = ActiveShare
-        .builder()
-        .grant('grant-id-1')
-        .grantee(jane.id)
-        .capability(owner.id)
-        .build();
-      const securityIsManager = ActiveShare
-        .builder()
+      const janeIsOwner = ActiveShare.builder().grant('grant-id-1').grantee(jane.id).capability(owner.id).build();
+      const securityIsManager = ActiveShare.builder()
         .grant('grant-id-2')
         .grantee(security.id)
         .capability(manager.id)
         .build();
-      const everyoneIsViewer = ActiveShare
-        .builder()
+      const everyoneIsViewer = ActiveShare.builder()
         .grant('grant-id-3')
         .grantee(everyone.id)
         .capability(viewer.id)
@@ -289,9 +312,14 @@ describe('EntityShareModal', () => {
         fireEvent.click(deleteButton);
 
         await waitFor(() => {
-          expect(EntityShareActions.prepare).toHaveBeenCalledWith('dashboard', 'The title', mockEntityShareState.entity, {
-            selected_grantee_capabilities: selectedGranteeCapabilities.remove(grantee.id),
-          });
+          expect(EntityShareActions.prepare).toHaveBeenCalledWith(
+            'dashboard',
+            'The title',
+            mockEntityShareState.entity,
+            {
+              selected_grantee_capabilities: selectedGranteeCapabilities.remove(grantee.id),
+            },
+          );
         });
       };
 

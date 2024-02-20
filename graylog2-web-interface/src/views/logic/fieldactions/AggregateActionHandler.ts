@@ -26,21 +26,21 @@ import { addWidget } from 'views/logic/slices/widgetActions';
 
 import duplicateCommonWidgetSettings from './DuplicateCommonWidgetSettings';
 
-const AggregateActionHandler: ThunkActionHandler<{ widget?: Widget }> = ({
-  field,
-  type,
-  contexts: { widget = Widget.empty() },
-}) => (dispatch: AppDispatch) => {
-  const newWidgetBuilder = AggregationWidget.builder()
-    .newId()
-    .config(AggregationWidgetConfig.builder()
-      .rowPivots([pivotForField(field, type)])
-      .series([Series.forFunction('count()'), Series.forFunction('percentage()')])
-      .visualization(DataTable.type)
-      .build());
-  const newWidget = duplicateCommonWidgetSettings(newWidgetBuilder, widget).build();
+const AggregateActionHandler: ThunkActionHandler<{ widget?: Widget }> =
+  ({ field, type, contexts: { widget = Widget.empty() } }) =>
+  (dispatch: AppDispatch) => {
+    const newWidgetBuilder = AggregationWidget.builder()
+      .newId()
+      .config(
+        AggregationWidgetConfig.builder()
+          .rowPivots([pivotForField(field, type)])
+          .series([Series.forFunction('count()'), Series.forFunction('percentage()')])
+          .visualization(DataTable.type)
+          .build(),
+      );
+    const newWidget = duplicateCommonWidgetSettings(newWidgetBuilder, widget).build();
 
-  return dispatch(addWidget(newWidget));
-};
+    return dispatch(addWidget(newWidget));
+  };
 
 export default AggregateActionHandler;

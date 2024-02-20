@@ -70,7 +70,9 @@ const CreateInputControl = createReactClass({
 
       options = inputTypesIds.map((id) => ({ value: id, label: inputTypes[id] }));
 
-      options.sort((inputTypeA, inputTypeB) => inputTypeA.label.toLowerCase().localeCompare(inputTypeB.label.toLowerCase()));
+      options.sort((inputTypeA, inputTypeB) =>
+        inputTypeA.label.toLowerCase().localeCompare(inputTypeB.label.toLowerCase()),
+      );
     } else {
       options.push({ value: 'none', label: 'No inputs available', disabled: true });
     }
@@ -91,15 +93,18 @@ const CreateInputControl = createReactClass({
       event_details: { value: selectedInput },
     });
 
-    InputTypesActions.get.triggerPromise(selectedInput).then((inputDefinition) => this.setState({ selectedInputDefinition: inputDefinition }));
+    InputTypesActions.get
+      .triggerPromise(selectedInput)
+      .then((inputDefinition) => this.setState({ selectedInputDefinition: inputDefinition }));
   },
 
   _openModal(event) {
     event.preventDefault();
     const { selectedInput } = this.state;
 
-    const customConfiguration = PluginStore.exports('inputConfiguration')
-      .find((inputConfig) => inputConfig.type === selectedInput);
+    const customConfiguration = PluginStore.exports('inputConfiguration').find(
+      (inputConfig) => inputConfig.type === selectedInput,
+    );
 
     if (customConfiguration) {
       const onClose = () => this.setState({ customInputsComponent: undefined });
@@ -132,16 +137,22 @@ const CreateInputControl = createReactClass({
       const inputTypeName = inputTypes[selectedInput];
 
       inputModal = (
-        <InputForm ref={(configurationForm) => {
-          this.configurationForm = configurationForm;
-        }}
-                   key="configuration-form-input"
-                   configFields={selectedInputDefinition.requested_configuration}
-                   title={<span>Launch new <em>{inputTypeName}</em> input</span>}
-                   submitButtonText="Launch Input"
-                   helpBlock="Select a name of your new input that describes it."
-                   typeName={selectedInput}
-                   submitAction={this._createInput} />
+        <InputForm
+          ref={(configurationForm) => {
+            this.configurationForm = configurationForm;
+          }}
+          key="configuration-form-input"
+          configFields={selectedInputDefinition.requested_configuration}
+          title={
+            <span>
+              Launch new <em>{inputTypeName}</em> input
+            </span>
+          }
+          submitButtonText="Launch Input"
+          helpBlock="Select a name of your new input that describes it."
+          typeName={selectedInput}
+          submitAction={this._createInput}
+        />
       );
     }
 
@@ -150,23 +161,29 @@ const CreateInputControl = createReactClass({
         <Col md={12}>
           <StyledForm className="form-inline" onSubmit={this._openModal}>
             <div className="form-group" style={{ width: 300 }}>
-              <Select placeholder="Select input"
-                      options={this._formatSelectOptions()}
-                      matchProp="label"
-                      onChange={this._onInputSelect}
-                      value={selectedInput} />
+              <Select
+                placeholder="Select input"
+                options={this._formatSelectOptions()}
+                matchProp="label"
+                onChange={this._onInputSelect}
+                value={selectedInput}
+              />
             </div>
             &nbsp;
-            <Button bsStyle="success" type="submit" disabled={!selectedInput}>Launch new input</Button>
-            <ExternalLinkButton href="https://marketplace.graylog.org/"
-                                bsStyle="info"
-                                onClick={() => {
-                                  this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.FIND_MORE_CLICKED, {
-                                    app_pathname: getPathnameWithoutId(this.props.location.pathname),
-                                    app_action_value: 'inputs-find-more',
-                                  });
-                                }}
-                                style={{ marginLeft: 10 }}>
+            <Button bsStyle="success" type="submit" disabled={!selectedInput}>
+              Launch new input
+            </Button>
+            <ExternalLinkButton
+              href="https://marketplace.graylog.org/"
+              bsStyle="info"
+              onClick={() => {
+                this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.FIND_MORE_CLICKED, {
+                  app_pathname: getPathnameWithoutId(this.props.location.pathname),
+                  app_action_value: 'inputs-find-more',
+                });
+              }}
+              style={{ marginLeft: 10 }}
+            >
               Find more inputs
             </ExternalLinkButton>
           </StyledForm>

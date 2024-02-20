@@ -26,10 +26,10 @@ const StyledList = styled.ul`
 `;
 
 type Props = {
-  bsNoItemsStyle?: 'info' | 'success' | 'warning',
-  noItemsText?: string | React.ReactNode,
-  items: Array<React.ReactNode>,
-}
+  bsNoItemsStyle?: 'info' | 'success' | 'warning';
+  noItemsText?: string | React.ReactNode;
+  items: Array<React.ReactNode>;
+};
 
 /**
  * Component used to represent list of entities in Graylog, where each entity will have a title, description,
@@ -38,18 +38,10 @@ type Props = {
  */
 const EntityList = ({ bsNoItemsStyle, items, noItemsText }: Props) => {
   if (items.length === 0) {
-    return (
-      <Alert bsStyle={bsNoItemsStyle}>
-        {noItemsText}
-      </Alert>
-    );
+    return <Alert bsStyle={bsNoItemsStyle}>{noItemsText}</Alert>;
   }
 
-  return (
-    <StyledList>
-      {items}
-    </StyledList>
-  );
+  return <StyledList>{items}</StyledList>;
 };
 
 EntityList.defaultProps = {
@@ -61,10 +53,7 @@ EntityList.propTypes = {
   /** bsStyle to use when there are no items in the list. */
   bsNoItemsStyle: PropTypes.oneOf(['info', 'success', 'warning']),
   /** Text to show when there are no items in the list. */
-  noItemsText: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.element,
-  ]),
+  noItemsText: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
   /** Array of `EntityListItem` that will be shown.  */
   items: PropTypes.array.isRequired,
 };

@@ -70,28 +70,25 @@ class TypeAheadFieldInput extends React.Component {
       const { autoFocus, valueLink, onChange } = this.props;
       const fieldInput = $(this.fieldInput.getInputDOMNode());
 
-      fetch('GET', qualifyUrl(ApiRoutes.SystemApiController.fields().url))
-        .then(
-          (data) => {
-            fieldInput.typeahead(
-              {
-                hint: true,
-                highlight: true,
-                minLength: 1,
-              },
-              {
-                name: 'fields',
-                displayKey: 'value',
-                source: UniversalSearch.substringMatcher(data.fields, 'value', 6),
-              },
-            );
-
-            if (autoFocus) {
-              fieldInput.focus();
-              fieldInput.typeahead('close');
-            }
+      fetch('GET', qualifyUrl(ApiRoutes.SystemApiController.fields().url)).then((data) => {
+        fieldInput.typeahead(
+          {
+            hint: true,
+            highlight: true,
+            minLength: 1,
+          },
+          {
+            name: 'fields',
+            displayKey: 'value',
+            source: UniversalSearch.substringMatcher(data.fields, 'value', 6),
           },
         );
+
+        if (autoFocus) {
+          fieldInput.focus();
+          fieldInput.typeahead('close');
+        }
+      });
 
       // eslint-disable-next-line react/no-find-dom-node
       const fieldFormGroup = ReactDOM.findDOMNode(this.fieldInput);
@@ -137,14 +134,18 @@ class TypeAheadFieldInput extends React.Component {
     const { id, label, valueLink, error, onBlur } = this.props;
 
     return (
-      <Input id={id}
-             ref={(fieldInput) => { this.fieldInput = fieldInput; }}
-             label={label}
-             onBlur={onBlur}
-             error={error}
-             wrapperClassName="typeahead-wrapper"
-             defaultValue={valueLink ? valueLink.value : null}
-             {...this._getFilteredProps()} />
+      <Input
+        id={id}
+        ref={(fieldInput) => {
+          this.fieldInput = fieldInput;
+        }}
+        label={label}
+        onBlur={onBlur}
+        error={error}
+        wrapperClassName="typeahead-wrapper"
+        defaultValue={valueLink ? valueLink.value : null}
+        {...this._getFilteredProps()}
+      />
     );
   }
 }

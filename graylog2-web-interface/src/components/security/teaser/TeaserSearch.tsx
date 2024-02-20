@@ -28,10 +28,10 @@ import type { SearchJson } from 'views/logic/search/Search';
 import StaticSearch from 'views/components/StaticSearch';
 
 type HotspotMeta = {
-  positionX: string,
-  positionY: string,
-  description: string
-}
+  positionX: string;
+  positionY: string;
+  description: string;
+};
 
 const StyledPageContentLayout = styled(PageContentLayout)`
   .page-content-grid {
@@ -49,41 +49,42 @@ const DashboardOverlay = styled.div`
   z-index: 1;
 `;
 
-const searchAreaContainer = (hotspots: Array<HotspotMeta>) => ({ children }: React.PropsWithChildren) => (
-  <StyledPageContentLayout>
-    <DashboardOverlay>
-      {hotspots.map(({ description, positionX, positionY }, index) => (
-        // eslint-disable-next-line react/no-array-index-key
-        <Hotspot positionX={positionX} positionY={positionY} index={index} key={`hotspot-${index}`}>
-          {description}
-        </Hotspot>
-      ))}
-    </DashboardOverlay>
-    <div inert="">
-      {children}
-    </div>
-  </StyledPageContentLayout>
-);
+const searchAreaContainer =
+  (hotspots: Array<HotspotMeta>) =>
+  ({ children }: React.PropsWithChildren) => (
+    <StyledPageContentLayout>
+      <DashboardOverlay>
+        {hotspots.map(({ description, positionX, positionY }, index) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <Hotspot positionX={positionX} positionY={positionY} index={index} key={`hotspot-${index}`}>
+            {description}
+          </Hotspot>
+        ))}
+      </DashboardOverlay>
+      <div inert="">{children}</div>
+    </StyledPageContentLayout>
+  );
 
 type Props = {
-  searchJson: Partial<SearchJson>,
-  viewJson: any,
-  searchJobResult: Partial<SearchJobResult>,
-  hotspots: Array<HotspotMeta>,
-}
+  searchJson: Partial<SearchJson>;
+  viewJson: any;
+  searchJobResult: Partial<SearchJobResult>;
+  hotspots: Array<HotspotMeta>;
+};
 
 const TeaserSearch = ({ searchJson, viewJson, searchJobResult, hotspots }: Props) => {
-  const searchPageLayout = useMemo(() => ({
-    sidebar: { isShown: false },
-    viewActions: SAVE_COPY,
-    searchAreaContainer: { component: searchAreaContainer(hotspots) },
-  }), [hotspots]);
+  const searchPageLayout = useMemo(
+    () => ({
+      sidebar: { isShown: false },
+      viewActions: SAVE_COPY,
+      searchAreaContainer: { component: searchAreaContainer(hotspots) },
+    }),
+    [hotspots],
+  );
 
   return (
     <SearchPageLayoutProvider value={searchPageLayout}>
-      <StaticSearch searchJson={searchJson}
-                    viewJson={viewJson}
-                    searchJobResult={searchJobResult} />
+      <StaticSearch searchJson={searchJson} viewJson={viewJson} searchJobResult={searchJobResult} />
     </SearchPageLayoutProvider>
   );
 };

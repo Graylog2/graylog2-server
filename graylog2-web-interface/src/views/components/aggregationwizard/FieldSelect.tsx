@@ -35,42 +35,50 @@ const FieldName = styled.span`
 `;
 
 type Props = {
-  ariaLabel?: string,
-  autoFocus?: boolean,
-  allowCreate?: boolean,
-  className?: string,
-  clearable?: boolean,
-  excludedFields?: Array<string>,
-  id: string,
-  isFieldQualified?: (field: FieldTypeMapping) => boolean,
-  menuPortalTarget?: HTMLElement,
-  name: string,
-  onChange: (fieldName: string) => void,
-  onMenuClose?: () => void,
-  openMenuOnFocus?: boolean,
-  persistSelection?: boolean,
-  placeholder?: string,
-  selectRef?: React.Ref<SelectInstance<unknown, boolean, GroupBase<unknown>>>,
-  size?: 'normal' | 'small',
-  value: string | undefined,
-}
+  ariaLabel?: string;
+  autoFocus?: boolean;
+  allowCreate?: boolean;
+  className?: string;
+  clearable?: boolean;
+  excludedFields?: Array<string>;
+  id: string;
+  isFieldQualified?: (field: FieldTypeMapping) => boolean;
+  menuPortalTarget?: HTMLElement;
+  name: string;
+  onChange: (fieldName: string) => void;
+  onMenuClose?: () => void;
+  openMenuOnFocus?: boolean;
+  persistSelection?: boolean;
+  placeholder?: string;
+  selectRef?: React.Ref<SelectInstance<unknown, boolean, GroupBase<unknown>>>;
+  size?: 'normal' | 'small';
+  value: string | undefined;
+};
 
-const sortByLabel = ({ label: label1 }: { label: string }, { label: label2 }: { label: string }) => defaultCompare(label1, label2);
+const sortByLabel = ({ label: label1 }: { label: string }, { label: label2 }: { label: string }) =>
+  defaultCompare(label1, label2);
 
-const UnqualifiedOption = styled.span(({ theme }) => css`
-  color: ${theme.colors.variant.light.default};
-`);
+const UnqualifiedOption = styled.span(
+  ({ theme }) => css`
+    color: ${theme.colors.variant.light.default};
+  `,
+);
 
 type OptionRendererProps = {
-  label: string,
-  qualified: boolean,
-  type?: FieldType,
+  label: string;
+  qualified: boolean;
+  type?: FieldType;
 };
 
 const OptionRenderer = ({ label, qualified, type }: OptionRendererProps) => {
   const children = (
     <FieldName>
-      {type && <><FieldTypeIcon type={type} /> </>}{label}
+      {type && (
+        <>
+          <FieldTypeIcon type={type} />{' '}
+        </>
+      )}
+      {label}
     </FieldName>
   );
 
@@ -103,38 +111,43 @@ const FieldSelect = ({
 }: Props) => {
   const activeQuery = useActiveQueryId();
   const fieldTypes = useContext(FieldTypesContext);
-  const fieldOptions = useMemo(() => fieldTypes.queryFields
-    .get(activeQuery, Immutable.List())
-    .filter((field) => !excludedFields.includes(field.name))
-    .map((field) => ({
-      label: field.name,
-      value: field.name,
-      type: field.type,
-      qualified: isFieldQualified(field),
-    }))
-    .toArray()
-    .sort(sortByLabel), [activeQuery, excludedFields, fieldTypes.queryFields, isFieldQualified]);
+  const fieldOptions = useMemo(
+    () =>
+      fieldTypes.queryFields
+        .get(activeQuery, Immutable.List())
+        .filter((field) => !excludedFields.includes(field.name))
+        .map((field) => ({
+          label: field.name,
+          value: field.name,
+          type: field.type,
+          qualified: isFieldQualified(field),
+        }))
+        .toArray()
+        .sort(sortByLabel),
+    [activeQuery, excludedFields, fieldTypes.queryFields, isFieldQualified],
+  );
 
   return (
-    <Select options={fieldOptions}
-            inputId={`select-${id}`}
-            forwardedRef={selectRef}
-            allowCreate={allowCreate}
-            className={className}
-            onMenuClose={onMenuClose}
-            openMenuOnFocus={openMenuOnFocus}
-            persistSelection={persistSelection}
-            clearable={clearable}
-            placeholder={placeholder}
-            name={name}
-            value={value}
-            aria-label={ariaLabel}
-            optionRenderer={OptionRenderer}
-            size={size}
-            autoFocus={autoFocus}
-            menuPortalTarget={menuPortalTarget}
-            onChange={onChange} />
-
+    <Select
+      options={fieldOptions}
+      inputId={`select-${id}`}
+      forwardedRef={selectRef}
+      allowCreate={allowCreate}
+      className={className}
+      onMenuClose={onMenuClose}
+      openMenuOnFocus={openMenuOnFocus}
+      persistSelection={persistSelection}
+      clearable={clearable}
+      placeholder={placeholder}
+      name={name}
+      value={value}
+      aria-label={ariaLabel}
+      optionRenderer={OptionRenderer}
+      size={size}
+      autoFocus={autoFocus}
+      menuPortalTarget={menuPortalTarget}
+      onChange={onChange}
+    />
   );
 };
 

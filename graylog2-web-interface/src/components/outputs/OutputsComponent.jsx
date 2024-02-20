@@ -176,39 +176,39 @@ const OutputsComponent = createReactClass({
     if (this.state.outputs && this.state.types && (!this.props.streamId || this.state.assignableOutputs)) {
       const { permissions } = this.props;
       const { streamId } = this.props;
-      const createOutputDropdown = (this.isPermitted(permissions, ['outputs:create'])
-        ? (
-          <CreateOutputDropdown types={this.state.types}
-                                onSubmit={this._handleCreateOutput}
-                                getTypeDefinition={OutputsStore.loadAvailable}
-                                streamId={streamId} />
-        ) : null);
-      const assignOutputDropdown = (streamId
-        ? (
-          <AssignOutputDropdown streamId={streamId}
-                                outputs={this.state.assignableOutputs}
-                                onSubmit={this._handleAssignOutput} />
-        ) : null);
+      const createOutputDropdown = this.isPermitted(permissions, ['outputs:create']) ? (
+        <CreateOutputDropdown
+          types={this.state.types}
+          onSubmit={this._handleCreateOutput}
+          getTypeDefinition={OutputsStore.loadAvailable}
+          streamId={streamId}
+        />
+      ) : null;
+      const assignOutputDropdown = streamId ? (
+        <AssignOutputDropdown
+          streamId={streamId}
+          outputs={this.state.assignableOutputs}
+          onSubmit={this._handleAssignOutput}
+        />
+      ) : null;
 
       return (
         <div className="outputs">
           <Row className="content">
-            <Col md={4}>
-              {createOutputDropdown}
-            </Col>
-            <Col md={8}>
-              {assignOutputDropdown}
-            </Col>
+            <Col md={4}>{createOutputDropdown}</Col>
+            <Col md={8}>{assignOutputDropdown}</Col>
           </Row>
 
-          <OutputList streamId={streamId}
-                      outputs={this.state.outputs}
-                      permissions={permissions}
-                      getTypeDefinition={OutputsStore.loadAvailable}
-                      types={this.state.types}
-                      onRemove={this._removeOutputFromStream}
-                      onTerminate={this._removeOutputGlobally}
-                      onUpdate={this._handleOutputUpdate} />
+          <OutputList
+            streamId={streamId}
+            outputs={this.state.outputs}
+            permissions={permissions}
+            getTypeDefinition={OutputsStore.loadAvailable}
+            types={this.state.types}
+            onRemove={this._removeOutputFromStream}
+            onTerminate={this._removeOutputGlobally}
+            onUpdate={this._handleOutputUpdate}
+          />
         </div>
       );
     }

@@ -26,8 +26,8 @@ const Swatches = styled.div`
 `;
 
 const StyledColorSwatch = styled(ColorSwatch)`
-  flex-basis: ${(props) => props.categoryName === 'global' ? '100px' : '1px'};
-  max-width: ${(props) => props.categoryName === 'global' ? '200px' : 'auto'};
+  flex-basis: ${(props) => (props.categoryName === 'global' ? '100px' : '1px')};
+  max-width: ${(props) => (props.categoryName === 'global' ? '200px' : 'auto')};
 
   button {
     margin-right: 6px;
@@ -41,7 +41,7 @@ const StyledColorSwatch = styled(ColorSwatch)`
 
 const getValues = (data = {}, callback = () => {}) => {
   return Object.keys(data).map((key) => callback(key));
-}
+};
 
 const CategoryWrap = (categoryName, categoryColors) => (
   <>
@@ -51,33 +51,41 @@ const CategoryWrap = (categoryName, categoryColors) => (
           const copyTextName = categoryName === 'gray' ? `${categoryName}[${name}]` : `${categoryName}.${name}`;
 
           return (
-            <StyledColorSwatch name={name}
-                               section={categoryName}
-                               color={categoryColors[name]}
-                               copyText={`theme.colors.${copyTextName}`}
-                               key={`${categoryName}-${name}`} />
-          )
+            <StyledColorSwatch
+              name={name}
+              section={categoryName}
+              color={categoryColors[name]}
+              copyText={`theme.colors.${copyTextName}`}
+              key={`${categoryName}-${name}`}
+            />
+          );
         }
       })}
     </Swatches>
 
     <div>
-      {getValues(categoryColors, (name) =>
-        typeof categoryColors[name] === 'object' && (
-          <div key={`${categoryName}-${name}`}>
-            <SubcategoryName>{categoryName} &mdash; {name}</SubcategoryName>
+      {getValues(
+        categoryColors,
+        (name) =>
+          typeof categoryColors[name] === 'object' && (
+            <div key={`${categoryName}-${name}`}>
+              <SubcategoryName>
+                {categoryName} &mdash; {name}
+              </SubcategoryName>
 
-            <Swatches>
-              {getValues(categoryColors[name], (subname) => (
-                <StyledColorSwatch name={subname}
-                                   categoryName={categoryName}
-                                   color={categoryColors[name][subname]}
-                                   copyText={`theme.colors.${categoryName}.${name}.${subname}`}
-                                   key={`${categoryName}-${name}-${categoryColors[name][subname]}`} />
-              ))}
-            </Swatches>
-          </div>
-        )
+              <Swatches>
+                {getValues(categoryColors[name], (subname) => (
+                  <StyledColorSwatch
+                    name={subname}
+                    categoryName={categoryName}
+                    color={categoryColors[name][subname]}
+                    copyText={`theme.colors.${categoryName}.${name}.${subname}`}
+                    key={`${categoryName}-${name}-${categoryColors[name][subname]}`}
+                  />
+                ))}
+              </Swatches>
+            </div>
+          ),
       )}
     </div>
   </>
@@ -87,12 +95,12 @@ const Colors = () => (
   <>
     {getValues(colors, (categoryName) => (
       <div key={categoryName}>
-          <CategoryTitle key={`title-${categoryName}`}>{categoryName}</CategoryTitle>
-          {CategoryWrap(categoryName, colors[categoryName])}
+        <CategoryTitle key={`title-${categoryName}`}>{categoryName}</CategoryTitle>
+        {CategoryWrap(categoryName, colors[categoryName])}
       </div>
     ))}
   </>
 );
 
-<Colors />
+<Colors />;
 ```

@@ -22,19 +22,23 @@ import type View from 'views/logic/views/View';
 import type { SearchExecutionResult } from 'views/types';
 import SearchResult from 'views/logic/SearchResult';
 
-const delay = (ms: number) => new Promise((resolve) => {
-  setTimeout(resolve, ms);
-});
+const delay = (ms: number) =>
+  new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
 
-const trackJobStatus = (job: SearchJobType): Promise<SearchJobType> => new Promise((resolve) => {
-  if (job?.execution?.done || job?.execution?.completed_exceptionally) {
-    resolve(job);
-  } else {
-    resolve(delay(250)
-      .then(() => searchJobStatus(job.id))
-      .then((jobStatus) => trackJobStatus(jobStatus)));
-  }
-});
+const trackJobStatus = (job: SearchJobType): Promise<SearchJobType> =>
+  new Promise((resolve) => {
+    if (job?.execution?.done || job?.execution?.completed_exceptionally) {
+      resolve(job);
+    } else {
+      resolve(
+        delay(250)
+          .then(() => searchJobStatus(job.id))
+          .then((jobStatus) => trackJobStatus(jobStatus)),
+      );
+    }
+  });
 
 const executeSearch = (
   view: View,
@@ -44,7 +48,8 @@ const executeSearch = (
 ): Promise<SearchExecutionResult> => {
   const { widgetMapping, search } = view;
 
-  const globalOverride = (executionStateParam.globalOverride ?? GlobalOverride.empty()).toBuilder()
+  const globalOverride = (executionStateParam.globalOverride ?? GlobalOverride.empty())
+    .toBuilder()
     .keepQueries(keepQueries)
     .build();
 
@@ -53,7 +58,10 @@ const executeSearch = (
   if (widgetsToSearch) {
     const keepSearchTypes = widgetsToSearch
       .map((widgetId) => widgetMapping.get(widgetId))
-      .reduce((acc, searchTypeSet) => (searchTypeSet ? [...acc, ...searchTypeSet.toArray()] : acc), globalOverride.keepSearchTypes || []);
+      .reduce(
+        (acc, searchTypeSet) => (searchTypeSet ? [...acc, ...searchTypeSet.toArray()] : acc),
+        globalOverride.keepSearchTypes || [],
+      );
     const newGlobalOverride = globalOverride.toBuilder().keepSearchTypes(keepSearchTypes).build();
     executionStateBuilder = executionStateBuilder.globalOverride(newGlobalOverride);
   }

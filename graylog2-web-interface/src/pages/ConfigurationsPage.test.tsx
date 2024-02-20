@@ -23,16 +23,16 @@ import ConfigurationsPage from 'pages/ConfigurationsPage';
 import SidecarConfig from 'components/configurations/SidecarConfig';
 
 jest.mock('components/configurations/SearchesConfig', () => () => <span>Search Configuration Component</span>);
-jest.mock('components/configurations/MessageProcessorsConfig', () => () => <span>Message Processors Configuration Component</span>);
+jest.mock('components/configurations/MessageProcessorsConfig', () => () => (
+  <span>Message Processors Configuration Component</span>
+));
 jest.mock('components/configurations/SidecarConfig');
 
 const ComponentThrowingError = () => {
   throw new Error('Boom!');
 };
 
-const ComponentWorkingFine = () => (
-  <span>It is all good!</span>
-);
+const ComponentWorkingFine = () => <span>It is all good!</span>;
 
 describe('ConfigurationsPage', () => {
   afterEach(() => {

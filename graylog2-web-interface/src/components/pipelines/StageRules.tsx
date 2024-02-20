@@ -30,9 +30,9 @@ const TitleTd = styled.td`
 `;
 
 type Props = {
-  pipeline: PipelineType,
-  stage: StageType,
-  rules: RuleType[],
+  pipeline: PipelineType;
+  stage: StageType;
+  rules: RuleType[];
 };
 
 const StageRules = ({ pipeline, stage, rules }: Props) => {
@@ -50,30 +50,32 @@ const StageRules = ({ pipeline, stage, rules }: Props) => {
         description: `Rule ${stage.rules[ruleIdx]} has been renamed or removed. This rule will be skipped.`,
       };
 
-      ruleTitle = <span><Icon name="exclamation-triangle" className="text-danger" /> {stage.rules[ruleIdx]}</span>;
+      ruleTitle = (
+        <span>
+          <Icon name="exclamation-triangle" className="text-danger" /> {stage.rules[ruleIdx]}
+        </span>
+      );
     } else {
       const isRuleBuilder = rule.rule_builder ? '?rule_builder=true' : '';
 
-      ruleTitle = (
-        <Link to={`${Routes.SYSTEM.PIPELINES.RULE(rule.id)}${isRuleBuilder}`}>
-          {rule.title}
-        </Link>
-      );
+      ruleTitle = <Link to={`${Routes.SYSTEM.PIPELINES.RULE(rule.id)}${isRuleBuilder}`}>{rule.title}</Link>;
     }
 
     return (
       <tr key={rule.id}>
-        <TitleTd>
-          {ruleTitle}
-        </TitleTd>
+        <TitleTd>{ruleTitle}</TitleTd>
         <td>{rule.description}</td>
         <td>
-          <MetricContainer name={`org.graylog.plugins.pipelineprocessor.ast.Rule.${rule.id}.${pipeline.id}.${stage.stage}.executed`}>
+          <MetricContainer
+            name={`org.graylog.plugins.pipelineprocessor.ast.Rule.${rule.id}.${pipeline.id}.${stage.stage}.executed`}
+          >
             <CounterRate zeroOnMissing suffix="msg/s" />
           </MetricContainer>
         </td>
         <td>
-          <MetricContainer name={`org.graylog.plugins.pipelineprocessor.ast.Rule.${rule.id}.${pipeline.id}.${stage.stage}.failed`}>
+          <MetricContainer
+            name={`org.graylog.plugins.pipelineprocessor.ast.Rule.${rule.id}.${pipeline.id}.${stage.stage}.failed`}
+          >
             <CounterRate showTotal zeroOnMissing suffix="errors/s" />
           </MetricContainer>
         </td>
@@ -82,16 +84,18 @@ const StageRules = ({ pipeline, stage, rules }: Props) => {
   };
 
   return (
-    <DataTable id="processing-timeline"
-               className="table-hover"
-               headers={headers}
-               // eslint-disable-next-line react/no-unstable-nested-components
-               headerCellFormatter={(header) => (<th>{header}</th>)}
-               rows={rules}
-               dataRowFormatter={_ruleRowFormatter}
-               noDataText="This stage has no rules yet. Click on edit to add some."
-               filterLabel=""
-               filterKeys={[]} />
+    <DataTable
+      id="processing-timeline"
+      className="table-hover"
+      headers={headers}
+      // eslint-disable-next-line react/no-unstable-nested-components
+      headerCellFormatter={(header) => <th>{header}</th>}
+      rows={rules}
+      dataRowFormatter={_ruleRowFormatter}
+      noDataText="This stage has no rules yet. Click on edit to add some."
+      filterLabel=""
+      filterKeys={[]}
+    />
   );
 };
 

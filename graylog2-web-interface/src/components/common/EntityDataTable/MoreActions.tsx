@@ -21,14 +21,16 @@ import DropdownButton from 'components/bootstrap/DropdownButton';
 import { MORE_ACTIONS_TITLE, MORE_ACTIONS_HOVER_TITLE } from './Constants';
 
 type Props = React.PropsWithChildren<{
-  disabled?: boolean,
-}>
+  disabled?: boolean;
+}>;
 const MoreActions = ({ children, disabled }: Props) => (
-  <DropdownButton title={MORE_ACTIONS_TITLE}
-                  bsSize="xsmall"
-                  pullRight
-                  buttonTitle={MORE_ACTIONS_HOVER_TITLE}
-                  disabled={disabled}>
+  <DropdownButton
+    title={MORE_ACTIONS_TITLE}
+    bsSize="xsmall"
+    pullRight
+    buttonTitle={MORE_ACTIONS_HOVER_TITLE}
+    disabled={disabled}
+  >
     {children}
   </DropdownButton>
 );

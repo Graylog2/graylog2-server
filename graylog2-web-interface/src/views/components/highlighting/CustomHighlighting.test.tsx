@@ -25,12 +25,10 @@ import { StaticColor } from 'views/logic/views/formatting/highlighting/Highlight
 
 import CustomHighlighting from './CustomHighlighting';
 
-const renderDecorators = (decorators, field, value) => decorators.map((Decorator) => (
-  <Decorator key={Decorator.name}
-             type={FieldType.Unknown}
-             field={field}
-             value={value} />
-));
+const renderDecorators = (decorators, field, value) =>
+  decorators.map((Decorator) => (
+    <Decorator key={Decorator.name} type={FieldType.Unknown} field={field} value={value} />
+  ));
 
 describe('CustomHighlighting', () => {
   const field = 'foo';
@@ -43,7 +41,7 @@ describe('CustomHighlighting', () => {
     </CustomHighlighting>
   );
 
-  const CustomHighlightingWithContext = ({ highlightingRules }: {highlightingRules: Array<HighlightingRule>}) => (
+  const CustomHighlightingWithContext = ({ highlightingRules }: { highlightingRules: Array<HighlightingRule> }) => (
     <HighlightingRulesContext.Provider value={highlightingRules}>
       <SimpleCustomHighlighting />
     </HighlightingRulesContext.Provider>
@@ -92,11 +90,7 @@ describe('CustomHighlighting', () => {
   });
 
   it('does not render highlight if rule value only matches substring', async () => {
-    const rule = HighlightingRule.builder()
-      .field(field)
-      .value('2')
-      .color(StaticColor.create('#bc98fd'))
-      .build();
+    const rule = HighlightingRule.builder().field(field).value('2').color(StaticColor.create('#bc98fd')).build();
     const { findByText } = render(<CustomHighlightingWithContext highlightingRules={[rule]} />);
 
     const elem = await findByText('42');
@@ -105,11 +99,7 @@ describe('CustomHighlighting', () => {
   });
 
   it('does not render highlight if rule value does not match', async () => {
-    const rule = HighlightingRule.builder()
-      .field(field)
-      .value('23')
-      .color(StaticColor.create('#bc98fd'))
-      .build();
+    const rule = HighlightingRule.builder().field(field).value('23').color(StaticColor.create('#bc98fd')).build();
     const { findByText } = render(<CustomHighlightingWithContext highlightingRules={[rule]} />);
 
     const elem = await findByText('42');

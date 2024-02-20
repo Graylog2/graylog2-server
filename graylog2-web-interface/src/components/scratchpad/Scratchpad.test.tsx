@@ -25,11 +25,13 @@ import Scratchpad from './Scratchpad';
 const setScratchpadVisibility = jest.fn();
 
 const SUT = () => (
-  <ScratchpadContext.Provider value={{
-    isScratchpadVisible: true,
-    localStorageItem: 'gl-scratchpad-jest',
-    setScratchpadVisibility,
-  }}>
+  <ScratchpadContext.Provider
+    value={{
+      isScratchpadVisible: true,
+      localStorageItem: 'gl-scratchpad-jest',
+      setScratchpadVisibility,
+    }}
+  >
     <Scratchpad />
   </ScratchpadContext.Provider>
 );

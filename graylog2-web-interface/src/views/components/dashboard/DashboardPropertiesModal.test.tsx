@@ -25,17 +25,18 @@ import DashboardPropertiesModal from './DashboardPropertiesModal';
 describe('DashboardPropertiesModal', () => {
   it('should use updated view when saving', async () => {
     const onSave = jest.fn();
-    const view = View.builder()
-      .type(View.Type.Dashboard)
-      .title('')
-      .build();
+    const view = View.builder().type(View.Type.Dashboard).title('').build();
 
-    render(<DashboardPropertiesModal onClose={jest.fn()}
-                                     onSave={onSave}
-                                     title="Saving new dashboard"
-                                     view={view}
-                                     submitButtonText="Create Dashboard"
-                                     show />);
+    render(
+      <DashboardPropertiesModal
+        onClose={jest.fn()}
+        onSave={onSave}
+        title="Saving new dashboard"
+        view={view}
+        submitButtonText="Create Dashboard"
+        show
+      />,
+    );
 
     await screen.findByText('Saving new dashboard');
     const titleInput = await screen.findByRole('textbox', { name: /title/i, hidden: true });
@@ -45,9 +46,11 @@ describe('DashboardPropertiesModal', () => {
     userEvent.click(await screen.findByRole('button', { name: /create dashboard/i, hidden: true }));
 
     await waitFor(() => {
-      expect(onSave).toHaveBeenCalledWith(expect.objectContaining({
-        title: 'My title',
-      }));
+      expect(onSave).toHaveBeenCalledWith(
+        expect.objectContaining({
+          title: 'My title',
+        }),
+      );
     });
   });
 });

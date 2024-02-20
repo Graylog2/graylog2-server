@@ -38,9 +38,7 @@ class ConfigurationHelper extends React.Component {
     const { onVariableRename } = this.props;
 
     return (
-
       <Panel header="Collector Configuration Reference">
-
         <Row className="row-sm">
           <Col md={12}>
             <Tabs id="configurationsHelper" defaultActiveKey={1} animation={false}>
@@ -54,8 +52,8 @@ class ConfigurationHelper extends React.Component {
                 <p className={ConfigurationHelperStyle.marginQuickReferenceText}>
                   Use variables to share text snippets across multiple configurations.
                   <br />
-                  If your configuration format needs to use literals like <code>$&#123;foo&#125;</code>,
-                  which shall not act as a variable, you will have to write it as
+                  If your configuration format needs to use literals like <code>$&#123;foo&#125;</code>, which shall not
+                  act as a variable, you will have to write it as
                   <code>$&#123;&apos;$&apos;&#125;&#123;foo&#125;</code>.
                 </p>
                 <ConfigurationVariablesHelper onVariableRename={onVariableRename} />
@@ -64,13 +62,38 @@ class ConfigurationHelper extends React.Component {
                 <Row className="row-sm">
                   <Col md={12}>
                     <p className={ConfigurationHelperStyle.marginQuickReferenceText}>
-                      We provide collector configuration templates to get you started.<br />
+                      We provide collector configuration templates to get you started.
+                      <br />
                       For further information please refer to the official documentation of your collector.
                     </p>
                     <ul className={ConfigurationHelperStyle.ulStyle}>
-                      <li><a href="https://www.elastic.co/guide/en/beats/filebeat/current/index.html" target="_blank" rel="noopener noreferrer">Filebeat Reference</a> </li>
-                      <li><a href="https://www.elastic.co/guide/en/beats/winlogbeat/current/index.html" target="_blank" rel="noopener noreferrer">Winlogbeat Reference</a> </li>
-                      <li><a href="https://nxlog.co/docs/nxlog-ce/nxlog-reference-manual.html" target="_blank" rel="noopener noreferrer">NXLog Reference Manual</a> </li>
+                      <li>
+                        <a
+                          href="https://www.elastic.co/guide/en/beats/filebeat/current/index.html"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Filebeat Reference
+                        </a>{' '}
+                      </li>
+                      <li>
+                        <a
+                          href="https://www.elastic.co/guide/en/beats/winlogbeat/current/index.html"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Winlogbeat Reference
+                        </a>{' '}
+                      </li>
+                      <li>
+                        <a
+                          href="https://nxlog.co/docs/nxlog-ce/nxlog-reference-manual.html"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          NXLog Reference Manual
+                        </a>{' '}
+                      </li>
                     </ul>
                   </Col>
                 </Row>

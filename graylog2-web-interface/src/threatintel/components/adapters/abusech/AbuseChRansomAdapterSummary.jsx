@@ -39,7 +39,9 @@ class AbuseChRansomAdapterSummary extends React.Component {
           <dt>Blocklist type</dt>
           <dd>{blocklistType[config.blocklist_type]}</dd>
           <dt>Update interval</dt>
-          <dd><TimeUnit value={config.refresh_interval} unit={config.refresh_interval_unit} /></dd>
+          <dd>
+            <TimeUnit value={config.refresh_interval} unit={config.refresh_interval_unit} />
+          </dd>
         </dl>
         <Alert style={{ marginBottom: 10 }} bsStyle="warning" title="Deprecation Warning">
           <p>The abuse.ch Ransomware Tracker was shut down on 2019-12-08. This Data Adapter should not be used.</p>

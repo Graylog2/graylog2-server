@@ -21,7 +21,7 @@ import PropTypes from 'prop-types';
 import style from './ExpandableList.css';
 
 type Props = PropsWithChildren<{
-  className?: string,
+  className?: string;
 }>;
 
 /**
@@ -31,9 +31,7 @@ type Props = PropsWithChildren<{
  * The ExpandableList can be used nested.
  */
 const ExpandableList = ({ children, className }: Props) => (
-  <ul className={className ? `${style.list} ${className}` : style.list}>
-    {children}
-  </ul>
+  <ul className={className ? `${style.list} ${className}` : style.list}>{children}</ul>
 );
 
 ExpandableList.defaultProps = {

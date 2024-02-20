@@ -17,9 +17,7 @@
  */
 import uniq from 'lodash/uniq';
 
-const range = (start: number, end: number): Array<number> => [
-  ...Array((end + 1) - start).keys(),
-].map((i) => i + start);
+const range = (start: number, end: number): Array<number> => [...Array(end + 1 - start).keys()].map((i) => i + start);
 
 const normalizeInfinity = ({ width, height, col, row }: Position, maxWidth: number): Position => ({
   col,
@@ -30,7 +28,12 @@ const normalizeInfinity = ({ width, height, col, row }: Position, maxWidth: numb
 
 type Grid<T> = Array<Array<T>>;
 
-const placeItemInGrid = <T extends boolean | string | number>(grid: Grid<T>, item: Position, value: T, overlapValue: T = value) => {
+const placeItemInGrid = <T extends boolean | string | number>(
+  grid: Grid<T>,
+  item: Position,
+  value: T,
+  overlapValue: T = value,
+) => {
   let overlap = false;
 
   range(item.col, item.col + item.width - 1).forEach((x) => {
@@ -40,7 +43,7 @@ const placeItemInGrid = <T extends boolean | string | number>(grid: Grid<T>, ite
       }
 
       // eslint-disable-next-line no-param-reassign
-      (grid[y] ??= [])[x] = (grid[y]?.[x] !== undefined) ? overlapValue : value;
+      (grid[y] ??= [])[x] = grid[y]?.[x] !== undefined ? overlapValue : value;
     });
   });
 
@@ -65,13 +68,14 @@ const itemsOverlap = (items: Position[]) => {
 };
 
 type Position = {
-  col: number,
-  row: number,
-  height: number,
-  width: number,
+  col: number;
+  row: number;
+  height: number;
+  width: number;
 };
 
-const rowIsEmpty = <T extends boolean | string | number>(grid: Grid<T>, row: number) => (grid[row] ?? []).every((cell) => cell === undefined);
+const rowIsEmpty = <T extends boolean | string | number>(grid: Grid<T>, row: number) =>
+  (grid[row] ?? []).every((cell) => cell === undefined);
 
 const findGaps = (_items: Position[], minWidth: number = 1, maxWidth: number = 13): Position[] => {
   if (_items.length === 0) {

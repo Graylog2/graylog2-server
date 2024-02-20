@@ -28,19 +28,19 @@ class IndexMaintenanceStrategiesSummary extends React.Component {
 
   render() {
     if (!this.props.config) {
-      return (<Spinner />);
+      return <Spinner />;
     }
 
     const activeStrategy = this.props.config.strategy;
     const strategy = this.props.pluginExports.filter((exportedStrategy) => exportedStrategy.type === activeStrategy)[0];
 
     if (!strategy || !strategy.summaryComponent) {
-      return (<Alert bsStyle="danger">Summary for strategy {activeStrategy} not found!</Alert>);
+      return <Alert bsStyle="danger">Summary for strategy {activeStrategy} not found!</Alert>;
     }
 
     const element = React.createElement(strategy.summaryComponent, { config: this.props.config.config });
 
-    return (<span key={strategy.type}>{element}</span>);
+    return <span key={strategy.type}>{element}</span>;
   }
 }
 

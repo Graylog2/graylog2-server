@@ -23,8 +23,7 @@ import { ButtonToolbar, Button } from 'components/bootstrap';
 const AuthenticatorActionLinks = () => (
   <ButtonToolbar>
     <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.AUTHENTICATORS.EDIT}>
-      <Button bsStyle="success"
-              type="button">
+      <Button bsStyle="success" type="button">
         Edit Authenticators
       </Button>
     </LinkContainer>

@@ -20,48 +20,50 @@ import styled, { css } from 'styled-components';
 import type { SyntheticEvent } from 'react';
 
 type Props = {
-  children: React.ReactNode,
-  minWidth?: number
-  onMenuItemSelect?: (e: SyntheticEvent) => void,
-  show: boolean,
-  zIndex?: number,
+  children: React.ReactNode;
+  minWidth?: number;
+  onMenuItemSelect?: (e: SyntheticEvent) => void;
+  show: boolean;
+  zIndex?: number;
 };
 
 const StyledDropdownMenu = styled.ul.attrs(() => ({
-  className: 'dropdown-menu', /* stylelint-disable-line property-no-unknown */
-}))<{ $show: boolean, $zIndex: number, $minWidth: number }>(({ $show, theme, $zIndex, $minWidth }) => css`
-  display: ${$show ? 'block' : 'none'};
-  color: ${theme.colors.variant.dark.default};
-  background-color: ${theme.colors.variant.lightest.default};
-  box-shadow: 0 3px 3px ${theme.colors.global.navigationBoxShadow};
-  z-index: ${$zIndex};
-  min-width: ${$minWidth ? `${$minWidth}px` : 'max-content'};
-  
-  .dropdown-header {
+  className: 'dropdown-menu' /* stylelint-disable-line property-no-unknown */,
+}))<{ $show: boolean; $zIndex: number; $minWidth: number }>(
+  ({ $show, theme, $zIndex, $minWidth }) => css`
+    display: ${$show ? 'block' : 'none'};
     color: ${theme.colors.variant.dark.default};
-    padding: 3px 10px;
-  }
-  
-  > li {
-    > a {
+    background-color: ${theme.colors.variant.lightest.default};
+    box-shadow: 0 3px 3px ${theme.colors.global.navigationBoxShadow};
+    z-index: ${$zIndex};
+    min-width: ${$minWidth ? `${$minWidth}px` : 'max-content'};
+
+    .dropdown-header {
+      color: ${theme.colors.variant.dark.default};
       padding: 3px 10px;
-      color: ${theme.colors.variant.darker.default};
-      display: flex;
-      align-items: center;
-      
-      &:hover {
-        color: ${theme.colors.variant.darkest.default};
-        background-color: ${theme.colors.variant.lighter.default};
-      }
     }
-    
-    &.disabled {
+
+    > li {
       > a {
-        color: ${theme.colors.variant.light.default};
+        padding: 3px 10px;
+        color: ${theme.colors.variant.darker.default};
+        display: flex;
+        align-items: center;
+
+        &:hover {
+          color: ${theme.colors.variant.darkest.default};
+          background-color: ${theme.colors.variant.lighter.default};
+        }
+      }
+
+      &.disabled {
+        > a {
+          color: ${theme.colors.variant.light.default};
+        }
       }
     }
-  }
-`);
+  `,
+);
 
 function closeOnChildSelect(child: React.ReactElement, updateDepth: number, onMenuItemSelect) {
   if (child.props?.onSelect) {
@@ -90,12 +92,13 @@ function closeOnChildrenSelect(children: React.ReactNode, updateDepth: number, o
     return children;
   }
 
-  return React.Children.map(
-    children,
-    (child: React.ReactElement) => (child?.props ? React.cloneElement(child, {
-      ...child.props,
-      ...closeOnChildSelect(child, updateDepth + 1, onToggle),
-    }) : child),
+  return React.Children.map(children, (child: React.ReactElement) =>
+    child?.props
+      ? React.cloneElement(child, {
+          ...child.props,
+          ...closeOnChildSelect(child, updateDepth + 1, onToggle),
+        })
+      : child,
   );
 }
 

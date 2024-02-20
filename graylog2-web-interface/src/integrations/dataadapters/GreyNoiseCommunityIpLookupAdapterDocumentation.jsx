@@ -24,7 +24,9 @@ class GreyNoiseCommunityIpLookupAdapterDocumentation extends React.Component {
     return (
       <div>
         <Alert style={{ marginBottom: 10 }} bsStyle="warning" title="Deprecation Warning">
-          <p>The GreyNoise Community IP Lookup Data Adapter is no longer supported. This Data Adapter should not be used.</p>
+          <p>
+            The GreyNoise Community IP Lookup Data Adapter is no longer supported. This Data Adapter should not be used.
+          </p>
         </Alert>
       </div>
     );

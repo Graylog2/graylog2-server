@@ -95,7 +95,11 @@ const SubstringExtractorConfiguration = createReactClass({
       this.props.onExtractorPreviewLoad('');
       this.setState({ trying: false });
     } else {
-      const promise = ToolsStore.testSubstring(this.state.configuration.begin_index, this.state.configuration.end_index, this.props.exampleMessage);
+      const promise = ToolsStore.testSubstring(
+        this.state.configuration.begin_index,
+        this.state.configuration.end_index,
+        this.props.exampleMessage,
+      );
 
       promise.then((result) => {
         if (!result.successful) {
@@ -114,42 +118,57 @@ const SubstringExtractorConfiguration = createReactClass({
   _isTryButtonDisabled() {
     const { configuration } = this.state;
 
-    return this.state.trying || configuration.begin_index === undefined || configuration.begin_index < 0 || configuration.end_index === undefined || configuration.end_index < 0 || !this.props.exampleMessage;
+    return (
+      this.state.trying ||
+      configuration.begin_index === undefined ||
+      configuration.begin_index < 0 ||
+      configuration.end_index === undefined ||
+      configuration.end_index < 0 ||
+      !this.props.exampleMessage
+    );
   },
 
   render() {
     const endIndexHelpMessage = (
       <span>
-        Where to end extracting. (Exclusive){' '}
-        <strong>Example:</strong> <em>1,5</em> cuts <em>love</em> from the string <em>ilovelogs</em>.
+        Where to end extracting. (Exclusive) <strong>Example:</strong> <em>1,5</em> cuts <em>love</em> from the string{' '}
+        <em>ilovelogs</em>.
       </span>
     );
 
     return (
       <div>
-        <Input type="number"
-               ref={(beginIndex) => { this.beginIndex = beginIndex; }}
-               id="begin_index"
-               label="Begin index"
-               labelClassName="col-md-2"
-               wrapperClassName="col-md-10"
-               defaultValue={this.state.configuration.begin_index}
-               onChange={this._onChange('begin_index')}
-               min="0"
-               required
-               help="Character position from where to start extracting. (Inclusive)" />
+        <Input
+          type="number"
+          ref={(beginIndex) => {
+            this.beginIndex = beginIndex;
+          }}
+          id="begin_index"
+          label="Begin index"
+          labelClassName="col-md-2"
+          wrapperClassName="col-md-10"
+          defaultValue={this.state.configuration.begin_index}
+          onChange={this._onChange('begin_index')}
+          min="0"
+          required
+          help="Character position from where to start extracting. (Inclusive)"
+        />
 
-        <Input type="number"
-               ref={(endIndex) => { this.endIndex = endIndex; }}
-               id="end_index"
-               label="End index"
-               labelClassName="col-md-2"
-               wrapperClassName="col-md-10"
-               defaultValue={this.state.configuration.end_index}
-               onChange={this._onChange('end_index')}
-               min="0"
-               required
-               help={endIndexHelpMessage} />
+        <Input
+          type="number"
+          ref={(endIndex) => {
+            this.endIndex = endIndex;
+          }}
+          id="end_index"
+          label="End index"
+          labelClassName="col-md-2"
+          wrapperClassName="col-md-10"
+          defaultValue={this.state.configuration.end_index}
+          onChange={this._onChange('end_index')}
+          min="0"
+          required
+          help={endIndexHelpMessage}
+        />
 
         <Row>
           <Col mdOffset={2} md={10}>

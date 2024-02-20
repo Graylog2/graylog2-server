@@ -65,7 +65,9 @@ describe('useFetchView', () => {
     asMock(ViewManagementActions.get).mockResolvedValue(viewJson);
     const search = Search.create().toBuilder().parameters([]).build();
 
-    asMock(ViewDeserializer).mockImplementation(async (response: ViewJson) => View.fromJSON(response).toBuilder().search(search).build());
+    asMock(ViewDeserializer).mockImplementation(async (response: ViewJson) =>
+      View.fromJSON(response).toBuilder().search(search).build(),
+    );
   });
 
   it('fetches view', () => {

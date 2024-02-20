@@ -30,12 +30,12 @@ import { getValueFromInput } from 'util/FormsUtils';
 import StringUtils from 'util/StringUtils';
 
 type Config = {
-  sidecar_expiration_threshold: string,
-  sidecar_inactive_threshold: string,
-  sidecar_update_interval: string,
-  sidecar_send_status: boolean,
-  sidecar_configuration_override: boolean,
-}
+  sidecar_expiration_threshold: string;
+  sidecar_inactive_threshold: string;
+  sidecar_update_interval: string;
+  sidecar_send_status: boolean;
+  sidecar_configuration_override: boolean;
+};
 
 const DEFAULT_CONFIG = {
   sidecar_expiration_threshold: 'P14D',
@@ -87,7 +87,8 @@ const SidecarConfig = () => {
 
   const expirationThresholdValidator = (milliseconds: number) => milliseconds >= 60 * 1000;
 
-  const durationMilliseconds = (duration: string) => ISODurationUtils.isValidDuration(duration, (milliseconds) => milliseconds);
+  const durationMilliseconds = (duration: string) =>
+    ISODurationUtils.isValidDuration(duration, (milliseconds) => milliseconds);
 
   const updateIntervalValidator = (milliseconds: number) => {
     const inactiveMilliseconds = durationMilliseconds(formConfig.sidecar_inactive_threshold);
@@ -96,7 +97,9 @@ const SidecarConfig = () => {
     return milliseconds >= 1000 && milliseconds < inactiveMilliseconds && milliseconds < expirationMilliseconds;
   };
 
-  if (!loaded || !viewConfig) { return <Spinner />; }
+  if (!loaded || !viewConfig) {
+    return <Spinner />;
+  }
 
   return (
     <div>
@@ -116,55 +119,69 @@ const SidecarConfig = () => {
       </dl>
 
       <IfPermitted permissions="clusterconfigentry:edit">
-        <Button bsStyle="info" bsSize="xs" onClick={openModal}>Edit configuration</Button>
+        <Button bsStyle="info" bsSize="xs" onClick={openModal}>
+          Edit configuration
+        </Button>
       </IfPermitted>
 
       {showConfigModal && formConfig && (
-      <BootstrapModalForm show
-                          title="Update Sidecars System Configuration"
-                          onSubmitForm={saveConfig}
-                          onCancel={closeModal}
-                          submitButtonText="Update configuration">
-        <fieldset>
-          <ISODurationInput id="inactive-threshold-field"
-                            duration={formConfig.sidecar_inactive_threshold}
-                            update={onUpdate('sidecar_inactive_threshold')}
-                            label="Inactive threshold (as ISO8601 Duration)"
-                            help="Amount of time of inactivity after which Sidecars are flagged as inactive."
-                            validator={inactiveThresholdValidator}
-                            errorText="invalid (min: 1 second)"
-                            required />
+        <BootstrapModalForm
+          show
+          title="Update Sidecars System Configuration"
+          onSubmitForm={saveConfig}
+          onCancel={closeModal}
+          submitButtonText="Update configuration"
+        >
+          <fieldset>
+            <ISODurationInput
+              id="inactive-threshold-field"
+              duration={formConfig.sidecar_inactive_threshold}
+              update={onUpdate('sidecar_inactive_threshold')}
+              label="Inactive threshold (as ISO8601 Duration)"
+              help="Amount of time of inactivity after which Sidecars are flagged as inactive."
+              validator={inactiveThresholdValidator}
+              errorText="invalid (min: 1 second)"
+              required
+            />
 
-          <ISODurationInput id="sidecar-expiration-field"
-                            duration={formConfig.sidecar_expiration_threshold}
-                            update={onUpdate('sidecar_expiration_threshold')}
-                            label="Expiration threshold (as ISO8601 Duration)"
-                            help="Amount of time after which inactive Sidecars are purged from the database."
-                            validator={expirationThresholdValidator}
-                            errorText="invalid (min: 1 minute)"
-                            required />
-          <ISODurationInput id="sidecar-update-field"
-                            duration={formConfig.sidecar_update_interval}
-                            update={onUpdate('sidecar_update_interval')}
-                            label="Update interval (as ISO8601 Duration)"
-                            help="Time between Sidecar update requests."
-                            validator={updateIntervalValidator}
-                            errorText="invalid (min: 1 second, lower: inactive/expiration threshold)"
-                            required />
-        </fieldset>
-        <Input type="checkbox"
-               id="send-status-updates-checkbox"
-               label="Send status updates"
-               checked={formConfig.sidecar_send_status}
-               onChange={onUpdate('sidecar_send_status')}
-               help="Send Sidecar status and host metrics from each client" />
-        <Input type="checkbox"
-               id="override-sidecar-config-checkbox"
-               label="Override Sidecar configuration"
-               checked={formConfig.sidecar_configuration_override}
-               onChange={onUpdate('sidecar_configuration_override')}
-               help="Override configuration file settings for all Sidecars" />
-      </BootstrapModalForm>
+            <ISODurationInput
+              id="sidecar-expiration-field"
+              duration={formConfig.sidecar_expiration_threshold}
+              update={onUpdate('sidecar_expiration_threshold')}
+              label="Expiration threshold (as ISO8601 Duration)"
+              help="Amount of time after which inactive Sidecars are purged from the database."
+              validator={expirationThresholdValidator}
+              errorText="invalid (min: 1 minute)"
+              required
+            />
+            <ISODurationInput
+              id="sidecar-update-field"
+              duration={formConfig.sidecar_update_interval}
+              update={onUpdate('sidecar_update_interval')}
+              label="Update interval (as ISO8601 Duration)"
+              help="Time between Sidecar update requests."
+              validator={updateIntervalValidator}
+              errorText="invalid (min: 1 second, lower: inactive/expiration threshold)"
+              required
+            />
+          </fieldset>
+          <Input
+            type="checkbox"
+            id="send-status-updates-checkbox"
+            label="Send status updates"
+            checked={formConfig.sidecar_send_status}
+            onChange={onUpdate('sidecar_send_status')}
+            help="Send Sidecar status and host metrics from each client"
+          />
+          <Input
+            type="checkbox"
+            id="override-sidecar-config-checkbox"
+            label="Override Sidecar configuration"
+            checked={formConfig.sidecar_configuration_override}
+            onChange={onUpdate('sidecar_configuration_override')}
+            help="Override configuration file settings for all Sidecars"
+          />
+        </BootstrapModalForm>
       )}
     </div>
   );

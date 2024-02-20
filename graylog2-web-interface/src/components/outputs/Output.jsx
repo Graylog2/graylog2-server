@@ -24,43 +24,45 @@ import EditOutputButton from 'components/outputs/EditOutputButton';
 import { ConfigurationWell } from 'components/configurationforms';
 import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
 
-const NodeRow = styled.div(({ theme }) => css`
-  border-bottom: 1px solid ${theme.colors.gray[80]};
-  padding-bottom: 8px;
-  margin-bottom: 8px;
-  margin-top: 0;
+const NodeRow = styled.div(
+  ({ theme }) => css`
+    border-bottom: 1px solid ${theme.colors.gray[80]};
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+    margin-top: 0;
 
-  .hostname {
-    font-size: ${theme.fonts.size.small};
-  }
+    .hostname {
+      font-size: ${theme.fonts.size.small};
+    }
 
-  .well {
-    margin-bottom: 0;
-    margin-top: 3px;
-    font-family: ${theme.fonts.family.monospace};
-    font-size: ${theme.fonts.size.small};
-  }
+    .well {
+      margin-bottom: 0;
+      margin-top: 3px;
+      font-family: ${theme.fonts.family.monospace};
+      font-size: ${theme.fonts.size.small};
+    }
 
-  .xtrc-converters {
-    margin-top: 10px;
-  }
+    .xtrc-converters {
+      margin-top: 10px;
+    }
 
-  .xtrc-config li {
-    margin-left: 10px;
-  }
+    .xtrc-config li {
+      margin-left: 10px;
+    }
 
-  .xtrc-converters li {
-    margin-left: 10px;
-  }
+    .xtrc-converters li {
+      margin-left: 10px;
+    }
 
-  .xtrc-converter-config li {
-    margin-left: 20px;
-  }
+    .xtrc-converter-config li {
+      margin-left: 20px;
+    }
 
-  .dropdown-menu a.selected {
-    font-weight: bold;
-  }
-`);
+    .dropdown-menu a.selected {
+      font-weight: bold;
+    }
+  `,
+);
 
 const NodeRowInfo = styled(ButtonToolbar)`
   position: relative;
@@ -125,7 +127,7 @@ class Output extends React.Component {
   _typeNotAvailable = () => {
     const { types, output } = this.props;
 
-    return (types[output.type] === undefined);
+    return types[output.type] === undefined;
   };
 
   render() {
@@ -137,8 +139,11 @@ class Output extends React.Component {
     }
 
     const { output } = this.props;
-    const contentPack = (output.content_pack
-      ? <span title="Created from content pack"><Icon name="gift" /></span> : null);
+    const contentPack = output.content_pack ? (
+      <span title="Created from content pack">
+        <Icon name="gift" />
+      </span>
+    ) : null;
 
     let alert;
     let configurationWell;
@@ -152,10 +157,12 @@ class Output extends React.Component {
       );
     } else {
       configurationWell = (
-        <ConfigurationWell key={`configuration-well-output-${output.id}`}
-                           id={output.id}
-                           configuration={output.configuration}
-                           typeDefinition={typeDefinition} />
+        <ConfigurationWell
+          key={`configuration-well-output-${output.id}`}
+          id={output.id}
+          configuration={output.configuration}
+          typeDefinition={typeDefinition}
+        />
       );
     }
 
@@ -188,10 +195,12 @@ class Output extends React.Component {
             <Col md={6}>
               <NodeRowInfo className="text-right pull-right">
                 <IfPermitted permissions="outputs:edit">
-                  <EditOutputButton disabled={this._typeNotAvailable()}
-                                    output={output}
-                                    onUpdate={onUpdate}
-                                    getTypeDefinition={getTypeDefinition} />
+                  <EditOutputButton
+                    disabled={this._typeNotAvailable()}
+                    output={output}
+                    onUpdate={onUpdate}
+                    getTypeDefinition={getTypeDefinition}
+                  />
                 </IfPermitted>
                 {deleteFromStreamButton}
                 <IfPermitted permissions="outputs:terminate">

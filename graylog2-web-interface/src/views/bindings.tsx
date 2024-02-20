@@ -57,8 +57,12 @@ import {
   EventDefinitionReplaySearchPage,
   EventReplaySearchPage,
 } from 'views/pages';
-import AddMessageCountActionHandler, { CreateMessageCount } from 'views/logic/fieldactions/AddMessageCountActionHandler';
-import AddMessageTableActionHandler, { CreateMessagesWidget } from 'views/logic/fieldactions/AddMessageTableActionHandler';
+import AddMessageCountActionHandler, {
+  CreateMessageCount,
+} from 'views/logic/fieldactions/AddMessageCountActionHandler';
+import AddMessageTableActionHandler, {
+  CreateMessagesWidget,
+} from 'views/logic/fieldactions/AddMessageTableActionHandler';
 import RemoveFromTableActionHandler from 'views/logic/fieldactions/RemoveFromTableActionHandler';
 import RemoveFromAllTablesActionHandler from 'views/logic/fieldactions/RemoveFromAllTablesActionHandler';
 import AddCustomAggregation, { CreateCustomAggregation } from 'views/logic/creatoractions/AddCustomAggregation';
@@ -129,7 +133,8 @@ VisualizationConfig.registerSubtype(ScatterVisualization.type, ScatterVisualizat
 Parameter.registerSubtype(ValueParameter.type, ValueParameter);
 Parameter.registerSubtype(LookupTableParameter.type, LookupTableParameter);
 
-const isAnalysisDisabled = (field: string, analysisDisabledFields: string[] = []) => analysisDisabledFields.includes(field);
+const isAnalysisDisabled = (field: string, analysisDisabledFields: string[] = []) =>
+  analysisDisabledFields.includes(field);
 
 const exports: PluginExports = {
   pages: {
@@ -152,7 +157,11 @@ const exports: PluginExports = {
     { path: extendedSearchPath, component: NewSearchPage, parentComponent: App },
     { path: showViewsPath, component: ShowViewPage, parentComponent: App },
     { path: Routes.ALERTS.replay_search(':alertId'), component: EventReplaySearchPage, parentComponent: App },
-    { path: Routes.ALERTS.DEFINITIONS.replay_search(':definitionId'), component: EventDefinitionReplaySearchPage, parentComponent: App },
+    {
+      path: Routes.ALERTS.DEFINITIONS.replay_search(':definitionId'),
+      component: EventDefinitionReplaySearchPage,
+      parentComponent: App,
+    },
   ],
   enterpriseWidgets: [
     {
@@ -181,9 +190,7 @@ const exports: PluginExports = {
       hasEditSubmitButton: true,
       needsControlledHeight: (widget: Widget) => {
         const widgetVisualization = get(widget, 'config.visualization');
-        const flexibleHeightWidgets = [
-          DataTable.type,
-        ];
+        const flexibleHeightWidgets = [DataTable.type];
 
         return !flexibleHeightWidgets.find((visualization) => visualization === widgetVisualization);
       },
@@ -241,21 +248,18 @@ const exports: PluginExports = {
       type: 'aggregate',
       title: 'Show top values',
       thunk: AggregateActionHandler,
-      isEnabled: (({
-        field,
-        type,
-        contexts: { analysisDisabledFields },
-      }) => (!isFunction(field) && type.isEnumerable() && !type.isDecorated() && !isAnalysisDisabled(field, analysisDisabledFields))),
+      isEnabled: ({ field, type, contexts: { analysisDisabledFields } }) =>
+        !isFunction(field) &&
+        type.isEnumerable() &&
+        !type.isDecorated() &&
+        !isAnalysisDisabled(field, analysisDisabledFields),
       resetFocus: true,
     },
     {
       type: 'statistics',
       title: 'Statistics',
-      isEnabled: (({
-        field,
-        type,
-        contexts: { analysisDisabledFields },
-      }) => (!isFunction(field) && !type.isDecorated() && !isAnalysisDisabled(field, analysisDisabledFields))),
+      isEnabled: ({ field, type, contexts: { analysisDisabledFields } }) =>
+        !isFunction(field) && !type.isDecorated() && !isAnalysisDisabled(field, analysisDisabledFields),
       thunk: FieldStatisticsHandler,
       resetFocus: false,
     },
@@ -279,14 +283,14 @@ const exports: PluginExports = {
       type: 'add-to-all-tables',
       title: 'Add to all tables',
       thunk: AddToAllTablesActionHandler,
-      isEnabled: ({ field, type }) => (!isFunction(field) && !type.isDecorated()),
+      isEnabled: ({ field, type }) => !isFunction(field) && !type.isDecorated(),
       resetFocus: false,
     },
     {
       type: 'remove-from-all-tables',
       title: 'Remove from all tables',
       thunk: RemoveFromAllTablesActionHandler,
-      isEnabled: ({ field, type }) => (!isFunction(field) && !type.isDecorated()),
+      isEnabled: ({ field, type }) => !isFunction(field) && !type.isDecorated(),
       resetFocus: false,
     },
     {
@@ -306,71 +310,78 @@ const exports: PluginExports = {
       help: ChangeFieldTypeHelp,
     },
   ],
-  valueActions: filterCloudValueActions([
-    {
-      type: 'exclude',
-      title: 'Exclude from results',
-      thunk: ExcludeFromQueryHandler,
-      isEnabled: ({ field, type }: ActionHandlerArguments) => (!isFunction(field) && !type.isDecorated()),
-      resetFocus: false,
-    },
-    {
-      type: 'add-to-query',
-      title: 'Add to query',
-      thunk: AddToQueryHandler,
-      isEnabled: ({ field, type }: ActionHandlerArguments) => (!isFunction(field) && !type.isDecorated()),
-      resetFocus: false,
-    },
-    {
-      type: 'show-bucket',
-      title: 'Show documents for value',
-      thunk: ShowDocumentsHandler,
-      isEnabled: ShowDocumentsHandler.isEnabled,
-      resetFocus: true,
-    },
-    {
-      type: 'create-extractor',
-      title: 'Create extractor',
-      isEnabled: ({ type, contexts }) => (!!contexts.message && !type.isDecorated() && !!contexts.isLocalNode),
-      component: SelectExtractorType,
-      resetFocus: false,
-    },
-    {
-      type: 'highlight-value',
-      title: 'Highlight this value',
-      thunk: HighlightValueHandler,
-      isEnabled: HighlightValueHandler.isEnabled,
-      resetFocus: false,
-    },
-    {
-      type: 'copy-value-to-clipboard',
-      title: 'Copy value to clipboard',
-      handler: CopyValueToClipboard,
-      isEnabled: () => true,
-      resetFocus: false,
-    },
-    {
-      type: 'create-event-definition-from-value',
-      title: 'Create event definition',
-      isEnabled: () => true,
-      resetFocus: false,
-      component: CreateEventDefinition,
-    },
-  ], ['create-extractor']),
+  valueActions: filterCloudValueActions(
+    [
+      {
+        type: 'exclude',
+        title: 'Exclude from results',
+        thunk: ExcludeFromQueryHandler,
+        isEnabled: ({ field, type }: ActionHandlerArguments) => !isFunction(field) && !type.isDecorated(),
+        resetFocus: false,
+      },
+      {
+        type: 'add-to-query',
+        title: 'Add to query',
+        thunk: AddToQueryHandler,
+        isEnabled: ({ field, type }: ActionHandlerArguments) => !isFunction(field) && !type.isDecorated(),
+        resetFocus: false,
+      },
+      {
+        type: 'show-bucket',
+        title: 'Show documents for value',
+        thunk: ShowDocumentsHandler,
+        isEnabled: ShowDocumentsHandler.isEnabled,
+        resetFocus: true,
+      },
+      {
+        type: 'create-extractor',
+        title: 'Create extractor',
+        isEnabled: ({ type, contexts }) => !!contexts.message && !type.isDecorated() && !!contexts.isLocalNode,
+        component: SelectExtractorType,
+        resetFocus: false,
+      },
+      {
+        type: 'highlight-value',
+        title: 'Highlight this value',
+        thunk: HighlightValueHandler,
+        isEnabled: HighlightValueHandler.isEnabled,
+        resetFocus: false,
+      },
+      {
+        type: 'copy-value-to-clipboard',
+        title: 'Copy value to clipboard',
+        handler: CopyValueToClipboard,
+        isEnabled: () => true,
+        resetFocus: false,
+      },
+      {
+        type: 'create-event-definition-from-value',
+        title: 'Create event definition',
+        isEnabled: () => true,
+        resetFocus: false,
+        component: CreateEventDefinition,
+      },
+    ],
+    ['create-extractor'],
+  ),
   visualizationTypes: visualizationBindings,
-  widgetCreators: [{
-    title: 'Message Count',
-    func: CreateMessageCount,
-    icon: () => <Icon name="hashtag" />,
-  }, {
-    title: 'Message Table',
-    func: CreateMessagesWidget,
-    icon: () => <Icon name="list" />,
-  }, {
-    title: 'Custom Aggregation',
-    func: CreateCustomAggregation,
-    icon: () => <Icon name="chart-column" />,
-  }],
+  widgetCreators: [
+    {
+      title: 'Message Count',
+      func: CreateMessageCount,
+      icon: () => <Icon name="hashtag" />,
+    },
+    {
+      title: 'Message Table',
+      func: CreateMessagesWidget,
+      icon: () => <Icon name="list" />,
+    },
+    {
+      title: 'Custom Aggregation',
+      func: CreateCustomAggregation,
+      icon: () => <Icon name="chart-column" />,
+    },
+  ],
   creators: [
     {
       type: 'preset',
@@ -388,17 +399,14 @@ const exports: PluginExports = {
       func: AddCustomAggregation,
     },
   ],
-  'views.completers': [
-    new FieldNameCompletion(),
-    new FieldValueCompletion(),
-    new OperatorCompletion(),
-  ],
-  'views.hooks.loadingView': [
-    requirementsProvided,
-    bindSearchParamsFromQuery,
-  ],
+  'views.completers': [new FieldNameCompletion(), new FieldValueCompletion(), new OperatorCompletion()],
+  'views.hooks.loadingView': [requirementsProvided, bindSearchParamsFromQuery],
   'views.elements.header': [
-    () => <IfSearch><MigrateFieldCharts /></IfSearch>,
+    () => (
+      <IfSearch>
+        <MigrateFieldCharts />
+      </IfSearch>
+    ),
     ViewHeader,
   ],
   'views.export.formats': [

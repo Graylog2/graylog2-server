@@ -20,13 +20,15 @@ import { singletonActions } from 'logic/singleton';
 import type { RefluxActions } from 'stores/StoreTypes';
 
 type CustomizationActionsType = RefluxActions<{
-  update: (type: string, config: {}) => Promise<unknown>,
-  get: (type: string) => Promise<unknown>,
+  update: (type: string, config: {}) => Promise<unknown>;
+  get: (type: string) => Promise<unknown>;
 }>;
 
-const CustomizationActions: CustomizationActionsType = singletonActions('customization.actions', () => Reflux.createActions({
-  update: { asyncResult: true },
-  get: { asyncResult: true },
-}));
+const CustomizationActions: CustomizationActionsType = singletonActions('customization.actions', () =>
+  Reflux.createActions({
+    update: { asyncResult: true },
+    get: { asyncResult: true },
+  }),
+);
 
 export default CustomizationActions;

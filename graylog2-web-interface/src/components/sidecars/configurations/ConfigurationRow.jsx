@@ -63,23 +63,28 @@ class ConfigurationRow extends React.Component {
     return (
       <tr>
         <td className={styles.name}>{configuration.name}</td>
-        <td className={styles.color}><ColorLabel color={configuration.color} size="small" /></td>
+        <td className={styles.color}>
+          <ColorLabel color={configuration.color} size="small" />
+        </td>
         <td>
-          <CollectorIndicator collector={collector.name || 'Unknown collector'}
-                              operatingSystem={collector.node_operating_system} />
+          <CollectorIndicator
+            collector={collector.name || 'Unknown collector'}
+            operatingSystem={collector.node_operating_system}
+          />
         </td>
         <td className={styles.actions}>
           <ButtonToolbar>
             <LinkContainer to={Routes.SYSTEM.SIDECARS.EDIT_CONFIGURATION(configuration.id)}>
-              <Button onClick={this.openModal} bsStyle="info" bsSize="xsmall">Edit</Button>
+              <Button onClick={this.openModal} bsStyle="info" bsSize="xsmall">
+                Edit
+              </Button>
             </LinkContainer>
-            <DropdownButton id={`more-actions-${configuration.id}`}
-                            title="More actions"
-                            bsSize="xsmall"
-                            pullRight>
-              <CopyConfigurationModal configuration={configuration}
-                                      validateConfiguration={validateConfiguration}
-                                      copyConfiguration={onCopy} />
+            <DropdownButton id={`more-actions-${configuration.id}`} title="More actions" bsSize="xsmall" pullRight>
+              <CopyConfigurationModal
+                configuration={configuration}
+                validateConfiguration={validateConfiguration}
+                copyConfiguration={onCopy}
+              />
               <MenuItem divider />
               <MenuItem onSelect={this._handleDelete}>Delete</MenuItem>
             </DropdownButton>

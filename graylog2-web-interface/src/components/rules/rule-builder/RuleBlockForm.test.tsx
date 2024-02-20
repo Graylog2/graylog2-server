@@ -24,12 +24,11 @@ import { buildRuleBlock, actionsBlockDict } from './fixtures';
 const block = buildRuleBlock({
   functionName: 'substring',
   step_title: 'substring "wingardium leviosa" start "1" end "2"',
-  params:
-{
-  value: 'wingardium leviosa',
-  start: 1,
-  indexEnd: 2,
-},
+  params: {
+    value: 'wingardium leviosa',
+    start: 1,
+    indexEnd: 2,
+  },
 });
 
 const options = actionsBlockDict.map(({ name }) => ({ label: name, value: name }));
@@ -39,19 +38,18 @@ const mockCancel = jest.fn();
 const mockSelect = jest.fn();
 const mockUpdate = jest.fn();
 
-const comp = ({
-  existingBlock = undefined,
-  selectedBlockDict = undefined,
-} = {}) => (
-  <RuleBlockForm onAdd={mockAdd}
-                 onCancel={mockCancel}
-                 onSelect={mockSelect}
-                 onUpdate={mockUpdate}
-                 options={options}
-                 selectedBlockDict={selectedBlockDict}
-                 existingBlock={existingBlock}
-                 order={1}
-                 type="action" />
+const comp = ({ existingBlock = undefined, selectedBlockDict = undefined } = {}) => (
+  <RuleBlockForm
+    onAdd={mockAdd}
+    onCancel={mockCancel}
+    onSelect={mockSelect}
+    onUpdate={mockUpdate}
+    options={options}
+    selectedBlockDict={selectedBlockDict}
+    existingBlock={existingBlock}
+    order={1}
+    type="action"
+  />
 );
 
 describe('RuleBlockForm', () => {
@@ -152,7 +150,9 @@ describe('RuleBlockForm', () => {
   it('shows and updates function form when a block is present', async () => {
     render(comp({ existingBlock: block, selectedBlockDict: actionsBlockDict[4] }));
 
-    expect(screen.getByRole('heading', { name: 'substring "wingardium leviosa" start "1" end "2"' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'substring "wingardium leviosa" start "1" end "2"' }),
+    ).toBeInTheDocument();
 
     const updateButton = await screen.findByRole('button', { name: 'Update' });
 
@@ -161,11 +161,15 @@ describe('RuleBlockForm', () => {
 
     fireEvent.click(updateButton);
 
-    await waitFor(() => expect(mockUpdate).toHaveBeenCalledWith({ indexEnd: 2, start: 1, value: 'Lumos' }, 'substring'));
+    await waitFor(() =>
+      expect(mockUpdate).toHaveBeenCalledWith({ indexEnd: 2, start: 1, value: 'Lumos' }, 'substring'),
+    );
   });
 
   it('displays errors when existing', async () => {
-    render(comp({ existingBlock: { ...block, errors: ['wrong 1', 'not right 2'] }, selectedBlockDict: actionsBlockDict[4] }));
+    render(
+      comp({ existingBlock: { ...block, errors: ['wrong 1', 'not right 2'] }, selectedBlockDict: actionsBlockDict[4] }),
+    );
 
     expect(screen.getByText('wrong 1')).toBeInTheDocument();
     expect(screen.getByText('not right 2')).toBeInTheDocument();

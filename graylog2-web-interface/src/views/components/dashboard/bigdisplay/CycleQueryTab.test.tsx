@@ -30,11 +30,15 @@ import { selectQuery } from 'views/logic/slices/viewSlice';
 import OriginalCycleQueryTab from './CycleQueryTab';
 
 type AdditionalProps = {
-  view: View,
-  activeQuery: QueryId,
+  view: View;
+  activeQuery: QueryId;
 };
 
-const CycleQueryTab = ({ view, activeQuery, ...props }: AdditionalProps & React.ComponentProps<typeof OriginalCycleQueryTab>) => (
+const CycleQueryTab = ({
+  view,
+  activeQuery,
+  ...props
+}: AdditionalProps & React.ComponentProps<typeof OriginalCycleQueryTab>) => (
   <TestStoreProvider view={view} initialQuery={activeQuery}>
     <OriginalCycleQueryTab {...props} />
   </TestStoreProvider>
@@ -48,11 +52,10 @@ jest.mock('views/logic/slices/viewSlice', () => ({
 }));
 
 describe('CycleQueryTab', () => {
-  const search = Search.create().toBuilder().queries([
-    Query.builder().id('foo').build(),
-    Query.builder().id('bar').build(),
-    Query.builder().id('baz').build(),
-  ]).build();
+  const search = Search.create()
+    .toBuilder()
+    .queries([Query.builder().id('foo').build(), Query.builder().id('bar').build(), Query.builder().id('baz').build()])
+    .build();
   const view = View.create().toBuilder().search(search).build();
 
   beforeAll(loadViewsPlugin);

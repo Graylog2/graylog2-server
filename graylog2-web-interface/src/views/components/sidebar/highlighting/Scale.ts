@@ -35,8 +35,10 @@ const scaleForGradient = (gradient: string): chroma.Scale => {
     case 'Jet':
     case 'Picnic':
     case 'Portland':
-    case 'Rainbow': return plotlyScaleToChroma(scales[gradient]);
-    default: return chroma.scale(gradient);
+    case 'Rainbow':
+      return plotlyScaleToChroma(scales[gradient]);
+    default:
+      return chroma.scale(gradient);
   }
 };
 

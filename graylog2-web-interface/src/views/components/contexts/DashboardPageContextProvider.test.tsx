@@ -52,15 +52,14 @@ describe('DashboardPageContextProvider', () => {
     asMock(useLocation).mockReturnValue(emptyLocation);
   });
 
-  const renderSUT = (consume: (value: DashboardPageContextType) => React.ReactNode) => render((
-    <TestStoreProvider>
-      <DashboardPageContextProvider>
-        <DashboardPageContext.Consumer>
-          {consume}
-        </DashboardPageContext.Consumer>
-      </DashboardPageContextProvider>
-    </TestStoreProvider>
-  ));
+  const renderSUT = (consume: (value: DashboardPageContextType) => React.ReactNode) =>
+    render(
+      <TestStoreProvider>
+        <DashboardPageContextProvider>
+          <DashboardPageContext.Consumer>{consume}</DashboardPageContext.Consumer>
+        </DashboardPageContextProvider>
+      </TestStoreProvider>,
+    );
 
   it('should update url on page set', () => {
     let contextValue;

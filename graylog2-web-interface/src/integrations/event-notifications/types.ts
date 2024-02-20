@@ -15,81 +15,81 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 export type TeamsNotificationSummaryType = {
-    type: string,
-    notification: NotificationType,
-}
+  type: string;
+  notification: NotificationType;
+};
 
 export type NotificationType = {
-    config: ConfigType,
-}
+  config: ConfigType;
+};
 
 export interface ConfigType {
-    defaultValue?: any,
-    icon_url?: string,
-    backlog_size?: number,
-    custom_message: string,
-    webhook_url?: string,
-    color?: string,
-    time_zone?: string,
+  defaultValue?: any;
+  icon_url?: string;
+  backlog_size?: number;
+  custom_message: string;
+  webhook_url?: string;
+  color?: string;
+  time_zone?: string;
 }
 
 export type ValidationType = {
-    failed?: boolean,
-    errors?: ErrorType,
-}
+  failed?: boolean;
+  errors?: ErrorType;
+};
 
 export interface ErrorType {
-    webhook_url: string[],
-    color: string[],
-    icon_url: string,
-    backlog_size: number,
-    custom_message: string,
+  webhook_url: string[];
+  color: string[];
+  icon_url: string;
+  backlog_size: number;
+  custom_message: string;
 }
 
 export type SlackNotificationSummaryType = {
-    type: string,
-    notification: SlackNotificationType,
-    definitionNotification: any,
-}
+  type: string;
+  notification: SlackNotificationType;
+  definitionNotification: any;
+};
 
 export type SlackNotificationType = {
-    config: SlackConfigType,
-}
+  config: SlackConfigType;
+};
 
 export interface SlackConfigType {
-    icon_emoji?: string,
-    icon_url?: string,
-    link_names: string,
-    notify_channel: boolean,
-    notify_here: boolean,
-    backlog_size: number,
-    user_name?: string,
-    custom_message: string,
-    channel: string,
-    webhook_url: string,
-    color: string,
-    time_zone: string,
-    include_title: boolean,
+  icon_emoji?: string;
+  icon_url?: string;
+  link_names: string;
+  notify_channel: boolean;
+  notify_here: boolean;
+  backlog_size: number;
+  user_name?: string;
+  custom_message: string;
+  channel: string;
+  webhook_url: string;
+  color: string;
+  time_zone: string;
+  include_title: boolean;
 }
 
 export type SlackValidationType = {
-    failed: boolean,
-    errors?: SlackErrorType,
-    error_context?: any
-}
+  failed: boolean;
+  errors?: SlackErrorType;
+  error_context?: any;
+};
 
 export interface SlackErrorType {
-    icon_emoji?: string,
-    icon_url?: string,
-    link_names: string,
-    notify_channel: string,
-    notify_here: string,
-    backlog_size: number,
-    user_name?: string,
-    custom_message: string,
-    channel: string,
-    webhook_url: string,
-    color: string,
-    time_zone: string,
-    include_title?: string,
+  icon_emoji?: string;
+  icon_url?: string;
+  link_names: string;
+  notify_channel: string;
+  notify_here: string;
+  backlog_size: number;
+  user_name?: string;
+  custom_message: string;
+  channel: string;
+  webhook_url: string;
+  color: string;
+  time_zone: string;
+  include_title?: string;
 }

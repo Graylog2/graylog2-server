@@ -18,13 +18,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { LinkContainer } from 'components/common/router';
-import {
-  EmptyEntity,
-  EntityList,
-  IfPermitted,
-  PaginatedList,
-  SearchForm,
-} from 'components/common';
+import { EmptyEntity, EntityList, IfPermitted, PaginatedList, SearchForm } from 'components/common';
 import { Button, Col, Row } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import QueryHelper from 'components/common/QueryHelper';
@@ -39,8 +33,8 @@ const EmptyContent = () => (
     <Col md={6} mdOffset={3} lg={4} lgOffset={4}>
       <EmptyEntity>
         <p>
-          Create Event Definitions that are able to search, aggregate or correlate Messages and other
-          Events, allowing you to record significant Events in Graylog and alert on them.
+          Create Event Definitions that are able to search, aggregate or correlate Messages and other Events, allowing
+          you to record significant Events in Graylog and alert on them.
         </p>
         <IfPermitted permissions="eventdefinitions:create">
           <LinkContainer to={Routes.ALERTS.DEFINITIONS.CREATE}>
@@ -53,55 +47,68 @@ const EmptyContent = () => (
 );
 
 type Props = {
-  eventDefinitions: Array<EventDefinition>,
-  context?: React.ComponentProps<typeof EventDefinitionEntry>['context'],
+  eventDefinitions: Array<EventDefinition>;
+  context?: React.ComponentProps<typeof EventDefinitionEntry>['context'];
   pagination: {
-    grandTotal: number,
-    page: number,
-    pageSize: number,
-    total: number,
-  },
-  query: string,
-  onPageChange: (page: number, size: number) => void,
-  onQueryChange: (newQuery?: string) => void,
-  onDelete: (eventDefinition: EventDefinition) => void,
-  onCopy: (eventDefinition: EventDefinition) => void,
-  onEnable: (eventDefinition: EventDefinition) => void,
-  onDisable: (eventDefinition: EventDefinition) => void,
+    grandTotal: number;
+    page: number;
+    pageSize: number;
+    total: number;
+  };
+  query: string;
+  onPageChange: (page: number, size: number) => void;
+  onQueryChange: (newQuery?: string) => void;
+  onDelete: (eventDefinition: EventDefinition) => void;
+  onCopy: (eventDefinition: EventDefinition) => void;
+  onEnable: (eventDefinition: EventDefinition) => void;
+  onDisable: (eventDefinition: EventDefinition) => void;
 };
 
 export const PAGE_SIZES = [10, 50, 100];
 
-const EventDefinitions = ({ eventDefinitions, context, pagination, query, onPageChange, onQueryChange, onDelete, onCopy, onEnable, onDisable }: Props) => {
+const EventDefinitions = ({
+  eventDefinitions,
+  context,
+  pagination,
+  query,
+  onPageChange,
+  onQueryChange,
+  onDelete,
+  onCopy,
+  onEnable,
+  onDisable,
+}: Props) => {
   if (pagination.grandTotal === 0) {
     return <EmptyContent />;
   }
 
   const items = eventDefinitions.map((definition) => (
-    <EventDefinitionEntry key={definition.id}
-                          context={context}
-                          eventDefinition={definition}
-                          onDisable={onDisable}
-                          onEnable={onEnable}
-                          onDelete={onDelete}
-                          onCopy={onCopy} />
+    <EventDefinitionEntry
+      key={definition.id}
+      context={context}
+      eventDefinition={definition}
+      onDisable={onDisable}
+      onEnable={onEnable}
+      onDelete={onDelete}
+      onCopy={onCopy}
+    />
   ));
 
   return (
     <Row>
       <Col md={12}>
-        <SearchForm query={query}
-                    onSearch={onQueryChange}
-                    onReset={onQueryChange}
-                    placeholder="Find Event Definitions"
-                    wrapperClass={styles.inline}
-                    queryHelpComponent={<QueryHelper entityName="event definition" />}
-                    topMargin={0}
-                    useLoadingState />
+        <SearchForm
+          query={query}
+          onSearch={onQueryChange}
+          onReset={onQueryChange}
+          placeholder="Find Event Definitions"
+          wrapperClass={styles.inline}
+          queryHelpComponent={<QueryHelper entityName="event definition" />}
+          topMargin={0}
+          useLoadingState
+        />
 
-        <PaginatedList pageSizes={PAGE_SIZES}
-                       totalItems={pagination.total}
-                       onChange={onPageChange}>
+        <PaginatedList pageSizes={PAGE_SIZES} totalItems={pagination.total} onChange={onPageChange}>
           <div className={styles.definitionList}>
             <EntityList items={items} />
           </div>

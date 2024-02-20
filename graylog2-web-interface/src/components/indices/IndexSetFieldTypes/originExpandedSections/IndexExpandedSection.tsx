@@ -20,9 +20,8 @@ import type { ExpandedSectionProps } from 'components/indices/IndexSetFieldTypes
 
 const IndexExpandedSection = ({ type }: ExpandedSectionProps) => (
   <p>
-    Field type <i>{type}</i> comes from the search engine index mapping.
-    It could have been created dynamically, set by Graylog instance or come from historical
-    profiles and/or custom mappings.
+    Field type <i>{type}</i> comes from the search engine index mapping. It could have been created dynamically, set by
+    Graylog instance or come from historical profiles and/or custom mappings.
   </p>
 );
 

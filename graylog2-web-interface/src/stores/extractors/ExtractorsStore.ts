@@ -42,93 +42,92 @@ export type InputSummary = {
 };
 
 export type NodeSummary = {
-  cluster_id: string,
-  hostname: string,
-  is_leader: boolean,
-  is_master: boolean,
-  last_seen: string,
-  node_id: string,
-  short_node_id: string,
-  transport_address: string,
-  type: string,
+  cluster_id: string;
+  hostname: string;
+  is_leader: boolean;
+  is_master: boolean;
+  last_seen: string;
+  node_id: string;
+  short_node_id: string;
+  transport_address: string;
+  type: string;
 };
 
 type RateMetricsResponse = {
-  total: number,
-  mean: number,
-  five_minute: number,
-  fifteen_minute: number,
-  one_minute: number,
+  total: number;
+  mean: number;
+  five_minute: number;
+  fifteen_minute: number;
+  one_minute: number;
 };
 
 type TimerMetricsResponse = {
-  min: number,
-  max: number,
-  std_dev: number,
-  mean: number,
-  '95th_percentile': number,
-  '99th_percentile': number,
-  '98th_percentile': number,
+  min: number;
+  max: number;
+  std_dev: number;
+  mean: number;
+  '95th_percentile': number;
+  '99th_percentile': number;
+  '98th_percentile': number;
 };
 
 type TimerRateMetricsResponse = {
-  rate: RateMetricsResponse,
-  rate_unit: string,
-  time: TimerMetricsResponse,
-  duration_unit: string,
+  rate: RateMetricsResponse;
+  rate_unit: string;
+  time: TimerMetricsResponse;
+  duration_unit: string;
 };
 
 export type ExtractorMetrics = {
-  condition_misses: number,
-  execution: TimerRateMetricsResponse,
-  total: TimerRateMetricsResponse,
-  condition: TimerRateMetricsResponse,
-  condition_hits: number,
-  converters: TimerRateMetricsResponse,
+  condition_misses: number;
+  execution: TimerRateMetricsResponse;
+  total: TimerRateMetricsResponse;
+  condition: TimerRateMetricsResponse;
+  condition_hits: number;
+  converters: TimerRateMetricsResponse;
 };
 
 export type ExtractorType = {
-  creator_user_id: string,
-  extractor_type?: string,
-  source_field: string,
-  condition_type: string,
-  converter_exceptions: number,
-  title: string,
-  type: string,
-  cursor_strategy: string,
-  exceptions: number,
-  target_field: string,
+  creator_user_id: string;
+  extractor_type?: string;
+  source_field: string;
+  condition_type: string;
+  converter_exceptions: number;
+  title: string;
+  type: string;
+  cursor_strategy: string;
+  exceptions: number;
+  target_field: string;
   extractor_config: {
-    [_key: string]: Object,
-  },
-  condition_value: string,
+    [_key: string]: Object;
+  };
+  condition_value: string;
   converters: {
-    [_key: string]: Object,
-  }[],
-  id?: string,
-  metrics: ExtractorMetrics,
-  order: number,
+    [_key: string]: Object;
+  }[];
+  id?: string;
+  metrics: ExtractorMetrics;
+  order: number;
 };
 
 type ExtractorsActionsType = {
-  list: (inputId: string) => Promise<Array<ExtractorType>>,
-  get: (inputId: string, extractorId: string) => Promise<ExtractorType>,
-  create: (inputId: string, extractor: ExtractorType, calledFromMethod: boolean) => Promise<unknown>,
-  save: (inputId: string, extractor: ExtractorType) => Promise<unknown>,
-  update: (inputId: string, extractor: ExtractorType, calledFromMethod: boolean) => Promise<unknown>,
-  delete: (inputId: string, extractor: ExtractorType) => Promise<unknown>,
-  order: { asyncResult: true },
-  import: (inputId: string, orderedExtractors: Array<ExtractorType>) => Promise<unknown>,
+  list: (inputId: string) => Promise<Array<ExtractorType>>;
+  get: (inputId: string, extractorId: string) => Promise<ExtractorType>;
+  create: (inputId: string, extractor: ExtractorType, calledFromMethod: boolean) => Promise<unknown>;
+  save: (inputId: string, extractor: ExtractorType) => Promise<unknown>;
+  update: (inputId: string, extractor: ExtractorType, calledFromMethod: boolean) => Promise<unknown>;
+  delete: (inputId: string, extractor: ExtractorType) => Promise<unknown>;
+  order: { asyncResult: true };
+  import: (inputId: string, orderedExtractors: Array<ExtractorType>) => Promise<unknown>;
 };
 
 export type ExtractorsStoreState = {
-  extractors: Array<ExtractorType>,
-  extractor: ExtractorType,
+  extractors: Array<ExtractorType>;
+  extractor: ExtractorType;
 };
 
-export const ExtractorsActions = singletonActions(
-  'core.Extractors',
-  () => Reflux.createActions<ExtractorsActionsType>({
+export const ExtractorsActions = singletonActions('core.Extractors', () =>
+  Reflux.createActions<ExtractorsActionsType>({
     list: { asyncResult: true },
     get: { asyncResult: true },
     create: { asyncResult: true },
@@ -141,7 +140,8 @@ export const ExtractorsActions = singletonActions(
 );
 
 function getExtractorDTO(extractor: ExtractorType) {
-  const conditionValue = extractor.condition_type && extractor.condition_type !== 'none' ? extractor.condition_value : '';
+  const conditionValue =
+    extractor.condition_type && extractor.condition_type !== 'none' ? extractor.condition_value : '';
 
   return {
     title: extractor.title,
@@ -157,9 +157,8 @@ function getExtractorDTO(extractor: ExtractorType) {
   };
 }
 
-export const ExtractorsStore = singletonStore(
-  'core.Extractors',
-  () => Reflux.createStore<ExtractorsStoreState>({
+export const ExtractorsStore = singletonStore('core.Extractors', () =>
+  Reflux.createStore<ExtractorsStoreState>({
     listenables: [ExtractorsActions],
     sourceUrl: '/system/inputs/',
     extractors: undefined,
@@ -211,7 +210,10 @@ export const ExtractorsStore = singletonStore(
     },
 
     get(inputId: string, extractorId: string) {
-      const promise = fetch('GET', URLUtils.qualifyUrl(URLUtils.concatURLPath(this.sourceUrl, inputId, 'extractors', extractorId)));
+      const promise = fetch(
+        'GET',
+        URLUtils.qualifyUrl(URLUtils.concatURLPath(this.sourceUrl, inputId, 'extractors', extractorId)),
+      );
 
       promise.then((response) => {
         this.extractor = response;
@@ -251,8 +253,7 @@ export const ExtractorsStore = singletonStore(
           }
         })
         .catch((error) => {
-          UserNotification.error(`Creating extractor failed: ${error}`,
-            'Could not create extractor');
+          UserNotification.error(`Creating extractor failed: ${error}`, 'Could not create extractor');
         });
 
       if (!calledFromMethod) {
@@ -276,8 +277,7 @@ export const ExtractorsStore = singletonStore(
           }
         })
         .catch((error) => {
-          UserNotification.error(`Updating extractor failed: ${error}`,
-            'Could not update extractor');
+          UserNotification.error(`Updating extractor failed: ${error}`, 'Could not update extractor');
         });
 
       if (!calledFromMethod) {
@@ -301,8 +301,10 @@ export const ExtractorsStore = singletonStore(
           }
         })
         .catch((error) => {
-          UserNotification.error(`Deleting extractor failed: ${error}`,
-            `Could not delete extractor ${extractor.title}`);
+          UserNotification.error(
+            `Deleting extractor failed: ${error}`,
+            `Could not delete extractor ${extractor.title}`,
+          );
         });
 
       ExtractorsActions.delete.promise(promise);
@@ -327,8 +329,7 @@ export const ExtractorsStore = singletonStore(
       });
 
       promise.catch((error) => {
-        UserNotification.error(`Changing extractor positions failed: ${error}`,
-          'Could not update extractor positions');
+        UserNotification.error(`Changing extractor positions failed: ${error}`, 'Could not update extractor positions');
       });
 
       ExtractorsActions.order.promise(promise);
@@ -343,21 +344,29 @@ export const ExtractorsStore = singletonStore(
         const promise = this._silentExtractorCreate(inputId, extractor);
 
         promise
-          .then(() => { successfulImports += 1; })
-          .catch(() => { failedImports += 1; });
+          .then(() => {
+            successfulImports += 1;
+          })
+          .catch(() => {
+            failedImports += 1;
+          });
 
         promises.push(promise);
       });
 
       Promise.allSettled(promises).then(() => {
         if (failedImports === 0) {
-          UserNotification.success(`Import results: ${successfulImports} extractor(s) imported.`,
-            'Import operation successful');
+          UserNotification.success(
+            `Import results: ${successfulImports} extractor(s) imported.`,
+            'Import operation successful',
+          );
 
           this.propagateState();
         } else {
-          UserNotification.warning(`Import results: ${successfulImports} extractor(s) imported, ${failedImports} error(s).`,
-            'Import operation completed');
+          UserNotification.warning(
+            `Import results: ${successfulImports} extractor(s) imported, ${failedImports} error(s).`,
+            'Import operation completed',
+          );
         }
       });
     },

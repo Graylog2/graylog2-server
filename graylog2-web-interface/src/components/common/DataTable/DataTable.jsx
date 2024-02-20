@@ -33,11 +33,7 @@ const StyledTable = styled.table`
 // eslint-disable-next-line react/prop-types
 const NoData = ({ noDataText }) => {
   if (typeof noDataText === 'string') {
-    return (
-      <NoEntitiesExist>
-        {noDataText}
-      </NoEntitiesExist>
-    );
+    return <NoEntitiesExist>{noDataText}</NoEntitiesExist>;
   }
 
   return noDataText;
@@ -115,7 +111,7 @@ class DataTable extends React.Component {
     rowClassName: '',
     useResponsiveTable: true,
     // eslint-disable-next-line react/no-unstable-nested-components
-    headerCellFormatter: (header) => (<th>{header}</th>),
+    headerCellFormatter: (header) => <th>{header}</th>,
     sortByKey: undefined,
     sortBy: undefined,
     useNumericSort: false,
@@ -150,9 +146,13 @@ class DataTable extends React.Component {
     let sortedDataRows = this._getEffectiveRows();
 
     if (sortByKey) {
-      sortedDataRows = sortedDataRows.sort((a, b) => a[sortByKey].localeCompare(b[sortByKey], undefined, { numeric: useNumericSort }));
+      sortedDataRows = sortedDataRows.sort((a, b) =>
+        a[sortByKey].localeCompare(b[sortByKey], undefined, { numeric: useNumericSort }),
+      );
     } else if (sortBy) {
-      sortedDataRows = sortedDataRows.sort((a, b) => sortBy(a).localeCompare(sortBy(b), undefined, { numeric: useNumericSort }));
+      sortedDataRows = sortedDataRows.sort((a, b) =>
+        sortBy(a).localeCompare(sortBy(b), undefined, { numeric: useNumericSort }),
+      );
     }
 
     const formattedDataRows = sortedDataRows.map((row) => {
@@ -174,7 +174,7 @@ class DataTable extends React.Component {
     const { filteredRows } = this.state;
     const { filterKeys, rows } = this.props;
 
-    return (filterKeys.length === 0 ? rows : filteredRows.filter((row) => rows.some((r) => isEqual(r, row))));
+    return filterKeys.length === 0 ? rows : filteredRows.filter((row) => rows.some((r) => isEqual(r, row)));
   };
 
   render() {
@@ -204,12 +204,8 @@ class DataTable extends React.Component {
     } else {
       data = (
         <StyledTable className={`table ${className ?? ''}`}>
-          <thead>
-            {this.getFormattedHeaders()}
-          </thead>
-          <tbody>
-            {this.getFormattedDataRows()}
-          </tbody>
+          <thead>{this.getFormattedHeaders()}</thead>
+          <tbody>{this.getFormattedDataRows()}</tbody>
         </StyledTable>
       );
     }
@@ -217,14 +213,16 @@ class DataTable extends React.Component {
     return (
       <div>
         {customFilter || (
-          <Filter label={filterLabel}
-                  rows={rows}
-                  id={id}
-                  displayKey={displayKey}
-                  filterBy={filterBy}
-                  filterSuggestions={filterSuggestions}
-                  filterKeys={filterKeys}
-                  onDataFiltered={this.filterDataRows}>
+          <Filter
+            label={filterLabel}
+            rows={rows}
+            id={id}
+            displayKey={displayKey}
+            filterBy={filterBy}
+            filterSuggestions={filterSuggestions}
+            filterKeys={filterKeys}
+            onDataFiltered={this.filterDataRows}
+          >
             {children}
           </Filter>
         )}

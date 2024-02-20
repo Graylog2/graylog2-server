@@ -23,9 +23,9 @@ import Routes from 'routing/Routes';
 import type { Event, EventDefinitionContext } from 'components/events/events/types';
 
 type Props = {
-  event: Event,
-  eventDefinitionContext: EventDefinitionContext,
-}
+  event: Event;
+  eventDefinitionContext: EventDefinitionContext;
+};
 
 const EventDefinitionLink = ({ event, eventDefinitionContext }: Props) => {
   const currentUser = useCurrentUser();
@@ -34,10 +34,11 @@ const EventDefinitionLink = ({ event, eventDefinitionContext }: Props) => {
     return <em>{event.event_definition_id}</em>;
   }
 
-  return isPermitted(currentUser.permissions,
-    `eventdefinitions:edit:${eventDefinitionContext.id}`)
-    ? <Link to={Routes.ALERTS.DEFINITIONS.edit(eventDefinitionContext.id)}>{eventDefinitionContext.title}</Link>
-    : <>eventDefinitionContext.title</>;
+  return isPermitted(currentUser.permissions, `eventdefinitions:edit:${eventDefinitionContext.id}`) ? (
+    <Link to={Routes.ALERTS.DEFINITIONS.edit(eventDefinitionContext.id)}>{eventDefinitionContext.title}</Link>
+  ) : (
+    <>eventDefinitionContext.title</>
+  );
 };
 
 export default EventDefinitionLink;

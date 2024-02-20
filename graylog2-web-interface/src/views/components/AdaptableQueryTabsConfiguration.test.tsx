@@ -48,19 +48,21 @@ describe('AdaptableQueryTabsConfiguration', () => {
 
   afterAll(unloadViewsPlugin);
 
-  const renderConfiguration = () => render((
-    <TestStoreProvider>
-      <AdaptableQueryTabsConfiguration show
-                                       setShow={() => {}}
-                                       activeQueryId="queryId-1"
-                                       dashboardId="dashboard-id"
-                                       queriesList={OrderedSet(
-                                         [
-                                           { id: 'queryId-1', title: 'Query Title 1' },
-                                           { id: 'queryId-2', title: 'Query Title 2' },
-                                         ])} />
-    </TestStoreProvider>
-  ));
+  const renderConfiguration = () =>
+    render(
+      <TestStoreProvider>
+        <AdaptableQueryTabsConfiguration
+          show
+          setShow={() => {}}
+          activeQueryId="queryId-1"
+          dashboardId="dashboard-id"
+          queriesList={OrderedSet([
+            { id: 'queryId-1', title: 'Query Title 1' },
+            { id: 'queryId-2', title: 'Query Title 2' },
+          ])}
+        />
+      </TestStoreProvider>,
+    );
 
   it('should display modal window', async () => {
     renderConfiguration();

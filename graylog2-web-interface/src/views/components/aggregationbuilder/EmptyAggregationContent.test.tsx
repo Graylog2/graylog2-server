@@ -25,11 +25,11 @@ describe('EmptyAggregationContext', () => {
   it('calls render completion callback after first render', () => {
     const onRenderComplete = jest.fn();
 
-    mount((
+    mount(
       <RenderCompletionCallback.Provider value={onRenderComplete}>
         <EmptyAggregationContent toggleEdit={() => {}} editing={false} />
-      </RenderCompletionCallback.Provider>
-    ));
+      </RenderCompletionCallback.Provider>,
+    );
 
     expect(onRenderComplete).toHaveBeenCalled();
   });

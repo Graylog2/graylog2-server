@@ -59,7 +59,11 @@ describe('NewDashboardPage', () => {
   beforeEach(() => {
     asMock(useLocation).mockReturnValue(mockLocation);
     asMock(useQuery).mockReturnValue({});
-    asMock(useProcessHooksForView).mockReturnValue({ status: 'loaded', view: View.create(), executionState: SearchExecutionState.empty() });
+    asMock(useProcessHooksForView).mockReturnValue({
+      status: 'loaded',
+      view: View.create(),
+      executionState: SearchExecutionState.empty(),
+    });
     asMock(useCreateSearch).mockImplementation(async (view: Promise<View>) => view);
   });
 
@@ -80,11 +84,14 @@ describe('NewDashboardPage', () => {
 
     await waitFor(() => expect(useCreateSearch).toHaveBeenCalled());
 
-    await expect(asMock(useCreateSearch).mock.calls[0][0]).resolves.toEqual(expect.objectContaining({ type: View.Type.Dashboard }));
+    await expect(asMock(useCreateSearch).mock.calls[0][0]).resolves.toEqual(
+      expect.objectContaining({ type: View.Type.Dashboard }),
+    );
   });
 
   it('should render transform search view to dashboard view, if view is defined in location state', async () => {
-    const view = View.create().toBuilder()
+    const view = View.create()
+      .toBuilder()
       .type(View.Type.Search)
       .title('My Search')
       .search(Search.builder().build())
@@ -99,11 +106,16 @@ describe('NewDashboardPage', () => {
 
     await waitFor(() => expect(useCreateSearch).toHaveBeenCalled());
 
-    await expect(asMock(useCreateSearch).mock.calls[0][0]).resolves.toEqual(expect.objectContaining({ title: 'My Search', type: View.Type.Dashboard }));
+    await expect(asMock(useCreateSearch).mock.calls[0][0]).resolves.toEqual(
+      expect.objectContaining({ title: 'My Search', type: View.Type.Dashboard }),
+    );
   });
 
   it('should process hooks with provided location query when transforming search view to dashboard view', async () => {
-    const view = View.create().toBuilder().type(View.Type.Search).search(Search.builder().build())
+    const view = View.create()
+      .toBuilder()
+      .type(View.Type.Search)
+      .search(Search.builder().build())
       .createdAt(new Date('2019-10-16T14:38:44.681Z'))
       .build();
 
@@ -115,9 +127,7 @@ describe('NewDashboardPage', () => {
       relative: '300',
     });
 
-    const { findByText } = render((
-      <SimpleNewDashboardPage />
-    ));
+    const { findByText } = render(<SimpleNewDashboardPage />);
 
     await findByText('Extended search page');
 

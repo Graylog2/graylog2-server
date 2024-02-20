@@ -27,19 +27,19 @@ type SearchJobId = string;
 type SearchId = string;
 
 type ExecutionInfoType = {
-  done: boolean,
-  cancelled: boolean,
-  completed_exceptionally: boolean,
+  done: boolean;
+  cancelled: boolean;
+  completed_exceptionally: boolean;
 };
 
 export type SearchJobType = {
-  id: SearchJobId,
-  search: Search,
-  search_id: SearchId,
-  results: { [id: string]: any },
-  execution: ExecutionInfoType,
-  owner: string,
-  errors: Array<SearchErrorResponse>,
+  id: SearchJobId;
+  search: Search;
+  search_id: SearchId;
+  results: { [id: string]: any };
+  execution: ExecutionInfoType;
+  owner: string;
+  errors: Array<SearchErrorResponse>;
 };
 
 export function runSearchJob(search: Search, executionState: SearchExecutionState): Promise<SearchJobType> {

@@ -36,21 +36,27 @@ jest.mock('views/stores/SearchConfigStore', () => ({
   SearchConfigActions: {
     refresh: jest.fn(() => Promise.resolve()),
   },
-  SearchConfigStore: MockStore(['getInitialState', () => ({
-    searchesClusterConfig: {
-      relative_timerange_options: { P1D: 'Search in last day', PT0S: 'Search in all messages' },
-      query_time_range_limit: 'PT0S',
-    },
-  })]),
+  SearchConfigStore: MockStore([
+    'getInitialState',
+    () => ({
+      searchesClusterConfig: {
+        relative_timerange_options: { P1D: 'Search in last day', PT0S: 'Search in all messages' },
+        query_time_range_limit: 'PT0S',
+      },
+    }),
+  ]),
 }));
 
 jest.mock('views/stores/StreamsStore', () => ({
-  StreamsStore: MockStore(['getInitialState', () => ({
-    streams: [
-      { title: 'PFLog', id: '5c2e27d6ba33a9681ad62775' },
-      { title: 'DNS Logs', id: '5d2d9649e117dc4df84cf83c' },
-    ],
-  })]),
+  StreamsStore: MockStore([
+    'getInitialState',
+    () => ({
+      streams: [
+        { title: 'PFLog', id: '5c2e27d6ba33a9681ad62775' },
+        { title: 'DNS Logs', id: '5d2d9649e117dc4df84cf83c' },
+      ],
+    }),
+  ]),
 }));
 
 jest.mock('moment', () => {
@@ -78,16 +84,16 @@ describe('EditWidgetFrame', () => {
       .timerange({ type: 'relative', from: 300 })
       .config({})
       .build();
-    const renderSUT = (props?: Partial<React.ComponentProps<typeof EditWidgetFrame>>) => render((
-      <TestStoreProvider>
-        <WidgetContext.Provider value={widget}>
-          <EditWidgetFrame onSubmit={() => {}} onCancel={() => {}} {...props}>
-            Hello World!
-            These are some buttons!
-          </EditWidgetFrame>
-        </WidgetContext.Provider>
-      </TestStoreProvider>
-    ));
+    const renderSUT = (props?: Partial<React.ComponentProps<typeof EditWidgetFrame>>) =>
+      render(
+        <TestStoreProvider>
+          <WidgetContext.Provider value={widget}>
+            <EditWidgetFrame onSubmit={() => {}} onCancel={() => {}} {...props}>
+              Hello World! These are some buttons!
+            </EditWidgetFrame>
+          </WidgetContext.Provider>
+        </TestStoreProvider>,
+      );
 
     beforeAll(loadViewsPlugin);
 
@@ -103,7 +109,7 @@ describe('EditWidgetFrame', () => {
       await waitFor(() => expect(execute).toHaveBeenCalledTimes(1));
     });
 
-    it('changes the widget\'s streams when using stream filter', async () => {
+    it("changes the widget's streams when using stream filter", async () => {
       renderSUT();
       const streamFilter = await screen.findByTestId('streams-filter');
       const reactSelect = streamFilter.querySelector('div');
@@ -121,9 +127,14 @@ describe('EditWidgetFrame', () => {
 
       fireEvent.click(searchButton);
 
-      await waitFor(() => expect(updateWidget).toHaveBeenCalledWith('deadbeef', expect.objectContaining({
-        streams: ['5c2e27d6ba33a9681ad62775'],
-      })));
+      await waitFor(() =>
+        expect(updateWidget).toHaveBeenCalledWith(
+          'deadbeef',
+          expect.objectContaining({
+            streams: ['5c2e27d6ba33a9681ad62775'],
+          }),
+        ),
+      );
     });
 
     it('calls onSubmit', async () => {

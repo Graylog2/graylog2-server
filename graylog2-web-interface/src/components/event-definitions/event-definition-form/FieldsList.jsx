@@ -44,7 +44,9 @@ const providerFormatter = (config) => {
   return (
     <p>
       {configKeys.map((key) => (
-        <span key={key} className={styles.providerOptions}>{key}: <em>{JSON.stringify(config[key])}</em></span>
+        <span key={key} className={styles.providerOptions}>
+          {key}: <em>{JSON.stringify(config[key])}</em>
+        </span>
       ))}
     </p>
   );
@@ -126,9 +128,7 @@ class FieldsList extends React.Component {
     if (fieldNames.length === 0) {
       return (
         <>
-          <p>
-            This Event does not have any custom Fields yet.
-          </p>
+          <p>This Event does not have any custom Fields yet.</p>
           {addCustomFieldButton}
         </>
       );
@@ -136,12 +136,14 @@ class FieldsList extends React.Component {
 
     return (
       <>
-        <DataTable id="event-definition-fields"
-                   className="table-striped table-hover"
-                   headers={HEADERS}
-                   rows={fieldNames}
-                   dataRowFormatter={this.fieldFormatter}
-                   filterKeys={[]} />
+        <DataTable
+          id="event-definition-fields"
+          className="table-striped table-hover"
+          headers={HEADERS}
+          rows={fieldNames}
+          dataRowFormatter={this.fieldFormatter}
+          filterKeys={[]}
+        />
         {addCustomFieldButton}
       </>
     );

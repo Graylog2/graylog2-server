@@ -24,28 +24,32 @@ import FieldActions from './actions/FieldActions';
 import InteractiveContext from './contexts/InteractiveContext';
 
 type Props = {
-  children?: React.ReactNode,
-  disabled?: boolean,
-  name: string,
-  menuContainer?: HTMLElement,
-  queryId: string,
-  type: FieldType,
+  children?: React.ReactNode;
+  disabled?: boolean;
+  name: string;
+  menuContainer?: HTMLElement;
+  queryId: string;
+  type: FieldType;
 };
 
 const Field = ({ children, disabled = false, menuContainer, name, queryId, type }: Props) => (
   <InteractiveContext.Consumer>
-    {(interactive) => (interactive
-      ? (
-        <FieldActions element={children || name}
-                      disabled={!interactive || disabled}
-                      menuContainer={menuContainer}
-                      name={name}
-                      type={type}
-                      queryId={queryId}>
+    {(interactive) =>
+      interactive ? (
+        <FieldActions
+          element={children || name}
+          disabled={!interactive || disabled}
+          menuContainer={menuContainer}
+          name={name}
+          type={type}
+          queryId={queryId}
+        >
           {name} = {type.type}
         </FieldActions>
+      ) : (
+        <span>{children}</span>
       )
-      : <span>{children}</span>)}
+    }
   </InteractiveContext.Consumer>
 );
 

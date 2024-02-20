@@ -22,9 +22,8 @@ import UserNotification from 'util/UserNotification';
 import fetch, { fetchPeriodically } from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
 
-export const SidecarsActions = singletonActions(
-  'core.Sidecars',
-  () => Reflux.createActions({
+export const SidecarsActions = singletonActions('core.Sidecars', () =>
+  Reflux.createActions({
     listPaginated: { asyncResult: true },
     getSidecar: { asyncResult: true },
     getSidecarActions: { asyncResult: true },
@@ -33,9 +32,8 @@ export const SidecarsActions = singletonActions(
   }),
 );
 
-export const SidecarsStore = singletonStore(
-  'core.Sidecars',
-  () => Reflux.createStore({
+export const SidecarsStore = singletonStore('core.Sidecars', () =>
+  Reflux.createStore({
     listenables: [SidecarsActions],
     sourceUrl: '/sidecars',
     sidecars: undefined,
@@ -102,8 +100,10 @@ export const SidecarsStore = singletonStore(
           return response;
         },
         (error) => {
-          UserNotification.error(error.status === 400 ? error.responseMessage : `Fetching Sidecars failed with status: ${error.message}`,
-            'Could not retrieve Sidecars');
+          UserNotification.error(
+            error.status === 400 ? error.responseMessage : `Fetching Sidecars failed with status: ${error.message}`,
+            'Could not retrieve Sidecars',
+          );
         },
       );
 
@@ -134,13 +134,9 @@ export const SidecarsStore = singletonStore(
       action.properties.restart = true;
       const promise = fetch('PUT', URLUtils.qualifyUrl(`${this.sourceUrl}/${sidecarId}/action`), [action]);
 
-      promise
-        .catch(
-          (error) => {
-            UserNotification.error(`Restarting Sidecar failed with status: ${error}`,
-              'Could not restart Sidecar');
-          },
-        );
+      promise.catch((error) => {
+        UserNotification.error(`Restarting Sidecar failed with status: ${error}`, 'Could not restart Sidecar');
+      });
 
       SidecarsActions.restartCollector.promise(promise);
     },
@@ -148,13 +144,12 @@ export const SidecarsStore = singletonStore(
     getSidecarActions(sidecarId) {
       const promise = fetchPeriodically('GET', URLUtils.qualifyUrl(`${this.sourceUrl}/${sidecarId}/action`));
 
-      promise
-        .catch(
-          (error) => {
-            UserNotification.error(`Fetching Sidecar actions failed with status: ${error}`,
-              'Could not retrieve Sidecar actions');
-          },
+      promise.catch((error) => {
+        UserNotification.error(
+          `Fetching Sidecar actions failed with status: ${error}`,
+          'Could not retrieve Sidecar actions',
         );
+      });
 
       SidecarsActions.getSidecarActions.promise(promise);
     },
@@ -169,7 +164,7 @@ export const SidecarsStore = singletonStore(
 
     assignConfigurations(sidecars, configurations) {
       const nodes = sidecars.map(({ sidecar, collector }) => {
-      // Add all previous assignments, but the one that was changed
+        // Add all previous assignments, but the one that was changed
         const assignments = sidecar.assignments.filter((assignment) => assignment.collector_id !== collector.id);
 
         // Add new assignments
@@ -182,18 +177,19 @@ export const SidecarsStore = singletonStore(
 
       const promise = fetch('PUT', URLUtils.qualifyUrl(`${this.sourceUrl}/configurations`), { nodes: nodes });
 
-      promise
-        .then(
-          (response) => {
-            UserNotification.success('', `Configuration change for ${sidecars.length} collectors requested`);
+      promise.then(
+        (response) => {
+          UserNotification.success('', `Configuration change for ${sidecars.length} collectors requested`);
 
-            return response;
-          },
-          (error) => {
-            UserNotification.error(`Fetching Sidecar actions failed with status: ${error}`,
-              'Could not retrieve Sidecar actions');
-          },
-        );
+          return response;
+        },
+        (error) => {
+          UserNotification.error(
+            `Fetching Sidecar actions failed with status: ${error}`,
+            'Could not retrieve Sidecar actions',
+          );
+        },
+      );
 
       SidecarsActions.assignConfigurations.promise(promise);
     },

@@ -19,7 +19,9 @@ import PropTypes from 'prop-types';
 
 function Options({ value, label }) {
   return (
-    <option value={value} key={value}>{label}</option>
+    <option value={value} key={value}>
+      {label}
+    </option>
   );
 }
 

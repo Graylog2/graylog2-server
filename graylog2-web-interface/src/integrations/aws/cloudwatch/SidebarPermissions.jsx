@@ -33,16 +33,18 @@ function Policies({ title, note, policy }) {
     <div>
       <Header onClick={toggleOpen}>
         <HeaderContent>
-          <Title>{opened ? 'Hide' : 'Show'} {title}</Title>
+          <Title>
+            {opened ? 'Hide' : 'Show'} {title}
+          </Title>
           <Note>{note}</Note>
         </HeaderContent>
 
-        <Icon opened={opened}><i className="fa fa-chevron-right fa-2x" /></Icon>
+        <Icon opened={opened}>
+          <i className="fa fa-chevron-right fa-2x" />
+        </Icon>
       </Header>
 
-      <Policy opened={opened}>
-        {JSON.stringify(policy, null, 2)}
-      </Policy>
+      <Policy opened={opened}>{JSON.stringify(policy, null, 2)}</Policy>
     </div>
   );
 }
@@ -58,18 +60,25 @@ export default function SidebarPermissions() {
 
   return (
     <Panel bsStyle="info" header={<span>AWS Policy Permissions</span>}>
-      <p>Please verify that you have granted your AWS IAM user sufficient permissions. You can use the following policies for reference.</p>
+      <p>
+        Please verify that you have granted your AWS IAM user sufficient permissions. You can use the following policies
+        for reference.
+      </p>
 
       {!permissionsStatus.loading && permissionsStatus.data && (
-      <>
-        <Policies title="Recommended Policy"
-                  note="To be able to use all available functionality for Kinesis setup."
-                  policy={JSON.parse(permissionsStatus.data.setup_policy)} />
+        <>
+          <Policies
+            title="Recommended Policy"
+            note="To be able to use all available functionality for Kinesis setup."
+            policy={JSON.parse(permissionsStatus.data.setup_policy)}
+          />
 
-        <Policies title="Least Privilege Policy"
-                  note="Doesn&apos;t include Kinesis auto-subscription controls."
-                  policy={JSON.parse(permissionsStatus.data.auto_setup_policy)} />
-      </>
+          <Policies
+            title="Least Privilege Policy"
+            note="Doesn't include Kinesis auto-subscription controls."
+            policy={JSON.parse(permissionsStatus.data.auto_setup_policy)}
+          />
+        </>
       )}
     </Panel>
   );
@@ -94,7 +103,11 @@ const Policy = styled.pre`
   overflow: hidden;
   max-height: ${(props) => (props.opened ? '1000px' : '0')};
   opacity: ${(props) => (props.opened ? '1' : '0')};
-  transition: max-height 150ms ease-in-out, opacity 150ms ease-in-out, margin 150ms ease-in-out, padding 150ms ease-in-out;
+  transition:
+    max-height 150ms ease-in-out,
+    opacity 150ms ease-in-out,
+    margin 150ms ease-in-out,
+    padding 150ms ease-in-out;
   margin-bottom: ${(props) => (props.opened ? '12px' : '0')};
   padding: ${(props) => (props.opened ? '9.5px' : '0')};
 `;

@@ -28,19 +28,21 @@ import type { Message } from './Types';
 import CustomHighlighting from '../highlighting/CustomHighlighting';
 
 type Props = {
-  message: Message,
-  fields: FieldTypeMappingsList,
+  message: Message;
+  fields: FieldTypeMappingsList;
 };
 
-const MessageDetailsDL = styled(MessageDetailsDefinitionList)(({ theme }) => css`
-  color: ${theme.colors.global.textDefault};
+const MessageDetailsDL = styled(MessageDetailsDefinitionList)(
+  ({ theme }) => css`
+    color: ${theme.colors.global.textDefault};
 
-  dd {
-    &:not(:last-child) {
-      border-bottom: 1px solid  ${theme.colors.gray[90]};
+    dd {
+      &:not(:last-child) {
+        border-bottom: 1px solid ${theme.colors.gray[90]};
+      }
     }
-  }
-`);
+  `,
+);
 
 const MessageFields = ({ message, fields }: Props) => {
   const formattedFields = message.formatted_fields;
@@ -50,22 +52,13 @@ const MessageFields = ({ message, fields }: Props) => {
       const { type } = fields.find((t) => t.name === key, undefined, FieldTypeMapping.create(key, FieldType.Unknown));
 
       return (
-        <CustomHighlighting key={key}
-                            field={key}
-                            value={formattedFields[key]}>
-          <MessageField fieldName={key}
-                        fieldType={type}
-                        message={message}
-                        value={formattedFields[key]} />
+        <CustomHighlighting key={key} field={key} value={formattedFields[key]}>
+          <MessageField fieldName={key} fieldType={type} message={message} value={formattedFields[key]} />
         </CustomHighlighting>
       );
     });
 
-  return (
-    <MessageDetailsDL className="message-details-fields">
-      {renderedFields}
-    </MessageDetailsDL>
-  );
+  return <MessageDetailsDL className="message-details-fields">{renderedFields}</MessageDetailsDL>;
 };
 
 export default MessageFields;

@@ -23,5 +23,5 @@ const TimezoneSelectExample = createReactClass({
   },
 });
 
-<TimezoneSelectExample />
+<TimezoneSelectExample />;
 ```

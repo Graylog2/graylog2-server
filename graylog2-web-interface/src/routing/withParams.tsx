@@ -24,10 +24,14 @@ type ParamsContext = {
   };
 };
 
-const withParams = <Props extends ParamsContext>(Component: React.ComponentType<Props>): React.ComponentType<Subtract<Props, ParamsContext>> => (props) => {
-  const params = useParams();
+const withParams =
+  <Props extends ParamsContext>(
+    Component: React.ComponentType<Props>,
+  ): React.ComponentType<Subtract<Props, ParamsContext>> =>
+  (props) => {
+    const params = useParams();
 
-  return <Component {...props as Props} params={params} />;
-};
+    return <Component {...(props as Props)} params={params} />;
+  };
 
 export default withParams;

@@ -28,23 +28,28 @@ type Props = {
    * When a custom description is provided
    * the button will be disabled
    */
-  disabledInfo?: string,
-  entityId: string,
-  entityType: string,
-  onClick: () => void,
-  bsStyle?: StyleProps,
-  bsSize?: BsSize,
+  disabledInfo?: string;
+  entityId: string;
+  entityType: string;
+  onClick: () => void;
+  bsStyle?: StyleProps;
+  bsSize?: BsSize;
 };
 
 const ShareButton = ({ bsStyle, bsSize, entityId, entityType, onClick, disabledInfo }: Props) => (
   <HasOwnership id={entityId} type={entityType}>
     {({ disabled: hasMissingPermissions }) => (
-      <Button bsStyle={bsStyle}
-              bsSize={bsSize}
-              onClick={onClick}
-              disabled={!!disabledInfo || hasMissingPermissions}
-              title="Share">
-        <Icon name="user-plus" /> Share {(!!disabledInfo || hasMissingPermissions) && <SharingDisabledPopover type={entityType} description={disabledInfo} />}
+      <Button
+        bsStyle={bsStyle}
+        bsSize={bsSize}
+        onClick={onClick}
+        disabled={!!disabledInfo || hasMissingPermissions}
+        title="Share"
+      >
+        <Icon name="user-plus" /> Share{' '}
+        {(!!disabledInfo || hasMissingPermissions) && (
+          <SharingDisabledPopover type={entityType} description={disabledInfo} />
+        )}
       </Button>
     )}
   </HasOwnership>

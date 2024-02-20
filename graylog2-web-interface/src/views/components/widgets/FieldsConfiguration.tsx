@@ -23,15 +23,15 @@ import FieldSelect from 'views/components/aggregationwizard/FieldSelect';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 
 type Props = {
-  createSelectPlaceholder?: string
-  displaySortableListOverlayInPortal?: boolean,
-  menuPortalTarget?: HTMLElement,
-  onChange: (newFields: Array<string>) => void,
-  isFieldQualified?: (field: FieldTypeMapping) => boolean,
-  selectSize?: 'normal' | 'small',
-  selectedFields: Array<string>,
-  testPrefix?: string,
-}
+  createSelectPlaceholder?: string;
+  displaySortableListOverlayInPortal?: boolean;
+  menuPortalTarget?: HTMLElement;
+  onChange: (newFields: Array<string>) => void;
+  isFieldQualified?: (field: FieldTypeMapping) => boolean;
+  selectSize?: 'normal' | 'small';
+  selectedFields: Array<string>;
+  testPrefix?: string;
+};
 
 const FieldsConfiguration = ({
   createSelectPlaceholder,
@@ -43,29 +43,34 @@ const FieldsConfiguration = ({
   selectedFields,
   testPrefix,
 }: Props) => {
-  const onAddField = useCallback((newField: string) => (
-    onChange([...selectedFields, newField])
-  ), [onChange, selectedFields]);
+  const onAddField = useCallback(
+    (newField: string) => onChange([...selectedFields, newField]),
+    [onChange, selectedFields],
+  );
 
   return (
     <>
-      <SelectedFieldsList testPrefix={testPrefix}
-                          selectedFields={selectedFields}
-                          selectSize={selectSize}
-                          displayOverlayInPortal={displaySortableListOverlayInPortal}
-                          onChange={onChange} />
-      <FieldSelect id="field-create-select"
-                   onChange={onAddField}
-                   clearable={false}
-                   isFieldQualified={isFieldQualified}
-                   persistSelection={false}
-                   name="field-create-select"
-                   value={undefined}
-                   size={selectSize}
-                   menuPortalTarget={menuPortalTarget}
-                   excludedFields={selectedFields ?? []}
-                   placeholder={createSelectPlaceholder}
-                   ariaLabel={createSelectPlaceholder} />
+      <SelectedFieldsList
+        testPrefix={testPrefix}
+        selectedFields={selectedFields}
+        selectSize={selectSize}
+        displayOverlayInPortal={displaySortableListOverlayInPortal}
+        onChange={onChange}
+      />
+      <FieldSelect
+        id="field-create-select"
+        onChange={onAddField}
+        clearable={false}
+        isFieldQualified={isFieldQualified}
+        persistSelection={false}
+        name="field-create-select"
+        value={undefined}
+        size={selectSize}
+        menuPortalTarget={menuPortalTarget}
+        excludedFields={selectedFields ?? []}
+        placeholder={createSelectPlaceholder}
+        ariaLabel={createSelectPlaceholder}
+      />
     </>
   );
 };

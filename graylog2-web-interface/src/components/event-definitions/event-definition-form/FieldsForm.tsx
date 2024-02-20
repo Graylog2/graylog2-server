@@ -36,16 +36,16 @@ import type { EventDefinition } from '../event-definitions-types';
 import commonStyles from '../common/commonStyles.css';
 
 type Props = {
-  currentUser: User,
-  eventDefinition: EventDefinition,
+  currentUser: User;
+  eventDefinition: EventDefinition;
   validation: {
     errors: {
-      title?: string,
-    }
-  },
-  onChange: (name: string, value: unknown) => void,
-  canEdit: boolean,
-}
+      title?: string;
+    };
+  };
+  onChange: (name: string, value: unknown) => void;
+  canEdit: boolean;
+};
 
 const FieldsForm = ({ currentUser, eventDefinition, validation, onChange, canEdit }: Props) => {
   const [editField, setEditField] = useState<string | undefined>(undefined);
@@ -69,9 +69,10 @@ const FieldsForm = ({ currentUser, eventDefinition, validation, onChange, canEdi
   };
 
   const addCustomField = (prevFieldName, fieldName, config, isKey, keyPosition) => {
-    const nextFieldSpec = (prevFieldName === fieldName
-      ? cloneDeep(eventDefinition.field_spec)
-      : omit(eventDefinition.field_spec, prevFieldName));
+    const nextFieldSpec =
+      prevFieldName === fieldName
+        ? cloneDeep(eventDefinition.field_spec)
+        : omit(eventDefinition.field_spec, prevFieldName);
 
     nextFieldSpec[fieldName] = config;
     onChange('field_spec', nextFieldSpec);
@@ -95,12 +96,14 @@ const FieldsForm = ({ currentUser, eventDefinition, validation, onChange, canEdi
 
   if (showFieldForm) {
     return (
-      <FieldForm keys={eventDefinition.key_spec}
-                 fieldName={editField}
-                 config={editField ? eventDefinition.field_spec[editField] : undefined}
-                 onChange={addCustomField}
-                 onCancel={toggleFieldForm}
-                 currentUser={currentUser} />
+      <FieldForm
+        keys={eventDefinition.key_spec}
+        fieldName={editField}
+        config={editField ? eventDefinition.field_spec[editField] : undefined}
+        onChange={addCustomField}
+        onCancel={toggleFieldForm}
+        currentUser={currentUser}
+      />
     );
   }
 
@@ -111,24 +114,26 @@ const FieldsForm = ({ currentUser, eventDefinition, validation, onChange, canEdi
   return (
     <Row>
       <Col md={12}>
-        <h2 className={commonStyles.title}>Event Fields <small>(optional)</small></h2>
+        <h2 className={commonStyles.title}>
+          Event Fields <small>(optional)</small>
+        </h2>
 
         {!canEditCondition ? (
-          <p>
-            The event fields of this event definition type cannot be edited.
-          </p>
+          <p>The event fields of this event definition type cannot be edited.</p>
         ) : (
           <>
             <p>
-              Include additional information in Events generated from this Event Definition by adding custom Fields. That
-              can help you search Events or having more context when receiving Notifications.
+              Include additional information in Events generated from this Event Definition by adding custom Fields.
+              That can help you search Events or having more context when receiving Notifications.
             </p>
 
             {errors.length > 0 && (
               <Alert bsStyle="danger" className={commonStyles.validationSummary} title="Fields with errors">
                 <p>Please correct the following errors before saving this Event Definition:</p>
                 <ul>
-                  {errors.map((error) => <li key={error}>{error}</li>)}
+                  {errors.map((error) => (
+                    <li key={error}>{error}</li>
+                  ))}
                 </ul>
               </Alert>
             )}
@@ -141,15 +146,21 @@ const FieldsForm = ({ currentUser, eventDefinition, validation, onChange, canEdi
                     <EventKeyHelpPopover />
                   </HoverForHelp>
                 </dt>
-                <dd>{eventDefinition.key_spec.length > 0 ? eventDefinition.key_spec.join(', ') : 'No Keys configured yet.'}</dd>
+                <dd>
+                  {eventDefinition.key_spec.length > 0
+                    ? eventDefinition.key_spec.join(', ')
+                    : 'No Keys configured yet.'}
+                </dd>
               </dl>
             )}
-            <FieldsList fields={eventDefinition.field_spec}
-                        validation={validation}
-                        keys={eventDefinition.key_spec}
-                        onAddFieldClick={toggleFieldForm}
-                        onEditFieldClick={toggleFieldForm}
-                        onRemoveFieldClick={removeCustomField} />
+            <FieldsList
+              fields={eventDefinition.field_spec}
+              validation={validation}
+              keys={eventDefinition.key_spec}
+              onAddFieldClick={toggleFieldForm}
+              onEditFieldClick={toggleFieldForm}
+              onRemoveFieldClick={removeCustomField}
+            />
           </>
         )}
       </Col>

@@ -74,14 +74,17 @@ const FieldResultWrap = styled.div(({ resultType, theme }) => {
   `;
 });
 
-const FieldValue = styled.dd(({ removed, theme }) => css`
-  font-family: ${theme.fonts.family.monospace};
+const FieldValue = styled.dd(
+  ({ removed, theme }) => css`
+    font-family: ${theme.fonts.family.monospace};
 
-  ${removed && css`
-    text-decoration: line-through;
-    font-style: italic;
-`}
-`);
+    ${removed &&
+    css`
+      text-decoration: line-through;
+      font-style: italic;
+    `}
+  `,
+);
 
 const SimulationChanges = createReactClass({
   displayName: 'SimulationChanges',
@@ -100,7 +103,11 @@ const SimulationChanges = createReactClass({
   },
 
   _formatFieldValue(field, value, isRemoved = false) {
-    return <FieldValue key={`${field}-value`} removed={isRemoved}>{String(value)}</FieldValue>;
+    return (
+      <FieldValue key={`${field}-value`} removed={isRemoved}>
+        {String(value)}
+      </FieldValue>
+    );
   },
 
   _formatAddedFields(addedFields) {
@@ -120,9 +127,7 @@ const SimulationChanges = createReactClass({
     return (
       <FieldResultWrap resultType="added">
         <h4>Added fields</h4>
-        <dl>
-          {formattedFields}
-        </dl>
+        <dl>{formattedFields}</dl>
       </FieldResultWrap>
     );
   },
@@ -144,9 +149,7 @@ const SimulationChanges = createReactClass({
     return (
       <FieldResultWrap resultType="removed">
         <h4>Removed fields</h4>
-        <dl>
-          {formattedFields}
-        </dl>
+        <dl>{formattedFields}</dl>
       </FieldResultWrap>
     );
   },
@@ -169,9 +172,7 @@ const SimulationChanges = createReactClass({
     return (
       <FieldResultWrap resultType="mutated">
         <h4>Mutated fields</h4>
-        <dl>
-          {formattedFields}
-        </dl>
+        <dl>{formattedFields}</dl>
       </FieldResultWrap>
     );
   },
@@ -211,7 +212,9 @@ const SimulationChanges = createReactClass({
         <Col md={12}>
           <h3>
             Changes in original message{' '}
-            <small><em>{originalMessage.id}</em></small>
+            <small>
+              <em>{originalMessage.id}</em>
+            </small>
           </h3>
           {this._getOriginalMessageChanges()}
         </Col>
@@ -234,8 +237,8 @@ const SimulationChanges = createReactClass({
           <h3>Other changes</h3>
           <p>
             There would be {createdMessages.length}{' '}
-            <Pluralize singular="message" plural="messages" value={createdMessages.length} /> created.{' '}
-            Switch to the <em>Results preview</em> view option to see{' '}
+            <Pluralize singular="message" plural="messages" value={createdMessages.length} /> created. Switch to the{' '}
+            <em>Results preview</em> view option to see{' '}
             <Pluralize singular="it" plural="them" value={createdMessages.length} />.
           </p>
         </Col>

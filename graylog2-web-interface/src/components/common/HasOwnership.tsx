@@ -23,10 +23,10 @@ import useCurrentUser from 'hooks/useCurrentUser';
 type ChildFun = (props: { disabled: boolean }) => React.ReactElement;
 
 type Props = {
-  children: React.ReactNode | ChildFun,
-  id: string,
-  type: string,
-  hideChildren: boolean,
+  children: React.ReactNode | ChildFun;
+  id: string;
+  type: string;
+  hideChildren: boolean;
 };
 
 const HasOwnership = ({ children, id, type, hideChildren }: Props) => {
@@ -57,10 +57,7 @@ const HasOwnership = ({ children, id, type, hideChildren }: Props) => {
 
 HasOwnership.propTypes = {
   /** Children to render if user has ownership of the entity */
-  children: PropTypes.oneOfType([
-    PropTypes.node,
-    PropTypes.func,
-  ]).isRequired,
+  children: PropTypes.oneOfType([PropTypes.node, PropTypes.func]).isRequired,
   /** The id string which shows entity */
   id: PropTypes.string,
   /** The type of the entity e.g dashboard, stream */

@@ -38,9 +38,11 @@ class NodeListItem extends React.Component {
 
     if (!this.props.systemOverview) {
       return (
-        <EntityListItem key={`entry-list-${node.node_id}`}
-                        title={title}
-                        description="System information is currently unavailable." />
+        <EntityListItem
+          key={`entry-list-${node.node_id}`}
+          title={title}
+          description="System information is currently unavailable."
+        />
       );
     }
 
@@ -60,12 +62,14 @@ class NodeListItem extends React.Component {
     );
 
     return (
-      <EntityListItem key={`entry-list-${node.node_id}`}
-                      title={title}
-                      titleSuffix={nodeThroughput}
-                      description={journalState}
-                      actions={actions}
-                      contentRow={additionalContent} />
+      <EntityListItem
+        key={`entry-list-${node.node_id}`}
+        title={title}
+        titleSuffix={nodeThroughput}
+        description={journalState}
+        actions={actions}
+        contentRow={additionalContent}
+      />
     );
   }
 }

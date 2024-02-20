@@ -40,13 +40,15 @@ describe('NumberRefExpression', () => {
     };
 
     const wrapper = mount(
-      <NumberRefExpression eventDefinition={eventDefinition()}
-                           aggregationFunctions={aggregationFunctions}
-                           expression={expression}
-                           formattedFields={formattedFields}
-                           onChange={() => { }}
-                           renderLabel={false}
-                           validation={{ errors: {} }} />,
+      <NumberRefExpression
+        eventDefinition={eventDefinition()}
+        aggregationFunctions={aggregationFunctions}
+        expression={expression}
+        formattedFields={formattedFields}
+        onChange={() => {}}
+        renderLabel={false}
+        validation={{ errors: {} }}
+      />,
     );
 
     const functionSelect = wrapper.find('Select.aggregation-function').at(0);
@@ -63,18 +65,18 @@ describe('NumberRefExpression', () => {
       expr: 'number-ref',
       ref: 'avg-took_ms',
     };
-    const series = [
-      { id: 'avg-took_ms', type: 'avg', field: 'took_ms' },
-    ];
+    const series = [{ id: 'avg-took_ms', type: 'avg', field: 'took_ms' }];
 
     const wrapper = mount(
-      <NumberRefExpression eventDefinition={eventDefinition(series)}
-                           aggregationFunctions={aggregationFunctions}
-                           expression={expression}
-                           formattedFields={formattedFields}
-                           onChange={() => { }}
-                           renderLabel={false}
-                           validation={{ errors: {} }} />,
+      <NumberRefExpression
+        eventDefinition={eventDefinition(series)}
+        aggregationFunctions={aggregationFunctions}
+        expression={expression}
+        formattedFields={formattedFields}
+        onChange={() => {}}
+        renderLabel={false}
+        validation={{ errors: {} }}
+      />,
     );
 
     const functionSelect = wrapper.find('Select.aggregation-function').at(0);
@@ -103,13 +105,15 @@ describe('NumberRefExpression', () => {
     });
 
     const wrapper = mount(
-      <NumberRefExpression eventDefinition={definition}
-                           aggregationFunctions={aggregationFunctions}
-                           expression={expression}
-                           formattedFields={formattedFields}
-                           onChange={handleChange}
-                           renderLabel={false}
-                           validation={{ errors: {} }} />,
+      <NumberRefExpression
+        eventDefinition={definition}
+        aggregationFunctions={aggregationFunctions}
+        expression={expression}
+        formattedFields={formattedFields}
+        onChange={handleChange}
+        renderLabel={false}
+        validation={{ errors: {} }}
+      />,
     );
 
     const functionSelect = wrapper.find('Select Select.aggregation-function').at(0);
@@ -138,13 +142,15 @@ describe('NumberRefExpression', () => {
     });
 
     const wrapper = mount(
-      <NumberRefExpression eventDefinition={definition}
-                           aggregationFunctions={aggregationFunctions}
-                           expression={expression}
-                           formattedFields={formattedFields}
-                           onChange={handleChange}
-                           renderLabel={false}
-                           validation={{ errors: {} }} />,
+      <NumberRefExpression
+        eventDefinition={definition}
+        aggregationFunctions={aggregationFunctions}
+        expression={expression}
+        formattedFields={formattedFields}
+        onChange={handleChange}
+        renderLabel={false}
+        validation={{ errors: {} }}
+      />,
     );
 
     const fieldSelect = wrapper.find('Select Select.aggregation-function-field').at(0);
@@ -173,13 +179,15 @@ describe('NumberRefExpression', () => {
     });
 
     const wrapper = mount(
-      <NumberRefExpression eventDefinition={definition}
-                           aggregationFunctions={aggregationFunctions}
-                           expression={expression}
-                           formattedFields={formattedFields}
-                           onChange={handleChange}
-                           renderLabel={false}
-                           validation={{ errors: {} }} />,
+      <NumberRefExpression
+        eventDefinition={definition}
+        aggregationFunctions={aggregationFunctions}
+        expression={expression}
+        formattedFields={formattedFields}
+        onChange={handleChange}
+        renderLabel={false}
+        validation={{ errors: {} }}
+      />,
     );
 
     const fieldSelect = wrapper.find('Select Select.aggregation-function-field').at(0);

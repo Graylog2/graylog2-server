@@ -32,14 +32,17 @@ export type ResultType<Stores> = { [K in keyof Stores]: ExtractStoreState<Stores
 
 type ReplaceUnknownWithEmptyObject<T> = T;
 
-type PropsWithDefaults<C extends React.ComponentType> = JSX.LibraryManagedAttributes<C, ReplaceUnknownWithEmptyObject<React.ComponentProps<C>>>;
+type PropsWithDefaults<C extends React.ComponentType> = JSX.LibraryManagedAttributes<
+  C,
+  ReplaceUnknownWithEmptyObject<React.ComponentProps<C>>
+>;
 
 type PropsMapper<V, R> = (props: V) => R;
 
-const id = <V, > (x: V): V => x;
+const id = <V,>(x: V): V => x;
 
-export function useStore<U> (store: StoreType<U>): U;
-export function useStore<U, M extends (props: U) => any> (store: StoreType<U>, propsMapper: M): ReturnType<M>;
+export function useStore<U>(store: StoreType<U>): U;
+export function useStore<U, M extends (props: U) => any>(store: StoreType<U>, propsMapper: M): ReturnType<M>;
 
 export function useStore(store, propsMapper = id) {
   const [storeState, setStoreState] = useState(() => store.getInitialState());
@@ -93,21 +96,22 @@ type ConnectedComponent<C, NewProps> = React.ComponentType<ConnectedProps<C, New
  *
  */
 
-function connect<C extends React.ComponentType<React.ComponentProps<C>>, Stores extends object> (
+function connect<C extends React.ComponentType<React.ComponentProps<C>>, Stores extends object>(
   Component: C,
   stores: Stores,
 ): ConnectedComponent<C, Stores>;
 
-function connect<C extends React.ComponentType<React.ComponentProps<C>>, Stores extends object, MappedProps extends object> (
+function connect<
+  C extends React.ComponentType<React.ComponentProps<C>>,
+  Stores extends object,
+  MappedProps extends object,
+>(
   Component: C,
   stores: Stores,
   mapProps: PropsMapper<ResultType<Stores>, MappedProps>,
 ): ConnectedComponent<C, MappedProps>;
 
-function connect<C extends React.ComponentType<React.ComponentProps<C>>,
-  Stores,
-  MappedProps extends object,
-  >(
+function connect<C extends React.ComponentType<React.ComponentProps<C>>, Stores, MappedProps extends object>(
   Component: C,
   stores: Stores,
   mapProps: PropsMapper<ResultType<Stores>, MappedProps> = (props: ResultType<Stores>) => props as MappedProps,
@@ -124,20 +128,24 @@ function connect<C extends React.ComponentType<React.ComponentProps<C>>,
       super(props);
 
       // Retrieving initial state from each configured store
-      const storeStates = Object.keys(stores).map((key) => {
-        const store = stores[key];
+      const storeStates = Object.keys(stores)
+        .map((key) => {
+          const store = stores[key];
 
-        if (store === undefined || !isFunction(store.getInitialState)) {
-          // eslint-disable-next-line no-console
-          console.error(`Error: The store passed for the \`${key}\` property is not defined or invalid. Check the connect()-call wrapping your \`${wrappedComponentName}\` component.`);
+          if (store === undefined || !isFunction(store.getInitialState)) {
+            // eslint-disable-next-line no-console
+            console.error(
+              `Error: The store passed for the \`${key}\` property is not defined or invalid. Check the connect()-call wrapping your \`${wrappedComponentName}\` component.`,
+            );
 
-          return [key, undefined];
-        }
+            return [key, undefined];
+          }
 
-        const state = store.getInitialState();
+          const state = store.getInitialState();
 
-        return [key, state];
-      }).reduce((prev, [key, state]) => ({ ...prev, [key as string]: state }), {});
+          return [key, state];
+        })
+        .reduce((prev, [key, state]) => ({ ...prev, [key as string]: state }), {});
 
       this.state = { ...this.state, ...storeStates };
     }
@@ -148,7 +156,9 @@ function connect<C extends React.ComponentType<React.ComponentProps<C>>,
 
         if (store === undefined || !isFunction(store.listen)) {
           // eslint-disable-next-line no-console
-          console.error(`Error: The store passed for the \`${key}\` property is not defined or invalid. Check the connect()-call wrapping your \`${wrappedComponentName}\` component.`);
+          console.error(
+            `Error: The store passed for the \`${key}\` property is not defined or invalid. Check the connect()-call wrapping your \`${wrappedComponentName}\` component.`,
+          );
 
           return () => {};
         }
@@ -184,7 +194,7 @@ function connect<C extends React.ComponentType<React.ComponentProps<C>>,
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { ref, ...componentProps } = this.props;
 
-      return <Component {...nextProps as MappedProps} {...componentProps as PropsWithDefaults<C>} />;
+      return <Component {...(nextProps as MappedProps)} {...(componentProps as PropsWithDefaults<C>)} />;
     }
   }
 

@@ -84,7 +84,8 @@ class LookupTableExtractorConfiguration extends React.Component {
     promise.finally(() => this.setState({ trying: false }));
   };
 
-  _isTryButtonDisabled = () => this.state.trying || !this.props.configuration.lookup_table_name || !this.props.exampleMessage;
+  _isTryButtonDisabled = () =>
+    this.state.trying || !this.props.configuration.lookup_table_name || !this.props.exampleMessage;
 
   render() {
     if (!this.state.lookupTables) {
@@ -101,19 +102,23 @@ class LookupTableExtractorConfiguration extends React.Component {
 
     return (
       <div>
-        <Input id="lookup_table_name"
-               label="Lookup Table"
-               labelClassName="col-md-2"
-               wrapperClassName="col-md-10"
-               help={helpMessage}>
+        <Input
+          id="lookup_table_name"
+          label="Lookup Table"
+          labelClassName="col-md-2"
+          wrapperClassName="col-md-10"
+          help={helpMessage}
+        >
           <Row className="row-sm">
             <Col md={11}>
-              <Select placeholder="Select a lookup table"
-                      clearable={false}
-                      options={lookupTables}
-                      matchProp="label"
-                      onChange={this._onSelect('lookup_table_name')}
-                      value={this.props.configuration.lookup_table_name} />
+              <Select
+                placeholder="Select a lookup table"
+                clearable={false}
+                options={lookupTables}
+                matchProp="label"
+                onChange={this._onSelect('lookup_table_name')}
+                value={this.props.configuration.lookup_table_name}
+              />
             </Col>
             <Col md={1} className="text-right">
               <Button bsStyle="info" onClick={this._onTryClick} disabled={this._isTryButtonDisabled()}>

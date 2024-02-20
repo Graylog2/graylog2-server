@@ -37,17 +37,21 @@ describe('PluggableSearchBarControls', () => {
     Store.get.mockReturnValue(false);
   });
 
-  const createPluggableSearchBarControl = (overrides = {}) => () => ({
-    id: 'example-component',
-    placement: 'right',
-    component: () => <div>Example Component</div>,
-    ...overrides,
-  });
+  const createPluggableSearchBarControl =
+    (overrides = {}) =>
+    () => ({
+      id: 'example-component',
+      placement: 'right',
+      component: () => <div>Example Component</div>,
+      ...overrides,
+    });
 
   it('should render left search bar controls from plugins', () => {
     const example = createPluggableSearchBarControl({ placement: 'left' });
 
-    asMock(usePluginEntities).mockImplementation((entityKey) => ({ 'views.components.searchBar': [example] }[entityKey]));
+    asMock(usePluginEntities).mockImplementation(
+      (entityKey) => ({ 'views.components.searchBar': [example] })[entityKey],
+    );
     render(<PluggableSearchBarControls />);
 
     expect(screen.getByText('Example Component')).toBeInTheDocument();
@@ -55,14 +59,16 @@ describe('PluggableSearchBarControls', () => {
 
   it('should render right search bar controls from plugins', () => {
     const example = createPluggableSearchBarControl({ placement: 'right' });
-    asMock(usePluginEntities).mockImplementation((entityKey) => ({ 'views.components.searchBar': [example] }[entityKey]));
+    asMock(usePluginEntities).mockImplementation(
+      (entityKey) => ({ 'views.components.searchBar': [example] })[entityKey],
+    );
     render(<PluggableSearchBarControls />);
 
     expect(screen.getByText('Example Component')).toBeInTheDocument();
   });
 
   it('should render fallback for search bar filters', () => {
-    asMock(usePluginEntities).mockImplementation((entityKey) => ({ 'views.components.searchBar': [] }[entityKey]));
+    asMock(usePluginEntities).mockImplementation((entityKey) => ({ 'views.components.searchBar': [] })[entityKey]);
     render(<PluggableSearchBarControls />);
 
     expect(screen.getByText('Filters')).toBeInTheDocument();
@@ -70,7 +76,9 @@ describe('PluggableSearchBarControls', () => {
 
   it('should not render fallback when search bar filters are defined', () => {
     const example = createPluggableSearchBarControl({ id: 'search-filters', placement: 'left' });
-    asMock(usePluginEntities).mockImplementation((entityKey) => ({ 'views.components.searchBar': [example] }[entityKey]));
+    asMock(usePluginEntities).mockImplementation(
+      (entityKey) => ({ 'views.components.searchBar': [example] })[entityKey],
+    );
     render(<PluggableSearchBarControls />);
 
     expect(screen.queryByText('Filters')).not.toBeInTheDocument();

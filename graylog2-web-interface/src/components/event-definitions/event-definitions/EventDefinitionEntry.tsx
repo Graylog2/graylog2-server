@@ -22,19 +22,8 @@ import useGetPermissionsByScope from 'hooks/useScopePermissions';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import Routes from 'routing/Routes';
 import { Link, LinkContainer } from 'components/common/router';
-import {
-  EntityListItem,
-  IfPermitted,
-  Icon,
-  ShareButton,
-  Spinner,
-} from 'components/common';
-import {
-  Button,
-  DropdownButton,
-  Label,
-  MenuItem,
-} from 'components/bootstrap';
+import { EntityListItem, IfPermitted, Icon, ShareButton, Spinner } from 'components/common';
+import { Button, DropdownButton, Label, MenuItem } from 'components/bootstrap';
 import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
 
 import EventDefinitionDescription from './EventDefinitionDescription';
@@ -45,30 +34,25 @@ type Props = {
   context: {
     scheduler: {
       [id: string]: {
-        is_scheduled: boolean,
-      },
-    },
-  },
-  eventDefinition: EventDefinition,
-  onDisable: (eventDefinition: EventDefinition) => void,
-  onEnable: (eventDefinition: EventDefinition) => void,
-  onDelete: (eventDefinition: EventDefinition) => void,
-  onCopy: (eventDefinition: EventDefinition) => void,
+        is_scheduled: boolean;
+      };
+    };
+  };
+  eventDefinition: EventDefinition;
+  onDisable: (eventDefinition: EventDefinition) => void;
+  onEnable: (eventDefinition: EventDefinition) => void;
+  onDelete: (eventDefinition: EventDefinition) => void;
+  onCopy: (eventDefinition: EventDefinition) => void;
 };
 
-const getConditionPlugin = (type: string) => PluginStore.exports('eventDefinitionTypes')
-  .find((edt) => edt.type === type);
+const getConditionPlugin = (type: string) =>
+  PluginStore.exports('eventDefinitionTypes').find((edt) => edt.type === type);
 
-const renderDescription = (definition, context) => <EventDefinitionDescription definition={definition} context={context} />;
+const renderDescription = (definition, context) => (
+  <EventDefinitionDescription definition={definition} context={context} />
+);
 
-const EventDefinitionEntry = ({
-  context,
-  eventDefinition,
-  onDisable,
-  onEnable,
-  onDelete,
-  onCopy,
-}: Props) => {
+const EventDefinitionEntry = ({ context, eventDefinition, onDisable, onEnable, onDelete, onCopy }: Props) => {
   const [showEntityShareModal, setShowEntityShareModal] = useState(false);
   const isScheduled = get(context, `scheduler.${eventDefinition.id}.is_scheduled`, true);
   const { loadingScopePermissions, scopePermissions } = useGetPermissionsByScope(eventDefinition);
@@ -88,7 +72,11 @@ const EventDefinitionEntry = ({
       return suffix;
     }
 
-    return <span>{suffix} <Label bsStyle="warning">disabled</Label></span>;
+    return (
+      <span>
+        {suffix} <Label bsStyle="warning">disabled</Label>
+      </span>
+    );
   };
 
   const showActions = (): boolean => scopePermissions?.is_mutable;
@@ -127,7 +115,11 @@ const EventDefinitionEntry = ({
         </IfPermitted>
       )}
 
-      <ShareButton entityId={eventDefinition.id} entityType="event_definition" onClick={() => setShowEntityShareModal(true)} />
+      <ShareButton
+        entityId={eventDefinition.id}
+        entityType="event_definition"
+        onClick={() => setShowEntityShareModal(true)}
+      />
 
       {!isSystemEventDefinition() && (
         <DropdownButton id="more-dropdown" title="More" pullRight>
@@ -150,25 +142,27 @@ const EventDefinitionEntry = ({
   const linkTitle = <Link to={Routes.ALERTS.DEFINITIONS.show(eventDefinition.id)}>{eventDefinition.title}</Link>;
 
   if (loadingScopePermissions) {
-    return (
-      <Spinner text="Loading Event Definitions" />
-    );
+    return <Spinner text="Loading Event Definitions" />;
   }
 
   return (
     <>
-      <EntityListItem key={`event-definition-${eventDefinition.id}`}
-                      title={linkTitle}
-                      titleSuffix={titleSuffix()}
-                      description={renderDescription(eventDefinition, context)}
-                      actions={actions} />
+      <EntityListItem
+        key={`event-definition-${eventDefinition.id}`}
+        title={linkTitle}
+        titleSuffix={titleSuffix()}
+        description={renderDescription(eventDefinition, context)}
+        actions={actions}
+      />
       {showEntityShareModal && (
-        <EntityShareModal entityId={eventDefinition.id}
-                          entityType="event_definition"
-                          entityTypeTitle="event definition"
-                          entityTitle={eventDefinition.title}
-                          description="Search for a User or Team to add as collaborator on this event definition."
-                          onClose={() => setShowEntityShareModal(false)} />
+        <EntityShareModal
+          entityId={eventDefinition.id}
+          entityType="event_definition"
+          entityTypeTitle="event definition"
+          entityTitle={eventDefinition.title}
+          description="Search for a User or Team to add as collaborator on this event definition."
+          onClose={() => setShowEntityShareModal(false)}
+        />
       )}
     </>
   );

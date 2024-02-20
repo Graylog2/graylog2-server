@@ -38,12 +38,7 @@ jest.mock('views/logic/slices/viewSlice', () => {
   };
 });
 
-const view = createSearch()
-  .toBuilder()
-  .id('viewId')
-  .title('Some view')
-  .type(View.Type.Dashboard)
-  .build();
+const view = createSearch().toBuilder().id('viewId').title('Some view').type(View.Type.Dashboard).build();
 
 const ViewHeader = () => (
   <TestStoreProvider view={view}>

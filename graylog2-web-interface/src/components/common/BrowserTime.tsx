@@ -22,8 +22,8 @@ import type { DateTimeFormats } from 'util/DateTime';
 import { formatAsBrowserTime, adjustFormat } from 'util/DateTime';
 
 type Props = {
-  dateTime?: string | number | Date | Moment,
-  format?: DateTimeFormats,
+  dateTime?: string | number | Date | Moment;
+  format?: DateTimeFormats;
 };
 
 /**

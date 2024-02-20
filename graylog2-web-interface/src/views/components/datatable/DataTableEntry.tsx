@@ -36,26 +36,34 @@ import CustomHighlighting from '../highlighting/CustomHighlighting';
 import DecoratedValue from '../messagelist/decoration/DecoratedValue';
 
 type Field = {
-  field: string,
-  source: string,
+  field: string;
+  source: string;
 };
 type Props = {
-  columnPivots: Array<string>,
-  columnPivotValues: Array<Array<string>>,
-  fields: Immutable.Set<Field>,
-  item: { [key: string]: any },
-  series: Array<Series>,
-  types: FieldTypeMappingsList,
-  valuePath: ValuePath,
+  columnPivots: Array<string>;
+  columnPivotValues: Array<Array<string>>;
+  fields: Immutable.Set<Field>;
+  item: { [key: string]: any };
+  series: Array<Series>;
+  types: FieldTypeMappingsList;
+  valuePath: ValuePath;
 };
 
 const _c = (field, value, path, source) => ({ field, value, path, source });
 
-type ColumnProps = { field: string, value: any, type: FieldType, valuePath: ValuePath, source: string | undefined | null };
+type ColumnProps = {
+  field: string;
+  value: any;
+  type: FieldType;
+  valuePath: ValuePath;
+  source: string | undefined | null;
+};
 
-const flattenValuePath = (valuePath: ValuePath) => valuePath.flatMap((path) => Object.entries(path))
-  .map(([key, value]) => `${key}:${value}`)
-  .join('-');
+const flattenValuePath = (valuePath: ValuePath) =>
+  valuePath
+    .flatMap((path) => Object.entries(path))
+    .map(([key, value]) => `${key}:${value}`)
+    .join('-');
 
 const Column = ({ field, value, type, valuePath, source }: ColumnProps) => {
   const additionalContextValue = useMemo(() => ({ valuePath }), [valuePath]);
@@ -64,13 +72,9 @@ const Column = ({ field, value, type, valuePath, source }: ColumnProps) => {
     <TableDataCell $isNumeric={type.isNumeric()} data-testid={`value-cell-${flattenValuePath(valuePath)}-${field}`}>
       <AdditionalContext.Provider value={additionalContextValue}>
         <CustomHighlighting field={source ?? field} value={value}>
-          {value !== null && value !== undefined
-            ? (
-              <Value field={source ?? field}
-                     type={type}
-                     value={value}
-                     render={DecoratedValue} />
-            ) : null}
+          {value !== null && value !== undefined ? (
+            <Value field={source ?? field} type={type} value={value} render={DecoratedValue} />
+          ) : null}
         </CustomHighlighting>
       </AdditionalContext.Provider>
     </TableDataCell>
@@ -93,12 +97,11 @@ const DataTableEntry = ({ columnPivots, fields, series, columnPivotValues, value
   const classes = 'message-group';
   const activeQuery = useActiveQueryId();
 
-  const fieldColumns = fields.toArray().map(({ field: fieldName, source }, i) => _c(
-    fieldName,
-    item[fieldName],
-    fullValuePathForField(fieldName, valuePath).slice(0, i + 1),
-    source,
-  ));
+  const fieldColumns = fields
+    .toArray()
+    .map(({ field: fieldName, source }, i) =>
+      _c(fieldName, item[fieldName], fullValuePathForField(fieldName, valuePath).slice(0, i + 1), source),
+    );
   const columnPivotFields = columnPivotValues.flatMap((columnPivotValueKeys) => {
     const translatedPath = columnPivotValueKeys.flatMap((value, idx) => [columnPivots[idx], value]);
     const parentValuePath = [...valuePath];
@@ -124,12 +127,14 @@ const DataTableEntry = ({ columnPivots, fields, series, columnPivotValues, value
         const key = `${activeQuery}-${field}=${value}-${idx}`;
 
         return (
-          <Column key={key}
-                  field={field}
-                  value={value}
-                  type={fieldTypeFor(columnNameToField(field, series), types)}
-                  valuePath={path.slice()}
-                  source={source} />
+          <Column
+            key={key}
+            field={field}
+            value={value}
+            type={fieldTypeFor(columnNameToField(field, series), types)}
+            valuePath={path.slice()}
+            source={source}
+          />
         );
       })}
     </tr>

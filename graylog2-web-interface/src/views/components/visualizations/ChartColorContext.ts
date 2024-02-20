@@ -22,7 +22,7 @@ import ColorMapper from 'views/components/visualizations/ColorMapper';
 export type ChartColorMap = ColorMapper;
 export type ChangeColorFunction = (value: string, color: string) => Promise<unknown>;
 
-const ChartColorContext = React.createContext<{ colors: ChartColorMap, setColor: ChangeColorFunction }>({
+const ChartColorContext = React.createContext<{ colors: ChartColorMap; setColor: ChangeColorFunction }>({
   colors: ColorMapper.create(),
   setColor: () => Promise.resolve([]),
 });

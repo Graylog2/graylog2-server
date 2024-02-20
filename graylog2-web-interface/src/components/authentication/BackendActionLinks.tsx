@@ -22,20 +22,17 @@ import Routes from 'routing/Routes';
 import { ButtonToolbar, Button } from 'components/bootstrap';
 
 type Props = {
-  activeBackend: AuthenticationBackend | undefined,
-  finishedLoading: boolean,
+  activeBackend: AuthenticationBackend | undefined;
+  finishedLoading: boolean;
 };
 
 const BackendActionLinks = ({ activeBackend, finishedLoading }: Props) => (
   <ButtonToolbar>
     <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE}>
-      <Button disabled={!finishedLoading || !activeBackend}>
-        View active service
-      </Button>
+      <Button disabled={!finishedLoading || !activeBackend}>View active service</Button>
     </LinkContainer>
     <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.BACKENDS.edit(activeBackend?.id)}>
-      <Button disabled={!activeBackend || !finishedLoading}
-              type="button">
+      <Button disabled={!activeBackend || !finishedLoading} type="button">
         Edit active service
       </Button>
     </LinkContainer>

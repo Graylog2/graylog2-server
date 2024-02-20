@@ -26,9 +26,9 @@ import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
  */
 
 type Props = {
-  children: React.ReactNode,
-  permissions: string | Array<string>,
-  anyPermissions?: boolean,
+  children: React.ReactNode;
+  permissions: string | Array<string>;
+  anyPermissions?: boolean;
 };
 
 const _checkPermissions = (permissions, anyPermissions, currentUser) => {
@@ -42,24 +42,26 @@ const _checkPermissions = (permissions, anyPermissions, currentUser) => {
 const IfPermitted = ({ children, permissions, anyPermissions, ...rest }: Props) => {
   const currentUser = useCurrentUser();
 
-  if ((!permissions || permissions.length === 0) || (currentUser && _checkPermissions(permissions, anyPermissions, currentUser))) {
+  if (
+    !permissions ||
+    permissions.length === 0 ||
+    (currentUser && _checkPermissions(permissions, anyPermissions, currentUser))
+  ) {
     return (
       <>
-        {
-          React.Children.map(children, (child) => {
-            if (React.isValidElement(child)) {
-              const presentProps = (child && child.props) ? Object.keys(child.props) : [];
-              // do not overwrite existing props
-              const filteredRest = Object.entries(rest)
-                .filter((entry) => !presentProps.includes(entry[0]))
-                .reduce((obj, [k, v]) => ({ ...obj, [k]: v }), {});
+        {React.Children.map(children, (child) => {
+          if (React.isValidElement(child)) {
+            const presentProps = child && child.props ? Object.keys(child.props) : [];
+            // do not overwrite existing props
+            const filteredRest = Object.entries(rest)
+              .filter((entry) => !presentProps.includes(entry[0]))
+              .reduce((obj, [k, v]) => ({ ...obj, [k]: v }), {});
 
-              return React.cloneElement(child, filteredRest);
-            }
+            return React.cloneElement(child, filteredRest);
+          }
 
-            return child;
-          })
-        }
+          return child;
+        })}
       </>
     );
   }
@@ -71,10 +73,7 @@ IfPermitted.propTypes = {
   /** Children to render if user has permissions. */
   children: PropTypes.node.isRequired,
   /** Permissions the current user must fulfill. By default, the user must have all permissions that are passed in this prop. */
-  permissions: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.arrayOf(PropTypes.string),
-  ]).isRequired,
+  permissions: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]).isRequired,
   /** This flag controls which permissions the user must fulfill: (all, at least one). */
   anyPermissions: PropTypes.bool,
 };

@@ -27,8 +27,7 @@ import { InputsActions } from 'stores/inputs/InputsStore';
 import ShowMessagePage from './ShowMessagePage';
 import { message, event, input } from './ShowMessagePage.fixtures';
 
-jest.mock('views/components/messagelist/MessageDetail',
-  () => (props) => <span>{JSON.stringify(props, null, 2)}</span>);
+jest.mock('views/components/messagelist/MessageDetail', () => (props) => <span>{JSON.stringify(props, null, 2)}</span>);
 
 const mockLoadMessage = jest.fn();
 const mockGetInput = jest.fn();
@@ -56,13 +55,13 @@ jest.mock('views/logic/fieldtypes/useFieldTypes', () => jest.fn());
 jest.mock('routing/withParams', () => (x) => x);
 
 type SimpleShowMessagePageProps = {
-  index: string,
-  messageId: string,
+  index: string;
+  messageId: string;
 };
 
 const SimpleShowMessagePage = ({ index, messageId }: SimpleShowMessagePageProps) => (
   // @ts-expect-error
-  (<ShowMessagePage params={{ index, messageId }} />)
+  <ShowMessagePage params={{ index, messageId }} />
 );
 
 describe('ShowMessagePage', () => {
@@ -75,10 +74,13 @@ describe('ShowMessagePage', () => {
     asMock(isLocalNode).mockResolvedValue(true);
   });
 
-  const testForwarderPlugin = new PluginManifest({}, {
-    // @ts-expect-error
-    forwarder: [{ isLocalNode }],
-  });
+  const testForwarderPlugin = new PluginManifest(
+    {},
+    {
+      // @ts-expect-error
+      forwarder: [{ isLocalNode }],
+    },
+  );
 
   beforeAll(loadViewsPlugin);
 
@@ -101,8 +103,9 @@ describe('ShowMessagePage', () => {
     mockLoadMessage.mockImplementation(() => Promise.resolve(message));
     asMock(InputsActions.get).mockResolvedValue(input);
 
-    const { container } = render(<SimpleShowMessagePage index="graylog_5"
-                                                        messageId="20f683d2-a874-11e9-8a11-0242ac130004" />);
+    const { container } = render(
+      <SimpleShowMessagePage index="graylog_5" messageId="20f683d2-a874-11e9-8a11-0242ac130004" />,
+    );
 
     await screen.findByText(/Deprecated field/);
 

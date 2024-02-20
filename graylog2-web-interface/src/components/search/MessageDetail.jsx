@@ -68,9 +68,7 @@ class MessageDetail extends React.Component {
         </>
       );
 
-      nodeInformation = AppConfig.isCloud()
-        ? nodeContent
-        : <a href={nodeURL}>{nodeContent}</a>;
+      nodeInformation = AppConfig.isCloud() ? nodeContent : <a href={nodeURL}>{nodeContent}</a>;
     } else {
       nodeInformation = <span style={{ wordBreak: 'break-word' }}>stopped node</span>;
     }
@@ -100,14 +98,22 @@ class MessageDetail extends React.Component {
     const { streams, message } = this.props;
 
     if (message.streams) {
-      return message.streams.map((stream) => (<li key={stream.id}><StreamLink stream={stream} /></li>));
+      return message.streams.map((stream) => (
+        <li key={stream.id}>
+          <StreamLink stream={stream} />
+        </li>
+      ));
     }
 
     const _streams = streamIds.map((id) => {
       const stream = streams.get(id);
 
       if (stream !== undefined) {
-        return <li key={stream.id}><StreamLink stream={stream} /></li>;
+        return (
+          <li key={stream.id}>
+            <StreamLink stream={stream} />
+          </li>
+        );
       }
 
       return null;
@@ -122,42 +128,39 @@ class MessageDetail extends React.Component {
     const streamLinks = this._getStreamLinks(streamIds);
 
     // Legacy
-    const viaRadio = message.source_radio_id
-      ? (
-        <span>
-          via <em>{this._inputName(message.source_radio_input_id)}</em> on
-          radio {this._nodeName(message.source_radio_id)}
-        </span>
-      )
-      : null;
+    const viaRadio = message.source_radio_id ? (
+      <span>
+        via <em>{this._inputName(message.source_radio_input_id)}</em> on radio {this._nodeName(message.source_radio_id)}
+      </span>
+    ) : null;
 
     const rawTimestamp = message.fields.timestamp;
     const timestamp = [
       <dt key={`dt-${rawTimestamp}`}>Timestamp</dt>,
-      <dd key={`dd-${rawTimestamp}`}><Timestamp dateTime={rawTimestamp} /></dd>,
+      <dd key={`dd-${rawTimestamp}`}>
+        <Timestamp dateTime={rawTimestamp} />
+      </dd>,
     ];
 
-    const receivedBy = message.source_input_id && message.source_node_id && nodes
-      ? (
+    const receivedBy =
+      message.source_input_id && message.source_node_id && nodes ? (
         <div>
           <dt>Received by</dt>
           <dd>
-            <em>{this._inputName(message.source_input_id)}</em>{' '}
-            on {this._nodeName(message.source_node_id)}
+            <em>{this._inputName(message.source_input_id)}</em> on {this._nodeName(message.source_node_id)}
             {viaRadio && <br />}
             {viaRadio}
           </dd>
         </div>
-      )
-      : null;
+      ) : null;
 
-    const messageTitle = message.index
-      ? (
-        <Link to={Routes.message_show(message.index, message.id)}>
-          {message.id}
-        </Link>
-      )
-      : <span>{message.id} <Label bsStyle="warning">Not stored</Label></span>;
+    const messageTitle = message.index ? (
+      <Link to={Routes.message_show(message.index, message.id)}>{message.id}</Link>
+    ) : (
+      <span>
+        {message.id} <Label bsStyle="warning">Not stored</Label>
+      </span>
+    );
 
     return (
       <div>
@@ -181,21 +184,20 @@ class MessageDetail extends React.Component {
               <dd>{message.index ? message.index : 'Message is not stored'}</dd>
 
               {streamIds.size > 0 && <dt>Routed into streams</dt>}
-              {streamIds.size > 0
-            && (
-            <dd className="stream-list">
-              <ul>
-                {streamLinks}
-              </ul>
-            </dd>
-            )}
+              {streamIds.size > 0 && (
+                <dd className="stream-list">
+                  <ul>{streamLinks}</ul>
+                </dd>
+              )}
             </MessageDetailsDefinitionList>
           </Col>
           <Col md={9}>
             <div>
-              <MessageFields message={message}
-                             renderForDisplay={renderForDisplay}
-                             customFieldActions={customFieldActions} />
+              <MessageFields
+                message={message}
+                renderForDisplay={renderForDisplay}
+                customFieldActions={customFieldActions}
+              />
             </div>
           </Col>
         </Row>

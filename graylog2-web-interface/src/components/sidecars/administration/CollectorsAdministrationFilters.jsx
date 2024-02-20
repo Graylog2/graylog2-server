@@ -74,14 +74,20 @@ const CollectorsAdministrationFilters = createReactClass({
     }
 
     return (
-      <SelectPopover id="collector-filter"
-                     title="Filter by collector"
-                     triggerNode={<Button bsSize="small" bsStyle="link">Collector <span className="caret" /></Button>}
-                     items={collectorItems}
-                     itemFormatter={collectorFormatter}
-                     onItemSelect={filter}
-                     selectedItems={collectorFilter ? [collectorFilter] : []}
-                     filterPlaceholder="Filter by collector" />
+      <SelectPopover
+        id="collector-filter"
+        title="Filter by collector"
+        triggerNode={
+          <Button bsSize="small" bsStyle="link">
+            Collector <span className="caret" />
+          </Button>
+        }
+        items={collectorItems}
+        itemFormatter={collectorFormatter}
+        onItemSelect={filter}
+        selectedItems={collectorFilter ? [collectorFilter] : []}
+        filterPlaceholder="Filter by collector"
+      />
     );
   },
 
@@ -98,7 +104,11 @@ const CollectorsAdministrationFilters = createReactClass({
       const [id] = configurationId.split(';');
       const configuration = find(configurations, { id: id });
 
-      return <span><ColorLabel color={configuration.color} size="xsmall" /> {configuration.name}</span>;
+      return (
+        <span>
+          <ColorLabel color={configuration.color} size="xsmall" /> {configuration.name}
+        </span>
+      );
     };
 
     const filter = ([configurationId], callback) => {
@@ -116,35 +126,48 @@ const CollectorsAdministrationFilters = createReactClass({
     }
 
     return (
-      <SelectPopover id="configuration-filter"
-                     title="Filter by configuration"
-                     triggerNode={<Button bsSize="small" bsStyle="link">Configuration <span className="caret" /></Button>}
-                     items={configurationItems}
-                     itemFormatter={configurationFormatter}
-                     onItemSelect={filter}
-                     selectedItems={configurationFilter ? [configurationFilter] : []}
-                     filterPlaceholder="Filter by configuration" />
+      <SelectPopover
+        id="configuration-filter"
+        title="Filter by configuration"
+        triggerNode={
+          <Button bsSize="small" bsStyle="link">
+            Configuration <span className="caret" />
+          </Button>
+        }
+        items={configurationItems}
+        itemFormatter={configurationFormatter}
+        onItemSelect={filter}
+        selectedItems={configurationFilter ? [configurationFilter] : []}
+        filterPlaceholder="Filter by configuration"
+      />
     );
   },
 
   getOSFilter() {
     const { collectors, filters } = this.props;
 
-    const operatingSystems = uniq(collectors.map((collector) => upperFirst(collector.node_operating_system)))
-      .sort(naturalSortIgnoreCase);
+    const operatingSystems = uniq(collectors.map((collector) => upperFirst(collector.node_operating_system))).sort(
+      naturalSortIgnoreCase,
+    );
 
     const filter = ([os], callback) => this.onFilterChange('os', os, callback);
 
     const osFilter = filters.os;
 
     return (
-      <SelectPopover id="os-filter"
-                     title="Filter by OS"
-                     triggerNode={<Button bsSize="small" bsStyle="link">OS <span className="caret" /></Button>}
-                     items={operatingSystems}
-                     onItemSelect={filter}
-                     selectedItems={osFilter ? [osFilter] : []}
-                     filterPlaceholder="Filter by OS" />
+      <SelectPopover
+        id="os-filter"
+        title="Filter by OS"
+        triggerNode={
+          <Button bsSize="small" bsStyle="link">
+            OS <span className="caret" />
+          </Button>
+        }
+        items={operatingSystems}
+        onItemSelect={filter}
+        selectedItems={osFilter ? [osFilter] : []}
+        filterPlaceholder="Filter by OS"
+      />
     );
   },
 
@@ -157,14 +180,20 @@ const CollectorsAdministrationFilters = createReactClass({
     const statusFormatter = (statusCode) => upperFirst(SidecarStatusEnum.toString(statusCode));
 
     return (
-      <SelectPopover id="status-filter"
-                     title="Filter by collector status"
-                     triggerNode={<Button bsSize="small" bsStyle="link">Collector Status <span className="caret" /></Button>}
-                     items={status}
-                     itemFormatter={statusFormatter}
-                     onItemSelect={filter}
-                     selectedItems={statusFilter ? [statusFilter] : []}
-                     filterPlaceholder="Filter by collector status" />
+      <SelectPopover
+        id="status-filter"
+        title="Filter by collector status"
+        triggerNode={
+          <Button bsSize="small" bsStyle="link">
+            Collector Status <span className="caret" />
+          </Button>
+        }
+        items={status}
+        itemFormatter={statusFormatter}
+        onItemSelect={filter}
+        selectedItems={statusFilter ? [statusFilter] : []}
+        filterPlaceholder="Filter by collector status"
+      />
     );
   },
 

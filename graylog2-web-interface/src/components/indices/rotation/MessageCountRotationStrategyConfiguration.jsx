@@ -36,15 +36,17 @@ const MessageCountRotationStrategyConfiguration = ({ config, updateConfig }) => 
 
   return (
     <div>
-      <Input type="number"
-             id="max-docs-per-index"
-             label="Max documents per index"
-             labelClassName="col-sm-3"
-             wrapperClassName="col-sm-9"
-             onChange={_onInputUpdate('max_docs_per_index')}
-             value={maxDocsPerIndex}
-             help="Maximum number of documents in an index before it gets rotated"
-             required />
+      <Input
+        type="number"
+        id="max-docs-per-index"
+        label="Max documents per index"
+        labelClassName="col-sm-3"
+        wrapperClassName="col-sm-9"
+        onChange={_onInputUpdate('max_docs_per_index')}
+        value={maxDocsPerIndex}
+        help="Maximum number of documents in an index before it gets rotated"
+        required
+      />
     </div>
   );
 };

@@ -22,9 +22,7 @@ import useLocation from 'routing/useLocation';
 
 import useQuery from './useQuery';
 
-export type Location<
-  Query = { [key: string]: unknown | null | undefined; }
-> = {
+export type Location<Query = { [key: string]: unknown | null | undefined }> = {
   query: Query;
   pathname: string;
   search: string;
@@ -34,12 +32,16 @@ type LocationContext = {
   location: Location;
 };
 
-const withLocation = <Props extends LocationContext>(Component: React.ComponentType<Props>): React.ComponentType<Subtract<Props, LocationContext>> => (props) => {
-  const location = useLocation();
-  const query = useQuery();
-  const locationWithQuery: Location = useMemo(() => ({ ...location, query }), [location, query]);
+const withLocation =
+  <Props extends LocationContext>(
+    Component: React.ComponentType<Props>,
+  ): React.ComponentType<Subtract<Props, LocationContext>> =>
+  (props) => {
+    const location = useLocation();
+    const query = useQuery();
+    const locationWithQuery: Location = useMemo(() => ({ ...location, query }), [location, query]);
 
-  return <Component {...props as Props} location={locationWithQuery} />;
-};
+    return <Component {...(props as Props)} location={locationWithQuery} />;
+  };
 
 export default withLocation;

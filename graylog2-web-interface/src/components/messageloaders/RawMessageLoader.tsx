@@ -39,13 +39,13 @@ import type { Input as InputType, CodecTypes } from './Types';
 const DEFAULT_REMOTE_ADDRESS = '127.0.0.1';
 
 type InputSelectProps = {
-  inputs: Immutable.Map<string, InputType>,
-  selectedInputId: string | undefined,
-  onInputSelect: (selectedInputId: string) => void,
-  show: boolean,
+  inputs: Immutable.Map<string, InputType>;
+  selectedInputId: string | undefined;
+  onInputSelect: (selectedInputId: string) => void;
+  show: boolean;
 };
 
-const ServerInputSelect = ({ inputs, selectedInputId, onInputSelect }: Subtract<InputSelectProps, {show}>) => {
+const ServerInputSelect = ({ inputs, selectedInputId, onInputSelect }: Subtract<InputSelectProps, { show }>) => {
   const _formatInputSelectOptions = () => {
     if (!inputs) {
       return [{ value: 'none', label: 'Loading inputs...', disabled: true }];
@@ -69,18 +69,26 @@ const ServerInputSelect = ({ inputs, selectedInputId, onInputSelect }: Subtract<
   };
 
   return (
-    <Input id="inputSelect"
-           name="inputSelect"
-           label={<>Message input <small>(optional)</small></>}
-           help="Select the message input ID that should be assigned to the parsed message.">
-      <Select inputId="inputSelect"
-              name="inputSelect"
-              aria-label="Message input"
-              placeholder="Select input"
-              options={_formatInputSelectOptions()}
-              matchProp="label"
-              onChange={onInputSelect}
-              value={selectedInputId} />
+    <Input
+      id="inputSelect"
+      name="inputSelect"
+      label={
+        <>
+          Message input <small>(optional)</small>
+        </>
+      }
+      help="Select the message input ID that should be assigned to the parsed message."
+    >
+      <Select
+        inputId="inputSelect"
+        name="inputSelect"
+        aria-label="Message input"
+        placeholder="Select input"
+        options={_formatInputSelectOptions()}
+        matchProp="label"
+        onChange={onInputSelect}
+        value={selectedInputId}
+      />
     </Input>
   );
 };
@@ -90,9 +98,11 @@ const ForwarderInputSelect = ({ onInputSelect }: Pick<InputSelectProps, 'onInput
 
   return (
     <>
-      <ForwarderInputDropdown onLoadMessage={onInputSelect}
-                              label="Forwarder Input selection (optional)"
-                              autoLoadMessage />
+      <ForwarderInputDropdown
+        onLoadMessage={onInputSelect}
+        label="Forwarder Input selection (optional)"
+        autoLoadMessage
+      />
       <p className="description">Select an Input profile from the list below then select an then select an Input.</p>
     </>
   );
@@ -113,13 +123,17 @@ const InputSelect = ({ inputs, selectedInputId, onInputSelect, show }: InputSele
   return ForwarderInputDropdown ? (
     <fieldset>
       <legend>Input selection (optional)</legend>
-      <Input id="inputTypeSelect"
-             type="select"
-             label="Select an Input type (optional)"
-             help="Select the Input type you want to load the message from."
-             value={selectedInputType ?? 'placeholder'}
-             onChange={(e) => setSelectedInputType(e.target.value)}>
-        <option value="placeholder" disabled>Select an Input type</option>
+      <Input
+        id="inputTypeSelect"
+        type="select"
+        label="Select an Input type (optional)"
+        help="Select the Input type you want to load the message from."
+        value={selectedInputType ?? 'placeholder'}
+        onChange={(e) => setSelectedInputType(e.target.value)}
+      >
+        <option value="placeholder" disabled>
+          Select an Input type
+        </option>
         <option value="server">Server Input</option>
         <option value="forwarder">Forwarder Input</option>
       </Input>
@@ -127,9 +141,7 @@ const InputSelect = ({ inputs, selectedInputId, onInputSelect, show }: InputSele
       {selectedInputType === 'server' && (
         <ServerInputSelect inputs={inputs} selectedInputId={selectedInputId} onInputSelect={onInputSelect} />
       )}
-      {selectedInputType === 'forwarder' && (
-        <ForwarderInputSelect onInputSelect={onInputSelect} />
-      )}
+      {selectedInputType === 'forwarder' && <ForwarderInputSelect onInputSelect={onInputSelect} />}
     </fieldset>
   ) : (
     <ServerInputSelect inputs={inputs} selectedInputId={selectedInputId} onInputSelect={onInputSelect} />
@@ -137,20 +149,20 @@ const InputSelect = ({ inputs, selectedInputId, onInputSelect, show }: InputSele
 };
 
 type OptionsType = {
-  message: string,
-  remoteAddress: string,
-  codec: string,
+  message: string;
+  remoteAddress: string;
+  codec: string;
   codecConfiguration: {
-    [key: string]: string,
-  },
-  inputId?: string,
+    [key: string]: string;
+  };
+  inputId?: string;
 };
 
 type Props = {
-  inputs?: Immutable.Map<string, InputType>,
-  codecTypes: CodecTypes,
-  onMessageLoaded: (message: Message | undefined, option: OptionsType) => void,
-  inputIdSelector?: boolean,
+  inputs?: Immutable.Map<string, InputType>;
+  codecTypes: CodecTypes;
+  onMessageLoaded: (message: Message | undefined, option: OptionsType) => void;
+  inputIdSelector?: boolean;
 };
 
 const RawMessageLoader = ({ onMessageLoaded, inputIdSelector, codecTypes, inputs }: Props) => {
@@ -179,16 +191,13 @@ const RawMessageLoader = ({ onMessageLoaded, inputIdSelector, codecTypes, inputs
     const promise = MessagesActions.loadRawMessage(message, remoteAddress, codec, codecConfiguration);
 
     promise.then((loadedMessage) => {
-      onMessageLoaded(
-        loadedMessage,
-        {
-          message: message,
-          remoteAddress: remoteAddress,
-          codec: codec,
-          codecConfiguration: codecConfiguration,
-          inputId: inputId,
-        },
-      );
+      onMessageLoaded(loadedMessage, {
+        message: message,
+        remoteAddress: remoteAddress,
+        codec: codec,
+        codecConfiguration: codecConfiguration,
+        inputId: inputId,
+      });
     });
 
     promise.finally(() => setLoading(false));
@@ -246,39 +255,47 @@ const RawMessageLoader = ({ onMessageLoaded, inputIdSelector, codecTypes, inputs
     switch (configField.type) {
       case 'text':
         return (
-          <TextField key={elementKey}
-                     typeName={typeName}
-                     title={key}
-                     field={configField}
-                     value={value}
-                     onChange={_onCodecConfigurationChange} />
+          <TextField
+            key={elementKey}
+            typeName={typeName}
+            title={key}
+            field={configField}
+            value={value}
+            onChange={_onCodecConfigurationChange}
+          />
         );
       case 'number':
         return (
-          <NumberField key={elementKey}
-                       typeName={typeName}
-                       title={key}
-                       field={configField}
-                       value={value}
-                       onChange={_onCodecConfigurationChange} />
+          <NumberField
+            key={elementKey}
+            typeName={typeName}
+            title={key}
+            field={configField}
+            value={value}
+            onChange={_onCodecConfigurationChange}
+          />
         );
       case 'boolean':
         return (
-          <BooleanField key={elementKey}
-                        typeName={typeName}
-                        title={key}
-                        field={configField}
-                        value={value}
-                        onChange={_onCodecConfigurationChange} />
+          <BooleanField
+            key={elementKey}
+            typeName={typeName}
+            title={key}
+            field={configField}
+            value={value}
+            onChange={_onCodecConfigurationChange}
+          />
         );
       case 'dropdown':
         return (
-          <DropdownField key={elementKey}
-                         typeName={typeName}
-                         title={key}
-                         field={configField}
-                         value={value}
-                         onChange={_onCodecConfigurationChange} />
+          <DropdownField
+            key={elementKey}
+            typeName={typeName}
+            title={key}
+            field={configField}
+            value={value}
+            onChange={_onCodecConfigurationChange}
+          />
         );
       default:
         return null;
@@ -302,49 +319,65 @@ const RawMessageLoader = ({ onMessageLoaded, inputIdSelector, codecTypes, inputs
       <Col md={7}>
         <form onSubmit={_loadMessage}>
           <fieldset>
-            <Input id="message"
-                   name="message"
-                   type="textarea"
-                   label="Raw message"
-                   value={message}
-                   onChange={_onMessageChange}
-                   rows={3}
-                   required />
-            <Input id="remoteAddress"
-                   name="remoteAddress"
-                   type="text"
-                   label={<span>Source IP address <small>(optional)</small></span>}
-                   help={`Remote IP address to use as message source. Graylog will use ${DEFAULT_REMOTE_ADDRESS} by default.`}
-                   value={remoteAddress}
-                   onChange={_onRemoteAddressChange} />
+            <Input
+              id="message"
+              name="message"
+              type="textarea"
+              label="Raw message"
+              value={message}
+              onChange={_onMessageChange}
+              rows={3}
+              required
+            />
+            <Input
+              id="remoteAddress"
+              name="remoteAddress"
+              type="text"
+              label={
+                <span>
+                  Source IP address <small>(optional)</small>
+                </span>
+              }
+              help={`Remote IP address to use as message source. Graylog will use ${DEFAULT_REMOTE_ADDRESS} by default.`}
+              value={remoteAddress}
+              onChange={_onRemoteAddressChange}
+            />
           </fieldset>
-          <InputSelect inputs={inputs}
-                       selectedInputId={inputId}
-                       onInputSelect={_onInputSelect}
-                       show={inputIdSelector} />
+          <InputSelect
+            inputs={inputs}
+            selectedInputId={inputId}
+            onInputSelect={_onInputSelect}
+            show={inputIdSelector}
+          />
           <fieldset>
             <legend>Codec configuration</legend>
-            <Input id="codec"
-                   name="codec"
-                   label="Message codec"
-                   help="Select the codec that should be used to decode the message."
-                   required>
-              <Select id="codec"
-                      aria-label="Message codec"
-                      placeholder="Select codec"
-                      options={_formatSelectOptions()}
-                      matchProp="label"
-                      onChange={_onCodecSelect}
-                      value={codec} />
+            <Input
+              id="codec"
+              name="codec"
+              label="Message codec"
+              help="Select the codec that should be used to decode the message."
+              required
+            >
+              <Select
+                id="codec"
+                aria-label="Message codec"
+                placeholder="Select codec"
+                options={_formatSelectOptions()}
+                matchProp="label"
+                onChange={_onCodecSelect}
+                value={codec}
+              />
             </Input>
             {codecConfigurationOptions}
           </fieldset>
-          <FormSubmit submitButtonText="Load message"
-                      submitLoadingText="Loading message..."
-                      isSubmitting={loading}
-                      isAsyncSubmit
-                      disabledSubmit={_isSubmitDisabled}
-                      onCancel={() => history.goBack()} />
+          <FormSubmit
+            submitButtonText="Load message"
+            submitLoadingText="Loading message..."
+            isSubmitting={loading}
+            isAsyncSubmit
+            disabledSubmit={_isSubmitDisabled}
+            onCancel={() => history.goBack()}
+          />
         </form>
       </Col>
     </Row>
@@ -369,5 +402,8 @@ export default connect(
   RawMessageLoader,
   { inputs: InputsStore, codecTypes: CodecTypesStore },
   // @ts-ignore
-  ({ inputs: { inputs }, codecTypes: { codecTypes } }) => ({ inputs: (inputs ? Immutable.Map(InputsStore.inputsAsMap(inputs)) : undefined), codecTypes }),
+  ({ inputs: { inputs }, codecTypes: { codecTypes } }) => ({
+    inputs: inputs ? Immutable.Map(InputsStore.inputsAsMap(inputs)) : undefined,
+    codecTypes,
+  }),
 );

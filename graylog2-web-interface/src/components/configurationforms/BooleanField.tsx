@@ -23,12 +23,12 @@ import { Input } from 'components/bootstrap';
 import type { BooleanField as BooleanFieldType } from 'components/configurationforms/types';
 
 type Props = {
-  autoFocus?: boolean,
-  field: BooleanFieldType,
-  onChange: (title: string, value: boolean, dirty?: boolean) => void,
-  title: string,
-  typeName: string,
-  value?: boolean,
+  autoFocus?: boolean;
+  field: BooleanFieldType;
+  onChange: (title: string, value: boolean, dirty?: boolean) => void;
+  title: string;
+  typeName: string;
+  value?: boolean;
 };
 
 const BooleanField = ({ autoFocus, field, onChange, title, typeName, value }: Props) => {
@@ -39,14 +39,16 @@ const BooleanField = ({ autoFocus, field, onChange, title, typeName, value }: Pr
   };
 
   return (
-    <Input id={`${typeName}-${title}`}
-           name={`configuration[${title}]`}
-           type="checkbox"
-           label={field.human_name}
-           checked={value}
-           help={field.description}
-           onChange={handleChange}
-           autoFocus={autoFocus} />
+    <Input
+      id={`${typeName}-${title}`}
+      name={`configuration[${title}]`}
+      type="checkbox"
+      label={field.human_name}
+      checked={value}
+      help={field.description}
+      onChange={handleChange}
+      autoFocus={autoFocus}
+    />
   );
 };
 

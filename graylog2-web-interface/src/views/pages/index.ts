@@ -23,7 +23,9 @@ const StreamSearchPage = loadAsync(() => import(/* webpackChunkName: "StreamSear
 const NewDashboardPage = loadAsync(() => import(/* webpackChunkName: "NewDashboardPage" */ './NewDashboardPage'));
 const ShowViewPage = loadAsync(() => import(/* webpackChunkName: "ShowViewPage" */ './ShowViewPage'));
 const EventReplaySearchPage = loadAsync(() => import(/* webpackChunkName: "ShowViewPage" */ './EventReplaySearchPage'));
-const EventDefinitionReplaySearchPage = loadAsync(() => import(/* webpackChunkName: "ShowViewPage" */ './EventDefinitionReplaySearchPage'));
+const EventDefinitionReplaySearchPage = loadAsync(
+  () => import(/* webpackChunkName: "ShowViewPage" */ './EventDefinitionReplaySearchPage'),
+);
 
 export {
   DashboardsPage,

@@ -30,8 +30,8 @@ import FieldType from './fieldtypes/FieldType';
 
 const widgetsKey = 'enterpriseWidgets' as const;
 
-const _findWidgetDefinition = (type: string) => PluginStore.exports(widgetsKey)
-  .find((widget) => widget.type.toLocaleUpperCase() === type.toLocaleUpperCase());
+const _findWidgetDefinition = (type: string) =>
+  PluginStore.exports(widgetsKey).find((widget) => widget.type.toLocaleUpperCase() === type.toLocaleUpperCase());
 
 export function widgetDefinition(type: string) {
   const typeDefinition = _findWidgetDefinition(type);
@@ -49,30 +49,30 @@ export function widgetDefinition(type: string) {
   throw new Error(`Neither a widget of type "${type}" nor a default widget are registered!`);
 }
 
-export const resultHistogram = (id: string = generateId()) => AggregationWidget.builder()
-  .id(id)
-  .config(
-    AggregationWidgetConfig.builder()
-      .columnPivots([])
-      .rowPivots([
-        pivotForField(TIMESTAMP_FIELD, new FieldType('date', [], [])),
-      ])
-      .series([
-        Series.forFunction('count()'),
-      ])
-      .sort([])
-      .visualization('bar')
-      .rollup(true)
-      .build(),
-  )
-  .build();
+export const resultHistogram = (id: string = generateId()) =>
+  AggregationWidget.builder()
+    .id(id)
+    .config(
+      AggregationWidgetConfig.builder()
+        .columnPivots([])
+        .rowPivots([pivotForField(TIMESTAMP_FIELD, new FieldType('date', [], []))])
+        .series([Series.forFunction('count()')])
+        .sort([])
+        .visualization('bar')
+        .rollup(true)
+        .build(),
+    )
+    .build();
 
-export const allMessagesTable = (id: string = generateId(), decorators: Array<Decorator> = []) => MessageWidget.builder()
-  .id(id)
-  .config(MessageWidgetConfig.builder()
-    .fields(DEFAULT_MESSAGE_FIELDS)
-    .showMessageRow(true)
-    .showSummary(true)
-    .decorators(decorators)
-    .build())
-  .build();
+export const allMessagesTable = (id: string = generateId(), decorators: Array<Decorator> = []) =>
+  MessageWidget.builder()
+    .id(id)
+    .config(
+      MessageWidgetConfig.builder()
+        .fields(DEFAULT_MESSAGE_FIELDS)
+        .showMessageRow(true)
+        .showSummary(true)
+        .decorators(decorators)
+        .build(),
+    )
+    .build();

@@ -21,11 +21,11 @@ import Spinner from 'components/common/Spinner';
 import { Row, Col } from 'components/bootstrap';
 
 type Props = {
-  children: React.ReactNode,
-  title: string,
-  showLoading?: boolean,
-  headerActions?: React.ReactElement,
-  className?: string,
+  children: React.ReactNode;
+  title: string;
+  showLoading?: boolean;
+  headerActions?: React.ReactElement;
+  className?: string;
 };
 
 const Header = styled.div`
@@ -43,10 +43,12 @@ export const Headline = styled.h2`
   display: inline;
 `;
 
-const LoadingSpinner = styled(Spinner)(({ theme }) => css`
-  margin-left: 10px;
-  font-size: ${theme.fonts.size.h3};
-`);
+const LoadingSpinner = styled(Spinner)(
+  ({ theme }) => css`
+    margin-left: 10px;
+    font-size: ${theme.fonts.size.h3};
+  `,
+);
 
 const SectionComponent = ({ children, title, showLoading = false, headerActions, className }: Props) => (
   <Row className={`content ${className}`}>

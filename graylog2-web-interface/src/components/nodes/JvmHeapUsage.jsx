@@ -35,28 +35,30 @@ const NodeHeap = styled.div`
   }
 `;
 
-const Blob = styled.span(({ theme }) => css`
-  display: inline-block;
-  width: 9px;
-  height: 9px;
-  margin-left: 2px;
-  border: 1px solid;
+const Blob = styled.span(
+  ({ theme }) => css`
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    margin-left: 2px;
+    border: 1px solid;
 
-  &.used-memory {
-    background-color: ${theme.colors.variant.primary};
-    border-color: ${theme.colors.variant.dark.primary};
-  }
+    &.used-memory {
+      background-color: ${theme.colors.variant.primary};
+      border-color: ${theme.colors.variant.dark.primary};
+    }
 
-  &.committed-memory {
-    background-color: ${theme.colors.variant.warning};
-    border-color: ${theme.colors.variant.dark.warning};
-  }
+    &.committed-memory {
+      background-color: ${theme.colors.variant.warning};
+      border-color: ${theme.colors.variant.dark.warning};
+    }
 
-  &.max-memory {
-    background-color: ${theme.colors.global.background};
-    border-color: ${theme.colors.gray[80]};
-  }
-`);
+    &.max-memory {
+      background-color: ${theme.colors.global.background};
+      border-color: ${theme.colors.gray[80]};
+    }
+  `,
+);
 
 const StyledProgressBar = styled(ProgressBar)`
   height: 25px;
@@ -83,13 +85,17 @@ const JvmHeapUsage = createReactClass({
       maxMemory: 'jvm.memory.heap.max',
     };
 
-    Object.keys(this.metricNames).forEach((metricShortName) => MetricsActions.add(nodeId, this.metricNames[metricShortName]));
+    Object.keys(this.metricNames).forEach((metricShortName) =>
+      MetricsActions.add(nodeId, this.metricNames[metricShortName]),
+    );
   },
 
   componentWillUnmount() {
     const { nodeId } = this.props;
 
-    Object.keys(this.metricNames).forEach((metricShortName) => MetricsActions.remove(nodeId, this.metricNames[metricShortName]));
+    Object.keys(this.metricNames).forEach((metricShortName) =>
+      MetricsActions.remove(nodeId, this.metricNames[metricShortName]),
+    );
   },
 
   _extractMetricValues() {
@@ -121,7 +127,11 @@ const JvmHeapUsage = createReactClass({
     const extractedMetrics = this._extractMetricValues();
     const { usedPercentage, committedPercentage, usedMemory, committedMemory, maxMemory } = extractedMetrics;
     let progressBarConfig = [{ value: 0 }];
-    let detail = <p><Spinner text="Loading heap usage information..." /></p>;
+    let detail = (
+      <p>
+        <Spinner text="Loading heap usage information..." />
+      </p>
+    );
 
     if (usedPercentage || committedPercentage) {
       if (Object.keys(extractedMetrics).length === 0) {
@@ -134,14 +144,10 @@ const JvmHeapUsage = createReactClass({
 
         detail = (
           <p>
-            The JVM is using{' '}
-            <Blob className="used-memory" />
-            <strong> {NumberUtils.formatBytes(usedMemory)}</strong>
-            {' '}of{' '}
-            <Blob className="committed-memory" />
-            <strong> {NumberUtils.formatBytes(committedMemory)}</strong>
-            {' '}heap space and will not attempt to use more than{' '}
-            <Blob className="max-memory" />
+            The JVM is using <Blob className="used-memory" />
+            <strong> {NumberUtils.formatBytes(usedMemory)}</strong> of <Blob className="committed-memory" />
+            <strong> {NumberUtils.formatBytes(committedMemory)}</strong> heap space and will not attempt to use more
+            than <Blob className="max-memory" />
             <strong> {NumberUtils.formatBytes(maxMemory)}</strong>
           </p>
         );

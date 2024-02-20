@@ -31,16 +31,16 @@ export const Position = {
 
 export const PositionsMap = PropTypes.objectOf(PropTypes.shape(Position));
 
-export const ImmutablePositionsMap = ImmutablePropTypes.mapOf(ImmutablePropTypes.mapContains(Position), PropTypes.string);
+export const ImmutablePositionsMap = ImmutablePropTypes.mapOf(
+  ImmutablePropTypes.mapContains(Position),
+  PropTypes.string,
+);
 
 export const WidgetsMap = PropTypes.objectOf(CustomPropTypes.instanceOf(Widget));
 
 export const ImmutableWidgetsMap = ImmutablePropTypes.mapOf(CustomPropTypes.instanceOf(Widget), PropTypes.string);
 
-export const WidgetData = PropTypes.oneOfType([
-  PropTypes.arrayOf(PropTypes.object),
-  PropTypes.object,
-]);
+export const WidgetData = PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.object), PropTypes.object]);
 
 export const WidgetDataMap = PropTypes.objectOf(WidgetData);
 

@@ -47,117 +47,140 @@ const DragHandle = styled.div`
 `;
 
 type ListItemProps = {
-  item: { id: string, title: string },
-  draggableProps: DraggableProvidedDraggableProps,
-  dragHandleProps: DraggableProvidedDragHandleProps,
-  className: string,
-  onChange: (fieldName: string) => void,
-  onRemove: () => void,
-  selectedFields: Array<string>,
-  selectSize: 'normal' | 'small',
-  testIdPrefix: string,
-}
+  item: { id: string; title: string };
+  draggableProps: DraggableProvidedDraggableProps;
+  dragHandleProps: DraggableProvidedDragHandleProps;
+  className: string;
+  onChange: (fieldName: string) => void;
+  onRemove: () => void;
+  selectedFields: Array<string>;
+  selectSize: 'normal' | 'small';
+  testIdPrefix: string;
+};
 
-const ListItem = forwardRef<HTMLDivElement, ListItemProps>(({
-  selectSize,
-  className,
-  dragHandleProps,
-  draggableProps,
-  item,
-  onChange,
-  onRemove,
-  selectedFields,
-  testIdPrefix,
-}: ListItemProps, ref) => {
-  const [isEditing, setIsEditing] = useState(false);
+const ListItem = forwardRef<HTMLDivElement, ListItemProps>(
+  (
+    {
+      selectSize,
+      className,
+      dragHandleProps,
+      draggableProps,
+      item,
+      onChange,
+      onRemove,
+      selectedFields,
+      testIdPrefix,
+    }: ListItemProps,
+    ref,
+  ) => {
+    const [isEditing, setIsEditing] = useState(false);
 
-  const _onChange = (newFieldName: string) => {
-    onChange(newFieldName);
-    setIsEditing(false);
-  };
+    const _onChange = (newFieldName: string) => {
+      onChange(newFieldName);
+      setIsEditing(false);
+    };
 
-  return (
-    <ListItemContainer className={className} ref={ref} {...(draggableProps ?? {})}>
-      {isEditing && (
-        <EditFieldSelect id="add-field-select"
-                         onChange={_onChange}
-                         onMenuClose={() => setIsEditing(false)}
-                         autoFocus
-                         openMenuOnFocus
-                         clearable={false}
-                         size={selectSize}
-                         excludedFields={selectedFields.filter((fieldName) => fieldName !== item.id)}
-                         ariaLabel="Fields"
-                         name="add-field-select"
-                         value={item.id}
-                         aria-label={`Edit ${item.title} field`} />
-      )}
+    return (
+      <ListItemContainer className={className} ref={ref} {...(draggableProps ?? {})}>
+        {isEditing && (
+          <EditFieldSelect
+            id="add-field-select"
+            onChange={_onChange}
+            onMenuClose={() => setIsEditing(false)}
+            autoFocus
+            openMenuOnFocus
+            clearable={false}
+            size={selectSize}
+            excludedFields={selectedFields.filter((fieldName) => fieldName !== item.id)}
+            ariaLabel="Fields"
+            name="add-field-select"
+            value={item.id}
+            aria-label={`Edit ${item.title} field`}
+          />
+        )}
 
-      {!isEditing && (
-        <>
-          <DragHandle {...dragHandleProps} data-testid={`${testIdPrefix}-drag-handle`}>
-            <Icon name="bars" />
-          </DragHandle>
-          <FieldTitle>{item.title}</FieldTitle>
-          <div>
-            <IconButton name="edit" title={`Edit ${item.title} field`} onClick={() => setIsEditing(true)} />
-            <IconButton name="trash-alt" title={`Remove ${item.title} field`} onClick={onRemove} />
-          </div>
-        </>
-      )}
-    </ListItemContainer>
-  );
-});
+        {!isEditing && (
+          <>
+            <DragHandle {...dragHandleProps} data-testid={`${testIdPrefix}-drag-handle`}>
+              <Icon name="bars" />
+            </DragHandle>
+            <FieldTitle>{item.title}</FieldTitle>
+            <div>
+              <IconButton name="edit" title={`Edit ${item.title} field`} onClick={() => setIsEditing(true)} />
+              <IconButton name="trash-alt" title={`Remove ${item.title} field`} onClick={onRemove} />
+            </div>
+          </>
+        )}
+      </ListItemContainer>
+    );
+  },
+);
 
 type Props = {
-  onChange: (newSelectedFields: Array<string>) => void,
-  displayOverlayInPortal?: boolean,
-  selectedFields: Array<string>
-  testPrefix?: string,
-  selectSize?: 'normal' | 'small'
+  onChange: (newSelectedFields: Array<string>) => void;
+  displayOverlayInPortal?: boolean;
+  selectedFields: Array<string>;
+  testPrefix?: string;
+  selectSize?: 'normal' | 'small';
 };
 
 const SelectedFieldsList = ({ testPrefix, selectedFields, onChange, selectSize, displayOverlayInPortal }: Props) => {
   const fieldsForList = useMemo(() => selectedFields?.map((field) => ({ id: field, title: field })), [selectedFields]);
 
-  const onChangeField = useCallback((fieldIndex: number, newFieldName: string) => {
-    const newFields = [...selectedFields];
-    newFields[fieldIndex] = newFieldName;
+  const onChangeField = useCallback(
+    (fieldIndex: number, newFieldName: string) => {
+      const newFields = [...selectedFields];
+      newFields[fieldIndex] = newFieldName;
 
-    onChange(newFields);
-  }, [onChange, selectedFields]);
+      onChange(newFields);
+    },
+    [onChange, selectedFields],
+  );
 
-  const onRemoveField = useCallback((removedFieldName: string) => {
-    const newFields = selectedFields.filter((fieldName) => fieldName !== removedFieldName);
-    onChange(newFields);
-  }, [onChange, selectedFields]);
+  const onRemoveField = useCallback(
+    (removedFieldName: string) => {
+      const newFields = selectedFields.filter((fieldName) => fieldName !== removedFieldName);
+      onChange(newFields);
+    },
+    [onChange, selectedFields],
+  );
 
-  const SortableListItem = useCallback(({ item, index, dragHandleProps, draggableProps, className, ref }) => (
-    <ListItem onChange={(newFieldName) => onChangeField(index, newFieldName)}
-              onRemove={() => onRemoveField(item.id)}
-              selectSize={selectSize}
-              selectedFields={selectedFields ?? []}
-              item={item}
-              testIdPrefix={`${testPrefix}-field-${index}`}
-              dragHandleProps={dragHandleProps}
-              draggableProps={draggableProps}
-              className={className}
-              ref={ref} />
-  ), [selectSize, selectedFields, testPrefix, onChangeField, onRemoveField]);
+  const SortableListItem = useCallback(
+    ({ item, index, dragHandleProps, draggableProps, className, ref }) => (
+      <ListItem
+        onChange={(newFieldName) => onChangeField(index, newFieldName)}
+        onRemove={() => onRemoveField(item.id)}
+        selectSize={selectSize}
+        selectedFields={selectedFields ?? []}
+        item={item}
+        testIdPrefix={`${testPrefix}-field-${index}`}
+        dragHandleProps={dragHandleProps}
+        draggableProps={draggableProps}
+        className={className}
+        ref={ref}
+      />
+    ),
+    [selectSize, selectedFields, testPrefix, onChangeField, onRemoveField],
+  );
 
-  const onSortChange = useCallback((newFieldsList: Array<{ id: string, title: string }>) => {
-    onChange(newFieldsList.map(({ id }) => id));
-  }, [onChange]);
+  const onSortChange = useCallback(
+    (newFieldsList: Array<{ id: string; title: string }>) => {
+      onChange(newFieldsList.map(({ id }) => id));
+    },
+    [onChange],
+  );
 
   if (!selectedFields?.length) {
     return null;
   }
 
   return (
-    <SortableList items={fieldsForList}
-                  onMoveItem={onSortChange}
-                  customListItemRender={SortableListItem}
-                  displayOverlayInPortal={displayOverlayInPortal} />
+    <SortableList
+      items={fieldsForList}
+      onMoveItem={onSortChange}
+      customListItemRender={SortableListItem}
+      displayOverlayInPortal={displayOverlayInPortal}
+    />
   );
 };
 

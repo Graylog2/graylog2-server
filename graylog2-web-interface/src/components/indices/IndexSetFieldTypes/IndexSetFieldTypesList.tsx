@@ -22,12 +22,7 @@ import keyBy from 'lodash/keyBy';
 
 import useIndexSetFieldTypes from 'components/indices/IndexSetFieldTypes/hooks/useIndexSetFieldType';
 import useParams from 'routing/useParams';
-import {
-  Icon,
-  NoEntitiesExist,
-  PaginatedList, SearchForm,
-  Spinner,
-} from 'components/common';
+import { Icon, NoEntitiesExist, PaginatedList, SearchForm, Spinner } from 'components/common';
 import EntityDataTable from 'components/common/EntityDataTable';
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
 import type { Sort } from 'stores/PaginationTypes';
@@ -54,10 +49,12 @@ export const DEFAULT_LAYOUT = {
   columnsOrder: ['field_name', 'type', 'origin', 'is_reserved'],
 };
 
-const StyledIcon = styled(Icon)<{ $value: 'true' | 'false' }>(({ theme, $value }) => css`
-  color: ${$value === 'true' ? theme.colors.variant.success : theme.colors.variant.danger};
-  margin-right: 5px;
-`);
+const StyledIcon = styled(Icon)<{ $value: 'true' | 'false' }>(
+  ({ theme, $value }) => css`
+    color: ${$value === 'true' ? theme.colors.variant.success : theme.colors.variant.danger};
+    margin-right: 5px;
+  `,
+);
 const StyledTopRow = styled.div`
   margin-bottom: 5px;
   display: flex;
@@ -89,120 +86,141 @@ const IndexSetFieldTypesList = () => {
     defaultSort: DEFAULT_LAYOUT.sort,
   });
   const paginationQueryParameter = usePaginationQueryParameter(undefined, layoutConfig.pageSize, false);
-  const searchParams = useMemo(() => ({
-    query,
-    page: paginationQueryParameter.page,
-    pageSize: layoutConfig.pageSize,
-    sort: layoutConfig.sort,
-    filters: urlQueryFilters,
-  }), [paginationQueryParameter.page, layoutConfig.pageSize, layoutConfig.sort, query, urlQueryFilters]);
+  const searchParams = useMemo(
+    () => ({
+      query,
+      page: paginationQueryParameter.page,
+      pageSize: layoutConfig.pageSize,
+      sort: layoutConfig.sort,
+      filters: urlQueryFilters,
+    }),
+    [paginationQueryParameter.page, layoutConfig.pageSize, layoutConfig.sort, query, urlQueryFilters],
+  );
   const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(ENTITY_TABLE_ID);
 
-  const onPageSizeChange = useCallback((newPageSize: number) => {
-    paginationQueryParameter.resetPage();
-    updateTableLayout({ perPage: newPageSize });
-  }, [paginationQueryParameter, updateTableLayout]);
+  const onPageSizeChange = useCallback(
+    (newPageSize: number) => {
+      paginationQueryParameter.resetPage();
+      updateTableLayout({ perPage: newPageSize });
+    },
+    [paginationQueryParameter, updateTableLayout],
+  );
 
-  const onSortChange = useCallback((newSort: Sort) => {
-    paginationQueryParameter.resetPage();
-    updateTableLayout({ sort: newSort });
-  }, [paginationQueryParameter, updateTableLayout]);
+  const onSortChange = useCallback(
+    (newSort: Sort) => {
+      paginationQueryParameter.resetPage();
+      updateTableLayout({ sort: newSort });
+    },
+    [paginationQueryParameter, updateTableLayout],
+  );
 
-  const onColumnsChange = useCallback((displayedAttributes: Array<string>) => {
-    updateTableLayout({ displayedAttributes });
-  }, [updateTableLayout]);
+  const onColumnsChange = useCallback(
+    (displayedAttributes: Array<string>) => {
+      updateTableLayout({ displayedAttributes });
+    },
+    [updateTableLayout],
+  );
   const {
     isLoading,
     data: { list, pagination, attributes },
     refetch: refetchFieldTypes,
-  } = useIndexSetFieldTypes(
-    indexSetId,
-    searchParams,
-    { enabled: !isLoadingLayoutPreferences },
-  );
+  } = useIndexSetFieldTypes(indexSetId, searchParams, { enabled: !isLoadingLayoutPreferences });
 
   const customColumnRenderers = useCustomColumnRenderers(attributes);
 
-  const onSubmitCallback = useCallback((response: FieldTypePutResponse) => {
-    const newEntityFieldName = response?.[indexSetId]?.fieldName;
+  const onSubmitCallback = useCallback(
+    (response: FieldTypePutResponse) => {
+      const newEntityFieldName = response?.[indexSetId]?.fieldName;
 
-    if (newEntityFieldName && selectedEntitiesData[newEntityFieldName]) {
-      setSelectedEntitiesData({ ...selectedEntitiesData, [newEntityFieldName]: response[indexSetId] });
-    }
+      if (newEntityFieldName && selectedEntitiesData[newEntityFieldName]) {
+        setSelectedEntitiesData({ ...selectedEntitiesData, [newEntityFieldName]: response[indexSetId] });
+      }
 
-    refetchFieldTypes();
-  }, [indexSetId, refetchFieldTypes, selectedEntitiesData]);
-  const renderActions = useCallback((fieldType: IndexSetFieldType) => (
-    <FieldTypeActions fieldType={fieldType}
-                      indexSetId={indexSetId}
-                      onSubmitCallback={onSubmitCallback} />
-  ), [indexSetId, onSubmitCallback]);
-
-  const onSearch = useCallback((val: string) => {
-    paginationQueryParameter.resetPage();
-    setQuery(val);
-  }, [paginationQueryParameter, setQuery]);
-  const onSearchReset = useCallback(() => setQuery(''), [setQuery]);
-  const onChangeFilters = useCallback((newUrlQueryFilters: UrlQueryFilters) => {
-    paginationQueryParameter.resetPage();
-    setUrlQueryFilters(newUrlQueryFilters);
-  }, [paginationQueryParameter, setUrlQueryFilters]);
-
-  const bulkSection = useMemo(() => ({
-    onChangeSelection: (selectedItemsIds: Array<string>) => {
-      setSelectedEntitiesData((cur) => {
-        const selectedItemsIdsSet = new Set(selectedItemsIds);
-        const filtratedCurrentItems = pickBy(cur, (_, fieldName) => selectedItemsIdsSet.has(fieldName));
-        const filtratedCurrentEntries = list.filter(({ fieldName }) => selectedItemsIdsSet.has(fieldName));
-        const listOfCurrentEntries = keyBy(filtratedCurrentEntries, 'id');
-
-        return ({ ...filtratedCurrentItems, ...listOfCurrentEntries });
-      });
+      refetchFieldTypes();
     },
-    actions: <BulkActions indexSetId={indexSetId} selectedEntitiesData={selectedEntitiesData} />,
-    isEntitySelectable,
-  }), [indexSetId, list, selectedEntitiesData]);
+    [indexSetId, refetchFieldTypes, selectedEntitiesData],
+  );
+  const renderActions = useCallback(
+    (fieldType: IndexSetFieldType) => (
+      <FieldTypeActions fieldType={fieldType} indexSetId={indexSetId} onSubmitCallback={onSubmitCallback} />
+    ),
+    [indexSetId, onSubmitCallback],
+  );
+
+  const onSearch = useCallback(
+    (val: string) => {
+      paginationQueryParameter.resetPage();
+      setQuery(val);
+    },
+    [paginationQueryParameter, setQuery],
+  );
+  const onSearchReset = useCallback(() => setQuery(''), [setQuery]);
+  const onChangeFilters = useCallback(
+    (newUrlQueryFilters: UrlQueryFilters) => {
+      paginationQueryParameter.resetPage();
+      setUrlQueryFilters(newUrlQueryFilters);
+    },
+    [paginationQueryParameter, setUrlQueryFilters],
+  );
+
+  const bulkSection = useMemo(
+    () => ({
+      onChangeSelection: (selectedItemsIds: Array<string>) => {
+        setSelectedEntitiesData((cur) => {
+          const selectedItemsIdsSet = new Set(selectedItemsIds);
+          const filtratedCurrentItems = pickBy(cur, (_, fieldName) => selectedItemsIdsSet.has(fieldName));
+          const filtratedCurrentEntries = list.filter(({ fieldName }) => selectedItemsIdsSet.has(fieldName));
+          const listOfCurrentEntries = keyBy(filtratedCurrentEntries, 'id');
+
+          return { ...filtratedCurrentItems, ...listOfCurrentEntries };
+        });
+      },
+      actions: <BulkActions indexSetId={indexSetId} selectedEntitiesData={selectedEntitiesData} />,
+      isEntitySelectable,
+    }),
+    [indexSetId, list, selectedEntitiesData],
+  );
 
   if (isLoadingLayoutPreferences || isLoading) {
     return <Spinner />;
   }
 
   return (
-    <PaginatedList totalItems={pagination?.total}
-                   pageSize={layoutConfig.pageSize}
-                   showPageSizeSelect={false}>
+    <PaginatedList totalItems={pagination?.total} pageSize={layoutConfig.pageSize} showPageSizeSelect={false}>
       <StyledTopRow>
-        <SearchForm onSearch={onSearch}
-                    onReset={onSearchReset}
-                    query={query}
-                    placeholder="Enter search query for the field name...">
-          <EntityFilters attributes={attributes}
-                         urlQueryFilters={urlQueryFilters}
-                         setUrlQueryFilters={onChangeFilters}
-                         filterValueRenderers={FilterValueRenderers} />
+        <SearchForm
+          onSearch={onSearch}
+          onReset={onSearchReset}
+          query={query}
+          placeholder="Enter search query for the field name..."
+        >
+          <EntityFilters
+            attributes={attributes}
+            urlQueryFilters={urlQueryFilters}
+            setUrlQueryFilters={onChangeFilters}
+            filterValueRenderers={FilterValueRenderers}
+          />
         </SearchForm>
         <IndexSetProfile />
       </StyledTopRow>
-      {pagination?.total === 0 && (
-        <NoEntitiesExist>
-          No fields have been found.
-        </NoEntitiesExist>
-      )}
+      {pagination?.total === 0 && <NoEntitiesExist>No fields have been found.</NoEntitiesExist>}
       {!!list?.length && (
-        <EntityDataTable<IndexSetFieldType> data={list}
-                                            visibleColumns={layoutConfig.displayedAttributes}
-                                            columnsOrder={DEFAULT_LAYOUT.columnsOrder}
-                                            onColumnsChange={onColumnsChange}
-                                            onSortChange={onSortChange}
-                                            activeSort={layoutConfig.sort}
-                                            pageSize={searchParams.pageSize}
-                                            onPageSizeChange={onPageSizeChange}
-                                            actionsCellWidth={120}
-                                            columnRenderers={customColumnRenderers}
-                                            columnDefinitions={attributes}
-                                            rowActions={renderActions}
-                                            expandedSectionsRenderer={expandedSections}
-                                            bulkSelection={bulkSection} />
+        <EntityDataTable<IndexSetFieldType>
+          data={list}
+          visibleColumns={layoutConfig.displayedAttributes}
+          columnsOrder={DEFAULT_LAYOUT.columnsOrder}
+          onColumnsChange={onColumnsChange}
+          onSortChange={onSortChange}
+          activeSort={layoutConfig.sort}
+          pageSize={searchParams.pageSize}
+          onPageSizeChange={onPageSizeChange}
+          actionsCellWidth={120}
+          columnRenderers={customColumnRenderers}
+          columnDefinitions={attributes}
+          rowActions={renderActions}
+          expandedSectionsRenderer={expandedSections}
+          bulkSelection={bulkSection}
+        />
       )}
     </PaginatedList>
   );

@@ -25,14 +25,14 @@ import DocsHelper from 'util/DocsHelper';
 const SidecarNewCollectorPage = () => (
   <DocumentTitle title="New Log Collector">
     <SidecarsPageNavigation />
-    <PageHeader title="New Log Collector"
-                documentationLink={{
-                  title: 'Sidecar documentation',
-                  path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
-                }}>
-      <span>
-        Some words about log collectors.
-      </span>
+    <PageHeader
+      title="New Log Collector"
+      documentationLink={{
+        title: 'Sidecar documentation',
+        path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
+      }}
+    >
+      <span>Some words about log collectors.</span>
     </PageHeader>
 
     <Row className="content">

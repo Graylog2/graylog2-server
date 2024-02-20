@@ -56,33 +56,37 @@ const AggregationConditions = () => {
   const { aggregations } = useAlertAndEventDefinitionData();
   const highlightingRules = useHighlightingRules();
 
-  const aggregationsMap = useMemo(() => new Map(aggregations.map((agg) => [
-    `${agg.fnSeries}${agg.expr}${agg.value}`, agg,
-  ])), [aggregations]);
+  const aggregationsMap = useMemo(
+    () => new Map(aggregations.map((agg) => [`${agg.fnSeries}${agg.expr}${agg.value}`, agg])),
+    [aggregations],
+  );
 
-  const changeColor = useCallback(({ rule, newColor, condition }) => {
-    if (rule) {
-      dispatch(updateHighlightingRule(rule, { color: StaticColor.create(newColor) }));
-    } else {
-      const { value, fnSeries, expr } = aggregationsMap.get(condition);
+  const changeColor = useCallback(
+    ({ rule, newColor, condition }) => {
+      if (rule) {
+        dispatch(updateHighlightingRule(rule, { color: StaticColor.create(newColor) }));
+      } else {
+        const { value, fnSeries, expr } = aggregationsMap.get(condition);
 
-      dispatch(createHighlightingRules([
-        {
-          value,
-          field: fnSeries,
-          color: randomColor(),
-          condition: exprToConditionMapper[expr],
-        },
-      ]));
-    }
-  }, [aggregationsMap, dispatch]);
+        dispatch(
+          createHighlightingRules([
+            {
+              value,
+              field: fnSeries,
+              color: randomColor(),
+              condition: exprToConditionMapper[expr],
+            },
+          ]),
+        );
+      }
+    },
+    [aggregationsMap, dispatch],
+  );
 
   const highlightedAggregations = useMemo<Map<string, HighlightingRule>>(() => {
-    const initial = new Map<string, HighlightingRule>(aggregations.map(
-      ({ fnSeries, value, expr }) => [
-        `${fnSeries}${expr}${value}`, undefined,
-      ],
-    ));
+    const initial = new Map<string, HighlightingRule>(
+      aggregations.map(({ fnSeries, value, expr }) => [`${fnSeries}${expr}${value}`, undefined]),
+    );
 
     return highlightingRules.reduce((acc, rule) => {
       const { field, value, condition } = rule;
@@ -109,25 +113,29 @@ const AggregationConditions = () => {
 
         return (
           <Condition title={condition} key={condition}>
-            <ColorPickerPopover id="formatting-rule-color"
-                                placement="right"
-                                color={hexColor}
-                                colors={DEFAULT_CUSTOM_HIGHLIGHT_RANGE.map((c) => [c])}
-                                triggerNode={(
-                                  <ColorComponent style={{ backgroundColor: hexColor }}>
-                                    {!hexColor && <Icon name="fill-drip" size="xs" />}
-                                  </ColorComponent>
-                                )}
-                                onChange={(newColor, _, hidePopover) => {
-                                  hidePopover();
-                                  changeColor({ newColor, rule, condition });
-                                }} />
+            <ColorPickerPopover
+              id="formatting-rule-color"
+              placement="right"
+              color={hexColor}
+              colors={DEFAULT_CUSTOM_HIGHLIGHT_RANGE.map((c) => [c])}
+              triggerNode={
+                <ColorComponent style={{ backgroundColor: hexColor }}>
+                  {!hexColor && <Icon name="fill-drip" size="xs" />}
+                </ColorComponent>
+              }
+              onChange={(newColor, _, hidePopover) => {
+                hidePopover();
+                changeColor({ newColor, rule, condition });
+              }}
+            />
             <span>{condition}</span>
           </Condition>
         );
       })}
     </List>
-  ) : <NoAttributeProvided name="Aggregation conditions" />;
+  ) : (
+    <NoAttributeProvided name="Aggregation conditions" />
+  );
 };
 
 export default AggregationConditions;

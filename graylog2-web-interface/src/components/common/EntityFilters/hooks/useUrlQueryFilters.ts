@@ -23,19 +23,26 @@ import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 const useUrlQueryFilters = (): [UrlQueryFilters, (filters: UrlQueryFilters) => void] => {
   const [pureUrlQueryFilters, setPureUrlQueryFilters] = useQueryParam('filters', ArrayParam);
 
-  const filtersFromQuery = useMemo(() => (pureUrlQueryFilters ?? []).reduce((col, filter) => {
-    const [attributeId, filterValue] = filter.split(/=(.*)/);
+  const filtersFromQuery = useMemo(
+    () =>
+      (pureUrlQueryFilters ?? []).reduce((col, filter) => {
+        const [attributeId, filterValue] = filter.split(/=(.*)/);
 
-    return col.set(attributeId, [...(col.get(attributeId) ?? []), filterValue]);
-  }, OrderedMap<string, Array<string>>()), [pureUrlQueryFilters]);
+        return col.set(attributeId, [...(col.get(attributeId) ?? []), filterValue]);
+      }, OrderedMap<string, Array<string>>()),
+    [pureUrlQueryFilters],
+  );
 
-  const setFilterValues = useCallback((newFilters: UrlQueryFilters) => {
-    const newPureUrlQueryFilters = newFilters.entrySeq().reduce((col, [attributeId, filters]) => (
-      [...col, ...filters.map((value) => `${attributeId}=${value}`)]
-    ), []);
+  const setFilterValues = useCallback(
+    (newFilters: UrlQueryFilters) => {
+      const newPureUrlQueryFilters = newFilters
+        .entrySeq()
+        .reduce((col, [attributeId, filters]) => [...col, ...filters.map((value) => `${attributeId}=${value}`)], []);
 
-    setPureUrlQueryFilters(newPureUrlQueryFilters);
-  }, [setPureUrlQueryFilters]);
+      setPureUrlQueryFilters(newPureUrlQueryFilters);
+    },
+    [setPureUrlQueryFilters],
+  );
 
   return [filtersFromQuery, setFilterValues];
 };

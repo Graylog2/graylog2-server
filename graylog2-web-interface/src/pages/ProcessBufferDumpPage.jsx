@@ -45,8 +45,9 @@ const ProcessBufferDumpPage = createReactClass({
   componentDidMount() {
     const { params } = this.props;
 
-    ClusterOverviewStore.processbufferDump(params.nodeId)
-      .then((processbufferDump) => this.setState({ processbufferDump: processbufferDump }));
+    ClusterOverviewStore.processbufferDump(params.nodeId).then((processbufferDump) =>
+      this.setState({ processbufferDump: processbufferDump }),
+    );
   },
 
   _isLoading() {
@@ -64,20 +65,24 @@ const ProcessBufferDumpPage = createReactClass({
       <span>
         Process-buffer dump of node {node.short_node_id} / {node.hostname}
         &nbsp;
-        <small>Taken at <Timestamp dateTime={new Date()} /> </small>
+        <small>
+          Taken at <Timestamp dateTime={new Date()} />{' '}
+        </small>
       </span>
     );
 
-    const content = processbufferDump ? <pre className="processbufferdump">{JSON.stringify(processbufferDump, null, 2)}</pre> : <Spinner />;
+    const content = processbufferDump ? (
+      <pre className="processbufferdump">{JSON.stringify(processbufferDump, null, 2)}</pre>
+    ) : (
+      <Spinner />
+    );
 
     return (
       <DocumentTitle title={`Process-buffer dump of node ${node.short_node_id} / ${node.hostname}`}>
         <div>
           <PageHeader title={title} />
           <Row className="content">
-            <Col md={12}>
-              {content}
-            </Col>
+            <Col md={12}>{content}</Col>
           </Row>
         </div>
       </DocumentTitle>

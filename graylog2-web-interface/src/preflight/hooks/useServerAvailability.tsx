@@ -20,16 +20,10 @@ import { useQuery } from '@tanstack/react-query';
 import { qualifyUrl } from 'util/URLUtils';
 import { Builder } from 'logic/rest/FetchProvider';
 
-const fetchServerAvailability = () => new Builder('GET', qualifyUrl('/api'))
-  .json()
-  .build();
+const fetchServerAvailability = () => new Builder('GET', qualifyUrl('/api')).json().build();
 
 const useServerAvailability = () => {
-  const { data } = useQuery(
-    ['server-availability'],
-    fetchServerAvailability,
-    { refetchInterval: 2000 },
-  );
+  const { data } = useQuery(['server-availability'], fetchServerAvailability, { refetchInterval: 2000 });
 
   return { data: !!data };
 };

@@ -23,17 +23,11 @@ import type { AppDispatch } from 'stores/useAppDispatch';
 import { addWidget } from 'views/logic/slices/widgetActions';
 
 export const CreateMessageCount = () => {
-  const series = Series.forFunction('count()')
-    .toBuilder()
-    .config(new SeriesConfig('Message Count'))
-    .build();
+  const series = Series.forFunction('count()').toBuilder().config(new SeriesConfig('Message Count')).build();
 
   return AggregationWidget.builder()
     .newId()
-    .config(AggregationWidgetConfig.builder()
-      .series([series])
-      .visualization(NumberVisualization.type)
-      .build())
+    .config(AggregationWidgetConfig.builder().series([series]).visualization(NumberVisualization.type).build())
     .build();
 };
 

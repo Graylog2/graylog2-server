@@ -23,14 +23,14 @@ import type { IconName } from 'components/common/Icon';
 import Icon from './Icon';
 import Delayed from './Delayed';
 
-const StyledIcon = styled(Icon)<{ $displayMargin: boolean }>(({ $displayMargin }) => (
-  $displayMargin ? 'margin-right: 6px;' : ''
-));
+const StyledIcon = styled(Icon)<{ $displayMargin: boolean }>(({ $displayMargin }) =>
+  $displayMargin ? 'margin-right: 6px;' : '',
+);
 
 type Props = {
-  delay?: number,
-  name?: IconName,
-  text?: string,
+  delay?: number;
+  name?: IconName;
+  text?: string;
 };
 
 /**
@@ -38,7 +38,8 @@ type Props = {
  */
 const Spinner = ({ name, text, delay, ...rest }: Props) => (
   <Delayed delay={delay}>
-    <StyledIcon {...rest} name={name} $displayMargin={!!text?.trim()} spin />{text}
+    <StyledIcon {...rest} name={name} $displayMargin={!!text?.trim()} spin />
+    {text}
   </Delayed>
 );
 

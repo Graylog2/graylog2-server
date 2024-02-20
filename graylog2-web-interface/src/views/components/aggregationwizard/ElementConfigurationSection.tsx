@@ -19,92 +19,105 @@ import styled, { css } from 'styled-components';
 
 import IconButton from 'components/common/IconButton';
 
-const Wrapper = styled.div(({ theme }) => css`
-  border-radius: 6px;
-  margin-bottom: 6px;
+const Wrapper = styled.div(
+  ({ theme }) => css`
+    border-radius: 6px;
+    margin-bottom: 6px;
 
-  &:last-child {
-    margin-bottom: 0;
-  }
+    &:last-child {
+      margin-bottom: 0;
+    }
 
-  div[class^='col-'] {
-    padding-right: 0;
-    padding-left: 0;
-  }
+    div[class^='col-'] {
+      padding-right: 0;
+      padding-left: 0;
+    }
 
-  input {
-    font-size: ${theme.fonts.size.body};
-  }
+    input {
+      font-size: ${theme.fonts.size.body};
+    }
 
-  .form-group {
-    margin: 0 0 3px;
-  }
+    .form-group {
+      margin: 0 0 3px;
+    }
 
-  .control-label {
-    padding-left: 0;
-    padding-right: 5px;
-    padding-top: 5px;
-    font-weight: normal;
-    text-align: left;
-    hyphens: auto;
-  }
+    .control-label {
+      padding-left: 0;
+      padding-right: 5px;
+      padding-top: 5px;
+      font-weight: normal;
+      text-align: left;
+      hyphens: auto;
+    }
 
-  .help-block {
-    margin: 0;
-    hyphens: auto;
-  }
+    .help-block {
+      margin: 0;
+      hyphens: auto;
+    }
 
-  .checkbox {
-    min-height: auto;
-  }
-`);
+    .checkbox {
+      min-height: auto;
+    }
+  `,
+);
 
-const Header = styled.div<{ $isEmpty: boolean }>(({ theme, $isEmpty }) => css`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1px;
-  min-height: 26px;
-  font-weight: bold;
-  background-color: ${theme.colors.global.contentBackground};
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  
-  &::before {
-    content: ' ';
-    top: 50%;
-    width: 100%;
-    border-bottom: 1px solid ${$isEmpty ? theme.colors.gray['70'] : theme.utils.contrastingColor(theme.colors.global.contentBackground, 'AA')};
-    position: absolute;
-  }
-`);
+const Header = styled.div<{ $isEmpty: boolean }>(
+  ({ theme, $isEmpty }) => css`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1px;
+    min-height: 26px;
+    font-weight: bold;
+    background-color: ${theme.colors.global.contentBackground};
+    position: sticky;
+    top: 0;
+    z-index: 1;
 
-const ElementTitle = styled.div<{ $isEmpty: boolean }>(({ theme, $isEmpty }) => css`
-  background-color: ${theme.colors.global.contentBackground};
-  color: ${$isEmpty ? theme.colors.gray['70'] : theme.colors.global.textDefault};
-  z-index: 1;
-  padding-right: 8px;
-`);
+    &::before {
+      content: ' ';
+      top: 50%;
+      width: 100%;
+      border-bottom: 1px solid
+        ${$isEmpty
+          ? theme.colors.gray['70']
+          : theme.utils.contrastingColor(theme.colors.global.contentBackground, 'AA')};
+      position: absolute;
+    }
+  `,
+);
 
-const ElementActions = styled.div(({ theme }) => css`
-  background-color: ${theme.colors.global.contentBackground};
-  z-index: 1;
-  padding-left: 5px;
-`);
+const ElementTitle = styled.div<{ $isEmpty: boolean }>(
+  ({ theme, $isEmpty }) => css`
+    background-color: ${theme.colors.global.contentBackground};
+    color: ${$isEmpty ? theme.colors.gray['70'] : theme.colors.global.textDefault};
+    z-index: 1;
+    padding-right: 8px;
+  `,
+);
 
-const StyledIconButton = styled(IconButton)(({ theme }) => `
+const ElementActions = styled.div(
+  ({ theme }) => css`
+    background-color: ${theme.colors.global.contentBackground};
+    z-index: 1;
+    padding-left: 5px;
+  `,
+);
+
+const StyledIconButton = styled(IconButton)(
+  ({ theme }) => `
   color: ${theme.colors.global.textDefault};
-`);
+`,
+);
 
 type Props = {
-  allowCreate: boolean,
-  children: React.ReactNode,
-  elementTitle: string,
-  onCreate: () => void,
-  sectionTitle?: string,
-  isEmpty?: boolean,
-}
+  allowCreate: boolean;
+  children: React.ReactNode;
+  elementTitle: string;
+  onCreate: () => void;
+  sectionTitle?: string;
+  isEmpty?: boolean;
+};
 
 const ElementConfigurationSection = ({
   allowCreate,
@@ -119,18 +132,12 @@ const ElementConfigurationSection = ({
   return (
     <Wrapper data-testid={`${title}-section`}>
       <Header $isEmpty={isEmpty}>
-        <ElementTitle $isEmpty={isEmpty}>
-          {title}
-        </ElementTitle>
+        <ElementTitle $isEmpty={isEmpty}>{title}</ElementTitle>
         <ElementActions>
-          {allowCreate && (
-            <StyledIconButton title={`Add a ${elementTitle}`} name="plus" onClick={onCreate} />
-          )}
+          {allowCreate && <StyledIconButton title={`Add a ${elementTitle}`} name="plus" onClick={onCreate} />}
         </ElementActions>
       </Header>
-      <div>
-        {children}
-      </div>
+      <div>{children}</div>
     </Wrapper>
   );
 };

@@ -27,12 +27,11 @@ import type {
   ActionDefinition,
   ActionHandlerArguments,
   ExternalLinkAction,
-  HandlerAction, SetActionComponents, ActionComponents,
+  HandlerAction,
+  SetActionComponents,
+  ActionComponents,
 } from 'views/components/actions/ActionHandler';
-import {
-  createHandlerFor,
-  isExternalLinkAction,
-} from 'views/components/actions/ActionHandler';
+import { createHandlerFor, isExternalLinkAction } from 'views/components/actions/ActionHandler';
 import HoverForHelp from 'components/common/HoverForHelp';
 import useAppDispatch from 'stores/useAppDispatch';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -48,24 +47,26 @@ const StyledMenuItem: typeof MenuItem = styled(MenuItem)`
   }
 `;
 
-const ExternalLinkIcon = styled(Icon)(({ theme }) => `
+const ExternalLinkIcon = styled(Icon)(
+  ({ theme }) => `
   margin-left: ${theme.spacings.xxs};
-`);
+`,
+);
 
 type Props = {
-  action: ActionDefinition,
-  handlerArgs: ActionHandlerArguments,
-  onMenuToggle: () => void,
-  overflowingComponents: ActionComponents,
-  setOverflowingComponents: (components: ActionComponents) => void,
-  type: 'field' | 'value',
-}
+  action: ActionDefinition;
+  handlerArgs: ActionHandlerArguments;
+  onMenuToggle: () => void;
+  overflowingComponents: ActionComponents;
+  setOverflowingComponents: (components: ActionComponents) => void;
+  type: 'field' | 'value';
+};
 
 const StyledHoverForHelp = styled((props) => <HoverForHelp {...props} />)`
   margin-left: 5px;
 `;
 
-const ActionTitle = ({ action, handlerArgs }: { action: ActionDefinition, handlerArgs: ActionHandlerArguments }) => {
+const ActionTitle = ({ action, handlerArgs }: { action: ActionDefinition; handlerArgs: ActionHandlerArguments }) => {
   if (action.help) {
     const help = action.help(handlerArgs);
 
@@ -88,10 +89,10 @@ const ActionTitle = ({ action, handlerArgs }: { action: ActionDefinition, handle
 };
 
 type ExternalLinkItemProps = Pick<Props, 'handlerArgs' | 'onMenuToggle' | 'type'> & {
-  action: ExternalLinkAction<ActionContexts>,
-  disabled: boolean,
-  field: string,
-}
+  action: ExternalLinkAction<ActionContexts>;
+  disabled: boolean;
+  field: string;
+};
 
 const ExternalLinkItem = ({ action, disabled, field, handlerArgs, onMenuToggle, type }: ExternalLinkItemProps) => {
   const { unsetWidgetFocusing } = useContext(WidgetFocusContext);
@@ -113,22 +114,20 @@ const ExternalLinkItem = ({ action, disabled, field, handlerArgs, onMenuToggle, 
   }, [action, onMenuToggle, unsetWidgetFocusing]);
 
   return (
-    <StyledMenuItem disabled={disabled}
-                    eventKey={{ action: type, field }}
-                    onSelect={onSelect}
-                    {...linkProps}>
+    <StyledMenuItem disabled={disabled} eventKey={{ action: type, field }} onSelect={onSelect} {...linkProps}>
       <ActionTitle action={action} handlerArgs={handlerArgs} />
       <ExternalLinkIcon name="external-link" />
     </StyledMenuItem>
   );
 };
 
-type ActionHandlerItemProps =
-  Pick<Props, 'handlerArgs' | 'onMenuToggle' | 'overflowingComponents' | 'setOverflowingComponents' | 'type'>
-  & {
-  action: HandlerAction<ActionContexts>,
-  disabled: boolean,
-  field: string,
+type ActionHandlerItemProps = Pick<
+  Props,
+  'handlerArgs' | 'onMenuToggle' | 'overflowingComponents' | 'setOverflowingComponents' | 'type'
+> & {
+  action: HandlerAction<ActionContexts>;
+  disabled: boolean;
+  field: string;
 };
 
 const ActionHandlerItem = ({
@@ -145,11 +144,17 @@ const ActionHandlerItem = ({
   const location = useLocation();
   const sendTelemetry = useSendTelemetry();
 
-  const setActionComponents: SetActionComponents = useCallback((fn) => {
-    setOverflowingComponents(fn(overflowingComponents));
-  }, [overflowingComponents, setOverflowingComponents]);
+  const setActionComponents: SetActionComponents = useCallback(
+    (fn) => {
+      setOverflowingComponents(fn(overflowingComponents));
+    },
+    [overflowingComponents, setOverflowingComponents],
+  );
 
-  const handler = useMemo(() => createHandlerFor(dispatch, action, setActionComponents), [action, dispatch, setActionComponents]);
+  const handler = useMemo(
+    () => createHandlerFor(dispatch, action, setActionComponents),
+    [action, dispatch, setActionComponents],
+  );
 
   const onSelect = useCallback(() => {
     const { resetFocus = false, title } = action;
@@ -172,9 +177,7 @@ const ActionHandlerItem = ({
   const { field } = handlerArgs;
 
   return (
-    <StyledMenuItem disabled={disabled}
-                    eventKey={{ action: type, field }}
-                    onSelect={onSelect}>
+    <StyledMenuItem disabled={disabled} eventKey={{ action: type, field }} onSelect={onSelect}>
       <ActionTitle action={action} handlerArgs={handlerArgs} />
     </StyledMenuItem>
   );
@@ -195,24 +198,28 @@ const ActionMenuItem = ({
 
   if (isExternalLinkAction(action)) {
     return (
-      <ExternalLinkItem action={action}
-                        disabled={actionDisabled}
-                        field={field}
-                        handlerArgs={handlerArgs}
-                        onMenuToggle={onMenuToggle}
-                        type={type} />
+      <ExternalLinkItem
+        action={action}
+        disabled={actionDisabled}
+        field={field}
+        handlerArgs={handlerArgs}
+        onMenuToggle={onMenuToggle}
+        type={type}
+      />
     );
   }
 
   return (
-    <ActionHandlerItem action={action}
-                       disabled={actionDisabled}
-                       field={field}
-                       handlerArgs={handlerArgs}
-                       onMenuToggle={onMenuToggle}
-                       overflowingComponents={overflowingComponents}
-                       setOverflowingComponents={setOverflowingComponents}
-                       type={type} />
+    <ActionHandlerItem
+      action={action}
+      disabled={actionDisabled}
+      field={field}
+      handlerArgs={handlerArgs}
+      onMenuToggle={onMenuToggle}
+      overflowingComponents={overflowingComponents}
+      setOverflowingComponents={setOverflowingComponents}
+      type={type}
+    />
   );
 };
 

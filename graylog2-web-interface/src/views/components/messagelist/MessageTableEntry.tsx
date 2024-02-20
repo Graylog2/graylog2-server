@@ -45,23 +45,29 @@ import CustomHighlighting from '../highlighting/CustomHighlighting';
 import TypeSpecificValue from '../TypeSpecificValue';
 import HighlightMessageContext from '../contexts/HighlightMessageContext';
 
-export const TableBody = styled.tbody<{ $expanded?: boolean, $highlighted?: boolean }>(({
-  $expanded,
-  $highlighted,
-  theme,
-}) => `
+export const TableBody = styled.tbody<{ $expanded?: boolean; $highlighted?: boolean }>(
+  ({ $expanded, $highlighted, theme }) => `
   && {
     border-top: 0;
 
-    ${$expanded ? css`
-  border-left: 7px solid ${theme.colors.variant.light.info};
-` : ''}
+    ${
+      $expanded
+        ? css`
+            border-left: 7px solid ${theme.colors.variant.light.info};
+          `
+        : ''
+    }
 
-    ${$highlighted ? css`
-  border-left: 7px solid ${theme.colors.variant.light.success};
-` : ''}
+    ${
+      $highlighted
+        ? css`
+            border-left: 7px solid ${theme.colors.variant.light.success};
+          `
+        : ''
+    }
   }
-`);
+`,
+);
 
 const FieldsRow = styled.tr`
   cursor: pointer;
@@ -93,25 +99,33 @@ const MessageDetailRow = styled.tr`
 `;
 
 type Props = {
-  config: MessagesWidgetConfig,
-  disableSurroundingSearch?: boolean,
-  expandAllRenderAsync: boolean,
-  expanded: boolean,
-  fields: FieldTypeMappingsList,
-  message: Message,
-  selectedFields?: Immutable.OrderedSet<string>,
-  showMessageRow?: boolean,
-  toggleDetail: (string) => void,
+  config: MessagesWidgetConfig;
+  disableSurroundingSearch?: boolean;
+  expandAllRenderAsync: boolean;
+  expanded: boolean;
+  fields: FieldTypeMappingsList;
+  message: Message;
+  selectedFields?: Immutable.OrderedSet<string>;
+  showMessageRow?: boolean;
+  toggleDetail: (string) => void;
 };
 
-const isDecoratedField = (field, decorationStats) => decorationStats
-  && (decorationStats.added_fields[field] !== undefined || decorationStats.changed_fields[field] !== undefined);
+const isDecoratedField = (field, decorationStats) =>
+  decorationStats &&
+  (decorationStats.added_fields[field] !== undefined || decorationStats.changed_fields[field] !== undefined);
 
-const fieldType = (fieldName, { decoration_stats: decorationStats }: {
-  decoration_stats?: any
-}, fields) => (isDecoratedField(fieldName, decorationStats)
-  ? FieldType.Decorated
-  : ((fields && fields.find((f) => f.name === fieldName)) || { type: FieldType.Unknown }).type);
+const fieldType = (
+  fieldName,
+  {
+    decoration_stats: decorationStats,
+  }: {
+    decoration_stats?: any;
+  },
+  fields,
+) =>
+  isDecoratedField(fieldName, decorationStats)
+    ? FieldType.Decorated
+    : ((fields && fields.find((f) => f.name === fieldName)) || { type: FieldType.Unknown }).type;
 
 const _renderStrong = (children, strong = false) => {
   if (strong) {
@@ -166,13 +180,19 @@ const MessageTableEntry = ({
             const type = fieldType(selectedFieldName, message, fields);
 
             return (
-              <TableDataCell $isNumeric={type.isNumeric()} key={selectedFieldName} data-testid={`message-summary-field-${selectedFieldName}`}>
+              <TableDataCell
+                $isNumeric={type.isNumeric()}
+                key={selectedFieldName}
+                data-testid={`message-summary-field-${selectedFieldName}`}
+              >
                 {_renderStrong(
                   <CustomHighlighting field={selectedFieldName} value={message.fields[selectedFieldName]}>
-                    <TypeSpecificValue value={message.fields[selectedFieldName]}
-                                       field={selectedFieldName}
-                                       type={type}
-                                       render={DecoratedValue} />
+                    <TypeSpecificValue
+                      value={message.fields[selectedFieldName]}
+                      field={selectedFieldName}
+                      type={type}
+                      render={DecoratedValue}
+                    />
                   </CustomHighlighting>,
                   idx === 0,
                 )}
@@ -181,24 +201,28 @@ const MessageTableEntry = ({
           })}
         </FieldsRow>
 
-        <MessagePreview showMessageRow={showMessageRow}
-                        config={config}
-                        colSpanFixup={colSpanFixup}
-                        messageFieldType={fieldType(MESSAGE_FIELD, message, fields)}
-                        onRowClick={_toggleDetail}
-                        message={message} />
+        <MessagePreview
+          showMessageRow={showMessageRow}
+          config={config}
+          colSpanFixup={colSpanFixup}
+          messageFieldType={fieldType(MESSAGE_FIELD, message, fields)}
+          onRowClick={_toggleDetail}
+          message={message}
+        />
 
         {expanded && (
           <MessageDetailRow>
             {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
             <td colSpan={colSpanFixup}>
-              <MessageDetail message={message}
-                             fields={fields}
-                             streams={streams}
-                             allStreams={allStreams}
-                             inputs={inputs}
-                             disableSurroundingSearch={disableSurroundingSearch}
-                             expandAllRenderAsync={expandAllRenderAsync} />
+              <MessageDetail
+                message={message}
+                fields={fields}
+                streams={streams}
+                allStreams={allStreams}
+                inputs={inputs}
+                disableSurroundingSearch={disableSurroundingSearch}
+                expandAllRenderAsync={expandAllRenderAsync}
+              />
             </td>
           </MessageDetailRow>
         )}

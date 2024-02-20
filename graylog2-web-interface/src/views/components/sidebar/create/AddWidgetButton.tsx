@@ -52,42 +52,42 @@ const CreateButton = styled(Button)`
 `;
 
 type Props = {
-  onClick: () => void,
-  sendTelemetry: (eventType: TelemetryEventType | EventType, event: TelemetryEvent) => void,
-  location: Location
+  onClick: () => void;
+  sendTelemetry: (eventType: TelemetryEventType | EventType, event: TelemetryEvent) => void;
+  location: Location;
 };
 
 type State = {
-  overflowingComponents: { [key: string]: React.ReactNode },
+  overflowingComponents: { [key: string]: React.ReactNode };
 };
 
 export type CreatorProps = {
-  view: View,
+  view: View;
 };
 type CreatorType = 'preset' | 'generic';
 type CreatorFunction = () => (dispatch: AppDispatch, getState: GetState) => unknown;
 
 type FunctionalCreator = {
-  func: CreatorFunction,
-  title: string,
-  type: CreatorType,
-  condition?: () => boolean,
+  func: CreatorFunction;
+  title: string;
+  type: CreatorType;
+  condition?: () => boolean;
 };
 
 type CreatorComponentProps = {
-  onClose: () => void,
+  onClose: () => void;
 };
 
 type ComponentCreator = {
-  component: React.ComponentType<CreatorComponentProps>,
-  condition?: () => boolean,
-  title: string,
-  type: CreatorType,
+  component: React.ComponentType<CreatorComponentProps>;
+  condition?: () => boolean;
+  title: string;
+  type: CreatorType;
 };
 
 export type Creator = ComponentCreator | FunctionalCreator;
 
-export const isCreatorFunc = (creator: Creator): creator is FunctionalCreator => ('func' in creator);
+export const isCreatorFunc = (creator: Creator): creator is FunctionalCreator => 'func' in creator;
 
 const WithDispatch = ({ children }: { children: (dispatch: AppDispatch) => JSX.Element }) => {
   const dispatch = useAppDispatch();
@@ -104,7 +104,7 @@ class AddWidgetButton extends React.Component<Props, State> {
     };
   }
 
-  _createHandlerFor = (dispatch: AppDispatch, creator: Creator): () => void => {
+  _createHandlerFor = (dispatch: AppDispatch, creator: Creator): (() => void) => {
     const { onClick, sendTelemetry, location } = this.props;
 
     if (isCreatorFunc(creator)) {
@@ -128,15 +128,16 @@ class AddWidgetButton extends React.Component<Props, State> {
 
       return () => {
         const id = generateId();
-        const onClose = () => this.setState((state) => {
-          const { overflowingComponents } = state;
+        const onClose = () =>
+          this.setState((state) => {
+            const { overflowingComponents } = state;
 
-          delete overflowingComponents[id];
+            delete overflowingComponents[id];
 
-          onClick();
+            onClick();
 
-          return { overflowingComponents };
-        });
+            return { overflowingComponents };
+          });
         const renderedComponent = <CreatorComponent key={creator.title} onClose={onClose} />;
 
         this.setState((state) => {
@@ -158,9 +159,7 @@ class AddWidgetButton extends React.Component<Props, State> {
     return (
       <WithDispatch key={creator.title}>
         {(dispatch) => (
-          <CreateButton key={creator.title}
-                        onClick={this._createHandlerFor(dispatch, creator)}
-                        disabled={disabled}>
+          <CreateButton key={creator.title} onClick={this._createHandlerFor(dispatch, creator)} disabled={disabled}>
             {creator.title}
           </CreateButton>
         )}
@@ -169,7 +168,7 @@ class AddWidgetButton extends React.Component<Props, State> {
   };
 
   _createGroup = (creators: Array<Creator>, type: 'preset' | 'generic'): React.ReactNode => {
-    const typeCreators = creators.filter((c) => (c.type === type));
+    const typeCreators = creators.filter((c) => c.type === type);
     const sortedCreators = sortBy(typeCreators, 'title');
 
     return sortedCreators.map(this._createMenuItem);
@@ -184,8 +183,9 @@ class AddWidgetButton extends React.Component<Props, State> {
 
     return (
       <>
-        <SectionInfo>Use the following options to add an aggregation, log view (enterprise feature) or parameters
-          (enterprise feature) to your search.
+        <SectionInfo>
+          Use the following options to add an aggregation, log view (enterprise feature) or parameters (enterprise
+          feature) to your search.
         </SectionInfo>
         <Group>
           <SectionSubheadline>Generic</SectionSubheadline>

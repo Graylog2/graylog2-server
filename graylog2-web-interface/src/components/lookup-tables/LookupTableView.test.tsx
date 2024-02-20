@@ -18,11 +18,7 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import { mount } from 'wrappedEnzyme';
 
-import {
-  createLookupTable,
-  createLookupTableCache,
-  createLookupTableAdapter,
-} from 'fixtures/lookupTables';
+import { createLookupTable, createLookupTableCache, createLookupTableAdapter } from 'fixtures/lookupTables';
 import { asMock } from 'helpers/mocking';
 import useScopePermissions from 'hooks/useScopePermissions';
 import type { GenericEntityType } from 'logic/lookup-tables/types';
@@ -49,19 +45,17 @@ const mountLUT = (scope: string) => {
 
 describe('LookupTableView', () => {
   beforeAll(() => {
-    asMock(useScopePermissions).mockImplementation(
-      (entity: GenericEntityType) => {
-        const scopes = {
-          ILLUMINATE: { is_mutable: false },
-          DEFAULT: { is_mutable: true },
-        };
+    asMock(useScopePermissions).mockImplementation((entity: GenericEntityType) => {
+      const scopes = {
+        ILLUMINATE: { is_mutable: false },
+        DEFAULT: { is_mutable: true },
+      };
 
-        return {
-          loadingScopePermissions: false,
-          scopePermissions: scopes[entity._scope],
-        };
-      },
-    );
+      return {
+        loadingScopePermissions: false,
+        scopePermissions: scopes[entity._scope],
+      };
+    });
   });
 
   it('should show "edit" button', () => {
@@ -81,7 +75,9 @@ describe('LookupTableView', () => {
 
     const wrapper = mountLUT('DEFAULT');
 
-    wrapper.find('input[name="lookupkey"]').simulate('change', { target: { name: 'lookupkey', value: nonWordCharactersKey } });
+    wrapper
+      .find('input[name="lookupkey"]')
+      .simulate('change', { target: { name: 'lookupkey', value: nonWordCharactersKey } });
 
     expect(wrapper.find('input[name="lookupkey"]').length).toBe(1);
     expect(wrapper.find('input[name="lookupkey"]').prop('value')).toBe(nonWordCharactersKey);

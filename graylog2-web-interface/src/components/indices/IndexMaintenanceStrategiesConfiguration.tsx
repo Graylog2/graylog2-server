@@ -44,48 +44,49 @@ import { Select } from 'components/common';
 import { useIndexRetention } from 'components/indices/contexts/IndexRetentionContext';
 
 type IndexMaintenanceStrategiesFormValues = {
-  rotation_strategy?: RotationStrategy,
-  rotation_strategy_class?: string,
-  retention_strategy_class?: string,
-}
+  rotation_strategy?: RotationStrategy;
+  rotation_strategy_class?: string;
+  retention_strategy_class?: string;
+};
 
 interface ConfigComponentProps extends SystemConfigurationComponentProps {
-  config: StrategyConfig,
-  jsonSchema: JsonSchema,
-  updateConfig: (update: StrategyConfig) => void
-  useMaxNumberOfIndices?: () => [
-    number | undefined,
-    React.Dispatch<React.SetStateAction<number>>
-  ],
+  config: StrategyConfig;
+  jsonSchema: JsonSchema;
+  updateConfig: (update: StrategyConfig) => void;
+  useMaxNumberOfIndices?: () => [number | undefined, React.Dispatch<React.SetStateAction<number>>];
 }
 
 type Props = {
-  title: string,
-  name: string,
-  description?: string,
-  selectPlaceholder: string,
+  title: string;
+  name: string;
+  description?: string;
+  selectPlaceholder: string;
   pluginExports: Array<{
-    type: string,
-    displayName: string,
-    configComponent: React.ComponentType<ConfigComponentProps>
-  }>,
-  strategies: Strategies,
+    type: string;
+    displayName: string;
+    configComponent: React.ComponentType<ConfigComponentProps>;
+  }>;
+  strategies: Strategies;
   retentionStrategiesContext: {
-    max_index_retention_period?: string,
-  },
+    max_index_retention_period?: string;
+  };
   activeConfig: {
+    strategy: string;
+    config: StrategyConfig;
+  };
+  getState: (
     strategy: string,
-    config: StrategyConfig,
-  },
-  getState: (strategy: string, data: StrategyConfig) => {
-    rotation_strategy_config?: StrategyConfig,
-    rotation_strategy_class?: string,
-    retention_strategy_config?: StrategyConfig,
-    retention_strategy_class?: string,
-  },
-}
+    data: StrategyConfig,
+  ) => {
+    rotation_strategy_config?: StrategyConfig;
+    rotation_strategy_class?: string;
+    retention_strategy_config?: StrategyConfig;
+    retention_strategy_class?: string;
+  };
+};
 
-const hasRetentionConfigField = (configData: StrategyConfig, field: string): configData is RetentionStrategyConfig => field in configData;
+const hasRetentionConfigField = (configData: StrategyConfig, field: string): configData is RetentionStrategyConfig =>
+  field in configData;
 
 const StyledH3 = styled.h3`
   margin-bottom: 10px;
@@ -99,32 +100,46 @@ const StyledAlert = styled(Alert)`
   margin-left: 15px;
 `;
 
-const getStrategyJsonSchema = (selectedStrategy: string, strategies: Strategies) : JsonSchema | undefined => {
+const getStrategyJsonSchema = (selectedStrategy: string, strategies: Strategies): JsonSchema | undefined => {
   const result = strategies.filter((s) => s.type === selectedStrategy)[0];
 
   return result ? result.json_schema : undefined;
 };
 
-const getDefaultStrategyConfig = (selectedStrategy: string, strategies: Strategies) : StrategyConfig | undefined => {
+const getDefaultStrategyConfig = (selectedStrategy: string, strategies: Strategies): StrategyConfig | undefined => {
   const result = strategies.filter((s) => s.type === selectedStrategy)[0];
 
   return result ? result.default_config : undefined;
 };
 
-const getTimeBaseStrategyWithElasticLimit = (activeConfig: TimeBasedRotationStrategyConfig, strategies: Strategies) : StrategyConfig => {
-  const timeBasedStrategy = getDefaultStrategyConfig(TIME_BASED_ROTATION_STRATEGY, strategies) as TimeBasedRotationStrategyConfig;
+const getTimeBaseStrategyWithElasticLimit = (
+  activeConfig: TimeBasedRotationStrategyConfig,
+  strategies: Strategies,
+): StrategyConfig => {
+  const timeBasedStrategy = getDefaultStrategyConfig(
+    TIME_BASED_ROTATION_STRATEGY,
+    strategies,
+  ) as TimeBasedRotationStrategyConfig;
 
   return { ...activeConfig, max_rotation_period: timeBasedStrategy?.max_rotation_period };
 };
 
-const getStrategyConfig = (configTypeName: string, selectedStrategy: string, activeStrategy: string, activeConfig: StrategyConfig, strategies: Strategies) : StrategyConfig | undefined => {
+const getStrategyConfig = (
+  configTypeName: string,
+  selectedStrategy: string,
+  activeStrategy: string,
+  activeConfig: StrategyConfig,
+  strategies: Strategies,
+): StrategyConfig | undefined => {
   if (selectedStrategy === TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY && configTypeName === 'retention') {
     return activeConfig;
   }
 
   if (activeStrategy === selectedStrategy) {
     // If the newly selected strategy is the current active strategy, we use the active configuration.
-    return activeStrategy === TIME_BASED_ROTATION_STRATEGY ? getTimeBaseStrategyWithElasticLimit(activeConfig as TimeBasedRotationStrategyConfig, strategies) : activeConfig;
+    return activeStrategy === TIME_BASED_ROTATION_STRATEGY
+      ? getTimeBaseStrategyWithElasticLimit(activeConfig as TimeBasedRotationStrategyConfig, strategies)
+      : activeConfig;
   }
 
   // If the newly selected strategy is not the current active strategy, we use the selected strategy's default config.
@@ -135,18 +150,16 @@ const getConfigurationComponent = (
   configTypeName: string,
   selectedStrategy: string,
   pluginExports: Array<{
-    type: string,
-    displayName: string,
-    configComponent: React.ComponentType,
+    type: string;
+    displayName: string;
+    configComponent: React.ComponentType;
   }>,
   strategies: Strategies,
   strategy: Strategy | string,
   config: StrategyConfig,
   onConfigUpdate: (update: StrategyConfig) => void,
-  useMaxNumberOfIndices: () => [
-    number | undefined,
-    React.Dispatch<React.SetStateAction<number>>
-  ]) => {
+  useMaxNumberOfIndices: () => [number | undefined, React.Dispatch<React.SetStateAction<number>>],
+) => {
   if (!selectedStrategy || selectedStrategy.length < 1) {
     return null;
   }
@@ -161,7 +174,7 @@ const getConfigurationComponent = (
 
   const strategyConfig = getStrategyConfig(configTypeName, selectedStrategy, strategyType, config, strategies);
 
-  let componentProps : ConfigComponentProps = {
+  let componentProps: ConfigComponentProps = {
     config: strategyConfig,
     jsonSchema: getStrategyJsonSchema(selectedStrategy, strategies),
     updateConfig: onConfigUpdate,
@@ -171,9 +184,12 @@ const getConfigurationComponent = (
     componentProps = { ...componentProps, useMaxNumberOfIndices };
   }
 
-  const element = React.createElement(strategyPlugin.configComponent as React.ComponentType<ConfigComponentProps>, componentProps);
+  const element = React.createElement(
+    strategyPlugin.configComponent as React.ComponentType<ConfigComponentProps>,
+    componentProps,
+  );
 
-  return (<div key={strategyType}>{element}</div>);
+  return <div key={strategyType}>{element}</div>;
 };
 
 const IndexMaintenanceStrategiesConfiguration = ({
@@ -186,7 +202,7 @@ const IndexMaintenanceStrategiesConfiguration = ({
   retentionStrategiesContext: { max_index_retention_period: maxRetentionPeriod },
   activeConfig: { strategy, config },
   getState,
-} : Props) => {
+}: Props) => {
   const [newStrategy, setNewStrategy] = useState<string | undefined>(strategy);
   const {
     setValues,
@@ -208,16 +224,19 @@ const IndexMaintenanceStrategiesConfiguration = ({
 
   const retentionIsNotNoop = retentionStrategyClass !== NOOP_RETENTION_STRATEGY;
   const isArchiveRetention = retentionStrategyClass !== ARCHIVE_RETENTION_STRATEGY;
-  const shouldShowMaxRetentionWarning = maxRetentionPeriod && rotationStrategyClass === TIME_BASED_ROTATION_STRATEGY && retentionIsNotNoop;
+  const shouldShowMaxRetentionWarning =
+    maxRetentionPeriod && rotationStrategyClass === TIME_BASED_ROTATION_STRATEGY && retentionIsNotNoop;
   const isTimeBasedSizeOptimizing = rotationStrategyClass === TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY;
   const shouldShowTimeBasedSizeOptimizingForm = isTimeBasedSizeOptimizing && name === 'retention' && retentionIsNotNoop;
-  const shouldShowNormalRetentionForm = (!isTimeBasedSizeOptimizing || (name === 'retention' && (!retentionIsNotNoop || !isArchiveRetention)));
-  const helpText = isTimeBasedSizeOptimizing && name === 'rotation'
-    ? 'The Time Based Size Optimizing Rotation Strategy tries to rotate the index daily.'
-    + ' It can however skip the rotation to achieve optimal sized indices by keeping the shard size between 20 and 50 GB.'
-    + ' The optimization can delay the rotation within the range of the configured retention min/max lifetime.'
-    + ' If an index is older than the range between min/max, it will be rotated regardless of its current size.'
-    : null;
+  const shouldShowNormalRetentionForm =
+    !isTimeBasedSizeOptimizing || (name === 'retention' && (!retentionIsNotNoop || !isArchiveRetention));
+  const helpText =
+    isTimeBasedSizeOptimizing && name === 'rotation'
+      ? 'The Time Based Size Optimizing Rotation Strategy tries to rotate the index daily.' +
+        ' It can however skip the rotation to achieve optimal sized indices by keeping the shard size between 20 and 50 GB.' +
+        ' The optimization can delay the rotation within the range of the configured retention min/max lifetime.' +
+        ' If an index is older than the range between min/max, it will be rotated regardless of its current size.'
+      : null;
 
   const _onSelect = (selectedStrategy) => {
     if (!selectedStrategy || selectedStrategy.length < 1) {
@@ -231,64 +250,70 @@ const IndexMaintenanceStrategiesConfiguration = ({
     setValues({ ...values, ...getState(selectedStrategy, newConfig) });
   };
 
-  const _onConfigUpdate = useCallback((newConfig) => {
-    const _addConfigType = (selectedStrategy, data) => {
-      // The config object needs to have the "type" field set to the "default_config.type" to make the REST call work.
-      const result = strategies.filter((s) => s.type === selectedStrategy)[0];
-      const copy = data;
+  const _onConfigUpdate = useCallback(
+    (newConfig) => {
+      const _addConfigType = (selectedStrategy, data) => {
+        // The config object needs to have the "type" field set to the "default_config.type" to make the REST call work.
+        const result = strategies.filter((s) => s.type === selectedStrategy)[0];
+        const copy = data;
 
-      if (result) {
-        copy.type = result.default_config.type;
+        if (result) {
+          copy.type = result.default_config.type;
+        }
+
+        return copy;
+      };
+
+      const configuration = _addConfigType(newStrategy, newConfig);
+      setValues({ ...values, ...getState(newStrategy, configuration) });
+    },
+    [getState, newStrategy, setValues, strategies, values],
+  );
+
+  const _onIndexTimeSizeOptimizingUpdate = useCallback(
+    (newConfig) => {
+      if (isTimeBasedSizeOptimizing) {
+        setValues({
+          ...values,
+          ...{
+            rotation_strategy_class: rotationStrategyClass,
+            rotation_strategy: { ...newConfig, type: TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY_TYPE },
+          },
+        });
       }
-
-      return copy;
-    };
-
-    const configuration = _addConfigType(newStrategy, newConfig);
-    setValues({ ...values, ...getState(newStrategy, configuration) });
-  }, [getState, newStrategy, setValues, strategies, values]);
-
-  const _onIndexTimeSizeOptimizingUpdate = useCallback((newConfig) => {
-    if (isTimeBasedSizeOptimizing) {
-      setValues({ ...values, ...{ rotation_strategy_class: rotationStrategyClass, rotation_strategy: { ...newConfig, type: TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY_TYPE } } });
-    }
-  }, [isTimeBasedSizeOptimizing, rotationStrategyClass, setValues, values]);
+    },
+    [isTimeBasedSizeOptimizing, rotationStrategyClass, setValues, values],
+  );
 
   const getAvailableSelectOptions = () => {
-    const availableStrategies = pluginExports
-      .filter((pluginOptions) => strategies.find(({ type }) => type === pluginOptions.type));
+    const availableStrategies = pluginExports.filter((pluginOptions) =>
+      strategies.find(({ type }) => type === pluginOptions.type),
+    );
 
-    const isSelectedItemInList = availableStrategies.filter((availableStrategy) => availableStrategy.type === newStrategy).length > 0;
+    const isSelectedItemInList =
+      availableStrategies.filter((availableStrategy) => availableStrategy.type === newStrategy).length > 0;
 
     if (!isSelectedItemInList) {
-      return [...availableStrategies, pluginExports.find((pluginOptions) => pluginOptions.type === newStrategy)].map((pluginOptions) => ({ value: pluginOptions.type, label: pluginOptions.displayName }));
+      return [...availableStrategies, pluginExports.find((pluginOptions) => pluginOptions.type === newStrategy)].map(
+        (pluginOptions) => ({ value: pluginOptions.type, label: pluginOptions.displayName }),
+      );
     }
 
-    return availableStrategies
-      .map((c) => ({ value: c.type, label: c.displayName }));
+    return availableStrategies.map((c) => ({ value: c.type, label: c.displayName }));
   };
 
   const getDisplayName = () => pluginExports.find((pluginOptions) => pluginOptions.type === newStrategy).displayName;
 
   const getActiveSelection = () => newStrategy;
 
-  const shouldShowInvalidRetentionWarning = () => (
-    name === RETENTION && !getStrategyJsonSchema(getActiveSelection(), strategies)
-  );
+  const shouldShowInvalidRetentionWarning = () =>
+    name === RETENTION && !getStrategyJsonSchema(getActiveSelection(), strategies);
 
   return (
     <div>
       <StyledH3>{title}</StyledH3>
-      {description && (
-        <StyledAlert>
-          {description}
-        </StyledAlert>
-      )}
-      {helpText && (
-        <StyledAlert>
-          {helpText}
-        </StyledAlert>
-      )}
+      {description && <StyledAlert>{description}</StyledAlert>}
+      {helpText && <StyledAlert>{helpText}</StyledAlert>}
       {shouldShowMaxRetentionWarning && (
         <StyledAlert bsStyle="warning">
           The effective retention period value calculated from the
@@ -298,47 +323,47 @@ const IndexMaintenanceStrategiesConfiguration = ({
       )}
       {shouldShowInvalidRetentionWarning() && (
         <StyledAlert bsStyle="danger">
-          {getDisplayName()} strategy was deactivated.
-          Please configure a valid retention strategy.
+          {getDisplayName()} strategy was deactivated. Please configure a valid retention strategy.
         </StyledAlert>
       )}
       <Row>
         <Col md={12}>
-          <Input id="strategy-select"
-                 labelClassName="col-sm-3"
-                 wrapperClassName="col-sm-9"
-                 label={selectPlaceholder}>
-            <StyledSelect placeholder={selectPlaceholder}
-                          options={getAvailableSelectOptions()}
-                          matchProp="label"
-                          value={getActiveSelection()}
-                          onChange={_onSelect}
-                          clearable={false} />
+          <Input id="strategy-select" labelClassName="col-sm-3" wrapperClassName="col-sm-9" label={selectPlaceholder}>
+            <StyledSelect
+              placeholder={selectPlaceholder}
+              options={getAvailableSelectOptions()}
+              matchProp="label"
+              value={getActiveSelection()}
+              onChange={_onSelect}
+              clearable={false}
+            />
           </Input>
         </Col>
       </Row>
       <Row>
         <Col md={12}>
-          {shouldShowTimeBasedSizeOptimizingForm && getConfigurationComponent(
-            name,
-            TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY,
-            PluginStore.exports('indexRotationConfig'),
-            [rotationStrategy],
-            rotationStrategy,
-            rotationStrategy,
-            _onIndexTimeSizeOptimizingUpdate,
-            () => [maxNumberOfIndices, setMaxNumberOfIndices],
-          )}
-          {shouldShowNormalRetentionForm && getConfigurationComponent(
-            name,
-            getActiveSelection(),
-            pluginExports,
-            strategies,
-            strategy,
-            config,
-            _onConfigUpdate,
-            () => [maxNumberOfIndices, setMaxNumberOfIndices],
-          )}
+          {shouldShowTimeBasedSizeOptimizingForm &&
+            getConfigurationComponent(
+              name,
+              TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY,
+              PluginStore.exports('indexRotationConfig'),
+              [rotationStrategy],
+              rotationStrategy,
+              rotationStrategy,
+              _onIndexTimeSizeOptimizingUpdate,
+              () => [maxNumberOfIndices, setMaxNumberOfIndices],
+            )}
+          {shouldShowNormalRetentionForm &&
+            getConfigurationComponent(
+              name,
+              getActiveSelection(),
+              pluginExports,
+              strategies,
+              strategy,
+              config,
+              _onConfigUpdate,
+              () => [maxNumberOfIndices, setMaxNumberOfIndices],
+            )}
         </Col>
       </Row>
     </div>

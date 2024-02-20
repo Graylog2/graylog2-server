@@ -51,28 +51,39 @@ class StaticFieldForm extends React.Component {
 
   render() {
     return (
-      <BootstrapModalForm show={this.state.showModal}
-                          title="Add static field"
-                          submitButtonText="Add field"
-                          onCancel={this.close}
-                          onSubmitForm={this._addStaticField}>
-        <p>Define a static field that is added to every message that comes in via this input. The field is not
-          overwritten If the message already has that key. Key must only contain alphanumeric characters or
-          underscores and not be a reserved field.
+      <BootstrapModalForm
+        show={this.state.showModal}
+        title="Add static field"
+        submitButtonText="Add field"
+        onCancel={this.close}
+        onSubmitForm={this._addStaticField}
+      >
+        <p>
+          Define a static field that is added to every message that comes in via this input. The field is not
+          overwritten If the message already has that key. Key must only contain alphanumeric characters or underscores
+          and not be a reserved field.
         </p>
-        <Input ref={(fieldName) => { this.fieldName = fieldName; }}
-               type="text"
-               id="field-name"
-               label="Field name"
-               required
-               pattern="[A-Za-z0-9_]*"
-               title="Should consist only of alphanumeric characters and underscores."
-               autoFocus />
-        <Input ref={(fieldValue) => { this.fieldValue = fieldValue; }}
-               type="text"
-               id="field-value"
-               label="Field value"
-               required />
+        <Input
+          ref={(fieldName) => {
+            this.fieldName = fieldName;
+          }}
+          type="text"
+          id="field-name"
+          label="Field name"
+          required
+          pattern="[A-Za-z0-9_]*"
+          title="Should consist only of alphanumeric characters and underscores."
+          autoFocus
+        />
+        <Input
+          ref={(fieldValue) => {
+            this.fieldValue = fieldValue;
+          }}
+          type="text"
+          id="field-value"
+          label="Field value"
+          required
+        />
       </BootstrapModalForm>
     );
   }

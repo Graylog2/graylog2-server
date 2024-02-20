@@ -33,7 +33,7 @@ import useLocation from 'routing/useLocation';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 
 type Props = {
-  refetchEventNotifications: () => void,
+  refetchEventNotifications: () => void;
 };
 
 const BulkActions = ({ refetchEventNotifications }: Props) => {
@@ -53,20 +53,26 @@ const BulkActions = ({ refetchEventNotifications }: Props) => {
 
     // eslint-disable-next-line no-alert
     if (window.confirm(`Do you really want to remove ${selectedItemsAmount} ${descriptor}?`)) {
-      const deleteCalls = selectedEntities.map((notificationId) => fetch('DELETE', qualifyUrl(ApiRoutes.EventNotificationsApiController.delete(notificationId).url)).then(() => notificationId));
+      const deleteCalls = selectedEntities.map((notificationId) =>
+        fetch('DELETE', qualifyUrl(ApiRoutes.EventNotificationsApiController.delete(notificationId).url)).then(
+          () => notificationId,
+        ),
+      );
 
       Promise.allSettled(deleteCalls).then((result) => {
         const fulfilledRequests = result.filter((response) => response.status === 'fulfilled') as Array<{
-          status: 'fulfilled',
-          value: string
+          status: 'fulfilled';
+          value: string;
         }>;
         const deletedNotificationIds = fulfilledRequests.map(({ value }) => value);
-        const notDeletedNotificationIds = selectedEntities?.filter((streamId) => !deletedNotificationIds.includes(streamId));
+        const notDeletedNotificationIds = selectedEntities?.filter(
+          (streamId) => !deletedNotificationIds.includes(streamId),
+        );
 
         if (notDeletedNotificationIds.length) {
           const rejectedRequests = result.filter((response) => response.status === 'rejected') as Array<{
-            status: 'rejected',
-            reason: FetchError
+            status: 'rejected';
+            reason: FetchError;
           }>;
           const errorMessages = uniq(rejectedRequests.map((request) => request.reason.responseMessage));
 
@@ -74,7 +80,9 @@ const BulkActions = ({ refetchEventNotifications }: Props) => {
             queryClient.invalidateQueries(['eventNotifications', 'overview']);
           }
 
-          UserNotification.error(`${notDeletedNotificationIds.length} out of ${selectedEntities} selected ${descriptor} could not be deleted. Status: ${errorMessages.join()}`);
+          UserNotification.error(
+            `${notDeletedNotificationIds.length} out of ${selectedEntities} selected ${descriptor} could not be deleted. Status: ${errorMessages.join()}`,
+          );
 
           return;
         }
@@ -82,10 +90,22 @@ const BulkActions = ({ refetchEventNotifications }: Props) => {
         queryClient.invalidateQueries(['eventNotifications', 'overview']);
         setSelectedEntities(notDeletedNotificationIds);
         refetchEventNotifications();
-        UserNotification.success(`${selectedItemsAmount} ${descriptor} ${StringUtils.pluralize(selectedItemsAmount, 'was', 'were')} deleted successfully.`, 'Success');
+        UserNotification.success(
+          `${selectedItemsAmount} ${descriptor} ${StringUtils.pluralize(selectedItemsAmount, 'was', 'were')} deleted successfully.`,
+          'Success',
+        );
       });
     }
-  }, [sendTelemetry, pathname, selectedItemsAmount, descriptor, selectedEntities, queryClient, setSelectedEntities, refetchEventNotifications]);
+  }, [
+    sendTelemetry,
+    pathname,
+    selectedItemsAmount,
+    descriptor,
+    selectedEntities,
+    queryClient,
+    setSelectedEntities,
+    refetchEventNotifications,
+  ]);
 
   return (
     <BulkActionsDropdown>

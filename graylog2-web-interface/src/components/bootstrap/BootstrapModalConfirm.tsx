@@ -23,14 +23,14 @@ import Modal from './Modal';
 import BootstrapModalWrapper from './BootstrapModalWrapper';
 
 type Props = {
-  showModal: boolean,
-  title: string | React.ReactNode,
-  confirmButtonText: string,
-  cancelButtonDisabled: boolean,
-  confirmButtonDisabled: boolean,
-  onConfirm: (e: React.BaseSyntheticEvent) => void,
-  onCancel: () => void,
-  children: React.ReactNode,
+  showModal: boolean;
+  title: string | React.ReactNode;
+  confirmButtonText: string;
+  cancelButtonDisabled: boolean;
+  confirmButtonDisabled: boolean;
+  onConfirm: (e: React.BaseSyntheticEvent) => void;
+  onCancel: () => void;
+  children: React.ReactNode;
 };
 
 /**
@@ -48,25 +48,22 @@ const BootstrapModalConfirm = ({
   onConfirm,
   ...restProps
 }: Props) => (
-  <BootstrapModalWrapper showModal={showModal}
-                         onHide={onCancel}
-                         role="alertdialog"
-                         {...restProps}>
+  <BootstrapModalWrapper showModal={showModal} onHide={onCancel} role="alertdialog" {...restProps}>
     <Modal.Header closeButton>
       <Modal.Title>{title}</Modal.Title>
     </Modal.Header>
 
-    <Modal.Body>
-      {children}
-    </Modal.Body>
+    <Modal.Body>{children}</Modal.Body>
 
     <Modal.Footer>
-      <ModalSubmit disabledCancel={cancelButtonDisabled}
-                   disabledSubmit={confirmButtonDisabled}
-                   onCancel={onCancel}
-                   onSubmit={onConfirm}
-                   submitButtonText={confirmButtonText}
-                   submitButtonType="button" />
+      <ModalSubmit
+        disabledCancel={cancelButtonDisabled}
+        disabledSubmit={confirmButtonDisabled}
+        onCancel={onCancel}
+        onSubmit={onConfirm}
+        submitButtonText={confirmButtonText}
+        submitButtonType="button"
+      />
     </Modal.Footer>
   </BootstrapModalWrapper>
 );
@@ -75,10 +72,7 @@ BootstrapModalConfirm.propTypes = {
   /** Control whether the modal is shown or not. Prop updates should trigger opening (if show changes from false to true), respectively closing the modal (if show changes from false to true). */
   showModal: PropTypes.bool.isRequired,
   /** Title to use in the modal. */
-  title: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.element,
-  ]).isRequired,
+  title: PropTypes.oneOfType([PropTypes.string, PropTypes.element]).isRequired,
   /** Text to use in the confirmation button. */
   confirmButtonText: PropTypes.string,
   /** Indicates whether the cancel button should be disabled or not. */
@@ -96,10 +90,7 @@ BootstrapModalConfirm.propTypes = {
    * React elements to display in the modal body. This should be the information the user has
    * to confirm in order to proceed with the operation.
    */
-  children: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.element,
-  ]).isRequired,
+  children: PropTypes.oneOfType([PropTypes.string, PropTypes.element]).isRequired,
 };
 
 BootstrapModalConfirm.defaultProps = {

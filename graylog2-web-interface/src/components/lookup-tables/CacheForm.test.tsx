@@ -30,28 +30,33 @@ import NullCacheFieldSet from './caches/NullCacheFieldSet';
 
 jest.mock('hooks/useScopePermissions');
 
-PluginStore.register(new PluginManifest({}, {
-  lookupTableCaches: [
+PluginStore.register(
+  new PluginManifest(
+    {},
     {
-      type: 'guava_cache', // old name kept for backwards compatibility
-      displayName: 'Node-local, in-memory cache',
-      formComponent: CaffeineCacheFieldSet,
+      lookupTableCaches: [
+        {
+          type: 'guava_cache', // old name kept for backwards compatibility
+          displayName: 'Node-local, in-memory cache',
+          formComponent: CaffeineCacheFieldSet,
+        },
+        {
+          type: 'none',
+          displayName: 'Do not cache values',
+          formComponent: NullCacheFieldSet,
+        },
+      ],
     },
-    {
-      type: 'none',
-      displayName: 'Do not cache values',
-      formComponent: NullCacheFieldSet,
-    },
-  ],
-}));
+  ),
+);
 
 const renderedCache = ({
   scope,
   inCache = { ...createLookupTableCache() },
   create = false,
   withConfig = true,
-  validate = () => { },
-  saved = () => { },
+  validate = () => {},
+  saved = () => {},
   validationErrors = {},
 }) => {
   const mockCache = {
@@ -62,13 +67,15 @@ const renderedCache = ({
   if (!withConfig) mockCache.config = { type: 'none' };
 
   return render(
-    <CacheForm cache={mockCache}
-               type={mockCache.config.type}
-               saved={saved}
-               title="Data Cache"
-               create={create}
-               validate={validate}
-               validationErrors={validationErrors} />,
+    <CacheForm
+      cache={mockCache}
+      type={mockCache.config.type}
+      saved={saved}
+      title="Data Cache"
+      create={create}
+      validate={validate}
+      validationErrors={validationErrors}
+    />,
   );
 };
 
@@ -76,19 +83,17 @@ describe('CacheForm', () => {
   const findSubmitButton = () => screen.findByRole('button', { name: /update cache/i });
 
   beforeAll(() => {
-    asMock(useScopePermissions).mockImplementation(
-      (entity: GenericEntityType) => {
-        const scopes = {
-          ILLUMINATE: { is_mutable: false },
-          DEFAULT: { is_mutable: true },
-        };
+    asMock(useScopePermissions).mockImplementation((entity: GenericEntityType) => {
+      const scopes = {
+        ILLUMINATE: { is_mutable: false },
+        DEFAULT: { is_mutable: true },
+      };
 
-        return {
-          loadingScopePermissions: false,
-          scopePermissions: scopes[entity._scope],
-        };
-      },
-    );
+      return {
+        loadingScopePermissions: false,
+        scopePermissions: scopes[entity._scope],
+      };
+    });
   });
 
   it('should show "Update Cache" button', async () => {

@@ -31,11 +31,12 @@ const List = styled.div`
   grid-template-columns: 1fr 1fr;
   gap: 1em;
 `;
-const CustomFieldTypesList = ({ list, fieldTypes }: { list: Array<CustomFieldMapping>, fieldTypes: FieldTypes }) => (
+const CustomFieldTypesList = ({ list, fieldTypes }: { list: Array<CustomFieldMapping>; fieldTypes: FieldTypes }) => (
   <List>
     {list.map(({ field, type }) => (
       <Item key={field}>
-        <b>{field}:</b><i>{fieldTypes[type]}</i>
+        <b>{field}:</b>
+        <i>{fieldTypes[type]}</i>
       </Item>
     ))}
   </List>

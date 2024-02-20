@@ -31,12 +31,7 @@ const TIME_ICON_BOD = 'hourglass-start';
 const TIME_ICON_MID = 'hourglass-half';
 const TIME_ICON_EOD = 'hourglass-end';
 
-const TIME_TYPES = [
-  'hours',
-  'minutes',
-  'seconds',
-  'milliseconds',
-];
+const TIME_TYPES = ['hours', 'minutes', 'seconds', 'milliseconds'];
 
 const SetTimeOption = styled.div`
   display: flex;
@@ -45,7 +40,9 @@ const SetTimeOption = styled.div`
   flex: 1;
   padding-top: 12px;
 
-  b { padding: 0 3px; }
+  b {
+    padding: 0 3px;
+  }
 `;
 
 const StyledFormControl = styled(FormControl)`
@@ -54,46 +51,48 @@ const StyledFormControl = styled(FormControl)`
   &:nth-of-type(1) {
     grid-area: 2 / 2 / 2 / 2;
   }
-  
+
   &:nth-of-type(2) {
     grid-area: 2 / 4 / 2 / 4;
   }
-  
+
   &:nth-of-type(3) {
     grid-area: 2 / 6 / 2 / 6;
   }
 `;
 
-const StyledInputAddon = styled(InputGroup.Addon)(({ theme }) => css`
-  padding: 0;
-  background: ${theme.colors.variant.lightest.default};
-  font-weight: bold;
-  width: auto;
-  display: flex;
-  align-items: center;
+const StyledInputAddon = styled(InputGroup.Addon)(
+  ({ theme }) => css`
+    padding: 0;
+    background: ${theme.colors.variant.lightest.default};
+    font-weight: bold;
+    width: auto;
+    display: flex;
+    align-items: center;
 
-  &:not(:first-child, :last-child) {
-    border-right: 0;
-    border-left: 0;
-    padding: 0 3px;
-  }
+    &:not(:first-child, :last-child) {
+      border-right: 0;
+      border-left: 0;
+      padding: 0 3px;
+    }
 
-  &:nth-of-type(1) {
-    grid-area: 2 / 1 / 2 / 1;
-  }
-  
-  &:nth-of-type(2) {
-    grid-area: 2 / 3 / 2 / 3;
-  }
-  
-  &:nth-of-type(3) {
-    grid-area: 2 / 5 / 2 / 5;
-  }
-  
-  &:nth-of-type(4) {
-    grid-area: 2 / 7 / 2 / 7;
-  }
-`);
+    &:nth-of-type(1) {
+      grid-area: 2 / 1 / 2 / 1;
+    }
+
+    &:nth-of-type(2) {
+      grid-area: 2 / 3 / 2 / 3;
+    }
+
+    &:nth-of-type(3) {
+      grid-area: 2 / 5 / 2 / 5;
+    }
+
+    &:nth-of-type(4) {
+      grid-area: 2 / 7 / 2 / 7;
+    }
+  `,
+);
 
 const StyledButton = styled(Button)`
   padding: 6px 9px;
@@ -108,7 +107,7 @@ const FormGroupGrid = styled(FormGroup)`
   label {
     padding-left: 6px;
     margin: 0;
-    
+
     &:nth-child(1) {
       grid-area: 1 / 2 / 1 / 2;
     }
@@ -179,12 +178,13 @@ const fieldUpdate = (value: string, toUserTimezone: (date: Date) => Moment) => {
     }).format(DATE_TIME_FORMATS.default);
   };
 
-  const handleTimeToggle = (eod = false) => moment({
-    ...initialDateTime,
-    hours: eod ? 23 : 0,
-    minutes: eod ? 59 : 0,
-    seconds: eod ? 59 : 0,
-  }).format(DATE_TIME_FORMATS.default);
+  const handleTimeToggle = (eod = false) =>
+    moment({
+      ...initialDateTime,
+      hours: eod ? 23 : 0,
+      minutes: eod ? 59 : 0,
+      seconds: eod ? 59 : 0,
+    }).format(DATE_TIME_FORMATS.default);
 
   return {
     initialDateTime,
@@ -198,12 +198,10 @@ const AbsoluteTimeInput = ({ dateTime, range, onChange }) => {
   const hourIcon = useRef<IconName>(TIME_ICON_MID);
   const { toUserTimezone } = useUserDateTime();
 
-  const {
-    initialDateTime,
-    handleChangeSetTime,
-    handleClickTimeNow,
-    handleTimeToggle,
-  } = fieldUpdate(dateTime, toUserTimezone);
+  const { initialDateTime, handleChangeSetTime, handleClickTimeNow, handleTimeToggle } = fieldUpdate(
+    dateTime,
+    toUserTimezone,
+  );
 
   const _onChangeSetTime = (event) => {
     hourIcon.current = TIME_ICON_MID;
@@ -232,46 +230,57 @@ const AbsoluteTimeInput = ({ dateTime, range, onChange }) => {
   return (
     <SetTimeOption>
       <FormGroupGrid>
-        <label htmlFor={`${range}-time-hours`} title={`${range} hours label`}>HH</label>
-        <label htmlFor={`${range}-time-minutes`} title={`${range} minutes label`}>mm</label>
-        <label htmlFor={`${range}-time-seconds`} title={`${range} seconds label`}>ss</label>
+        <label htmlFor={`${range}-time-hours`} title={`${range} hours label`}>
+          HH
+        </label>
+        <label htmlFor={`${range}-time-minutes`} title={`${range} minutes label`}>
+          mm
+        </label>
+        <label htmlFor={`${range}-time-seconds`} title={`${range} seconds label`}>
+          ss
+        </label>
         <GridInputGroup>
           <StyledInputAddon>
-            <StyledButton bsStyle="link"
-                          bsSize="small"
-                          onClick={_onClickHourToggle}
-                          title="Toggle between beginning and end of day">
+            <StyledButton
+              bsStyle="link"
+              bsSize="small"
+              onClick={_onClickHourToggle}
+              title="Toggle between beginning and end of day"
+            >
               <Icon name={hourIcon.current} />
             </StyledButton>
           </StyledInputAddon>
-          <StyledFormControl type="number"
-                             id={`${range}-time-hours`}
-                             title={`${range} hour`}
-                             value={initialDateTime.hours ?? ''}
-                             onChange={_onChangeSetTime}
-                             onFocus={_onFocusSelect}
-                             bsSize="sm" />
+          <StyledFormControl
+            type="number"
+            id={`${range}-time-hours`}
+            title={`${range} hour`}
+            value={initialDateTime.hours ?? ''}
+            onChange={_onChangeSetTime}
+            onFocus={_onFocusSelect}
+            bsSize="sm"
+          />
           <StyledInputAddon>:</StyledInputAddon>
-          <StyledFormControl type="number"
-                             id={`${range}-time-minutes`}
-                             title={`${range} minutes`}
-                             value={initialDateTime.minutes ?? ''}
-                             onChange={_onChangeSetTime}
-                             onFocus={_onFocusSelect}
-                             bsSize="sm" />
+          <StyledFormControl
+            type="number"
+            id={`${range}-time-minutes`}
+            title={`${range} minutes`}
+            value={initialDateTime.minutes ?? ''}
+            onChange={_onChangeSetTime}
+            onFocus={_onFocusSelect}
+            bsSize="sm"
+          />
           <StyledInputAddon>:</StyledInputAddon>
-          <StyledFormControl type="number"
-                             id={`${range}-time-seconds`}
-                             title={`${range} seconds`}
-                             value={initialDateTime.seconds ?? ''}
-                             onChange={_onChangeSetTime}
-                             onFocus={_onFocusSelect}
-                             bsSize="sm" />
+          <StyledFormControl
+            type="number"
+            id={`${range}-time-seconds`}
+            title={`${range} seconds`}
+            value={initialDateTime.seconds ?? ''}
+            onChange={_onChangeSetTime}
+            onFocus={_onFocusSelect}
+            bsSize="sm"
+          />
           <StyledInputAddon>
-            <StyledButton bsStyle="link"
-                          bsSize="small"
-                          onClick={_onClickTimeNow}
-                          title="Set to current local time">
+            <StyledButton bsStyle="link" bsSize="small" onClick={_onClickTimeNow} title="Set to current local time">
               <Icon name="magic" />
             </StyledButton>
           </StyledInputAddon>

@@ -48,12 +48,14 @@ const GroupExpression = (props) => {
       <BooleanOperatorSelector operator={expression.operator} onOperatorChange={handleOperatorChange} />
       <Clearfix />
       <Group>
-        <AggregationConditionExpression {...props}
-                                        expression={expression.child}
-                                        validation={validation.child}
-                                        parent={expression}
-                                        onChange={onChildChange('child')}
-                                        level={level + 1} />
+        <AggregationConditionExpression
+          {...props}
+          expression={expression.child}
+          validation={validation.child}
+          parent={expression}
+          onChange={onChildChange('child')}
+          level={level + 1}
+        />
       </Group>
     </>
   );

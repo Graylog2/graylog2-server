@@ -19,56 +19,56 @@ import type { Attribute } from 'stores/PaginationTypes';
 
 export type FieldTypeOrigin = 'INDEX' | 'OVERRIDDEN_INDEX' | 'OVERRIDDEN_PROFILE' | 'PROFILE';
 export type IndexSetFieldTypeJson = {
-  field_name: string,
-  type: string,
-  origin: FieldTypeOrigin,
-  is_reserved: boolean,
-}
+  field_name: string;
+  type: string;
+  origin: FieldTypeOrigin;
+  is_reserved: boolean;
+};
 export type IndexSetFieldType = {
-  id: string,
-  fieldName: string,
-  origin: FieldTypeOrigin,
-  isReserved: boolean,
-  type: string,
-}
+  id: string;
+  fieldName: string;
+  origin: FieldTypeOrigin;
+  isReserved: boolean;
+  type: string;
+};
 
 export type ExpandedSectionProps = {
-  type: string,
-  fieldName?: string,
-}
+  type: string;
+  fieldName?: string;
+};
 export type ProfileWithMappingsByField = {
-  name: string,
-  description?: string,
-  id: string,
-  customFieldMappingsByField: Record<string, string>
-}
+  name: string;
+  description?: string;
+  id: string;
+  customFieldMappingsByField: Record<string, string>;
+};
 export type RemoveFieldTypeBody = {
-  indexSets: Array<string>,
-  fields: Array<string>,
-  rotated: boolean,
-}
+  indexSets: Array<string>;
+  fields: Array<string>;
+  rotated: boolean;
+};
 export type RemoveFieldTypeBodyJson = {
-  index_sets: Array<string>,
-  fields: Array<string>,
-  rotate: boolean,
-}
+  index_sets: Array<string>;
+  fields: Array<string>;
+  rotate: boolean;
+};
 
 export type SetIndexSetFieldTypeProfileBodyJson = {
-  index_sets: Array<string>,
-  rotate: boolean,
-  profile_id: string,
-}
+  index_sets: Array<string>;
+  rotate: boolean;
+  profile_id: string;
+};
 
-export type SetIndexSetFieldTypeProfileBody = { indexSetId: string, rotated: boolean, profileId: string}
+export type SetIndexSetFieldTypeProfileBody = { indexSetId: string; rotated: boolean; profileId: string };
 
-export type RemoveProfileFromIndexSetBody = { indexSetId: string, rotated: boolean, }
+export type RemoveProfileFromIndexSetBody = { indexSetId: string; rotated: boolean };
 export type RemoveProfileFromIndexSetBodyJson = {
-  index_sets: Array<string>,
-  rotate: boolean,
-}
+  index_sets: Array<string>;
+  rotate: boolean;
+};
 
 export type IndexSetFieldTypesQueryData = {
-  list: Readonly<Array<IndexSetFieldType>>,
-  pagination: { total: number },
-  attributes: Array<Attribute>
+  list: Readonly<Array<IndexSetFieldType>>;
+  pagination: { total: number };
+  attributes: Array<Attribute>;
 };

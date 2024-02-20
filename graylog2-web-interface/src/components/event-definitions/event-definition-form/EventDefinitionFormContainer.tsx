@@ -45,20 +45,26 @@ const fetchNotifications = () => {
 };
 
 type Props = {
-  action: 'edit' | 'create',
-  eventDefinition: EventDefinition,
-  onEventDefinitionChange: (nextEventDefinition: EventDefinition) => void,
-}
+  action: 'edit' | 'create';
+  eventDefinition: EventDefinition;
+  onEventDefinitionChange: (nextEventDefinition: EventDefinition) => void;
+};
 
 const getConditionPlugin = (edType): any => {
   if (edType === undefined) {
     return {};
   }
 
-  return PluginStore.exports('eventDefinitionTypes').find((eventDefinitionType) => eventDefinitionType.type === edType) || {};
+  return (
+    PluginStore.exports('eventDefinitionTypes').find((eventDefinitionType) => eventDefinitionType.type === edType) || {}
+  );
 };
 
-const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinitionInitial, onEventDefinitionChange }: Props) => {
+const EventDefinitionFormContainer = ({
+  action,
+  eventDefinition: eventDefinitionInitial,
+  onEventDefinitionChange,
+}: Props) => {
   const [eventDefinition, setEventDefinition] = useState(eventDefinitionInitial);
   const [validation, setValidation] = useState({ errors: {} });
   const [eventsClusterConfig, setEventsClusterConfig] = useState(undefined);
@@ -80,11 +86,14 @@ const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinition
     ConfigurationsActions.listEventsClusterConfig().then((config) => setEventsClusterConfig(config));
   }, []);
 
-  const handleChange = useCallback((key: string, value: unknown) => {
-    setEventDefinition((prev) => ({ ...prev, [key]: value }));
-    onEventDefinitionChange({ ...eventDefinition, [key]: value });
-    setIsDirty(true);
-  }, [eventDefinition, onEventDefinitionChange, setEventDefinition, setIsDirty]);
+  const handleChange = useCallback(
+    (key: string, value: unknown) => {
+      setEventDefinition((prev) => ({ ...prev, [key]: value }));
+      onEventDefinitionChange({ ...eventDefinition, [key]: value });
+      setIsDirty(true);
+    },
+    [eventDefinition, onEventDefinitionChange, setEventDefinition, setIsDirty],
+  );
 
   useEffect(() => {
     fetchClusterConfig();
@@ -92,19 +101,19 @@ const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinition
 
     if (hasLocalStorageConfig) {
       const conditionPlugin = getConditionPlugin(configFromLocalStorage.type);
-      const defaultConfig = conditionPlugin?.defaultConfig || {} as EventDefinition['config'];
+      const defaultConfig = conditionPlugin?.defaultConfig || ({} as EventDefinition['config']);
 
       setEventDefinition((cur) => {
         const cloned = cloneDeep(cur);
 
-        return ({
+        return {
           ...cloned,
           config: {
             ...defaultConfig,
             ...cloned.config,
             ...configFromLocalStorage,
           },
-        });
+        };
       });
     }
   }, [configFromLocalStorage, fetchClusterConfig, hasLocalStorageConfig]);
@@ -125,9 +134,11 @@ const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinition
       }
 
       if (body.type && body.type === 'ApiError') {
-        if (body.message.includes('org.graylog.events.conditions.Expression')
-          || body.message.includes('org.graylog.events.conditions.Expr')
-          || body.message.includes('org.graylog.events.processor.aggregation.AggregationSeries')) {
+        if (
+          body.message.includes('org.graylog.events.conditions.Expression') ||
+          body.message.includes('org.graylog.events.conditions.Expr') ||
+          body.message.includes('org.graylog.events.processor.aggregation.AggregationSeries')
+        ) {
           setValidation({
             errors: { conditions: ['Aggregation condition is not valid'] },
           });
@@ -152,8 +163,7 @@ const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinition
         app_action_value: 'create-event-definition-button',
       });
 
-      EventDefinitionsActions.create(eventDefinition)
-        .then(handleSubmitSuccessResponse, handleSubmitFailureResponse);
+      EventDefinitionsActions.create(eventDefinition).then(handleSubmitSuccessResponse, handleSubmitFailureResponse);
     } else {
       sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_SUMMARY.UPDATE_CLICKED, {
         app_pathname: getPathnameWithoutId(pathname),
@@ -161,15 +171,17 @@ const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinition
         app_action_value: 'update-event-definition-button',
       });
 
-      EventDefinitionsActions.update(eventDefinition.id, eventDefinition)
-        .then(handleSubmitSuccessResponse, handleSubmitFailureResponse);
+      EventDefinitionsActions.update(eventDefinition.id, eventDefinition).then(
+        handleSubmitSuccessResponse,
+        handleSubmitFailureResponse,
+      );
     }
   };
 
   const handleCancel = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_SUMMARY.CANCEL_CLICKED, {
       app_pathname: getPathnameWithoutId(pathname),
-      app_section: (action === 'create') ? 'new-event-definition' : 'edit-event-definition',
+      app_section: action === 'create' ? 'new-event-definition' : 'edit-event-definition',
       app_action_value: 'cancel-button',
     });
 
@@ -185,17 +197,19 @@ const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinition
       {isDirty && (
         <ConfirmLeaveDialog question="Do you really want to abandon this page and lose your changes? This action cannot be undone." />
       )}
-      <EventDefinitionForm action={action}
-                           eventDefinition={eventDefinition}
-                           currentUser={currentUser}
-                           validation={validation}
-                           entityTypes={entityTypes}
-                           notifications={notifications.all}
-                           defaults={defaults}
-                           onChange={handleChange}
-                           onCancel={handleCancel}
-                           onSubmit={handleSubmit}
-                           canEdit={scopePermissions.is_mutable} />
+      <EventDefinitionForm
+        action={action}
+        eventDefinition={eventDefinition}
+        currentUser={currentUser}
+        validation={validation}
+        entityTypes={entityTypes}
+        notifications={notifications.all}
+        defaults={defaults}
+        onChange={handleChange}
+        onCancel={handleCancel}
+        onSubmit={handleSubmit}
+        canEdit={scopePermissions.is_mutable}
+      />
     </>
   );
 };

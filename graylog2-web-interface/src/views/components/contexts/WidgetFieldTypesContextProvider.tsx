@@ -24,7 +24,7 @@ import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
 
 type Props = {
-  children: React.ReactNode,
+  children: React.ReactNode;
 };
 
 const WidgetFieldTypesContextProvider = ({ children }: Props) => {
@@ -35,17 +35,13 @@ const WidgetFieldTypesContextProvider = ({ children }: Props) => {
   const fieldTypesContextValue = useMemo(() => {
     const fieldTypesList = Immutable.List(fieldTypes);
 
-    return ({
+    return {
       all: fieldTypesList,
       queryFields: Immutable.Map({ [query.id]: fieldTypesList }),
-    });
+    };
   }, [fieldTypes, query.id]);
 
-  return (
-    <FieldTypesContext.Provider value={fieldTypesContextValue}>
-      {children}
-    </FieldTypesContext.Provider>
-  );
+  return <FieldTypesContext.Provider value={fieldTypesContextValue}>{children}</FieldTypesContext.Provider>;
 };
 
 export default WidgetFieldTypesContextProvider;

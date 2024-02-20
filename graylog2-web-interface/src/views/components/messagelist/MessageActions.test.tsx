@@ -26,10 +26,7 @@ const searchConfig: SearchesConfig = {
   analysis_disabled_fields: [],
   query_time_range_limit: 'PT0S',
   relative_timerange_options: {},
-  surrounding_filter_fields: [
-    'somefield',
-    'someotherfield',
-  ],
+  surrounding_filter_fields: ['somefield', 'someotherfield'],
   quick_access_timerange_presets: [],
   surrounding_timerange_options: {
     PT1S: '1 second',
@@ -43,22 +40,25 @@ const searchConfig: SearchesConfig = {
 };
 
 describe('MessageActions', () => {
-  const renderActions = (props = {}) => render((
-    <MessageActions index="some-index"
-                    id="some-id"
-                    fields={{
-                      timestamp: '2020-02-28T09:45:31.368Z',
-                    }}
-                    disabled={false}
-                    disableSurroundingSearch={false}
-                    disableTestAgainstStream={false}
-                    decorationStats={{}}
-                    showOriginal
-                    toggleShowOriginal={() => {}}
-                    streams={Immutable.List()}
-                    searchConfig={searchConfig}
-                    {...props} />
-  ));
+  const renderActions = (props = {}) =>
+    render(
+      <MessageActions
+        index="some-index"
+        id="some-id"
+        fields={{
+          timestamp: '2020-02-28T09:45:31.368Z',
+        }}
+        disabled={false}
+        disableSurroundingSearch={false}
+        disableTestAgainstStream={false}
+        decorationStats={{}}
+        showOriginal
+        toggleShowOriginal={() => {}}
+        streams={Immutable.List()}
+        searchConfig={searchConfig}
+        {...props}
+      />,
+    );
 
   it('renders surrounding search button', () => {
     const { getByText } = renderActions();

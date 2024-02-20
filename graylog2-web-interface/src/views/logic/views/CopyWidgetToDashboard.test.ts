@@ -25,19 +25,23 @@ import Parameter from '../parameters/Parameter';
 
 jest.mock('logic/generateId', () => jest.fn(() => 'dead-beef'));
 
-jest.mock('bson-objectid', () => jest.fn(() => ({
-  toString: jest.fn(() => 'new-search-id'),
-})));
+jest.mock('bson-objectid', () =>
+  jest.fn(() => ({
+    toString: jest.fn(() => 'new-search-id'),
+  })),
+);
 
 jest.mock('../Widgets', () => ({
   widgetDefinition: () => ({ searchTypes: () => [{ type: 'pivot' }] }),
 }));
 
-jest.mock('../SearchType', () => jest.fn(() => ({
-  type: 'pivot',
-  handler: jest.fn(),
-  defaults: {},
-})));
+jest.mock('../SearchType', () =>
+  jest.fn(() => ({
+    type: 'pivot',
+    handler: jest.fn(),
+    defaults: {},
+  })),
+);
 
 const readFixture = (fixtureName: string) => readJsonFixture(__dirname, fixtureName);
 
@@ -50,18 +54,16 @@ describe('copyWidgetToDashboard', () => {
     const searchViewFixture = View.fromJSON(readFixture('./CopyWidgetToDashboard.Search-View.fixture.json'));
     const searchSearchFixture = Search.fromJSON(readFixture('./CopyWidgetToDashboard.Search-Search.fixture.json'));
 
-    return searchViewFixture.toBuilder()
-      .search(searchSearchFixture)
-      .build();
+    return searchViewFixture.toBuilder().search(searchSearchFixture).build();
   };
 
   it('should copy a widget to a dashboard', () => {
     const searchView = generateSearchView();
     const dashboardViewFixture = View.fromJSON(readFixture('./CopyWidgetToDashboard.Dashboard-View.fixture.json'));
-    const dashboardSearchFixture = Search.fromJSON(readFixture('./CopyWidgetToDashboard.Dashboard-Search.fixture.json'));
-    const dashboardView = dashboardViewFixture.toBuilder()
-      .search(dashboardSearchFixture)
-      .build();
+    const dashboardSearchFixture = Search.fromJSON(
+      readFixture('./CopyWidgetToDashboard.Dashboard-Search.fixture.json'),
+    );
+    const dashboardView = dashboardViewFixture.toBuilder().search(dashboardSearchFixture).build();
 
     const widgetId = '4d73ccaa-aabf-451a-b36e-309f55798e04';
 
@@ -74,11 +76,13 @@ describe('copyWidgetToDashboard', () => {
     // The fixtures view state queries order is different than the search queries order.
     // This test ensures that we are still determining the first dashboard page (query) correctly.
     const searchView = generateSearchView();
-    const dashboardViewFixture = View.fromJSON(readFixture('./CopyWidgetToDashboard.Dashboard-View-Multiple-Queries.fixture.json'));
-    const dashboardSearchFixture = Search.fromJSON(readFixture('./CopyWidgetToDashboard.Dashboard-Search-Multiple-Queries.fixture.json'));
-    const dashboardView = dashboardViewFixture.toBuilder()
-      .search(dashboardSearchFixture)
-      .build();
+    const dashboardViewFixture = View.fromJSON(
+      readFixture('./CopyWidgetToDashboard.Dashboard-View-Multiple-Queries.fixture.json'),
+    );
+    const dashboardSearchFixture = Search.fromJSON(
+      readFixture('./CopyWidgetToDashboard.Dashboard-Search-Multiple-Queries.fixture.json'),
+    );
+    const dashboardView = dashboardViewFixture.toBuilder().search(dashboardSearchFixture).build();
 
     const widgetId = '4d73ccaa-aabf-451a-b36e-309f55798e04';
 

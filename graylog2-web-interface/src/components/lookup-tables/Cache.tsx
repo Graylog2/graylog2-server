@@ -24,15 +24,10 @@ import useScopePermissions from 'hooks/useScopePermissions';
 import type { LookupTableCache } from 'logic/lookup-tables/types';
 
 import type { CachePluginType } from './types';
-import {
-  SummaryContainer,
-  SummaryRow,
-  Title,
-  Value,
-} from './caches/SummaryComponents.styled';
+import { SummaryContainer, SummaryRow, Title, Value } from './caches/SummaryComponents.styled';
 
 type Props = {
-  cache: LookupTableCache,
+  cache: LookupTableCache;
 };
 
 const Cache = ({ cache }: Props) => {
@@ -51,7 +46,9 @@ const Cache = ({ cache }: Props) => {
   return (
     <Row className="content">
       <Col md={12}>
-        <h2>{cache.title} <small>({plugin.displayName})</small></h2>
+        <h2>
+          {cache.title} <small>({plugin.displayName})</small>
+        </h2>
         <SummaryContainer>
           <SummaryRow>
             <Title>Description:</Title>
@@ -60,11 +57,8 @@ const Cache = ({ cache }: Props) => {
         </SummaryContainer>
         <h4>Configuration</h4>
         <div>{React.createElement(plugin.summaryComponent, { cache: cache })}</div>
-        {(!loadingScopePermissions && scopePermissions?.is_mutable) && (
-          <Button bsStyle="success"
-                  onClick={handleEdit(cache.name)}
-                  role="button"
-                  name="edit">
+        {!loadingScopePermissions && scopePermissions?.is_mutable && (
+          <Button bsStyle="success" onClick={handleEdit(cache.name)} role="button" name="edit">
             Edit
           </Button>
         )}

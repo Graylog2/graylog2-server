@@ -24,12 +24,12 @@ import { optionalMarker } from 'components/configurationforms/FieldHelpers';
 import type { NumberField as NumberFieldType } from './types';
 
 type Props = {
-  autoFocus?: boolean,
-  field: NumberFieldType,
-  onChange: (title: string, value: number, dirty?: boolean) => void,
-  title: string,
-  typeName: string,
-  value: number,
+  autoFocus?: boolean;
+  field: NumberFieldType;
+  onChange: (title: string, value: number, dirty?: boolean) => void;
+  title: string;
+  typeName: string;
+  value: number;
 };
 
 const NumberField = ({ autoFocus, field, onChange, title, typeName, value }: Props) => {
@@ -39,10 +39,14 @@ const NumberField = ({ autoFocus, field, onChange, title, typeName, value }: Pro
     const { min, max } = _getDefaultValidationSpecs();
 
     switch (attribute.toUpperCase()) {
-      case 'ONLY_NEGATIVE': return { min: min, max: -1 };
-      case 'ONLY_POSITIVE': return { min: 0, max: max };
-      case 'IS_PORT_NUMBER': return { min: 0, max: 65535 };
-      default: return { min, max };
+      case 'ONLY_NEGATIVE':
+        return { min: min, max: -1 };
+      case 'ONLY_POSITIVE':
+        return { min: 0, max: max };
+      case 'IS_PORT_NUMBER':
+        return { min: 0, max: 65535 };
+      default:
+        return { min, max };
     }
   };
 
@@ -67,19 +71,25 @@ const NumberField = ({ autoFocus, field, onChange, title, typeName, value }: Pro
   const isRequired = !field.is_optional;
   const validationSpecs = validationSpec();
 
-  const label = <>{field.human_name} {optionalMarker(field)}</>;
+  const label = (
+    <>
+      {field.human_name} {optionalMarker(field)}
+    </>
+  );
 
   return (
-    <Input id={`${typeName}-${title}`}
-           label={label}
-           type="number"
-           name={`configuration[${title}]`}
-           required={isRequired}
-           onChange={handleChange}
-           value={value || 0}
-           help={field.description}
-           {...validationSpecs}
-           autoFocus={autoFocus} />
+    <Input
+      id={`${typeName}-${title}`}
+      label={label}
+      type="number"
+      name={`configuration[${title}]`}
+      required={isRequired}
+      onChange={handleChange}
+      value={value || 0}
+      help={field.description}
+      {...validationSpecs}
+      autoFocus={autoFocus}
+    />
   );
 };
 

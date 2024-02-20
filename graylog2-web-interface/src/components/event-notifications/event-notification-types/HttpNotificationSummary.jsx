@@ -38,7 +38,9 @@ class HttpNotificationSummary extends React.Component {
         <>
           <tr>
             <td>URL</td>
-            <td><code>{notification.config.url}</code></td>
+            <td>
+              <code>{notification.config.url}</code>
+            </td>
           </tr>
         </>
       </CommonNotificationSummary>

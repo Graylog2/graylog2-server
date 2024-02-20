@@ -47,7 +47,9 @@ describe('ServiceSelect', () => {
     fireEvent.click(submitButton);
 
     await waitFor(() => expect(history.push).toHaveBeenCalledTimes(1));
-    await waitFor(() => expect(history.push).toHaveBeenCalledWith(Routes.SYSTEM.AUTHENTICATION.BACKENDS.createBackend('ldap')));
+    await waitFor(() =>
+      expect(history.push).toHaveBeenCalledWith(Routes.SYSTEM.AUTHENTICATION.BACKENDS.createBackend('ldap')),
+    );
   });
 
   it('should redirect correctly after selecting active directory', async () => {
@@ -61,6 +63,10 @@ describe('ServiceSelect', () => {
     fireEvent.click(submitButton);
 
     await waitFor(() => expect(history.push).toHaveBeenCalledTimes(1));
-    await waitFor(() => expect(history.push).toHaveBeenCalledWith(Routes.SYSTEM.AUTHENTICATION.BACKENDS.createBackend('active-directory')));
+    await waitFor(() =>
+      expect(history.push).toHaveBeenCalledWith(
+        Routes.SYSTEM.AUTHENTICATION.BACKENDS.createBackend('active-directory'),
+      ),
+    );
   });
 });

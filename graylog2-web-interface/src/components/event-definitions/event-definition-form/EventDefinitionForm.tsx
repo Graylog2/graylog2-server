@@ -64,23 +64,23 @@ const WizardContainer = styled.div`
 `;
 
 type Props = {
-  action: 'edit' | 'create',
-  eventDefinition: EventDefinition,
-  currentUser: User,
+  action: 'edit' | 'create';
+  eventDefinition: EventDefinition;
+  currentUser: User;
   validation: {
     errors: {
-      config?: unknown,
-      title?: string,
-    }
-  },
-  entityTypes: {},
-  notifications: Array<EventNotification>,
-  defaults: { default_backlog_size: number },
-  onChange: (key: string, value: unknown) => void,
-  onCancel: () => void,
-  onSubmit: () => void
-  canEdit: boolean,
-}
+      config?: unknown;
+      title?: string;
+    };
+  };
+  entityTypes: {};
+  notifications: Array<EventNotification>;
+  defaults: { default_backlog_size: number };
+  onChange: (key: string, value: unknown) => void;
+  onCancel: () => void;
+  onSubmit: () => void;
+  canEdit: boolean;
+};
 
 const EventDefinitionForm = ({
   action,
@@ -96,7 +96,7 @@ const EventDefinitionForm = ({
   canEdit,
 }: Props) => {
   const { step } = useQuery();
-  const [activeStep, setActiveStep] = useState(step as string || STEP_KEYS[0]);
+  const [activeStep, setActiveStep] = useState((step as string) || STEP_KEYS[0]);
   const history = useHistory();
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
@@ -131,9 +131,10 @@ const EventDefinitionForm = ({
     currentUser,
   };
 
-  const canEditCondition = React.useMemo(() => (
-    canEdit || eventDefinition._scope.toUpperCase() === 'ILLUMINATE'
-  ), [canEdit, eventDefinition._scope]);
+  const canEditCondition = React.useMemo(
+    () => canEdit || eventDefinition._scope.toUpperCase() === 'ILLUMINATE',
+    [canEdit, eventDefinition._scope],
+  );
 
   const eventDefinitionType = getConditionPlugin(eventDefinition.config.type);
 
@@ -162,10 +163,12 @@ const EventDefinitionForm = ({
       key: STEP_KEYS[4],
       title: 'Summary',
       component: (
-        <EventDefinitionSummary eventDefinition={eventDefinition}
-                                currentUser={currentUser}
-                                notifications={notifications}
-                                validation={validation} />
+        <EventDefinitionSummary
+          eventDefinition={eventDefinition}
+          currentUser={currentUser}
+          notifications={notifications}
+          validation={validation}
+        />
       ),
     },
   ];
@@ -173,7 +176,7 @@ const EventDefinitionForm = ({
   const handleStepChange = (nextStep) => {
     sendTelemetry(STEP_TELEMETRY_KEYS[STEP_KEYS.indexOf(nextStep)], {
       app_pathname: getPathnameWithoutId(pathname),
-      app_section: (action === 'create') ? 'new-event-definition' : 'edit-event-definition',
+      app_section: action === 'create' ? 'new-event-definition' : 'edit-event-definition',
       app_action_value: 'event-definition-step',
       current_step: steps[STEP_KEYS.indexOf(activeStep)].title,
     });
@@ -184,9 +187,11 @@ const EventDefinitionForm = ({
   const renderButtons = () => {
     if (activeStep === last(STEP_KEYS)) {
       return (
-        <ModalSubmit onCancel={onCancel}
-                     onSubmit={handleSubmit}
-                     submitButtonText={`${eventDefinition.id ? 'Update' : 'Create'} event definition`} />
+        <ModalSubmit
+          onCancel={onCancel}
+          onSubmit={handleSubmit}
+          submitButtonText={`${eventDefinition.id ? 'Update' : 'Create'} event definition`}
+        />
       );
     }
 
@@ -195,7 +200,7 @@ const EventDefinitionForm = ({
     const handlePreviousClick = () => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_PREVIOUS_CLICKED, {
         app_pathname: getPathnameWithoutId(pathname),
-        app_section: (action === 'create') ? 'new-event-definition' : 'edit-event-definition',
+        app_section: action === 'create' ? 'new-event-definition' : 'edit-event-definition',
         app_action_value: 'previous-button',
         current_step: steps[activeStepIndex].title,
       });
@@ -207,7 +212,7 @@ const EventDefinitionForm = ({
     const handleNextClick = () => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_NEXT_CLICKED, {
         app_pathname: getPathnameWithoutId(pathname),
-        app_section: (action === 'create') ? 'new-event-definition' : 'edit-event-definition',
+        app_section: action === 'create' ? 'new-event-definition' : 'edit-event-definition',
         app_action_value: 'next-button',
         current_step: steps[activeStepIndex].title,
       });
@@ -218,14 +223,11 @@ const EventDefinitionForm = ({
 
     return (
       <div>
-        <Button bsStyle="info"
-                onClick={handlePreviousClick}
-                disabled={activeStepIndex === 0}>
+        <Button bsStyle="info" onClick={handlePreviousClick} disabled={activeStepIndex === 0}>
           Previous
         </Button>
         <div className="pull-right">
-          <Button bsStyle="info"
-                  onClick={handleNextClick}>
+          <Button bsStyle="info" onClick={handleNextClick}>
             Next
           </Button>
         </div>
@@ -237,13 +239,15 @@ const EventDefinitionForm = ({
     <Row>
       <Col md={12}>
         <WizardContainer>
-          <Wizard steps={steps}
-                  activeStep={activeStep}
-                  onStepChange={handleStepChange}
-                  horizontal
-                  justified
-                  containerClassName=""
-                  hidePreviousNextButtons />
+          <Wizard
+            steps={steps}
+            activeStep={activeStep}
+            onStepChange={handleStepChange}
+            horizontal
+            justified
+            containerClassName=""
+            hidePreviousNextButtons
+          />
         </WizardContainer>
         {renderButtons()}
       </Col>

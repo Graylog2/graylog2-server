@@ -25,9 +25,8 @@ import { SystemLoadBalancerStore } from 'stores/load-balancer/SystemLoadBalancer
 import { SystemProcessingStore } from 'stores/system-processing/SystemProcessingStore';
 
 // eslint-disable-next-line import/prefer-default-export
-export const ClusterOverviewStore = singletonStore(
-  'core.ClusterOverview',
-  () => Reflux.createStore({
+export const ClusterOverviewStore = singletonStore('core.ClusterOverview', () =>
+  Reflux.createStore({
     sourceUrl: '/cluster',
     clusterOverview: undefined,
 
@@ -50,38 +49,51 @@ export const ClusterOverviewStore = singletonStore(
           this.clusterOverview = response;
           this.trigger({ clusterOverview: this.clusterOverview });
         },
-        (error) => UserNotification.error(`Getting cluster overview failed: ${error}`, 'Could not get cluster overview'),
+        (error) =>
+          UserNotification.error(`Getting cluster overview failed: ${error}`, 'Could not get cluster overview'),
       );
 
       return promise;
     },
 
     threadDump(nodeId) {
-      const promise = fetch('GET', URLUtils.qualifyUrl(`${this.sourceUrl}/${nodeId}/threaddump`))
-        .then(
-          (response) => response.threaddump,
-          (error) => UserNotification.error(`Getting thread dump for node '${nodeId}' failed: ${error}`, 'Could not get thread dump'),
-        );
+      const promise = fetch('GET', URLUtils.qualifyUrl(`${this.sourceUrl}/${nodeId}/threaddump`)).then(
+        (response) => response.threaddump,
+        (error) =>
+          UserNotification.error(
+            `Getting thread dump for node '${nodeId}' failed: ${error}`,
+            'Could not get thread dump',
+          ),
+      );
 
       return promise;
     },
 
     processbufferDump(nodeId) {
-      const promise = fetch('GET', URLUtils.qualifyUrl(`${this.sourceUrl}/${nodeId}/processbufferdump`))
-        .then(
-          (response) => response.processbuffer_dump,
-          (error) => UserNotification.error(`Getting process buffer dump for node '${nodeId}' failed: ${error}`, 'Could not get process buffer dump'),
-        );
+      const promise = fetch('GET', URLUtils.qualifyUrl(`${this.sourceUrl}/${nodeId}/processbufferdump`)).then(
+        (response) => response.processbuffer_dump,
+        (error) =>
+          UserNotification.error(
+            `Getting process buffer dump for node '${nodeId}' failed: ${error}`,
+            'Could not get process buffer dump',
+          ),
+      );
 
       return promise;
     },
 
     systemLogs(nodeId, limit) {
-      const promise = fetchStreamingPlainText('GET', URLUtils.qualifyUrl(`${this.sourceUrl}/system/loggers/messages/recent/${nodeId}?limit=${limit}`))
-        .then(
-          (response) => response,
-          (error) => UserNotification.error(`Getting system log messages for node '${nodeId}' failed: ${error}`, 'Could not get system log messages'),
-        );
+      const promise = fetchStreamingPlainText(
+        'GET',
+        URLUtils.qualifyUrl(`${this.sourceUrl}/system/loggers/messages/recent/${nodeId}?limit=${limit}`),
+      ).then(
+        (response) => response,
+        (error) =>
+          UserNotification.error(
+            `Getting system log messages for node '${nodeId}' failed: ${error}`,
+            'Could not get system log messages',
+          ),
+      );
 
       return promise;
     },
@@ -89,7 +101,12 @@ export const ClusterOverviewStore = singletonStore(
     jvm(nodeId) {
       const promise = fetch('GET', URLUtils.qualifyUrl(`${this.sourceUrl}/${nodeId}/jvm`));
 
-      promise.catch((error) => UserNotification.error(`Getting JVM information for node '${nodeId}' failed: ${error}`, 'Could not get JVM information'));
+      promise.catch((error) =>
+        UserNotification.error(
+          `Getting JVM information for node '${nodeId}' failed: ${error}`,
+          'Could not get JVM information',
+        ),
+      );
 
       return promise;
     },

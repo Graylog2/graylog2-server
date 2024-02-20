@@ -32,17 +32,17 @@ import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/us
 import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 
 jest.mock('stores/users/CurrentUserStore', () => ({
-  CurrentUserStore: MockStore(
-    'get',
-    ['getInitialState', () => ({
+  CurrentUserStore: MockStore('get', [
+    'getInitialState',
+    () => ({
       currentUser: {
         id: 'user-betty-id',
         full_name: 'Betty Holberton',
         username: 'betty',
         permissions: ['dashboards:create'],
       },
-    })],
-  ),
+    }),
+  ]),
 }));
 
 jest.mock('views/components/dashboard/hooks/useDashboards', () => () => ({
@@ -107,7 +107,8 @@ jest.mock('react-router-dom', () => ({
 const finderTimeout = applyTimeoutMultiplier(15000);
 const testTimeout = applyTimeoutMultiplier(30000);
 
-const setInitialUrl = (url: string) => asMock(createBrowserRouter).mockImplementation((routes) => createMemoryRouter(routes, { initialEntries: [url] }));
+const setInitialUrl = (url: string) =>
+  asMock(createBrowserRouter).mockImplementation((routes) => createMemoryRouter(routes, { initialEntries: [url] }));
 
 describe('Create a new dashboard', () => {
   beforeAll(loadViewsPlugin);
@@ -130,20 +131,28 @@ describe('Create a new dashboard', () => {
     </DefaultProviders>
   );
 
-  it('using Dashboards Page', async () => {
-    setInitialUrl(Routes.DASHBOARDS);
-    const { findByText, findAllByText } = renderUnwrapped(<SimpleAppRouter />);
+  it(
+    'using Dashboards Page',
+    async () => {
+      setInitialUrl(Routes.DASHBOARDS);
+      const { findByText, findAllByText } = renderUnwrapped(<SimpleAppRouter />);
 
-    const buttons = await findAllByText('Create new dashboard', {}, { timeout: finderTimeout });
+      const buttons = await findAllByText('Create new dashboard', {}, { timeout: finderTimeout });
 
-    fireEvent.click(buttons[0]);
-    await findByText(/This dashboard has no widgets yet/, {}, { timeout: finderTimeout });
-  }, testTimeout);
+      fireEvent.click(buttons[0]);
+      await findByText(/This dashboard has no widgets yet/, {}, { timeout: finderTimeout });
+    },
+    testTimeout,
+  );
 
-  it('by going to the new dashboards endpoint', async () => {
-    setInitialUrl(Routes.pluginRoute('DASHBOARDS_NEW'));
-    const { findByText } = renderUnwrapped(<SimpleAppRouter />);
+  it(
+    'by going to the new dashboards endpoint',
+    async () => {
+      setInitialUrl(Routes.pluginRoute('DASHBOARDS_NEW'));
+      const { findByText } = renderUnwrapped(<SimpleAppRouter />);
 
-    await findByText(/This dashboard has no widgets yet/, {}, { timeout: finderTimeout });
-  }, testTimeout);
+      await findByText(/This dashboard has no widgets yet/, {}, { timeout: finderTimeout });
+    },
+    testTimeout,
+  );
 });

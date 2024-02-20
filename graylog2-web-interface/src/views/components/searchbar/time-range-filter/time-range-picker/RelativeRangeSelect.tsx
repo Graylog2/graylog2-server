@@ -39,7 +39,7 @@ const RangeWrapper = styled.div`
 const InputWrap = styled.div`
   grid-area: 2 / 1 / 3 / 3;
   position: relative;
-  
+
   .form-group {
     margin: 0;
   }
@@ -54,61 +54,68 @@ const RangeTitle = styled.h3`
   grid-area: 1 / 1 / 2 / 2;
 `;
 
-const Ago = styled.span(({ theme }) => css`
-  grid-area: 2 / 7 / 3 / 8;
-  font-size: ${theme.fonts.size.large};
+const Ago = styled.span(
+  ({ theme }) => css`
+    grid-area: 2 / 7 / 3 / 8;
+    font-size: ${theme.fonts.size.large};
 
-  &::after {
-    content: 'ago';
-  }
-`);
+    &::after {
+      content: 'ago';
+    }
+  `,
+);
 
-const RangeCheck = styled.label(({ theme }) => css`
-  font-size: ${theme.fonts.size.small};
-  grid-area: 1 / 2 / 2 / 8;
-  margin-left: 15px;
-  font-weight: normal;
-  align-self: self-end;
-  
-  &.shortened {
-    grid-area: 1 / 2 / 2 / 4;
-    text-decoration: line-through;
-    cursor: not-allowed;
-  }
-  
-  input {
-    margin-right: 6px;
-  }
-`);
+const RangeCheck = styled.label(
+  ({ theme }) => css`
+    font-size: ${theme.fonts.size.small};
+    grid-area: 1 / 2 / 2 / 8;
+    margin-left: 15px;
+    font-weight: normal;
+    align-self: self-end;
 
-const ErrorMessage = styled.span(({ theme }) => css`
-  color: ${theme.colors.variant.dark.danger};
-  grid-area: 3 / 1 / 3 / 4;
-  font-size: ${theme.fonts.size.small};
-  font-style: italic;
-  padding: 3px;
-`);
+    &.shortened {
+      grid-area: 1 / 2 / 2 / 4;
+      text-decoration: line-through;
+      cursor: not-allowed;
+    }
 
-const buildRangeTypes = (limitDuration) => RELATIVE_RANGE_TYPES.map(({ label, type }) => {
-  const typeDuration = moment.duration(1, type).asSeconds();
+    input {
+      margin-right: 6px;
+    }
+  `,
+);
 
-  if (limitDuration === 0 || typeDuration <= limitDuration) {
-    return { label, value: type };
-  }
+const ErrorMessage = styled.span(
+  ({ theme }) => css`
+    color: ${theme.colors.variant.dark.danger};
+    grid-area: 3 / 1 / 3 / 4;
+    font-size: ${theme.fonts.size.small};
+    font-style: italic;
+    padding: 3px;
+  `,
+);
 
-  return null;
-}).filter(Boolean);
+const buildRangeTypes = (limitDuration) =>
+  RELATIVE_RANGE_TYPES.map(({ label, type }) => {
+    const typeDuration = moment.duration(1, type).asSeconds();
+
+    if (limitDuration === 0 || typeDuration <= limitDuration) {
+      return { label, value: type };
+    }
+
+    return null;
+  }).filter(Boolean);
 
 type Props = {
-  defaultRange: RangeClassified
-  disableUnsetRange?: boolean,
-  disabled?: boolean,
-  fieldName: 'range' | 'from' | 'to',
-  limitDuration: number,
-  onUnsetRange?: () => void,
-  title: string,
-  unsetRangeLabel: string,
-}
+  defaultRange: RangeClassified;
+  disableUnsetRange?: boolean;
+  disabled?: boolean;
+  fieldName: 'range' | 'from' | 'to';
+  limitDuration: number;
+  onUnsetRange?: () => void;
+  title: string;
+  unsetRangeLabel: string;
+};
 
 const RelativeRangeSelectInner = ({
   classifiedRange,
@@ -124,34 +131,40 @@ const RelativeRangeSelectInner = ({
   title,
   unsetRangeLabel,
 }: Required<Props> & {
-  classifiedRange: RangeClassified,
-  error: string | undefined,
-  name: string,
-  onChange: (changeEvent: { target: { name: string, value: RangeClassified } }) => void,
+  classifiedRange: RangeClassified;
+  error: string | undefined;
+  name: string;
+  onChange: (changeEvent: { target: { name: string; value: RangeClassified } }) => void;
 }) => {
   const { initialValues } = useFormikContext<TimeRangePickerFormValues>();
   const availableRangeTypes = buildRangeTypes(limitDuration);
   const { isAllTime, value, unit } = classifiedRange;
 
-  const _onChange = React.useCallback((newClassifiedRange) => {
-    onChange({
-      target: {
-        name,
-        value: newClassifiedRange,
-      },
-    });
-  }, [name, onChange]);
+  const _onChange = React.useCallback(
+    (newClassifiedRange) => {
+      onChange({
+        target: {
+          name,
+          value: newClassifiedRange,
+        },
+      });
+    },
+    [name, onChange],
+  );
 
-  const _onChangeTime = React.useCallback((event) => {
-    const inputIsEmpty = event.target.value === '';
-    const inputValue = inputIsEmpty ? null : event.target.value;
+  const _onChangeTime = React.useCallback(
+    (event) => {
+      const inputIsEmpty = event.target.value === '';
+      const inputValue = inputIsEmpty ? null : event.target.value;
 
-    _onChange({
-      value: inputValue,
-      isAllTime,
-      unit,
-    });
-  }, [_onChange, unit, isAllTime]);
+      _onChange({
+        value: inputValue,
+        isAllTime,
+        unit,
+      });
+    },
+    [_onChange, unit, isAllTime],
+  );
 
   const _onChangeUnit = (newUnit) => {
     _onChange({ value, isAllTime, unit: newUnit });
@@ -160,9 +173,10 @@ const RelativeRangeSelectInner = ({
   const _onUnsetRange = (event) => {
     const isUnsetting = event.target.checked;
     const hasInitialRelativeRange = isTypeRelativeClassified(initialValues.timeRangeTabs.relative);
-    const _defaultRange = (hasInitialRelativeRange && !initialValues.timeRangeTabs.relative?.[fieldName].isAllTime)
-      ? initialValues.timeRangeTabs.relative[fieldName]
-      : defaultRange;
+    const _defaultRange =
+      hasInitialRelativeRange && !initialValues.timeRangeTabs.relative?.[fieldName].isAllTime
+        ? initialValues.timeRangeTabs.relative[fieldName]
+        : defaultRange;
 
     if (isUnsetting && !!onUnsetRange) {
       onUnsetRange();
@@ -175,40 +189,42 @@ const RelativeRangeSelectInner = ({
     <RangeWrapper>
       <RangeTitle>{title}</RangeTitle>
       <RangeCheck htmlFor={`relative-unset-${fieldName}`} className={disableUnsetRange && 'shortened'}>
-        <input checked={isAllTime}
-               className="mousetrap"
-               disabled={disableUnsetRange}
-               id={`relative-unset-${fieldName}`}
-               onChange={_onUnsetRange}
-               type="checkbox"
-               value="0" />
+        <input
+          checked={isAllTime}
+          className="mousetrap"
+          disabled={disableUnsetRange}
+          id={`relative-unset-${fieldName}`}
+          onChange={_onUnsetRange}
+          type="checkbox"
+          value="0"
+        />
         {unsetRangeLabel}
       </RangeCheck>
       <InputWrap>
-        <RelativeRangeValueInput disabled={disabled}
-                                 error={error}
-                                 fieldName={fieldName}
-                                 onChange={_onChangeTime}
-                                 unsetRange={isAllTime}
-                                 value={value} />
+        <RelativeRangeValueInput
+          disabled={disabled}
+          error={error}
+          fieldName={fieldName}
+          onChange={_onChangeTime}
+          unsetRange={isAllTime}
+          value={value}
+        />
       </InputWrap>
-      <StyledSelect clearable={false}
-                    disabled={disabled || isAllTime}
-                    id={`relative-timerange-${fieldName}-unit`}
-                    inputProps={{ className: 'mousetrap' }}
-                    name={`relative-timerange-${fieldName}-unit`}
-                    onChange={_onChangeUnit}
-                    options={availableRangeTypes}
-                    placeholder="Select a range length"
-                    value={unit} />
+      <StyledSelect
+        clearable={false}
+        disabled={disabled || isAllTime}
+        id={`relative-timerange-${fieldName}-unit`}
+        inputProps={{ className: 'mousetrap' }}
+        name={`relative-timerange-${fieldName}-unit`}
+        onChange={_onChangeUnit}
+        options={availableRangeTypes}
+        placeholder="Select a range length"
+        value={unit}
+      />
 
       <Ago />
 
-      {error && (
-        <ErrorMessage>
-          {error}
-        </ErrorMessage>
-      )}
+      {error && <ErrorMessage>{error}</ErrorMessage>}
     </RangeWrapper>
   );
 };
@@ -225,18 +241,20 @@ const RelativeRangeSelect = ({
 }: Props) => (
   <Field name={`timeRangeTabs.relative.${fieldName}`}>
     {({ field: { value, onChange, name }, meta: { error } }) => (
-      <RelativeRangeSelectInner classifiedRange={value}
-                                defaultRange={defaultRange}
-                                disableUnsetRange={disableUnsetRange}
-                                disabled={disabled}
-                                error={error}
-                                fieldName={fieldName}
-                                limitDuration={limitDuration}
-                                name={name}
-                                onUnsetRange={onUnsetRange}
-                                onChange={onChange}
-                                title={title}
-                                unsetRangeLabel={unsetRangeLabel} />
+      <RelativeRangeSelectInner
+        classifiedRange={value}
+        defaultRange={defaultRange}
+        disableUnsetRange={disableUnsetRange}
+        disabled={disabled}
+        error={error}
+        fieldName={fieldName}
+        limitDuration={limitDuration}
+        name={name}
+        onUnsetRange={onUnsetRange}
+        onChange={onChange}
+        title={title}
+        unsetRangeLabel={unsetRangeLabel}
+      />
     )}
   </Field>
 );

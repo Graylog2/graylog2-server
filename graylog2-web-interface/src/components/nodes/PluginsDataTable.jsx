@@ -34,8 +34,10 @@ class PluginsDataTable extends React.Component {
       <td className="limited">{plugin.author}</td>
       <td className="limited" style={{ width: '50%' }}>
         {plugin.description}
-          &nbsp;&nbsp;
-        <ExternalLink href={plugin.url} style={{ marginLeft: 10 }}>Website</ExternalLink>
+        &nbsp;&nbsp;
+        <ExternalLink href={plugin.url} style={{ marginLeft: 10 }}>
+          Website
+        </ExternalLink>
       </td>
     </tr>
   );
@@ -52,16 +54,18 @@ class PluginsDataTable extends React.Component {
     const headers = ['Name', 'Version', 'Author', 'Description'];
 
     return (
-      <DataTable id="plugin-list"
-                 rowClassName="row-sm"
-                 className="table-hover table-condensed table-striped"
-                 headers={headers}
-                 headerCellFormatter={this._headerCellFormatter}
-                 sortByKey="name"
-                 rows={this.props.plugins}
-                 dataRowFormatter={this._pluginInfoFormatter}
-                 filterLabel="Filter"
-                 filterKeys={[]} />
+      <DataTable
+        id="plugin-list"
+        rowClassName="row-sm"
+        className="table-hover table-condensed table-striped"
+        headers={headers}
+        headerCellFormatter={this._headerCellFormatter}
+        sortByKey="name"
+        rows={this.props.plugins}
+        dataRowFormatter={this._pluginInfoFormatter}
+        filterLabel="Filter"
+        filterKeys={[]}
+      />
     );
   }
 }

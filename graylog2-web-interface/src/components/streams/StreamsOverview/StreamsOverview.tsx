@@ -30,11 +30,7 @@ import EntityDataTable from 'components/common/EntityDataTable';
 import useStreams from 'components/streams/hooks/useStreams';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
-import {
-  DEFAULT_LAYOUT,
-  ENTITY_TABLE_ID,
-  ADDITIONAL_ATTRIBUTES,
-} from 'components/streams/StreamsOverview/Constants';
+import { DEFAULT_LAYOUT, ENTITY_TABLE_ID, ADDITIONAL_ATTRIBUTES } from 'components/streams/StreamsOverview/Constants';
 import EntityFilters from 'components/common/EntityFilters';
 import FilterValueRenderers from 'components/streams/StreamsOverview/FilterValueRenderers';
 import useTableElements from 'components/streams/StreamsOverview/hooks/useTableComponents';
@@ -57,8 +53,8 @@ const useRefetchStreamsOnStoreChange = (refetchStreams: () => void) => {
 };
 
 type Props = {
-  indexSets: Array<IndexSet>
-}
+  indexSets: Array<IndexSet>;
+};
 
 const StreamsOverview = ({ indexSets }: Props) => {
   const [urlQueryFilters, setUrlQueryFilters] = useUrlQueryFilters();
@@ -71,36 +67,40 @@ const StreamsOverview = ({ indexSets }: Props) => {
   });
   const paginationQueryParameter = usePaginationQueryParameter(undefined, layoutConfig.pageSize, false);
   const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(ENTITY_TABLE_ID);
-  const { data: paginatedStreams, isInitialLoading: isLoadingStreams, refetch: refetchStreams } = useStreams({
-    query: query,
-    page: paginationQueryParameter.page,
-    pageSize: layoutConfig.pageSize,
-    sort: layoutConfig.sort,
-    filters: urlQueryFilters,
-  }, { enabled: !isLoadingLayoutPreferences });
-  const { entityActions, expandedSections, bulkActions } = useTableElements({ indexSets });
   const {
-    onPageSizeChange,
-    onSearch,
-    onSearchReset,
-    onColumnsChange,
-    onSortChange,
-  } = useTableEventHandlers({
+    data: paginatedStreams,
+    isInitialLoading: isLoadingStreams,
+    refetch: refetchStreams,
+  } = useStreams(
+    {
+      query: query,
+      page: paginationQueryParameter.page,
+      pageSize: layoutConfig.pageSize,
+      sort: layoutConfig.sort,
+      filters: urlQueryFilters,
+    },
+    { enabled: !isLoadingLayoutPreferences },
+  );
+  const { entityActions, expandedSections, bulkActions } = useTableElements({ indexSets });
+  const { onPageSizeChange, onSearch, onSearchReset, onColumnsChange, onSortChange } = useTableEventHandlers({
     paginationQueryParameter,
     updateTableLayout,
     setQuery,
   });
 
-  const onChangeFilters = useCallback((newUrlQueryFilters: UrlQueryFilters) => {
-    paginationQueryParameter.resetPage();
-    setUrlQueryFilters(newUrlQueryFilters);
-  }, [paginationQueryParameter, setUrlQueryFilters]);
+  const onChangeFilters = useCallback(
+    (newUrlQueryFilters: UrlQueryFilters) => {
+      paginationQueryParameter.resetPage();
+      setUrlQueryFilters(newUrlQueryFilters);
+    },
+    [paginationQueryParameter, setUrlQueryFilters],
+  );
 
   useRefetchStreamsOnStoreChange(refetchStreams);
 
   const columnRenderers = useMemo(() => CustomColumnRenderers(indexSets), [indexSets]);
   const columnDefinitions = useMemo(
-    () => ([...(paginatedStreams?.attributes ?? []), ...ADDITIONAL_ATTRIBUTES]),
+    () => [...(paginatedStreams?.attributes ?? []), ...ADDITIONAL_ATTRIBUTES],
     [paginatedStreams?.attributes],
   );
 
@@ -108,42 +108,50 @@ const StreamsOverview = ({ indexSets }: Props) => {
     return <Spinner />;
   }
 
-  const { elements, attributes, pagination: { total } } = paginatedStreams;
+  const {
+    elements,
+    attributes,
+    pagination: { total },
+  } = paginatedStreams;
 
   return (
-    <PaginatedList pageSize={layoutConfig.pageSize}
-                   showPageSizeSelect={false}
-                   totalItems={total}>
+    <PaginatedList pageSize={layoutConfig.pageSize} showPageSizeSelect={false} totalItems={total}>
       <div style={{ marginBottom: 5 }}>
-        <SearchForm onSearch={onSearch}
-                    onReset={onSearchReset}
-                    query={query}
-                    queryHelpComponent={<QueryHelper entityName="stream" />}>
-          <EntityFilters attributes={attributes}
-                         urlQueryFilters={urlQueryFilters}
-                         setUrlQueryFilters={onChangeFilters}
-                         filterValueRenderers={FilterValueRenderers} />
+        <SearchForm
+          onSearch={onSearch}
+          onReset={onSearchReset}
+          query={query}
+          queryHelpComponent={<QueryHelper entityName="stream" />}
+        >
+          <EntityFilters
+            attributes={attributes}
+            urlQueryFilters={urlQueryFilters}
+            setUrlQueryFilters={onChangeFilters}
+            filterValueRenderers={FilterValueRenderers}
+          />
         </SearchForm>
       </div>
       <div>
         {elements?.length === 0 ? (
           <NoSearchResult>No streams have been found</NoSearchResult>
         ) : (
-          <EntityDataTable<Stream> data={elements}
-                                   visibleColumns={layoutConfig.displayedAttributes}
-                                   columnsOrder={DEFAULT_LAYOUT.columnsOrder}
-                                   onColumnsChange={onColumnsChange}
-                                   onSortChange={onSortChange}
-                                   onPageSizeChange={onPageSizeChange}
-                                   pageSize={layoutConfig.pageSize}
-                                   bulkSelection={{ actions: bulkActions }}
-                                   expandedSectionsRenderer={expandedSections}
-                                   activeSort={layoutConfig.sort}
-                                   rowActions={entityActions}
-                                   actionsCellWidth={160}
-                                   columnRenderers={columnRenderers}
-                                   columnDefinitions={columnDefinitions}
-                                   entityAttributesAreCamelCase={false} />
+          <EntityDataTable<Stream>
+            data={elements}
+            visibleColumns={layoutConfig.displayedAttributes}
+            columnsOrder={DEFAULT_LAYOUT.columnsOrder}
+            onColumnsChange={onColumnsChange}
+            onSortChange={onSortChange}
+            onPageSizeChange={onPageSizeChange}
+            pageSize={layoutConfig.pageSize}
+            bulkSelection={{ actions: bulkActions }}
+            expandedSectionsRenderer={expandedSections}
+            activeSort={layoutConfig.sort}
+            rowActions={entityActions}
+            actionsCellWidth={160}
+            columnRenderers={columnRenderers}
+            columnDefinitions={columnDefinitions}
+            entityAttributesAreCamelCase={false}
+          />
         )}
       </div>
     </PaginatedList>

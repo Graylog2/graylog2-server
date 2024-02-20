@@ -53,11 +53,11 @@ describe('SearchResult', () => {
   };
 
   it('should show spinner with undefined fields', () => {
-    const { getByText } = render(
-      <SearchResult />,
-    );
+    const { getByText } = render(<SearchResult />);
 
-    act(() => { jest.advanceTimersByTime(200); });
+    act(() => {
+      jest.advanceTimersByTime(200);
+    });
 
     expect(getByText('Loading...')).not.toBeNull();
   });
@@ -66,7 +66,9 @@ describe('SearchResult', () => {
     asMock(useIsLoading).mockReturnValue(true);
     const { getByText } = render(<SimpleSearchResult />);
 
-    act(() => { jest.advanceTimersByTime(500); });
+    act(() => {
+      jest.advanceTimersByTime(500);
+    });
 
     expect(getByText('Updating search results...')).not.toBeNull();
   });

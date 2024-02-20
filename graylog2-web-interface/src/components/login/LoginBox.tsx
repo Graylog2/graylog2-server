@@ -18,30 +18,30 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
-const Wrapper = styled.div(({ theme }) => css`
-  background-color: ${theme.colors.global.contentBackground};
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 33%;
-  padding: 30px;
-  max-width: 440px;
-  min-width: 330px;
-`);
+const Wrapper = styled.div(
+  ({ theme }) => css`
+    background-color: ${theme.colors.global.contentBackground};
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 33%;
+    padding: 30px;
+    max-width: 440px;
+    min-width: 330px;
+  `,
+);
 
 const Container = styled.div`
   width: 100%;
 `;
 
 type Props = {
-  children: React.ReactNode,
+  children: React.ReactNode;
 };
 
 const LoginBox = ({ children }: Props) => (
   <Wrapper className="container">
-    <Container>
-      {children}
-    </Container>
+    <Container>{children}</Container>
   </Wrapper>
 );
 

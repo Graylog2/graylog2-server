@@ -30,25 +30,22 @@ const AutoRefreshProvider = ({ children }: React.PropsWithChildren) => {
   const [refreshConfig, setRefreshConfig] = useState<RefreshConfig | null>(null);
   const startAutoRefresh = useCallback((interval: number) => setRefreshConfig({ enabled: true, interval }), []);
   const stopAutoRefresh = useCallback(() => setRefreshConfig((cur) => ({ ...cur, enabled: false })), []);
-  const contextValue = useMemo(() => ({
-    refreshConfig,
-    startAutoRefresh,
-    stopAutoRefresh,
-  }), [refreshConfig, startAutoRefresh, stopAutoRefresh]);
+  const contextValue = useMemo(
+    () => ({
+      refreshConfig,
+      startAutoRefresh,
+      stopAutoRefresh,
+    }),
+    [refreshConfig, startAutoRefresh, stopAutoRefresh],
+  );
 
   useEffect(() => {
-    const refreshInterval = refreshConfig?.enabled
-      ? setInterval(() => refreshSearch(), refreshConfig.interval)
-      : null;
+    const refreshInterval = refreshConfig?.enabled ? setInterval(() => refreshSearch(), refreshConfig.interval) : null;
 
     return () => clearInterval(refreshInterval);
   }, [refreshSearch, refreshConfig?.enabled, refreshConfig?.interval]);
 
-  return (
-    <AutoRefreshContext.Provider value={contextValue}>
-      {children}
-    </AutoRefreshContext.Provider>
-  );
+  return <AutoRefreshContext.Provider value={contextValue}>{children}</AutoRefreshContext.Provider>;
 };
 
 export default AutoRefreshProvider;

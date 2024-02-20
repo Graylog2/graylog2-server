@@ -62,85 +62,104 @@ class OTXAdapterFieldSet extends React.Component {
 
     return (
       <fieldset>
-        <Input id="indicator"
-               label="Indicator"
-               required
-               onChange={this.props.handleFormEvent}
-               help={this.props.validationMessage('indicator', 'The OTX indicator type that should be used for lookups.')}
-               bsStyle={this.props.validationState('indicator')}
-               labelClassName="col-sm-3"
-               wrapperClassName="col-sm-9">
-          <Select placeholder="Select indicator"
-                  clearable={false}
-                  options={OTX_INDICATORS}
-                  matchProp="label"
-                  onChange={this.handleSelect('indicator')}
-                  value={config.indicator} />
+        <Input
+          id="indicator"
+          label="Indicator"
+          required
+          onChange={this.props.handleFormEvent}
+          help={this.props.validationMessage('indicator', 'The OTX indicator type that should be used for lookups.')}
+          bsStyle={this.props.validationState('indicator')}
+          labelClassName="col-sm-3"
+          wrapperClassName="col-sm-9"
+        >
+          <Select
+            placeholder="Select indicator"
+            clearable={false}
+            options={OTX_INDICATORS}
+            matchProp="label"
+            onChange={this.handleSelect('indicator')}
+            value={config.indicator}
+          />
         </Input>
-        <Input type="text"
-               id="api_key"
-               name="api_key"
-               label="OTX API Key"
-               onChange={this.props.handleFormEvent}
-               help={this.props.validationMessage('api_key', 'Your OTX API key.')}
-               bsStyle={this.props.validationState('api_key')}
-               value={config.api_key}
-               labelClassName="col-sm-3"
-               wrapperClassName="col-sm-9" />
-        <Input type="text"
-               id="api_url"
-               name="api_url"
-               label="OTX API URL"
-               onChange={this.props.handleFormEvent}
-               help={this.props.validationMessage('api_url', 'URL of the OTX API server.')}
-               bsStyle={this.props.validationState('api_url')}
-               value={config.api_url}
-               labelClassName="col-sm-3"
-               wrapperClassName="col-sm-9" />
-        <Input type="text"
-               id="http_user_agent"
-               name="http_user_agent"
-               label="HTTP User-Agent"
-               required
-               onChange={this.props.handleFormEvent}
-               help={this.props.validationMessage('http_user_agent', 'The User-Agent header that should be used for the HTTP request.')}
-               bsStyle={this.props.validationState('http_user_agent')}
-               value={config.http_user_agent}
-               labelClassName="col-sm-3"
-               wrapperClassName="col-sm-9" />
-        <Input type="number"
-               id="http_connect_timeout"
-               name="http_connect_timeout"
-               label="HTTP Connect Timeout"
-               required
-               onChange={this.props.handleFormEvent}
-               help={this.props.validationMessage('http_connect_timeout', 'HTTP connection timeout in milliseconds.')}
-               bsStyle={this.props.validationState('http_connect_timeout')}
-               value={config.http_connect_timeout}
-               labelClassName="col-sm-3"
-               wrapperClassName="col-sm-9" />
-        <Input type="number"
-               id="http_write_timeout"
-               name="http_write_timeout"
-               label="HTTP Write Timeout"
-               required
-               onChange={this.props.handleFormEvent}
-               help={this.props.validationMessage('http_write_timeout', 'HTTP write timeout in milliseconds.')}
-               bsStyle={this.props.validationState('http_write_timeout')}
-               value={config.http_write_timeout}
-               labelClassName="col-sm-3"
-               wrapperClassName="col-sm-9" />
-        <Input type="number"
-               id="http_read_timeout"
-               name="http_read_timeout"
-               label="HTTP Read Timeout"
-               required
-               onChange={this.props.handleFormEvent}
-               help={this.props.validationMessage('http_read_timeout', 'HTTP read timeout in milliseconds.')}
-               bsStyle={this.props.validationState('http_read_timeout')}
-               value={config.http_read_timeout}
-               labelClassName="col-sm-3"
-               wrapperClassName="col-sm-9" />
+        <Input
+          type="text"
+          id="api_key"
+          name="api_key"
+          label="OTX API Key"
+          onChange={this.props.handleFormEvent}
+          help={this.props.validationMessage('api_key', 'Your OTX API key.')}
+          bsStyle={this.props.validationState('api_key')}
+          value={config.api_key}
+          labelClassName="col-sm-3"
+          wrapperClassName="col-sm-9"
+        />
+        <Input
+          type="text"
+          id="api_url"
+          name="api_url"
+          label="OTX API URL"
+          onChange={this.props.handleFormEvent}
+          help={this.props.validationMessage('api_url', 'URL of the OTX API server.')}
+          bsStyle={this.props.validationState('api_url')}
+          value={config.api_url}
+          labelClassName="col-sm-3"
+          wrapperClassName="col-sm-9"
+        />
+        <Input
+          type="text"
+          id="http_user_agent"
+          name="http_user_agent"
+          label="HTTP User-Agent"
+          required
+          onChange={this.props.handleFormEvent}
+          help={this.props.validationMessage(
+            'http_user_agent',
+            'The User-Agent header that should be used for the HTTP request.',
+          )}
+          bsStyle={this.props.validationState('http_user_agent')}
+          value={config.http_user_agent}
+          labelClassName="col-sm-3"
+          wrapperClassName="col-sm-9"
+        />
+        <Input
+          type="number"
+          id="http_connect_timeout"
+          name="http_connect_timeout"
+          label="HTTP Connect Timeout"
+          required
+          onChange={this.props.handleFormEvent}
+          help={this.props.validationMessage('http_connect_timeout', 'HTTP connection timeout in milliseconds.')}
+          bsStyle={this.props.validationState('http_connect_timeout')}
+          value={config.http_connect_timeout}
+          labelClassName="col-sm-3"
+          wrapperClassName="col-sm-9"
+        />
+        <Input
+          type="number"
+          id="http_write_timeout"
+          name="http_write_timeout"
+          label="HTTP Write Timeout"
+          required
+          onChange={this.props.handleFormEvent}
+          help={this.props.validationMessage('http_write_timeout', 'HTTP write timeout in milliseconds.')}
+          bsStyle={this.props.validationState('http_write_timeout')}
+          value={config.http_write_timeout}
+          labelClassName="col-sm-3"
+          wrapperClassName="col-sm-9"
+        />
+        <Input
+          type="number"
+          id="http_read_timeout"
+          name="http_read_timeout"
+          label="HTTP Read Timeout"
+          required
+          onChange={this.props.handleFormEvent}
+          help={this.props.validationMessage('http_read_timeout', 'HTTP read timeout in milliseconds.')}
+          bsStyle={this.props.validationState('http_read_timeout')}
+          value={config.http_read_timeout}
+          labelClassName="col-sm-3"
+          wrapperClassName="col-sm-9"
+        />
       </fieldset>
     );
   }

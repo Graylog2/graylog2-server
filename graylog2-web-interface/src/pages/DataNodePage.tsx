@@ -28,34 +28,40 @@ import Icon from 'components/common/Icon';
 import useDataNode from 'components/datanode/hooks/useDataNode';
 import DataNodeActions from 'components/datanode/DataNodeList/DataNodeActions';
 
-const StyledHorizontalDl = styled.dl(({ theme }) => css`
-  margin: ${theme.spacings.md} 0;
-  
-  > dt {
-    clear: left;
-    float: left;
-    margin-bottom: ${theme.spacings.md};
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    width: 160px;
-  }
-  
-  > *:not(dt) {
-    margin-bottom: ${theme.spacings.md};
-    margin-left: 140px;
-  }
-`);
+const StyledHorizontalDl = styled.dl(
+  ({ theme }) => css`
+    margin: ${theme.spacings.md} 0;
+
+    > dt {
+      clear: left;
+      float: left;
+      margin-bottom: ${theme.spacings.md};
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      width: 160px;
+    }
+
+    > *:not(dt) {
+      margin-bottom: ${theme.spacings.md};
+      margin-left: 140px;
+    }
+  `,
+);
 const StatusLabel = styled(Label)`
   display: inline-flex;
   justify-content: center;
   gap: 4px;
 `;
-const BooleanIcon = styled(Icon)<{ value: boolean }>(({ theme, value }) => css`
-  color: ${value ? theme.colors.variant.success : theme.colors.variant.danger};
-`);
+const BooleanIcon = styled(Icon)<{ value: boolean }>(
+  ({ theme, value }) => css`
+    color: ${value ? theme.colors.variant.success : theme.colors.variant.danger};
+  `,
+);
 const BooleanValue = ({ value }: { value: boolean }) => (
-  <><BooleanIcon name={value ? 'check-circle' : 'times-circle'} value={value} /> {value ? 'yes' : 'no'}</>
+  <>
+    <BooleanIcon name={value ? 'check-circle' : 'times-circle'} value={value} /> {value ? 'yes' : 'no'}
+  </>
 );
 
 const ActionsCol = styled(Col)`
@@ -80,11 +86,13 @@ const DataNodePage = () => {
   return (
     <DocumentTitle title={`Data Nodes: ${datanode.hostname}`}>
       <DataNodesPageNavigation />
-      <PageHeader title={`Data Nodes: ${datanode.hostname}`}
-                  documentationLink={{
-                    title: 'Data Nodes documentation',
-                    path: DocsHelper.PAGES.GRAYLOG_DATA_NODE,
-                  }} />
+      <PageHeader
+        title={`Data Nodes: ${datanode.hostname}`}
+        documentationLink={{
+          title: 'Data Nodes documentation',
+          path: DocsHelper.PAGES.GRAYLOG_DATA_NODE,
+        }}
+      />
       <Row className="content">
         <Col xs={12}>
           <Col xs={9}>
@@ -96,17 +104,24 @@ const DataNodePage = () => {
               <dd>{datanode.transport_address || '-'}</dd>
               <dt>Status:</dt>
               <dd>
-                <StatusLabel bsStyle={datanodeDisabled ? 'warning' : 'success'}
-                             title={datanode.data_node_status}
-                             aria-label={datanode.data_node_status}
-                             role="button">
+                <StatusLabel
+                  bsStyle={datanodeDisabled ? 'warning' : 'success'}
+                  title={datanode.data_node_status}
+                  aria-label={datanode.data_node_status}
+                  role="button"
+                >
                   {datanode.data_node_status || 'N/A'}
                 </StatusLabel>
               </dd>
               <dt>Is leader:</dt>
-              <dd><BooleanValue value={datanode.is_leader} /></dd>
+              <dd>
+                <BooleanValue value={datanode.is_leader} />
+              </dd>
               <dt>Certificate valid until:</dt>
-              <dd><RelativeTime dateTime={datanode.cert_valid_until} /> <CertRenewalButton nodeId={datanode.node_id} status={datanode.status} /></dd>
+              <dd>
+                <RelativeTime dateTime={datanode.cert_valid_until} />{' '}
+                <CertRenewalButton nodeId={datanode.node_id} status={datanode.status} />
+              </dd>
             </StyledHorizontalDl>
           </Col>
           <ActionsCol xs={3}>

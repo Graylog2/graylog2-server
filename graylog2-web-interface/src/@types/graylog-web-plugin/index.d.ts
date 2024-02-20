@@ -28,27 +28,27 @@ interface PluginRoute {
 }
 
 interface PluginNavigationDropdownItem {
-  description: string,
-  path: string,
-  permissions?: string | Array<string>,
-  requiredFeatureFlag?: string,
+  description: string;
+  path: string;
+  permissions?: string | Array<string>;
+  requiredFeatureFlag?: string;
 }
 
 type PluginNavigationLink = {
   path: string;
-}
+};
 
 type PluginNavigationDropdown = {
   children: Array<PluginNavigationDropdownItem>;
-}
+};
 
 type PluginNavigation = {
   description: string;
   requiredFeatureFlag?: string;
   perspective?: string;
   BadgeComponent?: React.ComponentType<{ text: string }>;
-  position?: 'last' | undefined,
-} & (PluginNavigationLink | PluginNavigationDropdown)
+  position?: 'last' | undefined;
+} & (PluginNavigationLink | PluginNavigationDropdown);
 
 interface PluginNavigationItems {
   key: string;
@@ -62,7 +62,7 @@ interface GlobalNotification {
 interface PluginPages {
   search?: {
     component: React.ComponentType;
-  }
+  };
 }
 
 interface PluginPageFooter {
@@ -106,10 +106,14 @@ interface PluginCloud {
       password: React.ComponentType<{}>;
     };
     validations: {
-      password: (errors: { [name: string]: string }, password: string, passwordRepeat: string) => { [name: string]: string };
+      password: (
+        errors: { [name: string]: string },
+        password: string,
+        passwordRepeat: string,
+      ) => { [name: string]: string };
     };
     extractSubmitError: (errors: FetchError) => string;
-    onCreate: (formData: { [name: string ]: string }) => { [name: string]: string };
+    onCreate: (formData: { [name: string]: string }) => { [name: string]: string };
   };
 }
 interface InputConfiguration {
@@ -130,41 +134,41 @@ interface LogoutHook {
 }
 
 type DataTiering = {
-  type: string,
-  TiersConfigurationFields: React.ComponentType<{}>,
+  type: string;
+  TiersConfigurationFields: React.ComponentType<{}>;
   TiersSummary: React.ComponentType<{
-    config: DataTieringConfig
-  }>,
-}
+    config: DataTieringConfig;
+  }>;
+};
 
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {
     navigation?: Array<PluginNavigation>;
-    dataTiering?: Array<DataTiering>
+    dataTiering?: Array<DataTiering>;
     defaultNavigation?: Array<PluginNavigation>;
     navigationItems?: Array<PluginNavigationItems>;
-    globalNotifications?: Array<GlobalNotification>
+    globalNotifications?: Array<GlobalNotification>;
     // Global context providers allow to fetch and process data once
     // and provide the result for all components in your plugin.
-    globalContextProviders?: Array<React.ComponentType<React.PropsWithChildrean<{}>>>,
+    globalContextProviders?: Array<React.ComponentType<React.PropsWithChildrean<{}>>>;
     routes?: Array<PluginRoute>;
-    entityRoutes?: Array<(id: string, type: string) => string>
+    entityRoutes?: Array<(id: string, type: string) => string>;
     pages?: PluginPages;
     pageFooter?: Array<PluginPageFooter>;
     cloud?: Array<PluginCloud>;
     forwarder?: Array<PluginForwarder>;
     inputConfiguration?: Array<InputConfiguration>;
     loginProviderType?: Array<ProviderType>;
-    'hooks.logout'?: Array<LogoutHook>,
+    'hooks.logout'?: Array<LogoutHook>;
   }
   interface PluginMetadata {
-    name?: string,
-    author?: string,
-    description?: string,
-    license?: string,
+    name?: string;
+    author?: string;
+    description?: string;
+    license?: string;
   }
   interface PluginRegistration {
-    metadata?: PluginMetadata
+    metadata?: PluginMetadata;
     exports: PluginExports;
   }
 
@@ -176,7 +180,7 @@ declare module 'graylog-web-plugin/plugin' {
     register: (manifest: PluginRegistration) => void;
     exports: <T extends keyof PluginExports>(key: T) => PluginExports[T];
     unregister: (manifest: PluginRegistration) => void;
-    get: () => Array<PluginRegistration>
+    get: () => Array<PluginRegistration>;
   }
 
   const PluginStore: PluginStore;

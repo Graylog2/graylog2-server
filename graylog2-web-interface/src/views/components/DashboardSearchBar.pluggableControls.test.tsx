@@ -50,10 +50,14 @@ jest.mock('views/stores/SearchConfigStore', () => ({
   },
 }));
 
-jest.mock('views/components/searchbar/queryvalidation/validateQuery', () => jest.fn(() => Promise.resolve({
-  status: 'OK',
-  explanations: [],
-})));
+jest.mock('views/components/searchbar/queryvalidation/validateQuery', () =>
+  jest.fn(() =>
+    Promise.resolve({
+      status: 'OK',
+      explanations: [],
+    }),
+  ),
+);
 
 const DashboardSearchBar = () => (
   <TestStoreProvider>
@@ -63,9 +67,7 @@ const DashboardSearchBar = () => (
 
 describe('DashboardSearchBar pluggable controls', () => {
   const PluggableSearchBarControl = () => (
-    <FormikInput label="Pluggable Control"
-                 name="pluggableControl"
-                 id="pluggable-control" />
+    <FormikInput label="Pluggable Control" name="pluggableControl" id="pluggable-control" />
   );
 
   const mockOnSubmit = jest.fn((_values, entity) => Promise.resolve(entity));
@@ -74,30 +76,35 @@ describe('DashboardSearchBar pluggable controls', () => {
   useViewsPlugin();
 
   beforeAll(() => {
-    PluginStore.register(new PluginManifest({}, {
-      'views.components.searchBar': [
-        () => ({
-          id: 'pluggable-search-bar-control',
-          component: PluggableSearchBarControl,
-          useInitialSearchValues: () => ({
-            pluggableControl: 'Initial Value',
-          }),
-          useInitialDashboardWidgetValues: () => ({
-            pluggableControl: 'Initial Value',
-          }),
-          onSearchSubmit: mockOnSubmit,
-          onDashboardWidgetSubmit: mockOnSubmit,
-          validationPayload: (values) => {
-            // @ts-ignore
-            const { pluggableControl } = values;
+    PluginStore.register(
+      new PluginManifest(
+        {},
+        {
+          'views.components.searchBar': [
+            () => ({
+              id: 'pluggable-search-bar-control',
+              component: PluggableSearchBarControl,
+              useInitialSearchValues: () => ({
+                pluggableControl: 'Initial Value',
+              }),
+              useInitialDashboardWidgetValues: () => ({
+                pluggableControl: 'Initial Value',
+              }),
+              onSearchSubmit: mockOnSubmit,
+              onDashboardWidgetSubmit: mockOnSubmit,
+              validationPayload: (values) => {
+                // @ts-ignore
+                const { pluggableControl } = values;
 
-            return ({ customKey: pluggableControl });
-          },
-          onValidate: mockOnValidate,
-          placement: 'right',
-        }),
-      ],
-    }));
+                return { customKey: pluggableControl };
+              },
+              onValidate: mockOnValidate,
+              placement: 'right',
+            }),
+          ],
+        },
+      ),
+    );
   });
 
   beforeEach(() => {
@@ -112,44 +119,60 @@ describe('DashboardSearchBar pluggable controls', () => {
     expect(pluggableFormField).toHaveValue('Initial Value');
   });
 
-  it('should register submit handler', async () => {
-    render(<DashboardSearchBar />);
+  it(
+    'should register submit handler',
+    async () => {
+      render(<DashboardSearchBar />);
 
-    const searchButton = await screen.findByRole('button', { name: /perform search/i });
-    await waitFor(() => expect(searchButton).not.toHaveClass('disabled'));
-    userEvent.click(searchButton);
+      const searchButton = await screen.findByRole('button', { name: /perform search/i });
+      await waitFor(() => expect(searchButton).not.toHaveClass('disabled'));
+      userEvent.click(searchButton);
 
-    await waitFor(() => expect(mockOnSubmit).toHaveBeenCalledWith(
-      {
-        pluggableControl: 'Initial Value',
-        queryString: '',
-        timerange: undefined,
-      },
-      expect.any(Function),
-      undefined,
-    ));
-  }, testTimeout);
+      await waitFor(() =>
+        expect(mockOnSubmit).toHaveBeenCalledWith(
+          {
+            pluggableControl: 'Initial Value',
+            queryString: '',
+            timerange: undefined,
+          },
+          expect.any(Function),
+          undefined,
+        ),
+      );
+    },
+    testTimeout,
+  );
 
   it('should register validation handler', async () => {
     render(<DashboardSearchBar />);
 
-    await waitFor(() => expect(mockOnValidate).toHaveBeenCalledWith({
-      pluggableControl: 'Initial Value',
-      queryString: '',
-      timerange: {},
-    }, {
-      executionState: SearchExecutionState.empty(),
-      view: expect.objectContaining({ id: 'search-id-1' }),
-    }));
+    await waitFor(() =>
+      expect(mockOnValidate).toHaveBeenCalledWith(
+        {
+          pluggableControl: 'Initial Value',
+          queryString: '',
+          timerange: {},
+        },
+        {
+          executionState: SearchExecutionState.empty(),
+          view: expect.objectContaining({ id: 'search-id-1' }),
+        },
+      ),
+    );
   });
 
   it('should extend query validation payload', async () => {
     render(<DashboardSearchBar />);
 
-    await waitFor(() => expect(validateQuery).toHaveBeenCalledWith({
-      customKey: 'Initial Value',
-      queryString: '',
-      timeRange: undefined,
-    }, 'Europe/Berlin'));
+    await waitFor(() =>
+      expect(validateQuery).toHaveBeenCalledWith(
+        {
+          customKey: 'Initial Value',
+          queryString: '',
+          timeRange: undefined,
+        },
+        'Europe/Berlin',
+      ),
+    );
   });
 });

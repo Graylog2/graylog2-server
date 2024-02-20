@@ -21,24 +21,26 @@ import { ReadOnlyFormGroup } from 'components/common';
 import { Well } from 'components/bootstrap';
 import type { SlackNotificationSummaryType } from 'integrations/event-notifications/types';
 
-const NewExampleWell = styled(Well)(({ theme }) => css`
-  margin-bottom: 5px;
-  font-family: ${theme.fonts.family.monospace};
-  font-size: ${theme.fonts.size.body};
-  white-space: pre-wrap;
-  word-wrap: break-word;
-`);
+const NewExampleWell = styled(Well)(
+  ({ theme }) => css`
+    margin-bottom: 5px;
+    font-family: ${theme.fonts.family.monospace};
+    font-size: ${theme.fonts.size.body};
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  `,
+);
 
 const SlackNotificationDetails: React.FC<SlackNotificationSummaryType> = ({ notification }) => (
   <>
     <ReadOnlyFormGroup label="Webhook URL" value={notification.config.webhook_url} />
     <ReadOnlyFormGroup label="Channel" value={notification.config.channel} />
-    <ReadOnlyFormGroup label="Custom Message Template "
-                       value={(
-                         <NewExampleWell bsSize="small">
-                           {notification.config.custom_message || <em>Empty body</em>}
-                         </NewExampleWell>
-                       )} />
+    <ReadOnlyFormGroup
+      label="Custom Message Template "
+      value={
+        <NewExampleWell bsSize="small">{notification.config.custom_message || <em>Empty body</em>}</NewExampleWell>
+      }
+    />
     <ReadOnlyFormGroup label="Message Backlog Limit" value={notification.config.backlog_size} />
     <ReadOnlyFormGroup label="User Name" value={notification.config.user_name} />
     <ReadOnlyFormGroup label="Include Title" value={notification.config.include_title} />

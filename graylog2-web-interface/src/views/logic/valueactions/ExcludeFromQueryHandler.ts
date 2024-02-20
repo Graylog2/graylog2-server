@@ -22,24 +22,24 @@ import { updateQueryString } from 'views/logic/slices/viewSlice';
 import { selectQueryString } from 'views/logic/slices/viewSelectors';
 
 const formatNewQuery = (oldQuery: string, field: string, value: any) => {
-  const fieldPredicate = value === MISSING_BUCKET_NAME
-    ? `_exists_:${field}`
-    : `NOT ${field}:${escape(value)}`;
+  const fieldPredicate = value === MISSING_BUCKET_NAME ? `_exists_:${field}` : `NOT ${field}:${escape(value)}`;
 
   return addToQuery(oldQuery, fieldPredicate);
 };
 
 type Args = {
-  queryId: string,
-  field: string,
-  value?: string,
+  queryId: string;
+  field: string;
+  value?: string;
 };
 
-const ExcludeFromQueryHandler = ({ queryId, field, value }: Args) => (dispatch: AppDispatch, getState: () => RootState) => {
-  const oldQuery = selectQueryString(queryId)(getState());
-  const newQuery = formatNewQuery(oldQuery, field, value);
+const ExcludeFromQueryHandler =
+  ({ queryId, field, value }: Args) =>
+  (dispatch: AppDispatch, getState: () => RootState) => {
+    const oldQuery = selectQueryString(queryId)(getState());
+    const newQuery = formatNewQuery(oldQuery, field, value);
 
-  return dispatch(updateQueryString(queryId, newQuery));
-};
+    return dispatch(updateQueryString(queryId, newQuery));
+  };
 
 export default ExcludeFromQueryHandler;

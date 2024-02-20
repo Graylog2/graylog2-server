@@ -70,11 +70,7 @@ const retentionStrategies = [
         },
         index_action: {
           type: 'string',
-          enum: [
-            'NONE',
-            'CLOSE',
-            'DELETE',
-          ],
+          enum: ['NONE', 'CLOSE', 'DELETE'],
         },
         type: {
           type: 'string',
@@ -245,22 +241,24 @@ jest.mock('components/indices/hooks/useIndexDefaults', () => jest.fn());
 
 describe('IndexSetConfigurationForm', () => {
   beforeEach(() => {
-    asMock(useProfileOptions).mockReturnValue(({ isLoading: false, options: [], refetch: () => {} }));
-    asMock(useIndexDefaults).mockReturnValue(({ loadingIndexDefaultsConfig: false, indexDefaultsConfig }));
+    asMock(useProfileOptions).mockReturnValue({ isLoading: false, options: [], refetch: () => {} });
+    asMock(useIndexDefaults).mockReturnValue({ loadingIndexDefaultsConfig: false, indexDefaultsConfig });
   });
 
   const onSave = jest.fn();
   const cancelLink = '/cancelLink';
 
   const SUT = (props: Partial<React.ComponentProps<typeof IndexSetConfigurationForm>>) => (
-    <IndexSetConfigurationForm retentionStrategiesContext={retentionStrategiesContext}
-                               rotationStrategies={rotationStrategies}
-                               retentionStrategies={retentionStrategies}
-                               cancelLink={cancelLink}
-                               onUpdate={onSave}
-                               submitButtonText="Save"
-                               submitLoadingText="Saving..."
-                               {...props} />
+    <IndexSetConfigurationForm
+      retentionStrategiesContext={retentionStrategiesContext}
+      rotationStrategies={rotationStrategies}
+      retentionStrategies={retentionStrategies}
+      cancelLink={cancelLink}
+      onUpdate={onSave}
+      submitButtonText="Save"
+      submitLoadingText="Saving..."
+      {...props}
+    />
   );
 
   it('Should render IndexSetConfigurationForm', async () => {

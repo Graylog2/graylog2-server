@@ -31,7 +31,7 @@ const SelectedEntitiesAmount = styled.div`
 `;
 
 type Props = {
-  bulkActions: React.ReactNode,
+  bulkActions: React.ReactNode;
 };
 
 const BulkActionsRow = ({ bulkActions }: Props) => {

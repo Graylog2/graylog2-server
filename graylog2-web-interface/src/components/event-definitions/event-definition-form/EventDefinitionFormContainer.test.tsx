@@ -69,33 +69,51 @@ jest.mock('react-router-dom', () => {
 jest.mock('stores/connect', () => ({
   __esModule: true,
   useStore: jest.fn((store) => store.getInitialState()),
-  default: jest.fn((
-    Component: React.ComponentType<React.ComponentProps<any>>,
-    stores: { [key: string]: any },
-    _mapProps: (args: { [key: string]: any }) => any,
-  ) => {
-    const storeProps = Object.entries(stores).reduce((acc, [key, store]) => ({ ...acc, [key]: store.getInitialState() }), {});
-    const componentProps = {
-      ...storeProps,
-      eventDefinition: {
-        ...mockEventDefinition,
-        config: {
-          ...mockEventDefinition.config,
-          query: 'http_response_code:400',
+  default: jest.fn(
+    (
+      Component: React.ComponentType<React.ComponentProps<any>>,
+      stores: { [key: string]: any },
+      _mapProps: (args: { [key: string]: any }) => any,
+    ) => {
+      const storeProps = Object.entries(stores).reduce(
+        (acc, [key, store]) => ({ ...acc, [key]: store.getInitialState() }),
+        {},
+      );
+      const componentProps = {
+        ...storeProps,
+        eventDefinition: {
+          ...mockEventDefinition,
+          config: {
+            ...mockEventDefinition.config,
+            query: 'http_response_code:400',
+          },
         },
-      },
-    };
+      };
 
-    const ConnectStoreWrapper = () => (<Component {...componentProps} />);
+      const ConnectStoreWrapper = () => <Component {...componentProps} />;
 
-    return ConnectStoreWrapper;
-  }),
+      return ConnectStoreWrapper;
+    },
+  ),
 }));
 
 jest.mock('stores/event-definitions/AvailableEventDefinitionTypesStore', () => ({
   AvailableEventDefinitionTypesStore: {
     getInitialState: () => ({
-      aggregation_functions: ['avg', 'card', 'count', 'max', 'min', 'sum', 'stddev', 'sumofsquares', 'variance', 'percentage', 'percentile', 'latest'],
+      aggregation_functions: [
+        'avg',
+        'card',
+        'count',
+        'max',
+        'min',
+        'sum',
+        'stddev',
+        'sumofsquares',
+        'variance',
+        'percentage',
+        'percentile',
+        'latest',
+      ],
       field_provider_types: ['template-v1', 'lookup-v1'],
       processor_types: ['aggregation-v1', 'system-notifications-v1', 'correlation-v1', 'anomaly-v1', 'sigma-v1'],
       storage_handler_types: ['persist-to-streams-v1'],
@@ -103,31 +121,33 @@ jest.mock('stores/event-definitions/AvailableEventDefinitionTypesStore', () => (
   },
 }));
 
-const mockEventNotifications = [{
-  id: 'mock-notification-id',
-  title: 'mock-notification-title',
-  description: 'mock-notification-description',
-  config: {
-    body_template: '',
-    email_recipients: ['test-user@graylog.com'],
-    html_body_template: '',
-    lookup_recipient_emails: false,
-    lookup_reply_to_email: false,
-    lookup_sender_email: false,
-    recipients_lut_key: null,
-    recipients_lut_name: null,
-    reply_to: '',
-    reply_to_lut_key: null,
-    reply_to_lut_name: null,
-    sender: 'info-test@graylog.com',
-    sender_lut_key: null,
-    sender_lut_name: null,
-    subject: 'Mock test email notification subject',
-    time_zone: 'UTC',
-    type: 'email-notification-v1',
-    user_recipients: [],
+const mockEventNotifications = [
+  {
+    id: 'mock-notification-id',
+    title: 'mock-notification-title',
+    description: 'mock-notification-description',
+    config: {
+      body_template: '',
+      email_recipients: ['test-user@graylog.com'],
+      html_body_template: '',
+      lookup_recipient_emails: false,
+      lookup_reply_to_email: false,
+      lookup_sender_email: false,
+      recipients_lut_key: null,
+      recipients_lut_name: null,
+      reply_to: '',
+      reply_to_lut_key: null,
+      reply_to_lut_name: null,
+      sender: 'info-test@graylog.com',
+      sender_lut_key: null,
+      sender_lut_name: null,
+      subject: 'Mock test email notification subject',
+      time_zone: 'UTC',
+      type: 'email-notification-v1',
+      user_recipients: [],
+    },
   },
-}];
+];
 
 jest.mock('stores/event-notifications/EventNotificationsStore', () => ({
   EventNotificationsActions: { listAll: jest.fn() },
@@ -151,13 +171,15 @@ jest.mock('stores/event-notifications/EventNotificationsStore', () => ({
 
 jest.mock('stores/configurations/ConfigurationsStore', () => ({
   ConfigurationsActions: {
-    listEventsClusterConfig: jest.fn(() => Promise.resolve({
-      events_catchup_window: 3600000,
-      events_notification_default_backlog: 50,
-      events_notification_retry_period: 300000,
-      events_notification_tcp_keepalive: false,
-      events_search_timeout: 60000,
-    })),
+    listEventsClusterConfig: jest.fn(() =>
+      Promise.resolve({
+        events_catchup_window: 3600000,
+        events_notification_default_backlog: 50,
+        events_notification_retry_period: 300000,
+        events_notification_tcp_keepalive: false,
+        events_search_timeout: 60000,
+      }),
+    ),
   },
 }));
 
@@ -179,12 +201,14 @@ jest.mock('../event-definition-types/withStreams', () => ({
 jest.mock('logic/telemetry/withTelemetry', () => ({
   __esModule: true,
   default: (Component: React.FC) => (props: any) => (
-    <Component {...props}
-               streams={[{ id: 'stream-id', title: 'stream-title' }]}
-               sendTelemetry={() => {}}
-               onChange={() => {}}
-               currentUser={mockDefaultUser}
-               validation={{ errors: {} }} />
+    <Component
+      {...props}
+      streams={[{ id: 'stream-id', title: 'stream-title' }]}
+      sendTelemetry={() => {}}
+      onChange={() => {}}
+      currentUser={mockDefaultUser}
+      validation={{ errors: {} }}
+    />
   ),
 }));
 
@@ -196,10 +220,19 @@ jest.mock('hooks/useCurrentUser');
 
 describe('EventDefinitionFormContainer', () => {
   beforeEach(() => {
-    asMock(useLocation).mockImplementation(() => ({ pathname: '/event-definitions', search: '', hash: '', state: null, key: 'mock-key' }));
+    asMock(useLocation).mockImplementation(() => ({
+      pathname: '/event-definitions',
+      search: '',
+      hash: '',
+      state: null,
+      key: 'mock-key',
+    }));
     asMock(useSendTelemetry).mockImplementation(() => jest.fn());
     asMock(useCurrentUser).mockImplementation(() => mockDefaultUser);
-    asMock(useEventDefinitionConfigFromLocalStorage).mockImplementation(() => ({ hasLocalStorageConfig: false, configFromLocalStorage: undefined }));
+    asMock(useEventDefinitionConfigFromLocalStorage).mockImplementation(() => ({
+      hasLocalStorageConfig: false,
+      configFromLocalStorage: undefined,
+    }));
     asMock(useScopePermissions).mockImplementation(() => exampleEntityScopeMutable);
   });
 

@@ -25,7 +25,7 @@ import ThemeWrapper from 'preflight/theme/ThemeWrapper';
 
 import App from './App';
 
-ReactDOM.render((
+ReactDOM.render(
   <PreflightThemeProvider>
     <GlobalThemeStyles />
     <DefaultQueryClientProvider>
@@ -36,9 +36,8 @@ ReactDOM.render((
         </>
       </ThemeWrapper>
     </DefaultQueryClientProvider>
-  </PreflightThemeProvider>
-),
-document.getElementById('app-root'),
+  </PreflightThemeProvider>,
+  document.getElementById('app-root'),
 );
 
 // @ts-ignore

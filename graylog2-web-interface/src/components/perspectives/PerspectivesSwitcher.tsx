@@ -37,13 +37,15 @@ const Container = styled.span`
   padding-right: 0;
 `;
 
-const ItemContainer = styled.span(({ theme }) => css`
-  font-size: ${theme.fonts.size.large};
-  display: flex;
-  flex-direction: row;
-  align-content: center;
-  align-items: center;
-`);
+const ItemContainer = styled.span(
+  ({ theme }) => css`
+    font-size: ${theme.fonts.size.large};
+    display: flex;
+    flex-direction: row;
+    align-content: center;
+    align-items: center;
+  `,
+);
 
 const DropdownTrigger = styled.button`
   background: transparent;
@@ -54,21 +56,26 @@ const StyledMenuDropdown = styled(Menu.Dropdown)`
   z-index: 1032 !important;
 `;
 
-const DropdownIcon = styled(Icon)(({ theme }) => css`
-  color: ${theme.colors.global.textDefault};
-`);
+const DropdownIcon = styled(Icon)(
+  ({ theme }) => css`
+    color: ${theme.colors.global.textDefault};
+  `,
+);
 
 const Switcher = () => {
   const { setActivePerspective } = useActivePerspective();
   const perspectives = usePerspectives();
   const history = useHistory();
 
-  const onChangePerspective = useCallback((nextPerspectiveId: string) => () => {
-    const { welcomeRoute } = perspectives.find(({ id }) => id === nextPerspectiveId);
+  const onChangePerspective = useCallback(
+    (nextPerspectiveId: string) => () => {
+      const { welcomeRoute } = perspectives.find(({ id }) => id === nextPerspectiveId);
 
-    history.push(welcomeRoute);
-    setActivePerspective(nextPerspectiveId);
-  }, [history, perspectives, setActivePerspective]);
+      history.push(welcomeRoute);
+      setActivePerspective(nextPerspectiveId);
+    },
+    [history, perspectives, setActivePerspective],
+  );
 
   return (
     <Container className={CONTAINER_CLASS}>
@@ -97,9 +104,7 @@ const PerspectivesSwitcher = () => {
   const hasPerspectivesFeature = useFeature('frontend_perspectives');
 
   if (!hasPerspectivesFeature || perspectives.length === 1) {
-    return (
-      <ActivePerspectiveBrand className="navbar-brand" />
-    );
+    return <ActivePerspectiveBrand className="navbar-brand" />;
   }
 
   return <Switcher />;

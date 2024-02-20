@@ -67,18 +67,30 @@ class JSONValueInput extends React.Component {
   };
 
   render() {
-    const options = OPTIONS.filter((o) => this.props.allowedTypes.indexOf(o.value) > -1).map((o) => <MenuItem key={o.value} onSelect={() => this._onValueTypeSelect(o.value)}>{o.label}</MenuItem>);
+    const options = OPTIONS.filter((o) => this.props.allowedTypes.indexOf(o.value) > -1).map((o) => (
+      <MenuItem key={o.value} onSelect={() => this._onValueTypeSelect(o.value)}>
+        {o.label}
+      </MenuItem>
+    ));
 
     return (
       <FormGroup validationState={this.props.validationState}>
         {this.props.label && <ControlLabel className={this.props.labelClassName}>{this.props.label}</ControlLabel>}
         <InputWrapper className={this.props.wrapperClassName}>
           <InputGroup>
-            <FormControl type="text" onChange={this._onUpdate} onBlur={this.props.onBlur} value={this.state.value} required={this.props.required} />
-            <DropdownButton componentClass={InputGroup.Button}
-                            id="input-dropdown-addon"
-                            bsStyle={this.props.validationState === 'error' ? 'danger' : 'default'}
-                            title={OPTIONS.filter((o) => o.value === this.props.valueType)[0].label}>
+            <FormControl
+              type="text"
+              onChange={this._onUpdate}
+              onBlur={this.props.onBlur}
+              value={this.state.value}
+              required={this.props.required}
+            />
+            <DropdownButton
+              componentClass={InputGroup.Button}
+              id="input-dropdown-addon"
+              bsStyle={this.props.validationState === 'error' ? 'danger' : 'default'}
+              title={OPTIONS.filter((o) => o.value === this.props.valueType)[0].label}
+            >
               {options}
             </DropdownButton>
           </InputGroup>
@@ -104,7 +116,9 @@ JSONValueInput.propTypes = {
     const errors = [];
 
     if (!(props[propName] instanceof Array)) {
-      return new Error(`Invalid prop ${propName} supplied to ${componentName}. Expected an array but got ${props[propName]}`);
+      return new Error(
+        `Invalid prop ${propName} supplied to ${componentName}. Expected an array but got ${props[propName]}`,
+      );
     }
 
     props[propName].forEach((p) => {
@@ -114,7 +128,9 @@ JSONValueInput.propTypes = {
     });
 
     if (errors.length > 0) {
-      return new Error(`Invalid prop ${propName} supplied to ${componentName}. Expected array of ${values} but got invalid ${errors}`);
+      return new Error(
+        `Invalid prop ${propName} supplied to ${componentName}. Expected array of ${values} but got invalid ${errors}`,
+      );
     }
 
     return null;

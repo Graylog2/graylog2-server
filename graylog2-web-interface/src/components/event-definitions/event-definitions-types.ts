@@ -16,69 +16,69 @@
  */
 
 type Provider = {
-  type: string,
-  template: string,
-  require_values: boolean,
-}
+  type: string;
+  template: string;
+  require_values: boolean;
+};
 
 type FieldSpec = {
   [key: string]: {
-    data_type: string,
-    providers: Array<Provider>,
-  }
+    data_type: string;
+    providers: Array<Provider>;
+  };
 };
 
 type Notification = {
-  notification_id: number,
+  notification_id: number;
 };
 
 export type Scheduler = {
   data: {
-    type: string
-    timerange_from: number,
-    timerange_to: number,
-  },
-  next_time: string,
-  triggered_at: string,
-  queued_notifications: number,
-  is_scheduled: boolean,
-  status: string
+    type: string;
+    timerange_from: number;
+    timerange_to: number;
+  };
+  next_time: string;
+  triggered_at: string;
+  queued_notifications: number;
+  is_scheduled: boolean;
+  status: string;
 };
 
 export type SearchFilter = {
-  id: string,
-  type: string,
-  title: string,
-  queryString: string,
-  disabled: boolean,
-  negation: boolean,
-  frontendId?: string,
-  description?: string,
+  id: string;
+  type: string;
+  title: string;
+  queryString: string;
+  disabled: boolean;
+  negation: boolean;
+  frontendId?: string;
+  description?: string;
 };
 
 export type EventDefinition = {
-  id: string,
+  id: string;
   config?: {
-    type: string,
-    execute_every_ms?: number,
-    search_within_ms?: number,
-    event_limit?: number,
-    sigma_rule_id?: string,
-    streams?: Array<string>
-    filters?: Array<SearchFilter>,
-  },
-  title: string,
-  description?: string,
-  matched_at?: string,
-  priority?: number,
-  key_spec?: Array<string>
-  field_spec?: FieldSpec,
+    type: string;
+    execute_every_ms?: number;
+    search_within_ms?: number;
+    event_limit?: number;
+    sigma_rule_id?: string;
+    streams?: Array<string>;
+    filters?: Array<SearchFilter>;
+  };
+  title: string;
+  description?: string;
+  matched_at?: string;
+  priority?: number;
+  key_spec?: Array<string>;
+  field_spec?: FieldSpec;
   notification_settings?: {
-    backlog_size: number,
-    grace_period_ms: number,
-  }
-  notifications?: Array<Notification>,
-  _scope?: string,
-  scheduler?: Scheduler,
-  state?: 'ENABLED' | 'DISABLED',
+    backlog_size: number;
+    grace_period_ms: number;
+  };
+  notifications?: Array<Notification>;
+  _scope?: string;
+  scheduler?: Scheduler;
+  state?: 'ENABLED' | 'DISABLED';
 };

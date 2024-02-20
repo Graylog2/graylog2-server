@@ -38,15 +38,19 @@ const deleteFavoriteItem = (grn: string) => {
 const useFavoriteItemMutation = () => {
   const putMutation = useMutation(putFavoriteItem, {
     onError: (errorThrown) => {
-      UserNotification.error(`Adding item to favorites failed with status: ${errorThrown}`,
-        'Could not add item to favorites');
+      UserNotification.error(
+        `Adding item to favorites failed with status: ${errorThrown}`,
+        'Could not add item to favorites',
+      );
     },
   });
 
   const deleteMutation = useMutation(deleteFavoriteItem, {
     onError: (errorThrown) => {
-      UserNotification.error(`Deleting item from favorites failed with status: ${errorThrown}`,
-        'Could not delete item from favorites');
+      UserNotification.error(
+        `Deleting item from favorites failed with status: ${errorThrown}`,
+        'Could not delete item from favorites',
+      );
     },
   });
 

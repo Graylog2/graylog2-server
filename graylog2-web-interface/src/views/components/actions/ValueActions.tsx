@@ -26,18 +26,21 @@ import { ActionContext } from 'views/logic/ActionContext';
 import CustomPropTypes from '../CustomPropTypes';
 
 type Props = {
-  children: React.ReactNode,
-  element: React.ReactNode,
-  field: string,
-  menuContainer: HTMLElement | undefined | null,
-  queryId: QueryId,
-  type: FieldType,
-  value: React.ReactNode,
+  children: React.ReactNode;
+  element: React.ReactNode;
+  field: string;
+  menuContainer: HTMLElement | undefined | null;
+  queryId: QueryId;
+  type: FieldType;
+  value: React.ReactNode;
 };
 
 const ValueActions = ({ children, element, field, menuContainer, queryId, type, value }: Props) => {
   const actionContext = useContext(ActionContext);
-  const handlerArgs = useMemo(() => ({ queryId, field, type, value, contexts: actionContext }), [actionContext, field, queryId, type, value]);
+  const handlerArgs = useMemo(
+    () => ({ queryId, field, type, value, contexts: actionContext }),
+    [actionContext, field, queryId, type, value],
+  );
   const elementWithStatus = (() => element) as React.ComponentType<{ active: boolean }>;
 
   return (

@@ -36,20 +36,21 @@ import {
 import connect, { useStore } from '../connect';
 
 const SimpleComponentWithoutStores = () => <span>Hello World!</span>;
-const createSimpleStore = () => Reflux.createStore<{ value: number }>({
-  getInitialState() {
-    return this.state;
-  },
-  setValue(value: number) {
-    this.state = { value };
-    this.trigger(this.state);
-  },
-  noop() {},
-  reset() {
-    this.state = undefined;
-    this.trigger(this.state);
-  },
-});
+const createSimpleStore = () =>
+  Reflux.createStore<{ value: number }>({
+    getInitialState() {
+      return this.state;
+    },
+    setValue(value: number) {
+      this.state = { value };
+      this.trigger(this.state);
+    },
+    noop() {},
+    reset() {
+      this.state = undefined;
+      this.trigger(this.state);
+    },
+  });
 
 const SimpleStore = createSimpleStore();
 
@@ -130,7 +131,7 @@ describe('connect()', () => {
     const Component = connect(
       SimpleComponentWithDummyStore,
       { simpleStore: SimpleStore },
-      ({ simpleStore }) => (simpleStore && { simpleStore: { value: simpleStore.value * 2 } }),
+      ({ simpleStore }) => simpleStore && { simpleStore: { value: simpleStore.value * 2 } },
     );
     render(<Component />);
 
@@ -163,16 +164,14 @@ describe('connect()', () => {
     const Component = connect(
       () => <span>hello!</span>,
       { simpleStore: SimpleStore },
-      ({ simpleStore }) => (simpleStore && { storeValue: simpleStore.value }),
+      ({ simpleStore }) => simpleStore && { storeValue: simpleStore.value },
     );
     render(<Component />);
     await screen.findByText('hello!');
   });
 
   it('types props which have a default value (defaultProps) as optional', async () => {
-    const BaseComponent = ({ exampleProp }: {
-      exampleProp: string
-    }) => <span>{exampleProp}</span>;
+    const BaseComponent = ({ exampleProp }: { exampleProp: string }) => <span>{exampleProp}</span>;
 
     BaseComponent.defaultProps = {
       exampleProp: 'hello!',
@@ -189,9 +188,11 @@ describe('connect()', () => {
   });
 
   describe('generates `shouldComponentUpdate`', () => {
-    const Component: React.ComponentType<{ someProp?: any, foo: number }> = jest.fn(() => <span>Hello!</span>);
+    const Component: React.ComponentType<{ someProp?: any; foo: number }> = jest.fn(() => <span>Hello!</span>);
 
-    afterEach(() => { jest.clearAllMocks(); });
+    afterEach(() => {
+      jest.clearAllMocks();
+    });
 
     it('comparing empty values properly', async () => {
       const ComponentClass = connect(Component, {});
@@ -225,37 +226,37 @@ describe('connect()', () => {
 
     // eslint-disable-next-line jest/expect-expect
     it.each`
-    initial                  | next                     | result    | description
-    ${undefined}             | ${undefined}             | ${false}  | ${'equal undefined values'}
-    ${undefined}             | ${null}                  | ${true}   | ${'from undefined to null value'}
-    ${undefined}             | ${42}                    | ${true}   | ${'from undefined to numeric value'}
-    ${42}                    | ${42}                    | ${false}  | ${'equal numeric values'}
-    ${42}                    | ${23}                    | ${true}   | ${'non-equal numeric values'}
-    ${'Hello there!'}        | ${'Hello there!'}        | ${false}  | ${'equal string values'}
-    ${'Hello there!'}        | ${'Hello World!'}        | ${true}   | ${'non-equal string values'}
-    ${{}}                    | ${{}}                    | ${false}  | ${'equal empty objects'}
-    ${{ bar: 23 }}           | ${{ bar: 23 }}           | ${false}  | ${'equal objects'}
-    ${{ bar: 23 }}           | ${{ bar: 42 }}           | ${true}   | ${'non-equal objects'}
-    ${[]}                    | ${[]}                    | ${false}  | ${'equal empty arrays'}
-    ${[23]}                  | ${[23]}                  | ${false}  | ${'equal arrays'}
-    ${[23]}                  | ${[42]}                  | ${true}   | ${'non-equal arrays'}
-    ${Map()}                 | ${Map()}                 | ${false}  | ${'equal empty immutable maps'}
-    ${Map({ bar: 23 })}      | ${Map({ bar: 23 })}      | ${false}  | ${'equal immutable maps'}
-    ${Map({ bar: 23 })}      | ${Map({ bar: 42 })}      | ${true}   | ${'non-equal immutable maps'}
-    ${List()}                | ${List()}                | ${false}  | ${'equal empty immutable lists'}
-    ${List([23])}            | ${List([23])}            | ${false}  | ${'equal immutable lists'}
-    ${List([23])}            | ${List([42])}            | ${true}   | ${'non-equal immutable lists'}
-    ${new AlwaysEqual()}     | ${new AlwaysEqual()}     | ${false}  | ${'value class which is always equal'}
-    ${new NeverEqual()}      | ${new NeverEqual()}      | ${true}   | ${'value class which is never equal'}
-    ${new AlwaysEqual()}     | ${new NeverEqual()}      | ${false}  | ${'value class which is always equal'}
-    ${new NeverEqual()}      | ${new AlwaysEqual()}     | ${true}   | ${'value class which is never equal'}
-    ${new NonValueClass(23)} | ${new NonValueClass(42)} | ${true}   | ${'value class which is never equal'}
-    ${mapWithObject()}       | ${mapWithObject()}       | ${false}  | ${'immutable maps containing objects'}
-    ${listWithObject()}      | ${listWithObject()}      | ${false}  | ${'immutable lists containing objects'}
-    ${objectWithMap()}       | ${objectWithMap()}       | ${false}  | ${'objects containing immutable maps'}
-    ${arrayOfMaps()}         | ${arrayOfMaps()}         | ${false}  | ${'arrays containing immutable maps'}
-    ${mixedMapsAndObjects()} | ${mixedMapsAndObjects()} | ${false}  | ${'nested immutable maps and objects'}
-  `('compares $description and returns $result', verifyShouldComponentUpdate);
+      initial                  | next                     | result   | description
+      ${undefined}             | ${undefined}             | ${false} | ${'equal undefined values'}
+      ${undefined}             | ${null}                  | ${true}  | ${'from undefined to null value'}
+      ${undefined}             | ${42}                    | ${true}  | ${'from undefined to numeric value'}
+      ${42}                    | ${42}                    | ${false} | ${'equal numeric values'}
+      ${42}                    | ${23}                    | ${true}  | ${'non-equal numeric values'}
+      ${'Hello there!'}        | ${'Hello there!'}        | ${false} | ${'equal string values'}
+      ${'Hello there!'}        | ${'Hello World!'}        | ${true}  | ${'non-equal string values'}
+      ${{}}                    | ${{}}                    | ${false} | ${'equal empty objects'}
+      ${{ bar: 23 }}           | ${{ bar: 23 }}           | ${false} | ${'equal objects'}
+      ${{ bar: 23 }}           | ${{ bar: 42 }}           | ${true}  | ${'non-equal objects'}
+      ${[]}                    | ${[]}                    | ${false} | ${'equal empty arrays'}
+      ${[23]}                  | ${[23]}                  | ${false} | ${'equal arrays'}
+      ${[23]}                  | ${[42]}                  | ${true}  | ${'non-equal arrays'}
+      ${Map()}                 | ${Map()}                 | ${false} | ${'equal empty immutable maps'}
+      ${Map({ bar: 23 })}      | ${Map({ bar: 23 })}      | ${false} | ${'equal immutable maps'}
+      ${Map({ bar: 23 })}      | ${Map({ bar: 42 })}      | ${true}  | ${'non-equal immutable maps'}
+      ${List()}                | ${List()}                | ${false} | ${'equal empty immutable lists'}
+      ${List([23])}            | ${List([23])}            | ${false} | ${'equal immutable lists'}
+      ${List([23])}            | ${List([42])}            | ${true}  | ${'non-equal immutable lists'}
+      ${new AlwaysEqual()}     | ${new AlwaysEqual()}     | ${false} | ${'value class which is always equal'}
+      ${new NeverEqual()}      | ${new NeverEqual()}      | ${true}  | ${'value class which is never equal'}
+      ${new AlwaysEqual()}     | ${new NeverEqual()}      | ${false} | ${'value class which is always equal'}
+      ${new NeverEqual()}      | ${new AlwaysEqual()}     | ${true}  | ${'value class which is never equal'}
+      ${new NonValueClass(23)} | ${new NonValueClass(42)} | ${true}  | ${'value class which is never equal'}
+      ${mapWithObject()}       | ${mapWithObject()}       | ${false} | ${'immutable maps containing objects'}
+      ${listWithObject()}      | ${listWithObject()}      | ${false} | ${'immutable lists containing objects'}
+      ${objectWithMap()}       | ${objectWithMap()}       | ${false} | ${'objects containing immutable maps'}
+      ${arrayOfMaps()}         | ${arrayOfMaps()}         | ${false} | ${'arrays containing immutable maps'}
+      ${mixedMapsAndObjects()} | ${mixedMapsAndObjects()} | ${false} | ${'nested immutable maps and objects'}
+    `('compares $description and returns $result', verifyShouldComponentUpdate);
   });
 });
 
@@ -345,7 +346,11 @@ describe('useStore', () => {
   it('does not reregister if props mapper is provided as arrow function', async () => {
     const listenSpy = jest.spyOn(SimpleStore, 'listen');
 
-    const ComponentWithPropsMapper = ({ propsMapper }: { propsMapper: (state: { value: number }) => ({ value: number }) }) => {
+    const ComponentWithPropsMapper = ({
+      propsMapper,
+    }: {
+      propsMapper: (state: { value: number }) => { value: number };
+    }) => {
       const { value } = useStore(SimpleStore, propsMapper) || { value: undefined };
 
       return <span>{value ? `Value is: ${value}` : 'No value.'}</span>;

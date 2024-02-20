@@ -25,13 +25,15 @@ const SelectableListExample = createReactClass({
   render() {
     const { options, selectedOptions } = this.state;
     return (
-      <SelectableList selectedOptionsType="object"
-                      options={options}
-                      onChange={this.onChange}
-                      selectedOptions={selectedOptions} />
+      <SelectableList
+        selectedOptionsType="object"
+        options={options}
+        onChange={this.onChange}
+        selectedOptions={selectedOptions}
+      />
     );
   },
 });
 
-<SelectableListExample />
+<SelectableListExample />;
 ```

@@ -18,13 +18,13 @@ import * as Immutable from 'immutable';
 import type { $PropertyType } from 'utility-types';
 
 type InternalState = {
-  enabled: boolean,
-  usernameHeader: string,
+  enabled: boolean;
+  usernameHeader: string;
 };
 
 export type HTTPHeaderAuthConfigJSON = {
-  enabled: boolean,
-  username_header: string,
+  enabled: boolean;
+  username_header: string;
 };
 
 export default class HTTPHeaderAuthConfig {
@@ -46,10 +46,7 @@ export default class HTTPHeaderAuthConfig {
   }
 
   toBuilder() {
-    const {
-      usernameHeader,
-      enabled,
-    } = this._value;
+    const { usernameHeader, enabled } = this._value;
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder(Immutable.Map({ usernameHeader, enabled }));

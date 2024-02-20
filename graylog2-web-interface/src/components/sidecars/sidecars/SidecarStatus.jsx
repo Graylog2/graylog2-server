@@ -43,7 +43,12 @@ const SidecarStatus = createReactClass({
   // eslint-disable-next-line react/no-unstable-nested-components
   formatNodeDetails(details) {
     if (!details) {
-      return <p>Node details are currently unavailable. Please wait a moment and ensure the sidecar is correctly connected to the server.</p>;
+      return (
+        <p>
+          Node details are currently unavailable. Please wait a moment and ensure the sidecar is correctly connected to
+          the server.
+        </p>
+      );
     }
 
     const metrics = details.metrics || {};
@@ -59,9 +64,11 @@ const SidecarStatus = createReactClass({
         <dt>Load</dt>
         <dd>{defaultTo(metrics.load_1, 'Not available')}</dd>
         <dt>Volumes &gt; 75% full</dt>
-        {metrics.disks_75 === undefined
-          ? <dd>Not available</dd>
-          : <dd>{metrics.disks_75.length > 0 ? metrics.disks_75.join(', ') : 'None'}</dd>}
+        {metrics.disks_75 === undefined ? (
+          <dd>Not available</dd>
+        ) : (
+          <dd>{metrics.disks_75.length > 0 ? metrics.disks_75.join(', ') : 'None'}</dd>
+        )}
       </dl>
     );
   },
@@ -69,11 +76,21 @@ const SidecarStatus = createReactClass({
   // eslint-disable-next-line react/no-unstable-nested-components
   formatCollectorStatus(details, collectors) {
     if (!details || !collectors) {
-      return <p>Collectors status are currently unavailable. Please wait a moment and ensure the sidecar is correctly connected to the server.</p>;
+      return (
+        <p>
+          Collectors status are currently unavailable. Please wait a moment and ensure the sidecar is correctly
+          connected to the server.
+        </p>
+      );
     }
 
     if (!details.status) {
-      return <p>Did not receive collectors status, set the option <code>send_status: true</code> in the sidecar configuration to see this information.</p>;
+      return (
+        <p>
+          Did not receive collectors status, set the option <code>send_status: true</code> in the sidecar configuration
+          to see this information.
+        </p>
+      );
     }
 
     const collectorStatuses = details.status.collectors;
@@ -105,9 +122,11 @@ const SidecarStatus = createReactClass({
 
           if (status.verbose_message) {
             verboseButton = (
-              <Button bsStyle="link"
-                      bsSize="xs"
-                      onClick={() => this._onShowVerbose(collector.name, status.verbose_message)}>
+              <Button
+                bsStyle="link"
+                bsSize="xs"
+                onClick={() => this._onShowVerbose(collector.name, status.verbose_message)}
+              >
                 Show Details
               </Button>
             );
@@ -127,17 +146,17 @@ const SidecarStatus = createReactClass({
 
       if (collector) {
         statuses.push(
-          <dt key={`${collector.id}-key`} className={statusClass}>{collector.name}</dt>,
-          <dd key={`${collector.id}-description`} className={statusClass}>{statusBadge}&ensp;{statusMessage}&ensp;{verboseButton}</dd>,
+          <dt key={`${collector.id}-key`} className={statusClass}>
+            {collector.name}
+          </dt>,
+          <dd key={`${collector.id}-description`} className={statusClass}>
+            {statusBadge}&ensp;{statusMessage}&ensp;{verboseButton}
+          </dd>,
         );
       }
     });
 
-    return (
-      <dl className={commonStyles.deflist}>
-        {statuses}
-      </dl>
-    );
+    return <dl className={commonStyles.deflist}>{statuses}</dl>;
   },
 
   _onShowVerbose(name, verbose) {
@@ -178,14 +197,15 @@ const SidecarStatus = createReactClass({
             </div>
           </Col>
         </Row>
-        <VerboseMessageModal showModal={this.state.showVerboseModal}
-                             onHide={this._onHideVerbose}
-                             collectorName={this.state.collectorName}
-                             collectorVerbose={this.state.collectorVerbose} />
+        <VerboseMessageModal
+          showModal={this.state.showVerboseModal}
+          onHide={this._onHideVerbose}
+          collectorName={this.state.collectorName}
+          collectorVerbose={this.state.collectorVerbose}
+        />
       </div>
     );
   },
-
 });
 
 export default SidecarStatus;

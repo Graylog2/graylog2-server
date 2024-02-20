@@ -50,7 +50,7 @@ const SidecarListContainer = createReactClass({
       this._reloadSidecars({
         sortField: field,
         // eslint-disable-next-line no-nested-ternary
-        order: (this.state.sort.field === field ? (this.state.sort.order === 'asc' ? 'desc' : 'asc') : 'asc'),
+        order: this.state.sort.field === field ? (this.state.sort.order === 'asc' ? 'desc' : 'asc') : 'asc',
       });
     };
   },
@@ -93,9 +93,10 @@ const SidecarListContainer = createReactClass({
     options.pageSize = pageSize || paginationQueryParameter.pageSize;
     options.onlyActive = onlyActive === undefined ? this.state.onlyActive : onlyActive; // Avoid || to handle false values
 
-    const shouldKeepPage = options.pageSize === paginationQueryParameter.pageSize
-      && options.onlyActive === this.state.onlyActive
-      && options.query === this.state.query; // Only keep page number when other parameters don't change
+    const shouldKeepPage =
+      options.pageSize === paginationQueryParameter.pageSize &&
+      options.onlyActive === this.state.onlyActive &&
+      options.query === this.state.query; // Only keep page number when other parameters don't change
     let effectivePage = 1;
 
     if (shouldKeepPage) {
@@ -119,15 +120,17 @@ const SidecarListContainer = createReactClass({
     }
 
     return (
-      <SidecarList sidecars={sidecars}
-                   onlyActive={onlyActive}
-                   pagination={pagination}
-                   query={query}
-                   sort={sort}
-                   onPageChange={this.handlePageChange}
-                   onQueryChange={this.handleQueryChange}
-                   onSortChange={this.handleSortChange}
-                   toggleShowInactive={this.toggleShowInactive} />
+      <SidecarList
+        sidecars={sidecars}
+        onlyActive={onlyActive}
+        pagination={pagination}
+        query={query}
+        sort={sort}
+        onPageChange={this.handlePageChange}
+        onQueryChange={this.handleQueryChange}
+        onSortChange={this.handleSortChange}
+        toggleShowInactive={this.toggleShowInactive}
+      />
     );
   },
 });

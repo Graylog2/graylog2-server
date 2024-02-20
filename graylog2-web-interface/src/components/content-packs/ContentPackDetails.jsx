@@ -51,36 +51,51 @@ const ContentPackDetails = (props) => {
               <dt>Summary:</dt> <dd>{contentPack.summary}&nbsp;</dd>
               <dt>Vendor:</dt> <dd>{contentPack.vendor}&nbsp;</dd>
               <dt>URL:</dt> <dd>{contentPackAnchor}&nbsp;</dd>
-              {contentPack.id && (<span><dt>ID:</dt> <dd><code>{contentPack.id}</code></dd></span>)}
-              {contentPack.parameters && !verbose && (<span><dt>Parameters:</dt> <dd>{contentPack.parameters.length}</dd></span>)}
-              {contentPack.entities && !verbose && (<span><dt>Entities:</dt> <dd>{contentPack.entities.length}</dd></span>)}
+              {contentPack.id && (
+                <span>
+                  <dt>ID:</dt>{' '}
+                  <dd>
+                    <code>{contentPack.id}</code>
+                  </dd>
+                </span>
+              )}
+              {contentPack.parameters && !verbose && (
+                <span>
+                  <dt>Parameters:</dt> <dd>{contentPack.parameters.length}</dd>
+                </span>
+              )}
+              {contentPack.entities && !verbose && (
+                <span>
+                  <dt>Entities:</dt> <dd>{contentPack.entities.length}</dd>
+                </span>
+              )}
             </dl>
           </div>
-          {contentPack.description
-          && (
-          <div>
-            <h2>Description</h2>
-            <br />
-            <Well>
-              <Markdown text={contentPack.description} />
-            </Well>
-          </div>
+          {contentPack.description && (
+            <div>
+              <h2>Description</h2>
+              <br />
+              <Well>
+                <Markdown text={contentPack.description} />
+              </Well>
+            </div>
           )}
           <br />
           {contentPack.status && <ContentPackStatus states={contentPack.states} />}
           <br />
           <br />
-          {contentPack.constraints && showConstraints
-          && (
-          <div>
-            <ContentPackConstraints constraints={constraints} />
-            <br />
-          </div>
+          {contentPack.constraints && showConstraints && (
+            <div>
+              <ContentPackConstraints constraints={constraints} />
+              <br />
+            </div>
           )}
-          {contentPack.entities && contentPack.entities.length > 0 && verbose
-          && <ContentPackEntitiesList contentPack={contentPack} readOnly />}
-          {contentPack.parameters && contentPack.parameters.length > 0 && verbose
-          && <ContentPackParameterList contentPack={contentPack} readOnly />}
+          {contentPack.entities && contentPack.entities.length > 0 && verbose && (
+            <ContentPackEntitiesList contentPack={contentPack} readOnly />
+          )}
+          {contentPack.parameters && contentPack.parameters.length > 0 && verbose && (
+            <ContentPackParameterList contentPack={contentPack} readOnly />
+          )}
         </div>
       </Col>
     </Row>

@@ -23,21 +23,15 @@ import MapVisualization from '../MapVisualization';
 
 describe('MapVisualization', () => {
   it('renders with minimal props', () => {
-    const wrapper = mount(<MapVisualization id="somemap"
-                                            onChange={() => {}}
-                                            data={[]}
-                                            height={1600}
-                                            width={900} />);
+    const wrapper = mount(<MapVisualization id="somemap" onChange={() => {}} data={[]} height={1600} width={900} />);
 
     expect(wrapper.find('div.map#visualization-somemap')).toExist();
   });
 
   it('does not render circle markers for invalid data', () => {
-    const wrapper = mount(<MapVisualization id="somemap"
-                                            onChange={() => {}}
-                                            data={fixtures.invalidData}
-                                            height={1600}
-                                            width={900} />);
+    const wrapper = mount(
+      <MapVisualization id="somemap" onChange={() => {}} data={fixtures.invalidData} height={1600} width={900} />,
+    );
 
     expect(wrapper.find('div.map#visualization-somemap')).toExist();
     expect(wrapper.find('CircleMarker')).not.toExist();

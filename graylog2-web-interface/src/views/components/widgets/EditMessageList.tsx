@@ -54,7 +54,11 @@ const PreviewOptionCheckbox = styled(Checkbox)`
   }
 `;
 
-const _onFieldSelectionChanged = (fields: Array<string>, config: MessagesWidgetConfig, onChange: (newConfig: MessagesWidgetConfig) => void) => {
+const _onFieldSelectionChanged = (
+  fields: Array<string>,
+  config: MessagesWidgetConfig,
+  onChange: (newConfig: MessagesWidgetConfig) => void,
+) => {
   const newConfig = config.toBuilder().fields(fields).build();
 
   return onChange(newConfig);
@@ -67,12 +71,22 @@ const _onSortChange = (sort: $PropertyType<AggregationWidgetConfig, 'sort'>, con
 };
 
 const _onSortDirectionChange = (direction: SortConfig['direction'], config, onChange) => {
-  const newConfig = config.toBuilder().sort(config.sort.map((sort) => sort.toBuilder().direction(direction).build())).build();
+  const newConfig = config
+    .toBuilder()
+    .sort(config.sort.map((sort) => sort.toBuilder().direction(direction).build()))
+    .build();
 
   return onChange(newConfig);
 };
 
-const EditMessageList = ({ children, config, fields, onChange, onCancel, onSubmit }: EditWidgetComponentProps<MessagesWidgetConfig>) => {
+const EditMessageList = ({
+  children,
+  config,
+  fields,
+  onChange,
+  onCancel,
+  onSubmit,
+}: EditWidgetComponentProps<MessagesWidgetConfig>) => {
   const { sort } = config;
   const [sortDirection] = (sort || []).map((s) => s.direction);
   const onDecoratorsChange = (newDecorators) => onChange(config.toBuilder().decorators(newDecorators).build());
@@ -82,23 +96,27 @@ const EditMessageList = ({ children, config, fields, onChange, onCancel, onSubmi
   return (
     <FullHeightRow>
       <FullHeightCol md={3}>
-        <StickyBottomActions actions={<SaveOrCancelButtons onCancel={onCancel} onSubmit={onSubmit} />}
-                             alignActionsAtBottom>
+        <StickyBottomActions
+          actions={<SaveOrCancelButtons onCancel={onCancel} onSubmit={onSubmit} />}
+          alignActionsAtBottom
+        >
           <DescriptionBox description="Fields">
-            <FieldsConfiguration onChange={(newFields) => _onFieldSelectionChanged(newFields, config, onChange)}
-                                 menuPortalTarget={document.body}
-                                 selectedFields={config.fields} />
-
+            <FieldsConfiguration
+              onChange={(newFields) => _onFieldSelectionChanged(newFields, config, onChange)}
+              menuPortalTarget={document.body}
+              selectedFields={config.fields}
+            />
           </DescriptionBox>
           <DescriptionBox description="Message Preview">
             {sortedMessagePreviewOptions.map((option) => (
-              <PreviewOptionCheckbox key={option.title} checked={option.isChecked(config)} onChange={() => option.onChange(config, onChange)} disabled={option.isDisabled(config)}>
+              <PreviewOptionCheckbox
+                key={option.title}
+                checked={option.isChecked(config)}
+                onChange={() => option.onChange(config, onChange)}
+                disabled={option.isDisabled(config)}
+              >
                 {option.title}
-                {option.help && (
-                  <HoverForHelp title={option.title}>
-                    {option.help}
-                  </HoverForHelp>
-                )}
+                {option.help && <HoverForHelp title={option.title}>{option.help}</HoverForHelp>}
               </PreviewOptionCheckbox>
             ))}
           </DescriptionBox>
@@ -106,19 +124,18 @@ const EditMessageList = ({ children, config, fields, onChange, onCancel, onSubmi
             <FieldSortSelect fields={fields} sort={sort} onChange={(data) => _onSortChange(data, config, onChange)} />
           </DescriptionBox>
           <DescriptionBox description="Direction">
-            <SortDirectionSelect disabled={!sort || sort.length === 0}
-                                 direction={sortDirection && sortDirection.direction}
-                                 onChange={(data) => _onSortDirectionChange(data, config, onChange)} />
+            <SortDirectionSelect
+              disabled={!sort || sort.length === 0}
+              direction={sortDirection && sortDirection.direction}
+              onChange={(data) => _onSortDirectionChange(data, config, onChange)}
+            />
           </DescriptionBox>
           <DescriptionBox description="Decorators">
-            <DecoratorSidebar decorators={config.decorators}
-                              onChange={onDecoratorsChange} />
+            <DecoratorSidebar decorators={config.decorators} onChange={onDecoratorsChange} />
           </DescriptionBox>
         </StickyBottomActions>
       </FullHeightCol>
-      <FullHeightCol md={9}>
-        {children}
-      </FullHeightCol>
+      <FullHeightCol md={9}>{children}</FullHeightCol>
     </FullHeightRow>
   );
 };

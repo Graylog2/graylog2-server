@@ -56,18 +56,18 @@ import WidgetActionsMenu from './WidgetActionsMenu';
 import InteractiveContext from '../contexts/InteractiveContext';
 
 export type Props = {
-  id: string,
-  widget: WidgetModel,
-  editing: boolean,
-  title: string,
-  position: WidgetPosition,
-  onPositionsChange: (position: BackendWidgetPosition) => void,
+  id: string;
+  widget: WidgetModel;
+  editing: boolean;
+  title: string;
+  position: WidgetPosition;
+  onPositionsChange: (position: BackendWidgetPosition) => void;
 };
 
 export type Result = {
-  total: number,
-  rows: Rows,
-  effective_timerange: AbsoluteTimeRange,
+  total: number;
+  rows: Rows;
+  effective_timerange: AbsoluteTimeRange;
 };
 
 const _visualizationForType = (type: string) => widgetDefinition(type).visualizationComponent;
@@ -80,7 +80,10 @@ const useQueryFieldTypes = () => {
   const fieldTypes = useContext(FieldTypesContext);
   const queryId = useActiveQueryId();
 
-  return useMemo(() => fieldTypes.queryFields.get(queryId, fieldTypes.all), [fieldTypes.all, fieldTypes.queryFields, queryId]);
+  return useMemo(
+    () => fieldTypes.queryFields.get(queryId, fieldTypes.all),
+    [fieldTypes.all, fieldTypes.queryFields, queryId],
+  );
 };
 
 const WidgetFooter = styled.div`
@@ -90,11 +93,11 @@ const WidgetFooter = styled.div`
 `;
 
 type VisualizationProps = Pick<Props, 'title' | 'id' | 'widget' | 'editing'> & {
-  queryId: string,
-  setLoadingState: (loading: boolean) => void,
-  onToggleEdit: () => void,
-  onWidgetConfigChange: (newWidgetConfig: WidgetConfig) => Promise<void>,
-  fields: FieldTypeMappingsList,
+  queryId: string;
+  setLoadingState: (loading: boolean) => void;
+  onToggleEdit: () => void;
+  onWidgetConfigChange: (newWidgetConfig: WidgetConfig) => Promise<void>;
+  fields: FieldTypeMappingsList;
 };
 
 const Visualization = ({
@@ -119,18 +122,20 @@ const Visualization = ({
     const { config, filter } = widget;
 
     return (
-      <VisComponent config={config}
-                    data={data as WidgetResults}
-                    editing={editing}
-                    fields={fields}
-                    filter={filter}
-                    queryId={queryId}
-                    onConfigChange={onWidgetConfigChange}
-                    setLoadingState={setLoadingState}
-                    title={title}
-                    toggleEdit={onToggleEdit}
-                    type={widget.type}
-                    id={id} />
+      <VisComponent
+        config={config}
+        data={data as WidgetResults}
+        editing={editing}
+        fields={fields}
+        filter={filter}
+        queryId={queryId}
+        onConfigChange={onWidgetConfigChange}
+        setLoadingState={setLoadingState}
+        title={title}
+        toggleEdit={onToggleEdit}
+        type={widget.type}
+        id={id}
+      />
     );
   }
 
@@ -138,15 +143,15 @@ const Visualization = ({
 };
 
 type EditWrapperProps = {
-  children: React.ReactElement,
-  config: WidgetConfig,
-  editing: boolean,
-  fields: FieldTypeMappingsList,
-  id: string,
-  onToggleEdit: () => void,
-  onCancelEdit: () => void,
-  onWidgetConfigChange: (newWidgetConfig: WidgetConfig) => void,
-  type: string,
+  children: React.ReactElement;
+  config: WidgetConfig;
+  editing: boolean;
+  fields: FieldTypeMappingsList;
+  id: string;
+  onToggleEdit: () => void;
+  onCancelEdit: () => void;
+  onWidgetConfigChange: (newWidgetConfig: WidgetConfig) => void;
+  type: string;
 };
 
 const EditWrapper = ({
@@ -165,18 +170,22 @@ const EditWrapper = ({
 
   return editing ? (
     <EditWidgetFrame onSubmit={onToggleEdit} onCancel={onCancelEdit} displaySubmitActions={!hasOwnSubmitButton}>
-      <EditComponent config={config}
-                     fields={fields}
-                     editing={editing}
-                     id={id}
-                     type={type}
-                     onSubmit={onToggleEdit}
-                     onCancel={onCancelEdit}
-                     onChange={onWidgetConfigChange}>
+      <EditComponent
+        config={config}
+        fields={fields}
+        editing={editing}
+        id={id}
+        type={type}
+        onSubmit={onToggleEdit}
+        onCancel={onCancelEdit}
+        onChange={onWidgetConfigChange}
+      >
         {children}
       </EditComponent>
     </EditWidgetFrame>
-  ) : children;
+  ) : (
+    children
+  );
 };
 
 const setWidgetTitle = (widgetId: string, newTitle: string) => async (dispatch: AppDispatch, getState: GetState) => {
@@ -225,16 +234,18 @@ const Widget = ({ id, editing, widget, title, position, onPositionsChange }: Pro
     onToggleEdit();
   }, [dispatch, id, oldWidget, onToggleEdit, pathname, sendTelemetry]);
   const onRenameWidget = useCallback((newTitle: string) => dispatch(setWidgetTitle(id, newTitle)), [dispatch, id]);
-  const onWidgetConfigChange = useCallback(async (newWidgetConfig: WidgetConfig) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.WIDGET_CONFIG_UPDATED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'search-widget',
-      app_action_value: 'widget-edit-update-button',
-    });
+  const onWidgetConfigChange = useCallback(
+    async (newWidgetConfig: WidgetConfig) => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.WIDGET_CONFIG_UPDATED, {
+        app_pathname: getPathnameWithoutId(pathname),
+        app_section: 'search-widget',
+        app_action_value: 'widget-edit-update-button',
+      });
 
-    return dispatch(updateWidgetConfig(id, newWidgetConfig)).then(() => {
-    });
-  }, [dispatch, id, pathname, sendTelemetry]);
+      return dispatch(updateWidgetConfig(id, newWidgetConfig)).then(() => {});
+    },
+    [dispatch, id, pathname, sendTelemetry],
+  );
   const activeQuery = useActiveQueryId();
 
   const { config } = widget;
@@ -245,38 +256,46 @@ const Widget = ({ id, editing, widget, title, position, onPositionsChange }: Pro
       <WidgetFrame widgetId={id}>
         <InteractiveContext.Consumer>
           {(interactive) => (
-            <WidgetHeader title={title}
-                          hideDragHandle={!interactive || isFocused}
-                          loading={loading}
-                          onRename={onRenameWidget}>
+            <WidgetHeader
+              title={title}
+              hideDragHandle={!interactive || isFocused}
+              loading={loading}
+              onRename={onRenameWidget}
+            >
               {!editing ? (
-                <WidgetActionsMenu isFocused={isFocused}
-                                   toggleEdit={onToggleEdit}
-                                   title={title}
-                                   position={position}
-                                   onPositionsChange={onPositionsChange} />
+                <WidgetActionsMenu
+                  isFocused={isFocused}
+                  toggleEdit={onToggleEdit}
+                  title={title}
+                  position={position}
+                  onPositionsChange={onPositionsChange}
+                />
               ) : null}
             </WidgetHeader>
           )}
         </InteractiveContext.Consumer>
-        <EditWrapper onToggleEdit={onToggleEdit}
-                     onCancelEdit={onCancelEdit}
-                     onWidgetConfigChange={onWidgetConfigChange}
-                     config={config}
-                     editing={editing}
-                     fields={fields}
-                     id={id}
-                     type={widget.type}>
+        <EditWrapper
+          onToggleEdit={onToggleEdit}
+          onCancelEdit={onCancelEdit}
+          onWidgetConfigChange={onWidgetConfigChange}
+          config={config}
+          editing={editing}
+          fields={fields}
+          id={id}
+          type={widget.type}
+        >
           <WidgetErrorBoundary>
-            <Visualization id={id}
-                           editing={editing}
-                           queryId={activeQuery}
-                           widget={widget}
-                           fields={fields}
-                           title={title}
-                           setLoadingState={setLoading}
-                           onToggleEdit={onToggleEdit}
-                           onWidgetConfigChange={onWidgetConfigChange} />
+            <Visualization
+              id={id}
+              editing={editing}
+              queryId={activeQuery}
+              widget={widget}
+              fields={fields}
+              title={title}
+              setLoadingState={setLoading}
+              onToggleEdit={onToggleEdit}
+              onWidgetConfigChange={onWidgetConfigChange}
+            />
           </WidgetErrorBoundary>
         </EditWrapper>
         <WidgetFooter>

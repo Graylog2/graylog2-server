@@ -28,8 +28,8 @@ import type { SearchTypeIds, WidgetMapping, WidgetId } from '../views/types';
 const filterForWidget = (widget) => (widget.filter ? { filter: { type: 'query_string', query: widget.filter } } : {});
 
 export type ResultType = {
-  searchTypes: SearchTypeList,
-  widgetMapping: WidgetMapping,
+  searchTypes: SearchTypeList;
+  widgetMapping: WidgetMapping;
 };
 
 type SearchTypeWithWidgetId = SearchType & {
@@ -37,24 +37,28 @@ type SearchTypeWithWidgetId = SearchType & {
   config: any;
 };
 
-export default (widgets: (Array<Widget> | Immutable.List<Widget>)): ResultType => {
+export default (widgets: Array<Widget> | Immutable.List<Widget>): ResultType => {
   let widgetMapping = Immutable.Map<WidgetId, SearchTypeIds>();
   const searchTypes = Immutable.List<Widget>(widgets)
-    .map((widget) => widgetDefinition(widget.type)
-      .searchTypes(widget)
-      .map((searchType) => ({
-        id: generateId(),
-        timerange: widget.timerange,
-        query: widget.query,
-        streams: widget.streams,
-        ...searchType,
-        widgetId: widget.id,
-        ...filterForWidget(widget),
-        filters: widget.filters,
-      })))
+    .map((widget) =>
+      widgetDefinition(widget.type)
+        .searchTypes(widget)
+        .map((searchType) => ({
+          id: generateId(),
+          timerange: widget.timerange,
+          query: widget.query,
+          streams: widget.streams,
+          ...searchType,
+          widgetId: widget.id,
+          ...filterForWidget(widget),
+          filters: widget.filters,
+        })),
+    )
     .reduce((acc, cur) => acc.merge(cur), Immutable.Set<SearchTypeWithWidgetId>())
     .map((searchType) => {
-      widgetMapping = widgetMapping.update(searchType.widgetId, Immutable.Set(), (widgetSearchTypes) => widgetSearchTypes.add(searchType.id));
+      widgetMapping = widgetMapping.update(searchType.widgetId, Immutable.Set(), (widgetSearchTypes) =>
+        widgetSearchTypes.add(searchType.id),
+      );
       const typeDefinition = searchTypeDefinition(searchType.type);
 
       if (!typeDefinition || !typeDefinition.defaults) {
@@ -73,12 +77,10 @@ export default (widgets: (Array<Widget> | Immutable.List<Widget>)): ResultType =
       return Immutable.Map<string, any>(defaults)
         .merge(rest)
         .merge(config)
-        .merge(
-          {
-            id: searchType.id,
-            type: searchType.type,
-          },
-        )
+        .merge({
+          id: searchType.id,
+          type: searchType.type,
+        })
         .toJS() as SearchType;
     })
     .toArray();

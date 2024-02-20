@@ -20,10 +20,10 @@ type Permission = string;
 type Permissions = Array<Permission>;
 type UserPermissions = Immutable.List<Permission>;
 
-const _isWildCard = (permissionSet: UserPermissions | Permissions) => (permissionSet.indexOf('*') > -1);
+const _isWildCard = (permissionSet: UserPermissions | Permissions) => permissionSet.indexOf('*') > -1;
 
 const _permissionPredicate = (permissionSet: UserPermissions | Permissions, p: Permission) => {
-  if ((permissionSet.indexOf(p) > -1) || (permissionSet.indexOf('*') > -1)) {
+  if (permissionSet.indexOf(p) > -1 || permissionSet.indexOf('*') > -1) {
     return true;
   }
 
@@ -33,16 +33,21 @@ const _permissionPredicate = (permissionSet: UserPermissions | Permissions, p: P
     const first = permissionParts[0];
     const second = `${permissionParts[0]}:${permissionParts[1]}`;
 
-    return (permissionSet.indexOf(first) > -1)
-      || (permissionSet.indexOf(`${first}:*`) > -1)
-      || (permissionSet.indexOf(second) > -1)
-      || (permissionSet.indexOf(`${second}:*`) > -1);
+    return (
+      permissionSet.indexOf(first) > -1 ||
+      permissionSet.indexOf(`${first}:*`) > -1 ||
+      permissionSet.indexOf(second) > -1 ||
+      permissionSet.indexOf(`${second}:*`) > -1
+    );
   }
 
-  return (permissionSet.indexOf(`${p}:*`) > -1);
+  return permissionSet.indexOf(`${p}:*`) > -1;
 };
 
-export const isPermitted = (possessedPermissions: UserPermissions | Permissions, requiredPermissions: Permissions | Permission) => {
+export const isPermitted = (
+  possessedPermissions: UserPermissions | Permissions,
+  requiredPermissions: Permissions | Permission,
+) => {
   if (!requiredPermissions || requiredPermissions.length === 0) {
     return true;
   }

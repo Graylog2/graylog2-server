@@ -46,9 +46,7 @@ const NewPipeline = ({ onChange }: Props) => {
   return (
     <Row>
       <Col md={6}>
-        <p>
-          Give a name and description to the new pipeline. You can add stages to it when you save the changes.
-        </p>
+        <p>Give a name and description to the new pipeline. You can add stages to it when you save the changes.</p>
         <PipelineDetails create onChange={_onChange} onCancel={_goBack} />
       </Col>
     </Row>

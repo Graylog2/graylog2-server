@@ -27,33 +27,37 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
 
-const StyledButton = styled(Button)<{ $dirty: boolean }>(({ theme, $dirty }) => css`
-  position: relative;
-  min-width: 63px;
+const StyledButton = styled(Button)<{ $dirty: boolean }>(
+  ({ theme, $dirty }) => css`
+    position: relative;
+    min-width: 63px;
 
-  &&&.disabled {
-    color: ${theme.utils.contrastingColor(theme.colors.variant.success)};
-  }
-
-  ${$dirty ? css`
-    &::after {
-      position: absolute;
-      content: '';
-      height: 16px;
-      width: 16px;
-      top: -5px;
-      right: -6px;
-      border-radius: 50%;
-      background-color: ${theme.colors.variant.warning};
+    &&&.disabled {
+      color: ${theme.utils.contrastingColor(theme.colors.variant.success)};
     }
-` : ''}
-`);
+
+    ${$dirty
+      ? css`
+          &::after {
+            position: absolute;
+            content: '';
+            height: 16px;
+            width: 16px;
+            top: -5px;
+            right: -6px;
+            border-radius: 50%;
+            background-color: ${theme.colors.variant.warning};
+          }
+        `
+      : ''}
+  `,
+);
 
 type Props = {
-  disabled: boolean,
-  glyph: IconName,
-  dirty: boolean,
-  displaySpinner?: boolean,
+  disabled: boolean;
+  glyph: IconName;
+  dirty: boolean;
+  displaySpinner?: boolean;
 };
 
 const onButtonClick = (e: MouseEvent, disabled: Boolean, triggerTelemetry: () => void) => {
@@ -83,12 +87,14 @@ const SearchButton = ({ dirty, disabled, glyph, displaySpinner }: Props) => {
   };
 
   return (
-    <StyledButton onClick={(e) => onButtonClick(e, disabled, triggerTelemetry)}
-                  title={title}
-                  className={className}
-                  type="submit"
-                  bsStyle="success"
-                  $dirty={dirty}>
+    <StyledButton
+      onClick={(e) => onButtonClick(e, disabled, triggerTelemetry)}
+      title={title}
+      className={className}
+      type="submit"
+      bsStyle="success"
+      $dirty={dirty}
+    >
       {displaySpinner ? <Spinner delay={0} text="" /> : <Icon name={glyph} />}
     </StyledButton>
   );

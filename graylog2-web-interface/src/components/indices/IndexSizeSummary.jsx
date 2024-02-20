@@ -30,8 +30,8 @@ class IndexSizeSummary extends React.Component {
 
     if (index.size) {
       return (
-        <span>({NumberUtils.formatBytes(index.size.bytes)}{' '}
-          / {numeral(index.size.events).format('0,0')} messages){' '}
+        <span>
+          ({NumberUtils.formatBytes(index.size.bytes)} / {numeral(index.size.events).format('0,0')} messages){' '}
         </span>
       );
     }

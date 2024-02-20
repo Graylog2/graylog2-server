@@ -26,19 +26,16 @@ import { layoutPreferencesJSON, layoutPreferences } from 'fixtures/entityListLay
 
 import useUserLayoutPreferences from './useUserLayoutPreferences';
 
-const createQueryClient = () => new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: false,
+const createQueryClient = () =>
+  new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+      },
     },
-  },
-});
+  });
 
-const wrapper = ({ children }) => (
-  <QueryClientProvider client={createQueryClient()}>
-    {children}
-  </QueryClientProvider>
-);
+const wrapper = ({ children }) => <QueryClientProvider client={createQueryClient()}>{children}</QueryClientProvider>;
 
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 jest.mock('util/UserNotification', () => ({ error: jest.fn() }));
@@ -69,6 +66,8 @@ describe('useUserSearchFilterQuery hook', () => {
       await waitFor(() => !result.current.isInitialLoading);
     });
 
-    expect(UserNotification.error).toHaveBeenCalledWith('Loading layout preferences for "streams" overview failed with Error: Error!');
+    expect(UserNotification.error).toHaveBeenCalledWith(
+      'Loading layout preferences for "streams" overview failed with Error: Error!',
+    );
   });
 });

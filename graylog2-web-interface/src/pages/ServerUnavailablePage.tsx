@@ -33,9 +33,9 @@ const StyledIcon = styled(Icon)`
 
 type Props = {
   server: {
-    up: false,
-    error?: ServerError,
-  },
+    up: false;
+    error?: ServerError;
+  };
 };
 
 const ServerUnavailablePage = ({ server }: Props) => {
@@ -72,7 +72,9 @@ const ServerUnavailablePage = ({ server }: Props) => {
 
       errorDetails.push(
         <dt key="status-original-request-title">Original Request</dt>,
-        <dd key="status-original-request-content">{String(originalError.method)} {String(originalError.url)}</dd>,
+        <dd key="status-original-request-content">
+          {String(originalError.method)} {String(originalError.url)}
+        </dd>,
       );
 
       errorDetails.push(
@@ -97,9 +99,7 @@ const ServerUnavailablePage = ({ server }: Props) => {
         <hr style={{ marginTop: 10, marginBottom: 10 }} />
         <p>This is the last response we received from the server:</p>
         <Well bsSize="small" style={{ whiteSpace: 'pre-line' }}>
-          <dl style={{ marginBottom: 0 }}>
-            {errorDetails}
-          </dl>
+          <dl style={{ marginBottom: 0 }}>{errorDetails}</dl>
         </Well>
       </div>
     );
@@ -112,26 +112,26 @@ const ServerUnavailablePage = ({ server }: Props) => {
       <LoginChrome>
         <Modal show onHide={() => {}}>
           <Modal.Header>
-            <Modal.Title><Icon name="exclamation-triangle" /> {modalTitle}</Modal.Title>
+            <Modal.Title>
+              <Icon name="exclamation-triangle" /> {modalTitle}
+            </Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <div>
               <p>
-                We are experiencing problems connecting to the Graylog server running on <i>{qualifyUrl('')}</i>.
-                Please verify that the server is healthy and working correctly.
+                We are experiencing problems connecting to the Graylog server running on <i>{qualifyUrl('')}</i>. Please
+                verify that the server is healthy and working correctly.
               </p>
               <p>You will be automatically redirected to the previous page once we can connect to the server.</p>
               <p>
                 Do you need a hand?{' '}
-                <a href="https://www.graylog.org/community-support" rel="noopener noreferrer" target="_blank">We can
-                  help you
-                </a>.
+                <a href="https://www.graylog.org/community-support" rel="noopener noreferrer" target="_blank">
+                  We can help you
+                </a>
+                .
               </p>
               <div>
-                <Button bsStyle="primary"
-                        tabIndex={0}
-                        onClick={_toggleDetails}
-                        bsSize="sm">
+                <Button bsStyle="primary" tabIndex={0} onClick={_toggleDetails} bsSize="sm">
                   {showDetails ? 'Less details' : 'More details'}
                   <StyledIcon name={showDetails ? 'chevron-up' : 'chevron-down'} />
                 </Button>

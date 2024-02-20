@@ -23,17 +23,15 @@ import fetch from 'logic/rest/FetchProvider';
 import EntityIndex from 'logic/content-packs/EntityIndex';
 import { singletonStore, singletonActions } from 'logic/singleton';
 
-export const CatalogActions = singletonActions(
-  'core.Catalog',
-  () => Reflux.createActions({
+export const CatalogActions = singletonActions('core.Catalog', () =>
+  Reflux.createActions({
     showEntityIndex: { asyncResult: true },
     getSelectedEntities: { asyncResult: true },
   }),
 );
 
-export const CatalogStore = singletonStore(
-  'core.Catalog',
-  () => Reflux.createStore({
+export const CatalogStore = singletonStore('core.Catalog', () =>
+  Reflux.createStore({
     listenables: [CatalogActions],
 
     getInitialState() {
@@ -44,22 +42,28 @@ export const CatalogStore = singletonStore(
 
     showEntityIndex() {
       const url = URLUtils.qualifyUrl(ApiRoutes.CatalogsController.showEntityIndex().url);
-      const promise = fetch('GET', url)
-        .then((result) => {
-          const entityIndex = groupBy(result.entities.map((e) => EntityIndex.fromJSON(e)), 'type.name');
+      const promise = fetch('GET', url).then((result) => {
+        const entityIndex = groupBy(
+          result.entities.map((e) => EntityIndex.fromJSON(e)),
+          'type.name',
+        );
 
-          this.trigger({ entityIndex: entityIndex });
+        this.trigger({ entityIndex: entityIndex });
 
-          return result;
-        });
+        return result;
+      });
 
       CatalogActions.showEntityIndex.promise(promise);
     },
 
     getSelectedEntities(requestedEntities) {
-      const payload = Object.keys(requestedEntities).reduce((result, key) => result.concat(requestedEntities[key]
-        .filter((entitiy) => entitiy instanceof EntityIndex)
-        .map((entity) => entity.toJSON())), []);
+      const payload = Object.keys(requestedEntities).reduce(
+        (result, key) =>
+          result.concat(
+            requestedEntities[key].filter((entitiy) => entitiy instanceof EntityIndex).map((entity) => entity.toJSON()),
+          ),
+        [],
+      );
       const url = URLUtils.qualifyUrl(ApiRoutes.CatalogsController.queryEntities().url);
       const promise = fetch('POST', url, { entities: payload });
 

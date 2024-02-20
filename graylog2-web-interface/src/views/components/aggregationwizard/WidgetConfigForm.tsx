@@ -37,30 +37,30 @@ const StyledForm = styled(Form)`
 type Required<T, K extends keyof T> = Pick<T, K> & Partial<T>;
 
 export type MetricFormValues = {
-  function: string,
-  field: string | undefined,
-  name?: string | undefined,
-  percentile?: number | undefined,
-  strategy?: string,
+  function: string;
+  field: string | undefined;
+  name?: string | undefined;
+  percentile?: number | undefined;
+  strategy?: string;
 };
 
 export type GroupingDirection = 'row' | 'column';
 
 export type BaseGrouping = {
-  fields: Array<string>,
-  direction: GroupingDirection,
-  id: string,
+  fields: Array<string>;
+  direction: GroupingDirection;
+  id: string;
 };
 
 export type DateGrouping = Required<BaseGrouping, 'id'> & {
-  type: typeof DateType,
-  interval: AutoTimeConfig | TimeUnitConfig,
+  type: typeof DateType;
+  interval: AutoTimeConfig | TimeUnitConfig;
 };
 
 export type ValuesGrouping = Required<BaseGrouping, 'id'> & {
-  type: typeof ValuesType,
-  limit: number,
-  skipEmptyValues?: boolean,
+  type: typeof ValuesType;
+  limit: number;
+  skipEmptyValues?: boolean;
 };
 
 export type GroupByFormValues = DateGrouping | ValuesGrouping;
@@ -68,56 +68,56 @@ export type GroupByFormValues = DateGrouping | ValuesGrouping;
 export type VisualizationConfigFormValues = {};
 
 export type VisualizationFormValues = {
-  type: string,
-  config?: VisualizationConfigFormValues,
-  eventAnnotation?: boolean,
+  type: string;
+  config?: VisualizationConfigFormValues;
+  eventAnnotation?: boolean;
 };
 
 export type VisualizationConfigDefinition<
   ConfigType extends VisualizationConfig = VisualizationConfig,
-  ConfigFormValuesType extends VisualizationConfigFormValues = VisualizationConfigFormValues
-  > = {
-  fromConfig: (config: ConfigType | undefined) => ConfigFormValuesType,
-  toConfig: (formValues: ConfigFormValuesType) => ConfigType,
-  createConfig?: () => Partial<ConfigFormValuesType>,
-  fields: Array<ConfigurationField>,
+  ConfigFormValuesType extends VisualizationConfigFormValues = VisualizationConfigFormValues,
+> = {
+  fromConfig: (config: ConfigType | undefined) => ConfigFormValuesType;
+  toConfig: (formValues: ConfigFormValuesType) => ConfigType;
+  createConfig?: () => Partial<ConfigFormValuesType>;
+  fields: Array<ConfigurationField>;
 };
 
 export type SortFormValues = {
-  type?: 'metric' | 'groupBy',
-  field?: string,
-  direction?: 'Ascending' | 'Descending',
-  id: string,
-}
+  type?: 'metric' | 'groupBy';
+  field?: string;
+  direction?: 'Ascending' | 'Descending';
+  id: string;
+};
 
 export interface WidgetConfigFormValues {
-  metrics?: Array<MetricFormValues>,
+  metrics?: Array<MetricFormValues>;
   groupBy?: {
-    columnRollup: boolean,
-    groupings: Array<GroupByFormValues>,
-  },
-  visualization?: VisualizationFormValues,
-  sort?: Array<SortFormValues>,
-  rowLimit?: string,
-  columnLimit?: string,
+    columnRollup: boolean;
+    groupings: Array<GroupByFormValues>;
+  };
+  visualization?: VisualizationFormValues;
+  sort?: Array<SortFormValues>;
+  rowLimit?: string;
+  columnLimit?: string;
 }
 export type GroupingValidationErrors = {
-  groupings?: Array<{ [key: string]: string }>,
-}
+  groupings?: Array<{ [key: string]: string }>;
+};
 export interface WidgetConfigValidationErrors {
-  metrics?: Array<{ [key: string]: string }>,
-  groupBy?: GroupingValidationErrors | string,
-  visualization?: { [key: string]: string | any },
-  sort?: Array<{ [key: string]: string }>,
+  metrics?: Array<{ [key: string]: string }>;
+  groupBy?: GroupingValidationErrors | string;
+  visualization?: { [key: string]: string | any };
+  sort?: Array<{ [key: string]: string }>;
 }
 
 type Props = {
-  children: ((props: FormikProps<WidgetConfigFormValues>) => React.ReactNode) | React.ReactNode,
-  initialValues: WidgetConfigFormValues,
-  onSubmit: (formValues: WidgetConfigFormValues) => void,
-  validate: (formValues: WidgetConfigFormValues) => WidgetConfigValidationErrors,
-  config: AggregationWidgetConfig,
-}
+  children: ((props: FormikProps<WidgetConfigFormValues>) => React.ReactNode) | React.ReactNode;
+  initialValues: WidgetConfigFormValues;
+  onSubmit: (formValues: WidgetConfigFormValues) => void;
+  validate: (formValues: WidgetConfigFormValues) => WidgetConfigValidationErrors;
+  config: AggregationWidgetConfig;
+};
 
 const useBindApplyElementConfigurationChanges = (formRef, config) => {
   const { bindApplyElementConfigurationChanges } = useContext(WidgetEditApplyAllChangesContext);
@@ -143,16 +143,21 @@ const WidgetConfigForm = ({ children, onSubmit, initialValues, validate, config 
   useBindApplyElementConfigurationChanges(formRef, config);
 
   return (
-    <Formik<WidgetConfigFormValues> initialValues={initialValues}
-                                    validate={validate}
-                                    enableReinitialize
-                                    innerRef={formRef}
-                                    validateOnChange
-                                    validateOnMount
-                                    onSubmit={onSubmit}>
+    <Formik<WidgetConfigFormValues>
+      initialValues={initialValues}
+      validate={validate}
+      enableReinitialize
+      innerRef={formRef}
+      validateOnChange
+      validateOnMount
+      onSubmit={onSubmit}
+    >
       {(...args) => (
         <StyledForm className="form form-horizontal">
-          <PropagateDisableSubmissionState formKey="widget-config" disableSubmission={!args[0].isValid || args[0].isValidating || args[0].isSubmitting} />
+          <PropagateDisableSubmissionState
+            formKey="widget-config"
+            disableSubmission={!args[0].isValid || args[0].isValidating || args[0].isSubmitting}
+          />
           {typeof children === 'function' ? children(...args) : children}
         </StyledForm>
       )}

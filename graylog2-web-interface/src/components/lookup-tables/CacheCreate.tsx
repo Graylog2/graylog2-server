@@ -33,33 +33,39 @@ const INIT_CACHE: LookupTableCache = {
   config: { type: 'none' },
 };
 
-type TypesType = { type?: string, lable?: string };
-type cacheTypeOptionsType = { value: string, label: string }
+type TypesType = { type?: string; lable?: string };
+type cacheTypeOptionsType = { value: string; label: string };
 
 type Props = {
-  saved: () => void,
-  types: TypesType[],
-  validate: () => void,
-  validationErrors: validationErrorsType,
+  saved: () => void;
+  types: TypesType[];
+  validate: () => void;
+  validationErrors: validationErrorsType;
 };
 
 const CacheCreate = ({ saved, types, validate, validationErrors }: Props) => {
   const [type, setType] = React.useState<string>(null);
   const cachePlugins = usePluginEntities('lookupTableCaches');
 
-  const plugins = React.useMemo(() => (
-    cachePlugins.reduce((acc: any, plugin: CachePluginType) => {
-      acc[plugin.type] = plugin;
+  const plugins = React.useMemo(
+    () =>
+      cachePlugins.reduce((acc: any, plugin: CachePluginType) => {
+        acc[plugin.type] = plugin;
 
-      return acc;
-    }, {})
-  ), [cachePlugins]);
+        return acc;
+      }, {}),
+    [cachePlugins],
+  );
 
-  const cacheTypes = React.useMemo(() => (
-    Object.values(types)
-      .map((inType: TypesType) => ({ value: inType.type, label: plugins[inType.type].displayName }))
-      .sort((a: cacheTypeOptionsType, b: cacheTypeOptionsType) => naturalSort(a.label.toLowerCase(), b.label.toLowerCase()))
-  ), [types, plugins]);
+  const cacheTypes = React.useMemo(
+    () =>
+      Object.values(types)
+        .map((inType: TypesType) => ({ value: inType.type, label: plugins[inType.type].displayName }))
+        .sort((a: cacheTypeOptionsType, b: cacheTypeOptionsType) =>
+          naturalSort(a.label.toLowerCase(), b.label.toLowerCase()),
+        ),
+    [types, plugins],
+  );
 
   const cache = React.useMemo(() => {
     if (type) {
@@ -80,32 +86,38 @@ const CacheCreate = ({ saved, types, validate, validationErrors }: Props) => {
     <>
       <Row className="content">
         <Col lg={6} className="form form-horizontal">
-          <Input id="cache-type-select"
-                 label="Cache Type"
-                 required
-                 autoFocus
-                 help="The type of cache to configure."
-                 labelClassName="col-sm-3"
-                 wrapperClassName="col-sm-9">
-            <Select placeholder="Select Cache Type"
-                    clearable={false}
-                    options={cacheTypes}
-                    matchProp="label"
-                    onChange={handleSelect}
-                    value={type} />
+          <Input
+            id="cache-type-select"
+            label="Cache Type"
+            required
+            autoFocus
+            help="The type of cache to configure."
+            labelClassName="col-sm-3"
+            wrapperClassName="col-sm-9"
+          >
+            <Select
+              placeholder="Select Cache Type"
+              clearable={false}
+              options={cacheTypes}
+              matchProp="label"
+              onChange={handleSelect}
+              value={type}
+            />
           </Input>
         </Col>
       </Row>
       {cache && (
         <Row className="content">
           <Col lg={12}>
-            <CacheForm cache={cache}
-                       type={type}
-                       title="Configure Cache"
-                       create
-                       saved={saved}
-                       validationErrors={validationErrors}
-                       validate={validate} />
+            <CacheForm
+              cache={cache}
+              type={type}
+              title="Configure Cache"
+              create
+              saved={saved}
+              validationErrors={validationErrors}
+              validate={validate}
+            />
           </Col>
         </Row>
       )}

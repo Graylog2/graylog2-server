@@ -43,11 +43,7 @@ jest.mock('stores/telemetry/TelemetrySettingsStore', () => ({
   TelemetrySettingsStore: MockStore(),
 }));
 
-const Wrapper = ({ children }: { children: React.ReactElement }) => (
-  <TelemetryInit>
-    {children}
-  </TelemetryInit>
-);
+const Wrapper = ({ children }: { children: React.ReactElement }) => <TelemetryInit>{children}</TelemetryInit>;
 
 describe('<TelemetryInit>', () => {
   afterEach(() => {

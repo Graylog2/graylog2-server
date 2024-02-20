@@ -23,18 +23,20 @@ import { Input } from 'components/bootstrap';
 import { optionalMarker } from 'components/configurationforms/FieldHelpers';
 
 type Props = {
-  autoFocus?: boolean,
-  field: DropdownFieldType,
-  onChange: (title: string, value: string, dirty?: boolean) => void,
-  title: string,
-  typeName: string,
-  value: string,
-  addPlaceholder: boolean,
+  autoFocus?: boolean;
+  field: DropdownFieldType;
+  onChange: (title: string, value: string, dirty?: boolean) => void;
+  title: string;
+  typeName: string;
+  value: string;
+  addPlaceholder: boolean;
 };
 
 const DropdownField = ({ autoFocus, field, onChange, title, typeName, value, addPlaceholder }: Props) => {
   const formatOption = (key, displayValue, disabled = false) => (
-    <option key={`${typeName}-${title}-${key}`} value={key} id={key} disabled={disabled}>{displayValue}</option>
+    <option key={`${typeName}-${title}-${key}`} value={key} id={key} disabled={disabled}>
+      {displayValue}
+    </option>
   );
 
   const handleChange = (event) => {
@@ -47,18 +49,24 @@ const DropdownField = ({ autoFocus, field, onChange, title, typeName, value, add
     options.unshift(formatOption('', `Select ${field.human_name || title}`, true));
   }
 
-  const label = <>{field.human_name} {optionalMarker(field)}</>;
+  const label = (
+    <>
+      {field.human_name} {optionalMarker(field)}
+    </>
+  );
 
   return (
-    <Input id={`${typeName}-${title}`}
-           name={`configuration[${title}]`}
-           label={label}
-           type="select"
-           value={value}
-           help={field.description}
-           onChange={handleChange}
-           autoFocus={autoFocus}
-           required={!field.is_optional}>
+    <Input
+      id={`${typeName}-${title}`}
+      name={`configuration[${title}]`}
+      label={label}
+      type="select"
+      value={value}
+      help={field.description}
+      onChange={handleChange}
+      autoFocus={autoFocus}
+      required={!field.is_optional}
+    >
       {options}
     </Input>
   );

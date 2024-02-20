@@ -44,10 +44,12 @@ jest.mock('graylog-web-plugin/plugin', () => ({
 jest.mock('views/logic/Widgets', () => ({
   ...jest.requireActual('views/logic/Widgets'),
   widgetDefinition: () => ({
-    searchTypes: () => [{
-      type: 'AGGREGATION',
-      typeDefinition: {},
-    }],
+    searchTypes: () => [
+      {
+        type: 'AGGREGATION',
+        typeDefinition: {},
+      },
+    ],
   }),
 }));
 
@@ -58,11 +60,7 @@ const queryClient = new QueryClient({
     },
   },
 });
-const wrapper = ({ children }) => (
-  <QueryClientProvider client={queryClient}>
-    {children}
-  </QueryClientProvider>
-);
+const wrapper = ({ children }) => <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
 
 const mockedHookData = {
   alertId: mockEventData.event.id,
@@ -76,13 +74,21 @@ const mockedHookData = {
   aggregations: mockedMappedAggregation,
 };
 
-const mockUseRouterForEvent = (id) => asMock(useLocation).mockImplementation(() => ({
-  pathname: `/alerts/${id}/replay-search`,
-} as Location));
+const mockUseRouterForEvent = (id) =>
+  asMock(useLocation).mockImplementation(
+    () =>
+      ({
+        pathname: `/alerts/${id}/replay-search`,
+      }) as Location,
+  );
 
-const mockUseRouterForEventDefinition = (id) => asMock(useLocation).mockImplementation(() => ({
-  pathname: `/alerts/definitions/${id}/replay-search`,
-} as Location));
+const mockUseRouterForEventDefinition = (id) =>
+  asMock(useLocation).mockImplementation(
+    () =>
+      ({
+        pathname: `/alerts/definitions/${id}/replay-search`,
+      }) as Location,
+  );
 
 describe('useAlertAndEventDefinitionData', () => {
   beforeEach(() => {

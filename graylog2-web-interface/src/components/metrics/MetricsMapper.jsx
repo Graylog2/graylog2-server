@@ -32,8 +32,7 @@ const MetricsMapper = createReactClass({
   mixins: [Reflux.connect(MetricsStore)],
 
   getDefaultProps() {
-    return {
-    };
+    return {};
   },
 
   getInitialState() {
@@ -81,11 +80,7 @@ const MetricsMapper = createReactClass({
 
     const value = this.props.computeValue(metricsMap);
 
-    return (
-      <span>
-        {value}
-      </span>
-    );
+    return <span>{value}</span>;
   },
 });
 

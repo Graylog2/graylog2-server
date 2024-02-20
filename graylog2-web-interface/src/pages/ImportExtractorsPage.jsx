@@ -53,13 +53,20 @@ const ImportExtractorsPage = createReactClass({
     return (
       <DocumentTitle title={`Import extractors to ${input.title}`}>
         <div>
-          <PageHeader title={<span>Import extractors to <em>{input.title}</em></span>}>
+          <PageHeader
+            title={
+              <span>
+                Import extractors to <em>{input.title}</em>
+              </span>
+            }
+          >
             <span>
               Exported extractors can be imported to an input. All you need is the JSON export of extractors from any
               other Graylog setup or from{' '}
               <a href="https://marketplace.graylog.org/" rel="noopener noreferrer" target="_blank">
                 the Graylog Marketplace
-              </a>.
+              </a>
+              .
             </span>
           </PageHeader>
           <ImportExtractors input={input} />

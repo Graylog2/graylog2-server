@@ -24,11 +24,16 @@ import { FormikFormGroup } from 'components/common';
 import { DATA_TIERING_TYPE } from 'components/indices/data-tiering';
 
 const dayFields = ['index_lifetime_max', 'index_lifetime_min', 'index_hot_lifetime_min'];
-const hotWarmOnlyFormFields = ['index_hot_lifetime_min', 'warm_tier_enabled', 'archive_before_deletion', 'warm_tier_repository_name'];
+const hotWarmOnlyFormFields = [
+  'index_hot_lifetime_min',
+  'warm_tier_enabled',
+  'archive_before_deletion',
+  'warm_tier_repository_name',
+];
 
 export const durationToRoundedDays = (duration: string) => Math.round(moment.duration(duration).asDays());
 
-export const prepareDataTieringInitialValues = (values: IndexSet) : IndexSetFormValues => {
+export const prepareDataTieringInitialValues = (values: IndexSet): IndexSetFormValues => {
   if (!values.data_tiering) return values as unknown as IndexSetFormValues;
 
   let { data_tiering } = values;
@@ -43,7 +48,7 @@ export const prepareDataTieringInitialValues = (values: IndexSet) : IndexSetForm
   return { ...values, data_tiering } as unknown as IndexSetFormValues;
 };
 
-export const prepareDataTieringConfig = (values: IndexSetFormValues, pluginStore) : IndexSet => {
+export const prepareDataTieringConfig = (values: IndexSetFormValues, pluginStore): IndexSet => {
   if (!values.data_tiering) return values as unknown as IndexSet;
 
   const hotWarmDefaultValues = {
@@ -52,7 +57,9 @@ export const prepareDataTieringConfig = (values: IndexSetFormValues, pluginStore
     warm_tier_repository_name: null,
   };
 
-  const dataTieringPlugin = pluginStore.exports('dataTiering').find((plugin) => (plugin.type === DATA_TIERING_TYPE.HOT_WARM));
+  const dataTieringPlugin = pluginStore
+    .exports('dataTiering')
+    .find((plugin) => plugin.type === DATA_TIERING_TYPE.HOT_WARM);
   const dataTieringType = dataTieringPlugin?.type ?? DATA_TIERING_TYPE.HOT_ONLY;
 
   let { data_tiering } = values;
@@ -79,7 +86,7 @@ export const prepareDataTieringConfig = (values: IndexSetFormValues, pluginStore
 };
 
 const DataTieringConfiguration = () => {
-  const dataTieringPlugin = PluginStore.exports('dataTiering').find((plugin) => (plugin.type === 'hot_warm'));
+  const dataTieringPlugin = PluginStore.exports('dataTiering').find((plugin) => plugin.type === 'hot_warm');
 
   const { values } = useFormikContext<IndexSetFormValues>();
 
@@ -115,21 +122,25 @@ const DataTieringConfiguration = () => {
 
   return (
     <>
-      <FormikFormGroup type="number"
-                       label="Max. days in storage"
-                       name="data_tiering.index_lifetime_max"
-                       min={0}
-                       help="After how many days your data should be deleted."
-                       validate={validateMaxDaysInStorage}
-                       required />
-      <FormikFormGroup type="number"
-                       label="Min. days in storage"
-                       name="data_tiering.index_lifetime_min"
-                       min={0}
-                       max={values?.data_tiering?.index_lifetime_max}
-                       validate={validateMinDaysInStorage}
-                       help="How many days at minumum your data should be stored."
-                       required />
+      <FormikFormGroup
+        type="number"
+        label="Max. days in storage"
+        name="data_tiering.index_lifetime_max"
+        min={0}
+        help="After how many days your data should be deleted."
+        validate={validateMaxDaysInStorage}
+        required
+      />
+      <FormikFormGroup
+        type="number"
+        label="Min. days in storage"
+        name="data_tiering.index_lifetime_min"
+        min={0}
+        max={values?.data_tiering?.index_lifetime_max}
+        validate={validateMinDaysInStorage}
+        help="How many days at minumum your data should be stored."
+        required
+      />
       {dataTieringPlugin && <dataTieringPlugin.TiersConfigurationFields />}
     </>
   );

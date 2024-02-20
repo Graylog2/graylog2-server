@@ -59,9 +59,8 @@ class LinkToNode extends React.PureComponent {
 
       const content = (
         <>
-          <Icon name={iconName} className={iconClass} title={iconTitle} />
-          {' '}
-          {node.short_node_id}<HideOnCloud> / {node.hostname}</HideOnCloud>
+          <Icon name={iconName} className={iconClass} title={iconTitle} /> {node.short_node_id}
+          <HideOnCloud> / {node.hostname}</HideOnCloud>
         </>
       );
 
@@ -69,9 +68,7 @@ class LinkToNode extends React.PureComponent {
         return content;
       }
 
-      return (
-        <Link to={Routes.SYSTEM.NODES.SHOW(this.props.nodeId)}>{content}</Link>
-      );
+      return <Link to={Routes.SYSTEM.NODES.SHOW(this.props.nodeId)}>{content}</Link>;
     }
 
     return <i>Unknown Node</i>;
@@ -82,8 +79,7 @@ LinkToNode.defaultProps = {
   nodes: undefined,
 };
 
-export default connect(
-  LinkToNode,
-  { nodeStore: NodesStore },
-  ({ nodeStore, ...rest }) => ({ ...rest, nodes: nodeStore.nodes }),
-);
+export default connect(LinkToNode, { nodeStore: NodesStore }, ({ nodeStore, ...rest }) => ({
+  ...rest,
+  nodes: nodeStore.nodes,
+}));

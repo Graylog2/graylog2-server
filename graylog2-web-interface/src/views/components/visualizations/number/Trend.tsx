@@ -25,38 +25,41 @@ import type { TrendPreference } from 'views/logic/aggregationbuilder/visualizati
 type TrendDirection = 'good' | 'bad' | 'neutral';
 
 type Props = {
-  current: number,
-  previous: number | undefined | null,
-  trendPreference: TrendPreference,
+  current: number;
+  previous: number | undefined | null;
+  trendPreference: TrendPreference;
 };
 
-const background = (theme: DefaultTheme, trend: TrendDirection = 'neutral') => ({
-  good: theme.colors.variant.success,
-  bad: theme.colors.variant.danger,
-  neutral: theme.colors.global.contentBackground,
-}[trend]);
+const background = (theme: DefaultTheme, trend: TrendDirection = 'neutral') =>
+  ({
+    good: theme.colors.variant.success,
+    bad: theme.colors.variant.danger,
+    neutral: theme.colors.global.contentBackground,
+  })[trend];
 
 const Background = styled.div<{ trend: TrendDirection | undefined }>(({ theme, trend }) => {
   const bgColor = background(theme, trend);
 
   return css`
     text-align: right;
-    ${trend && css`
+    ${trend &&
+    css`
       background-color: ${bgColor} !important; /* Needed for report generation */
       color: ${theme.utils.contrastingColor(bgColor)} !important /* Needed for report generation */;
       color-adjust: exact !important; /* Needed for report generation */
-`}
-`;
+    `}
+  `;
 });
 
-const TextContainer = styled.div<{ trend: TrendDirection | undefined, ref }>(({ theme, trend }) => {
+const TextContainer = styled.div<{ trend: TrendDirection | undefined; ref }>(({ theme, trend }) => {
   const bgColor = background(theme, trend);
 
   return css`
-      margin: 5px;
-      color: ${theme.utils.contrastingColor(bgColor)} !important /* Needed for report generation */;
-      font-family: ${theme.fonts.family.body};
-      color-adjust: exact !important; /* Needed for report generation */`;
+    margin: 5px;
+    color: ${theme.utils.contrastingColor(bgColor)} !important /* Needed for report generation */;
+    font-family: ${theme.fonts.family.body};
+    color-adjust: exact !important; /* Needed for report generation */
+  `;
 });
 
 const StyledIcon = styled(Icon)<{ trend: TrendDirection | undefined }>(({ theme, trend }) => {
@@ -65,7 +68,8 @@ const StyledIcon = styled(Icon)<{ trend: TrendDirection | undefined }>(({ theme,
   return css`
     path {
       fill: ${theme.utils.contrastingColor(bgColor)};
-    }`;
+    }
+  `;
 });
 
 const _trendDirection = (delta: number, trendPreference: TrendPreference): TrendDirection => {
@@ -80,12 +84,9 @@ const _trendDirection = (delta: number, trendPreference: TrendPreference): Trend
   }
 };
 
-// eslint-disable-next-line no-nested-ternary
-const _trendIcon = (delta: number) => (delta === 0
-  ? 'arrow-circle-right'
-  : delta > 0
-    ? 'arrow-circle-up'
-    : 'arrow-circle-down');
+const _trendIcon = (delta: number) =>
+  // eslint-disable-next-line no-nested-ternary
+  delta === 0 ? 'arrow-circle-right' : delta > 0 ? 'arrow-circle-up' : 'arrow-circle-down';
 
 const diff = (current: number | undefined, previous: number | undefined): [number, number] => {
   if (typeof current === 'number' && typeof previous === 'number') {
@@ -105,12 +106,17 @@ const Trend = React.forwardRef<HTMLSpanElement, Props>(({ current, previous, tre
   const trendIcon = _trendIcon(difference);
 
   const absoluteDifference = Number.isFinite(difference) ? numeral(difference).format('+0,0[.]0[000]') : '--';
-  const relativeDifference = Number.isFinite(differencePercent) ? numeral(differencePercent).format('+0[.]0[0]%') : '--';
+  const relativeDifference = Number.isFinite(differencePercent)
+    ? numeral(differencePercent).format('+0[.]0[0]%')
+    : '--';
 
   return (
     <Background trend={backgroundTrend} data-testid="trend-background">
       <TextContainer trend={backgroundTrend} ref={ref}>
-        <StyledIcon name={trendIcon} trend={backgroundTrend} data-testid="trend-icon" /> <span data-testid="trend-value" title={`Previous value: ${previous}`}>{absoluteDifference} / {relativeDifference}</span>
+        <StyledIcon name={trendIcon} trend={backgroundTrend} data-testid="trend-icon" />{' '}
+        <span data-testid="trend-value" title={`Previous value: ${previous}`}>
+          {absoluteDifference} / {relativeDifference}
+        </span>
       </TextContainer>
     </Background>
   );

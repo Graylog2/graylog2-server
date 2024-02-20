@@ -22,24 +22,31 @@ import type FetchError from 'logic/errors/FetchError';
 import UnauthorizedErrorPage from './UnauthorizedErrorPage';
 
 type Props = {
-  error: FetchError | undefined | null,
-  missingStreamIds: string[],
+  error: FetchError | undefined | null;
+  missingStreamIds: string[];
 };
 
 const StreamPermissionErrorPage = ({ error, missingStreamIds = [] }: Props) => {
   const description = (
     <>
       <p>This resource includes streams you do not have permissions for.</p>
-      <p>Please contact your administrator and provide the error details which include a list of streams you need access to.</p>
+      <p>
+        Please contact your administrator and provide the error details which include a list of streams you need access
+        to.
+      </p>
     </>
   );
-  const streamIds = missingStreamIds.length > 0
-    ? missingStreamIds
-    : error?.additional?.body?.streams;
-  const errorDetails = streamIds?.length > 0 ? `You need permissions for streams with the id: ${streamIds.join(', ')}.` : undefined;
+  const streamIds = missingStreamIds.length > 0 ? missingStreamIds : error?.additional?.body?.streams;
+  const errorDetails =
+    streamIds?.length > 0 ? `You need permissions for streams with the id: ${streamIds.join(', ')}.` : undefined;
 
   return (
-    <UnauthorizedErrorPage error={error} description={description} title="Missing Stream Permissions" errorDetails={errorDetails} />
+    <UnauthorizedErrorPage
+      error={error}
+      description={description}
+      title="Missing Stream Permissions"
+      errorDetails={errorDetails}
+    />
   );
 };
 

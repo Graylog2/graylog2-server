@@ -17,7 +17,7 @@
 
 import type { ItemKey, StrategyId } from 'views/logic/valueactions/createEventDefinition/types';
 
-export const labels: { [key in ItemKey]: string} = {
+export const labels: { [key in ItemKey]: string } = {
   rowValuePath: 'Query from table row',
   columnValuePath: 'Query from table column',
   columnGroupBy: 'Group by column values',
@@ -32,12 +32,23 @@ export const labels: { [key in ItemKey]: string} = {
 };
 
 export const aggregationGroup: Array<ItemKey> = ['columnGroupBy', 'rowGroupBy', 'aggCondition'];
-export const searchGroup: Array<ItemKey> = ['rowValuePath', 'columnValuePath',
-  'queryWithReplacedParams', 'searchFilterQuery', 'searchFromValue'];
-export const strategiesLabels: {[key in StrategyId]: { label: string, description: string}} = {
-  EXACT: { label: 'Exactly this value', description: 'Strategy includes all search queries, filters, etc which relate to current search view' },
+export const searchGroup: Array<ItemKey> = [
+  'rowValuePath',
+  'columnValuePath',
+  'queryWithReplacedParams',
+  'searchFilterQuery',
+  'searchFromValue',
+];
+export const strategiesLabels: { [key in StrategyId]: { label: string; description: string } } = {
+  EXACT: {
+    label: 'Exactly this value',
+    description: 'Strategy includes all search queries, filters, etc which relate to current search view',
+  },
   ROW: { label: 'Any in row', description: 'Strategy includes row pivots' },
   COL: { label: 'Any in column', description: 'Strategy includes column pivots' },
-  ALL: { label: 'Any in widget', description: 'Strategy includes all row and column pivot values, related to selected value' },
+  ALL: {
+    label: 'Any in widget',
+    description: 'Strategy includes all row and column pivot values, related to selected value',
+  },
   CUSTOM: { label: 'Custom', description: 'You can select any search part' },
 };

@@ -21,25 +21,27 @@ import { Field } from 'formik';
 import TextInput from 'preflight/components/common/TextInput';
 
 type Props = {
-  name: string,
-  label: React.ReactNode,
-  placeholder?: string,
-  type?: string
-  required?: boolean,
-}
+  name: string;
+  label: React.ReactNode;
+  placeholder?: string;
+  type?: string;
+  required?: boolean;
+};
 
 const FormikTextInput = ({ name, placeholder, label, type, required }: Props) => (
   <Field name={name}>
     {({ field: { value, onChange, onBlur }, meta: { error: validationError } }) => (
-      <TextInput onBlur={onBlur}
-                 required={required}
-                 id={name}
-                 label={label}
-                 type={type}
-                 placeholder={placeholder}
-                 value={value}
-                 error={validationError}
-                 onChange={onChange} />
+      <TextInput
+        onBlur={onBlur}
+        required={required}
+        id={name}
+        label={label}
+        type={type}
+        placeholder={placeholder}
+        value={value}
+        error={validationError}
+        onChange={onChange}
+      />
     )}
   </Field>
 );

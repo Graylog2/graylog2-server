@@ -28,31 +28,31 @@ import FieldsConfiguration from 'views/components/widgets/FieldsConfiguration';
 import CustomExportSettings from './CustomExportSettings';
 
 type ExportSettingsType = {
-  selectedWidget: Widget | undefined | null,
-  view: View,
+  selectedWidget: Widget | undefined | null;
+  view: View;
 };
 
-const SelectedWidgetInfo = ({ selectedWidget, view }: { selectedWidget: Widget, view: View }) => {
+const SelectedWidgetInfo = ({ selectedWidget, view }: { selectedWidget: Widget; view: View }) => {
   const selectedWidgetTitle = view.getWidgetTitleByWidget(selectedWidget);
 
   return (
     <Row>
       <i>
         <IfSearch>
-          {selectedWidget && `The following settings are based on the message table: ${selectedWidgetTitle}`}<br />
+          {selectedWidget && `The following settings are based on the message table: ${selectedWidgetTitle}`}
+          <br />
         </IfSearch>
         <IfDashboard>
-          {selectedWidget && `You are currently exporting the search results for the message table: ${selectedWidgetTitle}`}<br />
+          {selectedWidget &&
+            `You are currently exporting the search results for the message table: ${selectedWidgetTitle}`}
+          <br />
         </IfDashboard>
       </i>
     </Row>
   );
 };
 
-const ExportSettings = ({
-  selectedWidget,
-  view,
-}: ExportSettingsType) => (
+const ExportSettings = ({ selectedWidget, view }: ExportSettingsType) => (
   <>
     <Row>
       <ExportFormatSelection />
@@ -61,12 +61,14 @@ const ExportSettings = ({
     {selectedWidget && <SelectedWidgetInfo selectedWidget={selectedWidget} view={view} />}
     <Row>
       <p>
-        Define the fields for your file.<br />
+        Define the fields for your file.
+        <br />
       </p>
       {selectedWidget && (
-      <p>
-        The export supports fields created by decorators which are part of the message table, but they currently do not appear in the field list. If you want to export a decorated field, just enter its name.
-      </p>
+        <p>
+          The export supports fields created by decorators which are part of the message table, but they currently do
+          not appear in the field list. If you want to export a decorated field, just enter its name.
+        </p>
       )}
       <p>
         When you&apos;ve finished the configuration, click on <q>Start Download</q>.
@@ -77,14 +79,16 @@ const ExportSettings = ({
         {({ field: { name, value, onChange } }) => (
           <>
             <label htmlFor={name}>Fields to export</label>
-            <FieldsConfiguration onChange={
-                                      (newFields) => onChange({
-                                        target: { name, value: newFields.map((field) => ({ field })) },
-                                      })
-                                   }
-                                 selectSize="normal"
-                                 displaySortableListOverlayInPortal
-                                 selectedFields={value.map(({ field }) => field)} />
+            <FieldsConfiguration
+              onChange={(newFields) =>
+                onChange({
+                  target: { name, value: newFields.map((field) => ({ field })) },
+                })
+              }
+              selectSize="normal"
+              displaySortableListOverlayInPortal
+              selectedFields={value.map(({ field }) => field)}
+            />
           </>
         )}
       </Field>
@@ -94,15 +98,11 @@ const ExportSettings = ({
         {({ field: { name, value, onChange } }) => (
           <>
             <label htmlFor={name}>Messages limit</label>
-            <Input type="number"
-                   id={name}
-                   name={name}
-                   onChange={onChange}
-                   min={1}
-                   step={1}
-                   value={value} />
+            <Input type="number" id={name} name={name} onChange={onChange} min={1} step={1} value={value} />
             <HelpBlock>
-              Messages are loaded in chunks. If a limit is defined, all chunks up to the one where the limit is reached will be retrieved. Which means the total number of delivered messages can be higher than the defined limit.
+              Messages are loaded in chunks. If a limit is defined, all chunks up to the one where the limit is reached
+              will be retrieved. Which means the total number of delivered messages can be higher than the defined
+              limit.
             </HelpBlock>
           </>
         )}

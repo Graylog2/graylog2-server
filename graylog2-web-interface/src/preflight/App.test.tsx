@@ -32,23 +32,29 @@ jest.mock('util/AppConfig', () => ({
   gl2ServerUrl: () => 'https://example.org/',
 }));
 
-jest.mock('preflight/hooks/useServerAvailability', () => jest.fn(() => ({
-  data: false,
-})));
+jest.mock('preflight/hooks/useServerAvailability', () =>
+  jest.fn(() => ({
+    data: false,
+  })),
+);
 
-jest.mock('preflight/hooks/useDataNodes', () => jest.fn(() => ({
-  data: [],
-  isFetching: false,
-  isInitialLoading: false,
-  error: undefined,
-})));
+jest.mock('preflight/hooks/useDataNodes', () =>
+  jest.fn(() => ({
+    data: [],
+    isFetching: false,
+    isInitialLoading: false,
+    error: undefined,
+  })),
+);
 
-jest.mock('preflight/hooks/useDataNodesCA', () => jest.fn(() => ({
-  data: undefined,
-  isInitialLoading: false,
-  isFetching: false,
-  error: undefined,
-})));
+jest.mock('preflight/hooks/useDataNodesCA', () =>
+  jest.fn(() => ({
+    data: undefined,
+    isInitialLoading: false,
+    isFetching: false,
+    error: undefined,
+  })),
+);
 
 jest.mock('preflight/util/UserNotification', () => ({
   error: jest.fn(),
@@ -89,7 +95,9 @@ describe('App', () => {
   it('should render', async () => {
     renderPreflight(<App />);
 
-    await screen.findByText(/It looks like you are starting Graylog for the first time and have not configured a data node./);
+    await screen.findByText(
+      /It looks like you are starting Graylog for the first time and have not configured a data node./,
+    );
   });
 
   it('should resume startup and display loading page', async () => {
@@ -97,7 +105,9 @@ describe('App', () => {
 
     const resumeStartupButton = await startupButton();
     userEvent.click(resumeStartupButton);
-    await waitFor(() => expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/api/status/skip-config'), undefined, false));
+    await waitFor(() =>
+      expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/api/status/skip-config'), undefined, false),
+    );
     await screen.findByText(/The Graylog server is currently starting./);
   });
 
@@ -114,8 +124,14 @@ describe('App', () => {
     const resumeStartupButton = await startupButton();
     userEvent.click(resumeStartupButton);
 
-    await waitFor(() => expect(window.confirm).toHaveBeenCalledWith('Are you sure you want to resume startup without a running Graylog data node? This will cause the configuration to fall back to using an Opensearch instance on localhost:9200.'));
-    await waitFor(() => expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/api/status/skip-config'), undefined, false));
+    await waitFor(() =>
+      expect(window.confirm).toHaveBeenCalledWith(
+        'Are you sure you want to resume startup without a running Graylog data node? This will cause the configuration to fall back to using an Opensearch instance on localhost:9200.',
+      ),
+    );
+    await waitFor(() =>
+      expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/api/status/skip-config'), undefined, false),
+    );
   });
 
   it('should display error when resuming startup failed', async () => {
@@ -128,7 +144,14 @@ describe('App', () => {
       userEvent.click(resumeStartupButton);
     });
 
-    await waitFor(() => expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/api/status/skip-config'), undefined, false));
-    await waitFor(() => expect(UserNotification.error).toHaveBeenCalledWith('Resuming startup failed with error: Error: Unexpected error!', 'Could not resume startup'));
+    await waitFor(() =>
+      expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/api/status/skip-config'), undefined, false),
+    );
+    await waitFor(() =>
+      expect(UserNotification.error).toHaveBeenCalledWith(
+        'Resuming startup failed with error: Error: Unexpected error!',
+        'Could not resume startup',
+      ),
+    );
   });
 });

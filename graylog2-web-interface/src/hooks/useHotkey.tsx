@@ -55,13 +55,13 @@ const catchErrors = (hotKeysCollections: HotkeyCollections, actionKey: string, s
 };
 
 export type HotkeysProps = {
-  actionKey: string,
-  callback?: (event: KeyboardEvent, handler: HotkeysEvent) => unknown,
-  scope: ScopeName,
-  options?: Options,
-  dependencies?: Array<unknown>,
-  telemetryAppPathname?: string,
-}
+  actionKey: string;
+  callback?: (event: KeyboardEvent, handler: HotkeysEvent) => unknown;
+  scope: ScopeName;
+  options?: Options;
+  dependencies?: Array<unknown>;
+  telemetryAppPathname?: string;
+};
 
 const useHotkey = <T extends HTMLElement>({
   actionKey,
@@ -92,21 +92,27 @@ const useHotkey = <T extends HTMLElement>({
   catchErrors(hotKeysCollections, actionKey, scope);
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  const mergedOptions = useMemo(() => ({
-    ...defaultOptions,
-    ...options,
-    scopes: scope,
-  }), [options, scope]);
+  const mergedOptions = useMemo(
+    () => ({
+      ...defaultOptions,
+      ...options,
+      scopes: scope,
+    }),
+    [options, scope],
+  );
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  const callbackWithTelemetry = useCallback((event: KeyboardEvent, handler: HotkeysEvent) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.SHORTCUT_TYPED, {
-      app_pathname: telemetryAppPathname ?? getPathnameWithoutId(location.pathname),
-      event_details: { actionKey, scope, keys: hotKeysCollections?.[scope]?.actions?.[actionKey]?.keys },
-    });
+  const callbackWithTelemetry = useCallback(
+    (event: KeyboardEvent, handler: HotkeysEvent) => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.SHORTCUT_TYPED, {
+        app_pathname: telemetryAppPathname ?? getPathnameWithoutId(location.pathname),
+        event_details: { actionKey, scope, keys: hotKeysCollections?.[scope]?.actions?.[actionKey]?.keys },
+      });
 
-    callback(event, handler);
-  }, [actionKey, callback, hotKeysCollections, location.pathname, scope, sendTelemetry, telemetryAppPathname]);
+      callback(event, handler);
+    },
+    [actionKey, callback, hotKeysCollections, location.pathname, scope, sendTelemetry, telemetryAppPathname],
+  );
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
@@ -123,7 +129,16 @@ const useHotkey = <T extends HTMLElement>({
     });
 
     return () => removeActiveHotkey({ scope, actionKey });
-  }, [actionKey, addActiveHotkey, scope, removeActiveHotkey, mergedOptions.combinationKey, mergedOptions.enabled, mergedOptions.displayInOverview, mergedOptions.splitKey]);
+  }, [
+    actionKey,
+    addActiveHotkey,
+    scope,
+    removeActiveHotkey,
+    mergedOptions.combinationKey,
+    mergedOptions.enabled,
+    mergedOptions.displayInOverview,
+    mergedOptions.splitKey,
+  ]);
 
   return originalUseHotkeys<T>(
     hotKeysCollections?.[scope]?.actions?.[actionKey]?.keys,

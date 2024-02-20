@@ -21,23 +21,25 @@ import styled, { css } from 'styled-components';
 import Icon from 'components/common/Icon';
 
 type Props = {
-  children: React.ReactNode,
-  small: boolean,
+  children: React.ReactNode;
+  small: boolean;
 };
 
-const IconStack = styled.div<{ small: boolean }>(({ small, theme }) => css`
-  position: relative;
-  min-width: 2.5em;
-  font-size: ${small ? theme.fonts.size.body : theme.fonts.size.large};
-  
-  .fa-stack-1x {
-    color: ${theme.colors.global.textAlt};
-  }
-  
-  .fa-stack-2x {
-    color: ${theme.colors.global.textDefault};
-  }
-`);
+const IconStack = styled.div<{ small: boolean }>(
+  ({ small, theme }) => css`
+    position: relative;
+    min-width: 2.5em;
+    font-size: ${small ? theme.fonts.size.body : theme.fonts.size.large};
+
+    .fa-stack-1x {
+      color: ${theme.colors.global.textAlt};
+    }
+
+    .fa-stack-2x {
+      color: ${theme.colors.global.textDefault};
+    }
+  `,
+);
 
 const SupportLink = ({ small, children }: Props) => (
   <table className="description-tooltips" style={{ marginBottom: '10px', display: 'inline' }}>
@@ -50,9 +52,7 @@ const SupportLink = ({ small, children }: Props) => (
           </IconStack>
         </td>
         <td>
-          <strong>
-            {children}
-          </strong>
+          <strong>{children}</strong>
         </td>
       </tr>
     </tbody>

@@ -31,67 +31,69 @@ import styles from './GenericPlot.lazy.css';
 import InteractiveContext from '../contexts/InteractiveContext';
 import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
 
-const StyledPlot = styled(Plot)(({ theme }) => css`
-  .hoverlayer .hovertext {
-    rect {
-      fill: ${theme.colors.global.contentBackground} !important;
-      opacity: 0.9 !important;
-    }
+const StyledPlot = styled(Plot)(
+  ({ theme }) => css`
+    .hoverlayer .hovertext {
+      rect {
+        fill: ${theme.colors.global.contentBackground} !important;
+        opacity: 0.9 !important;
+      }
 
-    .name {
-      fill: ${theme.colors.global.textDefault} !important;
-    }
+      .name {
+        fill: ${theme.colors.global.textDefault} !important;
+      }
 
-    path {
-      stroke: ${theme.colors.global.contentBackground} !important;
+      path {
+        stroke: ${theme.colors.global.contentBackground} !important;
+      }
     }
-  }
-`);
+  `,
+);
 
 type LegendConfig = {
-  name: string,
-  target: HTMLElement,
-  color?: string,
+  name: string;
+  target: HTMLElement;
+  color?: string;
 };
 
 type ChartMarker = {
-  colors?: Array<string>,
-  color?: string,
-  size?: number,
+  colors?: Array<string>;
+  color?: string;
+  size?: number;
 };
 
 export type ChartConfig = {
-  name: string,
-  labels: Array<string>,
-  originalLabels?: Array<string>,
-  line?: ChartMarker,
-  marker?: ChartMarker,
-  originalName?: string,
+  name: string;
+  labels: Array<string>;
+  originalLabels?: Array<string>;
+  line?: ChartMarker;
+  marker?: ChartMarker;
+  originalName?: string;
 };
 
 export type ChartColor = {
-  line?: ChartMarker,
-  marker?: ChartMarker,
+  line?: ChartMarker;
+  marker?: ChartMarker;
   outsidetextfont?: {
-    color: string,
-  },
+    color: string;
+  };
 };
 
 type Props = {
-  chartData: Array<any>,
-  layout: {},
-  onZoom: (from: string, to: string) => boolean,
-  setChartColor?: (data: ChartConfig, color: ColorMapper) => ChartColor,
+  chartData: Array<any>;
+  layout: {};
+  onZoom: (from: string, to: string) => boolean;
+  setChartColor?: (data: ChartConfig, color: ColorMapper) => ChartColor;
 };
 
 type GenericPlotProps = Props & { theme: DefaultTheme };
 
 type State = {
-  legendConfig?: LegendConfig,
+  legendConfig?: LegendConfig;
 };
 
 type Axis = {
-  autosize: boolean,
+  autosize: boolean;
 };
 
 const nonInteractiveLayout = {
@@ -228,14 +230,16 @@ class GenericPlot extends React.Component<GenericPlotProps, State> {
               {(interactive) => (
                 <RenderCompletionCallback.Consumer>
                   {(onRenderComplete) => (
-                    <StyledPlot data={newChartData}
-                                useResizeHandler
-                                layout={interactive ? plotLayout : merge({}, nonInteractiveLayout, plotLayout)}
-                                style={style}
-                                onAfterPlot={onRenderComplete}
-                                onClick={interactive ? null : () => false}
-                                onRelayout={interactive ? this._onRelayout : () => false}
-                                config={config} />
+                    <StyledPlot
+                      data={newChartData}
+                      useResizeHandler
+                      layout={interactive ? plotLayout : merge({}, nonInteractiveLayout, plotLayout)}
+                      style={style}
+                      onAfterPlot={onRenderComplete}
+                      onClick={interactive ? null : () => false}
+                      onRelayout={interactive ? this._onRelayout : () => false}
+                      config={config}
+                    />
                   )}
                 </RenderCompletionCallback.Consumer>
               )}

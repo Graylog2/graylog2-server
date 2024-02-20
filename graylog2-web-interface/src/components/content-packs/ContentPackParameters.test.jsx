@@ -52,15 +52,15 @@ describe('<ContentPackParameters />', () => {
       },
     };
     const contentPack = ContentPack.builder()
-      .parameters(
-        [{
+      .parameters([
+        {
           name: 'A parameter name',
           title: 'A parameter title',
           description: 'A parameter descriptions',
           type: 'string',
           default_value: 'test',
-        }],
-      )
+        },
+      ])
       .entities([entity])
       .build();
     const wrapper = mount(<ContentPackParameters contentPack={contentPack} appliedParameter={{}} />);

@@ -49,26 +49,41 @@ const extractTimerangeParams = (timerange: TimeRange): [string, string | number]
       }
 
       return formatResult(result);
-    case 'keyword': return formatResult({ ...result, keyword: timerange.keyword });
-    case 'absolute': return formatResult({ ...result, from: timerange.from, to: timerange.to });
-    default: return Object.entries(result);
+    case 'keyword':
+      return formatResult({ ...result, keyword: timerange.keyword });
+    case 'absolute':
+      return formatResult({ ...result, from: timerange.from, to: timerange.to });
+    default:
+      return Object.entries(result);
   }
 };
 
-export const syncWithQueryParameters = (viewType: ViewType, query: string, searchQuery: Query, action: (to: string) => unknown) => {
+export const syncWithQueryParameters = (
+  viewType: ViewType,
+  query: string,
+  searchQuery: Query,
+  action: (to: string) => unknown,
+) => {
   if (viewType !== View.Type.Search) {
     return;
   }
 
   if (searchQuery) {
-    const { query: { query_string: queryString }, timerange, filter = Immutable.Map() } = searchQuery;
-    const baseUri = new URI(query).setSearch('q', queryString)
+    const {
+      query: { query_string: queryString },
+      timerange,
+      filter = Immutable.Map(),
+    } = searchQuery;
+    const baseUri = new URI(query)
+      .setSearch('q', queryString)
       .removeQuery('from')
       .removeQuery('to')
       .removeQuery('keyword')
       .removeQuery('relative');
-    const uriWithTimerange = extractTimerangeParams(timerange)
-      .reduce((prev, [key, value]) => prev.setSearch(key, String(value)), baseUri);
+    const uriWithTimerange = extractTimerangeParams(timerange).reduce(
+      (prev, [key, value]) => prev.setSearch(key, String(value)),
+      baseUri,
+    );
     const currentStreams = filtersToStreamSet(filter);
     const uri = currentStreams.isEmpty()
       ? uriWithTimerange.removeSearch('streams').toString()
@@ -87,5 +102,8 @@ export const useSyncWithQueryParameters = (query: string) => {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => syncWithQueryParameters(viewType, query, currentQuery, history.replace), []);
-  useEffect(() => syncWithQueryParameters(viewType, query, currentQuery, history.push), [currentQuery, history.push, query, viewType]);
+  useEffect(
+    () => syncWithQueryParameters(viewType, query, currentQuery, history.push),
+    [currentQuery, history.push, query, viewType],
+  );
 };

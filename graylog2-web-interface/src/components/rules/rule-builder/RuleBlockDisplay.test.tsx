@@ -42,7 +42,16 @@ describe('RuleBlockDisplay', () => {
   it('uses the step_title', async () => {
     render(
       <RuleBuilderProvider>
-        <RuleBlockDisplay block={block} onDelete={mockDelete} onEdit={mockEdit} onNegate={mockNegate} onDuplicate={mockDuplicate} onInsertAbove={mockInsertAbove} onInsertBelow={mockInsertBelow} type={type} />
+        <RuleBlockDisplay
+          block={block}
+          onDelete={mockDelete}
+          onEdit={mockEdit}
+          onNegate={mockNegate}
+          onDuplicate={mockDuplicate}
+          onInsertAbove={mockInsertAbove}
+          onInsertBelow={mockInsertBelow}
+          type={type}
+        />
       </RuleBuilderProvider>,
     );
 
@@ -52,7 +61,17 @@ describe('RuleBlockDisplay', () => {
   it('shows the outputvariable and its return type', async () => {
     render(
       <RuleBuilderProvider>
-        <RuleBlockDisplay block={block} onDelete={mockDelete} onEdit={mockEdit} onNegate={mockNegate} onDuplicate={mockDuplicate} onInsertAbove={mockInsertAbove} onInsertBelow={mockInsertBelow} returnType={RuleBuilderTypes.Number} type={type} />
+        <RuleBlockDisplay
+          block={block}
+          onDelete={mockDelete}
+          onEdit={mockEdit}
+          onNegate={mockNegate}
+          onDuplicate={mockDuplicate}
+          onInsertAbove={mockInsertAbove}
+          onInsertBelow={mockInsertBelow}
+          returnType={RuleBuilderTypes.Number}
+          type={type}
+        />
       </RuleBuilderProvider>,
     );
 
@@ -64,7 +83,16 @@ describe('RuleBlockDisplay', () => {
   it('calls deleteHandler when clicking the delete button', async () => {
     render(
       <RuleBuilderProvider>
-        <RuleBlockDisplay block={block} onDelete={mockDelete} onEdit={mockEdit} onNegate={mockNegate} onDuplicate={mockDuplicate} onInsertAbove={mockInsertAbove} onInsertBelow={mockInsertBelow} type={type} />
+        <RuleBlockDisplay
+          block={block}
+          onDelete={mockDelete}
+          onEdit={mockEdit}
+          onNegate={mockNegate}
+          onDuplicate={mockDuplicate}
+          onInsertAbove={mockInsertAbove}
+          onInsertBelow={mockInsertBelow}
+          type={type}
+        />
       </RuleBuilderProvider>,
     );
 
@@ -80,7 +108,16 @@ describe('RuleBlockDisplay', () => {
   it('calls editHandler when clicking the edit button', async () => {
     render(
       <RuleBuilderProvider>
-        <RuleBlockDisplay block={block} onDelete={mockDelete} onEdit={mockEdit} onNegate={mockNegate} onDuplicate={mockDuplicate} onInsertAbove={mockInsertAbove} onInsertBelow={mockInsertBelow} type={type} />
+        <RuleBlockDisplay
+          block={block}
+          onDelete={mockDelete}
+          onEdit={mockEdit}
+          onNegate={mockNegate}
+          onDuplicate={mockDuplicate}
+          onInsertAbove={mockInsertAbove}
+          onInsertBelow={mockInsertBelow}
+          type={type}
+        />
       </RuleBuilderProvider>,
     );
 
@@ -96,7 +133,17 @@ describe('RuleBlockDisplay', () => {
   it('calls negateHandler when clicking the negate button', async () => {
     render(
       <RuleBuilderProvider>
-        <RuleBlockDisplay block={block} negatable onDelete={mockDelete} onEdit={mockEdit} onNegate={mockNegate} onDuplicate={mockDuplicate} onInsertAbove={mockInsertAbove} onInsertBelow={mockInsertBelow} type={type} />
+        <RuleBlockDisplay
+          block={block}
+          negatable
+          onDelete={mockDelete}
+          onEdit={mockEdit}
+          onNegate={mockNegate}
+          onDuplicate={mockDuplicate}
+          onInsertAbove={mockInsertAbove}
+          onInsertBelow={mockInsertBelow}
+          type={type}
+        />
       </RuleBuilderProvider>,
     );
 
@@ -110,7 +157,16 @@ describe('RuleBlockDisplay', () => {
   it('displays errors when existing', async () => {
     render(
       <RuleBuilderProvider>
-        <RuleBlockDisplay block={{ ...block, errors: ['wrong 1', 'not right 2'] }} onDelete={mockDelete} onEdit={mockEdit} onNegate={mockNegate} onDuplicate={mockDuplicate} onInsertAbove={mockInsertAbove} onInsertBelow={mockInsertBelow} type={type} />
+        <RuleBlockDisplay
+          block={{ ...block, errors: ['wrong 1', 'not right 2'] }}
+          onDelete={mockDelete}
+          onEdit={mockEdit}
+          onNegate={mockNegate}
+          onDuplicate={mockDuplicate}
+          onInsertAbove={mockInsertAbove}
+          onInsertBelow={mockInsertBelow}
+          type={type}
+        />
       </RuleBuilderProvider>,
     );
 

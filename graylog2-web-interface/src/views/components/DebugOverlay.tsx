@@ -21,26 +21,25 @@ import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import useAppSelector from 'stores/useAppSelector';
 
 type Props = {
-  onClose: () => void,
-  show: boolean,
+  onClose: () => void;
+  show: boolean;
 };
 
 const DebugOverlay = ({ show, onClose }: Props) => {
   const fullState = useAppSelector((state) => state);
 
   return (
-    <BootstrapModalWrapper showModal={show}
-                           onHide={onClose}>
+    <BootstrapModalWrapper showModal={show} onHide={onClose}>
       <Modal.Header closeButton>
         <Modal.Title>Debug information</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <textarea disabled
-                  style={{ height: '80vh', width: '100%' }}
-                  value={JSON.stringify(fullState, null, 2)} />
+        <textarea disabled style={{ height: '80vh', width: '100%' }} value={JSON.stringify(fullState, null, 2)} />
       </Modal.Body>
       <Modal.Footer>
-        <Button type="button" onClick={() => onClose()}>Close</Button>
+        <Button type="button" onClick={() => onClose()}>
+          Close
+        </Button>
       </Modal.Footer>
     </BootstrapModalWrapper>
   );

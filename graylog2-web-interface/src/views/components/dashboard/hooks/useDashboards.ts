@@ -31,23 +31,21 @@ const INITIAL_DATA = {
 };
 
 type PaginatedDashboardsResponse = PaginatedListJSON & {
-  elements: Array<ViewJson>,
-  attributes: Array<Attribute>,
+  elements: Array<ViewJson>;
+  attributes: Array<Attribute>;
 };
 
 type Options = {
-  enabled: boolean,
-}
+  enabled: boolean;
+};
 
 const dashboardsUrl = qualifyUrl('/dashboards');
 
 const fetchDashboards = (searchParams: SearchParams) => {
-  const url = PaginationURL(
-    dashboardsUrl,
-    searchParams.page,
-    searchParams.pageSize,
-    searchParams.query,
-    { sort: searchParams.sort.attributeId, order: searchParams.sort.direction });
+  const url = PaginationURL(dashboardsUrl, searchParams.page, searchParams.pageSize, searchParams.query, {
+    sort: searchParams.sort.attributeId,
+    order: searchParams.sort.direction,
+  });
 
   return fetch<PaginatedDashboardsResponse>('GET', qualifyUrl(url)).then(
     ({ elements, total, count, page, per_page: perPage, attributes }) => ({
@@ -58,33 +56,35 @@ const fetchDashboards = (searchParams: SearchParams) => {
   );
 };
 
-const useDashboards = (searchParams: SearchParams, { enabled }: Options = { enabled: true }): {
+const useDashboards = (
+  searchParams: SearchParams,
+  { enabled }: Options = { enabled: true },
+): {
   data: {
-    list: Readonly<Array<View>>,
-    pagination: { total: number },
-    attributes: Array<Attribute>
-  },
-  refetch: () => void,
-  isInitialLoading: boolean,
+    list: Readonly<Array<View>>;
+    pagination: { total: number };
+    attributes: Array<Attribute>;
+  };
+  refetch: () => void;
+  isInitialLoading: boolean;
 } => {
   const { data, refetch, isInitialLoading } = useQuery(
     ['dashboards', 'overview', searchParams],
     () => fetchDashboards(searchParams),
     {
       onError: (errorThrown) => {
-        UserNotification.error(`Loading dashboards failed with status: ${errorThrown}`,
-          'Could not load dashboards');
+        UserNotification.error(`Loading dashboards failed with status: ${errorThrown}`, 'Could not load dashboards');
       },
       keepPreviousData: true,
       enabled,
     },
   );
 
-  return ({
+  return {
     data: data ?? INITIAL_DATA,
     refetch,
     isInitialLoading,
-  });
+  };
 };
 
 export default useDashboards;

@@ -87,7 +87,11 @@ describe('UsersSection', () => {
 
     await waitFor(() => expect(AuthzRolesActions.loadUsersForRole).toHaveBeenCalledTimes(2));
 
-    expect(AuthzRolesActions.loadUsersForRole).toHaveBeenCalledWith(exampleRole.id, exampleRole.name, { page: 1, perPage: 5, query: 'name of an assigned user' });
+    expect(AuthzRolesActions.loadUsersForRole).toHaveBeenCalledWith(exampleRole.id, exampleRole.name, {
+      page: 1,
+      perPage: 5,
+      query: 'name of an assigned user',
+    });
   });
 
   it('should unassign a user', async () => {

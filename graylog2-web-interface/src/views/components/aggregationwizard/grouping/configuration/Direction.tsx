@@ -21,42 +21,48 @@ import { Field } from 'formik';
 import { Input } from 'components/bootstrap';
 
 const DirectionOptions = styled.div`
-display: flex;
+  display: flex;
 
-div:first-child {
-  margin-right: 5px;
-}
+  div:first-child {
+    margin-right: 5px;
+  }
 `;
 
 type Props = {
-  groupingIndex: number,
+  groupingIndex: number;
 };
 
 const Direction = ({ groupingIndex }: Props) => (
   <Field name={`groupBy.groupings.${groupingIndex}.direction`}>
     {({ field: { name, value, onChange, onBlur }, meta: { error } }) => (
-      <Input id="group-by-direction"
-             label="Direction"
-             error={error}
-             labelClassName="col-sm-3"
-             wrapperClassName="col-sm-9">
+      <Input
+        id="group-by-direction"
+        label="Direction"
+        error={error}
+        labelClassName="col-sm-3"
+        wrapperClassName="col-sm-9"
+      >
         <DirectionOptions>
-          <Input checked={value === 'row'}
-                 formGroupClassName=""
-                 id={name}
-                 label="Row"
-                 onBlur={onBlur}
-                 onChange={onChange}
-                 type="radio"
-                 value="row" />
-          <Input checked={value === 'column'}
-                 formGroupClassName=""
-                 id={name}
-                 label="Column"
-                 onBlur={onBlur}
-                 onChange={onChange}
-                 type="radio"
-                 value="column" />
+          <Input
+            checked={value === 'row'}
+            formGroupClassName=""
+            id={name}
+            label="Row"
+            onBlur={onBlur}
+            onChange={onChange}
+            type="radio"
+            value="row"
+          />
+          <Input
+            checked={value === 'column'}
+            formGroupClassName=""
+            id={name}
+            label="Column"
+            onBlur={onBlur}
+            onChange={onChange}
+            type="radio"
+            value="column"
+          />
         </DirectionOptions>
       </Input>
     )}

@@ -24,18 +24,18 @@ import useElementDimensions from 'hooks/useElementDimensions';
 
 const REACT_SELECT_MAX_OPTIONS_LENGTH = 1000;
 const MAX_CONTAINER_SIZE = 300;
-const Container = styled.div<{ height: number}>`
+const Container = styled.div<{ height: number }>`
   flex: 1 1 auto;
   height: ${(props) => props?.height || MAX_CONTAINER_SIZE}px;
 `;
 
 type RowProps = {
-  data: Array<React.ReactNode>,
-  index: number,
-  setSize: (index: number, size: number) => void,
-  containerWidth: number
-  style: object
-}
+  data: Array<React.ReactNode>;
+  index: number;
+  setSize: (index: number, size: number) => void;
+  containerWidth: number;
+  style: object;
+};
 
 const Row = ({ data, index, setSize, style, containerWidth }: RowProps) => {
   const rowRef = useRef(null);
@@ -52,10 +52,10 @@ const Row = ({ data, index, setSize, style, containerWidth }: RowProps) => {
 };
 
 type WindowListProps = Partial<MenuListProps> & {
-  listRef?: any,
-  children: Array<React.ReactNode>,
-  onItemsRendered?: () => void
-}
+  listRef?: any;
+  children: Array<React.ReactNode>;
+  onItemsRendered?: () => void;
+};
 
 export const WindowList = ({ children, listRef, ...rest }: WindowListProps) => {
   const containerRef = useRef(null);
@@ -64,11 +64,14 @@ export const WindowList = ({ children, listRef, ...rest }: WindowListProps) => {
   const containerDimensions = useElementDimensions(containerRef);
   const { width } = containerDimensions;
 
-  const setSize = useCallback((index: number, size: number) => {
-    sizeMap.current = { ...sizeMap.current, [index]: size };
-    const currentRef = listRef || vListRef;
-    currentRef.current?.resetAfterIndex(index);
-  }, [listRef]);
+  const setSize = useCallback(
+    (index: number, size: number) => {
+      sizeMap.current = { ...sizeMap.current, [index]: size };
+      const currentRef = listRef || vListRef;
+      currentRef.current?.resetAfterIndex(index);
+    },
+    [listRef],
+  );
 
   const totalHeight = Object.entries(children).reduce((sum, [index]) => {
     if (sizeMap.current[index] && sum < MAX_CONTAINER_SIZE) {
@@ -82,19 +85,17 @@ export const WindowList = ({ children, listRef, ...rest }: WindowListProps) => {
 
   return (
     <Container ref={containerRef} height={totalHeight} data-testid="infinite-loader-container">
-      <List ref={listRef || vListRef}
-            height={totalHeight || 300}
-            itemCount={children.length}
-            itemSize={getSize}
-            itemData={children}
-            width={width}
-            {...rest}>
+      <List
+        ref={listRef || vListRef}
+        height={totalHeight || 300}
+        itemCount={children.length}
+        itemSize={getSize}
+        itemData={children}
+        width={width}
+        {...rest}
+      >
         {({ data, index, style }) => (
-          <Row data={data}
-               style={style}
-               index={index}
-               setSize={setSize}
-               containerWidth={width} />
+          <Row data={data} style={style} index={index} setSize={setSize} containerWidth={width} />
         )}
       </List>
     </Container>
@@ -106,15 +107,21 @@ WindowList.defaultProps = {
   onItemsRendered: undefined,
 };
 
-const CustomMenuList = ({ children, innerProps, ...rest }: Partial<MenuListProps> & { children: Array<React.ReactNode> }) => {
-  if (!children?.length || (children.length < REACT_SELECT_MAX_OPTIONS_LENGTH)) {
+const CustomMenuList = ({
+  children,
+  innerProps,
+  ...rest
+}: Partial<MenuListProps> & { children: Array<React.ReactNode> }) => {
+  if (!children?.length || children.length < REACT_SELECT_MAX_OPTIONS_LENGTH) {
     return (
-      <Components.MenuList {...rest}
-                           innerProps={{
-                             ...innerProps,
-                             // @ts-ignore
-                             'data-testid': 'react-select-list',
-                           }}>
+      <Components.MenuList
+        {...rest}
+        innerProps={{
+          ...innerProps,
+          // @ts-ignore
+          'data-testid': 'react-select-list',
+        }}
+      >
         {children}
       </Components.MenuList>
     );

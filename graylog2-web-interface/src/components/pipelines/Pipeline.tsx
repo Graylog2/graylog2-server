@@ -43,12 +43,12 @@ const StyledP = styled.p`
 `;
 
 type Props = {
-  pipeline: PipelineType,
-  connections: PipelineConnectionsType[],
-  streams: Stream[],
-  onConnectionsChange: (updatedConnections, callback?) => void,
-  onStagesChange: (newStages: StageType[], callback?) => void,
-  onPipelineChange: (pipeline: PipelineType, callback?) => void,
+  pipeline: PipelineType;
+  connections: PipelineConnectionsType[];
+  streams: Stream[];
+  onConnectionsChange: (updatedConnections, callback?) => void;
+  onStagesChange: (newStages: StageType[], callback?) => void;
+  onPipelineChange: (pipeline: PipelineType, callback?) => void;
 };
 
 const Pipeline = ({ pipeline, connections, streams, onConnectionsChange, onStagesChange, onPipelineChange }: Props) => {
@@ -56,9 +56,9 @@ const Pipeline = ({ pipeline, connections, streams, onConnectionsChange, onStage
     if (connections.length === 0) {
       return (
         <ConnectionWarning bsStyle="danger">
-          This pipeline is currently not connected to any streams. You have to connect a pipeline to at least one
-          stream to make it process incoming messages. Note that this is not required if you intend to use this
-          pipeline only for search result transformation using decorators.
+          This pipeline is currently not connected to any streams. You have to connect a pipeline to at least one stream
+          to make it process incoming messages. Note that this is not required if you intend to use this pipeline only
+          for search result transformation using decorators.
         </ConnectionWarning>
       );
     }
@@ -73,31 +73,39 @@ const Pipeline = ({ pipeline, connections, streams, onConnectionsChange, onStage
     onStagesChange(newStages, callback);
   };
 
-  const _updateStage = useCallback((prevStage) => (stage, callback) => {
-    const newStages = pipeline.stages.filter((s) => s.stage !== prevStage.stage);
+  const _updateStage = useCallback(
+    (prevStage) => (stage, callback) => {
+      const newStages = pipeline.stages.filter((s) => s.stage !== prevStage.stage);
 
-    newStages.push(stage);
-    onStagesChange(newStages, callback);
-  }, [pipeline, onStagesChange]);
+      newStages.push(stage);
+      onStagesChange(newStages, callback);
+    },
+    [pipeline, onStagesChange],
+  );
 
-  const _deleteStage = useCallback((stage) => () => {
-    // eslint-disable-next-line no-alert
-    if (window.confirm(`You are about to delete stage ${stage.stage}, are you sure you want to proceed?`)) {
-      const newStages = pipeline.stages.filter((s) => s.stage !== stage.stage);
+  const _deleteStage = useCallback(
+    (stage) => () => {
+      // eslint-disable-next-line no-alert
+      if (window.confirm(`You are about to delete stage ${stage.stage}, are you sure you want to proceed?`)) {
+        const newStages = pipeline.stages.filter((s) => s.stage !== stage.stage);
 
-      onStagesChange(newStages);
-    }
-  }, [pipeline, onStagesChange]);
+        onStagesChange(newStages);
+      }
+    },
+    [pipeline, onStagesChange],
+  );
 
   const _formatConnectedStreams = (connectedStreams: Stream[]) => {
     const formattedStreams = connectedStreams.map((s) => `"${s.title}"`);
-    const streamList = formattedStreams.length > 1 ? [formattedStreams.slice(0, -1).join(', '), formattedStreams.slice(-1)].join(' and ') : formattedStreams[0];
+    const streamList =
+      formattedStreams.length > 1
+        ? [formattedStreams.slice(0, -1).join(', '), formattedStreams.slice(-1)].join(' and ')
+        : formattedStreams[0];
 
     return (
       <span>
         This pipeline is processing messages from the{' '}
-        <Pluralize singular="stream" plural="streams" value={formattedStreams.length} />{' '}
-        {streamList}.
+        <Pluralize singular="stream" plural="streams" value={formattedStreams.length} /> {streamList}.
       </span>
     );
   };
@@ -108,12 +116,14 @@ const Pipeline = ({ pipeline, connections, streams, onConnectionsChange, onStage
     return pipeline.stages
       .sort((s1, s2) => s1.stage - s2.stage)
       .map((stage) => (
-        <Stage key={`stage-${stage.stage}`}
-               pipeline={pipeline}
-               stage={stage}
-               isLastStage={stage.stage === maxStage}
-               onUpdate={_updateStage(stage)}
-               onDelete={_deleteStage(stage)} />
+        <Stage
+          key={`stage-${stage.stage}`}
+          pipeline={pipeline}
+          stage={stage}
+          isLastStage={stage.stage === maxStage}
+          onUpdate={_updateStage(stage)}
+          onDelete={_deleteStage(stage)}
+        />
       ));
   }, [pipeline, _updateStage, _deleteStage]);
 
@@ -126,18 +136,22 @@ const Pipeline = ({ pipeline, connections, streams, onConnectionsChange, onStage
       <StyledRow className="row-sm">
         <Col md={12}>
           <div className="pull-right">
-            <PipelineConnectionsForm pipeline={pipeline}
-                                     connections={connections}
-                                     streams={streams}
-                                     save={onConnectionsChange} />
+            <PipelineConnectionsForm
+              pipeline={pipeline}
+              connections={connections}
+              streams={streams}
+              save={onConnectionsChange}
+            />
           </div>
           <h2>Pipeline connections</h2>
           <StyledP>
-            <PipelineConnectionsList pipeline={pipeline}
-                                     connections={connections}
-                                     streams={streams}
-                                     streamsFormatter={_formatConnectedStreams}
-                                     noConnectionsMessage="Select streams that will be processed by this pipeline." />
+            <PipelineConnectionsList
+              pipeline={pipeline}
+              connections={connections}
+              streams={streams}
+              streamsFormatter={_formatConnectedStreams}
+              noConnectionsMessage="Select streams that will be processed by this pipeline."
+            />
           </StyledP>
           <hr />
         </Col>
@@ -149,8 +163,8 @@ const Pipeline = ({ pipeline, connections, streams, onConnectionsChange, onStage
           </div>
           <h2>Pipeline Stages</h2>
           <StyledP>
-            Stages are groups of conditions and actions which need to run in order, and provide the necessary{' '}
-            control flow to decide whether or not to run the rest of a pipeline.
+            Stages are groups of conditions and actions which need to run in order, and provide the necessary control
+            flow to decide whether or not to run the rest of a pipeline.
           </StyledP>
         </Col>
       </StyledRow>

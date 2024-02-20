@@ -82,11 +82,12 @@ const trafficResponse = {
 jest.mock('hooks/useCurrentUser');
 
 jest.mock('stores/cluster/ClusterTrafficStore', () => ({
-  ClusterTrafficStore: MockStore(
-    ['getInitialState', jest.fn(() => ({
+  ClusterTrafficStore: MockStore([
+    'getInitialState',
+    jest.fn(() => ({
       traffic: undefined,
-    }))],
-  ),
+    })),
+  ]),
   ClusterTrafficActions: {
     getTraffic: jest.fn((_days: number) => ({ traffic: undefined })),
   },
@@ -94,7 +95,8 @@ jest.mock('stores/cluster/ClusterTrafficStore', () => ({
 
 describe('GraylogClusterOverview', () => {
   beforeEach(() => {
-    const currentUserWithPermissions = adminUser.toBuilder()
+    const currentUserWithPermissions = adminUser
+      .toBuilder()
       .permissions(Immutable.List(['licenses:read']))
       .build();
 

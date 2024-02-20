@@ -23,9 +23,9 @@ import useHasUndeclaredParameters from 'views/logic/parameters/useHasUndeclaredP
 import useHotkey from 'hooks/useHotkey';
 
 type Props = {
-  onClick: () => void,
-  openSaveAsModal: () => void,
-}
+  onClick: () => void;
+  openSaveAsModal: () => void;
+};
 
 const SaveAsDashboardButton = ({ onClick, openSaveAsModal }: Props) => {
   const hasUndeclaredParameters = useHasUndeclaredParameters();
@@ -38,9 +38,7 @@ const SaveAsDashboardButton = ({ onClick, openSaveAsModal }: Props) => {
   });
 
   return (
-    <Button onClick={onClick}
-            disabled={hasUndeclaredParameters}
-            title="Save as new dashboard">
+    <Button onClick={onClick} disabled={hasUndeclaredParameters} title="Save as new dashboard">
       <Icon name="copy" /> Save as
     </Button>
   );

@@ -21,17 +21,19 @@ import { ConfirmDialog } from 'components/common';
 import TelemetryInfoText from 'logic/telemetry/TelemetryInfoText';
 
 type Props = {
-  show: boolean,
-  onConfirm: () => void,
-}
+  show: boolean;
+  onConfirm: () => void;
+};
 
 const TelemetryInfoModal = ({ show, onConfirm }: Props) => (
-  <ConfirmDialog show={show}
-                 onConfirm={onConfirm}
-                 hideCancelButton={false}
-                 onCancel={onConfirm}
-                 title="Help us improve Graylog"
-                 btnConfirmText="Ok">
+  <ConfirmDialog
+    show={show}
+    onConfirm={onConfirm}
+    hideCancelButton={false}
+    onCancel={onConfirm}
+    title="Help us improve Graylog"
+    btnConfirmText="Ok"
+  >
     <TelemetryInfoText showProfile />
   </ConfirmDialog>
 );

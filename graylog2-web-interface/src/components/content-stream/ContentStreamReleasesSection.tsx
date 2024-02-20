@@ -27,14 +27,18 @@ import useContentStream from 'components/content-stream/hook/useContentStream';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
-const StyledListGroupItem = styled(ListGroupItem)(({ theme }: { theme: DefaultTheme }) => css`
-  display: flex;
-  gap: ${theme.spacings.md};
-  align-items: flex-start;
-`);
-const LastOpenedTime = styled.i(({ theme }: { theme: DefaultTheme }) => css`
-  color: ${theme.colors.gray[60]};
-`);
+const StyledListGroupItem = styled(ListGroupItem)(
+  ({ theme }: { theme: DefaultTheme }) => css`
+    display: flex;
+    gap: ${theme.spacings.md};
+    align-items: flex-start;
+  `,
+);
+const LastOpenedTime = styled.i(
+  ({ theme }: { theme: DefaultTheme }) => css`
+    color: ${theme.colors.gray[60]};
+  `,
+);
 export const StyledLabel = styled(Label)`
   cursor: default;
   width: 110px;
@@ -67,12 +71,8 @@ const ContentStreamReleasesSection = () => {
     return (
       <Alert bsStyle="info">
         <p>
-          Unable to load RSS feed at the moment ! You can read more
-          on {' '}
-          <ExternalLink href="https://www.graylog.org/post/tag/release-info">
-            Graylog.org
-          </ExternalLink>
-          .
+          Unable to load RSS feed at the moment ! You can read more on{' '}
+          <ExternalLink href="https://www.graylog.org/post/tag/release-info">Graylog.org</ExternalLink>.
         </p>
       </Alert>
     );
@@ -86,7 +86,11 @@ const ContentStreamReleasesSection = () => {
             {/* eslint-disable-next-line react/no-danger */}
             <span dangerouslySetInnerHTML={{ __html: _sanitizeText(feed?.title) }} />
           </a>
-          {feed?.pubDate ? <LastOpenedTime><RelativeTime dateTime={feed.pubDate} /></LastOpenedTime> : null}
+          {feed?.pubDate ? (
+            <LastOpenedTime>
+              <RelativeTime dateTime={feed.pubDate} />
+            </LastOpenedTime>
+          ) : null}
         </StyledListGroupItem>
       ))}
     </ListGroup>

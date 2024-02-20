@@ -108,7 +108,7 @@ class EditExtractorConverters extends React.Component {
     const { converters } = this.props;
     const currentConverter = converters.filter((converter) => converter.type === converterType)[0];
 
-    return (currentConverter ? currentConverter.config : {});
+    return currentConverter ? currentConverter.config : {};
   };
 
   _getConvertersConfiguration = () => {
@@ -117,101 +117,127 @@ class EditExtractorConverters extends React.Component {
       // Get converter configuration from disabledConverters if it was disabled
       let converterConfig = this._getConverterByType(converterType);
 
-      if (Object.keys(converterConfig).length === 0 && ('converterType' in disabledConverters)) {
+      if (Object.keys(converterConfig).length === 0 && 'converterType' in disabledConverters) {
         converterConfig = disabledConverters[converterType];
       }
 
       switch (converterType) {
         case ExtractorUtils.ConverterTypes.NUMERIC:
           return (
-            <NumericConverterConfiguration key={converterType}
-                                           type={converterType}
-                                           configuration={converterConfig}
-                                           onChange={this._onConverterChange} />
+            <NumericConverterConfiguration
+              key={converterType}
+              type={converterType}
+              configuration={converterConfig}
+              onChange={this._onConverterChange}
+            />
           );
         case ExtractorUtils.ConverterTypes.DATE:
           return (
-            <DateConverterConfiguration key={converterType}
-                                        type={converterType}
-                                        configuration={converterConfig}
-                                        onChange={this._onConverterChange} />
+            <DateConverterConfiguration
+              key={converterType}
+              type={converterType}
+              configuration={converterConfig}
+              onChange={this._onConverterChange}
+            />
           );
         case ExtractorUtils.ConverterTypes.HASH:
           return (
-            <HashConverterConfiguration key={converterType}
-                                        type={converterType}
-                                        configuration={converterConfig}
-                                        onChange={this._onConverterChange} />
+            <HashConverterConfiguration
+              key={converterType}
+              type={converterType}
+              configuration={converterConfig}
+              onChange={this._onConverterChange}
+            />
           );
         case ExtractorUtils.ConverterTypes.SPLIT_AND_COUNT:
           return (
-            <SplitAndCountConverterConfiguration key={converterType}
-                                                 type={converterType}
-                                                 configuration={converterConfig}
-                                                 onChange={this._onConverterChange} />
+            <SplitAndCountConverterConfiguration
+              key={converterType}
+              type={converterType}
+              configuration={converterConfig}
+              onChange={this._onConverterChange}
+            />
           );
         case ExtractorUtils.ConverterTypes.IP_ANONYMIZER:
           return (
-            <IpAnonymizerConverterConfiguration key={converterType}
-                                                type={converterType}
-                                                configuration={converterConfig}
-                                                onChange={this._onConverterChange} />
+            <IpAnonymizerConverterConfiguration
+              key={converterType}
+              type={converterType}
+              configuration={converterConfig}
+              onChange={this._onConverterChange}
+            />
           );
         case ExtractorUtils.ConverterTypes.SYSLOG_PRI_LEVEL:
           return (
-            <SyslogPriLevelConverterConfiguration key={converterType}
-                                                  type={converterType}
-                                                  configuration={converterConfig}
-                                                  onChange={this._onConverterChange} />
+            <SyslogPriLevelConverterConfiguration
+              key={converterType}
+              type={converterType}
+              configuration={converterConfig}
+              onChange={this._onConverterChange}
+            />
           );
         case ExtractorUtils.ConverterTypes.SYSLOG_PRI_FACILITY:
           return (
-            <SyslogPriFacilityConverterConfiguration key={converterType}
-                                                     type={converterType}
-                                                     configuration={converterConfig}
-                                                     onChange={this._onConverterChange} />
+            <SyslogPriFacilityConverterConfiguration
+              key={converterType}
+              type={converterType}
+              configuration={converterConfig}
+              onChange={this._onConverterChange}
+            />
           );
         case ExtractorUtils.ConverterTypes.TOKENIZER:
           return (
-            <TokenizerConverterConfiguration key={converterType}
-                                             type={converterType}
-                                             configuration={converterConfig}
-                                             onChange={this._onConverterChange} />
+            <TokenizerConverterConfiguration
+              key={converterType}
+              type={converterType}
+              configuration={converterConfig}
+              onChange={this._onConverterChange}
+            />
           );
         case ExtractorUtils.ConverterTypes.CSV:
           return (
-            <CSVConverterConfiguration key={converterType}
-                                       type={converterType}
-                                       configuration={converterConfig}
-                                       onChange={this._onConverterChange} />
+            <CSVConverterConfiguration
+              key={converterType}
+              type={converterType}
+              configuration={converterConfig}
+              onChange={this._onConverterChange}
+            />
           );
         case ExtractorUtils.ConverterTypes.LOWERCASE:
           return (
-            <LowercaseConverterConfiguration key={converterType}
-                                             type={converterType}
-                                             configuration={converterConfig}
-                                             onChange={this._onConverterChange} />
+            <LowercaseConverterConfiguration
+              key={converterType}
+              type={converterType}
+              configuration={converterConfig}
+              onChange={this._onConverterChange}
+            />
           );
         case ExtractorUtils.ConverterTypes.UPPERCASE:
           return (
-            <UppercaseConverterConfiguration key={converterType}
-                                             type={converterType}
-                                             configuration={converterConfig}
-                                             onChange={this._onConverterChange} />
+            <UppercaseConverterConfiguration
+              key={converterType}
+              type={converterType}
+              configuration={converterConfig}
+              onChange={this._onConverterChange}
+            />
           );
         case ExtractorUtils.ConverterTypes.FLEXDATE:
           return (
-            <FlexdateConverterConfiguration key={converterType}
-                                            type={converterType}
-                                            configuration={converterConfig}
-                                            onChange={this._onConverterChange} />
+            <FlexdateConverterConfiguration
+              key={converterType}
+              type={converterType}
+              configuration={converterConfig}
+              onChange={this._onConverterChange}
+            />
           );
         case ExtractorUtils.ConverterTypes.LOOKUP_TABLE:
           return (
-            <LookupTableConverterConfiguration key={converterType}
-                                               type={converterType}
-                                               configuration={converterConfig}
-                                               onChange={this._onConverterChange} />
+            <LookupTableConverterConfiguration
+              key={converterType}
+              type={converterType}
+              configuration={converterConfig}
+              onChange={this._onConverterChange}
+            />
           );
         default:
           // eslint-disable-next-line no-console
@@ -228,14 +254,12 @@ class EditExtractorConverters extends React.Component {
     const { extractorType } = this.props;
     const { selectedConverter } = this.state;
 
-    if (extractorType === ExtractorUtils.ExtractorTypes.GROK
-      || extractorType === ExtractorUtils.ExtractorTypes.JSON) {
+    if (extractorType === ExtractorUtils.ExtractorTypes.GROK || extractorType === ExtractorUtils.ExtractorTypes.JSON) {
       return (
         <div className="form-group">
           <div className="col-md-offset-2 col-md-10">
             <Panel bsStyle="info" style={{ marginBottom: 0 }}>
-              Cannot add converters to{' '}
-              <em>{ExtractorUtils.getReadableExtractorTypeName(extractorType)}</em> extractors.
+              Cannot add converters to <em>{ExtractorUtils.getReadableExtractorTypeName(extractorType)}</em> extractors.
             </Panel>
           </div>
         </div>
@@ -244,18 +268,22 @@ class EditExtractorConverters extends React.Component {
 
     return (
       <div>
-        <Input id="add-converter"
-               label="Add converter"
-               labelClassName="col-md-2"
-               wrapperClassName="col-md-10"
-               help="Add converters to transform the extracted value.">
+        <Input
+          id="add-converter"
+          label="Add converter"
+          labelClassName="col-md-2"
+          wrapperClassName="col-md-10"
+          help="Add converters to transform the extracted value."
+        >
           <Row className="row-sm">
             <Col md={11}>
-              <Select id="add-converter"
-                      placeholder="Select a converter"
-                      options={this._getConverterOptions()}
-                      value={selectedConverter}
-                      onChange={this._onConverterSelect} />
+              <Select
+                id="add-converter"
+                placeholder="Select a converter"
+                options={this._getConverterOptions()}
+                value={selectedConverter}
+                onChange={this._onConverterSelect}
+              />
             </Col>
             <Col md={1} className="text-right">
               <Button bsStyle="info" onClick={this._onConverterAdd} disabled={!selectedConverter}>

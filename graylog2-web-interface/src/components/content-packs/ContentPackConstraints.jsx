@@ -23,10 +23,7 @@ import { Badge } from 'components/bootstrap';
 
 class ContentPackConstraints extends React.Component {
   static propTypes = {
-    constraints: PropTypes.oneOfType([
-      PropTypes.object,
-      PropTypes.array,
-    ]),
+    constraints: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
     isFulfilled: PropTypes.bool,
   };
 
@@ -76,13 +73,15 @@ class ContentPackConstraints extends React.Component {
         <h2>Constraints</h2>
         <br />
         <br />
-        <DataTable id="content-packs-constraints"
-                   headers={headers}
-                   headerCellFormatter={(header) => <th>{header}</th>}
-                   sortBy={(row) => (row.constraint ? row.constraint.type : row.type)}
-                   dataRowFormatter={this._rowFormatter}
-                   rows={constraints}
-                   filterKeys={[]} />
+        <DataTable
+          id="content-packs-constraints"
+          headers={headers}
+          headerCellFormatter={(header) => <th>{header}</th>}
+          sortBy={(row) => (row.constraint ? row.constraint.type : row.type)}
+          dataRowFormatter={this._rowFormatter}
+          rows={constraints}
+          filterKeys={[]}
+        />
       </div>
     );
   }

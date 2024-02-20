@@ -27,9 +27,9 @@ const nextButton = () => screen.findByRole('button', { name: /Next/i });
 
 describe('<Wizard />', () => {
   const steps: Steps = [
-    { key: 'Key1', title: 'Title1', component: (<div>Component1</div>) },
-    { key: 'Key2', title: 'Title2', component: (<div>Component2</div>) },
-    { key: 'Key3', title: 'Title3', component: (<div>Component3</div>) },
+    { key: 'Key1', title: 'Title1', component: <div>Component1</div> },
+    { key: 'Key2', title: 'Title2', component: <div>Component2</div> },
+    { key: 'Key3', title: 'Title3', component: <div>Component3</div> },
   ];
 
   it('should render with 3 steps', async () => {
@@ -39,7 +39,11 @@ describe('<Wizard />', () => {
   });
 
   it('should render with 3 steps and children', async () => {
-    render(<Wizard steps={steps}><span>Preview</span></Wizard>);
+    render(
+      <Wizard steps={steps}>
+        <span>Preview</span>
+      </Wizard>,
+    );
 
     await screen.findByText('Preview');
   });
@@ -51,7 +55,11 @@ describe('<Wizard />', () => {
   });
 
   it('should render in horizontal mode with 3 steps and children', async () => {
-    render(<Wizard steps={steps} horizontal><span>Preview</span></Wizard>);
+    render(
+      <Wizard steps={steps} horizontal>
+        <span>Preview</span>
+      </Wizard>,
+    );
 
     await screen.findByText('Preview');
   });

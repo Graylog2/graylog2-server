@@ -24,10 +24,10 @@ import commonStyles from '../common/commonStyles.css';
 type Props = {
   validation: {
     errors: {
-      [name: string]: any
-    }
-  },
-}
+      [name: string]: any;
+    };
+  };
+};
 
 const EventDefinitionValidationSummary = ({ validation }: Props) => {
   const fieldsWithErrors = Object.keys(validation.errors);
@@ -42,11 +42,13 @@ const EventDefinitionValidationSummary = ({ validation }: Props) => {
         <Alert bsStyle="danger" className={commonStyles.validationSummary} title="We found some errors!">
           <p>Please correct the following errors before saving this Event Definition:</p>
           <ul>
-            {fieldsWithErrors.map((field) => validation.errors[field].map((error) => {
-              const effectiveError = (field === 'config' ? error.replace('config', 'condition') : error);
+            {fieldsWithErrors.map((field) =>
+              validation.errors[field].map((error) => {
+                const effectiveError = field === 'config' ? error.replace('config', 'condition') : error;
 
-              return <li key={`${field}-${effectiveError}`}>{effectiveError}</li>;
-            }))}
+                return <li key={`${field}-${effectiveError}`}>{effectiveError}</li>;
+              }),
+            )}
           </ul>
         </Alert>
       </Col>

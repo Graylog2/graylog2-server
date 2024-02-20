@@ -41,9 +41,9 @@ import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 
 type Props = {
   params: {
-    index: string | undefined | null,
-    messageId: string | undefined | null,
-  },
+    index: string | undefined | null;
+    messageId: string | undefined | null;
+  };
 };
 
 const useStreams = () => {
@@ -91,9 +91,9 @@ const useMessage = (index: string, messageId: string) => {
 };
 
 type FieldTypesProviderProps = {
-  children: React.ReactNode,
-  streams: Array<string>,
-  timestamp: string,
+  children: React.ReactNode;
+  streams: Array<string>;
+  timestamp: string;
 };
 
 const FieldTypesProvider = ({ streams, timestamp, children }: FieldTypesProviderProps) => {
@@ -101,19 +101,15 @@ const FieldTypesProvider = ({ streams, timestamp, children }: FieldTypesProvider
   const types = useMemo(() => {
     const fieldTypesList = Immutable.List(fieldTypes);
 
-    return ({ all: fieldTypesList, queryFields: Immutable.Map({ query: fieldTypesList }) });
+    return { all: fieldTypesList, queryFields: Immutable.Map({ query: fieldTypesList }) };
   }, [fieldTypes]);
 
-  return (
-    <FieldTypesContext.Provider value={types}>
-      {children}
-    </FieldTypesContext.Provider>
-  );
+  return <FieldTypesContext.Provider value={types}>{children}</FieldTypesContext.Provider>;
 };
 
 type MessageFields = {
-  streams: Array<string>,
-  timestamp: string,
+  streams: Array<string>;
+  timestamp: string;
 };
 
 const ShowMessagePage = ({ params: { index, messageId } }: Props) => {
@@ -124,12 +120,14 @@ const ShowMessagePage = ({ params: { index, messageId } }: Props) => {
   const { streams, allStreams } = useStreams();
   const { message, inputs } = useMessage(index, messageId);
 
-  useEffect(() => { NodesActions.list(); }, []);
+  useEffect(() => {
+    NodesActions.list();
+  }, []);
 
-  const isLoaded = useMemo(() => (message !== undefined
-    && streams !== undefined
-    && inputs !== undefined
-    && allStreams !== undefined), [message, streams, inputs, allStreams]);
+  const isLoaded = useMemo(
+    () => message !== undefined && streams !== undefined && inputs !== undefined && allStreams !== undefined,
+    [message, streams, inputs, allStreams],
+  );
 
   const view = useMemo(() => View.create(), []);
   const executionState = useMemo(() => SearchExecutionState.empty(), []);
@@ -146,12 +144,14 @@ const ShowMessagePage = ({ params: { index, messageId } }: Props) => {
               <WindowDimensionsContextProvider>
                 <FieldTypesProvider streams={fieldTypesStreams} timestamp={timestamp}>
                   <InteractiveContext.Provider value={false}>
-                    <MessageDetail fields={Immutable.List()}
-                                   streams={streams}
-                                   allStreams={allStreams}
-                                   disableSurroundingSearch
-                                   inputs={inputs}
-                                   message={message} />
+                    <MessageDetail
+                      fields={Immutable.List()}
+                      streams={streams}
+                      allStreams={allStreams}
+                      disableSurroundingSearch
+                      inputs={inputs}
+                      message={message}
+                    />
                   </InteractiveContext.Provider>
                 </FieldTypesProvider>
               </WindowDimensionsContextProvider>

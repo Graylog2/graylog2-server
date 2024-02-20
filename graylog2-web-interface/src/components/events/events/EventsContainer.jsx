@@ -165,26 +165,32 @@ class EventsContainer extends React.Component {
     }
 
     return (
-      <Events events={events.events}
-              parameters={events.parameters}
-              totalEvents={events.totalEvents}
-              currentUser={currentUser}
-              totalEventDefinitions={eventDefinitions.pagination.grandTotal}
-              context={events.context}
-              onQueryChange={this.handleQueryChange}
-              onPageChange={this.handlePageChange}
-              onAlertFilterChange={this.handleAlertFilterChange}
-              onTimeRangeChange={this.handleTimeRangeChange}
-              onSearchReload={this.handleSearchReload} />
+      <Events
+        events={events.events}
+        parameters={events.parameters}
+        totalEvents={events.totalEvents}
+        currentUser={currentUser}
+        totalEventDefinitions={eventDefinitions.pagination.grandTotal}
+        context={events.context}
+        onQueryChange={this.handleQueryChange}
+        onPageChange={this.handlePageChange}
+        onAlertFilterChange={this.handleAlertFilterChange}
+        onTimeRangeChange={this.handleTimeRangeChange}
+        onSearchReload={this.handleSearchReload}
+      />
     );
   }
 }
 
-export default connect(withPaginationQueryParameter(EventsContainer, { pageSizes: PAGE_SIZES }), {
-  events: EventsStore,
-  eventDefinitions: EventDefinitionsStore,
-  currentUser: CurrentUserStore,
-}, ({ currentUser, ...otherProps }) => ({
-  ...otherProps,
-  currentUser: currentUser.currentUser,
-}));
+export default connect(
+  withPaginationQueryParameter(EventsContainer, { pageSizes: PAGE_SIZES }),
+  {
+    events: EventsStore,
+    eventDefinitions: EventDefinitionsStore,
+    currentUser: CurrentUserStore,
+  },
+  ({ currentUser, ...otherProps }) => ({
+    ...otherProps,
+    currentUser: currentUser.currentUser,
+  }),
+);

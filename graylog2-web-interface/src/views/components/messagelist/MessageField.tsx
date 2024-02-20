@@ -33,20 +33,24 @@ import InteractiveContext from '../contexts/InteractiveContext';
 const SPECIAL_FIELDS = [FULL_MESSAGE_FIELD, 'level'];
 
 type Props = {
-  fieldName: string,
-  fieldType: FieldType,
-  message: Message,
-  value: any,
+  fieldName: string;
+  fieldType: FieldType;
+  message: Message;
+  value: any;
 };
 
-const DecoratedField = styled.small(({ theme }) => css`
-  color: ${theme.colors.gray[70]};
-  font-weight: normal;
-`);
+const DecoratedField = styled.small(
+  ({ theme }) => css`
+    color: ${theme.colors.gray[70]};
+    font-weight: normal;
+  `,
+);
 
-const DefinitionDescription = styled.dd(({ theme }) => `
+const DefinitionDescription = styled.dd(
+  ({ theme }) => `
   font-family: ${theme.fonts.family.monospace};
-`);
+`,
+);
 
 const MessageField = ({ fieldName, fieldType, message, value }: Props) => {
   const innerValue = SPECIAL_FIELDS.indexOf(fieldName) !== -1 ? message.fields[fieldName] : value;
@@ -60,25 +64,33 @@ const MessageField = ({ fieldName, fieldType, message, value }: Props) => {
     },
   } = message;
 
-  const isDecoratedField = decorationStats
-    && (decorationStats.added_fields[fieldName] !== undefined || decorationStats.changed_fields[fieldName] !== undefined);
+  const isDecoratedField =
+    decorationStats &&
+    (decorationStats.added_fields[fieldName] !== undefined || decorationStats.changed_fields[fieldName] !== undefined);
 
   const ValueContext = isDecoratedField
     ? ({ children }) => (
-      <InteractiveContext.Provider value={false}>
-        {children} <DecoratedField>(decorated)</DecoratedField>
-      </InteractiveContext.Provider>
-    )
+        <InteractiveContext.Provider value={false}>
+          {children} <DecoratedField>(decorated)</DecoratedField>
+        </InteractiveContext.Provider>
+      )
     : ({ children }) => children;
 
   return (
     <>
       <dt data-testid={`message-field-name-${fieldName}`}>
-        <Field queryId={activeQuery} name={fieldName} type={isDecoratedField ? FieldType.Decorated : fieldType}>{fieldName}</Field>
+        <Field queryId={activeQuery} name={fieldName} type={isDecoratedField ? FieldType.Decorated : fieldType}>
+          {fieldName}
+        </Field>
       </dt>
       <DefinitionDescription data-testid={`message-field-value-${fieldName}`}>
         <ValueContext>
-          <Value field={fieldName} value={innerValue} type={isDecoratedField ? FieldType.Decorated : fieldType} render={DecoratedValue} />
+          <Value
+            field={fieldName}
+            value={innerValue}
+            type={isDecoratedField ? FieldType.Decorated : fieldType}
+            render={DecoratedValue}
+          />
         </ValueContext>
       </DefinitionDescription>
     </>

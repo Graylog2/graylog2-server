@@ -35,12 +35,16 @@ const ConfigurationSummary = styled.div`
 `;
 
 type Props = {
-  collectors: Collector[],
-  configurations: Configuration[],
-  selectedSidecarCollectorPairs: SidecarCollectorPairType[],
-  onConfigurationSelectionChange: (pairs: SidecarCollectorPairType[], configs: Configuration[], callback: () => void) => void,
-  show: boolean,
-  onCancel: () => void,
+  collectors: Collector[];
+  configurations: Configuration[];
+  selectedSidecarCollectorPairs: SidecarCollectorPairType[];
+  onConfigurationSelectionChange: (
+    pairs: SidecarCollectorPairType[],
+    configs: Configuration[],
+    callback: () => void,
+  ) => void;
+  show: boolean;
+  onCancel: () => void;
 };
 
 const CollectorConfigurationModalContainer = ({
@@ -56,22 +60,31 @@ const CollectorConfigurationModalContainer = ({
   const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
   const sendTelemetry = useSendTelemetry();
 
-  const getSelectedLogCollector = () => (uniq<Collector>(selectedSidecarCollectorPairs.map(({ collector }) => collector)))[0];
+  const getSelectedLogCollector = () =>
+    uniq<Collector>(selectedSidecarCollectorPairs.map(({ collector }) => collector))[0];
 
-  const sortConfigurationNames = (configs: Configuration[]) => configs.sort((config1, config2) => naturalSortIgnoreCase(config1.name, config2.name))
-    .map((config) => config.name);
+  const sortConfigurationNames = (configs: Configuration[]) =>
+    configs.sort((config1, config2) => naturalSortIgnoreCase(config1.name, config2.name)).map((config) => config.name);
 
-  const getAssignedConfigurations = (_selectedSidecarCollectorPairs: SidecarCollectorPairType[], selectedCollector: Collector) => {
-    const assignments = _selectedSidecarCollectorPairs.map(({ sidecar }) => sidecar).reduce((accumulator, sidecar) => accumulator.concat(sidecar.assignments), []);
+  const getAssignedConfigurations = (
+    _selectedSidecarCollectorPairs: SidecarCollectorPairType[],
+    selectedCollector: Collector,
+  ) => {
+    const assignments = _selectedSidecarCollectorPairs
+      .map(({ sidecar }) => sidecar)
+      .reduce((accumulator, sidecar) => accumulator.concat(sidecar.assignments), []);
 
-    const filteredAssignments = assignments.map((assignment) => configurations.find((configuration) => configuration.id === assignment.configuration_id))
+    const filteredAssignments = assignments
+      .map((assignment) => configurations.find((configuration) => configuration.id === assignment.configuration_id))
       .filter((configuration) => selectedCollector?.id === configuration.collector_id);
 
     return sortConfigurationNames(filteredAssignments);
   };
 
   const getUnassignedConfigurations = (assignedConfigurations: string[], selectedCollector: Collector) => {
-    const filteredConfigs = configurations.filter((config) => !assignedConfigurations.includes(config.name) && (selectedCollector?.id === config.collector_id));
+    const filteredConfigs = configurations.filter(
+      (config) => !assignedConfigurations.includes(config.name) && selectedCollector?.id === config.collector_id,
+    );
 
     return sortConfigurationNames(filteredConfigs);
   };
@@ -80,8 +93,12 @@ const CollectorConfigurationModalContainer = ({
     const occurrences = countBy(_assignedConfigurations);
 
     return [
-      uniq<string>(_assignedConfigurations.filter((config) => occurrences[config] === selectedSidecarCollectorPairs.length)),
-      uniq<string>(_assignedConfigurations.filter((config) => occurrences[config] < selectedSidecarCollectorPairs.length)),
+      uniq<string>(
+        _assignedConfigurations.filter((config) => occurrences[config] === selectedSidecarCollectorPairs.length),
+      ),
+      uniq<string>(
+        _assignedConfigurations.filter((config) => occurrences[config] < selectedSidecarCollectorPairs.length),
+      ),
     ];
   };
 
@@ -98,7 +115,9 @@ const CollectorConfigurationModalContainer = ({
   };
 
   const confirmConfigurationChange = () => {
-    const assignedConfigurationsToSave = configurations.filter((config) => nextAssignedConfigurations.includes(config.name));
+    const assignedConfigurationsToSave = configurations.filter((config) =>
+      nextAssignedConfigurations.includes(config.name),
+    );
 
     selectedSidecarCollectorPairs.forEach((sidecarCollectorPair) => {
       let configs = assignedConfigurationsToSave;
@@ -134,13 +153,23 @@ const CollectorConfigurationModalContainer = ({
   const getSidecars = (configName: string) => {
     const configuration = getConfiguration(configName);
 
-    return selectedSidecarCollectorPairs.filter(({ sidecar }) => sidecar.assignments.map((assignment) => assignment.configuration_id).includes(configuration.id)).map((assignment) => assignment.sidecar);
+    return selectedSidecarCollectorPairs
+      .filter(({ sidecar }) =>
+        sidecar.assignments.map((assignment) => assignment.configuration_id).includes(configuration.id),
+      )
+      .map((assignment) => assignment.sidecar);
   };
 
   const getAssignedFromTags = (configId: string, collectorId: string, sidecars: SidecarSummary[]) => {
-    const assigned_from_tags = sidecars.reduce((accumulator, sidecar) => accumulator.concat(
-      sidecar.assignments.find((assignment) => (assignment.collector_id === collectorId) && (assignment.configuration_id === configId)).assigned_from_tags,
-    ), []);
+    const assigned_from_tags = sidecars.reduce(
+      (accumulator, sidecar) =>
+        accumulator.concat(
+          sidecar.assignments.find(
+            (assignment) => assignment.collector_id === collectorId && assignment.configuration_id === configId,
+          ).assigned_from_tags,
+        ),
+      [],
+    );
 
     return uniq(assigned_from_tags);
   };
@@ -160,12 +189,16 @@ const CollectorConfigurationModalContainer = ({
     const summary = selectedSidecarCollectorPairs.length <= 5 ? sidecarsSummary : numberOfSidecarsSummary;
 
     return (
-      <BootstrapModalConfirm showModal={showConfirmModal}
-                             title="Configuration summary"
-                             onConfirm={confirmConfigurationChange}
-                             onCancel={cancelConfigurationChange}>
+      <BootstrapModalConfirm
+        showModal={showConfirmModal}
+        title="Configuration summary"
+        onConfirm={confirmConfigurationChange}
+        onCancel={cancelConfigurationChange}
+      >
         <ConfigurationSummary>
-          <p>Are you sure you want to proceed with this action for <b>{summary}</b>?</p>
+          <p>
+            Are you sure you want to proceed with this action for <b>{summary}</b>?
+          </p>
         </ConfigurationSummary>
       </BootstrapModalConfirm>
     );
@@ -176,18 +209,21 @@ const CollectorConfigurationModalContainer = ({
       const selectedCollector = getSelectedLogCollector();
       const assignedConfigurations = getAssignedConfigurations(selectedSidecarCollectorPairs, selectedCollector);
       const unassignedConfigurations = getUnassignedConfigurations(assignedConfigurations, selectedCollector);
-      const [initialAssignedConfigs, initialPartiallyAssignedConfigs] = getFullyAndPartiallyAssignments(assignedConfigurations);
+      const [initialAssignedConfigs, initialPartiallyAssignedConfigs] =
+        getFullyAndPartiallyAssignments(assignedConfigurations);
 
       return (
-        <CollectorConfigurationModal show={show}
-                                     selectedCollectorName={selectedCollector?.name || ''}
-                                     selectedSidecarNames={selectedSidecarCollectorPairs.map(({ sidecar }) => sidecar.node_name)}
-                                     initialAssignedConfigs={initialAssignedConfigs}
-                                     initialPartiallyAssignedConfigs={initialPartiallyAssignedConfigs}
-                                     unassignedConfigs={unassignedConfigurations}
-                                     onCancel={onCancel}
-                                     onSave={onSave}
-                                     getRowData={getRowData} />
+        <CollectorConfigurationModal
+          show={show}
+          selectedCollectorName={selectedCollector?.name || ''}
+          selectedSidecarNames={selectedSidecarCollectorPairs.map(({ sidecar }) => sidecar.node_name)}
+          initialAssignedConfigs={initialAssignedConfigs}
+          initialPartiallyAssignedConfigs={initialPartiallyAssignedConfigs}
+          unassignedConfigs={unassignedConfigurations}
+          onCancel={onCancel}
+          onSave={onSave}
+          getRowData={getRowData}
+        />
       );
     };
 

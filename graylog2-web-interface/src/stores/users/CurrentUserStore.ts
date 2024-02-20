@@ -26,12 +26,11 @@ import { SessionActions, SessionStore } from 'stores/sessions/SessionStore';
 import { StartpageStore } from 'stores/users/StartpageStore';
 
 export type CurrentUserStoreState = {
-  currentUser: UserJSON,
+  currentUser: UserJSON;
 };
 
-export const CurrentUserStore = singletonStore(
-  'core.CurrentUser',
-  () => Reflux.createStore<CurrentUserStoreState>({
+export const CurrentUserStore = singletonStore('core.CurrentUser', () =>
+  Reflux.createStore<CurrentUserStoreState>({
     listenables: [SessionActions],
     currentUser: undefined,
 
@@ -69,13 +68,15 @@ export const CurrentUserStore = singletonStore(
     },
 
     update(username) {
-      return fetch('GET', qualifyUrl(ApiRoutes.UsersApiController.loadByUsername(encodeURIComponent(username)).url))
-        .then((resp) => {
-          this.currentUser = resp;
-          this.trigger({ currentUser: this.currentUser });
+      return fetch(
+        'GET',
+        qualifyUrl(ApiRoutes.UsersApiController.loadByUsername(encodeURIComponent(username)).url),
+      ).then((resp) => {
+        this.currentUser = resp;
+        this.trigger({ currentUser: this.currentUser });
 
-          return resp;
-        });
+        return resp;
+      });
     },
   }),
 );

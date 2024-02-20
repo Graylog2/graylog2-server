@@ -24,8 +24,8 @@ import { Button } from 'components/bootstrap';
 import Icon from 'components/common/Icon';
 
 const DEFAULT_SIZE = { width: 450, height: 400 };
-const halfWidth = Math.ceil((window.innerWidth / 2) - (DEFAULT_SIZE.width / 2));
-const halfHeight = Math.ceil((window.innerHeight / 2) - (DEFAULT_SIZE.height / 2));
+const halfWidth = Math.ceil(window.innerWidth / 2 - DEFAULT_SIZE.width / 2);
+const halfHeight = Math.ceil(window.innerHeight / 2 - DEFAULT_SIZE.height / 2);
 const stayOnScreenHeight = halfHeight < 0 ? 55 : halfHeight;
 const DEFAULT_POSITION = {
   x: halfWidth,
@@ -39,53 +39,64 @@ const InteractableModalWrapper = styled.div`
   pointer-events: none;
 `;
 
-const StyledRnd = styled(Rnd)(({ theme }) => css`
-  box-shadow: 0 0 9px ${theme.colors.global.navigationBoxShadow},
-    0 0 6px ${theme.colors.global.navigationBoxShadow},
-    0 0 3px ${theme.colors.global.navigationBoxShadow};
-  background-color: ${theme.colors.global.contentBackground};
-  border: 1px solid ${theme.colors.variant.lightest.default};
-  border-radius: 3px;
-  flex-direction: column;
-  display: flex !important;
-  pointer-events: auto;
-`);
+const StyledRnd = styled(Rnd)(
+  ({ theme }) => css`
+    box-shadow:
+      0 0 9px ${theme.colors.global.navigationBoxShadow},
+      0 0 6px ${theme.colors.global.navigationBoxShadow},
+      0 0 3px ${theme.colors.global.navigationBoxShadow};
+    background-color: ${theme.colors.global.contentBackground};
+    border: 1px solid ${theme.colors.variant.lightest.default};
+    border-radius: 3px;
+    flex-direction: column;
+    display: flex !important;
+    pointer-events: auto;
+  `,
+);
 
 const Content = styled.div`
   flex: 1;
   padding: 0 15px;
 `;
 
-const Header = styled.header(({ theme }) => css`
-  padding: 6px 12px 9px;
-  display: flex;
-  align-items: center;
-  background-color: ${theme.colors.variant.lightest.default};
-  border-bottom: 1px solid ${theme.colors.variant.lighter.default};
-  border-top-left-radius: 3px;
-  border-top-right-radius: 3px;
-  cursor: move;
-`);
+const Header = styled.header(
+  ({ theme }) => css`
+    padding: 6px 12px 9px;
+    display: flex;
+    align-items: center;
+    background-color: ${theme.colors.variant.lightest.default};
+    border-bottom: 1px solid ${theme.colors.variant.lighter.default};
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    cursor: move;
+  `,
+);
 
-const Title = styled.h3(({ theme }) => css`
-  color: ${theme.colors.global.textDefault};
-  flex: 1;
-`);
+const Title = styled.h3(
+  ({ theme }) => css`
+    color: ${theme.colors.global.textDefault};
+    flex: 1;
+  `,
+);
 
-const DragBars = styled(Icon)(({ theme }) => css`
-  color: ${theme.colors.variant.darker.default};
-  margin-right: 9px;
-`);
+const DragBars = styled(Icon)(
+  ({ theme }) => css`
+    color: ${theme.colors.variant.darker.default};
+    margin-right: 9px;
+  `,
+);
 
-const CloseButton = styled(Button)(({ theme }) => css`
-  && {
-    color: ${theme.colors.variant.light.default};
-    
-    &:hover {
-      color: ${theme.colors.variant.default};
+const CloseButton = styled(Button)(
+  ({ theme }) => css`
+    && {
+      color: ${theme.colors.variant.light.default};
+
+      &:hover {
+        color: ${theme.colors.variant.default};
+      }
     }
-  }
-`);
+  `,
+);
 
 /**
  * A resizable and draggable modal component
@@ -93,20 +104,20 @@ const CloseButton = styled(Button)(({ theme }) => css`
  * Can be controlled or uncontrolled, using [`react-rnd`](https://github.com/bokuweb/react-rnd) under the hood
  */
 
-type Coords = { x: number, y: number };
-type Size = { width: string, height: string };
+type Coords = { x: number; y: number };
+type Size = { width: string; height: string };
 
 type Props = {
-  className?: string,
-  minHeight?: number,
-  minWidth?: number,
-  onClose: () => void,
-  onDrag: (newCoords: Coords) => void,
-  onResize: (newSize: Size) => void,
-  position: Coords,
-  size: Size,
-  title: string,
-  wrapperClassName?: string,
+  className?: string;
+  minHeight?: number;
+  minWidth?: number;
+  onClose: () => void;
+  onDrag: (newCoords: Coords) => void;
+  onResize: (newSize: Size) => void;
+  position: Coords;
+  size: Size;
+  title: string;
+  wrapperClassName?: string;
 };
 
 const InteractableModal = ({
@@ -212,29 +223,32 @@ const InteractableModal = ({
 
   return (
     <InteractableModalWrapper className={wrapperClassName} role="dialog">
-      <StyledRnd default={{ ...position, ...size }}
-                 minHeight={minHeight}
-                 minWidth={minWidth}
-                 maxHeight={window.innerHeight}
-                 maxWidth={window.innerWidth}
-                 dragHandleClassName={dragHandleClassName}
-                 onDragStop={handleDragStop}
-                 onResizeStop={handleResizeStop}
-                 position={dragPosition}
-                 size={resizeSize}
-                 className={className}
-                 bounds="window">
+      <StyledRnd
+        default={{ ...position, ...size }}
+        minHeight={minHeight}
+        minWidth={minWidth}
+        maxHeight={window.innerHeight}
+        maxWidth={window.innerWidth}
+        dragHandleClassName={dragHandleClassName}
+        onDragStop={handleDragStop}
+        onResizeStop={handleResizeStop}
+        position={dragPosition}
+        size={resizeSize}
+        className={className}
+        bounds="window"
+      >
         <Header ref={dragHandleRef}>
-          <Title><DragBars name="bars" />{title}</Title>
+          <Title>
+            <DragBars name="bars" />
+            {title}
+          </Title>
 
           <CloseButton bsStyle="link" onClick={onClose} bsSize="small" title="Close">
             <Icon name="times" size="lg" />
           </CloseButton>
         </Header>
 
-        <Content>
-          {children}
-        </Content>
+        <Content>{children}</Content>
       </StyledRnd>
     </InteractableModalWrapper>
   );

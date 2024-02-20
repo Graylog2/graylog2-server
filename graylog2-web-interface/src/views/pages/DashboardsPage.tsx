@@ -30,26 +30,31 @@ const DashboardsPage = () => {
 
   return (
     <DocumentTitle title="Dashboards">
-      <PageHeader title="Dashboards"
-                  actions={(
-                    <IfPermitted permissions="dashboards:create">
-                      <LinkContainer to={Routes.pluginRoute('DASHBOARDS_NEW')}>
-                        <Button bsStyle="success"
-                                onClick={() => {
-                                  sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_CREATE_CLICKED, {
-                                    app_pathname: 'dashboard',
-                                    app_section: 'dashboard',
-                                    app_action_value: 'dashboard-create-button',
-                                  });
-                                }}>Create new dashboard
-                        </Button>
-                      </LinkContainer>
-                    </IfPermitted>
-                  )}
-                  documentationLink={{
-                    title: 'Dashboard documentation',
-                    path: DocsHelper.PAGES.DASHBOARDS,
-                  }}>
+      <PageHeader
+        title="Dashboards"
+        actions={
+          <IfPermitted permissions="dashboards:create">
+            <LinkContainer to={Routes.pluginRoute('DASHBOARDS_NEW')}>
+              <Button
+                bsStyle="success"
+                onClick={() => {
+                  sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_CREATE_CLICKED, {
+                    app_pathname: 'dashboard',
+                    app_section: 'dashboard',
+                    app_action_value: 'dashboard-create-button',
+                  });
+                }}
+              >
+                Create new dashboard
+              </Button>
+            </LinkContainer>
+          </IfPermitted>
+        }
+        documentationLink={{
+          title: 'Dashboard documentation',
+          path: DocsHelper.PAGES.DASHBOARDS,
+        }}
+      >
         <span>
           Use dashboards to create specific views on your messages. Create a new dashboard here and add any graph or
           chart you create in other parts of Graylog with one click.

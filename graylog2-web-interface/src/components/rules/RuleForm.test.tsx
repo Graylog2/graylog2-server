@@ -44,22 +44,24 @@ describe('RuleForm', () => {
     const handleDescription = jest.fn();
     const handleSavePipelineRule = jest.fn();
 
-    const { getByLabelText, getByRole } = renderWithDataRouter((
-      <PipelineRulesContext.Provider value={{
-        description: '',
-        handleDescription: handleDescription,
-        ruleSource: ruleToUpdate.source,
-        handleSavePipelineRule,
-        ruleSourceRef: {},
-        usedInPipelines: [],
-        onAceLoaded: () => {},
-        onChangeSource: () => {},
-        setRawMessageToSimulate: () => {},
-        setRuleSimulationResult: () => {},
-      }}>
+    const { getByLabelText, getByRole } = renderWithDataRouter(
+      <PipelineRulesContext.Provider
+        value={{
+          description: '',
+          handleDescription: handleDescription,
+          ruleSource: ruleToUpdate.source,
+          handleSavePipelineRule,
+          ruleSourceRef: {},
+          usedInPipelines: [],
+          onAceLoaded: () => {},
+          onChangeSource: () => {},
+          setRawMessageToSimulate: () => {},
+          setRuleSimulationResult: () => {},
+        }}
+      >
         <RuleForm create={false} />
-      </PipelineRulesContext.Provider>
-    ));
+      </PipelineRulesContext.Provider>,
+    );
 
     const descriptionInput = getByLabelText('Description');
 
@@ -78,63 +80,72 @@ describe('RuleForm', () => {
     });
   });
 
-  it('should run rule simulation using the rule input', async () => {
-    const ruleToUpdate = {
-      source: `rule "concat new_"
+  it(
+    'should run rule simulation using the rule input',
+    async () => {
+      const ruleToUpdate = {
+        source: `rule "concat new_"
       when
       has_field("message")
       then
         set_field("message", concat("new_",to_string($message.message)));
       end`,
-    };
-
-    const _setRawMessage = jest.fn();
-    const ruleInput = 'new_test';
-
-    const PipelineRulesContextProvider = ({ children, setRawMessage }: React.PropsWithChildren<{ setRawMessage: (message: string) => void }>) => {
-      const [rawMessageToSimulate, _setRawMessageToSimulate] = useState('');
-
-      const setRawMessageToSimulate = (message: string) => {
-        setRawMessage(message);
-        _setRawMessageToSimulate(message);
       };
 
-      return (
-        <PipelineRulesContext.Provider value={{
-          ruleSource: ruleToUpdate.source,
-          ruleSourceRef: {},
-          usedInPipelines: [],
-          rawMessageToSimulate,
-          setRawMessageToSimulate,
-          setRuleSimulationResult: () => {},
-          simulateRule: () => {},
-        }}>
-          {children}
-        </PipelineRulesContext.Provider>
+      const _setRawMessage = jest.fn();
+      const ruleInput = 'new_test';
+
+      const PipelineRulesContextProvider = ({
+        children,
+        setRawMessage,
+      }: React.PropsWithChildren<{ setRawMessage: (message: string) => void }>) => {
+        const [rawMessageToSimulate, _setRawMessageToSimulate] = useState('');
+
+        const setRawMessageToSimulate = (message: string) => {
+          setRawMessage(message);
+          _setRawMessageToSimulate(message);
+        };
+
+        return (
+          <PipelineRulesContext.Provider
+            value={{
+              ruleSource: ruleToUpdate.source,
+              ruleSourceRef: {},
+              usedInPipelines: [],
+              rawMessageToSimulate,
+              setRawMessageToSimulate,
+              setRuleSimulationResult: () => {},
+              simulateRule: () => {},
+            }}
+          >
+            {children}
+          </PipelineRulesContext.Provider>
+        );
+      };
+
+      renderWithDataRouter(
+        <PipelineRulesContextProvider setRawMessage={_setRawMessage}>
+          <RuleForm create={false} />
+        </PipelineRulesContextProvider>,
       );
-    };
 
-    renderWithDataRouter(
-      <PipelineRulesContextProvider setRawMessage={_setRawMessage}>
-        <RuleForm create={false} />
-      </PipelineRulesContextProvider>,
-    );
+      const rawMessageInput = await screen.findByTitle('Message string or JSON');
 
-    const rawMessageInput = await screen.findByTitle('Message string or JSON');
+      expect(rawMessageInput).toHaveValue('');
 
-    expect(rawMessageInput).toHaveValue('');
+      await userEvent.paste(rawMessageInput, ruleInput);
+      const runSimulationButton = await screen.findByRole('button', { name: 'Run rule simulation' });
 
-    await userEvent.paste(rawMessageInput, ruleInput);
-    const runSimulationButton = await screen.findByRole('button', { name: 'Run rule simulation' });
+      await waitFor(() => {
+        expect(runSimulationButton).not.toBeDisabled();
+      });
 
-    await waitFor(() => {
-      expect(runSimulationButton).not.toBeDisabled();
-    });
+      await userEvent.click(runSimulationButton);
 
-    await userEvent.click(runSimulationButton);
-
-    await waitFor(() => {
-      expect(_setRawMessage).toHaveBeenCalledWith(ruleInput);
-    });
-  }, extendedTimeout);
+      await waitFor(() => {
+        expect(_setRawMessage).toHaveBeenCalledWith(ruleInput);
+      });
+    },
+    extendedTimeout,
+  );
 });

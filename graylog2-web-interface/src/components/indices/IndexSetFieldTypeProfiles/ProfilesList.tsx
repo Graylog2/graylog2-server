@@ -19,11 +19,7 @@ import { useQueryParam, StringParam } from 'use-query-params';
 import keyBy from 'lodash/keyBy';
 import mapValues from 'lodash/mapValues';
 
-import {
-  NoEntitiesExist,
-  PaginatedList, SearchForm,
-  Spinner,
-} from 'components/common';
+import { NoEntitiesExist, PaginatedList, SearchForm, Spinner } from 'components/common';
 import EntityDataTable from 'components/common/EntityDataTable';
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
 import type { Sort } from 'stores/PaginationTypes';
@@ -32,11 +28,8 @@ import EntityFilters from 'components/common/EntityFilters';
 import useUrlQueryFilters from 'components/common/EntityFilters/hooks/useUrlQueryFilters';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
-import type {
-  IndexSetFieldTypeProfile,
-} from 'components/indices/IndexSetFieldTypeProfiles/types';
-import useProfiles
-  from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfiles';
+import type { IndexSetFieldTypeProfile } from 'components/indices/IndexSetFieldTypeProfiles/types';
+import useProfiles from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfiles';
 import useExpandedSectionsRenderer from 'components/indices/IndexSetFieldTypeProfiles/ExpandedSectionsRenderer';
 import useCustomColumnRenderers from 'components/indices/IndexSetFieldTypeProfiles/helpers/useCustomColumnRenderers';
 import profileActions from 'components/indices/IndexSetFieldTypeProfiles/helpers/profileActions';
@@ -62,45 +55,60 @@ const ProfilesList = () => {
     defaultSort: DEFAULT_LAYOUT.sort,
   });
   const paginationQueryParameter = usePaginationQueryParameter(undefined, layoutConfig.pageSize, false);
-  const searchParams = useMemo(() => ({
-    query,
-    page: paginationQueryParameter.page,
-    pageSize: layoutConfig.pageSize,
-    sort: layoutConfig.sort,
-    filters: urlQueryFilters,
-  }), [paginationQueryParameter.page, layoutConfig.pageSize, layoutConfig.sort, query, urlQueryFilters]);
+  const searchParams = useMemo(
+    () => ({
+      query,
+      page: paginationQueryParameter.page,
+      pageSize: layoutConfig.pageSize,
+      sort: layoutConfig.sort,
+      filters: urlQueryFilters,
+    }),
+    [paginationQueryParameter.page, layoutConfig.pageSize, layoutConfig.sort, query, urlQueryFilters],
+  );
   const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(ENTITY_TABLE_ID);
 
-  const onPageSizeChange = useCallback((newPageSize: number) => {
-    paginationQueryParameter.resetPage();
-    updateTableLayout({ perPage: newPageSize });
-  }, [paginationQueryParameter, updateTableLayout]);
+  const onPageSizeChange = useCallback(
+    (newPageSize: number) => {
+      paginationQueryParameter.resetPage();
+      updateTableLayout({ perPage: newPageSize });
+    },
+    [paginationQueryParameter, updateTableLayout],
+  );
 
-  const onSortChange = useCallback((newSort: Sort) => {
-    paginationQueryParameter.resetPage();
-    updateTableLayout({ sort: newSort });
-  }, [paginationQueryParameter, updateTableLayout]);
+  const onSortChange = useCallback(
+    (newSort: Sort) => {
+      paginationQueryParameter.resetPage();
+      updateTableLayout({ sort: newSort });
+    },
+    [paginationQueryParameter, updateTableLayout],
+  );
 
-  const onColumnsChange = useCallback((displayedAttributes: Array<string>) => {
-    updateTableLayout({ displayedAttributes });
-  }, [updateTableLayout]);
+  const onColumnsChange = useCallback(
+    (displayedAttributes: Array<string>) => {
+      updateTableLayout({ displayedAttributes });
+    },
+    [updateTableLayout],
+  );
   const {
     isLoading,
     data: { list, pagination, attributes },
-  } = useProfiles(
-    searchParams,
-    { enabled: !isLoadingLayoutPreferences },
-  );
+  } = useProfiles(searchParams, { enabled: !isLoadingLayoutPreferences });
 
-  const onSearch = useCallback((val: string) => {
-    paginationQueryParameter.resetPage();
-    setQuery(val);
-  }, [paginationQueryParameter, setQuery]);
+  const onSearch = useCallback(
+    (val: string) => {
+      paginationQueryParameter.resetPage();
+      setQuery(val);
+    },
+    [paginationQueryParameter, setQuery],
+  );
   const onSearchReset = useCallback(() => setQuery(''), [setQuery]);
-  const onChangeFilters = useCallback((newUrlQueryFilters: UrlQueryFilters) => {
-    paginationQueryParameter.resetPage();
-    setUrlQueryFilters(newUrlQueryFilters);
-  }, [paginationQueryParameter, setUrlQueryFilters]);
+  const onChangeFilters = useCallback(
+    (newUrlQueryFilters: UrlQueryFilters) => {
+      paginationQueryParameter.resetPage();
+      setUrlQueryFilters(newUrlQueryFilters);
+    },
+    [paginationQueryParameter, setUrlQueryFilters],
+  );
 
   const expandedSectionsRenderer = useExpandedSectionsRenderer();
 
@@ -113,38 +121,33 @@ const ProfilesList = () => {
   }
 
   return (
-    <PaginatedList totalItems={pagination?.total}
-                   pageSize={layoutConfig.pageSize}
-                   showPageSizeSelect={false}>
+    <PaginatedList totalItems={pagination?.total} pageSize={layoutConfig.pageSize} showPageSizeSelect={false}>
       <div style={{ marginBottom: 5 }}>
-        <SearchForm onSearch={onSearch}
-                    onReset={onSearchReset}
-                    query={query}
-                    placeholder="Search for profile name...">
-          <EntityFilters attributes={attributes}
-                         urlQueryFilters={urlQueryFilters}
-                         setUrlQueryFilters={onChangeFilters} />
+        <SearchForm onSearch={onSearch} onReset={onSearchReset} query={query} placeholder="Search for profile name...">
+          <EntityFilters
+            attributes={attributes}
+            urlQueryFilters={urlQueryFilters}
+            setUrlQueryFilters={onChangeFilters}
+          />
         </SearchForm>
       </div>
-      {pagination?.total === 0 && (
-        <NoEntitiesExist>
-          No field type profiles have been found.
-        </NoEntitiesExist>
-      )}
+      {pagination?.total === 0 && <NoEntitiesExist>No field type profiles have been found.</NoEntitiesExist>}
       {!!list?.length && (
-        <EntityDataTable<IndexSetFieldTypeProfile> data={list}
-                                                   visibleColumns={layoutConfig.displayedAttributes}
-                                                   columnsOrder={DEFAULT_LAYOUT.columnsOrder}
-                                                   onColumnsChange={onColumnsChange}
-                                                   onSortChange={onSortChange}
-                                                   activeSort={layoutConfig.sort}
-                                                   pageSize={searchParams.pageSize}
-                                                   onPageSizeChange={onPageSizeChange}
-                                                   actionsCellWidth={120}
-                                                   columnRenderers={customColumnRenderers}
-                                                   columnDefinitions={attributes}
-                                                   expandedSectionsRenderer={expandedSectionsRenderer}
-                                                   rowActions={profileActions} />
+        <EntityDataTable<IndexSetFieldTypeProfile>
+          data={list}
+          visibleColumns={layoutConfig.displayedAttributes}
+          columnsOrder={DEFAULT_LAYOUT.columnsOrder}
+          onColumnsChange={onColumnsChange}
+          onSortChange={onSortChange}
+          activeSort={layoutConfig.sort}
+          pageSize={searchParams.pageSize}
+          onPageSizeChange={onPageSizeChange}
+          actionsCellWidth={120}
+          columnRenderers={customColumnRenderers}
+          columnDefinitions={attributes}
+          expandedSectionsRenderer={expandedSectionsRenderer}
+          rowActions={profileActions}
+        />
       )}
     </PaginatedList>
   );

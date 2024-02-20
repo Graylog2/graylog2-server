@@ -21,16 +21,20 @@ import { OverlayTrigger } from 'components/common';
 
 type Props = {
   route: {
-    id: string,
-    state: string,
-    node_hostname: string,
-    node_name: string,
-    primary: boolean,
-  }
-}
+    id: string;
+    state: string;
+    node_hostname: string;
+    node_name: string;
+    primary: boolean;
+  };
+};
 
 const ShardRouting = ({ route }: Props) => {
-  const tooltip = <>State: <i>{route.state}</i> on {route.node_hostname} ({route.node_name})</>;
+  const tooltip = (
+    <>
+      State: <i>{route.state}</i> on {route.node_hostname} ({route.node_name})
+    </>
+  );
 
   return (
     <li className={classNames('shard', `shard-${route.state}`, { 'shard-primary': route.primary })}>

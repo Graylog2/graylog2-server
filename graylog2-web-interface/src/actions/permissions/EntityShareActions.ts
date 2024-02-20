@@ -26,25 +26,29 @@ import type EntityShareState from 'logic/permissions/EntityShareState';
 
 export type PaginatedEntityShares = PaginatedList<SharedEntity> & {
   context: {
-    granteeCapabilities: { [grn: string]: string },
-  },
+    granteeCapabilities: { [grn: string]: string };
+  };
 };
 
 export type EntitySharePayload = {
-  selected_grantee_capabilities: SelectedGranteeCapabilities,
+  selected_grantee_capabilities: SelectedGranteeCapabilities;
 };
 
 export type ActionsType = {
-  prepare: (entityType: string, entityTitle: string, GRN: GRN, payload?: EntitySharePayload) => Promise<EntityShareState>,
-  update: (entityType: string, entityTitle: string, GRN: GRN, payload: EntitySharePayload) => Promise<EntityShareState>,
-  loadUserSharesPaginated: (userId: string, pagination: Pagination) => Promise<PaginatedEntityShares>,
+  prepare: (
+    entityType: string,
+    entityTitle: string,
+    GRN: GRN,
+    payload?: EntitySharePayload,
+  ) => Promise<EntityShareState>;
+  update: (entityType: string, entityTitle: string, GRN: GRN, payload: EntitySharePayload) => Promise<EntityShareState>;
+  loadUserSharesPaginated: (userId: string, pagination: Pagination) => Promise<PaginatedEntityShares>;
 };
 
 type EntityShareActionsType = RefluxActions<ActionsType>;
 
-const EntityShareActions: EntityShareActionsType = singletonActions(
-  'permissions.EntityShare',
-  () => Reflux.createActions({
+const EntityShareActions: EntityShareActionsType = singletonActions('permissions.EntityShare', () =>
+  Reflux.createActions({
     prepare: { asyncResult: true },
     update: { asyncResult: true },
     loadUserSharesPaginated: { asyncResult: true },

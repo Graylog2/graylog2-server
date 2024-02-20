@@ -6,6 +6,6 @@ styles.map((style, i) => {
     <span key={`button-${style}-${i}`}>
       <Badge bsStyle={style.toLowerCase()}>{style}</Badge>{' '}
     </span>
-  )
-})
+  );
+});
 ```

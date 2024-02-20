@@ -20,10 +20,10 @@ import type { EventNotification, TestResults } from 'stores/event-notifications/
 import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
 
 type UseNotificationTestType = {
-  isLoadingTest: boolean,
-  testResults: TestResults
-  getNotificationTest: (notification: EventNotification) => void,
-}
+  isLoadingTest: boolean;
+  testResults: TestResults;
+  getNotificationTest: (notification: EventNotification) => void;
+};
 
 const useNotificationTest = (): UseNotificationTestType => {
   const [testResults, setTestResults] = useState(undefined);
@@ -32,32 +32,32 @@ const useNotificationTest = (): UseNotificationTestType => {
     setTestResults({ [notification.id]: { isLoading: true, id: notification.id } });
     let result = { isLoading: false, id: null, error: null, message: null };
 
-    EventNotificationsActions.testPersisted(notification)
-      .then(
-        (response) => {
-          result = {
-            ...result,
-            id: notification.id,
-            error: false,
-            message: 'Notification was executed successfully.',
-          };
+    EventNotificationsActions.testPersisted(notification).then(
+      (response) => {
+        result = {
+          ...result,
+          id: notification.id,
+          error: false,
+          message: 'Notification was executed successfully.',
+        };
 
-          setTestResults({ [notification.id]: result });
+        setTestResults({ [notification.id]: result });
 
-          return response;
-        },
-        (errorResponse) => {
-          result = { isLoading: false, id: notification.id, error: true, message: null };
+        return response;
+      },
+      (errorResponse) => {
+        result = { isLoading: false, id: notification.id, error: true, message: null };
 
-          if (errorResponse.status !== 400 || !errorResponse.additional.body || !errorResponse.additional.body.failed) {
-            result.message = errorResponse.responseMessage || 'Unknown errorResponse, please check your Graylog server logs.';
-          }
+        if (errorResponse.status !== 400 || !errorResponse.additional.body || !errorResponse.additional.body.failed) {
+          result.message =
+            errorResponse.responseMessage || 'Unknown errorResponse, please check your Graylog server logs.';
+        }
 
-          setTestResults({ [notification.id]: result });
+        setTestResults({ [notification.id]: result });
 
-          return errorResponse;
-        },
-      );
+        return errorResponse;
+      },
+    );
   };
 
   return {

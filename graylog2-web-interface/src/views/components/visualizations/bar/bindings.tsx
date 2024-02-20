@@ -18,71 +18,90 @@ import * as React from 'react';
 
 import type { VisualizationType } from 'views/types';
 import BarVisualization from 'views/components/visualizations/bar/BarVisualization';
-import BarVisualizationConfig, { DEFAULT_BARMODE } from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
+import BarVisualizationConfig, {
+  DEFAULT_BARMODE,
+} from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
 import { hasAtLeastOneMetric } from 'views/components/visualizations/validations';
 import type { AxisType } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 import { axisTypes, DEFAULT_AXIS_TYPE } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 
 type BarVisualizationConfigFormValues = {
-  barmode: 'group' | 'stack' | 'relative' | 'overlay',
-  axisType: AxisType,
+  barmode: 'group' | 'stack' | 'relative' | 'overlay';
+  axisType: AxisType;
 };
 
 const validate = hasAtLeastOneMetric('Bar chart');
 
-const barChart: VisualizationType<typeof BarVisualization.type, BarVisualizationConfig, BarVisualizationConfigFormValues> = {
+const barChart: VisualizationType<
+  typeof BarVisualization.type,
+  BarVisualizationConfig,
+  BarVisualizationConfigFormValues
+> = {
   type: BarVisualization.type,
   displayName: 'Bar Chart',
   component: BarVisualization,
   config: {
     createConfig: () => ({ barmode: DEFAULT_BARMODE, axisType: DEFAULT_AXIS_TYPE }),
-    fromConfig: (config: BarVisualizationConfig | undefined) => ({ barmode: config?.barmode ?? DEFAULT_BARMODE, axisType: config?.axisType ?? DEFAULT_AXIS_TYPE }),
-    toConfig: (formValues: BarVisualizationConfigFormValues) => BarVisualizationConfig.create(formValues.barmode, formValues.axisType),
-    fields: [{
-      name: 'barmode',
-      title: 'Mode',
-      type: 'select',
-      options: [['Group', 'group'], ['Stack', 'stack'], ['Relative', 'relative'], ['Overlay', 'overlay']],
-      required: true,
-      helpComponent: () => {
-        const options = {
-          group: {
-            label: 'Group',
-            help: 'Every series is represented by its own bar in the chart.',
-          },
-          stack: {
-            label: 'Stack',
-            help: 'All series are stacked upon each other resulting in one bar.',
-          },
-          relative: {
-            label: 'Relative',
-            help: 'All series are stacked upon each other resulting in one chart. But negative series are placed below zero.',
-          },
-          overlay: {
-            label: 'Overlay',
-            help: 'All series are placed as bars upon each other. To be able to see the bars the opacity is reduced to 75%.'
-              + ' It is recommended to use this option with not more than 3 series.',
-          },
-        };
+    fromConfig: (config: BarVisualizationConfig | undefined) => ({
+      barmode: config?.barmode ?? DEFAULT_BARMODE,
+      axisType: config?.axisType ?? DEFAULT_AXIS_TYPE,
+    }),
+    toConfig: (formValues: BarVisualizationConfigFormValues) =>
+      BarVisualizationConfig.create(formValues.barmode, formValues.axisType),
+    fields: [
+      {
+        name: 'barmode',
+        title: 'Mode',
+        type: 'select',
+        options: [
+          ['Group', 'group'],
+          ['Stack', 'stack'],
+          ['Relative', 'relative'],
+          ['Overlay', 'overlay'],
+        ],
+        required: true,
+        helpComponent: () => {
+          const options = {
+            group: {
+              label: 'Group',
+              help: 'Every series is represented by its own bar in the chart.',
+            },
+            stack: {
+              label: 'Stack',
+              help: 'All series are stacked upon each other resulting in one bar.',
+            },
+            relative: {
+              label: 'Relative',
+              help: 'All series are stacked upon each other resulting in one chart. But negative series are placed below zero.',
+            },
+            overlay: {
+              label: 'Overlay',
+              help:
+                'All series are placed as bars upon each other. To be able to see the bars the opacity is reduced to 75%.' +
+                ' It is recommended to use this option with not more than 3 series.',
+            },
+          };
 
-        return (
-          <ul>
-            {Object.values(options).map(({ label, help }) => (
-              <li key={label}>
-                <h4>{label}</h4>
-                {help}
-              </li>
-            ))}
-          </ul>
-        );
+          return (
+            <ul>
+              {Object.values(options).map(({ label, help }) => (
+                <li key={label}>
+                  <h4>{label}</h4>
+                  {help}
+                </li>
+              ))}
+            </ul>
+          );
+        },
       },
-    }, {
-      name: 'axisType',
-      title: 'Axis Type',
-      type: 'select',
-      options: axisTypes,
-      required: true,
-    }],
+      {
+        name: 'axisType',
+        title: 'Axis Type',
+        type: 'select',
+        options: axisTypes,
+        required: true,
+      },
+    ],
   },
   capabilities: ['event-annotations'],
   validate,

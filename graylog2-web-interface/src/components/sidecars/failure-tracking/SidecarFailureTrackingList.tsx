@@ -47,21 +47,21 @@ const ErrorMessageCol = styled.col`
 const VerboseMessageCol = styled.col`
   width: 50%;
 `;
-type SortType = { field: string, order: string };
+type SortType = { field: string; order: string };
 type Props = {
-  sidecars: Array<SidecarSummary>,
-  collectors: Array<Collector>,
-  pagination: PaginationInfo,
-  query: string,
-  sort: SortType,
-  onlyActive: boolean,
-  onPageChange: (page: number, pageSize: number) => void,
-  onQueryChange: (query?: string) => void,
-  onSortChange: (sortField: string) => void,
-  toggleShowInactive: () => void,
+  sidecars: Array<SidecarSummary>;
+  collectors: Array<Collector>;
+  pagination: PaginationInfo;
+  query: string;
+  sort: SortType;
+  onlyActive: boolean;
+  onPageChange: (page: number, pageSize: number) => void;
+  onQueryChange: (query?: string) => void;
+  onSortChange: (sortField: string) => void;
+  toggleShowInactive: () => void;
 };
 
-const NoMatchingListAlert = ({ onlyActive, query }: {onlyActive: boolean, query: string}) => {
+const NoMatchingListAlert = ({ onlyActive, query }: { onlyActive: boolean; query: string }) => {
   const showInactiveHint = onlyActive && ' and/or click on "Include inactive sidecars"';
 
   return (
@@ -75,10 +75,10 @@ const SidecarTable = ({
   rows,
   sort,
   onSortChange,
-} : {
-  rows: React.ReactNode[],
-  sort: SortType,
-  onSortChange:(sortField: string) => void,
+}: {
+  rows: React.ReactNode[];
+  sort: SortType;
+  onSortChange: (sortField: string) => void;
 }) => {
   const columns = {
     node_name: 'Sidecar',
@@ -106,33 +106,29 @@ const SidecarTable = ({
             <th key={columnKey}>
               {columns[columnKey]}
               {sortableColumns.includes(columnKey) && (
-                <StyledSortIcon activeDirection={sort.field === columnKey ? sort.order : null}
-                                onChange={() => onSortChange(columnKey)}
-                                title={columnKey}
-                                ascId="asc"
-                                descId="desc" />
+                <StyledSortIcon
+                  activeDirection={sort.field === columnKey ? sort.order : null}
+                  onChange={() => onSortChange(columnKey)}
+                  title={columnKey}
+                  ascId="asc"
+                  descId="desc"
+                />
               )}
             </th>
           ))}
         </tr>
       </thead>
-      <tbody>
-        {rows}
-      </tbody>
+      <tbody>{rows}</tbody>
     </Table>
   );
 };
 
-const EmptyList = ({ query, onlyActive }: {query: string, onlyActive: boolean}) => {
+const EmptyList = ({ query, onlyActive }: { query: string; onlyActive: boolean }) => {
   if (query) {
     return <NoMatchingListAlert onlyActive={onlyActive} query={query} />;
   }
 
-  return (
-    <NoEntitiesExist>
-      There are no sidecars with failures.
-    </NoEntitiesExist>
-  );
+  return <NoEntitiesExist>There are no sidecars with failures.</NoEntitiesExist>;
 };
 
 const SidecarFailureTrackingList = ({
@@ -147,40 +143,49 @@ const SidecarFailureTrackingList = ({
   onSortChange,
   toggleShowInactive,
 }: Props) => {
-  const [collectorDetailsToShow, setCollectorDetailsToShow] = useState<{ name: string, verbose_message: string }|null>(null);
-  const sidecarRows = sidecars.map((sidecar) => <SidecarFailureTrackingRows key={sidecar.node_id} sidecar={sidecar} collectors={collectors} onShowDetails={setCollectorDetailsToShow} />);
+  const [collectorDetailsToShow, setCollectorDetailsToShow] = useState<{
+    name: string;
+    verbose_message: string;
+  } | null>(null);
+  const sidecarRows = sidecars.map((sidecar) => (
+    <SidecarFailureTrackingRows
+      key={sidecar.node_id}
+      sidecar={sidecar}
+      collectors={collectors}
+      onShowDetails={setCollectorDetailsToShow}
+    />
+  ));
   const showOrHideInactive = onlyActive ? 'Include' : 'Hide';
 
   return (
     <div>
       <div>
-        <SidecarSearchForm query={query}
-                           onSearch={onQueryChange}
-                           onReset={onQueryChange}>
-          <Button bsStyle="primary"
-                  onClick={toggleShowInactive}>
+        <SidecarSearchForm query={query} onSearch={onQueryChange} onReset={onQueryChange}>
+          <Button bsStyle="primary" onClick={toggleShowInactive}>
             {showOrHideInactive} inactive sidecars
           </Button>
         </SidecarSearchForm>
       </div>
 
-      <PaginatedList showPageSizeSelect={false}
-                     totalItems={pagination.total}
-                     onChange={onPageChange}>
+      <PaginatedList showPageSizeSelect={false} totalItems={pagination.total} onChange={onPageChange}>
         <Row>
           <Col md={12}>
-            {sidecarRows.length > 0
-              ? <SidecarTable rows={sidecarRows} sort={sort} onSortChange={onSortChange} />
-              : <EmptyList query={query} onlyActive={onlyActive} />}
+            {sidecarRows.length > 0 ? (
+              <SidecarTable rows={sidecarRows} sort={sort} onSortChange={onSortChange} />
+            ) : (
+              <EmptyList query={query} onlyActive={onlyActive} />
+            )}
           </Col>
         </Row>
       </PaginatedList>
 
       {collectorDetailsToShow && (
-        <VerboseMessageModal showModal
-                             onHide={() => setCollectorDetailsToShow(null)}
-                             collectorName={collectorDetailsToShow.name}
-                             collectorVerbose={collectorDetailsToShow.verbose_message} />
+        <VerboseMessageModal
+          showModal
+          onHide={() => setCollectorDetailsToShow(null)}
+          collectorName={collectorDetailsToShow.name}
+          collectorVerbose={collectorDetailsToShow.verbose_message}
+        />
       )}
     </div>
   );

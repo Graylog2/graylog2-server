@@ -23,10 +23,7 @@ type InternalState = CapabilityType;
 export default class Capability {
   _value: InternalState;
 
-  constructor(
-    id: InternalState['id'],
-    title: InternalState['title'],
-  ) {
+  constructor(id: InternalState['id'], title: InternalState['title']) {
     this._value = { id, title };
   }
 
@@ -54,11 +51,7 @@ export default class Capability {
   static fromJSON(value: InternalState): Capability {
     const { id, title } = value;
 
-    return Capability
-      .builder()
-      .id(id)
-      .title(title)
-      .build();
+    return Capability.builder().id(id).title(title).build();
   }
 
   static builder(): Builder {

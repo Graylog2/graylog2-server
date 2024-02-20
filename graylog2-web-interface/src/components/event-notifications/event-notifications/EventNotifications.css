@@ -1,7 +1,7 @@
 :local(.notificationList) {
-    margin-top: 10px;
+  margin-top: 10px;
 }
 
 :local(.inline) {
-    display: inline-block;
+  display: inline-block;
 }

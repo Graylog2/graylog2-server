@@ -55,9 +55,7 @@ describe('<TokenList />', () => {
       return Promise.resolve({ name: 'hans', token: 'beef2003', id: 'abc3', last_access: '1970-01-01T00:00:00.000Z' });
     });
 
-    render(<TokenList tokens={tokens}
-                      onCreate={createFn}
-                      onDelete={() => {}} />);
+    render(<TokenList tokens={tokens} onCreate={createFn} onDelete={() => {}} />);
 
     const nameInput = await screen.findByPlaceholderText('What is this token for?');
     userEvent.type(nameInput, 'hans');
@@ -73,8 +71,7 @@ describe('<TokenList />', () => {
   it('should delete a token', async () => {
     const deleteFn = jest.fn();
 
-    render(<TokenList tokens={tokens}
-                      onDelete={deleteFn} />);
+    render(<TokenList tokens={tokens} onDelete={deleteFn} />);
 
     (await screen.findAllByRole('button', { name: 'Delete' }))[0].click();
 

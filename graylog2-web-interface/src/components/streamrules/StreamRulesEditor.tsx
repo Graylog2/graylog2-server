@@ -37,13 +37,13 @@ const StreamAlertHeader = styled(Panel.Heading)`
   font-weight: bold;
 `;
 
-const MatchIcon = styled(Icon)<{ $empty?: boolean, $matches?: boolean }>(({ theme, $empty, $matches }) => {
+const MatchIcon = styled(Icon)<{ $empty?: boolean; $matches?: boolean }>(({ theme, $empty, $matches }) => {
   const matchColor = $matches ? theme.colors.variant.success : theme.colors.variant.danger;
 
   return css`
-      color: ${$empty ? theme.colors.variant.info : matchColor};
-      margin-right: 3px;
-`;
+    color: ${$empty ? theme.colors.variant.info : matchColor};
+    margin-right: 3px;
+  `;
 });
 
 const StyledSpinner = styled(Spinner)`
@@ -53,10 +53,10 @@ const StyledSpinner = styled(Spinner)`
 const getListClassName = (matchData) => (matchData.matches ? 'success' : 'danger');
 
 type Props = {
-  streamId: string,
-  messageId: string | undefined,
-  index: string,
-}
+  streamId: string;
+  messageId: string | undefined;
+  index: string;
+};
 
 const StreamRulesEditor = ({ streamId, messageId, index }: Props) => {
   const [showStreamRuleForm, setShowStreamRuleForm] = useState(false);
@@ -94,7 +94,7 @@ const StreamRulesEditor = ({ streamId, messageId, index }: Props) => {
     setShowStreamRuleForm(true);
   };
 
-  const styles = (matchData ? getListClassName(matchData) : 'info');
+  const styles = matchData ? getListClassName(matchData) : 'info';
 
   if (!stream) {
     return (
@@ -110,25 +110,23 @@ const StreamRulesEditor = ({ streamId, messageId, index }: Props) => {
         <h2>1. Load a message to test rules</h2>
 
         <div className="stream-loader">
-          <LoaderTabs messageId={messageId}
-                      index={index}
-                      onMessageLoaded={onMessageLoaded} />
+          <LoaderTabs messageId={messageId} index={index} onMessageLoaded={onMessageLoaded} />
         </div>
 
         <hr />
 
         <div className="buttons pull-right">
-          <Button bsStyle="success"
-                  className="show-stream-rule"
-                  onClick={_onAddStreamRule}>
+          <Button bsStyle="success" className="show-stream-rule" onClick={_onAddStreamRule}>
             Add stream rule
           </Button>
           {showStreamRuleForm && (
-            <StreamRuleModal title="New Stream Rule"
-                             onClose={() => setShowStreamRuleForm(false)}
-                             submitButtonText="Create Rule"
-                             submitLoadingText="Creating Rule..."
-                             onSubmit={_onStreamRuleFormSubmit} />
+            <StreamRuleModal
+              title="New Stream Rule"
+              onClose={() => setShowStreamRuleForm(false)}
+              submitButtonText="Create Rule"
+              submitLoadingText="Creating Rule..."
+              onSubmit={_onStreamRuleFormSubmit}
+            />
           )}
         </div>
 
@@ -143,7 +141,7 @@ const StreamRulesEditor = ({ streamId, messageId, index }: Props) => {
               </>
             )}
 
-            {(matchData && !matchData.matches) && (
+            {matchData && !matchData.matches && (
               <>
                 <MatchIcon name="times" /> This message would not be routed to this stream.
               </>
@@ -151,12 +149,12 @@ const StreamRulesEditor = ({ streamId, messageId, index }: Props) => {
 
             {!matchData && (
               <>
-                <MatchIcon $empty name="exclamation-circle" /> Please load a message in Step 1 above to check if it would match against these rules.
+                <MatchIcon $empty name="exclamation-circle" /> Please load a message in Step 1 above to check if it
+                would match against these rules.
               </>
             )}
           </StreamAlertHeader>
-          <StreamRuleList stream={stream}
-                          matchData={matchData} />
+          <StreamRuleList stream={stream} matchData={matchData} />
         </Panel>
 
         <p>

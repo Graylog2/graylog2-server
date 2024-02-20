@@ -34,7 +34,10 @@ class FlexdateConverterConfiguration extends React.Component {
     this.props.onChange(this.props.type, this._getConverterObject());
   }
 
-  _getConverterObject = (configuration) => ({ type: this.props.type, config: configuration || this.props.configuration });
+  _getConverterObject = (configuration) => ({
+    type: this.props.type,
+    config: configuration || this.props.configuration,
+  });
 
   _toggleConverter = (event) => {
     let converter;
@@ -57,30 +60,37 @@ class FlexdateConverterConfiguration extends React.Component {
   render() {
     const timezoneHelpMessage = (
       <span>
-        Time zone to apply to date. Read more in the <DocumentationLink page={DocsHelper.PAGES.PAGE_FLEXIBLE_DATE_CONVERTER} text="documentation" />.
+        Time zone to apply to date. Read more in the{' '}
+        <DocumentationLink page={DocsHelper.PAGES.PAGE_FLEXIBLE_DATE_CONVERTER} text="documentation" />.
       </span>
     );
 
     return (
       <div className="xtrc-converter">
-        <Input type="checkbox"
-               id={`enable-${this.props.type}-converter`}
-               label="Flexibly parse date"
-               wrapperClassName="col-md-offset-2 col-md-10"
-               defaultChecked
-               onChange={this._toggleConverter} />
+        <Input
+          type="checkbox"
+          id={`enable-${this.props.type}-converter`}
+          label="Flexibly parse date"
+          wrapperClassName="col-md-offset-2 col-md-10"
+          defaultChecked
+          onChange={this._toggleConverter}
+        />
         <Row className="row-sm">
           <Col md={9} mdOffset={2}>
             <div className="xtrc-converter-subfields">
-              <Input label="Time Zone"
-                     id={`${this.props.type}_converter_timezone`}
-                     labelClassName="col-sm-3"
-                     wrapperClassName="col-sm-9"
-                     help={timezoneHelpMessage}>
-                <TimezoneSelect id={`${this.props.type}_converter_timezone`}
-                                className="timezone-select"
-                                value={this.props.configuration.time_zone}
-                                onChange={this._onChange('time_zone')} />
+              <Input
+                label="Time Zone"
+                id={`${this.props.type}_converter_timezone`}
+                labelClassName="col-sm-3"
+                wrapperClassName="col-sm-9"
+                help={timezoneHelpMessage}
+              >
+                <TimezoneSelect
+                  id={`${this.props.type}_converter_timezone`}
+                  className="timezone-select"
+                  value={this.props.configuration.time_zone}
+                  onChange={this._onChange('time_zone')}
+                />
               </Input>
             </div>
           </Col>

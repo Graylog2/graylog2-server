@@ -1,4 +1,5 @@
 Simple option input:
+
 ```js
 import createReactClass from 'create-react-class';
 
@@ -14,26 +15,25 @@ const SimpleSelect = createReactClass({
   },
 
   onChange(nextValue) {
-    this.setState({selectedOption: nextValue});
+    this.setState({ selectedOption: nextValue });
   },
 
   render() {
     const { options, selectedOption } = this.state;
     return (
       <div>
-          <span>Selected option: "{selectedOption}"</span>
-          <Select value={selectedOption}
-                  onChange={this.onChange}
-                  options={options}/>
+        <span>Selected option: "{selectedOption}"</span>
+        <Select value={selectedOption} onChange={this.onChange} options={options} />
       </div>
     );
   },
 });
 
-<SimpleSelect />
+<SimpleSelect />;
 ```
 
 Multi select input:
+
 ```js
 import createReactClass from 'create-react-class';
 import { MultiSelect } from 'components/common';
@@ -53,25 +53,27 @@ const SimpleSelect = createReactClass({
   },
 
   onChange(nextValue) {
-    this.setState({selectedOptions: nextValue});
+    this.setState({ selectedOptions: nextValue });
   },
 
   render() {
     const { options, selectedOptions } = this.state;
     return (
       <div>
-          <span>Selected options: "{selectedOptions}"</span>
-          <MultiSelect value={selectedOptions}
-                       onChange={this.onChange}
-                       options={options}
-                       displayKey="spanish"
-                       valueKey="english"
-                       delimiter=";"
-                       allowCreate />
+        <span>Selected options: "{selectedOptions}"</span>
+        <MultiSelect
+          value={selectedOptions}
+          onChange={this.onChange}
+          options={options}
+          displayKey="spanish"
+          valueKey="english"
+          delimiter=";"
+          allowCreate
+        />
       </div>
     );
   },
 });
 
-<SimpleSelect />
+<SimpleSelect />;
 ```

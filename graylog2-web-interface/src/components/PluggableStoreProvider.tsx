@@ -30,58 +30,76 @@ import type { RootState } from 'views/types';
 import useSearchExecutors from 'views/components/contexts/useSearchExecutors';
 
 type Props = {
-  initialQuery: QueryId,
-  isNew: boolean,
+  initialQuery: QueryId;
+  isNew: boolean;
+  view: View;
+  executionState: SearchExecutionState;
+  undoRedoState?: UndoRedoState;
+  result?: RootState['searchExecution']['result'];
+};
+
+const useActiveQuery = (initialQuery: Props['initialQuery'], view: Props['view']) =>
+  useMemo(() => {
+    const queries: QuerySet = view?.search?.queries ?? Immutable.Set();
+
+    if (initialQuery && queries.find((q) => q.id === initialQuery) !== undefined) {
+      return initialQuery;
+    }
+
+    return queries.first()?.id;
+  }, [initialQuery, view?.search?.queries]);
+
+const useInitialState = (
+  undoRedoState: UndoRedoState,
   view: View,
+  isNew: boolean,
+  activeQuery,
   executionState: SearchExecutionState,
-  undoRedoState?: UndoRedoState,
-  result?: RootState['searchExecution']['result'],
-}
+  result?: Props['result'],
+): Partial<RootState> =>
+  useMemo(
+    () => {
+      const undoRedo = undoRedoState ? { undoRedo: undoRedoState } : {};
 
-const useActiveQuery = (initialQuery: Props['initialQuery'], view: Props['view']) => useMemo(() => {
-  const queries: QuerySet = view?.search?.queries ?? Immutable.Set();
-
-  if (initialQuery && queries.find((q) => q.id === initialQuery) !== undefined) {
-    return initialQuery;
-  }
-
-  return queries.first()?.id;
-}, [initialQuery, view?.search?.queries]);
-
-const useInitialState = (undoRedoState: UndoRedoState, view: View, isNew: boolean, activeQuery, executionState: SearchExecutionState, result?: Props['result']): Partial<RootState> => useMemo(() => {
-  const undoRedo = undoRedoState ? { undoRedo: undoRedoState } : {};
-
-  return ({
-    view: {
-      view,
-      isDirty: false,
-      isNew,
-      activeQuery,
+      return {
+        view: {
+          view,
+          isDirty: false,
+          isNew,
+          activeQuery,
+        },
+        searchExecution: {
+          widgetsToSearch: undefined,
+          executionState,
+          isLoading: false,
+          result,
+        },
+        ...undoRedo,
+      };
     },
-    searchExecution: {
-      widgetsToSearch: undefined,
-      executionState,
-      isLoading: false,
-      result,
-    },
-    ...undoRedo,
-  });
-},
-// eslint-disable-next-line react-hooks/exhaustive-deps
-[executionState, isNew, view]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [executionState, isNew, view],
+  );
 
-const PluggableStoreProvider = ({ initialQuery, children, isNew, view, executionState, undoRedoState, result }: React.PropsWithChildren<Props>) => {
+const PluggableStoreProvider = ({
+  initialQuery,
+  children,
+  isNew,
+  view,
+  executionState,
+  undoRedoState,
+  result,
+}: React.PropsWithChildren<Props>) => {
   const reducers = usePluginEntities('views.reducers');
   const activeQuery = useActiveQuery(initialQuery, view);
   const initialState = useInitialState(undoRedoState, view, isNew, activeQuery, executionState, result);
   const searchExecutors = useSearchExecutors();
-  const store = useMemo(() => createStore(reducers, initialState, searchExecutors), [initialState, reducers, searchExecutors]);
-
-  return (
-    <Provider store={store}>
-      {children}
-    </Provider>
+  const store = useMemo(
+    () => createStore(reducers, initialState, searchExecutors),
+    [initialState, reducers, searchExecutors],
   );
+
+  return <Provider store={store}>{children}</Provider>;
 };
 
 PluggableStoreProvider.defaultProps = {

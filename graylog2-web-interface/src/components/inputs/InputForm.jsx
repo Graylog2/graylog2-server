@@ -106,11 +106,13 @@ class InputForm extends React.Component {
     const titleValue = this.getTitleValue();
 
     return (
-      <ConfigurationForm {...this.props}
-                         ref={this.configurationForm}
-                         values={values}
-                         titleValue={titleValue}
-                         submitAction={this._onSubmit}>
+      <ConfigurationForm
+        {...this.props}
+        ref={this.configurationForm}
+        values={values}
+        titleValue={titleValue}
+        submitAction={this._onSubmit}
+      >
         <HideOnCloud>
           <NodeOrGlobalSelect onChange={this._handleChange} global={this.state.global} node={this.state.node} />
         </HideOnCloud>

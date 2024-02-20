@@ -30,7 +30,9 @@ import generateId from 'logic/generateId';
 import FilterPreview from './FilterPreview';
 
 const isPermittedToSeePreview = (currentUser, config) => {
-  const missingPermissions = config?.streams?.some((stream) => !isPermitted(currentUser.permissions, `streams:read:${stream}`));
+  const missingPermissions = config?.streams?.some(
+    (stream) => !isPermitted(currentUser.permissions, `streams:read:${stream}`),
+  );
 
   return !missingPermissions;
 };
@@ -53,17 +55,20 @@ class FilterPreviewContainer extends React.Component {
       .timerange({ type: 'relative', range: (config?.search_within_ms || 0) / 1000 })
       .filter(formattedStreams.length === 0 ? null : { type: 'or', filters: formattedStreams })
       .filters(config.filters)
-      .searchTypes([{
-        id: searchTypeId,
-        type: 'messages',
-        limit: 10,
-        offset: 0,
-      }]);
+      .searchTypes([
+        {
+          id: searchTypeId,
+          type: 'messages',
+          limit: 10,
+          offset: 0,
+        },
+      ]);
 
     const query = queryBuilder.build();
 
-    const search = Search.create().toBuilder()
-      .parameters(config?.query_parameters?.filter((param) => (!param.embryonic)) || [])
+    const search = Search.create()
+      .toBuilder()
+      .parameters(config?.query_parameters?.filter((param) => !param.embryonic) || [])
       .queries([query])
       .build();
 
@@ -107,7 +112,12 @@ class FilterPreviewContainer extends React.Component {
       search_within_ms: searchWithin,
     } = eventDefinition.config;
 
-    if (query !== prevQuery || queryParameters !== prevQueryParameters || !isEqual(streams, prevStreams) || searchWithin !== prevSearchWithin) {
+    if (
+      query !== prevQuery ||
+      queryParameters !== prevQueryParameters ||
+      !isEqual(streams, prevStreams) ||
+      searchWithin !== prevSearchWithin
+    ) {
       this.fetchSearch(eventDefinition.config);
     }
   }
@@ -126,19 +136,25 @@ class FilterPreviewContainer extends React.Component {
     }
 
     return (
-      <FilterPreview eventDefinition={eventDefinition}
-                     isFetchingData={isLoading}
-                     displayPreview={isPermittedToSeePreview(currentUser, eventDefinition.config)}
-                     searchResult={searchResult}
-                     errors={errors} />
+      <FilterPreview
+        eventDefinition={eventDefinition}
+        isFetchingData={isLoading}
+        displayPreview={isPermittedToSeePreview(currentUser, eventDefinition.config)}
+        searchResult={searchResult}
+        errors={errors}
+      />
     );
   }
 }
 
-export default connect(FilterPreviewContainer, {
-  filterPreview: FilterPreviewStore,
-  currentUser: CurrentUserStore,
-}, ({ currentUser, ...otherProps }) => ({
-  ...otherProps,
-  currentUser: currentUser.currentUser,
-}));
+export default connect(
+  FilterPreviewContainer,
+  {
+    filterPreview: FilterPreviewStore,
+    currentUser: CurrentUserStore,
+  },
+  ({ currentUser, ...otherProps }) => ({
+    ...otherProps,
+    currentUser: currentUser.currentUser,
+  }),
+);

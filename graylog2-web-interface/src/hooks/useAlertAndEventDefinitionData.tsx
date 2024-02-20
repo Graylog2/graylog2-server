@@ -27,34 +27,41 @@ import type { EventDefinition } from 'logic/alerts/types';
 
 const useAlertAndEventDefinitionData = () => {
   const { pathname: path } = useLocation();
-  const { alertId, definitionId } = useParams<{ alertId?: string, definitionId?: string }>();
+  const { alertId, definitionId } = useParams<{ alertId?: string; definitionId?: string }>();
   const queryClient = useQueryClient();
   const eventData = queryClient.getQueryData(['event-by-id', alertId]) as Event;
-  const data = queryClient.getQueryData(['event-definition-by-id', definitionId || eventData?.event_definition_id]) as { eventDefinition: EventDefinition, aggregations: Array<EventDefinitionAggregation>};
+  const data = queryClient.getQueryData(['event-definition-by-id', definitionId || eventData?.event_definition_id]) as {
+    eventDefinition: EventDefinition;
+    aggregations: Array<EventDefinitionAggregation>;
+  };
   const eventDefinition = data?.eventDefinition;
   const aggregations = data?.aggregations;
 
   return useMemo<{
-    alertId: string,
-    definitionId: string,
-    definitionTitle: string,
-    isAlert: boolean,
-    isEvent: boolean,
-    isEventDefinition: boolean,
-    eventData: Event,
-    eventDefinition: EventDefinition,
-    aggregations: Array<EventDefinitionAggregation>,
-  }>(() => ({
-    alertId,
-    definitionId: eventDefinition?.id,
-    definitionTitle: eventDefinition?.title,
-    isAlert: (path === Routes.ALERTS.replay_search(alertId)) && eventData && eventData?.alert,
-    isEvent: !!alertId && (path === Routes.ALERTS.replay_search(alertId)) && eventData && !eventData?.alert,
-    isEventDefinition: !!definitionId && (path === Routes.ALERTS.DEFINITIONS.replay_search(definitionId)) && !!eventDefinition,
-    eventData,
-    eventDefinition,
-    aggregations,
-  }), [alertId, eventDefinition, path, eventData, definitionId, aggregations]);
+    alertId: string;
+    definitionId: string;
+    definitionTitle: string;
+    isAlert: boolean;
+    isEvent: boolean;
+    isEventDefinition: boolean;
+    eventData: Event;
+    eventDefinition: EventDefinition;
+    aggregations: Array<EventDefinitionAggregation>;
+  }>(
+    () => ({
+      alertId,
+      definitionId: eventDefinition?.id,
+      definitionTitle: eventDefinition?.title,
+      isAlert: path === Routes.ALERTS.replay_search(alertId) && eventData && eventData?.alert,
+      isEvent: !!alertId && path === Routes.ALERTS.replay_search(alertId) && eventData && !eventData?.alert,
+      isEventDefinition:
+        !!definitionId && path === Routes.ALERTS.DEFINITIONS.replay_search(definitionId) && !!eventDefinition,
+      eventData,
+      eventDefinition,
+      aggregations,
+    }),
+    [alertId, eventDefinition, path, eventData, definitionId, aggregations],
+  );
 };
 
 export default useAlertAndEventDefinitionData;

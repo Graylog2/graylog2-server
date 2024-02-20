@@ -26,15 +26,17 @@ import PipelinesPageNavigation from 'components/pipelines/PipelinesPageNavigatio
 const PipelinesOverviewPage = () => (
   <DocumentTitle title="Pipelines">
     <PipelinesPageNavigation />
-    <PageHeader title="Pipelines overview"
-                actions={<CreatePipelineButton />}
-                documentationLink={{
-                  title: 'Pipelines documentation',
-                  path: DocsHelper.PAGES.PIPELINES,
-                }}>
+    <PageHeader
+      title="Pipelines overview"
+      actions={<CreatePipelineButton />}
+      documentationLink={{
+        title: 'Pipelines documentation',
+        path: DocsHelper.PAGES.PIPELINES,
+      }}
+    >
       <span>
-        Pipelines let you transform and process messages coming from streams. Pipelines consist of stages where
-        rules are evaluated and applied. Messages can go through one or more stages.
+        Pipelines let you transform and process messages coming from streams. Pipelines consist of stages where rules
+        are evaluated and applied. Messages can go through one or more stages.
       </span>
     </PageHeader>
     <Row className="content">

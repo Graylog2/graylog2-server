@@ -26,7 +26,11 @@ import {
   getFieldNameForFieldValueInBrackets,
   isCompleteFieldName,
   isTypeString,
-  isTypeTerm, isKeywordOperator, isSpace, isTypeNumber, removeFinalColon,
+  isTypeTerm,
+  isKeywordOperator,
+  isSpace,
+  isTypeNumber,
+  removeFinalColon,
 } from 'views/components/searchbar/completions/token-helper';
 
 import type { Completer, CompleterContext, FieldTypes } from '../SearchBarAutocompletions';
@@ -40,11 +44,16 @@ const formatValue = (value: string, type: string) => {
   const trimmedValue = value?.trim();
 
   switch (type) {
-    case 'constant.numeric': return Number(trimmedValue);
-    case 'string': return unquote(trimmedValue);
-    case 'keyword.operator': return '';
-    case 'paren.lparen': return '';
-    default: return trimmedValue;
+    case 'constant.numeric':
+      return Number(trimmedValue);
+    case 'string':
+      return unquote(trimmedValue);
+    case 'keyword.operator':
+      return '';
+    case 'paren.lparen':
+      return '';
+    default:
+      return trimmedValue;
   }
 };
 
@@ -64,10 +73,10 @@ const getFieldNameAndInput = ({
   prevToken,
   currentTokenIdx,
 }: {
-  tokens: Array<Token>,
-  currentToken: Token | undefined | null,
-  prevToken: Token | undefined | null,
-  currentTokenIdx: number
+  tokens: Array<Token>;
+  currentToken: Token | undefined | null;
+  prevToken: Token | undefined | null;
+  currentTokenIdx: number;
 }) => {
   const nextToken = tokens[currentTokenIdx + 1] ?? null;
 
@@ -79,7 +88,10 @@ const getFieldNameAndInput = ({
     };
   }
 
-  if ((isTypeTerm(currentToken) || isTypeString(currentToken) || isKeywordOperator(currentToken)) && isCompleteFieldName(prevToken)) {
+  if (
+    (isTypeTerm(currentToken) || isTypeString(currentToken) || isKeywordOperator(currentToken)) &&
+    isCompleteFieldName(prevToken)
+  ) {
     return {
       fieldName: removeFinalColon(prevToken.value),
       input: formatValue(currentToken.value, currentToken.type),
@@ -89,7 +101,10 @@ const getFieldNameAndInput = ({
 
   const fieldNameFromForValueInBrackets = getFieldNameForFieldValueInBrackets(tokens, currentTokenIdx);
 
-  if (fieldNameFromForValueInBrackets && !(isSpace(currentToken) && (isTypeTerm(prevToken) || isTypeNumber(prevToken)))) {
+  if (
+    fieldNameFromForValueInBrackets &&
+    !(isSpace(currentToken) && (isTypeTerm(prevToken) || isTypeNumber(prevToken)))
+  ) {
     return {
       fieldName: fieldNameFromForValueInBrackets,
       input: formatValue(currentToken.value, currentToken.type),
@@ -102,7 +117,13 @@ const getFieldNameAndInput = ({
 
 const isEnumerableField = (field: FieldTypeMapping | undefined) => field?.type.isEnumerable() ?? false;
 
-const formatSuggestion = (value: string, occurrence: number, input: string | number, isQuoted: boolean, title: string | undefined): CompletionResult => ({
+const formatSuggestion = (
+  value: string,
+  occurrence: number,
+  input: string | number,
+  isQuoted: boolean,
+  title: string | undefined,
+): CompletionResult => ({
   name: value,
   value: isQuoted ? value : escape(value),
   score: occurrence,
@@ -110,17 +131,19 @@ const formatSuggestion = (value: string, occurrence: number, input: string | num
   meta: title ? `${title}: ${occurrence} hits` : `${occurrence} hits`,
 });
 
-type PreviousSuggestions = Array<{ value: string, occurrence: number, title?: string }> | undefined;
+type PreviousSuggestions = Array<{ value: string; occurrence: number; title?: string }> | undefined;
 
 class FieldValueCompletion implements Completer {
-  private previousSuggestions: undefined | {
-    furtherSuggestionsCount: number,
-    suggestions: PreviousSuggestions,
-    fieldName: string,
-    input: string | number,
-    timeRange: TimeRange | NoTimeRangeOverride | undefined,
-    streams: Array<string> | undefined,
-  };
+  private previousSuggestions:
+    | undefined
+    | {
+        furtherSuggestionsCount: number;
+        suggestions: PreviousSuggestions;
+        fieldName: string;
+        input: string | number;
+        timeRange: TimeRange | NoTimeRangeOverride | undefined;
+        streams: Array<string> | undefined;
+      };
 
   // eslint-disable-next-line class-methods-use-this
   private readonly shouldFetchCompletions = (fieldName: string, fieldTypes: FieldTypes) => {
@@ -157,11 +180,13 @@ class FieldValueCompletion implements Completer {
       input: prevInput,
     } = this.previousSuggestions;
 
-    return String(input).startsWith(String(prevInput))
-      && prevFieldName === fieldName
-      && isEqual(prevStreams, streams)
-      && isEqual(prevTimeRange, timeRange)
-      && !furtherSuggestionsCount;
+    return (
+      String(input).startsWith(String(prevInput)) &&
+      prevFieldName === fieldName &&
+      isEqual(prevStreams, streams) &&
+      isEqual(prevTimeRange, timeRange) &&
+      !furtherSuggestionsCount
+    );
   }
 
   private filterExistingSuggestions(input: string | number, isQuoted: boolean) {
@@ -207,7 +232,10 @@ class FieldValueCompletion implements Completer {
       }
     }
 
-    const normalizedTimeRange = (!timeRange || isNoTimeRangeOverride(timeRange)) ? undefined : normalizeFromSearchBarForBackend(timeRange, userTimezone);
+    const normalizedTimeRange =
+      !timeRange || isNoTimeRangeOverride(timeRange)
+        ? undefined
+        : normalizeFromSearchBarForBackend(timeRange, userTimezone);
 
     return SearchSuggestions.suggestFieldValue({
       field: fieldName,
@@ -229,7 +257,9 @@ class FieldValueCompletion implements Completer {
         suggestions,
       };
 
-      return suggestions.map(({ value, occurrence, title }: any) => formatSuggestion(value, occurrence, input, isQuoted, title));
+      return suggestions.map(({ value, occurrence, title }: any) =>
+        formatSuggestion(value, occurrence, input, isQuoted, title),
+      );
     });
   };
 

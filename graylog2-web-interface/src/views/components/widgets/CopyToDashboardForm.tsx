@@ -22,15 +22,22 @@ import useDashboards from 'views/components/dashboard/hooks/useDashboards';
 import type { SearchParams } from 'stores/PaginationTypes';
 
 type Props = {
-  activeDashboardId?: string,
-  onCancel: () => void,
-  onCopyToDashboard: (selectedDashboardId: string | undefined | null) => Promise<void>,
-  submitButtonText: string,
-  submitLoadingText: string,
-  onCreateNewDashboard?: () => Promise<void>,
+  activeDashboardId?: string;
+  onCancel: () => void;
+  onCopyToDashboard: (selectedDashboardId: string | undefined | null) => Promise<void>;
+  submitButtonText: string;
+  submitLoadingText: string;
+  onCreateNewDashboard?: () => Promise<void>;
 };
 
-const CopyToDashboardForm = ({ onCancel, onCopyToDashboard, submitButtonText, submitLoadingText, activeDashboardId, onCreateNewDashboard }: Props) => {
+const CopyToDashboardForm = ({
+  onCancel,
+  onCopyToDashboard,
+  submitButtonText,
+  submitLoadingText,
+  activeDashboardId,
+  onCreateNewDashboard,
+}: Props) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedDashboard, setSelectedDashboard] = useState<string | null>(null);
   const isMounted = useRef<boolean>();
@@ -64,14 +71,16 @@ const CopyToDashboardForm = ({ onCancel, onCopyToDashboard, submitButtonText, su
     [],
   );
   const handleSearchReset = useCallback(() => handleSearch(''), [handleSearch]);
-  const handlePageChange = useCallback((newPage: number, newPageSize: number) => setSearchParams(
-    (cur) => ({ ...cur, page: newPage, pageSize: newPageSize })),
-  [],
+  const handlePageChange = useCallback(
+    (newPage: number, newPageSize: number) =>
+      setSearchParams((cur) => ({ ...cur, page: newPage, pageSize: newPageSize })),
+    [],
   );
 
   const handleSubmit = () => {
     setIsSubmitting(true);
-    const submitHandler = async () => (createNewDashboard ? onCreateNewDashboard() : onCopyToDashboard(selectedDashboard));
+    const submitHandler = async () =>
+      createNewDashboard ? onCreateNewDashboard() : onCopyToDashboard(selectedDashboard);
 
     submitHandler().then(() => {
       if (isMounted.current) {
@@ -82,12 +91,16 @@ const CopyToDashboardForm = ({ onCancel, onCopyToDashboard, submitButtonText, su
 
   const onSelectDashboard = (dashboardId: string) => {
     setSelectedDashboard(dashboardId);
-    if (createNewDashboard) { setCreateNewDashboard(false); }
+    if (createNewDashboard) {
+      setCreateNewDashboard(false);
+    }
   };
 
   const toggleCreateNewDashboard = () => {
     setCreateNewDashboard((cur) => !cur);
-    if (selectedDashboard) { setSelectedDashboard(null); }
+    if (selectedDashboard) {
+      setSelectedDashboard(null);
+    }
   };
 
   const showCreateNewDashboardCheckbox = typeof onCreateNewDashboard === 'function';
@@ -98,15 +111,16 @@ const CopyToDashboardForm = ({ onCancel, onCopyToDashboard, submitButtonText, su
         {isLoadingDashboards && <Spinner />}
         {!isLoadingDashboards && (
           <>
-            <PaginatedList onChange={handlePageChange}
-                           activePage={searchParams.page}
-                           totalItems={paginatedDashboards.pagination.total}
-                           pageSize={searchParams.pageSize}
-                           pageSizes={[5, 10, 15]}
-                           useQueryParameter={false}>
+            <PaginatedList
+              onChange={handlePageChange}
+              activePage={searchParams.page}
+              totalItems={paginatedDashboards.pagination.total}
+              pageSize={searchParams.pageSize}
+              pageSizes={[5, 10, 15]}
+              useQueryParameter={false}
+            >
               <div style={{ marginBottom: '5px' }}>
-                <SearchForm onSearch={handleSearch}
-                            onReset={handleSearchReset} />
+                <SearchForm onSearch={handleSearch} onReset={handleSearchReset} />
               </div>
               {paginatedDashboards.list.length ? (
                 <ListGroup>
@@ -114,38 +128,46 @@ const CopyToDashboardForm = ({ onCancel, onCopyToDashboard, submitButtonText, su
                     const isActiveDashboard = activeDashboardId === dashboard.id;
 
                     return (
-                      <ListGroupItem active={selectedDashboard === dashboard.id}
-                                     onClick={isActiveDashboard ? undefined : () => onSelectDashboard(dashboard.id)}
-                                     header={dashboard.title}
-                                     disabled={isActiveDashboard}
-                                     key={dashboard.id}>
+                      <ListGroupItem
+                        active={selectedDashboard === dashboard.id}
+                        onClick={isActiveDashboard ? undefined : () => onSelectDashboard(dashboard.id)}
+                        header={dashboard.title}
+                        disabled={isActiveDashboard}
+                        key={dashboard.id}
+                      >
                         {dashboard.summary}
                       </ListGroupItem>
                     );
                   })}
                 </ListGroup>
-              ) : <span>No dashboards found</span>}
+              ) : (
+                <span>No dashboards found</span>
+              )}
             </PaginatedList>
             {showCreateNewDashboardCheckbox && (
-              <Input type="checkbox"
-                     id="create-new-dashboard"
-                     name="createNewDashboard"
-                     label="Create a new dashboard"
-                     onChange={toggleCreateNewDashboard}
-                     checked={createNewDashboard} />
+              <Input
+                type="checkbox"
+                id="create-new-dashboard"
+                name="createNewDashboard"
+                label="Create a new dashboard"
+                onChange={toggleCreateNewDashboard}
+                checked={createNewDashboard}
+              />
             )}
           </>
         )}
       </Modal.Body>
       <Modal.Footer>
-        <ModalSubmit submitButtonText={submitButtonText}
-                     submitLoadingText={submitLoadingText}
-                     isAsyncSubmit
-                     isSubmitting={isSubmitting}
-                     disabledSubmit={!selectedDashboard && !createNewDashboard}
-                     submitButtonType="button"
-                     onSubmit={handleSubmit}
-                     onCancel={onCancel} />
+        <ModalSubmit
+          submitButtonText={submitButtonText}
+          submitLoadingText={submitLoadingText}
+          isAsyncSubmit
+          isSubmitting={isSubmitting}
+          disabledSubmit={!selectedDashboard && !createNewDashboard}
+          submitButtonType="button"
+          onSubmit={handleSubmit}
+          onCancel={onCancel}
+        />
       </Modal.Footer>
     </Modal>
   );

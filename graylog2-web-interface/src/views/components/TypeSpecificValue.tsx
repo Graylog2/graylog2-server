@@ -36,22 +36,30 @@ const _formatValue = (field, value, truncate, render, type) => {
   const stringified = isString(value) ? value : JSON.stringify(value);
   const Component = render;
 
-  return trim(stringified) === ''
-    ? <EmptyValue />
-    : <Component field={field} value={(truncate ? trunc(stringified) : stringified)} type={type} />;
+  return trim(stringified) === '' ? (
+    <EmptyValue />
+  ) : (
+    <Component field={field} value={truncate ? trunc(stringified) : stringified} type={type} />
+  );
 };
 
 type Props = {
-  field: string,
-  value?: any,
-  type: FieldType,
-  truncate?: boolean,
-  render?: React.ComponentType<ValueRendererProps>,
+  field: string;
+  value?: any;
+  type: FieldType;
+  truncate?: boolean;
+  render?: React.ComponentType<ValueRendererProps>;
 };
 
 const defaultComponent = ({ value }: ValueRendererProps) => value;
 
-const TypeSpecificValue = ({ field, value, render = defaultComponent, type = FieldType.Unknown, truncate = false }: Props) => {
+const TypeSpecificValue = ({
+  field,
+  value,
+  render = defaultComponent,
+  type = FieldType.Unknown,
+  truncate = false,
+}: Props) => {
   const Component = render;
 
   if (value === undefined) {
@@ -63,13 +71,20 @@ const TypeSpecificValue = ({ field, value, render = defaultComponent, type = Fie
   }
 
   switch (type.type) {
-    case 'date': return <Timestamp dateTime={value} render={render} field={field} format="complete" />;
-    case 'boolean': return <Component value={String(value)} field={field} />;
-    case 'input': return <InputField value={String(value)} />;
-    case 'node': return <NodeField value={String(value)} />;
-    case 'streams': return <StreamsField value={value} />;
-    case 'percentage': return <PercentageField value={value} />;
-    default: return _formatValue(field, value, truncate, render, type);
+    case 'date':
+      return <Timestamp dateTime={value} render={render} field={field} format="complete" />;
+    case 'boolean':
+      return <Component value={String(value)} field={field} />;
+    case 'input':
+      return <InputField value={String(value)} />;
+    case 'node':
+      return <NodeField value={String(value)} />;
+    case 'streams':
+      return <StreamsField value={value} />;
+    case 'percentage':
+      return <PercentageField value={value} />;
+    default:
+      return _formatValue(field, value, truncate, render, type);
   }
 };
 

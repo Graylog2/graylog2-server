@@ -27,10 +27,10 @@ import TypeSpecificValue from './TypeSpecificValue';
 import InteractiveContext from './contexts/InteractiveContext';
 
 type Props = {
-  field: string,
-  value: any,
-  render?: ValueRenderer,
-  type: FieldType,
+  field: string;
+  value: any;
+  render?: ValueRenderer;
+  type: FieldType;
 };
 
 const ValueActionTitle = styled.span`
@@ -41,8 +41,14 @@ const defaultRenderer: ValueRenderer = ({ value }: ValueRendererProps) => value;
 
 const InteractiveValue = ({ field, value, render, type }: Props) => {
   const queryId = useActiveQueryId();
-  const RenderComponent: ValueRenderer = useMemo(() => render ?? ((props: ValueRendererProps) => props.value), [render]);
-  const Component = useCallback(({ value: componentValue }) => <RenderComponent field={field} value={componentValue} />, [RenderComponent, field]);
+  const RenderComponent: ValueRenderer = useMemo(
+    () => render ?? ((props: ValueRendererProps) => props.value),
+    [render],
+  );
+  const Component = useCallback(
+    ({ value: componentValue }) => <RenderComponent field={field} value={componentValue} />,
+    [RenderComponent, field],
+  );
   const element = <TypeSpecificValue field={field} value={value} type={type} render={Component} />;
 
   return (
@@ -60,9 +66,15 @@ InteractiveValue.defaultProps = {
 
 const Value = ({ field, value, render = defaultRenderer, type = FieldType.Unknown }: Props) => (
   <InteractiveContext.Consumer>
-    {(interactive) => ((interactive)
-      ? <InteractiveValue field={field} value={value} render={render} type={type} />
-      : <span><TypeSpecificValue field={field} value={value} render={render} type={type} /></span>)}
+    {(interactive) =>
+      interactive ? (
+        <InteractiveValue field={field} value={value} render={render} type={type} />
+      ) : (
+        <span>
+          <TypeSpecificValue field={field} value={value} render={render} type={type} />
+        </span>
+      )
+    }
   </InteractiveContext.Consumer>
 );
 

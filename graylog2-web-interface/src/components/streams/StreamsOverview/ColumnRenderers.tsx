@@ -41,7 +41,11 @@ const customColumnRenderers = (indexSets: Array<IndexSet>): ColumnRenderers<Stre
       renderCell: (title: string, stream) => (
         <>
           <Link to={Routes.stream_search(stream.id)}>{title}</Link>
-          {stream.is_default && <DefaultLabel bsStyle="primary" bsSize="xsmall">Default</DefaultLabel>}
+          {stream.is_default && (
+            <DefaultLabel bsStyle="primary" bsSize="xsmall">
+              Default
+            </DefaultLabel>
+          )}
         </>
       ),
     },

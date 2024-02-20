@@ -28,33 +28,33 @@ import useViewsPlugin from 'views/test/testViewsPlugin';
 
 import AggregationWizard from './AggregationWizard';
 
-const widgetConfig = AggregationWidgetConfig
-  .builder()
-  .visualization(DataTable.type)
-  .build();
+const widgetConfig = AggregationWidgetConfig.builder().visualization(DataTable.type).build();
 
 jest.mock('views/hooks/useAggregationFunctions');
 
 const fieldTypes = { all: simpleFields(), queryFields: simpleQueryFields('queryId') };
 
 describe('AggregationWizard', () => {
-  const renderSUT = (props: Partial<React.ComponentProps<typeof AggregationWizard>> = {}) => render((
-    <TestStoreProvider>
-      <FieldTypesContext.Provider value={fieldTypes}>
-        <AggregationWizard onChange={() => {}}
-                           onSubmit={() => {}}
-                           onCancel={() => {}}
-                           config={widgetConfig}
-                           editing
-                           id="widget-id"
-                           type="AGGREGATION"
-                           fields={Immutable.List([])}
-                           {...props}>
-          <div>The Visualization</div>
-        </AggregationWizard>
-      </FieldTypesContext.Provider>
-    </TestStoreProvider>
-  ));
+  const renderSUT = (props: Partial<React.ComponentProps<typeof AggregationWizard>> = {}) =>
+    render(
+      <TestStoreProvider>
+        <FieldTypesContext.Provider value={fieldTypes}>
+          <AggregationWizard
+            onChange={() => {}}
+            onSubmit={() => {}}
+            onCancel={() => {}}
+            config={widgetConfig}
+            editing
+            id="widget-id"
+            type="AGGREGATION"
+            fields={Immutable.List([])}
+            {...props}
+          >
+            <div>The Visualization</div>
+          </AggregationWizard>
+        </FieldTypesContext.Provider>
+      </TestStoreProvider>,
+    );
 
   useViewsPlugin();
 
@@ -65,20 +65,13 @@ describe('AggregationWizard', () => {
   });
 
   it('should list available aggregation elements in element select', async () => {
-    const config = AggregationWidgetConfig
-      .builder()
-      .visualization(DataTable.type)
-      .build();
+    const config = AggregationWidgetConfig.builder().visualization(DataTable.type).build();
 
     renderSUT({ config });
 
     await userEvent.click(await screen.findByRole('button', { name: 'Add' }));
     const addElementMenu = await screen.findByRole('menu');
-    const notConfiguredElements = [
-      'Metric',
-      'Grouping',
-      'Sort',
-    ];
+    const notConfiguredElements = ['Metric', 'Grouping', 'Sort'];
 
     notConfiguredElements.forEach((elementTitle) => {
       expect(within(addElementMenu).getByText(elementTitle)).toBeInTheDocument();

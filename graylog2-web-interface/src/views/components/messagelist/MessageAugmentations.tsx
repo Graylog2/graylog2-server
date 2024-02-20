@@ -28,8 +28,8 @@ const StyledSticky: typeof Sticky = styled(Sticky)`
 `;
 
 type Props = {
-  message: Message,
-}
+  message: Message;
+};
 
 const MessageAugmentations = ({ message }: Props) => {
   const theme = useTheme();
@@ -42,12 +42,16 @@ const MessageAugmentations = ({ message }: Props) => {
   }
 
   return (
-    <StyledSticky boundaryElement={`#sticky-augmentations-boundary-${message.id}`}
-                  disabled={!isSticky}
-                  positionRecheckInterval={400}
-                  scrollElement="#sticky-augmentations-container">
+    <StyledSticky
+      boundaryElement={`#sticky-augmentations-boundary-${message.id}`}
+      disabled={!isSticky}
+      positionRecheckInterval={400}
+      scrollElement="#sticky-augmentations-container"
+    >
       <dl>
-        {augmentations.map(({ component: Augmentation, id }) => <Augmentation key={id} message={message} />)}
+        {augmentations.map(({ component: Augmentation, id }) => (
+          <Augmentation key={id} message={message} />
+        ))}
       </dl>
     </StyledSticky>
   );

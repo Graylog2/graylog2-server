@@ -41,7 +41,9 @@ const RestApiOverview = ({ node }) => {
       <dt>Transport address:</dt>
       <dd>{transport_address}</dd>
       <dt>Last seen:</dt>
-      <dd><RelativeTime dateTime={last_seen} /></dd>
+      <dd>
+        <RelativeTime dateTime={last_seen} />
+      </dd>
     </StyledDl>
   );
 };

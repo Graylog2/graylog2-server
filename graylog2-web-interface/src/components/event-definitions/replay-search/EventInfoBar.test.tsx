@@ -36,7 +36,10 @@ jest.mock('stores/event-notifications/EventNotificationsStore', () => ({
   EventNotificationsActions: {
     listAll: jest.fn(async () => Promise.resolve()),
   },
-  EventNotificationsStore: MockStore((['getInitialState', () => ({ all: [{ id: 'email_notification_id', title: 'Email notification' }] })])),
+  EventNotificationsStore: MockStore([
+    'getInitialState',
+    () => ({ all: [{ id: 'email_notification_id', title: 'Email notification' }] }),
+  ]),
 }));
 
 jest.mock('hooks/useAlertAndEventDefinitionData');
@@ -44,10 +47,12 @@ jest.mock('hooks/useAlertAndEventDefinitionData');
 jest.mock('views/logic/Widgets', () => ({
   ...jest.requireActual('views/logic/Widgets'),
   widgetDefinition: () => ({
-    searchTypes: () => [{
-      type: 'AGGREGATION',
-      typeDefinition: {},
-    }],
+    searchTypes: () => [
+      {
+        type: 'AGGREGATION',
+        typeDefinition: {},
+      },
+    ],
   }),
 }));
 
@@ -61,17 +66,18 @@ const setMockedHookCache = ({
   alertId = mockEventData.event.id,
   definitionId = mockEventDefinitionTwoAggregations.id,
   definitionTitle = mockEventDefinitionTwoAggregations.title,
-}) => asMock(useAlertAndEventDefinitionData).mockImplementation(() => ({
-  eventData,
-  eventDefinition,
-  aggregations,
-  isEvent,
-  isEventDefinition,
-  isAlert,
-  alertId,
-  definitionId,
-  definitionTitle,
-}));
+}) =>
+  asMock(useAlertAndEventDefinitionData).mockImplementation(() => ({
+    eventData,
+    eventDefinition,
+    aggregations,
+    isEvent,
+    isEventDefinition,
+    isAlert,
+    alertId,
+    definitionId,
+    definitionTitle,
+  }));
 
 jest.mock('views/logic/slices/highlightSelectors', () => ({
   selectHighlightingRules: jest.fn(),
@@ -87,12 +93,10 @@ describe('<EventInfoBar />', () => {
   useViewsPlugin();
 
   beforeAll(() => {
-    asMock(selectHighlightingRules)
-      .mockReturnValue([
-        HighlightingRule.create('count(field1)', 500, 'greater', StaticColor.create('#fff')),
-        HighlightingRule.create('count(field2)', 8000, 'less', StaticColor.create('#000')),
-      ],
-      );
+    asMock(selectHighlightingRules).mockReturnValue([
+      HighlightingRule.create('count(field1)', 500, 'greater', StaticColor.create('#fff')),
+      HighlightingRule.create('count(field2)', 8000, 'less', StaticColor.create('#000')),
+    ]);
   });
 
   it('Always shows fields: Priority, Execute search every, Search within, Description, Notifications, Aggregation conditions', async () => {

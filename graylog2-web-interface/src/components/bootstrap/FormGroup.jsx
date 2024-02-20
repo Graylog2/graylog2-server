@@ -57,7 +57,9 @@ const StyledFormGroup = styled(BootstrapFormGroup)(({ theme, validationState }) 
 
         &:focus {
           border-color: ${chroma(border).darken(0.1)};
-          box-shadow: inset 0 1px 1px rgb(0 0 0 / 7.5%), 0 0 6px ${chroma(border).brighten(0.2)};
+          box-shadow:
+            inset 0 1px 1px rgb(0 0 0 / 7.5%),
+            0 0 6px ${chroma(border).brighten(0.2)};
         }
       }
 
@@ -71,7 +73,7 @@ const StyledFormGroup = styled(BootstrapFormGroup)(({ theme, validationState }) 
         color: ${text};
       }
     }
-`;
+  `;
 });
 
 const FormGroup = memo(({ children, validationState, ...props }) => (

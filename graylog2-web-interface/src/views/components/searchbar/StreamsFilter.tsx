@@ -29,10 +29,10 @@ const Container = styled.div`
 `;
 
 type Props = {
-  disabled: boolean,
-  value: Array<string>,
-  streams: Array<{ key: string, value: string }>,
-  onChange: (newStreamIds: Array<string>) => void,
+  disabled: boolean;
+  value: Array<string>;
+  streams: Array<{ key: string; value: string }>;
+  onChange: (newStreamIds: Array<string>) => void;
 };
 
 const StreamsFilter = ({ disabled, value, streams, onChange }: Props) => {
@@ -56,15 +56,17 @@ const StreamsFilter = ({ disabled, value, streams, onChange }: Props) => {
 
   return (
     <Container data-testid="streams-filter" title={placeholder}>
-      <Select placeholder={placeholder}
-              disabled={disabled}
-              inputProps={{ 'aria-label': placeholder }}
-              displayKey="key"
-              inputId="streams-filter"
-              onChange={handleChange}
-              options={options}
-              multi
-              value={selectedStreams} />
+      <Select
+        placeholder={placeholder}
+        disabled={disabled}
+        inputProps={{ 'aria-label': placeholder }}
+        displayKey="key"
+        inputId="streams-filter"
+        onChange={handleChange}
+        options={options}
+        multi
+        value={selectedStreams}
+      />
     </Container>
   );
 };

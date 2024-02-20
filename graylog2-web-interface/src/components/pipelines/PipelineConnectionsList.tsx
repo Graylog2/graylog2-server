@@ -23,12 +23,12 @@ import type { PipelineConnectionsType } from 'stores/pipelines/PipelineConnectio
 import type { Stream } from 'stores/streams/StreamsStore';
 
 type Props = {
-  pipeline: PipelineType,
-  connections: PipelineConnectionsType[],
-  streams: Stream[],
-  streamsFormatter: (streams: Stream[]) => React.ReactNode,
-  noConnectionsMessage?: React.ReactNode,
-}
+  pipeline: PipelineType;
+  connections: PipelineConnectionsType[];
+  streams: Stream[];
+  streamsFormatter: (streams: Stream[]) => React.ReactNode;
+  noConnectionsMessage?: React.ReactNode;
+};
 
 const PipelineConnectionsList = ({ pipeline, connections, streams, streamsFormatter, noConnectionsMessage }: Props) => {
   const streamsUsingPipeline = connections
@@ -38,9 +38,7 @@ const PipelineConnectionsList = ({ pipeline, connections, streams, streamsFormat
     .sort((s1, s2) => naturalSort(s1.title, s2.title));
 
   return (
-    <span>
-      {streamsUsingPipeline.length === 0 ? noConnectionsMessage : streamsFormatter(streamsUsingPipeline)}
-    </span>
+    <span>{streamsUsingPipeline.length === 0 ? noConnectionsMessage : streamsFormatter(streamsUsingPipeline)}</span>
   );
 };
 

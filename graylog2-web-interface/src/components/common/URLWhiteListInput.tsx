@@ -26,19 +26,30 @@ import ToolsStore from 'stores/tools/ToolsStore';
 import { triggerInput } from 'util/FormsUtils';
 
 type Props = {
-  label: string,
-  onChange: (event: SyntheticEvent<EventTarget>) => void,
-  validationMessage: string,
-  validationState: string,
-  url: string,
-  onValidationChange?: (validationState: string) => void,
-  labelClassName: string,
-  wrapperClassName: string,
-  urlType: React.ComponentProps<typeof URLWhiteListFormModal>['urlType'],
-  autofocus: boolean,
+  label: string;
+  onChange: (event: SyntheticEvent<EventTarget>) => void;
+  validationMessage: string;
+  validationState: string;
+  url: string;
+  onValidationChange?: (validationState: string) => void;
+  labelClassName: string;
+  wrapperClassName: string;
+  urlType: React.ComponentProps<typeof URLWhiteListFormModal>['urlType'];
+  autofocus: boolean;
 };
 
-const URLWhiteListInput = ({ label, onChange, validationMessage, validationState, url, onValidationChange, labelClassName, wrapperClassName, urlType, autofocus }: Props) => {
+const URLWhiteListInput = ({
+  label,
+  onChange,
+  validationMessage,
+  validationState,
+  url,
+  onValidationChange,
+  labelClassName,
+  wrapperClassName,
+  urlType,
+  autofocus,
+}: Props) => {
   const [isWhitelisted, setIsWhitelisted] = useState(false);
   const [currentValidationState, setCurrentValidationState] = useState(validationState);
   const [ownValidationMessage, setOwnValidationMessage] = useState(validationMessage);
@@ -47,7 +58,9 @@ const URLWhiteListInput = ({ label, onChange, validationMessage, validationState
     // eslint-disable-next-line no-template-curly-in-string
     const keyWildcard = '${key}';
 
-    return type && type === 'regex' && isValidURL(typedUrl) ? ToolsStore.urlWhiteListGenerateRegex(typedUrl, keyWildcard) : typedUrl;
+    return type && type === 'regex' && isValidURL(typedUrl)
+      ? ToolsStore.urlWhiteListGenerateRegex(typedUrl, keyWildcard)
+      : typedUrl;
   };
 
   const [suggestedUrl, setSuggestedUrl] = useState(url);
@@ -107,24 +120,35 @@ const URLWhiteListInput = ({ label, onChange, validationMessage, validationState
     return () => clearTimeout(timer);
   }, [url, validationState, checkIsWhitelisted]);
 
-  const addButton = isWhitelistError() && !isWhitelisted ? <URLWhiteListFormModal newUrlEntry={suggestedUrl} onUpdate={onUpdate} urlType={urlType} /> : '';
-  const helpMessage = <>{validationState === null ? ownValidationMessage : validationMessage} {addButton}</>;
+  const addButton =
+    isWhitelistError() && !isWhitelisted ? (
+      <URLWhiteListFormModal newUrlEntry={suggestedUrl} onUpdate={onUpdate} urlType={urlType} />
+    ) : (
+      ''
+    );
+  const helpMessage = (
+    <>
+      {validationState === null ? ownValidationMessage : validationMessage} {addButton}
+    </>
+  );
   const bsStyle = currentValidationState === '' ? null : currentValidationState;
 
   return (
-    <Input type="text"
-           id="url"
-           name="url"
-           label={label}
-           ref={urlInputRef}
-           autoFocus={autofocus}
-           required
-           onChange={onChange}
-           help={helpMessage}
-           bsStyle={bsStyle}
-           value={url}
-           labelClassName={labelClassName}
-           wrapperClassName={wrapperClassName} />
+    <Input
+      type="text"
+      id="url"
+      name="url"
+      label={label}
+      ref={urlInputRef}
+      autoFocus={autofocus}
+      required
+      onChange={onChange}
+      help={helpMessage}
+      bsStyle={bsStyle}
+      value={url}
+      labelClassName={labelClassName}
+      wrapperClassName={wrapperClassName}
+    />
   );
 };
 
@@ -133,10 +157,7 @@ URLWhiteListInput.propTypes = {
   label: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
   validationState: PropTypes.string,
-  validationMessage: PropTypes.oneOfType([
-    PropTypes.object,
-    PropTypes.string,
-  ]),
+  validationMessage: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
   url: PropTypes.string,
   onValidationChange: PropTypes.func,
   labelClassName: PropTypes.string,

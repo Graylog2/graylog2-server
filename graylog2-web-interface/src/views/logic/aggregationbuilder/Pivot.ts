@@ -18,23 +18,23 @@ import type { TimeUnits } from 'views/Constants';
 import { DEFAULT_PIVOT_LIMIT } from 'views/Constants';
 
 export type AutoTimeConfig = {
-  type: 'auto',
-  scaling: number,
+  type: 'auto';
+  scaling: number;
 };
 
 export type TimeUnitConfig = {
-  type: 'timeunit',
-  value: number,
-  unit: keyof typeof TimeUnits,
+  type: 'timeunit';
+  value: number;
+  unit: keyof typeof TimeUnits;
 };
 
 export type TimeConfigType = {
-  interval: AutoTimeConfig | TimeUnitConfig,
+  interval: AutoTimeConfig | TimeUnitConfig;
 };
 
 export type ValuesConfigType = {
-  limit: number,
-  skip_empty_values: boolean,
+  limit: number;
+  skip_empty_values: boolean;
 };
 
 export type PivotConfigType = TimeConfigType | ValuesConfigType;
@@ -42,18 +42,18 @@ export type PivotConfigType = TimeConfigType | ValuesConfigType;
 export const DateType = 'time';
 export const ValuesType = 'values';
 
-export type FieldTypeCategory = typeof DateType | typeof ValuesType
+export type FieldTypeCategory = typeof DateType | typeof ValuesType;
 
 export type PivotJson = {
-  fields: Array<string>,
-  type: string,
-  config: PivotConfigType,
+  fields: Array<string>;
+  type: string;
+  config: PivotConfigType;
 };
 
 type InternalState = {
-  fields: Array<string>,
-  type: string,
-  config: PivotConfigType,
+  fields: Array<string>;
+  type: string;
+  config: PivotConfigType;
 };
 
 const DEFAULT_PIVOT_CONFIG = { limit: DEFAULT_PIVOT_LIMIT, skip_empty_values: false };

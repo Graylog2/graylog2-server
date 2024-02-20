@@ -33,18 +33,20 @@ const Container = styled.div`
   align-items: center;
 `;
 
-const TitleWrap = styled.span<{ $active?: boolean }>(({ $active }) => css`
-  padding-right: ${$active ? '6px' : '0'};
-`);
+const TitleWrap = styled.span<{ $active?: boolean }>(
+  ({ $active }) => css`
+    padding-right: ${$active ? '6px' : '0'};
+  `,
+);
 
 type Props = {
-  active: boolean,
-  allowsClosing?: boolean,
-  id: QueryId,
-  onRemove: () => Promise<void | ViewState>,
-  openEditModal: (title: string) => void,
-  openCopyToDashboardModal: (isOpen: boolean) => void,
-  title: string,
+  active: boolean;
+  allowsClosing?: boolean;
+  id: QueryId;
+  onRemove: () => Promise<void | ViewState>;
+  openEditModal: (title: string) => void;
+  openCopyToDashboardModal: (isOpen: boolean) => void;
+  title: string;
 };
 
 const QueryTitle = ({ active, allowsClosing, id, onRemove, openEditModal, openCopyToDashboardModal, title }: Props) => {
@@ -56,8 +58,10 @@ const QueryTitle = ({ active, allowsClosing, id, onRemove, openEditModal, openCo
     setTitleValue(title);
   }, [title]);
 
-  const _onDuplicate = useCallback(() => dispatch(duplicateQuery(id))
-    .then((queryId) => setDashboardPage(queryId)), [dispatch, id, setDashboardPage]);
+  const _onDuplicate = useCallback(
+    () => dispatch(duplicateQuery(id)).then((queryId) => setDashboardPage(queryId)),
+    [dispatch, id, setDashboardPage],
+  );
 
   return (
     <Container>
@@ -69,11 +73,11 @@ const QueryTitle = ({ active, allowsClosing, id, onRemove, openEditModal, openCo
         <QueryActionDropdown>
           <MenuItem onSelect={() => openEditModal(titleValue)}>Edit Title</MenuItem>
           <MenuItem onSelect={_onDuplicate}>Duplicate</MenuItem>
-          <MenuItem onSelect={() => openCopyToDashboardModal(true)}>
-            Copy to Dashboard
-          </MenuItem>
+          <MenuItem onSelect={() => openCopyToDashboardModal(true)}>Copy to Dashboard</MenuItem>
           <MenuItem divider />
-          <MenuItem onSelect={onRemove} disabled={!allowsClosing}>Delete</MenuItem>
+          <MenuItem onSelect={onRemove} disabled={!allowsClosing}>
+            Delete
+          </MenuItem>
         </QueryActionDropdown>
       )}
     </Container>

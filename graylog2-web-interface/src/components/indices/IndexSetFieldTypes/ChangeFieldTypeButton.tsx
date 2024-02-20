@@ -22,8 +22,8 @@ import { Button } from 'components/bootstrap';
 import ChangeFieldTypeModal from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldTypeModal';
 
 type Props = {
-  indexSetId: string
-}
+  indexSetId: string;
+};
 
 const ChangeFieldTypeButton = ({ indexSetId }: Props) => {
   const [showModal, setShowModal] = useState(false);
@@ -31,13 +31,17 @@ const ChangeFieldTypeButton = ({ indexSetId }: Props) => {
 
   return (
     <>
-      <Button bsStyle="success" onClick={toggleModal}>Change field type</Button>
+      <Button bsStyle="success" onClick={toggleModal}>
+        Change field type
+      </Button>
       {showModal && (
-        <ChangeFieldTypeModal initialSelectedIndexSets={[indexSetId]}
-                              onClose={toggleModal}
-                              showFieldSelect
-                              show
-                              showSelectionTable={false} />
+        <ChangeFieldTypeModal
+          initialSelectedIndexSets={[indexSetId]}
+          onClose={toggleModal}
+          showFieldSelect
+          show
+          showSelectionTable={false}
+        />
       )}
     </>
   );

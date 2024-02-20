@@ -41,31 +41,41 @@ const DashboardsOverview = () => {
     defaultSort: DEFAULT_LAYOUT.sort,
   });
   const paginationQueryParameter = usePaginationQueryParameter(undefined, layoutConfig.pageSize, false);
-  const searchParams = useMemo(() => ({
-    query,
-    page: paginationQueryParameter.page,
-    pageSize: layoutConfig.pageSize,
-    sort: layoutConfig.sort,
-  }), [layoutConfig.pageSize,
-    layoutConfig.sort,
-    paginationQueryParameter.page,
-    query,
-  ]);
+  const searchParams = useMemo(
+    () => ({
+      query,
+      page: paginationQueryParameter.page,
+      pageSize: layoutConfig.pageSize,
+      sort: layoutConfig.sort,
+    }),
+    [layoutConfig.pageSize, layoutConfig.sort, paginationQueryParameter.page, query],
+  );
   const customColumnRenderers = useColumnRenderers({ searchParams });
-  const { data: paginatedDashboards, isInitialLoading: isLoadingDashboards, refetch } = useDashboards(searchParams, { enabled: !isLoadingLayoutPreferences });
+  const {
+    data: paginatedDashboards,
+    isInitialLoading: isLoadingDashboards,
+    refetch,
+  } = useDashboards(searchParams, { enabled: !isLoadingLayoutPreferences });
   const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(ENTITY_TABLE_ID);
-  const onSearch = useCallback((newQuery: string) => {
-    paginationQueryParameter.resetPage();
-    setQuery(newQuery);
-  }, [paginationQueryParameter, setQuery]);
+  const onSearch = useCallback(
+    (newQuery: string) => {
+      paginationQueryParameter.resetPage();
+      setQuery(newQuery);
+    },
+    [paginationQueryParameter, setQuery],
+  );
 
-  const onColumnsChange = useCallback((displayedAttributes: Array<string>) => {
-    updateTableLayout({ displayedAttributes });
-  }, [updateTableLayout]);
+  const onColumnsChange = useCallback(
+    (displayedAttributes: Array<string>) => {
+      updateTableLayout({ displayedAttributes });
+    },
+    [updateTableLayout],
+  );
 
-  const renderDashboardActions = useCallback((dashboard: View) => (
-    <DashboardActions dashboard={dashboard} refetchDashboards={refetch} />
-  ), [refetch]);
+  const renderDashboardActions = useCallback(
+    (dashboard: View) => <DashboardActions dashboard={dashboard} refetchDashboards={refetch} />,
+    [refetch],
+  );
 
   const onReset = useCallback(() => {
     onSearch('');
@@ -76,10 +86,13 @@ const DashboardsOverview = () => {
     updateTableLayout({ perPage: newPageSize });
   };
 
-  const onSortChange = useCallback((newSort: Sort) => {
-    updateTableLayout({ sort: newSort });
-    paginationQueryParameter.resetPage();
-  }, [paginationQueryParameter, updateTableLayout]);
+  const onSortChange = useCallback(
+    (newSort: Sort) => {
+      updateTableLayout({ sort: newSort });
+      paginationQueryParameter.resetPage();
+    },
+    [paginationQueryParameter, updateTableLayout],
+  );
 
   if (isLoadingDashboards || isLoadingLayoutPreferences) {
     return <Spinner />;
@@ -88,38 +101,36 @@ const DashboardsOverview = () => {
   const { list: dashboards, pagination, attributes } = paginatedDashboards;
 
   return (
-    <PaginatedList pageSize={layoutConfig.pageSize}
-                   showPageSizeSelect={false}
-                   totalItems={pagination.total}>
+    <PaginatedList pageSize={layoutConfig.pageSize} showPageSizeSelect={false} totalItems={pagination.total}>
       <div style={{ marginBottom: 5 }}>
-        <SearchForm onSearch={onSearch}
-                    queryHelpComponent={<QueryHelper entityName="dashboard" commonFields={['id', 'title', 'description', 'summary']} />}
-                    onReset={onReset}
-                    query={query}
-                    topMargin={0} />
+        <SearchForm
+          onSearch={onSearch}
+          queryHelpComponent={
+            <QueryHelper entityName="dashboard" commonFields={['id', 'title', 'description', 'summary']} />
+          }
+          onReset={onReset}
+          query={query}
+          topMargin={0}
+        />
       </div>
-      {!dashboards?.length && !query && (
-        <NoEntitiesExist>
-          No dashboards have been created yet.
-        </NoEntitiesExist>
-      )}
-      {!dashboards?.length && query && (
-        <NoSearchResult>No dashboards have been found.</NoSearchResult>
-      )}
+      {!dashboards?.length && !query && <NoEntitiesExist>No dashboards have been created yet.</NoEntitiesExist>}
+      {!dashboards?.length && query && <NoSearchResult>No dashboards have been found.</NoSearchResult>}
       {!!dashboards?.length && (
-        <EntityDataTable<View> activeSort={layoutConfig.sort}
-                               bulkSelection={{ actions: <BulkActions /> }}
-                               columnDefinitions={attributes}
-                               columnRenderers={customColumnRenderers}
-                               columnsOrder={DEFAULT_LAYOUT.columnsOrder}
-                               data={dashboards}
-                               onColumnsChange={onColumnsChange}
-                               onPageSizeChange={onPageSizeChange}
-                               onSortChange={onSortChange}
-                               pageSize={layoutConfig.pageSize}
-                               rowActions={renderDashboardActions}
-                               actionsCellWidth={160}
-                               visibleColumns={layoutConfig.displayedAttributes} />
+        <EntityDataTable<View>
+          activeSort={layoutConfig.sort}
+          bulkSelection={{ actions: <BulkActions /> }}
+          columnDefinitions={attributes}
+          columnRenderers={customColumnRenderers}
+          columnsOrder={DEFAULT_LAYOUT.columnsOrder}
+          data={dashboards}
+          onColumnsChange={onColumnsChange}
+          onPageSizeChange={onPageSizeChange}
+          onSortChange={onSortChange}
+          pageSize={layoutConfig.pageSize}
+          rowActions={renderDashboardActions}
+          actionsCellWidth={160}
+          visibleColumns={layoutConfig.displayedAttributes}
+        />
       )}
     </PaginatedList>
   );

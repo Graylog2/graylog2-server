@@ -23,7 +23,7 @@ import type { AccountStatus } from './UserOverview';
 
 export type StartPage = {
   id: string;
-  type: 'dashboard' | 'stream' | 'search'
+  type: 'dashboard' | 'stream' | 'search';
 };
 
 export type UserJSON = {
@@ -275,29 +275,31 @@ export default class User {
     } = this._value;
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return new Builder(Immutable.Map({
-      id,
-      username,
-      fullName,
-      firstName,
-      lastName,
-      email,
-      permissions,
-      timezone,
-      grnPermissions,
-      preferences,
-      roles,
-      readOnly,
-      external,
-      sessionTimeoutMs,
-      startpage,
-      sessionActive,
-      clientAddress,
-      lastActivity,
-      accountStatus,
-      serviceAccount,
-      authServiceEnabled,
-    }));
+    return new Builder(
+      Immutable.Map({
+        id,
+        username,
+        fullName,
+        firstName,
+        lastName,
+        email,
+        permissions,
+        timezone,
+        grnPermissions,
+        preferences,
+        roles,
+        readOnly,
+        external,
+        sessionTimeoutMs,
+        startpage,
+        sessionActive,
+        clientAddress,
+        lastActivity,
+        accountStatus,
+        serviceAccount,
+        authServiceEnabled,
+      }),
+    );
   }
 
   static create(
@@ -350,7 +352,24 @@ export default class User {
 
   static empty() {
     // @ts-ignore
-    return User.create('', '', '', '', Immutable.List(), '', {}, Immutable.Set(), false, false, -1, undefined, false, '', '', 'enabled');
+    return User.create(
+      '',
+      '',
+      '',
+      '',
+      Immutable.List(),
+      '',
+      {},
+      Immutable.Set(),
+      false,
+      false,
+      -1,
+      undefined,
+      false,
+      '',
+      '',
+      'enabled',
+    );
   }
 
   toJSON(): UserJSON {

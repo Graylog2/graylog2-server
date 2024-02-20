@@ -19,7 +19,10 @@ import PropTypes from 'prop-types';
 
 import { Spinner } from 'components/common';
 import { CollectorsActions, CollectorsStore } from 'stores/sidecars/CollectorsStore';
-import { CollectorConfigurationsActions, CollectorConfigurationsStore } from 'stores/sidecars/CollectorConfigurationsStore';
+import {
+  CollectorConfigurationsActions,
+  CollectorConfigurationsStore,
+} from 'stores/sidecars/CollectorConfigurationsStore';
 import withTelemetry from 'logic/telemetry/withTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import connect from 'stores/connect';
@@ -60,12 +63,11 @@ class ConfigurationListContainer extends React.Component {
       app_section: 'configuration',
     });
 
-    CollectorConfigurationsActions.copyConfiguration(configuration, name)
-      .then((response) => {
-        callback();
+    CollectorConfigurationsActions.copyConfiguration(configuration, name).then((response) => {
+      callback();
 
-        return response;
-      });
+      return response;
+    });
   };
 
   render() {
@@ -77,16 +79,18 @@ class ConfigurationListContainer extends React.Component {
     }
 
     return (
-      <ConfigurationList collectors={collectors}
-                         query={configurations.query}
-                         pagination={configurations.pagination}
-                         total={configurations.total}
-                         configurations={configurations.paginatedConfigurations}
-                         onPageChange={this.handlePageChange}
-                         onQueryChange={this.handleQueryChange}
-                         onClone={this.handleClone}
-                         onDelete={handleDelete}
-                         validateConfiguration={validateConfiguration} />
+      <ConfigurationList
+        collectors={collectors}
+        query={configurations.query}
+        pagination={configurations.pagination}
+        total={configurations.total}
+        configurations={configurations.paginatedConfigurations}
+        onPageChange={this.handlePageChange}
+        onQueryChange={this.handleQueryChange}
+        onClone={this.handleClone}
+        onDelete={handleDelete}
+        validateConfiguration={validateConfiguration}
+      />
     );
   }
 }
@@ -103,10 +107,16 @@ ConfigurationListContainer.defaultProps = {
   sendTelemetry: () => {},
 };
 
-export default withTelemetry(connect(ConfigurationListContainer, {
-  configurations: CollectorConfigurationsStore,
-  collectorsState: CollectorsStore,
-}, ({ configurations, collectorsState }) => ({
-  collectors: collectorsState.collectors,
-  configurations,
-})));
+export default withTelemetry(
+  connect(
+    ConfigurationListContainer,
+    {
+      configurations: CollectorConfigurationsStore,
+      collectorsState: CollectorsStore,
+    },
+    ({ configurations, collectorsState }) => ({
+      collectors: collectorsState.collectors,
+      configurations,
+    }),
+  ),
+);

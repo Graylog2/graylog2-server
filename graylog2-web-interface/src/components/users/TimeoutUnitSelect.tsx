@@ -33,9 +33,7 @@ const OPTIONS = [
 ];
 
 const TimeoutUnitSelect = (props) => (
-  <TimeoutSelect {...props}
-                 inputProps={{ 'aria-label': 'Timeout unit' }}
-                 options={OPTIONS} />
+  <TimeoutSelect {...props} inputProps={{ 'aria-label': 'Timeout unit' }} options={OPTIONS} />
 );
 
 export default TimeoutUnitSelect;

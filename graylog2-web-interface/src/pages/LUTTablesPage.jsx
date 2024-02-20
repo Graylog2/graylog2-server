@@ -51,8 +51,12 @@ class LUTTablesPage extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    const { location: { pathname } } = this.props;
-    const { location: { pathname: prevPathname } } = prevProps;
+    const {
+      location: { pathname },
+    } = this.props;
+    const {
+      location: { pathname: prevPathname },
+    } = prevProps;
 
     if (pathname !== prevPathname) {
       this._loadData(this.props);
@@ -136,49 +140,52 @@ class LUTTablesPage extends React.Component {
           <Row className="content">
             <Col lg={8}>
               <h2>Lookup Table</h2>
-              <LookupTableForm table={table}
-                               create={false}
-                               saved={saved}
-                               validate={_validateTable}
-                               validationErrors={validationErrors} />
+              <LookupTableForm
+                table={table}
+                create={false}
+                saved={saved}
+                validate={_validateTable}
+                validationErrors={validationErrors}
+              />
             </Col>
           </Row>
         );
       } else {
-        content = (
-          <LookupTableView dataAdapter={dataAdapter}
-                           cache={cache}
-                           table={table} />
-        );
+        content = <LookupTableView dataAdapter={dataAdapter} cache={cache} table={table} />;
       }
     } else if (_isCreating(this.props)) {
-      content = (
-        <LookupTableCreate saved={saved}
-                           validate={_validateTable}
-                           validationErrors={validationErrors} />
-      );
+      content = <LookupTableCreate saved={saved} validate={_validateTable} validationErrors={validationErrors} />;
     } else if (!tables) {
       content = <Spinner text="Loading lookup tables" />;
     } else {
       content = (
-        <LookupTablesOverview tables={tables}
-                              caches={caches}
-                              dataAdapters={dataAdapters}
-                              pagination={pagination}
-                              errorStates={errorStates} />
+        <LookupTablesOverview
+          tables={tables}
+          caches={caches}
+          dataAdapters={dataAdapters}
+          pagination={pagination}
+          errorStates={errorStates}
+        />
       );
     }
 
     return (
       <DocumentTitle title="Lookup Tables">
         <LUTPageNavigation />
-        <PageHeader title="Lookup Tables"
-                    actions={(
-                      <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CREATE}>
-                        <Button bsStyle="success" style={{ marginLeft: 5 }}>Create lookup table</Button>
-                      </LinkContainer>
-                      )}>
-          <span>Lookup tables can be used in extractors, converters and processing pipelines to translate message fields or to enrich messages.</span>
+        <PageHeader
+          title="Lookup Tables"
+          actions={
+            <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CREATE}>
+              <Button bsStyle="success" style={{ marginLeft: 5 }}>
+                Create lookup table
+              </Button>
+            </LinkContainer>
+          }
+        >
+          <span>
+            Lookup tables can be used in extractors, converters and processing pipelines to translate message fields or
+            to enrich messages.
+          </span>
         </PageHeader>
 
         {content}
@@ -217,7 +224,11 @@ LUTTablesPage.defaultProps = {
   action: undefined,
 };
 
-export default connect(withHistory(withParams(withLocation(withPaginationQueryParameter(LUTTablesPage)))), { lookupTableStore: LookupTablesStore }, ({ lookupTableStore, ...otherProps }) => ({
-  ...otherProps,
-  ...lookupTableStore,
-}));
+export default connect(
+  withHistory(withParams(withLocation(withPaginationQueryParameter(LUTTablesPage)))),
+  { lookupTableStore: LookupTablesStore },
+  ({ lookupTableStore, ...otherProps }) => ({
+    ...otherProps,
+    ...lookupTableStore,
+  }),
+);

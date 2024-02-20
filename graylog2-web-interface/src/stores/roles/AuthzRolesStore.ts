@@ -33,8 +33,8 @@ import UserOverview from 'logic/users/UserOverview';
 import type { PaginatedListJSON, Pagination } from 'stores/PaginationTypes';
 
 export type PaginatedRolesResponse = PaginatedListJSON & {
-  roles: Array<RoleJSON>,
-  context?: RoleContext,
+  roles: Array<RoleJSON>;
+  context?: RoleContext;
 };
 
 const _responseToPaginatedList = ({
@@ -74,9 +74,8 @@ const encodeApiUrl = (apiRoute: (...args: Array<string>) => { url: string }, uri
   return apiRoute(...encodedUriParams).url;
 };
 
-const AuthzRolesStore: Store<{}> = singletonStore(
-  'AuthzRoles',
-  () => Reflux.createStore({
+const AuthzRolesStore: Store<{}> = singletonStore('AuthzRoles', () =>
+  Reflux.createStore({
     listenables: [AuthzRolesActions],
 
     load(roleId: $PropertyType<Role, 'id'>): Promise<Role> {
@@ -115,16 +114,11 @@ const AuthzRolesStore: Store<{}> = singletonStore(
       return promise;
     },
 
-    loadUsersForRole(roleId: string, _roleName: string, {
-      page,
-      perPage,
-      query,
-    }: Pagination): Promise<PaginatedUsers> {
+    loadUsersForRole(roleId: string, _roleName: string, { page, perPage, query }: Pagination): Promise<PaginatedUsers> {
       const apiUrl = encodeApiUrl(ApiRoutes.AuthzRolesController.loadUsersForRole, [roleId]);
       const url = PaginationURL(apiUrl, page, perPage, query);
 
-      const promise = fetch('GET', qualifyUrl(url))
-        .then(_responseToPaginatedUserList);
+      const promise = fetch('GET', qualifyUrl(url)).then(_responseToPaginatedUserList);
 
       AuthzRolesActions.loadUsersForRole.promise(promise);
 
@@ -135,8 +129,7 @@ const AuthzRolesStore: Store<{}> = singletonStore(
       const apiUrl = encodeApiUrl(ApiRoutes.AuthzRolesController.loadRolesForUser, [username]);
       const url = PaginationURL(apiUrl, page, perPage, query);
 
-      const promise = fetch('GET', qualifyUrl(url))
-        .then(_responseToPaginatedList);
+      const promise = fetch('GET', qualifyUrl(url)).then(_responseToPaginatedList);
 
       AuthzRolesActions.loadRolesForUser.promise(promise);
 
@@ -147,8 +140,7 @@ const AuthzRolesStore: Store<{}> = singletonStore(
       const apiUrl = encodeApiUrl(ApiRoutes.AuthzRolesController.list);
       const url = PaginationURL(apiUrl, page, perPage, query);
 
-      const promise = fetch('GET', qualifyUrl(url))
-        .then(_responseToPaginatedList);
+      const promise = fetch('GET', qualifyUrl(url)).then(_responseToPaginatedList);
 
       AuthzRolesActions.loadRolesPaginated.promise(promise);
 

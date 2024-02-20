@@ -28,10 +28,7 @@ const BulkActionsDropdown = ({ children }: PropsWithChildren) => {
   const cancelEntitySelection = useCallback(() => setSelectedEntities([]), [setSelectedEntities]);
 
   return (
-    <DropdownButton bsSize="small"
-                    title="Bulk actions"
-                    id="bulk-actions-dropdown"
-                    disabled={!selectedEntities?.length}>
+    <DropdownButton bsSize="small" title="Bulk actions" id="bulk-actions-dropdown" disabled={!selectedEntities?.length}>
       {children}
       {Boolean(React.Children.count(children)) && <MenuItem divider />}
       <MenuItem onClick={cancelEntitySelection}>Cancel selection</MenuItem>

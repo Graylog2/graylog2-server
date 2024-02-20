@@ -25,7 +25,7 @@ import Button from 'components/bootstrap/Button';
 import AppConfig from 'util/AppConfig';
 
 interface Props {
-  readFromConfig?: boolean,
+  readFromConfig?: boolean;
 }
 
 const FlexWrap = styled.div`
@@ -39,11 +39,13 @@ const ShortContent = styled.p`
   font-weight: bold;
 `;
 
-const LongContent = styled.div<{ $visible: boolean}>(({ $visible }) => css`
-  white-space: pre-wrap;
-  display: ${$visible ? 'block' : 'none'};
-  padding-top: 12px;
-`);
+const LongContent = styled.div<{ $visible: boolean }>(
+  ({ $visible }) => css`
+    white-space: pre-wrap;
+    display: ${$visible ? 'block' : 'none'};
+    padding-top: 12px;
+  `,
+);
 
 const StyledAlert = styled(Alert)`
   margin-bottom: 6px;
@@ -75,34 +77,45 @@ const PublicNotifications = ({ readFromConfig }: Props) => {
     return null;
   }
 
-  const publicNotifications = Object.keys(allNotification).map((notificationId) => {
-    if (dismissedNotifications?.has(notificationId)) {
-      return null;
-    }
+  const publicNotifications = Object.keys(allNotification)
+    .map((notificationId) => {
+      if (dismissedNotifications?.has(notificationId)) {
+        return null;
+      }
 
-    const toggleReadMore = () => {
-      setShowReadMore(showReadMore ? undefined : notificationId);
-    };
+      const toggleReadMore = () => {
+        setShowReadMore(showReadMore ? undefined : notificationId);
+      };
 
-    const notification = allNotification[notificationId];
-    const { variant, hiddenTitle, isActive, isDismissible, title, shortMessage, longMessage } = notification;
+      const notification = allNotification[notificationId];
+      const { variant, hiddenTitle, isActive, isDismissible, title, shortMessage, longMessage } = notification;
 
-    if (!isActive) {
-      return null;
-    }
+      if (!isActive) {
+        return null;
+      }
 
-    const _dismiss = () => onDismissPublicNotification(notificationId);
+      const _dismiss = () => onDismissPublicNotification(notificationId);
 
-    return (
-      <StyledAlert bsStyle={variant} onDismiss={isDismissible ? _dismiss : undefined} key={title} title={!hiddenTitle && title}>
-        <FlexWrap>
-          <ShortContent>{shortMessage}</ShortContent>
-          {longMessage && <Button bsStyle="link" onClick={toggleReadMore}>Read {showReadMore === notificationId ? 'Less' : 'More'}</Button>}
-        </FlexWrap>
-        {longMessage && <LongContent $visible={showReadMore === notificationId}>{longMessage}</LongContent>}
-      </StyledAlert>
-    );
-  }).filter((a) => a);
+      return (
+        <StyledAlert
+          bsStyle={variant}
+          onDismiss={isDismissible ? _dismiss : undefined}
+          key={title}
+          title={!hiddenTitle && title}
+        >
+          <FlexWrap>
+            <ShortContent>{shortMessage}</ShortContent>
+            {longMessage && (
+              <Button bsStyle="link" onClick={toggleReadMore}>
+                Read {showReadMore === notificationId ? 'Less' : 'More'}
+              </Button>
+            )}
+          </FlexWrap>
+          {longMessage && <LongContent $visible={showReadMore === notificationId}>{longMessage}</LongContent>}
+        </StyledAlert>
+      );
+    })
+    .filter((a) => a);
 
   if (publicNotifications.length) {
     return <Wrapper>{publicNotifications}</Wrapper>;

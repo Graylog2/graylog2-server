@@ -18,14 +18,14 @@ import * as Immutable from 'immutable';
 
 import VisualizationConfig from './VisualizationConfig';
 
-export type PinnedColumns = Array<string>
+export type PinnedColumns = Array<string>;
 
 export type DataTableVisualizationConfigType = {
-  pinnedColumns: PinnedColumns,
+  pinnedColumns: PinnedColumns;
 };
 
 export type DataTableVisualizationConfigTypeJSON = {
-  pinned_columns: PinnedColumns,
+  pinned_columns: PinnedColumns;
 };
 
 export default class DataTableVisualizationConfig extends VisualizationConfig {

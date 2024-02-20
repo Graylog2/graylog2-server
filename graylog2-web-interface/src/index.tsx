@@ -48,12 +48,12 @@ PluginStore.register(new PluginManifest({}, SecurityBindings));
 const appContainer = document.querySelector('div#app-root');
 const root = createRoot(appContainer);
 
-root.render((
+root.render(
   <CustomizationProvider>
     <TelemetryInit>
       <LoginQueryClientProvider>
         <AppFacade />
       </LoginQueryClientProvider>
     </TelemetryInit>
-  </CustomizationProvider>
-));
+  </CustomizationProvider>,
+);

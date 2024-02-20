@@ -21,13 +21,18 @@ import useIsMountedRef from './useIsMountedRef';
 
 describe('useIsMountedRef', () => {
   it('should be true after mount', () => {
-    const { result: { current: isMountedRef } } = renderHook(useIsMountedRef);
+    const {
+      result: { current: isMountedRef },
+    } = renderHook(useIsMountedRef);
 
     expect(isMountedRef.current).toEqual(true);
   });
 
   it('should be false after unmount', () => {
-    const { unmount, result: { current: isMountedRef } } = renderHook(useIsMountedRef);
+    const {
+      unmount,
+      result: { current: isMountedRef },
+    } = renderHook(useIsMountedRef);
 
     expect(isMountedRef.current).toEqual(true);
 

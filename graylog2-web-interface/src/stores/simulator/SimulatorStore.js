@@ -23,16 +23,14 @@ import MessageFormatter from 'logic/message/MessageFormatter';
 import ObjectUtils from 'util/ObjectUtils';
 import { singletonStore, singletonActions } from 'logic/singleton';
 
-export const SimulatorActions = singletonActions(
-  'core.Simulator',
-  () => Reflux.createActions({
+export const SimulatorActions = singletonActions('core.Simulator', () =>
+  Reflux.createActions({
     simulate: { asyncResult: true },
   }),
 );
 
-export const SimulatorStore = singletonStore(
-  'core.Simulator',
-  () => Reflux.createStore({
+export const SimulatorStore = singletonStore('core.Simulator', () =>
+  Reflux.createStore({
     listenables: [SimulatorActions],
 
     simulate(stream, messageFields, inputId) {

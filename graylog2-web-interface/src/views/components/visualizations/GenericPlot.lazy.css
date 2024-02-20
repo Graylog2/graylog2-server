@@ -1,7 +1,7 @@
 div.plotly-notifier {
-    visibility: hidden;
+  visibility: hidden;
 }
 
 :local(.customPopover) .popover-content {
-    padding: 0;
+  padding: 0;
 }

@@ -30,8 +30,8 @@ import { Button } from 'components/bootstrap';
 import { Select, ErrorAlert } from 'components/common';
 
 type Props = {
-  onSubmit: (user: Immutable.Set<UserOverview>) => Promise<PaginatedListType | null | undefined>,
-  role: Role,
+  onSubmit: (user: Immutable.Set<UserOverview>) => Promise<PaginatedListType | null | undefined>;
+  role: Role;
 };
 
 const SubmitButton = styled(Button)`
@@ -42,19 +42,21 @@ const FormElements = styled.div`
   display: flex;
 `;
 
-const Errors = styled.div(({ theme }) => css`
-  width: 100%;
-  margin-top: 3px;
-  color: ${theme.colors.variant.danger};
+const Errors = styled.div(
+  ({ theme }) => css`
+    width: 100%;
+    margin-top: 3px;
+    color: ${theme.colors.variant.danger};
 
-  > * {
-    margin-right: 5px;
+    > * {
+      margin-right: 5px;
 
-    &:last-child {
-      margin-right: 0;
+      &:last-child {
+        margin-right: 0;
+      }
     }
-  }
-`);
+  `,
+);
 
 const SelectOption = styled.div`
   display: flex;
@@ -65,9 +67,7 @@ const StyledSelect = styled(Select)`
   flex: 1;
 `;
 
-const _renderOption = ({ label }: { label: string }) => (
-  <SelectOption>{label}</SelectOption>
-);
+const _renderOption = ({ label }: { label: string }) => <SelectOption>{label}</SelectOption>;
 
 const _isRequired = (field) => (value) => (!value ? `The ${field} is required` : undefined);
 
@@ -79,16 +79,15 @@ const UsersSelector = ({ role, onSubmit }: Props) => {
   const _loadUsers = useCallback(() => {
     const getUnlimited = { page: 1, perPage: 0, query: '' };
 
-    UsersDomain.loadUsersPaginated(getUnlimited)
-      .then((paginatedUsers) => {
-        const resultUsers = paginatedUsers.list
-          .filter((u) => !u.roles.includes(role.name))
-          .map((u) => ({ label: u.name, value: u.name }))
-          .toArray();
+    UsersDomain.loadUsersPaginated(getUnlimited).then((paginatedUsers) => {
+      const resultUsers = paginatedUsers.list
+        .filter((u) => !u.roles.includes(role.name))
+        .map((u) => ({ label: u.name, value: u.name }))
+        .toArray();
 
-        setOptions(resultUsers);
-        setUsers(paginatedUsers.list);
-      });
+      setOptions(resultUsers);
+      setUsers(paginatedUsers.list);
+    });
   }, [role]);
 
   const onUpdate = ({ user }: { user: string }, { resetForm }) => {
@@ -97,16 +96,22 @@ const UsersSelector = ({ role, onSubmit }: Props) => {
     }
 
     const newUsers = user.split(',');
-    const userOverview: Immutable.Set<UserOverview> = Immutable.Set(compact(newUsers.map((newUser) => users.find((u) => u.username === newUser))));
+    const userOverview: Immutable.Set<UserOverview> = Immutable.Set(
+      compact(newUsers.map((newUser) => users.find((u) => u.username === newUser))),
+    );
 
     if (!userOverview) {
-      setError(`This is an exceptional error! Unable to find user with name ${user} in ${users.map((u) => u.username).join(', ')}`);
+      setError(
+        `This is an exceptional error! Unable to find user with name ${user} in ${users.map((u) => u.username).join(', ')}`,
+      );
 
       return;
     }
 
     setError(undefined);
-    onSubmit(userOverview).then(() => { resetForm(); });
+    onSubmit(userOverview).then(() => {
+      resetForm();
+    });
   };
 
   useEffect(() => {
@@ -126,28 +131,26 @@ const UsersSelector = ({ role, onSubmit }: Props) => {
       <ErrorAlert onClose={setError} runtimeError>
         {error}
       </ErrorAlert>
-      <Formik onSubmit={onUpdate}
-              initialValues={{ user: undefined }}>
+      <Formik onSubmit={onUpdate} initialValues={{ user: undefined }}>
         {({ isSubmitting, isValid, errors }) => (
           <Form>
             <FormElements>
               <Field name="user" validate={_isRequired('user')}>
                 {({ field: { name, value, onChange } }) => (
-                  <StyledSelect inputProps={{ 'aria-label': 'Search for users' }}
-                                onChange={(user) => {
-                                  onChange({ target: { value: user, name } });
-                                }}
-                                optionRenderer={_renderOption}
-                                multi
-                                options={options}
-                                placeholder="Search for users"
-                                value={value} />
+                  <StyledSelect
+                    inputProps={{ 'aria-label': 'Search for users' }}
+                    onChange={(user) => {
+                      onChange({ target: { value: user, name } });
+                    }}
+                    optionRenderer={_renderOption}
+                    multi
+                    options={options}
+                    placeholder="Search for users"
+                    value={value}
+                  />
                 )}
               </Field>
-              <SubmitButton bsStyle="success"
-                            disabled={isSubmitting || !isValid}
-                            title="Assign User"
-                            type="submit">
+              <SubmitButton bsStyle="success" disabled={isSubmitting || !isValid} title="Assign User" type="submit">
                 Assign User
               </SubmitButton>
             </FormElements>

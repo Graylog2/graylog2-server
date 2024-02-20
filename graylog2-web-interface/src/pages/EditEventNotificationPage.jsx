@@ -50,16 +50,15 @@ class EditEventDefinitionPage extends React.Component {
     const { params, currentUser } = this.props;
 
     if (isPermitted(currentUser.permissions, `eventnotifications:edit:${params.notificationId}`)) {
-      EventNotificationsActions.get(params.notificationId)
-        .then(
-          (notification) => this.setState({ notification: notification }),
-          (error) => {
-            if (error.status === 404) {
-              const { history } = this.props;
-              history.push(Routes.ALERTS.NOTIFICATIONS.LIST);
-            }
-          },
-        );
+      EventNotificationsActions.get(params.notificationId).then(
+        (notification) => this.setState({ notification: notification }),
+        (error) => {
+          if (error.status === 404) {
+            const { history } = this.props;
+            history.push(Routes.ALERTS.NOTIFICATIONS.LIST);
+          }
+        },
+      );
     }
   }
 
@@ -86,15 +85,17 @@ class EditEventDefinitionPage extends React.Component {
     return (
       <DocumentTitle title={`Edit "${notification.title}" Notification`}>
         <EventsPageNavigation />
-        <PageHeader title={`Edit "${notification.title}" Notification`}
-                    actions={<EventNotificationActionLinks notificationId={notification.id} />}
-                    documentationLink={{
-                      title: 'Alerts documentation',
-                      path: DocsHelper.PAGES.ALERTS,
-                    }}>
+        <PageHeader
+          title={`Edit "${notification.title}" Notification`}
+          actions={<EventNotificationActionLinks notificationId={notification.id} />}
+          documentationLink={{
+            title: 'Alerts documentation',
+            path: DocsHelper.PAGES.ALERTS,
+          }}
+        >
           <span>
-            Notifications alert you of any configured Event when they occur. Graylog can send Notifications directly
-            to you or to other systems you use for that purpose.
+            Notifications alert you of any configured Event when they occur. Graylog can send Notifications directly to
+            you or to other systems you use for that purpose.
           </span>
         </PageHeader>
 
@@ -108,6 +109,10 @@ class EditEventDefinitionPage extends React.Component {
   }
 }
 
-export default connect(withHistory(withParams(EditEventDefinitionPage)), {
-  currentUser: CurrentUserStore,
-}, ({ currentUser }) => ({ currentUser: currentUser.currentUser }));
+export default connect(
+  withHistory(withParams(EditEventDefinitionPage)),
+  {
+    currentUser: CurrentUserStore,
+  },
+  ({ currentUser }) => ({ currentUser: currentUser.currentUser }),
+);

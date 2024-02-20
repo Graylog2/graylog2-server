@@ -27,35 +27,37 @@ import Search from '../search/Search';
 
 jest.mock('logic/generateId', () => jest.fn(() => 'dead-beef'));
 
-jest.mock('bson-objectid', () => jest.fn(() => ({
-  toString: jest.fn(() => 'new-search-id'),
-})));
+jest.mock('bson-objectid', () =>
+  jest.fn(() => ({
+    toString: jest.fn(() => 'new-search-id'),
+  })),
+);
 
 jest.mock('../Widgets', () => ({
   widgetDefinition: () => ({ searchTypes: () => [{ type: 'pivot' }] }),
 }));
 
-jest.mock('../SearchType', () => jest.fn(() => ({
-  type: 'pivot',
-  handler: jest.fn(),
-  defaults: {},
-})));
+jest.mock('../SearchType', () =>
+  jest.fn(() => ({
+    type: 'pivot',
+    handler: jest.fn(),
+    defaults: {},
+  })),
+);
 
 jest.mock('views/logic/Widgets', () => ({
   widgetDefinition: jest.fn(() => ({
     defaultHeight: 4,
     defaultWidth: 4,
     type: 'aggregation',
-    searchTypes: jest.fn(() => ([{}])),
+    searchTypes: jest.fn(() => [{}]),
   })),
 }));
 
 const readFixture = (fixtureName: string) => readJsonFixture(__dirname, fixtureName);
 const dashboardFixture = View.fromJSON(readFixture('./MoveWidgetToTab.Dashboard.fixture.json'));
 const searchFixture = Search.fromJSON(readFixture('./MoveWidgetToTab.Search.fixture.json'));
-const dashboard = dashboardFixture.toBuilder()
-  .search(searchFixture)
-  .build();
+const dashboard = dashboardFixture.toBuilder().search(searchFixture).build();
 
 const widgetId = 'b34c3c6f-c49d-41d3-a65a-f746134f8f3e';
 const targetQueryId = '5faea09b-4187-4eda-9d59-7a86d4774c73';
@@ -73,13 +75,10 @@ describe('MoveWidgetToTab', () => {
   });
 
   it('should work when titles are empty', () => {
-    const newStates = dashboard.state.update(
-      sourceQueryId,
-      (query) => query.toBuilder().titles(Immutable.Map()).build(),
+    const newStates = dashboard.state.update(sourceQueryId, (query) =>
+      query.toBuilder().titles(Immutable.Map()).build(),
     );
-    const dashboardWithoutTitles = dashboard.toBuilder()
-      .state(newStates)
-      .build();
+    const dashboardWithoutTitles = dashboard.toBuilder().state(newStates).build();
     const newDashboard = MoveWidgetToTab(widgetId, targetQueryId, dashboardWithoutTitles, false);
 
     expect(newDashboard).toMatchSnapshot();

@@ -19,9 +19,5 @@ import type { TitleProps } from '@mantine/core';
 import { Title as MantineTitle } from '@mantine/core';
 
 type Props = TitleProps;
-const Title = ({ children, ...props }: Props) => (
-  <MantineTitle {...props}>
-    {children}
-  </MantineTitle>
-);
+const Title = ({ children, ...props }: Props) => <MantineTitle {...props}>{children}</MantineTitle>;
 export default Title;

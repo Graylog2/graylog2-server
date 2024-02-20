@@ -21,11 +21,11 @@ import StreamsContext from 'contexts/StreamsContext';
 import UserHasNoStreamAccess from 'pages/UserHasNoStreamAccess';
 
 type Props = {
-  children: React.ReactElement,
+  children: React.ReactElement;
 };
 
 export default ({ children }: Props) => {
   const streams = useContext(StreamsContext);
 
-  return (streams && streams.length > 0 ? children : <UserHasNoStreamAccess />);
+  return streams && streams.length > 0 ? children : <UserHasNoStreamAccess />;
 };

@@ -23,5 +23,5 @@ const ColorPickerExample = createReactClass({
   },
 });
 
-<ColorPickerExample />
+<ColorPickerExample />;
 ```

@@ -27,7 +27,7 @@ import ExternalLink from 'components/common/ExternalLink';
  */
 
 type Props = React.ComponentProps<typeof Button> & {
-  iconClass: React.ComponentProps<typeof ExternalLink>['iconClass']
+  iconClass: React.ComponentProps<typeof ExternalLink>['iconClass'];
 };
 const ExternalLinkButton = ({ iconClass, children, ...props }: Props) => (
   <Button {...props}>

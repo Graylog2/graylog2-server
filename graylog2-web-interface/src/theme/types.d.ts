@@ -22,28 +22,18 @@ import type { Colors, ColorVariants, ThemeColorModes } from 'theme/colors';
 import type { ThemesColors } from './theme-types';
 
 interface CustomizationHooks {
-  useThemeCustomizer: () => ({
-    currentColors: ThemeColorModes,
-    customThemeColors: {},
-    isDefaultColors: boolean,
-    isSaved: boolean,
-    isLoadingCustomColors: boolean,
-    onChangeTheme: ({
-      mode,
-      key,
-      type,
-      hex,
-    }: {
-      mode: ColorScheme,
-      key: string,
-      type: string,
-      hex: string
-    }) => void,
-    onResetTheme: () => Promise,
-    onRevertTheme: () => Promise,
-    onSaveTheme: () => Promise,
-  }),
-  useCustomThemeColors: (isInitialLoad?: boolean) => ({ data: ThemesColors, isInitialLoading: boolean })
+  useThemeCustomizer: () => {
+    currentColors: ThemeColorModes;
+    customThemeColors: {};
+    isDefaultColors: boolean;
+    isSaved: boolean;
+    isLoadingCustomColors: boolean;
+    onChangeTheme: ({ mode, key, type, hex }: { mode: ColorScheme; key: string; type: string; hex: string }) => void;
+    onResetTheme: () => Promise;
+    onRevertTheme: () => Promise;
+    onSaveTheme: () => Promise;
+  };
+  useCustomThemeColors: (isInitialLoad?: boolean) => { data: ThemesColors; isInitialLoading: boolean };
 }
 
 interface CustomizationActions {
@@ -52,10 +42,10 @@ interface CustomizationActions {
     mode,
     initialLoad,
   }: {
-    graylogColors: Colors,
-    mode: LegacyColorScheme,
-    initialLoad: boolean
-  }) => Promise,
+    graylogColors: Colors;
+    mode: LegacyColorScheme;
+    initialLoad: boolean;
+  }) => Promise;
 }
 
 interface CustomizationType {
@@ -64,25 +54,25 @@ interface CustomizationType {
 }
 
 export interface Notification {
-  title: string,
-  shortMessage: string,
-  longMessage: string,
-  isActive: boolean,
-  isDismissible: boolean,
-  atLogin: boolean,
-  isGlobal: boolean,
-  variant: ColorVariants,
-  hiddenTitle: boolean,
+  title: string;
+  shortMessage: string;
+  longMessage: string;
+  isActive: boolean;
+  isDismissible: boolean;
+  atLogin: boolean;
+  isGlobal: boolean;
+  variant: ColorVariants;
+  hiddenTitle: boolean;
 }
 type NotificationId = string;
 export type Notifications = { [id: string]: Notification };
 
 export interface PublicNotificationsHooks {
-  usePublicNotifications: () => ({
-    notifications: Notifications,
-    dismissedNotifications: Set<NotificationId>,
-    onDismissPublicNotification: (NotificationId) => void,
-  })
+  usePublicNotifications: () => {
+    notifications: Notifications;
+    dismissedNotifications: Set<NotificationId>;
+    onDismissPublicNotification: (NotificationId) => void;
+  };
 }
 
 interface PublicNotificationsType {

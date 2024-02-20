@@ -104,26 +104,31 @@ const InputListItem = createReactClass({
     const titleSuffix = (
       <span>
         {this.props.input.name}
-        &nbsp;
-        ({this.props.input.id})
-        &nbsp;
+        &nbsp; ({this.props.input.id}) &nbsp;
         <InputStateBadge input={this.props.input} />
       </span>
     );
 
     const actions = [];
-    const queryField = (input.type === 'org.graylog.plugins.forwarder.input.ForwarderServiceInput') ? 'gl2_forwarder_input' : 'gl2_source_input';
+    const queryField =
+      input.type === 'org.graylog.plugins.forwarder.input.ForwarderServiceInput'
+        ? 'gl2_forwarder_input'
+        : 'gl2_source_input';
 
     if (this.isPermitted(this.props.permissions, ['searches:relative'])) {
       actions.push(
-        <LinkContainer key={`received-messages-${this.props.input.id}`}
-                       to={Routes.search(`${queryField}:${this.props.input.id}`, recentMessagesTimeRange())}>
-          <Button onClick={() => {
-            sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.SHOW_RECEIVED_MESSAGES_CLICKED, {
-              app_pathname: getPathnameWithoutId(location.pathname),
-              app_action_value: 'show-received-messages',
-            });
-          }}>
+        <LinkContainer
+          key={`received-messages-${this.props.input.id}`}
+          to={Routes.search(`${queryField}:${this.props.input.id}`, recentMessagesTimeRange())}
+        >
+          <Button
+            onClick={() => {
+              sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.SHOW_RECEIVED_MESSAGES_CLICKED, {
+                app_pathname: getPathnameWithoutId(location.pathname),
+                app_action_value: 'show-received-messages',
+              });
+            }}
+          >
             Show received messages
           </Button>
         </LinkContainer>,
@@ -142,12 +147,14 @@ const InputListItem = createReactClass({
 
         actions.push(
           <LinkContainer key={`manage-extractors-${this.props.input.id}`} to={extractorRoute}>
-            <Button onClick={() => {
-              sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.MANAGE_EXTRACTORS_CLICKED, {
-                app_pathname: getPathnameWithoutId(location.pathname),
-                app_action_value: 'manage-extractors',
-              });
-            }}>
+            <Button
+              onClick={() => {
+                sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.MANAGE_EXTRACTORS_CLICKED, {
+                  app_pathname: getPathnameWithoutId(location.pathname),
+                  app_action_value: 'manage-extractors',
+                });
+              }}
+            >
               Manage extractors
             </Button>
           </LinkContainer>,
@@ -162,13 +169,15 @@ const InputListItem = createReactClass({
     if (!this.props.input.global) {
       showMetricsMenuItem = (
         <LinkContainer to={Routes.filtered_metrics(this.props.input.node, this.props.input.id)}>
-          <MenuItem key={`show-metrics-${this.props.input.id}`}
-                    onClick={() => {
-                      sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.SHOW_METRICS_CLICKED, {
-                        app_pathname: getPathnameWithoutId(location.pathname),
-                        app_action_value: 'show-metrics',
-                      });
-                    }}>
+          <MenuItem
+            key={`show-metrics-${this.props.input.id}`}
+            onClick={() => {
+              sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.SHOW_METRICS_CLICKED, {
+                app_pathname: getPathnameWithoutId(location.pathname),
+                app_action_value: 'show-metrics',
+              });
+            }}
+          >
             Show metrics
           </MenuItem>
         </LinkContainer>
@@ -176,14 +185,18 @@ const InputListItem = createReactClass({
     }
 
     actions.push(
-      <DropdownButton key={`more-actions-${this.props.input.id}`}
-                      title="More actions"
-                      id={`more-actions-dropdown-${this.props.input.id}`}
-                      pullRight>
+      <DropdownButton
+        key={`more-actions-${this.props.input.id}`}
+        title="More actions"
+        id={`more-actions-dropdown-${this.props.input.id}`}
+        pullRight
+      >
         <IfPermitted permissions={`inputs:edit:${this.props.input.id}`}>
-          <MenuItem key={`edit-input-${this.props.input.id}`}
-                    onSelect={this._editInput}
-                    disabled={definition === undefined}>
+          <MenuItem
+            key={`edit-input-${this.props.input.id}`}
+            onSelect={this._editInput}
+            disabled={definition === undefined}
+          >
             Edit input
           </MenuItem>
         </IfPermitted>
@@ -191,8 +204,8 @@ const InputListItem = createReactClass({
         {showMetricsMenuItem}
 
         <IfPermitted permissions={`inputs:edit:${this.props.input.id}`}>
-          <MenuItem key={`add-static-field-${this.props.input.id}`} onSelect={this._openStaticFieldForm}>Add static
-            field
+          <MenuItem key={`add-static-field-${this.props.input.id}`} onSelect={this._openStaticFieldForm}>
+            Add static field
           </MenuItem>
         </IfPermitted>
 
@@ -200,7 +213,9 @@ const InputListItem = createReactClass({
           <MenuItem key={`divider-${this.props.input.id}`} divider />
         </IfPermitted>
         <IfPermitted permissions="inputs:terminate">
-          <MenuItem key={`delete-input-${this.props.input.id}`} onSelect={this._deleteInput}>Delete input</MenuItem>
+          <MenuItem key={`delete-input-${this.props.input.id}`} onSelect={this._deleteInput}>
+            Delete input
+          </MenuItem>
         </IfPermitted>
       </DropdownButton>,
     );
@@ -210,40 +225,45 @@ const InputListItem = createReactClass({
     if (!this.props.input.global && this.props.input.node) {
       subtitle = (
         <span>
-          On node{' '}<LinkToNode nodeId={this.props.input.node} />
+          On node <LinkToNode nodeId={this.props.input.node} />
         </span>
       );
     }
 
-    const inputForm = definition
-      ? (
-        <InputForm ref={(configurationForm) => {
+    const inputForm = definition ? (
+      <InputForm
+        ref={(configurationForm) => {
           this.configurationForm = configurationForm;
         }}
-                   key={`edit-form-input-${input.id}`}
-                   globalValue={input.global}
-                   nodeValue={input.node}
-                   configFields={definition.requested_configuration}
-                   title={`Editing Input ${input.title}`}
-                   titleValue={input.title}
-                   typeName={input.type}
-                   includeTitleField
-                   submitAction={this._updateInput}
-                   submitButtonText="Update input"
-                   values={input.attributes} />
-      ) : null;
+        key={`edit-form-input-${input.id}`}
+        globalValue={input.global}
+        nodeValue={input.node}
+        configFields={definition.requested_configuration}
+        title={`Editing Input ${input.title}`}
+        titleValue={input.title}
+        typeName={input.type}
+        includeTitleField
+        submitAction={this._updateInput}
+        submitButtonText="Update input"
+        values={input.attributes}
+      />
+    ) : null;
 
     const additionalContent = (
       <div>
         <Col md={8}>
-          <ConfigurationWell className="configuration-well"
-                             id={input.id}
-                             configuration={input.attributes}
-                             typeDefinition={definition || {}} />
-          <StaticFieldForm ref={(staticFieldForm) => {
-            this.staticFieldForm = staticFieldForm;
-          }}
-                           input={this.props.input} />
+          <ConfigurationWell
+            className="configuration-well"
+            id={input.id}
+            configuration={input.attributes}
+            typeDefinition={definition || {}}
+          />
+          <StaticFieldForm
+            ref={(staticFieldForm) => {
+              this.staticFieldForm = staticFieldForm;
+            }}
+            input={this.props.input}
+          />
           <InputStaticFields input={this.props.input} />
         </Col>
         <Col md={4}>
@@ -254,13 +274,15 @@ const InputListItem = createReactClass({
     );
 
     return (
-      <EntityListItem key={`entry-list-${this.props.input.id}`}
-                      title={this.props.input.title}
-                      titleSuffix={titleSuffix}
-                      description={subtitle}
-                      createdFromContentPack={!!this.props.input.content_pack}
-                      actions={actions}
-                      contentRow={additionalContent} />
+      <EntityListItem
+        key={`entry-list-${this.props.input.id}`}
+        title={this.props.input.title}
+        titleSuffix={titleSuffix}
+        description={subtitle}
+        createdFromContentPack={!!this.props.input.content_pack}
+        actions={actions}
+        contentRow={additionalContent}
+      />
     );
   },
 });

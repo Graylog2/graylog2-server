@@ -34,21 +34,22 @@ const PluginList = createReactClass({
 
     return (
       <li key={pluginName} className={plugin ? 'text-success' : 'text-danger'}>
-        <Icon name={plugin ? 'check-circle' : 'minus-circle'} />&nbsp;
+        <Icon name={plugin ? 'check-circle' : 'minus-circle'} />
+        &nbsp;
         {this.ENTERPRISE_PLUGINS[pluginName]} is {plugin ? 'installed' : 'not installed'}
       </li>
     );
   },
 
   render() {
-    const enterprisePluginList = Object.keys(this.ENTERPRISE_PLUGINS).map((pluginName) => this._formatPlugin(pluginName));
+    const enterprisePluginList = Object.keys(this.ENTERPRISE_PLUGINS).map((pluginName) =>
+      this._formatPlugin(pluginName),
+    );
 
     return (
       <>
         <p>This is the status of Graylog Enterprise modules in this cluster:</p>
-        <ul className={style.enterprisePlugins}>
-          {enterprisePluginList}
-        </ul>
+        <ul className={style.enterprisePlugins}>{enterprisePluginList}</ul>
       </>
     );
   },

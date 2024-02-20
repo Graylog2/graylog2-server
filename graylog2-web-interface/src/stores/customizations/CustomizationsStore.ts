@@ -26,64 +26,66 @@ import CustomizationActions from 'actions/customizations/CustomizationActions';
 const urlPrefix = ApiRoutes.ClusterConfigResource.config().url;
 
 export type CustomizationsStoreState = {
-  customization: {},
+  customization: {};
 };
 
-const CustomizationStore = singletonStore('customization.store', () => Reflux.createStore<CustomizationsStoreState>({
-  listenables: [CustomizationActions],
+const CustomizationStore = singletonStore('customization.store', () =>
+  Reflux.createStore<CustomizationsStoreState>({
+    listenables: [CustomizationActions],
 
-  customization: {},
+    customization: {},
 
-  getInitialState() {
-    return {
-      customization: this.customization,
-    };
-  },
+    getInitialState() {
+      return {
+        customization: this.customization,
+      };
+    },
 
-  get(type: string) {
-    const promise = fetch('GET', this._url(`/${type}`));
+    get(type: string) {
+      const promise = fetch('GET', this._url(`/${type}`));
 
-    promise.then((response) => {
-      this.customization = { ...this.customization, [type]: response };
-      this.propagateChanges();
-
-      return response;
-    });
-
-    CustomizationActions.get.promise(promise);
-  },
-
-  update(type: string, config: {}) {
-    const promise = fetch('PUT', this._url(`/${type}`), config);
-
-    promise.then(
-      (response) => {
+      promise.then((response) => {
         this.customization = { ...this.customization, [type]: response };
         this.propagateChanges();
 
         return response;
-      },
-      (error) => {
-        UserNotification.error(`Update failed: ${error}`, `Could not update customization: ${type}`);
-      },
-    );
+      });
 
-    CustomizationActions.update.promise(promise);
-  },
+      CustomizationActions.get.promise(promise);
+    },
 
-  propagateChanges() {
-    this.trigger(this.getState());
-  },
+    update(type: string, config: {}) {
+      const promise = fetch('PUT', this._url(`/${type}`), config);
 
-  getState(): CustomizationsStoreState {
-    return {
-      customization: this.customization,
-    };
-  },
+      promise.then(
+        (response) => {
+          this.customization = { ...this.customization, [type]: response };
+          this.propagateChanges();
 
-  _url(path: string): string {
-    return qualifyUrl(urlPrefix + path);
-  },
-}));
+          return response;
+        },
+        (error) => {
+          UserNotification.error(`Update failed: ${error}`, `Could not update customization: ${type}`);
+        },
+      );
+
+      CustomizationActions.update.promise(promise);
+    },
+
+    propagateChanges() {
+      this.trigger(this.getState());
+    },
+
+    getState(): CustomizationsStoreState {
+      return {
+        customization: this.customization,
+      };
+    },
+
+    _url(path: string): string {
+      return qualifyUrl(urlPrefix + path);
+    },
+  }),
+);
 
 export default CustomizationStore;

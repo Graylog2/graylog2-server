@@ -23,9 +23,8 @@ import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
 
-export const CollectorConfigurationsActions = singletonActions(
-  'core.CollectorConfigurations',
-  () => Reflux.createActions({
+export const CollectorConfigurationsActions = singletonActions('core.CollectorConfigurations', () =>
+  Reflux.createActions({
     all: { asyncResult: true },
     list: { asyncResult: true },
     getConfiguration: { asyncResult: true },
@@ -39,9 +38,8 @@ export const CollectorConfigurationsActions = singletonActions(
   }),
 );
 
-export const CollectorConfigurationsStore = singletonStore(
-  'core.CollectorConfigurations',
-  () => Reflux.createStore({
+export const CollectorConfigurationsStore = singletonStore('core.CollectorConfigurations', () =>
+  Reflux.createStore({
     listenables: [CollectorConfigurationsActions],
     sourceUrl: '/sidecar',
     configurations: undefined,
@@ -90,19 +88,20 @@ export const CollectorConfigurationsStore = singletonStore(
     all() {
       const promise = this._fetchConfigurations({ pageSize: 0 });
 
-      promise
-        .then(
-          (response) => {
-            this.configurations = response.configurations;
-            this.propagateChanges();
+      promise.then(
+        (response) => {
+          this.configurations = response.configurations;
+          this.propagateChanges();
 
-            return response.configurations;
-          },
-          (error) => {
-            UserNotification.error(`Fetching collector configurations failed with status: ${error}`,
-              'Could not retrieve configurations');
-          },
-        );
+          return response.configurations;
+        },
+        (error) => {
+          UserNotification.error(
+            `Fetching collector configurations failed with status: ${error}`,
+            'Could not retrieve configurations',
+          );
+        },
+      );
 
       CollectorConfigurationsActions.all.promise(promise);
     },
@@ -110,28 +109,29 @@ export const CollectorConfigurationsStore = singletonStore(
     list({ query = '', page = 1, pageSize = 10 }) {
       const promise = this._fetchConfigurations({ query: query, page: page, pageSize: pageSize });
 
-      promise
-        .then(
-          (response) => {
-            this.query = response.query;
+      promise.then(
+        (response) => {
+          this.query = response.query;
 
-            this.pagination = {
-              page: response.pagination.page,
-              pageSize: response.pagination.per_page,
-              total: response.pagination.total,
-            };
+          this.pagination = {
+            page: response.pagination.page,
+            pageSize: response.pagination.per_page,
+            total: response.pagination.total,
+          };
 
-            this.total = response.total;
-            this.paginatedConfigurations = response.configurations;
-            this.propagateChanges();
+          this.total = response.total;
+          this.paginatedConfigurations = response.configurations;
+          this.propagateChanges();
 
-            return response.configurations;
-          },
-          (error) => {
-            UserNotification.error(`Fetching collector configurations failed with status: ${error}`,
-              'Could not retrieve configurations');
-          },
-        );
+          return response.configurations;
+        },
+        (error) => {
+          UserNotification.error(
+            `Fetching collector configurations failed with status: ${error}`,
+            'Could not retrieve configurations',
+          );
+        },
+      );
 
       CollectorConfigurationsActions.list.promise(promise);
     },
@@ -183,13 +183,12 @@ export const CollectorConfigurationsStore = singletonStore(
         requestTemplate,
       );
 
-      promise
-        .catch(
-          (error) => {
-            UserNotification.error(`Fetching configuration preview failed with status: ${error}`,
-              'Could not retrieve preview');
-          },
+      promise.catch((error) => {
+        UserNotification.error(
+          `Fetching configuration preview failed with status: ${error}`,
+          'Could not retrieve preview',
         );
+      });
 
       CollectorConfigurationsActions.renderPreview.promise(promise);
     },
@@ -200,15 +199,21 @@ export const CollectorConfigurationsStore = singletonStore(
 
       const promise = fetch(method, url, configuration);
 
-      promise
-        .then((response) => {
+      promise.then(
+        (response) => {
           UserNotification.success('', 'Configuration successfully created');
 
           return response;
-        }, (error) => {
-          UserNotification.error(error.status === 400 ? error.responseMessage : `Creating configuration failed with status: ${error.message}`,
-            'Could not save configuration');
-        });
+        },
+        (error) => {
+          UserNotification.error(
+            error.status === 400
+              ? error.responseMessage
+              : `Creating configuration failed with status: ${error.message}`,
+            'Could not save configuration',
+          );
+        },
+      );
 
       CollectorConfigurationsActions.createConfiguration.promise(promise);
     },
@@ -218,16 +223,20 @@ export const CollectorConfigurationsStore = singletonStore(
 
       const promise = fetch('PUT', url, configuration);
 
-      promise
-        .then((response) => {
+      promise.then(
+        (response) => {
           UserNotification.success('', 'Configuration successfully updated');
           this.refreshList();
 
           return response;
-        }, (error) => {
-          UserNotification.error(`Updating Configuration failed: ${error.status === 400 ? error.responseMessage : error.message}`,
-            `Could not update Configuration ${configuration.name}`);
-        });
+        },
+        (error) => {
+          UserNotification.error(
+            `Updating Configuration failed: ${error.status === 400 ? error.responseMessage : error.message}`,
+            `Could not update Configuration ${configuration.name}`,
+          );
+        },
+      );
 
       CollectorConfigurationsActions.updateConfiguration.promise(promise);
     },
@@ -238,16 +247,20 @@ export const CollectorConfigurationsStore = singletonStore(
 
       const promise = fetch(method, url);
 
-      promise
-        .then((response) => {
+      promise.then(
+        (response) => {
           UserNotification.success('', `Configuration "${name}" successfully copied`);
           this.refreshList();
 
           return response;
-        }, (error) => {
-          UserNotification.error(`Saving configuration "${name}" failed with status: ${error.message}`,
-            'Could not save Configuration');
-        });
+        },
+        (error) => {
+          UserNotification.error(
+            `Saving configuration "${name}" failed with status: ${error.message}`,
+            'Could not save Configuration',
+          );
+        },
+      );
 
       CollectorConfigurationsActions.copyConfiguration.promise(promise);
     },
@@ -256,22 +269,26 @@ export const CollectorConfigurationsStore = singletonStore(
       const url = URLUtils.qualifyUrl(`${this.sourceUrl}/configurations/${configuration.id}`);
       const promise = fetch('DELETE', url);
 
-      promise
-        .then((response) => {
+      promise.then(
+        (response) => {
           UserNotification.success('', `Configuration "${configuration.name}" successfully deleted`);
           this.refreshList();
 
           return response;
-        }, (error) => {
-          UserNotification.error(`Deleting Configuration failed: ${error.status === 400 ? error.responseMessage : error.message}`,
-            `Could not delete Configuration ${configuration.name}`);
-        });
+        },
+        (error) => {
+          UserNotification.error(
+            `Deleting Configuration failed: ${error.status === 400 ? error.responseMessage : error.message}`,
+            `Could not delete Configuration ${configuration.name}`,
+          );
+        },
+      );
 
       CollectorConfigurationsActions.delete.promise(promise);
     },
 
     validate(configuration) {
-    // set minimum api defaults for faster validation feedback
+      // set minimum api defaults for faster validation feedback
       const payload = {
         name: ' ',
         collector_id: ' ',
@@ -283,17 +300,16 @@ export const CollectorConfigurationsStore = singletonStore(
 
       const promise = fetch('POST', URLUtils.qualifyUrl(`${this.sourceUrl}/configurations/validate`), payload);
 
-      promise
-        .then(
-          (response) => response,
-          (error) => (
-            UserNotification.error(`Validating configuration "${payload.name}" failed with status: ${error.message}`,
-              'Could not validate configuration')
+      promise.then(
+        (response) => response,
+        (error) =>
+          UserNotification.error(
+            `Validating configuration "${payload.name}" failed with status: ${error.message}`,
+            'Could not validate configuration',
           ),
-        );
+      );
 
       CollectorConfigurationsActions.validate.promise(promise);
     },
-
   }),
 );

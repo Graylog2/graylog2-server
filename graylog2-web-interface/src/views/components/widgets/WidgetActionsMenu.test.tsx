@@ -67,16 +67,13 @@ const openActionDropdown = async () => {
   await screen.findByRole('heading', { name: 'Actions' });
 };
 
-const waitForDropdownToClose = () => waitFor(() => {
-  expect(screen.queryByRole('heading', { name: 'Actions' })).not.toBeInTheDocument();
-});
+const waitForDropdownToClose = () =>
+  waitFor(() => {
+    expect(screen.queryByRole('heading', { name: 'Actions' })).not.toBeInTheDocument();
+  });
 
 describe('<WidgetActionsMenu />', () => {
-  const widget = WidgetModel.builder().newId()
-    .type('dummy')
-    .id('widget-id')
-    .config({})
-    .build();
+  const widget = WidgetModel.builder().newId().type('dummy').id('widget-id').config({}).build();
 
   const viewState = ViewState.builder()
     .widgets(Immutable.List([widget]))
@@ -93,24 +90,21 @@ describe('<WidgetActionsMenu />', () => {
     .build();
 
   const searchDB1 = Search.builder().id('search-1').build();
-  const dashboard1 = View.builder().type(View.Type.Dashboard).id('view-1').title('view 1')
-    .search(searchDB1)
-    .build();
-  const dashboard2 = View.builder().type(View.Type.Dashboard).id('view-2').title('view 2')
-    .build();
+  const dashboard1 = View.builder().type(View.Type.Dashboard).id('view-1').title('view 1').search(searchDB1).build();
+  const dashboard2 = View.builder().type(View.Type.Dashboard).id('view-2').title('view 2').build();
   const dashboardList = [dashboard1, dashboard2];
 
   type DummyWidgetProps = {
-    view?: View,
-    widget?: WidgetModel,
-    focusedWidget?: WidgetFocusContextType['focusedWidget'],
-    setWidgetFocusing?: WidgetFocusContextType['setWidgetFocusing'],
-    setWidgetEditing?: WidgetFocusContextType['setWidgetEditing'],
-    unsetWidgetFocusing?: WidgetFocusContextType['unsetWidgetFocusing'],
-    unsetWidgetEditing?: WidgetFocusContextType['unsetWidgetEditing'],
-    title?: string
-    isFocused?: boolean,
-  }
+    view?: View;
+    widget?: WidgetModel;
+    focusedWidget?: WidgetFocusContextType['focusedWidget'];
+    setWidgetFocusing?: WidgetFocusContextType['setWidgetFocusing'];
+    setWidgetEditing?: WidgetFocusContextType['setWidgetEditing'];
+    unsetWidgetFocusing?: WidgetFocusContextType['unsetWidgetFocusing'];
+    unsetWidgetEditing?: WidgetFocusContextType['unsetWidgetEditing'];
+    title?: string;
+    isFocused?: boolean;
+  };
 
   const DummyWidget = ({
     view = search,
@@ -124,20 +118,24 @@ describe('<WidgetActionsMenu />', () => {
   }: DummyWidgetProps) => (
     <TestStoreProvider view={view} initialQuery="query-id">
       <FieldTypesContext.Provider value={{ all: Immutable.List(), queryFields: Immutable.Map() }}>
-        <WidgetFocusContext.Provider value={{
-          setWidgetFocusing,
-          setWidgetEditing,
-          unsetWidgetFocusing,
-          unsetWidgetEditing,
-          focusedWidget,
-        }}>
+        <WidgetFocusContext.Provider
+          value={{
+            setWidgetFocusing,
+            setWidgetEditing,
+            unsetWidgetFocusing,
+            unsetWidgetEditing,
+            focusedWidget,
+          }}
+        >
           <WidgetContext.Provider value={propsWidget}>
-            <WidgetActionsMenu isFocused={false}
-                               toggleEdit={() => {}}
-                               title="Widget Title"
-                               position={new WidgetPosition(1, 1, 1, 1)}
-                               onPositionsChange={() => {}}
-                               {...props} />
+            <WidgetActionsMenu
+              isFocused={false}
+              toggleEdit={() => {}}
+              title="Widget Title"
+              position={new WidgetPosition(1, 1, 1, 1)}
+              onPositionsChange={() => {}}
+              {...props}
+            />
           </WidgetContext.Provider>
         </WidgetFocusContext.Provider>
       </FieldTypesContext.Provider>
@@ -188,11 +186,7 @@ describe('<WidgetActionsMenu />', () => {
   });
 
   it('does not display export action if widget is not a message table', async () => {
-    const dummyWidget = WidgetModel.builder()
-      .id('widgetId')
-      .type('dummy')
-      .config({})
-      .build();
+    const dummyWidget = WidgetModel.builder().id('widgetId').type('dummy').config({}).build();
     const { queryByText } = render(<DummyWidget title="Dummy Widget" widget={dummyWidget} />);
 
     await openActionDropdown();
@@ -201,10 +195,7 @@ describe('<WidgetActionsMenu />', () => {
   });
 
   it('allows export for message tables', async () => {
-    const messagesWidget = MessagesWidget.builder()
-      .id('widgetId')
-      .config({})
-      .build();
+    const messagesWidget = MessagesWidget.builder().id('widgetId').config({}).build();
 
     render(<DummyWidget title="Dummy Widget" widget={messagesWidget} />);
 
@@ -242,14 +233,13 @@ describe('<WidgetActionsMenu />', () => {
         refetch: () => {},
       });
 
-      ViewManagementActions.get = mockAction(jest.fn((async () => Promise.resolve(dashboard1.toJSON()))));
+      ViewManagementActions.get = mockAction(jest.fn(async () => Promise.resolve(dashboard1.toJSON())));
       ViewManagementActions.update = mockAction(jest.fn((view) => Promise.resolve(view)));
       asMock(fetchSearch).mockResolvedValue(searchDB1.toJSON());
 
-      asMock(CopyWidgetToDashboard).mockImplementation(() => View.builder()
-        .search(Search.builder().id('search-id').build())
-        .id('new-id').type(View.Type.Dashboard)
-        .build());
+      asMock(CopyWidgetToDashboard).mockImplementation(() =>
+        View.builder().search(Search.builder().id('search-id').build()).id('new-id').type(View.Type.Dashboard).build(),
+      );
 
       asMock(useViewType).mockReturnValue(View.Type.Search);
     });
@@ -290,8 +280,7 @@ describe('<WidgetActionsMenu />', () => {
       await renderAndClick();
       await waitFor(() => expect(createSearch).toHaveBeenCalledTimes(1));
 
-      expect(createSearch).toHaveBeenCalledWith(Search.builder().id('search-id').parameters([]).queries([])
-        .build());
+      expect(createSearch).toHaveBeenCalledWith(Search.builder().id('search-id').parameters([]).queries([]).build());
     });
 
     it('should update dashboard with new search and widget', async () => {
@@ -299,10 +288,7 @@ describe('<WidgetActionsMenu />', () => {
       await waitFor(() => expect(ViewManagementActions.update).toHaveBeenCalledTimes(1));
 
       expect(ViewManagementActions.update).toHaveBeenCalledWith(
-        View.builder()
-          .search(Search.builder().id('search-id').build())
-          .id('new-id').type(View.Type.Dashboard)
-          .build(),
+        View.builder().search(Search.builder().id('search-id').build()).id('new-id').type(View.Type.Dashboard).build(),
       );
     });
 

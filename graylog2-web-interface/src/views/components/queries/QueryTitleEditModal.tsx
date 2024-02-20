@@ -27,12 +27,12 @@ import Input from 'components/bootstrap/Input';
  */
 
 type Props = {
-  onTitleChange: (newTitle: string) => void,
+  onTitleChange: (newTitle: string) => void;
 };
 
 type State = {
-  titleDraft: string,
-  showModal: boolean,
+  titleDraft: string;
+  showModal: boolean;
 };
 
 class QueryTitleEditModal extends React.Component<Props, State> {
@@ -77,22 +77,26 @@ class QueryTitleEditModal extends React.Component<Props, State> {
     const { titleDraft, showModal } = this.state;
 
     return (
-      <BootstrapModalForm show={showModal}
-                          title="Editing dashboard page title"
-                          onSubmitForm={this._onDraftSave}
-                          onCancel={this.close}
-                          submitButtonText="Update title"
-                          bsSize="large">
-        <Input autoFocus
-               help="Enter a helpful dashboard page title. It has a maximum length of 40 characters."
-               id="title"
-               label="Title"
-               name="title"
-               onChange={this._onDraftChange}
-               maxLength={40}
-               required
-               type="text"
-               value={titleDraft} />
+      <BootstrapModalForm
+        show={showModal}
+        title="Editing dashboard page title"
+        onSubmitForm={this._onDraftSave}
+        onCancel={this.close}
+        submitButtonText="Update title"
+        bsSize="large"
+      >
+        <Input
+          autoFocus
+          help="Enter a helpful dashboard page title. It has a maximum length of 40 characters."
+          id="title"
+          label="Title"
+          name="title"
+          onChange={this._onDraftChange}
+          maxLength={40}
+          required
+          type="text"
+          value={titleDraft}
+        />
       </BootstrapModalForm>
     );
   }

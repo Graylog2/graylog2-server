@@ -24,66 +24,68 @@ import styled, { css } from 'styled-components';
 import Icon from './Icon';
 
 type Props = {
-  currentPage: number,
-  totalPages: number,
-  boundaryPagesRange?: number,
-  siblingPagesRange?: number,
-  hideEllipsis?: boolean,
-  hidePreviousAndNextPageLinks?: boolean,
-  hideFirstAndLastPageLinks?: boolean,
-  disabled?: boolean,
-  onChange: (nextPage: number) => void,
+  currentPage: number;
+  totalPages: number;
+  boundaryPagesRange?: number;
+  siblingPagesRange?: number;
+  hideEllipsis?: boolean;
+  hidePreviousAndNextPageLinks?: boolean;
+  hideFirstAndLastPageLinks?: boolean;
+  disabled?: boolean;
+  onChange: (nextPage: number) => void;
 };
 
-const StyledBootstrapPagination = styled(BootstrapPagination)(({ theme }) => css`
-  &.pagination {
-    font-size: ${theme.fonts.size.small};
-    margin-top: 10px;
-    margin-bottom: 0;
+const StyledBootstrapPagination = styled(BootstrapPagination)(
+  ({ theme }) => css`
+    &.pagination {
+      font-size: ${theme.fonts.size.small};
+      margin-top: 10px;
+      margin-bottom: 0;
 
-    > li {
-      > a,
-      > span {
-        color: ${theme.utils.contrastingColor(theme.colors.global.contentBackground)};
-        background-color: ${theme.colors.global.contentBackground};
-        border-color: ${theme.colors.variant.light.default};
-        border-radius: 0;
-
-        &:hover,
-        &:focus {
-          color: ${theme.utils.contrastingColor(theme.colors.variant.lighter.default)};
-          background-color: ${theme.colors.variant.lighter.default};
-          border-color: ${theme.colors.variant.light.default};
-        }
-      }
-
-      &.active > a,
-      &.active > span {
-        &,
-        &:hover,
-        &:focus {
-          color: ${theme.utils.contrastingColor(theme.colors.variant.lightest.info)};
-          background-color: ${theme.colors.variant.lightest.info};
-          border-color: ${theme.colors.variant.lighter.info};
-          z-index: 1;
-        }
-      }
-
-      &.disabled {
+      > li {
         > a,
-        > a:hover,
-        > a:focus,
-        > span,
-        > span:hover,
-        > span:focus {
-          color: ${theme.colors.variant.light.default};
+        > span {
+          color: ${theme.utils.contrastingColor(theme.colors.global.contentBackground)};
           background-color: ${theme.colors.global.contentBackground};
-          border-color: ${theme.colors.variant.lighter.default};
+          border-color: ${theme.colors.variant.light.default};
+          border-radius: 0;
+
+          &:hover,
+          &:focus {
+            color: ${theme.utils.contrastingColor(theme.colors.variant.lighter.default)};
+            background-color: ${theme.colors.variant.lighter.default};
+            border-color: ${theme.colors.variant.light.default};
+          }
+        }
+
+        &.active > a,
+        &.active > span {
+          &,
+          &:hover,
+          &:focus {
+            color: ${theme.utils.contrastingColor(theme.colors.variant.lightest.info)};
+            background-color: ${theme.colors.variant.lightest.info};
+            border-color: ${theme.colors.variant.lighter.info};
+            z-index: 1;
+          }
+        }
+
+        &.disabled {
+          > a,
+          > a:hover,
+          > a:focus,
+          > span,
+          > span:hover,
+          > span:focus {
+            color: ${theme.colors.variant.light.default};
+            background-color: ${theme.colors.global.contentBackground};
+            border-color: ${theme.colors.variant.lighter.default};
+          }
         }
       }
     }
-  }
-`);
+  `,
+);
 
 const UltimatePagination = createUltimatePagination({
   WrapperComponent: StyledBootstrapPagination,
@@ -93,10 +95,7 @@ const UltimatePagination = createUltimatePagination({
       const title = isActive ? 'Active page' : `Open page ${value}`;
 
       return (
-        <BootstrapPagination.Item active={isActive}
-                                  onClick={onClick}
-                                  title={title}
-                                  aria-label={title}>
+        <BootstrapPagination.Item active={isActive} onClick={onClick} title={title} aria-label={title}>
           {value}
         </BootstrapPagination.Item>
       );
@@ -173,16 +172,18 @@ const Pagination = ({
   }
 
   return (
-    <UltimatePagination currentPage={currentPage}
-                        totalPages={totalPages}
-                        boundaryPagesRange={boundaryPagesRange}
-                        siblingPagesRange={siblingPagesRange}
-                        hideEllipsis={hideEllipsis}
-                        hidePreviousAndNextPageLinks={hidePreviousAndNextPageLinks}
-                        hideFirstAndLastPageLinks={hideFirstAndLastPageLinks}
-                        disabled={disabled}
-                        onChange={onChange}
-                        data-testid="graylog-pagination" />
+    <UltimatePagination
+      currentPage={currentPage}
+      totalPages={totalPages}
+      boundaryPagesRange={boundaryPagesRange}
+      siblingPagesRange={siblingPagesRange}
+      hideEllipsis={hideEllipsis}
+      hidePreviousAndNextPageLinks={hidePreviousAndNextPageLinks}
+      hideFirstAndLastPageLinks={hideFirstAndLastPageLinks}
+      disabled={disabled}
+      onChange={onChange}
+      data-testid="graylog-pagination"
+    />
   );
 };
 

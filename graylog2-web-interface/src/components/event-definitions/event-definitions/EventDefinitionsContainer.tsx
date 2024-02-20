@@ -17,7 +17,15 @@
 import * as React from 'react';
 import { useState, useMemo, useCallback } from 'react';
 
-import { EntityDataTable, NoSearchResult, PaginatedList, QueryHelper, RelativeTime, SearchForm, Spinner } from 'components/common';
+import {
+  EntityDataTable,
+  NoSearchResult,
+  PaginatedList,
+  QueryHelper,
+  RelativeTime,
+  SearchForm,
+  Spinner,
+} from 'components/common';
 import type { Sort } from 'stores/PaginationTypes';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import 'components/event-definitions/event-definition-types';
@@ -48,14 +56,11 @@ const customColumnRenderers = (refetchEventDefinitions: () => void): ColumnRende
       ),
     },
     matched_at: {
-      renderCell: (_matched_at: string, eventDefinition) => (
-        eventDefinition.matched_at ? <RelativeTime dateTime={eventDefinition.matched_at} /> : 'Never'
-      ),
+      renderCell: (_matched_at: string, eventDefinition) =>
+        eventDefinition.matched_at ? <RelativeTime dateTime={eventDefinition.matched_at} /> : 'Never',
     },
     scheduling: {
-      renderCell: (_scheduling: string, eventDefinition) => (
-        <SchedulingCell definition={eventDefinition} />
-      ),
+      renderCell: (_scheduling: string, eventDefinition) => <SchedulingCell definition={eventDefinition} />,
     },
     status: {
       renderCell: (_status: string, eventDefinition) => (
@@ -79,7 +84,11 @@ const EventDefinitionsContainer = () => {
   });
   const paginationQueryParameter = usePaginationQueryParameter(undefined, 20);
   const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(ENTITY_TABLE_ID);
-  const { data: paginatedEventDefinitions, refetch: refetchEventDefinitions, isInitialLoading: isLoadingEventDefinitions } = useEventDefinitions({
+  const {
+    data: paginatedEventDefinitions,
+    refetch: refetchEventDefinitions,
+    isInitialLoading: isLoadingEventDefinitions,
+  } = useEventDefinitions({
     query,
     page: paginationQueryParameter.page,
     pageSize: layoutConfig.pageSize,
@@ -87,98 +96,117 @@ const EventDefinitionsContainer = () => {
   });
   const columnRenderers = customColumnRenderers(refetchEventDefinitions);
   const columnDefinitions = useMemo(
-    () => ([...(paginatedEventDefinitions?.attributes ?? []), ...ADDITIONAL_ATTRIBUTES]),
+    () => [...(paginatedEventDefinitions?.attributes ?? []), ...ADDITIONAL_ATTRIBUTES],
     [paginatedEventDefinitions?.attributes],
   );
 
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
 
-  const onSearch = useCallback((newQuery: string) => {
-    paginationQueryParameter.resetPage();
-    setQuery(newQuery);
-  }, [paginationQueryParameter]);
+  const onSearch = useCallback(
+    (newQuery: string) => {
+      paginationQueryParameter.resetPage();
+      setQuery(newQuery);
+    },
+    [paginationQueryParameter],
+  );
 
   const onReset = useCallback(() => {
     onSearch('');
   }, [onSearch]);
 
-  const onColumnsChange = useCallback((displayedAttributes: Array<string>) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_LIST.COLUMNS_CHANGED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'event-definition-list',
-      app_action_value: 'columns-select',
-      columns: displayedAttributes,
-    });
+  const onColumnsChange = useCallback(
+    (displayedAttributes: Array<string>) => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_LIST.COLUMNS_CHANGED, {
+        app_pathname: getPathnameWithoutId(pathname),
+        app_section: 'event-definition-list',
+        app_action_value: 'columns-select',
+        columns: displayedAttributes,
+      });
 
-    updateTableLayout({ displayedAttributes });
-  }, [pathname, sendTelemetry, updateTableLayout]);
+      updateTableLayout({ displayedAttributes });
+    },
+    [pathname, sendTelemetry, updateTableLayout],
+  );
 
-  const onPageSizeChange = useCallback((newPageSize: number) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_LIST.PAGE_SIZE_CHANGED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'event-definition-list',
-      app_action_value: 'page-size-select',
-      page_size: newPageSize,
-    });
+  const onPageSizeChange = useCallback(
+    (newPageSize: number) => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_LIST.PAGE_SIZE_CHANGED, {
+        app_pathname: getPathnameWithoutId(pathname),
+        app_section: 'event-definition-list',
+        app_action_value: 'page-size-select',
+        page_size: newPageSize,
+      });
 
-    paginationQueryParameter.setPagination({ page: 1, pageSize: newPageSize });
-    updateTableLayout({ perPage: newPageSize });
-  }, [paginationQueryParameter, pathname, sendTelemetry, updateTableLayout]);
+      paginationQueryParameter.setPagination({ page: 1, pageSize: newPageSize });
+      updateTableLayout({ perPage: newPageSize });
+    },
+    [paginationQueryParameter, pathname, sendTelemetry, updateTableLayout],
+  );
 
-  const onSortChange = useCallback((newSort: Sort) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_LIST.SORT_CHANGED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'event-definition-list',
-      app_action_value: 'sort-select',
-      sort: newSort,
-    });
+  const onSortChange = useCallback(
+    (newSort: Sort) => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_LIST.SORT_CHANGED, {
+        app_pathname: getPathnameWithoutId(pathname),
+        app_section: 'event-definition-list',
+        app_action_value: 'sort-select',
+        sort: newSort,
+      });
 
-    paginationQueryParameter.resetPage();
-    updateTableLayout({ sort: newSort });
-  }, [paginationQueryParameter, pathname, sendTelemetry, updateTableLayout]);
+      paginationQueryParameter.resetPage();
+      updateTableLayout({ sort: newSort });
+    },
+    [paginationQueryParameter, pathname, sendTelemetry, updateTableLayout],
+  );
 
-  const renderEventDefinitionActions = useCallback((listItem: EventDefinition) => (
-    <EventDefinitionActions eventDefinition={listItem} refetchEventDefinitions={refetchEventDefinitions} />
-  ), [refetchEventDefinitions]);
+  const renderEventDefinitionActions = useCallback(
+    (listItem: EventDefinition) => (
+      <EventDefinitionActions eventDefinition={listItem} refetchEventDefinitions={refetchEventDefinitions} />
+    ),
+    [refetchEventDefinitions],
+  );
 
   if (isLoadingLayoutPreferences || isLoadingEventDefinitions) {
     return <Spinner />;
   }
 
-  const { elements, pagination: { total } } = paginatedEventDefinitions;
+  const {
+    elements,
+    pagination: { total },
+  } = paginatedEventDefinitions;
 
   return (
-    <PaginatedList pageSize={layoutConfig.pageSize}
-                   showPageSizeSelect={false}
-                   totalItems={total}>
+    <PaginatedList pageSize={layoutConfig.pageSize} showPageSizeSelect={false} totalItems={total}>
       <div style={{ marginBottom: 5 }}>
-        <SearchForm onSearch={onSearch}
-                    onReset={onReset}
-                    queryHelpComponent={<QueryHelper entityName="event definition" />} />
+        <SearchForm
+          onSearch={onSearch}
+          onReset={onReset}
+          queryHelpComponent={<QueryHelper entityName="event definition" />}
+        />
       </div>
       <div>
         {elements?.length === 0 ? (
           <NoSearchResult>No Event Definition has been found</NoSearchResult>
         ) : (
-          <EntityDataTable<EventDefinition> data={elements}
-                                            visibleColumns={layoutConfig.displayedAttributes}
-                                            columnsOrder={DEFAULT_LAYOUT.columnsOrder}
-                                            onColumnsChange={onColumnsChange}
-                                            onSortChange={onSortChange}
-                                            onPageSizeChange={onPageSizeChange}
-                                            pageSize={layoutConfig.pageSize}
-                                            bulkSelection={{ actions: <BulkActions /> }}
-                                            activeSort={layoutConfig.sort}
-                                            actionsCellWidth={160}
-                                            rowActions={renderEventDefinitionActions}
-                                            columnRenderers={columnRenderers}
-                                            columnDefinitions={columnDefinitions}
-                                            entityAttributesAreCamelCase={false} />
+          <EntityDataTable<EventDefinition>
+            data={elements}
+            visibleColumns={layoutConfig.displayedAttributes}
+            columnsOrder={DEFAULT_LAYOUT.columnsOrder}
+            onColumnsChange={onColumnsChange}
+            onSortChange={onSortChange}
+            onPageSizeChange={onPageSizeChange}
+            pageSize={layoutConfig.pageSize}
+            bulkSelection={{ actions: <BulkActions /> }}
+            activeSort={layoutConfig.sort}
+            actionsCellWidth={160}
+            rowActions={renderEventDefinitionActions}
+            columnRenderers={columnRenderers}
+            columnDefinitions={columnDefinitions}
+            entityAttributesAreCamelCase={false}
+          />
         )}
       </div>
     </PaginatedList>
-
   );
 };
 

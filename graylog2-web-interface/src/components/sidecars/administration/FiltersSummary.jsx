@@ -55,7 +55,12 @@ class FiltersSummary extends React.Component {
     return value;
   };
 
-  formatFilters = (filters) => Object.keys(filters).map((filterKey) => <li key={filterKey}>{filterKey}: {this.formatFilter(filterKey, filters[filterKey])}</li>);
+  formatFilters = (filters) =>
+    Object.keys(filters).map((filterKey) => (
+      <li key={filterKey}>
+        {filterKey}: {this.formatFilter(filterKey, filters[filterKey])}
+      </li>
+    ));
 
   render() {
     const { filters, onResetFilters } = this.props;
@@ -68,7 +73,9 @@ class FiltersSummary extends React.Component {
       <Row className="row-sm">
         <Col md={10}>
           <ul className="list-inline">
-            <li><b>Filters</b></li>
+            <li>
+              <b>Filters</b>
+            </li>
             {this.formatFilters(filters)}
             <li>
               <Button bsStyle="link" bsSize="xsmall" className={style.deleteButton} onClick={onResetFilters}>

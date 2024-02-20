@@ -20,24 +20,26 @@ import { SegmentedControl as MantineSegmentedControl, useMantineTheme } from '@m
 import type { SegmentedControlItem } from '@mantine/core';
 
 type Props = {
-  data: Array<string> | Array<SegmentedControlItem>,
-  defaultValue?: string,
-  disabled?: boolean,
-  handleChange?: (value: string) => void | Dispatch<SetStateAction<string>>,
-  value?: string,
-}
+  data: Array<string> | Array<SegmentedControlItem>;
+  defaultValue?: string;
+  disabled?: boolean;
+  handleChange?: (value: string) => void | Dispatch<SetStateAction<string>>;
+  value?: string;
+};
 
 const SegmentedControl = ({ data, defaultValue, disabled, handleChange, value }: Props) => {
   const theme = useMantineTheme();
 
   return (
-    <MantineSegmentedControl color={theme.other.shades.default('info')}
-                             data={data}
-                             defaultValue={defaultValue}
-                             disabled={disabled}
-                             value={value}
-                             onChange={handleChange}
-                             styles={{ label: { marginBottom: 0 } }} />
+    <MantineSegmentedControl
+      color={theme.other.shades.default('info')}
+      data={data}
+      defaultValue={defaultValue}
+      disabled={disabled}
+      value={value}
+      onChange={handleChange}
+      styles={{ label: { marginBottom: 0 } }}
+    />
   );
 };
 

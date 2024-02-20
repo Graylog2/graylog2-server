@@ -37,17 +37,21 @@ const renderComponent = (onChange: (e: React.BaseSyntheticEvent) => void, values
     } = props;
 
     return (
-      <div {...restInnerProps} ref={ref}><div>{children}</div></div>
+      <div {...restInnerProps} ref={ref}>
+        <div>{children}</div>
+      </div>
     );
   };
 
   return render(
-    <InputList id="testList"
-               name="testList"
-               values={values}
-               isClearable
-               onChange={onChange}
-               components={{ Input, MultiValueRemove, ClearIndicator }} />,
+    <InputList
+      id="testList"
+      name="testList"
+      values={values}
+      isClearable
+      onChange={onChange}
+      components={{ Input, MultiValueRemove, ClearIndicator }}
+    />,
   );
 };
 

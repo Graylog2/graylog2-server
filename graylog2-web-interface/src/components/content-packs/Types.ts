@@ -16,34 +16,34 @@
  */
 
 export type ContentPackInstallation = {
-  created_at: string,
-  description: string,
-  entities?: Array<ContentPackEntity>,
-  id: string,
-  name: string,
-  parameters?: Array<any>,
-  rev: number,
-  server_version: string,
-  summary: string,
-  url: string,
-  v: number,
-  vendor: string,
-}
+  created_at: string;
+  description: string;
+  entities?: Array<ContentPackEntity>;
+  id: string;
+  name: string;
+  parameters?: Array<any>;
+  rev: number;
+  server_version: string;
+  summary: string;
+  url: string;
+  v: number;
+  vendor: string;
+};
 
 export type ContentPackVersionsType = {
-  contentPacks: Array<ContentPackInstallation>,
-  latest: ContentPackInstallation,
-  latestRevision: number,
-  revisions: Array<number>
-}
+  contentPacks: Array<ContentPackInstallation>;
+  latest: ContentPackInstallation;
+  latestRevision: number;
+  revisions: Array<number>;
+};
 
 export type ContentPackEntity = {
-  id: string,
-  type: EntityType,
-  v: string,
-  data: Data,
-  constraints: Array<Constraint>,
-}
+  id: string;
+  type: EntityType;
+  v: string;
+  data: Data;
+  constraints: Array<Constraint>;
+};
 
 export interface EntityType {
   name: string;
@@ -52,27 +52,27 @@ export interface EntityType {
 }
 
 export interface Data {
-  [key: string]: Type | { [key: string]: Type },
+  [key: string]: Type | { [key: string]: Type };
 }
 
 export interface Type {
-  '@type': string,
+  '@type': string;
 
-  '@value': string,
+  '@value': string;
 }
 
 export interface Constraint {
-  type: string,
+  type: string;
 
-  plugin?: string,
+  plugin?: string;
 
-  version: string,
+  version: string;
 }
 
 export type ContentPackMetadata = {
   [key: number]: {
     [key: number]: {
-      [key: string]: number,
-    },
-  },
-}
+      [key: string]: number;
+    };
+  };
+};

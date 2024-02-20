@@ -51,7 +51,9 @@ jest.mock('views/components/SearchBar', () => mockComponent('SearchBar'));
 const mockRefreshSearch = jest.fn();
 
 jest.mock('views/components/DashboardSearchBar', () => () => (
-  <button type="button" onClick={mockRefreshSearch}>Execute Query</button>
+  <button type="button" onClick={mockRefreshSearch}>
+    Execute Query
+  </button>
 ));
 
 jest.mock('views/hooks/SyncWithQueryParameters');
@@ -60,7 +62,12 @@ jest.mock('routing/withLocation', () => (Component) => (props) => (
   <Component location={{ query: {}, pathname: '', search: '' }} {...props} />
 ));
 
-jest.mock('views/components/contexts/WidgetFieldTypesContextProvider', () => ({ children }) => children);
+jest.mock(
+  'views/components/contexts/WidgetFieldTypesContextProvider',
+  () =>
+    ({ children }) =>
+      children,
+);
 
 const view = createSearch({ queryId: 'foobar' });
 

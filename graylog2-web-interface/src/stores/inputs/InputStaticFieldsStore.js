@@ -21,9 +21,8 @@ import * as URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import { singletonStore } from 'logic/singleton';
 
-export const InputStaticFieldsStore = singletonStore(
-  'core.InputStaticFields',
-  () => Reflux.createStore({
+export const InputStaticFieldsStore = singletonStore('core.InputStaticFields', () =>
+  Reflux.createStore({
     listenables: [],
     sourceUrl: (inputId) => `/system/inputs/${inputId}/staticfields`,
 
@@ -31,19 +30,20 @@ export const InputStaticFieldsStore = singletonStore(
       const url = URLUtils.qualifyUrl(this.sourceUrl(input.id));
       const promise = fetch('POST', url, { key: name, value: value });
 
-      promise
-        .then(
-          (response) => {
-            this.trigger({});
-            UserNotification.success(`Static field '${name}' added to '${input.title}' successfully`);
+      promise.then(
+        (response) => {
+          this.trigger({});
+          UserNotification.success(`Static field '${name}' added to '${input.title}' successfully`);
 
-            return response;
-          },
-          (error) => {
-            UserNotification.error(`Adding static field to input failed with: ${error}`,
-              `Could not add static field to input '${input.title}'`);
-          },
-        );
+          return response;
+        },
+        (error) => {
+          UserNotification.error(
+            `Adding static field to input failed with: ${error}`,
+            `Could not add static field to input '${input.title}'`,
+          );
+        },
+      );
 
       return promise;
     },
@@ -52,19 +52,20 @@ export const InputStaticFieldsStore = singletonStore(
       const url = URLUtils.qualifyUrl(`${this.sourceUrl(input.id)}/${name}`);
       const promise = fetch('DELETE', url);
 
-      promise
-        .then(
-          (response) => {
-            this.trigger({});
-            UserNotification.success(`Static field '${name}' removed from '${input.title}' successfully`);
+      promise.then(
+        (response) => {
+          this.trigger({});
+          UserNotification.success(`Static field '${name}' removed from '${input.title}' successfully`);
 
-            return response;
-          },
-          (error) => {
-            UserNotification.error(`Removing static field from input failed with: ${error}`,
-              `Could not remove static field '${name} from input '${input.title}'`);
-          },
-        );
+          return response;
+        },
+        (error) => {
+          UserNotification.error(
+            `Removing static field from input failed with: ${error}`,
+            `Could not remove static field '${name} from input '${input.title}'`,
+          );
+        },
+      );
 
       return promise;
     },

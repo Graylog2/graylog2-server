@@ -28,7 +28,9 @@ const SizeBasedRotationStrategySummary = ({ config }) => {
         <dt>Index rotation strategy:</dt>
         <dd>Index Size</dd>
         <dt>Max index size:</dt>
-        <dd>{maxSize} bytes ({NumberUtils.formatBytes(maxSize)})</dd>
+        <dd>
+          {maxSize} bytes ({NumberUtils.formatBytes(maxSize)})
+        </dd>
       </dl>
     </div>
   );

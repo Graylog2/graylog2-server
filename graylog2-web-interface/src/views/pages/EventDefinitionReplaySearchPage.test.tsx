@@ -52,16 +52,18 @@ jest.mock('stores/event-notifications/EventNotificationsStore', () => ({
   EventNotificationsActions: {
     listAll: jest.fn(async () => Promise.resolve()),
   },
-  EventNotificationsStore: MockStore((['getInitialState', () => ({ all: [] })])),
+  EventNotificationsStore: MockStore(['getInitialState', () => ({ all: [] })]),
 }));
 
 jest.mock('views/logic/Widgets', () => ({
   ...jest.requireActual('views/logic/Widgets'),
   widgetDefinition: () => ({
-    searchTypes: () => [{
-      type: 'AGGREGATION',
-      typeDefinition: {},
-    }],
+    searchTypes: () => [
+      {
+        type: 'AGGREGATION',
+        typeDefinition: {},
+      },
+    ],
   }),
 }));
 
@@ -79,7 +81,11 @@ describe('EventDefinitionReplaySearchPage', () => {
   beforeEach(() => {
     asMock(useParams).mockReturnValue({ definitionId: mockEventDefinitionTwoAggregations.id });
     asMock(UseCreateViewForEventDefinition).mockReturnValue(Promise.resolve(mockView));
-    asMock(useProcessHooksForView).mockReturnValue({ status: 'loaded', view: mockView, executionState: SearchExecutionState.empty() });
+    asMock(useProcessHooksForView).mockReturnValue({
+      status: 'loaded',
+      view: mockView,
+      executionState: SearchExecutionState.empty(),
+    });
     asMock(SearchComponent).mockImplementation(() => <span>Extended Search Page</span>);
 
     asMock(useEventDefinition).mockImplementation(() => ({
@@ -105,13 +111,16 @@ describe('EventDefinitionReplaySearchPage', () => {
 
     render(<SimpleReplaySearchPage />);
 
-    await waitFor(() => expect(useEventDefinition).toHaveBeenCalledWith(mockEventDefinitionTwoAggregations.id, {
-      onErrorHandler,
-    }));
+    await waitFor(() =>
+      expect(useEventDefinition).toHaveBeenCalledWith(mockEventDefinitionTwoAggregations.id, {
+        onErrorHandler,
+      }),
+    );
 
     await waitFor(() => {
       expect(UseCreateViewForEventDefinition).toHaveBeenCalledWith({
-        eventDefinition: mockEventDefinitionTwoAggregations, aggregations: mockedMappedAggregation,
+        eventDefinition: mockEventDefinitionTwoAggregations,
+        aggregations: mockedMappedAggregation,
       });
     });
   });

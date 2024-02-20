@@ -22,10 +22,10 @@ import { TextField } from 'components/configurationforms';
 import type { TextField as TextFieldType } from './types';
 
 type Props = {
-  helpText?: string,
-  onChange: (title: string, value: string, dirty?: boolean) => void,
-  typeName: string,
-  value: string,
+  helpText?: string;
+  onChange: (title: string, value: string, dirty?: boolean) => void;
+  typeName: string;
+  value: string;
 };
 
 const TitleField = ({ typeName, helpText, value, onChange }: Props) => {
@@ -42,13 +42,15 @@ const TitleField = ({ typeName, helpText, value, onChange }: Props) => {
   };
 
   return (
-    <TextField key={`${typeName}-title`}
-               typeName={typeName}
-               title="title"
-               field={titleField}
-               value={value}
-               onChange={onChange}
-               autoFocus />
+    <TextField
+      key={`${typeName}-title`}
+      typeName={typeName}
+      title="title"
+      field={titleField}
+      value={value}
+      onChange={onChange}
+      autoFocus
+    />
   );
 };
 

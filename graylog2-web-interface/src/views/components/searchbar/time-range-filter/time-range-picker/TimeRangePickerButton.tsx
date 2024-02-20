@@ -21,16 +21,18 @@ import { Button } from 'components/bootstrap';
 import { Icon } from 'components/common';
 
 type Props = {
-  hasError?: boolean
-  disabled?: boolean,
-  onClick?: (e: SyntheticEvent) => void,
+  hasError?: boolean;
+  disabled?: boolean;
+  onClick?: (e: SyntheticEvent) => void;
 };
 
 const TimeRangePickerButton = ({ hasError, disabled, onClick }: Props) => (
-  <Button bsStyle={hasError ? 'danger' : 'info'}
-          disabled={disabled}
-          onClick={onClick}
-          aria-label="Open Time Range Selector">
+  <Button
+    bsStyle={hasError ? 'danger' : 'info'}
+    disabled={disabled}
+    onClick={onClick}
+    aria-label="Open Time Range Selector"
+  >
     <Icon name={hasError ? 'exclamation-triangle' : 'clock'} />
   </Button>
 );

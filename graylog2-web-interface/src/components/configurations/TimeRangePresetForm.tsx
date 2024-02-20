@@ -31,10 +31,10 @@ import TimeRangeInputSettingsContext from 'views/components/contexts/TimeRangeIn
 import generateId from 'logic/generateId';
 
 export type TimeRangePreset = {
-  timerange: TimeRange,
-  description: string,
-  id: string,
-}
+  timerange: TimeRange;
+  description: string;
+  id: string;
+};
 
 const ItemWrapper = styled.div`
   display: flex;
@@ -57,14 +57,14 @@ const Description = styled.div`
 `;
 
 type ItemProps = {
-  idx: number,
-  id: string,
-  timerange: TimeRange,
-  description: string,
-  onChange: (timerange: TimeRangePreset, idx: number) => void,
-  onRemove: (idx: number) => void,
-  limitDuration: number,
-}
+  idx: number;
+  id: string;
+  timerange: TimeRange;
+  description: string;
+  onChange: (timerange: TimeRangePreset, idx: number) => void;
+  onRemove: (idx: number) => void;
+  limitDuration: number;
+};
 
 const contextSettings = {
   showDropdownButton: false,
@@ -74,13 +74,19 @@ const contextSettings = {
 };
 
 const TimeRangePresetFormItem = ({ idx, id, timerange, description, onChange, onRemove, limitDuration }: ItemProps) => {
-  const handleOnChangeRange = useCallback((newTimerange: TimeRange) => {
-    onChange({ timerange: newTimerange, description, id }, idx);
-  }, [description, id, idx, onChange]);
+  const handleOnChangeRange = useCallback(
+    (newTimerange: TimeRange) => {
+      onChange({ timerange: newTimerange, description, id }, idx);
+    },
+    [description, id, idx, onChange],
+  );
 
-  const handleOnChangeDescription = useCallback((newDescription: string) => {
-    onChange({ timerange, description: newDescription, id }, idx);
-  }, [id, idx, onChange, timerange]);
+  const handleOnChangeDescription = useCallback(
+    (newDescription: string) => {
+      onChange({ timerange, description: newDescription, id }, idx);
+    },
+    [id, idx, onChange, timerange],
+  );
 
   const handleOnRemove = useCallback(() => {
     onRemove(idx);
@@ -90,17 +96,24 @@ const TimeRangePresetFormItem = ({ idx, id, timerange, description, onChange, on
 
   return (
     <ItemWrapper data-testid={`time-range-preset-${id}`}>
-      <TimeRangeFilter onChange={handleOnChangeRange} limitDuration={limitDuration} value={timerange} withinPortal={false} />
+      <TimeRangeFilter
+        onChange={handleOnChangeRange}
+        limitDuration={limitDuration}
+        value={timerange}
+        withinPortal={false}
+      />
       <Description>
-        <StyledInput type="text"
-                     id={`quick-access-time-range-description-${id}`}
-                     placeholder="Add description..."
-                     title="Time range preset description"
-                     aria-label="Time range preset description"
-                     required
-                     defaultValue={description}
-                     onChange={({ target: { value } }) => debounceHandleOnChangeDescription(value)}
-                     formGroupClassName="" />
+        <StyledInput
+          type="text"
+          id={`quick-access-time-range-description-${id}`}
+          placeholder="Add description..."
+          title="Time range preset description"
+          aria-label="Time range preset description"
+          required
+          defaultValue={description}
+          onChange={({ target: { value } }) => debounceHandleOnChangeDescription(value)}
+          formGroupClassName=""
+        />
         <IconWrapper className="input-group-addon" onClick={handleOnRemove} title="Remove preset">
           <Icon name="trash-alt" style={{ cursor: 'pointer' }} />
         </IconWrapper>
@@ -109,44 +122,66 @@ const TimeRangePresetFormItem = ({ idx, id, timerange, description, onChange, on
   );
 };
 
-const TimeRangePresetForm = ({ options, onUpdate }: {
-  options: Immutable.List<TimeRangePreset>,
-  onUpdate: Dispatch<Immutable.List<TimeRangePreset>>
+const TimeRangePresetForm = ({
+  options,
+  onUpdate,
+}: {
+  options: Immutable.List<TimeRangePreset>;
+  onUpdate: Dispatch<Immutable.List<TimeRangePreset>>;
 }) => {
-  const onChange = useCallback((newPreset: TimeRangePreset, idx: number) => {
-    const newState = options.set(idx, newPreset);
-    onUpdate(newState);
-  }, [onUpdate, options]);
+  const onChange = useCallback(
+    (newPreset: TimeRangePreset, idx: number) => {
+      const newState = options.set(idx, newPreset);
+      onUpdate(newState);
+    },
+    [onUpdate, options],
+  );
 
   const { searchesClusterConfig: config } = useStore(SearchConfigStore);
-  const limitDuration = useMemo(() => moment.duration(config?.query_time_range_limit).asSeconds() ?? 0, [config?.query_time_range_limit]);
+  const limitDuration = useMemo(
+    () => moment.duration(config?.query_time_range_limit).asSeconds() ?? 0,
+    [config?.query_time_range_limit],
+  );
 
-  const onRemove = useCallback((idx: number) => {
-    const newState = options.delete(idx);
-    onUpdate(newState);
-  }, [onUpdate, options]);
+  const onRemove = useCallback(
+    (idx: number) => {
+      const newState = options.delete(idx);
+      onUpdate(newState);
+    },
+    [onUpdate, options],
+  );
 
-  const onMoveItem = useCallback((items: Array<TimeRangePreset>) => {
-    onUpdate(Immutable.List(items));
-  }, [onUpdate]);
+  const onMoveItem = useCallback(
+    (items: Array<TimeRangePreset>) => {
+      onUpdate(Immutable.List(items));
+    },
+    [onUpdate],
+  );
 
   const addTimeRange = useCallback(() => {
-    onUpdate(options.push({
-      id: generateId(),
-      description: '',
-      timerange: { type: 'relative', from: 300 },
-    }));
+    onUpdate(
+      options.push({
+        id: generateId(),
+        description: '',
+        timerange: { type: 'relative', from: 300 },
+      }),
+    );
   }, [onUpdate, options]);
 
-  const customContentRender = useCallback(({ item: { id, description, timerange }, index }) => (
-    <TimeRangePresetFormItem id={id}
-                             onRemove={onRemove}
-                             idx={index}
-                             onChange={onChange}
-                             timerange={timerange}
-                             description={description}
-                             limitDuration={limitDuration} />
-  ), [limitDuration, onChange, onRemove]);
+  const customContentRender = useCallback(
+    ({ item: { id, description, timerange }, index }) => (
+      <TimeRangePresetFormItem
+        id={id}
+        onRemove={onRemove}
+        idx={index}
+        onChange={onChange}
+        timerange={timerange}
+        description={description}
+        limitDuration={limitDuration}
+      />
+    ),
+    [limitDuration, onChange, onRemove],
+  );
 
   return (
     <div className="form-group">
@@ -156,14 +191,21 @@ const TimeRangePresetForm = ({ options, onUpdate }: {
       </span>
       <div className="wrapper">
         <TimeRangeInputSettingsContext.Provider value={contextSettings}>
-          <SortableList items={options.toArray()}
-                        onMoveItem={onMoveItem}
-                        displayOverlayInPortal
-                        alignItemContent="center"
-                        customContentRender={customContentRender} />
+          <SortableList
+            items={options.toArray()}
+            onMoveItem={onMoveItem}
+            displayOverlayInPortal
+            alignItemContent="center"
+            customContentRender={customContentRender}
+          />
         </TimeRangeInputSettingsContext.Provider>
       </div>
-      <Button bsSize="xs" onClick={addTimeRange} title="Add new search time range preset" aria-label="Add new search time range preset">
+      <Button
+        bsSize="xs"
+        onClick={addTimeRange}
+        title="Add new search time range preset"
+        aria-label="Add new search time range preset"
+      >
         Add option
       </Button>
     </div>

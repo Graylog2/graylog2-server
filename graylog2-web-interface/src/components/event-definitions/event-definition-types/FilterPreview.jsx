@@ -38,12 +38,13 @@ class FilterPreview extends React.Component {
     displayPreview: false,
   };
 
-  renderMessages = (messages) => messages.map(({ index, message }) => (
-    <tr key={`${index}-${message._id}`}>
-      <td>{message.timestamp}</td>
-      <td>{message.message}</td>
-    </tr>
-  ));
+  renderMessages = (messages) =>
+    messages.map(({ index, message }) => (
+      <tr key={`${index}-${message._id}`}>
+        <td>{message.timestamp}</td>
+        <td>{message.message}</td>
+      </tr>
+    ));
 
   renderSearchResult = (searchResult = {}) => {
     if (!searchResult.messages || searchResult.messages.length === 0) {
@@ -58,9 +59,7 @@ class FilterPreview extends React.Component {
             <th>Message</th>
           </tr>
         </thead>
-        <tbody>
-          {this.renderMessages(searchResult.messages)}
-        </tbody>
+        <tbody>{this.renderMessages(searchResult.messages)}</tbody>
       </Table>
     );
   };
@@ -68,26 +67,33 @@ class FilterPreview extends React.Component {
   render() {
     const { isFetchingData, searchResult, errors, displayPreview } = this.props;
 
-    const renderedResults = isFetchingData ? <Spinner text="Loading filter preview..." /> : this.renderSearchResult(searchResult);
+    const renderedResults = isFetchingData ? (
+      <Spinner text="Loading filter preview..." />
+    ) : (
+      this.renderSearchResult(searchResult)
+    );
 
     return (
       <>
-        <HelpPanel collapsible
-                   defaultExpanded={!displayPreview}
-                   title="How many Events will Filter & Aggregation create?">
+        <HelpPanel
+          collapsible
+          defaultExpanded={!displayPreview}
+          title="How many Events will Filter & Aggregation create?"
+        >
           <p>
             The Filter & Aggregation Condition will generate different number of Events, depending on how it is
             configured:
           </p>
           <ul>
-            <li><b>Filter:</b>&emsp;One Event per message matching the filter</li>
             <li>
-              <b>Aggregation without groups:</b>&emsp;One Event every time the aggregation result satisfies
-              the condition
+              <b>Filter:</b>&emsp;One Event per message matching the filter
             </li>
             <li>
-              <b>Aggregation with groups:</b>&emsp;One Event per group whose aggregation result satisfies
-              the condition
+              <b>Aggregation without groups:</b>&emsp;One Event every time the aggregation result satisfies the
+              condition
+            </li>
+            <li>
+              <b>Aggregation with groups:</b>&emsp;One Event per group whose aggregation result satisfies the condition
             </li>
           </ul>
         </HelpPanel>

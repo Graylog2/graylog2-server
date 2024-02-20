@@ -21,56 +21,56 @@ import { singleton } from 'logic/singleton';
 
 export type DefaultScopeName = '*';
 export type ScopeName = 'general' | 'search' | 'dashboard' | 'scratchpad' | 'query-input';
-export type ScopeParam = Array<ScopeName> | ScopeName
+export type ScopeParam = Array<ScopeName> | ScopeName;
 
 export type KeyboardModifiers = {
-  alt?: boolean
-  ctrl?: boolean
-  meta?: boolean
-  shift?: boolean
-  mod?: boolean
-}
+  alt?: boolean;
+  ctrl?: boolean;
+  meta?: boolean;
+  shift?: boolean;
+  mod?: boolean;
+};
 
 export type Hotkey = KeyboardModifiers & {
-  keys: readonly string[]
-  scopes: ScopeName,
-  description: string
-}
+  keys: readonly string[];
+  scopes: ScopeName;
+  description: string;
+};
 
-export type HotkeysEvent = Hotkey
-export type FormTags = 'input' | 'textarea' | 'select' | 'INPUT' | 'TEXTAREA' | 'SELECT'
-export type HotkeyCallback = (keyboardEvent: KeyboardEvent, hotkeysEvent: HotkeysEvent) => void
+export type HotkeysEvent = Hotkey;
+export type FormTags = 'input' | 'textarea' | 'select' | 'INPUT' | 'TEXTAREA' | 'SELECT';
+export type HotkeyCallback = (keyboardEvent: KeyboardEvent, hotkeysEvent: HotkeysEvent) => void;
 
-export type Trigger = boolean | ((keyboardEvent: KeyboardEvent, hotkeysEvent: HotkeysEvent) => boolean)
+export type Trigger = boolean | ((keyboardEvent: KeyboardEvent, hotkeysEvent: HotkeysEvent) => boolean);
 export type Options = {
-  combinationKey?: string // Character to split keys in hotkeys combinations. (Default: +)
-  enabled?: Trigger // Main setting that determines if the hotkey is enabled or not. (Default: true)
-  enableOnFormTags?: readonly FormTags[] | boolean // Enable hotkeys on a list of tags. (Default: false)
-  enableOnContentEditable?: boolean // Enable hotkeys on tags with contentEditable props. (Default: false)
-  preventDefault?: Trigger // Prevent default browser behavior? (Default: false)
-  displayInOverview?: boolean,
-  splitKey?: string,
-}
+  combinationKey?: string; // Character to split keys in hotkeys combinations. (Default: +)
+  enabled?: Trigger; // Main setting that determines if the hotkey is enabled or not. (Default: true)
+  enableOnFormTags?: readonly FormTags[] | boolean; // Enable hotkeys on a list of tags. (Default: false)
+  enableOnContentEditable?: boolean; // Enable hotkeys on tags with contentEditable props. (Default: false)
+  preventDefault?: Trigger; // Prevent default browser behavior? (Default: false)
+  displayInOverview?: boolean;
+  splitKey?: string;
+};
 export type ActiveHotkey = {
-  options?: Options & { scope: ScopeName },
-}
-export type ActiveHotkeys = Immutable.Map<`${ScopeName}.${string}`, ActiveHotkey>
+  options?: Options & { scope: ScopeName };
+};
+export type ActiveHotkeys = Immutable.Map<`${ScopeName}.${string}`, ActiveHotkey>;
 export type HotkeyCollection = {
-  title: string,
-  description: string,
-  actions: Record<string, { keys: string | Array<string>, description: string, displayKeys?: string }>,
-}
-export type HotkeyCollections = Record<ScopeName, HotkeyCollection>
+  title: string;
+  description: string;
+  actions: Record<string, { keys: string | Array<string>; description: string; displayKeys?: string }>;
+};
+export type HotkeyCollections = Record<ScopeName, HotkeyCollection>;
 
 type HotkeysContextType = {
-  enabledScopes: Array<ScopeName | DefaultScopeName>,
-  hotKeysCollections: HotkeyCollections,
-  activeHotkeys: ActiveHotkeys,
-  addActiveHotkey: (props: { scope: ScopeName, actionKey: string, options: Options & { scope: ScopeName } }) => void,
-  removeActiveHotkey: (props: { scope: ScopeName, actionKey: string }) => void,
-  showHotkeysModal: boolean,
-  setShowHotkeysModal: React.Dispatch<React.SetStateAction<boolean>>
-}
+  enabledScopes: Array<ScopeName | DefaultScopeName>;
+  hotKeysCollections: HotkeyCollections;
+  activeHotkeys: ActiveHotkeys;
+  addActiveHotkey: (props: { scope: ScopeName; actionKey: string; options: Options & { scope: ScopeName } }) => void;
+  removeActiveHotkey: (props: { scope: ScopeName; actionKey: string }) => void;
+  showHotkeysModal: boolean;
+  setShowHotkeysModal: React.Dispatch<React.SetStateAction<boolean>>;
+};
 
 const HotkeysContext = React.createContext<HotkeysContextType | undefined>(undefined);
 

@@ -34,34 +34,38 @@ const Value = styled.span`
 `;
 
 const StyledTooltip = styled(Tooltip).attrs((props) => ({
-  className: props.opened ? 'in' : '', /* stylelint-disable-line */
-}))(({ opened }) => css`
-  display: ${opened ? 'block' : 'none'};
-`);
+  className: props.opened ? 'in' : '' /* stylelint-disable-line */,
+}))(
+  ({ opened }) => css`
+    display: ${opened ? 'block' : 'none'};
+  `,
+);
 
 const Wrapped = styled.div`
   flex: 1;
   position: relative;
 `;
 
-const Swatch = styled.button(({ color, theme }) => css`
-  height: 60px;
-  background-color: ${color};
-  border: 1px solid #222;
-  color: ${theme.utils.readableColor(color)};
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  padding: 3px 6px;
-  width: 100%;
+const Swatch = styled.button(
+  ({ color, theme }) => css`
+    height: 60px;
+    background-color: ${color};
+    border: 1px solid #222;
+    color: ${theme.utils.readableColor(color)};
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    padding: 3px 6px;
+    width: 100%;
 
-  &:hover {
-    ${Value} {
-      opacity: 1;
+    &:hover {
+      ${Value} {
+        opacity: 1;
+      }
     }
-  }
-`);
+  `,
+);
 
 const ColorSwatch = ({ className, color, name, copyText }) => {
   const [opened, setOpened] = useState(false);
@@ -90,23 +94,20 @@ const ColorSwatch = ({ className, color, name, copyText }) => {
   }, [copyText]);
 
   return (
-    (
-      <Wrapped className={className}>
-        <StyledTooltip placement="top"
-                       opened={opened}
-                       positionTop={-32}
-                       id={`${copyText ? copyText.replace(/\./g, '-') : name}-tooltip`}>
-          Copied!
-        </StyledTooltip>
-        <Swatch color={color}
-                data-clipboard-button
-                data-clipboard-text={copyText}
-                ref={swatchRef}>
-          <Name>{name}</Name>
-          <Value>{color}</Value>
-        </Swatch>
-      </Wrapped>
-    )
+    <Wrapped className={className}>
+      <StyledTooltip
+        placement="top"
+        opened={opened}
+        positionTop={-32}
+        id={`${copyText ? copyText.replace(/\./g, '-') : name}-tooltip`}
+      >
+        Copied!
+      </StyledTooltip>
+      <Swatch color={color} data-clipboard-button data-clipboard-text={copyText} ref={swatchRef}>
+        <Name>{name}</Name>
+        <Value>{color}</Value>
+      </Swatch>
+    </Wrapped>
   );
 };
 

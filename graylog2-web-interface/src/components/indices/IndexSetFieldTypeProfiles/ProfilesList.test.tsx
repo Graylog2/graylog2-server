@@ -29,23 +29,23 @@ import { profile1, attributes, profile2 } from 'fixtures/indexSetFieldTypeProfil
 import ProfilesList from 'components/indices/IndexSetFieldTypeProfiles/ProfilesList';
 import useProfiles from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfiles';
 
-const getData = (list = [profile1]) => (
-  {
-    list,
-    pagination: {
-      total: 1,
-    },
-    attributes,
-  }
-);
+const getData = (list = [profile1]) => ({
+  list,
+  pagination: {
+    total: 1,
+  },
+  attributes,
+});
 
-const renderIndexSetFieldTypeProfilesList = () => render(
-  <QueryParamProvider adapter={ReactRouter6Adapter}>
-    <TestStoreProvider>
-      <ProfilesList />
-    </TestStoreProvider>,
-  </QueryParamProvider>,
-);
+const renderIndexSetFieldTypeProfilesList = () =>
+  render(
+    <QueryParamProvider adapter={ReactRouter6Adapter}>
+      <TestStoreProvider>
+        <ProfilesList />
+      </TestStoreProvider>
+      ,
+    </QueryParamProvider>,
+  );
 
 jest.mock('routing/useParams', () => jest.fn());
 
@@ -63,10 +63,7 @@ describe('IndexSetFieldTypesList', () => {
     asMock(useUserLayoutPreferences).mockReturnValue({
       data: {
         ...layoutPreferences,
-        displayedAttributes: ['name',
-          'description',
-          'type',
-          'custom_field_mappings'],
+        displayedAttributes: ['name', 'description', 'type', 'custom_field_mappings'],
       },
       isInitialLoading: false,
     });

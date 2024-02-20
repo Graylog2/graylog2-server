@@ -17,4 +17,4 @@
 import type { ColorScheme, ThemeBaseColors } from '@graylog/sawmill';
 import type { DeepPartial } from 'utility-types';
 
-export type ThemesColors = Record<ColorScheme, DeepPartial<ThemeBaseColors>>
+export type ThemesColors = Record<ColorScheme, DeepPartial<ThemeBaseColors>>;

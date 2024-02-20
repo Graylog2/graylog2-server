@@ -26,7 +26,7 @@ const SidecarIcon = styled(Icon)`
 `;
 
 type Props = {
-  operatingSystem: string,
+  operatingSystem: string;
 };
 
 const matchIcon = (os: string) => {
@@ -67,9 +67,7 @@ const matchIcon = (os: string) => {
 const OperatingSystemIcon = ({ operatingSystem }: Props) => {
   const { iconName, iconType } = matchIcon(operatingSystem.trim().toLowerCase());
 
-  return (
-    <SidecarIcon name={iconName} type={iconType} fixedWidth />
-  );
+  return <SidecarIcon name={iconName} type={iconType} fixedWidth />;
 };
 
 OperatingSystemIcon.propTypes = {

@@ -45,18 +45,22 @@ const _formatLocales = (locales: Array<Locales>) => {
 };
 
 type Option = {
-  value: string,
-  label: string,
-}
+  value: string;
+  label: string;
+};
 const _renderOption = (option: Option) => (
-  <span key={option.value} title="{option.value} [{option.value}]">{option.label} [{option.value}]</span>
+  <span key={option.value} title="{option.value} [{option.value}]">
+    {option.label} [{option.value}]
+  </span>
 );
 
 /**
  * Component that renders a form input with all available locale settings. It also makes easy to filter
  * values to quickly find the locale needed.
  */
-const LocaleSelect = (props: Omit<React.ComponentProps<typeof Select>, 'placeholder' | 'options' | 'optionRenderer'>) => {
+const LocaleSelect = (
+  props: Omit<React.ComponentProps<typeof Select>, 'placeholder' | 'options' | 'optionRenderer'>,
+) => {
   const { locales } = useStore(SystemStore);
 
   if (!locales) {
@@ -65,12 +69,7 @@ const LocaleSelect = (props: Omit<React.ComponentProps<typeof Select>, 'placehol
 
   const _locales = _formatLocales(locales);
 
-  return (
-    <Select {...props}
-            placeholder="Pick a locale"
-            options={_locales}
-            optionRenderer={_renderOption} />
-  );
+  return <Select {...props} placeholder="Pick a locale" options={_locales} optionRenderer={_renderOption} />;
 };
 
 export default LocaleSelect;

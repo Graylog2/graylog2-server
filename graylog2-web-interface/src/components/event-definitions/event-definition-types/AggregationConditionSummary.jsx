@@ -29,9 +29,15 @@ const Expression = ({ expression, series }) => {
       // eslint-disable-next-line no-case-declarations
       const selectedSeries = series.find((s) => s.id === expression.ref);
 
-      return (selectedSeries && selectedSeries.type
-        ? <var>{selectedSeries.type}({selectedSeries.strategy ? `${selectedSeries.strategy}, ` : null}{selectedSeries.field}{selectedSeries.percentile ? `, ${selectedSeries.percentile}` : null})</var>
-        : <span>No series selected</span>);
+      return selectedSeries && selectedSeries.type ? (
+        <var>
+          {selectedSeries.type}({selectedSeries.strategy ? `${selectedSeries.strategy}, ` : null}
+          {selectedSeries.field}
+          {selectedSeries.percentile ? `, ${selectedSeries.percentile}` : null})
+        </var>
+      ) : (
+        <span>No series selected</span>
+      );
     case '&&':
     case '||':
       return (
@@ -42,7 +48,11 @@ const Expression = ({ expression, series }) => {
         </>
       );
     case 'group':
-      return <span>[<Expression expression={expression.child} series={series} />]</span>;
+      return (
+        <span>
+          [<Expression expression={expression.child} series={series} />]
+        </span>
+      );
     case '<':
     case '<=':
     case '>':
@@ -51,7 +61,7 @@ const Expression = ({ expression, series }) => {
       return (
         <>
           <Expression expression={expression.left} series={series} />{' '}
-          <strong className="text-primary">{expression.expr}{' '}</strong>
+          <strong className="text-primary">{expression.expr} </strong>
           <Expression expression={expression.right} series={series} />
         </>
       );
@@ -69,7 +79,9 @@ Expression.defaultProps = {
   expression: null,
 };
 
-const AggregationConditionSummary = ({ conditions, series }) => <Expression expression={conditions?.expression} series={series} />;
+const AggregationConditionSummary = ({ conditions, series }) => (
+  <Expression expression={conditions?.expression} series={series} />
+);
 
 AggregationConditionSummary.propTypes = {
   conditions: PropTypes.object.isRequired,

@@ -30,21 +30,25 @@ export const Title = styled.div`
   margin-bottom: 5px;
 `;
 
-const ErrorsList = styled.ul(({ theme }) => `
+const ErrorsList = styled.ul(
+  ({ theme }) => `
   font-family: ${theme.fonts.family.monospace};
   list-style: initial;
   padding-left: 20px;
-`);
+`,
+);
 
 type Props = {
-  errors: Array<string>,
-  message: string,
+  errors: Array<string>;
+  message: string;
 };
 
 const ConnectionErrors = ({ errors, message }: Props) => (
   <NotificationContainer bsStyle="danger" title={message}>
     <ErrorsList>
-      {errors.map((error) => <li key={String(error)}>{String(error)}</li>)}
+      {errors.map((error) => (
+        <li key={String(error)}>{String(error)}</li>
+      ))}
     </ErrorsList>
   </NotificationContainer>
 );

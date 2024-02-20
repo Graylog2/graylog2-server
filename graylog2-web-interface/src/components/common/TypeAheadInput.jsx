@@ -122,26 +122,28 @@ class TypeAheadInput extends React.Component {
 
     const $fieldInput = $(this.fieldInput);
 
-    $fieldInput.typeahead({
-      hint: true,
-      highlight: true,
-      minLength: 1,
-    },
-    {
-      name: 'dataset-name',
-      displayKey: displayKey,
-      source: UniversalSearch.substringMatcher(suggestions, displayKey, 6),
-      templates: {
-        suggestion: (value) => {
-          // Escape all text here that may be user-generated, since this is not automatically escaped by React.
-          if (suggestionText) {
-            return `<div><strong>${escape(suggestionText)}</strong> ${escape(value[displayKey])}</div>`;
-          }
+    $fieldInput.typeahead(
+      {
+        hint: true,
+        highlight: true,
+        minLength: 1,
+      },
+      {
+        name: 'dataset-name',
+        displayKey: displayKey,
+        source: UniversalSearch.substringMatcher(suggestions, displayKey, 6),
+        templates: {
+          suggestion: (value) => {
+            // Escape all text here that may be user-generated, since this is not automatically escaped by React.
+            if (suggestionText) {
+              return `<div><strong>${escape(suggestionText)}</strong> ${escape(value[displayKey])}</div>`;
+            }
 
-          return `<div>${escape(value[displayKey])}</div>`;
+            return `<div>${escape(value[displayKey])}</div>`;
+          },
         },
       },
-    });
+    );
 
     if (typeof onTypeaheadLoaded === 'function') {
       onTypeaheadLoaded();
@@ -159,13 +161,17 @@ class TypeAheadInput extends React.Component {
     const { id, label, onKeyPress, formGroupClassName } = this.props;
 
     return (
-      <StyledInput id={id}
-                   type="text"
-                   ref={(fieldInput) => { this.fieldInputElem = fieldInput; }}
-                   wrapperClassName="typeahead-wrapper"
-                   formGroupClassName={formGroupClassName}
-                   label={label}
-                   onKeyPress={onKeyPress} />
+      <StyledInput
+        id={id}
+        type="text"
+        ref={(fieldInput) => {
+          this.fieldInputElem = fieldInput;
+        }}
+        wrapperClassName="typeahead-wrapper"
+        formGroupClassName={formGroupClassName}
+        label={label}
+        onKeyPress={onKeyPress}
+      />
     );
   }
 }

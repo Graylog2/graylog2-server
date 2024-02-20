@@ -48,10 +48,10 @@ const Visualization = styled.div`
 `;
 
 type Props = {
-  children: React.ReactNode,
-  onCancel: () => void,
-  onSubmit: () => void,
-  displaySubmitActions?: boolean,
+  children: React.ReactNode;
+  onCancel: () => void;
+  onSubmit: () => void;
+  displaySubmitActions?: boolean;
 };
 
 const EditWidgetFrame = ({ children, onCancel, onSubmit, displaySubmitActions }: Props) => {
@@ -73,9 +73,7 @@ const EditWidgetFrame = ({ children, onCancel, onSubmit, displaySubmitActions }:
             </QueryControls>
           </IfDashboard>
           <Visualization role="presentation">
-            <WidgetOverrideElements>
-              {children}
-            </WidgetOverrideElements>
+            <WidgetOverrideElements>{children}</WidgetOverrideElements>
           </Visualization>
           {displaySubmitActions && (
             <div>

@@ -20,16 +20,18 @@ import styled, { css } from 'styled-components';
 
 import { ListGroupItem } from 'components/bootstrap';
 
-const StyledListGroupItem = styled(ListGroupItem)(({ theme }) => css`
-  background-color: ${theme.colors.variant.lightest.default};
-  font-size: ${theme.fonts.size.body};
-  color: ${theme.utils.contrastingColor(theme.colors.variant.lightest.default)};
-  padding: 0 15px;
+const StyledListGroupItem = styled(ListGroupItem)(
+  ({ theme }) => css`
+    background-color: ${theme.colors.variant.lightest.default};
+    font-size: ${theme.fonts.size.body};
+    color: ${theme.utils.contrastingColor(theme.colors.variant.lightest.default)};
+    padding: 0 15px;
 
-  .form-group {
-    margin: 0;
-  }
-`);
+    .form-group {
+      margin: 0;
+    }
+  `,
+);
 
 const HeaderWrapper = styled.div`
   padding: 10px 0;

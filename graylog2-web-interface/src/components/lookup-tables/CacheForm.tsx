@@ -30,9 +30,9 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 type TitleProps = {
-  title: string,
-  typeName: string,
-  create: boolean,
+  title: string;
+  typeName: string;
+  create: boolean;
 };
 
 const Title = ({ title, typeName, create }: TitleProps) => {
@@ -54,13 +54,13 @@ const INIT_CACHE: LookupTableCache = {
 };
 
 type Props = {
-  type: string,
-  saved: () => void,
-  title: string,
-  create?: boolean,
-  cache?: LookupTableCache,
-  validate?: (arg: LookupTableCache) => void,
-  validationErrors?: validationErrorsType,
+  type: string;
+  saved: () => void;
+  title: string;
+  create?: boolean;
+  cache?: LookupTableCache;
+  validate?: (arg: LookupTableCache) => void;
+  validationErrors?: validationErrorsType;
 };
 
 const CacheForm = ({ type, saved, title, create, cache, validate, validationErrors }: Props) => {
@@ -71,13 +71,11 @@ const CacheForm = ({ type, saved, title, create, cache, validate, validationErro
 
   const plugin = React.useMemo(() => PluginStore.exports('lookupTableCaches').find((p) => p.type === type), [type]);
 
-  const pluginName = React.useMemo(() => (plugin.displayName || type), [plugin, type]);
-  const DocComponent = React.useMemo(() => (plugin.documentationComponent), [plugin]);
+  const pluginName = React.useMemo(() => plugin.displayName || type, [plugin, type]);
+  const DocComponent = React.useMemo(() => plugin.documentationComponent, [plugin]);
   const configFieldSet = React.useMemo(() => {
     if (plugin) {
-      return React.createElement(
-        plugin.formComponent, { config: cache.config, ref: configRef },
-      );
+      return React.createElement(plugin.formComponent, { config: cache.config, ref: configRef });
     }
 
     return null;
@@ -116,9 +114,7 @@ const CacheForm = ({ type, saved, title, create, cache, validate, validationErro
   };
 
   const handleSubmit = (values: LookupTableCache) => {
-    const promise = create
-      ? LookupTableCachesActions.create(values)
-      : LookupTableCachesActions.update(values);
+    const promise = create ? LookupTableCachesActions.create(values) : LookupTableCachesActions.update(values);
 
     return promise.then(() => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.LUT[create ? 'CACHE_CREATED' : 'CACHE_UPDATED'], {
@@ -142,63 +138,74 @@ const CacheForm = ({ type, saved, title, create, cache, validate, validationErro
       <Title title={title} typeName={pluginName} create={create} />
       <Row>
         <Col lg={6} style={{ marginTop: 10 }}>
-          <Formik initialValues={{ ...INIT_CACHE, ...cache }}
-                  validate={handleValidation}
-                  validateOnBlur
-                  validateOnChange={false}
-                  validateOnMount={!create}
-                  onSubmit={handleSubmit}
-                  enableReinitialize>
+          <Formik
+            initialValues={{ ...INIT_CACHE, ...cache }}
+            validate={handleValidation}
+            validateOnBlur
+            validateOnChange={false}
+            validateOnMount={!create}
+            onSubmit={handleSubmit}
+            enableReinitialize
+          >
             {({ errors, values, setValues, isSubmitting }) => (
               <Form className="form form-horizontal">
                 <fieldset>
-                  <FormikFormGroup type="text"
-                                   name="title"
-                                   label="* Title"
-                                   required
-                                   help={errors.title ? null : 'A short title for this cache.'}
-                                   onChange={handleTitleChange(values, setValues)}
-                                   autoFocus
-                                   labelClassName="col-sm-3"
-                                   wrapperClassName="col-sm-9" />
-                  <FormikFormGroup type="text"
-                                   name="description"
-                                   label="Description"
-                                   help="Cache description."
-                                   labelClassName="col-sm-3"
-                                   wrapperClassName="col-sm-9" />
-                  <FormikFormGroup type="text"
-                                   name="name"
-                                   label="* Name"
-                                   required
-                                   error={validationErrors.name ? validationErrors.name[0] : null}
-                                   onChange={() => setGenerateName(false)}
-                                   help={
-                                    (errors.name || validationErrors.name)
-                                      ? null
-                                      : 'The name that is being used to refer to this cache. Must be unique.'
-                                  }
-                                   labelClassName="col-sm-3"
-                                   wrapperClassName="col-sm-9" />
-
+                  <FormikFormGroup
+                    type="text"
+                    name="title"
+                    label="* Title"
+                    required
+                    help={errors.title ? null : 'A short title for this cache.'}
+                    onChange={handleTitleChange(values, setValues)}
+                    autoFocus
+                    labelClassName="col-sm-3"
+                    wrapperClassName="col-sm-9"
+                  />
+                  <FormikFormGroup
+                    type="text"
+                    name="description"
+                    label="Description"
+                    help="Cache description."
+                    labelClassName="col-sm-3"
+                    wrapperClassName="col-sm-9"
+                  />
+                  <FormikFormGroup
+                    type="text"
+                    name="name"
+                    label="* Name"
+                    required
+                    error={validationErrors.name ? validationErrors.name[0] : null}
+                    onChange={() => setGenerateName(false)}
+                    help={
+                      errors.name || validationErrors.name
+                        ? null
+                        : 'The name that is being used to refer to this cache. Must be unique.'
+                    }
+                    labelClassName="col-sm-3"
+                    wrapperClassName="col-sm-9"
+                  />
                 </fieldset>
                 {configFieldSet}
                 <fieldset>
                   <Row>
                     <Col mdOffset={3} sm={12}>
                       {create && (
-                        <FormSubmit submitButtonText="Create cache"
-                                    submitLoadingText="Creating cache..."
-                                    isSubmitting={isSubmitting}
-                                    isAsyncSubmit
-                                    onCancel={onCancel} />
+                        <FormSubmit
+                          submitButtonText="Create cache"
+                          submitLoadingText="Creating cache..."
+                          isSubmitting={isSubmitting}
+                          isAsyncSubmit
+                          onCancel={onCancel}
+                        />
                       )}
                       {updatable && (
-                        <FormSubmit submitButtonText="Update cache"
-                                    submitLoadingText="Updating cache..."
-                                    isAsyncSubmit
-                                    isSubmitting={isSubmitting}
-                                    onCancel={onCancel} />
+                        <FormSubmit
+                          submitButtonText="Update cache"
+                          submitLoadingText="Updating cache..."
+                          isAsyncSubmit
+                          isSubmitting={isSubmitting}
+                          onCancel={onCancel}
+                        />
                       )}
                     </Col>
                   </Row>
@@ -207,7 +214,9 @@ const CacheForm = ({ type, saved, title, create, cache, validate, validationErro
             )}
           </Formik>
         </Col>
-        <Col lg={6} style={{ marginTop: 10 }}>{DocComponent ? <DocComponent /> : null}</Col>
+        <Col lg={6} style={{ marginTop: 10 }}>
+          {DocComponent ? <DocComponent /> : null}
+        </Col>
       </Row>
     </>
   );

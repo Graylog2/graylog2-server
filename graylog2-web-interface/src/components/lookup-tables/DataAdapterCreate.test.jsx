@@ -33,12 +33,12 @@ jest.mock('components/lookup-tables', () => ({
 
 jest.mock('graylog-web-plugin/plugin', () => ({
   PluginStore: {
-    exports: () => ([
+    exports: () => [
       {
         type: 'someType',
         displayName: 'Some Mocked Data Adapter Type',
       },
-    ]),
+    ],
   },
 }));
 

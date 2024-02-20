@@ -26,9 +26,7 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { Spinner } from 'components/common';
 import { Alert, BootstrapModalForm, Input, Badge } from 'components/bootstrap';
-import type {
-  RemovalResponse,
-} from 'components/indices/IndexSetFieldTypes/hooks/useRemoveCustomFieldTypeMutation';
+import type { RemovalResponse } from 'components/indices/IndexSetFieldTypes/hooks/useRemoveCustomFieldTypeMutation';
 import useRemoveCustomFieldTypeMutation from 'components/indices/IndexSetFieldTypes/hooks/useRemoveCustomFieldTypeMutation';
 import IndexSetsRemovalErrorAlert from 'components/indices/IndexSetFieldTypes/IndexSetsRemovalErrorAlert';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
@@ -44,78 +42,101 @@ const StyledLabel = styled.h5`
 const BetaBadge = () => <Badge bsStyle="danger">Beta Feature</Badge>;
 
 type Props = {
-  show: boolean,
-  onClose: () => void,
-  fields: Array<string>,
-  indexSetIds: Array<string>,
-}
+  show: boolean;
+  onClose: () => void;
+  fields: Array<string>;
+  indexSetIds: Array<string>;
+};
 
 type ContentProps = {
-  indexSetIds: Array<string>,
-  indexSets: Record<string, IndexSet>,
-  fields: Array<string>,
-  setRotated: React.Dispatch<React.SetStateAction<boolean>>
-  rotated: boolean,
-}
+  indexSetIds: Array<string>;
+  indexSets: Record<string, IndexSet>;
+  fields: Array<string>;
+  setRotated: React.Dispatch<React.SetStateAction<boolean>>;
+  rotated: boolean;
+};
 
 const indexSetsStoreMapper = ({ indexSets }: IndexSetsStoreState): Record<string, IndexSet> => {
   if (!indexSets) return null;
 
-  return Object.fromEntries(indexSets.map((indexSet) => ([indexSet.id, indexSet])));
+  return Object.fromEntries(indexSets.map((indexSet) => [indexSet.id, indexSet]));
 };
 
-const OverriddenProfilesFieldsWithTypeList = ({ overriddenProfilesFieldsWithType }: {overriddenProfilesFieldsWithType: Array<{ field: string, type: string }>}) => (
+const OverriddenProfilesFieldsWithTypeList = ({
+  overriddenProfilesFieldsWithType,
+}: {
+  overriddenProfilesFieldsWithType: Array<{ field: string; type: string }>;
+}) => (
   <>
     {overriddenProfilesFieldsWithType.map(({ field, type }, index) => {
       const isLast = index === overriddenProfilesFieldsWithType.length - 1;
 
       return (
         <span key={`${field}-${type}`}>
-          <b>{field}:</b> <i>{type}</i>{isLast ? '' : ', '}
+          <b>{field}:</b> <i>{type}</i>
+          {isLast ? '' : ', '}
         </span>
       );
     })}
   </>
 );
 
-const IndexSetCustomFieldTypeRemoveContent = ({ fields, indexSets, setRotated, rotated, indexSetIds }: ContentProps) => {
+const IndexSetCustomFieldTypeRemoveContent = ({
+  fields,
+  indexSets,
+  setRotated,
+  rotated,
+  indexSetIds,
+}: ContentProps) => {
   const fieldsStr = fields.join(', ');
   const indexSetsStr = indexSetIds.map((id) => indexSets[id].title).join(', ');
   const { customFieldMappingsByField, name: profileName, id: profileId } = useIndexProfileWithMappingsByField();
-  const overriddenIndexFieldsStr = useMemo(() => fields.filter((field) => !customFieldMappingsByField[field]).join(', '), [customFieldMappingsByField, fields]);
-  const overriddenProfilesFieldsWithType = useMemo(() => fields.filter((field) => customFieldMappingsByField[field])
-    .map((field) => ({ field, type: customFieldMappingsByField[field] })), [customFieldMappingsByField, fields]);
+  const overriddenIndexFieldsStr = useMemo(
+    () => fields.filter((field) => !customFieldMappingsByField[field]).join(', '),
+    [customFieldMappingsByField, fields],
+  );
+  const overriddenProfilesFieldsWithType = useMemo(
+    () =>
+      fields
+        .filter((field) => customFieldMappingsByField[field])
+        .map((field) => ({ field, type: customFieldMappingsByField[field] })),
+    [customFieldMappingsByField, fields],
+  );
 
   return (
     <div>
       <Alert>
         After removing the overridden field type for <b>{fieldsStr}</b> in <b>{indexSetsStr}</b>
         {overriddenIndexFieldsStr && (
-          <>, the settings of your <i>search engine</i> will be applied for
-            fields: <b>{overriddenIndexFieldsStr}</b>
+          <>
+            , the settings of your <i>search engine</i> will be applied for fields: <b>{overriddenIndexFieldsStr}</b>
           </>
         )}
         {!!overriddenProfilesFieldsWithType.length && (
           <>
             {', '}
-            the settings from <Link to={Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.edit(profileId)}>{profileName}</Link> (
-            namely <OverriddenProfilesFieldsWithTypeList overriddenProfilesFieldsWithType={overriddenProfilesFieldsWithType} />
-            )
-            {' '}
-            will be applied.
+            the settings from <Link to={Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.edit(profileId)}>
+              {profileName}
+            </Link>{' '}
+            ( namely{' '}
+            <OverriddenProfilesFieldsWithTypeList overriddenProfilesFieldsWithType={overriddenProfilesFieldsWithType} />
+            ) will be applied.
           </>
         )}
       </Alert>
       <StyledLabel>Select Rotation Strategy</StyledLabel>
       <p>
-        To see and use field type changes for <b>{fieldsStr}</b>, you have to rotate indices. You can automatically rotate affected indices after submitting this form or do that manually later.
+        To see and use field type changes for <b>{fieldsStr}</b>, you have to rotate indices. You can automatically
+        rotate affected indices after submitting this form or do that manually later.
       </p>
-      <Input type="checkbox"
-             id="rotate"
-             name="rotate"
-             label="Rotate affected indices after change"
-             onChange={() => setRotated((cur: boolean) => !cur)}
-             checked={rotated} />
+      <Input
+        type="checkbox"
+        id="rotate"
+        name="rotate"
+        label="Rotate affected indices after change"
+        onChange={() => setRotated((cur: boolean) => !cur)}
+        checked={rotated}
+      />
     </div>
   );
 };
@@ -125,62 +146,90 @@ const IndexSetCustomFieldTypeRemoveModal = ({ show, fields, onClose, indexSetIds
   const indexSets = useStore(IndexSetsStore, indexSetsStoreMapper);
   const [removalResponse, setRemovalResponse] = useState<RemovalResponse>(null);
   const [rotated, setRotated] = useState(true);
-  const removeSucceededFieldsFromSelected = useCallback((response: RemovalResponse) => {
-    const succeededFields = new Set(Object.values(response).flatMap(((indexSet) => indexSet.succeeded.map(({ fieldName }) => fieldName))));
-    setSelectedEntities((cur) => cur.filter((field) => !succeededFields.has(field)));
-  }, [setSelectedEntities]);
-  const onErrorHandler = useCallback((response: RemovalResponse) => {
-    removeSucceededFieldsFromSelected(response);
-    setRemovalResponse(response);
-  }, [removeSucceededFieldsFromSelected]);
-  const onSuccessHandler = useCallback((response: RemovalResponse) => {
-    removeSucceededFieldsFromSelected(response);
-    onClose();
-  }, [onClose, removeSucceededFieldsFromSelected]);
+  const removeSucceededFieldsFromSelected = useCallback(
+    (response: RemovalResponse) => {
+      const succeededFields = new Set(
+        Object.values(response).flatMap((indexSet) => indexSet.succeeded.map(({ fieldName }) => fieldName)),
+      );
+      setSelectedEntities((cur) => cur.filter((field) => !succeededFields.has(field)));
+    },
+    [setSelectedEntities],
+  );
+  const onErrorHandler = useCallback(
+    (response: RemovalResponse) => {
+      removeSucceededFieldsFromSelected(response);
+      setRemovalResponse(response);
+    },
+    [removeSucceededFieldsFromSelected],
+  );
+  const onSuccessHandler = useCallback(
+    (response: RemovalResponse) => {
+      removeSucceededFieldsFromSelected(response);
+      onClose();
+    },
+    [onClose, removeSucceededFieldsFromSelected],
+  );
   const { removeCustomFieldTypeMutation } = useRemoveCustomFieldTypeMutation({ onErrorHandler, onSuccessHandler });
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
   const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
-  const onSubmit = useCallback((e: React.FormEvent) => {
-    e.preventDefault();
-    setRemovalResponse(null);
+  const onSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      setRemovalResponse(null);
 
-    removeCustomFieldTypeMutation({ fields, indexSets: indexSetIds, rotated })
-      .then(() => {
+      removeCustomFieldTypeMutation({ fields, indexSets: indexSetIds, rotated }).then(() => {
         sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_FIELD_VALUE_ACTION.REMOVE_CUSTOM_FIELD_TYPE_REMOVED, {
           app_pathname: telemetryPathName,
-          app_action_value:
-            {
-              value: 'removed-custom-field-type',
-              rotated,
-            },
+          app_action_value: {
+            value: 'removed-custom-field-type',
+            rotated,
+          },
         });
       });
-  }, [fields, indexSetIds, removeCustomFieldTypeMutation, rotated, sendTelemetry, telemetryPathName]);
+    },
+    [fields, indexSetIds, removeCustomFieldTypeMutation, rotated, sendTelemetry, telemetryPathName],
+  );
 
   const onCancel = useCallback(() => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_FIELD_VALUE_ACTION.REMOVE_CUSTOM_FIELD_TYPE_CLOSED, { app_pathname: telemetryPathName, app_action_value: 'removed-custom-field-type-closed' });
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_FIELD_VALUE_ACTION.REMOVE_CUSTOM_FIELD_TYPE_CLOSED, {
+      app_pathname: telemetryPathName,
+      app_action_value: 'removed-custom-field-type-closed',
+    });
     onClose();
   }, [onClose, sendTelemetry, telemetryPathName]);
 
   useEffect(() => {
     IndexSetsActions.list(false);
-    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_FIELD_VALUE_ACTION.REMOVE_CUSTOM_FIELD_TYPE_OPENED, { app_pathname: telemetryPathName, app_action_value: 'removed-custom-field-type-opened' });
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_FIELD_VALUE_ACTION.REMOVE_CUSTOM_FIELD_TYPE_OPENED, {
+      app_pathname: telemetryPathName,
+      app_action_value: 'removed-custom-field-type-opened',
+    });
   }, [sendTelemetry, telemetryPathName]);
 
   return (
-    <BootstrapModalForm title={<span>Remove Field Type Overrides <BetaBadge /></span>}
-                        submitButtonText="Remove field type overrides"
-                        onSubmitForm={onSubmit}
-                        onCancel={onCancel}
-                        show={show}
-                        bsSize="large">
-      {!indexSets ? <Spinner /> : (
-        <IndexSetCustomFieldTypeRemoveContent rotated={rotated}
-                                              setRotated={setRotated}
-                                              fields={fields}
-                                              indexSetIds={indexSetIds}
-                                              indexSets={indexSets} />
+    <BootstrapModalForm
+      title={
+        <span>
+          Remove Field Type Overrides <BetaBadge />
+        </span>
+      }
+      submitButtonText="Remove field type overrides"
+      onSubmitForm={onSubmit}
+      onCancel={onCancel}
+      show={show}
+      bsSize="large"
+    >
+      {!indexSets ? (
+        <Spinner />
+      ) : (
+        <IndexSetCustomFieldTypeRemoveContent
+          rotated={rotated}
+          setRotated={setRotated}
+          fields={fields}
+          indexSetIds={indexSetIds}
+          indexSets={indexSets}
+        />
       )}
       {removalResponse && <IndexSetsRemovalErrorAlert removalResponse={removalResponse} indexSets={indexSets} />}
     </BootstrapModalForm>

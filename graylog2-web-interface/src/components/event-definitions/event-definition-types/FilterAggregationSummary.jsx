@@ -36,7 +36,11 @@ import LinkToReplaySearch from '../replay-search/LinkToReplaySearch';
 
 const formatStreamOrId = (streamOrId) => {
   if (typeof streamOrId === 'string') {
-    return <span key={streamOrId}><em>{streamOrId}</em></span>;
+    return (
+      <span key={streamOrId}>
+        <em>{streamOrId}</em>
+      </span>
+    );
   }
 
   return (
@@ -49,23 +53,19 @@ const formatStreamOrId = (streamOrId) => {
 const getConditionType = (config) => {
   const { group_by: groupBy, series, conditions } = config;
 
-  return (isEmpty(groupBy)
-  && (!conditions || isEmpty(conditions) || conditions.expression === null)
-  && isEmpty(series)
-    ? 'filter' : 'aggregation');
+  return isEmpty(groupBy) && (!conditions || isEmpty(conditions) || conditions.expression === null) && isEmpty(series)
+    ? 'filter'
+    : 'aggregation';
 };
 
 const renderQueryParameters = (queryParameters) => {
   if (queryParameters.some((p) => p.embryonic)) {
-    const undeclaredParameters = queryParameters.filter((p) => p.embryonic)
+    const undeclaredParameters = queryParameters
+      .filter((p) => p.embryonic)
       .map((p) => p.name)
       .join(', ');
 
-    return (
-      <Alert bsStyle="danger">
-        There are undeclared query parameters: {undeclaredParameters}
-      </Alert>
-    );
+    return <Alert bsStyle="danger">There are undeclared query parameters: {undeclaredParameters}</Alert>;
   }
 
   return <dd>{queryParameters.map((p) => p.name).join(', ')}</dd>;
@@ -85,9 +85,14 @@ class FilterAggregationSummary extends React.Component {
       return 'No Streams selected, searches in all Streams';
     }
 
-    const warning = streamIdsWithMissingPermission.length > 0
-      ? <Alert bsStyle="warning">Missing Stream Permissions for:<br />{streamIdsWithMissingPermission.join(', ')}</Alert>
-      : null;
+    const warning =
+      streamIdsWithMissingPermission.length > 0 ? (
+        <Alert bsStyle="warning">
+          Missing Stream Permissions for:
+          <br />
+          {streamIdsWithMissingPermission.join(', ')}
+        </Alert>
+      ) : null;
 
     const renderedStreams = streamIds
       .map((id) => streams.find((s) => s.id === id) || id)
@@ -157,9 +162,13 @@ class FilterAggregationSummary extends React.Component {
         <dt>Streams</dt>
         <dd className={styles.streamList}>{this.renderStreams(effectiveStreamIds, streamIdsWithMissingPermission)}</dd>
         <dt>Search within</dt>
-        <dd>{searchWithin.duration} {searchWithin.unit.toLowerCase()}</dd>
+        <dd>
+          {searchWithin.duration} {searchWithin.unit.toLowerCase()}
+        </dd>
         <dt>Execute search every</dt>
-        <dd>{executeEvery.duration} {executeEvery.unit.toLowerCase()}</dd>
+        <dd>
+          {executeEvery.duration} {executeEvery.unit.toLowerCase()}
+        </dd>
         <dt>Enable scheduling</dt>
         <dd>{isScheduled ? 'yes' : 'no'}</dd>
         {conditionType === 'filter' && (
@@ -174,13 +183,13 @@ class FilterAggregationSummary extends React.Component {
             <dd>{groupBy && groupBy.length > 0 ? groupBy.join(', ') : 'No Group by configured'}</dd>
             <dt>Create Events if</dt>
             <dd>
-              {validationResults.isValid
-                ? <AggregationConditionSummary series={series} conditions={conditions} />
-                : (
-                  <Alert bsSize="small" bsStyle="danger">
-                    Condition is not valid: {validationResults.errors.join(', ')}
-                  </Alert>
-                )}
+              {validationResults.isValid ? (
+                <AggregationConditionSummary series={series} conditions={conditions} />
+              ) : (
+                <Alert bsSize="small" bsStyle="danger">
+                  Condition is not valid: {validationResults.errors.join(', ')}
+                </Alert>
+              )}
             </dd>
           </>
         )}

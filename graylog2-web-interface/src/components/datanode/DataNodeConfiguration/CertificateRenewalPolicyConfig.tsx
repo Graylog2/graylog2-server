@@ -36,32 +36,33 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 type RenewalPolicy = {
-  mode: 'AUTOMATIC' | 'MANUAL',
-  certificate_lifetime: string,
-}
+  mode: 'AUTOMATIC' | 'MANUAL';
+  certificate_lifetime: string;
+};
 const TIME_UNITS = ['hours', 'days', 'months', 'years'] as const;
 const TIME_UNITS_UPPER = TIME_UNITS.map((unit) => unit.toLocaleUpperCase());
 
 type FormConfig = {
-  mode: RenewalPolicy['mode'],
-  lifetimeUnit: typeof TIME_UNITS[number],
-  lifetimeValue: number,
-}
+  mode: RenewalPolicy['mode'];
+  lifetimeUnit: (typeof TIME_UNITS)[number];
+  lifetimeValue: number;
+};
 
 const StyledDefList = styled.dl.attrs({
   className: 'deflist',
-})(({ theme }: { theme: DefaultTheme }) => css`
-  &&.deflist {
-    dd {
-      padding-left: ${theme.spacings.md};
-      margin-left: 200px;
+})(
+  ({ theme }: { theme: DefaultTheme }) => css`
+    &&.deflist {
+      dd {
+        padding-left: ${theme.spacings.md};
+        margin-left: 200px;
+      }
     }
-  }
-`);
-
-const handleSaveConfig = async (configToSave: RenewalPolicy) => (
-  ConfigurationsActions.update(ConfigurationType.CERTIFICATE_RENEWAL_POLICY_CONFIG, configToSave)
+  `,
 );
+
+const handleSaveConfig = async (configToSave: RenewalPolicy) =>
+  ConfigurationsActions.update(ConfigurationType.CERTIFICATE_RENEWAL_POLICY_CONFIG, configToSave);
 
 const smallestUnit = (duration: string) => {
   if (duration.endsWith('H')) {
@@ -83,14 +84,16 @@ const smallestUnit = (duration: string) => {
   throw new Error(`Invalid duration specified: ${duration}`);
 };
 
-const fetchCurrentConfig = () => ConfigurationsActions.list(ConfigurationType.CERTIFICATE_RENEWAL_POLICY_CONFIG) as Promise<RenewalPolicy>;
+const fetchCurrentConfig = () =>
+  ConfigurationsActions.list(ConfigurationType.CERTIFICATE_RENEWAL_POLICY_CONFIG) as Promise<RenewalPolicy>;
 
 const NoExistingPolicy = ({ createPolicy }: { createPolicy: () => void }) => (
-  <span>There is no Certificate Renewal Policy yet. Click&nbsp;
-    <Button onClick={createPolicy}
-            bsSize="xsmall"
-            bsStyle="primary">here
-    </Button> to create one.
+  <span>
+    There is no Certificate Renewal Policy yet. Click&nbsp;
+    <Button onClick={createPolicy} bsSize="xsmall" bsStyle="primary">
+      here
+    </Button>{' '}
+    to create one.
   </span>
 );
 
@@ -104,14 +107,16 @@ const DEFAULT_CONFIG = {
 
 const queryKey = ['config', 'certificate-renewal-policy'];
 
-const renewalModeExplanation = 'Setting the renewal policy to "Automatic" will '
-  + 'renew all expiring certificates without any user interaction. Setting it to "Manual" will create a system '
-  + 'notification when one or more certificates are about to expire, allowing you to confirm their renewal.';
-const lifetimeExplanation = 'The certificate lifetime will be used for the length of the validity of newly created certificates.';
+const renewalModeExplanation =
+  'Setting the renewal policy to "Automatic" will ' +
+  'renew all expiring certificates without any user interaction. Setting it to "Manual" will create a system ' +
+  'notification when one or more certificates are about to expire, allowing you to confirm their renewal.';
+const lifetimeExplanation =
+  'The certificate lifetime will be used for the length of the validity of newly created certificates.';
 
 type Props = {
-  className?: string
-}
+  className?: string;
+};
 
 const CertificateRenewalPolicyConfig = ({ className }: Props) => {
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -127,7 +132,10 @@ const CertificateRenewalPolicyConfig = ({ className }: Props) => {
       setShowModal(false);
     },
     onError: (err: Error) => {
-      UserNotification.error(`Error Updating Detector Definition: ${err.toString()}`, 'Unable to update detector definition');
+      UserNotification.error(
+        `Error Updating Detector Definition: ${err.toString()}`,
+        'Unable to update detector definition',
+      );
     },
   });
 
@@ -179,37 +187,43 @@ const CertificateRenewalPolicyConfig = ({ className }: Props) => {
   return (
     <div className={className}>
       <h2>Certificate Renewal Policy Configuration</h2>
-      <p>
-        These settings will be used when detecting expiration of certificates and/or when renewing them.
-      </p>
-      {!currentConfig ? <NoExistingPolicy createPolicy={() => setShowModal(true)} /> : (
+      <p>These settings will be used when detecting expiration of certificates and/or when renewing them.</p>
+      {!currentConfig ? (
+        <NoExistingPolicy createPolicy={() => setShowModal(true)} />
+      ) : (
         <>
           <StyledDefList>
             <dt>Renewal Mode:</dt>
             <dd>{capitalize(currentConfig.mode)}</dd>
-            <dd><i>{renewalModeExplanation}</i></dd>
+            <dd>
+              <i>{renewalModeExplanation}</i>
+            </dd>
             <dt>Certificate Lifetime:</dt>
-            <dd>{formConfig.lifetimeValue} {formConfig.lifetimeUnit}</dd>
-            <dd><i>{lifetimeExplanation}</i></dd>
+            <dd>
+              {formConfig.lifetimeValue} {formConfig.lifetimeUnit}
+            </dd>
+            <dd>
+              <i>{lifetimeExplanation}</i>
+            </dd>
           </StyledDefList>
 
           <p className="no-bm">
             <IfPermitted permissions="indices:changestate">
-              <Button bsStyle="info"
-                      bsSize="xs"
-                      onClick={() => {
-                        setShowModal(true);
-                      }}>Edit configuration
+              <Button
+                bsStyle="info"
+                bsSize="xs"
+                onClick={() => {
+                  setShowModal(true);
+                }}
+              >
+                Edit configuration
               </Button>
             </IfPermitted>
           </p>
         </>
       )}
 
-      <Modal show={showModal}
-             onHide={resetConfig}
-             aria-modal="true"
-             aria-labelledby="dialog_label">
+      <Modal show={showModal} onHide={resetConfig} aria-modal="true" aria-labelledby="dialog_label">
         <Formik<FormConfig> onSubmit={saveConfig} initialValues={formConfig}>
           {({ values, setFieldValue, isSubmitting, isValid, isValidating }) => (
             <Form>
@@ -223,42 +237,46 @@ const CertificateRenewalPolicyConfig = ({ className }: Props) => {
                     <Col md={12}>
                       <Field name="mode">
                         {({ field: { name, value, onChange } }) => (
-                          <Input id={name}
-                                 label="Certificate Renewal Mode"
-                                 help={renewalModeExplanation}>
-                            <Select options={certicateRenewalModes}
-                                    clearable={false}
-                                    name={name}
-                                    value={value ?? 'AUTOMATIC'}
-                                    aria-label="Select certificate renewal mode"
-                                    size="small"
-                                    onChange={(newValue) => onChange({ target: { name, value: newValue } })} />
+                          <Input id={name} label="Certificate Renewal Mode" help={renewalModeExplanation}>
+                            <Select
+                              options={certicateRenewalModes}
+                              clearable={false}
+                              name={name}
+                              value={value ?? 'AUTOMATIC'}
+                              aria-label="Select certificate renewal mode"
+                              size="small"
+                              onChange={(newValue) => onChange({ target: { name, value: newValue } })}
+                            />
                           </Input>
                         )}
                       </Field>
-                      <TimeUnitInput label="Certificate Lifetime"
-                                     help={lifetimeExplanation}
-                                     update={(value, unit) => {
-                                       setFieldValue('lifetimeValue', value);
-                                       setFieldValue('lifetimeUnit', unit);
-                                     }}
-                                     value={values.lifetimeValue}
-                                     unit={values.lifetimeUnit.toLocaleUpperCase()}
-                                     enabled
-                                     hideCheckbox
-                                     units={TIME_UNITS_UPPER} />
+                      <TimeUnitInput
+                        label="Certificate Lifetime"
+                        help={lifetimeExplanation}
+                        update={(value, unit) => {
+                          setFieldValue('lifetimeValue', value);
+                          setFieldValue('lifetimeUnit', unit);
+                        }}
+                        value={values.lifetimeValue}
+                        unit={values.lifetimeUnit.toLocaleUpperCase()}
+                        enabled
+                        hideCheckbox
+                        units={TIME_UNITS_UPPER}
+                      />
                     </Col>
                   </Row>
                 </div>
               </Modal.Body>
 
               <Modal.Footer>
-                <ModalSubmit onCancel={resetConfig}
-                             disabledSubmit={isValidating || !isValid}
-                             isSubmitting={isSubmitting}
-                             isAsyncSubmit
-                             submitLoadingText="Updating configuration"
-                             submitButtonText="Update configuration" />
+                <ModalSubmit
+                  onCancel={resetConfig}
+                  disabledSubmit={isValidating || !isValid}
+                  isSubmitting={isSubmitting}
+                  isAsyncSubmit
+                  submitLoadingText="Updating configuration"
+                  submitButtonText="Update configuration"
+                />
               </Modal.Footer>
             </Form>
           )}

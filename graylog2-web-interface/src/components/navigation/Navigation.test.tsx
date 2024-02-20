@@ -37,7 +37,13 @@ jest.mock('hooks/useFeature', () => (featureFlag: string) => featureFlag === 'fr
 jest.mock('routing/useLocation', () => jest.fn(() => ({ pathname: '' })));
 
 describe('Navigation', () => {
-  const SUT = () => <HotkeysProvider><PerspectivesProvider><Navigation /></PerspectivesProvider></HotkeysProvider>;
+  const SUT = () => (
+    <HotkeysProvider>
+      <PerspectivesProvider>
+        <Navigation />
+      </PerspectivesProvider>
+    </HotkeysProvider>
+  );
 
   beforeAll(() => {
     PluginStore.register(new PluginManifest({}, PerspectivesBindings));

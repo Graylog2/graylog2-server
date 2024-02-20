@@ -37,12 +37,7 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import TrafficGraph from './TrafficGraph';
 
-const DAYS = [
-  30,
-  90,
-  180,
-  365,
-];
+const DAYS = [30, 90, 180, 365];
 
 const Wrapper = styled.div`
   margin-bottom: 5px;
@@ -65,12 +60,16 @@ const Wrapper = styled.div`
 const StyledDl = styled.dl`
   margin-bottom: 0;
 `;
-const StyledH2 = styled.h2(({ theme }) => css`
-  margin-bottom: ${theme.spacings.sm};
-`);
-const StyledH3 = styled.h3(({ theme }) => css`
-  margin-bottom: ${theme.spacings.sm};
-`);
+const StyledH2 = styled.h2(
+  ({ theme }) => css`
+    margin-bottom: ${theme.spacings.sm};
+  `,
+);
+const StyledH3 = styled.h3(
+  ({ theme }) => css`
+    margin-bottom: ${theme.spacings.sm};
+  `,
+);
 
 const Header = () => <StyledH2>Graylog cluster</StyledH2>;
 
@@ -143,34 +142,43 @@ const GraylogClusterTrafficGraph = () => {
     };
   }, []);
 
-  const TrafficGraphComponent = (isPermitted(currentUser.permissions, ['licenses:read']) && licensePlugin[0]?.EnterpriseTrafficGraph) || TrafficGraph;
+  const TrafficGraphComponent =
+    (isPermitted(currentUser.permissions, ['licenses:read']) && licensePlugin[0]?.EnterpriseTrafficGraph) ||
+    TrafficGraph;
   let sumOutput = null;
   let trafficGraph = <Spinner />;
 
   if (traffic) {
     const bytesOut = reduce(traffic.output, (result, value) => result + value);
 
-    sumOutput = <small>Last {graphDays} days: {NumberUtils.formatBytes(bytesOut)}</small>;
+    sumOutput = (
+      <small>
+        Last {graphDays} days: {NumberUtils.formatBytes(bytesOut)}
+      </small>
+    );
 
     const unixTraffic = formatTrafficData(traffic.output);
 
-    trafficGraph = (
-      <TrafficGraphComponent traffic={unixTraffic}
-                             width={graphWidth} />
-    );
+    trafficGraph = <TrafficGraphComponent traffic={unixTraffic} width={graphWidth} />;
   }
 
   return (
     <>
       <Wrapper className="form-inline graph-days pull-right">
-        <Input id="graph-days"
-               type="select"
-               bsSize="small"
-               label="Days"
-               value={graphDays}
-               onChange={onGraphDaysChange}
-               formGroupClassName="graph-days-select">
-          {DAYS.map((size) => <option key={`option-${size}`} value={size}>{size}</option>)}
+        <Input
+          id="graph-days"
+          type="select"
+          bsSize="small"
+          label="Days"
+          value={graphDays}
+          onChange={onGraphDaysChange}
+          formGroupClassName="graph-days-select"
+        >
+          {DAYS.map((size) => (
+            <option key={`option-${size}`} value={size}>
+              {size}
+            </option>
+          ))}
         </Input>
       </Wrapper>
 
@@ -181,9 +189,9 @@ const GraylogClusterTrafficGraph = () => {
 };
 
 type Props = {
-  layout?: 'default' | 'compact',
-  children: React.ReactNode
-}
+  layout?: 'default' | 'compact';
+  children: React.ReactNode;
+};
 
 const GraylogClusterOverview = ({ layout, children }: Props) => {
   if (layout === 'compact') {

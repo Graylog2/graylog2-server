@@ -40,12 +40,15 @@ jest.mock('views/stores/SearchConfigStore', () => ({
   SearchConfigActions: {
     refresh: jest.fn(() => Promise.resolve()),
   },
-  SearchConfigStore: MockStore(['getInitialState', () => ({
-    searchesClusterConfig: {
-      relative_timerange_options: { P1D: 'Search in last day', PT0S: 'Search in all messages' },
-      query_time_range_limit: 'PT0S',
-    },
-  })]),
+  SearchConfigStore: MockStore([
+    'getInitialState',
+    () => ({
+      searchesClusterConfig: {
+        relative_timerange_options: { P1D: 'Search in last day', PT0S: 'Search in all messages' },
+        query_time_range_limit: 'PT0S',
+      },
+    }),
+  ]),
 }));
 
 jest.mock('views/hooks/useGlobalOverride');
@@ -78,32 +81,33 @@ describe('WidgetQueryControls', () => {
   };
 
   const emptyGlobalOverride = GlobalOverride.empty();
-  const globalOverrideWithQuery = GlobalOverride.create(undefined, { type: 'elasticsearch', query_string: 'source:foo' });
-  const globalOverrideWithTimeRange = GlobalOverride.create({ type: 'absolute', from: '2020-01-01T10:00:00.850Z', to: '2020-01-02T10:00:00.000Z' });
+  const globalOverrideWithQuery = GlobalOverride.create(undefined, {
+    type: 'elasticsearch',
+    query_string: 'source:foo',
+  });
+  const globalOverrideWithTimeRange = GlobalOverride.create({
+    type: 'absolute',
+    from: '2020-01-01T10:00:00.850Z',
+    to: '2020-01-02T10:00:00.000Z',
+  });
   const globalOverrideWithQueryAndTimeRange = GlobalOverride.create(
     { type: 'absolute', from: '2020-01-01T10:00:00.850Z', to: '2020-01-02T10:00:00.000Z' },
     { type: 'elasticsearch', query_string: 'source:foo' },
   );
-  const widget = Widget.builder()
-    .id('deadbeef')
-    .type('dummy')
-    .config({})
-    .build();
+  const widget = Widget.builder().id('deadbeef').type('dummy').config({}).build();
 
   const Wrapper = ({ children }: { children: React.ReactNode }) => (
     <TestStoreProvider>
-      <WidgetContext.Provider value={widget}>
-        {children}
-      </WidgetContext.Provider>
+      <WidgetContext.Provider value={widget}>{children}</WidgetContext.Provider>
     </TestStoreProvider>
   );
 
-  const renderSUT = (props = {}) => render(
-    <Wrapper>
-      <WidgetQueryControls {...defaultProps}
-                           {...props} />
-    </Wrapper>,
-  );
+  const renderSUT = (props = {}) =>
+    render(
+      <Wrapper>
+        <WidgetQueryControls {...defaultProps} {...props} />
+      </Wrapper>,
+    );
 
   describe('displays if global override is set', () => {
     const resetTimeRangeButtonTitle = /reset global override/i;

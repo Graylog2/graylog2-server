@@ -24,27 +24,25 @@ import { singletonStore, singletonActions } from 'logic/singleton';
 import type { Input } from 'components/messageloaders/Types';
 
 export type PaginatedStreamRulesInputs = {
-  list: Array<Input>,
+  list: Array<Input>;
 };
 
 type StreamRulesInputsActionsType = {
-  list: () => Promise<{ inputs: Array<Input>, total: number }>,
-}
+  list: () => Promise<{ inputs: Array<Input>; total: number }>;
+};
 
 type StreamRulesInputsStoreState = {
-  inputs: Array<Input> | undefined,
-}
+  inputs: Array<Input> | undefined;
+};
 
-export const StreamRulesInputsActions = singletonActions(
-  'core.StreamRulesInputs',
-  () => Reflux.createActions<StreamRulesInputsActionsType>({
+export const StreamRulesInputsActions = singletonActions('core.StreamRulesInputs', () =>
+  Reflux.createActions<StreamRulesInputsActionsType>({
     list: { asyncResult: true },
   }),
 );
 
-export const StreamRulesInputsStore = singletonStore(
-  'core.StreamRulesInputs',
-  () => Reflux.createStore<StreamRulesInputsStoreState>({
+export const StreamRulesInputsStore = singletonStore('core.StreamRulesInputs', () =>
+  Reflux.createStore<StreamRulesInputsStoreState>({
     listenables: [StreamRulesInputsActions],
     sourceUrl: '/streams/rules/inputs',
     inputs: undefined,
@@ -64,19 +62,20 @@ export const StreamRulesInputsStore = singletonStore(
     list() {
       const promise = fetch('GET', qualifyUrl(this.sourceUrl));
 
-      promise
-        .then(
-          (response) => {
-            this.inputs = response.inputs;
-            this.trigger(this._state());
+      promise.then(
+        (response) => {
+          this.inputs = response.inputs;
+          this.trigger(this._state());
 
-            return this.inputs;
-          },
-          (error) => {
-            UserNotification.error(`Fetching Stream Rule Inputs List failed with status: ${error}`,
-              'Could not retrieve Stream Rule Inputs');
-          },
-        );
+          return this.inputs;
+        },
+        (error) => {
+          UserNotification.error(
+            `Fetching Stream Rule Inputs List failed with status: ${error}`,
+            'Could not retrieve Stream Rule Inputs',
+          );
+        },
+      );
 
       StreamRulesInputsActions.list.promise(promise);
     },

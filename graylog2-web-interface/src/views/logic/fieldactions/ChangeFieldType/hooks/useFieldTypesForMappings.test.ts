@@ -73,6 +73,7 @@ describe('useFieldType custom hook', () => {
 
     expect(UserNotification.error).toHaveBeenCalledWith(
       'Loading field type options failed with status: Error: Error',
-      'Could not load field type options');
+      'Could not load field type options',
+    );
   });
 });

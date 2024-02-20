@@ -24,17 +24,17 @@ import { Input } from 'components/bootstrap';
 import { optionalMarker } from 'components/configurationforms/FieldHelpers';
 
 type Props = {
-  autoFocus?: boolean,
-  field: ListFieldType,
-  onChange: (title: string, value: Array<string>, dirty?: boolean) => void,
-  title: string,
-  typeName: string,
-  value: Array<string> | string,
+  autoFocus?: boolean;
+  field: ListFieldType;
+  onChange: (title: string, value: Array<string>, dirty?: boolean) => void;
+  title: string;
+  typeName: string;
+  value: Array<string> | string;
 };
 
 const ListField = ({ autoFocus, field, onChange, title, typeName, value }: Props) => {
   const handleChange = (nextValue) => {
-    const values = (nextValue === '' ? [] : nextValue.split(','));
+    const values = nextValue === '' ? [] : nextValue.split(',');
 
     onChange(title, values);
   };
@@ -42,26 +42,32 @@ const ListField = ({ autoFocus, field, onChange, title, typeName, value }: Props
   const isRequired = !field.is_optional;
   const allowCreate = field.attributes.includes('allow_create');
   const options = field.additional_info?.values || {};
-  const formattedOptions = Object.entries(options)
-    .map(([label, optionValue]) => ({ value: optionValue, label: label }));
+  const formattedOptions = Object.entries(options).map(([label, optionValue]) => ({
+    value: optionValue,
+    label: label,
+  }));
 
-  const label = <>{field.human_name} {optionalMarker(field)}</>;
+  const label = (
+    <>
+      {field.human_name} {optionalMarker(field)}
+    </>
+  );
 
   const selectValue = Array.isArray(value) ? value.join(',') : value;
 
   return (
-    <Input id={`${typeName}-${title}`}
-           label={label}
-           help={field.description}>
-      <MultiSelect inputId={`${typeName}-${title}`}
-                   name={`configuration[${title}]`}
-                   required={isRequired}
-                   autoFocus={autoFocus}
-                   options={formattedOptions}
-                   value={selectValue}
-                   placeholder={`${allowCreate ? 'Add' : 'Select'} ${field.human_name}`}
-                   onChange={handleChange}
-                   allowCreate={allowCreate} />
+    <Input id={`${typeName}-${title}`} label={label} help={field.description}>
+      <MultiSelect
+        inputId={`${typeName}-${title}`}
+        name={`configuration[${title}]`}
+        required={isRequired}
+        autoFocus={autoFocus}
+        options={formattedOptions}
+        value={selectValue}
+        placeholder={`${allowCreate ? 'Add' : 'Select'} ${field.human_name}`}
+        onChange={handleChange}
+        allowCreate={allowCreate}
+      />
     </Input>
   );
 };

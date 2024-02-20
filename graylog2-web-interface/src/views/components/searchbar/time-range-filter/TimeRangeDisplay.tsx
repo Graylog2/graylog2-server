@@ -19,7 +19,9 @@ import styled, { css } from 'styled-components';
 
 import type {
   TimeRange as TimeRangeType,
-  NoTimeRangeOverride, AbsoluteTimeRange, RelativeTimeRange,
+  NoTimeRangeOverride,
+  AbsoluteTimeRange,
+  RelativeTimeRange,
 } from 'views/logic/queries/Query';
 import {
   isTypeKeyword,
@@ -33,18 +35,20 @@ import assertUnreachable from 'logic/assertUnreachable';
 export const EMPTY_RANGE = '----/--/-- --:--:--.---';
 export const EMPTY_OUTPUT = { from: EMPTY_RANGE, until: EMPTY_RANGE };
 
-const TimeRangeWrapper = styled.div(({ theme }) => css`
-  width: 100%;
-  padding: 3px 13px;
-  display: flex;
-  justify-content: space-around;
-  background-color: ${theme.colors.table.backgroundAlt};
-  align-items: center;
+const TimeRangeWrapper = styled.div(
+  ({ theme }) => css`
+    width: 100%;
+    padding: 3px 13px;
+    display: flex;
+    justify-content: space-around;
+    background-color: ${theme.colors.table.backgroundAlt};
+    align-items: center;
 
-  > span {
-    flex: 1;
-  }
-`);
+    > span {
+      flex: 1;
+    }
+  `,
+);
 
 export const range = (timerange: AbsoluteTimeRange | RelativeTimeRange | null | undefined) => {
   let from = EMPTY_RANGE;
@@ -82,29 +86,39 @@ export const range = (timerange: AbsoluteTimeRange | RelativeTimeRange | null | 
 
 const TimeRange = ({ timerange }: { timerange: TimeRangeType | null | undefined }) => {
   if (isTypeKeyword(timerange)) {
-    return <span>Keyword: <b>{timerange.keyword}</b></span>;
+    return (
+      <span>
+        Keyword: <b>{timerange.keyword}</b>
+      </span>
+    );
   }
 
   const { from, until } = range(timerange);
 
   return (
     <>
-      <span data-testid="from">From: <b>{from}</b></span>
-      <span data-testid="to">Until: <b>{until}</b></span>
+      <span data-testid="from">
+        From: <b>{from}</b>
+      </span>
+      <span data-testid="to">
+        Until: <b>{until}</b>
+      </span>
     </>
   );
 };
 
 type Props = {
-  timerange: TimeRangeType | NoTimeRangeOverride | null | undefined,
-  toggleDropdownShow?: () => void,
+  timerange: TimeRangeType | NoTimeRangeOverride | null | undefined;
+  toggleDropdownShow?: () => void;
 };
 
 const TimeRangeDisplay = ({ timerange, toggleDropdownShow }: Props) => (
-  <TimeRangeWrapper aria-label="Search Time Range, Opens Time Range Selector On Click" role="button" onClick={toggleDropdownShow}>
-    {isNoTimeRangeOverride(timerange)
-      ? <span>No Override</span>
-      : <TimeRange timerange={timerange} />}
+  <TimeRangeWrapper
+    aria-label="Search Time Range, Opens Time Range Selector On Click"
+    role="button"
+    onClick={toggleDropdownShow}
+  >
+    {isNoTimeRangeOverride(timerange) ? <span>No Override</span> : <TimeRange timerange={timerange} />}
   </TimeRangeWrapper>
 );
 

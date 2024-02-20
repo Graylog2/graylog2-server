@@ -37,11 +37,13 @@ const URLColumn = styled.div`
   flex: 1;
 `;
 
-const StyledFormControl = styled(FormControl)(({ theme }) => css`
-  &[readonly] {
-    background-color: ${theme.colors.input.background};
-  }
-`);
+const StyledFormControl = styled(FormControl)(
+  ({ theme }) => css`
+    &[readonly] {
+      background-color: ${theme.colors.input.background};
+    }
+  `,
+);
 
 const InputGroupAddon = styled(InputGroup.Addon)`
   padding: 0;
@@ -53,7 +55,7 @@ const StyledClipboardButton = styled(ClipboardButton)`
 `;
 
 type Props = {
-  entityGRN: string,
+  entityGRN: string;
 };
 
 const ShareableEntityURL = ({ entityGRN }: Props) => {
@@ -70,15 +72,15 @@ const ShareableEntityURL = ({ entityGRN }: Props) => {
           <InputGroup>
             <StyledFormControl type="text" value={entityUrl} readOnly />
             <InputGroupAddon>
-              <StyledClipboardButton text={entityUrl}
-                                     buttonTitle="Copy parameter to clipboard"
-                                     title={<Icon name="copy" fixedWidth />} />
+              <StyledClipboardButton
+                text={entityUrl}
+                buttonTitle="Copy parameter to clipboard"
+                title={<Icon name="copy" fixedWidth />}
+              />
             </InputGroupAddon>
           </InputGroup>
         </FormGroup>
-        <div>
-          You or anyone authorized to view can access this link.
-        </div>
+        <div>You or anyone authorized to view can access this link.</div>
       </URLColumn>
     </Container>
   );

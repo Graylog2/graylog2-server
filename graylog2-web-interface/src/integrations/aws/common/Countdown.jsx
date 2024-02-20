@@ -54,9 +54,7 @@ function Countdown({ callback, className, timeInSeconds, paused }) {
     };
   }, [paused]);
 
-  return (
-    <span className={className}>{currentTime}</span>
-  );
+  return <span className={className}>{currentTime}</span>;
 }
 
 Countdown.propTypes = {

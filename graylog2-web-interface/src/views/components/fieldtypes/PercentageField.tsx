@@ -20,8 +20,8 @@ import numeral from 'numeral';
 import styled from 'styled-components';
 
 type Props = {
-  value: number,
-}
+  value: number;
+};
 
 const NumberCell = styled.span`
   float: right;

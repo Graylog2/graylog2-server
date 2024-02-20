@@ -21,18 +21,20 @@ import useNodeSummaries from 'hooks/useNodeSummaries';
 import usePluginEntities from 'hooks/usePluginEntities';
 
 type Props = {
-  value: string,
-}
+  value: string;
+};
 
 const useForwarderNode = (nodeId: string, enabled: boolean) => {
   const { fetchForwarderNode } = usePluginEntities('forwarder')[0] ?? {};
-  const { data: forwarderNode, isError, isLoading } = useQuery(
-    ['forwarder', 'node', nodeId],
-    () => fetchForwarderNode(nodeId),
-    { enabled: fetchForwarderNode && enabled },
-  );
+  const {
+    data: forwarderNode,
+    isError,
+    isLoading,
+  } = useQuery(['forwarder', 'node', nodeId], () => fetchForwarderNode(nodeId), {
+    enabled: fetchForwarderNode && enabled,
+  });
 
-  return (isLoading || isError) ? undefined : forwarderNode;
+  return isLoading || isError ? undefined : forwarderNode;
 };
 
 const NodeField = ({ value }: Props) => {

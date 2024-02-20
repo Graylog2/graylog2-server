@@ -21,12 +21,7 @@ import isEqual from 'lodash/isEqual';
 import without from 'lodash/without';
 import IsolatedScroll from 'react-isolated-scroll';
 
-import {
-  FormControl,
-  FormGroup,
-  ListGroup,
-  ListGroupItem,
-} from 'components/bootstrap';
+import { FormControl, FormGroup, ListGroup, ListGroupItem } from 'components/bootstrap';
 import Icon from 'components/common/Icon';
 import OverlayTrigger from 'components/common/OverlayTrigger';
 
@@ -159,10 +154,12 @@ class SelectPopover extends React.Component {
 
     return (
       <FormGroup controlId="dataFilterInput" className={style.dataFilterInput}>
-        <FormControl type="text"
-                     placeholder={filterPlaceholder}
-                     value={filterText}
-                     onChange={this.handleFilterChange(items)} />
+        <FormControl
+          type="text"
+          placeholder={filterPlaceholder}
+          value={filterText}
+          onChange={this.handleFilterChange(items)}
+        />
       </FormGroup>
     );
   };
@@ -178,16 +175,8 @@ class SelectPopover extends React.Component {
   };
 
   render() {
-    const {
-      displayDataFilter,
-      itemFormatter,
-      items,
-      placement,
-      triggerAction,
-      triggerNode,
-      disabled,
-      title,
-    } = this.props;
+    const { displayDataFilter, itemFormatter, items, placement, triggerAction, triggerNode, disabled, title } =
+      this.props;
     const { filteredItems, selectedItems } = this.state;
     const popover = (
       <>
@@ -196,11 +185,12 @@ class SelectPopover extends React.Component {
         <IsolatedScroll className={style.scrollableList}>
           <ListGroup>
             {filteredItems.map((item) => (
-              <ListGroupItem key={item}
-                             onClick={disabled ? () => {
-                             } : this.handleItemSelection(item)}
-                             active={selectedItems.includes(item)}
-                             disabled={disabled}>
+              <ListGroupItem
+                key={item}
+                onClick={disabled ? () => {} : this.handleItemSelection(item)}
+                active={selectedItems.includes(item)}
+                disabled={disabled}
+              >
                 {itemFormatter(item)}
               </ListGroupItem>
             ))}
@@ -210,14 +200,16 @@ class SelectPopover extends React.Component {
     );
 
     return (
-      <OverlayTrigger ref={(c) => {
-        this.overlay = c;
-      }}
-                      trigger={triggerAction}
-                      placement={placement}
-                      overlay={popover}
-                      title={title}
-                      rootClose>
+      <OverlayTrigger
+        ref={(c) => {
+          this.overlay = c;
+        }}
+        trigger={triggerAction}
+        placement={placement}
+        overlay={popover}
+        title={title}
+        rootClose
+      >
         {triggerNode}
       </OverlayTrigger>
     );

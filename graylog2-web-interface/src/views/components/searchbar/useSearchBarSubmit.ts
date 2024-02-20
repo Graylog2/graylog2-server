@@ -35,32 +35,37 @@ const recordQueryString = async (isDirty: boolean, query: string) => {
 };
 
 type FormValues = {
-  queryString: string,
-  timerange: TimeRange,
-}
+  queryString: string;
+  timerange: TimeRange;
+};
 
 const _trim = (s: string | undefined) => (s === undefined ? undefined : s.trim());
 
 const useSearchBarSubmit = (initialValues: FormValues, onSubmit: (v: FormValues) => Promise<unknown>) => {
   const { userTimezone } = useUserDateTime();
   const [enableReinitialize, setEnableReinitialize] = useState(true);
-  const _onSubmit = useCallback(async (values: SearchBarFormValues) => {
-    setEnableReinitialize(false);
-    const { queryString, timerange, ...rest } = values;
+  const _onSubmit = useCallback(
+    async (values: SearchBarFormValues) => {
+      setEnableReinitialize(false);
+      const { queryString, timerange, ...rest } = values;
 
-    const trimmedQueryString = _trim(queryString);
-    await recordQueryString(trimmedQueryString !== _trim(initialValues?.queryString), trimmedQueryString);
+      const trimmedQueryString = _trim(queryString);
+      await recordQueryString(trimmedQueryString !== _trim(initialValues?.queryString), trimmedQueryString);
 
-    try {
-      return onSubmit({
-        queryString,
-        timerange: isNoTimeRangeOverride(timerange) ? undefined : normalizeFromSearchBarForBackend(timerange, userTimezone),
-        ...rest,
-      });
-    } finally {
-      setEnableReinitialize(true);
-    }
-  }, [initialValues?.queryString, onSubmit, userTimezone]);
+      try {
+        return onSubmit({
+          queryString,
+          timerange: isNoTimeRangeOverride(timerange)
+            ? undefined
+            : normalizeFromSearchBarForBackend(timerange, userTimezone),
+          ...rest,
+        });
+      } finally {
+        setEnableReinitialize(true);
+      }
+    },
+    [initialValues?.queryString, onSubmit, userTimezone],
+  );
 
   return { enableReinitialize, onSubmit: _onSubmit };
 };

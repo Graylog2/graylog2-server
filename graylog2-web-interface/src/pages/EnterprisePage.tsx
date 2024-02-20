@@ -48,8 +48,8 @@ const EnterprisePage = () => {
       <div>
         <PageHeader title="Try Graylog Enterprise">
           <span>
-            Graylog Enterprise adds commercial functionality to the Open Source Graylog core. You can learn more
-            about Graylog Enterprise on the <EnterpriseProductLink>product page</EnterpriseProductLink>.
+            Graylog Enterprise adds commercial functionality to the Open Source Graylog core. You can learn more about
+            Graylog Enterprise on the <EnterpriseProductLink>product page</EnterpriseProductLink>.
           </span>
         </PageHeader>
 
@@ -61,10 +61,9 @@ const EnterprisePage = () => {
             <Col md={6}>
               <GraylogEnterpriseHeader>Graylog Operations</GraylogEnterpriseHeader>
               <p>
-                Designed to meet the needs of resource-constrained IT Operations and Software Engineering teams,
-                Graylog Operations provides numerous productivity enhancements that will save you thousands of
-                hours per year in collecting and analyzing log data to uncover the root cause of performance,
-                outage, and error issues.
+                Designed to meet the needs of resource-constrained IT Operations and Software Engineering teams, Graylog
+                Operations provides numerous productivity enhancements that will save you thousands of hours per year in
+                collecting and analyzing log data to uncover the root cause of performance, outage, and error issues.
               </p>
               <ProductLinkComponent href="https://go2.graylog.org/request-graylog-operations" clusterId={clusterId}>
                 Request now
@@ -73,12 +72,15 @@ const EnterprisePage = () => {
             <Col md={6}>
               <GraylogEnterpriseHeader>Graylog Security</GraylogEnterpriseHeader>
               <p>
-                Extend Graylog Open’s capabilities for detecting, investigating, and responding to cybersecurity
-                threats with security-specific dashboards and alerts, anomaly detection AI/ML engine,
-                integrations with other security tools, SOAR capabilities, and numerous compliance reporting
-                features.
+                Extend Graylog Open’s capabilities for detecting, investigating, and responding to cybersecurity threats
+                with security-specific dashboards and alerts, anomaly detection AI/ML engine, integrations with other
+                security tools, SOAR capabilities, and numerous compliance reporting features.
               </p>
-              <ProductLinkComponent href="https://go2.graylog.org/request-graylog-security" licenseSubject="/license/security" clusterId={clusterId}>
+              <ProductLinkComponent
+                href="https://go2.graylog.org/request-graylog-security"
+                licenseSubject="/license/security"
+                clusterId={clusterId}
+              >
                 Request now
               </ProductLinkComponent>
             </Col>

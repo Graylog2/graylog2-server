@@ -21,19 +21,19 @@ import { MockStore } from 'helpers/mocking';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
 import useProfile from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfile';
-import useIndexProfileWithMappingsByField
-  from 'components/indices/IndexSetFieldTypes/hooks/useIndexProfileWithMappingsByField';
+import useIndexProfileWithMappingsByField from 'components/indices/IndexSetFieldTypes/hooks/useIndexProfileWithMappingsByField';
 
 jest.mock('stores/indices/IndexSetsStore', () => ({
   IndexSetsActions: {
     list: jest.fn(),
   },
-  IndexSetsStore: MockStore(['getInitialState', () => ({
-    indexSets: [
-      { id: '111', title: 'index set title', field_type_profile: 'profile-id-111' },
-    ],
-    indexSet: { id: '111', title: 'index set title', field_type_profile: 'profile-id-111' },
-  })]),
+  IndexSetsStore: MockStore([
+    'getInitialState',
+    () => ({
+      indexSets: [{ id: '111', title: 'index set title', field_type_profile: 'profile-id-111' }],
+      indexSet: { id: '111', title: 'index set title', field_type_profile: 'profile-id-111' },
+    }),
+  ]),
 }));
 
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings', () => jest.fn());
@@ -68,13 +68,16 @@ describe('useRemoveCustomFieldTypeMutation', () => {
         id: 'profile-id-111',
         description: 'Profile description',
         indexSetIds: [],
-        customFieldMappings: [{
-          field: 'field-1',
-          type: 'ip',
-        }, {
-          field: 'field-2',
-          type: 'int',
-        }],
+        customFieldMappings: [
+          {
+            field: 'field-1',
+            type: 'ip',
+          },
+          {
+            field: 'field-2',
+            type: 'int',
+          },
+        ],
       },
     });
   });

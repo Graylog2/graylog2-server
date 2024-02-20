@@ -62,42 +62,46 @@ describe('Views bindings value actions', () => {
     });
 
     it('should be enabled for fields with a message context', () => {
-      expect(isEnabled({ ...defaultArguments, field: 'something', type: FieldTypes.STRING() }, getState))
-        .toEqual(true);
+      expect(isEnabled({ ...defaultArguments, field: 'something', type: FieldTypes.STRING() }, getState)).toEqual(true);
     });
 
     it('should be disabled for fields without a message context', () => {
-      expect(isEnabled({ ...defaultArguments, contexts: {}, field: 'something', type: FieldTypes.STRING() }, getState))
-        .toEqual(false);
+      expect(
+        isEnabled({ ...defaultArguments, contexts: {}, field: 'something', type: FieldTypes.STRING() }, getState),
+      ).toEqual(false);
     });
 
     it('should be enabled for fields with type string', () => {
-      expect(isEnabled({ ...defaultArguments, field: 'something', type: FieldTypes.STRING() }, getState))
-        .toEqual(true);
+      expect(isEnabled({ ...defaultArguments, field: 'something', type: FieldTypes.STRING() }, getState)).toEqual(true);
     });
 
     it('should be enabled for fields with type number', () => {
-      expect(isEnabled({ ...defaultArguments, field: 'something', type: FieldTypes.INT() }, getState))
-        .toEqual(true);
+      expect(isEnabled({ ...defaultArguments, field: 'something', type: FieldTypes.INT() }, getState)).toEqual(true);
     });
 
     it('should be enabled for compound fields', () => {
       expect(
-        isEnabled({
-          ...defaultArguments,
-          field: 'something',
-          type: FieldType.create('string', [Properties.Compound]),
-        }, getState),
+        isEnabled(
+          {
+            ...defaultArguments,
+            field: 'something',
+            type: FieldType.create('string', [Properties.Compound]),
+          },
+          getState,
+        ),
       ).toEqual(true);
     });
 
     it('should be disabled for decorated fields', () => {
       expect(
-        isEnabled({
-          ...defaultArguments,
-          field: 'something',
-          type: FieldType.create('string', [Properties.Decorated]),
-        }, getState),
+        isEnabled(
+          {
+            ...defaultArguments,
+            field: 'something',
+            type: FieldType.create('string', [Properties.Decorated]),
+          },
+          getState,
+        ),
       ).toBe(false);
     });
   });
@@ -115,22 +119,27 @@ describe('Views bindings value actions', () => {
 
     it('should be disabled for decorated fields', () => {
       expect(
-        action.isEnabled({
-          ...defaultArguments,
-          field: 'something',
-          type: FieldType.create('string', [Properties.Decorated]),
-        }, getState),
+        action.isEnabled(
+          {
+            ...defaultArguments,
+            field: 'something',
+            type: FieldType.create('string', [Properties.Decorated]),
+          },
+          getState,
+        ),
       ).toEqual(false);
     });
 
     it('should be disabled for functions', () => {
-      expect(action.isEnabled({ ...defaultArguments, field: 'count(something)', type: FieldTypes.STRING() }, getState))
-        .toEqual(false);
+      expect(
+        action.isEnabled({ ...defaultArguments, field: 'count(something)', type: FieldTypes.STRING() }, getState),
+      ).toEqual(false);
     });
 
     it('should be enabled for fields with type string', () => {
-      expect(action.isEnabled({ ...defaultArguments, field: 'something', type: FieldTypes.STRING() }, getState))
-        .toEqual(true);
+      expect(
+        action.isEnabled({ ...defaultArguments, field: 'something', type: FieldTypes.STRING() }, getState),
+      ).toEqual(true);
     });
   });
 });

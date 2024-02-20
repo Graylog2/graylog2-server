@@ -36,18 +36,25 @@ import type { Generator } from '../ChartData';
 import XYPlot from '../XYPlot';
 
 type ChartDefinition = {
-  type: string,
-  name: string,
-  x?: Array<string>,
-  y?: Array<any>,
-  z?: Array<Array<any>>,
-  opacity?: number,
-  originalName: string,
+  type: string;
+  name: string;
+  x?: Array<string>;
+  y?: Array<any>;
+  z?: Array<Array<any>>;
+  opacity?: number;
+  originalName: string;
 };
 
-const setChartColor = (chart: ChartConfig, colors: ColorMapper) => ({ marker: { color: colors.get(chart.originalName ?? chart.name) } });
+const setChartColor = (chart: ChartConfig, colors: ColorMapper) => ({
+  marker: { color: colors.get(chart.originalName ?? chart.name) },
+});
 
-const defineSingleDateBarWidth = (chartDataResult: ChartDefinition[], config: AggregationWidgetConfig, timeRangeFrom: string, timeRangeTo: string) => {
+const defineSingleDateBarWidth = (
+  chartDataResult: ChartDefinition[],
+  config: AggregationWidgetConfig,
+  timeRangeFrom: string,
+  timeRangeTo: string,
+) => {
   const barWidth = 0.03; // width in percentage, relative to chart width
   const minXUnits = 30;
 
@@ -76,56 +83,72 @@ type Layout = {
   barmode?: string;
 };
 
-const BarVisualization = makeVisualization(({
-  config,
-  data,
-  effectiveTimerange,
-  height,
-}: VisualizationComponentProps) => {
-  const visualizationConfig = (config.visualizationConfig ?? BarVisualizationConfig.empty()) as BarVisualizationConfig;
-  const _layout: Layout = {};
+const BarVisualization = makeVisualization(
+  ({ config, data, effectiveTimerange, height }: VisualizationComponentProps) => {
+    const visualizationConfig = (config.visualizationConfig ??
+      BarVisualizationConfig.empty()) as BarVisualizationConfig;
+    const _layout: Layout = {};
 
-  if (visualizationConfig && visualizationConfig.barmode) {
-    _layout.barmode = visualizationConfig?.barmode;
-  }
+    if (visualizationConfig && visualizationConfig.barmode) {
+      _layout.barmode = visualizationConfig?.barmode;
+    }
 
-  const opacity = visualizationConfig?.opacity ?? 1.0;
+    const opacity = visualizationConfig?.opacity ?? 1.0;
 
-  const mapKeys = useMapKeys();
-  const rowPivotFields = useMemo(() => config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [], [config?.rowPivots]);
-  const _mapKeys = useCallback((labels: string[]) => labels
-    .map((label) => label.split(keySeparator)
-      .map((l, i) => mapKeys(l, rowPivotFields[i]))
-      .join(humanSeparator),
-    ), [mapKeys, rowPivotFields]);
+    const mapKeys = useMapKeys();
+    const rowPivotFields = useMemo(
+      () => config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [],
+      [config?.rowPivots],
+    );
+    const _mapKeys = useCallback(
+      (labels: string[]) =>
+        labels.map((label) =>
+          label
+            .split(keySeparator)
+            .map((l, i) => mapKeys(l, rowPivotFields[i]))
+            .join(humanSeparator),
+        ),
+      [mapKeys, rowPivotFields],
+    );
 
-  const _seriesGenerator: Generator = useCallback(({ type, name, labels, values, originalName }): ChartDefinition => ({
-    type,
-    name,
-    x: _mapKeys(labels),
-    y: values,
-    opacity,
-    originalName,
-  }), [_mapKeys, opacity]);
+    const _seriesGenerator: Generator = useCallback(
+      ({ type, name, labels, values, originalName }): ChartDefinition => ({
+        type,
+        name,
+        x: _mapKeys(labels),
+        y: values,
+        opacity,
+        originalName,
+      }),
+      [_mapKeys, opacity],
+    );
 
-  const rows = useMemo(() => retrieveChartData(data), [data]);
-  const _chartDataResult = useChartData(rows, { widgetConfig: config, chartType: 'bar', generator: _seriesGenerator });
+    const rows = useMemo(() => retrieveChartData(data), [data]);
+    const _chartDataResult = useChartData(rows, {
+      widgetConfig: config,
+      chartType: 'bar',
+      generator: _seriesGenerator,
+    });
 
-  const { eventChartData, shapes } = useEvents(config, data.events);
+    const { eventChartData, shapes } = useEvents(config, data.events);
 
-  const chartDataResult = eventChartData ? [..._chartDataResult, eventChartData] : _chartDataResult;
-  const layout = shapes ? { ..._layout, shapes } : _layout;
+    const chartDataResult = eventChartData ? [..._chartDataResult, eventChartData] : _chartDataResult;
+    const layout = shapes ? { ..._layout, shapes } : _layout;
 
-  return (
-    <XYPlot config={config}
-            axisType={visualizationConfig.axisType}
-            chartData={defineSingleDateBarWidth(chartDataResult, config, effectiveTimerange?.from, effectiveTimerange?.to)}
-            effectiveTimerange={effectiveTimerange}
-            setChartColor={setChartColor}
-            height={height}
-            plotLayout={layout} />
-  );
-}, 'bar');
+    return (
+      <XYPlot
+        config={config}
+        axisType={visualizationConfig.axisType}
+        chartData={defineSingleDateBarWidth(chartDataResult, config, effectiveTimerange?.from, effectiveTimerange?.to)}
+        effectiveTimerange={effectiveTimerange}
+        setChartColor={setChartColor}
+        height={height}
+        plotLayout={layout}
+      />
+    );
+  },
+  'bar',
+);
 
 BarVisualization.propTypes = {
   config: AggregationType.isRequired,

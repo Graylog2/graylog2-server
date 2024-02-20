@@ -62,12 +62,7 @@ class DataAdapterCreate extends React.Component {
   };
 
   render() {
-    const {
-      types,
-      validate,
-      validationErrors,
-      saved,
-    } = this.props;
+    const { types, validate, validationErrors, saved } = this.props;
     const { type, dataAdapter } = this.state;
     const adapterPlugins = {};
 
@@ -75,53 +70,63 @@ class DataAdapterCreate extends React.Component {
       adapterPlugins[p.type] = p;
     });
 
-    const sortedAdapters = Object.keys(types).map((key) => {
-      const typeItem = types[key];
+    const sortedAdapters = Object.keys(types)
+      .map((key) => {
+        const typeItem = types[key];
 
-      if (adapterPlugins[typeItem.type] === undefined) {
-        // eslint-disable-next-line no-console
-        console.error(`Plugin component for data adapter type ${typeItem.type} is missing - invalid or missing plugin?`);
+        if (adapterPlugins[typeItem.type] === undefined) {
+          // eslint-disable-next-line no-console
+          console.error(
+            `Plugin component for data adapter type ${typeItem.type} is missing - invalid or missing plugin?`,
+          );
 
-        return { value: typeItem.type, disabled: true, label: `${typeItem.type} - missing or invalid plugin` };
-      }
+          return { value: typeItem.type, disabled: true, label: `${typeItem.type} - missing or invalid plugin` };
+        }
 
-      return { value: typeItem.type, label: adapterPlugins[typeItem.type].displayName };
-    }).sort((a, b) => naturalSort(a.label.toLowerCase(), b.label.toLowerCase()));
+        return { value: typeItem.type, label: adapterPlugins[typeItem.type].displayName };
+      })
+      .sort((a, b) => naturalSort(a.label.toLowerCase(), b.label.toLowerCase()));
 
     return (
       <div>
         <Row className="content">
           <Col lg={8}>
             <form className="form form-horizontal" onSubmit={() => {}}>
-              <Input id="data-adapter-type-select"
-                     label="Data Adapter Type"
-                     required
-                     autoFocus
-                     help="The type of data adapter to configure."
-                     labelClassName="col-sm-3"
-                     wrapperClassName="col-sm-9">
-                <Select placeholder="Select Data Adapter Type"
-                        clearable={false}
-                        options={sortedAdapters}
-                        matchProp="label"
-                        onChange={this._onTypeSelect}
-                        value={null} />
+              <Input
+                id="data-adapter-type-select"
+                label="Data Adapter Type"
+                required
+                autoFocus
+                help="The type of data adapter to configure."
+                labelClassName="col-sm-3"
+                wrapperClassName="col-sm-9"
+              >
+                <Select
+                  placeholder="Select Data Adapter Type"
+                  clearable={false}
+                  options={sortedAdapters}
+                  matchProp="label"
+                  onChange={this._onTypeSelect}
+                  value={null}
+                />
               </Input>
             </form>
           </Col>
         </Row>
         {dataAdapter && (
-        <Row className="content">
-          <Col lg={12}>
-            <DataAdapterForm dataAdapter={dataAdapter}
-                             type={type}
-                             create
-                             title="Configure Adapter"
-                             validate={validate}
-                             validationErrors={validationErrors}
-                             saved={saved} />
-          </Col>
-        </Row>
+          <Row className="content">
+            <Col lg={12}>
+              <DataAdapterForm
+                dataAdapter={dataAdapter}
+                type={type}
+                create
+                title="Configure Adapter"
+                validate={validate}
+                validationErrors={validationErrors}
+                saved={saved}
+              />
+            </Col>
+          </Row>
         )}
       </div>
     );

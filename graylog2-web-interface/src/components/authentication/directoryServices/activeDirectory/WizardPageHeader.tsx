@@ -25,14 +25,18 @@ import StringUtils from 'util/StringUtils';
 import type { DirectoryServiceBackend } from 'logic/authentication/directoryServices/types';
 
 type Props = {
-  authenticationBackend?: DirectoryServiceBackend,
+  authenticationBackend?: DirectoryServiceBackend;
 };
 
 const _pageTitle = (authBackend) => {
   if (authBackend) {
     const backendTitle = StringUtils.truncateWithEllipses(authBackend.title, 30);
 
-    return <>Edit Authentication Service - <i>{backendTitle}</i></>;
+    return (
+      <>
+        Edit Authentication Service - <i>{backendTitle}</i>
+      </>
+    );
   }
 
   return 'Create Active Directory Authentication Service';
@@ -45,15 +49,14 @@ const WizardPageHeader = ({ authenticationBackend: authBackend }: Props) => {
   return (
     <>
       <AuthenticationPageNavigation />
-      <PageHeader title={pageTitle}
-                  actions={(
-                    <BackendActionLinks activeBackend={activeBackend}
-                                        finishedLoading={finishedLoading} />
-                  )}
-                  documentationLink={{
-                    title: 'Authentication documentation',
-                    path: DocsHelper.PAGES.USERS_ROLES,
-                  }}>
+      <PageHeader
+        title={pageTitle}
+        actions={<BackendActionLinks activeBackend={activeBackend} finishedLoading={finishedLoading} />}
+        documentationLink={{
+          title: 'Authentication documentation',
+          path: DocsHelper.PAGES.USERS_ROLES,
+        }}
+      >
         <span>Configure Graylog&apos;s authentication services of this Graylog cluster.</span>
       </PageHeader>
     </>

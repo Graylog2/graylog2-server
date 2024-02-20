@@ -30,107 +30,121 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 export type UntypedBigDisplayModeQuery = {
-  interval?: string,
-  refresh?: string,
-  tabs?: string,
+  interval?: string;
+  refresh?: string;
+  tabs?: string;
 };
 
 type Configuration = {
-  queryCycleInterval?: number,
-  queryTabs?: Array<number>,
-  refreshInterval: number,
+  queryCycleInterval?: number;
+  queryTabs?: Array<number>;
+  refreshInterval: number;
 };
 
 type ConfigurationModalProps = {
-  onClose: () => void,
-  onSave: (Configuration) => void,
-  show: boolean,
-  view: View,
+  onClose: () => void;
+  onSave: (Configuration) => void;
+  show: boolean;
+  view: View;
 };
 
 interface CheckboxTarget {
   target: {
-    checked: boolean,
-  }
+    checked: boolean;
+  };
 }
 
 const ConfigurationModal = ({ onSave, view, show, onClose }: ConfigurationModalProps) => {
-  const availableTabs = view.search.queries.keySeq().map((query, idx) => [
-    idx,
-    queryTitle(view, query.id),
-  ]).toJS();
+  const availableTabs = view.search.queries
+    .keySeq()
+    .map((query, idx) => [idx, queryTitle(view, query.id)])
+    .toJS();
   const [refreshInterval, setRefreshInterval] = useState(10);
   const [queryTabs, setQueryTabs] = useState(availableTabs.map(([idx]) => idx));
   const [queryCycleInterval, setQueryCycleInterval] = useState(30);
   const addQueryTab = useCallback((idx) => setQueryTabs([...queryTabs, idx]), [queryTabs, setQueryTabs]);
-  const removeQueryTab = useCallback((idx) => setQueryTabs(queryTabs.filter((tab) => tab !== idx)), [queryTabs, setQueryTabs]);
-  const _onSave = useCallback(() => onSave({
-    refreshInterval,
-    queryTabs,
-    queryCycleInterval,
-  }), [onSave, refreshInterval, queryTabs, queryCycleInterval]);
+  const removeQueryTab = useCallback(
+    (idx) => setQueryTabs(queryTabs.filter((tab) => tab !== idx)),
+    [queryTabs, setQueryTabs],
+  );
+  const _onSave = useCallback(
+    () =>
+      onSave({
+        refreshInterval,
+        queryTabs,
+        queryCycleInterval,
+      }),
+    [onSave, refreshInterval, queryTabs, queryCycleInterval],
+  );
 
   return (
-    <BootstrapModalForm bsSize="large"
-                        onCancel={onClose}
-                        onSubmitForm={_onSave}
-                        submitButtonText="Start full screen view"
-                        title="Configuring Full Screen"
-                        show={show}>
-      <Input autoFocus
-             id="refresh-interval"
-             type="number"
-             min="1"
-             name="refresh-interval"
-             label="Refresh Interval"
-             help="After how many seconds should the dashboard refresh?"
-             onChange={({ target: { value } }) => setRefreshInterval(value ? Number.parseInt(value, 10) : value)}
-             required
-             step={1}
-             value={refreshInterval} />
+    <BootstrapModalForm
+      bsSize="large"
+      onCancel={onClose}
+      onSubmitForm={_onSave}
+      submitButtonText="Start full screen view"
+      title="Configuring Full Screen"
+      show={show}
+    >
+      <Input
+        autoFocus
+        id="refresh-interval"
+        type="number"
+        min="1"
+        name="refresh-interval"
+        label="Refresh Interval"
+        help="After how many seconds should the dashboard refresh?"
+        onChange={({ target: { value } }) => setRefreshInterval(value ? Number.parseInt(value, 10) : value)}
+        required
+        step={1}
+        value={refreshInterval}
+      />
 
       <FormGroup>
         <ControlLabel>Tabs</ControlLabel>
         <ul>
           {availableTabs.map(([idx, title]) => (
             <li key={`${idx}-${title}`}>
-              <Checkbox inline
-                        checked={queryTabs.includes(idx)}
-                        onChange={(event) => ((event as unknown as CheckboxTarget).target.checked
-                          ? addQueryTab(idx)
-                          : removeQueryTab(idx))}>
+              <Checkbox
+                inline
+                checked={queryTabs.includes(idx)}
+                onChange={(event) =>
+                  (event as unknown as CheckboxTarget).target.checked ? addQueryTab(idx) : removeQueryTab(idx)
+                }
+              >
                 {title}
               </Checkbox>
             </li>
           ))}
         </ul>
-        <HelpBlock>
-          Select the query tabs to include in rotation.
-        </HelpBlock>
+        <HelpBlock>Select the query tabs to include in rotation.</HelpBlock>
       </FormGroup>
 
-      <Input id="query-cycle-interval"
-             type="number"
-             min="1"
-             name="query-cycle-interval"
-             label="Tab cycle interval"
-             help="After how many seconds should the next tab be shown?"
-             onChange={({ target: { value } }) => setQueryCycleInterval(value ? Number.parseInt(value, 10) : value)}
-             required
-             step="1"
-             value={queryCycleInterval} />
+      <Input
+        id="query-cycle-interval"
+        type="number"
+        min="1"
+        name="query-cycle-interval"
+        label="Tab cycle interval"
+        help="After how many seconds should the next tab be shown?"
+        onChange={({ target: { value } }) => setQueryCycleInterval(value ? Number.parseInt(value, 10) : value)}
+        required
+        step="1"
+        value={queryCycleInterval}
+      />
     </BootstrapModalForm>
   );
 };
 
-const redirectToBigDisplayMode = (history: HistoryFunction, view: View, config: UntypedBigDisplayModeQuery, unsetWidgetFocusing): void => {
+const redirectToBigDisplayMode = (
+  history: HistoryFunction,
+  view: View,
+  config: UntypedBigDisplayModeQuery,
+  unsetWidgetFocusing,
+): void => {
   unsetWidgetFocusing();
 
-  history.push(
-    new URI(Routes.pluginRoute('DASHBOARDS_TV_VIEWID')(view.id))
-      .search(config)
-      .toString(),
-  );
+  history.push(new URI(Routes.pluginRoute('DASHBOARDS_TV_VIEWID')(view.id)).search(config).toString());
 };
 
 const createQueryFromConfiguration = (
@@ -141,7 +155,10 @@ const createQueryFromConfiguration = (
     interval: Number(queryCycleInterval).toString(),
     refresh: Number(refreshInterval).toString(),
   };
-  const allQueryIndices = view.search.queries.toIndexedSeq().map((_, v) => v).toJS();
+  const allQueryIndices = view.search.queries
+    .toIndexedSeq()
+    .map((_, v) => v)
+    .toJS();
 
   return !queryTabs || allQueryIndices.join(',') === queryTabs.join(',')
     ? basicConfiguration
@@ -149,9 +166,9 @@ const createQueryFromConfiguration = (
 };
 
 type Props = {
-  disabled?: boolean,
-  show?: boolean,
-  view: View,
+  disabled?: boolean;
+  show?: boolean;
+  view: View;
 };
 
 const BigDisplayModeConfiguration = ({ disabled, show, view }: Props) => {
@@ -172,10 +189,7 @@ const BigDisplayModeConfiguration = ({ disabled, show, view }: Props) => {
   return (
     <>
       {showConfigurationModal && (
-        <ConfigurationModal onClose={() => setShowConfigurationModal(false)}
-                            onSave={onSave}
-                            show
-                            view={view} />
+        <ConfigurationModal onClose={() => setShowConfigurationModal(false)} onSave={onSave} show view={view} />
       )}
       <MenuItem disabled={disabled} onSelect={() => setShowConfigurationModal(true)} icon="desktop">
         Full Screen

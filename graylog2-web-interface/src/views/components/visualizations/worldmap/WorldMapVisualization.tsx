@@ -38,7 +38,7 @@ import transformKeys from '../TransformKeys';
 import RenderCompletionCallback from '../../widgets/RenderCompletionCallback';
 
 const _arrayToMap = ([name, x, y]: ChartData) => ({ name, x, y });
-const _lastKey = <T, >(keys: Array<T>) => keys[keys.length - 1];
+const _lastKey = <T,>(keys: Array<T>) => keys[keys.length - 1];
 
 const _createSeriesWithoutMetric = (rows: Rows) => {
   const leafs = getLeafsFromRows(rows);
@@ -54,67 +54,65 @@ const _createSeriesWithoutMetric = (rows: Rows) => {
 const _formatSeriesForMap = (rowPivots: Array<Pivot>) => {
   const fields = rowPivots.flatMap((rowPivot) => rowPivot.fields);
 
-  return (result: Array<ReturnType<typeof _arrayToMap>>) => result.map(({ name, x, y }) => {
-    const keys = x.map((k) => Object.fromEntries(k.slice(0, -1)
-      .map((key, idx) => [fields[idx], key])));
-    const newX = x.map(_lastKey);
+  return (result: Array<ReturnType<typeof _arrayToMap>>) =>
+    result.map(({ name, x, y }) => {
+      const keys = x.map((k) => Object.fromEntries(k.slice(0, -1).map((key, idx) => [fields[idx], key])));
+      const newX = x.map(_lastKey);
 
-    const values = fromPairs(zip(newX, y).filter(([_, v]) => (v !== undefined)));
+      const values = fromPairs(zip(newX, y).filter(([_, v]) => v !== undefined));
 
-    return { keys, name, values };
-  });
+      return { keys, name, values };
+    });
 };
 
-const WorldMapVisualization = makeVisualization(({
-  config,
-  data,
-  editing,
-  onChange,
-  width,
-  ...rest
-}: VisualizationComponentProps) => {
-  const { rowPivots } = config;
-  const onRenderComplete = useContext(RenderCompletionCallback);
-  const hasMetric = !isEmpty(config.series);
-  const markerRadiusSize = !hasMetric ? 1 : undefined;
-  const seriesExtractor = hasMetric ? extractSeries() : _createSeriesWithoutMetric;
-  const { formatTime } = useUserDateTime();
+const WorldMapVisualization = makeVisualization(
+  ({ config, data, editing, onChange, width, ...rest }: VisualizationComponentProps) => {
+    const { rowPivots } = config;
+    const onRenderComplete = useContext(RenderCompletionCallback);
+    const hasMetric = !isEmpty(config.series);
+    const markerRadiusSize = !hasMetric ? 1 : undefined;
+    const seriesExtractor = hasMetric ? extractSeries() : _createSeriesWithoutMetric;
+    const { formatTime } = useUserDateTime();
 
-  const pipeline = flow([
-    transformKeys(config.rowPivots, config.columnPivots, formatTime),
-    seriesExtractor,
-    formatSeries,
-    (results: ExtractedSeries) => results.map(_arrayToMap),
-    _formatSeriesForMap(rowPivots),
-  ]);
+    const pipeline = flow([
+      transformKeys(config.rowPivots, config.columnPivots, formatTime),
+      seriesExtractor,
+      formatSeries,
+      (results: ExtractedSeries) => results.map(_arrayToMap),
+      _formatSeriesForMap(rowPivots),
+    ]);
 
-  const rows = retrieveChartData(data);
+    const rows = retrieveChartData(data);
 
-  const series = pipeline(rows);
+    const series = pipeline(rows);
 
-  const viewport = get(config, 'visualizationConfig.viewport');
+    const viewport = get(config, 'visualizationConfig.viewport');
 
-  const _onChange = (newViewport: Viewport) => {
-    if (editing) {
-      onChange({
-        zoom: newViewport.zoom,
-        centerX: newViewport.center[0],
-        centerY: newViewport.center[1],
-      });
-    }
-  };
+    const _onChange = (newViewport: Viewport) => {
+      if (editing) {
+        onChange({
+          zoom: newViewport.zoom,
+          centerX: newViewport.center[0],
+          centerY: newViewport.center[1],
+        });
+      }
+    };
 
-  return (
-    <MapVisualization {...rest}
-                      data={series}
-                      id="world-map"
-                      viewport={viewport}
-                      width={width}
-                      onRenderComplete={onRenderComplete}
-                      markerRadiusSize={markerRadiusSize}
-                      onChange={_onChange} />
-  );
-}, 'map');
+    return (
+      <MapVisualization
+        {...rest}
+        data={series}
+        id="world-map"
+        viewport={viewport}
+        width={width}
+        onRenderComplete={onRenderComplete}
+        markerRadiusSize={markerRadiusSize}
+        onChange={_onChange}
+      />
+    );
+  },
+  'map',
+);
 
 WorldMapVisualization.propTypes = {
   config: AggregationType.isRequired,

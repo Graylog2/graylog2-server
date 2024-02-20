@@ -62,10 +62,10 @@ const ColumnListItem = ({
   onClick,
   selectedColumns,
 }: {
-  allColumns: Array<Column>
-  column: Column,
-  onClick: (selectedColumns: Array<string>) => void,
-  selectedColumns: Array<string>,
+  allColumns: Array<Column>;
+  column: Column;
+  onClick: (selectedColumns: Array<string>) => void;
+  selectedColumns: Array<string>;
 }) => {
   const isSelected = selectedColumns.includes(column.id);
 
@@ -94,31 +94,35 @@ const ColumnListItem = ({
 };
 
 type Props = {
-  allColumns: Array<Column>
-  onChange: (attributes: Array<string>) => void,
-  selectedColumns: Array<string>,
-}
+  allColumns: Array<Column>;
+  onChange: (attributes: Array<string>) => void;
+  selectedColumns: Array<string>;
+};
 
 const ColumnsVisibilitySelect = ({ onChange, selectedColumns, allColumns }: Props) => {
   const sortedColumns = useMemo(
-    () => allColumns.sort((col1, col2) => (naturalSort(col1.title, col2.title))),
+    () => allColumns.sort((col1, col2) => naturalSort(col1.title, col2.title)),
     [allColumns],
   );
 
   return (
-    <StyledDropdownButton title="Columns"
-                          bsSize="small"
-                          pullRight
-                          aria-label="Configure visible columns"
-                          id="columns-visibility-select"
-                          bsStyle="default"
-                          closeOnItemClick={false}>
+    <StyledDropdownButton
+      title="Columns"
+      bsSize="small"
+      pullRight
+      aria-label="Configure visible columns"
+      id="columns-visibility-select"
+      bsStyle="default"
+      closeOnItemClick={false}
+    >
       {sortedColumns.map((column) => (
-        <ColumnListItem column={column}
-                        onClick={onChange}
-                        key={column.id}
-                        allColumns={allColumns}
-                        selectedColumns={selectedColumns} />
+        <ColumnListItem
+          column={column}
+          onClick={onChange}
+          key={column.id}
+          allColumns={allColumns}
+          selectedColumns={selectedColumns}
+        />
       ))}
     </StyledDropdownButton>
   );

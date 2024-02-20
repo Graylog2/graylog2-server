@@ -78,8 +78,8 @@ class NodeOverview extends React.Component {
           <Col md={12}>
             <h2>Buffers</h2>
             <p className="description">
-              Buffers are built to cache small amounts of messages for a very short time
-              (usually milliseconds) on their way through the different processors.
+              Buffers are built to cache small amounts of messages for a very short time (usually milliseconds) on their
+              way through the different processors.
             </p>
             <Row>
               <Col md={4}>
@@ -100,10 +100,9 @@ class NodeOverview extends React.Component {
             <h2>Disk Journal</h2>
             <p className="description">
               Incoming messages are written to the disk journal to ensure they are kept safe in case of a server
-              failure. The journal also helps keeping Graylog working if any of the outputs is too slow to keep
-              up with the message rate or whenever there is a peak in incoming messages. It makes sure that
-              Graylog does not buffer all of those messages in main memory and avoids overly long garbage
-              collection pauses that way.
+              failure. The journal also helps keeping Graylog working if any of the outputs is too slow to keep up with
+              the message rate or whenever there is a peak in incoming messages. It makes sure that Graylog does not
+              buffer all of those messages in main memory and avoids overly long garbage collection pauses that way.
             </p>
             <JournalDetails nodeId={node.node_id} />
           </Col>
@@ -112,7 +111,11 @@ class NodeOverview extends React.Component {
         <Row className="content">
           <Col md={6}>
             <h2>System</h2>
-            <SystemInformation node={node} systemInformation={systemOverview} jvmInformation={this.props.jvmInformation} />
+            <SystemInformation
+              node={node}
+              systemInformation={systemOverview}
+              jvmInformation={this.props.jvmInformation}
+            />
           </Col>
           <Col md={6}>
             <h2>REST API</h2>
@@ -122,7 +125,9 @@ class NodeOverview extends React.Component {
 
         <Row className="content">
           <Col md={12}>
-            <h2>Installed plugins <small>{pluginCount}</small></h2>
+            <h2>
+              Installed plugins <small>{pluginCount}</small>
+            </h2>
             <PluginsDataTable plugins={this.props.plugins} />
           </Col>
         </Row>
@@ -132,11 +137,15 @@ class NodeOverview extends React.Component {
             <HideOnCloud>
               <span className="pull-right">
                 <LinkContainer to={Routes.node_inputs(node.node_id)}>
-                  <Button bsStyle="success" bsSize="small">Manage inputs</Button>
+                  <Button bsStyle="success" bsSize="small">
+                    Manage inputs
+                  </Button>
                 </LinkContainer>
               </span>
             </HideOnCloud>
-            <h2 style={{ marginBottom: 15 }}>Available input types <small>{inputCount}</small></h2>
+            <h2 style={{ marginBottom: 15 }}>
+              Available input types <small>{inputCount}</small>
+            </h2>
             <InputTypesDataTable inputDescriptions={this.props.inputDescriptions} />
           </Col>
         </Row>

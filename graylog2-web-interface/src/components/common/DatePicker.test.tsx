@@ -21,9 +21,7 @@ import { alice } from 'fixtures/users';
 
 import DatePicker from './DatePicker';
 
-const mockCurrentUser = alice.toBuilder()
-  .timezone('Europe/Berlin')
-  .build();
+const mockCurrentUser = alice.toBuilder().timezone('Europe/Berlin').build();
 
 jest.mock('hooks/useCurrentUser', () => () => mockCurrentUser);
 

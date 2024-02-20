@@ -19,16 +19,18 @@ const TypeAheadInputExample = createReactClass({
     return (
       <div>
         <p>Selected number: {selectedNumber === undefined ? 'none' : selectedNumber}</p>
-        <TypeAheadInput id="typeahead-input"
-                        label="Numbers"
-                        displayKey="number"
-                        suggestionText="Select number"
-                        suggestions={suggestions}
-                        onSuggestionSelected={this.onChange} />
+        <TypeAheadInput
+          id="typeahead-input"
+          label="Numbers"
+          displayKey="number"
+          suggestionText="Select number"
+          suggestions={suggestions}
+          onSuggestionSelected={this.onChange}
+        />
       </div>
     );
   },
 });
 
-<TypeAheadInputExample />
+<TypeAheadInputExample />;
 ```

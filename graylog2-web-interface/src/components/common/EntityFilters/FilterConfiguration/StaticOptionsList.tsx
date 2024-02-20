@@ -22,11 +22,11 @@ import { defaultCompare } from 'logic/DefaultCompare';
 import type { Filters } from 'components/common/EntityFilters/types';
 
 type Props = {
-  allActiveFilters: Filters | undefined,
-  attribute: Attribute,
-  filterValueRenderer: (value: unknown, title: string) => React.ReactNode | undefined,
-  onSubmit: (filter: { title: string, value: string }) => void,
-}
+  allActiveFilters: Filters | undefined;
+  attribute: Attribute;
+  filterValueRenderer: (value: unknown, title: string) => React.ReactNode | undefined;
+  onSubmit: (filter: { title: string; value: string }) => void;
+};
 
 const StaticOptionsList = ({ allActiveFilters, attribute, filterValueRenderer, onSubmit }: Props) => (
   <>

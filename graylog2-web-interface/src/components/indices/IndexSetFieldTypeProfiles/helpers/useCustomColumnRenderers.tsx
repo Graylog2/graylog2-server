@@ -20,19 +20,24 @@ import type { CustomFieldMapping, IndexSetFieldTypeProfile } from 'components/in
 import CustomFieldMappingsCell from 'components/indices/IndexSetFieldTypeProfiles/cells/CustomFieldMappingsCell';
 import IndexSetsCell from 'components/indices/IndexSetFieldTypeProfiles/cells/IndexSetsCell';
 
-const useCustomColumnRenderers = (normalizedIndexSetsTitles: Record<string, string>) => useMemo(() => ({
-  attributes: {
-    custom_field_mappings: {
-      renderCell: (customFieldTypes: Array<CustomFieldMapping>, profile: IndexSetFieldTypeProfile) => (
-        <CustomFieldMappingsCell profile={profile}
-                                 customFieldTypes={customFieldTypes} />
-      ),
-      staticWidth: 200,
-    },
-    index_set_ids: {
-      renderCell: (indexSetIds: Array<string>) => <IndexSetsCell indexSetIds={indexSetIds} normalizedIndexSetsTitles={normalizedIndexSetsTitles} />,
-    },
-  },
-}), [normalizedIndexSetsTitles]);
+const useCustomColumnRenderers = (normalizedIndexSetsTitles: Record<string, string>) =>
+  useMemo(
+    () => ({
+      attributes: {
+        custom_field_mappings: {
+          renderCell: (customFieldTypes: Array<CustomFieldMapping>, profile: IndexSetFieldTypeProfile) => (
+            <CustomFieldMappingsCell profile={profile} customFieldTypes={customFieldTypes} />
+          ),
+          staticWidth: 200,
+        },
+        index_set_ids: {
+          renderCell: (indexSetIds: Array<string>) => (
+            <IndexSetsCell indexSetIds={indexSetIds} normalizedIndexSetsTitles={normalizedIndexSetsTitles} />
+          ),
+        },
+      },
+    }),
+    [normalizedIndexSetsTitles],
+  );
 
 export default useCustomColumnRenderers;

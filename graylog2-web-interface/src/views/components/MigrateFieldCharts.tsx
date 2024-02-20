@@ -51,11 +51,11 @@ type LegacyInterpolation = 'linear' | 'step-after' | 'basis' | 'bundle' | 'cardi
 type LegacyInterval = 'minute' | 'hour' | 'day' | 'week' | 'month' | 'quarter' | 'year';
 type LegacyVisualization = 'bar' | 'area' | 'line' | 'scatterplot';
 type LegacyFieldChart = {
-  field: string,
-  renderer: LegacyVisualization,
-  interpolation: LegacyInterpolation,
-  valuetype: LegacySeries,
-  interval: LegacyInterval,
+  field: string;
+  renderer: LegacyVisualization;
+  interpolation: LegacyInterpolation;
+  valuetype: LegacySeries;
+  interval: LegacyInterval;
 };
 
 const Actions = styled.div`
@@ -94,7 +94,7 @@ const mapVisualization = (legacyVisualization: LegacyVisualization) => {
   }
 };
 
-const mapTime = (legacyTime: string): { value: number, unit: keyof typeof TimeUnits } => {
+const mapTime = (legacyTime: string): { value: number; unit: keyof typeof TimeUnits } => {
   switch (legacyTime) {
     case 'quarter':
       return { unit: 'months', value: 3 };
@@ -137,65 +137,72 @@ const _updateExistingWidgetPos = (existingPositions: WidgetPositions, rowOffset:
   Object.keys(updatedWidgetPos).forEach((widgetId) => {
     const widgetPos = updatedWidgetPos[widgetId];
 
-    updatedWidgetPos[widgetId] = widgetPos.toBuilder().row(widgetPos.row + rowOffset).build();
+    updatedWidgetPos[widgetId] = widgetPos
+      .toBuilder()
+      .row(widgetPos.row + rowOffset)
+      .build();
   });
 
   return updatedWidgetPos;
 };
 
-const _migrateWidgets = (legacyCharts: Array<LegacyFieldChart>) => async (_dispatch: AppDispatch, getState: GetState) => {
-  const { defaultHeight } = widgetDefinition(AggregationWidget.type);
-  const currentView = selectActiveViewState(getState());
-  const activeQuery = selectActiveQuery(getState());
-  const newWidgetPositions = {};
+const _migrateWidgets =
+  (legacyCharts: Array<LegacyFieldChart>) => async (_dispatch: AppDispatch, getState: GetState) => {
+    const { defaultHeight } = widgetDefinition(AggregationWidget.type);
+    const currentView = selectActiveViewState(getState());
+    const activeQuery = selectActiveQuery(getState());
+    const newWidgetPositions = {};
 
-  const newWidgets = legacyCharts.map((chart: LegacyFieldChart, index: number) => {
-    const { field } = chart;
-    // The old field charts only have one series per chart.
-    // The series always relates to the selected field.
-    const series = new Series(mapSeries(chart.valuetype, field));
-    // Because all field charts show the results for the defined timerange,
-    // the new row pivot always contains the timestamp field.
-    const rowPivotConfig = { interval: { type: 'timeunit' as const, ...mapTime(chart.interval) } };
-    const rowPivot = Pivot.create([TIMESTAMP_FIELD], 'time', rowPivotConfig);
-    const visualization = mapVisualization(chart.renderer);
-    const visualizationConfig = createVisualizationConfig(chart.interpolation, visualization);
-    // create widget with migrated data
-    const widgetConfig = AggregationWidgetConfig.builder()
-      .visualization(visualization)
-      .visualizationConfig(visualizationConfig)
-      .series([series])
-      .rowPivots([rowPivot])
-      .build();
-    const newWidget = AggregationWidget.builder()
-      .newId()
-      .timerange(undefined)
-      .config(widgetConfig)
-      .build();
+    const newWidgets = legacyCharts.map((chart: LegacyFieldChart, index: number) => {
+      const { field } = chart;
+      // The old field charts only have one series per chart.
+      // The series always relates to the selected field.
+      const series = new Series(mapSeries(chart.valuetype, field));
+      // Because all field charts show the results for the defined timerange,
+      // the new row pivot always contains the timestamp field.
+      const rowPivotConfig = { interval: { type: 'timeunit' as const, ...mapTime(chart.interval) } };
+      const rowPivot = Pivot.create([TIMESTAMP_FIELD], 'time', rowPivotConfig);
+      const visualization = mapVisualization(chart.renderer);
+      const visualizationConfig = createVisualizationConfig(chart.interpolation, visualization);
+      // create widget with migrated data
+      const widgetConfig = AggregationWidgetConfig.builder()
+        .visualization(visualization)
+        .visualizationConfig(visualizationConfig)
+        .series([series])
+        .rowPivots([rowPivot])
+        .build();
+      const newWidget = AggregationWidget.builder().newId().timerange(undefined).config(widgetConfig).build();
       // create widget position for new widget
-    const widgetRowPos = (defaultHeight * index) + 1;
+      const widgetRowPos = defaultHeight * index + 1;
 
-    newWidgetPositions[newWidget.id] = new WidgetPosition(1, widgetRowPos, defaultHeight, Infinity);
+      newWidgetPositions[newWidget.id] = new WidgetPosition(1, widgetRowPos, defaultHeight, Infinity);
 
-    return newWidget;
-  });
+      return newWidget;
+    });
 
-  const newWidgetsRowOffset = legacyCharts.length * defaultHeight;
-  const existingWidgetPos = _updateExistingWidgetPos(currentView.widgetPositions, newWidgetsRowOffset);
-  const newViewState = currentView
-    .toBuilder()
-    .widgets(Immutable.List([
-      // @ts-ignore
-      ...currentView.widgets,
-      ...newWidgets,
-    ]))
-    .widgetPositions({ ...existingWidgetPos, ...newWidgetPositions })
-    .build();
+    const newWidgetsRowOffset = legacyCharts.length * defaultHeight;
+    const existingWidgetPos = _updateExistingWidgetPos(currentView.widgetPositions, newWidgetsRowOffset);
+    const newViewState = currentView
+      .toBuilder()
+      .widgets(
+        Immutable.List([
+          // @ts-ignore
+          ...currentView.widgets,
+          ...newWidgets,
+        ]),
+      )
+      .widgetPositions({ ...existingWidgetPos, ...newWidgetPositions })
+      .build();
 
-  return { newViewState, currentQueryId: activeQuery };
-};
+    return { newViewState, currentQueryId: activeQuery };
+  };
 
-const _onMigrate = async (dispatch: AppDispatch, legacyCharts: Array<LegacyFieldChart>, setMigrating: (migrating: boolean) => void, setMigrationFinished: (finished: boolean) => void) => {
+const _onMigrate = async (
+  dispatch: AppDispatch,
+  legacyCharts: Array<LegacyFieldChart>,
+  setMigrating: (migrating: boolean) => void,
+  setMigrationFinished: (finished: boolean) => void,
+) => {
   setMigrating(true);
 
   const { newViewState, currentQueryId } = await dispatch(_migrateWidgets(legacyCharts));
@@ -217,7 +224,10 @@ const MigrateFieldCharts = () => {
   const legacyCharts: Array<LegacyFieldChart> = values(Store.get(FIELD_CHARTS_KEY));
   const chartAmount = legacyCharts.length;
   const dispatch = useAppDispatch();
-  const onMigrate = useCallback(() => _onMigrate(dispatch, legacyCharts, setMigrating, setMigrationFinished), [dispatch, legacyCharts]);
+  const onMigrate = useCallback(
+    () => _onMigrate(dispatch, legacyCharts, setMigrating, setMigrationFinished),
+    [dispatch, legacyCharts],
+  );
 
   if (migrationFinished || isEmpty(legacyCharts)) {
     return null;
@@ -229,21 +239,17 @@ const MigrateFieldCharts = () => {
         <Alert bsStyle="warning" title="Migrate existing search page charts">
           {/* Should we inform the user here about the backend migrations? */}
           <br />
-          We found {chartAmount} chart(s), created for an older version of the search.
-          Do you want to migrate these chart(s) for the current search?
+          We found {chartAmount} chart(s), created for an older version of the search. Do you want to migrate these
+          chart(s) for the current search?
           <br />
-          When you have run the migration and want to keep the newly created charts, you will have to save the current search as a new dashboard.
-          Otherwise the charts will get lost, when leaving the search page.
+          When you have run the migration and want to keep the newly created charts, you will have to save the current
+          search as a new dashboard. Otherwise the charts will get lost, when leaving the search page.
           <br />
           <Actions>
-            <Button bsStyle="primary"
-                    onClick={onMigrate}
-                    disabled={migrating}
-                    className="save-button-margin">
+            <Button bsStyle="primary" onClick={onMigrate} disabled={migrating} className="save-button-margin">
               Migrate {migrating && <Spinner text="" />}
             </Button>
-            <Button onClick={() => _onCancel(setMigrationFinished)}
-                    disabled={migrating}>
+            <Button onClick={() => _onCancel(setMigrationFinished)} disabled={migrating}>
               Discard charts
             </Button>
           </Actions>

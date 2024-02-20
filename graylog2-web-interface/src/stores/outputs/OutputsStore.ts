@@ -23,32 +23,28 @@ import UserNotification from 'util/UserNotification';
 import { singletonStore } from 'logic/singleton';
 
 type Output = {
-  id: string,
-  title: string,
-  type: string,
+  id: string;
+  title: string;
+  type: string;
 };
 
 // eslint-disable-next-line import/prefer-default-export
-export const OutputsStore = singletonStore(
-  'core.Outputs',
-  () => Reflux.createStore({
+export const OutputsStore = singletonStore('core.Outputs', () =>
+  Reflux.createStore({
     OUTPUTS_URL: URLUtils.qualifyUrl(ApiRoutes.OutputsApiController.index().url),
 
     load(callback: (outputs: Array<Output>) => void) {
-      fetch('GET', this.OUTPUTS_URL)
-        .then(callback, this._failCallback);
+      fetch('GET', this.OUTPUTS_URL).then(callback, this._failCallback);
     },
     loadForStreamId(streamId: string, callback: (outputs: Array<Output>) => void) {
       const url = URLUtils.qualifyUrl(ApiRoutes.StreamOutputsApiController.index(streamId).url);
 
-      fetch('GET', url)
-        .then(callback, this._failCallback);
+      fetch('GET', url).then(callback, this._failCallback);
     },
     loadAvailableTypes(callback: (available: any) => void) {
       const url = URLUtils.qualifyUrl(ApiRoutes.OutputsApiController.availableTypes().url);
 
-      fetch('GET', url)
-        .then(callback, this._failCallback);
+      fetch('GET', url).then(callback, this._failCallback);
     },
     loadAvailable(typeName: string, callback: (available: any) => void) {
       const url = URLUtils.qualifyUrl(ApiRoutes.OutputsApiController.availableTypes().url);
@@ -60,37 +56,33 @@ export const OutputsStore = singletonStore(
     remove(outputId: string, callback: (error: any) => void) {
       const url = URLUtils.qualifyUrl(ApiRoutes.OutputsApiController.delete(outputId).url);
 
-      fetch('DELETE', url)
-        .then(callback, (error) => {
-          UserNotification.error(`Terminating output failed with status: ${error}`,
-            'Could not terminate output');
-        });
+      fetch('DELETE', url).then(callback, (error) => {
+        UserNotification.error(`Terminating output failed with status: ${error}`, 'Could not terminate output');
+      });
     },
     save(output: any, callback: (output: Output) => void) {
       const failCallback = (error) => {
-        UserNotification.error(`Saving Output "${output.title}" failed with status: ${error}`,
-          'Could not save Output');
+        UserNotification.error(`Saving Output "${output.title}" failed with status: ${error}`, 'Could not save Output');
       };
 
       const url = URLUtils.qualifyUrl(ApiRoutes.OutputsApiController.create().url);
 
-      fetch('POST', url, output)
-        .then(callback, failCallback);
+      fetch('POST', url, output).then(callback, failCallback);
     },
     update(output: Output, deltas: any, callback: (output: Output) => void) {
       const failCallback = (error) => {
-        UserNotification.error(`Updating Output "${output.title}" failed with status: ${error}`,
-          'Could not update Output');
+        UserNotification.error(
+          `Updating Output "${output.title}" failed with status: ${error}`,
+          'Could not update Output',
+        );
       };
 
       const url = URLUtils.qualifyUrl(ApiRoutes.OutputsApiController.update(output.id).url);
 
-      fetch('PUT', url, deltas)
-        .then(callback, failCallback);
+      fetch('PUT', url, deltas).then(callback, failCallback);
     },
     _failCallback(error: string) {
-      UserNotification.error(`Loading outputs failed with status: ${error}`,
-        'Could not load outputs');
+      UserNotification.error(`Loading outputs failed with status: ${error}`, 'Could not load outputs');
     },
   }),
 );

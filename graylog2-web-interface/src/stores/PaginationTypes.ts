@@ -21,31 +21,31 @@ import type { AdditionalQueries } from 'util/PaginationURL';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 
 export type PaginatedResponseType = {
-  count: number,
-  total: number,
-  page: number,
-  per_page: number,
-  query: string | null,
+  count: number;
+  total: number;
+  page: number;
+  per_page: number;
+  query: string | null;
 };
 
 export type PaginatedListJSON = {
-  page: $PropertyType<Pagination, 'page'>,
-  per_page: $PropertyType<Pagination, 'perPage'>,
-  query: $PropertyType<Pagination, 'query'>,
-  total: number,
-  count: number,
+  page: $PropertyType<Pagination, 'page'>;
+  per_page: $PropertyType<Pagination, 'perPage'>;
+  query: $PropertyType<Pagination, 'query'>;
+  total: number;
+  count: number;
 };
 
 export type Pagination = {
-  page: number,
-  perPage: number,
-  query: string,
-  additionalQueries?: AdditionalQueries,
+  page: number;
+  perPage: number;
+  query: string;
+  additionalQueries?: AdditionalQueries;
 };
 
 export type ListPagination = Pagination & {
-  total: number,
-  count: number,
+  total: number;
+  count: number;
 };
 
 export const DEFAULT_PAGINATION: Pagination = {
@@ -55,34 +55,33 @@ export const DEFAULT_PAGINATION: Pagination = {
 };
 
 export type PaginatedList<ItemType> = {
-  list: Immutable.List<ItemType>,
-  pagination: ListPagination,
+  list: Immutable.List<ItemType>;
+  pagination: ListPagination;
 };
 
 export type Sort = {
-  attributeId: string,
-  direction: 'asc' | 'desc'
+  attributeId: string;
+  direction: 'asc' | 'desc';
 };
 
 export type SearchParams = {
-  page: number,
-  pageSize: number,
-  query: string,
-  sort: Sort
-  filters?: UrlQueryFilters
-}
+  page: number;
+  pageSize: number;
+  query: string;
+  sort: Sort;
+  filters?: UrlQueryFilters;
+};
 
 export type Attribute = {
-  id: string,
-  title: string,
-  type?: 'BOOLEAN' | 'STRING' | 'DATE' | 'OBJECT_ID',
-  sortable: boolean,
-  hidden?: boolean,
-  searchable?: boolean,
-  filterable?: true,
-  filter_options?: Array<{ value: string, title: string }>
-  related_collection?: string,
+  id: string;
+  title: string;
+  type?: 'BOOLEAN' | 'STRING' | 'DATE' | 'OBJECT_ID';
+  sortable: boolean;
+  hidden?: boolean;
+  searchable?: boolean;
+  filterable?: true;
+  filter_options?: Array<{ value: string; title: string }>;
+  related_collection?: string;
+};
 
-}
-
-export type Attributes = Array<Attribute>
+export type Attributes = Array<Attribute>;

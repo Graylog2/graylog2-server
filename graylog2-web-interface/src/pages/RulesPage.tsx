@@ -39,10 +39,12 @@ const Flex = styled.div`
   display: flex;
 `;
 
-const SpinnerWrapper = styled.div(({ theme }) => css`
-  font-size: ${theme.fonts.size.h3};
-  padding: ${theme.spacings.xxs} ${theme.spacings.sm};
-`);
+const SpinnerWrapper = styled.div(
+  ({ theme }) => css`
+    font-size: ${theme.fonts.size.h3};
+    padding: ${theme.spacings.xxs} ${theme.spacings.sm};
+  `,
+);
 
 const _loadData = (pagination: Pagination, setIsLoading, setPaginatedRules) => {
   setIsLoading(true);
@@ -102,7 +104,11 @@ const RulesPage = () => {
 
   const renderDebugMetricsButton = () => {
     if (metricsConfig && metricsConfig.metrics_enabled) {
-      return <Button bsStyle="warning" onClick={toggleMetricsConfig}>Debug Metrics: ON</Button>;
+      return (
+        <Button bsStyle="warning" onClick={toggleMetricsConfig}>
+          Debug Metrics: ON
+        </Button>
+      );
     }
 
     return <Button onClick={toggleMetricsConfig}>Debug Metrics</Button>;
@@ -111,16 +117,18 @@ const RulesPage = () => {
   // eslint-disable-next-line react/no-unstable-nested-components
   const RulesButtonToolbar = () => (
     <ButtonToolbar className="pull-right">
-      <Button bsStyle="success"
-              onClick={() => {
-                sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.CREATE_RULE_CLICKED, {
-                  app_pathname: getPathnameWithoutId(pathname),
-                  app_section: 'pipeline-rules',
-                  app_action_value: 'create-rule-button',
-                });
+      <Button
+        bsStyle="success"
+        onClick={() => {
+          sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.CREATE_RULE_CLICKED, {
+            app_pathname: getPathnameWithoutId(pathname),
+            app_section: 'pipeline-rules',
+            app_action_value: 'create-rule-button',
+          });
 
-                history.push(`${Routes.SYSTEM.PIPELINES.RULE('new')}?rule_builder=true`);
-              }}>
+          history.push(`${Routes.SYSTEM.PIPELINES.RULE('new')}?rule_builder=true`);
+        }}
+      >
         Create Rule
       </Button>
       {renderDebugMetricsButton()}
@@ -131,28 +139,37 @@ const RulesPage = () => {
 
   const searchFilter = (
     <Flex>
-      <SearchForm query={query}
-                  onSearch={handleSearch}
-                  queryHelpComponent={<QueryHelper entityName="Pipeline Rule" />}
-                  wrapperClass="has-bm"
-                  onReset={() => handleSearch('')}
-                  topMargin={0} />
-      {isDataLoading && <SpinnerWrapper><Spinner text="" delay={0} /></SpinnerWrapper>}
+      <SearchForm
+        query={query}
+        onSearch={handleSearch}
+        queryHelpComponent={<QueryHelper entityName="Pipeline Rule" />}
+        wrapperClass="has-bm"
+        onReset={() => handleSearch('')}
+        topMargin={0}
+      />
+      {isDataLoading && (
+        <SpinnerWrapper>
+          <Spinner text="" delay={0} />
+        </SpinnerWrapper>
+      )}
     </Flex>
   );
 
   return (
     <DocumentTitle title="Pipeline rules">
       <PipelinesPageNavigation />
-      <PageHeader title="Pipeline Rules"
-                  actions={<RulesButtonToolbar />}
-                  documentationLink={{
-                    title: 'Pipeline rules documentation',
-                    path: DocsHelper.PAGES.PIPELINE_RULES,
-                  }}>
+      <PageHeader
+        title="Pipeline Rules"
+        actions={<RulesButtonToolbar />}
+        documentationLink={{
+          title: 'Pipeline rules documentation',
+          path: DocsHelper.PAGES.PIPELINE_RULES,
+        }}
+      >
         <span>
-          Rules are a way of applying changes to messages in Graylog. A rule consists of a condition and a list of actions.
-          Graylog evaluates the condition against a message and executes the actions if the condition is satisfied.
+          Rules are a way of applying changes to messages in Graylog. A rule consists of a condition and a list of
+          actions. Graylog evaluates the condition against a message and executes the actions if the condition is
+          satisfied.
         </span>
       </PageHeader>
 
@@ -164,10 +181,12 @@ const RulesPage = () => {
             <Row>
               <Col md={12}>
                 <PaginatedList totalItems={total}>
-                  <RuleList rules={rules}
-                            rulesContext={rulesContext}
-                            onDelete={handleDelete}
-                            searchFilter={searchFilter} />
+                  <RuleList
+                    rules={rules}
+                    rulesContext={rulesContext}
+                    onDelete={handleDelete}
+                    searchFilter={searchFilter}
+                  />
                   {openMetricsConfig && <RuleMetricsConfigContainer onClose={onCloseMetricsConfig} />}
                 </PaginatedList>
               </Col>

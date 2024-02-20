@@ -26,11 +26,12 @@ import { selectView } from 'views/logic/slices/viewSelectors';
 import useAppDispatch from 'stores/useAppDispatch';
 import { selectSearchExecutionState } from 'views/logic/slices/searchExecutionSelectors';
 
-const bindSearchParamsFromQueryThunk = (query: { [key: string]: unknown; }) => (_dispatch: AppDispatch, getState: () => RootState) => {
-  const view = selectView(getState());
-  const executionState = selectSearchExecutionState(getState());
-  bindSearchParamsFromQuery({ view, query, retry: () => Promise.resolve(), executionState });
-};
+const bindSearchParamsFromQueryThunk =
+  (query: { [key: string]: unknown }) => (_dispatch: AppDispatch, getState: () => RootState) => {
+    const view = selectView(getState());
+    const executionState = selectSearchExecutionState(getState());
+    bindSearchParamsFromQuery({ view, query, retry: () => Promise.resolve(), executionState });
+  };
 
 const useBindSearchParamsFromQuery = (query: { [key: string]: unknown }) => {
   const dispatch = useAppDispatch();
@@ -42,7 +43,7 @@ const useBindSearchParamsFromQuery = (query: { [key: string]: unknown }) => {
 };
 
 type Props = {
-  location: Location,
+  location: Location;
 };
 
 const SynchronizeUrl = ({ location }: Props) => {

@@ -23,7 +23,7 @@ import MoreActions from 'components/common/EntityDataTable/MoreActions';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import useProfileMutations from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileMutations';
 
-const ProfileActions = ({ profileId, profileName }: { profileId: string, profileName: string }) => {
+const ProfileActions = ({ profileId, profileName }: { profileId: string; profileName: string }) => {
   const { deselectEntity } = useSelectedEntities();
   const { deleteProfile } = useProfileMutations();
 
@@ -39,14 +39,10 @@ const ProfileActions = ({ profileId, profileName }: { profileId: string, profile
   return (
     <ButtonToolbar>
       <LinkContainer to={Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.edit(profileId)}>
-        <Button bsSize="xs">
-          Edit
-        </Button>
+        <Button bsSize="xs">Edit</Button>
       </LinkContainer>
       <MoreActions>
-        <MenuItem onSelect={onDelete}>
-          Delete
-        </MenuItem>
+        <MenuItem onSelect={onDelete}>Delete</MenuItem>
       </MoreActions>
     </ButtonToolbar>
   );

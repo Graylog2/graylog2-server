@@ -30,10 +30,8 @@ import Query from '../queries/Query';
 import type { ViewType } from '../views/View';
 import View from '../views/View';
 
-const createQuery = (queryString: string) => Query.builder()
-  .id('queryId')
-  .query({ type: 'elasticsearch', query_string: queryString })
-  .build();
+const createQuery = (queryString: string) =>
+  Query.builder().id('queryId').query({ type: 'elasticsearch', query_string: queryString }).build();
 
 jest.mock('views/logic/slices/viewSlice', () => ({
   ...jest.requireActual('views/logic/slices/viewSlice'),
@@ -63,11 +61,13 @@ describe('ExcludeFromQueryHandler', () => {
     const state = { ...mockRootState, view: { view } } as RootState;
     const dispatch = mockDispatch(state);
 
-    await dispatch(ExcludeFromQueryHandler({
-      queryId: 'queryId',
-      field: 'something',
-      value: 'other',
-    }));
+    await dispatch(
+      ExcludeFromQueryHandler({
+        queryId: 'queryId',
+        field: 'something',
+        value: 'other',
+      }),
+    );
 
     expect(updateQueryString).toHaveBeenCalledWith('queryId', 'NOT something:other');
   });
@@ -78,11 +78,13 @@ describe('ExcludeFromQueryHandler', () => {
     const state = { ...mockRootState, view: { view } } as RootState;
     const dispatch = mockDispatch(state);
 
-    await dispatch(ExcludeFromQueryHandler({
-      queryId: 'queryId',
-      field: 'foo',
-      value: 'bar',
-    }));
+    await dispatch(
+      ExcludeFromQueryHandler({
+        queryId: 'queryId',
+        field: 'foo',
+        value: 'bar',
+      }),
+    );
 
     expect(updateQueryString).toHaveBeenCalledWith('queryId', 'NOT foo:bar');
   });
@@ -93,11 +95,13 @@ describe('ExcludeFromQueryHandler', () => {
     const state = { ...mockRootState, view: { view } } as RootState;
     const dispatch = mockDispatch(state);
 
-    await dispatch(ExcludeFromQueryHandler({
-      queryId: 'queryId',
-      field: 'do',
-      value: 'panic',
-    }));
+    await dispatch(
+      ExcludeFromQueryHandler({
+        queryId: 'queryId',
+        field: 'do',
+        value: 'panic',
+      }),
+    );
 
     expect(updateQueryString).toHaveBeenCalledWith('queryId', 'answer:42 AND NOT do:panic');
   });
@@ -108,11 +112,13 @@ describe('ExcludeFromQueryHandler', () => {
     const state = { ...mockRootState, view: { view } } as RootState;
     const dispatch = mockDispatch(state);
 
-    await dispatch(ExcludeFromQueryHandler({
-      queryId: 'queryId',
-      field: 'do',
-      value: MISSING_BUCKET_NAME,
-    }));
+    await dispatch(
+      ExcludeFromQueryHandler({
+        queryId: 'queryId',
+        field: 'do',
+        value: MISSING_BUCKET_NAME,
+      }),
+    );
 
     expect(updateQueryString).toHaveBeenCalledWith('queryId', 'answer:42 AND _exists_:do');
   });
@@ -123,13 +129,18 @@ describe('ExcludeFromQueryHandler', () => {
     const state = { ...mockRootState, view: { view } } as RootState;
     const dispatch = mockDispatch(state);
 
-    await dispatch(ExcludeFromQueryHandler({
-      queryId: 'queryId',
-      field: 'something',
-      value: 'foo && || : \\ / + - ! ( ) { } [ ] ^ " ~ * ? bar',
-    }));
+    await dispatch(
+      ExcludeFromQueryHandler({
+        queryId: 'queryId',
+        field: 'something',
+        value: 'foo && || : \\ / + - ! ( ) { } [ ] ^ " ~ * ? bar',
+      }),
+    );
 
-    expect(updateQueryString).toHaveBeenCalledWith('queryId', 'NOT something:"foo && || : \\\\ / + - ! ( ) { } [ ] ^ \\" ~ * ? bar"');
+    expect(updateQueryString).toHaveBeenCalledWith(
+      'queryId',
+      'NOT something:"foo && || : \\\\ / + - ! ( ) { } [ ] ^ \\" ~ * ? bar"',
+    );
   });
 
   describe('for dashboards', () => {
@@ -147,11 +158,13 @@ describe('ExcludeFromQueryHandler', () => {
       } as RootState;
       const dispatch = mockDispatch(state);
 
-      await dispatch(ExcludeFromQueryHandler({
-        queryId: 'queryId',
-        field: 'do',
-        value: 'panic',
-      }));
+      await dispatch(
+        ExcludeFromQueryHandler({
+          queryId: 'queryId',
+          field: 'do',
+          value: 'panic',
+        }),
+      );
 
       expect(updateQueryString).toHaveBeenCalledWith('queryId', 'something AND NOT do:panic');
     });

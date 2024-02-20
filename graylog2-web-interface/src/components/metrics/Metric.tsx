@@ -45,10 +45,10 @@ const _formatName = (metricName: string, namespace: string) => {
 };
 
 type Props = {
-  metric: MetricType,
-  namespace: string,
-  nodeId: string,
-}
+  metric: MetricType;
+  namespace: string;
+  nodeId: string;
+};
 
 const Metric = ({ metric, namespace, nodeId }: Props) => {
   const [expanded, setExpanded] = useState(false);
@@ -62,9 +62,10 @@ const Metric = ({ metric, namespace, nodeId }: Props) => {
   return (
     <span>
       <div className="name">
-        <Icon name={_formatIcon(metric.type)} />{' '}
-        {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-        <a className="open" href="#" onClick={_showDetails}>{_formatName(metric.full_name, namespace)}</a>
+        <Icon name={_formatIcon(metric.type)} /> {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+        <a className="open" href="#" onClick={_showDetails}>
+          {_formatName(metric.full_name, namespace)}
+        </a>
       </div>
       {details}
     </span>

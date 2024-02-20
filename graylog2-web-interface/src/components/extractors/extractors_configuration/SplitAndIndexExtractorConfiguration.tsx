@@ -27,19 +27,27 @@ import ToolsStore from 'stores/tools/ToolsStore';
 
 const DEFAULT_CONFIGURATION = { index: 1 };
 
-const _getEffectiveConfiguration = (configuration) => ExtractorUtils.getEffectiveConfiguration(DEFAULT_CONFIGURATION, configuration);
+const _getEffectiveConfiguration = (configuration) =>
+  ExtractorUtils.getEffectiveConfiguration(DEFAULT_CONFIGURATION, configuration);
 
 type Configuration = { [key: string]: string };
 type Props = {
-  configuration: Configuration,
-  exampleMessage: string,
-  onChange: (newConfig: Configuration) => void,
-  onExtractorPreviewLoad: (preview: React.ReactNode | string) => void,
-}
+  configuration: Configuration;
+  exampleMessage: string;
+  onChange: (newConfig: Configuration) => void;
+  onExtractorPreviewLoad: (preview: React.ReactNode | string) => void;
+};
 
-const SplitAndIndexExtractorConfiguration = ({ configuration: initialConfiguration, exampleMessage, onChange, onExtractorPreviewLoad }: Props) => {
+const SplitAndIndexExtractorConfiguration = ({
+  configuration: initialConfiguration,
+  exampleMessage,
+  onChange,
+  onExtractorPreviewLoad,
+}: Props) => {
   const [configuration, setConfiguration] = useState(_getEffectiveConfiguration(initialConfiguration));
-  useEffect(() => { setConfiguration(_getEffectiveConfiguration(initialConfiguration)); }, [initialConfiguration]);
+  useEffect(() => {
+    setConfiguration(_getEffectiveConfiguration(initialConfiguration));
+  }, [initialConfiguration]);
 
   const [trying, setTrying] = useState(false);
 
@@ -58,12 +66,14 @@ const SplitAndIndexExtractorConfiguration = ({ configuration: initialConfigurati
 
     promise.then((result) => {
       if (!result.successful) {
-        UserNotification.warning('We were not able to run the split and index extraction. Please check your parameters.');
+        UserNotification.warning(
+          'We were not able to run the split and index extraction. Please check your parameters.',
+        );
 
         return;
       }
 
-      const preview = (result.cut ? <samp>{result.cut}</samp> : '');
+      const preview = result.cut ? <samp>{result.cut}</samp> : '';
 
       onExtractorPreviewLoad(preview);
     });
@@ -73,42 +83,51 @@ const SplitAndIndexExtractorConfiguration = ({ configuration: initialConfigurati
 
   const splitByHelpMessage = (
     <span>
-      What character to split on. <strong>Example:</strong> A whitespace character will split{' '}
-      <em>foo bar baz</em> to <em>[foo,bar,baz]</em>.
+      What character to split on. <strong>Example:</strong> A whitespace character will split <em>foo bar baz</em> to{' '}
+      <em>[foo,bar,baz]</em>.
     </span>
   );
 
   const indexHelpMessage = (
     <span>
-      What part of the split string to you want to use? <strong>Example:</strong> <em>2</em> selects <em>bar</em>{' '}
-      from <em>foo bar baz</em> when split by whitespace.
+      What part of the split string to you want to use? <strong>Example:</strong> <em>2</em> selects <em>bar</em> from{' '}
+      <em>foo bar baz</em> when split by whitespace.
     </span>
   );
 
-  const isTryButtonDisabled = trying || configuration.split_by === '' || configuration.index === undefined || configuration.index < 1 || !exampleMessage;
+  const isTryButtonDisabled =
+    trying ||
+    configuration.split_by === '' ||
+    configuration.index === undefined ||
+    configuration.index < 1 ||
+    !exampleMessage;
 
   return (
     <div>
-      <Input type="text"
-             id="split_by"
-             label="Split by"
-             labelClassName="col-md-2"
-             wrapperClassName="col-md-10"
-             defaultValue={configuration.split_by}
-             onChange={_onChange('split_by')}
-             required
-             help={splitByHelpMessage} />
+      <Input
+        type="text"
+        id="split_by"
+        label="Split by"
+        labelClassName="col-md-2"
+        wrapperClassName="col-md-10"
+        defaultValue={configuration.split_by}
+        onChange={_onChange('split_by')}
+        required
+        help={splitByHelpMessage}
+      />
 
-      <Input type="number"
-             id="index"
-             label="Target index"
-             labelClassName="col-md-2"
-             wrapperClassName="col-md-10"
-             defaultValue={configuration.index}
-             onChange={_onChange('index')}
-             min="1"
-             required
-             help={indexHelpMessage} />
+      <Input
+        type="number"
+        id="index"
+        label="Target index"
+        labelClassName="col-md-2"
+        wrapperClassName="col-md-10"
+        defaultValue={configuration.index}
+        onChange={_onChange('index')}
+        min="1"
+        required
+        help={indexHelpMessage}
+      />
 
       <Row>
         <Col mdOffset={2} md={10}>

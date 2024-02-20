@@ -22,17 +22,14 @@ import { updateWidgetConfig } from 'views/logic/slices/widgetActions';
 
 type Contexts = { widget: Widget };
 
-const AddToTableActionHandler = ({
-  field,
-  contexts: { widget },
-}: ActionHandlerArguments<{ widget?: Widget }>) => (dispatch: AppDispatch) => {
-  const newFields = [].concat(widget.config.fields, [field]);
-  const newConfig = widget.config.toBuilder()
-    .fields(newFields)
-    .build();
+const AddToTableActionHandler =
+  ({ field, contexts: { widget } }: ActionHandlerArguments<{ widget?: Widget }>) =>
+  (dispatch: AppDispatch) => {
+    const newFields = [].concat(widget.config.fields, [field]);
+    const newConfig = widget.config.toBuilder().fields(newFields).build();
 
-  return dispatch(updateWidgetConfig(widget.id, newConfig));
-};
+    return dispatch(updateWidgetConfig(widget.id, newConfig));
+  };
 
 const isEnabled: ActionHandlerCondition<Contexts> = ({ contexts: { widget }, field }) => {
   if (MessagesWidget.isMessagesWidget(widget) && widget.config) {

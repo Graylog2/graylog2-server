@@ -63,12 +63,14 @@ describe('EventDefinitionEntry', () => {
     exampleEventDefinition._scope = scope;
 
     return (
-      <EventDefinitionEntry onDelete={() => { }}
-                            onCopy={() => { }}
-                            onDisable={() => { }}
-                            onEnable={() => { }}
-                            context={{ scheduler: {} }}
-                            eventDefinition={exampleEventDefinition} />
+      <EventDefinitionEntry
+        onDelete={() => {}}
+        onCopy={() => {}}
+        onDisable={() => {}}
+        onEnable={() => {}}
+        context={{ scheduler: {} }}
+        eventDefinition={exampleEventDefinition}
+      />
     );
   };
 
@@ -77,7 +79,8 @@ describe('EventDefinitionEntry', () => {
   });
 
   it('allows sharing for owners', async () => {
-    const user = currentUser.toBuilder()
+    const user = currentUser
+      .toBuilder()
       .grnPermissions(Immutable.List(['entity:own:grn::::event_definition:event-definition-id']))
       .build();
     asMock(useCurrentUser).mockReturnValue(user);
@@ -102,7 +105,8 @@ describe('EventDefinitionEntry', () => {
   });
 
   it('does not allow sharing for viewer', () => {
-    const user = currentUser.toBuilder()
+    const user = currentUser
+      .toBuilder()
       .grnPermissions(Immutable.List(['entity:view:grn::::event_definition:event-definition-id']))
       .build();
     asMock(useCurrentUser).mockReturnValue(user);

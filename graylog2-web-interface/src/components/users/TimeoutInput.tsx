@@ -24,7 +24,7 @@ import TimeoutUnitSelect from 'components/users/TimeoutUnitSelect';
 import { MS_DAY, MS_HOUR, MS_MINUTE, MS_SECOND } from './timeoutConstants';
 
 type Props = {
-  value: number,
+  value: number;
   onChange: (value: number) => void;
 };
 
@@ -78,51 +78,48 @@ const TimeoutInput = ({ value: propsValue, onChange }: Props) => {
   };
 
   return (
-    <Input id="timeout-controls"
-           labelClassName="col-sm-3"
-           wrapperClassName="col-sm-9"
-           label="Sessions Timeout">
+    <Input id="timeout-controls" labelClassName="col-sm-3" wrapperClassName="col-sm-9" label="Sessions Timeout">
       <Row className="no-bm">
         <Col xs={12}>
           <Alert bsStyle="info" title="Changing the session timeout">
             Changing the timeout setting for sessions will log the user out of Graylog and will invalidate all their
-            current sessions. If you are changing the setting for your own user, you will be logged out at the moment
-            of saving the setting. In that case, make sure to save any pending changes before changing the timeout.
+            current sessions. If you are changing the setting for your own user, you will be logged out at the moment of
+            saving the setting. In that case, make sure to save any pending changes before changing the timeout.
           </Alert>
         </Col>
       </Row>
       <>
-        <Input type="checkbox"
-               id="session-timeout-never"
-               name="session_timeout_never"
-               label="Sessions do not time out"
-               help="When checked, sessions never time out due to inactivity."
-               formGroupClassName="no-bm"
-               onChange={_onClick}
-               checked={sessionTimeoutNever} />
+        <Input
+          type="checkbox"
+          id="session-timeout-never"
+          name="session_timeout_never"
+          label="Sessions do not time out"
+          help="When checked, sessions never time out due to inactivity."
+          formGroupClassName="no-bm"
+          onChange={_onClick}
+          checked={sessionTimeoutNever}
+        />
 
         <div className="clearfix">
           <Col xs={2}>
-            <Input type="number"
-                   id="timeout"
-                   placeholder="Timeout amount"
-                   name="timeout"
-                   min={1}
-                   formGroupClassName="form-group no-bm"
-                   disabled={sessionTimeoutNever}
-                   value={value}
-                   onChange={_onChangeValue} />
+            <Input
+              type="number"
+              id="timeout"
+              placeholder="Timeout amount"
+              name="timeout"
+              min={1}
+              formGroupClassName="form-group no-bm"
+              disabled={sessionTimeoutNever}
+              value={value}
+              onChange={_onChangeValue}
+            />
           </Col>
           <Col xs={4}>
-            <TimeoutUnitSelect disabled={sessionTimeoutNever}
-                               value={String(unit)}
-                               onChange={_onChangeUnit} />
+            <TimeoutUnitSelect disabled={sessionTimeoutNever} value={String(unit)} onChange={_onChangeUnit} />
           </Col>
           <Row className="no-bm">
             <Col xs={12}>
-              <HelpBlock>
-                Session automatically end after this amount of time, unless they are actively used.
-              </HelpBlock>
+              <HelpBlock>Session automatically end after this amount of time, unless they are actively used.</HelpBlock>
             </Col>
           </Row>
         </div>

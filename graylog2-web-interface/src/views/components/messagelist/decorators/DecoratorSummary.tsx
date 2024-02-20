@@ -27,15 +27,15 @@ import InlineForm from './InlineForm';
 import DecoratorStyles from './decoratorStyles.css';
 
 type Props = {
-  decorator: Decorator,
-  decoratorTypes: { [key: string]: DecoratorType },
-  disableMenu?: boolean,
-  typeDefinition: DecoratorType,
-  onDelete: (id: string) => void,
-  onUpdate: (id: string, decorator: Decorator) => void,
+  decorator: Decorator;
+  decoratorTypes: { [key: string]: DecoratorType };
+  disableMenu?: boolean;
+  typeDefinition: DecoratorType;
+  onDelete: (id: string) => void;
+  onUpdate: (id: string, decorator: Decorator) => void;
 };
 type State = {
-  editing: boolean,
+  editing: boolean;
 };
 
 const SpacedActions = styled.div`
@@ -106,7 +106,7 @@ class DecoratorSummary extends React.Component<Props, State> {
     const configKeys = Object.keys(config);
 
     configKeys.forEach((key) => {
-      const configValues = (typeConfig[key] ? typeConfig[key].additional_info.values : undefined);
+      const configValues = typeConfig[key] ? typeConfig[key].additional_info.values : undefined;
       const originalValue = config[key];
 
       if (configValues) {
@@ -144,24 +144,26 @@ class DecoratorSummary extends React.Component<Props, State> {
     const wrapperComponent = InlineForm('Update');
     const decoratorId = decorator.id || 'new';
 
-    const content = editing
-      ? (
-        <ConfigurationForm<Decorator['config']> key="configuration-form-decorator"
-                                                configFields={requestedConfiguration}
-                                                title={`Edit ${name}`}
-                                                typeName={decorator.type}
-                                                includeTitleField={false}
-                                                submitAction={this._handleSubmit}
-                                                cancelAction={this._closeEditForm}
-                                                wrapperComponent={wrapperComponent}
-                                                values={decorator.config} />
-      )
-      : (
-        <ConfigurationWell key={`configuration-well-decorator-${decoratorId}`}
-                           id={decoratorId}
-                           configuration={config}
-                           typeDefinition={typeDefinition} />
-      );
+    const content = editing ? (
+      <ConfigurationForm<Decorator['config']>
+        key="configuration-form-decorator"
+        configFields={requestedConfiguration}
+        title={`Edit ${name}`}
+        typeName={decorator.type}
+        includeTitleField={false}
+        submitAction={this._handleSubmit}
+        cancelAction={this._closeEditForm}
+        wrapperComponent={wrapperComponent}
+        values={decorator.config}
+      />
+    ) : (
+      <ConfigurationWell
+        key={`configuration-well-decorator-${decoratorId}`}
+        id={decoratorId}
+        configuration={config}
+        typeDefinition={typeDefinition}
+      />
+    );
 
     return (
       <span className={DecoratorStyles.fixedWidth}>

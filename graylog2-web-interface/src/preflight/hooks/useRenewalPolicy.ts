@@ -24,27 +24,23 @@ import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 
 export const QUERY_KEY = ['data-nodes', 'renewal-policy'];
-const fetchRenewalPolicy = (): Promise<RenewalPolicy> => (
-  fetch('GET', qualifyUrl('/api/renewal_policy'), undefined, false)
-);
+const fetchRenewalPolicy = (): Promise<RenewalPolicy> =>
+  fetch('GET', qualifyUrl('/api/renewal_policy'), undefined, false);
 
 const useRenewalPolicy = (): {
-  data: RenewalPolicy,
-  isFetching: boolean,
-  error: FetchError,
-  isInitialLoading: boolean
+  data: RenewalPolicy;
+  isFetching: boolean;
+  error: FetchError;
+  isInitialLoading: boolean;
 } => {
   const [metaData, setMetaData] = useState<{
-    error: FetchError | null,
-    isInitialLoading: false,
+    error: FetchError | null;
+    isInitialLoading: false;
   }>({
     error: null,
     isInitialLoading: false,
   });
-  const {
-    data,
-    isFetching,
-  } = useQuery<RenewalPolicy, FetchError>({
+  const { data, isFetching } = useQuery<RenewalPolicy, FetchError>({
     queryKey: QUERY_KEY,
     queryFn: fetchRenewalPolicy,
     initialData: undefined,

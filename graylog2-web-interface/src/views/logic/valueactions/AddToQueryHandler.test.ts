@@ -31,10 +31,8 @@ import type { ViewType } from '../views/View';
 import View from '../views/View';
 import GlobalOverride from '../search/GlobalOverride';
 
-const createQuery = (id: string, queryString: string = '') => Query.builder()
-  .id(id)
-  .query({ type: 'elasticsearch', query_string: queryString })
-  .build();
+const createQuery = (id: string, queryString: string = '') =>
+  Query.builder().id(id).query({ type: 'elasticsearch', query_string: queryString }).build();
 
 jest.mock('views/logic/slices/viewSlice', () => ({
   ...jest.requireActual('views/logic/slices/viewSlice'),
@@ -64,12 +62,14 @@ describe('AddToQueryHandler', () => {
     const state = { ...mockRootState, view: { view } } as RootState;
     const dispatch = mockDispatch(state);
 
-    await dispatch(AddToQueryHandler({
-      queryId: 'queryId',
-      field: 'timestamp',
-      value: '2019-01-17T11:00:09.025Z',
-      type: new FieldType('date', [], []),
-    }));
+    await dispatch(
+      AddToQueryHandler({
+        queryId: 'queryId',
+        field: 'timestamp',
+        value: '2019-01-17T11:00:09.025Z',
+        type: new FieldType('date', [], []),
+      }),
+    );
 
     expect(updateQueryString).toHaveBeenCalledWith('queryId', 'timestamp:"2019-01-17T11:00:09.025Z"');
   });
@@ -80,12 +80,14 @@ describe('AddToQueryHandler', () => {
     const state = { ...mockRootState, view: { view } } as RootState;
     const dispatch = mockDispatch(state);
 
-    await dispatch(AddToQueryHandler({
-      queryId: 'anotherQueryId',
-      field: 'bar',
-      value: 42,
-      type: new FieldType('keyword', [], []),
-    }));
+    await dispatch(
+      AddToQueryHandler({
+        queryId: 'anotherQueryId',
+        field: 'bar',
+        value: 42,
+        type: new FieldType('keyword', [], []),
+      }),
+    );
 
     expect(updateQueryString).toHaveBeenCalledWith('anotherQueryId', 'foo:23 AND bar:42');
   });
@@ -96,12 +98,14 @@ describe('AddToQueryHandler', () => {
     const state = { ...mockRootState, view: { view } } as RootState;
     const dispatch = mockDispatch(state);
 
-    await dispatch(AddToQueryHandler({
-      queryId: 'anotherQueryId',
-      field: 'bar',
-      value: MISSING_BUCKET_NAME,
-      type: new FieldType('keyword', [], []),
-    }));
+    await dispatch(
+      AddToQueryHandler({
+        queryId: 'anotherQueryId',
+        field: 'bar',
+        value: MISSING_BUCKET_NAME,
+        type: new FieldType('keyword', [], []),
+      }),
+    );
 
     expect(updateQueryString).toHaveBeenCalledWith('anotherQueryId', 'foo:23 AND NOT _exists_:bar');
   });
@@ -125,12 +129,14 @@ describe('AddToQueryHandler', () => {
       } as RootState;
       const dispatch = mockDispatch(state);
 
-      await dispatch(AddToQueryHandler({
-        queryId: 'queryId',
-        field: 'bar',
-        value: 42,
-        type: new FieldType('keyword', [], []),
-      }));
+      await dispatch(
+        AddToQueryHandler({
+          queryId: 'queryId',
+          field: 'bar',
+          value: 42,
+          type: new FieldType('keyword', [], []),
+        }),
+      );
 
       expect(updateQueryString).toHaveBeenCalledWith('queryId', 'something AND bar:42');
     });
@@ -139,20 +145,19 @@ describe('AddToQueryHandler', () => {
       const state = {
         ...mockDashboardRootState,
         searchExecution: {
-          executionState: SearchExecutionState.create(
-            Immutable.Map(),
-            undefined,
-          ),
+          executionState: SearchExecutionState.create(Immutable.Map(), undefined),
         },
       } as RootState;
       const dispatch = mockDispatch(state);
 
-      await dispatch(AddToQueryHandler({
-        queryId: 'queryId',
-        field: 'bar',
-        value: 42,
-        type: new FieldType('keyword', [], []),
-      }));
+      await dispatch(
+        AddToQueryHandler({
+          queryId: 'queryId',
+          field: 'bar',
+          value: 42,
+          type: new FieldType('keyword', [], []),
+        }),
+      );
 
       expect(updateQueryString).toHaveBeenCalledWith('queryId', 'bar:42');
     });

@@ -77,21 +77,25 @@ const EventInfoBar = () => {
     <FlatContentRow>
       <Header>
         <Button bsStyle="link" className="btn-text" bsSize="xsmall" onClick={toggleOpen}>
-          <Icon name={`caret-${open ? 'down' : 'right'}`} />&nbsp;
+          <Icon name={`caret-${open ? 'down' : 'right'}`} />
+          &nbsp;
           {open ? `Hide ${currentTypeText} details` : `Show ${currentTypeText} details`}
         </Button>
       </Header>
       {open && (
-      <Container data-testid="info-container">
-        <Row>
-          {infoAttributes.map(({ title, content, show }) => (show !== false) && (
-            <Item key={title}>
-              <b>{title}: </b>
-              <Value title={title}>{content || <NoAttributeProvided name={title} />}</Value>
-            </Item>
-          ))}
-        </Row>
-      </Container>
+        <Container data-testid="info-container">
+          <Row>
+            {infoAttributes.map(
+              ({ title, content, show }) =>
+                show !== false && (
+                  <Item key={title}>
+                    <b>{title}: </b>
+                    <Value title={title}>{content || <NoAttributeProvided name={title} />}</Value>
+                  </Item>
+                ),
+            )}
+          </Row>
+        </Container>
       )}
     </FlatContentRow>
   );

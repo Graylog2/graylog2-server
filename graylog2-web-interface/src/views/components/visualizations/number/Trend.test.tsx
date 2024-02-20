@@ -23,7 +23,8 @@ const renderTrend = ({
   current = 42,
   previous = 42,
   trendPreference = 'NEUTRAL',
-}: Partial<React.ComponentProps<typeof Trend>> = {}) => render(<Trend current={current} previous={previous} trendPreference={trendPreference} />);
+}: Partial<React.ComponentProps<typeof Trend>> = {}) =>
+  render(<Trend current={current} previous={previous} trendPreference={trendPreference} />);
 
 const findTrend = async () => {
   const trend = await screen.findByTestId('trend-value');

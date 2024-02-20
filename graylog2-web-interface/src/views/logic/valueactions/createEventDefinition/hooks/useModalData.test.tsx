@@ -18,41 +18,42 @@ import React from 'react';
 import { renderHook } from 'wrappedTestingLibrary/hooks';
 
 import MockStore from 'helpers/mocking/StoreMock';
-import {
-  ltParamJSON, modalDataResult,
-} from 'fixtures/createEventDefinitionFromValue';
+import { ltParamJSON, modalDataResult } from 'fixtures/createEventDefinitionFromValue';
 import useModalData from 'views/logic/valueactions/createEventDefinition/hooks/useModalData';
 
 jest.mock('views/stores/StreamsStore', () => ({
-  StreamsStore: MockStore(['getInitialState', () => ({
-    streams: [
-      { title: 'streamId-1-title', id: 'streamId-1' },
-      { title: 'streamId-2-title', id: 'streamId-2' },
-    ],
-  })]),
+  StreamsStore: MockStore([
+    'getInitialState',
+    () => ({
+      streams: [
+        { title: 'streamId-1-title', id: 'streamId-1' },
+        { title: 'streamId-2-title', id: 'streamId-2' },
+      ],
+    }),
+  ]),
 }));
 
-const wrapper = ({ children }) => (
-  <div>
-    {children}
-  </div>
-);
+const wrapper = ({ children }) => <div>{children}</div>;
 
 describe('useModalData', () => {
   it('return correct data', async () => {
-    const { result, waitFor } = renderHook(() => useModalData({
-      searchWithinMs: 300000,
-      searchFilterQuery: '(http_method:GET)',
-      queryWithReplacedParams: 'http_method:GET',
-      searchFromValue: 'action:show',
-      aggField: 'action',
-      aggFunction: 'count',
-      aggValue: 400,
-      columnGroupBy: ['action', 'http_method'],
-      rowGroupBy: ['action'],
-      streams: ['streamId-1', 'streamId-2'],
-      lutParameters: [ltParamJSON],
-    }), { wrapper });
+    const { result, waitFor } = renderHook(
+      () =>
+        useModalData({
+          searchWithinMs: 300000,
+          searchFilterQuery: '(http_method:GET)',
+          queryWithReplacedParams: 'http_method:GET',
+          searchFromValue: 'action:show',
+          aggField: 'action',
+          aggFunction: 'count',
+          aggValue: 400,
+          columnGroupBy: ['action', 'http_method'],
+          rowGroupBy: ['action'],
+          streams: ['streamId-1', 'streamId-2'],
+          lutParameters: [ltParamJSON],
+        }),
+      { wrapper },
+    );
     await waitFor(() => !!result.current);
 
     expect(result.current).toEqual(modalDataResult);

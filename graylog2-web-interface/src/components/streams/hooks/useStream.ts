@@ -28,31 +28,29 @@ const fetchStream = (streamId: string) => {
   return fetch('GET', qualifyUrl(url));
 };
 
-const useStream = (streamId: string, { enabled } = { enabled: true }): {
-  data: Stream
-  refetch: () => void,
-  isFetching: boolean,
-  isError,
+const useStream = (
+  streamId: string,
+  { enabled } = { enabled: true },
+): {
+  data: Stream;
+  refetch: () => void;
+  isFetching: boolean;
+  isError;
 } => {
-  const { data, refetch, isFetching, isError } = useQuery(
-    ['streams', streamId],
-    () => fetchStream(streamId),
-    {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading stream failed with status: ${errorThrown}`,
-          'Could not load Stream');
-      },
-      keepPreviousData: true,
-      enabled,
+  const { data, refetch, isFetching, isError } = useQuery(['streams', streamId], () => fetchStream(streamId), {
+    onError: (errorThrown) => {
+      UserNotification.error(`Loading stream failed with status: ${errorThrown}`, 'Could not load Stream');
     },
-  );
+    keepPreviousData: true,
+    enabled,
+  });
 
-  return ({
+  return {
     data,
     refetch,
     isFetching,
     isError,
-  });
+  };
 };
 
 export default useStream;

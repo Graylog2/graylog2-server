@@ -39,40 +39,19 @@ class Input extends React.Component {
     id: PropTypes.string.isRequired,
     type: PropTypes.string,
     name: PropTypes.string,
-    label: PropTypes.oneOfType([
-      PropTypes.element,
-      PropTypes.string,
-    ]),
+    label: PropTypes.oneOfType([PropTypes.element, PropTypes.string]),
     labelClassName: PropTypes.string,
     bsStyle: PropTypes.oneOf(['success', 'warning', 'error']),
     formGroupClassName: PropTypes.string,
     inputDescClassName: PropTypes.string,
-    value: PropTypes.oneOfType([
-      PropTypes.string,
-      PropTypes.number,
-    ]),
+    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     placeholder: PropTypes.string,
-    error: PropTypes.oneOfType([
-      PropTypes.element,
-      PropTypes.string,
-    ]),
-    help: PropTypes.oneOfType([
-      PropTypes.element,
-      PropTypes.string,
-    ]),
+    error: PropTypes.oneOfType([PropTypes.element, PropTypes.string]),
+    help: PropTypes.oneOfType([PropTypes.element, PropTypes.string]),
     wrapperClassName: PropTypes.string,
-    addonAfter: PropTypes.oneOfType([
-      PropTypes.element,
-      PropTypes.string,
-    ]),
-    buttonAfter: PropTypes.oneOfType([
-      PropTypes.element,
-      PropTypes.string,
-    ]),
-    children: PropTypes.oneOfType([
-      PropTypes.array,
-      PropTypes.element,
-    ]),
+    addonAfter: PropTypes.oneOfType([PropTypes.element, PropTypes.string]),
+    buttonAfter: PropTypes.oneOfType([PropTypes.element, PropTypes.string]),
+    children: PropTypes.oneOfType([PropTypes.array, PropTypes.element]),
   };
 
   static defaultProps = {
@@ -116,7 +95,13 @@ class Input extends React.Component {
   getChecked = () => this.getInputDOMNode().checked;
 
   _renderFormControl = (componentClass, controlProps, children) => (
-    <FormControl inputRef={(ref) => { this.input = ref; }} componentClass={componentClass} {...controlProps}>
+    <FormControl
+      inputRef={(ref) => {
+        this.input = ref;
+      }}
+      componentClass={componentClass}
+      {...controlProps}
+    >
       {children}
     </FormControl>
   );
@@ -162,21 +147,35 @@ class Input extends React.Component {
   };
 
   _renderCheckboxGroup = (controlProps) => {
-    const { id, buttonAfter, bsStyle, formGroupClassName, inputDescClassName, wrapperClassName, label, error, help } = this.props;
+    const { id, buttonAfter, bsStyle, formGroupClassName, inputDescClassName, wrapperClassName, label, error, help } =
+      this.props;
 
     return (
       <FormGroup controlId={id} validationState={error ? 'error' : bsStyle} bsClass={formGroupClassName}>
         <InputWrapper className={wrapperClassName}>
           {buttonAfter ? (
             <InputGroup>
-              <Checkbox inputRef={(ref) => { this.input = ref; }} {...controlProps}>{label}</Checkbox>
+              <Checkbox
+                inputRef={(ref) => {
+                  this.input = ref;
+                }}
+                {...controlProps}
+              >
+                {label}
+              </Checkbox>
               {buttonAfter && <InputGroup.Button>{buttonAfter}</InputGroup.Button>}
             </InputGroup>
           ) : (
-            <Checkbox inputRef={(ref) => { this.input = ref; }} {...controlProps}>{label}</Checkbox>
+            <Checkbox
+              inputRef={(ref) => {
+                this.input = ref;
+              }}
+              {...controlProps}
+            >
+              {label}
+            </Checkbox>
           )}
           <InputDescription error={error} help={help} className={inputDescClassName} />
-
         </InputWrapper>
       </FormGroup>
     );
@@ -188,7 +187,14 @@ class Input extends React.Component {
     return (
       <FormGroup controlId={id} validationState={error ? 'error' : bsStyle} bsClass={formGroupClassName}>
         <InputWrapper className={wrapperClassName}>
-          <Radio inputRef={(ref) => { this.input = ref; }} {...controlProps}>{label}</Radio>
+          <Radio
+            inputRef={(ref) => {
+              this.input = ref;
+            }}
+            {...controlProps}
+          >
+            {label}
+          </Radio>
           <InputDescription error={error} help={help} className={inputDescClassName} />
         </InputWrapper>
       </FormGroup>
@@ -204,8 +210,15 @@ class Input extends React.Component {
       name,
       // The following props need to be extracted even if they are not used
       // so they are not passed as controll props to the input
-      bsStyle, formGroupClassName, wrapperClassName, labelClassName, inputDescClassName, // eslint-disable-line no-unused-vars
-      error, help, addonAfter, buttonAfter, // eslint-disable-line no-unused-vars
+      bsStyle,
+      formGroupClassName,
+      wrapperClassName,
+      labelClassName,
+      inputDescClassName, // eslint-disable-line no-unused-vars
+      error,
+      help,
+      addonAfter,
+      buttonAfter, // eslint-disable-line no-unused-vars
       ...controlProps
     } = this.props;
 

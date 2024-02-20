@@ -27,7 +27,7 @@ import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 type PostHogSettings = {
   host: string;
   key: string;
-}
+};
 
 const getPostHogSettings = (): PostHogSettings => {
   const { host, api_key: key } = AppConfig.telemetry() || {};
@@ -39,15 +39,12 @@ const getPostHogSettings = (): PostHogSettings => {
 };
 
 const init = (key: string, host: string) => {
-  posthog.init(
-    key,
-    {
-      autocapture: false,
-      api_host: host,
-      capture_pageview: false,
-      capture_pageleave: false,
-    },
-  );
+  posthog.init(key, {
+    autocapture: false,
+    api_host: host,
+    capture_pageview: false,
+    capture_pageleave: false,
+  });
 
   return posthog;
 };
@@ -63,15 +60,11 @@ const TelemetryInit = ({ children }: { children: React.ReactElement }) => {
     }
   }, [currentUser]);
 
-  if ((!settings?.telemetry_enabled) || !host || !key) {
+  if (!settings?.telemetry_enabled || !host || !key) {
     return children;
   }
 
-  return (
-    <PostHogProvider client={init(key, host)}>
-      {children}
-    </PostHogProvider>
-  );
+  return <PostHogProvider client={init(key, host)}>{children}</PostHogProvider>;
 };
 
 export default TelemetryInit;

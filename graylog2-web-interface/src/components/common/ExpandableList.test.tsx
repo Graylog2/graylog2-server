@@ -88,7 +88,10 @@ describe('<ExpandableList />', () => {
       </ExpandableList>,
     );
 
-    wrapper.find('input[type="checkbox"]').at(1).simulate('change', { target: { checked: true } });
+    wrapper
+      .find('input[type="checkbox"]')
+      .at(1)
+      .simulate('change', { target: { checked: true } });
 
     expect(checkFn.mock.calls.length).toBe(1);
   });

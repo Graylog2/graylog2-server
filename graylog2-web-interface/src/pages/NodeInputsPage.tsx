@@ -47,14 +47,20 @@ const NodeInputsPage = () => {
     return <Spinner />;
   }
 
-  const title = <span>Inputs of node {node.short_node_id} / {node.hostname}</span>;
+  const title = (
+    <span>
+      Inputs of node {node.short_node_id} / {node.hostname}
+    </span>
+  );
 
   return (
     <DocumentTitle title={`Inputs of node ${node.short_node_id} / ${node.hostname}`}>
       <div>
         <PageHeader title={title}>
           <span>
-            Graylog nodes accept data via inputs. On this page you can see which inputs are running on this specific node.<br />
+            Graylog nodes accept data via inputs. On this page you can see which inputs are running on this specific
+            node.
+            <br />
             You can launch and terminate inputs on your cluster <Link to={Routes.SYSTEM.INPUTS}>here</Link>.
           </span>
         </PageHeader>

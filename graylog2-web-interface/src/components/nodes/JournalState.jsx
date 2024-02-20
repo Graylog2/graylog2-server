@@ -41,11 +41,15 @@ const JournalState = createReactClass({
       entriesUncommitted: 'org.graylog2.journal.entries-uncommitted',
     };
 
-    Object.keys(this.metricNames).forEach((metricShortName) => MetricsActions.add(this.props.nodeId, this.metricNames[metricShortName]));
+    Object.keys(this.metricNames).forEach((metricShortName) =>
+      MetricsActions.add(this.props.nodeId, this.metricNames[metricShortName]),
+    );
   },
 
   componentWillUnmount() {
-    Object.keys(this.metricNames).forEach((metricShortName) => MetricsActions.remove(this.props.nodeId, this.metricNames[metricShortName]));
+    Object.keys(this.metricNames).forEach((metricShortName) =>
+      MetricsActions.remove(this.props.nodeId, this.metricNames[metricShortName]),
+    );
   },
 
   _isLoading() {
@@ -67,11 +71,10 @@ const JournalState = createReactClass({
 
     return (
       <span>
-        The journal contains <strong>{numeral(metrics.entriesUncommitted).format('0,0')} unprocessed messages</strong> in {metrics.segments}
-        {' '}<Pluralize value={metrics.segments} singular="segment" plural="segments" />.{' '}
-        <strong>{numeral(metrics.append).format('0,0')} messages</strong> appended, <strong>
-          {numeral(metrics.read).format('0,0')} messages
-        </strong> read in the last second.
+        The journal contains <strong>{numeral(metrics.entriesUncommitted).format('0,0')} unprocessed messages</strong>{' '}
+        in {metrics.segments} <Pluralize value={metrics.segments} singular="segment" plural="segments" />.{' '}
+        <strong>{numeral(metrics.append).format('0,0')} messages</strong> appended,{' '}
+        <strong>{numeral(metrics.read).format('0,0')} messages</strong> read in the last second.
       </span>
     );
   },

@@ -35,9 +35,7 @@ const AdditionalFields = ({ children, className, onToggle, title, visible }) => 
         {title} <Icon name={fieldsVisible ? 'angle-down' : 'angle-right'} fixedWidth />
       </ToggleAdditionalFields>
 
-      <AdditionalFieldsContent visible={fieldsVisible}>
-        {children}
-      </AdditionalFieldsContent>
+      <AdditionalFieldsContent visible={fieldsVisible}>{children}</AdditionalFieldsContent>
     </div>
   );
 };

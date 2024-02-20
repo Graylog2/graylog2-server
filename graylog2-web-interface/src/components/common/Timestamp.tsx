@@ -23,13 +23,13 @@ import useUserDateTime from 'hooks/useUserDateTime';
 import { adjustFormat } from 'util/DateTime';
 
 type Props = {
-  dateTime?: string | number | Date | Moment,
-  field?: string,
-  format?: DateTimeFormats,
-  render?: React.ComponentType<{ value: string, field: string | undefined }>,
-  tz?: string,
-  className?: string,
-}
+  dateTime?: string | number | Date | Moment;
+  field?: string;
+  format?: DateTimeFormats;
+  render?: React.ComponentType<{ value: string; field: string | undefined }>;
+  tz?: string;
+  className?: string;
+};
 
 /**
  * Component that renders a given date time based on the user time zone in a `time` HTML element.

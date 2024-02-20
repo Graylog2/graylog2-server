@@ -17,89 +17,85 @@
 import React from 'react';
 import { renderHook } from 'wrappedTestingLibrary/hooks';
 
-import {
-  ltParamJSON, urlConfigWithAgg,
-} from 'fixtures/createEventDefinitionFromValue';
+import { ltParamJSON, urlConfigWithAgg } from 'fixtures/createEventDefinitionFromValue';
 import useLocalStorageConfigData from 'views/logic/valueactions/createEventDefinition/hooks/useLocalStorageConfigData';
 
-const wrapper = ({ children }) => (
-  <div>
-    {children}
-  </div>
-);
+const wrapper = ({ children }) => <div>{children}</div>;
 
 describe('useUrlConfigData', () => {
   it('concat all query values correct and return rest', async () => {
-    const { result, waitFor } = renderHook(() => useLocalStorageConfigData({
-      mappedData: {
-        searchWithinMs: 300000,
-        searchFilterQuery: '(http_method:GET)',
-        queryWithReplacedParams: 'http_method:GET',
-        searchFromValue: 'action:show',
-        aggField: 'action',
-        aggFunction: 'count',
-        aggValue: 400,
-        columnGroupBy: ['action', 'http_method'],
-        rowGroupBy: ['action'],
-        streams: ['streamId-1', 'streamId-2'],
-        lutParameters: [ltParamJSON],
-      },
-      checked: {
-        searchWithinMs: true,
-        searchFilterQuery: true,
-        queryWithReplacedParams: true,
-        searchFromValue: true,
-        aggCondition: true,
-        columnGroupBy: true,
-        rowGroupBy: true,
-        streams: true,
-        lutParameters: true,
-      },
-    }), { wrapper });
+    const { result, waitFor } = renderHook(
+      () =>
+        useLocalStorageConfigData({
+          mappedData: {
+            searchWithinMs: 300000,
+            searchFilterQuery: '(http_method:GET)',
+            queryWithReplacedParams: 'http_method:GET',
+            searchFromValue: 'action:show',
+            aggField: 'action',
+            aggFunction: 'count',
+            aggValue: 400,
+            columnGroupBy: ['action', 'http_method'],
+            rowGroupBy: ['action'],
+            streams: ['streamId-1', 'streamId-2'],
+            lutParameters: [ltParamJSON],
+          },
+          checked: {
+            searchWithinMs: true,
+            searchFilterQuery: true,
+            queryWithReplacedParams: true,
+            searchFromValue: true,
+            aggCondition: true,
+            columnGroupBy: true,
+            rowGroupBy: true,
+            streams: true,
+            lutParameters: true,
+          },
+        }),
+      { wrapper },
+    );
     await waitFor(() => !!result.current);
 
     expect(result.current).toEqual(urlConfigWithAgg);
   });
 
   it('ignore non-selected values', async () => {
-    const { result, waitFor } = renderHook(() => useLocalStorageConfigData({
-      mappedData: {
-        searchWithinMs: 300000,
-        searchFilterQuery: '(http_method:GET)',
-        queryWithReplacedParams: 'http_method:GET',
-        searchFromValue: 'action:show',
-        aggField: 'action',
-        aggFunction: 'count',
-        aggValue: 400,
-        columnGroupBy: ['action', 'http_method'],
-        rowGroupBy: ['action'],
-        streams: ['streamId-1', 'streamId-2'],
-        lutParameters: [ltParamJSON],
-      },
-      checked: {
-        searchWithinMs: true,
-        searchFilterQuery: true,
-        aggCondition: true,
-        columnGroupBy: true,
-        streams: true,
-      },
-    }), { wrapper });
+    const { result, waitFor } = renderHook(
+      () =>
+        useLocalStorageConfigData({
+          mappedData: {
+            searchWithinMs: 300000,
+            searchFilterQuery: '(http_method:GET)',
+            queryWithReplacedParams: 'http_method:GET',
+            searchFromValue: 'action:show',
+            aggField: 'action',
+            aggFunction: 'count',
+            aggValue: 400,
+            columnGroupBy: ['action', 'http_method'],
+            rowGroupBy: ['action'],
+            streams: ['streamId-1', 'streamId-2'],
+            lutParameters: [ltParamJSON],
+          },
+          checked: {
+            searchWithinMs: true,
+            searchFilterQuery: true,
+            aggCondition: true,
+            columnGroupBy: true,
+            streams: true,
+          },
+        }),
+      { wrapper },
+    );
     await waitFor(() => !!result.current);
 
     expect(result.current).toEqual({
       agg_field: 'action',
       agg_function: 'count',
       agg_value: 400,
-      group_by: [
-        'action',
-        'http_method',
-      ],
+      group_by: ['action', 'http_method'],
       query: '(http_method:GET)',
       search_within_ms: 300000,
-      streams: [
-        'streamId-1',
-        'streamId-2',
-      ],
+      streams: ['streamId-1', 'streamId-2'],
       type: 'aggregation-v1',
     });
   });

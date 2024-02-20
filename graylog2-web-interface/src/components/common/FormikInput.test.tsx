@@ -23,7 +23,15 @@ import FormikInput from './FormikInput';
 type FormValues = { [key: string]: unknown };
 
 describe('<FormikInput />', () => {
-  const SimpleForm = ({ children, onSubmit, initialValues }: { children: React.ReactNode, onSubmit: (FormValues) => Promise<void>, initialValues?: FormValues}) => (
+  const SimpleForm = ({
+    children,
+    onSubmit,
+    initialValues,
+  }: {
+    children: React.ReactNode;
+    onSubmit: (FormValues) => Promise<void>;
+    initialValues?: FormValues;
+  }) => (
     <Formik onSubmit={(data) => onSubmit(data)} initialValues={initialValues}>
       <Form>
         {children}
@@ -40,10 +48,7 @@ describe('<FormikInput />', () => {
     const submitStub = jest.fn();
     const { getByLabelText, getByText } = render(
       <SimpleForm onSubmit={submitStub}>
-        <FormikInput label="Username"
-                     id="username"
-                     name="username"
-                     type="text" />
+        <FormikInput label="Username" id="username" name="username" type="text" />
       </SimpleForm>,
     );
 
@@ -59,10 +64,7 @@ describe('<FormikInput />', () => {
     const submitStub = jest.fn();
     const { getByText } = render(
       <SimpleForm onSubmit={submitStub} initialValues={{ username: 'Initial username' }}>
-        <FormikInput label="Username"
-                     id="username"
-                     name="username"
-                     type="text" />
+        <FormikInput label="Username" id="username" name="username" type="text" />
       </SimpleForm>,
     );
 
@@ -76,10 +78,7 @@ describe('<FormikInput />', () => {
     const submitStub = jest.fn();
     const { getByLabelText, getByText } = render(
       <SimpleForm onSubmit={submitStub}>
-        <FormikInput label="Newsletter Subscription"
-                     id="newsletter"
-                     name="newsletter"
-                     type="checkbox" />
+        <FormikInput label="Newsletter Subscription" id="newsletter" name="newsletter" type="checkbox" />
       </SimpleForm>,
     );
 
@@ -95,11 +94,7 @@ describe('<FormikInput />', () => {
     const submitStub = jest.fn();
     const { getByLabelText } = render(
       <SimpleForm onSubmit={submitStub}>
-        <FormikInput label="Username"
-                     id="username"
-                     name="username"
-                     type="text"
-                     disabled />
+        <FormikInput label="Username" id="username" name="username" type="text" disabled />
       </SimpleForm>,
     );
 

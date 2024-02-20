@@ -27,38 +27,44 @@ import type { StyleProps } from 'components/bootstrap/Button';
  */
 
 type Props = {
-  bsSize?: BsSize,
-  bsStyle?: StyleProps,
-  buttonTitle?: string,
-  className?: string,
-  disabled?: boolean,
-  onSuccess?: () => void,
-  text: string,
-  title: React.ReactNode,
-}
+  bsSize?: BsSize;
+  bsStyle?: StyleProps;
+  buttonTitle?: string;
+  className?: string;
+  disabled?: boolean;
+  onSuccess?: () => void;
+  text: string;
+  title: React.ReactNode;
+};
 
 const ClipboardButton = ({ bsSize, bsStyle, buttonTitle, className, disabled, onSuccess, text, title }: Props) => {
   const button = (copy: () => void) => (
-    <Button bsSize={bsSize}
-            bsStyle={bsStyle}
-            className={className}
-            disabled={disabled}
-            title={buttonTitle}
-            onClick={() => {
-              copy();
-              onSuccess?.();
-            }}>
+    <Button
+      bsSize={bsSize}
+      bsStyle={bsStyle}
+      className={className}
+      disabled={disabled}
+      title={buttonTitle}
+      onClick={() => {
+        copy();
+        onSuccess?.();
+      }}
+    >
       {title}
     </Button>
   );
 
   return (
     <CopyButton value={text} timeout={2000}>
-      {({ copied, copy }) => (copied ? (
-        <Tooltip label="Copied!" withArrow position="top" opened>
-          {button(copy)}
-        </Tooltip>
-      ) : button(copy))}
+      {({ copied, copy }) =>
+        copied ? (
+          <Tooltip label="Copied!" withArrow position="top" opened>
+            {button(copy)}
+          </Tooltip>
+        ) : (
+          button(copy)
+        )
+      }
     </CopyButton>
   );
 };

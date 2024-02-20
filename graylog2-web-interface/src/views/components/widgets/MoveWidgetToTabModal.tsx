@@ -25,19 +25,20 @@ import useQueryIds from 'views/hooks/useQueryIds';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 
 type Props = {
-  view: View,
-  widgetId: string,
-  onCancel: () => void,
-  onSubmit: (widgetId: string, selectedTab: string | undefined | null, keepCopy: boolean) => void,
+  view: View;
+  widgetId: string;
+  onCancel: () => void;
+  onSubmit: (widgetId: string, selectedTab: string | undefined | null, keepCopy: boolean) => void;
 };
 
-type TabEntry = { id: string, name: string };
+type TabEntry = { id: string; name: string };
 
-const _tabList = (view: View, queryIds): Array<TabEntry> => queryIds.map((queryId) => {
-  const tabTitle = QueryTitle(view, queryId) || 'Unknown Page title';
+const _tabList = (view: View, queryIds): Array<TabEntry> =>
+  queryIds.map((queryId) => {
+    const tabTitle = QueryTitle(view, queryId) || 'Unknown Page title';
 
-  return ({ id: queryId, name: tabTitle });
-});
+    return { id: queryId, name: tabTitle };
+  });
 
 const MoveWidgetToTabModal = ({ view, onCancel, onSubmit, widgetId }: Props) => {
   const [selectedTab, setSelectedTab] = useState(null);
@@ -45,37 +46,39 @@ const MoveWidgetToTabModal = ({ view, onCancel, onSubmit, widgetId }: Props) => 
   const activeQuery = useActiveQueryId();
   const queryIds = useQueryIds();
   const onKeepCopy = useCallback((e) => setKeepCopy(e.target.checked), [setKeepCopy]);
-  const submit = useCallback(() => onSubmit(widgetId, selectedTab, keepCopy),
-    [onSubmit, widgetId, selectedTab, keepCopy]);
+  const submit = useCallback(
+    () => onSubmit(widgetId, selectedTab, keepCopy),
+    [onSubmit, widgetId, selectedTab, keepCopy],
+  );
 
   const list = _tabList(view, queryIds.toArray()).filter(({ id }) => id !== activeQuery);
 
   const tabList = list.map(({ id, name }) => (
-    <ListGroupItem onClick={() => setSelectedTab(id)}
-                   active={id === selectedTab}
-                   key={id}>
+    <ListGroupItem onClick={() => setSelectedTab(id)} active={id === selectedTab} key={id}>
       {name}
     </ListGroupItem>
   ));
-  const renderResult = list && list.length > 0
-    ? <ListGroup>{tabList}</ListGroup>
-    : <span>No pages found</span>;
+  const renderResult = list && list.length > 0 ? <ListGroup>{tabList}</ListGroup> : <span>No pages found</span>;
 
   return (
-    <BootstrapModalForm show
-                        onCancel={onCancel}
-                        submitButtonDisabled={!selectedTab}
-                        submitButtonText={`${keepCopy ? 'Copy' : 'Move'} widget`}
-                        onSubmitForm={submit}
-                        title="Choose Target Page">
+    <BootstrapModalForm
+      show
+      onCancel={onCancel}
+      submitButtonDisabled={!selectedTab}
+      submitButtonText={`${keepCopy ? 'Copy' : 'Move'} widget`}
+      onSubmitForm={submit}
+      title="Choose Target Page"
+    >
       {renderResult}
-      <Input type="checkbox"
-             id="keepCopy"
-             name="keepCopy"
-             label="Keep Copy on this Page"
-             onChange={onKeepCopy}
-             help="When 'Keep Copy on the Page' is enabled, the widget will be copied and not moved to another page"
-             checked={keepCopy} />
+      <Input
+        type="checkbox"
+        id="keepCopy"
+        name="keepCopy"
+        label="Keep Copy on this Page"
+        onChange={onKeepCopy}
+        help="When 'Keep Copy on the Page' is enabled, the widget will be copied and not moved to another page"
+        checked={keepCopy}
+      />
     </BootstrapModalForm>
   );
 };

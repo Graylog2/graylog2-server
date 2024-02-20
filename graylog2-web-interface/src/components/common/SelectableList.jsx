@@ -47,10 +47,7 @@ class SelectableList extends React.Component {
     /**
      * Array of string or objects containing the selected options.
      */
-    selectedOptions: PropTypes.arrayOf(PropTypes.oneOfType([
-      PropTypes.string,
-      PropTypes.object,
-    ])),
+    selectedOptions: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.string, PropTypes.object])),
     /** Indicates which option object key contains the text to display in the select input. same as react-select's `labelkey` prop. */
     displayKey: PropTypes.string,
     /** Indicates which option object key contains the value of the option. */
@@ -113,22 +110,26 @@ class SelectableList extends React.Component {
 
   render() {
     const formattedOptions = this.props.selectedOptions.map((option, idx) => (
-
-      (
-        <StyledListGroupItem key={`${this._getOptionId(option)}-${idx}`}>
-          <div>
-            {this._getOptionDisplayValue(option)}
-          </div>
-          <Button bsStyle="danger" bsSize="xsmall" onClick={this._onRemoveOption(idx)}>Remove</Button>
-        </StyledListGroupItem>
-      )
+      <StyledListGroupItem key={`${this._getOptionId(option)}-${idx}`}>
+        <div>{this._getOptionDisplayValue(option)}</div>
+        <Button bsStyle="danger" bsSize="xsmall" onClick={this._onRemoveOption(idx)}>
+          Remove
+        </Button>
+      </StyledListGroupItem>
     ));
 
     return (
       <div>
-        <Select ref={(select) => { this.select = select; }} autoFocus={this.props.autoFocus} options={this.props.options} onChange={this._onAddOption} clearable={false} />
-        {formattedOptions.length > 0
-        && <ListGroup style={{ marginTop: 10 }}>{formattedOptions}</ListGroup>}
+        <Select
+          ref={(select) => {
+            this.select = select;
+          }}
+          autoFocus={this.props.autoFocus}
+          options={this.props.options}
+          onChange={this._onAddOption}
+          clearable={false}
+        />
+        {formattedOptions.length > 0 && <ListGroup style={{ marginTop: 10 }}>{formattedOptions}</ListGroup>}
       </div>
     );
   }

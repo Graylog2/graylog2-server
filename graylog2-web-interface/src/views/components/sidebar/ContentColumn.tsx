@@ -22,52 +22,57 @@ import { IconButton } from 'components/common';
 import useViewTitle from 'views/hooks/useViewTitle';
 
 type Props = {
-  children: React.ReactNode,
-  closeSidebar: () => void,
-  searchPageLayout: SearchPreferencesLayout | undefined | null,
-  sectionTitle: string,
+  children: React.ReactNode;
+  closeSidebar: () => void;
+  searchPageLayout: SearchPreferencesLayout | undefined | null;
+  sectionTitle: string;
 };
 
-export const Container = styled.div<{ $sidebarIsPinned: boolean }>(({ theme, $sidebarIsPinned }) => css`
-  position: ${$sidebarIsPinned ? 'relative' : 'fixed'};
-  width: 270px;
-  height: ${$sidebarIsPinned ? '100%' : 'calc(100% - 50px)'}; /* subtract the nav height */
-  top: ${$sidebarIsPinned ? 0 : '50px'};
-  left: ${$sidebarIsPinned ? 0 : '50px'};
+export const Container = styled.div<{ $sidebarIsPinned: boolean }>(
+  ({ theme, $sidebarIsPinned }) => css`
+    position: ${$sidebarIsPinned ? 'relative' : 'fixed'};
+    width: 270px;
+    height: ${$sidebarIsPinned ? '100%' : 'calc(100% - 50px)'}; /* subtract the nav height */
+    top: ${$sidebarIsPinned ? 0 : '50px'};
+    left: ${$sidebarIsPinned ? 0 : '50px'};
 
-  background: ${theme.colors.global.contentBackground};
-  border-right: ${$sidebarIsPinned ? 'none' : `1px solid ${theme.colors.variant.light.default}`};
-  box-shadow: ${$sidebarIsPinned ? `3px 3px 3px ${theme.colors.global.navigationBoxShadow}` : 'none'};
+    background: ${theme.colors.global.contentBackground};
+    border-right: ${$sidebarIsPinned ? 'none' : `1px solid ${theme.colors.variant.light.default}`};
+    box-shadow: ${$sidebarIsPinned ? `3px 3px 3px ${theme.colors.global.navigationBoxShadow}` : 'none'};
 
-  z-index: ${$sidebarIsPinned ? 1030 : 6};
+    z-index: ${$sidebarIsPinned ? 1030 : 6};
 
-  ${$sidebarIsPinned && css`
-    &::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      right: -6px;
-      height: 6px;
-      width: 6px;
-      border-top-left-radius: 50%;
-      background: transparent;
-      box-shadow: -6px -6px 0 3px ${theme.colors.global.contentBackground};
-      z-index: 5; /* to render over Sidebar ContentColumn */
-    }
-`}
-`);
+    ${$sidebarIsPinned &&
+    css`
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: -6px;
+        height: 6px;
+        width: 6px;
+        border-top-left-radius: 50%;
+        background: transparent;
+        box-shadow: -6px -6px 0 3px ${theme.colors.global.contentBackground};
+        z-index: 5; /* to render over Sidebar ContentColumn */
+      }
+    `}
+  `,
+);
 
-const ContentGrid = styled.div(({ theme }) => css`
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: auto minmax(1px, 1fr);
-  height: 100%;
-  overflow-y: auto;
+const ContentGrid = styled.div(
+  ({ theme }) => css`
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(1px, 1fr);
+    height: 100%;
+    overflow-y: auto;
 
-  padding: 5px 15px 0;
+    padding: 5px 15px 0;
 
-  color: ${theme.colors.global.textDefault};
-`);
+    color: ${theme.colors.global.textDefault};
+  `,
+);
 
 const Header = styled.div`
   grid-column: 1;
@@ -96,12 +101,14 @@ const Title = styled.h1`
   cursor: pointer;
 `;
 
-const OverlayToggle = styled.div<{ $sidebarIsPinned: boolean }>(({ theme, $sidebarIsPinned }) => css`
-  > * {
-    font-size: ${theme.fonts.size.large};
-    color: ${$sidebarIsPinned ? theme.colors.variant.info : theme.colors.gray[30]};
-  }
-`);
+const OverlayToggle = styled.div<{ $sidebarIsPinned: boolean }>(
+  ({ theme, $sidebarIsPinned }) => css`
+    > * {
+      font-size: ${theme.fonts.size.large};
+      color: ${$sidebarIsPinned ? theme.colors.variant.info : theme.colors.gray[30]};
+    }
+  `,
+);
 
 const HorizontalRule = styled.hr`
   margin: 5px 0 10px;
@@ -131,7 +138,9 @@ const toggleSidebarPinning = (searchPageLayout) => {
     return;
   }
 
-  const { actions: { toggleSidebarPinning: togglePinning } } = searchPageLayout;
+  const {
+    actions: { toggleSidebarPinning: togglePinning },
+  } = searchPageLayout;
 
   togglePinning();
 };
@@ -150,18 +159,18 @@ const ContentColumn = ({ children, sectionTitle, closeSidebar, searchPageLayout 
             </CenterVertical>
             <CenterVertical>
               <OverlayToggle $sidebarIsPinned={sidebarIsPinned}>
-                <IconButton onClick={() => toggleSidebarPinning(searchPageLayout)}
-                            title={`Display sidebar ${sidebarIsPinned ? 'as overlay' : 'inline'}`}
-                            name="thumbtack" />
+                <IconButton
+                  onClick={() => toggleSidebarPinning(searchPageLayout)}
+                  title={`Display sidebar ${sidebarIsPinned ? 'as overlay' : 'inline'}`}
+                  name="thumbtack"
+                />
               </OverlayToggle>
             </CenterVertical>
           </SearchTitle>
           <HorizontalRule />
           <SectionTitle>{sectionTitle}</SectionTitle>
         </Header>
-        <SectionContent>
-          {children}
-        </SectionContent>
+        <SectionContent>{children}</SectionContent>
       </ContentGrid>
     </Container>
   );

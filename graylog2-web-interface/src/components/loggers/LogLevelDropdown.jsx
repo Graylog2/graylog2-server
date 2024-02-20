@@ -62,14 +62,15 @@ const LogLevelDropdown = createReactClass({
 
   render() {
     const { subsystem, nodeId } = this.props;
-    const loglevels = this.state.availableLoglevels
-      .map((loglevel) => (
-        <MenuItem key={`${subsystem}-${nodeId}-${loglevel}`}
-                  active={subsystem.level === loglevel}
-                  onClick={this._menuLevelClick(loglevel)}>
-          {capitalize(loglevel)}
-        </MenuItem>
-      ));
+    const loglevels = this.state.availableLoglevels.map((loglevel) => (
+      <MenuItem
+        key={`${subsystem}-${nodeId}-${loglevel}`}
+        active={subsystem.level === loglevel}
+        onClick={this._menuLevelClick(loglevel)}
+      >
+        {capitalize(loglevel)}
+      </MenuItem>
+    ));
 
     return (
       <DropdownButton id="loglevel" bsSize="xsmall" title={capitalize(subsystem.level)}>

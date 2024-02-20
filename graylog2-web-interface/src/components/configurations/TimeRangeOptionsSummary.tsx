@@ -31,11 +31,7 @@ const TimeRangeOptionsSummary = ({ options }: Props) => {
     ));
   }
 
-  return (
-    <dl className="deflist">
-      {timerangeOptionsSummary}
-    </dl>
-  );
+  return <dl className="deflist">{timerangeOptionsSummary}</dl>;
 };
 
 TimeRangeOptionsSummary.propTypes = {

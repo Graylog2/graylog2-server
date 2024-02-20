@@ -22,29 +22,33 @@ import type { SizeProp } from '@fortawesome/fontawesome-svg-core';
 import { OverlayTrigger } from 'components/common';
 import Icon from 'components/common/Icon';
 
-const StyledPopover = styled.span(({ theme }) => css`
-  ul {
-    padding-left: 0;
-  }
-
-  li {
-    margin-bottom: 5px;
-
-    &:last-child {
-      margin-bottom: 0;
+const StyledPopover = styled.span(
+  ({ theme }) => css`
+    ul {
+      padding-left: 0;
     }
-  }
 
-  h4 {
-    font-size: ${theme.fonts.size.large};
-  }
-`);
+    li {
+      margin-bottom: 5px;
 
-const StyledIcon = styled(Icon)<{ $type: Type, $displayLeftMargin: boolean }>(({ theme, $type, $displayLeftMargin }) => css`
-  color: ${$type === 'error' ? theme.colors.variant.danger : 'inherit'};
-  margin: 0;
-  margin-left: ${$displayLeftMargin ? '0.3em' : 0};
-`);
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    h4 {
+      font-size: ${theme.fonts.size.large};
+    }
+  `,
+);
+
+const StyledIcon = styled(Icon)<{ $type: Type; $displayLeftMargin: boolean }>(
+  ({ theme, $type, $displayLeftMargin }) => css`
+    color: ${$type === 'error' ? theme.colors.variant.danger : 'inherit'};
+    margin: 0;
+    margin-left: ${$displayLeftMargin ? '0.3em' : 0};
+  `,
+);
 
 const iconName = (type: Type) => {
   switch (type) {
@@ -59,17 +63,17 @@ const iconName = (type: Type) => {
 type Type = 'info' | 'error';
 
 type Props = {
-  children: React.ReactNode,
-  className?: string,
-  displayLeftMargin?: boolean,
-  id?: string,
-  placement?: 'top' | 'right' | 'bottom' | 'left',
-  iconSize?: SizeProp
-  pullRight?: boolean,
-  title?: string,
-  testId?: string,
-  trigger?: React.ComponentProps<typeof OverlayTrigger>['trigger'],
-  type?: 'info' | 'error',
+  children: React.ReactNode;
+  className?: string;
+  displayLeftMargin?: boolean;
+  id?: string;
+  placement?: 'top' | 'right' | 'bottom' | 'left';
+  iconSize?: SizeProp;
+  pullRight?: boolean;
+  title?: string;
+  testId?: string;
+  trigger?: React.ComponentProps<typeof OverlayTrigger>['trigger'];
+  type?: 'info' | 'error';
 };
 
 const HoverForHelp = ({
@@ -85,16 +89,20 @@ const HoverForHelp = ({
   iconSize,
   trigger,
 }: Props) => (
-  <OverlayTrigger trigger={trigger}
-                  placement={placement}
-                  overlay={<StyledPopover id={id}>{children}</StyledPopover>}
-                  title={title}
-                  testId={testId}>
-    <StyledIcon className={`${className} ${pullRight ? 'pull-right' : ''}`}
-                name={iconName(type)}
-                $type={type}
-                $displayLeftMargin={displayLeftMargin}
-                size={iconSize} />
+  <OverlayTrigger
+    trigger={trigger}
+    placement={placement}
+    overlay={<StyledPopover id={id}>{children}</StyledPopover>}
+    title={title}
+    testId={testId}
+  >
+    <StyledIcon
+      className={`${className} ${pullRight ? 'pull-right' : ''}`}
+      name={iconName(type)}
+      $type={type}
+      $displayLeftMargin={displayLeftMargin}
+      size={iconSize}
+    />
   </OverlayTrigger>
 );
 
@@ -107,7 +115,8 @@ HoverForHelp.propTypes = {
   pullRight: PropTypes.bool,
   title: PropTypes.string,
   testId: PropTypes.string,
-  trigger: PropTypes.arrayOf(PropTypes.oneOf(['click', 'focus', 'hover'])) || PropTypes.oneOf(['click', 'focus', 'hover']),
+  trigger:
+    PropTypes.arrayOf(PropTypes.oneOf(['click', 'focus', 'hover'])) || PropTypes.oneOf(['click', 'focus', 'hover']),
 };
 
 HoverForHelp.defaultProps = {

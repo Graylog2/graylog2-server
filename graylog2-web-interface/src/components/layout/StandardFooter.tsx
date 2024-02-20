@@ -24,8 +24,8 @@ import { SystemStore } from 'stores/system/SystemStore';
 
 type SystemStoreState = {
   system: {
-    version?: string,
-    hostname?: string,
+    version?: string;
+    hostname?: string;
   };
 };
 
@@ -35,9 +35,9 @@ type Jvm = {
 
 type Props = {
   system?: {
-    version?: string,
-    hostname?: string,
-  },
+    version?: string;
+    hostname?: string;
+  };
 };
 
 const StandardFooter = ({ system }: Props) => {
@@ -58,9 +58,7 @@ const StandardFooter = ({ system }: Props) => {
   }, []);
 
   if (!(system && jvm)) {
-    return (
-      <>Graylog {getFullVersion()}</>
-    );
+    return <>Graylog {getFullVersion()}</>;
   }
 
   return (

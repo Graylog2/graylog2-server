@@ -27,29 +27,27 @@ const INITIAL_DATA = {
 const fetchFieldTypes = async () => {
   const fieldTypes = await SystemFieldTypes.getAllFieldTypes();
 
-  return ({ fieldTypes });
+  return { fieldTypes };
 };
 
 const useFieldTypesForMappings = (): {
-  data: { fieldTypes: FieldTypes },
-  isLoading: boolean,
+  data: { fieldTypes: FieldTypes };
+  isLoading: boolean;
 } => {
-  const { data, isLoading } = useQuery(
-    ['fieldTypeOptions'],
-    fetchFieldTypes,
-    {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading field type options failed with status: ${errorThrown}`,
-          'Could not load field type options');
-      },
-      keepPreviousData: true,
+  const { data, isLoading } = useQuery(['fieldTypeOptions'], fetchFieldTypes, {
+    onError: (errorThrown) => {
+      UserNotification.error(
+        `Loading field type options failed with status: ${errorThrown}`,
+        'Could not load field type options',
+      );
     },
-  );
+    keepPreviousData: true,
+  });
 
-  return ({
+  return {
     data: data ?? INITIAL_DATA,
     isLoading,
-  });
+  };
 };
 
 export default useFieldTypesForMappings;

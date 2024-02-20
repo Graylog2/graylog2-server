@@ -27,9 +27,8 @@ import { singletonStore } from 'logic/singleton';
 import { MESSAGE_FIELD, SOURCE_FIELD } from '../../views/Constants';
 
 // eslint-disable-next-line import/prefer-default-export
-export const UniversalSearchStore = singletonStore(
-  'core.UniversalSearch',
-  () => Reflux.createStore({
+export const UniversalSearchStore = singletonStore('core.UniversalSearch', () =>
+  Reflux.createStore({
     DEFAULT_LIMIT: 150,
     listenables: [],
 
@@ -38,7 +37,19 @@ export const UniversalSearchStore = singletonStore(
       const effectiveLimit = limit || this.DEFAULT_LIMIT;
       const offset = (page - 1) * effectiveLimit;
 
-      const url = URLUtils.qualifyUrl(ApiRoutes.UniversalSearchApiController.search(type, query, timerangeParams, streamId, effectiveLimit, offset, sortField, sortOrder, decorate).url);
+      const url = URLUtils.qualifyUrl(
+        ApiRoutes.UniversalSearchApiController.search(
+          type,
+          query,
+          timerangeParams,
+          streamId,
+          effectiveLimit,
+          offset,
+          sortField,
+          sortOrder,
+          decorate,
+        ).url,
+      );
 
       return fetch('GET', url).then((response) => {
         const result = jQuery.extend({}, response);
@@ -46,7 +57,7 @@ export const UniversalSearchStore = singletonStore(
         result.fields = response.fields.map((field) => ({
           hash: md5(field),
           name: field,
-          standard_selected: (field === MESSAGE_FIELD || field === SOURCE_FIELD),
+          standard_selected: field === MESSAGE_FIELD || field === SOURCE_FIELD,
         }));
 
         result.messages = result.messages.map((message) => MessageFormatter.formatMessageSummary(message));

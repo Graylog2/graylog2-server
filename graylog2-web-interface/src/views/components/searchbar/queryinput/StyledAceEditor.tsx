@@ -22,180 +22,183 @@ import { INPUT_BORDER_RADIUS } from 'theme/constants';
 import AceEditor from './ace';
 
 type Props = {
-  $height: number,
-  $scTheme: DefaultTheme,
-  disabled: boolean,
+  $height: number;
+  $scTheme: DefaultTheme;
+  disabled: boolean;
 };
 
-const StyledAceEditor = styled(AceEditor)<Props>(({ $scTheme, $height, disabled, value }) => css`
-  &.ace-queryinput {
-    ${$height ? `height: ${$height}px !important` : ''}
-    min-height: 34px;
-    width: 100% !important;
-    background-color: ${$scTheme.colors.input.background};
-    color: ${$scTheme.utils.contrastingColor($scTheme.colors.input.background, 'AAA')};
-    border: 1px solid ${$scTheme.colors.variant.light.default};
-    border-radius: ${INPUT_BORDER_RADIUS};
-
-    &.ace_multiselect .ace_selection.ace_start {
-      box-shadow: 0 0 3px 0 ${$scTheme.colors.input.background};
-    }
-
-    .ace_gutter {
-      background: ${$scTheme.colors.input.background};
-      color: ${$scTheme.utils.contrastingColor($scTheme.colors.input.background, 'AAA')};
-    }
-
-    .ace_print-margin {
-      width: 1px;
-      background: ${$scTheme.colors.input.background};
-    }
-
-    .ace_cursor {
-      color: ${$scTheme.colors.gray[50]};
-      display: ${disabled ? 'none' : 'block'} !important;
-    }
-
-    .ace_hidden-cursors {
-      display: ${value ? 'block' : 'none'};
-    }
-
-    .ace_marker-layer .ace_selection {
-      background: ${$scTheme.colors.variant.lightest.default};
-    }
-
-    .ace_marker-layer .ace_step {
-      background: ${$scTheme.colors.variant.warning};
-    }
-
-    .ace_marker-layer .ace_bracket {
-      margin: -1px 0 0 -1px;
-      border: none;
-    }
-
-    .ace_marker-layer .ace_active-line {
-      background: ${$scTheme.colors.input.background};
-    }
-
-    .ace_gutter-active-line {
+const StyledAceEditor = styled(AceEditor)<Props>(
+  ({ $scTheme, $height, disabled, value }) => css`
+    &.ace-queryinput {
+      ${$height ? `height: ${$height}px !important` : ''}
+      min-height: 34px;
+      width: 100% !important;
       background-color: ${$scTheme.colors.input.background};
-    }
+      color: ${$scTheme.utils.contrastingColor($scTheme.colors.input.background, 'AAA')};
+      border: 1px solid ${$scTheme.colors.variant.light.default};
+      border-radius: ${INPUT_BORDER_RADIUS};
 
-    .ace_marker-layer .ace_selected-word {
-      border: 1px solid ${$scTheme.colors.gray[80]};
-    }
+      &.ace_multiselect .ace_selection.ace_start {
+        box-shadow: 0 0 3px 0 ${$scTheme.colors.input.background};
+      }
 
-    .ace_invisible {
-      color: ${$scTheme.colors.input.background};
-    }
+      .ace_gutter {
+        background: ${$scTheme.colors.input.background};
+        color: ${$scTheme.utils.contrastingColor($scTheme.colors.input.background, 'AAA')};
+      }
 
-    .ace_keyword,
-    .ace_meta,
-    .ace_storage,
-    .ace_storage.ace_type,
-    .ace_support.ace_type {
-      color: ${$scTheme.colors.variant.info};
-    }
+      .ace_print-margin {
+        width: 1px;
+        background: ${$scTheme.colors.input.background};
+      }
 
-    .ace_keyword.ace_operator {
-      color: ${$scTheme.colors.global.textDefault};
-    }
+      .ace_cursor {
+        color: ${$scTheme.colors.gray[50]};
+        display: ${disabled ? 'none' : 'block'} !important;
+      }
 
-    .ace_constant.ace_character,
-    .ace_constant.ace_language,
-    .ace_constant.ace_numeric,
-    .ace_keyword.ace_other.ace_unit,
-    .ace_support.ace_constant,
-    .ace_variable.ace_parameter {
-      color: ${$scTheme.colors.variant.dark.danger};
-    }
+      .ace_hidden-cursors {
+        display: ${value ? 'block' : 'none'};
+      }
 
-    .ace_constant.ace_other {
-      color: ${$scTheme.colors.variant.default};
-    }
+      .ace_marker-layer .ace_selection {
+        background: ${$scTheme.colors.variant.lightest.default};
+      }
 
-    .ace_invalid {
-      color: ${$scTheme.utils.readableColor($scTheme.colors.brand.primary)};
-      background-color: ${$scTheme.colors.brand.primary};
-    }
+      .ace_marker-layer .ace_step {
+        background: ${$scTheme.colors.variant.warning};
+      }
 
-    .ace_invalid.ace_deprecated {
-      color: ${$scTheme.utils.readableColor($scTheme.colors.brand.primary)};
-      background-color: ${$scTheme.colors.variant.dark.primary};
-    }
+      .ace_marker-layer .ace_bracket {
+        margin: -1px 0 0 -1px;
+        border: none;
+      }
 
-    .ace_fold {
-      background-color: ${$scTheme.colors.variant.info};
-      border-color: ${$scTheme.utils.contrastingColor($scTheme.colors.input.background, 'AAA')};
-    }
+      .ace_marker-layer .ace_active-line {
+        background: ${$scTheme.colors.input.background};
+      }
 
-    .ace_entity.ace_name.ace_function,
-    .ace_support.ace_function,
-    .ace_variable,
-    .ace_term {
-      color: ${$scTheme.colors.variant.darker.info};
-    }
+      .ace_gutter-active-line {
+        background-color: ${$scTheme.colors.input.background};
+      }
 
-    .ace_support.ace_class,
-    .ace_support.ace_type {
-      color: ${$scTheme.colors.variant.dark.warning};
-    }
+      .ace_marker-layer .ace_selected-word {
+        border: 1px solid ${$scTheme.colors.gray[80]};
+      }
 
-    .ace_heading,
-    .ace_markup.ace_heading,
-    .ace_string {
-      color: ${$scTheme.colors.variant.dark.success};
-    }
+      .ace_invisible {
+        color: ${$scTheme.colors.input.background};
+      }
 
-    .ace_entity.ace_name.ace_tag,
-    .ace_entity.ace_other.ace_attribute-name,
-    .ace_meta.ace_tag,
-    .ace_string.ace_regexp,
-    .ace_variable {
-      color: ${$scTheme.colors.brand.primary};
-    }
+      .ace_keyword,
+      .ace_meta,
+      .ace_storage,
+      .ace_storage.ace_type,
+      .ace_support.ace_type {
+        color: ${$scTheme.colors.variant.info};
+      }
 
-    .ace_comment {
-      color: ${$scTheme.colors.gray[60]};
-    }
+      .ace_keyword.ace_operator {
+        color: ${$scTheme.colors.global.textDefault};
+      }
 
-    .ace_indent-guide {
-      background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAAE0lEQVQImWP4////f4bdu3f/BwAlfgctduB85QAAAABJRU5ErkJggg==') right repeat-y;
-    }
+      .ace_constant.ace_character,
+      .ace_constant.ace_language,
+      .ace_constant.ace_numeric,
+      .ace_keyword.ace_other.ace_unit,
+      .ace_support.ace_constant,
+      .ace_variable.ace_parameter {
+        color: ${$scTheme.colors.variant.dark.danger};
+      }
 
-    .ace_placeholder {
-      left: 0;
-      right: 0;
-      padding: 0;
-      margin-top: 6px;
-      margin-left: 4px;
-      margin-right: 4px;
-      transform: none;
-      opacity: 1;
-      z-index: auto !important;
-      font-family: ${$scTheme.fonts.family.monospace} !important;
-      font-size: ${$scTheme.fonts.size.body};
-      color: ${$scTheme.colors.input.placeholder};
-      text-overflow: ellipsis;
-      max-width: 100%;
-      overflow: hidden;
-    }
+      .ace_constant.ace_other {
+        color: ${$scTheme.colors.variant.default};
+      }
 
-    .ace_marker {
-      border-bottom: 2px dashed;
-      position: absolute;
-      border-radius: 0;
-      margin-top: 1px;
-    }
+      .ace_invalid {
+        color: ${$scTheme.utils.readableColor($scTheme.colors.brand.primary)};
+        background-color: ${$scTheme.colors.brand.primary};
+      }
 
-    .ace_marker.ace_validation_error {
-      border-color: ${$scTheme.colors.variant.danger};
-    }
+      .ace_invalid.ace_deprecated {
+        color: ${$scTheme.utils.readableColor($scTheme.colors.brand.primary)};
+        background-color: ${$scTheme.colors.variant.dark.primary};
+      }
 
-    .ace_marker.ace_validation_warning {
-      border-color: ${$scTheme.colors.variant.dark.warning};
+      .ace_fold {
+        background-color: ${$scTheme.colors.variant.info};
+        border-color: ${$scTheme.utils.contrastingColor($scTheme.colors.input.background, 'AAA')};
+      }
+
+      .ace_entity.ace_name.ace_function,
+      .ace_support.ace_function,
+      .ace_variable,
+      .ace_term {
+        color: ${$scTheme.colors.variant.darker.info};
+      }
+
+      .ace_support.ace_class,
+      .ace_support.ace_type {
+        color: ${$scTheme.colors.variant.dark.warning};
+      }
+
+      .ace_heading,
+      .ace_markup.ace_heading,
+      .ace_string {
+        color: ${$scTheme.colors.variant.dark.success};
+      }
+
+      .ace_entity.ace_name.ace_tag,
+      .ace_entity.ace_other.ace_attribute-name,
+      .ace_meta.ace_tag,
+      .ace_string.ace_regexp,
+      .ace_variable {
+        color: ${$scTheme.colors.brand.primary};
+      }
+
+      .ace_comment {
+        color: ${$scTheme.colors.gray[60]};
+      }
+
+      .ace_indent-guide {
+        background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAAE0lEQVQImWP4////f4bdu3f/BwAlfgctduB85QAAAABJRU5ErkJggg==')
+          right repeat-y;
+      }
+
+      .ace_placeholder {
+        left: 0;
+        right: 0;
+        padding: 0;
+        margin-top: 6px;
+        margin-left: 4px;
+        margin-right: 4px;
+        transform: none;
+        opacity: 1;
+        z-index: auto !important;
+        font-family: ${$scTheme.fonts.family.monospace} !important;
+        font-size: ${$scTheme.fonts.size.body};
+        color: ${$scTheme.colors.input.placeholder};
+        text-overflow: ellipsis;
+        max-width: 100%;
+        overflow: hidden;
+      }
+
+      .ace_marker {
+        border-bottom: 2px dashed;
+        position: absolute;
+        border-radius: 0;
+        margin-top: 1px;
+      }
+
+      .ace_marker.ace_validation_error {
+        border-color: ${$scTheme.colors.variant.danger};
+      }
+
+      .ace_marker.ace_validation_warning {
+        border-color: ${$scTheme.colors.variant.dark.warning};
+      }
     }
-  }
-`);
+  `,
+);
 
 export default StyledAceEditor;

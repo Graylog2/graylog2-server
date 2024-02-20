@@ -20,18 +20,18 @@ import { Menu as MantineMenu, type MenuProps } from '@mantine/core';
 import styled, { css, useTheme } from 'styled-components';
 
 type Props = PropsWithChildren<{
-  closeOnItemClick?: boolean,
-  onChange?: (isOpen: boolean) => void,
-  onClose?: () => void,
-  opened?: boolean,
-  portalProps?: { target: HTMLElement },
-  keepMounted?: boolean,
-  position?: MenuProps['position'],
-  shadow?: MenuProps['shadow'],
-  width?: number,
-  withinPortal?: boolean,
-  zIndex?: number,
-}>
+  closeOnItemClick?: boolean;
+  onChange?: (isOpen: boolean) => void;
+  onClose?: () => void;
+  opened?: boolean;
+  portalProps?: { target: HTMLElement };
+  keepMounted?: boolean;
+  position?: MenuProps['position'];
+  shadow?: MenuProps['shadow'];
+  width?: number;
+  withinPortal?: boolean;
+  zIndex?: number;
+}>;
 
 const Menu = ({
   children,
@@ -59,41 +59,50 @@ const Menu = ({
   });
 
   return (
-    <MantineMenu closeOnItemClick={closeOnItemClick}
-                 onClose={onClose}
-                 shadow={shadow}
-                 opened={opened}
-                 onChange={onChange}
-                 portalProps={portalProps}
-                 width={width}
-                 position={position}
-                 withinPortal={withinPortal}
-                 styles={styles}
-                 keepMounted={keepMounted}
-                 zIndex={zIndex}>
+    <MantineMenu
+      closeOnItemClick={closeOnItemClick}
+      onClose={onClose}
+      shadow={shadow}
+      opened={opened}
+      onChange={onChange}
+      portalProps={portalProps}
+      width={width}
+      position={position}
+      withinPortal={withinPortal}
+      styles={styles}
+      keepMounted={keepMounted}
+      zIndex={zIndex}
+    >
       {children}
     </MantineMenu>
   );
 };
 
-const StyledMenuItem = styled(MantineMenu.Item)(({ theme }) => css`
-  color: ${theme.colors.global.textDefault};
-  font-size: ${theme.fonts.size.body};
-  white-space: nowrap;
-  
-  &:hover, &:focus {
-    text-decoration: none;  
-    color: inherit;
-  }
-`);
+const StyledMenuItem = styled(MantineMenu.Item)(
+  ({ theme }) => css`
+    color: ${theme.colors.global.textDefault};
+    font-size: ${theme.fonts.size.body};
+    white-space: nowrap;
 
-const StyledMenuDivider = styled(MantineMenu.Divider)(({ theme }) => css`
-  border-color: ${theme.colors.variant.lighter.default};
-`);
+    &:hover,
+    &:focus {
+      text-decoration: none;
+      color: inherit;
+    }
+  `,
+);
 
-const StyledMenuLabel = styled(MantineMenu.Label)(({ theme }) => css`
-  font-size: ${theme.fonts.size.navigation};
-`);
+const StyledMenuDivider = styled(MantineMenu.Divider)(
+  ({ theme }) => css`
+    border-color: ${theme.colors.variant.lighter.default};
+  `,
+);
+
+const StyledMenuLabel = styled(MantineMenu.Label)(
+  ({ theme }) => css`
+    font-size: ${theme.fonts.size.navigation};
+  `,
+);
 
 Menu.Target = MantineMenu.Target;
 Menu.Dropdown = MantineMenu.Dropdown;

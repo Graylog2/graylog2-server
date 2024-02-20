@@ -22,22 +22,26 @@ import { MenuItem, BootstrapModalForm, Input } from 'components/bootstrap';
 const CloneMenuItem = ({ error, id, showModal, onClose, name, onChange, onSave, onSelect }) => (
   <>
     <MenuItem onSelect={onSelect}>Clone</MenuItem>
-    <BootstrapModalForm show={showModal}
-                        title="Clone"
-                        onSubmitForm={onSave}
-                        onCancel={onClose}
-                        submitButtonDisabled={Boolean(error)}
-                        submitButtonText="Done">
+    <BootstrapModalForm
+      show={showModal}
+      title="Clone"
+      onSubmitForm={onSave}
+      onCancel={onClose}
+      submitButtonDisabled={Boolean(error)}
+      submitButtonText="Done"
+    >
       <fieldset>
-        <Input type="text"
-               id={id}
-               label="Name"
-               defaultValue={name}
-               onChange={onChange}
-               bsStyle={error ? 'error' : null}
-               help={error || 'Type a name for the new collector'}
-               autoFocus
-               required />
+        <Input
+          type="text"
+          id={id}
+          label="Name"
+          defaultValue={name}
+          onChange={onChange}
+          bsStyle={error ? 'error' : null}
+          help={error || 'Type a name for the new collector'}
+          autoFocus
+          required
+        />
       </fieldset>
     </BootstrapModalForm>
   </>

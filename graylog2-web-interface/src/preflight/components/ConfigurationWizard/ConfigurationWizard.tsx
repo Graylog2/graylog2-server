@@ -36,19 +36,27 @@ import CertificateProvisioning from './CertificateProvisioning';
 import CAConfiguration from './CAConfiguration';
 import ConfigurationFinished from './ConfigurationFinished';
 
-const StepIcon = styled(Icon)<{ $color: string }>(({ $color, theme }) => css`
-  color: ${$color};
-  background-color: ${theme.colors.input.background};
-  border-radius: 50%;
-`);
+const StepIcon = styled(Icon)<{ $color: string }>(
+  ({ $color, theme }) => css`
+    color: ${$color};
+    background-color: ${theme.colors.input.background};
+    border-radius: 50%;
+  `,
+);
 
-const StyledListItem = styled(List.Item)<{ $isStepSkipped: boolean }>(({ $isStepSkipped }) => css`
-  > * {
-    text-decoration: ${$isStepSkipped ? 'line-through' : 'none'};
-  }
-`);
+const StyledListItem = styled(List.Item)<{ $isStepSkipped: boolean }>(
+  ({ $isStepSkipped }) => css`
+    > * {
+      text-decoration: ${$isStepSkipped ? 'line-through' : 'none'};
+    }
+  `,
+);
 
-const stepIcon = (stepKey: ConfigurationStep, activeStepKey: ConfigurationStep, theme: DefaultTheme): { name: IconName, color: string } => {
+const stepIcon = (
+  stepKey: ConfigurationStep,
+  activeStepKey: ConfigurationStep,
+  theme: DefaultTheme,
+): { name: IconName; color: string } => {
   const stepIndex = CONFIGURATION_STEPS_ORDER.findIndex((key) => key === stepKey);
   const activeStepIndex = CONFIGURATION_STEPS_ORDER.findIndex((key) => key === activeStepKey);
 
@@ -73,8 +81,8 @@ const stepIcon = (stepKey: ConfigurationStep, activeStepKey: ConfigurationStep, 
 };
 
 type FetchErrorsOverviewProps = {
-  errors: Array<{ entityName: string, error: FetchError}> | null
-}
+  errors: Array<{ entityName: string; error: FetchError }> | null;
+};
 
 const FetchErrorsOverview = ({ errors }: FetchErrorsOverviewProps) => (
   <>
@@ -87,12 +95,16 @@ const FetchErrorsOverview = ({ errors }: FetchErrorsOverviewProps) => (
 );
 
 type Props = {
-  setIsWaitingForStartup: React.Dispatch<React.SetStateAction<boolean>>,
-}
+  setIsWaitingForStartup: React.Dispatch<React.SetStateAction<boolean>>;
+};
 
 const ConfigurationWizard = ({ setIsWaitingForStartup }: Props) => {
   const [isSkippingProvisioning, setIsSkippingProvisioning] = useState(false);
-  const { step: activeStepKey, isLoading: isLoadingConfigurationStep, errors } = useConfigurationStep({ isSkippingProvisioning });
+  const {
+    step: activeStepKey,
+    isLoading: isLoadingConfigurationStep,
+    errors,
+  } = useConfigurationStep({ isSkippingProvisioning });
   const theme = useTheme();
 
   const onSkipProvisioning = useCallback(() => {
@@ -110,46 +122,43 @@ const ConfigurationWizard = ({ setIsWaitingForStartup }: Props) => {
   return (
     <Grid>
       <Grid.Col span={12} md={6} orderMd={2}>
-        <List spacing="md"
-              size="lg"
-              center>
+        <List spacing="md" size="lg" center>
           {CONFIGURATION_STEPS_ORDER.map((configurationStepKey) => {
             const { description } = CONFIGURATION_STEPS[configurationStepKey];
-            const isStepSkipped = configurationStepKey === CONFIGURATION_STEPS.CERTIFICATE_PROVISIONING.key && isSkippingProvisioning;
+            const isStepSkipped =
+              configurationStepKey === CONFIGURATION_STEPS.CERTIFICATE_PROVISIONING.key && isSkippingProvisioning;
             const { name: iconName, color: iconColor } = stepIcon(configurationStepKey, activeStepKey, theme);
 
             return (
-              <StyledListItem key={configurationStepKey}
-                              $isStepSkipped={isStepSkipped}
-                              icon={(
-                                <StepIcon name={iconName}
-                                          $color={iconColor}
-                                          size="xl" />
-                              )}>
+              <StyledListItem
+                key={configurationStepKey}
+                $isStepSkipped={isStepSkipped}
+                icon={<StepIcon name={iconName} $color={iconColor} size="xl" />}
+              >
                 {description}
               </StyledListItem>
             );
           })}
         </List>
         <Space h="md" />
-        You can always
-        {' '}
-        <ResumeStartupButton setIsWaitingForStartup={setIsWaitingForStartup}
-                             compact
-                             variant="light">
+        You can always{' '}
+        <ResumeStartupButton setIsWaitingForStartup={setIsWaitingForStartup} compact variant="light">
           resume startup
-        </ResumeStartupButton>
-        {' '}
+        </ResumeStartupButton>{' '}
         or <RestartConfigurationButton compact variant="light" color="red" /> the configuration
       </Grid.Col>
       <Grid.Col span={12} md={6} orderMd={1}>
         {activeStepKey === CONFIGURATION_STEPS.CA_CONFIGURATION.key && <CAConfiguration />}
         {activeStepKey === CONFIGURATION_STEPS.RENEWAL_POLICY_CONFIGURATION.key && <RenewalPolicyConfiguration />}
-        {activeStepKey === CONFIGURATION_STEPS.CERTIFICATE_PROVISIONING.key && <CertificateProvisioning onSkipProvisioning={onSkipProvisioning} />}
+        {activeStepKey === CONFIGURATION_STEPS.CERTIFICATE_PROVISIONING.key && (
+          <CertificateProvisioning onSkipProvisioning={onSkipProvisioning} />
+        )}
         {activeStepKey === CONFIGURATION_STEPS.CONFIGURATION_FINISHED.key && (
-          <ConfigurationFinished setIsWaitingForStartup={setIsWaitingForStartup}
-                                 isSkippingProvisioning={isSkippingProvisioning}
-                                 setIsSkippingProvisioning={setIsSkippingProvisioning} />
+          <ConfigurationFinished
+            setIsWaitingForStartup={setIsWaitingForStartup}
+            isSkippingProvisioning={isSkippingProvisioning}
+            setIsSkippingProvisioning={setIsSkippingProvisioning}
+          />
         )}
       </Grid.Col>
     </Grid>

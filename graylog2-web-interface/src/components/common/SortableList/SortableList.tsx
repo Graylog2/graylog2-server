@@ -32,14 +32,14 @@ const reorder = <ItemType extends ListItemType>(list: Array<ItemType>, startInde
 };
 
 export type Props<ItemType extends ListItemType> = {
-  alignItemContent?: 'flex-start' | 'center',
-  customContentRender?: CustomContentRender<ItemType>,
-  customListItemRender?: CustomListItemRender<ItemType>,
-  disableDragging?: boolean,
-  displayOverlayInPortal?: boolean,
-  items: Array<ItemType>,
-  onMoveItem: (newList: Array<ItemType>, sourceIndex: number, destinationIndex: number) => void,
-}
+  alignItemContent?: 'flex-start' | 'center';
+  customContentRender?: CustomContentRender<ItemType>;
+  customListItemRender?: CustomListItemRender<ItemType>;
+  disableDragging?: boolean;
+  displayOverlayInPortal?: boolean;
+  items: Array<ItemType>;
+  onMoveItem: (newList: Array<ItemType>, sourceIndex: number, destinationIndex: number) => void;
+};
 
 /**
  * Component that renders a list of elements and let users manually
@@ -57,34 +57,34 @@ const SortableList = <ItemType extends ListItemType>({
   items,
   onMoveItem,
 }: Props<ItemType>) => {
-  const onDragEnd = useCallback((result: DropResult) => {
-    if (!result.destination) {
-      return;
-    }
+  const onDragEnd = useCallback(
+    (result: DropResult) => {
+      if (!result.destination) {
+        return;
+      }
 
-    if (result.source.index !== result.destination.index) {
-      const newList: Array<ItemType> = reorder(
-        items,
-        result.source.index,
-        result.destination.index,
-      );
+      if (result.source.index !== result.destination.index) {
+        const newList: Array<ItemType> = reorder(items, result.source.index, result.destination.index);
 
-      onMoveItem(newList, result.source.index, result.destination.index);
-    }
-  }, [items, onMoveItem]);
+        onMoveItem(newList, result.source.index, result.destination.index);
+      }
+    },
+    [items, onMoveItem],
+  );
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <Droppable droppableId="droppable">
         {({ droppableProps, innerRef, placeholder }) => (
-          <div {...droppableProps}
-               ref={innerRef}>
-            <List alignItemContent={alignItemContent}
-                  items={items}
-                  disableDragging={disableDragging}
-                  displayOverlayInPortal={displayOverlayInPortal}
-                  customContentRender={customContentRender}
-                  customListItemRender={customListItemRender} />
+          <div {...droppableProps} ref={innerRef}>
+            <List
+              alignItemContent={alignItemContent}
+              items={items}
+              disableDragging={disableDragging}
+              displayOverlayInPortal={displayOverlayInPortal}
+              customContentRender={customContentRender}
+              customListItemRender={customListItemRender}
+            />
             {placeholder}
           </div>
         )}

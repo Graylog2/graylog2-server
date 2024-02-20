@@ -21,21 +21,23 @@ import Select from 'components/common/Select';
 import Direction from 'views/logic/aggregationbuilder/Direction';
 
 type Props = {
-  direction: string | undefined | null,
-  disabled: boolean,
-  onChange: (newDirection: Direction) => any,
+  direction: string | undefined | null;
+  disabled: boolean;
+  onChange: (newDirection: Direction) => any;
 };
 
 const SortDirectionSelect = ({ direction, disabled, onChange }: Props) => (
-  <Select disabled={disabled}
-          clearable={false}
-          options={[
-            { label: 'Ascending', value: 'Ascending' },
-            { label: 'Descending', value: 'Descending' },
-          ]}
-          onChange={(value: string) => onChange(Direction.fromString(value))}
-          placeholder={disabled ? 'No sorting selected' : 'Click to select direction'}
-          value={direction ?? null} />
+  <Select
+    disabled={disabled}
+    clearable={false}
+    options={[
+      { label: 'Ascending', value: 'Ascending' },
+      { label: 'Descending', value: 'Descending' },
+    ]}
+    onChange={(value: string) => onChange(Direction.fromString(value))}
+    placeholder={disabled ? 'No sorting selected' : 'Click to select direction'}
+    value={direction ?? null}
+  />
 );
 
 SortDirectionSelect.propTypes = {

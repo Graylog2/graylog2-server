@@ -29,16 +29,18 @@ const getColorStyles = (theme, bsStyle) => {
   return css`
     background-color: ${backgroundColor};
     color: ${textColor};
-`;
+  `;
 };
 
 type StyledLabelProps = {
-  bsStyle?: string,
+  bsStyle?: string;
 };
 type Props = React.ComponentProps<typeof BootstrapLabel> & StyledLabelProps;
-const StyledLabel: React.ComponentType<Props> = styled(BootstrapLabel)<StyledLabelProps>(({ bsStyle, theme }) => css`
-  ${getColorStyles(theme, bsStyle)}
-  padding: 0.3em 0.6em;
-`);
+const StyledLabel: React.ComponentType<Props> = styled(BootstrapLabel)<StyledLabelProps>(
+  ({ bsStyle, theme }) => css`
+    ${getColorStyles(theme, bsStyle)}
+    padding: 0.3em 0.6em;
+  `,
+);
 
 export default StyledLabel;

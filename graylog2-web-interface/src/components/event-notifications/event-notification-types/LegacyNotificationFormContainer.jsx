@@ -44,7 +44,11 @@ class LegacyNotificationFormContainer extends React.Component {
     const { allLegacyTypes } = notifications;
 
     if (!allLegacyTypes) {
-      return <p><Spinner text="Loading legacy notification information..." /></p>;
+      return (
+        <p>
+          <Spinner text="Loading legacy notification information..." />
+        </p>
+      );
     }
 
     return <LegacyNotificationForm {...this.props} legacyTypes={allLegacyTypes} />;

@@ -17,11 +17,11 @@
 import * as Immutable from 'immutable';
 
 export type SeriesConfigJson = {
-  name: string,
+  name: string;
 };
 
 type InternalState = {
-  name: string | undefined | null,
+  name: string | undefined | null;
 };
 
 export default class SeriesConfig {

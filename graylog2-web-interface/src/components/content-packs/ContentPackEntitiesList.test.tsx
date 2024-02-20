@@ -67,10 +67,7 @@ describe('<ContentPackEntitiesList />', () => {
     .fromServer(true)
     .build();
 
-  const contentPack = ContentPack.builder()
-    .entities([entity1, entity2])
-    .parameters([parameter])
-    .build();
+  const contentPack = ContentPack.builder().entities([entity1, entity2]).parameters([parameter]).build();
 
   it('should render with empty entities', async () => {
     const emptyContentPack = { entities: [] };
@@ -82,8 +79,7 @@ describe('<ContentPackEntitiesList />', () => {
   it('should render with entities and parameters without readOnly', async () => {
     const appliedParameter = { '111-beef': [{ configKey: 'title', paramName: 'A parameter name' }] };
 
-    render(<ContentPackEntitiesList contentPack={contentPack}
-                                    appliedParameter={appliedParameter} />);
+    render(<ContentPackEntitiesList contentPack={contentPack} appliedParameter={appliedParameter} />);
 
     await screen.findByText('test');
   });

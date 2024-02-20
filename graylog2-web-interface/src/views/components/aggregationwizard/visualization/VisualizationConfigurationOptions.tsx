@@ -28,8 +28,8 @@ import SelectField from './configurationFields/SelectField';
 import MultiSelectField from './configurationFields/MultiSelectField';
 
 type Props = {
-  name: string,
-  fields: Array<ConfigurationField>,
+  name: string;
+  fields: Array<ConfigurationField>;
 };
 
 const TitleLabelWithHelp = styled.div`
@@ -43,65 +43,73 @@ const TitleHoverForHelp = styled((props) => <HoverForHelp {...props} />)`
 
 const componentForType = (type: string) => {
   switch (type) {
-    case 'select': return SelectField;
-    case 'boolean': return BooleanField;
-    case 'numeric': return NumericField;
-    case 'multi-select': return MultiSelectField;
-    default: throw new Error(`Invalid configuration field type: ${type}`);
+    case 'select':
+      return SelectField;
+    case 'boolean':
+      return BooleanField;
+    case 'numeric':
+      return NumericField;
+    case 'multi-select':
+      return MultiSelectField;
+    default:
+      throw new Error(`Invalid configuration field type: ${type}`);
   }
 };
 
 const titleForField = (field: ConfigurationField) => {
   const { helpComponent: HelpComponent } = field;
 
-  return HelpComponent
-    ? (
-      <TitleLabelWithHelp>
-        {field.title}
-        <TitleHoverForHelp title={`Help for ${field.title}`} placement="top">
-          <HelpComponent />
-        </TitleHoverForHelp>
-      </TitleLabelWithHelp>
-    )
-    : field.title;
+  return HelpComponent ? (
+    <TitleLabelWithHelp>
+      {field.title}
+      <TitleHoverForHelp title={`Help for ${field.title}`} placement="top">
+        <HelpComponent />
+      </TitleHoverForHelp>
+    </TitleLabelWithHelp>
+  ) : (
+    field.title
+  );
 };
 
 export type FieldComponentProps = {
-  field: ConfigurationField,
-  name: string,
-  title: React.ReactNode,
-  value: any,
-  onChange: (e: React.ChangeEvent<any>) => void,
-  error: string | undefined,
-  values: any,
-}
+  field: ConfigurationField;
+  name: string;
+  title: React.ReactNode;
+  value: any;
+  onChange: (e: React.ChangeEvent<any>) => void;
+  error: string | undefined;
+  values: any;
+};
 
 const VisualizationConfigurationOptions = ({ name: namePrefix, fields = [] }: Props) => {
   const { values } = useFormikContext();
   const visualizationConfig: VisualizationConfigFormValues = getIn(values, namePrefix);
 
   return (
-    <>{fields
-      .filter((field) => (field.isShown ? field.isShown(visualizationConfig) : true))
-      .map((field) => {
-        const Component = componentForType(field.type);
-        const title = titleForField(field);
+    <>
+      {fields
+        .filter((field) => (field.isShown ? field.isShown(visualizationConfig) : true))
+        .map((field) => {
+          const Component = componentForType(field.type);
+          const title = titleForField(field);
 
-        return (
-          <Field key={`${namePrefix}.${field.name}`} name={`${namePrefix}.${field.name}`}>
-            {({ field: { name, value, onChange }, meta: { error } }) => (
-              <Component key={`${namePrefix}.${field.name}`}
-                         name={name}
-                         value={value}
-                         values={values}
-                         onChange={onChange}
-                         error={error}
-                         field={field}
-                         title={title} />
-            )}
-          </Field>
-        );
-      })}
+          return (
+            <Field key={`${namePrefix}.${field.name}`} name={`${namePrefix}.${field.name}`}>
+              {({ field: { name, value, onChange }, meta: { error } }) => (
+                <Component
+                  key={`${namePrefix}.${field.name}`}
+                  name={name}
+                  value={value}
+                  values={values}
+                  onChange={onChange}
+                  error={error}
+                  field={field}
+                  title={title}
+                />
+              )}
+            </Field>
+          );
+        })}
     </>
   );
 };

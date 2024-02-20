@@ -25,11 +25,11 @@ import { Icon } from 'components/common';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 
 type Props = {
-  contentPackId: string,
-  revision: number,
-  show: boolean,
-  onHide: () => void,
-}
+  contentPackId: string;
+  revision: number;
+  show: boolean;
+  onHide: () => void;
+};
 
 const ContentPackDownloadControl = ({ contentPackId, revision, show, onHide }: Props) => {
   const [showDownloadModal, setShowDownloadModal] = useState(show);
@@ -45,9 +45,7 @@ const ContentPackDownloadControl = ({ contentPackId, revision, show, onHide }: P
   const modalTitle = 'Download Content Pack';
 
   return (
-    <BootstrapModalWrapper showModal={showDownloadModal}
-                           onHide={closeModal}
-                           bsSize="large">
+    <BootstrapModalWrapper showModal={showDownloadModal} onHide={closeModal} bsSize="large">
       <Modal.Header closeButton>
         <Modal.Title>{modalTitle}</Modal.Title>
       </Modal.Header>
@@ -55,7 +53,7 @@ const ContentPackDownloadControl = ({ contentPackId, revision, show, onHide }: P
         <p>{infoText}</p>
         <p>
           <a href={getDownloadUrl()} target="_blank" rel="noopener noreferrer">
-            <Icon name="cloud-download-alt" />{' '}Download
+            <Icon name="cloud-download-alt" /> Download
           </a>
         </p>
       </Modal.Body>
@@ -75,8 +73,7 @@ ContentPackDownloadControl.propTypes = {
 
 ContentPackDownloadControl.defaultProps = {
   show: false,
-  onHide: () => {
-  },
+  onHide: () => {},
 };
 
 export default ContentPackDownloadControl;

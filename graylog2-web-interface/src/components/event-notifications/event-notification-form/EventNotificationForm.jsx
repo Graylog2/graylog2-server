@@ -35,8 +35,8 @@ const getNotificationPlugin = (type) => {
   return PluginStore.exports('eventNotificationTypes').find((n) => n.type === type) || {};
 };
 
-const formattedEventNotificationTypes = () => PluginStore.exports('eventNotificationTypes')
-  .map((type) => ({ label: type.displayName, value: type.type }));
+const formattedEventNotificationTypes = () =>
+  PluginStore.exports('eventNotificationTypes').map((type) => ({ label: type.displayName, value: type.type }));
 
 class EventNotificationForm extends React.Component {
   static propTypes = {
@@ -81,11 +81,13 @@ class EventNotificationForm extends React.Component {
     sendTelemetry(
       action === 'create'
         ? TELEMETRY_EVENT_TYPE.NOTIFICATIONS.CREATE_CLICKED
-        : TELEMETRY_EVENT_TYPE.NOTIFICATIONS.EDIT_CLICKED, {
+        : TELEMETRY_EVENT_TYPE.NOTIFICATIONS.EDIT_CLICKED,
+      {
         app_pathname: getPathnameWithoutId(location.pathname),
         app_section: 'event-notification',
         app_action_value: `${action}-button`,
-      });
+      },
+    );
 
     event.preventDefault();
 
@@ -140,11 +142,11 @@ class EventNotificationForm extends React.Component {
     const notificationPlugin = getNotificationPlugin(notification.config.type);
     const notificationFormComponent = notificationPlugin.formComponent
       ? React.createElement(notificationPlugin.formComponent, {
-        config: notification.config,
-        onChange: this.handleConfigChange,
-        validation: validation,
-        setIsSubmitEnabled: this.setIsSubmitEnabled,
-      })
+          config: notification.config,
+          onChange: this.handleConfigChange,
+          validation: validation,
+          setIsSubmitEnabled: this.setIsSubmitEnabled,
+        })
       : null;
 
     const testButtonText = testResult.isLoading ? <Spinner text="Testing..." /> : 'Execute Test Notification';
@@ -153,67 +155,82 @@ class EventNotificationForm extends React.Component {
       <Row>
         <Col lg={8}>
           <form onSubmit={this.handleSubmit} id={formId}>
-            <Input id="notification-title"
-                   name="title"
-                   label="Title"
-                   type="text"
-                   bsStyle={validation.errors.title ? 'error' : null}
-                   help={get(validation, 'errors.title[0]', 'Title to identify this Notification.')}
-                   value={notification.title}
-                   onChange={this.handleChange}
-                   required
-                   autoFocus />
+            <Input
+              id="notification-title"
+              name="title"
+              label="Title"
+              type="text"
+              bsStyle={validation.errors.title ? 'error' : null}
+              help={get(validation, 'errors.title[0]', 'Title to identify this Notification.')}
+              value={notification.title}
+              onChange={this.handleChange}
+              required
+              autoFocus
+            />
 
-            <Input id="notification-description"
-                   name="description"
-                   label={<span>Description <small className="text-muted">(Optional)</small></span>}
-                   type="textarea"
-                   help="Longer description for this Notification."
-                   value={notification.description}
-                   onChange={this.handleChange}
-                   rows={2} />
+            <Input
+              id="notification-description"
+              name="description"
+              label={
+                <span>
+                  Description <small className="text-muted">(Optional)</small>
+                </span>
+              }
+              type="textarea"
+              help="Longer description for this Notification."
+              value={notification.description}
+              onChange={this.handleChange}
+              rows={2}
+            />
 
             <FormGroup controlId="notification-type" validationState={validation.errors.config ? 'error' : null}>
               <ControlLabel>Notification Type</ControlLabel>
-              <Select id="notification-type"
-                      options={formattedEventNotificationTypes()}
-                      value={notification.config.type}
-                      onChange={this.handleTypeChange}
-                      clearable={false}
-                      required />
-              <HelpBlock>
-                {get(validation, 'errors.config[0]', 'Choose the type of Notification to create.')}
-              </HelpBlock>
+              <Select
+                id="notification-type"
+                options={formattedEventNotificationTypes()}
+                value={notification.config.type}
+                onChange={this.handleTypeChange}
+                clearable={false}
+                required
+              />
+              <HelpBlock>{get(validation, 'errors.config[0]', 'Choose the type of Notification to create.')}</HelpBlock>
             </FormGroup>
 
             {notificationFormComponent}
 
             {notificationFormComponent && (
               <FormGroup>
-                <ControlLabel>Test Notification <small className="text-muted">(Optional)</small></ControlLabel>
+                <ControlLabel>
+                  Test Notification <small className="text-muted">(Optional)</small>
+                </ControlLabel>
                 <FormControl.Static>
-                  <Button bsStyle="info"
-                          bsSize="small"
-                          disabled={testResult.isLoading}
-                          onClick={this.handleTestTrigger}>
+                  <Button
+                    bsStyle="info"
+                    bsSize="small"
+                    disabled={testResult.isLoading}
+                    onClick={this.handleTestTrigger}
+                  >
                     {testButtonText}
                   </Button>
                 </FormControl.Static>
                 {testResult.message && (
-                  <Alert bsStyle={testResult.error ? 'danger' : 'success'} title={testResult.error ? 'Error: ' : 'Success: '}>
+                  <Alert
+                    bsStyle={testResult.error ? 'danger' : 'success'}
+                    title={testResult.error ? 'Error: ' : 'Success: '}
+                  >
                     {testResult.message}
                   </Alert>
                 )}
-                <HelpBlock>
-                  Execute this Notification with a test Alert.
-                </HelpBlock>
+                <HelpBlock>Execute this Notification with a test Alert.</HelpBlock>
               </FormGroup>
             )}
 
             {!embedded && (
-              <FormSubmit disabledSubmit={!isSubmitEnabled}
-                          submitButtonText={`${action === 'create' ? 'Create' : 'Update'} notification`}
-                          onCancel={onCancel} />
+              <FormSubmit
+                disabledSubmit={!isSubmitEnabled}
+                submitButtonText={`${action === 'create' ? 'Create' : 'Update'} notification`}
+                onCancel={onCancel}
+              />
             )}
           </form>
         </Col>

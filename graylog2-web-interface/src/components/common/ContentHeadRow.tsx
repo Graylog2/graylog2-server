@@ -21,29 +21,31 @@ import classNames from 'classnames';
 
 import { Row } from 'components/bootstrap';
 
-const StyledRow = styled(Row)(({ theme }) => css`
-  padding-bottom: 0;
+const StyledRow = styled(Row)(
+  ({ theme }) => css`
+    padding-bottom: 0;
 
-  p {
-    margin-top: 15px;
-  }
+    p {
+      margin-top: 15px;
+    }
 
-  .actions-lg {
-    float: right;
-  }
+    .actions-lg {
+      float: right;
+    }
 
-  .actions-sm {
-    padding-bottom: 15px;
-  }
+    .actions-sm {
+      padding-bottom: 15px;
+    }
 
-  .btn-lg {
-    font-size: ${theme.fonts.size.large};
-  }
-`);
+    .btn-lg {
+      font-size: ${theme.fonts.size.large};
+    }
+  `,
+);
 
 type Props = {
-  children: React.ReactNode,
-  className: string,
+  children: React.ReactNode;
+  className: string;
 };
 
 const ContentHeadRow = ({ children, className, ...props }: Props) => (

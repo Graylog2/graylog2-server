@@ -39,7 +39,11 @@ const EventNotificationDetails = ({ notification }) => {
       <ReadOnlyFormGroup label="Title" value={notification.title} />
       <ReadOnlyFormGroup label="Description" value={notification.description} />
       <ReadOnlyFormGroup label="Notification Type" value={notification.config.type} />
-      {DetailsComponent ? <DetailsComponent notification={notification} /> : <Alert bsStyle="danger">Notification type not supported</Alert>}
+      {DetailsComponent ? (
+        <DetailsComponent notification={notification} />
+      ) : (
+        <Alert bsStyle="danger">Notification type not supported</Alert>
+      )}
     </SectionComponent>
   );
 };

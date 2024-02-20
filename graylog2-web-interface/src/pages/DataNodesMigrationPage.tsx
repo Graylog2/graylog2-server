@@ -24,19 +24,20 @@ import DataNodesPageNavigation from 'components/datanode/DataNodePageNavigation'
 const DataNodesMigrationPage = () => (
   <DocumentTitle title="Data Nodes Migration">
     <DataNodesPageNavigation />
-    <PageHeader title="Data Nodes Migration"
-                documentationLink={{
-                  title: 'Data Nodes documentation',
-                  path: DocsHelper.PAGES.GRAYLOG_DATA_NODE,
-                }}>
+    <PageHeader
+      title="Data Nodes Migration"
+      documentationLink={{
+        title: 'Data Nodes documentation',
+        path: DocsHelper.PAGES.GRAYLOG_DATA_NODE,
+      }}
+    >
       <span>
-        Graylog Data Nodes offer a better integration with Graylog and simplify future updates. They allow you to index and search through all the messages in your Graylog message database.
+        Graylog Data Nodes offer a better integration with Graylog and simplify future updates. They allow you to index
+        and search through all the messages in your Graylog message database.
       </span>
     </PageHeader>
     <Row className="content">
-      <Col md={12}>
-        TODO: Migration Component
-      </Col>
+      <Col md={12}>TODO: Migration Component</Col>
     </Row>
   </DocumentTitle>
 );

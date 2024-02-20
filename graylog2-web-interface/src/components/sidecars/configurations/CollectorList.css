@@ -1,15 +1,15 @@
 :local(.actionsColumn) {
-    width: 180px;
+  width: 180px;
 }
 
 :local(.inline) {
-    display: inline-block;
+  display: inline-block;
 }
 
 :local(.collectorTable) {
-    margin-top: 15px;
+  margin-top: 15px;
 }
 
 :local(.collectorRow) .pagination {
-    margin: 5px 0;
+  margin: 5px 0;
 }

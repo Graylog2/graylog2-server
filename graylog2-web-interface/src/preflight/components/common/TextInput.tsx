@@ -17,8 +17,6 @@
 import * as React from 'react';
 import { TextInput as MantineTextInput } from '@mantine/core';
 
-const TextInput = (props: React.ComponentProps<typeof MantineTextInput>) => (
-  <MantineTextInput {...props} />
-);
+const TextInput = (props: React.ComponentProps<typeof MantineTextInput>) => <MantineTextInput {...props} />;
 
 export default TextInput;

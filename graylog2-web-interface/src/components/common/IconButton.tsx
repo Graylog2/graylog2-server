@@ -21,35 +21,37 @@ import styled, { css } from 'styled-components';
 import Icon from 'components/common/Icon';
 import type { IconName } from 'components/common/Icon';
 
-const Wrapper = styled.button<{ disabled: boolean }>(({ theme, disabled }) => css`
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  height: 25px;
-  width: 25px;
-  border: 0;
-  background-color: transparent;
-  cursor: pointer;
-  color: ${disabled ? theme.colors.gray[90] : theme.colors.gray[60]};
-  font-size: ${theme.fonts.size.large};
+const Wrapper = styled.button<{ disabled: boolean }>(
+  ({ theme, disabled }) => css`
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    height: 25px;
+    width: 25px;
+    border: 0;
+    background-color: transparent;
+    cursor: pointer;
+    color: ${disabled ? theme.colors.gray[90] : theme.colors.gray[60]};
+    font-size: ${theme.fonts.size.large};
 
-  &:hover {
-    background-color: ${theme.colors.gray[80]};
-  }
+    &:hover {
+      background-color: ${theme.colors.gray[80]};
+    }
 
-  &:active {
-    background-color: ${theme.colors.gray[70]};
-  }
-`);
+    &:active {
+      background-color: ${theme.colors.gray[70]};
+    }
+  `,
+);
 
 type Props = {
-  focusable?: boolean,
-  title?: string,
-  onClick?: () => void,
-  className?: string,
-  name: IconName,
-  disabled?: boolean,
-  'data-testid'?: string
+  focusable?: boolean;
+  title?: string;
+  onClick?: () => void;
+  className?: string;
+  name: IconName;
+  disabled?: boolean;
+  'data-testid'?: string;
 };
 
 const handleClick = (onClick) => {
@@ -58,18 +60,22 @@ const handleClick = (onClick) => {
   }
 };
 
-const IconButton = React.forwardRef<HTMLButtonElement, Props>(({ title, onClick, focusable, className, disabled, 'data-testid': dataTestId, ...rest }: Props, ref) => (
-  <Wrapper ref={ref}
-           tabIndex={focusable ? 0 : -1}
-           data-testid={dataTestId}
-           title={title}
-           onClick={() => handleClick(onClick)}
-           className={className}
-           type="button"
-           disabled={disabled}>
-    <Icon {...rest} />
-  </Wrapper>
-));
+const IconButton = React.forwardRef<HTMLButtonElement, Props>(
+  ({ title, onClick, focusable, className, disabled, 'data-testid': dataTestId, ...rest }: Props, ref) => (
+    <Wrapper
+      ref={ref}
+      tabIndex={focusable ? 0 : -1}
+      data-testid={dataTestId}
+      title={title}
+      onClick={() => handleClick(onClick)}
+      className={className}
+      type="button"
+      disabled={disabled}
+    >
+      <Icon {...rest} />
+    </Wrapper>
+  ),
+);
 
 IconButton.propTypes = {
   className: PropTypes.string,

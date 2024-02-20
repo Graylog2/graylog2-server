@@ -27,30 +27,44 @@ import SortElement from './SortElement';
 import ElementConfigurationContainer from '../ElementConfigurationContainer';
 
 const SortsConfiguration = () => {
-  const { values: { sort }, setFieldValue, setValues, values } = useFormikContext<WidgetConfigFormValues>();
-  const removeSort = useCallback((index) => () => {
-    setValues(SortElement.onRemove(index, values));
-  }, [setValues, values]);
+  const {
+    values: { sort },
+    setFieldValue,
+    setValues,
+    values,
+  } = useFormikContext<WidgetConfigFormValues>();
+  const removeSort = useCallback(
+    (index) => () => {
+      setValues(SortElement.onRemove(index, values));
+    },
+    [setValues, values],
+  );
 
   return (
-    <FieldArray name="sort"
-                validateOnChange={false}
-                render={() => (
-                  <SortableList items={sort}
-                                onMoveItem={(newSort) => setFieldValue('sort', newSort)}
-                                customListItemRender={({ item, index, dragHandleProps, draggableProps, className, ref }) => (
-                                  <ElementConfigurationContainer key={`sort-${item.id}`}
-                                                                 dragHandleProps={dragHandleProps}
-                                                                 draggableProps={draggableProps}
-                                                                 className={className}
-                                                                 testIdPrefix={`sort-${index}`}
-                                                                 onRemove={removeSort(index)}
-                                                                 elementTitle={SortElement.title}
-                                                                 ref={ref}>
-                                    <SortConfiguration index={index} />
-                                  </ElementConfigurationContainer>
-                                )} />
-                )} />
+    <FieldArray
+      name="sort"
+      validateOnChange={false}
+      render={() => (
+        <SortableList
+          items={sort}
+          onMoveItem={(newSort) => setFieldValue('sort', newSort)}
+          customListItemRender={({ item, index, dragHandleProps, draggableProps, className, ref }) => (
+            <ElementConfigurationContainer
+              key={`sort-${item.id}`}
+              dragHandleProps={dragHandleProps}
+              draggableProps={draggableProps}
+              className={className}
+              testIdPrefix={`sort-${index}`}
+              onRemove={removeSort(index)}
+              elementTitle={SortElement.title}
+              ref={ref}
+            >
+              <SortConfiguration index={index} />
+            </ElementConfigurationContainer>
+          )}
+        />
+      )}
+    />
   );
 };
 

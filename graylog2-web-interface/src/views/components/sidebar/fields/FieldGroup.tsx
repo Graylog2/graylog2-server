@@ -17,24 +17,23 @@
 import * as React from 'react';
 
 type Props = {
-  group: string,
-  onSelect: (newGroup: string) => void,
-  selected: boolean,
-  text: string,
-  title: string,
+  group: string;
+  onSelect: (newGroup: string) => void;
+  selected: boolean;
+  text: string;
+  title: string;
 };
 
 const FieldGroup = ({ onSelect, selected, group, text, title }: Props) => (
-
-  (
-    <a onClick={() => onSelect(group)}
-       role="button"
-       style={{ fontWeight: selected ? 'bold' : 'normal' }}
-       tabIndex={0}
-       title={title}>
-      {text}
-    </a>
-  )
+  <a
+    onClick={() => onSelect(group)}
+    role="button"
+    style={{ fontWeight: selected ? 'bold' : 'normal' }}
+    tabIndex={0}
+    title={title}
+  >
+    {text}
+  </a>
 );
 
 export default FieldGroup;

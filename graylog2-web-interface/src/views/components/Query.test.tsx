@@ -57,14 +57,8 @@ describe('Query', () => {
   });
 
   it('renders no widget creation explanation, if there are some widgets defined', async () => {
-    const widget1 = AggregationWidget.builder()
-      .id('widget1')
-      .config(AggregationWidgetConfig.builder().build())
-      .build();
-    const widget2 = AggregationWidget.builder()
-      .id('widget2')
-      .config(AggregationWidgetConfig.builder().build())
-      .build();
+    const widget1 = AggregationWidget.builder().id('widget1').config(AggregationWidgetConfig.builder().build()).build();
+    const widget2 = AggregationWidget.builder().id('widget2').config(AggregationWidgetConfig.builder().build()).build();
     const viewWithWidgets = createViewWithWidgets([widget1, widget2], {});
 
     render(<Query view={viewWithWidgets} />);

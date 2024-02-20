@@ -29,22 +29,30 @@ const P = styled.p`
 `;
 
 type Props = {
-  setIsWaitingForStartup: React.Dispatch<React.SetStateAction<boolean>>,
-}
+  setIsWaitingForStartup: React.Dispatch<React.SetStateAction<boolean>>;
+};
 
 const Setup = ({ setIsWaitingForStartup }: Props) => (
   <>
     <Section title="Welcome!" titleOrder={1} dataTestid="welcome-section">
       <P>
-        It looks like you are starting Graylog for the first time and have not configured a data node.<br />
+        It looks like you are starting Graylog for the first time and have not configured a data node.
+        <br />
         Data nodes allow you to index and search through all the messages in your Graylog message database.
       </P>
       <P>
-        You can either implement a <DocumentationLink page={DocsHelper.PAGES.GRAYLOG_DATA_NODE} text="Graylog data node" /> (recommended) or you can configure an <DocumentationLink page={DocsHelper.PAGES.OPEN_SEARCH_SETUP} text="OpenSearch" /> node manually.
-        For the manual OpenSearch configuration you need to adjust the Graylog configuration and restart the Graylog server. After the restart this page will not show up again.
+        You can either implement a{' '}
+        <DocumentationLink page={DocsHelper.PAGES.GRAYLOG_DATA_NODE} text="Graylog data node" /> (recommended) or you
+        can configure an <DocumentationLink page={DocsHelper.PAGES.OPEN_SEARCH_SETUP} text="OpenSearch" /> node
+        manually. For the manual OpenSearch configuration you need to adjust the Graylog configuration and restart the
+        Graylog server. After the restart this page will not show up again.
       </P>
       <P>
-        You can always skip the configuration and <ResumeStartupButton variant="light" compact setIsWaitingForStartup={setIsWaitingForStartup}>resume startup</ResumeStartupButton>.
+        You can always skip the configuration and{' '}
+        <ResumeStartupButton variant="light" compact setIsWaitingForStartup={setIsWaitingForStartup}>
+          resume startup
+        </ResumeStartupButton>
+        .
       </P>
     </Section>
     <Section title="Graylog Data Nodes" titleOrder={2}>

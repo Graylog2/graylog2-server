@@ -24,12 +24,14 @@ export const AdvancedOptionsProvider = ({ children }) => {
   const [isAWSCustomEndpointsVisible, setAWSCustomEndpointsVisibility] = useState(false);
 
   return (
-    <AdvancedOptionsContext.Provider value={{
-      isAdvancedOptionsVisible,
-      isAWSCustomEndpointsVisible,
-      setAdvancedOptionsVisibility,
-      setAWSCustomEndpointsVisibility,
-    }}>
+    <AdvancedOptionsContext.Provider
+      value={{
+        isAdvancedOptionsVisible,
+        isAWSCustomEndpointsVisible,
+        setAdvancedOptionsVisibility,
+        setAWSCustomEndpointsVisibility,
+      }}
+    >
       {children}
     </AdvancedOptionsContext.Provider>
   );

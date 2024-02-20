@@ -45,9 +45,7 @@
           "row_groups": [
             {
               "type": "values",
-              "fields": [
-                "associated_ip"
-              ],
+              "fields": ["associated_ip"],
               "limit": 15,
               "skip_empty_values": false
             }
@@ -87,9 +85,7 @@
           "row_groups": [
             {
               "type": "values",
-              "fields": [
-                "event_source"
-              ],
+              "fields": ["event_source"],
               "limit": 15,
               "skip_empty_values": false
             }
@@ -123,9 +119,7 @@
           "row_groups": [
             {
               "type": "values",
-              "fields": [
-                "event_source"
-              ],
+              "fields": ["event_source"],
               "limit": 15,
               "skip_empty_values": false
             }
@@ -159,9 +153,7 @@
           "row_groups": [
             {
               "type": "values",
-              "fields": [
-                "event_source_product"
-              ],
+              "fields": ["event_source_product"],
               "limit": 15,
               "skip_empty_values": false
             }
@@ -201,9 +193,7 @@
           "row_groups": [
             {
               "type": "values",
-              "fields": [
-                "source_ip"
-              ],
+              "fields": ["source_ip"],
               "limit": 15,
               "skip_empty_values": false
             }
@@ -237,9 +227,7 @@
           "row_groups": [
             {
               "type": "time",
-              "fields": [
-                "timestamp"
-              ],
+              "fields": ["timestamp"],
               "interval": {
                 "type": "auto",
                 "scaling": 1
@@ -281,9 +269,7 @@
           "row_groups": [
             {
               "type": "values",
-              "fields": [
-                "destination_ip"
-              ],
+              "fields": ["destination_ip"],
               "limit": 15,
               "skip_empty_values": false
             }
@@ -323,9 +309,7 @@
           "row_groups": [
             {
               "type": "values",
-              "fields": [
-                "associated_user_name"
-              ],
+              "fields": ["associated_user_name"],
               "limit": 15,
               "skip_empty_values": false
             }
@@ -359,9 +343,7 @@
           "row_groups": [
             {
               "type": "values",
-              "fields": [
-                "query_result"
-              ],
+              "fields": ["query_result"],
               "limit": 15,
               "skip_empty_values": false
             }

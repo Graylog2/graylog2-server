@@ -59,25 +59,24 @@ const formatRuleField = (streamRule: Partial<StreamRule>) => {
 };
 
 type Props = {
-  streamRule: Partial<StreamRule>,
-  inputs: Array<Input>,
-}
+  streamRule: Partial<StreamRule>;
+  inputs: Array<Input>;
+};
 
 const HumanReadableStreamRule = ({ streamRule, inputs = [] }: Props) => {
   const { data: streamRuleTypes } = useStreamRuleTypes();
   const streamRuleType = streamRuleTypes?.find(({ id }) => id === streamRule.type);
-  const negation = (streamRule.inverted ? 'not ' : null);
-  const longDesc = (streamRuleType ? streamRuleType.long_desc : null);
+  const negation = streamRule.inverted ? 'not ' : null;
+  const longDesc = streamRuleType ? streamRuleType.long_desc : null;
 
   if (streamRule.type === STREAM_RULE_TYPES.ALWAYS_MATCHES) {
-    return (
-      <span>Rule always matches</span>
-    );
+    return <span>Rule always matches</span>;
   }
 
   return (
     <span>
-      <em>{formatRuleField(streamRule)}</em> <strong>must {negation}</strong>{longDesc} <em>{formatRuleValue(inputs, streamRule)}</em>
+      <em>{formatRuleField(streamRule)}</em> <strong>must {negation}</strong>
+      {longDesc} <em>{formatRuleValue(inputs, streamRule)}</em>
     </span>
   );
 };

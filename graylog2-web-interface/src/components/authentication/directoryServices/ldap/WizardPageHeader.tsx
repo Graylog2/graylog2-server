@@ -26,15 +26,19 @@ import useActiveBackend from 'components/authentication/useActiveBackend';
 import BackendActionLinks from 'components/authentication/BackendActionLinks';
 
 type Props = {
-  authenticationBackend?: DirectoryServiceBackend | OktaBackend,
-  title?: string,
+  authenticationBackend?: DirectoryServiceBackend | OktaBackend;
+  title?: string;
 };
 
 const _pageTitle = (authBackend, title) => {
   if (authBackend) {
     const backendTitle = StringUtils.truncateWithEllipses(authBackend.title, 30);
 
-    return <>Edit Authentication Service - <i>{backendTitle}</i></>;
+    return (
+      <>
+        Edit Authentication Service - <i>{backendTitle}</i>
+      </>
+    );
   }
 
   return title || 'Create LDAP Authentication Service';
@@ -47,15 +51,14 @@ const WizardPageHeader = ({ authenticationBackend: authBackend, title }: Props) 
   return (
     <>
       <AuthenticationPageNavigation />
-      <PageHeader title={pageTitle}
-                  actions={(
-                    <BackendActionLinks activeBackend={activeBackend}
-                                        finishedLoading={finishedLoading} />
-                  )}
-                  documentationLink={{
-                    title: 'Authentication documentation',
-                    path: DocsHelper.PAGES.USERS_ROLES,
-                  }}>
+      <PageHeader
+        title={pageTitle}
+        actions={<BackendActionLinks activeBackend={activeBackend} finishedLoading={finishedLoading} />}
+        documentationLink={{
+          title: 'Authentication documentation',
+          path: DocsHelper.PAGES.USERS_ROLES,
+        }}
+      >
         <span>Configure Graylog&apos;s authentication services of this Graylog cluster.</span>
       </PageHeader>
     </>

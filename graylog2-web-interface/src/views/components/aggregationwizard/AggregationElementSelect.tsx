@@ -22,15 +22,19 @@ import type { AggregationElement } from './AggregationElementType';
 import type { WidgetConfigFormValues } from './WidgetConfigForm';
 
 type Props = {
-  aggregationElements: Array<AggregationElement<keyof WidgetConfigFormValues>>,
-  formValues: WidgetConfigFormValues,
-  onSelect: (elementKey: string) => void,
-}
+  aggregationElements: Array<AggregationElement<keyof WidgetConfigFormValues>>;
+  formValues: WidgetConfigFormValues;
+  onSelect: (elementKey: string) => void;
+};
 
 const AggregationElementSelect = ({ aggregationElements, onSelect, formValues }: Props) => {
   const menuItems = aggregationElements
     .filter(({ allowCreate }) => allowCreate(formValues))
-    .map(({ key, title }) => <MenuItem key={`element-select-${key}`} onSelect={() => onSelect(key)}>{title}</MenuItem>);
+    .map(({ key, title }) => (
+      <MenuItem key={`element-select-${key}`} onSelect={() => onSelect(key)}>
+        {title}
+      </MenuItem>
+    ));
 
   return (
     <DropdownButton id="add-aggregation-element" dropup title="Add">

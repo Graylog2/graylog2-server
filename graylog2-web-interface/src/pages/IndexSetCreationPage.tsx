@@ -26,23 +26,18 @@ import connect from 'stores/connect';
 import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import { IndicesConfigurationActions, IndicesConfigurationStore } from 'stores/indices/IndicesConfigurationStore';
-import {
-  RetentionStrategyPropType,
-  RotationStrategyPropType,
-} from 'components/indices/Types';
-import type {
-  RetentionStrategy, RotationStrategy, RetentionStrategyContext,
-} from 'components/indices/Types';
+import { RetentionStrategyPropType, RotationStrategyPropType } from 'components/indices/Types';
+import type { RetentionStrategy, RotationStrategy, RetentionStrategyContext } from 'components/indices/Types';
 import { adjustFormat } from 'util/DateTime';
 import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 type Props = {
-  retentionStrategies?: Array<RetentionStrategy> | null | undefined,
-  rotationStrategies?: Array<RotationStrategy> | null | undefined,
-  retentionStrategiesContext?: RetentionStrategyContext | null | undefined,
-}
+  retentionStrategies?: Array<RetentionStrategy> | null | undefined;
+  rotationStrategies?: Array<RotationStrategy> | null | undefined;
+  retentionStrategiesContext?: RetentionStrategyContext | null | undefined;
+};
 
 const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, retentionStrategiesContext }: Props) => {
   const history = useHistory();
@@ -77,11 +72,13 @@ const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, retenti
     <DocumentTitle title="Create Index Set">
       <IndicesPageNavigation />
       <div>
-        <PageHeader title="Create Index Set"
-                    documentationLink={{
-                      title: 'Index model documentation',
-                      path: DocsHelper.PAGES.INDEX_MODEL,
-                    }}>
+        <PageHeader
+          title="Create Index Set"
+          documentationLink={{
+            title: 'Index model documentation',
+            path: DocsHelper.PAGES.INDEX_MODEL,
+          }}
+        >
           <span>
             Create a new index set that will let you configure the retention, sharding, and replication of messages
             coming from one or more streams.
@@ -90,14 +87,16 @@ const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, retenti
 
         <Row className="content">
           <Col md={12}>
-            <IndexSetConfigurationForm retentionStrategiesContext={retentionStrategiesContext}
-                                       rotationStrategies={rotationStrategies}
-                                       retentionStrategies={retentionStrategies}
-                                       submitButtonText="Create index set"
-                                       submitLoadingText="Creating index set..."
-                                       create
-                                       cancelLink={Routes.SYSTEM.INDICES.LIST}
-                                       onUpdate={_saveConfiguration} />
+            <IndexSetConfigurationForm
+              retentionStrategiesContext={retentionStrategiesContext}
+              rotationStrategies={rotationStrategies}
+              retentionStrategies={retentionStrategies}
+              submitButtonText="Create index set"
+              submitLoadingText="Creating index set..."
+              create
+              cancelLink={Routes.SYSTEM.INDICES.LIST}
+              onUpdate={_saveConfiguration}
+            />
           </Col>
         </Row>
       </div>

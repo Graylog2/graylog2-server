@@ -101,14 +101,18 @@ describe('ExtraWidgetActions', () => {
 
     await userEvent.click(menuItem);
 
-    await waitFor(() => expect(dummyActionWhichIsNotHidden.action)
-      .toHaveBeenCalledWith(widget, expect.objectContaining({
-        widgetFocusContext: expect.objectContaining({
-          focusedWidget: undefined,
-          setWidgetFocusing: expect.any(Function),
-          setWidgetEditing: expect.any(Function),
+    await waitFor(() =>
+      expect(dummyActionWhichIsNotHidden.action).toHaveBeenCalledWith(
+        widget,
+        expect.objectContaining({
+          widgetFocusContext: expect.objectContaining({
+            focusedWidget: undefined,
+            setWidgetFocusing: expect.any(Function),
+            setWidgetEditing: expect.any(Function),
+          }),
         }),
-      })));
+      ),
+    );
   });
 
   it('renders divider if at least one action is present', async () => {

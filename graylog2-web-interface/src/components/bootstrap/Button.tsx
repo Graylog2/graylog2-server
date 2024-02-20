@@ -25,12 +25,16 @@ import type { BsSize } from 'components/bootstrap/types';
 const sizeForMantine = (size: BsSize) => {
   switch (size) {
     case 'xs':
-    case 'xsmall': return 'xs';
+    case 'xsmall':
+      return 'xs';
     case 'sm':
-    case 'small': return 'sm';
+    case 'small':
+      return 'sm';
     case 'lg':
-    case 'large': return 'lg';
-    default: return 'md';
+    case 'large':
+      return 'lg';
+    default:
+      return 'md';
   }
 };
 
@@ -40,31 +44,34 @@ const mapStyle = (style: StyleProps) => (style === 'default' ? 'gray' : style);
 
 const styleProps = (style: StyleProps) => {
   switch (style) {
-    case 'default': return { color: 'gray' };
-    case 'link': return { variant: 'subtle' };
-    default: return { color: style };
+    case 'default':
+      return { color: 'gray' };
+    case 'link':
+      return { variant: 'subtle' };
+    default:
+      return { color: style };
   }
 };
 
 type Props = React.PropsWithChildren<{
-  active?: boolean,
-  'aria-label'?: string,
-  bsStyle?: StyleProps,
-  bsSize?: BsSize,
-  className?: string,
-  'data-testid'?: string,
-  disabled?: boolean,
-  form?: string,
-  href?: string,
-  id?: string,
-  name?: string,
-  onClick?: ((e: React.MouseEvent<HTMLButtonElement>) => void) | ((e: boolean) => void) | (() => void),
-  rel?: 'noopener noreferrer',
-  role?: string,
-  tabIndex?: number,
-  target?: '_blank',
-  title?: string,
-  type?: 'button' | 'reset' | 'submit',
+  active?: boolean;
+  'aria-label'?: string;
+  bsStyle?: StyleProps;
+  bsSize?: BsSize;
+  className?: string;
+  'data-testid'?: string;
+  disabled?: boolean;
+  form?: string;
+  href?: string;
+  id?: string;
+  name?: string;
+  onClick?: ((e: React.MouseEvent<HTMLButtonElement>) => void) | ((e: boolean) => void) | (() => void);
+  rel?: 'noopener noreferrer';
+  role?: string;
+  tabIndex?: number;
+  target?: '_blank';
+  title?: string;
+  type?: 'button' | 'reset' | 'submit';
 }>;
 
 const stylesForSize = (size: BsSize) => {
@@ -113,7 +120,7 @@ const disabledStyles = (style: ColorVariant, other: Other) => {
 
 const generateStyles = (other: Other, bsStyle: StyleProps, bsSize: BsSize, disabled: boolean) => {
   const sizeStyles = stylesForSize(bsSize);
-  const disableStyles = (disabled && bsStyle !== 'link' ? disabledStyles(bsStyle, other) : {});
+  const disableStyles = disabled && bsStyle !== 'link' ? disabledStyles(bsStyle, other) : {};
 
   return {
     root: {
@@ -138,13 +145,35 @@ const generateStyles = (other: Other, bsStyle: StyleProps, bsSize: BsSize, disab
 };
 
 const Button = React.forwardRef<HTMLButtonElement, Props>(
-  ({
-    'aria-label': ariaLabel, bsStyle, bsSize, className, 'data-testid': dataTestId, id, onClick, disabled, href,
-    title, form, target, type, rel, role, name, tabIndex, children,
-  }, ref) => {
+  (
+    {
+      'aria-label': ariaLabel,
+      bsStyle,
+      bsSize,
+      className,
+      'data-testid': dataTestId,
+      id,
+      onClick,
+      disabled,
+      href,
+      title,
+      form,
+      target,
+      type,
+      rel,
+      role,
+      name,
+      tabIndex,
+      children,
+    },
+    ref,
+  ) => {
     const theme = useMantineTheme();
     const style = mapStyle(bsStyle);
-    const styles = useMemo(() => generateStyles(theme.other, style, bsSize, disabled), [bsSize, disabled, style, theme.other]);
+    const styles = useMemo(
+      () => generateStyles(theme.other, style, bsSize, disabled),
+      [bsSize, disabled, style, theme.other],
+    );
 
     const sharedProps = {
       id,
@@ -163,27 +192,32 @@ const Button = React.forwardRef<HTMLButtonElement, Props>(
 
     if (href) {
       return (
-        <MantineButton component="a"
-                       href={href}
-                       target={target}
-                       rel={rel}
-                       onClick={onClick as (e: React.MouseEvent<HTMLAnchorElement>) => void}
-                       {...sharedProps}>
+        <MantineButton
+          component="a"
+          href={href}
+          target={target}
+          rel={rel}
+          onClick={onClick as (e: React.MouseEvent<HTMLAnchorElement>) => void}
+          {...sharedProps}
+        >
           {children}
         </MantineButton>
       );
     }
 
     return (
-      <MantineButton ref={ref}
-                     form={form}
-                     onClick={onClick as (e: React.MouseEvent<HTMLButtonElement>) => void}
-                     name={name}
-                     {...sharedProps}>
+      <MantineButton
+        ref={ref}
+        form={form}
+        onClick={onClick as (e: React.MouseEvent<HTMLButtonElement>) => void}
+        name={name}
+        {...sharedProps}
+      >
         {children}
       </MantineButton>
     );
-  });
+  },
+);
 
 Button.defaultProps = {
   active: undefined,

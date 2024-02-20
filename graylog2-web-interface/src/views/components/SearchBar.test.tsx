@@ -33,10 +33,9 @@ import OriginalSearchBar from './SearchBar';
 
 jest.mock('views/logic/fieldtypes/useFieldTypes');
 
-jest.mock('stores/streams/StreamsStore', () => MockStore(
-  ['listStreams', () => ({ then: jest.fn() })],
-  'availableStreams',
-));
+jest.mock('stores/streams/StreamsStore', () =>
+  MockStore(['listStreams', () => ({ then: jest.fn() })], 'availableStreams'),
+);
 
 jest.mock('views/stores/SearchConfigStore', () => ({
   SearchConfigStore: MockStore(),
@@ -45,14 +44,18 @@ jest.mock('views/stores/SearchConfigStore', () => ({
   },
 }));
 
-jest.mock('views/components/searchbar/saved-search/SearchActionsMenu', () => jest.fn(() => (
-  <div>Saved Search Controls</div>
-)));
+jest.mock('views/components/searchbar/saved-search/SearchActionsMenu', () =>
+  jest.fn(() => <div>Saved Search Controls</div>),
+);
 
-jest.mock('views/components/searchbar/queryvalidation/validateQuery', () => jest.fn(() => Promise.resolve({
-  status: 'OK',
-  explanations: [],
-})));
+jest.mock('views/components/searchbar/queryvalidation/validateQuery', () =>
+  jest.fn(() =>
+    Promise.resolve({
+      status: 'OK',
+      explanations: [],
+    }),
+  ),
+);
 
 jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
 jest.mock('views/logic/queries/useCurrentQuery');
@@ -116,7 +119,9 @@ describe('SearchBar', () => {
   });
 
   it('date exceeding limitDuration should render with error Icon & search button disabled', async () => {
-    asMock(SearchConfigStore.getInitialState).mockReturnValue({ searchesClusterConfig: { ...mockSearchesClusterConfig, query_time_range_limit: 'PT1M' } });
+    asMock(SearchConfigStore.getInitialState).mockReturnValue({
+      searchesClusterConfig: { ...mockSearchesClusterConfig, query_time_range_limit: 'PT1M' },
+    });
     render(<SearchBar />);
 
     const timeRangePickerButton = await screen.findByLabelText('Open Time Range Selector');

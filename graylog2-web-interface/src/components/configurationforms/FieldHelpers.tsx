@@ -18,9 +18,13 @@ import React from 'react';
 
 import type { ConfigurationField } from 'components/configurationforms/types';
 
-export const hasAttribute = (array: Array<string>, attribute: string): boolean => array.find((e) => e.toLowerCase() === attribute.toLowerCase()) !== undefined;
+export const hasAttribute = (array: Array<string>, attribute: string): boolean =>
+  array.find((e) => e.toLowerCase() === attribute.toLowerCase()) !== undefined;
 
-export const optionalMarker = (field: ConfigurationField): React.ReactNode | null => (field.is_optional && field.type !== 'boolean' ? <span className="configuration-field-optional">(optional)</span> : null);
+export const optionalMarker = (field: ConfigurationField): React.ReactNode | null =>
+  field.is_optional && field.type !== 'boolean' ? (
+    <span className="configuration-field-optional">(optional)</span>
+  ) : null;
 
 export default {
   hasAttribute,

@@ -30,32 +30,37 @@ export const RECENT_ACTIONS_QUERY_KEY = 'recent_actions_query_key';
 const fetchRecentActivities = async ({ page }: RequestQuery): Promise<PaginatedRecentActivity> => {
   const url = PaginationURL(`${urlPrefix}/recentActivity`, page, 5, '');
 
-  return fetch('GET', qualifyUrl(url)).then((data: PaginatedResponseRecentActivity): PaginatedRecentActivity => ({
-    page: data.page,
-    per_page: data.per_page,
-    count: data.count,
-    total: data.total,
-    recentActivity: data.recentActivity.map((activity) => ({
-      id: activity.id,
-      itemTitle: activity.item_title,
-      timestamp: activity.timestamp,
-      activityType: activity.activity_type,
-      itemGrn: activity.item_grn,
-      userName: activity.user_name,
-    })),
-  }));
+  return fetch('GET', qualifyUrl(url)).then(
+    (data: PaginatedResponseRecentActivity): PaginatedRecentActivity => ({
+      page: data.page,
+      per_page: data.per_page,
+      count: data.count,
+      total: data.total,
+      recentActivity: data.recentActivity.map((activity) => ({
+        id: activity.id,
+        itemTitle: activity.item_title,
+        timestamp: activity.timestamp,
+        activityType: activity.activity_type,
+        itemGrn: activity.item_grn,
+        userName: activity.user_name,
+      })),
+    }),
+  );
 };
 
-const useRecentActivity = (pagination: RequestQuery): { data: PaginatedRecentActivity, isFetching: boolean } => useQuery([RECENT_ACTIONS_QUERY_KEY, pagination], () => fetchRecentActivities(pagination), {
-  onError: (errorThrown) => {
-    UserNotification.error(`Loading recent activity failed with status: ${errorThrown}`,
-      'Could not load recent activity');
-  },
-  retry: 0,
-  initialData: {
-    recentActivity: [],
-    ...DEFAULT_PAGINATION,
-  },
-});
+const useRecentActivity = (pagination: RequestQuery): { data: PaginatedRecentActivity; isFetching: boolean } =>
+  useQuery([RECENT_ACTIONS_QUERY_KEY, pagination], () => fetchRecentActivities(pagination), {
+    onError: (errorThrown) => {
+      UserNotification.error(
+        `Loading recent activity failed with status: ${errorThrown}`,
+        'Could not load recent activity',
+      );
+    },
+    retry: 0,
+    initialData: {
+      recentActivity: [],
+      ...DEFAULT_PAGINATION,
+    },
+  });
 
 export default useRecentActivity;

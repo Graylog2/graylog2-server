@@ -20,7 +20,7 @@ import { useStore } from 'stores/connect';
 import { SearchConfigActions, SearchConfigStore } from 'views/stores/SearchConfigStore';
 import type { SearchesConfig } from 'components/search/SearchConfig';
 
-const useSearchConfiguration = (): { config: SearchesConfig, refresh: () => void} => {
+const useSearchConfiguration = (): { config: SearchesConfig; refresh: () => void } => {
   const { searchesClusterConfig } = useStore(SearchConfigStore);
 
   useEffect(() => {

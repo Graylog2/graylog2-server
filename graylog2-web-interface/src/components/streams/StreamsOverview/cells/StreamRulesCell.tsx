@@ -28,8 +28,8 @@ const StyledCountBadge = styled(CountBadge)`
 `;
 
 type Props = {
-  stream: Stream
-}
+  stream: Stream;
+};
 
 const StreamRulesCell = ({ stream }: Props) => {
   const buttonRef = useRef();
@@ -44,7 +44,11 @@ const StreamRulesCell = ({ stream }: Props) => {
   const streamRulesSectionIsOpen = expandedSections?.[stream.id]?.includes('rules');
 
   return (
-    <StyledCountBadge onClick={toggleRulesSection} ref={buttonRef} title={`${streamRulesSectionIsOpen ? 'Hide' : 'Show'} stream rules`}>
+    <StyledCountBadge
+      onClick={toggleRulesSection}
+      ref={buttonRef}
+      title={`${streamRulesSectionIsOpen ? 'Hide' : 'Show'} stream rules`}
+    >
       {stream.rules.length}
     </StyledCountBadge>
   );

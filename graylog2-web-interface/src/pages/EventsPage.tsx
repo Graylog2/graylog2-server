@@ -29,14 +29,16 @@ const EventsPage = () => {
   return (
     <DocumentTitle title="Alerts &amp; Events">
       <EventsPageNavigation />
-      <PageHeader title="Alerts &amp; Events"
-                  documentationLink={{
-                    title: 'Alerts documentation',
-                    path: DocsHelper.PAGES.ALERTS,
-                  }}>
+      <PageHeader
+        title="Alerts &amp; Events"
+        documentationLink={{
+          title: 'Alerts documentation',
+          path: DocsHelper.PAGES.ALERTS,
+        }}
+      >
         <span>
-          Define Events through different conditions. Add Notifications to Events that require your attention
-          to create Alerts.
+          Define Events through different conditions. Add Notifications to Events that require your attention to create
+          Alerts.
         </span>
       </PageHeader>
 

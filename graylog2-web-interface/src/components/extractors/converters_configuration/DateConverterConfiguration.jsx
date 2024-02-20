@@ -34,7 +34,10 @@ class DateConverterConfiguration extends React.Component {
     this.props.onChange(this.props.type, this._getConverterObject());
   }
 
-  _getConverterObject = (configuration) => ({ type: this.props.type, config: configuration || this.props.configuration });
+  _getConverterObject = (configuration) => ({
+    type: this.props.type,
+    config: configuration || this.props.configuration,
+  });
 
   _toggleConverter = (event) => {
     let converter;
@@ -57,64 +60,81 @@ class DateConverterConfiguration extends React.Component {
   render() {
     const dateFormatHelpMessage = (
       <span>
-        String format the date uses. Read more in the <DocumentationLink page={DocsHelper.PAGES.PAGE_STANDARD_DATE_CONVERTER} text="documentation" />.
+        String format the date uses. Read more in the{' '}
+        <DocumentationLink page={DocsHelper.PAGES.PAGE_STANDARD_DATE_CONVERTER} text="documentation" />.
       </span>
     );
 
     const timezoneHelpMessage = (
       <span>
-        Time zone to apply to date. Read more in the <DocumentationLink page={DocsHelper.PAGES.PAGE_STANDARD_DATE_CONVERTER} text="documentation" />.
+        Time zone to apply to date. Read more in the{' '}
+        <DocumentationLink page={DocsHelper.PAGES.PAGE_STANDARD_DATE_CONVERTER} text="documentation" />.
       </span>
     );
 
     const localeHelpMessage = (
       <span>
-        Locale to use when parsing the date. Read more in the <DocumentationLink page={DocsHelper.PAGES.PAGE_STANDARD_DATE_CONVERTER} text="documentation" />.
+        Locale to use when parsing the date. Read more in the{' '}
+        <DocumentationLink page={DocsHelper.PAGES.PAGE_STANDARD_DATE_CONVERTER} text="documentation" />.
       </span>
     );
 
     return (
       <div className="xtrc-converter">
-        <Input type="checkbox"
-               ref={(converterEnabled) => { this.converterEnabled = converterEnabled; }}
-               id={`enable-${this.props.type}-converter`}
-               label="Convert to date type"
-               wrapperClassName="col-md-offset-2 col-md-10"
-               defaultChecked
-               onChange={this._toggleConverter} />
+        <Input
+          type="checkbox"
+          ref={(converterEnabled) => {
+            this.converterEnabled = converterEnabled;
+          }}
+          id={`enable-${this.props.type}-converter`}
+          label="Convert to date type"
+          wrapperClassName="col-md-offset-2 col-md-10"
+          defaultChecked
+          onChange={this._toggleConverter}
+        />
         <Row className="row-sm">
           <Col md={9} mdOffset={2}>
             <div className="xtrc-converter-subfields">
-              <Input type="text"
-                     id={`${this.props.type}_converter_date_format`}
-                     label="Format string"
-                     defaultValue={this.props.configuration.date_format}
-                     labelClassName="col-md-3"
-                     wrapperClassName="col-md-9"
-                     placeholder="yyyy-MM-dd HH:mm:ss.SSS"
-                     onChange={this._onChange('date_format')}
-                     required={this.converterEnabled && this.converterEnabled.getChecked()}
-                     help={dateFormatHelpMessage} />
+              <Input
+                type="text"
+                id={`${this.props.type}_converter_date_format`}
+                label="Format string"
+                defaultValue={this.props.configuration.date_format}
+                labelClassName="col-md-3"
+                wrapperClassName="col-md-9"
+                placeholder="yyyy-MM-dd HH:mm:ss.SSS"
+                onChange={this._onChange('date_format')}
+                required={this.converterEnabled && this.converterEnabled.getChecked()}
+                help={dateFormatHelpMessage}
+              />
 
-              <Input label="Time Zone"
-                     id={`${this.props.type}_converter_timezone`}
-                     labelClassName="col-sm-3"
-                     wrapperClassName="col-sm-9"
-                     help={timezoneHelpMessage}>
-                <TimezoneSelect id={`${this.props.type}_converter_timezone`}
-                                className="timezone-select"
-                                value={this.props.configuration.time_zone}
-                                onChange={this._onChange('time_zone')} />
+              <Input
+                label="Time Zone"
+                id={`${this.props.type}_converter_timezone`}
+                labelClassName="col-sm-3"
+                wrapperClassName="col-sm-9"
+                help={timezoneHelpMessage}
+              >
+                <TimezoneSelect
+                  id={`${this.props.type}_converter_timezone`}
+                  className="timezone-select"
+                  value={this.props.configuration.time_zone}
+                  onChange={this._onChange('time_zone')}
+                />
               </Input>
-              <Input label="Locale"
-                     id={`${this.props.type}_converter_locale`}
-                     labelClassName="col-sm-3"
-                     wrapperClassName="col-sm-9"
-                     help={localeHelpMessage}>
-                <LocaleSelect id={`${this.props.type}_converter_locale`}
-                              className="locale-select"
-                              value={this.props.configuration.locale}
-                              onChange={this._onChange('locale')} />
+              <Input
+                label="Locale"
+                id={`${this.props.type}_converter_locale`}
+                labelClassName="col-sm-3"
+                wrapperClassName="col-sm-9"
+                help={localeHelpMessage}
+              >
+                <LocaleSelect
+                  id={`${this.props.type}_converter_locale`}
+                  className="locale-select"
+                  value={this.props.configuration.locale}
+                  onChange={this._onChange('locale')}
+                />
               </Input>
             </div>
           </Col>

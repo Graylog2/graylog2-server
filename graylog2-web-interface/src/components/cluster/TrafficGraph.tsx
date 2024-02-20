@@ -21,9 +21,9 @@ import { Spinner } from 'components/common';
 import GenericPlot from 'views/components/visualizations/GenericPlot';
 
 type Props = {
-  traffic: { [key: string]: number },
-  width: number,
-  layoutExtension?: {},
+  traffic: { [key: string]: number };
+  width: number;
+  layoutExtension?: {};
 };
 
 const TrafficGraph = ({ width, traffic, layoutExtension }: Props) => {
@@ -31,11 +31,13 @@ const TrafficGraph = ({ width, traffic, layoutExtension }: Props) => {
     return <Spinner />;
   }
 
-  const chartData = [{
-    type: 'bar',
-    x: Object.keys(traffic),
-    y: Object.values(traffic),
-  }];
+  const chartData = [
+    {
+      type: 'bar',
+      x: Object.keys(traffic),
+      y: Object.values(traffic),
+    },
+  ];
   const layout = {
     showlegend: false,
     margin: {
@@ -64,8 +66,7 @@ const TrafficGraph = ({ width, traffic, layoutExtension }: Props) => {
 
   return (
     <div style={{ height: '200px', width: width }}>
-      <GenericPlot chartData={chartData}
-                   layout={layout} />
+      <GenericPlot chartData={chartData} layout={layout} />
     </div>
   );
 };

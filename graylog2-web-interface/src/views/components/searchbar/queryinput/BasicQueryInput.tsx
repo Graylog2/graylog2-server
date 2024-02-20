@@ -28,46 +28,42 @@ import type { Editor } from './ace-types';
 const ACE_THEME = 'ace-queryinput';
 
 export type BaseProps = {
-  className?: string
-  error?: QueryValidationState,
-  height?: number,
-  maxLines?: number,
-  onLoad?: (editor: Editor) => void,
-  placeholder?: string,
-  value: string,
-  warning?: QueryValidationState,
-  wrapEnabled?: boolean,
-  inputId?: string,
+  className?: string;
+  error?: QueryValidationState;
+  height?: number;
+  maxLines?: number;
+  onLoad?: (editor: Editor) => void;
+  placeholder?: string;
+  value: string;
+  warning?: QueryValidationState;
+  wrapEnabled?: boolean;
+  inputId?: string;
 };
 
 type EnabledInputProps = BaseProps & {
-  disabled: false,
-  enableAutocompletion?: boolean,
-  onBlur?: (query: string) => void,
-  onChange: (query: string) => Promise<string>,
-  onExecute: (editor: Editor) => void,
+  disabled: false;
+  enableAutocompletion?: boolean;
+  onBlur?: (query: string) => void;
+  onChange: (query: string) => Promise<string>;
+  onExecute: (editor: Editor) => void;
 };
 type DisabledInputProps = BaseProps & { disabled: true };
-type Props = EnabledInputProps | DisabledInputProps
+type Props = EnabledInputProps | DisabledInputProps;
 
 const isEnabledInput = (props: Props): props is EnabledInputProps => !props.disabled;
 const isDisabledInput = (props: Props): props is DisabledInputProps => props.disabled;
 
 const getMarkers = (errors: QueryValidationState | undefined, warnings: QueryValidationState | undefined) => {
   const markerClassName = 'ace_marker';
-  const createMarkers = (explanations: QueryValidationState['explanations'] = [], className: string = ''): IMarker[] => explanations.map(({
-    beginLine,
-    beginColumn,
-    endLine,
-    endColumn,
-  }) => ({
-    startRow: beginLine,
-    startCol: beginColumn,
-    endRow: endLine,
-    endCol: endColumn,
-    type: 'text',
-    className,
-  }));
+  const createMarkers = (explanations: QueryValidationState['explanations'] = [], className: string = ''): IMarker[] =>
+    explanations.map(({ beginLine, beginColumn, endLine, endColumn }) => ({
+      startRow: beginLine,
+      startCol: beginColumn,
+      endRow: endLine,
+      endCol: endColumn,
+      type: 'text',
+      className,
+    }));
 
   return [
     ...createMarkers(errors?.explanations, `${markerClassName} ace_validation_error`),
@@ -78,33 +74,25 @@ const getMarkers = (errors: QueryValidationState | undefined, warnings: QueryVal
 // Basic query input component which is being implemented by the `QueryInput` component.
 // This is just a very basic query input which can be implemented for example to display a read only query.
 const BasicQueryInput = forwardRef<any, Props>((props, ref) => {
-  const {
-    className,
-    disabled,
-    error,
-    height,
-    maxLines,
-    placeholder,
-    value,
-    warning,
-    wrapEnabled,
-    onLoad,
-    inputId,
-  } = props;
+  const { className, disabled, error, height, maxLines, placeholder, value, warning, wrapEnabled, onLoad, inputId } =
+    props;
   const theme = useTheme();
   const markers = useMemo(() => getMarkers(error, warning), [error, warning]);
-  const _onLoad = useCallback((editor) => {
-    if (editor) {
-      editor.renderer.setScrollMargin(7, 6);
-      editor.renderer.setPadding(12);
+  const _onLoad = useCallback(
+    (editor) => {
+      if (editor) {
+        editor.renderer.setScrollMargin(7, 6);
+        editor.renderer.setPadding(12);
 
-      if (inputId) {
-        editor.textInput.getElement().setAttribute('id', inputId);
+        if (inputId) {
+          editor.textInput.getElement().setAttribute('id', inputId);
+        }
+
+        onLoad?.(editor);
       }
-
-      onLoad?.(editor);
-    }
-  }, [inputId, onLoad]);
+    },
+    [inputId, onLoad],
+  );
   const editorProps = useMemo(() => ({ $blockScrolling: Infinity, selectionStyle: 'line' }), []);
   const setOptions = useMemo(() => ({ indentedSoftWrap: false }), []);
 
@@ -138,18 +126,16 @@ const BasicQueryInput = forwardRef<any, Props>((props, ref) => {
   }
 
   if (isEnabledInput(props)) {
-    const {
-      onBlur,
-      onChange,
-      enableAutocompletion,
-    } = props;
+    const { onBlur, onChange, enableAutocompletion } = props;
 
     return (
-      <StyledAceEditor {...commonProps}
-                       enableBasicAutocompletion={enableAutocompletion}
-                       enableLiveAutocompletion={enableAutocompletion}
-                       onBlur={onBlur}
-                       onChange={onChange} />
+      <StyledAceEditor
+        {...commonProps}
+        enableBasicAutocompletion={enableAutocompletion}
+        enableLiveAutocompletion={enableAutocompletion}
+        onBlur={onBlur}
+        onChange={onChange}
+      />
     );
   }
 

@@ -26,7 +26,7 @@ import { Link } from 'components/common/router';
 
 type NodeId = string;
 type Props = {
-  nodeId: NodeId,
+  nodeId: NodeId;
 };
 
 const BreakWord = styled.span`
@@ -43,12 +43,8 @@ const NodeName = ({ nodeId }: Props) => {
       <Link to={nodeURL}>
         <Icon name="circle-nodes" />
         &nbsp;
-        <BreakWord>
-          {node.short_node_id}
-        </BreakWord>&nbsp;/&nbsp;
-        <BreakWord>
-          {node.hostname}
-        </BreakWord>
+        <BreakWord>{node.short_node_id}</BreakWord>&nbsp;/&nbsp;
+        <BreakWord>{node.hostname}</BreakWord>
       </Link>
     );
   }

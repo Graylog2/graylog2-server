@@ -17,9 +17,7 @@
 
 import isAllMessagesRange from 'views/logic/queries/IsAllMessagesRange';
 import { NO_TIMERANGE_OVERRIDE, RELATIVE_ALL_TIME } from 'views/Constants';
-import {
-  normalizeIfClassifiedRelativeTimeRange,
-} from 'views/components/searchbar/time-range-filter/time-range-picker/RelativeTimeRangeClassifiedHelper';
+import { normalizeIfClassifiedRelativeTimeRange } from 'views/components/searchbar/time-range-filter/time-range-picker/RelativeTimeRangeClassifiedHelper';
 import { isTypeKeyword, isTypeRelativeWithEnd, isTypeRelativeWithStartOnly } from 'views/typeGuards/timeRange';
 import { adjustFormat, toUTCFromTz } from 'util/DateTime';
 import type { TimeRangePickerTimeRange } from 'views/components/searchbar/time-range-filter/time-range-picker/TimeRangePicker';
@@ -54,11 +52,7 @@ export const normalizeFromPickerForSearchBar = (timeRange: TimeRangePickerTimeRa
     return tr;
   };
 
-  return normalizeIfKeywordTimeRange(
-    normalizeIfAllMessagesRange(
-      normalizeIfClassifiedRelativeTimeRange(timeRange),
-    ),
-  );
+  return normalizeIfKeywordTimeRange(normalizeIfAllMessagesRange(normalizeIfClassifiedRelativeTimeRange(timeRange)));
 };
 
 export const normalizeFromSearchBarForBackend = (timerange: TimeRange, userTz: string): TimeRange => {
@@ -97,6 +91,7 @@ export const normalizeFromSearchBarForBackend = (timerange: TimeRange, userTz: s
       throw new Error('Invalid relative time range');
     case 'keyword':
       return timerange;
-    default: throw new Error(`Invalid time range type: ${type}`);
+    default:
+      throw new Error(`Invalid time range type: ${type}`);
   }
 };

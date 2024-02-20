@@ -22,7 +22,11 @@ import { act } from 'react-dom/test-utils';
 import DataTable from 'components/common/DataTable';
 import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';
 
-const rowFormatter = (row) => <tr><td>{row.title}</td></tr>;
+const rowFormatter = (row) => (
+  <tr>
+    <td>{row.title}</td>
+  </tr>
+);
 
 const simulateTypeAheadFilter = (wrapper, filterText) => {
   const filter = wrapper.find(TypeAheadDataFilter);
@@ -39,11 +43,7 @@ const simulateTypeAheadFilter = (wrapper, filterText) => {
 const filterRows = (rows, filterText) => rows.filter((row) => row.title.match(filterText));
 
 describe('<DataTable />', () => {
-  const rows = [
-    { title: 'Row 1' },
-    { title: 'Row 2' },
-    { title: 'Foo 3' },
-  ];
+  const rows = [{ title: 'Row 1' }, { title: 'Row 2' }, { title: 'Foo 3' }];
 
   it('should render with no rows', () => {
     const wrapper = mount(<DataTable id="myDataTable" headers={['One']} rows={[]} dataRowFormatter={rowFormatter} />);
@@ -53,17 +53,13 @@ describe('<DataTable />', () => {
   });
 
   it('should render with rows', () => {
-    const wrapper = mount(
-      <DataTable id="myDataTable" headers={['One']} rows={rows} dataRowFormatter={rowFormatter} />,
-    );
+    const wrapper = mount(<DataTable id="myDataTable" headers={['One']} rows={rows} dataRowFormatter={rowFormatter} />);
 
     expect(wrapper.find('tbody tr')).toHaveLength(rows.length);
   });
 
   it('should update rendered rows when array changes', () => {
-    const wrapper = mount(
-      <DataTable id="myDataTable" headers={['One']} rows={rows} dataRowFormatter={rowFormatter} />,
-    );
+    const wrapper = mount(<DataTable id="myDataTable" headers={['One']} rows={rows} dataRowFormatter={rowFormatter} />);
 
     expect(wrapper.find('tbody tr')).toHaveLength(rows.length);
 
@@ -78,7 +74,13 @@ describe('<DataTable />', () => {
 
   it('should filter rows', () => {
     const wrapper = mount(
-      <DataTable id="myDataTable" headers={['One']} rows={rows} dataRowFormatter={rowFormatter} filterKeys={['title']} />,
+      <DataTable
+        id="myDataTable"
+        headers={['One']}
+        rows={rows}
+        dataRowFormatter={rowFormatter}
+        filterKeys={['title']}
+      />,
     );
 
     expect(wrapper.find('tbody tr')).toHaveLength(rows.length);
@@ -96,7 +98,13 @@ describe('<DataTable />', () => {
 
   it('should keep filter when row in props change', () => {
     const wrapper = mount(
-      <DataTable id="myDataTable" headers={['One']} rows={rows} dataRowFormatter={rowFormatter} filterKeys={['title']} />,
+      <DataTable
+        id="myDataTable"
+        headers={['One']}
+        rows={rows}
+        dataRowFormatter={rowFormatter}
+        filterKeys={['title']}
+      />,
     );
 
     expect(wrapper.find('tbody tr')).toHaveLength(rows.length);
@@ -124,7 +132,13 @@ describe('<DataTable />', () => {
 
   it('should not try to render removed rows', () => {
     const wrapper = mount(
-      <DataTable id="myDataTable" headers={['One']} rows={rows} dataRowFormatter={rowFormatter} filterKeys={['title']} />,
+      <DataTable
+        id="myDataTable"
+        headers={['One']}
+        rows={rows}
+        dataRowFormatter={rowFormatter}
+        filterKeys={['title']}
+      />,
     );
 
     expect(wrapper.find('tbody tr')).toHaveLength(rows.length);

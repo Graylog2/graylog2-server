@@ -50,11 +50,8 @@ const emptyLocation = {
   key: '',
 };
 
-const ShowFocusedWidget = ({ focusedWidget }: WidgetFocusContextType) => (focusedWidget ? (
-  <span>Focused widget: {JSON.stringify(focusedWidget)}</span>
-) : (
-  <span>No focused widget</span>
-));
+const ShowFocusedWidget = ({ focusedWidget }: WidgetFocusContextType) =>
+  focusedWidget ? <span>Focused widget: {JSON.stringify(focusedWidget)}</span> : <span>No focused widget</span>;
 
 jest.mock('views/logic/slices/searchExecutionSlice', () => ({
   ...jest.requireActual('views/logic/slices/searchExecutionSlice'),
@@ -79,9 +76,7 @@ describe('WidgetFocusProvider', () => {
     return render(
       <TestStoreProvider view={view}>
         <WidgetFocusProvider>
-          <WidgetFocusContext.Consumer>
-            {consume}
-          </WidgetFocusContext.Consumer>
+          <WidgetFocusContext.Consumer>{consume}</WidgetFocusContext.Consumer>
         </WidgetFocusProvider>
       </TestStoreProvider>,
     );

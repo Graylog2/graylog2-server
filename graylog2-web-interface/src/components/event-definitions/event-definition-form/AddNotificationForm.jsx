@@ -19,8 +19,7 @@ import PropTypes from 'prop-types';
 
 import { Select } from 'components/common';
 import { Button, ButtonToolbar, Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/bootstrap';
-import EventNotificationFormContainer
-  from 'components/event-notifications/event-notification-form/EventNotificationFormContainer';
+import EventNotificationFormContainer from 'components/event-notifications/event-notification-form/EventNotificationFormContainer';
 import withTelemetry from 'logic/telemetry/withTelemetry';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -125,9 +124,15 @@ class AddNotificationForm extends React.Component {
   render() {
     const { notifications } = this.props;
     const { displayNewNotificationForm, selectedNotification } = this.state;
-    const doneButton = displayNewNotificationForm
-      ? <Button bsStyle="success" type="submit" form="new-notification-form">Add notification</Button>
-      : <Button bsStyle="success" onClick={this.handleSubmit}>Add notification</Button>;
+    const doneButton = displayNewNotificationForm ? (
+      <Button bsStyle="success" type="submit" form="new-notification-form">
+        Add notification
+      </Button>
+    ) : (
+      <Button bsStyle="success" onClick={this.handleSubmit}>
+        Add notification
+      </Button>
+    );
 
     return (
       <Row>
@@ -137,23 +142,27 @@ class AddNotificationForm extends React.Component {
           <fieldset>
             <FormGroup controlId="notification-select">
               <ControlLabel>Choose Notification</ControlLabel>
-              <Select id="notification-select"
-                      matchProp="label"
-                      placeholder="Select Notification"
-                      onChange={this.handleSelectNotificationChange}
-                      options={this.formatNotifications(notifications)}
-                      value={selectedNotification} />
+              <Select
+                id="notification-select"
+                matchProp="label"
+                placeholder="Select Notification"
+                onChange={this.handleSelectNotificationChange}
+                options={this.formatNotifications(notifications)}
+                value={selectedNotification}
+              />
               <HelpBlock>
-                Select a Notification to use on Alerts of this kind or create a new Notification that you can
-                later use in other Alerts.
+                Select a Notification to use on Alerts of this kind or create a new Notification that you can later use
+                in other Alerts.
               </HelpBlock>
             </FormGroup>
 
             {displayNewNotificationForm && (
-              <EventNotificationFormContainer action="create"
-                                              formId="new-notification-form"
-                                              onSubmit={this.handleNewNotificationSubmit}
-                                              embedded />
+              <EventNotificationFormContainer
+                action="create"
+                formId="new-notification-form"
+                onSubmit={this.handleNewNotificationSubmit}
+                embedded
+              />
             )}
           </fieldset>
 

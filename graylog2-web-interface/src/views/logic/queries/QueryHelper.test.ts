@@ -29,7 +29,10 @@ describe('QueryHelper', () => {
     });
 
     it('concat queries with custom operator and without brackets', () => {
-      const result = concatQueryStrings(['field1:value1 OR field2:value2', 'field3:value3'], { operator: 'OR', withBrackets: false });
+      const result = concatQueryStrings(['field1:value1 OR field2:value2', 'field3:value3'], {
+        operator: 'OR',
+        withBrackets: false,
+      });
 
       expect(result).toEqual('field1:value1 OR field2:value2 OR field3:value3');
     });

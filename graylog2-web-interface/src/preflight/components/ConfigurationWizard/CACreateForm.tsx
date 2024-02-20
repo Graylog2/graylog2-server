@@ -26,14 +26,9 @@ import UserNotification from 'preflight/util/UserNotification';
 import UnsecureConnectionAlert from 'preflight/components/ConfigurationWizard/UnsecureConnectionAlert';
 import { QUERY_KEY as DATA_NODES_CA_QUERY_KEY } from 'preflight/hooks/useDataNodesCA';
 
-type FormValues = {}
+type FormValues = {};
 
-const createCA = (caData: FormValues) => fetch(
-  'POST',
-  qualifyUrl('/api/ca/create'),
-  caData,
-  false,
-);
+const createCA = (caData: FormValues) => fetch('POST', qualifyUrl('/api/ca/create'), caData, false);
 
 const CACreateForm = () => {
   const queryClient = useQueryClient();
@@ -53,19 +48,18 @@ const CACreateForm = () => {
   return (
     <div>
       <p>
-        Here you can quickly create a new certificate authority.
-        All you need to do is to click on the &ldquo;Create CA&rdquo; button.
-        The CA should only be used to secure your Graylog data nodes.
+        Here you can quickly create a new certificate authority. All you need to do is to click on the &ldquo;Create
+        CA&rdquo; button. The CA should only be used to secure your Graylog data nodes.
       </p>
       <Space h="xs" />
-      <Formik initialValues={{ organization: 'Graylog CA' }} onSubmit={(formValues: FormValues) => onSubmit(formValues)}>
+      <Formik
+        initialValues={{ organization: 'Graylog CA' }}
+        onSubmit={(formValues: FormValues) => onSubmit(formValues)}
+      >
         {({ isSubmitting, isValid }) => (
           <Form>
             <UnsecureConnectionAlert renderIfSecure={<Space h="md" />} />
-            <FormikInput placeholder="Organization Name"
-                         name="organization"
-                         label="Organization Name"
-                         required />
+            <FormikInput placeholder="Organization Name" name="organization" label="Organization Name" required />
             <Space h="md" />
             <Button disabled={isSubmitting || !isValid} type="submit">
               {isSubmitting ? 'Creating CA...' : 'Create CA'}

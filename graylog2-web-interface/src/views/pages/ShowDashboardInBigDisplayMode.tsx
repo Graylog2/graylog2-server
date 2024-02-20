@@ -27,9 +27,9 @@ import useQuery from 'routing/useQuery';
 import ShowViewPage from './ShowViewPage';
 
 type BigDisplayModeQuery = {
-  tabs?: Array<number>,
-  interval: number,
-  refresh: number,
+  tabs?: Array<number>;
+  interval: number;
+  refresh: number;
 };
 
 const castQueryWithDefaults = ({ tabs, interval, refresh }: UntypedBigDisplayModeQuery): BigDisplayModeQuery => ({

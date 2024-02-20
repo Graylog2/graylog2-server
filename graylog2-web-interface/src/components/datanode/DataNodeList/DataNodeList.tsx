@@ -58,9 +58,7 @@ const columnRenderers: ColumnRenderers<DataNode> = {
   attributes: {
     hostname: {
       renderCell: (_hostname: string, dataNode: DataNode) => (
-        <Link to={Routes.SYSTEM.DATANODES.SHOW(dataNode.node_id)}>
-          {dataNode.hostname}
-        </Link>
+        <Link to={Routes.SYSTEM.DATANODES.SHOW(dataNode.node_id)}>{dataNode.hostname}</Link>
       ),
     },
     status: {
@@ -70,14 +68,14 @@ const columnRenderers: ColumnRenderers<DataNode> = {
       renderCell: (_is_leader: string, dataNode: DataNode) => (dataNode.is_leader ? 'yes' : 'no'),
     },
     cert_valid_until: {
-      renderCell: (_cert_valid_until: string, dataNode: DataNode) => <RelativeTime dateTime={dataNode.cert_valid_until} />,
+      renderCell: (_cert_valid_until: string, dataNode: DataNode) => (
+        <RelativeTime dateTime={dataNode.cert_valid_until} />
+      ),
     },
   },
 };
 
-const entityActions = (dataNode: DataNode) => (
-  <DataNodeActions dataNode={dataNode} />
-);
+const entityActions = (dataNode: DataNode) => <DataNodeActions dataNode={dataNode} />;
 
 const SearchContainer = styled.div`
   margin-bottom: 5px;
@@ -93,24 +91,28 @@ const DataNodeList = () => {
   });
   const paginationQueryParameter = usePaginationQueryParameter(undefined, layoutConfig.pageSize, false);
   const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(ENTITY_TABLE_ID);
-  const { data: { elements, pagination: { total } }, isInitialLoading: isInitialLoadingDataNodes, refetch } = useDataNodes({
-    query: query,
-    page: paginationQueryParameter.page,
-    pageSize: layoutConfig.pageSize,
-    sort: layoutConfig.sort,
-  }, { enabled: !isLoadingLayoutPreferences });
+  const {
+    data: {
+      elements,
+      pagination: { total },
+    },
+    isInitialLoading: isInitialLoadingDataNodes,
+    refetch,
+  } = useDataNodes(
+    {
+      query: query,
+      page: paginationQueryParameter.page,
+      pageSize: layoutConfig.pageSize,
+      sort: layoutConfig.sort,
+    },
+    { enabled: !isLoadingLayoutPreferences },
+  );
 
   useEffect(() => {
     refetch();
   }, [query, paginationQueryParameter.page, layoutConfig.pageSize, layoutConfig.sort, refetch]);
 
-  const {
-    onPageSizeChange,
-    onSearch,
-    onSearchReset,
-    onColumnsChange,
-    onSortChange,
-  } = useTableEventHandlers({
+  const { onPageSizeChange, onSearch, onSearchReset, onColumnsChange, onSortChange } = useTableEventHandlers({
     paginationQueryParameter,
     updateTableLayout,
     setQuery,
@@ -121,42 +123,48 @@ const DataNodeList = () => {
   }
 
   return (
-    <PaginatedList pageSize={layoutConfig.pageSize}
-                   showPageSizeSelect={false}
-                   totalItems={total}>
+    <PaginatedList pageSize={layoutConfig.pageSize} showPageSizeSelect={false} totalItems={total}>
       <SearchContainer>
-        <SearchForm onSearch={onSearch}
-                    onReset={onSearchReset}
-                    query={query}
-                    queryHelpComponent={(
-                      <QueryHelper entityName="datanode"
-                                   commonFields={['name']}
-                                   example={(
-                                     <p>
-                                       Find entities with a description containing node:<br />
-                                       <code>name:node</code><br />
-                                     </p>
-                                   )} />
-                    )} />
+        <SearchForm
+          onSearch={onSearch}
+          onReset={onSearchReset}
+          query={query}
+          queryHelpComponent={
+            <QueryHelper
+              entityName="datanode"
+              commonFields={['name']}
+              example={
+                <p>
+                  Find entities with a description containing node:
+                  <br />
+                  <code>name:node</code>
+                  <br />
+                </p>
+              }
+            />
+          }
+        />
       </SearchContainer>
       <div>
         {elements?.length === 0 ? (
           <NoSearchResult>No Data Nodes have been found</NoSearchResult>
         ) : (
-          <EntityDataTable<DataNode> data={elements}
-                                     visibleColumns={layoutConfig.displayedAttributes}
-                                     columnsOrder={DEFAULT_LAYOUT.columnsOrder}
-                                     onColumnsChange={onColumnsChange}
-                                     onSortChange={onSortChange}
-                                     onPageSizeChange={onPageSizeChange}
-                                     pageSize={layoutConfig.pageSize}
-                                     bulkSelection={{ actions: <DataNodeBulkActions /> }}
-                                     activeSort={layoutConfig.sort}
-                                     rowActions={entityActions}
-                                     actionsCellWidth={160}
-                                     columnRenderers={columnRenderers}
-                                     columnDefinitions={columnDefinitions}
-                                     entityAttributesAreCamelCase={false} />
+          <EntityDataTable<DataNode>
+            data={elements}
+            visibleColumns={layoutConfig.displayedAttributes}
+            columnsOrder={DEFAULT_LAYOUT.columnsOrder}
+            onColumnsChange={onColumnsChange}
+            onSortChange={onSortChange}
+            onPageSizeChange={onPageSizeChange}
+            pageSize={layoutConfig.pageSize}
+            bulkSelection={{ actions: <DataNodeBulkActions /> }}
+            activeSort={layoutConfig.sort}
+            rowActions={entityActions}
+            actionsCellWidth={160}
+            columnRenderers={columnRenderers}
+            columnDefinitions={columnDefinitions}
+            entityAttributesAreCamelCase={false}
+          />
         )}
       </div>
     </PaginatedList>

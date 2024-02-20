@@ -38,8 +38,8 @@ const Actions = styled(ButtonToolbar)`
 `;
 
 type Props = {
-  adapter: LookupTableAdapter,
-  error: string,
+  adapter: LookupTableAdapter;
+  error: string;
 };
 
 const DataAdapterTableEntry = ({ adapter, error = null }: Props) => {
@@ -82,22 +82,19 @@ const DataAdapterTableEntry = ({ adapter, error = null }: Props) => {
           </MetricContainer>
         </td>
         <td>
-          {loadingScopePermissions ? <Spinner /> : scopePermissions.is_mutable && (
-            <Actions>
-              <Button bsSize="xsmall"
-                      onClick={_onEdit}
-                      role="button"
-                      name="edit">
-                Edit
-              </Button>
-              <Button bsSize="xsmall"
-                      bsStyle="danger"
-                      onClick={_onDelete}
-                      role="button"
-                      name="delete">
-                Delete
-              </Button>
-            </Actions>
+          {loadingScopePermissions ? (
+            <Spinner />
+          ) : (
+            scopePermissions.is_mutable && (
+              <Actions>
+                <Button bsSize="xsmall" onClick={_onEdit} role="button" name="edit">
+                  Edit
+                </Button>
+                <Button bsSize="xsmall" bsStyle="danger" onClick={_onDelete} role="button" name="delete">
+                  Delete
+                </Button>
+              </Actions>
+            )
           )}
         </td>
       </tr>

@@ -33,18 +33,15 @@ import useQuery from 'routing/useQuery';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
-const _saveConfiguration = (history: HistoryFunction, indexSet: IndexSet) => IndexSetsActions.update(indexSet).then(() => {
-  history.push(Routes.SYSTEM.INDICES.LIST);
-});
+const _saveConfiguration = (history: HistoryFunction, indexSet: IndexSet) =>
+  IndexSetsActions.update(indexSet).then(() => {
+    history.push(Routes.SYSTEM.INDICES.LIST);
+  });
 
 const IndexSetConfigurationPage = () => {
   const { indexSetId } = useParams();
   const { indexSet } = useStore(IndexSetsStore);
-  const {
-    retentionStrategies,
-    rotationStrategies,
-    retentionStrategiesContext,
-  } = useStore(IndicesConfigurationStore);
+  const { retentionStrategies, rotationStrategies, retentionStrategiesContext } = useStore(IndicesConfigurationStore);
   const history = useHistory();
   const { from } = useQuery();
   const sendTelemetry = useSendTelemetry();
@@ -63,7 +60,7 @@ const IndexSetConfigurationPage = () => {
     return Routes.SYSTEM.INDICES.LIST;
   };
 
-  const isLoading = () => !indexSet || !rotationStrategies || !retentionStrategies || (indexSetId !== indexSet.id);
+  const isLoading = () => !indexSet || !rotationStrategies || !retentionStrategies || indexSetId !== indexSet.id;
 
   if (isLoading()) {
     return <Spinner />;
@@ -82,27 +79,31 @@ const IndexSetConfigurationPage = () => {
     <DocumentTitle title="Configure Index Set">
       <IndicesPageNavigation />
       <div>
-        <PageHeader title="Configure Index Set"
-                    documentationLink={{
-                      title: 'Index model documentation',
-                      path: DocsHelper.PAGES.INDEX_MODEL,
-                    }}>
+        <PageHeader
+          title="Configure Index Set"
+          documentationLink={{
+            title: 'Index model documentation',
+            path: DocsHelper.PAGES.INDEX_MODEL,
+          }}
+        >
           <span>
-            Modify the current configuration for this index set, allowing you to customize the retention, sharding,
-            and replication of messages coming from one or more streams.
+            Modify the current configuration for this index set, allowing you to customize the retention, sharding, and
+            replication of messages coming from one or more streams.
           </span>
         </PageHeader>
 
         <Row className="content">
           <Col md={12}>
-            <IndexSetConfigurationForm indexSet={indexSet}
-                                       retentionStrategiesContext={retentionStrategiesContext}
-                                       rotationStrategies={rotationStrategies}
-                                       retentionStrategies={retentionStrategies}
-                                       submitButtonText="Update index set"
-                                       submitLoadingText="Updating index set..."
-                                       cancelLink={formCancelLink()}
-                                       onUpdate={saveConfiguration} />
+            <IndexSetConfigurationForm
+              indexSet={indexSet}
+              retentionStrategiesContext={retentionStrategiesContext}
+              rotationStrategies={rotationStrategies}
+              retentionStrategies={retentionStrategies}
+              submitButtonText="Update index set"
+              submitLoadingText="Updating index set..."
+              cancelLink={formCancelLink()}
+              onUpdate={saveConfiguration}
+            />
           </Col>
         </Row>
       </div>

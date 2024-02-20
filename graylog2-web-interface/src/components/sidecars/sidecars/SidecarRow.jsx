@@ -29,18 +29,20 @@ import recentMessagesTimeRange from 'util/TimeRangeHelper';
 
 import style from './SidecarRow.css';
 
-const SidecarTR = styled.tr(({ inactive, theme }) => css`
-  color: ${inactive ? theme.utils.contrastingColor(theme.colors.table.background, 'AA') : 'currentColor'};
-  opacity: ${inactive ? 0.9 : 1};
+const SidecarTR = styled.tr(
+  ({ inactive, theme }) => css`
+    color: ${inactive ? theme.utils.contrastingColor(theme.colors.table.background, 'AA') : 'currentColor'};
+    opacity: ${inactive ? 0.9 : 1};
 
-  &:nth-of-type(2n+1) {
-    color: ${inactive ? theme.utils.contrastingColor(theme.colors.table.backgroundAlt, 'AA') : 'currentColor'};
-  }
+    &:nth-of-type(2n + 1) {
+      color: ${inactive ? theme.utils.contrastingColor(theme.colors.table.backgroundAlt, 'AA') : 'currentColor'};
+    }
 
-  td:not(:last-child) {
-    font-style: ${inactive ? 'italic' : 'normal'};
-  }
-`);
+    td:not(:last-child) {
+      font-style: ${inactive ? 'italic' : 'normal'};
+    }
+  `,
+);
 
 class SidecarRow extends React.Component {
   static propTypes = {
@@ -72,39 +74,50 @@ class SidecarRow extends React.Component {
     return (
       <SidecarTR inactive={!sidecar.active}>
         <td className={style.sidecarName}>
-          <Link to={Routes.SYSTEM.SIDECARS.STATUS(sidecar.node_id)}>
-            {sidecar.node_name}
-          </Link>
+          <Link to={Routes.SYSTEM.SIDECARS.STATUS(sidecar.node_id)}>{sidecar.node_name}</Link>
         </td>
         <td aria-label="Status">
-          <StatusIndicator status={sidecarStatus.status}
-                           message={sidecarStatus.message}
-                           id={sidecarStatus.id}
-                           lastSeen={sidecar.last_seen} />
+          <StatusIndicator
+            status={sidecarStatus.status}
+            message={sidecarStatus.message}
+            id={sidecarStatus.id}
+            lastSeen={sidecar.last_seen}
+          />
         </td>
         <td>
-          <OperatingSystemIcon operatingSystem={sidecar.node_details.operating_system} />&ensp;
+          <OperatingSystemIcon operatingSystem={sidecar.node_details.operating_system} />
+          &ensp;
           {sidecar.node_details.operating_system}
         </td>
         <td>
-          {showRelativeTime
-            ? <RelativeTime dateTime={sidecar.last_seen} />
-            : <Timestamp dateTime={sidecar.last_seen} />}
+          {showRelativeTime ? (
+            <RelativeTime dateTime={sidecar.last_seen} />
+          ) : (
+            <Timestamp dateTime={sidecar.last_seen} />
+          )}
         </td>
         <td>
           {sidecar.node_id}
           {annotation}
         </td>
-        <td>
-          {sidecar.sidecar_version}
-        </td>
+        <td>{sidecar.sidecar_version}</td>
         <td>
           <ButtonToolbar>
             <LinkContainer to={`${Routes.SYSTEM.SIDECARS.ADMINISTRATION}?node_id=${sidecar.node_id}`}>
-              <Button bsSize="xsmall" bsStyle="info">Manage sidecar</Button>
+              <Button bsSize="xsmall" bsStyle="info">
+                Manage sidecar
+              </Button>
             </LinkContainer>
-            <LinkContainer to={Routes.search_with_query(`gl2_source_collector:${sidecar.node_id}`, 'absolute', recentMessagesTimeRange())}>
-              <Button bsSize="xsmall" bsStyle="info">Show messages</Button>
+            <LinkContainer
+              to={Routes.search_with_query(
+                `gl2_source_collector:${sidecar.node_id}`,
+                'absolute',
+                recentMessagesTimeRange(),
+              )}
+            >
+              <Button bsSize="xsmall" bsStyle="info">
+                Show messages
+              </Button>
             </LinkContainer>
           </ButtonToolbar>
         </td>

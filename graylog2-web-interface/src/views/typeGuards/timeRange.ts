@@ -26,16 +26,25 @@ import type {
   AbsoluteTimeRange,
 } from 'views/logic/queries/Query';
 
-export const isTypeAbsolute = (timeRange: TimeRange | NoTimeRangeOverride): timeRange is AbsoluteTimeRange => 'type' in timeRange && timeRange.type === 'absolute';
+export const isTypeAbsolute = (timeRange: TimeRange | NoTimeRangeOverride): timeRange is AbsoluteTimeRange =>
+  'type' in timeRange && timeRange.type === 'absolute';
 
-export const isTypeRelative = (timeRange: TimeRange | NoTimeRangeOverride): timeRange is RelativeTimeRange => 'type' in timeRange && timeRange.type === 'relative';
+export const isTypeRelative = (timeRange: TimeRange | NoTimeRangeOverride): timeRange is RelativeTimeRange =>
+  'type' in timeRange && timeRange.type === 'relative';
 
-export const isTypeRelativeWithStartOnly = (timeRange: TimeRange | NoTimeRangeOverride): timeRange is RelativeTimeRangeStartOnly => isTypeRelative(timeRange) && 'range' in timeRange;
+export const isTypeRelativeWithStartOnly = (
+  timeRange: TimeRange | NoTimeRangeOverride,
+): timeRange is RelativeTimeRangeStartOnly => isTypeRelative(timeRange) && 'range' in timeRange;
 
-export const isTypeRelativeWithEnd = (timeRange: TimeRange | NoTimeRangeOverride): timeRange is RelativeTimeRangeWithEnd => isTypeRelative(timeRange) && 'from' in timeRange;
+export const isTypeRelativeWithEnd = (
+  timeRange: TimeRange | NoTimeRangeOverride,
+): timeRange is RelativeTimeRangeWithEnd => isTypeRelative(timeRange) && 'from' in timeRange;
 
-export const isTypeKeyword = (timeRange: TimeRange | NoTimeRangeOverride): timeRange is KeywordTimeRange => 'type' in timeRange && timeRange.type === 'keyword';
+export const isTypeKeyword = (timeRange: TimeRange | NoTimeRangeOverride): timeRange is KeywordTimeRange =>
+  'type' in timeRange && timeRange.type === 'keyword';
 
-export const isNoTimeRangeOverride = (timeRange: TimeRange | NoTimeRangeOverride): timeRange is NoTimeRangeOverride => timeRange !== undefined && isEqual(timeRange, {});
+export const isNoTimeRangeOverride = (timeRange: TimeRange | NoTimeRangeOverride): timeRange is NoTimeRangeOverride =>
+  timeRange !== undefined && isEqual(timeRange, {});
 
-export const isTimeRange = (timeRange: TimeRange | NoTimeRangeOverride): timeRange is TimeRange => timeRange && 'type' in timeRange;
+export const isTimeRange = (timeRange: TimeRange | NoTimeRangeOverride): timeRange is TimeRange =>
+  timeRange && 'type' in timeRange;

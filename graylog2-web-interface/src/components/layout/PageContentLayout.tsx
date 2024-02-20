@@ -24,13 +24,14 @@ import { Grid } from 'components/bootstrap';
 import Footer from 'components/layout/Footer';
 
 type Props = {
-  children?: React.ReactNode,
-  className?: string,
-  FooterComponent?: React.ComponentType,
-  NotificationsComponent?: React.ComponentType<{ children: React.ReactNode; }>,
+  children?: React.ReactNode;
+  className?: string;
+  FooterComponent?: React.ComponentType;
+  NotificationsComponent?: React.ComponentType<{ children: React.ReactNode }>;
 };
 
-const Container = styled.div(({ theme }) => `
+const Container = styled.div(
+  ({ theme }) => `
   display: flex;
   flex-direction: column;
   overflow: auto;
@@ -39,7 +40,8 @@ const Container = styled.div(({ theme }) => `
 
   /* Bottom gap is defined by the footer */
   padding: ${theme.spacings.sm} ${theme.spacings.sm} 0 ${theme.spacings.sm};
-`);
+`,
+);
 
 const StyledGrid = styled(Grid)`
   width: 100%;

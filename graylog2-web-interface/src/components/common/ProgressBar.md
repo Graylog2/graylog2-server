@@ -1,15 +1,18 @@
 ## Default
+
 ```js
 <ProgressBar bars={[{ value: 35 }]} />
 ```
 
 ## Labeled
+
 ```js
 const value = 60;
-<ProgressBar bars={[{ value, label: `${value}%` }]} />
+<ProgressBar bars={[{ value, label: `${value}%` }]} />;
 ```
 
 ## Variant
+
 ```js
 <div>
   <ProgressBar bars={[{ value: 70, bsStyle: 'primary' }]} />
@@ -21,6 +24,7 @@ const value = 60;
 ```
 
 ## Striped
+
 ```js
 <div>
   <ProgressBar bars={[{ value: 40, bsStyle: 'success', striped: true }]} />
@@ -29,17 +33,21 @@ const value = 60;
   <ProgressBar bars={[{ value: 80, bsStyle: 'danger', striped: true }]} />
 </div>
 ```
+
 ## Animated
 
 ```js
-  <ProgressBar bars={[{ value: 45, bsStyle: 'danger', animated: true }]} />
+<ProgressBar bars={[{ value: 45, bsStyle: 'danger', animated: true }]} />
 ```
 
 ## Multiples
+
 ```js
-<ProgressBar bars={[
-  { value: 35, bsStyle: 'success', striped: true },
-  { value: 20, bsStyle: 'warning' },
-  { value: 10, bsStyle: 'danger', animated: true }
-]} />
+<ProgressBar
+  bars={[
+    { value: 35, bsStyle: 'success', striped: true },
+    { value: 20, bsStyle: 'warning' },
+    { value: 10, bsStyle: 'danger', animated: true },
+  ]}
+/>
 ```

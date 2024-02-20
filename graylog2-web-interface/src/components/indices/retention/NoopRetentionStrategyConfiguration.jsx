@@ -26,9 +26,7 @@ const StyledAlert = styled(Alert)`
 `;
 
 const NoopRetentionStrategyConfiguration = () => (
-  <StyledAlert>
-    This retention strategy is not configurable because it does not do anything.
-  </StyledAlert>
+  <StyledAlert>This retention strategy is not configurable because it does not do anything.</StyledAlert>
 );
 
 export default NoopRetentionStrategyConfiguration;

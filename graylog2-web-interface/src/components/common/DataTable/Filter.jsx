@@ -26,35 +26,23 @@ const Wrapper = styled.div`
   }
 `;
 
-const Filter = ({
-  children,
-  displayKey,
-  filterBy,
-  filterKeys,
-  filterSuggestions,
-  id,
-  label,
-  onDataFiltered,
-  rows,
-}) => {
+const Filter = ({ children, displayKey, filterBy, filterKeys, filterSuggestions, id, label, onDataFiltered, rows }) => {
   if (filterKeys.length !== 0) {
     return (
       <Wrapper className="row">
         <div className="col-md-8">
-          <TypeAheadDataFilter id={`${id}-data-filter`}
-                               label={label}
-                               data={rows}
-                               displayKey={displayKey}
-                               filterBy={filterBy}
-                               filterSuggestions={filterSuggestions}
-                               searchInKeys={filterKeys}
-                               onDataFiltered={onDataFiltered} />
+          <TypeAheadDataFilter
+            id={`${id}-data-filter`}
+            label={label}
+            data={rows}
+            displayKey={displayKey}
+            filterBy={filterBy}
+            filterSuggestions={filterSuggestions}
+            searchInKeys={filterKeys}
+            onDataFiltered={onDataFiltered}
+          />
         </div>
-        {children && (
-          <div className="col-md-4">
-            {children}
-          </div>
-        )}
+        {children && <div className="col-md-4">{children}</div>}
       </Wrapper>
     );
   }

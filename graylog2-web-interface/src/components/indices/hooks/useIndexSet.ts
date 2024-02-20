@@ -21,12 +21,9 @@ import moment from 'moment';
 
 import useIndexDefaults from 'components/indices/hooks/useIndexDefaults';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
-import type {
-  RotationStrategyConfig,
-  RetentionStrategyConfig,
-} from 'components/indices/Types';
+import type { RotationStrategyConfig, RetentionStrategyConfig } from 'components/indices/Types';
 
-const useIndexSet = (initialIndexSet?: IndexSet) :[IndexSet, Dispatch<SetStateAction<IndexSet>>] => {
+const useIndexSet = (initialIndexSet?: IndexSet): [IndexSet, Dispatch<SetStateAction<IndexSet>>] => {
   const { loadingIndexDefaultsConfig, indexDefaultsConfig } = useIndexDefaults();
   const [indexSet, setIndexSet] = useState(initialIndexSet);
 
@@ -49,11 +46,15 @@ const useIndexSet = (initialIndexSet?: IndexSet) :[IndexSet, Dispatch<SetStateAc
       index_analyzer: indexDefaultsConfig.index_analyzer,
       index_optimization_max_num_segments: indexDefaultsConfig.index_optimization_max_num_segments,
       index_optimization_disabled: indexDefaultsConfig.index_optimization_disabled,
-      field_type_refresh_interval: moment.duration(indexDefaultsConfig.field_type_refresh_interval, indexDefaultsConfig.field_type_refresh_interval_unit).asMilliseconds(),
+      field_type_refresh_interval: moment
+        .duration(indexDefaultsConfig.field_type_refresh_interval, indexDefaultsConfig.field_type_refresh_interval_unit)
+        .asMilliseconds(),
     };
 
     if (initialIndexSet) {
-      const initialIndexWithoutNullValues = Object.fromEntries(Object.entries(initialIndexSet).filter(([_, v]) => v != null));
+      const initialIndexWithoutNullValues = Object.fromEntries(
+        Object.entries(initialIndexSet).filter(([_, v]) => v != null),
+      );
       setIndexSet({ ...defaultIndexSet, ...initialIndexWithoutNullValues });
     } else {
       setIndexSet({ ...defaultIndexSet });

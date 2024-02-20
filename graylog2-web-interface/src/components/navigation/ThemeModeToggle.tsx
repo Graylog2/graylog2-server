@@ -20,20 +20,19 @@ import styled, { css, useTheme } from 'styled-components';
 import defer from 'lodash/defer';
 
 import { Icon, Toggle } from 'components/common';
-import {
-  COLOR_SCHEME_LIGHT,
-  COLOR_SCHEME_DARK,
-} from 'theme/constants';
+import { COLOR_SCHEME_LIGHT, COLOR_SCHEME_DARK } from 'theme/constants';
 
 const ThemeModeToggleWrap = styled.div`
   display: flex;
   align-items: center;
 `;
 
-const ModeIcon = styled(Icon)<{ $currentMode: boolean }>(({ theme, $currentMode }) => css`
-  opacity: ${$currentMode ? '1' : '0.5'};
-  color: ${$currentMode ? theme.colors.brand.primary : theme.colors.variant.darkest.default};
-`);
+const ModeIcon = styled(Icon)<{ $currentMode: boolean }>(
+  ({ theme, $currentMode }) => css`
+    opacity: ${$currentMode ? '1' : '0.5'};
+    color: ${$currentMode ? theme.colors.brand.primary : theme.colors.variant.darkest.default};
+  `,
+);
 
 const ThemeModeToggle = () => {
   const theme = useTheme();
@@ -59,20 +58,26 @@ const ThemeModeToggle = () => {
 
   return (
     <ThemeModeToggleWrap>
-      <ModeIcon name={loadingLightMode ? 'spinner' : 'sun'}
-                spin={loadingLightMode}
-                $currentMode={currentMode === COLOR_SCHEME_LIGHT} />
+      <ModeIcon
+        name={loadingLightMode ? 'spinner' : 'sun'}
+        spin={loadingLightMode}
+        $currentMode={currentMode === COLOR_SCHEME_LIGHT}
+      />
       <Toggle>
-        <input value={COLOR_SCHEME_DARK}
-               type="checkbox"
-               onChange={toggleThemeMode}
-               checked={currentMode === COLOR_SCHEME_DARK}
-               disabled={loadingLightMode || loadingDarkMode} />
+        <input
+          value={COLOR_SCHEME_DARK}
+          type="checkbox"
+          onChange={toggleThemeMode}
+          checked={currentMode === COLOR_SCHEME_DARK}
+          disabled={loadingLightMode || loadingDarkMode}
+        />
         <span className="slider" />
       </Toggle>
-      <ModeIcon name={loadingDarkMode ? 'spinner' : 'moon'}
-                spin={loadingDarkMode}
-                $currentMode={currentMode === COLOR_SCHEME_DARK} />
+      <ModeIcon
+        name={loadingDarkMode ? 'spinner' : 'moon'}
+        spin={loadingDarkMode}
+        $currentMode={currentMode === COLOR_SCHEME_DARK}
+      />
     </ThemeModeToggleWrap>
   );
 };

@@ -32,18 +32,15 @@ const LoggerOverview = createReactClass({
     }
 
     const { subsystems } = this.state;
-    const nodeLoggers = Object.keys(this.state.loggers)
-      .map((nodeId) => (
-        <NodeLoggers key={`node-loggers-${nodeId}`}
-                     nodeId={nodeId}
-                     subsystems={subsystems[nodeId] ? subsystems[nodeId].subsystems : {}} />
-      ));
+    const nodeLoggers = Object.keys(this.state.loggers).map((nodeId) => (
+      <NodeLoggers
+        key={`node-loggers-${nodeId}`}
+        nodeId={nodeId}
+        subsystems={subsystems[nodeId] ? subsystems[nodeId].subsystems : {}}
+      />
+    ));
 
-    return (
-      <span>
-        {nodeLoggers}
-      </span>
-    );
+    return <span>{nodeLoggers}</span>;
   },
 });
 

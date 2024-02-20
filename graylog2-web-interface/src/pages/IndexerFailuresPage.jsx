@@ -63,22 +63,28 @@ class IndexerFailuresPage extends React.Component {
     return (
       <DocumentTitle title="Indexer failures">
         <span>
-          <PageHeader title="Indexer failures"
-                      documentationLink={{
-                        title: 'Indexer failures documentation',
-                        path: DocsHelper.PAGES.INDEXER_FAILURES,
-                      }}>
+          <PageHeader
+            title="Indexer failures"
+            documentationLink={{
+              title: 'Indexer failures documentation',
+              path: DocsHelper.PAGES.INDEXER_FAILURES,
+            }}
+          >
             <span>
-              This is a list of message index attempts that failed. A failure means that a message you sent to Graylog was{' '}
-              properly processed but writing it to the Elasticsearch cluster failed. Note that the list is capped to a size{' '}
-              of 50 MB so it will contain a lot of failure logs but not necessarily all that ever occurred.
+              This is a list of message index attempts that failed. A failure means that a message you sent to Graylog
+              was properly processed but writing it to the Elasticsearch cluster failed. Note that the list is capped to
+              a size of 50 MB so it will contain a lot of failure logs but not necessarily all that ever occurred.
               <br />
               Collection containing a total of {numeral(this.state.total).format('0,0')} indexer failures.
             </span>
           </PageHeader>
           <Row className="content">
             <Col md={12}>
-              <PaginatedList totalItems={this.state.total} onChange={this._onChangePaginatedList} pageSize={this.defaultPageSize}>
+              <PaginatedList
+                totalItems={this.state.total}
+                onChange={this._onChangePaginatedList}
+                pageSize={this.defaultPageSize}
+              >
                 <IndexerFailuresList failures={this.state.failures} />
               </PaginatedList>
             </Col>

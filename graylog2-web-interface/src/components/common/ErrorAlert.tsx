@@ -26,17 +26,19 @@ const StyledRow = styled(Row)`
   margin-bottom: 0 !important;
 `;
 
-const Container = styled.div<{ margin: number }>(({ margin }) => `
+const Container = styled.div<{ margin: number }>(
+  ({ margin }) => `
   margin-top: ${margin}px;
   margin-bottom: ${margin}px;
-`);
+`,
+);
 
 type Props = {
-  onClose: (msg?: string) => void,
-  children: React.ReactNode,
-  bsStyle: ColorVariant,
-  marginTopBottom: number,
-  runtimeError: boolean,
+  onClose: (msg?: string) => void;
+  children: React.ReactNode;
+  bsStyle: ColorVariant;
+  marginTopBottom: number;
+  runtimeError: boolean;
 };
 
 const ErrorAlert = ({ children, onClose, bsStyle = 'warning', marginTopBottom = 15, runtimeError }: Props) => {
@@ -69,11 +71,7 @@ ErrorAlert.propTypes = {
   bsStyle: PropTypes.string,
   runtimeError: PropTypes.bool,
   marginTopBottom: PropTypes.number,
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.element),
-    PropTypes.element,
-    PropTypes.string,
-  ]),
+  children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.element), PropTypes.element, PropTypes.string]),
   onClose: PropTypes.func,
 };
 

@@ -37,10 +37,10 @@ import DrilldownContextProvider from './contexts/DrilldownContextProvider';
 import WidgetFieldTypesContextProvider from './contexts/WidgetFieldTypesContextProvider';
 
 type Props = {
-  editing: boolean,
-  onPositionsChange: (position: BackendWidgetPosition) => void,
-  position: WidgetPosition,
-  widgetId: string,
+  editing: boolean;
+  onPositionsChange: (position: BackendWidgetPosition) => void;
+  position: WidgetPosition;
+  widgetId: string;
 };
 
 const useTitle = (widget: WidgetType) => {
@@ -49,18 +49,14 @@ const useTitle = (widget: WidgetType) => {
   return activeViewState?.titles?.getIn([TitleTypes.Widget, widget.id], defaultTitle(widget)) as string;
 };
 
-const WidgetComponent = ({
-  editing,
-  onPositionsChange = () => undefined,
-  position,
-  widgetId,
-}: Props) => {
+const WidgetComponent = ({ editing, onPositionsChange = () => undefined, position, widgetId }: Props) => {
   const widget = useWidget(widgetId);
   const viewType = useViewType();
   const title = useTitle(widget);
   const additionalContext = useMemo(() => ({ widget }), [widget]);
 
-  const WidgetFieldTypesIfDashboard = viewType === View.Type.Dashboard ? WidgetFieldTypesContextProvider : React.Fragment;
+  const WidgetFieldTypesIfDashboard =
+    viewType === View.Type.Dashboard ? WidgetFieldTypesContextProvider : React.Fragment;
 
   return (
     <DrilldownContextProvider widget={widget}>
@@ -68,12 +64,14 @@ const WidgetComponent = ({
         <AdditionalContext.Provider value={additionalContext}>
           <ExportSettingsContextProvider>
             <WidgetFieldTypesIfDashboard>
-              <Widget editing={editing}
-                      id={widget.id}
-                      onPositionsChange={onPositionsChange}
-                      position={position}
-                      title={title}
-                      widget={widget} />
+              <Widget
+                editing={editing}
+                id={widget.id}
+                onPositionsChange={onPositionsChange}
+                position={position}
+                title={title}
+                widget={widget}
+              />
             </WidgetFieldTypesIfDashboard>
           </ExportSettingsContextProvider>
         </AdditionalContext.Provider>

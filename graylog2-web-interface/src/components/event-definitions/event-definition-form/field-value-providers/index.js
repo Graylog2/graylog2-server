@@ -22,23 +22,28 @@ import LookupTableFieldValueProviderForm from './LookupTableFieldValueProviderFo
 import LookupTableFieldValueProviderFormContainer from './LookupTableFieldValueProviderFormContainer';
 import LookupTableFieldValueProviderSummary from './LookupTableFieldValueProviderSummary';
 
-PluginStore.register(new PluginManifest({}, {
-  fieldValueProviders: [
+PluginStore.register(
+  new PluginManifest(
+    {},
     {
-      type: TemplateFieldValueProviderForm.type,
-      displayName: 'Template',
-      formComponent: TemplateFieldValueProviderForm,
-      summaryComponent: TemplateFieldValueProviderSummary,
-      defaultConfig: TemplateFieldValueProviderForm.defaultConfig,
-      requiredFields: TemplateFieldValueProviderForm.requiredFields,
+      fieldValueProviders: [
+        {
+          type: TemplateFieldValueProviderForm.type,
+          displayName: 'Template',
+          formComponent: TemplateFieldValueProviderForm,
+          summaryComponent: TemplateFieldValueProviderSummary,
+          defaultConfig: TemplateFieldValueProviderForm.defaultConfig,
+          requiredFields: TemplateFieldValueProviderForm.requiredFields,
+        },
+        {
+          type: LookupTableFieldValueProviderForm.type,
+          displayName: 'Lookup Table',
+          formComponent: LookupTableFieldValueProviderFormContainer,
+          summaryComponent: LookupTableFieldValueProviderSummary,
+          defaultConfig: LookupTableFieldValueProviderForm.defaultConfig,
+          requiredFields: LookupTableFieldValueProviderForm.requiredFields,
+        },
+      ],
     },
-    {
-      type: LookupTableFieldValueProviderForm.type,
-      displayName: 'Lookup Table',
-      formComponent: LookupTableFieldValueProviderFormContainer,
-      summaryComponent: LookupTableFieldValueProviderSummary,
-      defaultConfig: LookupTableFieldValueProviderForm.defaultConfig,
-      requiredFields: LookupTableFieldValueProviderForm.requiredFields,
-    },
-  ],
-}));
+  ),
+);

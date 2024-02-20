@@ -43,7 +43,11 @@ class ConfigurationWell extends React.Component {
       finalValue = Array.isArray(value) ? value.join(', ') : String(value);
     }
 
-    return (<li key={`${id}-${key}`}><div className="key">{key}:</div> <div className="value">{finalValue}</div></li>);
+    return (
+      <li key={`${id}-${key}`}>
+        <div className="key">{key}:</div> <div className="value">{finalValue}</div>
+      </li>
+    );
   };
 
   _formatEncryptedField = (value, key) => {
@@ -56,7 +60,11 @@ class ConfigurationWell extends React.Component {
       finalValue = this.PASSWORD_PLACEHOLDER;
     }
 
-    return (<li key={`${id}-${key}`}><div className="key">{key}:</div> <div className="value">{finalValue}</div></li>);
+    return (
+      <li key={`${id}-${key}`}>
+        <div className="key">{key}:</div> <div className="value">{finalValue}</div>
+      </li>
+    );
   };
 
   _formatPasswordField = (value, key) => {
@@ -72,34 +80,38 @@ class ConfigurationWell extends React.Component {
 
   _formatConfiguration = (id, config, typeDefinition) => {
     if (!config) {
-      return ('');
+      return '';
     }
 
-    const formattedItems = Object.keys(config).sort().map((key) => {
-      const value = config[key];
-      const requestedConfiguration = (typeDefinition && typeDefinition.requested_configuration ? typeDefinition.requested_configuration[key] : undefined);
+    const formattedItems = Object.keys(config)
+      .sort()
+      .map((key) => {
+        const value = config[key];
+        const requestedConfiguration =
+          typeDefinition && typeDefinition.requested_configuration
+            ? typeDefinition.requested_configuration[key]
+            : undefined;
 
-      if (requestedConfiguration
-        && (requestedConfiguration.attributes.indexOf('is_password') > -1 || requestedConfiguration.attributes.indexOf('is_sensitive') > -1)) {
-        return this._formatPasswordField(value, key);
-      }
+        if (
+          requestedConfiguration &&
+          (requestedConfiguration.attributes.indexOf('is_password') > -1 ||
+            requestedConfiguration.attributes.indexOf('is_sensitive') > -1)
+        ) {
+          return this._formatPasswordField(value, key);
+        }
 
-      if (requestedConfiguration && requestedConfiguration.is_encrypted) {
-        return this._formatEncryptedField(value, key);
-      }
+        if (requestedConfiguration && requestedConfiguration.is_encrypted) {
+          return this._formatEncryptedField(value, key);
+        }
 
-      return this._formatRegularField(value, key);
-    });
+        return this._formatRegularField(value, key);
+      });
 
     if (formattedItems.length < 1) {
       formattedItems.push(<li key="placeholder">-- no configuration --</li>);
     }
 
-    return (
-      <ul>
-        {formattedItems}
-      </ul>
-    );
+    return <ul>{formattedItems}</ul>;
   };
 
   render() {

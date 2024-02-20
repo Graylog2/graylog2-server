@@ -25,18 +25,31 @@ import { RuleBuilderTypes, outputVariablesPropType } from './types';
 import type { OutputVariables, BlockFieldDict, BlockType } from './types';
 
 type Props = {
-  param: BlockFieldDict,
-  functionName: string,
-  blockId: string,
-  order: number,
-  outputVariableList?: OutputVariables,
-  blockType: BlockType,
+  param: BlockFieldDict;
+  functionName: string;
+  blockId: string;
+  order: number;
+  outputVariableList?: OutputVariables;
+  blockType: BlockType;
   resetField: (fieldName: string) => void;
-}
+};
 
-const SupportedFieldTypes = [RuleBuilderTypes.String, RuleBuilderTypes.Object, RuleBuilderTypes.Number, RuleBuilderTypes.Boolean];
+const SupportedFieldTypes = [
+  RuleBuilderTypes.String,
+  RuleBuilderTypes.Object,
+  RuleBuilderTypes.Number,
+  RuleBuilderTypes.Boolean,
+];
 
-const RuleBlockFormField = ({ param, functionName, blockId, order, outputVariableList, blockType, resetField }: Props) => {
+const RuleBlockFormField = ({
+  param,
+  functionName,
+  blockId,
+  order,
+  outputVariableList,
+  blockType,
+  resetField,
+}: Props) => {
   const [primaryInputToggle, setPrimaryInputToggle] = useState<'custom' | 'select' | undefined>(undefined);
   const [field, fieldMeta] = useField(param.name);
 
@@ -44,22 +57,22 @@ const RuleBlockFormField = ({ param, functionName, blockId, order, outputVariabl
     setPrimaryInputToggle(undefined);
   }, [functionName]);
 
-  const paramValueExists = (paramValue: string | number | boolean | undefined) : boolean => (
-    typeof paramValue !== 'undefined' && paramValue !== null);
+  const paramValueExists = (paramValue: string | number | boolean | undefined): boolean =>
+    typeof paramValue !== 'undefined' && paramValue !== null;
 
-  const paramValueIsVariable = (paramValue: string | number | boolean | undefined) : boolean => (
-    typeof paramValue === 'string' && paramValue.startsWith('$'));
+  const paramValueIsVariable = (paramValue: string | number | boolean | undefined): boolean =>
+    typeof paramValue === 'string' && paramValue.startsWith('$');
 
   const shouldHandlePrimaryParam = () => {
     if (!param.rule_builder_variable) return false;
-    if ((order === 0)) return false;
+    if (order === 0) return false;
 
     return true;
   };
 
-  const validateTextField = (value: string) : string | undefined => {
+  const validateTextField = (value: string): string | undefined => {
     if (paramValueExists(value) && paramValueIsVariable(value)) {
-      return 'Fields starting with \'$\' are not allowed.';
+      return "Fields starting with '$' are not allowed.";
     }
 
     return null;
@@ -70,7 +83,7 @@ const RuleBlockFormField = ({ param, functionName, blockId, order, outputVariabl
     resetField(param.name);
   };
 
-  const filteredOutputVariableList = () => (
+  const filteredOutputVariableList = () =>
     outputVariableList.filter((outputVariable) => {
       if (outputVariable.blockId === blockId) return false;
 
@@ -78,13 +91,13 @@ const RuleBlockFormField = ({ param, functionName, blockId, order, outputVariabl
 
       if (param.type === RuleBuilderTypes.Object) return true;
 
-      return (outputVariable.variableType === param.type);
-    }));
+      return outputVariable.variableType === param.type;
+    });
 
   const primaryInputButtonAfter = () => {
     if (!shouldHandlePrimaryParam() || filteredOutputVariableList().length <= 0) return null;
 
-    return (<Button onClick={() => onPrimaryInputToggle('select')}>Use output from previous steps</Button>);
+    return <Button onClick={() => onPrimaryInputToggle('select')}>Use output from previous steps</Button>;
   };
 
   const showOutputVariableSelect = () => {
@@ -103,7 +116,11 @@ const RuleBlockFormField = ({ param, functionName, blockId, order, outputVariabl
 
   const labelText = (labelParam: BlockFieldDict): React.ReactElement | string => {
     if (labelParam.optional) {
-      return <>{labelParam.name} <InputOptionalInfo /></>;
+      return (
+        <>
+          {labelParam.name} <InputOptionalInfo />
+        </>
+      );
     }
 
     return labelParam.name;
@@ -111,18 +128,25 @@ const RuleBlockFormField = ({ param, functionName, blockId, order, outputVariabl
 
   if (showOutputVariableSelect()) {
     return (
-      <FormikFormGroup type="select"
-                       key={`${functionName}_${param.name}`}
-                       name={param.name}
-                       label={labelText(param)}
-                       required={!param.optional}
-                       buttonAfter={<Button onClick={() => onPrimaryInputToggle('custom')}>{`Set custom ${param.name}`}</Button>}
-                       help={param.description}
-                       {...field}>
-        <option key="placeholder" value="">Select output from list</option>
+      <FormikFormGroup
+        type="select"
+        key={`${functionName}_${param.name}`}
+        name={param.name}
+        label={labelText(param)}
+        required={!param.optional}
+        buttonAfter={<Button onClick={() => onPrimaryInputToggle('custom')}>{`Set custom ${param.name}`}</Button>}
+        help={param.description}
+        {...field}
+      >
+        <option key="placeholder" value="">
+          Select output from list
+        </option>
         {filteredOutputVariableList().map(({ variableName, stepOrder }) => (
-          <option key={`option-${variableName}`} value={variableName}>{`Output from step ${(stepOrder + 1)} (${variableName})`}</option>),
-        )}
+          <option
+            key={`option-${variableName}`}
+            value={variableName}
+          >{`Output from step ${stepOrder + 1} (${variableName})`}</option>
+        ))}
       </FormikFormGroup>
     );
   }
@@ -133,65 +157,69 @@ const RuleBlockFormField = ({ param, functionName, blockId, order, outputVariabl
     case RuleBuilderTypes.String:
     case RuleBuilderTypes.Object:
       return (
-        <FormikFormGroup type="text"
-                         key={`${functionName}_${param.name}`}
-                         name={param.name}
-                         label={labelText(param)}
-                         required={!param.optional}
-                         validate={validateTextField}
-                         buttonAfter={primaryInputButtonAfter()}
-                         help={param.description}
-                         {...field} />
+        <FormikFormGroup
+          type="text"
+          key={`${functionName}_${param.name}`}
+          name={param.name}
+          label={labelText(param)}
+          required={!param.optional}
+          validate={validateTextField}
+          buttonAfter={primaryInputButtonAfter()}
+          help={param.description}
+          {...field}
+        />
       );
     case RuleBuilderTypes.Number:
       return (
-        <FormikFormGroup type="number"
-                         key={`${functionName}_${param.name}`}
-                         name={param.name}
-                         label={labelText(param)}
-                         required={!param.optional}
-                         buttonAfter={primaryInputButtonAfter()}
-                         help={param.description}
-                         {...field} />
-
+        <FormikFormGroup
+          type="number"
+          key={`${functionName}_${param.name}`}
+          name={param.name}
+          label={labelText(param)}
+          required={!param.optional}
+          buttonAfter={primaryInputButtonAfter()}
+          help={param.description}
+          {...field}
+        />
       );
     case RuleBuilderTypes.Boolean:
       return (
         <>
           <ControlLabel className="col-sm-3">{labelText(param)}</ControlLabel>
-          <FormikFormGroup type="checkbox"
-                           key={`${functionName}_${param.name}`}
-                           name={param.name}
-                           label={field.value ? 'true' : 'false'}
-                           help={param.description}
-                           checked={field.value}
-                           buttonAfter={primaryInputButtonAfter()}
-                           {...field} />
+          <FormikFormGroup
+            type="checkbox"
+            key={`${functionName}_${param.name}`}
+            name={param.name}
+            label={field.value ? 'true' : 'false'}
+            help={param.description}
+            checked={field.value}
+            buttonAfter={primaryInputButtonAfter()}
+            {...field}
+          />
         </>
       );
     default:
       if (blockType === 'action') {
         return (
-          <FormikFormGroup type="select"
-                           key={`${functionName}_${param.name}`}
-                           name={param.name}
-                           label={labelText(param)}
-                           required={!param.optional}
-                           help={
-                            (!filteredOutputVariableList().length && param.optional)
-                              ? typeNotFoundErrorMessage
-                              : param.description
-                           }
-                           error={
-                             (!filteredOutputVariableList().length && !param.optional)
-                               ? typeNotFoundErrorMessage
-                               : undefined
-                           }
-                           {...field}>
-            <option key="placeholder" value="">Select output from list</option>
+          <FormikFormGroup
+            type="select"
+            key={`${functionName}_${param.name}`}
+            name={param.name}
+            label={labelText(param)}
+            required={!param.optional}
+            help={!filteredOutputVariableList().length && param.optional ? typeNotFoundErrorMessage : param.description}
+            error={!filteredOutputVariableList().length && !param.optional ? typeNotFoundErrorMessage : undefined}
+            {...field}
+          >
+            <option key="placeholder" value="">
+              Select output from list
+            </option>
             {filteredOutputVariableList().map(({ variableName, stepOrder }) => (
-              <option key={`option-${variableName}`} value={variableName}>{`Output from step ${(stepOrder + 1)} (${variableName})`}</option>),
-            )}
+              <option
+                key={`option-${variableName}`}
+                value={variableName}
+              >{`Output from step ${stepOrder + 1} (${variableName})`}</option>
+            ))}
           </FormikFormGroup>
         );
       }

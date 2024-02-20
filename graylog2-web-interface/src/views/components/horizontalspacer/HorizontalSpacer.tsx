@@ -26,9 +26,9 @@ import styled from 'styled-components';
 
 type Props = {
   /** Needed height in px */
-  height: number,
+  height: number;
   /** Allow custom classNames */
-  className?: string,
+  className?: string;
 };
 
 const Spacer = styled.div<Pick<Props, 'height'>>`

@@ -31,53 +31,65 @@ import useMapKeys from 'views/components/visualizations/useMapKeys';
 import type { Generator } from '../ChartData';
 import XYPlot from '../XYPlot';
 
-const AreaVisualization = makeVisualization(({
-  config,
-  data,
-  effectiveTimerange,
-  height,
-}: VisualizationComponentProps) => {
-  const visualizationConfig = (config.visualizationConfig || AreaVisualizationConfig.empty()) as AreaVisualizationConfig;
-  const { interpolation = 'linear' } = visualizationConfig;
-  const mapKeys = useMapKeys();
-  const rowPivotFields = useMemo(() => config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [], [config?.rowPivots]);
-  const _mapKeys = useCallback((labels: string[]) => labels
-    .map((label) => label.split(keySeparator)
-      .map((l, i) => mapKeys(l, rowPivotFields[i]))
-      .join(humanSeparator),
-    ), [mapKeys, rowPivotFields]);
-  const chartGenerator: Generator = useCallback(({ type, name, labels, values, originalName }) => ({
-    type,
-    name,
-    x: _mapKeys(labels),
-    y: values,
-    fill: 'tozeroy',
-    line: { shape: toPlotly(interpolation) },
-    originalName,
-  }), [_mapKeys, interpolation]);
+const AreaVisualization = makeVisualization(
+  ({ config, data, effectiveTimerange, height }: VisualizationComponentProps) => {
+    const visualizationConfig = (config.visualizationConfig ||
+      AreaVisualizationConfig.empty()) as AreaVisualizationConfig;
+    const { interpolation = 'linear' } = visualizationConfig;
+    const mapKeys = useMapKeys();
+    const rowPivotFields = useMemo(
+      () => config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [],
+      [config?.rowPivots],
+    );
+    const _mapKeys = useCallback(
+      (labels: string[]) =>
+        labels.map((label) =>
+          label
+            .split(keySeparator)
+            .map((l, i) => mapKeys(l, rowPivotFields[i]))
+            .join(humanSeparator),
+        ),
+      [mapKeys, rowPivotFields],
+    );
+    const chartGenerator: Generator = useCallback(
+      ({ type, name, labels, values, originalName }) => ({
+        type,
+        name,
+        x: _mapKeys(labels),
+        y: values,
+        fill: 'tozeroy',
+        line: { shape: toPlotly(interpolation) },
+        originalName,
+      }),
+      [_mapKeys, interpolation],
+    );
 
-  const rows = useMemo(() => retrieveChartData(data), [data]);
+    const rows = useMemo(() => retrieveChartData(data), [data]);
 
-  const _chartDataResult = useChartData(rows, {
-    widgetConfig: config,
-    chartType: 'scatter',
-    generator: chartGenerator,
-  });
+    const _chartDataResult = useChartData(rows, {
+      widgetConfig: config,
+      chartType: 'scatter',
+      generator: chartGenerator,
+    });
 
-  const { eventChartData, shapes } = useEvents(config, data.events);
+    const { eventChartData, shapes } = useEvents(config, data.events);
 
-  const chartDataResult = eventChartData ? [..._chartDataResult, eventChartData] : _chartDataResult;
-  const layout: { shapes?: Shapes } = shapes ? { shapes } : {};
+    const chartDataResult = eventChartData ? [..._chartDataResult, eventChartData] : _chartDataResult;
+    const layout: { shapes?: Shapes } = shapes ? { shapes } : {};
 
-  return (
-    <XYPlot config={config}
-            axisType={visualizationConfig.axisType}
-            plotLayout={layout}
-            effectiveTimerange={effectiveTimerange}
-            height={height}
-            chartData={chartDataResult} />
-  );
-}, 'area');
+    return (
+      <XYPlot
+        config={config}
+        axisType={visualizationConfig.axisType}
+        plotLayout={layout}
+        effectiveTimerange={effectiveTimerange}
+        height={height}
+        chartData={chartDataResult}
+      />
+    );
+  },
+  'area',
+);
 
 AreaVisualization.propTypes = {
   config: AggregationType.isRequired,

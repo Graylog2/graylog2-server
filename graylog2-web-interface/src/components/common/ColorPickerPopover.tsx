@@ -22,13 +22,13 @@ import ColorPicker from 'components/common/ColorPicker';
 import Popover from 'components/common/Popover';
 
 type Props = {
-  id: string,
-  placement?: 'top' | 'right' | 'bottom' | 'left',
-  title?: string,
-  triggerNode: React.ReactElement,
-  color: string,
-  colors?: Array<Array<string>>,
-  onChange: (color: string, event: React.ChangeEvent<HTMLInputElement>, handleToggle: () => void) => void,
+  id: string;
+  placement?: 'top' | 'right' | 'bottom' | 'left';
+  title?: string;
+  triggerNode: React.ReactElement;
+  color: string;
+  colors?: Array<Array<string>>;
+  onChange: (color: string, event: React.ChangeEvent<HTMLInputElement>, handleToggle: () => void) => void;
 };
 
 /**
@@ -44,13 +44,18 @@ const ColorPickerPopover = ({ id, placement, title, triggerNode, onChange, ...re
   const [show, setShow] = useState(false);
   const toggleTarget = useRef();
 
-  const handleToggle = useCallback(() => { setShow(!show); }, [show]);
+  const handleToggle = useCallback(() => {
+    setShow(!show);
+  }, [show]);
 
   const onClose = useCallback(() => setShow(false), []);
 
-  const handleChange = useCallback((newColor: string, event: React.ChangeEvent<HTMLInputElement>) => {
-    onChange(newColor, event, handleToggle);
-  }, [handleToggle, onChange]);
+  const handleChange = useCallback(
+    (newColor: string, event: React.ChangeEvent<HTMLInputElement>) => {
+      onChange(newColor, event, handleToggle);
+    },
+    [handleToggle, onChange],
+  );
 
   return (
     <Popover id={id} opened={show} position={placement} onClose={onClose}>
@@ -62,8 +67,7 @@ const ColorPickerPopover = ({ id, placement, title, triggerNode, onChange, ...re
       </Popover.Target>
 
       <Popover.Dropdown title={title}>
-        <ColorPicker onChange={handleChange}
-                     {...rest} />
+        <ColorPicker onChange={handleChange} {...rest} />
       </Popover.Dropdown>
     </Popover>
   );
@@ -79,11 +83,11 @@ ColorPickerPopover.propTypes = {
   /** React node that will be used as trigger to show/hide the popover. */
   triggerNode: PropTypes.node.isRequired,
   /**
-     * Function that will be called when the selected color changes.
-     * The function receives the color in hexadecimal format as first argument,
-     * the event as the second argument, and a callback function to hide the
-     * overlay as third argument.
-     */
+   * Function that will be called when the selected color changes.
+   * The function receives the color in hexadecimal format as first argument,
+   * the event as the second argument, and a callback function to hide the
+   * overlay as third argument.
+   */
   onChange: PropTypes.func.isRequired,
 };
 

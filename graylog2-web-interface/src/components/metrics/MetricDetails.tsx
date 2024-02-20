@@ -75,9 +75,9 @@ const StyledMetricDetail = styled.div`
 `;
 
 type Props = {
-  metric: Metric,
-  nodeId: string,
-}
+  metric: Metric;
+  nodeId: string;
+};
 
 const MetricDetails = ({ nodeId, metric, metric: { full_name: metricName } }: Props) => {
   const metrics = useStore(MetricsStore, (metricsStoreState) => metricsStoreState.metrics);
@@ -85,7 +85,9 @@ const MetricDetails = ({ nodeId, metric, metric: { full_name: metricName } }: Pr
   useEffect(() => {
     MetricsActions.add(nodeId, metricName);
 
-    return () => { MetricsActions.remove(nodeId, metricName); };
+    return () => {
+      MetricsActions.remove(nodeId, metricName);
+    };
   }, [metricName, nodeId]);
 
   const currentMetric = metrics?.[nodeId]?.[metricName] ?? metric;

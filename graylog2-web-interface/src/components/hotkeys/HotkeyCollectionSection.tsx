@@ -59,19 +59,19 @@ const keyMapper = (key: string, isMacOS: boolean) => {
 };
 
 type KeyProps = {
-  combinationKey: string,
-  description: string,
-  isMacOS: boolean,
-  keys: string | Array<string>,
-  splitKey: string,
-}
+  combinationKey: string;
+  description: string;
+  isMacOS: boolean;
+  keys: string | Array<string>;
+  splitKey: string;
+};
 
 type ShortcutKeysProps = {
-  keys: string | Array<string>,
-  splitKey: string,
-  combinationKey: string,
-  isMacOS: boolean
-}
+  keys: string | Array<string>;
+  splitKey: string;
+  combinationKey: string;
+  isMacOS: boolean;
+};
 
 const ShortcutKeys = ({ keys, splitKey, combinationKey, isMacOS }: ShortcutKeysProps) => {
   const shortcutsArray = isArray(keys) ? keys : [keys];
@@ -112,16 +112,16 @@ const Key = ({ description, keys, combinationKey, splitKey, isMacOS }: KeyProps)
   </ShortcutListItem>
 );
 type Props = {
-  title: string,
-  description: string,
+  title: string;
+  description: string;
   sectionActions: Array<{
-    keyDescription: string,
-    reactKey: string,
-    keys: string | Array<string>,
-    splitKey: string,
-    combinationKey: string,
-    isEnabled: boolean,
-  }>
+    keyDescription: string;
+    reactKey: string;
+    keys: string | Array<string>;
+    splitKey: string;
+    combinationKey: string;
+    isEnabled: boolean;
+  }>;
 };
 
 const HotkeyCollectionSection = ({ title, description, sectionActions }: Props) => {
@@ -132,12 +132,14 @@ const HotkeyCollectionSection = ({ title, description, sectionActions }: Props) 
       <p className="description">{description}</p>
       <ShortcutList>
         {sectionActions.map(({ keyDescription, keys, combinationKey, splitKey, reactKey }) => (
-          <Key description={keyDescription}
-               keys={keys}
-               combinationKey={combinationKey}
-               splitKey={splitKey}
-               isMacOS={isMacOS}
-               key={reactKey} />
+          <Key
+            description={keyDescription}
+            keys={keys}
+            combinationKey={combinationKey}
+            splitKey={splitKey}
+            isMacOS={isMacOS}
+            key={reactKey}
+          />
         ))}
       </ShortcutList>
     </SectionComponent>

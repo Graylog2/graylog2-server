@@ -23,33 +23,38 @@ import ExpandedEntitiesSectionsContext from './ExpandedSectionsContext';
 const ExpandedSectionsProvider = ({ children }: { children: React.ReactNode }): React.ReactElement => {
   const [expandedSections, setExpandedSections] = useState<{ [entityId: string]: Array<string> } | undefined>();
 
-  const toggleSection = useCallback((entityId: string, sectionName: string) => setExpandedSections((cur) => {
-    const newCur = { ...cur ?? {} };
+  const toggleSection = useCallback(
+    (entityId: string, sectionName: string) =>
+      setExpandedSections((cur) => {
+        const newCur = { ...(cur ?? {}) };
 
-    if (newCur[entityId]?.includes(sectionName)) {
-      const newSections = newCur[entityId].filter((section) => section !== sectionName);
+        if (newCur[entityId]?.includes(sectionName)) {
+          const newSections = newCur[entityId].filter((section) => section !== sectionName);
 
-      if (newSections.length === 0) {
-        delete newCur[entityId];
+          if (newSections.length === 0) {
+            delete newCur[entityId];
 
-        return newCur;
-      }
+            return newCur;
+          }
 
-      return { ...newCur, [entityId]: newSections };
-    }
+          return { ...newCur, [entityId]: newSections };
+        }
 
-    return { ...newCur, [entityId]: [...newCur[entityId] ?? [], sectionName] };
-  }), []);
+        return { ...newCur, [entityId]: [...(newCur[entityId] ?? []), sectionName] };
+      }),
+    [],
+  );
 
-  const contextValue = useMemo(() => ({
-    expandedSections,
-    toggleSection,
-  }), [expandedSections, toggleSection]);
+  const contextValue = useMemo(
+    () => ({
+      expandedSections,
+      toggleSection,
+    }),
+    [expandedSections, toggleSection],
+  );
 
   return (
-    <ExpandedEntitiesSectionsContext.Provider value={contextValue}>
-      {children}
-    </ExpandedEntitiesSectionsContext.Provider>
+    <ExpandedEntitiesSectionsContext.Provider value={contextValue}>{children}</ExpandedEntitiesSectionsContext.Provider>
   );
 };
 

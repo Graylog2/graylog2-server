@@ -26,11 +26,11 @@ import useUserDateTime from 'hooks/useUserDateTime';
 import style from './StatusIndicator.css';
 
 type Props = {
-  message: string,
-  status: number,
-  lastSeen: string,
-  id: string,
-}
+  message: string;
+  status: number;
+  lastSeen: string;
+  id: string;
+};
 
 const StatusIndicator = ({ message: messageProp, status, lastSeen, id }: Props) => {
   const { toUserTimezone } = useUserDateTime();

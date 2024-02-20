@@ -32,29 +32,31 @@ const Content = styled.div`
   position: relative;
 `;
 
-const Actions = styled.div<{ $scrolledToBottom: boolean, $alignAtBottom: boolean }>(({ theme, $scrolledToBottom, $alignAtBottom }) => css`
-  position: sticky;
-  width: 100%;
-  bottom: 0;
-  background: ${theme.colors.global.contentBackground};
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  justify-content: ${$alignAtBottom ? 'flex-end' : 'space-between'};
-  padding-top: 5px;
+const Actions = styled.div<{ $scrolledToBottom: boolean; $alignAtBottom: boolean }>(
+  ({ theme, $scrolledToBottom, $alignAtBottom }) => css`
+    position: sticky;
+    width: 100%;
+    bottom: 0;
+    background: ${theme.colors.global.contentBackground};
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    justify-content: ${$alignAtBottom ? 'flex-end' : 'space-between'};
+    padding-top: 5px;
 
-  &::before {
-    box-shadow: 1px -2px 3px rgb(0 0 0 / 25%);
-    content: ' ';
-    display: ${$scrolledToBottom ? 'block' : 'none'};
-    height: 3px;
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-  }
-`);
+    &::before {
+      box-shadow: 1px -2px 3px rgb(0 0 0 / 25%);
+      content: ' ';
+      display: ${$scrolledToBottom ? 'block' : 'none'};
+      height: 3px;
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+    }
+  `,
+);
 
 const ScrolledToBottomIndicator = styled.div`
   width: 1px;
@@ -65,16 +67,19 @@ const ScrolledToBottomIndicator = styled.div`
 `;
 
 const useScrolledToBottom = (): {
-  setScrolledToBottomIndicatorRef: (ref: HTMLDivElement) => void,
-  scrolledToBottom: boolean
+  setScrolledToBottomIndicatorRef: (ref: HTMLDivElement) => void;
+  scrolledToBottom: boolean;
 } => {
   const [scrolledToBottomIndicatorRef, setScrolledToBottomIndicatorRef] = useState(null);
   const [scrolledToBottom, setScrolledToBottom] = useState(false);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => {
-      setScrolledToBottom(!entry.isIntersecting);
-    }, { threshold: 0.9 });
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setScrolledToBottom(!entry.isIntersecting);
+      },
+      { threshold: 0.9 },
+    );
 
     if (scrolledToBottomIndicatorRef) {
       observer.observe(scrolledToBottomIndicatorRef);
@@ -91,12 +96,12 @@ const useScrolledToBottom = (): {
 };
 
 type Props = {
-  actions: React.ReactNode,
-  children: React.ReactNode,
-  className?: string,
+  actions: React.ReactNode;
+  children: React.ReactNode;
+  className?: string;
   // Set this to align the actions at the bottom of the free space
-  alignActionsAtBottom?: boolean,
-}
+  alignActionsAtBottom?: boolean;
+};
 
 const StickyBottomActions = ({ actions, children, className, alignActionsAtBottom }: Props) => {
   const { setScrolledToBottomIndicatorRef, scrolledToBottom } = useScrolledToBottom();

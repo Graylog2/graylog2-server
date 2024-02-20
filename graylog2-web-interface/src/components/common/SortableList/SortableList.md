@@ -1,6 +1,6 @@
 ```js
 import createReactClass from 'create-react-class';
-import SortableList from './SortableList'
+import SortableList from './SortableList';
 
 const SortableListExample = createReactClass({
   getInitialState() {
@@ -25,12 +25,12 @@ const SortableListExample = createReactClass({
 
     return (
       <div>
-        <p>Sorted list: {sortedList.map(item => item.title).join(', ')}</p>
+        <p>Sorted list: {sortedList.map((item) => item.title).join(', ')}</p>
         <SortableList items={list} onMoveItem={this.onSortList} />
       </div>
     );
   },
 });
 
-<SortableListExample />
+<SortableListExample />;
 ```

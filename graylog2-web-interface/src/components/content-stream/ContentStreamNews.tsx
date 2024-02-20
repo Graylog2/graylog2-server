@@ -34,12 +34,8 @@ const ContentStreamNews = () => {
     return (
       <Alert bsStyle="info">
         <p>
-          Unable to load RSS feed at the moment ! You can read more
-          on {' '}
-          <ExternalLink href="https://www.graylog.org/blog/">
-            Graylog
-          </ExternalLink>
-          .
+          Unable to load RSS feed at the moment ! You can read more on{' '}
+          <ExternalLink href="https://www.graylog.org/blog/">Graylog</ExternalLink>.
         </p>
       </Alert>
     );

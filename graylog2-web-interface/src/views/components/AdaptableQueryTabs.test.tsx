@@ -55,7 +55,12 @@ Object.defineProperties(window.HTMLElement.prototype, {
 const DEFAULT_PROPS = {
   maxWidth: 600,
   queries: Immutable.OrderedSet(['query-id-1', 'query-id-2', 'query-id-3', 'query-id-4']),
-  titles: Immutable.Map<string, string>([['query-id-1', 'Tab 1'], ['query-id-2', 'Tab 2'], ['query-id-3', 'Tab 3'], ['query-id-4', 'Tab 4']]),
+  titles: Immutable.Map<string, string>([
+    ['query-id-1', 'Tab 1'],
+    ['query-id-2', 'Tab 2'],
+    ['query-id-3', 'Tab 3'],
+    ['query-id-4', 'Tab 4'],
+  ]),
   onRemove: () => Promise.resolve(),
   onTitleChange: () => Promise.resolve(Map(['tab', Map(['query-id-1', 'Tab 1'])]) as TitlesMap),
   onSelect: (id: string) => Promise.resolve(id),
@@ -113,26 +118,34 @@ describe('AdaptableQueryTabs', () => {
 
       // Displays main tabs
       mainTabs.forEach((tabNr) => {
-        expect(screen.getByRole(mainTabRole, {
-          name: `Tab ${tabNr}`,
-        })).toBeInTheDocument();
+        expect(
+          screen.getByRole(mainTabRole, {
+            name: `Tab ${tabNr}`,
+          }),
+        ).toBeInTheDocument();
 
         // Does not display main tabs in dropdown
-        expect(screen.queryByRole(dropdownTabRole, {
-          name: `Tab ${tabNr}`,
-        })).not.toBeInTheDocument();
+        expect(
+          screen.queryByRole(dropdownTabRole, {
+            name: `Tab ${tabNr}`,
+          }),
+        ).not.toBeInTheDocument();
       });
 
       // Displays dropdown tabs
       dropdownTabs.forEach((tabNr) => {
-        expect(screen.getByRole(dropdownTabRole, {
-          name: `Tab ${tabNr}`,
-        })).toBeInTheDocument();
+        expect(
+          screen.getByRole(dropdownTabRole, {
+            name: `Tab ${tabNr}`,
+          }),
+        ).toBeInTheDocument();
 
         // Does not display tabs in dropdown as main tabs
-        expect(screen.queryByRole(mainTabRole, {
-          name: `Tab ${tabNr}`,
-        })).not.toBeInTheDocument();
+        expect(
+          screen.queryByRole(mainTabRole, {
+            name: `Tab ${tabNr}`,
+          }),
+        ).not.toBeInTheDocument();
       });
 
       await closeMoreTabsDropdown();
@@ -151,14 +164,18 @@ describe('AdaptableQueryTabs', () => {
 
       // Displays main tabs
       mainTabs.forEach((tabNr) => {
-        expect(screen.getByRole(mainTabRole, {
-          name: `Tab ${tabNr}`,
-        })).toBeInTheDocument();
+        expect(
+          screen.getByRole(mainTabRole, {
+            name: `Tab ${tabNr}`,
+          }),
+        ).toBeInTheDocument();
 
         // Does not display main tabs in dropdown
-        expect(screen.queryByRole(dropdownTabRole, {
-          name: `Tab ${tabNr}`,
-        })).not.toBeInTheDocument();
+        expect(
+          screen.queryByRole(dropdownTabRole, {
+            name: `Tab ${tabNr}`,
+          }),
+        ).not.toBeInTheDocument();
       });
 
       await closeMoreTabsDropdown();
@@ -179,9 +196,11 @@ describe('AdaptableQueryTabs', () => {
 
       // Displays main tabs
       mainTabs.forEach((tabNr) => {
-        expect(screen.getByRole(mainTabRole, {
-          name: `Tab ${tabNr}`,
-        })).toBeInTheDocument();
+        expect(
+          screen.getByRole(mainTabRole, {
+            name: `Tab ${tabNr}`,
+          }),
+        ).toBeInTheDocument();
       });
     });
 

@@ -31,37 +31,47 @@ import type { RuleBuilderRule } from './rule-builder/types';
 import { useRuleBuilder } from './rule-builder/RuleBuilderContext';
 import { hasRuleBuilderErrors } from './rule-builder/helpers';
 
-const ResetButton = styled(Button)(({ theme }) => css`
-  margin-left: ${theme.spacings.xs};
-`);
+const ResetButton = styled(Button)(
+  ({ theme }) => css`
+    margin-left: ${theme.spacings.xs};
+  `,
+);
 
-const MessageShowContainer = styled.div(({ theme }) => css`
-  padding: ${theme.spacings.sm};
-`);
+const MessageShowContainer = styled.div(
+  ({ theme }) => css`
+    padding: ${theme.spacings.sm};
+  `,
+);
 
 const ActionOutputIndex = styled.span`
   color: #aaa;
 `;
 
-const OutputContainer = styled.div(({ theme }) => css`
-  margin-bottom: ${theme.spacings.xs};
-`);
+const OutputContainer = styled.div(
+  ({ theme }) => css`
+    margin-bottom: ${theme.spacings.xs};
+  `,
+);
 
-const OutputText = styled.div<{ $highlighted?: boolean }>(({ $highlighted, theme }) => css`
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-  color: ${$highlighted ? theme.colors.variant.info : 'inherit'};
-  font-weight: ${$highlighted ? 'bold' : 'inherit'};
-`);
+const OutputText = styled.div<{ $highlighted?: boolean }>(
+  ({ $highlighted, theme }) => css`
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    color: ${$highlighted ? theme.colors.variant.info : 'inherit'};
+    font-weight: ${$highlighted ? 'bold' : 'inherit'};
+  `,
+);
 
-const StyledFormGroup = styled(FormGroup)(({ theme }) => css`
-  margin-bottom: ${theme.spacings.xl};
-`);
+const StyledFormGroup = styled(FormGroup)(
+  ({ theme }) => css`
+    margin-bottom: ${theme.spacings.xl};
+  `,
+);
 
 type Props = {
-  rule?: RuleType | RuleBuilderRule,
-  onSaveMessage?: (message: string) => void,
+  rule?: RuleType | RuleBuilderRule;
+  onSaveMessage?: (message: string) => void;
 };
 
 const RuleSimulation = ({ rule: currentRule, onSaveMessage }: Props) => {
@@ -78,9 +88,12 @@ const RuleSimulation = ({ rule: currentRule, onSaveMessage }: Props) => {
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
 
-  useEffect(() => () => {
-    setRuleSimulationResult(null);
-  }, [setRuleSimulationResult]);
+  useEffect(
+    () => () => {
+      setRuleSimulationResult(null);
+    },
+    [setRuleSimulationResult],
+  );
 
   useEffect(() => {
     if (hasRuleBuilderErrors(currentRule)) {
@@ -91,8 +104,12 @@ const RuleSimulation = ({ rule: currentRule, onSaveMessage }: Props) => {
   }, [currentRule, setRuleSimulationResult, simulateRule]);
 
   const is_rule_builder = Boolean(currentRule?.rule_builder);
-  const errorMessage = hasRuleBuilderErrors(currentRule) ? 'Could not run the rule simulation. Please fix the rule builder errors.' : undefined;
-  const conditionsOutputKeys = Object.keys(ruleSimulationResult?.simulator_condition_variables || {}).sort((a, b) => Number(a) - Number(b));
+  const errorMessage = hasRuleBuilderErrors(currentRule)
+    ? 'Could not run the rule simulation. Please fix the rule builder errors.'
+    : undefined;
+  const conditionsOutputKeys = Object.keys(ruleSimulationResult?.simulator_condition_variables || {}).sort(
+    (a, b) => Number(a) - Number(b),
+  );
 
   const handleRawMessageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRawMessageToSimulate(event.target.value);
@@ -125,26 +142,30 @@ const RuleSimulation = ({ rule: currentRule, onSaveMessage }: Props) => {
 
   return (
     <StyledFormGroup>
-      <ControlLabel>Rule Simulation <small className="text-muted">(Optional)</small></ControlLabel>
+      <ControlLabel>
+        Rule Simulation <small className="text-muted">(Optional)</small>
+      </ControlLabel>
       <div>
-        <Input id="message"
-               type="textarea"
-               placeholder={DEFAULT_SIMULATOR_JSON_MESSAGE}
-               value={rawMessageToSimulate}
-               onChange={handleRawMessageChange}
-               title="Message string or JSON"
-               help="Enter a normal string to simulate the message field, Key-Value pairs or a JSON to simulate the whole message."
-               error={errorMessage}
-               rows={3} />
-        <Button bsStyle="info"
-                bsSize="xsmall"
-                disabled={!rawMessageToSimulate || Boolean(errorMessage)}
-                onClick={handleRunRuleSimulation}>
+        <Input
+          id="message"
+          type="textarea"
+          placeholder={DEFAULT_SIMULATOR_JSON_MESSAGE}
+          value={rawMessageToSimulate}
+          onChange={handleRawMessageChange}
+          title="Message string or JSON"
+          help="Enter a normal string to simulate the message field, Key-Value pairs or a JSON to simulate the whole message."
+          error={errorMessage}
+          rows={3}
+        />
+        <Button
+          bsStyle="info"
+          bsSize="xsmall"
+          disabled={!rawMessageToSimulate || Boolean(errorMessage)}
+          onClick={handleRunRuleSimulation}
+        >
           Run rule simulation
         </Button>
-        <ResetButton bsStyle="default"
-                     bsSize="xsmall"
-                     onClick={handleResetRuleSimulation}>
+        <ResetButton bsStyle="default" bsSize="xsmall" onClick={handleResetRuleSimulation}>
           Reset
         </ResetButton>
         {rawMessageToSimulate && ruleSimulationResult && (
@@ -159,7 +180,8 @@ const RuleSimulation = ({ rule: currentRule, onSaveMessage }: Props) => {
                     <label htmlFor="simulation_conditions_output">Conditions Output</label>
                     {conditionsOutputKeys.map((conditionsOutputKey) => (
                       <OutputText key={conditionsOutputKey}>
-                        <ActionOutputIndex>{conditionsOutputKey}</ActionOutputIndex>: {JSON.stringify(ruleSimulationResult?.simulator_condition_variables[conditionsOutputKey])}
+                        <ActionOutputIndex>{conditionsOutputKey}</ActionOutputIndex>:{' '}
+                        {JSON.stringify(ruleSimulationResult?.simulator_condition_variables[conditionsOutputKey])}
                       </OutputText>
                     ))}
                   </OutputContainer>
@@ -171,9 +193,11 @@ const RuleSimulation = ({ rule: currentRule, onSaveMessage }: Props) => {
                       const keyValue = Object.entries(actionOutputKeyValue)[0];
 
                       return (
-                        <OutputText key={keyValue[0]}
-                                    $highlighted={highlightedOutput === keyValue[0]}
-                                    title={JSON.stringify(keyValue[1])}>
+                        <OutputText
+                          key={keyValue[0]}
+                          $highlighted={highlightedOutput === keyValue[0]}
+                          title={JSON.stringify(keyValue[1])}
+                        >
                           <ActionOutputIndex>${keyValue[0]}</ActionOutputIndex>: {JSON.stringify(keyValue[1])}
                         </OutputText>
                       );

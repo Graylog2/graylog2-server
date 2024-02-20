@@ -60,15 +60,17 @@ describe('RuleBuilder', () => {
       createRule,
     } as any);
 
-    render((
-      <PipelineRulesContext.Provider value={{
-        simulateRule: () => {},
-        setRawMessageToSimulate: () => {},
-        setRuleSimulationResult: () => {},
-      }}>
+    render(
+      <PipelineRulesContext.Provider
+        value={{
+          simulateRule: () => {},
+          setRawMessageToSimulate: () => {},
+          setRuleSimulationResult: () => {},
+        }}
+      >
         <RuleBuilder />
-      </PipelineRulesContext.Provider>
-    ));
+      </PipelineRulesContext.Provider>,
+    );
 
     const titleInput = await screen.findByLabelText('Title');
     const descriptionInput = await screen.findByLabelText('Description');
@@ -96,15 +98,17 @@ describe('RuleBuilder', () => {
       updateRule,
     } as any);
 
-    const { getByLabelText, getByRole } = render((
-      <PipelineRulesContext.Provider value={{
-        simulateRule: () => {},
-        setRawMessageToSimulate: () => {},
-        setRuleSimulationResult: () => {},
-      }}>
+    const { getByLabelText, getByRole } = render(
+      <PipelineRulesContext.Provider
+        value={{
+          simulateRule: () => {},
+          setRawMessageToSimulate: () => {},
+          setRuleSimulationResult: () => {},
+        }}
+      >
         <RuleBuilder />
-      </PipelineRulesContext.Provider>
-    ));
+      </PipelineRulesContext.Provider>,
+    );
     const titleInput = getByLabelText('Title');
     const descriptionInput = getByLabelText('Description');
 
@@ -129,15 +133,17 @@ describe('RuleBuilder', () => {
       rule: { title, description, rule_builder },
     } as any);
 
-    const { getByRole } = render((
-      <PipelineRulesContext.Provider value={{
-        simulateRule: () => {},
-        setRawMessageToSimulate: () => {},
-        setRuleSimulationResult: () => {},
-      }}>
+    const { getByRole } = render(
+      <PipelineRulesContext.Provider
+        value={{
+          simulateRule: () => {},
+          setRawMessageToSimulate: () => {},
+          setRuleSimulationResult: () => {},
+        }}
+      >
         <RuleBuilder />
-      </PipelineRulesContext.Provider>
-    ));
+      </PipelineRulesContext.Provider>,
+    );
 
     const convertButton = getByRole('button', { name: 'Convert Rule Builder to Source Code', hidden: true });
     userEvent.click(convertButton);
@@ -158,15 +164,17 @@ describe('RuleBuilder', () => {
       rule: { title, description, rule_builder },
     } as any);
 
-    const { getByText, getByRole } = render((
-      <PipelineRulesContext.Provider value={{
-        simulateRule: () => {},
-        setRawMessageToSimulate: () => {},
-        setRuleSimulationResult: () => {},
-      }}>
+    const { getByText, getByRole } = render(
+      <PipelineRulesContext.Provider
+        value={{
+          simulateRule: () => {},
+          setRawMessageToSimulate: () => {},
+          setRuleSimulationResult: () => {},
+        }}
+      >
         <RuleBuilder />
-      </PipelineRulesContext.Provider>
-    ));
+      </PipelineRulesContext.Provider>,
+    );
 
     const ruleSimulationLabel = getByText('Rule Simulation');
     const runRuleSimulation = getByRole('button', { name: 'Run rule simulation' });
@@ -188,21 +196,23 @@ describe('RuleBuilder', () => {
       rule: { title, description, rule_builder },
     } as any);
 
-    const { getByText, getByTestId } = render((
-      <PipelineRulesContext.Provider value={{
-        ruleSimulationResult: {
-          fields: { message: rawMessageToSimulate },
-          simulator_condition_variables: { 1: conditionOutput1 },
-          simulator_action_variables: [{ output_1: actionOutput1 }, { output_2: actionOutput2 }],
-        },
-        rawMessageToSimulate,
-        simulateRule: () => {},
-        setRawMessageToSimulate: () => {},
-        setRuleSimulationResult: () => {},
-      }}>
+    const { getByText, getByTestId } = render(
+      <PipelineRulesContext.Provider
+        value={{
+          ruleSimulationResult: {
+            fields: { message: rawMessageToSimulate },
+            simulator_condition_variables: { 1: conditionOutput1 },
+            simulator_action_variables: [{ output_1: actionOutput1 }, { output_2: actionOutput2 }],
+          },
+          rawMessageToSimulate,
+          simulateRule: () => {},
+          setRawMessageToSimulate: () => {},
+          setRuleSimulationResult: () => {},
+        }}
+      >
         <RuleBuilder />
-      </PipelineRulesContext.Provider>
-    ));
+      </PipelineRulesContext.Provider>,
+    );
 
     const conditionOutputs = getByText('Conditions Output');
     const actionOutputs = getByText('Actions Output');

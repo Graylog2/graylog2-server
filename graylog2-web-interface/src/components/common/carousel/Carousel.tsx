@@ -21,7 +21,7 @@ import useEmblaCarousel from 'embla-carousel-react';
 import CarouselSlide from 'components/common/carousel/CarouselSlide';
 
 type Props = {
-  children: React.ReactNode,
+  children: React.ReactNode;
 };
 
 const StyledDiv = styled.div`
@@ -42,9 +42,7 @@ const Carousel = ({ children }: Props) => {
 
   return (
     <StyledDiv className="carousel" ref={emblaRef}>
-      <div className="carousel-container">
-        {children}
-      </div>
+      <div className="carousel-container">{children}</div>
     </StyledDiv>
   );
 };

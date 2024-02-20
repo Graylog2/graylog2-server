@@ -26,12 +26,12 @@ import RangePresetDropdown from './TimeRangePresetDropdown';
 import TimeRangePickerButton from './time-range-picker/TimeRangePickerButton';
 
 type Props = {
-  disabled?: boolean,
-  hasErrorOnMount?: boolean,
-  onPresetSelectOpen: () => void,
-  setCurrentTimeRange: (timeRange: TimeRange | NoTimeRangeOverride) => void,
-  toggleShow: () => void,
-  showPresetDropdown?: boolean,
+  disabled?: boolean;
+  hasErrorOnMount?: boolean;
+  onPresetSelectOpen: () => void;
+  setCurrentTimeRange: (timeRange: TimeRange | NoTimeRangeOverride) => void;
+  toggleShow: () => void;
+  showPresetDropdown?: boolean;
 };
 
 const StyledRangePresetDropdown = styled(RangePresetDropdown)`
@@ -74,16 +74,16 @@ const TimeRangeFilterButtons = ({
 
   return (
     <StyledButtonGroup>
-      <TimeRangePickerButton hasError={hasErrorOnMount}
-                             disabled={disabled}
-                             onClick={_onClick} />
+      <TimeRangePickerButton hasError={hasErrorOnMount} disabled={disabled} onClick={_onClick} />
       {showPresetDropdown && (
-        <StyledRangePresetDropdown disabled={disabled}
-                                   displayTitle={false}
-                                   onChange={selectRelativeTimeRangePreset}
-                                   onToggle={_onPresetSelectToggle}
-                                   header="Select time range"
-                                   bsSize={null} />
+        <StyledRangePresetDropdown
+          disabled={disabled}
+          displayTitle={false}
+          onChange={selectRelativeTimeRangePreset}
+          onToggle={_onPresetSelectToggle}
+          header="Select time range"
+          bsSize={null}
+        />
       )}
     </StyledButtonGroup>
   );

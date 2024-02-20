@@ -23,21 +23,24 @@ import SectionComponent from 'components/common/Section/SectionComponent';
 import type Role from 'logic/roles/Role';
 
 type Props = {
-  role: Role,
+  role: Role;
 };
 
 const UsersSection = ({ role: { id, name } }: Props) => {
   const [loading, setLoading] = useState(false);
 
-  const _onLoad = useCallback((pagination) => {
-    setLoading(true);
+  const _onLoad = useCallback(
+    (pagination) => {
+      setLoading(true);
 
-    return AuthzRolesDomain.loadUsersForRole(id, name, pagination).then((paginatedRoles) => {
-      setLoading(false);
+      return AuthzRolesDomain.loadUsersForRole(id, name, pagination).then((paginatedRoles) => {
+        setLoading(false);
 
-      return paginatedRoles;
-    });
-  }, [id, name]);
+        return paginatedRoles;
+      });
+    },
+    [id, name],
+  );
 
   return (
     <SectionComponent title="Users" showLoading={loading}>

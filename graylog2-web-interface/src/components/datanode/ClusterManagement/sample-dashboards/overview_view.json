@@ -48,15 +48,11 @@
             "type": "elasticsearch",
             "query_string": "NOT(_exists_:node)"
           },
-          "streams": [
-            "datastream:gl-datanode-metrics"
-          ],
+          "streams": ["datastream:gl-datanode-metrics"],
           "config": {
             "row_pivots": [
               {
-                "fields": [
-                  "timestamp"
-                ],
+                "fields": ["timestamp"],
                 "type": "time",
                 "config": {
                   "interval": {
@@ -102,15 +98,11 @@
             "type": "elasticsearch",
             "query_string": "NOT(_exists_:node)"
           },
-          "streams": [
-            "datastream:gl-datanode-metrics"
-          ],
+          "streams": ["datastream:gl-datanode-metrics"],
           "config": {
             "row_pivots": [
               {
-                "fields": [
-                  "timestamp"
-                ],
+                "fields": ["timestamp"],
                 "type": "time",
                 "config": {
                   "interval": {
@@ -156,15 +148,11 @@
             "type": "elasticsearch",
             "query_string": ""
           },
-          "streams": [
-            "datastream:gl-datanode-metrics"
-          ],
+          "streams": ["datastream:gl-datanode-metrics"],
           "config": {
             "row_pivots": [
               {
-                "fields": [
-                  "timestamp"
-                ],
+                "fields": ["timestamp"],
                 "type": "time",
                 "config": {
                   "interval": {
@@ -222,15 +210,11 @@
             "type": "elasticsearch",
             "query_string": ""
           },
-          "streams": [
-            "datastream:gl-datanode-metrics"
-          ],
+          "streams": ["datastream:gl-datanode-metrics"],
           "config": {
             "row_pivots": [
               {
-                "fields": [
-                  "timestamp"
-                ],
+                "fields": ["timestamp"],
                 "type": "time",
                 "config": {
                   "interval": {
@@ -243,9 +227,7 @@
             ],
             "column_pivots": [
               {
-                "fields": [
-                  "node"
-                ],
+                "fields": ["node"],
                 "type": "values",
                 "config": {
                   "limit": 15,
@@ -287,15 +269,11 @@
             "type": "elasticsearch",
             "query_string": ""
           },
-          "streams": [
-            "datastream:gl-datanode-metrics"
-          ],
+          "streams": ["datastream:gl-datanode-metrics"],
           "config": {
             "row_pivots": [
               {
-                "fields": [
-                  "timestamp"
-                ],
+                "fields": ["timestamp"],
                 "type": "time",
                 "config": {
                   "interval": {
@@ -341,15 +319,11 @@
             "type": "elasticsearch",
             "query_string": ""
           },
-          "streams": [
-            "datastream:gl-datanode-metrics"
-          ],
+          "streams": ["datastream:gl-datanode-metrics"],
           "config": {
             "row_pivots": [
               {
-                "fields": [
-                  "timestamp"
-                ],
+                "fields": ["timestamp"],
                 "type": "time",
                 "config": {
                   "interval": {
@@ -362,9 +336,7 @@
             ],
             "column_pivots": [
               {
-                "fields": [
-                  "node"
-                ],
+                "fields": ["node"],
                 "type": "values",
                 "config": {
                   "limit": 15,
@@ -406,15 +378,11 @@
             "type": "elasticsearch",
             "query_string": ""
           },
-          "streams": [
-            "datastream:gl-datanode-metrics"
-          ],
+          "streams": ["datastream:gl-datanode-metrics"],
           "config": {
             "row_pivots": [
               {
-                "fields": [
-                  "timestamp"
-                ],
+                "fields": ["timestamp"],
                 "type": "time",
                 "config": {
                   "interval": {
@@ -460,15 +428,11 @@
             "type": "elasticsearch",
             "query_string": ""
           },
-          "streams": [
-            "datastream:gl-datanode-metrics"
-          ],
+          "streams": ["datastream:gl-datanode-metrics"],
           "config": {
             "row_pivots": [
               {
-                "fields": [
-                  "timestamp"
-                ],
+                "fields": ["timestamp"],
                 "type": "time",
                 "config": {
                   "interval": {
@@ -481,9 +445,7 @@
             ],
             "column_pivots": [
               {
-                "fields": [
-                  "node"
-                ],
+                "fields": ["node"],
                 "type": "values",
                 "config": {
                   "limit": 15,
@@ -537,15 +499,11 @@
             "type": "elasticsearch",
             "query_string": ""
           },
-          "streams": [
-            "datastream:gl-datanode-metrics"
-          ],
+          "streams": ["datastream:gl-datanode-metrics"],
           "config": {
             "row_pivots": [
               {
-                "fields": [
-                  "timestamp"
-                ],
+                "fields": ["timestamp"],
                 "type": "time",
                 "config": {
                   "interval": {
@@ -558,9 +516,7 @@
             ],
             "column_pivots": [
               {
-                "fields": [
-                  "node"
-                ],
+                "fields": ["node"],
                 "type": "values",
                 "config": {
                   "limit": 15,
@@ -614,15 +570,11 @@
             "type": "elasticsearch",
             "query_string": ""
           },
-          "streams": [
-            "datastream:gl-datanode-metrics"
-          ],
+          "streams": ["datastream:gl-datanode-metrics"],
           "config": {
             "row_pivots": [
               {
-                "fields": [
-                  "timestamp"
-                ],
+                "fields": ["timestamp"],
                 "type": "time",
                 "config": {
                   "interval": {
@@ -635,9 +587,7 @@
             ],
             "column_pivots": [
               {
-                "fields": [
-                  "node"
-                ],
+                "fields": ["node"],
                 "type": "values",
                 "config": {
                   "limit": 15,
@@ -691,16 +641,12 @@
             "type": "elasticsearch",
             "query_string": ""
           },
-          "streams": [
-            "datastream:gl-datanode-metrics"
-          ],
+          "streams": ["datastream:gl-datanode-metrics"],
           "config": {
             "row_pivots": [],
             "column_pivots": [
               {
-                "fields": [
-                  "node"
-                ],
+                "fields": ["node"],
                 "type": "values",
                 "config": {
                   "limit": 15,
@@ -742,9 +688,7 @@
             "type": "elasticsearch",
             "query_string": ""
           },
-          "streams": [
-            "datastream:gl-datanode-metrics"
-          ],
+          "streams": ["datastream:gl-datanode-metrics"],
           "config": {
             "row_pivots": [],
             "column_pivots": [],
@@ -771,42 +715,18 @@
         }
       ],
       "widget_mapping": {
-        "a6e3d286-5efb-470e-a0a0-a5b3898f147c": [
-          "cda87d95-f63a-4b34-a9a4-74aec9f8272c"
-        ],
-        "ed454696-6d2c-4613-86d7-0cf7b5da1382": [
-          "bf7e6a6d-282c-4994-876c-7c38757c6721"
-        ],
-        "27927645-c3a6-47c2-80df-991edb6303be": [
-          "4bd49e29-1292-44f5-91d0-0e48ce8656e7"
-        ],
-        "a7c7f94f-71b3-4bbe-864c-5812d65f71ca": [
-          "83c000b2-f27b-43cd-afc3-865b35957ce6"
-        ],
-        "d7d52d4c-5f38-4169-bdda-de252894d547": [
-          "5a1854ce-c49a-445c-b817-cfda5307757c"
-        ],
-        "4057ca77-e5e7-47bc-8b97-def6b6915542": [
-          "4cf919f9-8f5d-4445-9921-790aae8f5730"
-        ],
-        "9cdd9c0f-277d-4ed1-b117-b36b0c2e1f30": [
-          "e6998f76-980b-414e-980a-8c5f9799e89f"
-        ],
-        "ec14deeb-2dba-4a93-bc16-fe0a2b020797": [
-          "c0adee78-6ad0-4ac9-b6c7-df6f23224418"
-        ],
-        "dd635ef7-d899-4837-90e0-a79a7140054d": [
-          "5834d88f-790e-43a6-8758-00418dac460c"
-        ],
-        "df0c1860-6351-4e30-afea-c3e5598e5421": [
-          "d219df39-73cb-4309-a54a-2f8fa1af4f83"
-        ],
-        "532b816d-2dc9-43ad-81bc-104476554605": [
-          "2ecc9350-e2ed-4a3a-a8b8-38e2a9842ec2"
-        ],
-        "e0133cb1-018e-456e-bd5c-7c460a0b7a36": [
-          "c39b63e1-ec0a-483c-94a7-f1ce6d349024"
-        ]
+        "a6e3d286-5efb-470e-a0a0-a5b3898f147c": ["cda87d95-f63a-4b34-a9a4-74aec9f8272c"],
+        "ed454696-6d2c-4613-86d7-0cf7b5da1382": ["bf7e6a6d-282c-4994-876c-7c38757c6721"],
+        "27927645-c3a6-47c2-80df-991edb6303be": ["4bd49e29-1292-44f5-91d0-0e48ce8656e7"],
+        "a7c7f94f-71b3-4bbe-864c-5812d65f71ca": ["83c000b2-f27b-43cd-afc3-865b35957ce6"],
+        "d7d52d4c-5f38-4169-bdda-de252894d547": ["5a1854ce-c49a-445c-b817-cfda5307757c"],
+        "4057ca77-e5e7-47bc-8b97-def6b6915542": ["4cf919f9-8f5d-4445-9921-790aae8f5730"],
+        "9cdd9c0f-277d-4ed1-b117-b36b0c2e1f30": ["e6998f76-980b-414e-980a-8c5f9799e89f"],
+        "ec14deeb-2dba-4a93-bc16-fe0a2b020797": ["c0adee78-6ad0-4ac9-b6c7-df6f23224418"],
+        "dd635ef7-d899-4837-90e0-a79a7140054d": ["5834d88f-790e-43a6-8758-00418dac460c"],
+        "df0c1860-6351-4e30-afea-c3e5598e5421": ["d219df39-73cb-4309-a54a-2f8fa1af4f83"],
+        "532b816d-2dc9-43ad-81bc-104476554605": ["2ecc9350-e2ed-4a3a-a8b8-38e2a9842ec2"],
+        "e0133cb1-018e-456e-bd5c-7c460a0b7a36": ["c39b63e1-ec0a-483c-94a7-f1ce6d349024"]
       },
       "positions": {
         "a6e3d286-5efb-470e-a0a0-a5b3898f147c": {
@@ -921,15 +841,11 @@
             "type": "elasticsearch",
             "query_string": ""
           },
-          "streams": [
-            "datastream:gl-datanode-metrics"
-          ],
+          "streams": ["datastream:gl-datanode-metrics"],
           "config": {
             "row_pivots": [
               {
-                "fields": [
-                  "timestamp"
-                ],
+                "fields": ["timestamp"],
                 "type": "time",
                 "config": {
                   "interval": {
@@ -942,9 +858,7 @@
             ],
             "column_pivots": [
               {
-                "fields": [
-                  "node"
-                ],
+                "fields": ["node"],
                 "type": "values",
                 "config": {
                   "limit": 15,
@@ -986,16 +900,12 @@
             "type": "elasticsearch",
             "query_string": ""
           },
-          "streams": [
-            "datastream:gl-datanode-metrics"
-          ],
+          "streams": ["datastream:gl-datanode-metrics"],
           "config": {
             "row_pivots": [],
             "column_pivots": [
               {
-                "fields": [
-                  "node"
-                ],
+                "fields": ["node"],
                 "type": "values",
                 "config": {
                   "limit": 15,
@@ -1037,15 +947,11 @@
             "type": "elasticsearch",
             "query_string": ""
           },
-          "streams": [
-            "datastream:gl-datanode-metrics"
-          ],
+          "streams": ["datastream:gl-datanode-metrics"],
           "config": {
             "row_pivots": [
               {
-                "fields": [
-                  "timestamp"
-                ],
+                "fields": ["timestamp"],
                 "type": "time",
                 "config": {
                   "interval": {
@@ -1058,9 +964,7 @@
             ],
             "column_pivots": [
               {
-                "fields": [
-                  "node"
-                ],
+                "fields": ["node"],
                 "type": "values",
                 "config": {
                   "limit": 15,
@@ -1102,15 +1006,11 @@
             "type": "elasticsearch",
             "query_string": ""
           },
-          "streams": [
-            "datastream:gl-datanode-metrics"
-          ],
+          "streams": ["datastream:gl-datanode-metrics"],
           "config": {
             "row_pivots": [
               {
-                "fields": [
-                  "timestamp"
-                ],
+                "fields": ["timestamp"],
                 "type": "time",
                 "config": {
                   "interval": {
@@ -1123,9 +1023,7 @@
             ],
             "column_pivots": [
               {
-                "fields": [
-                  "node"
-                ],
+                "fields": ["node"],
                 "type": "values",
                 "config": {
                   "limit": 15,
@@ -1156,18 +1054,10 @@
         }
       ],
       "widget_mapping": {
-        "9eab774e-817c-4df3-9644-f67798fba0c3": [
-          "ecc94d84-1309-4c8b-92cc-db170a8d61de"
-        ],
-        "9c6517e3-b90e-4599-ba21-15a82db52692": [
-          "0754e55c-2974-4001-b5cf-8dd81a4b0d2f"
-        ],
-        "59b137cb-e454-401b-bd41-6e872e68459d": [
-          "98179000-b7e4-4073-9ffb-940593d4ea96"
-        ],
-        "afc840e2-449b-4c67-a164-b82a18a44e4d": [
-          "40144c75-59c3-465d-b260-8f2cf93ca5c7"
-        ]
+        "9eab774e-817c-4df3-9644-f67798fba0c3": ["ecc94d84-1309-4c8b-92cc-db170a8d61de"],
+        "9c6517e3-b90e-4599-ba21-15a82db52692": ["0754e55c-2974-4001-b5cf-8dd81a4b0d2f"],
+        "59b137cb-e454-401b-bd41-6e872e68459d": ["98179000-b7e4-4073-9ffb-940593d4ea96"],
+        "afc840e2-449b-4c67-a164-b82a18a44e4d": ["40144c75-59c3-465d-b260-8f2cf93ca5c7"]
       },
       "positions": {
         "59b137cb-e454-401b-bd41-6e872e68459d": {

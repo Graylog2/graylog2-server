@@ -54,12 +54,14 @@ const UndoNavItem = ({ sidebarIsPinned }: { sidebarIsPinned: boolean }) => {
   });
 
   return (
-    <NavItem disabled={!isUndoAvailable}
-             onClick={onClick}
-             icon="undo"
-             title={TITLE}
-             ariaLabel={TITLE}
-             sidebarIsPinned={sidebarIsPinned} />
+    <NavItem
+      disabled={!isUndoAvailable}
+      onClick={onClick}
+      icon="undo"
+      title={TITLE}
+      ariaLabel={TITLE}
+      sidebarIsPinned={sidebarIsPinned}
+    />
   );
 };
 

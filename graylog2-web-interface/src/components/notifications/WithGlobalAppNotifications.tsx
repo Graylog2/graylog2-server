@@ -22,8 +22,8 @@ import PublicNotifications from 'components/common/PublicNotifications';
 import GlobalAppNotifications from './GlobalAppNotifications';
 
 type Props = {
-  children: React.ReactNode
-}
+  children: React.ReactNode;
+};
 
 const WithGlobalNotifications = ({ children }: Props) => (
   <>
@@ -34,10 +34,7 @@ const WithGlobalNotifications = ({ children }: Props) => (
 );
 
 WithGlobalNotifications.propTypes = {
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.element),
-    PropTypes.element,
-  ]).isRequired,
+  children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.element), PropTypes.element]).isRequired,
 };
 
 export default WithGlobalNotifications;

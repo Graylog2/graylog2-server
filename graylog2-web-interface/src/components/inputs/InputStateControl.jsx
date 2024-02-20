@@ -76,10 +76,9 @@ const InputStateControl = createReactClass({
       app_action_value: 'start-input',
     });
 
-    InputStatesStore.start(this.props.input)
-      .finally(() => {
-        this.setState({ loading: false });
-      });
+    InputStatesStore.start(this.props.input).finally(() => {
+      this.setState({ loading: false });
+    });
   },
 
   _stopInput() {
@@ -90,10 +89,9 @@ const InputStateControl = createReactClass({
       app_action_value: 'stop-input',
     });
 
-    InputStatesStore.stop(this.props.input)
-      .finally(() => {
-        this.setState({ loading: false });
-      });
+    InputStatesStore.stop(this.props.input).finally(() => {
+      this.setState({ loading: false });
+    });
   },
 
   render() {

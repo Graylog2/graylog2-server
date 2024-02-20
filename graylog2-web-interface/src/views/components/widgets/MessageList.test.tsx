@@ -135,18 +135,20 @@ describe('MessageList', () => {
 
   const SimpleMessageList = (props: Partial<React.ComponentProps<typeof MessageList>>) => (
     <TestStoreProvider>
-      <MessageList title="Message List"
-                   editing={false}
-                   filter=""
-                   type="messages"
-                   id="message-list"
-                   queryId="deadbeef"
-                   toggleEdit={() => {}}
-                   setLoadingState={() => {}}
-                   data={props.data}
-                   config={props.config}
-                   fields={props.fields}
-                   {...props} />
+      <MessageList
+        title="Message List"
+        editing={false}
+        filter=""
+        type="messages"
+        id="message-list"
+        queryId="deadbeef"
+        toggleEdit={() => {}}
+        setLoadingState={() => {}}
+        data={props.data}
+        config={props.config}
+        fields={props.fields}
+        {...props}
+      />
     </TestStoreProvider>
   );
 
@@ -161,10 +163,7 @@ describe('MessageList', () => {
 
     const configWithFields = MessagesWidgetConfig.builder().fields([TIMESTAMP_FIELD, 'file_name']).build();
 
-    render(
-      <SimpleMessageList config={configWithFields}
-                         fields={Immutable.List(fields)} />,
-    );
+    render(<SimpleMessageList config={configWithFields} fields={Immutable.List(fields)} />);
 
     await screen.findByText('file_name');
     await screen.findByText(TIMESTAMP_FIELD);
@@ -174,10 +173,7 @@ describe('MessageList', () => {
     const fields = [new FieldTypeMapping('file_name', new FieldType('string', ['full-text-search'], []))];
     const emptyConfig = MessagesWidgetConfig.builder().fields([]).build();
 
-    render(
-      <SimpleMessageList config={emptyConfig}
-                         fields={Immutable.List(fields)} />,
-    );
+    render(<SimpleMessageList config={emptyConfig} fields={Immutable.List(fields)} />);
 
     await findTable();
 
@@ -200,10 +196,12 @@ describe('MessageList', () => {
   });
 
   it('reexecute query for search type, when using pagination', async () => {
-    const dispatch = jest.fn().mockResolvedValue(finishedLoading({
-      result: new SearchResult(dummySearchJobResults),
-      widgetMapping: Immutable.Map(),
-    }));
+    const dispatch = jest.fn().mockResolvedValue(
+      finishedLoading({
+        result: new SearchResult(dummySearchJobResults),
+        widgetMapping: Immutable.Map(),
+      }),
+    );
     asMock(useAppDispatch).mockReturnValue(dispatch);
     const searchTypePayload = { [data.id]: { limit: Messages.DEFAULT_LIMIT, offset: Messages.DEFAULT_LIMIT } };
     const secondPageSize = 10;
@@ -224,10 +222,12 @@ describe('MessageList', () => {
       stopAutoRefresh,
     });
 
-    const dispatch = jest.fn().mockResolvedValue(finishedLoading({
-      result: new SearchResult(dummySearchJobResults),
-      widgetMapping: Immutable.Map(),
-    }));
+    const dispatch = jest.fn().mockResolvedValue(
+      finishedLoading({
+        result: new SearchResult(dummySearchJobResults),
+        widgetMapping: Immutable.Map(),
+      }),
+    );
     asMock(useAppDispatch).mockReturnValue(dispatch);
     const secondPageSize = 10;
 
@@ -239,15 +239,19 @@ describe('MessageList', () => {
   });
 
   it('displays error description, when using pagination throws an error', async () => {
-    const dispatch = jest.fn().mockResolvedValue(finishedLoading({
-      result: new SearchResult({
-        ...dummySearchJobResults,
-        errors: [{
-          description: 'Error description',
-        } as SearchErrorResponse],
+    const dispatch = jest.fn().mockResolvedValue(
+      finishedLoading({
+        result: new SearchResult({
+          ...dummySearchJobResults,
+          errors: [
+            {
+              description: 'Error description',
+            } as SearchErrorResponse,
+          ],
+        }),
+        widgetMapping: Immutable.Map(),
       }),
-      widgetMapping: Immutable.Map(),
-    }));
+    );
     asMock(useAppDispatch).mockReturnValue(dispatch);
 
     const secondPageSize = 10;

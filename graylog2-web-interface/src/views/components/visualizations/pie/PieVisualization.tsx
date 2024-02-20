@@ -41,7 +41,7 @@ const _verticalDimensions = (idx: number, total: number) => {
   const sliceSize = 1 / rows;
   const spacer = sliceSize * 0.1;
 
-  return [(sliceSize * position) + spacer, (sliceSize * (position + 1)) - spacer];
+  return [sliceSize * position + spacer, sliceSize * (position + 1) - spacer];
 };
 
 const _horizontalDimensions = (idx: number, total: number) => {
@@ -50,35 +50,33 @@ const _horizontalDimensions = (idx: number, total: number) => {
   const sliceSize = 1 / Math.min(total, maxItemsPerRow);
   const spacer = sliceSize * 0.1;
 
-  return [(sliceSize * position) + spacer, (sliceSize * (position + 1)) - spacer];
+  return [sliceSize * position + spacer, sliceSize * (position + 1) - spacer];
 };
 
-const _generateSeries = (mapKeys: KeyMapper): Generator => ({
-  type,
-  name,
-  labels,
-  values,
-  idx,
-  total,
-  originalName,
-  config,
-}) => {
-  const rowPivots = config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [];
+const _generateSeries =
+  (mapKeys: KeyMapper): Generator =>
+  ({ type, name, labels, values, idx, total, originalName, config }) => {
+    const rowPivots = config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [];
 
-  return {
-    type,
-    name,
-    hole: 0.4,
-    labels: labels.map((label) => label.split(keySeparator).map((l, i) => mapKeys(l, rowPivots[i])).join(humanSeparator)),
-    originalLabels: labels,
-    values,
-    domain: {
-      x: _horizontalDimensions(idx, total),
-      y: _verticalDimensions(idx, total),
-    },
-    originalName,
+    return {
+      type,
+      name,
+      hole: 0.4,
+      labels: labels.map((label) =>
+        label
+          .split(keySeparator)
+          .map((l, i) => mapKeys(l, rowPivots[i]))
+          .join(humanSeparator),
+      ),
+      originalLabels: labels,
+      values,
+      domain: {
+        x: _horizontalDimensions(idx, total),
+        y: _verticalDimensions(idx, total),
+      },
+      originalName,
+    };
   };
-};
 
 const setChartColor = (chart: ChartConfig, colorMap: ColorMapper) => {
   const colors = chart.originalLabels.map((label) => colorMap.get(label));
@@ -86,7 +84,7 @@ const setChartColor = (chart: ChartConfig, colorMap: ColorMapper) => {
   return { marker: { colors } };
 };
 
-const labelMapper = (data: Array<{ labels: Array<string>, originalLabels?: Array<string> }>) => [
+const labelMapper = (data: Array<{ labels: Array<string>; originalLabels?: Array<string> }>) => [
   ...new Set(data.flatMap(({ labels, originalLabels }) => originalLabels ?? labels)),
 ];
 
@@ -95,12 +93,21 @@ const rowPivotsToFields = (config: AggregationWidgetConfig) => config?.rowPivots
 const PieVisualization = makeVisualization(({ config, data }: VisualizationComponentProps) => {
   const rows = useMemo(() => retrieveChartData(data), [data]);
   const mapKeys = useMapKeys();
-  const transformedData = useChartData(rows, { widgetConfig: config, chartType: 'pie', generator: _generateSeries(mapKeys) });
+  const transformedData = useChartData(rows, {
+    widgetConfig: config,
+    chartType: 'pie',
+    generator: _generateSeries(mapKeys),
+  });
 
   return (
-    <PlotLegend config={config} chartData={transformedData} labelMapper={labelMapper} labelFields={rowPivotsToFields} neverHide>
-      <GenericPlot chartData={transformedData}
-                   setChartColor={setChartColor} />
+    <PlotLegend
+      config={config}
+      chartData={transformedData}
+      labelMapper={labelMapper}
+      labelFields={rowPivotsToFields}
+      neverHide
+    >
+      <GenericPlot chartData={transformedData} setChartColor={setChartColor} />
     </PlotLegend>
   );
 }, 'pie');

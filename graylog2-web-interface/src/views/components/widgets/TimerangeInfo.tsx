@@ -28,26 +28,31 @@ import useSearchResult from 'views/hooks/useSearchResult';
 import SearchQueryExecutionInfoHelper from 'views/components/widgets/SearchQueryExecutionInfoHelper';
 
 type Props = {
-  className?: string,
-  widget: Widget,
-  activeQuery?: string,
-  widgetId?: string,
+  className?: string;
+  widget: Widget;
+  activeQuery?: string;
+  widgetId?: string;
 };
 
-const Wrapper = styled.div(({ theme }) => css`
-  font-size: ${theme.fonts.size.tiny};
-  color: ${theme.colors.gray[30]};
-  width: max-content;
-  display: flex;
-  gap: 5px;
-  align-items: center;
-  margin-right: 10px;
-`);
+const Wrapper = styled.div(
+  ({ theme }) => css`
+    font-size: ${theme.fonts.size.tiny};
+    color: ${theme.colors.gray[30]};
+    width: max-content;
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    margin-right: 10px;
+  `,
+);
 
-const StyledIcon = styled(Icon)(({ theme }) => css`
-  color: ${theme.colors.gray[60]}
-`);
-const getEffectiveWidgetTimerange = (result, activeQuery, searchTypeId) => result?.results?.[activeQuery]?.searchTypes[searchTypeId]?.effective_timerange;
+const StyledIcon = styled(Icon)(
+  ({ theme }) => css`
+    color: ${theme.colors.gray[60]};
+  `,
+);
+const getEffectiveWidgetTimerange = (result, activeQuery, searchTypeId) =>
+  result?.results?.[activeQuery]?.searchTypes[searchTypeId]?.effective_timerange;
 
 const TimerangeInfo = ({ className, widget, activeQuery, widgetId }: Props) => {
   const { formatTime } = useUserDateTime();
@@ -57,14 +62,18 @@ const TimerangeInfo = ({ className, widget, activeQuery, widgetId }: Props) => {
   const toLocalTimeWithMS = (dateTime: DateTime) => formatTime(dateTime, 'complete');
   const toInternalTime = (dateTime: DateTime) => formatTime(dateTime, 'internal');
   const globalTimerangeString = globalOverride?.timerange
-    ? `Global Override: ${timerangeToString(globalOverride.timerange, toLocalTimeWithMS)}` : undefined;
+    ? `Global Override: ${timerangeToString(globalOverride.timerange, toLocalTimeWithMS)}`
+    : undefined;
 
   const configuredTimerange = timerangeToString(widget.timerange || DEFAULT_TIMERANGE, toLocalTimeWithMS);
 
   const searchTypeId = widgetId ? widgetMapping?.get(widgetId)?.first() : undefined;
 
-  const effectiveTimerange = (activeQuery && searchTypeId) ? getEffectiveWidgetTimerange(result, activeQuery, searchTypeId) : undefined;
-  const effectiveTimerangeString = effectiveTimerange ? timerangeToString(effectiveTimerange, toInternalTime) : 'Effective widget time range is currently not available.';
+  const effectiveTimerange =
+    activeQuery && searchTypeId ? getEffectiveWidgetTimerange(result, activeQuery, searchTypeId) : undefined;
+  const effectiveTimerangeString = effectiveTimerange
+    ? timerangeToString(effectiveTimerange, toInternalTime)
+    : 'Effective widget time range is currently not available.';
 
   const currentWidgetMapping = widgetMapping?.get(widgetId);
 

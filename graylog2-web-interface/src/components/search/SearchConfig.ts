@@ -18,12 +18,12 @@
 import type { TimeRange } from 'views/logic/queries/Query';
 
 export type SearchesConfig = {
-  surrounding_timerange_options: { [key: string]: string },
-  surrounding_filter_fields: Array<string>,
-  query_time_range_limit: string,
-  relative_timerange_options: { [key: string]: string },
-  analysis_disabled_fields: Array<string>,
-  auto_refresh_timerange_options: { [key: string]: string },
-  default_auto_refresh_option: string,
-  quick_access_timerange_presets: Array<{ description: string, timerange: TimeRange, id: string}>
+  surrounding_timerange_options: { [key: string]: string };
+  surrounding_filter_fields: Array<string>;
+  query_time_range_limit: string;
+  relative_timerange_options: { [key: string]: string };
+  analysis_disabled_fields: Array<string>;
+  auto_refresh_timerange_options: { [key: string]: string };
+  default_auto_refresh_option: string;
+  quick_access_timerange_presets: Array<{ description: string; timerange: TimeRange; id: string }>;
 };

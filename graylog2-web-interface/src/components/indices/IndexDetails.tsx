@@ -28,11 +28,11 @@ import { IndexRangesActions } from 'stores/indices/IndexRangesStore';
 import { IndicesActions } from 'stores/indices/IndicesStore';
 
 type Props = {
-  index: IndexInfo,
-  indexName: string,
-  indexRange: IndexRange,
-  indexSetId: string,
-  isDeflector: boolean,
+  index: IndexInfo;
+  indexName: string;
+  indexRange: IndexRange;
+  indexSetId: string;
+  isDeflector: boolean;
 };
 
 const IndexDetails = ({ index, indexName, indexRange, indexSetId, isDeflector }: Props) => {
@@ -66,15 +66,21 @@ const IndexDetails = ({ index, indexName, indexRange, indexSetId, isDeflector }:
     if (isDeflector) {
       return (
         <span>
-          <Button bsStyle="danger" bsSize="xs" disabled>Active write index cannot be deleted</Button>
+          <Button bsStyle="danger" bsSize="xs" disabled>
+            Active write index cannot be deleted
+          </Button>
         </span>
       );
     }
 
     return (
       <span>
-        <Button bsStyle="warning" bsSize="xs" onClick={_onRecalculateIndex}>Recalculate index ranges</Button>{' '}
-        <Button bsStyle="danger" bsSize="xs" onClick={_onDeleteIndex}>Delete index</Button>
+        <Button bsStyle="warning" bsSize="xs" onClick={_onRecalculateIndex}>
+          Recalculate index ranges
+        </Button>{' '}
+        <Button bsStyle="danger" bsSize="xs" onClick={_onDeleteIndex}>
+          Delete index
+        </Button>
       </span>
     );
   }, [isDeflector, _onDeleteIndex, _onRecalculateIndex]);
@@ -86,7 +92,6 @@ const IndexDetails = ({ index, indexName, indexRange, indexSetId, isDeflector }:
   return (
     <div className="index-info">
       <IndexRangeSummary indexRange={indexRange} />{' '}
-
       <HideOnCloud>
         {NumberUtils.formatNumber(index.all_shards.segments)} segments,{' '}
         {NumberUtils.formatNumber(index.all_shards.open_search_contexts)} open search contexts,{' '}
@@ -102,7 +107,6 @@ const IndexDetails = ({ index, indexName, indexRange, indexSetId, isDeflector }:
         <ShardRoutingOverview routing={index.routing} indexName={indexName} />
       </HideOnCloud>
       <hr style={{ marginBottom: '5', marginTop: '10' }} />
-
       {actionButtons}
     </div>
   );

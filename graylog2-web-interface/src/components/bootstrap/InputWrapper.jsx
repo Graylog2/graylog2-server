@@ -17,9 +17,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-const InputWrapper = ({ children, className }) => (className
-  ? <div className={className}>{children}</div>
-  : <span>{children}</span>);
+const InputWrapper = ({ children, className }) =>
+  className ? <div className={className}>{children}</div> : <span>{children}</span>;
 
 InputWrapper.propTypes = {
   className: PropTypes.string,

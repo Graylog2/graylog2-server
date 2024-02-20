@@ -22,16 +22,14 @@ import Grantee from 'logic/permissions/Grantee';
 
 import OwnersCell from './OwnersCell';
 
-const everyone = Grantee.builder()
-  .type('global')
-  .id('grn::::global:everyone')
-  .title('grn::::global:everyone')
-  .build();
+const everyone = Grantee.builder().type('global').id('grn::::global:everyone').title('grn::::global:everyone').build();
 
 const SUT = (props: React.ComponentProps<typeof OwnersCell>) => (
   <table>
     <tbody>
-      <tr><OwnersCell {...props} /></tr>
+      <tr>
+        <OwnersCell {...props} />
+      </tr>
     </tbody>
   </table>
 );

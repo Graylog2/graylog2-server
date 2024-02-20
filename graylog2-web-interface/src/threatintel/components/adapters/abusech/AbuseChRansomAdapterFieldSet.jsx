@@ -60,28 +60,34 @@ class AbuseChRansomAdapterFieldSet extends React.Component {
 
     return (
       <fieldset>
-        <Input label="Blocklist type"
-               id="blocklist-type-selector"
-               required
-               autoFocus
-               help="Select the type of the abuse.ch ransomware blocklist"
-               labelClassName="col-sm-3"
-               wrapperClassName="col-sm-9">
-          <Select placeholder="Select the type of blocklist"
-                  clearable={false}
-                  options={blocklistTypes}
-                  matchProp="label"
-                  onChange={this._onBlocklistTypeSelect}
-                  value={config.blocklist_type} />
+        <Input
+          label="Blocklist type"
+          id="blocklist-type-selector"
+          required
+          autoFocus
+          help="Select the type of the abuse.ch ransomware blocklist"
+          labelClassName="col-sm-3"
+          wrapperClassName="col-sm-9"
+        >
+          <Select
+            placeholder="Select the type of blocklist"
+            clearable={false}
+            options={blocklistTypes}
+            matchProp="label"
+            onChange={this._onBlocklistTypeSelect}
+            value={config.blocklist_type}
+          />
         </Input>
-        <TimeUnitInput label="Refresh blocklist"
-                       help="If enabled, the abuse.ch ransomware blocklist is refreshed when it changed."
-                       update={this.updateRefreshInterval}
-                       value={config.refresh_interval}
-                       unit={config.refresh_interval_unit || 'MINUTES'}
-                       defaultEnabled={config.refresh_interval > 0}
-                       labelClassName="col-sm-3"
-                       wrapperClassName="col-sm-9" />
+        <TimeUnitInput
+          label="Refresh blocklist"
+          help="If enabled, the abuse.ch ransomware blocklist is refreshed when it changed."
+          update={this.updateRefreshInterval}
+          value={config.refresh_interval}
+          unit={config.refresh_interval_unit || 'MINUTES'}
+          defaultEnabled={config.refresh_interval > 0}
+          labelClassName="col-sm-3"
+          wrapperClassName="col-sm-9"
+        />
       </fieldset>
     );
   }

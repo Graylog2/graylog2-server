@@ -55,7 +55,9 @@ const mockSearchStoreState = (storeState: Partial<SearchExecutionResult> = {}): 
           'search-type-id': {
             type: 'pivot',
             effective_timerange: {
-              type: 'absolute', from: '2021-04-26T12:32:48.000Z', to: '2021-04-26T14:32:48.000Z',
+              type: 'absolute',
+              from: '2021-04-26T12:32:48.000Z',
+              to: '2021-04-26T14:32:48.000Z',
             },
           },
         },
@@ -115,7 +117,8 @@ describe('TimerangeInfo', () => {
   });
 
   it('should display an absolute timerange', () => {
-    const absoluteWidget = widget.toBuilder()
+    const absoluteWidget = widget
+      .toBuilder()
       .timerange({ type: 'absolute', from: '2021-03-27T14:32:31.894Z', to: '2021-04-26T14:32:48.000Z' })
       .build();
     render(<TimerangeInfo widget={absoluteWidget} />);
@@ -124,9 +127,7 @@ describe('TimerangeInfo', () => {
   });
 
   it('should display a keyword timerange', () => {
-    const keywordWidget = widget.toBuilder()
-      .timerange({ type: 'keyword', keyword: '5 minutes ago' })
-      .build();
+    const keywordWidget = widget.toBuilder().timerange({ type: 'keyword', keyword: '5 minutes ago' }).build();
     render(<TimerangeInfo widget={keywordWidget} />);
 
     expect(screen.getByText('5 minutes ago')).toBeInTheDocument();
@@ -136,9 +137,7 @@ describe('TimerangeInfo', () => {
     const state = GlobalOverride.empty().toBuilder().timerange({ type: 'relative', range: 3000 }).build();
     asMock(useGlobalOverride).mockReturnValue(state);
 
-    const keywordWidget = widget.toBuilder()
-      .timerange({ type: 'keyword', keyword: '5 minutes ago' })
-      .build();
+    const keywordWidget = widget.toBuilder().timerange({ type: 'keyword', keyword: '5 minutes ago' }).build();
 
     render(<TimerangeInfo widget={keywordWidget} />);
 
@@ -148,18 +147,20 @@ describe('TimerangeInfo', () => {
   it('should not throw error when related search type is empty', () => {
     const relativeWidget = widget.toBuilder().timerange({ type: 'relative', range: 3000 }).build();
 
-    asMock(useSearchResult).mockReturnValue(mockSearchStoreState({
-      result: new SearchResult({
-        ...defaultSearchResult,
-        results: {
-          'active-query-id': {
-            execution_stats: {},
-            errors: [],
-            search_types: {},
+    asMock(useSearchResult).mockReturnValue(
+      mockSearchStoreState({
+        result: new SearchResult({
+          ...defaultSearchResult,
+          results: {
+            'active-query-id': {
+              execution_stats: {},
+              errors: [],
+              search_types: {},
+            },
           },
-        },
-      }),
-    }) as SearchExecutionResult);
+        }),
+      }) as SearchExecutionResult,
+    );
 
     render(<TimerangeInfo widget={relativeWidget} activeQuery="active-query-id" widgetId="widget-id" />);
 
@@ -167,9 +168,11 @@ describe('TimerangeInfo', () => {
   });
 
   it('should not throw error and display default time range when widget id does not exist in search widget mapping', () => {
-    asMock(useSearchResult).mockReturnValue(mockSearchStoreState({
-      widgetMapping: Immutable.Map(),
-    }) as SearchExecutionResult);
+    asMock(useSearchResult).mockReturnValue(
+      mockSearchStoreState({
+        widgetMapping: Immutable.Map(),
+      }) as SearchExecutionResult,
+    );
 
     render(<TimerangeInfo widget={widget} activeQuery="active-query-id" widgetId="widget-id" />);
 

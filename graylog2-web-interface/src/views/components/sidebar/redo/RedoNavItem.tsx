@@ -54,12 +54,14 @@ const RedoNavItem = ({ sidebarIsPinned }: { sidebarIsPinned: boolean }) => {
   });
 
   return (
-    <NavItem disabled={!isRedoAvailable}
-             onClick={onClick}
-             icon="redo"
-             title={TITLE}
-             ariaLabel={TITLE}
-             sidebarIsPinned={sidebarIsPinned} />
+    <NavItem
+      disabled={!isRedoAvailable}
+      onClick={onClick}
+      icon="redo"
+      title={TITLE}
+      ariaLabel={TITLE}
+      sidebarIsPinned={sidebarIsPinned}
+    />
   );
 };
 

@@ -23,7 +23,9 @@ import type { QueryId } from 'views/logic/queries/Query';
 import type Query from 'views/logic/queries/Query';
 import { selectSearchQueries } from 'views/logic/slices/viewSelectors';
 
-const selectQueriesAsMap = createSelector(selectSearchQueries, (queries) => Immutable.OrderedMap<QueryId, Query>(queries.map((q) => [q.id, q])));
+const selectQueriesAsMap = createSelector(selectSearchQueries, (queries) =>
+  Immutable.OrderedMap<QueryId, Query>(queries.map((q) => [q.id, q])),
+);
 
 const useQueries = () => useAppSelector(selectQueriesAsMap);
 

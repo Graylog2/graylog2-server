@@ -20,13 +20,13 @@ import PropTypes from 'prop-types';
 import LookupTableFieldValueProviderForm from './LookupTableFieldValueProviderForm';
 
 type Props = {
-  config: {},
-  validation: {},
+  config: {};
+  validation: {};
   currentUser: {
-    permissions: Array<string>,
-  },
-  onChange: () => void,
-}
+    permissions: Array<string>;
+  };
+  onChange: () => void;
+};
 
 const LookupTableFieldValueProviderFormContainer = ({ ...otherProps }: Props) => (
   <LookupTableFieldValueProviderForm {...otherProps} />

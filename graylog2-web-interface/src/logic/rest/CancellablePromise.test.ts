@@ -23,9 +23,10 @@ describe('CancellablePromise', () => {
     expect(promise.isCancelled()).toBeTruthy();
   });
 
-  it('should implement then', async () => CancellablePromise.of(Promise.resolve('ハチ公')).then((result) => {
-    expect(result).toBe('ハチ公');
-  }));
+  it('should implement then', async () =>
+    CancellablePromise.of(Promise.resolve('ハチ公')).then((result) => {
+      expect(result).toBe('ハチ公');
+    }));
 
   it('should implement finally', () => {
     CancellablePromise.of(Promise.resolve('ハチ公')).finally(() => {
@@ -37,9 +38,12 @@ describe('CancellablePromise', () => {
     });
   });
 
-  it('should implement catch', () => CancellablePromise.of(Promise.resolve(() => {
-    throw new Error('ハチ公');
-  })).catch((error) => {
-    expect(error).toBe('ハチ公');
-  }));
+  it('should implement catch', () =>
+    CancellablePromise.of(
+      Promise.resolve(() => {
+        throw new Error('ハチ公');
+      }),
+    ).catch((error) => {
+      expect(error).toBe('ハチ公');
+    }));
 });

@@ -42,70 +42,95 @@ const RollupColumnsLabel = styled.div`
 `;
 
 type RollupHoverForHelpProps = {
-  children: React.ReactNode,
-  title: string,
+  children: React.ReactNode;
+  title: string;
 };
 
 const RollupHoverForHelp = styled((props: RollupHoverForHelpProps) => <HoverForHelp {...props} />)`
   margin-left: 5px;
 `;
 
-type GroupingsItemProps = Omit<React.ComponentProps<typeof ElementConfigurationContainer>, 'testIdPrefix' | 'onRemove' | 'elementTitle' | 'children'> & {
+type GroupingsItemProps = Omit<
+  React.ComponentProps<typeof ElementConfigurationContainer>,
+  'testIdPrefix' | 'onRemove' | 'elementTitle' | 'children'
+> & {
   /* eslint-disable react/no-unused-prop-types */
-  item: { id: string },
-  index: number,
+  item: { id: string };
+  index: number;
   /* eslint-enable react/no-unused-prop-types */
 };
 
-const SettingsSeparator = styled.hr(({ theme }) => css`
-  border-style: dashed;
-  border-color: ${theme.colors.variant.lighter.default};
-  margin-top: 5px;
-  margin-bottom: 5px;
-`);
+const SettingsSeparator = styled.hr(
+  ({ theme }) => css`
+    border-style: dashed;
+    border-color: ${theme.colors.variant.lighter.default};
+    margin-top: 5px;
+    margin-bottom: 5px;
+  `,
+);
 
 const GroupingsConfiguration = () => {
-  const { values: { groupBy }, values, errors, setValues, setFieldValue } = useFormikContext<WidgetConfigFormValues>();
+  const {
+    values: { groupBy },
+    values,
+    errors,
+    setValues,
+    setFieldValue,
+  } = useFormikContext<WidgetConfigFormValues>();
   const disableColumnRollup = !groupBy?.groupings?.find(({ direction }) => direction === 'column');
-  const removeGrouping = useCallback((index) => () => {
-    setValues(GroupingElement.onRemove(index, values));
-  }, [setValues, values]);
+  const removeGrouping = useCallback(
+    (index) => () => {
+      setValues(GroupingElement.onRemove(index, values));
+    },
+    [setValues, values],
+  );
 
   const isEmpty = (groupBy?.groupings ?? []).length === 0;
 
-  const GroupingsItem = useCallback(({ item, index, dragHandleProps, draggableProps, className, ref }: GroupingsItemProps) => (
-    <ElementConfigurationContainer key={`grouping-${item.id}`}
-                                   dragHandleProps={dragHandleProps}
-                                   draggableProps={draggableProps}
-                                   className={className}
-                                   testIdPrefix={`grouping-${index}`}
-                                   onRemove={removeGrouping(index)}
-                                   elementTitle={GroupingElement.title}
-                                   ref={ref}>
-      <GroupingConfiguration index={index} />
-    </ElementConfigurationContainer>
-  ), [removeGrouping]);
+  const GroupingsItem = useCallback(
+    ({ item, index, dragHandleProps, draggableProps, className, ref }: GroupingsItemProps) => (
+      <ElementConfigurationContainer
+        key={`grouping-${item.id}`}
+        dragHandleProps={dragHandleProps}
+        draggableProps={draggableProps}
+        className={className}
+        testIdPrefix={`grouping-${index}`}
+        onRemove={removeGrouping(index)}
+        elementTitle={GroupingElement.title}
+        ref={ref}
+      >
+        <GroupingConfiguration index={index} />
+      </ElementConfigurationContainer>
+    ),
+    [removeGrouping],
+  );
 
   const hasGroupByError = isString(errors?.groupBy);
 
   return (
     <>
-      <FieldArray name="groupBy.groupings"
-                  validateOnChange={false}
-                  render={() => (
-                    <SortableList items={groupBy?.groupings}
-                                  onMoveItem={(newGroupings) => setFieldValue('groupBy.groupings', newGroupings)}
-                                  customListItemRender={GroupingsItem} />
-                  )} />
+      <FieldArray
+        name="groupBy.groupings"
+        validateOnChange={false}
+        render={() => (
+          <SortableList
+            items={groupBy?.groupings}
+            onMoveItem={(newGroupings) => setFieldValue('groupBy.groupings', newGroupings)}
+            customListItemRender={GroupingsItem}
+          />
+        )}
+      />
       {!isEmpty && (
         <>
           <SettingsSeparator />
           <ElementConfigurationContainer elementTitle="Settings">
             <Field name="groupBy.columnRollup">
               {({ field: { name, onChange, value } }) => (
-                <RollupColumnsCheckbox onChange={() => onChange({ target: { name, value: !groupBy?.columnRollup } })}
-                                       checked={value ?? false}
-                                       disabled={disableColumnRollup}>
+                <RollupColumnsCheckbox
+                  onChange={() => onChange({ target: { name, value: !groupBy?.columnRollup } })}
+                  checked={value ?? false}
+                  disabled={disableColumnRollup}
+                >
                   <RollupColumnsLabel>
                     Rollup Columns
                     <RollupHoverForHelp title="Rollup Columns">

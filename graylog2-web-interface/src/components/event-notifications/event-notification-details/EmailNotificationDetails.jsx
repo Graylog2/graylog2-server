@@ -24,8 +24,13 @@ import styles from '../event-notification-types/EmailNotificationSummary.css';
 
 const EmailNotificationDetails = ({ notification }) => {
   const recipients = (
-    <ReadOnlyFormGroup label="Email Recipients"
-                       value={notification.config.email_recipients.join(', ') || 'No email addresses are configured to receive this notification.'} />
+    <ReadOnlyFormGroup
+      label="Email Recipients"
+      value={
+        notification.config.email_recipients.join(', ') ||
+        'No email addresses are configured to receive this notification.'
+      }
+    />
   );
   const recipientLookupInfo = (
     <>
@@ -33,18 +38,14 @@ const EmailNotificationDetails = ({ notification }) => {
       <ReadOnlyFormGroup label="Email Recipients Lookup Table Key" value={notification.config.recipients_lut_key} />
     </>
   );
-  const sender = (
-    <ReadOnlyFormGroup label="Sender" value={notification.config.sender} />
-  );
+  const sender = <ReadOnlyFormGroup label="Sender" value={notification.config.sender} />;
   const senderLookupInfo = (
     <>
       <ReadOnlyFormGroup label="Sender Lookup Table Name" value={notification.config.sender_lut_name} />
       <ReadOnlyFormGroup label="Sender Lookup Table Key" value={notification.config.sender_lut_key} />
     </>
   );
-  const replyTo = (
-    <ReadOnlyFormGroup label="Reply-To" value={notification.config.reply_to} />
-  );
+  const replyTo = <ReadOnlyFormGroup label="Reply-To" value={notification.config.reply_to} />;
   const replyToLookupInfo = (
     <>
       <ReadOnlyFormGroup label="Reply-To Lookup Table Name" value={notification.config.reply_to_lut_name} />
@@ -54,27 +55,43 @@ const EmailNotificationDetails = ({ notification }) => {
 
   return (
     <>
-      <ReadOnlyFormGroup label="Use Lookup Table for Sender" value={notification.config.lookup_sender_email ? 'Yes' : 'No'} />
+      <ReadOnlyFormGroup
+        label="Use Lookup Table for Sender"
+        value={notification.config.lookup_sender_email ? 'Yes' : 'No'}
+      />
       {notification.config.lookup_sender_email ? senderLookupInfo : sender}
       <ReadOnlyFormGroup label="Subject" value={notification.config.subject} />
-      <ReadOnlyFormGroup label="Use Lookup Table for Reply-To" value={notification.config.lookup_reply_to_email ? 'Yes' : 'No'} />
+      <ReadOnlyFormGroup
+        label="Use Lookup Table for Reply-To"
+        value={notification.config.lookup_reply_to_email ? 'Yes' : 'No'}
+      />
       {notification.config.lookup_reply_to_email ? replyToLookupInfo : replyTo}
-      <ReadOnlyFormGroup label="User Recipients" value={notification.config.user_recipients.join(', ') || 'No users will receive this notification.'} />
-      <ReadOnlyFormGroup label="Use Lookup Table for Email Recipients" value={notification.config.lookup_recipient_emails ? 'Yes' : 'No'} />
+      <ReadOnlyFormGroup
+        label="User Recipients"
+        value={notification.config.user_recipients.join(', ') || 'No users will receive this notification.'}
+      />
+      <ReadOnlyFormGroup
+        label="Use Lookup Table for Email Recipients"
+        value={notification.config.lookup_recipient_emails ? 'Yes' : 'No'}
+      />
       {notification.config.lookup_recipient_emails ? recipientLookupInfo : recipients}
       <ReadOnlyFormGroup label="Time Zone" value={notification.config.time_zone} />
-      <ReadOnlyFormGroup label="Email Body"
-                         value={(
-                           <Well bsSize="small" className={styles.bodyPreview}>
-                             {notification.config.body_template || <em>Empty body</em>}
-                           </Well>
-                       )} />
-      <ReadOnlyFormGroup label="Email HTML Body"
-                         value={(
-                           <Well bsSize="small" className={styles.bodyPreview}>
-                             {notification.config.html_body_template || <em>Empty body</em>}
-                           </Well>
-                       )} />
+      <ReadOnlyFormGroup
+        label="Email Body"
+        value={
+          <Well bsSize="small" className={styles.bodyPreview}>
+            {notification.config.body_template || <em>Empty body</em>}
+          </Well>
+        }
+      />
+      <ReadOnlyFormGroup
+        label="Email HTML Body"
+        value={
+          <Well bsSize="small" className={styles.bodyPreview}>
+            {notification.config.html_body_template || <em>Empty body</em>}
+          </Well>
+        }
+      />
     </>
   );
 };

@@ -95,9 +95,7 @@
           "row_groups": [
             {
               "type": "values",
-              "fields": [
-                "user_name"
-              ],
+              "fields": ["user_name"],
               "limit": 15,
               "skip_empty_values": false
             }
@@ -160,9 +158,7 @@
           "row_groups": [
             {
               "type": "values",
-              "fields": [
-                "target_user_name"
-              ],
+              "fields": ["target_user_name"],
               "limit": 15,
               "skip_empty_values": false
             }
@@ -196,9 +192,7 @@
           "row_groups": [
             {
               "type": "values",
-              "fields": [
-                "user_name"
-              ],
+              "fields": ["user_name"],
               "limit": 15,
               "skip_empty_values": false
             }
@@ -232,9 +226,7 @@
           "row_groups": [
             {
               "type": "values",
-              "fields": [
-                "user_name"
-              ],
+              "fields": ["user_name"],
               "limit": 15,
               "skip_empty_values": false
             }
@@ -268,9 +260,7 @@
           "row_groups": [
             {
               "type": "values",
-              "fields": [
-                "event_source"
-              ],
+              "fields": ["event_source"],
               "limit": 15,
               "skip_empty_values": false
             }
@@ -304,9 +294,7 @@
           "row_groups": [
             {
               "type": "values",
-              "fields": [
-                "user_name"
-              ],
+              "fields": ["user_name"],
               "limit": 15,
               "skip_empty_values": false
             }
@@ -314,9 +302,7 @@
           "column_groups": [
             {
               "type": "values",
-              "fields": [
-                "event_outcome"
-              ],
+              "fields": ["event_outcome"],
               "limit": 15,
               "skip_empty_values": false
             }
@@ -376,9 +362,7 @@
           "row_groups": [
             {
               "type": "values",
-              "fields": [
-                "gim_event_type"
-              ],
+              "fields": ["gim_event_type"],
               "limit": 15,
               "skip_empty_values": false
             }
@@ -441,9 +425,7 @@
           "row_groups": [
             {
               "type": "values",
-              "fields": [
-                "event_source_product"
-              ],
+              "fields": ["event_source_product"],
               "limit": 15,
               "skip_empty_values": false
             }
@@ -477,9 +459,7 @@
           "row_groups": [
             {
               "type": "values",
-              "fields": [
-                "source_user_name"
-              ],
+              "fields": ["source_user_name"],
               "limit": 15,
               "skip_empty_values": false
             }

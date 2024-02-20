@@ -22,19 +22,21 @@ import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import type { IndexSetsDefaultConfiguration } from 'stores/indices/IndexSetsStore';
 
-const fetchIndexDefaults: () => Promise<IndexSetsDefaultConfiguration> = () => fetch('GET', qualifyUrl(`${ApiRoutes.ClusterConfigResource.config().url}/org.graylog2.configuration.IndexSetsDefaultConfiguration`));
+const fetchIndexDefaults: () => Promise<IndexSetsDefaultConfiguration> = () =>
+  fetch(
+    'GET',
+    qualifyUrl(
+      `${ApiRoutes.ClusterConfigResource.config().url}/org.graylog2.configuration.IndexSetsDefaultConfiguration`,
+    ),
+  );
 
 const useIndexDefaults = () => {
-  const { data, isLoading } = useQuery<IndexSetsDefaultConfiguration, Error>(
-    ['index-defaults'],
-    fetchIndexDefaults,
-    {
-      onError: (fetchError: Error) => {
-        UserNotification.error(`Error fetching index defaults: ${fetchError.message}`);
-      },
-      retry: 1,
+  const { data, isLoading } = useQuery<IndexSetsDefaultConfiguration, Error>(['index-defaults'], fetchIndexDefaults, {
+    onError: (fetchError: Error) => {
+      UserNotification.error(`Error fetching index defaults: ${fetchError.message}`);
     },
-  );
+    retry: 1,
+  });
 
   return {
     loadingIndexDefaultsConfig: isLoading,

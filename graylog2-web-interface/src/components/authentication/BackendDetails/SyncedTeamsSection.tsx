@@ -22,7 +22,7 @@ import type AuthenticationBackend from 'logic/authentication/AuthenticationBacke
 import SectionComponent from 'components/common/Section/SectionComponent';
 
 type Props = {
-  authenticationBackend: AuthenticationBackend,
+  authenticationBackend: AuthenticationBackend;
 };
 
 const SyncedTeamsSection = ({ authenticationBackend }: Props) => {

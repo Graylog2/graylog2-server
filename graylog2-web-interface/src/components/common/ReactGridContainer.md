@@ -1,4 +1,5 @@
 Regular `ReactGridContainer`:
+
 ```js
 import createReactClass from 'create-react-class';
 
@@ -38,9 +39,7 @@ const ReactGridContainerExample = createReactClass({
     };
 
     return (
-      <ReactGridContainer positions={positions}
-                          onPositionsChange={this.onPositionsChange}
-                          columns={columns}>
+      <ReactGridContainer positions={positions} onPositionsChange={this.onPositionsChange} columns={columns}>
         {this.widgetDiv(1)}
         {this.widgetDiv(2)}
         {this.widgetDiv(3)}
@@ -50,11 +49,11 @@ const ReactGridContainerExample = createReactClass({
   },
 });
 
-<ReactGridContainerExample />
+<ReactGridContainerExample />;
 ```
 
-
 Lock or block resizing in `ReactGridContainer`:
+
 ```js
 import createReactClass from 'create-react-class';
 import { Button, ButtonToolbar } from 'components/bootstrap';
@@ -114,13 +113,15 @@ const ReactGridContainerExampleLocked = createReactClass({
             isResizable is {String(isResizable)}
           </Button>
         </ButtonToolbar>
-        <br/>
-        <ReactGridContainer positions={positions}
-                            onPositionsChange={this.onPositionsChange}
-                            columns={columns}
-                            rowHeight={100}
-                            locked={locked}
-                            isResizable={isResizable}>
+        <br />
+        <ReactGridContainer
+          positions={positions}
+          onPositionsChange={this.onPositionsChange}
+          columns={columns}
+          rowHeight={100}
+          locked={locked}
+          isResizable={isResizable}
+        >
           {this.widgetDiv(1)}
           {this.widgetDiv(2)}
           {this.widgetDiv(3)}
@@ -131,5 +132,5 @@ const ReactGridContainerExampleLocked = createReactClass({
   },
 });
 
-<ReactGridContainerExampleLocked />
+<ReactGridContainerExampleLocked />;
 ```

@@ -19,29 +19,35 @@ import * as Immutable from 'immutable';
 import type { QueryString, TimeRange } from '../queries/Query';
 
 export type SearchTypeOptions<T = any> = {
-  [searchTypeId: string]: T
+  [searchTypeId: string]: T;
 };
 
 type InternalState = {
-  timerange?: TimeRange,
-  query?: QueryString,
-  keepSearchTypes?: string[],
-  keepQueries?: string[],
-  searchTypes?: SearchTypeOptions,
+  timerange?: TimeRange;
+  query?: QueryString;
+  keepSearchTypes?: string[];
+  keepQueries?: string[];
+  searchTypes?: SearchTypeOptions;
 };
 
 type JsonRepresentation = {
-  timerange?: TimeRange,
-  query?: QueryString,
-  keep_search_types?: string[],
-  keep_queries?: string[],
-  search_types?: SearchTypeOptions,
+  timerange?: TimeRange;
+  query?: QueryString;
+  keep_search_types?: string[];
+  keep_queries?: string[];
+  search_types?: SearchTypeOptions;
 };
 
 export default class GlobalOverride {
   private readonly _value: InternalState;
 
-  constructor(timerange?: TimeRange, query?: QueryString, keepSearchTypes?: string[], searchTypes?: SearchTypeOptions, keepQueries?: string[]) {
+  constructor(
+    timerange?: TimeRange,
+    query?: QueryString,
+    keepSearchTypes?: string[],
+    searchTypes?: SearchTypeOptions,
+    keepQueries?: string[],
+  ) {
     this._value = { timerange, query, keepSearchTypes, searchTypes, keepQueries };
   }
 
@@ -72,7 +78,13 @@ export default class GlobalOverride {
     return new Builder(Immutable.Map({ timerange, query, keepSearchTypes, searchTypes, keepQueries }));
   }
 
-  static create(timerange?: TimeRange, query?: QueryString, keepSearchTypes?: string[], searchTypes?: SearchTypeOptions, keepQueries?: string[]): GlobalOverride {
+  static create(
+    timerange?: TimeRange,
+    query?: QueryString,
+    keepSearchTypes?: string[],
+    searchTypes?: SearchTypeOptions,
+    keepQueries?: string[],
+  ): GlobalOverride {
     return new GlobalOverride(timerange, query, keepSearchTypes, searchTypes, keepQueries);
   }
 

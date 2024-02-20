@@ -44,7 +44,14 @@ const getFilename = (view, selectedWidget) => {
 
 const startDownload = (
   format: string,
-  downloadFile: (format: string, payload: ExportPayload, searchQueries: Set<Query>, searchType: SearchType | undefined | null, searchId: string, filename: string) => Promise<void>,
+  downloadFile: (
+    format: string,
+    payload: ExportPayload,
+    searchQueries: Set<Query>,
+    searchType: SearchType | undefined | null,
+    searchId: string,
+    filename: string,
+  ) => Promise<void>,
   view: View,
   executionState: SearchExecutionState,
   selectedWidget: Widget | undefined | null,
@@ -58,7 +65,9 @@ const startDownload = (
     limit,
     ...customSettings,
   };
-  const searchType: SearchType | undefined | null = selectedWidget ? view.getSearchTypeByWidgetId(selectedWidget.id) : undefined;
+  const searchType: SearchType | undefined | null = selectedWidget
+    ? view.getSearchTypeByWidgetId(selectedWidget.id)
+    : undefined;
   const filename = getFilename(view, selectedWidget);
 
   return downloadFile(format, payload, view.search.queries, searchType, view.search.id, filename);

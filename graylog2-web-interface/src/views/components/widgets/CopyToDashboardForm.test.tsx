@@ -24,12 +24,8 @@ import { asMock } from 'helpers/mocking';
 
 import CopyToDashboardForm from './CopyToDashboardForm';
 
-const view1 = View.builder().type(View.Type.Dashboard).id('view-1').title('view 1')
-  .search(Search.create())
-  .build();
-const view2 = View.builder().type(View.Type.Dashboard).id('view-2').title('view 2')
-  .search(Search.create())
-  .build();
+const view1 = View.builder().type(View.Type.Dashboard).id('view-1').title('view 1').search(Search.create()).build();
+const view2 = View.builder().type(View.Type.Dashboard).id('view-2').title('view 2').search(Search.create()).build();
 const dashboardList = [view1, view2];
 
 jest.mock('views/components/dashboard/hooks/useDashboards');
@@ -61,12 +57,14 @@ describe('CopyToDashboardForm', () => {
   });
 
   const SUT = (props: Partial<React.ComponentProps<typeof CopyToDashboardForm>>) => (
-    <CopyToDashboardForm onCancel={() => {}}
-                         onCopyToDashboard={() => Promise.resolve()}
-                         onCreateNewDashboard={() => Promise.resolve()}
-                         submitButtonText="Submit"
-                         submitLoadingText="Submitting..."
-                         {...props} />
+    <CopyToDashboardForm
+      onCancel={() => {}}
+      onCopyToDashboard={() => Promise.resolve()}
+      onCreateNewDashboard={() => Promise.resolve()}
+      submitButtonText="Submit"
+      submitLoadingText="Submitting..."
+      {...props}
+    />
   );
 
   const submitModal = () => {
@@ -172,14 +170,16 @@ describe('CopyToDashboardForm', () => {
 
     fireEvent.change(searchInput, { target: { value: 'view 1' } });
 
-    await waitFor(() => expect(useDashboards).toHaveBeenCalledWith({
-      query: 'view 1',
-      page: 1,
-      pageSize: 5,
-      sort: {
-        attributeId: 'title',
-        direction: 'asc',
-      },
-    }));
+    await waitFor(() =>
+      expect(useDashboards).toHaveBeenCalledWith({
+        query: 'view 1',
+        page: 1,
+        pageSize: 5,
+        sort: {
+          attributeId: 'title',
+          direction: 'asc',
+        },
+      }),
+    );
   });
 });

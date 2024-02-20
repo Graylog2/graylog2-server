@@ -25,40 +25,36 @@ import SawmillMantine from '@graylog/sawmill/mantine';
 import { DEFAULT_THEME_MODE } from './constants';
 
 type Props = {
-  children: React.ReactNode,
+  children: React.ReactNode;
 };
 
 const useSCTheme = (
   colorScheme: ColorScheme,
   setColorScheme: (newColorScheme: ColorScheme) => void,
   mantineTheme: MantineTheme,
-) => useMemo(() => {
-  const theme = SawmillSC({ colorScheme });
+) =>
+  useMemo(() => {
+    const theme = SawmillSC({ colorScheme });
 
-  const onChangeColorScheme = (nextMode: ColorScheme) => {
-    setColorScheme(nextMode);
-  };
+    const onChangeColorScheme = (nextMode: ColorScheme) => {
+      setColorScheme(nextMode);
+    };
 
-  return ({
-    ...theme,
-    changeMode: onChangeColorScheme,
-    mantine: mantineTheme,
-  });
-}, [colorScheme, mantineTheme, setColorScheme]);
+    return {
+      ...theme,
+      changeMode: onChangeColorScheme,
+      mantine: mantineTheme,
+    };
+  }, [colorScheme, mantineTheme, setColorScheme]);
 
 const PreflightThemeProvider = ({ children }: Props) => {
   const [colorScheme, setColorScheme] = useState<ColorScheme>(DEFAULT_THEME_MODE);
-  const mantineTheme = useMemo(
-    () => SawmillMantine({ colorScheme }),
-    [colorScheme],
-  );
+  const mantineTheme = useMemo(() => SawmillMantine({ colorScheme }), [colorScheme]);
   const scTheme = useSCTheme(colorScheme, setColorScheme, mantineTheme);
 
   return (
     <MantineProvider theme={mantineTheme}>
-      <ThemeProvider theme={scTheme}>
-        {children}
-      </ThemeProvider>
+      <ThemeProvider theme={scTheme}>{children}</ThemeProvider>
     </MantineProvider>
   );
 };

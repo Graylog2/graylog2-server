@@ -59,13 +59,15 @@ describe('QueryTitle', () => {
 
   const SUT = (props: Partial<React.ComponentProps<typeof QueryTitle>>) => (
     <TestStoreProvider>
-      <QueryTitle active
-                  id="query-id-1"
-                  openEditModal={() => {}}
-                  onRemove={() => Promise.resolve()}
-                  title="Foo"
-                  openCopyToDashboardModal={() => {}}
-                  {...props} />
+      <QueryTitle
+        active
+        id="query-id-1"
+        openEditModal={() => {}}
+        onRemove={() => Promise.resolve()}
+        title="Foo"
+        openCopyToDashboardModal={() => {}}
+        {...props}
+      />
       <QueryCount />
     </TestStoreProvider>
   );

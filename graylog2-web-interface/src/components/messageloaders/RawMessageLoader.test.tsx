@@ -54,13 +54,18 @@ describe('<RawMessageLoader.test>', () => {
 
   describe('with forwarder plugin installed', () => {
     beforeEach(() => {
-      asMock(PluginStore.exports).mockImplementation((type) => ({
-        forwarder: [{
-          messageLoaders: {
-            ForwarderInputDropdown: () => <>Forwarder Inputs</>,
-          },
-        }],
-      }[type]));
+      asMock(PluginStore.exports).mockImplementation(
+        (type) =>
+          ({
+            forwarder: [
+              {
+                messageLoaders: {
+                  ForwarderInputDropdown: () => <>Forwarder Inputs</>,
+                },
+              },
+            ],
+          })[type],
+      );
     });
 
     it('allows user to select between server and forwarder input on premise', () => {

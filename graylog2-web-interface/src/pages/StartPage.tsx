@@ -29,9 +29,12 @@ const StartPage = () => {
   const isLoading = !currentUser;
   const history = useHistory();
 
-  const redirect = useCallback((page: string) => {
-    history.replace(page);
-  }, [history]);
+  const redirect = useCallback(
+    (page: string) => {
+      history.replace(page);
+    },
+    [history],
+  );
 
   const redirectToStartPage = useCallback(() => {
     const startPage = currentUser?.startpage;

@@ -22,13 +22,15 @@ import { Well } from 'components/bootstrap';
 
 import MessageLoader from './MessageLoader';
 
-const NewExampleWell = styled(Well)(({ theme }) => css`
-  margin-bottom: 5px;
-  font-family: ${theme.fonts.family.monospace};
-  font-size: ${theme.fonts.size.body};
-  white-space: pre-wrap;
-  word-wrap: break-word;
-`);
+const NewExampleWell = styled(Well)(
+  ({ theme }) => css`
+    margin-bottom: 5px;
+    font-family: ${theme.fonts.family.monospace};
+    font-size: ${theme.fonts.size.body};
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  `,
+);
 
 const NoExample = styled.div`
   margin-top: 15px;
@@ -57,7 +59,11 @@ class ExtractorExampleMessage extends React.Component {
 
   render() {
     const { example, field } = this.props;
-    const originalMessage = <span id="xtrc-original-example" style={{ display: 'none' }}>{example}</span>;
+    const originalMessage = (
+      <span id="xtrc-original-example" style={{ display: 'none' }}>
+        {example}
+      </span>
+    );
     let messagePreview;
 
     if (example) {
@@ -69,8 +75,8 @@ class ExtractorExampleMessage extends React.Component {
     } else {
       messagePreview = (
         <NoExample className="alert alert-warning">
-          Could not load an example of field &lsquo;{field}&rsquo;. It is not possible to test
-          the extractor before updating it.
+          Could not load an example of field &lsquo;{field}&rsquo;. It is not possible to test the extractor before
+          updating it.
         </NoExample>
       );
     }

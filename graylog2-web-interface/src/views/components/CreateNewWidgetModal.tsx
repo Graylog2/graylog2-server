@@ -40,13 +40,15 @@ const WidgetList = styled.div`
   gap: 0.7rem;
 `;
 
-const CreateWidgetButton = styled(Button)(({ theme }) => css`
-  background-color: transparent;
-  border-color: ${theme.colors.variant.gray};
-  border-radius: 4px;
-  height: 8rem;
-  width: 8rem;
-`);
+const CreateWidgetButton = styled(Button)(
+  ({ theme }) => css`
+    background-color: transparent;
+    border-color: ${theme.colors.variant.gray};
+    border-radius: 4px;
+    height: 8rem;
+    width: 8rem;
+  `,
+);
 
 const ButtonInner = styled.div`
   display: flex;
@@ -58,14 +60,16 @@ const ButtonInner = styled.div`
   gap: 0.3rem;
 `;
 
-const HugeIcon = styled.div(({ theme }) => css`
-  font-size: ${theme.fonts.size.huge};
-`);
+const HugeIcon = styled.div(
+  ({ theme }) => css`
+    font-size: ${theme.fonts.size.huge};
+  `,
+);
 
 type Props = {
-  onCancel: () => void,
-  position: WidgetPosition,
-}
+  onCancel: () => void;
+  position: WidgetPosition;
+};
 
 const CreateNewWidgetModal = ({ onCancel, position }: Props) => {
   const creators = usePluginEntities('widgetCreators');
@@ -74,39 +78,42 @@ const CreateNewWidgetModal = ({ onCancel, position }: Props) => {
   const location = useLocation();
   const sendTelemetry = useSendTelemetry();
 
-  const widgetButtons = useMemo(() => creators.map(({ title, func, icon: WidgetIcon }) => {
-    const onClick = async () => {
-      sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_CREATE[upperCase(title).replace(/ /g, '_')], {
-        app_pathname: getPathnameWithoutId(location.pathname),
-        app_section: 'search-widget',
-      });
+  const widgetButtons = useMemo(
+    () =>
+      creators.map(({ title, func, icon: WidgetIcon }) => {
+        const onClick = async () => {
+          sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_CREATE[upperCase(title).replace(/ /g, '_')], {
+            app_pathname: getPathnameWithoutId(location.pathname),
+            app_section: 'search-widget',
+          });
 
-      const newId = generateId();
-      const newWidget = func({ view }).toBuilder().id(newId).build();
+          const newId = generateId();
+          const newWidget = func({ view }).toBuilder().id(newId).build();
 
-      return dispatch(addWidget(newWidget, position));
-    };
+          return dispatch(addWidget(newWidget, position));
+        };
 
-    return (
-      <CreateWidgetButton key={title} type="button" title={`Create ${title} Widget`} onClick={onClick}>
-        <ButtonInner>
-          <HugeIcon><WidgetIcon /></HugeIcon>
-          {title}
-        </ButtonInner>
-      </CreateWidgetButton>
-    );
-  }), [creators, dispatch, location.pathname, position, sendTelemetry, view]);
+        return (
+          <CreateWidgetButton key={title} type="button" title={`Create ${title} Widget`} onClick={onClick}>
+            <ButtonInner>
+              <HugeIcon>
+                <WidgetIcon />
+              </HugeIcon>
+              {title}
+            </ButtonInner>
+          </CreateWidgetButton>
+        );
+      }),
+    [creators, dispatch, location.pathname, position, sendTelemetry, view],
+  );
 
   return (
-    <Modal onHide={onCancel}
-           show>
+    <Modal onHide={onCancel} show>
       <Modal.Header closeButton>
         <Modal.Title>{modalTitle}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <WidgetList>
-          {widgetButtons}
-        </WidgetList>
+        <WidgetList>{widgetButtons}</WidgetList>
       </Modal.Body>
       <Modal.Footer>
         <Button type="button" onClick={onCancel}>

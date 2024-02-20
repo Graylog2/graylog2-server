@@ -19,8 +19,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
-import EventDefinitionFormContainer
-  from 'components/event-definitions/event-definition-form/EventDefinitionFormContainer';
+import EventDefinitionFormContainer from 'components/event-definitions/event-definition-form/EventDefinitionFormContainer';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import { isPermitted } from 'util/PermissionsMixin';
@@ -32,13 +31,19 @@ const CreateEventDefinitionPage = () => {
   const navigate = useNavigate();
   const [eventDefinitionTitle, setEventDefinitionTitle] = useState();
 
-  const handleEventDefinitionChange = useCallback((eventDefinition) => {
-    if (eventDefinition.title !== eventDefinitionTitle) {
-      setEventDefinitionTitle(eventDefinition.title);
-    }
-  }, [eventDefinitionTitle]);
+  const handleEventDefinitionChange = useCallback(
+    (eventDefinition) => {
+      if (eventDefinition.title !== eventDefinitionTitle) {
+        setEventDefinitionTitle(eventDefinition.title);
+      }
+    },
+    [eventDefinitionTitle],
+  );
 
-  const pageTitle = useMemo(() => (eventDefinitionTitle ? `New Event Definition "${eventDefinitionTitle}"` : 'New Event Definition'), [eventDefinitionTitle]);
+  const pageTitle = useMemo(
+    () => (eventDefinitionTitle ? `New Event Definition "${eventDefinitionTitle}"` : 'New Event Definition'),
+    [eventDefinitionTitle],
+  );
 
   useEffect(() => {
     if (!isPermitted(currentUser.permissions, 'eventdefinitions:create')) {
@@ -50,14 +55,14 @@ const CreateEventDefinitionPage = () => {
     <DocumentTitle title={pageTitle}>
       <EventsPageNavigation />
 
-      <PageHeader title={pageTitle}
-                  documentationLink={{
-                    title: 'Alerts documentation',
-                    path: DocsHelper.PAGES.ALERTS,
-                  }}>
-        <span>
-          Event Definitions allow you to create Alerts from different Conditions and alert on them.
-        </span>
+      <PageHeader
+        title={pageTitle}
+        documentationLink={{
+          title: 'Alerts documentation',
+          path: DocsHelper.PAGES.ALERTS,
+        }}
+      >
+        <span>Event Definitions allow you to create Alerts from different Conditions and alert on them.</span>
       </PageHeader>
 
       <Row className="content">
@@ -65,7 +70,6 @@ const CreateEventDefinitionPage = () => {
           <EventDefinitionFormContainer action="create" onEventDefinitionChange={handleEventDefinitionChange} />
         </Col>
       </Row>
-
     </DocumentTitle>
   );
 };

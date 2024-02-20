@@ -42,7 +42,12 @@ jest.mock('util/AppConfig', () => ({
 
 const AreaVisualization = (props: React.ComponentProps<typeof OriginalAreaVisualization>) => (
   <TestStoreProvider>
-    <FieldTypesContext.Provider value={{ all: Immutable.List(), queryFields: Immutable.Map({ 'query-id-1': Immutable.List<FieldTypeMapping>() }) }}>
+    <FieldTypesContext.Provider
+      value={{
+        all: Immutable.List(),
+        queryFields: Immutable.Map({ 'query-id-1': Immutable.List<FieldTypeMapping>() }),
+      }}
+    >
       <OriginalAreaVisualization {...props} />
     </FieldTypesContext.Provider>
   </TestStoreProvider>
@@ -61,21 +66,28 @@ describe('AreaVisualization', () => {
       .series([Series.forFunction('avg(nf_bytes)'), Series.forFunction('sum(nf_pkts)')])
       .build();
 
-    const wrapper = mount(<AreaVisualization config={config}
-                                             data={simpleChartData}
-                                             effectiveTimerange={effectiveTimerange}
-                                             fields={Immutable.List()}
-                                             height={1024}
-                                             onChange={() => {}}
-                                             toggleEdit={() => {}}
-                                             width={800} />);
+    const wrapper = mount(
+      <AreaVisualization
+        config={config}
+        data={simpleChartData}
+        effectiveTimerange={effectiveTimerange}
+        fields={Immutable.List()}
+        height={1024}
+        onChange={() => {}}
+        toggleEdit={() => {}}
+        width={800}
+      />,
+    );
 
     const genericPlot = wrapper.find('GenericPlot');
 
-    expect(genericPlot).toHaveProp('layout', expect.objectContaining({
-      xaxis: { range: ['2019-11-28T16:21:00.486+01:00', '2019-11-28T16:25:57.000+01:00'], type: 'date' },
-      legend: { y: -0.14 },
-    }));
+    expect(genericPlot).toHaveProp(
+      'layout',
+      expect.objectContaining({
+        xaxis: { range: ['2019-11-28T16:21:00.486+01:00', '2019-11-28T16:25:57.000+01:00'], type: 'date' },
+        legend: { y: -0.14 },
+      }),
+    );
 
     expect(genericPlot).toHaveProp('chartData', [
       {

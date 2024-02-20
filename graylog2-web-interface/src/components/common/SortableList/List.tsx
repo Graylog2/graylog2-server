@@ -20,13 +20,13 @@ import type { ListItemType, CustomContentRender, CustomListItemRender } from './
 import SortableListItem from './SortableListItem';
 
 export type Props<ItemType extends ListItemType> = {
-  alignItemContent?: 'flex-start' | 'center',
-  customContentRender?: CustomContentRender<ItemType>,
-  customListItemRender?: CustomListItemRender<ItemType>,
-  disableDragging?: boolean,
-  displayOverlayInPortal?: boolean,
-  items: Array<ItemType>,
-}
+  alignItemContent?: 'flex-start' | 'center';
+  customContentRender?: CustomContentRender<ItemType>;
+  customListItemRender?: CustomListItemRender<ItemType>;
+  disableDragging?: boolean;
+  displayOverlayInPortal?: boolean;
+  items: Array<ItemType>;
+};
 
 const List = <ItemType extends ListItemType>({
   alignItemContent,
@@ -38,17 +38,19 @@ const List = <ItemType extends ListItemType>({
 }: Props<ItemType>) => (
   <>
     {items.map((item, index) => (
-      <SortableListItem alignItemContent={alignItemContent}
-                        item={item}
-                        index={index}
-                        key={item.id}
-                        customContentRender={customContentRender}
-                        customListItemRender={customListItemRender}
-                        disableDragging={disableDragging}
-                        displayOverlayInPortal={displayOverlayInPortal} />
+      <SortableListItem
+        alignItemContent={alignItemContent}
+        item={item}
+        index={index}
+        key={item.id}
+        customContentRender={customContentRender}
+        customListItemRender={customListItemRender}
+        disableDragging={disableDragging}
+        displayOverlayInPortal={displayOverlayInPortal}
+      />
     ))}
   </>
-  );
+);
 
 List.defaultProps = {
   displayOverlayInPortal: false,

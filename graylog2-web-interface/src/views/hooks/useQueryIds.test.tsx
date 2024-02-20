@@ -25,22 +25,21 @@ import useQueryIds from 'views/hooks/useQueryIds';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 
-const createView = (queryIds: Array<string>) => View.builder()
-  .search(Search.builder()
-    .queries(Immutable.OrderedSet(queryIds.map((queryId) => Query.builder().id(queryId).build())))
-    .build())
-  .build();
+const createView = (queryIds: Array<string>) =>
+  View.builder()
+    .search(
+      Search.builder()
+        .queries(Immutable.OrderedSet(queryIds.map((queryId) => Query.builder().id(queryId).build())))
+        .build(),
+    )
+    .build();
 
 const Wrapper = ({ children, queryIds }: React.PropsWithChildren<{ queryIds: Array<string> }>) => (
-  <TestStoreProvider view={createView(queryIds)}>
-    {children}
-  </TestStoreProvider>
+  <TestStoreProvider view={createView(queryIds)}>{children}</TestStoreProvider>
 );
-const createWrapper = (queryIds: Array<string>) => ({ children }: React.PropsWithChildren<{}>) => (
-  <Wrapper queryIds={queryIds}>
-    {children}
-  </Wrapper>
-);
+const createWrapper =
+  (queryIds: Array<string>) =>
+  ({ children }: React.PropsWithChildren<{}>) => <Wrapper queryIds={queryIds}>{children}</Wrapper>;
 
 describe('useQueryIds', () => {
   beforeEach(() => {

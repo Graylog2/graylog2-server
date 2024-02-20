@@ -25,24 +25,28 @@ import AppConfig from 'util/AppConfig';
  * This component should be conditionally rendered if you have a form that is in a "dirty" state. It will confirm with the user that they want to navigate away, refresh, or in any way unload the component.
  */
 type Props = {
-  question: string,
+  question: string;
 };
 
-const locationHasChanged = (currentLocation: Location, newLocation: Location, question: string) => ((newLocation.pathname !== currentLocation.pathname)
-  // eslint-disable-next-line no-alert
-  ? !window.confirm(question)
-  : false);
+const locationHasChanged = (currentLocation: Location, newLocation: Location, question: string) =>
+  newLocation.pathname !== currentLocation.pathname
+    ? // eslint-disable-next-line no-alert
+      !window.confirm(question)
+    : false;
 
 const ConfirmLeaveDialog = ({ question }: Props) => {
-  const handleLeavePage = useCallback((e) => {
-    if (AppConfig.gl2DevMode()) {
-      return null;
-    }
+  const handleLeavePage = useCallback(
+    (e) => {
+      if (AppConfig.gl2DevMode()) {
+        return null;
+      }
 
-    e.returnValue = question;
+      e.returnValue = question;
 
-    return question;
-  }, [question]);
+      return question;
+    },
+    [question],
+  );
 
   useEffect(() => {
     window.addEventListener('beforeunload', handleLeavePage);
@@ -52,7 +56,9 @@ const ConfirmLeaveDialog = ({ question }: Props) => {
     };
   }, [handleLeavePage]);
 
-  useBlocker((history) => !AppConfig.gl2DevMode() && locationHasChanged(history.currentLocation, history.nextLocation, question));
+  useBlocker(
+    (history) => !AppConfig.gl2DevMode() && locationHasChanged(history.currentLocation, history.nextLocation, question),
+  );
 
   return null;
 };

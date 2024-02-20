@@ -28,73 +28,79 @@ const INITIAL_DATA = {
 };
 
 type Options = {
-  enabled: boolean,
-}
+  enabled: boolean;
+};
 export type Sort = {
-    attributeId: 'index_set_id' | 'index_set_title',
-    direction: 'asc' | 'desc'
-}
+  attributeId: 'index_set_id' | 'index_set_title';
+  direction: 'asc' | 'desc';
+};
 
 export type SearchParams = {
-    page: number,
-    pageSize: number,
-    sort: Sort
-}
+  page: number;
+  pageSize: number;
+  sort: Sort;
+};
 
-const fetchFieldTypeUsages = async ({ field, streams }: { field: string, streams: Array<string>}, searchParams: SearchParams) => {
-  const { sort: { attributeId, direction }, page, pageSize } = searchParams;
+const fetchFieldTypeUsages = async (
+  { field, streams }: { field: string; streams: Array<string> },
+  searchParams: SearchParams,
+) => {
+  const {
+    sort: { attributeId, direction },
+    page,
+    pageSize,
+  } = searchParams;
   const body = { field, streams: streams.length ? streams : undefined };
 
-  return SystemIndexSetsTypes.fieldTypeSummaries(
-    body, attributeId, page, pageSize, direction).then(
+  return SystemIndexSetsTypes.fieldTypeSummaries(body, attributeId, page, pageSize, direction).then(
     ({ elements, total, attributes }) => ({
-      list: elements
-        .map(({
-          stream_titles,
-          index_set_title,
-          index_set_id,
-          types,
-        }) => ({
-          streamTitles: stream_titles,
-          types,
-          id: index_set_id,
-          indexSetTitle: index_set_title,
-        })),
+      list: elements.map(({ stream_titles, index_set_title, index_set_id, types }) => ({
+        streamTitles: stream_titles,
+        types,
+        id: index_set_id,
+        indexSetTitle: index_set_title,
+      })),
       pagination: { total },
       attributes,
     }),
   );
 };
 
-const useFieldTypeUsages = ({ streams, field }: { streams: Array<string>, field: string }, searchParams: SearchParams, { enabled }: Options = { enabled: true }): {
+const useFieldTypeUsages = (
+  { streams, field }: { streams: Array<string>; field: string },
+  searchParams: SearchParams,
+  { enabled }: Options = { enabled: true },
+): {
   data: {
-    list: Readonly<Array<FieldTypeUsage>>,
-    pagination: { total: number },
-    attributes: Array<Attribute>
-  },
-  refetch: () => void,
-  isInitialLoading: boolean,
-  isLoading: boolean,
+    list: Readonly<Array<FieldTypeUsage>>;
+    pagination: { total: number };
+    attributes: Array<Attribute>;
+  };
+  refetch: () => void;
+  isInitialLoading: boolean;
+  isLoading: boolean;
 } => {
   const { data, refetch, isInitialLoading, isLoading } = useQuery(
     ['fieldTypeUsages', field, searchParams],
     () => fetchFieldTypeUsages({ streams, field }, searchParams),
     {
       onError: (errorThrown) => {
-        UserNotification.error(`Loading ${field} types failed with status: ${errorThrown}`,
-          'Could not load field types');
+        UserNotification.error(
+          `Loading ${field} types failed with status: ${errorThrown}`,
+          'Could not load field types',
+        );
       },
       keepPreviousData: true,
       enabled,
     },
   );
 
-  return ({
+  return {
     data: data ?? INITIAL_DATA,
     refetch,
     isInitialLoading,
     isLoading,
-  });
+  };
 };
 
 export default useFieldTypeUsages;

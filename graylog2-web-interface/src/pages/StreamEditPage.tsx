@@ -27,7 +27,7 @@ import useStream from 'components/streams/hooks/useStream';
 
 const StreamEditPage = () => {
   const params = useParams<{ streamId: string }>();
-  const query = useQuery() as { index: string, message_id: string };
+  const query = useQuery() as { index: string; message_id: string };
   const { data: stream } = useStream(params.streamId);
 
   if (!stream) {
@@ -37,29 +37,27 @@ const StreamEditPage = () => {
   return (
     <DocumentTitle title={`Rules of Stream ${stream.title}`}>
       <div>
-        <PageHeader title={<span>Rules of Stream &quot;{stream.title}&quot;</span>}
-                    documentationLink={{
-                      title: 'Streams documentation',
-                      path: DocsHelper.PAGES.STREAMS,
-                    }}>
+        <PageHeader
+          title={<span>Rules of Stream &quot;{stream.title}&quot;</span>}
+          documentationLink={{
+            title: 'Streams documentation',
+            path: DocsHelper.PAGES.STREAMS,
+          }}
+        >
           <span>
-            This screen is dedicated to an easy and comfortable creation and manipulation of stream rules. You can{' '}
-            see the effect configured stream rules have on message matching here.
+            This screen is dedicated to an easy and comfortable creation and manipulation of stream rules. You can see
+            the effect configured stream rules have on message matching here.
           </span>
         </PageHeader>
 
         {!stream.is_default && (
-          <StreamRulesEditor streamId={params.streamId}
-                             messageId={query.message_id}
-                             index={query.index} />
+          <StreamRulesEditor streamId={params.streamId} messageId={query.message_id} index={query.index} />
         )}
 
         {stream.is_default && (
           <div className="row content">
             <div className="col-md-12">
-              <Alert bsStyle="danger">
-                The default stream cannot be edited.
-              </Alert>
+              <Alert bsStyle="danger">The default stream cannot be edited.</Alert>
             </div>
           </div>
         )}

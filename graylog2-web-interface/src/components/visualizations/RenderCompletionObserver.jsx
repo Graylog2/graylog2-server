@@ -22,10 +22,7 @@ import RenderCompletionCallback from 'views/components/widgets/RenderCompletionC
 class RenderCompletionObserver extends React.Component {
   static propTypes = {
     onRenderComplete: PropTypes.func.isRequired,
-    children: PropTypes.oneOfType([
-      PropTypes.element,
-      PropTypes.arrayOf(PropTypes.element),
-    ]).isRequired,
+    children: PropTypes.oneOfType([PropTypes.element, PropTypes.arrayOf(PropTypes.element)]).isRequired,
   };
 
   _renderComplete = false;

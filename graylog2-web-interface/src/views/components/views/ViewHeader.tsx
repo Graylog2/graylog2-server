@@ -36,23 +36,25 @@ import { createGRN } from 'logic/permissions/GRN';
 import ExecutionInfo from 'views/components/views/ExecutionInfo';
 
 const links = {
-  [View.Type.Dashboard]: ({ id, title }) => [{
-    link: Routes.DASHBOARDS,
-    label: 'Dashboards',
-  },
-  {
-    label: title || id,
-    dataTestId: 'view-title',
-  },
+  [View.Type.Dashboard]: ({ id, title }) => [
+    {
+      link: Routes.DASHBOARDS,
+      label: 'Dashboards',
+    },
+    {
+      label: title || id,
+      dataTestId: 'view-title',
+    },
   ],
-  [View.Type.Search]: ({ id, title }) => [{
-    link: Routes.SEARCH,
-    label: 'Search',
-  },
-  {
-    label: title || id,
-    dataTestId: 'view-title',
-  },
+  [View.Type.Search]: ({ id, title }) => [
+    {
+      link: Routes.SEARCH,
+      label: 'Search',
+    },
+    {
+      label: title || id,
+      dataTestId: 'view-title',
+    },
   ],
   alert: ({ id }) => [
     {
@@ -77,23 +79,27 @@ const links = {
   ],
 };
 
-const Content = styled.div(({ theme }) => css`
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
-  margin-bottom: ${theme.spacings.xs};
-  gap: 4px;
-`);
+const Content = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    margin-bottom: ${theme.spacings.xs};
+    gap: 4px;
+  `,
+);
 
 const ExecutionInfoContainer = styled.div`
   margin-left: auto;
 `;
 
-const EditButton = styled.div(({ theme }) => css`
-  color: ${theme.colors.gray[60]};
-  font-size: ${theme.fonts.size.tiny};
-  cursor: pointer;
-`);
+const EditButton = styled.div(
+  ({ theme }) => css`
+    color: ${theme.colors.gray[60]};
+    font-size: ${theme.fonts.size.tiny};
+    cursor: pointer;
+  `,
+);
 
 const TitleWrapper = styled.span`
   display: flex;
@@ -110,12 +116,17 @@ const TitleWrapper = styled.span`
 `;
 
 const StyledIcon = styled(Icon)`
-font-size: 0.5rem;
+  font-size: 0.5rem;
 `;
 
-const CrumbLink = ({ label, link, dataTestId }: { label: string, link: string | undefined, dataTestId?: string}) => (
-  link ? <Link target="_blank" to={link} data-testid={dataTestId}>{label}</Link> : <span data-testid={dataTestId}>{label}</span>
-);
+const CrumbLink = ({ label, link, dataTestId }: { label: string; link: string | undefined; dataTestId?: string }) =>
+  link ? (
+    <Link target="_blank" to={link} data-testid={dataTestId}>
+      {label}
+    </Link>
+  ) : (
+    <span data-testid={dataTestId}>{label}</span>
+  );
 
 CrumbLink.defaultProps = {
   dataTestId: undefined,
@@ -128,16 +139,23 @@ const ViewHeader = () => {
   const [showMetadataEdit, setShowMetadataEdit] = useState<boolean>(false);
   const toggleMetadataEdit = useCallback(() => setShowMetadataEdit((cur) => !cur), [setShowMetadataEdit]);
 
-  const { alertId, definitionId, definitionTitle, isAlert, isEventDefinition, isEvent } = useAlertAndEventDefinitionData();
+  const { alertId, definitionId, definitionTitle, isAlert, isEventDefinition, isEvent } =
+    useAlertAndEventDefinitionData();
   const dispatch = useAppDispatch();
-  const _onSaveView = useCallback(async (updatedView: View) => {
-    await dispatch(onSaveView(updatedView));
-    await dispatch(updateView(updatedView));
-  }, [dispatch]);
+  const _onSaveView = useCallback(
+    async (updatedView: View) => {
+      await dispatch(onSaveView(updatedView));
+      await dispatch(updateView(updatedView));
+    },
+    [dispatch],
+  );
 
   const typeText = view?.type?.toLocaleLowerCase();
   const title = useViewTitle();
-  const onChangeFavorite = useCallback((newValue: boolean) => dispatch(updateView(view.toBuilder().favorite(newValue).build())), [dispatch, view]);
+  const onChangeFavorite = useCallback(
+    (newValue: boolean) => dispatch(updateView(view.toBuilder().favorite(newValue).build())),
+    [dispatch, view],
+  );
 
   const breadCrumbs = useMemo(() => {
     if (isAlert || isEvent) return links.alert({ id: alertId });
@@ -151,38 +169,48 @@ const ViewHeader = () => {
   return (
     <Row>
       <Content>
-        {
-          breadCrumbs.map(({ label, link, dataTestId }, index) => {
-            const theLast = index === breadCrumbs.length - 1;
+        {breadCrumbs.map(({ label, link, dataTestId }, index) => {
+          const theLast = index === breadCrumbs.length - 1;
 
-            return (
-              <TitleWrapper key={`${label}_${link}`}>
-                <CrumbLink link={link} label={label} dataTestId={dataTestId} />
-                {!theLast && <StyledIcon name="chevron-right" />}
-                {isSavedView && theLast && (
-                  <>
-                    <FavoriteIcon isFavorite={view.favorite} grn={createGRN(view.type, view.id)} onChange={onChangeFavorite} />
-                    <EditButton onClick={toggleMetadataEdit}
-                                role="button"
-                                title={`Edit ${typeText} ${view.title} metadata`}
-                                tabIndex={0}>
-                      <Icon name="pen-to-square" />
-                    </EditButton>
-                  </>
-                )}
-              </TitleWrapper>
-            );
-          })
-        }
+          return (
+            <TitleWrapper key={`${label}_${link}`}>
+              <CrumbLink link={link} label={label} dataTestId={dataTestId} />
+              {!theLast && <StyledIcon name="chevron-right" />}
+              {isSavedView && theLast && (
+                <>
+                  <FavoriteIcon
+                    isFavorite={view.favorite}
+                    grn={createGRN(view.type, view.id)}
+                    onChange={onChangeFavorite}
+                  />
+                  <EditButton
+                    onClick={toggleMetadataEdit}
+                    role="button"
+                    title={`Edit ${typeText} ${view.title} metadata`}
+                    tabIndex={0}
+                  >
+                    <Icon name="pen-to-square" />
+                  </EditButton>
+                </>
+              )}
+            </TitleWrapper>
+          );
+        })}
         {showMetadataEdit && (
-        <ViewPropertiesModal show
-                             view={view}
-                             title={`Editing saved ${typeText}`}
-                             onClose={toggleMetadataEdit}
-                             onSave={_onSaveView}
-                             submitButtonText={`Save ${typeText}`} />
+          <ViewPropertiesModal
+            show
+            view={view}
+            title={`Editing saved ${typeText}`}
+            onClose={toggleMetadataEdit}
+            onSave={_onSaveView}
+            submitButtonText={`Save ${typeText}`}
+          />
         )}
-        {showExecutionInfo && <ExecutionInfoContainer><ExecutionInfo /></ExecutionInfoContainer>}
+        {showExecutionInfo && (
+          <ExecutionInfoContainer>
+            <ExecutionInfo />
+          </ExecutionInfoContainer>
+        )}
       </Content>
     </Row>
   );

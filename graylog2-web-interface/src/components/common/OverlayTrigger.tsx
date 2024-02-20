@@ -25,17 +25,17 @@ import useClickOutside from 'hooks/useClickOutside';
 type Triggers = 'click' | 'focus' | 'hover';
 
 type Props = {
-  disabled?: boolean,
-  testId?: string,
-  children: React.ReactElement,
-  overlay: React.ReactNode,
-  placement: 'top' | 'right' | 'bottom' | 'left',
-  trigger?: Triggers | Array<Triggers>,
-  className?: string,
-  rootClose?: boolean,
-  width?: number,
-  title?: React.ReactNode,
-}
+  disabled?: boolean;
+  testId?: string;
+  children: React.ReactElement;
+  overlay: React.ReactNode;
+  placement: 'top' | 'right' | 'bottom' | 'left';
+  trigger?: Triggers | Array<Triggers>;
+  className?: string;
+  rootClose?: boolean;
+  width?: number;
+  title?: React.ReactNode;
+};
 
 const TriggerWrap = styled.span`
   display: inline-block;
@@ -46,55 +46,61 @@ const Container = styled.div`
 `;
 
 type OverlayType = {
-  hide: () => void,
+  hide: () => void;
 };
-const OverlayTrigger = React.forwardRef<OverlayType, Props>(({ children, disabled, placement, overlay, rootClose, trigger, testId, className, title, width }, ref) => {
-  const [opened, { close, open, toggle }] = useDisclosure(false);
+const OverlayTrigger = React.forwardRef<OverlayType, Props>(
+  ({ children, disabled, placement, overlay, rootClose, trigger, testId, className, title, width }, ref) => {
+    const [opened, { close, open, toggle }] = useDisclosure(false);
 
-  useImperativeHandle(ref, () => ({
-    hide: close,
-  }), [close]);
+    useImperativeHandle(
+      ref,
+      () => ({
+        hide: close,
+      }),
+      [close],
+    );
 
-  // @ts-ignore
-  OverlayTrigger.hide = close;
+    // @ts-ignore
+    OverlayTrigger.hide = close;
 
-  const containerRef = useRef();
+    const containerRef = useRef();
 
-  const [dropdown, setDropdown] = useState<HTMLDivElement | null>(null);
-  const [control, setControl] = useState<HTMLSpanElement | null>(null);
-  useClickOutside(rootClose ? close : () => {}, null, [control, dropdown]);
+    const [dropdown, setDropdown] = useState<HTMLDivElement | null>(null);
+    const [control, setControl] = useState<HTMLSpanElement | null>(null);
+    useClickOutside(rootClose ? close : () => {}, null, [control, dropdown]);
 
-  const hover = trigger === 'hover' || trigger?.includes?.('hover');
-  const focus = trigger === 'focus' || trigger?.includes?.('focus');
-  const click = trigger === 'click' || trigger?.includes?.('click');
+    const hover = trigger === 'hover' || trigger?.includes?.('hover');
+    const focus = trigger === 'focus' || trigger?.includes?.('focus');
+    const click = trigger === 'click' || trigger?.includes?.('click');
 
-  return disabled
-    ? children
-    : (
+    return disabled ? (
+      children
+    ) : (
       <Container ref={containerRef} data-testid={testId} className={className}>
         <Popover opened={opened} withArrow width={width} position={placement} withinPortal>
           <Popover.Target>
-            <TriggerWrap className={children.props.className}
-                         ref={setControl}
-                         role="button"
-                         onClick={click ? toggle : undefined}
-                         onMouseEnter={hover ? open : undefined}
-                         onMouseLeave={hover ? close : undefined}
-                         onFocus={focus ? open : undefined}
-                         onBlur={focus ? open : undefined}>
+            <TriggerWrap
+              className={children.props.className}
+              ref={setControl}
+              role="button"
+              onClick={click ? toggle : undefined}
+              onMouseEnter={hover ? open : undefined}
+              onMouseLeave={hover ? close : undefined}
+              onFocus={focus ? open : undefined}
+              onBlur={focus ? open : undefined}
+            >
               {children}
             </TriggerWrap>
           </Popover.Target>
 
           <Popover.Dropdown title={title}>
-            <div ref={setDropdown}>
-              {overlay}
-            </div>
+            <div ref={setDropdown}>{overlay}</div>
           </Popover.Dropdown>
         </Popover>
       </Container>
     );
-});
+  },
+);
 
 OverlayTrigger.defaultProps = {
   disabled: false,

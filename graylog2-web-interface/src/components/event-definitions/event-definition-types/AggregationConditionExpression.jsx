@@ -21,7 +21,11 @@ import get from 'lodash/get';
 
 import { Icon } from 'components/common';
 import { Button, ButtonToolbar, Clearfix, Col, FormGroup } from 'components/bootstrap';
-import { emptyBooleanExpressionConfig, emptyGroupExpressionConfig, replaceBooleanExpressionOperatorInGroup } from 'logic/alerts/AggregationExpressionConfig';
+import {
+  emptyBooleanExpressionConfig,
+  emptyGroupExpressionConfig,
+  replaceBooleanExpressionOperatorInGroup,
+} from 'logic/alerts/AggregationExpressionConfig';
 import { internalNodePropType } from 'logic/alerts/AggregationExpressionTypes';
 
 import NumberExpression from './AggregationConditionExpressions/NumberExpression';
@@ -73,7 +77,7 @@ class AggregationConditionExpression extends React.Component {
 
     const { expression } = this.props;
 
-    return (expression.expr === '&&' || expression.expr === '||' ? expression.expr : '&&');
+    return expression.expr === '&&' || expression.expr === '||' ? expression.expr : '&&';
   };
 
   // eslint-disable-next-line class-methods-use-this
@@ -102,7 +106,11 @@ class AggregationConditionExpression extends React.Component {
     const prevOperator = this.getBooleanOperator(parent, defaultOperator);
     const groupOperator = prevOperator === '&&' ? '||' : '&&';
     const groupExpression = emptyGroupExpressionConfig({ operator: groupOperator });
-    const nextExpression = emptyBooleanExpressionConfig({ operator: prevOperator, left: expression, right: groupExpression });
+    const nextExpression = emptyBooleanExpressionConfig({
+      operator: prevOperator,
+      left: expression,
+      right: groupExpression,
+    });
 
     onChange({ conditions: nextExpression });
   };
@@ -132,7 +140,7 @@ class AggregationConditionExpression extends React.Component {
         nextUpdate = null;
       } else {
         // Otherwise replace the current tree with the still existing branch
-        nextUpdate = expression[(branch === 'left' ? 'right' : 'left')];
+        nextUpdate = expression[branch === 'left' ? 'right' : 'left'];
       }
     } else if (branch === 'child' && update.expr === 'group') {
       // Avoid that a group's child is another group. Groups should at least have one expression
@@ -169,14 +177,14 @@ class AggregationConditionExpression extends React.Component {
         expressionComponent = <NumberExpression {...this.props} parent={parent} />;
         break;
       case 'group':
-        expressionComponent = <GroupExpression {...this.props} onChildChange={this.handleChildChange} parent={parent} />;
+        expressionComponent = (
+          <GroupExpression {...this.props} onChildChange={this.handleChildChange} parent={parent} />
+        );
         break;
       case '&&':
       case '||':
         expressionComponent = (
-          <BooleanExpression {...this.props}
-                             onChildChange={this.handleChildChange}
-                             parent={parent} />
+          <BooleanExpression {...this.props} onChildChange={this.handleChildChange} parent={parent} />
         );
 
         break;
@@ -193,9 +201,15 @@ class AggregationConditionExpression extends React.Component {
               <FormGroup>
                 <div className={renderLabel ? styles.formControlNoLabel : undefined}>
                   <ButtonToolbar>
-                    <Button bsSize="sm" onClick={this.handleDeleteExpression} title="Delete Expression"><Icon name="minus" fixedWidth /></Button>
-                    <Button bsSize="sm" onClick={this.handleAddExpression} title="Add Expression"><Icon name="plus" fixedWidth /></Button>
-                    <Button bsSize="sm" onClick={this.handleAddGroup}>Add Group</Button>
+                    <Button bsSize="sm" onClick={this.handleDeleteExpression} title="Delete Expression">
+                      <Icon name="minus" fixedWidth />
+                    </Button>
+                    <Button bsSize="sm" onClick={this.handleAddExpression} title="Add Expression">
+                      <Icon name="plus" fixedWidth />
+                    </Button>
+                    <Button bsSize="sm" onClick={this.handleAddGroup}>
+                      Add Group
+                    </Button>
                   </ButtonToolbar>
                 </div>
               </FormGroup>
@@ -207,9 +221,11 @@ class AggregationConditionExpression extends React.Component {
     if (!parent && expression.expr !== 'group') {
       return (
         <>
-          <BooleanOperatorSelector initialText="Messages must meet"
-                                   operator={this.getEffectiveGlobalGroupOperator()}
-                                   onOperatorChange={this.handleOperatorChange} />
+          <BooleanOperatorSelector
+            initialText="Messages must meet"
+            operator={this.getEffectiveGlobalGroupOperator()}
+            onOperatorChange={this.handleOperatorChange}
+          />
           <Clearfix />
           {expressionComponent}
         </>

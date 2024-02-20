@@ -3,7 +3,6 @@ import createReactClass from 'create-react-class';
 import { ExpandableListItem } from 'components/common';
 
 const ExpandableListExample = createReactClass({
-
   render() {
     return (
       <ExpandableList>
@@ -31,6 +30,5 @@ const ExpandableListExample = createReactClass({
   },
 });
 
-<ExpandableListExample />
-
+<ExpandableListExample />;
 ```

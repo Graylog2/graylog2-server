@@ -22,224 +22,254 @@ import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import { ConfigurationFormField, TitleField } from 'components/configurationforms';
 
 import { FIELD_TYPES_WITH_ENCRYPTION_SUPPORT } from './types';
-import type { ConfigurationFormData, ConfigurationField, ConfigurationFieldValue, EncryptedFieldValue, FieldValue, ConfigurationFieldWithEncryption } from './types';
+import type {
+  ConfigurationFormData,
+  ConfigurationField,
+  ConfigurationFieldValue,
+  EncryptedFieldValue,
+  FieldValue,
+  ConfigurationFieldWithEncryption,
+} from './types';
 
 type Props<Configuration extends object> = {
-  cancelAction: () => void,
+  cancelAction: () => void;
   configFields?: {
-    [key: string]: ConfigurationField,
-  },
-  children?: React.ReactNode,
-  titleHelpText?: string,
-  includeTitleField: boolean,
-  submitAction: (data: ConfigurationFormData<Configuration>) => void,
-  title: string | React.ReactNode | null,
-  titleValue: string,
-  typeName?: string,
-  values: { [key:string]: any },
-  wrapperComponent: React.ComponentType<React.PropsWithChildren<{
-    show: boolean,
-    title: string | React.ReactNode | null,
-    onCancel: () => void,
-    onSubmitForm: () => void,
-    submitButtonText: string
-  }>>,
-  submitButtonText: string,
-}
-
-const ConfigurationForm = forwardRef(<Configuration extends object>({
-  cancelAction,
-  configFields,
-  children,
-  titleHelpText,
-  includeTitleField,
-  submitAction,
-  title,
-  titleValue: initialTitleValue,
-  typeName,
-  values: initialValues,
-  wrapperComponent: WrapperComponent,
-  submitButtonText,
-} : Props<Configuration>, ref: typeof ConfigurationForm) => {
-  const [showConfigurationModal, setShowConfigurationModal] = useState(false);
-  const [titleValue, setTitleValue] = useState(undefined);
-  const [values, setValues] = useState<{[key:string]: any} | undefined>(undefined);
-  const [fieldStates, setFieldStates] = useState<{[key:string]: any} | undefined>({});
-
-  useEffect(() => {
-    const defaultValues = {};
-
-    if (configFields) {
-      Object.keys(configFields).forEach((field) => {
-        defaultValues[field] = configFields[field].default_value;
-      });
-    }
-
-    setValues({ ...defaultValues, ...initialValues });
-    setFieldStates({});
-  }, [showConfigurationModal, configFields, initialValues]);
-
-  useEffect(() => {
-    setTitleValue(initialTitleValue);
-  }, [initialTitleValue, showConfigurationModal]);
-
-  const getFormData = (): ConfigurationFormData<Configuration> => {
-    const data: ConfigurationFormData<Configuration> = {
-      type: typeName,
-      configuration: {},
-    };
-
-    if (includeTitleField) {
-      data.title = titleValue;
-    }
-
-    Object.keys(configFields).forEach((fieldName) => {
-      data.configuration[fieldName] = (values[fieldName] === undefined ? null : values[fieldName]);
-    });
-
-    return data;
+    [key: string]: ConfigurationField;
   };
+  children?: React.ReactNode;
+  titleHelpText?: string;
+  includeTitleField: boolean;
+  submitAction: (data: ConfigurationFormData<Configuration>) => void;
+  title: string | React.ReactNode | null;
+  titleValue: string;
+  typeName?: string;
+  values: { [key: string]: any };
+  wrapperComponent: React.ComponentType<
+    React.PropsWithChildren<{
+      show: boolean;
+      title: string | React.ReactNode | null;
+      onCancel: () => void;
+      onSubmitForm: () => void;
+      submitButtonText: string;
+    }>
+  >;
+  submitButtonText: string;
+};
 
-  const sortByPosOrOptionality = (x1, x2) => {
-    const DEFAULT_POSITION = 100; // corresponds to ConfigurationField.java
-    const x1pos = configFields[x1.name].position || DEFAULT_POSITION;
-    const x2pos = configFields[x2.name].position || DEFAULT_POSITION;
+const ConfigurationForm = forwardRef(
+  <Configuration extends object>(
+    {
+      cancelAction,
+      configFields,
+      children,
+      titleHelpText,
+      includeTitleField,
+      submitAction,
+      title,
+      titleValue: initialTitleValue,
+      typeName,
+      values: initialValues,
+      wrapperComponent: WrapperComponent,
+      submitButtonText,
+    }: Props<Configuration>,
+    ref: typeof ConfigurationForm,
+  ) => {
+    const [showConfigurationModal, setShowConfigurationModal] = useState(false);
+    const [titleValue, setTitleValue] = useState(undefined);
+    const [values, setValues] = useState<{ [key: string]: any } | undefined>(undefined);
+    const [fieldStates, setFieldStates] = useState<{ [key: string]: any } | undefined>({});
 
-    let diff = x1pos - x2pos;
+    useEffect(() => {
+      const defaultValues = {};
 
-    if (!diff) {
-      const isOptionalToNumber = (optional: boolean) : number => (optional ? 1 : 0);
-
-      diff = isOptionalToNumber(configFields[x1.name].is_optional) - isOptionalToNumber(configFields[x2.name].is_optional);
-    }
-
-    if (!diff) {
-      // Sort equal fields stably
-      diff = x1.pos - x2.pos;
-    }
-
-    return diff;
-  };
-
-  const fieldIsEncrypted = (configField: ConfigurationField) : boolean => {
-    const fieldSupportsEncryption = FIELD_TYPES_WITH_ENCRYPTION_SUPPORT.includes(
-      (configField.type as unknown as typeof FIELD_TYPES_WITH_ENCRYPTION_SUPPORT[number]),
-    );
-
-    if (!fieldSupportsEncryption) {
-      return false;
-    }
-
-    return (configField as ConfigurationFieldWithEncryption).is_encrypted;
-  };
-
-  const handleEncryptedFieldsBeforeSubmit = (data): ConfigurationFormData<Configuration> => {
-    const configurationEntries = Object.entries(data.configuration).map(([fieldName, fieldValue] : [string, ConfigurationFieldValue]) => {
-      const configField = configFields[fieldName as string];
-      const fieldState = fieldStates[fieldName as string];
-
-      if (fieldIsEncrypted(configField) && !fieldState?.dirty && fieldValue && (fieldValue as EncryptedFieldValue<FieldValue>).is_set !== undefined) {
-        return [fieldName, { keep_value: true }];
+      if (configFields) {
+        Object.keys(configFields).forEach((field) => {
+          defaultValues[field] = configFields[field].default_value;
+        });
       }
 
-      return [fieldName, fieldValue];
-    });
+      setValues({ ...defaultValues, ...initialValues });
+      setFieldStates({});
+    }, [showConfigurationModal, configFields, initialValues]);
 
-    return { ...data, configuration: Object.fromEntries(configurationEntries) };
-  };
+    useEffect(() => {
+      setTitleValue(initialTitleValue);
+    }, [initialTitleValue, showConfigurationModal]);
 
-  const handleCancel = () => {
-    setShowConfigurationModal(false);
+    const getFormData = (): ConfigurationFormData<Configuration> => {
+      const data: ConfigurationFormData<Configuration> = {
+        type: typeName,
+        configuration: {},
+      };
 
-    if (cancelAction) {
-      cancelAction();
-    }
-  };
+      if (includeTitleField) {
+        data.title = titleValue;
+      }
 
-  const save = () => {
-    const data = getFormData();
+      Object.keys(configFields).forEach((fieldName) => {
+        data.configuration[fieldName] = values[fieldName] === undefined ? null : values[fieldName];
+      });
 
-    submitAction(handleEncryptedFieldsBeforeSubmit(data));
+      return data;
+    };
 
-    setShowConfigurationModal(false);
-  };
+    const sortByPosOrOptionality = (x1, x2) => {
+      const DEFAULT_POSITION = 100; // corresponds to ConfigurationField.java
+      const x1pos = configFields[x1.name].position || DEFAULT_POSITION;
+      const x2pos = configFields[x2.name].position || DEFAULT_POSITION;
 
-  useImperativeHandle(ref, () => ({
-    open() {
-      setShowConfigurationModal(true);
-    },
-    getValue() {
-      return getFormData();
-    },
-  }));
+      let diff = x1pos - x2pos;
 
-  const handleTitleChange = (_, value) => {
-    setTitleValue(value);
-  };
+      if (!diff) {
+        const isOptionalToNumber = (optional: boolean): number => (optional ? 1 : 0);
 
-  const handleChange = (field: string, value: ConfigurationFieldValue, dirty: boolean = true) => {
-    setValues({ ...values, ...{ [field]: value } });
-    setFieldStates({ ...fieldStates, ...{ [field]: { dirty } } });
-  };
+        diff =
+          isOptionalToNumber(configFields[x1.name].is_optional) - isOptionalToNumber(configFields[x2.name].is_optional);
+      }
 
-  const renderConfigField = (configField, key, autoFocus) => {
-    if (!values) return null;
-    const value = values[key];
+      if (!diff) {
+        // Sort equal fields stably
+        diff = x1.pos - x2.pos;
+      }
 
-    return (
-      <ConfigurationFormField key={key}
-                              typeName={typeName}
-                              configField={configField}
-                              configKey={key}
-                              configValue={value}
-                              autoFocus={autoFocus}
-                              dirty={fieldStates[key]?.dirty}
-                              onChange={handleChange} />
-    );
-  };
+      return diff;
+    };
 
-  let shouldAutoFocus = true;
-  let titleElement;
+    const fieldIsEncrypted = (configField: ConfigurationField): boolean => {
+      const fieldSupportsEncryption = FIELD_TYPES_WITH_ENCRYPTION_SUPPORT.includes(
+        configField.type as unknown as (typeof FIELD_TYPES_WITH_ENCRYPTION_SUPPORT)[number],
+      );
 
-  if (includeTitleField) {
-    titleElement = (
-      <TitleField key={`${typeName}-title`}
-                  typeName={typeName}
-                  value={titleValue}
-                  onChange={handleTitleChange}
-                  helpText={titleHelpText} />
-    );
+      if (!fieldSupportsEncryption) {
+        return false;
+      }
 
-    shouldAutoFocus = false;
-  }
+      return (configField as ConfigurationFieldWithEncryption).is_encrypted;
+    };
 
-  const sortedConfigFieldKeys = Object.keys(configFields).map((name, pos) => ({ name, pos })).sort(sortByPosOrOptionality);
+    const handleEncryptedFieldsBeforeSubmit = (data): ConfigurationFormData<Configuration> => {
+      const configurationEntries = Object.entries(data.configuration).map(
+        ([fieldName, fieldValue]: [string, ConfigurationFieldValue]) => {
+          const configField = configFields[fieldName as string];
+          const fieldState = fieldStates[fieldName as string];
 
-  const renderedConfigFields = sortedConfigFieldKeys.map((key) => {
-    const configField = renderConfigField(configFields[key.name], key.name, shouldAutoFocus);
+          if (
+            fieldIsEncrypted(configField) &&
+            !fieldState?.dirty &&
+            fieldValue &&
+            (fieldValue as EncryptedFieldValue<FieldValue>).is_set !== undefined
+          ) {
+            return [fieldName, { keep_value: true }];
+          }
 
-    if (shouldAutoFocus) {
+          return [fieldName, fieldValue];
+        },
+      );
+
+      return { ...data, configuration: Object.fromEntries(configurationEntries) };
+    };
+
+    const handleCancel = () => {
+      setShowConfigurationModal(false);
+
+      if (cancelAction) {
+        cancelAction();
+      }
+    };
+
+    const save = () => {
+      const data = getFormData();
+
+      submitAction(handleEncryptedFieldsBeforeSubmit(data));
+
+      setShowConfigurationModal(false);
+    };
+
+    useImperativeHandle(ref, () => ({
+      open() {
+        setShowConfigurationModal(true);
+      },
+      getValue() {
+        return getFormData();
+      },
+    }));
+
+    const handleTitleChange = (_, value) => {
+      setTitleValue(value);
+    };
+
+    const handleChange = (field: string, value: ConfigurationFieldValue, dirty: boolean = true) => {
+      setValues({ ...values, ...{ [field]: value } });
+      setFieldStates({ ...fieldStates, ...{ [field]: { dirty } } });
+    };
+
+    const renderConfigField = (configField, key, autoFocus) => {
+      if (!values) return null;
+      const value = values[key];
+
+      return (
+        <ConfigurationFormField
+          key={key}
+          typeName={typeName}
+          configField={configField}
+          configKey={key}
+          configValue={value}
+          autoFocus={autoFocus}
+          dirty={fieldStates[key]?.dirty}
+          onChange={handleChange}
+        />
+      );
+    };
+
+    let shouldAutoFocus = true;
+    let titleElement;
+
+    if (includeTitleField) {
+      titleElement = (
+        <TitleField
+          key={`${typeName}-title`}
+          typeName={typeName}
+          value={titleValue}
+          onChange={handleTitleChange}
+          helpText={titleHelpText}
+        />
+      );
+
       shouldAutoFocus = false;
     }
 
-    return configField;
-  });
+    const sortedConfigFieldKeys = Object.keys(configFields)
+      .map((name, pos) => ({ name, pos }))
+      .sort(sortByPosOrOptionality);
 
-  return (
-    <WrapperComponent show={showConfigurationModal}
-                      title={title}
-                      onCancel={handleCancel}
-                      onSubmitForm={save}
-                      submitButtonText={submitButtonText}>
-      <fieldset>
-        <input type="hidden" name="type" value={typeName} />
-        {children}
-        {titleElement}
-        {renderedConfigFields}
-      </fieldset>
-    </WrapperComponent>
-  );
-});
+    const renderedConfigFields = sortedConfigFieldKeys.map((key) => {
+      const configField = renderConfigField(configFields[key.name], key.name, shouldAutoFocus);
+
+      if (shouldAutoFocus) {
+        shouldAutoFocus = false;
+      }
+
+      return configField;
+    });
+
+    return (
+      <WrapperComponent
+        show={showConfigurationModal}
+        title={title}
+        onCancel={handleCancel}
+        onSubmitForm={save}
+        submitButtonText={submitButtonText}
+      >
+        <fieldset>
+          <input type="hidden" name="type" value={typeName} />
+          {children}
+          {titleElement}
+          {renderedConfigFields}
+        </fieldset>
+      </WrapperComponent>
+    );
+  },
+);
 
 ConfigurationForm.propTypes = {
   cancelAction: PropTypes.func,

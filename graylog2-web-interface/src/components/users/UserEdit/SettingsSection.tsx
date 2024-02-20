@@ -34,23 +34,23 @@ import useIsGlobalTimeoutEnabled from '../../../hooks/useIsGlobalTimeoutEnabled'
 import { Link } from '../../common/router';
 
 export type SettingsFormValues = {
-  timezone: string,
-  session_timeout_ms: number,
-  startpage: StartPage | null | undefined,
-  service_account: boolean,
-}
+  timezone: string;
+  session_timeout_ms: number;
+  startpage: StartPage | null | undefined;
+  service_account: boolean;
+};
 
 const GlobalTimeoutMessage = styled(ReadOnlyFormGroup)`
   margin-bottom: 20px;
-  
+
   .read-only-value-col {
     padding-top: 0;
   }
 `;
 
 type Props = {
-  user: User,
-  onSubmit: (payload: { timezone: $PropertyType<User, 'timezone'> }) => Promise<void>,
+  user: User;
+  onSubmit: (payload: { timezone: $PropertyType<User, 'timezone'> }) => Promise<void>;
 };
 
 const _validate = async (values) => {
@@ -66,29 +66,34 @@ const _validate = async (values) => {
 };
 
 const SettingsSection = ({
-  user: {
-    id,
-    timezone,
-    sessionTimeoutMs,
-    startpage,
-    permissions,
-    serviceAccount,
-  },
+  user: { id, timezone, sessionTimeoutMs, startpage, permissions, serviceAccount },
   onSubmit,
 }: Props) => {
   const isGlobalTimeoutEnabled = useIsGlobalTimeoutEnabled();
 
   return (
     <SectionComponent title="Settings">
-      <Formik<SettingsFormValues> onSubmit={onSubmit}
-                                  validate={_validate}
-                                  initialValues={{ timezone, session_timeout_ms: sessionTimeoutMs, startpage, service_account: serviceAccount }}>
+      <Formik<SettingsFormValues>
+        onSubmit={onSubmit}
+        validate={_validate}
+        initialValues={{ timezone, session_timeout_ms: sessionTimeoutMs, startpage, service_account: serviceAccount }}
+      >
         {({ isSubmitting, isValid }) => (
           <Form className="form form-horizontal">
             <IfPermitted permissions="*">
               {isGlobalTimeoutEnabled ? (
-                <GlobalTimeoutMessage label="Sessions Timeout"
-                                      value={<NoSearchResult>User session timeout is not editable because the <IfPermitted permissions={['clusterconfigentry:read']}><Link to={Routes.SYSTEM.CONFIGURATIONS}>global session timeout</Link></IfPermitted> is enabled.</NoSearchResult>} />
+                <GlobalTimeoutMessage
+                  label="Sessions Timeout"
+                  value={
+                    <NoSearchResult>
+                      User session timeout is not editable because the{' '}
+                      <IfPermitted permissions={['clusterconfigentry:read']}>
+                        <Link to={Routes.SYSTEM.CONFIGURATIONS}>global session timeout</Link>
+                      </IfPermitted>{' '}
+                      is enabled.
+                    </NoSearchResult>
+                  }
+                />
               ) : (
                 <TimeoutFormGroup />
               )}
@@ -102,10 +107,7 @@ const SettingsSection = ({
             <Row className="no-bm">
               <Col xs={12}>
                 <div className="pull-right">
-                  <Button bsStyle="success"
-                          disabled={isSubmitting || !isValid}
-                          title="Update Settings"
-                          type="submit">
+                  <Button bsStyle="success" disabled={isSubmitting || !isValid} title="Update Settings" type="submit">
                     Update Settings
                   </Button>
                 </div>

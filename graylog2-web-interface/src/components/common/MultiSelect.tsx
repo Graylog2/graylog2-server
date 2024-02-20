@@ -32,7 +32,15 @@ class MultiSelect extends React.Component<Props> {
   getValue = () => this._select.getValue();
 
   render() {
-    return <Select ref={(c) => { this._select = c; }} multi {...this.props} />;
+    return (
+      <Select
+        ref={(c) => {
+          this._select = c;
+        }}
+        multi
+        {...this.props}
+      />
+    );
   }
 }
 

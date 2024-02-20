@@ -36,7 +36,7 @@ import ScratchpadToggle from './ScratchpadToggle';
 import StyledNavbar from './Navigation.styles';
 
 type Props = {
-  pathname: string,
+  pathname: string;
 };
 
 const Navigation = React.memo(({ pathname }: Props) => {
@@ -50,7 +50,9 @@ const Navigation = React.memo(({ pathname }: Props) => {
         </Navbar.Brand>
         <Navbar.Toggle />
         <DevelopmentHeaderBadge smallScreen />
-        {pluginItems.map(({ key, component: Item }) => <Item key={key} smallScreen />)}
+        {pluginItems.map(({ key, component: Item }) => (
+          <Item key={key} smallScreen />
+        ))}
       </Navbar.Header>
       <Navbar.Collapse>
         <MainNavbar pathname={pathname} />
@@ -68,7 +70,9 @@ const Navigation = React.memo(({ pathname }: Props) => {
 
           <InactiveNavItem className="dev-badge-wrap">
             <DevelopmentHeaderBadge />
-            {pluginItems.map(({ key, component: Item }) => <Item key={key} />)}
+            {pluginItems.map(({ key, component: Item }) => (
+              <Item key={key} />
+            ))}
           </InactiveNavItem>
           <ScratchpadToggle />
 

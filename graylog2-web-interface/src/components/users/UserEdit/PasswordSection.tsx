@@ -34,7 +34,7 @@ const isCloud = AppConfig.isCloud();
 
 const oktaUserForm = isCloud ? PluginStore.exports('cloud')[0].oktaUserForm : null;
 type Props = {
-  user: User,
+  user: User;
 };
 
 const _validate = (values) => {
@@ -43,7 +43,9 @@ const _validate = (values) => {
   const { password, password_repeat: passwordRepeat } = values;
 
   if (isCloud && oktaUserForm) {
-    const { validations: { password: validateCloudPasswords } } = oktaUserForm;
+    const {
+      validations: { password: validateCloudPasswords },
+    } = oktaUserForm;
 
     errors = validateCloudPasswords(errors, password, passwordRepeat);
   } else {
@@ -62,32 +64,38 @@ const _onSubmit = (formData, userId) => {
 
 const PasswordGroup = () => {
   if (isCloud && oktaUserForm) {
-    const { fields: { password: CloudPasswordFormGroup } } = oktaUserForm;
+    const {
+      fields: { password: CloudPasswordFormGroup },
+    } = oktaUserForm;
 
     return <CloudPasswordFormGroup />;
   }
 
   return (
     <>
-      <FormikFormGroup label="New Password"
-                       name="password"
-                       type="password"
-                       help="Passwords must be at least 6 characters long. We recommend using a strong password."
-                       maxLength={100}
-                       minLength={6}
-                       autoComplete="new-password"
-                       labelClassName="col-sm-3"
-                       wrapperClassName="col-sm-9"
-                       required />
-      <FormikFormGroup label="Repeat Password"
-                       name="password_repeat"
-                       type="password"
-                       minLength={6}
-                       maxLength={100}
-                       autoComplete="new-password"
-                       required
-                       labelClassName="col-sm-3"
-                       wrapperClassName="col-sm-9" />
+      <FormikFormGroup
+        label="New Password"
+        name="password"
+        type="password"
+        help="Passwords must be at least 6 characters long. We recommend using a strong password."
+        maxLength={100}
+        minLength={6}
+        autoComplete="new-password"
+        labelClassName="col-sm-3"
+        wrapperClassName="col-sm-9"
+        required
+      />
+      <FormikFormGroup
+        label="Repeat Password"
+        name="password_repeat"
+        type="password"
+        minLength={6}
+        maxLength={100}
+        autoComplete="new-password"
+        required
+        labelClassName="col-sm-3"
+        wrapperClassName="col-sm-9"
+      />
     </>
   );
 };
@@ -107,30 +115,33 @@ const PasswordSection = ({ user: { id } }: Props) => {
 
   return (
     <SectionComponent title="Password">
-      <Formik onSubmit={(formData) => _onSubmit(formData, id)}
-              validate={_validate}
-              initialValues={{}}>
+      <Formik onSubmit={(formData) => _onSubmit(formData, id)} validate={_validate} initialValues={{}}>
         {({ isSubmitting, isValid }) => (
           <Form className="form form-horizontal">
-            <InvisibleInput readOnly id="username" autoComplete="username" type={isCloud ? 'email' : undefined} value={isCloud ? currentUser.email : currentUser.username} />
+            <InvisibleInput
+              readOnly
+              id="username"
+              autoComplete="username"
+              type={isCloud ? 'email' : undefined}
+              value={isCloud ? currentUser.email : currentUser.username}
+            />
             {requiresOldPassword && (
-              <FormikFormGroup label="Old Password"
-                               name="old_password"
-                               type="password"
-                               maxLength={100}
-                               autoComplete="current-password"
-                               required
-                               labelClassName="col-sm-3"
-                               wrapperClassName="col-sm-9" />
+              <FormikFormGroup
+                label="Old Password"
+                name="old_password"
+                type="password"
+                maxLength={100}
+                autoComplete="current-password"
+                required
+                labelClassName="col-sm-3"
+                wrapperClassName="col-sm-9"
+              />
             )}
             <PasswordGroup />
             <Row className="no-bm">
               <Col xs={12}>
                 <div className="pull-right">
-                  <Button bsStyle="success"
-                          disabled={isSubmitting || !isValid}
-                          title="Change Password"
-                          type="submit">
+                  <Button bsStyle="success" disabled={isSubmitting || !isValid} title="Change Password" type="submit">
                     Change Password
                   </Button>
                 </div>

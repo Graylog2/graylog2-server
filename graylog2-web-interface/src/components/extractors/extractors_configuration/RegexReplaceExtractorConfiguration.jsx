@@ -49,7 +49,12 @@ class RegexReplaceExtractorConfiguration extends React.Component {
     this.setState({ trying: true });
 
     const { configuration } = this.props;
-    const promise = ToolsStore.testRegexReplace(configuration.regex, configuration.replacement, configuration.replace_all, this.props.exampleMessage);
+    const promise = ToolsStore.testRegexReplace(
+      configuration.regex,
+      configuration.replacement,
+      configuration.replace_all,
+      this.props.exampleMessage,
+    );
 
     promise.then((result) => {
       if (!result.matched) {
@@ -64,7 +69,7 @@ class RegexReplaceExtractorConfiguration extends React.Component {
         return;
       }
 
-      const preview = (result.match.match ? <samp>{result.match.match}</samp> : '');
+      const preview = result.match.match ? <samp>{result.match.match}</samp> : '';
 
       this.props.onExtractorPreviewLoad(preview);
     });
@@ -72,21 +77,29 @@ class RegexReplaceExtractorConfiguration extends React.Component {
     promise.finally(() => this.setState({ trying: false }));
   };
 
-  _isTryButtonDisabled = () => this.state.trying || !this.props.configuration.regex || !this.props.configuration.replacement || !this.props.exampleMessage;
+  _isTryButtonDisabled = () =>
+    this.state.trying ||
+    !this.props.configuration.regex ||
+    !this.props.configuration.replacement ||
+    !this.props.exampleMessage;
 
   render() {
     const regexHelpMessage = (
       <span>
-        The regular expression used for extraction.{' '}
-        Learn more in the <DocumentationLink page={DocsHelper.PAGES.EXTRACTORS} text="documentation" />.
+        The regular expression used for extraction. Learn more in the{' '}
+        <DocumentationLink page={DocsHelper.PAGES.EXTRACTORS} text="documentation" />.
       </span>
     );
 
     const replacementHelpMessage = (
-      <span>The replacement used for the matching text. Please refer to the{' '}
-        <a target="_blank"
-           href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#replaceAll(java.lang.String)"
-           rel="noreferrer">Matcher
+      <span>
+        The replacement used for the matching text. Please refer to the{' '}
+        <a
+          target="_blank"
+          href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#replaceAll(java.lang.String)"
+          rel="noreferrer"
+        >
+          Matcher
         </a>{' '}
         API documentation for the possible options.
       </span>
@@ -94,35 +107,41 @@ class RegexReplaceExtractorConfiguration extends React.Component {
 
     return (
       <div>
-        <Input type="text"
-               id="regex"
-               label="Regular expression"
-               labelClassName="col-md-2"
-               placeholder="^.*string(.+)$"
-               onChange={this._onChange('regex')}
-               wrapperClassName="col-md-10"
-               defaultValue={this.props.configuration.regex}
-               required
-               help={regexHelpMessage} />
+        <Input
+          type="text"
+          id="regex"
+          label="Regular expression"
+          labelClassName="col-md-2"
+          placeholder="^.*string(.+)$"
+          onChange={this._onChange('regex')}
+          wrapperClassName="col-md-10"
+          defaultValue={this.props.configuration.regex}
+          required
+          help={regexHelpMessage}
+        />
 
-        <Input type="text"
-               id="replacement"
-               label="Replacement"
-               labelClassName="col-md-2"
-               placeholder="$1"
-               onChange={this._onChange('replacement')}
-               wrapperClassName="col-md-10"
-               defaultValue={this.props.configuration.replacement}
-               required
-               help={replacementHelpMessage} />
+        <Input
+          type="text"
+          id="replacement"
+          label="Replacement"
+          labelClassName="col-md-2"
+          placeholder="$1"
+          onChange={this._onChange('replacement')}
+          wrapperClassName="col-md-10"
+          defaultValue={this.props.configuration.replacement}
+          required
+          help={replacementHelpMessage}
+        />
 
-        <Input type="checkbox"
-               id="replace_all"
-               label="Replace all occurrences of the pattern"
-               wrapperClassName="col-md-offset-2 col-md-10"
-               defaultChecked={this.props.configuration.replace_all}
-               onChange={this._onChange('replace_all')}
-               help="Whether to replace all occurrences of the given pattern or only the first occurrence." />
+        <Input
+          type="checkbox"
+          id="replace_all"
+          label="Replace all occurrences of the pattern"
+          wrapperClassName="col-md-offset-2 col-md-10"
+          defaultChecked={this.props.configuration.replace_all}
+          onChange={this._onChange('replace_all')}
+          help="Whether to replace all occurrences of the given pattern or only the first occurrence."
+        />
 
         <Row>
           <Col mdOffset={2} md={10}>

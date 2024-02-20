@@ -26,12 +26,15 @@ import type { Input } from 'components/messageloaders/Types';
 import FormatReceivedBy from './FormatReceivedBy';
 
 jest.mock('stores/nodes/NodesStore', () => ({
-  NodesStore: MockStore(['getInitialState', () => ({ nodes: { existingNode: { short_node_id: 'foobar', hostname: 'existing.node' } } })]),
+  NodesStore: MockStore([
+    'getInitialState',
+    () => ({ nodes: { existingNode: { short_node_id: 'foobar', hostname: 'existing.node' } } }),
+  ]),
 }));
 
 type ForwarderReceivedByProps = {
-  inputId: string,
-  forwarderNodeId: string,
+  inputId: string;
+  forwarderNodeId: string;
 };
 
 describe('FormatReceivedBy', () => {
@@ -59,24 +62,30 @@ describe('FormatReceivedBy', () => {
   it('shows node information if present', async () => {
     render(<FormatReceivedBy isLocalNode inputs={Immutable.Map()} sourceNodeId="existingNode" sourceInputId="bar" />);
 
-    const nodeLink = await screen.findByRole('link', { name: /existing.node/ }) as HTMLAnchorElement;
+    const nodeLink = (await screen.findByRole('link', { name: /existing.node/ })) as HTMLAnchorElement;
 
     expect(nodeLink.href).toEqual('http://localhost/system/nodes/existingNode');
     expect(within(nodeLink).getByText('foobar')).not.toBeNull();
   });
 
   describe('allows overriding node information through plugin', () => {
-    const ForwarderReceivedBy = ({ inputId, forwarderNodeId }: ForwarderReceivedByProps) => <span>Mighty plugin magic: {inputId}/{forwarderNodeId}</span>;
+    const ForwarderReceivedBy = ({ inputId, forwarderNodeId }: ForwarderReceivedByProps) => (
+      <span>
+        Mighty plugin magic: {inputId}/{forwarderNodeId}
+      </span>
+    );
     const isLocalNode = jest.fn(() => Promise.resolve(false));
     const pluginManifest = {
       exports: {
-        forwarder: [{
-          isLocalNode,
-          ForwarderReceivedBy,
-          messageLoaders: { ForwarderInputDropdown: () => <div /> },
-          fetchForwarderNode: async () => ({ node_id: 'deadbeef', title: 'Test Node' }),
-          fetchForwarderInput: async () => ({ id: 'deadbeef', title: 'Test Input' }),
-        }],
+        forwarder: [
+          {
+            isLocalNode,
+            ForwarderReceivedBy,
+            messageLoaders: { ForwarderInputDropdown: () => <div /> },
+            fetchForwarderNode: async () => ({ node_id: 'deadbeef', title: 'Test Node' }),
+            fetchForwarderInput: async () => ({ id: 'deadbeef', title: 'Test Input' }),
+          },
+        ],
       } as PluginExports,
     };
 

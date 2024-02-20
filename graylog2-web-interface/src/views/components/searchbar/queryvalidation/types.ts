@@ -15,16 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 export type QueryValidationState = {
-  status: 'OK' | 'ERROR' | 'WARNING',
+  status: 'OK' | 'ERROR' | 'WARNING';
   explanations: Array<{
-    id: string,
-    errorType: string,
-    errorTitle: string,
-    errorMessage: string,
-    beginLine: number,
-    endLine: number,
-    beginColumn: number,
-    endColumn: number,
-    relatedProperty?: string,
-  }>,
+    id: string;
+    errorType: string;
+    errorTitle: string;
+    errorMessage: string;
+    beginLine: number;
+    endLine: number;
+    beginColumn: number;
+    endColumn: number;
+    relatedProperty?: string;
+  }>;
 };

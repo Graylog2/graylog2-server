@@ -22,40 +22,42 @@ import type { Input } from 'components/bootstrap';
 import FormikInput from './FormikInput';
 
 type Props = {
-  autoComplete?: string,
-  buttonAfter?: React.ReactElement | string,
-  children?: React.ReactNode,
-  disabled?: boolean,
-  label: React.ReactElement | string,
-  name: string,
-  onChange?: (event: SyntheticEvent<Input>) => void,
-  labelClassName?: string,
-  wrapperClassName?: string,
-  formGroupClassName?: string,
-  type?: string,
-  error?: React.ReactElement | string,
-  placeholder?: string
-  help?: React.ReactElement | string,
-  min?: number,
-  max?: number,
-  minLength?: number,
-  maxLength?: number,
-  required?: boolean,
-  bsSize?: 'large' | 'small' | 'xsmall',
-  validate?: (arg: any) => string | undefined,
-  rows?: number,
-  autoFocus?: boolean,
+  autoComplete?: string;
+  buttonAfter?: React.ReactElement | string;
+  children?: React.ReactNode;
+  disabled?: boolean;
+  label: React.ReactElement | string;
+  name: string;
+  onChange?: (event: SyntheticEvent<Input>) => void;
+  labelClassName?: string;
+  wrapperClassName?: string;
+  formGroupClassName?: string;
+  type?: string;
+  error?: React.ReactElement | string;
+  placeholder?: string;
+  help?: React.ReactElement | string;
+  min?: number;
+  max?: number;
+  minLength?: number;
+  maxLength?: number;
+  required?: boolean;
+  bsSize?: 'large' | 'small' | 'xsmall';
+  validate?: (arg: any) => string | undefined;
+  rows?: number;
+  autoFocus?: boolean;
 };
 
 /** Displays the FormikInput with a specific layout */
 const FormikFormGroup = ({ labelClassName, wrapperClassName, label, name, onChange, ...rest }: Props) => (
-  <FormikInput {...rest}
-               label={label}
-               id={name}
-               onChange={onChange}
-               name={name}
-               labelClassName={labelClassName}
-               wrapperClassName={wrapperClassName} />
+  <FormikInput
+    {...rest}
+    label={label}
+    id={name}
+    onChange={onChange}
+    name={name}
+    labelClassName={labelClassName}
+    wrapperClassName={wrapperClassName}
+  />
 );
 
 FormikFormGroup.defaultProps = {

@@ -48,19 +48,17 @@ const fromLegacyColorSchemeName = (legacyColorScheme: LegacyColorScheme): ColorS
   return legacyColorScheme;
 };
 
-const getInitialThemeMode = (
-  {
-    userPreferencesThemeMode,
-    browserThemePreference,
-    initialThemeModeOverride,
-    userIsLoggedIn,
-  }: {
-    userPreferencesThemeMode: UserPreferences[typeof PREFERENCES_THEME_MODE],
-    browserThemePreference: ColorScheme,
-    initialThemeModeOverride: ColorScheme,
-    userIsLoggedIn: boolean,
-  },
-) => {
+const getInitialThemeMode = ({
+  userPreferencesThemeMode,
+  browserThemePreference,
+  initialThemeModeOverride,
+  userIsLoggedIn,
+}: {
+  userPreferencesThemeMode: UserPreferences[typeof PREFERENCES_THEME_MODE];
+  browserThemePreference: ColorScheme;
+  initialThemeModeOverride: ColorScheme;
+  userIsLoggedIn: boolean;
+}) => {
   if (initialThemeModeOverride) {
     return initialThemeModeOverride;
   }
@@ -74,7 +72,10 @@ const getInitialThemeMode = (
   return userThemePreference ?? browserThemePreference ?? DEFAULT_THEME_MODE;
 };
 
-const usePreferredColorScheme = (initialThemeModeOverride: ColorScheme, userIsLoggedIn: boolean): [ColorScheme, (newThemeMode: ColorScheme) => void] => {
+const usePreferredColorScheme = (
+  initialThemeModeOverride: ColorScheme,
+  userIsLoggedIn: boolean,
+): [ColorScheme, (newThemeMode: ColorScheme) => void] => {
   const browserThemePreference = useBrowserColorSchemePreference();
 
   const { userIsReadOnly, username } = useStore(CurrentUserStore, (userStore) => ({
@@ -83,8 +84,8 @@ const usePreferredColorScheme = (initialThemeModeOverride: ColorScheme, userIsLo
   }));
 
   const userPreferences = useContext(UserPreferencesContext);
-  const [currentThemeMode, setCurrentThemeMode] = useState<ColorScheme>(
-    () => getInitialThemeMode({
+  const [currentThemeMode, setCurrentThemeMode] = useState<ColorScheme>(() =>
+    getInitialThemeMode({
       userPreferencesThemeMode: userPreferences[PREFERENCES_THEME_MODE],
       browserThemePreference,
       initialThemeModeOverride,
@@ -92,19 +93,22 @@ const usePreferredColorScheme = (initialThemeModeOverride: ColorScheme, userIsLo
     }),
   );
 
-  const changeCurrentThemeMode = useCallback((newThemeMode: ColorScheme) => {
-    setCurrentThemeMode(newThemeMode);
+  const changeCurrentThemeMode = useCallback(
+    (newThemeMode: ColorScheme) => {
+      setCurrentThemeMode(newThemeMode);
 
-    if (userIsLoggedIn) {
-      Store.set(PREFERENCES_THEME_MODE, newThemeMode);
+      if (userIsLoggedIn) {
+        Store.set(PREFERENCES_THEME_MODE, newThemeMode);
 
-      if (!userIsReadOnly) {
-        const nextPreferences = { ...userPreferences, [PREFERENCES_THEME_MODE]: newThemeMode };
+        if (!userIsReadOnly) {
+          const nextPreferences = { ...userPreferences, [PREFERENCES_THEME_MODE]: newThemeMode };
 
-        PreferencesStore.saveUserPreferences(username, nextPreferences);
+          PreferencesStore.saveUserPreferences(username, nextPreferences);
+        }
       }
-    }
-  }, [userIsLoggedIn, userIsReadOnly, userPreferences, username]);
+    },
+    [userIsLoggedIn, userIsReadOnly, userPreferences, username],
+  );
 
   return [currentThemeMode, changeCurrentThemeMode];
 };

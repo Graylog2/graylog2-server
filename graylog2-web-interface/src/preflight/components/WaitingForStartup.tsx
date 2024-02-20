@@ -40,13 +40,15 @@ const WaitingForStartup = () => {
   return (
     <Section title="Configuration successful">
       <P>
-        The Graylog server is currently starting. Depending on your setup it may take a few minutes.
-        This page will automatically refresh once the Graylog server is reachable.
-        You can always refresh manually, please be aware that this page will not be visible afterwards.
+        The Graylog server is currently starting. Depending on your setup it may take a few minutes. This page will
+        automatically refresh once the Graylog server is reachable. You can always refresh manually, please be aware
+        that this page will not be visible afterwards.
       </P>
 
       <Space h="md" />
-      <b><Spinner delay={0} text="Waiting for Graylog server ..." /></b>
+      <b>
+        <Spinner delay={0} text="Waiting for Graylog server ..." />
+      </b>
     </Section>
   );
 };

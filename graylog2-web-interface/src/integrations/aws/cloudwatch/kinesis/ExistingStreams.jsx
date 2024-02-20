@@ -54,18 +54,25 @@ const KinesisStreams = ({ onChange, onSubmit, toggleSetup }) => {
     setSidebar(
       <Panel bsStyle="info" header={<span>Don&apos;t see the stream you need?</span>}>
         <AutoSetupContent>
-          <p>At least one Kinesis stream must exist in the specified region in order to continue with the setup. The log stream must contain at least a few log messages.</p>
+          <p>
+            At least one Kinesis stream must exist in the specified region in order to continue with the setup. The log
+            stream must contain at least a few log messages.
+          </p>
 
           <p>
-            Graylog also supports the ability to create a Kinesis stream for you and subscribe it to a CloudWatch log group of your choice. Please be aware that this option will create additional resources in your AWS environment that will incur billing charges.
+            Graylog also supports the ability to create a Kinesis stream for you and subscribe it to a CloudWatch log
+            group of your choice. Please be aware that this option will create additional resources in your AWS
+            environment that will incur billing charges.
           </p>
         </AutoSetupContent>
 
-        <Button onClick={() => {
-          clearSidebar();
-          toggleSetup();
-        }}
-                type="button">
+        <Button
+          onClick={() => {
+            clearSidebar();
+            toggleSetup();
+          }}
+          type="button"
+        >
           Setup Kinesis Automatically
         </Button>
       </Panel>,
@@ -78,7 +85,9 @@ const KinesisStreams = ({ onChange, onSubmit, toggleSetup }) => {
 
       setFormError({
         full_message: logDataStatus.error,
-        nice_message: <span>We were unable to find any logs in this Kinesis stream. Please select a different Kinesis stream.</span>,
+        nice_message: (
+          <span>We were unable to find any logs in this Kinesis stream. Please select a different Kinesis stream.</span>
+        ),
       });
     }
   }, [logDataStatus.error]);
@@ -89,41 +98,42 @@ const KinesisStreams = ({ onChange, onSubmit, toggleSetup }) => {
 
   return (
     <>
-      <LoadingModal show={logDataStatus.loading}
-                    backdrop="static"
-                    keyboard={false}
-                    bsSize="small">
+      <LoadingModal show={logDataStatus.loading} backdrop="static" keyboard={false} bsSize="small">
         <LoadingContent>
           <i className="fa fa-spin fa-spinner" />
           <LoadingMessage>This request may take a few moments.</LoadingMessage>
         </LoadingContent>
       </LoadingModal>
 
-      <FormWrap onSubmit={handleSubmit}
-                buttonContent="Verify Stream &amp; Format"
-                loading={logDataStatus.loading}
-                error={formError}
-                disabled={formValidation.isFormValid(['awsCloudWatchKinesisStream'], formData)}
-                title="Select Kinesis Stream"
-                description={(
-                  <>
-                    <p>
-                      Below is a list of all Kinesis streams found within the specified AWS account.
-                    </p>
-                    <p>
-                      Please select the stream you would like to read messages from, or follow the&nbsp;
-                      <DocumentationLink page={DocsRoutes.INTEGRATIONS.AWS.AWS_KINESIS_CLOUDWATCH_INPUTS} text="AWS Kinesis/CloudWatch Input " />
-                      documentation for more details on this set up.
-                    </p>
-                  </>
-                )}>
-
-        <ValidatedInput id="awsCloudWatchKinesisStream"
-                        type="select"
-                        fieldData={formData.awsCloudWatchKinesisStream}
-                        onChange={onChange}
-                        label="Select Stream"
-                        required>
+      <FormWrap
+        onSubmit={handleSubmit}
+        buttonContent="Verify Stream &amp; Format"
+        loading={logDataStatus.loading}
+        error={formError}
+        disabled={formValidation.isFormValid(['awsCloudWatchKinesisStream'], formData)}
+        title="Select Kinesis Stream"
+        description={
+          <>
+            <p>Below is a list of all Kinesis streams found within the specified AWS account.</p>
+            <p>
+              Please select the stream you would like to read messages from, or follow the&nbsp;
+              <DocumentationLink
+                page={DocsRoutes.INTEGRATIONS.AWS.AWS_KINESIS_CLOUDWATCH_INPUTS}
+                text="AWS Kinesis/CloudWatch Input "
+              />
+              documentation for more details on this set up.
+            </p>
+          </>
+        }
+      >
+        <ValidatedInput
+          id="awsCloudWatchKinesisStream"
+          type="select"
+          fieldData={formData.awsCloudWatchKinesisStream}
+          onChange={onChange}
+          label="Select Stream"
+          required
+        >
           {renderOptions(availableStreams, 'Select Kinesis Stream')}
         </ValidatedInput>
 
@@ -140,8 +150,7 @@ KinesisStreams.propTypes = {
 };
 
 KinesisStreams.defaultProps = {
-  toggleSetup: () => {
-  },
+  toggleSetup: () => {},
 };
 
 const AutoSetupContent = styled.div`

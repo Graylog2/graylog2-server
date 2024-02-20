@@ -37,13 +37,15 @@ import useMapKeys from 'views/components/visualizations/useMapKeys';
 import type ColorMapper from 'views/components/visualizations/ColorMapper';
 import type { KeyMapper } from 'views/components/visualizations/TransformKeys';
 
-const ColorHint = styled.div(({ color }) => css`
-  cursor: pointer;
-  background-color: ${color} !important; /* Needed for report generation */
-  -webkit-print-color-adjust: exact !important; /* Needed for report generation */
-  width: 12px;
-  height: 12px;
-`);
+const ColorHint = styled.div(
+  ({ color }) => css`
+    cursor: pointer;
+    background-color: ${color} !important; /* Needed for report generation */
+    -webkit-print-color-adjust: exact !important; /* Needed for report generation */
+    width: 12px;
+    height: 12px;
+  `,
+);
 
 const Container = styled.div`
   display: grid;
@@ -83,18 +85,16 @@ const ValueContainer = styled.div`
 `;
 
 type Props = {
-  children: React.ReactNode,
-  config: AggregationWidgetConfig,
-  chartData: any,
-  labelFields?: (config: Props['config']) => Array<string>,
-  labelMapper?: (data: Array<any>) => Array<string> | undefined | null,
-  neverHide?: boolean,
+  children: React.ReactNode;
+  config: AggregationWidgetConfig;
+  chartData: any;
+  labelFields?: (config: Props['config']) => Array<string>;
+  labelMapper?: (data: Array<any>) => Array<string> | undefined | null;
+  neverHide?: boolean;
 };
 
-const defaultLabelMapper = (data: Array<Pick<ChartDefinition, 'name' | 'originalName'>>) => data.map(({
-  name,
-  originalName,
-}) => originalName ?? name);
+const defaultLabelMapper = (data: Array<Pick<ChartDefinition, 'name' | 'originalName'>>) =>
+  data.map(({ name, originalName }) => originalName ?? name);
 
 const stringLenSort = (s1: string, s2: string) => {
   if (s1.length < s2.length) {
@@ -111,55 +111,60 @@ const stringLenSort = (s1: string, s2: string) => {
 const columnPivotsToFields = (config: Props['config']) => config?.columnPivots?.flatMap((pivot) => pivot.fields) ?? [];
 
 type TableCellProps = {
-  value: string,
-  fieldTypes: FieldTypes,
-  colors: ColorMapper,
-  activeQuery: string,
-  labelFields: string[],
-  mapKeys: KeyMapper,
-  setColor: (name: string, newColor: string) => void,
-}
+  value: string;
+  fieldTypes: FieldTypes;
+  colors: ColorMapper;
+  activeQuery: string;
+  labelFields: string[];
+  mapKeys: KeyMapper;
+  setColor: (name: string, newColor: string) => void;
+};
 
-const TableCell = ({ value, fieldTypes, colors, activeQuery, labelFields, mapKeys, setColor }:TableCellProps) => {
+const TableCell = ({ value, fieldTypes, colors, activeQuery, labelFields, mapKeys, setColor }: TableCellProps) => {
   const [showPopover, setShowPopover] = useState(false);
   const labelsWithField = value.split(keySeparator).map((label, idx) => {
     const field = labelFields[idx];
-    const fieldType = fieldTypes?.queryFields?.get(activeQuery)?.find((type) => type.name === field)?.type ?? FieldType.Unknown;
+    const fieldType =
+      fieldTypes?.queryFields?.get(activeQuery)?.find((type) => type.name === field)?.type ?? FieldType.Unknown;
 
     return { label, field, type: fieldType };
   });
   const defaultColor = value === eventsDisplayName ? EVENT_COLOR : undefined;
-  const val = labelsWithField.map(({ label, field, type }) => (field
-    ? <Value key={`${field}:${label}`} type={type} value={label} field={field} />
-    : label));
-  const humanLabel = Object.values(labelsWithField).map(({
-    label,
-    field,
-  }) => mapKeys(label, field)).join(humanSeparator);
+  const val = labelsWithField.map(({ label, field, type }) =>
+    field ? <Value key={`${field}:${label}`} type={type} value={label} field={field} /> : label,
+  );
+  const humanLabel = Object.values(labelsWithField)
+    .map(({ label, field }) => mapKeys(label, field))
+    .join(humanSeparator);
 
-  const _onColorSelect = useCallback((field: string, color: string) => {
-    setColor(field, color);
-    setShowPopover(false);
-  }, [setColor]);
+  const _onColorSelect = useCallback(
+    (field: string, color: string) => {
+      setColor(field, color);
+      setShowPopover(false);
+    },
+    [setColor],
+  );
 
   return (
     <LegendCell key={value}>
       <LegendEntry>
         <Popover position="top" withArrow opened={showPopover}>
           <Popover.Target>
-            <ColorHint aria-label="Color Hint"
-                       onClick={() => setShowPopover((show) => !show)}
-                       color={colors.get(value, defaultColor)} />
+            <ColorHint
+              aria-label="Color Hint"
+              onClick={() => setShowPopover((show) => !show)}
+              color={colors.get(value, defaultColor)}
+            />
           </Popover.Target>
           <Popover.Dropdown title={`Configuration for ${humanLabel}`}>
-            <ColorPicker color={colors.get(value, defaultColor)}
-                         colors={defaultColors}
-                         onChange={(newColor) => _onColorSelect(value, newColor)} />
+            <ColorPicker
+              color={colors.get(value, defaultColor)}
+              colors={defaultColors}
+              onChange={(newColor) => _onColorSelect(value, newColor)}
+            />
           </Popover.Dropdown>
         </Popover>
-        <ValueContainer>
-          {val}
-        </ValueContainer>
+        <ValueContainer>{val}</ValueContainer>
       </LegendEntry>
     </LegendCell>
   );
@@ -188,22 +193,24 @@ const PlotLegend = ({
     return <>{children}</>;
   }
 
-  const tableCells = labels.sort(stringLenSort).map((value) => (
-    <TableCell key={value}
-               colors={colors}
-               value={value}
-               labelFields={_labelFields}
-               setColor={setColor}
-               mapKeys={mapKeys}
-               fieldTypes={fieldTypes}
-               activeQuery={activeQuery} />
-  ));
+  const tableCells = labels
+    .sort(stringLenSort)
+    .map((value) => (
+      <TableCell
+        key={value}
+        colors={colors}
+        value={value}
+        labelFields={_labelFields}
+        setColor={setColor}
+        mapKeys={mapKeys}
+        fieldTypes={fieldTypes}
+        activeQuery={activeQuery}
+      />
+    ));
 
   const result = chunk(tableCells, 5).map((cells, index) => (
     // eslint-disable-next-line react/no-array-index-key
-    <LegendRow key={index}>
-      {cells}
-    </LegendRow>
+    <LegendRow key={index}>{cells}</LegendRow>
   ));
 
   return (

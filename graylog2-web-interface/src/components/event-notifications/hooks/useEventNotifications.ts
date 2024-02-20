@@ -22,41 +22,47 @@ import type { EventNotification } from 'stores/event-notifications/EventNotifica
 import { EventNotificationsStore } from 'stores/event-notifications/EventNotificationsStore';
 
 type Options = {
-  enabled: boolean,
-}
+  enabled: boolean;
+};
 
-const useEventNotifications = (searchParams: SearchParams, { enabled }: Options = { enabled: true }): {
-  data: {
-    elements: Array<EventNotification>,
-    pagination: { total: number }
-    attributes: Array<{ id: string, title: string, sortable: boolean }>
-  } | undefined,
-  refetch: () => void,
-  isInitialLoading: boolean,
+const useEventNotifications = (
+  searchParams: SearchParams,
+  { enabled }: Options = { enabled: true },
+): {
+  data:
+    | {
+        elements: Array<EventNotification>;
+        pagination: { total: number };
+        attributes: Array<{ id: string; title: string; sortable: boolean }>;
+      }
+    | undefined;
+  refetch: () => void;
+  isInitialLoading: boolean;
 } => {
   const { data, refetch, isInitialLoading } = useQuery(
     ['eventNotifications', 'overview', searchParams],
-    () => EventNotificationsStore.searchPaginated(
-      searchParams.page,
-      searchParams.pageSize,
-      searchParams.query,
-      { sort: searchParams?.sort.attributeId, order: searchParams?.sort.direction },
-    ),
+    () =>
+      EventNotificationsStore.searchPaginated(searchParams.page, searchParams.pageSize, searchParams.query, {
+        sort: searchParams?.sort.attributeId,
+        order: searchParams?.sort.direction,
+      }),
     {
       onError: (errorThrown) => {
-        UserNotification.error(`Loading event notifications failed with status: ${errorThrown}`,
-          'Could not load event notifications');
+        UserNotification.error(
+          `Loading event notifications failed with status: ${errorThrown}`,
+          'Could not load event notifications',
+        );
       },
       keepPreviousData: true,
       enabled,
     },
   );
 
-  return ({
+  return {
     data,
     refetch,
     isInitialLoading,
-  });
+  };
 };
 
 export default useEventNotifications;

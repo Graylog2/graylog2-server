@@ -16,31 +16,31 @@
  */
 
 export type Input = {
-  id: string,
-  title: string,
-  name: string,
-  type: string,
+  id: string;
+  title: string;
+  name: string;
+  type: string;
   attributes: {
-    [type: string]: any,
-  },
-  created_at: string,
-  creator_user_id: string,
-  content_pack?: boolean,
-  global: boolean,
-  static_fields: { [field: string]: any },
-  node?: string,
+    [type: string]: any;
+  };
+  created_at: string;
+  creator_user_id: string;
+  content_pack?: boolean;
+  global: boolean;
+  static_fields: { [field: string]: any };
+  node?: string;
 };
 
-export type Codec ={
-  type: string,
-  name: string,
+export type Codec = {
+  type: string;
+  name: string;
   requested_configuration: {
     [key: string]: {
-      [key: string]: any,
-    },
-  },
+      [key: string]: any;
+    };
+  };
 };
 
 export type CodecTypes = {
-  [key: string]: Codec,
+  [key: string]: Codec;
 };

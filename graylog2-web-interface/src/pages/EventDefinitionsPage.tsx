@@ -35,27 +35,31 @@ const EventDefinitionsPage = () => {
   return (
     <DocumentTitle title="Event Definitions">
       <EventsPageNavigation />
-      <PageHeader title="Event Definitions"
-                  actions={(
-                    <IfPermitted permissions="eventdefinitions:create">
-                      <LinkContainer to={Routes.ALERTS.DEFINITIONS.CREATE}>
-                        <Button bsStyle="success"
-                                onClick={() => {
-                                  sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CREATE_BUTTON_CLICKED, {
-                                    app_pathname: getPathnameWithoutId(pathname),
-                                    app_section: 'event-definitions',
-                                    app_action_value: 'create-event-definition-button',
-                                  });
-                                }}>
-                          Create event definition
-                        </Button>
-                      </LinkContainer>
-                    </IfPermitted>
-                    )}
-                  documentationLink={{
-                    title: 'Alerts documentation',
-                    path: DocsHelper.PAGES.ALERTS,
-                  }}>
+      <PageHeader
+        title="Event Definitions"
+        actions={
+          <IfPermitted permissions="eventdefinitions:create">
+            <LinkContainer to={Routes.ALERTS.DEFINITIONS.CREATE}>
+              <Button
+                bsStyle="success"
+                onClick={() => {
+                  sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CREATE_BUTTON_CLICKED, {
+                    app_pathname: getPathnameWithoutId(pathname),
+                    app_section: 'event-definitions',
+                    app_action_value: 'create-event-definition-button',
+                  });
+                }}
+              >
+                Create event definition
+              </Button>
+            </LinkContainer>
+          </IfPermitted>
+        }
+        documentationLink={{
+          title: 'Alerts documentation',
+          path: DocsHelper.PAGES.ALERTS,
+        }}
+      >
         <span>
           Create new Event Definitions that will allow you to search for different Conditions and alert on them.
         </span>

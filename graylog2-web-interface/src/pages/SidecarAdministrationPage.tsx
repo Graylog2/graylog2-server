@@ -29,11 +29,13 @@ const SidecarAdministrationPage = () => {
   return (
     <DocumentTitle title="Collectors Administration">
       <SidecarsPageNavigation />
-      <PageHeader title="Collectors Administration"
-                  documentationLink={{
-                    title: 'Sidecar documentation',
-                    path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
-                  }}>
+      <PageHeader
+        title="Collectors Administration"
+        documentationLink={{
+          title: 'Sidecar documentation',
+          path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
+        }}
+      >
         <span>
           The Graylog collectors can reliably forward contents of log files or Windows EventLog from your servers.
         </span>

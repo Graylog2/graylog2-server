@@ -27,34 +27,36 @@ import NumberUtils from 'util/NumberUtils';
 import { Icon, LinkToNode, Spinner } from 'components/common';
 import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
 
-const InputIO = styled.span(({ theme }) => css`
-  .total {
-    color: ${theme.colors.gray[70]};
-  }
+const InputIO = styled.span(
+  ({ theme }) => css`
+    .total {
+      color: ${theme.colors.gray[70]};
+    }
 
-  .value {
-    font-family: ${theme.fonts.family.monospace};
-  }
+    .value {
+      font-family: ${theme.fonts.family.monospace};
+    }
 
-  .persec {
-    margin-left: 3px;
-  }
+    .persec {
+      margin-left: 3px;
+    }
 
-  .channel-direction {
-    position: relative;
-    left: -1px;
-  }
+    .channel-direction {
+      position: relative;
+      left: -1px;
+    }
 
-  .channel-direction-down {
-    position: relative;
-    top: 1px;
-  }
+    .channel-direction-down {
+      position: relative;
+      top: 1px;
+    }
 
-  .channel-direction-up {
-    position: relative;
-    top: -1px;
-  }
-`);
+    .channel-direction-up {
+      position: relative;
+      top: -1px;
+    }
+  `,
+);
 
 const InputThroughput = createReactClass({
   displayName: 'InputThroughput',
@@ -172,8 +174,8 @@ const InputThroughput = createReactClass({
   _formatConnections(openConnections, totalConnections) {
     return (
       <span>
-        Active connections: <span className="active">{this._formatCount(openConnections)} </span>
-        (<span className="total">{this._formatCount(totalConnections)}</span> total)
+        Active connections: <span className="active">{this._formatCount(openConnections)} </span>(
+        <span className="total">{this._formatCount(totalConnections)}</span> total)
         <br />
       </span>
     );
@@ -202,9 +204,15 @@ const InputThroughput = createReactClass({
       <span key={input.id + nodeId}>
         <LinkToNode nodeId={nodeId} />
         <br />
-        {!isNaN(writtenBytes1Sec) && this._formatNetworkStats(writtenBytes1Sec, writtenBytesTotal, readBytes1Sec, readBytesTotal)}
+        {!isNaN(writtenBytes1Sec) &&
+          this._formatNetworkStats(writtenBytes1Sec, writtenBytesTotal, readBytes1Sec, readBytesTotal)}
         {!isNaN(openConnections) && this._formatConnections(openConnections, totalConnections)}
-        {!isNaN(emptyMessages) && <span>Empty messages discarded: {this._formatCount(emptyMessages)}<br /></span>}
+        {!isNaN(emptyMessages) && (
+          <span>
+            Empty messages discarded: {this._formatCount(emptyMessages)}
+            <br />
+          </span>
+        )}
         {isNaN(writtenBytes1Sec) && isNaN(openConnections) && <span>No metrics available for this node</span>}
         <br />
       </span>
@@ -240,13 +248,30 @@ const InputThroughput = createReactClass({
       <div className="graylog-input-metrics">
         <h3>Throughput / Metrics</h3>
         <span>
-          {isNaN(incomingMessages) && isNaN(writtenBytes1Sec) && isNaN(openConnections) && <i>No metrics available for this input</i>}
-          {!isNaN(incomingMessages) && <span>1 minute average rate: {this._formatCount(incomingMessages)} msg/s<br /></span>}
-          {!isNaN(writtenBytes1Sec) && this._formatNetworkStats(writtenBytes1Sec, writtenBytesTotal, readBytes1Sec, readBytesTotal)}
+          {isNaN(incomingMessages) && isNaN(writtenBytes1Sec) && isNaN(openConnections) && (
+            <i>No metrics available for this input</i>
+          )}
+          {!isNaN(incomingMessages) && (
+            <span>
+              1 minute average rate: {this._formatCount(incomingMessages)} msg/s
+              <br />
+            </span>
+          )}
+          {!isNaN(writtenBytes1Sec) &&
+            this._formatNetworkStats(writtenBytes1Sec, writtenBytesTotal, readBytes1Sec, readBytesTotal)}
           {!isNaN(openConnections) && this._formatConnections(openConnections, totalConnections)}
-          {!isNaN(emptyMessages) && <span>Empty messages discarded: {this._formatCount(emptyMessages)}<br /></span>}
-          {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-          {!isNaN(writtenBytes1Sec) && input.global && <a href="" onClick={this._toggleShowDetails}>{showDetails ? 'Hide' : 'Show'} details</a>}
+          {!isNaN(emptyMessages) && (
+            <span>
+              Empty messages discarded: {this._formatCount(emptyMessages)}
+              <br />
+            </span>
+          )}
+          {!isNaN(writtenBytes1Sec) && input.global && (
+            // eslint-disable-next-line jsx-a11y/anchor-is-valid
+            <a href="" onClick={this._toggleShowDetails}>
+              {showDetails ? 'Hide' : 'Show'} details
+            </a>
+          )}
           {!isNaN(writtenBytes1Sec) && showDetails && this._formatAllNodeDetails(metrics)}
         </span>
       </div>

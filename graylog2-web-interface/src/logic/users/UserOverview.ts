@@ -182,23 +182,25 @@ export default class UserOverview {
     } = this._value;
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return new Builder(Immutable.Map({
-      id,
-      username,
-      fullName,
-      email,
-      roles,
-      readOnly,
-      external,
-      sessionActive,
-      clientAddress,
-      lastActivity,
-      enabled,
-      authServiceId,
-      authServiceUid,
-      authServiceEnabled,
-      accountStatus,
-    }));
+    return new Builder(
+      Immutable.Map({
+        id,
+        username,
+        fullName,
+        email,
+        roles,
+        readOnly,
+        external,
+        sessionActive,
+        clientAddress,
+        lastActivity,
+        enabled,
+        authServiceId,
+        authServiceUid,
+        authServiceEnabled,
+        accountStatus,
+      }),
+    );
   }
 
   static create(
@@ -294,7 +296,8 @@ export default class UserOverview {
       account_status: accountStatus,
     } = value;
 
-    return UserOverview.create(id,
+    return UserOverview.create(
+      id,
       username,
       fullName,
       email,
@@ -308,7 +311,8 @@ export default class UserOverview {
       authServiceId,
       authServiceUid,
       authServiceEnabled,
-      accountStatus);
+      accountStatus,
+    );
   }
 
   static builder(): Builder {

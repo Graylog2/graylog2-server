@@ -61,37 +61,40 @@ const ContentWrap = styled.strong`
   }
 `;
 
-const ThroughputData = styled.span(({ $dataIn, theme }) => css`
-  font-size: ${theme.fonts.size.small};
-  line-height: 1;
-  grid-area: ${$dataIn ? '1 / 1 / 2 / 2' : '2 / 1 / 3 / 2'};
-  display: grid;
-  grid-template-columns: 1fr 1.75em;
-  grid-template-rows: 1fr 1px;
-  grid-gap: 0 3px;
-  color: ${theme.colors.global.textDefault};
+const ThroughputData = styled.span(
+  ({ $dataIn, theme }) => css`
+    font-size: ${theme.fonts.size.small};
+    line-height: 1;
+    grid-area: ${$dataIn ? '1 / 1 / 2 / 2' : '2 / 1 / 3 / 2'};
+    display: grid;
+    grid-template-columns: 1fr 1.75em;
+    grid-template-rows: 1fr 1px;
+    grid-gap: 0 3px;
+    color: ${theme.colors.global.textDefault};
 
-  > span {
-    grid-area: 1 / 1 / 2 / 2;
-    text-align: right;
-    padding-left: 3px;
-  }
+    > span {
+      grid-area: 1 / 1 / 2 / 2;
+      text-align: right;
+      padding-left: 3px;
+    }
 
-  > i {
-    font-weight: normal;
-    grid-area: 1 / 2 / 2 / 3;
-  }
+    > i {
+      font-weight: normal;
+      grid-area: 1 / 2 / 2 / 3;
+    }
 
-  &::after {
-    ${$dataIn && css`
-      content: ' ';
-      min-height: 1px;
-      background-color: ${theme.colors.variant.light.default};
-      display: block;
-      grid-area: 2 / 1 / 3 / 3;
-`}
-  }
-`);
+    &::after {
+      ${$dataIn &&
+      css`
+        content: ' ';
+        min-height: 1px;
+        background-color: ${theme.colors.variant.light.default};
+        display: block;
+        grid-area: 2 / 1 / 3 / 3;
+      `}
+    }
+  `,
+);
 
 const GlobalThroughput = (props) => {
   const { throughput } = useStore(GlobalThroughputStore);
@@ -113,11 +116,7 @@ const GlobalThroughput = (props) => {
     );
   }
 
-  return (
-    <ThroughputNavItem {...props}>
-      {output}
-    </ThroughputNavItem>
-  );
+  return <ThroughputNavItem {...props}>{output}</ThroughputNavItem>;
 };
 
 export default GlobalThroughput;

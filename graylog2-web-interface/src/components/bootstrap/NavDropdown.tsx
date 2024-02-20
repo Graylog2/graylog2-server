@@ -38,9 +38,9 @@ class ModifiedBootstrapNavDropdown extends BootstrapNavDropdown {
     }
 
     if (
-      props.active
-      || (activeKey != null && props.eventKey === activeKey)
-      || (activeHref && props.href === activeHref)
+      props.active ||
+      (activeKey != null && props.eventKey === activeKey) ||
+      (activeHref && props.href === activeHref)
     ) {
       return true;
     }
@@ -53,24 +53,25 @@ const StyledMenuDropdown = styled(Menu.Dropdown)`
   z-index: 1032 !important;
 `;
 
-const DropdownTrigger = styled.button<{ $active: boolean }>(({ theme, $active }) => css`
-  background: transparent;
-  border: 0;
-  padding: 15px;
+const DropdownTrigger = styled.button<{ $active: boolean }>(
+  ({ theme, $active }) => css`
+    background: transparent;
+    border: 0;
+    padding: 15px;
 
-  &:hover {
-    ${hoverIndicatorStyles(theme)}
-  }
+    &:hover {
+      ${hoverIndicatorStyles(theme)}
+    }
 
-  ${$active ? activeIndicatorStyles(theme) : ''}
+    ${$active ? activeIndicatorStyles(theme) : ''}
 
-
-  &:hover,
+    &:hover,
   &:focus {
-    color: ${theme.colors.variant.darker.default};
-    background-color: transparent;
-  }
-`);
+      color: ${theme.colors.variant.darker.default};
+      background-color: transparent;
+    }
+  `,
+);
 
 const NavItem = styled.span`
   display: inline-flex;
@@ -80,14 +81,21 @@ const NavItem = styled.span`
 `;
 
 type Props = {
-  title?: React.ReactNode,
-  inactiveTitle?: string,
-  badge?: React.ComponentType<{ text: React.ReactNode }>,
-  noCaret?: boolean,
-  hoverTitle?: string,
-}
+  title?: React.ReactNode;
+  inactiveTitle?: string;
+  badge?: React.ComponentType<{ text: React.ReactNode }>;
+  noCaret?: boolean;
+  hoverTitle?: string;
+};
 
-const NavDropdown = ({ title, inactiveTitle, badge: Badge, noCaret, children, hoverTitle }: React.PropsWithChildren<Props>) => {
+const NavDropdown = ({
+  title,
+  inactiveTitle,
+  badge: Badge,
+  noCaret,
+  children,
+  hoverTitle,
+}: React.PropsWithChildren<Props>) => {
   const isActive = inactiveTitle ? inactiveTitle !== title : undefined;
 
   return (
@@ -95,17 +103,12 @@ const NavDropdown = ({ title, inactiveTitle, badge: Badge, noCaret, children, ho
       <NavItem>
         <Menu.Target>
           <DropdownTrigger $active={isActive} title={hoverTitle}>
-            <NavItemStateIndicator>
-              {Badge ? <Badge text={title} /> : title}
-            </NavItemStateIndicator>
-            {' '}
+            <NavItemStateIndicator>{Badge ? <Badge text={title} /> : title}</NavItemStateIndicator>{' '}
             {noCaret ? null : <span className="caret" />}
           </DropdownTrigger>
         </Menu.Target>
       </NavItem>
-      <StyledMenuDropdown>
-        {children}
-      </StyledMenuDropdown>
+      <StyledMenuDropdown>{children}</StyledMenuDropdown>
     </Menu>
   );
 };

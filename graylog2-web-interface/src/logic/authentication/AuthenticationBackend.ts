@@ -23,23 +23,23 @@ import type { DirectoryServiceBackendConfig } from 'logic/authentication/directo
 import type { OktaBackendConfig } from 'logic/authentication/okta/types';
 
 type InternalState = {
-  id: string,
-  title: string,
-  description: string,
-  defaultRoles: Immutable.List<string>,
-  config: DirectoryServiceBackendConfig | OktaBackendConfig,
+  id: string;
+  title: string;
+  description: string;
+  defaultRoles: Immutable.List<string>;
+  config: DirectoryServiceBackendConfig | OktaBackendConfig;
 };
 
 type TypedConfig = {
-  type: string,
+  type: string;
 };
 
 export type AuthenticationBackendJSON = {
-  id: string,
-  title: string,
-  description: string,
-  default_roles: Array<string>,
-  config: DirectoryServiceBackendConfig | OktaBackendConfig,
+  id: string;
+  title: string;
+  description: string;
+  default_roles: Array<string>;
+  config: DirectoryServiceBackendConfig | OktaBackendConfig;
 };
 
 const configFromJson = (config: $PropertyType<AuthenticationBackendJSON, 'config'>) => {
@@ -102,32 +102,22 @@ export default class AuthenticationBackend {
   }
 
   toBuilder(): Builder {
-    const {
-      id,
-      title,
-      description,
-      defaultRoles,
-      config,
-    } = this._value;
+    const { id, title, description, defaultRoles, config } = this._value;
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return new Builder(Immutable.Map({
-      id,
-      title,
-      description,
-      defaultRoles,
-      config,
-    }));
+    return new Builder(
+      Immutable.Map({
+        id,
+        title,
+        description,
+        defaultRoles,
+        config,
+      }),
+    );
   }
 
   toJSON() {
-    const {
-      id,
-      title,
-      description,
-      defaultRoles = Immutable.List(),
-      config,
-    } = this._value;
+    const { id, title, description, defaultRoles = Immutable.List(), config } = this._value;
 
     const formattedConfig = configToJson(config);
 
@@ -141,23 +131,11 @@ export default class AuthenticationBackend {
   }
 
   static fromJSON(value: AuthenticationBackendJSON) {
-    const {
-      id,
-      title,
-      description,
-      default_roles: defaultRoles,
-      config,
-    } = value;
+    const { id, title, description, default_roles: defaultRoles, config } = value;
 
     const formattedConfig = configFromJson(config);
 
-    return new AuthenticationBackend(
-      id,
-      title,
-      description,
-      Immutable.List(defaultRoles),
-      formattedConfig,
-    );
+    return new AuthenticationBackend(id, title, description, Immutable.List(defaultRoles), formattedConfig);
   }
 
   static builder(): Builder {
@@ -196,20 +174,8 @@ class Builder {
   }
 
   build(): AuthenticationBackend {
-    const {
-      id,
-      title,
-      description,
-      defaultRoles,
-      config,
-    } = this.value.toObject();
+    const { id, title, description, defaultRoles, config } = this.value.toObject();
 
-    return new AuthenticationBackend(
-      id,
-      title,
-      description,
-      defaultRoles,
-      config,
-    );
+    return new AuthenticationBackend(id, title, description, defaultRoles, config);
   }
 }

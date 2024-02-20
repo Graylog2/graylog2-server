@@ -44,9 +44,13 @@ describe('AggregationElementSelect', () => {
   it('should select an aggregation element', async () => {
     const onSelectMock = jest.fn();
 
-    render(<AggregationElementSelect onSelect={onSelectMock}
-                                     formValues={{ metrics: [] }}
-                                     aggregationElements={aggregationElements} />);
+    render(
+      <AggregationElementSelect
+        onSelect={onSelectMock}
+        formValues={{ metrics: [] }}
+        aggregationElements={aggregationElements}
+      />,
+    );
 
     await userEvent.click(await screen.findByRole('button', { name: 'Add' }));
 
@@ -61,9 +65,13 @@ describe('AggregationElementSelect', () => {
   });
 
   it('should not list already configured aggregation elements which can not be configured multiple times', async () => {
-    render(<AggregationElementSelect onSelect={() => {}}
-                                     formValues={{ metrics: [] }}
-                                     aggregationElements={aggregationElements} />);
+    render(
+      <AggregationElementSelect
+        onSelect={() => {}}
+        formValues={{ metrics: [] }}
+        aggregationElements={aggregationElements}
+      />,
+    );
 
     await userEvent.click(await screen.findByRole('button', { name: 'Add' }));
 

@@ -30,9 +30,9 @@ const StyledFormSubmit = styled(FormSubmit)`
 `;
 
 type LoadMessageFormProps = {
-  loadMessage: (e: React.FormEvent) => void,
-  children: React.ReactNode,
-  loading: boolean,
+  loadMessage: (e: React.FormEvent) => void;
+  children: React.ReactNode;
+  loading: boolean;
 };
 
 const LoadMessageForm = ({ loadMessage, children, loading }: LoadMessageFormProps) => {
@@ -42,38 +42,47 @@ const LoadMessageForm = ({ loadMessage, children, loading }: LoadMessageFormProp
     <div>
       <form className="form-inline message-loader-form" onSubmit={loadMessage}>
         {children}
-        <StyledFormSubmit submitButtonText="Load message"
-                          isSubmitting={loading}
-                          submitLoadingText="Loading message..."
-                          isAsyncSubmit
-                          displayCancel
-                          onCancel={() => history.goBack()} />
+        <StyledFormSubmit
+          submitButtonText="Load message"
+          isSubmitting={loading}
+          submitLoadingText="Loading message..."
+          isAsyncSubmit
+          displayCancel
+          onCancel={() => history.goBack()}
+        />
       </form>
     </div>
   );
 };
 
 type Props = {
-  hidden: boolean,
-  hideText: string,
-  onMessageLoaded: (data: any) => void,
-  messageId?: string,
-  index?: string,
+  hidden: boolean;
+  hideText: string;
+  onMessageLoaded: (data: any) => void;
+  messageId?: string;
+  index?: string;
 };
 
-const useMessageLoader = (defaultMessageId: string, defaultIndex: string, onMessageLoaded: (data: any) => void): [boolean, (messageId: string, index: string) => void] => {
+const useMessageLoader = (
+  defaultMessageId: string,
+  defaultIndex: string,
+  onMessageLoaded: (data: any) => void,
+): [boolean, (messageId: string, index: string) => void] => {
   const [loading, setLoading] = useState(false);
-  const loadMessage = useCallback((messageId: string, index: string) => {
-    if (messageId === '' || index === '') {
-      return;
-    }
+  const loadMessage = useCallback(
+    (messageId: string, index: string) => {
+      if (messageId === '' || index === '') {
+        return;
+      }
 
-    setLoading(true);
-    const promise = MessagesActions.loadMessage(index, messageId);
+      setLoading(true);
+      const promise = MessagesActions.loadMessage(index, messageId);
 
-    promise.then((data) => onMessageLoaded(data));
-    promise.finally(() => setLoading(false));
-  }, [onMessageLoaded]);
+      promise.then((data) => onMessageLoaded(data));
+      promise.finally(() => setLoading(false));
+    },
+    [onMessageLoaded],
+  );
 
   useEffect(() => {
     if (defaultMessageId && defaultIndex) {
@@ -84,7 +93,13 @@ const useMessageLoader = (defaultMessageId: string, defaultIndex: string, onMess
   return [loading, loadMessage];
 };
 
-const MessageLoader = ({ hidden, hideText, onMessageLoaded, messageId: defaultMessageId, index: defaultIndex }: Props) => {
+const MessageLoader = ({
+  hidden,
+  hideText,
+  onMessageLoaded,
+  messageId: defaultMessageId,
+  index: defaultIndex,
+}: Props) => {
   const [isHidden, setIsHidden] = useState(hidden);
 
   const [messageId, setMessageId] = useState<string>(defaultMessageId);
@@ -96,13 +111,16 @@ const MessageLoader = ({ hidden, hideText, onMessageLoaded, messageId: defaultMe
 
   const [loading, loadMessage] = useMessageLoader(defaultMessageId, defaultIndex, onMessageLoaded);
 
-  const _loadMessage = useCallback((e?: React.FormEvent) => {
-    if (e?.preventDefault) {
-      e.preventDefault();
-    }
+  const _loadMessage = useCallback(
+    (e?: React.FormEvent) => {
+      if (e?.preventDefault) {
+        e.preventDefault();
+      }
 
-    loadMessage(messageId, index);
-  }, [index, loadMessage, messageId]);
+      loadMessage(messageId, index);
+    },
+    [index, loadMessage, messageId],
+  );
 
   const toggleMessageForm = useCallback(() => {
     setIsHidden(!isHidden);
@@ -118,13 +136,31 @@ const MessageLoader = ({ hidden, hideText, onMessageLoaded, messageId: defaultMe
     <div className="message-loader">
       {hideText || (
         <p>
-          Wrong example? <Button bsSize="sm" onClick={toggleMessageForm}>Load another message</Button>
+          Wrong example?{' '}
+          <Button bsSize="sm" onClick={toggleMessageForm}>
+            Load another message
+          </Button>
         </p>
       )}
       {isHidden || (
         <LoadMessageForm loading={loading} loadMessage={_loadMessage}>
-          <input ref={messageIdRef} type="text" className="form-control message-id-input" placeholder="Message ID" required value={messageId} onChange={onChangeMessageId} />
-          <input type="text" className="form-control" placeholder="Index" required value={index} onChange={onChangeIndex} />
+          <input
+            ref={messageIdRef}
+            type="text"
+            className="form-control message-id-input"
+            placeholder="Message ID"
+            required
+            value={messageId}
+            onChange={onChangeMessageId}
+          />
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Index"
+            required
+            value={index}
+            onChange={onChangeIndex}
+          />
         </LoadMessageForm>
       )}
     </div>

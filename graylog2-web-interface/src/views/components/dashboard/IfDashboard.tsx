@@ -20,7 +20,7 @@ import View from 'views/logic/views/View';
 import useViewType from 'views/hooks/useViewType';
 
 type Props = {
-  children: React.ReactNode,
+  children: React.ReactNode;
 };
 
 const IfDashboard = ({ children }: Props) => {

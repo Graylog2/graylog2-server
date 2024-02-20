@@ -23,16 +23,19 @@ const nodeThroughput = (input, output) => ({
 });
 const metricsUpdate = (metrics) => ({ metrics });
 
-const onUpdate = (fn, done) => GlobalThroughputStore.listen((newThroughput) => {
-  fn(newThroughput);
-  done();
-});
+const onUpdate = (fn, done) =>
+  GlobalThroughputStore.listen((newThroughput) => {
+    fn(newThroughput);
+    done();
+  });
 
 describe('GlobalThroughputStore', () => {
   let unsub;
 
   afterEach(() => {
-    if (unsub) { unsub(); }
+    if (unsub) {
+      unsub();
+    }
   });
 
   it('should return zeroed response if response does not contain metrics', (done) => {
@@ -48,9 +51,11 @@ describe('GlobalThroughputStore', () => {
       expect(newThroughput).toEqual(expectedThroughput(42, 17));
     }, done);
 
-    GlobalThroughputStore.updateMetrics(metricsUpdate({
-      node1: nodeThroughput(42, 17),
-    }));
+    GlobalThroughputStore.updateMetrics(
+      metricsUpdate({
+        node1: nodeThroughput(42, 17),
+      }),
+    );
   });
 
   it('should sum individual throughputs from response', (done) => {
@@ -58,23 +63,30 @@ describe('GlobalThroughputStore', () => {
       expect(newThroughput).toEqual(expectedThroughput(609, 5187));
     }, done);
 
-    GlobalThroughputStore.updateMetrics(metricsUpdate({
-      node1: nodeThroughput(42, 17),
-      node2: nodeThroughput(549, 4980),
-      node3: nodeThroughput(18, 190),
-    }));
+    GlobalThroughputStore.updateMetrics(
+      metricsUpdate({
+        node1: nodeThroughput(42, 17),
+        node2: nodeThroughput(549, 4980),
+        node3: nodeThroughput(18, 190),
+      }),
+    );
   });
 
   it('should reset values between sequential updates', (done) => {
-    unsub = onUpdate((newThroughput) => {
-      expect(newThroughput).toEqual(expectedThroughput(609, 5187));
-    }, () => {});
+    unsub = onUpdate(
+      (newThroughput) => {
+        expect(newThroughput).toEqual(expectedThroughput(609, 5187));
+      },
+      () => {},
+    );
 
-    GlobalThroughputStore.updateMetrics(metricsUpdate({
-      node1: nodeThroughput(42, 17),
-      node2: nodeThroughput(549, 4980),
-      node3: nodeThroughput(18, 190),
-    }));
+    GlobalThroughputStore.updateMetrics(
+      metricsUpdate({
+        node1: nodeThroughput(42, 17),
+        node2: nodeThroughput(549, 4980),
+        node3: nodeThroughput(18, 190),
+      }),
+    );
 
     unsub();
 
@@ -82,10 +94,12 @@ describe('GlobalThroughputStore', () => {
       expect(newThroughput).toEqual(expectedThroughput(0, 0));
     }, done);
 
-    GlobalThroughputStore.updateMetrics(metricsUpdate({
-      node1: nodeThroughput(0, 0),
-      node2: nodeThroughput(0, 0),
-      node3: nodeThroughput(0, 0),
-    }));
+    GlobalThroughputStore.updateMetrics(
+      metricsUpdate({
+        node1: nodeThroughput(0, 0),
+        node2: nodeThroughput(0, 0),
+        node3: nodeThroughput(0, 0),
+      }),
+    );
   });
 });

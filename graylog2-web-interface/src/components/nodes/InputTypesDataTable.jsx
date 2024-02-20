@@ -32,8 +32,7 @@ class InputTypesDataTable extends React.Component {
       <td className="limited">{inputType.name}</td>
       <td className="limited">{inputType.type}</td>
       <td className="limited" style={{ width: 150 }}>
-        {inputType.link_to_docs
-          && <ExternalLink href={inputType.link_to_docs}>Documentation</ExternalLink>}
+        {inputType.link_to_docs && <ExternalLink href={inputType.link_to_docs}>Documentation</ExternalLink>}
       </td>
     </tr>
   );
@@ -44,11 +43,7 @@ class InputTypesDataTable extends React.Component {
     }
 
     if (Object.keys(this.props.inputDescriptions).length === 0) {
-      return (
-        <Alert bsStyle="warning">
-          Input types are unavailable.
-        </Alert>
-      );
+      return <Alert bsStyle="warning">Input types are unavailable.</Alert>;
     }
 
     const headers = ['Name', 'Type', 'Documentation'];
@@ -56,16 +51,18 @@ class InputTypesDataTable extends React.Component {
     const rows = Object.keys(this.props.inputDescriptions).map((key) => this.props.inputDescriptions[key]);
 
     return (
-      <DataTable id="input-types-list"
-                 rowClassName="row-sm"
-                 className="table-hover table-condensed table-striped"
-                 headers={headers}
-                 headerCellFormatter={this._headerCellFormatter}
-                 sortByKey="name"
-                 rows={rows}
-                 dataRowFormatter={this._inputTypeFormatter}
-                 filterLabel="Filter"
-                 filterKeys={[]} />
+      <DataTable
+        id="input-types-list"
+        rowClassName="row-sm"
+        className="table-hover table-condensed table-striped"
+        headers={headers}
+        headerCellFormatter={this._headerCellFormatter}
+        sortByKey="name"
+        rows={rows}
+        dataRowFormatter={this._inputTypeFormatter}
+        filterLabel="Filter"
+        filterKeys={[]}
+      />
     );
   }
 }

@@ -117,9 +117,7 @@ const ThreatIntelPluginConfig = createReactClass({
       <div>
         <h3>Threat Intelligence Lookup Configuration</h3>
 
-        <p>
-          Configuration for threat intelligence lookup plugin.
-        </p>
+        <p>Configuration for threat intelligence lookup plugin.</p>
 
         <dl className="deflist">
           <dt>Tor exit nodes:</dt>
@@ -130,38 +128,46 @@ const ThreatIntelPluginConfig = createReactClass({
         </dl>
 
         <IfPermitted permissions="clusterconfigentry:edit">
-          <Button bsStyle="info" bsSize="xs" onClick={this._openModal}>Edit configuration</Button>
+          <Button bsStyle="info" bsSize="xs" onClick={this._openModal}>
+            Edit configuration
+          </Button>
         </IfPermitted>
 
-        <BootstrapModalForm show={this.state.threatintelConfigModal}
-                            title="Update Threat Intelligence plugin Configuration"
-                            onSubmitForm={this._saveConfig}
-                            onCancel={this._resetConfig}
-                            submitButtonText="Update configuration">
+        <BootstrapModalForm
+          show={this.state.threatintelConfigModal}
+          title="Update Threat Intelligence plugin Configuration"
+          onSubmitForm={this._saveConfig}
+          onCancel={this._resetConfig}
+          submitButtonText="Update configuration"
+        >
           <fieldset>
-            <Input type="checkbox"
-                   id="tor-checkbox"
-                   ref={(elem) => {
-                     // eslint-disable-next-line react/no-unused-class-component-methods
-                     this.torEnabled = elem;
-                   }}
-                   label="Allow Tor exit node lookups?"
-                   help="Enable to include Tor exit node lookup in global pipeline function, disabling also stops refreshing the data."
-                   name="tor_enabled"
-                   checked={this.state.config.tor_enabled}
-                   onChange={this._onCheckboxClick('tor_enabled', 'torEnabled')} />
+            <Input
+              type="checkbox"
+              id="tor-checkbox"
+              ref={(elem) => {
+                // eslint-disable-next-line react/no-unused-class-component-methods
+                this.torEnabled = elem;
+              }}
+              label="Allow Tor exit node lookups?"
+              help="Enable to include Tor exit node lookup in global pipeline function, disabling also stops refreshing the data."
+              name="tor_enabled"
+              checked={this.state.config.tor_enabled}
+              onChange={this._onCheckboxClick('tor_enabled', 'torEnabled')}
+            />
 
-            <Input type="checkbox"
-                   id="spamhaus-checkbox"
-                   ref={(elem) => {
-                     // eslint-disable-next-line react/no-unused-class-component-methods
-                     this.spamhausEnabled = elem;
-                   }}
-                   label="Allow Spamhaus DROP/EDROP lookups?"
-                   help="Enable to include Spamhaus lookup in global pipeline function, disabling also stops refreshing the data."
-                   name="tor_enabled"
-                   checked={this.state.config.spamhaus_enabled}
-                   onChange={this._onCheckboxClick('spamhaus_enabled', 'spamhausEnabled')} />
+            <Input
+              type="checkbox"
+              id="spamhaus-checkbox"
+              ref={(elem) => {
+                // eslint-disable-next-line react/no-unused-class-component-methods
+                this.spamhausEnabled = elem;
+              }}
+              label="Allow Spamhaus DROP/EDROP lookups?"
+              help="Enable to include Spamhaus lookup in global pipeline function, disabling also stops refreshing the data."
+              name="tor_enabled"
+              checked={this.state.config.spamhaus_enabled}
+              onChange={this._onCheckboxClick('spamhaus_enabled', 'spamhausEnabled')}
+            />
           </fieldset>
         </BootstrapModalForm>
       </div>

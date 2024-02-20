@@ -23,11 +23,11 @@ import { ButtonGroup } from 'components/bootstrap/index';
 import Icon from '../common/Icon';
 
 type Props = {
-  disabled?: boolean,
-  title: React.ComponentProps<typeof Button>['children'],
-  open?: boolean,
-  onMenuChange?: (newState: boolean) => void,
-  width?: number,
+  disabled?: boolean;
+  title: React.ComponentProps<typeof Button>['children'];
+  open?: boolean;
+  onMenuChange?: (newState: boolean) => void;
+  width?: number;
 } & Pick<React.ComponentProps<typeof Button>, 'bsStyle' | 'bsSize' | 'children' | 'id' | 'onClick'>;
 const SplitButton = React.forwardRef<HTMLButtonElement, Props>(
   ({ children, disabled, title, open, onMenuChange, width, onClick, ...props }, ref) => (
@@ -37,11 +37,11 @@ const SplitButton = React.forwardRef<HTMLButtonElement, Props>(
           {title}
         </Button>
         <Menu.Target>
-          <Button ref={ref} aria-label="More Actions" {...props}><Icon name="caret-down" /></Button>
+          <Button ref={ref} aria-label="More Actions" {...props}>
+            <Icon name="caret-down" />
+          </Button>
         </Menu.Target>
-        <Menu.Dropdown>
-          {children}
-        </Menu.Dropdown>
+        <Menu.Dropdown>{children}</Menu.Dropdown>
       </ButtonGroup>
     </Menu>
   ),

@@ -46,23 +46,25 @@ const PageContent = styled.div`
   flex: 1;
 `;
 
-const ScrollToHint = styled.div(({ theme }) => css`
-  position: fixed;
-  left: 50%;
-  margin-left: -125px;
-  top: 50px;
-  /* stylelint-disable function-no-unknown */
-  color: ${theme.utils.readableColor(chroma(theme.colors.brand.tertiary).alpha(0.8).css())};
-  font-size: 80px;
-  padding: 25px;
-  z-index: 2000;
-  width: 200px;
-  text-align: center;
-  cursor: pointer;
-  border-radius: 10px;
-  display: none;
-  background: ${chroma(theme.colors.brand.tertiary).alpha(0.8).css()};
-`);
+const ScrollToHint = styled.div(
+  ({ theme }) => css`
+    position: fixed;
+    left: 50%;
+    margin-left: -125px;
+    top: 50px;
+    /* stylelint-disable function-no-unknown */
+    color: ${theme.utils.readableColor(chroma(theme.colors.brand.tertiary).alpha(0.8).css())};
+    font-size: 80px;
+    padding: 25px;
+    z-index: 2000;
+    width: 200px;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 10px;
+    display: none;
+    background: ${chroma(theme.colors.brand.tertiary).alpha(0.8).css()};
+  `,
+);
 
 const App = () => (
   <QueryParamProvider adapter={ReactRouter6Adapter}>

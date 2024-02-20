@@ -75,7 +75,9 @@ const SystemLogsPage = () => {
     <span>
       The most recent system logs (limited to {DEFAULT_LIMIT}) of node {shortNodeId} / {hostname}
       &nbsp;
-      <small>Taken at <Timestamp dateTime={taken} /></small>
+      <small>
+        Taken at <Timestamp dateTime={taken} />
+      </small>
     </span>
   );
 
@@ -86,9 +88,7 @@ const SystemLogsPage = () => {
           <small>Reload&nbsp;</small>
           <Icon name="sync" spin={isReloadingResults} />
         </Button>
-        <StyledButton onClick={onCancel}>
-          Back
-        </StyledButton>
+        <StyledButton onClick={onCancel}>Back</StyledButton>
       </div>
     </Col>
   );
@@ -99,17 +99,11 @@ const SystemLogsPage = () => {
     <DocumentTitle title={`System Logs of node ${shortNodeId} / ${hostname}`}>
       <div>
         <PageHeader title={title} />
+        <Row className="content">{control}</Row>
         <Row className="content">
-          {control}
+          <Col md={12}>{logs}</Col>
         </Row>
-        <Row className="content">
-          <Col md={12}>
-            {logs}
-          </Col>
-        </Row>
-        <Row className="content">
-          {control}
-        </Row>
+        <Row className="content">{control}</Row>
       </div>
     </DocumentTitle>
   );

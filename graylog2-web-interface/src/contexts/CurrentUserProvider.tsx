@@ -33,11 +33,7 @@ const CurrentUserProvider = ({ children }) => {
     return <Spinner />;
   }
 
-  return (
-    <CurrentUserContext.Provider value={currentUser}>
-      {children}
-    </CurrentUserContext.Provider>
-  );
+  return <CurrentUserContext.Provider value={currentUser}>{children}</CurrentUserContext.Provider>;
 };
 
 CurrentUserProvider.propTypes = {

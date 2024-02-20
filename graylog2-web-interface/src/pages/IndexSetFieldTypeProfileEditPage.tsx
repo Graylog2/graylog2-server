@@ -42,21 +42,21 @@ const IndexSetFieldTypeProfileEditPage = () => {
   return (
     <DocumentTitle title="Edit Index Set Field Type Profile">
       <IndicesPageNavigation />
-      <PageHeader title={`Edit  "${data?.name}" Index Set Field Type Profile`}
-                  documentationLink={{
-                    title: 'Index model documentation',
-                    path: DocsHelper.PAGES.INDEX_MODEL,
-                  }}>
+      <PageHeader
+        title={`Edit  "${data?.name}" Index Set Field Type Profile`}
+        documentationLink={{
+          title: 'Index model documentation',
+          path: DocsHelper.PAGES.INDEX_MODEL,
+        }}
+      >
         <span>
-          With index set field type profiles you can bundle up custom field types into profiles.
-          Then you can assign this profile to any index set.
-          On this page you can modify the &quot;{data?.name}&quot; field type profile configuration.
+          With index set field type profiles you can bundle up custom field types into profiles. Then you can assign
+          this profile to any index set. On this page you can modify the &quot;{data?.name}&quot; field type profile
+          configuration.
         </span>
       </PageHeader>
       <Row className="content">
-        <Col md={12}>
-          {!isFetching ? <EditProfile profile={data} /> : <Spinner />}
-        </Col>
+        <Col md={12}>{!isFetching ? <EditProfile profile={data} /> : <Spinner />}</Col>
       </Row>
     </DocumentTitle>
   );

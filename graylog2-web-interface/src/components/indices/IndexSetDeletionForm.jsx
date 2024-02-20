@@ -79,9 +79,7 @@ class IndexSetDeletionForm extends React.Component {
       return (
         <Row>
           <Col md={12}>
-            <Alert bsStyle="danger">
-              Unable to delete the index set because it is the default index set!
-            </Alert>
+            <Alert bsStyle="danger">Unable to delete the index set because it is the default index set!</Alert>
           </Col>
         </Row>
       );
@@ -97,16 +95,15 @@ class IndexSetDeletionForm extends React.Component {
           <Row>
             <Col md={12}>
               <Alert bsStyle="danger">
-                Unable to delete the index set because it has assigned streams. Remove stream assignments to be able to delete this index set.
+                Unable to delete the index set because it has assigned streams. Remove stream assignments to be able to
+                delete this index set.
               </Alert>
             </Col>
           </Row>
           <Row>
             <Col md={12}>
               <h4>Assigned streams:</h4>
-              <ul>
-                {assignedStreams}
-              </ul>
+              <ul>{assignedStreams}</ul>
             </Col>
           </Row>
         </div>
@@ -116,12 +113,14 @@ class IndexSetDeletionForm extends React.Component {
     return (
       <Row>
         <Col md={12}>
-          <Input id="remove-data-checkbox"
-                 type="checkbox"
-                 label="Remove all data for this index set?"
-                 help={<span>All indices related to this index set will be deleted from Elasticsearch.</span>}
-                 checked={this.state.deleteIndices}
-                 onChange={this._onRemoveClick} />
+          <Input
+            id="remove-data-checkbox"
+            type="checkbox"
+            label="Remove all data for this index set?"
+            help={<span>All indices related to this index set will be deleted from Elasticsearch.</span>}
+            checked={this.state.deleteIndices}
+            onChange={this._onRemoveClick}
+          />
         </Col>
       </Row>
     );
@@ -137,13 +136,15 @@ class IndexSetDeletionForm extends React.Component {
 
   render() {
     return (
-      <BootstrapModalForm show={this.state.showModal}
-                          title={`Delete index set "${this.props.indexSet.title}"?`}
-                          data-telemetry-title="Delete index set"
-                          onCancel={this.close}
-                          onSubmitForm={this._onDelete}
-                          submitButtonText="Delete"
-                          submitButtonDisabled={!this._isDeletable()}>
+      <BootstrapModalForm
+        show={this.state.showModal}
+        title={`Delete index set "${this.props.indexSet.title}"?`}
+        data-telemetry-title="Delete index set"
+        onCancel={this.close}
+        onSubmitForm={this._onDelete}
+        submitButtonText="Delete"
+        submitButtonDisabled={!this._isDeletable()}
+      >
         {this._modalContent()}
       </BootstrapModalForm>
     );

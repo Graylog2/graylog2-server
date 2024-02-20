@@ -21,7 +21,7 @@ import type { HotkeysProps } from 'hooks/useHotkey';
 import useHotkey from 'hooks/useHotkey';
 
 type Props = PropsWithChildren<{
-  shortcuts: Array<HotkeysProps>,
+  shortcuts: Array<HotkeysProps>;
 }>;
 
 const HotkeyComponent = ({ shortcut }: { shortcut: HotkeysProps }) => {
@@ -30,9 +30,11 @@ const HotkeyComponent = ({ shortcut }: { shortcut: HotkeysProps }) => {
   return null;
 };
 
-const KeyCapture = ({ children, shortcuts } : Props) => (
+const KeyCapture = ({ children, shortcuts }: Props) => (
   <>
-    {shortcuts.map((shortcut) => <HotkeyComponent key={`${shortcut.scope}.${shortcut.actionKey}`} shortcut={shortcut} />)}
+    {shortcuts.map((shortcut) => (
+      <HotkeyComponent key={`${shortcut.scope}.${shortcut.actionKey}`} shortcut={shortcut} />
+    ))}
     {children}
   </>
 );
