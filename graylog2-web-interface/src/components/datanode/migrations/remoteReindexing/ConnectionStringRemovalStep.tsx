@@ -20,13 +20,13 @@ import type { MigrationStepComponentProps } from 'components/datanode/Types';
 import MigrationStepTriggerButtonToolbar from 'components/datanode/migrations/common/MigrationStepTriggerButtonToolbar';
 import { Space } from 'preflight/components/common';
 
-const ConnectionStringRemovalStep = ({ nextSteps, onTriggerStep }: MigrationStepComponentProps) => (
+const ConnectionStringRemovalStep = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => (
   <>
     <p>Please remove the <code>elasticsearch_hosts</code> line from you graylog configuration file (<code>graylog.conf</code>). </p>
     <p>Ex. <code>elasticsearch_hosts = https://admin:admin@opensearch1:9200,https://admin:admin@opensearch2:9200,https://admin:admin@opensearch3:9200</code></p>
     <Space h="md" />
     <p>Once that is done please proceed to the next step.</p>
-    <MigrationStepTriggerButtonToolbar nextSteps={nextSteps} onTriggerStep={onTriggerStep} />
+    <MigrationStepTriggerButtonToolbar nextSteps={currentStep.next_steps} onTriggerStep={onTriggerStep} />
   </>
 );
 export default ConnectionStringRemovalStep;

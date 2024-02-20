@@ -29,7 +29,7 @@ const CompatibilityAlert = styled(Alert)`
   margin-bottom: 5px;
 `;
 
-const CompatibilityCheckStep = ({ nextSteps, onTriggerStep }: MigrationStepComponentProps) => {
+const CompatibilityCheckStep = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => {
   const { error: requestError, data, isInitialLoading, isError } = useCompatibilityCheck();
 
   if (isInitialLoading) {
@@ -60,7 +60,7 @@ const CompatibilityCheckStep = ({ nextSteps, onTriggerStep }: MigrationStepCompo
       {!isCompatible && (<p>Your Opensearch cluster cannot be migrated to this data node version because it&apos;s not compatible</p>)}
       {isCompatible && <CompatibilityStatus opensearchVersion={data.opensearch_version} nodeInfo={data.info} />}
 
-      <MigrationStepTriggerButtonToolbar nextSteps={nextSteps} onTriggerStep={onTriggerStep} />
+      <MigrationStepTriggerButtonToolbar nextSteps={currentStep.next_steps} onTriggerStep={onTriggerStep} />
     </>
   );
 };

@@ -26,6 +26,7 @@ import JournalDowntimeWarning from 'components/datanode/migrations/rollingUpgrad
 import StopMessageProcessing from 'components/datanode/migrations/rollingUpgrade/StopMessageProcessing';
 import CompatibilityCheckStep from 'components/datanode/migrations/CompatibilityCheckStep';
 import RestartGraylog from 'components/datanode/migrations/rollingUpgrade/RestartGraylog';
+import MigrationError from 'components/datanode/migrations/common/MigrationError';
 
 type Props = {
     currentStep: MigrationState,
@@ -62,7 +63,7 @@ const StyledPanelGroup = styled(PanelGroup)`
 `;
 
 const RollingUpgradeMigration = ({ currentStep, onTriggerNextStep }: Props) => {
-  const { next_steps: nextSteps, state: activeStep } = currentStep;
+  const { state: activeStep } = currentStep;
 
   const onStepComplete = (step: MigrationActions, args: StepArgs = {}) => {
     onTriggerNextStep(step, args);
@@ -71,20 +72,20 @@ const RollingUpgradeMigration = ({ currentStep, onTriggerNextStep }: Props) => {
   const getStepComponent = (step: MigrationStateItem) => {
     switch (step) {
       case MIGRATION_STATE.ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE.key:
-        return <Welcome nextSteps={nextSteps} onTriggerStep={onStepComplete} />;
+        return <Welcome currentStep={currentStep} onTriggerStep={onStepComplete} />;
       case MIGRATION_STATE.DIRECTORY_COMPATIBILITY_CHECK_PAGE2.key:
-        return <CompatibilityCheckStep nextSteps={nextSteps} onTriggerStep={onStepComplete} />;
+        return <CompatibilityCheckStep currentStep={currentStep} onTriggerStep={onStepComplete} />;
       case MIGRATION_STATE.PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES.key:
       case MIGRATION_STATE.PROVISION_ROLLING_UPGRADE_NODES_RUNNING.key:
-        return <CertificatesProvisioning nextSteps={nextSteps} onTriggerStep={onStepComplete} />;
+        return <CertificatesProvisioning currentStep={currentStep} onTriggerStep={onStepComplete} />;
       case MIGRATION_STATE.JOURNAL_SIZE_DOWNTIME_WARNING.key:
-        return <JournalDowntimeWarning nextSteps={nextSteps} onTriggerStep={onStepComplete} />;
+        return <JournalDowntimeWarning currentStep={currentStep} onTriggerStep={onStepComplete} />;
       case MIGRATION_STATE.MESSAGE_PROCESSING_STOP.key:
-        return <StopMessageProcessing nextSteps={nextSteps} onTriggerStep={onStepComplete} />;
+        return <StopMessageProcessing currentStep={currentStep} onTriggerStep={onStepComplete} />;
       case MIGRATION_STATE.RESTART_GRAYLOG.key:
-        return <RestartGraylog nextSteps={nextSteps} onTriggerStep={onStepComplete} />;
+        return <RestartGraylog currentStep={currentStep} onTriggerStep={onStepComplete} />;
       default:
-        return <Welcome nextSteps={nextSteps} onTriggerStep={onStepComplete} />;
+        return <Welcome currentStep={currentStep} onTriggerStep={onStepComplete} />;
     }
   };
 
@@ -107,6 +108,7 @@ const RollingUpgradeMigration = ({ currentStep, onTriggerNextStep }: Props) => {
               </Panel.Heading>
               <Panel.Collapse>
                 <Panel.Body>
+                  <MigrationError errorMessage={currentStep.error_message} />
                   {getStepComponent(rollingUpgradeStep)}
                 </Panel.Body>
               </Panel.Collapse>

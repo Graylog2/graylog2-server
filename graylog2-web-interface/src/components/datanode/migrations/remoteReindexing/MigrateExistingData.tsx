@@ -23,7 +23,7 @@ import type { RemoteReindexRequest } from '../../hooks/useRemoteReindexMigration
 import type { MigrationStepComponentProps } from '../../Types';
 import MigrationStepTriggerButtonToolbar from '../common/MigrationStepTriggerButtonToolbar';
 
-const MigrateExistingData = ({ nextSteps, onTriggerStep }: MigrationStepComponentProps) => {
+const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => {
   const initialValues: RemoteReindexRequest = {
     hostname: '',
     user: '',
@@ -58,7 +58,7 @@ const MigrateExistingData = ({ nextSteps, onTriggerStep }: MigrationStepComponen
                  type="password"
                  value={values.password}
                  onChange={handleChange} />
-          <MigrationStepTriggerButtonToolbar nextSteps={nextSteps} onTriggerStep={onTriggerStep} args={values} />
+          <MigrationStepTriggerButtonToolbar nextSteps={currentStep.next_steps} onTriggerStep={onTriggerStep} args={values} />
         </Form>
       )}
     </Formik>

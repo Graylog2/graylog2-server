@@ -24,7 +24,7 @@ import type { MigrationStepComponentProps } from 'components/datanode/Types';
 import MigrationStepTriggerButtonToolbar from 'components/datanode/migrations/common/MigrationStepTriggerButtonToolbar';
 import JournalSizeWarning from 'components/datanode/migrations/rollingUpgrade/JournalSizeWarning';
 
-const Welcome = ({ nextSteps, onTriggerStep }: MigrationStepComponentProps) => {
+const Welcome = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => {
   const { data: dataNodes } = useDataNodes();
 
   return (
@@ -40,7 +40,7 @@ const Welcome = ({ nextSteps, onTriggerStep }: MigrationStepComponentProps) => {
           <JournalSizeWarning />
         </Col>
       </Row>
-      <MigrationStepTriggerButtonToolbar disabled={dataNodes?.elements?.length <= 0} nextSteps={nextSteps} onTriggerStep={onTriggerStep} />
+      <MigrationStepTriggerButtonToolbar disabled={dataNodes?.elements?.length <= 0} nextSteps={currentStep.next_steps} onTriggerStep={onTriggerStep} />
     </>
   );
 };

@@ -40,28 +40,28 @@ const MigrationWizard = () => {
     onTriggerNextState({ step, args });
   };
 
-  const { state: activeStep, next_steps: nextSteps } = currentStep;
+  const { state: activeStep } = currentStep;
 
   const steps = [
     {
       key: MIGRATION_STATE.MIGRATION_WELCOME_PAGE.key,
       title: MIGRATION_STATE.MIGRATION_WELCOME_PAGE.description,
-      component: <MigrationWelcomeStep nextSteps={nextSteps} onTriggerStep={onTriggerStep} />,
+      component: <MigrationWelcomeStep currentStep={currentStep} onTriggerStep={onTriggerStep} />,
     },
     {
       key: MIGRATION_STATE.DIRECTORY_COMPATIBILITY_CHECK_PAGE.key,
       title: MIGRATION_STATE.DIRECTORY_COMPATIBILITY_CHECK_PAGE.description,
-      component: <CompatibilityCheckStep nextSteps={nextSteps} onTriggerStep={onTriggerStep} />,
+      component: <CompatibilityCheckStep currentStep={currentStep} onTriggerStep={onTriggerStep} />,
     },
     {
       key: MIGRATION_STATE.CA_CREATION_PAGE.key,
       title: MIGRATION_STATE.CA_CREATION_PAGE.description,
-      component: <CAStep nextSteps={nextSteps} onTriggerStep={onTriggerStep} />,
+      component: <CAStep currentStep={currentStep} onTriggerStep={onTriggerStep} />,
     },
     {
       key: MIGRATION_STATE.RENEWAL_POLICY_CREATION_PAGE.key,
       title: MIGRATION_STATE.RENEWAL_POLICY_CREATION_PAGE.description,
-      component: <CertificateRenewalStep nextSteps={nextSteps} onTriggerStep={onTriggerStep} />,
+      component: <CertificateRenewalStep currentStep={currentStep} onTriggerStep={onTriggerStep} />,
     },
     {
       key: MIGRATION_STATE.MIGRATION_SELECTION_PAGE.key,

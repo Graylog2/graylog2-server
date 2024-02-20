@@ -23,7 +23,7 @@ import type { MigrationStepComponentProps } from '../../Types';
 import MigrationStepTriggerButtonToolbar from '../common/MigrationStepTriggerButtonToolbar';
 import useMigrationState from '../../hooks/useMigrationState';
 
-const RemoteReindexRunning = ({ nextSteps, onTriggerStep }: MigrationStepComponentProps) => {
+const RemoteReindexRunning = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => {
   const { currentStep: { response } } = useMigrationState(3000);
 
   const remoteReindexMigration = response as RemoteReindexMigration;
@@ -41,7 +41,7 @@ const RemoteReindexRunning = ({ nextSteps, onTriggerStep }: MigrationStepCompone
         bsStyle: 'info',
         label: remoteReindexMigration?.status,
       }]} />
-      <MigrationStepTriggerButtonToolbar nextSteps={nextSteps} onTriggerStep={onTriggerStep} />
+      <MigrationStepTriggerButtonToolbar nextSteps={currentStep.next_steps} onTriggerStep={onTriggerStep} />
     </>
   );
 };

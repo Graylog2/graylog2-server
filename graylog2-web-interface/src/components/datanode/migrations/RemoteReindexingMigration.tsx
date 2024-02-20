@@ -23,6 +23,7 @@ import {
   REMOTE_REINDEXING_MIGRATION_STEPS,
 } from 'components/datanode/Constants';
 import type { MigrationActions, StepArgs, MigrationState, MigrationStateItem } from 'components/datanode/Types';
+import MigrationError from 'components/datanode/migrations/common/MigrationError';
 
 import Welcome from './remoteReindexing/Welcome';
 import ExistingDataMigrationQuestion from './remoteReindexing/ExistingDataMigrationQuestion';
@@ -68,7 +69,7 @@ type Props = {
 }
 
 const RemoteReindexingMigration = ({ currentStep, onTriggerNextStep }: Props) => {
-  const { next_steps: nextSteps, state: activeStep } = currentStep;
+  const { state: activeStep } = currentStep;
 
   const onStepComplete = (step: MigrationActions, args: StepArgs = {}) => {
     onTriggerNextStep(step, args);
@@ -77,22 +78,22 @@ const RemoteReindexingMigration = ({ currentStep, onTriggerNextStep }: Props) =>
   const getStepComponent = (step: MigrationStateItem) => {
     switch (step) {
       case MIGRATION_STATE.REMOTE_REINDEX_WELCOME_PAGE.key:
-        return <Welcome nextSteps={nextSteps} onTriggerStep={onStepComplete} />;
+        return <Welcome currentStep={currentStep} onTriggerStep={onStepComplete} />;
       case MIGRATION_STATE.PROVISION_DATANODE_CERTIFICATES_PAGE.key:
       case MIGRATION_STATE.PROVISION_DATANODE_CERTIFICATES_RUNNING.key:
-        return <CertificatesProvisioning nextSteps={nextSteps} onTriggerStep={onStepComplete} />;
+        return <CertificatesProvisioning currentStep={currentStep} onTriggerStep={onStepComplete} />;
       case MIGRATION_STATE.EXISTING_DATA_MIGRATION_QUESTION_PAGE.key:
-        return <ExistingDataMigrationQuestion nextSteps={nextSteps} onTriggerStep={onStepComplete} />;
+        return <ExistingDataMigrationQuestion currentStep={currentStep} onTriggerStep={onStepComplete} />;
       case MIGRATION_STATE.MIGRATE_EXISTING_DATA.key:
-        return <MigrateExistingData nextSteps={nextSteps} onTriggerStep={onStepComplete} />;
+        return <MigrateExistingData currentStep={currentStep} onTriggerStep={onStepComplete} />;
       case MIGRATION_STATE.REMOTE_REINDEX_RUNNING.key:
-        return <RemoteReindexRunning nextSteps={nextSteps} onTriggerStep={onStepComplete} />;
+        return <RemoteReindexRunning currentStep={currentStep} onTriggerStep={onStepComplete} />;
       case MIGRATION_STATE.ASK_TO_SHUTDOWN_OLD_CLUSTER.key:
-        return <ShutdownClusterStep nextSteps={nextSteps} onTriggerStep={onStepComplete} />;
+        return <ShutdownClusterStep currentStep={currentStep} onTriggerStep={onStepComplete} />;
       case MIGRATION_STATE.MANUALLY_REMOVE_OLD_CONNECTION_STRING_FROM_CONFIG.key:
-        return <ConnectionStringRemovalStep nextSteps={nextSteps} onTriggerStep={onStepComplete} />;
+        return <ConnectionStringRemovalStep currentStep={currentStep} onTriggerStep={onStepComplete} />;
       default:
-        return <Welcome nextSteps={nextSteps} onTriggerStep={onStepComplete} />;
+        return <Welcome currentStep={currentStep} onTriggerStep={onStepComplete} />;
     }
   };
 
@@ -114,6 +115,7 @@ const RemoteReindexingMigration = ({ currentStep, onTriggerNextStep }: Props) =>
                 </Panel.Title>
               </Panel.Heading>
               <Panel.Body collapsible>
+                <MigrationError errorMessage={currentStep.error_message} />
                 {getStepComponent(remoteReindexingStep)}
               </Panel.Body>
             </Panel>

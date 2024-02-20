@@ -24,7 +24,7 @@ import useMigrationState from 'components/datanode/hooks/useMigrationState';
 import MigrationDatanodeList from 'components/datanode/migrations/MigrationDatanodeList';
 import { Alert } from 'components/bootstrap';
 
-const CertificatesProvisioning = ({ nextSteps, onTriggerStep }: MigrationStepComponentProps) => {
+const CertificatesProvisioning = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => {
   const { currentStep: step, isLoading } = useMigrationState(3000);
 
   if (isLoading) {
@@ -51,7 +51,7 @@ const CertificatesProvisioning = ({ nextSteps, onTriggerStep }: MigrationStepCom
       )}
       <MigrationDatanodeList />
       <br />
-      <MigrationStepTriggerButtonToolbar nextSteps={nextSteps} onTriggerStep={onTriggerStep} />
+      <MigrationStepTriggerButtonToolbar nextSteps={currentStep.next_steps} onTriggerStep={onTriggerStep} />
     </>
   );
 };

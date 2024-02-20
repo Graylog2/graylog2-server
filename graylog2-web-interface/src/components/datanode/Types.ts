@@ -85,7 +85,7 @@ export type MigrationStateItem = ExtractKeyValues<typeof MIGRATION_STATE>
 export type MigrationState = {
   state: MigrationStateItem,
   next_steps: Array<MigrationActions>,
-  error_message?: string|null,
+  error_message?: string | null,
   response?: { [_key: string]: unknown },
 }
 
@@ -99,6 +99,6 @@ export type StepArgs = {[_key: string]: unknown};
 
 export type OnTriggerStepFunction = (step: MigrationActions, args: StepArgs) => void
 export type MigrationStepComponentProps = {
-  nextSteps: Array<MigrationActions>,
+  currentStep: MigrationState,
   onTriggerStep: OnTriggerStepFunction,
 };

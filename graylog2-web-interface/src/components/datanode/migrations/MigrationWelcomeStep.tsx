@@ -22,10 +22,11 @@ import { Icon } from 'components/common';
 import { DocumentationLink } from 'components/support';
 import MigrationDatanodeList from 'components/datanode/migrations/MigrationDatanodeList';
 import MigrationStepTriggerButtonToolbar from 'components/datanode/migrations/common/MigrationStepTriggerButtonToolbar';
-import type { MigrationActions, OnTriggerStepFunction } from 'components/datanode/Types';
+import type { MigrationState, OnTriggerStepFunction } from 'components/datanode/Types';
+import MigrationError from 'components/datanode/migrations/common/MigrationError';
 
 type Props = {
-  nextSteps: Array<MigrationActions>,
+  currentStep: MigrationState,
   onTriggerStep: OnTriggerStepFunction,
 };
 
@@ -47,9 +48,10 @@ const StyledHelpPanel = styled(StyledPanel)`
   margin-top: 30px;
 `;
 
-const MigrationWelcomeStep = ({ nextSteps, onTriggerStep }: Props) => (
+const MigrationWelcomeStep = ({ currentStep, onTriggerStep }: Props) => (
   <Row>
     <Col md={6}>
+      <MigrationError errorMessage={currentStep.error_message} />
       <Headline>Migration to Data node !</Headline>
       <p>
         It looks like you updated Graylog and want to configure a data node. Data nodes allow you to index and search through all the messages in your Graylog message database.
@@ -61,7 +63,7 @@ const MigrationWelcomeStep = ({ nextSteps, onTriggerStep }: Props) => (
       <p>You can get more information on the Data node migration <DocumentationLink page="graylog-data-node" text="documentation" /></p>
       <br />
       <MigrationDatanodeList />
-      <MigrationStepTriggerButtonToolbar nextSteps={nextSteps} onTriggerStep={onTriggerStep} />
+      <MigrationStepTriggerButtonToolbar nextSteps={currentStep.next_steps} onTriggerStep={onTriggerStep} />
     </Col>
     <Col md={6}>
       <StyledHelpPanel bsStyle="info">

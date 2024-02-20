@@ -29,6 +29,7 @@ import {
   ROLLING_UPGRADE_MIGRATION_STEPS,
 } from 'components/datanode/Constants';
 import RemoteReindexingMigration from 'components/datanode/migrations/RemoteReindexingMigration';
+import MigrationError from 'components/datanode/migrations/common/MigrationError';
 
 const ManualMigrationStep = () => {
   const migrationTypeOptions = [{ label: 'Rolling upgrade migration', value: 'SELECT_ROLLING_UPGRADE_MIGRATION' }, { label: 'Remote Re-indexing Migration', value: 'SELECT_REMOTE_REINDEX_MIGRATION' }];
@@ -62,6 +63,7 @@ const ManualMigrationStep = () => {
           </form>
         </Col>
       )}
+      <MigrationError errorMessage={currentStep.error_message} />
       {(currentStep && ROLLING_UPGRADE_MIGRATION_STEPS.includes(currentStep.state)) && <RollingUpgradeMigration onTriggerNextStep={onMigrationStepChange} currentStep={currentStep} />}
       {(currentStep && REMOTE_REINDEXING_MIGRATION_STEPS.includes(currentStep.state)) && <RemoteReindexingMigration onTriggerNextStep={onMigrationStepChange} currentStep={currentStep} />}
     </>

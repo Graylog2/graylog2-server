@@ -19,11 +19,11 @@ import * as React from 'react';
 import MigrationStepTriggerButtonToolbar from 'components/datanode/migrations/common/MigrationStepTriggerButtonToolbar';
 import type { MigrationStepComponentProps } from 'components/datanode/Types';
 
-const StopMessageProcessing = ({ nextSteps, onTriggerStep }: MigrationStepComponentProps) => (
+const StopMessageProcessing = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => (
   <>
     <p>Graylog processing is stopped.</p>
     <p />
-    <MigrationStepTriggerButtonToolbar nextSteps={nextSteps} onTriggerStep={onTriggerStep} />
+    <MigrationStepTriggerButtonToolbar nextSteps={currentStep.next_steps} onTriggerStep={onTriggerStep} />
   </>
 
 );

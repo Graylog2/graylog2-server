@@ -20,12 +20,15 @@ import CertificateRenewalPolicyConfig from 'components/datanode/DataNodeConfigur
 import { Space } from 'preflight/components/common';
 import type { MigrationStepComponentProps } from 'components/datanode/Types';
 import MigrationStepTriggerButtonToolbar from 'components/datanode/migrations/common/MigrationStepTriggerButtonToolbar';
+import MigrationError from 'components/datanode/migrations/common/MigrationError';
 
-const CertificateRenewalStep = ({ nextSteps, onTriggerStep }: MigrationStepComponentProps) => (
+const CertificateRenewalStep = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => (
   <>
+    <MigrationError errorMessage={currentStep.error_message} />
     <CertificateRenewalPolicyConfig />
     <Space h="xs" />
-    <MigrationStepTriggerButtonToolbar nextSteps={nextSteps} onTriggerStep={onTriggerStep} />
+    {(currentStep.next_steps.length <= 0) && (<p>Please create a certificate renewal policy before proceeding.</p>)}
+    <MigrationStepTriggerButtonToolbar nextSteps={currentStep.next_steps} onTriggerStep={onTriggerStep} />
   </>
 
 );

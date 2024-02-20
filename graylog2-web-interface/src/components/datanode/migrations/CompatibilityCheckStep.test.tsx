@@ -20,6 +20,7 @@ import { render, screen } from 'wrappedTestingLibrary';
 import CompatibilityCheckStep from 'components/datanode/migrations/CompatibilityCheckStep';
 import { asMock } from 'helpers/mocking';
 import useCompatibilityCheck from 'components/datanode/hooks/useCompatibilityCheck';
+import type { MigrationState } from 'components/datanode/Types';
 
 jest.mock('components/datanode/hooks/useCompatibilityCheck', () => jest.fn(() => ({
   data: {
@@ -43,9 +44,18 @@ jest.mock('components/datanode/hooks/useCompatibilityCheck', () => jest.fn(() =>
   error: undefined,
 })));
 
+const currentStep = {
+  state: 'DIRECTORY_COMPATIBILITY_CHECK_PAGE',
+  next_steps: [
+    'SHOW_CA_CREATION',
+  ],
+  error_message: null,
+  response: null,
+} as MigrationState;
+
 describe('CompatibilityCheckStep', () => {
   it('should render CompatibilityCheckStep', async () => {
-    render(<CompatibilityCheckStep onTriggerStep={() => {}} nextSteps={[]} />);
+    render(<CompatibilityCheckStep onTriggerStep={() => {}} currentStep={currentStep} />);
 
     await screen.findByRole('heading', {
       name: /Your existing opensearch data can be migrated to data node\./i,
@@ -65,7 +75,7 @@ describe('CompatibilityCheckStep', () => {
       error: undefined,
     });
 
-    render(<CompatibilityCheckStep onTriggerStep={() => {}} nextSteps={[]} />);
+    render(<CompatibilityCheckStep onTriggerStep={() => {}} currentStep={currentStep} />);
 
     await screen.findByRole('heading', {
       name: /your existing opensearch data cannot be migrated to data node\./i,
