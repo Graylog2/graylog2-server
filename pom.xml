@@ -657,7 +657,8 @@
                                 </bannedDependencies>
                                 <banDuplicatePomDependencyVersions/>
                                 <requireMavenVersion>
-                                    <version>[3.6.0,)</version>
+                                    <!-- Enforce the same version we define in the maven wrapper -->
+                                    <version>[3.9.6]</version>
                                 </requireMavenVersion>
                                 <requireJavaVersion>
                                     <version>[17.0,17.99]</version>
