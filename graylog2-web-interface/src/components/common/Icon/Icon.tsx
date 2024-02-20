@@ -24,14 +24,14 @@ import type { SizeProp, IconName } from './types';
 type IconTypes = 'brand' | 'regular' | 'solid';
 
 const sizeMap = {
-  xs: '.75em',
-  sm: '.875em',
-  lg: '1.25em',
-  xl: '1.5em',
-  '2x': '2em',
-  '3x': '3em',
-  '4x': '4em',
-  '5x': '5em',
+  xs: '.938em',
+  sm: '1.094em',
+  lg: '1.438em',
+  xl: '1.725em',
+  '2x': '2.30em',
+  '3x': '3.45em',
+  '4x': '4.60em',
+  '5x': '5.75em',
 };
 
 const StyledSpan = styled.span<{
@@ -44,7 +44,7 @@ const StyledSpan = styled.span<{
   $flipHorizontal,
 }) => css`
   font-variation-settings: 'opsz' 48, 'wght' 700;
-  font-size: ${sizeMap[$size] ?? 'inherit'};
+  font-size: ${sizeMap[$size] ?? '1.15em'};
   transform: rotate(${$rotation}deg) scaleY(${$flipHorizontal ? -1 : 1});
 `);
 
