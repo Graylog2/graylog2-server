@@ -17,7 +17,7 @@
 
 import React from 'react';
 import type { RotateProp } from '@fortawesome/fontawesome-svg-core';
-import styled, { css } from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
 
 import type { SizeProp, IconName } from './types';
 
@@ -34,18 +34,30 @@ const sizeMap = {
   '5x': '5.75em',
 };
 
+const spinAnimation = keyframes`
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(359deg);
+  }
+`;
+
 const StyledSpan = styled.span<{
   $size: string,
+  $spin: boolean,
   $rotation: RotateProp
   $flipHorizontal: boolean,
 }>(({
   $size,
+  $spin,
   $rotation,
   $flipHorizontal,
 }) => css`
   font-variation-settings: 'opsz' 48, 'wght' 700;
   font-size: ${sizeMap[$size] ?? '1.15em'};
   transform: rotate(${$rotation}deg) scaleY(${$flipHorizontal ? -1 : 1});
+  animation: ${$spin ? css`${spinAnimation} 2s infinite linear` : 'none'};
 `);
 
 type Props = {
@@ -104,6 +116,7 @@ const Icon = ({
                 $rotation={rotation}
                 $flipHorizontal={flipHorizontal}
                 $size={size}
+                $spin={spin}
                 style={style}>
       {name}
     </StyledSpan>
