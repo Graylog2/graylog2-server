@@ -34,9 +34,18 @@ const sizeMap = {
   '5x': '5em',
 };
 
-const StyledSpan = styled.span<{ $size: string }>(({ theme, $size }) => css`
+const StyledSpan = styled.span<{
+  $size: string,
+  $rotation: RotateProp
+  $flipHorizontal: boolean,
+}>(({
+  $size,
+  $rotation,
+  $flipHorizontal,
+}) => css`
   font-variation-settings: 'opsz' 48, 'wght' 700;
   font-size: ${sizeMap[$size] ?? 'inherit'};
+  transform: rotate(${$rotation}deg) scaleY(${$flipHorizontal ? -1 : 1});
 `);
 
 type Props = {
@@ -44,7 +53,7 @@ type Props = {
   'data-testid'?: string,
   /** Name of Material Symbol icon */
   name: IconName,
-  rotation?: RotateProp,
+  rotation?: 90 | 180 | 270,
   size?: SizeProp,
   spin?: boolean,
   /**
@@ -62,6 +71,7 @@ type Props = {
   onFocus?: (event: React.FocusEvent<SVGSVGElement>) => void,
   tabIndex?: number,
   title?: string,
+  flipHorizontal?: boolean,
 }
 
 /**
@@ -77,6 +87,7 @@ const Icon = ({
   rotation,
   spin,
   fixedWidth,
+  flipHorizontal,
   inverse,
   style,
   'data-testid': testId,
@@ -90,6 +101,8 @@ const Icon = ({
   return (
     <StyledSpan className={`material-symbols-outlined ${className ?? ''}`}
                 data-testid={testId}
+                $rotation={rotation}
+                $flipHorizontal={flipHorizontal}
                 $size={size}
                 style={style}>
       {name}
@@ -119,8 +132,9 @@ Icon.defaultProps = {
   className: undefined,
   'data-testid': undefined,
   fixedWidth: false,
+  flipHorizontal: false,
   inverse: false,
-  rotation: undefined,
+  rotation: 0,
   size: undefined,
   spin: false,
   style: undefined,
