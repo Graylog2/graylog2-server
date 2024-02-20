@@ -95,6 +95,8 @@ export class Builder {
 
   private body: { body: any, mimeType?: string };
 
+  private signal: AbortSignal;
+
   private accept: string;
 
   private responseHandler: (response: unknown) => unknown;
@@ -130,6 +132,12 @@ export class Builder {
     this.responseHandler = defaultResponseHandler;
 
     this.errorHandler = (error: Response) => onServerError(error);
+
+    return this;
+  }
+
+  setSignal(signal: AbortSignal) {
+    this.signal = signal;
 
     return this;
   }
@@ -213,6 +221,7 @@ export class Builder {
     return CancellablePromise.of<unknown>(window.fetch(this.url, {
       method: this.method,
       headers,
+      signal: this.signal ? this.signal : undefined,
       body: this.body ? this.body.body : undefined,
     })).then(this.responseHandler, this.errorHandler)
       .catch(this.errorHandler);
@@ -238,6 +247,19 @@ type Method = 'GET' | 'PUT' | 'POST' | 'DELETE';
 export default function fetch<T = any>(method: Method, url: string, body?: any, requireSession: boolean = true): Promise<T> {
   const promise = () => new Builder(method, url)
     .json(body)
+    .build();
+
+  if (requireSession) {
+    return queuePromiseIfNotLoggedin(promise)();
+  }
+
+  return promise();
+}
+
+export function fetchWithSignal<T = any>(signal: AbortSignal, method: Method, url: string, body?: any, requireSession: boolean = true): Promise<T> {
+  const promise = () => new Builder(method, url)
+    .json(body)
+    .setSignal(signal)
     .build();
 
   if (requireSession) {
