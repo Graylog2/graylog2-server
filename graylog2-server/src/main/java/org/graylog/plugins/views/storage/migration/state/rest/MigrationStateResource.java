@@ -22,6 +22,7 @@ import io.swagger.annotations.ApiParam;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -83,5 +84,15 @@ public class MigrationStateResource {
     public String serialize() {
         // you can use https://dreampuf.github.io/GraphvizOnline/ to visualize the result
         return stateMachine.serialize();
+    }
+
+    @DELETE
+    @Path("/state")
+    @NoAuditEvent("No Audit Event needed") // TODO: do we need audit log here?
+    @RequiresPermissions(RestPermissions.DATANODE_MIGRATION)
+    @ApiOperation(value = "Reset the whole migration to the first step, start over")
+    public CurrentStateInformation resetState() {
+        stateMachine.reset();
+        return new CurrentStateInformation(stateMachine.getState(), stateMachine.nextSteps());
     }
 }
