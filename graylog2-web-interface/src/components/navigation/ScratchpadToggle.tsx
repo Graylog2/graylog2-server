@@ -20,12 +20,13 @@ import styled from 'styled-components';
 import { ScratchpadContext } from 'contexts/ScratchpadProvider';
 import { Icon } from 'components/common';
 import { Button } from 'components/bootstrap';
+import { NAV_ITEM_HEIGHT } from 'theme/constants';
 
 const Toggle = styled(Button)`
-  padding-left: 6px;
-  padding-right: 6px;
+  padding: 0 15px;
   background: none;
   border: 0;
+  min-height: ${NAV_ITEM_HEIGHT};
 `;
 
 const ScratchpadToggle = () => {
