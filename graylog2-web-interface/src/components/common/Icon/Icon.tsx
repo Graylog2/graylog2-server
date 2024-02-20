@@ -21,7 +21,7 @@ import styled, { css, keyframes } from 'styled-components';
 
 import type { SizeProp, IconName } from './types';
 
-type IconTypes = 'brand' | 'regular' | 'solid';
+type IconTypes = 'regular' | 'solid';
 
 const sizeMap = {
   xs: '.938em',
@@ -48,13 +48,15 @@ const StyledSpan = styled.span<{
   $spin: boolean,
   $rotation: RotateProp
   $flipHorizontal: boolean,
+  $fill: boolean
 }>(({
   $size,
   $spin,
   $rotation,
   $flipHorizontal,
+  $fill,
 }) => css`
-  font-variation-settings: 'opsz' 48, 'wght' 700;
+  font-variation-settings: 'opsz' 48, 'wght' 700 ${$fill ? ", 'FILL' 1" : ''};
   font-size: ${sizeMap[$size] ?? '1.15em'};
   transform: rotate(${$rotation}deg) scaleY(${$flipHorizontal ? -1 : 1});
   animation: ${$spin ? css`${spinAnimation} 2s infinite linear` : 'none'};
@@ -116,6 +118,7 @@ const Icon = ({
                 $rotation={rotation}
                 $flipHorizontal={flipHorizontal}
                 $size={size}
+                $fill={type === 'solid'}
                 $spin={spin}
                 style={style}>
       {name}

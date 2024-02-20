@@ -22,12 +22,13 @@ import { Icon } from 'components/common';
 import { Button } from 'components/bootstrap';
 import { NAV_ITEM_HEIGHT } from 'theme/constants';
 
-const Toggle = styled(Button)`
+const Toggle = styled(Button)(({ theme }) => `
   padding: 0 15px;
   background: none;
   border: 0;
   min-height: ${NAV_ITEM_HEIGHT};
-`;
+  color: ${theme.colors.global.textDefault};
+`);
 
 const ScratchpadToggle = () => {
   const { toggleScratchpadVisibility } = useContext(ScratchpadContext);
