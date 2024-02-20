@@ -16,20 +16,20 @@
  */
 package org.graylog.storage.opensearch2;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.graylog.plugins.views.search.searchfilters.db.UsedSearchFiltersToQueryStringsMapper;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.fetch.subphase.highlight.HighlightBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.search.slice.SliceBuilder;
 import org.graylog2.indexer.searches.ChunkCommand;
 import org.graylog2.indexer.searches.SearchesConfig;
 import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.Stream;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 
 import java.util.Optional;
 import java.util.Set;
@@ -67,6 +67,8 @@ public class SearchRequestFactory {
         searchSourceBuilder.fetchSource(chunkCommand.fields().toArray(new String[0]), new String[0]);
         chunkCommand.batchSize()
                 .ifPresent(batchSize -> searchSourceBuilder.size(Math.toIntExact(batchSize)));
+        chunkCommand.sliceParams()
+                .ifPresent(sliceParams -> searchSourceBuilder.slice(new SliceBuilder(sliceParams.id(), sliceParams.max())));
         return searchSourceBuilder;
     }
 
