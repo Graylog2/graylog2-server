@@ -36,7 +36,7 @@ const ManualMigrationStep = () => {
   const { currentStep } = useMigrationState();
   const { onTriggerNextState } = useTriggerMigrationState();
 
-  const onMigrationStepChange = (step: MigrationActions, args: StepArgs = {}) => {
+  const onMigrationStepChange = (step: MigrationActions, args?: StepArgs = {}) => {
     onTriggerNextState({ step, args });
   };
 

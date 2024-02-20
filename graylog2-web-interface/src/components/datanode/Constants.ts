@@ -188,25 +188,13 @@ export const MIGRATION_ACTIONS = {
     key: 'PROVISION_DATANODE_CERTIFICATES',
     label: 'Provision data nodes with certificates',
   },
-  SHOW_MIGRATE_EXISTING_DATA: {
-    key: 'SHOW_MIGRATE_EXISTING_DATA',
-    label: 'Migrate existing data',
-  },
   SKIP_EXISTING_DATA_MIGRATION: {
     key: 'SKIP_EXISTING_DATA_MIGRATION',
     label: 'Skip existing data migration',
   },
-  REQUEST_MIGRATION_STATUS: {
-    key: 'REQUEST_MIGRATION_STATUS',
-    label: 'Request migration status',
-  },
   RETRY_MIGRATE_EXISTING_DATA: {
     key: 'RETRY_MIGRATE_EXISTING_DATA',
     label: 'Retry migrate existing data',
-  },
-  SHOW_ASK_TO_SHUTDOWN_OLD_CLUSTER: {
-    key: 'SHOW_ASK_TO_SHUTDOWN_OLD_CLUSTER',
-    label: 'Shut down old cluster',
   },
 };
 export default MIGRATION_STEP;

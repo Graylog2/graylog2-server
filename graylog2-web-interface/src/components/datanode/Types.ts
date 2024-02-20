@@ -91,13 +91,13 @@ export type MigrationState = {
 
 export type MigrationStepRequest = {
   step: MigrationActions,
-  args: {
+  args?: {
     [key: string]: unknown;
   };
 };
 export type StepArgs = {[_key: string]: unknown};
 
-export type OnTriggerStepFunction = (step: MigrationActions, args: StepArgs) => void
+export type OnTriggerStepFunction = (step: MigrationActions, args?: StepArgs) => unknown
 export type MigrationStepComponentProps = {
   currentStep: MigrationState,
   onTriggerStep: OnTriggerStepFunction,

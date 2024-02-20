@@ -18,15 +18,12 @@ import * as React from 'react';
 
 import { ProgressBar } from 'components/common';
 
-import type { RemoteReindexMigration } from '../../hooks/useRemoteReindexMigrationStatus';
 import type { MigrationStepComponentProps } from '../../Types';
 import MigrationStepTriggerButtonToolbar from '../common/MigrationStepTriggerButtonToolbar';
-import useMigrationState from '../../hooks/useMigrationState';
+import useRemoteReindexMigrationStatus from '../../hooks/useRemoteReindexMigrationStatus';
 
 const RemoteReindexRunning = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => {
-  const { currentStep: { response } } = useMigrationState(3000);
-
-  const remoteReindexMigration = response as RemoteReindexMigration;
+  const { nextSteps, migrationStatus } = useRemoteReindexMigrationStatus();
 
   return (
     <>
@@ -37,11 +34,11 @@ const RemoteReindexRunning = ({ currentStep, onTriggerStep }: MigrationStepCompo
       <ProgressBar bars={[{
         animated: true,
         striped: true,
-        value: remoteReindexMigration?.progress || 0,
+        value: migrationStatus?.progress || 0,
         bsStyle: 'info',
-        label: remoteReindexMigration?.status,
+        label: `${migrationStatus?.status || ''} ${migrationStatus?.progress || 0}%`,
       }]} />
-      <MigrationStepTriggerButtonToolbar nextSteps={currentStep.next_steps} onTriggerStep={onTriggerStep} />
+      <MigrationStepTriggerButtonToolbar nextSteps={nextSteps || currentStep.next_steps} onTriggerStep={onTriggerStep} />
     </>
   );
 };

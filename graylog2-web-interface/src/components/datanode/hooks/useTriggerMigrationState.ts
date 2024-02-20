@@ -19,10 +19,10 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Migration } from '@graylog/server-api';
 import { MIGRATION_STATE_QUERY_KEY } from 'components/datanode/hooks/useMigrationState';
 import UserNotification from 'util/UserNotification';
-import type { MigrationStepRequest } from 'components/datanode/Types';
+import type { MigrationState, MigrationStepRequest } from 'components/datanode/Types';
 
 const useTriggerMigrationState = (): {
-  onTriggerNextState: (step: MigrationStepRequest) => void,
+  onTriggerNextState: (step: MigrationStepRequest) => Promise<MigrationState>,
   isLoadingNextMigrationState: boolean,
   isError: boolean,
   error: Error,
@@ -36,7 +36,7 @@ const useTriggerMigrationState = (): {
   });
 
   return {
-    onTriggerNextState,
+    onTriggerNextState: onTriggerNextState as (step: MigrationStepRequest) => Promise<MigrationState>,
     isLoadingNextMigrationState,
     isError,
     error,

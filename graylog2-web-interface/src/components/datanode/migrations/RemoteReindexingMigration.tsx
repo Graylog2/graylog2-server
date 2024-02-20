@@ -103,7 +103,7 @@ const RemoteReindexingMigration = ({ currentStep, onTriggerNextStep }: Props) =>
       <p>Follow these steps to migrate your existing migrating an existing OpenSearch 2.x or 1.3.x cluster to Data
         Node.
       </p>
-      <StyledPanelGroup accordion id="first" activeKey={activeStep}>
+      <StyledPanelGroup accordion id="first" activeKey={activeStep} onSelect={() => {}}>
         {REMOTE_REINDEXING_MIGRATION_STEPS.map((remoteReindexingStep, index) => {
           const { description } = MIGRATION_STATE[remoteReindexingStep];
 

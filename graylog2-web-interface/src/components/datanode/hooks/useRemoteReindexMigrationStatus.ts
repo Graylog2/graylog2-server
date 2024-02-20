@@ -14,11 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { useState, useEffect } from 'react';
 
-import { qualifyUrl } from 'util/URLUtils';
-import UserNotification from 'util/UserNotification';
-import fetch from 'logic/rest/FetchProvider';
+import useTriggerMigrationState from './useTriggerMigrationState';
+
+import type { MigrationActions } from '../Types';
 
 export type MigrationStatus = 'NOT_STARTED'|'STARTING'|'RUNNING'|'ERROR'|'FINISHED';
 
@@ -47,52 +47,41 @@ export type RemoteReindexRequest = {
   user: string,
 }
 
-export const remoteReindex = async (request: RemoteReindexRequest) => {
-  try {
-    const result = await fetch('POST', qualifyUrl('/remote-reindex-migration/remoteReindex'), request);
-
-    UserNotification.success('Successful Remote Reindexing.');
-
-    return result;
-  } catch (errorThrown) {
-    UserNotification.error(`Remote Reindexing failed with status: ${errorThrown}`, 'Remote Reindexing Failure.');
-
-    return null;
-  }
-};
-
-const fetchRemoteReindexStatus = async (migrationID: string) => fetch('GET', qualifyUrl(`/remote-reindex-migration/status/${migrationID}`));
-
-const useRemoteReindexMigrationStatus = (migrationID: string, onSuccess: () => void) : {
-  data: RemoteReindexMigration,
-  refetch: () => void,
-  isInitialLoading: boolean,
-  error: any,
+const useRemoteReindexMigrationStatus = () : {
+  nextSteps: MigrationActions[],
+  migrationStatus: RemoteReindexMigration,
 } => {
-  const { data, refetch, isInitialLoading, error } = useQuery<RemoteReindexMigration>(
-    ['remote-reindex-status'],
-    () => fetchRemoteReindexStatus(migrationID),
-    {
-      onError: (errorThrown) => {
-        UserNotification.error(`Loading Remote Reindex Migration Status failed with status: ${errorThrown}`,
-          'Could not load Remote Reindex Migration Status');
-      },
-      onSuccess: (currentData) => {
-        if (currentData.status === 'FINISHED') {
-          onSuccess();
-        }
-      },
-      notifyOnChangeProps: ['data', 'error'],
-      refetchInterval: 5000,
-      enabled: !!migrationID,
-    },
-  );
+  const [nextSteps, setNextSteps] = useState<MigrationActions[]>(['RETRY_MIGRATE_EXISTING_DATA']);
+  const [migrationStatus, setMigrationStatus] = useState<RemoteReindexMigration>(null);
+  const { onTriggerNextState } = useTriggerMigrationState();
+
+  useEffect(() => {
+    const fetchCurrentMigrationStatus = async () => {
+      if (migrationStatus?.progress !== 100) {
+        onTriggerNextState({ step: 'REQUEST_MIGRATION_STATUS' }).then((data) => {
+          const _migrationStatus = data?.response as RemoteReindexMigration;
+
+          if (_migrationStatus) {
+            setMigrationStatus(_migrationStatus);
+
+            if (_migrationStatus?.progress === 100) {
+              setNextSteps(['RETRY_MIGRATE_EXISTING_DATA', 'SHOW_ASK_TO_SHUTDOWN_OLD_CLUSTER']);
+            }
+          }
+        });
+      }
+    };
+
+    const interval = setInterval(() => {
+      fetchCurrentMigrationStatus();
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [onTriggerNextState, migrationStatus]);
 
   return ({
-    data,
-    refetch,
-    isInitialLoading,
-    error,
+    nextSteps,
+    migrationStatus,
   });
 };
 
