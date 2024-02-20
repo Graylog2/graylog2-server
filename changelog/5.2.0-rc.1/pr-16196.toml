@@ -1,5 +1,0 @@
-type = "c"
-message = "Show syntax error in pipeline rule editor when trying to access nested variables using an array literal, e.g. `result.[\"key\"]`."
-
-pulls = ["16196"]
-issues = ["16029"]
