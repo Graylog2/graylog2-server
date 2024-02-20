@@ -74,6 +74,7 @@ public class MigrationStateMachineBuilder {
         config.configure(MigrationState.PROVISION_DATANODE_CERTIFICATES_PAGE)
                 .permit(MigrationStep.PROVISION_DATANODE_CERTIFICATES, MigrationState.PROVISION_DATANODE_CERTIFICATES_RUNNING, migrationActions::provisionAndStartDataNodes);
 
+        // This page should contain the "Please restart Graylog to continue with data migration"
         config.configure(MigrationState.PROVISION_DATANODE_CERTIFICATES_RUNNING)
                 .permitIf(MigrationStep.SHOW_DATA_MIGRATION_QUESTION, MigrationState.EXISTING_DATA_MIGRATION_QUESTION_PAGE, migrationActions::dataNodeStartupFinished);
 
@@ -94,7 +95,7 @@ public class MigrationStateMachineBuilder {
                 .permitIf(MigrationStep.SHOW_ASK_TO_SHUTDOWN_OLD_CLUSTER, MigrationState.ASK_TO_SHUTDOWN_OLD_CLUSTER, migrationActions::isRemoteReindexingFinished);
 
         config.configure(MigrationState.ASK_TO_SHUTDOWN_OLD_CLUSTER)
-                .permitIf(MigrationStep.CONFIRM_OLD_CLUSTER_STOPPED, MigrationState.MANUALLY_REMOVE_OLD_CONNECTION_STRING_FROM_CONFIG, migrationActions::isOldClusterStopped);
+                .permitIf(MigrationStep.CONFIRM_OLD_CLUSTER_STOPPED, MigrationState.FINISHED, migrationActions::isOldClusterStopped);
 
         // in place / rolling upgrade branch of the migration
         config.configure(MigrationState.ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE)
@@ -111,21 +112,14 @@ public class MigrationStateMachineBuilder {
                 .permitIf(MigrationStep.CALCULATE_JOURNAL_SIZE, MigrationState.JOURNAL_SIZE_DOWNTIME_WARNING, migrationActions::provisioningFinished);
 
         config.configure(MigrationState.JOURNAL_SIZE_DOWNTIME_WARNING)
-                .permit(MigrationStep.SHOW_STOP_PROCESSING_PAGE, MigrationState.MESSAGE_PROCESSING_STOP);
+                .permit(MigrationStep.SHOW_STOP_PROCESSING_PAGE, MigrationState.MESSAGE_PROCESSING_STOP, migrationActions::stopMessageProcessing);
 
         config.configure(MigrationState.MESSAGE_PROCESSING_STOP)
-                .onEntry(migrationActions::stopMessageProcessing)
-                .permit(MigrationStep.SHOW_ROLLING_UPGRADE_ASK_TO_SHUTDOWN_OLD_CLUSTER, MigrationState.REPLACE_CLUSTER, migrationActions::startDataNodes);
+                .permit(MigrationStep.SHOW_ROLLING_UPGRADE_ASK_TO_SHUTDOWN_OLD_CLUSTER, MigrationState.RESTART_GRAYLOG, migrationActions::startDataNodes);
 
-        config.configure(MigrationState.REPLACE_CLUSTER)
-                .permit(MigrationStep.SHOW_ASK_TO_RESTART_MESSAGE_PROCESSING, MigrationState.MESSAGE_PROCESSING_RESTART, migrationActions::startMessageProcessing);
-
-        config.configure(MigrationState.MESSAGE_PROCESSING_RESTART)
-                .permit(MigrationStep.CONFIRM_ROLLING_UPGRADE_OLD_CLUSTER_STOPPED, MigrationState.MANUALLY_REMOVE_OLD_CONNECTION_STRING_FROM_CONFIG, migrationActions::isOldClusterStopped);
-
-        // common cleanup steps
-        config.configure(MigrationState.MANUALLY_REMOVE_OLD_CONNECTION_STRING_FROM_CONFIG)
-                .permit(MigrationStep.CONFIRM_OLD_CONNECTION_STRING_FROM_CONFIG_REMOVED, MigrationState.FINISHED);
+        // shows the "remove connection string, restart graylog"
+        config.configure(MigrationState.RESTART_GRAYLOG)
+                .permitIf(MigrationStep.CONFIRM_OLD_CONNECTION_STRING_FROM_CONFIG_REMOVED_AND_GRAYLOG_RESTARTED, MigrationState.FINISHED, migrationActions::dataNodeStartupFinished);
 
         return config;
     }
