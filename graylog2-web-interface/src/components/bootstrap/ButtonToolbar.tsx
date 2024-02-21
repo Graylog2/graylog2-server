@@ -19,13 +19,23 @@ import styled from 'styled-components';
 
 import OriginalButtonGroup from './ButtonGroup';
 
+const Container = styled.div`
+  display: inline-block;
+`;
+
 const StyledButtonToolbar = styled(OriginalButtonGroup)`
   gap: 0.25em;
 `;
 
-const ButtonToolbar = (props: React.ComponentProps<typeof StyledButtonToolbar>) => (
-  <StyledButtonToolbar {...props} />
+const ButtonToolbar = ({ className, ...rest }: React.ComponentProps<typeof StyledButtonToolbar> & { className?: string }) => (
+  <Container role="toolbar" className={className}>
+    <StyledButtonToolbar {...rest} />
+  </Container>
 );
+
+ButtonToolbar.defaultProps = {
+  className: undefined,
+};
 
 /** @component */
 export default ButtonToolbar;
