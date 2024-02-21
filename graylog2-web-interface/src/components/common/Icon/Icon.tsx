@@ -76,8 +76,6 @@ type Props = {
    * Not all icons can be outlined.
    * */
   type?: IconTypes,
-  fixedWidth?: boolean,
-  inverse?: boolean,
   style?: React.CSSProperties,
   onClick?: (event: React.MouseEvent) => void,
   onMouseEnter?: (event: React.MouseEvent) => void,
@@ -92,7 +90,6 @@ type Props = {
  * Component that renders an icon or glyph.
  * Uses Material Symbols: https://fonts.google.com/icons
  */
-
 const Icon = ({
   name,
   type,
@@ -100,9 +97,7 @@ const Icon = ({
   className,
   rotation,
   spin,
-  fixedWidth,
   flipHorizontal,
-  inverse,
   style,
   'data-testid': testId,
   onClick,
@@ -133,9 +128,7 @@ const Icon = ({
 Icon.defaultProps = {
   className: undefined,
   'data-testid': undefined,
-  fixedWidth: false,
   flipHorizontal: false,
-  inverse: false,
   rotation: 0,
   size: undefined,
   spin: false,

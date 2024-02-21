@@ -40,7 +40,7 @@ const ScratchpadToggle = () => {
               aria-label="Scratchpad"
               id="scratchpad-toggle"
               onClick={toggleScratchpadVisibility}>
-        <Icon name="edit_square" size="lg" fixedWidth title="Scratchpad" />
+        <Icon name="edit_square" size="lg" title="Scratchpad" />
       </Toggle>
     </li>
 

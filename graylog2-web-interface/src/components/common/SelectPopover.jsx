@@ -172,7 +172,7 @@ class SelectPopover extends React.Component {
 
     return (
       <ListGroupItem onClick={this.clearItemSelection}>
-        <Icon name="close" fixedWidth className="text-danger" /> {clearSelectionText}
+        <Icon name="close" className="text-danger" /> {clearSelectionText}
       </ListGroupItem>
     );
   };

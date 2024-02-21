@@ -99,7 +99,7 @@ const TokenList = ({ creatingToken, deletingToken, onCreate, onDelete, tokens }:
             <p>This is your new token. Make sure to copy it now, you will not be able to see it again.</p>
             <pre>
               {createdToken.token}
-              <StyledCopyTokenButton title={<Icon name="content_copy" fixedWidth />} text={createdToken.token} bsSize="xsmall" />
+              <StyledCopyTokenButton title={<Icon name="content_copy" />} text={createdToken.token} bsSize="xsmall" />
             </pre>
             <Button bsStyle="primary" onClick={() => setCreatedToken(undefined)}>Done</Button>
           </Panel.Body>

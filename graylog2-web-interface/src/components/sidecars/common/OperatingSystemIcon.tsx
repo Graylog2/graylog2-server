@@ -74,7 +74,7 @@ const OperatingSystemIcon = ({ operatingSystem }: Props) => {
     <Container>
       {iconType === 'brand'
         ? <BrandIcon name={iconName} />
-        : <Icon name={iconName} fixedWidth />}
+        : <Icon name={iconName} />}
     </Container>
   );
 };

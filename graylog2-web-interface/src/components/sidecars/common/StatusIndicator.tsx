@@ -64,7 +64,7 @@ const StatusIndicator = ({ message: messageProp, status, lastSeen, id }: Props) 
     return (
       <OverlayTrigger placement="top" overlay={message} rootClose trigger="hover">
         <span className={`${className} ${style.indicator}`}>
-          <Icon name={icon} fixedWidth /> {text}
+          <Icon name={icon} /> {text}
         </span>
       </OverlayTrigger>
     );
@@ -72,7 +72,7 @@ const StatusIndicator = ({ message: messageProp, status, lastSeen, id }: Props) 
 
   return (
     <span className={`${className} ${style.indicator}`}>
-      <Icon name={icon} fixedWidth /> {text}
+      <Icon name={icon} /> {text}
     </span>
   );
 };

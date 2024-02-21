@@ -293,7 +293,7 @@ class SourceCodeEditor extends React.Component<Props, State> {
           <Toolbar style={{ width: validCssWidth }}>
             <ButtonToolbar>
               <ButtonGroup ref={this.overlayContainerRef}>
-                <ClipboardButton title={<Icon name="content_copy" fixedWidth />}
+                <ClipboardButton title={<Icon name="content_copy" />}
                                  bsStyle="link"
                                  bsSize="sm"
                                  onSuccess={this.focusEditor}
@@ -302,7 +302,7 @@ class SourceCodeEditor extends React.Component<Props, State> {
                                  disabled={this.isCopyDisabled()} />
                 <OverlayTrigger placement="top" trigger="click" overlay={overlay} rootClose width={250}>
                   <Button bsStyle="link" bsSize="sm" title="Paste (Ctrl+V / &#8984;V)" disabled={this.isPasteDisabled()}>
-                    <Icon name="content_copy" fixedWidth />
+                    <Icon name="content_copy" />
                   </Button>
                 </OverlayTrigger>
               </ButtonGroup>
@@ -312,14 +312,14 @@ class SourceCodeEditor extends React.Component<Props, State> {
                         onClick={this.handleUndo}
                         title="Undo (Ctrl+Z / &#8984;Z)"
                         disabled={this.isUndoDisabled()}>
-                  <Icon name="undo" fixedWidth />
+                  <Icon name="undo" />
                 </Button>
                 <Button bsStyle="link"
                         bsSize="sm"
                         onClick={this.handleRedo}
                         title="Redo (Ctrl+Shift+Z / &#8984;&#8679;Z)"
                         disabled={this.isRedoDisabled()}>
-                  <Icon name="redo" fixedWidth />
+                  <Icon name="redo" />
                 </Button>
               </ButtonGroup>
             </ButtonToolbar>

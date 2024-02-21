@@ -96,12 +96,12 @@ const SidecarStatus = createReactClass({
         case SidecarStatusEnum.RUNNING:
           statusMessage = 'Collector is running.';
           statusClass = 'text-success';
-          statusBadge = <Icon name="play_arrow" fixedWidth />;
+          statusBadge = <Icon name="play_arrow" />;
           break;
         case SidecarStatusEnum.FAILING:
           statusMessage = status.message;
           statusClass = 'text-danger';
-          statusBadge = <Icon name="warning" fixedWidth />;
+          statusBadge = <Icon name="warning" />;
 
           if (status.verbose_message) {
             verboseButton = (
@@ -117,12 +117,12 @@ const SidecarStatus = createReactClass({
         case SidecarStatusEnum.STOPPED:
           statusMessage = status.message;
           statusClass = 'text-danger';
-          statusBadge = <Icon name="stop" fixedWidth />;
+          statusBadge = <Icon name="stop" />;
           break;
         default:
           statusMessage = 'Collector status is currently unknown.';
           statusClass = 'text-info';
-          statusBadge = <Icon name="help" fixedWidth />;
+          statusBadge = <Icon name="help" />;
       }
 
       if (collector) {

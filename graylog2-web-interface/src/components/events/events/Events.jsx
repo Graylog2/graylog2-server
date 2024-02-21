@@ -113,7 +113,7 @@ const priorityFormatter = (eventId, priority) => {
 
   return (
     <OverlayTrigger placement="top" trigger={['hover', 'click', 'focus']} overlay={tooltip}>
-      <EventsIcon name={icon} fixedWidth className={style} />
+      <EventsIcon name={icon} className={style} />
     </OverlayTrigger>
   );
 };
