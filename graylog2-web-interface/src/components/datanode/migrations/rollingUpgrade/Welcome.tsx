@@ -33,7 +33,7 @@ const Welcome = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) =>
         <Col md={6}>
           <h3>Welcome</h3>
           <p>Using the rolling upgrade will allow you to move the Data Node by using the data folder of your existing cluster to the Data Node cluster.</p>
-          <p>To start please install Data Node on every OS/ES node from your previous setup. You can find more information on how to download and install the Data Node  <DocumentationLink page="graylog-data-node" text="here" />.</p>
+          <p>To start please install Data Node on every OS/ES node from your previous setup. You can find more information on how to download and install the Data Node <DocumentationLink page="graylog-data-node" text="here" />.</p>
           <MigrationDatanodeList />
         </Col>
         <Col md={6}>
