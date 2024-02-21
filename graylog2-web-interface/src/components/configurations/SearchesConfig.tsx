@@ -136,6 +136,10 @@ const SearchesConfig = () => {
     setFormConfig({ ...formConfig, query_time_range_limit: queryTimeRangeLimit });
   };
 
+  const onCancelAfterSecondsChanged = ({ target: { value } }) => {
+    setFormConfig({ ...formConfig, cancel_after_seconds: value });
+  };
+
   const openModal = () => {
     setShowConfigModal(true);
   };
@@ -253,6 +257,14 @@ const SearchesConfig = () => {
         </dd>
       </dl>
 
+      <dl className="deflist">
+        <dt>Cancellation timeout</dt>
+        <dd>{viewConfig.cancel_after_seconds} seconds</dd>
+        <dd>The time in seconds per widget after which search execution will be canceled automatically.
+          That minimizes amount of executed searches and improves performance.
+        </dd>
+      </dl>
+
       <Row>
         <Col md={4}>
           <strong>Search Time Range Presets</strong>
@@ -320,6 +332,16 @@ const SearchesConfig = () => {
                                 validator={queryTimeRangeLimitValidator}
                                 required />
             )}
+            <Input id="cancel_after_seconds"
+                   type="number"
+                   label="Cancellation timeout"
+                   name="cancel_after_seconds"
+                   min="1"
+                   step="1"
+                   pattern="\d+"
+                   value={formConfig.cancel_after_seconds}
+                   onChange={onCancelAfterSecondsChanged}
+                   help="The time in seconds per widget after which search execution will be canceled automatically. That minimizes amount of executed searches and improves performance." />
             <TimeRangePresetForm options={timeRangePresets} onUpdate={onTimeRangePresetsUpdate} />
             <TimeRangeOptionsForm options={surroundingTimeRangeOptionsUpdate || buildTimeRangeOptions(formConfig.surrounding_timerange_options)}
                                   update={onSurroundingTimeRangeOptionsUpdate}
