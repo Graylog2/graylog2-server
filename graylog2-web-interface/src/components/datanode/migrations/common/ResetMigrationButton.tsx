@@ -16,25 +16,32 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import fetch from 'logic/rest/FetchProvider';
 import { ConfirmDialog } from 'components/common';
 import { Button } from 'components/bootstrap';
 import { qualifyUrl } from 'util/URLUtils';
-import UserNotification from 'preflight/util/UserNotification';
+import UserNotification from 'util/UserNotification';
+import { QUERY_KEY as DATA_NODES_CA_QUERY_KEY } from 'preflight/hooks/useDataNodesCA';
+import { MIGRATION_STATE_QUERY_KEY } from 'components/datanode/hooks/useMigrationState';
 
-const resetMigration = async () => {
-  try {
-    await fetch('DELETE', qualifyUrl('/migration/state'));
-
-    UserNotification.success('Migration reset successfully.');
-  } catch (errorThrown) {
-    UserNotification.error(`Resetting migration failed with status: ${errorThrown}`, 'Could not reset the migration.');
-  }
-};
+const resetMigration = async () => fetch('DELETE', qualifyUrl('/migration/state'));
 
 const ResetMigrationButton = () => {
+  const queryClient = useQueryClient();
   const [showDialog, setShowDialog] = useState(false);
+
+  const { mutateAsync: onResetMigration } = useMutation(resetMigration, {
+    onSuccess: () => {
+      UserNotification.success('Migration state reset successful.');
+      queryClient.invalidateQueries(DATA_NODES_CA_QUERY_KEY);
+      queryClient.invalidateQueries(MIGRATION_STATE_QUERY_KEY);
+    },
+    onError: (error) => {
+      UserNotification.error(`Resetting migration state failed with status: ${error}`, 'Could not reset the migration state.');
+    },
+  });
 
   return (
     <>
@@ -44,8 +51,8 @@ const ResetMigrationButton = () => {
       {showDialog && (
         <ConfirmDialog title="Reset Migration"
                        show
-                       onConfirm={() => {
-                         resetMigration();
+                       onConfirm={async () => {
+                         await onResetMigration();
                          setShowDialog(false);
                        }}
                        onCancel={() => setShowDialog(false)}>

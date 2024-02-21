@@ -24,6 +24,7 @@ import MigrationWizard from 'components/datanode/migrations/MigrationWizard';
 import useMigrationWizardStep from 'components/datanode/hooks/useMigrationWizardStep';
 import useTriggerMigrationState from 'components/datanode/hooks/useTriggerMigrationState';
 import { MIGRATION_STATE } from 'components/datanode/Constants';
+import ResetMigrationButton from 'components/datanode/migrations/common/ResetMigrationButton';
 
 const DataNodesMigrationPage = () => {
   const { step: currentStep, isLoading } = useMigrationWizardStep();
@@ -39,6 +40,7 @@ const DataNodesMigrationPage = () => {
     <DocumentTitle title="Data Nodes Migration">
       <DataNodesPageNavigation />
       <PageHeader title="Data Nodes Migration"
+                  actions={<ResetMigrationButton />}
                   documentationLink={{
                     title: 'Data Nodes documentation',
                     path: DocsHelper.PAGES.GRAYLOG_DATA_NODE,
