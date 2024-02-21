@@ -53,6 +53,9 @@ const StyledDefList = styled.dl.attrs({
   className: 'deflist',
 })(({ theme }: { theme: DefaultTheme }) => css`
   &&.deflist {
+    dt {
+      float: left;
+    }
     dd {
       padding-left: ${theme.spacings.md};
       margin-left: 200px;

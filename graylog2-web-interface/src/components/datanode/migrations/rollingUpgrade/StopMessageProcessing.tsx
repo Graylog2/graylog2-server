@@ -30,8 +30,6 @@ const StyledHelpPanel = styled(StyledPanel)`
 const StopMessageProcessing = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => (
   <>
     <p>Graylog processing is stopped.</p>
-    <p />
-    <MigrationStepTriggerButtonToolbar nextSteps={currentStep.next_steps} onTriggerStep={onTriggerStep} />
     <StyledHelpPanel bsStyle="warning">
       <Panel.Heading>
         <Panel.Title componentClass="h3"><Icon name="exclamation-triangle" />Stop OpenSearch</Panel.Title>
@@ -40,6 +38,9 @@ const StopMessageProcessing = ({ currentStep, onTriggerStep }: MigrationStepComp
         <p>Please stop your OpenSearch cluster before proceeding.</p>
       </Panel.Body>
     </StyledHelpPanel>
+    <p />
+    <MigrationStepTriggerButtonToolbar nextSteps={currentStep.next_steps} onTriggerStep={onTriggerStep} />
+
   </>
 );
 
