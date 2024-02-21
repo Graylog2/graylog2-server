@@ -30,6 +30,7 @@ import type { KeywordTimeRange } from 'views/logic/queries/Query';
 import useUserDateTime from 'hooks/useUserDateTime';
 import { InputDescription } from 'components/common';
 import debounceWithPromise from 'views/logic/debounceWithPromise';
+import type FetchError from 'logic/errors/FetchError';
 
 import { EMPTY_RANGE } from '../TimeRangeDisplay';
 
@@ -73,13 +74,13 @@ const debouncedTestNaturalDate = debounceWithPromise((
   userTZ: string,
   mounted: React.RefObject<boolean>,
   setSuccessfulPreview: (response: KeywordPreview) => void,
-  setFailedPreview: (error: Error) => void,
+  setFailedPreview: () => void,
 ) => ToolsStore.testNaturalDate(keyword, userTZ).then((response) => {
   if (mounted.current) {
     setSuccessfulPreview(response);
   }
-}).catch((re) => {
-  setFailedPreview(re);
+}).catch(() => {
+  setFailedPreview();
 
   return 'Unable to parse keyword.';
 }), 350);
@@ -100,8 +101,6 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
 
   const _setFailedPreview = useCallback(() => {
     setKeywordPreview({ from: EMPTY_RANGE, to: EMPTY_RANGE, timezone: userTimezone });
-
-    return 'Unable to parse keyword.';
   }, [userTimezone]);
 
   const _validateKeyword = useCallback((keyword: string) => {
