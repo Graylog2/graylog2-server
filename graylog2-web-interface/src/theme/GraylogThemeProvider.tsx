@@ -31,7 +31,7 @@ import ColorSchemeContext from './ColorSchemeContext';
 import { COLOR_SCHEMES } from './constants';
 import usePreferredColorScheme from './hooks/usePreferredColorScheme';
 
-import 'material-symbols/outlined.css';
+import 'material-symbols/rounded.css';
 
 type Props = {
   children: React.ReactNode,

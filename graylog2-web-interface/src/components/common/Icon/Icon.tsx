@@ -107,7 +107,7 @@ const Icon = ({
   tabIndex,
   title,
 }: Props) => (
-  <StyledSpan className={`material-symbols-outlined ${className ?? ''}`}
+  <StyledSpan className={`material-symbols-rounded ${className ?? ''}`}
               data-testid={testId}
               onClick={onClick}
               style={style}
