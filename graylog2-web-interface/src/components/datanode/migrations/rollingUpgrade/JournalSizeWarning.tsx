@@ -24,6 +24,7 @@ import { StyledPanel } from 'components/datanode/migrations/MigrationWelcomeStep
 const StyledHelpPanel = styled(StyledPanel)`
   margin-top: 30px;
 `;
+
 const JournalSizeWarning = () => (
   <StyledHelpPanel bsStyle="warning">
     <Panel.Heading>

@@ -26,7 +26,9 @@ import { Button } from 'components/bootstrap';
 import { QUERY_KEY as DATA_NODES_CA_QUERY_KEY } from 'components/datanode/hooks/useDataNodesCA';
 import { MIGRATION_STATE_QUERY_KEY } from 'components/datanode/hooks/useMigrationState';
 
-type FormValues = {}
+type FormValues = {
+  organization: string
+}
 
 const createCA = (caData: FormValues) => fetch(
   'POST',
