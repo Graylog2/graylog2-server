@@ -103,6 +103,7 @@ const StyledButton = styled(MantineButton)<{
 }) => css`
   color: ${theme.mantine.other.colors.contrast[$bsStyle]};
   font-weight: 400;
+  overflow: visible;
 
   ${disabledStyles(theme.mantine.other, $bsStyle)}
   ${stylesForSize($bsSize)}
