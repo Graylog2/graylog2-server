@@ -28,13 +28,15 @@ type Props = {
     nodes: Array<NodeInfo>,
     opensearch_data_location: string,
   }
-}
+};
+
 const Grid = styled.div`
   display: grid;
   grid-template-columns: 25% 75%;
   grid-gap: 0.5rem;
   margin-bottom: 1rem;
 `;
+
 const StyledSpan = styled.span`
   display: block;
   clear: both;
@@ -51,7 +53,7 @@ const CompatibilityStatus = ({ opensearchVersion, nodeInfo }: Props) => {
   return (
     <Grid>
       <div>
-        <StyledSpan><strong>Datanode Opensearch version</strong>: {opensearchVersion}</StyledSpan>
+        <StyledSpan><strong>Datanode OpenSearch version</strong>: {opensearchVersion}</StyledSpan>
         <StyledSpan><strong>OpenSearch data location</strong>: {opensearchLocation}</StyledSpan>
       </div>
       <div>

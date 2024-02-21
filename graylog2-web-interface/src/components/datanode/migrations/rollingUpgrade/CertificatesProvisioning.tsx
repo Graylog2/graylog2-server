@@ -40,14 +40,14 @@ const CertificatesProvisioning = ({ currentStep, onTriggerStep }: MigrationStepC
       {isProvisioningOverview && (
       <p>
         Certificate authority has been configured successfully.<br />
-        You can now provision certificate for your data nodes.
+        You can now provision certificate for your Data Nodes.
       </p>
       )}
       {(isProvisioningRunning && !haveNextStep) && (
       <Spinner text="Provisioning certificate" />
       )}
       {(isProvisioningRunning && haveNextStep) && (
-      <Alert bsStyle="success">Provisioning the data node finished.</Alert>
+      <Alert bsStyle="success">Provisioning the Data Node finished.</Alert>
       )}
       <MigrationDatanodeList />
       <br />

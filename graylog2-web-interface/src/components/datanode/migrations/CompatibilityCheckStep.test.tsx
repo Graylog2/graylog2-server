@@ -58,7 +58,7 @@ describe('CompatibilityCheckStep', () => {
     render(<CompatibilityCheckStep onTriggerStep={() => {}} currentStep={currentStep} />);
 
     await screen.findByRole('heading', {
-      name: /Your existing opensearch data can be migrated to data node\./i,
+      name: /Your existing OpenSearch data can be migrated to Data Node\./i,
     });
   });
 
@@ -78,7 +78,7 @@ describe('CompatibilityCheckStep', () => {
     render(<CompatibilityCheckStep onTriggerStep={() => {}} currentStep={currentStep} />);
 
     await screen.findByRole('heading', {
-      name: /your existing opensearch data cannot be migrated to data node\./i,
+      name: /your existing OpenSearch data cannot be migrated to Data Node\./i,
     });
   });
 });

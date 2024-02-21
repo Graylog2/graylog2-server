@@ -26,7 +26,7 @@ export const MIGRATION_STEP = {
   },
   COMPATIBILITY_CHECK: {
     key: 'COMPATIBILITY_CHECK',
-    description: 'Check opensearch compatibility with datanode',
+    description: 'Check OpenSearch compatibility with datanode',
   },
   MANUAL_MIGRATION_STEP: {
     key: 'MANUAL_MIGRATION_STEP',
@@ -49,7 +49,7 @@ export const MIGRATION_STATE = {
   },
   CA_CREATION_PAGE: {
     key: 'CA_CREATION_PAGE',
-    description: 'Certificate autority',
+    description: 'Certificate authority',
   },
   RENEWAL_POLICY_CREATION_PAGE: {
     key: 'RENEWAL_POLICY_CREATION_PAGE',
@@ -81,7 +81,7 @@ export const MIGRATION_STATE = {
   },
   RESTART_GRAYLOG: {
     key: 'RESTART_GRAYLOG',
-    description: 'Update configuration file and restart graylog',
+    description: 'Update configuration file and restart Graylog',
   },
   REMOTE_REINDEX_WELCOME_PAGE: {
     key: 'REMOTE_REINDEX_WELCOME_PAGE',
@@ -89,11 +89,11 @@ export const MIGRATION_STATE = {
   },
   PROVISION_DATANODE_CERTIFICATES_PAGE: {
     key: 'PROVISION_DATANODE_CERTIFICATES_PAGE',
-    description: 'Provision data node with certificates',
+    description: 'Provision Data Node with certificates',
   },
   PROVISION_DATANODE_CERTIFICATES_RUNNING: {
     key: 'PROVISION_DATANODE_CERTIFICATES_RUNNING',
-    description: 'Provision data node with certificates running',
+    description: 'Provision Data Node with certificates running',
   },
   EXISTING_DATA_MIGRATION_QUESTION_PAGE: {
     key: 'EXISTING_DATA_MIGRATION_QUESTION_PAGE',
@@ -121,7 +121,7 @@ export const MIGRATION_STATE = {
   },
   PROVISION_ROLLING_UPGRADE_NODES_RUNNING: {
     key: 'PROVISION_ROLLING_UPGRADE_NODES_RUNNING',
-    description: 'Provisionning data nodes certificate.',
+    description: 'Provisionning Data Nodes certificate.',
   },
   JOURNAL_SIZE_DOWNTIME_WARNING: {
     key: 'JOURNAL_SIZE_DOWNTIME_WARNING',
@@ -186,7 +186,7 @@ export const MIGRATION_ACTIONS = {
   },
   PROVISION_DATANODE_CERTIFICATES: {
     key: 'PROVISION_DATANODE_CERTIFICATES',
-    label: 'Provision data nodes with certificates',
+    label: 'Provision Data Nodes with certificates',
   },
   SKIP_EXISTING_DATA_MIGRATION: {
     key: 'SKIP_EXISTING_DATA_MIGRATION',

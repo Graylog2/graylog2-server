@@ -30,29 +30,29 @@ const MigrationDatanodeList = () => {
   const { data: dataNodes, isInitialLoading } = useDataNodes();
 
   if (isInitialLoading) {
-    return <Spinner text="Loading data nodes" />;
+    return <Spinner text="Loading Data Nodes" />;
   }
 
   return (
     <div>
       {(!dataNodes || dataNodes?.elements.length === 0) ? (
         <>
-          <p><StyledIcon name="info-circle" />There are no data nodes found.</p>
-          <Alert bsStyle="warning" title="No data nodes found">
-            Please start at least a data node to continue the migration process. You can find more information on how to start a data nodes in our <DocumentationLink page="graylog-data-node" text="documentation" />.
+          <p><StyledIcon name="info-circle" />There are no Data Nodes found.</p>
+          <Alert bsStyle="warning" title="No Data Nodes found">
+            Please start at least a Data Node to continue the migration process. You can find more information on how to start a Data Nodes in our <DocumentationLink page="graylog-data-node" text="documentation" />.
           </Alert>
-          <p><Spinner text="Looking for data nodes..." /></p>
+          <p><Spinner text="Looking for Data Nodes..." /></p>
         </>
       ) : (
         <>
-          <h4>Data nodes found:</h4>
+          <h4>Data Nodes found:</h4>
           <br />
           <Table bordered condensed striped hover>
             <thead>
               <tr>
                 <th>Hostname</th>
                 <th>Transport address</th>
-                <th>status</th>
+                <th>Status</th>
                 <th>Certificate valid until</th>
               </tr>
             </thead>

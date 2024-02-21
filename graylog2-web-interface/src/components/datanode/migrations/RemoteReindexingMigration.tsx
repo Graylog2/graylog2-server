@@ -40,6 +40,7 @@ const StyledTitle = styled.h3`
     font-size: 80%;
   }
 `;
+
 const StyledPanelGroup = styled(PanelGroup)`
   &.panel-group > .panel {
     margin-top: 0;
@@ -121,7 +122,6 @@ const RemoteReindexingMigration = ({ currentStep, onTriggerNextStep }: Props) =>
             </Panel>
           );
         })}
-
       </StyledPanelGroup>
     </Col>
   );

@@ -26,6 +26,7 @@ import { StyledPanel } from 'components/datanode/migrations/MigrationWelcomeStep
 const StyledHelpPanel = styled(StyledPanel)`
   margin-top: 30px;
 `;
+
 const StopMessageProcessing = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => (
   <>
     <p>Graylog processing is stopped.</p>
@@ -33,13 +34,13 @@ const StopMessageProcessing = ({ currentStep, onTriggerStep }: MigrationStepComp
     <MigrationStepTriggerButtonToolbar nextSteps={currentStep.next_steps} onTriggerStep={onTriggerStep} />
     <StyledHelpPanel bsStyle="warning">
       <Panel.Heading>
-        <Panel.Title componentClass="h3"><Icon name="exclamation-triangle" />Stop Opensearch</Panel.Title>
+        <Panel.Title componentClass="h3"><Icon name="exclamation-triangle" />Stop OpenSearch</Panel.Title>
       </Panel.Heading>
       <Panel.Body>
-        <p>Please stop your Opensearch cluster before proceeding.</p>
+        <p>Please stop your OpenSearch cluster before proceeding.</p>
       </Panel.Body>
     </StyledHelpPanel>
   </>
-
 );
+
 export default StopMessageProcessing;

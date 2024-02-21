@@ -31,7 +31,8 @@ import MigrationError from 'components/datanode/migrations/common/MigrationError
 type Props = {
     currentStep: MigrationState,
     onTriggerNextStep: (step: MigrationActions, args: StepArgs) => void,
-}
+};
+
 const StyledTitle = styled.h3`
   margin-bottom: 10px;
 
@@ -39,6 +40,7 @@ const StyledTitle = styled.h3`
     font-size: 80%;
   }
 `;
+
 const StyledPanelGroup = styled(PanelGroup)`
   &.panel-group > .panel {
     margin-top: 0;
@@ -91,9 +93,9 @@ const RollingUpgradeMigration = ({ currentStep, onTriggerNextStep }: Props) => {
 
   return (
     <Col>
-      <StyledTitle>Rolling upgrade migration.</StyledTitle>
-      <p>Follow these steps to migrate your existing migrating an existing OpenSearch 2.x or 1.3.x cluster to Data
-        Node
+      <StyledTitle>Rolling upgrade migration</StyledTitle>
+      <p>Follow these steps to migrate your existing OpenSearch version 2.x or 1.3.x cluster to the Data
+        Node.
       </p>
       <StyledPanelGroup accordion id="first" activeKey={activeStep} onSelect={() => {}}>
         {ROLLING_UPGRADE_MIGRATION_STEPS.map((rollingUpgradeStep, index) => {

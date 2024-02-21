@@ -30,6 +30,5 @@ const CertificateRenewalStep = ({ currentStep, onTriggerStep }: MigrationStepCom
     {(currentStep.next_steps.length <= 0) && (<p>Please create a certificate renewal policy before proceeding.</p>)}
     <MigrationStepTriggerButtonToolbar nextSteps={currentStep.next_steps} onTriggerStep={onTriggerStep} />
   </>
-
 );
 export default CertificateRenewalStep;
