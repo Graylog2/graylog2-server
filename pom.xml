@@ -148,7 +148,7 @@
         <kafka09.version>0.9.0.1-7</kafka09.version>
         <log4j.version>2.22.1</log4j.version>
         <lucene.version>9.9.2</lucene.version>
-        <metrics.version>4.1.9</metrics.version>
+        <metrics.version>4.2.25</metrics.version>
         <mongodb-driver.version>4.11.1</mongodb-driver.version>
         <mongojack.version>4.8.2</mongojack.version>
         <natty.version>0.13</natty.version>
@@ -406,6 +406,13 @@
                 <groupId>commons-net</groupId>
                 <artifactId>commons-net</artifactId>
                 <version>${commons-net.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.dropwizard.metrics</groupId>
+                <artifactId>metrics-bom</artifactId>
+                <version>${metrics.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
 
             <!-- Always check mongojack dependencies to see if we need to adjust our mongodb-driver dependencies -->

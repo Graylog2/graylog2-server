@@ -109,7 +109,7 @@ const ConfigurationWizard = ({ setIsWaitingForStartup }: Props) => {
 
   return (
     <Grid>
-      <Grid.Col span={12} md={6} orderMd={2}>
+      <Grid.Col span={{ base: 12, md: 6, orderMd: 2 }}>
         <List spacing="md"
               size="lg"
               center>
@@ -142,7 +142,7 @@ const ConfigurationWizard = ({ setIsWaitingForStartup }: Props) => {
         {' '}
         or <RestartConfigurationButton compact variant="light" color="red" /> the configuration
       </Grid.Col>
-      <Grid.Col span={12} md={6} orderMd={1}>
+      <Grid.Col span={{ base: 12, md: 6, orderMd: 1 }}>
         {activeStepKey === CONFIGURATION_STEPS.CA_CONFIGURATION.key && <CAConfiguration />}
         {activeStepKey === CONFIGURATION_STEPS.RENEWAL_POLICY_CONFIGURATION.key && <RenewalPolicyConfiguration />}
         {activeStepKey === CONFIGURATION_STEPS.CERTIFICATE_PROVISIONING.key && <CertificateProvisioning onSkipProvisioning={onSkipProvisioning} />}

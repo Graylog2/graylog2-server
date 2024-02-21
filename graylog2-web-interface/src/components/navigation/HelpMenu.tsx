@@ -25,7 +25,7 @@ import useHotkeysContext from 'hooks/useHotkeysContext';
 import Menu from 'components/bootstrap/Menu';
 
 const HelpMenuLinkItem = ({ href, children }: React.PropsWithChildren<{ href: string }>) => (
-  <Menu.Item component="a" href={href} target="_blank" icon={<Icon name="external-link-alt" />}>
+  <Menu.Item component="a" href={href} target="_blank" leftSection={<Icon name="external-link-alt" />}>
     {children}
   </Menu.Item>
 );
@@ -47,9 +47,9 @@ const HelpMenu = () => {
       </Menu.Item>
 
       {AppConfig.isCloud() && (
-      <HelpMenuLinkItem href={Routes.global_api_browser()}>
-        Cluster Global API browser
-      </HelpMenuLinkItem>
+        <HelpMenuLinkItem href={Routes.global_api_browser()}>
+          Cluster Global API browser
+        </HelpMenuLinkItem>
       )}
     </NavDropdown>
   );

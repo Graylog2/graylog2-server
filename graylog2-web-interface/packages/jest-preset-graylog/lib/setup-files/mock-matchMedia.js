@@ -14,18 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import styled from 'styled-components';
 
-import OriginalButtonGroup from './ButtonGroup';
-
-const StyledButtonToolbar = styled(OriginalButtonGroup)`
-  gap: 0.25em;
-`;
-
-const ButtonToolbar = (props: React.ComponentProps<typeof StyledButtonToolbar>) => (
-  <StyledButtonToolbar {...props} />
-);
-
-/** @component */
-export default ButtonToolbar;
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: jest.fn().mockImplementation((query) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: jest.fn(), // Deprecated
+    removeListener: jest.fn(), // Deprecated
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    dispatchEvent: jest.fn(),
+  })),
+});
