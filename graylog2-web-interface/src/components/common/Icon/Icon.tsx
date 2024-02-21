@@ -16,10 +16,9 @@
  */
 
 import React from 'react';
-import type { RotateProp } from '@fortawesome/fontawesome-svg-core';
 import styled, { css, keyframes } from 'styled-components';
 
-import type { SizeProp, IconName } from './types';
+import type { SizeProp, RotateProp, IconName } from './types';
 
 type IconTypes = 'regular' | 'solid';
 
@@ -67,7 +66,7 @@ type Props = {
   'data-testid'?: string,
   /** Name of Material Symbol icon */
   name: IconName,
-  rotation?: 90 | 180 | 270,
+  rotation?: RotateProp,
   size?: SizeProp,
   spin?: boolean,
   /**

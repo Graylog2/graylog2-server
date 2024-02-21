@@ -233,7 +233,7 @@ const WidgetActionsMenu = ({
                               parameters={parameters} />
         </IfDashboard>
         {isFocused && (
-          <IconButton name="adjust"
+          <IconButton name="fullscreen_exit"
                       title="Un-focus widget"
                       onClick={unsetWidgetFocusing} />
         )}
@@ -243,7 +243,7 @@ const WidgetActionsMenu = ({
                                      widgetType={widget.type}
                                      onStretch={onPositionsChange}
                                      position={position} />
-            <IconButton name="center_focus_strong"
+            <IconButton name="fullscreen"
                         title="Focus this widget"
                         onClick={focusWidget} />
           </>
