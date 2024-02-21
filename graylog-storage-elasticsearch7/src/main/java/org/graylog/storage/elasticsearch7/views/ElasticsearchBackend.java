@@ -45,6 +45,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.MultiSe
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.IndicesOptions;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.PlainActionFuture;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders;
@@ -56,6 +57,7 @@ import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.FieldTypeException;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
+import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,6 +72,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContext> {
@@ -258,7 +263,9 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 })
                 .collect(Collectors.toList());
 
-        final List<MultiSearchResponse.Item> results = client.msearch(searches, "Unable to perform search query: ");
+        //ES does not support per-request cancel_after_time_interval. We have to use simplified solution - the whole multi-search will be cancelled if it takes more than configured max. exec. time.
+        final PlainActionFuture<MultiSearchResponse> mSearchFuture = client.cancellableMsearch(searches);
+        final List<MultiSearchResponse.Item> results = getResults(mSearchFuture, job.getCancelAfterSeconds(), searches.size());
 
         for (SearchType searchType : query.searchTypes()) {
             final String searchTypeId = searchType.id();
@@ -305,6 +312,21 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 .searchTypes(resultsMap)
                 .errors(new HashSet<>(queryContext.errors()))
                 .build();
+    }
+
+    @NotNull
+    private static List<MultiSearchResponse.Item> getResults(PlainActionFuture<MultiSearchResponse> mSearchFuture,
+                                                             final Integer cancelAfterSeconds,
+                                                             final int numSearchTypes) {
+        try {
+            if (!SearchJob.NO_CANCELLATION.equals(cancelAfterSeconds)) {
+                return Arrays.asList(mSearchFuture.get(cancelAfterSeconds, TimeUnit.SECONDS).getResponses());
+            } else {
+                return Arrays.asList(mSearchFuture.get().getResponses());
+            }
+        } catch (TimeoutException | InterruptedException | ExecutionException e) {
+            return Collections.nCopies(numSearchTypes, new MultiSearchResponse.Item(null, e));
+        }
     }
 
     private Optional<ElasticsearchException> checkForFailedShards(MultiSearchResponse.Item multiSearchResponse) {

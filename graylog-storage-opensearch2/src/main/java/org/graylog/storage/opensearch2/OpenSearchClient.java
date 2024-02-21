@@ -21,6 +21,8 @@ import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Streams;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.graylog.shaded.opensearch2.org.apache.http.ContentTooLongException;
 import org.graylog.shaded.opensearch2.org.apache.http.client.config.RequestConfig;
 import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchException;
@@ -29,6 +31,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.search.MultiSearchRe
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.MultiSearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.action.support.PlainActionFuture;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
 import org.graylog.shaded.opensearch2.org.opensearch.client.ResponseException;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
@@ -41,10 +44,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -112,6 +111,20 @@ public class OpenSearchClient {
 
         return Streams.stream(result)
                 .collect(Collectors.toList());
+    }
+
+    public PlainActionFuture<MultiSearchResponse> cancellableMsearch(final List<SearchRequest> searchRequests) {
+        var multiSearchRequest = new MultiSearchRequest();
+
+        indexerMaxConcurrentSearches.ifPresent(multiSearchRequest::maxConcurrentSearchRequests);
+        indexerMaxConcurrentShardRequests.ifPresent(maxShardRequests -> searchRequests
+                .forEach(request -> request.setMaxConcurrentShardRequests(maxShardRequests)));
+
+        searchRequests.forEach(multiSearchRequest::add);
+
+        final PlainActionFuture<MultiSearchResponse> future = new PlainActionFuture<>();
+        client.msearchAsync(multiSearchRequest, requestOptions(), future);
+        return future;
     }
 
     private SearchResponse firstResponseFrom(MultiSearchResponse result, String errorMessage) {
