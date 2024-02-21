@@ -1,4 +1,4 @@
 type = "f"
 message = "OpenSearch renamed cluster.initial_master_nodes to initial_cluster_manager_nodes, which was not reflected yet and is a possible cause of startup bugs."
 
-pulls = ["18339"]
+pulls = ["18342"]
