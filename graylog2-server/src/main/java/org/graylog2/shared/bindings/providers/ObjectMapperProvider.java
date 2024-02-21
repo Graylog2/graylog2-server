@@ -37,6 +37,9 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.vdurmont.semver4j.Requirement;
 import com.vdurmont.semver4j.Semver;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNDeserializer;
 import org.graylog.grn.GRNKeyDeserializer;
@@ -45,6 +48,7 @@ import org.graylog2.database.ObjectIdSerializer;
 import org.graylog2.jackson.AutoValueSubtypeResolver;
 import org.graylog2.jackson.DeserializationProblemHandlerModule;
 import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
+import org.graylog2.jackson.JacksonModelValidator;
 import org.graylog2.jackson.JodaDurationCompatSerializer;
 import org.graylog2.jackson.JodaTimePeriodKeyDeserializer;
 import org.graylog2.jackson.SemverDeserializer;
@@ -68,11 +72,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
-import jakarta.inject.Singleton;
-
 import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
@@ -159,6 +158,7 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
                         .addDeserializer(GRN.class, new GRNDeserializer(grnRegistry))
                         .addDeserializer(EncryptedValue.class, new EncryptedValueDeserializer(encryptedValueService))
                         .setDeserializerModifier(inputConfigurationBeanDeserializerModifier)
+                        .setSerializerModifier(JacksonModelValidator.getBeanSerializerModifier())
                 );
 
         if (subtypes != null) {

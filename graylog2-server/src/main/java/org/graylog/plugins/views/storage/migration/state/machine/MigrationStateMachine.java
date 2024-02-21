@@ -32,4 +32,6 @@ public interface MigrationStateMachine {
     MigrationStateMachineContext getContext();
 
     String serialize();
+
+    void reset();
 }
