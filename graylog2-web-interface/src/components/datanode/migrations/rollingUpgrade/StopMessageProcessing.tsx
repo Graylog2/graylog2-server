@@ -15,15 +15,30 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import styled from 'styled-components';
 
 import MigrationStepTriggerButtonToolbar from 'components/datanode/migrations/common/MigrationStepTriggerButtonToolbar';
 import type { MigrationStepComponentProps } from 'components/datanode/Types';
+import { Panel } from 'components/bootstrap';
+import { Icon } from 'components/common';
+import { StyledPanel } from 'components/datanode/migrations/MigrationWelcomeStep';
 
+const StyledHelpPanel = styled(StyledPanel)`
+  margin-top: 30px;
+`;
 const StopMessageProcessing = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => (
   <>
     <p>Graylog processing is stopped.</p>
     <p />
     <MigrationStepTriggerButtonToolbar nextSteps={currentStep.next_steps} onTriggerStep={onTriggerStep} />
+    <StyledHelpPanel bsStyle="warning">
+      <Panel.Heading>
+        <Panel.Title componentClass="h3"><Icon name="exclamation-triangle" />Stop Opensearch</Panel.Title>
+      </Panel.Heading>
+      <Panel.Body>
+        <p>Please stop your Opensearch cluster before proceeding.</p>
+      </Panel.Body>
+    </StyledHelpPanel>
   </>
 
 );
