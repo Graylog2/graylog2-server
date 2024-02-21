@@ -79,10 +79,10 @@ type Props = {
   fixedWidth?: boolean,
   inverse?: boolean,
   style?: React.CSSProperties,
-  onClick?: (event: React.MouseEvent<SVGSVGElement>) => void,
-  onMouseEnter?: (event: React.MouseEvent<SVGSVGElement>) => void,
-  onMouseLeave?: (event: React.MouseEvent<SVGSVGElement>) => void,
-  onFocus?: (event: React.FocusEvent<SVGSVGElement>) => void,
+  onClick?: (event: React.MouseEvent) => void,
+  onMouseEnter?: (event: React.MouseEvent) => void,
+  onMouseLeave?: (event: React.MouseEvent) => void,
+  onFocus?: (event: React.FocusEvent) => void,
   tabIndex?: number,
   title?: string,
   flipHorizontal?: boolean,
@@ -111,38 +111,24 @@ const Icon = ({
   onFocus,
   tabIndex,
   title,
-}: Props) => {
-  return (
-    <StyledSpan className={`material-symbols-outlined ${className ?? ''}`}
-                data-testid={testId}
-                $rotation={rotation}
-                $flipHorizontal={flipHorizontal}
-                $size={size}
-                $fill={type === 'solid'}
-                $spin={spin}
-                style={style}>
-      {name}
-    </StyledSpan>
-  );
-
-  return (
-    <CustomFontAwesomeIcon className={className}
-                           data-testid={testId}
-                           fixedWidth={fixedWidth}
-                           icon={{ prefix, iconName }}
-                           inverse={inverse}
-                           rotation={rotation}
-                           size={size}
-                           spin={spin}
-                           style={style}
-                           onClick={onClick}
-                           onMouseEnter={onMouseEnter}
-                           onMouseLeave={onMouseLeave}
-                           tabIndex={tabIndex}
-                           title={title}
-                           onFocus={onFocus} />
-  );
-};
+}: Props) => (
+  <StyledSpan className={`material-symbols-outlined ${className ?? ''}`}
+              data-testid={testId}
+              onClick={onClick}
+              style={style}
+              title={title}
+              onFocus={onFocus}
+              onMouseEnter={onMouseEnter}
+              onMouseLeave={onMouseLeave}
+              tabIndex={tabIndex}
+              $rotation={rotation}
+              $flipHorizontal={flipHorizontal}
+              $size={size}
+              $fill={type === 'solid'}
+              $spin={spin}>
+    {name}
+  </StyledSpan>
+);
 
 Icon.defaultProps = {
   className: undefined,
