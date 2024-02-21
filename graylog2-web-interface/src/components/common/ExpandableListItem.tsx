@@ -48,7 +48,7 @@ const Toggle = styled.div`
   margin-right: 5px;
 `;
 
-const IconStack = styled.div(({ theme }) => css`
+const IconContainer = styled.div(({ theme }) => css`
   cursor: pointer;
   font-size: ${theme.fonts.size.large};
   line-height: 20px;
@@ -228,13 +228,18 @@ class ExpandableListItem extends React.Component<Props, State> {
     return (
       <ItemWrap $padded={padded}>
         <Container>
-          {selectable && <Checkbox inputRef={(ref) => { this._checkbox = ref; }} inline checked={checked} {...inputProps} />}
-          {expandable
-          && (
-            <Toggle>
-              <IconStack tabIndex={0} onClick={this._toggleExpand}>
-                <Icon name="expand_circle_down" />
-              </IconStack>
+          {selectable && (
+          <Checkbox inputRef={(ref) => { this._checkbox = ref; }}
+                    inline
+                    title="Select item"
+                    checked={checked}
+                    {...inputProps} />
+          )}
+          {expandable && (
+            <Toggle role="button" tabIndex={0} onClick={this._toggleExpand} title={`${expanded ? 'Shrink' : 'Expand'} list item`}>
+              <IconContainer>
+                <Icon name={expanded ? 'expand_circle_up' : 'expand_circle_down'} />
+              </IconContainer>
             </Toggle>
           )}
           <HeaderWrap className="header">

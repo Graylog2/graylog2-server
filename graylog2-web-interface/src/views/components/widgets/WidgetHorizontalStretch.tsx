@@ -82,7 +82,7 @@ const WidgetHorizontalStretch = ({ onStretch, position, widgetId, widgetType }: 
                       name={icon}
                       title={title}
                       $stretched={stretched}
-                      rotation={stretched ? 90 : 0} />
+                      rotation={stretched ? 90 : undefined} />
   );
 };
 
