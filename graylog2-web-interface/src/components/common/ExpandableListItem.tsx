@@ -49,26 +49,16 @@ const Toggle = styled.div`
 `;
 
 const IconStack = styled.div(({ theme }) => css`
-  
-    cursor: pointer;
-    font-size: ${theme.fonts.size.large};
-    line-height: 20px;
-    width: 1em;
-    height: 1em;
-    vertical-align: text-top;
+  cursor: pointer;
+  font-size: ${theme.fonts.size.large};
+  line-height: 20px;
+  width: 1em;
+  height: 1em;
+  vertical-align: text-top;
 
-    &:hover [class*='fa-'] {
-      color: ${theme.colors.variant.primary};
-      opacity: 1;
-    }
-
-
-  *:first-child {
-    opacity: 0;
-
-    ~ *:hover {
-      color: ${theme.colors.global.contentBackground};
-    }
+  &:hover {
+    color: ${theme.colors.variant.primary};
+    opacity: 1;
   }
 `);
 
@@ -243,8 +233,7 @@ class ExpandableListItem extends React.Component<Props, State> {
           && (
             <Toggle>
               <IconStack tabIndex={0} onClick={this._toggleExpand}>
-                <Icon name="circle" className="fa-stack-1x" />
-                <Icon name={`keyboard_arrow_${expanded ? 'down' : 'up'}`} className="fa-stack-1x" />
+                <Icon name="expand_circle_down" />
               </IconStack>
             </Toggle>
           )}
