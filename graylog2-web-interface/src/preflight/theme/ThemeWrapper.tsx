@@ -15,13 +15,20 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo } from 'react';
-import { useTheme } from 'styled-components';
-import { Global, MantineProvider } from '@mantine/core';
+import { createGlobalStyle, useTheme } from 'styled-components';
+import { MantineProvider } from '@mantine/core';
 import SawmillMantine from '@graylog/sawmill/mantine';
 
 type Props = {
   children: React.ReactElement,
 };
+
+const GlobalStyles = createGlobalStyle`
+  body {
+    background-color: ${(props) => props.theme.colors.global.background};
+    color: ${(props) => props.theme.colors.global.textDefault};
+  },
+`;
 
 const ThemeWrapper = ({ children }: Props) => {
   const theme = useTheme();
@@ -30,16 +37,9 @@ const ThemeWrapper = ({ children }: Props) => {
     [theme.mode],
   );
 
-  const globalStyles = () => ({
-    body: {
-      backgroundColor: theme.colors.global.background,
-      color: theme.colors.global.textDefault,
-    },
-  });
-
   return (
     <MantineProvider theme={mantineTheme}>
-      <Global styles={globalStyles} />
+      <GlobalStyles />
       {children}
     </MantineProvider>
   );

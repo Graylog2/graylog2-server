@@ -56,7 +56,9 @@ const UserMenu = () => {
       <LinkContainer to={route}>
         <Menu.Item>{label}</Menu.Item>
       </LinkContainer>
-      <Menu.Item onClick={onLogoutClicked} icon={<Icon name="logout" />}>Log out</Menu.Item>
+      <Menu.Item onClick={onLogoutClicked} leftSection={<Icon name="logout" />}>
+        Log out
+      </Menu.Item>
     </NavDropdown>
   );
 };

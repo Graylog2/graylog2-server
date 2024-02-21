@@ -15,10 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo } from 'react';
 import type { ColorVariant } from '@graylog/sawmill';
 import type { MantineTheme } from '@graylog/sawmill/mantine';
-import { Button as MantineButton, useMantineTheme } from '@mantine/core';
+import { Button as MantineButton } from '@mantine/core';
+import styled, { css } from 'styled-components';
 
 import type { BsSize } from 'components/bootstrap/types';
 
@@ -46,6 +46,84 @@ const styleProps = (style: StyleProps) => {
   }
 };
 
+const stylesForSize = (size: BsSize) => {
+  switch (size) {
+    case 'xs':
+    case 'xsmall':
+      return css`
+        height: 21.4141px;
+        padding: 1px 5px;
+      `;
+    case 'sm':
+    case 'small':
+      return css`
+        height: 29.4141px;
+        padding: 5px 10px;
+      `;
+    case 'lg':
+    case 'large':
+      return css`
+        height: 43.1641px;
+        padding: 10px 16px;
+      `;
+    case 'medium':
+    default:
+      return css`
+        height: 33.84px;
+        padding: 6px 12px;
+      `;
+  }
+};
+
+const disabledStyles = (other: MantineTheme['other'], style: StyleProps) => {
+  if (style === 'link') {
+    return '';
+  }
+
+  const colors = other.colors.disabled[style];
+
+  return css`
+    &:disabled,
+    &[data-disabled] {
+      pointer-events: all;
+      color: ${colors.color};
+      background-color: ${colors.background};
+      opacity: 0.65;
+    }
+  `;
+};
+
+const StyledButton = styled(MantineButton)<{
+  $bsStyle: StyleProps,
+  $bsSize: BsSize
+}>(({
+  theme,
+  $bsStyle,
+  $bsSize,
+}) => css`
+  color: ${theme.mantine.other.colors.contrast[$bsStyle]};
+  font-weight: 400;
+  overflow: visible;
+
+  ${disabledStyles(theme.mantine.other, $bsStyle)}
+  ${stylesForSize($bsSize)}
+
+  &:hover {
+    color: ${theme.mantine.other.colors.contrast[$bsStyle]};
+    text-decoration: none;
+  }
+
+  &:focus {
+    color: ${theme.mantine.other.colors.contrast[$bsStyle]};
+    text-decoration: none;
+  }
+
+  .mantine-Button-label {
+    gap: 0.25em;
+    overflow: visible;
+  }
+`);
+
 type Props = React.PropsWithChildren<{
   active?: boolean,
   'aria-label'?: string,
@@ -67,95 +145,24 @@ type Props = React.PropsWithChildren<{
   type?: 'button' | 'reset' | 'submit',
 }>;
 
-const stylesForSize = (size: BsSize) => {
-  switch (size) {
-    case 'xs':
-    case 'xsmall':
-      return {
-        height: '21.4141px',
-        padding: '1px 5px',
-      };
-    case 'sm':
-    case 'small':
-      return {
-        height: '29.4141px',
-        padding: '5px 10px',
-      };
-    case 'lg':
-    case 'large':
-      return {
-        height: '43.1641px',
-        padding: '10px 16px',
-      };
-    case 'medium':
-    default:
-      return {
-        height: '33.84px',
-        padding: '6px 12px',
-      };
-  }
-};
-
-type Other = MantineTheme['other'];
-
-const disabledStyles = (style: ColorVariant, other: Other) => {
-  const colors = other.colors.disabled[style];
-
-  return {
-    ':disabled': {
-      pointerEvents: 'all',
-      color: colors.color,
-      backgroundColor: colors.background,
-      opacity: '0.65',
-    },
-  };
-};
-
-const generateStyles = (other: Other, bsStyle: StyleProps, bsSize: BsSize, disabled: boolean) => {
-  const sizeStyles = stylesForSize(bsSize);
-  const disableStyles = (disabled && bsStyle !== 'link' ? disabledStyles(bsStyle, other) : {});
-
-  return {
-    root: {
-      ...sizeStyles,
-      color: other.colors.contrast[bsStyle],
-      fontWeight: 400,
-      ':disabled': disableStyles,
-      ':hover': {
-        color: other.colors.contrast[bsStyle],
-        textDecoration: 'none',
-      },
-      ':focus': {
-        color: other.colors.contrast[bsStyle],
-        textDecoration: 'none',
-      },
-    },
-    label: {
-      gap: '0.25em',
-      overflow: 'visible',
-    },
-  };
-};
-
 const Button = React.forwardRef<HTMLButtonElement, Props>(
   ({
     'aria-label': ariaLabel, bsStyle, bsSize, className, 'data-testid': dataTestId, id, onClick, disabled, href,
     title, form, target, type, rel, role, name, tabIndex, children,
   }, ref) => {
-    const theme = useMantineTheme();
     const style = mapStyle(bsStyle);
-    const styles = useMemo(() => generateStyles(theme.other, style, bsSize, disabled), [bsSize, disabled, style, theme.other]);
 
     const sharedProps = {
       id,
       'aria-label': ariaLabel,
       className,
       ...styleProps(style),
+      $bsStyle: style,
+      $bsSize: bsSize,
       'data-testid': dataTestId,
       disabled,
       role,
       size: sizeForMantine(bsSize),
-      styles,
       tabIndex,
       title,
       type,
@@ -163,25 +170,25 @@ const Button = React.forwardRef<HTMLButtonElement, Props>(
 
     if (href) {
       return (
-        <MantineButton component="a"
-                       href={href}
-                       target={target}
-                       rel={rel}
-                       onClick={onClick as (e: React.MouseEvent<HTMLAnchorElement>) => void}
-                       {...sharedProps}>
+        <StyledButton component="a"
+                      href={href}
+                      target={target}
+                      rel={rel}
+                      onClick={onClick as (e: React.MouseEvent<HTMLAnchorElement>) => void}
+                      {...sharedProps}>
           {children}
-        </MantineButton>
+        </StyledButton>
       );
     }
 
     return (
-      <MantineButton ref={ref}
-                     form={form}
-                     onClick={onClick as (e: React.MouseEvent<HTMLButtonElement>) => void}
-                     name={name}
-                     {...sharedProps}>
+      <StyledButton ref={ref}
+                    form={form}
+                    onClick={onClick as (e: React.MouseEvent<HTMLButtonElement>) => void}
+                    name={name}
+                    {...sharedProps}>
         {children}
-      </MantineButton>
+      </StyledButton>
     );
   });
 
