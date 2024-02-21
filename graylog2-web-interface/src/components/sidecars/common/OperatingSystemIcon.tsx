@@ -19,7 +19,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { Icon } from 'components/common';
-import BrandIcon from 'components/common/BrandIcon/BrandIcon';
+import BrandIcon from 'components/common/BrandIcon';
 
 const Container = styled.div`
   display: inline-block;
