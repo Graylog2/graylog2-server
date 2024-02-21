@@ -65,7 +65,7 @@ const SortIcon = <AscDirection extends string, DescDirection extends string>({
   className,
 }: Props<AscDirection, DescDirection>) => {
   const handleSortChange = useCallback(() => onChange(activeDirection), [activeDirection, onChange]);
-  const flipIcon = activeDirection === ascId && activeDirection !== descId;
+  const isAscSort = activeDirection === ascId && activeDirection !== descId;
 
   const sortActive = !!activeDirection;
 
@@ -75,7 +75,7 @@ const SortIcon = <AscDirection extends string, DescDirection extends string>({
                     type="button"
                     aria-label={title}
                     onClick={handleSortChange}>
-      <Icon name="sort" data-testid="sort-icon-svg" flipHorizontal={flipIcon} />
+      <Icon name="sort" data-testid="sort-icon-svg" flipHorizontal={isAscSort} className={`sort-icon-${isAscSort ? 'asc' : 'desc'}`} />
       {order && <Bulb>{order}</Bulb>}
     </StyledSortIcon>
   );

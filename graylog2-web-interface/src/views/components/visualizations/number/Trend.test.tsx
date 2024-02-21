@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen } from 'wrappedTestingLibrary';
+import { render, screen, within } from 'wrappedTestingLibrary';
 
 import Trend from './Trend';
 
@@ -156,21 +156,21 @@ describe('Trend', () => {
 
       const trendIcon = await screen.findByTestId('trend-icon');
 
-      expect(trendIcon).toHaveClass('fa-arrow-circle-right');
+      within(trendIcon).getByText('arrow_circle_right');
     });
 
     it('shows circle down if current values is lower', async () => {
       renderTrend({ current: 41 });
       const trendIcon = await screen.findByTestId('trend-icon');
 
-      expect(trendIcon).toHaveClass('fa-arrow-circle-down');
+      within(trendIcon).getByText('arrow_circle_down');
     });
 
     it('shows circle up if current values is higher', async () => {
       renderTrend({ current: 43 });
       const trendIcon = await screen.findByTestId('trend-icon');
 
-      expect(trendIcon).toHaveClass('fa-arrow-circle-up');
+      within(trendIcon).getByText('arrow_circle_up');
     });
   });
 });

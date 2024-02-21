@@ -58,10 +58,8 @@ const plugin: PluginRegistration = { exports: { visualizationTypes: [dataTable] 
 
 const selectEventConfig = { container: document.body };
 
-const addElement = async (key: 'Grouping' | 'Metric' | 'Sort') => {
-  await userEvent.click(await screen.findByRole('button', { name: 'Add' }));
-  await screen.findByRole('menu');
-  await userEvent.click(await screen.findByRole('menuitem', { name: key }));
+const addGrouping = async () => {
+  await userEvent.click(await screen.findByRole('button', { name: /add a grouping/i }));
 };
 
 const selectField = async (fieldName: string, groupingIndex: number = 0, fieldSelectLabel = 'Add a field') => {
@@ -117,7 +115,7 @@ describe('AggregationWizard', () => {
   it('should require group by function when adding a group by element', async () => {
     renderSUT();
 
-    await addElement('Grouping');
+    await addGrouping();
 
     await screen.findByText('Field is required.');
   }, extendedTimeout);
@@ -126,7 +124,7 @@ describe('AggregationWizard', () => {
     const onChange = jest.fn();
     renderSUT({ onChange });
 
-    await addElement('Grouping');
+    await addGrouping();
     await selectField('took_ms');
 
     await screen.findByText('took_ms');
@@ -149,7 +147,7 @@ describe('AggregationWizard', () => {
     const queryFields = Immutable.List([queryFieldTypeMapping]);
     renderSUT({ onChange, fieldTypesList: { all: fields, queryFields: Immutable.Map({ queryId: queryFields }) } });
 
-    await addElement('Grouping');
+    await addGrouping();
     await selectField('status_code');
     await screen.findByText('status_code');
     await submitWidgetConfigForm();
@@ -186,12 +184,12 @@ describe('AggregationWizard', () => {
     const onChange = jest.fn();
     renderSUT({ onChange });
 
-    await addElement('Grouping');
+    await addGrouping();
     await selectField('timestamp');
-    await addElement('Grouping');
+    await addGrouping();
     await selectField('took_ms', 1);
 
-    await screen.findByRole('checkbox', { name: 'Auto' });
+    await screen.findByRole('checkbox', { name: /auto/i });
 
     await submitWidgetConfigForm();
 
@@ -212,10 +210,10 @@ describe('AggregationWizard', () => {
     const onChange = jest.fn();
     renderSUT({ onChange });
 
-    await addElement('Grouping');
+    await addGrouping();
     await selectField('timestamp');
 
-    const autoCheckbox = await screen.findByRole('checkbox', { name: 'Auto' });
+    const autoCheckbox = await screen.findByRole('checkbox', { name: /auto/i });
     await screen.findByRole('slider', { name: /interval/i });
 
     await userEvent.click(autoCheckbox);
