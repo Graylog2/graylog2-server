@@ -89,8 +89,6 @@ const textResponseHandler = (resp: Response) => {
 export class Builder {
   private options = {};
 
-  private readonly controler: AbortController;
-
   private readonly url: string;
 
   private readonly method: string;
@@ -114,7 +112,6 @@ export class Builder {
 
     this.responseHandler = (response) => response;
     this.errorHandler = undefined;
-    this.controler = new AbortController();
   }
 
   setHeader(header, value) {
@@ -217,7 +214,6 @@ export class Builder {
       method: this.method,
       headers,
       body: this.body ? this.body.body : undefined,
-      signal: this.controler.signal,
     })).then(this.responseHandler, this.errorHandler)
       .catch(this.errorHandler);
   }
@@ -240,18 +236,6 @@ function queuePromiseIfNotLoggedin<T>(promise: () => Promise<T>): () => Promise<
 type Method = 'GET' | 'PUT' | 'POST' | 'DELETE';
 
 export default function fetch<T = any>(method: Method, url: string, body?: any, requireSession: boolean = true): Promise<T> {
-  const promise = () => new Builder(method, url)
-    .json(body)
-    .build();
-
-  if (requireSession) {
-    return queuePromiseIfNotLoggedin(promise)();
-  }
-
-  return promise();
-}
-
-export function abortableFetch<T = any>(method: Method, url: string, body?: any, requireSession: boolean = true): Promise<T> {
   const promise = () => new Builder(method, url)
     .json(body)
     .build();
