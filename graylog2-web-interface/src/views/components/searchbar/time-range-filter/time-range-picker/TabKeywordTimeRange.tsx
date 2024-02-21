@@ -30,7 +30,6 @@ import type { KeywordTimeRange } from 'views/logic/queries/Query';
 import useUserDateTime from 'hooks/useUserDateTime';
 import { InputDescription } from 'components/common';
 import debounceWithPromise from 'views/logic/debounceWithPromise';
-import type FetchError from 'logic/errors/FetchError';
 
 import { EMPTY_RANGE } from '../TimeRangeDisplay';
 
