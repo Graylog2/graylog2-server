@@ -29,8 +29,8 @@ const Welcome = ({ currentStep, onTriggerStep } : MigrationStepComponentProps) =
   return (
     <>
       <h3>Welcome</h3>
-      <p>Using the Remote Reindexing will allow you to move the datanode by reindexing the data in your existing cluster to the datanode cluster.</p>
-      <p>To start please install Data Node on every OS/ES node from you previous setup. You can fing more information on how to download and install the Data Node  <DocumentationLink page="graylog-data-node" text="here" />.</p>
+      <p>Using the Remote Reindexing will allow you to move the Data Node by reindexing the data in your existing cluster to the Data Node cluster.</p>
+      <p>To start please install Data Node on every OS/ES node from your previous setup. You can find more information on how to download and install the Data Node  <DocumentationLink page="graylog-data-node" text="here" />.</p>
       <MigrationDatanodeList />
       <MigrationStepTriggerButtonToolbar disabled={dataNodes?.elements?.length <= 0} nextSteps={currentStep.next_steps} onTriggerStep={onTriggerStep} />
     </>

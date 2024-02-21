@@ -52,12 +52,12 @@ const MigrationWelcomeStep = ({ currentStep, onTriggerStep }: Props) => (
   <Row>
     <Col md={6}>
       <MigrationError errorMessage={currentStep.error_message} />
-      <Headline>Migration to Data Node !</Headline>
+      <Headline>Migration to Data Node</Headline>
       <p>
         It looks like you updated Graylog and want to configure a Data Node. Data Nodes allow you to index and search through all the messages in your Graylog message database.
       </p>
       <p>
-        Using this migration tool you can check the compatibility and follow the steps to migrate your exsisting OpenSearch data to a Data Node.<br />
+        Using this migration tool you can check the compatibility and follow the steps to migrate your existing OpenSearch data to a Data Node.<br />
       </p>
       <p>Migrating to Data Node requires some steps the are performed using the UI in this wizard, but it also requires some additional steps that should be performed on the OS, your current OS/ES cluster and your config files.</p>
       <p>You can get more information on the Data Node migration <DocumentationLink page="graylog-data-node" text="documentation" />.</p>
