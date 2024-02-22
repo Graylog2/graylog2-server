@@ -27,6 +27,7 @@ import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
+import SearchExplainContext from 'views/components/contexts/SearchExplainContext';
 import TimerangeInfo from 'views/components/widgets/TimerangeInfo';
 import IfDashboard from 'views/components/dashboard/IfDashboard';
 import type WidgetConfig from 'views/logic/widgets/WidgetConfig';
@@ -43,6 +44,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
+import useView from 'views/hooks/useView';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
@@ -52,6 +54,7 @@ import ErrorWidget from './ErrorWidget';
 import WidgetColorContext from './WidgetColorContext';
 import WidgetErrorBoundary from './WidgetErrorBoundary';
 import WidgetActionsMenu from './WidgetActionsMenu';
+import WarmTierAlert from './WarmTierAlert';
 
 import InteractiveContext from '../contexts/InteractiveContext';
 
@@ -239,10 +242,21 @@ const Widget = ({ id, editing, widget, title, position, onPositionsChange }: Pro
 
   const { config } = widget;
   const isFocused = focusedWidget?.id === id;
+  const { getExplainForWidget } = useContext(SearchExplainContext);
+
+  const view = useView();
+  const explainedWidget = getExplainForWidget(activeQuery, id, view.widgetMapping);
+
+  const isWidgetInWarmTier = () => (
+    explainedWidget?.searched_index_ranges.some((range) => range.is_warm_tiered)
+  );
 
   return (
     <WidgetColorContext id={id}>
       <WidgetFrame widgetId={id}>
+        {isWidgetInWarmTier() && (
+        <WarmTierAlert />
+        )}
         <InteractiveContext.Consumer>
           {(interactive) => (
             <WidgetHeader title={title}

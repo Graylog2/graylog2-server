@@ -36,13 +36,12 @@ const trackJobStatus = (job: SearchJobType): Promise<SearchJobType> => new Promi
   }
 });
 
-const executeSearch = (
+export const buildSearchExecutionState = (
   view: View,
   widgetsToSearch: string[],
   executionStateParam: SearchExecutionState,
-  keepQueries: string[] = [],
-): Promise<SearchExecutionResult> => {
-  const { widgetMapping, search } = view;
+  keepQueries: string[] = []): SearchExecutionState => {
+  const { widgetMapping } = view;
 
   const globalOverride = (executionStateParam.globalOverride ?? GlobalOverride.empty()).toBuilder()
     .keepQueries(keepQueries)
@@ -58,7 +57,18 @@ const executeSearch = (
     executionStateBuilder = executionStateBuilder.globalOverride(newGlobalOverride);
   }
 
-  const executionState = executionStateBuilder.build();
+  return executionStateBuilder.build();
+};
+
+const executeSearch = (
+  view: View,
+  widgetsToSearch: string[],
+  executionStateParam: SearchExecutionState,
+  keepQueries: string[] = [],
+): Promise<SearchExecutionResult> => {
+  const { widgetMapping, search } = view;
+
+  const executionState = buildSearchExecutionState(view, widgetsToSearch, executionStateParam, keepQueries);
 
   return runSearchJob(search, executionState)
     .then((job) => trackJobStatus(job))
