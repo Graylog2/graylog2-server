@@ -100,11 +100,12 @@ public class OpensearchCommandLineProcess implements Closeable {
     }
 
     private void configureS3RepositoryPlugin(OpensearchConfiguration config) {
-        if (config.s3RepositoryConfiguration() == null) {
+        if (config.s3RepositoryConfiguration().isRepositoryEnabled()) {
+            installPlugin(config);
+            configureS3Credentials(config);
+        } else {
             LOG.info("No S3 repository configuration provided, skipping plugin initialization");
         }
-        installPlugin(config);
-        configureS3Credentials(config);
     }
 
     private void configureS3Credentials(OpensearchConfiguration config) {
