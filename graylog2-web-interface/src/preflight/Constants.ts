@@ -32,6 +32,10 @@ export const CONFIGURATION_STEPS = {
     key: 'CONFIGURATION_FINISHED',
     description: 'Configuration finished',
   },
+  DATA_MIGRATION: {
+    key: 'DATA_MIGRATION',
+    description: 'Migrate data from existing node',
+  },
 } as const;
 
 export const CONFIGURATION_STEPS_ORDER = [
@@ -39,6 +43,7 @@ export const CONFIGURATION_STEPS_ORDER = [
   CONFIGURATION_STEPS.RENEWAL_POLICY_CONFIGURATION.key,
   CONFIGURATION_STEPS.CERTIFICATE_PROVISIONING.key,
   CONFIGURATION_STEPS.CONFIGURATION_FINISHED.key,
+  CONFIGURATION_STEPS.DATA_MIGRATION.key,
 ];
 
 export const DATA_NODES_STATUS = {

@@ -64,7 +64,7 @@ describe('useConfigurationStep', () => {
       isInitialLoading: true,
     });
 
-    const { result, waitFor } = renderHook(() => useConfigurationStep({ isSkippingProvisioning: false }));
+    const { result, waitFor } = renderHook(() => useConfigurationStep({ isSkippingProvisioning: false, shouldMigrateData: false }));
 
     await waitFor(() => expect(result.current.isLoading).toBe(true));
   });
@@ -75,7 +75,7 @@ describe('useConfigurationStep', () => {
       isInitialLoading: true,
     });
 
-    const { result, waitFor } = renderHook(() => useConfigurationStep({ isSkippingProvisioning: false }));
+    const { result, waitFor } = renderHook(() => useConfigurationStep({ isSkippingProvisioning: false, shouldMigrateData: false }));
 
     await waitFor(() => expect(result.current.isLoading).toBe(true));
   });
@@ -86,7 +86,7 @@ describe('useConfigurationStep', () => {
       data: undefined,
     });
 
-    const { result, waitFor } = renderHook(() => useConfigurationStep({ isSkippingProvisioning: false }));
+    const { result, waitFor } = renderHook(() => useConfigurationStep({ isSkippingProvisioning: false, shouldMigrateData: false }));
 
     await waitFor(() => expect(result.current).toEqual({
       step: CONFIGURATION_STEPS.CA_CONFIGURATION.key,
@@ -101,7 +101,7 @@ describe('useConfigurationStep', () => {
       data: { id: 'ca-id', type: 'ca-type' },
     });
 
-    const { result, waitFor } = renderHook(() => useConfigurationStep({ isSkippingProvisioning: false }));
+    const { result, waitFor } = renderHook(() => useConfigurationStep({ isSkippingProvisioning: false, shouldMigrateData: false }));
 
     await waitFor(() => expect(result.current).toEqual({
       step: CONFIGURATION_STEPS.RENEWAL_POLICY_CONFIGURATION.key,
@@ -141,7 +141,7 @@ describe('useConfigurationStep', () => {
       },
     });
 
-    const { result, waitFor } = renderHook(() => useConfigurationStep({ isSkippingProvisioning: false }));
+    const { result, waitFor } = renderHook(() => useConfigurationStep({ isSkippingProvisioning: false, shouldMigrateData: false }));
 
     await waitFor(() => expect(result.current).toEqual({
       step: CONFIGURATION_STEPS.CERTIFICATE_PROVISIONING.key,
@@ -164,7 +164,7 @@ describe('useConfigurationStep', () => {
       },
     });
 
-    const { result, waitFor } = renderHook(() => useConfigurationStep({ isSkippingProvisioning: true }));
+    const { result, waitFor } = renderHook(() => useConfigurationStep({ isSkippingProvisioning: true, shouldMigrateData: false }));
 
     await waitFor(() => expect(result.current).toEqual({
       step: CONFIGURATION_STEPS.CONFIGURATION_FINISHED.key,
@@ -204,7 +204,7 @@ describe('useConfigurationStep', () => {
       },
     });
 
-    const { result, waitFor } = renderHook(() => useConfigurationStep({ isSkippingProvisioning: false }));
+    const { result, waitFor } = renderHook(() => useConfigurationStep({ isSkippingProvisioning: false, shouldMigrateData: false }));
 
     await waitFor(() => expect(result.current).toEqual({
       step: CONFIGURATION_STEPS.CONFIGURATION_FINISHED.key,

@@ -16,16 +16,17 @@
  */
 import * as React from 'react';
 
-import { Title, Space, Button } from 'preflight/components/common';
+import { Title, Space, Button, Group } from 'preflight/components/common';
 import ResumeStartupButton from 'preflight/components/ResumeStartupButton';
 
 type Props = {
   isSkippingProvisioning: boolean,
   setIsWaitingForStartup: React.Dispatch<React.SetStateAction<boolean>>,
   setIsSkippingProvisioning: React.Dispatch<React.SetStateAction<boolean>>,
+  setShouldMigrateData: React.Dispatch<React.SetStateAction<boolean>>,
 }
 
-const ConfigurationFinished = ({ setIsWaitingForStartup, isSkippingProvisioning, setIsSkippingProvisioning }: Props) => {
+const ConfigurationFinished = ({ setIsWaitingForStartup, isSkippingProvisioning, setIsSkippingProvisioning, setShouldMigrateData }: Props) => {
   const description = isSkippingProvisioning
     ? (
       <>
@@ -41,7 +42,12 @@ const ConfigurationFinished = ({ setIsWaitingForStartup, isSkippingProvisioning,
       <Title order={3}>Configuration finished</Title>
       <p>{description}</p>
       <Space h="md" />
-      <ResumeStartupButton setIsWaitingForStartup={setIsWaitingForStartup} />
+      <Group>
+        <ResumeStartupButton setIsWaitingForStartup={setIsWaitingForStartup} variant="light" />
+        <Button size="xs" onClick={() => setShouldMigrateData(true)}>
+          Migrate Data
+        </Button>
+      </Group>
     </div>
   );
 };
