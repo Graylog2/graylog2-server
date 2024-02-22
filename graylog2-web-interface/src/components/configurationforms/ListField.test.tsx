@@ -17,6 +17,7 @@
 import React from 'react';
 import { screen, render, waitFor } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
+import userEvent from '@testing-library/user-event';
 
 import { creatableListField, listField } from 'fixtures/configurationforms';
 
@@ -83,14 +84,15 @@ describe('<ListField>', () => {
   it('should call onChange when clearing values', async () => {
     const updateFunction = jest.fn();
 
-    render(
+    const { container } = render(
       <SUT onChange={updateFunction}
            value={['one']} />,
     );
 
-    const select = screen.getByLabelText(listField.human_name, { exact: false });
+    // eslint-disable-next-line testing-library/no-container,testing-library/no-node-access
+    const clearIcons = container.querySelectorAll('.list-field-select svg[aria-hidden="true"]');
+    userEvent.click(clearIcons[clearIcons.length - 1]);
 
-    await selectEvent.clearAll(select);
     await waitFor(() => expect(updateFunction).toHaveBeenCalledWith('example_list_field', []));
   });
 
