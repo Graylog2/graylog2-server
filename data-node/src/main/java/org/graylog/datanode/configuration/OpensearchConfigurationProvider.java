@@ -36,7 +36,6 @@ import jakarta.inject.Named;
 import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
@@ -54,6 +53,7 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
     private final byte[] signingKey;
     private final NodeService<DataNodeDto> nodeService;
     private final PreflightConfigService preflightConfigService;
+    private final S3RepositoryConfiguration s3RepositoryConfiguration;
 
     @Inject
     public OpensearchConfigurationProvider(final Configuration localConfiguration,
@@ -63,7 +63,8 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
                                            final InSecureConfiguration inSecureConfiguration,
                                            final NodeService<DataNodeDto> nodeService,
                                            final PreflightConfigService preflightConfigService,
-                                           final @Named("password_secret") String passwordSecret) {
+                                           final @Named("password_secret") String passwordSecret,
+                                           final S3RepositoryConfiguration s3RepositoryConfiguration) {
         this.localConfiguration = localConfiguration;
         this.datanodeConfiguration = datanodeConfiguration;
         this.uploadedCertFilesSecureConfiguration = uploadedCertFilesSecureConfiguration;
@@ -72,6 +73,7 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
         this.signingKey = passwordSecret.getBytes(StandardCharsets.UTF_8);
         this.nodeService = nodeService;
         this.preflightConfigService = preflightConfigService;
+        this.s3RepositoryConfiguration = s3RepositoryConfiguration;
     }
 
     private boolean isPreflight() {
@@ -125,27 +127,12 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
                     List.of("cluster_manager", "data", "ingest", "remote_cluster_client", "search"),
                     localConfiguration.getOpensearchDiscoverySeedHosts(),
                     securityConfiguration,
-                    getS3RepositoryConfiguration(localConfiguration),
+                    s3RepositoryConfiguration,
+                    localConfiguration.getNodeSearchCacheSize(),
                     opensearchProperties.build()
             );
         } catch (GeneralSecurityException | KeyStoreStorageException | IOException e) {
             throw new OpensearchConfigurationException(e);
-        }
-    }
-
-    @Nullable
-    private S3RepositoryConfiguration getS3RepositoryConfiguration(Configuration localConfiguration) {
-        if (localConfiguration.getS3ClientUser() != null && localConfiguration.getS3ClientPassword() != null) {
-            return new S3RepositoryConfiguration(
-                    localConfiguration.getS3ClientDefaultProtocol(),
-                    localConfiguration.getS3ClientDefaultEndpoint(),
-                    localConfiguration.getS3ClientDefaultRegion(),
-                    localConfiguration.isS3ClientDefaultPathStyleAccess(),
-                    localConfiguration.getS3ClientUser(),
-                    localConfiguration.getS3ClientPassword()
-            );
-        } else {
-            return null;
         }
     }
 

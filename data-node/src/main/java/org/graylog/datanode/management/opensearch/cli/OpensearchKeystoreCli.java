@@ -28,7 +28,7 @@ public class OpensearchKeystoreCli extends AbstractOpensearchCli {
         return run("create");
     }
 
-    public void add(String key, String value) {
-        run(Collections.singletonList(value), "add", key);
+    public void add(String key, String secretValue) {
+        run(Collections.singletonList(secretValue), "add", key);
     }
 }

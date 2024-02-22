@@ -21,7 +21,6 @@ import com.github.joschi.jadconfig.ParameterException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.Validator;
 import com.github.joschi.jadconfig.ValidatorMethod;
-import com.github.joschi.jadconfig.converters.BooleanConverter;
 import com.github.joschi.jadconfig.converters.IntegerConverter;
 import com.github.joschi.jadconfig.converters.StringListConverter;
 import com.github.joschi.jadconfig.converters.StringSetConverter;
@@ -242,25 +241,8 @@ public class Configuration extends BaseConfiguration {
     private String metricsPolicy = "gl-datanode-metrics-ism";
 
 
-    @Parameter(value = "s3_client_user")
-    private String s3ClientUser;
-
-    @Parameter(value = "s3_client_password")
-    private String s3ClientPassword;
-
-    @Parameter(value = "s3_client_default_protocol")
-    private String s3ClientDefaultProtocol = "http";
-
-    @Parameter(value = "s3_client_default_endpoint")
-    private String s3ClientDefaultEndpoint = "MinIO:9000";
-
-    @Parameter(value = "s3_client_default_region")
-    private String s3ClientDefaultRegion = "us-east-2";
-
-    @Parameter(value = "s3_client_default_region", converter = BooleanConverter.class)
-    private boolean s3ClientDefaultPathStyleAccess = true;
-
-
+    @Parameter(value = "node_search_cache_size")
+    private String searchCacheSize = "10m";
 
     public boolean isInsecureStartup() {
         return insecureStartup;
@@ -657,27 +639,7 @@ public class Configuration extends BaseConfiguration {
         return rootPasswordSha2;
     }
 
-    public String getS3ClientUser() {
-        return s3ClientUser;
-    }
-
-    public String getS3ClientPassword() {
-        return s3ClientPassword;
-    }
-
-    public String getS3ClientDefaultProtocol() {
-        return s3ClientDefaultProtocol;
-    }
-
-    public String getS3ClientDefaultEndpoint() {
-        return s3ClientDefaultEndpoint;
-    }
-
-    public String getS3ClientDefaultRegion() {
-        return s3ClientDefaultRegion;
-    }
-
-    public boolean isS3ClientDefaultPathStyleAccess() {
-        return s3ClientDefaultPathStyleAccess;
+    public String getNodeSearchCacheSize() {
+        return searchCacheSize;
     }
 }

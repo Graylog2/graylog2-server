@@ -41,6 +41,8 @@ public record OpensearchConfiguration(
         List<String> discoverySeedHosts,
         OpensearchSecurityConfiguration opensearchSecurityConfiguration,
         S3RepositoryConfiguration s3RepositoryConfiguration,
+
+        String nodeSearchCacheSize,
         Map<String, String> additionalConfiguration
 ) {
     public Map<String, String> asMap() {
@@ -75,9 +77,9 @@ public record OpensearchConfiguration(
 
         config.put("discovery.seed_providers", "file");
 
-        config.put("node.search.cache.size", "10mb");
-        if(s3RepositoryConfiguration != null) {
-            config.putAll(s3RepositoryConfiguration.getProperties());
+        config.put("node.search.cache.size", nodeSearchCacheSize);
+        if(s3RepositoryConfiguration.isRepositoryEnabled()) {
+            config.putAll(s3RepositoryConfiguration.toOpensearchProperties());
         }
 
         config.putAll(additionalConfiguration);

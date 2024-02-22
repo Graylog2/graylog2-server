@@ -170,6 +170,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
                 original.discoverySeedHosts(),
                 original.opensearchSecurityConfiguration(),
                 original.s3RepositoryConfiguration(),
+                original.nodeSearchCacheSize(),
                 finalAdditionalConfig);
 
         if (config.securityConfigured()) {

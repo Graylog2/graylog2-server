@@ -54,8 +54,8 @@ public class DatanodeSearchableSnapshotsIT {
         s3Container.start();
 
         datanode = new DatanodeContainerizedBackend(network, mongoDB, "datanode", datanodeContainer -> {
-            datanodeContainer.withEnv("GRAYLOG_DATANODE_S3_CLIENT_USER", s3Container.getAccessKey());
-            datanodeContainer.withEnv("GRAYLOG_DATANODE_S3_CLIENT_PASSWORD", s3Container.getSecretKey());
+            datanodeContainer.withEnv("GRAYLOG_DATANODE_S3_CLIENT_DEFAULT_ACCESS_KEY", s3Container.getAccessKey());
+            datanodeContainer.withEnv("GRAYLOG_DATANODE_S3_CLIENT_DEFAULT_SECRET_KEY", s3Container.getSecretKey());
             datanodeContainer.withEnv("GRAYLOG_DATANODE_S3_CLIENT_DEFAULT_ENDPOINT", s3Container.getInternalURI().toString());
         });
         datanode.start();

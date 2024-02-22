@@ -112,11 +112,9 @@ public class OpensearchCommandLineProcess implements Closeable {
         LOG.info("Creating opensearch keystore");
         final String createdMessage = opensearchKeystoreCli.create();
         LOG.info(createdMessage);
-        LOG.info("Setting opensearch keystore secrets");
-        opensearchKeystoreCli.add("s3.client.default.access_key", config.s3RepositoryConfiguration().username());
-        opensearchKeystoreCli.add("s3.client.default.secret_key", config.s3RepositoryConfiguration().password());
-        //echo user | ./bin/opensearch-keystore add s3.client.default.access_key
-        //echo password | ./bin/opensearch-keystore add s3.client.default.secret_key
+        LOG.info("Setting opensearch s3 repository keystore secrets");
+        opensearchKeystoreCli.add("s3.client.default.access_key", config.s3RepositoryConfiguration().getS3ClientDefaultAccessKey());
+        opensearchKeystoreCli.add("s3.client.default.secret_key", config.s3RepositoryConfiguration().getS3ClientDefaultSecretKey());
     }
 
 

@@ -16,18 +16,53 @@
  */
 package org.graylog.datanode.configuration;
 
+import com.github.joschi.jadconfig.Parameter;
+import com.github.joschi.jadconfig.converters.BooleanConverter;
+import org.apache.logging.log4j.util.Strings;
+
 import java.util.Map;
 
-public record S3RepositoryConfiguration(String protocol, String endpoint, String region, boolean pathStyleAccess,
-                                        String username, String password) {
+public class S3RepositoryConfiguration {
+
+    @Parameter(value = "s3_client_default_access_key")
+    private String s3ClientDefaultAccessKey;
+
+    @Parameter(value = "s3_client_default_secret_key")
+    private String s3ClientDefaultSecretKey;
+
+    @Parameter(value = "s3_client_default_protocol")
+    private String s3ClientDefaultProtocol = "http";
+
+    @Parameter(value = "s3_client_default_endpoint")
+    private String s3ClientDefaultEndpoint;
+
+    @Parameter(value = "s3_client_default_region")
+    private String s3ClientDefaultRegion = "us-east-2";
+
+    @Parameter(value = "s3_client_default_region", converter = BooleanConverter.class)
+    private boolean s3ClientDefaultPathStyleAccess = true;
 
 
-    public Map<String, String> getProperties() {
+    public Map<String, String> toOpensearchProperties() {
         return Map.of(
-                "s3.client.default.protocol", protocol,
-                "s3.client.default.endpoint", endpoint,
-                "s3.client.default.region", region,
-                "s3.client.default.path_style_access", String.valueOf(pathStyleAccess)
+                "s3.client.default.protocol", s3ClientDefaultProtocol,
+                "s3.client.default.endpoint", s3ClientDefaultEndpoint,
+                "s3.client.default.region", s3ClientDefaultRegion,
+                "s3.client.default.path_style_access", String.valueOf(s3ClientDefaultPathStyleAccess)
         );
+    }
+
+    public String getS3ClientDefaultAccessKey() {
+        return s3ClientDefaultAccessKey;
+    }
+
+    public String getS3ClientDefaultSecretKey() {
+        return s3ClientDefaultSecretKey;
+    }
+
+    public boolean isRepositoryEnabled() {
+        return Strings.isNotBlank(s3ClientDefaultEndpoint) &&
+                Strings.isNotBlank(s3ClientDefaultAccessKey) &&
+                Strings.isNotBlank(s3ClientDefaultSecretKey);
     }
 }
