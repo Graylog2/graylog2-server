@@ -17,7 +17,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
-type IconName = 'apple' | 'windows' | 'linux' | 'freebsd' | 'github';
+type IconName = 'apple' | 'freebsd' | 'github' | 'linux' | 'windows';
 
 const Container = styled.div`
   padding: 3px;

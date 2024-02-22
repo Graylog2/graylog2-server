@@ -18,7 +18,7 @@
 import React from 'react';
 import styled, { css, keyframes } from 'styled-components';
 
-import type { SizeProp, RotateProp, IconName } from './types';
+import type { SizeProp, RotateProp, IconName, FlipProp } from './types';
 
 type IconTypes = 'regular' | 'solid';
 
@@ -46,18 +46,18 @@ const StyledSpan = styled.span<{
   $size: string,
   $spin: boolean,
   $rotation: RotateProp
-  $flipHorizontal: boolean,
+  $flip: FlipProp,
   $fill: boolean
 }>(({
   $size,
   $spin,
   $rotation,
-  $flipHorizontal,
+  $flip,
   $fill,
 }) => css`
   font-variation-settings: 'opsz' 48, 'wght' 700 ${$fill ? ", 'FILL' 1" : ''};
   font-size: ${sizeMap[$size] ?? '1.15em'};
-  transform: rotate(${$rotation}deg) scaleY(${$flipHorizontal ? -1 : 1});
+  transform: rotate(${$rotation}deg) scaleY(${$flip === 'horizontal' || $flip === 'both' ? -1 : 1}) scaleX(${$flip === 'vertical' || $flip === 'both' ? -1 : 1});
   animation: ${$spin ? css`${spinAnimation} 2s infinite linear` : 'none'};
 `);
 
@@ -82,12 +82,13 @@ type Props = {
   onFocus?: (event: React.FocusEvent) => void,
   tabIndex?: number,
   title?: string,
-  flipHorizontal?: boolean,
+  flip?: FlipProp,
 }
 
 /**
  * Component that renders an icon or glyph.
  * Uses Material Symbols: https://fonts.google.com/icons
+ * Have a look at the `BrandIcon` component for brand icons.
  */
 const Icon = ({
   name,
@@ -96,7 +97,7 @@ const Icon = ({
   className,
   rotation,
   spin,
-  flipHorizontal,
+  flip,
   style,
   'data-testid': testId,
   onClick,
@@ -116,7 +117,7 @@ const Icon = ({
               onMouseLeave={onMouseLeave}
               tabIndex={tabIndex}
               $rotation={rotation}
-              $flipHorizontal={flipHorizontal}
+              $flip={flip}
               $size={size}
               $fill={type === 'solid'}
               $spin={spin}>
@@ -127,7 +128,7 @@ const Icon = ({
 Icon.defaultProps = {
   className: undefined,
   'data-testid': undefined,
-  flipHorizontal: false,
+  flip: undefined,
   rotation: 0,
   size: undefined,
   spin: false,

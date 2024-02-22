@@ -1,12 +1,15 @@
 Examples:
 ```js
-<p><strong>Default:</strong> <Icon name="pencil-alt" /></p>
+<p><strong>Default:</strong> <Icon name="edit_square" /></p>
 
 <p><strong>Spinning:</strong> <Icon name="sync" spin /></p>
 
-<p><strong>Pulsing:</strong> <Icon name="progress_activity" pulse /></p>
-
-<p><strong>Rotate:</strong> <Icon name="drag_indicator" rotate="90" /></p>
+<p>
+  <strong>Rotate:</strong>{' '}
+  <Icon name="description" rotation={90} />{' '}
+  <Icon name="description" rotation={180} />{' '}
+  <Icon name="description" rotation={270} />
+</p>
 
 <p>
   <strong>Sizeable:</strong>{' '}
@@ -18,17 +21,14 @@ Examples:
 </p>
 
 <p>
-  <strong>Flipped:</strong>{' '}
-  <Icon name="hand-paper" flip="horizontal" />{' '}<Icon name="hand-paper" />
+  <strong>Filled:</strong>{' '}
+  <Icon name="edit_square" type="solid" />
 </p>
 
 <p>
-  <strong>Outlined:</strong>{' '}
-  <Icon name="star" type="regular" />{' '}<Icon name="hand-paper" type="regular" />
-</p>
-
-<p>
-  <strong>Brand:</strong>{' '}
-  <Icon name="github" type="brand" />
+  <strong>Filled:</strong>{' '}
+  <Icon name="edit_square" flip="horizontal" />
+  <Icon name="edit_square" flip="vertical" />
+  <Icon name="edit_square" flip="both" />
 </p>
 ```

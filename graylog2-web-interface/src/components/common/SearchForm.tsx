@@ -270,7 +270,7 @@ SearchForm.propTypes = {
    *
    * **Note:** Due to size constraints rendering this component inside the input,
    * this component should contain very little text and should be very light. For
-   * instance, a `Button` component with `bsStyle="link"` and a font-awesome icon
+   * instance, a `Button` component with `bsStyle="link"` and an icon
    * inside would work just fine.
    */
   queryHelpComponent: PropTypes.element,
