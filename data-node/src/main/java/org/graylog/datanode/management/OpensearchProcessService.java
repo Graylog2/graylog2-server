@@ -54,12 +54,9 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     private final OpensearchProcess process;
     private final Provider<OpensearchConfiguration> configurationProvider;
     private final EventBus eventBus;
-    private final NodeService<DataNodeDto> nodeService;
     private final NodeId nodeId;
     private final DataNodeProvisioningService dataNodeProvisioningService;
     private final IndexFieldTypesService indexFieldTypesService;
-    private final ObjectMapper objectMapper;
-    private final ProcessStateMachine processStateMachine;
     private final ClusterEventBus clusterEventBus;
 
 
@@ -78,12 +75,9 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
                                     final ClusterEventBus clusterEventBus) {
         this.configurationProvider = configurationProvider;
         this.eventBus = eventBus;
-        this.nodeService = nodeService;
         this.nodeId = nodeId;
         this.dataNodeProvisioningService = dataNodeProvisioningService;
-        this.objectMapper = objectMapper;
         this.indexFieldTypesService = indexFieldTypesService;
-        this.processStateMachine = processStateMachine;
         this.clusterEventBus = clusterEventBus;
         this.process = createOpensearchProcess(datanodeConfiguration, trustManager, configuration, nodeService, objectMapper, processStateMachine);
         eventBus.register(this);
@@ -175,6 +169,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
                 original.nodeRoles(),
                 original.discoverySeedHosts(),
                 original.opensearchSecurityConfiguration(),
+                original.s3RepositoryConfiguration(),
                 finalAdditionalConfig);
 
         if (config.securityConfigured()) {

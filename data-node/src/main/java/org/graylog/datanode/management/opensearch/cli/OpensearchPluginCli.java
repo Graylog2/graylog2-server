@@ -14,27 +14,25 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode;
+package org.graylog.datanode.management.opensearch.cli;
 
-import org.graylog.datanode.configuration.OpensearchArchitecture;
-
-import javax.annotation.Nullable;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 
-public record OpensearchDistribution(Path directory, String version, @Nullable String platform,
-                                     @Nullable OpensearchArchitecture architecture) {
+public class OpensearchPluginCli extends AbstractOpensearchCli {
 
-    public OpensearchDistribution(Path path, String version) {
-        this(path, version, null, null);
+    public OpensearchPluginCli(Path configPath, Path binPath) {
+        super(configPath, binPath.resolve("opensearch-plugin"));
     }
 
-    public Path getOpensearchExecutable() {
-        return directory.resolve(Paths.get("bin", "opensearch"));
+    public List<String> list() {
+        final String output = run("list");
+        return Arrays.stream(output.split("\n")).toList();
     }
 
-    public Path getOpensearchBinPath() {
-        return directory.resolve("bin");
+    public void install(String pluginName) {
+        // the --batch argument will skip the permission warning confirmation if any occurs
+        run("install", "--batch", pluginName);
     }
-
 }

@@ -19,6 +19,7 @@ package org.graylog.datanode.process;
 import org.apache.commons.exec.OS;
 import org.graylog.datanode.OpensearchDistribution;
 import org.graylog.datanode.configuration.DatanodeDirectories;
+import org.graylog.datanode.configuration.S3RepositoryConfiguration;
 import org.graylog.datanode.configuration.variants.OpensearchSecurityConfiguration;
 import org.graylog.datanode.management.Environment;
 import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
@@ -34,9 +35,12 @@ public record OpensearchConfiguration(
         String hostname,
         int httpPort,
         int transportPort,
-        String clusterName, String nodeName, List<String> nodeRoles,
+        String clusterName,
+        String nodeName,
+        List<String> nodeRoles,
         List<String> discoverySeedHosts,
         OpensearchSecurityConfiguration opensearchSecurityConfiguration,
+        S3RepositoryConfiguration s3RepositoryConfiguration,
         Map<String, String> additionalConfiguration
 ) {
     public Map<String, String> asMap() {
@@ -70,6 +74,11 @@ public record OpensearchConfiguration(
         }
 
         config.put("discovery.seed_providers", "file");
+
+        config.put("node.search.cache.size", "10mb");
+        if(s3RepositoryConfiguration != null) {
+            config.putAll(s3RepositoryConfiguration.getProperties());
+        }
 
         config.putAll(additionalConfiguration);
         return config;

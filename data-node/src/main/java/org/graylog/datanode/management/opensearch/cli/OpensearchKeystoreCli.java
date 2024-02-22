@@ -14,27 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode;
+package org.graylog.datanode.management.opensearch.cli;
 
-import org.graylog.datanode.configuration.OpensearchArchitecture;
-
-import javax.annotation.Nullable;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.Collections;
 
-public record OpensearchDistribution(Path directory, String version, @Nullable String platform,
-                                     @Nullable OpensearchArchitecture architecture) {
-
-    public OpensearchDistribution(Path path, String version) {
-        this(path, version, null, null);
+public class OpensearchKeystoreCli extends AbstractOpensearchCli {
+    public OpensearchKeystoreCli(Path configPath, Path binPath) {
+        super(configPath, binPath.resolve("opensearch-keystore"));
     }
 
-    public Path getOpensearchExecutable() {
-        return directory.resolve(Paths.get("bin", "opensearch"));
+    public String create() {
+        return run("create");
     }
 
-    public Path getOpensearchBinPath() {
-        return directory.resolve("bin");
+    public void add(String key, String value) {
+        run(Collections.singletonList(value), "add", key);
     }
-
 }

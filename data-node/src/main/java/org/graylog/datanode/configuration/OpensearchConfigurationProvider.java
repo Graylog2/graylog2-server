@@ -36,6 +36,7 @@ import jakarta.inject.Named;
 import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
@@ -121,13 +122,30 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
                     localConfiguration.getOpensearchTransportPort(),
                     localConfiguration.getClustername(),
                     localConfiguration.getDatanodeNodeName(),
-                    List.of(),
+                    List.of("cluster_manager", "data", "ingest", "remote_cluster_client", "search"),
                     localConfiguration.getOpensearchDiscoverySeedHosts(),
                     securityConfiguration,
+                    getS3RepositoryConfiguration(localConfiguration),
                     opensearchProperties.build()
             );
         } catch (GeneralSecurityException | KeyStoreStorageException | IOException e) {
             throw new OpensearchConfigurationException(e);
+        }
+    }
+
+    @Nullable
+    private S3RepositoryConfiguration getS3RepositoryConfiguration(Configuration localConfiguration) {
+        if (localConfiguration.getS3ClientUser() != null && localConfiguration.getS3ClientPassword() != null) {
+            return new S3RepositoryConfiguration(
+                    localConfiguration.getS3ClientDefaultProtocol(),
+                    localConfiguration.getS3ClientDefaultEndpoint(),
+                    localConfiguration.getS3ClientDefaultRegion(),
+                    localConfiguration.isS3ClientDefaultPathStyleAccess(),
+                    localConfiguration.getS3ClientUser(),
+                    localConfiguration.getS3ClientPassword()
+            );
+        } else {
+            return null;
         }
     }
 
