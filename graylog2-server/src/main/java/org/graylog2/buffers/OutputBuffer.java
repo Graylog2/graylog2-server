@@ -30,6 +30,7 @@ import jakarta.inject.Named;
 import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 import org.graylog2.buffers.processors.OutputBufferProcessor;
+import org.graylog2.indexer.messages.MessageWithIndex;
 import org.graylog2.plugin.GlobalMetricNames;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.buffers.Buffer;
@@ -45,6 +46,7 @@ import static com.codahale.metrics.MetricRegistry.name;
 import static org.graylog2.shared.metrics.MetricUtils.constantGauge;
 import static org.graylog2.shared.metrics.MetricUtils.safelyRegister;
 
+@SuppressWarnings("UnstableApiUsage")
 @Singleton
 public class OutputBuffer extends Buffer {
     private static final Logger LOG = LoggerFactory.getLogger(OutputBuffer.class);
@@ -96,6 +98,10 @@ public class OutputBuffer extends Buffer {
     private ThreadFactory threadFactory(final MetricRegistry metricRegistry) {
         final ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("outputbufferprocessor-%d").build();
         return new InstrumentedThreadFactory(threadFactory, metricRegistry, name(this.getClass(), "thread-factory"));
+    }
+
+    public void insertLowPrio(MessageWithIndex message) {
+        insertBlocking(message);
     }
 
     public void insertBlocking(Message message) {

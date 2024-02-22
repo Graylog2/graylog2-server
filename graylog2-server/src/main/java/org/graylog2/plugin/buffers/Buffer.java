@@ -57,6 +57,10 @@ public abstract class Buffer implements EventBuffer {
         return (long) ringBuffer.getBufferSize() - ringBuffer.remainingCapacity();
     }
 
+    public int getUsagePercent() {
+        return (int) (getUsage() * 100 / getRingBufferSize());
+    }
+
     protected void insert(Message message) {
         long sequence = ringBuffer.next();
         MessageEvent event = ringBuffer.get(sequence);
@@ -73,7 +77,7 @@ public abstract class Buffer implements EventBuffer {
         event.setMessageWithIndex(messageWithIndex);
         ringBuffer.publish(sequence);
 
-        //afterInsert(1);
+        afterInsert(1);
     }
 
     protected WaitStrategy getWaitStrategy(String waitStrategyName, String configOptionName) {

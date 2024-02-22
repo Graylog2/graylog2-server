@@ -127,6 +127,7 @@ public class OutputBufferProcessor implements WorkHandler<MessageEvent> {
             } else {
                 LOG.error("The default output future was null, this is a bug!");
             }
+            outputThroughput.inc();
             event.clearMessages();
             return;
         }
