@@ -58,7 +58,12 @@ public class DatanodeSearchableSnapshotsIT {
             datanodeContainer.withEnv("GRAYLOG_DATANODE_S3_CLIENT_DEFAULT_SECRET_KEY", s3Container.getSecretKey());
             datanodeContainer.withEnv("GRAYLOG_DATANODE_S3_CLIENT_DEFAULT_ENDPOINT", s3Container.getInternalURI().toString());
         });
-        datanode.start();
+
+        try {
+            datanode.start();
+        } catch (Exception e) {
+            System.out.println(datanode.getLogs());
+        }
     }
 
     @AfterEach
