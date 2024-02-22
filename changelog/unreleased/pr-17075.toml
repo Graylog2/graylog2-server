@@ -1,0 +1,4 @@
+type = "c"
+message = "Updated io.jsonwebtoken:jjwt-api from 0.11.5 to 0.12.3"
+
+pulls = ["18219"]
