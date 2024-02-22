@@ -2,7 +2,9 @@ Upgrading to Graylog 6.0.x
 ==========================
 
 ## Breaking Changes
+
 - Default value for `data_dir` configuration option has been removed and must be specified in `graylog.conf`.
+
 ### Changed default number of process-buffer and output-buffer processors
 
 The default values for the configuration settings `processbuffer_processors` and `outputbuffer_processors` have been
@@ -23,6 +25,14 @@ The name of the `jvm_classes_loaded` metric [has been changed](https://github.co
 
 Prometheus queries referencing `jvm_classes_loaded` need to be adapted to
 the new name `jvm_classes_currently_loaded`.
+
+### Authentication required to use API browser
+
+Users now have to log in before visiting the API browser. It is sufficient to log in with any user known to Graylog. No
+particular permissions are required.
+
+The username/password field was removed from the header of the API browser. If users want to perform API requests with
+different credentials, they must log out of Graylog and re-login with another user.
 
 ### Plugins
 
