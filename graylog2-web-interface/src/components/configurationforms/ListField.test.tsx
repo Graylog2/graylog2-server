@@ -17,9 +17,9 @@
 import React from 'react';
 import { screen, render, waitFor } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
-import userEvent from '@testing-library/user-event';
 
 import { creatableListField, listField } from 'fixtures/configurationforms';
+import customSelectEvent from 'helpers/selectEvent';
 
 import ListField from './ListField';
 
@@ -89,9 +89,7 @@ describe('<ListField>', () => {
            value={['one']} />,
     );
 
-    // eslint-disable-next-line testing-library/no-container,testing-library/no-node-access
-    const clearIcons = container.querySelectorAll('.list-field-select svg[aria-hidden="true"]');
-    userEvent.click(clearIcons[clearIcons.length - 1]);
+    customSelectEvent.clearAll(container, 'list-field-select');
 
     await waitFor(() => expect(updateFunction).toHaveBeenCalledWith('example_list_field', []));
   });
