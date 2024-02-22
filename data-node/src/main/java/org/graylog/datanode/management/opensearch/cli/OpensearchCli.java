@@ -18,19 +18,21 @@ package org.graylog.datanode.management.opensearch.cli;
 
 import org.graylog.datanode.process.OpensearchConfiguration;
 
-import java.util.Collections;
+public class OpensearchCli {
 
-public class OpensearchKeystoreCli extends AbstractOpensearchCli {
+    private final OpensearchKeystoreCli keystore;
+    private final OpensearchPluginCli plugin;
 
-    OpensearchKeystoreCli(OpensearchConfiguration config) {
-        super(config, "opensearch-keystore");
+    public OpensearchCli(OpensearchConfiguration config) {
+        this.keystore = new OpensearchKeystoreCli(config);
+        this.plugin = new OpensearchPluginCli(config);
     }
 
-    public String create() {
-        return run("create");
+    public OpensearchKeystoreCli keystore() {
+        return keystore;
     }
 
-    public void add(String key, String secretValue) {
-        run(Collections.singletonList(secretValue), "add", key);
+    public OpensearchPluginCli plugin() {
+        return plugin;
     }
 }

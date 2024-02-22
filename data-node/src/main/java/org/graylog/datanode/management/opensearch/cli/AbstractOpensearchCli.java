@@ -20,6 +20,7 @@ import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecuteResultHandler;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.PumpStreamHandler;
+import org.graylog.datanode.process.OpensearchConfiguration;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -27,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
@@ -38,9 +40,21 @@ public abstract class AbstractOpensearchCli {
     private final Path configPath;
     private final Path binPath;
 
-    public AbstractOpensearchCli(Path configPath, Path bin) {
+    private AbstractOpensearchCli(Path configPath, Path bin) {
         this.configPath = configPath;
         this.binPath = bin;
+    }
+
+    public AbstractOpensearchCli(OpensearchConfiguration config, String binName) {
+        this(config.datanodeDirectories().getOpensearchProcessConfigurationDir(),
+                checkExecutable(config.opensearchDistribution().getOpensearchBinPath().resolve(binName)));
+    }
+
+    private static Path checkExecutable(Path path) {
+        if (!Files.isExecutable(path)) {
+            throw new IllegalArgumentException("Path " + path + " doesn't point to any known opensearch cli tool");
+        }
+        return path;
     }
 
     protected String run(String... args) {

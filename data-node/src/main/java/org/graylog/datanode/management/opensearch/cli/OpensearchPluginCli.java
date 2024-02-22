@@ -16,14 +16,32 @@
  */
 package org.graylog.datanode.management.opensearch.cli;
 
+import org.graylog.datanode.process.OpensearchConfiguration;
+import org.graylog2.shared.utilities.StringUtils;
+
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
 public class OpensearchPluginCli extends AbstractOpensearchCli {
 
-    public OpensearchPluginCli(Path configPath, Path binPath) {
-        super(configPath, binPath.resolve("opensearch-plugin"));
+    private final Path pluginsPath;
+
+    OpensearchPluginCli(OpensearchConfiguration config) {
+        super(config, "opensearch-plugin");
+        this.pluginsPath = config.datanodeDirectories().getOpensearchPluginsDir()
+                .orElseThrow(() -> new IllegalStateException("Configuration opensearch_plugins_location not set. Please point this configuration to a directory holding plugins ZIP files."));
+    }
+
+    private Path resolveOpensearchPlugin(String pluginName, String version) {
+        final String pluginFileName = StringUtils.f("%s-%s.zip", pluginName, version);
+        final Path pluginFilePath = pluginsPath.resolve(pluginFileName);
+        if (!Files.exists(pluginFilePath)) {
+            throw new IllegalStateException("Failed to find " + pluginFileName + " plugin, tried path " + pluginFilePath);
+        }
+
+        return pluginFilePath;
     }
 
     public List<String> list() {
@@ -31,8 +49,7 @@ public class OpensearchPluginCli extends AbstractOpensearchCli {
         return Arrays.stream(output.split("\n")).toList();
     }
 
-    public void install(String pluginName) {
-        // the --batch argument will skip the permission warning confirmation if any occurs
-        run("install", "--batch", pluginName);
+    public void installFromZip(String pluginName, String version) {
+        run("install", "--batch", resolveOpensearchPlugin(pluginName, version).toAbsolutePath().toUri().toString());
     }
 }

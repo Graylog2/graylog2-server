@@ -18,15 +18,13 @@ package org.graylog.datanode.management;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import jakarta.validation.constraints.NotNull;
 import org.apache.commons.exec.OS;
-import org.graylog.datanode.management.opensearch.cli.OpensearchKeystoreCli;
-import org.graylog.datanode.management.opensearch.cli.OpensearchPluginCli;
+import org.graylog.datanode.management.opensearch.cli.OpensearchCli;
 import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog.datanode.process.ProcessInformation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.validation.constraints.NotNull;
 
 import java.io.BufferedReader;
 import java.io.Closeable;
@@ -100,32 +98,31 @@ public class OpensearchCommandLineProcess implements Closeable {
     }
 
     private void configureS3RepositoryPlugin(OpensearchConfiguration config) {
+        final OpensearchCli opensearchCli = new OpensearchCli(config);
         if (config.s3RepositoryConfiguration().isRepositoryEnabled()) {
-            installPlugin(config);
-            configureS3Credentials(config);
+            installPlugin(opensearchCli, config, "repository-s3");
+            configureS3Credentials(opensearchCli, config);
         } else {
             LOG.info("No S3 repository configuration provided, skipping plugin initialization");
         }
     }
 
-    private void configureS3Credentials(OpensearchConfiguration config) {
-        final OpensearchKeystoreCli opensearchKeystoreCli = new OpensearchKeystoreCli(config.datanodeDirectories().getOpensearchProcessConfigurationDir(), config.opensearchDistribution().getOpensearchBinPath());
+    private void configureS3Credentials(OpensearchCli opensearchCli, OpensearchConfiguration config) {
         LOG.info("Creating opensearch keystore");
-        final String createdMessage = opensearchKeystoreCli.create();
+        final String createdMessage = opensearchCli.keystore().create();
         LOG.info(createdMessage);
         LOG.info("Setting opensearch s3 repository keystore secrets");
-        opensearchKeystoreCli.add("s3.client.default.access_key", config.s3RepositoryConfiguration().getS3ClientDefaultAccessKey());
-        opensearchKeystoreCli.add("s3.client.default.secret_key", config.s3RepositoryConfiguration().getS3ClientDefaultSecretKey());
+        opensearchCli.keystore().add("s3.client.default.access_key", config.s3RepositoryConfiguration().getS3ClientDefaultAccessKey());
+        opensearchCli.keystore().add("s3.client.default.secret_key", config.s3RepositoryConfiguration().getS3ClientDefaultSecretKey());
     }
 
 
-    private void installPlugin(OpensearchConfiguration config) {
-        final OpensearchPluginCli opensearchPluginCli = new OpensearchPluginCli(config.datanodeDirectories().getOpensearchProcessConfigurationDir(), config.opensearchDistribution().getOpensearchBinPath());
-        final List<String> installedPlugins = opensearchPluginCli.list();
-        if (!installedPlugins.contains("repository-s3")) {
-            opensearchPluginCli.install("repository-s3");
+    private void installPlugin(OpensearchCli opensearchCli, OpensearchConfiguration config, String pluginName) {
+        final List<String> installedPlugins = opensearchCli.plugin().list();
+        if (!installedPlugins.contains(pluginName)) {
+            opensearchCli.plugin().installFromZip(pluginName, config.opensearchDistribution().version());
         } else {
-            LOG.info("Opensearch repository-s3 plugin already installed, skipping");
+            LOG.info("Opensearch plugin " + pluginName + " already installed, skipping");
         }
     }
 
