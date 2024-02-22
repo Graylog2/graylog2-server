@@ -19,6 +19,7 @@ package org.graylog.events.processor.aggregation;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
@@ -65,6 +66,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -73,6 +75,7 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -88,6 +91,7 @@ public class PivotAggregationSearch implements AggregationSearch {
     private final AggregationEventProcessorConfig config;
     private final AggregationEventProcessorParameters parameters;
     private final String searchOwner;
+    private final List<SearchType> additionalSearchTypes;
     private final SearchJobService searchJobService;
     private final QueryEngine queryEngine;
     private final EventsConfigurationProvider configurationProvider;
@@ -102,6 +106,7 @@ public class PivotAggregationSearch implements AggregationSearch {
                                   @Assisted AggregationEventProcessorParameters parameters,
                                   @Assisted String searchOwner,
                                   @Assisted EventDefinition eventDefinition,
+                                  @Assisted List<SearchType> additionalSearchTypes,
                                   SearchJobService searchJobService,
                                   QueryEngine queryEngine,
                                   EventsConfigurationProvider configProvider,
@@ -113,6 +118,7 @@ public class PivotAggregationSearch implements AggregationSearch {
         this.parameters = parameters;
         this.searchOwner = searchOwner;
         this.eventDefinition = eventDefinition;
+        this.additionalSearchTypes = additionalSearchTypes;
         this.searchJobService = searchJobService;
         this.queryEngine = queryEngine;
         this.configurationProvider = configProvider;
@@ -131,6 +137,10 @@ public class PivotAggregationSearch implements AggregationSearch {
         final SearchJob searchJob = getSearchJob(parameters, searchOwner, config.searchWithinMs(), config.executeEveryMs());
         final QueryResult queryResult = searchJob.results().get(QUERY_ID);
         final QueryResult streamQueryResult = searchJob.results().get(STREAMS_QUERY_ID);
+        final Map<String, SearchType.Result> additionalResults = additionalSearchTypes.stream()
+                .filter(searchType -> queryResult.searchTypes().containsKey(searchType.id()))
+                .map(searchType -> queryResult.searchTypes().get(searchType.id()))
+                .collect(toMap(SearchType.Result::id, result -> result));
 
         final Set<SearchError> aggregationErrors = firstNonNull(queryResult.errors(), Collections.emptySet());
         final Set<SearchError> streamErrors = firstNonNull(streamQueryResult.errors(), Collections.emptySet());
@@ -185,6 +195,7 @@ public class PivotAggregationSearch implements AggregationSearch {
                 .effectiveTimerange(pivotResult.effectiveTimerange())
                 .totalAggregatedMessages(pivotResult.total())
                 .sourceStreams(extractSourceStreams(streamsResult))
+                .additionalResults(additionalResults)
                 .build();
     }
 
@@ -474,11 +485,12 @@ public class PivotAggregationSearch implements AggregationSearch {
         // We always have row groups because of the date range buckets
         pivotBuilder.rowGroups(groupBy);
 
-        final Set<SearchType> searchTypes = Collections.singleton(pivotBuilder.build());
+        final Set<SearchType> pivots = Sets.newHashSet(pivotBuilder.build());
+        pivots.addAll(additionalSearchTypes);
 
         final Query.Builder queryBuilder = Query.builder()
                 .id(QUERY_ID)
-                .searchTypes(searchTypes)
+                .searchTypes(pivots)
                 .query(decorateQuery(config))
                 .timerange(parameters.timerange());
 
