@@ -39,7 +39,7 @@ public class S3RepositoryConfiguration {
     @Parameter(value = "s3_client_default_region")
     private String s3ClientDefaultRegion = "us-east-2";
 
-    @Parameter(value = "s3_client_default_region", converter = BooleanConverter.class)
+    @Parameter(value = "s3_client_default_path_style_access", converter = BooleanConverter.class)
     private boolean s3ClientDefaultPathStyleAccess = true;
 
 
