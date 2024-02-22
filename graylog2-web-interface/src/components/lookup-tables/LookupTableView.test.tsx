@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
-import { mount } from 'wrappedEnzyme';
+import userEvent from '@testing-library/user-event';
 
 import {
   createLookupTable,
@@ -37,14 +37,6 @@ const renderedLUT = (scope: string) => {
   const dataAdapter = createLookupTableAdapter();
 
   return render(<LookupTableView table={table} cache={cache} dataAdapter={dataAdapter} />);
-};
-
-const mountLUT = (scope: string) => {
-  const table = createLookupTable(1, { _scope: scope });
-  const cache = createLookupTableCache();
-  const dataAdapter = createLookupTableAdapter();
-
-  return mount(<LookupTableView table={table} cache={cache} dataAdapter={dataAdapter} />);
 };
 
 describe('LookupTableView', () => {
@@ -76,16 +68,17 @@ describe('LookupTableView', () => {
     expect(screen.queryByRole('button', { name: /edit/i })).not.toBeInTheDocument();
   });
 
-  it('should allow non-word-characters in lookup tables key field', () => {
+  it('should allow non-word-characters in lookup tables key field', async () => {
     const nonWordCharactersKey = '177.228.126.200';
 
-    const wrapper = mountLUT('DEFAULT');
+    const table = createLookupTable(1, { _scope: 'DEFAULT' });
+    const cache = createLookupTableCache();
+    const dataAdapter = createLookupTableAdapter();
 
-    wrapper.find('input[name="lookupkey"]').simulate('change', { target: { name: 'lookupkey', value: nonWordCharactersKey } });
+    render(<LookupTableView table={table} cache={cache} dataAdapter={dataAdapter} />);
 
-    expect(wrapper.find('input[name="lookupkey"]').length).toBe(1);
-    expect(wrapper.find('input[name="lookupkey"]').prop('value')).toBe(nonWordCharactersKey);
+    await userEvent.type(await screen.findByPlaceholderText('Insert key that should be looked up'), nonWordCharactersKey);
 
-    expect(wrapper.find('button[name="lookupbutton"]').prop('disabled')).toBe(false);
+    expect(await screen.findByRole('button', { name: /look up/i })).toBeEnabled();
   });
 });

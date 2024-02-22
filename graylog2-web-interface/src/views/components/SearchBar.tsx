@@ -68,6 +68,7 @@ import { updateQuery } from 'views/logic/slices/viewSlice';
 import useHandlerContext from 'views/components/useHandlerContext';
 import QueryHistoryButton from 'views/components/searchbar/QueryHistoryButton';
 import type { Editor } from 'views/components/searchbar/queryinput/ace-types';
+import useIsLoading from 'views/hooks/useIsLoading';
 
 import SearchBarForm from './searchbar/SearchBarForm';
 
@@ -152,6 +153,7 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
   const _onSubmit = useCallback((values: SearchBarFormValues) => onSubmit(dispatch, values, pluggableSearchBarControls, currentQuery),
     [currentQuery, dispatch, onSubmit, pluggableSearchBarControls]);
   const handlerContext = useHandlerContext();
+  const isLoadingExecution = useIsLoading();
 
   if (!currentQuery || !config) {
     return <Spinner />;
@@ -180,7 +182,7 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
                 setFieldValue,
                 validateForm,
               }) => {
-                const disableSearchSubmit = isSubmitting || isValidating || !isValid;
+                const disableSearchSubmit = isSubmitting || isValidating || !isValid || isLoadingExecution;
 
                 return (
                   <>
@@ -212,7 +214,7 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
                         <SearchButtonAndQuery>
                           <SearchButton disabled={disableSearchSubmit}
                                         dirty={dirty}
-                                        displaySpinner={isSubmitting} />
+                                        displaySpinner={isSubmitting || isLoadingExecution} />
                           <SearchInputAndValidationContainer>
                             <Field name="queryString">
                               {({ field: { name, value, onChange }, meta: { error } }) => (

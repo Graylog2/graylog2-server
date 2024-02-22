@@ -19,7 +19,7 @@ import type { TextProps } from '@mantine/core';
 import styled, { css } from 'styled-components';
 
 import HelpMenu from 'preflight/navigation/HelpMenu';
-import { Group, Header, Text } from 'preflight/components/common';
+import { Group, AppShell, Text } from 'preflight/components/common';
 
 import NavigationBrand from './NavigationBrand';
 import ThemeModeToggle from './ThemeModeToggle';
@@ -27,7 +27,7 @@ import ThemeModeToggle from './ThemeModeToggle';
 type StyledMantineTextProps = TextProps & {
   children: React.ReactNode,
 };
-const GraylogHeader = styled(Header)(({ theme }) => css`
+const GraylogHeader = styled(AppShell.Header)(({ theme }) => css`
   background-color: ${theme.colors.global.contentBackground};
   border: 1px solid ${theme.colors.variant.lighter.default};
   padding: ${theme.spacings.md};
@@ -41,13 +41,13 @@ const StyledText = styled(Text)<StyledMantineTextProps>(({ theme }) => css`
   color: ${theme.mode === 'light' ? theme.colors.brand.concrete : 'white'};
 `);
 const Navigation = () => (
-  <GraylogHeader height={80}>
+  <GraylogHeader>
     <NavigationContainer>
-      <Group position="left" spacing="xs">
+      <Group gap="xs">
         <NavigationBrand />
-        <StyledText weight={700} size="lg" mr={1}>Graylog Initial Setup</StyledText>
+        <StyledText fw={700} size="lg" mr={1}>Graylog Initial Setup</StyledText>
       </Group>
-      <Group position="right">
+      <Group justify="flex-end">
         <HelpMenu />
         <ThemeModeToggle />
       </Group>

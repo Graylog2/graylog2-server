@@ -161,13 +161,15 @@ public class MigrationActionsImpl implements MigrationActions {
 
     @Override
     public boolean provisioningFinished() {
-        return nodeService.allActive().values().stream().allMatch(node -> node.getDataNodeStatus() == DataNodeStatus.PREPARED);
+        return nodeService.allActive().values().stream().allMatch(node -> dataNodeProvisioningService.getPreflightConfigFor(node.getNodeId())
+                .map(dn -> dn.state() == DataNodeProvisioningConfig.State.STARTUP_PREPARED)
+                .orElse(false));
     }
 
     @Override
     public void startDataNodes() {
         final Map<String, DataNodeDto> activeDataNodes = nodeService.allActive();
-        activeDataNodes.values().forEach(node -> dataNodeProvisioningService.changeState(node.getNodeId(), DataNodeProvisioningConfig.State.STARTUP_REQUESTED));
+        activeDataNodes.values().forEach(node -> dataNodeProvisioningService.changeState(node.getNodeId(), DataNodeProvisioningConfig.State.STARTUP_TRIGGER));
     }
 
     @Override

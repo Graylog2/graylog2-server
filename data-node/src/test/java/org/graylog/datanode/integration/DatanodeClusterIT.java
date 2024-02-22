@@ -222,7 +222,7 @@ public class DatanodeClusterIT {
                 datanodeContainer -> {
                     datanodeContainer.withNetwork(network);
                     datanodeContainer.withEnv("GRAYLOG_DATANODE_PASSWORD_SECRET", DatanodeContainerizedBackend.SIGNING_SECRET);
-                    datanodeContainer.withEnv("GRAYLOG_DATANODE_CLUSTER_INITIAL_MANAGER_NODES", hostnameNodeA);
+                    datanodeContainer.withEnv("GRAYLOG_DATANODE_INITIAL_CLUSTER_MANAGER_NODES", hostnameNodeA);
                     datanodeContainer.withEnv("GRAYLOG_DATANODE_OPENSEARCH_DISCOVERY_SEED_HOSTS", hostnameNodeA + ":9300");
 
                     datanodeContainer.withFileSystemBind(transportKeystore.location().toAbsolutePath().toString(), IMAGE_WORKING_DIR + "/config/datanode-transport-certificates.p12");

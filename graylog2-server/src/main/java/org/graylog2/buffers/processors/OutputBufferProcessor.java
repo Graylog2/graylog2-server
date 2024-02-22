@@ -17,13 +17,17 @@
 package org.graylog2.buffers.processors;
 
 import com.codahale.metrics.Counter;
+import com.codahale.metrics.Gauge;
 import com.codahale.metrics.InstrumentedExecutorService;
 import com.codahale.metrics.Meter;
+import com.codahale.metrics.Metric;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.common.util.concurrent.Uninterruptibles;
+import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
 import org.graylog2.Configuration;
 import org.graylog2.outputs.DefaultMessageOutput;
 import org.graylog2.outputs.OutputRouter;
@@ -36,8 +40,7 @@ import org.graylog2.shared.buffers.WorkHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -45,6 +48,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
@@ -66,34 +70,62 @@ public class OutputBufferProcessor implements WorkHandler<MessageEvent> {
 
     private final OutputRouter outputRouter;
     private final MessageOutput defaultMessageOutput;
+    private final int processorOrdinal;
 
     @Inject
     public OutputBufferProcessor(Configuration configuration,
-                                 MetricRegistry metricRegistry,
+                                 MetricRegistry globalMetricRegistry,
                                  ServerStatus serverStatus,
                                  OutputRouter outputRouter,
-                                 @DefaultMessageOutput MessageOutput defaultMessageOutput) {
+                                 @DefaultMessageOutput MessageOutput defaultMessageOutput,
+                                 @Assisted int processorOrdinal) {
         this.configuration = configuration;
         this.serverStatus = serverStatus;
         this.outputRouter = outputRouter;
         this.defaultMessageOutput = defaultMessageOutput;
+        this.processorOrdinal = processorOrdinal;
 
-        final String nameFormat = "outputbuffer-processor-executor-%d";
         final int corePoolSize = configuration.getOutputBufferProcessorThreadsCorePoolSize();
-        this.executor = executorService(metricRegistry, nameFormat, corePoolSize);
+        this.executor = executorService(globalMetricRegistry, corePoolSize);
 
-        this.incomingMessages = metricRegistry.meter(INCOMING_MESSAGES_METRICNAME);
-        this.outputThroughput = metricRegistry.counter(GlobalMetricNames.OUTPUT_THROUGHPUT);
-        this.processTime = metricRegistry.timer(PROCESS_TIME_METRICNAME);
+        this.incomingMessages = globalMetricRegistry.meter(INCOMING_MESSAGES_METRICNAME);
+        this.outputThroughput = globalMetricRegistry.counter(GlobalMetricNames.OUTPUT_THROUGHPUT);
+        this.processTime = globalMetricRegistry.timer(PROCESS_TIME_METRICNAME);
     }
 
-    private ExecutorService executorService(final MetricRegistry metricRegistry, final String nameFormat,
-                                            final int corePoolSize) {
+    private ExecutorService executorService(final MetricRegistry globalRegistry, final int corePoolSize) {
+
+        final String nameFormat = "outputbuffer-processor-" + processorOrdinal + "-executor-%d";
         final ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat(nameFormat).build();
-        return new InstrumentedExecutorService(
-                Executors.newFixedThreadPool(corePoolSize, threadFactory),
-                metricRegistry,
-                name(this.getClass(), "executor-service"));
+
+        // Some executor service metrics are shared between buffer processors. This is unusual but was done on
+        // purpose. We'll keep the shared metrics shared but put the gauges, which can't be shared, in a separate
+        // namespace.
+        final String sharedPrefix = name(this.getClass(), "executor-service");
+        final String uniquePrefix = name(this.getClass(), String.valueOf(processorOrdinal), "executor-service");
+
+        ExecutorService delegate = Executors.newFixedThreadPool(corePoolSize, threadFactory);
+
+        // Get or create shared metrics and copy them into a local registry to be re-used by the executor service
+        var localRegistry = new MetricRegistry();
+        localRegistry.register(name(uniquePrefix, "submitted"), globalRegistry.meter(name(sharedPrefix, "submitted")));
+        localRegistry.register(name(uniquePrefix, "running"), globalRegistry.counter(name(sharedPrefix, "running")));
+        localRegistry.register(name(uniquePrefix, "completed"), globalRegistry.meter(name(sharedPrefix, "completed")));
+        localRegistry.register(name(uniquePrefix, "idle"), globalRegistry.timer(name(sharedPrefix, "idle")));
+        localRegistry.register(name(uniquePrefix, "duration"), globalRegistry.timer(name(sharedPrefix, "duration")));
+
+        final InstrumentedExecutorService executorService = new InstrumentedExecutorService(
+                delegate,
+                localRegistry,
+                uniquePrefix);
+
+        // Register gauges from the local registry in the global registry
+        final Map<String, Metric> gauges = localRegistry.getMetrics().entrySet().stream()
+                .filter(e -> e.getValue() instanceof Gauge)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        globalRegistry.registerAll(() -> gauges);
+
+        return executorService;
     }
 
     /**
@@ -200,5 +232,9 @@ public class OutputBufferProcessor implements WorkHandler<MessageEvent> {
             doneSignal.countDown();
         }
         return future;
+    }
+
+    public interface Factory {
+        OutputBufferProcessor create(@Assisted int ordinal);
     }
 }

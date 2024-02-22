@@ -56,7 +56,7 @@ const comp = ({
 
 describe('RuleBlockForm', () => {
   afterEach(() => {
-    jest.resetAllMocks();
+    jest.clearAllMocks();
   });
 
   it('renders a select with all functions as options', async () => {

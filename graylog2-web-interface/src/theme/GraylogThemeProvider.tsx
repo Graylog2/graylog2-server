@@ -80,7 +80,8 @@ const GraylogThemeProvider = ({ children, initialThemeModeOverride, userIsLogged
 
   return (
     <ColorSchemeContext.Provider value={colorScheme}>
-      <MantineProvider theme={mantineTheme}>
+      <MantineProvider theme={mantineTheme}
+                       forceColorScheme={colorScheme}>
         <ThemeProvider theme={scTheme}>
           {children}
         </ThemeProvider>

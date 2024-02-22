@@ -50,7 +50,7 @@ describe('Action', () => {
   });
 
   afterEach(() => {
-    jest.resetAllMocks();
+    jest.clearAllMocks();
   });
 
   const exampleHandlerArgs = {
