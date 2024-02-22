@@ -18,7 +18,7 @@ package org.graylog.datanode.configuration;
 
 import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.converters.BooleanConverter;
-import org.apache.logging.log4j.util.Strings;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
 
@@ -61,8 +61,8 @@ public class S3RepositoryConfiguration {
     }
 
     public boolean isRepositoryEnabled() {
-        return Strings.isNotBlank(s3ClientDefaultEndpoint) &&
-                Strings.isNotBlank(s3ClientDefaultAccessKey) &&
-                Strings.isNotBlank(s3ClientDefaultSecretKey);
+        return StringUtils.isNotBlank(s3ClientDefaultEndpoint) &&
+                StringUtils.isNotBlank(s3ClientDefaultAccessKey) &&
+                StringUtils.isNotBlank(s3ClientDefaultSecretKey);
     }
 }
