@@ -147,7 +147,7 @@
         <kafka.version>3.6.1</kafka.version>
         <kafka09.version>0.9.0.1-7</kafka09.version>
         <log4j.version>2.22.1</log4j.version>
-        <lucene.version>9.9.2</lucene.version>
+        <lucene.version>9.10.0</lucene.version>
         <metrics.version>4.2.25</metrics.version>
         <mongodb-driver.version>4.11.1</mongodb-driver.version>
         <mongojack.version>4.8.2</mongojack.version>
@@ -195,7 +195,7 @@
         <mockito.version>5.10.0</mockito.version>
         <restassured.version>5.4.0</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
-        <testcontainers.version>1.19.5</testcontainers.version>
+        <testcontainers.version>1.19.6</testcontainers.version>
         <testcontainers.opensearch.version>2.0.1</testcontainers.opensearch.version>
 
         <!-- Nodejs dependencies -->
