@@ -59,7 +59,7 @@ const MigrationWelcomeStep = ({ currentStep, onTriggerStep }: Props) => (
       <p>
         Using this migration tool you can check the compatibility and follow the steps to migrate your existing OpenSearch data to a Data Node.<br />
       </p>
-      <p>Migrating to Data Node requires some steps the are performed using the UI in this wizard, but it also requires some additional steps that should be performed on the OS, your current OS/ES cluster and your config files.</p>
+      <p>Migrating to Data Node requires some steps that are performed using the UI in this wizard, but it also requires some additional steps that should be performed on the OS, your current OS/ES cluster and your config files.</p>
       <p>You can get more information on the Data Node migration <DocumentationLink page="graylog-data-node" text="documentation" />.</p>
       <br />
       <MigrationDatanodeList />
