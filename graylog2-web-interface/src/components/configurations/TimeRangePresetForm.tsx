@@ -102,7 +102,7 @@ const TimeRangePresetFormItem = ({ idx, id, timerange, description, onChange, on
                      onChange={({ target: { value } }) => debounceHandleOnChangeDescription(value)}
                      formGroupClassName="" />
         <IconWrapper className="input-group-addon" onClick={handleOnRemove} title="Remove preset">
-          <Icon name="trash-alt" style={{ cursor: 'pointer' }} />
+          <Icon name="delete" style={{ cursor: 'pointer' }} />
         </IconWrapper>
       </Description>
     </ItemWrapper>

@@ -22,12 +22,12 @@ import { Icon } from 'components/common';
 import type { Metric as MetricType } from 'stores/metrics/MetricsStore';
 
 const iconMapping = {
-  timer: 'clock',
-  histogram: 'signal',
-  meter: 'play-circle',
-  gauge: 'tachometer-alt',
+  timer: 'schedule',
+  histogram: 'signal_cellular_alt',
+  meter: 'play_circle',
+  gauge: 'speed',
   counter: 'circle',
-  unknown: 'question-circle',
+  unknown: 'help',
 };
 
 const _formatIcon = (type: string) => iconMapping[type] ?? iconMapping.unknown;

@@ -144,7 +144,7 @@ const DashboardActionsMenu = () => {
                      disabledInfo={isNewView && 'Only saved dashboards can be shared.'} />
       )}
       {showDropDownButton && (
-        <DropdownButton title={<Icon name="ellipsis-h" />}
+        <DropdownButton title={<Icon name="more_horiz" />}
                         id="query-tab-actions-dropdown"
                         pullRight
                         keepMounted
@@ -159,7 +159,7 @@ const DashboardActionsMenu = () => {
           <MenuItem onSelect={() => setEditDashboardOpen(true)} disabled={isNewView || !allowedToEdit} icon="edit">
             Edit metadata
           </MenuItem>
-          <MenuItem onSelect={() => setExportOpen(true)} icon="cloud-download-alt">Export</MenuItem>
+          <MenuItem onSelect={() => setExportOpen(true)} icon="download">Export</MenuItem>
           {debugOverlay}
           <MenuItem divider />
           <BigDisplayModeConfiguration view={view} disabled={isNewView} />

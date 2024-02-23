@@ -69,7 +69,7 @@ const MigrationWelcomeStep = ({ currentStep, onTriggerStep }: Props) => (
     <Col md={6}>
       <StyledHelpPanel bsStyle="info">
         <Panel.Heading>
-          <Panel.Title componentClass="h3"><Icon name="info-circle" /> Migrating Elasticsearch 7.10</Panel.Title>
+          <Panel.Title componentClass="h3"><Icon name="info" /> Migrating Elasticsearch 7.10</Panel.Title>
         </Panel.Heading>
         <Panel.Body>
           <p>Migration from <code>Elasticsearch 7.10</code> needs an additional step. ES 7.10 does not understand JWT

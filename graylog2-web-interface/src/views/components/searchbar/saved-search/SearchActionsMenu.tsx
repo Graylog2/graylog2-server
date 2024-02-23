@@ -234,7 +234,7 @@ const SearchActionsMenu = () => {
                    onClick={toggleShareSearch}
                    bsStyle="default"
                    disabledInfo={isNew && 'Only saved searches can be shared.'} />
-      <DropdownButton title={<Icon name="ellipsis-h" />}
+      <DropdownButton title={<Icon name="more_horiz" />}
                       aria-label="Open search actions dropdown"
                       id="search-actions-dropdown"
                       pullRight
@@ -243,10 +243,10 @@ const SearchActionsMenu = () => {
           Edit metadata
         </MenuItem>
         <IfPermitted permissions="dashboards:create">
-          <MenuItem onSelect={_loadAsDashboard} icon="tachometer-alt">Export to dashboard</MenuItem>
+          <MenuItem onSelect={_loadAsDashboard} icon="dashboard">Export to dashboard</MenuItem>
         </IfPermitted>
-        <MenuItem onSelect={toggleExport} icon="cloud-download-alt">Export</MenuItem>
-        <MenuItem disabled={disableReset} onSelect={loadNewView} icon="eraser">
+        <MenuItem onSelect={toggleExport} icon="download">Export</MenuItem>
+        <MenuItem disabled={disableReset} onSelect={loadNewView} icon="restart_alt">
           Reset search
         </MenuItem>
         {pluggableActions.length ? (

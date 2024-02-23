@@ -170,13 +170,13 @@ const RuleBlockDisplay = ({ block, negatable, onEdit, onDelete, onNegate, onDupl
       <Col xs={3} md={2} className="text-right">
         {showActions && type === 'condition' && (
           <ActionsContainer>
-            <IconButton name="edit" onClick={onEdit} title="Edit" />
-            <IconButton name="trash-alt" onClick={onDelete} title="Delete" />
+            <IconButton name="edit_square" onClick={onEdit} title="Edit" />
+            <IconButton name="delete" onClick={onDelete} title="Delete" />
           </ActionsContainer>
         )}
         {showActions && type === 'action' && (
           <ActionsContainer>
-            <EditIconButton name="edit" onClick={onEdit} title="Edit" />
+            <EditIconButton name="edit_square" onClick={onEdit} title="Edit" />
             <OverlayDropdownButton title={MORE_ACTIONS_TITLE}
                                    buttonTitle={MORE_ACTIONS_HOVER_TITLE}
                                    bsSize="xsmall"

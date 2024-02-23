@@ -61,7 +61,7 @@ class MessageDetail extends React.Component {
 
       const nodeContent = (
         <>
-          <Icon name="code-branch" />
+          <Icon name="fork_right" />
           &nbsp;
           <span style={{ wordBreak: 'break-word' }}>{node.short_node_id}</span>&nbsp;/&nbsp;
           <span style={{ wordBreak: 'break-word' }}>{node.hostname}</span>
@@ -165,7 +165,7 @@ class MessageDetail extends React.Component {
           <Col md={12}>
             {this._formatMessageActions()}
             <MessageDetailsTitle>
-              <Icon name="envelope" />
+              <Icon name="mail" />
               &nbsp;
               {messageTitle}
             </MessageDetailsTitle>

@@ -19,6 +19,7 @@ import PropTypes from 'prop-types';
 import styled, { createGlobalStyle } from 'styled-components';
 
 import { Button, Panel } from 'components/bootstrap';
+import Icon from 'components/common/Icon';
 
 export const ErrorMessage = ({ fullMessage, niceMessage }) => {
   const [expanded, toggleExpanded] = useState(false);
@@ -30,7 +31,7 @@ export const ErrorMessage = ({ fullMessage, niceMessage }) => {
       {niceMessage
         && (
           <ErrorToggleInfo onClick={() => toggleExpanded(!expanded)} expanded={expanded}>
-            More Info <i className="fa fa-chevron-right" />
+            More Info <MoreIcon name="keyboard_arrow_right" />
           </ErrorToggleInfo>
         )}
     </>
@@ -180,11 +181,11 @@ const ErrorToggleInfo = styled.button`
   text-transform: uppercase;
   margin: 12px 0 0;
   padding: 0;
+`;
 
-  .fa {
-    transform: rotate(${(props) => (props.expanded ? '90deg' : '0deg')});
-    transition: 150ms transform ease-in-out;
-  }
+const MoreIcon = styled(Icon)`
+  transform: rotate(${(props) => (props.expanded ? '90deg' : '0deg')});
+  transition: 150ms transform ease-in-out;
 `;
 
 export default FormWrap;

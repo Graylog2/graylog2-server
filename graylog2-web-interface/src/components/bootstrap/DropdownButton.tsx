@@ -48,7 +48,7 @@ const DropdownButton = ({ buttonTitle, children, closeOnItemClick, dropup, title
   <Menu position={position(pullRight, dropup)} onChange={onToggle} keepMounted={keepMounted} closeOnItemClick={closeOnItemClick}>
     <Menu.Target>
       <Button onClick={onMouseDown} aria-label={buttonTitle} {...rest} title={buttonTitle}>
-        {title}{noCaret ? null : <>{' '}<Icon name="caret-down" /></>}
+        {title}{noCaret ? null : <>{' '}<Icon name="arrow_drop_down" /></>}
       </Button>
     </Menu.Target>
     <Menu.Dropdown>{children}</Menu.Dropdown>

@@ -18,6 +18,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
+import Icon from 'components/common/Icon';
+import Spinner from 'components/common/Spinner';
+
 const KinesisSetupStep = ({ label, progress }) => {
   const { data, error, loading } = progress;
 
@@ -29,10 +32,10 @@ const KinesisSetupStep = ({ label, progress }) => {
   return (
     <StepItem>
       <IconWrap>
-        {!data && !loading && !error && <i className="fa fa-hourglass-start fa-2x" style={{ color: '#dce1e5' }} />}
-        {loading && <i className="fa fa-spinner fa-2x fa-spin" style={{ color: '#0063be' }} />}
-        {data && <i className="fa fa-check fa-2x" style={{ color: '#00ae42' }} />}
-        {error && <i className="fa fa-times fa-2x" style={{ color: '#ad0707' }} />}
+        {!data && !loading && !error && <Icon name="hourglass_bottom" size="2x" style={{ color: '#dce1e5' }} />}
+        {loading && <Spinner name="spinner" size="2x" style={{ color: '#0063be' }} />}
+        {data && <Icon name="check" size="2x" style={{ color: '#00ae42' }} />}
+        {error && <Icon name="times" size="2x" style={{ color: '#ad0707' }} />}
       </IconWrap>
 
       <Content>

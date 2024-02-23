@@ -50,7 +50,7 @@ const Row = styled.div`
 
 const ErrorWidget = ({ errors, title }: Props) => (
   <Center>
-    <Icon name="exclamation-triangle" size="3x" className={styles.iconMargin} />
+    <Icon name="warning" size="3x" className={styles.iconMargin} />
     <Description>
       <Row>
         <strong>{title}</strong>

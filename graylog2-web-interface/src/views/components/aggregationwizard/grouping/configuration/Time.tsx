@@ -100,14 +100,14 @@ const Time = ({ index }: Props) => (
 
         {value.type === 'auto' && (
         <RangeSelect>
-          <Icon name="search-minus" size="lg" style={{ paddingRight: '0.5rem' }} />
+          <Icon name="zoom_out" size="lg" style={{ paddingRight: '0.5rem' }} />
           <StyledFormControl type="range"
                              min={0.5}
                              max={10}
                              step={0.5}
                              value={value.scaling ? (1 / value.scaling) : 1.0}
                              onChange={(e) => onChange({ target: { name, value: { ...value, scaling: 1 / parseFloat((e.target as HTMLInputElement).value) } } })} />
-          <Icon name="search-plus" size="lg" style={{ paddingLeft: '0.5rem' }} />
+          <Icon name="zoom_in" size="lg" style={{ paddingLeft: '0.5rem' }} />
           <CurrentScale>
             {value.scaling ? (1 / value.scaling) : 1.0}x
           </CurrentScale>

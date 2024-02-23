@@ -37,7 +37,7 @@ const MigrationDatanodeList = () => {
     <div>
       {(!dataNodes || dataNodes?.elements.length === 0) ? (
         <>
-          <p><StyledIcon name="info-circle" />There are no Data Nodes found.</p>
+          <p><StyledIcon name="info" />There are no Data Nodes found.</p>
           <Alert bsStyle="warning" title="No Data Nodes found">
             Please start at least a Data Node to continue the migration process. You can find more information on how to start a Data Nodes in our <DocumentationLink page="graylog-data-node" text="documentation" />.
           </Alert>
