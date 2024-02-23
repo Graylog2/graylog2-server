@@ -245,7 +245,7 @@ public class Configuration extends BaseConfiguration {
 
 
     @Parameter(value = "node_search_cache_size")
-    private String searchCacheSize = "10m";
+    private String searchCacheSize = "10gb";
 
     public boolean isInsecureStartup() {
         return insecureStartup;
