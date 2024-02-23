@@ -168,7 +168,7 @@ class AddWidgetButton extends React.Component<Props, State> {
     );
   };
 
-  _createGroup = (creators: Array<Creator>, type: 'preset' | 'generic'): React.ReactNode => {
+  _createGroup = (creators: Array<Creator>, type: 'preset' | 'generic' | 'investigations'): React.ReactNode => {
     const typeCreators = creators.filter((c) => (c.type === type));
     const sortedCreators = sortBy(typeCreators, 'title');
 
@@ -180,6 +180,8 @@ class AddWidgetButton extends React.Component<Props, State> {
     const creators = PluginStore.exports('creators');
     const presets = this._createGroup(creators, 'preset');
     const generic = this._createGroup(creators, 'generic');
+    const investigations = this._createGroup(creators, 'investigations');
+    console.log({ creators });
     const components: Array<React.ReactNode> = Object.values(overflowingComponents);
 
     return (
@@ -195,6 +197,12 @@ class AddWidgetButton extends React.Component<Props, State> {
           <SectionSubheadline>Predefined Aggregation</SectionSubheadline>
           {presets}
         </Group>
+        {!!React.Children.count(investigations) && (
+          <Group>
+            <SectionSubheadline>Investigations</SectionSubheadline>
+            {investigations}
+          </Group>
+        )}
         {components}
       </>
     );
