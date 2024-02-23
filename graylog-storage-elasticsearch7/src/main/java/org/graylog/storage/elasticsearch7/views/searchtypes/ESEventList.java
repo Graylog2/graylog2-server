@@ -23,9 +23,13 @@ import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.searchtypes.events.EventList;
 import org.graylog.plugins.views.search.searchtypes.events.EventSummary;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.BoolQueryBuilder;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.SearchHit;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.Aggregations;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.sort.SortOrder;
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
+import org.graylog2.plugin.Message;
 
 import java.util.List;
 import java.util.Map;
@@ -37,8 +41,22 @@ public class ESEventList implements ESSearchTypeHandler<EventList> {
     @Override
     public void doGenerateQueryPart(Query query, EventList eventList,
                                     ESGeneratedQueryContext queryContext) {
-        queryContext.searchSourceBuilder(eventList)
-                .size(10000);
+        final var searchSourceBuilder = queryContext.searchSourceBuilder(eventList);
+        searchSourceBuilder.sort(Message.FIELD_TIMESTAMP, SortOrder.DESC);
+        final var queryBuilder = searchSourceBuilder.query();
+        if (!eventList.attributes().isEmpty() && queryBuilder instanceof BoolQueryBuilder boolQueryBuilder) {
+            final var filterQuery = eventList.attributes().stream()
+                    .flatMap(attribute -> attribute.toQueryStrings().stream())
+                    .collect(Collectors.joining(" AND "));
+            boolQueryBuilder.filter(QueryBuilders.queryStringQuery(filterQuery));
+        }
+
+        searchSourceBuilder.size(10000);
+        eventList.page().ifPresent(page -> {
+            final var pageSize = eventList.perPage().orElse(EventList.DEFAULT_PAGE_SIZE);
+            searchSourceBuilder.size(pageSize);
+            searchSourceBuilder.from(page * pageSize);
+        });
     }
 
     protected List<Map<String, Object>> extractResult(SearchResponse result) {

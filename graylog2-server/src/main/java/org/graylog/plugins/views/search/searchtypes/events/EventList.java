@@ -36,6 +36,7 @@ import org.graylog2.database.filtering.AttributeFilter;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -47,6 +48,7 @@ import static org.graylog2.plugin.streams.Stream.DEFAULT_SYSTEM_EVENTS_STREAM_ID
 @JsonTypeName(EventList.NAME)
 @JsonDeserialize(builder = EventList.Builder.class)
 public abstract class EventList implements SearchType {
+    public static final int DEFAULT_PAGE_SIZE = 10;
     public static final String NAME = "events";
     private static final Set<String> FILTER_FIELD_ALLOWLIST = Set.of("priority", "event_definition_id");
 
@@ -65,6 +67,12 @@ public abstract class EventList implements SearchType {
     @Override
     @JsonProperty(FIELD_SEARCH_FILTERS)
     public abstract List<UsedSearchFilter> filters();
+
+    @JsonProperty
+    public abstract Optional<Integer> page();
+
+    @JsonProperty
+    public abstract Optional<Integer> perPage();
 
     @JsonProperty
     public abstract List<AttributeFilter> attributes();
@@ -141,6 +149,16 @@ public abstract class EventList implements SearchType {
         public abstract Builder streams(Set<String> streams);
 
         @JsonProperty
+        public abstract Builder page(int page);
+
+        abstract Optional<Integer> page();
+
+        @JsonProperty
+        public abstract Builder perPage(int pageSize);
+
+        abstract Optional<Integer> perPage();
+
+        @JsonProperty
         public abstract Builder attributes(List<AttributeFilter> attributeFilters);
 
         abstract List<AttributeFilter> attributes();
@@ -155,6 +173,9 @@ public abstract class EventList implements SearchType {
                 checkArgument(FILTER_FIELD_ALLOWLIST.contains(attribute.field()),
                         "Unexpected field name for attribute filter: " + attribute.field() + ", allowed values: " + FILTER_FIELD_ALLOWLIST);
             }
+
+            checkArgument(page().orElse(1) > 0, "Page needs to be a positive, non-zero value");
+            checkArgument(perPage().orElse(1) > 0, "Per page needs to be a positive, non-zero value");
             return autoBuild();
         }
     }

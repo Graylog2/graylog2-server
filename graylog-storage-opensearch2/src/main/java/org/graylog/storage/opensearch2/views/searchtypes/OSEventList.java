@@ -27,7 +27,9 @@ import org.graylog.shaded.opensearch2.org.opensearch.index.query.BoolQueryBuilde
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.SearchHit;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregations;
+import org.graylog.shaded.opensearch2.org.opensearch.search.sort.SortOrder;
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
+import org.graylog2.plugin.Message;
 
 import java.util.List;
 import java.util.Map;
@@ -40,14 +42,21 @@ public class OSEventList implements OSSearchTypeHandler<EventList> {
     public void doGenerateQueryPart(Query query, EventList eventList,
                                     OSGeneratedQueryContext queryContext) {
         final var searchSourceBuilder = queryContext.searchSourceBuilder(eventList);
+        searchSourceBuilder.sort(Message.FIELD_TIMESTAMP, SortOrder.DESC);
         final var queryBuilder = searchSourceBuilder.query();
         if (!eventList.attributes().isEmpty() && queryBuilder instanceof BoolQueryBuilder boolQueryBuilder) {
             final var filterQuery = eventList.attributes().stream()
-                    .flatMap(a -> a.toQueryStrings().stream())
+                    .flatMap(attribute -> attribute.toQueryStrings().stream())
                     .collect(Collectors.joining(" AND "));
             boolQueryBuilder.filter(QueryBuilders.queryStringQuery(filterQuery));
         }
+
         searchSourceBuilder.size(10000);
+        eventList.page().ifPresent(page -> {
+            final var pageSize = eventList.perPage().orElse(EventList.DEFAULT_PAGE_SIZE);
+            searchSourceBuilder.size(pageSize);
+            searchSourceBuilder.from(page * pageSize);
+        });
     }
 
     protected List<Map<String, Object>> extractResult(SearchResponse result) {
