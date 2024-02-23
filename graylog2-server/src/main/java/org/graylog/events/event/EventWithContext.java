@@ -32,7 +32,7 @@ public abstract class EventWithContext {
     public abstract Optional<Event> eventContext();
 
     public abstract Map<String, Object> eventModifierState();
-    
+
     public static EventWithContext create(Event event) {
         return builder().event(event).build();
     }
@@ -54,7 +54,7 @@ public abstract class EventWithContext {
     }
 
     public static Builder builder() {
-        return new AutoValue_EventWithContext.Builder();
+        return new AutoValue_EventWithContext.Builder().eventModifierState(Map.of());
     }
 
     public abstract Builder toBuilder();
