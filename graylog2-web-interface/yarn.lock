@@ -2619,15 +2619,16 @@
   resolved "https://registry.yarnpkg.com/@polka/url/-/url-1.0.0-next.21.tgz#5de5a2385a35309427f6011992b544514d559aa1"
   integrity sha512-a5Sab1C4/icpTZVzZc5Ghpz88yQtGOyNqYXcZgOssB2uuAr+wF/MvN6bgtW32q7HHrvBki+BsZ0OuNv6EV3K9g==
 
-"@puppeteer/browsers@2.0.1":
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/@puppeteer/browsers/-/browsers-2.0.1.tgz#ecae91d06cba83c58ce1e748b050cfc93d6861b2"
-  integrity sha512-IQj/rJY1MNfZ6Z2ERu+6S0LkIPBSXRGddgmvODqjm1afHy04aJIiWmoohuFtL78SPSlbjpIMuFVfhyqsR5Ng4A==
+"@puppeteer/browsers@2.1.0":
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@puppeteer/browsers/-/browsers-2.1.0.tgz#2683d3c908ecfc9af6b63111b5037679d3cebfd8"
+  integrity sha512-xloWvocjvryHdUjDam/ZuGMh7zn4Sn3ZAaV4Ah2e2EwEt90N3XphZlSsU3n0VDc1F7kggCjMuH0UuxfPQ5mD9w==
   dependencies:
     debug "4.3.4"
     extract-zip "2.0.1"
     progress "2.0.3"
     proxy-agent "6.4.0"
+    semver "7.6.0"
     tar-fs "3.0.5"
     unbzip2-stream "1.4.3"
     yargs "17.7.2"
@@ -4943,9 +4944,9 @@ camelize@^1.0.0:
   integrity sha1-FkpUg+Yw+kMh5a8HAg5TGDGyYJs=
 
 caniuse-lite@^1.0.30001332, caniuse-lite@^1.0.30001449, caniuse-lite@^1.0.30001503, caniuse-lite@^1.0.30001517, caniuse-lite@^1.0.30001524, caniuse-lite@^1.0.30001565:
-  version "1.0.30001588"
-  resolved "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001588.tgz"
-  integrity sha512-+hVY9jE44uKLkH0SrUTqxjxqNTOWHsbnQDIKjwkZ3lNTzUUVdBLBGXtj/q5Mp5u98r3droaZAewQuEDzjQdZlQ==
+  version "1.0.30001589"
+  resolved "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001589.tgz"
+  integrity sha512-vNQWS6kI+q6sBlHbh71IIeC+sRwK2N3EDySc/updIGhIee2x5z00J4c1242/5/d6EpEMdOnk/m+6tuk4/tcsqg==
 
 canvas-fit@^1.5.0:
   version "1.5.0"
@@ -6070,10 +6071,10 @@ detect-node@^2.0.4:
   resolved "https://registry.yarnpkg.com/detect-node/-/detect-node-2.1.0.tgz#c9c70775a49c3d03bc2c06d9a73be550f978f8b1"
   integrity sha512-T0NIuQpnTvFDATNuHN5roPwSBG83rFsuO+MXXH9/3N1eFbn4wcPjttvjMLEPWJ0RGUYgQE7cGgS3tNxbqCGM7g==
 
-devtools-protocol@0.0.1232444:
-  version "0.0.1232444"
-  resolved "https://registry.yarnpkg.com/devtools-protocol/-/devtools-protocol-0.0.1232444.tgz#406345a90a871ba852c530d73482275234936eed"
-  integrity sha512-pM27vqEfxSxRkTMnF+XCmxSEb6duO5R+t8A9DEEJgy4Wz2RVanje2mmj99B6A3zv2r/qGfYlOvYznUhuokizmg==
+devtools-protocol@0.0.1249869:
+  version "0.0.1249869"
+  resolved "https://registry.yarnpkg.com/devtools-protocol/-/devtools-protocol-0.0.1249869.tgz#000c3cf1afc189a18db98135a50d4a8f95a47d29"
+  integrity sha512-Ctp4hInA0BEavlUoRy9mhGq0i+JSo/AwVyX2EFgZmV1kYB+Zq+EMBAn52QWu6FbRr10hRb6pBl420upbp4++vg==
 
 diff-match-patch@^1.0.5:
   version "1.0.5"
@@ -6360,22 +6361,22 @@ elementary-circuits-directed-graph@^1.0.4:
     strongly-connected-components "^1.0.1"
 
 embla-carousel-react@^8.0.0-rc11:
-  version "8.0.0-rc23"
-  resolved "https://registry.yarnpkg.com/embla-carousel-react/-/embla-carousel-react-8.0.0-rc23.tgz#bd1760f6c0b333fd68d50bf5d9617b8b72dd0dd4"
-  integrity sha512-EmtIx4oYkBAUi9R31Tg1lh2HCw0Q01bOftXRDhIlNfB+gsDRS76AgeYU+mQc9qW6yeI5C/W5BqtPZU+ymR0E2Q==
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/embla-carousel-react/-/embla-carousel-react-8.0.0.tgz#73abd0a30c2faa37532ae3c4c0b484867e066d5f"
+  integrity sha512-qT0dii8ZwoCtEIBE6ogjqU2+5IwnGfdt2teKjCzW88JRErflhlCpz8KjWnW8xoRZOP8g0clRtsMEFoAgS/elfA==
   dependencies:
-    embla-carousel "8.0.0-rc23"
-    embla-carousel-reactive-utils "8.0.0-rc23"
+    embla-carousel "8.0.0"
+    embla-carousel-reactive-utils "8.0.0"
 
-embla-carousel-reactive-utils@8.0.0-rc23:
-  version "8.0.0-rc23"
-  resolved "https://registry.yarnpkg.com/embla-carousel-reactive-utils/-/embla-carousel-reactive-utils-8.0.0-rc23.tgz#9d64577a9bde68e4c4cd4bb76bf4daec7110ea9a"
-  integrity sha512-/NPejNksrw1iWthTtrps5LNj6gJzylvfCuNTh2+P0FLSPbX/+RlT84Ab5qnbSS/vdmEs8daJbVvb5Bol9v0OdQ==
+embla-carousel-reactive-utils@8.0.0:
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/embla-carousel-reactive-utils/-/embla-carousel-reactive-utils-8.0.0.tgz#65342e9feb8d2780fcb1d1d6050ce41837385efa"
+  integrity sha512-JCw0CqCXI7tbHDRogBb9PoeMLyjEC1vpN0lDOzUjmlfVgtfF+ffLaOK8bVtXVUEbNs/3guGe3NSzA5J5aYzLzw==
 
-embla-carousel@8.0.0-rc23:
-  version "8.0.0-rc23"
-  resolved "https://registry.yarnpkg.com/embla-carousel/-/embla-carousel-8.0.0-rc23.tgz#07052fd046d4cfa5cc9809a8003d3e210dd05103"
-  integrity sha512-ybuDHm+udElyH+XpuemS/W+x8ZhB3a/4UzeTBvsoZUxDSty12ch1f2T0CZxGqIs2FfdaofEOmpLMSvuEPVTMCg==
+embla-carousel@8.0.0:
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/embla-carousel/-/embla-carousel-8.0.0.tgz#164d0faafe3220c2584c08d45a738c9fb4efc344"
+  integrity sha512-ecixcyqS6oKD2nh5Nj5MObcgoSILWNI/GtBxkidn5ytFaCCmwVHo2SecksaQZHcARMMpIR2dWOlSIdA1LkZFUA==
 
 emittery@^0.13.1:
   version "0.13.1"
@@ -6957,7 +6958,7 @@ eslint-config-airbnb@19.0.4:
     eslint-config-airbnb "19.0.4"
     eslint-import-resolver-webpack "0.13.8"
     eslint-plugin-compat "4.2.0"
-    eslint-plugin-graylog "file:../../../../Library/Caches/Yarn/v6/npm-eslint-config-graylog-1.3.0-8db21746-108b-44bb-a38e-0a7476187937-1707916403978/node_modules/eslint-plugin-graylog"
+    eslint-plugin-graylog "file:../../../../.cache/yarn/v6/npm-eslint-config-graylog-1.3.0-5efd7404-88ee-4743-b813-763d033e44c6-1708646895529/node_modules/eslint-plugin-graylog"
     eslint-plugin-import "2.25.3"
     eslint-plugin-jest "27.9.0"
     eslint-plugin-jest-dom "5.1.0"
@@ -8380,13 +8381,13 @@ graphemer@^1.4.0:
     "@types/create-react-class" "15.6.7"
     "@types/jquery" "3.5.29"
     "@types/react" "18.2.57"
-    babel-preset-graylog "file:packages/babel-preset-graylog"
+    babel-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-6.0.0-SNAPSHOT-53720185-1344-4bdf-9969-94a1d290792a-1708646895249/node_modules/babel-preset-graylog"
     create-react-class "15.7.0"
-    eslint-config-graylog "file:../../../../Library/Caches/Yarn/v6/npm-graylog-web-plugin-6.0.0-SNAPSHOT-129c030f-ddaa-4823-8a06-5f2dd3dfe901-1707916403885/node_modules/eslint-config-graylog"
+    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-6.0.0-SNAPSHOT-53720185-1344-4bdf-9969-94a1d290792a-1708646895249/node_modules/eslint-config-graylog"
     formik "2.4.5"
     history "^5.3.0"
     html-webpack-plugin "^5.5.0"
-    jest-preset-graylog "file:../../../../Library/Caches/Yarn/v6/npm-graylog-web-plugin-6.0.0-SNAPSHOT-129c030f-ddaa-4823-8a06-5f2dd3dfe901-1707916403885/node_modules/jest-preset-graylog"
+    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-6.0.0-SNAPSHOT-53720185-1344-4bdf-9969-94a1d290792a-1708646895249/node_modules/jest-preset-graylog"
     jquery "3.7.1"
     moment "2.30.1"
     moment-timezone "0.5.45"
@@ -10841,6 +10842,11 @@ material-colors@^1.2.1:
   resolved "https://registry.yarnpkg.com/material-colors/-/material-colors-1.2.6.tgz#6d1958871126992ceecc72f4bcc4d8f010865f46"
   integrity sha512-6qE4B9deFBIa9YSpOc9O0Sgc43zTeVYbgDT5veRKSlB2+ZuHNoVVxA1L/ckMUayV9Ay9y7Z/SZCLcGteW9i7bg==
 
+material-symbols@^0.14.7:
+  version "0.14.7"
+  resolved "https://registry.yarnpkg.com/material-symbols/-/material-symbols-0.14.7.tgz#ce7c81320efabefb01960bdf4af537c141372163"
+  integrity sha512-65aJAnHtKx98tm41vz9gS6fQfUo+8pCg2sETOC/linpHKEv6gw7U+iHN5Bha6tfM8hDSGfjCwaKOWb+Rs/XyDg==
+
 math-log2@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/math-log2/-/math-log2-1.0.1.tgz#fb8941be5f5ebe8979e718e6273b178e58694565"
@@ -12141,9 +12147,9 @@ postcss@^8.4.31, postcss@^8.4.33:
     source-map-js "^1.0.2"
 
 posthog-js@^1.52.0:
-  version "1.108.0"
-  resolved "https://registry.yarnpkg.com/posthog-js/-/posthog-js-1.108.0.tgz#df8cc955b35c123892dd02c4660128a30b1d4240"
-  integrity sha512-BTQC5qWafdy2n4HpibkPPjZO/24YzxRokynMJ3avftUVIKSqFkU2dFeAA4ij0j43uFzAcRIacdwRdeXERd4WAA==
+  version "1.108.2"
+  resolved "https://registry.yarnpkg.com/posthog-js/-/posthog-js-1.108.2.tgz#3df3b01130462890ed99d74004cee6e9af889c02"
+  integrity sha512-31gAeJuql5TXoxSE/69w9htHN35B1f1NN5XBEIrS9xX7LoqzIgUIuhAPFOpX4yUtsXqqWD57xEtR/2hfdEsWRA==
   dependencies:
     fflate "^0.4.8"
     preact "^10.19.3"
@@ -12303,26 +12309,26 @@ punycode@^2.1.0, punycode@^2.1.1:
   resolved "https://registry.yarnpkg.com/punycode/-/punycode-2.1.1.tgz#b58b010ac40c22c5657616c8d2c2c02c7bf479ec"
   integrity sha512-XRsRjdf+j5ml+y/6GKHPZbrF/8p2Yga0JPtdqTIY2Xe5ohJPD9saDJJLPvp9+NSBprVvevdXZybnj2cv8OEd0A==
 
-puppeteer-core@22.1.0:
-  version "22.1.0"
-  resolved "https://registry.yarnpkg.com/puppeteer-core/-/puppeteer-core-22.1.0.tgz#92faad0f9e6a7f9b1f488dc02e640254606730e6"
-  integrity sha512-LdsQxslPf0Rpk6gLvkyyrraad2S4PUjGCT2CAKS2EnrRPpzIb6fsrFnoPNZxLlMkU7apU1g4Nf5wYePdSjxLkQ==
+puppeteer-core@22.2.0:
+  version "22.2.0"
+  resolved "https://registry.yarnpkg.com/puppeteer-core/-/puppeteer-core-22.2.0.tgz#85bf2c492ba02e8051bb75dff3043d21d9945f21"
+  integrity sha512-rxLM860FP05CxCPAn6dwY0KnVhbnogsXu4XORb+2hb/va69v7R1VdJWLMGHd7EE5wfpT8oFZ7Q6NN85OhOtV9Q==
   dependencies:
-    "@puppeteer/browsers" "2.0.1"
+    "@puppeteer/browsers" "2.1.0"
     chromium-bidi "0.5.9"
     cross-fetch "4.0.0"
     debug "4.3.4"
-    devtools-protocol "0.0.1232444"
+    devtools-protocol "0.0.1249869"
     ws "8.16.0"
 
 puppeteer@^22.0.0:
-  version "22.1.0"
-  resolved "https://registry.yarnpkg.com/puppeteer/-/puppeteer-22.1.0.tgz#a3c839f51e0660f17b1623f0ae9dcc2282d4c40d"
-  integrity sha512-suatHy6A48YkoykjrJNkJaixWVrvnPtzIgngK17V/P0MvgSyJzuu21PyR+0lWIK0cfZqKqmR8CHZvHzOCd4MIg==
+  version "22.2.0"
+  resolved "https://registry.yarnpkg.com/puppeteer/-/puppeteer-22.2.0.tgz#2f4e4bff252bc6999f213288ed717940b27b0918"
+  integrity sha512-0Ax7zeqqbQL6Zcpo1WAvrqWQAnGsLB4tmQUUwsb5Cfo05XaQ78LWUUjaO4um7qaddKpZfk0vXlGcRVwtedpWfg==
   dependencies:
-    "@puppeteer/browsers" "2.0.1"
+    "@puppeteer/browsers" "2.1.0"
     cosmiconfig "9.0.0"
-    puppeteer-core "22.1.0"
+    puppeteer-core "22.2.0"
 
 pure-rand@^6.0.0:
   version "6.0.1"
@@ -13583,6 +13589,13 @@ selfsigned@^2.4.1:
   version "5.7.2"
   resolved "https://registry.yarnpkg.com/semver/-/semver-5.7.2.tgz#48d55db737c3287cd4835e17fa13feace1c41ef8"
   integrity sha512-cBznnQ9KjJqU67B52RMC65CMarK2600WFnbkcaiwWq3xy/5haFJlshgnpjovMVJ+Hff49d8GEn0b87C5pDQ10g==
+
+semver@7.6.0:
+  version "7.6.0"
+  resolved "https://registry.yarnpkg.com/semver/-/semver-7.6.0.tgz#1a46a4db4bffcccd97b743b5005c8325f23d4e2d"
+  integrity sha512-EnwXhrlwXMk9gKu5/flx5sv/an57AkRplG3hTK68W7FRDN+k+OWBj65M7719OkA82XLBxrcX0KSHj+X5COhOVg==
+  dependencies:
+    lru-cache "^6.0.0"
 
 semver@^6.0.0, semver@^6.3.0, semver@^6.3.1:
   version "6.3.1"

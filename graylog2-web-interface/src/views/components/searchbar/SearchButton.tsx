@@ -89,7 +89,7 @@ const SearchButton = ({ dirty, disabled, glyph, displaySpinner }: Props) => {
                   type="submit"
                   bsStyle="success"
                   $dirty={dirty}>
-      {displaySpinner ? <Spinner delay={0} text="" /> : <Icon name={glyph} />}
+      {displaySpinner ? <Spinner delay={0} text="" /> : <Icon name={glyph} size="lg" />}
     </StyledButton>
   );
 };

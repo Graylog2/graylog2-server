@@ -174,7 +174,7 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit }) => {
           </li>
           <li>
             <strong>Global Input</strong>
-            <span><Icon name="check" /></span>
+            <span><Icon name="done" /></span>
           </li>
           <li>
             <strong>Record Batch Size</strong>
@@ -188,11 +188,11 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit }) => {
           </li>
           <li>
             <strong>Enable Throttling</strong>
-            <span><Icon name={throttleEnabled ? 'check' : 'times'} /></span>
+            <span><Icon name={throttleEnabled ? 'check_circle' : 'cancel'} /></span>
           </li>
           <li>
             <strong>Add Flow Log prefix to field names</strong>
-            <span><Icon name={addPrefix ? 'check' : 'times'} /></span>
+            <span><Icon name={addPrefix ? 'check_circle' : 'cancel'} /></span>
           </li>
         </ReviewItems>
 

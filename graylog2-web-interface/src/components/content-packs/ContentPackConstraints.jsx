@@ -49,7 +49,7 @@ class ContentPackConstraints extends React.Component {
         <td>{constraint.version}</td>
         <td>
           <Badge bsStyle={constraint.fulfilled ? 'success' : 'danger'}>
-            <Icon name={constraint.fulfilled ? 'check' : 'times'} />
+            <Icon name={constraint.fulfilled ? 'check_circle' : 'cancel'} />
           </Badge>
         </td>
       </tr>

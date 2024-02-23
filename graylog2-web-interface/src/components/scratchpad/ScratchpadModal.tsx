@@ -242,12 +242,12 @@ const Scratchpad = () => {
                             </>
                           )}>
             <Button bsStyle="link">
-              <Icon name="question-circle" />
+              <Icon name="help" />
             </Button>
           </OverlayTrigger>
 
           <StatusMessage $visible={showStatusMessage}>
-            <Icon name={statusMessage === STATUS_COPIED ? 'copy' : 'hdd'} type="regular" /> {statusMessage}
+            <Icon name={statusMessage === STATUS_COPIED ? 'content_copy' : 'save'} type="regular" /> {statusMessage}
           </StatusMessage>
 
           <ButtonGroup>
@@ -255,10 +255,10 @@ const Scratchpad = () => {
                     data-clipboard-target={`#${TEXTAREA_ID}`}
                     id="scratchpad-actions"
                     title="Copy">
-              <Icon name="copy" />
+              <Icon name="content_copy" />
             </Button>
             <Button onClick={openConfirmClear} title="Clear">
-              <Icon name="trash-alt" />
+              <Icon name="delete" />
             </Button>
           </ButtonGroup>
 

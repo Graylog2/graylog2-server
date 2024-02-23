@@ -31,7 +31,7 @@ const TimeRangePickerButton = ({ hasError, disabled, onClick }: Props) => (
           disabled={disabled}
           onClick={onClick}
           aria-label="Open Time Range Selector">
-    <Icon name={hasError ? 'exclamation-triangle' : 'clock'} />
+    <Icon name={hasError ? 'warning' : 'schedule'} />
   </Button>
 );
 

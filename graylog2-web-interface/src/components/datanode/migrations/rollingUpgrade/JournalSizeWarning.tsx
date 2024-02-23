@@ -28,7 +28,7 @@ const StyledHelpPanel = styled(StyledPanel)`
 const JournalSizeWarning = () => (
   <StyledHelpPanel bsStyle="warning">
     <Panel.Heading>
-      <Panel.Title componentClass="h3"><Icon name="exclamation-triangle" /> Journal size warning</Panel.Title>
+      <Panel.Title componentClass="h3"><Icon name="warning" /> Journal size warning</Panel.Title>
     </Panel.Heading>
     <Panel.Body>
       <p>Please note that during migration you will have to stop processing on your Graylog node, this will result in the journal growing in size.
