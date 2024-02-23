@@ -23,6 +23,8 @@ import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.searchtypes.events.EventList;
 import org.graylog.plugins.views.search.searchtypes.events.EventSummary;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.index.query.BoolQueryBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.SearchHit;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregations;
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
@@ -37,8 +39,15 @@ public class OSEventList implements OSSearchTypeHandler<EventList> {
     @Override
     public void doGenerateQueryPart(Query query, EventList eventList,
                                     OSGeneratedQueryContext queryContext) {
-        queryContext.searchSourceBuilder(eventList)
-                .size(10000);
+        final var searchSourceBuilder = queryContext.searchSourceBuilder(eventList);
+        final var queryBuilder = searchSourceBuilder.query();
+        if (!eventList.attributes().isEmpty() && queryBuilder instanceof BoolQueryBuilder boolQueryBuilder) {
+            final var filterQuery = eventList.attributes().stream()
+                    .flatMap(a -> a.toQueryStrings().stream())
+                    .collect(Collectors.joining(" AND "));
+            boolQueryBuilder.filter(QueryBuilders.queryStringQuery(filterQuery));
+        }
+        searchSourceBuilder.size(10000);
     }
 
     protected List<Map<String, Object>> extractResult(SearchResponse result) {

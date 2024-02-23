@@ -31,6 +31,7 @@ import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.entities.EventListEntity;
 import org.graylog2.contentpacks.model.entities.SearchTypeEntity;
+import org.graylog2.database.filtering.AttributeFilter;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -38,6 +39,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static org.graylog2.plugin.streams.Stream.DEFAULT_EVENTS_STREAM_ID;
 import static org.graylog2.plugin.streams.Stream.DEFAULT_SYSTEM_EVENTS_STREAM_ID;
 
@@ -46,6 +48,7 @@ import static org.graylog2.plugin.streams.Stream.DEFAULT_SYSTEM_EVENTS_STREAM_ID
 @JsonDeserialize(builder = EventList.Builder.class)
 public abstract class EventList implements SearchType {
     public static final String NAME = "events";
+    private static final Set<String> FILTER_FIELD_ALLOWLIST = Set.of("priority", "event_definition_id");
 
     @Override
     public abstract String type();
@@ -63,12 +66,16 @@ public abstract class EventList implements SearchType {
     @JsonProperty(FIELD_SEARCH_FILTERS)
     public abstract List<UsedSearchFilter> filters();
 
+    @JsonProperty
+    public abstract List<AttributeFilter> attributes();
+
     @JsonCreator
     public static Builder builder() {
         return new AutoValue_EventList.Builder()
                 .type(NAME)
                 .filters(Collections.emptyList())
-                .streams(Collections.emptySet());
+                .streams(Collections.emptySet())
+                .attributes(Collections.emptyList());
     }
 
     public abstract Builder toBuilder();
@@ -133,11 +140,20 @@ public abstract class EventList implements SearchType {
         @JsonProperty
         public abstract Builder streams(Set<String> streams);
 
+        @JsonProperty
+        public abstract Builder attributes(List<AttributeFilter> attributeFilters);
+
+        abstract List<AttributeFilter> attributes();
+
         abstract EventList autoBuild();
 
         public EventList build() {
             if(id() == null) {
                 id(UUID.randomUUID().toString());
+            }
+            for (final var attribute : attributes()) {
+                checkArgument(FILTER_FIELD_ALLOWLIST.contains(attribute.field()),
+                        "Unexpected field name for attribute filter: " + attribute.field() + ", allowed values: " + FILTER_FIELD_ALLOWLIST);
             }
             return autoBuild();
         }
