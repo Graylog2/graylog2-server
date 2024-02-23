@@ -37,11 +37,11 @@ const StyledCol = styled(Col)`
 `;
 
 const SearchLoadingIndicator = () => {
-  const [indicatorText, setIndictorText] = useState('Updating search results...');
+  const [indicatorText, setIndicatorText] = useState('Updating search results...');
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      setIndictorText('This is taking a bit longer, please hold on...');
+      setIndicatorText('This is taking a bit longer, please hold on...');
     }, 20000);
 
     return () => clearTimeout(timeoutId);
