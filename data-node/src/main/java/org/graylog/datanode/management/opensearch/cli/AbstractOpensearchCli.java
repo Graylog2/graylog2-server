@@ -40,6 +40,12 @@ public abstract class AbstractOpensearchCli {
     private final Path configPath;
     private final Path binPath;
 
+    /**
+     *
+     * @param configPath Opensearch CLI tools adapt configuration stored under OPENSEARCH_PATH_CONF env property.
+     *                   This is why wealways want to set this configPath for each CLI tool.
+     * @param bin location of the actual executable binary that this wrapper handles
+     */
     private AbstractOpensearchCli(Path configPath, Path bin) {
         this.configPath = configPath;
         this.binPath = bin;
@@ -57,11 +63,19 @@ public abstract class AbstractOpensearchCli {
         return path;
     }
 
-    protected String run(String... args) {
-        return run(Collections.emptyList(), args);
+    protected String runBatch(String... args) {
+        return runWithStdin(Collections.emptyList(), args);
     }
 
-    protected String run(List<String> answersToPrompts, String... args) {
+    /**
+     * @param answersToPrompts Some opensearch CLI tools have to be operated in an interactive way - provide answers
+     *                         to questions the tool is asking. It's scripting unfriendly. Our way around this is to
+     *                         provide an input stream of expected responses, each delimited by \n. There is no validation
+     *                         and no logic, just the expected order of responses.
+     * @param args arguments of the command, in opensearch-keystore create, the create is the first argument
+     * @return All the STDOUT and STDERR of the process merged into one String.
+     */
+    protected String runWithStdin(List<String> answersToPrompts, String... args) {
         final CommandLine cmd = new CommandLine(binPath.toFile());
         Arrays.asList(args).forEach(cmd::addArgument);
 
@@ -75,6 +89,7 @@ public abstract class AbstractOpensearchCli {
             pumpStreamHandler = new PumpStreamHandler(stdout, stdout, input);
         }
 
+        // TODO: add watchdog and timeout to the underlying command handling
         final DefaultExecutor executor = new DefaultExecutor.Builder<>()
                 .setExecuteStreamHandler(pumpStreamHandler)
                 .get();

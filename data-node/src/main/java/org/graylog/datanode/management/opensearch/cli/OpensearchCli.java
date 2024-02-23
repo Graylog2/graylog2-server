@@ -18,6 +18,10 @@ package org.graylog.datanode.management.opensearch.cli;
 
 import org.graylog.datanode.process.OpensearchConfiguration;
 
+/**
+ * Collection of opensearch CLI tools. All of them need to have OPENSEARCH_PATH_CONF preconfigured, so they operate
+ * on the correct version of configuration.
+ */
 public class OpensearchCli {
 
     private final OpensearchKeystoreCli keystore;

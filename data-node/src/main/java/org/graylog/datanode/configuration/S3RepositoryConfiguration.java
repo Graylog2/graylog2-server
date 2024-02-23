@@ -21,6 +21,7 @@ import com.github.joschi.jadconfig.converters.BooleanConverter;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
+import java.util.Set;
 
 public class S3RepositoryConfiguration {
 
@@ -43,6 +44,10 @@ public class S3RepositoryConfiguration {
     private boolean s3ClientDefaultPathStyleAccess = true;
 
 
+    /**
+     * access and secret keys are handled separately and stored in an opensearch keystore.
+     * See usages of {@link #getS3ClientDefaultAccessKey()} and {@link #getS3ClientDefaultSecretKey()}
+     */
     public Map<String, String> toOpensearchProperties() {
         return Map.of(
                 "s3.client.default.protocol", s3ClientDefaultProtocol,
@@ -60,9 +65,26 @@ public class S3RepositoryConfiguration {
         return s3ClientDefaultSecretKey;
     }
 
+    /**
+     * Verify that either both access and secret keys and the endpoint are configured or none of them. Partial configuration
+     * will lead to an IllegalStateException.
+     */
     public boolean isRepositoryEnabled() {
-        return StringUtils.isNotBlank(s3ClientDefaultEndpoint) &&
-                StringUtils.isNotBlank(s3ClientDefaultAccessKey) &&
-                StringUtils.isNotBlank(s3ClientDefaultSecretKey);
+
+        final Set<String> requiredProperties = Set.of(s3ClientDefaultEndpoint, s3ClientDefaultAccessKey, s3ClientDefaultSecretKey);
+
+        if (requiredProperties.stream().allMatch(StringUtils::isNotBlank)) {
+            // All the required properties are set and not blank, s3 repository is enabled
+            return true;
+        } else if (requiredProperties.stream().allMatch(StringUtils::isBlank)) {
+            // all are empty, this means repository is not configured at all
+            return false;
+        } else {
+            // One or two properties are configured, this is an incomplete configuration we can't handle this situation
+            throw new IllegalStateException("""
+                    S3 Client not configured properly, all
+                    s3_client_default_access_key, s3_client_default_secret_key and s3_client_default_endpoint
+                    have to be provided in the configuration!""");
+        }
     }
 }

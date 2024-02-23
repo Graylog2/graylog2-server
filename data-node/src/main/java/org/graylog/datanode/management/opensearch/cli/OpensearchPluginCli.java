@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.management.opensearch.cli;
 
+import org.graylog.datanode.configuration.DatanodeDirectories;
 import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog2.shared.utilities.StringUtils;
 
@@ -44,12 +45,22 @@ public class OpensearchPluginCli extends AbstractOpensearchCli {
         return pluginFilePath;
     }
 
+    /**
+     * Installs plugin by its name, will be downloaded from the internet. This is not a preferred way for distributed
+     * releases, as it requires access to the internet. We should rather predownload plugins and use {@link #installFromZip(String, String)}
+     */
     public List<String> list() {
-        final String output = run("list");
+        final String output = runBatch("list");
         return Arrays.stream(output.split("\n")).toList();
     }
 
+    /**
+     * Install plugin from predownloaded zip file. The exact location of the file is determined by {@link DatanodeDirectories#getOpensearchPluginsDir()}
+     * @param pluginName Name without version, e.g. "repository-s3"
+     * @param version Semver version of the plugin. Usually it should correspond to the opensearch version, but it may
+     *                differ for some plugins.
+     */
     public void installFromZip(String pluginName, String version) {
-        run("install", "--batch", resolveOpensearchPlugin(pluginName, version).toAbsolutePath().toUri().toString());
+        runBatch("install", "--batch", resolveOpensearchPlugin(pluginName, version).toAbsolutePath().toUri().toString());
     }
 }

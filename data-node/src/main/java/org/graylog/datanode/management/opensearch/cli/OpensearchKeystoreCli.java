@@ -26,11 +26,20 @@ public class OpensearchKeystoreCli extends AbstractOpensearchCli {
         super(config, "opensearch-keystore");
     }
 
+    /**
+     * Create a new opensearch keystore. This command expects that there is no keystore. Otherwise, it will ask for
+     * confirmation to override it and this fails, as there is currently no stdin configured.
+     * @return STDOUT/STDERR of the execution as one String
+     */
     public String create() {
-        return run("create");
+        return runBatch("create");
     }
 
+    /**
+     * Add secrets to the store. The command is interactive, it will ask for the secret value (to avoid recording the value
+     * in the command line history). So we have to work around that and provide the value in STDIN.
+     */
     public void add(String key, String secretValue) {
-        run(Collections.singletonList(secretValue), "add", key);
+        runWithStdin(Collections.singletonList(secretValue), "add", key);
     }
 }
