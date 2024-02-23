@@ -52,14 +52,15 @@ const MigrationWelcomeStep = ({ currentStep, onTriggerStep }: Props) => (
   <Row>
     <Col md={6}>
       <MigrationError errorMessage={currentStep.error_message} />
-      <Headline>Migration to Data Node</Headline>
+      <Headline>Data Nodes Migration</Headline>
       <p>
-        It looks like you updated Graylog and want to configure a Data Node. Data Nodes allow you to index and search through all the messages in your Graylog message database.
+        The Graylog Data Node is a management component designed to configure and optimize OpenSearch for use with Graylog, reducing administrative overhead and simplifying future updates.
       </p>
+      <p>Deployments earlier than v5.2 or that opted to not install with a Data Node will need to migrate the message databases to Data Nodes.</p>
       <p>
-        Using this migration tool you can check the compatibility and follow the steps to migrate your existing OpenSearch data to a Data Node.<br />
+        This migration tool will check the compatibility of your components and guide you through to migrate your existing OpenSearch data to a Data Node.<br />
       </p>
-      <p>Migrating to Data Node requires some steps that are performed using the UI in this wizard, but it also requires some additional steps that should be performed on the OS, your current OS/ES cluster and your config files.</p>
+      <p>Migrating to Data Node will requires some steps performed on the OS, within your current OS/ES cluster, and in your configuration files.</p>
       <p>You can get more information on the Data Node migration <DocumentationLink page="graylog-data-node" text="documentation" />.</p>
       <br />
       <MigrationDatanodeList />
@@ -73,7 +74,7 @@ const MigrationWelcomeStep = ({ currentStep, onTriggerStep }: Props) => (
         <Panel.Body>
           <p>Migration from <code>Elasticsearch 7.10</code> needs an additional step. ES 7.10 does not understand JWT
             authentication.
-            So you have to first migrate to OpenSearch before running the update of the security information. Look at
+            So So you will need to first migrate to OpenSearch before running the update of the security information. Look at
             the supplied <code>es710-docker-compose.yml</code> as an example.
           </p>
         </Panel.Body>
