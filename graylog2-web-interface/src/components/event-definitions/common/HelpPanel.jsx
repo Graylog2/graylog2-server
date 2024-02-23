@@ -30,7 +30,7 @@ const IconHeader = styled(Icon)`
 const ConditionalCollapse = ({ condition, wrapper, children }) => (condition ? wrapper(children) : children);
 
 export const HelpPanel = ({ bsStyle, children, className, collapsible, header, title, defaultExpanded }) => {
-  const defaultHeader = <h3><IconHeader name="info-circle" />{title}</h3>;
+  const defaultHeader = <h3><IconHeader name="info" />{title}</h3>;
 
   return (
     <Panel defaultExpanded={defaultExpanded}

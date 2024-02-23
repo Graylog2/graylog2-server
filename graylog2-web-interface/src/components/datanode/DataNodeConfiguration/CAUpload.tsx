@@ -132,13 +132,13 @@ const CAUpload = () => {
                             loading={isLoading}>
                   <DropzoneInner>
                     <Dropzone.Accept>
-                      <Icon name="file" type="solid" size="2x" />
+                      <Icon name="draft" type="solid" size="2x" />
                     </Dropzone.Accept>
                     <Dropzone.Reject>
-                      <Icon name="triangle-exclamation" size="2x" />
+                      <Icon name="warning" size="2x" />
                     </Dropzone.Reject>
                     <Dropzone.Idle>
-                      <Icon name="file" type="regular" size="2x" />
+                      <Icon name="draft" type="regular" size="2x" />
                     </Dropzone.Idle>
                     <div>
                       Drag CA here or click to select file
@@ -148,11 +148,11 @@ const CAUpload = () => {
                 <Files>
                   {value?.filter((file) => !!file).map(({ name: fileName }, index) => (
                     <File key={fileName}>
-                      <Icon name="file" /> {fileName} <DeleteIcon name="xmark"
-                                                                  onClick={() => {
-                                                                    const newValue = value.filter((_ignored, idx) => idx !== index);
-                                                                    onChange({ target: { name, value: newValue } });
-                                                                  }} />
+                      <Icon name="draft" /> {fileName} <DeleteIcon name="xmark"
+                                                                   onClick={() => {
+                                                                     const newValue = value.filter((_ignored, idx) => idx !== index);
+                                                                     onChange({ target: { name, value: newValue } });
+                                                                   }} />
                     </File>
                   ))}
                 </Files>

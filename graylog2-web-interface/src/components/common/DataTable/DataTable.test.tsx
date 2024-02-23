@@ -49,7 +49,7 @@ describe('<DataTable />', () => {
     const wrapper = mount(<DataTable id="myDataTable" headers={['One']} rows={[]} dataRowFormatter={rowFormatter} />);
 
     expect(wrapper.find('table')).toHaveLength(0);
-    expect(wrapper.text()).toBe('No data available.');
+    expect(wrapper.text()).toContain('No data available.');
   });
 
   it('should render with rows', () => {

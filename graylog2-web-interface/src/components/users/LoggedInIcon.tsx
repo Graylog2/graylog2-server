@@ -25,7 +25,7 @@ const Wrapper = styled.div<{ $active: boolean }>(({ theme, $active }) => css`
 
 const LoggedInIcon = ({ active, ...rest }: { active: boolean }) => (
   <Wrapper $active={active}>
-    <Icon {...rest} name={active ? 'check-circle' : 'times-circle'} />
+    <Icon {...rest} name={active ? 'check_circle' : 'cancel'} />
   </Wrapper>
 );
 
