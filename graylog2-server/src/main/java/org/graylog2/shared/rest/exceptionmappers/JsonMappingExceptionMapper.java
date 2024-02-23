@@ -22,7 +22,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
-import org.graylog2.plugin.rest.ApiError;
+import org.graylog2.plugin.rest.RequestError;
 
 import java.util.stream.Collectors;
 
@@ -33,13 +33,15 @@ import static jakarta.ws.rs.core.Response.status;
 public class JsonMappingExceptionMapper implements ExceptionMapper<JsonMappingException> {
     @Override
     public Response toResponse(JsonMappingException e) {
-        final String message = errorWithJsonPath(e);
-        final ApiError apiError = ApiError.create(message);
+        final var errorPath = errorPath(e);
+        final var location = e.getLocation();
+        final String message = errorWithJsonPath(e, errorPath);
+        final var apiError = RequestError.create(message, location.getLineNr(), location.getColumnNr(), errorPath);
         return status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(apiError).build();
     }
 
     private String errorPath(final JsonMappingException e) {
-        final String pathToErrorField = e.getPath().stream()
+        return e.getPath().stream()
                 .map(path -> {
                     final var fieldName = path.getFieldName();
                     if (fieldName == null && path.getIndex() != -1) {
@@ -48,12 +50,11 @@ public class JsonMappingExceptionMapper implements ExceptionMapper<JsonMappingEx
                     return fieldName;
                 })
                 .collect(Collectors.joining("."));
-        return "\"" + pathToErrorField + "\"";
     }
 
-    private String errorWithJsonPath(final JsonMappingException e) {
+    private String errorWithJsonPath(final JsonMappingException e, String path) {
         final var location = "[" + e.getLocation().getLineNr() + ", " + e.getLocation().getColumnNr() + "]";
-        final var quotedPath = errorPath(e);
+        final var quotedPath = "\"" + path + "\"";
         final var messagePrefix = "Error at " + quotedPath + " " + location;
 
 
