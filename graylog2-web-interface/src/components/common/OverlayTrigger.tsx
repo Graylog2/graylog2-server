@@ -38,11 +38,11 @@ type Props = {
 }
 
 const TriggerWrap = styled.span`
-  display: inline-block;
+  display: inline-flex;
 `;
 
 const Container = styled.div`
-  display: inline-block;
+  display: inline-flex;
 `;
 
 type OverlayType = {

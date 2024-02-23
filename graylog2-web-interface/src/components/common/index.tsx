@@ -24,6 +24,7 @@ export { default as AccordionItem } from './AccordionItem';
 export { default as Affix } from './Affix';
 export { default as Autocomplete } from './Autocomplete/Autocomplete';
 export { default as BrowserTime } from './BrowserTime';
+export { default as BrandIcon } from './BrandIcon';
 export { default as Center } from './Center';
 export { default as Carousel } from 'components/common/carousel/Carousel';
 export { default as ClipboardButton } from './ClipboardButton';

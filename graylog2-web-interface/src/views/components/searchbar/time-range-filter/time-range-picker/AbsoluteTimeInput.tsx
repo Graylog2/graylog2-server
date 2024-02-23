@@ -27,9 +27,9 @@ import type { IconName } from 'components/common/Icon';
 import { DATE_TIME_FORMATS } from 'util/DateTime';
 import useUserDateTime from 'hooks/useUserDateTime';
 
-const TIME_ICON_BOD = 'hourglass-start';
-const TIME_ICON_MID = 'hourglass-half';
-const TIME_ICON_EOD = 'hourglass-end';
+const TIME_ICON_BOD = 'hourglass_top';
+const TIME_ICON_MID = 'hourglass';
+const TIME_ICON_EOD = 'hourglass_top';
 
 const TIME_TYPES = [
   'hours',
@@ -272,7 +272,7 @@ const AbsoluteTimeInput = ({ dateTime, range, onChange }) => {
                           bsSize="small"
                           onClick={_onClickTimeNow}
                           title="Set to current local time">
-              <Icon name="magic" />
+              <Icon name="calendar_clock" />
             </StyledButton>
           </StyledInputAddon>
         </GridInputGroup>

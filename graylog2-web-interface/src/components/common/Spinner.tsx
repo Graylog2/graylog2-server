@@ -16,16 +16,17 @@
  */
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import type { IconName } from 'components/common/Icon';
 
 import Icon from './Icon';
 import Delayed from './Delayed';
 
-const StyledIcon = styled(Icon)<{ $displayMargin: boolean }>(({ $displayMargin }) => (
-  $displayMargin ? 'margin-right: 6px;' : ''
-));
+const StyledIcon = styled(Icon)<{ $displayMargin: boolean }>(({ $displayMargin }) => css`
+  vertical-align: bottom;
+  ${$displayMargin ? 'margin-right: 6px;' : ''}
+`);
 
 type Props = {
   delay?: number,
@@ -52,7 +53,7 @@ Spinner.propTypes = {
 };
 
 Spinner.defaultProps = {
-  name: 'spinner',
+  name: 'progress_activity',
   text: 'Loading...',
   delay: 200,
 };

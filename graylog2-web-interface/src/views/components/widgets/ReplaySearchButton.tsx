@@ -69,8 +69,8 @@ const buildSearchLink = (
 export const ReplaySearchButtonComponent = ({ searchLink, children, onClick }: { children?: React.ReactNode, searchLink: string, onClick?: () => void }) => (
   <NeutralLink href={searchLink} target="_blank" rel="noopener noreferrer" title="Replay search" onClick={onClick}>
     {children
-      ? <>{children} <StyledIcon name="play" /></>
-      : <IconButton name="play" focusable={false} />}
+      ? <>{children} <StyledIcon name="play_arrow" /></>
+      : <IconButton name="play_arrow" focusable={false} />}
   </NeutralLink>
 );
 

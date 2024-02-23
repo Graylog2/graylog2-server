@@ -87,7 +87,7 @@ const DataAdapterTableEntry = ({ adapter, error = null }: Props) => {
               <Button bsSize="xsmall"
                       onClick={_onEdit}
                       role="button"
-                      name="edit">
+                      name="edit_square">
                 Edit
               </Button>
               <Button bsSize="xsmall"

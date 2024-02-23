@@ -154,7 +154,7 @@ const SubstringExtractorConfiguration = createReactClass({
         <Row>
           <Col mdOffset={2} md={10}>
             <Button bsStyle="info" onClick={this._onTryClick} disabled={this._isTryButtonDisabled()}>
-              {this.state.trying ? <Icon name="spinner" spin /> : 'Try'}
+              {this.state.trying ? <Icon name="progress_activity" spin /> : 'Try'}
             </Button>
           </Col>
         </Row>

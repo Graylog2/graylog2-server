@@ -114,7 +114,7 @@ const ActiveFilter = ({
                              filterValueRenderer={filterValueRenderer} />
       )}
       <CenteredButton bsSize="xsmall" onClick={() => onDeleteFilter(attribute.id, value)} title="Delete filter">
-        <Icon name="times" />
+        <Icon name="close" />
       </CenteredButton>
     </Container>
   );

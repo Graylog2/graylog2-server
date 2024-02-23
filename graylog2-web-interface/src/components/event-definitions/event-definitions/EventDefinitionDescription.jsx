@@ -121,7 +121,7 @@ class EventDefinitionDescription extends React.Component {
       timerange = (
         <>
           <DetailTitle>Next timerange:</DetailTitle>
-          <DetailValue><Timestamp dateTime={from} /> <Icon name="arrow-circle-right" /> <Timestamp dateTime={to} /></DetailValue>
+          <DetailValue><Timestamp dateTime={from} /> <Icon name="arrow_circle_right" /> <Timestamp dateTime={to} /></DetailValue>
         </>
       );
     }

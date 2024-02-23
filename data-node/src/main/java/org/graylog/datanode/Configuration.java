@@ -107,8 +107,8 @@ public class Configuration extends BaseConfiguration {
     /**
      * Comma separated list of opensearch nodes that are eligible as manager nodes.
      */
-    @Parameter(value = "cluster_initial_manager_nodes")
-    private String initialManagerNodes;
+    @Parameter(value = "initial_cluster_manager_nodes")
+    private String initialClusterManagerNodes;
 
     @Parameter(value = "opensearch_http_port", converter = IntegerConverter.class)
     private int opensearchHttpPort = 9200;
@@ -240,6 +240,13 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "metrics_policy")
     private String metricsPolicy = "gl-datanode-metrics-ism";
 
+    @Parameter(value = "opensearch_indices_query_bool_max_clause_count")
+    private Integer indicesQueryBoolMaxClauseCount = 32768;
+
+    public Integer getIndicesQueryBoolMaxClauseCount() {
+        return indicesQueryBoolMaxClauseCount;
+    }
+
     public boolean isInsecureStartup() {
         return insecureStartup;
     }
@@ -340,8 +347,8 @@ public class Configuration extends BaseConfiguration {
         return datanodeNodeName != null && !datanodeNodeName.isBlank() ? datanodeNodeName : getHostname();
     }
 
-    public String getInitialManagerNodes() {
-        return initialManagerNodes;
+    public String getInitialClusterManagerNodes() {
+        return initialClusterManagerNodes;
     }
 
     public int getOpensearchHttpPort() {

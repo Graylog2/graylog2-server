@@ -96,11 +96,11 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
         try {
             ImmutableMap.Builder<String, String> opensearchProperties = ImmutableMap.builder();
 
-            if (localConfiguration.getInitialManagerNodes() != null && !localConfiguration.getInitialManagerNodes().isBlank()) {
-                opensearchProperties.put("cluster.initial_master_nodes", localConfiguration.getInitialManagerNodes());
-            } else if (isPreflight()) {
+            if (localConfiguration.getInitialClusterManagerNodes() != null && !localConfiguration.getInitialClusterManagerNodes().isBlank()) {
+                opensearchProperties.put("cluster.initial_cluster_manager_nodes", localConfiguration.getInitialClusterManagerNodes());
+            } else {
                 final var nodeList = String.join(",", nodeService.allActive().values().stream().map(Node::getHostname).collect(Collectors.toSet()));
-                opensearchProperties.put("cluster.initial_master_nodes", nodeList);
+                opensearchProperties.put("cluster.initial_cluster_manager_nodes", nodeList);
             }
             opensearchProperties.putAll(commonOpensearchConfig(localConfiguration));
 
@@ -143,6 +143,9 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
 
         // Uncomment the following line to get DEBUG logs for the underlying Opensearch
         //config.put("logger.org.opensearch", "debug");
+
+        // common OpenSearch config parameters from our docs
+        config.put("indices.query.bool.max_clause_count", localConfiguration.getIndicesQueryBoolMaxClauseCount().toString());
 
         return config.build();
     }
