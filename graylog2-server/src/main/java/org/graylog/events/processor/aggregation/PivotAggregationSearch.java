@@ -485,12 +485,12 @@ public class PivotAggregationSearch implements AggregationSearch {
         // We always have row groups because of the date range buckets
         pivotBuilder.rowGroups(groupBy);
 
-        final Set<SearchType> pivots = Sets.newHashSet(pivotBuilder.build());
-        pivots.addAll(additionalSearchTypes);
+        final Set<SearchType> searchTypes = Sets.newHashSet(pivotBuilder.build());
+        searchTypes.addAll(additionalSearchTypes);
 
         final Query.Builder queryBuilder = Query.builder()
                 .id(QUERY_ID)
-                .searchTypes(pivots)
+                .searchTypes(searchTypes)
                 .query(decorateQuery(config))
                 .timerange(parameters.timerange());
 
