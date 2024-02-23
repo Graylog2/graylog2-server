@@ -102,7 +102,7 @@ const CreateEventDefinitionModal = ({ modalData, mappedData, show, onClose }: { 
       <Modal.Body>
         <RadioSection strategyAvailabilities={strategyAvailabilities} strategy={strategy} onChange={onStrategyChange} />
         <Button bsStyle="link" className="btn-text" bsSize="xsmall" onClick={toggleDetailsOpen}>
-          <Icon name={`caret-${showDetails ? 'down' : 'right'}`} />&nbsp;
+          <Icon name={`arrow_${showDetails ? 'drop_down' : 'right'}`} />&nbsp;
           {showDetails ? 'Hide strategy details' : 'Show strategy details'}
         </Button>
         {

@@ -14,15 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { fas } from '@fortawesome/free-solid-svg-icons';
-import { far } from '@fortawesome/free-regular-svg-icons';
-import { faApple, faFreebsd, faGithub, faGithubAlt, faLinux, faWindows } from '@fortawesome/free-brands-svg-icons';
 
-library.add(fas, far, faApple, faGithub, faGithubAlt, faLinux, faWindows, faFreebsd);
+import type { MaterialSymbol as IconName } from 'material-symbols';
 
-const CustomFontAwesomeIcon = (props: React.ComponentProps<typeof FontAwesomeIcon>) => <FontAwesomeIcon {...props} />;
+export type SizeProp = 'xs' | 'sm' | 'lg' | 'xl' | '2x' | '3x' | '4x' | '5x'
+export type RotateProp = 90 | 80 | 270;
+export type FlipProp = 'horizontal' | 'vertical' | 'both';
 
-export default CustomFontAwesomeIcon;
+export { IconName };

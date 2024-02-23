@@ -55,7 +55,7 @@ const ContentPackDownloadControl = ({ contentPackId, revision, show, onHide }: P
         <p>{infoText}</p>
         <p>
           <a href={getDownloadUrl()} target="_blank" rel="noopener noreferrer">
-            <Icon name="cloud-download-alt" />{' '}Download
+            <Icon name="download" />{' '}Download
           </a>
         </p>
       </Modal.Body>

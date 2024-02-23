@@ -110,7 +110,7 @@ const ListItem = forwardRef(<ItemType extends ListItemType>({
                          containerProps={{ ...draggableProps }}>
       {!disableDragging && (
         <DragHandle {...dragHandleProps} data-testid={`sortable-item-${item.id}`}>
-          <Icon name="bars" />
+          <Icon name="drag_indicator" />
         </DragHandle>
       )}
       {itemContent}

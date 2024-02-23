@@ -36,7 +36,7 @@ type Props = {
 }
 const Error = ({ error, title }: Props) => (
   <Center>
-    <ErrorIcon name="exclamation-triangle" size="3x" />
+    <ErrorIcon name="warning" size="3x" />
     <Description>
       <strong>{title}</strong>
       <span>{error}</span>

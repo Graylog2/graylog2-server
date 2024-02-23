@@ -361,7 +361,7 @@ const exports: PluginExports = {
   widgetCreators: [{
     title: 'Message Count',
     func: CreateMessageCount,
-    icon: () => <Icon name="hashtag" />,
+    icon: () => <Icon name="tag" />,
   }, {
     title: 'Message Table',
     func: CreateMessagesWidget,
@@ -369,7 +369,7 @@ const exports: PluginExports = {
   }, {
     title: 'Custom Aggregation',
     func: CreateCustomAggregation,
-    icon: () => <Icon name="chart-column" />,
+    icon: () => <Icon name="monitoring" />,
   }],
   creators: [
     {

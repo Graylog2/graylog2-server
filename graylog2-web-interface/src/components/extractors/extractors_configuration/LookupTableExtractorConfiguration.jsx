@@ -117,7 +117,7 @@ class LookupTableExtractorConfiguration extends React.Component {
             </Col>
             <Col md={1} className="text-right">
               <Button bsStyle="info" onClick={this._onTryClick} disabled={this._isTryButtonDisabled()}>
-                {this.state.trying ? <Icon name="spinner" spin /> : 'Try'}
+                {this.state.trying ? <Icon name="progress_activity" spin /> : 'Try'}
               </Button>
             </Col>
           </Row>

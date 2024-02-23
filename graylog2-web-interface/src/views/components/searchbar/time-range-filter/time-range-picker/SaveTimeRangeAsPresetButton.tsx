@@ -108,7 +108,7 @@ const TimeRangeAddToQuickListForm = ({ children, addTimerange, toggleModal, show
                            formGroupClassName="" />
               {!!equalTimerange && (
                 <p>
-                  <Icon name="exclamation-triangle" />
+                  <Icon name="warning" />
                   You already have similar time range in{' '}
                   <Link to={Routes.SYSTEM.CONFIGURATIONS} target="_blank">Range configuration</Link>
                   <br />
