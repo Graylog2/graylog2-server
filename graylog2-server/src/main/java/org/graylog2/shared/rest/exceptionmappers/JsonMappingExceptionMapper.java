@@ -18,7 +18,6 @@ package org.graylog2.shared.rest.exceptionmappers;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
-import com.fasterxml.jackson.databind.exc.ValueInstantiationException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
@@ -34,15 +33,12 @@ import static jakarta.ws.rs.core.Response.status;
 public class JsonMappingExceptionMapper implements ExceptionMapper<JsonMappingException> {
     @Override
     public Response toResponse(JsonMappingException e) {
-        final String messagePrefix = errorWithJsonPath(e);
-        final String problemMessage = firstNonNull(e.getCause().getMessage(), e.getMessage());
-        final String location = "[" + e.getLocation().getLineNr() + ", " + e.getLocation().getColumnNr() + "]";
-        final String message = firstNonNull(problemMessage, "Couldn't process JSON input");
-        final ApiError apiError = ApiError.create("Error at " + location + ": " + messagePrefix + ": " + message);
+        final String message = errorWithJsonPath(e);
+        final ApiError apiError = ApiError.create(message);
         return status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(apiError).build();
     }
 
-    private String errorWithJsonPath(final JsonMappingException e) {
+    private String errorPath(final JsonMappingException e) {
         final String pathToErrorField = e.getPath().stream()
                 .map(path -> {
                     final var fieldName = path.getFieldName();
@@ -52,14 +48,23 @@ public class JsonMappingExceptionMapper implements ExceptionMapper<JsonMappingEx
                     return fieldName;
                 })
                 .collect(Collectors.joining("."));
-        final var quotedPath = "\"" + pathToErrorField + "\"";
+        return "\"" + pathToErrorField + "\"";
+    }
+
+    private String errorWithJsonPath(final JsonMappingException e) {
+        final var location = "[" + e.getLocation().getLineNr() + ", " + e.getLocation().getColumnNr() + "]";
+        final var quotedPath = errorPath(e);
+        final var messagePrefix = "Error at " + quotedPath + " " + location;
+
+
         if (e instanceof MismatchedInputException mismatchedInputException) {
-            return quotedPath + " must be of type " + mismatchedInputException.getTargetType().getSimpleName();
-        }
-        if (e instanceof ValueInstantiationException) {
-            return "Unable to construct " + quotedPath;
+            return messagePrefix + ": Must be of type " + mismatchedInputException.getTargetType().getSimpleName();
         } else {
-            return "Error for " + quotedPath;
+            final var cause = e.getCause();
+            final String problemMessage = firstNonNull(cause, e).getMessage();
+            final String message = firstNonNull(problemMessage, "Couldn't process JSON input");
+
+            return messagePrefix + ": " + message;
         }
     }
 }
