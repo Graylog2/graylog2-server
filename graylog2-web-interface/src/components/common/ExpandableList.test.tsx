@@ -15,51 +15,55 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { render, screen } from 'wrappedTestingLibrary';
 import 'helpers/mocking/react-dom_mock';
+import userEvent from '@testing-library/user-event';
 
 import ExpandableList from 'components/common/ExpandableList';
 import ExpandableListItem from 'components/common/ExpandableListItem';
 
 describe('<ExpandableList />', () => {
-  it('should render with no children', () => {
-    const wrapper = mount(<ExpandableList />);
+  it('should render with no children', async () => {
+    render(<ExpandableList />);
 
-    expect(wrapper).toExist();
+    await screen.findByRole('list');
   });
 
-  it('should render with a Item', () => {
-    const checkFn = jest.fn();
-
-    const wrapper = mount(
+  it('should render with a Item', async () => {
+    render(
       <ExpandableList>
-        <ExpandableListItem header="Wheel of time" onChange={checkFn}>
+        <ExpandableListItem header="Wheel of time" onChange={() => {}}>
           <span>Edmonds Field</span>
         </ExpandableListItem>
       </ExpandableList>,
     );
 
-    expect(wrapper).toExist();
+    await screen.findByRole('list');
+    await screen.findByRole('button', { name: /wheel of time/i });
+
+    expect(screen.queryByText('Edmonds Field')).not.toBeInTheDocument();
   });
 
-  it('should render with a nested ExpandableList', () => {
-    const checkFn = jest.fn();
-
-    const wrapper = mount(
+  it('should render with a nested ExpandableList', async () => {
+    render(
       <ExpandableList>
-        <ExpandableListItem expandable expanded header="Wheel of time" onChange={checkFn}>
+        <ExpandableListItem expandable expanded header="Wheel of time" onChange={() => {}}>
           <ExpandableList>
-            <ExpandableListItem expandable expanded={false} header="Edmonds Field" onChange={checkFn} />
+            <ExpandableListItem expandable expanded={false} header="Edmonds Field" onChange={() => {}} />
           </ExpandableList>
         </ExpandableListItem>
       </ExpandableList>,
     );
 
-    expect(wrapper).toExist();
+    await screen.findByRole('button', { name: /wheel of time/i });
+
+    expect(await screen.findAllByRole('list')).toHaveLength(2);
+
+    await screen.findByRole('button', { name: /edmonds field/i });
   });
 
-  it('should expand a expandable list item', () => {
-    const wrapper = mount(
+  it('should expand a expandable list item', async () => {
+    render(
       <ExpandableList>
         <ExpandableListItem expandable header="Wheel of time" readOnly>
           <ExpandableList>
@@ -69,16 +73,15 @@ describe('<ExpandableList />', () => {
       </ExpandableList>,
     );
 
-    expect(wrapper.find('span.header').length).toBe(1);
+    await userEvent.click(await screen.findByRole('button', { name: /expand list item/i }));
 
-    wrapper.find('div.fa-stack').simulate('click');
-
-    expect(wrapper.find('span.header').length).toBe(2);
+    await screen.findByRole('button', { name: /edmonds field/i });
   });
 
-  it('should select a selectable list item', () => {
+  it('should select a selectable list item', async () => {
     const checkFn = jest.fn();
-    const wrapper = mount(
+
+    render(
       <ExpandableList>
         <ExpandableListItem expanded header="Wheel of time" readOnly>
           <ExpandableList>
@@ -88,8 +91,8 @@ describe('<ExpandableList />', () => {
       </ExpandableList>,
     );
 
-    wrapper.find('input[type="checkbox"]').at(1).simulate('change', { target: { checked: true } });
+    await userEvent.click((await screen.findAllByRole('checkbox', { name: /select item/i }))[1]);
 
-    expect(checkFn.mock.calls.length).toBe(1);
+    expect(checkFn).toHaveBeenCalledTimes(1);
   });
 });

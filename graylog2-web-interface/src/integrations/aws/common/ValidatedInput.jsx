@@ -20,13 +20,14 @@ import styled from 'styled-components';
 
 import { Input } from 'components/bootstrap';
 import formValidation from 'integrations/aws/utils/formValidation';
+import Icon from 'components/common/Icon';
 
 const Label = ({ label, error }) => {
   if (error) {
     return (
       <ErrorContainer>
         {label}
-        <Error><i className="fa fa-exclamation-triangle" /> {error}</Error>
+        <Error><Icon name="warning" /> {error}</Error>
       </ErrorContainer>
     );
   }

@@ -341,14 +341,14 @@ class Wizard extends React.Component<Props, State> {
                       bsSize="xsmall"
                       bsStyle="info"
                       disabled={this._disableButton('previous')}>
-                <Icon name="caret-left" />
+                <Icon name="arrow_left" />
               </Button>
               <Button onClick={this._onNext}
                       aria-label="Next"
                       bsSize="xsmall"
                       bsStyle="info"
                       disabled={this._disableButton('next')}>
-                <Icon name="caret-right" />
+                <Icon name="arrow_right" />
               </Button>
             </HorizontalButtonToolbar>
           </div>

@@ -113,7 +113,7 @@ const SplitAndIndexExtractorConfiguration = ({ configuration: initialConfigurati
       <Row>
         <Col mdOffset={2} md={10}>
           <Button bsStyle="info" onClick={_onTryClick} disabled={isTryButtonDisabled}>
-            {trying ? <Icon name="spinner" spin /> : 'Try'}
+            {trying ? <Icon name="progress_activity" spin /> : 'Try'}
           </Button>
         </Col>
       </Row>

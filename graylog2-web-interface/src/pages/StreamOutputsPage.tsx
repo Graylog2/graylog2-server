@@ -21,7 +21,6 @@ import { Link } from 'components/common/router';
 import { Col } from 'components/bootstrap';
 import { ContentHeadRow, DocumentTitle, Spinner } from 'components/common';
 import OutputsComponent from 'components/outputs/OutputsComponent';
-import SupportLink from 'components/support/SupportLink';
 import Routes from 'routing/Routes';
 import useCurrentUser from 'hooks/useCurrentUser';
 import useStream from 'components/streams/hooks/useStream';
@@ -50,13 +49,12 @@ const StreamOutputsPage = () => {
 
               A global view of all configured outputs is available <Link to={Routes.SYSTEM.OUTPUTS}>here</Link>.
               You can find output plugins on <a href="https://marketplace.graylog.org/" rel="noopener noreferrer" target="_blank">the Graylog Marketplace</a>.
-            </p>
+              <br />
 
-            <SupportLink>
               <i>Removing</i> an output removes it from this stream but it will still be in the list of available outputs.
               Deleting an output <i>globally</i> will remove it from this and all other streams and terminate it.
               You can see all defined outputs in details at the {' '} <Link to={Routes.SYSTEM.OUTPUTS}>global output list</Link>.
-            </SupportLink>
+            </p>
           </Col>
         </ContentHeadRow>
         <OutputsComponent streamId={stream.id} permissions={currentUser.permissions} />

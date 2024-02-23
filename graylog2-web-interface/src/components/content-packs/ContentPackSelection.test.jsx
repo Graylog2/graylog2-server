@@ -153,7 +153,7 @@ describe('<ContentPackSelection />', () => {
                               entities={entities} />,
       );
 
-      wrapper.find('div.fa-stack').simulate('click');
+      wrapper.find({ title: 'Expand list item' }).at(1).simulate('click');
       wrapper.find('input[type="checkbox"]').at(1).simulate('change', { target: { checked: false } });
 
       expect(changeFn.mock.calls.length).toBe(1);
@@ -170,7 +170,7 @@ describe('<ContentPackSelection />', () => {
        * Search for falcon
        *
       /* Open menu to show all checkboxes */
-      wrapper.find('div.fa-stack').simulate('click');
+      wrapper.find({ title: 'Expand list item' }).at(1).simulate('click');
 
       expect(wrapper.find('input[type="checkbox"]').length).toEqual(3);
 
@@ -189,7 +189,7 @@ describe('<ContentPackSelection />', () => {
        */
       wrapper.find('button[title=\'Reset search\']').simulate('click');
       /* Open menu to show all checkboxes */
-      wrapper.find('div.fa-stack').simulate('click');
+      wrapper.find({ title: 'Expand list item' }).at(1).simulate('click');
 
       expect(wrapper.find('input[type="checkbox"]').length).toEqual(3);
     });

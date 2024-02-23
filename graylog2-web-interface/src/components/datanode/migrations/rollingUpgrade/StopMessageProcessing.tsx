@@ -32,7 +32,7 @@ const StopMessageProcessing = ({ currentStep, onTriggerStep }: MigrationStepComp
     <p>Graylog processing is stopped.</p>
     <StyledHelpPanel bsStyle="warning">
       <Panel.Heading>
-        <Panel.Title componentClass="h3"><Icon name="exclamation-triangle" />Stop OpenSearch</Panel.Title>
+        <Panel.Title componentClass="h3"><Icon name="warning" />Stop OpenSearch</Panel.Title>
       </Panel.Heading>
       <Panel.Body>
         <p>Please stop your OpenSearch cluster before proceeding.</p>

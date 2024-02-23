@@ -56,7 +56,8 @@ const StyledMenuDropdown = styled(Menu.Dropdown)`
 const DropdownTrigger = styled.button<{ $active: boolean }>(({ theme, $active }) => css`
   background: transparent;
   border: 0;
-  padding: 15px;
+  padding: 0 15px;
+  min-height: ${NAV_ITEM_HEIGHT};
 
   &:hover {
     ${hoverIndicatorStyles(theme)}
