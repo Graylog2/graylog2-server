@@ -20,6 +20,7 @@ import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.converters.BooleanConverter;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 
@@ -70,13 +71,10 @@ public class S3RepositoryConfiguration {
      * will lead to an IllegalStateException.
      */
     public boolean isRepositoryEnabled() {
-
-        final Set<String> requiredProperties = Set.of(s3ClientDefaultEndpoint, s3ClientDefaultAccessKey, s3ClientDefaultSecretKey);
-
-        if (requiredProperties.stream().allMatch(StringUtils::isNotBlank)) {
+        if (noneBlank(s3ClientDefaultEndpoint, s3ClientDefaultAccessKey, s3ClientDefaultSecretKey)) {
             // All the required properties are set and not blank, s3 repository is enabled
             return true;
-        } else if (requiredProperties.stream().allMatch(StringUtils::isBlank)) {
+        } else if (allBlank(s3ClientDefaultEndpoint, s3ClientDefaultAccessKey, s3ClientDefaultSecretKey)) {
             // all are empty, this means repository is not configured at all
             return false;
         } else {
@@ -86,5 +84,13 @@ public class S3RepositoryConfiguration {
                     s3_client_default_access_key, s3_client_default_secret_key and s3_client_default_endpoint
                     have to be provided in the configuration!""");
         }
+    }
+
+    private boolean noneBlank(String... properties) {
+        return Arrays.stream(properties).noneMatch(StringUtils::isBlank);
+    }
+
+    private boolean allBlank(String... properties) {
+        return Arrays.stream(properties).allMatch(StringUtils::isBlank);
     }
 }
