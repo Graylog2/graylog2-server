@@ -53,7 +53,7 @@ public abstract class AbstractOpensearchCli {
 
     public AbstractOpensearchCli(OpensearchConfiguration config, String binName) {
         this(config.datanodeDirectories().getOpensearchProcessConfigurationDir(),
-                checkExecutable(config.opensearchDistribution().getOpensearchBinPath().resolve(binName)));
+                checkExecutable(config.opensearchDistribution().getOpensearchBinDirPath().resolve(binName)));
     }
 
     private static Path checkExecutable(Path path) {
