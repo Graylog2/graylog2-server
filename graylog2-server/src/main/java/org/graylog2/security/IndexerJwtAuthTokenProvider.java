@@ -63,13 +63,8 @@ public class IndexerJwtAuthTokenProvider implements Provider<String> {
     }
 
     public static String createToken(final byte[] apiKeySecretBytes, final Duration tokenExpirationDuration) {
-        //SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
-
         long nowMillis = System.currentTimeMillis();
         Date now = new Date(nowMillis);
-
-        //Key signingKey = new SecretKeySpec(apiKeySecretBytes, signatureAlgorithm.getJcaName());
-
         final SecretKey signingKey = Keys.hmacShaKeyFor(apiKeySecretBytes);
 
         JwtBuilder builder = Jwts.builder()
@@ -82,8 +77,7 @@ public class IndexerJwtAuthTokenProvider implements Provider<String> {
                 .expiration(new Date(nowMillis + tokenExpirationDuration.toMilliseconds()))
                 .signWith(signingKey);
 
-        final var token = builder.compact();
-        return token;
+        return builder.compact();
     }
 
     @Override
