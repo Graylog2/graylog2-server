@@ -29,7 +29,7 @@ const DownsizeWarning = styled(Alert)`
 const JournalDowntimeWarning = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => (
   <>
     <h3>Journal downtime size warning</h3>
-    <p>Please note that during migration processing  will stop on your Graylog node, this will result in the journal growing in size.</p>
+    <p>Please note that during migration data processing  will stop on your Graylog node, this will result in the journal growing in size.</p>
     <p>Therefore increase your journal volume size.</p>
     <DownsizeWarning bsStyle="danger">
       <p>Please make sure your journal volume size is sufficient before proceeding.</p>
