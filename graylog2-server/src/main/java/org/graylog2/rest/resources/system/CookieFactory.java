@@ -57,7 +57,7 @@ public class CookieFactory {
                 .expiry(validUntil)
                 .secure(isSecure)
                 .httpOnly(true)
-                .sameSite(NewCookie.SameSite.LAX)
+                .sameSite(NewCookie.SameSite.STRICT)
                 .build();
     }
 
