@@ -18,21 +18,16 @@ package org.graylog.datanode.initializers;
 
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.security.Keys;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import javax.crypto.spec.SecretKeySpec;
+import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
-import java.security.Key;
 
 @Singleton
 public class JwtTokenValidator implements AuthTokenValidator {
-
-    private static final Logger LOG = LoggerFactory.getLogger(JwtTokenValidator.class);
 
     public static final String REQUIRED_SUBJECT = "admin";
     public static final String REQUIRED_ISSUER = "graylog";
@@ -44,19 +39,17 @@ public class JwtTokenValidator implements AuthTokenValidator {
 
     @Override
     public void verifyToken(String token) throws TokenVerificationException {
-        SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
-        Key signingKey = new SecretKeySpec(this.signingKey.getBytes(StandardCharsets.UTF_8), signatureAlgorithm.getJcaName());
+        final SecretKey key = Keys.hmacShaKeyFor(this.signingKey.getBytes(StandardCharsets.UTF_8));
         final JwtParser parser = Jwts.parser()
-                .setSigningKey(signingKey)
+                .verifyWith(key)
                 .requireSubject(REQUIRED_SUBJECT)
                 .requireIssuer(REQUIRED_ISSUER)
                 .build();
         try {
             parser.parse(token);
         } catch (UnsupportedJwtException e) {
-            LOG.warn("Token format/configuration is not supported", e);
-            throw new TokenVerificationException("Token format/configuration is not supported");
-        } catch (Exception e) {
+            throw new TokenVerificationException("Token format/configuration is not supported", e);
+        } catch (Throwable e) {
             throw new TokenVerificationException(e);
         }
     }
