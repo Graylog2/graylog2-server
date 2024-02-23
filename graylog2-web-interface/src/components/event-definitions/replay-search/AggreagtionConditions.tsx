@@ -115,7 +115,7 @@ const AggregationConditions = () => {
                                 colors={DEFAULT_CUSTOM_HIGHLIGHT_RANGE.map((c) => [c])}
                                 triggerNode={(
                                   <ColorComponent style={{ backgroundColor: hexColor }}>
-                                    {!hexColor && <Icon name="fill-drip" size="xs" />}
+                                    {!hexColor && <Icon name="colors" size="xs" />}
                                   </ColorComponent>
                                 )}
                                 onChange={(newColor, _, hidePopover) => {

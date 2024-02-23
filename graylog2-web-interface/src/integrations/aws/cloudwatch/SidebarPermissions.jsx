@@ -21,6 +21,7 @@ import styled from 'styled-components';
 import { Panel } from 'components/bootstrap';
 import useFetch from 'integrations/aws/common/hooks/useFetch';
 import { ApiRoutes } from 'integrations/aws/common/Routes';
+import Icon from 'components/common/Icon';
 
 function Policies({ title, note, policy }) {
   const [opened, setOpened] = useState(false);
@@ -37,7 +38,7 @@ function Policies({ title, note, policy }) {
           <Note>{note}</Note>
         </HeaderContent>
 
-        <Icon opened={opened}><i className="fa fa-chevron-right fa-2x" /></Icon>
+        <IconContainer $opened={opened}><Icon name="arrow-right" size="2x" /></IconContainer>
       </Header>
 
       <Policy opened={opened}>
@@ -85,7 +86,7 @@ const HeaderContent = styled.div`
   flex-grow: 1;
 `;
 
-const Icon = styled.span`
+const IconContainer = styled.span`
   transform: rotate(${(props) => (props.opened ? '90deg' : '0deg')});
   transition: transform 150ms ease-in-out;
 `;

@@ -64,7 +64,7 @@ const ListItem = ({
                    onChange={(newTitle) => onUpdateTitle(id, newTitle)} />
     <div>
       <IconButton title={`Remove page ${title}`}
-                  name="trash-alt"
+                  name="delete"
                   onClick={() => onRemove(id)}
                   disabled={disableDelete} />
     </div>

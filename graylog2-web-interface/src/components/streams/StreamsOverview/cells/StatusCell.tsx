@@ -85,7 +85,7 @@ const StatusCell = ({ stream }: Props) => {
       {!disableChange && (
         <>
           <Spacer />
-          <Icon name={stream.disabled ? 'play' : 'pause'} />
+          <Icon name={stream.disabled ? 'play_arrow' : 'pause'} />
         </>
       )}
     </StatusLabel>

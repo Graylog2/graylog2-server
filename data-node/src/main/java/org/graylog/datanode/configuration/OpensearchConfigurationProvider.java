@@ -98,7 +98,7 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
 
             if (localConfiguration.getInitialClusterManagerNodes() != null && !localConfiguration.getInitialClusterManagerNodes().isBlank()) {
                 opensearchProperties.put("cluster.initial_cluster_manager_nodes", localConfiguration.getInitialClusterManagerNodes());
-            } else if (isPreflight()) {
+            } else {
                 final var nodeList = String.join(",", nodeService.allActive().values().stream().map(Node::getHostname).collect(Collectors.toSet()));
                 opensearchProperties.put("cluster.initial_cluster_manager_nodes", nodeList);
             }

@@ -14,15 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { fas } from '@fortawesome/free-solid-svg-icons';
-import { far } from '@fortawesome/free-regular-svg-icons';
-import { faApple, faFreebsd, faGithub, faGithubAlt, faLinux, faWindows } from '@fortawesome/free-brands-svg-icons';
+import * as React from 'react';
 
-library.add(fas, far, faApple, faGithub, faGithubAlt, faLinux, faWindows, faFreebsd);
-
-const CustomFontAwesomeIcon = (props: React.ComponentProps<typeof FontAwesomeIcon>) => <FontAwesomeIcon {...props} />;
-
-export default CustomFontAwesomeIcon;
+const MigrationFinishedStep = () => (
+  <p>The migration is finished !</p>
+);
+export default MigrationFinishedStep;

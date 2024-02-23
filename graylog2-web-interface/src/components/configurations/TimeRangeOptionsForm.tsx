@@ -120,7 +120,7 @@ class TimeRangeOptionsForm extends React.Component<Props> {
                      value={description}
                      onChange={this._onChange(idx, 'description')} />
               <span className="input-group-addon">
-                <Icon name="trash-alt" style={{ cursor: 'pointer' }} onClick={this._onRemove(idx)} />
+                <Icon name="delete" style={{ cursor: 'pointer' }} onClick={this._onRemove(idx)} />
               </span>
             </div>
           </Col>

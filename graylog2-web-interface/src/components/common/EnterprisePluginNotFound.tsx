@@ -43,7 +43,7 @@ const EnterprisePluginNotFound = ({ featureName, wrapperClassName }: Props) => (
   <Panel bsStyle="info" className={wrapperClassName}>
     <Panel.Heading>
       <Header>
-        <HeaderIcon name="crown" />Enterprise Feature
+        <HeaderIcon name="enterprise" />Enterprise Feature
       </Header>
     </Panel.Heading>
     <Panel.Body>

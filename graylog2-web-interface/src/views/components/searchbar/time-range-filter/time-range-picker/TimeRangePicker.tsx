@@ -192,7 +192,7 @@ const TimeRangePicker = ({
       <span>Search Time Range</span>
       {limitDuration > 0 && (
         <LimitLabel>
-          <Icon name="exclamation-triangle" />
+          <Icon name="warning" />
           <span>Admin has limited searching to {moment.duration(-limitDuration, 'seconds').humanize(true)}</span>
         </LimitLabel>
       )}

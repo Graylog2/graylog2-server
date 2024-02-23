@@ -74,7 +74,7 @@ const TimerangeInfo = ({ className, widget, activeQuery, widgetId }: Props) => {
         <TextOverflowEllipsis titleOverride={effectiveTimerangeString}>
           {globalTimerangeString || configuredTimerange}
         </TextOverflowEllipsis>
-        <StyledIcon name="question-circle" />
+        <StyledIcon name="help" />
       </Wrapper>
     </SearchQueryExecutionInfoHelper>
   );

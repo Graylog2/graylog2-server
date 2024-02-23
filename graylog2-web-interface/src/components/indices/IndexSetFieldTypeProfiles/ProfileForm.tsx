@@ -194,7 +194,7 @@ const ProfileForm = ({ initialValues, submitButtonText, submitLoadingText, onCan
                                       )}
                                     </Field>
                                   </SelectGroup>
-                                  {(customFieldMappings.length > 1) && <IconButton name="trash-alt" onClick={() => (remove(index))} title="Remove mapping" />}
+                                  {(customFieldMappings.length > 1) && <IconButton name="delete" onClick={() => (remove(index))} title="Remove mapping" />}
                                 </Item>
                               ))}
                             </List>
