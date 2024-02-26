@@ -20,7 +20,8 @@ package org.graylog.plugins.map.geoip;
 import com.codahale.metrics.Timer;
 import com.google.inject.assistedinject.Assisted;
 import com.maxmind.geoip2.exception.AddressNotFoundException;
-import jakarta.inject.Inject;
+
+import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.IOException;
 import java.net.InetAddress;
