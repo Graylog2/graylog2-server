@@ -23,15 +23,15 @@ import ExternalLink from 'components/common/ExternalLink';
 /**
  * Component that renders a link to an external resource as a button.
  *
- * All props besides `iconClass` and `children` are passed down to the react-bootstrap `<Button />` component.
+ * All props besides `iconName` and `children` are passed down to the react-bootstrap `<Button />` component.
  */
 
 type Props = React.ComponentProps<typeof Button> & {
-  iconClass: React.ComponentProps<typeof ExternalLink>['iconClass']
+  iconName: React.ComponentProps<typeof ExternalLink>['iconName']
 };
-const ExternalLinkButton = ({ iconClass, children, ...props }: Props) => (
+const ExternalLinkButton = ({ iconName, children, ...props }: Props) => (
   <Button {...props}>
-    <ExternalLink iconClass={iconClass}>{children}</ExternalLink>
+    <ExternalLink iconName={iconName}>{children}</ExternalLink>
   </Button>
 );
 
@@ -46,8 +46,8 @@ ExternalLinkButton.propTypes = {
   bsSize: PropTypes.string,
   /** Browser window target attribute for the external link. */
   target: PropTypes.string,
-  /** FontAwesome icon class name to use for the indicator icon. */
-  iconClass: PropTypes.string,
+  /** Icon name to use for the indicator icon. */
+  iconName: PropTypes.string,
   /** Additional class name to adjust styling of the button. */
   className: PropTypes.string,
   /** Render a disabled button if this is <code>true</code>. */
@@ -58,7 +58,7 @@ ExternalLinkButton.defaultProps = {
   bsStyle: 'default',
   bsSize: undefined,
   target: '_blank',
-  iconClass: 'open_in_new',
+  iconName: 'open_in_new',
   className: '',
   disabled: false,
 };
