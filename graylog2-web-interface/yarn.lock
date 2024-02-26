@@ -2383,9 +2383,9 @@
   integrity sha512-Hcv+nVC0kZnQ3tD9GVu5xSMR4VVYOteQIr/hwFPVEvPdlXqgGEuRjiheChHgdM+JyqdgNcmzZOX/tnl0JOiI7A==
 
 "@mantine/core@^7.5.2":
-  version "7.5.2"
-  resolved "https://registry.yarnpkg.com/@mantine/core/-/core-7.5.2.tgz#c9bb809f1b0ccb212a609f30b0829d28e3584fbe"
-  integrity sha512-e58qTiLEp9qLxQ5JZlPNykJWBR+oi0q2J8JPKTjTJD+4UM58uh9oL4wuMEdUyBgiYGvDc/cVYF+rftMpuCt+KQ==
+  version "7.5.3"
+  resolved "https://registry.yarnpkg.com/@mantine/core/-/core-7.5.3.tgz#ac83faf5d8f1b02bb09fde79d07365f6c3e76e1a"
+  integrity sha512-Wvv6DJXI+GX9mmKG5HITTh/24sCZ0RoYQHdTHh0tOfGnEy+RleyhA82UjnMsp0n2NjfCISBwbiKgfya6b2iaFw==
   dependencies:
     "@floating-ui/react" "^0.24.8"
     clsx "2.0.0"
@@ -2395,29 +2395,29 @@
     type-fest "^3.13.1"
 
 "@mantine/dropzone@^7.5.2":
-  version "7.5.2"
-  resolved "https://registry.yarnpkg.com/@mantine/dropzone/-/dropzone-7.5.2.tgz#d1216d63dd950ce5b5c4f89c19b4d9d6d2181de2"
-  integrity sha512-YjzaBEppLhb5F+lKpBSVeIGneCdisC+0nSertcjjo7QXPc++NR+WbVuTiPMYZoUuRbpJ2GRRTFZndmK1FvO+7w==
+  version "7.5.3"
+  resolved "https://registry.yarnpkg.com/@mantine/dropzone/-/dropzone-7.5.3.tgz#8e6e0d3c379b09a6e59a2ac2fd5fed1a3c4bf393"
+  integrity sha512-NbMnLN9B07WHkdrpxNTC0k0vzR6prONF+/awFPidphsXGAgRSZhiZXv06l9Wp9wVp6xPhVMTqGphh0i4Ey+AYg==
   dependencies:
     react-dropzone-esm "15.0.1"
 
 "@mantine/hooks@^7.5.2":
-  version "7.5.2"
-  resolved "https://registry.yarnpkg.com/@mantine/hooks/-/hooks-7.5.2.tgz#cd11e379438f707e10e7e061cc14b9ae2233ec8e"
-  integrity sha512-4POujH5Xx84VB/xfM6EttDq725dqqL2DntoeMjHz3Ua94aK5Y0VSc1IwlETxCuF7yNV5/w/Z8kgeVVa5cDgrPg==
+  version "7.5.3"
+  resolved "https://registry.yarnpkg.com/@mantine/hooks/-/hooks-7.5.3.tgz#34168712075ee40ff7353c840420d4568b0dd54e"
+  integrity sha512-mFI448mAs12v8FrgSVhytqlhTVrEjIfd/PqPEfwJu5YcZIq4YZdqpzJIUbANnRrFSvmoQpDb1PssdKx7Ds35hw==
 
 "@mantine/notifications@^7.5.2":
-  version "7.5.2"
-  resolved "https://registry.yarnpkg.com/@mantine/notifications/-/notifications-7.5.2.tgz#f6260576ae6da580b7ed6b3578c2072969e46870"
-  integrity sha512-wGRDeOG2NGng202k/vZPfkRJMHtflvIORYe4cJaQAd9EhP646xr/ji8zzdXeXvUO5PrKlBpu+K+HSF1bQQY4og==
+  version "7.5.3"
+  resolved "https://registry.yarnpkg.com/@mantine/notifications/-/notifications-7.5.3.tgz#0729cf68a96cabdc4e04364b8406d589ccadf3f4"
+  integrity sha512-08mWoGBfc8sGDTRthBg/HYPD8dRHyugZpeUH1U7RjWQmYD4ktdkT8bdBocStTSJkCQIvtP7OPJ1MiKln1idt5w==
   dependencies:
-    "@mantine/store" "7.5.2"
+    "@mantine/store" "7.5.3"
     react-transition-group "4.4.5"
 
-"@mantine/store@7.5.2":
-  version "7.5.2"
-  resolved "https://registry.yarnpkg.com/@mantine/store/-/store-7.5.2.tgz#adfea0d01d2ca572fe5fe1e43363cbccc18f97ef"
-  integrity sha512-au53HLLH/LfHLOR2Zb00TgG11xAXZNJb4jqsEhAr90axCIw6mlBDIAhbb+Yu6OwDaV7TscE/sonkUstmRjLh/w==
+"@mantine/store@7.5.3":
+  version "7.5.3"
+  resolved "https://registry.yarnpkg.com/@mantine/store/-/store-7.5.3.tgz#936fc63f16a0013ad8dfe66a5b82ae8a51fc282c"
+  integrity sha512-jLTIaChJr9rWtzSRp2HQGHfuoFcr3ylD0JW/vsE5gpFvhoZFfkrxx5QsM1kn5wV34rZo0nQNMIJ8hvBVvfJtLQ==
 
 "@mapbox/geojson-rewind@^0.5.2":
   version "0.5.2"
@@ -6958,7 +6958,7 @@ eslint-config-airbnb@19.0.4:
     eslint-config-airbnb "19.0.4"
     eslint-import-resolver-webpack "0.13.8"
     eslint-plugin-compat "4.2.0"
-    eslint-plugin-graylog "file:../../../../.cache/yarn/v6/npm-eslint-config-graylog-1.3.0-5efd7404-88ee-4743-b813-763d033e44c6-1708646895529/node_modules/eslint-plugin-graylog"
+    eslint-plugin-graylog "file:packages/eslint-plugin-graylog"
     eslint-plugin-import "2.25.3"
     eslint-plugin-jest "27.9.0"
     eslint-plugin-jest-dom "5.1.0"
@@ -8381,13 +8381,13 @@ graphemer@^1.4.0:
     "@types/create-react-class" "15.6.7"
     "@types/jquery" "3.5.29"
     "@types/react" "18.2.57"
-    babel-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-6.0.0-SNAPSHOT-53720185-1344-4bdf-9969-94a1d290792a-1708646895249/node_modules/babel-preset-graylog"
+    babel-preset-graylog "file:packages/babel-preset-graylog"
     create-react-class "15.7.0"
-    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-6.0.0-SNAPSHOT-53720185-1344-4bdf-9969-94a1d290792a-1708646895249/node_modules/eslint-config-graylog"
+    eslint-config-graylog "file:packages/eslint-config-graylog"
     formik "2.4.5"
     history "^5.3.0"
     html-webpack-plugin "^5.5.0"
-    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-6.0.0-SNAPSHOT-53720185-1344-4bdf-9969-94a1d290792a-1708646895249/node_modules/jest-preset-graylog"
+    jest-preset-graylog "file:packages/jest-preset-graylog"
     jquery "3.7.1"
     moment "2.30.1"
     moment-timezone "0.5.45"
@@ -12795,7 +12795,7 @@ react-textarea-autosize@8.5.3:
     use-composed-ref "^1.3.0"
     use-latest "^1.2.1"
 
-react-transition-group@4.4.5:
+react-transition-group@4.4.5, react-transition-group@^4.3.0:
   version "4.4.5"
   resolved "https://registry.yarnpkg.com/react-transition-group/-/react-transition-group-4.4.5.tgz#e53d4e3f3344da8521489fbef8f2581d42becdd1"
   integrity sha512-pZcd1MCJoiKiBR2NRxeCRg13uCXbydPnmB4EOeRrY7480qNWO8IIgQG6zlDkm6uRMsURXPuKq0GWtiM59a5Q6g==
@@ -12814,16 +12814,6 @@ react-transition-group@^2.0.0, react-transition-group@^2.2.1:
     loose-envify "^1.4.0"
     prop-types "^15.6.2"
     react-lifecycles-compat "^3.0.4"
-
-react-transition-group@^4.3.0:
-  version "4.4.2"
-  resolved "https://registry.yarnpkg.com/react-transition-group/-/react-transition-group-4.4.2.tgz#8b59a56f09ced7b55cbd53c36768b922890d5470"
-  integrity sha512-/RNYfRAMlZwDSr6z4zNKV6xu53/e2BuaBbGhbyYIXTrmgu/bGHzmqOs7mJSJBHy9Ud+ApHx3QjrkKSp1pxvlFg==
-  dependencies:
-    "@babel/runtime" "^7.5.5"
-    dom-helpers "^5.0.1"
-    loose-envify "^1.4.0"
-    prop-types "^15.6.2"
 
 react-ultimate-pagination@^1.2.0:
   version "1.3.2"
