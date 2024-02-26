@@ -25,8 +25,8 @@ const CAConfiguration = () => (
   <>
     <h2>Configure Certificate Authority</h2>
     <p>
-      In this first step you can either upload or create a new certificate authority.<br />
-      Using it we can provision your Data Nodes with certificates easily.
+      In this step you can either upload or create a new certificate authority.<br />
+      The certificate authority will provision and manage certificates for your Data Nodes more easily.
     </p>
     <Tabs defaultActiveKey={TAB_KEYS[0]} id="ca-configurations">
       <Tab eventKey={TAB_KEYS[0]} title="Create new CA">

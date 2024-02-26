@@ -139,6 +139,12 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
         config.put("path.logs", datanodeConfiguration.datanodeDirectories().getLogsTargetDir().toString());
 
         config.put("network.bind_host", localConfiguration.getBindAddress());
+
+        // https://opensearch.org/docs/latest/tuning-your-cluster/availability-and-recovery/snapshots/snapshot-restore/#shared-file-system
+        if(localConfiguration.getPathRepo() != null && !localConfiguration.getPathRepo().isEmpty()) {
+            config.put("path.repo", String.join(",", localConfiguration.getPathRepo()));
+        }
+
         //config.put("network.publish_host", Tools.getLocalCanonicalHostname());
 
         // Uncomment the following line to get DEBUG logs for the underlying Opensearch

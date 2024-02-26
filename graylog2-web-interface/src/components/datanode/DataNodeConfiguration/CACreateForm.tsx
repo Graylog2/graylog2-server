@@ -55,9 +55,7 @@ const CaCreateForm = () => {
   return (
     <div>
       <p>
-        Here you can quickly create a new certificate authority.
-        All you need to do is to click on the &ldquo;Create CA&rdquo; button.
-        The CA should only be used to secure your Graylog Data Nodes.
+        Click on the &ldquo;Create CA&rdquo; button to quickly create a new certificate authority for your Graylog Data Nodes.
       </p>
       <Formik initialValues={{ organization: 'Graylog CA' }} onSubmit={(formValues: FormValues) => onSubmit(formValues)}>
         {({ isSubmitting, isValid }) => (
