@@ -55,7 +55,7 @@ const PreflightThemeProvider = ({ children }: Props) => {
   const scTheme = useSCTheme(colorScheme, setColorScheme, mantineTheme);
 
   return (
-    <MantineProvider theme={mantineTheme}>
+    <MantineProvider theme={mantineTheme} forceColorScheme={colorScheme}>
       <ThemeProvider theme={scTheme}>
         {children}
       </ThemeProvider>
