@@ -43,7 +43,7 @@ const _entityItemHeader = (entity) => {
     return <><HeaderIcon name="archive" className={style.contentPackEntity} />{' '}<span>{entity.title}</span></>;
   }
 
-  return <><HeaderIcon name="server" />{' '}<HeaderText>{entity.title}</HeaderText></>;
+  return <><HeaderIcon name="dns" />{' '}<HeaderText>{entity.title}</HeaderText></>;
 };
 
 class ContentPackSelection extends React.Component {
@@ -370,7 +370,7 @@ class ContentPackSelection extends React.Component {
           <Col smOffset={1} lg={8}>
             <h2>Content Pack selection</h2>
             {edit && (
-            <HelpBlock>You can select between installed entities from the server (<Icon name="server" />) or
+            <HelpBlock>You can select between installed entities from the server (<Icon name="dns" />) or
               entities from the former content pack revision (<Icon name="archive" className={style.contentPackEntity} />).
             </HelpBlock>
             )}

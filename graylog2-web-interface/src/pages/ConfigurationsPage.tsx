@@ -69,7 +69,7 @@ const SectionLink = ({ name, showCaret }: SectionLinkProps) => {
     <LinkContainer key={`nav-${name}`} to={name}>
       <NavItem title={name} active={isActive}>
         {name}
-        {showCaret && (isActive ? <SubNavIconClosed name="caret-right" /> : <SubNavIconOpen name="caret-down" />)}
+        {showCaret && (isActive ? <SubNavIconClosed name="arrow_right" /> : <SubNavIconOpen name="arrow_drop_down" />)}
       </NavItem>
     </LinkContainer>
   );

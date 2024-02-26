@@ -60,9 +60,7 @@ const widgetConfig = AggregationWidgetConfig
 const selectEventConfig = { container: document.body };
 
 const addSortElement = async () => {
-  await userEvent.click(await screen.findByRole('button', { name: 'Add' }));
-  await screen.findByRole('menu');
-  await userEvent.click(await screen.findByRole('menuitem', { name: 'Sort' }));
+  await userEvent.click(await screen.findByRole('button', { name: /add a sort/i }));
 };
 
 const findWidgetConfigFormSubmitButton = () => screen.findByRole('button', { name: /update preview/i });
@@ -186,8 +184,7 @@ describe('AggregationWizard', () => {
 
     renderSUT({ config, onChange: onChangeMock });
 
-    const addSortButton = await screen.findByRole('button', { name: 'Add a Sort' });
-    userEvent.click(addSortButton);
+    await addSortElement();
 
     await sortByTookMsDesc('sort-element-1', 'max(took_ms)');
     await submitWidgetConfigForm();

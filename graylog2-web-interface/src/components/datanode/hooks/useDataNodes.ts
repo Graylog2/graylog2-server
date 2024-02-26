@@ -18,10 +18,11 @@ import { useQuery } from '@tanstack/react-query';
 
 import { qualifyUrl } from 'util/URLUtils';
 import PaginationURL from 'util/PaginationURL';
-import type { DataNode } from 'preflight/types';
 import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
-import type { Attribute, PaginatedListJSON, SearchParams } from 'stores/PaginationTypes';
+import type { Attribute, SearchParams, PaginatedResponseType } from 'stores/PaginationTypes';
+import type FetchError from 'logic/errors/FetchError';
+import type { DataNodes } from 'components/datanode/Types';
 
 export const bulkRemoveDataNode = async (entity_ids: string[], selectBackFailedEntities: (entity_ids: string[]) => void) => {
   try {
@@ -135,22 +136,29 @@ export const renewDatanodeCertificate = (nodeId: string) => fetch('POST', qualif
     UserNotification.error(`Certificate renewal failed with error: ${error}`);
   });
 
-const fetchDataNodes = async (params?: SearchParams) => {
+const fetchDataNodes = async (params?: Partial<SearchParams>) => {
   const url = PaginationURL('/system/cluster/datanodes', params?.page, params?.pageSize, params?.query, { sort: params?.sort?.attributeId, order: params?.sort?.direction });
 
   return fetch('GET', qualifyUrl(url));
 };
 
-const useDataNodes = (params: SearchParams, { enabled }: Options = { enabled: true }) : {
-  data: {
-    elements: Array<DataNode>,
-    pagination: PaginatedListJSON,
-    attributes: Array<Attribute>
-  },
+export type DataNodeResponse = {
+  elements: DataNodes,
+  pagination: PaginatedResponseType,
+  attributes: Array<Attribute>
+}
+
+const useDataNodes = (params: Partial<SearchParams> = {
+  query: '',
+  page: 1,
+  pageSize: 0,
+}, { enabled }: Options = { enabled: true }, refetchInterval : number | false = 5000) : {
+  data: DataNodeResponse,
   refetch: () => void,
   isInitialLoading: boolean,
+  error: FetchError,
 } => {
-  const { data, refetch, isInitialLoading } = useQuery(
+  const { data, refetch, isInitialLoading, error } = useQuery<DataNodeResponse, FetchError>(
     ['datanodes'],
     () => fetchDataNodes(params),
     {
@@ -159,7 +167,7 @@ const useDataNodes = (params: SearchParams, { enabled }: Options = { enabled: tr
           'Could not load Data Nodes.');
       },
       notifyOnChangeProps: ['data', 'error'],
-      refetchInterval: 5000,
+      refetchInterval,
       enabled,
     },
   );
@@ -168,10 +176,17 @@ const useDataNodes = (params: SearchParams, { enabled }: Options = { enabled: tr
     data: data || {
       attributes: [],
       elements: [],
-      pagination: { total: 0 },
+      pagination: {
+        query: '',
+        page: 1,
+        per_page: 0,
+        total: 0,
+        count: 0,
+      },
     },
     refetch,
     isInitialLoading,
+    error,
   });
 };
 
