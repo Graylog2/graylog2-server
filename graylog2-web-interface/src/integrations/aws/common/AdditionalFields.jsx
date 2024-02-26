@@ -32,7 +32,7 @@ const AdditionalFields = ({ children, className, onToggle, title, visible }) => 
   return (
     <div className={className}>
       <ToggleAdditionalFields bsStyle="link" bsSize="xsmall" onClick={handleToggle} type="button">
-        {title} <Icon name={fieldsVisible ? 'angle-down' : 'angle-right'} fixedWidth />
+        {title} <Icon name={fieldsVisible ? 'keyboard_arrow_down' : 'keyboard_arrow_right'} />
       </ToggleAdditionalFields>
 
       <AdditionalFieldsContent visible={fieldsVisible}>

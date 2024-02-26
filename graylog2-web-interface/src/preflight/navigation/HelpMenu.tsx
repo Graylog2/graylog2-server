@@ -31,7 +31,7 @@ const HelpMenu = () => (
         position="bottom-end">
     <Menu.Target>
       <StyledButton variant="default">
-        <Text weight={500} size="sm" mr={3}>Get Help</Text>
+        <Text fw={500} size="sm" mr={3}>Get Help</Text>
         <Icon name="chevron-down" />
       </StyledButton>
     </Menu.Target>

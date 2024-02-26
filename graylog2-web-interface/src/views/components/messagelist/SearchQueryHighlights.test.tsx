@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
 
 import { AdditionalContext } from 'views/logic/ActionContext';
 import type { Message } from 'views/components/messagelist/Types';
@@ -38,15 +38,13 @@ describe('SearchQueryHighlights', () => {
   it('works for empty field & value', async () => {
     const { container } = render(<SearchQueryHighlights field="" value="" />);
 
-    expect(container).toMatchSnapshot();
+    expect(container.children).toHaveLength(2);
   });
 
   it('returns unmodified string without ranges', async () => {
-    const { findByText } = render(<SearchQueryHighlights field="foo" value="bar" />);
+    render(<SearchQueryHighlights field="foo" value="bar" />);
 
-    const elem = await findByText('bar');
-
-    expect(elem).toMatchSnapshot();
+    await screen.findByText('bar');
   });
 
   it('does not highlight string if range for field is absent', async () => {
@@ -61,7 +59,8 @@ describe('SearchQueryHighlights', () => {
 
     const elem = await findByText('foobar');
 
-    expect(elem).toMatchSnapshot();
+    expect(elem).not.toHaveStyleRule('background-color');
+    expect(elem).not.toHaveStyleRule('color');
   });
 
   it('highlights string for single highlight range', async () => {
@@ -76,7 +75,8 @@ describe('SearchQueryHighlights', () => {
 
     const elem = await findByText('foobar');
 
-    expect(elem).toMatchSnapshot();
+    expect(elem).toHaveStyle('background-color: rgb(255, 236, 61)');
+    expect(elem).toHaveStyle('color: rgb(81, 75, 19);');
   });
 
   it('does not highlight string if start is negative', async () => {
@@ -91,7 +91,8 @@ describe('SearchQueryHighlights', () => {
 
     const elem = await findByText('foobar');
 
-    expect(elem).toMatchSnapshot();
+    expect(elem).not.toHaveStyleRule('background-color');
+    expect(elem).not.toHaveStyleRule('color');
   });
 
   it('does not highlight string if length is negative', async () => {
@@ -106,7 +107,8 @@ describe('SearchQueryHighlights', () => {
 
     const elem = await findByText('foobar');
 
-    expect(elem).toMatchSnapshot();
+    expect(elem).not.toHaveStyleRule('background-color');
+    expect(elem).not.toHaveStyleRule('color');
   });
 
   it('highlights remainder of string if length of range exceeds length of string', async () => {
@@ -119,9 +121,11 @@ describe('SearchQueryHighlights', () => {
       </AdditionalContext.Provider>,
     );
 
-    const elem = await findByText(hasBrokenUpText('foobar'));
+    await findByText(hasBrokenUpText('foobar'));
+    const elemSuffix = await findByText('bar');
 
-    expect(elem).toMatchSnapshot();
+    expect(elemSuffix).toHaveStyle('background-color: rgb(255, 236, 61)');
+    expect(elemSuffix).toHaveStyle('color: rgb(81, 75, 19);');
   });
 
   it('highlights string for multiple highlight ranges', async () => {
@@ -137,9 +141,15 @@ describe('SearchQueryHighlights', () => {
       </AdditionalContext.Provider>,
     );
 
-    const elem = await findByText(hasBrokenUpText('the brown fox jumps over the lazy dog'));
+    await findByText(hasBrokenUpText('the brown fox jumps over the lazy dog'));
+    const elemHighlight1 = await findByText('brown');
+    const elemHighlight2 = await findByText('jumps over');
 
-    expect(elem).toMatchSnapshot();
+    expect(elemHighlight1).toHaveStyle('background-color: rgb(255, 236, 61)');
+    expect(elemHighlight1).toHaveStyle('color: rgb(81, 75, 19);');
+
+    expect(elemHighlight2).toHaveStyle('background-color: rgb(255, 236, 61)');
+    expect(elemHighlight2).toHaveStyle('color: rgb(81, 75, 19);');
   });
 
   it('highlights string for multiple, overlapping highlight ranges', async () => {
@@ -155,9 +165,15 @@ describe('SearchQueryHighlights', () => {
       </AdditionalContext.Provider>,
     );
 
-    const elem = await findByText(hasBrokenUpText('the brown fox jumps over the lazy dog'));
+    await findByText(hasBrokenUpText('the brown fox jumps over the lazy dog'));
+    const elemHighlight1 = await findByText('brown');
+    const elemHighlight2 = await findByText('fox jum');
 
-    expect(elem).toMatchSnapshot();
+    expect(elemHighlight1).toHaveStyle('background-color: rgb(255, 236, 61)');
+    expect(elemHighlight1).toHaveStyle('color: rgb(81, 75, 19);');
+
+    expect(elemHighlight2).toHaveStyle('background-color: rgb(255, 236, 61)');
+    expect(elemHighlight2).toHaveStyle('color: rgb(81, 75, 19);');
   });
 
   it('highlights string for multiple highlight ranges where one is a complete subset of the other', async () => {
@@ -173,8 +189,11 @@ describe('SearchQueryHighlights', () => {
       </AdditionalContext.Provider>,
     );
 
-    const elem = await findByText(hasBrokenUpText('the brown fox jumps over the lazy dog'));
+    await findByText(hasBrokenUpText('the brown fox jumps over the lazy dog'));
 
-    expect(elem).toMatchSnapshot();
+    const elemHighlight = await findByText('brown');
+
+    expect(elemHighlight).toHaveStyle('background-color: rgb(255, 236, 61)');
+    expect(elemHighlight).toHaveStyle('color: rgb(81, 75, 19);');
   });
 });

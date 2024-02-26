@@ -32,9 +32,7 @@ public interface MigrationActions {
 
     void reindexUpgradeSelected();
 
-    boolean reindexingFinished();
-
-    void reindexOldData();
+    boolean isRemoteReindexingFinished();
 
     void stopMessageProcessing();
 
@@ -51,12 +49,14 @@ public interface MigrationActions {
 
     void startDataNodes();
 
-    void resetMigration();
-
     boolean dataNodeStartupFinished();
 
     void setStateMachineContext(MigrationStateMachineContext context);
 
     MigrationStateMachineContext getStateMachineContext();
+
+    void startRemoteReindex();
+
+    void requestMigrationStatus();
 
 }

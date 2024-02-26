@@ -69,7 +69,7 @@ const isEntitySelectable = (fieldType: IndexSetFieldType) => !fieldType.isReserv
 const FilterValueRenderers = {
   is_reserved: (value: 'true' | 'false', title: string) => (
     <>
-      <StyledIcon name={value === 'true' ? 'circle-check' : 'circle-xmark'} $value={value} />
+      <StyledIcon name={value === 'true' ? 'check_circle' : 'cancel'} $value={value} />
       {title}
     </>
   ),

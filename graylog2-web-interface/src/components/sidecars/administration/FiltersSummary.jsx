@@ -72,7 +72,7 @@ class FiltersSummary extends React.Component {
             {this.formatFilters(filters)}
             <li>
               <Button bsStyle="link" bsSize="xsmall" className={style.deleteButton} onClick={onResetFilters}>
-                <Icon name="times" /> Clear all
+                <Icon name="close" /> Clear all
               </Button>
             </li>
           </ul>

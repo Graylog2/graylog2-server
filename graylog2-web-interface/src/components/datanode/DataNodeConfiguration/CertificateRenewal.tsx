@@ -61,7 +61,7 @@ const useDataNodes = () => {
     queryKey: ['data-nodes', 'overview'],
     queryFn: fetchDataNodes,
     onError: (errorThrown) => {
-      UserNotification.error(`Loading data nodes failed with status: ${errorThrown}`,
+      UserNotification.error(`Loading Data Nodes failed with status: ${errorThrown}`,
         'Could not load streams');
     },
     keepPreviousData: true,
@@ -153,9 +153,9 @@ const CertificateRenewal = () => {
     <div>
       <h2>Certificate Renewal & Provisioning</h2>
       <p>
-        Here you can manually trigger the certificate renewal or provisioning for Graylog data nodes.
+        Here you can manually trigger the certificate renewal or provisioning for Graylog Data Nodes.
         It is only necessary to manually provision certificates when the renewal policy mode &quot;Manual&quot; is configured and
-        data nodes have been started after the initial certificate provisioning.
+        Data Nodes have been started after the initial certificate provisioning.
       </p>
 
       {!!sortedDataNodes?.length && (
@@ -190,7 +190,7 @@ const CertificateRenewal = () => {
       {isInitialLoadingDataNodes && <Spinner />}
       {(!sortedDataNodes?.length && !isInitialLoadingDataNodes) && (
         <Alert>
-          No data nodes have been found.
+          No Data Nodes have been found.
         </Alert>
       )}
     </div>

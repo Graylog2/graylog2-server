@@ -27,6 +27,7 @@ import Countdown from 'integrations/aws/common/Countdown';
 import { DEFAULT_KINESIS_LOG_TYPE, KINESIS_LOG_TYPES } from 'integrations/aws/common/constants';
 import { ApiContext } from 'integrations/aws/context/Api';
 import { FormDataContext } from 'integrations/aws/context/FormData';
+import Icon from 'components/common/Icon';
 
 const StepHealthCheck = ({ onChange, onSubmit }) => {
   const { logData, setLogData } = useContext(ApiContext);
@@ -68,7 +69,8 @@ const StepHealthCheck = ({ onChange, onSubmit }) => {
     return (
       <Panel bsStyle="warning"
              header={(
-               <Notice><i className="fa fa-exclamation-triangle fa-2x" />
+               <Notice>
+                 <Icon name="warning" size="2x" />
                  <span>We haven&apos;t received a response back from Amazon yet.</span>
                </Notice>
             )}>
@@ -96,7 +98,7 @@ const StepHealthCheck = ({ onChange, onSubmit }) => {
   }
 
   const knownLog = logData.type === DEFAULT_KINESIS_LOG_TYPE;
-  const iconClass = knownLog ? 'check' : 'exclamation-triangle';
+  const iconClass = knownLog ? 'check_circle' : 'warning';
   const acknowledgment = knownLog ? 'Awesome!' : 'Drats!';
   const bsStyle = knownLog ? 'success' : 'warning';
   const logTypeLabel = KINESIS_LOG_TYPES.find((type) => type.value === logData.type).label;
@@ -116,7 +118,8 @@ const StepHealthCheck = ({ onChange, onSubmit }) => {
 
       <Panel bsStyle={bsStyle}
              header={(
-               <Notice><i className={`fa fa-${iconClass} fa-2x`} />
+               <Notice>
+                 <Icon name={iconClass} size="2x" />
                  <span>{acknowledgment} looks like <em>{logType}</em> message type.</span>
                </Notice>
              )}>

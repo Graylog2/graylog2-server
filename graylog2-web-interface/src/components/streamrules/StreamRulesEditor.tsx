@@ -145,13 +145,13 @@ const StreamRulesEditor = ({ streamId, messageId, index }: Props) => {
 
             {(matchData && !matchData.matches) && (
               <>
-                <MatchIcon name="times" /> This message would not be routed to this stream.
+                <MatchIcon name="close" /> This message would not be routed to this stream.
               </>
             )}
 
             {!matchData && (
               <>
-                <MatchIcon $empty name="exclamation-circle" /> Please load a message in Step 1 above to check if it would match against these rules.
+                <MatchIcon $empty name="error" /> Please load a message in Step 1 above to check if it would match against these rules.
               </>
             )}
           </StreamAlertHeader>

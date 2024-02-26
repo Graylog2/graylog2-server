@@ -36,8 +36,7 @@ const ToggleActionButton = ({ onClick, isOpen }: Props) => (
   <StyledButton bsStyle="link"
                 onClick={() => onClick()}
                 type="button">{isOpen ? 'Close' : 'Open'}
-    <Icon name={isOpen ? 'angle-down' : 'angle-right'}
-          fixedWidth />
+    <Icon name={isOpen ? 'keyboard_arrow_down' : 'keyboard_arrow_right'} />
   </StyledButton>
 );
 
