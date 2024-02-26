@@ -82,7 +82,7 @@ class ContentPackParameterList extends React.Component {
     const { onDeleteParameter, readOnly } = this.props;
     const parameterApplied = this._parameterApplied(parameter.name);
     const buttonTitle = parameterApplied ? 'Still in use' : 'Delete Parameter';
-    const icon = parameterApplied ? 'check' : 'times';
+    const icon = parameterApplied ? 'check_circle' : 'cancel';
     const bsStyle = parameterApplied ? 'success' : 'failure';
 
     return (

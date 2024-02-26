@@ -90,7 +90,7 @@ describe('SavedSearchForm', () => {
       render(<SavedSearchForm {...props}
                               saveSearch={onSave} />);
 
-      const saveButton = await screen.findByRole('button', { name: 'Save' });
+      const saveButton = await screen.findByRole('button', { name: /Save search/i });
       userEvent.click(saveButton);
 
       expect(onSave).toHaveBeenCalledTimes(1);
@@ -103,7 +103,7 @@ describe('SavedSearchForm', () => {
                               saveAsSearch={onSaveAs} />);
 
       userEvent.type(await findTitleInput(), ' and further title');
-      const saveAsButton = await screen.findByRole('button', { name: 'Save as' });
+      const saveAsButton = await screen.findByRole('button', { name: /Save as/i });
       userEvent.click(saveAsButton);
 
       expect(onSaveAs).toHaveBeenCalledWith('new Title and further title');
@@ -115,7 +115,7 @@ describe('SavedSearchForm', () => {
       render(<SavedSearchForm {...props}
                               saveAsSearch={onSaveAs} />);
 
-      const saveAsButton = await screen.findByRole('button', { name: 'Save as' });
+      const saveAsButton = await screen.findByRole('button', { name: /Save as/i });
       userEvent.click(saveAsButton);
 
       expect(onSaveAs).not.toHaveBeenCalled();

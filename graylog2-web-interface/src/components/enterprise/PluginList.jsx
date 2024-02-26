@@ -34,7 +34,7 @@ const PluginList = createReactClass({
 
     return (
       <li key={pluginName} className={plugin ? 'text-success' : 'text-danger'}>
-        <Icon name={plugin ? 'check-circle' : 'minus-circle'} />&nbsp;
+        <Icon name={plugin ? 'check_circle' : 'radio_button_unchecked'} />&nbsp;
         {this.ENTERPRISE_PLUGINS[pluginName]} is {plugin ? 'installed' : 'not installed'}
       </li>
     );

@@ -19,7 +19,6 @@ package org.graylog.plugins.views.storage.migration.state.actions;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachineContext;
-import org.graylog.plugins.views.storage.migration.state.persistence.DatanodeMigrationConfiguration;
 import org.graylog.security.certutil.CaService;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog2.bootstrap.preflight.PreflightConfigResult;
@@ -73,11 +72,6 @@ public class MigrationActionsImpl implements MigrationActions {
         this.clusterProcessingControlFactory = clusterProcessingControlFactory;
         this.migrationService = migrationService;
         this.preflightConfigService = preflightConfigService;
-    }
-
-    @Override
-    public void resetMigration() {
-        clusterConfigService.remove(DatanodeMigrationConfiguration.class);
     }
 
 
@@ -167,18 +161,27 @@ public class MigrationActionsImpl implements MigrationActions {
 
     @Override
     public boolean provisioningFinished() {
-        return nodeService.allActive().values().stream().allMatch(node -> node.getDataNodeStatus() == DataNodeStatus.PREPARED);
+        return nodeService.allActive().values().stream().allMatch(node -> dataNodeProvisioningService.getPreflightConfigFor(node.getNodeId())
+                .map(dn -> dn.state() == DataNodeProvisioningConfig.State.STARTUP_PREPARED)
+                .orElse(false));
     }
 
     @Override
     public void startDataNodes() {
         final Map<String, DataNodeDto> activeDataNodes = nodeService.allActive();
-        activeDataNodes.values().forEach(node -> dataNodeProvisioningService.changeState(node.getNodeId(), DataNodeProvisioningConfig.State.STARTUP_REQUESTED));
+        activeDataNodes.values().forEach(node -> dataNodeProvisioningService.changeState(node.getNodeId(), DataNodeProvisioningConfig.State.STARTUP_TRIGGER));
     }
 
     @Override
     public boolean dataNodeStartupFinished() {
-        return nodeService.allActive().values().stream().allMatch(node -> node.getDataNodeStatus() == DataNodeStatus.AVAILABLE);
+        boolean dataNodesAvailable = nodeService.allActive().values().stream().allMatch(node -> node.getDataNodeStatus() == DataNodeStatus.AVAILABLE);
+        if (dataNodesAvailable) { // set preflight config once more to FINISHED to be sure that a Graylog restart will connect to the data nodes
+            var preflight = preflightConfigService.getPreflightConfigResult();
+            if (preflight == null || !preflight.equals(PreflightConfigResult.FINISHED)) {
+                preflightConfigService.setConfigResult(PreflightConfigResult.FINISHED);
+            }
+        }
+        return dataNodesAvailable;
     }
 
     @Override

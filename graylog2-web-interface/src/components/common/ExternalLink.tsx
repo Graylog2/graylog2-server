@@ -57,7 +57,7 @@ const ExternalLink = ({ children, className, href, iconClass, target }: Props) =
 ExternalLink.defaultProps = {
   href: '',
   target: '_blank',
-  iconClass: 'external-link-alt',
+  iconClass: 'open_in_new',
   className: '',
 };
 

@@ -61,6 +61,7 @@ import type { TimeRange } from 'views/logic/queries/Query';
 import QueryHistoryButton from 'views/components/searchbar/QueryHistoryButton';
 import type { Editor } from 'views/components/searchbar/queryinput/ace-types';
 import useView from 'views/hooks/useView';
+import useIsLoading from 'views/hooks/useIsLoading';
 
 import TimeRangeFilter from './searchbar/time-range-filter';
 import type { DashboardFormValues } from './DashboardSearchBarForm';
@@ -125,6 +126,7 @@ const DashboardSearchBar = () => {
 
   const { parameters } = useParameters();
   const initialValues = useInitialFormValues(timerange, queryString);
+  const isLoadingExecution = useIsLoading();
 
   if (!config) {
     return <Spinner />;
@@ -142,7 +144,7 @@ const DashboardSearchBar = () => {
                                  onSubmit={submitForm}
                                  validateQueryString={(values) => _validateQueryString(values, pluggableSearchBarControls, userTimezone, handlerContext)}>
               {({ dirty, errors, isSubmitting, isValid, isValidating, handleSubmit, values, setFieldValue, validateForm }) => {
-                const disableSearchSubmit = isSubmitting || isValidating || !isValid;
+                const disableSearchSubmit = isSubmitting || isValidating || !isValid || isLoadingExecution;
 
                 return (
                   <SearchBarContainer>
@@ -159,8 +161,8 @@ const DashboardSearchBar = () => {
                     <SearchQueryRow>
                       <SearchButtonAndQuery>
                         <SearchButton disabled={disableSearchSubmit}
-                                      glyph="filter"
-                                      displaySpinner={isSubmitting}
+                                      glyph="filter_alt"
+                                      displaySpinner={isSubmitting || isLoadingExecution}
                                       dirty={dirty} />
                         <SearchInputAndValidationContainer>
                           <Field name="queryString">

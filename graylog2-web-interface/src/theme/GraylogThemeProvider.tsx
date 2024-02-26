@@ -31,6 +31,8 @@ import ColorSchemeContext from './ColorSchemeContext';
 import { COLOR_SCHEMES } from './constants';
 import usePreferredColorScheme from './hooks/usePreferredColorScheme';
 
+import 'material-symbols/rounded.css';
+
 type Props = {
   children: React.ReactNode,
   initialThemeModeOverride: ColorScheme,
@@ -71,7 +73,8 @@ const GraylogThemeProvider = ({ children, initialThemeModeOverride, userIsLogged
 
   return (
     <ColorSchemeContext.Provider value={colorScheme}>
-      <MantineProvider theme={mantineTheme}>
+      <MantineProvider theme={mantineTheme}
+                       forceColorScheme={colorScheme}>
         <ThemeProvider theme={scTheme}>
           {children}
         </ThemeProvider>

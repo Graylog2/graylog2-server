@@ -30,7 +30,7 @@ const ConfigurationFinished = ({ setIsWaitingForStartup, isSkippingProvisioning,
     ? (
       <>
         You&apos;ve finished the configuration successfully. You can still
-        {' '}<Button variant="light" compact onClick={() => setIsSkippingProvisioning(false)} size="xs">go back</Button>
+        {' '}<Button variant="light" onClick={() => setIsSkippingProvisioning(false)} size="compact-xs">go back</Button>
         {' '}to provision the certificates.
       </>
     )

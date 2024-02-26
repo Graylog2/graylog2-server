@@ -22,7 +22,7 @@ import styled, { css } from 'styled-components';
 
 import 'react-day-picker/lib/style.css';
 
-import { isValidDate, toDateObject, adjustFormat, DATE_TIME_FORMATS } from 'util/DateTime';
+import { isValidDate, toDateObject, adjustFormat } from 'util/DateTime';
 
 const StyledDayPicker = styled(DayPicker)(({ theme }) => css`
   width: 100%;
@@ -59,13 +59,15 @@ const StyledDayPicker = styled(DayPicker)(({ theme }) => css`
   }
 `);
 
-const isValidDateProp = (date: string | undefined) => {
-  if (!date) {
-    return true;
+const useSelectedDate = (date: string | undefined) => useMemo(() => {
+  const isDateValid = !date || isValidDate(toDateObject(date, ['date']));
+
+  if (isDateValid) {
+    return date;
   }
 
-  return isValidDate(toDateObject(date, ['date']));
-};
+  return undefined;
+}, [date]);
 
 type Props = {
   date?: string | undefined,
@@ -75,25 +77,23 @@ type Props = {
 };
 
 const DatePicker = ({ date, fromDate, onChange, showOutsideDays }: Props) => {
-  if (!isValidDateProp(date)) {
-    throw Error(`Date time provided for date picker "${date}" is not valid. The expected format is ${DATE_TIME_FORMATS.date}.`);
-  }
+  const selectedDate = useSelectedDate(date);
 
   const modifiers = useMemo(() => ({
     selected: (moddedDate: Date) => {
-      if (!date) {
+      if (!selectedDate) {
         return false;
       }
 
-      return date === adjustFormat(moddedDate, 'date');
+      return selectedDate === adjustFormat(moddedDate, 'date');
     },
     disabled: {
       before: new Date(fromDate),
     },
-  }), [fromDate, date]);
+  }), [fromDate, selectedDate]);
 
   return (
-    <StyledDayPicker initialMonth={date ? toDateObject(date).toDate() : undefined}
+    <StyledDayPicker initialMonth={selectedDate ? toDateObject(selectedDate).toDate() : undefined}
                      onDayClick={onChange}
                      modifiers={modifiers}
                      showOutsideDays={showOutsideDays} />

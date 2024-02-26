@@ -158,7 +158,7 @@ const ViewHeader = () => {
             return (
               <TitleWrapper key={`${label}_${link}`}>
                 <CrumbLink link={link} label={label} dataTestId={dataTestId} />
-                {!theLast && <StyledIcon name="chevron-right" />}
+                {!theLast && <StyledIcon name="keyboard_arrow_right" />}
                 {isSavedView && theLast && (
                   <>
                     <FavoriteIcon isFavorite={view.favorite} grn={createGRN(view.type, view.id)} onChange={onChangeFavorite} />
@@ -166,7 +166,7 @@ const ViewHeader = () => {
                                 role="button"
                                 title={`Edit ${typeText} ${view.title} metadata`}
                                 tabIndex={0}>
-                      <Icon name="pen-to-square" />
+                      <Icon name="edit_square" />
                     </EditButton>
                   </>
                 )}

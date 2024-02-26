@@ -42,7 +42,7 @@ const IndicatorSeparator = () => null;
 const DropdownIndicator = (props) => {
   const {
     /* eslint-disable react/prop-types */
-    children = <Icon name="caret-down" />,
+    children = <Icon name="arrow_drop_down" />,
     getStyles,
     innerProps: { ref, ...restInnerProps },
     /* eslint-enable react/prop-types */

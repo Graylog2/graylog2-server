@@ -23,6 +23,9 @@ import java.util.Locale;
 import java.util.function.Function;
 
 public record ShardsInfo(String index, int shard, ShardType shardType, State state, long docs, String store, String ip, String node ) {
+    public static boolean isStartedPrimaryShard(ShardsInfo shardsInfo) {
+        return shardsInfo.shardType() == ShardsInfo.ShardType.PRIMARY && shardsInfo.state() == ShardsInfo.State.STARTED;
+    }
 
     public static ShardsInfo create(JsonNode jsonNode) {
 

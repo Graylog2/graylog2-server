@@ -34,6 +34,11 @@ import com.maxmind.geoip2.model.CityResponse;
 import com.maxmind.geoip2.model.CountryResponse;
 import com.maxmind.geoip2.record.Country;
 import com.maxmind.geoip2.record.Location;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.plugins.map.config.DatabaseType;
 import org.graylog2.plugin.lookup.LookupCachePurge;
@@ -45,13 +50,6 @@ import org.joda.time.Duration;
 import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
-
-import jakarta.inject.Inject;
-
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -65,6 +63,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static org.graylog.plugins.map.config.GeoIpProcessorConfig.DISABLE_IPINFO_DB_TYPE_CHECK;
 import static org.slf4j.LoggerFactory.getLogger;
 
 public class MaxmindDataAdapter extends LookupDataAdapter {
@@ -73,6 +72,7 @@ public class MaxmindDataAdapter extends LookupDataAdapter {
 
     public static final String NAME = "maxmind_geoip";
     private final Config config;
+    private final boolean disableIpInfoDbTypeCheck;
     private final AtomicReference<IPLocationDatabaseAdapter> databaseAdapter = new AtomicReference<>();
     private FileInfo fileInfo = FileInfo.empty();
 
@@ -80,9 +80,11 @@ public class MaxmindDataAdapter extends LookupDataAdapter {
     protected MaxmindDataAdapter(@Assisted("id") String id,
                                  @Assisted("name") String name,
                                  @Assisted LookupDataAdapterConfiguration config,
+                                 @Named(DISABLE_IPINFO_DB_TYPE_CHECK) boolean disableIpInfoDbTypeCheck,
                                  MetricRegistry metricRegistry) {
         super(id, name, config, metricRegistry);
         this.config = (Config) config;
+        this.disableIpInfoDbTypeCheck = disableIpInfoDbTypeCheck;
     }
 
     @Override
@@ -157,7 +159,7 @@ public class MaxmindDataAdapter extends LookupDataAdapter {
                 return new MaxMindIPLocationDatabaseAdapter(file);
             case IPINFO_ASN:
             case IPINFO_STANDARD_LOCATION:
-                return new IPinfoIPLocationDatabaseAdapter(file);
+                return new IPinfoIPLocationDatabaseAdapter(file, disableIpInfoDbTypeCheck);
             default:
                 throw new IllegalStateException("Unexpected value: " + config.dbType());
         }

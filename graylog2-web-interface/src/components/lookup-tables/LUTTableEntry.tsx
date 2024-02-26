@@ -104,7 +104,7 @@ const LUTTableEntry = ({ table, cache, dataAdapter, errors }: Props) => {
               <Button bsSize="xsmall"
                       onClick={handleEdit}
                       role="button"
-                      name="edit">
+                      name="edit_square">
                 Edit
               </Button>
               <Button bsSize="xsmall"

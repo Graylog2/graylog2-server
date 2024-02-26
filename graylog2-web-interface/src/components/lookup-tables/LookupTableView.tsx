@@ -112,7 +112,7 @@ const LookupTableView = ({ table, cache, dataAdapter }: Props) => {
           <Button bsStyle="success"
                   onClick={handleEdit(table.name)}
                   role="button"
-                  name="edit">
+                  name="edit_square">
             Edit
           </Button>
         )}

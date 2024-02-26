@@ -120,12 +120,12 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
 
     public GenericContainer<?> build() {
         final Path graylog = getPath().resolve("graylog-datanode-" + getProjectVersion() + ".jar");
-        if(!Files.exists(graylog)) {
+        if (!Files.exists(graylog)) {
             LOG.info("Searching for {} failed.", graylog.toAbsolutePath());
             LOG.info("Project repos path: {}, absolute path: {}", getProjectReposPath(), getProjectReposPath().toAbsolutePath());
-            if(Files.exists(getPath())) {
+            if (Files.exists(getPath())) {
                 LOG.info("contents of base path {}:", getPath());
-                try(var files = Files.list(getPath())) {
+                try (var files = Files.list(getPath())) {
                     files.forEach(file -> LOG.info("{}", file.toString()));
                 } catch (IOException ex) {
                     LOG.info("listing files failed with exception: {}", ex.getMessage());
@@ -155,7 +155,7 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_DISCOVERY_SEED_HOSTS", nodeName + ":" + openSearchTransportPort)
 
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_NETWORK_HOST", nodeName)
-                .withEnv("GRAYLOG_DATANODE_CLUSTER_INITIAL_MANAGER_NODES", nodeName)
+                .withEnv("GRAYLOG_DATANODE_INITIAL_CLUSTER_MANAGER_NODES", nodeName)
 
                 .withEnv("GRAYLOG_DATANODE_ROOT_USERNAME", rootUsername)
                 .withEnv("GRAYLOG_DATANODE_PASSWORD_SECRET", passwordSecret)
