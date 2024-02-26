@@ -44,7 +44,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <opensearch.version>2.11.0</opensearch.version>
+        <opensearch.version>2.12.0</opensearch.version>
 
         <!--
            We don't need to sign anything in this module. This fixes a release build error related to setting
@@ -540,6 +540,7 @@
                             <url>
                                 https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.version}/opensearch-${opensearch.version}-linux-x64.tar.gz
                             </url>
+                            <md5>4ff7a31d7269134050b5dd3b4173f14b</md5>
                             <outputFileName>opensearch-${opensearch.version}-linux-x64.tar.gz</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch</outputDirectory>
                             <unpack>true</unpack>
@@ -561,6 +562,7 @@
                             <url>
                                 https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.version}/opensearch-${opensearch.version}-linux-arm64.tar.gz
                             </url>
+                            <md5>f636260002ec75bf34082d117e9257f9</md5>
                             <outputFileName>opensearch-${opensearch.version}-linux-aarch64.tar.gz</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch</outputDirectory>
                             <unpack>true</unpack>
@@ -593,7 +595,7 @@
                                 -->
                                 <chmod dir="${project.build.directory}/opensearch"
                                        includes="opensearch-*/config/**"
-                                       perm="ugo+r" />
+                                       perm="ugo+r"/>
                             </target>
                         </configuration>
                     </execution>
@@ -606,28 +608,28 @@
                         <configuration>
                             <target>
                                 <!-- Remove unused OpenSearch plugins -->
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-alerting" />
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-custom-codecs" />
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-geospatial" />
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-knn" />
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-neural-search" />
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-notifications" />
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-notifications-core" />
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-performance-analyzer" />
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-reports-scheduler" />
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-security-analytics" />
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-sql" />
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-alerting" />
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-custom-codecs" />
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-geospatial" />
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-knn" />
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-neural-search" />
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-notifications" />
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-notifications-core" />
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-performance-analyzer" />
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-reports-scheduler" />
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-security-analytics" />
-                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-sql" />
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-alerting"/>
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-custom-codecs"/>
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-geospatial"/>
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-knn"/>
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-neural-search"/>
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-notifications"/>
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-notifications-core"/>
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-performance-analyzer"/>
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-reports-scheduler"/>
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-security-analytics"/>
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/plugins/opensearch-sql"/>
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-alerting"/>
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-custom-codecs"/>
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-geospatial"/>
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-knn"/>
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-neural-search"/>
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-notifications"/>
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-notifications-core"/>
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-performance-analyzer"/>
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-reports-scheduler"/>
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-security-analytics"/>
+                                <delete dir="${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/plugins/opensearch-sql"/>
                             </target>
                         </configuration>
                     </execution>
