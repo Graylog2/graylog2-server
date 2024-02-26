@@ -246,6 +246,13 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "path_repo", converter = StringListConverter.class)
     private List<String> pathRepo;
 
+    @Parameter(value = "opensearch_indices_query_bool_max_clause_count")
+    private Integer indicesQueryBoolMaxClauseCount = 32768;
+
+    public Integer getIndicesQueryBoolMaxClauseCount() {
+        return indicesQueryBoolMaxClauseCount;
+    }
+
     public boolean isInsecureStartup() {
         return insecureStartup;
     }

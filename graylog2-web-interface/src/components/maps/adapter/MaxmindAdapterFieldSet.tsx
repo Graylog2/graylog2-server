@@ -58,7 +58,7 @@ const MaxmindAdapterFieldSet = ({ config, updateConfig, handleFormEvent, validat
   if (isCloud) {
     databaseTypes = ipInfoDatabaseTypes;
   } else {
-    databaseTypes.concat(ipInfoDatabaseTypes);
+    databaseTypes = databaseTypes.concat(ipInfoDatabaseTypes);
   }
 
   const update = (value: number, unit: string, enabled: boolean, name: string) => {

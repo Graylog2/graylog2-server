@@ -45,7 +45,7 @@ const MigrationDatanodeList = () => {
         </>
       ) : (
         <>
-          <h4>Data Nodes found:</h4>
+          <h4>Data Nodes found: {dataNodes?.elements.length}</h4>
           <br />
           <Table bordered condensed striped hover>
             <thead>
