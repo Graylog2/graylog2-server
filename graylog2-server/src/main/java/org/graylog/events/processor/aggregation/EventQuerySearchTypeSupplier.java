@@ -17,5 +17,6 @@ public interface EventQuerySearchTypeSupplier {
     @Nonnull
     Set<SearchType> additionalSearchTypes(EventDefinition eventDefinition);
 
+    @Nonnull
     Map<String, Object> eventModifierData(Map<String, SearchType.Result> results);
 }
