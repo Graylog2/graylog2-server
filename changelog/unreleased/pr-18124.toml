@@ -1,0 +1,6 @@
+type = "fixed"
+message = "Fix support for changed IPinfo ASN mmdb files."
+
+issues = ["Graylog2/graylog-plugin-enterprise#6436"]
+pulls = ["18124"]
+

@@ -20,12 +20,14 @@ package org.graylog.plugins.map.geoip;
 import com.codahale.metrics.Timer;
 import com.google.inject.assistedinject.Assisted;
 import com.maxmind.geoip2.exception.AddressNotFoundException;
-
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+import javax.inject.Named;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Locale;
 import java.util.Optional;
+
+import static org.graylog.plugins.map.config.GeoIpProcessorConfig.DISABLE_IPINFO_DB_TYPE_CHECK;
 
 /**
  * A {@link GeoIpResolver} to load IP Location data from {@link org.graylog.plugins.map.config.DatabaseVendorType#IPINFO}.
@@ -35,8 +37,9 @@ public class IpInfoLocationResolver extends IpInfoIpResolver<GeoLocationInformat
     @Inject
     public IpInfoLocationResolver(@Assisted Timer resolveTime,
                                   @Assisted String configPath,
-                                  @Assisted boolean enabled) {
-        super(resolveTime, configPath, enabled);
+                                  @Assisted boolean enabled,
+                                  @Named(DISABLE_IPINFO_DB_TYPE_CHECK) boolean disableIpInfoDbTypeCheck) {
+        super(resolveTime, configPath, enabled, disableIpInfoDbTypeCheck);
     }
 
     @Override
