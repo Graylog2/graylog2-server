@@ -251,7 +251,7 @@ const WidgetActionsMenu = ({
 
         <IconButton name="edit_square"
                     title="Edit"
-                    type="regular"
+                    iconType="regular"
                     onClick={toggleEdit} />
 
         <WidgetActionDropdown>
