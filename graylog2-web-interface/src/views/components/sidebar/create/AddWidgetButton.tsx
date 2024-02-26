@@ -59,7 +59,7 @@ type FunctionalCreator = {
   func: CreatorFunction,
   title: string,
   type: CreatorType,
-  condition?: () => boolean,
+  useCondition?: () => boolean,
 };
 
 type CreatorComponentProps = {
@@ -68,7 +68,7 @@ type CreatorComponentProps = {
 
 type ComponentCreator = {
   component: React.ComponentType<CreatorComponentProps>,
-  condition?: () => boolean,
+  useCondition?: () => boolean,
   title: string,
   type: CreatorType,
 };
@@ -96,7 +96,7 @@ const CreateMenuItem = ({
 }) => {
   const location = useLocation();
   const sendTelemetry = useSendTelemetry();
-  const disabled = creator.condition?.() === false;
+  const disabled = creator.useCondition?.() === false;
 
   const createHandlerFor = (dispatch: AppDispatch) => {
     if (isCreatorFunc(creator)) {
