@@ -21,18 +21,14 @@ import { addWidget } from 'views/logic/slices/widgetActions';
 import MessagesWidget from '../widgets/MessagesWidget';
 import MessagesWidgetConfig from '../widgets/MessagesWidgetConfig';
 
-export const CreateMessagesWidget = () => {
-  console.log('CreateMessagesWidget');
-
-  return MessagesWidget.builder()
-    .newId()
-    .config(
-      MessagesWidgetConfig.builder()
-        .fields(DEFAULT_MESSAGE_FIELDS)
-        .showMessageRow(true)
-        .showSummary(true)
-        .build(),
-    ).build();
-};
+export const CreateMessagesWidget = () => MessagesWidget.builder()
+  .newId()
+  .config(
+    MessagesWidgetConfig.builder()
+      .fields(DEFAULT_MESSAGE_FIELDS)
+      .showMessageRow(true)
+      .showSummary(true)
+      .build(),
+  ).build();
 
 export default () => (dispatch: AppDispatch) => dispatch(addWidget(CreateMessagesWidget()));
