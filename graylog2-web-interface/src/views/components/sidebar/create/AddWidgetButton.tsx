@@ -15,24 +15,22 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 import styled from 'styled-components';
 import sortBy from 'lodash/sortBy';
 import upperCase from 'lodash/upperCase';
-import type { Location } from 'history';
+import { useState } from 'react';
 
+import useLocation from 'routing/useLocation';
 import { Button } from 'components/bootstrap';
 import type View from 'views/logic/views/View';
 import generateId from 'logic/generateId';
 import type { AppDispatch } from 'stores/useAppDispatch';
 import useAppDispatch from 'stores/useAppDispatch';
 import type { GetState } from 'views/types';
-import withTelemetry from 'logic/telemetry/withTelemetry';
-import type { EventType } from 'logic/telemetry/Constants';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import type { TelemetryEventType, TelemetryEvent } from 'logic/telemetry/TelemetryContext';
 import { getPathnameWithoutId } from 'util/URLUtils';
-import withLocation from 'routing/withLocation';
+import usePluginEntities from 'hooks/usePluginEntities';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 import SectionInfo from '../SectionInfo';
 import SectionSubheadline from '../SectionSubheadline';
@@ -51,20 +49,10 @@ const CreateButton = styled(Button)`
   width: 100%;
 `;
 
-type Props = {
-  onClick: () => void,
-  sendTelemetry: (eventType: TelemetryEventType | EventType, event: TelemetryEvent) => void,
-  location: Location
-};
-
-type State = {
-  overflowingComponents: { [key: string]: React.ReactNode },
-};
-
 export type CreatorProps = {
   view: View,
 };
-type CreatorType = 'preset' | 'generic';
+type CreatorType = 'preset' | 'generic' | 'investigations';
 type CreatorFunction = () => (dispatch: AppDispatch, getState: GetState) => unknown;
 
 type FunctionalCreator = {
@@ -87,6 +75,8 @@ type ComponentCreator = {
 
 export type Creator = ComponentCreator | FunctionalCreator;
 
+type OverflowingComponents = { [key: string]: React.ReactNode }
+
 export const isCreatorFunc = (creator: Creator): creator is FunctionalCreator => ('func' in creator);
 
 const WithDispatch = ({ children }: { children: (dispatch: AppDispatch) => JSX.Element }) => {
@@ -95,18 +85,20 @@ const WithDispatch = ({ children }: { children: (dispatch: AppDispatch) => JSX.E
   return children(dispatch);
 };
 
-class AddWidgetButton extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
+const CreateMenuItem = ({
+  creator,
+  onClick,
+  setOverflowingComponents,
+}: {
+  creator: Creator,
+  onClick: () => void,
+  setOverflowingComponents: React.Dispatch<React.SetStateAction<OverflowingComponents>>
+}) => {
+  const location = useLocation();
+  const sendTelemetry = useSendTelemetry();
+  const disabled = creator.condition?.() === false;
 
-    this.state = {
-      overflowingComponents: {},
-    };
-  }
-
-  _createHandlerFor = (dispatch: AppDispatch, creator: Creator): () => void => {
-    const { onClick, sendTelemetry, location } = this.props;
-
+  const createHandlerFor = (dispatch: AppDispatch) => {
     if (isCreatorFunc(creator)) {
       return () => {
         sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_CREATE[upperCase(creator.title).replace(/ /g, '_')], {
@@ -128,23 +120,27 @@ class AddWidgetButton extends React.Component<Props, State> {
 
       return () => {
         const id = generateId();
-        const onClose = () => this.setState((state) => {
-          const { overflowingComponents } = state;
 
-          delete overflowingComponents[id];
+        const onClose = () => {
+          setOverflowingComponents((cur) => {
+            const newState = { ...cur };
+
+            delete newState[id];
+
+            return newState;
+          });
 
           onClick();
+        };
 
-          return { overflowingComponents };
-        });
         const renderedComponent = <CreatorComponent key={creator.title} onClose={onClose} />;
 
-        this.setState((state) => {
-          const { overflowingComponents } = state;
+        setOverflowingComponents((cur) => {
+          const newState = { ...cur };
 
-          overflowingComponents[id] = renderedComponent;
+          newState[id] = renderedComponent;
 
-          return { overflowingComponents };
+          return newState;
         });
       };
     }
@@ -152,61 +148,80 @@ class AddWidgetButton extends React.Component<Props, State> {
     throw new Error(`Invalid binding for creator: ${JSON.stringify(creator)} - has neither 'func' nor 'component'.`);
   };
 
-  _createMenuItem = (creator: Creator): React.ReactNode => {
-    const disabled = creator.condition?.() === false;
+  return (
+    <WithDispatch key={creator.title}>
+      {(dispatch) => (
+        <CreateButton key={creator.title}
+                      onClick={createHandlerFor(dispatch)}
+                      disabled={disabled}>
+          {creator.title}
+        </CreateButton>
+      )}
+    </WithDispatch>
+  );
+};
 
-    return (
-      <WithDispatch key={creator.title}>
-        {(dispatch) => (
-          <CreateButton key={creator.title}
-                        onClick={this._createHandlerFor(dispatch, creator)}
-                        disabled={disabled}>
-            {creator.title}
-          </CreateButton>
-        )}
-      </WithDispatch>
-    );
-  };
+const GroupCreateMenuItems = ({
+  creators,
+  onClick,
+  setOverflowingComponents,
+}: {
+  creators: Array<Creator>,
+  onClick: () => void,
+  setOverflowingComponents: React.Dispatch<React.SetStateAction<OverflowingComponents>>
+}) => (
+  <>
+    {sortBy(creators, 'title').map((creator) => (
+      <CreateMenuItem creator={creator}
+                      key={creator.title}
+                      onClick={onClick}
+                      setOverflowingComponents={setOverflowingComponents} />
+    ))}
+  </>
+);
 
-  _createGroup = (creators: Array<Creator>, type: 'preset' | 'generic' | 'investigations'): React.ReactNode => {
-    const typeCreators = creators.filter((c) => (c.type === type));
-    const sortedCreators = sortBy(typeCreators, 'title');
+const createGroup = (creators: Array<Creator>, type: CreatorType) => creators.filter((c) => (c.type === type));
 
-    return sortedCreators.map(this._createMenuItem);
-  };
+type Props = {
+  onClick: () => void,
+};
 
-  render() {
-    const { overflowingComponents } = this.state;
-    const creators = PluginStore.exports('creators');
-    const presets = this._createGroup(creators, 'preset');
-    const generic = this._createGroup(creators, 'generic');
-    const investigations = this._createGroup(creators, 'investigations');
-    console.log({ creators });
-    const components: Array<React.ReactNode> = Object.values(overflowingComponents);
+const AddWidgetButton = ({ onClick }: Props) => {
+  const [overflowingComponents, setOverflowingComponents] = useState<OverflowingComponents>({});
+  const creators = usePluginEntities('creators');
+  const presets = createGroup(creators, 'preset');
+  const generic = createGroup(creators, 'generic');
+  const investigations = createGroup(creators, 'investigations');
+  const components: Array<React.ReactNode> = Object.values(overflowingComponents);
 
-    return (
-      <>
-        <SectionInfo>Use the following options to add an aggregation, log view (enterprise feature) or parameters
-          (enterprise feature) to your search.
-        </SectionInfo>
+  return (
+    <>
+      <SectionInfo>Use the following options to add an aggregation, log view (enterprise feature) or parameters
+        (enterprise feature) to your search.
+      </SectionInfo>
+      <Group>
+        <SectionSubheadline>Generic</SectionSubheadline>
+        <GroupCreateMenuItems creators={generic}
+                              onClick={onClick}
+                              setOverflowingComponents={setOverflowingComponents} />
+      </Group>
+      <Group>
+        <SectionSubheadline>Predefined Aggregation</SectionSubheadline>
+        <GroupCreateMenuItems creators={presets}
+                              onClick={onClick}
+                              setOverflowingComponents={setOverflowingComponents} />
+      </Group>
+      {!!investigations?.length && (
         <Group>
-          <SectionSubheadline>Generic</SectionSubheadline>
-          {generic}
+          <SectionSubheadline>Investigations</SectionSubheadline>
+          <GroupCreateMenuItems creators={investigations}
+                                onClick={onClick}
+                                setOverflowingComponents={setOverflowingComponents} />
         </Group>
-        <Group>
-          <SectionSubheadline>Predefined Aggregation</SectionSubheadline>
-          {presets}
-        </Group>
-        {!!React.Children.count(investigations) && (
-          <Group>
-            <SectionSubheadline>Investigations</SectionSubheadline>
-            {investigations}
-          </Group>
-        )}
-        {components}
-      </>
-    );
-  }
-}
+      )}
+      {components}
+    </>
+  );
+};
 
-export default withLocation(withTelemetry(AddWidgetButton));
+export default AddWidgetButton;
