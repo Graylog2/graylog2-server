@@ -41,7 +41,7 @@ type Props = {
 const DocumentationLink = ({ page, title = '', text, displayIcon }: Props) => (
   <Container href={DocsHelper.toString(page)} title={title} target="_blank">
     {text}
-    {displayIcon && <StyledIcon name="lightbulb" type="regular" size="lg" />}
+    {displayIcon && <StyledIcon name="info" type="regular" size="lg" />}
   </Container>
 );
 
