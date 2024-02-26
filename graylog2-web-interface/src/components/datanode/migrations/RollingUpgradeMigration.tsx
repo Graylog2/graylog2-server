@@ -94,8 +94,8 @@ const RollingUpgradeMigration = ({ currentStep, onTriggerNextStep }: Props) => {
   return (
     <Col>
       <StyledTitle>Rolling upgrade migration</StyledTitle>
-      <p>Follow these steps to migrate your existing OpenSearch version 2.x or 1.3.x cluster to the Data
-        Node.
+      <p>Follow these steps to migrate your existing OpenSearch version 2.x or 1.3.x cluster to Data
+        Nodes.
       </p>
       <StyledPanelGroup accordion id="first" activeKey={activeStep} onSelect={() => {}}>
         {ROLLING_UPGRADE_MIGRATION_STEPS.map((rollingUpgradeStep, index) => {

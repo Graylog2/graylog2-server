@@ -149,6 +149,9 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
         // Uncomment the following line to get DEBUG logs for the underlying Opensearch
         //config.put("logger.org.opensearch", "debug");
 
+        // common OpenSearch config parameters from our docs
+        config.put("indices.query.bool.max_clause_count", localConfiguration.getIndicesQueryBoolMaxClauseCount().toString());
+
         return config.build();
     }
 

@@ -1,0 +1,5 @@
+type = "c"
+message = "Set `SameSite` attribute in cookies."
+
+issues = ["16428"]
+pulls = ["18329"]

@@ -121,7 +121,7 @@ export const MIGRATION_STATE = {
   },
   PROVISION_ROLLING_UPGRADE_NODES_RUNNING: {
     key: 'PROVISION_ROLLING_UPGRADE_NODES_RUNNING',
-    description: 'Provisionning Data Nodes certificate.',
+    description: 'Provision the Data Nodes certificate.',
   },
   JOURNAL_SIZE_DOWNTIME_WARNING: {
     key: 'JOURNAL_SIZE_DOWNTIME_WARNING',
