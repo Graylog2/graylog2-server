@@ -86,7 +86,7 @@ const SideNav = ({ children, isOpen, toggleIsOpen }: Props) => (
       {children}
     </ul>
     <NavToggleButton $navIsOpen={isOpen} onClick={toggleIsOpen}>
-      <Icon name={isOpen ? 'keyboard_arrow_left' : 'crop_square'} />
+      <Icon name={isOpen ? 'chevron_left' : 'crop_square'} />
     </NavToggleButton>
   </Nav>
 );
