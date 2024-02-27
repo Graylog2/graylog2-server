@@ -14,12 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { DocumentTitle, PageHeader } from 'components/common';
+import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { Row, Col } from 'components/bootstrap';
 import { useStore } from 'stores/connect';
+import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
 import useParams from 'routing/useParams';
 import DocsHelper from 'util/DocsHelper';
@@ -28,9 +29,11 @@ import IndexSetFieldTypesList from 'components/indices/IndexSetFieldTypes/IndexS
 import ChangeFieldTypeButton from 'components/indices/IndexSetFieldTypes/ChangeFieldTypeButton';
 import useHasTypeMappingPermission from 'hooks/useHasTypeMappingPermission';
 import { IndicesPageNavigation } from 'components/indices';
+import isFieldTypeChangeAllowed from 'components/indices/helpers/isFieldTypeChangeAllowed';
 
 const IndexSetFieldTypesPage = () => {
   const { indexSetId } = useParams();
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const { indexSet } = useStore(IndexSetsStore);
   const hasMappingPermission = useHasTypeMappingPermission();
@@ -39,7 +42,13 @@ const IndexSetFieldTypesPage = () => {
     if (!hasMappingPermission) {
       navigate(Routes.NOTFOUND);
     } else {
-      IndexSetsActions.get(indexSetId);
+      IndexSetsActions.get(indexSetId).then((response: IndexSet) => {
+        if (isFieldTypeChangeAllowed(response)) {
+          setIsLoading(false);
+        } else {
+          navigate(Routes.NOTFOUND);
+        }
+      });
     }
   }, [hasMappingPermission, indexSetId, navigate]);
 
@@ -59,7 +68,7 @@ const IndexSetFieldTypesPage = () => {
 
       <Row className="content">
         <Col md={12}>
-          <IndexSetFieldTypesList />
+          {isLoading ? <Spinner /> : <IndexSetFieldTypesList />}
         </Col>
       </Row>
     </DocumentTitle>
