@@ -29,7 +29,7 @@ import { IndicesPageNavigation } from 'components/indices';
 
 const IndexSetFieldTypeProfileEditPage = () => {
   const { profileId } = useParams();
-  const { data, isFetched } = useProfile(profileId);
+  const { data, isFetching } = useProfile(profileId);
   const navigate = useNavigate();
   const hasMappingPermission = useHasTypeMappingPermission();
 
@@ -55,7 +55,7 @@ const IndexSetFieldTypeProfileEditPage = () => {
       </PageHeader>
       <Row className="content">
         <Col md={12}>
-          {isFetched ? <EditProfile profile={data} /> : <Spinner />}
+          {!isFetching ? <EditProfile profile={data} /> : <Spinner />}
         </Col>
       </Row>
     </DocumentTitle>

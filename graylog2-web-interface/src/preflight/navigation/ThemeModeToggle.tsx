@@ -21,7 +21,7 @@ import styled, { css, useTheme } from 'styled-components';
 import defer from 'lodash/defer';
 import { COLOR_SCHEME_LIGHT, COLOR_SCHEME_DARK } from '@graylog/sawmill';
 
-import { Icon } from 'preflight/components/common';
+import Icon from 'components/common/Icon';
 
 const ThemeModeToggleWrap = styled.div`
   display: flex;
@@ -125,7 +125,7 @@ const ThemeModeToggle = () => {
 
   return (
     <ThemeModeToggleWrap>
-      <ModeIcon name={loadingLightMode ? 'spinner' : 'sun'}
+      <ModeIcon name={loadingLightMode ? 'progress_activity' : 'light_mode'}
                 spin={loadingLightMode}
                 $currentMode={currentMode === COLOR_SCHEME_LIGHT} />
       <Toggle>
@@ -136,7 +136,7 @@ const ThemeModeToggle = () => {
                disabled={loadingLightMode || loadingDarkMode} />
         <span className="slider" />
       </Toggle>
-      <ModeIcon name={loadingDarkMode ? 'spinner' : 'moon'}
+      <ModeIcon name={loadingDarkMode ? 'progress_activity' : 'dark_mode'}
                 spin={loadingDarkMode}
                 $currentMode={currentMode === COLOR_SCHEME_DARK} />
     </ThemeModeToggleWrap>

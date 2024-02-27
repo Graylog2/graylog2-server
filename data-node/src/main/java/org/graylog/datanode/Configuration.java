@@ -23,6 +23,7 @@ import com.github.joschi.jadconfig.Validator;
 import com.github.joschi.jadconfig.ValidatorMethod;
 import com.github.joschi.jadconfig.converters.IntegerConverter;
 import com.github.joschi.jadconfig.converters.StringListConverter;
+import com.github.joschi.jadconfig.converters.StringSetConverter;
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
@@ -31,6 +32,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.net.InetAddresses;
 import org.graylog.datanode.configuration.BaseConfiguration;
 import org.graylog.datanode.configuration.DatanodeDirectories;
+import org.graylog2.Configuration.SafeClassesValidator;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.SuppressForbidden;
 import org.joda.time.DateTimeZone;
@@ -50,6 +52,7 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * Helper class to hold configuration of Graylog
@@ -82,6 +85,9 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "opensearch_location")
     private String opensearchDistributionRoot = "dist";
 
+    @Parameter(value = "opensearch_plugins_location", validators = DirectoryReadableValidator.class)
+    private Path opensearchPluginsDir = Path.of("dist/plugins");
+
     @Parameter(value = "opensearch_data_location", required = true, validators = DirectoryWritableValidator.class)
     private Path opensearchDataLocation = Path.of("datanode/data");
 
@@ -104,8 +110,8 @@ public class Configuration extends BaseConfiguration {
     /**
      * Comma separated list of opensearch nodes that are eligible as manager nodes.
      */
-    @Parameter(value = "cluster_initial_manager_nodes")
-    private String initialManagerNodes;
+    @Parameter(value = "initial_cluster_manager_nodes")
+    private String initialClusterManagerNodes;
 
     @Parameter(value = "opensearch_http_port", converter = IntegerConverter.class)
     private int opensearchHttpPort = 9200;
@@ -213,9 +219,15 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "http_allow_embedding")
     private boolean httpAllowEmbedding = false;
 
+    /**
+     * Classes considered safe to load by name. A set of prefixes matched against the fully qualified class name.
+     */
+    @Parameter(value = org.graylog2.Configuration.SAFE_CLASSES, converter = StringSetConverter.class, validators = SafeClassesValidator.class)
+    private Set<String> safeClasses = Set.of("org.graylog.", "org.graylog2.");
+
     @Parameter(value = "metrics_timestamp")
     private String metricsTimestamp = "timestamp";
-    
+
     @Parameter(value = "metrics_stream")
     private String metricsStream = "gl-datanode-metrics";
 
@@ -230,6 +242,22 @@ public class Configuration extends BaseConfiguration {
 
     @Parameter(value = "metrics_policy")
     private String metricsPolicy = "gl-datanode-metrics-ism";
+
+    @Parameter(value = "node_search_cache_size")
+    private String searchCacheSize = "10gb";
+  
+    /**
+     * https://opensearch.org/docs/latest/tuning-your-cluster/availability-and-recovery/snapshots/snapshot-restore/#shared-file-system
+     */
+    @Parameter(value = "path_repo", converter = StringListConverter.class)
+    private List<String> pathRepo;
+
+    @Parameter(value = "opensearch_indices_query_bool_max_clause_count")
+    private Integer indicesQueryBoolMaxClauseCount = 32768;
+
+    public Integer getIndicesQueryBoolMaxClauseCount() {
+        return indicesQueryBoolMaxClauseCount;
+    }
 
     public boolean isInsecureStartup() {
         return insecureStartup;
@@ -253,6 +281,11 @@ public class Configuration extends BaseConfiguration {
 
     public String getOpensearchDistributionRoot() {
         return opensearchDistributionRoot;
+    }
+
+    @Nullable
+    public Path getOpensearchPluginsDir() {
+        return opensearchPluginsDir;
     }
 
     /**
@@ -331,8 +364,8 @@ public class Configuration extends BaseConfiguration {
         return datanodeNodeName != null && !datanodeNodeName.isBlank() ? datanodeNodeName : getHostname();
     }
 
-    public String getInitialManagerNodes() {
-        return initialManagerNodes;
+    public String getInitialClusterManagerNodes() {
+        return initialClusterManagerNodes;
     }
 
     public int getOpensearchHttpPort() {
@@ -626,4 +659,12 @@ public class Configuration extends BaseConfiguration {
         return rootPasswordSha2;
     }
 
+
+    public String getNodeSearchCacheSize() {
+        return searchCacheSize;
+    }
+  
+    public List<String> getPathRepo() {
+        return pathRepo;
+    }
 }

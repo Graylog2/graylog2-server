@@ -167,9 +167,9 @@ const ProfileForm = ({ initialValues, submitButtonText, submitLoadingText, onCan
                               Here you can set up type mapping to any field.
                             </HelpBlock>
                             <List>
-                              {(isLoading || isLoadingFieldTypes) ? <Spinner /> : customFieldMappings.map((_, index) => (
+                              {(isLoading || isLoadingFieldTypes) ? <Spinner /> : customFieldMappings.map(({ field }, index) => (
                                 // eslint-disable-next-line react/no-array-index-key
-                                <Item key={index}>
+                                <Item key={index} data-testid={`custom-mapping-row-for-${field}`}>
                                   <SelectGroup>
                                     <Field name={`customFieldMappings.${index}.field`} required>
                                       {({ field: { name, value, onChange }, meta: { error } }) => (
@@ -194,7 +194,7 @@ const ProfileForm = ({ initialValues, submitButtonText, submitLoadingText, onCan
                                       )}
                                     </Field>
                                   </SelectGroup>
-                                  {(customFieldMappings.length > 1) && <IconButton name="trash-alt" onClick={() => (remove(index))} title="Remove mapping" />}
+                                  {(customFieldMappings.length > 1) && <IconButton name="delete" onClick={() => (remove(index))} title="Remove mapping" />}
                                 </Item>
                               ))}
                             </List>

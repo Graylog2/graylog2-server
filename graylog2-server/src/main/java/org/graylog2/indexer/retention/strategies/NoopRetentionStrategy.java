@@ -16,11 +16,10 @@
  */
 package org.graylog2.indexer.retention.strategies;
 
-import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.indices.Indices;
+import org.graylog2.indexer.retention.executors.CountBasedRetentionExecutor;
+import org.graylog2.indexer.retention.executors.TimeBasedRetentionExecutor;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
-import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,12 +29,13 @@ import java.util.List;
 import java.util.Optional;
 
 public class NoopRetentionStrategy extends AbstractIndexRetentionStrategy {
-    private static final Logger LOG = LoggerFactory.getLogger(NoopRetentionStrategy.class);
     public static final String NAME = "none";
+    private static final Logger LOG = LoggerFactory.getLogger(NoopRetentionStrategy.class);
 
     @Inject
-    public NoopRetentionStrategy(Indices indices, ActivityWriter activityWriter, JobSchedulerClock clock) {
-        super(indices, activityWriter, clock);
+    public NoopRetentionStrategy(CountBasedRetentionExecutor countBasedRetentionExecutor,
+                                 TimeBasedRetentionExecutor timeBasedRetentionExecutor) {
+        super(countBasedRetentionExecutor, timeBasedRetentionExecutor);
     }
 
     @Override

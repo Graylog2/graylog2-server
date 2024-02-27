@@ -22,8 +22,7 @@ import type User from 'logic/users/User';
 import type { PaginatedListType } from 'components/common/PaginatedItemOverview';
 import PaginatedItemOverview from 'components/common/PaginatedItemOverview';
 import SectionComponent from 'components/common/Section/SectionComponent';
-
-import RolesQueryHelp from '../RolesQueryHelp';
+import RolesQueryHelper from 'components/roles/RolesQueryHelper';
 
 type Props = {
   user: User,
@@ -48,7 +47,7 @@ const RolesSection = ({ user: { username } }: Props) => {
     <SectionComponent title="Roles" showLoading={loading}>
       <PaginatedItemOverview noDataText="No selected roles have been found."
                              onLoad={_onLoad}
-                             queryHelper={<RolesQueryHelp />} />
+                             queryHelper={<RolesQueryHelper />} />
     </SectionComponent>
   );
 };

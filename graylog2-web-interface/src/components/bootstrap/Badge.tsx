@@ -14,28 +14,53 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import styled, { css } from 'styled-components';
-// eslint-disable-next-line no-restricted-imports
-import { Badge as BootstrapBadge } from 'react-bootstrap';
+import * as React from 'react';
 import type { ColorVariant } from '@graylog/sawmill';
+import { Badge as MantineBadge } from '@mantine/core';
+import styled, { css } from 'styled-components';
 
-type BadgeProps = {
-  bsStyle?: ColorVariant,
-};
-type MergedProps = React.ComponentProps<typeof BootstrapBadge> & BadgeProps;
-const Badge: React.ComponentType<MergedProps> = styled(BootstrapBadge)<BadgeProps>(({ bsStyle, theme }) => {
-  if (!bsStyle) {
-    return undefined;
+const StyledBadge = styled(MantineBadge)<{ color: ColorVariant }>(({ theme, color }) => css`
+  color: ${theme.mantine.other.colors.contrast[color]};
+  text-transform: none;
+
+  .mantine-Badge-label {
+    font-size: ${theme.mantine.fontSizes.sm};
   }
+`);
 
-  const backgroundColor = theme.colors.variant[bsStyle];
-  const textColor = theme.utils.readableColor(backgroundColor);
+type Props = React.PropsWithChildren<{
+  bsStyle?: ColorVariant,
+  className?: string
+  'data-testid'?: string,
+  onClick?: () => void
+  title?: string,
+}>
 
-  return css`
-    background-color: ${backgroundColor};
-    color: ${textColor};
-`;
-});
+const Badge = React.forwardRef<HTMLDivElement, Props>(({
+  bsStyle,
+  className,
+  children,
+  'data-testid': dataTestid,
+  onClick,
+  title,
+}, ref) => (
+  <StyledBadge color={bsStyle}
+               className={className}
+               title={title}
+               data-testid={dataTestid}
+               ref={ref}
+               variant="filled"
+               onClick={onClick}>
+    {children}
+  </StyledBadge>
+));
+
+Badge.defaultProps = {
+  bsStyle: 'default',
+  className: undefined,
+  'data-testid': undefined,
+  onClick: undefined,
+  title: undefined,
+};
 
 export default Badge;
-export { Badge as StyledBadge };

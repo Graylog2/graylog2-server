@@ -28,7 +28,7 @@ import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.testing.completebackend.Lifecycle.CLASS;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = CLASS, mongoVersions = {MongodbServer.MONGO5})
+@ContainerMatrixTestsConfiguration(serverLifecycle = CLASS)
 class MongoDBFixturesWithClassLifecycleIT {
     private final GraylogApis api;
 

@@ -223,7 +223,7 @@ const WidgetActionsMenu = ({
   }, [pathname, sendTelemetry, setWidgetFocusing, widget.id]);
 
   return (
-    <Container>
+    <Container className="widget-actions-menu">
       <IfInteractive>
         <IfDashboard>
           <ReplaySearchButton queryString={query.query_string}
@@ -233,7 +233,7 @@ const WidgetActionsMenu = ({
                               parameters={parameters} />
         </IfDashboard>
         {isFocused && (
-          <IconButton name="compress-arrows-alt"
+          <IconButton name="fullscreen_exit"
                       title="Un-focus widget"
                       onClick={unsetWidgetFocusing} />
         )}
@@ -243,14 +243,15 @@ const WidgetActionsMenu = ({
                                      widgetType={widget.type}
                                      onStretch={onPositionsChange}
                                      position={position} />
-            <IconButton name="expand-arrows-alt"
+            <IconButton name="fullscreen"
                         title="Focus this widget"
                         onClick={focusWidget} />
           </>
         )}
 
-        <IconButton name="edit"
+        <IconButton name="edit_square"
                     title="Edit"
+                    iconType="regular"
                     onClick={toggleEdit} />
 
         <WidgetActionDropdown>

@@ -38,6 +38,6 @@ public class MigrationStateMachineProvider implements Provider<MigrationStateMac
     @Override
     public MigrationStateMachine get() {
         final StateMachine<MigrationState, MigrationStep> stateMachine = MigrationStateMachineBuilder.buildFromPersistedState(persistenceService, migrationActions);
-        return new MigrationStateMachineImpl(stateMachine);
+        return new MigrationStateMachineImpl(stateMachine, migrationActions, persistenceService);
     }
 }

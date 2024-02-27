@@ -26,12 +26,11 @@ const Container = styled.div`
   margin-bottom: 0;
 `;
 
-type Props = {
+type Props = React.PropsWithChildren<{
   isFocused: boolean,
-  children: React.ReactNode,
   className?: string,
   style?: React.CSSProperties,
-}
+}>
 
 const WidgetContainer = React.forwardRef<HTMLDivElement, Props>(({ children, className, isFocused, style, ...rest }, ref) => {
   let containerStyle = {
@@ -63,7 +62,7 @@ WidgetContainer.defaultProps = {
 };
 
 WidgetContainer.propTypes = {
-  children: PropTypes.element.isRequired,
+  children: PropTypes.any.isRequired,
   className: PropTypes.string,
   isFocused: PropTypes.bool.isRequired,
   style: PropTypes.object,

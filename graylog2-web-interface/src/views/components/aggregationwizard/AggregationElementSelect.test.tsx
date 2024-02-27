@@ -48,15 +48,15 @@ describe('AggregationElementSelect', () => {
                                      formValues={{ metrics: [] }}
                                      aggregationElements={aggregationElements} />);
 
-    await userEvent.click(await screen.findByRole('button', { name: 'Add' }));
+    await userEvent.click(await screen.findByRole('button', { name: /add/i }));
 
-    await userEvent.click(await screen.findByRole('menuitem', { name: 'Metric' }));
+    await userEvent.click(await screen.findByRole('menuitem', { name: /metric/i }));
 
     expect(onSelectMock).toHaveBeenCalledTimes(1);
     expect(onSelectMock).toHaveBeenCalledWith('metrics');
 
     await waitFor(() => {
-      expect(screen.queryByRole('menuitem', { name: 'Metric' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('menuitem', { name: /metric/ })).not.toBeInTheDocument();
     });
   });
 
@@ -65,7 +65,7 @@ describe('AggregationElementSelect', () => {
                                      formValues={{ metrics: [] }}
                                      aggregationElements={aggregationElements} />);
 
-    await userEvent.click(await screen.findByRole('button', { name: 'Add' }));
+    await userEvent.click(await screen.findByRole('button', { name: /add/i }));
 
     await screen.findByRole('menuitem', { name: 'Metric' });
 

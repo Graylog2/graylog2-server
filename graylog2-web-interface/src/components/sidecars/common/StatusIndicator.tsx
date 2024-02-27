@@ -18,7 +18,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import upperFirst from 'lodash/upperFirst';
 
-import { Popover } from 'components/bootstrap';
 import { OverlayTrigger, Icon } from 'components/common';
 import SidecarStatusEnum from 'logic/sidecar/SidecarStatusEnum';
 import { relativeDifference } from 'util/DateTime';
@@ -45,33 +44,27 @@ const StatusIndicator = ({ message: messageProp, status, lastSeen, id }: Props) 
   switch (status) {
     case SidecarStatusEnum.RUNNING:
       className = 'text-success';
-      icon = 'play';
+      icon = 'play_arrow';
       break;
     case SidecarStatusEnum.FAILING:
       className = 'text-danger';
-      icon = 'exclamation-triangle';
+      icon = 'warning';
       break;
     case SidecarStatusEnum.STOPPED:
       className = 'text-danger';
-      icon = 'stop';
+      icon = 'error';
       break;
     default:
       className = 'text-info';
-      icon = 'question-circle';
+      icon = 'help';
       message += ` (${relativeDifference(lastSeenDateTime)})`;
   }
 
   if (message && id) {
-    const popover = (
-      <Popover id={`${id}-status-tooltip`}>
-        {message}
-      </Popover>
-    );
-
     return (
-      <OverlayTrigger placement="top" overlay={popover} rootClose trigger="hover">
+      <OverlayTrigger placement="top" overlay={message} rootClose trigger="hover">
         <span className={`${className} ${style.indicator}`}>
-          <Icon name={icon} fixedWidth /> {text}
+          <Icon name={icon} /> {text}
         </span>
       </OverlayTrigger>
     );
@@ -79,7 +72,7 @@ const StatusIndicator = ({ message: messageProp, status, lastSeen, id }: Props) 
 
   return (
     <span className={`${className} ${style.indicator}`}>
-      <Icon name={icon} fixedWidth /> {text}
+      <Icon name={icon} /> {text}
     </span>
   );
 };

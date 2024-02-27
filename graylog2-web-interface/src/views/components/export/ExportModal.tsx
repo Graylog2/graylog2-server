@@ -61,7 +61,7 @@ const _getInitialWidgetFields = (selectedWidget: Widget): OrderedSet<string> => 
   return OrderedSet(selectedWidget.config.fields);
 };
 
-const _getInitialFields = (selectedWidget) => {
+const _getInitialFields = (selectedWidget: Widget) => {
   const initialFields = selectedWidget ? _getInitialWidgetFields(selectedWidget) : DEFAULT_FIELDS;
 
   return initialFields.map((field) => ({ field })).toArray();
@@ -172,7 +172,7 @@ const ExportModal = ({ closeModal, view, directExportWidgetId }: Props) => {
                              isSubmitting={loading}
                              isAsyncSubmit
                              submitLoadingText="Downloading..."
-                             submitIcon="cloud-download-alt"
+                             submitIcon="download"
                              submitButtonText="Start Download" />
               </Modal.Footer>
             </Form>

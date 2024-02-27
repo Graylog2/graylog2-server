@@ -103,6 +103,7 @@ export const mockEventDefinitionTwoAggregations:EventDefinition = {
         field: 'field2',
       },
     ],
+    filters: [],
     conditions: {
       expression: {
         expr: '||',

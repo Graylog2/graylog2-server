@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
+import { fireEvent, render, screen, waitFor, within } from 'wrappedTestingLibrary';
 
 import { StoreMock as MockStore, asMock } from 'helpers/mocking';
 import MockQuery from 'views/logic/queries/Query';
@@ -123,8 +123,7 @@ describe('SearchBar', () => {
     const searchButton = await screen.findByRole('button', { name: /perform search/i });
 
     await waitFor(() => expect(searchButton.classList).toContain('disabled'));
-    const exclamationIcon = timeRangePickerButton.querySelector('svg');
-    await waitFor(() => expect(exclamationIcon).toHaveClass('fa-exclamation-triangle'));
+    within(timeRangePickerButton).getByText('warning');
   });
 
   it('should hide the save load controls if editing the widget', async () => {

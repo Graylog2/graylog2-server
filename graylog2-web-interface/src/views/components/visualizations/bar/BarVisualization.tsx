@@ -45,12 +45,6 @@ type ChartDefinition = {
   originalName: string,
 };
 
-const getChartColor = (fullData: Array<ChartConfig>, name: string) => {
-  const data = fullData.find((d) => (d.name === name));
-
-  return data?.marker?.color;
-};
-
 const setChartColor = (chart: ChartConfig, colors: ColorMapper) => ({ marker: { color: colors.get(chart.originalName ?? chart.name) } });
 
 const defineSingleDateBarWidth = (chartDataResult: ChartDefinition[], config: AggregationWidgetConfig, timeRangeFrom: string, timeRangeTo: string) => {
@@ -127,7 +121,6 @@ const BarVisualization = makeVisualization(({
             axisType={visualizationConfig.axisType}
             chartData={defineSingleDateBarWidth(chartDataResult, config, effectiveTimerange?.from, effectiveTimerange?.to)}
             effectiveTimerange={effectiveTimerange}
-            getChartColor={getChartColor}
             setChartColor={setChartColor}
             height={height}
             plotLayout={layout} />

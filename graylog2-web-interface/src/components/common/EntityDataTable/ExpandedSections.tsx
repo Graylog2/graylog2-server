@@ -78,7 +78,7 @@ const ExpandedSections = <Entity extends EntityBase>({
                 <h3>{section.title}</h3>
                 <Actions>
                   {actions}
-                  <HideSectionButton name="times" onClick={hideSection} title="Hide section" />
+                  <HideSectionButton name="close" onClick={hideSection} title="Hide section" />
                 </Actions>
               </Header>
               {section.content(entity)}

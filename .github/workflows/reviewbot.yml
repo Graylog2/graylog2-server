@@ -24,7 +24,7 @@ jobs:
           distribution: temurin
           cache: maven
       - name: Compile with Maven / Install dependencies
-        run: mvn --fail-fast -Dmaven.wagon.http.retryHandler.class=standard -Dmaven.wagon.http.retryHandler.count=3 -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 compile
+        run: ./mvnw --fail-fast -Dmaven.wagon.http.retryHandler.class=standard -Dmaven.wagon.http.retryHandler.count=3 -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 compile
       - name: Reviewbot
         uses: Graylog2/reviewbot@v1
         with:

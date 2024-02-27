@@ -19,14 +19,14 @@ package org.graylog2.indexer.rotation.strategies;
 import com.google.common.base.MoreObjects;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.graylog2.audit.AuditEventSender;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
+import org.graylog2.indexer.rotation.common.IndexRotator;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
-import org.graylog2.plugin.system.NodeId;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeField;
 import org.joda.time.DateTimeFieldType;
@@ -50,6 +50,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
+import static org.graylog2.indexer.rotation.common.IndexRotator.Result;
 import static org.joda.time.DateTimeFieldType.dayOfMonth;
 import static org.joda.time.DateTimeFieldType.hourOfDay;
 import static org.joda.time.DateTimeFieldType.minuteOfHour;
@@ -59,39 +60,23 @@ import static org.joda.time.DateTimeFieldType.weekOfWeekyear;
 import static org.joda.time.DateTimeFieldType.year;
 
 @Singleton
-public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
-    private static final Logger log = LoggerFactory.getLogger(TimeBasedRotationStrategy.class);
+public class TimeBasedRotationStrategy implements RotationStrategy {
     public static final String NAME = "time";
     public static final String OVERRIDE_HINT = "(elasticsearch_max_write_index_age overrides configured period)";
-
+    private static final Logger log = LoggerFactory.getLogger(TimeBasedRotationStrategy.class);
+    private final Indices indices;
+    private final ElasticsearchConfiguration elasticsearchConfiguration;
+    private final IndexRotator indexRotator;
     private Map<String, DateTime> anchor;
 
     @Inject
-    public TimeBasedRotationStrategy(Indices indices, NodeId nodeId,
-                                     AuditEventSender auditEventSender,
-                                     ElasticsearchConfiguration elasticsearchConfiguration) {
-        super(auditEventSender, nodeId, elasticsearchConfiguration, indices);
+    public TimeBasedRotationStrategy(Indices indices,
+                                     ElasticsearchConfiguration elasticsearchConfiguration,
+                                     IndexRotator indexRotator) {
+        this.indices = indices;
+        this.elasticsearchConfiguration = elasticsearchConfiguration;
+        this.indexRotator = indexRotator;
         this.anchor = new ConcurrentHashMap<>();
-    }
-
-    @Override
-    public Class<? extends RotationStrategyConfig> configurationClass() {
-        return TimeBasedRotationStrategyConfig.class;
-    }
-
-    @Override
-    public RotationStrategyConfig defaultConfiguration() {
-        return TimeBasedRotationStrategyConfig.builder()
-                .maxRotationPeriod(elasticsearchConfiguration.getMaxWriteIndexAge())
-                .build();
-    }
-
-    /**
-     * Resets internal state. After a reset, the rotation strategy will behave like it would after a server restart.
-     * I.e. no previous anchor points will be available, so rotation uses the index creation dates as reference points.
-     */
-    public void reset() {
-        this.anchor.clear();
     }
 
     /**
@@ -181,9 +166,37 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
         return d1.isLongerThan(d2);
     }
 
-    @Nullable
     @Override
-    protected Result shouldRotate(String index, IndexSet indexSet) {
+    public void rotate(IndexSet indexSet) {
+        indexRotator.rotate(indexSet, this::shouldRotate);
+    }
+
+    @Override
+    public Class<? extends RotationStrategyConfig> configurationClass() {
+        return TimeBasedRotationStrategyConfig.class;
+    }
+
+    @Override
+    public RotationStrategyConfig defaultConfiguration() {
+        return TimeBasedRotationStrategyConfig.builder()
+                .maxRotationPeriod(elasticsearchConfiguration.getMaxWriteIndexAge())
+                .build();
+    }
+
+    /**
+     * Resets internal state. After a reset, the rotation strategy will behave like it would after a server restart.
+     * I.e. no previous anchor points will be available, so rotation uses the index creation dates as reference points.
+     */
+    public void reset() {
+        this.anchor.clear();
+    }
+
+    private IndexRotator.Result createResult(boolean shouldRotate, String message) {
+        return IndexRotator.createResult(shouldRotate, message, this.getClass().getCanonicalName());
+    }
+
+    @Nullable
+    private Result shouldRotate(String index, IndexSet indexSet) {
         final IndexSetConfig indexSetConfig = requireNonNull(indexSet.getConfig(), "Index set configuration must not be null");
         final String indexSetId = indexSetConfig.id();
         checkState(!isNullOrEmpty(index), "Index name must not be null or empty");

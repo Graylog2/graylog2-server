@@ -31,9 +31,12 @@ import ColorSchemeContext from './ColorSchemeContext';
 import { COLOR_SCHEMES } from './constants';
 import usePreferredColorScheme from './hooks/usePreferredColorScheme';
 
+import 'material-symbols/rounded.css';
+
 type Props = {
   children: React.ReactNode,
-  initialThemeModeOverride: ColorScheme
+  initialThemeModeOverride: ColorScheme,
+  userIsLoggedIn: boolean,
 }
 
 const useSCTheme = (
@@ -70,8 +73,8 @@ const useMantineTheme = (
   }), [colorScheme, customThemeColors]);
 };
 
-const GraylogThemeProvider = ({ children, initialThemeModeOverride }: Props) => {
-  const [colorScheme, changeColorScheme] = usePreferredColorScheme(initialThemeModeOverride);
+const GraylogThemeProvider = ({ children, initialThemeModeOverride, userIsLoggedIn }: Props) => {
+  const [colorScheme, changeColorScheme] = usePreferredColorScheme(initialThemeModeOverride, userIsLoggedIn);
   const themeCustomizer = usePluginEntities('customization.theme.customizer');
   const useCustomThemeColors = themeCustomizer?.[0]?.hooks.useCustomThemeColors;
   const mantineTheme = useMantineTheme(colorScheme, useCustomThemeColors);
@@ -79,7 +82,8 @@ const GraylogThemeProvider = ({ children, initialThemeModeOverride }: Props) => 
 
   return (
     <ColorSchemeContext.Provider value={colorScheme}>
-      <MantineProvider theme={mantineTheme}>
+      <MantineProvider theme={mantineTheme}
+                       forceColorScheme={colorScheme}>
         <ThemeProvider theme={scTheme}>
           {children}
         </ThemeProvider>
