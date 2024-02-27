@@ -78,15 +78,15 @@ const MigrationWelcomeStep = ({ currentStep, onTriggerStep }: Props) => (
           </p>
           <h5>Migrating an OpenSearch Cluster</h5>
           <p>
-            Depending on how you secured your existing cluster, some preliminary changes are needed to the security configuration. We use JWT authentication between Graylog and OpenSearch. If you want to perform a rolling upgrade of your existing cluster into the DataNode, you have to manually include JWT authentication to your existing OpenSearch cluster prior to running the migration wizard.
+            Depending on how you secured your existing cluster, some preliminary changes are needed to the security configuration. We use JWT authentication between Graylog and OpenSearch. If you want to perform a rolling upgrade of your existing cluster into the Data Node, you have to manually include JWT authentication to your existing OpenSearch cluster prior to running the migration wizard.
           </p>
           <p>
             Enable JWT authentication in <code>opensearch-security/config.yml</code> (section <code>jwt_auth_domain</code>, <code>http_enabled: true</code>, <code>transport_enabled: true</code>)
-            Add the signing key by  converting the <code>GRAYLOG_PASSWORD_SECRET</code> to <code>base64</code> e.g. by doing <code>echo `&quot;`The password secret you chose`&quot;` | base64</code> and put it into the <code>signing_key</code> line
+            Add the signing key by converting the <code>GRAYLOG_PASSWORD_SECRET</code> to <code>base64</code> e.g. by doing <code>echo `&quot;`The password secret you chose`&quot;` | base64</code> and put it into the <code>signing_key</code> line
           </p>
           <h5>Usage of certificates</h5>
           <p>
-            If your existing cluster uses certificates, by default these will get replaced with the Graylog CA and automatically generated certificates during provisioning of the DataNodes. If you have to reuse your own certificates, please read the docs on how to include your own CA/certificates in Graylog/DataNode
+            If your existing cluster uses certificates, by default these will get replaced with the Graylog CA and automatically generated certificates during provisioning of the Data Nodes. If you have to reuse your own certificates, please read the <DocumentationLink page="graylog-data-node" text="documentation" /> on how to include your own CA/certificates in Graylog/DataNode
           </p>
         </Panel.Body>
       </StyledHelpPanel>
