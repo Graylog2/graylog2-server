@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext, useEffect, useState } from 'react';
+import { useContext } from 'react';
 import styled, { css } from 'styled-components';
 
 import Spinner from 'components/common/Spinner';
@@ -37,24 +37,15 @@ const StyledCol = styled(Col)`
 `;
 
 const SearchLoadingIndicator = () => {
-  const [indicatorText, setIndicatorText] = useState('Updating search results...');
+  const isLoading = useIsLoading();
 
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      setIndicatorText('This is taking a bit longer, please hold on...');
-    }, 20000);
-
-    return () => clearTimeout(timeoutId);
-  }, []);
-
-  return <LoadingIndicator text={indicatorText} />;
+  return isLoading && <LoadingIndicator text="Updating search results..." />;
 };
 
 const SearchResult = React.memo(() => {
   const fieldTypes = useContext(FieldTypesContext);
   const { focusedWidget } = useContext(WidgetFocusContext);
   const hasFocusedWidget = !!focusedWidget?.id;
-  const isLoading = useIsLoading();
 
   if (!fieldTypes) {
     return <Spinner />;
@@ -64,7 +55,7 @@ const SearchResult = React.memo(() => {
     <StyledRow $hasFocusedWidget={hasFocusedWidget}>
       <StyledCol>
         <Query />
-        {isLoading && <SearchLoadingIndicator />}
+        <SearchLoadingIndicator />
       </StyledCol>
     </StyledRow>
   );
