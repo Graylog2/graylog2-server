@@ -39,7 +39,7 @@ const StyledCol = styled(Col)`
 const SearchLoadingIndicator = () => {
   const isLoading = useIsLoading();
 
-  return isLoading && <LoadingIndicator text="Updating search results..." />;
+  return (isLoading && <LoadingIndicator text="Updating search results..." />);
 };
 
 const SearchResult = React.memo(() => {
