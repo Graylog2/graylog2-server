@@ -254,9 +254,11 @@ const Widget = ({ id, editing, widget, title, position, onPositionsChange }: Pro
   return (
     <WidgetColorContext id={id}>
       <WidgetFrame widgetId={id}>
-        {isWidgetInWarmTier() && (
-        <WarmTierAlert />
-        )}
+        <IfDashboard>
+          {isWidgetInWarmTier() && (
+            <WarmTierAlert />
+          )}
+        </IfDashboard>
         <InteractiveContext.Consumer>
           {(interactive) => (
             <WidgetHeader title={title}
