@@ -540,7 +540,9 @@
                             <url>
                                 https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.version}/opensearch-${opensearch.version}-linux-x64.tar.gz
                             </url>
-                            <md5>4ff7a31d7269134050b5dd3b4173f14b</md5>
+                            <sha512>
+                                02af3abe0488279d9ba29cde8f69924344fdcef0bd59b13cec53e80121972469168c7479f4ffea645224c4e17d552b99408d5a217bdfe4851c143bde34afca90
+                            </sha512>
                             <outputFileName>opensearch-${opensearch.version}-linux-x64.tar.gz</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch</outputDirectory>
                             <unpack>true</unpack>
@@ -562,7 +564,9 @@
                             <url>
                                 https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.version}/opensearch-${opensearch.version}-linux-arm64.tar.gz
                             </url>
-                            <md5>f636260002ec75bf34082d117e9257f9</md5>
+                            <sha512>
+                                33838c1a6374338641288df7bd97c17bbab739cc1ae8137ea9fcd9a0e4c6f6bb9b5c3a677a2c181d73dc513526018b7eed1e0db4ed3c12f93586727afa22fce1
+                            </sha512>
                             <outputFileName>opensearch-${opensearch.version}-linux-aarch64.tar.gz</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch</outputDirectory>
                             <unpack>true</unpack>
