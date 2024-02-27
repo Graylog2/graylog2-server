@@ -35,6 +35,8 @@ import java.util.concurrent.CompletableFuture;
 // execution must come before results, as it signals the overall "done" state
 @JsonPropertyOrder({"execution", "results"})
 public class SearchJob implements ParameterProvider {
+
+    public static final Integer NO_CANCELLATION = 0;
     private final String id;
 
     private final Search search;
@@ -47,10 +49,17 @@ public class SearchJob implements ParameterProvider {
 
     private Set<SearchError> errors = Sets.newHashSet();
 
+    private final Integer cancelAfterSeconds;
+
     public SearchJob(String id, Search search, String owner) {
+        this(id, search, owner, NO_CANCELLATION);
+    }
+
+    public SearchJob(String id, Search search, String owner, Integer cancelAfterSeconds) {
         this.id = id;
         this.search = search;
         this.owner = owner;
+        this.cancelAfterSeconds = cancelAfterSeconds != null ? cancelAfterSeconds : NO_CANCELLATION;
     }
 
     @JsonProperty
@@ -61,6 +70,11 @@ public class SearchJob implements ParameterProvider {
     @JsonIgnore
     public Search getSearch() {
         return search;
+    }
+
+    @JsonProperty("cancel_after_seconds")
+    public Integer getCancelAfterSeconds() {
+        return cancelAfterSeconds;
     }
 
     @JsonProperty("search_id")

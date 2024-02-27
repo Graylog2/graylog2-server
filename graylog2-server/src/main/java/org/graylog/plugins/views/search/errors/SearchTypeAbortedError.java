@@ -14,17 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+package org.graylog.plugins.views.search.errors;
 
-import type { TimeRange } from 'views/logic/queries/Query';
+import org.graylog.plugins.views.search.Query;
+import org.jetbrains.annotations.NotNull;
 
-export type SearchesConfig = {
-  surrounding_timerange_options: { [key: string]: string },
-  surrounding_filter_fields: Array<string>,
-  query_time_range_limit: string,
-  relative_timerange_options: { [key: string]: string },
-  analysis_disabled_fields: Array<string>,
-  auto_refresh_timerange_options: { [key: string]: string },
-  default_auto_refresh_option: string,
-  quick_access_timerange_presets: Array<{ description: string, timerange: TimeRange, id: string}>,
-  cancel_after_seconds: number,
-};
+public class SearchTypeAbortedError extends SearchTypeError {
+
+    public SearchTypeAbortedError(@NotNull Query query, @NotNull String searchTypeId, Throwable throwable) {
+        super(query, searchTypeId, throwable);
+    }
+}

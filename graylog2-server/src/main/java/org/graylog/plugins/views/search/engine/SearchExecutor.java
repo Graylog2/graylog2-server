@@ -18,6 +18,9 @@ package org.graylog.plugins.views.search.engine;
 
 import com.google.common.util.concurrent.Uninterruptibles;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.InternalServerErrorException;
+import jakarta.ws.rs.NotFoundException;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchJob;
@@ -29,11 +32,6 @@ import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.ExecutionState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-
-import jakarta.ws.rs.InternalServerErrorException;
-import jakarta.ws.rs.NotFoundException;
 
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -75,12 +73,12 @@ public class SearchExecutor {
         final Set<SearchError> validationErrors = searchValidation.validate(preValidationSearch, searchUser);
 
         if (hasFatalError(validationErrors)) {
-            return searchJobWithFatalError(searchJobService.create(preValidationSearch, searchUser.username()), validationErrors);
+            return searchJobWithFatalError(searchJobService.create(preValidationSearch, searchUser.username(), executionState.cancelAfterSeconds()), validationErrors);
         }
 
         final Search normalizedSearch = searchNormalization.postValidation(preValidationSearch, searchUser, executionState);
 
-        final SearchJob searchJob = queryEngine.execute(searchJobService.create(normalizedSearch, searchUser.username()), validationErrors);
+        final SearchJob searchJob = queryEngine.execute(searchJobService.create(normalizedSearch, searchUser.username(), executionState.cancelAfterSeconds()), validationErrors);
 
         validationErrors.forEach(searchJob::addError);
 

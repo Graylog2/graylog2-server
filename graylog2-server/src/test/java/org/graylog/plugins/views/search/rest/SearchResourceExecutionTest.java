@@ -18,6 +18,8 @@ package org.graylog.plugins.views.search.rest;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
+import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.core.Response;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.Search;
@@ -33,6 +35,7 @@ import org.graylog.plugins.views.search.engine.validation.PluggableSearchValidat
 import org.graylog.plugins.views.search.events.SearchJobExecutionEvent;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.rest.exceptions.MissingStreamPermissionException;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,9 +47,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-
-import jakarta.ws.rs.ForbiddenException;
-import jakarta.ws.rs.core.Response;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -82,7 +82,8 @@ public class SearchResourceExecutionTest {
 
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private SearchUser searchUser;
-
+    @Mock
+    private ClusterConfigService clusterConfigService;
     private SearchResource searchResource;
 
     private SearchJobService searchJobService;
@@ -96,7 +97,7 @@ public class SearchResourceExecutionTest {
                 new PluggableSearchValidation(executionGuard, Collections.emptySet()),
                 new PluggableSearchNormalization(Collections.emptySet()));
 
-        this.searchResource = new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus) {
+        this.searchResource = new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus, clusterConfigService) {
             @Override
             protected User getCurrentUser() {
                 return currentUser;

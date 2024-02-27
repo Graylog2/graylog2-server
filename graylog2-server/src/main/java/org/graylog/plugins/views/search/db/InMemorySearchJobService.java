@@ -18,14 +18,11 @@ package org.graylog.plugins.views.search.db;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.bson.types.ObjectId;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
-import org.graylog.plugins.views.search.Search;
-import org.graylog.plugins.views.search.SearchJob;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -46,9 +43,11 @@ public class InMemorySearchJobService implements SearchJobService {
     }
 
     @Override
-    public SearchJob create(Search query, String owner) {
+    public SearchJob create(final Search query,
+                            final String owner,
+                            final Integer cancelAfterSeconds) {
         final String id = new ObjectId().toHexString();
-        final SearchJob searchJob = new SearchJob(id, query, owner);
+        final SearchJob searchJob = new SearchJob(id, query, owner, cancelAfterSeconds);
         cache.put(id, searchJob);
         return searchJob;
     }

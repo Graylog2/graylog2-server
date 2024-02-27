@@ -21,28 +21,8 @@ import com.google.common.util.concurrent.Uninterruptibles;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
-import org.graylog.plugins.views.search.Search;
-import org.graylog.plugins.views.search.SearchDomain;
-import org.graylog.plugins.views.search.SearchJob;
-import org.graylog.plugins.views.search.db.SearchJobService;
-import org.graylog.plugins.views.search.engine.SearchExecutor;
-import org.graylog.plugins.views.search.events.SearchJobExecutionEvent;
-import org.graylog.plugins.views.search.permissions.SearchUser;
-import org.graylog2.audit.jersey.AuditEvent;
-import org.graylog2.audit.jersey.NoAuditEvent;
-import org.graylog2.plugin.rest.PluginRestResource;
-import org.graylog2.shared.rest.resources.RestResource;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jakarta.inject.Inject;
-
 import jakarta.validation.constraints.NotNull;
-
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
@@ -55,6 +35,25 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
+import org.graylog.plugins.views.search.Search;
+import org.graylog.plugins.views.search.SearchDomain;
+import org.graylog.plugins.views.search.SearchJob;
+import org.graylog.plugins.views.search.db.SearchJobService;
+import org.graylog.plugins.views.search.engine.SearchExecutor;
+import org.graylog.plugins.views.search.events.SearchJobExecutionEvent;
+import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.indexer.searches.SearchesClusterConfig;
+import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.shared.rest.resources.RestResource;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.util.List;
@@ -81,15 +80,19 @@ public class SearchResource extends RestResource implements PluginRestResource {
     private final SearchJobService searchJobService;
     private final EventBus serverEventBus;
 
+    private final ClusterConfigService clusterConfigService;
+
     @Inject
-    public SearchResource(SearchDomain searchDomain,
-                          SearchExecutor searchExecutor,
-                          SearchJobService searchJobService,
-                          EventBus serverEventBus) {
+    public SearchResource(final SearchDomain searchDomain,
+                          final SearchExecutor searchExecutor,
+                          final SearchJobService searchJobService,
+                          final EventBus serverEventBus,
+                          final ClusterConfigService clusterConfigService) {
         this.searchDomain = searchDomain;
         this.searchExecutor = searchExecutor;
         this.searchJobService = searchJobService;
         this.serverEventBus = serverEventBus;
+        this.clusterConfigService = clusterConfigService;
     }
 
     @POST
@@ -158,7 +161,11 @@ public class SearchResource extends RestResource implements PluginRestResource {
                                  @ApiParam ExecutionState executionState,
                                  @Context SearchUser searchUser) {
 
-        final SearchJob searchJob = searchExecutor.execute(id, searchUser, executionState);
+
+        final SearchesClusterConfig searchesClusterConfig = clusterConfigService.get(SearchesClusterConfig.class);
+        final ExecutionState enrichedExecutionState = executionState == null ?
+                ExecutionState.empty().withDefaultQueryCancellationIfNotSpecified(searchesClusterConfig) : executionState.withDefaultQueryCancellationIfNotSpecified(searchesClusterConfig);
+        final SearchJob searchJob = searchExecutor.execute(id, searchUser, enrichedExecutionState);
 
         postAuditEvent(searchJob);
 
@@ -177,16 +184,10 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @Produces({MediaType.APPLICATION_JSON, SEARCH_FORMAT_V1})
     public Response executeSyncJob(@ApiParam @NotNull(message = "Search body is mandatory") SearchDTO searchRequest,
                                    @ApiParam(name = "timeout", defaultValue = "60000")
-                                   @QueryParam("timeout") @DefaultValue("60000") long timeout,
+                                   @QueryParam("timeout") @DefaultValue("60000") @Deprecated long timeout,
                                    @Context SearchUser searchUser) {
         final Search search = searchRequest.toSearch();
-        final SearchJob searchJob = searchExecutor.execute(search, searchUser, ExecutionState.empty());
-
-        postAuditEvent(searchJob);
-
-        final SearchJobDTO searchJobDTO = SearchJobDTO.fromSearchJob(searchJob);
-
-        return Response.ok(searchJobDTO).build();
+        return executeSyncJobInner(search, searchUser);
     }
 
     @POST
@@ -197,10 +198,16 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @Produces({SEARCH_FORMAT_V2})
     public Response executeSyncJobv2(@ApiParam @NotNull(message = "Search body is mandatory") SearchDTOv2 searchRequest,
                                      @ApiParam(name = "timeout", defaultValue = "60000")
-                                     @QueryParam("timeout") @DefaultValue("60000") long timeout,
+                                     @QueryParam("timeout") @DefaultValue("60000") @Deprecated long timeout,
                                      @Context SearchUser searchUser) {
         final Search search = searchRequest.toSearch();
-        final SearchJob searchJob = searchExecutor.execute(search, searchUser, ExecutionState.empty());
+        return executeSyncJobInner(search, searchUser);
+    }
+
+    private Response executeSyncJobInner(final Search search, final SearchUser searchUser) {
+        final SearchesClusterConfig searchesClusterConfig = clusterConfigService.get(SearchesClusterConfig.class);
+        final ExecutionState enrichedExecutionState = ExecutionState.empty().withDefaultQueryCancellationIfNotSpecified(searchesClusterConfig);
+        final SearchJob searchJob = searchExecutor.execute(search, searchUser, enrichedExecutionState);
 
         postAuditEvent(searchJob);
 
@@ -232,4 +239,5 @@ public class SearchResource extends RestResource implements PluginRestResource {
         final SearchJobExecutionEvent searchJobExecutionEvent = SearchJobExecutionEvent.create(getCurrentUser(), searchJob, DateTime.now(DateTimeZone.UTC));
         this.serverEventBus.post(searchJobExecutionEvent);
     }
+
 }
