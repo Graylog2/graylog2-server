@@ -88,7 +88,11 @@ const disabledStyles = (themeColors: DefaultTheme['colors'], style: StyleProps) 
       pointer-events: all;
       color: ${colors.color};
       background-color: ${colors.background};
-      opacity: 0.65;
+      opacity: 0.45;
+
+      &:hover {
+        color: ${colors.color};
+      }
     }
   `;
 };
