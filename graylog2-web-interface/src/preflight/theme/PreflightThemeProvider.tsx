@@ -24,6 +24,8 @@ import SawmillMantine from '@graylog/sawmill/mantine';
 
 import { DEFAULT_THEME_MODE } from './constants';
 
+import 'material-symbols/rounded.css';
+
 type Props = {
   children: React.ReactNode,
 };
@@ -55,7 +57,7 @@ const PreflightThemeProvider = ({ children }: Props) => {
   const scTheme = useSCTheme(colorScheme, setColorScheme, mantineTheme);
 
   return (
-    <MantineProvider theme={mantineTheme}>
+    <MantineProvider theme={mantineTheme} forceColorScheme={colorScheme}>
       <ThemeProvider theme={scTheme}>
         {children}
       </ThemeProvider>
