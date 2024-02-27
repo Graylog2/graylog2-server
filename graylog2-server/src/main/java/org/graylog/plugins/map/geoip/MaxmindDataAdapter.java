@@ -46,6 +46,7 @@ import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -62,6 +63,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static org.graylog.plugins.map.config.GeoIpProcessorConfig.DISABLE_IPINFO_DB_TYPE_CHECK;
 import static org.slf4j.LoggerFactory.getLogger;
 
 public class MaxmindDataAdapter extends LookupDataAdapter {
@@ -70,6 +72,7 @@ public class MaxmindDataAdapter extends LookupDataAdapter {
 
     public static final String NAME = "maxmind_geoip";
     private final Config config;
+    private final boolean disableIpInfoDbTypeCheck;
     private final AtomicReference<IPLocationDatabaseAdapter> databaseAdapter = new AtomicReference<>();
     private FileInfo fileInfo = FileInfo.empty();
 
@@ -77,9 +80,11 @@ public class MaxmindDataAdapter extends LookupDataAdapter {
     protected MaxmindDataAdapter(@Assisted("id") String id,
                                  @Assisted("name") String name,
                                  @Assisted LookupDataAdapterConfiguration config,
+                                 @Named(DISABLE_IPINFO_DB_TYPE_CHECK) boolean disableIpInfoDbTypeCheck,
                                  MetricRegistry metricRegistry) {
         super(id, name, config, metricRegistry);
         this.config = (Config) config;
+        this.disableIpInfoDbTypeCheck = disableIpInfoDbTypeCheck;
     }
 
     @Override
@@ -154,7 +159,7 @@ public class MaxmindDataAdapter extends LookupDataAdapter {
                 return new MaxMindIPLocationDatabaseAdapter(file);
             case IPINFO_ASN:
             case IPINFO_STANDARD_LOCATION:
-                return new IPinfoIPLocationDatabaseAdapter(file);
+                return new IPinfoIPLocationDatabaseAdapter(file, disableIpInfoDbTypeCheck);
             default:
                 throw new IllegalStateException("Unexpected value: " + config.dbType());
         }

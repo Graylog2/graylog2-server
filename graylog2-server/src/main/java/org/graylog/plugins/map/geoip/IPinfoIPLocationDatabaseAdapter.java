@@ -45,14 +45,16 @@ public class IPinfoIPLocationDatabaseAdapter implements IPLocationDatabaseAdapte
             .configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true);
 
     private final Reader reader;
+    private final boolean disableIpInfoDbTypeCheck;
 
-    public IPinfoIPLocationDatabaseAdapter(File databaseFile) throws IOException {
+    public IPinfoIPLocationDatabaseAdapter(File databaseFile, boolean disableIpInfoDbTypeCheck) throws IOException {
         this.reader = new Reader(databaseFile, Reader.FileMode.MEMORY_MAPPED, NoCache.getInstance());
+        this.disableIpInfoDbTypeCheck = disableIpInfoDbTypeCheck;
     }
 
     private ObjectNode get(InetAddress ipAddress, String type) throws IOException, AddressNotFoundException {
         final String databaseType = reader.getMetadata().getDatabaseType();
-        if (!databaseType.contains(type)) {
+        if (!disableIpInfoDbTypeCheck && (!databaseType.contains("ipinfo") || !databaseType.contains(type))) {
             final String caller = Thread.currentThread().getStackTrace()[2].getMethodName();
             throw new UnsupportedOperationException("Invalid attempt to open a \"" + databaseType + "\" database using the " + caller + " method");
         }
@@ -74,12 +76,12 @@ public class IPinfoIPLocationDatabaseAdapter implements IPLocationDatabaseAdapte
 
     @Override
     public IPinfoStandardLocation ipInfoStandardLocation(InetAddress ipAddress) throws IOException, AddressNotFoundException {
-        return OBJECT_MAPPER.convertValue(get(ipAddress, "ipinfo standard_location"), IPinfoStandardLocation.class);
+        return OBJECT_MAPPER.convertValue(get(ipAddress, "standard_location"), IPinfoStandardLocation.class);
     }
 
     @Override
     public IPinfoASN ipInfoASN(InetAddress ipAddress) throws IOException, AddressNotFoundException {
-        return OBJECT_MAPPER.convertValue(get(ipAddress, "ipinfo asn"), IPinfoASN.class);
+        return OBJECT_MAPPER.convertValue(get(ipAddress, "asn"), IPinfoASN.class);
     }
 
     @Override
