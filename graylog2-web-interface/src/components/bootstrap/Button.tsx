@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 import type { ColorVariant } from '@graylog/sawmill';
-import type { MantineTheme } from '@graylog/sawmill/mantine';
 import { Button as MantineButton } from '@mantine/core';
+import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 
 import type { BsSize } from 'components/bootstrap/types';
@@ -75,12 +75,12 @@ const stylesForSize = (size: BsSize) => {
   }
 };
 
-const disabledStyles = (other: MantineTheme['other'], style: StyleProps) => {
+const disabledStyles = (themeColors: DefaultTheme['colors'], style: StyleProps) => {
   if (style === 'link') {
     return '';
   }
 
-  const colors = other.colors.disabled[style];
+  const colors = themeColors.disabled[style];
 
   return css`
     &:disabled,
@@ -101,20 +101,20 @@ const StyledButton = styled(MantineButton)<{
   $bsStyle,
   $bsSize,
 }) => css`
-  color: ${theme.mantine.other.colors.contrast[$bsStyle]};
+  color: ${theme.colors.contrast[$bsStyle]};
   font-weight: 400;
   overflow: visible;
 
-  ${disabledStyles(theme.mantine.other, $bsStyle)}
+  ${disabledStyles(theme.colors, $bsStyle)}
   ${stylesForSize($bsSize)}
 
   &:hover {
-    color: ${theme.mantine.other.colors.contrast[$bsStyle]};
+    color: ${theme.colors.contrast[$bsStyle]};
     text-decoration: none;
   }
 
   &:focus {
-    color: ${theme.mantine.other.colors.contrast[$bsStyle]};
+    color: ${theme.colors.contrast[$bsStyle]};
     text-decoration: none;
   }
 
