@@ -45,10 +45,11 @@ public class OSEventList implements OSSearchTypeHandler<EventList> {
         searchSourceBuilder.sort(Message.FIELD_TIMESTAMP, SortOrder.DESC);
         final var queryBuilder = searchSourceBuilder.query();
         if (!eventList.attributes().isEmpty() && queryBuilder instanceof BoolQueryBuilder boolQueryBuilder) {
-            final var filterQuery = eventList.attributes().stream()
+            final var filterQueries = eventList.attributes().stream()
                     .flatMap(attribute -> attribute.toQueryStrings().stream())
-                    .collect(Collectors.joining(" AND "));
-            boolQueryBuilder.filter(QueryBuilders.queryStringQuery(filterQuery));
+                    .toList();
+
+            filterQueries.forEach(filterQuery -> boolQueryBuilder.filter(QueryBuilders.queryStringQuery(filterQuery)));
         }
 
         searchSourceBuilder.size(10000);
