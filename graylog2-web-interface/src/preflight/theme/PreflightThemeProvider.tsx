@@ -24,6 +24,8 @@ import SawmillMantine from '@graylog/sawmill/mantine';
 
 import { DEFAULT_THEME_MODE } from './constants';
 
+import 'material-symbols/rounded.css';
+
 type Props = {
   children: React.ReactNode,
 };

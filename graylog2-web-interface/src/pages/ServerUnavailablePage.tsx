@@ -133,7 +133,7 @@ const ServerUnavailablePage = ({ server }: Props) => {
                         onClick={_toggleDetails}
                         bsSize="sm">
                   {showDetails ? 'Less details' : 'More details'}
-                  <StyledIcon name={showDetails ? 'keyboard_arrow_up' : 'keyboard_arrow_down'} />
+                  <StyledIcon name={showDetails ? 'expand_less' : 'expand_more'} />
                 </Button>
                 {_formatErrorMessage()}
               </div>
