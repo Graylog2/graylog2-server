@@ -31,8 +31,8 @@ const CertificatesProvisioning = ({ currentStep, onTriggerStep }: MigrationStepC
     return <Spinner text="Loading migration state." />;
   }
 
-  const isProvisioningOverview = step.state === MIGRATION_STATE.PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES.key;
-  const isProvisioningRunning = step.state === MIGRATION_STATE.PROVISION_ROLLING_UPGRADE_NODES_RUNNING.key;
+  const isProvisioningOverview = (step.state === MIGRATION_STATE.PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES.key) || (step.state === MIGRATION_STATE.PROVISION_DATANODE_CERTIFICATES_PAGE.key);
+  const isProvisioningRunning = (step.state === MIGRATION_STATE.PROVISION_ROLLING_UPGRADE_NODES_RUNNING.key) || (step.state === MIGRATION_STATE.PROVISION_DATANODE_CERTIFICATES_RUNNING.key);
   const haveNextStep = step?.next_steps?.length > 0;
 
   return (
