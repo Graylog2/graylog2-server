@@ -85,6 +85,9 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "opensearch_location")
     private String opensearchDistributionRoot = "dist";
 
+    @Parameter(value = "opensearch_plugins_location", validators = DirectoryReadableValidator.class)
+    private Path opensearchPluginsDir = Path.of("dist/plugins");
+
     @Parameter(value = "opensearch_data_location", required = true, validators = DirectoryWritableValidator.class)
     private Path opensearchDataLocation = Path.of("datanode/data");
 
@@ -240,6 +243,9 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "metrics_policy")
     private String metricsPolicy = "gl-datanode-metrics-ism";
 
+    @Parameter(value = "node_search_cache_size")
+    private String searchCacheSize = "10gb";
+  
     /**
      * https://opensearch.org/docs/latest/tuning-your-cluster/availability-and-recovery/snapshots/snapshot-restore/#shared-file-system
      */
@@ -275,6 +281,11 @@ public class Configuration extends BaseConfiguration {
 
     public String getOpensearchDistributionRoot() {
         return opensearchDistributionRoot;
+    }
+
+    @Nullable
+    public Path getOpensearchPluginsDir() {
+        return opensearchPluginsDir;
     }
 
     /**
@@ -648,6 +659,11 @@ public class Configuration extends BaseConfiguration {
         return rootPasswordSha2;
     }
 
+
+    public String getNodeSearchCacheSize() {
+        return searchCacheSize;
+    }
+  
     public List<String> getPathRepo() {
         return pathRepo;
     }

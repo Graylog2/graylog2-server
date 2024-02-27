@@ -27,6 +27,7 @@ public abstract class RestOperationParameters {
 
     abstract int port();
 
+    @Nullable
     abstract KeyStore truststore();
 
     @Nullable

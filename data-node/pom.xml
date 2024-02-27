@@ -572,6 +572,19 @@
                             </fileMappers>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>download-repository-s3-plugin</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>wget</goal>
+                        </goals>
+                        <configuration>
+                            <url>https://artifacts.opensearch.org/releases/plugins/repository-s3/${opensearch.version}/repository-s3-${opensearch.version}.zip</url>
+                            <outputFileName>repository-s3-${opensearch.version}.zip</outputFileName>
+                            <outputDirectory>${project.build.directory}/opensearch/plugins</outputDirectory>
+                            <md5>c361d92a4ae83328dfd413878b8747e6</md5>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
 

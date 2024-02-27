@@ -141,7 +141,7 @@ const UltimatePagination = createUltimatePagination({
                                   title={title}
                                   aria-label={title}
                                   className="pagination-control">
-          <Icon name="keyboard_arrow_left" />
+          <Icon name="chevron_left" />
         </BootstrapPagination.Prev>
       );
     },
@@ -154,7 +154,7 @@ const UltimatePagination = createUltimatePagination({
                                   title={title}
                                   aria-label={title}
                                   className="pagination-control">
-          <Icon name="keyboard_arrow_right" />
+          <Icon name="chevron_right" />
         </BootstrapPagination.Next>
       );
     },
