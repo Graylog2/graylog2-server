@@ -29,9 +29,7 @@ export type WidgetExplain = {
   }>
 }
 
-export type SearchExplainContextType = {
-  getExplainForWidget: (queryId: string, widgetId: string, widgetMapping: WidgetMapping) => WidgetExplain | undefined,
-  explainedSearch: {
+type ExplainedSearch = {
     search_id: string,
     search: {
       queries: {
@@ -42,13 +40,19 @@ export type SearchExplainContextType = {
         }
       }
     },
-    search_errors: Array<Object>
-  },
+    search_errors: Array<Object>,
+  }
+
+export type SearchExplainContextType = {
+  onSearchExplain: () => Promise<ExplainedSearch>,
+  getExplainForWidget: (queryId: string, widgetId: string, widgetMapping: WidgetMapping) => WidgetExplain | undefined,
+  explainedSearch: ExplainedSearch,
 };
 
 const defaultContext = {
   getExplainForWidget: () => undefined,
   explainedSearch: undefined,
+  onSearchExplain: () => undefined,
 };
 
 const SearchExplainContext = React.createContext<SearchExplainContextType>(defaultContext);

@@ -38,16 +38,6 @@ const SearchExplainContextProvider = ({ children }: { children: React.ReactNode 
 
   const [searchExplain, setSearchExplain] = useState<SearchExplainContextType['explainedSearch'] | undefined>(undefined);
 
-  const searchExplainContextValue = useMemo(() => {
-    const getExplainForWidget = (queryId: string, widgetId: string, widgetMapping: WidgetMapping): WidgetExplain | undefined => {
-      const searchTypeId = widgetMapping?.get(widgetId).first();
-
-      return searchExplain?.search?.queries?.[queryId]?.search_types?.[searchTypeId];
-    };
-
-    return ({ getExplainForWidget, explainedSearch: searchExplain });
-  }, [searchExplain]);
-
   const { mutateAsync: onSearchExplain } = useMutation(() => fetch(
     'POST',
     qualifyUrl(`views/search/${view.search.id}/explain`),
@@ -60,6 +50,16 @@ const SearchExplainContextProvider = ({ children }: { children: React.ReactNode 
       setSearchExplain(result);
     },
   });
+
+  const searchExplainContextValue = useMemo(() => {
+    const getExplainForWidget = (queryId: string, widgetId: string, widgetMapping: WidgetMapping): WidgetExplain | undefined => {
+      const searchTypeId = widgetMapping?.get(widgetId).first();
+
+      return searchExplain?.search?.queries?.[queryId]?.search_types?.[searchTypeId];
+    };
+
+    return ({ getExplainForWidget, explainedSearch: searchExplain, onSearchExplain });
+  }, [searchExplain, onSearchExplain]);
 
   useEffect(() => {
     onSearchExplain();

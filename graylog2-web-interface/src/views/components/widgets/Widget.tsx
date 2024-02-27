@@ -45,6 +45,8 @@ import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import useView from 'views/hooks/useView';
+import useViewType from 'views/hooks/useViewType';
+import View from 'views/logic/views/View';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
@@ -197,8 +199,10 @@ const Widget = ({ id, editing, widget, title, position, onPositionsChange }: Pro
   const dispatch = useAppDispatch();
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
+  const viewType = useViewType();
+  const { getExplainForWidget, onSearchExplain } = useContext(SearchExplainContext);
 
-  const onToggleEdit = useCallback(() => {
+  const onToggleEdit = useCallback((isCancel = false) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.WIDGET_EDIT_TOGGLED, {
       app_pathname: getPathnameWithoutId(pathname),
       app_section: 'search-widget',
@@ -208,12 +212,16 @@ const Widget = ({ id, editing, widget, title, position, onPositionsChange }: Pro
     if (editing) {
       unsetWidgetEditing();
       setOldWidget(undefined);
+
+      if (!isCancel && viewType === View.Type.Dashboard) {
+        onSearchExplain();
+      }
     } else {
       stopAutoRefresh();
       setWidgetEditing(widget.id);
       setOldWidget(widget);
     }
-  }, [editing, pathname, sendTelemetry, setWidgetEditing, stopAutoRefresh, unsetWidgetEditing, widget]);
+  }, [editing, pathname, sendTelemetry, setWidgetEditing, stopAutoRefresh, unsetWidgetEditing, widget, onSearchExplain, viewType]);
   const onCancelEdit = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.WIDGET_EDIT_CANCEL_CLICKED, {
       app_pathname: getPathnameWithoutId(pathname),
@@ -225,7 +233,7 @@ const Widget = ({ id, editing, widget, title, position, onPositionsChange }: Pro
       dispatch(updateWidget(id, oldWidget));
     }
 
-    onToggleEdit();
+    onToggleEdit(true);
   }, [dispatch, id, oldWidget, onToggleEdit, pathname, sendTelemetry]);
   const onRenameWidget = useCallback((newTitle: string) => dispatch(setWidgetTitle(id, newTitle)), [dispatch, id]);
   const onWidgetConfigChange = useCallback(async (newWidgetConfig: WidgetConfig) => {
@@ -242,7 +250,6 @@ const Widget = ({ id, editing, widget, title, position, onPositionsChange }: Pro
 
   const { config } = widget;
   const isFocused = focusedWidget?.id === id;
-  const { getExplainForWidget } = useContext(SearchExplainContext);
 
   const view = useView();
   const explainedWidget = getExplainForWidget(activeQuery, id, view.widgetMapping);
