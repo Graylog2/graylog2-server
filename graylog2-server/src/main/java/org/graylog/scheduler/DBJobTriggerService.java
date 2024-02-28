@@ -389,10 +389,9 @@ public class DBJobTriggerService {
      *
      * @param trigger       trigger that should be released
      * @param triggerUpdate update to apply to the trigger
-     * @param isRescheduled indicates whether trigger is rescheduled due to e.g. unavailable lock
      * @return true if the trigger has been modified, false otherwise
      */
-    public boolean releaseTrigger(JobTriggerDto trigger, JobTriggerUpdate triggerUpdate, boolean isRescheduled) {
+    public boolean releaseTrigger(JobTriggerDto trigger, JobTriggerUpdate triggerUpdate) {
         requireNonNull(trigger, "trigger cannot be null");
         requireNonNull(triggerUpdate, "triggerUpdate cannot be null");
 
@@ -409,8 +408,8 @@ public class DBJobTriggerService {
         );
         final DBUpdate.Builder update = DBUpdate.unset(FIELD_LOCK_OWNER);
 
-        if (isRescheduled) {
-            update.set(FIELD_TIMES_RESCHEDULED, trigger.timesRescheduled() + 1);
+        if (triggerUpdate.rescheduled()) {
+            update.inc(FIELD_TIMES_RESCHEDULED);
         } else {
             update.set(FIELD_TIMES_RESCHEDULED, 0);
         }
@@ -440,10 +439,6 @@ public class DBJobTriggerService {
             throw new IllegalStateException("Expected to release only one trigger (id=" + trigger.id() + ") but database query modified " + changedDocs);
         }
         return changedDocs == 1;
-    }
-
-    public boolean releaseTrigger(JobTriggerDto trigger, JobTriggerUpdate triggerUpdate) {
-        return releaseTrigger(trigger, triggerUpdate, false);
     }
 
     /**

@@ -33,8 +33,14 @@ public abstract class JobTriggerUpdate {
 
     public abstract Optional<JobTriggerStatus> status();
 
+    public abstract boolean rescheduled();
+
     public static JobTriggerUpdate withNextTime(DateTime nextTime) {
         return builder().nextTime(nextTime).build();
+    }
+
+    public static JobTriggerUpdate rescheduleWithNextTime(DateTime nextTime) {
+        return builder().rescheduled(true).nextTime(nextTime).build();
     }
 
     /**
@@ -70,7 +76,7 @@ public abstract class JobTriggerUpdate {
     public static abstract class Builder {
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_JobTriggerUpdate.Builder();
+            return new AutoValue_JobTriggerUpdate.Builder().rescheduled(false);
         }
 
         public abstract Builder nextTime(@Nullable DateTime nextTime);
@@ -78,6 +84,8 @@ public abstract class JobTriggerUpdate {
         public abstract Builder data(@Nullable JobTriggerData data);
 
         public abstract Builder status(@Nullable JobTriggerStatus status);
+
+        public abstract Builder rescheduled(boolean rescheduled);
 
         public abstract JobTriggerUpdate build();
     }

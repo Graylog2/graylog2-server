@@ -171,7 +171,7 @@ public class JobExecutionEngine {
 
                 if (!workerPool.execute(() -> handleTriggerWithConcurrencyLimit(trigger))) {
                     // The job couldn't be executed so we have to release the trigger again with the same nextTime
-                    jobTriggerService.releaseTrigger(trigger, JobTriggerUpdate.withNextTime(trigger.nextTime()), true);
+                    jobTriggerService.releaseTrigger(trigger, JobTriggerUpdate.rescheduleWithNextTime(trigger.nextTime()));
                     executionDenyRate.mark();
                     executionRescheduledMetric = trigger.timesRescheduled();
                     return false;
@@ -203,7 +203,7 @@ public class JobExecutionEngine {
                     handleTrigger(trigger);
                 } catch (AlreadyLockedException e) {
                     final DateTime nextTime = DateTime.now(DateTimeZone.UTC).plus(slidingBackoff(trigger));
-                    jobTriggerService.releaseTrigger(trigger, JobTriggerUpdate.withNextTime(nextTime), true);
+                    jobTriggerService.releaseTrigger(trigger, JobTriggerUpdate.rescheduleWithNextTime(nextTime));
                     executionDenyRate.mark();
                     executionRescheduledMetric = trigger.timesRescheduled();
                 }
@@ -247,7 +247,7 @@ public class JobExecutionEngine {
             // TODO: Check if we need to implement a max-retry after which the trigger is set to ERROR
             final DateTime nextTime = DateTime.now(DateTimeZone.UTC).plus(slidingBackoff(trigger));
             LOG.error("Couldn't handle trigger {} - retrying at {}", trigger.id(), nextTime, e);
-            jobTriggerService.releaseTrigger(trigger, JobTriggerUpdate.withNextTime(nextTime), true);
+            jobTriggerService.releaseTrigger(trigger, JobTriggerUpdate.rescheduleWithNextTime(nextTime));
         } finally {
             eventBus.post(JobCompletedEvent.INSTANCE);
         }
@@ -273,12 +273,12 @@ public class JobExecutionEngine {
             executionSuccessful.inc();
 
             LOG.trace("Update trigger: trigger={} update={}", trigger.id(), triggerUpdate);
-            jobTriggerService.releaseTrigger(trigger, triggerUpdate, false);
+            jobTriggerService.releaseTrigger(trigger, triggerUpdate);
         } catch (JobExecutionException e) {
             LOG.error("Job execution error - trigger={} job={}", trigger.id(), jobDefinition.id(), e);
             executionFailed.inc();
 
-            jobTriggerService.releaseTrigger(e.getTrigger(), e.getUpdate(), false);
+            jobTriggerService.releaseTrigger(e.getTrigger(), e.getUpdate());
         } catch (Exception e) {
             executionFailed.inc();
             // This is an unhandled job execution error so we mark the trigger as defective
@@ -288,7 +288,7 @@ public class JobExecutionEngine {
             // don't know what happened and we also got no instructions from the job. (no JobExecutionException)
             final DateTime nextFutureTime = scheduleStrategies.nextFutureTime(trigger).orElse(null);
 
-            jobTriggerService.releaseTrigger(trigger, JobTriggerUpdate.withNextTime(nextFutureTime), false);
+            jobTriggerService.releaseTrigger(trigger, JobTriggerUpdate.withNextTime(nextFutureTime));
         }
     }
 }
