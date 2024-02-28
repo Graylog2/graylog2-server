@@ -17,11 +17,15 @@
 package org.graylog2.cluster.lock;
 
 import com.google.inject.Scopes;
+import com.google.inject.assistedinject.FactoryModuleBuilder;
+import org.graylog.scheduler.RefreshingLockService;
 import org.graylog2.plugin.PluginModule;
 
 public class LockServiceModule extends PluginModule {
     @Override
     protected void configure() {
         bind(LockService.class).to(MongoLockService.class).in(Scopes.SINGLETON);
+
+        install(new FactoryModuleBuilder().build(RefreshingLockService.Factory.class));
     }
 }

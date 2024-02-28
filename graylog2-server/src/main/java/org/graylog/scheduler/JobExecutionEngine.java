@@ -64,7 +64,7 @@ public class JobExecutionEngine {
     private final JobTriggerUpdates.Factory jobTriggerUpdatesFactory;
     private final Map<String, Job.Factory> jobFactory;
     private final JobWorkerPool workerPool;
-    private final RefreshingLockServiceFactory refreshingLockServiceFactory;
+    private final RefreshingLockService.Factory refreshingLockServiceFactory;
     private final Map<String, Integer> maxConcurrencyMap;
     private final long backoffMillis;
 
@@ -83,7 +83,7 @@ public class JobExecutionEngine {
                               JobSchedulerEventBus eventBus,
                               JobScheduleStrategies scheduleStrategies,
                               JobTriggerUpdates.Factory jobTriggerUpdatesFactory,
-                              RefreshingLockServiceFactory refreshingLockServiceFactory,
+                              RefreshingLockService.Factory refreshingLockServiceFactory,
                               Map<String, Job.Factory> jobFactory,
                               @Assisted JobWorkerPool workerPool,
                               JobSchedulerConfig schedulerConfig,
@@ -98,7 +98,7 @@ public class JobExecutionEngine {
                               JobSchedulerEventBus eventBus,
                               JobScheduleStrategies scheduleStrategies,
                               JobTriggerUpdates.Factory jobTriggerUpdatesFactory,
-                              RefreshingLockServiceFactory refreshingLockServiceFactory,
+                              RefreshingLockService.Factory refreshingLockServiceFactory,
                               Map<String, Job.Factory> jobFactory,
                               @Assisted JobWorkerPool workerPool,
                               JobSchedulerConfig schedulerConfig,

@@ -136,26 +136,18 @@ class JobSchedulerServiceIT {
                         .build()
         );
 
-        final RefreshingLockServiceFactory refreshingLockServiceFactory = new RefreshingLockServiceFactory(
-                lockService,
-                scheduler,
-                leaderElectionLockTTL);
-
-        final JobExecutionEngine.Factory executionEnginFactory = workerPool -> {
-            JobExecutionEngine engine = new JobExecutionEngine(
-                    jobTriggerService,
-                    jobDefinitionService,
-                    eventBus,
-                    scheduleStrategies,
-                    jobTriggerUpdatesFactory,
-                    refreshingLockServiceFactory,
-                    jobFactories,
-                    workerPool,
-                    schedulerConfig,
-                    metricRegistry,
-                    200);
-            return engine;
-        };
+        final JobExecutionEngine.Factory executionEnginFactory = workerPool -> new JobExecutionEngine(
+                jobTriggerService,
+                jobDefinitionService,
+                eventBus,
+                scheduleStrategies,
+                jobTriggerUpdatesFactory,
+                () -> new RefreshingLockService(lockService, scheduler, leaderElectionLockTTL),
+                jobFactories,
+                workerPool,
+                schedulerConfig,
+                metricRegistry,
+                200);
 
         final JobWorkerPool.Factory workerPoolFactory = (name, poolSize, shutdownCallback) ->
                 new JobWorkerPool(name, poolSize, shutdownCallback, gracefulShutdownService, metricRegistry);

@@ -45,7 +45,7 @@ class JobExecutionEngineTest {
     @Mock
     private JobTriggerUpdates.Factory jobTriggerUpdatesFactory;
     @Mock
-    private RefreshingLockServiceFactory refreshingLockServiceFactory;
+    private RefreshingLockService.Factory refreshingLockServiceFactory;
     @Mock
     private Map<String, Job.Factory> jobFactory;
     @Mock

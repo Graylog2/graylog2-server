@@ -16,6 +16,8 @@
  */
 package org.graylog.scheduler;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.graylog2.cluster.lock.Lock;
 import org.graylog2.cluster.lock.LockService;
 import org.graylog2.shared.utilities.StringUtils;
@@ -28,15 +30,20 @@ import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("AssignmentToNull")
 public class RefreshingLockService implements AutoCloseable {
+    public interface Factory {
+        RefreshingLockService create();
+    }
+
     private final LockService lockService;
     private final ScheduledExecutorService scheduler;
     private final Duration leaderElectionLockTTL;
     private ScheduledFuture<?> lockRefreshFuture;
     private Lock lock;
 
+    @Inject
     public RefreshingLockService(LockService lockService,
-                                 ScheduledExecutorService scheduler,
-                                 Duration leaderElectionLockTTL) {
+                                 @Named("daemonScheduler") ScheduledExecutorService scheduler,
+                                 @Named("lock_service_lock_ttl") Duration leaderElectionLockTTL) {
         this.lockService = lockService;
         this.scheduler = scheduler;
         this.leaderElectionLockTTL = leaderElectionLockTTL;
