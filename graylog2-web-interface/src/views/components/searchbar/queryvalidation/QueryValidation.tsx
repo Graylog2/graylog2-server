@@ -207,12 +207,12 @@ const QueryValidation = () => {
                                 $clickable
                                 tabIndex={0}
                                 type="button">
-              <ErrorIcon $status={status} name="exclamation-circle" />
+              <ErrorIcon $status={status} name="error" />
             </ExplanationTrigger>
           ) : (
             <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
                                title="Search query syntax documentation"
-                               text={<Icon name="lightbulb" />} />
+                               text={<Icon name="lightbulb_circle" />} />
           )}
         </Container>
       </Popover.Target>
@@ -226,7 +226,7 @@ const QueryValidation = () => {
                 <span><b>{errorTitle}</b>: {errorMessage}</span>
                 <DocumentationLink page={getErrorDocumentationLink(errorType)}
                                    title={`${errorTitle} documentation`}
-                                   text={<DocumentationIcon name="lightbulb" />} />
+                                   text={<DocumentationIcon name="lightbulb_circle" />} />
               </Explanation>
             ))}
             {plugableValidationExplanation?.map((PlugableExplanation, index) => (

@@ -39,6 +39,9 @@ public interface ExportJob {
     @JsonProperty(FIELD_ID)
     String id();
 
-    @JsonProperty
+    @JsonProperty(FIELD_TYPE)
+    String type();
+
+    @JsonProperty(FIELD_CREATED_AT)
     DateTime createdAt();
 }

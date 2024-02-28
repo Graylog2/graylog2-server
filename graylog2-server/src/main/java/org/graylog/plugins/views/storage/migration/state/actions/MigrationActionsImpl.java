@@ -19,7 +19,6 @@ package org.graylog.plugins.views.storage.migration.state.actions;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachineContext;
-import org.graylog.plugins.views.storage.migration.state.persistence.DatanodeMigrationConfiguration;
 import org.graylog.security.certutil.CaService;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog2.bootstrap.preflight.PreflightConfigResult;
@@ -44,6 +43,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 @Singleton
 public class MigrationActionsImpl implements MigrationActions {
@@ -73,11 +73,6 @@ public class MigrationActionsImpl implements MigrationActions {
         this.clusterProcessingControlFactory = clusterProcessingControlFactory;
         this.migrationService = migrationService;
         this.preflightConfigService = preflightConfigService;
-    }
-
-    @Override
-    public void resetMigration() {
-        clusterConfigService.remove(DatanodeMigrationConfiguration.class);
     }
 
 
@@ -167,13 +162,15 @@ public class MigrationActionsImpl implements MigrationActions {
 
     @Override
     public boolean provisioningFinished() {
-        return nodeService.allActive().values().stream().allMatch(node -> node.getDataNodeStatus() == DataNodeStatus.PREPARED);
+        return nodeService.allActive().values().stream().allMatch(node -> dataNodeProvisioningService.getPreflightConfigFor(node.getNodeId())
+                .map(dn -> dn.state() == DataNodeProvisioningConfig.State.STARTUP_PREPARED)
+                .orElse(false));
     }
 
     @Override
     public void startDataNodes() {
         final Map<String, DataNodeDto> activeDataNodes = nodeService.allActive();
-        activeDataNodes.values().forEach(node -> dataNodeProvisioningService.changeState(node.getNodeId(), DataNodeProvisioningConfig.State.STARTUP_REQUESTED));
+        activeDataNodes.values().forEach(node -> dataNodeProvisioningService.changeState(node.getNodeId(), DataNodeProvisioningConfig.State.STARTUP_TRIGGER));
     }
 
     @Override
@@ -208,7 +205,8 @@ public class MigrationActionsImpl implements MigrationActions {
 
     @Override
     public boolean isRemoteReindexingFinished() {
-        return getStateMachineContext().getExtendedState(MigrationStateMachineContext.KEY_MIGRATION_ID, String.class)
+        return Optional.ofNullable(getStateMachineContext())
+                .flatMap(ctx -> ctx.getExtendedState(MigrationStateMachineContext.KEY_MIGRATION_ID, String.class))
                 .map(migrationService::status)
                 .filter(m -> m.status() == RemoteReindexingMigrationAdapter.Status.FINISHED)
                 .isPresent();

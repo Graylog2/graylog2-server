@@ -74,7 +74,7 @@ const CreateFilterDropdown = ({ filterableAttributes, filterValueRenderers, onCr
 
   return (
     <Container>
-      <OverlayDropdownButton title={<Icon name="plus" />}
+      <OverlayDropdownButton title={<Icon name="add" />}
                              bsSize="small"
                              buttonTitle="Create Filter"
                              onToggle={onToggleDropdown}

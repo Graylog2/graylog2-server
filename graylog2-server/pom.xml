@@ -868,7 +868,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>exec-maven-plugin</artifactId>
-                    <version>3.1.1</version>
+                    <version>3.2.0</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -1087,6 +1087,7 @@
                             <workingDirectory>${webInterface.path}</workingDirectory>
                             <nodeVersion>${nodejs.version}</nodeVersion>
                             <yarnVersion>${yarn.version}</yarnVersion>
+                            <nodeDownloadRoot>https://graylog-ci-cache.s3.eu-west-1.amazonaws.com/downloads/node/</nodeDownloadRoot>
                         </configuration>
 
                         <executions>

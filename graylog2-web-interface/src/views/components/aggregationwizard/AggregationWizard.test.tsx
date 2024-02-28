@@ -72,7 +72,7 @@ describe('AggregationWizard', () => {
 
     renderSUT({ config });
 
-    await userEvent.click(await screen.findByRole('button', { name: 'Add' }));
+    await userEvent.click(await screen.findByRole('button', { name: /add an element/i }));
     const addElementMenu = await screen.findByRole('menu');
     const notConfiguredElements = [
       'Metric',
@@ -92,9 +92,7 @@ describe('AggregationWizard', () => {
 
     expect(within(metricsSection).queryByText('Function')).not.toBeInTheDocument();
 
-    await userEvent.click(await screen.findByRole('button', { name: 'Add' }));
-
-    await userEvent.click(await screen.findByRole('menuitem', { name: 'Metric' }));
+    await userEvent.click(await screen.findByRole('button', { name: /add a metric/i }));
 
     await waitFor(() => within(metricsSection).findByText('Function'));
     await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument());

@@ -73,7 +73,7 @@ const NewWidgetPlaceholder = React.forwardRef<HTMLDivElement, Props>(({ style, p
   return (
     <div style={containerStyle} ref={ref}>
       <PlaceholderBox onClick={onClick}>
-        <HugeIcon name="circle-plus" />
+        <HugeIcon name="add_circle" />
         Create a new widget here
       </PlaceholderBox>
       {show && <Component onCancel={onCancel} position={position} />}

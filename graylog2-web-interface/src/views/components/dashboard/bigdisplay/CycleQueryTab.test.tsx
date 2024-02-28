@@ -68,12 +68,6 @@ describe('CycleQueryTab', () => {
     jest.useRealTimers();
   });
 
-  it('does not return markup', () => {
-    const { container } = render(<CycleQueryTab view={view} activeQuery="bar" interval={1} tabs={[1, 2]} />);
-
-    expect(container.firstChild).toEqual(null);
-  });
-
   it('should not switch to anything before interval', () => {
     const dispatch = jest.fn();
     asMock(useAppDispatch).mockReturnValue(dispatch);

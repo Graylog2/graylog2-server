@@ -30,7 +30,7 @@ const EntityIcon = ({ entity }) => {
     return <span><Icon title="Content Pack" name="archive" className={ContentPackEntitiesListStyle.contentPackEntity} /></span>;
   }
 
-  return <span><Icon title="Server" name="server" /></span>;
+  return <span><Icon title="dns" name="server" /></span>;
 };
 
 EntityIcon.propTypes = {

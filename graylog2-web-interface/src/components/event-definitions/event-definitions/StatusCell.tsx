@@ -84,7 +84,7 @@ const StatusCell = ({ eventDefinition, refetchEventDefinitions } : Props) => {
         {!disableChange && (
           <>
             <Spacer />
-            <Icon name={isEnabled ? 'pause' : 'play'} />
+            <Icon name={isEnabled ? 'pause' : 'play_arrow'} />
           </>
         )}
       </StatusLabel>

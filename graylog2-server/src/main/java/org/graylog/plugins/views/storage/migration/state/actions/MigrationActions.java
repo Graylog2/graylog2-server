@@ -49,8 +49,6 @@ public interface MigrationActions {
 
     void startDataNodes();
 
-    void resetMigration();
-
     boolean dataNodeStartupFinished();
 
     void setStateMachineContext(MigrationStateMachineContext context);

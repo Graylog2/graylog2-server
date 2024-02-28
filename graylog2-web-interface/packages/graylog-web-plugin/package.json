@@ -33,7 +33,7 @@
     "@tanstack/react-query": "4.36.1",
     "@types/create-react-class": "15.6.7",
     "@types/jquery": "3.5.29",
-    "@types/react": "18.2.56",
+    "@types/react": "18.2.60",
     "babel-preset-graylog": "file:../babel-preset-graylog",
     "create-react-class": "15.7.0",
     "eslint-config-graylog": "file:../eslint-config-graylog",
@@ -53,7 +53,7 @@
     "styled-components": "6.1.1",
     "typescript": "5.3.3",
     "use-query-params": "^2.2.0",
-    "webpack": "5.90.2",
+    "webpack": "5.90.3",
     "webpack-cli": "5.1.4",
     "webpack-merge": "4.2.2"
   }

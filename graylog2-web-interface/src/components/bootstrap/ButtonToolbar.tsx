@@ -24,7 +24,7 @@ const StyledButtonToolbar = styled(OriginalButtonGroup)`
 `;
 
 const ButtonToolbar = (props: React.ComponentProps<typeof StyledButtonToolbar>) => (
-  <StyledButtonToolbar role="toolbar" {...props} />
+  <StyledButtonToolbar {...props} />
 );
 
 /** @component */
