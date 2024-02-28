@@ -53,6 +53,7 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
     private final byte[] signingKey;
     private final NodeService<DataNodeDto> nodeService;
     private final PreflightConfigService preflightConfigService;
+    private final S3RepositoryConfiguration s3RepositoryConfiguration;
 
     @Inject
     public OpensearchConfigurationProvider(final Configuration localConfiguration,
@@ -62,7 +63,8 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
                                            final InSecureConfiguration inSecureConfiguration,
                                            final NodeService<DataNodeDto> nodeService,
                                            final PreflightConfigService preflightConfigService,
-                                           final @Named("password_secret") String passwordSecret) {
+                                           final @Named("password_secret") String passwordSecret,
+                                           final S3RepositoryConfiguration s3RepositoryConfiguration) {
         this.localConfiguration = localConfiguration;
         this.datanodeConfiguration = datanodeConfiguration;
         this.uploadedCertFilesSecureConfiguration = uploadedCertFilesSecureConfiguration;
@@ -71,6 +73,7 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
         this.signingKey = passwordSecret.getBytes(StandardCharsets.UTF_8);
         this.nodeService = nodeService;
         this.preflightConfigService = preflightConfigService;
+        this.s3RepositoryConfiguration = s3RepositoryConfiguration;
     }
 
     private boolean isPreflight() {
@@ -121,9 +124,11 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
                     localConfiguration.getOpensearchTransportPort(),
                     localConfiguration.getClustername(),
                     localConfiguration.getDatanodeNodeName(),
-                    List.of(),
+                    List.of("cluster_manager", "data", "ingest", "remote_cluster_client", "search"),
                     localConfiguration.getOpensearchDiscoverySeedHosts(),
                     securityConfiguration,
+                    s3RepositoryConfiguration,
+                    localConfiguration.getNodeSearchCacheSize(),
                     opensearchProperties.build()
             );
         } catch (GeneralSecurityException | KeyStoreStorageException | IOException e) {
@@ -139,6 +144,12 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
         config.put("path.logs", datanodeConfiguration.datanodeDirectories().getLogsTargetDir().toString());
 
         config.put("network.bind_host", localConfiguration.getBindAddress());
+
+        // https://opensearch.org/docs/latest/tuning-your-cluster/availability-and-recovery/snapshots/snapshot-restore/#shared-file-system
+        if(localConfiguration.getPathRepo() != null && !localConfiguration.getPathRepo().isEmpty()) {
+            config.put("path.repo", String.join(",", localConfiguration.getPathRepo()));
+        }
+
         //config.put("network.publish_host", Tools.getLocalCanonicalHostname());
 
         // Uncomment the following line to get DEBUG logs for the underlying Opensearch

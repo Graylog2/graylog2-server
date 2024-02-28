@@ -161,7 +161,7 @@ const DashboardSearchBar = () => {
                     <SearchQueryRow>
                       <SearchButtonAndQuery>
                         <SearchButton disabled={disableSearchSubmit}
-                                      glyph="filter"
+                                      glyph="filter_alt"
                                       displaySpinner={isSubmitting || isLoadingExecution}
                                       dirty={dirty} />
                         <SearchInputAndValidationContainer>

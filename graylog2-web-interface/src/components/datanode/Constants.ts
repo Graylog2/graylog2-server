@@ -93,7 +93,7 @@ export const MIGRATION_STATE = {
   },
   PROVISION_DATANODE_CERTIFICATES_RUNNING: {
     key: 'PROVISION_DATANODE_CERTIFICATES_RUNNING',
-    description: 'Provision Data Node with certificates running',
+    description: "Provision the Data Node's certificate.",
   },
   EXISTING_DATA_MIGRATION_QUESTION_PAGE: {
     key: 'EXISTING_DATA_MIGRATION_QUESTION_PAGE',
@@ -121,7 +121,7 @@ export const MIGRATION_STATE = {
   },
   PROVISION_ROLLING_UPGRADE_NODES_RUNNING: {
     key: 'PROVISION_ROLLING_UPGRADE_NODES_RUNNING',
-    description: 'Provision the Data Nodes certificate.',
+    description: "Provision the Data Node's certificate.",
   },
   JOURNAL_SIZE_DOWNTIME_WARNING: {
     key: 'JOURNAL_SIZE_DOWNTIME_WARNING',
