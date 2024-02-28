@@ -29,7 +29,6 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.SearchHit;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.Aggregations;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.sort.SortOrder;
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
-import org.graylog2.plugin.Message;
 
 import java.util.List;
 import java.util.Map;
@@ -42,7 +41,8 @@ public class ESEventList implements ESSearchTypeHandler<EventList> {
     public void doGenerateQueryPart(Query query, EventList eventList,
                                     ESGeneratedQueryContext queryContext) {
         final var searchSourceBuilder = queryContext.searchSourceBuilder(eventList);
-        searchSourceBuilder.sort(Message.FIELD_TIMESTAMP, SortOrder.DESC);
+        final var sortConfig = eventList.sortWithDefault();
+        searchSourceBuilder.sort(sortConfig.field(), toSortOrder(sortConfig.direction()));
         final var queryBuilder = searchSourceBuilder.query();
         if (!eventList.attributes().isEmpty() && queryBuilder instanceof BoolQueryBuilder boolQueryBuilder) {
             final var filterQueries = eventList.attributes().stream()
@@ -58,6 +58,13 @@ public class ESEventList implements ESSearchTypeHandler<EventList> {
             searchSourceBuilder.size(pageSize);
             searchSourceBuilder.from(page * pageSize);
         });
+    }
+
+    private SortOrder toSortOrder(EventList.Direction direction) {
+        return switch (direction) {
+            case ASC -> SortOrder.ASC;
+            case DESC -> SortOrder.DESC;
+        };
     }
 
     protected List<Map<String, Object>> extractResult(SearchResponse result) {

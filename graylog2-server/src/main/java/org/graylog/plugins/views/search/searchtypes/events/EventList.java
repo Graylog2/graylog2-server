@@ -32,6 +32,7 @@ import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.entities.EventListEntity;
 import org.graylog2.contentpacks.model.entities.SearchTypeEntity;
 import org.graylog2.database.filtering.AttributeFilter;
+import org.graylog2.plugin.Message;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -51,6 +52,14 @@ public abstract class EventList implements SearchType {
     public static final int DEFAULT_PAGE_SIZE = 10;
     public static final String NAME = "events";
     private static final Set<String> FILTER_FIELD_ALLOWLIST = Set.of("priority", "event_definition_id");
+    public static final SortConfig DEFAULT_SORT = new SortConfig(Message.FIELD_TIMESTAMP, Direction.DESC);
+
+    public enum Direction {
+        ASC,
+        DESC;
+    }
+
+    public record SortConfig(@JsonProperty("field") String field, @JsonProperty("direction") Direction direction) {}
 
     @Override
     public abstract String type();
@@ -76,6 +85,13 @@ public abstract class EventList implements SearchType {
 
     @JsonProperty
     public abstract List<AttributeFilter> attributes();
+
+    @JsonProperty
+    public abstract Optional<SortConfig> sort();
+
+    public SortConfig sortWithDefault() {
+        return sort().orElse(DEFAULT_SORT);
+    }
 
     @JsonCreator
     public static Builder builder() {
@@ -162,6 +178,9 @@ public abstract class EventList implements SearchType {
         public abstract Builder attributes(List<AttributeFilter> attributeFilters);
 
         abstract List<AttributeFilter> attributes();
+
+        @JsonProperty
+        public abstract Builder sort(@Nullable SortConfig sort);
 
         abstract EventList autoBuild();
 
