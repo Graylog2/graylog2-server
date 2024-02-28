@@ -45,7 +45,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Base64;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -382,7 +381,7 @@ public abstract class ProxiedResource extends RestResource {
         final Node executionNode = nodeService.allActive().values().stream()
                 .filter(node -> Objects.equals(nodeId, node.getNodeId()))
                 .findFirst()
-                .orElseThrow(() -> new IllegalStateException(String.format(Locale.ENGLISH, "Node %s cannot be found among active nodes", nodeId)));
+                .orElseThrow(() -> new IllegalStateException(StringUtils.f("Node %s cannot be found among active nodes", nodeId)));
         return doNodeApiCall(executionNode.getNodeId(), interfaceClass, remoteInterfaceFunction, Function.identity(), timeout);
 
     }
