@@ -43,7 +43,7 @@ import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.system.shutdown.GracefulShutdownService;
-import org.junit.After;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
@@ -165,7 +165,7 @@ class JobSchedulerServiceIT {
         jobSchedulerService = new JobSchedulerService(executionEnginFactory, workerPoolFactory, schedulerConfig, clock, eventBus, serverStatus, loopSleepDuration);
     }
 
-    @After
+    @AfterEach
     public void cleanUp() {
         jobSchedulerService.triggerShutdown();
     }
