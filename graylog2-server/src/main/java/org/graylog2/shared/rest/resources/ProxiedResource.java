@@ -381,7 +381,7 @@ public abstract class ProxiedResource extends RestResource {
         final Node executionNode = nodeService.allActive().values().stream()
                 .filter(node -> Objects.equals(nodeId, node.getNodeId()))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Node cannot be found among active nodes, node id : " + nodeId));
+                .orElseThrow(() -> new IllegalStateException(String.format("Node %s cannot be found among active nodes", nodeId)));
         return doNodeApiCall(executionNode.getNodeId(), interfaceClass, remoteInterfaceFunction, Function.identity(), timeout);
 
     }
