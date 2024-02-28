@@ -30,26 +30,25 @@ import java.util.Map;
 /**
  * Job scheduler specific configuration fields for the server configuration file.
  */
-@SuppressWarnings({"FieldCanBeLocal", "unused", "WeakerAccess"})
+@SuppressWarnings({"FieldCanBeLocal", "unused", "WeakerAccess", "FieldMayBeFinal"})
 public class JobSchedulerConfiguration implements PluginConfigBean {
     public static final String LOOP_SLEEP_DURATION = "job_scheduler_loop_sleep_duration";
     public static final String LOCK_EXPIRATION_DURATION = "job_scheduler_lock_expiration_duration";
     public static final String MAX_CONCURRENT_JOBS = "job_scheduler_max_concurrent_jobs";
 
     @Parameter(value = LOOP_SLEEP_DURATION, validators = PositiveDurationValidator.class)
-    private final Duration loopSleepDuration = Duration.seconds(1);
+    private Duration loopSleepDuration = Duration.seconds(1);
 
     @Parameter(value = LOCK_EXPIRATION_DURATION, validators = Minimum1MinuteValidator.class)
-    private final Duration lockExpirationDuration = Duration.minutes(5);
+    private Duration lockExpirationDuration = Duration.minutes(5);
 
     @Parameter(value = MAX_CONCURRENT_JOBS, converter = MapConverter.StringInteger.class)
     private Map<String, Integer> jobSchedulerMaxConcurrencyList = Collections.emptyMap();
 
     /**
-     * Concurrency limits per job type
+     * Concurrency limits per job type. A missing entry signifies unlimited concurrency. (up to the number of worker threads)
      *
-     * @return mapping of job type to max number of worker threads to assign for this job type. A missing
-     * entry signifies unlimited concurrency (up to numberOfWorkerThreads)
+     * @return mapping of job type to max number of worker threads
      */
     public Map<String, Integer> getJobSchedulerMaxConcurrency() {
         return jobSchedulerMaxConcurrencyList;
