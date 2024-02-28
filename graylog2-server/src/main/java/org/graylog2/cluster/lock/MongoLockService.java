@@ -95,6 +95,7 @@ public class MongoLockService implements LockService {
     @Override
     public Optional<Lock> lock(@Nonnull String resource, int maxConcurrency) {
         Preconditions.checkArgument(!Strings.isNullOrEmpty(resource));
+        Preconditions.checkArgument(maxConcurrency > 0, "maxConcurrency must be greater 0");
 
         for (int i = 0; i < maxConcurrency; i++) {
             Optional<Lock> lock = doLock(f("%s-%d", resource, i), UUID.randomUUID().toString());
