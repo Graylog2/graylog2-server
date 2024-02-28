@@ -93,6 +93,8 @@ describe('RollingUpgradeMigration', () => {
     await screen.findByRole('button', {
       name: /1. Welcome to Rolling upgrade migration/i,
     });
+
+    await screen.findByRole('heading', { name: /Welcome/i });
   });
 
   it('should render CompatibilityCheckStep step', async () => {
@@ -115,7 +117,7 @@ describe('RollingUpgradeMigration', () => {
     renderStep(MIGRATION_STATE.PROVISION_ROLLING_UPGRADE_NODES_RUNNING.key);
 
     await screen.findByRole('button', {
-      name: /4. Provision the Data Nodes certificate./i,
+      name: /4. Provision the Data Node's certificate./i,
     });
   });
 
@@ -125,6 +127,8 @@ describe('RollingUpgradeMigration', () => {
     await screen.findByRole('button', {
       name: /5. Journal size downtime warning/i,
     });
+
+    await screen.findByRole('heading', { name: /Journal downtime size warning/i });
   });
 
   it('should render StopMessageProcessing step', async () => {
@@ -133,6 +137,8 @@ describe('RollingUpgradeMigration', () => {
     await screen.findByRole('button', {
       name: /6. Stop message processing/i,
     });
+
+    await screen.findByRole('heading', { name: /Stop OpenSearch/i });
   });
 
   it('should render RestartGraylog step', async () => {
@@ -141,5 +147,7 @@ describe('RollingUpgradeMigration', () => {
     await screen.findByRole('button', {
       name: /7. Update configuration file and restart Graylog/i,
     });
+
+    await screen.findByText(/please restart Graylog to finish the migration./);
   });
 });
