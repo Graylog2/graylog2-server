@@ -16,21 +16,15 @@
  */
 package org.graylog.scheduler;
 
-import com.github.joschi.jadconfig.Converter;
 import com.github.joschi.jadconfig.Parameter;
-import com.github.joschi.jadconfig.ParameterException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.Validator;
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
-import com.google.common.base.Strings;
-import org.apache.commons.lang3.NotImplementedException;
+import org.graylog2.configuration.converters.MapConverter;
 import org.graylog2.plugin.PluginConfigBean;
 
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -48,8 +42,8 @@ public class JobSchedulerConfiguration implements PluginConfigBean {
     @Parameter(value = LOCK_EXPIRATION_DURATION, validators = Minimum1MinuteValidator.class)
     private final Duration lockExpirationDuration = Duration.minutes(5);
 
-    @Parameter(value = MAX_CONCURRENT_JOBS, converter = ConcurrenyListConverter.class)
-    private final Map<String, Integer> jobSchedulerMaxConcurrencyList = Collections.emptyMap();
+    @Parameter(value = MAX_CONCURRENT_JOBS, converter = MapConverter.StringInteger.class)
+    private Map<String, Integer> jobSchedulerMaxConcurrencyList = Collections.emptyMap();
 
     /**
      * Concurrency limits per job type
@@ -67,31 +61,6 @@ public class JobSchedulerConfiguration implements PluginConfigBean {
 
     public Duration getLockExpirationDuration() {
         return lockExpirationDuration;
-    }
-
-    public static class ConcurrenyListConverter implements Converter<Map<String, Integer>> {
-        public ConcurrenyListConverter() {
-        }
-
-        @Override
-        public Map<String, Integer> convertFrom(String value) {
-            Map<String, Integer> jobMaxConcurrency = new HashMap<>();
-            List<String> stringList = Strings.isNullOrEmpty(value) ? Collections.emptyList() : Arrays.asList(value.split(","));
-            for (String s : stringList) {
-                String[] splits = s.split("\\:");
-                if (splits.length == 2) {
-                    jobMaxConcurrency.put(splits[0], Integer.parseInt(splits[1]));
-                } else {
-                    throw new ParameterException("Invalid job concurrency configuration: " + s);
-                }
-            }
-            return jobMaxConcurrency;
-        }
-
-        @Override
-        public String convertTo(Map<String, Integer> stringIntegerMap) {
-            throw new NotImplementedException("Cannot convert concurrency limits to String.");
-        }
     }
 
     public static class Minimum1MinuteValidator implements Validator<Duration> {
