@@ -160,7 +160,7 @@ class IndexSetPage extends React.Component<Props, State> {
                         <Button bsStyle="info">Edit Index Set</Button>
                       </LinkContainer>
                       <IndicesMaintenanceDropdown indexSetId={indexSetId} indexSet={indexSet} />
-                      <IndicesConfigurationDropdown indexSetId={indexSetId} indexSet={indexSet} />
+                      <IndicesConfigurationDropdown indexSetId={indexSetId} />
                     </ButtonToolbar>
                   )}>
         <span>

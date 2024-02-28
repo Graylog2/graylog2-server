@@ -20,7 +20,6 @@ import { useNavigate } from 'react-router-dom';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { Row, Col } from 'components/bootstrap';
 import { useStore } from 'stores/connect';
-import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
 import useParams from 'routing/useParams';
 import DocsHelper from 'util/DocsHelper';
@@ -29,7 +28,6 @@ import IndexSetFieldTypesList from 'components/indices/IndexSetFieldTypes/IndexS
 import ChangeFieldTypeButton from 'components/indices/IndexSetFieldTypes/ChangeFieldTypeButton';
 import useHasTypeMappingPermission from 'hooks/useHasTypeMappingPermission';
 import { IndicesPageNavigation } from 'components/indices';
-import isFieldTypeChangeAllowed from 'components/indices/helpers/isFieldTypeChangeAllowed';
 
 const IndexSetFieldTypesPage = () => {
   const { indexSetId } = useParams();
@@ -42,13 +40,7 @@ const IndexSetFieldTypesPage = () => {
     if (!hasMappingPermission) {
       navigate(Routes.NOTFOUND);
     } else {
-      IndexSetsActions.get(indexSetId).then((response: IndexSet) => {
-        if (isFieldTypeChangeAllowed(response)) {
-          setIsLoading(false);
-        } else {
-          navigate(Routes.NOTFOUND);
-        }
-      });
+      IndexSetsActions.get(indexSetId).then(() => setIsLoading(false));
     }
   }, [hasMappingPermission, indexSetId, navigate]);
 

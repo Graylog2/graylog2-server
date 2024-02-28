@@ -44,7 +44,7 @@ import useHistory from 'routing/useHistory';
 import IndexSetProfileConfiguration from 'components/indices/IndexSetProfileConfiguration';
 import useFeature from 'hooks/useFeature';
 import useIndexSet from 'components/indices/hooks/useIndexSet';
-import isFieldTypeChangeAllowed from 'components/indices/helpers/isFieldTypeChangeAllowed';
+import isIndexFieldTypeChangeAllowed from 'components/indices/helpers/isIndexFieldTypeChangeAllowed';
 
 type Props = {
   cancelLink: string,
@@ -363,7 +363,7 @@ const IndexSetConfigurationForm = ({
                   </>
                 )}
 
-                {isFieldTypeChangeAllowed(indexSet) && (
+                {isIndexFieldTypeChangeAllowed(indexSet) && (
                 <Field name="field_type_profile">
                   {({ field: { name, value } }) => (
                     <IndexSetProfileConfiguration value={value}

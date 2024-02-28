@@ -29,9 +29,10 @@ type Props = {
   fieldType: IndexSetFieldType,
   indexSetId: string,
   onSubmitCallback: (props: FieldTypePutResponse) => void,
+  showEditButton: boolean,
 }
 
-const FieldTypeActions = ({ onSubmitCallback, fieldType, indexSetId }: Props) => {
+const FieldTypeActions = ({ onSubmitCallback, fieldType, indexSetId, showEditButton }: Props) => {
   const [showResetModal, setShowResetModal] = useState<boolean>(false);
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
   const toggleResetModal = () => setShowResetModal((cur) => !cur);
@@ -40,6 +41,7 @@ const FieldTypeActions = ({ onSubmitCallback, fieldType, indexSetId }: Props) =>
 
   return (
     <>
+      {showEditButton && (
       <Button onClick={toggleEditModal}
               role="button"
               bsSize="xsmall"
@@ -47,14 +49,15 @@ const FieldTypeActions = ({ onSubmitCallback, fieldType, indexSetId }: Props) =>
               title={`Edit field type for ${fieldType.fieldName}`}
               tabIndex={0}>
         Edit {
-          fieldType.isReserved && (
-            <HoverForHelp displayLeftMargin title="Reserved field is not editable" pullRight={false}>
-              We use reserved fields internally and expect a certain structure from them. Changing the field type for
-              reserved fields might impact the stability of Graylog
-            </HoverForHelp>
-          )
+        fieldType.isReserved && (
+          <HoverForHelp displayLeftMargin title="Reserved field is not editable" pullRight={false}>
+            We use reserved fields internally and expect a certain structure from them. Changing the field type for
+            reserved fields might impact the stability of Graylog
+          </HoverForHelp>
+        )
       }
       </Button>
+      )}
       {showResetButton && (
         <Button onClick={toggleResetModal}
                 role="button"

@@ -20,17 +20,15 @@ import useHistory from 'routing/useHistory';
 import { ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import useHasTypeMappingPermission from 'hooks/useHasTypeMappingPermission';
-import type { IndexSet } from 'stores/indices/IndexSetsStore';
-import isFieldTypeChangeAllowed from 'components/indices/helpers/isFieldTypeChangeAllowed';
 
-const IndicesConfigurationDropdown = ({ indexSetId, indexSet }: { indexSetId: string, indexSet: IndexSet, }) => {
+const IndicesConfigurationDropdown = ({ indexSetId }: { indexSetId: string }) => {
   const hasMappingPermission = useHasTypeMappingPermission();
   const history = useHistory();
   const onShowFieldTypes = useCallback(() => {
     history.push(Routes.SYSTEM.INDEX_SETS.FIELD_TYPES(indexSetId));
   }, [history, indexSetId]);
 
-  if (!hasMappingPermission || !isFieldTypeChangeAllowed(indexSet)) return null;
+  if (!hasMappingPermission) return null;
 
   return (
     <ButtonGroup>

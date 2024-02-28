@@ -43,6 +43,9 @@ import OriginFilterValueRenderer from 'components/indices/IndexSetFieldTypes/Ori
 import useCustomColumnRenderers from 'components/indices/IndexSetFieldTypes/hooks/useCustomColumnRenderers';
 import IndexSetProfile from 'components/indices/IndexSetFieldTypes/IndexSetProfile';
 import type { FieldTypePutResponse } from 'views/logic/fieldactions/ChangeFieldType/types';
+import { useStore } from 'stores/connect';
+import { IndexSetsStore } from 'stores/indices/IndexSetsStore';
+import isIndexFieldTypeChangeAllowed from 'components/indices/helpers/isIndexFieldTypeChangeAllowed';
 
 import BulkActions from './BulkActions';
 
@@ -78,6 +81,7 @@ const FilterValueRenderers = {
 
 const IndexSetFieldTypesList = () => {
   const { indexSetId } = useParams();
+  const { indexSet } = useStore(IndexSetsStore);
   const [selectedEntitiesData, setSelectedEntitiesData] = useState<Record<string, IndexSetFieldType>>({});
   const [urlQueryFilters, setUrlQueryFilters] = useUrlQueryFilters();
   const [query, setQuery] = useQueryParam('query', StringParam);
@@ -132,11 +136,13 @@ const IndexSetFieldTypesList = () => {
 
     refetchFieldTypes();
   }, [indexSetId, refetchFieldTypes, selectedEntitiesData]);
+  const indexFieldTypeChangeAllowed = useMemo(() => !isIndexFieldTypeChangeAllowed(indexSet), [indexSet]);
   const renderActions = useCallback((fieldType: IndexSetFieldType) => (
     <FieldTypeActions fieldType={fieldType}
                       indexSetId={indexSetId}
-                      onSubmitCallback={onSubmitCallback} />
-  ), [indexSetId, onSubmitCallback]);
+                      onSubmitCallback={onSubmitCallback}
+                      showEditButton={indexFieldTypeChangeAllowed} />
+  ), [indexSetId, onSubmitCallback, indexFieldTypeChangeAllowed]);
 
   const onSearch = useCallback((val: string) => {
     paginationQueryParameter.resetPage();
@@ -181,7 +187,7 @@ const IndexSetFieldTypesList = () => {
                          setUrlQueryFilters={onChangeFilters}
                          filterValueRenderers={FilterValueRenderers} />
         </SearchForm>
-        <IndexSetProfile />
+        <IndexSetProfile disabled={!indexFieldTypeChangeAllowed} />
       </StyledTopRow>
       {pagination?.total === 0 && (
         <NoEntitiesExist>

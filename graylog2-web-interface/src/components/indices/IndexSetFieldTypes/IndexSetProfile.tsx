@@ -30,7 +30,7 @@ const Container = styled.div`
   align-items: center;
 `;
 
-const IndexSetProfile = () => {
+const IndexSetProfile = ({ disabled }: { disabled: boolean }) => {
   const { name, id, description } = useIndexProfileWithMappingsByField();
   const [showSetModal, setShowSetModal] = useState(false);
   const toggleModal = () => setShowSetModal((cur) => !cur);
@@ -40,7 +40,7 @@ const IndexSetProfile = () => {
     <Container title={title}>
       <b>Field type mapping profile:</b>
       {id ? <Link target="_blank" to={Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.edit(id)}>{name}</Link> : <i>Not set</i>}
-      <IconButton name="edit_square" onClick={toggleModal} title="Set field type profile" />
+      <IconButton disabled={disabled} name="edit_square" onClick={toggleModal} title="Set field type profile" />
       {showSetModal && <SetProfileModal show={showSetModal} onClose={toggleModal} currentProfile={id} />}
     </Container>
   );
