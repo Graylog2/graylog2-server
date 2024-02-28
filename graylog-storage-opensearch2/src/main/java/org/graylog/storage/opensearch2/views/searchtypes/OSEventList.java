@@ -37,7 +37,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-public class OSEventList implements OSSearchTypeHandler<EventList> {
+public class OSEventList implements EventListStrategy {
     @Override
     public void doGenerateQueryPart(Query query, EventList eventList,
                                     OSGeneratedQueryContext queryContext) {

@@ -188,10 +188,6 @@ public abstract class EventList implements SearchType {
             if(id() == null) {
                 id(UUID.randomUUID().toString());
             }
-            for (final var attribute : attributes()) {
-                checkArgument(FILTER_FIELD_ALLOWLIST.contains(attribute.field()),
-                        "Unexpected field name for attribute filter: " + attribute.field() + ", allowed values: " + FILTER_FIELD_ALLOWLIST);
-            }
 
             checkArgument(page().orElse(1) > 0, "Page needs to be a positive, non-zero value");
             checkArgument(perPage().orElse(1) > 0, "Per page needs to be a positive, non-zero value");
