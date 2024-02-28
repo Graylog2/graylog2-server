@@ -32,27 +32,13 @@ import java.util.Set;
 
 @AutoValue
 @JsonDeserialize(builder = EventSummary.Builder.class)
-public abstract class EventSummary {
+public abstract class EventSummary implements CommonEventSummary {
     private static final String FIELD_ID = "id";
     private static final String FIELD_STREAMS = "streams";
     private static final String FIELD_EVENT_TIMESTAMP = "timestamp";
     private static final String FIELD_MESSAGE = "message";
     private static final String FIELD_ALERT = "alert";
 
-    @JsonProperty(FIELD_ID)
-    public abstract String id();
-
-    @JsonProperty(FIELD_STREAMS)
-    public abstract Set<String> streams();
-
-    @JsonProperty(FIELD_EVENT_TIMESTAMP)
-    public abstract DateTime timestamp();
-
-    @JsonProperty(FIELD_MESSAGE)
-    public abstract String message();
-
-    @JsonProperty(FIELD_ALERT)
-    public abstract boolean alert();
 
     @SuppressWarnings("unchecked")
     public static EventSummary parse(Map<String, Object> rawEvent) {

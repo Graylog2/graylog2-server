@@ -212,10 +212,16 @@ public abstract class EventList implements SearchType {
         }
 
         @JsonProperty
-        public abstract List<EventSummary> events();
+        public abstract List<CommonEventSummary> events();
 
         public static Builder builder() {
             return new AutoValue_EventList_Result.Builder();
+        }
+
+        abstract Builder toBuilder();
+
+        public Result withEvents(List<CommonEventSummary> events) {
+            return toBuilder().events(events).build();
         }
 
         public static Builder result(String searchTypeId) {
@@ -228,7 +234,7 @@ public abstract class EventList implements SearchType {
 
             public abstract Builder name(String name);
 
-            public abstract Builder events(List<EventSummary> events);
+            public abstract Builder events(List<CommonEventSummary> events);
 
             public abstract Result build();
         }
