@@ -15,12 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo, useCallback, useContext, useRef } from 'react';
+import { useMemo, useCallback, useRef } from 'react';
 import { Field } from 'formik';
 import moment from 'moment';
 import styled, { css } from 'styled-components';
 
-import SearchExplainContext from 'views/components/contexts/SearchExplainContext';
 import { useStore } from 'stores/connect';
 import RefreshControls from 'views/components/searchbar/RefreshControls';
 import { Spinner } from 'components/common';
@@ -116,16 +115,14 @@ const DashboardSearchBar = () => {
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
   const dispatch = useAppDispatch();
   const handlerContext = useHandlerContext();
-  const { onSearchExplain } = useContext(SearchExplainContext);
 
   const submitForm = useCallback(async (values) => {
     const { timerange: newTimerange, queryString: newQueryString } = values;
     await executePluggableSubmitHandler(dispatch, values, pluggableSearchBarControls);
 
     dispatch(setGlobalOverride(newQueryString, newTimerange));
-    onSearchExplain();
     dispatch(execute());
-  }, [dispatch, pluggableSearchBarControls, onSearchExplain]);
+  }, [dispatch, pluggableSearchBarControls]);
 
   const { parameters } = useParameters();
   const initialValues = useInitialFormValues(timerange, queryString);

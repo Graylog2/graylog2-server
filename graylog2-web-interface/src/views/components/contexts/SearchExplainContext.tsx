@@ -44,7 +44,6 @@ type ExplainedSearch = {
   }
 
 export type SearchExplainContextType = {
-  onSearchExplain: () => Promise<ExplainedSearch>,
   getExplainForWidget: (queryId: string, widgetId: string, widgetMapping: WidgetMapping) => WidgetExplain | undefined,
   explainedSearch: ExplainedSearch,
 };
@@ -52,7 +51,6 @@ export type SearchExplainContextType = {
 const defaultContext = {
   getExplainForWidget: () => undefined,
   explainedSearch: undefined,
-  onSearchExplain: () => undefined,
 };
 
 const SearchExplainContext = React.createContext<SearchExplainContextType>(defaultContext);

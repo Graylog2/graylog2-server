@@ -30,12 +30,13 @@ import {
 import { selectView } from 'views/logic/slices/viewSelectors';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
+import useViewType from 'views/hooks/useViewType';
+import View from 'views/logic/views/View';
 
 const SearchExplainContextProvider = ({ children }: { children: React.ReactNode }): React.ReactElement => {
   const view = useAppSelector(selectView);
   const executionState = useAppSelector(selectSearchExecutionState);
   const widgetsToSearch = useAppSelector(selectWidgetsToSearch);
-
   const [searchExplain, setSearchExplain] = useState<SearchExplainContextType['explainedSearch'] | undefined>(undefined);
 
   const { mutateAsync: onSearchExplain } = useMutation(() => fetch(
@@ -58,12 +59,16 @@ const SearchExplainContextProvider = ({ children }: { children: React.ReactNode 
       return searchExplain?.search?.queries?.[queryId]?.search_types?.[searchTypeId];
     };
 
-    return ({ getExplainForWidget, explainedSearch: searchExplain, onSearchExplain });
-  }, [searchExplain, onSearchExplain]);
+    return ({ getExplainForWidget, explainedSearch: searchExplain });
+  }, [searchExplain]);
+
+  const viewType = useViewType();
 
   useEffect(() => {
-    onSearchExplain();
-  }, [onSearchExplain],
+    if (view.search.id && viewType === View.Type.Dashboard && view._value.title) {
+      onSearchExplain();
+    }
+  }, [onSearchExplain, view.search.id, executionState, widgetsToSearch, viewType, view._value.title],
   );
 
   return (
