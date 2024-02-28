@@ -22,6 +22,7 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.binder.LinkedBindingBuilder;
 import com.google.inject.binder.ScopedBindingBuilder;
 import com.google.inject.multibindings.MapBinder;
+import com.google.inject.multibindings.OptionalBinder;
 import org.graylog.plugins.views.ViewsModule;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.engine.GeneratedQueryContext;
@@ -53,6 +54,7 @@ import org.graylog.storage.opensearch2.views.OpenSearchBackend;
 import org.graylog.storage.opensearch2.views.export.OpenSearchExportBackend;
 import org.graylog.storage.opensearch2.views.export.RequestStrategy;
 import org.graylog.storage.opensearch2.views.export.SearchAfter;
+import org.graylog.storage.opensearch2.views.searchtypes.EventListStrategy;
 import org.graylog.storage.opensearch2.views.searchtypes.OSEventListDelegate;
 import org.graylog.storage.opensearch2.views.searchtypes.OSMessageList;
 import org.graylog.storage.opensearch2.views.searchtypes.OSSearchTypeHandler;
@@ -92,6 +94,7 @@ public class ViewsOSBackendModule extends ViewsModule {
 
         registerOSSearchTypeHandler(MessageList.NAME, OSMessageList.class);
         registerOSSearchTypeHandler(EventList.NAME, OSEventListDelegate.class);
+        OptionalBinder.newOptionalBinder(binder(), EventListStrategy.class);
         registerOSSearchTypeHandler(Pivot.NAME, OSPivot.class).in(Scopes.SINGLETON);
 
         registerPivotSeriesHandler(Average.NAME, OSAverageHandler.class);
