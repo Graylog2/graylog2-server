@@ -21,7 +21,7 @@ import { Col, Panel, PanelGroup } from 'components/bootstrap';
 import { MIGRATION_STATE, ROLLING_UPGRADE_MIGRATION_STEPS } from 'components/datanode/Constants';
 import type { MigrationActions, MigrationState, StepArgs, MigrationStateItem } from 'components/datanode/Types';
 import Welcome from 'components/datanode/migrations/rollingUpgrade/Welcome';
-import CertificatesProvisioning from 'components/datanode/migrations/rollingUpgrade/CertificatesProvisioning';
+import CertificatesProvisioning from 'components/datanode/migrations/common/CertificatesProvisioning';
 import JournalDowntimeWarning from 'components/datanode/migrations/rollingUpgrade/JournalDowntimeWarning';
 import StopMessageProcessing from 'components/datanode/migrations/rollingUpgrade/StopMessageProcessing';
 import CompatibilityCheckStep from 'components/datanode/migrations/CompatibilityCheckStep';
