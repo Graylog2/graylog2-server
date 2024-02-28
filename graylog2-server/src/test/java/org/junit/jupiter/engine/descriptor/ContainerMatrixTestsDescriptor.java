@@ -52,6 +52,7 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
     private final Set<URL> mongoDBFixtures = Collections.synchronizedSet(new HashSet<>());
     private final Set<String> enabledFeatureFlags = Collections.synchronizedSet(new HashSet<>());
     private final boolean withMailServerEnabled;
+    private final boolean withWebhookServerEnabled;
     private final Map<String, String> additionalConfigurationParameters;
 
     public ContainerMatrixTestsDescriptor(TestDescriptor parent,
@@ -64,11 +65,11 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
                                           MongodbServer mongoVersion,
                                           Set<Integer> extraPorts,
                                           List<URL> mongoDBFixtures,
-                                          List<String> enabledFeatureFlags, boolean withMailServerEnabled,
-                                          Map<String, String> additionalConfigurationParameters) {
-        super(parent.getUniqueId().append(SEGMENT_TYPE,
-                        createKey(lifecycle, mavenProjectDirProviderId, pluginJarsProviderId, esVersion, mongoVersion, withMailServerEnabled, additionalConfigurationParameters)),
-                createKey(lifecycle, mavenProjectDirProviderId, pluginJarsProviderId, esVersion, mongoVersion, withMailServerEnabled, additionalConfigurationParameters));
+                                          List<String> enabledFeatureFlags, boolean withMailServerEnabled, boolean withWebhookServerEnabled, Map<String, String> additionalConfigurationParameters) {
+        super(
+                parent.getUniqueId().append(SEGMENT_TYPE, createKey(lifecycle, mavenProjectDirProviderId, pluginJarsProviderId, esVersion, mongoVersion, withMailServerEnabled, withWebhookServerEnabled, additionalConfigurationParameters)),
+                createKey(lifecycle, mavenProjectDirProviderId, pluginJarsProviderId, esVersion, mongoVersion, withMailServerEnabled, withWebhookServerEnabled, additionalConfigurationParameters)
+        );
         setParent(parent);
         this.lifecycle = lifecycle;
         this.mavenProjectDirProvider = mavenProjectDirProvider;
@@ -79,6 +80,7 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
         this.mongoDBFixtures.addAll(mongoDBFixtures);
         this.enabledFeatureFlags.addAll(enabledFeatureFlags);
         this.withMailServerEnabled = withMailServerEnabled;
+        this.withWebhookServerEnabled = withWebhookServerEnabled;
         this.additionalConfigurationParameters = additionalConfigurationParameters;
     }
 
@@ -98,11 +100,12 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
         this.extraPorts.addAll(extraPorts);
         this.mongoDBFixtures.addAll(mongoDBFixtures);
         this.withMailServerEnabled = false;
+        this.withWebhookServerEnabled = false;
         this.additionalConfigurationParameters = new HashMap<>();
     }
 
     protected static String createKey(Lifecycle lifecycle, String mavenProjectDirProvider, String pluginJarsProvider, SearchVersion searchVersion,
-                                      MongodbServer mongoVersion, boolean withMailServerEnabled, Map<String, String> additionalConfigurationParameters) {
+                                      MongodbServer mongoVersion, boolean withMailServerEnabled, boolean withWebhookServerEnabled, Map<String, String> additionalConfigurationParameters) {
         final ImmutableMap.Builder<String, Object> values = ImmutableMap.<String, Object>builder()
                 .put("Lifecycle", lifecycle.name())
                 .put("MavenProjectDirProvider", mavenProjectDirProvider)
@@ -113,6 +116,11 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
         if(withMailServerEnabled) {
             values.put("Mailserver", "enabled");
         }
+
+        if(withWebhookServerEnabled) {
+            values.put("Webhookserver", "enabled");
+        }
+
 
         values.putAll(additionalConfigurationParameters);
 
@@ -167,5 +175,9 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
 
     public Map<String, String> getAdditionalConfigurationParameters() {
         return additionalConfigurationParameters;
+    }
+
+    public boolean withEnabledWebhookServer() {
+        return withWebhookServerEnabled;
     }
 }

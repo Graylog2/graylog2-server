@@ -16,7 +16,7 @@
  */
 package org.graylog.datanode.metrics;
 
-import org.graylog.storage.opensearch2.ism.policy.actions.RollupAction;
+import org.graylog2.indexer.datastream.policy.actions.RollupAction;
 
 import java.util.Locale;
 import java.util.Objects;

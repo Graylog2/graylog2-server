@@ -79,7 +79,7 @@ const SearchFilterBanner = ({ onHide, pluggableControls }: Props) => {
       </SearchFilterHelp>
       <StyledButtonGroup>
         <Button disabled bsSize="small">
-          <Icon name="plus" />
+          <Icon name="add" />
         </Button>
         <Button disabled bsSize="small">
           <Icon name="folder" />

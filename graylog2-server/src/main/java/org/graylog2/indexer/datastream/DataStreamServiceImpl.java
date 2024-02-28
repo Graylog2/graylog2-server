@@ -31,6 +31,10 @@ import java.util.stream.Collectors;
 
 public class DataStreamServiceImpl implements DataStreamService {
 
+    private static final Map<String, String> TIMESTAMP_TYPE = Map.of(
+            "type", "date",
+            "format", "yyyy-MM-dd HH:mm:ss.SSS||strict_date_optional_time||epoch_millis"
+    );
     private final DataStreamAdapter dataStreamAdapter;
     private final IndexFieldTypesService indexFieldTypesService;
 
@@ -49,16 +53,13 @@ public class DataStreamServiceImpl implements DataStreamService {
     }
 
     private void updateDataStreamTemplate(String dataStreamName, String timestampField, Map<String, Map<String, String>> mappings) {
-        if (!mappings.containsKey(timestampField)) {
-            mappings.put(timestampField, ImmutableMap.of(
-                    "type", "date",
-                    "format", "yyyy-MM-dd HH:mm:ss.SSS||strict_date_optional_time||epoch_millis")
-            );
-        }
+        final Map<String, Map<String, String>> effectiveMappings = mappings.containsKey(timestampField)
+                ? mappings
+                : ImmutableMap.<String, Map<String, String>>builder().putAll(mappings).put(timestampField, TIMESTAMP_TYPE).build();
         Template template = new Template(List.of(dataStreamName + "*"),
-                new Template.Mappings(ImmutableMap.of("properties", mappings)), 99999L, new Template.Settings(Map.of()));
+                new Template.Mappings(ImmutableMap.of("properties", effectiveMappings)), 99999L, new Template.Settings(Map.of()));
         dataStreamAdapter.ensureDataStreamTemplate(dataStreamName + "-template", template, timestampField);
-        createFieldTypes(dataStreamName, mappings);
+        createFieldTypes(dataStreamName, effectiveMappings);
     }
 
     private void createFieldTypes(String metricsStream, Map<String, Map<String, String>> mappings) {

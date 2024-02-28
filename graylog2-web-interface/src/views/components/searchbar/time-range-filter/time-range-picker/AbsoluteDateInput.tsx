@@ -59,7 +59,7 @@ const AbsoluteDateInput = ({ name, disabled, onChange, value, hasError, classNam
                <Button disabled={disabled}
                        onClick={_onSetTimeToNow}
                        title="Insert current date">
-                 <Icon name="magic" />
+                 <Icon name="calendar_clock" />
                </Button>
              )}
              className="mousetrap"

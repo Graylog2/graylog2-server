@@ -22,10 +22,10 @@ import org.graylog.plugins.views.storage.migration.state.machine.MigrationStep;
 
 import java.util.List;
 
-public record CurrentStateInformation(MigrationState state, List<MigrationStep> nextSteps, String errorMessage) {
+public record CurrentStateInformation(MigrationState state, List<MigrationStep> nextSteps, String errorMessage, Object response) {
 
     public CurrentStateInformation(MigrationState state, List<MigrationStep> nextSteps) {
-        this(state, nextSteps, null);
+        this(state, nextSteps, null, null);
     }
 
     public boolean hasErrors() {

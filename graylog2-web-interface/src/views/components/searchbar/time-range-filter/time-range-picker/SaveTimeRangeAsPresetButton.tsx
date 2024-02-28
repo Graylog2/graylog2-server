@@ -98,7 +98,7 @@ const TimeRangeAddToQuickListForm = ({ children, addTimerange, toggleModal, show
                         id="time-range-preset-popover"
                         data-testid="time-range-preset-popover">
         <Formik<FormValues> onSubmit={onSubmit} initialValues={{ description: '' }} validate={validate}>
-          {({ isValid }) => (
+          {({ isValid, submitForm }) => (
             <Form>
               <FormikInput type="text"
                            name="description"
@@ -107,15 +107,17 @@ const TimeRangeAddToQuickListForm = ({ children, addTimerange, toggleModal, show
                            aria-label="Time range description"
                            formGroupClassName="" />
               {!!equalTimerange && (
-              <p>
-                <Icon name="exclamation-triangle" />
-                You already have similar time range in{' '}
-                <Link to={Routes.SYSTEM.CONFIGURATIONS} target="_blank">Range configuration</Link>
-                <br />
-                <i>({equalTimerange.description})</i>
-              </p>
+                <p>
+                  <Icon name="warning" />
+                  You already have similar time range in{' '}
+                  <Link to={Routes.SYSTEM.CONFIGURATIONS} target="_blank">Range configuration</Link>
+                  <br />
+                  <i>({equalTimerange.description})</i>
+                </p>
               )}
               <StyledModalSubmit disabledSubmit={!isValid}
+                                 submitButtonType="button"
+                                 onSubmit={submitForm}
                                  submitButtonText="Save preset"
                                  isAsyncSubmit={false}
                                  displayCancel

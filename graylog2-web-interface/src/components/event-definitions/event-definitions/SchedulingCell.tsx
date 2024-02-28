@@ -55,7 +55,7 @@ const getTimeRange = (scheduler: Scheduler) => {
   return (
     <>
       <DetailTitle>Next time range:</DetailTitle>
-      <DetailValue><Timestamp dateTime={from} /> <Icon name="arrow-circle-right" /> <Timestamp dateTime={to} /></DetailValue>
+      <DetailValue><Timestamp dateTime={from} /> <Icon name="arrow_circle_right" /> <Timestamp dateTime={to} /></DetailValue>
     </>
   );
 };
@@ -114,7 +114,7 @@ const SchedulingInfo = ({
                       title={`${title} details.`}
                       overlay={detailsPopover(scheduler, clearNotifications)}
                       width={500}>
-        <DetailsButton bsStyle="link"><Icon name="circle-info" /></DetailsButton>
+        <DetailsButton bsStyle="link"><Icon name="info" /></DetailsButton>
       </OverlayTrigger>
     </>
   );

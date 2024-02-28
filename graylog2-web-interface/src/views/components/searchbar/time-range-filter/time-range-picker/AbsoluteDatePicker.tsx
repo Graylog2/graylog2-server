@@ -39,7 +39,8 @@ const AbsoluteDatePicker = ({ dateTime, onChange, startDate }: Props) => {
     }
 
     const selectedDateObject = toDateObject(selectedDate);
-    const newDate = initialDateTime.set({
+    const validInitialDateTime = initialDateTime.isValid() ? initialDateTime : toUTCFromTz(undefined, userTimezone);
+    const newDate = validInitialDateTime.set({
       year: selectedDateObject.year(),
       month: selectedDateObject.month(),
       date: selectedDateObject.date(),

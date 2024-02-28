@@ -143,14 +143,14 @@ public class MigrationStateMachineBuilderTest {
     public void testProvisionDatanodeCertificatesRunning() {
         StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.PROVISION_DATANODE_CERTIFICATES_PAGE);
         stateMachine.fire(MigrationStep.PROVISION_DATANODE_CERTIFICATES);
-        verify(migrationActions, times(1)).provisionDataNodes();
+        verify(migrationActions, times(1)).provisionAndStartDataNodes();
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.PROVISION_DATANODE_CERTIFICATES_RUNNING);
         assertThat(stateMachine.getPermittedTriggers()).isEmpty();
-        verify(migrationActions, times(1)).provisioningFinished();
+        verify(migrationActions, times(1)).dataNodeStartupFinished();
         reset(migrationActions);
-        when(migrationActions.provisioningFinished()).thenReturn(true);
+        when(migrationActions.dataNodeStartupFinished()).thenReturn(true);
         assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SHOW_DATA_MIGRATION_QUESTION);
-        verify(migrationActions, times(1)).provisioningFinished();
+        verify(migrationActions, times(1)).dataNodeStartupFinished();
         verifyNoMoreInteractions(migrationActions);
     }
 
@@ -167,13 +167,13 @@ public class MigrationStateMachineBuilderTest {
         StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.EXISTING_DATA_MIGRATION_QUESTION_PAGE);
         stateMachine.fire(MigrationStep.SHOW_MIGRATE_EXISTING_DATA);
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.MIGRATE_EXISTING_DATA);
-        verify(migrationActions).reindexOldData();
-        assertThat(stateMachine.getPermittedTriggers()).isEmpty();
-        verify(migrationActions, times(1)).reindexingFinished();
+        assertThat(stateMachine.getPermittedTriggers()).contains(MigrationStep.START_REMOTE_REINDEX_MIGRATION);
+        stateMachine.fire(MigrationStep.START_REMOTE_REINDEX_MIGRATION);
+        verify(migrationActions, times(1)).startRemoteReindex();
         reset(migrationActions);
-        when(migrationActions.reindexingFinished()).thenReturn(true);
-        assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SHOW_ASK_TO_SHUTDOWN_OLD_CLUSTER);
-        verify(migrationActions, times(1)).reindexingFinished();
+        when(migrationActions.isRemoteReindexingFinished()).thenReturn(true);
+        assertThat(stateMachine.getPermittedTriggers()).contains(MigrationStep.SHOW_ASK_TO_SHUTDOWN_OLD_CLUSTER, MigrationStep.REQUEST_MIGRATION_STATUS, MigrationStep.RETRY_MIGRATE_EXISTING_DATA);
+        verify(migrationActions, times(1)).isRemoteReindexingFinished();
         verifyNoMoreInteractions(migrationActions);
     }
 
@@ -225,16 +225,33 @@ public class MigrationStateMachineBuilderTest {
     }
 
     @Test
-    public void testMessageProcessingStopReplaceClusterAndMpRestart() {
+    public void testMessageProcessingStop() {
         StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.JOURNAL_SIZE_DOWNTIME_WARNING);
         stateMachine.fire(MigrationStep.SHOW_STOP_PROCESSING_PAGE);
-        assertThat(stateMachine.getState()).isEqualTo(MigrationState.MESSAGE_PROCESSING_STOP_REPLACE_CLUSTER_AND_MP_RESTART);
+        assertThat(stateMachine.getState()).isEqualTo(MigrationState.MESSAGE_PROCESSING_STOP);
         verify(migrationActions).stopMessageProcessing();
-        assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SHOW_ASK_TO_SHUTDOWN_OLD_CLUSTER);
+        assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SHOW_ROLLING_UPGRADE_ASK_TO_SHUTDOWN_OLD_CLUSTER);
         verifyNoMoreInteractions(migrationActions);
-        stateMachine.fire(MigrationStep.SHOW_ASK_TO_SHUTDOWN_OLD_CLUSTER);
-        verify(migrationActions).startMessageProcessing();
-        verifyNoMoreInteractions(migrationActions);
+        stateMachine.fire(MigrationStep.SHOW_ROLLING_UPGRADE_ASK_TO_SHUTDOWN_OLD_CLUSTER);
+    }
+
+    @Test
+    public void testDataNodeClusterStart() {
+        StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.MESSAGE_PROCESSING_STOP);
+        stateMachine.fire(MigrationStep.SHOW_ROLLING_UPGRADE_ASK_TO_SHUTDOWN_OLD_CLUSTER);
+        assertThat(stateMachine.getState()).isEqualTo(MigrationState.RESTART_GRAYLOG);
+        assertThat(stateMachine.getPermittedTriggers()).isEmpty();
+        when(migrationActions.dataNodeStartupFinished()).thenReturn(true);
+        assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.CONFIRM_OLD_CONNECTION_STRING_FROM_CONFIG_REMOVED_AND_GRAYLOG_RESTARTED);
+        stateMachine.fire(MigrationStep.CONFIRM_OLD_CONNECTION_STRING_FROM_CONFIG_REMOVED_AND_GRAYLOG_RESTARTED);
+    }
+
+    @Test
+    public void testFinishRollingMigration() {
+        StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.RESTART_GRAYLOG);
+        when(migrationActions.dataNodeStartupFinished()).thenReturn(true);
+        stateMachine.fire(MigrationStep.CONFIRM_OLD_CONNECTION_STRING_FROM_CONFIG_REMOVED_AND_GRAYLOG_RESTARTED);
+        assertThat(stateMachine.getState()).isEqualTo(MigrationState.FINISHED);
     }
 
     @Test
@@ -253,8 +270,8 @@ public class MigrationStateMachineBuilderTest {
 
     @Test
     public void testAskToShutdownOldClusterFromReindexing() {
-        StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.MIGRATE_EXISTING_DATA);
-        when(migrationActions.reindexingFinished()).thenReturn(true);
+        StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.REMOTE_REINDEX_RUNNING);
+        when(migrationActions.isRemoteReindexingFinished()).thenReturn(true);
         stateMachine.fire(MigrationStep.SHOW_ASK_TO_SHUTDOWN_OLD_CLUSTER);
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.ASK_TO_SHUTDOWN_OLD_CLUSTER);
     }
@@ -264,9 +281,6 @@ public class MigrationStateMachineBuilderTest {
         StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.ASK_TO_SHUTDOWN_OLD_CLUSTER);
         when(migrationActions.isOldClusterStopped()).thenReturn(true);
         stateMachine.fire(MigrationStep.CONFIRM_OLD_CLUSTER_STOPPED);
-        assertThat(stateMachine.getState()).isEqualTo(MigrationState.MANUALLY_REMOVE_OLD_CONNECTION_STRING_FROM_CONFIG);
-        assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.CONFIRM_OLD_CONNECTION_STRING_FROM_CONFIG_REMOVED);
-        stateMachine.fire(MigrationStep.CONFIRM_OLD_CONNECTION_STRING_FROM_CONFIG_REMOVED);
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.FINISHED);
     }
 

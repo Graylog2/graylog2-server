@@ -40,7 +40,7 @@ const SaveViewButton = forwardRef<HTMLButtonElement, Props>(({ title, onClick, d
             ref={ref}
             onClick={onClick}
             disabled={disabled}>
-      <StyledIcon name="floppy-disk" type={isDirty ? 'solid' : 'regular'} $isDirty={!disabled && isDirty} /> Save
+      <StyledIcon name="save" type={isDirty ? 'solid' : 'regular'} $isDirty={!disabled && isDirty} /> Save
     </Button>
   );
 });

@@ -16,13 +16,13 @@
  */
 import * as React from 'react';
 import { useCallback, useContext, useMemo, useState } from 'react';
-import { Form, Formik } from 'formik';
+import { Formik } from 'formik';
 import styled, { css } from 'styled-components';
 import moment from 'moment';
 
 import { Button, Col, Row } from 'components/bootstrap';
 import Popover from 'components/common/Popover';
-import { Icon, KeyCapture, ModalSubmit } from 'components/common';
+import { Icon, KeyCapture, ModalSubmit, NestedForm } from 'components/common';
 import type {
   AbsoluteTimeRange,
   KeywordTimeRange,
@@ -170,7 +170,7 @@ const TimeRangePicker = ({
     });
   }, [location.pathname, sendTelemetry, toggleDropdownShow]);
 
-  const handleSubmit = useCallback(({ timeRangeTabs, activeTab }: TimeRangePickerFormValues) => {
+  const onSubmit = useCallback(({ timeRangeTabs, activeTab }: TimeRangePickerFormValues) => {
     const normalizedTimeRange = normalizeFromPickerForSearchBar(timeRangeTabs[activeTab]);
 
     setCurrentTimeRange(normalizedTimeRange);
@@ -192,7 +192,7 @@ const TimeRangePicker = ({
       <span>Search Time Range</span>
       {limitDuration > 0 && (
         <LimitLabel>
-          <Icon name="exclamation-triangle" />
+          <Icon name="warning" />
           <span>Admin has limited searching to {moment.duration(-limitDuration, 'seconds').humanize(true)}</span>
         </LimitLabel>
       )}
@@ -220,14 +220,14 @@ const TimeRangePicker = ({
       <Popover.Dropdown title={title}>
         <Formik<TimeRangePickerFormValues> initialValues={initialValues}
                                            validate={_validateTimeRange}
-                                           onSubmit={handleSubmit}
+                                           onSubmit={onSubmit}
                                            validateOnMount>
           {(({ isValid, submitForm }) => (
             <KeyCapture shortcuts={[
               { actionKey: 'submit-form', callback: submitForm, scope: 'general', options: { displayInOverview: false } },
               { actionKey: 'close-modal', callback: handleCancel, scope: 'general', options: { displayInOverview: false } },
             ]}>
-              <Form>
+              <NestedForm>
                 <Row>
                   <Col md={12}>
                     <TimeRangePresetRow />
@@ -248,7 +248,7 @@ const TimeRangePicker = ({
                                  submitButtonText="Update time range" />
                   </Col>
                 </Row>
-              </Form>
+              </NestedForm>
             </KeyCapture>
           ))}
         </Formik>

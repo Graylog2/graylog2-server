@@ -1,0 +1,4 @@
+type = "f"
+message = "Add a sensible default value for OpenSearch inside the DataNode for indices.query.bool.max_clause_count"
+
+pulls = ["18354"]

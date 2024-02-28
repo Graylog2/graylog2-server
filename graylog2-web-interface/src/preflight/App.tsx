@@ -27,7 +27,8 @@ const App = () => {
   const [isWaitingForStartup, setIsWaitingForStartup] = useState(false);
 
   return (
-    <AppShell padding="md" header={<Navigation />}>
+    <AppShell padding="md" header={{ height: 80 }}>
+      <Navigation />
       <ErrorBoundary>
         {!isWaitingForStartup && <Setup setIsWaitingForStartup={setIsWaitingForStartup} />}
         {isWaitingForStartup && <WaitingForStartup />}
