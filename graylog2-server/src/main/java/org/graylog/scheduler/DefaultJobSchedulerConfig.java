@@ -16,12 +16,12 @@
  */
 package org.graylog.scheduler;
 
+import com.google.common.collect.ImmutableMap;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog2.cluster.leader.LeaderElectionService;
 
 import javax.annotation.Nullable;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -30,12 +30,12 @@ import java.util.Map;
 @Singleton
 public class DefaultJobSchedulerConfig implements JobSchedulerConfig {
     private final LeaderElectionService leaderElectionService;
-    private final Map<String, Integer> jobMaxConcurrency;
+    private final JobSchedulerConfiguration config;
 
     @Inject
-    public DefaultJobSchedulerConfig(LeaderElectionService leaderElectionService) {
+    public DefaultJobSchedulerConfig(LeaderElectionService leaderElectionService, JobSchedulerConfiguration config) {
         this.leaderElectionService = leaderElectionService;
-        this.jobMaxConcurrency = new HashMap<>();
+        this.config = config;
     }
 
     @Override
@@ -51,6 +51,6 @@ public class DefaultJobSchedulerConfig implements JobSchedulerConfig {
     @Override
     @Nullable
     public Map<String, Integer> jobMaxConcurrency() {
-        return jobMaxConcurrency;
+        return ImmutableMap.copyOf(config.getJobSchedulerMaxConcurrency());
     }
 }
