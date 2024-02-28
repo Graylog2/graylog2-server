@@ -93,6 +93,8 @@ describe('RemoteReindexingMigration', () => {
     await screen.findByRole('button', {
       name: /1. Remote reindexing migration/i,
     });
+
+    await screen.findByRole('heading', { name: /Welcome/i });
   });
 
   it('should render CertificatesProvisioning page step', async () => {
@@ -107,7 +109,7 @@ describe('RemoteReindexingMigration', () => {
     renderStep(MIGRATION_STATE.PROVISION_DATANODE_CERTIFICATES_RUNNING.key);
 
     await screen.findByRole('button', {
-      name: /3. Provision Data Node with certificates running/i,
+      name: /3. Provision the Data Node's certificate./i,
     });
   });
 
@@ -117,6 +119,8 @@ describe('RemoteReindexingMigration', () => {
     await screen.findByRole('button', {
       name: /4. Migrate existing data question/i,
     });
+
+    await screen.findByText(/Do you want to migrate your existing data?/);
   });
 
   it('should render MigrateExistingData step', async () => {
@@ -125,6 +129,10 @@ describe('RemoteReindexingMigration', () => {
     await screen.findByRole('button', {
       name: /5. Migrate existing data/i,
     });
+
+    await screen.findByLabelText(/Cluster URI/);
+    await screen.findByLabelText(/Username/);
+    await screen.findByLabelText(/Password/);
   });
 
   it('should render RemoteReindexRunning step', async () => {
@@ -133,6 +141,8 @@ describe('RemoteReindexingMigration', () => {
     await screen.findByRole('button', {
       name: /6. Remote reindexing migration running/i,
     });
+
+    await screen.findByText(/We are currently migrating your existing data asynchronically/);
   });
 
   it('should render ShutdownClusterStep step', async () => {
@@ -141,6 +151,8 @@ describe('RemoteReindexingMigration', () => {
     await screen.findByRole('button', {
       name: /7. Shut down old cluster/i,
     });
+
+    await screen.findByText(/To finish please shut down your/);
   });
 
   it('should render ConnectionStringRemovalStep step', async () => {
@@ -149,5 +161,7 @@ describe('RemoteReindexingMigration', () => {
     await screen.findByRole('button', {
       name: /8. Remove connection string/i,
     });
+
+    await screen.findByText(/line from your Graylog configuration file/);
   });
 });
