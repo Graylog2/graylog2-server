@@ -17,6 +17,7 @@
 package org.graylog2.database.filtering;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -31,7 +32,7 @@ public record AttributeFilter(@JsonProperty(FIELD_FIELD) String field,
 
     @JsonCreator
     public static AttributeFilter create(@JsonProperty(FIELD_FIELD) String field,
-                                         @JsonProperty(FIELD_VALUE) List<String> value) {
+                                         @JsonProperty(FIELD_VALUE) @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY) List<String> value) {
         checkArgument(!value.isEmpty(), "Value should not be empty.");
         return new AttributeFilter(field, value);
     }
