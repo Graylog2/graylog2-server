@@ -175,10 +175,6 @@ public class JobExecutionEngine {
         return false;
     }
 
-    private boolean hasConcurrencyLimit(JobTriggerDto trigger) {
-        return maxConcurrencyMap.containsKey(trigger.jobDefinitionType());
-    }
-
     public void updateLockedJobs() {
         if (workerPool.anySlotsUsed()) {
             jobTriggerService.updateLockedJobTriggers();
@@ -186,11 +182,11 @@ public class JobExecutionEngine {
     }
 
     private void handleTriggerWithConcurrencyLimit(JobTriggerDto trigger) {
-        if (hasConcurrencyLimit(trigger)) {
-            try (RefreshingLockService refreshingLockService = refreshingLockServiceFactory.create()) {
+        final int maxConcurrency = maxConcurrencyMap.getOrDefault(trigger.jobDefinitionType(), 0);
+        if (maxConcurrency > 0) {
+            try (final RefreshingLockService refreshingLockService = refreshingLockServiceFactory.create()) {
                 try {
-                    refreshingLockService.acquireAndKeepLock(
-                            trigger.jobDefinitionType(), maxConcurrencyMap.get(trigger.jobDefinitionType()));
+                    refreshingLockService.acquireAndKeepLock(trigger.jobDefinitionType(), maxConcurrency);
                     handleTrigger(trigger);
                 } catch (AlreadyLockedException e) {
                     final DateTime nextTime = DateTime.now(DateTimeZone.UTC).plus(slidingBackoff(trigger));
