@@ -17,7 +17,6 @@
 package org.graylog.scheduler;
 
 import com.codahale.metrics.Counter;
-import com.codahale.metrics.Gauge;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
@@ -73,7 +72,7 @@ public class JobExecutionEngine {
     private final Counter executionFailed;
     private final Timer executionTime;
     private final Meter executionDenyRate;
-    private int executionRescheduledMetric = 0;
+    private final Meter executionRescheduledRate;
 
     private final AtomicBoolean isRunning = new AtomicBoolean(true);
     private final AtomicBoolean shouldCleanup = new AtomicBoolean(true);
@@ -120,15 +119,7 @@ public class JobExecutionEngine {
         this.executionFailed = metricRegistry.counter(MetricRegistry.name(getClass(), "executions", "failed"));
         this.executionTime = metricRegistry.timer(MetricRegistry.name(getClass(), "executions", "time"));
         this.executionDenyRate = metricRegistry.meter(MetricRegistry.name(getClass(), "executions", "deny-rate"));
-
-        metricRegistry.register(
-                MetricRegistry.name(getClass(), "executions", "rescheduled"),
-                new Gauge<Integer>() {
-                    @Override
-                    public Integer getValue() {
-                        return executionRescheduledMetric;
-                    }
-                });
+        this.executionRescheduledRate = metricRegistry.meter(MetricRegistry.name(getClass(), "executions", "rescheduled"));
     }
 
     /**
@@ -173,7 +164,7 @@ public class JobExecutionEngine {
                     // The job couldn't be executed so we have to release the trigger again with the same nextTime
                     jobTriggerService.releaseTrigger(trigger, JobTriggerUpdate.rescheduleWithNextTime(trigger.nextTime()));
                     executionDenyRate.mark();
-                    executionRescheduledMetric = trigger.timesRescheduled();
+                    executionRescheduledRate.mark();
                     return false;
                 }
 
@@ -205,7 +196,7 @@ public class JobExecutionEngine {
                     final DateTime nextTime = DateTime.now(DateTimeZone.UTC).plus(slidingBackoff(trigger));
                     jobTriggerService.releaseTrigger(trigger, JobTriggerUpdate.rescheduleWithNextTime(nextTime));
                     executionDenyRate.mark();
-                    executionRescheduledMetric = trigger.timesRescheduled();
+                    executionRescheduledRate.mark();
                 }
             }
         } else {
