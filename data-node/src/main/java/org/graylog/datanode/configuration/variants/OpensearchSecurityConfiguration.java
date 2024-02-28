@@ -121,6 +121,9 @@ public class OpensearchSecurityConfiguration {
             config.put("plugins.security.ssl.http.truststore_type", TRUSTSTORE_FORMAT);
             config.put("plugins.security.ssl.http.truststore_filepath", TRUSTSTORE_FILE.toString());
             config.put("plugins.security.ssl.http.truststore_password", truststore.passwordAsString());
+
+            // enable client cert auth
+            config.put("plugins.security.ssl.http.clientauth_mode", "OPTIONAL");
         } else {
             config.put("plugins.security.disabled", "true");
             config.put("plugins.security.ssl.http.enabled", "false");
