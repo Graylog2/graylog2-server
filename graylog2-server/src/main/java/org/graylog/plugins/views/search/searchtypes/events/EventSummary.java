@@ -38,6 +38,7 @@ public abstract class EventSummary implements CommonEventSummary {
     private static final String FIELD_EVENT_TIMESTAMP = "timestamp";
     private static final String FIELD_MESSAGE = "message";
     private static final String FIELD_ALERT = "alert";
+    private static final String FIELD_EVENT_DEFINITION_ID = "event_definition_id";
 
 
     @SuppressWarnings("unchecked")
@@ -48,6 +49,7 @@ public abstract class EventSummary implements CommonEventSummary {
                 .message((String) rawEvent.get(EventDto.FIELD_MESSAGE))
                 .streams(ImmutableSet.copyOf((ArrayList<String>) rawEvent.get(EventDto.FIELD_SOURCE_STREAMS)))
                 .timestamp(DateTime.parse((String) rawEvent.get(EventDto.FIELD_EVENT_TIMESTAMP), Tools.ES_DATE_FORMAT_FORMATTER))
+                .eventDefinitionId((String) rawEvent.get(EventDto.FIELD_EVENT_DEFINITION_ID))
                 .build();
     }
 
@@ -79,6 +81,9 @@ public abstract class EventSummary implements CommonEventSummary {
 
         @JsonProperty(FIELD_ALERT)
         public abstract Builder alert(boolean alert);
+
+        @JsonProperty(FIELD_EVENT_DEFINITION_ID)
+        public abstract Builder eventDefinitionId(String eventDefinitionId);
 
         public abstract EventSummary build();
     }

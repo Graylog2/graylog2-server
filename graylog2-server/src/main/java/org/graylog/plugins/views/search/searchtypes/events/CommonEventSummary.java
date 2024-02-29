@@ -11,6 +11,7 @@ public interface CommonEventSummary {
     String FIELD_EVENT_TIMESTAMP = "timestamp";
     String FIELD_MESSAGE = "message";
     String FIELD_ALERT = "alert";
+    String FIELD_EVENT_DEFINITION_ID = "event_definition_id";
 
     @JsonProperty(FIELD_ID)
     String id();
@@ -26,4 +27,7 @@ public interface CommonEventSummary {
 
     @JsonProperty(FIELD_ALERT)
     boolean alert();
+
+    @JsonProperty(FIELD_EVENT_DEFINITION_ID)
+    String eventDefinitionId();
 }
