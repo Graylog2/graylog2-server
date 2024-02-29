@@ -26,7 +26,7 @@ import org.graylog.events.event.EventDto;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -47,7 +47,7 @@ public abstract class EventSummary implements CommonEventSummary {
                 .alert((boolean) rawEvent.get(EventDto.FIELD_ALERT))
                 .id((String) rawEvent.get(EventDto.FIELD_ID))
                 .message((String) rawEvent.get(EventDto.FIELD_MESSAGE))
-                .streams(ImmutableSet.copyOf((ArrayList<String>) rawEvent.get(EventDto.FIELD_SOURCE_STREAMS)))
+                .streams(ImmutableSet.copyOf((List<String>) rawEvent.get(EventDto.FIELD_SOURCE_STREAMS)))
                 .timestamp(DateTime.parse((String) rawEvent.get(EventDto.FIELD_EVENT_TIMESTAMP), Tools.ES_DATE_FORMAT_FORMATTER))
                 .eventDefinitionId((String) rawEvent.get(EventDto.FIELD_EVENT_DEFINITION_ID))
                 .build();
