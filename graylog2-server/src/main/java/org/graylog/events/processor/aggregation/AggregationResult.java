@@ -52,7 +52,7 @@ public abstract class AggregationResult {
     public abstract Map<String, SearchType.Result> additionalResults();
 
     public static Builder builder() {
-        return Builder.create().additionalResults(Map.of());
+        return Builder.create().additionalResults(ImmutableMap.of());
     }
 
     public abstract Builder toBuilder();
