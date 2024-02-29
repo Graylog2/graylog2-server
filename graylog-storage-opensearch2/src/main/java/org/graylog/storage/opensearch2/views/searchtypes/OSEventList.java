@@ -23,8 +23,11 @@ import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.searchtypes.events.EventList;
 import org.graylog.plugins.views.search.searchtypes.events.EventSummary;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.index.query.BoolQueryBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.SearchHit;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregations;
+import org.graylog.shaded.opensearch2.org.opensearch.search.sort.SortOrder;
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
 
 import java.util.List;
@@ -37,8 +40,31 @@ public class OSEventList implements OSSearchTypeHandler<EventList> {
     @Override
     public void doGenerateQueryPart(Query query, EventList eventList,
                                     OSGeneratedQueryContext queryContext) {
-        queryContext.searchSourceBuilder(eventList)
-                .size(10000);
+        final var searchSourceBuilder = queryContext.searchSourceBuilder(eventList);
+        final var sortConfig = eventList.sortWithDefault();
+        searchSourceBuilder.sort(sortConfig.field(), toSortOrder(sortConfig.direction()));
+        final var queryBuilder = searchSourceBuilder.query();
+        if (!eventList.attributes().isEmpty() && queryBuilder instanceof BoolQueryBuilder boolQueryBuilder) {
+            final var filterQueries = eventList.attributes().stream()
+                    .flatMap(attribute -> attribute.toQueryStrings().stream())
+                    .toList();
+
+            filterQueries.forEach(filterQuery -> boolQueryBuilder.filter(QueryBuilders.queryStringQuery(filterQuery)));
+        }
+
+        searchSourceBuilder.size(10000);
+        eventList.page().ifPresent(page -> {
+            final var pageSize = eventList.perPage().orElse(EventList.DEFAULT_PAGE_SIZE);
+            searchSourceBuilder.size(pageSize);
+            searchSourceBuilder.from(page * pageSize);
+        });
+    }
+
+    private SortOrder toSortOrder(EventList.Direction direction) {
+        return switch (direction) {
+            case ASC -> SortOrder.ASC;
+            case DESC -> SortOrder.DESC;
+        };
     }
 
     protected List<Map<String, Object>> extractResult(SearchResponse result) {
