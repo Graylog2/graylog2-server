@@ -289,7 +289,7 @@ class JobSchedulerServiceIT {
         }
 
         @Override
-        public Map<String, Integer> jobMaxConcurrency() {
+        public Map<String, Integer> concurrencyLimits() {
             return Map.of(LimitedJobA.TYPE_NAME, MAX_CONCURRENCY);
         }
     }

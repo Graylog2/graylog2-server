@@ -39,10 +39,10 @@ public interface JobSchedulerConfig {
     int numberOfWorkerThreads();
 
     /**
-     * Concurrency limits per job type
+     * Concurrency limits per job type.
      *
      * @return mapping of job type to max number of worker threads to assign for this job type. A missing
      * entry signifies unlimited concurrency (up to numberOfWorkerThreads)
      */
-    Map<String, Integer> jobMaxConcurrency();
+    Map<String, Integer> concurrencyLimits();
 }

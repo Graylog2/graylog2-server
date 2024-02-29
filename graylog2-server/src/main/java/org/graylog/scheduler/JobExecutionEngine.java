@@ -34,7 +34,6 @@ import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -65,7 +64,7 @@ public class JobExecutionEngine {
     private final Map<String, Job.Factory> jobFactory;
     private final JobWorkerPool workerPool;
     private final RefreshingLockService.Factory refreshingLockServiceFactory;
-    private final Map<String, Integer> maxConcurrencyMap;
+    private final Map<String, Integer> concurrencyLimits;
     private final long backoffMillis;
 
     private final Counter executionSuccessful;
@@ -112,7 +111,7 @@ public class JobExecutionEngine {
         this.jobFactory = jobFactory;
         this.workerPool = workerPool;
         this.refreshingLockServiceFactory = refreshingLockServiceFactory;
-        this.maxConcurrencyMap = schedulerConfig != null ? schedulerConfig.jobMaxConcurrency() : Collections.emptyMap();
+        this.concurrencyLimits = schedulerConfig.concurrencyLimits();
         this.backoffMillis = backoffMillis;
 
         this.executionSuccessful = metricRegistry.counter(MetricRegistry.name(getClass(), "executions", "successful"));
@@ -182,11 +181,11 @@ public class JobExecutionEngine {
     }
 
     private void handleTriggerWithConcurrencyLimit(JobTriggerDto trigger) {
-        final int maxConcurrency = maxConcurrencyMap.getOrDefault(trigger.jobDefinitionType(), 0);
-        if (maxConcurrency > 0) {
+        final int maxTypeConcurrency = concurrencyLimits.getOrDefault(trigger.jobDefinitionType(), 0);
+        if (maxTypeConcurrency > 0) {
             try (final RefreshingLockService refreshingLockService = refreshingLockServiceFactory.create()) {
                 try {
-                    refreshingLockService.acquireAndKeepLock(trigger.jobDefinitionType(), maxConcurrency);
+                    refreshingLockService.acquireAndKeepLock(trigger.jobDefinitionType(), maxTypeConcurrency);
                     handleTrigger(trigger);
                 } catch (AlreadyLockedException e) {
                     final DateTime nextTime = DateTime.now(DateTimeZone.UTC).plus(slidingBackoff(trigger));

@@ -50,7 +50,7 @@ public class DefaultJobSchedulerConfig implements JobSchedulerConfig {
 
     @Override
     @Nullable
-    public Map<String, Integer> jobMaxConcurrency() {
-        return ImmutableMap.copyOf(config.getJobSchedulerMaxConcurrency());
+    public Map<String, Integer> concurrencyLimits() {
+        return ImmutableMap.copyOf(config.getConcurrencyLimits());
     }
 }

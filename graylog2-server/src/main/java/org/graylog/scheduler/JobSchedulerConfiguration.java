@@ -24,7 +24,6 @@ import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import org.graylog2.configuration.converters.MapConverter;
 import org.graylog2.plugin.PluginConfigBean;
 
-import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -34,7 +33,7 @@ import java.util.Map;
 public class JobSchedulerConfiguration implements PluginConfigBean {
     public static final String LOOP_SLEEP_DURATION = "job_scheduler_loop_sleep_duration";
     public static final String LOCK_EXPIRATION_DURATION = "job_scheduler_lock_expiration_duration";
-    public static final String MAX_CONCURRENT_JOBS = "job_scheduler_max_concurrent_jobs";
+    public static final String CONCURRENCY_LIMITS = "job_scheduler_concurrency_limits";
 
     @Parameter(value = LOOP_SLEEP_DURATION, validators = PositiveDurationValidator.class)
     private Duration loopSleepDuration = Duration.seconds(1);
@@ -42,16 +41,16 @@ public class JobSchedulerConfiguration implements PluginConfigBean {
     @Parameter(value = LOCK_EXPIRATION_DURATION, validators = Minimum1MinuteValidator.class)
     private Duration lockExpirationDuration = Duration.minutes(5);
 
-    @Parameter(value = MAX_CONCURRENT_JOBS, converter = MapConverter.StringInteger.class)
-    private Map<String, Integer> jobSchedulerMaxConcurrencyList = Collections.emptyMap();
+    @Parameter(value = CONCURRENCY_LIMITS, converter = MapConverter.StringInteger.class)
+    private Map<String, Integer> concurrencyLimits = Map.of();
 
     /**
      * Concurrency limits per job type. A missing entry signifies unlimited concurrency. (up to the number of worker threads)
      *
      * @return mapping of job type to max number of worker threads
      */
-    public Map<String, Integer> getJobSchedulerMaxConcurrency() {
-        return jobSchedulerMaxConcurrencyList;
+    public Map<String, Integer> getConcurrencyLimits() {
+        return concurrencyLimits;
     }
 
     public Duration getLoopSleepDuration() {
