@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.engine;
 
 import com.google.common.collect.ImmutableSet;
+import jakarta.ws.rs.NotFoundException;
 import org.assertj.core.api.Condition;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
@@ -39,6 +40,7 @@ import org.graylog.plugins.views.search.rest.ExecutionStateGlobalOverride;
 import org.graylog.plugins.views.search.rest.TestSearchUser;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
+import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.rest.exceptions.MissingStreamPermissionException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,8 +52,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
-import jakarta.ws.rs.NotFoundException;
-
 import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -61,6 +61,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -74,6 +75,9 @@ public class SearchExecutorTest {
     @Mock
     private QueryEngine queryEngine;
 
+    @Mock
+    private NodeId nodeId;
+
     @Captor
     private ArgumentCaptor<SearchJob> searchJobCaptor;
 
@@ -81,7 +85,8 @@ public class SearchExecutorTest {
 
     @BeforeEach
     void setUp() {
-        final SearchJobService searchJobService = new InMemorySearchJobService();
+        doReturn("The-best-node").when(nodeId).getNodeId();
+        final SearchJobService searchJobService = new InMemorySearchJobService(nodeId);
         this.searchExecutor = new SearchExecutor(searchDomain,
                 searchJobService,
                 queryEngine,
