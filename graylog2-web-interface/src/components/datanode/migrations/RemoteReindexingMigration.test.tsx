@@ -83,7 +83,7 @@ const renderStep = (_state: MigrationStateItem) => {
     response: null,
   } as MigrationState);
 
-  render(<RemoteReindexingMigration onTriggerNextStep={() => {}} currentStep={getCurrentStep(_state)} />);
+  render(<RemoteReindexingMigration onTriggerStep={async () => ({} as MigrationState)} currentStep={getCurrentStep(_state)} />);
 };
 
 describe('RemoteReindexingMigration', () => {

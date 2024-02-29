@@ -19,7 +19,7 @@ import styled from 'styled-components';
 
 import { Col, Panel, PanelGroup } from 'components/bootstrap';
 import { MIGRATION_STATE, ROLLING_UPGRADE_MIGRATION_STEPS } from 'components/datanode/Constants';
-import type { MigrationActions, MigrationState, StepArgs, MigrationStateItem } from 'components/datanode/Types';
+import type { MigrationActions, StepArgs, MigrationStateItem, MigrationStepComponentProps } from 'components/datanode/Types';
 import Welcome from 'components/datanode/migrations/rollingUpgrade/Welcome';
 import CertificatesProvisioning from 'components/datanode/migrations/common/CertificatesProvisioning';
 import JournalDowntimeWarning from 'components/datanode/migrations/rollingUpgrade/JournalDowntimeWarning';
@@ -27,11 +27,6 @@ import StopMessageProcessing from 'components/datanode/migrations/rollingUpgrade
 import CompatibilityCheckStep from 'components/datanode/migrations/CompatibilityCheckStep';
 import RestartGraylog from 'components/datanode/migrations/rollingUpgrade/RestartGraylog';
 import MigrationError from 'components/datanode/migrations/common/MigrationError';
-
-type Props = {
-    currentStep: MigrationState,
-    onTriggerNextStep: (step: MigrationActions, args: StepArgs) => void,
-};
 
 const StyledTitle = styled.h3`
   margin-bottom: 10px;
@@ -64,12 +59,10 @@ const StyledPanelGroup = styled(PanelGroup)`
   }
 `;
 
-const RollingUpgradeMigration = ({ currentStep, onTriggerNextStep }: Props) => {
+const RollingUpgradeMigration = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => {
   const { state: activeStep } = currentStep;
 
-  const onStepComplete = (step: MigrationActions, args: StepArgs = {}) => {
-    onTriggerNextStep(step, args);
-  };
+  const onStepComplete = async (step: MigrationActions, args: StepArgs = {}) => onTriggerStep(step, args);
 
   const getStepComponent = (step: MigrationStateItem) => {
     switch (step) {

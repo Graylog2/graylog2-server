@@ -55,7 +55,7 @@ const currentStep = {
 
 describe('CompatibilityCheckStep', () => {
   it('should render CompatibilityCheckStep', async () => {
-    render(<CompatibilityCheckStep onTriggerStep={() => {}} currentStep={currentStep} />);
+    render(<CompatibilityCheckStep onTriggerStep={async () => ({} as MigrationState)} currentStep={currentStep} />);
 
     await screen.findByRole('heading', {
       name: /Your existing OpenSearch data can be migrated to Data Node\./i,
@@ -75,7 +75,7 @@ describe('CompatibilityCheckStep', () => {
       error: undefined,
     });
 
-    render(<CompatibilityCheckStep onTriggerStep={() => {}} currentStep={currentStep} />);
+    render(<CompatibilityCheckStep onTriggerStep={async () => ({} as MigrationState)} currentStep={currentStep} />);
 
     await screen.findByRole('heading', {
       name: /your existing OpenSearch data cannot be migrated to Data Node\./i,

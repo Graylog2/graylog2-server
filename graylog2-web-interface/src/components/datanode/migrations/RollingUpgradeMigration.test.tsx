@@ -83,7 +83,7 @@ const renderStep = (_state: MigrationStateItem) => {
     response: null,
   } as MigrationState);
 
-  render(<RollingUpgradeMigration onTriggerNextStep={() => {}} currentStep={getCurrentStep(_state)} />);
+  render(<RollingUpgradeMigration onTriggerStep={async () => ({} as MigrationState)} currentStep={getCurrentStep(_state)} />);
 };
 
 describe('RollingUpgradeMigration', () => {
