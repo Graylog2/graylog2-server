@@ -34,6 +34,7 @@ import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visuali
 import useAppDispatch from 'stores/useAppDispatch';
 import { updateWidgetConfig } from 'views/logic/slices/widgetActions';
 
+import TableHead from './TableHead';
 import DataTableEntry from './DataTableEntry';
 import MessagesTable from './MessagesTable';
 import deduplicateValues from './DeduplicateValues';
@@ -61,7 +62,7 @@ const getStylesForPinnedColumns = (tag: 'th'|'td', stickyLeftMarginsByColumnInde
     }
   `).concat((' ; '));
 
-const THead = styled.thead<{
+const THead = styled(TableHead)<{
     $stickyLeftMarginsByColumnIndex: Array<{index: number, column: string, leftMargin: number}>
 }>(({ $stickyLeftMarginsByColumnIndex }) => css`
   & tr.pivot-header-row {

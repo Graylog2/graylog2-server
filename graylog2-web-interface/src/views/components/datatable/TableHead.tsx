@@ -14,12 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import styled, { css } from 'styled-components';
 
-import DataTable from './DataTable';
+import { VISUALIZATION_TABLE_HEADER_HEIGHT } from 'views/Constants';
 
-export { default as TableDataCell } from './TableDataCell';
-export { default as TableHeaderCell } from './TableHeaderCell';
-export { default as TableHead } from './TableHead';
-export { default as bindings } from './bindings';
+const TableHead = styled.thead(({ theme }) => css`
+  background-color: ${theme.colors.gray[90]};
+  height: ${VISUALIZATION_TABLE_HEADER_HEIGHT}px;
+  color: ${theme.utils.readableColor(theme.colors.gray[90])};
+  position: sticky;
+  top: 0;
+  z-index: 1;
+`);
 
-export default DataTable;
+export default TableHead;

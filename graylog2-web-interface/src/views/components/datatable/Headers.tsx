@@ -45,12 +45,14 @@ const CenteredTh = styled(TableHeaderCell)`
 `;
 
 const PinIcon = styled.button(({ theme }) => css`
+  display: inline-flex;
   border: 0;
   background: transparent;
   padding: 5px;
   cursor: pointer;
   position: relative;
   color: ${theme.colors.gray[70]};
+  vertical-align: middle;
 
   &.active {
     color: ${theme.colors.gray[20]};

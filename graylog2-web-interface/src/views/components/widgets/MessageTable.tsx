@@ -32,7 +32,7 @@ import FieldSortIcon from 'views/components/widgets/FieldSortIcon';
 import Field from 'views/components/Field';
 import MessageTableProviders from 'views/components/messagelist/MessageTableProviders';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
-import { TableHeaderCell } from 'views/components/datatable';
+import { TableHeaderCell, TableHead } from 'views/components/datatable';
 
 import InteractiveContext from '../contexts/InteractiveContext';
 
@@ -78,18 +78,6 @@ const TableWrapper = styled.div(({ theme }) => css`
     &.table-responsive {
       overflow-y: auto;
     }
-  }
-`);
-
-const TableHead = styled.thead(({ theme }) => css`
-  background-color: ${theme.colors.gray[90]};
-  color: ${theme.utils.readableColor(theme.colors.gray[90])};
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  
-  && > tr > th {
-    min-width: 50px;
   }
 `);
 

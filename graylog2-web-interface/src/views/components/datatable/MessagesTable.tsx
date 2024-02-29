@@ -39,10 +39,6 @@ const StyledTable = styled(Table)<{ $stickyHeader: boolean }>(({ theme, $stickyH
     z-index: 2` : ''}
   }
   
-  thead > tr {
-    color: ${theme.colors.global.textAlt};
-  }
-  
   td,
   th {
     position: relative;
