@@ -29,20 +29,20 @@ import java.util.Map;
 /**
  * Job scheduler specific configuration fields for the server configuration file.
  */
-@SuppressWarnings({"FieldCanBeLocal", "unused", "WeakerAccess", "FieldMayBeFinal"})
+@SuppressWarnings({"FieldCanBeLocal", "unused", "WeakerAccess"})
 public class JobSchedulerConfiguration implements PluginConfigBean {
     public static final String LOOP_SLEEP_DURATION = "job_scheduler_loop_sleep_duration";
     public static final String LOCK_EXPIRATION_DURATION = "job_scheduler_lock_expiration_duration";
     public static final String CONCURRENCY_LIMITS = "job_scheduler_concurrency_limits";
 
     @Parameter(value = LOOP_SLEEP_DURATION, validators = PositiveDurationValidator.class)
-    private Duration loopSleepDuration = Duration.seconds(1);
+    private final Duration loopSleepDuration = Duration.seconds(1);
 
     @Parameter(value = LOCK_EXPIRATION_DURATION, validators = Minimum1MinuteValidator.class)
-    private Duration lockExpirationDuration = Duration.minutes(5);
+    private final Duration lockExpirationDuration = Duration.minutes(5);
 
     @Parameter(value = CONCURRENCY_LIMITS, converter = MapConverter.StringInteger.class)
-    private Map<String, Integer> concurrencyLimits = Map.of();
+    private final Map<String, Integer> concurrencyLimits = Map.of();
 
     /**
      * Concurrency limits per job type. A missing entry signifies unlimited concurrency. (up to the number of worker threads)
