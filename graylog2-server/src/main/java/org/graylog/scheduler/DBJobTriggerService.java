@@ -23,7 +23,6 @@ import com.mongodb.BasicDBObject;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import one.util.streamex.StreamEx;
-import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog.scheduler.capabilities.SchedulerCapabilitiesService;
 import org.graylog.scheduler.clock.JobSchedulerClock;
@@ -55,9 +54,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static com.mongodb.client.model.Sorts.ascending;
-import static com.mongodb.client.model.Sorts.descending;
-import static com.mongodb.client.model.Sorts.orderBy;
 import static java.util.Objects.requireNonNull;
 import static org.graylog.scheduler.JobSchedulerConfiguration.LOCK_EXPIRATION_DURATION;
 
@@ -361,8 +357,8 @@ public class DBJobTriggerService {
                         constraintsQuery,
                         DBQuery.lessThan(FIELD_LAST_LOCK_TIME, now.minus(lockExpirationDuration.toMilliseconds())))
         );
-        // We want to lock the trigger with the oldest next time, but prioritise rescheduled jobs
-        final Bson sort = orderBy(ascending(FIELD_NEXT_TIME), descending(FIELD_CONCURRENCY_RESCHEDULE_COUNT));
+        // We want to lock the trigger with the oldest next time
+        final DBSort.SortBuilder sort = DBSort.asc(FIELD_NEXT_TIME);
 
         final DBUpdate.Builder lockUpdate = DBUpdate.set(FIELD_LOCK_OWNER, nodeId)
                 .set(FIELD_LAST_LOCK_OWNER, nodeId)
