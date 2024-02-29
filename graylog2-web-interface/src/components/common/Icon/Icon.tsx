@@ -18,9 +18,7 @@
 import React from 'react';
 import styled, { css, keyframes } from 'styled-components';
 
-import type { SizeProp, RotateProp, IconName, FlipProp } from './types';
-
-type IconTypes = 'regular' | 'solid';
+import type { SizeProp, RotateProp, IconName, FlipProp, IconType } from './types';
 
 const sizeMap = {
   xs: '.938em',
@@ -74,7 +72,7 @@ type Props = {
    * The type regular is needed to outlined icon.
    * Not all icons can be outlined.
    * */
-  type?: IconTypes,
+  type?: IconType,
   style?: React.CSSProperties,
   onClick?: (event: React.MouseEvent) => void,
   onMouseEnter?: (event: React.MouseEvent) => void,

@@ -37,7 +37,7 @@ class DatanodeDirectoriesLockfileCheckTest {
         final Path logsDirLock = logsDir.resolve(DatanodeDirectoriesLockfileCheck.DATANODE_LOCKFILE);
         final Path configDirLock = configDir.resolve(DatanodeDirectoriesLockfileCheck.DATANODE_LOCKFILE);
 
-        final PreflightCheck check = new DatanodeDirectoriesLockfileCheck("5ca1ab1e-0000-4000-a000-000000000000", new DatanodeDirectories(dataDir, logsDir, null, configDir));
+        final PreflightCheck check = new DatanodeDirectoriesLockfileCheck("5ca1ab1e-0000-4000-a000-000000000000", new DatanodeDirectories(dataDir, logsDir, null, configDir, null));
         check.runCheck();
 
         Assertions.assertThat(Files.readString(dataDirLock)).isEqualTo("5ca1ab1e-0000-4000-a000-000000000000");
@@ -59,7 +59,7 @@ class DatanodeDirectoriesLockfileCheckTest {
         Files.writeString(logsDirLock, "5ca1ab1e-0000-4000-a000-000000000000");
         Files.writeString(configDirLock, "5ca1ab1e-0000-4000-a000-000000000000");
 
-        final PreflightCheck check = new DatanodeDirectoriesLockfileCheck("5ca1ab1e-0000-4000-a000-000000000000", new DatanodeDirectories(dataDir, logsDir, null, configDir));
+        final PreflightCheck check = new DatanodeDirectoriesLockfileCheck("5ca1ab1e-0000-4000-a000-000000000000", new DatanodeDirectories(dataDir, logsDir, null, configDir, null));
         check.runCheck();
 
         Assertions.assertThat(Files.readString(dataDirLock)).isEqualTo("5ca1ab1e-0000-4000-a000-000000000000");
@@ -80,7 +80,7 @@ class DatanodeDirectoriesLockfileCheckTest {
         Files.writeString(logsDirLock, "5ca1ab1e-0000-4000-a000-000000000001");
         Files.writeString(configDirLock, "5ca1ab1e-0000-4000-a000-000000000001");
 
-        final PreflightCheck check = new DatanodeDirectoriesLockfileCheck("5ca1ab1e-0000-4000-a000-000000000000", new DatanodeDirectories(dataDir, logsDir, null, configDir));
+        final PreflightCheck check = new DatanodeDirectoriesLockfileCheck("5ca1ab1e-0000-4000-a000-000000000000", new DatanodeDirectories(dataDir, logsDir, null, configDir, null));
 
         Assertions.assertThatThrownBy(check::runCheck)
                 .isInstanceOf(DatanodeLockFileException.class)

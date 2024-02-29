@@ -43,6 +43,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 @Singleton
 public class MigrationActionsImpl implements MigrationActions {
@@ -204,7 +205,8 @@ public class MigrationActionsImpl implements MigrationActions {
 
     @Override
     public boolean isRemoteReindexingFinished() {
-        return getStateMachineContext().getExtendedState(MigrationStateMachineContext.KEY_MIGRATION_ID, String.class)
+        return Optional.ofNullable(getStateMachineContext())
+                .flatMap(ctx -> ctx.getExtendedState(MigrationStateMachineContext.KEY_MIGRATION_ID, String.class))
                 .map(migrationService::status)
                 .filter(m -> m.status() == RemoteReindexingMigrationAdapter.Status.FINISHED)
                 .isPresent();
