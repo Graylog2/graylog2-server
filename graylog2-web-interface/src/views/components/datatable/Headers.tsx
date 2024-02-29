@@ -74,6 +74,7 @@ type HeaderFilterProps = {
   onSetColumnsWidth?: (props: { field: string, offsetWidth: number }) => void
   isPinned?: boolean | undefined,
   showPinIcon?: boolean,
+  setLoadingState: (loading: boolean) => void,
   togglePin: (field: string) => void,
 }
 
@@ -93,6 +94,7 @@ const HeaderField = ({
   isPinned,
   showPinIcon = false,
   togglePin,
+  setLoadingState,
 }: HeaderFilterProps) => {
   const type = fieldTypeFor(field, fields);
   const thRef = useRef(null);
@@ -116,11 +118,11 @@ const HeaderField = ({
       <Field name={field} queryId={activeQuery} type={type}>{title}</Field>
       {showPinIcon && <PinIcon data-testid={`pin-${prefix}${field}`} type="button" onClick={_togglePin} className={isPinned ? 'active' : ''}><Icon name="push_pin" /></PinIcon>}
       {sortable && sortType && (
-      <FieldSortIcon fieldName={field}
-                     onSortChange={onSortChange}
-                     setLoadingState={() => {}}
-                     sortConfigMap={sortConfigMap}
-                     type={sortType} />
+        <FieldSortIcon fieldName={field}
+                       onSortChange={onSortChange}
+                       setLoadingState={setLoadingState}
+                       sortConfigMap={sortConfigMap}
+                       type={sortType} />
       )}
     </TableHeaderCell>
   );
