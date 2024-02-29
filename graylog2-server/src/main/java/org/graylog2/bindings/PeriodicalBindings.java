@@ -58,7 +58,7 @@ public class PeriodicalBindings extends AbstractModule {
         periodicalBinder.addBinding().to(ClusterEventCleanupPeriodical.class);
         periodicalBinder.addBinding().to(IndexRangesCleanupPeriodical.class);
         periodicalBinder.addBinding().to(TrafficCounterCalculator.class);
-        periodicalBinder.addBinding().to(IndexFieldTypePollerPeriodical.class);
+        periodicalBinder.addBinding().to(IndexFieldTypePollerPeriodical.class).asEagerSingleton();
         periodicalBinder.addBinding().to(ScheduleTriggerCleanUp.class);
         periodicalBinder.addBinding().to(ESVersionCheckPeriodical.class);
         periodicalBinder.addBinding().to(UserSessionTerminationPeriodical.class);
