@@ -161,7 +161,7 @@ public class JobExecutionEngine {
 
                 if (!workerPool.execute(() -> handleTriggerWithConcurrencyLimit(trigger))) {
                     // The job couldn't be executed so we have to release the trigger again with the same nextTime
-                    jobTriggerService.releaseTrigger(trigger, JobTriggerUpdate.rescheduleWithNextTime(trigger.nextTime()));
+                    jobTriggerService.releaseTrigger(trigger, JobTriggerUpdate.withNextTime(trigger.nextTime()));
                     executionDenyRate.mark();
                     executionRescheduledRate.mark();
                     return false;
@@ -231,9 +231,9 @@ public class JobExecutionEngine {
         } catch (Exception e) {
             // The trigger cannot be handled because of an unknown error, retry in a few seconds
             // TODO: Check if we need to implement a max-retry after which the trigger is set to ERROR
-            final DateTime nextTime = DateTime.now(DateTimeZone.UTC).plus(slidingBackoff(trigger));
+            final DateTime nextTime = DateTime.now(DateTimeZone.UTC).plusSeconds(5);
             LOG.error("Couldn't handle trigger {} - retrying at {}", trigger.id(), nextTime, e);
-            jobTriggerService.releaseTrigger(trigger, JobTriggerUpdate.rescheduleWithNextTime(nextTime));
+            jobTriggerService.releaseTrigger(trigger, JobTriggerUpdate.withNextTime(nextTime));
         } finally {
             eventBus.post(JobCompletedEvent.INSTANCE);
         }
