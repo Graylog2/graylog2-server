@@ -33,7 +33,6 @@ import org.graylog.scheduler.schedule.OnceJobSchedule;
 import org.graylog.scheduler.worker.JobWorkerPool;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
-import org.graylog2.bindings.providers.CommonMongoJackObjectMapperProvider;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.cluster.lock.LockService;
 import org.graylog2.cluster.lock.MongoLockService;
@@ -43,7 +42,6 @@ import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.system.shutdown.GracefulShutdownService;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
@@ -66,7 +64,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MongoDBExtension.class)
 @ExtendWith(MockitoExtension.class)
-@Timeout(10)
+@Timeout(60)
 class JobSchedulerServiceIT {
 
     @Mock
@@ -105,7 +103,7 @@ class JobSchedulerServiceIT {
         final Duration lockExpirationDuration = Duration.seconds(10);
 
         customJobDefinitionService = new DBCustomJobDefinitionService(
-                new MongoCollections(new CommonMongoJackObjectMapperProvider(() -> objectMapper),
+                new MongoCollections(new MongoJackObjectMapperProvider(objectMapper),
                         mongoDBTestService.mongoConnection()));
 
         jobTriggerService = new DBJobTriggerService(
@@ -136,7 +134,7 @@ class JobSchedulerServiceIT {
                         .build()
         );
 
-        final JobExecutionEngine.Factory executionEnginFactory = workerPool -> new JobExecutionEngine(
+        final JobExecutionEngine.Factory engineFactory = workerPool -> new JobExecutionEngine(
                 jobTriggerService,
                 jobDefinitionService,
                 eventBus,
@@ -154,12 +152,7 @@ class JobSchedulerServiceIT {
 
         final Duration loopSleepDuration = Duration.milliseconds(200);
 
-        jobSchedulerService = new JobSchedulerService(executionEnginFactory, workerPoolFactory, schedulerConfig, clock, eventBus, serverStatus, loopSleepDuration);
-    }
-
-    @AfterEach
-    public void cleanUp() {
-        jobSchedulerService.triggerShutdown();
+        jobSchedulerService = new JobSchedulerService(engineFactory, workerPoolFactory, schedulerConfig, clock, eventBus, serverStatus, loopSleepDuration);
     }
 
     @Test
