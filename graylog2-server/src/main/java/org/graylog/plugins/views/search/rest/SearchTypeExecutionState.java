@@ -42,6 +42,12 @@ public abstract class SearchTypeExecutionState {
     @JsonProperty
     public abstract Optional<Integer> offset();
 
+    @JsonProperty
+    public abstract Optional<Integer> page();
+
+    @JsonProperty
+    public abstract Optional<Integer> perPage();
+    
     @Nullable
     @JsonProperty("after")
     public abstract List<Object> searchAfter();
