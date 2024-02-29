@@ -189,7 +189,7 @@ public class JobExecutionEngine {
                     handleTrigger(trigger);
                 } catch (AlreadyLockedException e) {
                     final DateTime nextTime = DateTime.now(DateTimeZone.UTC).plus(slidingBackoff(trigger));
-                    jobTriggerService.releaseTrigger(trigger, JobTriggerUpdate.rescheduleWithNextTime(nextTime));
+                    jobTriggerService.releaseTrigger(trigger, JobTriggerUpdate.withConcurrencyReschedule(nextTime));
                     executionDenyRate.mark();
                     executionRescheduledRate.mark();
                 }
@@ -204,10 +204,10 @@ public class JobExecutionEngine {
      */
     private Duration slidingBackoff(JobTriggerDto trigger) {
         long slidingBackoffMillis;
-        if (trigger.timesRescheduled() < 1) {
+        if (trigger.concurrencyRescheduleCount() < 1) {
             slidingBackoffMillis = backoffMillis;
         } else {
-            slidingBackoffMillis = backoffMillis / Math.min(trigger.timesRescheduled(), 5);
+            slidingBackoffMillis = backoffMillis / Math.min(trigger.concurrencyRescheduleCount(), 5);
         }
         return Duration.millis(slidingBackoffMillis);
     }

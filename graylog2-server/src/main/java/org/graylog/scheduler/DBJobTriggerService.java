@@ -79,7 +79,7 @@ public class DBJobTriggerService {
     private static final String FIELD_SCHEDULE = JobTriggerDto.FIELD_SCHEDULE;
     private static final String FIELD_DATA = JobTriggerDto.FIELD_DATA;
     private static final String FIELD_UPDATED_AT = JobTriggerDto.FIELD_UPDATED_AT;
-    private static final String FIELD_TIMES_RESCHEDULED = JobTriggerDto.FIELD_TIMES_RESCHEDULED;
+    private static final String FIELD_CONCURRENCY_RESCHEDULE_COUNT = JobTriggerDto.FIELD_CONCURRENCY_RESCHEDULE_COUNT;
     private static final String FIELD_TRIGGERED_AT = JobTriggerDto.FIELD_TRIGGERED_AT;
     private static final String FIELD_CONSTRAINTS = JobTriggerDto.FIELD_CONSTRAINTS;
     private static final String FIELD_LAST_EXECUTION_TIME = JobTriggerDto.FIELD_EXECUTION_DURATION;
@@ -249,7 +249,7 @@ public class DBJobTriggerService {
                 .set(FIELD_NEXT_TIME, trigger.nextTime())
                 .set(FIELD_DATA, trigger.data())
                 .set(FIELD_UPDATED_AT, clock.nowUTC())
-                .set(FIELD_TIMES_RESCHEDULED, trigger.timesRescheduled());
+                .set(FIELD_CONCURRENCY_RESCHEDULE_COUNT, trigger.concurrencyRescheduleCount());
 
         if (trigger.endTime().isPresent()) {
             update.set(FIELD_END_TIME, trigger.endTime());
@@ -362,7 +362,7 @@ public class DBJobTriggerService {
                         DBQuery.lessThan(FIELD_LAST_LOCK_TIME, now.minus(lockExpirationDuration.toMilliseconds())))
         );
         // We want to lock the trigger with the oldest next time, but prioritise rescheduled jobs
-        final Bson sort = orderBy(ascending(FIELD_NEXT_TIME), descending(FIELD_TIMES_RESCHEDULED));
+        final Bson sort = orderBy(ascending(FIELD_NEXT_TIME), descending(FIELD_CONCURRENCY_RESCHEDULE_COUNT));
 
         final DBUpdate.Builder lockUpdate = DBUpdate.set(FIELD_LOCK_OWNER, nodeId)
                 .set(FIELD_LAST_LOCK_OWNER, nodeId)
@@ -408,10 +408,10 @@ public class DBJobTriggerService {
         );
         final DBUpdate.Builder update = DBUpdate.unset(FIELD_LOCK_OWNER);
 
-        if (triggerUpdate.rescheduled()) {
-            update.inc(FIELD_TIMES_RESCHEDULED);
+        if (triggerUpdate.concurrencyReschedule()) {
+            update.inc(FIELD_CONCURRENCY_RESCHEDULE_COUNT);
         } else {
-            update.set(FIELD_TIMES_RESCHEDULED, 0);
+            update.set(FIELD_CONCURRENCY_RESCHEDULE_COUNT, 0);
         }
 
         // An empty next time indicates that this trigger should not be fired anymore. (e.g. for "once" schedules)

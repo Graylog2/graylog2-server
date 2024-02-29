@@ -53,7 +53,7 @@ public abstract class JobTriggerDto {
     public static final String FIELD_DATA = "data";
     static final String FIELD_CONSTRAINTS = "constraints";
     public static final String FIELD_IS_CANCELLED = "is_cancelled";
-    public static final String FIELD_TIMES_RESCHEDULED = "times_rescheduled";
+    public static final String FIELD_CONCURRENCY_RESCHEDULE_COUNT = "concurrency_reschedule_count";
 
     @Id
     @ObjectId
@@ -106,8 +106,8 @@ public abstract class JobTriggerDto {
     @JsonProperty(FIELD_IS_CANCELLED)
     public abstract boolean isCancelled();
 
-    @JsonProperty(FIELD_TIMES_RESCHEDULED)
-    public abstract int timesRescheduled();
+    @JsonProperty(FIELD_CONCURRENCY_RESCHEDULE_COUNT)
+    public abstract int concurrencyRescheduleCount();
 
     public static Builder builder() {
         return Builder.create();
@@ -137,7 +137,7 @@ public abstract class JobTriggerDto {
                     .nextTime(now)
                     .status(JobTriggerStatus.RUNNABLE)
                     .isCancelled(false)
-                    .timesRescheduled(0)
+                    .concurrencyRescheduleCount(0)
                     .constraints(ImmutableSet.of())
                     .lock(JobTriggerLock.empty());
         }
@@ -192,8 +192,8 @@ public abstract class JobTriggerDto {
         @JsonProperty(FIELD_IS_CANCELLED)
         public abstract Builder isCancelled(boolean isCancelled);
 
-        @JsonProperty(FIELD_TIMES_RESCHEDULED)
-        public abstract Builder timesRescheduled(int timesRescheduled);
+        @JsonProperty(FIELD_CONCURRENCY_RESCHEDULE_COUNT)
+        public abstract Builder concurrencyRescheduleCount(int timesRescheduled);
 
         public abstract JobTriggerDto build();
     }

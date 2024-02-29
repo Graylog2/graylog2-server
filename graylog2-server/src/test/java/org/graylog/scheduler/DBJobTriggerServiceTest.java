@@ -224,7 +224,6 @@ public class DBJobTriggerServiceTest {
     }
 
 
-
     @Test
     @MongoDBFixtures("job-triggers.json")
     public void getForJobs() {
@@ -322,7 +321,7 @@ public class DBJobTriggerServiceTest {
                 .createdAt(now)
                 .updatedAt(now)
                 .triggeredAt(now)
-                .timesRescheduled(99)
+                .concurrencyRescheduleCount(99)
                 .status(JobTriggerStatus.ERROR)
                 .lock(JobTriggerLock.builder()
                         .owner("yolo")
@@ -349,7 +348,7 @@ public class DBJobTriggerServiceTest {
                     assertThat(dto.endTime()).isEqualTo(updatedTrigger.endTime());
                     assertThat(dto.updatedAt()).isEqualTo(updatedTrigger.updatedAt());
                     assertThat(dto.schedule()).isEqualTo(updatedTrigger.schedule());
-                    assertThat(dto.timesRescheduled()).isEqualTo(updatedTrigger.timesRescheduled());
+                    assertThat(dto.concurrencyRescheduleCount()).isEqualTo(updatedTrigger.concurrencyRescheduleCount());
                 });
 
         assertThatCode(() -> dbJobTriggerService.update(null))
@@ -540,7 +539,7 @@ public class DBJobTriggerServiceTest {
         final JobTriggerDto trigger2 = dbJobTriggerService.create(JobTriggerDto.Builder.create(clock)
                 .jobDefinitionId("abc-2")
                 .jobDefinitionType("event-processor-execution-v1")
-                .timesRescheduled(1)
+                .concurrencyRescheduleCount(1)
                 .nextTime(clock.nowUTC().plusSeconds(11))
                 .schedule(IntervalJobSchedule.builder()
                         .interval(1)
@@ -551,7 +550,7 @@ public class DBJobTriggerServiceTest {
         final JobTriggerDto trigger3 = dbJobTriggerService.create(JobTriggerDto.Builder.create(clock)
                 .jobDefinitionId("abc-3")
                 .jobDefinitionType("event-processor-execution-v1")
-                .timesRescheduled(2)
+                .concurrencyRescheduleCount(2)
                 .nextTime(clock.nowUTC().plusSeconds(11))
                 .schedule(IntervalJobSchedule.builder()
                         .interval(1)
