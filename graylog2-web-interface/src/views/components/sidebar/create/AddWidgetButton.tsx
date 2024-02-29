@@ -80,12 +80,6 @@ type OverflowingComponents = { [key: string]: React.ReactNode }
 
 export const isCreatorFunc = (creator: Creator): creator is FunctionalCreator => ('func' in creator);
 
-const WithDispatch = ({ children }: { children: (dispatch: AppDispatch) => JSX.Element }) => {
-  const dispatch = useAppDispatch();
-
-  return children(dispatch);
-};
-
 const CreateMenuItem = ({
   creator,
   onClick,
@@ -97,9 +91,10 @@ const CreateMenuItem = ({
 }) => {
   const location = useLocation();
   const sendTelemetry = useSendTelemetry();
+  const dispatch = useAppDispatch();
   const disabled = creator.useCondition?.() === false;
 
-  const createHandlerFor = (dispatch: AppDispatch) => {
+  const createHandlerFor = () => {
     if (isCreatorFunc(creator)) {
       return () => {
         sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_CREATE[upperCase(creator.title).replace(/ /g, '_')], {
@@ -150,15 +145,11 @@ const CreateMenuItem = ({
   };
 
   return (
-    <WithDispatch key={creator.title}>
-      {(dispatch) => (
-        <CreateButton key={creator.title}
-                      onClick={createHandlerFor(dispatch)}
-                      disabled={disabled}>
-          {creator.title}
-        </CreateButton>
-      )}
-    </WithDispatch>
+    <CreateButton key={creator.title}
+                  onClick={createHandlerFor()}
+                  disabled={disabled}>
+      {creator.title}
+    </CreateButton>
   );
 };
 
