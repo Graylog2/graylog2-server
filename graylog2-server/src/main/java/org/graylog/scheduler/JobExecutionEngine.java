@@ -100,7 +100,7 @@ public class JobExecutionEngine {
                               JobTriggerUpdates.Factory jobTriggerUpdatesFactory,
                               RefreshingLockService.Factory refreshingLockServiceFactory,
                               Map<String, Job.Factory> jobFactory,
-                              @Assisted JobWorkerPool workerPool,
+                              JobWorkerPool workerPool,
                               JobSchedulerConfig schedulerConfig,
                               MetricRegistry metricRegistry,
                               long backoffMillis) {
