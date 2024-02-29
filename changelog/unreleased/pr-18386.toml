@@ -1,0 +1,4 @@
+type = "a"
+message = "bumping OpenSearch inside the DataNode to 2.12.0"
+
+pulls = ["18386"]

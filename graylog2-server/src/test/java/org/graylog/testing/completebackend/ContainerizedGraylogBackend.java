@@ -108,7 +108,11 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
     }
 
     private void createLicenses(final MongoDBInstance mongoDBInstance, final String... licenseStrs) {
-        final List<String> licenses = Arrays.stream(licenseStrs).map(System::getenv).filter(StringUtils::isNotBlank).collect(Collectors.toList());
+        final List<String> licenses = Arrays.stream(licenseStrs)
+                .map(System::getenv)
+                .filter(StringUtils::isNotBlank)
+                .map(String::trim)
+                .collect(Collectors.toList());
         if (!licenses.isEmpty()) {
             ServiceLoader<TestLicenseImporter> loader = ServiceLoader.load(TestLicenseImporter.class);
             loader.forEach(importer -> importer.importLicenses(mongoDBInstance, licenses));
