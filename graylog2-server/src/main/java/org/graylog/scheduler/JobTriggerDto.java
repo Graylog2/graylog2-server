@@ -107,8 +107,7 @@ public abstract class JobTriggerDto {
     public abstract boolean isCancelled();
 
     @JsonProperty(FIELD_TIMES_RESCHEDULED)
-    @Nullable
-    public abstract Integer timesRescheduled();
+    public abstract int timesRescheduled();
 
     public static Builder builder() {
         return Builder.create();
