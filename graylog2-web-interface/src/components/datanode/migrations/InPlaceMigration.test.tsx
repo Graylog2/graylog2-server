@@ -87,7 +87,7 @@ const renderStep = (_state: MigrationStateItem) => {
 };
 
 describe('InPlaceMigration', () => {
-  it('should render Welcome step', async () => {
+  it('should render In-Place migration Welcome step', async () => {
     renderStep(MIGRATION_STATE.ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE.key);
 
     await screen.findByRole('button', {
