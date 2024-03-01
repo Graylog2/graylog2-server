@@ -18,14 +18,17 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 import { Col, Panel, PanelGroup } from 'components/bootstrap';
-import { MIGRATION_STATE, ROLLING_UPGRADE_MIGRATION_STEPS } from 'components/datanode/Constants';
 import type { MigrationActions, StepArgs, MigrationStateItem, MigrationStepComponentProps } from 'components/datanode/Types';
-import Welcome from 'components/datanode/migrations/rollingUpgrade/Welcome';
+import {
+  IN_PLACE_MIGRATION_STEPS,
+  MIGRATION_STATE,
+} from 'components/datanode/Constants';
+import Welcome from 'components/datanode/migrations/in-place/Welcome';
 import CertificatesProvisioning from 'components/datanode/migrations/common/CertificatesProvisioning';
-import JournalDowntimeWarning from 'components/datanode/migrations/rollingUpgrade/JournalDowntimeWarning';
-import StopMessageProcessing from 'components/datanode/migrations/rollingUpgrade/StopMessageProcessing';
+import JournalDowntimeWarning from 'components/datanode/migrations/in-place/JournalDowntimeWarning';
+import StopMessageProcessing from 'components/datanode/migrations/in-place/StopMessageProcessing';
 import CompatibilityCheckStep from 'components/datanode/migrations/CompatibilityCheckStep';
-import RestartGraylog from 'components/datanode/migrations/rollingUpgrade/RestartGraylog';
+import RestartGraylog from 'components/datanode/migrations/in-place/RestartGraylog';
 import MigrationError from 'components/datanode/migrations/common/MigrationError';
 
 const StyledTitle = styled.h3`
@@ -59,7 +62,7 @@ const StyledPanelGroup = styled(PanelGroup)`
   }
 `;
 
-const RollingUpgradeMigration = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => {
+const InPlaceMigration = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => {
   const { state: activeStep } = currentStep;
 
   const onStepComplete = async (step: MigrationActions, args: StepArgs = {}) => onTriggerStep(step, args);
@@ -86,16 +89,16 @@ const RollingUpgradeMigration = ({ currentStep, onTriggerStep }: MigrationStepCo
 
   return (
     <Col>
-      <StyledTitle>Rolling upgrade migration</StyledTitle>
+      <StyledTitle>In-Place migration</StyledTitle>
       <p>Follow these steps to migrate your existing OpenSearch version 2.x or 1.3.x cluster to Data
         Nodes.
       </p>
       <StyledPanelGroup accordion id="first" activeKey={activeStep} onSelect={() => {}}>
-        {ROLLING_UPGRADE_MIGRATION_STEPS.map((rollingUpgradeStep, index) => {
-          const { description } = MIGRATION_STATE[rollingUpgradeStep];
+        {IN_PLACE_MIGRATION_STEPS.map((inPlaceStep, index) => {
+          const { description } = MIGRATION_STATE[inPlaceStep];
 
           return (
-            <Panel eventKey={rollingUpgradeStep} key={rollingUpgradeStep} collapsible={false}>
+            <Panel eventKey={inPlaceStep} key={inPlaceStep} collapsible={false}>
               <Panel.Heading>
                 <Panel.Title>
                   <Panel.Toggle tabIndex={index}>{`${index + 1}. ${description}`}</Panel.Toggle>
@@ -104,7 +107,7 @@ const RollingUpgradeMigration = ({ currentStep, onTriggerStep }: MigrationStepCo
               <Panel.Collapse>
                 <Panel.Body>
                   <MigrationError errorMessage={currentStep.error_message} />
-                  {getStepComponent(rollingUpgradeStep)}
+                  {getStepComponent(inPlaceStep)}
                 </Panel.Body>
               </Panel.Collapse>
             </Panel>
@@ -116,4 +119,4 @@ const RollingUpgradeMigration = ({ currentStep, onTriggerStep }: MigrationStepCo
   );
 };
 
-export default RollingUpgradeMigration;
+export default InPlaceMigration;

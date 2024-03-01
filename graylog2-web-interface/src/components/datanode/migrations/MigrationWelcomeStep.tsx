@@ -73,7 +73,7 @@ const MigrationWelcomeStep = ({ currentStep, onTriggerStep }: MigrationStepCompo
           </p>
           <h5>Migrating an OpenSearch Cluster</h5>
           <p>
-            Depending on how you secured your existing cluster, some preliminary changes are needed to the security configuration. We use JWT authentication between Graylog and OpenSearch. If you want to perform a rolling upgrade of your existing cluster into the Data Node, you have to manually include JWT authentication to your existing OpenSearch cluster prior to running the migration wizard.
+            Depending on how you secured your existing cluster, some preliminary changes are needed to the security configuration. We use JWT authentication between Graylog and OpenSearch. If you want to perform an In-Place migration of your existing cluster into the Data Node, you have to manually include JWT authentication to your existing OpenSearch cluster prior to running the migration wizard.
           </p>
           <p>
             Enable JWT authentication in <code>opensearch-security/config.yml</code> (section <code>jwt_auth_domain</code>, <code>http_enabled: true</code>, <code>transport_enabled: true</code>)

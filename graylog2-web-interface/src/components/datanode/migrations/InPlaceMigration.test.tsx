@@ -19,7 +19,7 @@ import { render, screen } from 'wrappedTestingLibrary';
 
 import type { MigrationState, MigrationStateItem } from 'components/datanode/Types';
 
-import RollingUpgradeMigration from './RollingUpgradeMigration';
+import InPlaceMigration from './InPlaceMigration';
 
 import { MIGRATION_STATE } from '../Constants';
 
@@ -83,15 +83,15 @@ const renderStep = (_state: MigrationStateItem) => {
     response: null,
   } as MigrationState);
 
-  render(<RollingUpgradeMigration onTriggerStep={async () => ({} as MigrationState)} currentStep={getCurrentStep(_state)} />);
+  render(<InPlaceMigration onTriggerStep={async () => ({} as MigrationState)} currentStep={getCurrentStep(_state)} />);
 };
 
-describe('RollingUpgradeMigration', () => {
+describe('InPlaceMigration', () => {
   it('should render Welcome step', async () => {
     renderStep(MIGRATION_STATE.ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE.key);
 
     await screen.findByRole('button', {
-      name: /1. Welcome to Rolling upgrade migration/i,
+      name: /1. Welcome to In-Place migration/i,
     });
 
     await screen.findByRole('heading', { name: /Welcome/i });

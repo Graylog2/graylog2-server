@@ -40,3 +40,8 @@ import { DATE_TIME_FORMATS } from 'util/DateTime';
   </tbody>
 </table>
 ```
+
+#### Current time
+```tsx
+<Timestamp dateTime={new Date()} />
+```
