@@ -19,6 +19,7 @@ package org.graylog.scheduler;
 import com.codahale.metrics.MetricRegistry;
 import org.graylog.scheduler.eventbus.JobSchedulerEventBus;
 import org.graylog.scheduler.worker.JobWorkerPool;
+import org.graylog2.cluster.lock.RefreshingLockService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;

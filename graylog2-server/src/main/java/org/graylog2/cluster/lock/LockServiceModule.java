@@ -18,7 +18,6 @@ package org.graylog2.cluster.lock;
 
 import com.google.inject.Scopes;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
-import org.graylog.scheduler.RefreshingLockService;
 import org.graylog2.plugin.PluginModule;
 
 public class LockServiceModule extends PluginModule {

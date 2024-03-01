@@ -36,6 +36,7 @@ import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.cluster.lock.LockService;
 import org.graylog2.cluster.lock.MongoLockService;
+import org.graylog2.cluster.lock.RefreshingLockService;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.system.NodeId;

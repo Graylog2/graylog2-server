@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.scheduler;
+package org.graylog2.cluster.lock;
 
 public class AlreadyLockedException extends Exception {
     public AlreadyLockedException(String message) {

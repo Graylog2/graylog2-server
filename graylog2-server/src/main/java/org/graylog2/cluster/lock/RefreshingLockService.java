@@ -14,12 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.scheduler;
+package org.graylog2.cluster.lock;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-import org.graylog2.cluster.lock.Lock;
-import org.graylog2.cluster.lock.LockService;
 
 import java.time.Duration;
 import java.util.Optional;
@@ -52,15 +50,15 @@ public class RefreshingLockService implements AutoCloseable {
     public void acquireAndKeepLock(String resource, int maxConcurrency) throws AlreadyLockedException {
         Optional<Lock> optionalLock = lockService.lock(resource, maxConcurrency);
         if (optionalLock.isEmpty()) {
-            throw new AlreadyLockedException(f("Could not acquire lock for resource <%s> with max. concurrency <%d>", resource, maxConcurrency));
+            throw new AlreadyLockedException(f("Could not acquire lock for resource <%s> with max concurrency <%d>", resource, maxConcurrency));
         }
         scheduleLock(optionalLock.get());
     }
 
-    public void acquireAndKeepLock(String resource, String triggerId) throws AlreadyLockedException {
-        Optional<Lock> optionalLock = lockService.lock(resource, triggerId);
+    public void acquireAndKeepLock(String resource, String lockContext) throws AlreadyLockedException {
+        Optional<Lock> optionalLock = lockService.lock(resource, lockContext);
         if (optionalLock.isEmpty()) {
-            throw new AlreadyLockedException(f("Could not acquire lock for resource <%s> triggerId <%s>", resource, triggerId));
+            throw new AlreadyLockedException(f("Could not acquire lock for resource <%s> and lock context <%s>", resource, lockContext));
         }
         scheduleLock(optionalLock.get());
     }
