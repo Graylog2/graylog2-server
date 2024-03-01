@@ -106,6 +106,13 @@ public abstract class EventList implements SearchType {
 
     @Override
     public SearchType applyExecutionContext(SearchTypeExecutionState state) {
+        if (state.page().isPresent() || state.perPage().isPresent()) {
+            final var builder = toBuilder();
+            state.page().ifPresent(builder::page);
+            state.perPage().ifPresent(builder::perPage);
+            return builder.build();
+        }
+
         return this;
     }
 
