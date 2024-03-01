@@ -21,7 +21,6 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog2.cluster.leader.LeaderElectionService;
 
-import javax.annotation.Nullable;
 import java.util.Map;
 
 /**
@@ -49,7 +48,6 @@ public class DefaultJobSchedulerConfig implements JobSchedulerConfig {
     }
 
     @Override
-    @Nullable
     public Map<String, Integer> concurrencyLimits() {
         return ImmutableMap.copyOf(config.getConcurrencyLimits());
     }
