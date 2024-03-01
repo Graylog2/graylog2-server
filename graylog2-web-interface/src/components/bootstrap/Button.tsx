@@ -18,7 +18,7 @@ import * as React from 'react';
 import type { ColorVariant } from '@graylog/sawmill';
 import { Button as MantineButton } from '@mantine/core';
 import type { DefaultTheme } from 'styled-components';
-import styled, { css } from 'styled-components';
+import styled, { useTheme, css } from 'styled-components';
 
 import type { BsSize } from 'components/bootstrap/types';
 
@@ -38,11 +38,10 @@ export type StyleProps = ColorVariant | 'link';
 
 const mapStyle = (style: StyleProps) => (style === 'default' ? 'gray' : style);
 
-const styleProps = (style: StyleProps) => {
+const stylesProps = (style: StyleProps) => {
   switch (style) {
-    case 'default': return { color: 'gray' };
     case 'link': return { variant: 'subtle' };
-    default: return { color: style };
+    default: return {};
   }
 };
 
@@ -104,32 +103,36 @@ const StyledButton = styled(MantineButton)<{
   theme,
   $bsStyle,
   $bsSize,
-}) => css`
-  color: ${theme.colors.contrast[$bsStyle]};
-  font-weight: 400;
-  overflow: visible;
+}) => {
+  const textColor = $bsStyle === 'link' ? theme.colors.global.link : theme.colors.button[$bsStyle].color;
 
-  ${disabledStyles(theme.colors, $bsStyle)}
-  ${stylesForSize($bsSize)}
-
-  &:hover {
-    color: ${theme.colors.contrast[$bsStyle]};
-    text-decoration: none;
-  }
-
-  &:focus {
-    color: ${theme.colors.contrast[$bsStyle]};
-    text-decoration: none;
-  }
-
-  .mantine-Button-label {
-    gap: 0.25em;
+  return css`
+    color: ${textColor};
+    font-weight: 400;
     overflow: visible;
-  }
-  .mantine-Button-loader {
-    visibility: hidden;
-  }
-`);
+
+    ${disabledStyles(theme.colors, $bsStyle)}
+    ${stylesForSize($bsSize)}
+
+    &:hover {
+      color: ${textColor};
+      text-decoration: none;
+    }
+
+    &:focus {
+      color: ${textColor};
+      text-decoration: none;
+    }
+
+    .mantine-Button-label {
+      gap: 0.25em;
+      overflow: visible;
+    }
+    .mantine-Button-loader {
+      visibility: hidden;
+    }
+  `;
+});
 
 type Props = React.PropsWithChildren<{
   active?: boolean,
@@ -157,15 +160,18 @@ const Button = React.forwardRef<HTMLButtonElement, Props>(
     'aria-label': ariaLabel, bsStyle, bsSize, className, 'data-testid': dataTestId, id, onClick, disabled, href,
     title, form, target, type, rel, role, name, tabIndex, children,
   }, ref) => {
+    const theme = useTheme();
     const style = mapStyle(bsStyle);
+    const color = style === 'link' ? 'transparent' : theme.colors.button[style].background;
 
     const sharedProps = {
       id,
       'aria-label': ariaLabel,
       className,
-      ...styleProps(style),
+      ...stylesProps(style),
       $bsStyle: style,
       $bsSize: bsSize,
+      color,
       'data-testid': dataTestId,
       disabled,
       role,
