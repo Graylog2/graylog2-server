@@ -15,36 +15,39 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
+import { act } from 'react-dom/test-utils';
 
 import LoadingIndicator from 'components/common/LoadingIndicator';
 
+jest.useFakeTimers();
+
 describe('<LoadingIndicator />', () => {
-  it('Use defaults props to change loading text after timeout', async () => {
-    render(<LoadingIndicator longWaitTimeout={1000} />);
+  it('Use defaults props to change loading text after default timeout', async () => {
+    render(<LoadingIndicator />);
 
     await screen.findByText('Loading...');
 
-    await waitFor(() => {
-      expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
-    }, { timeout: 1000 });
+    act(() => {
+      jest.advanceTimersByTime(20000);
+    });
 
-    await waitFor(() => {
-      expect(screen.getByText('This is taking a bit longer, please hold on...')).toBeInTheDocument();
-    }, { timeout: 1000 });
+    expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
+
+    await screen.findByText('This is taking a bit longer, please hold on...');
   });
 
   it('Use passed props to change loading text after timeout', async () => {
-    render(<LoadingIndicator text="Loading data..." longWaitText="It takes some time. Please wait a bit more..." longWaitTimeout={1000} />);
+    render(<LoadingIndicator text="Loading data..." longWaitText="It takes some time. Please wait a bit more..." longWaitTimeout={30000} />);
 
     await screen.findByText('Loading data...');
 
-    await waitFor(() => {
-      expect(screen.queryByText('Loading data...')).not.toBeInTheDocument();
-    }, { timeout: 1000 });
+    act(() => {
+      jest.advanceTimersByTime(30000);
+    });
 
-    await waitFor(() => {
-      expect(screen.getByText('It takes some time. Please wait a bit more...')).toBeInTheDocument();
-    }, { timeout: 1000 });
+    expect(screen.queryByText('Loading data...')).not.toBeInTheDocument();
+
+    await screen.findByText('It takes some time. Please wait a bit more...');
   });
 });
