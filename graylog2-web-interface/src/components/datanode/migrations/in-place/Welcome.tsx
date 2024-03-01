@@ -22,7 +22,7 @@ import MigrationDatanodeList from 'components/datanode/migrations/MigrationDatan
 import useDataNodes from 'components/datanode/hooks/useDataNodes';
 import type { MigrationStepComponentProps } from 'components/datanode/Types';
 import MigrationStepTriggerButtonToolbar from 'components/datanode/migrations/common/MigrationStepTriggerButtonToolbar';
-import JournalSizeWarning from 'components/datanode/migrations/rollingUpgrade/JournalSizeWarning';
+import JournalSizeWarning from 'components/datanode/migrations/in-place/JournalSizeWarning';
 
 const Welcome = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => {
   const { data: dataNodes } = useDataNodes();
@@ -32,7 +32,7 @@ const Welcome = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) =>
       <Row>
         <Col md={6}>
           <h3>Welcome</h3>
-          <p>A rolling upgrade will migrate the data folder of your existing cluster to a Data Node cluster.</p>
+          <p>An In-Place migration will migrate the data folder of your existing cluster to a Data Node cluster.</p>
           <p>To start please install Data Node on every OS/ES node from your previous setup. You can find more information on how to download and install the Data Node <DocumentationLink page="graylog-data-node" text="here" />.</p>
           <MigrationDatanodeList />
         </Col>
