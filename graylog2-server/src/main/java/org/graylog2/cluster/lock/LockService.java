@@ -41,8 +41,7 @@ public interface LockService {
     Optional<Lock> lock(@Nonnull String resource);
 
     /**
-     * Request a concurrency lock. Fails if too many locks of this type already allocated.
-     * Does not extend the expiry time of existing locks.
+     * Request a concurrency lock. Fails if too many locks of this resource are already allocated.
      *
      * @param resource       Unique identifier for the resource that should be guarded by this lock.
      * @param maxConcurrency Do not allocate more than this number of lock instance.
