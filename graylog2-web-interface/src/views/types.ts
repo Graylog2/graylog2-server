@@ -57,6 +57,7 @@ import type { Event } from 'components/events/events/types';
 import type Parameter from 'views/logic/parameters/Parameter';
 import type { UndoRedoState } from 'views/logic/slices/undoRedoSlice';
 import type { SearchExecutors } from 'views/logic/slices/searchExecutionSlice';
+import type { JobIds } from 'views/stores/SearchJobs';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> =
   ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
@@ -378,11 +379,14 @@ export type SearchExecutionResult = {
   widgetMapping: WidgetMapping,
 };
 
+export type JobIdsState = JobIds & { abortController: AbortController } | null;
+
 export interface SearchExecution {
   executionState: SearchExecutionState;
   result: SearchExecutionResult;
   isLoading: boolean;
   widgetsToSearch: Array<string>,
+  jobIds: JobIds & { abortController: AbortController } | null,
 }
 
 export interface SearchMetadataState {

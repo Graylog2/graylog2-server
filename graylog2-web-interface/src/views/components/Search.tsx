@@ -47,7 +47,7 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import SynchronizeUrl from 'views/components/SynchronizeUrl';
 import useView from 'views/hooks/useView';
 import useAppDispatch from 'stores/useAppDispatch';
-import { execute } from 'views/logic/slices/searchExecutionSlice';
+import { cancelExecutedJob, execute } from 'views/logic/slices/searchExecutionSlice';
 import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
 import useAppSelector from 'stores/useAppSelector';
 import useParameters from 'views/hooks/useParameters';
@@ -128,6 +128,10 @@ const Search = () => {
 
     StreamsActions.refresh();
   }, []);
+
+  useEffect(() => () => {
+    dispatch(cancelExecutedJob());
+  }, [dispatch]);
 
   return (
     <>
