@@ -111,6 +111,10 @@ public class DBJobTriggerServiceTest {
             assertThat(dto.updatedAt()).isEqualTo(DateTime.parse("2019-01-01T00:00:00.000Z"));
             assertThat(dto.triggeredAt()).isNotPresent();
             assertThat(dto.status()).isEqualTo(JobTriggerStatus.RUNNABLE);
+            assertThat(dto.executionDurationMs()).isEmpty();
+            assertThat(dto.concurrencyRescheduleCount()).isEqualTo(0);
+            assertThat(dto.constraints()).isEmpty();
+            assertThat(dto.isCancelled()).isFalse();
 
             assertThat(dto.lock().owner()).isNull();
             assertThat(dto.lock().lastLockTime()).isNull();
@@ -135,6 +139,10 @@ public class DBJobTriggerServiceTest {
             assertThat(dto.updatedAt()).isEqualTo(DateTime.parse("2019-01-01T00:00:00.000Z"));
             assertThat(dto.triggeredAt()).isNotPresent();
             assertThat(dto.status()).isEqualTo(JobTriggerStatus.RUNNABLE);
+            assertThat(dto.executionDurationMs()).isEmpty();
+            assertThat(dto.concurrencyRescheduleCount()).isEqualTo(0);
+            assertThat(dto.constraints()).isEmpty();
+            assertThat(dto.isCancelled()).isFalse();
 
             assertThat(dto.lock().owner()).isNull();
             assertThat(dto.lock().lastLockTime()).isNull();
@@ -163,6 +171,10 @@ public class DBJobTriggerServiceTest {
             assertThat(dto.updatedAt()).isEqualTo(DateTime.parse("2019-01-01T00:00:00.000Z"));
             assertThat(dto.triggeredAt()).isPresent().get().isEqualTo(DateTime.parse("2019-01-01T01:00:00.000Z"));
             assertThat(dto.status()).isEqualTo(JobTriggerStatus.RUNNING);
+            assertThat(dto.executionDurationMs()).isEmpty();
+            assertThat(dto.concurrencyRescheduleCount()).isEqualTo(0);
+            assertThat(dto.constraints()).isEmpty();
+            assertThat(dto.isCancelled()).isFalse();
 
             assertThat(dto.lock().owner()).isEqualTo(NODE_ID);
             assertThat(dto.lock().lastLockTime()).isEqualTo(DateTime.parse("2019-01-01T01:00:00.000Z"));
@@ -314,17 +326,22 @@ public class DBJobTriggerServiceTest {
 
         final JobTriggerDto updatedTrigger = originalTrigger.toBuilder()
                 .jobDefinitionId("xyz-123")
-                .jobDefinitionType("event-processor-execution-v1")
+                .jobDefinitionType("event-processor-execution-v2")
                 .startTime(now)
                 .endTime(now)
                 .nextTime(now)
                 .createdAt(now)
                 .updatedAt(now)
                 .triggeredAt(now)
+                .constraints(Set.of("nope"))
+                .executionDurationMs(42L)
                 .concurrencyRescheduleCount(99)
+                .isCancelled(true)
                 .status(JobTriggerStatus.ERROR)
                 .lock(JobTriggerLock.builder()
                         .owner("yolo")
+                        .lastOwner("yolo2")
+                        .progress(42)
                         .build())
                 .schedule(OnceJobSchedule.create())
                 .build();
@@ -342,6 +359,9 @@ public class DBJobTriggerServiceTest {
                     assertThat(dto.triggeredAt()).isEqualTo(originalTrigger.triggeredAt());
                     assertThat(dto.status()).isEqualTo(originalTrigger.status());
                     assertThat(dto.lock()).isEqualTo(originalTrigger.lock());
+                    assertThat(dto.constraints()).isEmpty();
+                    assertThat(dto.executionDurationMs()).isEmpty();
+                    assertThat(dto.isCancelled()).isFalse();
 
                     // These should be updated:
                     assertThat(dto.startTime()).isEqualTo(updatedTrigger.startTime());
@@ -521,61 +541,8 @@ public class DBJobTriggerServiceTest {
         assertThat(service.nextRunnableTrigger()).isEmpty();
     }
 
-    @Test
-    public void nextRunnableTriggerRescheduled() {
-        // No triggers yet
-        assertThat(dbJobTriggerService.nextRunnableTrigger()).isEmpty();
 
-        final JobTriggerDto trigger1 = dbJobTriggerService.create(JobTriggerDto.Builder.create(clock)
-                .jobDefinitionId("abc-1")
-                .jobDefinitionType("event-processor-execution-v1")
-                .nextTime(clock.nowUTC().plusSeconds(10))
-                .schedule(IntervalJobSchedule.builder()
-                        .interval(1)
-                        .unit(TimeUnit.SECONDS)
-                        .build())
-                .build());
-
-        final JobTriggerDto trigger2 = dbJobTriggerService.create(JobTriggerDto.Builder.create(clock)
-                .jobDefinitionId("abc-2")
-                .jobDefinitionType("event-processor-execution-v1")
-                .concurrencyRescheduleCount(1)
-                .nextTime(clock.nowUTC().plusSeconds(11))
-                .schedule(IntervalJobSchedule.builder()
-                        .interval(1)
-                        .unit(TimeUnit.SECONDS)
-                        .build())
-                .build());
-
-        final JobTriggerDto trigger3 = dbJobTriggerService.create(JobTriggerDto.Builder.create(clock)
-                .jobDefinitionId("abc-3")
-                .jobDefinitionType("event-processor-execution-v1")
-                .concurrencyRescheduleCount(2)
-                .nextTime(clock.nowUTC().plusSeconds(11))
-                .schedule(IntervalJobSchedule.builder()
-                        .interval(1)
-                        .unit(TimeUnit.SECONDS)
-                        .build())
-                .build());
-
-        // First try is empty because the next time of the trigger is in the future
-        assertThat(dbJobTriggerService.nextRunnableTrigger()).isEmpty();
-
-        clock.plus(20, TimeUnit.SECONDS);
-
-        // First expecting trigger1, since it has lowest nextTime
-        assertNextTrigger(dbJobTriggerService.nextRunnableTrigger(), trigger1);
-
-        // Expecting trigger3, since it has been rescheduled more
-        assertNextTrigger(dbJobTriggerService.nextRunnableTrigger(), trigger3);
-
-        // Expecting last trigger
-        assertNextTrigger(dbJobTriggerService.nextRunnableTrigger(), trigger2);
-
-        // No trigger left
-        assertThat(dbJobTriggerService.nextRunnableTrigger()).isEmpty();
-    }
-
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private void assertNextTrigger(Optional<JobTriggerDto> trigger, JobTriggerDto expected) {
         assertThat(trigger)
                 .isNotEmpty()
@@ -596,6 +563,7 @@ public class DBJobTriggerServiceTest {
         final JobTriggerDto trigger1 = dbJobTriggerService.create(JobTriggerDto.Builder.create(clock)
                 .jobDefinitionId("abc-123")
                 .jobDefinitionType("event-processor-execution-v1")
+                .concurrencyRescheduleCount(42)
                 .schedule(IntervalJobSchedule.builder()
                         .interval(1)
                         .unit(TimeUnit.SECONDS)
@@ -608,10 +576,13 @@ public class DBJobTriggerServiceTest {
         assertThat(dbJobTriggerService.releaseTrigger(trigger1, update)).isFalse();
 
         // Lock the trigger
-        assertThat(dbJobTriggerService.nextRunnableTrigger()).isNotEmpty();
+        final Optional<JobTriggerDto> runnableTrigger = dbJobTriggerService.nextRunnableTrigger();
+        assertThat(runnableTrigger).isNotEmpty();
+
+        clock.plus(15, TimeUnit.SECONDS);
 
         // Releasing the trigger should work now
-        assertThat(dbJobTriggerService.releaseTrigger(trigger1, update)).isTrue();
+        assertThat(dbJobTriggerService.releaseTrigger(runnableTrigger.get(), update)).isTrue();
 
         assertThat(dbJobTriggerService.get(trigger1.id()))
                 .isPresent()
@@ -621,10 +592,52 @@ public class DBJobTriggerServiceTest {
                     assertThat(trigger.lock().owner()).isNull();
                     assertThat(trigger.status()).isEqualTo(JobTriggerStatus.RUNNABLE);
                     assertThat(trigger.nextTime()).isEqualTo(update.nextTime().orElse(null));
+                    assertThat(trigger.executionDurationMs()).isPresent().get().isEqualTo(15_000L);
+                    assertThat(trigger.concurrencyRescheduleCount()).isEqualTo(0);
                     assertThat(trigger.data()).isPresent().get().satisfies(data -> {
                         assertThat(data).isInstanceOf(TestJobTriggerData.class);
                         assertThat(data).isEqualTo(TestJobTriggerData.create(Collections.singletonMap("hello", "world")));
                     });
+                });
+
+        // Releasing it again doesn't do anything
+        assertThat(dbJobTriggerService.releaseTrigger(trigger1, update)).isFalse();
+    }
+
+    @Test
+    public void releaseTriggerWithConcurrencyRescheduleCount() {
+        final JobTriggerDto trigger1 = dbJobTriggerService.create(JobTriggerDto.Builder.create(clock)
+                .jobDefinitionId("abc-123")
+                .jobDefinitionType("event-processor-execution-v1")
+                .concurrencyRescheduleCount(0)
+                .schedule(IntervalJobSchedule.builder()
+                        .interval(1)
+                        .unit(TimeUnit.SECONDS)
+                        .build())
+                .build());
+        final JobTriggerUpdate update = JobTriggerUpdate.withConcurrencyReschedule(clock.nowUTC().plusSeconds(20));
+
+        // Releasing the trigger should not do anything because the trigger has not been locked yet
+        assertThat(dbJobTriggerService.releaseTrigger(trigger1, update)).isFalse();
+
+        // Lock the trigger
+        final Optional<JobTriggerDto> runnableTrigger = dbJobTriggerService.nextRunnableTrigger();
+        assertThat(runnableTrigger).isNotEmpty();
+
+        // Releasing the trigger should work now
+        assertThat(dbJobTriggerService.releaseTrigger(runnableTrigger.get(), update)).isTrue();
+
+        assertThat(dbJobTriggerService.get(trigger1.id()))
+                .isPresent()
+                .get()
+                .satisfies(trigger -> {
+                    // Make sure the lock is gone
+                    assertThat(trigger.lock().owner()).isNull();
+                    assertThat(trigger.status()).isEqualTo(JobTriggerStatus.RUNNABLE);
+                    assertThat(trigger.nextTime()).isEqualTo(update.nextTime().orElse(null));
+                    // The count must be increased by one
+                    assertThat(trigger.concurrencyRescheduleCount()).isEqualTo(1);
+                    assertThat(trigger.data()).isEmpty();
                 });
 
         // Releasing it again doesn't do anything
@@ -647,10 +660,11 @@ public class DBJobTriggerServiceTest {
         assertThat(dbJobTriggerService.releaseTrigger(trigger1, update)).isFalse();
 
         // Lock the trigger
-        assertThat(dbJobTriggerService.nextRunnableTrigger()).isNotEmpty();
+        final Optional<JobTriggerDto> runnableTrigger = dbJobTriggerService.nextRunnableTrigger();
+        assertThat(runnableTrigger).isNotEmpty();
 
         // Releasing the trigger should work now
-        assertThat(dbJobTriggerService.releaseTrigger(trigger1, update)).isTrue();
+        assertThat(dbJobTriggerService.releaseTrigger(runnableTrigger.get(), update)).isTrue();
 
         assertThat(dbJobTriggerService.get(trigger1.id()))
                 .isPresent()
@@ -684,10 +698,11 @@ public class DBJobTriggerServiceTest {
         assertThat(dbJobTriggerService.releaseTrigger(trigger1, update)).isFalse();
 
         // Lock the trigger
-        assertThat(dbJobTriggerService.nextRunnableTrigger()).isNotEmpty();
+        final Optional<JobTriggerDto> runnableTrigger = dbJobTriggerService.nextRunnableTrigger();
+        assertThat(runnableTrigger).isNotEmpty();
 
         // Releasing the trigger should work now
-        assertThat(dbJobTriggerService.releaseTrigger(trigger1, update)).isTrue();
+        assertThat(dbJobTriggerService.releaseTrigger(runnableTrigger.get(), update)).isTrue();
 
         assertThat(dbJobTriggerService.get(trigger1.id()))
                 .isPresent()
