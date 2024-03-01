@@ -788,8 +788,6 @@ public class DBJobTriggerServiceTest {
     public void deleteCompleted() {
         assertThat(dbJobTriggerService.deleteCompletedOnceSchedulesOlderThan(1, TimeUnit.DAYS)).isEqualTo(1);
         assertThat(dbJobTriggerService.get("54e3deadbeefdeadbeef0003")).isNotPresent();
-
-
     }
 
     @Test
@@ -799,7 +797,6 @@ public class DBJobTriggerServiceTest {
         // sets updated_at to recent timestamp
         dbJobTriggerService.update(trigger);
         assertThat(dbJobTriggerService.deleteCompletedOnceSchedulesOlderThan(1, TimeUnit.DAYS)).isZero();
-
     }
 
     @Test
@@ -898,5 +895,36 @@ public class DBJobTriggerServiceTest {
                 .build());
         assertThat(dbJobTriggerService.nextRunnableTrigger()).isEmpty();
         dbJobTriggerService.deleteByQuery(DBQuery.empty());
+    }
+
+    @Test
+    @MongoDBFixtures("job-triggers.json")
+    public void updateProgress() {
+        final JobTriggerDto trigger = dbJobTriggerService.get("54e3deadbeefdeadbeef0003").orElseThrow(AssertionError::new);
+
+        assertThat(trigger.lock().progress()).isEqualTo(0);
+
+        assertThat(dbJobTriggerService.updateProgress(trigger, 42)).isEqualTo(1);
+
+        final JobTriggerDto updatedTrigger = dbJobTriggerService.get("54e3deadbeefdeadbeef0003").orElseThrow(AssertionError::new);
+
+        assertThat(updatedTrigger.lock().progress()).isEqualTo(42);
+    }
+
+    @Test
+    @MongoDBFixtures("locked-job-triggers.json")
+    public void cancelTriggerByQuery() {
+        // Must return an empty Optional if the query didn't match any trigger
+        assertThat(dbJobTriggerService.cancelTriggerByQuery(DBQuery.is("foo", "bar"))).isEmpty();
+
+        final JobTriggerDto lockedTrigger = dbJobTriggerService.get("54e3deadbeefdeadbeef0001").orElseThrow(AssertionError::new);
+
+        assertThat(lockedTrigger.isCancelled()).isFalse();
+
+        assertThat(dbJobTriggerService.cancelTriggerByQuery(DBQuery.is("_id", "54e3deadbeefdeadbeef0001"))).isPresent();
+
+        final JobTriggerDto cancelledTrigger = dbJobTriggerService.get(lockedTrigger.id()).orElseThrow(AssertionError::new);
+
+        assertThat(cancelledTrigger.isCancelled()).isTrue();
     }
 }
