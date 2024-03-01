@@ -25,8 +25,14 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
+/**
+ * Service that can be used to acquire a {@link Lock} that will be refreshed periodically in a background thread.
+ * Each instance of the service needs to be closed to release the lock.
+ */
 public class RefreshingLockService implements AutoCloseable {
     public interface Factory {
         RefreshingLockService create();
@@ -47,6 +53,13 @@ public class RefreshingLockService implements AutoCloseable {
         this.lockTTL = lockTTL;
     }
 
+    /**
+     * Lock the given resource and ensure that only the given number of locks for the resource exist in the cluster.
+     *
+     * @param resource       the resource to lock
+     * @param maxConcurrency maximum number of locks for the resource
+     * @throws AlreadyLockedException when the resource couldn't be locked
+     */
     public void acquireAndKeepLock(String resource, int maxConcurrency) throws AlreadyLockedException {
         Optional<Lock> optionalLock = lockService.lock(resource, maxConcurrency);
         if (optionalLock.isEmpty()) {
@@ -55,7 +68,15 @@ public class RefreshingLockService implements AutoCloseable {
         scheduleLock(optionalLock.get());
     }
 
+    /**
+     * Lock the given resource exclusively.
+     *
+     * @param resource    the resource to lock
+     * @param lockContext the identifier for the exclusive lock
+     * @throws AlreadyLockedException when the resource couldn't be locked
+     */
     public void acquireAndKeepLock(String resource, String lockContext) throws AlreadyLockedException {
+        checkArgument(!isNullOrEmpty(lockContext), "lockContext cannot be blank");
         Optional<Lock> optionalLock = lockService.lock(resource, lockContext);
         if (optionalLock.isEmpty()) {
             throw new AlreadyLockedException(f("Could not acquire lock for resource <%s> and lock context <%s>", resource, lockContext));
@@ -72,6 +93,9 @@ public class RefreshingLockService implements AutoCloseable {
         lockRefreshFuture = scheduler.scheduleAtFixedRate(() -> refreshLock(lock), duration.toMillis(), duration.toMillis(), TimeUnit.MILLISECONDS);
     }
 
+    /**
+     * Release the lock.
+     */
     public void releaseLock() {
         if (lockRefreshFuture != null) {
             lockRefreshFuture.cancel(true);
@@ -90,6 +114,9 @@ public class RefreshingLockService implements AutoCloseable {
         }
     }
 
+    /**
+     * Release the lock.
+     */
     @Override
     public void close() {
         releaseLock();
