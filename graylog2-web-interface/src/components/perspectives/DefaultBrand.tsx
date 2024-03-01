@@ -15,7 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { useTheme } from 'styled-components';
+import styled, { useTheme } from 'styled-components';
+
+const Container = styled.div`
+  display: inline-flex;
+`;
 
 type Props = {
   className?: string,
@@ -25,7 +29,7 @@ const DefaultBrand = ({ className }: Props) => {
   const theme = useTheme();
 
   return (
-    <div className={`${className}`}>
+    <Container className={`${className}`}>
       <svg width="90"
            height="27"
            viewBox="0 0 90 27"
@@ -53,7 +57,7 @@ const DefaultBrand = ({ className }: Props) => {
               d="M64.8595 10.6898C64.8934 10.5641 65.0649 10.5474 65.1226 10.6641L66.3454 13.1387C66.3692 13.1869 66.4184 13.2174 66.4721 13.2174H67.4674C67.7014 13.2174 67.8913 13.4072 67.8913 13.6413C67.8913 13.8754 67.7014 14.0652 67.4674 14.0652H65.9453C65.8916 14.0652 65.8424 14.0347 65.8187 13.9865L65.1899 12.7143L64.1405 16.5928C64.1066 16.7185 63.9351 16.7352 63.8774 16.6185L62.6546 14.1439C62.6308 14.0957 62.5817 14.0652 62.528 14.0652H61.5326C61.2986 14.0652 61.1087 13.8754 61.1087 13.6413C61.1087 13.4072 61.2986 13.2174 61.5326 13.2174H63.0547C63.1084 13.2174 63.1576 13.2479 63.1814 13.2961L63.8102 14.5683L64.8595 10.6898Z"
               fill={theme.colors.brand.logo} />
       </svg>
-    </div>
+    </Container>
   );
 };
 
