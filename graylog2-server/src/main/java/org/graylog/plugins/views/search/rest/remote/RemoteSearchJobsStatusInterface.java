@@ -14,12 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search;
+package org.graylog.plugins.views.search.rest.remote;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.http.GET;
+import retrofit2.http.Headers;
+import retrofit2.http.Path;
+import retrofit2.http.Streaming;
 
-public record SearchJobIdentifier(@JsonProperty("id") String id,
-                                  @JsonProperty("search_id") String searchId,
-                                  @JsonProperty("owner") String owner,
-                                  @JsonProperty("executing_node") String executingNodeId) {}
+public interface RemoteSearchJobsStatusInterface {
 
+    @GET("views/search/status/{jobId}")
+    @Streaming
+    @Headers({"Accept: */*"})
+    Call<ResponseBody> jobStatus(@Path("jobId") String jobId);
+}

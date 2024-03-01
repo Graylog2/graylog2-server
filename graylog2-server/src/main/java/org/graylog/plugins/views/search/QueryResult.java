@@ -83,14 +83,21 @@ public abstract class QueryResult {
                     .executionStats(QueryExecutionStats.empty());
         }
 
+        @JsonProperty
         public abstract Builder query(Query query);
 
+        @JsonProperty("execution_stats")
         public abstract Builder executionStats(QueryExecutionStats stats);
 
+        @JsonProperty("search_types")
         public abstract Builder searchTypes(Map<String, SearchType.Result> results);
 
+        @JsonProperty("errors")
+        @Nullable
+        @JsonInclude(JsonInclude.Include.NON_ABSENT)
         public abstract Builder errors(@Nullable Set<SearchError> errors);
 
+        @JsonProperty("state")
         public abstract Builder state(State state);
 
         public abstract QueryResult build();
