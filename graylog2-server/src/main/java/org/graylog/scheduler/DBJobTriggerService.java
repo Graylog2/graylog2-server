@@ -32,7 +32,6 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.utilities.MongoQueryUtils;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.mongojack.DBCursor;
 import org.mongojack.DBQuery;
 import org.mongojack.DBQuery.Query;
@@ -78,8 +77,8 @@ public class DBJobTriggerService {
     private static final String FIELD_CONCURRENCY_RESCHEDULE_COUNT = JobTriggerDto.FIELD_CONCURRENCY_RESCHEDULE_COUNT;
     private static final String FIELD_TRIGGERED_AT = JobTriggerDto.FIELD_TRIGGERED_AT;
     private static final String FIELD_CONSTRAINTS = JobTriggerDto.FIELD_CONSTRAINTS;
-    private static final String FIELD_LAST_EXECUTION_TIME = JobTriggerDto.FIELD_EXECUTION_DURATION;
-
+    private static final String FIELD_LAST_EXECUTION_DURATION = JobTriggerDto.FIELD_EXECUTION_DURATION;
+    private static final String FIELD_IS_CANCELLED = JobTriggerDto.FIELD_IS_CANCELLED;
     private static final String FIELD_JOB_DEFINITION_TYPE = JobTriggerDto.FIELD_JOB_DEFINITION_TYPE;
 
     private final String nodeId;
@@ -426,8 +425,8 @@ public class DBJobTriggerService {
             update.set(FIELD_DATA, triggerUpdate.data());
         }
         trigger.triggeredAt().ifPresent(triggeredAt -> {
-            var duration = new org.joda.time.Duration(triggeredAt, DateTime.now(DateTimeZone.UTC));
-            update.set(FIELD_LAST_EXECUTION_TIME, Optional.of(duration.getMillis()));
+            var duration = new org.joda.time.Duration(triggeredAt, clock.nowUTC());
+            update.set(FIELD_LAST_EXECUTION_DURATION, Optional.of(duration.getMillis()));
         });
 
         final int changedDocs = db.update(query, update).getN();
@@ -494,7 +493,7 @@ public class DBJobTriggerService {
     }
 
     /**
-     * Update the job progress on a trigger
+     * Update the job progress on a trigger.
      *
      * @param trigger  the trigger to update
      * @param progress the job progress in percent (0-100)
@@ -506,13 +505,13 @@ public class DBJobTriggerService {
     }
 
     /**
-     * Cancel a JobTrigger that matches a query
+     * Cancel a JobTrigger that matches a query.
      *
      * @param query the db query
      * @return an Optional of the trigger that was cancelled. Empty if no matching trigger was found.
      */
     public Optional<JobTriggerDto> cancelTriggerByQuery(Query query) {
-        final DBUpdate.Builder update = DBUpdate.set(JobTriggerDto.FIELD_IS_CANCELLED, true);
+        final DBUpdate.Builder update = DBUpdate.set(FIELD_IS_CANCELLED, true);
 
         return Optional.ofNullable(db.findAndModify(query, update));
     }
