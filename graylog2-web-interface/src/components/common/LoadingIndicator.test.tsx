@@ -32,9 +32,9 @@ describe('<LoadingIndicator />', () => {
       jest.advanceTimersByTime(20000);
     });
 
-    expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
-
     await screen.findByText('This is taking a bit longer, please hold on...');
+
+    expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
   });
 
   it('Use passed props to change loading text after timeout', async () => {
@@ -46,8 +46,8 @@ describe('<LoadingIndicator />', () => {
       jest.advanceTimersByTime(30000);
     });
 
-    expect(screen.queryByText('Loading data...')).not.toBeInTheDocument();
-
     await screen.findByText('It takes some time. Please wait a bit more...');
+
+    expect(screen.queryByText('Loading data...')).not.toBeInTheDocument();
   });
 });
