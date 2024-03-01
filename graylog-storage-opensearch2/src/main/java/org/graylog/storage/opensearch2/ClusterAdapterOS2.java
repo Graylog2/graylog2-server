@@ -22,6 +22,8 @@ import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.base.Strings;
 import com.google.common.primitives.Ints;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import jakarta.json.JsonObject;
 import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchException;
 import org.graylog.storage.opensearch2.cat.NodeResponse;
@@ -47,9 +49,6 @@ import org.opensearch.client.opensearch.cat.nodes.NodesRecord;
 import org.opensearch.client.opensearch.cluster.HealthResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 
 import java.util.Collection;
 import java.util.List;
@@ -134,6 +133,7 @@ public class ClusterAdapterOS2 implements ClusterAdapter {
         final var response = client.execute((c) -> c.cluster().getSettings(builder -> builder.includeDefaults(true)));
         final var diskDefaults = getDiskDefaults(response.defaults());
         final var watermarkDefaults = diskDefaults.getJsonObject("watermark");
+        LOG.info("Got response: " + diskDefaults);
         return ClusterAllocationDiskSettingsFactory.create(
                 Boolean.parseBoolean(diskDefaults.getString("threshold_enabled")),
                 watermarkDefaults.getString("low"),
