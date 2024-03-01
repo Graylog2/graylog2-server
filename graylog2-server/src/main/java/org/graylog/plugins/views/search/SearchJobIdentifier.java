@@ -14,15 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.db;
+package org.graylog.plugins.views.search;
 
-import org.graylog.plugins.views.search.Search;
-import org.graylog.plugins.views.search.SearchJob;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.Optional;
+public record SearchJobIdentifier(@JsonProperty String id,
+                                  @JsonProperty("search_id") String searchId,
+                                  @JsonProperty String owner,
+                                  @JsonProperty("executing_node") String executingNodeId) {
 
-public interface SearchJobService {
 
-    SearchJob create(Search search, String owner);
-    Optional<SearchJob> load(String id, String owner);
 }

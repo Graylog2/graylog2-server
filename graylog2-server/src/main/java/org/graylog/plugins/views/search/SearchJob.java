@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import one.util.streamex.EntryStream;
@@ -35,11 +36,11 @@ import java.util.concurrent.CompletableFuture;
 // execution must come before results, as it signals the overall "done" state
 @JsonPropertyOrder({"execution", "results"})
 public class SearchJob implements ParameterProvider {
-    private final String id;
+
+    @JsonUnwrapped
+    private SearchJobIdentifier searchJobIdentifier;
 
     private final Search search;
-
-    private final String owner;
 
     private CompletableFuture<Void> resultFuture;
 
@@ -47,15 +48,14 @@ public class SearchJob implements ParameterProvider {
 
     private Set<SearchError> errors = Sets.newHashSet();
 
-    public SearchJob(String id, Search search, String owner) {
-        this.id = id;
+    public SearchJob(String id, Search search, String owner, String executingNodeId) {
         this.search = search;
-        this.owner = owner;
+        this.searchJobIdentifier = new SearchJobIdentifier(id, search.id(), owner, executingNodeId);
     }
 
     @JsonProperty
     public String getId() {
-        return id;
+        return searchJobIdentifier.id();
     }
 
     @JsonIgnore
@@ -63,14 +63,19 @@ public class SearchJob implements ParameterProvider {
         return search;
     }
 
+    @JsonIgnore
+    public SearchJobIdentifier getSearchJobIdentifier() {
+        return searchJobIdentifier;
+    }
+
     @JsonProperty("search_id")
     public String getSearchId() {
-        return search.id();
+        return searchJobIdentifier.searchId();
     }
 
     @JsonProperty
     public String getOwner() {
-        return owner;
+        return searchJobIdentifier.owner();
     }
 
     @JsonProperty("errors")
