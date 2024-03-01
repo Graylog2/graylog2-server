@@ -19,7 +19,6 @@ package org.graylog.storage.opensearch2.views;
 import com.google.common.collect.ImmutableSet;
 import jakarta.inject.Provider;
 import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
@@ -34,7 +33,6 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregation;
-import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog.storage.opensearch2.views.searchtypes.OSSearchTypeHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.EffectiveTimeRangeExtractor;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivot;
@@ -57,21 +55,15 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-public class OpenSearchBackendGeneratedRequestTestBase {
+public class OpenSearchBackendGeneratedRequestTestBase extends OpensearchMockedClientTestBase {
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
 
     OpenSearchBackend openSearchBackend;
-
-    @Mock
-    protected OpenSearchClient client;
 
     @Mock
     protected IndexLookup indexLookup;
@@ -121,10 +113,10 @@ public class OpenSearchBackendGeneratedRequestTestBase {
         return null;
     }
 
-    List<SearchRequest> run(SearchJob searchJob, Query query, OSGeneratedQueryContext queryContext, Set<QueryResult> predecessorResults) {
+    List<SearchRequest> run(SearchJob searchJob, Query query, OSGeneratedQueryContext queryContext) {
         this.openSearchBackend.doRun(searchJob, query, queryContext);
 
-        verify(client, times(1)).msearch(clientRequestCaptor.capture(), any());
+        verify(client).cancellableMsearch(clientRequestCaptor.capture());
 
         return clientRequestCaptor.getValue();
     }

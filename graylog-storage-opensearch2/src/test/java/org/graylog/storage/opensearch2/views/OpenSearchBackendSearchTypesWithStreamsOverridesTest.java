@@ -31,7 +31,6 @@ import org.graylog.storage.opensearch2.testing.TestMultisearchResponse;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -41,7 +40,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.storage.opensearch2.views.ViewsUtils.indicesOf;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -52,9 +50,7 @@ public class OpenSearchBackendSearchTypesWithStreamsOverridesTest extends OpenSe
     @Before
     public void setUp() throws Exception {
         final MultiSearchResponse response = TestMultisearchResponse.fromFixture("successfulMultiSearchResponse.json");
-        final List<MultiSearchResponse.Item> items = Arrays.stream(response.getResponses())
-                .collect(Collectors.toList());
-        when(client.msearch(any(), any())).thenReturn(items);
+        mockCancellableMSearch(response);
         when(indexLookup.indexNamesForStreamsInTimeRange(eq(ImmutableSet.of(stream1Id)), any()))
                 .thenReturn(ImmutableSet.of("index1", "index2"));
         when(indexLookup.indexNamesForStreamsInTimeRange(eq(ImmutableSet.of(stream2Id)), any()))
@@ -62,7 +58,7 @@ public class OpenSearchBackendSearchTypesWithStreamsOverridesTest extends OpenSe
     }
 
     @Test
-    public void searchTypeWithEmptyStreamsDefaultsToQueriesStreams() throws IOException {
+    public void searchTypeWithEmptyStreamsDefaultsToQueriesStreams() {
         final Query query = queryFor(Pivot.builder()
                 .id("pivot1")
                 .series(Collections.singletonList(Average.builder().field("field1").build()))
@@ -75,7 +71,7 @@ public class OpenSearchBackendSearchTypesWithStreamsOverridesTest extends OpenSe
     }
 
     @Test
-    public void searchTypeWithoutStreamsDefaultsToQueriesStreams() throws IOException {
+    public void searchTypeWithoutStreamsDefaultsToQueriesStreams() {
         final Query query = queryFor(Pivot.builder()
                 .id("pivot1")
                 .series(Collections.singletonList(Average.builder().field("field1").build()))
@@ -87,7 +83,7 @@ public class OpenSearchBackendSearchTypesWithStreamsOverridesTest extends OpenSe
     }
 
     @Test
-    public void searchTypeWithStreamsOverridesQueriesStreams() throws IOException {
+    public void searchTypeWithStreamsOverridesQueriesStreams() {
         final Query query = queryFor(Pivot.builder()
                 .id("pivot1")
                 .series(Collections.singletonList(Average.builder().field("field1").build()))
@@ -100,7 +96,7 @@ public class OpenSearchBackendSearchTypesWithStreamsOverridesTest extends OpenSe
     }
 
     @Test
-    public void queryWithMixedPresenceOfOverridesIncludesMultipleSetsOfIndices() throws IOException {
+    public void queryWithMixedPresenceOfOverridesIncludesMultipleSetsOfIndices() {
         final Query query = queryFor(Pivot.builder()
                         .id("pivot1")
                         .series(Collections.singletonList(Average.builder().field("field1").build()))
@@ -129,13 +125,13 @@ public class OpenSearchBackendSearchTypesWithStreamsOverridesTest extends OpenSe
                 .build();
     }
 
-    private List<SearchRequest> run(Query query) throws IOException {
+    private List<SearchRequest> run(Query query) {
         final SearchJob job = searchJobForQuery(query);
         final OSGeneratedQueryContext context = this.openSearchBackend.generate(query, Collections.emptySet());
 
         this.openSearchBackend.doRun(job, query, context);
 
-        verify(client, times(1)).msearch(clientRequestCaptor.capture(), any());
+        verify(client).cancellableMsearch(clientRequestCaptor.capture());
 
         return clientRequestCaptor.getValue();
     }

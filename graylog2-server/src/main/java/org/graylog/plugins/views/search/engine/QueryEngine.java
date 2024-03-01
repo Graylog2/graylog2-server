@@ -18,6 +18,8 @@ package org.graylog.plugins.views.search.engine;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryMetadata;
 import org.graylog.plugins.views.search.QueryMetadataDecorator;
@@ -29,9 +31,6 @@ import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.errors.SearchException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 
 import java.util.Collection;
 import java.util.Objects;
@@ -104,7 +103,7 @@ public class QueryEngine {
             final CompletableFuture<QueryResult> queryResultFuture = searchJob.getQueryResultFuture(query.id());
             if (!queryResultFuture.isDone()) {
                 // this is not going to throw an exception, because we will always replace it with a placeholder "FAILED" result above
-                final QueryResult result = queryResultFuture.join();
+                //final QueryResult result = queryResultFuture.join();
 
             } else {
                 LOG.debug("[{}] Not generating query for query {}", defaultIfEmpty(query.id(), "root"), query);

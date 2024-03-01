@@ -18,6 +18,9 @@ package org.graylog.plugins.views.search.engine;
 
 import com.google.common.util.concurrent.Uninterruptibles;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.InternalServerErrorException;
+import jakarta.ws.rs.NotFoundException;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchJob;
@@ -29,11 +32,6 @@ import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.ExecutionState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-
-import jakarta.ws.rs.InternalServerErrorException;
-import jakarta.ws.rs.NotFoundException;
 
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -63,13 +61,21 @@ public class SearchExecutor {
     }
 
     public SearchJob execute(String searchId, SearchUser searchUser, ExecutionState executionState) {
+        return execute(searchId, searchUser, executionState, false);
+    }
+
+    public SearchJob execute(String searchId, SearchUser searchUser, ExecutionState executionState, boolean async) {
         return searchDomain.getForUser(searchId, searchUser)
-                .map(s -> execute(s, searchUser, executionState))
+                .map(s -> execute(s, searchUser, executionState, async))
                 .orElseThrow(() -> new NotFoundException("No search found with id <" + searchId + ">."));
     }
 
-    @WithSpan
     public SearchJob execute(Search search, SearchUser searchUser, ExecutionState executionState) {
+        return execute(search, searchUser, executionState, false);
+    }
+
+    @WithSpan
+    public SearchJob execute(Search search, SearchUser searchUser, ExecutionState executionState, boolean async) {
         final Search preValidationSearch = searchNormalization.preValidation(search, searchUser, executionState);
 
         final Set<SearchError> validationErrors = searchValidation.validate(preValidationSearch, searchUser);
@@ -85,7 +91,9 @@ public class SearchExecutor {
         validationErrors.forEach(searchJob::addError);
 
         try {
-            Uninterruptibles.getUninterruptibly(searchJob.getResultFuture(), 60000, TimeUnit.MILLISECONDS);
+            if (!async) {
+                Uninterruptibles.getUninterruptibly(searchJob.getResultFuture(), 60000, TimeUnit.MILLISECONDS);
+            }
         } catch (ExecutionException e) {
             LOG.error("Error executing search job <{}>", searchJob.getId(), e);
             throw new InternalServerErrorException("Error executing search job: " + e.getMessage(), e);

@@ -18,6 +18,8 @@ package org.graylog.plugins.views.search.rest;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.core.Response;
 import org.assertj.core.api.Assertions;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
@@ -26,11 +28,9 @@ import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.engine.SearchExecutor;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog2.plugin.system.NodeId;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
-import jakarta.ws.rs.NotFoundException;
-import jakarta.ws.rs.core.Response;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -72,7 +72,7 @@ public class SearchResourceTest {
                 .build();
 
         final SearchDomain searchDomain = mockSearchDomain(Optional.of(search));
-        final SearchResource resource = new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus);
+        final SearchResource resource = new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus, mock(NodeId.class));
         final SearchDTO returnedSearch = resource.getSearch(search.id(), searchUser);
 
         assertThat(returnedSearch.id()).isEqualTo(search.id());
@@ -81,7 +81,7 @@ public class SearchResourceTest {
     @Test
     public void getSearchThrowsNotFoundIfSearchDoesntExist() {
         final SearchDomain searchDomain = mockSearchDomain(Optional.empty());
-        final SearchResource resource = new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus);
+        final SearchResource resource = new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus, mock(NodeId.class));
         assertThatExceptionOfType(NotFoundException.class)
                 .isThrownBy(() -> resource.getSearch("god", searchUser))
                 .withMessageContaining("god");
@@ -94,7 +94,7 @@ public class SearchResourceTest {
         final SearchDomain searchDomain = mock(SearchDomain.class);
         when(searchDomain.saveForUser(any(), any())).thenReturn(search.toSearch());
 
-        final SearchResource resource = new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus);
+        final SearchResource resource = new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus, mock(NodeId.class));
         final Response response = resource.createSearch(search, searchUser);
 
         Assertions.assertThat(response.getStatus()).isEqualTo(Response.Status.CREATED.getStatusCode());

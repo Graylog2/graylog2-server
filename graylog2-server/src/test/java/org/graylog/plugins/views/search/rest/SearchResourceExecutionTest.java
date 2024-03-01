@@ -58,6 +58,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -101,7 +102,7 @@ public class SearchResourceExecutionTest {
                 new PluggableSearchValidation(executionGuard, Collections.emptySet()),
                 new PluggableSearchNormalization(Collections.emptySet()));
 
-        this.searchResource = new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus) {
+        this.searchResource = new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus, mock(NodeId.class)) {
             @Override
             protected User getCurrentUser() {
                 return currentUser;
