@@ -100,16 +100,21 @@ public class MongoLockService implements LockService {
         for (int i = 0; i < maxConcurrency; i++) {
             Optional<Lock> lock = doLock(f("%s-%d", resource, i), getLockedByString(UUID.randomUUID().toString()));
             if (lock.isPresent()) {
-                LOG.trace("{} {} locked", resource, i);
+                if (LOG.isTraceEnabled()) {
+                    LOG.trace("Resource <{}> locked ({} of {} max)", resource, i, maxConcurrency);
+                }
                 return lock;
             }
         }
-        LOG.trace("{} exceeded max {}", resource, maxConcurrency);
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Couldn't lock resource <{}> because of concurrency limit (max {})", resource, maxConcurrency);
+        }
         return Optional.empty();
     }
 
     @Override
     public Optional<Lock> extendLock(@Nonnull Lock lock) {
+        //noinspection ConstantValue
         if (lock != null) {
             return doLock(lock.resource(), lock.lockedBy());
         }
@@ -147,6 +152,7 @@ public class MongoLockService implements LockService {
 
     @Override
     public Optional<Lock> unlock(@Nonnull Lock lock) {
+        //noinspection ConstantValue
         if (lock != null) {
             return doUnlock(lock.resource(), lock.lockedBy());
         }
