@@ -20,6 +20,7 @@ import io.opentelemetry.instrumentation.annotations.WithSpan;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
+import org.graylog.plugins.views.search.searchtypes.events.CommonEventSummary;
 import org.graylog.plugins.views.search.searchtypes.events.EventList;
 import org.graylog.plugins.views.search.searchtypes.events.EventSummary;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
@@ -80,7 +81,7 @@ public class ESEventList implements ESSearchTypeHandler<EventList> {
         final Set<String> effectiveStreams = searchType.streams().isEmpty()
                 ? query.usedStreamIds()
                 : searchType.streams();
-        final List<EventSummary> eventSummaries = extractResult(result).stream()
+        final List<CommonEventSummary> eventSummaries = extractResult(result).stream()
                 .map(EventSummary::parse)
                 .filter(eventSummary -> effectiveStreams.containsAll(eventSummary.streams()))
                 .collect(Collectors.toList());
@@ -88,7 +89,6 @@ public class ESEventList implements ESSearchTypeHandler<EventList> {
                 .events(eventSummaries)
                 .id(searchType.id());
         searchType.name().ifPresent(resultBuilder::name);
-        return resultBuilder
-                .build();
+        return resultBuilder.build();
     }
 }
