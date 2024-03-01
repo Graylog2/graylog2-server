@@ -24,7 +24,6 @@ import com.google.common.base.Strings;
 import com.google.common.primitives.Ints;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-import jakarta.json.JsonObject;
 import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchException;
 import org.graylog.storage.opensearch2.cat.NodeResponse;
 import org.graylog2.indexer.ElasticsearchException;
@@ -46,10 +45,12 @@ import org.opensearch.client.json.JsonData;
 import org.opensearch.client.opensearch.cat.aliases.AliasesRecord;
 import org.opensearch.client.opensearch.cat.indices.IndicesRecord;
 import org.opensearch.client.opensearch.cat.nodes.NodesRecord;
+import org.opensearch.client.opensearch.cluster.GetClusterSettingsResponse;
 import org.opensearch.client.opensearch.cluster.HealthResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
@@ -131,23 +132,42 @@ public class ClusterAdapterOS2 implements ClusterAdapter {
     @Override
     public ClusterAllocationDiskSettings clusterAllocationDiskSettings() {
         final var response = client.execute((c) -> c.cluster().getSettings(builder -> builder.includeDefaults(true)));
-        final var diskDefaults = getDiskDefaults(response.defaults());
-        final var watermarkDefaults = diskDefaults.getJsonObject("watermark");
-        LOG.info("Got response: " + diskDefaults);
         return ClusterAllocationDiskSettingsFactory.create(
-                Boolean.parseBoolean(diskDefaults.getString("threshold_enabled")),
-                watermarkDefaults.getString("low"),
-                watermarkDefaults.getString("high"),
-                watermarkDefaults.getString("flood_stage")
+                Boolean.parseBoolean(getSetting(response, "cluster.routing.allocation.disk.threshold_enabled")),
+                getSetting(response, "cluster.routing.allocation.disk.watermark.low"),
+                getSetting(response, "cluster.routing.allocation.disk.watermark.high"),
+                getSetting(response, "cluster.routing.allocation.disk.watermark.flood_stage")
         );
     }
 
-    private JsonObject getDiskDefaults(Map<String, JsonData> defaults) {
-        return defaults.get("cluster").toJson().asJsonObject()
-                .getJsonObject("routing")
-                .getJsonObject("allocation")
-                .getJsonObject("disk");
+    private String getSetting(GetClusterSettingsResponse response, String key) {
+        final var persistentSetting = getSetting(response.persistent(), key);
+        if (persistentSetting != null) {
+            return persistentSetting;
+        }
+        final var transientSetting = getSetting(response.transient_(), key);
+        if (transientSetting != null) {
+            return transientSetting;
+        }
+        return getSetting(response.defaults(), key);
     }
+
+    private String getSetting(Map<String, JsonData> settings, String key) {
+        final var keyPath = Arrays.stream(key.split("\\.")).toList();
+        final var firstKey = keyPath.get(0);
+        if (firstKey == null || settings == null || settings.isEmpty() || !settings.containsKey(firstKey)) {
+            return null;
+        }
+
+        var current = settings.get(firstKey).toJson();
+
+        for (String curKey : keyPath.subList(1, keyPath.size())) {
+            current = current.asJsonObject().get(curKey);
+        }
+
+        return current.toString();
+    }
+
 
     @Override
     public Optional<String> nodeIdToName(String nodeId) {
