@@ -61,7 +61,7 @@ export const MIGRATION_STATE = {
   },
   ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE: {
     key: 'ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE',
-    description: 'Welcome to Rolling upgrade migration',
+    description: 'Welcome to In-Place migration',
   },
   ASK_TO_SHUTDOWN_OLD_CLUSTER: {
     key: 'ASK_TO_SHUTDOWN_OLD_CLUSTER',
