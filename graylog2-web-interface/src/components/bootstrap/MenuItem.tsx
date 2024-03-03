@@ -116,6 +116,7 @@ CustomMenuItem.defaultProps = {
   rel: undefined,
   target: undefined,
   title: undefined,
+  variant: undefined,
 };
 
 /** @component */
