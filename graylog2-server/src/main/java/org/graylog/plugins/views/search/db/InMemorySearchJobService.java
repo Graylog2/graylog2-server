@@ -18,14 +18,12 @@ package org.graylog.plugins.views.search.db;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.bson.types.ObjectId;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
-import org.graylog.plugins.views.search.Search;
-import org.graylog.plugins.views.search.SearchJob;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
+import org.graylog2.plugin.system.NodeId;
 
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -35,9 +33,11 @@ import java.util.concurrent.TimeUnit;
 public class InMemorySearchJobService implements SearchJobService {
 
     private final Cache<String, SearchJob> cache;
+    private final NodeId nodeId;
 
     @Inject
-    public InMemorySearchJobService() {
+    public InMemorySearchJobService(final NodeId nodeId) {
+        this.nodeId = nodeId;
         cache = CacheBuilder.newBuilder()
                 .expireAfterAccess(5, TimeUnit.MINUTES)
                 .maximumSize(1000)
@@ -46,9 +46,10 @@ public class InMemorySearchJobService implements SearchJobService {
     }
 
     @Override
-    public SearchJob create(Search query, String owner) {
+    public SearchJob create(final Search search,
+                            final String owner) {
         final String id = new ObjectId().toHexString();
-        final SearchJob searchJob = new SearchJob(id, query, owner);
+        final SearchJob searchJob = new SearchJob(id, search, owner, nodeId.getNodeId());
         cache.put(id, searchJob);
         return searchJob;
     }
