@@ -159,7 +159,8 @@ export const executeWithExecutionState = (view: View, widgetsToSearch: Array<str
       .then(searchExecutors.resultMapper)
       .then((result) => {
         dispatch(setJobIds(null));
-        dispatch(finishedLoading(result));
+
+        return dispatch(finishedLoading(result));
       });
   });
 

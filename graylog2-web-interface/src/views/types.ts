@@ -386,7 +386,7 @@ export interface SearchExecution {
   result: SearchExecutionResult;
   isLoading: boolean;
   widgetsToSearch: Array<string>,
-  jobIds: JobIds & { abortController: AbortController } | null,
+  jobIds?: JobIds & { abortController: AbortController } | null,
 }
 
 export interface SearchMetadataState {

@@ -129,9 +129,16 @@ const Search = () => {
     StreamsActions.refresh();
   }, []);
 
-  useEffect(() => () => {
-    dispatch(cancelExecutedJob());
-  }, [dispatch]);
+  const handleLeavePage = useCallback(() => dispatch(cancelExecutedJob()), [dispatch]);
+
+  useEffect(() => {
+    window.addEventListener('beforeunload', handleLeavePage);
+
+    return () => {
+      handleLeavePage();
+      window.removeEventListener('beforeunload', handleLeavePage);
+    };
+  }, [handleLeavePage]);
 
   return (
     <>
