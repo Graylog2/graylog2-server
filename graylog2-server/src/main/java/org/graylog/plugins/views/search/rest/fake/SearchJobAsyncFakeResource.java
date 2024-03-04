@@ -42,6 +42,8 @@ import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.rest.RemoteInterfaceProvider;
 import org.graylog2.shared.rest.resources.ProxiedResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -55,6 +57,8 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 @Consumes({MediaType.APPLICATION_JSON})
 @RequiresAuthentication
 public class SearchJobAsyncFakeResource extends ProxiedResource implements PluginRestResource {
+
+    private static final Logger LOG = LoggerFactory.getLogger(SearchJobAsyncFakeResource.class);
 
     private static Map<SearchJobId, SearchJobStatus> fakeSearchJobs = new HashMap<>();
     private static int latestNodeJobCounter = 0;
@@ -82,6 +86,7 @@ public class SearchJobAsyncFakeResource extends ProxiedResource implements Plugi
                           @Context SearchUser searchUser) {
 
         SearchJobId searchJobId = new SearchJobId(searchUser.getUser().getId(), currentNodeId, String.valueOf(latestNodeJobCounter++));
+        LOG.info("Starting search job : " + searchJobId.asyncSearchId());
         fakeSearchJobs.put(searchJobId, new SearchJobStatus(graylogSearchId));
 
         return Response.accepted()
@@ -96,6 +101,7 @@ public class SearchJobAsyncFakeResource extends ProxiedResource implements Plugi
     public Response poll(@PathParam("asyncSearchId") String asyncSearchId,
                          @PathParam("node_id") String nodeId,
                          @Context SearchUser searchUser) {
+        LOG.info("Polling search job : " + asyncSearchId);
 
         SearchJobId searchJobId = new SearchJobId(searchUser.getUser().getId(), nodeId, asyncSearchId);
         final SearchJobStatus searchJobStatus = fakeSearchJobs.get(searchJobId);
@@ -132,8 +138,10 @@ public class SearchJobAsyncFakeResource extends ProxiedResource implements Plugi
         SearchJobId searchJobId = new SearchJobId(searchUser.getUser().getId(), nodeId, asyncSearchId);
         final SearchJobStatus searchJobStatus = fakeSearchJobs.get(searchJobId);
         if (searchJobStatus == null) {
+            LOG.info("Search job cannot be cancelled, it does not exist : " + asyncSearchId);
             return Response.status(Response.Status.NOT_FOUND).build();
         } else {
+            LOG.info("Search job cancelled : " + asyncSearchId);
             searchJobStatus.isCancelled = true;
             return Response.ok().build();
         }
