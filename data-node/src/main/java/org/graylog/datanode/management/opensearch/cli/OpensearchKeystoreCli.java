@@ -27,12 +27,12 @@ public class OpensearchKeystoreCli extends AbstractOpensearchCli {
     }
 
     /**
-     * Create a new opensearch keystore. This command expects that there is no keystore. Otherwise, it will ask for
-     * confirmation to override it and this fails, as there is currently no stdin configured.
+     * Create a new opensearch keystore. This command expects that there is no keystore. If there is a keystore,
+     * it will respond YES to override existing.
      * @return STDOUT/STDERR of the execution as one String
      */
     public String create() {
-        return runBatch("create");
+        return runWithStdin(Collections.singletonList("Y"),"create");
     }
 
     /**

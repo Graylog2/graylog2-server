@@ -34,7 +34,6 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -76,39 +75,32 @@ public class ESEventListTest {
                 .streams(streams)
                 .timestamp(DateTime.parse(timestamp.toString(Tools.ES_DATE_FORMAT_FORMATTER), Tools.ES_DATE_FORMAT_FORMATTER))
                 .alert(false)
+                .eventDefinitionId("deadbeef")
                 .build();
     }
 
     static class TestESEventList extends ESEventList {
-        private Map<String, Object> hit(String id, ArrayList<String> streams) {
+        private Map<String, Object> hit(String id, List<String> streams) {
             return ImmutableMap.of(
                     EventDto.FIELD_ID, id,
                     EventDto.FIELD_MESSAGE, "message",
                     EventDto.FIELD_SOURCE_STREAMS, streams,
                     EventDto.FIELD_EVENT_TIMESTAMP, timestamp.toString(Tools.ES_DATE_FORMAT_FORMATTER),
+                    EventDto.FIELD_EVENT_DEFINITION_ID, "deadbeef",
                     EventDto.FIELD_ALERT, false
             );
         }
 
         @Override
         protected List<Map<String, Object>> extractResult(SearchResponse result) {
-            final ArrayList<String> list1 = new ArrayList<>(); list1.add("stream-id-1");
-            final ArrayList<String> list2 = new ArrayList<>(); list2.add("stream-id-2");
-            final ArrayList<String> list3 = new ArrayList<>(); list3.add("stream-id-1"); list3.add("stream-id-2");
-            final ArrayList<String> list4 = new ArrayList<>(); list4.add("stream-id-3");
-            final ArrayList<String> list5 = new ArrayList<>(); list5.add("stream-id-1"); list5.add("stream-id-3");
-            final ArrayList<String> list6 = new ArrayList<>(); list6.add("stream-id-2"); list6.add("stream-id-3");
-            final ArrayList<String> list7 = new ArrayList<>(); list7.add("stream-id-1"); list7.add("stream-id-2");
-            list7.add("stream-id-3");
-
             return ImmutableList.of(
-                    hit("find-1", list1),
-                    hit("find-2", list2),
-                    hit("find-3", list3),
-                    hit("do-not-find-1", list4),
-                    hit("do-not-find-2", list5),
-                    hit("do-not-find-3", list6),
-                    hit("do-not-find-4", list7)
+                    hit("find-1", List.of("stream-id-1")),
+                    hit("find-2", List.of("stream-id-2")),
+                    hit("find-3", List.of("stream-id-1", "stream-id-2")),
+                    hit("do-not-find-1", List.of("stream-id-3")),
+                    hit("do-not-find-2", List.of("stream-id-1", "stream-id-3")),
+                    hit("do-not-find-3", List.of("stream-id-2", "stream-id-3")),
+                    hit("do-not-find-4", List.of("stream-id-1", "stream-id-2", "stream-id-3"))
             );
         }
     }

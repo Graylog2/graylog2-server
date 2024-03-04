@@ -14,15 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.db;
+package org.graylog.storage.opensearch2.views.searchtypes;
 
-import org.graylog.plugins.views.search.Search;
-import org.graylog.plugins.views.search.SearchJob;
+import org.graylog.plugins.views.search.searchtypes.events.EventList;
 
-import java.util.Optional;
-
-public interface SearchJobService {
-
-    SearchJob create(Search search, String owner);
-    Optional<SearchJob> load(String id, String owner);
+public interface EventListStrategy extends OSSearchTypeHandler<EventList> {
 }

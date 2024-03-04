@@ -1087,6 +1087,7 @@
                             <workingDirectory>${webInterface.path}</workingDirectory>
                             <nodeVersion>${nodejs.version}</nodeVersion>
                             <yarnVersion>${yarn.version}</yarnVersion>
+                            <nodeDownloadRoot>https://graylog-ci-cache.s3.eu-west-1.amazonaws.com/downloads/node/</nodeDownloadRoot>
                         </configuration>
 
                         <executions>

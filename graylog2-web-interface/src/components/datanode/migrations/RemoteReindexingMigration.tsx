@@ -28,7 +28,7 @@ import MigrationError from 'components/datanode/migrations/common/MigrationError
 import Welcome from './remoteReindexing/Welcome';
 import ExistingDataMigrationQuestion from './remoteReindexing/ExistingDataMigrationQuestion';
 import RemoteReindexRunning from './remoteReindexing/RemoteReindexRunning';
-import CertificatesProvisioning from './rollingUpgrade/CertificatesProvisioning';
+import CertificatesProvisioning from './common/CertificatesProvisioning';
 import MigrateExistingData from './remoteReindexing/MigrateExistingData';
 import ShutdownClusterStep from './remoteReindexing/ShutdownClusterStep';
 import ConnectionStringRemovalStep from './remoteReindexing/ConnectionStringRemovalStep';
