@@ -16,6 +16,8 @@
  */
 package org.graylog2.indexer.datastream.policy.actions;
 
+import static org.graylog2.shared.utilities.StringUtils.f;
+
 public class RolloverTimeUnitFormatter {
 
     private RolloverTimeUnitFormatter() {
@@ -26,6 +28,6 @@ public class RolloverTimeUnitFormatter {
      * <a href="https://opensearch.org/docs/latest/im-plugin/ism/policies/#transitions">...</a>
      */
     public static String formatDays(long days) {
-        return String.format("%dd", days);
+        return f("%dd", days);
     }
 }
