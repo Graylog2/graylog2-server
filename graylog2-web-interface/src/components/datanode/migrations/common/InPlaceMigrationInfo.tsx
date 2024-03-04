@@ -29,14 +29,14 @@ export const StyledPanel = styled(Panel)<{ bsStyle: string }>(({ bsStyle = 'defa
   margin-top: ${theme.spacings.md} !important;
 `);
 
-const ImPlaceMigrationInfo = () => (
+const InPlaceMigrationInfo = () => (
   <StyledPanel bsStyle="info">
     <Panel.Heading>
       <Panel.Title componentClass="h3">In-Place migration</Panel.Title>
     </Panel.Heading>
     <Panel.Body>
-      If you are doing an In-Place migration, make sure that the configuration of your Data nodes in <code>datanode.conf</code>, specifically the <code>opensearch_data_location</code> configuration option, points to the correct existing OpenSearch data directory on every node.
+      If you are doing an In-Place migration, make sure that the configuration of your Data Nodes in <code>datanode.conf</code>, specifically the <code>opensearch_data_location</code> configuration option, points to the correct existing OpenSearch data directory on every node.
     </Panel.Body>
   </StyledPanel>
 );
-export default ImPlaceMigrationInfo;
+export default InPlaceMigrationInfo;

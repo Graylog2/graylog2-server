@@ -24,7 +24,7 @@ import MigrationDatanodeList from 'components/datanode/migrations/MigrationDatan
 import MigrationStepTriggerButtonToolbar from 'components/datanode/migrations/common/MigrationStepTriggerButtonToolbar';
 import type { MigrationState, OnTriggerStepFunction } from 'components/datanode/Types';
 import MigrationError from 'components/datanode/migrations/common/MigrationError';
-import ImPlaceMigrationInfo from 'components/datanode/migrations/common/ImPlaceMigrationInfo';
+import InPlaceMigrationInfo from 'components/datanode/migrations/common/InPlaceMigrationInfo';
 
 type Props = {
   currentStep: MigrationState,
@@ -91,7 +91,7 @@ const MigrationWelcomeStep = ({ currentStep, onTriggerStep }: Props) => (
           </p>
         </Panel.Body>
       </StyledHelpPanel>
-      <ImPlaceMigrationInfo />
+      <InPlaceMigrationInfo />
     </Col>
   </Row>
 );
