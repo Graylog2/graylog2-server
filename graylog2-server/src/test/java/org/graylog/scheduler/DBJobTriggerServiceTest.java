@@ -24,11 +24,13 @@ import com.google.common.collect.ImmutableSet;
 import org.graylog.events.JobSchedulerTestClock;
 import org.graylog.events.TestJobTriggerData;
 import org.graylog.scheduler.capabilities.SchedulerCapabilitiesService;
+import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
 import org.graylog.scheduler.schedule.OnceJobSchedule;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -44,6 +46,7 @@ import org.mongojack.DBQuery;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -76,6 +79,7 @@ public class DBJobTriggerServiceTest {
     private DBJobTriggerService dbJobTriggerService;
     private final JobSchedulerTestClock clock = new JobSchedulerTestClock(DateTime.now(DateTimeZone.UTC));
     private MongoJackObjectMapperProvider mapperProvider;
+    private MongoCollections mongoCollections;
 
     @Before
     public void setUp() throws Exception {
@@ -87,7 +91,12 @@ public class DBJobTriggerServiceTest {
         objectMapper.registerSubtypes(new NamedType(TestJobTriggerData.class, TestJobTriggerData.TYPE_NAME));
 
         mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
-        this.dbJobTriggerService = new DBJobTriggerService(mongodb.mongoConnection(), mapperProvider, nodeId, clock, schedulerCapabilitiesService, EXPIRATION_DURATION);
+        this.mongoCollections = new MongoCollections(mapperProvider, mongodb.mongoConnection());
+        this.dbJobTriggerService = serviceWithClock(clock);
+    }
+
+    private DBJobTriggerService serviceWithClock(JobSchedulerClock clock) {
+        return new DBJobTriggerService(mongodb.mongoConnection(), mongoCollections, mapperProvider, nodeId, clock, schedulerCapabilitiesService, EXPIRATION_DURATION);
     }
 
     @Test
@@ -517,7 +526,7 @@ public class DBJobTriggerServiceTest {
     public void nextRunnableTriggerWithEndTime() {
         // Set clock to base date used in the fixture file
         final JobSchedulerTestClock clock = new JobSchedulerTestClock(DateTime.parse("2019-01-01T00:00:00.000Z"));
-        final DBJobTriggerService service = new DBJobTriggerService(mongodb.mongoConnection(), mapperProvider, nodeId, clock, schedulerCapabilitiesService, EXPIRATION_DURATION);
+        final DBJobTriggerService service = serviceWithClock(clock);
 
         // No triggers yet because 54e3deadbeefdeadbeef0002 is already locked and RUNNING
         assertThat(service.nextRunnableTrigger()).isEmpty();
@@ -824,7 +833,7 @@ public class DBJobTriggerServiceTest {
     @MongoDBFixtures("stale-job-triggers-with-expired-lock.json")
     public void nextStaleTrigger() {
         final JobSchedulerTestClock clock = new JobSchedulerTestClock(DateTime.parse("2019-01-01T02:00:00.000Z"));
-        final DBJobTriggerService service = new DBJobTriggerService(mongodb.mongoConnection(), mapperProvider, nodeId, clock, schedulerCapabilitiesService, EXPIRATION_DURATION);
+        final DBJobTriggerService service = serviceWithClock(clock);
 
         assertThat(service.nextRunnableTrigger())
                 .isNotEmpty()
@@ -837,7 +846,7 @@ public class DBJobTriggerServiceTest {
     public void updateLockedJobTriggers() {
         DateTime newLockTime = DateTime.parse("2019-01-01T02:00:00.000Z");
         final JobSchedulerTestClock clock = new JobSchedulerTestClock(newLockTime);
-        final DBJobTriggerService service = new DBJobTriggerService(mongodb.mongoConnection(), mapperProvider, nodeId, clock, schedulerCapabilitiesService, EXPIRATION_DURATION);
+        final DBJobTriggerService service = serviceWithClock(clock);
 
         service.updateLockedJobTriggers();
 
@@ -926,5 +935,19 @@ public class DBJobTriggerServiceTest {
         final JobTriggerDto cancelledTrigger = dbJobTriggerService.get(lockedTrigger.id()).orElseThrow(AssertionError::new);
 
         assertThat(cancelledTrigger.isCancelled()).isTrue();
+    }
+
+    @Test
+    @MongoDBFixtures("job-triggers-for-overdue-count.json")
+    public void numberOfOverdueTriggers() {
+        final JobSchedulerTestClock clock = new JobSchedulerTestClock(DateTime.parse("2019-01-01T04:00:00.000Z"));
+        final DBJobTriggerService service = serviceWithClock(clock);
+
+        final Map<String, Long> result = service.numberOfOverdueTriggers();
+
+        assertThat(result).isEqualTo(Map.of(
+                "event-processor-execution-v1", 2L,
+                "notification-execution-v1", 1L
+        ));
     }
 }

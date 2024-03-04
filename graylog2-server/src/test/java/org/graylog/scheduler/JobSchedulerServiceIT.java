@@ -109,6 +109,7 @@ class JobSchedulerServiceIT {
 
         jobTriggerService = new DBJobTriggerService(
                 mongoDBTestService.mongoConnection(),
+                new MongoCollections(new MongoJackObjectMapperProvider(objectMapper), mongoDBTestService.mongoConnection()),
                 new MongoJackObjectMapperProvider(objectMapper),
                 nodeId,
                 clock,

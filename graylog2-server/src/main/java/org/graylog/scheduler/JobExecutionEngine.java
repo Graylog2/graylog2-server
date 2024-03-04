@@ -17,19 +17,27 @@
 package org.graylog.scheduler;
 
 import com.codahale.metrics.Counter;
+import com.codahale.metrics.Gauge;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+import com.github.benmanes.caffeine.cache.CacheLoader;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Functions;
 import com.google.inject.assistedinject.Assisted;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.inject.Inject;
+import one.util.streamex.EntryStream;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.graylog.scheduler.eventbus.JobCompletedEvent;
 import org.graylog.scheduler.eventbus.JobSchedulerEventBus;
 import org.graylog.scheduler.worker.JobWorkerPool;
 import org.graylog2.cluster.lock.AlreadyLockedException;
 import org.graylog2.cluster.lock.RefreshingLockService;
+import org.graylog2.shared.metrics.MetricUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
@@ -38,6 +46,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.graylog.tracing.GraylogSemanticAttributes.SCHEDULER_JOB_CLASS;
@@ -74,6 +84,7 @@ public class JobExecutionEngine {
     private final Meter executionDenied;
     private final Meter executionRescheduled;
     private final Timer executionTime;
+    private final LoadingCache<String, Long> gaugeCache;
 
     private final AtomicBoolean isRunning = new AtomicBoolean(true);
     private final AtomicBoolean shouldCleanup = new AtomicBoolean(true);
@@ -121,6 +132,34 @@ public class JobExecutionEngine {
         this.executionDenied = metricRegistry.meter(MetricRegistry.name(getClass(), "executions", "denied"));
         this.executionRescheduled = metricRegistry.meter(MetricRegistry.name(getClass(), "executions", "rescheduled"));
         this.executionTime = metricRegistry.timer(MetricRegistry.name(getClass(), "executions", "time"));
+
+        // We use a cache to avoid having every gauge metric hitting the database.
+        this.gaugeCache = Caffeine.newBuilder()
+                .expireAfterWrite(15, TimeUnit.SECONDS)
+                .build(new CacheLoader<>() {
+                    @Override
+                    public @Nullable Long load(String key) {
+                        throw new UnsupportedOperationException("Always use #loadAll");
+                    }
+
+                    @Override
+                    public Map<String, Long> loadAll(Set<? extends String> keys) {
+                        // Since the DBJobTriggerService#numberOfOverdueTriggers only returns counts for existing
+                        // triggers, we initialize all known job definition types with zero to always get counts
+                        // for all types.
+                        return EntryStream.of(jobFactory.entrySet().stream())
+                                .mapValues(Functions.constant(0L))
+                                .append(jobTriggerService.numberOfOverdueTriggers())
+                                .toMap((defaultValue, dbValue) -> dbValue);
+                    }
+                });
+
+        // We always get the full set of job type names to populate the cache for the next gauge calls.
+        jobFactory.keySet().forEach(jobType -> MetricUtils.safelyRegister(
+                metricRegistry,
+                MetricRegistry.name(getClass(), "executions", "overdue", "type", jobType),
+                (Gauge<Long>) () -> gaugeCache.getAll(jobFactory.keySet()).get(jobType)
+        ));
     }
 
     /**

@@ -16,10 +16,16 @@
  */
 package org.graylog.scheduler;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import com.mongodb.BasicDBObject;
+import com.mongodb.client.AggregateIterable;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Accumulators;
+import com.mongodb.client.model.Aggregates;
+import com.mongodb.client.model.Filters;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import one.util.streamex.StreamEx;
@@ -28,6 +34,7 @@ import org.graylog.scheduler.capabilities.SchedulerCapabilitiesService;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.scheduler.schedule.OnceJobSchedule;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.utilities.MongoQueryUtils;
@@ -51,6 +58,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
@@ -86,9 +94,11 @@ public class DBJobTriggerService {
     private final JobSchedulerClock clock;
     private final SchedulerCapabilitiesService schedulerCapabilitiesService;
     private final Duration lockExpirationDuration;
+    private final MongoCollection<JobTriggerDto> collection;
 
     @Inject
     public DBJobTriggerService(MongoConnection mongoConnection,
+                               MongoCollections mongoCollections,
                                MongoJackObjectMapperProvider mapper,
                                NodeId nodeId,
                                JobSchedulerClock clock,
@@ -102,6 +112,7 @@ public class DBJobTriggerService {
                 JobTriggerDto.class,
                 ObjectId.class,
                 mapper.get());
+        this.collection = mongoCollections.get(COLLECTION_NAME, JobTriggerDto.class);
 
         db.createIndex(new BasicDBObject(FIELD_JOB_DEFINITION_ID, 1));
         db.createIndex(new BasicDBObject(FIELD_LOCK_OWNER, 1));
@@ -526,5 +537,37 @@ public class DBJobTriggerService {
         try (final DBCursor<JobTriggerDto> cursor = db.find(query).sort(DBSort.desc(FIELD_UPDATED_AT))) {
             return ImmutableList.copyOf((Iterator<? extends JobTriggerDto>) cursor);
         }
+    }
+
+    private record OverdueTrigger(@JsonProperty("_id") String type, @JsonProperty("count") long count) {}
+
+    /**
+     * Returns the number of overdue triggers grouped by job type.
+     *
+     * @return a map of job type counts
+     */
+    public Map<String, Long> numberOfOverdueTriggers() {
+        final DateTime now = clock.nowUTC();
+        final AggregateIterable<OverdueTrigger> result = collection.aggregate(List.of(
+                Aggregates.match(
+                        Filters.and(
+                                Filters.eq(FIELD_LOCK_OWNER, null),
+                                Filters.eq(FIELD_STATUS, JobTriggerStatus.RUNNABLE),
+                                Filters.lte(FIELD_NEXT_TIME, now),
+                                Filters.or(
+                                        Filters.not(Filters.exists(FIELD_END_TIME)),
+                                        Filters.eq(FIELD_END_TIME, null),
+                                        Filters.gte(FIELD_END_TIME, now)
+                                )
+                        )
+                ),
+                Aggregates.group(
+                        "$" + FIELD_JOB_DEFINITION_TYPE,
+                        Accumulators.sum("count", 1)
+                )
+        ), OverdueTrigger.class);
+
+        return StreamSupport.stream(result.spliterator(), false)
+                .collect(Collectors.toMap(OverdueTrigger::type, OverdueTrigger::count));
     }
 }
