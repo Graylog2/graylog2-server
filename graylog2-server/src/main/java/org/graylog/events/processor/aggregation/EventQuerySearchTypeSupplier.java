@@ -17,19 +17,22 @@
 package org.graylog.events.processor.aggregation;
 
 import org.graylog.events.processor.EventDefinition;
-import org.graylog.events.processor.EventProcessorException;
 import org.graylog.plugins.views.search.SearchType;
 
-import java.util.List;
+import javax.annotation.Nonnull;
+import java.util.Map;
+import java.util.Set;
 
-public interface AggregationSearch {
-    interface Factory {
-        AggregationSearch create(AggregationEventProcessorConfig config,
-                                 AggregationEventProcessorParameters parameters,
-                                 String searchOwner,
-                                 EventDefinition eventDefinition,
-                                 List<SearchType> additionalSearchTypes);
-    }
+/**
+ * Implementations of this interface are able to contribute {@link org.graylog.plugins.views.search.SearchType search types}
+ * to non-scroll-based event processors.
+ * <p>
+ * The search types will be added to the original query and their results will be available to {@link org.graylog.events.processor.modifier.EventModifier event modifiers} by the engine.
+ */
+public interface EventQuerySearchTypeSupplier {
+    @Nonnull
+    Set<SearchType> additionalSearchTypes(EventDefinition eventDefinition);
 
-    AggregationResult doSearch() throws EventProcessorException;
+    @Nonnull
+    Map<String, Object> eventModifierData(Map<String, SearchType.Result> results);
 }

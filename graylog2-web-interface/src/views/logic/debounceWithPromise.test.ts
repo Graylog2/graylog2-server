@@ -14,15 +14,26 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.db;
+import debounceWithPromise from './debounceWithPromise';
 
-import org.graylog.plugins.views.search.Search;
-import org.graylog.plugins.views.search.SearchJob;
+describe('debounceWithPromise', () => {
+  beforeAll(() => {
+    jest.useFakeTimers();
+  });
 
-import java.util.Optional;
+  it('never returns a pending promise', async () => {
+    const fn = jest.fn(async (attempt: number) => attempt);
 
-public interface SearchJobService {
+    const debouncedFn = debounceWithPromise(fn, 300);
 
-    SearchJob create(Search search, String owner);
-    Optional<SearchJob> load(String id, String owner);
-}
+    const result1 = debouncedFn(1);
+    const result2 = debouncedFn(2);
+    const result3 = debouncedFn(3);
+
+    jest.advanceTimersByTime(400);
+
+    await expect(result1).resolves.toBe(3);
+    await expect(result2).resolves.toBe(3);
+    await expect(result3).resolves.toBe(3);
+  });
+});

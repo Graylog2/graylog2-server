@@ -25,6 +25,14 @@ import Icon from '../common/Icon';
 const Container = styled.a`
   display: inline-flex;
   align-items: center;
+
+  &:hover, &:focus {
+    text-decoration: none;
+
+    .documentation-link-text {
+      text-decoration: underline;
+    }
+  }
 `;
 
 const StyledIcon = styled(Icon)`
@@ -40,8 +48,12 @@ type Props = {
 
 const DocumentationLink = ({ page, title = '', text, displayIcon }: Props) => (
   <Container href={DocsHelper.toString(page)} title={title} target="_blank">
-    {text}
-    {displayIcon && <StyledIcon name="lightbulb_circle" type="regular" size="lg" />}
+    <span className="documentation-link-text">{text}</span>
+    {displayIcon && (
+      <StyledIcon name="lightbulb_circle"
+                  type="regular"
+                  size="lg" />
+    )}
   </Container>
 );
 
