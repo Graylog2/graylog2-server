@@ -18,16 +18,24 @@ package org.graylog2.indexer.datastream.policy.actions;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
-public class RolloverTimeUnitFormatter {
+public class RolloverActionFormatter {
 
-    private RolloverTimeUnitFormatter() {
+    private RolloverActionFormatter() {
     }
 
     /**
      * Formats retention value in days using the proper OpenSearch time value format (e.g. 14d).
      * <a href="https://opensearch.org/docs/latest/im-plugin/ism/policies/#transitions">...</a>
      */
-    public static String formatDays(long days) {
+    public static String formatDaysDuration(long days) {
         return f("%dd", days);
+    }
+
+    /**
+     * Formats size value in gigabytes using the proper OpenSearch size value format (e.g. 30gb).
+     * <a href="https://opensearch.org/docs/latest/im-plugin/ism/policies/#transitions">...</a>
+     */
+    public static String formatGbSize(long gigabytes) {
+        return f("%dgb", gigabytes);
     }
 }

@@ -24,7 +24,9 @@ class RolloverTimeUnitFormatterTest {
 
     @Test
     public void testOpenSearchRetentionFormatting() {
-        assertEquals("1d", RolloverTimeUnitFormatter.formatDays(1));
-        assertEquals("14d", RolloverTimeUnitFormatter.formatDays(14));
+        assertEquals("1d", RolloverActionFormatter.formatDaysDuration(1));
+        assertEquals("14d", RolloverActionFormatter.formatDaysDuration(14));
+        assertEquals("2gb", RolloverActionFormatter.formatGbSize(2));
+        assertEquals("30gb", RolloverActionFormatter.formatGbSize(30));
     }
 }

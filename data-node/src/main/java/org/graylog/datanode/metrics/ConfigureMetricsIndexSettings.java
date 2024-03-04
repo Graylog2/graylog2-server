@@ -46,7 +46,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.graylog2.indexer.datastream.policy.actions.RolloverTimeUnitFormatter.formatDays;
+import static org.graylog2.indexer.datastream.policy.actions.RolloverActionFormatter.formatDaysDuration;
 
 public class ConfigureMetricsIndexSettings implements StateMachineTracer {
 
@@ -161,12 +161,12 @@ public class ConfigureMetricsIndexSettings implements StateMachineTracer {
         RollupAction rollupAction = new RollupAction(ismRollup);
         final List<Action> actions = ImmutableList.of(new Action(rollupAction));
         final List<Policy.Transition> transitions = ImmutableList.of(new Policy.Transition(nextState,
-                new Policy.Condition(formatDays(configuration.getMetricsRetention().toDays()))));
+                new Policy.Condition(formatDaysDuration(configuration.getMetricsRetention().toDays()))));
         return new Policy.State("rollup", actions, transitions);
     }
 
     private Policy.State ismOpenState(String nextState) {
-        final List<Action> actions = ImmutableList.of(new Action(new RolloverAction("1d")));
+        final List<Action> actions = ImmutableList.of(new Action(new RolloverAction("1d", null)));
         final List<Policy.Transition> transitions = ImmutableList.of(new Policy.Transition(nextState, null));
         return new Policy.State("open", actions, transitions);
     }
