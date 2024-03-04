@@ -120,7 +120,15 @@ public class DataStreamAdapterOS2 implements DataStreamAdapter {
         if (Objects.isNull(id)) {
             throw new IllegalArgumentException("Policy Id may not be null");
         }
-        final Optional<IsmPolicy> osPolicy = ismApi.getPolicy(id);
+        Optional<IsmPolicy> osPolicy;
+        try {
+            osPolicy = ismApi.getPolicy(id);
+        } catch (Exception e) {
+            // delete non-readable policies
+            ismApi.removePolicyFromIndex(dataStreamName);
+            ismApi.deletePolicy(id);
+            osPolicy = Optional.empty();
+        }
         if (osPolicy.isPresent()) {
             ismApi.removePolicyFromIndex(dataStreamName);
             ismApi.deletePolicy(id);

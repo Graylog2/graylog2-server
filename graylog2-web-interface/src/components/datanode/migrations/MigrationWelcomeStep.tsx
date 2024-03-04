@@ -22,13 +22,9 @@ import { Icon } from 'components/common';
 import { DocumentationLink } from 'components/support';
 import MigrationDatanodeList from 'components/datanode/migrations/MigrationDatanodeList';
 import MigrationStepTriggerButtonToolbar from 'components/datanode/migrations/common/MigrationStepTriggerButtonToolbar';
-import type { MigrationState, OnTriggerStepFunction } from 'components/datanode/Types';
+import type { MigrationStepComponentProps } from 'components/datanode/Types';
 import MigrationError from 'components/datanode/migrations/common/MigrationError';
-
-type Props = {
-  currentStep: MigrationState,
-  onTriggerStep: OnTriggerStepFunction,
-};
+import InPlaceMigrationInfo from 'components/datanode/migrations/common/InPlaceMigrationInfo';
 
 const Headline = styled.h2`
   margin-top: 5px;
@@ -48,7 +44,7 @@ const StyledHelpPanel = styled(StyledPanel)`
   margin-top: 30px;
 `;
 
-const MigrationWelcomeStep = ({ currentStep, onTriggerStep }: Props) => (
+const MigrationWelcomeStep = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => (
   <Row>
     <Col md={6}>
       <MigrationError errorMessage={currentStep.error_message} />
@@ -90,6 +86,7 @@ const MigrationWelcomeStep = ({ currentStep, onTriggerStep }: Props) => (
           </p>
         </Panel.Body>
       </StyledHelpPanel>
+      <InPlaceMigrationInfo />
     </Col>
   </Row>
 );

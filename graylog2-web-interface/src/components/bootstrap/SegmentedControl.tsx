@@ -16,7 +16,8 @@
  */
 import * as React from 'react';
 import type { Dispatch, SetStateAction } from 'react';
-import { SegmentedControl as MantineSegmentedControl, useMantineTheme } from '@mantine/core';
+import { SegmentedControl as MantineSegmentedControl } from '@mantine/core';
+import { useTheme } from 'styled-components';
 import type { SegmentedControlItem } from '@mantine/core';
 
 type Props = {
@@ -28,10 +29,10 @@ type Props = {
 }
 
 const SegmentedControl = ({ data, defaultValue, disabled, handleChange, value }: Props) => {
-  const theme = useMantineTheme();
+  const theme = useTheme();
 
   return (
-    <MantineSegmentedControl color={theme.other.shades.default('info')}
+    <MantineSegmentedControl color={theme.colors.variant.info}
                              data={data}
                              defaultValue={defaultValue}
                              disabled={disabled}

@@ -23,6 +23,7 @@ import useDataNodes from 'components/datanode/hooks/useDataNodes';
 import type { MigrationStepComponentProps } from 'components/datanode/Types';
 import MigrationStepTriggerButtonToolbar from 'components/datanode/migrations/common/MigrationStepTriggerButtonToolbar';
 import JournalSizeWarning from 'components/datanode/migrations/in-place/JournalSizeWarning';
+import InPlaceMigrationInfo from 'components/datanode/migrations/common/InPlaceMigrationInfo';
 
 const Welcome = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => {
   const { data: dataNodes } = useDataNodes();
@@ -38,6 +39,7 @@ const Welcome = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) =>
         </Col>
         <Col md={6}>
           <JournalSizeWarning />
+          <InPlaceMigrationInfo />
         </Col>
       </Row>
       <MigrationStepTriggerButtonToolbar disabled={dataNodes?.elements?.length <= 0} nextSteps={currentStep.next_steps} onTriggerStep={onTriggerStep} />
