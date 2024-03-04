@@ -21,10 +21,12 @@ import useRemoteReindexMigrationStatus from './useRemoteReindexMigrationStatus';
 import { MIGRATION_STATE } from '../Constants';
 import type { MigrationState } from '../Types';
 
+const mockOnTrigger = (migrationState: MigrationState = {} as unknown as MigrationState) => jest.fn(() => Promise.resolve(migrationState));
+
 describe('useRemoteReindexMigrationStatus', () => {
   it('should not fetch migration status on other steps', async () => {
     const currentStep = { state: MIGRATION_STATE.REMOTE_REINDEX_WELCOME_PAGE.key, next_steps: [] };
-    const onTriggerStep = jest.fn(() => Promise.resolve({} as MigrationState));
+    const onTriggerStep = mockOnTrigger();
 
     const { result, waitFor } = renderHook(() => useRemoteReindexMigrationStatus(currentStep, onTriggerStep, 1));
 
@@ -36,7 +38,7 @@ describe('useRemoteReindexMigrationStatus', () => {
   it('should only fetch migration status on the RemoteReindexRunning step', async () => {
     const currentStep = { state: MIGRATION_STATE.REMOTE_REINDEX_RUNNING.key, next_steps: [] };
     const migrationState = { response: { progress: 0, status: 'STARTING' } } as unknown as MigrationState;
-    const onTriggerStep = jest.fn(() => Promise.resolve(migrationState));
+    const onTriggerStep = mockOnTrigger(migrationState);
 
     const { result, waitFor } = renderHook(() => useRemoteReindexMigrationStatus(currentStep, onTriggerStep, 1));
 
@@ -48,7 +50,7 @@ describe('useRemoteReindexMigrationStatus', () => {
   it('should update nextSteps when migration progress is 100%', async () => {
     const currentStep = { state: MIGRATION_STATE.REMOTE_REINDEX_RUNNING.key, next_steps: [] };
     const migrationState = { response: { progress: 100, status: 'FINISHED' } } as unknown as MigrationState;
-    const onTriggerStep = jest.fn(() => Promise.resolve(migrationState));
+    const onTriggerStep = mockOnTrigger(migrationState);
 
     const { result, waitFor } = renderHook(() => useRemoteReindexMigrationStatus(currentStep, onTriggerStep, 1));
 
