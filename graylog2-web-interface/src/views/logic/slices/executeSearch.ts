@@ -63,7 +63,7 @@ export const startJob = async (
   return runStartJob(search, executionState).then((res) => ({ asyncSearchId: res.async_search_id, nodeId: res.node_id }));
 };
 
-export const pollJob = (jobIds: JobIds, result: SearchJobType | null, signal: AbortSignal): Promise<SearchJobType> => new Promise((resolve, reject) => {
+export const pollJob = (jobIds: JobIds, result: SearchJobType | null, signal: AbortSignal): Promise<SearchJobType> => new Promise((resolve) => {
   if (result) {
     resolve(result);
   } else {
@@ -71,7 +71,7 @@ export const pollJob = (jobIds: JobIds, result: SearchJobType | null, signal: Ab
       .then(() => {
         if (!signal.aborted) {
           resolve(runPollJob(jobIds).then((res) => pollJob(jobIds, res, signal)));
-        } else { reject(); }
+        }
       });
   }
 });

@@ -129,16 +129,15 @@ const Search = () => {
     StreamsActions.refresh();
   }, []);
 
-  const handleLeavePage = useCallback(() => dispatch(cancelExecutedJob()), [dispatch]);
-
   useEffect(() => {
+    const handleLeavePage = () => dispatch(cancelExecutedJob());
     window.addEventListener('beforeunload', handleLeavePage);
 
     return () => {
       handleLeavePage();
       window.removeEventListener('beforeunload', handleLeavePage);
     };
-  }, [handleLeavePage]);
+  }, [dispatch]);
 
   return (
     <>
