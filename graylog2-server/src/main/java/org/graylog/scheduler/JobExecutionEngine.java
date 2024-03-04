@@ -71,9 +71,9 @@ public class JobExecutionEngine {
 
     private final Counter executionSuccessful;
     private final Counter executionFailed;
+    private final Meter executionDenied;
+    private final Meter executionRescheduled;
     private final Timer executionTime;
-    private final Meter executionDenyRate;
-    private final Meter executionRescheduledRate;
 
     private final AtomicBoolean isRunning = new AtomicBoolean(true);
     private final AtomicBoolean shouldCleanup = new AtomicBoolean(true);
@@ -118,9 +118,9 @@ public class JobExecutionEngine {
 
         this.executionSuccessful = metricRegistry.counter(MetricRegistry.name(getClass(), "executions", "successful"));
         this.executionFailed = metricRegistry.counter(MetricRegistry.name(getClass(), "executions", "failed"));
+        this.executionDenied = metricRegistry.meter(MetricRegistry.name(getClass(), "executions", "denied"));
+        this.executionRescheduled = metricRegistry.meter(MetricRegistry.name(getClass(), "executions", "rescheduled"));
         this.executionTime = metricRegistry.timer(MetricRegistry.name(getClass(), "executions", "time"));
-        this.executionDenyRate = metricRegistry.meter(MetricRegistry.name(getClass(), "executions", "deny-rate"));
-        this.executionRescheduledRate = metricRegistry.meter(MetricRegistry.name(getClass(), "executions", "rescheduled"));
     }
 
     /**
@@ -164,15 +164,14 @@ public class JobExecutionEngine {
                 if (!workerPool.execute(() -> handleTriggerWithConcurrencyLimit(trigger))) {
                     // The job couldn't be executed so we have to release the trigger again with the same nextTime
                     jobTriggerService.releaseTrigger(trigger, JobTriggerUpdate.withNextTime(trigger.nextTime()));
-                    executionDenyRate.mark();
-                    executionRescheduledRate.mark();
+                    executionDenied.mark();
                     return false;
                 }
 
                 return true;
             }
         }
-        executionDenyRate.mark();
+        executionDenied.mark();
         return false;
     }
 
@@ -192,8 +191,8 @@ public class JobExecutionEngine {
                 } catch (AlreadyLockedException e) {
                     final DateTime nextTime = DateTime.now(DateTimeZone.UTC).plus(slidingBackoff(trigger));
                     jobTriggerService.releaseTrigger(trigger, JobTriggerUpdate.withConcurrencyReschedule(nextTime));
-                    executionDenyRate.mark();
-                    executionRescheduledRate.mark();
+                    executionDenied.mark();
+                    executionRescheduled.mark();
                 }
             }
         } else {
