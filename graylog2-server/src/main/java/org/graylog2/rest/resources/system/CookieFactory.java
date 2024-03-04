@@ -17,18 +17,28 @@
 package org.graylog2.rest.resources.system;
 
 import com.google.common.base.Strings;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.NewCookie;
 import org.graylog2.configuration.HttpConfiguration;
+import org.graylog2.rest.RestTools;
 import org.graylog2.rest.models.system.sessions.responses.SessionResponse;
 
 import java.net.URI;
 import java.util.Date;
 import java.util.Optional;
 
+@Singleton
 public class CookieFactory {
     private static final String HEADER_ORIGIN = "Origin";
     private static final String HEADER_X_FORWARDED_PROTO = "X-Forwarded-Proto";
+    private final URI httpExternalUri;
+
+    @Inject
+    public CookieFactory(HttpConfiguration httpConfiguration) {
+        httpExternalUri = httpConfiguration.getHttpExternalUri();
+    }
 
     NewCookie createAuthenticationCookie(SessionResponse token, ContainerRequestContext requestContext) {
         return makeCookie(token.getAuthenticationToken(), token.validUntil(), requestContext);
@@ -42,8 +52,7 @@ public class CookieFactory {
         final Date now = new Date();
         final int maxAge = Long.valueOf((validUntil.getTime() - now.getTime()) / 1000).intValue();
 
-        final URI baseUri = baseUriFromRequest(requestContext);
-        final String basePath = Optional.ofNullable(Strings.emptyToNull(baseUri.getPath())).orElse("/");
+        final String basePath = cookiePathFromRequest(requestContext);
 
         final boolean isSecure = schemeFromRequest(requestContext)
                 .map(scheme -> scheme.equalsIgnoreCase("https"))
@@ -86,15 +95,8 @@ public class CookieFactory {
                 .flatMap(this::safeCreateUri);
     }
 
-    private URI baseUriFromRequest(ContainerRequestContext requestContext) {
-        final Optional<URI> graylogUrlFromHeader = uriFromHeader(requestContext, HttpConfiguration.OVERRIDE_HEADER);
-        if (graylogUrlFromHeader.isPresent()) {
-            return graylogUrlFromHeader.get();
-        }
-
-        final Optional<URI> origin = uriFromHeader(requestContext, HEADER_ORIGIN);
-
-        return origin.orElseGet(() -> requestContext.getUriInfo().getBaseUri());
+    private String cookiePathFromRequest(ContainerRequestContext requestContext) {
+        return RestTools.buildExternalUri(requestContext.getHeaders(), httpExternalUri).getPath();
     }
 
     private Optional<URI> safeCreateUri(String uri) {
