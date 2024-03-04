@@ -16,9 +16,8 @@
  */
 package org.graylog.storage.opensearch2;
 
-import org.graylog2.indexer.counts.CountsAdapter;
-
 import jakarta.inject.Inject;
+import org.graylog2.indexer.counts.CountsAdapter;
 
 import java.util.List;
 
@@ -32,8 +31,13 @@ public class CountsAdapterOS2 implements CountsAdapter {
 
     @Override
     public long totalCount(List<String> indices) {
-        final var response = client.execute(c -> c.count(request -> request.index(indices)), "Fetching message count failed for indices ");
+        final var result = client.execute(c -> c.search(searchBuilder -> searchBuilder
+                        .query(queryBuilder -> queryBuilder.matchAll(matchAll -> matchAll))
+                        .size(0)
+                        .trackTotalHits(totalHits -> totalHits.enabled(true))
+                        .index(indices), IndexedMessage.class),
+                "Fetching message count failed for indices ");
 
-        return response.count();
+        return result.hits().total().value();
     }
 }
