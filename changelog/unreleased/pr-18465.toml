@@ -1,0 +1,4 @@
+type = "f"
+message = "bumping the OpenSearch client to 2.12.0"
+
+pulls = ["18386"]
