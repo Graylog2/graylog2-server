@@ -16,6 +16,7 @@
  */
 package org.graylog2.rest.resources.system;
 
+import com.google.common.base.CharMatcher;
 import com.google.common.base.Strings;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -29,10 +30,15 @@ import java.net.URI;
 import java.util.Date;
 import java.util.Optional;
 
+import static com.google.common.base.CharMatcher.ascii;
+import static com.google.common.base.CharMatcher.isNot;
+import static com.google.common.base.CharMatcher.javaIsoControl;
+
 @Singleton
 public class CookieFactory {
     private static final String HEADER_ORIGIN = "Origin";
     private static final String HEADER_X_FORWARDED_PROTO = "X-Forwarded-Proto";
+    private static final CharMatcher PATH_MATCHER = ascii().and(isNot(';')).and(javaIsoControl().negate());
     private final URI httpExternalUri;
 
     @Inject
@@ -96,7 +102,9 @@ public class CookieFactory {
     }
 
     private String cookiePathFromRequest(ContainerRequestContext requestContext) {
-        return RestTools.buildExternalUri(requestContext.getHeaders(), httpExternalUri).getPath();
+        return sanitizePath(
+                RestTools.buildExternalUri(requestContext.getHeaders(), httpExternalUri).getPath()
+        );
     }
 
     private Optional<URI> safeCreateUri(String uri) {
@@ -105,6 +113,18 @@ public class CookieFactory {
         } catch (IllegalArgumentException ignored) {
             return Optional.empty();
         }
+    }
+
+    /**
+     * Remove characters that are unsafe to use for the path in the cookie.
+     * According to RFC 6265 the allowed characters are:
+     * <p>
+     * {@code
+     * <any CHAR except CTLs or ";">
+     * }
+     */
+    private String sanitizePath(String path) {
+        return PATH_MATCHER.retainFrom(path);
     }
 
 }
