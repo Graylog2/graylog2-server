@@ -23,7 +23,7 @@ import useUserDateTime from 'hooks/useUserDateTime';
 import { adjustFormat } from 'util/DateTime';
 
 type Props = {
-  dateTime?: string | number | Date | Moment,
+  dateTime: string | number | Date | Moment | undefined,
   field?: string,
   format?: DateTimeFormats,
   render?: React.ComponentType<{ value: string, field: string | undefined }>,
@@ -41,9 +41,14 @@ type Props = {
  * from a UTC time that was used in the server.
  *
  */
-const Timestamp = ({ dateTime: dateTimeProp, field, format, render: Component, tz, className }: Props) => {
+const Timestamp = ({ dateTime, field, format, render: Component, tz, className }: Props) => {
   const { formatTime: formatWithUserTz } = useUserDateTime();
-  const dateTime = dateTimeProp ?? new Date();
+
+  if (!dateTime) {
+    // eslint-disable-next-line react/jsx-no-useless-fragment
+    return <></>;
+  }
+
   const formattedDateTime = tz ? adjustFormat(dateTime, format, tz) : formatWithUserTz(dateTime, format);
   const dateTimeString = adjustFormat(dateTime, 'internal');
 

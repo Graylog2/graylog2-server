@@ -93,6 +93,7 @@ const HoverForHelp = ({
                   testId={testId}>
     <StyledIcon className={`${className} ${pullRight ? 'pull-right' : ''}`}
                 name={iconName(type)}
+                type="regular"
                 $type={type}
                 $displayLeftMargin={displayLeftMargin}
                 size={iconSize} />

@@ -514,7 +514,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>exec-maven-plugin</artifactId>
-                    <version>3.1.1</version>
+                    <version>3.2.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -540,7 +540,9 @@
                             <url>
                                 https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.version}/opensearch-${opensearch.version}-linux-x64.tar.gz
                             </url>
-                            <md5>99e957aef76d72c22106d21de6daa8c1</md5>
+                            <sha512>
+                                7009e61af99f148148a5585a55cc1446a071d4365a6f03677d3c16483f2777bc57f1ea9cc77fb8cab412c482941d4608af48a79a89a447cf7c5e255a9120886f
+                            </sha512>
                             <outputFileName>opensearch-${opensearch.version}-linux-x64.tar.gz</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch</outputDirectory>
                             <unpack>true</unpack>
@@ -562,7 +564,9 @@
                             <url>
                                 https://artifacts.opensearch.org/releases/bundle/opensearch/${opensearch.version}/opensearch-${opensearch.version}-linux-arm64.tar.gz
                             </url>
-                            <md5>d968de4cf01c843d3e63950917c614aa</md5>
+                            <sha512>
+                                bf316cf32c703b1b1d4c174c4c75326ef0a6dd58ba4c8f06f925947c1dd3d3dfdb19a5a68dcd4b463111ef31c87364cb18fa4e9f947e3db71a8f4c5e76b74547
+                            </sha512>
                             <outputFileName>opensearch-${opensearch.version}-linux-aarch64.tar.gz</outputFileName>
                             <outputDirectory>${project.build.directory}/opensearch</outputDirectory>
                             <unpack>true</unpack>
@@ -572,6 +576,23 @@
                                     <replacement>$1-linux-aarch64/</replacement>
                                 </org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
                             </fileMappers>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>download-repository-s3-plugin</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>wget</goal>
+                        </goals>
+                        <configuration>
+                            <url>
+                                https://artifacts.opensearch.org/releases/plugins/repository-s3/${opensearch.version}/repository-s3-${opensearch.version}.zip
+                            </url>
+                            <outputFileName>repository-s3-${opensearch.version}.zip</outputFileName>
+                            <outputDirectory>${project.build.directory}/opensearch/plugins</outputDirectory>
+                            <sha512>
+                                a99a5e92a48a7c2c0039b89ca074295e5ec10e40c92cb2801bed6a486588188f600d3deb0f805f0833f67fe4fda6d2f6fd199a81c4475927eb20ad76c78312fd
+                            </sha512>
                         </configuration>
                     </execution>
                 </executions>
