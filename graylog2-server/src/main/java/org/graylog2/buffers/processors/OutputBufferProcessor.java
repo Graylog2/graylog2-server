@@ -34,6 +34,7 @@ import org.graylog2.outputs.OutputRouter;
 import org.graylog2.plugin.GlobalMetricNames;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.ServerStatus;
+import org.graylog2.plugin.SystemMessage;
 import org.graylog2.plugin.buffers.MessageEvent;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.shared.buffers.WorkHandler;
@@ -159,7 +160,7 @@ public class OutputBufferProcessor implements WorkHandler<MessageEvent> {
         }
         LOG.trace("Processing message <{}> from OutputBuffer.", msg.getId());
 
-        if (msg.isSystemMessage()) {
+        if (msg instanceof SystemMessage) {
             incomingSystemMessages.mark();
         } else {
             incomingMessages.mark();

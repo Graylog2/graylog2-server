@@ -45,7 +45,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
@@ -132,9 +131,9 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput {
         }
 
         try {
-            indexMessageBatch(messages);
+            var indexingResults = indexMessageBatch(messages);
             // This does not exclude failedMessageIds, because we don't know if ES is ever gonna accept these messages.
-            acknowledger.acknowledge(messages.stream().map(MessageWithIndex::message).collect(Collectors.toList()));
+            acknowledger.acknowledge(indexingResults);
         } catch (Exception e) {
             log.error("Unable to flush message buffer", e);
             bufferFlushFailures.mark();
@@ -152,18 +151,7 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput {
             bufferFlushes.mark();
         }
 
-        runIndexingResultCallbacks(messages, indexingResults);
-
         return indexingResults;
-    }
-
-    // TODO not the ideal place for this
-    private static void runIndexingResultCallbacks(List<MessageWithIndex> messages, IndexingResults indexingResults) {
-        if (messages.stream().anyMatch(m -> m.message().hasIndexingResultCallback())) {
-            final var resultMap = indexingResults.allResults().stream().collect(Collectors.toMap(r -> r.message().getMessageId(), r -> r, (a, b) -> a));
-
-            messages.forEach(m -> m.message().runIndexingResultCallback(resultMap.get(m.message().getMessageId())));
-        }
     }
 
     public void forceFlushIfTimedout() {

@@ -37,8 +37,6 @@ import org.graylog.failure.FailureCause;
 import org.graylog.failure.ProcessingFailureCause;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.messages.Indexable;
-import org.graylog2.indexer.messages.IndexingResult;
-import org.graylog2.indexer.messages.IndexingResultCallback;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.utilities.date.DateTimeConverter;
 import org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory;
@@ -324,9 +322,6 @@ public class Message implements Messages, Indexable {
      */
     private Map<String, Object> metadata;
 
-    private final static String SYSTEM_MESSAGE_METADATA_FLAG = "is-system-message";
-    private final static String SYSTEM_MESSAGE_INDEXING_RESULT_CALLBACK = "indexing-result-callback";
-
     private com.codahale.metrics.Counter sizeCounter = new com.codahale.metrics.Counter();
 
     private List<ProcessingError> processingErrors;
@@ -372,26 +367,6 @@ public class Message implements Messages, Indexable {
 
     public Message(final Map<String, Object> fields) {
         this((String) fields.get(FIELD_ID), Maps.filterKeys(fields, not(equalTo(FIELD_ID))));
-    }
-
-    /**
-     * Creates a Message that is used for System purposes like restoring Archives.
-     * The message has the following properties:
-     * <ul>
-     *  <li>A size of 0, so its traffic is not accounted</li>
-     *  <li>A single predetermined IndexSet</li>
-     *  <li>No streams, so it will only be routed to the {@link org.graylog2.outputs.DefaultMessageOutput}</li>
-     *  <li>Returns true to {@link #isSystemMessage()}</li>
-     * </ul>
-     */
-    public static Message createSystemMessage(@Nonnull String id, @Nonnull IndexSet indexSet, Map<String, Object> fields) {
-        var message = new Message(id, fields);
-        message.sizeCounter = new com.codahale.metrics.Counter();
-        message.indexSets = Set.of(indexSet);
-        message.streams = Set.of();
-        message.markAsSystemMessage();
-
-        return message;
     }
 
     private Message(String id, Map<String, Object> newFields) {
@@ -952,29 +927,6 @@ public class Message implements Messages, Indexable {
 
     private boolean shouldNotRecord(ServerStatus serverStatus) {
         return !serverStatus.getDetailedMessageRecordingStrategy().shouldRecord(this);
-    }
-
-    private void markAsSystemMessage() {
-        setMetadata(SYSTEM_MESSAGE_METADATA_FLAG, true);
-    }
-
-    public boolean isSystemMessage() {
-        return getMetadataValue(SYSTEM_MESSAGE_METADATA_FLAG) != null;
-    }
-
-    public void registerIndexingResultCallback(IndexingResultCallback callback) {
-        setMetadata(SYSTEM_MESSAGE_INDEXING_RESULT_CALLBACK, callback);
-    }
-
-    public boolean hasIndexingResultCallback() {
-        return getMetadataValue(SYSTEM_MESSAGE_INDEXING_RESULT_CALLBACK) != null;
-    }
-
-    public void runIndexingResultCallback(IndexingResult result) {
-        var callBack = getMetadataValue(SYSTEM_MESSAGE_INDEXING_RESULT_CALLBACK);
-        if (callBack instanceof IndexingResultCallback indexingResultCallback) {
-            indexingResultCallback.accept(result);
-        }
     }
 
     /**
