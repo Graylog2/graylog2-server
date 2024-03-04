@@ -97,7 +97,7 @@ export type MigrationStepRequest = {
 };
 export type StepArgs = {[_key: string]: unknown};
 
-export type OnTriggerStepFunction = (step: MigrationActions, args?: StepArgs) => unknown
+export type OnTriggerStepFunction = (step: MigrationActions, args?: StepArgs) => Promise<MigrationState>
 export type MigrationStepComponentProps = {
   currentStep: MigrationState,
   onTriggerStep: OnTriggerStepFunction,

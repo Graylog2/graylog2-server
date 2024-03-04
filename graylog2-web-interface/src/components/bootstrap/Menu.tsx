@@ -85,8 +85,10 @@ const StyledMenuLabel = styled(MantineMenu.Label)(({ theme }) => css`
 Menu.Target = MantineMenu.Target;
 
 Menu.Dropdown = styled(MantineMenu.Dropdown)(({ theme }) => css`
-  background-color: ${theme.colors.global.contentBackground};
-  border: 1px solid ${theme.colors.variant.lighter.default};
+  && {
+    background-color: ${theme.colors.global.contentBackground};
+    border: 1px solid ${theme.colors.variant.lighter.default};
+  }
 `);
 
 Menu.Item = StyledMenuItem;

@@ -45,9 +45,7 @@ const MigrationWizard = () => {
     return <Spinner text="Loading ..." />;
   }
 
-  const onTriggerStep = (step: MigrationActions, args: StepArgs = {}) => {
-    onTriggerNextState({ step, args });
-  };
+  const onTriggerStep = async (step: MigrationActions, args: StepArgs = {}) => onTriggerNextState({ step, args });
 
   const { state: activeStep } = currentStep;
 
