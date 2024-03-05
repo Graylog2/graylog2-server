@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix potential deadlock in async query string validation."
+
+issues = ["16883"]
+pulls = ["18467"]

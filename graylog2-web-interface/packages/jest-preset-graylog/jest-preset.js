@@ -59,5 +59,5 @@ module.exports = {
   transform: {
     '^.+\\.[tj]sx?$': 'babel-jest',
   },
-  transformIgnorePatterns: ['node_modules/(?!(@react-hook|uuid|@?react-leaflet|jest-preset-graylog|graylog-web-plugin)/)'],
+  transformIgnorePatterns: ['node_modules/(?!(@react-hook|uuid|@?react-leaflet|jest-preset-graylog|graylog-web-plugin|p-debounce)/)'],
 };
