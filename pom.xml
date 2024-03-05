@@ -87,7 +87,7 @@
         <maven.compiler.useIncrementalCompilation>false</maven.compiler.useIncrementalCompilation>
 
         <!-- Dependencies -->
-        <opensearch.shaded.version>2.11.0-1</opensearch.shaded.version>
+        <opensearch.shaded.version>2.12.0-2</opensearch.shaded.version>
         <airline.version>3.0.0</airline.version>
         <amqp-client.version>5.20.0</amqp-client.version>
         <antlr.version>4.13.1</antlr.version>
@@ -99,15 +99,15 @@
         <auto-value.version>1.10.4</auto-value.version>
         <auto-value-javabean.version>2.5.2</auto-value-javabean.version>
         <aws-java-sdk-1.version>1.12.607</aws-java-sdk-1.version>
-        <aws-java-sdk-2.version>2.23.4</aws-java-sdk-2.version>
+        <aws-java-sdk-2.version>2.24.13</aws-java-sdk-2.version>
         <aws-kinesis-client.version>2.2.10</aws-kinesis-client.version>
-        <aws-msk-iam-auth.version>2.0.2</aws-msk-iam-auth.version>
+        <aws-msk-iam-auth.version>2.0.3</aws-msk-iam-auth.version>
         <bouncycastle.version>1.77</bouncycastle.version>
-        <byte-buddy.version>1.14.11</byte-buddy.version>
+        <byte-buddy.version>1.14.12</byte-buddy.version>
         <caffeine.version>3.1.8</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
         <classgraph.version>4.8.165</classgraph.version>
-        <commons-codec.version>1.16.0</commons-codec.version>
+        <commons-codec.version>1.16.1</commons-codec.version>
         <commons-csv.version>1.10.0</commons-csv.version>
         <commons-email.version>1.6.0</commons-email.version>
         <commons-lang3.version>3.14.0</commons-lang3.version>
@@ -120,7 +120,7 @@
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>4.2.0</geoip2.version>
         <grok.version>0.1.9-graylog-2</grok.version>
-        <grpc.version>1.61.0</grpc.version>
+        <grpc.version>1.62.2</grpc.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>
         <guava.version>33.0.0-jre</guava.version>
         <guice.version>7.0.0</guice.version>
@@ -131,6 +131,7 @@
         <jackson.version>2.15.3</jackson.version>
         <jadconfig.version>0.14.0</jadconfig.version>
         <java-semver.version>0.9.0</java-semver.version>
+        <javax.annotation-api.version>1.3.2</javax.annotation-api.version>
         <jakarta.annotation-api.version>2.1.1</jakarta.annotation-api.version>
         <jakarta.inject.version>2.0.1</jakarta.inject.version>
         <jakarta.ws.rs-api.version>3.1.0</jakarta.ws.rs-api.version>
@@ -140,36 +141,35 @@
         <jdot.version>1.0</jdot.version>
         <jersey.version>3.1.5</jersey.version>
         <jmte.version>5.0.0</jmte.version>
-        <joda-time.version>2.12.6</joda-time.version>
+        <joda-time.version>2.12.7</joda-time.version>
         <jool.version>0.9.15</jool.version>
         <json-path.version>2.9.0</json-path.version>
         <kafka.version>3.6.1</kafka.version>
         <kafka09.version>0.9.0.1-7</kafka09.version>
-        <log4j.version>2.22.1</log4j.version>
-        <lucene.version>9.9.2</lucene.version>
-        <metrics.version>4.1.9</metrics.version>
+        <log4j.version>2.23.0</log4j.version>
+        <lucene.version>9.10.0</lucene.version>
+        <metrics.version>4.2.25</metrics.version>
         <mongodb-driver.version>4.11.1</mongodb-driver.version>
-        <mongojack.version>2.10.1.4</mongojack.version>
-        <mongojack4.version>4.8.1-1</mongojack4.version>
+        <mongojack.version>4.8.2</mongojack.version>
         <natty.version>0.13</natty.version>
-        <netty.version>4.1.106.Final</netty.version>
-        <netty-tcnative-boringssl-static.version>2.0.62.Final</netty-tcnative-boringssl-static.version>
+        <netty.version>4.1.107.Final</netty.version>
+        <netty-tcnative-boringssl-static.version>2.0.63.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>4.12.0</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
         <opentelemetry.version>1.32.0</opentelemetry.version>
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
         <pkts.version>3.0.10</pkts.version>
         <prometheus-client.version>0.16.0</prometheus-client.version>
-        <protobuf.version>3.25.2</protobuf.version>
+        <protobuf.version>3.25.3</protobuf.version>
         <reflections.version>0.10.2</reflections.version>
         <retrofit.version>2.9.0</retrofit.version>
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
         <shiro.version>1.13.0</shiro.version>
         <snakeyaml.version>2.2</snakeyaml.version>
         <snappy-java.version>1.1.10.5</snappy-java.version>
-        <oshi.version>6.4.11</oshi.version>
+        <oshi.version>6.4.13</oshi.version>
         <siv-mode.version>1.5.0</siv-mode.version>
-        <slf4j.version>2.0.11</slf4j.version>
+        <slf4j.version>2.0.12</slf4j.version>
         <streamex.version>0.8.2</streamex.version>
         <swagger.version>1.6.13</swagger.version>
         <syslog4j.version>0.9.61</syslog4j.version>
@@ -180,22 +180,22 @@
         <zstd.version>1.5.5-11</zstd.version>
         <cron-utils.version>9.2.1</cron-utils.version>
         <asciitable.version>0.3.2</asciitable.version>
-        <jjwt.version>0.11.5</jjwt.version>
+        <jjwt.version>0.12.5</jjwt.version>
         <stateless4j.version>2.6.0</stateless4j.version>
 
         <!-- Test dependencies -->
         <apacheds-server.version>2.0.0-M24</apacheds-server.version>
-        <assertj-core.version>3.25.2</assertj-core.version>
+        <assertj-core.version>3.25.3</assertj-core.version>
         <assertj-joda-time.version>2.2.0</assertj-joda-time.version>
         <awaitility.version>4.2.0</awaitility.version>
-        <equalsverifier.version>3.15.6</equalsverifier.version>
+        <equalsverifier.version>3.15.8</equalsverifier.version>
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.2</junit.version>
-        <junit-jupiter.version>5.10.1</junit-jupiter.version>
-        <mockito.version>5.10.0</mockito.version>
+        <junit-jupiter.version>5.10.2</junit-jupiter.version>
+        <mockito.version>5.11.0</mockito.version>
         <restassured.version>5.4.0</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
-        <testcontainers.version>1.19.4</testcontainers.version>
+        <testcontainers.version>1.19.6</testcontainers.version>
         <testcontainers.opensearch.version>2.0.1</testcontainers.opensearch.version>
 
         <!-- Nodejs dependencies -->
@@ -357,6 +357,13 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <!-- Still needed because the protobuf compiler adds javax.annotation.Generated
+                 annotations to generated classes -->
+            <dependency>
+                <groupId>javax.annotation</groupId>
+                <artifactId>javax.annotation-api</artifactId>
+                <version>${javax.annotation-api.version}</version>
+            </dependency>
             <dependency>
                 <groupId>io.grpc</groupId>
                 <artifactId>grpc-bom</artifactId>
@@ -392,13 +399,37 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-compress</artifactId>
-                <version>1.25.0</version>
+                <version>1.26.0</version>
             </dependency>
 
             <dependency>
                 <groupId>commons-net</groupId>
                 <artifactId>commons-net</artifactId>
                 <version>${commons-net.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.dropwizard.metrics</groupId>
+                <artifactId>metrics-bom</artifactId>
+                <version>${metrics.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Always check mongojack dependencies to see if we need to adjust our mongodb-driver dependencies -->
+            <dependency>
+                <groupId>org.mongodb</groupId>
+                <artifactId>mongodb-driver-sync</artifactId>
+                <version>${mongodb-driver.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mongodb</groupId>
+                <artifactId>mongodb-driver-legacy</artifactId>
+                <version>${mongodb-driver.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mongojack</groupId>
+                <artifactId>mongojack</artifactId>
+                <version>${mongojack.version}</version>
             </dependency>
 
             <!-- test -->
@@ -500,7 +531,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
-                    <version>3.5.1</version>
+                    <version>3.5.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -540,7 +571,7 @@
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>4.8.3.0</version>
+                    <version>4.8.3.1</version>
                 </plugin>
                 <plugin>
                     <groupId>de.thetaphi</groupId>
@@ -633,7 +664,8 @@
                                 </bannedDependencies>
                                 <banDuplicatePomDependencyVersions/>
                                 <requireMavenVersion>
-                                    <version>[3.6.0,)</version>
+                                    <!-- Enforce the same version we define in the maven wrapper -->
+                                    <version>[3.9.6]</version>
                                 </requireMavenVersion>
                                 <requireJavaVersion>
                                     <version>[17.0,17.99]</version>

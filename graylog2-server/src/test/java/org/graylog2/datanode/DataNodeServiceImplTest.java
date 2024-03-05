@@ -16,6 +16,7 @@
  */
 package org.graylog2.datanode;
 
+import com.google.common.eventbus.EventBus;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.DataNodeStatus;
@@ -30,6 +31,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
@@ -38,6 +41,8 @@ public class DataNodeServiceImplTest {
 
     @Mock
     private ClusterEventBus clusterEventBus;
+    @Mock
+    private EventBus eventBus;
     private NodeService<DataNodeDto> nodeService;
 
     private DataNodeServiceImpl classUnderTest;
@@ -45,7 +50,7 @@ public class DataNodeServiceImplTest {
     @Before
     public void setUp() {
         this.nodeService = new TestDataNodeNodeClusterService();
-        this.classUnderTest = new DataNodeServiceImpl(clusterEventBus, nodeService);
+        this.classUnderTest = new DataNodeServiceImpl(clusterEventBus, nodeService, eventBus);
     }
 
     private DataNodeDto buildTestNode(String nodeId, DataNodeStatus status) {
@@ -72,7 +77,7 @@ public class DataNodeServiceImplTest {
     }
 
     @Test
-    public void removeNodeFailsWhenRemovingAnother() throws NodeNotFoundException {
+    public void removeNodeFailsWhenRemovingAllSequentially() throws NodeNotFoundException {
         final String testNodeId = "node";
         nodeService.registerServer(buildTestNode(testNodeId, DataNodeStatus.AVAILABLE));
         nodeService.registerServer(buildTestNode("othernode", DataNodeStatus.REMOVING));
@@ -80,8 +85,29 @@ public class DataNodeServiceImplTest {
         Exception e = assertThrows(IllegalArgumentException.class, () -> {
             classUnderTest.removeNode(testNodeId);
         });
-        assertEquals("Only one data node can be removed at a time.", e.getMessage());
+        assertEquals("Cannot remove last data node in the cluster.", e.getMessage());
         verifyNoMoreInteractions(clusterEventBus);
+    }
+
+    @Test
+    public void removeNodesPostsFirstToEventBus() throws NodeNotFoundException {
+        String node1 = "node1";
+        String node2 = "node2";
+        nodeService.registerServer(buildTestNode(node1, DataNodeStatus.AVAILABLE));
+        nodeService.registerServer(buildTestNode(node2, DataNodeStatus.AVAILABLE));
+        nodeService.registerServer(buildTestNode("node3", DataNodeStatus.AVAILABLE));
+
+        classUnderTest.removeNode(node1);
+        verify(clusterEventBus).post(DataNodeLifecycleEvent.create(node1, DataNodeLifecycleTrigger.REMOVE));
+
+        classUnderTest.removeNode(node2);
+        verifyNoMoreInteractions(clusterEventBus);
+
+        long removeCount = nodeService.allActive().values().stream()
+                .filter(dto -> dto.getActionQueue() == DataNodeLifecycleTrigger.REMOVE)
+                .count();
+
+        assertEquals(removeCount, 2);
     }
 
     @Test
@@ -149,6 +175,24 @@ public class DataNodeServiceImplTest {
         nodeService.registerServer(buildTestNode(testNodeId, DataNodeStatus.UNAVAILABLE));
         classUnderTest.startNode(testNodeId);
         verify(clusterEventBus).post(DataNodeLifecycleEvent.create(testNodeId, DataNodeLifecycleTrigger.START));
+    }
+
+    @Test
+    public void removedLifecycleEventRemovesNextNode() {
+        DataNodeDto node1 = buildTestNode("node1", DataNodeStatus.REMOVING);
+        nodeService.registerServer(node1);
+        DataNodeDto node2 = buildTestNode("node2", DataNodeStatus.AVAILABLE);
+        nodeService.registerServer(node2);
+        DataNodeDto node3 = buildTestNode("node3", DataNodeStatus.AVAILABLE);
+        nodeService.registerServer(node3);
+
+        nodeService.update(node2.toBuilder().setActionQueue(DataNodeLifecycleTrigger.REMOVE).build());
+        nodeService.update(node3.toBuilder().setActionQueue(DataNodeLifecycleTrigger.REMOVE).build());
+
+        classUnderTest.handleDataNodeLifeCycleEvent(DataNodeLifecycleEvent.create("node1", DataNodeLifecycleTrigger.REMOVED));
+
+        verify(clusterEventBus, times(1)).post(any());
+
     }
 
 }

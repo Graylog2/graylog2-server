@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 
 public class TestDataNodeNodeClusterService implements NodeService<DataNodeDto> {
 
-    private final List<DataNodeDto> nodes = new LinkedList<>();
+    private List<DataNodeDto> nodes = new LinkedList<>();
 
 
     @Override
@@ -71,6 +71,11 @@ public class TestDataNodeNodeClusterService implements NodeService<DataNodeDto> 
     @Override
     public void ping(NodeDto dto) {
         throw new UnsupportedOperationException("Unsupported operation");
+    }
+
+    @Override
+    public void update(NodeDto dto) {
+        nodes = nodes.stream().map(node -> Objects.equals(node.getNodeId(), dto.getNodeId()) ? (DataNodeDto) dto : node).collect(Collectors.toList());
     }
 
     @Override

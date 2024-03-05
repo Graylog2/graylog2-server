@@ -153,11 +153,11 @@ describe('<WidgetActionsMenu />', () => {
     asMock(createSearch).mockImplementation(async (s) => s);
   });
 
-  it('is updating widget focus context on focus', () => {
+  it('is updating widget focus context on focus', async () => {
     const mockSetWidgetFocusing = jest.fn();
     render(<DummyWidget title="Dummy Widget" setWidgetFocusing={mockSetWidgetFocusing} />);
 
-    const focusButton = screen.getByTitle('Focus this widget');
+    const focusButton = await screen.findByTitle('Focus this widget');
 
     fireEvent.click(focusButton);
 

@@ -19,7 +19,7 @@ import { useCallback, useMemo, useContext, useRef, useImperativeHandle } from 'r
 import PropTypes from 'prop-types';
 import isEmpty from 'lodash/isEmpty';
 import type { FormikErrors } from 'formik';
-import { createGlobalStyle } from 'styled-components';
+import styled, { createGlobalStyle, css } from 'styled-components';
 
 import UserPreferencesContext from 'contexts/UserPreferencesContext';
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
@@ -51,6 +51,14 @@ const GlobalEditorStyles = createGlobalStyle<{ $width?: number; $offsetLeft: num
     left: ${(props) => (props.$offsetLeft ?? 143) + 7}px !important;
   }
 `;
+
+const Container = styled.div<{ $hasValue: boolean }>(({ $hasValue }) => css`
+  width: 100%;
+
+  .ace_hidden-cursors {
+    display: ${$hasValue ? 'block' : 'none'};
+  }
+`);
 
 const displayValidationErrors = () => {
   QueryValidationActions.displayValidationErrors();
@@ -184,29 +192,36 @@ const useCompleter = ({ streams, timeRange, completerFactory, view }: Pick<Props
 };
 
 const useShowHotkeysInOverview = () => {
+  const options = { enabled: false };
+
   useHotkey({
     scope: 'query-input',
     actionKey: 'submit-search',
+    options,
   });
 
   useHotkey({
     scope: 'query-input',
     actionKey: 'insert-newline',
+    options,
   });
 
   useHotkey({
     scope: 'query-input',
     actionKey: 'create-search-filter',
+    options,
   });
 
   useHotkey({
     scope: 'query-input',
     actionKey: 'show-suggestions',
+    options,
   });
 
   useHotkey({
     scope: 'query-input',
     actionKey: 'show-history',
+    options,
   });
 };
 
@@ -282,8 +297,6 @@ const QueryInput = React.forwardRef<Editor, Props>(({
       name: 'Show completions',
       bindKey: { win: 'Alt-Space', mac: 'Alt-Space' },
       exec: async (editor: Editor) => {
-        console.log('test', editor.getValue());
-
         if (editor.getValue()) {
           startAutocomplete(editor);
 
@@ -318,7 +331,7 @@ const QueryInput = React.forwardRef<Editor, Props>(({
   useImperativeHandle(outerRef, () => innerRef.current, []);
 
   return (
-    <>
+    <Container $hasValue={!!value}>
       <GlobalEditorStyles $width={inputWidth} $offsetLeft={inputElement?.offsetLeft} />
       <BasicQueryInput height={height}
                        className={className}
@@ -337,7 +350,7 @@ const QueryInput = React.forwardRef<Editor, Props>(({
                        value={value}
                        wrapEnabled={wrapEnabled} />
 
-    </>
+    </Container>
   );
 });
 

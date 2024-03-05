@@ -59,7 +59,7 @@ const CollectorsAdministrationActions = ({
                            bsSize="small"
                            disabled={selectedLogCollectorsNames.length !== 1}
                            onClick={() => setShowConfigurationModal(true)}>
-        <Icon name="edit" /> Assign Configurations
+        <Icon name="edit_square" /> Assign Configurations
       </ConfigurationButton>
       <CollectorConfigurationModalContainer collectors={collectors}
                                             configurations={configurations}

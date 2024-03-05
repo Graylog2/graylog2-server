@@ -16,17 +16,16 @@
  */
 package org.graylog2.plugin.lookup;
 
-import com.google.common.collect.Multimap;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.google.common.collect.Multimap;
 
 import java.util.Optional;
 
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
-        include = JsonTypeInfo.As.PROPERTY,
+        include = JsonTypeInfo.As.EXISTING_PROPERTY,
         property = LookupCacheConfiguration.TYPE_FIELD,
         visible = true,
         defaultImpl = FallbackCacheConfig.class)

@@ -171,7 +171,7 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
   const limitDuration = moment.duration(config?.query_time_range_limit).asSeconds() ?? 0;
   const hasTimeRangeOverride = globalOverride?.timerange !== undefined;
-  const hasQueryOverride = globalOverride?.query !== undefined;
+  const hasQueryOverride = !!globalOverride?.query?.query_string;
   const formRef = useRef(null);
   const { parameters } = useParameters();
   const handlerContext = useHandlerContext();
@@ -205,8 +205,7 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
                                    limitDuration={limitDuration}
                                    onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
                                    value={values?.timerange}
-                                   hasErrorOnMount={!!errors.timerange}
-                                   position="right" />
+                                   hasErrorOnMount={!!errors.timerange} />
                 )}
                 {hasTimeRangeOverride && (
                   <TimeRangeOverrideInfo value={globalOverride?.timerange}

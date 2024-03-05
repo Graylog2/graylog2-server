@@ -18,13 +18,17 @@ package org.graylog.events.processor.aggregation;
 
 import org.graylog.events.processor.EventDefinition;
 import org.graylog.events.processor.EventProcessorException;
+import org.graylog.plugins.views.search.SearchType;
+
+import java.util.List;
 
 public interface AggregationSearch {
     interface Factory {
         AggregationSearch create(AggregationEventProcessorConfig config,
                                  AggregationEventProcessorParameters parameters,
                                  String searchOwner,
-                                 EventDefinition eventDefinition);
+                                 EventDefinition eventDefinition,
+                                 List<SearchType> additionalSearchTypes);
     }
 
     AggregationResult doSearch() throws EventProcessorException;

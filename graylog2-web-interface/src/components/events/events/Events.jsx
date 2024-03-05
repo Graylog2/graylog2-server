@@ -97,15 +97,12 @@ const priorityFormatter = (eventId, priority) => {
 
   switch (priority) {
     case EventDefinitionPriorityEnum.LOW:
-      icon = 'thermometer-empty';
       style = 'text-muted';
       break;
     case EventDefinitionPriorityEnum.HIGH:
-      icon = 'thermometer-full';
       style = 'text-danger';
       break;
     default:
-      icon = 'thermometer-half';
       style = 'text-info';
   }
 
@@ -113,7 +110,7 @@ const priorityFormatter = (eventId, priority) => {
 
   return (
     <OverlayTrigger placement="top" trigger={['hover', 'click', 'focus']} overlay={tooltip}>
-      <EventsIcon name={icon} fixedWidth className={style} />
+      <EventsIcon name="thermometer" className={style} />
     </OverlayTrigger>
   );
 };

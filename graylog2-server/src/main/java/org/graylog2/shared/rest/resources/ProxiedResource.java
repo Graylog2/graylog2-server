@@ -19,6 +19,13 @@ package org.graylog2.shared.rest.resources;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Stopwatch;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.ws.rs.container.AsyncResponse;
+import jakarta.ws.rs.container.ConnectionCallback;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.Cookie;
+import jakarta.ws.rs.core.HttpHeaders;
 import okhttp3.ResponseBody;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
@@ -32,16 +39,6 @@ import retrofit2.Response;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-
-import jakarta.ws.rs.container.AsyncResponse;
-import jakarta.ws.rs.container.ConnectionCallback;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.Cookie;
-import jakarta.ws.rs.core.HttpHeaders;
-
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -49,6 +46,7 @@ import java.time.Duration;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -363,6 +361,45 @@ public abstract class ProxiedResource extends RestResource {
             Class<RemoteInterfaceType> interfaceClass
     ) throws IOException {
         return requestOnLeader(remoteInterfaceFunction, interfaceClass, getDefaultProxyCallTimeout());
+    }
+
+    /**
+     * Execute the given remote interface function on the given node.
+     * <p>
+     * This is used to forward an API request to the given node. It is useful in situations where an API call has to
+     * be executed on a particular, chosen node.
+     * <p>
+     * The returned {@link NodeResponse} object is constructed from the remote response's status code and body.
+     */
+    protected <RemoteInterfaceType, RemoteCallResponseType> NodeResponse<RemoteCallResponseType> requestOnNode(
+            String nodeId,
+            Function<RemoteInterfaceType, Call<RemoteCallResponseType>> remoteInterfaceFunction,
+            Class<RemoteInterfaceType> interfaceClass,
+            Duration timeout
+    ) throws IOException {
+
+        final Node executionNode = nodeService.allActive().values().stream()
+                .filter(node -> Objects.equals(nodeId, node.getNodeId()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException(StringUtils.f("Node %s cannot be found among active nodes", nodeId)));
+        return doNodeApiCall(executionNode.getNodeId(), interfaceClass, remoteInterfaceFunction, Function.identity(), timeout);
+
+    }
+
+    /**
+     * Execute the given remote interface function on the given node.
+     * <p>
+     * This is used to forward an API request to the given node. It is useful in situations where an API call has to
+     * be executed on a particular, chosen node.
+     * <p>
+     * The returned {@link NodeResponse} object is constructed from the remote response's status code and body.
+     */
+    protected <RemoteInterfaceType, RemoteCallResponseType> NodeResponse<RemoteCallResponseType> requestOnNode(
+            String nodeId,
+            Function<RemoteInterfaceType, Call<RemoteCallResponseType>> remoteInterfaceFunction,
+            Class<RemoteInterfaceType> interfaceClass
+    ) throws IOException {
+        return requestOnNode(nodeId, remoteInterfaceFunction, interfaceClass, getDefaultProxyCallTimeout());
     }
 
     protected <RemoteInterfaceType, RemoteCallResponseType, FinalResponseType> NodeResponse<FinalResponseType> doNodeApiCall(

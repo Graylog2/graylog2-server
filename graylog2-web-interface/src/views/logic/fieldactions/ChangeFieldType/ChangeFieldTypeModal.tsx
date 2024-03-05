@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo, useCallback, useState, useEffect } from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
+import mapValues from 'lodash/mapValues';
 
 import { Badge, BootstrapModalForm, Alert, Input } from 'components/bootstrap';
 import { Select, Spinner } from 'components/common';
@@ -32,6 +33,10 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
 import FieldSelect from 'views/logic/fieldactions/ChangeFieldType/FieldSelect';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
+import type {
+  FieldTypePutResponse,
+  FieldTypePutResponseJson,
+} from 'views/logic/fieldactions/ChangeFieldType/types';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 
@@ -45,18 +50,14 @@ const StyledLabel = styled.h5`
   margin-bottom: 5px;
 `;
 
-const RedBadge = styled(Badge)(({ theme }) => css`
-  background-color: ${theme.colors.variant.light.danger};
-`);
-
-const BetaBadge = () => <RedBadge>Beta Feature</RedBadge>;
+const BetaBadge = () => <Badge bsStyle="danger">Beta Feature</Badge>;
 
 const failureStreamId = '000000000000000000000004';
 
 type Props = {
   show: boolean,
   onClose: () => void,
-  onSubmitCallback?: () => void,
+  onSubmitCallback?: (params: FieldTypePutResponse) => void,
   initialSelectedIndexSets: Array<string>,
   showSelectionTable?: boolean,
   showFieldSelect?: boolean,
@@ -112,7 +113,7 @@ const ChangeFieldTypeModal = ({
       newFieldType: type,
       rotated,
       field: fieldName,
-    }).then(() => {
+    }).then((responseJson: FieldTypePutResponseJson) => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_FIELD_VALUE_ACTION.CHANGE_FIELD_TYPE_CHANGED, {
         app_pathname: telemetryPathName,
         app_action_value:
@@ -123,8 +124,18 @@ const ChangeFieldTypeModal = ({
           },
       });
 
-      onClose();
-    }).then(() => onSubmitCallback && onSubmitCallback());
+      if (onSubmitCallback) {
+        const response: FieldTypePutResponse = mapValues(responseJson, (fieldType) => ({
+          id: fieldType.field_name,
+          origin: fieldType.origin,
+          fieldName: fieldType.field_name,
+          type: fieldType.type,
+          isReserved: fieldType.is_reserved,
+        }));
+
+        onSubmitCallback(response);
+      }
+    }).then(() => onClose());
   }, [fieldName, indexSetSelection, initialSelectedIndexSets.length, onClose, onSubmitCallback, putFieldTypeMutation, rotated, sendTelemetry, telemetryPathName, type]);
 
   const onChangeFieldType = useCallback((value: string) => {

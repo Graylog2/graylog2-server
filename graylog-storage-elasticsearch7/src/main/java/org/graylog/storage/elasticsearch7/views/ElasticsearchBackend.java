@@ -18,6 +18,9 @@ package org.graylog.storage.elasticsearch7.views;
 
 import com.google.common.collect.Maps;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Provider;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.GlobalOverride;
 import org.graylog.plugins.views.search.Query;
@@ -56,10 +59,6 @@ import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-import jakarta.inject.Provider;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -255,7 +254,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                     return new SearchRequest()
                             .source(searchTypeQueries.get(searchTypeId))
                             .indices(indices.toArray(new String[0]))
-                            .indicesOptions(IndicesOptions.fromOptions(false, false, true, false));
+                            .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN);
                 })
                 .collect(Collectors.toList());
 

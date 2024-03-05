@@ -41,7 +41,7 @@ const SaveAsDashboardButton = ({ onClick, openSaveAsModal }: Props) => {
     <Button onClick={onClick}
             disabled={hasUndeclaredParameters}
             title="Save as new dashboard">
-      <Icon name="copy" /> Save as
+      <Icon name="content_copy" /> Save as
     </Button>
   );
 };

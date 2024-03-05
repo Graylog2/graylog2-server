@@ -191,6 +191,8 @@ const IndexSetConfigurationForm = ({
   const [fieldTypeRefreshIntervalUnit, setFieldTypeRefreshIntervalUnit] = useState<Unit>('seconds');
   const { loadingIndexDefaultsConfig, indexDefaultsConfig } = useIndexDefaults();
   const [indexSet] = useIndexSet(initialIndexSet);
+  const isCloud = AppConfig.isCloud();
+  const enableDataTieringCloud = useFeature('data_tiering_cloud');
 
   const retentionConfigSegments: Array<{value: RetentionConfigSegment, label: string}> = [
     { value: 'data_tiering', label: 'Data Tiering' },
@@ -206,8 +208,14 @@ const IndexSetConfigurationForm = ({
   const [selectedRetentionSegment, setSelectedRetentionSegment] = useState<RetentionConfigSegment>(initialSegment());
 
   const prepareRetentionConfigBeforeSubmit = useCallback((values: IndexSetFormValues) : IndexSet => {
+    const legacyConfig = { ...values, data_tiering: indexDefaultsConfig.data_tiering, use_legacy_rotation: true };
+
+    if (isCloud && !enableDataTieringCloud) {
+      return legacyConfig;
+    }
+
     if (selectedRetentionSegment === 'legacy') {
-      return { ...values, data_tiering: undefined, use_legacy_rotation: true };
+      return legacyConfig;
     }
 
     const configWithDataTiering = prepareDataTieringConfig(values, PluginStore);
@@ -222,7 +230,7 @@ const IndexSetConfigurationForm = ({
     };
 
     return { ...configWithDataTiering, ...legacyDefaultConfig, use_legacy_rotation: false };
-  }, [loadingIndexDefaultsConfig, indexDefaultsConfig, selectedRetentionSegment]);
+  }, [loadingIndexDefaultsConfig, indexDefaultsConfig, selectedRetentionSegment, enableDataTieringCloud, isCloud]);
 
   const saveConfiguration = (values: IndexSetFormValues) => onUpdate(prepareRetentionConfigBeforeSubmit(values));
 
@@ -237,8 +245,6 @@ const IndexSetConfigurationForm = ({
     setFieldTypeRefreshIntervalUnit(unit);
   };
 
-  const enableDataTieringCloud = useFeature('data_tiering_cloud');
-
   if (!indexSet) return null;
 
   const {
@@ -249,8 +255,6 @@ const IndexSetConfigurationForm = ({
   } = indexSet;
 
   const onCancel = () => history.push(cancelLink);
-
-  const isCloud = AppConfig.isCloud();
 
   if (loadingIndexDefaultsConfig) return (<Spinner />);
 

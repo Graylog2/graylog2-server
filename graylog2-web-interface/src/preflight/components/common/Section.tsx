@@ -54,10 +54,10 @@ type Props = {
 
 const SectionHeader = ({ title, actions, titleOrder }: Props) => (
   <Row>
-    <Col lg={6} md={6}>
+    <Col span={{ base: 12, lg: 6, md: 6 }}>
       <Title order={titleOrder}>{title}</Title>
     </Col>
-    <Col lg={6} md={6}>
+    <Col span={{ base: 12, lg: 6, md: 6 }}>
       <TitleActionContainer>{actions}</TitleActionContainer>
     </Col>
   </Row>

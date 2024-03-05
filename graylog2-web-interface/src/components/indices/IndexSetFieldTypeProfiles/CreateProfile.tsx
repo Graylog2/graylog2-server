@@ -27,6 +27,7 @@ import type {
 } from 'components/indices/IndexSetFieldTypeProfiles/types';
 import useProfileMutations from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileMutations';
 import Routes from 'routing/Routes';
+import useHistory from 'routing/useHistory';
 
 const CreateProfile = () => {
   const sendTelemetry = useSendTelemetry();
@@ -34,6 +35,21 @@ const CreateProfile = () => {
   const navigate = useNavigate();
   const { createProfile } = useProfileMutations();
   const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
+  const location = useLocation();
+  const history = useHistory();
+  const initialValues = useMemo<IndexSetFieldTypeProfileForm>(() => {
+    const defaultCustomFieldMappings = location?.state?.customFieldMappings;
+
+    if (defaultCustomFieldMappings) {
+      return ({
+        customFieldMappings: defaultCustomFieldMappings,
+        name: null,
+        description: null,
+      });
+    }
+
+    return undefined;
+  }, [location?.state?.customFieldMappings]);
 
   const onSubmit = useCallback((profile: IndexSetFieldTypeProfileForm) => {
     createProfile(profile).then(() => {
@@ -52,11 +68,11 @@ const CreateProfile = () => {
 
   const onCancel = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_FIELD_TYPE_PROFILE.NEW_CANCELED, { app_pathname: telemetryPathName, app_action_value: 'create-new-index-set-field-type-profile-canceled' });
-    navigate(Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW);
-  }, [navigate, sendTelemetry, telemetryPathName]);
+    history.goBack();
+  }, [history, sendTelemetry, telemetryPathName]);
 
   return (
-    <ProfileForm onCancel={onCancel} submitButtonText="Create profile" submitLoadingText="Creating profile..." onSubmit={onSubmit} />
+    <ProfileForm initialValues={initialValues} onCancel={onCancel} submitButtonText="Create profile" submitLoadingText="Creating profile..." onSubmit={onSubmit} />
   );
 };
 

@@ -27,7 +27,6 @@ import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 import org.graylog2.buffers.processors.OutputBufferProcessor;
 import org.graylog2.plugin.GlobalMetricNames;
@@ -53,7 +52,7 @@ public class OutputBuffer extends Buffer {
 
     @Inject
     public OutputBuffer(MetricRegistry metricRegistry,
-                        Provider<OutputBufferProcessor> processorProvider,
+                        OutputBufferProcessor.Factory processorFactory,
                         @Named("outputbuffer_processors") int processorCount,
                         @Named("ring_size") int ringSize,
                         @Named("processor_wait_strategy") String waitStrategyName) {
@@ -81,7 +80,7 @@ public class OutputBuffer extends Buffer {
 
         final EventHandler<MessageEvent>[] processors = new PartitioningWorkHandler[processorCount];
         for (int i = 0; i < processorCount; i++) {
-            processors[i] = new PartitioningWorkHandler<>(processorProvider.get(), i, processorCount);
+            processors[i] = new PartitioningWorkHandler<>(processorFactory.create(i), i, processorCount);
         }
 
         disruptor.handleEventsWith(processors);
