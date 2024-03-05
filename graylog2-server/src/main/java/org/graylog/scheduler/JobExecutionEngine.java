@@ -240,10 +240,10 @@ public class JobExecutionEngine {
     }
 
     /**
-     * Progressively reduce backoff from 100% to 20% based on how many times rescheduled
+     * Progressively reduce backoff from 100% to 20% based on how many times the trigger was rescheduled.
      */
     private Duration slidingBackoff(JobTriggerDto trigger) {
-        long slidingBackoffMillis;
+        final long slidingBackoffMillis;
         if (trigger.concurrencyRescheduleCount() < 1) {
             slidingBackoffMillis = backoffMillis;
         } else {
