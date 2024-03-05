@@ -175,7 +175,7 @@ public class AESTools {
             final byte[] plainBytes = SIV_MODE.decrypt(
                     Arrays.copyOf(encryptionKey, 16),
                     Arrays.copyOfRange(encryptionKey, 16, 32),
-                    new Hex().decode(cipherText.getBytes(UTF_8))
+                    Hex.decodeHex(cipherText)
             );
             return new String(plainBytes, UTF_8);
         } catch (Exception e) {
