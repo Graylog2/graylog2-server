@@ -135,7 +135,7 @@ public class JobExecutionEngine {
 
         // We use a cache to avoid having every gauge metric hitting the database.
         this.gaugeCache = Caffeine.newBuilder()
-                .expireAfterWrite(15, TimeUnit.SECONDS)
+                .expireAfterWrite(5, TimeUnit.SECONDS)
                 .build(new CacheLoader<>() {
                     @Override
                     public @Nullable Long load(String key) {
