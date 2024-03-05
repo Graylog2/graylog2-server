@@ -550,6 +550,9 @@ public class DBJobTriggerService {
         final DateTime now = clock.nowUTC();
         final AggregateIterable<OverdueTrigger> result = collection.aggregate(List.of(
                 Aggregates.match(
+                        // We deliberately don't include the filter to include expired trigger locks we use in
+                        // #nextRunnableTrigger because we consider that an edge case that's not important for
+                        // the overdue calculation.
                         Filters.and(
                                 Filters.eq(FIELD_LOCK_OWNER, null),
                                 Filters.eq(FIELD_STATUS, JobTriggerStatus.RUNNABLE),
