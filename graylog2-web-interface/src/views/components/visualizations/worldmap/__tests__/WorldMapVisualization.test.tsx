@@ -25,6 +25,7 @@ import Series from 'views/logic/aggregationbuilder/Series';
 import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
+import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 
 import WorldMapVisualization from '../WorldMapVisualization';
 
@@ -43,17 +44,22 @@ describe('WorldMapVisualization', () => {
     type: 'absolute',
   };
 
+  const defaultProps = {
+    config,
+    data: { chart: [] },
+    editing: false,
+    effectiveTimerange: effectiveTimerange,
+    fields: Immutable.List<FieldTypeMapping>(),
+    onChange: () => {},
+    toggleEdit: () => {},
+    setLoadingState: () => {},
+    height: 1024,
+    width: 800,
+  };
+
   it('does not call onChange when not editing', () => {
     const onChange = jest.fn();
-    const wrapper = mount(<WorldMapVisualization config={config}
-                                                 data={{ chart: [] }}
-                                                 editing={false}
-                                                 effectiveTimerange={effectiveTimerange}
-                                                 fields={Immutable.List()}
-                                                 onChange={onChange}
-                                                 toggleEdit={() => {}}
-                                                 height={1024}
-                                                 width={800} />);
+    const wrapper = mount(<WorldMapVisualization {...defaultProps} onChange={onChange} />);
     const mapVisualization = wrapper.find('map-visualization');
 
     const { onChange: _onChange } = mapVisualization.at(0).props() as MapVisualizationProps;
@@ -67,15 +73,7 @@ describe('WorldMapVisualization', () => {
 
   it('does call onChange when editing', () => {
     const onChange = jest.fn();
-    const wrapper = mount(<WorldMapVisualization config={config}
-                                                 data={{ chart: [] }}
-                                                 editing
-                                                 effectiveTimerange={effectiveTimerange}
-                                                 fields={Immutable.List()}
-                                                 onChange={onChange}
-                                                 toggleEdit={() => {}}
-                                                 height={1024}
-                                                 width={800} />);
+    const wrapper = mount(<WorldMapVisualization {...defaultProps} editing />);
     const mapVisualization = wrapper.find('map-visualization');
 
     const { onChange: _onChange } = mapVisualization.at(0).props() as MapVisualizationProps;
@@ -95,15 +93,7 @@ describe('WorldMapVisualization', () => {
     const renderCompletionCallback = jest.fn();
     const wrapper = mount((
       <RenderCompletionCallback.Provider value={renderCompletionCallback}>
-        <WorldMapVisualization config={config}
-                               data={{ chart: [] }}
-                               editing
-                               effectiveTimerange={effectiveTimerange}
-                               fields={Immutable.List()}
-                               onChange={() => {}}
-                               toggleEdit={() => {}}
-                               height={1024}
-                               width={800} />
+        <WorldMapVisualization {...defaultProps} editing />
       </RenderCompletionCallback.Provider>
     ));
 
@@ -137,15 +127,10 @@ describe('WorldMapVisualization', () => {
       values: { '37.751,-97.822': 25, '35.69,139.69': 6 },
     }];
     const wrapper = mount((
-      <WorldMapVisualization config={configWithMetric}
+      <WorldMapVisualization {...defaultProps}
+                             config={configWithMetric}
                              data={data}
-                             editing
-                             effectiveTimerange={effectiveTimerange}
-                             fields={Immutable.List()}
-                             onChange={() => {}}
-                             toggleEdit={() => {}}
-                             height={1024}
-                             width={800} />
+                             editing />
     ));
     const mapVisualization = wrapper.find('map-visualization');
 
@@ -166,15 +151,10 @@ describe('WorldMapVisualization', () => {
       values: { '37.751,-97.822': null, '35.69,139.69': null },
     }];
     const wrapper = mount((
-      <WorldMapVisualization config={configWithoutMetric}
+      <WorldMapVisualization {...defaultProps}
+                             config={configWithoutMetric}
                              data={data}
-                             editing
-                             effectiveTimerange={effectiveTimerange}
-                             fields={Immutable.List()}
-                             onChange={() => {}}
-                             toggleEdit={() => {}}
-                             height={1024}
-                             width={800} />
+                             editing />
     ));
     const mapVisualization = wrapper.find('map-visualization');
 

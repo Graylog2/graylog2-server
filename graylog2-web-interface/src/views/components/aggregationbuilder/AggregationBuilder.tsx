@@ -55,8 +55,9 @@ export type VisualizationComponentProps = {
   fields: FieldTypeMappingsList,
   height: number,
   onChange: OnVisualizationConfigChange,
-  width: number,
+  setLoadingState: (loading: boolean) => void,
   toggleEdit: () => void,
+  width: number,
 };
 
 export type VisualizationComponent<T extends string> =
@@ -92,6 +93,7 @@ const AggregationBuilder = ({
   editing = false,
   fields,
   toggleEdit,
+  setLoadingState,
 }: WidgetComponentProps<AggregationWidgetConfig>) => {
   const onVisualizationConfigChange = useContext(OnVisualizationConfigChangeContext);
 
@@ -115,6 +117,7 @@ const AggregationBuilder = ({
       {({ height, width }) => (
         <VisComponent config={config}
                       data={rows}
+                      setLoadingState={setLoadingState}
                       effectiveTimerange={effectiveTimerange}
                       editing={editing}
                       fields={fields}

@@ -46,12 +46,13 @@ import type { VisualizationComponentProps } from '../aggregationbuilder/Aggregat
 import { makeVisualization, retrieveChartData } from '../aggregationbuilder/AggregationBuilder';
 
 type Props = VisualizationComponentProps & {
-  data: { [key: string]: Rows } & { events?: Events },
-  striped?: boolean,
   bordered?: boolean,
   borderedHeader?: boolean,
-  stickyHeader?: boolean,
   condensed?: boolean,
+  data: { [key: string]: Rows } & { events?: Events },
+  setLoadingState: (loading: boolean) => void
+  stickyHeader?: boolean,
+  striped?: boolean,
 };
 
 const getStylesForPinnedColumns = (tag: 'th'|'td', stickyLeftMarginsByColumnIndex: Array<{index: number, column: string, leftMargin: number}>) => stickyLeftMarginsByColumnIndex.map(({ index, leftMargin }) => `
@@ -120,15 +121,16 @@ const _extractColumnPivotValues = (rows): Array<Array<string>> => {
 };
 
 const DataTable = ({
-  config,
-  data,
-  fields,
-  striped,
   bordered,
   borderedHeader,
-  stickyHeader,
   condensed,
+  config,
+  data,
   editing,
+  fields,
+  setLoadingState,
+  stickyHeader,
+  striped,
 }: Props) => {
   const formContext = useContext(FormikContext);
   const onRenderComplete = useContext(RenderCompletionCallback);
@@ -274,6 +276,7 @@ const DataTable = ({
                      onSortChange={_onSortChange}
                      sortConfigMap={sortConfigMap}
                      onSetColumnsWidth={onSetColumnsWidth}
+                     setLoadingState={setLoadingState}
                      pinnedColumns={pinnedColumns}
                      togglePin={togglePin} />
           </THead>

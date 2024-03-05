@@ -226,7 +226,8 @@ type Props = {
   sortConfigMap: OrderedMap<string, SortConfig>;
   onSetColumnsWidth: (props: { field: string, offsetWidth: number }) => void,
   pinnedColumns?: Immutable.Set<string>
-  togglePin: (field: string) => void
+  togglePin: (field: string) => void,
+  setLoadingState: (loading: boolean) => void,
 };
 
 const Headers = ({
@@ -242,6 +243,7 @@ const Headers = ({
   onSetColumnsWidth,
   pinnedColumns,
   togglePin,
+  setLoadingState,
 }: Props) => {
   const activeQuery = useActiveQueryId();
   const rowFieldNames = rowPivots.flatMap((pivot) => pivot.fields);
@@ -264,7 +266,8 @@ const Headers = ({
                  onSetColumnsWidth={onSetColumnsWidth}
                  isPinned={pinnedColumns.has(`${prefix}${field}`)}
                  showPinIcon={showPinIcon}
-                 togglePin={togglePin} />
+                 togglePin={togglePin}
+                 setLoadingState={setLoadingState} />
   );
 
   const rowPivotFields = rowFieldNames.map((fieldName) => headerField({ field: fieldName, sortable: interactive, sortType: SortConfig.PIVOT_TYPE, showPinIcon: interactive }));
