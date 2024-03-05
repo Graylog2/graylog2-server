@@ -31,13 +31,13 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.StreamingOutput;
 import okhttp3.ResponseBody;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.RemoteInterfaceProvider;
+import org.graylog2.rest.RestTools;
 import org.graylog2.shared.rest.resources.ProxiedResource;
 
 import java.io.IOException;
@@ -71,30 +71,9 @@ public class SearchJobsStatusResource extends ProxiedResource implements PluginR
                                      @Suspended AsyncResponse asyncResponse) {
         processAsync(asyncResponse,
                 () -> {
-                    final NodeResponse<ResponseBody> nodeResponse;
                     try {
-                        nodeResponse = requestOnNode(nodeId, r -> r.jobStatus(jobId), RemoteSearchJobsStatusInterface.class);
-
-                        if (nodeResponse.isSuccess()) {
-                            // we cannot use try-with because the ResponseBody needs to stream the output
-                            ResponseBody responseBody = nodeResponse.entity().orElseThrow();
-
-                            try {
-                                StreamingOutput streamingOutput = output -> {
-                                    try {
-                                        responseBody.byteStream().transferTo(output);
-                                    } catch (Exception e) {
-                                        responseBody.close(); // avoid leaking connections on errors
-                                    }
-                                };
-                                return Response.ok(streamingOutput, MediaType.valueOf(MediaType.APPLICATION_JSON)).build();
-
-                            } catch (Exception e) {
-                                responseBody.close();
-                            }
-                        }
-                        return Response.status(nodeResponse.code()).entity(nodeResponse.body()).build();
-
+                        final NodeResponse<ResponseBody> nodeResponse = requestOnNode(nodeId, r -> r.jobStatus(jobId), RemoteSearchJobsStatusInterface.class);
+                        return RestTools.streamResponse(nodeResponse, MediaType.APPLICATION_JSON, null);
                     } catch (IOException e) {
                         return Response.serverError().entity(e.getMessage()).build();
                     }
