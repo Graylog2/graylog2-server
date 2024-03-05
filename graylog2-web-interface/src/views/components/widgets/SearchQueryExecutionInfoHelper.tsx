@@ -17,17 +17,18 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 import type { PropsWithChildren } from 'react';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useContext, useMemo, useState } from 'react';
 import numeral from 'numeral';
 import isEmpty from 'lodash/isEmpty';
 
-import { Timestamp } from 'components/common';
+import { Icon, Timestamp } from 'components/common';
 import { Table } from 'components/bootstrap';
 import useAppSelector from 'stores/useAppSelector';
 import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
 import type { MessageResult, SearchTypeResult, SearchTypeResultTypes } from 'views/types';
 import type { SearchTypeIds } from 'views/logic/views/types';
 import Popover from 'components/common/Popover';
+import InteractiveContext from 'views/components/contexts/InteractiveContext';
 
 type Props = PropsWithChildren & {
   currentWidgetMapping: SearchTypeIds,
@@ -53,6 +54,10 @@ type WidgetExecutionData = {
   timestamp: string,
   effectiveTimerange: SearchTypeResult['effective_timerange'] | MessageResult['effectiveTimerange']
 }
+
+const StyledIcon = styled(Icon)(({ theme }) => css`
+  color: ${theme.colors.gray[60]}
+`);
 
 const HelpPopover = ({ widgetExecutionData }: { widgetExecutionData: WidgetExecutionData}) => (
   <StyledTable condensed>
@@ -86,6 +91,7 @@ const HelpPopover = ({ widgetExecutionData }: { widgetExecutionData: WidgetExecu
 
 const SearchQueryExecutionInfoHelper = ({ currentWidgetMapping, children }: Props) => {
   const [open, setOpen] = useState(false);
+  const interactive = useContext(InteractiveContext);
   const result = useAppSelector(selectCurrentQueryResults);
   const currentWidgetSearchType = useMemo<SearchTypeResultTypes[keyof SearchTypeResultTypes]>(() => {
     const searchTypeId = currentWidgetMapping?.toJS()?.[0];
@@ -109,16 +115,21 @@ const SearchQueryExecutionInfoHelper = ({ currentWidgetMapping, children }: Prop
     setOpen((cur) => !cur);
   }, []);
 
-  return (
+  return interactive ? (
     <Popover position="bottom" opened={open} onClose={onClose} closeOnClickOutside>
       <Popover.Target>
-        <TargetContainer role="presentation" onClick={onToggle}>{children}</TargetContainer>
+        <TargetContainer role="presentation" onClick={onToggle}>
+          <>
+            {children}
+            <StyledIcon name="help" />
+          </>
+        </TargetContainer>
       </Popover.Target>
       <Popover.Dropdown title="Execution Info">
         {isEmpty(result) ? <i>No query executed yet.</i> : <HelpPopover widgetExecutionData={widgetExecutionData} />}
       </Popover.Dropdown>
     </Popover>
-  );
+  ) : <span>{children}</span>;
 };
 
 export default SearchQueryExecutionInfoHelper;
