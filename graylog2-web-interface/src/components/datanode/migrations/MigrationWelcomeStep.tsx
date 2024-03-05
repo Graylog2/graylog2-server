@@ -22,13 +22,9 @@ import { Icon } from 'components/common';
 import { DocumentationLink } from 'components/support';
 import MigrationDatanodeList from 'components/datanode/migrations/MigrationDatanodeList';
 import MigrationStepTriggerButtonToolbar from 'components/datanode/migrations/common/MigrationStepTriggerButtonToolbar';
-import type { MigrationState, OnTriggerStepFunction } from 'components/datanode/Types';
+import type { MigrationStepComponentProps } from 'components/datanode/Types';
 import MigrationError from 'components/datanode/migrations/common/MigrationError';
-
-type Props = {
-  currentStep: MigrationState,
-  onTriggerStep: OnTriggerStepFunction,
-};
+import InPlaceMigrationInfo from 'components/datanode/migrations/common/InPlaceMigrationInfo';
 
 const Headline = styled.h2`
   margin-top: 5px;
@@ -48,7 +44,7 @@ const StyledHelpPanel = styled(StyledPanel)`
   margin-top: 30px;
 `;
 
-const MigrationWelcomeStep = ({ currentStep, onTriggerStep }: Props) => (
+const MigrationWelcomeStep = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => (
   <Row>
     <Col md={6}>
       <MigrationError errorMessage={currentStep.error_message} />
@@ -78,7 +74,7 @@ const MigrationWelcomeStep = ({ currentStep, onTriggerStep }: Props) => (
           </p>
           <h5>Migrating an OpenSearch Cluster</h5>
           <p>
-            Depending on how you secured your existing cluster, some preliminary changes are needed to the security configuration. We use JWT authentication between Graylog and OpenSearch. If you want to perform a rolling upgrade of your existing cluster into the Data Node, you have to manually include JWT authentication to your existing OpenSearch cluster prior to running the migration wizard.
+            Depending on how you secured your existing cluster, some preliminary changes are needed to the security configuration. We use JWT authentication between Graylog and OpenSearch. If you want to perform an In-Place migration of your existing cluster into the Data Node, you have to manually include JWT authentication to your existing OpenSearch cluster prior to running the migration wizard.
           </p>
           <p>
             Enable JWT authentication in <code>opensearch-security/config.yml</code> (section <code>jwt_auth_domain</code>, <code>http_enabled: true</code>, <code>transport_enabled: true</code>)
@@ -90,6 +86,7 @@ const MigrationWelcomeStep = ({ currentStep, onTriggerStep }: Props) => (
           </p>
         </Panel.Body>
       </StyledHelpPanel>
+      <InPlaceMigrationInfo />
     </Col>
   </Row>
 );
