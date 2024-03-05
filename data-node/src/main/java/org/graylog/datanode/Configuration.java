@@ -100,6 +100,9 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "config_location", validators = DirectoryReadableValidator.class)
     private Path configLocation = null;
 
+    @Parameter(value = "native_lib_dir", required = true)
+    private Path nativeLibDir = Path.of("native_libs");
+
     @Parameter(value = "process_logs_buffer_size")
     private Integer opensearchProcessLogsBufferSize = 500;
 
@@ -435,6 +438,10 @@ public class Configuration extends BaseConfiguration {
 
     public String getMetricsPolicy() {
         return metricsPolicy;
+    }
+
+    public Path getNativeLibDir() {
+        return nativeLibDir;
     }
 
     public static class NodeIdFileValidator implements Validator<String> {
