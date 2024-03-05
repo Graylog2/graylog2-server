@@ -78,7 +78,15 @@ public class QueryValidationResource extends RestResource implements PluginRestR
     ) {
         ValidationRequest request = prepareRequest(validationRequest, searchUser);
         final ValidationResponse response = queryValidationService.validate(request);
-        return ValidationResponseDTO.create(toStatus(response.status()), toExplanations(response), indexRanges(request));
+        Set<ExplainResults.IndexRangeResult> searchedIndexRanges = indexRanges(request);
+        return ValidationResponseDTO.create(
+                toStatus(response.status(), containsWarmIndices(searchedIndexRanges)),
+                toExplanations(response),
+                searchedIndexRanges);
+    }
+
+    private boolean containsWarmIndices(Set<ExplainResults.IndexRangeResult> searchedIndexRanges) {
+        return searchedIndexRanges.stream().anyMatch(ExplainResults.IndexRangeResult::isWarmTiered);
     }
 
     private ValidationRequest prepareRequest(ValidationRequestDTO validationRequest, SearchUser searchUser) {
@@ -105,12 +113,16 @@ public class QueryValidationResource extends RestResource implements PluginRestR
                 .collect(toImmutableSet());
     }
 
-    private ValidationStatusDTO toStatus(final ValidationStatus status) {
-        return switch (status) {
+    private ValidationStatusDTO toStatus(final ValidationStatus status, boolean hasWarmIndices) {
+        ValidationStatusDTO validationStatusDTO = switch (status) {
             case WARNING -> ValidationStatusDTO.WARNING;
             case ERROR -> ValidationStatusDTO.ERROR;
             default -> ValidationStatusDTO.OK;
         };
+        if (validationStatusDTO == ValidationStatusDTO.OK) {
+            return hasWarmIndices ? ValidationStatusDTO.WARNING : ValidationStatusDTO.OK;
+        }
+        return validationStatusDTO;
     }
 
     private List<ValidationMessageDTO> toExplanations(final ValidationResponse response) {
