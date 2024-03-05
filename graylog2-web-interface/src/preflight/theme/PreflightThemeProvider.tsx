@@ -24,16 +24,17 @@ import SawmillMantine from '@graylog/sawmill/mantine';
 
 import { DEFAULT_THEME_MODE } from './constants';
 
+import 'material-symbols/rounded.css';
+
 type Props = {
   children: React.ReactNode,
 };
 
 const useSCTheme = (
-  colorScheme: ColorScheme,
   setColorScheme: (newColorScheme: ColorScheme) => void,
   mantineTheme: MantineTheme,
 ) => useMemo(() => {
-  const theme = SawmillSC({ colorScheme });
+  const theme = SawmillSC(mantineTheme);
 
   const onChangeColorScheme = (nextMode: ColorScheme) => {
     setColorScheme(nextMode);
@@ -42,9 +43,8 @@ const useSCTheme = (
   return ({
     ...theme,
     changeMode: onChangeColorScheme,
-    mantine: mantineTheme,
   });
-}, [colorScheme, mantineTheme, setColorScheme]);
+}, [mantineTheme, setColorScheme]);
 
 const PreflightThemeProvider = ({ children }: Props) => {
   const [colorScheme, setColorScheme] = useState<ColorScheme>(DEFAULT_THEME_MODE);
@@ -52,10 +52,10 @@ const PreflightThemeProvider = ({ children }: Props) => {
     () => SawmillMantine({ colorScheme }),
     [colorScheme],
   );
-  const scTheme = useSCTheme(colorScheme, setColorScheme, mantineTheme);
+  const scTheme = useSCTheme(setColorScheme, mantineTheme);
 
   return (
-    <MantineProvider theme={mantineTheme}>
+    <MantineProvider theme={mantineTheme} forceColorScheme={colorScheme}>
       <ThemeProvider theme={scTheme}>
         {children}
       </ThemeProvider>

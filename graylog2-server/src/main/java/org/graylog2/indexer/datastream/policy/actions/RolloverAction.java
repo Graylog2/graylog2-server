@@ -18,11 +18,7 @@ package org.graylog2.indexer.datastream.policy.actions;
 
 import javax.annotation.Nonnull;
 
-public record RolloverAction(@Nonnull String minIndexAge, boolean copyAlias) implements WrappedAction {
-
-    public RolloverAction(@Nonnull String minIndexAge) {
-        this(minIndexAge, false);
-    }
+public record RolloverAction(@Nonnull String minIndexAge) implements WrappedAction {
 
     @Override
     public Type getType() {

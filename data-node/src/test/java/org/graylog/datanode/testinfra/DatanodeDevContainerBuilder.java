@@ -24,16 +24,18 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
-import org.testcontainers.images.PullPolicy;
 import org.testcontainers.images.builder.ImageFromDockerfile;
+import org.testcontainers.images.builder.dockerfile.DockerfileBuilder;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static org.graylog.datanode.testinfra.DatanodeContainerizedBackend.IMAGE_WORKING_DIR;
 import static org.graylog.testing.completebackend.DefaultPluginJarsProvider.getProjectReposPath;
@@ -141,6 +143,7 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
                 .withNetwork(network)
                 .withEnv("GRAYLOG_DATANODE_DATA_DIR", "data")
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_LOCATION", IMAGE_WORKING_DIR)
+                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_PLUGINS_LOCATION", IMAGE_WORKING_DIR + "/plugins")
                 .withEnv("GRAYLOG_DATANODE_INSECURE_STARTUP", "true")
                 .withEnv("GRAYLOG_DATANODE_CONFIG_LOCATION", IMAGE_WORKING_DIR + "/config") // this is the datanode config dir for certs
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_DATA_LOCATION", IMAGE_WORKING_DIR + "/opensearch/data")
@@ -197,25 +200,49 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
             throw new RuntimeException("Failed to link opensearch distribution to the datanode docker image, path " + downloadedOpensearch.toAbsolutePath() + " does not exist!");
         }
 
-        return new ImageFromDockerfile("local/graylog-datanode:latest", false)
-                // the following command makes the opensearch tar.gz archive accessible in the docker build context, so it can
-                // be later used by the ADD command
-                .withFileFromPath(opensearchTarArchive, downloadedOpensearch)
-                .withDockerfileFromBuilder(builder ->
-                        builder.from("eclipse-temurin:17-jre-jammy")
-                                .workDir(IMAGE_WORKING_DIR)
-                                .run("mkdir -p opensearch/config")
-                                .run("mkdir -p opensearch/data")
-                                .run("mkdir -p opensearch/logs")
-                                .run("mkdir -p config")
+        final Path pluginsDir = getPath().resolve(Path.of("opensearch", "plugins"));
+        final List<String> pluginNames = getPluginNames(pluginsDir);
+        LOG.info("Detected following opensearch plugins: " + String.join(", ", pluginNames));
 
-                                .add(opensearchTarArchive, "./" + opensearchTarArchive + "/") // this will automatically extract the tar
-                                .run("touch datanode.conf") // create empty configuration file, required but all config comes via env props
-                                .run("useradd opensearch")
-                                .run("chown -R opensearch:opensearch " + IMAGE_WORKING_DIR)
-                                .user("opensearch")
-                                .expose(DatanodeContainerizedBackend.DATANODE_REST_PORT, DatanodeContainerizedBackend.DATANODE_OPENSEARCH_HTTP_PORT)
-                                .entryPoint("java", "-jar", "graylog-datanode.jar", "datanode", "-f", "datanode.conf")
-                                .build());
+        final ImageFromDockerfile image = new ImageFromDockerfile("local/graylog-datanode:latest", false);
+
+        // the following command makes the opensearch tar.gz archive accessible in the docker build context, so it can
+        // be later used by the ADD command
+        image.withFileFromPath(opensearchTarArchive, downloadedOpensearch);
+
+        // add plugin files to the docker build context, so they can be used by ADD command later
+        pluginNames.forEach(pluginName -> image.withFileFromPath(pluginName, pluginsDir.resolve(pluginName)));
+
+        return image.withDockerfileFromBuilder(builder ->
+        {
+            final DockerfileBuilder fileBuilder = builder.from("eclipse-temurin:17-jre-jammy")
+                    .workDir(IMAGE_WORKING_DIR)
+                    .run("mkdir -p opensearch/config")
+                    .run("mkdir -p opensearch/data")
+                    .run("mkdir -p opensearch/logs")
+                    .run("mkdir -p config")
+                    .run("mkdir -p plugins")
+                    .add(opensearchTarArchive, "./" + opensearchTarArchive + "/"); // this will automatically extract the tar
+
+            pluginNames.forEach(pluginName -> {
+                fileBuilder.add(pluginName, "./plugins/" + pluginName);
+            });
+
+            fileBuilder.run("touch datanode.conf") // create empty configuration file, required but all config comes via env props
+                    .run("useradd opensearch")
+                    .run("chown -R opensearch:opensearch " + IMAGE_WORKING_DIR)
+                    .user("opensearch")
+                    .expose(DatanodeContainerizedBackend.DATANODE_REST_PORT, DatanodeContainerizedBackend.DATANODE_OPENSEARCH_HTTP_PORT)
+                    .entryPoint("java", "-jar", "graylog-datanode.jar", "datanode", "-f", "datanode.conf");
+            builder.build();
+        });
+    }
+
+    private static List<String> getPluginNames(Path pluginsDir) {
+        try {
+            return Files.list(pluginsDir).map(p -> p.getFileName().toString()).collect(Collectors.toList());
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to list opensearch plugins", e);
+        }
     }
 }

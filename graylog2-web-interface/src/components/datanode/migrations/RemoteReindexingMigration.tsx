@@ -22,13 +22,13 @@ import {
   MIGRATION_STATE,
   REMOTE_REINDEXING_MIGRATION_STEPS,
 } from 'components/datanode/Constants';
-import type { MigrationActions, StepArgs, MigrationState, MigrationStateItem } from 'components/datanode/Types';
+import type { MigrationActions, StepArgs, MigrationStateItem, MigrationStepComponentProps } from 'components/datanode/Types';
 import MigrationError from 'components/datanode/migrations/common/MigrationError';
 
 import Welcome from './remoteReindexing/Welcome';
 import ExistingDataMigrationQuestion from './remoteReindexing/ExistingDataMigrationQuestion';
 import RemoteReindexRunning from './remoteReindexing/RemoteReindexRunning';
-import CertificatesProvisioning from './rollingUpgrade/CertificatesProvisioning';
+import CertificatesProvisioning from './common/CertificatesProvisioning';
 import MigrateExistingData from './remoteReindexing/MigrateExistingData';
 import ShutdownClusterStep from './remoteReindexing/ShutdownClusterStep';
 import ConnectionStringRemovalStep from './remoteReindexing/ConnectionStringRemovalStep';
@@ -64,17 +64,10 @@ const StyledPanelGroup = styled(PanelGroup)`
   }
 `;
 
-type Props = {
-  currentStep: MigrationState,
-  onTriggerNextStep: (step: MigrationActions, args: StepArgs) => void,
-}
-
-const RemoteReindexingMigration = ({ currentStep, onTriggerNextStep }: Props) => {
+const RemoteReindexingMigration = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => {
   const { state: activeStep } = currentStep;
 
-  const onStepComplete = (step: MigrationActions, args: StepArgs = {}) => {
-    onTriggerNextStep(step, args);
-  };
+  const onStepComplete = async (step: MigrationActions, args: StepArgs = {}) => onTriggerStep(step, args);
 
   const getStepComponent = (step: MigrationStateItem) => {
     switch (step) {

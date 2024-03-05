@@ -105,7 +105,7 @@ public class ElasticsearchBackendErrorHandlingTest {
                 .queries(ImmutableSet.of(query))
                 .build();
 
-        this.searchJob = new SearchJob("job1", search, "admin");
+        this.searchJob = new SearchJob("job1", search, "admin", "test-node-id");
 
         this.queryContext = new ESGeneratedQueryContext(
                 this.backend,

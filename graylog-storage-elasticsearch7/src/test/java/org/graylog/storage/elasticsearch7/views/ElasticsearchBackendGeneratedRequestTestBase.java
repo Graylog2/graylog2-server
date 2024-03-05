@@ -17,6 +17,7 @@
 package org.graylog.storage.elasticsearch7.views;
 
 import com.google.common.collect.ImmutableSet;
+import jakarta.inject.Provider;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.Search;
@@ -51,8 +52,6 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-
-import jakarta.inject.Provider;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -111,7 +110,7 @@ public class ElasticsearchBackendGeneratedRequestTestBase {
                 .id("search1")
                 .queries(ImmutableSet.of(query))
                 .build();
-        return new SearchJob("job1", search, "admin");
+        return new SearchJob("job1", search, "admin", "test-node-id");
     }
 
     TimeRange timeRangeForTest() {
