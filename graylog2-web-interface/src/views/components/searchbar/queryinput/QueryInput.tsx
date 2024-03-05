@@ -19,6 +19,7 @@ import { useCallback, useMemo, useContext, useRef } from 'react';
 import PropTypes from 'prop-types';
 import isEmpty from 'lodash/isEmpty';
 import type { FormikErrors } from 'formik';
+import styled, { css } from 'styled-components';
 
 import UserPreferencesContext from 'contexts/UserPreferencesContext';
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
@@ -41,19 +42,27 @@ import type { Completer, FieldTypes } from '../SearchBarAutocompletions';
 
 const defaultCompleterFactory = (...args: ConstructorParameters<typeof SearchBarAutoCompletions>) => new SearchBarAutoCompletions(...args);
 
+const Container = styled.div<{ $hasValue: boolean }>(({ $hasValue }) => css`
+  width: 100%;
+
+  .ace_hidden-cursors {
+    display: ${$hasValue ? 'block' : 'none'};
+  }
+`);
+
 const displayValidationErrors = () => {
   QueryValidationActions.displayValidationErrors();
 };
 
 const handleExecution = ({
-  editor,
-  onExecute,
-  value,
-  error,
-  disableExecution,
-  isValidating,
-  validate,
-}: {
+                           editor,
+                           onExecute,
+                           value,
+                           error,
+                           disableExecution,
+                           isValidating,
+                           validate,
+                         }: {
   editor: Editor,
   onExecute: (query: string) => void,
   value: string,
@@ -189,27 +198,27 @@ type Props = BaseProps & {
 };
 
 const QueryInput = ({
-  className,
-  commands,
-  completerFactory = defaultCompleterFactory,
-  disableExecution,
-  error,
-  height,
-  inputId,
-  isValidating,
-  maxLines,
-  onBlur,
-  onChange,
-  onExecute: onExecuteProp,
-  placeholder,
-  streams,
-  timeRange,
-  value,
-  validate,
-  warning,
-  wrapEnabled,
-  name,
-}: Props) => {
+                      className,
+                      commands,
+                      completerFactory = defaultCompleterFactory,
+                      disableExecution,
+                      error,
+                      height,
+                      inputId,
+                      isValidating,
+                      maxLines,
+                      onBlur,
+                      onChange,
+                      onExecute: onExecuteProp,
+                      placeholder,
+                      streams,
+                      timeRange,
+                      value,
+                      validate,
+                      warning,
+                      wrapEnabled,
+                      name,
+                    }: Props) => {
   const { userTimezone } = useUserDateTime();
   const isInitialTokenizerUpdate = useRef(true);
   const { enableSmartSearch } = useContext(UserPreferencesContext);
@@ -237,22 +246,24 @@ const QueryInput = ({
   }, [name, onChange]);
 
   return (
-    <BasicQueryInput height={height}
-                     className={className}
-                     disabled={false}
-                     enableAutocompletion={enableSmartSearch}
-                     error={error}
-                     inputId={inputId}
-                     warning={warning}
-                     maxLines={maxLines}
-                     onBlur={onBlur}
-                     onExecute={onExecute}
-                     onChange={_onChange}
-                     onLoad={onLoadEditor}
-                     placeholder={placeholder}
-                     ref={updateEditorConfiguration}
-                     value={value}
-                     wrapEnabled={wrapEnabled} />
+    <Container $hasValue={!!value}>
+      <BasicQueryInput height={height}
+                       className={className}
+                       disabled={false}
+                       enableAutocompletion={enableSmartSearch}
+                       error={error}
+                       inputId={inputId}
+                       warning={warning}
+                       maxLines={maxLines}
+                       onBlur={onBlur}
+                       onExecute={onExecute}
+                       onChange={_onChange}
+                       onLoad={onLoadEditor}
+                       placeholder={placeholder}
+                       ref={updateEditorConfiguration}
+                       value={value}
+                       wrapEnabled={wrapEnabled} />
+    </Container>
   );
 };
 
