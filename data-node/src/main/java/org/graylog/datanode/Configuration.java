@@ -55,7 +55,7 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * Helper class to hold configuration of Graylog
+ * Helper class to hold configuration of DataNode
  */
 @SuppressWarnings("FieldMayBeFinal")
 public class Configuration extends BaseConfiguration {
@@ -245,7 +245,7 @@ public class Configuration extends BaseConfiguration {
 
     @Parameter(value = "node_search_cache_size")
     private String searchCacheSize = "10gb";
-  
+
     /**
      * https://opensearch.org/docs/latest/tuning-your-cluster/availability-and-recovery/snapshots/snapshot-restore/#shared-file-system
      */
@@ -663,7 +663,7 @@ public class Configuration extends BaseConfiguration {
     public String getNodeSearchCacheSize() {
         return searchCacheSize;
     }
-  
+
     public List<String> getPathRepo() {
         return pathRepo;
     }
