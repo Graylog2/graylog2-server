@@ -23,11 +23,13 @@ import freemarker.core.TemplateConfiguration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
-import jakarta.inject.Inject;
-import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.NotFoundException;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
+
+import jakarta.inject.Inject;
+
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.NotFoundException;
 
 import java.io.IOException;
 import java.io.StringWriter;
