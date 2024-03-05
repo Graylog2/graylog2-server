@@ -36,9 +36,7 @@ const ManualMigrationStep = () => {
   const { currentStep } = useMigrationState();
   const { onTriggerNextState } = useTriggerMigrationState();
 
-  const onMigrationStepChange = (step: MigrationActions, args?: StepArgs = {}) => {
-    onTriggerNextState({ step, args });
-  };
+  const onMigrationStepChange = async (step: MigrationActions, args?: StepArgs = {}) => onTriggerNextState({ step, args });
 
   return (
     <>
@@ -64,8 +62,8 @@ const ManualMigrationStep = () => {
         </Col>
       )}
       <MigrationError errorMessage={currentStep.error_message} />
-      {(currentStep && IN_PLACE_MIGRATION_STEPS.includes(currentStep.state)) && <InPlaceMigration onTriggerNextStep={onMigrationStepChange} currentStep={currentStep} />}
-      {(currentStep && REMOTE_REINDEXING_MIGRATION_STEPS.includes(currentStep.state)) && <RemoteReindexingMigration onTriggerNextStep={onMigrationStepChange} currentStep={currentStep} />}
+      {(currentStep && IN_PLACE_MIGRATION_STEPS.includes(currentStep.state)) && <InPlaceMigration onTriggerStep={onMigrationStepChange} currentStep={currentStep} />}
+      {(currentStep && REMOTE_REINDEXING_MIGRATION_STEPS.includes(currentStep.state)) && <RemoteReindexingMigration onTriggerStep={onMigrationStepChange} currentStep={currentStep} />}
     </>
   );
 };
