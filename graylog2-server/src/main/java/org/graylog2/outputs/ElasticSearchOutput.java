@@ -19,6 +19,7 @@ package org.graylog2.outputs;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+import jakarta.inject.Inject;
 import org.graylog2.indexer.messages.IndexingResults;
 import org.graylog2.indexer.messages.MessageWithIndex;
 import org.graylog2.indexer.messages.Messages;
@@ -27,12 +28,9 @@ import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.streams.Stream;
-import org.graylog2.shared.journal.Journal;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -54,17 +52,14 @@ public class ElasticSearchOutput implements MessageOutput {
     private final Meter failures;
     private final Timer processTime;
     private final Messages messages;
-    private final Journal journal;
     private final AtomicBoolean isRunning = new AtomicBoolean(false);
     protected final MessageQueueAcknowledger acknowledger;
 
     @Inject
     public ElasticSearchOutput(MetricRegistry metricRegistry,
                                Messages messages,
-                               Journal journal,
                                MessageQueueAcknowledger acknowledger) {
         this.messages = messages;
-        this.journal = journal;
         this.acknowledger = acknowledger;
         // Only constructing metrics here. write() get's another Core reference. (because this technically is a plugin)
         this.writes = metricRegistry.meter(WRITES_METRICNAME);

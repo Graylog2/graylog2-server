@@ -29,7 +29,6 @@ import org.graylog2.indexer.messages.IndexingResults;
 import org.graylog2.indexer.messages.MessageWithIndex;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.Message;
-import org.graylog2.shared.journal.Journal;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,11 +72,10 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput {
     public BlockingBatchedESOutput(MetricRegistry metricRegistry,
                                    Messages messages,
                                    org.graylog2.Configuration serverConfiguration,
-                                   Journal journal,
                                    MessageQueueAcknowledger acknowledger,
                                    Cluster cluster,
                                    @Named("daemonScheduler") ScheduledExecutorService daemonScheduler) {
-        super(metricRegistry, messages, journal, acknowledger);
+        super(metricRegistry, messages, acknowledger);
         this.maxBufferSize = serverConfiguration.getOutputBatchSize();
         outputFlushInterval = serverConfiguration.getOutputFlushInterval();
         this.processTime = metricRegistry.timer(name(this.getClass(), "processTime"));
