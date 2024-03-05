@@ -51,6 +51,11 @@ public class MigrationActionsAdapter implements MigrationActions {
     }
 
     @Override
+    public void calculateTrafficEstimate() {
+
+    }
+
+    @Override
     public boolean runDirectoryCompatibilityCheck() {
         return false;
     }
