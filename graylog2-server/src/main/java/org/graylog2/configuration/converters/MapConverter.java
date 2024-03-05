@@ -21,6 +21,7 @@ import com.github.joschi.jadconfig.ParameterException;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Maps;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -35,7 +36,7 @@ public class MapConverter {
     private static final Splitter ENTRY_SPLITTER = Splitter.on(Pattern.compile("\\s*,\\s*")).trimResults().omitEmptyStrings();
     private static final Splitter VALUE_SPLITTER = Splitter.on(Pattern.compile(":")).trimResults().omitEmptyStrings().limit(2);
 
-    private static <T> Map<String, T> convertValue(String value, Function<String, T> valueConverter) {
+    private static <T> Map<String, T> convertFromValue(String value, Function<String, T> valueConverter) {
         try {
             return ENTRY_SPLITTER.splitToStream(value)
                     .map(sequence -> {
@@ -52,12 +53,23 @@ public class MapConverter {
                             throw new ParameterException("Invalid map entry value: " + sequence, e);
                         }
                     })
-                    .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
+                    .collect(Collectors.toMap(
+                            Map.Entry::getKey,
+                            Map.Entry::getValue,
+                            (v1, v2) -> {throw new IllegalStateException("Duplicate key in value: " + value);},
+                            LinkedHashMap::new // We are using a linked hash map to keep the order of the keys
+                    ));
         } catch (ParameterException e) {
             throw e;
         } catch (Exception e) {
             throw new ParameterException("Invalid value - " + e.getMessage(), e);
         }
+    }
+
+    private static <T> String convertToValue(Map<String, T> value) {
+        return value.entrySet().stream()
+                .map(entry -> entry.getKey() + ":" + entry.getValue())
+                .collect(Collectors.joining(","));
     }
 
     /**
@@ -66,11 +78,12 @@ public class MapConverter {
     public static class StringString implements Converter<Map<String, String>> {
         @Override
         public Map<String, String> convertFrom(String value) {
-            return convertValue(value, Function.identity());
+            return convertFromValue(value, Function.identity());
         }
+
         @Override
         public String convertTo(Map<String, String> value) {
-            throw new UnsupportedOperationException("#convertTo not implemented");
+            return convertToValue(value);
         }
     }
 
@@ -80,12 +93,12 @@ public class MapConverter {
     public static class StringInteger implements Converter<Map<String, Integer>> {
         @Override
         public Map<String, Integer> convertFrom(String value) {
-            return convertValue(value, Integer::parseInt);
+            return convertFromValue(value, Integer::parseInt);
         }
 
         @Override
         public String convertTo(Map<String, Integer> value) {
-            throw new UnsupportedOperationException("#convertTo not implemented");
+            return convertToValue(value);
         }
     }
 }

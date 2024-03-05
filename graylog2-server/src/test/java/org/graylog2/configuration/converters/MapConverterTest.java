@@ -44,6 +44,12 @@ class MapConverterTest {
         return config;
     }
 
+    private JadConfig createJadConfig(Map<String, String> values) throws Exception {
+        final var jadConfig = new JadConfig(new InMemoryRepository(values), new TestConfig());
+        jadConfig.process();
+        return jadConfig;
+    }
+
     @Nested
     class StringStringTest {
         @Test
@@ -59,7 +65,7 @@ class MapConverterTest {
         void withDuplicateKeys() throws Exception {
             assertThatThrownBy(() -> createConfig(Map.of("map_string_string", "hello:test1,world:2,hello:test2")))
                     .cause()
-                    .hasMessageContaining("Duplicate key")
+                    .hasMessageContaining("Duplicate key in value:")
                     .isInstanceOf(ParameterException.class);
         }
 
@@ -80,6 +86,16 @@ class MapConverterTest {
                     .hasMessageContaining("Invalid map entry argument")
                     .isInstanceOf(ParameterException.class);
         }
+
+        @Test
+        void convertTo() throws Exception {
+            final var config = createJadConfig(Map.of("map_string_string", "hello:test, world: 2 ,test :test"));
+
+            assertThat(config.dump()).isEqualTo(Map.of(
+                    "map_string_string", "hello:test,world:2,test:test",
+                    "map_string_integer", ""
+            ));
+        }
     }
 
     @Nested
@@ -97,7 +113,7 @@ class MapConverterTest {
         void withDuplicateKeys() throws Exception {
             assertThatThrownBy(() -> createConfig(Map.of("map_string_integer", "hello:1,world:2,hello:3")))
                     .cause()
-                    .hasMessageContaining("Duplicate key")
+                    .hasMessageContaining("Duplicate key in value:")
                     .isInstanceOf(ParameterException.class);
         }
 
@@ -122,6 +138,13 @@ class MapConverterTest {
                     .cause()
                     .hasMessageContaining("Invalid map entry value")
                     .isInstanceOf(ParameterException.class);
+        }
+
+        @Test
+        void convertTo() throws Exception {
+            final var config = createJadConfig(Map.of("map_string_integer", "hello:1, world:2 ,test:3"));
+
+            assertThat(config.dump()).isEqualTo(Map.of("map_string_integer", "hello:1,world:2,test:3", "map_string_string", ""));
         }
     }
 }
