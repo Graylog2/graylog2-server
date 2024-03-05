@@ -55,14 +55,14 @@ const displayValidationErrors = () => {
 };
 
 const handleExecution = ({
-                           editor,
-                           onExecute,
-                           value,
-                           error,
-                           disableExecution,
-                           isValidating,
-                           validate,
-                         }: {
+  editor,
+  onExecute,
+  value,
+  error,
+  disableExecution,
+  isValidating,
+  validate,
+}: {
   editor: Editor,
   onExecute: (query: string) => void,
   value: string,
@@ -198,27 +198,27 @@ type Props = BaseProps & {
 };
 
 const QueryInput = ({
-                      className,
-                      commands,
-                      completerFactory = defaultCompleterFactory,
-                      disableExecution,
-                      error,
-                      height,
-                      inputId,
-                      isValidating,
-                      maxLines,
-                      onBlur,
-                      onChange,
-                      onExecute: onExecuteProp,
-                      placeholder,
-                      streams,
-                      timeRange,
-                      value,
-                      validate,
-                      warning,
-                      wrapEnabled,
-                      name,
-                    }: Props) => {
+  className,
+  commands,
+  completerFactory = defaultCompleterFactory,
+  disableExecution,
+  error,
+  height,
+  inputId,
+  isValidating,
+  maxLines,
+  onBlur,
+  onChange,
+  onExecute: onExecuteProp,
+  placeholder,
+  streams,
+  timeRange,
+  value,
+  validate,
+  warning,
+  wrapEnabled,
+  name,
+}: Props) => {
   const { userTimezone } = useUserDateTime();
   const isInitialTokenizerUpdate = useRef(true);
   const { enableSmartSearch } = useContext(UserPreferencesContext);
