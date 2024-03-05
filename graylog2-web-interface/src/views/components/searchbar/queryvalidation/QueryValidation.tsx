@@ -200,7 +200,7 @@ const warmTierExplanations = (searchesWarmTier: boolean, warmTierIndices: Array<
   let errorMessage = 'This will search the Warm Tier and can be slow.';
 
   if (timestampString.length > 0) {
-    errorMessage += `The following time ranges are in the Warm Tier: ${timestampString}`;
+    errorMessage += ` The following time ranges are in the Warm Tier: ${timestampString}.`;
   }
 
   const explanation = {
@@ -223,11 +223,11 @@ const QueryValidation = () => {
   const { warnings } = useContext(FormWarningsContext);
 
   const validationState = (queryStringErrors ?? warnings?.queryString) as QueryValidationState;
-  const rangesInWarmTier = validationState?.context?.searched_index_ranges.filter((range) => range.is_warm_tiered);
+  const rangesInWarmTier = validationState?.context?.searched_index_ranges?.filter((range) => range.is_warm_tiered);
   const searchesWarmTier = rangesInWarmTier?.length > 0;
 
   const { status, explanations = [] } = validationState ?? { explanations: [] };
-  const deduplicatedExplanations = useMemo(() => [...deduplicateExplanations(explanations), ...warmTierExplanations(searchesWarmTier, rangesInWarmTier)], [explanations, searchesWarmTier]);
+  const deduplicatedExplanations = useMemo(() => [...deduplicateExplanations(explanations), ...warmTierExplanations(searchesWarmTier, rangesInWarmTier)], [explanations, searchesWarmTier, rangesInWarmTier]);
   const hasExplanations = validationState && (validationState?.status !== 'OK');
 
   return (
