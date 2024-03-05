@@ -31,13 +31,15 @@ public class CountsAdapterOS2 implements CountsAdapter {
 
     @Override
     public long totalCount(List<String> indices) {
-        final var result = client.execute(c -> c.search(searchBuilder -> searchBuilder
-                        .query(queryBuilder -> queryBuilder.matchAll(matchAll -> matchAll))
-                        .size(0)
-                        .trackTotalHits(totalHits -> totalHits.enabled(true))
-                        .index(indices), IndexedMessage.class),
+        final var result = client.execute(c -> c.msearch(requestBuilder -> requestBuilder
+                        .searches(searchBuilder -> searchBuilder
+                                .header(headerBuilder -> headerBuilder.index(indices))
+                                .body(bodyBuilder -> bodyBuilder
+                                        .query(queryBuilder -> queryBuilder.matchAll(matchAll -> matchAll))
+                                        .size(0)
+                                        .trackTotalHits(totalHits -> totalHits.enabled(true)))), IndexedMessage.class),
                 "Fetching message count failed for indices ");
 
-        return result.hits().total().value();
+        return result.responses().get(0).result().hits().total().value();
     }
 }
