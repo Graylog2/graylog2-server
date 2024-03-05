@@ -24,6 +24,7 @@ import MigrationDatanodeList from 'components/datanode/migrations/MigrationDatan
 import MigrationStepTriggerButtonToolbar from 'components/datanode/migrations/common/MigrationStepTriggerButtonToolbar';
 import type { MigrationStepComponentProps } from 'components/datanode/Types';
 import MigrationError from 'components/datanode/migrations/common/MigrationError';
+import InPlaceMigrationInfo from 'components/datanode/migrations/common/InPlaceMigrationInfo';
 
 const Headline = styled.h2`
   margin-top: 5px;
@@ -85,6 +86,7 @@ const MigrationWelcomeStep = ({ currentStep, onTriggerStep }: MigrationStepCompo
           </p>
         </Panel.Body>
       </StyledHelpPanel>
+      <InPlaceMigrationInfo />
     </Col>
   </Row>
 );
