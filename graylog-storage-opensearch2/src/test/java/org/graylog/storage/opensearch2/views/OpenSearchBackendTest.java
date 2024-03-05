@@ -121,7 +121,7 @@ public class OpenSearchBackendTest {
                 .timerange(RelativeRange.create(300))
                 .build();
         final Search search = Search.builder().queries(ImmutableSet.of(query)).build();
-        final SearchJob job = new SearchJob("deadbeef", search, "admin");
+        final SearchJob job = new SearchJob("deadbeef", search, "admin", "test-node-id");
 
         final OSGeneratedQueryContext queryContext = mock(OSGeneratedQueryContext.class);
 

@@ -61,7 +61,7 @@ export const MIGRATION_STATE = {
   },
   ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE: {
     key: 'ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE',
-    description: 'Welcome to Rolling upgrade migration',
+    description: 'Welcome to In-Place migration',
   },
   ASK_TO_SHUTDOWN_OLD_CLUSTER: {
     key: 'ASK_TO_SHUTDOWN_OLD_CLUSTER',
@@ -93,7 +93,7 @@ export const MIGRATION_STATE = {
   },
   PROVISION_DATANODE_CERTIFICATES_RUNNING: {
     key: 'PROVISION_DATANODE_CERTIFICATES_RUNNING',
-    description: 'Provision Data Node with certificates running',
+    description: "Provision the Data Node's certificate.",
   },
   EXISTING_DATA_MIGRATION_QUESTION_PAGE: {
     key: 'EXISTING_DATA_MIGRATION_QUESTION_PAGE',
@@ -121,7 +121,7 @@ export const MIGRATION_STATE = {
   },
   PROVISION_ROLLING_UPGRADE_NODES_RUNNING: {
     key: 'PROVISION_ROLLING_UPGRADE_NODES_RUNNING',
-    description: 'Provision the Data Nodes certificate.',
+    description: "Provision the Data Node's certificate.",
   },
   JOURNAL_SIZE_DOWNTIME_WARNING: {
     key: 'JOURNAL_SIZE_DOWNTIME_WARNING',
@@ -137,7 +137,7 @@ export const MIGRATION_STATE = {
   },
 } as const;
 
-export const ROLLING_UPGRADE_MIGRATION_STEPS = [
+export const IN_PLACE_MIGRATION_STEPS = [
   MIGRATION_STATE.ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE.key,
   MIGRATION_STATE.DIRECTORY_COMPATIBILITY_CHECK_PAGE2.key,
   MIGRATION_STATE.PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES.key,

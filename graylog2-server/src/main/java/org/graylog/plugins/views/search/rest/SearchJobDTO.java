@@ -20,9 +20,11 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.google.auto.value.AutoValue;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.SearchJob;
+import org.graylog.plugins.views.search.SearchJobIdentifier;
 import org.graylog.plugins.views.search.errors.SearchError;
 
 import java.util.Map;
@@ -32,14 +34,8 @@ import java.util.Set;
 @JsonAutoDetect
 @JsonPropertyOrder({"execution", "results"})
 public abstract class SearchJobDTO {
-    @JsonProperty
-    abstract String id();
-
-    @JsonProperty("search_id")
-    abstract String searchId();
-
-    @JsonProperty
-    abstract String owner();
+    @JsonUnwrapped
+    abstract SearchJobIdentifier searchJobIdentifier();
 
     @JsonProperty("errors")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -53,22 +49,16 @@ public abstract class SearchJobDTO {
 
     public static SearchJobDTO fromSearchJob(SearchJob searchJob) {
         return Builder.create()
-                .id(searchJob.getId())
-                .owner(searchJob.getOwner())
+                .searchJobIdentifier(searchJob.getSearchJobIdentifier())
                 .errors(searchJob.getErrors())
                 .results(searchJob.results())
-                .searchId(searchJob.getSearchId())
                 .execution(ExecutionInfo.fromExecutionInfo(searchJob.execution()))
                 .build();
     }
 
     @AutoValue.Builder
     abstract static class Builder {
-        abstract Builder id(String id);
-
-        abstract Builder searchId(String searchId);
-
-        abstract Builder owner(String owner);
+        abstract Builder searchJobIdentifier(SearchJobIdentifier searchJobIdentifier);
 
         abstract Builder errors(Set<SearchError> errors);
 

@@ -245,7 +245,7 @@ const QueryValidation = () => {
           ) : (
             <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
                                title="Search query syntax documentation"
-                               text={<Icon name="lightbulb" />} />
+                               text={<Icon name="lightbulb_circle" />} />
           )}
         </Container>
       </Popover.Target>
@@ -260,7 +260,7 @@ const QueryValidation = () => {
                 {errorType && (
                 <DocumentationLink page={getErrorDocumentationLink(errorType)}
                                    title={`${errorTitle} documentation`}
-                                   text={<DocumentationIcon name="lightbulb" />} />
+                                   text={<DocumentationIcon name="lightbulb_circle" />} />
                 )}
               </Explanation>
             ))}

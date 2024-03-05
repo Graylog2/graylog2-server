@@ -31,8 +31,10 @@ import org.graylog.datanode.bindings.PeriodicalBindings;
 import org.graylog.datanode.bindings.ServerBindings;
 import org.graylog.datanode.bootstrap.Main;
 import org.graylog.datanode.bootstrap.ServerBootstrap;
+import org.graylog.datanode.configuration.S3RepositoryConfiguration;
 import org.graylog.datanode.rest.RestBindings;
 import org.graylog.datanode.shutdown.GracefulShutdown;
+import org.graylog.plugins.map.config.GeoIpProcessorConfig;
 import org.graylog2.bindings.MongoDBModule;
 import org.graylog2.bindings.PasswordAlgorithmBindings;
 import org.graylog2.cluster.nodes.DataNodeDto;
@@ -63,6 +65,7 @@ public class Server extends ServerBootstrap {
     private static final Logger LOG = LoggerFactory.getLogger(Server.class);
 
     protected static final Configuration configuration = new Configuration();
+    private final S3RepositoryConfiguration s3RepositoryConfiguration = new S3RepositoryConfiguration();
     private final MongoDbConfiguration mongoDbConfiguration = new MongoDbConfiguration();
     private final TLSProtocolsConfiguration tlsConfiguration = new TLSProtocolsConfiguration();
 
@@ -101,7 +104,8 @@ public class Server extends ServerBootstrap {
     protected List<Object> getCommandConfigurationBeans() {
         return Arrays.asList(configuration,
                 mongoDbConfiguration,
-                tlsConfiguration);
+                tlsConfiguration,
+                s3RepositoryConfiguration);
     }
 
     private static class ShutdownHook implements Runnable {
