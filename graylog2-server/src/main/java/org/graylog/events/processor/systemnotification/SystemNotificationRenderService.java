@@ -16,6 +16,10 @@
  */
 package org.graylog.events.processor.systemnotification;
 
+import freemarker.cache.ConditionalTemplateConfigurationFactory;
+import freemarker.cache.PathGlobMatcher;
+import freemarker.core.HTMLOutputFormat;
+import freemarker.core.TemplateConfiguration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
@@ -57,6 +61,13 @@ public class SystemNotificationRenderService {
         cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
         cfg.setLogTemplateExceptions(false);
         cfg.setClassForTemplateLoading(SystemNotificationRenderService.class, TEMPLATE_BASE_PATH);
+
+        TemplateConfiguration tcHTML = new TemplateConfiguration();
+        tcHTML.setOutputFormat(HTMLOutputFormat.INSTANCE);
+        cfg.setTemplateConfigurations(
+                new ConditionalTemplateConfigurationFactory(
+                        new PathGlobMatcher(Format.HTML.name() + "/**"),
+                        tcHTML));
     }
 
     public RenderResponse render(Notification.Type type, String key, Format format, Map<String, Object> values) {
