@@ -15,12 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import styled from 'styled-components';
 
 import TeaserSearch from 'components/security/teaser/TeaserSearch';
+import { Alert } from 'components/bootstrap';
 
 import viewJson from './sample-dashboards/overview_view.json';
 import searchJson from './sample-dashboards/overview_search.json';
 import resultJson from './sample-dashboards/overview_results.json';
+
+const StyledAlert = styled(Alert)`
+  margin-top: 0;
+`;
 
 const hotspots = [
   {
@@ -31,7 +37,12 @@ const hotspots = [
 ];
 
 const ClusterManagementTeaserSearch = () => (
-  <TeaserSearch viewJson={viewJson} searchJson={searchJson} searchJobResult={resultJson} hotspots={hotspots} />
+  <>
+    <StyledAlert bsStyle="warning">
+      Please make sure you have a valid Enterprise license and Data Node configured to see the performance metrics of your Data Node and your managed OpenSearch cluster.
+    </StyledAlert>
+    <TeaserSearch viewJson={viewJson} searchJson={searchJson} searchJobResult={resultJson} hotspots={hotspots} />
+  </>
 );
 
 export default ClusterManagementTeaserSearch;
