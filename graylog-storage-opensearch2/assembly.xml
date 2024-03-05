@@ -28,6 +28,8 @@
                 <include>org.apache.httpcomponents:httpcore-nio</include>
                 <include>jakarta.json.bind:jakarta.json.bind-api</include>
                 <include>jakarta.json:jakarta.json-api</include>
+                <include>com.fasterxml.jackson.core:jackson-core</include>
+                <include>com.fasterxml.jackson.core:jackson-databind</include>
             </includes>
             <unpackOptions>
                 <excludes>
