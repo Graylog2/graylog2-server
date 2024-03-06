@@ -28,6 +28,8 @@ import org.graylog.storage.errors.ResponseError;
 import org.graylog2.plugin.Message;
 import org.opensearch.client.json.JsonData;
 import org.opensearch.client.opensearch._types.FieldValue;
+import org.opensearch.client.opensearch._types.aggregations.LongTermsBucket;
+import org.opensearch.client.opensearch._types.aggregations.StringTermsBucket;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
 import org.opensearch.client.opensearch.core.MsearchRequest;
 import org.opensearch.client.opensearch.core.msearch.MultisearchBody;
@@ -86,10 +88,11 @@ public class QuerySuggestionsOS2 implements QuerySuggestionsService {
         try {
             final var resultItem = client.search(msearchRequest, "Failed to execute aggregation");
             final var result = resultItem.result();
-            final var fieldValues = result.aggregations().get(AGG_FIELD_VALUES).sterms();
+            final var rawAgg = result.aggregations().get(AGG_FIELD_VALUES);
+            final var fieldValues = rawAgg.isSterms() ? rawAgg.sterms() : rawAgg.lterms();
             final List<SuggestionEntry> entries = fieldValues.buckets().array()
                     .stream()
-                    .map(b -> new SuggestionEntry(b.key(), b.docCount()))
+                    .map(b -> new SuggestionEntry(b instanceof StringTermsBucket sBucket ? sBucket.key() : ((LongTermsBucket) b).key(), b.docCount()))
                     .collect(Collectors.toList());
 
             if (!entries.isEmpty()) {

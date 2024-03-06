@@ -106,8 +106,8 @@ public class OpenSearchClient {
         if (singleResult.isFailure()) {
             final var error = singleResult.failure().error();
             final var errorType = error.type();
-            final var index = error.metadata().get("index").to(String.class);
             if (errorType.equals("index_not_found_exception")) {
+                final var index = error.metadata().get("index").to(String.class);
                 throw IndexNotFoundException.create(errorMessage + "[" + index + "]", index);
             }
             throw new OpenSearchException(error.reason());
