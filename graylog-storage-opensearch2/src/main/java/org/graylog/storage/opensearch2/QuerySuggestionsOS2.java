@@ -16,6 +16,7 @@
  */
 package org.graylog.storage.opensearch2;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.engine.QuerySuggestionsService;
@@ -45,11 +46,13 @@ public class QuerySuggestionsOS2 implements QuerySuggestionsService {
 
     private final OpenSearchClient client;
     private final IndexLookup indexLookup;
+    private final ObjectMapper objectMapper;
 
     @Inject
-    public QuerySuggestionsOS2(OpenSearchClient client, IndexLookup indexLookup) {
+    public QuerySuggestionsOS2(OpenSearchClient client, IndexLookup indexLookup, ObjectMapper objectMapper) {
         this.client = client;
         this.indexLookup = indexLookup;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -94,8 +97,9 @@ public class QuerySuggestionsOS2 implements QuerySuggestionsService {
             } else {
                 final var suggestion = result.suggest().get(AGG_CORRECTIONS);
                 final List<SuggestionEntry> corrections = suggestion.stream()
-                        .map(Suggest::completion)
-                        .flatMap(e -> e.options().stream()).map(o -> new SuggestionEntry(o.text(), Double.valueOf(o.score()).longValue()))
+                        .filter(Suggest::isTerm)
+                        .map(Suggest::term)
+                        .flatMap(e -> e.options().stream()).map(o -> new SuggestionEntry(o.text(), o.freq()))
                         .collect(Collectors.toList());
                 return SuggestionResponse.forSuggestions(req.field(), req.input(), corrections, null);
             }
