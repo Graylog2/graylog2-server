@@ -27,14 +27,15 @@ const useJournalDowntimeSize = () : {
   refetch: () => void,
   isInitialLoading: boolean,
   error: any,
+  isError: boolean
 } => {
-  const { data, refetch, isInitialLoading, error } = useQuery(
+  const { data, refetch, isInitialLoading, error, isError } = useQuery(
     ['JournalDowntimeSize'],
     fetchJournalDowntimeSize,
     {
       onError: (errorThrown) => {
-        UserNotification.error(`Loading Data Node failed with status: ${errorThrown}`,
-          'Could not load Data Node');
+        UserNotification.error(`Loading Data Node migration journal estimate: ${errorThrown}`,
+          'Could not load Data Node journal size estimate');
       },
       notifyOnChangeProps: ['data', 'error'],
       refetchInterval: 5000,
@@ -46,6 +47,7 @@ const useJournalDowntimeSize = () : {
     refetch,
     isInitialLoading,
     error,
+    isError,
   });
 };
 
