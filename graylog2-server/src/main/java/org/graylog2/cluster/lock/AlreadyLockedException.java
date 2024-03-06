@@ -14,27 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.security.realm;
+package org.graylog2.cluster.lock;
 
-import org.apache.shiro.authz.SimpleAuthorizationInfo;
-import org.graylog2.plugin.database.users.User;
-
-import java.util.Set;
-
-public class UserAuthorizationInfo extends SimpleAuthorizationInfo {
-    private final User user;
-
-    public UserAuthorizationInfo(User user) {
-        super();
-        this.user = user;
-    }
-
-    public UserAuthorizationInfo(Set<String> roles, User user) {
-        super(roles);
-        this.user = user;
-    }
-
-    public User getUser() {
-        return user;
+public class AlreadyLockedException extends Exception {
+    public AlreadyLockedException(String message) {
+        super(message);
     }
 }

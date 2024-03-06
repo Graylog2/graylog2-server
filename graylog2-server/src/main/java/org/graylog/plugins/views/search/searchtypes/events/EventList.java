@@ -203,6 +203,8 @@ public abstract class EventList implements SearchType {
     }
 
     @AutoValue
+    @JsonTypeName(EventList.NAME)
+    @JsonDeserialize(builder = EventList.Result.Builder.class)
     public abstract static class Result implements SearchType.Result {
         @Override
         @JsonProperty
@@ -210,15 +212,13 @@ public abstract class EventList implements SearchType {
 
         @Override
         @JsonProperty
-        public String type() {
-            return NAME;
-        }
+        public abstract String type();
 
         @JsonProperty
         public abstract List<CommonEventSummary> events();
 
         public static Builder builder() {
-            return new AutoValue_EventList_Result.Builder();
+            return new AutoValue_EventList_Result.Builder().type(EventList.NAME);
         }
 
         abstract Builder toBuilder();
@@ -233,10 +233,21 @@ public abstract class EventList implements SearchType {
 
         @AutoValue.Builder
         public abstract static class Builder {
+            @JsonCreator
+            public static Builder create() {
+                return new AutoValue_EventList_Result.Builder().type(EventList.NAME);
+            }
+
+            @JsonProperty
             public abstract Builder id(String id);
 
+            @JsonProperty
             public abstract Builder name(String name);
 
+            @JsonProperty
+            public abstract Builder type(String type);
+
+            @JsonProperty
             public abstract Builder events(List<CommonEventSummary> events);
 
             public abstract Result build();
