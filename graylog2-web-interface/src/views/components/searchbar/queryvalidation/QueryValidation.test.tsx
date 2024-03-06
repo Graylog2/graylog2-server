@@ -118,7 +118,7 @@ describe('QueryValidation', () => {
 
     await openExplanation();
 
-    await screen.findByText(/This will search the Warm Tier and can be slow. The following time ranges are in the Warm Tier: 2024-03-06 09:02:11 to 2024-03-06 09:07:22./);
+    await screen.findByText(/Warm Tier Search: The selected time range includes data stored in the Warm Tier, which can be slow to retrieve. The following interval falls within the Warm Tier: 2024-03-06 09:02:11 to 2024-03-06 09:07:22./);
   });
 
   it('should display validation error specific documentation links', async () => {

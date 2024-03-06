@@ -398,6 +398,6 @@ describe('<Widget />', () => {
   }]
     } />);
 
-    await screen.findByText('Loading this widget might take a while as it searches the Warm Tier.');
+    await screen.findByText('This widget is retrieving data from the Warm Tier and may take longer to load.');
   });
 });

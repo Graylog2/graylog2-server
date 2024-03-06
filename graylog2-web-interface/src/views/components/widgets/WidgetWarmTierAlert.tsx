@@ -18,10 +18,10 @@ import * as React from 'react';
 
 import { Alert } from 'components/bootstrap';
 
-const WarmTierAlert = () => (
+const WidgetWarmTierAlert = () => (
   <Alert bsStyle="info">
-    Loading this widget might take a while as it searches the Warm Tier.
+    This widget is retrieving data from the Warm Tier and may take longer to load.
   </Alert>
 );
 
-export default WarmTierAlert;
+export default WidgetWarmTierAlert;

@@ -197,10 +197,10 @@ const warmTierExplanations = (searchesWarmTier: boolean, warmTierIndices: Array<
 
   const timestampString = timestampInfo.join(', ');
 
-  let errorMessage = 'This will search the Warm Tier and can be slow.';
+  let errorMessage = 'Warm Tier Search: The selected time range includes data stored in the Warm Tier, which can be slow to retrieve.';
 
   if (timestampString.length > 0) {
-    errorMessage += ` The following time ranges are in the Warm Tier: ${timestampString}.`;
+    errorMessage += ` The following interval falls within the Warm Tier: ${timestampString}.`;
   }
 
   const explanation = {
