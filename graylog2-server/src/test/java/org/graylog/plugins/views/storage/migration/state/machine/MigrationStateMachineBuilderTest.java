@@ -218,6 +218,7 @@ public class MigrationStateMachineBuilderTest {
         stateMachine.fire(MigrationStep.PROVISION_DATANODE_CERTIFICATES);
         Mockito.when(migrationActions.provisioningFinished()).thenReturn(true);
         stateMachine.fire(MigrationStep.CALCULATE_JOURNAL_SIZE);
+        verify(migrationActions, times(1)).calculateTrafficEstimate();
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.JOURNAL_SIZE_DOWNTIME_WARNING);
         assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SHOW_STOP_PROCESSING_PAGE);
         verify(migrationActions, times(1)).provisionDataNodes();
