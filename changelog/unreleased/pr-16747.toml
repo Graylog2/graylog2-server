@@ -1,0 +1,9 @@
+type = "changed"
+message = "Update com.floreysoft:jmte from 5.0.0 to 7.0.2"
+
+pulls = ["16747"]
+
+details.user = """
+The handling of strings in 'if' commands in JMTE templates has changed, please consult the Upgrading Notes for details and instructions on how to change your custom templates, if necessary.
+"""
+
