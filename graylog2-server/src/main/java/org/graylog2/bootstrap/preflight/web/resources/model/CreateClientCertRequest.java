@@ -18,4 +18,4 @@ package org.graylog2.bootstrap.preflight.web.resources.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public record CreateClientCertRequest(@JsonProperty("principal") String principal, @JsonProperty("password") String password) {}
+public record CreateClientCertRequest(@JsonProperty("principal") String principal, @JsonProperty("role") String role, @JsonProperty("password") String password) {}
