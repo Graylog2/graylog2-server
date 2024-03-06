@@ -30,11 +30,6 @@ import org.slf4j.LoggerFactory;
 
 public class SetIndexReadOnlyAndCalculateRangeJob extends SystemJob {
     private static final Logger LOG = LoggerFactory.getLogger(SetIndexReadOnlyAndCalculateRangeJob.class);
-
-    public interface Factory {
-        SetIndexReadOnlyAndCalculateRangeJob create(String indexName);
-    }
-
     private final SetIndexReadOnlyJob.Factory setIndexReadOnlyJobFactory;
     private final CreateNewSingleIndexRangeJob.Factory createNewSingleIndexRangeJobFactory;
     private final IndexSetRegistry indexSetRegistry;
@@ -70,7 +65,7 @@ public class SetIndexReadOnlyAndCalculateRangeJob extends SystemJob {
             LOG.debug("Not running job for closed index <{}>", indexName);
             return;
         }
-        final SystemJob setIndexReadOnlyJob = setIndexReadOnlyJobFactory.create(indexName);
+        final SetIndexReadOnlyJob setIndexReadOnlyJob = setIndexReadOnlyJobFactory.create(indexName);
         setIndexReadOnlyJob.execute();
         final SystemJob createNewSingleIndexRangeJob = createNewSingleIndexRangeJobFactory.create(indexSetRegistry.getAll(), indexName);
         createNewSingleIndexRangeJob.execute();
@@ -120,5 +115,9 @@ public class SetIndexReadOnlyAndCalculateRangeJob extends SystemJob {
     @Override
     public String getClassName() {
         return this.getClass().getCanonicalName();
+    }
+
+    public interface Factory {
+        SetIndexReadOnlyAndCalculateRangeJob create(String indexName);
     }
 }

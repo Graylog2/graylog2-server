@@ -23,7 +23,6 @@ import org.graylog2.indexer.indices.jobs.OptimizeIndexJob;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
-import org.graylog2.system.jobs.SystemJob;
 import org.graylog2.system.jobs.SystemJobConcurrencyException;
 import org.graylog2.system.jobs.SystemJobManager;
 import org.slf4j.Logger;
@@ -31,14 +30,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 
-public class SetIndexReadOnlyJob extends SystemJob {
+public class SetIndexReadOnlyJob {
     private static final Logger log = LoggerFactory.getLogger(SetIndexReadOnlyJob.class);
-
-    public interface Factory {
-        SetIndexReadOnlyJob create(String index);
-
-    }
-
     private final Indices indices;
     private final IndexSetRegistry indexSetRegistry;
     private final OptimizeIndexJob.Factory optimizeIndexJobFactory;
@@ -61,7 +54,6 @@ public class SetIndexReadOnlyJob extends SystemJob {
         this.activityWriter = activityWriter;
     }
 
-    @Override
     public void execute() {
         if (!indices.exists(index)) {
             log.debug("Not running job for deleted index <{}>", index);
@@ -74,7 +66,7 @@ public class SetIndexReadOnlyJob extends SystemJob {
 
         final Optional<IndexSet> indexSet = indexSetRegistry.getForIndex(index);
 
-        if (!indexSet.isPresent()) {
+        if (indexSet.isEmpty()) {
             log.error("Couldn't find index set for index <{}>", index);
             return;
         }
@@ -101,43 +93,7 @@ public class SetIndexReadOnlyJob extends SystemJob {
         }
     }
 
-    @Override
-    public void requestCancel() {
-        // not possible, ignore
-    }
-
-    @Override
-    public int getProgress() {
-        return 0;
-    }
-
-    @Override
-    public int maxConcurrency() {
-        return 1000;
-    }
-
-    @Override
-    public boolean providesProgress() {
-        return false;
-    }
-
-    @Override
-    public boolean isCancelable() {
-        return false;
-    }
-
-    @Override
-    public String getDescription() {
-        return "Sets an index to read only for performance and optionally triggers an optimization.";
-    }
-
-    @Override
-    public String getClassName() {
-        return this.getClass().getCanonicalName();
-    }
-
-    @Override
-    public String getInfo() {
-        return "Setting index " + index + " to read-only.";
+    public interface Factory {
+        SetIndexReadOnlyJob create(String index);
     }
 }
