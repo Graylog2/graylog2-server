@@ -16,7 +16,6 @@
  */
 package org.graylog.storage.opensearch2;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.engine.QuerySuggestionsService;
@@ -48,13 +47,11 @@ public class QuerySuggestionsOS2 implements QuerySuggestionsService {
 
     private final OpenSearchClient client;
     private final IndexLookup indexLookup;
-    private final ObjectMapper objectMapper;
 
     @Inject
-    public QuerySuggestionsOS2(OpenSearchClient client, IndexLookup indexLookup, ObjectMapper objectMapper) {
+    public QuerySuggestionsOS2(OpenSearchClient client, IndexLookup indexLookup) {
         this.client = client;
         this.indexLookup = indexLookup;
-        this.objectMapper = objectMapper;
     }
 
     @Override
