@@ -44,7 +44,7 @@ const UserMenu = () => {
   const onLogoutClicked = useLogout();
 
   return (
-    <NavDropdown title={<Icon name="user" size="lg" />}
+    <NavDropdown title={<Icon name="person" size="lg" />}
                  hoverTitle={`User Menu for ${fullName}`}
                  noCaret>
       <Menu.Label><FullName>{fullName}</FullName></Menu.Label>
@@ -56,7 +56,9 @@ const UserMenu = () => {
       <LinkContainer to={route}>
         <Menu.Item>{label}</Menu.Item>
       </LinkContainer>
-      <Menu.Item onClick={onLogoutClicked} icon={<Icon name="sign-out-alt" />}>Log out</Menu.Item>
+      <Menu.Item onClick={onLogoutClicked} leftSection={<Icon name="logout" />}>
+        Log out
+      </Menu.Item>
     </NavDropdown>
   );
 };

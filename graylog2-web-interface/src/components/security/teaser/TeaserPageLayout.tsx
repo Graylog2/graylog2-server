@@ -24,13 +24,13 @@ import Routes from 'routing/Routes';
 const navItems = [
   {
     path: Routes.SECURITY.OVERVIEW,
-    iconName: 'poll',
+    iconName: 'ballot',
     end: true,
     title: 'Overview',
   },
   {
     path: Routes.SECURITY.USER_ACTIVITY,
-    iconName: 'user',
+    iconName: 'person',
     end: false,
     title: 'User Activity',
   },
@@ -48,7 +48,7 @@ const navItems = [
   },
   {
     path: Routes.SECURITY.ANOMALIES,
-    iconName: 'search-plus',
+    iconName: 'zoom_in',
     end: false,
     title: 'Anomalies',
   },

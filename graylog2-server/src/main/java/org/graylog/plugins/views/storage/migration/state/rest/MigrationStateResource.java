@@ -22,6 +22,7 @@ import io.swagger.annotations.ApiParam;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -32,6 +33,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog.plugins.views.storage.migration.state.actions.TrafficSnapshot;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachine;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachineContext;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -83,5 +85,26 @@ public class MigrationStateResource {
     public String serialize() {
         // you can use https://dreampuf.github.io/GraphvizOnline/ to visualize the result
         return stateMachine.serialize();
+    }
+
+    @DELETE
+    @Path("/state")
+    @NoAuditEvent("No Audit Event needed") // TODO: do we need audit log here?
+    @RequiresPermissions(RestPermissions.DATANODE_MIGRATION)
+    @ApiOperation(value = "Reset the whole migration to the first step, start over")
+    public CurrentStateInformation resetState() {
+        stateMachine.reset();
+        return new CurrentStateInformation(stateMachine.getState(), stateMachine.nextSteps());
+    }
+
+    @GET
+    @Path("/journalestimate")
+    @NoAuditEvent("No audit event needed")
+    @RequiresPermissions(RestPermissions.DATANODE_MIGRATION)
+    @ApiOperation(value = "Get journal size estimate (bytes/minute)")
+    public long getTrafficPerMinute() {
+        return stateMachine.getContext()
+                .getExtendedState(TrafficSnapshot.ESTIMATED_TRAFFIC_PER_MINUTE, Long.class)
+                .orElse(0L);
     }
 }

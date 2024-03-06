@@ -25,11 +25,13 @@ import { useMemo } from 'react';
 import { MantineProvider } from '@mantine/core';
 
 import usePluginEntities from 'hooks/usePluginEntities';
-import type { ThemesColors } from 'theme/theme-types';
+import type { CustomThemesColors } from 'theme/theme-types';
 
 import ColorSchemeContext from './ColorSchemeContext';
 import { COLOR_SCHEMES } from './constants';
 import usePreferredColorScheme from './hooks/usePreferredColorScheme';
+
+import 'material-symbols/rounded.css';
 
 type Props = {
   children: React.ReactNode,
@@ -38,30 +40,21 @@ type Props = {
 }
 
 const useSCTheme = (
-  colorScheme: ColorScheme,
   changeColorScheme: (newColorScheme: ColorScheme) => void,
-  useCustomThemeColors: () => ({ data: ThemesColors }),
   mantineTheme: MantineTheme,
-) => {
-  const { data: customThemeColors } = useCustomThemeColors?.() ?? {};
+) => useMemo(() => {
+  const theme = SawmillSC(mantineTheme);
 
-  return useMemo(() => {
-    const theme = SawmillSC({
-      colorScheme,
-      customColors: customThemeColors?.[colorScheme],
-    });
-
-    return ({
-      ...theme,
-      changeMode: changeColorScheme,
-      mantine: mantineTheme,
-    });
-  }, [changeColorScheme, colorScheme, customThemeColors, mantineTheme]);
-};
+  return ({
+    ...theme,
+    changeMode: changeColorScheme,
+    mantine: mantineTheme,
+  });
+}, [changeColorScheme, mantineTheme]);
 
 const useMantineTheme = (
   colorScheme: ColorScheme,
-  useCustomThemeColors: () => ({ data: ThemesColors }),
+  useCustomThemeColors: () => ({ data: CustomThemesColors }),
 ) => {
   const { data: customThemeColors } = useCustomThemeColors?.() ?? {};
 
@@ -76,11 +69,12 @@ const GraylogThemeProvider = ({ children, initialThemeModeOverride, userIsLogged
   const themeCustomizer = usePluginEntities('customization.theme.customizer');
   const useCustomThemeColors = themeCustomizer?.[0]?.hooks.useCustomThemeColors;
   const mantineTheme = useMantineTheme(colorScheme, useCustomThemeColors);
-  const scTheme = useSCTheme(colorScheme, changeColorScheme, useCustomThemeColors, mantineTheme);
+  const scTheme = useSCTheme(changeColorScheme, mantineTheme);
 
   return (
     <ColorSchemeContext.Provider value={colorScheme}>
-      <MantineProvider theme={mantineTheme}>
+      <MantineProvider theme={mantineTheme}
+                       forceColorScheme={colorScheme}>
         <ThemeProvider theme={scTheme}>
           {children}
         </ThemeProvider>

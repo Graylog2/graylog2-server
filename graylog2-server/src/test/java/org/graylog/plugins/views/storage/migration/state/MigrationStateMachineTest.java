@@ -87,6 +87,22 @@ class MigrationStateMachineTest {
     }
 
     @Test
+    void testReset() {
+        final InMemoryStateMachinePersistence persistence = new InMemoryStateMachinePersistence();
+        final MigrationStateMachineProvider provider = new MigrationStateMachineProvider(persistence, new MigrationActionsAdapter());
+        final MigrationStateMachine sm = provider.get();
+        sm.trigger(MigrationStep.SELECT_MIGRATION, Collections.emptyMap());
+        sm.trigger(MigrationStep.SKIP_DIRECTORY_COMPATIBILITY_CHECK, Collections.emptyMap());
+
+        Assertions.assertThat(sm.getState()).isEqualTo(MigrationState.CA_CREATION_PAGE);
+
+        sm.reset();
+
+        Assertions.assertThat(sm.getState()).isEqualTo(MigrationState.NEW);
+
+    }
+
+    @Test
     void testSerialization() {
         final MigrationStateMachine migrationStateMachine = new MigrationStateMachineProvider(new InMemoryStateMachinePersistence(), new MigrationActionsAdapter()).get();
         final String serialized = migrationStateMachine.serialize();

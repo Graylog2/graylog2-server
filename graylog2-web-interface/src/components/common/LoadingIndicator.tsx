@@ -17,6 +17,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
+import { useEffect, useState } from 'react';
 
 import { Alert } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
@@ -43,6 +44,8 @@ const StyledAlert = styled(Alert)`
 
 type Props = {
   text: string,
+  longWaitText: string,
+  longWaitTimeout: number,
 };
 
 /**
@@ -52,23 +55,39 @@ type Props = {
  * Use this component when you want to load something in the background, but still provide some feedback that
  * an action is happening.
  */
-const LoadingIndicator = ({ text }: Props) => (
-  <Delayed delay={500}>
-    <Container>
-      <StyledAlert bsStyle="info">
-        <Spinner delay={0} text={text} />
-      </StyledAlert>
-    </Container>
-  </Delayed>
-);
+const LoadingIndicator = ({ text, longWaitText, longWaitTimeout }: Props) => {
+  const [indicatorText, setIndicatorText] = useState(text);
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setIndicatorText(longWaitText);
+    }, longWaitTimeout);
+
+    return () => clearTimeout(timeoutId);
+  }, [longWaitText, longWaitTimeout]);
+
+  return (
+    <Delayed delay={500}>
+      <Container>
+        <StyledAlert bsStyle="info">
+          <Spinner delay={0} text={indicatorText} />
+        </StyledAlert>
+      </Container>
+    </Delayed>
+  );
+};
 
 LoadingIndicator.propTypes = {
   /** Text to display while the indicator is shown. */
   text: PropTypes.string,
+  longWaitText: PropTypes.string,
+  longWaitTimeout: PropTypes.number,
 };
 
 LoadingIndicator.defaultProps = {
   text: 'Loading...',
+  longWaitText: 'This is taking a bit longer, please hold on...',
+  longWaitTimeout: 20000,
 };
 
 export default LoadingIndicator;

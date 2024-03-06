@@ -35,6 +35,9 @@ import PerspectivesBindings from 'components/perspectives/bindings';
 import NavigationBindings from 'components/navigation/bindings';
 import SecurityBindings from 'components/security/bindings';
 
+import '@graylog/sawmill/fonts';
+import '@mantine/core/styles.css';
+
 Reflux.setPromiseFactory((handlers) => CancellablePromise.of(new Promise(handlers)));
 
 PluginStore.register(new PluginManifest({}, ViewsBindings));

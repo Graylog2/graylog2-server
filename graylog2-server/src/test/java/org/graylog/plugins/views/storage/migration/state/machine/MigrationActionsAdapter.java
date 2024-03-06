@@ -27,11 +27,6 @@ public class MigrationActionsAdapter implements MigrationActions {
     }
 
     @Override
-    public void resetMigration() {
-
-    }
-
-    @Override
     public boolean dataNodeStartupFinished() {
         return false;
     }
@@ -52,6 +47,11 @@ public class MigrationActionsAdapter implements MigrationActions {
 
     @Override
     public void requestMigrationStatus() {
+
+    }
+
+    @Override
+    public void calculateTrafficEstimate() {
 
     }
 

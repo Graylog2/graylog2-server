@@ -114,7 +114,7 @@ class ScrollButton extends React.Component {
                  type="button"
                  className={position}
                  onClick={this.scrollToTop}>
-        <ArrowUpIcon name="chevron-up" />
+        <ArrowUpIcon name="expand_less" />
       </ScrollBtn>
     );
   }

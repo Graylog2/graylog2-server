@@ -193,8 +193,8 @@ class AggregationConditionExpression extends React.Component {
               <FormGroup>
                 <div className={renderLabel ? styles.formControlNoLabel : undefined}>
                   <ButtonToolbar>
-                    <Button bsSize="sm" onClick={this.handleDeleteExpression} title="Delete Expression"><Icon name="minus" fixedWidth /></Button>
-                    <Button bsSize="sm" onClick={this.handleAddExpression} title="Add Expression"><Icon name="plus" fixedWidth /></Button>
+                    <Button bsSize="sm" onClick={this.handleDeleteExpression} title="Delete Expression"><Icon name="remove" /></Button>
+                    <Button bsSize="sm" onClick={this.handleAddExpression} title="Add Expression"><Icon name="add" /></Button>
                     <Button bsSize="sm" onClick={this.handleAddGroup}>Add Group</Button>
                   </ButtonToolbar>
                 </div>

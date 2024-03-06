@@ -16,7 +16,17 @@
  */
 import * as React from 'react';
 import type { ColorVariant } from '@graylog/sawmill';
-import { Badge as MantineBadge, useMantineTheme } from '@mantine/core';
+import { Badge as MantineBadge } from '@mantine/core';
+import styled, { css } from 'styled-components';
+
+const StyledBadge = styled(MantineBadge)<{ color: ColorVariant }>(({ theme, color }) => css`
+  color: ${theme.colors.contrast[color]};
+  text-transform: none;
+
+  .mantine-Badge-label {
+    font-size: ${theme.fonts.size.small};
+  }
+`);
 
 type Props = React.PropsWithChildren<{
   bsStyle?: ColorVariant,
@@ -33,32 +43,17 @@ const Badge = React.forwardRef<HTMLDivElement, Props>(({
   'data-testid': dataTestid,
   onClick,
   title,
-}, ref) => {
-  const theme = useMantineTheme();
-
-  const styles = {
-    root: {
-      color: theme.other.colors.contrast[bsStyle],
-      textTransform: 'none' as const,
-    },
-    inner: {
-      fontSize: theme.fontSizes.sm,
-    },
-  };
-
-  return (
-    <MantineBadge color={bsStyle}
-                  className={className}
-                  title={title}
-                  data-testid={dataTestid}
-                  ref={ref}
-                  styles={styles}
-                  variant="filled"
-                  onClick={onClick}>
-      {children}
-    </MantineBadge>
-  );
-});
+}, ref) => (
+  <StyledBadge color={bsStyle}
+               className={className}
+               title={title}
+               data-testid={dataTestid}
+               ref={ref}
+               variant="filled"
+               onClick={onClick}>
+    {children}
+  </StyledBadge>
+));
 
 Badge.defaultProps = {
   bsStyle: 'default',

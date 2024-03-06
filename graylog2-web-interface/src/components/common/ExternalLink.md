@@ -6,7 +6,7 @@
 `ExternalLink` with a different icon:
 ```js
 <ExternalLink href="http://docs.graylog.org/"
-              iconClass="fa-external-link-square">
+              iconName="help">
   Graylog documentation
 </ExternalLink>
 ```

@@ -64,7 +64,7 @@ const TabRelativeTimeRange = ({ disabled, limitDuration }: Props) => {
                                onUnsetRange={() => { setFieldValue('timeRangeTabs.relative.to', RELATIVE_CLASSIFIED_ALL_TIME_RANGE); }}
                                title="From:"
                                unsetRangeLabel="All Time" />
-          <StyledIcon name="arrow-right" />
+          <StyledIcon name="arrow_right_alt" />
 
           <RelativeRangeSelect defaultRange={classifyToRange(DEFAULT_RELATIVE_TO)}
                                disableUnsetRange={disableUntil}

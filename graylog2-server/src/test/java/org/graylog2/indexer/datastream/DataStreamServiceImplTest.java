@@ -74,7 +74,7 @@ public class DataStreamServiceImplTest {
         dataStreamService.createDataStream("teststream", ts, mappings, mock(Policy.class));
         ArgumentCaptor<Template> templateCaptor = ArgumentCaptor.forClass(Template.class);
         verify(dataStreamAdapter).ensureDataStreamTemplate(anyString(), templateCaptor.capture(), anyString());
-        HashMap<String, Object> fieldMappings = (HashMap<String, Object>) templateCaptor.getValue().mappings().get("properties");
+        Map<String, Object> fieldMappings = (Map<String, Object>) templateCaptor.getValue().mappings().get("properties");
         Map<String, String> timestampMapping = (Map<String, String>) fieldMappings.get(ts);
         assertThat(timestampMapping).isNotNull();
         assertThat(timestampMapping.get("type")).isEqualTo("date");
@@ -90,7 +90,7 @@ public class DataStreamServiceImplTest {
         dataStreamService.createDataStream("teststream", ts, mappings, mock(Policy.class));
         ArgumentCaptor<Template> templateCaptor = ArgumentCaptor.forClass(Template.class);
         verify(dataStreamAdapter).ensureDataStreamTemplate(anyString(), templateCaptor.capture(), anyString());
-        HashMap<String, Object> fieldMappings = (HashMap<String, Object>) templateCaptor.getValue().mappings().get("properties");
+        Map<String, Object> fieldMappings = (Map<String, Object>) templateCaptor.getValue().mappings().get("properties");
         Map<String, String> timestampMapping = (Map<String, String>) fieldMappings.get(ts);
         assertThat(timestampMapping).isNotNull();
         assertThat(timestampMapping.get("type")).isEqualTo("date");
@@ -107,7 +107,7 @@ public class DataStreamServiceImplTest {
         dataStreamService.createDataStream(streamName, "ts", mappings, mock(Policy.class));
         ArgumentCaptor<Template> templateCaptor = ArgumentCaptor.forClass(Template.class);
         verify(dataStreamAdapter).ensureDataStreamTemplate(anyString(), templateCaptor.capture(), anyString());
-        HashMap<String, Object> fieldMappings = (HashMap<String, Object>) templateCaptor.getValue().mappings().get("properties");
+        Map<String, Object> fieldMappings = (Map<String, Object>) templateCaptor.getValue().mappings().get("properties");
         Map<String, String> timestampMapping = (Map<String, String>) fieldMappings.get(customField);
         assertThat(timestampMapping).isNotNull();
         assertThat(timestampMapping.get("type")).isEqualTo("keyword");

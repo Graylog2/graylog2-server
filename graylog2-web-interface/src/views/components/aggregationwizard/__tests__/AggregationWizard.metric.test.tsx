@@ -56,10 +56,8 @@ const selectEventConfig = { container: document.body };
 
 const plugin: PluginRegistration = { exports: { visualizationTypes: [dataTable] } };
 
-const addElement = async (key: 'Grouping' | 'Metric' | 'Sort') => {
-  await userEvent.click(await screen.findByRole('button', { name: 'Add' }));
-  await screen.findByRole('menu');
-  await userEvent.click(await screen.findByRole('menuitem', { name: key }));
+const addMetric = async () => {
+  await userEvent.click(await screen.findByRole('button', { name: /add a metric/i }));
 };
 
 const submitWidgetConfigForm = async () => {
@@ -120,7 +118,7 @@ describe('AggregationWizard', () => {
   it('should require metric function when adding a metric element', async () => {
     renderSUT();
 
-    await addElement('Metric');
+    await addMetric();
 
     await screen.findByText('Function is required.');
   }, extendedTimeout);
@@ -128,7 +126,7 @@ describe('AggregationWizard', () => {
   it('should require metric field when metric function is not count', async () => {
     renderSUT();
 
-    await addElement('Metric');
+    await addMetric();
 
     const functionSelect = await screen.findByLabelText('Select a function');
     await selectEvent.openMenu(functionSelect);

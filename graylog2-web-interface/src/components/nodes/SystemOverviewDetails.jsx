@@ -49,13 +49,13 @@ class SystemOverviewDetails extends React.Component {
     if (information.is_processing) {
       processingStatus = (
         <span>
-          <Icon name="info-circle" />&nbsp; <NodeThroughput nodeId={this.props.node.node_id} longFormat />
+          <Icon name="info" />&nbsp; <NodeThroughput nodeId={this.props.node.node_id} longFormat />
         </span>
       );
     } else {
       processingStatus = (
         <span>
-          <Icon name="exclamation-triangle" />&nbsp; Node is <strong>not</strong> processing messages
+          <Icon name="warning" />&nbsp; Node is <strong>not</strong> processing messages
         </span>
       );
     }
