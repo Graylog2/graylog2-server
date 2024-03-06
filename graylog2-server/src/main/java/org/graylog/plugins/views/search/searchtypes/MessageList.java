@@ -53,6 +53,7 @@ public abstract class MessageList implements SearchType {
     public static final String NAME = "messages";
 
     @Override
+    @JsonProperty
     public abstract String type();
 
     @Override
@@ -203,6 +204,8 @@ public abstract class MessageList implements SearchType {
 
     @AutoValue
     @JsonInclude(JsonInclude.Include.NON_ABSENT)
+    @JsonDeserialize(builder = Result.Builder.class)
+    @JsonTypeName(MessageList.NAME)
     public abstract static class Result implements SearchType.Result {
 
         @Override
@@ -210,10 +213,7 @@ public abstract class MessageList implements SearchType {
         public abstract String id();
 
         @Override
-        @JsonProperty
-        public String type() {
-            return NAME;
-        }
+        public abstract String type();
 
         @JsonProperty
         public abstract List<ResultMessageSummary> messages();
@@ -228,7 +228,7 @@ public abstract class MessageList implements SearchType {
         public abstract long totalResults();
 
         public static Builder builder() {
-            return new AutoValue_MessageList_Result.Builder();
+            return new AutoValue_MessageList_Result.Builder().type(MessageList.NAME);
         }
 
         public static Builder result(String searchTypeId) {
@@ -237,16 +237,31 @@ public abstract class MessageList implements SearchType {
 
         @AutoValue.Builder
         public abstract static class Builder {
+
+            @JsonCreator
+            public static Result.Builder create() {
+                return new AutoValue_MessageList_Result.Builder().type(MessageList.NAME);
+            }
+
+            @JsonProperty
             public abstract Builder id(String id);
 
+            @JsonProperty
             public abstract Builder name(@Nullable String name);
 
+            @JsonProperty
+            public abstract Builder type(String type);
+
+            @JsonProperty
             public abstract Builder messages(List<ResultMessageSummary> messages);
 
+            @JsonProperty
             public abstract Builder totalResults(long totalResults);
 
+            @JsonProperty
             public abstract Builder decorationStats(DecorationStats decorationStats);
 
+            @JsonProperty
             public abstract Builder effectiveTimerange(AbsoluteRange effectiveTimerange);
 
             public abstract Result build();
