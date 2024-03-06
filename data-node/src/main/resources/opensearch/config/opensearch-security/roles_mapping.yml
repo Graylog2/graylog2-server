@@ -37,7 +37,6 @@ readall:
   reserved: false
   backend_roles:
   - "readall"
-  users: [ "client1", "client2" ]
 
 manage_snapshots:
   reserved: false
