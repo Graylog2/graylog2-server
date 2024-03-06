@@ -73,7 +73,7 @@ describe('WorldMapVisualization', () => {
 
   it('does call onChange when editing', () => {
     const onChange = jest.fn();
-    const wrapper = mount(<WorldMapVisualization {...defaultProps} editing />);
+    const wrapper = mount(<WorldMapVisualization {...defaultProps} onChange={onChange} editing />);
     const mapVisualization = wrapper.find('map-visualization');
 
     const { onChange: _onChange } = mapVisualization.at(0).props() as MapVisualizationProps;
