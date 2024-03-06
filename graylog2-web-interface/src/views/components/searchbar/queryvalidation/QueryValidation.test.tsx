@@ -80,6 +80,47 @@ describe('QueryValidation', () => {
     await screen.findByText(/Cannot parse 'source: '/);
   });
 
+  it('should display warm tier warnings', async () => {
+    const validationWithWarmTierWarning: QueryValidationState = {
+      status: 'WARNING',
+      explanations: [],
+      context: {
+        searched_index_ranges: [
+          {
+            index_name: 'aloho_warm_1016',
+            begin: 1709715731270,
+            end: 1709716042255,
+            is_warm_tiered: true,
+          },
+          {
+            index_name: 'aloho_1017',
+            begin: 1709716042283,
+            end: 1709716342274,
+            is_warm_tiered: false,
+          },
+          {
+            index_name: 'aloho_1018',
+            begin: 0,
+            end: 0,
+            is_warm_tiered: false,
+          },
+          {
+            index_name: 'graylog_dev_master_8',
+            begin: 0,
+            end: 0,
+            is_warm_tiered: false,
+          },
+        ],
+      },
+    };
+
+    render(<SUT error={validationWithWarmTierWarning} />);
+
+    await openExplanation();
+
+    await screen.findByText(/This will search the Warm Tier and can be slow. The following time ranges are in the Warm Tier: 2024-03-06 09:02:11 to 2024-03-06 09:07:22./);
+  });
+
   it('should display validation error specific documentation links', async () => {
     render(<SUT error={validationError} />);
 
