@@ -25,6 +25,7 @@ import org.graylog2.rest.resources.entities.FilterOption;
 import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.search.SearchQueryField;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -33,12 +34,12 @@ import java.util.stream.Collectors;
 
 public record IndexSetFieldType(@JsonProperty(FIELD_NAME) String fieldName,
                                 @JsonProperty(TYPE) String type,
-                                @JsonProperty(IS_CUSTOM) boolean isCustom,
+                                @JsonProperty(ORIGIN) FieldTypeOrigin origin,
                                 @JsonProperty(IS_RESERVED) boolean isReserved) implements InMemoryFilterable {
 
     static final String FIELD_NAME = "field_name";
     static final String TYPE = "type";
-    static final String IS_CUSTOM = "is_custom";
+    static final String ORIGIN = "origin";
     static final String IS_RESERVED = "is_reserved";
 
     public static final String DEFAULT_SORT_FIELD = IndexSetFieldType.FIELD_NAME;
@@ -50,16 +51,16 @@ public record IndexSetFieldType(@JsonProperty(FIELD_NAME) String fieldName,
     public static final List<EntityAttribute> ATTRIBUTES = List.of(
             EntityAttribute.builder().id(IndexSetFieldType.FIELD_NAME).title("Field name")
                     .sortable(true)
+                    .filterable(true)
                     .build(),
-            EntityAttribute.builder().id(IndexSetFieldType.IS_CUSTOM).title("Is Custom")
-                    .type(SearchQueryField.Type.BOOLEAN)
+            EntityAttribute.builder().id(IndexSetFieldType.ORIGIN).title("Origin")
+                    .type(SearchQueryField.Type.STRING)
                     .sortable(true)
                     .filterable(true)
                     .filterOptions(
-                            Set.of(
-                                    FilterOption.create("true", "yes"),
-                                    FilterOption.create("false", "no")
-                            )
+                            Arrays.stream(FieldTypeOrigin.values())
+                                    .map(origin -> FilterOption.create(origin.toString(), origin.title()))
+                                    .collect(Collectors.toSet())
                     )
                     .build(),
             EntityAttribute.builder().id(IndexSetFieldType.IS_RESERVED).title("Is Reserved")
@@ -88,7 +89,7 @@ public record IndexSetFieldType(@JsonProperty(FIELD_NAME) String fieldName,
         return switch (fieldName) {
             case FIELD_NAME -> Optional.ofNullable(fieldName());
             case TYPE -> Optional.ofNullable(type());
-            case IS_CUSTOM -> Optional.of(isCustom());
+            case ORIGIN -> Optional.of(origin()).map(o -> o.toString());
             case IS_RESERVED -> Optional.of(isReserved());
             default -> Optional.empty();
         };
@@ -99,7 +100,7 @@ public record IndexSetFieldType(@JsonProperty(FIELD_NAME) String fieldName,
         final Comparator<IndexSetFieldType> comparator = switch (sort) {
             case TYPE -> Comparator.comparing(IndexSetFieldType::type);
             case IS_RESERVED -> Comparator.comparing(IndexSetFieldType::isReserved);
-            case IS_CUSTOM -> Comparator.comparing(IndexSetFieldType::isCustom);
+            case ORIGIN -> Comparator.comparing(IndexSetFieldType::origin);
             default -> Comparator.comparing(IndexSetFieldType::fieldName);
         };
 

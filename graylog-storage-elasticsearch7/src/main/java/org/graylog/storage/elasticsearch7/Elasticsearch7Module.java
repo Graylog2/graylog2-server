@@ -32,6 +32,8 @@ import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog2.indexer.counts.CountsAdapter;
 import org.graylog2.indexer.datanode.ProxyRequestAdapter;
+import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
+import org.graylog2.indexer.datastream.DataStreamAdapter;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerAdapter;
 import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.StreamsForFieldRetriever;
 import org.graylog2.indexer.indices.IndicesAdapter;
@@ -57,6 +59,7 @@ public class Elasticsearch7Module extends VersionAwareModule {
         bindForSupportedVersion(CountsAdapter.class).to(CountsAdapterES7.class);
         bindForSupportedVersion(ClusterAdapter.class).to(ClusterAdapterES7.class);
         bindForSupportedVersion(IndicesAdapter.class).to(IndicesAdapterES7.class);
+        bindForSupportedVersion(DataStreamAdapter.class).to(DataStreamAdapterES7.class);
         if (useComposableIndexTemplates) {
             bind(IndexTemplateAdapter.class).to(ComposableIndexTemplateAdapter.class);
         } else {
@@ -77,11 +80,13 @@ public class Elasticsearch7Module extends VersionAwareModule {
 
         bindForSupportedVersion(QuerySuggestionsService.class).to(QuerySuggestionsES7.class);
         bindForSupportedVersion(ProxyRequestAdapter.class).to(ProxyRequestAdapterES7.class);
-        
+
         install(new FactoryModuleBuilder().build(ScrollResultES7.Factory.class));
 
         bind(RestHighLevelClient.class).toProvider(RestHighLevelClientProvider.class);
         bind(CredentialsProvider.class).toProvider(ESCredentialsProvider.class);
+
+        bindForSupportedVersion(RemoteReindexingMigrationAdapter.class).to(RemoteReindexingMigrationAdapterES7.class);
     }
 
     private <T> LinkedBindingBuilder<T> bindForSupportedVersion(Class<T> interfaceClass) {

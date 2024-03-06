@@ -91,13 +91,13 @@ const StreamRule = ({ matchData, stream, streamRule, onSubmit, onDelete }: Props
               bsSize="xsmall"
               onClick={_onDelete}
               title="Delete stream rule">
-        <Icon name="trash-alt" type="regular" />
+        <Icon name="delete" type="regular" />
       </Button>
       <Button bsStyle="link"
               bsSize="xsmall"
               onClick={_onEdit}
               title="Edit stream rule">
-        <Icon name="edit" />
+        <Icon name="edit_square" />
       </Button>
     </ActionButtonsWrap>
   );

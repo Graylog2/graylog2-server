@@ -41,6 +41,12 @@ const Col = styled.div`
   align-items: center;
 `;
 
+const DragHandleContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
 const WidgetDragHandle = styled(Icon)`
   cursor: move;
   opacity: 0.3;
@@ -62,7 +68,7 @@ type Props = {
 const WidgetHeader = ({ children, onRename, hideDragHandle, title, loading }: Props) => (
   <Container>
     <Col>
-      {hideDragHandle || <span className="widget-drag-handle" title={`Drag handle for ${title}`}><WidgetDragHandle name="bars" /></span>}
+      {hideDragHandle || <DragHandleContainer className="widget-drag-handle" title={`Drag handle for ${title}`}><WidgetDragHandle name="drag_indicator" /></DragHandleContainer>}
       <EditableTitle key={title} disabled={!onRename} value={title} onChange={onRename} />
       {loading && <LoadingSpinner text="" delay={0} />}
     </Col>

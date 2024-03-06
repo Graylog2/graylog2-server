@@ -121,7 +121,7 @@ const EventDefinitionEntry = ({
         <IfPermitted permissions={`eventdefinitions:edit:${eventDefinition.id}`}>
           <LinkContainer to={Routes.ALERTS.DEFINITIONS.edit(eventDefinition.id)}>
             <Button>
-              <Icon name="edit" /> Edit
+              <Icon name="edit_square" /> Edit
             </Button>
           </LinkContainer>
         </IfPermitted>
@@ -139,7 +139,7 @@ const EventDefinitionEntry = ({
           {showActions() && (
             <IfPermitted permissions={`eventdefinitions:delete:${eventDefinition.id}`}>
               <MenuItem divider />
-              <MenuItem onClick={handleDelete} data-testid="delete-button">Delete</MenuItem>
+              <MenuItem onClick={handleDelete}>Delete</MenuItem>
             </IfPermitted>
           )}
         </DropdownButton>

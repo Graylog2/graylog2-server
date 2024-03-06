@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.management;
 
+import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog.datanode.process.ProcessEvent;
 import org.graylog.datanode.process.ProcessState;
@@ -31,6 +32,9 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.ClusterClient;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
+import org.graylog2.datanode.DataNodeLifecycleEvent;
+import org.graylog2.datanode.DataNodeLifecycleTrigger;
+import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,12 +56,16 @@ public class OpensearchRemovalTracer implements StateMachineTracer {
 
     private final OpensearchProcess process;
     private final String nodeName;
+    private final NodeId nodeId;
+    private final EventBus eventBus;
     boolean allocationExcludeChecked = false;
     ScheduledExecutorService executorService;
 
-    public OpensearchRemovalTracer(OpensearchProcess process, String nodeName) {
+    public OpensearchRemovalTracer(OpensearchProcess process, String nodeName, NodeId nodeId, EventBus eventBus) {
         this.process = process;
         this.nodeName = nodeName;
+        this.nodeId = nodeId;
+        this.eventBus = eventBus;
     }
 
 
@@ -130,6 +138,7 @@ public class OpensearchRemovalTracer implements StateMachineTracer {
                 if (health.getRelocatingShards() == 0) {
                     process.stop();
                     executorService.shutdown();
+                    eventBus.post(DataNodeLifecycleEvent.create(nodeId.getNodeId(), DataNodeLifecycleTrigger.REMOVED));
                 }
             } catch (IOException | OpenSearchStatusException e) {
                 process.onEvent(ProcessEvent.HEALTH_CHECK_FAILED);

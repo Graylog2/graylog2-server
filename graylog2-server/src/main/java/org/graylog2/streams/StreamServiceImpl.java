@@ -26,6 +26,7 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
 import com.mongodb.WriteResult;
+import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
 import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog2.database.MongoConnection;
@@ -36,8 +37,6 @@ import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
-import org.graylog2.notifications.Notification;
-import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
@@ -52,7 +51,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -81,7 +79,6 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     private final OutputService outputService;
     private final IndexSetService indexSetService;
     private final MongoIndexSet.Factory indexSetFactory;
-    private final NotificationService notificationService;
     private final EntityOwnershipService entityOwnershipService;
     private final ClusterEventBus clusterEventBus;
 
@@ -91,7 +88,6 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
                              OutputService outputService,
                              IndexSetService indexSetService,
                              MongoIndexSet.Factory indexSetFactory,
-                             NotificationService notificationService,
                              EntityOwnershipService entityOwnershipService,
                              ClusterEventBus clusterEventBus) {
         super(mongoConnection);
@@ -99,7 +95,6 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
         this.outputService = outputService;
         this.indexSetService = indexSetService;
         this.indexSetFactory = indexSetFactory;
-        this.notificationService = notificationService;
         this.entityOwnershipService = entityOwnershipService;
         this.clusterEventBus = clusterEventBus;
     }
@@ -269,14 +264,21 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
 
     @Override
     public Set<String> indexSetIdsByIds(Collection<String> streamIds) {
+        Set<String> dataStreamIds = streamIds.stream()
+                .filter(s -> s.startsWith(Stream.DATASTREAM_PREFIX))
+                .collect(Collectors.toSet());
+
         final Set<ObjectId> objectIds = streamIds.stream()
+                .filter(s -> !s.startsWith(Stream.DATASTREAM_PREFIX))
                 .map(ObjectId::new)
                 .collect(Collectors.toSet());
         final DBObject query = QueryBuilder.start(StreamImpl.FIELD_ID).in(objectIds).get();
         final DBObject onlyIndexSetIdField = DBProjection.include(FIELD_INDEX_SET_ID);
-        return StreamSupport.stream(collection(StreamImpl.class).find(query, onlyIndexSetIdField).spliterator(), false)
+        Set<String> indexSets = StreamSupport.stream(collection(StreamImpl.class).find(query, onlyIndexSetIdField).spliterator(), false)
                 .map(s -> s.get(FIELD_INDEX_SET_ID).toString())
                 .collect(Collectors.toSet());
+        indexSets.addAll(dataStreamIds);
+        return indexSets;
     }
 
     protected Set<Output> loadOutputsForRawStream(DBObject stream) {
@@ -308,13 +310,8 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
         }
 
         final String streamId = stream.getId();
-        for (Notification notification : notificationService.all()) {
-            Object rawValue = notification.getDetail("stream_id");
-            if (rawValue != null && rawValue.toString().equals(streamId)) {
-                LOG.debug("Removing notification that references stream: {}", notification);
-                notificationService.destroy(notification);
-            }
-        }
+        // we need to remove notifications referencing this stream. This happens in the DeletedStreamNotificationListener
+        // triggered by the StreamDeletedEvent below.
         super.destroy(stream);
 
         clusterEventBus.post(StreamsChangedEvent.create(streamId));

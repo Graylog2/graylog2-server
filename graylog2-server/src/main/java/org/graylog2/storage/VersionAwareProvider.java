@@ -16,8 +16,9 @@
  */
 package org.graylog2.storage;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+
 import java.util.Map;
 
 public class VersionAwareProvider<T> implements Provider<T> {

@@ -15,10 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useMemo, useContext, useRef } from 'react';
+import { useCallback, useMemo, useContext, useRef, useImperativeHandle } from 'react';
 import PropTypes from 'prop-types';
 import isEmpty from 'lodash/isEmpty';
 import type { FormikErrors } from 'formik';
+import styled, { createGlobalStyle, css } from 'styled-components';
 
 import UserPreferencesContext from 'contexts/UserPreferencesContext';
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
@@ -30,7 +31,10 @@ import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
 import usePluginEntities from 'hooks/usePluginEntities';
 import useUserDateTime from 'hooks/useUserDateTime';
 import type View from 'views/logic/views/View';
-import useView from 'views/hooks/useView';
+import useElementDimensions from 'hooks/useElementDimensions';
+import { displayHistoryCompletions } from 'views/components/searchbar/QueryHistoryButton';
+import { startAutocomplete } from 'views/components/searchbar/queryinput/commands';
+import useHotkey from 'hooks/useHotkey';
 
 import type { AutoCompleter, Editor, Command } from './ace-types';
 import type { BaseProps } from './BasicQueryInput';
@@ -40,6 +44,21 @@ import SearchBarAutoCompletions from '../SearchBarAutocompletions';
 import type { Completer, FieldTypes } from '../SearchBarAutocompletions';
 
 const defaultCompleterFactory = (...args: ConstructorParameters<typeof SearchBarAutoCompletions>) => new SearchBarAutoCompletions(...args);
+
+const GlobalEditorStyles = createGlobalStyle<{ $width?: number; $offsetLeft: number }>`
+  .ace_editor.ace_autocomplete {
+    width: ${(props) => (props.$width ?? 600) - 12}px !important;
+    left: ${(props) => (props.$offsetLeft ?? 143) + 7}px !important;
+  }
+`;
+
+const Container = styled.div<{ $hasValue: boolean }>(({ $hasValue }) => css`
+  width: 100%;
+
+  .ace_hidden-cursors {
+    display: ${$hasValue ? 'block' : 'none'};
+  }
+`);
 
 const displayValidationErrors = () => {
   QueryValidationActions.displayValidationErrors();
@@ -100,8 +119,8 @@ const _onLoadEditor = (editor: Editor, isInitialTokenizerUpdate: React.MutableRe
     editor.commands.removeCommands(['find', 'indent', 'outdent']);
 
     editor.session.on('tokenizerUpdate', () => {
-      if (editor.isFocused() && !editor.completer?.activated && !isInitialTokenizerUpdate.current) {
-        editor.execCommand('startAutocomplete');
+      if (editor.isFocused() && !editor.completer?.activated && editor.getValue() && !isInitialTokenizerUpdate.current) {
+        startAutocomplete(editor);
       }
 
       if (isInitialTokenizerUpdate.current) {
@@ -116,8 +135,13 @@ const _onLoadEditor = (editor: Editor, isInitialTokenizerUpdate: React.MutableRe
 // This is necessary for configuration options which rely on external data.
 // Unfortunately it is not possible to configure for example the command once
 // with the `onLoad` or `commands` prop, because the reference for the related function will be outdated.
-const _updateEditorConfiguration = (node: { editor: Editor; }, completer: AutoCompleter, commands: Array<Command>) => {
-  const editor = node && node.editor;
+const _updateEditorConfiguration = (node: { editor: Editor; }, completer: AutoCompleter, commands: Array<Command>, ref: React.MutableRefObject<Editor>) => {
+  const editor = node?.editor;
+
+  if (ref && editor) {
+    // eslint-disable-next-line no-param-reassign
+    ref.current = editor;
+  }
 
   if (editor) {
     editor.commands.on('afterExec', () => {
@@ -151,7 +175,8 @@ const _updateEditorConfiguration = (node: { editor: Editor; }, completer: AutoCo
   }
 };
 
-const useCompleter = ({ streams, timeRange, completerFactory, userTimezone }: Pick<Props, 'streams' | 'timeRange' | 'completerFactory'> & { userTimezone: string }) => {
+const useCompleter = ({ streams, timeRange, completerFactory, view }: Pick<Props, 'streams' | 'timeRange' | 'completerFactory' | 'view'>) => {
+  const { userTimezone } = useUserDateTime();
   const completers = usePluginEntities('views.completers');
   const { data: queryFields } = useFieldTypes(streams, isNoTimeRangeOverride(timeRange) ? DEFAULT_TIMERANGE : timeRange);
   const { data: allFields } = useFieldTypes([], DEFAULT_TIMERANGE);
@@ -161,10 +186,43 @@ const useCompleter = ({ streams, timeRange, completerFactory, userTimezone }: Pi
 
     return { all: allFieldsByName, query: queryFieldsByName };
   }, [allFields, queryFields]);
-  const view = useView();
 
   return useMemo(() => completerFactory(completers ?? [], timeRange, streams, fieldTypes, userTimezone, view),
     [completerFactory, completers, timeRange, streams, fieldTypes, userTimezone, view]);
+};
+
+const useShowHotkeysInOverview = () => {
+  const options = { enabled: false };
+
+  useHotkey({
+    scope: 'query-input',
+    actionKey: 'submit-search',
+    options,
+  });
+
+  useHotkey({
+    scope: 'query-input',
+    actionKey: 'insert-newline',
+    options,
+  });
+
+  useHotkey({
+    scope: 'query-input',
+    actionKey: 'create-search-filter',
+    options,
+  });
+
+  useHotkey({
+    scope: 'query-input',
+    actionKey: 'show-suggestions',
+    options,
+  });
+
+  useHotkey({
+    scope: 'query-input',
+    actionKey: 'show-history',
+    options,
+  });
 };
 
 type Props = BaseProps & {
@@ -175,7 +233,7 @@ type Props = BaseProps & {
     streams: Array<string>,
     fieldTypes: FieldTypes,
     userTimezone: string,
-    view: View,
+    view: View | undefined,
   ) => AutoCompleter,
   disableExecution?: boolean,
   isValidating?: boolean,
@@ -186,9 +244,10 @@ type Props = BaseProps & {
   streams?: Array<string> | undefined,
   timeRange?: TimeRange | NoTimeRangeOverride | undefined,
   validate: () => Promise<FormikErrors<{}>>,
+  view?: View
 };
 
-const QueryInput = ({
+const QueryInput = React.forwardRef<Editor, Props>(({
   className,
   commands,
   completerFactory = defaultCompleterFactory,
@@ -209,11 +268,14 @@ const QueryInput = ({
   warning,
   wrapEnabled,
   name,
-}: Props) => {
-  const { userTimezone } = useUserDateTime();
+  view,
+}, outerRef) => {
+  const innerRef = useRef<Editor>(null);
+  const inputElement = innerRef.current?.container;
+  const { width: inputWidth } = useElementDimensions(inputElement);
   const isInitialTokenizerUpdate = useRef(true);
   const { enableSmartSearch } = useContext(UserPreferencesContext);
-  const completer = useCompleter({ streams, timeRange, completerFactory, userTimezone });
+  const completer = useCompleter({ streams, timeRange, completerFactory, view });
   const onLoadEditor = useCallback((editor: Editor) => _onLoadEditor(editor, isInitialTokenizerUpdate), []);
   const onExecute = useCallback((editor: Editor) => handleExecution({
     editor,
@@ -224,37 +286,73 @@ const QueryInput = ({
     isValidating,
     validate,
   }), [onExecuteProp, value, error, disableExecution, isValidating, validate]);
-  const _commands = useMemo(() => [...commands, {
-    name: 'Execute',
-    bindKey: { win: 'Enter', mac: 'Enter' },
-    exec: onExecute,
-  }], [commands, onExecute]);
-  const updateEditorConfiguration = useCallback((node: { editor: Editor }) => _updateEditorConfiguration(node, completer, _commands), [_commands, completer]);
+  const _commands = useMemo(() => [
+    ...commands,
+    {
+      name: 'Execute',
+      bindKey: { win: 'Enter', mac: 'Enter' },
+      exec: onExecute,
+    },
+    {
+      name: 'Show completions',
+      bindKey: { win: 'Alt-Space', mac: 'Alt-Space' },
+      exec: async (editor: Editor) => {
+        if (editor.getValue()) {
+          startAutocomplete(editor);
+
+          return;
+        }
+
+        await displayHistoryCompletions(editor);
+      },
+    },
+    {
+      name: 'Show query history',
+      bindKey: { win: 'Alt-Shift-H', mac: 'Alt-Shift-H' },
+      exec: async (editor: Editor) => {
+        displayHistoryCompletions(editor);
+      },
+    },
+    // The following will disable the mentioned hotkeys.
+    {
+      name: 'Do nothing',
+      bindKey: { win: 'Ctrl-Space|Ctrl-Shift-Space', mac: 'Ctrl-Space|Ctrl-Shift-Space' },
+      exec: () => {},
+    },
+  ], [commands, onExecute]);
+  const updateEditorConfiguration = useCallback((node: { editor: Editor }) => _updateEditorConfiguration(node, completer, _commands, innerRef), [_commands, completer]);
   const _onChange = useCallback((newQuery: string) => {
     onChange({ target: { value: newQuery, name } });
 
     return Promise.resolve(newQuery);
   }, [name, onChange]);
 
+  useShowHotkeysInOverview();
+  useImperativeHandle(outerRef, () => innerRef.current, []);
+
   return (
-    <BasicQueryInput height={height}
-                     className={className}
-                     disabled={false}
-                     enableAutocompletion={enableSmartSearch}
-                     error={error}
-                     inputId={inputId}
-                     warning={warning}
-                     maxLines={maxLines}
-                     onBlur={onBlur}
-                     onExecute={onExecute}
-                     onChange={_onChange}
-                     onLoad={onLoadEditor}
-                     placeholder={placeholder}
-                     ref={updateEditorConfiguration}
-                     value={value}
-                     wrapEnabled={wrapEnabled} />
+    <Container $hasValue={!!value}>
+      <GlobalEditorStyles $width={inputWidth} $offsetLeft={inputElement?.offsetLeft} />
+      <BasicQueryInput height={height}
+                       className={className}
+                       disabled={false}
+                       enableAutocompletion={enableSmartSearch}
+                       error={error}
+                       inputId={inputId}
+                       warning={warning}
+                       maxLines={maxLines}
+                       onBlur={onBlur}
+                       onExecute={onExecute}
+                       onChange={_onChange}
+                       onLoad={onLoadEditor}
+                       placeholder={placeholder}
+                       ref={updateEditorConfiguration}
+                       value={value}
+                       wrapEnabled={wrapEnabled} />
+
+    </Container>
   );
-};
+});
 
 QueryInput.propTypes = {
   className: PropTypes.string,
@@ -293,6 +391,7 @@ QueryInput.defaultProps = {
   value: '',
   warning: undefined,
   wrapEnabled: undefined,
+  view: undefined,
 };
 
 export default QueryInput;

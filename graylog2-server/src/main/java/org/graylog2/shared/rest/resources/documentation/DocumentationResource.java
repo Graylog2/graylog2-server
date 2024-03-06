@@ -22,6 +22,16 @@ import com.google.common.collect.ImmutableSet;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.Configuration;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -31,15 +41,6 @@ import org.graylog2.shared.rest.documentation.generator.Generator;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.rest.resources.csp.CSP;
 
-import javax.inject.Inject;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -48,9 +49,11 @@ import java.util.Set;
 import static java.util.Objects.requireNonNull;
 import static org.graylog2.shared.initializers.JerseyService.PLUGIN_PREFIX;
 
+
 @Api(value = "Documentation", description = "Documentation of this API in JSON format.")
 @Path("/api-docs")
 @CSP(group = CSP.SWAGGER)
+@RequiresAuthentication
 public class DocumentationResource extends RestResource {
 
     private final Generator generator;

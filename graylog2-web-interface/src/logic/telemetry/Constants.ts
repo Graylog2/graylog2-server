@@ -467,6 +467,11 @@ export const TELEMETRY_EVENT_TYPE = {
     EDIT_OPENED: 'Index Set Field Type Profile Edit Opened',
     EDIT_CANCELED: 'Index Set Field Type Profile Edit Canceled',
     EDIT: 'Index Set Field Type Profile Edited',
+    CHANGE_FOR_INDEX_OPENED: 'Index Set Field Type Profile Change For Index Opened',
+    CHANGE_FOR_INDEX_CANCELED: 'Index Set Field Type Profile Change For Index  Canceled',
+    CHANGE_FOR_INDEX_CHANGED: 'Index Set Field Type Profile Change For Index Changed',
+    CHANGE_FOR_INDEX_REMOVED: 'Index Set Field Type Profile Change For Index Removed',
+    CREATE_PROFILE_FROM_SELECTED_RAN: 'Index Set Field Type Profile Create From Selected Ran',
   },
 } as const;
 

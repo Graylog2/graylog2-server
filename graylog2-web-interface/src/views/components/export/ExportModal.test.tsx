@@ -44,6 +44,7 @@ import TestStoreProvider from 'views/test/TestStoreProvider';
 import useSearchExecutionState from 'views/hooks/useSearchExecutionState';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import { usePlugin } from 'views/test/testPlugins';
+import startDownload from 'views/components/export/startDownload';
 
 import type { Props as ExportModalProps } from './ExportModal';
 import ExportModal from './ExportModal';
@@ -68,6 +69,8 @@ const pluginExports: PluginRegistration = {
 jest.mock('views/hooks/useSearchExecutionState');
 jest.mock('views/hooks/useViewType');
 
+jest.mock('./startDownload');
+
 describe('ExportModal', () => {
   // Prepare expected payload
 
@@ -90,6 +93,7 @@ describe('ExportModal', () => {
   usePlugin(pluginExports);
 
   beforeEach(() => {
+    asMock(startDownload).mockImplementation(jest.requireActual('./startDownload').default);
     jest.clearAllMocks();
     asMock(useViewType).mockReturnValue(View.Type.Search);
     asMock(useSearchExecutionState).mockReturnValue(new SearchExecutionState());
@@ -145,6 +149,7 @@ describe('ExportModal', () => {
   });
 
   it('should show loading indicator after starting download', async () => {
+    asMock(startDownload).mockImplementation(() => new Promise(() => {}));
     const { findByText, getAllByText } = render(<SimpleExportModal />);
 
     expect(getAllByText('Start Download')).toHaveLength(2);
@@ -152,8 +157,6 @@ describe('ExportModal', () => {
     triggerFormSubmit();
 
     await findByText('Downloading...');
-
-    await waitFor(() => expect(exportSearchMessages).toHaveBeenCalledTimes(1));
   });
 
   it('should be closed after finishing download', async () => {

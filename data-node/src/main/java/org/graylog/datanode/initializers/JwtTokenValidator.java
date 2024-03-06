@@ -16,17 +16,15 @@
  */
 package org.graylog.datanode.initializers;
 
-import io.jsonwebtoken.Jwt;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.security.Keys;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 
-import javax.crypto.spec.SecretKeySpec;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
-import java.security.Key;
-import java.util.Optional;
 
 @Singleton
 public class JwtTokenValidator implements AuthTokenValidator {
@@ -41,30 +39,18 @@ public class JwtTokenValidator implements AuthTokenValidator {
 
     @Override
     public void verifyToken(String token) throws TokenVerificationException {
-        SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
-        Key signingKey = new SecretKeySpec(this.signingKey.getBytes(StandardCharsets.UTF_8), signatureAlgorithm.getJcaName());
-        final JwtParser parser = Jwts.parserBuilder()
-                .setSigningKey(signingKey)
+        final SecretKey key = Keys.hmacShaKeyFor(this.signingKey.getBytes(StandardCharsets.UTF_8));
+        final JwtParser parser = Jwts.parser()
+                .verifyWith(key)
                 .requireSubject(REQUIRED_SUBJECT)
                 .requireIssuer(REQUIRED_ISSUER)
                 .build();
         try {
-            final Jwt parsed = parser.parse(token);
-            verifySignature(parsed, signatureAlgorithm);
-        } catch (Exception e) {
+            parser.parse(token);
+        } catch (UnsupportedJwtException e) {
+            throw new TokenVerificationException("Token format/configuration is not supported", e);
+        } catch (Throwable e) {
             throw new TokenVerificationException(e);
-        }
-    }
-
-    private void verifySignature(Jwt token, SignatureAlgorithm expectedAlgorithm) {
-        final SignatureAlgorithm usedAlgorithm = Optional.of(token.getHeader())
-                .map(h -> h.get("alg"))
-                .map(Object::toString)
-                .map(SignatureAlgorithm::forName)
-                .orElseThrow(() -> new IllegalArgumentException("Token doesn't provide valid signature algorithm"));
-
-        if (expectedAlgorithm != usedAlgorithm) {
-            throw new IllegalArgumentException("Token is using unsupported signature algorithm :" + usedAlgorithm);
         }
     }
 }

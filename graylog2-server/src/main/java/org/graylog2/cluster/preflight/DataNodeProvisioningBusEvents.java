@@ -18,8 +18,9 @@ package org.graylog2.cluster.preflight;
 
 import com.google.common.eventbus.EventBus;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;

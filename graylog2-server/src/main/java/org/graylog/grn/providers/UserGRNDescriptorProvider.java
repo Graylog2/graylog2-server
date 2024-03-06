@@ -21,7 +21,8 @@ import org.graylog.grn.GRNDescriptor;
 import org.graylog.grn.GRNDescriptorProvider;
 import org.graylog2.shared.users.UserService;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Optional;
 
 public class UserGRNDescriptorProvider implements GRNDescriptorProvider {

@@ -51,7 +51,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.inject.Inject;
+
+import jakarta.inject.Inject;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -105,7 +107,6 @@ public class IpfixCodec extends AbstractCodec implements MultiMessageCodec {
         }
         this.parser = new IpfixParser(this.infoElementDefs);
     }
-
 
 
     URL url(String s) throws MalformedURLException {
@@ -167,7 +168,7 @@ public class IpfixCodec extends AbstractCodec implements MultiMessageCodec {
     private static String createMessageString(long packetCount, long octetCount, String srcAddr, String dstAddr,
                                               Number srcPort, Number dstPort, long protocol) {
         String message = String.format(Locale.ROOT, "Ipfix [" + srcAddr + "]:" + srcPort + " <> [" + dstAddr + "]:" + dstPort + " " +
-                                                    "proto:" + protocol + " pkts:" + packetCount + " bytes:" + octetCount);
+                "proto:" + protocol + " pkts:" + packetCount + " bytes:" + octetCount);
         return message;
     }
 
@@ -192,24 +193,24 @@ public class IpfixCodec extends AbstractCodec implements MultiMessageCodec {
             final Map<Integer, ByteString> templatesMap = rawIpfix.getTemplatesMap();
 
             final Map<Integer, TemplateRecord> templateRecordMap = Seq.seq(templatesMap)
-                                                                      .map(entry -> entry.map2(byteString -> parser.parseTemplateRecord(Unpooled.wrappedBuffer(byteString.toByteArray()))))
-                                                                      .toMap(Tuple2::v1, Tuple2::v2);
+                    .map(entry -> entry.map2(byteString -> parser.parseTemplateRecord(Unpooled.wrappedBuffer(byteString.toByteArray()))))
+                    .toMap(Tuple2::v1, Tuple2::v2);
 
             return rawIpfix.getDataSetsList().stream()
-                           .map(dataSet -> {
-                               final int templateId = dataSet.getTemplateId();
-                               final ZonedDateTime flowExportTimestamp = ZonedDateTime.ofInstant(Instant.ofEpochSecond(dataSet.getTimestampEpochSeconds()), ZoneOffset.UTC);
-                               final TemplateRecord templateRecord = templateRecordMap.get(templateId);
-                               if (templateRecord == null) {
-                                   throw new IpfixException("Missing required template in journal entry for data records: template id " + templateId);
-                               }
-                               final Set<Flow> flows = parser.parseDataSet(templateRecord.informationElements(), templateRecordMap,
-                                                                           Unpooled.wrappedBuffer(dataSet.getDataRecords().toByteArray()));
-                               return flows.stream()
-                                           .map(flow -> formatFlow(flowExportTimestamp, sender, flow));
-                           })
-                           .flatMap(messageStream -> messageStream)
-                           .collect(Collectors.toList());
+                    .map(dataSet -> {
+                        final int templateId = dataSet.getTemplateId();
+                        final ZonedDateTime flowExportTimestamp = ZonedDateTime.ofInstant(Instant.ofEpochSecond(dataSet.getTimestampEpochSeconds()), ZoneOffset.UTC);
+                        final TemplateRecord templateRecord = templateRecordMap.get(templateId);
+                        if (templateRecord == null) {
+                            throw new IpfixException("Missing required template in journal entry for data records: template id " + templateId);
+                        }
+                        final Set<Flow> flows = parser.parseDataSet(templateRecord.informationElements(), templateRecordMap,
+                                Unpooled.wrappedBuffer(dataSet.getDataRecords().toByteArray()));
+                        return flows.stream()
+                                .map(flow -> formatFlow(flowExportTimestamp, sender, flow));
+                    })
+                    .flatMap(messageStream -> messageStream)
+                    .collect(Collectors.toList());
         } catch (InvalidProtocolBufferException e) {
             LOG.error("Unable to parse ipfix journal message", e);
             return Collections.emptyList();
@@ -255,12 +256,12 @@ public class IpfixCodec extends AbstractCodec implements MultiMessageCodec {
             final ConfigurationRequest configuration = super.getRequestedConfiguration();
             configuration.addField(
                     new ListField(CK_IPFIX_DEFINITION_PATH,
-                                  "IPFIX field definitions",
-                                  Collections.emptyList(),
-                                  Collections.emptyMap(),
-                                  "JSON file containing IPFIX field definitions.",
-                                  ConfigurationField.Optional.OPTIONAL,
-                                  ListField.Attribute.ALLOW_CREATE)
+                            "IPFIX field definitions",
+                            Collections.emptyList(),
+                            Collections.emptyMap(),
+                            "JSON file containing IPFIX field definitions.",
+                            ConfigurationField.Optional.OPTIONAL,
+                            ListField.Attribute.ALLOW_CREATE)
             );
             return configuration;
         }

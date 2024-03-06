@@ -60,13 +60,18 @@ import { updateWidget } from 'views/logic/slices/widgetActions';
 import { execute, setGlobalOverrideQuery, setGlobalOverrideTimerange } from 'views/logic/slices/searchExecutionSlice';
 import useAppDispatch from 'stores/useAppDispatch';
 import useHandlerContext from 'views/components/useHandlerContext';
+import useView from 'views/hooks/useView';
+import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
+import { normalizeFromSearchBarForBackend } from 'views/logic/queries/NormalizeTimeRange';
+import QueryHistoryButton from 'views/components/searchbar/QueryHistoryButton';
+import type { Editor } from 'views/components/searchbar/queryinput/ace-types';
 
 import TimeRangeOverrideInfo from './searchbar/WidgetTimeRangeOverride';
 import TimeRangeFilter from './searchbar/time-range-filter';
 import StreamsFilter from './searchbar/StreamsFilter';
 import SearchButton from './searchbar/SearchButton';
 import QueryInput from './searchbar/queryinput/AsyncQueryInput';
-import SearchBarForm, { normalizeSearchBarFormValues } from './searchbar/SearchBarForm';
+import SearchBarForm from './searchbar/SearchBarForm';
 import WidgetQueryOverride from './WidgetQueryOverride';
 import PluggableSearchBarControls from './searchbar/PluggableSearchBarControls';
 
@@ -115,10 +120,13 @@ const useBindApplySearchControlsChanges = (formRef) => {
   useEffect(() => {
     bindApplySearchControlsChanges((newWidget: Widget) => {
       if (formRef.current) {
-        const { dirty, values, isValid } = formRef.current;
+        const { dirty, values: { timerange, ...rest }, isValid } = formRef.current;
 
         if (dirty && isValid) {
-          const normalizedFormValues = normalizeSearchBarFormValues(values, userTimezone);
+          const normalizedFormValues = {
+            timerange: isNoTimeRangeOverride(timerange) ? undefined : normalizeFromSearchBarForBackend(timerange, userTimezone),
+            ...rest,
+          };
 
           return updateWidgetSearchControls(newWidget, normalizedFormValues);
         }
@@ -153,6 +161,8 @@ const _validateQueryString = (values: SearchBarFormValues, globalOverride: Globa
 };
 
 const WidgetQueryControls = ({ availableStreams }: Props) => {
+  const editorRef = useRef<Editor>(null);
+  const view = useView();
   const globalOverride = useGlobalOverride();
   const widget = useContext(WidgetContext);
   const { userTimezone } = useUserDateTime();
@@ -161,7 +171,7 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
   const limitDuration = moment.duration(config?.query_time_range_limit).asSeconds() ?? 0;
   const hasTimeRangeOverride = globalOverride?.timerange !== undefined;
-  const hasQueryOverride = globalOverride?.query !== undefined;
+  const hasQueryOverride = !!globalOverride?.query?.query_string;
   const formRef = useRef(null);
   const { parameters } = useParameters();
   const handlerContext = useHandlerContext();
@@ -195,8 +205,7 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
                                    limitDuration={limitDuration}
                                    onChange={(nextTimeRange) => setFieldValue('timerange', nextTimeRange)}
                                    value={values?.timerange}
-                                   hasErrorOnMount={!!errors.timerange}
-                                   position="right" />
+                                   hasErrorOnMount={!!errors.timerange} />
                 )}
                 {hasTimeRangeOverride && (
                   <TimeRangeOverrideInfo value={globalOverride?.timerange}
@@ -224,10 +233,12 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
                           <PluggableCommands usage="widget_query">
                             {(customCommands) => (
                               <QueryInput value={value}
+                                          view={view}
                                           timeRange={!isEmpty(globalOverride?.timerange) ? globalOverride.timerange : values?.timerange}
                                           streams={values?.streams}
                                           placeholder={'Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'}
                                           error={error}
+                                          ref={editorRef}
                                           disableExecution={disableSearchSubmit}
                                           isValidating={isValidatingQuery}
                                           warning={warnings.queryString}
@@ -244,6 +255,7 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
                   </Field>
 
                   <QueryValidation />
+                  <QueryHistoryButton editorRef={editorRef} />
                 </SearchInputAndValidation>
 
                 {hasQueryOverride && (

@@ -1,8 +1,6 @@
 NetFlow Plugin for Graylog
 ==========================
 
-[![Build Status](https://travis-ci.org/Graylog2/graylog-plugin-netflow.svg?branch=master)](https://travis-ci.org/Graylog2/graylog-plugin-netflow)
-
 This plugin provides a NetFlow UDP input to act as a Flow collector that receives data from Flow exporters. Each received Flow will be converted to a Graylog message.
 
 **Required Graylog version:** 2.3.0 and later
@@ -83,4 +81,4 @@ $ mvn release:prepare
 $ mvn release:perform
 ```
 
-This sets the version numbers, creates a tag and pushes to GitHub. Travis CI will build the release artifacts and upload to GitHub automatically.
+This sets the version numbers, creates a tag and pushes to GitHub.

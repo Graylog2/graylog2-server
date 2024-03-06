@@ -33,7 +33,7 @@ import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.indexer.Constants.FIELD_TYPES_MANAGEMENT_FEATURE;
 
-@ContainerMatrixTestsConfiguration(mongoVersions = MongodbServer.MONGO5, enabledFeatureFlags = FIELD_TYPES_MANAGEMENT_FEATURE)
+@ContainerMatrixTestsConfiguration(enabledFeatureFlags = FIELD_TYPES_MANAGEMENT_FEATURE)
 public class FieldTypeMappingsIT {
     private static final String INDEX_PREFIX = "custom-mappings";
     private final GraylogApis api;

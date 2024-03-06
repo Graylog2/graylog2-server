@@ -17,7 +17,7 @@
 package org.graylog.datanode.restoperations;
 
 
-import javax.ws.rs.HttpMethod;
+import jakarta.ws.rs.HttpMethod;
 
 public class DatanodeStatusChangeOperation extends RestOperation {
 

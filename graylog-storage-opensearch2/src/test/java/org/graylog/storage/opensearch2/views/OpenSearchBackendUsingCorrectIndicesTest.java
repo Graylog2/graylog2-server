@@ -18,6 +18,7 @@ package org.graylog.storage.opensearch2.views;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import jakarta.inject.Provider;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
@@ -48,7 +49,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import javax.inject.Provider;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -114,7 +114,7 @@ public class OpenSearchBackendUsingCorrectIndicesTest {
                 .id("search1")
                 .queries(ImmutableSet.of(query))
                 .build();
-        this.job = new SearchJob("job1", search, "admin");
+        this.job = new SearchJob("job1", search, "admin", "test-node-id");
     }
 
     @After
@@ -159,6 +159,7 @@ public class OpenSearchBackendUsingCorrectIndicesTest {
                 .searchTypes(ImmutableSet.of(MessageList.builder().id("1").build()))
                 .build();
     }
+
     private Search dummySearch(Query... queries) {
         return Search.builder()
                 .id("search1")
@@ -175,7 +176,7 @@ public class OpenSearchBackendUsingCorrectIndicesTest {
                 .filter(StreamFilter.ofId(streamId))
                 .build();
         final Search search = dummySearch(query);
-        final SearchJob job = new SearchJob("job1", search, "admin");
+        final SearchJob job = new SearchJob("job1", search, "admin", "test-node-id");
         final OSGeneratedQueryContext context = backend.generate(query, Collections.emptySet());
 
         when(indexLookup.indexNamesForStreamsInTimeRange(ImmutableSet.of("streamId"), RelativeRange.create(600)))
@@ -196,7 +197,7 @@ public class OpenSearchBackendUsingCorrectIndicesTest {
                 .filter(AndFilter.and(StreamFilter.ofId("stream1"), StreamFilter.ofId("stream2")))
                 .build();
         final Search search = dummySearch(query);
-        final SearchJob job = new SearchJob("job1", search, "admin");
+        final SearchJob job = new SearchJob("job1", search, "admin", "test-node-id");
         final OSGeneratedQueryContext context = backend.generate(query, Collections.emptySet());
 
         when(indexLookup.indexNamesForStreamsInTimeRange(ImmutableSet.of("stream1", "stream2"), RelativeRange.create(600)))

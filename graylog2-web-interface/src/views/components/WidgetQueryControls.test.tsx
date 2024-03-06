@@ -31,10 +31,10 @@ import WidgetQueryControls from './WidgetQueryControls';
 import WidgetContext from './contexts/WidgetContext';
 
 jest.mock('views/components/searchbar/queryvalidation/QueryValidation', () => mockComponent('QueryValidation'));
-jest.mock('views/components/searchbar/queryinput/QueryInput', () => ({ value = '' }: { value: string }) => <span>{value}</span>);
 jest.mock('views/components/searchbar/queryvalidation/QueryValidation', () => mockComponent('QueryValidation'));
-jest.mock('views/components/searchbar/queryinput/BasicQueryInput', () => ({ value = '' }: { value: string }) => <span>{value}</span>);
-jest.mock('views/components/searchbar/queryinput/QueryInput', () => ({ value = '' }: { value: string }) => <span>{value}</span>);
+
+jest.mock('views/components/searchbar/queryinput/QueryInput');
+jest.mock('views/components/searchbar/queryinput/BasicQueryInput');
 
 jest.mock('views/stores/SearchConfigStore', () => ({
   SearchConfigActions: {
@@ -105,12 +105,6 @@ describe('WidgetQueryControls', () => {
     </Wrapper>,
   );
 
-  it('should do something', () => {
-    const { container } = renderSUT();
-
-    expect(container).not.toBeNull();
-  });
-
   describe('displays if global override is set', () => {
     const resetTimeRangeButtonTitle = /reset global override/i;
     const resetQueryButtonTitle = /reset global filter/i;
@@ -139,7 +133,14 @@ describe('WidgetQueryControls', () => {
       renderSUT();
 
       expect(screen.queryByRole('button', { name: resetTimeRangeButtonTitle })).toBeNull();
-      expect(screen.queryByRole('button', { name: resetTimeRangeButtonTitle })).toBeNull();
+      expect(screen.queryByRole('button', { name: resetQueryButtonTitle })).toBeNull();
+    });
+
+    it('does not show global override query indicator if global override query is an object with an empty query string', async () => {
+      asMock(useGlobalOverride).mockReturnValue(GlobalOverride.create(undefined, { type: 'elasticsearch', query_string: '' }));
+      renderSUT();
+
+      expect(screen.queryByRole('button', { name: resetQueryButtonTitle })).toBeNull();
     });
 
     it('triggers resetting global override when reset time range override button is clicked', async () => {

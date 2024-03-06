@@ -18,26 +18,34 @@ package org.graylog.plugins.views.search.elasticsearch;
 
 import com.google.common.collect.Sets;
 import org.graylog2.indexer.fieldtypes.FieldTypeDTO;
+import org.graylog2.indexer.fieldtypes.IndexFieldTypesDTO;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+import org.graylog2.streams.StreamService;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class FieldTypesLookup {
     private final IndexFieldTypesService indexFieldTypesService;
+    private final StreamService streamService;
 
     @Inject
-    public FieldTypesLookup(IndexFieldTypesService indexFieldTypesService) {
+    public FieldTypesLookup(IndexFieldTypesService indexFieldTypesService, StreamService streamService) {
         this.indexFieldTypesService = indexFieldTypesService;
+        this.streamService = streamService;
     }
 
     private Map<String, Set<String>> get(Set<String> streamIds) {
-        return this.indexFieldTypesService.findForStreamIds(streamIds)
+        return findForStreamIds(streamIds)
                 .stream()
                 .flatMap(indexFieldTypes -> indexFieldTypes.fields().stream())
                 .collect(Collectors.toMap(
@@ -45,6 +53,20 @@ public class FieldTypesLookup {
                         fieldType -> Collections.singleton(fieldType.physicalType()),
                         Sets::union
                 ));
+    }
+
+    private Collection<IndexFieldTypesDTO> findForStreamIds(Collection<String> streamIds) {
+        final Set<String> indexSetIds = getIndexSetIds(streamIds);
+        return indexFieldTypesService.findForIndexSets(indexSetIds);
+    }
+
+    @NotNull
+    private Set<String> getIndexSetIds(Collection<String> streamIds) {
+        return streamService.loadByIds(streamIds)
+                .stream()
+                .filter(Objects::nonNull)
+                .map(stream -> stream.getIndexSet().getConfig().id())
+                .collect(Collectors.toSet());
     }
 
     public Optional<String> getType(Set<String> streamIds, String field) {

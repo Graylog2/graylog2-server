@@ -144,7 +144,7 @@ const MessageDetail = ({
             <Col md={12}>
               <Header>
                 <MessageDetailsTitle>
-                  <Icon name="envelope" />&nbsp;{messageTitle}
+                  <Icon name="mail" />&nbsp;{messageTitle}
                 </MessageDetailsTitle>
                 <MessageActions index={index}
                                 id={id}

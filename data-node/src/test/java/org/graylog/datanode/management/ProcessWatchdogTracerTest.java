@@ -29,7 +29,8 @@ class ProcessWatchdogTracerTest {
         final TestableProcess process = new TestableProcess();
         final ProcessWatchdog watchdog = new ProcessWatchdog(process, 3);
         process.addStateMachineTracer(watchdog);
-        process.restart();
+        process.configure("ignored");
+        process.start();
 
         // both process and watchdog are running now. Let's stop the process and see if the watchdog will restart it
         terminateProcess(process);

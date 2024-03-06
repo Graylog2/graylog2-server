@@ -17,29 +17,33 @@
 package org.graylog2.rest.resources.system.field_types;
 
 import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.indexer.fieldtypes.IndexFieldTypesListService;
 import org.graylog2.indexer.fieldtypes.mapping.FieldTypeMappingsService;
 import org.graylog2.indexer.indexset.CustomFieldMapping;
 import org.graylog2.indexer.indexset.CustomFieldMappings;
-import org.graylog2.rest.bulk.model.BulkOperationResponse;
+import org.graylog2.rest.bulk.model.BulkOperationFailure;
+import org.graylog2.rest.resources.system.indexer.responses.IndexSetFieldType;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
-import javax.inject.Inject;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -56,10 +60,12 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 public class FieldTypeMappingsResource extends RestResource {
 
     private final FieldTypeMappingsService fieldTypeMappingsService;
+    private final IndexFieldTypesListService indexFieldTypesListService;
 
     @Inject
-    public FieldTypeMappingsResource(final FieldTypeMappingsService fieldTypeMappingsService) {
+    public FieldTypeMappingsResource(final FieldTypeMappingsService fieldTypeMappingsService, final IndexFieldTypesListService indexFieldTypesListService) {
         this.fieldTypeMappingsService = fieldTypeMappingsService;
+        this.indexFieldTypesListService = indexFieldTypesListService;
     }
 
     @GET
@@ -79,15 +85,28 @@ public class FieldTypeMappingsResource extends RestResource {
             @ApiResponse(code = 403, message = "Unauthorized")
     })
     @AuditEvent(type = FIELD_TYPE_MAPPING_CREATE)
-    public Response changeFieldType(@ApiParam(name = "request")
+    public Map<String, IndexSetFieldType> changeFieldType(@ApiParam(name = "request")
                                     @Valid
                                     @NotNull(message = "Request body is mandatory") final FieldTypeChangeRequest request) {
-        checkPermissionsForCreation(request.indexSetsIds());
+        checkPermissions(request.indexSetsIds(), RestPermissions.TYPE_MAPPINGS_CREATE);
 
         var customMapping = new CustomFieldMapping(request.fieldName(), request.type());
         fieldTypeMappingsService.changeFieldType(customMapping, request.indexSetsIds(), request.rotateImmediately());
 
-        return Response.ok().build();
+        return newFieldTypes(request.indexSetsIds(), request.fieldName());
+    }
+
+    private Map<String, IndexSetFieldType> newFieldTypes(Set<String> indexSetIds, String fieldName) {
+        final var newIndexFieldTypes = indexFieldTypesListService.getIndexSetFieldTypesList(indexSetIds, Set.of(fieldName));
+
+        return newIndexFieldTypes.entrySet()
+                .stream()
+                .collect(Collectors.toMap(Map.Entry::getKey,
+                        entry -> entry.getValue()
+                                .stream()
+                                .filter(fieldType -> fieldType.fieldName().equals(fieldName))
+                                .findFirst()
+                                .orElseThrow(() -> new RuntimeException("Missing entry in field types list."))));
     }
 
     @PUT
@@ -101,7 +120,7 @@ public class FieldTypeMappingsResource extends RestResource {
     public Response setProfile(@ApiParam(name = "request")
                                @Valid
                                @NotNull(message = "Request body is mandatory") final FieldTypeProfileChangeRequest request) {
-        checkPermissionsForCreation(request.indexSetsIds());
+        checkPermissions(request.indexSetsIds(), RestPermissions.INDEXSETS_EDIT);
         fieldTypeMappingsService.setProfile(request.indexSetsIds(), request.profileId(), request.rotateImmediately());
 
         return Response.ok().build();
@@ -118,7 +137,7 @@ public class FieldTypeMappingsResource extends RestResource {
     public Response removeProfileFromIndexSets(@ApiParam(name = "request")
                                                @Valid
                                                @NotNull(message = "Request body is mandatory") final FieldTypeProfileUnsetRequest request) {
-        checkPermissionsForCreation(request.indexSetsIds());
+        checkPermissions(request.indexSetsIds(), RestPermissions.INDEXSETS_EDIT);
         fieldTypeMappingsService.removeProfileFromIndexSets(request.indexSetsIds(), request.rotateImmediately());
 
         return Response.ok().build();
@@ -132,15 +151,30 @@ public class FieldTypeMappingsResource extends RestResource {
             @ApiResponse(code = 403, message = "Unauthorized")
     })
     @AuditEvent(type = FIELD_TYPE_MAPPING_DELETE)
-    public Map<String, BulkOperationResponse> removeCustomMapping(@ApiParam(name = "request")
-                                        @Valid
-                                        @NotNull(message = "Request body is mandatory") final CustomFieldMappingRemovalRequest request) {
-        checkPermissionsForCreation(request.indexSetsIds());
+    public Map<String, MappingRemovalResult> removeCustomMapping(@ApiParam(name = "request")
+                                                                  @Valid
+                                                                  @NotNull(message = "Request body is mandatory") final CustomFieldMappingRemovalRequest request) {
+        checkPermissions(request.indexSetsIds(), RestPermissions.TYPE_MAPPINGS_DELETE);
 
-        return fieldTypeMappingsService.removeCustomMappingForFields(request.fieldNames(), request.indexSetsIds(), request.rotateImmediately());
+        final var result = fieldTypeMappingsService.removeCustomMappingForFields(request.fieldNames(), request.indexSetsIds(), request.rotateImmediately());
+        final var newTypes = this.indexFieldTypesListService.getIndexSetFieldTypesList(request.indexSetsIds(), request.fieldNames());
+        return result
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, value -> new MappingRemovalResult(
+                        value.getValue().successfullyPerformed(),
+                        value.getValue().failures(),
+                        value.getValue().errors(),
+                        newTypes.get(value.getKey())
+                )));
     }
 
-    private void checkPermissionsForCreation(final Set<String> indexSetsIds) {
-        indexSetsIds.forEach(indexSetId -> checkPermission(RestPermissions.TYPE_MAPPINGS_CREATE, indexSetId));
+    public record MappingRemovalResult(@JsonProperty("successfully_performed") int successfullyPerformed,
+                                       @JsonProperty("failures") List<BulkOperationFailure> failures,
+                                       @JsonProperty("errors") List<String> errors,
+                                       @JsonProperty("succeeded") List<IndexSetFieldType> succeeded) {}
+
+    private void checkPermissions(final Set<String> indexSetsIds, final String permission) {
+        indexSetsIds.forEach(indexSetId -> checkPermission(permission, indexSetId));
     }
 }

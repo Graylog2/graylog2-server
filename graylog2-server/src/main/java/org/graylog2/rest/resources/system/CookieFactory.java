@@ -17,12 +17,11 @@
 package org.graylog2.rest.resources.system;
 
 import com.google.common.base.Strings;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.core.NewCookie;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.rest.models.system.sessions.responses.SessionResponse;
 
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.core.Cookie;
-import javax.ws.rs.core.NewCookie;
 import java.net.URI;
 import java.util.Date;
 import java.util.Optional;
@@ -50,16 +49,16 @@ public class CookieFactory {
                 .map(scheme -> scheme.equalsIgnoreCase("https"))
                 .orElse(false);
 
-        return new NewCookie("authentication",
-                value,
-                basePath,
-                null,
-                Cookie.DEFAULT_VERSION,
-                "Authentication Cookie",
-                maxAge,
-                validUntil,
-                isSecure,
-                true);
+        return new NewCookie.Builder("authentication")
+                .value(value)
+                .comment("Authentication Cookie")
+                .path(basePath)
+                .maxAge(maxAge)
+                .expiry(validUntil)
+                .secure(isSecure)
+                .httpOnly(true)
+                .sameSite(NewCookie.SameSite.STRICT)
+                .build();
     }
 
     private Optional<String> schemeFromRequest(ContainerRequestContext requestContext) {

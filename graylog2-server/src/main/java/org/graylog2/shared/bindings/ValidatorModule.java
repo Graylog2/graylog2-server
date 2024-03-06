@@ -18,8 +18,8 @@ package org.graylog2.shared.bindings;
 
 import com.google.inject.AbstractModule;
 
-import javax.validation.Validation;
-import javax.validation.Validator;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 
 public class ValidatorModule extends AbstractModule {
     @Override

@@ -100,7 +100,7 @@ const ExternalLinkItem = ({ action, disabled, field, handlerArgs, onMenuToggle, 
     href: action.linkTarget(handlerArgs),
     target: '_blank',
     rel: 'noopener noreferrer',
-  };
+  } as const;
 
   const onSelect = useCallback(() => {
     const { resetFocus = false } = action;
@@ -118,7 +118,7 @@ const ExternalLinkItem = ({ action, disabled, field, handlerArgs, onMenuToggle, 
                     onSelect={onSelect}
                     {...linkProps}>
       <ActionTitle action={action} handlerArgs={handlerArgs} />
-      <ExternalLinkIcon name="external-link" />
+      <ExternalLinkIcon name="open_in_new" />
     </StyledMenuItem>
   );
 };

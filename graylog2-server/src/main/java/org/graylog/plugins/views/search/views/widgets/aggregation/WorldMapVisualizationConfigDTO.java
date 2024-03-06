@@ -22,7 +22,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 @AutoValue
 @JsonTypeName(WorldMapVisualizationConfigDTO.NAME)

@@ -21,7 +21,8 @@ import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.system.processing.DBProcessingStatusService;
 import org.joda.time.DateTime;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Set;
 
 import static org.graylog2.system.processing.DBProcessingStatusService.ProcessingNodesState;

@@ -18,6 +18,9 @@ package org.graylog.storage.elasticsearch7.views;
 
 import com.google.common.collect.Maps;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Provider;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.GlobalOverride;
 import org.graylog.plugins.views.search.Query;
@@ -52,12 +55,11 @@ import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.FieldTypeException;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.Tools;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -136,6 +138,9 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 .size(0)
                 .trackTotalHits(true);
 
+
+        final DateTime nowUTCSharedBetweenSearchTypes = Tools.nowUTC();
+
         final ESGeneratedQueryContext queryContext = queryContextFactory.create(this, searchSourceBuilder, validationErrors);
         searchTypes.stream()
                 .filter(searchType -> !isSearchTypeWithError(queryContext, searchType.id()))
@@ -157,7 +162,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                             .must(
                                     Objects.requireNonNull(
                                             TimeRangeQueryFactory.create(
-                                                    query.effectiveTimeRange(searchType)
+                                                    query.effectiveTimeRange(searchType, nowUTCSharedBetweenSearchTypes)
                                             ),
                                             "Timerange for search type " + searchType.id() + " cannot be found in query or search type."
                                     )
@@ -249,7 +254,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                     return new SearchRequest()
                             .source(searchTypeQueries.get(searchTypeId))
                             .indices(indices.toArray(new String[0]))
-                            .indicesOptions(IndicesOptions.fromOptions(false, false, true, false));
+                            .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN);
                 })
                 .collect(Collectors.toList());
 

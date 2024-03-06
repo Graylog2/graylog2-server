@@ -48,4 +48,6 @@ public interface NodeService<T extends NodeDto> {
      * @param dto Dto of the node to be marked as alive
      */
     void ping(NodeDto dto);
+
+    void update(NodeDto dto);
 }

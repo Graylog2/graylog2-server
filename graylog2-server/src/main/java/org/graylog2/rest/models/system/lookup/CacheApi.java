@@ -26,9 +26,10 @@ import org.graylog2.lookup.dto.CacheDto;
 import org.graylog2.plugin.lookup.LookupCacheConfiguration;
 
 import javax.annotation.Nullable;
-import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 
 @AutoValue
 @JsonAutoDetect

@@ -22,7 +22,8 @@ import org.graylog2.plugin.cluster.ClusterIdFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.time.ZonedDateTime;
 
 public class V19700101000000_GenerateClusterId extends Migration {
@@ -44,7 +45,7 @@ public class V19700101000000_GenerateClusterId extends Migration {
 
     @Override
     public void upgrade() {
-        if(clusterConfigService.get(ClusterId.class) == null) {
+        if (clusterConfigService.get(ClusterId.class) == null) {
             ClusterId clusterId = clusterIdFactory.create();
             clusterConfigService.write(clusterId);
 

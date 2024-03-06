@@ -43,7 +43,8 @@ import org.graylog2.security.encryption.EncryptedValueService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.net.URI;
 import java.time.ZonedDateTime;
 import java.util.Collections;

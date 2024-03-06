@@ -24,14 +24,17 @@ import Widget from 'views/logic/widgets/Widget';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
 import useWidgetActions from 'views/components/widgets/useWidgetActions';
+import wrapWithMenu from 'helpers/components/wrapWithMenu';
 
 jest.mock('views/components/widgets/useWidgetActions');
 
-const ExtraWidgetActions = (props: React.ComponentProps<typeof OriginalExtraWidgetActions>) => (
+const ExtraWidgetActionsWithoutMenu = (props: React.ComponentProps<typeof OriginalExtraWidgetActions>) => (
   <TestStoreProvider>
     <OriginalExtraWidgetActions {...props} />
   </TestStoreProvider>
 );
+
+const ExtraWidgetActions = wrapWithMenu(ExtraWidgetActionsWithoutMenu);
 
 describe('ExtraWidgetActions', () => {
   const widget = Widget.empty();
@@ -57,20 +60,20 @@ describe('ExtraWidgetActions', () => {
 
   afterAll(unloadViewsPlugin);
 
-  it('returns `null` if no action is configured', () => {
+  it('does not render menu items, when no action is configured', () => {
     asMock(useWidgetActions).mockReturnValue([]);
 
-    const { container } = render(<ExtraWidgetActions widget={widget} />);
+    render(<ExtraWidgetActionsWithoutMenu widget={widget} />);
 
-    expect(container).toBeEmptyDOMElement();
+    expect(screen.queryByRole('menuitem')).not.toBeInTheDocument();
   });
 
-  it('returns `null` if no action is not hidden', () => {
+  it('does not render menu items, if no action is hidden', () => {
     asMock(useWidgetActions).mockReturnValue([dummyActionWhichIsHidden]);
 
-    const { container } = render(<ExtraWidgetActions widget={widget} />);
+    render(<ExtraWidgetActionsWithoutMenu widget={widget} />);
 
-    expect(container).toBeEmptyDOMElement();
+    expect(screen.queryByRole('menuitem')).not.toBeInTheDocument();
   });
 
   it('renders action which has no `isHidden`', async () => {
@@ -121,9 +124,8 @@ describe('ExtraWidgetActions', () => {
 
     render(<ExtraWidgetActions widget={widget} />);
 
-    const menuItem = await screen.findByRole('presentation');
+    const menuItem = await screen.findByRole('menuitem');
 
-    expect(menuItem).toHaveClass('disabled');
-    expect(dummyActionWhichIsDisabled.disabled).toHaveBeenCalledTimes(1);
+    expect(menuItem).toBeDisabled();
   });
 });

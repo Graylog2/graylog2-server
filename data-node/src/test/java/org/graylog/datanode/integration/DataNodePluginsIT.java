@@ -24,6 +24,8 @@ import org.graylog.datanode.testinfra.DatanodeTestExtension;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
@@ -33,6 +35,7 @@ import static io.restassured.RestAssured.given;
 
 @ExtendWith(DatanodeTestExtension.class)
 public class DataNodePluginsIT {
+    private static final Logger LOG = LoggerFactory.getLogger(DataNodePluginsIT.class);
     private final DatanodeContainerizedBackend backend;
 
     public DataNodePluginsIT(DatanodeContainerizedBackend backend) {
@@ -43,26 +46,30 @@ public class DataNodePluginsIT {
     void ensureUnneededPluginsAreNotLoaded() throws Exception {
         final var opensearchRestPort = backend.getOpensearchRestPort();
         final var baseUrl = "http://localhost:" + opensearchRestPort;
-        waitForOpensearch(baseUrl);
+        try {
+            waitForOpensearch(baseUrl);
 
-        given()
-                .get(baseUrl + "/_cat/plugins")
-                .then()
-                .statusCode(200)
-                .body(
-                        Matchers.not(Matchers.containsString("opensearch-alerting")),
-                        Matchers.not(Matchers.containsString("opensearch-custom-codecs")),
-                        Matchers.not(Matchers.containsString("opensearch-geospatial")),
-                        Matchers.not(Matchers.containsString("opensearch-index-management")),
-                        Matchers.not(Matchers.containsString("opensearch-knn")),
-                        Matchers.not(Matchers.containsString("opensearch-neural-search")),
-                        Matchers.not(Matchers.containsString("opensearch-notifications")),
-                        Matchers.not(Matchers.containsString("opensearch-notifications-core")),
-                        Matchers.not(Matchers.containsString("opensearch-performance-analyzer")),
-                        Matchers.not(Matchers.containsString("opensearch-reports-scheduler")),
-                        Matchers.not(Matchers.containsString("opensearch-security-analytics")),
-                        Matchers.not(Matchers.containsString("opensearch-sql"))
-                );
+            given()
+                    .get(baseUrl + "/_cat/plugins")
+                    .then()
+                    .statusCode(200)
+                    .body(
+                            Matchers.not(Matchers.containsString("opensearch-alerting")),
+                            Matchers.not(Matchers.containsString("opensearch-custom-codecs")),
+                            Matchers.not(Matchers.containsString("opensearch-geospatial")),
+                            Matchers.not(Matchers.containsString("opensearch-knn")),
+                            Matchers.not(Matchers.containsString("opensearch-neural-search")),
+                            Matchers.not(Matchers.containsString("opensearch-notifications")),
+                            Matchers.not(Matchers.containsString("opensearch-notifications-core")),
+                            Matchers.not(Matchers.containsString("opensearch-performance-analyzer")),
+                            Matchers.not(Matchers.containsString("opensearch-reports-scheduler")),
+                            Matchers.not(Matchers.containsString("opensearch-security-analytics")),
+                            Matchers.not(Matchers.containsString("opensearch-sql"))
+                    );
+        } catch (Exception exception) {
+            LOG.error("DataNode Container logs follow:\n" + backend.getLogs());
+            throw exception;
+        }
     }
 
     private void waitForOpensearch(String baseUrl) throws ExecutionException, RetryException {

@@ -26,11 +26,12 @@ import org.graylog2.system.stats.ClusterStatsService;
 import org.graylog2.system.stats.elasticsearch.ElasticsearchStats;
 import org.graylog2.system.stats.mongo.MongoStats;
 
-import javax.inject.Inject;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+import jakarta.inject.Inject;
+
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 
 @Api(value = "System/ClusterStats", description = "[DEPRECATED] Cluster stats")
 @RequiresAuthentication
@@ -48,7 +49,7 @@ public class ClusterStatsResource extends RestResource {
     @GET
     @Timed
     @ApiOperation(value = "Cluster status information.",
-            notes = "This resource returns information about the Graylog cluster.")
+                  notes = "This resource returns information about the Graylog cluster.")
     public ClusterStats systemStats() {
         return clusterStatsService.clusterStats();
     }
@@ -57,7 +58,7 @@ public class ClusterStatsResource extends RestResource {
     @Path("/elasticsearch")
     @Timed
     @ApiOperation(value = "Elasticsearch information.",
-            notes = "This resource returns information about the Elasticsearch Cluster.")
+                  notes = "This resource returns information about the Elasticsearch Cluster.")
     public ElasticsearchStats elasticsearchStats() {
         return clusterStatsService.elasticsearchStats();
     }
@@ -66,7 +67,7 @@ public class ClusterStatsResource extends RestResource {
     @Path("/mongo")
     @Timed
     @ApiOperation(value = "MongoDB information.",
-            notes = "This resource returns information about MongoDB.")
+                  notes = "This resource returns information about MongoDB.")
     public MongoStats mongoStats() {
         return clusterStatsService.mongoStats();
     }

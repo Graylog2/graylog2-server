@@ -16,7 +16,6 @@
  */
 package org.graylog.datanode.bootstrap;
 
-import com.github.joschi.jadconfig.guice.NamedConfigParametersModule;
 import com.github.rvesse.airline.annotations.Option;
 import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.Binder;
@@ -31,6 +30,7 @@ import org.graylog.datanode.bindings.GenericBindings;
 import org.graylog.datanode.bindings.GenericInitializerBindings;
 import org.graylog.datanode.bindings.PreflightChecksBindings;
 import org.graylog.datanode.bindings.SchedulerBindings;
+import org.graylog2.bindings.NamedConfigParametersOverrideModule;
 import org.graylog2.bootstrap.preflight.MongoDBPreflightCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.graylog2.bootstrap.preflight.PreflightCheckService;
@@ -97,8 +97,8 @@ public abstract class ServerBootstrap extends CmdLineTool {
     }
 
     @Override
-    protected void beforeStart(TLSProtocolsConfiguration tlsProtocolsConfiguration, PathConfiguration pathConfiguration) {
-        super.beforeStart(tlsProtocolsConfiguration, pathConfiguration);
+    protected void beforeStart(TLSProtocolsConfiguration tlsProtocolsConfiguration, Configuration configuration) {
+        super.beforeStart(tlsProtocolsConfiguration, configuration);
 
         // Do not use a PID file if the user requested not to
         if (!isNoPidFile()) {
@@ -109,8 +109,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
         applySecuritySettings(tlsProtocolsConfiguration);
 
         // Set these early in the startup because netty's NativeLibraryUtil uses a static initializer
-        setNettyNativeDefaults(pathConfiguration);
-
+        setNettyNativeDefaults(configuration);
     }
 
     @Override
@@ -124,7 +123,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
             return;
         }
 
-       runMongoPreflightCheck();
+        runMongoPreflightCheck();
 
         final List<Module> preflightCheckModules = plugins.stream().map(Plugin::preflightCheckModules)
                 .flatMap(Collection::stream).collect(Collectors.toList());
@@ -153,7 +152,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
     private Injector getMongoPreFlightInjector() {
         return Guice.createInjector(
                 new IsDevelopmentBindings(),
-                new NamedConfigParametersModule(jadConfig.getConfigurationBeans()),
+                new NamedConfigParametersOverrideModule(jadConfig.getConfigurationBeans()),
                 new ConfigurationModule(configuration),
                 new DatanodeConfigurationBindings()
 
@@ -163,7 +162,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
     private Injector getPreflightInjector(List<Module> preflightCheckModules) {
         return Guice.createInjector(
                 new IsDevelopmentBindings(),
-                new NamedConfigParametersModule(jadConfig.getConfigurationBeans()),
+                new NamedConfigParametersOverrideModule(jadConfig.getConfigurationBeans()),
                 new ConfigurationModule(configuration),
                 new PreflightChecksBindings(),
                 new DatanodeConfigurationBindings(),
@@ -175,10 +174,10 @@ public abstract class ServerBootstrap extends CmdLineTool {
                 });
     }
 
-    private void setNettyNativeDefaults(PathConfiguration pathConfiguration) {
+    private void setNettyNativeDefaults(Configuration configuration) {
         // Give netty a better spot than /tmp to unpack its tcnative libraries
         if (System.getProperty("io.netty.native.workdir") == null) {
-            System.setProperty("io.netty.native.workdir", pathConfiguration.getNativeLibDir().toAbsolutePath().toString());
+            System.setProperty("io.netty.native.workdir", configuration.getNativeLibDir().toAbsolutePath().toString());
         }
         // Don't delete the native lib after unpacking, as this confuses needrestart(1) on some distributions
         if (System.getProperty("io.netty.native.deleteLibAfterLoading") == null) {

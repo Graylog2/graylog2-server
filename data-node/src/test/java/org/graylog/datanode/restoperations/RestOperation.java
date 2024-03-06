@@ -27,7 +27,8 @@ import org.bson.assertions.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.HttpMethod;
+import jakarta.ws.rs.HttpMethod;
+
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -49,25 +50,20 @@ public abstract class RestOperation {
     final ValidatableResponse validatedResponse(String url, String method, String body, String errorMessage, Predicate<ValidatableResponse>... predicates) {
 
         if (LOG.isInfoEnabled()) {
-            LOG.info("cURL request: " + formatCurlConnectionInfo(parameters.port(), url));
+            LOG.info("cURL request: " + formatCurlConnectionInfo(parameters, url));
         }
 
 
         final RequestSpecification req = RestAssured.given().accept(ContentType.JSON);
         Optional.ofNullable(parameters.truststore()).ifPresent(ts -> req.trustStore(parameters.truststore()));
         parameters.addAuthorizationHeaders(req);
-        ValidatableResponse response;
-        if (method.toUpperCase(Locale.ENGLISH).equals(HttpMethod.GET)) {
-            response = req.get(formatUrl(parameters.port(), url)).then();
-        } else if (method.toUpperCase(Locale.ENGLISH).equals(HttpMethod.PUT)) {
-            response = req.header(new Header("Content-Type", "application/json")).body(body).put(formatUrl(parameters.port(), url)).then();
-        } else if (method.toUpperCase(Locale.ENGLISH).equals(HttpMethod.POST)) {
-            response = req.header(new Header("Content-Type", "application/json")).body(body).post(formatUrl(parameters.port(), url)).then();
-        } else if (method.toUpperCase(Locale.ENGLISH).equals(HttpMethod.DELETE)) {
-            response = req.delete(formatUrl(parameters.port(), url)).then();
-        } else {
-            throw Assertions.fail("Method not implemented");
-        }
+        ValidatableResponse response = switch (method.toUpperCase(Locale.ENGLISH)) {
+            case HttpMethod.GET -> req.get(formatUrl(parameters, url)).then();
+            case HttpMethod.PUT -> req.header(new Header("Content-Type", "application/json")).body(body).put(formatUrl(parameters, url)).then();
+            case HttpMethod.POST -> req.header(new Header("Content-Type", "application/json")).body(body).post(formatUrl(parameters, url)).then();
+            case HttpMethod.DELETE -> req.delete(formatUrl(parameters, url)).then();
+            default -> throw Assertions.fail("Method not implemented");
+        };
         final boolean responseOk = Arrays.stream(predicates).allMatch(p -> p.test(response));
         if (!responseOk) {
             LOG.error(serializeResponse(response.extract()));
@@ -77,7 +73,7 @@ public abstract class RestOperation {
         return response;
     }
 
-    String formatCurlConnectionInfo(int port, String url) {
+    String formatCurlConnectionInfo(RestOperationParameters port, String url) {
         List<String> builder = new LinkedList<>();
         builder.add("curl -k"); // trust self-signed certs
         builder.add(parameters.formatCurlAuthentication());
@@ -94,7 +90,9 @@ public abstract class RestOperation {
         return String.format(Locale.ROOT, "\nstatus code: %d\nstatus line: %s\n\nContent-type: %s\nheaders: %s\nbody: %s", statusCode, statusLine, contentType, headers, body);
     }
 
-    String formatUrl(int port, String url) {
-        return "https://localhost:" + port + url;
+    String formatUrl(RestOperationParameters params, String url) {
+        final boolean securedConnection = params.truststore() != null;
+        String procotol = securedConnection ? "https" : "http";
+        return procotol + "://localhost:" + params.port() + url;
     }
 }

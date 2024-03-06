@@ -17,50 +17,65 @@
 import type { PropsWithChildren } from 'react';
 import React from 'react';
 import { Menu as MantineMenu, type MenuProps } from '@mantine/core';
-import styled, { css, useTheme } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 type Props = PropsWithChildren<{
+  closeOnItemClick?: boolean,
+  onChange?: (isOpen: boolean) => void,
+  onClose?: () => void,
+  opened?: boolean,
+  portalProps?: { target: HTMLElement },
+  keepMounted?: boolean,
   position?: MenuProps['position'],
   shadow?: MenuProps['shadow'],
   width?: number,
   withinPortal?: boolean,
-  opened?: boolean,
+  zIndex?: number,
 }>
 
-const Menu = ({ children, shadow, width, withinPortal, position, opened }: Props) => {
-  const theme = useTheme();
-
-  const styles = () => ({
-    dropdown: {
-      backgroundColor: theme.colors.global.contentBackground,
-      border: `1px solid ${theme.colors.variant.lighter.default}`,
-      fontFamily: theme.fonts.family.navigation,
-      fontSize: theme.fonts.size.navigation,
-    },
-  });
-
-  return (
-    <MantineMenu shadow={shadow}
-                 opened={opened}
-                 width={width}
-                 position={position}
-                 withinPortal={withinPortal}
-                 styles={styles}>
-      {children}
-    </MantineMenu>
-  );
-};
+const Menu = ({
+  children,
+  closeOnItemClick,
+  onClose,
+  shadow,
+  width,
+  withinPortal,
+  position,
+  opened,
+  onChange,
+  portalProps,
+  keepMounted,
+  zIndex,
+}: Props) => (
+  <MantineMenu closeOnItemClick={closeOnItemClick}
+               onClose={onClose}
+               shadow={shadow}
+               opened={opened}
+               onChange={onChange}
+               portalProps={portalProps}
+               width={width}
+               position={position}
+               withinPortal={withinPortal}
+               keepMounted={keepMounted}
+               zIndex={zIndex}>
+    {children}
+  </MantineMenu>
+);
 
 const StyledMenuItem = styled(MantineMenu.Item)(({ theme }) => css`
   color: ${theme.colors.global.textDefault};
-  font-family: ${theme.fonts.family.navigation};
-  font-size: ${theme.fonts.size.navigation};
-  padding-left: 20px;
-  padding-right: 20px;
+  font-size: ${theme.fonts.size.body};
+  white-space: nowrap;
+  
+  &[data-hovered], &:focus {
+    text-decoration: none;
+    color: inherit;
+    background-color: ${theme.utils.colorLevel(theme.colors.global.contentBackground, 10)}
+  }
 `);
 
 const StyledMenuDivider = styled(MantineMenu.Divider)(({ theme }) => css`
-  border-color: ${theme.colors.global.textDefault};
+  border-color: ${theme.colors.variant.lighter.default};
 `);
 
 const StyledMenuLabel = styled(MantineMenu.Label)(({ theme }) => css`
@@ -68,17 +83,30 @@ const StyledMenuLabel = styled(MantineMenu.Label)(({ theme }) => css`
 `);
 
 Menu.Target = MantineMenu.Target;
-Menu.Dropdown = MantineMenu.Dropdown;
+
+Menu.Dropdown = styled(MantineMenu.Dropdown)(({ theme }) => css`
+  && {
+    background-color: ${theme.colors.global.contentBackground};
+    border: 1px solid ${theme.colors.variant.lighter.default};
+  }
+`);
+
 Menu.Item = StyledMenuItem;
 Menu.Divider = StyledMenuDivider;
 Menu.Label = StyledMenuLabel;
 
 Menu.defaultProps = {
+  closeOnItemClick: true,
   position: undefined,
+  portalProps: undefined,
   shadow: undefined,
   width: undefined,
   withinPortal: false,
   opened: undefined,
+  onChange: undefined,
+  onClose: undefined,
+  keepMounted: undefined,
+  zIndex: undefined,
 };
 
 export default Menu;

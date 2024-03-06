@@ -53,7 +53,7 @@ class LinkToNode extends React.PureComponent {
     const node = nodes[this.props.nodeId];
 
     if (node) {
-      const iconName = node.is_leader ? 'star' : 'code-branch';
+      const iconName = node.is_leader ? 'star' : 'fork_right';
       const iconClass = node.is_leader ? 'leader-node' : '';
       const iconTitle = node.is_leader ? 'This is the leader node in the cluster' : '';
 

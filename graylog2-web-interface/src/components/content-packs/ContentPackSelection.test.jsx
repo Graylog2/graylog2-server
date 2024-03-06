@@ -17,6 +17,7 @@
 import React from 'react';
 import { mount } from 'wrappedEnzyme';
 import 'helpers/mocking/react-dom_mock';
+import { act } from 'react-dom/test-utils';
 
 import ContentPack from 'logic/content-packs/ContentPack';
 import ContentPackSelection from 'components/content-packs/ContentPackSelection';
@@ -152,7 +153,7 @@ describe('<ContentPackSelection />', () => {
                               entities={entities} />,
       );
 
-      wrapper.find('div.fa-stack').simulate('click');
+      wrapper.find({ title: 'Expand list item' }).at(1).simulate('click');
       wrapper.find('input[type="checkbox"]').at(1).simulate('change', { target: { checked: false } });
 
       expect(changeFn.mock.calls.length).toBe(1);
@@ -169,12 +170,16 @@ describe('<ContentPackSelection />', () => {
        * Search for falcon
        *
       /* Open menu to show all checkboxes */
-      wrapper.find('div.fa-stack').simulate('click');
+      wrapper.find({ title: 'Expand list item' }).at(1).simulate('click');
 
       expect(wrapper.find('input[type="checkbox"]').length).toEqual(3);
 
       wrapper.find('input#common-search-form-query-input').simulate('change', { target: { value: 'falcon' } });
-      jest.advanceTimersByTime(SEARCH_DEBOUNCE_THRESHOLD);
+
+      act(() => {
+        jest.advanceTimersByTime(SEARCH_DEBOUNCE_THRESHOLD);
+      });
+
       wrapper.update();
 
       expect(wrapper.find('input[type="checkbox"]').length).toEqual(2);
@@ -184,7 +189,7 @@ describe('<ContentPackSelection />', () => {
        */
       wrapper.find('button[title=\'Reset search\']').simulate('click');
       /* Open menu to show all checkboxes */
-      wrapper.find('div.fa-stack').simulate('click');
+      wrapper.find({ title: 'Expand list item' }).at(1).simulate('click');
 
       expect(wrapper.find('input[type="checkbox"]').length).toEqual(3);
     });
@@ -198,32 +203,46 @@ describe('<ContentPackSelection />', () => {
 
       const wrapper = mount(<ContentPackSelection contentPack={{}} entities={entities} />);
 
-      touchAllFields(wrapper);
-      wrapper.instance()._validate();
+      act(() => {
+        touchAllFields(wrapper);
+        wrapper.instance()._validate();
+      });
+
       wrapper.update();
 
       expect(wrapper.find({ error: 'Must be filled out.' }).find('InputDescription').length).toEqual(3);
 
       const wrapper2 = mount(<ContentPackSelection contentPack={{ name: 'name' }} entities={entities} />);
 
-      touchAllFields(wrapper2);
-      wrapper2.instance()._validate();
+      act(() => {
+        touchAllFields(wrapper2);
+        wrapper2.instance()._validate();
+      });
+
       wrapper2.update();
 
       expect(wrapper2.find({ error: 'Must be filled out.' }).find('InputDescription').length).toEqual(2);
 
       const wrapper1 = mount(<ContentPackSelection contentPack={{ name: 'name', summary: 'summary' }}
                                                    entities={entities} />);
-      touchAllFields(wrapper1);
-      wrapper1.instance()._validate();
+
+      act(() => {
+        touchAllFields(wrapper1);
+        wrapper1.instance()._validate();
+      });
+
       wrapper1.update();
 
       expect(wrapper1.find({ error: 'Must be filled out.' }).find('InputDescription').length).toEqual(1);
 
       const wrapper0 = mount(<ContentPackSelection contentPack={{ name: 'name', summary: 'summary', vendor: 'vendor' }}
                                                    entities={entities} />);
-      touchAllFields(wrapper0);
-      wrapper0.instance()._validate();
+
+      act(() => {
+        touchAllFields(wrapper0);
+        wrapper0.instance()._validate();
+      });
+
       wrapper0.update();
 
       expect(wrapper0.find({ error: 'Must be filled out.' }).find('InputDescription').length).toEqual(0);
@@ -243,8 +262,11 @@ describe('<ContentPackSelection />', () => {
         contentPack.url = `${protocol}//example.org`;
         const invalidWrapper = mount(<ContentPackSelection contentPack={contentPack} entities={entities} />);
 
-        invalidWrapper.instance()._handleTouched('url');
-        invalidWrapper.instance()._validate();
+        act(() => {
+          invalidWrapper.instance()._handleTouched('url');
+          invalidWrapper.instance()._validate();
+        });
+
         invalidWrapper.update();
 
         expect(invalidWrapper.find({ error: 'Must use a URL starting with http or https.' }).find('InputDescription')).toHaveLength(errors);

@@ -114,9 +114,8 @@ describe('Dashboard Search', () => {
   it('should list tabs for dashboard pages', async () => {
     render(<Search />);
 
-    await screen.findByRole('button', { name: 'First dashboard page' });
-
-    expect(screen.getByRole('button', { name: 'Second dashboard page' })).toBeInTheDocument();
+    await screen.findByRole('button', { name: /first dashboard page/i });
+    await screen.findByRole('button', { name: /second dashboard page/i });
   });
 
   it('should not list tabs for pages when focusing a widget', async () => {

@@ -34,8 +34,6 @@ import java.util.Set;
 
 /**
  * This is a collection of pointers to directories used to store data, logs and configuration of the managed opensearch.
- * Each data type is additionally stored in a subdirectory named after the nodeId, to avoid unexpected collisions when
- * running more datanode instances in the same machine.
  */
 public class DatanodeDirectories {
 
@@ -45,12 +43,14 @@ public class DatanodeDirectories {
     private final Path logsTargetDir;
     private final Path configurationSourceDir;
     private final Path configurationTargetDir;
+    private final Path opensearchPluginsDir;
 
-    public DatanodeDirectories(Path dataTargetDir, Path logsTargetDir, @Nullable Path configurationSourceDir, Path configurationTargetDir) {
+    public DatanodeDirectories(Path dataTargetDir, Path logsTargetDir, @Nullable Path configurationSourceDir, Path configurationTargetDir, @Nullable Path opensearchPluginsDir) {
         this.dataTargetDir = dataTargetDir;
         this.logsTargetDir = logsTargetDir;
         this.configurationSourceDir = configurationSourceDir;
         this.configurationTargetDir = configurationTargetDir;
+        this.opensearchPluginsDir = opensearchPluginsDir;
     }
 
     public static DatanodeDirectories fromConfiguration(Configuration configuration, NodeId nodeId) {
@@ -58,7 +58,8 @@ public class DatanodeDirectories {
                 backwardsCompatible(configuration.getOpensearchDataLocation(), nodeId, "opensearch_data_location"),
                 backwardsCompatible(configuration.getOpensearchLogsLocation(), nodeId, "opensearch_logs_location"),
                 configuration.getDatanodeConfigurationLocation(),
-                backwardsCompatible(configuration.getOpensearchConfigLocation(), nodeId, "opensearch_config_location")
+                backwardsCompatible(configuration.getOpensearchConfigLocation(), nodeId, "opensearch_config_location"),
+                configuration.getOpensearchPluginsDir()
         );
 
         LOG.info("Opensearch of the node {} uses following directories as its storage: {}", nodeId.getNodeId(), directories);
@@ -163,6 +164,10 @@ public class DatanodeDirectories {
     public Path createOpensearchProcessConfigurationFile(Path relativePath) throws IOException {
         final Path resolvedPath = getOpensearchProcessConfigurationDir().resolve(relativePath);
         return createRestrictedAccessFile(resolvedPath);
+    }
+
+    public Optional<Path> getOpensearchPluginsDir() {
+        return Optional.ofNullable(opensearchPluginsDir);
     }
 
     @Override
