@@ -16,6 +16,7 @@
  */
 package org.graylog.storage.opensearch2;
 
+import jakarta.inject.Inject;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.engine.QuerySuggestionsService;
 import org.graylog.plugins.views.search.engine.suggestions.SuggestionEntry;
@@ -27,11 +28,10 @@ import org.graylog2.plugin.Message;
 import org.opensearch.client.json.JsonData;
 import org.opensearch.client.opensearch._types.FieldValue;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
-import org.opensearch.client.opensearch.core.SearchRequest;
+import org.opensearch.client.opensearch.core.MsearchRequest;
+import org.opensearch.client.opensearch.core.msearch.MultisearchBody;
 import org.opensearch.client.opensearch.core.search.Suggest;
 import org.opensearch.client.opensearch.core.search.Suggester;
-
-import jakarta.inject.Inject;
 
 import java.util.List;
 import java.util.Map;
@@ -67,7 +67,7 @@ public class QuerySuggestionsOS2 implements QuerySuggestionsService {
                 .filter(filterBuilder -> filterBuilder.range(TimeRangeQueryFactory.create(req.timerange())))
                 .filter(filterBuilder -> filterBuilder.exists(existsBuilder -> existsBuilder.field(req.field())))
                 .filter(getPrefixQuery(req))));
-        final var searchRequest = SearchRequest.of(builder -> builder.index(affectedIndices.stream().toList())
+        final var searchRequest = MultisearchBody.of(builder -> builder
                 .size(0)
                 .query(query)
                 .suggest(suggestionBuilder)
@@ -76,8 +76,13 @@ public class QuerySuggestionsOS2 implements QuerySuggestionsService {
                                 .field(req.field())
                                 .size(req.size()))));
 
+        final MsearchRequest msearchRequest = new MsearchRequest.Builder().searches(searchesBuilder -> searchesBuilder
+                        .header(headerBuilder -> headerBuilder.index(affectedIndices.stream().toList()))
+                        .body(searchRequest))
+                .build();
         try {
-            final var result = client.singleSearch(searchRequest, "Failed to execute aggregation");
+            final var resultItem = client.search(msearchRequest, "Failed to execute aggregation");
+            final var result = resultItem.result();
             final var fieldValues = result.aggregations().get(AGG_FIELD_VALUES).sterms();
             final List<SuggestionEntry> entries = fieldValues.buckets().array()
                     .stream()
