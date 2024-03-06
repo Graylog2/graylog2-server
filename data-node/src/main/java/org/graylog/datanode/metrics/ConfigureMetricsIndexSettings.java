@@ -36,6 +36,7 @@ import org.graylog2.indexer.datastream.policy.actions.Action;
 import org.graylog2.indexer.datastream.policy.actions.DeleteAction;
 import org.graylog2.indexer.datastream.policy.actions.RolloverAction;
 import org.graylog2.indexer.datastream.policy.actions.RollupAction;
+import org.graylog2.indexer.datastream.policy.actions.TimesUnit;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,8 +46,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import static org.graylog2.indexer.datastream.policy.actions.RolloverActionFormatter.formatDaysDuration;
 
 public class ConfigureMetricsIndexSettings implements StateMachineTracer {
 
@@ -161,7 +160,7 @@ public class ConfigureMetricsIndexSettings implements StateMachineTracer {
         RollupAction rollupAction = new RollupAction(ismRollup);
         final List<Action> actions = ImmutableList.of(new Action(rollupAction));
         final List<Policy.Transition> transitions = ImmutableList.of(new Policy.Transition(nextState,
-                new Policy.Condition(formatDaysDuration(configuration.getMetricsRetention().toDays()))));
+                new Policy.Condition(TimesUnit.DAYS.format(configuration.getMetricsRetention().toDays()))));
         return new Policy.State("rollup", actions, transitions);
     }
 
