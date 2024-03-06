@@ -51,6 +51,23 @@ describe('<EntityFilters />', () => {
       ],
     },
     {
+      id: 'type',
+      title: 'Type',
+      type: 'STRING',
+      sortable: true,
+      filterable: true,
+      filter_options: [
+        {
+          value: 'string',
+          title: 'String (aggregatable)',
+        },
+        {
+          value: 'long',
+          title: 'Number',
+        },
+      ],
+    },
+    {
       id: 'index_set_id',
       filterable: true,
       related_collection: 'index_sets',
@@ -64,6 +81,8 @@ describe('<EntityFilters />', () => {
       type: 'DATE',
     },
   ] as Attributes;
+
+  const dropdownIsHidden = (dropdownTitle: string) => expect(screen.queryByRole('heading', { name: new RegExp(dropdownTitle, 'i') })).not.toBeInTheDocument();
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -108,6 +127,7 @@ describe('<EntityFilters />', () => {
       ));
 
       await waitFor(() => expect(setUrlQueryFilters).toHaveBeenCalledWith(OrderedMap({ disabled: ['false'] })));
+      await waitFor(() => dropdownIsHidden('create filter'));
     });
 
     it('should update active filter on click', async () => {
@@ -139,6 +159,30 @@ describe('<EntityFilters />', () => {
       ));
 
       await waitFor(() => expect(setUrlQueryFilters).toHaveBeenCalledWith(OrderedMap({ disabled: ['true'] })));
+    });
+
+    it('should prevent creating multiple filter for boolean value', async () => {
+      asMock(useFiltersWithTitle).mockReturnValue({
+        data: OrderedMap({ disabled: [{ title: 'Running', value: 'false' }] }),
+        onChange: onChangeFiltersWithTitle,
+        isInitialLoading: false,
+      });
+
+      render(
+        <EntityFilters attributes={attributes}
+                       setUrlQueryFilters={() => {}}
+                       urlQueryFilters={OrderedMap({ disabled: ['false'] })} />,
+      );
+
+      await screen.findByTestId('disabled-filter-false');
+
+      userEvent.click(await screen.findByRole('button', {
+        name: /create filter/i,
+      }));
+
+      const statusElement = await screen.findByRole('menuitem', { name: /status/i });
+
+      await waitFor(() => expect(statusElement).toBeDisabled());
     });
   });
 
@@ -183,6 +227,7 @@ describe('<EntityFilters />', () => {
       ));
 
       await waitFor(() => expect(setUrlQueryFilters).toHaveBeenCalledWith(OrderedMap({ index_set_id: ['index-set-1'] })));
+      await waitFor(() => dropdownIsHidden('create filter'));
     });
 
     it('should update active filter', async () => {
@@ -222,6 +267,7 @@ describe('<EntityFilters />', () => {
       ));
 
       await waitFor(() => expect(setUrlQueryFilters).toHaveBeenCalledWith(OrderedMap({ index_set_id: ['index-set-2'] })));
+      await waitFor(() => dropdownIsHidden('edit index set filter'));
     });
   });
 
@@ -244,6 +290,11 @@ describe('<EntityFilters />', () => {
       }));
 
       const timeRangeForm = await screen.findByTestId('time-range-form');
+
+      const fromInput = within(timeRangeForm).getByRole('textbox', { name: /from/i });
+      userEvent.clear(fromInput);
+      userEvent.paste(fromInput, '2020-01-01 00:55:00.000');
+
       const submitButton = within(timeRangeForm).getByRole('button', {
         name: /create filter/i,
       });
@@ -260,6 +311,7 @@ describe('<EntityFilters />', () => {
       ));
 
       await waitFor(() => expect(setUrlQueryFilters).toHaveBeenCalledWith(OrderedMap({ created_at: ['2019-12-31T23:55:00.000+00:00><'] })));
+      await waitFor(() => dropdownIsHidden('create created filter'));
     });
 
     it('should update active filter', async () => {
@@ -308,6 +360,37 @@ describe('<EntityFilters />', () => {
       ));
 
       await waitFor(() => expect(setUrlQueryFilters).toHaveBeenCalledWith(OrderedMap({ created_at: ['2019-12-31T23:55:00.001+00:00><'] })));
+      await waitFor(() => dropdownIsHidden('edit created filter'));
+    });
+  });
+
+  describe('string attribute', () => {
+    it('should prevent creating same filter multiple times', async () => {
+      const setUrlQueryFilters = jest.fn();
+
+      asMock(useFiltersWithTitle).mockReturnValue({
+        data: OrderedMap({ type: [{ title: 'String', value: 'string' }] }),
+        onChange: onChangeFiltersWithTitle,
+        isInitialLoading: false,
+      });
+
+      render(
+        <EntityFilters attributes={attributes}
+                       setUrlQueryFilters={setUrlQueryFilters}
+                       urlQueryFilters={OrderedMap({ type: ['string'] })} />,
+      );
+
+      await screen.findByTestId('type-filter-string');
+
+      userEvent.click(await screen.findByRole('button', {
+        name: /create filter/i,
+      }));
+
+      userEvent.click(await screen.findByRole('menuitem', {
+        name: /type/i,
+      }));
+
+      expect(screen.getByRole('menuitem', { name: /string/i })).toBeDisabled();
     });
   });
 

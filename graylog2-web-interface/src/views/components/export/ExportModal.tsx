@@ -31,6 +31,10 @@ import ExportWidgetSelection from 'views/components/export/ExportWidgetSelection
 import { MESSAGE_FIELD, SOURCE_FIELD, TIMESTAMP_FIELD } from 'views/Constants';
 import type { ExportSettings as ExportSettingsType } from 'views/components/ExportSettingsContext';
 import useSearchExecutionState from 'views/hooks/useSearchExecutionState';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import useLocation from 'routing/useLocation';
 
 import ExportSettings from './ExportSettings';
 import ExportStrategy from './ExportStrategy';
@@ -57,7 +61,7 @@ const _getInitialWidgetFields = (selectedWidget: Widget): OrderedSet<string> => 
   return OrderedSet(selectedWidget.config.fields);
 };
 
-const _getInitialFields = (selectedWidget) => {
+const _getInitialFields = (selectedWidget: Widget) => {
   const initialFields = selectedWidget ? _getInitialWidgetFields(selectedWidget) : DEFAULT_FIELDS;
 
   return initialFields.map((field) => ({ field })).toArray();
@@ -73,6 +77,8 @@ type FormState = {
 
 const ExportModal = ({ closeModal, view, directExportWidgetId }: Props) => {
   const executionState = useSearchExecutionState();
+  const location = useLocation();
+  const sendTelemetry = useSendTelemetry();
   const { state: viewStates } = view;
   const {
     shouldEnableDownload,
@@ -91,6 +97,11 @@ const ExportModal = ({ closeModal, view, directExportWidgetId }: Props) => {
   const singleWidgetDownload = !!directExportWidgetId;
 
   const _startDownload = ({ selectedWidget, selectedFields, limit, customSettings, format }: FormState) => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_EXPORT_DOWNLOADED, {
+      app_pathname: getPathnameWithoutId(location.pathname),
+      app_section: 'widget',
+    });
+
     setLoading(true);
 
     return startDownload(format, downloadFile, view, executionState, selectedWidget, selectedFields, limit, customSettings)
@@ -161,7 +172,7 @@ const ExportModal = ({ closeModal, view, directExportWidgetId }: Props) => {
                              isSubmitting={loading}
                              isAsyncSubmit
                              submitLoadingText="Downloading..."
-                             submitIcon="cloud-download-alt"
+                             submitIcon="download"
                              submitButtonText="Start Download" />
               </Modal.Footer>
             </Form>

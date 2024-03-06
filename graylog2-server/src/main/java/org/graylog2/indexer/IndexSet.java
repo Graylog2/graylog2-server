@@ -164,11 +164,40 @@ public interface IndexSet extends Comparable<IndexSet> {
     Optional<Integer> extractIndexNumber(String index);
 
     /**
+     * A {@link Comparator} that uses the index numbers for comparison.
+     *
+     * @return The Comparator
+     */
+    default Comparator<String> indexComparator() {
+        return (indexName1, indexName2) -> extractIndexNumber(indexName2).orElse(0)
+                .compareTo(extractIndexNumber(indexName1).orElse(0));
+    }
+
+    /**
      * The configuration for this index set.
      *
      * @return index set configuration object
      */
     IndexSetConfig getConfig();
+
+    default String getNthIndexBeforeActiveIndexSet(final int n) {
+        final String activeWriteIndex = getActiveWriteIndex();
+        if (activeWriteIndex != null) {
+            final Optional<Integer> deflectorNumber = extractIndexNumber(activeWriteIndex);
+            final String indexPrefix = getIndexPrefix();
+            return deflectorNumber
+                    .map(num -> {
+                        final int indexNumber = num - n;
+                        if (indexNumber >= 0) {
+                            return indexPrefix + MongoIndexSet.SEPARATOR + indexNumber;
+                        }
+                        return null;
+                    })
+                    .orElse(null);
+        }
+
+        return null;
+    }
 
     class IndexNameComparator implements Comparator<String> {
         private final IndexSet indexSet;

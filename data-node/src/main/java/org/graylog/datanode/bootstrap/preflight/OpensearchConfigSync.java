@@ -16,51 +16,55 @@
  */
 package org.graylog.datanode.bootstrap.preflight;
 
-import org.apache.logging.log4j.core.appender.rolling.action.DeletingVisitor;
-import org.apache.logging.log4j.core.appender.rolling.action.PathCondition;
-import org.graylog.datanode.Configuration;
+import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog2.bootstrap.preflight.PreflightCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
-import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.StandardCopyOption;
-import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Collections;
+import java.util.Set;
 
 public class OpensearchConfigSync implements PreflightCheck {
 
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchConfigSync.class);
 
-    private final Configuration configuration;
+    private final DatanodeConfiguration configuration;
 
     @Inject
-    public OpensearchConfigSync(Configuration configuration) {
-        this.configuration = configuration;
+    public OpensearchConfigSync(DatanodeConfiguration datanodeConfiguration) {
+        this.configuration = datanodeConfiguration;
     }
 
     @Override
     public void runCheck() throws PreflightCheckException {
-        final Path localOpensearchConfigDir = Path.of(configuration.getOpensearchConfigLocation()).resolve("opensearch");
-        LOG.info("Directory used for Opensearch configuration is {}", localOpensearchConfigDir.toAbsolutePath());
-
         try {
-            Files.createDirectories(localOpensearchConfigDir);
-            synchronizeConfig(Path.of("opensearch", "config"), localOpensearchConfigDir);
+
+            final Path opensearchProcessConfigurationDir = configuration.datanodeDirectories().createOpensearchProcessConfigurationDir();
+            LOG.info("Directory used for Opensearch process configuration is {}", opensearchProcessConfigurationDir.toAbsolutePath());
+
+            // this is a directory in main/resources that holds all the initial configuration files needed by the opensearch
+            // we manage this directory in git. Generally we assume that this is a read-only location and we need to copy
+            // its content to a read-write location for the managed opensearch process.
+            // This copy happens during each opensearch process start and will override any files that already exist
+            // from previous runs.
+            final Path sourceOfInitialConfiguration = Path.of("opensearch", "config");
+            synchronizeConfig(sourceOfInitialConfiguration, opensearchProcessConfigurationDir);
         } catch (IOException | URISyntaxException e) {
             throw new RuntimeException("Failed to prepare opensearch config directory", e);
-
         }
     }
 

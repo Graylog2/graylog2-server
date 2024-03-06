@@ -40,12 +40,12 @@ import static org.mockito.Mockito.when;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-                            MaxmindDataAdapterTest.CityDatabaseTest.class,
-                            MaxmindDataAdapterTest.CountryDatabaseTest.class,
-                            MaxmindDataAdapterTest.AsnDatabaseTest.class,
-                            MaxmindDataAdapterTest.IPinfoStandardLocationDatabaseTest.class,
-                            MaxmindDataAdapterTest.IPinfoASNDatabaseTest.class,
-                    })
+        MaxmindDataAdapterTest.CityDatabaseTest.class,
+        MaxmindDataAdapterTest.CountryDatabaseTest.class,
+        MaxmindDataAdapterTest.AsnDatabaseTest.class,
+        MaxmindDataAdapterTest.IPinfoStandardLocationDatabaseTest.class,
+        MaxmindDataAdapterTest.IPinfoASNDatabaseTest.class,
+})
 public class MaxmindDataAdapterTest {
     private static final String GEO_LITE2_CITY_MMDB = "/GeoLite2-City.mmdb";
     private static final String GEO_LITE2_COUNTRY_MMDB = "/GeoLite2-Country.mmdb";
@@ -78,7 +78,7 @@ public class MaxmindDataAdapterTest {
                     .path(getTestDatabasePath(DB_PATH.get(databaseType)))
                     .type("test")
                     .build();
-            adapter = new MaxmindDataAdapter("test", "test", config, new MetricRegistry());
+            adapter = new MaxmindDataAdapter("test", "test", config, false, new MetricRegistry());
 
             adapter.doStart();
         }
@@ -134,18 +134,18 @@ public class MaxmindDataAdapterTest {
         }
 
         @Test
-        public void doGetSuccessfullyResolvesGooglePublicDNSAddress() {
-            // This test will possibly get flaky when the entry for 8.8.8.8 changes!
-            final LookupResult lookupResult = adapter.doGet("8.8.8.8");
+        public void doGetSuccessfullyResolvesSomewhereInFranceDNSAddress() {
+            // This test will possibly get flaky when the entry for 91.91.252.10 changes!
+            final LookupResult lookupResult = adapter.doGet("91.91.252.10");
             assertThat(lookupResult.isEmpty()).isFalse();
             assertThat(lookupResult.multiValue())
                     .extracting("city")
                     .extracting("geoNameId")
-                    .isEqualTo(5375480);
+                    .isEqualTo(2983705L);
             assertThat(lookupResult.multiValue())
                     .extracting("location")
-                    .extracting("metroCode")
-                    .isEqualTo(807);
+                    .extracting("timeZone")
+                    .isEqualTo("Europe/Paris");
         }
 
         @Test
@@ -192,7 +192,7 @@ public class MaxmindDataAdapterTest {
             assertThat(lookupResult.multiValue())
                     .extracting("country")
                     .extracting("geoNameId")
-                    .isEqualTo(6252001);
+                    .isEqualTo(6252001L);
         }
 
         @Test
@@ -225,13 +225,13 @@ public class MaxmindDataAdapterTest {
         public void doGetSuccessfullyResolvesGooglePublicDNSAddress() {
             // This test will possibly get flaky when the entry for 8.8.8.8 changes!
             final LookupResult lookupResult = adapter.doGet("8.8.8.8");
-            assertThat(lookupResult.singleValue()).isEqualTo(15169);
+            assertThat(lookupResult.singleValue()).isEqualTo(15169L);
             assertThat(lookupResult.multiValue())
                     .extracting("as_number")
-                    .isEqualTo(15169);
+                    .isEqualTo(15169L);
             assertThat(lookupResult.multiValue())
                     .extracting("as_organization")
-                    .isEqualTo("Google LLC");
+                    .isEqualTo("GOOGLE");
         }
 
         @Test
@@ -284,7 +284,7 @@ public class MaxmindDataAdapterTest {
             assertThat(lookupResult.singleValue()).isNotNull().isEqualTo(15169L);
             assertThat(lookupResult.multiValue())
                     .extracting("asn", "asn_numeric", "name", "domain", "type", "route")
-                    .containsExactly("AS15169", 15169L, "Google LLC", "google.com", "business", "8.8.8.0/24");
+                    .containsExactly("AS15169", 15169L, "Google LLC", "google.com", "hosting", "8.8.8.0/24");
         }
 
         @Test

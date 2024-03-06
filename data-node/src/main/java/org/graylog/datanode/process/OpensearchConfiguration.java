@@ -17,25 +17,32 @@
 package org.graylog.datanode.process;
 
 import org.apache.commons.exec.OS;
+import org.graylog.datanode.OpensearchDistribution;
+import org.graylog.datanode.configuration.DatanodeDirectories;
+import org.graylog.datanode.configuration.S3RepositoryConfiguration;
 import org.graylog.datanode.configuration.variants.OpensearchSecurityConfiguration;
 import org.graylog.datanode.management.Environment;
 import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
 
-import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 public record OpensearchConfiguration(
-        Path opensearchDir,
-        Path opensearchConfigDir,
+        OpensearchDistribution opensearchDistribution,
+        DatanodeDirectories datanodeDirectories,
         String bindAddress,
         String hostname,
         int httpPort,
         int transportPort,
-        String clusterName, String nodeName, List<String> nodeRoles,
+        String clusterName,
+        String nodeName,
+        List<String> nodeRoles,
         List<String> discoverySeedHosts,
         OpensearchSecurityConfiguration opensearchSecurityConfiguration,
+        S3RepositoryConfiguration s3RepositoryConfiguration,
+
+        String nodeSearchCacheSize,
         Map<String, String> additionalConfiguration
 ) {
     public Map<String, String> asMap() {
@@ -58,9 +65,9 @@ public record OpensearchConfiguration(
         if (clusterName != null && !clusterName.isBlank()) {
             config.put("cluster.name", clusterName);
         }
-        if (nodeName != null && !nodeName.isBlank()) {
-            config.put("node.name", nodeName);
-        }
+
+        config.put("node.name", nodeName);
+
         if (nodeRoles != null && !nodeRoles.isEmpty()) {
             config.put("node.roles", toValuesList(nodeRoles));
         }
@@ -69,6 +76,11 @@ public record OpensearchConfiguration(
         }
 
         config.put("discovery.seed_providers", "file");
+
+        config.put("node.search.cache.size", nodeSearchCacheSize);
+        if(s3RepositoryConfiguration.isRepositoryEnabled()) {
+            config.putAll(s3RepositoryConfiguration.toOpensearchProperties());
+        }
 
         config.putAll(additionalConfiguration);
         return config;
@@ -80,7 +92,7 @@ public record OpensearchConfiguration(
 
     public Environment getEnv() {
         final Environment env = new Environment(System.getenv());
-        env.put("OPENSEARCH_PATH_CONF", opensearchConfigDir.resolve("opensearch").toAbsolutePath().toString());
+        env.put("OPENSEARCH_PATH_CONF", datanodeDirectories.getOpensearchProcessConfigurationDir().toString());
         return env;
     }
 

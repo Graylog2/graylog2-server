@@ -18,6 +18,7 @@ package org.graylog2.bootstrap.commands;
 
 import com.github.rvesse.airline.annotations.Command;
 import org.graylog2.commands.Server;
+import org.graylog2.migrations.MigrationType;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.Version;
 import org.jsoftbiz.utils.OS;
@@ -47,7 +48,7 @@ public class MigrateCmd extends Server {
         LOG.info("Arch: {}", os.getArch());
 
         try {
-            runMigrations();
+            runMigrations(this.injector, MigrationType.STANDARD);
         } catch (Exception e) {
             LOG.warn("Exception while running migrations", e);
             System.exit(1);

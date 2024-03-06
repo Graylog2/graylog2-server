@@ -21,4 +21,8 @@ public class CACreationException extends Exception {
     public CACreationException(String message, Throwable cause) {
         super(message, cause);
     }
+
+    public CACreationException(String message) {
+        super(message);
+    }
 }

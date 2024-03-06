@@ -156,6 +156,14 @@ export interface RetentionStrategyResponse {
   context: RetentionStrategyContext,
 }
 
+export type JsonSchema = RotationJsonSchema | RetentionJsonSchema
+
+export type Strategy = RotationStrategy | RetentionStrategy
+
+export type Strategies = Array<Strategy>
+
+export type StrategyConfig = RotationStrategyConfig | RetentionStrategyConfig
+
 export const RetentionStrategiesContextPropType = PropTypes.exact({
   max_index_retention_period: PropTypes.string,
 });

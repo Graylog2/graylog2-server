@@ -20,13 +20,12 @@ import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.bouncycastle.operator.OperatorException;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
-import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.cluster.preflight.DataNodeProvisioningService;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Optional;
@@ -50,19 +49,18 @@ public class CsrMongoStorage {
     }
 
 
-    public Optional<PKCS10CertificationRequest> readCsr(String nodeId) throws IOException, OperatorException {
-        final DataNodeProvisioningConfig preflightConfig = mongoService.getPreflightConfigFor(nodeId);
-        if (preflightConfig != null) {
-            final String csr = preflightConfig.csr();
-
-            if (csr != null) {
-                Reader pemReader = new BufferedReader(new StringReader(csr));
-                PEMParser pemParser = new PEMParser(pemReader);
-                Object parsedObj = pemParser.readObject();
-                if (parsedObj instanceof PKCS10CertificationRequest) {
-                    return Optional.of((PKCS10CertificationRequest) parsedObj);
-                }
-            }
+    public Optional<PKCS10CertificationRequest> readCsr(String nodeId) throws IOException {
+        final var nodeCsr = mongoService.getPreflightConfigFor(nodeId)
+                .flatMap(cfg -> Optional.ofNullable(cfg.csr()));
+        if (nodeCsr.isEmpty()) {
+            return Optional.empty();
+        }
+        final var csr = nodeCsr.get();
+        final var pemReader = new BufferedReader(new StringReader(csr));
+        final var pemParser = new PEMParser(pemReader);
+        final var parsedObj = pemParser.readObject();
+        if (parsedObj instanceof PKCS10CertificationRequest) {
+            return Optional.of((PKCS10CertificationRequest) parsedObj);
         }
         return Optional.empty();
     }

@@ -39,6 +39,4 @@ public class GraylogSchemaFields {
     public static final String FIELD_ILLUMINATE_GIM_TAGS = "gim_tags";
     public static final String FIELD_ILLUMINATE_GIM_VERSION = "gim_version";
 
-    public static final String FIELD_ASSOCIATED_ASSETS = "associated_assets";
-
 }

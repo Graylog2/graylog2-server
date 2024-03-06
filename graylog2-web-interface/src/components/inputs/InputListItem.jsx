@@ -27,6 +27,7 @@ import { EntityListItem, IfPermitted, LinkToNode, Spinner } from 'components/com
 import { ConfigurationWell } from 'components/configurationforms';
 import PermissionsMixin from 'util/PermissionsMixin';
 import Routes from 'routing/Routes';
+import recentMessagesTimeRange from 'util/TimeRangeHelper';
 import {
   InputForm,
   InputStateBadge,
@@ -38,6 +39,9 @@ import {
 import { InputsActions } from 'stores/inputs/InputsStore';
 import { InputTypesStore } from 'stores/inputs/InputTypesStore';
 import withTelemetry from 'logic/telemetry/withTelemetry';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import withLocation from 'routing/withLocation';
 
 const InputListItem = createReactClass({
   // eslint-disable-next-line react/no-unused-class-component-methods
@@ -49,13 +53,14 @@ const InputListItem = createReactClass({
     currentNode: PropTypes.object.isRequired,
     permissions: PropTypes.array.isRequired,
     sendTelemetry: PropTypes.func.isRequired,
+    location: PropTypes.object.isRequired,
   },
 
   mixins: [PermissionsMixin, Reflux.connect(InputTypesStore)],
 
   _deleteInput() {
-    this.props.sendTelemetry('click', {
-      app_pathname: 'inputs',
+    this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.INPUT_DELETED, {
+      app_pathname: getPathnameWithoutId(this.props.location.pathname),
       app_action_value: 'input-delete',
     });
 
@@ -70,14 +75,20 @@ const InputListItem = createReactClass({
   },
 
   _editInput() {
+    const { sendTelemetry, location } = this.props;
     this.configurationForm.open();
+
+    sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.INPUT_EDIT_CLICKED, {
+      app_pathname: getPathnameWithoutId(location.pathname),
+      app_action_value: 'show-received-messages',
+    });
   },
 
   _updateInput(data) {
     InputsActions.update(this.props.input.id, data);
 
-    this.props.sendTelemetry('form_submit', {
-      app_pathname: 'inputs',
+    this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.INPUT_UPDATED, {
+      app_pathname: getPathnameWithoutId(this.props.location.pathname),
       app_action_value: 'input-edit',
     });
   },
@@ -87,7 +98,7 @@ const InputListItem = createReactClass({
       return <Spinner />;
     }
 
-    const { input, sendTelemetry } = this.props;
+    const { input, sendTelemetry, location } = this.props;
     const definition = this.state.inputDescriptions[input.type];
 
     const titleSuffix = (
@@ -106,10 +117,10 @@ const InputListItem = createReactClass({
     if (this.isPermitted(this.props.permissions, ['searches:relative'])) {
       actions.push(
         <LinkContainer key={`received-messages-${this.props.input.id}`}
-                       to={Routes.search(`${queryField}:${this.props.input.id}`, { relative: 0 })}>
+                       to={Routes.search(`${queryField}:${this.props.input.id}`, recentMessagesTimeRange())}>
           <Button onClick={() => {
-            sendTelemetry('click', {
-              app_pathname: 'inputs',
+            sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.SHOW_RECEIVED_MESSAGES_CLICKED, {
+              app_pathname: getPathnameWithoutId(location.pathname),
               app_action_value: 'show-received-messages',
             });
           }}>
@@ -132,8 +143,8 @@ const InputListItem = createReactClass({
         actions.push(
           <LinkContainer key={`manage-extractors-${this.props.input.id}`} to={extractorRoute}>
             <Button onClick={() => {
-              sendTelemetry('click', {
-                app_pathname: 'inputs',
+              sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.MANAGE_EXTRACTORS_CLICKED, {
+                app_pathname: getPathnameWithoutId(location.pathname),
                 app_action_value: 'manage-extractors',
               });
             }}>
@@ -153,8 +164,8 @@ const InputListItem = createReactClass({
         <LinkContainer to={Routes.filtered_metrics(this.props.input.node, this.props.input.id)}>
           <MenuItem key={`show-metrics-${this.props.input.id}`}
                     onClick={() => {
-                      sendTelemetry('click', {
-                        app_pathname: 'inputs',
+                      sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.SHOW_METRICS_CLICKED, {
+                        app_pathname: getPathnameWithoutId(location.pathname),
                         app_action_value: 'show-metrics',
                       });
                     }}>
@@ -254,4 +265,4 @@ const InputListItem = createReactClass({
   },
 });
 
-export default withTelemetry(InputListItem);
+export default withLocation(withTelemetry(InputListItem));

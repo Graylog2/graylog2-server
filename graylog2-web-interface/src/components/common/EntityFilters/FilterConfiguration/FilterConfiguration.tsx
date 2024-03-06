@@ -48,7 +48,8 @@ export const FilterConfiguration = ({
     {isAttributeWithFilterOptions(attribute) && (
       <StaticOptionsList attribute={attribute}
                          filterValueRenderer={filterValueRenderer}
-                         onSubmit={onSubmit} />
+                         onSubmit={onSubmit}
+                         allActiveFilters={allActiveFilters} />
     )}
     {isAttributeWithRelatedCollection(attribute) && (
       <SuggestionsList attribute={attribute}

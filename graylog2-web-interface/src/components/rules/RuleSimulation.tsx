@@ -24,6 +24,7 @@ import type { RuleType } from 'stores/rules/RulesStore';
 import useLocation from 'routing/useLocation';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { getPathnameWithoutId } from 'util/URLUtils';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import { DEFAULT_SIMULATOR_JSON_MESSAGE, PipelineRulesContext } from './RuleContext';
 import type { RuleBuilderRule } from './rule-builder/types';
@@ -99,7 +100,7 @@ const RuleSimulation = ({ rule: currentRule, onSaveMessage }: Props) => {
   };
 
   const handleRunRuleSimulation = () => {
-    sendTelemetry('Pipeline Run Rule Simulation Clicked', {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.RUN_RULE_SIMULATION_CLICKED, {
       app_pathname: getPathnameWithoutId(pathname),
       app_section: 'pipeline-rule-simulation',
       app_action_value: 'run-rule-simulation-button',
@@ -110,7 +111,7 @@ const RuleSimulation = ({ rule: currentRule, onSaveMessage }: Props) => {
   };
 
   const handleResetRuleSimulation = () => {
-    sendTelemetry('Pipeline Reset Rule Simulation Clicked', {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.RESET_RULE_SIMULATION_CLICKED, {
       app_pathname: getPathnameWithoutId(pathname),
       app_section: 'pipeline-rule-simulation',
       app_action_value: 'reset-rule-simulation-button',

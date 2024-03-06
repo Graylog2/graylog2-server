@@ -39,6 +39,9 @@ export type TelemetryDataType = {
   search_cluster?: {
     [key: string]: string,
   },
+  data_nodes?: {
+    data_nodes_count: number,
+  }
 }
 
 const useTelemetryData = () => useQuery([TELEMETRY_CLUSTER_INFO_QUERY_KEY], () => Telemetry.get() as Promise<TelemetryDataType>, {

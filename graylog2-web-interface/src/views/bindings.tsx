@@ -43,7 +43,7 @@ import EventHandler from 'views/logic/searchtypes/events/EventHandler';
 import Widget from 'views/logic/widgets/Widget';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
-import DataTable from 'views/components/datatable/DataTable';
+import DataTable from 'views/components/datatable';
 import FieldStatisticsHandler from 'views/logic/fieldactions/FieldStatisticsHandler';
 import ExcludeFromQueryHandler from 'views/logic/valueactions/ExcludeFromQueryHandler';
 import { isFunction } from 'views/logic/aggregationbuilder/Series';
@@ -361,7 +361,7 @@ const exports: PluginExports = {
   widgetCreators: [{
     title: 'Message Count',
     func: CreateMessageCount,
-    icon: () => <Icon name="hashtag" />,
+    icon: () => <Icon name="tag" />,
   }, {
     title: 'Message Table',
     func: CreateMessagesWidget,
@@ -369,7 +369,7 @@ const exports: PluginExports = {
   }, {
     title: 'Custom Aggregation',
     func: CreateCustomAggregation,
-    icon: () => <Icon name="chart-column" />,
+    icon: () => <Icon name="monitoring" />,
   }],
   creators: [
     {

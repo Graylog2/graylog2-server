@@ -25,7 +25,8 @@ import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetFieldTypeSummary;
 import org.graylog2.streams.StreamService;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -51,7 +52,7 @@ public class IndexSetFieldTypeSummaryService {
             EntityAttribute.builder().id(INDEX_SET_ID).title("Index Set Id").hidden(true).sortable(true).build(),
             EntityAttribute.builder().id(INDEX_SET_TITLE).title("Index Set Title").sortable(true).build(),
             EntityAttribute.builder().id(STREAM_TITLES).title("Stream Titles").sortable(false).build(),
-            EntityAttribute.builder().id(FIELD_TYPE_HISTORY).title("Field Type History").sortable(false).build()
+            EntityAttribute.builder().id(FIELD_TYPE_HISTORY).title("Current Types").sortable(false).build()
     );
 
     private final IndexFieldTypesService indexFieldTypesService;

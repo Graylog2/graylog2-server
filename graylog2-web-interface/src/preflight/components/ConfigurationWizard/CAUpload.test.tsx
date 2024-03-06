@@ -80,7 +80,7 @@ describe('CAUpload', () => {
   });
 
   it('should show error when CA upload fails', async () => {
-    asMock(fetchMultiPartFormData).mockImplementation(() => Promise.reject(new Error('Error')));
+    asMock(fetchMultiPartFormData).mockRejectedValue(new Error('Something bad happened'));
 
     renderPreflight(
       <DefaultQueryClientProvider options={{ logger }}>
@@ -99,6 +99,6 @@ describe('CAUpload', () => {
       false,
     ));
 
-    expect(UserNotification.error).toHaveBeenCalledWith('CA upload failed with error: Error: Error');
+    expect(UserNotification.error).toHaveBeenCalledWith('CA upload failed with error: Error: Something bad happened');
   });
 });

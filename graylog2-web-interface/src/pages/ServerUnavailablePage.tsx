@@ -110,9 +110,9 @@ const ServerUnavailablePage = ({ server }: Props) => {
   return (
     <DocumentTitle title="Server unavailable">
       <LoginChrome>
-        <Modal show>
+        <Modal show onHide={() => {}}>
           <Modal.Header>
-            <Modal.Title><Icon name="exclamation-triangle" /> {modalTitle}</Modal.Title>
+            <Modal.Title><Icon name="warning" /> {modalTitle}</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <div>
@@ -133,7 +133,7 @@ const ServerUnavailablePage = ({ server }: Props) => {
                         onClick={_toggleDetails}
                         bsSize="sm">
                   {showDetails ? 'Less details' : 'More details'}
-                  <StyledIcon name={showDetails ? 'chevron-up' : 'chevron-down'} />
+                  <StyledIcon name={showDetails ? 'expand_less' : 'expand_more'} />
                 </Button>
                 {_formatErrorMessage()}
               </div>

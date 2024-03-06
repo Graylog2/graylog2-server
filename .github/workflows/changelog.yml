@@ -1,0 +1,17 @@
+name: "Changelog Check"
+
+on:
+  pull_request:
+    types:
+      - "opened"
+      - "synchronize"
+      - "reopened"
+      - "edited"
+
+jobs:
+  test:
+    name: "Check Changelog presence"
+    runs-on: "ubuntu-latest"
+
+    steps:
+      - uses: "Graylog2/actions/changelog-check@main"

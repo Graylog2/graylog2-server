@@ -23,21 +23,36 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
+import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.bool;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
 
 public class IsDouble extends AbstractFunction<Boolean> {
     public static final String NAME = "is_double";
 
     private final ParameterDescriptor<Object, Object> valueParam;
+    private final ParameterDescriptor<Boolean, Boolean> conversionParam;
 
     public IsDouble() {
         valueParam = object("value").ruleBuilderVariable().description("Value to check").build();
+        conversionParam = bool("attemptConversion").optional().description("Try to convert value to double from its string representation").build();
     }
 
     @Override
     public Boolean evaluate(FunctionArgs args, EvaluationContext context) {
         final Object value = valueParam.required(args, context);
-        return value instanceof Double;
+        final boolean convert = conversionParam.optional(args, context).orElse(false);
+        if (!convert) {
+            return value instanceof Double;
+        }
+        if (value instanceof Double) {
+            return true;
+        }
+        try {
+            Double.parseDouble(String.valueOf(value));
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 
     @Override
@@ -45,7 +60,7 @@ public class IsDouble extends AbstractFunction<Boolean> {
         return FunctionDescriptor.<Boolean>builder()
                 .name(NAME)
                 .returnType(Boolean.class)
-                .params(valueParam)
+                .params(valueParam, conversionParam)
                 .description("Checks whether a value is a floating point value (of type double)")
                 .ruleBuilderEnabled(false)
                 .ruleBuilderName("Check if double")

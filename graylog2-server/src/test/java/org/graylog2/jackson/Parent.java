@@ -19,7 +19,6 @@ package org.graylog2.jackson;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.google.auto.value.AutoValue;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NONE, include = JsonTypeInfo.As.PROPERTY, property = Parent.FIELD_VERSION)
 @JsonSubTypes({
@@ -36,7 +35,6 @@ public interface Parent {
     @JsonProperty(FIELD_TEXT)
     String text();
 
-    @AutoValue.Builder
     interface ParentBuilder<SELF> {
         @JsonProperty(FIELD_VERSION)
         SELF version(String version);

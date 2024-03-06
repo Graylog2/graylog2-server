@@ -18,7 +18,6 @@ package org.graylog.security.certutil.csr;
 
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.GeneralName;
@@ -26,7 +25,6 @@ import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
-import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
 import org.graylog.security.certutil.csr.exceptions.CSRGenerationException;
 import org.graylog.security.certutil.privatekey.PrivateKeyEncryptedStorage;
@@ -54,19 +52,18 @@ public class CsrGenerator {
                                                   final List<String> altNames,
                                                   final PrivateKeyEncryptedStorage privateKeyEncryptedStorage) throws CSRGenerationException {
         try {
-            KeyPairGenerator keyGen = KeyPairGenerator.getInstance(KEY_GENERATION_ALGORITHM);
-            java.security.KeyPair certKeyPair = keyGen.generateKeyPair();
+            final var keyGen = KeyPairGenerator.getInstance(KEY_GENERATION_ALGORITHM);
+            final var certKeyPair = keyGen.generateKeyPair();
 
             privateKeyEncryptedStorage.writeEncryptedKey(privateKeyPassword, certKeyPair.getPrivate());
 
-
-            PKCS10CertificationRequestBuilder p10Builder = new JcaPKCS10CertificationRequestBuilder(
+            final var p10Builder = new JcaPKCS10CertificationRequestBuilder(
                     new X500Principal("CN=" + principalName),
                     certKeyPair.getPublic()
             );
 
-            var names = new ArrayList<>(List.of(principalName));
-            if(altNames != null) {
+            final var names = new ArrayList<>(List.of(principalName));
+            if (altNames != null) {
                 names.addAll(altNames);
             }
 

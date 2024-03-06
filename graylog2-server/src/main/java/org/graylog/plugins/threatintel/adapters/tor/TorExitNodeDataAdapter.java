@@ -38,9 +38,9 @@ import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
 import org.graylog2.plugin.lookup.LookupResult;
 import org.joda.time.Duration;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -89,13 +89,13 @@ public class TorExitNodeDataAdapter extends LookupDataAdapter {
             throw new AdapterDisabledException("TOR service is disabled, not starting TOR exit addresses adapter. To enable it please go to System / Configurations.");
         }
         final Response torExitNodeListResponse = this.client.newCall(new Request.Builder()
-                .get()
-                .url(new HttpUrl.Builder()
-                        .scheme("https")
-                        .host("check.torproject.org")
-                        .addPathSegment("exit-addresses")
+                        .get()
+                        .url(new HttpUrl.Builder()
+                                .scheme("https")
+                                .host("check.torproject.org")
+                                .addPathSegment("exit-addresses")
+                                .build())
                         .build())
-                .build())
                 .execute();
 
         final ResponseBody body = torExitNodeListResponse.body();
@@ -105,7 +105,8 @@ public class TorExitNodeDataAdapter extends LookupDataAdapter {
     }
 
     @Override
-    protected void doStop() throws Exception {}
+    protected void doStop() throws Exception {
+    }
 
     @Override
     public Duration refreshInterval() {
@@ -127,7 +128,7 @@ public class TorExitNodeDataAdapter extends LookupDataAdapter {
         if (value != null) {
             final StringJoiner stringJoiner = new StringJoiner(", ");
             value.forEach(stringJoiner::add);
-            return LookupResult.multi(stringJoiner.toString(), new HashMap<Object, Object>() {{ put("node_ids", value); }});
+            return LookupResult.multi(stringJoiner.toString(), Map.of("node_ids", value));
         } else {
             return LookupResult.empty();
         }

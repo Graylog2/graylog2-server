@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.Configuration;
+import org.joda.time.Period;
 
 import java.nio.file.Path;
 
@@ -100,6 +101,9 @@ public abstract class ExposedConfiguration {
     @JsonProperty("stale_leader_timeout")
     public abstract int staleLeaderTimeout();
 
+    @JsonProperty("minimum_auto_refresh_interval")
+    public abstract Period minimumAutoRefreshInterval();
+
     public static ExposedConfiguration create(Configuration configuration) {
         return create(
                 configuration.getInputbufferProcessors(),
@@ -119,7 +123,8 @@ public abstract class ExposedConfiguration {
                 configuration.getStreamProcessingTimeout(),
                 configuration.getStreamProcessingMaxFaults(),
                 configuration.getOutputModuleTimeout(),
-                configuration.getStaleLeaderTimeout());
+                configuration.getStaleLeaderTimeout(),
+                configuration.getMinimumAutoRefreshInterval());
     }
 
     @JsonCreator
@@ -141,7 +146,8 @@ public abstract class ExposedConfiguration {
             @JsonProperty("stream_processing_timeout") long streamProcessingTimeout,
             @JsonProperty("stream_processing_max_faults") int streamProcessingMaxFaults,
             @JsonProperty("output_module_timeout") long outputModuleTimeout,
-            @JsonProperty("stale_leader_timeout") int staleLeaderTimeout) {
+            @JsonProperty("stale_leader_timeout") int staleLeaderTimeout,
+            @JsonProperty("minimum_auto_refresh_interval") Period minimumAutoRefreshInterval) {
         return new AutoValue_ExposedConfiguration(
                 inputBufferProcessors,
                 processBufferProcessors,
@@ -160,7 +166,8 @@ public abstract class ExposedConfiguration {
                 streamProcessingTimeout,
                 streamProcessingMaxFaults,
                 outputModuleTimeout,
-                staleLeaderTimeout);
+                staleLeaderTimeout,
+                minimumAutoRefreshInterval);
     }
 
 }

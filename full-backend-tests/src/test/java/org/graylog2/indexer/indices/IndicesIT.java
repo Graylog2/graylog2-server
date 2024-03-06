@@ -24,7 +24,6 @@ import com.google.common.eventbus.Subscribe;
 import org.apache.commons.codec.binary.Base64;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.containermatrix.MongodbServer;
-import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog.testing.elasticsearch.ContainerMatrixElasticsearchBaseTest;
@@ -40,6 +39,7 @@ import org.graylog2.indexer.MessageIndexTemplateProvider;
 import org.graylog2.indexer.TestIndexSet;
 import org.graylog2.indexer.cluster.Node;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
 import org.graylog2.indexer.indices.events.IndicesClosedEvent;
 import org.graylog2.indexer.indices.events.IndicesDeletedEvent;
@@ -56,6 +56,7 @@ import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.junit.Test;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -81,7 +82,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 // these tests only test the SearchServer, so there is only one MongoDB-version necessary (needed, to launch the tests)
-@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, mongoVersions = MongodbServer.MONGO5)
+@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS)
 public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
     private static final String INDEX_NAME = "graylog_0";
     private static final IndexSetConfig indexSetConfig = IndexSetConfig.builder()
@@ -122,7 +123,8 @@ public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
                 nodeId,
                 new NullAuditEventSender(),
                 eventBus,
-                searchServer().adapters().indicesAdapter()
+                searchServer().adapters().indicesAdapter(),
+                mock(IndexFieldTypeProfileService.class)
         );
     }
 
@@ -376,7 +378,8 @@ public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
                 nodeId,
                 new NullAuditEventSender(),
                 eventBus,
-                searchServer().adapters().indicesAdapter());
+                searchServer().adapters().indicesAdapter(),
+                mock(IndexFieldTypeProfileService.class));
 
         assertThatCode(() -> indices.ensureIndexTemplate(indexSet)).doesNotThrowAnyException();
 
@@ -408,7 +411,8 @@ public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
                 nodeId,
                 new NullAuditEventSender(),
                 eventBus,
-                searchServer().adapters().indicesAdapter());
+                searchServer().adapters().indicesAdapter(),
+                mock(IndexFieldTypeProfileService.class));
 
         assertThatCode(() -> indices.ensureIndexTemplate(indexSet))
                 .isExactlyInstanceOf(IndexTemplateNotFoundException.class)
@@ -638,6 +642,21 @@ public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
         indices.cycleAlias(deflector, index2, index1);
 
         assertThat(indices.exists(index1)).isTrue();
+    }
+
+    @ContainerMatrixTest
+    public void getIndexShardsInfo() {
+        client().createIndex("1shard1replica", 1, 1);
+        List<ShardsInfo> shardsInfo = indices.getShardsInfo("1shard1replica");
+        assertThat(shardsInfo.size()).isEqualTo(2);
+        assertThat(shardsInfo.stream()
+                .filter(info -> info.shardType() == ShardsInfo.ShardType.PRIMARY)
+                .findFirst())
+                .isNotEmpty();
+        assertThat(shardsInfo.stream()
+                .filter(info -> info.shardType() == ShardsInfo.ShardType.REPLICA)
+                .findFirst())
+                .isNotEmpty();
     }
 
     public static final class IndicesEventListener {

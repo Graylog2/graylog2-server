@@ -21,6 +21,10 @@ import { Select } from 'components/common';
 import { Button, ButtonToolbar, Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/bootstrap';
 import EventNotificationFormContainer
   from 'components/event-notifications/event-notification-form/EventNotificationFormContainer';
+import withTelemetry from 'logic/telemetry/withTelemetry';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import withLocation from 'routing/withLocation';
 
 import commonStyles from '../common/commonStyles.css';
 
@@ -30,36 +34,76 @@ class AddNotificationForm extends React.Component {
     onChange: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
     hasCreationPermissions: PropTypes.bool,
+    sendTelemetry: PropTypes.func.isRequired,
+    location: PropTypes.object.isRequired,
   };
 
   static defaultProps = {
     hasCreationPermissions: false,
   };
 
-  state = {
-    selectedNotification: undefined,
-    displayNewNotificationForm: false,
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      selectedNotification: undefined,
+      displayNewNotificationForm: false,
+    };
+  }
 
   handleNewNotificationSubmit = (promise) => {
+    this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_NOTIFICATIONS.DONE_CLICKED, {
+      app_pathname: getPathnameWithoutId(this.props.location.pathname),
+      app_section: 'event-definition-notifications',
+      app_action_value: 'done-button',
+    });
+
     const { onChange } = this.props;
 
     promise.then((notification) => onChange(notification.id));
   };
 
   handleSubmit = () => {
+    this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_NOTIFICATIONS.DONE_CLICKED, {
+      app_pathname: getPathnameWithoutId(this.props.location.pathname),
+      app_section: 'event-definition-notifications',
+      app_action_value: 'done-button',
+    });
+
     const { onChange } = this.props;
     const { selectedNotification } = this.state;
 
     onChange(selectedNotification);
   };
 
+  handleCancel = () => {
+    this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_NOTIFICATIONS.CANCEL_CLICKED, {
+      app_pathname: getPathnameWithoutId(this.props.location.pathname),
+      app_section: 'event-definition-notifications',
+      app_action_value: 'cancel-button',
+    });
+
+    this.props.onCancel();
+  };
+
   handleSelectNotificationChange = (nextNotificationId) => {
     if (nextNotificationId === 'create') {
+      this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_NOTIFICATIONS.CREATE_NEW_CLICKED, {
+        app_pathname: getPathnameWithoutId(this.props.location.pathname),
+        app_section: 'event-definition-notifications',
+        app_action_value: 'create-new-option',
+      });
+
       this.setState({ displayNewNotificationForm: true });
 
       return;
     }
+
+    this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_NOTIFICATIONS.NOTIFICATION_SELECTED, {
+      app_pathname: getPathnameWithoutId(this.props.location.pathname),
+      app_section: 'event-definition-notifications',
+      app_action_value: 'existing-notification-option',
+    });
 
     this.setState({ selectedNotification: nextNotificationId, displayNewNotificationForm: false });
   };
@@ -79,11 +123,11 @@ class AddNotificationForm extends React.Component {
   };
 
   render() {
-    const { notifications, onCancel } = this.props;
+    const { notifications } = this.props;
     const { displayNewNotificationForm, selectedNotification } = this.state;
     const doneButton = displayNewNotificationForm
-      ? <Button bsStyle="primary" type="submit" form="new-notification-form">Done</Button>
-      : <Button bsStyle="primary" onClick={this.handleSubmit}>Done</Button>;
+      ? <Button bsStyle="success" type="submit" form="new-notification-form">Add notification</Button>
+      : <Button bsStyle="success" onClick={this.handleSubmit}>Add notification</Button>;
 
     return (
       <Row>
@@ -115,7 +159,7 @@ class AddNotificationForm extends React.Component {
 
           <ButtonToolbar>
             {doneButton}
-            <Button onClick={onCancel}>Cancel</Button>
+            <Button onClick={this.handleCancel}>Cancel</Button>
           </ButtonToolbar>
         </Col>
       </Row>
@@ -123,4 +167,4 @@ class AddNotificationForm extends React.Component {
   }
 }
 
-export default AddNotificationForm;
+export default withLocation(withTelemetry(AddNotificationForm));

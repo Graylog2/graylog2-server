@@ -17,7 +17,7 @@
 import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
-import type { FeedITem } from 'components/content-stream/hook/useContentStream';
+import type { FeedItem } from 'components/content-stream/hook/useContentStream';
 import mockComponent from 'helpers/mocking/MockComponent';
 import ContentStreamNews from 'components/content-stream/ContentStreamNews';
 import { asMock } from 'helpers/mocking';
@@ -25,7 +25,7 @@ import useContentStream from 'components/content-stream/hook/useContentStream';
 
 jest.mock('components/common/carousel/Carousel', () => mockComponent('MockCarousel'));
 
-jest.mock('components/content-stream/news/ContentStreamNewsItem', () => ({ feed }: { feed: FeedITem }) => <div>{feed.title}</div>);
+jest.mock('components/content-stream/news/ContentStreamNewsItem', () => ({ feed }: { feed: FeedItem }) => <div>{feed.title}</div>);
 
 const useContentMock = {
   feedList: [

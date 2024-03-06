@@ -28,6 +28,7 @@ import org.graylog2.indexer.MessageIndexTemplateProvider;
 import org.graylog2.indexer.TestIndexSet;
 import org.graylog2.indexer.cluster.Node;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
@@ -98,7 +99,8 @@ public abstract class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
                 new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000"),
                 new NullAuditEventSender(),
                 mock(EventBus.class),
-                createIndicesAdapter()
+                createIndicesAdapter(),
+                mock(IndexFieldTypeProfileService.class)
         );
         final Configuration withStreamAwarenessOff = spy(new Configuration());
         doReturn(false).when(withStreamAwarenessOff).maintainsStreamAwareFieldTypes();
@@ -250,6 +252,7 @@ public abstract class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
                 FieldTypeDTO.builder().fieldName("full_message").physicalType("text").build(),
                 FieldTypeDTO.builder().fieldName("gl2_receive_timestamp").physicalType("date").build(),
                 FieldTypeDTO.builder().fieldName("gl2_processing_timestamp").physicalType("date").build(),
+                FieldTypeDTO.builder().fieldName("gl2_processing_duration_ms").physicalType("integer").build(),
                 FieldTypeDTO.builder().fieldName("gl2_message_id").physicalType("keyword").build(),
                 FieldTypeDTO.builder().fieldName("gl2_accounted_message_size").physicalType("long").build()
         );

@@ -17,19 +17,18 @@
 package org.graylog2.configuration;
 
 import com.google.common.base.Suppliers;
-import org.graylog2.bootstrap.preflight.PreflightConfig;
 import org.graylog2.bootstrap.preflight.PreflightConfigResult;
 import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.cluster.Node;
-import org.graylog2.cluster.NodeService;
+import org.graylog2.cluster.nodes.DataNodeDto;
+import org.graylog2.cluster.nodes.NodeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+
 import java.net.URI;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -39,14 +38,14 @@ public class RunsWithDataNodeDiscoveryProvider implements Provider<Boolean> {
 
     private static final Logger LOG = LoggerFactory.getLogger(RunsWithDataNodeDiscoveryProvider.class);
     private final PreflightConfigService preflightConfigService;
-    private final NodeService nodeService;
+    private final NodeService<DataNodeDto> nodeService;
 
     private final Supplier<Boolean> resultsCachingSupplier;
 
     @Inject
     public RunsWithDataNodeDiscoveryProvider(
             PreflightConfigService preflightConfigService,
-            NodeService nodeService) {
+            NodeService<DataNodeDto> nodeService) {
         this.preflightConfigService = preflightConfigService;
         this.nodeService = nodeService;
         this.resultsCachingSupplier = Suppliers.memoize(this::doGet);
@@ -58,9 +57,7 @@ public class RunsWithDataNodeDiscoveryProvider implements Provider<Boolean> {
     }
 
     private Boolean doGet() {
-        final PreflightConfigResult preflightResult = preflightConfigService.getPersistedConfig()
-                .map(PreflightConfig::result)
-                .orElse(PreflightConfigResult.UNKNOWN);
+        final PreflightConfigResult preflightResult = preflightConfigService.getPreflightConfigResult();
 
         // if preflight is finished, we assume that there will be some datanode registered via node-service.
         if (preflightResult == PreflightConfigResult.FINISHED) {
@@ -75,7 +72,7 @@ public class RunsWithDataNodeDiscoveryProvider implements Provider<Boolean> {
     }
 
     private List<URI> discover() {
-        return nodeService.allActive(Node.Type.DATANODE).values().stream()
+        return nodeService.allActive().values().stream()
                 .map(Node::getTransportAddress)
                 .map(URI::create)
                 .collect(Collectors.toList());

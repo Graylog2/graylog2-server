@@ -21,7 +21,6 @@ import { ShareButton, IfPermitted, HoverForHelp } from 'components/common';
 import { ButtonToolbar, MenuItem } from 'components/bootstrap';
 import type { Stream, StreamRule } from 'stores/streams/StreamsStore';
 import StreamsStore from 'stores/streams/StreamsStore';
-import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import { StartpageStore } from 'stores/users/StartpageStore';
@@ -31,9 +30,10 @@ import EntityShareModal from 'components/permissions/EntityShareModal';
 import { StreamRulesStore } from 'stores/streams/StreamRulesStore';
 import useCurrentUser from 'hooks/useCurrentUser';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
-import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import { MORE_ACTIONS_TITLE, MORE_ACTIONS_HOVER_TITLE } from 'components/common/EntityDataTable/Constants';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
+import MoreActions from 'components/common/EntityDataTable/MoreActions';
 
 import StreamModal from '../StreamModal';
 
@@ -51,6 +51,7 @@ const StreamActions = ({
   indexSets: Array<IndexSet>,
 }) => {
   const currentUser = useCurrentUser();
+  const { deselectEntity } = useSelectedEntities();
   const [showEntityShareModal, setShowEntityShareModal] = useState(false);
   const [showStreamRuleModal, setShowStreamRuleModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
@@ -62,9 +63,12 @@ const StreamActions = ({
   const isDefaultStream = stream.is_default;
   const isNotEditable = !stream.is_editable;
   const onToggleStreamStatus = useCallback(async () => {
-    sendTelemetry('input_button_toggle', {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_STATUS_TOGGLED, {
       app_pathname: 'streams',
       app_action_value: ' stream-item-status',
+      event_details: {
+        enabled: !stream.disabled,
+      },
     });
 
     setChangingStatus(true);
@@ -82,72 +86,72 @@ const StreamActions = ({
   }, [sendTelemetry, stream.disabled, stream.id, stream.title]);
 
   const toggleEntityShareModal = useCallback(() => {
-    sendTelemetry('click', {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_SHARE_MODAL_OPENED, {
       app_pathname: 'streams',
-      app_action_value: 'stream-item-share',
     });
 
     setShowEntityShareModal((cur) => !cur);
   }, [sendTelemetry]);
 
   const toggleUpdateModal = useCallback(() => {
-    sendTelemetry('click', {
-      app_pathname: 'streams',
-      app_action_value: 'stream-item-update',
-    });
-
     setShowUpdateModal((cur) => !cur);
-  }, [sendTelemetry]);
+  }, []);
 
   const toggleCloneModal = useCallback(() => {
-    sendTelemetry('click', {
-      app_pathname: 'streams',
-      app_action_value: 'stream-item-clone',
-    });
-
     setShowCloneModal((cur) => !cur);
-  }, [sendTelemetry]);
+  }, []);
 
   const toggleStreamRuleModal = useCallback(() => {
-    sendTelemetry('click', {
-      app_pathname: 'streams',
-      app_action_value: 'stream-item-rule',
-    });
-
     setShowStreamRuleModal((cur) => !cur);
-  }, [sendTelemetry]);
+  }, []);
 
   const onDelete = useCallback(() => {
-    sendTelemetry('click', {
-      app_pathname: 'streams',
-      app_action_value: 'stream-item-delete',
-    });
-
     // eslint-disable-next-line no-alert
     if (window.confirm('Do you really want to remove this stream?')) {
-      StreamsStore.remove(stream.id, (response) => {
-        UserNotification.success(`Stream '${stream.title}' was deleted successfully.`, 'Success');
+      sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_DELETED, {
+        app_pathname: 'streams',
+        app_action_value: 'stream-item-delete',
+      });
 
-        return response;
+      StreamsStore.remove(stream.id).then(() => {
+        deselectEntity(stream.id);
+        UserNotification.success(`Stream '${stream.title}' was deleted successfully.`, 'Success');
       }).catch((error) => {
         UserNotification.error(`An error occurred while deleting the stream. ${error}`);
       });
     }
-  }, [sendTelemetry, stream.id, stream.title]);
+  }, [deselectEntity, sendTelemetry, stream.id, stream.title]);
 
-  const onSaveStreamRule = useCallback((_streamRuleId: string, streamRule: StreamRule) => StreamRulesStore.create(stream.id, streamRule, () => UserNotification.success('Stream rule was created successfully.', 'Success')), [stream.id]);
+  const onSaveStreamRule = useCallback((_streamRuleId: string, streamRule: StreamRule) => StreamRulesStore.create(stream.id, streamRule, () => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_RULE_SAVED, {
+      app_pathname: 'streams',
+      app_action_value: 'stream-item-rule',
+    });
+
+    UserNotification.success('Stream rule was created successfully.', 'Success');
+  }), [sendTelemetry, stream.id]);
 
   const onUpdate = useCallback((newStream: Stream) => StreamsStore.update(stream.id, newStream, (response) => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_UPDATED, {
+      app_pathname: 'streams',
+    });
+
     UserNotification.success(`Stream '${newStream.title}' was updated successfully.`, 'Success');
 
     return response;
-  }), [stream.id]);
+  }), [sendTelemetry, stream.id]);
 
-  const onCloneSubmit = useCallback((newStream: Stream) => StreamsStore.cloneStream(stream.id, newStream, (response) => {
-    UserNotification.success(`Stream was successfully cloned as '${newStream.title}'.`, 'Success');
+  const onCloneSubmit = useCallback((newStream: Stream) => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.STREAM_ITEM_CLONED, {
+      app_pathname: 'streams',
+    });
 
-    return response;
-  }), [stream.id]);
+    return StreamsStore.cloneStream(stream.id, newStream, (response) => {
+      UserNotification.success(`Stream was successfully cloned as '${newStream.title}'.`, 'Success');
+
+      return response;
+    });
+  }, [sendTelemetry, stream.id]);
 
   return (
     <ButtonToolbar>
@@ -155,14 +159,9 @@ const StreamActions = ({
                    entityType="stream"
                    onClick={toggleEntityShareModal}
                    bsSize="xsmall" />
-      <OverlayDropdownButton title={MORE_ACTIONS_TITLE}
-                             bsSize="xsmall"
-                             buttonTitle={MORE_ACTIONS_HOVER_TITLE}
-                             disabled={isNotEditable}
-                             dropdownZIndex={1000}>
+      <MoreActions disabled={isNotEditable}>
         <IfPermitted permissions={[`streams:changestate:${stream.id}`, `streams:edit:${stream.id}`]} anyPermissions>
-          <MenuItem bsStyle="success"
-                    onSelect={onToggleStreamStatus}
+          <MenuItem onSelect={onToggleStreamStatus}
                     disabled={isDefaultStream || isNotEditable}>
             {changingStatus
               ? <span>{stream.disabled ? 'Starting Stream...' : 'Stopping Stream...'}</span>
@@ -186,27 +185,21 @@ const StreamActions = ({
         </IfPermitted>
 
         <IfPermitted permissions={[`streams:edit:${stream.id}`]}>
-          <LinkContainer to={Routes.stream_edit(stream.id)}>
-            <MenuItem disabled={isDefaultStream || isNotEditable}>
-              Manage Rules {isDefaultStream && <DefaultStreamHelp />}
-            </MenuItem>
-          </LinkContainer>
+          <MenuItem disabled={isDefaultStream || isNotEditable} href={Routes.stream_edit(stream.id)}>
+            Manage Rules {isDefaultStream && <DefaultStreamHelp />}
+          </MenuItem>
         </IfPermitted>
         <HideOnCloud>
           <IfPermitted permissions="stream_outputs:read">
-            <LinkContainer to={Routes.stream_outputs(stream.id)}>
-              <MenuItem>
-                Manage Outputs
-              </MenuItem>
-            </LinkContainer>
+            <MenuItem href={Routes.stream_outputs(stream.id)}>
+              Manage Outputs
+            </MenuItem>
           </IfPermitted>
         </HideOnCloud>
         <IfPermitted permissions={`streams:edit:${stream.id}`}>
-          <LinkContainer to={Routes.stream_alerts(stream.id)}>
-            <MenuItem>
-              Manage Alerts
-            </MenuItem>
-          </LinkContainer>
+          <MenuItem href={Routes.stream_alerts(stream.id)}>
+            Manage Alerts
+          </MenuItem>
         </IfPermitted>
 
         <IfPermitted permissions={`streams:edit:${stream.id}`}>
@@ -228,7 +221,7 @@ const StreamActions = ({
             Delete this stream {isDefaultStream && <DefaultStreamHelp />}
           </MenuItem>
         </IfPermitted>
-      </OverlayDropdownButton>
+      </MoreActions>
       {showUpdateModal && (
         <StreamModal title="Editing Stream"
                      onSubmit={onUpdate}

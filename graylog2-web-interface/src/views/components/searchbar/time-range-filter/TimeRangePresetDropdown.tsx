@@ -29,6 +29,10 @@ import type { TimeRange } from 'views/logic/queries/Query';
 import ToolsStore from 'stores/tools/ToolsStore';
 import type { SearchesConfig } from 'components/search/SearchConfig';
 import { isTypeRelativeWithEnd } from 'views/typeGuards/timeRange';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import useLocation from 'routing/useLocation';
+import type { BsSize } from 'components/bootstrap/types';
 
 type PresetOption = {
   eventKey?: TimeRange,
@@ -41,7 +45,7 @@ const ExternalIcon = styled(Icon)`
   margin-left: 6px;
 `;
 
-const AdminMenuItem = styled(MenuItem)(({ theme }) => css`
+const AdminMenuItem: React.ComponentType<React.ComponentProps<typeof MenuItem>> = styled(MenuItem)(({ theme }) => css`
   font-size: ${theme.fonts.size.small};
 `);
 
@@ -117,29 +121,38 @@ type Props = {
   onToggle?: (open: boolean) => void,
   className?: string,
   displayTitle?: boolean,
-  bsSize?: string,
+  bsSize?: BsSize,
   header: string,
   disabled?: boolean,
   onChange?: (timerange: TimeRange) => void,
 };
 
-const TimeRangePresetDropdown = ({ disabled, onChange, onToggle: onToggleProp, className, displayTitle, bsSize, header }: Props) => {
+const TimeRangePresetDropdown = ({
+  disabled,
+  onChange,
+  onToggle: onToggleProp,
+  className,
+  displayTitle,
+  bsSize,
+  header,
+}: Props) => {
   const sendTelemetry = useSendTelemetry();
   const { formatTime } = useUserDateTime();
+  const location = useLocation();
   const { options, setOptions: setDropdownOptions } = usePresetOptions(disabled);
 
-  const _onChange = useCallback((timerange: TimeRange) => {
+  const _onChange = useCallback((timerange: any) => {
     if (timerange !== null && timerange !== undefined) {
-      sendTelemetry('input_value_change', {
-        app_pathname: 'search',
-        app_section: 'search-bar',
-        app_action_value: 'timerange-preset-selector',
-        event_details: { timerange },
-      });
-
       onChange(onInitializingTimerange(timerange, formatTime));
     }
-  }, [formatTime, onChange, sendTelemetry]);
+
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_TIMERANGE_PRESET_SELECTED, {
+      app_pathname: getPathnameWithoutId(location.pathname),
+      app_section: 'search-bar',
+      app_action_value: 'timerange-preset-selector',
+      event_details: { timerange },
+    });
+  }, [formatTime, location.pathname, onChange, sendTelemetry]);
 
   const onToggle = useCallback(async (isOpen: boolean) => {
     if (typeof onToggleProp === 'function') {
@@ -158,13 +171,12 @@ const TimeRangePresetDropdown = ({ disabled, onChange, onToggle: onToggleProp, c
                     bsSize={bsSize}
                     className={className}
                     onToggle={onToggle}
-                    onMouseDown={onMouseDown}
-                    onSelect={_onChange}>
+                    onMouseDown={onMouseDown}>
       {header && (
         <MenuItem header>{header}</MenuItem>
       )}
       {options ? options.map(({ eventKey, key, disabled: isDisabled, label }) => (
-        <MenuItem eventKey={eventKey} key={key} disabled={isDisabled}>
+        <MenuItem key={key} disabled={isDisabled} onClick={() => _onChange(eventKey)}>
           {label}
         </MenuItem>
       )) : (
@@ -175,7 +187,7 @@ const TimeRangePresetDropdown = ({ disabled, onChange, onToggle: onToggleProp, c
       <IfPermitted permissions="clusterconfigentry:edit">
         <MenuItem divider />
         <AdminMenuItem href="/system/configurations" target="_blank">
-          Configure presets <ExternalIcon name="external-link-alt" />
+          Configure presets <ExternalIcon name="open_in_new" />
         </AdminMenuItem>
       </IfPermitted>
     </DropdownButton>

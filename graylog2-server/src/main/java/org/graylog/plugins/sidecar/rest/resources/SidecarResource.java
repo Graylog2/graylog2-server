@@ -58,24 +58,27 @@ import org.graylog2.shared.rest.resources.RestResource;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-import javax.inject.Inject;
-import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.EntityTag;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.inject.Inject;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.HeaderParam;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.EntityTag;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -151,9 +154,9 @@ public class SidecarResource extends RestResource implements PluginRestResource 
                                         @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                         @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
                                         @ApiParam(name = "sort",
-                                                value = "The field to sort the result on",
-                                                required = true,
-                                                allowableValues = "title,description,name,id")
+                                                  value = "The field to sort the result on",
+                                                  required = true,
+                                                  allowableValues = "title,description,name,id")
                                         @DefaultValue(Sidecar.FIELD_NODE_NAME) @QueryParam("sort") String sort,
                                         @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
                                         @DefaultValue("asc") @QueryParam("order") String order,
@@ -194,7 +197,7 @@ public class SidecarResource extends RestResource implements PluginRestResource 
     @Timed
     @Path("/{sidecarId}")
     @ApiOperation(value = "Create/update a Sidecar registration",
-            notes = "This is a stateless method which upserts a Sidecar registration")
+                  notes = "This is a stateless method which upserts a Sidecar registration")
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "The supplied request is not valid.")
     })

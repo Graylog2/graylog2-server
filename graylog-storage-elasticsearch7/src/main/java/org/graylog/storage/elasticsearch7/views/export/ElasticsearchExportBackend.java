@@ -22,8 +22,11 @@ import org.graylog.plugins.views.search.export.ExportBackend;
 import org.graylog.plugins.views.search.export.ExportMessagesCommand;
 import org.graylog.plugins.views.search.export.SimpleMessage;
 import org.graylog.plugins.views.search.export.SimpleMessageChunk;
+import org.graylog.plugins.views.search.searchfilters.db.UsedSearchFiltersToQueryStringsMapper;
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.IndicesOptions;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.TermsQueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.SearchHit;
@@ -36,8 +39,10 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -63,11 +68,17 @@ public class ElasticsearchExportBackend implements ExportBackend {
     private final RequestStrategy requestStrategy;
     private final boolean allowLeadingWildcard;
 
+    private final UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper;
+
     @Inject
-    public ElasticsearchExportBackend(IndexLookup indexLookup, RequestStrategy requestStrategy, @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard) {
+    public ElasticsearchExportBackend(IndexLookup indexLookup,
+                                      RequestStrategy requestStrategy,
+                                      @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard,
+                                      final UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper) {
         this.indexLookup = indexLookup;
         this.requestStrategy = requestStrategy;
         this.allowLeadingWildcard = allowLeadingWildcard;
+        this.usedSearchFiltersToQueryStringsMapper = usedSearchFiltersToQueryStringsMapper;
     }
 
     @Override
@@ -127,17 +138,28 @@ public class ElasticsearchExportBackend implements ExportBackend {
     }
 
     private QueryBuilder queryFrom(ExportMessagesCommand command) {
-        return boolQuery()
-                .filter(queryStringFilter(command))
+        final BoolQueryBuilder boolQueryBuilder = boolQuery()
+                .filter(queryStringFilter(command.queryString()))
                 .filter(timestampFilter(command))
                 .filter(streamsFilter(command));
+
+        final Collection<UsedSearchFilter> usedSearchFilters = command.usedSearchFilters();
+        if (usedSearchFilters != null) {
+            usedSearchFiltersToQueryStringsMapper.map(usedSearchFilters)
+                    .forEach(filterQueryString -> boolQueryBuilder.filter(queryStringFilter(filterQueryString)));
+        }
+        return boolQueryBuilder;
     }
 
-    private QueryBuilder queryStringFilter(ExportMessagesCommand command) {
-        ElasticsearchQueryString backendQuery = command.queryString();
+    private QueryBuilder queryStringFilter(final ElasticsearchQueryString backendQuery) {
         return backendQuery.isEmpty() ?
                 matchAllQuery() :
                 queryStringQuery(backendQuery.queryString()).allowLeadingWildcard(allowLeadingWildcard);
+    }
+
+    private QueryBuilder queryStringFilter(final String queryString) {
+        ElasticsearchQueryString backendQuery = ElasticsearchQueryString.of(queryString);
+        return queryStringFilter(backendQuery);
     }
 
     private QueryBuilder timestampFilter(ExportMessagesCommand command) {
@@ -180,35 +202,5 @@ public class ElasticsearchExportBackend implements ExportBackend {
                 .collect(toCollection(LinkedHashSet::new));
     }
 
-    private SimpleMessage buildHitWithAllFields(Map source, String index, DateTimeZone timeZone) {
-        LinkedHashMap<String, Object> fields = new LinkedHashMap<>();
 
-        for (Object key : source.keySet()) {
-            String name = (String) key;
-            Object value = valueFrom(source, name, timeZone);
-            fields.put(name, value);
-        }
-
-        // _id is needed, because the old decorators implementation relies on it
-        fields.put("_id", UUID.randomUUID().toString());
-
-        return SimpleMessage.from(index, fields);
-    }
-
-    private Object valueFrom(Map source, String name, DateTimeZone timeZone) {
-        if (name.equals(Message.FIELD_TIMESTAMP)) {
-            return fixTimestampFormat(source.get(Message.FIELD_TIMESTAMP), timeZone);
-        }
-        return source.get(name);
-    }
-
-    private Object fixTimestampFormat(Object rawTimestamp, DateTimeZone timeZone) {
-        try {
-            final DateTime parsed = ES_DATE_FORMAT_FORMATTER.parseDateTime(String.valueOf(rawTimestamp));
-            return parsed.withZone(timeZone).toString();
-        } catch (IllegalArgumentException e) {
-            LOG.warn("Could not parse timestamp {}", rawTimestamp, e);
-            return rawTimestamp;
-        }
-    }
 }

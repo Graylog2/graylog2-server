@@ -21,10 +21,13 @@ import { Button, Input } from 'components/bootstrap';
 import UserNotification from 'util/UserNotification';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import { GrokPatternsStore } from 'stores/grok-patterns/GrokPatternsStore';
+import withTelemetry from 'logic/telemetry/withTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 class BulkLoadPatternModal extends React.Component {
   static propTypes = {
     onSuccess: PropTypes.func.isRequired,
+    sendTelemetry: PropTypes.func,
   };
 
   constructor(props) {
@@ -57,6 +60,12 @@ class BulkLoadPatternModal extends React.Component {
       GrokPatternsStore.bulkImport(request, importStrategy).then(() => {
         UserNotification.success('Grok Patterns imported successfully', 'Success!');
         this._closeModal();
+
+        this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.GROK_PATTERN.IMPORTED, {
+          app_pathname: 'grokpatterns',
+          app_section: 'grokpatterns',
+        });
+
         onSuccess();
       });
     };
@@ -108,4 +117,8 @@ class BulkLoadPatternModal extends React.Component {
   }
 }
 
-export default BulkLoadPatternModal;
+BulkLoadPatternModal.defaultProps = {
+  sendTelemetry: () => {},
+};
+
+export default withTelemetry(BulkLoadPatternModal);

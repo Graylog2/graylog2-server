@@ -29,9 +29,10 @@ import { CollectorConfigurationsActions } from 'stores/sidecars/CollectorConfigu
 import { CollectorsActions } from 'stores/sidecars/CollectorsStore';
 import ConfigurationHelper from 'components/sidecars/configuration-forms/ConfigurationHelper';
 import useHistory from 'routing/useHistory';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import SourceViewModal from './SourceViewModal';
-import ImportsViewModal from './ImportsViewModal';
 import ConfigurationTagsSelect from './ConfigurationTagsSelect';
 
 import type { Collector, Configuration, ConfigurationSidecarsResponse } from '../types';
@@ -61,9 +62,9 @@ const ConfigurationForm = ({
   const [error, setError] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
   const [showPreviewModal, setShowPreviewModal] = useState(false);
-  const [showUploadsModal, setShowUploadsModal] = useState(false);
   const defaultTemplates = useRef({});
   const history = useHistory();
+  const sendTelemetry = useSendTelemetry();
 
   useEffect(() => {
     CollectorsActions.all().then((response) => setCollectors(response.collectors));
@@ -87,7 +88,14 @@ const ConfigurationForm = ({
     });
   };
 
-  const _save = () => {
+  const _save = async () => {
+    const isCreate = action === 'create';
+
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SIDECARS[`CONFIGURATION_${isCreate ? 'CREATED' : 'UPDATED'}`], {
+      app_pathname: 'sidecars',
+      app_section: 'configuration',
+    });
+
     if (_hasErrors()) {
       // Ensure we display an error on the template field, as this is not validated by the browser
       _validateFormData(formData, true);
@@ -95,12 +103,16 @@ const ConfigurationForm = ({
       return;
     }
 
-    if (action === 'create') {
-      CollectorConfigurationsActions.createConfiguration(formData)
+    let promise;
+
+    if (isCreate) {
+      promise = CollectorConfigurationsActions.createConfiguration(formData)
         .then(() => history.push(Routes.SYSTEM.SIDECARS.CONFIGURATION));
     } else {
-      CollectorConfigurationsActions.updateConfiguration(formData);
+      promise = CollectorConfigurationsActions.updateConfiguration(formData);
     }
+
+    await promise;
   };
 
   const _debouncedValidateFormData = debounce(_validateFormData, 200);
@@ -173,16 +185,8 @@ const ConfigurationForm = ({
       nextFormData.template = defaultTemplate;
     }
 
+    _debouncedValidateFormData(nextFormData, true);
     setFormData(nextFormData);
-  };
-
-  const _onTemplateImport = (nextTemplate) => {
-    const nextFormData = cloneDeep(formData);
-
-    // eslint-disable-next-line no-alert
-    if (!nextFormData.template || window.confirm('Do you want to overwrite your current work with this Configuration?')) {
-      _onTemplateChange(nextTemplate);
-    }
   };
 
   const _onSubmit = (event) => {
@@ -196,10 +200,6 @@ const ConfigurationForm = ({
 
   const _onShowSource = () => {
     setShowPreviewModal(true);
-  };
-
-  const _onShowImports = () => {
-    setShowUploadsModal(true);
   };
 
   const _formatCollector = (collector) => (collector ? `${collector.name} on ${upperFirst(collector.node_operating_system)}` : 'Unknown collector');
@@ -324,12 +324,6 @@ const ConfigurationForm = ({
                         onClick={_onShowSource}>
                   Preview
                 </Button>
-                <Button className="pull-right"
-                        bsStyle="link"
-                        bsSize="sm"
-                        onClick={_onShowImports}>
-                  Migrate
-                </Button>
                 <HelpBlock>
                   {_formatValidationMessage('template', 'Required. Collector configuration, see quick reference for more information.')}
                 </HelpBlock>
@@ -347,9 +341,6 @@ const ConfigurationForm = ({
           <SourceViewModal showModal={showPreviewModal}
                            onHide={() => setShowPreviewModal(false)}
                            templateString={formData.template} />
-          <ImportsViewModal showModal={showUploadsModal}
-                            onHide={() => setShowUploadsModal(false)}
-                            onApply={_onTemplateImport} />
         </div>
       </Col>
       <Col md={6}>

@@ -27,7 +27,7 @@ public class PeriodToRelativeRangeConverter implements Function<Period, Relative
     public RelativeRange apply(final Period period) {
         if (period != null) {
             return RelativeRange.Builder.builder()
-                    .from(period.toStandardSeconds().getSeconds())
+                    .from(period.withYears(0).withMonths(0).plusDays(period.getYears() * 365).plusDays(period.getMonths() * 30).toStandardSeconds().getSeconds())
                     .build();
         } else {
             return null;

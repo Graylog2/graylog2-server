@@ -20,6 +20,8 @@ import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import com.mongodb.BasicDBObject;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import one.util.streamex.StreamEx;
 import org.bson.types.ObjectId;
 import org.graylog.scheduler.capabilities.SchedulerCapabilitiesService;
@@ -30,6 +32,7 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.utilities.MongoQueryUtils;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.mongojack.DBCursor;
 import org.mongojack.DBQuery;
 import org.mongojack.DBQuery.Query;
@@ -39,8 +42,6 @@ import org.mongojack.JacksonDBCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -76,6 +77,7 @@ public class DBJobTriggerService {
     private static final String FIELD_UPDATED_AT = JobTriggerDto.FIELD_UPDATED_AT;
     private static final String FIELD_TRIGGERED_AT = JobTriggerDto.FIELD_TRIGGERED_AT;
     private static final String FIELD_CONSTRAINTS = JobTriggerDto.FIELD_CONSTRAINTS;
+    private static final String FIELD_LAST_EXECUTION_TIME = JobTriggerDto.FIELD_EXECUTION_DURATION;
 
     private static final String FIELD_JOB_DEFINITION_TYPE = JobTriggerDto.FIELD_JOB_DEFINITION_TYPE;
 
@@ -398,7 +400,7 @@ public class DBJobTriggerService {
                 //       That next status would need to be set on release.
                 DBQuery.is(FIELD_STATUS, JobTriggerStatus.RUNNING)
         );
-        final DBUpdate.Builder update = DBUpdate.set(FIELD_LOCK_OWNER, null);
+        final DBUpdate.Builder update = DBUpdate.unset(FIELD_LOCK_OWNER);
 
         // An empty next time indicates that this trigger should not be fired anymore. (e.g. for "once" schedules)
         if (triggerUpdate.nextTime().isPresent()) {
@@ -415,6 +417,10 @@ public class DBJobTriggerService {
         if (triggerUpdate.data().isPresent()) {
             update.set(FIELD_DATA, triggerUpdate.data());
         }
+        trigger.triggeredAt().ifPresent(triggeredAt -> {
+            var duration = new org.joda.time.Duration(triggeredAt, DateTime.now(DateTimeZone.UTC));
+            update.set(FIELD_LAST_EXECUTION_TIME, Optional.of(duration.getMillis()));
+        });
 
         final int changedDocs = db.update(query, update).getN();
         if (changedDocs > 1) {
@@ -439,7 +445,7 @@ public class DBJobTriggerService {
                 DBQuery.is(FIELD_LOCK_OWNER, nodeId),
                 DBQuery.is(FIELD_STATUS, JobTriggerStatus.RUNNING)
         );
-        final DBUpdate.Builder update = DBUpdate.set(FIELD_LOCK_OWNER, null)
+        final DBUpdate.Builder update = DBUpdate.unset(FIELD_LOCK_OWNER)
                 .set(FIELD_STATUS, JobTriggerStatus.RUNNABLE);
 
         return db.updateMulti(query, update).getN();
@@ -459,7 +465,7 @@ public class DBJobTriggerService {
                 DBQuery.is(FIELD_LOCK_OWNER, nodeId),
                 DBQuery.is(FIELD_ID, getId(trigger))
         );
-        final DBUpdate.Builder update = DBUpdate.set(FIELD_LOCK_OWNER, null)
+        final DBUpdate.Builder update = DBUpdate.unset(FIELD_LOCK_OWNER)
                 .set(FIELD_STATUS, JobTriggerStatus.ERROR);
 
         return db.update(query, update).getN() > 0;
@@ -481,6 +487,7 @@ public class DBJobTriggerService {
 
     /**
      * Update the job progress on a trigger
+     *
      * @param trigger  the trigger to update
      * @param progress the job progress in percent (0-100)
      */
@@ -492,7 +499,8 @@ public class DBJobTriggerService {
 
     /**
      * Cancel a JobTrigger that matches a query
-     * @param query  the db query
+     *
+     * @param query the db query
      * @return an Optional of the trigger that was cancelled. Empty if no matching trigger was found.
      */
     public Optional<JobTriggerDto> cancelTriggerByQuery(Query query) {
@@ -503,7 +511,8 @@ public class DBJobTriggerService {
 
     /**
      * Find triggers by using the provided query. Use judiciously!
-     * @param query  The query
+     *
+     * @param query The query
      * @return All found JobTriggers
      */
     public List<JobTriggerDto> findByQuery(Query query) {

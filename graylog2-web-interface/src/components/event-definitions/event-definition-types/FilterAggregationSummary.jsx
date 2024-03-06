@@ -102,6 +102,24 @@ class FilterAggregationSummary extends React.Component {
     );
   };
 
+  renderSearchFilters = () => {
+    const { filters } = this.props.config;
+
+    if (!filters || filters.length === 0) {
+      return <dd>No filters configured</dd>;
+    }
+
+    return (
+      <dd>
+        {filters.map((filter) => (
+          <div key={filter.id}>
+            {filter.title ? `${filter.title} -> ` : null}<code>{filter.queryString}</code>
+          </div>
+        ))}
+      </dd>
+    );
+  };
+
   render() {
     const { config, currentUser } = this.props;
     const {
@@ -122,8 +140,8 @@ class FilterAggregationSummary extends React.Component {
     const searchWithin = extractDurationAndUnit(searchWithinMs, TIME_UNITS);
     const executeEvery = extractDurationAndUnit(executeEveryMs, TIME_UNITS);
 
-    const effectiveStreamIds = streams.filter((s) => isPermitted(currentUser.permissions, `streams:read:${s}`));
-    const streamIdsWithMissingPermission = streams.filter((s) => !effectiveStreamIds.includes(s));
+    const effectiveStreamIds = streams?.filter((s) => isPermitted(currentUser.permissions, `streams:read:${s}`));
+    const streamIdsWithMissingPermission = streams?.filter((s) => !effectiveStreamIds.includes(s));
 
     const validationResults = validateExpression(conditions.expression, series);
 
@@ -134,6 +152,8 @@ class FilterAggregationSummary extends React.Component {
         <dt>Search Query</dt>
         <dd>{query || '*'}</dd>
         {queryParameters.length > 0 && renderQueryParameters(queryParameters)}
+        <dt>Search Filters</dt>
+        {this.renderSearchFilters()}
         <dt>Streams</dt>
         <dd className={styles.streamList}>{this.renderStreams(effectiveStreamIds, streamIdsWithMissingPermission)}</dd>
         <dt>Search within</dt>

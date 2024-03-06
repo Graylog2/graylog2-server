@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useCallback } from 'react';
 import PropTypes from 'prop-types';
+import styled, { css } from 'styled-components';
 
 import Spinner from 'components/common/Spinner';
 import { widgetDefinition } from 'views/logic/Widgets';
@@ -25,6 +26,14 @@ import { Position } from 'views/components/widgets/WidgetPropTypes';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { getPathnameWithoutId } from 'util/URLUtils';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+
+const StyledIconButton = styled(IconButton)<{ $stretched: boolean }>(({ $stretched }) => css`
+  span {
+    position: relative;
+    left: ${$stretched ? '-1px' : 0};
+  }
+`);
 
 type PositionType = {
   col: number,
@@ -52,7 +61,7 @@ const WidgetHorizontalStretch = ({ onStretch, position, widgetId, widgetType }: 
       id: widgetId, col, row, height, width: width === Infinity ? defaultWidth : Infinity,
     });
 
-    sendTelemetry('click', {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.SEARCH_WIDGET_HORIZONTAL_STRETCH, {
       app_pathname: getPathnameWithoutId(pathname),
       app_section: 'search-widget',
       app_action_value: 'widget-stretch-button',
@@ -65,11 +74,15 @@ const WidgetHorizontalStretch = ({ onStretch, position, widgetId, widgetType }: 
 
   const { width } = position;
   const stretched = width === Infinity;
-  const icon = stretched ? 'compress' : 'arrows-alt-h';
+  const icon = stretched ? 'compress' : 'width';
   const title = stretched ? 'Compress width' : 'Stretch width';
 
   return (
-    <IconButton onClick={onClick} name={icon} title={title} />
+    <StyledIconButton onClick={onClick}
+                      name={icon}
+                      title={title}
+                      $stretched={stretched}
+                      rotation={stretched ? 90 : undefined} />
   );
 };
 

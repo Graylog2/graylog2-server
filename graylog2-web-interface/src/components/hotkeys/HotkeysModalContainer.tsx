@@ -15,23 +15,23 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useCallback } from 'react';
 
 import useHotkey from 'hooks/useHotkey';
 import HotkeyModal from 'components/hotkeys/HotkeysModal';
+import useHotkeysContext from 'hooks/useHotkeysContext';
 
 const HotkeysModalContainer = () => {
-  const [show, setShow] = useState(false);
-  const toggleModal = useCallback(() => setShow((cur) => !cur), []);
+  const { showHotkeysModal, setShowHotkeysModal } = useHotkeysContext();
+  const toggleModal = useCallback(() => setShowHotkeysModal((cur) => !cur), [setShowHotkeysModal]);
 
   useHotkey({
     actionKey: 'show-hotkeys-modal',
-    callback: toggleModal,
+    callback: () => setShowHotkeysModal(true),
     scope: 'general',
-    telemetryAppPathname: 'general',
   });
 
-  if (!show) {
+  if (!showHotkeysModal) {
     return null;
   }
 

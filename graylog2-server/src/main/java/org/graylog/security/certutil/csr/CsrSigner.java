@@ -16,7 +16,7 @@
  */
 package org.graylog.security.certutil.csr;
 
-import org.bouncycastle.asn1.pkcs.Attribute;
+import com.google.common.collect.Sets;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extension;
@@ -32,14 +32,21 @@ import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.graylog2.plugin.certificates.RenewalPolicy;
 
 import java.math.BigInteger;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
+import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.ZoneId;
-import java.util.ArrayList;
+import java.time.Period;
+import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.bouncycastle.asn1.x509.GeneralName.dNSName;
 import static org.bouncycastle.asn1.x509.GeneralName.iPAddress;
@@ -47,6 +54,22 @@ import static org.bouncycastle.asn1.x509.GeneralName.rfc822Name;
 import static org.graylog.security.certutil.CertConstants.SIGNING_ALGORITHM;
 
 public class CsrSigner {
+    private static final Set<GeneralName> localhostAttributes = Set.of(
+            new GeneralName(dNSName, "localhost"),
+            new GeneralName(iPAddress, "127.0.0.1"),
+            new GeneralName(iPAddress, "0:0:0:0:0:0:0:1")
+    );
+
+    private final Clock clock;
+
+    public CsrSigner() {
+        this.clock = Clock.systemDefaultZone();
+    }
+
+    public CsrSigner(Clock clock) {
+        this.clock = clock;
+    }
+
     private boolean isValidName(final int name) {
         return switch (name) {
             case dNSName, iPAddress, rfc822Name -> true;
@@ -54,16 +77,35 @@ public class CsrSigner {
         };
     }
 
+    private boolean isDNSName(final int name) {
+        return name == dNSName;
+    }
+
+    private Duration periodToDuration(Period period) {
+        return Duration.ofDays(period.getYears() * 365L + period.getMonths() * 30L + period.getDays());
+    }
+
+    private Duration safeParse(String duration) {
+        try {
+            return Duration.parse(duration);
+        } catch (DateTimeParseException ignored) {
+            return periodToDuration(Period.parse(duration));
+        }
+    }
+
+    private Instant plusIsoDuration(Instant validFrom, String duration) {
+        return validFrom.plus(safeParse(duration));
+    }
+
     public X509Certificate sign(PrivateKey caPrivateKey, X509Certificate caCertificate, PKCS10CertificationRequest csr, RenewalPolicy renewalPolicy) throws Exception {
-        Instant validFrom = Instant.now();
-        final var lifetime = Duration.parse(renewalPolicy.certificateLifetime());
-        var validUntil = validFrom.plus(lifetime);
+        Instant validFrom = Instant.now(clock);
+        var validUntil = plusIsoDuration(validFrom, renewalPolicy.certificateLifetime());
 
         return sign(caPrivateKey, caCertificate, csr, validFrom, validUntil);
     }
 
     public X509Certificate sign(PrivateKey caPrivateKey, X509Certificate caCertificate, PKCS10CertificationRequest csr, int validityDays) throws Exception {
-        Instant validFrom = Instant.now();
+        Instant validFrom = Instant.now(clock);
         Instant validUntil = validFrom.plus(Duration.ofDays(validityDays));
 
         return sign(caPrivateKey, caCertificate, csr, validFrom, validUntil);
@@ -74,7 +116,6 @@ public class CsrSigner {
         BigInteger serialNumber = BigInteger.valueOf(System.currentTimeMillis());
 
         var issuerName = X500Name.getInstance(caCertificate.getSubjectX500Principal().getEncoded());
-        var issuerKey = caPrivateKey;
 
         var builder = new X509v3CertificateBuilder(
                 issuerName,
@@ -82,27 +123,35 @@ public class CsrSigner {
                 Date.from(validFrom), Date.from(validUntil),
                 csr.getSubject(), csr.getSubjectPublicKeyInfo());
 
-        var certAttributes = csr.getAttributes(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest);
-        if (certAttributes != null && certAttributes.length > 0) {
-            ArrayList<GeneralName> altNames = new ArrayList<>();
-
-            for (Attribute attribute : certAttributes) {
-                Extensions extensions = Extensions.getInstance(attribute.getAttrValues().getObjectAt(0));
-                GeneralNames gns = GeneralNames.fromExtensions(extensions, Extension.subjectAlternativeName);
-                if (gns != null && gns.getNames() != null) {
-                    Arrays.stream(gns.getNames()).filter(n -> isValidName(n.getTagNo())).forEach(altNames::add);
-                }
-            }
-            if (!altNames.isEmpty()) {
-                builder.addExtension(Extension.subjectAlternativeName, false,
-                        new GeneralNames(altNames.toArray(new GeneralName[altNames.size()])));
-            }
+        var altNames = Optional.ofNullable(csr.getAttributes(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest))
+                .stream()
+                .flatMap(Arrays::stream)
+                .map(attribute -> Extensions.getInstance(attribute.getAttrValues().getObjectAt(0)))
+                .flatMap(extensions -> Optional.ofNullable(GeneralNames.fromExtensions(extensions, Extension.subjectAlternativeName))
+                        .flatMap(gns -> Optional.ofNullable(gns.getNames()))
+                        .stream()
+                        .flatMap(Arrays::stream))
+                .filter(name -> isValidName(name.getTagNo()))
+                .flatMap(name -> isDNSName(name.getTagNo()) ? resolveDNSName(name) : Stream.of(name))
+                .collect(Collectors.toSet());
+        if (!altNames.isEmpty()) {
+            builder.addExtension(Extension.subjectAlternativeName, false,
+                    new GeneralNames(Sets.union(localhostAttributes, altNames).toArray(new GeneralName[0])));
         }
 
-        ContentSigner signer = new JcaContentSignerBuilder(SIGNING_ALGORITHM).build(issuerKey);
+        ContentSigner signer = new JcaContentSignerBuilder(SIGNING_ALGORITHM).build(caPrivateKey);
         X509CertificateHolder certHolder = builder.build(signer);
-        X509Certificate cert = new JcaX509CertificateConverter().getCertificate(certHolder);
-        return cert;
+        return new JcaX509CertificateConverter().getCertificate(certHolder);
+    }
+
+    private Stream<? extends GeneralName> resolveDNSName(GeneralName name) {
+        final var hostname = name.getName().toString();
+        try {
+            final var inetAddress = InetAddress.getByName(hostname);
+            return Stream.of(name, new GeneralName(iPAddress, inetAddress.getHostAddress()));
+        } catch (UnknownHostException e) {
+            return Stream.of(name);
+        }
     }
 
 }

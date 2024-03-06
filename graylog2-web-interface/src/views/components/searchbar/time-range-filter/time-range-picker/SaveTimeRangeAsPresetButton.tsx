@@ -16,13 +16,13 @@
  */
 import * as React from 'react';
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { Position } from 'react-overlays';
 import isEqual from 'lodash/isEqual';
 import styled from 'styled-components';
 import { useFormikContext, Formik, Form } from 'formik';
 
-import { Button, Popover } from 'components/bootstrap';
-import { Icon, Portal, ModalSubmit, FormikInput } from 'components/common';
+import { Button } from 'components/bootstrap';
+import Popover from 'components/common/Popover';
+import { Icon, ModalSubmit, FormikInput } from 'components/common';
 import type { TimeRange, KeywordTimeRange } from 'views/logic/queries/Query';
 import { ConfigurationsActions } from 'stores/configurations/ConfigurationsStore';
 import { ConfigurationType } from 'components/configurations/ConfigurationTypes';
@@ -40,6 +40,7 @@ import {
   normalizeFromSearchBarForBackend,
 } from 'views/logic/queries/NormalizeTimeRange';
 import { NO_TIMERANGE_OVERRIDE } from 'views/Constants';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 type FormValues = {
   description: string
@@ -64,13 +65,13 @@ const validate = ({ description }: FormValues) => {
   return ({});
 };
 
-type Props = {
+type Props = React.PropsWithChildren<{
   addTimerange: (title: string) => void,
+  show: boolean,
   toggleModal: () => void,
-  target: Button | undefined | null,
-};
+}>;
 
-const TimeRangeAddToQuickListForm = ({ addTimerange, toggleModal, target }: Props) => {
+const TimeRangeAddToQuickListForm = ({ children, addTimerange, toggleModal, show }: Props) => {
   const { userTimezone } = useUserDateTime();
   const { config } = useSearchConfiguration();
   const { values: { timeRangeTabs, activeTab } } = useFormikContext<TimeRangePickerFormValues>();
@@ -89,42 +90,44 @@ const TimeRangeAddToQuickListForm = ({ addTimerange, toggleModal, target }: Prop
   const onSubmit = ({ description }: { description: string }) => addTimerange(description);
 
   return (
-    <Portal>
-      <Position placement="left"
-                target={target}>
-        <Popover title="Save as preset"
-                 id="time-range-preset-popover"
-                 data-testid="time-range-preset-popover">
-          <Formik<FormValues> onSubmit={onSubmit} initialValues={{ description: '' }} validate={validate}>
-            {({ isValid }) => (
-              <Form>
-                <FormikInput type="text"
-                             name="description"
-                             id="time-range-preset-description"
-                             placeholder="Add description..."
-                             aria-label="Time range description"
-                             formGroupClassName="" />
-                {!!equalTimerange && (
-                  <p>
-                    <Icon name="exclamation-triangle" />
-                    You already have similar time range in{' '}
-                    <Link to={Routes.SYSTEM.CONFIGURATIONS} target="_blank">Range configuration</Link>
-                    <br />
-                    <i>({equalTimerange.description})</i>
-                  </p>
-                )}
-                <StyledModalSubmit disabledSubmit={!isValid}
-                                   submitButtonText="Save preset"
-                                   isAsyncSubmit={false}
-                                   displayCancel
-                                   onCancel={toggleModal}
-                                   bsSize="small" />
-              </Form>
-            )}
-          </Formik>
-        </Popover>
-      </Position>
-    </Portal>
+    <Popover position="left" withArrow opened={show}>
+      <Popover.Target>
+        {children}
+      </Popover.Target>
+      <Popover.Dropdown title="Save as preset"
+                        id="time-range-preset-popover"
+                        data-testid="time-range-preset-popover">
+        <Formik<FormValues> onSubmit={onSubmit} initialValues={{ description: '' }} validate={validate}>
+          {({ isValid, submitForm }) => (
+            <Form>
+              <FormikInput type="text"
+                           name="description"
+                           id="time-range-preset-description"
+                           placeholder="Add description..."
+                           aria-label="Time range description"
+                           formGroupClassName="" />
+              {!!equalTimerange && (
+                <p>
+                  <Icon name="warning" />
+                  You already have similar time range in{' '}
+                  <Link to={Routes.SYSTEM.CONFIGURATIONS} target="_blank">Range configuration</Link>
+                  <br />
+                  <i>({equalTimerange.description})</i>
+                </p>
+              )}
+              <StyledModalSubmit disabledSubmit={!isValid}
+                                 submitButtonType="button"
+                                 onSubmit={submitForm}
+                                 submitButtonText="Save preset"
+                                 isAsyncSubmit={false}
+                                 displayCancel
+                                 onCancel={toggleModal}
+                                 bsSize="small" />
+            </Form>
+          )}
+        </Formik>
+      </Popover.Dropdown>
+    </Popover>
   );
 };
 
@@ -163,10 +166,9 @@ const SaveTimeRangeAsPresetButton = () => {
     });
 
     if (timeRangePreset) {
-      sendTelemetry('form_submit', {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_TIMERANGE_PRESET_ADD_QUICK_ACCESS, {
         app_pathname: 'search',
         app_section: 'search-bar',
-        app_action_value: 'add_to_quick_access_timerange_presets',
         event_details: {
           timerange: timeRangePreset.timerange,
           id: timeRangePreset.id,
@@ -176,7 +178,9 @@ const SaveTimeRangeAsPresetButton = () => {
   }, [config, refresh, sendTelemetry, activeTabTimeRange, toggleModal, userTimezone]);
 
   return (
-    <>
+    <TimeRangeAddToQuickListForm show={showForm}
+                                 addTimerange={addTimerange}
+                                 toggleModal={toggleModal}>
       <Button disabled={!isValidTimeRange}
               title="Save current time range as preset"
               ref={formTarget}
@@ -184,12 +188,7 @@ const SaveTimeRangeAsPresetButton = () => {
               onClick={toggleModal}>
         Save as preset
       </Button>
-      {showForm && (
-        <TimeRangeAddToQuickListForm addTimerange={addTimerange}
-                                     toggleModal={toggleModal}
-                                     target={formTarget.current} />
-      )}
-    </>
+    </TimeRangeAddToQuickListForm>
   );
 };
 

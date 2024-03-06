@@ -34,8 +34,9 @@ import java.security.NoSuchProviderException;
 import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertPathValidatorException;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
+
+import static org.graylog.security.certutil.CertConstants.CA_KEY_ALIAS;
 
 class CertutilCaTest {
 
@@ -56,16 +57,7 @@ class CertutilCaTest {
         KeyStore keyStore = KeyStore.getInstance("PKCS12");
         keyStore.load(new FileInputStream(certPath.toFile()), "password".toCharArray());
 
-        Assertions.assertThat(keyStore.getKey("root", "password".toCharArray())).isNotNull();
-        Assertions.assertThat(keyStore.getKey("ca", "password".toCharArray())).isNotNull();
-        final Certificate rootCert = keyStore.getCertificate("root");
-        Assertions.assertThat(rootCert).isNotNull();
-
-        final Certificate caCert = keyStore.getCertificate("ca");
-
-        Assertions.assertThatCode(() -> caCert.verify(rootCert.getPublicKey()))
-                .doesNotThrowAnyException();
-
+        Assertions.assertThat(keyStore.getKey(CA_KEY_ALIAS, "password".toCharArray())).isNotNull();
 
         /*
         CertPathValidator validator = CertPathValidator.getInstance("PKIX");

@@ -19,12 +19,15 @@ package org.graylog2.bootstrap.preflight;
 import com.codahale.metrics.InstrumentedExecutorService;
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.jaxrs.base.JsonMappingExceptionMapper;
-import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
+import com.fasterxml.jackson.jakarta.rs.base.JsonMappingExceptionMapper;
+import com.fasterxml.jackson.jakarta.rs.json.JacksonXmlBindJsonProvider;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.net.HostAndPort;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.ext.ContextResolver;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.glassfish.grizzly.http.CompressionConfig;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.http.server.NetworkListener;
@@ -34,17 +37,19 @@ import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.server.model.Resource;
+import org.graylog2.Configuration;
 import org.graylog2.bootstrap.preflight.web.BasicAuthFilter;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.rest.MoreMediaTypes;
+import org.graylog2.shared.rest.exceptionmappers.AnyExceptionClassMapper;
 import org.graylog2.shared.rest.exceptionmappers.JacksonPropertyExceptionMapper;
 import org.graylog2.shared.rest.exceptionmappers.JsonProcessingExceptionMapper;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.ext.ContextResolver;
+import jakarta.inject.Inject;
+
 import java.net.URI;
 import java.util.Map;
 import java.util.Set;
@@ -60,22 +65,25 @@ public class PreflightJerseyService extends AbstractIdleService {
     private static final Logger LOG = LoggerFactory.getLogger(PreflightJerseyService.class);
 
     private final HttpConfiguration configuration;
-    private final BasicAuthFilter basicAuthFilter;
     private final Set<Class<?>> systemRestResources;
 
     private final ObjectMapper objectMapper;
     private final MetricRegistry metricRegistry;
+    private final Configuration localConfiguration;
+    private final PreflightConfigService preflightConfigService;
 
     private HttpServer apiHttpServer = null;
 
     @Inject
-    public PreflightJerseyService(final HttpConfiguration configuration,
-                                 final BasicAuthFilter basicAuthFilter,
+    public PreflightJerseyService(final HttpConfiguration httpConfiguration,
+                                  final Configuration localConfiguration,
                                   @PreflightRestResourcesBinding final Set<Class<?>> systemRestResources,
                                   ObjectMapper objectMapper,
-                                  MetricRegistry metricRegistry) {
-        this.configuration = requireNonNull(configuration, "configuration");
-        this.basicAuthFilter = requireNonNull(basicAuthFilter, "preflightAuthFilter");
+                                  MetricRegistry metricRegistry,
+                                  PreflightConfigService preflightConfigService) {
+        this.configuration = requireNonNull(httpConfiguration, "configuration");
+        this.localConfiguration = requireNonNull(localConfiguration, "localConfiguration");
+        this.preflightConfigService = requireNonNull(preflightConfigService, "preflightConfigService");
         this.systemRestResources = systemRestResources;
         this.objectMapper = requireNonNull(objectMapper, "objectMapper");
         this.metricRegistry = requireNonNull(metricRegistry, "metricRegistry");
@@ -127,21 +135,57 @@ public class PreflightJerseyService extends AbstractIdleService {
 
         apiHttpServer.start();
 
-        LOG.info("Started preflight REST API at <{}>", configuration.getHttpBindAddress());
+        final var username = localConfiguration.getRootUsername();
+        final var preflightPassword = preflightConfigService.getPreflightPassword();
+        logBanner(bindAddress, username, preflightPassword);
+    }
+
+    private void logBanner(HostAndPort bindAddress, String username, String preflightPassword) {
+        var banner = """
+
+                                                                             ---
+                                                                             ---
+                                                                             ---
+                    ########  ###   ######### ##########   ####         #### ---         .----               ----
+                  ###############   ###################### #####       ####  ---      ------------       .----------- --
+                 #####     ######   #####              #### ####      ####   ---     ---        ---     ---        -----
+                ####         ####   ####       ############  ####     ####   ---    --           ---   ---           ---
+                ###           ###   ####     ##############   ####   ####    ---   ---            --   --             --
+                ####         ####   ####    ####       ####    #### ####     ---   ---            --   --            .--
+                #####       #####   ####    ####       ####     #######      ---    ---          ---   ---           ---
+                 ################   ####     ##############     ######-       --     ----      ----      ---       -----
+                   ##############   ####      #############      #####        -----   -----------         ----------  --
+                             ####                                ####                                                ---
+                #####       ####                                ####                                     -          .--
+                  #############                                ####                                     -----     ----
+                     ######                                   ####                                          -------
+
+                ========================================================================================================
+
+                It seems you are starting Graylog for the first time. To set up a fresh install, a setup interface has
+                been started. You must log in to it to perform the initial configuration and continue.
+
+                Initial configuration is accessible at %s, with username '%s' and password '%s'.
+                Try clicking on http://%s:%s@%s
+
+                ========================================================================================================
+                """.formatted(bindAddress, username, preflightPassword, username, preflightPassword, bindAddress);
+
+        LOG.info(banner);
     }
 
     private ResourceConfig buildResourceConfig(final Set<Resource> additionalResources) {
-
-        final ResourceConfig rc = new ResourceConfig()
+        return new ResourceConfig()
                 .property(ServerProperties.BV_SEND_ERROR_IN_RESPONSE, true)
                 .property(ServerProperties.WADL_FEATURE_DISABLE, true)
                 .property(ServerProperties.MEDIA_TYPE_MAPPINGS, mediaTypeMappings())
                 .registerClasses(
-                        JacksonJaxbJsonProvider.class,
+                        JacksonXmlBindJsonProvider.class,
                         JsonProcessingExceptionMapper.class,
                         JsonMappingExceptionMapper.class,
-                        JacksonPropertyExceptionMapper.class
-)
+                        JacksonPropertyExceptionMapper.class,
+                        AnyExceptionClassMapper.class
+                )
                 // Replacing this with a lambda leads to missing subtypes - https://github.com/Graylog2/graylog2-server/pull/10617#discussion_r630236360
                 .register(new ContextResolver<ObjectMapper>() {
                     @Override
@@ -152,9 +196,14 @@ public class PreflightJerseyService extends AbstractIdleService {
                 .register(MultiPartFeature.class)
                 .registerClasses(systemRestResources)
                 .registerResources(additionalResources)
-                .register(basicAuthFilter);
+                .register(createBasicAuthFilter(localConfiguration, preflightConfigService));
+    }
 
-        return rc;
+    @NotNull
+    private BasicAuthFilter createBasicAuthFilter(Configuration localConfiguration, PreflightConfigService preflightConfigService) {
+        final String username = localConfiguration.getRootUsername();
+        final String preflightPassword = preflightConfigService.getPreflightPassword();
+        return new BasicAuthFilter(username, DigestUtils.sha256Hex(preflightPassword), "preflight-config");
     }
 
     private Map<String, MediaType> mediaTypeMappings() {

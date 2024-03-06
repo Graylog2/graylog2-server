@@ -19,14 +19,15 @@ package org.graylog.events.processor.aggregation;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
 import org.graylog.events.configuration.EventsConfigurationProvider;
 import org.graylog.events.processor.EventDefinition;
 import org.graylog.events.processor.EventProcessorException;
 import org.graylog.events.search.MoreSearch;
 import org.graylog.plugins.views.search.Filter;
-import org.graylog.plugins.views.search.Parameter;
 import org.graylog.plugins.views.search.ParameterProvider;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
@@ -38,7 +39,6 @@ import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.engine.QueryEngine;
-import org.graylog.plugins.views.search.engine.normalization.SearchNormalization;
 import org.graylog.plugins.views.search.errors.EmptyParameterError;
 import org.graylog.plugins.views.search.errors.QueryError;
 import org.graylog.plugins.views.search.errors.SearchError;
@@ -62,11 +62,11 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -75,6 +75,7 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -90,6 +91,7 @@ public class PivotAggregationSearch implements AggregationSearch {
     private final AggregationEventProcessorConfig config;
     private final AggregationEventProcessorParameters parameters;
     private final String searchOwner;
+    private final List<SearchType> additionalSearchTypes;
     private final SearchJobService searchJobService;
     private final QueryEngine queryEngine;
     private final EventsConfigurationProvider configurationProvider;
@@ -104,6 +106,7 @@ public class PivotAggregationSearch implements AggregationSearch {
                                   @Assisted AggregationEventProcessorParameters parameters,
                                   @Assisted String searchOwner,
                                   @Assisted EventDefinition eventDefinition,
+                                  @Assisted List<SearchType> additionalSearchTypes,
                                   SearchJobService searchJobService,
                                   QueryEngine queryEngine,
                                   EventsConfigurationProvider configProvider,
@@ -115,6 +118,7 @@ public class PivotAggregationSearch implements AggregationSearch {
         this.parameters = parameters;
         this.searchOwner = searchOwner;
         this.eventDefinition = eventDefinition;
+        this.additionalSearchTypes = additionalSearchTypes;
         this.searchJobService = searchJobService;
         this.queryEngine = queryEngine;
         this.configurationProvider = configProvider;
@@ -133,6 +137,10 @@ public class PivotAggregationSearch implements AggregationSearch {
         final SearchJob searchJob = getSearchJob(parameters, searchOwner, config.searchWithinMs(), config.executeEveryMs());
         final QueryResult queryResult = searchJob.results().get(QUERY_ID);
         final QueryResult streamQueryResult = searchJob.results().get(STREAMS_QUERY_ID);
+        final Map<String, SearchType.Result> additionalResults = additionalSearchTypes.stream()
+                .filter(searchType -> queryResult.searchTypes().containsKey(searchType.id()))
+                .map(searchType -> queryResult.searchTypes().get(searchType.id()))
+                .collect(toMap(SearchType.Result::id, result -> result));
 
         final Set<SearchError> aggregationErrors = firstNonNull(queryResult.errors(), Collections.emptySet());
         final Set<SearchError> streamErrors = firstNonNull(streamQueryResult.errors(), Collections.emptySet());
@@ -187,16 +195,17 @@ public class PivotAggregationSearch implements AggregationSearch {
                 .effectiveTimerange(pivotResult.effectiveTimerange())
                 .totalAggregatedMessages(pivotResult.total())
                 .sourceStreams(extractSourceStreams(streamsResult))
+                .additionalResults(additionalResults)
                 .build();
     }
 
     private ImmutableSet<String> extractSourceStreams(PivotResult pivotResult) {
         return pivotResult.rows().stream()
-            // "non-leaf" values can show up when the "rollup" feature is enabled in the pivot search type
-            .filter(row -> "leaf".equals(row.source()))
-            // We can just take the first key value because we only group by "streams"
-            .map(row -> row.key().get(0))
-            .collect(ImmutableSet.toImmutableSet());
+                // "non-leaf" values can show up when the "rollup" feature is enabled in the pivot search type
+                .filter(row -> "leaf".equals(row.source()))
+                // We can just take the first key value because we only group by "streams"
+                .map(row -> row.key().get(0))
+                .collect(ImmutableSet.toImmutableSet());
     }
 
     @VisibleForTesting
@@ -345,7 +354,7 @@ public class PivotAggregationSearch implements AggregationSearch {
             }
 
             DateTime resultTimestamp;
-            try{
+            try {
                 resultTimestamp = DateTime.parse(timeKey).withZone(DateTimeZone.UTC);
             } catch (IllegalArgumentException e) {
                 throw new IllegalStateException("Failed to create event for: " + eventDefinition.title() + " (possibly due to non-existing grouping fields)", e);
@@ -369,13 +378,13 @@ public class PivotAggregationSearch implements AggregationSearch {
         // This adds all streams if none were provided
         // TODO: Once we introduce "EventProcessor owners" this should only load the permitted streams of the
         //       user who created this EventProcessor.
-        search = search.addStreamsToQueriesWithoutStreams(() -> permittedStreams.load((streamId) -> true));
+        search = search.addStreamsToQueriesWithoutStreams(() -> permittedStreams.loadAllMessageStreams((streamId) -> true));
         final SearchJob searchJob = queryEngine.execute(searchJobService.create(search, username), Collections.emptySet());
         try {
             Uninterruptibles.getUninterruptibly(
-                searchJob.getResultFuture(),
-                configurationProvider.get().eventsSearchTimeout(),
-                TimeUnit.MILLISECONDS);
+                    searchJob.getResultFuture(),
+                    configurationProvider.get().eventsSearchTimeout(),
+                    TimeUnit.MILLISECONDS);
         } catch (ExecutionException e) {
             throw new EventProcessorException("Error executing search job: " + e.getMessage(), false, eventDefinition, e);
         } catch (TimeoutException e) {
@@ -395,18 +404,18 @@ public class PivotAggregationSearch implements AggregationSearch {
      */
     private Query getSourceStreamsQuery(AggregationEventProcessorParameters parameters) {
         final Pivot pivot = Pivot.builder()
-            .id(STREAMS_PIVOT_ID)
-            .rollup(true)
-            .rowGroups(ImmutableList.of(Values.builder().limit(Integer.MAX_VALUE).field("streams").build()))
-            .series(ImmutableList.of(Count.builder().id(STREAMS_PIVOT_COUNT_ID).build()))
-            .build();
+                .id(STREAMS_PIVOT_ID)
+                .rollup(true)
+                .rowGroups(ImmutableList.of(Values.builder().limit(Integer.MAX_VALUE).field("streams").build()))
+                .series(ImmutableList.of(Count.builder().id(STREAMS_PIVOT_COUNT_ID).build()))
+                .build();
 
         final Set<SearchType> searchTypes = Collections.singleton(pivot);
         final Query.Builder queryBuilder = Query.builder()
-            .id(STREAMS_QUERY_ID)
-            .searchTypes(searchTypes)
-            .query(ElasticsearchQueryString.of(config.query()))
-            .timerange(parameters.timerange());
+                .id(STREAMS_QUERY_ID)
+                .searchTypes(searchTypes)
+                .query(ElasticsearchQueryString.of(config.query()))
+                .timerange(parameters.timerange());
 
         final Set<String> streams = getStreams(parameters);
         if (!streams.isEmpty()) {
@@ -419,12 +428,12 @@ public class PivotAggregationSearch implements AggregationSearch {
     /**
      * Returns the query to compute the aggregation.
      *
-     * @param parameters processor parameters
+     * @param parameters     processor parameters
      * @param searchWithinMs processor search within period. Used to build the date range buckets
      * @param executeEveryMs
      * @return aggregation query
      */
-     protected Query getAggregationQuery(AggregationEventProcessorParameters parameters, long searchWithinMs, long executeEveryMs) {
+    protected Query getAggregationQuery(AggregationEventProcessorParameters parameters, long searchWithinMs, long executeEveryMs) {
         final Pivot.Builder pivotBuilder = Pivot.builder()
                 .id(PIVOT_ID)
                 .rollup(true);
@@ -449,35 +458,35 @@ public class PivotAggregationSearch implements AggregationSearch {
         // The first bucket must be the date range!
         groupBy.add(dateRangeBucket);
 
-        if (!config.groupBy().isEmpty()) {
-            // Then we add the configured groups
-            groupBy.addAll(config.groupBy().stream()
-                    .map(field -> Values.builder()
-                            // The pivot search type (as of Graylog 3.1.0) is using the "terms" aggregation under
-                            // the hood. The "terms" aggregation is meant to return the "top" terms and does not allow
-                            // and efficient retrieval and pagination over all terms.
-                            // Using Integer.MAX_VALUE as a limit can be very expensive with high cardinality grouping.
-                            // The ES documentation recommends to use the "Composite" aggregation instead.
-                            //
-                            // See the ES documentation for more details:
-                            //   https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-terms-aggregation.html#search-aggregations-bucket-terms-aggregation-size
-                            //   https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-composite-aggregation.html
-                            //
-                            // The "Composite" aggregation is only available since ES version 6.1, unfortunately.
-                            //
-                            // TODO: Either find a way to use the composite aggregation when the ES version in use is
-                            //       recent enough, and/or use a more conservative limit here and make it configurable
-                            //       by the user.
-                            .limit(Integer.MAX_VALUE)
-                            .field(field)
-                            .build())
-                    .toList());
-        }
+         if (!config.groupBy().isEmpty()) {
+             final Values values = Values.builder().fields(config.groupBy())
+                     .limit(Integer.MAX_VALUE)
+                     .build();
+             groupBy.add(values);
+
+             // The pivot search type (as of Graylog 3.1.0) is using the "terms" aggregation under
+             // the hood. The "terms" aggregation is meant to return the "top" terms and does not allow
+             // and efficient retrieval and pagination over all terms.
+             // Using Integer.MAX_VALUE as a limit can be very expensive with high cardinality grouping.
+             // The ES documentation recommends to use the "Composite" aggregation instead.
+             //
+             // See the ES documentation for more details:
+             //   https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-terms-aggregation.html#search-aggregations-bucket-terms-aggregation-size
+             //   https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-composite-aggregation.html
+             //
+             // The "Composite" aggregation is only available since ES version 6.1, unfortunately.
+             //
+             // TODO: Either find a way to use the composite aggregation when the ES version in use is
+             //       recent enough, and/or use a more conservative limit here and make it configurable
+             //       by the user.
+
+         }
 
         // We always have row groups because of the date range buckets
         pivotBuilder.rowGroups(groupBy);
 
-        final Set<SearchType> searchTypes = Collections.singleton(pivotBuilder.build());
+        final Set<SearchType> searchTypes = Sets.newHashSet(pivotBuilder.build());
+        searchTypes.addAll(additionalSearchTypes);
 
         final Query.Builder queryBuilder = Query.builder()
                 .id(QUERY_ID)
@@ -535,7 +544,7 @@ public class PivotAggregationSearch implements AggregationSearch {
             // By dividing it before casting we avoid a potential int overflow
             to = from.plusSeconds((int) (searchWithinMs / 1000));
             ranges.add(DateRange.builder().from(from).to(to).build());
-            from = from.plusSeconds((int) executeEveryMs/ 1000);
+            from = from.plusSeconds((int) executeEveryMs / 1000);
         } while (to.isBefore(timeRange.getTo()));
 
         return DateRangeBucket.builder().field("timestamp").ranges(ranges.build()).build();

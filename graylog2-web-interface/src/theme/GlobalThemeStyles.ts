@@ -16,6 +16,8 @@
  */
 import { createGlobalStyle, css } from 'styled-components';
 
+import { RowContentStyles } from 'components/bootstrap/Row';
+
 const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   #editor {
     height: 256px;
@@ -161,9 +163,7 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
   .content {
     padding-top: 15px;
     padding-bottom: 15px;
-    background-color: ${theme.colors.global.contentBackground};
-    border: 1px solid ${theme.colors.gray[80]};
-    margin-bottom: 10px;
+    ${RowContentStyles}
 
     p.description {
       margin-top: 3px;
@@ -646,14 +646,13 @@ const GlobalThemeStyles = createGlobalStyle(({ theme }) => css`
 
   /* additional styles for 'StyledAceEditor' */
   .ace_editor.ace_autocomplete {
-    width: 600px !important;
     margin-top: 6px;
     background-color: ${theme.colors.input.background};
     color: ${theme.colors.input.color};
   }
 
   .ace_editor.ace_autocomplete .ace_marker-layer .ace_active-line {
-    background-color: ${theme.utils.opacify(theme.colors.variant.info, 0.7)};
+    background-color: ${theme.colors.variant.lighter.info};
     color: ${theme.colors.input.colorDisabled};
   }
 

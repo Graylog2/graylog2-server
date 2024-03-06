@@ -20,7 +20,7 @@ import type Immutable from 'immutable';
 import { singleton } from 'logic/singleton';
 
 export type DefaultScopeName = '*';
-export type ScopeName = 'general' | 'search' | 'dashboard';
+export type ScopeName = 'general' | 'search' | 'dashboard' | 'scratchpad' | 'query-input';
 export type ScopeParam = Array<ScopeName> | ScopeName
 
 export type KeyboardModifiers = {
@@ -48,6 +48,8 @@ export type Options = {
   enableOnFormTags?: readonly FormTags[] | boolean // Enable hotkeys on a list of tags. (Default: false)
   enableOnContentEditable?: boolean // Enable hotkeys on tags with contentEditable props. (Default: false)
   preventDefault?: Trigger // Prevent default browser behavior? (Default: false)
+  displayInOverview?: boolean,
+  splitKey?: string,
 }
 export type ActiveHotkey = {
   options?: Options & { scope: ScopeName },
@@ -56,7 +58,7 @@ export type ActiveHotkeys = Immutable.Map<`${ScopeName}.${string}`, ActiveHotkey
 export type HotkeyCollection = {
   title: string,
   description: string,
-  actions: Record<string, { keys: string, description: string, displayKeys?: string }>,
+  actions: Record<string, { keys: string | Array<string>, description: string, displayKeys?: string }>,
 }
 export type HotkeyCollections = Record<ScopeName, HotkeyCollection>
 
@@ -66,6 +68,8 @@ type HotkeysContextType = {
   activeHotkeys: ActiveHotkeys,
   addActiveHotkey: (props: { scope: ScopeName, actionKey: string, options: Options & { scope: ScopeName } }) => void,
   removeActiveHotkey: (props: { scope: ScopeName, actionKey: string }) => void,
+  showHotkeysModal: boolean,
+  setShowHotkeysModal: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 const HotkeysContext = React.createContext<HotkeysContextType | undefined>(undefined);

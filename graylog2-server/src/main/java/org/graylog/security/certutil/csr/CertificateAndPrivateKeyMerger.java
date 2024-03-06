@@ -23,7 +23,8 @@ import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog.security.certutil.cert.CertificateChain;
 import org.graylog.security.certutil.privatekey.PrivateKeyEncryptedStorage;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
@@ -46,8 +47,8 @@ public class CertificateAndPrivateKeyMerger {
                           final PrivateKeyEncryptedStorage privateKeyEncryptedStorage,
                           final char[] privateKeyStoragePassword,
                           final char[] certFilePassword,
-                          final String alias) throws GeneralSecurityException, IOException,
-            OperatorCreationException, PKCSException, KeyStoreStorageException {
+                          final String alias)
+            throws GeneralSecurityException, IOException, OperatorCreationException, PKCSException, KeyStoreStorageException {
 
         KeyStore nodeKeystore = KeyStore.getInstance(CertConstants.PKCS12);
         nodeKeystore.load(null, null);

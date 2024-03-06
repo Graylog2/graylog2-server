@@ -35,8 +35,9 @@ const Value = (props: React.ComponentProps<typeof OriginalValue>) => (
 );
 
 describe('Value', () => {
-  const openActionsMenu = (value) => {
+  const openActionsMenu = async (value: string | RegExp) => {
     userEvent.click(screen.getByText(value));
+    await screen.findByRole('menu');
   };
 
   beforeEach(() => {
@@ -52,87 +53,79 @@ describe('Value', () => {
   afterAll(unloadViewsPlugin);
 
   describe('actions menu title', () => {
-    const Component = (props) => <Value {...props} />;
-
     it('renders without type information but no children', async () => {
       render(<Value field="foo" value={42} type={FieldType.Unknown} />);
 
-      openActionsMenu('42');
+      await openActionsMenu('42');
 
       await screen.findByText('foo = 42');
     });
 
     it('renders timestamps with a custom component', async () => {
-      render(<Component field="foo"
-                        queryId="someQueryId"
-                        value="2018-10-02T14:45:40Z"
-                        render={({ value }) => `The date ${value}`}
-                        type={new FieldType('date', [], [])} />);
+      render(<Value field="foo"
+                    value="2018-10-02T14:45:40Z"
+                    render={({ value }) => <>The date {value}</>}
+                    type={new FieldType('date', [], [])} />);
 
-      openActionsMenu('The date 2018-10-02 16:45:40.000');
+      await openActionsMenu('The date 2018-10-02 16:45:40.000');
       const title = await screen.findByTestId('value-actions-title');
 
       expect(title).toHaveTextContent('foo = 2018-10-02 16:45:40.000');
     });
 
     it('renders numeric timestamps with a custom component', async () => {
-      render(<Component field="foo"
-                        queryId="someQueryId"
-                        value={1571302317}
-                        render={({ value }) => `The number ${value}`}
-                        type={new FieldType('numeric', [], [])} />);
+      render(<Value field="foo"
+                    value={1571302317}
+                    render={({ value }) => <>The number {value}</>}
+                    type={new FieldType('numeric', [], [])} />);
 
       await screen.findByText('The number 1571302317');
     });
 
     it('renders booleans as strings', async () => {
-      render(<Component field="foo"
-                        queryId="someQueryId"
-                        value={false}
-                        type={new FieldType('boolean', [], [])} />);
+      render(<Value field="foo"
+                    value={false}
+                    type={new FieldType('boolean', [], [])} />);
 
-      openActionsMenu('false');
+      await openActionsMenu('false');
 
       await screen.findByText('foo = false');
     });
 
     it('renders booleans as strings even if field type is unknown', async () => {
-      render(<Component field="foo" queryId="someQueryId" value={false} type={FieldType.Unknown} />);
+      render(<Value field="foo" value={false} type={FieldType.Unknown} />);
 
-      openActionsMenu('false');
+      await openActionsMenu('false');
 
       await screen.findByText('foo = false');
     });
 
     it('renders arrays as strings', async () => {
-      render(<Component field="foo"
-                        queryId="someQueryId"
-                        value={[23, 'foo']}
-                        type={FieldType.Unknown} />);
+      render(<Value field="foo"
+                    value={[23, 'foo']}
+                    type={FieldType.Unknown} />);
 
-      openActionsMenu('[23,"foo"]');
+      await openActionsMenu('[23,"foo"]');
 
       await screen.findByText('foo = [23,"foo"]');
     });
 
     it('renders objects as strings', async () => {
-      render(<Component field="foo"
-                        queryId="someQueryId"
-                        value={{ foo: 23 }}
-                        type={FieldType.Unknown} />);
+      render(<Value field="foo"
+                    value={{ foo: 23 }}
+                    type={FieldType.Unknown} />);
 
-      openActionsMenu('{"foo":23}');
+      await openActionsMenu('{"foo":23}');
 
       await screen.findByText('foo = {"foo":23}');
     });
 
     it('truncates values longer than 30 characters', async () => {
-      render(<Component field="message"
-                        queryId="someQueryId"
-                        value="sophon unbound: [84785:0] error: outgoing tcp: connect: Address already in use for 1.0.0.1"
-                        type={new FieldType('string', [], [])} />);
+      render(<Value field="message"
+                    value="sophon unbound: [84785:0] error: outgoing tcp: connect: Address already in use for 1.0.0.1"
+                    type={new FieldType('string', [], [])} />);
 
-      openActionsMenu('sophon unbound: [84785:0] error: outgoing tcp: connect: Address already in use for 1.0.0.1');
+      await openActionsMenu('sophon unbound: [84785:0] error: outgoing tcp: connect: Address already in use for 1.0.0.1');
 
       await screen.findByText('message = sophon unbound: [84785:0] e...');
     });
@@ -166,7 +159,7 @@ describe('Value', () => {
   });
 
   describe('handles value action menu depending on interactive context', () => {
-    const component = (interactive) => (props) => (
+    const component = (interactive: boolean) => (props: React.ComponentProps<typeof Value>) => (
       <InteractiveContext.Provider value={interactive}>
         <Value {...props} />
       </InteractiveContext.Provider>
@@ -176,11 +169,10 @@ describe('Value', () => {
       const NoninteractiveComponent = component(false);
 
       render(<NoninteractiveComponent field="foo"
-                                      queryId="someQueryId"
                                       value={{ foo: 23 }}
                                       type={FieldType.Unknown} />);
 
-      openActionsMenu('{"foo":23}');
+      userEvent.click(screen.getByText('{"foo":23}'));
 
       expect(screen.queryByText('foo = {"foo":23}')).not.toBeInTheDocument();
     });
@@ -189,11 +181,10 @@ describe('Value', () => {
       const InteractiveComponent = component(true);
 
       render(<InteractiveComponent field="foo"
-                                   queryId="someQueryId"
                                    value={{ foo: 23 }}
                                    type={FieldType.Unknown} />);
 
-      openActionsMenu('{"foo":23}');
+      await openActionsMenu('{"foo":23}');
 
       await screen.findByText('foo = {"foo":23}');
     });

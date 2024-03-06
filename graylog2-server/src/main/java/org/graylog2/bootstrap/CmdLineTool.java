@@ -25,7 +25,6 @@ import com.github.joschi.jadconfig.Repository;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.guava.GuavaConverterFactory;
-import com.github.joschi.jadconfig.guice.NamedConfigParametersModule;
 import com.github.joschi.jadconfig.jodatime.JodaTimeConverterFactory;
 import com.github.joschi.jadconfig.repositories.EnvironmentRepository;
 import com.github.joschi.jadconfig.repositories.PropertiesRepository;
@@ -37,6 +36,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.google.inject.AbstractModule;
 import com.google.inject.Binder;
 import com.google.inject.CreationException;
 import com.google.inject.Guice;
@@ -45,6 +45,8 @@ import com.google.inject.Module;
 import com.google.inject.Stage;
 import com.google.inject.name.Names;
 import com.google.inject.spi.Message;
+import com.unboundid.util.ssl.SSLUtil;
+import com.unboundid.util.ssl.TLSCipherSuiteSelector;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import io.netty.util.internal.logging.Slf4JLoggerFactory;
 import org.apache.logging.log4j.Level;
@@ -52,6 +54,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.graylog2.Configuration;
+import org.graylog2.bindings.NamedConfigParametersOverrideModule;
 import org.graylog2.bootstrap.commands.MigrateCmd;
 import org.graylog2.configuration.PathConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
@@ -79,6 +82,7 @@ import org.graylog2.storage.versionprobe.ElasticsearchProbeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.Path;
@@ -220,7 +224,7 @@ public abstract class CmdLineTool implements CliCommand {
         final Set<String> tlsProtocols = configuration.getConfiguredTlsProtocols();
         final List<String> disabledAlgorithms = Stream.of(Security.getProperty("jdk.tls.disabledAlgorithms").split(",")).map(String::trim).collect(Collectors.toList());
 
-        // Only restrict ciphers if insecure TLS protocols are explicitly enabled.
+        // Only restrict ciphers if weak / insecure TLS protocols are explicitly enabled.
         // c.f. https://github.com/Graylog2/graylog2-server/issues/10944
         if (tlsProtocols == null || !(tlsProtocols.isEmpty() || tlsProtocols.contains("TLSv1") || tlsProtocols.contains("TLSv1.1"))) {
             disabledAlgorithms.addAll(ImmutableSet.of("CBC", "3DES"));
@@ -237,7 +241,11 @@ public abstract class CmdLineTool implements CliCommand {
                     .filter(p -> !reEnabledTLSProtocols.contains(p))
                     .collect(Collectors.toList());
 
+            // This is only effective when it is set before the static initializer of sun.security.ssl.Ciphersuite is executed.
             Security.setProperty("jdk.tls.disabledAlgorithms", String.join(", ", updatedProperties));
+
+            // https://github.com/pingidentity/ldapsdk/commit/837b8f0fe2947e64fcee0209e9b8ef713028515e
+            SSLUtil.setEnabledSSLCipherSuites(TLSCipherSuiteSelector.getSupportedCipherSuites());
         }
 
         // Explicitly register Bouncy Castle as security provider.
@@ -268,7 +276,7 @@ public abstract class CmdLineTool implements CliCommand {
         MetricRegistry metricRegistry = MetricRegistryFactory.create();
         featureFlags = getFeatureFlags(metricRegistry);
 
-        pluginLoader = new PluginLoader(getPluginPath(configFile).toFile(), chainingClassLoader);
+        pluginLoader = getPluginLoader(getPluginPath(configFile).toFile(), chainingClassLoader);
 
         installCommandConfig();
         installPluginBootstrapConfig(pluginLoader);
@@ -308,7 +316,7 @@ public abstract class CmdLineTool implements CliCommand {
 
         injector = setupInjector(
                 new IsDevelopmentBindings(),
-                new NamedConfigParametersModule(jadConfig.getConfigurationBeans()),
+                new NamedConfigParametersOverrideModule(jadConfig.getConfigurationBeans()),
                 new PluginBindings(plugins),
                 binder -> binder.bind(MetricRegistry.class).toInstance(metricRegistry)
         );
@@ -319,12 +327,16 @@ public abstract class CmdLineTool implements CliCommand {
             System.exit(1);
         }
 
-        addInstrumentedAppender(metricRegistry, logLevel);
+        addInstrumentedAppender(metricRegistry);
         // Report metrics via JMX.
         final JmxReporter reporter = JmxReporter.forRegistry(metricRegistry).build();
         reporter.start();
 
         startCommand();
+    }
+
+    protected PluginLoader getPluginLoader(File pluginDir, ChainingClassLoader classLoader) {
+        return new PluginLoader(pluginDir, classLoader);
     }
 
     private void installPluginBootstrapConfig(PluginLoader pluginLoader) {
@@ -391,13 +403,13 @@ public abstract class CmdLineTool implements CliCommand {
         context.updateLoggers(config);
     }
 
-    private void addInstrumentedAppender(final MetricRegistry metrics, final Level level) {
+    private void addInstrumentedAppender(final MetricRegistry metrics) {
         final InstrumentedAppender appender = new InstrumentedAppender(metrics, null, null, false);
         appender.start();
 
         final LoggerContext context = (LoggerContext) LogManager.getContext(false);
         final org.apache.logging.log4j.core.config.Configuration config = context.getConfiguration();
-        config.getLoggerConfig(LogManager.ROOT_LOGGER_NAME).addAppender(appender, level, null);
+        config.getLoggerConfig(LogManager.ROOT_LOGGER_NAME).addAppender(appender, null, null);
         context.updateLoggers(config);
     }
 
@@ -530,8 +542,8 @@ public abstract class CmdLineTool implements CliCommand {
      * It can be used to look up configuration values in modules at binding time.
      */
     protected Injector setupBootstrapConfigInjector() {
-        final NamedConfigParametersModule configModule =
-                new NamedConfigParametersModule(jadConfig.getConfigurationBeans());
+        final AbstractModule configModule =
+                new NamedConfigParametersOverrideModule(jadConfig.getConfigurationBeans());
 
         Injector bootstrapConfigInjector = null;
         try {

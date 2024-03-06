@@ -25,6 +25,10 @@ import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/bootstr
 import { defaultCompare } from 'logic/DefaultCompare';
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 import { ALL_MESSAGES_TIMERANGE } from 'views/Constants';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useLocation from 'routing/useLocation';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import AggregationConditionsForm from './AggregationConditionsForm';
 
@@ -56,6 +60,9 @@ const AggregationForm = ({ aggregationFunctions, eventDefinition, validation, on
       value: fieldType.name,
     })), [allFieldTypes]);
 
+  const { pathname } = useLocation();
+  const sendTelemetry = useSendTelemetry();
+
   const propagateConfigChange = useCallback((update: Partial<EventDefinitionConfig>) => {
     const nextConfig = { ...eventDefinition.config, ...update };
 
@@ -64,8 +71,16 @@ const AggregationForm = ({ aggregationFunctions, eventDefinition, validation, on
 
   const handleGroupByChange = useCallback((selected: string) => {
     const nextValue = selected === '' ? [] : selected.split(',');
+
+    sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.AGGREGATION_GROUP_BY_FIELD_SELECTED, {
+      app_pathname: getPathnameWithoutId(pathname),
+      app_section: 'event-definition-condition',
+      app_action_value: 'group-by-field-select',
+      selection_count: nextValue.length,
+    });
+
     propagateConfigChange({ group_by: nextValue });
-  }, [propagateConfigChange]);
+  }, [pathname, propagateConfigChange, sendTelemetry]);
 
   return (
     <fieldset>

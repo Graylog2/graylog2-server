@@ -17,9 +17,14 @@
 package org.graylog2.database.filtering;
 
 import org.bson.conversions.Bson;
+import org.graylog2.database.filtering.inmemory.InMemoryFilterable;
 
-interface Filter {
+import java.util.function.Predicate;
+
+public interface Filter {
     String field();
 
     Bson toBson();
+
+    Predicate<InMemoryFilterable> toPredicate();
 }

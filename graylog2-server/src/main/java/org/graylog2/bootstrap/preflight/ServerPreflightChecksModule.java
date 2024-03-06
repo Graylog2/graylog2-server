@@ -28,12 +28,12 @@ import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.system.FilePersistedNodeIdProvider;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.security.CustomCAX509TrustManager;
-import org.graylog2.security.IndexerJwtAuthTokenProvider;
 import org.graylog2.security.TrustManagerProvider;
 import org.graylog2.shared.bindings.providers.OkHttpClientProvider;
 import org.graylog2.storage.providers.ElasticsearchVersionProvider;
 
 import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 public class ServerPreflightChecksModule extends Graylog2Module {
 
@@ -45,7 +45,7 @@ public class ServerPreflightChecksModule extends Graylog2Module {
                 .implement(TrustManager.class, CustomCAX509TrustManager.class)
                 .build(TrustManagerProvider.class));
 
-        bind(CustomCAX509TrustManager.class).asEagerSingleton();
+        bind(X509TrustManager.class).to(CustomCAX509TrustManager.class).asEagerSingleton();
 
         bind(KeystoreContentMover.class).to(SinglePasswordKeystoreContentMover.class).asEagerSingleton();
         bind(OkHttpClient.class).toProvider(OkHttpClientProvider.class).asEagerSingleton();

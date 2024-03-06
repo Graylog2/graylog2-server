@@ -80,7 +80,7 @@ const FieldValue = styled.dd(({ removed, theme }) => css`
   ${removed && css`
     text-decoration: line-through;
     font-style: italic;
-  `}
+`}
 `);
 
 const SimulationChanges = createReactClass({

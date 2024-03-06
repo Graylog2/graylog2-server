@@ -43,7 +43,11 @@ const Toggle = styled.a.attrs({ href: '#' })(({ theme }) => css`
   }
 `);
 
-const StyledSubmenu = styled(Dropdown)<{ $left: boolean }>(({ $left, theme }) => css`
+type StyledSubmenuProps = React.PropsWithChildren<{
+  $left: boolean,
+  as: string,
+}>;
+const StyledSubmenu: React.ComponentType<StyledSubmenuProps> = styled(Dropdown)<{ $left: boolean }>(({ $left, theme }) => css`
   position: relative;
 
   > .dropdown-menu {

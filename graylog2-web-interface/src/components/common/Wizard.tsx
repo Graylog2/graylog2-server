@@ -20,6 +20,7 @@ import find from 'lodash/find';
 import styled, { css } from 'styled-components';
 
 import { Button, ButtonToolbar, Col, Nav, NavItem, Row } from 'components/bootstrap';
+import type { SelectCallback } from 'components/bootstrap/types';
 
 import Icon from './Icon';
 
@@ -153,7 +154,7 @@ export type StepKey = number | string;
 
 export type Step = {
   key: StepKey,
-  title: React.ReactElement,
+  title: React.ReactNode,
   component: React.ReactElement,
   disabled?: boolean,
 };
@@ -295,7 +296,7 @@ class Wizard extends React.Component<Props, State> {
         <Nav stacked
              bsStyle="pills"
              activeKey={selectedStep}
-             onSelect={this._wizardChanged}
+             onSelect={this._wizardChanged as SelectCallback}
              justified={justified}>
           {steps.map((navItem) => (
             <NavItem key={navItem.key} eventKey={navItem.key} disabled={navItem.disabled}>{navItem.title}</NavItem>
@@ -336,23 +337,25 @@ class Wizard extends React.Component<Props, State> {
           <div className="pull-right">
             <HorizontalButtonToolbar>
               <Button onClick={this._onPrevious}
+                      aria-label="Previous"
                       bsSize="xsmall"
                       bsStyle="info"
                       disabled={this._disableButton('previous')}>
-                <Icon name="caret-left" />
+                <Icon name="arrow_left" />
               </Button>
               <Button onClick={this._onNext}
+                      aria-label="Next"
                       bsSize="xsmall"
                       bsStyle="info"
                       disabled={this._disableButton('next')}>
-                <Icon name="caret-right" />
+                <Icon name="arrow_right" />
               </Button>
             </HorizontalButtonToolbar>
           </div>
         )}
         <StyledNav bsStyle="pills"
                    activeKey={selectedStep}
-                   onSelect={this._wizardChanged}
+                   onSelect={this._wizardChanged as SelectCallback}
                    justified={justified}>
           {steps.map((navItem) => (
             <NavItem key={navItem.key} eventKey={navItem.key} disabled={navItem.disabled}>{navItem.title}</NavItem>))}

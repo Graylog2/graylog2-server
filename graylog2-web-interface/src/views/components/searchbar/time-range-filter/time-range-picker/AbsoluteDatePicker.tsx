@@ -17,10 +17,10 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import { DateUtils } from 'react-day-picker';
-import moment from 'moment';
 
 import { DatePicker } from 'components/common';
-import { DATE_TIME_FORMATS } from 'util/DateTime';
+import { toUTCFromTz, toDateObject } from 'util/DateTime';
+import useUserDateTime from 'hooks/useUserDateTime';
 
 type Props = {
   dateTime: string,
@@ -29,25 +29,28 @@ type Props = {
 }
 
 const AbsoluteDatePicker = ({ dateTime, onChange, startDate }: Props) => {
-  const initialDateTime = moment(dateTime).toObject();
+  const { userTimezone, formatTime } = useUserDateTime();
+  const initialDateTime = toUTCFromTz(dateTime, userTimezone);
+  const initialDate = formatTime(initialDateTime, 'date');
 
-  const _onDatePicked = (date) => {
-    if (!!startDate && DateUtils.isDayBefore(date, startDate)) {
+  const _onDatePicked = (selectedDate: Date) => {
+    if (!!startDate && DateUtils.isDayBefore(selectedDate, startDate)) {
       return false;
     }
 
-    const newDate = moment(date).toObject();
+    const selectedDateObject = toDateObject(selectedDate);
+    const validInitialDateTime = initialDateTime.isValid() ? initialDateTime : toUTCFromTz(undefined, userTimezone);
+    const newDate = validInitialDateTime.set({
+      year: selectedDateObject.year(),
+      month: selectedDateObject.month(),
+      date: selectedDateObject.date(),
+    });
 
-    return onChange(moment({
-      ...initialDateTime,
-      years: newDate.years,
-      months: newDate.months,
-      date: newDate.date,
-    }).format(DATE_TIME_FORMATS.default));
+    return onChange(formatTime(newDate, 'default'));
   };
 
   return (
-    <DatePicker date={dateTime}
+    <DatePicker date={initialDate}
                 onChange={_onDatePicked}
                 fromDate={startDate} />
   );

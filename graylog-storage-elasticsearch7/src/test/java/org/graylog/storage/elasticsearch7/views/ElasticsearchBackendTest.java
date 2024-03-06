@@ -19,6 +19,7 @@ package org.graylog.storage.elasticsearch7.views;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
+import jakarta.inject.Provider;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.Search;
@@ -27,6 +28,7 @@ import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
+import org.graylog.plugins.views.search.engine.monitoring.collection.NoOpStatsCollector;
 import org.graylog.plugins.views.search.searchfilters.db.UsedSearchFiltersToQueryStringsMapper;
 import org.graylog.plugins.views.search.searchfilters.model.InlineQueryStringSearchFilter;
 import org.graylog.plugins.views.search.searchfilters.model.ReferencedQueryStringSearchFilter;
@@ -42,7 +44,6 @@ import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.inject.Provider;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -70,6 +71,7 @@ public class ElasticsearchBackendTest {
                 mock(IndexLookup.class),
                 (elasticsearchBackend, ssb, errors) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, errors, fieldTypesLookup),
                 usedSearchFiltersToQueryStringsMapper,
+                new NoOpStatsCollector<>(),
                 false);
     }
 
@@ -91,7 +93,7 @@ public class ElasticsearchBackendTest {
                 .timerange(RelativeRange.create(300))
                 .build();
         final Search search = Search.builder().queries(ImmutableSet.of(query)).build();
-        final SearchJob job = new SearchJob("deadbeef", search, "admin");
+        final SearchJob job = new SearchJob("deadbeef", search, "admin", "test-node-id");
 
         final ESGeneratedQueryContext queryContext = mock(ESGeneratedQueryContext.class);
 

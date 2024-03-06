@@ -37,7 +37,7 @@ public class DatanodeContainerizedBackend {
     private final MongoDBTestService mongoDBTestService;
     private boolean shouldCloseMongodb = false;
     private final GenericContainer<?> datanodeContainer;
-
+    private String nodeName;
 
     public DatanodeContainerizedBackend() {
         this(new DatanodeDockerHooksAdapter());
@@ -50,7 +50,7 @@ public class DatanodeContainerizedBackend {
     public DatanodeContainerizedBackend(final String nodeName, DatanodeDockerHooks hooks) {
 
         this.network = Network.newNetwork();
-        this.mongoDBTestService = MongoDBTestService.create(MongodbServer.MONGO5, this.network);
+        this.mongoDBTestService = MongoDBTestService.create(MongodbServer.DEFAULT_VERSION, this.network);
         this.mongoDBTestService.start();
 
         // we have created these resources, we have to close them.
@@ -71,6 +71,7 @@ public class DatanodeContainerizedBackend {
     }
 
     private GenericContainer<?> createDatanodeContainer(String nodeName, DatanodeDockerHooks customizer) {
+        this.nodeName = nodeName;
         MavenPackager.packageJarIfNecessary(new DefaultMavenProjectDirProvider());
 
         return new DatanodeDevContainerBuilder()
@@ -124,5 +125,9 @@ public class DatanodeContainerizedBackend {
 
     public Integer getOpensearchTransportPort() {
         return datanodeContainer.getMappedPort(DATANODE_OPENSEARCH_TRANSPORT_PORT);
+    }
+
+    public String getNodeName() {
+        return nodeName;
     }
 }

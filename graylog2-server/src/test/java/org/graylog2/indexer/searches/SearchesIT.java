@@ -216,8 +216,8 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
         };
         when(streamService.load(STREAM_ID)).thenReturn(stream);
         CountResult result = searches.count("*", AbsoluteRange.create(
-                new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
-                new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC)),
+                        new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
+                        new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC)),
                 "streams:" + STREAM_ID);
 
         assertThat(result.count()).isEqualTo(5L);
@@ -228,8 +228,8 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
         importFixture("org/graylog2/indexer/searches/SearchesIT.json");
 
         CountResult result = searches.count("*", AbsoluteRange.create(
-                new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
-                new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC)),
+                        new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
+                        new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC)),
                 "foobar-not-a-filter");
 
         assertThat(result.count()).isEqualTo(0L);
@@ -545,6 +545,26 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
         }
 
         assertThat(resultMessages).hasSize(10);
+    }
+
+    @Test
+    public void scrollWithChunkCommandAndSlicedScroll() {
+        importFixture("org/graylog2/indexer/searches/SearchesIT.json");
+
+        when(indexSetRegistry.getForIndices(Collections.singleton("graylog_0"))).thenReturn(Collections.singleton(indexSet));
+        var searchesAdapter = createSearchesAdapter();
+
+        var chunkCommand1 = ChunkCommand.builder()
+                .indices(Set.of("graylog_0"))
+                .sliceParams(0, 2)
+                .build();
+
+        final ChunkedResult scrollResult1 = searchesAdapter.scroll(chunkCommand1);
+        final ChunkedResult scrollResult2 = searchesAdapter.scroll(chunkCommand1.toBuilder().sliceParams(1, 2).build());
+
+        assertThat(scrollResult1).isNotNull();
+        assertThat(scrollResult2).isNotNull();
+        assertThat(scrollResult1.totalHits() + scrollResult2.totalHits()).isEqualTo(10L);
     }
 
     @Test

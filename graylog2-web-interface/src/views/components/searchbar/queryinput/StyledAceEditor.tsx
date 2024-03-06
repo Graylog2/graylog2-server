@@ -34,7 +34,7 @@ const StyledAceEditor = styled(AceEditor)<Props>(({ $scTheme, $height, disabled,
     width: 100% !important;
     background-color: ${$scTheme.colors.input.background};
     color: ${$scTheme.utils.contrastingColor($scTheme.colors.input.background, 'AAA')};
-    border: 1px solid ${$scTheme.colors.variant.light.default};
+    border: 1px solid ${$scTheme.colors.input.border};
     border-radius: ${INPUT_BORDER_RADIUS};
 
     &.ace_multiselect .ace_selection.ace_start {
@@ -160,7 +160,7 @@ const StyledAceEditor = styled(AceEditor)<Props>(({ $scTheme, $height, disabled,
     }
 
     .ace_indent-guide {
-      background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAAE0lEQVQImWP4////f4bdu3f/BwAlfgctduB85QAAAABJRU5ErkJggg==) right repeat-y;
+      background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAAE0lEQVQImWP4////f4bdu3f/BwAlfgctduB85QAAAABJRU5ErkJggg==') right repeat-y;
     }
 
     .ace_placeholder {

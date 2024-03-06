@@ -20,7 +20,6 @@ import com.google.common.util.concurrent.Service;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 import org.graylog.datanode.configuration.OpensearchConfigurationProvider;
-import org.graylog.datanode.initializers.JerseyService;
 import org.graylog.datanode.initializers.PeriodicalsService;
 import org.graylog.datanode.management.OpensearchProcess;
 import org.graylog.datanode.management.OpensearchProcessService;

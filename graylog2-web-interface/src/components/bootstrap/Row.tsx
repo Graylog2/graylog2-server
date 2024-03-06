@@ -20,12 +20,13 @@ import styled, { css } from 'styled-components';
 
 export const RowContentStyles = css(({ theme }) => css`
   background-color: ${theme.colors.global.contentBackground};
-  border: 1px solid ${theme.colors.variant.lighter.default};
   margin-bottom: ${theme.spacings.xs};
-  border-radius: 4px;
+  border-radius: 6px;
+  box-shadow: rgba(0, 0, 0, 0.04) 0 3px 5px;
 `);
 
-const Row = styled(BootstrapRow)`
+type RowProps = React.ComponentProps<typeof BootstrapRow>;
+const Row: React.ComponentType<RowProps> = styled(BootstrapRow)`
   &.content {
     ${RowContentStyles}
   }

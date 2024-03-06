@@ -50,7 +50,6 @@ import useAppDispatch from 'stores/useAppDispatch';
 import { execute } from 'views/logic/slices/searchExecutionSlice';
 import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
 import useAppSelector from 'stores/useAppSelector';
-import { RefreshActions } from 'views/stores/RefreshStore';
 import useParameters from 'views/hooks/useParameters';
 
 import ExternalValueActionsProvider from './ExternalValueActionsProvider';
@@ -81,7 +80,7 @@ const SearchArea = styled(PageContentLayout)(() => {
         /* overflow auto is required to display the message table widget height correctly */
         overflow: ${focusedWidget?.id ? 'auto' : 'visible'};
       }
-    `}
+`}
 `;
 });
 
@@ -113,27 +112,16 @@ const ViewAdditionalContextProvider = ({ children }: { children: React.ReactNode
 
 ViewAdditionalContextProvider.displayName = 'ViewAdditionalContextProvider';
 
-const useAutoRefresh = (refresh: () => Promise<unknown>) => {
-  useEffect(() => RefreshActions.refresh.listen(() => {
-    RefreshActions.refresh.promise(refresh());
-  }), [refresh]);
-};
-
-type Props = {
-  InfoBarSlot?: React.ComponentType,
-  SearchAreaContainer?: React.ComponentType,
-}
-
-const Search = ({ InfoBarSlot, SearchAreaContainer }: Props) => {
+const Search = () => {
   const dispatch = useAppDispatch();
   const refreshSearch = useCallback(() => dispatch(execute()), [dispatch]);
-  const { sidebar: { isShown: showSidebar } } = useSearchPageLayout();
+  const { sidebar: { isShown: showSidebar }, searchAreaContainer, infoBar } = useSearchPageLayout();
+  const InfoBar = infoBar?.component;
+  const SearchAreaContainer = searchAreaContainer?.component;
 
   useEffect(() => {
     refreshSearch();
   }, [refreshSearch]);
-
-  useAutoRefresh(refreshSearch);
 
   useEffect(() => {
     SearchConfigActions.refresh();
@@ -176,7 +164,7 @@ const Search = ({ InfoBarSlot, SearchAreaContainer }: Props) => {
                               <SearchArea as={SearchAreaContainer}>
                                 <IfInteractive>
                                   <HeaderElements />
-                                  {InfoBarSlot && <InfoBarSlot />}
+                                  {InfoBar && <InfoBar />}
                                   <IfDashboard>
                                     {!editingWidget && <DashboardSearchBar />}
                                   </IfDashboard>
@@ -208,11 +196,6 @@ const Search = ({ InfoBarSlot, SearchAreaContainer }: Props) => {
       </ExternalValueActionsProvider>
     </>
   );
-};
-
-Search.defaultProps = {
-  InfoBarSlot: undefined,
-  SearchAreaContainer: undefined,
 };
 
 export default Search;

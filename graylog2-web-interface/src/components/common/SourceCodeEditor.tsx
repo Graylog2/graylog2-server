@@ -26,7 +26,7 @@ import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import OverlayTrigger from 'components/common/OverlayTrigger';
-import { Button, ButtonGroup, ButtonToolbar, Tooltip } from 'components/bootstrap';
+import { Button, ButtonGroup, ButtonToolbar } from 'components/bootstrap';
 import PipelineRulesMode from 'components/rules/mode-pipeline';
 
 import ClipboardButton from './ClipboardButton';
@@ -47,10 +47,6 @@ const SourceCodeContainer = styled.div<ContainerProps>(({ $resizable, theme }) =
   ${theme.components.aceEditor}
 `);
 
-const StyledTooltip = styled(Tooltip)`
-  width: 250px;
-`;
-
 const Toolbar = styled.div(({ theme }) => css`
   background: ${theme.colors.global.contentBackground};
   border: 1px solid ${theme.colors.gray[80]};
@@ -59,7 +55,7 @@ const Toolbar = styled.div(({ theme }) => css`
 
   .btn-link {
     color: ${theme.colors.variant.dark.info};
-    
+
     &:hover {
       color: ${theme.colors.variant.darkest.info};
       background-color: ${theme.colors.variant.lightest.info};
@@ -68,7 +64,7 @@ const Toolbar = styled.div(({ theme }) => css`
     &.disabled,
     &[disabled] {
       color: ${theme.colors.variant.light.default};
-      
+
       &:hover {
         color: ${theme.colors.variant.light.default};
       }
@@ -108,6 +104,7 @@ type Props = {
   resizable?: boolean,
   toolbar?: boolean,
   value?: string,
+  wrapEnabled?: boolean,
 }
 
 type State = {
@@ -155,6 +152,8 @@ class SourceCodeEditor extends React.Component<Props, State> {
     value: PropTypes.string,
     /** Editor width in pixels. Use `Infinity` to indicate the editor should use 100% of its container's width. */
     width: PropTypes.number,
+    /** Specifies if the editor should wrap text or use horizontal scrolling. */
+    wrapEnabled: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -172,11 +171,12 @@ class SourceCodeEditor extends React.Component<Props, State> {
     toolbar: true,
     value: undefined,
     width: Infinity,
+    wrapEnabled: false,
   };
 
   private reactAce: AceEditor;
 
-  private readonly overlayContainerRef: React.RefObject<React.ReactElement>;
+  private readonly overlayContainerRef: React.RefObject<any>;
 
   constructor(props) {
     super(props);
@@ -281,9 +281,10 @@ class SourceCodeEditor extends React.Component<Props, State> {
       onBlur,
       readOnly,
       value,
+      wrapEnabled,
     } = this.props;
     const validCssWidth = isFinite(width) ? width : '100%';
-    const overlay = <StyledTooltip id="paste-button-tooltip" className="in">Press Ctrl+V (&#8984;V in macOS) or select Edit&thinsp;&rarr;&thinsp;Paste to paste from clipboard.</StyledTooltip>;
+    const overlay = <>Press Ctrl+V (&#8984;V in macOS) or select Edit&thinsp;&rarr;&thinsp;Paste to paste from clipboard.</>;
 
     return (
       <div className="source-code-editor">
@@ -292,16 +293,16 @@ class SourceCodeEditor extends React.Component<Props, State> {
           <Toolbar style={{ width: validCssWidth }}>
             <ButtonToolbar>
               <ButtonGroup ref={this.overlayContainerRef}>
-                <ClipboardButton title={<Icon name="copy" fixedWidth />}
+                <ClipboardButton title={<Icon name="content_copy" />}
                                  bsStyle="link"
                                  bsSize="sm"
                                  onSuccess={this.focusEditor}
                                  text={selectedText}
                                  buttonTitle="Copy (Ctrl+C / &#8984;C)"
                                  disabled={this.isCopyDisabled()} />
-                <OverlayTrigger placement="top" trigger="click" overlay={overlay} rootClose container={this.overlayContainerRef.current}>
+                <OverlayTrigger placement="top" trigger="click" overlay={overlay} rootClose width={250}>
                   <Button bsStyle="link" bsSize="sm" title="Paste (Ctrl+V / &#8984;V)" disabled={this.isPasteDisabled()}>
-                    <Icon name="clipboard" fixedWidth />
+                    <Icon name="content_copy" />
                   </Button>
                 </OverlayTrigger>
               </ButtonGroup>
@@ -311,14 +312,14 @@ class SourceCodeEditor extends React.Component<Props, State> {
                         onClick={this.handleUndo}
                         title="Undo (Ctrl+Z / &#8984;Z)"
                         disabled={this.isUndoDisabled()}>
-                  <Icon name="undo" fixedWidth />
+                  <Icon name="undo" />
                 </Button>
                 <Button bsStyle="link"
                         bsSize="sm"
                         onClick={this.handleRedo}
                         title="Redo (Ctrl+Shift+Z / &#8984;&#8679;Z)"
                         disabled={this.isRedoDisabled()}>
-                  <Icon name="redo" fixedWidth />
+                  <Icon name="redo" />
                 </Button>
               </ButtonGroup>
             </ButtonToolbar>
@@ -350,7 +351,8 @@ class SourceCodeEditor extends React.Component<Props, State> {
                        onSelectionChange={this.handleSelectionChange}
                        readOnly={readOnly}
                        value={value}
-                       width="100%" />
+                       width="100%"
+                       wrapEnabled={wrapEnabled} />
           </SourceCodeContainer>
         </Resizable>
       </div>

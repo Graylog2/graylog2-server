@@ -18,10 +18,11 @@ import * as React from 'react';
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import type { ButtonProps } from 'components/bootstrap';
 import { Button } from 'components/bootstrap';
 
-type Props = ButtonProps & {
+type ButtonProps = React.ComponentProps<typeof Button>;
+
+type Props = Omit<ButtonProps, 'target'> & {
   to: string,
   target?: '_blank' | '_self' | '_parent' | '_top' | 'framename',
 }

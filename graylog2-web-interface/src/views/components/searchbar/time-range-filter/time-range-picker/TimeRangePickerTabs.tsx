@@ -37,6 +37,10 @@ import { toDateObject } from 'util/DateTime';
 import {
   RELATIVE_CLASSIFIED_ALL_TIME_RANGE,
 } from 'views/components/searchbar/time-range-filter/time-range-picker/RelativeTimeRangeClassifiedHelper';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import useLocation from 'routing/useLocation';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import type { SelectCallback } from 'components/bootstrap/types';
 
 import TabAbsoluteTimeRange from './TabAbsoluteTimeRange';
 import TabKeywordTimeRange from './TabKeywordTimeRange';
@@ -119,7 +123,7 @@ const newTabTimeRange = ({
   timeRangeTabs,
   formatTime,
   defaultRanges,
-} : {
+}: {
   activeTab: TimeRangePickerFormValues['activeTab'],
   nextTab: TimeRangePickerFormValues['activeTab'],
   timeRangeTabs: TimeRangePickerFormValues['timeRangeTabs'],
@@ -143,6 +147,7 @@ const TimeRangeTabs = ({
   setValidatingKeyword,
 }: Props) => {
   const sendTelemetry = useSendTelemetry();
+  const location = useLocation();
   const { formatTime } = useUserDateTime();
   const { setValues, values: { activeTab, timeRangeTabs } } = useFormikContext<TimeRangePickerFormValues>();
   const defaultRanges = useMemo(() => createDefaultRanges(formatTime), [formatTime]);
@@ -162,15 +167,15 @@ const TimeRangeTabs = ({
       activeTab: nextTab,
     });
 
-    sendTelemetry('click', {
-      app_pathname: 'search',
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_TIMERANGE_PICKER_TAB_SELECTED, {
+      app_pathname: getPathnameWithoutId(location.pathname),
       app_section: 'search-bar',
       app_action_value: 'search-time-range',
       event_details: {
         tab: nextTab,
       },
     });
-  }, [activeTab, defaultRanges, formatTime, sendTelemetry, setValues, timeRangeTabs]);
+  }, [activeTab, defaultRanges, formatTime, location.pathname, sendTelemetry, setValues, timeRangeTabs]);
 
   const tabs = useMemo(() => timeRangeTypeTabs({
     activeTab,
@@ -183,7 +188,7 @@ const TimeRangeTabs = ({
     <StyledTabs id="dateTimeTypes"
                 defaultActiveKey={availableTimeRangeTypes[0].type}
                 activeKey={activeTab ?? -1}
-                onSelect={onSelect}
+                onSelect={onSelect as SelectCallback}
                 animation={false}>
       {tabs}
       {!activeTab && (<TabDisabledTimeRange />)}

@@ -64,11 +64,17 @@
             </includes>
         </fileSet>
 
+        <fileSet filtered="true"  encoding="UTF-8">
+            <directory>.mvn</directory>
+            <includes>
+                <include>**/*</include>
+            </includes>
+        </fileSet>
+
         <fileSet filtered="true" encoding="UTF-8">
             <directory></directory>
             <includes>
                 <include>.gitignore</include>
-                <include>.travis.yml</include>
                 <include>README.md</include>
                 <include>GETTING-STARTED.md</include>
                 <include>package.json</include>

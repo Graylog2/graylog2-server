@@ -14,39 +14,45 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
-import React from 'react';
+import * as React from 'react';
 
-import { MenuItem, NavDropdown } from 'components/bootstrap';
-import { ExternalLink, Icon } from 'components/common';
+import { NavDropdown } from 'components/bootstrap';
+import { Icon } from 'components/common';
 import AppConfig from 'util/AppConfig';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
+import useHotkeysContext from 'hooks/useHotkeysContext';
+import Menu from 'components/bootstrap/Menu';
 
-type Props = {
-  active: boolean,
-}
-const HelpMenu = ({ active }: Props) => (
-  <NavDropdown active={active}
-               id="help-menu-dropdown"
-               title={<Icon name="question-circle" size="lg" />}
-               aria-label="Help"
-               noCaret>
-
-    <MenuItem href={DocsHelper.versionedDocsHomePage()} target="_blank">
-      <ExternalLink>Documentation</ExternalLink>
-    </MenuItem>
-
-    {AppConfig.isCloud() && (
-    <MenuItem href={Routes.global_api_browser()} target="_blank">
-      <ExternalLink>Cluster Global API browser</ExternalLink>
-    </MenuItem>
-    )}
-  </NavDropdown>
+const HelpMenuLinkItem = ({ href, children }: React.PropsWithChildren<{ href: string }>) => (
+  <Menu.Item component="a" href={href} target="_blank" leftSection={<Icon name="open_in_new" />}>
+    {children}
+  </Menu.Item>
 );
 
-HelpMenu.propTypes = {
-  active: PropTypes.bool.isRequired,
+const HelpMenu = () => {
+  const { setShowHotkeysModal } = useHotkeysContext();
+
+  return (
+    <NavDropdown title={<Icon name="help" size="lg" />}
+                 hoverTitle="Help"
+                 noCaret>
+
+      <HelpMenuLinkItem href={DocsHelper.versionedDocsHomePage()}>
+        Documentation
+      </HelpMenuLinkItem>
+
+      <Menu.Item onClick={() => setShowHotkeysModal(true)}>
+        Keyboard Shortcuts
+      </Menu.Item>
+
+      {AppConfig.isCloud() && (
+        <HelpMenuLinkItem href={Routes.global_api_browser()}>
+          Cluster Global API browser
+        </HelpMenuLinkItem>
+      )}
+    </NavDropdown>
+  );
 };
 
 export default HelpMenu;

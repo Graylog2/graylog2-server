@@ -41,7 +41,7 @@ type Props = {
 const CreateTokenForm = ({ creatingToken, onCreate }: Props) => {
   const [tokenName, setTokenName] = useState('');
 
-  const createToken = (event) => {
+  const createToken = (event: React.SyntheticEvent) => {
     event.preventDefault();
     onCreate(tokenName);
     setTokenName('');
@@ -54,7 +54,7 @@ const CreateTokenForm = ({ creatingToken, onCreate }: Props) => {
         <FormControl type="text"
                      placeholder="What is this token for?"
                      value={tokenName}
-                     onChange={(event) => setTokenName(event.target.value)} />
+                     onChange={(event) => setTokenName((event.target as HTMLInputElement).value)} />
       </FormGroup>
       <Button id="create-token"
               disabled={tokenName === '' || creatingToken}

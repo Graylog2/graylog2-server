@@ -27,17 +27,26 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class CustomFieldMappings extends HashSet<CustomFieldMapping> {
-    public record TypeDescription(String description, FieldTypes.Type type) {}
+    public record TypeDescription(String description, FieldTypes.Type type, String physicalType) {
+        public TypeDescription(String description, FieldTypes.Type type) {
+            this(description,
+                    type,
+                    FieldTypeMapper.TYPE_MAP.entrySet()
+                            .stream()
+                            .filter(entry -> !entry.getKey().equals("half_float") && !entry.getKey().equals("scaled_float"))
+                            .filter(entry -> entry.getValue().equals(type))
+                            .findFirst()
+                            .map(Map.Entry::getKey)
+                            .orElseThrow(() -> new IllegalArgumentException(description + " field in CustomFieldMappings.AVAILABLE_TYPES is set to illegal value")));
+
+        }
+    }
 
     public static final Map<String, TypeDescription> AVAILABLE_TYPES = ImmutableMap.<String, TypeDescription>builder()
             .put("string", new TypeDescription("String (aggregatable)", FieldTypeMapper.STRING_TYPE))
             .put("string_fts", new TypeDescription("String (full-text searchable)", FieldTypeMapper.STRING_FTS_TYPE))
-            .put("long", new TypeDescription("Number (long)", FieldTypeMapper.LONG_TYPE))
-            .put("int", new TypeDescription("Number (int)", FieldTypeMapper.INT_TYPE))
-            .put("short", new TypeDescription("Number (short)", FieldTypeMapper.SHORT_TYPE))
-            .put("byte", new TypeDescription("Byte", FieldTypeMapper.BYTE_TYPE))
-            .put("double", new TypeDescription("Floating Point Number (double)", FieldTypeMapper.DOUBLE_TYPE))
-            .put("float", new TypeDescription("Floating Point Number (float)", FieldTypeMapper.FLOAT_TYPE))
+            .put("long", new TypeDescription("Number", FieldTypeMapper.LONG_TYPE))
+            .put("double", new TypeDescription("Number (Floating Point)", FieldTypeMapper.DOUBLE_TYPE))
             .put("date", new TypeDescription("Date", FieldTypeMapper.DATE_TYPE))
             .put("boolean", new TypeDescription("Boolean", FieldTypeMapper.BOOLEAN_TYPE))
             .put("binary", new TypeDescription("Binary Data", FieldTypeMapper.BINARY_TYPE))
@@ -62,5 +71,21 @@ public class CustomFieldMappings extends HashSet<CustomFieldMapping> {
         modifiedMappings.removeIf(m -> changedMapping.fieldName().equals(m.fieldName()));
         modifiedMappings.add(changedMapping);
         return new CustomFieldMappings(modifiedMappings);
+    }
+
+    public CustomFieldMappings mergeWith(final CustomFieldMappings changedMappings) {
+        if (changedMappings == null || changedMappings.isEmpty()) {
+            return this;
+        }
+        final Set<CustomFieldMapping> modifiedMappings = new HashSet<>(this);
+        for (CustomFieldMapping changedMapping : changedMappings) {
+            modifiedMappings.removeIf(m -> changedMapping.fieldName().equals(m.fieldName()));
+            modifiedMappings.add(changedMapping);
+        }
+        return new CustomFieldMappings(modifiedMappings);
+    }
+
+    public boolean containsCustomMappingForField(final String fieldName) {
+        return stream().anyMatch(m -> m.fieldName().equals(fieldName));
     }
 }

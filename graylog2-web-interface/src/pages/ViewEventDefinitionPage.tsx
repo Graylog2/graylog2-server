@@ -33,12 +33,12 @@ import EventsPageNavigation from 'components/events/EventsPageNavigation';
 import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 const ViewEventDefinitionPage = () => {
   const params = useParams<{ definitionId?: string }>();
   const currentUser = useCurrentUser();
   const [eventDefinition, setEventDefinition] = useState<EventDefinition | undefined>();
-  const [isMutable, setIsMutable] = useState<boolean>(true);
   const [showDialog, setShowDialog] = useState(false);
   const { all: notifications } = useStore(EventNotificationsStore);
   const history = useHistory();
@@ -59,7 +59,6 @@ const ViewEventDefinitionPage = () => {
             // back to the server.
             eventDefinitionResp.config._is_scheduled = response.context.scheduler.is_scheduled;
             setEventDefinition(eventDefinitionResp);
-            setIsMutable(response.is_mutable);
           },
           (error) => {
             if (error.status === 404) {
@@ -73,9 +72,8 @@ const ViewEventDefinitionPage = () => {
   }, [currentUser, history, params]);
 
   const handleDuplicateEvent = () => {
-    sendTelemetry('click', {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_DUPLICATED, {
       app_pathname: 'event-definition',
-      app_action_value: 'event-definition-action-copy',
     });
 
     EventDefinitionsActions.copy(eventDefinition).then((duplicatedEvent) => {
@@ -102,19 +100,17 @@ const ViewEventDefinitionPage = () => {
         <PageHeader title={`View "${eventDefinition.title}" Event Definition`}
                     actions={(
                       <ButtonToolbar>
-                        {isMutable && (
                         <IfPermitted permissions={`eventdefinitions:edit:${params.definitionId}`}>
                           <LinkContainer to={Routes.ALERTS.DEFINITIONS.edit(params.definitionId)}>
                             <Button bsStyle="success">Edit Event Definition</Button>
                           </LinkContainer>
                         </IfPermitted>
-                        )}
                         {!isSystemEventDefinition() && (
-                        <IfPermitted permissions="eventdefinitions:create">
-                          <Button onClick={() => setShowDialog(true)} bsStyle="success">Duplicate Event
-                            Definition
-                          </Button>
-                        </IfPermitted>
+                          <IfPermitted permissions="eventdefinitions:create">
+                            <Button onClick={() => setShowDialog(true)} bsStyle="success">Duplicate Event
+                              Definition
+                            </Button>
+                          </IfPermitted>
                         )}
                       </ButtonToolbar>
                   )}

@@ -47,7 +47,6 @@ import org.mockito.junit.MockitoRule;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -66,25 +65,21 @@ public class OpenSearchBackendSearchTypeOverridesTest extends OpenSearchBackendG
 
     @Before
     public void setUpFixtures() throws InvalidRangeParametersException {
-        final Set<SearchType> searchTypes = new HashSet<>() {{
-            add(
-                    Pivot.builder()
-                            .id("pivot1")
-                            .series(Collections.singletonList(Average.builder().field("field1").build()))
-                            .rollup(true)
-                            .timerange(DerivedTimeRange.of(AbsoluteRange.create("2019-09-11T10:31:52.819Z", "2019-09-11T10:36:52.823Z")))
-                            .filters(Collections.singletonList(InlineQueryStringSearchFilter.builder().title("Pivot1 local filter").description("Pivot1 local filter").queryString("local:filter").build()))
-                            .build()
-            );
-            add(
-                    Pivot.builder()
-                            .id("pivot2")
-                            .series(Collections.singletonList(Max.builder().field("field2").build()))
-                            .rollup(true)
-                            .query(ElasticsearchQueryString.of("source:babbage"))
-                            .build()
-            );
-        }};
+        final Set<SearchType> searchTypes = Set.of(
+                Pivot.builder()
+                        .id("pivot1")
+                        .series(Collections.singletonList(Average.builder().field("field1").build()))
+                        .rollup(true)
+                        .timerange(DerivedTimeRange.of(AbsoluteRange.create("2019-09-11T10:31:52.819Z", "2019-09-11T10:36:52.823Z")))
+                        .filters(Collections.singletonList(InlineQueryStringSearchFilter.builder().title("Pivot1 local filter").description("Pivot1 local filter").queryString("local:filter").build()))
+                        .build(),
+                Pivot.builder()
+                        .id("pivot2")
+                        .series(Collections.singletonList(Max.builder().field("field2").build()))
+                        .rollup(true)
+                        .query(ElasticsearchQueryString.of("source:babbage"))
+                        .build()
+        );
         this.query = Query.builder()
                 .id("query1")
                 .searchTypes(searchTypes)

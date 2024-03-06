@@ -32,7 +32,9 @@ import org.joda.time.Seconds;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.inject.Inject;
+
+import jakarta.inject.Inject;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -105,21 +107,21 @@ public class KinesisCloudWatchFlowLogCodec extends AbstractKinesisCodec {
     private Map<String, Object> buildFields(FlowLogMessage msg) {
 
         final String prefix = this.noFlowLogPrefix ? "" : FLOW_LOG_PREFIX;
-        return new HashMap<String, Object>() {{
-            put(prefix + FIELD_ACCOUNT_ID, msg.getAccountId());
-            put(prefix + FIELD_INTERFACE_ID, msg.getInterfaceId());
-            put(prefix + FIELD_SRC_ADDR, msg.getSourceAddress());
-            put(prefix + FIELD_DST_ADDR, msg.getDestinationAddress());
-            put(prefix + FIELD_SRC_PORT, msg.getSourcePort());
-            put(prefix + FIELD_DST_PORT, msg.getDestinationPort());
-            put(prefix + FIELD_PROTOCOL_NUMBER, msg.getProtocolNumber());
-            put(prefix + FIELD_PROTOCOL, protocolNumbers.lookup(msg.getProtocolNumber()));
-            put(prefix + FIELD_PACKETS, msg.getPackets());
-            put(prefix + FIELD_BYTES, msg.getBytes());
-            put(prefix + FIELD_CAPTURE_WINDOW_DURATION, Seconds.secondsBetween(msg.getCaptureWindowStart(), msg.getCaptureWindowEnd()).getSeconds());
-            put(prefix + FIELD_ACTION, msg.getAction());
-            put(prefix + FIELD_LOG_STATUS, msg.getLogStatus());
-        }};
+        final HashMap<String, Object> fields = new HashMap<>();
+        fields.put(prefix + FIELD_ACCOUNT_ID, msg.getAccountId());
+        fields.put(prefix + FIELD_INTERFACE_ID, msg.getInterfaceId());
+        fields.put(prefix + FIELD_SRC_ADDR, msg.getSourceAddress());
+        fields.put(prefix + FIELD_DST_ADDR, msg.getDestinationAddress());
+        fields.put(prefix + FIELD_SRC_PORT, msg.getSourcePort());
+        fields.put(prefix + FIELD_DST_PORT, msg.getDestinationPort());
+        fields.put(prefix + FIELD_PROTOCOL_NUMBER, msg.getProtocolNumber());
+        fields.put(prefix + FIELD_PROTOCOL, protocolNumbers.lookup(msg.getProtocolNumber()));
+        fields.put(prefix + FIELD_PACKETS, msg.getPackets());
+        fields.put(prefix + FIELD_BYTES, msg.getBytes());
+        fields.put(prefix + FIELD_CAPTURE_WINDOW_DURATION, Seconds.secondsBetween(msg.getCaptureWindowStart(), msg.getCaptureWindowEnd()).getSeconds());
+        fields.put(prefix + FIELD_ACTION, msg.getAction());
+        fields.put(prefix + FIELD_LOG_STATUS, msg.getLogStatus());
+        return fields;
     }
 
     @Override

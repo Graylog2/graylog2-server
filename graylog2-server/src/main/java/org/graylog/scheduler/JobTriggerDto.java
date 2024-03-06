@@ -17,6 +17,7 @@
 package org.graylog.scheduler;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
@@ -33,6 +34,7 @@ import java.util.Set;
 
 @AutoValue
 @JsonDeserialize(builder = JobTriggerDto.Builder.class)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class JobTriggerDto {
     public static final String FIELD_ID = "id";
 
@@ -41,6 +43,7 @@ public abstract class JobTriggerDto {
     static final String FIELD_START_TIME = "start_time";
     static final String FIELD_END_TIME = "end_time";
     static final String FIELD_NEXT_TIME = "next_time";
+    static final String FIELD_EXECUTION_DURATION = "execution_duration";
     private static final String FIELD_CREATED_AT = "created_at";
     static final String FIELD_UPDATED_AT = "updated_at";
     static final String FIELD_TRIGGERED_AT = "triggered_at";
@@ -59,6 +62,7 @@ public abstract class JobTriggerDto {
 
     @JsonProperty(FIELD_JOB_DEFINITION_TYPE)
     public abstract String jobDefinitionType();
+
     @JsonProperty(FIELD_JOB_DEFINITION_ID)
     public abstract String jobDefinitionId();
 
@@ -80,6 +84,9 @@ public abstract class JobTriggerDto {
     @JsonProperty(FIELD_TRIGGERED_AT)
     public abstract Optional<DateTime> triggeredAt();
 
+    @JsonProperty(FIELD_EXECUTION_DURATION)
+    public abstract Optional<Long> executionDurationMs();
+
     @JsonProperty(FIELD_STATUS)
     public abstract JobTriggerStatus status();
 
@@ -97,6 +104,7 @@ public abstract class JobTriggerDto {
 
     @JsonProperty(FIELD_IS_CANCELLED)
     public abstract boolean isCancelled();
+
     public static Builder builder() {
         return Builder.create();
     }
@@ -108,6 +116,7 @@ public abstract class JobTriggerDto {
     public abstract Builder toBuilder();
 
     @AutoValue.Builder
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static abstract class Builder {
         @JsonCreator
         public static Builder create() {
@@ -156,6 +165,9 @@ public abstract class JobTriggerDto {
 
         @JsonProperty(FIELD_TRIGGERED_AT)
         public abstract Builder triggeredAt(@Nullable DateTime triggeredAt);
+
+        @JsonProperty(FIELD_EXECUTION_DURATION)
+        public abstract Builder executionDurationMs(@Nullable Long executionDurationMs);
 
         @JsonProperty(FIELD_STATUS)
         public abstract Builder status(JobTriggerStatus status);

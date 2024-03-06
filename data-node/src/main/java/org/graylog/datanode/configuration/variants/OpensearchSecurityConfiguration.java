@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.graylog.datanode.Configuration;
+import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.configuration.TruststoreCreator;
 import org.graylog.security.certutil.CertConstants;
 import org.slf4j.Logger;
@@ -51,7 +51,7 @@ public class OpensearchSecurityConfiguration {
 
     private static final String KEYSTORE_FORMAT = "PKCS12";
     private static final String TRUSTSTORE_FORMAT = "PKCS12";
-    private static final String TRUSTSTORE_FILENAME = "datanode-truststore.p12";
+    private static final Path TRUSTSTORE_FILE = Path.of("datanode-truststore.p12");
 
     private final KeystoreInformation transportCertificate;
     private final KeystoreInformation httpCertificate;
@@ -73,15 +73,15 @@ public class OpensearchSecurityConfiguration {
      * initial set of opensearch users, it will create and persist a truststore that will be set as a system-wide
      * truststore.
      */
-    public OpensearchSecurityConfiguration configure(Configuration localConfiguration, byte[] signingKey) throws GeneralSecurityException, IOException {
+    public OpensearchSecurityConfiguration configure(DatanodeConfiguration datanodeConfiguration, byte[] signingKey) throws GeneralSecurityException, IOException {
         if (securityEnabled()) {
 
             logCertificateInformation("transport certificate", transportCertificate);
             logCertificateInformation("HTTP certificate", httpCertificate);
 
-            final Path opensearchConfigDir = Path.of(localConfiguration.getOpensearchConfigLocation()).resolve("opensearch");
+            final Path opensearchConfigDir = datanodeConfiguration.datanodeDirectories().getOpensearchProcessConfigurationDir();
 
-            final Path trustStorePath = opensearchConfigDir.resolve(TRUSTSTORE_FILENAME);
+            final Path trustStorePath = datanodeConfiguration.datanodeDirectories().createOpensearchProcessConfigurationFile(TRUSTSTORE_FILE);
             final String truststorePassword = RandomStringUtils.randomAlphabetic(256);
 
             this.truststore = TruststoreCreator.newTruststore()
@@ -108,13 +108,8 @@ public class OpensearchSecurityConfiguration {
             config.put("plugins.security.ssl.transport.keystore_alias", CertConstants.DATANODE_KEY_ALIAS);
 
             config.put("plugins.security.ssl.transport.truststore_type", TRUSTSTORE_FORMAT);
-            config.put("plugins.security.ssl.transport.truststore_filepath", TRUSTSTORE_FILENAME);
+            config.put("plugins.security.ssl.transport.truststore_filepath", TRUSTSTORE_FILE.toString());
             config.put("plugins.security.ssl.transport.truststore_password", truststore.passwordAsString());
-
-            // this disables hostname verification for transport. It's a workaround for localnode communication
-            // via SSL, where Opensearch still tries to communicate with 'localhost' and not the publish_host or other
-            // configured node names.
-            config.put("plugins.security.ssl.transport.enforce_hostname_verification", "false");
 
             config.put("plugins.security.ssl.http.enabled", "true");
 
@@ -124,7 +119,7 @@ public class OpensearchSecurityConfiguration {
             config.put("plugins.security.ssl.http.keystore_alias", CertConstants.DATANODE_KEY_ALIAS);
 
             config.put("plugins.security.ssl.http.truststore_type", TRUSTSTORE_FORMAT);
-            config.put("plugins.security.ssl.http.truststore_filepath", TRUSTSTORE_FILENAME);
+            config.put("plugins.security.ssl.http.truststore_filepath", TRUSTSTORE_FILE.toString());
             config.put("plugins.security.ssl.http.truststore_password", truststore.passwordAsString());
         } else {
             config.put("plugins.security.disabled", "true");

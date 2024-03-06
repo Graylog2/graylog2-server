@@ -22,10 +22,13 @@ import StreamModal from 'components/streams/StreamModal';
 import type { Stream } from 'stores/streams/StreamsStore';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import type { BsSize } from 'components/bootstrap/types';
+import type { StyleProps } from 'components/bootstrap/Button';
 
 type Props = {
-  bsSize?: string
-  bsStyle?: string,
+  bsSize?: BsSize,
+  bsStyle?: StyleProps,
   buttonText?: string,
   className?: string,
   indexSets: Array<IndexSet>
@@ -37,9 +40,8 @@ const CreateStreamButton = ({ bsSize, bsStyle, buttonText, className, indexSets,
   const sendTelemetry = useSendTelemetry();
 
   const toggleCreateModal = useCallback(() => {
-    sendTelemetry('click', {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.CREATE_FORM_MODAL_OPENED, {
       app_pathname: 'streams',
-      app_action_value: 'stream-create-button',
     });
 
     return setShowCreateModal((cur) => !cur);

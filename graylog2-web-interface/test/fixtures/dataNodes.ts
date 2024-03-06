@@ -26,7 +26,7 @@ export const dataNodes = [
     short_node_id: 'node-id-1',
     transport_address: 'http://localhost:9200',
     type: 'DATANODE',
-    status: 'UNCONFIGURED',
+    status: 'UNCONFIGURED' as const,
     cert_valid_until: '2020-02-10T20:40:00.000Z',
   },
   {
@@ -39,7 +39,7 @@ export const dataNodes = [
     short_node_id: 'node-id-2',
     transport_address: 'http://localhost:9201',
     type: 'DATANODE',
-    status: 'UNCONFIGURED',
+    status: 'UNCONFIGURED' as const,
     cert_valid_until: '2020-02-10T20:40:00.000Z',
   },
   {
@@ -52,7 +52,7 @@ export const dataNodes = [
     short_node_id: 'node-id-3',
     transport_address: 'http://localhost:9202',
     type: 'DATANODE',
-    status: 'UNCONFIGURED',
+    status: 'UNCONFIGURED' as const,
     cert_valid_until: '2020-02-10T20:40:00.000Z',
   },
 ];

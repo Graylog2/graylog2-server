@@ -21,10 +21,12 @@ import DOMPurify from 'dompurify';
 
 import { Carousel, Timestamp } from 'components/common';
 import { Panel } from 'components/bootstrap';
-import type { FeedITem, FeedMediaContent } from 'components/content-stream/hook/useContentStream';
+import type { FeedItem, FeedMediaContent } from 'components/content-stream/hook/useContentStream';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 type Props = {
-  feed: FeedITem
+  feed: FeedItem
 }
 
 const StyledImage = styled.img(({ theme }: { theme: DefaultTheme }) => css`
@@ -56,23 +58,42 @@ const _sanitizeText = (text) => DOMPurify.sanitize(text);
 
 const getImage = (media: FeedMediaContent | Array<FeedMediaContent>) => (Array.isArray(media) ? media?.[0]?.attr_url : media?.attr_url);
 
-const ContentStreamNewsItem = ({ feed }: Props) => (
-  <Carousel.Slide>
-    <StyledPanel>
-      <a href={feed?.link} target="_blank" rel="noreferrer">
-        <StyledImage src={getImage(feed?.['media:content'])} alt={feed?.title} />
-      </a>
+const ContentStreamNewsItem = ({ feed }: Props) => {
+  const sendTelemetry = useSendTelemetry();
 
-      <StyledPanelBody>
-        {/* eslint-disable-next-line react/no-danger */}
-        <a href={feed?.link} target="_blank" rel="noreferrer"><span dangerouslySetInnerHTML={{ __html: _sanitizeText(feed?.title) }} />
+  const handleSendTelemetry = () => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.CONTENTSTREAM.ARTICLE_CLICKED, {
+      app_pathname: 'welcome',
+      app_section: 'content-stream',
+      event_details: {
+        title: feed?.title,
+        link: feed?.link,
+      },
+    });
+  };
+
+  return (
+    <Carousel.Slide>
+      <StyledPanel>
+        <a href={feed?.link} onClick={() => handleSendTelemetry()} target="_blank" rel="noreferrer">
+          <StyledImage src={getImage(feed?.['media:content'])} alt={feed?.title} />
         </a>
-      </StyledPanelBody>
-      <StyledPanelFooter>
-        <Timestamp dateTime={_sanitizeText(feed?.pubDate)} format="shortReadable" />
-      </StyledPanelFooter>
-    </StyledPanel>
-  </Carousel.Slide>
-);
+
+        <StyledPanelBody>
+          <a href={feed?.link}
+             target="_blank"
+             onClick={() => handleSendTelemetry()}
+             rel="noreferrer">
+            {/* eslint-disable-next-line react/no-danger */}
+            <span dangerouslySetInnerHTML={{ __html: _sanitizeText(feed?.title) }} />
+          </a>
+        </StyledPanelBody>
+        <StyledPanelFooter>
+          <Timestamp dateTime={_sanitizeText(feed?.pubDate)} format="shortReadable" />
+        </StyledPanelFooter>
+      </StyledPanel>
+    </Carousel.Slide>
+  );
+};
 
 export default ContentStreamNewsItem;

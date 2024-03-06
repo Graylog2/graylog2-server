@@ -31,6 +31,7 @@ import org.graylog2.security.UserSessionTerminationService;
 import org.graylog2.security.encryption.EncryptedValueService;
 
 import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 public class SecurityBindings extends PluginModule {
     @Override
@@ -45,7 +46,7 @@ public class SecurityBindings extends PluginModule {
         install(new FactoryModuleBuilder()
                 .implement(TrustManager.class, DefaultX509TrustManager.class)
                 .build(TrustManagerProvider.class));
-        bind(CustomCAX509TrustManager.class).asEagerSingleton();
+        bind(X509TrustManager.class).to(CustomCAX509TrustManager.class).asEagerSingleton();
 
         OptionalBinder.newOptionalBinder(binder(), ActorAwareAuthenticationTokenFactory.class)
                 .setDefault().to(ActorAwareUsernamePasswordTokenFactory.class);

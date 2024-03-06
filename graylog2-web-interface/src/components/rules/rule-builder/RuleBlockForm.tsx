@@ -16,15 +16,16 @@
  */
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Formik, Form } from 'formik';
+import { Formik } from 'formik';
 import styled, { css } from 'styled-components';
 
-import { FormSubmit, Icon, OverlayTrigger, Select } from 'components/common';
-import { Button, Col, Popover, Row } from 'components/bootstrap';
+import { FormSubmit, Icon, OverlayTrigger, Select, NestedForm } from 'components/common';
+import { Button, Col, Row } from 'components/bootstrap';
 import RuleBlockFormField from 'components/rules/rule-builder/RuleBlockFormField';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import Errors from './Errors';
 import { ruleBlockPropType, blockDictPropType, outputVariablesPropType, RuleBuilderTypes } from './types';
@@ -61,10 +62,6 @@ const SelectedBlock = styled.div(({ theme }) => css`
 
 const SelectedBlockInfo = styled(Row)(({ theme }) => css`
   margin-bottom: ${theme.spacings.md};
-`);
-
-const HelpPopover = styled(Popover)(() => css`
-  min-width: 700px;
 `);
 
 const OptionTitle = styled.p(({ theme }) => css`
@@ -126,12 +123,15 @@ const RuleBlockForm = ({
   }, [selectedBlockDict, existingBlock]);
 
   const handleChange = (option: string, resetForm: () => void) => {
-    sendTelemetry(`Pipeline RuleBuilder New ${type} Selected`, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'pipeline-rule-builder',
-      app_action_value: `select-${type}`,
-      event_details: { option },
-    });
+    sendTelemetry(
+      type === 'condition'
+        ? TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.NEW_CONDITION_SELECTED
+        : TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.NEW_ACTION_SELECTED, {
+        app_pathname: getPathnameWithoutId(pathname),
+        app_section: 'pipeline-rule-builder',
+        app_action_value: `select-${type}`,
+        event_details: { option },
+      });
 
     resetForm();
     onSelect(option);
@@ -142,25 +142,30 @@ const RuleBlockForm = ({
   };
 
   const onSubmit = (values: { [key: string]: any }) => {
-    sendTelemetry(`Pipeline RuleBuilder ${existingBlock ? 'Update' : 'Add'} ${type} Clicked`, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'pipeline-rule-builder',
-      app_action_value: `${existingBlock ? 'update' : 'add'}-${type}-button`,
-    });
-
     if (existingBlock) {
+      sendTelemetry(
+        type === 'condition'
+          ? TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.UPDATE_CONDITION_CLICKED
+          : TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.UPDATE_ACTION_CLICKED, {
+          app_pathname: getPathnameWithoutId(pathname),
+          app_section: 'pipeline-rule-builder',
+          app_action_value: `update-${type}-button`,
+        });
+
       onUpdate(values, selectedBlockDict?.name);
     } else {
+      sendTelemetry(
+        type === 'condition'
+          ? TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.ADD_CONDITION_CLICKED
+          : TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.ADD_ACTION_CLICKED, {
+          app_pathname: getPathnameWithoutId(pathname),
+          app_section: 'pipeline-rule-builder',
+          app_action_value: `add-${type}-button`,
+        });
+
       onAdd(values);
     }
   };
-
-  const buildHelpPopover = (blockDict: BlockDict) => (
-    <HelpPopover id="selected-block-Dict-help"
-                 title="Function Syntax Help">
-      <RuleHelperTable entries={[blockDict]} expanded={{ [blockDict.name]: true }} />
-    </HelpPopover>
-  );
 
   const optionRenderer = (option: Option, isSelected: boolean) => (
     <>
@@ -174,7 +179,7 @@ const RuleBlockForm = ({
       <Col md={12}>
         <Formik enableReinitialize onSubmit={onSubmit} initialValues={initialValues}>
           {({ resetForm, setFieldValue, isValid }) => (
-            <Form>
+            <NestedForm>
               <SelectRow>
                 <Col md={12}>
                   <Select id={`existingBlock-select-${type}`}
@@ -199,10 +204,11 @@ const RuleBlockForm = ({
                         <OverlayTrigger trigger="click"
                                         rootClose
                                         placement="right"
-                                        overlay={buildHelpPopover(selectedBlockDict)}>
+                                        title="Function Syntax Help"
+                                        width={700}
+                                        overlay={<RuleHelperTable entries={[selectedBlockDict]} expanded={{ [selectedBlockDict.name]: true }} />}>
                           <Button bsStyle="link">
-                            <Icon name="question-circle"
-                                  fixedWidth
+                            <Icon name="help"
                                   title="Function Syntax Help"
                                   data-testid="funcSyntaxHelpIcon" />
                           </Button>
@@ -237,7 +243,7 @@ const RuleBlockForm = ({
 
                 </SelectedBlock>
               )}
-            </Form>
+            </NestedForm>
           )}
         </Formik>
       </Col>

@@ -35,7 +35,8 @@ import org.graylog.security.shares.EntityShareResponse.AvailableCapability;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.rest.ValidationResult;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -245,7 +246,7 @@ public class EntitySharesService {
                 if (availableGranteeGRNs.contains(g.grantee())) {
                     removedOwners.add(g.grantee());
                 }
-            // owner capability got changed
+                // owner capability got changed
             } else if (!selectedGranteeCapabilities.get(g.grantee()).equals(Capability.OWN)) {
                 removedOwners.add(g.grantee());
             }

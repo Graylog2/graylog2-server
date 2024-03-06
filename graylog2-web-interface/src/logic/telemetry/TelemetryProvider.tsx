@@ -75,10 +75,11 @@ const TelemetryProvider = ({ children }: { children: React.ReactElement }) => {
         && telemetryData.user_telemetry_settings?.telemetry_enabled) {
         const {
           cluster: { cluster_id: clusterId, ...clusterDetails },
-          current_user: { user, ...userDetails },
+          current_user: { user },
           license,
           plugin,
           search_cluster: searchCluster,
+          data_nodes: dataNodes,
           user_telemetry_settings: { telemetry_permission_asked: isPermissionAsked },
         } = telemetryData as TelemetryDataType;
         setGlobalProps(getGlobalProps(telemetryData));
@@ -90,9 +91,11 @@ const TelemetryProvider = ({ children }: { children: React.ReactElement }) => {
           ...license,
           ...plugin,
           ...searchCluster,
+          ...dataNodes,
+          ...getGlobalProps(telemetryData),
         });
 
-        posthog.identify(user, { ...userDetails });
+        posthog.identify(user, { ...getGlobalProps(telemetryData) });
         setShowTelemetryInfo(!isPermissionAsked);
       }
     };

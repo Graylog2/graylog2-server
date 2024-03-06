@@ -24,4 +24,5 @@ public interface CertConstants {
     String SIGNING_ALGORITHM = "SHA256withRSA";
     String PKCS12 = "PKCS12";
     String DATANODE_KEY_ALIAS = "datanode";
+    String CA_KEY_ALIAS = "ca";
 }

@@ -25,6 +25,7 @@ import Routes from 'routing/Routes';
 import OperatingSystemIcon from 'components/sidecars/common/OperatingSystemIcon';
 import StatusIndicator from 'components/sidecars/common/StatusIndicator';
 import SidecarStatusEnum from 'logic/sidecar/SidecarStatusEnum';
+import recentMessagesTimeRange from 'util/TimeRangeHelper';
 
 import style from './SidecarRow.css';
 
@@ -75,7 +76,7 @@ class SidecarRow extends React.Component {
             {sidecar.node_name}
           </Link>
         </td>
-        <td>
+        <td aria-label="Status">
           <StatusIndicator status={sidecarStatus.status}
                            message={sidecarStatus.message}
                            id={sidecarStatus.id}
@@ -102,7 +103,7 @@ class SidecarRow extends React.Component {
             <LinkContainer to={`${Routes.SYSTEM.SIDECARS.ADMINISTRATION}?node_id=${sidecar.node_id}`}>
               <Button bsSize="xsmall" bsStyle="info">Manage sidecar</Button>
             </LinkContainer>
-            <LinkContainer to={Routes.search_with_query(`gl2_source_collector:${sidecar.node_id}`, 'relative', { relative: 604800 })}>
+            <LinkContainer to={Routes.search_with_query(`gl2_source_collector:${sidecar.node_id}`, 'absolute', recentMessagesTimeRange())}>
               <Button bsSize="xsmall" bsStyle="info">Show messages</Button>
             </LinkContainer>
           </ButtonToolbar>

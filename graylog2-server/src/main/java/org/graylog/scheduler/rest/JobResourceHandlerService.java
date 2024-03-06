@@ -20,7 +20,9 @@ import org.graylog.scheduler.JobTriggerDto;
 import org.graylog.security.UserContext;
 import org.graylog2.rest.models.system.SystemJobSummary;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
+import java.time.Duration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -98,6 +100,7 @@ public class JobResourceHandlerService {
                 details.info(),
                 Objects.toString(trigger.lock().lastOwner(), ""),
                 trigger.triggeredAt().orElse(null),
+                Duration.ofMillis(trigger.executionDurationMs().orElse(0L)),
                 trigger.lock().progress(),
                 details.isCancellable(),
                 true,

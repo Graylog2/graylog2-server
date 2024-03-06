@@ -17,7 +17,7 @@
 
 import * as React from 'react';
 
-import { Alert } from 'preflight/components/common';
+import Alert from 'components/bootstrap/Alert';
 import isSecureConnection from 'preflight/util/IsSecureConnection';
 
 type Props = {
@@ -32,7 +32,7 @@ const UnsecureConnectionAlert = ({ renderIfSecure }: Props) => {
   }
 
   return (
-    <Alert type="warning">
+    <Alert bsStyle="warning">
       {connectionIsSecure === 'NO' && (
         <>
           Your connection is not secure. Please be aware the information will be send to the server unencrypted.

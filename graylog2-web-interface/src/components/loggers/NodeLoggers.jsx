@@ -25,6 +25,9 @@ import { LinkToNode, IfPermitted, Icon } from 'components/common';
 import { LoggingSubsystem, LogLevelMetricsOverview } from 'components/loggers';
 import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
 import withTelemetry from 'logic/telemetry/withTelemetry';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import withLocation from 'routing/withLocation';
 
 const NodeLoggers = createReactClass({
   // eslint-disable-next-line react/no-unused-class-component-methods
@@ -35,6 +38,7 @@ const NodeLoggers = createReactClass({
     nodeId: PropTypes.string.isRequired,
     subsystems: PropTypes.object.isRequired,
     sendTelemetry: PropTypes.func.isRequired,
+    location: PropTypes.object.isRequired,
   },
 
   mixins: [Reflux.connect(MetricsStore)],
@@ -95,14 +99,14 @@ const NodeLoggers = createReactClass({
                         onClick={() => {
                           this.setState({ showDetails: !showDetails });
 
-                          sendTelemetry('input_button_toggle', {
-                            app_pathname: 'logging',
+                          sendTelemetry(TELEMETRY_EVENT_TYPE.LOGGING.SHOW_LOG_LEVEL_METRICS_TOGGLED, {
+                            app_pathname: getPathnameWithoutId(this.props.location.pathname),
                             app_section: 'log-level',
                             app_action_value: 'show-metrics',
                             event_details: { showing: !showDetails },
                           });
                         }}>
-                  <Icon name="tachometer-alt" />{' '}
+                  <Icon name="speed" />{' '}
                   {showDetails ? 'Hide' : 'Show'} log level metrics
                 </Button>
               </div>
@@ -124,4 +128,4 @@ const NodeLoggers = createReactClass({
   },
 });
 
-export default withTelemetry(NodeLoggers);
+export default withLocation(withTelemetry(NodeLoggers));

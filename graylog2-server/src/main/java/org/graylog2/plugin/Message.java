@@ -31,6 +31,7 @@ import com.google.common.collect.Iterators;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.net.InetAddresses;
+import com.google.common.primitives.Ints;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.failure.FailureCause;
 import org.graylog.failure.ProcessingFailureCause;
@@ -38,6 +39,7 @@ import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.messages.Indexable;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.utilities.date.DateTimeConverter;
+import org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -47,6 +49,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 import java.net.InetAddress;
+import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -65,7 +68,6 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Predicates.equalTo;
 import static com.google.common.base.Predicates.not;
-import static org.graylog.schema.GraylogSchemaFields.FIELD_ASSOCIATED_ASSETS;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_CATEGORY;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_SUBCATEGORY;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_TYPE;
@@ -77,12 +79,14 @@ import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_GIM_EVENT_
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_GIM_TAGS;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_GIM_VERSION;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_TAGS;
+import static org.graylog.schema.SecurityFields.FIELD_ASSOCIATED_ASSETS;
 import static org.graylog2.plugin.Tools.buildElasticSearchTimeFormat;
 import static org.joda.time.DateTimeZone.UTC;
 
 @NotThreadSafe
 public class Message implements Messages, Indexable {
     private static final Logger LOG = LoggerFactory.getLogger(Message.class);
+    private static final Logger RATE_LIMITED_LOG = RateLimitedLogFactory.createRateLimitedLog(LOG, 3, Duration.ofMinutes(1));
 
     /**
      * The "_id" is used as document ID to address the document in Elasticsearch.
@@ -135,15 +139,19 @@ public class Message implements Messages, Indexable {
 
     /**
      * Will be set to the message processing time after all message processors have been run.
-     * TODO: To be done in Graylog 3.2
      */
     public static final String FIELD_GL2_PROCESSING_TIMESTAMP = "gl2_processing_timestamp";
 
     /**
      * Will be set to the message receive time at the input.
-     * TODO: To be done in Graylog 3.2
      */
     public static final String FIELD_GL2_RECEIVE_TIMESTAMP = "gl2_receive_timestamp";
+
+    /**
+     * Reflects the time span from receiving the message till sending it to the output in milliseconds.
+     * Will be set after all message processors have been run.
+     */
+    public static final String FIELD_GL2_PROCESSING_DURATION_MS = "gl2_processing_duration_ms";
 
     /**
      * Will be set to the hostname of the source node that sent a message. (if reverse lookup is enabled)
@@ -208,19 +216,20 @@ public class Message implements Messages, Indexable {
     private static final char KEY_REPLACEMENT_CHAR = '_';
 
     private static final ImmutableSet<String> GRAYLOG_FIELDS = ImmutableSet.of(
-        FIELD_GL2_ACCOUNTED_MESSAGE_SIZE,
-        FIELD_GL2_PROCESSING_ERROR,
-        FIELD_GL2_PROCESSING_TIMESTAMP,
-        FIELD_GL2_RECEIVE_TIMESTAMP,
-        FIELD_GL2_REMOTE_HOSTNAME,
-        FIELD_GL2_REMOTE_IP,
-        FIELD_GL2_REMOTE_PORT,
-        FIELD_GL2_SOURCE_COLLECTOR,
-        FIELD_GL2_SOURCE_COLLECTOR_INPUT,
-        FIELD_GL2_SOURCE_INPUT,
-        FIELD_GL2_SOURCE_NODE,
-        FIELD_GL2_SOURCE_RADIO,
-        FIELD_GL2_SOURCE_RADIO_INPUT
+            FIELD_GL2_ACCOUNTED_MESSAGE_SIZE,
+            FIELD_GL2_PROCESSING_ERROR,
+            FIELD_GL2_PROCESSING_DURATION_MS,
+            FIELD_GL2_PROCESSING_TIMESTAMP,
+            FIELD_GL2_RECEIVE_TIMESTAMP,
+            FIELD_GL2_REMOTE_HOSTNAME,
+            FIELD_GL2_REMOTE_IP,
+            FIELD_GL2_REMOTE_PORT,
+            FIELD_GL2_SOURCE_COLLECTOR,
+            FIELD_GL2_SOURCE_COLLECTOR_INPUT,
+            FIELD_GL2_SOURCE_INPUT,
+            FIELD_GL2_SOURCE_NODE,
+            FIELD_GL2_SOURCE_RADIO,
+            FIELD_GL2_SOURCE_RADIO_INPUT
     );
 
     // Graylog Illuminate Fields
@@ -240,9 +249,9 @@ public class Message implements Messages, Indexable {
     );
 
     private static final ImmutableSet<String> CORE_MESSAGE_FIELDS = ImmutableSet.of(
-        FIELD_MESSAGE,
-        FIELD_SOURCE,
-        FIELD_TIMESTAMP
+            FIELD_MESSAGE,
+            FIELD_SOURCE,
+            FIELD_TIMESTAMP
     );
 
     private static final ImmutableSet<String> ES_FIELDS = ImmutableSet.of(
@@ -262,6 +271,11 @@ public class Message implements Messages, Indexable {
             .addAll(GRAYLOG_FIELDS)
             .addAll(CORE_MESSAGE_FIELDS)
             .build();
+    public static final ImmutableSet<String> FIELDS_UNCHANGEABLE_BY_CUSTOM_MAPPINGS = new ImmutableSet.Builder<String>()
+            .addAll(RESERVED_SETTABLE_FIELDS)
+            .add(FIELD_GL2_MESSAGE_ID)
+            .add(FIELD_STREAMS)
+            .build();
 
     public static final ImmutableSet<String> RESERVED_FIELDS = new ImmutableSet.Builder<String>()
             .addAll(RESERVED_SETTABLE_FIELDS)
@@ -269,14 +283,14 @@ public class Message implements Messages, Indexable {
             .build();
 
     public static final ImmutableSet<String> FILTERED_FIELDS = new ImmutableSet.Builder<String>()
-        .addAll(GRAYLOG_FIELDS)
-        .addAll(ES_FIELDS)
-        .add(FIELD_STREAMS)
-        .add(FIELD_FULL_MESSAGE)
-        .build();
+            .addAll(GRAYLOG_FIELDS)
+            .addAll(ES_FIELDS)
+            .add(FIELD_STREAMS)
+            .add(FIELD_FULL_MESSAGE)
+            .build();
 
     private static final ImmutableSet<String> REQUIRED_FIELDS = ImmutableSet.of(
-        FIELD_MESSAGE, FIELD_ID
+            FIELD_MESSAGE, FIELD_ID
     );
 
     @Deprecated
@@ -375,21 +389,6 @@ public class Message implements Messages, Indexable {
         return true;
     }
 
-    @Deprecated
-    public String getValidationErrors() {
-        final StringBuilder sb = new StringBuilder();
-
-        for (String key : REQUIRED_FIELDS) {
-            final Object field = getField(key);
-            if (field == null) {
-                sb.append(key).append(" is missing, ");
-            } else if (field instanceof String && ((String) field).isEmpty()) {
-                sb.append(key).append(" is empty, ");
-            }
-        }
-        return sb.toString();
-    }
-
     @Override
     public String getId() {
         return getFieldAs(String.class, FIELD_ID);
@@ -429,7 +428,7 @@ public class Message implements Messages, Indexable {
                     obj.put(newKey, value);
                 } else {
                     LOG.warn("Keys must not contain a \".\" character! Ignoring field \"{}\"=\"{}\" in message [{}] - Unable to replace \".\" with a \"{}\" because of key conflict: \"{}\"=\"{}\"",
-                        key, value, getId(), KEY_REPLACEMENT_CHAR, newKey, obj.get(newKey));
+                            key, value, getId(), KEY_REPLACEMENT_CHAR, newKey, obj.get(newKey));
                     LOG.debug("Full message with \".\" in message key: {}", this);
                 }
             } else {
@@ -438,7 +437,7 @@ public class Message implements Messages, Indexable {
                     // Deliberate warning duplicates because the key with the "." might be transformed before reaching
                     // the duplicate original key with a "_". Otherwise we would silently overwrite the transformed key.
                     LOG.warn("Keys must not contain a \".\" character! Ignoring field \"{}\"=\"{}\" in message [{}] - Unable to replace \".\" with a \"{}\" because of key conflict: \"{}\"=\"{}\"",
-                        newKey, fields.get(newKey), getId(), KEY_REPLACEMENT_CHAR, key, value);
+                            newKey, fields.get(newKey), getId(), KEY_REPLACEMENT_CHAR, key, value);
                     LOG.debug("Full message with \".\" in message key: {}", this);
                 }
                 obj.put(key, value);
@@ -567,6 +566,8 @@ public class Message implements Messages, Indexable {
         if ((RESERVED_FIELDS.contains(trimmedKey) && !RESERVED_SETTABLE_FIELDS.contains(trimmedKey)) || !validKey(trimmedKey)) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Ignoring invalid or reserved key {} for message {}", trimmedKey, getId());
+            } else {
+                RATE_LIMITED_LOG.info("Ignoring invalid or reserved key {} for message {}", trimmedKey, getId());
             }
             return;
         }
@@ -656,39 +657,6 @@ public class Message implements Messages, Indexable {
         }
     }
 
-    @Deprecated
-    public void addStringFields(final Map<String, String> fields) {
-        if (fields == null) {
-            return;
-        }
-
-        for (Map.Entry<String, String> field : fields.entrySet()) {
-            addField(field.getKey(), field.getValue());
-        }
-    }
-
-    @Deprecated
-    public void addLongFields(final Map<String, Long> fields) {
-        if (fields == null) {
-            return;
-        }
-
-        for (Map.Entry<String, Long> field : fields.entrySet()) {
-            addField(field.getKey(), field.getValue());
-        }
-    }
-
-    @Deprecated
-    public void addDoubleFields(final Map<String, Double> fields) {
-        if (fields == null) {
-            return;
-        }
-
-        for (Map.Entry<String, Double> field : fields.entrySet()) {
-            addField(field.getKey(), field.getValue());
-        }
-    }
-
     public void removeField(final String key) {
         if (!RESERVED_FIELDS.contains(key)) {
             final Object removedValue = fields.remove(key);
@@ -731,6 +699,7 @@ public class Message implements Messages, Indexable {
 
     /**
      * Get the streams this message is currently routed to.
+     *
      * @return an immutable copy of the current set of assigned streams, empty if no streams have been assigned
      */
     public Set<Stream> getStreams() {
@@ -754,6 +723,7 @@ public class Message implements Messages, Indexable {
 
     /**
      * Assign all of the streams to this message.
+     *
      * @param newStreams an iterable of Stream objects
      */
     public void addStreams(Iterable<Stream> newStreams) {
@@ -764,6 +734,7 @@ public class Message implements Messages, Indexable {
 
     /**
      * Remove the stream assignment from this message.
+     *
      * @param stream the stream assignment to remove this message from
      * @return <tt>true</tt> if this message was assigned to the stream
      */
@@ -883,10 +854,16 @@ public class Message implements Messages, Indexable {
         return receiveTime;
     }
 
+    /**
+     * Sets the Message receive time.
+     * The time is taken from the receive time of the message, before it was written to the journal.
+     *
+     * @param receiveTime the new receive timestamp
+     */
     public void setReceiveTime(DateTime receiveTime) {
-        // TODO: In Graylog 3.2 we can set this as field in the message because at that point we have a mapping entry
         if (receiveTime != null) {
             this.receiveTime = receiveTime;
+            addField(FIELD_GL2_RECEIVE_TIMESTAMP, buildElasticSearchTimeFormat(receiveTime.withZone(UTC)));
         }
     }
 
@@ -895,10 +872,21 @@ public class Message implements Messages, Indexable {
         return processingTime;
     }
 
+    /**
+     * Sets the Message processing Time.
+     * The processing time should only be set once all message processors have finished.
+     * This is usually done in the {@link org.graylog2.shared.buffers.processors.ProcessBufferProcessor}
+     *
+     * @param processingTime the new processing timestamp
+     */
     public void setProcessingTime(DateTime processingTime) {
-        // TODO: In Graylog 3.2 we can set this as field in the message because at that point we have a mapping entry
         if (processingTime != null) {
             this.processingTime = processingTime;
+            addField(FIELD_GL2_PROCESSING_TIMESTAMP, buildElasticSearchTimeFormat(processingTime.withZone(UTC)));
+            if (getReceiveTime() != null) {
+                final long duration = processingTime.getMillis() - getReceiveTime().getMillis();
+                addField(FIELD_GL2_PROCESSING_DURATION_MS, Ints.saturatedCast(duration));
+            }
         }
     }
 
@@ -982,6 +970,7 @@ public class Message implements Messages, Indexable {
         static Timing timing(String name, long elapsedNanos) {
             return new Timing(name, elapsedNanos);
         }
+
         public static Message.Counter counter(String name, int counter) {
             return new Counter(name, counter);
         }

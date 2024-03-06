@@ -25,6 +25,8 @@ import ContentStreamReleasesSection from 'components/content-stream/ContentStrea
 import useContentStreamSettings from 'components/content-stream/hook/useContentStreamSettings';
 import useCurrentUser from 'hooks/useCurrentUser';
 import ToggleActionButton from 'components/content-stream/ToggleActionButton';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 const StyledNewsSectionComponent = styled(SectionComponent)<{ $enabled: boolean }>(({ $enabled, theme }) => css`
   overflow: hidden;
@@ -42,6 +44,7 @@ const StyledReleaseSectionComponent = styled(SectionComponent)<{ $enabled: boole
 
 const ContentStreamSection = () => {
   const { username } = useCurrentUser();
+  const sendTelemetry = useSendTelemetry();
   const {
     contentStreamSettings,
     isLoadingContentStreamSettings,
@@ -70,14 +73,36 @@ const ContentStreamSection = () => {
   };
 
   const { contentStreamEnabled, releasesSectionEnabled } = contentStreamSettings;
-  const toggleNews = () => updateContentStreamSettings({
-    enableContentStream: !contentStreamEnabled,
-    enableRelease: releasesSectionEnabled,
-  });
-  const toggleRelease = () => updateContentStreamSettings({
-    enableContentStream: contentStreamEnabled,
-    enableRelease: !releasesSectionEnabled,
-  });
+
+  const toggleNews = () => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.CONTENTSTREAM.NEWS_OPT_IN_TOGGLED, {
+      app_pathname: 'welcome',
+      app_section: 'content-stream',
+      event_details: {
+        contentStreamEnabled: !contentStreamEnabled,
+      },
+    });
+
+    updateContentStreamSettings({
+      enableContentStream: !contentStreamEnabled,
+      enableRelease: releasesSectionEnabled,
+    });
+  };
+
+  const toggleRelease = () => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.CONTENTSTREAM.RELEASE_OPT_IN_TOGGLED, {
+      app_pathname: 'welcome',
+      app_section: 'content-stream',
+      event_details: {
+        contentStreamEnabled: !releasesSectionEnabled,
+      },
+    });
+
+    updateContentStreamSettings({
+      enableContentStream: contentStreamEnabled,
+      enableRelease: !releasesSectionEnabled,
+    });
+  };
 
   return (
     <SectionGrid $columns="2fr 1fr">

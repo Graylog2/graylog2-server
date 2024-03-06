@@ -19,14 +19,35 @@ import React from 'react';
 import useCarouselAction from 'hooks/useCarouselAction';
 import { Icon } from 'components/common';
 import { Button } from 'components/bootstrap';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 const ContentStreamNewsContentActions = () => {
   const { scrollPrev, scrollNext } = useCarouselAction('.carousel');
+  const sendTelemetry = useSendTelemetry();
+
+  const handlePrev = () => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.CONTENTSTREAM.PREV_ARROW_CLICKED, {
+      app_pathname: 'welcome',
+      app_section: 'content-stream',
+    });
+
+    scrollPrev();
+  };
+
+  const handleNext = () => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.CONTENTSTREAM.NEXT_ARROW_CLICKED, {
+      app_pathname: 'welcome',
+      app_section: 'content-stream',
+    });
+
+    scrollNext();
+  };
 
   return (
     <>
-      <Button onClick={() => scrollPrev()}><Icon name="arrow-left" /></Button>
-      <Button onClick={() => scrollNext()}><Icon name="arrow-right" /></Button>
+      <Button onClick={() => handlePrev()}><Icon name="chevron_left" /></Button>
+      <Button onClick={() => handleNext()}><Icon name="chevron_right" /></Button>
     </>
   );
 };

@@ -98,8 +98,8 @@ config:
           type: noop
       basic_internal_auth_domain:
         description: "Authenticate via HTTP Basic against internal users database"
-        http_enabled: true
-        transport_enabled: true
+        http_enabled: false
+        transport_enabled: false
         order: 4
         http_authenticator:
           type: basic

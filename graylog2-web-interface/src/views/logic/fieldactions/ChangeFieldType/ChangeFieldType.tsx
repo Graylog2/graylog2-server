@@ -19,30 +19,38 @@ import React, { useCallback, useState } from 'react';
 import type { ActionComponentProps, ActionHandlerArguments } from 'views/components/actions/ActionHandler';
 import ChangeFieldTypeModal from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldTypeModal';
 import { isFunction } from 'views/logic/aggregationbuilder/Series';
-import isReservedField from 'views/logic/IsReservedField';
 import type User from 'logic/users/User';
 import AppConfig from 'util/AppConfig';
+import isReservedField from 'views/logic/IsReservedField';
+import useInitialSelection from 'views/logic/fieldactions/ChangeFieldType/hooks/useInitialSelection';
+import { isPermitted } from 'util/PermissionsMixin';
 
 const ChangeFieldType = ({
   field,
   onClose,
 }: ActionComponentProps) => {
   const [show, setShow] = useState(true);
-
   const handleOnClose = useCallback(() => {
     setShow(false);
     onClose();
   }, [onClose]);
 
-  return show ? <ChangeFieldTypeModal field={field} onClose={handleOnClose} show={show} /> : null;
+  const initialSelection = useInitialSelection();
+
+  return show ? (
+    <ChangeFieldTypeModal initialSelectedIndexSets={initialSelection}
+                          onClose={handleOnClose}
+                          initialData={{ fieldName: field }}
+                          show />
+  ) : null;
 };
 
-const hasMappingPermission = (currentUser: User) => currentUser.permissions.includes('typemappings:edit') || currentUser.permissions.includes('*');
+const hasMappingPermission = (currentUser: User) => isPermitted(currentUser?.permissions, 'typemappings:edit');
 
 export const isChangeFieldTypeEnabled = ({ field, type, contexts }: ActionHandlerArguments) => {
   const { currentUser } = contexts;
 
-  return (!isFunction(field) && !type.isDecorated() && !isReservedField(field) && field !== 'source' && hasMappingPermission(currentUser));
+  return (!isFunction(field) && !type.isDecorated() && !isReservedField(field) && hasMappingPermission(currentUser));
 };
 
 export const isChangeFieldTypeHidden = () => !AppConfig.isFeatureEnabled('field_types_management');

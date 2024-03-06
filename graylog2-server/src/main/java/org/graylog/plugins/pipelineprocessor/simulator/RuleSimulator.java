@@ -31,7 +31,8 @@ import org.graylog2.shared.metrics.MetricRegistryFactory;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -77,6 +78,10 @@ public class RuleSimulator {
             Map<String, Object> map = objectMapper.readValue(messageString, Map.class);
             if (!map.containsKey("_id")) {
                 map.put("_id", UUID.randomUUID().toString());
+            }
+            final String messageField = "message"; // message field must be of type string
+            if (map.containsKey(messageField) && !(map.get(messageField) instanceof String)) {
+                map.put(messageField, String.valueOf(map.get(messageField)));
             }
             message = new Message(map);
         } catch (JacksonException e) {

@@ -29,6 +29,7 @@ import IfPermitted from 'components/common/IfPermitted';
 import { isPermitted } from 'util/PermissionsMixin';
 import generateId from 'logic/generateId';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 const URL_WHITELIST_CONFIG = 'org.graylog2.system.urlwhitelist.UrlWhitelist';
 
@@ -104,7 +105,7 @@ const URLWhiteListFormModal = ({ newUrlEntry, urlType, onUpdate }: Props) => {
       event.stopPropagation();
     }
 
-    sendTelemetry('form_submit', {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.URLWHITELIST_CONFIGURATION_UPDATED, {
       app_section: 'urlwhitelist',
       app_action_value: 'configuration-update',
     });

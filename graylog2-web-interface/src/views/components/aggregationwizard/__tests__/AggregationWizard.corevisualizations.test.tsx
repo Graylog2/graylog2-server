@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import { act, render, screen, waitFor } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
@@ -72,7 +72,9 @@ const SimpleAggregationWizard = (props: Partial<React.ComponentProps<typeof Aggr
 const submitButton = async () => screen.findByRole('button', { name: /update preview/i });
 
 const expectSubmitButtonToBeDisabled = async () => {
-  expect(await submitButton()).toBeDisabled();
+  await waitFor(async () => {
+    expect(await submitButton()).toBeDisabled();
+  });
 };
 
 const expectSubmitButtonNotToBeDisabled = async () => {
@@ -83,8 +85,12 @@ const visualizationSelect = async () => screen.findByLabelText('Select visualiza
 
 const selectOption = async (ariaLabel: string, option: string) => {
   const select = await screen.findByLabelText(ariaLabel);
+
   await selectEvent.openMenu(select);
-  await selectEvent.select(select, option, selectEventConfig);
+
+  await act(async () => {
+    await selectEvent.select(select, option, selectEventConfig);
+  });
 };
 
 describe('AggregationWizard/Core Visualizations', () => {

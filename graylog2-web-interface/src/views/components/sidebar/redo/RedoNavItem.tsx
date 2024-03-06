@@ -21,6 +21,10 @@ import useAppDispatch from 'stores/useAppDispatch';
 import useAppSelector from 'stores/useAppSelector';
 import { selectUndoRedoAvailability } from 'views/logic/slices/undoRedoSelectors';
 import { redo } from 'views/logic/slices/undoRedoActions';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import useLocation from 'routing/useLocation';
 import useHotkey from 'hooks/useHotkey';
 import useViewType from 'views/hooks/useViewType';
 import type { ViewType } from 'views/logic/views/View';
@@ -31,13 +35,22 @@ const RedoNavItem = ({ sidebarIsPinned }: { sidebarIsPinned: boolean }) => {
   const viewType = useViewType();
   const dispatch = useAppDispatch();
   const { isRedoAvailable } = useAppSelector(selectUndoRedoAvailability);
-  const onClick = useCallback(() => dispatch(redo()), [dispatch]);
+  const sendTelemetry = useSendTelemetry();
+  const location = useLocation();
+
+  const onClick = useCallback(() => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_SIDEBAR_REDO, {
+      app_pathname: getPathnameWithoutId(location.pathname),
+      app_action_value: 'search-sidebar-redo',
+    });
+
+    return dispatch(redo());
+  }, [dispatch, location.pathname, sendTelemetry]);
 
   useHotkey({
     actionKey: 'redo',
     callback: () => dispatch(redo()),
     scope: viewType.toLowerCase() as Lowercase<ViewType>,
-    telemetryAppPathname: 'search',
   });
 
   return (

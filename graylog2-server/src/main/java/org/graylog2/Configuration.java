@@ -28,31 +28,41 @@ import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.PositiveLongValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
 import com.google.common.collect.Sets;
+import org.apache.commons.lang3.StringUtils;
+import org.graylog.plugins.views.search.engine.suggestions.FieldValueSuggestionMode;
+import org.graylog.plugins.views.search.engine.suggestions.FieldValueSuggestionModeConverter;
 import org.graylog.security.certutil.CaConfiguration;
+import org.graylog2.bindings.NamedBindingOverride;
 import org.graylog2.cluster.leader.AutomaticLeaderElectionService;
 import org.graylog2.cluster.leader.LeaderElectionMode;
 import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.cluster.lock.MongoLockService;
 import org.graylog2.configuration.converters.JavaDurationConverter;
 import org.graylog2.notifications.Notification;
-import org.graylog2.plugin.BaseConfiguration;
+import org.graylog2.plugin.Tools;
 import org.graylog2.security.realm.RootAccountRealm;
 import org.graylog2.utilities.IPSubnetConverter;
 import org.graylog2.utilities.IpSubnet;
 import org.joda.time.DateTimeZone;
+import org.joda.time.Period;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 /**
  * Helper class to hold configuration of Graylog
  */
 @SuppressWarnings("FieldMayBeFinal")
 public class Configuration extends CaConfiguration {
+    public static final String SAFE_CLASSES = "safe_classes";
 
+    public static final String CONTENT_PACKS_DIR = "content_packs_dir";
     /**
      * Deprecated! Use isLeader() instead.
      */
@@ -64,7 +74,7 @@ public class Configuration extends CaConfiguration {
 
     /**
      * Used for initializing static leader election. You shouldn't use this for other purposes, but if you must, don't
-     * use @{@link javax.inject.Named} injection but the getter isLeader() instead.
+     * use @{@link jakarta.inject.Named} injection but the getter isLeader() instead.
      **/
     @Parameter(value = "is_leader")
     private Boolean isLeader;
@@ -79,7 +89,7 @@ public class Configuration extends CaConfiguration {
     private int outputFlushInterval = 1;
 
     @Parameter(value = "outputbuffer_processors", required = true, validators = PositiveIntegerValidator.class)
-    private int outputBufferProcessors = 3;
+    private int outputBufferProcessors = defaultNumberOfOutputBufferProcessors();
 
     @Parameter(value = "outputbuffer_processor_threads_core_pool_size", required = true, validators = PositiveIntegerValidator.class)
     private int outputBufferProcessorThreadsCorePoolSize = 3;
@@ -134,7 +144,7 @@ public class Configuration extends CaConfiguration {
     private int staleMasterTimeout = 2000;
 
     /**
-     * Don't use @{@link javax.inject.Named} injection but the getter getStaleLeaderTimeout() instead.
+     * Don't use @{@link jakarta.inject.Named} injection but the getter getStaleLeaderTimeout() instead.
      **/
     @Parameter(value = "stale_leader_timeout", validators = PositiveIntegerValidator.class)
     private Integer staleLeaderTimeout;
@@ -161,8 +171,8 @@ public class Configuration extends CaConfiguration {
     @Parameter(value = "content_packs_loader_enabled")
     private boolean contentPacksLoaderEnabled = false;
 
-    @Parameter(value = "content_packs_dir")
-    private Path contentPacksDir = DEFAULT_DATA_DIR.resolve("contentpacks");
+    @Parameter(value = CONTENT_PACKS_DIR)
+    private Path contentPacksDir;
 
     @Parameter(value = "content_packs_auto_install", converter = TrimmedStringSetConverter.class)
     private Set<String> contentPacksAutoInstall = Collections.emptySet();
@@ -204,6 +214,12 @@ public class Configuration extends CaConfiguration {
     @Parameter(value = "enable_preflight_web")
     private boolean enablePreflightWeb = false;
 
+    @Parameter(value = "query_latency_monitoring_enabled")
+    private boolean queryLatencyMonitoringEnabled = false;
+
+    @Parameter(value = "query_latency_monitoring_window_size")
+    private int queryLatencyMonitoringWindowSize = 0;
+
     @Parameter(value = "leader_election_mode", converter = LeaderElectionMode.Converter.class)
     private LeaderElectionMode leaderElectionMode = LeaderElectionMode.STATIC;
 
@@ -215,6 +231,39 @@ public class Configuration extends CaConfiguration {
 
     @Parameter(value = "system_event_excluded_types", converter = TrimmedStringSetConverter.class)
     private Set<String> systemEventExcludedTypes = Sets.newHashSet(Notification.Type.SIDECAR_STATUS_UNKNOWN.name());
+
+    @Parameter(value = "datanode_proxy_api_allowlist")
+    private boolean datanodeProxyAPIAllowlist = true;
+
+    @Parameter(value = "minimum_auto_refresh_interval", required = true)
+    private Period minimumAutoRefreshInterval = Period.seconds(1);
+
+    /**
+     * Classes considered safe to load by name. A set of prefixes matched against the fully qualified class name.
+     */
+    @Parameter(value = SAFE_CLASSES, converter = StringSetConverter.class, validators = SafeClassesValidator.class)
+    private Set<String> safeClasses = Set.of("org.graylog.", "org.graylog2.");
+
+    @Parameter(value = "field_value_suggestion_mode", required = true, converter = FieldValueSuggestionModeConverter.class)
+    private FieldValueSuggestionMode fieldValueSuggestionMode = FieldValueSuggestionMode.ON;
+
+    public static final String INSTALL_HTTP_CONNECTION_TIMEOUT = "install_http_connection_timeout";
+    public static final String INSTALL_OUTPUT_BUFFER_DRAINING_INTERVAL = "install_output_buffer_drain_interval";
+    public static final String INSTALL_OUTPUT_BUFFER_DRAINING_MAX_RETRIES = "install_output_buffer_max_retries";
+
+    private static final int DEFAULT_INSTALL_RETRIES = 150;
+    private static final Duration DEFAULT_INSTALL_SECONDS = Duration.seconds(2);
+
+    @Parameter(value = INSTALL_HTTP_CONNECTION_TIMEOUT, validators = PositiveDurationValidator.class)
+    private Duration installHttpConnectionTimeout = Duration.seconds(10L);
+
+    @Parameter(value = INSTALL_OUTPUT_BUFFER_DRAINING_INTERVAL, validators = PositiveDurationValidator.class)
+    private Duration installOutputBufferDrainingInterval = DEFAULT_INSTALL_SECONDS;
+
+    // The maximum number of times to check if buffers have drained during Illuminate restarts on all
+    // nodes before giving up
+    @Parameter(value = INSTALL_OUTPUT_BUFFER_DRAINING_MAX_RETRIES, validators = PositiveIntegerValidator.class)
+    private int installOutputBufferDrainingMaxRetries = DEFAULT_INSTALL_RETRIES;
 
     public boolean maintainsStreamAwareFieldTypes() {
         return streamAwareFieldTypes;
@@ -402,8 +451,9 @@ public class Configuration extends CaConfiguration {
         return contentPacksLoaderEnabled;
     }
 
+    @NamedBindingOverride(value = CONTENT_PACKS_DIR)
     public Path getContentPacksDir() {
-        return contentPacksDir;
+        return Optional.ofNullable(contentPacksDir).orElse(getDataDir().resolve("contentpacks"));
     }
 
     public Set<String> getContentPacksAutoInstall() {
@@ -433,6 +483,18 @@ public class Configuration extends CaConfiguration {
 
     public Duration getFailureHandlingShutdownAwait() {
         return failureHandlingShutdownAwait;
+    }
+
+    public Period getMinimumAutoRefreshInterval() {
+        return minimumAutoRefreshInterval;
+    }
+
+    public Set<String> getSafeClasses() {
+        return safeClasses;
+    }
+
+    public FieldValueSuggestionMode getFieldValueSuggestionMode() {
+        return fieldValueSuggestionMode;
     }
 
     /**
@@ -487,6 +549,14 @@ public class Configuration extends CaConfiguration {
         return enablePreflightWeb;
     }
 
+    public boolean isQueryLatencyMonitoringEnabled() {
+        return queryLatencyMonitoringEnabled;
+    }
+
+    public int getQueryLatencyMonitoringWindowSize() {
+        return queryLatencyMonitoringWindowSize;
+    }
+
     public static class NodeIdFileValidator implements Validator<String> {
         @Override
         public void validate(String name, String path) throws ValidationException {
@@ -538,4 +608,47 @@ public class Configuration extends CaConfiguration {
             throw new ValidationException("Node ID file at path " + path + " isn't " + b + ". Please specify the correct path or change the permissions");
         }
     }
+
+    public static class SafeClassesValidator implements Validator<Set<String>> {
+        @Override
+        public void validate(String name, Set<String> set) throws ValidationException {
+            if (set.isEmpty()) {
+                throw new ValidationException(f("\"%s\" must not be empty. Please specify a comma-separated list of " +
+                        "fully-qualified class name prefixes.", name));
+            }
+            if (set.stream().anyMatch(StringUtils::isBlank)) {
+                throw new ValidationException(f("\"%s\" must only contain non-empty class name prefixes.", name));
+            }
+        }
+    }
+
+    /**
+     * Calculate the default number of output buffer processors as a linear function of available CPU cores.
+     * The function is designed to yield predetermined values for the following select numbers of CPU cores that
+     * have proven to work well in real-world production settings:
+     * <table>
+     *     <tr>
+     *         <th># CPU cores</th><th># buffer processors</th>
+     *     </tr>
+     *     <tr>
+     *         <td>2</td><td>1</td>
+     *     </tr>
+     *     <tr>
+     *         <td>4</td><td>1</td>
+     *     </tr>
+     *     <tr>
+     *         <td>8</td><td>2</td>
+     *     </tr>
+     *     <tr>
+     *         <td>12</td><td>3</td>
+     *     </tr>
+     *     <tr>
+     *         <td>16</td><td>3</td>
+     *     </tr>
+     * </table>
+     */
+    private static int defaultNumberOfOutputBufferProcessors() {
+        return Math.round(Tools.availableProcessors() * 0.162f + 0.625f);
+    }
+
 }

@@ -177,7 +177,6 @@ public class KinesisSetupResourceTest {
                         .destinationStreamArn(streamResponse.streamArn())
                         .roleArn(policyResponse.roleArn()).build();
         final CreateLogSubscriptionResponse subscriptionResponse = setupResource.createSubscription(subscriptionRequest);
-        subscriptionResponse.result();
         assertEquals("Success. The subscription filter [filter-name] was added for the CloudWatch log group [log-group-name].",
                 subscriptionResponse.result());
     }

@@ -1,0 +1,377 @@
+{
+  "id": "656510c70548c8792779eea5",
+  "queries": [
+    {
+      "id": "5ebe4f70-3dd7-436d-8242-3164bbbaea5c",
+      "query": {
+        "type": "elasticsearch",
+        "query_string": ""
+      },
+      "timerange": {
+        "from": 300,
+        "type": "relative"
+      },
+      "filter": null,
+      "filters": [],
+      "search_types": [
+        {
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(gim_event_type_code) AND _exists_:(network_bytes AND associated_ip)"
+          },
+          "streams": [],
+          "id": "53fc12e9-990c-4463-afb0-5e9f39892a60",
+          "name": "chart",
+          "series": [
+            {
+              "type": "sum",
+              "id": "sum(network_bytes)",
+              "field": "network_bytes"
+            }
+          ],
+          "sort": [
+            {
+              "type": "series",
+              "field": "sum(network_bytes)",
+              "direction": "Descending"
+            }
+          ],
+          "rollup": true,
+          "type": "pivot",
+          "row_groups": [
+            {
+              "type": "values",
+              "fields": [
+                "associated_ip"
+              ],
+              "limit": 15,
+              "skip_empty_values": false
+            }
+          ],
+          "column_groups": [],
+          "filter": null,
+          "filters": []
+        },
+        {
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(gim_event_type_code) AND _exists_:(gim_event_category AND event_source) AND gim_event_category:(network)"
+          },
+          "streams": [],
+          "id": "bd49d534-92cc-4b70-be56-1c8e2ffeb79f",
+          "name": "chart",
+          "series": [
+            {
+              "type": "sum",
+              "id": "sum(network_bytes)",
+              "field": "network_bytes"
+            }
+          ],
+          "sort": [
+            {
+              "type": "series",
+              "field": "sum(network_bytes)",
+              "direction": "Descending"
+            }
+          ],
+          "rollup": true,
+          "type": "pivot",
+          "row_groups": [
+            {
+              "type": "values",
+              "fields": [
+                "event_source"
+              ],
+              "limit": 15,
+              "skip_empty_values": false
+            }
+          ],
+          "column_groups": [],
+          "filter": null,
+          "filters": []
+        },
+        {
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(gim_event_type_code) AND _exists_:(event_source AND gim_event_category) AND gim_event_category:(\"name resolution\")"
+          },
+          "streams": [],
+          "id": "bc72e61e-9f67-4606-ac9b-bc9bf05643a2",
+          "name": "chart",
+          "series": [
+            {
+              "type": "count",
+              "id": "count()",
+              "field": null
+            }
+          ],
+          "sort": [],
+          "rollup": true,
+          "type": "pivot",
+          "row_groups": [
+            {
+              "type": "values",
+              "fields": [
+                "event_source"
+              ],
+              "limit": 15,
+              "skip_empty_values": false
+            }
+          ],
+          "column_groups": [],
+          "filter": null,
+          "filters": []
+        },
+        {
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(gim_event_type_code) AND _exists_:(gim_event_category AND event_source_product) AND gim_event_category:(\"name resolution\")"
+          },
+          "streams": [],
+          "id": "2416aa11-d8c1-4d77-862e-7000e060a996",
+          "name": "chart",
+          "series": [
+            {
+              "type": "count",
+              "id": "count()",
+              "field": null
+            }
+          ],
+          "sort": [],
+          "rollup": true,
+          "type": "pivot",
+          "row_groups": [
+            {
+              "type": "values",
+              "fields": [
+                "event_source_product"
+              ],
+              "limit": 15,
+              "skip_empty_values": false
+            }
+          ],
+          "column_groups": [],
+          "filter": null,
+          "filters": []
+        },
+        {
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(gim_event_type_code) AND _exists_:(gim_event_category AND network_bytes AND source_ip) AND gim_event_category:(network)"
+          },
+          "streams": [],
+          "id": "d4b777c8-a08f-43b2-9ce6-769ca8ff5b37",
+          "name": "chart",
+          "series": [
+            {
+              "type": "sum",
+              "id": "sum(network_bytes)",
+              "field": "network_bytes"
+            }
+          ],
+          "sort": [
+            {
+              "type": "series",
+              "field": "sum(network_bytes)",
+              "direction": "Descending"
+            }
+          ],
+          "rollup": true,
+          "type": "pivot",
+          "row_groups": [
+            {
+              "type": "values",
+              "fields": [
+                "source_ip"
+              ],
+              "limit": 15,
+              "skip_empty_values": false
+            }
+          ],
+          "column_groups": [],
+          "filter": null,
+          "filters": []
+        },
+        {
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(gim_event_type_code) AND _exists_:(gim_event_category AND timestamp AND network_bytes) AND gim_event_category:(network)"
+          },
+          "streams": [],
+          "id": "ed157f68-1bd1-4a06-91f6-37b37a377d62",
+          "name": "chart",
+          "series": [
+            {
+              "type": "sum",
+              "id": "sum(network_bytes)",
+              "field": "network_bytes"
+            }
+          ],
+          "sort": [],
+          "rollup": true,
+          "type": "pivot",
+          "row_groups": [
+            {
+              "type": "time",
+              "fields": [
+                "timestamp"
+              ],
+              "interval": {
+                "type": "auto",
+                "scaling": 1
+              }
+            }
+          ],
+          "column_groups": [],
+          "filter": null,
+          "filters": []
+        },
+        {
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(gim_event_type_code) AND _exists_:(gim_event_category AND network_bytes AND destination_ip) AND gim_event_category:(network)"
+          },
+          "streams": [],
+          "id": "7ff77c06-4f85-4586-b4e2-16dcff9a860f",
+          "name": "chart",
+          "series": [
+            {
+              "type": "sum",
+              "id": "sum(network_bytes)",
+              "field": "network_bytes"
+            }
+          ],
+          "sort": [
+            {
+              "type": "series",
+              "field": "sum(network_bytes)",
+              "direction": "Descending"
+            }
+          ],
+          "rollup": true,
+          "type": "pivot",
+          "row_groups": [
+            {
+              "type": "values",
+              "fields": [
+                "destination_ip"
+              ],
+              "limit": 15,
+              "skip_empty_values": false
+            }
+          ],
+          "column_groups": [],
+          "filter": null,
+          "filters": []
+        },
+        {
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(gim_event_category) AND _exists_:(associated_user_name AND network_bytes) AND gim_event_category:(network)"
+          },
+          "streams": [],
+          "id": "273e4a5c-2e84-47ca-8c8e-6aa56c2aa67a",
+          "name": "chart",
+          "series": [
+            {
+              "type": "sum",
+              "id": "sum(network_bytes)",
+              "field": "network_bytes"
+            }
+          ],
+          "sort": [
+            {
+              "type": "series",
+              "field": "sum(network_bytes)",
+              "direction": "Descending"
+            }
+          ],
+          "rollup": true,
+          "type": "pivot",
+          "row_groups": [
+            {
+              "type": "values",
+              "fields": [
+                "associated_user_name"
+              ],
+              "limit": 15,
+              "skip_empty_values": false
+            }
+          ],
+          "column_groups": [],
+          "filter": null,
+          "filters": []
+        },
+        {
+          "timerange": {
+            "from": 86400,
+            "type": "relative"
+          },
+          "query": {
+            "type": "elasticsearch",
+            "query_string": "_exists_:(gim_event_type_code) AND _exists_:(gim_event_category AND query_result) AND gim_event_category:(\"name resolution\")"
+          },
+          "streams": [],
+          "id": "00d9b465-3654-4cfc-bfc4-8c9d4b2b9638",
+          "name": "chart",
+          "series": [
+            {
+              "type": "count",
+              "id": "count()",
+              "field": null
+            }
+          ],
+          "sort": [],
+          "rollup": true,
+          "type": "pivot",
+          "row_groups": [
+            {
+              "type": "values",
+              "fields": [
+                "query_result"
+              ],
+              "limit": 15,
+              "skip_empty_values": false
+            }
+          ],
+          "column_groups": [],
+          "filter": null,
+          "filters": []
+        }
+      ]
+    }
+  ],
+  "parameters": []
+}

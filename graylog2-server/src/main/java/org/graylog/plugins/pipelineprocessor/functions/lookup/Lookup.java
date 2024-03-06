@@ -26,7 +26,8 @@ import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGrou
 import org.graylog2.lookup.LookupTableService;
 import org.graylog2.plugin.lookup.LookupResult;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.Collections;
 import java.util.Map;
 

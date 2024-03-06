@@ -31,6 +31,10 @@ import { MESSAGE_FIELD } from 'views/Constants';
 import type MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import { InputsStore } from 'stores/inputs/InputsStore';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import useLocation from 'routing/useLocation';
+import { TableDataCell } from 'views/components/datatable';
 
 import MessageDetail from './MessageDetail';
 import DecoratedValue from './decoration/DecoratedValue';
@@ -50,11 +54,11 @@ export const TableBody = styled.tbody<{ $expanded?: boolean, $highlighted?: bool
     border-top: 0;
 
     ${$expanded ? css`
-      border-left: 7px solid ${theme.colors.variant.light.info};
+  border-left: 7px solid ${theme.colors.variant.light.info};
 ` : ''}
 
     ${$highlighted ? css`
-      border-left: 7px solid ${theme.colors.variant.light.success};
+  border-left: 7px solid ${theme.colors.variant.light.success};
 ` : ''}
   }
 `);
@@ -131,6 +135,7 @@ const MessageTableEntry = ({
   const { inputs: inputsList = [] } = useStore(InputsStore);
   const { streams: streamsList = [] } = useStore(StreamsStore);
   const highlightMessageId = useContext(HighlightMessageContext);
+  const location = useLocation();
   const sendTelemetry = useSendTelemetry();
   const additionalContextValue = useMemo(() => ({ message }), [message]);
   const allStreams = Immutable.List<Stream>(streamsList);
@@ -141,8 +146,8 @@ const MessageTableEntry = ({
     const isSelectingText = !!window.getSelection()?.toString();
 
     if (!isSelectingText) {
-      sendTelemetry('input_button_toggle', {
-        app_pathname: 'search',
+      sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_MESSAGE_TABLE_DETAILS_TOGGLED, {
+        app_pathname: getPathnameWithoutId(location.pathname),
         app_section: 'widget',
         app_action_value: 'widget-message-table-toggle-details',
       });
@@ -161,7 +166,7 @@ const MessageTableEntry = ({
             const type = fieldType(selectedFieldName, message, fields);
 
             return (
-              <td key={selectedFieldName} data-testid={`message-summary-field-${selectedFieldName}`}>
+              <TableDataCell $isNumeric={type.isNumeric()} key={selectedFieldName} data-testid={`message-summary-field-${selectedFieldName}`}>
                 {_renderStrong(
                   <CustomHighlighting field={selectedFieldName} value={message.fields[selectedFieldName]}>
                     <TypeSpecificValue value={message.fields[selectedFieldName]}
@@ -171,7 +176,7 @@ const MessageTableEntry = ({
                   </CustomHighlighting>,
                   idx === 0,
                 )}
-              </td>
+              </TableDataCell>
             );
           })}
         </FieldsRow>
@@ -185,6 +190,7 @@ const MessageTableEntry = ({
 
         {expanded && (
           <MessageDetailRow>
+            {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
             <td colSpan={colSpanFixup}>
               <MessageDetail message={message}
                              fields={fields}

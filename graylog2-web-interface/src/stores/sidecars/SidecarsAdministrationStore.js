@@ -46,6 +46,15 @@ export const SidecarsAdministrationStore = singletonStore(
     },
     query: undefined,
 
+    getInitialState() {
+      return {
+        sidecars: this.sidecars,
+        filters: this.filters,
+        query: this.query,
+        pagination: this.pagination,
+      };
+    },
+
     propagateChanges() {
       this.trigger({
         sidecars: this.sidecars,

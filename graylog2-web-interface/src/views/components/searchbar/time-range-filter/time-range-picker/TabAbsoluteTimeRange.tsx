@@ -104,7 +104,7 @@ const TabAbsoluteTimeRange = ({ disabled, limitDuration }: Props) => {
           </RangeWrapper>
 
           <IconWrap>
-            <Icon name="arrow-right" />
+            <Icon name="arrow_right_alt" />
           </IconWrap>
 
           <RangeWrapper>
@@ -125,7 +125,7 @@ const TabAbsoluteTimeRange = ({ disabled, limitDuration }: Props) => {
               </RangeWrapper>
 
               <IconWrap>
-                <Icon name="arrow-right" />
+                <Icon name="arrow_right_alt" />
               </IconWrap>
 
               <RangeWrapper>

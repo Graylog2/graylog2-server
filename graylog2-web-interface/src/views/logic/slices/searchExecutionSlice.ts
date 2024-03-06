@@ -20,10 +20,10 @@ import * as Immutable from 'immutable';
 import trim from 'lodash/trim';
 
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
-import type { SearchExecution, RootState, GetState, SearchExecutionResult } from 'views/types';
+import type { SearchExecution, RootState, GetState, SearchExecutionResult, ExtraArguments } from 'views/types';
 import type { AppDispatch } from 'stores/useAppDispatch';
+import type { SearchParser } from 'views/logic/slices/searchMetadataSlice';
 import { parseSearch } from 'views/logic/slices/searchMetadataSlice';
-import executeSearch from 'views/logic/slices/executeSearch';
 import type View from 'views/logic/views/View';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import { selectView, selectParameters, selectActiveQuery } from 'views/logic/slices/viewSelectors';
@@ -101,25 +101,31 @@ export const { loading, finishedLoading, updateGlobalOverride, setWidgetsToSearc
 
 export const searchExecutionSliceReducer = searchExecutionSlice.reducer;
 
-export const executeWithExecutionState = (
-  view: View, widgetsToSearch: Array<string>, executionState: SearchExecutionState, resultMapper: (newResult: SearchExecutionResult) => SearchExecutionResult,
-) => (dispatch: AppDispatch, getState: GetState) => dispatch(parseSearch(view.search))
+export type SearchExecutors = {
+  parse: SearchParser,
+  execute: (view: View, widgetsToSearch: string[], executionStateParam: SearchExecutionState, keepQueries?: string[]) => Promise<SearchExecutionResult>,
+  resultMapper: (newResult: SearchExecutionResult) => SearchExecutionResult,
+};
+export const executeWithExecutionState = (view: View, widgetsToSearch: Array<string>, executionState: SearchExecutionState, searchExecutors: SearchExecutors) => (
+  dispatch: AppDispatch,
+  getState: GetState,
+) => dispatch(parseSearch(view.search, searchExecutors.parse))
   .then(() => {
     dispatch(loading());
     const activeQuery = selectActiveQuery(getState());
 
-    return executeSearch(view, widgetsToSearch, executionState, [activeQuery])
-      .then(resultMapper)
+    return searchExecutors.execute(view, widgetsToSearch, executionState, [activeQuery])
+      .then(searchExecutors.resultMapper)
       .then((result) => dispatch(finishedLoading(result)));
   });
 
-export const execute = () => (dispatch: AppDispatch, getState: () => RootState) => {
+export const execute = () => (dispatch: AppDispatch, getState: () => RootState, { searchExecutors }: ExtraArguments) => {
   const state = getState();
   const view = selectView(state);
   const executionState = selectSearchExecutionState(state);
   const widgetsToSearch = selectWidgetsToSearch(state);
 
-  return dispatch(executeWithExecutionState(view, widgetsToSearch, executionState, (result) => result));
+  return dispatch(executeWithExecutionState(view, widgetsToSearch, executionState, searchExecutors));
 };
 
 export const setGlobalOverrideQuery = (queryString: string) => async (dispatch: AppDispatch, getState: () => RootState) => {

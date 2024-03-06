@@ -29,12 +29,15 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import javax.inject.Provider;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.SecurityContext;
+import jakarta.inject.Provider;
+
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MultivaluedHashMap;
+import jakarta.ws.rs.core.SecurityContext;
+import jakarta.ws.rs.core.UriInfo;
+
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Collections;
@@ -64,6 +67,7 @@ public class ShiroSecurityContextFilterTest {
     public void setUp() throws Exception {
         when(securityContext.isSecure()).thenReturn(false);
         when(requestContext.getSecurityContext()).thenReturn(securityContext);
+        when(requestContext.getUriInfo()).thenReturn(mock(UriInfo.class));
 
         final DefaultSecurityManager securityManager = new DefaultSecurityManager();
         final Provider<Request> grizzlyRequestProvider = () -> mock(Request.class);

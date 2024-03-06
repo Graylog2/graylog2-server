@@ -35,7 +35,7 @@ const StyledButtonBar = styled.div`
   justify-content: flex-end;
 `;
 
-const SearchFilterHelp = styled(HoverForHelp)`
+const SearchFilterHelp = styled((props: any) => <HoverForHelp {...props} />)`
   margin-left: 5px;
 `;
 
@@ -79,7 +79,7 @@ const SearchFilterBanner = ({ onHide, pluggableControls }: Props) => {
       </SearchFilterHelp>
       <StyledButtonGroup>
         <Button disabled bsSize="small">
-          <Icon name="plus" />
+          <Icon name="add" />
         </Button>
         <Button disabled bsSize="small">
           <Icon name="folder" />

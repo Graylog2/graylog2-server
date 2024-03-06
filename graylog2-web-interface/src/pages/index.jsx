@@ -30,6 +30,11 @@ const CreateEventDefinitionPage = loadAsync(() => import('./CreateEventDefinitio
 const CreateEventNotificationPage = loadAsync(() => import('./CreateEventNotificationPage'));
 const CreateContentPackPage = loadAsync(() => import('pages/CreateContentPackPage'));
 const CreateExtractorsPage = loadAsync(() => import('./CreateExtractorsPage'));
+const DataNodesPage = loadAsync(() => import('./DataNodesPage'));
+const DataNodePage = loadAsync(() => import('./DataNodePage'));
+const DataNodesClusterManagementPage = loadAsync(() => import('./DataNodesClusterManagementPage'));
+const DataNodesClusterConfigurationPage = loadAsync(() => import('./DataNodesClusterConfigurationPage'));
+const DataNodesMigrationPage = loadAsync(() => import('./DataNodesMigrationPage'));
 const DelegatedSearchPage = loadAsync(() => import('./DelegatedSearchPage'));
 const EditEventDefinitionPage = loadAsync(() => import('./EditEventDefinitionPage'));
 const EditEventNotificationPage = loadAsync(() => import('./EditEventNotificationPage'));
@@ -47,9 +52,15 @@ const ImportExtractorsPage = loadAsync(() => import('./ImportExtractorsPage'));
 const IndexerFailuresPage = loadAsync(() => import('./IndexerFailuresPage'));
 const IndexSetConfigurationPage = loadAsync(() => import('./IndexSetConfigurationPage'));
 const IndexSetCreationPage = loadAsync(() => import('./IndexSetCreationPage'));
+
+const IndexSetFieldTypesPage = loadAsync(() => import('./IndexSetFieldTypesPage'));
 const IndexSetPage = loadAsync(() => import('./IndexSetPage'));
+const IndexSetFieldTypeProfileCreatePage = loadAsync(() => import('./IndexSetFieldTypeProfileCreatePage'));
+const IndexSetFieldTypeProfileEditPage = loadAsync(() => import('./IndexSetFieldTypeProfileEditPage'));
+const IndexSetFieldTypeProfilesPage = loadAsync(() => import('./IndexSetFieldTypeProfilesPage'));
 const IndicesPage = loadAsync(() => import('./IndicesPage'));
 const InputsPage = loadAsync(() => import('./InputsPage'));
+const KeyboardShortcutsPage = loadAsync(() => import('./KeyboardShortcutsPage'));
 const LoadingPage = loadAsync(() => import(/* webpackChunkName: "LoadingPage" */ 'pages/LoadingPage'));
 const LoggersPage = loadAsync(() => import('./LoggersPage'));
 const LoginPage = loadAsync(() => import(/* webpackChunkName: "LoginPage" */ 'pages/LoginPage'));
@@ -66,7 +77,6 @@ const RoleEditPage = loadAsync(() => import('./RoleEditPage'));
 const RolesOverviewPage = loadAsync(() => import('./RolesOverviewPage'));
 const RuleDetailsPage = loadAsync(() => import('./RuleDetailsPage'));
 const RulesPage = loadAsync(() => import('./RulesPage'));
-const SecurityPage = loadAsync(() => import('./SecurityPage'));
 const ShowContentPackPage = loadAsync(() => import('pages/ShowContentPackPage'));
 const ShowEventNotificationPage = loadAsync(() => import('./ShowEventNotificationPage'));
 const ShowMessagePage = loadAsync(() => import('./ShowMessagePage'));
@@ -113,6 +123,11 @@ export {
   CreateEventNotificationPage,
   CreateContentPackPage,
   CreateExtractorsPage,
+  DataNodesPage,
+  DataNodePage,
+  DataNodesClusterManagementPage,
+  DataNodesClusterConfigurationPage,
+  DataNodesMigrationPage,
   DelegatedSearchPage,
   EditEventDefinitionPage,
   EditEventNotificationPage,
@@ -130,9 +145,14 @@ export {
   IndexerFailuresPage,
   IndexSetConfigurationPage,
   IndexSetCreationPage,
+  IndexSetFieldTypesPage,
   IndexSetPage,
+  IndexSetFieldTypeProfileCreatePage,
+  IndexSetFieldTypeProfileEditPage,
+  IndexSetFieldTypeProfilesPage,
   IndicesPage,
   InputsPage,
+  KeyboardShortcutsPage,
   LoadingPage,
   LoggersPage,
   LoginPage,
@@ -150,7 +170,6 @@ export {
   RolesOverviewPage,
   RuleDetailsPage,
   RulesPage,
-  SecurityPage,
   ShowContentPackPage,
   ShowEventNotificationPage,
   ShowMessagePage,

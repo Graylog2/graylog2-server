@@ -27,12 +27,13 @@ import org.graylog2.streams.StreamRouter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.List;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
-public class StreamMatcherFilterProcessor implements MessageProcessor  {
+public class StreamMatcherFilterProcessor implements MessageProcessor {
     private static final Logger LOG = LoggerFactory.getLogger(StreamMatcherFilterProcessor.class);
 
     public static class Descriptor implements MessageProcessor.Descriptor {

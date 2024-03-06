@@ -21,7 +21,8 @@ import org.graylog.plugins.sidecar.permissions.SidecarRestPermissions;
 import org.graylog2.migrations.Migration;
 import org.graylog2.migrations.MigrationHelpers;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.time.ZonedDateTime;
 
 public class V20230502164900_AddSidecarManagerAndReaderRole extends Migration {

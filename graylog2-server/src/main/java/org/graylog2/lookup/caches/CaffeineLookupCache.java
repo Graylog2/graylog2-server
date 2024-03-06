@@ -25,10 +25,12 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.Expiry;
+import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.github.benmanes.caffeine.cache.stats.CacheStats;
 import com.github.benmanes.caffeine.cache.stats.StatsCounter;
 import com.google.auto.value.AutoValue;
 import com.google.inject.assistedinject.Assisted;
+import org.checkerframework.checker.index.qual.NonNegative;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.lookup.LookupCache;
@@ -39,9 +41,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.validation.constraints.Min;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+
+import jakarta.validation.constraints.Min;
+
 import java.util.Locale;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
@@ -75,34 +80,34 @@ public class CaffeineLookupCache extends LookupCache {
     }
 
     private Expiry<LookupCacheKey, LookupResult> buildExpiry(Config config) {
-       return new Expiry<>() {
-           @Override
-           public long expireAfterCreate(@NonNull LookupCacheKey lookupCacheKey, @NonNull LookupResult lookupResult, long currentTime) {
-               if (lookupResult.hasTTL()) {
-                   return TimeUnit.MILLISECONDS.toNanos(lookupResult.cacheTTL());
-               } else {
-                   if (config.expireAfterWrite() > 0 && config.expireAfterWriteUnit() != null) {
-                       //noinspection ConstantConditions
-                       return config.expireAfterWriteUnit().toNanos(config.expireAfterWrite());
-                   }
-                   return Long.MAX_VALUE;
-               }
-           }
+        return new Expiry<>() {
+            @Override
+            public long expireAfterCreate(@NonNull LookupCacheKey lookupCacheKey, @NonNull LookupResult lookupResult, long currentTime) {
+                if (lookupResult.hasTTL()) {
+                    return TimeUnit.MILLISECONDS.toNanos(lookupResult.cacheTTL());
+                } else {
+                    if (config.expireAfterWrite() > 0 && config.expireAfterWriteUnit() != null) {
+                        //noinspection ConstantConditions
+                        return config.expireAfterWriteUnit().toNanos(config.expireAfterWrite());
+                    }
+                    return Long.MAX_VALUE;
+                }
+            }
 
-           @Override
-           public long expireAfterUpdate(@NonNull LookupCacheKey lookupCacheKey, @NonNull LookupResult lookupResult, long currentTime, long currentDuration) {
-               return currentDuration;
-           }
+            @Override
+            public long expireAfterUpdate(@NonNull LookupCacheKey lookupCacheKey, @NonNull LookupResult lookupResult, long currentTime, long currentDuration) {
+                return currentDuration;
+            }
 
-           @Override
-           public long expireAfterRead(@NonNull LookupCacheKey lookupCacheKey, @NonNull LookupResult lookupResult, long currentTime, long currentDuration) {
-               if (config.expireAfterAccess() > 0 && config.expireAfterAccessUnit() != null) {
-                   //noinspection ConstantConditions
-                   return config.expireAfterAccessUnit().toNanos(config.expireAfterAccess());
-               }
-               return currentDuration;
-           }
-       };
+            @Override
+            public long expireAfterRead(@NonNull LookupCacheKey lookupCacheKey, @NonNull LookupResult lookupResult, long currentTime, long currentDuration) {
+                if (config.expireAfterAccess() > 0 && config.expireAfterAccessUnit() != null) {
+                    //noinspection ConstantConditions
+                    return config.expireAfterAccessUnit().toNanos(config.expireAfterAccess());
+                }
+                return currentDuration;
+            }
+        };
     }
 
     @Override
@@ -131,9 +136,9 @@ public class CaffeineLookupCache extends LookupCache {
                 final LookupResult result = loader.call();
                 if (ignoreResult(result, config.ignoreNull())) {
                     LOG.debug("Ignoring failed lookup for key {}", key);
-                        return LookupResult.builder()
-                                .cacheTTL(0L)
-                                .build();
+                    return LookupResult.builder()
+                            .cacheTTL(0L)
+                            .build();
                 }
                 return result;
             } catch (Exception e) {
@@ -301,7 +306,7 @@ public class CaffeineLookupCache extends LookupCache {
         }
 
         @Override
-        public void recordEviction() {
+        public void recordEviction(@NonNegative int i, RemovalCause removalCause) {
             // not tracking this metric
         }
 

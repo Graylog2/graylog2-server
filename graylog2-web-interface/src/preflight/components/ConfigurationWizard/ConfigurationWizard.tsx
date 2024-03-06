@@ -24,7 +24,8 @@ import { CONFIGURATION_STEPS, CONFIGURATION_STEPS_ORDER } from 'preflight/Consta
 import type { IconName } from 'components/common/Icon';
 import Icon from 'components/common/Icon';
 import Spinner from 'components/common/Spinner';
-import { List, Grid, Space, Alert } from 'preflight/components/common';
+import { List, Grid, Space } from 'preflight/components/common';
+import Alert from 'components/bootstrap/Alert';
 import RenewalPolicyConfiguration from 'preflight/components/ConfigurationWizard/RenewalPolicyConfiguration';
 import type { ConfigurationStep } from 'preflight/types';
 import ResumeStartupButton from 'preflight/components/ResumeStartupButton';
@@ -53,14 +54,14 @@ const stepIcon = (stepKey: ConfigurationStep, activeStepKey: ConfigurationStep, 
 
   if (stepIndex < activeStepIndex || activeStepKey === CONFIGURATION_STEPS.CONFIGURATION_FINISHED.key) {
     return {
-      name: 'circle-check',
+      name: 'check_circle',
       color: theme.colors.variant.success,
     };
   }
 
   if (stepKey === activeStepKey) {
     return {
-      name: 'circle-exclamation',
+      name: 'error',
       color: theme.colors.variant.info,
     };
   }
@@ -78,7 +79,7 @@ type FetchErrorsOverviewProps = {
 const FetchErrorsOverview = ({ errors }: FetchErrorsOverviewProps) => (
   <>
     {errors.map(({ entityName, error }) => (
-      <Alert type="danger" key={entityName}>
+      <Alert bsStyle="danger" key={entityName}>
         There was an error fetching the {entityName}: {error.message}
       </Alert>
     ))}
@@ -108,7 +109,7 @@ const ConfigurationWizard = ({ setIsWaitingForStartup }: Props) => {
 
   return (
     <Grid>
-      <Grid.Col span={12} md={6} orderMd={2}>
+      <Grid.Col span={{ base: 12, md: 6, orderMd: 2 }}>
         <List spacing="md"
               size="lg"
               center>
@@ -141,7 +142,7 @@ const ConfigurationWizard = ({ setIsWaitingForStartup }: Props) => {
         {' '}
         or <RestartConfigurationButton compact variant="light" color="red" /> the configuration
       </Grid.Col>
-      <Grid.Col span={12} md={6} orderMd={1}>
+      <Grid.Col span={{ base: 12, md: 6, orderMd: 1 }}>
         {activeStepKey === CONFIGURATION_STEPS.CA_CONFIGURATION.key && <CAConfiguration />}
         {activeStepKey === CONFIGURATION_STEPS.RENEWAL_POLICY_CONFIGURATION.key && <RenewalPolicyConfiguration />}
         {activeStepKey === CONFIGURATION_STEPS.CERTIFICATE_PROVISIONING.key && <CertificateProvisioning onSkipProvisioning={onSkipProvisioning} />}

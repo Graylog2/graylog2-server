@@ -39,7 +39,7 @@ const configurationStep = (
     return CONFIGURATION_STEPS.RENEWAL_POLICY_CONFIGURATION.key;
   }
 
-  const finishedProvisioning = !!dataNodes?.length && !dataNodes.some((dataNode) => dataNode.status !== DATA_NODES_STATUS.CONNECTED.key);
+  const finishedProvisioning = !!dataNodes?.length && !dataNodes.some((dataNode) => dataNode.status !== DATA_NODES_STATUS.CONNECTED);
 
   if (!finishedProvisioning && !isSkippingProvisioning) {
     return CONFIGURATION_STEPS.CERTIFICATE_PROVISIONING.key;

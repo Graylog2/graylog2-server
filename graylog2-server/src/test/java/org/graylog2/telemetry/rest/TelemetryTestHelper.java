@@ -35,6 +35,8 @@ public class TelemetryTestHelper {
     static final String PLUGIN = "plugin";
     static final String SEARCH_CLUSTER = "search_cluster";
 
+    static final String DATA_NODES = "data_nodes";
+
     public static void mockTrafficData(TrafficCounterService trafficCounterService1) {
         when(trafficCounterService1.clusterTrafficOfLastDays(any(), any())).thenReturn(TelemetryTestHelper.TRAFFIC_HISTOGRAM);
     }

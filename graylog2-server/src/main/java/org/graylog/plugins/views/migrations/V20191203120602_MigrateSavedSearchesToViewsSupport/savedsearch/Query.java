@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearchesToViewsSupport.savedsearch;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.common.base.Splitter;
@@ -38,6 +39,7 @@ public abstract class Query {
     private final String TIMESTAMP_FIELD = "timestamp";
     private final List<String> DEFAULT_FIELDS = ImmutableList.of(TIMESTAMP_FIELD, "source", "message");
 
+    @JsonProperty("rangeType")
     abstract String rangeType();
     abstract Optional<String> fields();
     public abstract String query();

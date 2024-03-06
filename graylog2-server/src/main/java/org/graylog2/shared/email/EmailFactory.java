@@ -28,8 +28,9 @@ import org.apache.commons.mail.MultiPartEmail;
 import org.apache.commons.mail.SimpleEmail;
 import org.graylog2.configuration.EmailConfiguration;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
 import java.util.function.Supplier;
 
 import static com.google.common.base.Strings.isNullOrEmpty;

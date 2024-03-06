@@ -23,6 +23,9 @@ import { Icon, Spinner } from 'components/common';
 import QueryValidationActions from 'views/actions/QueryValidationActions';
 import type { IconName } from 'components/common/Icon';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import useLocation from 'routing/useLocation';
 
 const StyledButton = styled(Button)<{ $dirty: boolean }>(({ theme, $dirty }) => css`
   position: relative;
@@ -43,7 +46,7 @@ const StyledButton = styled(Button)<{ $dirty: boolean }>(({ theme, $dirty }) => 
       border-radius: 50%;
       background-color: ${theme.colors.variant.warning};
     }
-  ` : ''}
+` : ''}
 `);
 
 type Props = {
@@ -64,12 +67,13 @@ const onButtonClick = (e: MouseEvent, disabled: Boolean, triggerTelemetry: () =>
 
 const SearchButton = ({ dirty, disabled, glyph, displaySpinner }: Props) => {
   const sendTelemetry = useSendTelemetry();
+  const location = useLocation();
   const className = disabled ? 'disabled' : '';
   const title = dirty ? 'Perform search (changes were made after last search execution)' : 'Perform Search';
 
   const triggerTelemetry = () => {
-    sendTelemetry('click', {
-      app_pathname: 'search',
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_BUTTON_CLICKED, {
+      app_pathname: getPathnameWithoutId(location.pathname),
       app_section: 'search-bar',
       app_action_value: 'search-button',
       event_details: {
@@ -85,7 +89,7 @@ const SearchButton = ({ dirty, disabled, glyph, displaySpinner }: Props) => {
                   type="submit"
                   bsStyle="success"
                   $dirty={dirty}>
-      {displaySpinner ? <Spinner delay={0} text="" /> : <Icon name={glyph} />}
+      {displaySpinner ? <Spinner delay={0} text="" /> : <Icon name={glyph} size="lg" />}
     </StyledButton>
   );
 };

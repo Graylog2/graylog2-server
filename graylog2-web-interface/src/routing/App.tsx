@@ -32,6 +32,7 @@ import 'stylesheets/typeahead.less';
 import NavigationTelemetry from 'logic/telemetry/NavigationTelemetry';
 import HotkeysProvider from 'contexts/HotkeysProvider';
 import HotkeysModalContainer from 'components/hotkeys/HotkeysModalContainer';
+import PerspectivesProvider from 'components/perspectives/contexts/PerspectivesProvider';
 
 const AppLayout = styled.div`
   display: flex;
@@ -72,28 +73,30 @@ const App = () => (
         }
 
         return (
-          <ScratchpadProvider loginName={currentUser.username}>
-            <NavigationTelemetry />
+          <PerspectivesProvider>
             <HotkeysProvider>
-              <>
-                <AppLayout>
-                  <Navigation />
-                  <ScrollToHint id="scroll-to-hint">
-                    <Icon name="arrow-up" />
-                  </ScrollToHint>
-                  <Scratchpad />
-                  <ReportedErrorBoundary>
-                    <RuntimeErrorBoundary>
-                      <PageContent>
-                        <Outlet />
-                      </PageContent>
-                    </RuntimeErrorBoundary>
-                  </ReportedErrorBoundary>
-                </AppLayout>
-                <HotkeysModalContainer />
-              </>
+              <ScratchpadProvider loginName={currentUser.username}>
+                <NavigationTelemetry />
+                <>
+                  <AppLayout>
+                    <Navigation />
+                    <ScrollToHint id="scroll-to-hint">
+                      <Icon name="arrow_upward" />
+                    </ScrollToHint>
+                    <Scratchpad />
+                    <ReportedErrorBoundary>
+                      <RuntimeErrorBoundary>
+                        <PageContent>
+                          <Outlet />
+                        </PageContent>
+                      </RuntimeErrorBoundary>
+                    </ReportedErrorBoundary>
+                  </AppLayout>
+                  <HotkeysModalContainer />
+                </>
+              </ScratchpadProvider>
             </HotkeysProvider>
-          </ScratchpadProvider>
+          </PerspectivesProvider>
         );
       }}
     </CurrentUserContext.Consumer>

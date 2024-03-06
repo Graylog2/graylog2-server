@@ -35,13 +35,18 @@ import org.graylog2.bootstrap.preflight.web.resources.PreflightAssetsResource;
 import org.graylog2.bootstrap.preflight.web.resources.PreflightResource;
 import org.graylog2.bootstrap.preflight.web.resources.PreflightStatusResource;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
-import org.graylog2.cluster.NodeService;
-import org.graylog2.cluster.NodeServiceImpl;
 import org.graylog2.cluster.leader.LeaderElectionModule;
+import org.graylog2.cluster.lock.LockServiceModule;
+import org.graylog2.cluster.nodes.DataNodeClusterService;
+import org.graylog2.cluster.nodes.DataNodeDto;
+import org.graylog2.cluster.nodes.NodeService;
+import org.graylog2.cluster.nodes.ServerNodeClusterService;
+import org.graylog2.cluster.nodes.ServerNodeDto;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.events.ClusterEventCleanupPeriodical;
 import org.graylog2.events.ClusterEventPeriodical;
+import org.graylog2.migrations.V20230929142900_CreateInitialPreflightPassword;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.inject.Graylog2Module;
@@ -68,7 +73,8 @@ public class PreflightWebModule extends Graylog2Module {
 
         bind(ServiceManager.class).toProvider(ServiceManagerProvider.class).asEagerSingleton();
         bind(MongoConnection.class).toProvider(MongoConnectionProvider.class);
-        bind(NodeService.class).to(NodeServiceImpl.class);
+        bind(new TypeLiteral<NodeService<ServerNodeDto>>() {}).to(ServerNodeClusterService.class);
+        bind(new TypeLiteral<NodeService<DataNodeDto>>() {}).to(DataNodeClusterService.class);
         bind(KeystoreContentMover.class).to(SinglePasswordKeystoreContentMover.class).asEagerSingleton();
         bind(ClusterConfigService.class).to(ClusterConfigServiceImpl.class);
         bind(CaService.class).to(CaServiceImpl.class);
@@ -91,16 +97,21 @@ public class PreflightWebModule extends Graylog2Module {
         serviceBinder.addBinding().to(PreflightJerseyService.class);
         serviceBinder.addBinding().to(PeriodicalsService.class);
 
+        install(new LockServiceModule());
         install(new LeaderElectionModule(configuration));
 
         bind(ClusterEventBus.class).toProvider(ClusterEventBusProvider.class).asEagerSingleton();
         bind(EventBus.class).toProvider(EventBusProvider.class).asEagerSingleton();
+
+        migrationsBinder().addBinding().to(V20230929142900_CreateInitialPreflightPassword.class);
 
         // needed for the ObjectMapperModule
         MapBinder.newMapBinder(binder(),
                 TypeLiteral.get(String.class),
                 new TypeLiteral<MessageInput.Factory<? extends MessageInput>>() {
                 });
+
+
     }
 
     protected void addPreflightRestResource(Class<?> restResourceClass) {

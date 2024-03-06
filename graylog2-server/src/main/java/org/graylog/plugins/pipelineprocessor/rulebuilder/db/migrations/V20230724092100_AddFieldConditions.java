@@ -25,7 +25,8 @@ import org.graylog2.migrations.Migration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 
@@ -52,8 +53,10 @@ public class V20230724092100_AddFieldConditions extends Migration {
         log.debug("Adding field condition fragments via migration");
         String[] noConversionTypes = {"collection", "list", "not_null", "null"};
         Arrays.stream(noConversionTypes).forEach(type -> ruleFragmentService.upsert(createCheckFieldTypeNoConversion(type)));
-        String[] conversionTypes = {"bool", "double", "long", "map", "string", "url", "ip"};
+        String[] conversionTypes = {"map", "string", "url"};
         Arrays.stream(conversionTypes).forEach(type -> ruleFragmentService.upsert(createCheckFieldType(type)));
+        String[] conversionParamTypes = {"bool", "double", "long", "ip", "number"};
+        Arrays.stream(conversionParamTypes).forEach(type -> ruleFragmentService.upsert(createCheckFieldTypeConversionParam(type)));
         ruleFragmentService.upsert(createCheckDateField());
         ruleFragmentService.upsert(createCIDRMatchField());
         ruleFragmentService.upsert(createStringContainsField());
@@ -95,6 +98,31 @@ public class V20230724092100_AddFieldConditions extends Migration {
                         .params(ImmutableList.of(
                                 string("field").description("Field to check").build(),
                                 bool("attemptConversion").optional().description("If set the check will also try if the field could be converted to a " + type + " using the to_" + type + " method").build()
+                        ))
+                        .returnType(Void.class)
+                        .description("Checks whether the value in the given field is a " + type)
+                        .ruleBuilderEnabled()
+                        .ruleBuilderName("Field is " + type)
+                        .ruleBuilderTitle("Check if value in '${field}' is a " + type)
+                        .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.BOOLEAN)
+                        .build())
+                .isCondition()
+                .build();
+    }
+
+    RuleFragment createCheckFieldTypeConversionParam(String type) {
+        return RuleFragment.builder()
+                .fragment(("is_%type%(" +
+                        "  value: $message.${field}<#if attemptConversion!false>," +
+                        "  attemptConversion: true</#if>" +
+                        ")")
+                        .replace("%type%", type)
+                )
+                .descriptor(FunctionDescriptor.builder()
+                        .name("field_" + type)
+                        .params(ImmutableList.of(
+                                string("field").description("Field to check").build(),
+                                bool("attemptConversion").optional().description("If set the check will also try if the field's string representation represents a " + type).build()
                         ))
                         .returnType(Void.class)
                         .description("Checks whether the value in the given field is a " + type)

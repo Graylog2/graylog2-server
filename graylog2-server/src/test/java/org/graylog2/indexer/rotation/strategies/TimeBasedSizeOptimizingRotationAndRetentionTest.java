@@ -19,15 +19,18 @@ package org.graylog2.indexer.rotation.strategies;
 import org.graylog.events.JobSchedulerTestClock;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.configuration.ElasticsearchConfiguration;
+import org.graylog2.indexer.RetentionTestIndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
+import org.graylog2.indexer.retention.executors.RetentionExecutor;
+import org.graylog2.indexer.retention.executors.TimeBasedRetentionExecutor;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
+import org.graylog2.indexer.rotation.common.IndexRotator;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.system.activities.ActivityWriter;
-import org.joda.time.DateTime;
 import org.joda.time.Period;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,23 +40,17 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.shared.utilities.StringUtils.f;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.mock;
 
 @ExtendWith(MockitoExtension.class)
 class TimeBasedSizeOptimizingRotationAndRetentionTest {
@@ -70,9 +67,12 @@ class TimeBasedSizeOptimizingRotationAndRetentionTest {
     @Mock
     private AuditEventSender auditEventSender;
 
+    @Mock
+    private ActivityWriter activityWriter;
+
     private JobSchedulerTestClock clock;
 
-    private TestIndexSet indexSet;
+    private RetentionTestIndexSet indexSet;
     private ElasticsearchConfiguration elasticsearchConfiguration;
     private TimeBasedSizeOptimizingStrategyConfig rotationStrategyConfig;
 
@@ -83,16 +83,23 @@ class TimeBasedSizeOptimizingRotationAndRetentionTest {
         clock = new JobSchedulerTestClock(Tools.nowUTC());
 
         elasticsearchConfiguration = new ElasticsearchConfiguration();
-        timeBasedSizeOptimizingStrategy = new TimeBasedSizeOptimizingStrategy(indices, nodeId, auditEventSender, elasticsearchConfiguration, clock);
+        IndexRotator indexRotator = new IndexRotator(indices, auditEventSender, nodeId);
+        timeBasedSizeOptimizingStrategy = new TimeBasedSizeOptimizingStrategy(indices, elasticsearchConfiguration, clock, indexRotator);
         rotationStrategyConfig = TimeBasedSizeOptimizingStrategyConfig.builder()
                 .indexLifetimeMin(Period.days(4))
                 .indexLifetimeMax(Period.days(6))
                 .build();
 
         final DeletionRetentionStrategyConfig deletionRetention = DeletionRetentionStrategyConfig.createDefault();
-        deletionRetentionStrategy = new DeletionRetentionStrategy(indices, mock(ActivityWriter.class), nodeId, auditEventSender, clock);
+        RetentionExecutor retentionExecutor = new RetentionExecutor(activityWriter, indices);
+        deletionRetentionStrategy = new DeletionRetentionStrategy(
+                indices,
+                nodeId,
+                auditEventSender,
+                null,
+                new TimeBasedRetentionExecutor(indices, clock, activityWriter, retentionExecutor));
 
-        indexSet = new TestIndexSet(IndexSetConfig.builder()
+        indexSet = new RetentionTestIndexSet(IndexSetConfig.builder()
                 .title("test index")
                 .indexPrefix("test")
                 .shards(elasticsearchConfiguration.getShards())
@@ -104,26 +111,26 @@ class TimeBasedSizeOptimizingRotationAndRetentionTest {
                 .indexOptimizationDisabled(elasticsearchConfiguration.isDisableIndexOptimization())
                 .rotationStrategy(rotationStrategyConfig)
                 .retentionStrategy(deletionRetention)
-                .build());
+                .build(), clock);
 
         lenient().when(indices.indexCreationDate(anyString())).thenAnswer(a -> {
             final String indexName = a.getArgument(0);
-            final Optional<TestIndex> index = indexSet.findByName(indexName);
-            return index.map(TestIndex::getCreationDate);
+            final Optional<RetentionTestIndexSet.TestIndex> index = indexSet.findByName(indexName);
+            return index.map(RetentionTestIndexSet.TestIndex::getCreationDate);
         });
 
         lenient().when(indices.getStoreSizeInBytes(anyString())).then(a -> {
             final String indexName = a.getArgument(0);
-            final Optional<TestIndex> index = indexSet.findByName(indexName);
-            return index.map(TestIndex::getSize);
+            final Optional<RetentionTestIndexSet.TestIndex> index = indexSet.findByName(indexName);
+            return index.map(RetentionTestIndexSet.TestIndex::getSize);
         });
 
         lenient().when(indices.numberOfMessages(anyString())).thenReturn(10L);
 
         lenient().when(indices.indexClosingDate(anyString())).then(a -> {
             final String indexName = a.getArgument(0);
-            final Optional<TestIndex> index = indexSet.findByName(indexName);
-            return index.map(TestIndex::getClosingDate);
+            final Optional<RetentionTestIndexSet.TestIndex> index = indexSet.findByName(indexName);
+            return index.map(RetentionTestIndexSet.TestIndex::getClosingDate);
         });
 
         // Report all indices that have a closingDate as read-only
@@ -131,8 +138,8 @@ class TimeBasedSizeOptimizingRotationAndRetentionTest {
             final List<String> indices = a.getArgument(0);
             final IndicesBlockStatus indicesBlockStatus = new IndicesBlockStatus();
             indices.forEach(i -> {
-                final Optional<TestIndex> index = indexSet.findByName(i);
-                if (index.map(TestIndex::getClosingDate).orElse(null) != null) {
+                final Optional<RetentionTestIndexSet.TestIndex> index = indexSet.findByName(i);
+                if (index.map(RetentionTestIndexSet.TestIndex::getClosingDate).orElse(null) != null) {
                     indicesBlockStatus.addIndexBlocks(i, Set.of("index.blocks.write"));
                 }
             });
@@ -198,7 +205,7 @@ class TimeBasedSizeOptimizingRotationAndRetentionTest {
 
         LOG.info("Existing indices from rotation:\n<{}>",
                 indexSet.getIndices().stream()
-                        .map(i -> f("%s: created: %s closed: %s/(%s ago)\n", i.name, i.creationDate, i.closingDate, getBetween(i))).toList());
+                        .map(i -> f("%s: created: %s closed: %s/(%s ago)\n", i.getName(), i.getCreationDate(), i.getClosingDate(), getBetween(i))).toList());
 
         // Retention should happen after indexLifetimeSoft (4 days)
         deletionRetentionStrategy.retain(indexSet);
@@ -259,126 +266,11 @@ class TimeBasedSizeOptimizingRotationAndRetentionTest {
         assertThat(indexSet.getIndicesNames()).isEqualTo(List.of("test_1", "test_2"));
     }
 
-    private String getBetween(TestIndex i) {
+    private String getBetween(RetentionTestIndexSet.TestIndex i) {
         if (i.getClosingDate() == null) {
             return "null";
         }
         return Period.fieldDifference(clock.nowUTC().toLocalDateTime(), i.getClosingDate().toLocalDateTime()).toString();
     }
 
-    class TestIndexSet extends org.graylog2.indexer.TestIndexSet {
-        private final List<TestIndex> indices;
-
-        public TestIndexSet(IndexSetConfig config) {
-            super(config);
-            this.indices = new ArrayList<>();
-        }
-
-        public List<TestIndex> getIndices() {
-            return indices;
-        }
-
-        public List<String> getIndicesNames() {
-            return indices.stream().map(TestIndex::getName).toList();
-        }
-        public Optional<TestIndex> findByName(String name) {
-            return indices.stream().filter(i -> i.name.equals(name)).findFirst();
-        }
-
-        public void deleteByName(String name) {
-            findByName(name).map(indices::remove);
-        }
-        public void addNewIndex(int count, long size) {
-            indices.add(new TestIndex(buildIndexName(count), clock.nowUTC(), null, size));
-        }
-
-        @Override
-        public Map<String, Set<String>> getAllIndexAliases() {
-            final String newestIndex = getNewestIndex();
-            return indices.stream().map(TestIndex::getName)
-                    .collect(Collectors.toMap(i -> i, i -> i.equals(newestIndex) ? Set.of(config.indexPrefix() + "_deflector") : Set.of()));
-        }
-
-        @Override
-        public String[] getManagedIndices() {
-            return indices.stream().map(TestIndex::getName).toArray(String[]::new);
-        }
-
-        @Override
-        public void cycle() {
-            final TestIndex newest = getNewest();
-            newest.setClosingDate(clock.nowUTC());
-
-            final Integer indexNr = extractIndexNumber(newest.getName()).get();
-            var nextIndexName = buildIndexName(indexNr + 1);
-            indices.add(new TestIndex(nextIndexName, clock.nowUTC(), null, 0));
-        }
-
-        @Override
-        public String getNewestIndex() {
-            return getNewest().getName();
-        }
-
-        public TestIndex getNewest() {
-            return indices.stream().sorted(Comparator.comparing(TestIndex::getCreationDate)).reduce((a, b) -> b).get();
-        }
-
-        @Override
-        public Optional<Integer> extractIndexNumber(final String indexName) {
-            final int beginIndex = config.indexPrefix().length() + 1;
-            if (indexName.length() < beginIndex) {
-                return Optional.empty();
-            }
-
-            final String suffix = indexName.substring(beginIndex);
-            try {
-                return Optional.of(Integer.parseInt(suffix));
-            } catch (NumberFormatException e) {
-                return Optional.empty();
-            }
-        }
-
-        String buildIndexName(final int number) {
-            return config.indexPrefix() + "_" + number;
-        }
-
-    }
-
-    static class TestIndex {
-        private final String name;
-        private final DateTime creationDate;
-        private DateTime closingDate;
-        private long size;
-
-        public TestIndex(String name, DateTime creationDate, @Nullable DateTime closingDate, long size) {
-            this.name = name;
-            this.creationDate = creationDate;
-            this.closingDate = closingDate;
-            this.size = size;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public DateTime getCreationDate() {
-            return creationDate;
-        }
-
-        public DateTime getClosingDate() {
-            return closingDate;
-        }
-
-        public void setClosingDate(DateTime closingDate) {
-            this.closingDate = closingDate;
-        }
-
-        public long getSize() {
-            return size;
-        }
-
-        public void setSize(long size) {
-            this.size = size;
-        }
-    }
 }

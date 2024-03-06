@@ -32,6 +32,11 @@ import 'components/event-notifications/event-notification-types';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import useCurrentUser from 'hooks/useCurrentUser';
 import useEventDefinitionConfigFromLocalStorage from 'components/event-definitions/hooks/useEventDefinitionConfigFromLocalStorage';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useLocation from 'routing/useLocation';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import useScopePermissions from 'hooks/useScopePermissions';
 
 import EventDefinitionForm from './EventDefinitionForm';
 
@@ -59,11 +64,14 @@ const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinition
   const [eventsClusterConfig, setEventsClusterConfig] = useState(undefined);
   const [isDirty, setIsDirty] = useState(false);
   const { configFromLocalStorage, hasLocalStorageConfig } = useEventDefinitionConfigFromLocalStorage();
+  const { loadingScopePermissions, scopePermissions } = useScopePermissions(eventDefinition);
 
   const entityTypes = useStore(AvailableEventDefinitionTypesStore);
   const notifications = useStore(EventNotificationsStore);
   const currentUser = useCurrentUser();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const sendTelemetry = useSendTelemetry();
 
   const isLoading = !entityTypes || !notifications.all || !eventsClusterConfig;
   const defaults = { default_backlog_size: eventsClusterConfig?.events_notification_default_backlog };
@@ -138,19 +146,37 @@ const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinition
 
   const handleSubmit = () => {
     if (action === 'create') {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_SUMMARY.CREATE_CLICKED, {
+        app_pathname: getPathnameWithoutId(pathname),
+        app_section: 'new-event-definition',
+        app_action_value: 'create-event-definition-button',
+      });
+
       EventDefinitionsActions.create(eventDefinition)
         .then(handleSubmitSuccessResponse, handleSubmitFailureResponse);
     } else {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_SUMMARY.UPDATE_CLICKED, {
+        app_pathname: getPathnameWithoutId(pathname),
+        app_section: 'edit-event-definition',
+        app_action_value: 'update-event-definition-button',
+      });
+
       EventDefinitionsActions.update(eventDefinition.id, eventDefinition)
         .then(handleSubmitSuccessResponse, handleSubmitFailureResponse);
     }
   };
 
   const handleCancel = () => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_SUMMARY.CANCEL_CLICKED, {
+      app_pathname: getPathnameWithoutId(pathname),
+      app_section: (action === 'create') ? 'new-event-definition' : 'edit-event-definition',
+      app_action_value: 'cancel-button',
+    });
+
     navigate(Routes.ALERTS.DEFINITIONS.LIST);
   };
 
-  if (isLoading) {
+  if (isLoading || loadingScopePermissions) {
     return <Spinner text="Loading Event information..." />;
   }
 
@@ -168,7 +194,8 @@ const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinition
                            defaults={defaults}
                            onChange={handleChange}
                            onCancel={handleCancel}
-                           onSubmit={handleSubmit} />
+                           onSubmit={handleSubmit}
+                           canEdit={scopePermissions.is_mutable} />
     </>
   );
 };

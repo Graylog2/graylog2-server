@@ -31,7 +31,7 @@ const RestTypesContainer = styled.i(({ theme }) => css`
 export const useColumnRenderers = (fieldTypes: FieldTypes) => {
   const customColumnRenderers: ColumnRenderers<FieldTypeUsage> = useMemo(() => ({
     attributes: {
-      streamTitles: {
+      stream_titles: {
         renderCell: (streams: Array<string>) => streams.join(', '),
       },
       types: {

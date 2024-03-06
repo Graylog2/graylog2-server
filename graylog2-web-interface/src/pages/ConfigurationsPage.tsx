@@ -35,7 +35,6 @@ import PermissionsConfig from 'components/configurations/PermissionsConfig';
 import PluginsConfig from 'components/configurations/PluginsConfig';
 import 'components/maps/configurations';
 import useCurrentUser from 'hooks/useCurrentUser';
-import DataNodeConfiguration from 'components/configurations/DataNodeConfiguration/DataNodeConfiguration';
 import { LinkContainer } from 'components/common/router';
 import useLocation from 'routing/useLocation';
 
@@ -70,7 +69,7 @@ const SectionLink = ({ name, showCaret }: SectionLinkProps) => {
     <LinkContainer key={`nav-${name}`} to={name}>
       <NavItem title={name} active={isActive}>
         {name}
-        {showCaret && (isActive ? <SubNavIconClosed name="caret-right" /> : <SubNavIconOpen name="caret-down" />)}
+        {showCaret && (isActive ? <SubNavIconClosed name="arrow_right" /> : <SubNavIconOpen name="arrow_drop_down" />)}
       </NavItem>
     </LinkContainer>
   );
@@ -161,14 +160,6 @@ const ConfigurationsPage = () => {
       props: {
         ConfigurationComponent: UserConfig,
         title: 'Index Set Defaults',
-      },
-    },
-    {
-      name: 'Data Node',
-      SectionComponent: ConfigurationSection,
-      props: {
-        ConfigurationComponent: DataNodeConfiguration,
-        title: 'Certificate Renewal Policy',
       },
     },
     {

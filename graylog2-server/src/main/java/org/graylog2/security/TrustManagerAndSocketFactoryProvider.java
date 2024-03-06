@@ -16,8 +16,9 @@
  */
 package org.graylog2.security;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
@@ -33,7 +34,7 @@ public class TrustManagerAndSocketFactoryProvider {
     private final SSLContext sslContext;
 
     @Inject
-    public TrustManagerAndSocketFactoryProvider(CustomCAX509TrustManager trustManager) throws NoSuchAlgorithmException, KeyManagementException {
+    public TrustManagerAndSocketFactoryProvider(X509TrustManager trustManager) throws NoSuchAlgorithmException, KeyManagementException {
         this.sslContext = SSLContext.getInstance("TLS");
         this.trustManager = trustManager;
         sslContext.init(null, new TrustManager[]{this.trustManager}, new SecureRandom());

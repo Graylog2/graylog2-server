@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.pipelineprocessor.functions.conversion;
 
+import org.apache.commons.lang.BooleanUtils;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
@@ -23,21 +24,30 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 
+import java.util.Objects;
+
+import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.bool;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
 
 public class IsBoolean extends AbstractFunction<Boolean> {
     public static final String NAME = "is_bool";
 
     private final ParameterDescriptor<Object, Object> valueParam;
+    private final ParameterDescriptor<Boolean, Boolean> conversionParam;
 
     public IsBoolean() {
         valueParam = object("value").ruleBuilderVariable().description("Value to check").build();
+        conversionParam = bool("attemptConversion").optional().description("Try to convert value to boolean from its string representation (default: false)").build();
     }
 
     @Override
     public Boolean evaluate(FunctionArgs args, EvaluationContext context) {
         final Object value = valueParam.required(args, context);
-        return value instanceof Boolean;
+        final boolean convert = conversionParam.optional(args, context).orElse(false);
+        if (!convert) {
+            return value instanceof Boolean;
+        }
+        return Objects.nonNull(BooleanUtils.toBooleanObject(String.valueOf(value)));
     }
 
     @Override
@@ -45,7 +55,7 @@ public class IsBoolean extends AbstractFunction<Boolean> {
         return FunctionDescriptor.<Boolean>builder()
                 .name(NAME)
                 .returnType(Boolean.class)
-                .params(valueParam)
+                .params(valueParam, conversionParam)
                 .description("Checks whether a value is a boolean value (true or false)")
                 .ruleBuilderEnabled(false)
                 .ruleBuilderName("Check if boolean")

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import ObjectID from 'bson-objectid';
 
 import useHistory from 'routing/useHistory';
@@ -26,6 +26,7 @@ import { ConfirmDialog, FormSubmit } from 'components/common';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import RuleBuilderProvider from './RuleBuilderProvider';
 import RuleBuilderBlock from './RuleBuilderBlock';
@@ -42,19 +43,19 @@ const ActionsCol = styled(Col)`
   margin-top: 50px;
 `;
 
-const StyledPanel = styled(Panel)`
-  background-color: #fff;
+const StyledPanel = styled(Panel)(({ theme }) => css`
+  background-color: ${theme.colors.global.contentBackground};
   border: 0;
   box-shadow: none;
   margin-bottom: 0;
-`;
+`);
 
-const StyledPanelHeading = styled(Panel.Heading)`
+const StyledPanelHeading = styled(Panel.Heading)(({ theme }) => css`
   display: flex;
   justify-content: space-between;
-  background-color: #f5f5f5 !important;
+  background-color: ${theme.colors.table.backgroundAlt} !important;
   border: 0;
-`;
+`);
 
 const WhenOperator = styled.div`
   display: flex;
@@ -139,11 +140,14 @@ const RuleBuilder = () => {
   };
 
   const updateWhenOperator = async (operator: 'AND'|'OR') => {
-    sendTelemetry(`Pipeline RuleBuilder Operator ${operator} Clicked`, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'pipeline-rules',
-      app_action_value: 'cancel-button',
-    });
+    sendTelemetry(
+      operator === 'AND'
+        ? TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.OPERATOR_AND_CLICKED
+        : TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.OPERATOR_OR_CLICKED, {
+        app_pathname: getPathnameWithoutId(pathname),
+        app_section: 'pipeline-rules',
+        app_action_value: 'cancel-button',
+      });
 
     const newOperatorRule: RuleBuilderRule = {
       ...rule,
@@ -247,7 +251,7 @@ const RuleBuilder = () => {
   };
 
   const handleCancel = () => {
-    sendTelemetry('Pipeline RuleBuilder Cancel Clicked', {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.CANCEL_CLICKED, {
       app_pathname: getPathnameWithoutId(pathname),
       app_section: 'pipeline-rules',
       app_action_value: 'cancel-button',
@@ -256,20 +260,23 @@ const RuleBuilder = () => {
     history.push(Routes.SYSTEM.PIPELINES.RULES);
   };
 
-  const handleSave = async (event?: React.FormEvent<HTMLFormElement>, closeAfter: boolean = false) => {
+  const handleSave = async (event?: React.SyntheticEvent<HTMLElement>, closeAfter: boolean = false) => {
     event?.preventDefault();
 
     if (initialRule) {
-      sendTelemetry(`Pipeline RuleBuilder Update Rule${closeAfter ? ' and Close' : ''} Clicked`, {
-        app_pathname: getPathnameWithoutId(pathname),
-        app_section: 'pipeline-rules',
-        app_action_value: closeAfter ? 'update-rule-and-close-button' : 'update-rule-button',
-      });
+      sendTelemetry(
+        closeAfter
+          ? TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.UPDATE_RULE_AND_CLOSE_CLICKED
+          : TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.UPDATE_RULE_CLICKED, {
+          app_pathname: getPathnameWithoutId(pathname),
+          app_section: 'pipeline-rules',
+          app_action_value: closeAfter ? 'update-rule-and-close-button' : 'update-rule-button',
+        });
 
       await updateRule(rule);
       if (closeAfter) handleCancel();
     } else {
-      sendTelemetry('Pipeline RuleBuilder Add Rule Clicked', {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.ADD_RULE_CLICKED, {
         app_pathname: getPathnameWithoutId(pathname),
         app_section: 'pipeline-rules',
         app_action_value: 'add-rule-button',
@@ -388,7 +395,7 @@ const RuleBuilder = () => {
                                   title="Convert Rule Builder to Source Code"
                                   disabled={hasRuleBuilderErrors(rule)}
                                   onClick={() => {
-                                    sendTelemetry('Pipeline RuleBuilder Convert to Source Code Clicked', {
+                                    sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.CONVERT_TO_SOURCE_CODE_CLICKED, {
                                       app_pathname: getPathnameWithoutId(pathname),
                                       app_section: 'pipeline-rules',
                                       app_action_value: 'convert-rule-builder-to-source-code-button',

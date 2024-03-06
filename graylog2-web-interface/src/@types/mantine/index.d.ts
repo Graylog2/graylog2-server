@@ -16,6 +16,11 @@
  */
 import type { MantineTheme as CustomMantineTheme } from '@graylog/sawmill/mantine';
 
+type Other = CustomMantineTheme['other'];
+
 declare module '@mantine/core' {
+  export interface MantineThemeOther extends Other {
+  }
+
   export interface MantineTheme extends CustomMantineTheme {}
 }

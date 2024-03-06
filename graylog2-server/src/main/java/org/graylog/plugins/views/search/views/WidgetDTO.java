@@ -27,8 +27,6 @@ import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.searchfilters.model.UsesSearchFilters;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
-import org.graylog2.contentpacks.model.ModelTypes;
-import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.WidgetEntity;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
@@ -38,6 +36,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static org.graylog2.contentpacks.facades.StreamReferenceFacade.getStreamEntityId;
 
 @AutoValue
 @JsonDeserialize(builder = WidgetDTO.Builder.class)
@@ -128,8 +128,8 @@ public abstract class WidgetDTO implements ContentPackable<WidgetEntity>, UsesSe
 
     @Override
     public WidgetEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
-        Set<String> mappedStreams = streams().stream().map(streamId ->
-                entityDescriptorIds.get(EntityDescriptor.create(streamId, ModelTypes.STREAM_V1)))
+        Set<String> mappedStreams = streams().stream()
+                .map(streamId -> getStreamEntityId(streamId, entityDescriptorIds))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toSet());

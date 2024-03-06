@@ -21,6 +21,9 @@ import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
+import org.graylog.plugins.pipelineprocessor.functions.arrays.ArrayContains;
+import org.graylog.plugins.pipelineprocessor.functions.arrays.ArrayRemove;
+import org.graylog.plugins.pipelineprocessor.functions.arrays.StringArrayAdd;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.BooleanConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.CsvMapConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.DoubleConversion;
@@ -84,6 +87,7 @@ import org.graylog.plugins.pipelineprocessor.functions.lookup.ListCount;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.ListGet;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.Lookup;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupAddStringList;
+import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupAll;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupAssignTtl;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupClearKey;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupHasValue;
@@ -293,6 +297,7 @@ public class ProcessorFunctionsModule extends PluginModule {
         addMessageProcessorFunction(LookupAssignTtl.NAME, LookupAssignTtl.class);
         addMessageProcessorFunction(ListGet.NAME, ListGet.class);
         addMessageProcessorFunction(ListCount.NAME, ListCount.class);
+        addMessageProcessorFunction(LookupAll.NAME, LookupAll.class);
 
         // Maps
         addMessageProcessorFunction(MapRemove.NAME, MapRemove.class);
@@ -303,6 +308,11 @@ public class ProcessorFunctionsModule extends PluginModule {
         // Debug
         addMessageProcessorFunction(Debug.NAME, Debug.class);
         addMessageProcessorFunction(MetricCounterIncrement.NAME, MetricCounterIncrement.class);
+
+        // Arrays
+        addMessageProcessorFunction(ArrayContains.NAME, ArrayContains.class);
+        addMessageProcessorFunction(ArrayRemove.NAME, ArrayRemove.class);
+        addMessageProcessorFunction(StringArrayAdd.NAME, StringArrayAdd.class);
     }
 
     protected void addMessageProcessorFunction(String name, Class<? extends Function<?>> functionClass) {

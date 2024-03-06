@@ -17,15 +17,13 @@
 package org.graylog.datanode.configuration;
 
 import org.graylog.datanode.Configuration;
-import org.graylog.datanode.OpensearchDistribution;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.system.NodeId;
 import org.graylog2.security.IndexerJwtAuthTokenProvider;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-import javax.inject.Singleton;
-import java.io.IOException;
-import java.nio.file.Path;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
 
 @Singleton
 public class DatanodeConfigurationProvider implements Provider<DatanodeConfiguration> {
@@ -33,27 +31,21 @@ public class DatanodeConfigurationProvider implements Provider<DatanodeConfigura
     private final DatanodeConfiguration datanodeConfiguration;
 
     @Inject
-    public DatanodeConfigurationProvider(final Configuration localConfiguration, IndexerJwtAuthTokenProvider jwtTokenProvider) throws IOException {
-        final OpensearchDistribution opensearchDistribution = detectOpensearchDistribution(localConfiguration);
+    public DatanodeConfigurationProvider(
+            final Configuration localConfiguration,
+            IndexerJwtAuthTokenProvider jwtTokenProvider,
+            OpensearchDistributionProvider opensearchDistributionProvider,
+            NodeId nodeId) {
         datanodeConfiguration = new DatanodeConfiguration(
-                opensearchDistribution,
-                getNodesFromConfig(localConfiguration.getDatanodeNodeName()),
+                opensearchDistributionProvider,
+                DatanodeDirectories.fromConfiguration(localConfiguration, nodeId),
                 localConfiguration.getProcessLogsBufferSize(),
                 jwtTokenProvider
         );
     }
 
-    public static String getNodesFromConfig(final String configProperty) {
-        if(configProperty != null) return configProperty;
-        return Tools.getLocalCanonicalHostname();
-    }
-
     @Override
     public DatanodeConfiguration get() {
         return datanodeConfiguration;
-    }
-
-    private static OpensearchDistribution detectOpensearchDistribution(final Configuration configuration) throws IOException {
-        return OpensearchDistribution.detectInDirectory(Path.of(configuration.getOpensearchDistributionRoot()));
     }
 }

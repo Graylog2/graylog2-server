@@ -15,21 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, fireEvent, screen } from 'wrappedTestingLibrary';
-import { useLocation } from 'react-router-dom';
+import { render, fireEvent, screen, waitFor } from 'wrappedTestingLibrary';
 import type { Location } from 'history';
 
+import useLocation from 'routing/useLocation';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import { asMock } from 'helpers/mocking';
 
 import PaginatedList from './PaginatedList';
 
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useLocation: jest.fn(() => ({
-    search: '',
-  })),
-}));
+jest.mock('routing/useLocation', () => jest.fn(() => ({ search: '' })));
 
 describe('PaginatedList', () => {
   it('should display Pagination', () => {
@@ -68,7 +63,7 @@ describe('PaginatedList', () => {
     expect(queryByText('1')).toBeNull();
   });
 
-  it('should reset current page on page size change', () => {
+  it('should reset current page on page size change', async () => {
     const onChangeStub = jest.fn();
     const { getByRole } = render(
       <PaginatedList totalItems={200}
@@ -84,6 +79,10 @@ describe('PaginatedList', () => {
     fireEvent.click(screen.getByRole('menuitem', { name: /100/ }));
 
     expect(onChangeStub).toHaveBeenCalledWith(1, 100);
+
+    await waitFor(() => {
+      expect(screen.queryByRole('menuitem', { name: /100/ })).not.toBeInTheDocument();
+    });
   });
 
   describe('with state based on URL query params', () => {

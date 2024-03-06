@@ -19,6 +19,18 @@ package org.graylog2.shared.rest.resources.documentation;
 import com.floreysoft.jmte.Engine;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.Configuration;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.rest.RestTools;
@@ -26,17 +38,6 @@ import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.rest.resources.csp.CSP;
 
 import javax.activation.MimetypesFileTypeMap;
-import javax.inject.Inject;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.GET;
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
@@ -47,6 +48,7 @@ import static java.util.Objects.requireNonNull;
 
 @Path("/api-browser")
 @CSP(group = CSP.SWAGGER)
+@RequiresAuthentication
 public class DocumentationBrowserResource extends RestResource {
     private final MimetypesFileTypeMap mimeTypes;
     private final HttpConfiguration httpConfiguration;

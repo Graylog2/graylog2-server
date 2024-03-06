@@ -1,0 +1,5 @@
+type = "a"
+message = "Datanode preflight check for data directory compatibility"
+
+issues = ["17424"]
+pulls = ["17487"]

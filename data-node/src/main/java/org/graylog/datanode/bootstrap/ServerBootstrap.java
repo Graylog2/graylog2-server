@@ -16,7 +16,6 @@
  */
 package org.graylog.datanode.bootstrap;
 
-import com.github.joschi.jadconfig.guice.NamedConfigParametersModule;
 import com.github.rvesse.airline.annotations.Option;
 import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.Binder;
@@ -31,6 +30,7 @@ import org.graylog.datanode.bindings.GenericBindings;
 import org.graylog.datanode.bindings.GenericInitializerBindings;
 import org.graylog.datanode.bindings.PreflightChecksBindings;
 import org.graylog.datanode.bindings.SchedulerBindings;
+import org.graylog2.bindings.NamedConfigParametersOverrideModule;
 import org.graylog2.bootstrap.preflight.MongoDBPreflightCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.graylog2.bootstrap.preflight.PreflightCheckService;
@@ -124,7 +124,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
             return;
         }
 
-       runMongoPreflightCheck();
+        runMongoPreflightCheck();
 
         final List<Module> preflightCheckModules = plugins.stream().map(Plugin::preflightCheckModules)
                 .flatMap(Collection::stream).collect(Collectors.toList());
@@ -153,7 +153,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
     private Injector getMongoPreFlightInjector() {
         return Guice.createInjector(
                 new IsDevelopmentBindings(),
-                new NamedConfigParametersModule(jadConfig.getConfigurationBeans()),
+                new NamedConfigParametersOverrideModule(jadConfig.getConfigurationBeans()),
                 new ConfigurationModule(configuration),
                 new DatanodeConfigurationBindings()
 
@@ -163,7 +163,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
     private Injector getPreflightInjector(List<Module> preflightCheckModules) {
         return Guice.createInjector(
                 new IsDevelopmentBindings(),
-                new NamedConfigParametersModule(jadConfig.getConfigurationBeans()),
+                new NamedConfigParametersOverrideModule(jadConfig.getConfigurationBeans()),
                 new ConfigurationModule(configuration),
                 new PreflightChecksBindings(),
                 new DatanodeConfigurationBindings(),
@@ -198,6 +198,8 @@ public abstract class ServerBootstrap extends CmdLineTool {
         LOG.info("OS: {}", os.getPlatformName());
         LOG.info("Arch: {}", os.getArch());
 
+        startNodeRegistration(injector);
+
         final ActivityWriter activityWriter;
         final ServiceManager serviceManager;
         try {
@@ -217,8 +219,6 @@ public abstract class ServerBootstrap extends CmdLineTool {
         Runtime.getRuntime().addShutdownHook(new Thread(injector.getInstance(shutdownHook())));
 
         // Start services.
-//        final ServiceManagerListener serviceManagerListener = injector.getInstance(ServiceManagerListener.class);
-//        serviceManager.addListener(serviceManagerListener, MoreExecutors.directExecutor());
         try {
             serviceManager.startAsync().awaitHealthy();
         } catch (Exception e) {
@@ -239,7 +239,6 @@ public abstract class ServerBootstrap extends CmdLineTool {
         try {
             Thread.currentThread().join();
         } catch (InterruptedException e) {
-            return;
         }
     }
 
@@ -269,13 +268,9 @@ public abstract class ServerBootstrap extends CmdLineTool {
         final List<Module> result = super.getSharedBindingsModules();
         result.add(new FreshInstallDetectionModule(isFreshInstallation()));
         result.add(new GenericBindings(isMigrationCommand()));
-//        result.add(new SecurityBindings());
-//        result.add(new ValidatorModule());
-//        result.add(new SharedPeriodicalBindings());
         result.add(new SchedulerBindings());
         result.add(new GenericInitializerBindings());
         result.add(new DatanodeConfigurationBindings());
-//        result.add(new SystemStatsModule(configuration.isDisableNativeSystemStatsCollector()));
 
         return result;
     }

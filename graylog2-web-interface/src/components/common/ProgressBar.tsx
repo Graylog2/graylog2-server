@@ -107,10 +107,10 @@ const Bar = styled.div<StyledBarProps>(({ $animated, $striped, theme, value }) =
         transparent
       );
       background-size: 40px 40px;
-    `}
+`}
     ${$animated && css`
       animation: ${animatedStripes} 2s linear infinite;
-    `}
+`}
     ${progressBarVariants}
 `;
 });

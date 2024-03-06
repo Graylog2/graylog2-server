@@ -43,7 +43,7 @@ describe('useFieldTypeMutation', () => {
     jest.clearAllMocks();
   });
 
-  describe('putFiledTypeMutation', () => {
+  describe('putFieldTypeMutation', () => {
     const putUrl = qualifyUrl(`${urlPrefix}`);
     const requestBody = { rotated: true, field: 'field', newFieldType: 'int', indexSetSelection: ['001'] };
 
@@ -59,7 +59,7 @@ describe('useFieldTypeMutation', () => {
       const { result, waitFor } = renderHook(() => useFieldTypeMutation(), { queryClientOptions: { logger } });
 
       act(() => {
-        result.current.putFiledTypeMutation(requestBody);
+        result.current.putFieldTypeMutation(requestBody);
       });
 
       await waitFor(() => expect(fetch).toHaveBeenCalledWith('PUT', putUrl, requestBodyJSON));
@@ -73,7 +73,7 @@ describe('useFieldTypeMutation', () => {
       const { result, waitFor } = renderHook(() => useFieldTypeMutation(), { queryClientOptions: { logger } });
 
       act(() => {
-        result.current.putFiledTypeMutation(requestBody).catch(() => {});
+        result.current.putFieldTypeMutation(requestBody).catch(() => {});
       });
 
       await waitFor(() => expect(UserNotification.error).toHaveBeenCalledWith(

@@ -25,23 +25,23 @@ import org.graylog.datanode.configuration.variants.SecurityConfigurationVariant;
 import org.graylog.datanode.configuration.variants.UploadedCertFilesSecureConfiguration;
 import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
-import org.graylog2.bootstrap.preflight.PreflightConfig;
 import org.graylog2.bootstrap.preflight.PreflightConfigResult;
 import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.cluster.Node;
-import org.graylog2.cluster.NodeService;
+import org.graylog2.cluster.nodes.DataNodeDto;
+import org.graylog2.cluster.nodes.NodeService;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Singleton
 public class OpensearchConfigurationProvider implements Provider<OpensearchConfiguration> {
@@ -51,9 +51,9 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
     private final InSecureConfiguration inSecureConfiguration;
     private final DatanodeConfiguration datanodeConfiguration;
     private final byte[] signingKey;
-    private final String nodeName;
-    private final NodeService nodeService;
+    private final NodeService<DataNodeDto> nodeService;
     private final PreflightConfigService preflightConfigService;
+    private final S3RepositoryConfiguration s3RepositoryConfiguration;
 
     @Inject
     public OpensearchConfigurationProvider(final Configuration localConfiguration,
@@ -61,9 +61,10 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
                                            final UploadedCertFilesSecureConfiguration uploadedCertFilesSecureConfiguration,
                                            final MongoCertSecureConfiguration mongoCertSecureConfiguration,
                                            final InSecureConfiguration inSecureConfiguration,
-                                           final NodeService nodeService,
+                                           final NodeService<DataNodeDto> nodeService,
                                            final PreflightConfigService preflightConfigService,
-                                           final @Named("password_secret") String passwordSecret) {
+                                           final @Named("password_secret") String passwordSecret,
+                                           final S3RepositoryConfiguration s3RepositoryConfiguration) {
         this.localConfiguration = localConfiguration;
         this.datanodeConfiguration = datanodeConfiguration;
         this.uploadedCertFilesSecureConfiguration = uploadedCertFilesSecureConfiguration;
@@ -72,13 +73,11 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
         this.signingKey = passwordSecret.getBytes(StandardCharsets.UTF_8);
         this.nodeService = nodeService;
         this.preflightConfigService = preflightConfigService;
-        this.nodeName = DatanodeConfigurationProvider.getNodesFromConfig(localConfiguration.getDatanodeNodeName());
+        this.s3RepositoryConfiguration = s3RepositoryConfiguration;
     }
 
     private boolean isPreflight() {
-        final PreflightConfigResult preflightResult = preflightConfigService.getPersistedConfig()
-                .map(PreflightConfig::result)
-                .orElse(PreflightConfigResult.UNKNOWN);
+        final PreflightConfigResult preflightResult = preflightConfigService.getPreflightConfigResult();
 
         // if preflight is finished, we assume that there will be some datanode registered via node-service.
         return preflightResult != PreflightConfigResult.FINISHED;
@@ -86,8 +85,6 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
 
     @Override
     public OpensearchConfiguration get() {
-        final Path opensearchConfigLocation = Path.of(localConfiguration.getOpensearchConfigLocation());
-
         //TODO: at some point bind the whole list, for now there is too much experiments with order and prerequisites
         List<SecurityConfigurationVariant> securityConfigurationTypes = List.of(
                 inSecureConfiguration,
@@ -96,17 +93,17 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
         );
 
         Optional<SecurityConfigurationVariant> chosenSecurityConfigurationVariant = securityConfigurationTypes.stream()
-                .filter(s -> s.checkPrerequisites(localConfiguration))
+                .filter(s -> s.isConfigured(localConfiguration))
                 .findFirst();
 
         try {
             ImmutableMap.Builder<String, String> opensearchProperties = ImmutableMap.builder();
 
-            if(localConfiguration.getInitialManagerNodes() != null && !localConfiguration.getInitialManagerNodes().isBlank()) {
-                opensearchProperties.put("cluster.initial_master_nodes", localConfiguration.getInitialManagerNodes());
-            } else if(isPreflight()) {
-                final var nodeList = String.join(",", nodeService.allActive(Node.Type.DATANODE).values().stream().map(Node::getHostname).toList());
-                opensearchProperties.put("cluster.initial_master_nodes", nodeList);
+            if (localConfiguration.getInitialClusterManagerNodes() != null && !localConfiguration.getInitialClusterManagerNodes().isBlank()) {
+                opensearchProperties.put("cluster.initial_cluster_manager_nodes", localConfiguration.getInitialClusterManagerNodes());
+            } else {
+                final var nodeList = String.join(",", nodeService.allActive().values().stream().map(Node::getHostname).collect(Collectors.toSet()));
+                opensearchProperties.put("cluster.initial_cluster_manager_nodes", nodeList);
             }
             opensearchProperties.putAll(commonOpensearchConfig(localConfiguration));
 
@@ -114,22 +111,24 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
             if (chosenSecurityConfigurationVariant.isPresent()) {
                 securityConfiguration = chosenSecurityConfigurationVariant.get()
                         .build()
-                        .configure(localConfiguration, signingKey);
+                        .configure(datanodeConfiguration, signingKey);
                 opensearchProperties.putAll(securityConfiguration.getProperties());
             }
 
             return new OpensearchConfiguration(
-                    datanodeConfiguration.opensearchDistribution().directory(),
-                    opensearchConfigLocation,
-                    localConfiguration.getHttpBindAddress().getHost(),
+                    datanodeConfiguration.opensearchDistributionProvider().get(),
+                    datanodeConfiguration.datanodeDirectories(),
+                    localConfiguration.getBindAddress(),
                     localConfiguration.getHostname(),
                     localConfiguration.getOpensearchHttpPort(),
                     localConfiguration.getOpensearchTransportPort(),
-                    "datanode-cluster",
-                    nodeName,
-                    List.of(),
+                    localConfiguration.getClustername(),
+                    localConfiguration.getDatanodeNodeName(),
+                    List.of("cluster_manager", "data", "ingest", "remote_cluster_client", "search"),
                     localConfiguration.getOpensearchDiscoverySeedHosts(),
                     securityConfiguration,
+                    s3RepositoryConfiguration,
+                    localConfiguration.getNodeSearchCacheSize(),
                     opensearchProperties.build()
             );
         } catch (GeneralSecurityException | KeyStoreStorageException | IOException e) {
@@ -139,18 +138,25 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
 
     private ImmutableMap<String, String> commonOpensearchConfig(final Configuration localConfiguration) {
         final ImmutableMap.Builder<String, String> config = ImmutableMap.builder();
-        Objects.requireNonNull(localConfiguration.getConfigLocation(), "config_location setting is required!");
-        localConfiguration.getOpensearchNetworkHostHost().ifPresent(
+        localConfiguration.getOpensearchNetworkHost().ifPresent(
                 networkHost -> config.put("network.host", networkHost));
-        config.put("path.data", Path.of(localConfiguration.getOpensearchDataLocation()).resolve(nodeName).toAbsolutePath().toString());
-        config.put("path.logs", Path.of(localConfiguration.getOpensearchLogsLocation()).resolve(nodeName).toAbsolutePath().toString());
+        config.put("path.data", datanodeConfiguration.datanodeDirectories().getDataTargetDir().toString());
+        config.put("path.logs", datanodeConfiguration.datanodeDirectories().getLogsTargetDir().toString());
 
-        // listen on all interfaces
-        config.put("network.bind_host", "0.0.0.0");
+        config.put("network.bind_host", localConfiguration.getBindAddress());
+
+        // https://opensearch.org/docs/latest/tuning-your-cluster/availability-and-recovery/snapshots/snapshot-restore/#shared-file-system
+        if(localConfiguration.getPathRepo() != null && !localConfiguration.getPathRepo().isEmpty()) {
+            config.put("path.repo", String.join(",", localConfiguration.getPathRepo()));
+        }
+
         //config.put("network.publish_host", Tools.getLocalCanonicalHostname());
 
         // Uncomment the following line to get DEBUG logs for the underlying Opensearch
         //config.put("logger.org.opensearch", "debug");
+
+        // common OpenSearch config parameters from our docs
+        config.put("indices.query.bool.max_clause_count", localConfiguration.getIndicesQueryBoolMaxClauseCount().toString());
 
         return config.build();
     }

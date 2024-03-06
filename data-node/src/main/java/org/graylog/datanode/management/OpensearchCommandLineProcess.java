@@ -16,13 +16,16 @@
  */
 package org.graylog.datanode.management;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import jakarta.validation.constraints.NotNull;
 import org.apache.commons.exec.OS;
+import org.graylog.datanode.management.opensearch.cli.OpensearchCli;
 import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog.datanode.process.ProcessInformation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.validation.constraints.NotNull;
 import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.IOException;
@@ -30,10 +33,8 @@ import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 public class OpensearchCommandLineProcess implements Closeable {
@@ -41,15 +42,18 @@ public class OpensearchCommandLineProcess implements Closeable {
 
     private final CommandLineProcess commandLineProcess;
     private final CommandLineProcessListener resultHandler;
+    private final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+    private static final Path CONFIG = Path.of("opensearch.yml");
 
     /**
      * as long as OpenSearch is not supported on macOS, we have to fix the jdk path if we want to
      * start the DataNode inside IntelliJ.
+     *
      * @param config
      */
     private void fixJdkOnMac(final OpensearchConfiguration config) {
         final var isMacOS = OS.isFamilyMac();
-        final var jdk = config.opensearchDir().resolve("jdk.app");
+        final var jdk = config.opensearchDistribution().directory().resolve("jdk.app");
         final var jdkNotLinked = !Files.exists(jdk);
         if (isMacOS && jdkNotLinked) {
             // Link System jdk into startup folder, get path:
@@ -59,7 +63,7 @@ public class OpensearchCommandLineProcess implements Closeable {
                 final Process process = builder.start();
                 final BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream(), Charset.defaultCharset()));
                 var line = reader.readLine();
-                if(line != null && Files.exists(Path.of(line))) {
+                if (line != null && Files.exists(Path.of(line))) {
                     final var target = Path.of(line);
                     final var src = Files.createDirectories(jdk.resolve("Contents"));
                     Files.createSymbolicLink(src.resolve("Home"), target);
@@ -75,13 +79,55 @@ public class OpensearchCommandLineProcess implements Closeable {
         }
     }
 
+    private void writeOpenSearchConfig(final OpensearchConfiguration config) {
+        try {
+            final Path configFile = config.datanodeDirectories().createOpensearchProcessConfigurationFile(CONFIG);
+            mapper.writeValue(configFile.toFile(), getOpensearchConfigurationArguments(config));
+        } catch (IOException e) {
+            throw new RuntimeException("Could not generate OpenSearch config: " + e.getMessage(), e);
+        }
+    }
+
     public OpensearchCommandLineProcess(OpensearchConfiguration config, ProcessListener listener) {
         fixJdkOnMac(config);
-        final Path executable = config.opensearchDir().resolve(Paths.get("bin", "opensearch"));
-        final List<String> arguments = getOpensearchConfigurationArguments(config).entrySet().stream()
-                .map(it -> String.format(Locale.ROOT, "-E%s=%s", it.getKey(), it.getValue())).toList();
+        configureS3RepositoryPlugin(config);
+        final Path executable = config.opensearchDistribution().getOpensearchExecutable();
+        writeOpenSearchConfig(config);
         resultHandler = new CommandLineProcessListener(listener);
-        commandLineProcess = new CommandLineProcess(executable, arguments, resultHandler, config.getEnv());
+        commandLineProcess = new CommandLineProcess(executable, List.of(), resultHandler, config.getEnv());
+    }
+
+    private void configureS3RepositoryPlugin(OpensearchConfiguration config) {
+        if (config.s3RepositoryConfiguration().isRepositoryEnabled()) {
+            final OpensearchCli opensearchCli = new OpensearchCli(config);
+            installPlugin(opensearchCli, config, "repository-s3");
+            configureS3Credentials(opensearchCli, config);
+        } else {
+            LOG.info("No S3 repository configuration provided, skipping plugin initialization");
+        }
+    }
+
+    private void configureS3Credentials(OpensearchCli opensearchCli, OpensearchConfiguration config) {
+        LOG.info("Creating opensearch keystore");
+        // this always operates on newly created configuration directory, there is no existing keystore present. Otherwise
+        // the command will get stuck. There is currently no timeout, so it will just block the startup forever
+        // TODO: add watchdog and timeout to the underlying command handling.
+        final String createdMessage = opensearchCli.keystore().create();
+        LOG.info(createdMessage);
+        LOG.info("Setting opensearch s3 repository keystore secrets");
+        opensearchCli.keystore().add("s3.client.default.access_key", config.s3RepositoryConfiguration().getS3ClientDefaultAccessKey());
+        opensearchCli.keystore().add("s3.client.default.secret_key", config.s3RepositoryConfiguration().getS3ClientDefaultSecretKey());
+    }
+
+
+    private void installPlugin(OpensearchCli opensearchCli, OpensearchConfiguration config, String pluginName) {
+        final List<String> installedPlugins = opensearchCli.plugin().list();
+        if (!installedPlugins.contains(pluginName)) {
+            opensearchCli.plugin().installFromZip(pluginName, config.opensearchDistribution().version());
+            LOG.info("Successfully installed opensearch plugin " + pluginName);
+        } else {
+            LOG.info("Opensearch plugin " + pluginName + " already installed, skipping");
+        }
     }
 
     private static Map<String, String> getOpensearchConfigurationArguments(OpensearchConfiguration config) {

@@ -21,8 +21,7 @@ import { useState, useEffect } from 'react';
 const Container = styled.div`
   height: 100%;
   display: flex;
-  flex-direction: column;
-  flex-wrap: nowrap;
+  flex-flow: column nowrap;
 `;
 
 const ScrollContainer = styled.div`

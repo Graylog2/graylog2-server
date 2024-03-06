@@ -25,6 +25,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import RuleBuilder from './rule-builder/RuleBuilder';
 import RuleForm from './RuleForm';
@@ -61,7 +62,7 @@ const Rule = ({ create, title, isRuleBuilder }: Props) => {
                     <Button bsStyle="success"
                             bsSize="small"
                             onClick={() => {
-                              sendTelemetry('Pipeline RuleBuilder Use Source Code Editor Clicked', {
+                              sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.USE_SOURCE_CODE_EDITOR_CLICKED, {
                                 app_pathname: getPathnameWithoutId(pathname),
                                 app_section: 'pipeline-rules',
                                 app_action_value: 'source-code-editor-button',
@@ -100,7 +101,7 @@ const Rule = ({ create, title, isRuleBuilder }: Props) => {
         <BootstrapModalConfirm showModal
                                title="Switch to Source Code Editor"
                                onConfirm={() => {
-                                 sendTelemetry('Pipeline RuleBuilder Switch to Source Code Editor Confirm Clicked', {
+                                 sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.SWITCH_TO_SOURCE_CODE_EDITOR_CONFIRM_CLICKED, {
                                    app_pathname: getPathnameWithoutId(pathname),
                                    app_section: 'pipeline-rules',
                                    app_action_value: 'confirm-button',
@@ -110,7 +111,7 @@ const Rule = ({ create, title, isRuleBuilder }: Props) => {
                                  setShowConfirmSourceCodeEditor(false);
                                }}
                                onCancel={() => {
-                                 sendTelemetry('Pipeline RuleBuilder Switch to Source Code Editor Cancel Clicked', {
+                                 sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.SWITCH_TO_SOURCE_CODE_EDITOR_CANCEL_CLICKED, {
                                    app_pathname: getPathnameWithoutId(pathname),
                                    app_section: 'pipeline-rules',
                                    app_action_value: 'cancel-button',

@@ -24,7 +24,8 @@ import okhttp3.Response;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;

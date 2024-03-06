@@ -26,7 +26,8 @@ import org.mongojack.DBUpdate;
 import org.mongojack.JacksonDBCollection;
 import org.mongojack.WriteResult;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -51,8 +52,8 @@ public class DataNodeProvisioningServiceImpl extends PaginatedDbService<DataNode
     }
 
     @Override
-    public DataNodeProvisioningConfig getPreflightConfigFor(String nodeId) {
-        return dbCollection.findOne(DBQuery.is(FIELD_NODEID, nodeId));
+    public Optional<DataNodeProvisioningConfig> getPreflightConfigFor(String nodeId) {
+        return Optional.ofNullable(dbCollection.findOne(DBQuery.is(FIELD_NODEID, nodeId)));
     }
 
     @Override
