@@ -1,0 +1,5 @@
+type = "f"
+message = "Reverts fix for #16029 due to regression in GeoIP lookup table access."
+
+issues = ["18017"]
+pulls = ["18322"]
