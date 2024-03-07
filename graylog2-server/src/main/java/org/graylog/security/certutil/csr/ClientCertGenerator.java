@@ -16,67 +16,94 @@
  */
 package org.graylog.security.certutil.csr;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.Extensions;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralNames;
+import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
+import org.graylog.security.certutil.CaService;
 import org.graylog.security.certutil.csr.exceptions.CSRGenerationException;
+import org.graylog.security.certutil.csr.exceptions.ClientCertGenerationException;
+import org.graylog.security.certutil.privatekey.PrivateKeyEncryptedFileStorage;
 import org.graylog.security.certutil.privatekey.PrivateKeyEncryptedStorage;
+import org.graylog2.indexer.security.SecurityAdapter;
+import org.graylog2.plugin.certificates.RenewalPolicy;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 
 import javax.security.auth.x500.X500Principal;
+import java.io.StringWriter;
 import java.security.KeyPairGenerator;
+import java.security.KeyStore;
+import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
+import static org.graylog.security.certutil.CertConstants.CA_KEY_ALIAS;
 import static org.graylog.security.certutil.CertConstants.KEY_GENERATION_ALGORITHM;
 import static org.graylog.security.certutil.CertConstants.SIGNING_ALGORITHM;
 
 public class ClientCertGenerator {
-    public PKCS10CertificationRequest generateCSR(final char[] privateKeyPassword,
-                                                  final String principalName,
-                                                  final List<String> altNames,
-                                                  final PrivateKeyEncryptedStorage privateKeyEncryptedStorage) throws CSRGenerationException {
+    private final CaService caService;
+    private final String passwordSecret;
+    private final CsrGenerator csrGenerator;
+    private final CsrSigner csrSigner;
+    private final ClusterConfigService clusterConfigService;
+    private final SecurityAdapter securityAdapter;
+
+    @Inject
+    public ClientCertGenerator(final CaService caService,
+                               @Named("password_secret") final String passwordSecret,
+                               final CsrGenerator csrGenerator,
+                               final CsrSigner csrSigner,
+                               final ClusterConfigService clusterConfigService,
+                               final SecurityAdapter securityAdapter) {
+        this.caService = caService;
+        this.passwordSecret = passwordSecret;
+        this.csrGenerator = csrGenerator;
+        this.csrSigner = csrSigner;
+        this.clusterConfigService = clusterConfigService;
+        this.securityAdapter = securityAdapter;
+    }
+
+    public String generateClientCert(final String principal,
+                                     final String role,
+                                     final char[] privateKeyPassword) throws ClientCertGenerationException {
         try {
-            final var keyGen = KeyPairGenerator.getInstance(KEY_GENERATION_ALGORITHM);
-            final var certKeyPair = keyGen.generateKeyPair();
+            var renewalPolicy = this.clusterConfigService.get(RenewalPolicy.class);
+            var privateKeyEncryptedStorage = new PrivateKeyEncryptedFileStorage(java.nio.file.Path.of(principal + ".cert"));
 
-            privateKeyEncryptedStorage.writeEncryptedKey(privateKeyPassword, certKeyPair.getPrivate());
+            final Optional<KeyStore> optKey = caService.loadKeyStore();
+            final var caKeystore = optKey.get();
 
-            final var p10Builder = new JcaPKCS10CertificationRequestBuilder(
-                    new X500Principal("CN=" + principalName),
-                    certKeyPair.getPublic()
-            );
+            var caPrivateKey = (PrivateKey) caKeystore.getKey(CA_KEY_ALIAS, passwordSecret.toCharArray());
+            var caCertificate = (X509Certificate) caKeystore.getCertificate(CA_KEY_ALIAS);
 
-            final var names = new ArrayList<>(List.of(principalName));
-            if (altNames != null) {
-                names.addAll(altNames);
+            var csr = csrGenerator.generateCSR(privateKeyPassword, principal, List.of(principal), privateKeyEncryptedStorage);
+            var pk = privateKeyEncryptedStorage.readEncryptedKey(privateKeyPassword);
+            var cert = csrSigner.sign(caPrivateKey, caCertificate, csr, renewalPolicy);
+
+            var writer = new StringWriter();
+            try (JcaPEMWriter jcaPEMWriter = new JcaPEMWriter(writer)) {
+                jcaPEMWriter.writeObject(caCertificate);
+                jcaPEMWriter.writeObject(pk);
+                jcaPEMWriter.writeObject(cert);
             }
 
-            Extension subjectAltNames = new Extension(Extension.subjectAlternativeName, false,
-                    new DEROctetString(
-                            new GeneralNames(
-                                    names.stream()
-                                            .map(alternativeName -> new GeneralName(GeneralName.dNSName, alternativeName))
-                                            .toArray(GeneralName[]::new)
-                            )
-                    )
-            );
-            p10Builder.addAttribute(
-                    PKCSObjectIdentifiers.pkcs_9_at_extensionRequest,
-                    new Extensions(subjectAltNames));
+            securityAdapter.addUserToRoleMapping(role, principal);
 
-            JcaContentSignerBuilder csBuilder = new JcaContentSignerBuilder(SIGNING_ALGORITHM);
-            ContentSigner signer = csBuilder.build(certKeyPair.getPrivate());
-            return p10Builder.build(signer);
-
+            return writer.toString();
         } catch (Exception e) {
-            throw new CSRGenerationException("Failed to generate Certificate Signing Request", e);
+            throw new ClientCertGenerationException("Failed to generate client certificate", e);
         }
     }
 }

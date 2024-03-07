@@ -37,14 +37,17 @@ import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.graylog.security.certutil.CaService;
 import org.graylog.security.certutil.ca.exceptions.CACreationException;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
+import org.graylog.security.certutil.csr.ClientCertGenerator;
 import org.graylog.security.certutil.csr.CsrGenerator;
 import org.graylog.security.certutil.csr.CsrSigner;
 import org.graylog.security.certutil.csr.exceptions.CSRGenerationException;
+import org.graylog.security.certutil.csr.exceptions.ClientCertGenerationException;
 import org.graylog.security.certutil.privatekey.PrivateKeyEncryptedFileStorage;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.bootstrap.preflight.web.resources.model.CA;
 import org.graylog2.bootstrap.preflight.web.resources.model.CreateCARequest;
 import org.graylog2.bootstrap.preflight.web.resources.model.CreateClientCertRequest;
+import org.graylog2.indexer.security.SecurityAdapter;
 import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.rest.ApiError;
@@ -69,22 +72,15 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 public class CAResource {
     private final CaService caService;
     private final String passwordSecret;
-
-    private final CsrGenerator csrGenerator;
-    private final CsrSigner csrSigner;
-    private final ClusterConfigService clusterConfigService;
+    private final ClientCertGenerator clientCertGenerator;
 
     @Inject
     public CAResource(final CaService caService,
                       final @Named("password_secret") String passwordSecret,
-                      final CsrGenerator csrGenerator,
-                      final CsrSigner csrSigner,
-                      final ClusterConfigService clusterConfigService) {
+                      final ClientCertGenerator clientCertGenerator) {
         this.caService = caService;
         this.passwordSecret = passwordSecret;
-        this.csrGenerator = csrGenerator;
-        this.csrSigner = csrSigner;
-        this.clusterConfigService = clusterConfigService;
+        this.clientCertGenerator = clientCertGenerator;
     }
 
     @GET
@@ -123,31 +119,10 @@ public class CAResource {
     @Produces(MediaType.TEXT_PLAIN)
     public Response createClientCert(@ApiParam(name = "request", required = true) @NotNull @Valid CreateClientCertRequest request) {
         try {
-            var principal = request.principal();
-            var password = request.password().toCharArray();
-            var renewalPolicy = this.clusterConfigService.get(RenewalPolicy.class);
-            var privateKeyEncryptedStorage = new PrivateKeyEncryptedFileStorage(java.nio.file.Path.of(principal + ".cert"));
-
-            final Optional<KeyStore> optKey = caService.loadKeyStore();
-            final var caKeystore = optKey.get();
-
-            var caPrivateKey = (PrivateKey) caKeystore.getKey(CA_KEY_ALIAS, passwordSecret.toCharArray());
-            var caCertificate = (X509Certificate) caKeystore.getCertificate(CA_KEY_ALIAS);
-
-            var csr = csrGenerator.generateCSR(password, principal, List.of(principal), privateKeyEncryptedStorage);
-            var pk = privateKeyEncryptedStorage.readEncryptedKey(password);
-            var cert = csrSigner.sign(caPrivateKey, caCertificate, csr, renewalPolicy);
-
-            var writer = new StringWriter();
-            try (JcaPEMWriter jcaPEMWriter = new JcaPEMWriter(writer)) {
-                jcaPEMWriter.writeObject(caCertificate);
-                jcaPEMWriter.writeObject(pk);
-                jcaPEMWriter.writeObject(cert);
-            }
-
-            return Response.ok().entity(writer.toString()).build();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+            var cert = clientCertGenerator.generateClientCert(request.principal(), request.role(), request.password().toCharArray());
+            return Response.ok().entity(cert).build();
+        } catch (ClientCertGenerationException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(ApiError.create(e.getMessage())).build();
         }
     }
 }
