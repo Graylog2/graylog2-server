@@ -1,0 +1,9 @@
+type = "c"
+message = "Update com.github.zafarkhaja:java-semver from 0.9.0 to 0.10.2."
+
+pulls = ["17925"]
+
+details.user = """
+Updated the semantic version library to the latest version, addressed various deprecation warnings
+and refactored and removed unused code.
+"""
