@@ -24,7 +24,6 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
-import jakarta.ws.rs.core.StreamingOutput;
 import okhttp3.ResponseBody;
 import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.jersey.server.model.Resource;
@@ -171,14 +170,9 @@ public class RestTools {
             ResponseBody responseBody = nodeResponse.entity().orElseThrow();
 
             try {
-                StreamingOutput streamingOutput = output -> {
-                    try {
-                        responseBody.byteStream().transferTo(output);
-                    } catch (Exception e) {
-                        responseBody.close(); // avoid leaking connections on errors
-                    }
-                };
-                final Response.ResponseBuilder responseBuilder = Response.ok(streamingOutput, MediaType.valueOf(mediaType));
+                final Response.ResponseBuilder responseBuilder = Response.ok()
+                        .type(MediaType.valueOf(mediaType))
+                        .entity(responseBody.byteStream());
                 if (additionalResponseBuildingOnSuccess != null) {
                     additionalResponseBuildingOnSuccess.accept(responseBuilder);
                 }
