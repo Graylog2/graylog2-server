@@ -74,7 +74,6 @@ import org.graylog.plugins.pipelineprocessor.parser.errors.IncompatibleArgumentT
 import org.graylog.plugins.pipelineprocessor.parser.errors.IncompatibleIndexType;
 import org.graylog.plugins.pipelineprocessor.parser.errors.IncompatibleType;
 import org.graylog.plugins.pipelineprocessor.parser.errors.IncompatibleTypes;
-import org.graylog.plugins.pipelineprocessor.parser.errors.InvalidFieldAccess;
 import org.graylog.plugins.pipelineprocessor.parser.errors.InvalidFunctionArgument;
 import org.graylog.plugins.pipelineprocessor.parser.errors.InvalidOperation;
 import org.graylog.plugins.pipelineprocessor.parser.errors.MissingRequiredParam;
@@ -433,9 +432,6 @@ public class PipelineRuleParser {
             isIdIsFieldAccess.pop(); // reset for error checks
             final Expression object = exprs.get(ctx.fieldSet);
             final Expression field = exprs.get(ctx.field);
-            if (field instanceof ArrayLiteralExpression) {
-                parseContext.addError(new InvalidFieldAccess(ctx, field));
-            }
             final FieldAccessExpression expr = new FieldAccessExpression(ctx.getStart(), object, field);
             log.trace("FIELDACCESS: ctx {} => {}", ctx, expr);
             exprs.put(ctx, expr);
