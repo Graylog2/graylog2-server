@@ -90,7 +90,7 @@ public class ContentPackTest {
                 .vendor("Graylog, Inc.")
                 .url(URI.create("https://www.graylog.org"))
                 .createdAt(DateTime.parse("2018-12-17T16:18:12.000Z"))
-                .serverVersion(Version.valueOf("3.0.0-alpha.6-SNAPSHOT"))
+                .serverVersion(Version.parse("3.0.0-alpha.6-SNAPSHOT"))
                 .parameters(ImmutableSet.of(
                         BooleanParameter.builder().name("MY_BOOLEAN").title("My Boolean").description("Some description").build(),
                         DoubleParameter.builder().name("MY_DOUBLE").title("My Double").description("Some description").defaultValue(Optional.of(12.34D)).build(),

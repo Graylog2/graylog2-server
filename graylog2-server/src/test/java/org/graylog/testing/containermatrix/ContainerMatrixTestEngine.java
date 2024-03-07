@@ -125,7 +125,7 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
      * @return
      */
     public static boolean isCompatible(SearchVersion override, SearchServer version) {
-        return version.getSearchVersion().satisfies(override.distribution(), "^" + override.version().getMajorVersion());
+        return version.getSearchVersion().satisfies(override.distribution(), "^" + override.version().majorVersion());
     }
 
     private Stream<SearchVersion> filterForCompatibleVersionOrDrop(SearchServer[] versions) {

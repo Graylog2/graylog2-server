@@ -32,32 +32,6 @@ import static java.util.Objects.requireNonNull;
 public class Version implements Comparable<Version> {
     private static final Logger LOG = LoggerFactory.getLogger(Version.class);
 
-    /**
-     * @deprecated Use {@link #getVersion()}
-     */
-    @Deprecated
-    public final int major;
-    /**
-     * @deprecated Use {@link #getVersion()}
-     */
-    @Deprecated
-    public final int minor;
-    /**
-     * @deprecated Use {@link #getVersion()}
-     */
-    @Deprecated
-    public final int patch;
-    /**
-     * @deprecated Use {@link #getVersion()}
-     */
-    @Deprecated
-    public final String additional;
-    /**
-     * @deprecated Use {@link #getVersion()}
-     */
-    @Deprecated
-    public final String abbrevCommitSha;
-
     private final com.github.zafarkhaja.semver.Version version;
 
     /**
@@ -91,14 +65,6 @@ public class Version implements Comparable<Version> {
 
     public Version(com.github.zafarkhaja.semver.Version version) {
         this.version = requireNonNull(version);
-
-        // Deprecated
-        this.major = version.getMajorVersion();
-        this.minor = version.getMinorVersion();
-        this.patch = version.getPatchVersion();
-        this.additional = version.getPreReleaseVersion();
-        this.abbrevCommitSha = version.getBuildMetadata();
-
     }
 
     /**
@@ -110,7 +76,7 @@ public class Version implements Comparable<Version> {
      * @return The {@link Version} instance built from the given parameters.
      */
     public static Version from(int major, int minor, int patch) {
-        return new Version(com.github.zafarkhaja.semver.Version.forIntegers(major, minor, patch));
+        return new Version(com.github.zafarkhaja.semver.Version.of(major, minor, patch));
     }
 
     /**
@@ -133,22 +99,23 @@ public class Version implements Comparable<Version> {
      * @param minor         The minor version component.
      * @param patch         The patch version component.
      * @param preRelease    The pre-release version component.
-     * @param buildMetadata Additional build metadata (e. g. the Git commit SHA).
+     * @param buildMetadata Additional build metadata (e.g. the Git commit SHA).
      * @return The {@link Version} instance built from the given parameters.
      */
-    public static Version from(int major, int minor, int patch, String preRelease, String buildMetadata) {
+    public static Version from(long major, long minor, long patch, String preRelease, String buildMetadata) {
         return new Version(buildSemVer(major, minor, patch, preRelease, buildMetadata));
     }
 
-    private static com.github.zafarkhaja.semver.Version buildSemVer(int major, int minor, int patch, String preRelease, String buildMetadata) {
-        com.github.zafarkhaja.semver.Version version = com.github.zafarkhaja.semver.Version.forIntegers(major, minor, patch);
+    private static com.github.zafarkhaja.semver.Version buildSemVer(long major, long minor, long patch, String preRelease, String buildMetadata) {
+        final com.github.zafarkhaja.semver.Version.Builder builder = new com.github.zafarkhaja.semver.Version.Builder()
+                .setVersionCore(major, minor, patch);
         if (!isNullOrEmpty(preRelease)) {
-            version = version.setPreReleaseVersion(preRelease);
+            builder.setPreReleaseVersion(preRelease);
         }
         if (!isNullOrEmpty(buildMetadata)) {
-            version = version.setBuildMetadata(buildMetadata);
+            builder.setBuildMetadata(buildMetadata);
         }
-        return version;
+        return builder.build();
     }
 
     /**
@@ -231,12 +198,13 @@ public class Version implements Comparable<Version> {
             final Properties versionProperties = new Properties();
             versionProperties.load(resource.openStream());
 
-            final com.github.zafarkhaja.semver.Version version = com.github.zafarkhaja.semver.Version.valueOf(versionProperties.getProperty(propertyName));
-            final int major = version.getMajorVersion();
-            final int minor = version.getMinorVersion();
-            final int patch = version.getPatchVersion();
-            final String qualifier = version.getPreReleaseVersion();
-            final String buildMetadata = version.getBuildMetadata();
+            String version1 = versionProperties.getProperty(propertyName);
+            final com.github.zafarkhaja.semver.Version version = com.github.zafarkhaja.semver.Version.parse(version1);
+            final long major = version.majorVersion();
+            final long minor = version.minorVersion();
+            final long patch = version.patchVersion();
+            final String qualifier = version.preReleaseVersion().orElse("");
+            final String buildMetadata = version.buildMetadata().orElse("");
 
             // If the version property already contains build metadata we want to use that instead of replacing it
             // with the Git commit ID
@@ -287,26 +255,18 @@ public class Version implements Comparable<Version> {
     }
 
     /**
-     * Check if this version is higher than the passed other version. Only taking major and minor version number in account.
-     *
-     * @param other {@link Version} to compare
-     */
-    @Deprecated
-    public boolean greaterMinor(Version other) {
-        return other.major < this.major || other.major == this.major && other.minor < this.minor;
-    }
-
-    /**
-     * @see com.github.zafarkhaja.semver.Version#greaterThanOrEqualTo(com.github.zafarkhaja.semver.Version)
+     * @see com.github.zafarkhaja.semver.Version#isHigherThanOrEquivalentTo(com.github.zafarkhaja.semver.Version)
      */
     public boolean sameOrHigher(Version other) {
-        if (isNullOrEmpty(version.getPreReleaseVersion())) {
-            return version.greaterThanOrEqualTo(other.getVersion());
+        if (isNullOrEmpty(version.preReleaseVersion().orElse(""))) {
+            return version.isHigherThanOrEquivalentTo(other.getVersion());
         } else {
             // If this is a pre-release version, use the major.minor.patch version for comparison with the other.
             // This allows plugins to require a server version of 2.1.0 and it still gets loaded on a 2.1.0-beta.2 server.
             // See: https://github.com/Graylog2/graylog2-server/issues/2462
-            return com.github.zafarkhaja.semver.Version.valueOf(version.getNormalVersion()).greaterThanOrEqualTo(other.getVersion());
+            String version1 = version.toStableVersion().toString();
+            com.github.zafarkhaja.semver.Version version2 = com.github.zafarkhaja.semver.Version.parse(version1);
+            return version2.isHigherThanOrEquivalentTo(other.getVersion());
         }
     }
 
@@ -315,8 +275,12 @@ public class Version implements Comparable<Version> {
      */
     @Override
     public boolean equals(final Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         final Version that = (Version) o;
         return version.equals(that.getVersion());

@@ -16,6 +16,7 @@
  */
 package org.graylog.testing.containermatrix;
 
+import com.github.zafarkhaja.semver.Version;
 import org.graylog2.storage.SearchVersion;
 
 import static org.graylog2.storage.SearchVersion.Distribution.DATANODE;
@@ -37,7 +38,7 @@ public enum SearchServer {
     private final SearchVersion searchVersion;
 
     SearchServer(final SearchVersion.Distribution distribution, final String version) {
-        this.searchVersion = SearchVersion.create(distribution, com.github.zafarkhaja.semver.Version.valueOf(version));
+        this.searchVersion = SearchVersion.create(distribution, Version.parse(version));
     }
 
     public SearchVersion getSearchVersion() {

@@ -24,7 +24,10 @@ import com.github.rholder.retry.RetryListener;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
+import com.github.zafarkhaja.semver.Version;
 import com.google.common.base.Strings;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -39,9 +42,6 @@ import retrofit2.Converter;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -178,7 +178,8 @@ public class VersionProbe {
 
     private Optional<SearchVersion> parseVersion(VersionResponse versionResponse) {
         try {
-            final com.github.zafarkhaja.semver.Version version = com.github.zafarkhaja.semver.Version.valueOf(versionResponse.number());
+            String version1 = versionResponse.number();
+            final com.github.zafarkhaja.semver.Version version = Version.parse(version1);
             return Optional.of(SearchVersion.create(versionResponse.distribution(), version));
         } catch (Exception e) {
             LOG.error("Unable to parse version retrieved from Elasticsearch node: <{}>", versionResponse.number(), e);

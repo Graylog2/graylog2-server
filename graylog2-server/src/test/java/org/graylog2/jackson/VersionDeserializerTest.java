@@ -40,13 +40,13 @@ public class VersionDeserializerTest {
     @Test
     public void successfullyDeserializesString() throws IOException {
         final Version version = objectMapper.readValue("\"1.3.7-rc.2+build.2.b8f12d7\"", Version.class);
-        assertThat(version).isEqualTo(Version.valueOf("1.3.7-rc.2+build.2.b8f12d7"));
+        assertThat(version).isEqualTo(Version.parse("1.3.7-rc.2+build.2.b8f12d7"));
     }
 
     @Test
     public void successfullyDeserializesInteger() throws IOException {
         final Version version = objectMapper.readValue("5", Version.class);
-        assertThat(version).isEqualTo(Version.forIntegers(5));
+        assertThat(version).isEqualTo(Version.of(5));
     }
 
     @Test
