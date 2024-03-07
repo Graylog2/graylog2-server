@@ -17,11 +17,11 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { useState, useCallback, forwardRef, useMemo } from 'react';
-import type { DraggableProvidedDraggableProps, DraggableProvidedDragHandleProps } from 'react-beautiful-dnd';
 
 import { IconButton, SortableList, Icon } from 'components/common';
 import FieldSelect from 'views/components/aggregationwizard/FieldSelect';
 import TextOverflowEllipsis from 'components/common/TextOverflowEllipsis';
+import type { DraggableProps, DragHandleProps } from 'components/common/SortableList';
 
 const ListItemContainer = styled.div`
   display: flex;
@@ -48,8 +48,8 @@ const DragHandle = styled.div`
 
 type ListItemProps = {
   item: { id: string, title: string },
-  draggableProps: DraggableProvidedDraggableProps,
-  dragHandleProps: DraggableProvidedDragHandleProps,
+  draggableProps: DraggableProps,
+  dragHandleProps: DragHandleProps,
   className: string,
   onChange: (fieldName: string) => void,
   onRemove: () => void,
