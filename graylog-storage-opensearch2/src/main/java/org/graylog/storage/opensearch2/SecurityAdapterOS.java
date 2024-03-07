@@ -31,18 +31,18 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * see: https://opensearch.org/docs/latest/security/access-control/api/
+ */
 public class SecurityAdapterOS implements SecurityAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(SecurityAdapterOS.class);
 
     final private PlainJsonApi jsonApi;
-    final private OpenSearchClient client;
     private final ObjectMapper objectMapper;
 
     @Inject
-    public SecurityAdapterOS(final OpenSearchClient client,
-                             final ObjectMapper objectMapper,
+    public SecurityAdapterOS(final ObjectMapper objectMapper,
                              final PlainJsonApi jsonApi) {
-        this.client = client;
         this.objectMapper = objectMapper;
         this.jsonApi = jsonApi;
     }
@@ -82,7 +82,6 @@ public class SecurityAdapterOS implements SecurityAdapter {
     }
 
     private MappingResponse setUserToRoleMapping(final String role, final Mapping mapping) {
-
         try {
             final JsonNode result = jsonApi.perform(
                     request("PUT", "rolesmapping/" + role,

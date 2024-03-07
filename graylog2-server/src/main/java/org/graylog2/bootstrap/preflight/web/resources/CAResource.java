@@ -24,13 +24,16 @@ import jakarta.inject.Named;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -52,6 +55,7 @@ import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.rest.ApiError;
 
+import java.io.IOException;
 import java.io.StringWriter;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -113,15 +117,31 @@ public class CAResource {
     }
 
     @POST
-    @Path("createClientCert")
+    @Path("clientCert")
     @NoAuditEvent("No Audit Event needed")
     @ApiOperation("Creates a client certificate")
-    @Produces(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.APPLICATION_JSON)
+    @RequiresPermissions("*")
     public Response createClientCert(@ApiParam(name = "request", required = true) @NotNull @Valid CreateClientCertRequest request) {
         try {
             var cert = clientCertGenerator.generateClientCert(request.principal(), request.role(), request.password().toCharArray());
             return Response.ok().entity(cert).build();
         } catch (ClientCertGenerationException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(ApiError.create(e.getMessage())).build();
+        }
+    }
+
+    @DELETE
+    @Path("clientCert/{role}/{principal}")
+    @NoAuditEvent("No Audit Event needed")
+    @ApiOperation("removes the cert and the user from the role")
+    @Produces(MediaType.APPLICATION_JSON)
+    @RequiresPermissions("*")
+    public Response deleteClientCert(@ApiParam(name = "role", required = true) @PathParam("role") String role, @ApiParam(name = "principal", required = true) @PathParam("principal") String principal) {
+        try {
+            clientCertGenerator.removeCertFor(role, principal);
+            return Response.ok().build();
+        } catch (IOException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(ApiError.create(e.getMessage())).build();
         }
     }

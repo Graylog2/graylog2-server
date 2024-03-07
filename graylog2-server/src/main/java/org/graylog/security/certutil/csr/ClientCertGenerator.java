@@ -39,7 +39,10 @@ import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 
 import javax.security.auth.x500.X500Principal;
+import java.io.IOException;
 import java.io.StringWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.PrivateKey;
@@ -59,10 +62,12 @@ public class ClientCertGenerator {
     private final CsrSigner csrSigner;
     private final ClusterConfigService clusterConfigService;
     private final SecurityAdapter securityAdapter;
+    private final Path dataDir;
 
     @Inject
     public ClientCertGenerator(final CaService caService,
                                @Named("password_secret") final String passwordSecret,
+                               @Named("data_dir") Path dataDir,
                                final CsrGenerator csrGenerator,
                                final CsrSigner csrSigner,
                                final ClusterConfigService clusterConfigService,
@@ -73,14 +78,27 @@ public class ClientCertGenerator {
         this.csrSigner = csrSigner;
         this.clusterConfigService = clusterConfigService;
         this.securityAdapter = securityAdapter;
+        this.dataDir = dataDir;
     }
 
-    public String generateClientCert(final String principal,
+    private Path certFilePath(final String principal) {
+        return dataDir.resolve(Path.of(principal + ".cert"));
+    }
+
+    private String c(final Object o) throws IOException {
+        var writer = new StringWriter();
+        try (JcaPEMWriter jcaPEMWriter = new JcaPEMWriter(writer)) {
+            jcaPEMWriter.writeObject(o);
+        }
+        return writer.toString().replace("\n", "");
+    }
+
+    public ClientCert generateClientCert(final String principal,
                                      final String role,
                                      final char[] privateKeyPassword) throws ClientCertGenerationException {
         try {
             var renewalPolicy = this.clusterConfigService.get(RenewalPolicy.class);
-            var privateKeyEncryptedStorage = new PrivateKeyEncryptedFileStorage(java.nio.file.Path.of(principal + ".cert"));
+            var privateKeyEncryptedStorage = new PrivateKeyEncryptedFileStorage(certFilePath(principal));
 
             final Optional<KeyStore> optKey = caService.loadKeyStore();
             final var caKeystore = optKey.get();
@@ -92,18 +110,19 @@ public class ClientCertGenerator {
             var pk = privateKeyEncryptedStorage.readEncryptedKey(privateKeyPassword);
             var cert = csrSigner.sign(caPrivateKey, caCertificate, csr, renewalPolicy);
 
-            var writer = new StringWriter();
-            try (JcaPEMWriter jcaPEMWriter = new JcaPEMWriter(writer)) {
-                jcaPEMWriter.writeObject(caCertificate);
-                jcaPEMWriter.writeObject(pk);
-                jcaPEMWriter.writeObject(cert);
-            }
-
             securityAdapter.addUserToRoleMapping(role, principal);
 
-            return writer.toString();
+            return new ClientCert(principal, role, c(caCertificate), c(pk), c(cert));
         } catch (Exception e) {
             throw new ClientCertGenerationException("Failed to generate client certificate", e);
+        }
+    }
+
+    public void removeCertFor(final String role, final String principal) throws IOException {
+        var certFile = certFilePath(principal);
+        if(Files.exists(certFile)) {
+            Files.delete(certFile);
+            securityAdapter.removeUserFromRoleMapping(role, principal);
         }
     }
 }
