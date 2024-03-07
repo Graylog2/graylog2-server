@@ -16,9 +16,14 @@
  */
 import * as React from 'react';
 import type { SyntheticEvent } from 'react';
+import styled from 'styled-components';
 
 import { Button } from 'components/bootstrap';
 import { Icon } from 'components/common';
+
+const StyledButton = styled(Button)`
+  padding: 6px 11px;
+`;
 
 type Props = {
   hasError?: boolean
@@ -27,12 +32,12 @@ type Props = {
 };
 
 const TimeRangePickerButton = ({ hasError, disabled, onClick }: Props) => (
-  <Button bsStyle={hasError ? 'danger' : 'info'}
-          disabled={disabled}
-          onClick={onClick}
-          aria-label="Open Time Range Selector">
+  <StyledButton bsStyle={hasError ? 'danger' : 'info'}
+                disabled={disabled}
+                onClick={onClick}
+                aria-label="Open Time Range Selector">
     <Icon name={hasError ? 'warning' : 'schedule'} />
-  </Button>
+  </StyledButton>
 );
 
 TimeRangePickerButton.defaultProps = {
