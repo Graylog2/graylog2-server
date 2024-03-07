@@ -142,7 +142,7 @@ We currently have a few internal packages, used for the core application and all
 - `stylelint-config-graylog` contains our custom stylelint configuration, based on the default stylelint config.
 
 ### Browser compatibility
-We currently do not have a pre-release process to test different or old browser. Nevertheless you should test layout changes in at least all modern browsers (Chrome, Firefox, Safari). Bigger layout changes should also be tested in older browsers. Have a look at our [public browser compatibility list](https://docs.graylog.org/docs/web-interface#browser-compatibility).
+We currently do not have a pre-release process to test different or old browser. Nevertheless, you should test layout changes in at least all modern browsers (Chrome, Firefox, Safari). Bigger layout changes should also be tested in older browsers. Have a look at our [public browser compatibility list](https://docs.graylog.org/docs/web-interface#browser-compatibility).
 
 ### Plugin System
 - Graylog's plugin system allows users to extend the graylog core product without changing its source code. There are multiple points in the application which can be extended, like the navigation.
@@ -202,5 +202,5 @@ We currently do not have a pre-release process to test different or old browser.
 
 ### Modals
 - Users should be able to close a modal with the keyboard, i.e. typing ESC.
-- Modal forms should not close when clicking outside of the modal, since it is easy to lose some data.
+- Modal forms should not close when clicking outside the modal, since it is easy to lose some data.
 - Modal forms should focus on the first input (you can use autofocus for that).

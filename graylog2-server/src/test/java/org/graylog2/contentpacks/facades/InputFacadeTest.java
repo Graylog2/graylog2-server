@@ -449,11 +449,11 @@ public class InputFacadeTest {
 
         final Input input = inputService.find("5ae2eb0a3d27464477f0fd8b");
         EntityDescriptor entityDescriptor = EntityDescriptor.create(ModelId.of(input.getId()), ModelTypes.INPUT_V1);
-        EntityDescriptor expectedEntitiyDescriptorWhois = EntityDescriptor.create(ModelId.of("dead-beef"), ModelTypes.LOOKUP_TABLE_V1);
-        EntityDescriptor expectedEntitiyDescriptorTor = EntityDescriptor.create(ModelId.of("dead-feed"), ModelTypes.LOOKUP_TABLE_V1);
+        EntityDescriptor expectedEntityDescriptorWhois = EntityDescriptor.create(ModelId.of("dead-beef"), ModelTypes.LOOKUP_TABLE_V1);
+        EntityDescriptor expectedEntityDescriptorTor = EntityDescriptor.create(ModelId.of("dead-feed"), ModelTypes.LOOKUP_TABLE_V1);
         Graph<EntityDescriptor> graph = facade.resolveNativeEntity(entityDescriptor);
-        assertThat(graph.nodes()).contains(expectedEntitiyDescriptorWhois);
-        assertThat(graph.nodes()).contains(expectedEntitiyDescriptorTor);
+        assertThat(graph.nodes()).contains(expectedEntityDescriptorWhois);
+        assertThat(graph.nodes()).contains(expectedEntityDescriptorTor);
     }
 
     @Test
