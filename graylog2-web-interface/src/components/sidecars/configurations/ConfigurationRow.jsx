@@ -81,7 +81,7 @@ class ConfigurationRow extends React.Component {
                                       validateConfiguration={validateConfiguration}
                                       copyConfiguration={onCopy} />
               <MenuItem divider />
-              <MenuItem onSelect={this._handleDelete}>Delete</MenuItem>
+              <MenuItem onSelect={this._handleDelete} variant="danger">Delete</MenuItem>
             </DropdownButton>
           </ButtonToolbar>
         </td>

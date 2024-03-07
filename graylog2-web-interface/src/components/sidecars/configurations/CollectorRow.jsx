@@ -66,7 +66,7 @@ const CollectorRow = createReactClass({
                                   validateCollector={validateCollector}
                                   copyCollector={onClone} />
               <MenuItem divider />
-              <MenuItem onSelect={this.handleDelete}>Delete</MenuItem>
+              <MenuItem onSelect={this.handleDelete} variant="danger">Delete</MenuItem>
             </DropdownButton>
           </ButtonToolbar>
         </td>
