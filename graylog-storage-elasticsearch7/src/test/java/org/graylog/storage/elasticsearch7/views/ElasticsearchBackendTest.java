@@ -200,7 +200,7 @@ public class ElasticsearchBackendTest {
                 .timerange(RelativeRange.create(300))
                 .build();
         final Search search = Search.builder().queries(ImmutableSet.of(query)).build();
-        final SearchJob job = new SearchJob("deadbeef", search, "admin");
+        final SearchJob job = new SearchJob("deadbeef", search, "admin", "test-node-id");
         final GeneratedQueryContext generatedQueryContext = backend.generate(query, Set.of());
 
         var explainResult = backend.explain(job, query, generatedQueryContext);
