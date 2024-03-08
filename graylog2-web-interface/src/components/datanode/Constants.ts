@@ -178,7 +178,7 @@ export const MIGRATION_ACTIONS = {
   },
   SHOW_RENEWAL_POLICY_CREATION: {
     key: 'SHOW_RENEWAL_POLICY_CREATION',
-    label: 'Configure certificat renewal policy',
+    label: 'Configure certificate renewal policy',
   },
   SHOW_MIGRATION_SELECTION: {
     key: 'SHOW_MIGRATION_SELECTION',
