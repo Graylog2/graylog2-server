@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fixing problem with query input which can make the search bar disappear."
+
+issues = ["18053"]
+pulls = ["18470"]

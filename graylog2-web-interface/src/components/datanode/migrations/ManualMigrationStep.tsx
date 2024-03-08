@@ -19,26 +19,24 @@ import * as React from 'react';
 
 import { Col, Input } from 'components/bootstrap';
 import { Select } from 'components/common';
-import RollingUpgradeMigration from 'components/datanode/migrations/RollingUpgradeMigration';
+import InPlaceMigration from 'components/datanode/migrations/InPlaceMigration';
 import useMigrationState from 'components/datanode/hooks/useMigrationState';
 import type { MigrationActions, StepArgs } from 'components/datanode/Types';
 import useTriggerMigrationState from 'components/datanode/hooks/useTriggerMigrationState';
 import {
+  IN_PLACE_MIGRATION_STEPS,
   MIGRATION_STATE,
   REMOTE_REINDEXING_MIGRATION_STEPS,
-  ROLLING_UPGRADE_MIGRATION_STEPS,
 } from 'components/datanode/Constants';
 import RemoteReindexingMigration from 'components/datanode/migrations/RemoteReindexingMigration';
 import MigrationError from 'components/datanode/migrations/common/MigrationError';
 
 const ManualMigrationStep = () => {
-  const migrationTypeOptions = [{ label: 'Rolling upgrade migration', value: 'SELECT_ROLLING_UPGRADE_MIGRATION' }, { label: 'Remote Re-indexing Migration', value: 'SELECT_REMOTE_REINDEX_MIGRATION' }];
+  const migrationTypeOptions = [{ label: 'In-Place migration', value: 'SELECT_ROLLING_UPGRADE_MIGRATION' }, { label: 'Remote Re-indexing Migration', value: 'SELECT_REMOTE_REINDEX_MIGRATION' }];
   const { currentStep } = useMigrationState();
   const { onTriggerNextState } = useTriggerMigrationState();
 
-  const onMigrationStepChange = (step: MigrationActions, args?: StepArgs = {}) => {
-    onTriggerNextState({ step, args });
-  };
+  const onMigrationStepChange = async (step: MigrationActions, args?: StepArgs = {}) => onTriggerNextState({ step, args });
 
   return (
     <>
@@ -64,8 +62,8 @@ const ManualMigrationStep = () => {
         </Col>
       )}
       <MigrationError errorMessage={currentStep.error_message} />
-      {(currentStep && ROLLING_UPGRADE_MIGRATION_STEPS.includes(currentStep.state)) && <RollingUpgradeMigration onTriggerNextStep={onMigrationStepChange} currentStep={currentStep} />}
-      {(currentStep && REMOTE_REINDEXING_MIGRATION_STEPS.includes(currentStep.state)) && <RemoteReindexingMigration onTriggerNextStep={onMigrationStepChange} currentStep={currentStep} />}
+      {(currentStep && IN_PLACE_MIGRATION_STEPS.includes(currentStep.state)) && <InPlaceMigration onTriggerStep={onMigrationStepChange} currentStep={currentStep} />}
+      {(currentStep && REMOTE_REINDEXING_MIGRATION_STEPS.includes(currentStep.state)) && <RemoteReindexingMigration onTriggerStep={onMigrationStepChange} currentStep={currentStep} />}
     </>
   );
 };

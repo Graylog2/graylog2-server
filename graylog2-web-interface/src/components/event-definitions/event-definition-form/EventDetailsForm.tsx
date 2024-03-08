@@ -68,7 +68,9 @@ const EventDetailsForm = ({ eventDefinition, validation, onChange, canEdit }: Pr
     onChange('priority', toNumber(nextPriority));
   };
 
-  const readOnly = !canEdit || eventDefinition.config.type === 'system-notifications-v1';
+  const readOnly = !canEdit
+    || eventDefinition.config.type === 'system-notifications-v1'
+    || eventDefinition.config.type === 'sigma-v1';
 
   return (
     <Row>

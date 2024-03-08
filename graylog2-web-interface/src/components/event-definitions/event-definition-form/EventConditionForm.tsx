@@ -110,6 +110,7 @@ const EventConditionForm = ({ action, entityTypes, eventDefinition, validation, 
 
   const disabledSelect = () => !formattedEventDefinitionTypes().some((edt) => eventDefinition.config.type === edt.value) && action === 'edit';
   const onlyFilters = () => eventDefinition._scope === 'ILLUMINATE' && action === 'edit';
+  const isSigma = () => eventDefinition.config.type === 'sigma-v1' && action === 'edit';
 
   const eventDefinitionType = getConditionPlugin(eventDefinition.config.type);
   const isSystemEventDefinition = eventDefinition.config.type === SYSTEM_EVENT_DEFINITION_TYPE;
@@ -149,7 +150,7 @@ const EventConditionForm = ({ action, entityTypes, eventDefinition, validation, 
                       value={eventDefinition.config.type}
                       onChange={handleEventDefinitionTypeChange}
                       clearable={false}
-                      disabled={disabledSelect() || onlyFilters()}
+                      disabled={disabledSelect() || onlyFilters() || isSigma()}
                       required />
               <HelpBlock>
                 {get(validation, 'errors.config[0]', 'Choose the type of Condition for this Event.')}

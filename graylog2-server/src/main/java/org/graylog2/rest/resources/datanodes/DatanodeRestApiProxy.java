@@ -75,7 +75,11 @@ public class DatanodeRestApiProxy implements ProxyRequestAdapter {
         }
 
         final Response response = httpClient.newCall(builder.build()).execute();
-        return new ProxyResponse(response.code(), response.body().byteStream());
+        return new ProxyResponse(response.code(), response.body().byteStream(), getContentType(response));
+    }
+
+    private String getContentType(Response response) {
+        return response.header("Content-Type");
     }
 
     @NotNull

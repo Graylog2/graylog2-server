@@ -1,0 +1,13 @@
+type = "a"
+message = "Add a `job_scheduler_concurrency_limits` configuration option to limit the parallel execution of job types."
+
+issues = ["graylog-plugin-enterprise#6313"]
+pulls = ["graylog-plugin-enterprise#6399", "#17880"]
+
+details.user = """
+Adds the ability to configure cluster-wide max concurrency for specified job types. No more than this number of
+instances of the job type will be executed in parallel (across the entire cluster).
+
+Example setting:
+job_scheduler_concurrency_limits = event-processor-execution-v1:2,notification-execution-v1:2
+"""
