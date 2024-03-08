@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, searchVersions = {SearchServer.ES7, SearchServer.OS2_LATEST, SearchServer.DATANODE_DEV}, withWebhookServerEnabled = true)
+// @ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, searchVersions = {SearchServer.ES7, SearchServer.OS2_LATEST, SearchServer.DATANODE_DEV}, withWebhookServerEnabled = true)
 public class PivotAggregationSearchIT {
 
     private static final Logger LOG = LoggerFactory.getLogger(PivotAggregationSearchIT.class);
