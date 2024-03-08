@@ -39,6 +39,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.sort.SortBuild
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.sort.SortOrder;
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
 import org.graylog2.indexer.results.ResultMessage;
+import org.graylog2.indexer.results.ResultMessageFactory;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
@@ -59,12 +60,12 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 
 public class ESMessageList implements ESSearchTypeHandler<MessageList> {
     private final LegacyDecoratorProcessor decoratorProcessor;
-    private final ResultMessage.Factory resultMessageFactory;
+    private final ResultMessageFactory resultMessageFactory;
     private final boolean allowHighlighting;
 
     @Inject
     public ESMessageList(LegacyDecoratorProcessor decoratorProcessor,
-                         ResultMessage.Factory resultMessageFactory,
+                         ResultMessageFactory resultMessageFactory,
                          @Named("allow_highlighting") boolean allowHighlighting) {
         this.decoratorProcessor = decoratorProcessor;
         this.resultMessageFactory = resultMessageFactory;

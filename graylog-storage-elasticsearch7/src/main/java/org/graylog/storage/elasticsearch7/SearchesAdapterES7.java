@@ -30,6 +30,7 @@ import org.graylog2.indexer.results.ChunkedResult;
 import org.graylog2.indexer.results.CountResult;
 import org.graylog2.indexer.results.FieldStatsResult;
 import org.graylog2.indexer.results.ResultMessage;
+import org.graylog2.indexer.results.ResultMessageFactory;
 import org.graylog2.indexer.results.SearchResult;
 import org.graylog2.indexer.searches.ChunkCommand;
 import org.graylog2.indexer.searches.SearchesAdapter;
@@ -48,13 +49,13 @@ public class SearchesAdapterES7 implements SearchesAdapter {
     private static final String AGG_EXTENDED_STATS = "gl2_extended_stats";
     private static final String AGG_VALUE_COUNT = "gl2_value_count";
 
-    private final ResultMessage.Factory resultMessageFactory;
+    private final ResultMessageFactory resultMessageFactory;
     private final ElasticsearchClient client;
     private final Scroll scroll;
     private final SearchRequestFactory searchRequestFactory;
 
     @Inject
-    public SearchesAdapterES7(ResultMessage.Factory resultMessageFactory,
+    public SearchesAdapterES7(ResultMessageFactory resultMessageFactory,
                               ElasticsearchClient client,
                               Scroll scroll,
                               SearchRequestFactory searchRequestFactory) {

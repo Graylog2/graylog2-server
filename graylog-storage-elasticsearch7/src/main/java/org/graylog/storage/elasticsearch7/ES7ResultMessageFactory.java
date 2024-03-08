@@ -21,6 +21,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.text.Text;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.SearchHit;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.graylog2.indexer.results.ResultMessage;
+import org.graylog2.indexer.results.ResultMessageFactory;
 
 import java.util.Arrays;
 import java.util.List;
@@ -29,10 +30,10 @@ import java.util.stream.Collectors;
 
 public class ES7ResultMessageFactory {
 
-    private final ResultMessage.Factory messageFactory;
+    private final ResultMessageFactory messageFactory;
 
     @Inject
-    public ES7ResultMessageFactory(ResultMessage.Factory messageFactory) {
+    public ES7ResultMessageFactory(ResultMessageFactory messageFactory) {
         this.messageFactory = messageFactory;
     }
 

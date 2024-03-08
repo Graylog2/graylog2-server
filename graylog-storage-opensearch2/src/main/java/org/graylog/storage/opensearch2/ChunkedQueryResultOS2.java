@@ -20,15 +20,16 @@ import com.google.common.collect.Streams;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
 import org.graylog2.indexer.results.ChunkedQueryResult;
 import org.graylog2.indexer.results.ResultMessage;
+import org.graylog2.indexer.results.ResultMessageFactory;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 public abstract class ChunkedQueryResultOS2 extends ChunkedQueryResult<OpenSearchClient, SearchResponse> {
 
-    private final ResultMessage.Factory resultMessageFactory;
+    private final ResultMessageFactory resultMessageFactory;
 
-    public ChunkedQueryResultOS2(ResultMessage.Factory resultMessageFactory, OpenSearchClient client,
+    public ChunkedQueryResultOS2(ResultMessageFactory resultMessageFactory, OpenSearchClient client,
                                  SearchResponse initialResult, String query, List<String> fields, int limit) {
         super(client, initialResult, query, fields, limit);
         this.resultMessageFactory = resultMessageFactory;

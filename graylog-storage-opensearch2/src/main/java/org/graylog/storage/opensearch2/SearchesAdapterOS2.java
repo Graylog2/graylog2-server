@@ -30,6 +30,7 @@ import org.graylog2.indexer.results.ChunkedResult;
 import org.graylog2.indexer.results.CountResult;
 import org.graylog2.indexer.results.FieldStatsResult;
 import org.graylog2.indexer.results.ResultMessage;
+import org.graylog2.indexer.results.ResultMessageFactory;
 import org.graylog2.indexer.results.SearchResult;
 import org.graylog2.indexer.searches.ChunkCommand;
 import org.graylog2.indexer.searches.SearchesAdapter;
@@ -51,13 +52,13 @@ public class SearchesAdapterOS2 implements SearchesAdapter {
     private final OpenSearchClient client;
     private final Scroll scroll;
     private final SearchRequestFactory searchRequestFactory;
-    private final ResultMessage.Factory resultMessageFactory;
+    private final ResultMessageFactory resultMessageFactory;
 
     @Inject
     public SearchesAdapterOS2(OpenSearchClient client,
                               Scroll scroll,
                               SearchRequestFactory searchRequestFactory,
-                              ResultMessage.Factory resultMessageFactory) {
+                              ResultMessageFactory resultMessageFactory) {
         this.client = client;
         this.scroll = scroll;
         this.searchRequestFactory = searchRequestFactory;

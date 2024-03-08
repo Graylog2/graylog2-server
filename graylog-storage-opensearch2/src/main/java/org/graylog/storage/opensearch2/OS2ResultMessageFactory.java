@@ -21,6 +21,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.core.common.text.Text;
 import org.graylog.shaded.opensearch2.org.opensearch.search.SearchHit;
 import org.graylog.shaded.opensearch2.org.opensearch.search.fetch.subphase.highlight.HighlightField;
 import org.graylog2.indexer.results.ResultMessage;
+import org.graylog2.indexer.results.ResultMessageFactory;
 
 import java.util.Arrays;
 import java.util.List;
@@ -29,10 +30,10 @@ import java.util.stream.Collectors;
 
 public class OS2ResultMessageFactory {
 
-    private final ResultMessage.Factory messageFactory;
+    private final ResultMessageFactory messageFactory;
 
     @Inject
-    public OS2ResultMessageFactory(ResultMessage.Factory messageFactory) {
+    public OS2ResultMessageFactory(ResultMessageFactory messageFactory) {
         this.messageFactory = messageFactory;
     }
 

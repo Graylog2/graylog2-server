@@ -22,7 +22,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchR
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.SearchHit;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.graylog2.indexer.results.ResultMessage;
+import org.graylog2.indexer.results.ResultMessageFactory;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -32,7 +32,7 @@ public class PaginationResultES7 extends ChunkedQueryResultES7 {
     private SearchRequest initialSearchRequest;
 
     @AssistedInject
-    public PaginationResultES7(ResultMessage.Factory resultMessageFactory,
+    public PaginationResultES7(ResultMessageFactory resultMessageFactory,
                                ElasticsearchClient client,
                                SearchRequest initialSearchRequest,
                                @Assisted SearchResponse initialResult,

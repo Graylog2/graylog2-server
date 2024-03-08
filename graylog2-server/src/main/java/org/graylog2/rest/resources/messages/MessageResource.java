@@ -44,6 +44,7 @@ import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.messages.DocumentNotFoundException;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.results.ResultMessage;
+import org.graylog2.indexer.results.ResultMessageFactory;
 import org.graylog2.inputs.codecs.CodecFactory;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.ResolvableInetSocketAddress;
@@ -77,11 +78,11 @@ public class MessageResource extends RestResource {
     private final Messages messages;
     private final CodecFactory codecFactory;
     private final IndexSetRegistry indexSetRegistry;
-    private final ResultMessage.Factory resultMessageFactory;
+    private final ResultMessageFactory resultMessageFactory;
 
     @Inject
     public MessageResource(Messages messages, CodecFactory codecFactory, IndexSetRegistry indexSetRegistry,
-                           ResultMessage.Factory resultMessageFactory) {
+                           ResultMessageFactory resultMessageFactory) {
         this.messages = requireNonNull(messages);
         this.codecFactory = requireNonNull(codecFactory);
         this.indexSetRegistry = requireNonNull(indexSetRegistry);

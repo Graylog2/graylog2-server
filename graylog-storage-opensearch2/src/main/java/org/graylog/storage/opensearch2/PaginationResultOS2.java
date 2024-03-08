@@ -22,7 +22,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.search.SearchHit;
 import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
-import org.graylog2.indexer.results.ResultMessage;
+import org.graylog2.indexer.results.ResultMessageFactory;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -32,7 +32,7 @@ public class PaginationResultOS2 extends ChunkedQueryResultOS2 {
     private final SearchRequest initialSearchRequest;
 
     @AssistedInject
-    public PaginationResultOS2(ResultMessage.Factory resultMessageFactory,
+    public PaginationResultOS2(ResultMessageFactory resultMessageFactory,
                                OpenSearchClient client,
                                SearchRequest initialSearchRequest,
                                @Assisted SearchResponse initialResult,

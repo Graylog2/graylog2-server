@@ -44,6 +44,7 @@ import org.graylog2.indexer.messages.IndexingSuccess;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.results.ResultMessage;
+import org.graylog2.indexer.results.ResultMessageFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,14 +70,14 @@ public class MessagesAdapterOS2 implements MessagesAdapter {
     static final String ILLEGAL_ARGUMENT_EXCEPTION = "illegal_argument_exception";
     static final String NO_WRITE_INDEX_DEFINED_FOR_ALIAS = "no write index is defined for alias";
 
-    private final ResultMessage.Factory resultMessageFactory;
+    private final ResultMessageFactory resultMessageFactory;
     private final OpenSearchClient client;
     private final Meter invalidTimestampMeter;
     private final ChunkedBulkIndexer chunkedBulkIndexer;
     private final ObjectMapper objectMapper;
 
     @Inject
-    public MessagesAdapterOS2(ResultMessage.Factory resultMessageFactory, OpenSearchClient openSearchClient,
+    public MessagesAdapterOS2(ResultMessageFactory resultMessageFactory, OpenSearchClient openSearchClient,
                               MetricRegistry metricRegistry, ChunkedBulkIndexer chunkedBulkIndexer, ObjectMapper objectMapper) {
         this.resultMessageFactory = resultMessageFactory;
         this.client = openSearchClient;

@@ -35,6 +35,7 @@ public class ChunkedQueryResultTest {
     private static final String INDEX_NAME = "graylog_0";
 
     private ServerlessChunkedQueryResultSimulation toTest;
+    private static final ResultMessageFactory resultMessageFactory = new TestResultMessageFactory();
 
     @Test
     void emptyResultWhenNextSearchResultReturnsNull() throws Exception {
@@ -211,7 +212,7 @@ public class ChunkedQueryResultTest {
         @Override
         protected List<ResultMessage> collectMessagesFromResult(List<String> result) {
             return result.stream()
-                    .map(res -> ResultMessage.parseFromSource(res, INDEX_NAME, Map.of("name", res)))
+                    .map(res -> resultMessageFactory.parseFromSource(res, INDEX_NAME, Map.of("name", res)))
                     .collect(Collectors.toList());
         }
 

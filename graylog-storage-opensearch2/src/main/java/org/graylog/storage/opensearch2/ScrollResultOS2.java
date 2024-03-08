@@ -22,7 +22,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.search.ClearScrollRe
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchScrollRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.common.unit.TimeValue;
-import org.graylog2.indexer.results.ResultMessage;
+import org.graylog2.indexer.results.ResultMessageFactory;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -38,7 +38,7 @@ public class ScrollResultOS2 extends ChunkedQueryResultOS2 {
     }
 
     @AssistedInject
-    public ScrollResultOS2(ResultMessage.Factory resultMessageFactory,
+    public ScrollResultOS2(ResultMessageFactory resultMessageFactory,
                            OpenSearchClient client,
                            @Assisted SearchResponse initialResult,
                            @Assisted("query") String query,

@@ -23,18 +23,18 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.Indice
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog2.indexer.results.ChunkedResult;
 import org.graylog2.indexer.results.MultiChunkResultRetriever;
-import org.graylog2.indexer.results.ResultMessage;
+import org.graylog2.indexer.results.ResultMessageFactory;
 import org.graylog2.indexer.searches.ChunkCommand;
 
 import java.util.Set;
 
 public class PaginationES7 implements MultiChunkResultRetriever {
-    private final ResultMessage.Factory resultMessageFactory;
+    private final ResultMessageFactory resultMessageFactory;
     private final ElasticsearchClient client;
     private final SearchRequestFactory searchRequestFactory;
 
     @Inject
-    public PaginationES7(final ResultMessage.Factory resultMessageFactory,
+    public PaginationES7(final ResultMessageFactory resultMessageFactory,
                          final ElasticsearchClient client,
                          final SearchRequestFactory searchRequestFactory) {
         this.resultMessageFactory = resultMessageFactory;
