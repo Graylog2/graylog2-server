@@ -1,0 +1,5 @@
+type = "f"
+message = "Provide more diagnostic information when stream rule fails."
+
+pulls = [""]
+issues=["13499"]
