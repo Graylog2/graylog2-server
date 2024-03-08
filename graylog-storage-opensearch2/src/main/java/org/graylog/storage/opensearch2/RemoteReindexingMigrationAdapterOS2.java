@@ -136,7 +136,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     private void createIndicesInNewCluster(RemoteReindexMigration migration) {
         migration.indices().forEach(index -> {
             if (this.indices.exists(index.getName())) {
-                index.onError("Can't migrate index " + index + ", as it already exists in the target indexer.");
+                index.onError("Can't migrate index " + index.getName() + ", as it already exists in the target indexer.");
             } else {
                 this.indices.create(index.getName(), indexSetRegistry.getForIndex(index.getName()).orElse(indexSetRegistry.getDefault()));
             }
