@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useState, useEffect } from 'react';
+import isEqual from 'lodash/isEqual';
 
 import type { MigrationActions, MigrationState, OnTriggerStepFunction } from '../Types';
 import { MIGRATION_STATE } from '../Constants';
@@ -46,6 +47,8 @@ export type RemoteReindexRequest = {
   user: string,
 }
 
+export const RemoteReindexFinishedStatusActions: MigrationActions[] = ['RETRY_MIGRATE_EXISTING_DATA', 'SHOW_ASK_TO_SHUTDOWN_OLD_CLUSTER'];
+
 const useRemoteReindexMigrationStatus = (
   currentStep: MigrationState,
   onTriggerStep: OnTriggerStepFunction,
@@ -59,27 +62,22 @@ const useRemoteReindexMigrationStatus = (
 
   useEffect(() => {
     const fetchCurrentMigrationStatus = async () => {
-      if (
-        currentStep?.state === MIGRATION_STATE.REMOTE_REINDEX_RUNNING.key
-        && (
-          (migrationStatus?.progress || 0) < 100
-          || migrationStatus?.status !== 'FINISHED'
-        )
-      ) {
-        onTriggerStep('REQUEST_MIGRATION_STATUS').then((data) => {
-          const _migrationStatus = data?.response as RemoteReindexMigration;
+      if (currentStep?.state === MIGRATION_STATE.REMOTE_REINDEX_RUNNING.key) {
+        if (
+          migrationStatus?.progress === 100
+          && migrationStatus?.status === 'FINISHED'
+          && !isEqual(migrationStatus, RemoteReindexFinishedStatusActions)
+        ) {
+          setNextSteps(currentStep?.next_steps.filter((action) => RemoteReindexFinishedStatusActions.includes(action)));
+        } else {
+          onTriggerStep('REQUEST_MIGRATION_STATUS').then((data) => {
+            const _migrationStatus = data?.response as RemoteReindexMigration;
 
-          if (_migrationStatus) {
-            setMigrationStatus(_migrationStatus);
-
-            if (
-              _migrationStatus?.progress === 100
-              && migrationStatus?.status === 'FINISHED'
-            ) {
-              setNextSteps(currentStep?.next_steps.filter((action) => ['RETRY_MIGRATE_EXISTING_DATA', 'SHOW_ASK_TO_SHUTDOWN_OLD_CLUSTER'].includes(action)));
+            if (_migrationStatus) {
+              setMigrationStatus(_migrationStatus);
             }
-          }
-        });
+          });
+        }
       }
     };
 
