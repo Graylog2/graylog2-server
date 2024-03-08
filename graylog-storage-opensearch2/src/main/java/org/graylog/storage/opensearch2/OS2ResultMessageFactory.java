@@ -16,7 +16,7 @@
  */
 package org.graylog.storage.opensearch2;
 
-import com.google.inject.Inject;
+import jakarta.inject.Inject;
 import org.graylog.shaded.opensearch2.org.opensearch.core.common.text.Text;
 import org.graylog.shaded.opensearch2.org.opensearch.search.SearchHit;
 import org.graylog.shaded.opensearch2.org.opensearch.search.fetch.subphase.highlight.HighlightField;
