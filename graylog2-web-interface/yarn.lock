@@ -3325,7 +3325,7 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react@*", "@types/react@18.0.28", "@types/react@18.2.63", "@types/react@^16", "@types/react@^16.9.11", "@types/react@^16.9.9":
+"@types/react@*", "@types/react@18.0.28", "@types/react@18.2.64", "@types/react@^16", "@types/react@^16.9.11", "@types/react@^16.9.9":
   version "18.0.28"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-18.0.28.tgz#accaeb8b86f4908057ad629a26635fe641480065"
   integrity sha512-RD0ivG1kEztNBdoAK7lekI9M+azSnitIn85h4iOiaLjaTrMjzslhaqCGaI4IyCJ1RljWiLCEu4jyrLLgqxBTew==
@@ -6979,7 +6979,7 @@ eslint-config-airbnb@19.0.4:
     eslint-config-airbnb "19.0.4"
     eslint-import-resolver-webpack "0.13.8"
     eslint-plugin-compat "4.2.0"
-    eslint-plugin-graylog "file:packages/eslint-plugin-graylog"
+    eslint-plugin-graylog "file:../../../../.cache/yarn/v6/npm-eslint-config-graylog-1.3.0-ad5c72f1-954e-4b95-9c88-2f7d9398b928-1709795845198/node_modules/eslint-plugin-graylog"
     eslint-plugin-import "2.25.3"
     eslint-plugin-jest "27.9.0"
     eslint-plugin-jest-dom "5.1.0"
@@ -8441,14 +8441,14 @@ graphemer@^1.4.0:
     "@tanstack/react-query" "4.36.1"
     "@types/create-react-class" "15.6.7"
     "@types/jquery" "3.5.29"
-    "@types/react" "18.2.63"
-    babel-preset-graylog "file:packages/babel-preset-graylog"
+    "@types/react" "18.2.64"
+    babel-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-6.0.0-SNAPSHOT-8d5c46a7-a6e4-44c7-85ec-193fcbe2e560-1709795845000/node_modules/babel-preset-graylog"
     create-react-class "15.7.0"
-    eslint-config-graylog "file:packages/eslint-config-graylog"
+    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-6.0.0-SNAPSHOT-8d5c46a7-a6e4-44c7-85ec-193fcbe2e560-1709795845000/node_modules/eslint-config-graylog"
     formik "2.4.5"
     history "^5.3.0"
     html-webpack-plugin "^5.5.0"
-    jest-preset-graylog "file:packages/jest-preset-graylog"
+    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-6.0.0-SNAPSHOT-8d5c46a7-a6e4-44c7-85ec-193fcbe2e560-1709795845000/node_modules/jest-preset-graylog"
     jquery "3.7.1"
     moment "2.30.1"
     moment-timezone "0.5.45"
@@ -8459,7 +8459,7 @@ graphemer@^1.4.0:
     react-router-dom "6.22.2"
     reflux "0.2.13"
     styled-components "6.1.1"
-    typescript "5.3.3"
+    typescript "5.4.2"
     use-query-params "^2.2.0"
     webpack "5.90.3"
     webpack-cli "5.1.4"
@@ -12252,9 +12252,9 @@ postcss@^8.4.31, postcss@^8.4.33:
     source-map-js "^1.0.2"
 
 posthog-js@^1.52.0:
-  version "1.111.0"
-  resolved "https://registry.yarnpkg.com/posthog-js/-/posthog-js-1.111.0.tgz#f396248b2671e6d943b7ef4b80aba43ff75335d2"
-  integrity sha512-0Bf1hnclW3WLV7UMrIOMk6kVeEWJMNxe8NhkWLraus1uB63p05pPUB8QnpU6JLbx4h800DvtOxAfXbiJN+ozWw==
+  version "1.111.2"
+  resolved "https://registry.yarnpkg.com/posthog-js/-/posthog-js-1.111.2.tgz#0e3947e55922611c81c4ae0b2bde21718aa8621d"
+  integrity sha512-ZBgX/CRzSVBdc6DTpNMb6PCs89VKqcQN4XcaL1LWcge1KvTvUktH9M5H4WZQEhuqZ6gDs76koQ/78YyAXgrSjA==
   dependencies:
     fflate "^0.4.8"
     preact "^10.19.3"
@@ -15124,7 +15124,12 @@ typedarray@^0.0.6:
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
 
-typescript@5.3.3, typescript@^5.3.3:
+typescript@5.4.2:
+  version "5.4.2"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.4.2.tgz#0ae9cebcfae970718474fe0da2c090cad6577372"
+  integrity sha512-+2/g0Fds1ERlP6JsakQQDXjZdZMM+rqpamFZJEKh4kwTIn3iDkgKtby0CeNd5ATNZ4Ry1ax15TMx0W2V+miizQ==
+
+typescript@^5.3.3:
   version "5.3.3"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.3.3.tgz#b3ce6ba258e72e6305ba66f5c9b452aaee3ffe37"
   integrity sha512-pXWcraxM0uxAS+tN0AG/BF2TyqmHO014Z070UsJ+pFvYuRSq8KH8DmWpnbXe0pEPDHXZV3FcAbJkijJ5oNEnWw==
