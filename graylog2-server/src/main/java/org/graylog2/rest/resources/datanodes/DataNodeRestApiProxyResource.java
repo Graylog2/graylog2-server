@@ -110,6 +110,6 @@ public class DataNodeRestApiProxyResource extends RestResource {
         }
 
         final var response = proxyRequestAdapter.request(request);
-        return Response.status(response.status()).entity(response.response()).build();
+        return Response.status(response.status()).entity(response.response()).type(response.contentType()).build();
     }
 }

@@ -74,4 +74,12 @@ public class RemoteReindexIndex {
         this.took = duration;
         this.batches = batches;
     }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "name='" + name + '\'' +
+                ", status=" + status +
+                '}';
+    }
 }

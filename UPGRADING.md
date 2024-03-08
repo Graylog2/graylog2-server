@@ -42,6 +42,32 @@ Now this can be achieved by registering a `navigation` plugin.
 The plugin entity needs the `description` `System` and `children` (array).
 Every child represents a dropdown option and needs a `path` and `description` attribute.
 
+### Template language change
+
+Graylog uses JMTE for a variety of templates (see below for a list of affected features). This library has been updated
+to version 7.0.2, which contains a breaking change, potentially affecting user generated templates.
+
+Previously an if statement in a template could compare a property to an unquoted string. This is no longer possible and will
+likely result in an error:
+
+Valid before: ${if property=somestring}
+Must be changed to: ${if property='somestring'}
+
+No default templates used this form, and no examples using this syntax were provided, so impact is likely to be minimal.
+
+Templates using the JMTE library are potentially affected and should to be checked for compatibility:
+* Decorators on search results
+* Custom event fields
+* HTTP event notifications
+* Script event notifications
+* Slack event notifications
+* MS Teams event notifications
+* Archive directory naming
+* HTTP JsonPath lookup table adapter
+
+Not affected by this change are the following templates using Freemarker:
+* Sidecar configurations
+
 ## Configuration File Changes
 | Option                           | Action    | Description                                                                                                                                                                                                                                             |
 |----------------------------------|-----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
