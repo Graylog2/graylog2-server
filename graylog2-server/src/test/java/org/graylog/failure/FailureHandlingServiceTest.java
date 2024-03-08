@@ -23,6 +23,8 @@ import org.awaitility.Awaitility;
 import org.awaitility.Durations;
 import org.graylog2.Configuration;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,6 +50,7 @@ public class FailureHandlingServiceTest {
     private final Configuration configuration = mock(Configuration.class);
     private final MessageQueueAcknowledger acknowledger = mock(MessageQueueAcknowledger.class);
     private final MetricRegistry metricRegistry = new MetricRegistry();
+    private MessageFactory messageFactory = new TestMessageFactory();
 
     private FailureSubmissionQueue failureSubmissionQueue;
 
@@ -269,7 +272,7 @@ public class FailureHandlingServiceTest {
     private ProcessingFailure createProcessingFailure(boolean ack) {
         return new ProcessingFailure(
                 ProcessingFailureCause.UNKNOWN, "Failure Message", "Failure Details",
-                Tools.nowUTC(), new Message(ImmutableMap.of("_id", "1234")), ack);
+                Tools.nowUTC(), messageFactory.createMessage(ImmutableMap.of("_id", "1234")), ack);
     }
 
     private FailureBatch indexingFailureBatch(IndexingFailure indexingFailure) {

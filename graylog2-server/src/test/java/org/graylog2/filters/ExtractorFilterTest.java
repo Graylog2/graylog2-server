@@ -22,6 +22,8 @@ import org.graylog.failure.ProcessingFailureCause;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.joda.time.DateTime;
@@ -46,6 +48,7 @@ class ExtractorFilterTest {
     private final EventBus eventBus;
     private final ScheduledExecutorService executorService;
     private ExtractorFilter dut;
+    private final MessageFactory messageFactory = new TestMessageFactory();
 
     public ExtractorFilterTest(@Mock InputService inputService, @Mock EventBus eventBus, @Mock ScheduledExecutorService executorService) {
         this.inputService = inputService;
@@ -68,7 +71,7 @@ class ExtractorFilterTest {
         dut = new ExtractorFilter(inputService, eventBus, executorService);
         dut.lifecycleChanged(Lifecycle.STARTING);
 
-        final Message message = new Message("message", "source", new DateTime(2016, 1, 1, 0, 0, DateTimeZone.UTC));
+        final Message message = messageFactory.createMessage("message", "source", new DateTime(2016, 1, 1, 0, 0, DateTimeZone.UTC));
         message.setSourceInputId("123");
 
         dut.filter(message);

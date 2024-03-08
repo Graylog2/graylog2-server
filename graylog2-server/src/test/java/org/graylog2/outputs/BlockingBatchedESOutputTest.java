@@ -23,7 +23,8 @@ import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.messages.MessageWithIndex;
 import org.graylog2.indexer.messages.Messages;
-import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.journal.NoopJournal;
@@ -63,6 +64,7 @@ public class BlockingBatchedESOutputTest {
     private Cluster cluster;
 
     private BlockingBatchedESOutput output;
+    private final MessageFactory messageFactory = new TestMessageFactory();
 
     @BeforeEach
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
@@ -165,7 +167,7 @@ public class BlockingBatchedESOutputTest {
     private List<MessageWithIndex> buildMessages(final int count) {
         final ImmutableList.Builder<MessageWithIndex> builder = ImmutableList.builder();
         for (int i = 0; i < count; i++) {
-            builder.add(new MessageWithIndex(new Message("message" + i, "test", Tools.nowUTC()), mock(IndexSet.class)));
+            builder.add(new MessageWithIndex(messageFactory.createMessage("message" + i, "test", Tools.nowUTC()), mock(IndexSet.class)));
         }
 
         return builder.build();
