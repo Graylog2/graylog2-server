@@ -16,6 +16,7 @@
  */
 package org.graylog.storage.elasticsearch7;
 
+import jakarta.inject.Inject;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.text.Text;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.SearchHit;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
@@ -27,11 +28,19 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ResultMessageFactory {
-    public static ResultMessage fromSearchHit(SearchHit hit) {
+
+    private final ResultMessage.Factory messageFactory;
+
+    @Inject
+    public ResultMessageFactory(ResultMessage.Factory messageFactory) {
+        this.messageFactory = messageFactory;
+    }
+
+    public ResultMessage fromSearchHit(SearchHit hit) {
         final Map<String, List<String>> highlights = hit.getHighlightFields().entrySet()
                 .stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, ResultMessageFactory::highlightsFromFragments));
-        return ResultMessage.parseFromSource(hit.getId(), hit.getIndex(), hit.getSourceAsMap(), highlights);
+        return messageFactory.parseFromSource(hit.getId(), hit.getIndex(), hit.getSourceAsMap(), highlights);
     }
 
     private static List<String> highlightsFromFragments(Map.Entry<String, HighlightField> entry) {

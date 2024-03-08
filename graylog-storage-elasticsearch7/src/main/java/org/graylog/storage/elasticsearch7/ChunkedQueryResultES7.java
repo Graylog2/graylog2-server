@@ -26,14 +26,18 @@ import java.util.stream.Collectors;
 
 public abstract class ChunkedQueryResultES7 extends ChunkedQueryResult<ElasticsearchClient, SearchResponse> {
 
-    public ChunkedQueryResultES7(ElasticsearchClient client, SearchResponse initialResult, String query, List<String> fields, int limit) {
+    private final ResultMessage.Factory resultMessageFactory;
+
+    public ChunkedQueryResultES7(ResultMessage.Factory resultMessageFactory, ElasticsearchClient client,
+                                 SearchResponse initialResult, String query, List<String> fields, int limit) {
         super(client, initialResult, query, fields, limit);
+        this.resultMessageFactory = resultMessageFactory;
     }
 
     @Override
     protected List<ResultMessage> collectMessagesFromResult(SearchResponse response) {
         return Streams.stream(response.getHits())
-                .map(hit -> ResultMessage.parseFromSource(hit.getId(), hit.getIndex(), hit.getSourceAsMap()))
+                .map(hit -> resultMessageFactory.parseFromSource(hit.getId(), hit.getIndex(), hit.getSourceAsMap()))
                 .collect(Collectors.toList());
     }
 

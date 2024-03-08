@@ -26,14 +26,18 @@ import java.util.stream.Collectors;
 
 public abstract class ChunkedQueryResultOS2 extends ChunkedQueryResult<OpenSearchClient, SearchResponse> {
 
-    public ChunkedQueryResultOS2(OpenSearchClient client, SearchResponse initialResult, String query, List<String> fields, int limit) {
+    private final ResultMessage.Factory resultMessageFactory;
+
+    public ChunkedQueryResultOS2(ResultMessage.Factory resultMessageFactory, OpenSearchClient client,
+                                 SearchResponse initialResult, String query, List<String> fields, int limit) {
         super(client, initialResult, query, fields, limit);
+        this.resultMessageFactory = resultMessageFactory;
     }
 
     @Override
     protected List<ResultMessage> collectMessagesFromResult(SearchResponse result) {
         return Streams.stream(result.getHits())
-                .map(hit -> ResultMessage.parseFromSource(hit.getId(), hit.getIndex(), hit.getSourceAsMap()))
+                .map(hit -> resultMessageFactory.parseFromSource(hit.getId(), hit.getIndex(), hit.getSourceAsMap()))
                 .collect(Collectors.toList());
     }
 

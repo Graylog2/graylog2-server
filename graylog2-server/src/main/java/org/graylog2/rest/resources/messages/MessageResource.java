@@ -24,6 +24,19 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import jakarta.inject.Inject;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -46,23 +59,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-
-import jakarta.inject.Inject;
-
-import jakarta.validation.constraints.NotEmpty;
-
-import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.ForbiddenException;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.NotFoundException;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.core.MediaType;
-
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
@@ -81,12 +77,15 @@ public class MessageResource extends RestResource {
     private final Messages messages;
     private final CodecFactory codecFactory;
     private final IndexSetRegistry indexSetRegistry;
+    private final ResultMessage.Factory resultMessageFactory;
 
     @Inject
-    public MessageResource(Messages messages, CodecFactory codecFactory, IndexSetRegistry indexSetRegistry) {
+    public MessageResource(Messages messages, CodecFactory codecFactory, IndexSetRegistry indexSetRegistry,
+                           ResultMessage.Factory resultMessageFactory) {
         this.messages = requireNonNull(messages);
         this.codecFactory = requireNonNull(codecFactory);
         this.indexSetRegistry = requireNonNull(indexSetRegistry);
+        this.resultMessageFactory = resultMessageFactory;
     }
 
     @GET
@@ -157,7 +156,7 @@ public class MessageResource extends RestResource {
         final RawMessage rawMessage = new RawMessage(0, new UUID(), Tools.nowUTC(), remoteAddress, request.message().getBytes(StandardCharsets.UTF_8));
         final Message message = decodeMessage(codec, remoteAddress, rawMessage);
 
-        return ResultMessage.createFromMessage(message);
+        return resultMessageFactory.createFromMessage(message);
     }
 
     private Message decodeMessage(Codec codec, ResolvableInetSocketAddress remoteAddress, RawMessage rawMessage) {

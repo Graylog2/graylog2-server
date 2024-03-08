@@ -20,7 +20,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Range;
+import com.google.inject.Inject;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,33 +34,47 @@ import static org.graylog2.plugin.Tools.ES_DATE_FORMAT_FORMATTER;
 
 public class ResultMessage {
     private static final Logger LOG = LoggerFactory.getLogger(ResultMessage.class);
+    private final MessageFactory messageFactory;
 
     private Message message;
     private String index;
 
+    public static class Factory {
+        private final MessageFactory messageFactory;
+
+        @Inject
+        public Factory(MessageFactory messageFactory) {
+            this.messageFactory = messageFactory;
+        }
+
+        public ResultMessage parseFromSource(String id, String index, Map<String, Object> message) {
+            return parseFromSource(id, index, message, Collections.emptyMap());
+        }
+
+        public ResultMessage parseFromSource(String id, String index, Map<String, Object> message, Map<String, List<String>> highlight) {
+            return new ResultMessage(messageFactory, id, index, message, HighlightParser.extractHighlightRanges(highlight));
+        }
+
+        public ResultMessage createFromMessage(Message message) {
+            ResultMessage m = new ResultMessage(messageFactory);
+            m.setMessage(message);
+            return m;
+        }
+    }
+
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public Multimap<String, Range<Integer>> highlightRanges;
 
-    protected ResultMessage() { /* use factory method */}
+    protected ResultMessage(MessageFactory messageFactory) { /* use factory method */
+        this.messageFactory = messageFactory;
+    }
 
-    private ResultMessage(String id, String index, Map<String, Object> message, Multimap<String, Range<Integer>> highlightRanges) {
+    private ResultMessage(MessageFactory messageFactory, String id, String index, Map<String,
+            Object> message, Multimap<String, Range<Integer>> highlightRanges) {
+        this(messageFactory);
         this.index = index;
         this.highlightRanges = highlightRanges;
         setMessage(id, message);
-    }
-
-    public static ResultMessage parseFromSource(String id, String index, Map<String, Object> message) {
-        return parseFromSource(id, index, message, Collections.emptyMap());
-    }
-
-    public static ResultMessage parseFromSource(String id, String index, Map<String, Object> message, Map<String, List<String>> highlight) {
-        return new ResultMessage(id, index, message, HighlightParser.extractHighlightRanges(highlight));
-    }
-
-    public static ResultMessage createFromMessage(Message message) {
-        ResultMessage m = new ResultMessage();
-        m.setMessage(message);
-        return m;
     }
 
     public void setMessage(Message message) {
@@ -78,7 +94,7 @@ public class ResultMessage {
                 LOG.warn("Could not parse timestamp of message {}", message.get("id"), e);
             }
         }
-        this.message = new Message(tmp);
+        this.message = messageFactory.createMessage(tmp);
     }
 
     public void setIndex(String index) {

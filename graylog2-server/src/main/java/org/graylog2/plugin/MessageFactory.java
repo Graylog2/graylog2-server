@@ -26,4 +26,5 @@ public interface MessageFactory {
     Message createMessage(Map<String, Object> fields);
 
     Message createMessage(String id, Map<String, Object> newFields);
+
 }

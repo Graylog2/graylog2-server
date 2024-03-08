@@ -36,4 +36,6 @@ public class DefaultMessageFactory implements MessageFactory {
     public Message createMessage(String id, Map<String, Object> newFields) {
         return new Message(id, newFields);
     }
+
+
 }
