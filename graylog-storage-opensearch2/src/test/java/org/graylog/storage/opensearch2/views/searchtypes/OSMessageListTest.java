@@ -28,6 +28,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.SearchHits;
 import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
 import org.graylog.testing.jsonpath.JsonPathAssert;
+import org.graylog2.indexer.results.TestResultMessageFactory;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.junit.Test;
@@ -45,7 +46,8 @@ public class OSMessageListTest {
 
     @Test
     public void includesCustomNameInResultIfPresent() {
-        final OSMessageList esMessageList = new OSMessageList();
+        final OSMessageList esMessageList = new OSMessageList(new LegacyDecoratorProcessor.Fake(),
+                new TestResultMessageFactory(), false);
         final MessageList messageList = someMessageList().toBuilder().name("customResult").build();
 
         final org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse result =
@@ -206,6 +208,7 @@ public class OSMessageListTest {
                                                                     OSGeneratedQueryContext context) {
         OSMessageList sut = new OSMessageList(
                 new LegacyDecoratorProcessor.Fake(),
+                new TestResultMessageFactory(),
                 allowHighlighting);
 
         sut.doGenerateQueryPart(someQuery(), messageList, context);

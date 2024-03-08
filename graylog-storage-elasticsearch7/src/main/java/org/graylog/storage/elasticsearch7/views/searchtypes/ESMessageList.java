@@ -16,7 +16,6 @@
  */
 package org.graylog.storage.elasticsearch7.views.searchtypes;
 
-import com.google.common.annotations.VisibleForTesting;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -70,12 +69,6 @@ public class ESMessageList implements ESSearchTypeHandler<MessageList> {
         this.decoratorProcessor = decoratorProcessor;
         this.resultMessageFactory = resultMessageFactory;
         this.allowHighlighting = allowHighlighting;
-    }
-
-    @VisibleForTesting
-    // TODO
-    public ESMessageList() {
-        this(new LegacyDecoratorProcessor.Fake(), null, false);
     }
 
     private ResultMessage resultMessageFromSearchHit(SearchHit hit) {

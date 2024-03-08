@@ -28,6 +28,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.SearchHits;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
 import org.graylog.testing.jsonpath.JsonPathAssert;
+import org.graylog2.indexer.results.TestResultMessageFactory;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.junit.Test;
@@ -45,7 +46,8 @@ public class ESMessageListTest {
 
     @Test
     public void includesCustomNameInResultIfPresent() {
-        final ESMessageList esMessageList = new ESMessageList();
+        final ESMessageList esMessageList = new ESMessageList(new LegacyDecoratorProcessor.Fake(),
+                new TestResultMessageFactory(), false);
         final MessageList messageList = someMessageList().toBuilder().name("customResult").build();
 
         final org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse result =
@@ -207,6 +209,7 @@ public class ESMessageListTest {
                                                                     ESGeneratedQueryContext context) {
         ESMessageList sut = new ESMessageList(
                 new LegacyDecoratorProcessor.Fake(),
+                new TestResultMessageFactory(),
                 allowHighlighting);
 
         sut.doGenerateQueryPart(someQuery(), messageList, context);
