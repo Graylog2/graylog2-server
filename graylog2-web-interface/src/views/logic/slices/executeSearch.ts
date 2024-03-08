@@ -16,8 +16,8 @@
  */
 import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
-import type { SearchJobType } from 'views/stores/SearchJobs';
-import { runSearchJob, searchJobStatus } from 'views/stores/SearchJobs';
+import type { SearchJobType, JobIds } from 'views/stores/SearchJobs';
+import { runSearchJob, searchJobStatus, runStartJob, runPollJob, runCancelJob } from 'views/stores/SearchJobs';
 import type View from 'views/logic/views/View';
 import type { SearchExecutionResult } from 'views/types';
 import SearchResult from 'views/logic/SearchResult';
@@ -35,6 +35,65 @@ const trackJobStatus = (job: SearchJobType): Promise<SearchJobType> => new Promi
       .then((jobStatus) => trackJobStatus(jobStatus)));
   }
 });
+
+export const startJob = async (
+  view: View,
+  widgetsToSearch: string[],
+  executionStateParam: SearchExecutionState,
+  keepQueries: string[] = [],
+): Promise<JobIds> => {
+  const { widgetMapping, search } = view;
+
+  const globalOverride = (executionStateParam.globalOverride ?? GlobalOverride.empty()).toBuilder()
+    .keepQueries(keepQueries)
+    .build();
+
+  let executionStateBuilder = executionStateParam.toBuilder().globalOverride(globalOverride);
+
+  if (widgetsToSearch) {
+    const keepSearchTypes = widgetsToSearch
+      .map((widgetId) => widgetMapping.get(widgetId))
+      .reduce((acc, searchTypeSet) => (searchTypeSet ? [...acc, ...searchTypeSet.toArray()] : acc), globalOverride.keepSearchTypes || []);
+    const newGlobalOverride = globalOverride.toBuilder().keepSearchTypes(keepSearchTypes).build();
+    executionStateBuilder = executionStateBuilder.globalOverride(newGlobalOverride);
+  }
+
+  const executionState = executionStateBuilder.build();
+
+  return runStartJob(search, executionState).then((res) => ({ asyncSearchId: res.id, nodeId: res.executing_node }));
+};
+
+export const pollJob = (jobIds: JobIds, result: SearchJobType | null, signal: AbortSignal): Promise<SearchJobType> => new Promise((resolve) => {
+  if (result?.execution?.done) {
+    resolve(result);
+  } else {
+    delay(2000)
+      .then(() => {
+        if (!signal.aborted) {
+          resolve(runPollJob(jobIds).then((res) => pollJob(jobIds, res, signal)));
+        }
+      });
+  }
+});
+
+export const executeJobResult = async ({ asyncSearchId, nodeId }: JobIds, view: View, signal: AbortSignal): Promise<SearchExecutionResult> => {
+  const { widgetMapping } = view;
+
+  /*
+  if (signal?.aborted) {
+    console.log('Aborted');
+    return Promise.reject();
+  }
+  signal.addEventListener('abort', () => {
+    console.log('Aborted Listener', { 'signal?.aborted': signal?.aborted });
+    Promise.reject();
+  });
+*/
+  return pollJob({ asyncSearchId, nodeId }, null, signal)
+    .then((result) => ({ widgetMapping, result: new SearchResult(result) }));
+};
+
+export const cancelJob = (jobIds: JobIds) => runCancelJob(jobIds);
 
 const executeSearch = (
   view: View,
