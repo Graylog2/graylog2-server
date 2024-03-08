@@ -16,7 +16,7 @@
  */
 package org.graylog2.indexer.results;
 
-import com.google.inject.Inject;
+import jakarta.inject.Inject;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 
