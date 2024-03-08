@@ -58,7 +58,7 @@ class DataNodeEntityTest {
 
         final JsonNode jsonNode = mapper.readTree(mapper.writeValueAsString(node));
 
-        assertThat(jsonNode.size()).isEqualTo(11);
+        assertThat(jsonNode.size()).isEqualTo(12);
 
         assertThat(ZonedDateTime.parse(jsonNode.path("last_seen").asText())).isEqualTo(lastSeen);
         assertThat(jsonNode.path("node_id").asText()).isEqualTo(nodeId);

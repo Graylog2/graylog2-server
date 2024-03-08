@@ -41,6 +41,7 @@ import org.graylog.events.processor.EventProcessorParameters;
 import org.graylog.events.processor.EventProcessorPreconditionException;
 import org.graylog.events.processor.EventStreamService;
 import org.graylog.events.search.MoreSearch;
+import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.errors.ParameterExpansionError;
 import org.graylog.plugins.views.search.errors.SearchException;
@@ -95,6 +96,7 @@ public class AggregationEventProcessor implements EventProcessor {
     private final Messages messages;
     private final NotificationService notificationService;
     private final PermittedStreams permittedStreams;
+    private final Set<EventQuerySearchTypeSupplier> eventQueryModifiers;
 
     @Inject
     public AggregationEventProcessor(@Assisted EventDefinition eventDefinition,
@@ -104,7 +106,8 @@ public class AggregationEventProcessor implements EventProcessor {
                                      MoreSearch moreSearch,
                                      EventStreamService eventStreamService,
                                      Messages messages, NotificationService notificationService,
-                                     PermittedStreams permittedStreams) {
+                                     PermittedStreams permittedStreams,
+                                     Set<EventQuerySearchTypeSupplier> eventQueryModifiers) {
         this.eventDefinition = eventDefinition;
         this.config = (AggregationEventProcessorConfig) eventDefinition.config();
         this.aggregationSearchFactory = aggregationSearchFactory;
@@ -115,6 +118,7 @@ public class AggregationEventProcessor implements EventProcessor {
         this.messages = messages;
         this.notificationService = notificationService;
         this.permittedStreams = permittedStreams;
+        this.eventQueryModifiers = eventQueryModifiers;
     }
 
     @Override
@@ -248,6 +252,7 @@ public class AggregationEventProcessor implements EventProcessor {
                         .timerangeEnd(parameters.timerange().getTo())
                         .query(config.query())
                         .streams(event.getSourceStreams())
+                        .filters(config.filters())
                         .build());
 
                 eventsWithContext.add(EventWithContext.create(event, msg));
@@ -281,7 +286,10 @@ public class AggregationEventProcessor implements EventProcessor {
     private void aggregatedSearch(EventFactory eventFactory, AggregationEventProcessorParameters parameters,
                                   EventConsumer<List<EventWithContext>> eventsConsumer) throws EventProcessorException {
         final String owner = "event-processor-" + AggregationEventProcessorConfig.TYPE_NAME + "-" + eventDefinition.id();
-        final AggregationSearch search = aggregationSearchFactory.create(config, parameters, owner, eventDefinition);
+        final List<SearchType> additionalSearchTypes = eventQueryModifiers.stream()
+                .flatMap(e -> e.additionalSearchTypes(eventDefinition).stream())
+                .toList();
+        final AggregationSearch search = aggregationSearchFactory.create(config, parameters, owner, eventDefinition, additionalSearchTypes);
         final AggregationResult result = search.doSearch();
 
         if (result.keyResults().isEmpty()) {
@@ -341,6 +349,7 @@ public class AggregationEventProcessor implements EventProcessor {
                     .timerangeEnd(event.getTimerangeEnd())
                     .query(config.query())
                     .streams(sourceStreams)
+                    .filters(config.filters())
                     .build());
             sourceStreams.forEach(event::addSourceStream);
 
@@ -394,8 +403,18 @@ public class AggregationEventProcessor implements EventProcessor {
             final Message message = new Message(eventMessage, "", result.effectiveTimerange().to());
             message.addFields(fields);
 
+            // Ask any event query modifier for its state and collect it into the event modifier state
+            final Map<String, Object> eventModifierState = eventQueryModifiers.stream()
+                    .flatMap(modifier -> modifier.eventModifierData(result.additionalResults()).entrySet().stream())
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
             LOG.debug("Creating event {}/{} - {} {} ({})", eventDefinition.title(), eventDefinition.id(), keyResult.key(), seriesString(keyResult), fields);
-            eventsWithContext.add(EventWithContext.create(event, message));
+
+            eventsWithContext.add(EventWithContext.builder()
+                    .event(event)
+                    .messageContext(message)
+                    .eventModifierState(eventModifierState)
+                    .build());
         }
 
         return eventsWithContext.build();

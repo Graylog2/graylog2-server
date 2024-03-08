@@ -44,10 +44,14 @@ const StyledBootstrapPagination = styled(BootstrapPagination)(({ theme }) => css
     > li {
       > a,
       > span {
+        display: flex;
+        align-items: center;
+        justify-content: center;
         color: ${theme.utils.contrastingColor(theme.colors.global.contentBackground)};
         background-color: ${theme.colors.global.contentBackground};
         border-color: ${theme.colors.variant.light.default};
         border-radius: 0;
+        height: 32px;
 
         &:hover,
         &:focus {
@@ -81,6 +85,7 @@ const StyledBootstrapPagination = styled(BootstrapPagination)(({ theme }) => css
           border-color: ${theme.colors.variant.lighter.default};
         }
       }
+      
     }
   }
 `);
@@ -105,8 +110,12 @@ const UltimatePagination = createUltimatePagination({
       const title = 'Open following page';
 
       return (
-        <BootstrapPagination.Ellipsis disabled={isActive} onClick={onClick} title={title} aria-label={title}>
-          <Icon name="ellipsis-h" />
+        <BootstrapPagination.Ellipsis disabled={isActive}
+                                      onClick={onClick}
+                                      title={title}
+                                      aria-label={title}
+                                      className="pagination-control">
+          <Icon name="more_horiz" />
         </BootstrapPagination.Ellipsis>
       );
     },
@@ -114,8 +123,12 @@ const UltimatePagination = createUltimatePagination({
       const title = 'Open first page';
 
       return (
-        <BootstrapPagination.First disabled={isActive} onClick={onClick} title={title} aria-label={title}>
-          <Icon name="angle-double-left" />
+        <BootstrapPagination.First disabled={isActive}
+                                   onClick={onClick}
+                                   title={title}
+                                   aria-label={title}
+                                   className="pagination-control">
+          <Icon name="keyboard_double_arrow_left" />
         </BootstrapPagination.First>
       );
     },
@@ -123,8 +136,12 @@ const UltimatePagination = createUltimatePagination({
       const title = 'Open previous page';
 
       return (
-        <BootstrapPagination.Prev disabled={isActive} onClick={onClick} title={title} aria-label={title}>
-          <Icon name="angle-left" />
+        <BootstrapPagination.Prev disabled={isActive}
+                                  onClick={onClick}
+                                  title={title}
+                                  aria-label={title}
+                                  className="pagination-control">
+          <Icon name="chevron_left" />
         </BootstrapPagination.Prev>
       );
     },
@@ -132,8 +149,12 @@ const UltimatePagination = createUltimatePagination({
       const title = 'Open next page';
 
       return (
-        <BootstrapPagination.Next disabled={isActive} onClick={onClick} title={title} aria-label={title}>
-          <Icon name="angle-right" />
+        <BootstrapPagination.Next disabled={isActive}
+                                  onClick={onClick}
+                                  title={title}
+                                  aria-label={title}
+                                  className="pagination-control">
+          <Icon name="chevron_right" />
         </BootstrapPagination.Next>
       );
     },
@@ -141,8 +162,12 @@ const UltimatePagination = createUltimatePagination({
       const title = 'Open last page';
 
       return (
-        <BootstrapPagination.Last disabled={isActive} onClick={onClick} title={title} aria-label={title}>
-          <Icon name="angle-double-right" />
+        <BootstrapPagination.Last disabled={isActive}
+                                  onClick={onClick}
+                                  title={title}
+                                  aria-label={title}
+                                  className="pagination-control">
+          <Icon name="keyboard_double_arrow_right" />
         </BootstrapPagination.Last>
       );
     },

@@ -28,6 +28,8 @@ jest.mock('stores/tools/ToolsStore', () => ({
   testNaturalDate: jest.fn(),
 }));
 
+jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
+
 const TabKeywordTimeRange = ({ defaultValue, ...props }: { defaultValue: string } & React.ComponentProps<typeof TabKeywordTimeRange>) => (
   <Formik initialValues={{ timeRangeTabs: { keyword: { type: 'keyword', keyword: defaultValue } }, activeTab: 'keyword' }}
           onSubmit={() => {}}

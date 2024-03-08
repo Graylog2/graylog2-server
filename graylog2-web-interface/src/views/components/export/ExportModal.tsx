@@ -172,7 +172,7 @@ const ExportModal = ({ closeModal, view, directExportWidgetId }: Props) => {
                              isSubmitting={loading}
                              isAsyncSubmit
                              submitLoadingText="Downloading..."
-                             submitIcon="cloud-download-alt"
+                             submitIcon="download"
                              submitButtonText="Start Download" />
               </Modal.Footer>
             </Form>

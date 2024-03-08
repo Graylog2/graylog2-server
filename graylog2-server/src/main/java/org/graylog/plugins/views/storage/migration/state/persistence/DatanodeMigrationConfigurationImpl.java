@@ -18,6 +18,7 @@ package org.graylog.plugins.views.storage.migration.state.persistence;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachineContext;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 
 import java.util.Optional;
@@ -40,5 +41,15 @@ public class DatanodeMigrationConfigurationImpl implements DatanodeMigrationPers
     @Override
     public void saveConfiguration(DatanodeMigrationConfiguration configuration) {
         clusterConfigService.write(configuration);
+    }
+
+    @Override
+    public Optional<MigrationStateMachineContext> getStateMachineContext() {
+        return Optional.ofNullable(clusterConfigService.get(MigrationStateMachineContext.class));
+    }
+
+    @Override
+    public void saveStateMachineContext(MigrationStateMachineContext context) {
+        clusterConfigService.write(context);
     }
 }

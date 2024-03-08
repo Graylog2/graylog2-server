@@ -89,11 +89,30 @@ public class RemoteReindexMigration {
         return this;
     }
 
+    public Status status() {
+        return status;
+    }
 
     public void finish() {
         if(finishCallback != null) {
             finishCallback.run();
         }
         status(Status.FINISHED);
+    }
+
+    /**
+     * @return How much of the migration is done, in percent, int value between 0 a 100.
+     */
+    @JsonProperty("progress")
+    public int progress() {
+        final int countOfIndices = indices.size();
+
+        if(indices.isEmpty()) {
+            return 100; // avoid division by zero. No indices == migration is immediately done
+        }
+
+        final int done = (int) indices.stream().map(RemoteReindexIndex::getStatus).filter(i -> i == Status.FINISHED || i == Status.ERROR).count();
+        float percent = (100.0f / countOfIndices) * done;
+        return (int) Math.ceil(percent);
     }
 }

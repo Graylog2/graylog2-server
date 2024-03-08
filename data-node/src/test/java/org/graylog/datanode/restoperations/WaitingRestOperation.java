@@ -48,7 +48,7 @@ public abstract class WaitingRestOperation extends RestOperation {
     final ValidatableResponse waitForResponse(String url, Predicate<ValidatableResponse>... predicates) throws ExecutionException, RetryException {
 
         if (LOG.isInfoEnabled()) {
-            LOG.info("cURL request: " + formatCurlConnectionInfo(parameters.port(), url));
+            LOG.info("cURL request: " + formatCurlConnectionInfo(parameters, url));
         }
 
         //noinspection UnstableApiUsage
@@ -86,12 +86,12 @@ public abstract class WaitingRestOperation extends RestOperation {
 
                 parameters.addAuthorizationHeaders(req);
 
-                return req.get(formatUrl(parameters.port(), url))
+                return req.get(formatUrl(parameters, url))
                         .then();
             });
         } catch (Exception e) {
             if (lastRecordedResponse != null) {
-                LOG.warn("Last recorded opensearch response, waiting for {}: {}", formatUrl(parameters.port(), url), lastRecordedResponse);
+                LOG.warn("Last recorded opensearch response, waiting for {}: {}", formatUrl(parameters, url), lastRecordedResponse);
             }
             throw e;
         }

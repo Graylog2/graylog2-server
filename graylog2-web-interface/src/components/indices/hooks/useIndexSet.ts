@@ -40,6 +40,7 @@ const useIndexSet = (initialIndexSet?: IndexSet) :[IndexSet, Dispatch<SetStateAc
       writable: true,
       can_be_default: true,
       shards: indexDefaultsConfig.shards,
+      data_tiering: indexDefaultsConfig.data_tiering,
       replicas: indexDefaultsConfig.replicas,
       rotation_strategy_class: indexDefaultsConfig.rotation_strategy_class,
       rotation_strategy: indexDefaultsConfig.rotation_strategy_config as RotationStrategyConfig,
@@ -52,7 +53,8 @@ const useIndexSet = (initialIndexSet?: IndexSet) :[IndexSet, Dispatch<SetStateAc
     };
 
     if (initialIndexSet) {
-      setIndexSet({ ...defaultIndexSet, ...initialIndexSet });
+      const initialIndexWithoutNullValues = Object.fromEntries(Object.entries(initialIndexSet).filter(([_, v]) => v != null));
+      setIndexSet({ ...defaultIndexSet, ...initialIndexWithoutNullValues });
     } else {
       setIndexSet({ ...defaultIndexSet });
     }

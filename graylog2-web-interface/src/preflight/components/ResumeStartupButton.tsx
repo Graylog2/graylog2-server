@@ -54,8 +54,7 @@ const ResumeStartupButton = ({ setIsWaitingForStartup, children, variant, compac
 
   return (
     <Button variant={variant}
-            compact={compact}
-            size="xs"
+            size={compact ? 'compact-xs' : 'xs'}
             onClick={onResumeStartup}>
       {children}
     </Button>

@@ -40,7 +40,6 @@
         $('pre code').each(function(i, e) {hljs.highlightBlock(e)});
 
         if ("${isCloud}") {
-          $('#api_selector').css('visibility', 'hidden');
           $('.warning-box').css('visibility', 'hidden');
         } else if ("${showWarning}") {
           $('.warning-box').css('visibility', '');
@@ -54,16 +53,6 @@
       },
       docExpansion: "none"
     });
-
-    var updateApiAuth = function() {
-        var user = $('#input_apiUser')[0].value;
-        var pass = $('#input_apiPassword')[0].value;
-        if(user && user.trim() != "" && pass && pass.trim() != "") {
-            window.authorizations.add("basic", new PasswordAuthorization("creds", user, pass));
-        }
-    };
-    $('#input_apiUser').change(updateApiAuth);
-    $('#input_apiPassword').change(updateApiAuth);
 
     // Add CSRF header
     window.authorizations.add("csrf", new ApiKeyAuthorization("X-Requested-By", "Graylog API Browser", "header"));
@@ -86,14 +75,6 @@
   <div class="swagger-ui-wrap">
     <img src="images/toplogo.png">
     <span class="subtitle">REST API browser</span>
-    <form id="api_selector">
-      <div class="input">
-        <input type="text" name="user" id="input_apiUser" placeholder="Username"/>
-      </div>
-      <div class="input">
-        <input type="password" name="password" id="input_apiPassword" placeholder="Password"/>
-      </div>
-    </form>
   </div>
 </div>
 

@@ -106,7 +106,7 @@ const NodeLoggers = createReactClass({
                             event_details: { showing: !showDetails },
                           });
                         }}>
-                  <Icon name="tachometer-alt" />{' '}
+                  <Icon name="speed" />{' '}
                   {showDetails ? 'Hide' : 'Show'} log level metrics
                 </Button>
               </div>

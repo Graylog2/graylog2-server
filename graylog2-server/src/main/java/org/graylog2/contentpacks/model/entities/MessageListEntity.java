@@ -18,8 +18,6 @@ package org.graylog2.contentpacks.model.entities;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
@@ -30,13 +28,9 @@ import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.Sort;
 import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
-import org.graylog.plugins.views.search.timeranges.OffsetRange;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.decorators.Decorator;
 import org.graylog2.decorators.DecoratorImpl;
-import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
-import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
-import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.annotation.Nullable;
@@ -128,13 +122,6 @@ public abstract class MessageListEntity implements SearchTypeEntity {
         public abstract Builder filters(List<UsedSearchFilter> filters);
 
         @JsonProperty
-        @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = false)
-        @JsonSubTypes({
-                @JsonSubTypes.Type(name = AbsoluteRange.ABSOLUTE, value = AbsoluteRange.class),
-                @JsonSubTypes.Type(name = RelativeRange.RELATIVE, value = RelativeRange.class),
-                @JsonSubTypes.Type(name = KeywordRange.KEYWORD, value = KeywordRange.class),
-                @JsonSubTypes.Type(name = OffsetRange.OFFSET, value = OffsetRange.class)
-        })
         public Builder timerange(@Nullable TimeRange timerange) {
             return timerange(timerange == null ? null : DerivedTimeRange.of(timerange));
         }

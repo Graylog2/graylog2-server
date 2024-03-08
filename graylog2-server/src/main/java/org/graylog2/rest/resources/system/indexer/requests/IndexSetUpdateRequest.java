@@ -54,7 +54,7 @@ public record IndexSetUpdateRequest(@JsonProperty("title") @NotBlank String titl
                                     @JsonProperty("field_type_refresh_interval") Duration fieldTypeRefreshInterval,
                                     @JsonProperty(FIELD_PROFILE_ID) @ValidObjectId @Nullable String fieldTypeProfile,
                                     @JsonProperty(FIELD_DATA_TIERING) @Nullable DataTieringConfig dataTiering,
-                                    @JsonProperty(FIELD_USE_LEGACY_ROTATION) Boolean useLegacyRotation) {
+                                    @JsonProperty(FIELD_USE_LEGACY_ROTATION) @Nullable Boolean useLegacyRotation) {
 
 
     public static IndexSetUpdateRequest fromIndexSetConfig(final IndexSetConfig indexSet) {

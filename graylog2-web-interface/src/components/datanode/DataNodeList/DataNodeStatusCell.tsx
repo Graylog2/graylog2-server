@@ -34,11 +34,20 @@ const DataNodeStatusCell = ({ dataNode }: Props) => {
   const datanodeDisabled = dataNode.data_node_status !== 'AVAILABLE';
 
   return (
-    <StatusLabel bsStyle={datanodeDisabled ? 'warning' : 'success'}
-                 title={dataNode.data_node_status}
-                 aria-label={dataNode.data_node_status}>
-      {dataNode.data_node_status}
-    </StatusLabel>
+    <>
+      <StatusLabel bsStyle={datanodeDisabled ? 'warning' : 'success'}
+                   title={dataNode.data_node_status}
+                   aria-label={dataNode.data_node_status}>
+        {dataNode.data_node_status}
+      </StatusLabel>&nbsp;
+      {dataNode.action_queue && (
+        <StatusLabel bsStyle="warning"
+                     title={dataNode.data_node_status}
+                     aria-label={dataNode.data_node_status}>
+          queued for {dataNode.action_queue}
+        </StatusLabel>
+      )}
+    </>
   );
 };
 

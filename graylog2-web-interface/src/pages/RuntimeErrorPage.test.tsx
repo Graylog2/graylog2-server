@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, fireEvent } from 'wrappedTestingLibrary';
+import { render, fireEvent, screen } from 'wrappedTestingLibrary';
 
 import mockComponent from 'helpers/mocking/MockComponent';
 
@@ -26,11 +26,11 @@ jest.mock('components/layout/Footer', () => mockComponent('Footer'));
 describe('RuntimeErrorPage', () => {
   const SimpleRuntimeErrorPage = () => <RuntimeErrorPage error={new Error('The error message')} componentStack="The component stack" />;
 
-  it('displays runtime error', () => {
-    const { getByText } = render(<SimpleRuntimeErrorPage />);
+  it('displays runtime error', async () => {
+    render(<SimpleRuntimeErrorPage />);
 
-    expect(getByText('Something went wrong.')).not.toBeNull();
-    expect(getByText('The error message')).not.toBeNull();
+    expect(await screen.findByText('Something went wrong.')).not.toBeNull();
+    expect(screen.getByText('The error message')).not.toBeNull();
   });
 
   it('displays component stack', async () => {

@@ -42,7 +42,7 @@ type Props = {
 };
 
 const UnauthorizedErrorPage = ({ error, errorDetails, title, description, location: { pathname } }: Props) => {
-  const errorMessage = error?.message || JSON.stringify(error);
+  const errorMessage = error?.message ?? JSON.stringify(error);
   const pageDetails = `The permissions check for the following request failed,\nwhile trying to access ${pathname}.`;
   const defaultDescription = (
     <>
@@ -58,7 +58,7 @@ const UnauthorizedErrorPage = ({ error, errorDetails, title, description, locati
         <dd>
           <pre className="content">
             <div className="pull-right">
-              <ClipboardButton title={<Icon name="copy" fixedWidth />}
+              <ClipboardButton title={<Icon name="content_copy" />}
                                bsSize="sm"
                                text={errorMessageString}
                                buttonTitle="Copy error details to clipboard" />

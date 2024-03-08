@@ -20,9 +20,10 @@ import { useCallback } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Formik, Form, Field } from 'formik';
 
+import Icon from 'components/common/Icon';
 import { fetchMultiPartFormData } from 'logic/rest/FetchProvider';
 import UserNotification from 'preflight/util/UserNotification';
-import { Input, Icon, Dropzone, FormikInput, Button, Space } from 'preflight/components/common';
+import { Input, Dropzone, FormikInput, Button, Space } from 'preflight/components/common';
 import { qualifyUrl } from 'util/URLUtils';
 import { QUERY_KEY as DATA_NODES_CA_QUERY_KEY } from 'preflight/hooks/useDataNodesCA';
 import UnsecureConnectionAlert from 'preflight/components/ConfigurationWizard/UnsecureConnectionAlert';
@@ -128,13 +129,13 @@ const CAUpload = () => {
                             loading={isLoading}>
                   <DropzoneInner>
                     <Dropzone.Accept>
-                      <Icon name="file" type="solid" size="2x" />
+                      <Icon name="draft" type="solid" size="2x" />
                     </Dropzone.Accept>
                     <Dropzone.Reject>
-                      <Icon name="triangle-exclamation" size="2x" />
+                      <Icon name="warning" size="2x" />
                     </Dropzone.Reject>
                     <Dropzone.Idle>
-                      <Icon name="file" type="regular" size="2x" />
+                      <Icon name="draft" type="regular" size="2x" />
                     </Dropzone.Idle>
                     <div>
                       Drag CA here or click to select file
@@ -144,11 +145,11 @@ const CAUpload = () => {
                 <Files>
                   {value?.filter((file) => !!file).map(({ name: fileName }, index) => (
                     <File key={fileName}>
-                      <Icon name="file" /> {fileName} <DeleteIcon name="xmark"
-                                                                  onClick={() => {
-                                                                    const newValue = value.filter((_ignored, idx) => idx !== index);
-                                                                    onChange({ target: { name, value: newValue } });
-                                                                  }} />
+                      <Icon name="draft" /> {fileName} <DeleteIcon name="xmark"
+                                                                   onClick={() => {
+                                                                     const newValue = value.filter((_ignored, idx) => idx !== index);
+                                                                     onChange({ target: { name, value: newValue } });
+                                                                   }} />
                     </File>
                   ))}
                 </Files>

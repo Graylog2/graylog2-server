@@ -190,7 +190,7 @@ const CollectorConfigurationModal = ({
                 }}>
         <IconTableCell>
           {selected && <Icon name="check" title={`${configName} is selected`} />}
-          {partiallySelected && <Icon type="regular" name="square-minus" title={`${configName} is selected`} />}
+          {partiallySelected && <Icon type="regular" name="radio_button_partial" title={`${configName} is selected`} />}
         </IconTableCell>
         <IconTableCell><ColorLabel color={configuration.color} size="xsmall" /></IconTableCell>
         <ConfigurationTableCell>
@@ -210,7 +210,7 @@ const CollectorConfigurationModal = ({
           </small>
         </CollectorTableCell>
         <UnselectTableCell>{(selected || partiallySelected) && !isAssignedFromTags
-          && <Icon name="times" title={`Remove ${configName}`} />}
+          && <Icon name="close" title={`Remove ${configName}`} />}
         </UnselectTableCell>
       </TableRow>
     );

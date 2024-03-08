@@ -725,6 +725,17 @@ metric_mappings:
   - metric_name: "job_scheduler_executions_successful"
     match_pattern: "org.graylog.scheduler.JobExecutionEngine.executions.successful"
 
+  - metric_name: "job_scheduler_executions_denied"
+    match_pattern: "org.graylog.scheduler.JobExecutionEngine.executions.denied"
+
+  - metric_name: "job_scheduler_executions_rescheduled"
+    match_pattern: "org.graylog.scheduler.JobExecutionEngine.executions.rescheduled"
+
+  - metric_name: "job_scheduler_executions_overdue"
+    match_pattern: "org.graylog.scheduler.JobExecutionEngine.executions.overdue.type.*"
+    wildcard_extract_labels:
+      - "job_definition_type"
+
   - metric_name: "job_scheduler_executions_time"
     match_pattern: "org.graylog.scheduler.JobExecutionEngine.executions.time"
 

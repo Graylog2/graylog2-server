@@ -49,12 +49,13 @@ const SavedSearchForm = ({ children, show, isCreateNew, saveSearch, saveAsSearch
   const trimmedTitle = (title ?? '').trim();
   const disableSaveAs = trimmedTitle === '' || (!isCreateNew && trimmedTitle === value);
   const createNewTitle = isCreateNew ? 'Create new' : 'Save as';
+  const createNewButtonTitle = isCreateNew ? 'Create new search' : 'Save as new search';
   const pluggableSaveViewControls = useSaveViewFormControls();
   const _saveSearch = useCallback(() => saveSearch(title), [saveSearch, title]);
   const _saveAsSearch = useCallback(() => saveAsSearch(title), [saveAsSearch, title]);
 
   return (
-    <Popover position="left" opened={show} withArrow>
+    <Popover position="left" opened={show} withArrow withinPortal>
       <Popover.Target>
         {children}
       </Popover.Target>
@@ -73,19 +74,21 @@ const SavedSearchForm = ({ children, show, isCreateNew, saveSearch, saveAsSearch
               && <Component key={id} disabledViewCreation={disableSaveAs} />))}
           <ButtonToolbar>
             {!isCreateNew && (
-            <Button bsStyle="primary"
-                    className={styles.button}
-                    type="submit"
-                    bsSize="sm"
-                    onClick={_saveSearch}>
-              Save
-            </Button>
+              <Button bsStyle="primary"
+                      className={styles.button}
+                      type="submit"
+                      bsSize="sm"
+                      title="Save search"
+                      onClick={_saveSearch}>
+                Save
+              </Button>
             )}
             <Button disabled={disableSaveAs}
                     bsStyle="info"
                     className={styles.button}
                     type="submit"
                     bsSize="sm"
+                    title={createNewButtonTitle}
                     onClick={_saveAsSearch}>
               {createNewTitle}
             </Button>

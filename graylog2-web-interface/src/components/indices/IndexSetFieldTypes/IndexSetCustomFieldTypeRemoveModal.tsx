@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 import { useStore } from 'stores/connect';
 import type { IndexSet, IndexSetsStoreState } from 'stores/indices/IndexSetsStore';
@@ -41,11 +41,7 @@ const StyledLabel = styled.h5`
   margin-bottom: 5px;
 `;
 
-const RedBadge = styled(Badge)(({ theme }) => css`
-  background-color: ${theme.colors.variant.light.danger};
-`);
-
-const BetaBadge = () => <RedBadge>Beta Feature</RedBadge>;
+const BetaBadge = () => <Badge bsStyle="danger">Beta Feature</Badge>;
 
 type Props = {
   show: boolean,
@@ -129,15 +125,18 @@ const IndexSetCustomFieldTypeRemoveModal = ({ show, fields, onClose, indexSetIds
   const indexSets = useStore(IndexSetsStore, indexSetsStoreMapper);
   const [removalResponse, setRemovalResponse] = useState<RemovalResponse>(null);
   const [rotated, setRotated] = useState(true);
-  const onErrorHandler = useCallback((response: RemovalResponse) => {
-    const failedFields = response.flatMap(((indexSet) => indexSet.failures.map(({ entityId }) => entityId)));
-    setSelectedEntities(failedFields);
-    setRemovalResponse(response);
+  const removeSucceededFieldsFromSelected = useCallback((response: RemovalResponse) => {
+    const succeededFields = new Set(Object.values(response).flatMap(((indexSet) => indexSet.succeeded.map(({ fieldName }) => fieldName))));
+    setSelectedEntities((cur) => cur.filter((field) => !succeededFields.has(field)));
   }, [setSelectedEntities]);
-  const onSuccessHandler = useCallback(() => {
+  const onErrorHandler = useCallback((response: RemovalResponse) => {
+    removeSucceededFieldsFromSelected(response);
+    setRemovalResponse(response);
+  }, [removeSucceededFieldsFromSelected]);
+  const onSuccessHandler = useCallback((response: RemovalResponse) => {
+    removeSucceededFieldsFromSelected(response);
     onClose();
-    setSelectedEntities([]);
-  }, [onClose, setSelectedEntities]);
+  }, [onClose, removeSucceededFieldsFromSelected]);
   const { removeCustomFieldTypeMutation } = useRemoveCustomFieldTypeMutation({ onErrorHandler, onSuccessHandler });
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();

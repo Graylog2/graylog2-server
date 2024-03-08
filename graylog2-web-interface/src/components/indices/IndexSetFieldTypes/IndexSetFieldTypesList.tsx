@@ -14,9 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useQueryParam, StringParam } from 'use-query-params';
+import pickBy from 'lodash/pickBy';
+import keyBy from 'lodash/keyBy';
 
 import useIndexSetFieldTypes from 'components/indices/IndexSetFieldTypes/hooks/useIndexSetFieldType';
 import useParams from 'routing/useParams';
@@ -36,11 +38,11 @@ import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import FieldTypeActions from 'components/indices/IndexSetFieldTypes/FieldTypeActions';
 import expandedSections from 'components/indices/IndexSetFieldTypes/originExpandedSections/expandedSections';
-import hasOverride from 'components/indices/helpers/hasOverride';
 import type { FieldTypeOrigin, IndexSetFieldType } from 'components/indices/IndexSetFieldTypes/types';
 import OriginFilterValueRenderer from 'components/indices/IndexSetFieldTypes/OriginFilterValueRenderer';
 import useCustomColumnRenderers from 'components/indices/IndexSetFieldTypes/hooks/useCustomColumnRenderers';
 import IndexSetProfile from 'components/indices/IndexSetFieldTypes/IndexSetProfile';
+import type { FieldTypePutResponse } from 'views/logic/fieldactions/ChangeFieldType/types';
 
 import BulkActions from './BulkActions';
 
@@ -56,7 +58,6 @@ const StyledIcon = styled(Icon)<{ $value: 'true' | 'false' }>(({ theme, $value }
   color: ${$value === 'true' ? theme.colors.variant.success : theme.colors.variant.danger};
   margin-right: 5px;
 `);
-
 const StyledTopRow = styled.div`
   margin-bottom: 5px;
   display: flex;
@@ -64,11 +65,11 @@ const StyledTopRow = styled.div`
   justify-content: space-between;
   align-items: center;
 `;
-const isEntitySelectable = (fieldType: IndexSetFieldType) => hasOverride(fieldType);
+const isEntitySelectable = (fieldType: IndexSetFieldType) => !fieldType.isReserved;
 const FilterValueRenderers = {
   is_reserved: (value: 'true' | 'false', title: string) => (
     <>
-      <StyledIcon name={value === 'true' ? 'circle-check' : 'circle-xmark'} $value={value} />
+      <StyledIcon name={value === 'true' ? 'check_circle' : 'cancel'} $value={value} />
       {title}
     </>
   ),
@@ -77,6 +78,7 @@ const FilterValueRenderers = {
 
 const IndexSetFieldTypesList = () => {
   const { indexSetId } = useParams();
+  const [selectedEntitiesData, setSelectedEntitiesData] = useState<Record<string, IndexSetFieldType>>({});
   const [urlQueryFilters, setUrlQueryFilters] = useUrlQueryFilters();
   const [query, setQuery] = useQueryParam('query', StringParam);
 
@@ -121,11 +123,20 @@ const IndexSetFieldTypesList = () => {
 
   const customColumnRenderers = useCustomColumnRenderers(attributes);
 
+  const onSubmitCallback = useCallback((response: FieldTypePutResponse) => {
+    const newEntityFieldName = response?.[indexSetId]?.fieldName;
+
+    if (newEntityFieldName && selectedEntitiesData[newEntityFieldName]) {
+      setSelectedEntitiesData({ ...selectedEntitiesData, [newEntityFieldName]: response[indexSetId] });
+    }
+
+    refetchFieldTypes();
+  }, [indexSetId, refetchFieldTypes, selectedEntitiesData]);
   const renderActions = useCallback((fieldType: IndexSetFieldType) => (
     <FieldTypeActions fieldType={fieldType}
                       indexSetId={indexSetId}
-                      refetchFieldTypes={refetchFieldTypes} />
-  ), [indexSetId, refetchFieldTypes]);
+                      onSubmitCallback={onSubmitCallback} />
+  ), [indexSetId, onSubmitCallback]);
 
   const onSearch = useCallback((val: string) => {
     paginationQueryParameter.resetPage();
@@ -136,6 +147,21 @@ const IndexSetFieldTypesList = () => {
     paginationQueryParameter.resetPage();
     setUrlQueryFilters(newUrlQueryFilters);
   }, [paginationQueryParameter, setUrlQueryFilters]);
+
+  const bulkSection = useMemo(() => ({
+    onChangeSelection: (selectedItemsIds: Array<string>) => {
+      setSelectedEntitiesData((cur) => {
+        const selectedItemsIdsSet = new Set(selectedItemsIds);
+        const filtratedCurrentItems = pickBy(cur, (_, fieldName) => selectedItemsIdsSet.has(fieldName));
+        const filtratedCurrentEntries = list.filter(({ fieldName }) => selectedItemsIdsSet.has(fieldName));
+        const listOfCurrentEntries = keyBy(filtratedCurrentEntries, 'id');
+
+        return ({ ...filtratedCurrentItems, ...listOfCurrentEntries });
+      });
+    },
+    actions: <BulkActions indexSetId={indexSetId} selectedEntitiesData={selectedEntitiesData} />,
+    isEntitySelectable,
+  }), [indexSetId, list, selectedEntitiesData]);
 
   if (isLoadingLayoutPreferences || isLoading) {
     return <Spinner />;
@@ -176,10 +202,7 @@ const IndexSetFieldTypesList = () => {
                                             columnDefinitions={attributes}
                                             rowActions={renderActions}
                                             expandedSectionsRenderer={expandedSections}
-                                            bulkSelection={{
-                                              actions: <BulkActions indexSetId={indexSetId} />,
-                                              isEntitySelectable,
-                                            }} />
+                                            bulkSelection={bulkSection} />
       )}
     </PaginatedList>
   );

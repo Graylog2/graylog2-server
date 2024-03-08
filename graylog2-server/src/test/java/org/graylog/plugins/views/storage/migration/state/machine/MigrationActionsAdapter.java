@@ -19,8 +19,39 @@ package org.graylog.plugins.views.storage.migration.state.machine;
 import org.graylog.plugins.views.storage.migration.state.actions.MigrationActions;
 
 public class MigrationActionsAdapter implements MigrationActions {
+
+    MigrationStateMachineContext context;
+
+    public MigrationActionsAdapter() {
+        this.context = new MigrationStateMachineContext();
+    }
+
     @Override
-    public void resetMigration() {
+    public boolean dataNodeStartupFinished() {
+        return false;
+    }
+
+    public void setStateMachineContext(MigrationStateMachineContext context) {
+        this.context = context;
+    }
+
+    @Override
+    public MigrationStateMachineContext getStateMachineContext() {
+        return context;
+    }
+
+    @Override
+    public void startRemoteReindex() {
+
+    }
+
+    @Override
+    public void requestMigrationStatus() {
+
+    }
+
+    @Override
+    public void calculateTrafficEstimate() {
 
     }
 
@@ -50,13 +81,8 @@ public class MigrationActionsAdapter implements MigrationActions {
     }
 
     @Override
-    public boolean reindexingFinished() {
+    public boolean isRemoteReindexingFinished() {
         return false;
-    }
-
-    @Override
-    public void reindexOldData() {
-
     }
 
     @Override
@@ -82,5 +108,23 @@ public class MigrationActionsAdapter implements MigrationActions {
     @Override
     public boolean caAndRemovalPolicyExist() {
         return false;
+    }
+
+    @Override
+    public void provisionDataNodes() {
+    }
+
+    @Override
+    public void provisionAndStartDataNodes() {
+    }
+
+    @Override
+    public boolean provisioningFinished() {
+        return false;
+    }
+
+    @Override
+    public void startDataNodes() {
+
     }
 }

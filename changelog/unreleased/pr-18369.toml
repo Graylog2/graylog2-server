@@ -1,0 +1,4 @@
+type = "a"
+message = "Propagate path.repo configuration in datanode. Needed to support fs snapshot repositories"
+
+pulls = ["18369"]

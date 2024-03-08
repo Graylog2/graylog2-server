@@ -17,7 +17,6 @@
 import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
-import suppressConsole from 'helpers/suppressConsole';
 import mockComponent from 'helpers/mocking/MockComponent';
 import FetchError from 'logic/errors/FetchError';
 
@@ -29,11 +28,9 @@ describe('StreamPermissionErrorPage', () => {
   it('displays fetch error', async () => {
     const response = { status: 403, body: { message: 'The request error message', streams: ['stream-1-id', 'stream-2-id'], type: 'MissingStreamPermission' } };
 
-    await suppressConsole(() => {
-      render(<StreamPermissionErrorPage error={new FetchError('The request error message', response.status, response)} missingStreamIds={['stream-1-id', 'stream-2-id']} />);
-    });
+    render(<StreamPermissionErrorPage error={new FetchError('The request error message', response.status, response)} missingStreamIds={['stream-1-id', 'stream-2-id']} />);
 
-    expect(screen.getByText('Missing Stream Permissions')).not.toBeNull();
-    expect(screen.getByText('You need permissions for streams with the id: stream-1-id, stream-2-id.')).not.toBeNull();
+    await screen.findByText('Missing Stream Permissions');
+    await screen.findByText('You need permissions for streams with the id: stream-1-id, stream-2-id.');
   });
 });

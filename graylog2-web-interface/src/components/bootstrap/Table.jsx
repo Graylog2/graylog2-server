@@ -94,7 +94,7 @@ const tableCss = css(({ theme }) => css`
     }
 
     > tbody > tr {
-      background-color: ${theme.colors.table.background};
+      background-color: ${theme.colors.global.contentBackground};
       transition: background-color 150ms ease-in-out;
     }
 

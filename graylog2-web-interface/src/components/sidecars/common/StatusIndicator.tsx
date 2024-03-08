@@ -44,19 +44,19 @@ const StatusIndicator = ({ message: messageProp, status, lastSeen, id }: Props) 
   switch (status) {
     case SidecarStatusEnum.RUNNING:
       className = 'text-success';
-      icon = 'play';
+      icon = 'play_arrow';
       break;
     case SidecarStatusEnum.FAILING:
       className = 'text-danger';
-      icon = 'exclamation-triangle';
+      icon = 'warning';
       break;
     case SidecarStatusEnum.STOPPED:
       className = 'text-danger';
-      icon = 'stop';
+      icon = 'error';
       break;
     default:
       className = 'text-info';
-      icon = 'question-circle';
+      icon = 'help';
       message += ` (${relativeDifference(lastSeenDateTime)})`;
   }
 
@@ -64,7 +64,7 @@ const StatusIndicator = ({ message: messageProp, status, lastSeen, id }: Props) 
     return (
       <OverlayTrigger placement="top" overlay={message} rootClose trigger="hover">
         <span className={`${className} ${style.indicator}`}>
-          <Icon name={icon} fixedWidth /> {text}
+          <Icon name={icon} /> {text}
         </span>
       </OverlayTrigger>
     );
@@ -72,7 +72,7 @@ const StatusIndicator = ({ message: messageProp, status, lastSeen, id }: Props) 
 
   return (
     <span className={`${className} ${style.indicator}`}>
-      <Icon name={icon} fixedWidth /> {text}
+      <Icon name={icon} /> {text}
     </span>
   );
 };

@@ -34,6 +34,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Map;
 import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.stream.Collectors;
@@ -60,10 +61,11 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
                                                                          final List<String> enabledFeatureFlags,
                                                                          final boolean preImportLicense,
                                                                          final boolean withMailServerEnabled,
+                                                                         final boolean webhookServerEnabled,
                                                                          Map<String, String> configParams) {
 
         LOG.debug("Creating Backend services {} {} {} flags <{}>", version, mongodbVersion, withMailServerEnabled ? "mail" : "", enabledFeatureFlags);
-        final Services services = servicesProvider.getServices(version, mongodbVersion, withMailServerEnabled, enabledFeatureFlags);
+        final Services services = servicesProvider.getServices(version, mongodbVersion, withMailServerEnabled, webhookServerEnabled, enabledFeatureFlags);
         LOG.debug("Done creating backend services");
 
         return new ContainerizedGraylogBackend().create(services, extraPorts, mongoDBFixtures, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, preImportLicense, configParams);
@@ -106,7 +108,11 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
     }
 
     private void createLicenses(final MongoDBInstance mongoDBInstance, final String... licenseStrs) {
-        final List<String> licenses = Arrays.stream(licenseStrs).map(System::getenv).filter(StringUtils::isNotBlank).collect(Collectors.toList());
+        final List<String> licenses = Arrays.stream(licenseStrs)
+                .map(System::getenv)
+                .filter(StringUtils::isNotBlank)
+                .map(String::trim)
+                .collect(Collectors.toList());
         if (!licenses.isEmpty()) {
             ServiceLoader<TestLicenseImporter> loader = ServiceLoader.load(TestLicenseImporter.class);
             loader.forEach(importer -> importer.importLicenses(mongoDBInstance, licenses));
@@ -150,6 +156,11 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
 
     public Optional<MailServerInstance> getEmailServerInstance() {
         return Optional.ofNullable(services.getMailServerContainer());
+    }
+
+    @Override
+    public Optional<WebhookServerInstance> getWebhookServerInstance() {
+        return Optional.ofNullable(services.getWebhookServerContainer());
     }
 
     @Override
