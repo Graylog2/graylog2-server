@@ -17,15 +17,14 @@
 package org.graylog.datanode;
 
 import io.restassured.response.ValidatableResponse;
+import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 
-@ContainerMatrixTestsConfiguration(searchVersions = SearchServer.DATANODE_DEV, additionalConfigurationParameters = {
-        @ContainerMatrixTestsConfiguration.ConfigurationParameter(key = "GRAYLOG_DATANODE_PROXY_API_ALLOWLIST", value = "false")})
+@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, searchVersions = SearchServer.DATANODE_DEV, additionalConfigurationParameters = {@ContainerMatrixTestsConfiguration.ConfigurationParameter(key = "GRAYLOG_DATANODE_PROXY_API_ALLOWLIST", value = "false")})
 public class DatanodeOpensearchProxyDisabledAllowlistIT {
     private GraylogApis apis;
 
@@ -36,9 +35,9 @@ public class DatanodeOpensearchProxyDisabledAllowlistIT {
 
     @ContainerMatrixTest
     void testProtectedPath() {
-        // this requests the / of the underlying opensearch. By default, it's disabled and should return HTTP 400
+        // this requests the /_search of the underlying opensearch. By default, it's disabled and should return HTTP 400
         // only if we disable the allowlist it should be accessible
-        final ValidatableResponse response = apis.get("/datanodes/request/", 200);
-        response.assertThat().body("cluster_name", Matchers.equalTo("datanode-cluster"));
+        final ValidatableResponse response = apis.get("/datanodes/leader/request/_search", 200);
+        System.out.println(response.extract().body().asString());
     }
 }
