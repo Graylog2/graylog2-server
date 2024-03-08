@@ -16,10 +16,12 @@
  */
 package org.graylog2.plugin;
 
+import jakarta.inject.Singleton;
 import org.joda.time.DateTime;
 
 import java.util.Map;
 
+@Singleton
 public class DefaultMessageFactory implements MessageFactory {
 
     @Override
