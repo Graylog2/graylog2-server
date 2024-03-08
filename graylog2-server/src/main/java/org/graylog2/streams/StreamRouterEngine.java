@@ -331,9 +331,9 @@ public class StreamRouterEngine {
             } catch (UncheckedTimeoutException e) {
                 streamFaultManager.registerFailure(stream);
             } catch (Exception e) {
-                LOG.warn("Unexpected error during stream matching", e);
                 streamMetrics.markExceptionMeter(streamId);
                 final String error = f("Error matching stream rule <%s> (%s)", streamRuleId, rule.getDescription());
+                LOG.warn(error, e);
                 message.addProcessingError(new Message.ProcessingError(
                         ProcessingFailureCause.StreamMatchException, error, ExceptionUtils.getRootCauseMessage(e)));
             }
