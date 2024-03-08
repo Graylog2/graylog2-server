@@ -62,14 +62,14 @@ import static org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.Qu
 public class MoreSearchAdapterES7 implements MoreSearchAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(MoreSearchAdapterES7.class);
     public static final IndicesOptions INDICES_OPTIONS = IndicesOptions.LENIENT_EXPAND_OPEN;
-    private final ResultMessageFactory resultMessageFactory;
+    private final ES7ResultMessageFactory resultMessageFactory;
     private final ElasticsearchClient client;
     private final Boolean allowLeadingWildcard;
     private final SortOrderMapper sortOrderMapper;
     private final MultiChunkResultRetriever multiChunkResultRetriever;
 
     @Inject
-    public MoreSearchAdapterES7(ResultMessageFactory resultMessageFactory,
+    public MoreSearchAdapterES7(ES7ResultMessageFactory resultMessageFactory,
                                 ElasticsearchClient client,
                                 @Named("allow_leading_wildcard_searches") Boolean allowLeadingWildcard,
                                 SortOrderMapper sortOrderMapper,

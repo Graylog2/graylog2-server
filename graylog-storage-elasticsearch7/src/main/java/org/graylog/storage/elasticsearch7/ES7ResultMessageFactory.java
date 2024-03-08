@@ -14,12 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch2;
+package org.graylog.storage.elasticsearch7;
 
-import com.google.inject.Inject;
-import org.graylog.shaded.opensearch2.org.opensearch.core.common.text.Text;
-import org.graylog.shaded.opensearch2.org.opensearch.search.SearchHit;
-import org.graylog.shaded.opensearch2.org.opensearch.search.fetch.subphase.highlight.HighlightField;
+import jakarta.inject.Inject;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.text.Text;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.SearchHit;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.graylog2.indexer.results.ResultMessage;
 
 import java.util.Arrays;
@@ -27,19 +27,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class ResultMessageFactory {
+public class ES7ResultMessageFactory {
 
     private final ResultMessage.Factory messageFactory;
 
     @Inject
-    public ResultMessageFactory(ResultMessage.Factory messageFactory) {
+    public ES7ResultMessageFactory(ResultMessage.Factory messageFactory) {
         this.messageFactory = messageFactory;
     }
 
     public ResultMessage fromSearchHit(SearchHit hit) {
         final Map<String, List<String>> highlights = hit.getHighlightFields().entrySet()
                 .stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, ResultMessageFactory::highlightsFromFragments));
+                .collect(Collectors.toMap(Map.Entry::getKey, ES7ResultMessageFactory::highlightsFromFragments));
         return messageFactory.parseFromSource(hit.getId(), hit.getIndex(), hit.getSourceAsMap(), highlights);
     }
 
