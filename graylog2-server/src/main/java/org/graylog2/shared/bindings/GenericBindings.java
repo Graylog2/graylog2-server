@@ -34,6 +34,8 @@ import org.graylog.failure.FailureHandlingService;
 import org.graylog2.indexer.EventIndexTemplateProvider;
 import org.graylog2.indexer.IndexTemplateProvider;
 import org.graylog2.indexer.MessageIndexTemplateProvider;
+import org.graylog2.indexer.results.DefaultResultMessageFactory;
+import org.graylog2.indexer.results.ResultMessageFactory;
 import org.graylog2.plugin.DefaultMessageFactory;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.LocalMetricRegistry;
@@ -70,6 +72,7 @@ public class GenericBindings extends Graylog2Module {
     @Override
     protected void configure() {
         bind(MessageFactory.class).to(DefaultMessageFactory.class).asEagerSingleton();
+        bind(ResultMessageFactory.class).to(DefaultResultMessageFactory.class).asEagerSingleton();
 
         bind(LocalMetricRegistry.class).in(Scopes.NO_SCOPE); // must not be a singleton!
 
