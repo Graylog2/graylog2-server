@@ -18,6 +18,8 @@ package org.graylog.integrations.aws.codecs;
 
 import org.graylog.integrations.aws.cloudwatch.KinesisLogEntry;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
@@ -29,12 +31,13 @@ import org.junit.Test;
 public class CloudWatchFlowLogCodecTest {
 
     private KinesisCloudWatchFlowLogCodec codec;
+    private final MessageFactory messageFactory = new TestMessageFactory();
 
     @Before
     public void setUp() {
 
         this.codec = new KinesisCloudWatchFlowLogCodec(Configuration.EMPTY_CONFIGURATION,
-                                                       new ObjectMapperProvider().get());
+                new ObjectMapperProvider().get(), messageFactory);
     }
 
     /**

@@ -18,6 +18,8 @@ package org.graylog2.inputs.codecs;
 
 import com.jayway.jsonpath.PathNotFoundException;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.journal.RawMessage;
@@ -35,6 +37,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class EncodingTest {
     private final ObjectMapperProvider objectMapperProvider = new ObjectMapperProvider();
+    private final MessageFactory messageFactory = new TestMessageFactory();
     final String MSG_FIELD = "short_message";
     final String MESSAGE = "äöüß";
     final String jsonString = "{"
@@ -49,7 +52,7 @@ class EncodingTest {
 
     @Test
     void GelfCodecTestUTF8() {
-        GelfCodec gelfCodecUTF8 = new GelfCodec(configUTF8, Mockito.mock(GelfChunkAggregator.class));
+        GelfCodec gelfCodecUTF8 = new GelfCodec(configUTF8, Mockito.mock(GelfChunkAggregator.class), messageFactory);
 
         final Message message = gelfCodecUTF8.decode(rawUTF8);
         assertThat(message.getMessage()).isEqualTo(MESSAGE);
@@ -59,7 +62,7 @@ class EncodingTest {
 
     @Test
     void GelfCodecTestUTF16() {
-        GelfCodec gelfCodecUTF16 = new GelfCodec(configUTF16, Mockito.mock(GelfChunkAggregator.class));
+        GelfCodec gelfCodecUTF16 = new GelfCodec(configUTF16, Mockito.mock(GelfChunkAggregator.class), messageFactory);
 
         final Message message = gelfCodecUTF16.decode(rawUTF16);
         assertThat(message.getMessage()).isEqualTo(MESSAGE);
@@ -72,7 +75,7 @@ class EncodingTest {
         Map<String, Object> jsonPathCollectionUTF8 = new HashMap<>();
         jsonPathCollectionUTF8.put(Codec.Config.CK_CHARSET_NAME, StandardCharsets.UTF_8.name());
         jsonPathCollectionUTF8.put(JsonPathCodec.CK_PATH, MSG_FIELD);
-        JsonPathCodec jsonPathCodecUTF8 = new JsonPathCodec(new Configuration(jsonPathCollectionUTF8),objectMapperProvider.get());
+        JsonPathCodec jsonPathCodecUTF8 = new JsonPathCodec(new Configuration(jsonPathCollectionUTF8), objectMapperProvider.get(), messageFactory);
 
         final Message message = jsonPathCodecUTF8.decode(rawUTF8);
         assertThat(message.getMessage()).contains(MESSAGE);
@@ -85,7 +88,7 @@ class EncodingTest {
         Map<String, Object> jsonPathCollectionUTF16 = new HashMap<>();
         jsonPathCollectionUTF16.put(Codec.Config.CK_CHARSET_NAME, StandardCharsets.UTF_16.name());
         jsonPathCollectionUTF16.put(JsonPathCodec.CK_PATH, MSG_FIELD);
-        JsonPathCodec jsonPathCodecUTF16 = new JsonPathCodec(new Configuration(jsonPathCollectionUTF16),objectMapperProvider.get());
+        JsonPathCodec jsonPathCodecUTF16 = new JsonPathCodec(new Configuration(jsonPathCollectionUTF16), objectMapperProvider.get(), messageFactory);
 
         final Message message = jsonPathCodecUTF16.decode(rawUTF16);
         assertThat(message.getMessage()).contains(MESSAGE);
