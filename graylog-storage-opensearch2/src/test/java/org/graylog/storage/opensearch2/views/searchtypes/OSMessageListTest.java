@@ -48,7 +48,8 @@ public class OSMessageListTest {
 
     @Test
     public void includesCustomNameInResultIfPresent() {
-        final OSMessageList esMessageList = new OSMessageList();
+        final OSMessageList esMessageList = new OSMessageList(new LegacyDecoratorProcessor.Fake(),
+                new TestResultMessageFactory(), false);
         final MessageList messageList = someMessageList().toBuilder().name("customResult").build();
 
         final org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse result =
