@@ -49,6 +49,7 @@ import java.util.stream.Collectors;
 public abstract class EventDefinitionEntity extends ScopedContentPackEntity implements NativeEntityConverter<EventDefinitionDto> {
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_DESCRIPTION = "description";
+    public static final String FIELD_REMEDIATION_STEPS = "remediation_steps";
     private static final String FIELD_PRIORITY = "priority";
     private static final String FIELD_ALERT = "alert";
     private static final String FIELD_CONFIG = "config";
@@ -66,6 +67,9 @@ public abstract class EventDefinitionEntity extends ScopedContentPackEntity impl
 
     @JsonProperty(FIELD_DESCRIPTION)
     public abstract ValueReference description();
+
+    @JsonProperty(FIELD_REMEDIATION_STEPS)
+    public abstract ValueReference remediationSteps();
 
     @Nullable
     @JsonProperty(UPDATED_AT)
@@ -121,6 +125,9 @@ public abstract class EventDefinitionEntity extends ScopedContentPackEntity impl
         @JsonProperty(FIELD_DESCRIPTION)
         public abstract Builder description(ValueReference description);
 
+        @JsonProperty(FIELD_REMEDIATION_STEPS)
+        public abstract Builder remediationSteps(ValueReference remediationSteps);
+
         @JsonProperty(UPDATED_AT)
         public abstract Builder updatedAt(DateTime updatedAt);
 
@@ -158,10 +165,10 @@ public abstract class EventDefinitionEntity extends ScopedContentPackEntity impl
     }
 
     @Override
-    public EventDefinitionDto toNativeEntity(Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> natvieEntities) {
+    public EventDefinitionDto toNativeEntity(Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> nativeEntities) {
         final ImmutableList<EventNotificationHandler.Config> notificationList = ImmutableList.copyOf(
                 notifications().stream()
-                        .map(notification -> notification.toNativeEntity(parameters, natvieEntities))
+                        .map(notification -> notification.toNativeEntity(parameters, nativeEntities))
                         .collect(Collectors.toList())
         );
         return EventDefinitionDto.builder()
@@ -169,9 +176,10 @@ public abstract class EventDefinitionEntity extends ScopedContentPackEntity impl
                 .title(title().asString(parameters))
                 .updatedAt(updatedAt())
                 .description(description().asString(parameters))
+                .remediationSteps(remediationSteps() != null ? remediationSteps().asString(parameters): null)
                 .priority(priority().asInteger(parameters))
                 .alert(alert().asBoolean(parameters))
-                .config(config().toNativeEntity(parameters, natvieEntities))
+                .config(config().toNativeEntity(parameters, nativeEntities))
                 .fieldSpec(fieldSpec())
                 .keySpec(keySpec())
                 .notificationSettings(notificationSettings())

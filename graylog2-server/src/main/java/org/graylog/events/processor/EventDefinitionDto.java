@@ -61,6 +61,7 @@ import java.util.stream.Collectors;
 public abstract class EventDefinitionDto extends ScopedEntity implements EventDefinition, ContentPackable<EventDefinitionEntity> {
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_DESCRIPTION = "description";
+    public static final String FIELD_REMEDIATION_STEPS = "remediation_steps";
     public static final String FIELD_NOTIFICATIONS = "notifications";
     public static final String FIELD_STATE = "state";
     public static final String FIELD_UPDATED_AT = "updated_at";
@@ -88,6 +89,11 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
     @Override
     @JsonProperty(FIELD_DESCRIPTION)
     public abstract String description();
+
+    @Override
+    @Nullable
+    @JsonProperty(FIELD_REMEDIATION_STEPS)
+    public abstract String remediationSteps();
 
     @Override
     @Nullable
@@ -201,6 +207,9 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
         @JsonProperty(FIELD_DESCRIPTION)
         public abstract Builder description(String description);
 
+        @JsonProperty(FIELD_REMEDIATION_STEPS)
+        public abstract Builder remediationSteps(String remediationSteps);
+
         @JsonProperty(FIELD_UPDATED_AT)
         public abstract Builder updatedAt(DateTime updatedAt);
 
@@ -280,6 +289,7 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
                 .matchedAt(matchedAt())
                 .title(ValueReference.of(title()))
                 .description(ValueReference.of(description()))
+                .remediationSteps(ValueReference.ofNullable(remediationSteps()))
                 .priority(ValueReference.of(priority()))
                 .alert(ValueReference.of(alert()))
                 .config(eventProcessorConfigEntity)

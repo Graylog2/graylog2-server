@@ -41,6 +41,10 @@ public interface EventDefinition {
 
     String description();
 
+    default String remediationSteps() {
+        return "";
+    };
+
     @Nullable
     DateTime updatedAt();
 
