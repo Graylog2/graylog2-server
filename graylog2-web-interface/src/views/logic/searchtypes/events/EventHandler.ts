@@ -52,6 +52,8 @@ type TimeFormatter = (timestamp: string) => string;
 
 export default {
   convert(events: Array<Event>) {
+    console.log(events);
+
     return events;
   },
 

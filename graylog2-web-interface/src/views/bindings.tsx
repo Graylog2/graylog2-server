@@ -103,6 +103,11 @@ import ChangeFieldType, {
   isChangeFieldTypeEnabled,
   isChangeFieldTypeHidden,
 } from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldType';
+import AddEventsWidgetActionHandler, { CreateEventsWidget } from 'views/logic/widgets/events/AddEventsWidgetActionHandler';
+import useFeature from 'hooks/useFeature';
+import EventsListConfigGenerator from 'views/logic/searchtypes/events/EventsListConfigGenerator';
+import EventsWidgetEdit from 'views/components/widgets/events/EventsWidgetEdit';
+import EventsWidget from 'views/logic/widgets/events/EventsWidget';
 
 import type { ActionHandlerArguments } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
@@ -114,9 +119,11 @@ import ValueParameter from './logic/parameters/ValueParameter';
 import MessageConfigGenerator from './logic/searchtypes/messages/MessageConfigGenerator';
 import UnknownWidget from './components/widgets/UnknownWidget';
 import NewSearchRedirectPage from './pages/NewSearchRedirectPage';
+import EventsVisualization from './components/widgets/events/EventsVisualization';
 
 Widget.registerSubtype(AggregationWidget.type, AggregationWidget);
 Widget.registerSubtype(MessagesWidget.type, MessagesWidget);
+Widget.registerSubtype(EventsWidget.type, EventsWidget);
 VisualizationConfig.registerSubtype(WorldMapVisualization.type, WorldMapVisualizationConfig);
 VisualizationConfig.registerSubtype(BarVisualization.type, BarVisualizationConfig);
 VisualizationConfig.registerSubtype(NumberVisualization.type, NumberVisualizationConfig);
@@ -202,6 +209,19 @@ const exports: PluginExports = {
       },
     },
     {
+      type: 'EVENTS',
+      displayName: 'Events',
+      defaultHeight: 4,
+      defaultWidth: 6,
+      hasEditSubmitButton: true,
+      visualizationComponent: EventsVisualization,
+      editComponent: EventsWidgetEdit,
+      searchTypes: EventsListConfigGenerator,
+      titleGenerator: () => 'Events Overview',
+      needsControlledHeight: () => false,
+      searchResultTransformer: (data: Array<unknown>) => data?.[0],
+    },
+    {
       type: 'default',
       visualizationComponent: UnknownWidget,
       needsControlledHeight: () => true,
@@ -226,7 +246,10 @@ const exports: PluginExports = {
     {
       type: 'events',
       handler: EventHandler,
-      defaults: {},
+      defaults: {
+        page: 1,
+        per_page: 10,
+      },
     },
   ],
   fieldActions: [
@@ -370,6 +393,10 @@ const exports: PluginExports = {
     title: 'Custom Aggregation',
     func: CreateCustomAggregation,
     icon: () => <Icon name="monitoring" />,
+  }, {
+    title: 'Events Overview',
+    func: CreateEventsWidget,
+    icon: () => <Icon name="extension" />,
   }],
   creators: [
     {
@@ -386,6 +413,16 @@ const exports: PluginExports = {
       type: 'generic',
       title: 'Aggregation',
       func: AddCustomAggregation,
+    },
+    {
+      type: 'events' as const,
+      title: 'Events Overview',
+      func: AddEventsWidgetActionHandler,
+      useCondition: () => {
+        const featureIsEnabled = useFeature('security_search_widgets');
+
+        return featureIsEnabled;
+      },
     },
   ],
   'views.completers': [

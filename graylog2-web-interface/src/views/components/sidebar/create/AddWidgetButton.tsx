@@ -53,7 +53,7 @@ const CreateButton = styled(Button)`
 export type CreatorProps = {
   view: View,
 };
-type CreatorType = 'preset' | 'generic' | 'investigations';
+type CreatorType = 'preset' | 'generic' | 'investigations' | 'events';
 type CreatorFunction = () => (dispatch: AppDispatch, getState: GetState) => unknown;
 
 type FunctionalCreator = {
@@ -183,7 +183,8 @@ const AddWidgetButton = ({ onClick }: Props) => {
   const creators = usePluginEntities('creators');
   const presets = createGroup(creators, 'preset');
   const generic = createGroup(creators, 'generic');
-  const investigations = createGroup(creators, 'investigations');
+  const investigationsCreator = createGroup(creators, 'investigations');
+  const eventsCreator = createGroup(creators, 'events');
   const components: Array<React.ReactNode> = Object.values(overflowingComponents);
 
   return (
@@ -203,11 +204,21 @@ const AddWidgetButton = ({ onClick }: Props) => {
                               onClick={onClick}
                               setOverflowingComponents={setOverflowingComponents} />
       </Group>
-      {!!investigations?.length && (
+      {!!investigationsCreator?.length && (
         <IfFeatureEnabled name="security_search_widgets">
           <Group>
             <SectionSubheadline>Investigations</SectionSubheadline>
-            <GroupCreateMenuItems creators={investigations}
+            <GroupCreateMenuItems creators={investigationsCreator}
+                                  onClick={onClick}
+                                  setOverflowingComponents={setOverflowingComponents} />
+          </Group>
+        </IfFeatureEnabled>
+      )}
+      {!!eventsCreator?.length && (
+        <IfFeatureEnabled name="security_search_widgets">
+          <Group>
+            <SectionSubheadline>Events</SectionSubheadline>
+            <GroupCreateMenuItems creators={eventsCreator}
                                   onClick={onClick}
                                   setOverflowingComponents={setOverflowingComponents} />
           </Group>
