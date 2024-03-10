@@ -60,7 +60,7 @@ public class PivotAggregationSearchIT {
 
         postMessages();
 
-        final List<WebhookRequest> requests = webhookTester.waitForRequests(request -> true);
+        final List<WebhookRequest> requests = webhookTester.waitForRequests((req) -> req.bodyAsJsonPath().read("event_definition_id").equals(eventDefinitionID));
 
         Assertions.assertThat(requests)
                 .isNotEmpty()
