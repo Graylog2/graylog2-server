@@ -22,7 +22,7 @@ jobs:
         run: npx browserslist@latest --update-db
       - name: Create/Update Pull Request
         id: pr-create
-        uses: Graylog2/create-pull-request@b3a2c5d525a1eb75e75c781e45a1bf3bfc23bdc6
+        uses: peter-evans/create-pull-request@b3a2c5d525a1eb75e75c781e45a1bf3bfc23bdc6
         with:
           title: Updating browserslist DB.
           body: This PR was created by a job that is running periodically to update the browserslist db automatically. See [here](https://github.com/browserslist/browserslist#browsers-data-updating) for details.
