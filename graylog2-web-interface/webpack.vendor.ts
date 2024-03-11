@@ -106,14 +106,10 @@ if (TARGET === 'start') {
       historyApiFallback: {
         disableDotRule: true,
       },
-      proxy: {
-        '/api': {
-          target: apiUrl,
-        },
-        '/config.js': {
-          target: apiUrl,
-        },
-      },
+      proxy: [{
+        context: ['/api', '/config.js'],
+        target: apiUrl,
+      }],
     },
   });
 }

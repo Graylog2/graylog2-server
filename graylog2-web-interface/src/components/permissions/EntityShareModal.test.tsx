@@ -65,20 +65,20 @@ describe('EntityShareModal', () => {
                       {...props} />
   );
 
-  const getModalSubmitButton = () => screen.getByRole('button', { name: /update sharing/i, hidden: true });
+  const getModalSubmitButton = () => screen.queryByRole('button', { name: /update sharing/i, hidden: true });
 
-  it('fetches entity share state initially', () => {
+  it('fetches entity share state initially', async () => {
     render(<SimpleEntityShareModal />);
 
-    expect(EntityShareActions.prepare).toHaveBeenCalledTimes(1);
-
-    expect(EntityShareActions.prepare).toHaveBeenCalledWith('dashboard', 'The title', mockEntityShareState.entity);
+    await waitFor(() => {
+      expect(EntityShareActions.prepare).toHaveBeenCalledWith('dashboard', 'The title', mockEntityShareState.entity);
+    });
   });
 
   it('updates entity share state on submit', async () => {
     render(<SimpleEntityShareModal />);
 
-    fireEvent.click(getModalSubmitButton());
+    fireEvent.click(await screen.findByRole('button', { name: /update sharing/i, hidden: true }));
 
     await waitFor(() => expect(EntityShareActions.update).toHaveBeenCalledTimes(1));
 
@@ -91,7 +91,7 @@ describe('EntityShareModal', () => {
     const onClose = jest.fn();
     render(<SimpleEntityShareModal onClose={onClose} />);
 
-    const cancelButton = screen.getByRole('button', {
+    const cancelButton = await screen.findByRole('button', {
       name: /cancel/i,
       hidden: true,
     });
@@ -104,35 +104,38 @@ describe('EntityShareModal', () => {
   });
 
   describe('displays', () => {
-    it('loading spinner while loading entity share state', () => {
+    it('loading spinner while loading entity share state', async () => {
       asMock(EntityShareStore.getInitialState).mockReturnValue(mockEmptyStore);
       render(<SimpleEntityShareModal />);
 
       act(() => { jest.advanceTimersByTime(200); });
 
-      expect(screen.getByText('Loading...')).not.toBeNull();
+      expect(await screen.findByText('Loading...')).not.toBeNull();
     });
 
-    it('displays an error if validation failed and disables submit', () => {
+    it('displays an error if validation failed and disables submit', async () => {
       asMock(EntityShareStore.getInitialState).mockReturnValue(mockFailedStore);
       render(<SimpleEntityShareModal />);
 
-      expect(screen.getByText('Removing the following owners will leave the entity ownerless:')).not.toBeNull();
-      expect(getModalSubmitButton()).toBeDisabled();
+      await screen.findByText('Removing the following owners will leave the entity ownerless:');
+
+      await waitFor(() => {
+        expect(getModalSubmitButton()).toBeDisabled();
+      });
     });
 
-    it('necessary information', () => {
+    it('necessary information', async () => {
       render(<SimpleEntityShareModal />);
 
       // provided description
-      expect(screen.getByText('The description')).not.toBeNull();
+      expect(await screen.findByText('The description')).not.toBeNull();
       // Provided title
-      expect(screen.getByText('The title')).not.toBeNull();
+      expect(await screen.findByText('The title')).not.toBeNull();
       // sharable urls
-      expect(screen.getByDisplayValue('http://localhost/dashboards/dashboard-id')).not.toBeNull();
+      expect(await screen.findByDisplayValue('http://localhost/dashboards/dashboard-id')).not.toBeNull();
       // missing dependencies warning
-      expect(screen.getByText('There are missing dependencies for the current set of collaborators')).not.toBeNull();
-      expect(screen.getByText(/needs access to/)).not.toBeNull();
+      expect(await screen.findByText('There are missing dependencies for the current set of collaborators')).not.toBeNull();
+      expect(await screen.findByText(/needs access to/)).not.toBeNull();
     });
   });
 
@@ -153,28 +156,34 @@ describe('EntityShareModal', () => {
         render(<SimpleEntityShareModal />);
 
         // Select a grantee
-        const granteesSelect = screen.getByLabelText('Search for users and teams');
+        const granteesSelect = await screen.findByLabelText('Search for users and teams');
 
-        await selectEvent.openMenu(granteesSelect);
+        await act(async () => {
+          await selectEvent.openMenu(granteesSelect);
+        });
 
-        await selectEvent.select(granteesSelect, newGrantee.title);
+        await act(async () => {
+          await selectEvent.select(granteesSelect, newGrantee.title);
+        });
 
         // Select a capability
-        const capabilitySelect = screen.getByLabelText('Select a capability');
+        const capabilitySelect = await screen.findByLabelText('Select a capability');
 
-        await selectEvent.openMenu(capabilitySelect);
+        await act(async () => {
+          await selectEvent.openMenu(capabilitySelect);
+        });
 
         await act(async () => { await selectEvent.select(capabilitySelect, capability.title); });
 
         // Submit form
-        const submitButton = screen.getByText('Add Collaborator');
+        const submitButton = await screen.findByText('Add Collaborator');
 
         fireEvent.click(submitButton);
 
-        await waitFor(() => expect(EntityShareActions.prepare).toHaveBeenCalledTimes(1));
-
-        expect(EntityShareActions.prepare).toHaveBeenCalledWith('dashboard', 'The title', mockEntityShareState.entity, {
-          selected_grantee_capabilities: mockEntityShareState.selectedGranteeCapabilities.merge({ [newGrantee.id]: capability.id }),
+        await waitFor(() => {
+          expect(EntityShareActions.prepare).toHaveBeenCalledWith('dashboard', 'The title', mockEntityShareState.entity, {
+            selected_grantee_capabilities: mockEntityShareState.selectedGranteeCapabilities.merge({ [newGrantee.id]: capability.id }),
+          });
         });
       };
 
@@ -197,36 +206,42 @@ describe('EntityShareModal', () => {
 
       await selectEvent.select(granteesSelect, john.title);
 
-      fireEvent.click(getModalSubmitButton());
+      fireEvent.click(await screen.findByRole('button', { name: /update sharing/i, hidden: true }));
 
-      await waitFor(() => expect(window.confirm).toHaveBeenCalledTimes(1));
-
-      expect(window.confirm).toHaveBeenCalledWith(`"${john.title}" got selected but was never added as a collaborator. Do you want to continue anyway?`);
+      await waitFor(() => {
+        expect(window.confirm).toHaveBeenCalledWith(`"${john.title}" got selected but was never added as a collaborator. Do you want to continue anyway?`);
+      });
     });
   });
 
   describe('selected grantees list', () => {
-    it('lists grantees', () => {
+    it('lists grantees', async () => {
       const ownerTitle = jane.title;
-      const { getByText } = render(<SimpleEntityShareModal />);
+      render(<SimpleEntityShareModal />);
 
-      expect(getByText(ownerTitle)).not.toBeNull();
+      await screen.findByText(ownerTitle);
     });
 
     it('allows updating the capability of a grantee', async () => {
       const ownerTitle = jane.title;
-      const { getByLabelText } = render(<SimpleEntityShareModal />);
+      render(<SimpleEntityShareModal />);
 
-      const capabilitySelect = getByLabelText(`Change the capability for ${ownerTitle}`);
+      const capabilitySelect = await screen.findByLabelText(`Change the capability for ${ownerTitle}`);
 
-      await selectEvent.openMenu(capabilitySelect);
+      await act(async () => {
+        await selectEvent.openMenu(capabilitySelect);
+      });
 
       await act(async () => { await selectEvent.select(capabilitySelect, viewer.title); });
 
-      await waitFor(() => expect(EntityShareActions.prepare).toHaveBeenCalledTimes(2));
+      await waitFor(() => {
+        expect(screen.queryAllByText(viewer.title)).toHaveLength(2);
+      });
 
-      expect(EntityShareActions.prepare).toHaveBeenCalledWith('dashboard', 'The title', mockEntityShareState.entity, {
-        selected_grantee_capabilities: mockEntityShareState.selectedGranteeCapabilities.merge({ [jane.id]: viewer.id }),
+      await waitFor(() => {
+        expect(EntityShareActions.prepare).toHaveBeenCalledWith('dashboard', 'The title', mockEntityShareState.entity, {
+          selected_grantee_capabilities: mockEntityShareState.selectedGranteeCapabilities.merge({ [jane.id]: viewer.id }),
+        });
       });
     });
 
@@ -267,16 +282,16 @@ describe('EntityShareModal', () => {
       });
 
       const deleteGrantee = async ({ grantee }) => {
-        const { getByTitle } = render(<SimpleEntityShareModal />);
+        render(<SimpleEntityShareModal />);
 
-        const deleteButton = getByTitle(`Remove sharing for ${grantee.title}`);
+        const deleteButton = await screen.findByTitle(`Remove sharing for ${grantee.title}`);
 
         fireEvent.click(deleteButton);
 
-        await waitFor(() => expect(EntityShareActions.prepare).toHaveBeenCalledTimes(2));
-
-        expect(EntityShareActions.prepare).toHaveBeenCalledWith('dashboard', 'The title', mockEntityShareState.entity, {
-          selected_grantee_capabilities: selectedGranteeCapabilities.remove(grantee.id),
+        await waitFor(() => {
+          expect(EntityShareActions.prepare).toHaveBeenCalledWith('dashboard', 'The title', mockEntityShareState.entity, {
+            selected_grantee_capabilities: selectedGranteeCapabilities.remove(grantee.id),
+          });
         });
       };
 

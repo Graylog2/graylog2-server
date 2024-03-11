@@ -3,6 +3,8 @@ Upgrading to Graylog 6.0.x
 
 ## Breaking Changes
 
+- Default value for `data_dir` configuration option has been removed and must be specified in `graylog.conf`.
+
 ### Changed default number of process-buffer and output-buffer processors
 
 The default values for the configuration settings `processbuffer_processors` and `outputbuffer_processors` have been
@@ -24,6 +26,14 @@ The name of the `jvm_classes_loaded` metric [has been changed](https://github.co
 Prometheus queries referencing `jvm_classes_loaded` need to be adapted to
 the new name `jvm_classes_currently_loaded`.
 
+### Authentication required to use API browser
+
+Users now have to log in before visiting the API browser. It is sufficient to log in with any user known to Graylog. No
+particular permissions are required.
+
+The username/password field was removed from the header of the API browser. If users want to perform API requests with
+different credentials, they must log out of Graylog and re-login with another user.
+
 ### Plugins
 
 Removal of `systemnavigation` web interface plugin. Previously it was possible to register options for the
@@ -32,10 +42,37 @@ Now this can be achieved by registering a `navigation` plugin.
 The plugin entity needs the `description` `System` and `children` (array).
 Every child represents a dropdown option and needs a `path` and `description` attribute.
 
+### Template language change
+
+Graylog uses JMTE for a variety of templates (see below for a list of affected features). This library has been updated
+to version 7.0.2, which contains a breaking change, potentially affecting user generated templates.
+
+Previously an if statement in a template could compare a property to an unquoted string. This is no longer possible and will
+likely result in an error:
+
+Valid before: ${if property=somestring}
+Must be changed to: ${if property='somestring'}
+
+No default templates used this form, and no examples using this syntax were provided, so impact is likely to be minimal.
+
+Templates using the JMTE library are potentially affected and should to be checked for compatibility:
+* Decorators on search results
+* Custom event fields
+* HTTP event notifications
+* Script event notifications
+* Slack event notifications
+* MS Teams event notifications
+* Archive directory naming
+* HTTP JsonPath lookup table adapter
+
+Not affected by this change are the following templates using Freemarker:
+* Sidecar configurations
+
 ## Configuration File Changes
-| Option                                         | Action    | Description                                                                                                                                                                                                                                             |
-|------------------------------------------------|-----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Option                           | Action    | Description                                                                                                                                                                                                                                             |
+|----------------------------------|-----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `disabled_retention_strategies`  | **added** | Disables the specified retention strategies. By default, strategies `none` and `close` are now disabled in new installations.<br/>Strategies can be re-enabled simply by removing from this list.<br/>**Do not extend this list on existing installs!** |
+| `field_value_suggestion_mode`    | **added** | Allows controlling field value suggestions, turning them on, off, or allowing them only for textual fields.                                                                                                                                             |
 
 
 ## Asset Import Changes
@@ -143,6 +180,16 @@ Removed fields:
 - `service`
 - `vendor_event_description`
 
+## Newly Stored Message Fields
+
+The following fields will be added to every Message.
+The data of the fields is *not* accounted as outgoing traffic.
+
+ - `gl2_receive_timestamp` - The time the Message was received
+ - `gl2_processing_timestamp` - The time the Message was processed and will be sent to an Output
+ - `gl2_processing_duration_ms` - The duration between the receive and processing times
+
+
 ## Java API Changes
 
 The following Java Code API changes have been made.
@@ -170,6 +217,13 @@ its code needs to be adjusted to also use the new package names.
 | `javax.inject.*`            | `jakarta.inject.*`            |
 | `javax.validation.*`        | `jakarta.validation.*`        |
 | `javax.ws.rs.*`             | `jakarta.ws.rs.*`             |
+
+### Removal of Mongojack 2 dependency
+
+The Java dependency on the Mongojack 2 library was removed and replaced with a
+compatibility layer. Plugins that interact with MongoDB might need to be
+modified if they use Mongojack functionality that is not commonly used
+throughout the Graylog core code base.
 
 ## REST API Endpoint Changes
 

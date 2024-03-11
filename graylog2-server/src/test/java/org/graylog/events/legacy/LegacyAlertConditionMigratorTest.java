@@ -35,6 +35,7 @@ import org.graylog.events.processor.EventProcessorExecutionJob;
 import org.graylog.events.processor.aggregation.AggregationEventProcessorConfig;
 import org.graylog.events.processor.aggregation.AggregationEventProcessorParameters;
 import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
+import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
 import org.graylog.plugins.views.search.searchtypes.pivot.HasField;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
@@ -51,6 +52,7 @@ import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.EntityScope;
@@ -130,10 +132,10 @@ public class LegacyAlertConditionMigratorTest {
         final MongoConnection mongoConnection = mongodb.mongoConnection();
         final JobSchedulerTestClock clock = new JobSchedulerTestClock(DateTime.now(DateTimeZone.UTC));
         final DBJobDefinitionService jobDefinitionService = new DBJobDefinitionService(mongoConnection, mongoJackObjectMapperProvider);
-        final DBJobTriggerService jobTriggerService = new DBJobTriggerService(mongoConnection, mongoJackObjectMapperProvider, new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000"), clock, schedulerCapabilitiesService, Duration.minutes(5));
+        final DBJobTriggerService jobTriggerService = new DBJobTriggerService(mongoConnection, new MongoCollections(mongoJackObjectMapperProvider, mongoConnection), mongoJackObjectMapperProvider, new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000"), clock, schedulerCapabilitiesService, Duration.minutes(5));
         notificationService = new DBNotificationService(mongoConnection, mongoJackObjectMapperProvider, mock(EntityOwnershipService.class));
 
-        this.eventDefinitionService = new DBEventDefinitionService(mongoConnection, mongoJackObjectMapperProvider, mock(DBEventProcessorStateService.class), mock(EntityOwnershipService.class), new EntityScopeService(ENTITY_SCOPES));
+        this.eventDefinitionService = new DBEventDefinitionService(mongoConnection, mongoJackObjectMapperProvider, mock(DBEventProcessorStateService.class), mock(EntityOwnershipService.class), new EntityScopeService(ENTITY_SCOPES), new IgnoreSearchFilters());
         this.eventDefinitionHandler = spy(new EventDefinitionHandler(eventDefinitionService, jobDefinitionService, jobTriggerService, clock));
         this.notificationResourceHandler = spy(new NotificationResourceHandler(notificationService, jobDefinitionService, eventDefinitionService, eventNotificationFactories));
         this.userService = mock(UserService.class);

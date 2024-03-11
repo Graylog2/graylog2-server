@@ -17,6 +17,7 @@
 package org.graylog2.periodical;
 
 import com.google.common.collect.ImmutableMap;
+import org.graylog2.datatiering.DataTieringOrchestrator;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.NoTargetIndexException;
@@ -47,7 +48,7 @@ import static org.mockito.Mockito.when;
 public class IndexRotationThreadTest {
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
-
+    private final NodeId nodeId = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
     @Mock
     private IndexSet indexSet;
     @Mock
@@ -58,9 +59,10 @@ public class IndexRotationThreadTest {
     private Indices indices;
     @Mock
     private Cluster cluster;
-    private final NodeId nodeId = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
     @Mock
     private IndexSetRegistry indexSetRegistry;
+    @Mock
+    private DataTieringOrchestrator dataTieringOrchestrator;
 
     @Before
     public void setUp() throws Exception {
@@ -83,8 +85,8 @@ public class IndexRotationThreadTest {
                 cluster,
                 new NullActivityWriter(),
                 nodeId,
-                ImmutableMap.<String, Provider<RotationStrategy>>builder().put("strategy", provider).build()
-        );
+                ImmutableMap.<String, Provider<RotationStrategy>>builder().put("strategy", provider).build(),
+                dataTieringOrchestrator);
         when(indexSetConfig.rotationStrategyClass()).thenReturn("strategy");
 
         rotationThread.checkForRotation(indexSet);
@@ -103,8 +105,8 @@ public class IndexRotationThreadTest {
                 cluster,
                 new NullActivityWriter(),
                 nodeId,
-                ImmutableMap.<String, Provider<RotationStrategy>>builder().put("strategy", provider).build()
-        );
+                ImmutableMap.<String, Provider<RotationStrategy>>builder().put("strategy", provider).build(),
+                dataTieringOrchestrator);
         when(indexSetConfig.rotationStrategyClass()).thenReturn("strategy");
 
         rotationThread.checkForRotation(indexSet);
@@ -124,8 +126,8 @@ public class IndexRotationThreadTest {
                 cluster,
                 new NullActivityWriter(),
                 nodeId,
-                ImmutableMap.<String, Provider<RotationStrategy>>builder().put("strategy", provider).build()
-        );
+                ImmutableMap.<String, Provider<RotationStrategy>>builder().put("strategy", provider).build(),
+                dataTieringOrchestrator);
         rotationThread.doRun();
 
         verify(indexSet, never()).cycle();

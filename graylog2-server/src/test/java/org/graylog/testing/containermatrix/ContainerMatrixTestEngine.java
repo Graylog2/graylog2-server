@@ -235,6 +235,7 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
         final Set<Integer> extraPorts = getExtraPorts(annotatedClasses);
         final List<URL> mongoDBFixtures = getMongoDBFixtures(annotatedClasses);
         final boolean withMailServerEnabled = isMailServerRequired(annotatedClasses);
+        final boolean withWebhookServerEnabled = isWebhookServerRequired(annotatedClasses);
         final Map<String, String> additionalConfig = getAdditionalConfigurationParameters(annotatedClasses);
 
         if (testAgainstRunningESMongoDB()) {
@@ -267,7 +268,9 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
                                                             extraPorts,
                                                             mongoDBFixtures,
                                                             getEnabledFeatureFlags(Lifecycle.VM, annotatedClasses),
-                                                            withMailServerEnabled, additionalConfig);
+                                                            withMailServerEnabled,
+                                                            withWebhookServerEnabled,
+                                                            additionalConfig);
                                                     new ContainerMatrixTestsDiscoverySelectorResolver(engineDescriptor).resolveSelectors(discoveryRequest, testsDescriptor);
                                                     engineDescriptor.addChild(testsDescriptor);
                                                 })
@@ -286,7 +289,7 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
                                                                     mongoVersion,
                                                                     extraPorts,
                                                                     new ArrayList<>(),
-                                                                    getEnabledFeatureFlags(Lifecycle.CLASS, annotatedClasses), withMailServerEnabled, additionalConfig);
+                                                                    getEnabledFeatureFlags(Lifecycle.CLASS, annotatedClasses), withMailServerEnabled, withWebhookServerEnabled, additionalConfig);
                                                             new ContainerMatrixTestsDiscoverySelectorResolver(engineDescriptor).resolveSelectors(discoveryRequest, testsDescriptor);
                                                             engineDescriptor.addChild(testsDescriptor);
                                                         })
@@ -297,6 +300,15 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
         }
 
         return engineDescriptor;
+    }
+
+    private boolean isWebhookServerRequired(Set<Class<?>> annotatedClasses) {
+        return annotatedClasses
+                .stream()
+                .map(aClass -> AnnotationSupport.findAnnotation(aClass, ContainerMatrixTestsConfiguration.class))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .anyMatch(ContainerMatrixTestsConfiguration::withWebhookServerEnabled);
     }
 
     private boolean isMailServerRequired(Set<Class<?>> annotatedClasses) {

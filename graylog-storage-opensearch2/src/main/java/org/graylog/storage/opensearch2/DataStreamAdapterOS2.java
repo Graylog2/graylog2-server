@@ -17,6 +17,7 @@
 package org.graylog.storage.opensearch2;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.inject.Inject;
 import org.graylog.shaded.opensearch2.org.opensearch.action.support.master.AcknowledgedResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CreateDataStreamRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.DeleteComposableIndexTemplateRequest;
@@ -28,16 +29,15 @@ import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.Composable
 import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.DataStream;
 import org.graylog.shaded.opensearch2.org.opensearch.common.compress.CompressedXContent;
 import org.graylog.storage.opensearch2.ism.IsmApi;
-import org.graylog.storage.opensearch2.ism.policy.IsmPolicy;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.datastream.DataStreamAdapter;
 import org.graylog2.indexer.datastream.Policy;
+import org.graylog2.indexer.datastream.policy.IsmPolicy;
 import org.graylog2.indexer.indices.Template;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import jakarta.inject.Inject;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
@@ -120,7 +120,15 @@ public class DataStreamAdapterOS2 implements DataStreamAdapter {
         if (Objects.isNull(id)) {
             throw new IllegalArgumentException("Policy Id may not be null");
         }
-        final Optional<IsmPolicy> osPolicy = ismApi.getPolicy(id);
+        Optional<IsmPolicy> osPolicy;
+        try {
+            osPolicy = ismApi.getPolicy(id);
+        } catch (Exception e) {
+            // delete non-readable policies
+            ismApi.removePolicyFromIndex(dataStreamName);
+            ismApi.deletePolicy(id);
+            osPolicy = Optional.empty();
+        }
         if (osPolicy.isPresent()) {
             ismApi.removePolicyFromIndex(dataStreamName);
             ismApi.deletePolicy(id);

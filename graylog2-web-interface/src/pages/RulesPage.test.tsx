@@ -15,16 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { renderWithDataRouter } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
 
 import RulesPage from './RulesPage';
 
 describe('RulesPage', () => {
-  it('should show create rule button', () => {
-    const { getByRole } = renderWithDataRouter(<RulesPage />);
+  it('should show create rule button', async () => {
+    render(<RulesPage />);
 
-    const createRuleButton = getByRole('button', { name: 'Create Rule' });
-
-    expect(createRuleButton).toBeInTheDocument();
+    await screen.findByRole('button', { name: 'Create Rule' });
   });
 });

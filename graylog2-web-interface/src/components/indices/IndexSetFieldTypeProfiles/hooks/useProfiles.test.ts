@@ -23,7 +23,7 @@ import suppressConsole from 'helpers/suppressConsole';
 import useProfiles from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfiles';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
-import { profile1JSON, profile2JSON, profile1, profile2 } from 'fixtures/indexSetFieldTypeProfiles';
+import { profile1JSON, profile2JSON, profile1, profile2, indexSetsAttribute } from 'fixtures/indexSetFieldTypeProfiles';
 
 const mockData = {
   attributes: [],
@@ -47,7 +47,7 @@ const mockData = {
 };
 
 const expectedState = {
-  attributes: [],
+  attributes: [indexSetsAttribute],
   list: [profile1, profile2],
   pagination: {
     total: 1,

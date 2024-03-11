@@ -22,7 +22,7 @@ import styled, { css } from 'styled-components';
 
 import { Link, LinkContainer } from 'components/common/router';
 import { OverlayTrigger, EmptyEntity, NoSearchResult, NoEntitiesExist, IfPermitted, PaginatedList, Timestamp, Icon } from 'components/common';
-import { Col, Label, Row, Table, Tooltip, Button } from 'components/bootstrap';
+import { Col, Label, Row, Table, Button } from 'components/bootstrap';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 import Routes from 'routing/Routes';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
@@ -97,23 +97,20 @@ const priorityFormatter = (eventId, priority) => {
 
   switch (priority) {
     case EventDefinitionPriorityEnum.LOW:
-      icon = 'thermometer-empty';
       style = 'text-muted';
       break;
     case EventDefinitionPriorityEnum.HIGH:
-      icon = 'thermometer-full';
       style = 'text-danger';
       break;
     default:
-      icon = 'thermometer-half';
       style = 'text-info';
   }
 
-  const tooltip = <Tooltip id={`priority-${eventId}`}>{priorityName} Priority</Tooltip>;
+  const tooltip = <>{priorityName} Priority</>;
 
   return (
     <OverlayTrigger placement="top" trigger={['hover', 'click', 'focus']} overlay={tooltip}>
-      <EventsIcon name={icon} fixedWidth className={style} />
+      <EventsIcon name="thermometer" className={style} />
     </OverlayTrigger>
   );
 };

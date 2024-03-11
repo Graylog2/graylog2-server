@@ -59,7 +59,7 @@ const ThemeModeToggle = () => {
 
   return (
     <ThemeModeToggleWrap>
-      <ModeIcon name={loadingLightMode ? 'spinner' : 'sun'}
+      <ModeIcon name={loadingLightMode ? 'progress_activity' : 'light_mode'}
                 spin={loadingLightMode}
                 $currentMode={currentMode === COLOR_SCHEME_LIGHT} />
       <Toggle>
@@ -70,7 +70,7 @@ const ThemeModeToggle = () => {
                disabled={loadingLightMode || loadingDarkMode} />
         <span className="slider" />
       </Toggle>
-      <ModeIcon name={loadingDarkMode ? 'spinner' : 'moon'}
+      <ModeIcon name={loadingDarkMode ? 'progress_activity' : 'dark_mode'}
                 spin={loadingDarkMode}
                 $currentMode={currentMode === COLOR_SCHEME_DARK} />
     </ThemeModeToggleWrap>

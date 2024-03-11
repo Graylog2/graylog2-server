@@ -56,7 +56,7 @@ const ErrorAlert = ({ children, onClose, bsStyle = 'warning', marginTopBottom = 
           </Col>
           <Col md={1}>
             <Button bsSize="xsmall" bsStyle={finalBsStyle} className="pull-right" onClick={() => onClose(undefined)}>
-              <Icon name="times" />
+              <Icon name="close" />
             </Button>
           </Col>
         </StyledRow>

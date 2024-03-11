@@ -36,6 +36,7 @@ export type FieldTypes = { all: FieldIndex, query: FieldIndex };
 type FieldIndex = { [fieldName: string]: FieldTypeMapping };
 
 export type CompleterContext = Readonly<{
+  commandArgs?: unknown,
   currentToken: Token | undefined | null,
   prevToken: Token | undefined | null,
   prefix: string,
@@ -106,7 +107,7 @@ export default class SearchBarAutoCompletions implements AutoCompleter {
 
   private readonly userTimezone: string;
 
-  private readonly view: View;
+  private readonly view: View | undefined;
 
   constructor(
     completers: Array<Completer>,
@@ -114,7 +115,7 @@ export default class SearchBarAutoCompletions implements AutoCompleter {
     streams: Array<string>,
     fieldTypes: FieldTypes,
     userTimezone: string,
-    view: View,
+    view?: View,
   ) {
     this.completers = completers;
     this.timeRange = timeRange;
@@ -137,6 +138,7 @@ export default class SearchBarAutoCompletions implements AutoCompleter {
               prefix,
               tokens,
               currentTokenIdx,
+              commandArgs: _session?.curOp?.args,
               timeRange: this.timeRange,
               streams: this.streams,
               fieldTypes: this.fieldTypes,

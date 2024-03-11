@@ -46,7 +46,7 @@ const sidebarSections: Array<SidebarSection> = [
   },
   {
     key: 'create',
-    icon: 'plus',
+    icon: 'add',
     title: 'Create',
     content: ({ toggleSidebar, sidebarIsPinned }: SidebarSectionProps) => (
       <AddWidgetButton onClick={!sidebarIsPinned ? toggleSidebar : () => {}} />
@@ -54,7 +54,7 @@ const sidebarSections: Array<SidebarSection> = [
   },
   {
     key: 'highlighting',
-    icon: 'paragraph',
+    icon: 'format_paragraph',
     title: 'Highlighting',
     content: () => <HighlightingRules />,
   },

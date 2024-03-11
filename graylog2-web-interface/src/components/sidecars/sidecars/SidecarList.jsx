@@ -85,7 +85,7 @@ class SidecarList extends React.Component {
 
     return (
       <NoSearchResult>
-        <Icon name="info-circle" />&nbsp;There are no sidecars matching the search criteria. Try adjusting your search filter{showInactiveHint}.
+        <Icon name="info" />&nbsp;There are no sidecars matching the search criteria. Try adjusting your search filter{showInactiveHint}.
       </NoSearchResult>
     );
   };

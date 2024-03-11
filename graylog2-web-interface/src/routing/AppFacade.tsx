@@ -28,12 +28,21 @@ import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import { ServerAvailabilityStore } from 'stores/sessions/ServerAvailabilityStore';
 import type { SessionStoreState } from 'stores/sessions/SessionStore';
 import { SessionStore } from 'stores/sessions/SessionStore';
+import GraylogThemeProvider from 'theme/GraylogThemeProvider';
+import GlobalThemeStyles from 'theme/GlobalThemeStyles';
 
 const LoginPage = loadAsync(() => import(/* webpackChunkName: "LoginPage" */ 'pages/LoginPage'));
 const LoadingPage = loadAsync(() => import(/* webpackChunkName: "LoadingPage" */ 'pages/LoadingPage'));
 const LoggedInPage = loadAsync(() => import(/* webpackChunkName: "LoggedInPage" */ 'pages/LoggedInPage'));
 
 const SERVER_PING_TIMEOUT = 20000;
+
+const LoggedOutThemeProvider = ({ children }: React.PropsWithChildren) => (
+  <GraylogThemeProvider userIsLoggedIn={false}>
+    <GlobalThemeStyles />
+    {children}
+  </GraylogThemeProvider>
+);
 
 const AppFacade = () => {
   const currentUser = useStore(CurrentUserStore as Store<CurrentUserStoreState>, (state) => state?.currentUser);
@@ -47,15 +56,27 @@ const AppFacade = () => {
   }, []);
 
   if (server.up === false) {
-    return <ServerUnavailablePage server={server} />;
+    return (
+      <LoggedOutThemeProvider>
+        <ServerUnavailablePage server={server} />
+      </LoggedOutThemeProvider>
+    );
   }
 
   if (!username) {
-    return <LoginPage />;
+    return (
+      <LoggedOutThemeProvider>
+        <LoginPage />
+      </LoggedOutThemeProvider>
+    );
   }
 
   if (!currentUser) {
-    return <LoadingPage text="We are preparing Graylog for you..." />;
+    return (
+      <LoggedOutThemeProvider>
+        <LoadingPage text="We are preparing Graylog for you..." />
+      </LoggedOutThemeProvider>
+    );
   }
 
   return <LoggedInPage />;

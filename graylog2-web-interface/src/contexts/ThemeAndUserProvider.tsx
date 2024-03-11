@@ -28,7 +28,7 @@ const ThemeAndUserProvider = ({ children }: React.PropsWithChildren<{}>) => (
   <CurrentUserProvider>
     <UserDateTimeProvider>
       <CurrentUserPreferencesProvider>
-        <GraylogThemeProvider>
+        <GraylogThemeProvider userIsLoggedIn>
           <GlobalThemeStyles />
           {children}
         </GraylogThemeProvider>

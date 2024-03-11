@@ -62,8 +62,7 @@ const CreateEventDefinitionPage = () => {
 
       <Row className="content">
         <Col md={12}>
-          <EventDefinitionFormContainer action="create"
-                                        onEventDefinitionChange={handleEventDefinitionChange} />
+          <EventDefinitionFormContainer action="create" onEventDefinitionChange={handleEventDefinitionChange} />
         </Col>
       </Row>
 

@@ -26,7 +26,7 @@ import java.util.Optional;
 
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
-        include = JsonTypeInfo.As.PROPERTY,
+        include = JsonTypeInfo.As.EXISTING_PROPERTY,
         property = LookupDataAdapterConfiguration.TYPE_FIELD,
         visible = true,
         defaultImpl = FallbackAdapterConfig.class)

@@ -20,13 +20,15 @@ import styled from 'styled-components';
 import { ScratchpadContext } from 'contexts/ScratchpadProvider';
 import { Icon } from 'components/common';
 import { Button } from 'components/bootstrap';
+import { NAV_ITEM_HEIGHT } from 'theme/constants';
 
-const Toggle = styled(Button)`
-  padding-left: 6px;
-  padding-right: 6px;
+const Toggle = styled(Button)(({ theme }) => `
+  padding: 0 15px;
   background: none;
   border: 0;
-`;
+  min-height: ${NAV_ITEM_HEIGHT};
+  color: ${theme.colors.global.textDefault};
+`);
 
 const ScratchpadToggle = () => {
   const { toggleScratchpadVisibility } = useContext(ScratchpadContext);
@@ -38,7 +40,7 @@ const ScratchpadToggle = () => {
               aria-label="Scratchpad"
               id="scratchpad-toggle"
               onClick={toggleScratchpadVisibility}>
-        <Icon name="edit" size="lg" fixedWidth title="Scratchpad" />
+        <Icon name="edit_square" size="lg" title="Scratchpad" />
       </Toggle>
     </li>
 

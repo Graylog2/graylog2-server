@@ -28,10 +28,8 @@ export const CollectorConfigurationsActions = singletonActions(
   () => Reflux.createActions({
     all: { asyncResult: true },
     list: { asyncResult: true },
-    listUploads: { asyncResult: true },
     getConfiguration: { asyncResult: true },
     getConfigurationSidecars: { asyncResult: true },
-    getUploads: { asyncResult: true },
     createConfiguration: { asyncResult: true },
     updateConfiguration: { asyncResult: true },
     renderPreview: { asyncResult: true },
@@ -89,17 +87,6 @@ export const CollectorConfigurationsStore = singletonStore(
       return fetch('GET', URLUtils.qualifyUrl(uri));
     },
 
-    _fetchUploads({ page }) {
-      const baseUrl = `${this.sourceUrl}/configurations/uploads`;
-      const search = {
-        page: page,
-      };
-
-      const uri = URI(baseUrl).search(search).toString();
-
-      return fetch('GET', URLUtils.qualifyUrl(uri));
-    },
-
     all() {
       const promise = this._fetchConfigurations({ pageSize: 0 });
 
@@ -147,20 +134,6 @@ export const CollectorConfigurationsStore = singletonStore(
         );
 
       CollectorConfigurationsActions.list.promise(promise);
-    },
-
-    listUploads({ page = 1 }) {
-      const promise = this._fetchUploads({ page: page });
-
-      promise
-        .catch(
-          (error) => {
-            UserNotification.error(`Fetching configuration uploads failed with status: ${error}`,
-              'Could not retrieve configurations');
-          },
-        );
-
-      CollectorConfigurationsActions.listUploads.promise(promise);
     },
 
     refreshList() {

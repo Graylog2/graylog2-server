@@ -43,7 +43,8 @@ public class EventSummaryTest {
                 EventDto.FIELD_MESSAGE, "message",
                 EventDto.FIELD_SOURCE_STREAMS, streams,
                 EventDto.FIELD_EVENT_TIMESTAMP, now.toString(Tools.ES_DATE_FORMAT_FORMATTER),
-                EventDto.FIELD_ALERT, false
+                EventDto.FIELD_ALERT, false,
+                EventDto.FIELD_EVENT_DEFINITION_ID, "deadbeef"
         );
 
         EventSummary eventSummary = EventSummary.parse(rawEvent);

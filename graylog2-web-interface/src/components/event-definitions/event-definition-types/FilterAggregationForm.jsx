@@ -36,6 +36,7 @@ const initialFilterConfig = {
   query: '',
   query_parameters: [],
   streams: [],
+  filters: [],
   search_within_ms: 5 * 60 * 1000,
   execute_every_ms: 5 * 60 * 1000,
   _is_scheduled: true,
@@ -128,6 +129,8 @@ class FilterAggregationForm extends React.Component {
     const { conditionType } = this.state;
     const { entityTypes, eventDefinition, streams, validation, currentUser } = this.props;
 
+    const onlyFilters = eventDefinition._scope === 'ILLUMINATE';
+
     return (
       <>
         <Row>
@@ -138,24 +141,26 @@ class FilterAggregationForm extends React.Component {
                         currentUser={currentUser}
                         onChange={this.props.onChange} />
 
-            <FormGroup>
-              <ControlLabel>Create Events for Definition if...</ControlLabel>
-              <Radio id="filter-type"
-                     name="conditionType"
-                     value={conditionTypes.FILTER}
-                     checked={conditionType === conditionTypes.FILTER}
-                     onChange={this.handleTypeChange}>
-                Filter has results
-              </Radio>
-              <Radio id="aggregation-type"
-                     name="conditionType"
-                     value={conditionTypes.AGGREGATION}
-                     checked={conditionType === conditionTypes.AGGREGATION}
-                     onChange={this.handleTypeChange}>
-                Aggregation of results reaches a threshold
-              </Radio>
-            </FormGroup>
-            {conditionType === conditionTypes.FILTER && (
+            {onlyFilters || (
+              <FormGroup>
+                <ControlLabel>Create Events for Definition if...</ControlLabel>
+                <Radio id="filter-type"
+                       name="conditionType"
+                       value={conditionTypes.FILTER}
+                       checked={conditionType === conditionTypes.FILTER}
+                       onChange={this.handleTypeChange}>
+                  Filter has results
+                </Radio>
+                <Radio id="aggregation-type"
+                       name="conditionType"
+                       value={conditionTypes.AGGREGATION}
+                       checked={conditionType === conditionTypes.AGGREGATION}
+                       onChange={this.handleTypeChange}>
+                  Aggregation of results reaches a threshold
+                </Radio>
+              </FormGroup>
+            )}
+            {(conditionType === conditionTypes.FILTER && !onlyFilters) && (
               <Row>
                 <Col md={12}>
                   <Input id="event-limit"
@@ -170,13 +175,12 @@ class FilterAggregationForm extends React.Component {
                 </Col>
               </Row>
             )}
-
           </Col>
           <Col md={5} lgOffset={1}>
             <FilterPreviewContainer eventDefinition={eventDefinition} />
           </Col>
         </Row>
-        {conditionType === conditionTypes.AGGREGATION && (
+        {(conditionType === conditionTypes.AGGREGATION && !onlyFilters) && (
           <Row>
             <Col md={12}>
               <AggregationForm eventDefinition={eventDefinition}

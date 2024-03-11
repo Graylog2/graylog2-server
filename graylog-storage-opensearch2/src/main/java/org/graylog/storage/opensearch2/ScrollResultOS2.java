@@ -23,10 +23,9 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRespons
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchScrollRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.common.unit.TimeValue;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.List;
-
-import static com.google.common.base.Preconditions.checkArgument;
 
 public class ScrollResultOS2 extends ChunkedQueryResultOS2 {
     private static final TimeValue DEFAULT_SCROLL = TimeValue.timeValueMinutes(1);
@@ -45,13 +44,17 @@ public class ScrollResultOS2 extends ChunkedQueryResultOS2 {
                            @Assisted List<String> fields,
                            @Assisted int limit) {
         super(client, initialResult, query, fields, limit);
-        checkArgument(initialResult.getScrollId() != null, "Unable to extract scroll id from supplied search result!");
         this.scroll = scroll;
 
     }
 
     @Override
+    @Nullable
     protected SearchResponse nextSearchResult() throws IOException {
+        if (this.lastSearchResponse.getScrollId() == null) {
+            //with ignore_unavailable=true and no available indices, response does not contain scrollId
+            return null;
+        }
         final SearchScrollRequest scrollRequest = new SearchScrollRequest(this.lastSearchResponse.getScrollId());
         scrollRequest.scroll(TimeValue.parseTimeValue(this.scroll, DEFAULT_SCROLL, "scroll time"));
         return client.executeWithIOException((c, requestOptions) -> c.scroll(scrollRequest, requestOptions),
@@ -60,6 +63,10 @@ public class ScrollResultOS2 extends ChunkedQueryResultOS2 {
 
     @Override
     public void cancel() throws IOException {
+        if (this.lastSearchResponse.getScrollId() == null) {
+            //with ignore_unavailable=true and no available indices, response does not contain scrollId, there is nothing to cancel
+            return;
+        }
         final ClearScrollRequest request = new ClearScrollRequest();
         request.addScrollId(this.lastSearchResponse.getScrollId());
 

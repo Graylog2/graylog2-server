@@ -44,6 +44,10 @@ import static org.mockito.Mockito.mock;
 
 public class IndexFieldTypeProfileUsagesServiceTest {
 
+    private static final String PROFILE1_ID = "aa0000000000000000000001";
+    private static final String PROFILE2_ID = "aa0000000000000000000002";
+    private static final String UNUSED_PROFILE_ID = "dada00000000000000000000";
+    private static final String WRONG_PROFILE_ID = "that's not proper ObjetID!";
     @Rule
     public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
@@ -59,9 +63,9 @@ public class IndexFieldTypeProfileUsagesServiceTest {
                 mock(ClusterConfigService.class),
                 mock(ClusterEventBus.class)
         );
-        mongoIndexSetService.save(createIndexSetConfigForTest("000000000000000000000001", "profile1"));
-        mongoIndexSetService.save(createIndexSetConfigForTest("000000000000000000000011", "profile1"));
-        mongoIndexSetService.save(createIndexSetConfigForTest("000000000000000000000002", "profile2"));
+        mongoIndexSetService.save(createIndexSetConfigForTest("000000000000000000000001", PROFILE1_ID));
+        mongoIndexSetService.save(createIndexSetConfigForTest("000000000000000000000011", PROFILE1_ID));
+        mongoIndexSetService.save(createIndexSetConfigForTest("000000000000000000000002", PROFILE2_ID));
         mongoIndexSetService.save(createIndexSetConfigForTest("000000000000000000000042", null));
         toTest = new IndexFieldTypeProfileUsagesService(mongoConnection);
     }
@@ -69,22 +73,25 @@ public class IndexFieldTypeProfileUsagesServiceTest {
     @Test
     public void testReturnsProperUsagesForSingleProfile() {
         assertEquals(Set.of("000000000000000000000001", "000000000000000000000011"),
-                toTest.usagesOfProfile("profile1"));
+                toTest.usagesOfProfile(PROFILE1_ID));
         assertEquals(Set.of("000000000000000000000002"),
-                toTest.usagesOfProfile("profile2"));
+                toTest.usagesOfProfile(PROFILE2_ID));
         assertEquals(Set.of(),
-                toTest.usagesOfProfile("unused_profile"));
+                toTest.usagesOfProfile(UNUSED_PROFILE_ID));
+        assertEquals(Set.of(),
+                toTest.usagesOfProfile(WRONG_PROFILE_ID));
     }
 
     @Test
     public void testReturnsProperUsagesForMultipleProfiles() {
         Map<String, Set<String>> expectedResult = Map.of(
-                "profile1", Set.of("000000000000000000000001", "000000000000000000000011"),
-                "profile2", Set.of("000000000000000000000002"),
-                "unused_profile", Set.of()
+                PROFILE1_ID, Set.of("000000000000000000000001", "000000000000000000000011"),
+                PROFILE2_ID, Set.of("000000000000000000000002"),
+                UNUSED_PROFILE_ID, Set.of(),
+                WRONG_PROFILE_ID, Set.of()
         );
 
-        assertEquals(expectedResult, toTest.usagesOfProfiles(Set.of("profile1", "profile2", "unused_profile")));
+        assertEquals(expectedResult, toTest.usagesOfProfiles(Set.of(PROFILE1_ID, PROFILE2_ID, UNUSED_PROFILE_ID, WRONG_PROFILE_ID)));
     }
 
     private IndexSetConfig createIndexSetConfigForTest(final String id, final String profileId) {
@@ -102,7 +109,8 @@ public class IndexFieldTypeProfileUsagesServiceTest {
                 1, true,
                 Duration.standardSeconds(5),
                 new CustomFieldMappings(),
-                profileId);
+                profileId,
+                null);
     }
 
 }

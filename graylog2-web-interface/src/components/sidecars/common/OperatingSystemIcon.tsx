@@ -19,8 +19,11 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { Icon } from 'components/common';
+import BrandIcon from 'components/common/BrandIcon';
 
-const SidecarIcon = styled(Icon)`
+const Container = styled.div`
+  display: inline-block;
+  vertical-align: middle;
   margin-right: 5px;
   margin-left: 2px;
 `;
@@ -59,8 +62,8 @@ const matchIcon = (os: string) => {
   }
 
   return {
-    iconName: 'question-circle',
-    iconType: 'solid',
+    iconName: 'help',
+    iconType: 'default',
   } as const;
 };
 
@@ -68,7 +71,11 @@ const OperatingSystemIcon = ({ operatingSystem }: Props) => {
   const { iconName, iconType } = matchIcon(operatingSystem.trim().toLowerCase());
 
   return (
-    <SidecarIcon name={iconName} type={iconType} fixedWidth />
+    <Container>
+      {iconType === 'brand'
+        ? <BrandIcon name={iconName} />
+        : <Icon name={iconName} />}
+    </Container>
   );
 };
 

@@ -16,23 +16,22 @@
  */
 import * as React from 'react';
 import { useCallback, useState } from 'react';
-import { Position } from 'react-overlays';
 import styled from 'styled-components';
 
-import { ButtonToolbar, Button, ControlLabel, FormControl, FormGroup, Popover } from 'components/bootstrap';
-import { Portal } from 'components/common';
+import { ButtonToolbar, Button, ControlLabel, FormControl, FormGroup } from 'components/bootstrap';
+import Popover from 'components/common/Popover';
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 
 import styles from './SavedSearchForm.css';
 
-type Props = {
+type Props = React.PropsWithChildren<{
+  show: boolean,
   saveSearch: (newTitle: string) => void,
   saveAsSearch: (newTitle: string) => void,
   toggleModal: () => void,
   isCreateNew: boolean,
   value: string,
-  target: typeof Button | undefined | null,
-};
+}>;
 
 const StyledForm = styled.form`
   width: 210px;
@@ -43,70 +42,65 @@ const stopEvent = (e) => {
   e.stopPropagation();
 };
 
-const SavedSearchForm = (props: Props) => {
-  const {
-    isCreateNew,
-    saveSearch,
-    saveAsSearch,
-    toggleModal,
-    value,
-    target,
-  } = props;
+const SavedSearchForm = ({ children, show, isCreateNew, saveSearch, saveAsSearch, toggleModal, value }: Props) => {
   const [title, setTitle] = useState(value);
   const onChangeTitle = useCallback((e: React.FormEvent<unknown>) => setTitle((e.target as HTMLInputElement).value), []);
 
   const trimmedTitle = (title ?? '').trim();
   const disableSaveAs = trimmedTitle === '' || (!isCreateNew && trimmedTitle === value);
   const createNewTitle = isCreateNew ? 'Create new' : 'Save as';
+  const createNewButtonTitle = isCreateNew ? 'Create new search' : 'Save as new search';
   const pluggableSaveViewControls = useSaveViewFormControls();
   const _saveSearch = useCallback(() => saveSearch(title), [saveSearch, title]);
   const _saveAsSearch = useCallback(() => saveAsSearch(title), [saveAsSearch, title]);
 
   return (
-    <Portal>
-      <Position placement="left"
-                target={target}>
-        <Popover title="Name of search"
-                 id="saved-search-popover">
-          <StyledForm onSubmit={stopEvent}>
-            <FormGroup>
-              <ControlLabel htmlFor="title">Title</ControlLabel>
-              <FormControl type="text"
-                           value={title}
-                           id="title"
-                           placeholder="Enter title"
-                           onChange={onChangeTitle} />
-            </FormGroup>
-            {pluggableSaveViewControls?.map(({ component: Component, id }) => (Component
+    <Popover position="left" opened={show} withArrow withinPortal>
+      <Popover.Target>
+        {children}
+      </Popover.Target>
+      <Popover.Dropdown title="Name of search"
+                        id="saved-search-popover">
+        <StyledForm onSubmit={stopEvent}>
+          <FormGroup>
+            <ControlLabel htmlFor="title">Title</ControlLabel>
+            <FormControl type="text"
+                         value={title}
+                         id="title"
+                         placeholder="Enter title"
+                         onChange={onChangeTitle} />
+          </FormGroup>
+          {pluggableSaveViewControls?.map(({ component: Component, id }) => (Component
               && <Component key={id} disabledViewCreation={disableSaveAs} />))}
-            <ButtonToolbar>
-              {!isCreateNew && (
-                <Button bsStyle="primary"
-                        className={styles.button}
-                        type="submit"
-                        bsSize="sm"
-                        onClick={_saveSearch}>
-                  Save
-                </Button>
-              )}
-              <Button disabled={disableSaveAs}
-                      bsStyle="info"
+          <ButtonToolbar>
+            {!isCreateNew && (
+              <Button bsStyle="primary"
                       className={styles.button}
                       type="submit"
                       bsSize="sm"
-                      onClick={_saveAsSearch}>
-                {createNewTitle}
+                      title="Save search"
+                      onClick={_saveSearch}>
+                Save
               </Button>
-              <Button className={styles.button}
-                      onClick={toggleModal}
-                      bsSize="sm">
-                Cancel
-              </Button>
-            </ButtonToolbar>
-          </StyledForm>
-        </Popover>
-      </Position>
-    </Portal>
+            )}
+            <Button disabled={disableSaveAs}
+                    bsStyle="info"
+                    className={styles.button}
+                    type="submit"
+                    bsSize="sm"
+                    title={createNewButtonTitle}
+                    onClick={_saveAsSearch}>
+              {createNewTitle}
+            </Button>
+            <Button className={styles.button}
+                    onClick={toggleModal}
+                    bsSize="sm">
+              Cancel
+            </Button>
+          </ButtonToolbar>
+        </StyledForm>
+      </Popover.Dropdown>
+    </Popover>
   );
 };
 

@@ -55,7 +55,7 @@ const BooleanIcon = styled(Icon)<{ value: boolean }>(({ theme, value }) => css`
   color: ${value ? theme.colors.variant.success : theme.colors.variant.danger};
 `);
 const BooleanValue = ({ value }: { value: boolean }) => (
-  <><BooleanIcon name={value ? 'check-circle' : 'times-circle'} value={value} /> {value ? 'yes' : 'no'}</>
+  <><BooleanIcon name={value ? 'check_circle' : 'cancel'} value={value} /> {value ? 'yes' : 'no'}</>
 );
 
 const ActionsCol = styled(Col)`

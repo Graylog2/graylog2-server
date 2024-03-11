@@ -15,10 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { IconName } from '@fortawesome/fontawesome-common-types';
 import { NavLink } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 
+import type { IconName } from 'components/common/Icon';
 import Icon from 'components/common/Icon';
 
 const StyledLink = styled(NavLink)(({ theme }) => css`

@@ -17,18 +17,22 @@
 package org.graylog2.configuration;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import org.graylog2.datatiering.DataTieringConfig;
+import org.graylog2.datatiering.fallback.PlaceholderDataTieringConfig;
 import org.graylog2.plugin.PluginConfigBean;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-
 import java.util.concurrent.TimeUnit;
+
+import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_DATA_TIERING;
 
 /**
  * In-database configuration (via ClusterConfigService) for index set
@@ -37,7 +41,7 @@ import java.util.concurrent.TimeUnit;
  */
 @JsonAutoDetect
 @AutoValue
-@JsonDeserialize(builder = AutoValue_IndexSetsDefaultConfiguration.Builder.class)
+@JsonDeserialize(builder = IndexSetsDefaultConfiguration.Builder.class)
 public abstract class IndexSetsDefaultConfiguration implements PluginConfigBean {
 
     public static final String INDEX_ANALYZER = "index_analyzer";
@@ -53,6 +57,10 @@ public abstract class IndexSetsDefaultConfiguration implements PluginConfigBean 
     public static final String RETENTION_STRATEGY_CLASS = "retention_strategy_class";
     public static final String RETENTION_STRATEGY_CONFIG = "retention_strategy_config";
     public static final String RETENTION_STRATEGY = "retention_strategy"; // alias for retention_strategy_config
+
+    public static Builder builder() {
+        return Builder.create();
+    }
 
     @NotBlank
     @JsonProperty(INDEX_ANALYZER)
@@ -114,14 +122,21 @@ public abstract class IndexSetsDefaultConfiguration implements PluginConfigBean 
         return retentionStrategyConfig();
     }
 
-    public static Builder builder() {
-        return new AutoValue_IndexSetsDefaultConfiguration.Builder();
-    }
+    @NotNull
+    @JsonProperty(FIELD_DATA_TIERING)
+    public abstract DataTieringConfig dataTiering();
 
     public abstract Builder toBuilder();
 
     @AutoValue.Builder
     public abstract static class Builder {
+
+        @JsonCreator
+        public static Builder create() {
+            return new AutoValue_IndexSetsDefaultConfiguration.Builder()
+                    .dataTiering(new PlaceholderDataTieringConfig());
+        }
+
         @JsonProperty(INDEX_ANALYZER)
         public abstract Builder indexAnalyzer(String indexAnalyzer);
 
@@ -166,6 +181,9 @@ public abstract class IndexSetsDefaultConfiguration implements PluginConfigBean 
         public Builder retentionStrategy(RetentionStrategyConfig retentionStrategyConfig) {
             return retentionStrategyConfig(retentionStrategyConfig);
         }
+
+        @JsonProperty(FIELD_DATA_TIERING)
+        public abstract Builder dataTiering(DataTieringConfig dataTiering);
 
         public abstract IndexSetsDefaultConfiguration build();
     }

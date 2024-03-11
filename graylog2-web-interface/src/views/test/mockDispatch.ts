@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import type { UnknownAction } from '@reduxjs/toolkit';
+
 import type { RootState, ExtraArguments, SearchExecutionResult } from 'views/types';
 import type { AppDispatch } from 'stores/useAppDispatch';
 import { asMock } from 'helpers/mocking';
@@ -29,10 +31,14 @@ const mockSearchExecutors: SearchExecutors = {
   execute: async () => ({}) as SearchExecutionResult,
 };
 
+type ActionFn = (d: AppDispatch, getState: () => RootState, extraArgs?: ExtraArguments) => UnknownAction;
+
+const isActionFn = (fn: UnknownAction | ActionFn): fn is ActionFn => typeof fn === 'function';
+
 const mockDispatch = (state: RootState = defaultState) => {
   const dispatch: AppDispatch = jest.fn();
 
-  asMock(dispatch).mockImplementation((fn: (d: AppDispatch, getState: () => RootState, extraArgs: ExtraArguments) => unknown) => (typeof fn === 'function'
+  asMock(dispatch).mockImplementation((fn) => (isActionFn(fn)
     ? fn(dispatch, () => state, { searchExecutors: mockSearchExecutors })
     : fn));
 
@@ -43,7 +49,7 @@ export const mockDispatchForView = (view: View, initialQuery: string = 'query-id
   const state = { ...defaultState, view: { view, activeQuery: initialQuery } } as RootState;
   const dispatch: AppDispatch = jest.fn();
 
-  asMock(dispatch).mockImplementation((fn: (d: AppDispatch, getState: () => RootState) => unknown) => (typeof fn === 'function'
+  asMock(dispatch).mockImplementation((fn) => (isActionFn(fn)
     ? fn(dispatch, () => state)
     : fn));
 

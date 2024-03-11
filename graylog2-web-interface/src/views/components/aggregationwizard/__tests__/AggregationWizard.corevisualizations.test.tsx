@@ -72,7 +72,9 @@ const SimpleAggregationWizard = (props: Partial<React.ComponentProps<typeof Aggr
 const submitButton = async () => screen.findByRole('button', { name: /update preview/i });
 
 const expectSubmitButtonToBeDisabled = async () => {
-  expect(await submitButton()).toBeDisabled();
+  await waitFor(async () => {
+    expect(await submitButton()).toBeDisabled();
+  });
 };
 
 const expectSubmitButtonNotToBeDisabled = async () => {
@@ -83,6 +85,7 @@ const visualizationSelect = async () => screen.findByLabelText('Select visualiza
 
 const selectOption = async (ariaLabel: string, option: string) => {
   const select = await screen.findByLabelText(ariaLabel);
+
   await selectEvent.openMenu(select);
 
   await act(async () => {

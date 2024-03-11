@@ -15,15 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
 
 import GettingStarted from './GettingStarted';
 
 describe('GettingStarted', () => {
-  it('should display description and select', () => {
-    const { queryByText, queryByLabelText } = render(<GettingStarted />);
+  it('should display description and select', async () => {
+    render(<GettingStarted />);
 
-    expect(queryByText(/Select an authentication service to setup a new one./)).not.toBeNull();
-    expect(queryByLabelText('Select a service')).not.toBeNull();
+    await screen.findByText(/Select an authentication service to setup a new one./);
+    await screen.findByLabelText('Select a service');
   });
 });

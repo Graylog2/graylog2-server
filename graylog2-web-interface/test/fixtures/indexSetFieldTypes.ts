@@ -16,8 +16,14 @@
  */
 
 import type { Attributes } from 'stores/PaginationTypes';
-import type { IndexSetFieldType } from 'components/indices/IndexSetFieldTypes/types';
+import type { IndexSetFieldType, IndexSetFieldTypeJson } from 'components/indices/IndexSetFieldTypes/types';
 
+export const overriddenIndexFieldJson: IndexSetFieldTypeJson = {
+  field_name: 'field-1',
+  type: 'bool',
+  origin: 'OVERRIDDEN_INDEX',
+  is_reserved: false,
+};
 export const overriddenIndexField: IndexSetFieldType = {
   id: 'field-1',
   fieldName: 'field-1',
