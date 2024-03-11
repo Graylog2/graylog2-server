@@ -14,24 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import styled from 'styled-components';
+import React from 'react';
 
-import ClientCertificateConfig from 'components/datanode/client-certificate/ClientCertificateConfig';
+import CreateClientCertificateButton from 'components/datanode/client-certificate/CreateClientCertificateButton';
 
-import CertificateRenewalPolicyConfig from './CertificateRenewalPolicyConfig';
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-`;
-
-const DataNodeConfiguration = () => (
-  <Container>
-    <CertificateRenewalPolicyConfig />
-    <ClientCertificateConfig />
-  </Container>
+const ClientCertificateConfig = () => (
+  <div>
+    <h2>Client Certificate</h2>
+    <p>Generate client certificates for 3rd part tool</p>
+    <CreateClientCertificateButton />
+  </div>
 );
-
-export default DataNodeConfiguration;
+export default ClientCertificateConfig;
