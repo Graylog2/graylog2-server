@@ -89,7 +89,8 @@ public class SecurityAdapterOS implements SecurityAdapter {
                     ),
                     "Could not set role mapping for role " + role);
 
-            return new MappingResponse("OK", "tbd");
+            var retval = new MappingResponse(result.get("status").asText(), result.get("message").asText());
+            return retval;
         } catch (JsonProcessingException ex) {
             LOG.error("Could not send Request: {}", ex.getMessage(), ex);
             return new MappingResponse("ERROR", ex.getMessage());
