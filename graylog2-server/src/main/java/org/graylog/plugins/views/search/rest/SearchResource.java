@@ -70,8 +70,8 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 public class SearchResource extends RestResource implements PluginRestResource {
     private static final Logger LOG = LoggerFactory.getLogger(SearchResource.class);
     private static final String BASE_PATH = "views/search";
-    private static final String SEARCH_FORMAT_V1 = "application/vnd.graylog.search.v1+json";
-    private static final String SEARCH_FORMAT_V2 = "application/vnd.graylog.search.v2+json";
+    public static final String SEARCH_FORMAT_V1 = "application/vnd.graylog.search.v1+json";
+    public static final String SEARCH_FORMAT_V2 = "application/vnd.graylog.search.v2+json";
 
     private final SearchDomain searchDomain;
     private final SearchExecutor searchExecutor;
@@ -220,8 +220,6 @@ public class SearchResource extends RestResource implements PluginRestResource {
 
             }
         }
-
-
         return SearchJobDTO.fromSearchJob(searchJob);
     }
 

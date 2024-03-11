@@ -14,12 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search;
+package org.graylog.plugins.views.search.rest;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public record SearchJobIdentifier(@JsonProperty("id") String id,
-                                  @JsonProperty("search_id") String searchId,
-                                  @JsonProperty("owner") String owner,
-                                  @JsonProperty("executing_node") String executingNodeId) {}
-
+@JsonAutoDetect
+public record ExecutionInfo(@JsonProperty("done") boolean done,
+                            @JsonProperty("cancelled") boolean cancelled,
+                            @JsonProperty("completed_exceptionally") boolean hasErrors) {
+}
