@@ -21,21 +21,32 @@ import { Alert } from 'components/bootstrap';
 import type { MigrationStepComponentProps } from 'components/datanode/Types';
 import MigrationStepTriggerButtonToolbar from 'components/datanode/migrations/common/MigrationStepTriggerButtonToolbar';
 
+import useJournalDowntimeSize from '../../hooks/useJournalDowntimeSize';
+import MigrationError from '../common/MigrationError';
+
 const DownsizeWarning = styled(Alert)`
   margin-top: 10px;
   margin-bottom: 5px;
 `;
 
-const JournalDowntimeWarning = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => (
-  <>
-    <h3>Journal downtime size warning</h3>
-    <p>Please note that during migration data processing  will stop on your Graylog node, this will result in the journal growing in size.</p>
-    <p>Therefore increase your journal volume size.</p>
-    <DownsizeWarning bsStyle="danger">
-      <p>Please make sure your journal volume size is sufficient before proceeding.</p>
-    </DownsizeWarning>
-    <MigrationStepTriggerButtonToolbar nextSteps={currentStep.next_steps} onTriggerStep={onTriggerStep} />
-  </>
-);
+const JournalDowntimeWarning = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => {
+  const { data, error, isError } = useJournalDowntimeSize();
+
+  return (
+    <>
+      <h3>Journal downtime size warning</h3>
+      <p>Please note that during migration data processing  will stop on your Graylog node, this will result in the journal growing in size.</p>
+      <p>Therefore increase your journal volume size.</p>
+      <p>Your current journal throughput is: <b>{data} KB/min</b></p>
+      {isError && (
+        <MigrationError errorMessage={`There was an error while estimating your journal throughput: ${error?.message}`} />
+      )}
+      <DownsizeWarning bsStyle="warning">
+        Please make sure your journal volume size is sufficient before proceeding.
+      </DownsizeWarning>
+      <MigrationStepTriggerButtonToolbar nextSteps={currentStep.next_steps} onTriggerStep={onTriggerStep} />
+    </>
+  );
+};
 
 export default JournalDowntimeWarning;

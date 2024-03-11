@@ -20,6 +20,7 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.InputStreamEntity;
 import org.graylog2.indexer.datanode.ProxyRequestAdapter;
 import org.opensearch.client.Request;
+import org.opensearch.client.Response;
 import org.opensearch.client.ResponseException;
 import org.opensearch.client.opensearch._types.OpenSearchException;
 
@@ -46,15 +47,19 @@ public class ProxyRequestAdapterOS2 implements ProxyRequestAdapter {
                 return restClient.performRequest(osRequest);
             }, "Unable to proxy request to data node");
 
-            return new ProxyResponse(osResponse.getStatusLine().getStatusCode(), osResponse.getEntity().getContent());
+            return new ProxyResponse(osResponse.getStatusLine().getStatusCode(), osResponse.getEntity().getContent(), getContentType(osResponse));
         } catch (OpenSearchException openSearchException) {
             final var cause = openSearchException.getCause();
             if (cause instanceof ResponseException responseException) {
                 final var response = responseException.getResponse();
                 final var status = response.getStatusLine().getStatusCode();
-                return new ProxyResponse(status, response.getEntity().getContent());
+                return new ProxyResponse(status, response.getEntity().getContent(), getContentType(response));
             }
             throw openSearchException;
         }
+    }
+
+    private String getContentType(Response response) {
+        return response.getEntity().getContentType().getValue();
     }
 }
