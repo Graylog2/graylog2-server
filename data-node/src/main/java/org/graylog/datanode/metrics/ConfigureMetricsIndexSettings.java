@@ -120,7 +120,8 @@ public class ConfigureMetricsIndexSettings implements StateMachineTracer {
         Policy policy = new Policy(null,
                 "Manages rollover, rollup and deletion of data note metrics indices",
                 null,
-                stateOpen.name(), ImmutableList.of(stateOpen, stateRollup, stateDelete));
+                stateOpen.name(), ImmutableList.of(stateOpen, stateRollup, stateDelete),
+                null);
 
         try {
             log.debug("Creating ISM configuration for metrics data stream {}",
