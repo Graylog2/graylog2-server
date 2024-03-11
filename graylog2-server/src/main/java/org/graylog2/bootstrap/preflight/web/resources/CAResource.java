@@ -117,7 +117,7 @@ public class CAResource {
     }
 
     @POST
-    @Path("clientCert")
+    @Path("clientcert")
     @NoAuditEvent("No Audit Event needed")
     @ApiOperation("Creates a client certificate")
     @Produces(MediaType.APPLICATION_JSON)
@@ -132,7 +132,7 @@ public class CAResource {
     }
 
     @DELETE
-    @Path("clientCert/{role}/{principal}")
+    @Path("clientcert/{role}/{principal}")
     @NoAuditEvent("No Audit Event needed")
     @ApiOperation("removes the cert and the user from the role")
     @Produces(MediaType.APPLICATION_JSON)
