@@ -23,8 +23,6 @@ import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchException;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
@@ -52,6 +50,9 @@ import org.graylog2.system.stats.elasticsearch.NodesStats;
 import org.graylog2.system.stats.elasticsearch.ShardStats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -343,5 +344,4 @@ public class ClusterAdapterOS2 implements ClusterAdapter {
                 .map(HealthStatus::fromString)
                 .min(HealthStatus::compareTo);
     }
-
 }
