@@ -18,13 +18,13 @@ package org.graylog2.outputs;
 
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableList;
+import org.graylog.testing.messages.MessagesExtension;
 import org.graylog2.Configuration;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.messages.MessageWithIndex;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.MessageFactory;
-import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.journal.NoopJournal;
@@ -50,6 +50,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@ExtendWith(MessagesExtension.class)
 public class BlockingBatchedESOutputTest {
 
     private Configuration config;
@@ -64,11 +65,13 @@ public class BlockingBatchedESOutputTest {
     private Cluster cluster;
 
     private BlockingBatchedESOutput output;
-    private final MessageFactory messageFactory = new TestMessageFactory();
+    private MessageFactory messageFactory;
 
     @BeforeEach
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
-    public void setUp() throws Exception {
+    public void setUp(MessageFactory messageFactory) throws Exception {
+        this.messageFactory = messageFactory;
+
         MetricRegistry metricRegistry = new MetricRegistry();
         NoopJournal journal = new NoopJournal();
         this.config = new Configuration() {

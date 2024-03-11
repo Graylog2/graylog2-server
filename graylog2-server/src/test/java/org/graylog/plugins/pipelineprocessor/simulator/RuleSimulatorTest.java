@@ -18,29 +18,30 @@ package org.graylog.plugins.pipelineprocessor.simulator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.plugins.pipelineprocessor.processors.ConfigurationStateUpdater;
+import org.graylog.testing.messages.MessagesExtension;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
-import org.graylog2.plugin.TestMessageFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 
 import java.util.Map;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@ExtendWith(MessagesExtension.class)
 class RuleSimulatorTest {
 
     private RuleSimulator ruleSimulator;
     private ObjectMapper objectMapper;
-    private final MessageFactory messageFactory = new TestMessageFactory();
 
     @Mock
     private ConfigurationStateUpdater configurationStateUpdater;
 
     @BeforeAll
-    public void setUp() {
+    public void setUp(MessageFactory messageFactory) {
         objectMapper = new ObjectMapper();
         ruleSimulator = new RuleSimulator(configurationStateUpdater, objectMapper, messageFactory);
     }

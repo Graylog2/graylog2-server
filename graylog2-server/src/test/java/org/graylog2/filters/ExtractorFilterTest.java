@@ -19,11 +19,11 @@ package org.graylog2.filters;
 import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.EventBus;
 import org.graylog.failure.ProcessingFailureCause;
+import org.graylog.testing.messages.MessagesExtension;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
-import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.joda.time.DateTime;
@@ -42,13 +42,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@ExtendWith(MessagesExtension.class)
 class ExtractorFilterTest {
 
     private final InputService inputService;
     private final EventBus eventBus;
     private final ScheduledExecutorService executorService;
     private ExtractorFilter dut;
-    private final MessageFactory messageFactory = new TestMessageFactory();
 
     public ExtractorFilterTest(@Mock InputService inputService, @Mock EventBus eventBus, @Mock ScheduledExecutorService executorService) {
         this.inputService = inputService;
@@ -57,7 +57,7 @@ class ExtractorFilterTest {
     }
 
     @Test
-    void testFailureHandling() {
+    void testFailureHandling(MessageFactory messageFactory) {
 
         final Input input = mock(Input.class);
         when(input.getId()).thenReturn("123");

@@ -21,14 +21,15 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.awaitility.Awaitility;
 import org.awaitility.Durations;
+import org.graylog.testing.messages.MessagesExtension;
 import org.graylog2.Configuration;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
-import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.Arrays;
 import java.util.List;
@@ -45,20 +46,22 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MessagesExtension.class)
 public class FailureHandlingServiceTest {
 
     private final Configuration configuration = mock(Configuration.class);
     private final MessageQueueAcknowledger acknowledger = mock(MessageQueueAcknowledger.class);
     private final MetricRegistry metricRegistry = new MetricRegistry();
-    private MessageFactory messageFactory = new TestMessageFactory();
+    private MessageFactory messageFactory;
 
     private FailureSubmissionQueue failureSubmissionQueue;
 
     @BeforeEach
-    public void setup() {
+    public void setup(MessageFactory messageFactory) {
         when(configuration.getFailureHandlingQueueCapacity()).thenReturn(1000);
 
         failureSubmissionQueue = new FailureSubmissionQueue(configuration, metricRegistry);
+        this.messageFactory = messageFactory;
     }
 
     @Test

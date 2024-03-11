@@ -17,9 +17,9 @@
 package org.graylog2.shared.messageq.localkafka;
 
 import com.google.common.collect.ImmutableList;
+import org.graylog.testing.messages.MessagesExtension;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
-import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.shared.journal.LocalKafkaJournal;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.joda.time.DateTime;
@@ -35,6 +35,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 @ExtendWith(MockitoExtension.class)
+@ExtendWith(MessagesExtension.class)
 public class LocalKafkaMessageQueueAcknowledgerTest {
 
     @Mock
@@ -45,8 +46,6 @@ public class LocalKafkaMessageQueueAcknowledgerTest {
 
     @InjectMocks
     LocalKafkaMessageQueueAcknowledger acknowledger;
-
-    private final MessageFactory messageFactory = new TestMessageFactory();
 
     @Test
     void acknowledgeOffset() {
@@ -61,7 +60,7 @@ public class LocalKafkaMessageQueueAcknowledgerTest {
     }
 
     @Test
-    void acknowledgeMessage() {
+    void acknowledgeMessage(MessageFactory messageFactory) {
         final Message message = messageFactory.createMessage("message", "source", DateTime.now(UTC));
         message.setMessageQueueId(1L);
         acknowledger.acknowledge(message);
@@ -69,14 +68,14 @@ public class LocalKafkaMessageQueueAcknowledgerTest {
     }
 
     @Test
-    void acknowledgeMessageWithoutMessageQueueId() {
+    void acknowledgeMessageWithoutMessageQueueId(MessageFactory messageFactory) {
         final Message message = messageFactory.createMessage("message", "source", DateTime.now(UTC));
         acknowledger.acknowledge(message);
         verifyNoMoreInteractions(kafkaJournal);
     }
 
     @Test
-    void acknowledgeMessageWithWrongTypeOfMessageQueueId() {
+    void acknowledgeMessageWithWrongTypeOfMessageQueueId(MessageFactory messageFactory) {
         final Message message = messageFactory.createMessage("message", "source", DateTime.now(UTC));
         message.setMessageQueueId("foo");
         acknowledger.acknowledge(message);
@@ -84,7 +83,7 @@ public class LocalKafkaMessageQueueAcknowledgerTest {
     }
 
     @Test
-    void acknowledgeMessages() {
+    void acknowledgeMessages(MessageFactory messageFactory) {
         final Message firstMessage = messageFactory.createMessage("message", "source", DateTime.now(UTC));
         firstMessage.setMessageQueueId(1L);
 
