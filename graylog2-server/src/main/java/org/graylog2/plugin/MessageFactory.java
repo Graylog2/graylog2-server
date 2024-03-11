@@ -27,4 +27,12 @@ public interface MessageFactory {
 
     Message createMessage(String id, Map<String, Object> newFields);
 
+    /**
+     * Returns a fake {@link Message}. This message must not be used for real message processing!
+     *
+     * @return a fake message
+     */
+    static Message createFakeMessage() {
+        return new Message("__fake", "__fake", DateTime.parse("2010-07-30T16:03:25Z")); // first Graylog release
+    }
 }

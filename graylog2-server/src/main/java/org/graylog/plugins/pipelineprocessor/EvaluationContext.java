@@ -25,8 +25,8 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog2.plugin.EmptyMessages;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageCollection;
+import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.Messages;
-import org.joda.time.DateTime;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -71,7 +71,7 @@ public class EvaluationContext {
     }
 
     private EvaluationContext() {
-        this(new Message("__dummy", "__dummy", DateTime.parse("2010-07-30T16:03:25Z")) {}); // first Graylog release
+        this(MessageFactory.createFakeMessage());
     }
 
     public EvaluationContext(@Nonnull Message message) {
