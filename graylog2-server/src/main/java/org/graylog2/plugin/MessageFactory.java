@@ -21,10 +21,31 @@ import org.joda.time.DateTime;
 import java.util.Map;
 
 public interface MessageFactory {
+    /**
+     * Returns a new {@link Message} object for the given fields.
+     *
+     * @param message   the message field value
+     * @param source    the source field value
+     * @param timestamp the timestamp field value
+     * @return the new message object
+     */
     Message createMessage(String message, String source, DateTime timestamp);
 
+    /**
+     * Returns a new {@link Message} object for the given fields map.
+     *
+     * @param fields the map of fields
+     * @return the new message object
+     */
     Message createMessage(Map<String, Object> fields);
 
+    /**
+     * Returns a new {@link Message} object for the given ID and fields.
+     *
+     * @param id        the message ID
+     * @param newFields the map of fields
+     * @return the new message object
+     */
     Message createMessage(String id, Map<String, Object> newFields);
 
     /**

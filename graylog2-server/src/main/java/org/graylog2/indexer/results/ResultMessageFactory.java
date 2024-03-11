@@ -22,9 +22,32 @@ import java.util.List;
 import java.util.Map;
 
 public interface ResultMessageFactory {
+    /**
+     * Returns a new {@link ResultMessage} for the given fields.
+     *
+     * @param id      the ID field value
+     * @param index   the index name field
+     * @param message the map of message fields
+     * @return the new result message
+     */
     ResultMessage parseFromSource(String id, String index, Map<String, Object> message);
 
+    /**
+     * Returns a new {@link ResultMessage} for the given fields.
+     *
+     * @param id        the ID field value
+     * @param index     the index name field
+     * @param message   the map of message fields
+     * @param highlight the map of fields to highlight
+     * @return the new result message
+     */
     ResultMessage parseFromSource(String id, String index, Map<String, Object> message, Map<String, List<String>> highlight);
 
+    /**
+     * Creates a new {@link ResultMessage} for the given {@link Message}.
+     *
+     * @param message the message
+     * @return the new result message
+     */
     ResultMessage createFromMessage(Message message);
 }
