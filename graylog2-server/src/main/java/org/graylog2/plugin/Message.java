@@ -104,7 +104,7 @@ public class Message implements Messages, Indexable {
     public static final String FIELD_TIMESTAMP = "timestamp";
     public static final String FIELD_LEVEL = "level";
     public static final String FIELD_STREAMS = "streams";
-
+    public static final String FIELD_FAILED_MESSAGE_STREAMS = "failed_message_streams";
     /**
      * Graylog is writing internal metadata to messages using this field prefix. Users must not use this prefix for
      * custom message fields.
@@ -275,6 +275,7 @@ public class Message implements Messages, Indexable {
             .addAll(RESERVED_SETTABLE_FIELDS)
             .add(FIELD_GL2_MESSAGE_ID)
             .add(FIELD_STREAMS)
+            .add(FIELD_FAILED_MESSAGE_STREAMS)
             .build();
 
     public static final ImmutableSet<String> RESERVED_FIELDS = new ImmutableSet.Builder<String>()
