@@ -1875,10 +1875,10 @@
   resolved "https://registry.yarnpkg.com/@floating-ui/utils/-/utils-0.2.1.tgz#16308cea045f0fc777b6ff20a9f25474dd8293d2"
   integrity sha512-9TANp6GPoMtYzQdt54kfAyMmz1+osLlXdg2ENroU7zzrtflTLrrC/lgrIfaSe+Wu0b89GKccT7vxXA0MoAIO+Q==
 
-"@graylog/sawmill@2.0.12":
-  version "2.0.12"
-  resolved "https://registry.yarnpkg.com/@graylog/sawmill/-/sawmill-2.0.12.tgz#d0aec2472f7e65539e4103b63f18c328c5ee8e57"
-  integrity sha512-wezkIJT8Iedrv0tw7Xh2+xYykvoziEMoyT8DlO3Jbdi2jtIWQTAXSnUjDz+dt4GND6lTdh1zNffUOUksv0Bp8Q==
+"@graylog/sawmill@2.0.14":
+  version "2.0.14"
+  resolved "https://registry.yarnpkg.com/@graylog/sawmill/-/sawmill-2.0.14.tgz#d3e0f8941858f676a93fbb91cb2238ca90fbd76f"
+  integrity sha512-94vOs0ru5I9nsQGvs+2dOEYuIgqcmwj6ijwLJl97lc9f9HWM2R88memxso2PO4BS37+4uO43eERwWz7Liw+V7Q==
   dependencies:
     "@openfonts/dm-sans_latin" "^1.0.2"
     "@openfonts/source-sans-pro_latin" "^1.44.2"
