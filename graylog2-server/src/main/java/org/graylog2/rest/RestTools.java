@@ -20,6 +20,7 @@ import com.google.common.base.Strings;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
@@ -146,5 +147,15 @@ public class RestTools {
     public static Response.ResponseBuilder respondWithFile(String filename, Object entity) {
         return Response.ok(entity)
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename);
+    }
+
+    public static Response.ResponseBuilder respondWithFile(String filename, Object entity, MediaType mediaType) {
+        return respondWithFile(filename, entity)
+                .type(mediaType);
+    }
+
+    public static Response.ResponseBuilder respondWithFile(String filename, Object entity, MediaType mediaType, long size) {
+        return respondWithFile(filename, entity, mediaType)
+                .header(HttpHeaders.CONTENT_LENGTH, size);
     }
 }

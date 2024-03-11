@@ -132,8 +132,7 @@ public class SupportBundleClusterResource extends ProxiedResource {
                     }
                 };
                 var mediaType = MediaType.valueOf(MediaType.APPLICATION_OCTET_STREAM);
-                return respondWithFile(filename, streamingOutput)
-                        .type(mediaType)
+                return respondWithFile(filename, streamingOutput, mediaType)
                         .build();
             } catch (Exception e) {
                 responseBody.close();

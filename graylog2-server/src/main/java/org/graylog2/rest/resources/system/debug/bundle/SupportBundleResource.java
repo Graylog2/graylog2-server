@@ -85,9 +85,7 @@ public class SupportBundleResource extends RestResource {
 
         var mediaType = MediaType.valueOf(MediaType.APPLICATION_OCTET_STREAM);
         StreamingOutput streamingOutput = outputStream -> supportBundleService.loadLogFileStream(logFile, outputStream);
-        return respondWithFile(logFile.name(), streamingOutput)
-                .type(mediaType)
-                .header(HttpHeaders.CONTENT_LENGTH, logFile.size())
+        return respondWithFile(logFile.name(), streamingOutput, mediaType, logFile.size())
                 .build();
     }
 
@@ -122,8 +120,7 @@ public class SupportBundleResource extends RestResource {
     public Response download(@PathParam("filename") @ApiParam("filename") String filename) {
         var mediaType = MediaType.valueOf(MediaType.APPLICATION_OCTET_STREAM);
         StreamingOutput streamingOutput = outputStream -> supportBundleService.downloadBundle(filename, outputStream);
-        return respondWithFile(filename, streamingOutput)
-                .type(mediaType)
+        return respondWithFile(filename, streamingOutput, mediaType)
                 .build();
     }
 
