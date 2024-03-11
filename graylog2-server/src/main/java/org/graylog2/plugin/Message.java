@@ -359,6 +359,7 @@ public class Message implements Messages, Indexable {
         classSizes.put(ZonedDateTime.class, 8);
     }
 
+    // Intentionally package-private to enforce MessageFactory usage.
     Message(final String message, final String source, final DateTime timestamp) {
         fields.put(FIELD_ID, new UUID().toString());
         addRequiredField(FIELD_MESSAGE, message);
@@ -366,10 +367,12 @@ public class Message implements Messages, Indexable {
         addRequiredField(FIELD_TIMESTAMP, timestamp);
     }
 
+    // Intentionally package-private to enforce MessageFactory usage.
     Message(final Map<String, Object> fields) {
         this((String) fields.get(FIELD_ID), Maps.filterKeys(fields, not(equalTo(FIELD_ID))));
     }
 
+    // Intentionally package-private to enforce MessageFactory usage.
     Message(String id, Map<String, Object> newFields) {
         Preconditions.checkArgument(id != null, "message id cannot be null");
         fields.put(FIELD_ID, id);

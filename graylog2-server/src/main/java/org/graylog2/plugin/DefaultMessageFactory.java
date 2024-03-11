@@ -21,9 +21,9 @@ import org.joda.time.DateTime;
 
 import java.util.Map;
 
+// Intentionally package-private to enforce usage of injected MessageFactory.
 @Singleton
 class DefaultMessageFactory implements MessageFactory {
-
     @Override
     public Message createMessage(final String message, final String source, final DateTime timestamp) {
         return new Message(message, source, timestamp);
@@ -38,6 +38,4 @@ class DefaultMessageFactory implements MessageFactory {
     public Message createMessage(final String id, Map<String, Object> newFields) {
         return new Message(id, newFields);
     }
-
-
 }
