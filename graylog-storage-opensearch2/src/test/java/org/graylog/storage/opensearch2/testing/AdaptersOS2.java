@@ -65,6 +65,7 @@ public class AdaptersOS2 implements Adapters {
     public IndicesAdapter indicesAdapter() {
         return new IndicesAdapterOS2(client,
                 new org.graylog.storage.opensearch2.stats.StatsApi(objectMapper, client),
+                new org.graylog.storage.opensearch2.stats.ClusterStatsApi(objectMapper, client),
                 new org.graylog.storage.opensearch2.cat.CatApi(objectMapper, client),
                 new org.graylog.storage.opensearch2.cluster.ClusterStateApi(objectMapper, client),
                 new ComposableIndexTemplateAdapter(client, objectMapper)

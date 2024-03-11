@@ -16,6 +16,11 @@
  */
 package org.graylog2.rest.resources.system.indexer;
 
+import jakarta.inject.Provider;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.ClientErrorException;
+import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.NotFoundException;
 import org.apache.shiro.subject.Subject;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
@@ -49,13 +54,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-
-import jakarta.inject.Provider;
-
-import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.ClientErrorException;
-import jakarta.ws.rs.ForbiddenException;
-import jakarta.ws.rs.NotFoundException;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -519,7 +517,7 @@ public class IndexSetsResourceTest {
                 Collections.emptyList()
         );
         when(indices.getClosedIndices(anyCollection())).thenReturn(Collections.singleton("closed_index_0"));
-        when(indices.getIndicesStats(anyCollection())).thenReturn(Collections.singleton(indexStatistics));
+        when(indices.getIndexSetStats(anyCollection())).thenReturn(Collections.singleton(indexStatistics));
 
         final IndexSetStats indexSetStats = indexSetsResource.globalStats();
 
@@ -532,7 +530,7 @@ public class IndexSetsResourceTest {
     @Test
     public void globalStats0() throws Exception {
         when(indexSetRegistry.getAll()).thenReturn(Collections.emptySet());
-        when(indices.getIndicesStats(anyCollection())).thenReturn(Collections.emptySet());
+        when(indices.getIndexSetStats(anyCollection())).thenReturn(Collections.emptySet());
 
         final IndexSetStats indexSetStats = indexSetsResource.globalStats();
 

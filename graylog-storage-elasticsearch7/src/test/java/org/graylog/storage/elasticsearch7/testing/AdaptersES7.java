@@ -36,6 +36,7 @@ import org.graylog.storage.elasticsearch7.cat.CatApi;
 import org.graylog.storage.elasticsearch7.cluster.ClusterStateApi;
 import org.graylog.storage.elasticsearch7.fieldtypes.streams.StreamsForFieldRetrieverES7;
 import org.graylog.storage.elasticsearch7.mapping.FieldMappingApi;
+import org.graylog.storage.elasticsearch7.stats.ClusterStatsApi;
 import org.graylog.storage.elasticsearch7.stats.StatsApi;
 import org.graylog.testing.elasticsearch.Adapters;
 import org.graylog2.Configuration;
@@ -69,6 +70,7 @@ public class AdaptersES7 implements Adapters {
         return new IndicesAdapterES7(
                 client,
                 new StatsApi(objectMapper, client),
+                new ClusterStatsApi(objectMapper, client),
                 new CatApi(objectMapper, client),
                 new ClusterStateApi(objectMapper, client),
                 objectMapper,

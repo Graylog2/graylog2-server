@@ -23,6 +23,18 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.AuditEventTypes;
@@ -46,21 +58,6 @@ import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.ForbiddenException;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.NotFoundException;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -125,7 +122,7 @@ public class IndicesResource extends RestResource {
                 .filter(index -> managedStatus.getOrDefault(index, false))
                 .collect(Collectors.toList());
 
-        return toIndexInfos(indices.getIndicesStats(managedIndices));
+        return toIndexInfos(indices.getIndexSetStats(managedIndices));
     }
 
     @GET
@@ -139,7 +136,7 @@ public class IndicesResource extends RestResource {
         final Set<String> indexWildcards = indexSets.stream()
                 .map(IndexSet::getIndexWildcard)
                 .collect(Collectors.toSet());
-        final Set<IndexStatistics> indicesStats = indices.getIndicesStats(indexWildcards);
+        final Set<IndexStatistics> indicesStats = indices.getIndexSetStats(indexWildcards);
 
         return getOpenIndicesInfo(indicesStats);
     }
@@ -273,7 +270,7 @@ public class IndicesResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     public OpenIndicesInfo indexSetOpen(@ApiParam(name = "indexSetId") @PathParam("indexSetId") String indexSetId) {
         final IndexSet indexSet = getIndexSet(indexSetRegistry, indexSetId);
-        final Set<IndexStatistics> indicesInfos = indices.getIndicesStats(indexSet).stream()
+        final Set<IndexStatistics> indicesInfos = indices.getIndexSetStats(indexSet).stream()
                 .filter(indexStats -> isPermitted(RestPermissions.INDICES_READ, indexStats.index()))
                 .collect(Collectors.toSet());
 

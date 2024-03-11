@@ -23,38 +23,9 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog2.audit.AuditEventTypes;
-import org.graylog2.audit.jersey.AuditEvent;
-import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.IndexSetRegistry;
-import org.graylog2.indexer.IndexSetStatsCreator;
-import org.graylog2.indexer.IndexSetValidator;
-import org.graylog2.indexer.indexset.DefaultIndexSetConfig;
-import org.graylog2.indexer.indexset.IndexSetConfig;
-import org.graylog2.indexer.indexset.IndexSetFieldTypeSummaryService;
-import org.graylog2.indexer.indexset.IndexSetService;
-import org.graylog2.indexer.indices.Indices;
-import org.graylog2.indexer.indices.jobs.IndexSetCleanupJob;
-import org.graylog2.indexer.indices.stats.IndexStatistics;
-import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.graylog2.rest.resources.system.indexer.requests.IndexSetUpdateRequest;
-import org.graylog2.rest.resources.system.indexer.responses.IndexSetResponse;
-import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
-import org.graylog2.rest.resources.system.indexer.responses.IndexSetSummary;
-import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.shared.security.RestPermissions;
-import org.graylog2.system.jobs.SystemJobConcurrencyException;
-import org.graylog2.system.jobs.SystemJobManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jakarta.inject.Inject;
-
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.ClientErrorException;
 import jakarta.ws.rs.Consumes;
@@ -70,13 +41,37 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog2.audit.AuditEventTypes;
+import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.IndexSetStatsCreator;
+import org.graylog2.indexer.IndexSetValidator;
+import org.graylog2.indexer.indexset.DefaultIndexSetConfig;
+import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.IndexSetFieldTypeSummaryService;
+import org.graylog2.indexer.indexset.IndexSetService;
+import org.graylog2.indexer.indices.Indices;
+import org.graylog2.indexer.indices.jobs.IndexSetCleanupJob;
+import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.rest.resources.system.indexer.requests.IndexSetUpdateRequest;
+import org.graylog2.rest.resources.system.indexer.responses.IndexSetResponse;
+import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
+import org.graylog2.rest.resources.system.indexer.responses.IndexSetSummary;
+import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.system.jobs.SystemJobConcurrencyException;
+import org.graylog2.system.jobs.SystemJobManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
@@ -199,13 +194,7 @@ public class IndexSetsResource extends RestResource {
     })
     public IndexSetStats globalStats() {
         checkPermission(RestPermissions.INDEXSETS_READ);
-
-        final Set<String> indexWildcards = indexSetRegistry.getAll().stream()
-                .map(IndexSet::getIndexWildcard)
-                .collect(Collectors.toSet());
-        final Set<IndexStatistics> indicesStats = indices.getIndicesStats(indexWildcards);
-        final Set<String> closedIndices = indices.getClosedIndices(indexWildcards);
-        return IndexSetStats.fromIndexStatistics(indicesStats, closedIndices);
+        return indices.getIndexSetStats();
     }
 
     @GET
