@@ -19,8 +19,10 @@ package org.graylog.plugins.views.storage.migration.state.machine;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -96,6 +98,13 @@ public class MigrationStateMachineContext {
         }
         Object value = this.extendedState.get(name);
         if (!type.isInstance(value)) {
+            if (value instanceof LinkedHashMap<?, ?> map) {
+                try {
+                    return Optional.of(new ObjectMapper().convertValue(map, type));
+                } catch (IllegalArgumentException e) {
+                    throw new IllegalArgumentException("Argument " + name + " must be of type " + type);
+                }
+            }
             throw new IllegalArgumentException("Argument " + name + " must be of type " + type);
         }
         return Optional.of((T) value);

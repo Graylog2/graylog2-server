@@ -87,7 +87,7 @@
         <maven.compiler.useIncrementalCompilation>false</maven.compiler.useIncrementalCompilation>
 
         <!-- Dependencies -->
-        <opensearch.shaded.version>2.11.1-1</opensearch.shaded.version>
+        <opensearch.shaded.version>2.12.0-2</opensearch.shaded.version>
         <airline.version>3.0.0</airline.version>
         <amqp-client.version>5.20.0</amqp-client.version>
         <antlr.version>4.13.1</antlr.version>
@@ -98,15 +98,15 @@
         <auto-service.version>1.1.1</auto-service.version>
         <auto-value.version>1.10.4</auto-value.version>
         <auto-value-javabean.version>2.5.2</auto-value-javabean.version>
-        <aws-java-sdk-1.version>1.12.607</aws-java-sdk-1.version>
-        <aws-java-sdk-2.version>2.23.4</aws-java-sdk-2.version>
+        <aws-java-sdk-1.version>1.12.675</aws-java-sdk-1.version>
+        <aws-java-sdk-2.version>2.24.13</aws-java-sdk-2.version>
         <aws-kinesis-client.version>2.2.10</aws-kinesis-client.version>
         <aws-msk-iam-auth.version>2.0.3</aws-msk-iam-auth.version>
         <bouncycastle.version>1.77</bouncycastle.version>
         <byte-buddy.version>1.14.12</byte-buddy.version>
         <caffeine.version>3.1.8</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
-        <classgraph.version>4.8.165</classgraph.version>
+        <classgraph.version>4.8.168</classgraph.version>
         <commons-codec.version>1.16.1</commons-codec.version>
         <commons-csv.version>1.10.0</commons-csv.version>
         <commons-email.version>1.6.0</commons-email.version>
@@ -140,20 +140,20 @@
         <jcip-annotations.version>1.0</jcip-annotations.version>
         <jdot.version>1.0</jdot.version>
         <jersey.version>3.1.5</jersey.version>
-        <jmte.version>5.0.0</jmte.version>
+        <jmte.version>7.0.2</jmte.version>
         <joda-time.version>2.12.7</joda-time.version>
         <jool.version>0.9.15</jool.version>
         <json-path.version>2.9.0</json-path.version>
         <kafka.version>3.6.1</kafka.version>
         <kafka09.version>0.9.0.1-7</kafka09.version>
-        <log4j.version>2.23.0</log4j.version>
+        <log4j.version>2.23.1</log4j.version>
         <lucene.version>9.10.0</lucene.version>
         <metrics.version>4.2.25</metrics.version>
-        <mongodb-driver.version>4.11.1</mongodb-driver.version>
+        <mongodb-driver.version>5.0.0</mongodb-driver.version>
         <mongojack.version>4.8.2</mongojack.version>
         <natty.version>0.13</natty.version>
         <netty.version>4.1.107.Final</netty.version>
-        <netty-tcnative-boringssl-static.version>2.0.62.Final</netty-tcnative-boringssl-static.version>
+        <netty-tcnative-boringssl-static.version>2.0.65.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>4.12.0</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
         <opentelemetry.version>1.32.0</opentelemetry.version>
@@ -164,10 +164,10 @@
         <reflections.version>0.10.2</reflections.version>
         <retrofit.version>2.9.0</retrofit.version>
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
-        <shiro.version>1.13.0</shiro.version>
+        <shiro.version>2.0.0</shiro.version>
         <snakeyaml.version>2.2</snakeyaml.version>
         <snappy-java.version>1.1.10.5</snappy-java.version>
-        <oshi.version>6.4.12</oshi.version>
+        <oshi.version>6.5.0</oshi.version>
         <siv-mode.version>1.5.0</siv-mode.version>
         <slf4j.version>2.0.12</slf4j.version>
         <streamex.version>0.8.2</streamex.version>
@@ -188,14 +188,14 @@
         <assertj-core.version>3.25.3</assertj-core.version>
         <assertj-joda-time.version>2.2.0</assertj-joda-time.version>
         <awaitility.version>4.2.0</awaitility.version>
-        <equalsverifier.version>3.15.7</equalsverifier.version>
+        <equalsverifier.version>3.15.8</equalsverifier.version>
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.2</junit.version>
         <junit-jupiter.version>5.10.2</junit-jupiter.version>
-        <mockito.version>5.10.0</mockito.version>
+        <mockito.version>5.11.0</mockito.version>
         <restassured.version>5.4.0</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
-        <testcontainers.version>1.19.6</testcontainers.version>
+        <testcontainers.version>1.19.7</testcontainers.version>
         <testcontainers.opensearch.version>2.0.1</testcontainers.opensearch.version>
 
         <!-- Nodejs dependencies -->
@@ -399,7 +399,7 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-compress</artifactId>
-                <version>1.26.0</version>
+                <version>1.26.1</version>
             </dependency>
 
             <dependency>
@@ -511,7 +511,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
-                    <version>3.6.0</version>
+                    <version>3.7.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
