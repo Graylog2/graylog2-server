@@ -92,6 +92,7 @@ public class SearchExecutor {
 
         try {
             if (!async) {
+                //TBD : use join() that was previously part of QueryEngine??
                 Uninterruptibles.getUninterruptibly(searchJob.getResultFuture(), 60000, TimeUnit.MILLISECONDS);
             }
         } catch (ExecutionException e) {

@@ -40,8 +40,6 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
-import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
-
 @Singleton
 public class QueryEngine {
     private static final Logger LOG = LoggerFactory.getLogger(QueryEngine.class);
@@ -98,17 +96,6 @@ public class QueryEngine {
                             return queryResult;
                         })
         ));
-
-        validQueries.forEach(query -> {
-            final CompletableFuture<QueryResult> queryResultFuture = searchJob.getQueryResultFuture(query.id());
-            if (!queryResultFuture.isDone()) {
-                // this is not going to throw an exception, because we will always replace it with a placeholder "FAILED" result above
-                //final QueryResult result = queryResultFuture.join();
-
-            } else {
-                LOG.debug("[{}] Not generating query for query {}", defaultIfEmpty(query.id(), "root"), query);
-            }
-        });
 
         LOG.debug("Search job {} executing", searchJob.getId());
         return searchJob.seal();
