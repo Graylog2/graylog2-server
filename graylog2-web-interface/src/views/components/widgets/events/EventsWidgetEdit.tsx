@@ -32,12 +32,15 @@ import EventsWidgetConfig, {
   LIST_MODE,
   NUMBER_MODE,
 } from 'views/logic/widgets/events/EventsWidgetConfig';
-import WidgetModeConfiguration from 'views/components/widgets/events/EventsWidgetEdit/WidgetModeConfiguration';
+// import WidgetModeConfiguration from 'views/components/widgets/events/EventsWidgetEdit/WidgetModeConfiguration';
+//
+// import SortConfiguration from './SortConfiguration';
+// import ColumnsConfiguration from './ColumnsConfiguration';
 
-import SortConfiguration from './SortConfiguration';
-import ColumnsConfiguration from './ColumnsConfiguration';
-
-import { SORT_DIRECTION_OPTIONS, EVENT_ATTRIBUTES } from '../Constants';
+import { SORT_DIRECTION_OPTIONS, EVENT_ATTRIBUTES } from './Constants';
+import WidgetModeConfiguration from 'views/components/widgets/overview-configuration/WidgetModeConfiguration';
+import ColumnsConfiguration from 'views/components/widgets/overview-configuration/ColumnsConfiguration';
+import SortConfiguration from 'views/components/widgets/overview-configuration/SortConfiguration';
 
 const COLUMNS = Object.keys(EVENT_ATTRIBUTES);
 

@@ -246,10 +246,7 @@ const exports: PluginExports = {
     {
       type: 'events',
       handler: EventHandler,
-      defaults: {
-        page: 1,
-        per_page: 10,
-      },
+      defaults: {},
     },
   ],
   fieldActions: [
@@ -396,7 +393,7 @@ const exports: PluginExports = {
   }, {
     title: 'Events Overview',
     func: CreateEventsWidget,
-    icon: () => <Icon name="extension" />,
+    icon: () => <Icon name="report" type="regular" />,
   }],
   creators: [
     {

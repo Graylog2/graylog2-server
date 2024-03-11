@@ -33,7 +33,7 @@ export type EventsWidgetConfigJSON = {
 export default class EventsWidgetConfig extends WidgetConfig {
   _value: InternalState;
 
-  static defaultFields: InternalState['fields'] = Immutable.OrderedSet(['name', 'status', 'created_at']);
+  static defaultFields: InternalState['fields'] = Immutable.OrderedSet(['message', 'event_definition_id', 'timestamp']);
 
   static defaultSort: InternalState['sort'] = new EventsWidgetSortConfig('timestamp', Direction.Descending);
 
