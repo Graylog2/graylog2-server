@@ -20,16 +20,7 @@ import com.codahale.metrics.annotation.Timed;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog2.audit.AuditEventTypes;
-import org.graylog2.audit.jersey.AuditEvent;
-import org.graylog2.shared.rest.HideOnCloud;
-import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.shared.security.RestrictToLeader;
-
 import jakarta.inject.Inject;
-
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;
@@ -42,12 +33,20 @@ import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog2.audit.AuditEventTypes;
+import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.shared.rest.HideOnCloud;
+import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestrictToLeader;
 
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 import java.util.List;
 import java.util.Optional;
 
+import static org.graylog2.rest.RestTools.respondWithFile;
 import static org.graylog2.shared.security.RestPermissions.SUPPORTBUNDLE_CREATE;
 import static org.graylog2.shared.security.RestPermissions.SUPPORTBUNDLE_READ;
 import static org.graylog2.shared.utilities.StringUtils.f;
@@ -86,10 +85,10 @@ public class SupportBundleResource extends RestResource {
 
         var mediaType = MediaType.valueOf(MediaType.APPLICATION_OCTET_STREAM);
         StreamingOutput streamingOutput = outputStream -> supportBundleService.loadLogFileStream(logFile, outputStream);
-        Response.ResponseBuilder response = Response.ok(streamingOutput, mediaType);
-        response.header("Content-Disposition", "attachment; filename=" + logFile.name());
-        response.header("Content-Length", logFile.size());
-        return response.build();
+        return respondWithFile(logFile.name(), streamingOutput)
+                .type(mediaType)
+                .header(HttpHeaders.CONTENT_LENGTH, logFile.size())
+                .build();
     }
 
     @POST
@@ -123,9 +122,9 @@ public class SupportBundleResource extends RestResource {
     public Response download(@PathParam("filename") @ApiParam("filename") String filename) {
         var mediaType = MediaType.valueOf(MediaType.APPLICATION_OCTET_STREAM);
         StreamingOutput streamingOutput = outputStream -> supportBundleService.downloadBundle(filename, outputStream);
-        Response.ResponseBuilder response = Response.ok(streamingOutput, mediaType);
-        response.header("Content-Disposition", "attachment; filename=" + filename);
-        return response.build();
+        return respondWithFile(filename, streamingOutput)
+                .type(mediaType)
+                .build();
     }
 
     @DELETE
