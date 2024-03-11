@@ -4,6 +4,8 @@ Upgrading to Graylog 6.0.x
 ## Breaking Changes
 
 - Default value for `data_dir` configuration option has been removed and must be specified in `graylog.conf`.
+- All plugins must be adjusted to work with Graylog 6.x. **Incompatible plugins will break the server startup.**
+  Detailed descriptions about Java API changes below.
 
 ### Changed default number of process-buffer and output-buffer processors
 
@@ -195,7 +197,7 @@ The data of the fields is *not* accounted as outgoing traffic.
 The following Java Code API changes have been made.
 
 | File/method                                                                     | Description                                     |
-|----------------------------------------------------------------------- ---------|-------------------------------------------------|
+|---------------------------------------------------------------------------------|-------------------------------------------------|
 | `org.graylog2.plugin.MessageFactory.createMessage(String, String, DateTime)`    | New factory method to create `Message` instance |
 | `org.graylog2.plugin.MessageFactory.createMessage(Map<String, Object>)`         | New factory method to create `Message` instance |
 | `org.graylog2.plugin.MessageFactory.createMessage(String, Map<String, Object>)` | New factory method to create `Message` instance |
