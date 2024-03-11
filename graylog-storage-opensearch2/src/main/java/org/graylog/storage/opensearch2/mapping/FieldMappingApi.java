@@ -20,9 +20,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.Streams;
-import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
-import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
 import org.graylog.storage.opensearch2.OpenSearchClient;
+import org.opensearch.client.Request;
+import org.opensearch.client.Response;
 
 import javax.annotation.Nullable;
 
@@ -55,8 +55,10 @@ public class FieldMappingApi {
     }
 
     public Map<String, FieldMapping> fieldTypes(String index) {
-        final JsonNode result = client.execute((c, requestOptions) -> {
-            final Response response = c.getLowLevelClient().performRequest(request(index));
+        final JsonNode result = client.executeLowLevel((restClient, requestOptions) -> {
+            final var request = request(index);
+            request.setOptions(requestOptions);
+            final Response response = restClient.performRequest(request);
             return objectMapper.readTree(response.getEntity().getContent());
         }, "Unable to retrieve field types of index " + index);
         final JsonNode fields = result.path(index).path("mappings").path("properties");
