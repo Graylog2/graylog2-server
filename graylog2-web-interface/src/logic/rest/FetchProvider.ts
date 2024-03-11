@@ -21,6 +21,7 @@ import ErrorsActions from 'actions/errors/ErrorsActions';
 import { createFromFetchError } from 'logic/errors/ReportedErrors';
 import CancellablePromise from 'logic/rest/CancellablePromise';
 import { ServerAvailabilityActions } from 'stores/sessions/ServerAvailabilityStore';
+import {AbortError} from "fork-ts-checker-webpack-plugin/lib/utils/async/abort-error";
 
 // eslint-disable-next-line global-require
 const importSessionStore = memoize(() => require('stores/sessions/SessionStore'));
@@ -33,7 +34,7 @@ const defaultOnUnauthorizedError = (error: FetchError) => ErrorsActions.report(c
 
 const emptyToUndefined = (s: any) => (s && s !== '' ? s : undefined);
 
-const onServerError = async (error: Response | undefined, onUnauthorized = defaultOnUnauthorizedError) => {
+const onServerError = async (error: Response & Partial<AbortError> | undefined, onUnauthorized = defaultOnUnauthorizedError) => {
   const contentType = error.headers?.get('Content-Type');
   const response = await (contentType?.startsWith('application/json') ? error.json().then((body) => body) : error?.text?.());
   const { SessionStore, SessionActions } = importSessionStore();
@@ -51,6 +52,7 @@ const onServerError = async (error: Response | undefined, onUnauthorized = defau
   if (error && !error.status) {
     ServerAvailabilityActions.reportError(fetchError);
   }
+
   const shouldThrowError = error?.name !== "AbortError";
 
   if(shouldThrowError) throw fetchError;
@@ -261,7 +263,7 @@ export function fetchWithSignal<T = any>(signal: AbortSignal, method: Method, ur
     .json(body)
     .signal(signal)
     .build();
-  console.log({ signal });
+
   if (requireSession) {
     return queuePromiseIfNotLoggedin(promise)();
   }

@@ -148,7 +148,6 @@ export const executeWithExecutionState = (view: View, widgetsToSearch: Array<str
      */
   })
   .then((jobIds: JobIds) => {
-    console.log({ jobIds })
     const abortController = new AbortController();
     dispatch(setJobIds({ ...jobIds, abortController }));
 
@@ -158,7 +157,11 @@ export const executeWithExecutionState = (view: View, widgetsToSearch: Array<str
         dispatch(setJobIds(null));
 
         return dispatch(finishedLoading(result));
-      });
+      })
+      .catch((e) => {
+        if (e.name === 'AbortError') return Promise.resolve();
+        return e
+      })
   });
 
 export const execute = () => (dispatch: AppDispatch, getState: () => RootState, { searchExecutors }: ExtraArguments) => {
