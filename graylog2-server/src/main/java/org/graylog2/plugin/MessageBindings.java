@@ -16,28 +16,14 @@
  */
 package org.graylog2.plugin;
 
-import jakarta.inject.Singleton;
-import org.joda.time.DateTime;
+import com.google.inject.AbstractModule;
+import org.graylog2.indexer.results.DefaultResultMessageFactory;
+import org.graylog2.indexer.results.ResultMessageFactory;
 
-import java.util.Map;
-
-@Singleton
-class DefaultMessageFactory implements MessageFactory {
-
+public class MessageBindings extends AbstractModule {
     @Override
-    public Message createMessage(final String message, final String source, final DateTime timestamp) {
-        return new Message(message, source, timestamp);
+    protected void configure() {
+        bind(MessageFactory.class).to(DefaultMessageFactory.class).asEagerSingleton();
+        bind(ResultMessageFactory.class).to(DefaultResultMessageFactory.class).asEagerSingleton();
     }
-
-    @Override
-    public Message createMessage(final Map<String, Object> fields) {
-        return new Message(fields);
-    }
-
-    @Override
-    public Message createMessage(final String id, Map<String, Object> newFields) {
-        return new Message(id, newFields);
-    }
-
-
 }
