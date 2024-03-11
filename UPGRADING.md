@@ -194,15 +194,31 @@ The data of the fields is *not* accounted as outgoing traffic.
 
 The following Java Code API changes have been made.
 
-| File/method                                                           | Description                    |
-|-----------------------------------------------------------------------|--------------------------------|
-| `org.graylog2.plugin.Message#addStringFields`                         | Deprecated method removed      |
-| `org.graylog2.plugin.Message#addLongFields`                           | Deprecated method removed      |
-| `org.graylog2.plugin.Message#addDoubleFields`                         | Deprecated method removed      |
-| `org.graylog2.plugin.Message#getValidationErrors`                     | Deprecated method removed      |
-| `org.graylog2.plugin.SingletonMessages`                               | Unused class removed           |
-| `org.graylog.plugins.views.search.engine.LuceneQueryParsingException` | Unused exception class removed |
-| `org.graylog2.indexer.IndexMappingTemplate#toTemplate`                | Method parameter list modified |
+| File/method                                                                     | Description                                     |
+|----------------------------------------------------------------------- ---------|-------------------------------------------------|
+| `org.graylog2.plugin.MessageFactory.createMessage(String, String, DateTime)`    | New factory method to create `Message` instance |
+| `org.graylog2.plugin.MessageFactory.createMessage(Map<String, Object>)`         | New factory method to create `Message` instance |
+| `org.graylog2.plugin.MessageFactory.createMessage(String, Map<String, Object>)` | New factory method to create `Message` instance |
+| `org.graylog2.plugin.Message(String, String, DateTime)`                         | Constructor became package-private              |
+| `org.graylog2.plugin.Message(Map<String, Object>)`                              | Constructor became package-private              |
+| `org.graylog2.plugin.Message(String, Map<String, Object>)`                      | Constructor became package-private              |
+| `org.graylog2.plugin.Message#addStringFields`                                   | Deprecated method removed                       |
+| `org.graylog2.plugin.Message#addLongFields`                                     | Deprecated method removed                       |
+| `org.graylog2.plugin.Message#addDoubleFields`                                   | Deprecated method removed                       |
+| `org.graylog2.plugin.Message#getValidationErrors`                               | Deprecated method removed                       |
+| `org.graylog2.plugin.SingletonMessages`                                         | Unused class removed                            |
+| `org.graylog.plugins.views.search.engine.LuceneQueryParsingException`           | Unused exception class removed                  |
+| `org.graylog2.indexer.IndexMappingTemplate#toTemplate`                          | Method parameter list modified                  |
+
+### Message Factory
+
+New `org.graylog2.plugin.Message` instances must now be created by using a `org.graylog2.plugin.MessageFactory` method.
+
+The previous constructors on `Message` are now package-private and can't be accessed by code in other packages anymore.
+The package-private constructors in `Message` might change in any release and are not considered a stable API anymore.
+
+Code that creates messages must now inject a `MessageFactory` and use one of the `createMessage()` methods
+to create new `Message` instances.
 
 ### Transition from the `javax` to the `jakarta` namespace
 
