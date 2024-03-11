@@ -41,6 +41,7 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import javax.security.auth.x500.X500Principal;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.KeyPairGenerator;
@@ -48,6 +49,7 @@ import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
@@ -81,8 +83,9 @@ public class ClientCertGenerator {
         this.dataDir = dataDir;
     }
 
-    private Path certFilePath(final String principal) {
-        return dataDir.resolve(Path.of(principal + ".cert"));
+    private Path certFilePath( final String role, final String principal) {
+        var certfile = Base64.getEncoder().encodeToString((role + ":" + principal).getBytes(StandardCharsets.UTF_8));
+        return dataDir.resolve(Path.of(certfile + ".cert"));
     }
 
     private String c(final Object o) throws IOException {
@@ -98,7 +101,7 @@ public class ClientCertGenerator {
                                      final char[] privateKeyPassword) throws ClientCertGenerationException {
         try {
             var renewalPolicy = this.clusterConfigService.get(RenewalPolicy.class);
-            var privateKeyEncryptedStorage = new PrivateKeyEncryptedFileStorage(certFilePath(principal));
+            var privateKeyEncryptedStorage = new PrivateKeyEncryptedFileStorage(certFilePath(role, principal));
 
             final Optional<KeyStore> optKey = caService.loadKeyStore();
             final var caKeystore = optKey.get();
