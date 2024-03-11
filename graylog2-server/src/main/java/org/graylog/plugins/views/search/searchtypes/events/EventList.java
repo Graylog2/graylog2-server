@@ -172,12 +172,12 @@ public abstract class EventList implements SearchType {
         public abstract Builder streams(Set<String> streams);
 
         @JsonProperty
-        public abstract Builder page(int page);
+        public abstract Builder page(@Nullable Integer page);
 
         abstract Optional<Integer> page();
 
         @JsonProperty
-        public abstract Builder perPage(int pageSize);
+        public abstract Builder perPage(@Nullable Integer pageSize);
 
         abstract Optional<Integer> perPage();
 

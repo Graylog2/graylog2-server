@@ -24,9 +24,11 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
+import okhttp3.ResponseBody;
 import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.jersey.server.model.Resource;
 import org.graylog2.configuration.HttpConfiguration;
+import org.graylog2.shared.rest.resources.ProxiedResource;
 import org.graylog2.shared.security.ShiroPrincipal;
 import org.graylog2.shared.security.ShiroSecurityContext;
 import org.graylog2.utilities.IpSubnet;
@@ -39,6 +41,7 @@ import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 
 public class RestTools {
 
@@ -157,5 +160,31 @@ public class RestTools {
     public static Response.ResponseBuilder respondWithFile(String filename, Object entity, MediaType mediaType, long size) {
         return respondWithFile(filename, entity, mediaType)
                 .header(HttpHeaders.CONTENT_LENGTH, size);
+    }
+
+    public static Response streamResponse(final ProxiedResource.NodeResponse<ResponseBody> nodeResponse,
+                                          final String mediaType,
+                                          final Consumer<Response.ResponseBuilder> additionalResponseBuildingOnSuccess) {
+        if (nodeResponse.isSuccess()) {
+            // we cannot use try-with because the ResponseBody needs to stream the output
+            ResponseBody responseBody = nodeResponse.entity().orElseThrow();
+
+            try {
+                final Response.ResponseBuilder responseBuilder = Response.ok()
+                        .type(MediaType.valueOf(mediaType))
+                        .entity(responseBody.byteStream());
+                if (additionalResponseBuildingOnSuccess != null) {
+                    additionalResponseBuildingOnSuccess.accept(responseBuilder);
+                }
+                return responseBuilder.build();
+
+            } catch (Exception e) {
+                responseBody.close();
+            }
+        }
+        return Response.status(nodeResponse.code())
+                .entity(nodeResponse.body())
+                .build();
+
     }
 }
