@@ -122,7 +122,7 @@ public class ClientCertGenerator {
     }
 
     public void removeCertFor(final String role, final String principal) throws IOException {
-        var certFile = certFilePath(principal);
+        var certFile = certFilePath(role, principal);
         if(Files.exists(certFile)) {
             Files.delete(certFile);
             securityAdapter.removeUserFromRoleMapping(role, principal);
