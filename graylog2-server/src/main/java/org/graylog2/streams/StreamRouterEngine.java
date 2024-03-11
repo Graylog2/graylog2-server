@@ -45,7 +45,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -300,17 +299,19 @@ public class StreamRouterEngine {
         public Stream match(Message message) {
             // TODO Add missing message recordings!
             try (final Timer.Context ignored = streamMetrics.getExecutionTimer(streamId, streamRuleId).time()) {
-                if (matcher.match(message, rule)) {
-                    return stream;
-                } else {
-                    return null;
-                }
+                throw new RuntimeException("test");
+//                if (matcher.match(message, rule)) {
+//                    return stream;
+//                } else {
+//                    return null;
+//                }
             } catch (Exception e) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Error matching stream rule <" + rule.getType() + "/" + rule.getValue() + ">: " + e.getMessage(), e);
-                }
                 streamMetrics.markExceptionMeter(streamId);
-                final String error = f("Error matching stream rule <%s> (%s)", streamRuleId, rule.getDescription());
+                final String error = f("Error matching stream rule <%s> %s <%s/%s> for stream %s",
+                        streamRuleId, rule.getDescription(), rule.getType(), rule.getValue(), stream.getTitle());
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug(error + ": " + e.getMessage(), e);
+                }
                 message.addProcessingError(new Message.ProcessingError(
                         ProcessingFailureCause.StreamMatchException, error, ExceptionUtils.getRootCauseMessage(e)));
                 return null;
@@ -321,18 +322,20 @@ public class StreamRouterEngine {
         private Stream matchWithTimeOut(final Message message, long timeout, TimeUnit unit) {
             Stream matchedStream = null;
             try (final Timer.Context ignored = streamMetrics.getExecutionTimer(streamId, streamRuleId).time()) {
-                matchedStream = timeLimiter.callWithTimeout(new Callable<Stream>() {
-                    @Override
-                    @Nullable
-                    public Stream call() throws Exception {
-                        return match(message);
-                    }
-                }, timeout, unit);
+                throw new RuntimeException("test");
+//                matchedStream = timeLimiter.callWithTimeout(new Callable<Stream>() {
+//                    @Override
+//                    @Nullable
+//                    public Stream call() throws Exception {
+//                        return match(message);
+//                    }
+//                }, timeout, unit);
             } catch (UncheckedTimeoutException e) {
                 streamFaultManager.registerFailure(stream);
             } catch (Exception e) {
                 streamMetrics.markExceptionMeter(streamId);
-                final String error = f("Error matching stream rule <%s> (%s)", streamRuleId, rule.getDescription());
+                final String error = f("Error matching stream rule <%s> %s <%s/%s> for stream %s",
+                        streamRuleId, rule.getDescription(), rule.getType(), rule.getValue(), stream.getTitle());
                 LOG.warn(error, e);
                 message.addProcessingError(new Message.ProcessingError(
                         ProcessingFailureCause.StreamMatchException, error, ExceptionUtils.getRootCauseMessage(e)));
