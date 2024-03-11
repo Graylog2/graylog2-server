@@ -17,9 +17,9 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
-import type { SizeProp } from '@fortawesome/fontawesome-svg-core';
 
 import { OverlayTrigger } from 'components/common';
+import type { SizeProp } from 'components/common/Icon';
 import Icon from 'components/common/Icon';
 
 const StyledPopover = styled.span(({ theme }) => css`
@@ -41,6 +41,7 @@ const StyledPopover = styled.span(({ theme }) => css`
 `);
 
 const StyledIcon = styled(Icon)<{ $type: Type, $displayLeftMargin: boolean }>(({ theme, $type, $displayLeftMargin }) => css`
+  display: inline-flex;
   color: ${$type === 'error' ? theme.colors.variant.danger : 'inherit'};
   margin: 0;
   margin-left: ${$displayLeftMargin ? '0.3em' : 0};
@@ -49,10 +50,10 @@ const StyledIcon = styled(Icon)<{ $type: Type, $displayLeftMargin: boolean }>(({
 const iconName = (type: Type) => {
   switch (type) {
     case 'error':
-      return 'circle-exclamation';
+      return 'error';
     case 'info':
     default:
-      return 'question-circle';
+      return 'help';
   }
 };
 
@@ -92,6 +93,7 @@ const HoverForHelp = ({
                   testId={testId}>
     <StyledIcon className={`${className} ${pullRight ? 'pull-right' : ''}`}
                 name={iconName(type)}
+                type="regular"
                 $type={type}
                 $displayLeftMargin={displayLeftMargin}
                 size={iconSize} />

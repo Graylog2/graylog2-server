@@ -8,7 +8,7 @@
 <ExternalLinkButton href="http://docs.graylog.org/"
                     bsStyle="success"
                     bsSize="lg"
-                    iconClass="fa-external-link-square">
+                    iconName="help">
   Graylog documentation
 </ExternalLinkButton>
 ```

@@ -187,7 +187,7 @@ const TimeRangePresetDropdown = ({
       <IfPermitted permissions="clusterconfigentry:edit">
         <MenuItem divider />
         <AdminMenuItem href="/system/configurations" target="_blank">
-          Configure presets <ExternalIcon name="external-link-alt" />
+          Configure presets <ExternalIcon name="open_in_new" />
         </AdminMenuItem>
       </IfPermitted>
     </DropdownButton>

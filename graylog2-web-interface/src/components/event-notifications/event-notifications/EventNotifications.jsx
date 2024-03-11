@@ -132,7 +132,7 @@ class EventNotifications extends React.Component {
         <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.edit(notification.id)}>
           <IfPermitted permissions={`eventnotifications:edit:${notification.id}`}>
             <Button>
-              <Icon name="edit" /> Edit
+              <Icon name="edit_square" /> Edit
             </Button>
           </IfPermitted>
         </LinkContainer>
@@ -146,7 +146,7 @@ class EventNotifications extends React.Component {
             </IfPermitted>
             <MenuItem divider />
             <IfPermitted permissions={`eventnotifications:delete:${notification.id}`}>
-              <MenuItem onClick={onDelete(notification)}>Delete</MenuItem>
+              <MenuItem onClick={onDelete(notification)} variant="danger">Delete</MenuItem>
             </IfPermitted>
           </DropdownButton>
         </IfPermitted>

@@ -18,6 +18,7 @@ package org.graylog.plugins.views.storage.migration.state.machine;
 
 import com.github.oxo42.stateless4j.StateMachine;
 import org.graylog.plugins.views.storage.migration.state.actions.MigrationActions;
+import org.graylog.plugins.views.storage.migration.state.persistence.DatanodeMigrationConfiguration;
 import org.graylog.plugins.views.storage.migration.state.persistence.DatanodeMigrationPersistence;
 import org.graylog.plugins.views.storage.migration.state.rest.CurrentStateInformation;
 
@@ -39,6 +40,7 @@ public class MigrationStateMachineImpl implements MigrationStateMachine {
         this.migrationActions = migrationActions;
         this.persistenceService = persistenceService;
         this.context = persistenceService.getStateMachineContext().orElse(new MigrationStateMachineContext());
+        migrationActions.setStateMachineContext(context);
     }
 
     @Override
@@ -83,5 +85,18 @@ public class MigrationStateMachineImpl implements MigrationStateMachine {
         } catch (IOException e) {
             throw new RuntimeException("Failed to serialize state map", e);
         }
+    }
+
+
+    /**
+     * The state machine is configured to obtain from and persist state via the underlying persistence service. If we
+     * change the state in the persistence, it will be automatically changed in the state machine as well.
+     *
+     * @see MigrationStateMachineBuilder#buildFromPersistedState(DatanodeMigrationPersistence, MigrationActions)
+     */
+    @Override
+    public void reset() {
+        persistenceService.saveStateMachineContext(new MigrationStateMachineContext());
+        persistenceService.saveConfiguration(new DatanodeMigrationConfiguration(MigrationState.NEW));
     }
 }

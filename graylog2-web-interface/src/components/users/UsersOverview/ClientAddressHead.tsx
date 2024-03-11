@@ -39,7 +39,7 @@ const ClientAddressHead = ({ title }: Props) => {
                withArrow
                label="The address of the client used to initially establish the session, not necessarily its current address.">
         <Button bsStyle="link" onClick={toggle}>
-          <IconWithHelp name="question-circle" fixedWidth />
+          <IconWithHelp name="help" />
         </Button>
       </Tooltip>
     </th>

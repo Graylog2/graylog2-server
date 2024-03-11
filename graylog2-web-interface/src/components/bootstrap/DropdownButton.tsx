@@ -15,11 +15,20 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import styled from 'styled-components';
 
 import Icon from 'components/common/Icon';
 
 import Menu from './Menu';
 import Button from './Button';
+
+const StyledIcon = styled(Icon)`
+  width: 10px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
 
 /**
  * This is the default dropdown button component. If you need to display the dropdown in a portal, please use the `OverlayDropdownButton`.
@@ -48,7 +57,7 @@ const DropdownButton = ({ buttonTitle, children, closeOnItemClick, dropup, title
   <Menu position={position(pullRight, dropup)} onChange={onToggle} keepMounted={keepMounted} closeOnItemClick={closeOnItemClick}>
     <Menu.Target>
       <Button onClick={onMouseDown} aria-label={buttonTitle} {...rest} title={buttonTitle}>
-        {title}{noCaret ? null : <>{' '}<Icon name="caret-down" /></>}
+        {title}{noCaret ? null : <>{' '}<StyledIcon name="arrow_drop_down" /></>}
       </Button>
     </Menu.Target>
     <Menu.Dropdown>{children}</Menu.Dropdown>

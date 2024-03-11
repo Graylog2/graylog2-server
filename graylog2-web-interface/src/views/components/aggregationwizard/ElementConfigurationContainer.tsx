@@ -68,10 +68,10 @@ const ElementConfigurationContainer = forwardRef<HTMLDivElement, Props>(({ child
     <ElementActions>
       {dragHandleProps && (
         <DragHandle {...dragHandleProps} data-testid={`${testIdPrefix}-drag-handle`}>
-          <Icon name="bars" />
+          <Icon name="drag_indicator" />
         </DragHandle>
       )}
-      {onRemove && <IconButton onClick={onRemove} name="trash-alt" title={`Remove ${elementTitle}`} />}
+      {onRemove && <IconButton onClick={onRemove} name="delete" title={`Remove ${elementTitle}`} />}
     </ElementActions>
   </Container>
 ));

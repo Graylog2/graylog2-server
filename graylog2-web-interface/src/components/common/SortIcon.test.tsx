@@ -30,7 +30,7 @@ describe('SortIcon', () => {
     const Button = await screen.findByRole('button');
 
     expect(Button).toHaveClass('active');
-    expect(Icon).toHaveClass('fa-arrow-up-short-wide');
+    expect(Icon).toHaveClass('sort-icon-asc');
   });
 
   it('has correct classes for desc direction', async () => {
@@ -39,7 +39,7 @@ describe('SortIcon', () => {
     const Button = await screen.findByRole('button');
 
     expect(Button).toHaveClass('active');
-    expect(Icon).toHaveClass('fa-arrow-down-wide-short');
+    expect(Icon).toHaveClass('sort-icon-desc');
   });
 
   it('has correct classes for inactive state', async () => {
@@ -48,7 +48,7 @@ describe('SortIcon', () => {
     const Button = await screen.findByRole('button');
 
     expect(Button).not.toHaveClass('active');
-    expect(Icon).toHaveClass('fa-arrow-down-wide-short');
+    expect(Icon).toHaveClass('sort-icon-desc');
   });
 
   it('trigger onChange with current direction on click', async () => {
@@ -66,7 +66,7 @@ describe('SortIcon', () => {
     const Button = await screen.findByRole('button');
 
     expect(Button).toHaveClass('active');
-    expect(Icon).toHaveClass('fa-arrow-up-short-wide');
+    expect(Icon).toHaveClass('sort-icon-asc');
   });
 
   it('has correct classes for desc direction with custom asc and dsc ids', async () => {
@@ -75,6 +75,6 @@ describe('SortIcon', () => {
     const Button = await screen.findByRole('button');
 
     expect(Button).toHaveClass('active');
-    expect(Icon).toHaveClass('fa-arrow-down-wide-short');
+    expect(Icon).toHaveClass('sort-icon-desc');
   });
 });

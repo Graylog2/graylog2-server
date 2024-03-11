@@ -29,6 +29,7 @@ import ValidatedInput from 'integrations/aws/common/ValidatedInput';
 import { ApiRoutes, DocsRoutes } from 'integrations/aws/common/Routes';
 import { renderOptions } from 'integrations/aws/common/Options';
 import formValidation from 'integrations/aws/utils/formValidation';
+import Spinner from 'components/common/Spinner';
 
 import FormAdvancedOptions from '../FormAdvancedOptions';
 
@@ -94,7 +95,7 @@ const KinesisStreams = ({ onChange, onSubmit, toggleSetup }) => {
                     keyboard={false}
                     bsSize="small">
         <LoadingContent>
-          <i className="fa fa-spin fa-spinner" />
+          <StyledSpinner />
           <LoadingMessage>This request may take a few moments.</LoadingMessage>
         </LoadingContent>
       </LoadingModal>
@@ -158,11 +159,11 @@ const LoadingModal = styled(Modal)`
 
 const LoadingContent = styled(Modal.Body)`
   text-align: center;
+`;
 
-  i.fa {
-    font-size: 48px;
-    color: #702785;
-  }
+const StyledSpinner = styled(Spinner)`
+  font-size: 48px;
+  color: #702785;
 `;
 
 const LoadingMessage = styled.p`

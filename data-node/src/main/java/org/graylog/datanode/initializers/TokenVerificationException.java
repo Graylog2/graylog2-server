@@ -17,11 +17,15 @@
 package org.graylog.datanode.initializers;
 
 public class TokenVerificationException extends Exception {
-    public TokenVerificationException(Exception cause) {
+    public TokenVerificationException(Throwable cause) {
         super(cause);
     }
 
     public TokenVerificationException(String message) {
         super(message);
+    }
+
+    public TokenVerificationException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

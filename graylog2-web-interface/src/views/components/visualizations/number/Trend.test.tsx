@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen } from 'wrappedTestingLibrary';
+import { render, screen, within } from 'wrappedTestingLibrary';
 
 import Trend from './Trend';
 
@@ -106,7 +106,7 @@ describe('Trend', () => {
 
       const background = await screen.findByTestId('trend-background');
 
-      expect(background).toHaveStyleRule('background-color', '#7eb356!important');
+      expect(background).toHaveStyleRule('background-color', '#2ECA8F!important');
     });
 
     it('shows good background if current value and preference are lower', async () => {
@@ -114,7 +114,7 @@ describe('Trend', () => {
 
       const background = await screen.findByTestId('trend-background');
 
-      expect(background).toHaveStyleRule('background-color', '#7eb356!important');
+      expect(background).toHaveStyleRule('background-color', '#2ECA8F!important');
     });
 
     it('shows bad background if current value is lower but preference is higher', async () => {
@@ -122,7 +122,7 @@ describe('Trend', () => {
 
       const background = await screen.findByTestId('trend-background');
 
-      expect(background).toHaveStyleRule('background-color', '#eb5454!important');
+      expect(background).toHaveStyleRule('background-color', '#FE4A49!important');
     });
 
     it('shows bad background if current value is higher but preference is lower', async () => {
@@ -130,7 +130,7 @@ describe('Trend', () => {
 
       const background = await screen.findByTestId('trend-background');
 
-      expect(background).toHaveStyleRule('background-color', '#eb5454!important');
+      expect(background).toHaveStyleRule('background-color', '#FE4A49!important');
     });
 
     it('shows neutral background if current value is higher but preference is neutral', async () => {
@@ -156,21 +156,21 @@ describe('Trend', () => {
 
       const trendIcon = await screen.findByTestId('trend-icon');
 
-      expect(trendIcon).toHaveClass('fa-arrow-circle-right');
+      within(trendIcon).getByText('arrow_circle_right');
     });
 
     it('shows circle down if current values is lower', async () => {
       renderTrend({ current: 41 });
       const trendIcon = await screen.findByTestId('trend-icon');
 
-      expect(trendIcon).toHaveClass('fa-arrow-circle-down');
+      within(trendIcon).getByText('arrow_circle_down');
     });
 
     it('shows circle up if current values is higher', async () => {
       renderTrend({ current: 43 });
       const trendIcon = await screen.findByTestId('trend-icon');
 
-      expect(trendIcon).toHaveClass('fa-arrow-circle-up');
+      within(trendIcon).getByText('arrow_circle_up');
     });
   });
 });

@@ -67,8 +67,7 @@ const Notification = ({ notification }: Props) => {
     <StyledAlert bsStyle="danger"
                  title={(
                    <>
-                     {message.title}{' '}
-
+                     <div dangerouslySetInnerHTML={{__html: _sanitizeDescription(message?.title)}} />
                      <NotificationTimestamp>
                        (triggered <RelativeTime dateTime={notification.timestamp} />)
                      </NotificationTimestamp>

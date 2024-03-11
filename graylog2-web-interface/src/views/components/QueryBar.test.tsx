@@ -87,9 +87,9 @@ describe('QueryBar', () => {
   it('renders existing tabs', async () => {
     render(<QueryBar />);
 
-    await screen.findByRole('button', { name: 'First Query' });
-    await screen.findByRole('button', { name: 'Second Query' });
-    await screen.findByRole('button', { name: 'Third Query' });
+    await screen.findByRole('button', { name: /first query/i });
+    await screen.findByRole('button', { name: /second Query/i });
+    await screen.findByRole('button', { name: /third query/i });
   });
 
   it('allows changing tab', async () => {
@@ -98,7 +98,7 @@ describe('QueryBar', () => {
 
     render(<QueryBar />);
 
-    const nextTab = await screen.findByRole('button', { name: 'Third Query' });
+    const nextTab = await screen.findByRole('button', { name: /third query/i });
 
     fireEvent.click(nextTab);
 
@@ -120,13 +120,13 @@ describe('QueryBar', () => {
       </DashboardPageContext.Provider>,
     );
 
-    const currentTab = await screen.findByRole('button', { name: 'Second Query' });
+    const currentTab = await screen.findByRole('button', { name: /second query/i });
 
     const dropdown = await within(currentTab).findByTestId('query-action-dropdown');
 
     fireEvent.click(dropdown);
 
-    const closeButton = await screen.findByRole('menuitem', { name: 'Delete', hidden: true });
+    const closeButton = await screen.findByRole('menuitem', { name: /delete/i, hidden: true });
 
     fireEvent.click(closeButton);
 

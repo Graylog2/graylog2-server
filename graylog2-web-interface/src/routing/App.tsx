@@ -81,7 +81,7 @@ const App = () => (
                   <AppLayout>
                     <Navigation />
                     <ScrollToHint id="scroll-to-hint">
-                      <Icon name="arrow-up" />
+                      <Icon name="arrow_upward" />
                     </ScrollToHint>
                     <Scratchpad />
                     <ReportedErrorBoundary>

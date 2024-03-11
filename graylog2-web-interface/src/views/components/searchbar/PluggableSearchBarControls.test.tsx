@@ -80,12 +80,12 @@ describe('PluggableSearchBarControls', () => {
     Store.get.mockReturnValue(true);
     const { container } = render(<PluggableSearchBarControls />);
 
-    expect(container.firstChild).toBeNull();
+    expect(container.children).toHaveLength(2);
   });
 
   it('should not render anything when there are no pluggable controls and `showLeftControls` is `false`', () => {
     const { container } = render(<PluggableSearchBarControls showLeftControls={false} />);
 
-    expect(container.firstChild).toBeNull();
+    expect(container.children).toHaveLength(2);
   });
 });

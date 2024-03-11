@@ -105,7 +105,7 @@ const SystemJob = ({ job }) => {
   return (
     <div>
       <JobWrap>
-        <Icon name="cog" />{' '}
+        <Icon name="settings" />{' '}
         <span data-toggle="tooltip" title={job.name}>{job.info}</span>{' '}
         - on <LinkToNode nodeId={job.node_id} />{' '}
         <RelativeTime dateTime={job.started_at} />{' '}
@@ -114,10 +114,10 @@ const SystemJob = ({ job }) => {
         </span>
         {!jobIsOver && job.is_cancelable
           ? (<Button type="button" bsSize="xs" bsStyle="primary" className="pull-right" onClick={_onCancel()}>Cancel</Button>)
-          : (<AcknowledgeButton type="button" bsStyle="link" onClick={_onAcknowledge()} bsSize="xs" className="pull-right" title="Acknowledge"><Icon name="x" /></AcknowledgeButton>)}
+          : (<AcknowledgeButton type="button" bsStyle="link" onClick={_onAcknowledge()} bsSize="xs" className="pull-right" title="Acknowledge"><Icon name="close" /></AcknowledgeButton>)}
       </JobWrap>
 
-      {!jobIsOver && <StyledProgressBar bars={[{ value: job.percent_complete, bsStyle: 'info', animated: true }]} />}
+      {!jobIsOver && job.provides_progress && <StyledProgressBar bars={[{ value: job.percent_complete, bsStyle: 'info', animated: true }]} />}
     </div>
   );
 };

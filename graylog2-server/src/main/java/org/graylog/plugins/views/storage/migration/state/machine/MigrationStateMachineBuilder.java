@@ -18,7 +18,8 @@ package org.graylog.plugins.views.storage.migration.state.machine;
 
 import com.github.oxo42.stateless4j.StateMachine;
 import com.github.oxo42.stateless4j.StateMachineConfig;
-import com.github.oxo42.stateless4j.delegates.Trace;
+import com.github.oxo42.stateless4j.delegates.Action1;
+import com.github.oxo42.stateless4j.delegates.Func;
 import com.google.common.annotations.VisibleForTesting;
 import org.graylog.plugins.views.storage.migration.state.actions.MigrationActions;
 import org.graylog.plugins.views.storage.migration.state.persistence.DatanodeMigrationConfiguration;
@@ -73,6 +74,7 @@ public class MigrationStateMachineBuilder {
         config.configure(MigrationState.PROVISION_DATANODE_CERTIFICATES_PAGE)
                 .permit(MigrationStep.PROVISION_DATANODE_CERTIFICATES, MigrationState.PROVISION_DATANODE_CERTIFICATES_RUNNING, migrationActions::provisionAndStartDataNodes);
 
+        // This page should contain the "Please restart Graylog to continue with data migration"
         config.configure(MigrationState.PROVISION_DATANODE_CERTIFICATES_RUNNING)
                 .permitIf(MigrationStep.SHOW_DATA_MIGRATION_QUESTION, MigrationState.EXISTING_DATA_MIGRATION_QUESTION_PAGE, migrationActions::dataNodeStartupFinished);
 
@@ -83,7 +85,7 @@ public class MigrationStateMachineBuilder {
         // we now have enough information in the context to start the remote reindex migration. This will move us to the
         // next state that will be active as long as the migration is running and will provide status information to the FE
         config.configure(MigrationState.MIGRATE_EXISTING_DATA) // this state and screen has to request username, password and url of the old cluster
-                        .permit(MigrationStep.START_REMOTE_REINDEX_MIGRATION, MigrationState.REMOTE_REINDEX_RUNNING, migrationActions::startRemoteReindex);
+                .permit(MigrationStep.START_REMOTE_REINDEX_MIGRATION, MigrationState.REMOTE_REINDEX_RUNNING, migrationActions::startRemoteReindex);
 
         // the state machine will stay in this state till the migration is finished or fails. It should provide
         // current migration status every time we trigger MigrationStep.REQUEST_MIGRATION_STATUS.
@@ -93,7 +95,7 @@ public class MigrationStateMachineBuilder {
                 .permitIf(MigrationStep.SHOW_ASK_TO_SHUTDOWN_OLD_CLUSTER, MigrationState.ASK_TO_SHUTDOWN_OLD_CLUSTER, migrationActions::isRemoteReindexingFinished);
 
         config.configure(MigrationState.ASK_TO_SHUTDOWN_OLD_CLUSTER)
-                .permitIf(MigrationStep.CONFIRM_OLD_CLUSTER_STOPPED, MigrationState.MANUALLY_REMOVE_OLD_CONNECTION_STRING_FROM_CONFIG, migrationActions::isOldClusterStopped);
+                .permitIf(MigrationStep.CONFIRM_OLD_CLUSTER_STOPPED, MigrationState.FINISHED, migrationActions::isOldClusterStopped);
 
         // in place / rolling upgrade branch of the migration
         config.configure(MigrationState.ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE)
@@ -110,21 +112,15 @@ public class MigrationStateMachineBuilder {
                 .permitIf(MigrationStep.CALCULATE_JOURNAL_SIZE, MigrationState.JOURNAL_SIZE_DOWNTIME_WARNING, migrationActions::provisioningFinished);
 
         config.configure(MigrationState.JOURNAL_SIZE_DOWNTIME_WARNING)
-                .permit(MigrationStep.SHOW_STOP_PROCESSING_PAGE, MigrationState.MESSAGE_PROCESSING_STOP);
+                .onEntry(migrationActions::calculateTrafficEstimate)
+                .permit(MigrationStep.SHOW_STOP_PROCESSING_PAGE, MigrationState.MESSAGE_PROCESSING_STOP, migrationActions::stopMessageProcessing);
 
         config.configure(MigrationState.MESSAGE_PROCESSING_STOP)
-                .onEntry(migrationActions::stopMessageProcessing)
-                .permit(MigrationStep.SHOW_ROLLING_UPGRADE_ASK_TO_SHUTDOWN_OLD_CLUSTER, MigrationState.REPLACE_CLUSTER, migrationActions::startDataNodes);
+                .permit(MigrationStep.SHOW_ROLLING_UPGRADE_ASK_TO_SHUTDOWN_OLD_CLUSTER, MigrationState.RESTART_GRAYLOG, migrationActions::startDataNodes);
 
-        config.configure(MigrationState.REPLACE_CLUSTER)
-                .permit(MigrationStep.SHOW_ASK_TO_RESTART_MESSAGE_PROCESSING, MigrationState.MESSAGE_PROCESSING_RESTART, migrationActions::startMessageProcessing);
-
-        config.configure(MigrationState.MESSAGE_PROCESSING_RESTART)
-                .permit(MigrationStep.CONFIRM_ROLLING_UPGRADE_OLD_CLUSTER_STOPPED, MigrationState.MANUALLY_REMOVE_OLD_CONNECTION_STRING_FROM_CONFIG, migrationActions::isOldClusterStopped);
-
-        // common cleanup steps
-        config.configure(MigrationState.MANUALLY_REMOVE_OLD_CONNECTION_STRING_FROM_CONFIG)
-                .permit(MigrationStep.CONFIRM_OLD_CONNECTION_STRING_FROM_CONFIG_REMOVED, MigrationState.FINISHED);
+        // shows the "remove connection string, restart graylog"
+        config.configure(MigrationState.RESTART_GRAYLOG)
+                .permitIf(MigrationStep.CONFIRM_OLD_CONNECTION_STRING_FROM_CONFIG_REMOVED_AND_GRAYLOG_RESTARTED, MigrationState.FINISHED, migrationActions::dataNodeStartupFinished);
 
         return config;
     }
@@ -135,17 +131,18 @@ public class MigrationStateMachineBuilder {
         return new StateMachine<>(state, config);
     }
 
-    private static StateMachine<MigrationState, MigrationStep> fromState(MigrationState state, Trace<MigrationState, MigrationStep> persistence, MigrationActions migrationActions) {
-        final StateMachineConfig<MigrationState, MigrationStep> config = configureStates(migrationActions);
-        final StateMachine<MigrationState, MigrationStep> stateMachine = new StateMachine<>(state, config);
-        stateMachine.fireInitialTransition(); // asserts that onEntry will be performed when loading persisted state
-        stateMachine.setTrace(persistence);
-        return stateMachine;
-    }
 
-    public static StateMachine<MigrationState, MigrationStep> buildFromPersistedState(DatanodeMigrationPersistence persistenceService, MigrationActions migrationActions) {
-        final MigrationState state = persistenceService.getConfiguration().map(DatanodeMigrationConfiguration::currentState).orElse(MigrationState.NEW);
-        final Trace<MigrationState, MigrationStep> persitanceTrace = new DatanodeMigrationPersistanceTrace(persistenceService);
-        return fromState(state, persitanceTrace, migrationActions);
+    public static StateMachine<MigrationState, MigrationStep> buildFromPersistedState(DatanodeMigrationPersistence persistence, MigrationActions migrationActions) {
+        final StateMachineConfig<MigrationState, MigrationStep> statesConfiguration = configureStates(migrationActions);
+
+        // state accessor and mutator
+        final Func<MigrationState> readStateFunction = () -> persistence.getConfiguration().map(DatanodeMigrationConfiguration::currentState).orElse(MigrationState.NEW);
+        final Action1<MigrationState> writeStateFunction = (currentState) -> persistence.saveConfiguration(new DatanodeMigrationConfiguration(currentState));
+
+        return new StateMachine<>(
+                readStateFunction.call(), // initial state obtained from the DB
+                readStateFunction,
+                writeStateFunction,
+                statesConfiguration);
     }
 }

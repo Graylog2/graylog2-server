@@ -70,7 +70,7 @@ const OverlayDropdownButton = ({
                                  aria-label={buttonTitle}
                                  title={buttonTitle}
                                  disabled={disabled}>
-                           {title} <Icon name="caret-down" />
+                           {title} <Icon name="arrow_drop_down" />
                          </Button>
                        </div>
                      )}
