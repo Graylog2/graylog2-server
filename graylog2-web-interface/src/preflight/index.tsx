@@ -25,6 +25,10 @@ import ThemeWrapper from 'preflight/theme/ThemeWrapper';
 
 import App from './App';
 
+import '@mantine/core/styles.css';
+import '@mantine/notifications/styles.css';
+import '@mantine/dropzone/styles.css';
+
 ReactDOM.render((
   <PreflightThemeProvider>
     <GlobalThemeStyles />

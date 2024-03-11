@@ -1,0 +1,30 @@
+plugins.security.allow_unsafe_democertificates: true
+plugins.security.ssl.transport.pemcert_filepath: node.pem
+plugins.security.ssl.transport.pemkey_filepath: node-key.pem
+plugins.security.ssl.transport.pemtrustedcas_filepath: root-ca.pem
+plugins.security.ssl.transport.enforce_hostname_verification: false
+plugins.security.ssl.transport.resolve_hostname: false
+plugins.security.ssl.http.enabled: true
+plugins.security.ssl.http.pemcert_filepath: node.pem
+plugins.security.ssl.http.pemkey_filepath: node-key.pem
+plugins.security.ssl.http.pemtrustedcas_filepath: root-ca.pem
+plugins.security.authcz.admin_dn:
+  - 'CN=A,OU=UNIT,O=ORG,L=TORONTO,ST=ONTARIO,C=CA'
+plugins.security.nodes_dn:
+  - 'CN=opensearch1,OU=UNIT,O=ORG,L=TORONTO,ST=ONTARIO,C=CA'
+  - 'CN=opensearch2,OU=UNIT,O=ORG,L=TORONTO,ST=ONTARIO,C=CA'
+  - 'CN=opensearch3,OU=UNIT,O=ORG,L=TORONTO,ST=ONTARIO,C=CA'
+#plugins.security.audit.type: internal_opensearch
+plugins.security.allow_default_init_securityindex: true
+plugins.security.system_indices.enabled: true
+
+plugins.security.ssl.transport.truststore_type: JKS
+plugins.security.ssl.transport.truststore_filepath: keystore.jks
+plugins.security.ssl.transport.truststore_password: password
+
+plugins.security.ssl.http.truststore_type: JKS
+plugins.security.ssl.http.truststore_filepath: keystore.jks
+plugins.security.ssl.http.truststore_password: password
+
+logger.org.opensearch: debug
+

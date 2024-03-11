@@ -18,7 +18,6 @@ package org.graylog2.shared.buffers;
 
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
-import com.lmax.disruptor.WorkHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

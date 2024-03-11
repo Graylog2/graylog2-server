@@ -74,11 +74,10 @@ if (mode === 'development') {
       hot: false,
       liveReload: true,
       compress: true,
-      proxy: {
-        '/api': {
-          target: apiUrl,
-        },
-      },
+      proxy: [{
+        context: ['/api'],
+        target: apiUrl,
+      }],
     },
     devtool: 'cheap-module-source-map',
     output: {

@@ -41,8 +41,8 @@
     </issueManagement>
 
     <ciManagement>
-        <system>Travis CI</system>
-        <url>https://travis-ci.org/Graylog2/graylog2-server</url>
+        <system>Github Actions</system>
+        <url>https://github.com/Graylog2/graylog2-server/actions</url>
     </ciManagement>
 
     <mailingLists>
@@ -149,13 +149,8 @@
         </dependency>
 
         <dependency>
-            <groupId>org.graylog.repackaged.mongojack</groupId>
+            <groupId>org.mongojack</groupId>
             <artifactId>mongojack</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.graylog.shaded</groupId>
-            <artifactId>mongojack4</artifactId>
         </dependency>
 
         <dependency>
@@ -606,6 +601,10 @@
             <artifactId>protobuf-java-util</artifactId>
         </dependency>
         <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+        </dependency>
+        <dependency>
             <groupId>jakarta.validation</groupId>
             <artifactId>jakarta.validation-api</artifactId>
         </dependency>
@@ -874,7 +873,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>exec-maven-plugin</artifactId>
-                    <version>3.1.1</version>
+                    <version>3.2.0</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -1093,6 +1092,7 @@
                             <workingDirectory>${webInterface.path}</workingDirectory>
                             <nodeVersion>${nodejs.version}</nodeVersion>
                             <yarnVersion>${yarn.version}</yarnVersion>
+                            <nodeDownloadRoot>https://graylog-ci-cache.s3.eu-west-1.amazonaws.com/downloads/node/</nodeDownloadRoot>
                         </configuration>
 
                         <executions>

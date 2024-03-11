@@ -17,7 +17,7 @@
 import type { PropsWithChildren } from 'react';
 import React from 'react';
 import { Menu as MantineMenu, type MenuProps } from '@mantine/core';
-import styled, { css, useTheme } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 type Props = PropsWithChildren<{
   closeOnItemClick?: boolean,
@@ -46,44 +46,31 @@ const Menu = ({
   portalProps,
   keepMounted,
   zIndex,
-}: Props) => {
-  const theme = useTheme();
-
-  const styles = () => ({
-    dropdown: {
-      backgroundColor: theme.colors.global.contentBackground,
-      border: `1px solid ${theme.colors.variant.lighter.default}`,
-      fontFamily: theme.fonts.family.navigation,
-      fontSize: theme.fonts.size.navigation,
-    },
-  });
-
-  return (
-    <MantineMenu closeOnItemClick={closeOnItemClick}
-                 onClose={onClose}
-                 shadow={shadow}
-                 opened={opened}
-                 onChange={onChange}
-                 portalProps={portalProps}
-                 width={width}
-                 position={position}
-                 withinPortal={withinPortal}
-                 styles={styles}
-                 keepMounted={keepMounted}
-                 zIndex={zIndex}>
-      {children}
-    </MantineMenu>
-  );
-};
+}: Props) => (
+  <MantineMenu closeOnItemClick={closeOnItemClick}
+               onClose={onClose}
+               shadow={shadow}
+               opened={opened}
+               onChange={onChange}
+               portalProps={portalProps}
+               width={width}
+               position={position}
+               withinPortal={withinPortal}
+               keepMounted={keepMounted}
+               zIndex={zIndex}>
+    {children}
+  </MantineMenu>
+);
 
 const StyledMenuItem = styled(MantineMenu.Item)(({ theme }) => css`
   color: ${theme.colors.global.textDefault};
   font-size: ${theme.fonts.size.body};
   white-space: nowrap;
   
-  &:hover, &:focus {
-    text-decoration: none;  
+  &[data-hovered], &:focus {
+    text-decoration: none;
     color: inherit;
+    background-color: ${theme.utils.colorLevel(theme.colors.global.contentBackground, 10)}
   }
 `);
 
@@ -96,7 +83,14 @@ const StyledMenuLabel = styled(MantineMenu.Label)(({ theme }) => css`
 `);
 
 Menu.Target = MantineMenu.Target;
-Menu.Dropdown = MantineMenu.Dropdown;
+
+Menu.Dropdown = styled(MantineMenu.Dropdown)(({ theme }) => css`
+  && {
+    background-color: ${theme.colors.global.contentBackground};
+    border: 1px solid ${theme.colors.variant.lighter.default};
+  }
+`);
+
 Menu.Item = StyledMenuItem;
 Menu.Divider = StyledMenuDivider;
 Menu.Label = StyledMenuLabel;

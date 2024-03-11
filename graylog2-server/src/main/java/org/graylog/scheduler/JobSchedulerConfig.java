@@ -16,6 +16,8 @@
  */
 package org.graylog.scheduler;
 
+import java.util.Map;
+
 /**
  * Used by the scheduler to configure itself.
  */
@@ -35,4 +37,12 @@ public interface JobSchedulerConfig {
      * @return number of worker threads
      */
     int numberOfWorkerThreads();
+
+    /**
+     * Concurrency limits per job type.
+     *
+     * @return mapping of job type to max number of worker threads to assign for this job type. A missing
+     * entry signifies unlimited concurrency (up to numberOfWorkerThreads)
+     */
+    Map<String, Integer> concurrencyLimits();
 }

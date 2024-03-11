@@ -19,17 +19,21 @@ import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import { asMock } from 'helpers/mocking';
-import mockComponent from 'helpers/mocking/MockComponent';
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 
-import SavedSearchForm from './SavedSearchForm';
+import OriginalSavedSearchForm from './SavedSearchForm';
 
-jest.mock('react-overlays', () => ({ Position: mockComponent('MockPosition') }));
-jest.mock('components/common/Portal', () => ({ children }) => (children));
 jest.mock('views/hooks/useSaveViewFormControls');
+
+const SavedSearchForm = (props: React.ComponentProps<typeof OriginalSavedSearchForm>) => (
+  <OriginalSavedSearchForm {...props}>
+    <button type="button">Submit</button>
+  </OriginalSavedSearchForm>
+);
 
 describe('SavedSearchForm', () => {
   const props = {
+    show: true,
     value: 'new Title',
     saveAsSearch: () => {},
     disableCreateNew: false,
@@ -86,7 +90,7 @@ describe('SavedSearchForm', () => {
       render(<SavedSearchForm {...props}
                               saveSearch={onSave} />);
 
-      const saveButton = await screen.findByRole('button', { name: 'Save' });
+      const saveButton = await screen.findByRole('button', { name: /Save search/i });
       userEvent.click(saveButton);
 
       expect(onSave).toHaveBeenCalledTimes(1);
@@ -99,7 +103,7 @@ describe('SavedSearchForm', () => {
                               saveAsSearch={onSaveAs} />);
 
       userEvent.type(await findTitleInput(), ' and further title');
-      const saveAsButton = await screen.findByRole('button', { name: 'Save as' });
+      const saveAsButton = await screen.findByRole('button', { name: /Save as/i });
       userEvent.click(saveAsButton);
 
       expect(onSaveAs).toHaveBeenCalledWith('new Title and further title');
@@ -111,7 +115,7 @@ describe('SavedSearchForm', () => {
       render(<SavedSearchForm {...props}
                               saveAsSearch={onSaveAs} />);
 
-      const saveAsButton = await screen.findByRole('button', { name: 'Save as' });
+      const saveAsButton = await screen.findByRole('button', { name: /Save as/i });
       userEvent.click(saveAsButton);
 
       expect(onSaveAs).not.toHaveBeenCalled();

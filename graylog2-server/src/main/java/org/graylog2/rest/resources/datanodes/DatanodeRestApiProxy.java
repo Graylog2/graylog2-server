@@ -34,6 +34,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Collection;
 import java.util.Locale;
 
 @Singleton
@@ -52,10 +53,12 @@ public class DatanodeRestApiProxy implements ProxyRequestAdapter {
 
     @Override
     public ProxyResponse request(ProxyRequest request) throws IOException {
-        final String host = nodeService.allActive().values().stream()
-                .filter(DataNodeDto::isLeader)
-                .map(DataNodeDto::getRestApiAddress)
+        Collection<DataNodeDto> datanodes = nodeService.allActive().values();
+        final String host = datanodes.stream()
+                .filter(node -> node.isLeader())
                 .findFirst()
+                .or(() -> datanodes.stream().findFirst())
+                .map(DataNodeDto::getRestApiAddress)
                 .map(url -> StringUtils.removeEnd(url, "/"))
                 .orElseThrow(() -> new IllegalStateException("No datanode present"));
 
@@ -72,7 +75,11 @@ public class DatanodeRestApiProxy implements ProxyRequestAdapter {
         }
 
         final Response response = httpClient.newCall(builder.build()).execute();
-        return new ProxyResponse(response.code(), response.body().byteStream());
+        return new ProxyResponse(response.code(), response.body().byteStream(), getContentType(response));
+    }
+
+    private String getContentType(Response response) {
+        return response.header("Content-Type");
     }
 
     @NotNull

@@ -19,6 +19,6 @@ import React from 'react';
 import type { IndexSetFieldTypeProfile } from 'components/indices/IndexSetFieldTypeProfiles/types';
 import ProfileActions from 'components/indices/IndexSetFieldTypeProfiles/ProfileActions';
 
-const profileActions = ({ id }: IndexSetFieldTypeProfile) => <ProfileActions profileId={id} />;
+const profileActions = ({ id, name }: IndexSetFieldTypeProfile) => <ProfileActions profileId={id} profileName={name} />;
 
 export default profileActions;

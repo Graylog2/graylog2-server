@@ -19,8 +19,6 @@ package org.graylog.plugins.views.search.searchtypes;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
@@ -30,15 +28,12 @@ import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.rest.SearchTypeExecutionState;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
-import org.graylog.plugins.views.search.timeranges.OffsetRange;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.entities.MessageListEntity;
 import org.graylog2.contentpacks.model.entities.SearchTypeEntity;
 import org.graylog2.decorators.Decorator;
 import org.graylog2.decorators.DecoratorImpl;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
-import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
-import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.rest.models.messages.responses.DecorationStats;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
@@ -58,6 +53,7 @@ public abstract class MessageList implements SearchType {
     public static final String NAME = "messages";
 
     @Override
+    @JsonProperty
     public abstract String type();
 
     @Override
@@ -169,13 +165,6 @@ public abstract class MessageList implements SearchType {
         public abstract Builder fields(List<String> fields);
 
         @JsonProperty
-        @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", visible = false)
-        @JsonSubTypes({
-                @JsonSubTypes.Type(name = AbsoluteRange.ABSOLUTE, value = AbsoluteRange.class),
-                @JsonSubTypes.Type(name = RelativeRange.RELATIVE, value = RelativeRange.class),
-                @JsonSubTypes.Type(name = KeywordRange.KEYWORD, value = KeywordRange.class),
-                @JsonSubTypes.Type(name = OffsetRange.OFFSET, value = OffsetRange.class)
-        })
         public Builder timerange(@Nullable TimeRange timerange) {
             return timerange(timerange == null ? null : DerivedTimeRange.of(timerange));
         }
@@ -215,6 +204,8 @@ public abstract class MessageList implements SearchType {
 
     @AutoValue
     @JsonInclude(JsonInclude.Include.NON_ABSENT)
+    @JsonDeserialize(builder = Result.Builder.class)
+    @JsonTypeName(MessageList.NAME)
     public abstract static class Result implements SearchType.Result {
 
         @Override
@@ -222,10 +213,7 @@ public abstract class MessageList implements SearchType {
         public abstract String id();
 
         @Override
-        @JsonProperty
-        public String type() {
-            return NAME;
-        }
+        public abstract String type();
 
         @JsonProperty
         public abstract List<ResultMessageSummary> messages();
@@ -240,7 +228,7 @@ public abstract class MessageList implements SearchType {
         public abstract long totalResults();
 
         public static Builder builder() {
-            return new AutoValue_MessageList_Result.Builder();
+            return new AutoValue_MessageList_Result.Builder().type(MessageList.NAME);
         }
 
         public static Builder result(String searchTypeId) {
@@ -249,16 +237,31 @@ public abstract class MessageList implements SearchType {
 
         @AutoValue.Builder
         public abstract static class Builder {
+
+            @JsonCreator
+            public static Result.Builder create() {
+                return new AutoValue_MessageList_Result.Builder().type(MessageList.NAME);
+            }
+
+            @JsonProperty
             public abstract Builder id(String id);
 
+            @JsonProperty
             public abstract Builder name(@Nullable String name);
 
+            @JsonProperty
+            public abstract Builder type(String type);
+
+            @JsonProperty
             public abstract Builder messages(List<ResultMessageSummary> messages);
 
+            @JsonProperty
             public abstract Builder totalResults(long totalResults);
 
+            @JsonProperty
             public abstract Builder decorationStats(DecorationStats decorationStats);
 
+            @JsonProperty
             public abstract Builder effectiveTimerange(AbsoluteRange effectiveTimerange);
 
             public abstract Result build();

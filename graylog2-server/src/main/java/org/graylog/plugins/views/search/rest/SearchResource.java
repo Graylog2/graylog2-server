@@ -21,6 +21,20 @@ import com.google.common.util.concurrent.Uninterruptibles;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import jakarta.inject.Inject;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
 import org.graylog.plugins.views.search.Search;
@@ -39,23 +53,6 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-
-import jakarta.validation.constraints.NotNull;
-
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DefaultValue;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.NotFoundException;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-
 import java.net.URI;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -73,8 +70,8 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 public class SearchResource extends RestResource implements PluginRestResource {
     private static final Logger LOG = LoggerFactory.getLogger(SearchResource.class);
     private static final String BASE_PATH = "views/search";
-    private static final String SEARCH_FORMAT_V1 = "application/vnd.graylog.search.v1+json";
-    private static final String SEARCH_FORMAT_V2 = "application/vnd.graylog.search.v2+json";
+    public static final String SEARCH_FORMAT_V1 = "application/vnd.graylog.search.v1+json";
+    public static final String SEARCH_FORMAT_V2 = "application/vnd.graylog.search.v2+json";
 
     private final SearchDomain searchDomain;
     private final SearchExecutor searchExecutor;
@@ -164,7 +161,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
 
         final SearchJobDTO searchJobDTO = SearchJobDTO.fromSearchJob(searchJob);
 
-        return Response.created(URI.create(BASE_PATH + "/status/" + searchJobDTO.id()))
+        return Response.created(URI.create(BASE_PATH + "/status/" + searchJobDTO.searchJobIdentifier().id()))
                 .entity(searchJob)
                 .build();
     }
@@ -223,8 +220,6 @@ public class SearchResource extends RestResource implements PluginRestResource {
 
             }
         }
-
-
         return SearchJobDTO.fromSearchJob(searchJob);
     }
 

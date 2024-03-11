@@ -23,6 +23,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRespons
 import org.graylog.shaded.opensearch2.org.opensearch.search.SearchHit;
 import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.List;
 
@@ -41,6 +42,7 @@ public class PaginationResultOS2 extends ChunkedQueryResultOS2 {
     }
 
     @Override
+    @Nullable
     protected SearchResponse nextSearchResult() throws IOException {
         final SearchSourceBuilder initialQuery = initialSearchRequest.source();
         final SearchHit[] hits = lastSearchResponse.getHits().getHits();

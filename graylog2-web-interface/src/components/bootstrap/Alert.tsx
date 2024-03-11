@@ -18,7 +18,7 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 import type { CSSProperties } from 'react';
 import type { ColorVariant } from '@graylog/sawmill';
-import { Alert as MantineAlert, useMantineTheme } from '@mantine/core';
+import { Alert as MantineAlert } from '@mantine/core';
 
 import Icon from 'components/common/Icon';
 
@@ -31,48 +31,46 @@ type Props = {
   title?: React.ReactNode,
 }
 
-const StyledAlert = styled(MantineAlert)(({ theme }) => css`
-  margin: ${theme.mantine.spacing.md} 0;
+const StyledAlert = styled(MantineAlert)<{ $bsStyle: ColorVariant }>(({ $bsStyle, theme }) => css`
+  margin: ${theme.spacings.md} 0;
+  border: 1px solid ${theme.colors.variant.lighter[$bsStyle]};
+
+  .mantine-Alert-message {
+    color: ${theme.colors.global.textDefault};
+    font-size: ${theme.fonts.size.body};
+  }
+
+  .mantine-Alert-title {
+    font-size: ${theme.fonts.size.body};
+    color: ${theme.colors.global.textDefault};
+  }
+
+  .mantine-Alert-closeButton {
+    color: ${theme.colors.global.textDefault};
+  },
 `);
 
 const iconNameForType = (bsStyle: ColorVariant) => {
   switch (bsStyle) {
     case 'warning':
     case 'danger':
-      return 'exclamation-triangle';
+      return 'error';
     case 'success':
-      return 'circle-check';
+      return 'check_circle';
     default:
-      return 'info-circle';
+      return 'info';
   }
 };
 
 const Alert = ({ children, bsStyle, title, style, className, onDismiss }: Props) => {
-  const theme = useMantineTheme();
   const displayCloseButton = typeof onDismiss === 'function';
   const iconName = iconNameForType(bsStyle);
 
-  const alertStyles = () => ({
-    root: {
-      border: `1px solid ${theme.other.shades.lighter(bsStyle)}`,
-    },
-    message: {
-      fontSize: theme.fontSizes.md,
-    },
-    title: {
-      fontSize: theme.fontSizes.md,
-      color: theme.other.colors.global.textDefault,
-    },
-    closeButton: {
-      color: theme.other.colors.global.textDefault,
-    },
-  });
-
   return (
-    <StyledAlert className={className}
+    <StyledAlert $bsStyle={bsStyle}
+                 className={className}
                  color={bsStyle}
                  style={style}
-                 styles={alertStyles}
                  onClose={onDismiss}
                  title={title}
                  icon={<Icon name={iconName} />}

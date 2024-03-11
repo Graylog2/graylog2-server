@@ -157,23 +157,31 @@ describe('AggregationWizard/Visualizations', () => {
 
     await selectOption('Select visualization type', 'Extra Config Required');
 
-    await expectSubmitButtonToBeDisabled();
+    await waitFor(async () => {
+      await expectSubmitButtonToBeDisabled();
+    });
 
     const factorInput = await screen.findByRole('spinbutton', { name: 'Important Factor' });
 
     fireEvent.change(factorInput, { target: { value: '10' } });
 
-    expect(await findWidgetConfigSubmitButton()).not.toBeDisabled();
+    await waitFor(async () => {
+      expect(await findWidgetConfigSubmitButton()).not.toBeDisabled();
+    });
 
     await selectOption('Select Mode', 'anothermode');
 
-    await expectSubmitButtonToBeDisabled();
+    await waitFor(async () => {
+      await expectSubmitButtonToBeDisabled();
+    });
 
     await selectOption('Select Favorite Color', 'Yellow');
 
     const submitButton = await findWidgetConfigSubmitButton();
 
-    expect(submitButton).not.toBeDisabled();
+    await waitFor(() => {
+      expect(submitButton).not.toBeDisabled();
+    });
 
     userEvent.click(submitButton);
 

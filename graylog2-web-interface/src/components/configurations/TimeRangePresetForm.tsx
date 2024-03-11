@@ -90,7 +90,7 @@ const TimeRangePresetFormItem = ({ idx, id, timerange, description, onChange, on
 
   return (
     <ItemWrapper data-testid={`time-range-preset-${id}`}>
-      <TimeRangeFilter onChange={handleOnChangeRange} limitDuration={limitDuration} value={timerange} />
+      <TimeRangeFilter onChange={handleOnChangeRange} limitDuration={limitDuration} value={timerange} withinPortal={false} />
       <Description>
         <StyledInput type="text"
                      id={`quick-access-time-range-description-${id}`}
@@ -102,7 +102,7 @@ const TimeRangePresetFormItem = ({ idx, id, timerange, description, onChange, on
                      onChange={({ target: { value } }) => debounceHandleOnChangeDescription(value)}
                      formGroupClassName="" />
         <IconWrapper className="input-group-addon" onClick={handleOnRemove} title="Remove preset">
-          <Icon name="trash-alt" style={{ cursor: 'pointer' }} />
+          <Icon name="delete" style={{ cursor: 'pointer' }} />
         </IconWrapper>
       </Description>
     </ItemWrapper>

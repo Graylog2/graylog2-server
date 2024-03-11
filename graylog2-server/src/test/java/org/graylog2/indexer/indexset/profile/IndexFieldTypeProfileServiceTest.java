@@ -45,6 +45,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -207,6 +208,24 @@ public class IndexFieldTypeProfileServiceTest {
     }
 
     @Test
+    public void testRetrievalWithIncorrectProfileIdReturnsEmptyOptional() {
+        assertTrue(toTest.getWithUsages("hmm").isEmpty());
+        assertTrue(toTest.get("hmm").isEmpty());
+    }
+
+    @Test
+    public void testRemovalWithIncorrectProfileIdDoesNothing() {
+        final int result = toTest.delete("hmm");
+        assertEquals(0, result);
+    }
+
+    @Test
+    public void testUpdateWithIncorrectProfileIdDoesNothing() {
+        final boolean result = toTest.update("hmm", new IndexFieldTypeProfile(null, "Hmm", "Hmm", new CustomFieldMappings(List.of())));
+        assertFalse(result);
+    }
+
+    @Test
     public void testRemovalOfProfileRemovesItsUsagesInIndexSet() {
         toTest.save(new IndexFieldTypeProfile("123400000000000000000001", "profile1", "profile1", new CustomFieldMappings()));
         toTest.save(new IndexFieldTypeProfile("123400000000000000000002", "profile2", "profile2", new CustomFieldMappings()));
@@ -262,7 +281,8 @@ public class IndexFieldTypeProfileServiceTest {
                 1, true,
                 Duration.standardSeconds(5),
                 new CustomFieldMappings(),
-                profileId);
+                profileId,
+                null);
     }
 
 }

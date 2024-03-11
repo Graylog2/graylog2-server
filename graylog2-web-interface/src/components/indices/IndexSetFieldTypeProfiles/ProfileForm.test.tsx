@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, fireEvent, act } from 'wrappedTestingLibrary';
+import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import selectEvent from 'react-select-event';
 
 import asMock from 'helpers/mocking/AsMock';
@@ -91,20 +91,18 @@ describe('IndexSetFieldTypesList', () => {
 
     const addMappingButton = await screen.findByRole('button', { name: /add mapping/i });
 
-    // eslint-disable-next-line testing-library/no-unnecessary-act
-    await act(async () => {
-      fireEvent.click(addMappingButton);
-    });
+    fireEvent.click(addMappingButton);
 
     const typeSecond = await screen.findByLabelText(/select customFieldMappings.1.type/i);
     const submitButton = await screen.findByLabelText('Submit');
 
-    // eslint-disable-next-line testing-library/no-unnecessary-act
-    await act(async () => {
-      await selectItem(typeSecond, 'String type');
+    await selectItem(typeSecond, 'String type');
 
-      fireEvent.click(submitButton);
+    await waitFor(async () => {
+      expect(screen.queryAllByText('String type')).toHaveLength(2);
     });
+
+    fireEvent.click(submitButton);
 
     expect(mockSubmit).not.toHaveBeenCalled();
   });
@@ -121,22 +119,20 @@ describe('IndexSetFieldTypesList', () => {
 
     const addMappingButton = await screen.findByRole('button', { name: /add mapping/i });
 
-    // eslint-disable-next-line testing-library/no-unnecessary-act
-    await act(async () => {
-      fireEvent.click(addMappingButton);
-    });
+    fireEvent.click(addMappingButton);
 
     const fieldSecond = await screen.findByLabelText(/select customFieldMappings.1.field/i);
     const typeSecond = await screen.findByLabelText(/select customFieldMappings.1.type/i);
     const submitButton = await screen.findByLabelText('Submit');
 
-    // eslint-disable-next-line testing-library/no-unnecessary-act
-    await act(async () => {
-      await selectItem(typeSecond, 'String type');
-      await selectItem(fieldSecond, 'http_method');
+    await selectItem(typeSecond, 'String type');
+    await selectItem(fieldSecond, 'http_method');
 
-      fireEvent.click(submitButton);
+    await waitFor(async () => {
+      expect(screen.queryAllByText('http_method')).toHaveLength(2);
     });
+
+    fireEvent.click(submitButton);
 
     expect(mockSubmit).not.toHaveBeenCalled();
   });

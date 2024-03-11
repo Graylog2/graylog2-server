@@ -32,7 +32,7 @@ export const DEFAULT_COMBINATION_KEY = '+';
 const defaultOptions: ReactHotKeysHookOptions & Options = {
   preventDefault: true,
   enabled: true,
-  enableOnFormTags: false,
+  enableOnFormTags: true,
   enableOnContentEditable: false,
   combinationKey: DEFAULT_COMBINATION_KEY,
   splitKey: DEFAULT_SPLIT_KEY,
@@ -56,7 +56,7 @@ const catchErrors = (hotKeysCollections: HotkeyCollections, actionKey: string, s
 
 export type HotkeysProps = {
   actionKey: string,
-  callback: (event: KeyboardEvent, handler: HotkeysEvent) => unknown,
+  callback?: (event: KeyboardEvent, handler: HotkeysEvent) => unknown,
   scope: ScopeName,
   options?: Options,
   dependencies?: Array<unknown>,

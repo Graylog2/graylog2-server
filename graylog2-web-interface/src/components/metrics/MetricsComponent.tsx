@@ -125,7 +125,7 @@ class MetricsComponent extends React.Component<Props, State> {
           <StyledWarningDiv className="text-warning">
             {error && (
               <>
-                <Icon name="exclamation-triangle" />&nbsp;
+                <Icon name="warning" />&nbsp;
                 Could not fetch metrics from node: server returned <em>{error.responseMessage || ''}</em>{' '}
                 with a {error.status} status code. Displaying last metrics available.
               </>

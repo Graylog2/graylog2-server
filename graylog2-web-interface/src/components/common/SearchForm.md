@@ -78,7 +78,7 @@ const SearchFormExample = createReactClass({
                     label="Search"
                     queryHelpComponent={(
                       <Button onClick={() => alert('help!')} bsStyle="link">
-                        <Icon name="question-circle" />
+                        <Icon name="help" />
                       </Button>)}
                     useLoadingState />
       </div>

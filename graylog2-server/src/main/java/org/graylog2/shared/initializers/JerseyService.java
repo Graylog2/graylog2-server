@@ -25,11 +25,14 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.net.HostAndPort;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import jakarta.ws.rs.container.ContainerResponseFilter;
 import jakarta.ws.rs.container.DynamicFeature;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.ext.ContextResolver;
 import jakarta.ws.rs.ext.ExceptionMapper;
+import org.glassfish.grizzly.GrizzlyFuture;
 import org.glassfish.grizzly.http.CompressionConfig;
 import org.glassfish.grizzly.http.server.ErrorPageGenerator;
 import org.glassfish.grizzly.http.server.HttpServer;
@@ -76,9 +79,6 @@ import org.graylog2.shared.security.tls.PemKeyStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-
 import javax.net.ssl.SSLContext;
 import java.io.IOException;
 import java.net.URI;
@@ -91,9 +91,12 @@ import java.security.cert.CertificateException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 import static com.codahale.metrics.MetricRegistry.name;
@@ -119,6 +122,7 @@ public class JerseyService extends AbstractIdleService {
     private final MetricRegistry metricRegistry;
     private final ErrorPageGenerator errorPageGenerator;
     private final TLSProtocolsConfiguration tlsConfiguration;
+    private final int shutdownTimeoutMs;
 
     private HttpServer apiHttpServer = null;
 
@@ -134,7 +138,8 @@ public class JerseyService extends AbstractIdleService {
                          ObjectMapper objectMapper,
                          MetricRegistry metricRegistry,
                          ErrorPageGenerator errorPageGenerator,
-                         TLSProtocolsConfiguration tlsConfiguration) {
+                         TLSProtocolsConfiguration tlsConfiguration,
+                         @Named("shutdown_timeout") int shutdownTimeoutMs) {
         this.configuration = requireNonNull(configuration, "configuration");
         this.dynamicFeatures = requireNonNull(dynamicFeatures, "dynamicFeatures");
         this.containerResponseFilters = requireNonNull(containerResponseFilters, "containerResponseFilters");
@@ -147,6 +152,7 @@ public class JerseyService extends AbstractIdleService {
         this.metricRegistry = requireNonNull(metricRegistry, "metricRegistry");
         this.errorPageGenerator = requireNonNull(errorPageGenerator, "errorPageGenerator");
         this.tlsConfiguration = requireNonNull(tlsConfiguration);
+        this.shutdownTimeoutMs = shutdownTimeoutMs;
     }
 
     @Override
@@ -165,7 +171,22 @@ public class JerseyService extends AbstractIdleService {
     private void shutdownHttpServer(HttpServer httpServer, HostAndPort bindAddress) {
         if (httpServer != null && httpServer.isStarted()) {
             LOG.info("Shutting down HTTP listener at <{}>", bindAddress);
-            httpServer.shutdownNow();
+
+            // Don't use HttpServer#shutdown(long, TimeUnit) as it will always log a warning, even when the shutdown
+            // completes within the grace period
+            final GrizzlyFuture<HttpServer> shutdownFuture = httpServer.shutdown();
+            try {
+                shutdownFuture.get(shutdownTimeoutMs, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            } catch (ExecutionException e) {
+                throw new RuntimeException(e);
+            } catch (TimeoutException e) {
+                shutdownFuture.cancel(true);
+                LOG.warn("Unable to gracefully shut down service within {} ms. Forcing immediate shutdown.",
+                        shutdownTimeoutMs);
+                httpServer.shutdownNow();
+            }
         }
     }
 

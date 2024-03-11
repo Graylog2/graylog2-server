@@ -48,27 +48,17 @@ const Toggle = styled.div`
   margin-right: 5px;
 `;
 
-const IconStack = styled.div(({ theme }) => css`
-  &.fa-stack {
-    cursor: pointer;
-    font-size: ${theme.fonts.size.large};
-    line-height: 20px;
-    width: 1em;
-    height: 1em;
-    vertical-align: text-top;
+const IconContainer = styled.div(({ theme }) => css`
+  cursor: pointer;
+  font-size: ${theme.fonts.size.large};
+  line-height: 20px;
+  width: 1em;
+  height: 1em;
+  vertical-align: text-top;
 
-    &:hover [class*='fa-'] {
-      color: ${theme.colors.variant.primary};
-      opacity: 1;
-    }
-  }
-
-  [class*='fa-']:first-child {
-    opacity: 0;
-
-    ~ [class*='fa-']:hover {
-      color: ${theme.colors.global.contentBackground};
-    }
+  &:hover {
+    color: ${theme.colors.variant.primary};
+    opacity: 1;
   }
 `);
 
@@ -238,14 +228,18 @@ class ExpandableListItem extends React.Component<Props, State> {
     return (
       <ItemWrap $padded={padded}>
         <Container>
-          {selectable && <Checkbox inputRef={(ref) => { this._checkbox = ref; }} inline checked={checked} {...inputProps} />}
-          {expandable
-          && (
-            <Toggle>
-              <IconStack className="fa-stack" tabIndex={0} onClick={this._toggleExpand}>
-                <Icon name="circle" className="fa-stack-1x" />
-                <Icon name={`angle-${expanded ? 'down' : 'up'}`} className="fa-stack-1x" />
-              </IconStack>
+          {selectable && (
+          <Checkbox inputRef={(ref) => { this._checkbox = ref; }}
+                    inline
+                    title="Select item"
+                    checked={checked}
+                    {...inputProps} />
+          )}
+          {expandable && (
+            <Toggle role="button" tabIndex={0} onClick={this._toggleExpand} title={`${expanded ? 'Shrink' : 'Expand'} list item`}>
+              <IconContainer>
+                <Icon name={expanded ? 'expand_circle_up' : 'expand_circle_down'} />
+              </IconContainer>
             </Toggle>
           )}
           <HeaderWrap className="header">

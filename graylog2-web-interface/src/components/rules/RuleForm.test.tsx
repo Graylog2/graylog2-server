@@ -16,14 +16,17 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
-import { renderWithDataRouter, screen, waitFor } from 'wrappedTestingLibrary';
+import { act, renderWithDataRouter, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
 import RuleForm from './RuleForm';
 import { PipelineRulesContext } from './RuleContext';
 
+const extendedTimeout = applyTimeoutMultiplier(30000);
+
 describe('RuleForm', () => {
-  it('should save and update the correct description value', () => {
+  it('should save and update the correct description value', async () => {
     const ruleToUpdate = {
       source: `rule "function howto"
       when
@@ -39,13 +42,14 @@ describe('RuleForm', () => {
     };
 
     const handleDescription = jest.fn();
+    const handleSavePipelineRule = jest.fn();
 
     const { getByLabelText, getByRole } = renderWithDataRouter((
       <PipelineRulesContext.Provider value={{
         description: '',
         handleDescription: handleDescription,
         ruleSource: ruleToUpdate.source,
-        handleSavePipelineRule: () => {},
+        handleSavePipelineRule,
         ruleSourceRef: {},
         usedInPipelines: [],
         onAceLoaded: () => {},
@@ -61,11 +65,17 @@ describe('RuleForm', () => {
 
     expect(descriptionInput).toHaveValue('');
 
-    userEvent.paste(descriptionInput, ruleToUpdate.description);
+    await userEvent.paste(descriptionInput, ruleToUpdate.description);
     const createRuleButton = getByRole('button', { name: 'Update rule & close' });
-    userEvent.click(createRuleButton);
 
-    expect(handleDescription).toHaveBeenCalledWith(ruleToUpdate.description);
+    // eslint-disable-next-line testing-library/no-unnecessary-act
+    await act(async () => {
+      await userEvent.click(createRuleButton);
+    });
+
+    await waitFor(() => {
+      expect(handleDescription).toHaveBeenCalledWith(ruleToUpdate.description);
+    });
   });
 
   it('should run rule simulation using the rule input', async () => {
@@ -114,15 +124,17 @@ describe('RuleForm', () => {
 
     expect(rawMessageInput).toHaveValue('');
 
-    userEvent.paste(rawMessageInput, ruleInput);
+    await userEvent.paste(rawMessageInput, ruleInput);
     const runSimulationButton = await screen.findByRole('button', { name: 'Run rule simulation' });
 
     await waitFor(() => {
       expect(runSimulationButton).not.toBeDisabled();
     });
 
-    userEvent.click(runSimulationButton);
+    await userEvent.click(runSimulationButton);
 
-    expect(_setRawMessage).toHaveBeenCalledWith(ruleInput);
-  });
+    await waitFor(() => {
+      expect(_setRawMessage).toHaveBeenCalledWith(ruleInput);
+    });
+  }, extendedTimeout);
 });

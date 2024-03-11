@@ -56,7 +56,7 @@ type Props = {
   sort: SortType,
   onlyActive: boolean,
   onPageChange: (page: number, pageSize: number) => void,
-  onQueryChange: (query: string) => void,
+  onQueryChange: (query?: string) => void,
   onSortChange: (sortField: string) => void,
   toggleShowInactive: () => void,
 };

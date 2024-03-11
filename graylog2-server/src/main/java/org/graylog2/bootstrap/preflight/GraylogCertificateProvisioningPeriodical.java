@@ -196,6 +196,14 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                             notificationService.fixed(Notification.Type.DATA_NODE_NEEDS_PROVISIONING);
                         }
                     }
+                } else {
+                    // if we're running through preflight and reach "STARTUP_PREPARED", we want to request STARTUP of OpenSearch
+                    var preparedNodes = nodesByState.getOrDefault(DataNodeProvisioningConfig.State.STARTUP_PREPARED, List.of());
+                    if(!preparedNodes.isEmpty()) {
+                        preparedNodes.forEach(c -> dataNodeProvisioningService.save(c.asStartupTrigger()));
+                        // waiting one iteration after writing the new state, so we return from execution here and skip the rest of the periodical
+                        return;
+                    }
                 }
 
                 final var caKeystore = optKey.get();
@@ -222,7 +230,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                     });
                 }
 
-                nodesByState.getOrDefault(DataNodeProvisioningConfig.State.STORED, List.of())
+                nodesByState.getOrDefault(DataNodeProvisioningConfig.State.STARTUP_REQUESTED, List.of())
                         .forEach(c -> {
                             dataNodeProvisioningService.save(c.asConnecting());
                             executor.submit(() -> checkConnectivity(c));

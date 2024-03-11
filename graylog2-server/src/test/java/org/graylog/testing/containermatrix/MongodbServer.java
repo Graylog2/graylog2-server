@@ -17,7 +17,8 @@
 package org.graylog.testing.containermatrix;
 
 public enum MongodbServer {
-    MONGO5("5.0");
+    MONGO5("5.0"),
+    MONGO7("7.0");
 
     public static final MongodbServer DEFAULT_VERSION = MONGO5;
 

@@ -1,0 +1,5 @@
+type = "c"
+message = "Shorten time range of show received messages buttons on inputs, forwarder profiles and sidecars."
+
+issues = ["5620"]
+pulls = ["5621"]
