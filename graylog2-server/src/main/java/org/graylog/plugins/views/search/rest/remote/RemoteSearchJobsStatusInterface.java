@@ -25,8 +25,11 @@ import retrofit2.http.Streaming;
 
 public interface RemoteSearchJobsStatusInterface {
 
+
     @GET("views/search/status/{jobId}")
     @Streaming
     @Headers({"Accept: */*"})
+        //Call<ResponseBody> response is used intentionally instead of Call<SearchJobDTO>, because we do not want unnecessary serialization/deserialization of response we just pass between nodes.
+        //What is more, SearchJobDTO is not supporting deserialization right now and it would require a significant amount of work to change that.
     Call<ResponseBody> jobStatus(@Path("jobId") String jobId);
 }
