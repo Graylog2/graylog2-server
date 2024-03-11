@@ -51,8 +51,9 @@ const onServerError = async (error: Response | undefined, onUnauthorized = defau
   if (error && !error.status) {
     ServerAvailabilityActions.reportError(fetchError);
   }
+  const shouldThrowError = error?.name !== "AbortError";
 
-  throw fetchError;
+  if(shouldThrowError) throw fetchError;
 };
 
 const maybeStringify = (body: any) => (body && typeof body !== 'string' ? JSON.stringify(body) : body);
@@ -97,6 +98,8 @@ export class Builder {
 
   private accept: string;
 
+  private abortSignal: AbortSignal;
+
   private responseHandler: (response: unknown) => unknown;
 
   private errorHandler: (error: unknown) => unknown;
@@ -134,6 +137,11 @@ export class Builder {
     return this;
   }
 
+  signal(signal: AbortSignal) {
+    this.abortSignal = signal;
+
+    return this;
+  }
   formData(body, acceptedMimeType = 'application/json') {
     this.body = { body };
 
@@ -214,6 +222,7 @@ export class Builder {
       method: this.method,
       headers,
       body: this.body ? this.body.body : undefined,
+      signal: this.abortSignal,
     })).then(this.responseHandler, this.errorHandler)
       .catch(this.errorHandler);
   }
@@ -240,6 +249,19 @@ export default function fetch<T = any>(method: Method, url: string, body?: any, 
     .json(body)
     .build();
 
+  if (requireSession) {
+    return queuePromiseIfNotLoggedin(promise)();
+  }
+
+  return promise();
+}
+
+export function fetchWithSignal<T = any>(signal: AbortSignal, method: Method, url: string, body?: any, requireSession: boolean = true): Promise<T> {
+  const promise = () => new Builder(method, url)
+    .json(body)
+    .signal(signal)
+    .build();
+  console.log({ signal });
   if (requireSession) {
     return queuePromiseIfNotLoggedin(promise)();
   }

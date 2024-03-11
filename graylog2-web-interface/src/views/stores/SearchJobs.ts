@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import fetch from 'logic/rest/FetchProvider';
+import fetch, {fetchWithSignal} from 'logic/rest/FetchProvider';
 import * as URLUtils from 'util/URLUtils';
 import type Search from 'views/logic/search/Search';
 import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
@@ -66,8 +66,8 @@ export function runSearchJob(search: Search, executionState: SearchExecutionStat
   return fetch('POST', executeQueryUrl(search.id), JSON.stringify(executionState));
 }
 
-export function runPollJob({ nodeId, asyncSearchId } : JobIds): Promise<SearchJobType | null> {
-  return fetch('GET', pollJobUrl(nodeId, asyncSearchId));
+export function runPollJob({ nodeId, asyncSearchId } : JobIds, signal: AbortSignal): Promise<SearchJobType | null> {
+  return fetchWithSignal(signal, 'GET', pollJobUrl(nodeId, asyncSearchId));
 }
 
 export function searchJobStatus(jobId: SearchJobId): Promise<SearchJobType> {

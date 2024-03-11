@@ -63,22 +63,21 @@ export const startJob = async (
   return runStartJob(search, executionState).then((res) => ({ asyncSearchId: res.id, nodeId: res.executing_node }));
 };
 
-export const pollJob = (jobIds: JobIds, result: SearchJobType | null, signal: AbortSignal): Promise<SearchJobType> => new Promise((resolve) => {
+export const pollJob = (jobIds: JobIds, result: SearchJobType | null, signal: AbortSignal): Promise<SearchJobType> => new Promise((resolve, reject) => {
   if (result?.execution?.done) {
     resolve(result);
   } else {
     delay(2000)
       .then(() => {
         if (!signal.aborted) {
-          resolve(runPollJob(jobIds).then((res) => pollJob(jobIds, res, signal)));
-        }
+          resolve(runPollJob(jobIds, signal).then((res) => pollJob(jobIds, res, signal)));
+        } else { reject() }
       });
   }
 });
 
 export const executeJobResult = async ({ asyncSearchId, nodeId }: JobIds, view: View, signal: AbortSignal): Promise<SearchExecutionResult> => {
   const { widgetMapping } = view;
-
   /*
   if (signal?.aborted) {
     console.log('Aborted');
@@ -92,6 +91,27 @@ export const executeJobResult = async ({ asyncSearchId, nodeId }: JobIds, view: 
   return pollJob({ asyncSearchId, nodeId }, null, signal)
     .then((result) => ({ widgetMapping, result: new SearchResult(result) }));
 };
+
+/*
+export const executeJobResult = async ({ asyncSearchId, nodeId }: JobIds, view: View, signal: AbortSignal): Promise<SearchExecutionResult> => {
+  return new Promise((resolve, reject) => {
+    const { widgetMapping } = view;
+
+    if (signal?.aborted) {
+      console.log('Aborted');
+      reject();
+    }
+    signal.addEventListener('abort', () => {
+      console.log('Aborted');
+      reject();
+    });
+
+    return resolve(pollJob({ asyncSearchId, nodeId }, null, signal)
+      .then((result) => ({ widgetMapping, result: new SearchResult(result) })));
+  })
+};
+*/
+
 
 export const cancelJob = (jobIds: JobIds) => runCancelJob(jobIds);
 
