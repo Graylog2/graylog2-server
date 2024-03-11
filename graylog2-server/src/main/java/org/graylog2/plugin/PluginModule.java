@@ -30,6 +30,7 @@ import org.graylog.events.notifications.EventNotificationConfig;
 import org.graylog.events.processor.EventProcessor;
 import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog.events.processor.EventProcessorParameters;
+import org.graylog.events.processor.aggregation.EventQuerySearchTypeSupplier;
 import org.graylog.events.processor.modifier.EventModifier;
 import org.graylog.events.processor.storage.EventStorageHandler;
 import org.graylog.grn.GRNDescriptorProvider;
@@ -252,6 +253,14 @@ public abstract class PluginModule extends Graylog2Module {
 
     protected void addEventModifier(Class<? extends EventModifier> eventModifierClass) {
         eventModifierBinder().addBinding().to(eventModifierClass);
+    }
+
+    protected Multibinder<EventQuerySearchTypeSupplier> eventQuerySearchTypeSupplierBinder() {
+        return Multibinder.newSetBinder(binder(), EventQuerySearchTypeSupplier.class);
+    }
+
+    protected void addEventQuerySearchTypeSupplier(Class<? extends EventQuerySearchTypeSupplier> eventModifierClass) {
+        eventQuerySearchTypeSupplierBinder().addBinding().to(eventModifierClass);
     }
 
     private MapBinder<String, EventStorageHandler.Factory> eventStorageHandlerBinder() {

@@ -22,7 +22,7 @@ import java.io.InputStream;
 public interface ProxyRequestAdapter {
     record ProxyRequest(String method, String path, InputStream body) {}
 
-    record ProxyResponse(int status, InputStream response) {}
+    record ProxyResponse(int status, InputStream response, String contentType) {}
 
     ProxyResponse request(ProxyRequest request) throws IOException;
 }

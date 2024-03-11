@@ -16,10 +16,7 @@
  */
 import { useState, useEffect } from 'react';
 
-import useTriggerMigrationState from './useTriggerMigrationState';
-import useMigrationState from './useMigrationState';
-
-import type { MigrationActions } from '../Types';
+import type { MigrationActions, MigrationState, OnTriggerStepFunction } from '../Types';
 import { MIGRATION_STATE } from '../Constants';
 
 export type MigrationStatus = 'NOT_STARTED'|'STARTING'|'RUNNING'|'ERROR'|'FINISHED';
@@ -49,22 +46,24 @@ export type RemoteReindexRequest = {
   user: string,
 }
 
-const useRemoteReindexMigrationStatus = () : {
+const useRemoteReindexMigrationStatus = (
+  currentStep: MigrationState,
+  onTriggerStep: OnTriggerStepFunction,
+  refetchInterval: number = 3000,
+) : {
   nextSteps: MigrationActions[],
   migrationStatus: RemoteReindexMigration,
 } => {
   const [nextSteps, setNextSteps] = useState<MigrationActions[]>(['RETRY_MIGRATE_EXISTING_DATA']);
-  const [migrationStatus, setMigrationStatus] = useState<RemoteReindexMigration>(null);
-  const { onTriggerNextState } = useTriggerMigrationState();
-  const { currentStep } = useMigrationState();
+  const [migrationStatus, setMigrationStatus] = useState<RemoteReindexMigration>(undefined);
 
   useEffect(() => {
     const fetchCurrentMigrationStatus = async () => {
       if (
         (currentStep?.state === MIGRATION_STATE.REMOTE_REINDEX_RUNNING.key)
-        && (migrationStatus?.progress !== 100)
+        && ((migrationStatus?.progress || 0) < 100)
       ) {
-        onTriggerNextState({ step: 'REQUEST_MIGRATION_STATUS' }).then((data) => {
+        onTriggerStep('REQUEST_MIGRATION_STATUS').then((data) => {
           const _migrationStatus = data?.response as RemoteReindexMigration;
 
           if (_migrationStatus) {
@@ -80,10 +79,10 @@ const useRemoteReindexMigrationStatus = () : {
 
     const interval = setInterval(() => {
       fetchCurrentMigrationStatus();
-    }, 3000);
+    }, refetchInterval);
 
     return () => clearInterval(interval);
-  }, [onTriggerNextState, migrationStatus, currentStep?.state]);
+  }, [onTriggerStep, migrationStatus, currentStep?.state, refetchInterval]);
 
   return ({
     nextSteps,

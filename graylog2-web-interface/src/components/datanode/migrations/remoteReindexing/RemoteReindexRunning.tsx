@@ -23,7 +23,7 @@ import MigrationStepTriggerButtonToolbar from '../common/MigrationStepTriggerBut
 import useRemoteReindexMigrationStatus from '../../hooks/useRemoteReindexMigrationStatus';
 
 const RemoteReindexRunning = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => {
-  const { nextSteps, migrationStatus } = useRemoteReindexMigrationStatus();
+  const { nextSteps, migrationStatus } = useRemoteReindexMigrationStatus(currentStep, onTriggerStep);
 
   return (
     <>

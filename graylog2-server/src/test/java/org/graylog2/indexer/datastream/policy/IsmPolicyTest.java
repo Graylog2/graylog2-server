@@ -88,7 +88,7 @@ public class IsmPolicyTest {
     public void testPolicySerializationWorks() throws IOException {
         ObjectMapper objectMapper = new ObjectMapperProvider().get();
         final String s = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(createSimpleTestPolicy());
-        assertThat(s).isEqualTo(simpleTestPolicyJson);
+        assertThat(objectMapper.readTree(s)).isEqualTo(objectMapper.readTree(simpleTestPolicyJson));
     }
 
     @Test

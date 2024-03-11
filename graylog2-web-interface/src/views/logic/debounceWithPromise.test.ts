@@ -14,27 +14,26 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.security.realm;
+import debounceWithPromise from './debounceWithPromise';
 
-import org.apache.shiro.authz.SimpleAuthorizationInfo;
-import org.graylog2.plugin.database.users.User;
+describe('debounceWithPromise', () => {
+  beforeAll(() => {
+    jest.useFakeTimers();
+  });
 
-import java.util.Set;
+  it('never returns a pending promise', async () => {
+    const fn = jest.fn(async (attempt: number) => attempt);
 
-public class UserAuthorizationInfo extends SimpleAuthorizationInfo {
-    private final User user;
+    const debouncedFn = debounceWithPromise(fn, 300);
 
-    public UserAuthorizationInfo(User user) {
-        super();
-        this.user = user;
-    }
+    const result1 = debouncedFn(1);
+    const result2 = debouncedFn(2);
+    const result3 = debouncedFn(3);
 
-    public UserAuthorizationInfo(Set<String> roles, User user) {
-        super(roles);
-        this.user = user;
-    }
+    jest.advanceTimersByTime(400);
 
-    public User getUser() {
-        return user;
-    }
-}
+    await expect(result1).resolves.toBe(3);
+    await expect(result2).resolves.toBe(3);
+    await expect(result3).resolves.toBe(3);
+  });
+});
