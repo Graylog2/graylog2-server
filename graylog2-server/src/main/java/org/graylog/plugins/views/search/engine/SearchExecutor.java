@@ -101,7 +101,7 @@ public class SearchExecutor {
                  * Imho in a separate PR we should decide which way to go, currently we wait indefinitely, as we did so far, and line 104 probably does not have a lot of sense, as it did not have before.
                  */
                 resultFuture.join();
-                Uninterruptibles.getUninterruptibly(resultFuture, 600, TimeUnit.MILLISECONDS);
+                Uninterruptibles.getUninterruptibly(resultFuture, 60000, TimeUnit.MILLISECONDS);
             }
         } catch (ExecutionException e) {
             LOG.error("Error executing search job <{}>", searchJob.getId(), e);
