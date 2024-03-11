@@ -34,39 +34,24 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.graylog.security.certutil.CaService;
+import org.graylog.security.certutil.audit.CaAuditEventTypes;
 import org.graylog.security.certutil.ca.exceptions.CACreationException;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog.security.certutil.csr.ClientCertGenerator;
-import org.graylog.security.certutil.csr.CsrGenerator;
-import org.graylog.security.certutil.csr.CsrSigner;
-import org.graylog.security.certutil.csr.exceptions.CSRGenerationException;
 import org.graylog.security.certutil.csr.exceptions.ClientCertGenerationException;
-import org.graylog.security.certutil.privatekey.PrivateKeyEncryptedFileStorage;
-import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.bootstrap.preflight.web.resources.model.CA;
 import org.graylog2.bootstrap.preflight.web.resources.model.CreateCARequest;
 import org.graylog2.bootstrap.preflight.web.resources.model.CreateClientCertRequest;
-import org.graylog2.indexer.security.SecurityAdapter;
-import org.graylog2.plugin.certificates.RenewalPolicy;
-import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.rest.ApiError;
 
 import java.io.IOException;
-import java.io.StringWriter;
-import java.security.KeyStore;
 import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
 import java.util.List;
-import java.util.Optional;
 
-import static org.graylog.security.certutil.CertConstants.CA_KEY_ALIAS;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @Path("/ca")
@@ -95,7 +80,7 @@ public class CAResource {
 
     @POST
     @Path("create")
-    @NoAuditEvent("No Audit Event needed")
+    @AuditEvent(type = CaAuditEventTypes.CA_CREATE)
     @ApiOperation("Creates a CA")
     public void createCA(@ApiParam(name = "request", required = true) @NotNull @Valid CreateCARequest request) throws CACreationException, KeyStoreStorageException, KeyStoreException {
         caService.create(request.organization(), CaService.DEFAULT_VALIDITY, passwordSecret.toCharArray());
@@ -104,7 +89,7 @@ public class CAResource {
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Path("upload")
-    @NoAuditEvent("No Audit Event needed")
+    @AuditEvent(type = CaAuditEventTypes.CA_UPLOAD)
     @ApiOperation("Upload a CA")
     @Produces(MediaType.APPLICATION_JSON)
     public Response uploadCA(@ApiParam(name = "password") @FormDataParam("password") String password, @ApiParam(name = "files") @FormDataParam("files") List<FormDataBodyPart> files) {
@@ -118,7 +103,7 @@ public class CAResource {
 
     @POST
     @Path("clientcert")
-    @NoAuditEvent("No Audit Event needed")
+    @AuditEvent(type = CaAuditEventTypes.CLIENTCERT_CREATE)
     @ApiOperation("Creates a client certificate")
     @Produces(MediaType.APPLICATION_JSON)
     @RequiresPermissions("*")
@@ -133,7 +118,7 @@ public class CAResource {
 
     @DELETE
     @Path("clientcert/{role}/{principal}")
-    @NoAuditEvent("No Audit Event needed")
+    @AuditEvent(type = CaAuditEventTypes.CLIENTCERT_DELETE)
     @ApiOperation("removes the cert and the user from the role")
     @Produces(MediaType.APPLICATION_JSON)
     @RequiresPermissions("*")
