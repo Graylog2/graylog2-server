@@ -17,8 +17,10 @@
 package org.graylog.storage.elasticsearch7;
 
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
+import org.graylog2.indexer.migration.IndexerConnectionCheckResult;
 import org.graylog2.indexer.migration.RemoteReindexMigration;
 
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.List;
 
@@ -30,6 +32,11 @@ public class RemoteReindexingMigrationAdapterES7 implements RemoteReindexingMigr
 
     @Override
     public RemoteReindexMigration status(String migrationID) {
+        throw new UnsupportedOperationException("Remote reindexing migrations are not supported for elasticsearch");
+    }
+
+    @Override
+    public IndexerConnectionCheckResult checkConnection(URI uri, String username, String password) {
         throw new UnsupportedOperationException("Remote reindexing migrations are not supported for elasticsearch");
     }
 }

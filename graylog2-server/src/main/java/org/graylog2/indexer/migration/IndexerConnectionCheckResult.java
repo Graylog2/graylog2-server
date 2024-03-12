@@ -14,23 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer.datanode;
+package org.graylog2.indexer.migration;
 
-import jakarta.validation.constraints.NotNull;
-import org.graylog2.indexer.migration.IndexerConnectionCheckResult;
-import org.graylog2.indexer.migration.RemoteReindexMigration;
-
-import java.net.URI;
+import java.net.MalformedURLException;
+import java.util.Collections;
 import java.util.List;
 
-public interface RemoteReindexingMigrationAdapter {
-    enum Status {
-        NOT_STARTED, STARTING, RUNNING, ERROR, FINISHED
+public record IndexerConnectionCheckResult(List<String> indices, String error) {
+
+    public static IndexerConnectionCheckResult success(List<String> indexNames) {
+        return new IndexerConnectionCheckResult(indexNames, null);
     }
 
-    RemoteReindexMigration start(URI uri, String username, String password, List<String> indices, boolean synchronous);
-
-    RemoteReindexMigration status(@NotNull String migrationID);
-
-    IndexerConnectionCheckResult checkConnection(final URI uri, final String username, final String password);
+    public static IndexerConnectionCheckResult failure(MalformedURLException e) {
+        return new IndexerConnectionCheckResult(Collections.emptyList(), e.getMessage());
+    }
 }

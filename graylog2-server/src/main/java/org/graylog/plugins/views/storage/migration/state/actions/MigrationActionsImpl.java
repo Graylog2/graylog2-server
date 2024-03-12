@@ -41,6 +41,7 @@ import org.graylog2.system.processing.control.RemoteProcessingControlResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
@@ -218,6 +219,14 @@ public class MigrationActionsImpl implements MigrationActions {
             context.getExtendedState(TrafficSnapshot.TRAFFIC_SNAPSHOT, TrafficSnapshot.class)
                     .ifPresent(traffic -> context.addExtendedState(TrafficSnapshot.ESTIMATED_TRAFFIC_PER_MINUTE, traffic.calculateEstimatedTrafficPerMinute(currentTraffic.getCount())));
         }
+    }
+
+    @Override
+    public void verifyRemoteIndexerConnection() {
+        final URI hostname = Objects.requireNonNull(URI.create(getStateMachineContext().getActionArgument("hostname", String.class)), "hostname has to be provided");
+        final String user = getStateMachineContext().getActionArgumentOpt("user", String.class).orElse(null);
+        final String password = getStateMachineContext().getActionArgumentOpt("password", String.class).orElse(null);
+        getStateMachineContext().setResponse(migrationService.checkConnection(hostname, user, password));
     }
 
     @Override
