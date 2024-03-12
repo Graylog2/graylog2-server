@@ -5,32 +5,7 @@ import styled, { css } from 'styled-components';
 import { IfPermitted, Timestamp } from 'components/common';
 import IfInteractive from 'views/components/dashboard/IfInteractive';
 import type { EventListItem } from 'views/components/widgets/events/types';
-
-const columnRenderersByType = {
-  date: (date: string) => <Timestamp dateTime={date} />,
-};
-
-const Name = styled.button(({ theme }) => css`
-  background: none;
-  border: none;
-  padding: 0;
-  color: ${theme.colors.global.link};
-
-  &:hover {
-    color: ${theme.colors.global.linkHover};
-    text-decoration: underline;
-  }
-`);
-
-const useColumnRenderers = () => ({
-  created_at: columnRenderersByType.date,
-  updated_at: columnRenderersByType.date,
-  name: (name: string) => (
-    <Name onClick={() => {}} type="button">
-      {name}
-    </Name>
-  ),
-});
+import usePluginEntities from 'hooks/usePluginEntities';
 
 type Props = {
   event: EventListItem,
@@ -38,13 +13,13 @@ type Props = {
 }
 
 const EventsTableRow = ({ event, fields }: Props) => {
-  const columnRenderers = useColumnRenderers();
+  const eventAttributes = usePluginEntities('views.components.widgets.events.attributes');
 
   return (
     <tr key={event.id}>
       {fields.toArray().map((field) => {
         const value = event[field];
-        const columnRenderer = columnRenderers[field];
+        const columnRenderer = (value: string ) => eventAttributes.find(({ attribute }) => attribute === field)?.displayValue?.(value) ?? value;
 
         return (
           <td key={field}>

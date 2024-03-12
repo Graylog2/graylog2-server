@@ -2,11 +2,11 @@ import * as React from 'react';
 import type * as Immutable from 'immutable';
 import styled from 'styled-components';
 
-import type { Filter } from '../../../../../../../../graylog-plugin-enterprise/enterprise/src/web/security-app/components/Investigations/plugin/SearchWidgets/logic/InvestigationsWidgetConfig';
 import { Input } from 'components/bootstrap';
 import { IconButton } from 'components/common';
-import type { FilterComponents } from '../../../../../../../../graylog-plugin-enterprise/enterprise/src/web/security-app/components/Investigations/plugin/SearchWidgets/types';
-import FilterEditButton from '../../../../../../../../graylog-plugin-enterprise/enterprise/src/web/security-app/components/Investigations/plugin/SearchWidgets/FilterEditButton';
+
+import { FilterComponents, Filter } from 'views/components/widgets/overview-configuration/filters/types';
+import FilterEditButton from 'views/components/widgets/overview-configuration/filters/FilterEditButton';
 
 const Container = styled.div`
   display: flex;
@@ -45,7 +45,7 @@ const SelectedFiltersList = ({ selectedFilters, columnTitle, filterComponents, o
   <Container>
     {selectedFilters.toArray().map(({ field: column, value: values }, filterIndex) => {
       const _columnTitle = columnTitle(column);
-      const filterComponent = filterComponents[column];
+      const filterComponent = filterComponents.find(({ attribute }) => attribute === column);
 
       return (
         <FilterContainer key={column}>
@@ -66,6 +66,7 @@ const SelectedFiltersList = ({ selectedFilters, columnTitle, filterComponents, o
                   <ValueActions>
                     <FilterEditButton filterComponent={filterComponent}
                                       onEdit={_onEdit}
+                                      selectedValues={values}
                                       columnTitle={columnTitle}
                                       column={column}
                                       value={value} />

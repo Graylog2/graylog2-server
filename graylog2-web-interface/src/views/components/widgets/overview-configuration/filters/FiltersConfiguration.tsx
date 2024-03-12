@@ -20,11 +20,10 @@ import { Field } from 'formik';
 
 import FilterSelect
   from 'views/components/widgets/overview-configuration/filters/FilterSelect';
-import type { FilterComponents } from '../../../../../../../../graylog-plugin-enterprise/enterprise/src/web/security-app/components/Investigations/plugin/SearchWidgets/types';
 
 import SelectedFiltersList from './SelectedFiltersList';
 
-import type { Filter } from '../../../../../../../../graylog-plugin-enterprise/enterprise/src/web/security-app/components/Investigations/plugin/SearchWidgets/logic/InvestigationsWidgetConfig';
+import { FilterComponents, Filter } from './types';
 
 type Props = {
   columnTitle: (column: string) => string,
@@ -87,7 +86,8 @@ const FiltersConfiguration = ({ filterComponents, columnTitle, name }: Props) =>
                                  onDelete={onDelete}
                                  onEdit={onEdit}
                                  filterComponents={filterComponents} />
-            <FilterSelect filterComponents={filterComponents}
+            <FilterSelect selectedFilters={values}
+                          filterComponents={filterComponents}
                           columnTitle={columnTitle}
                           onCreate={onCreate} />
           </>

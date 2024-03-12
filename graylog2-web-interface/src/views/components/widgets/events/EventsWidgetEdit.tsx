@@ -37,21 +37,14 @@ import EventsWidgetConfig, {
 // import SortConfiguration from './SortConfiguration';
 // import ColumnsConfiguration from './ColumnsConfiguration';
 
-import { SORT_DIRECTION_OPTIONS, EVENT_ATTRIBUTES } from './Constants';
+import { SORT_DIRECTION_OPTIONS } from './Constants';
 import WidgetModeConfiguration from 'views/components/widgets/overview-configuration/WidgetModeConfiguration';
 import ColumnsConfiguration from 'views/components/widgets/overview-configuration/ColumnsConfiguration';
 import SortConfiguration from 'views/components/widgets/overview-configuration/SortConfiguration';
+import usePluginEntities from 'hooks/usePluginEntities';
+import FiltersConfiguration from 'views/components/widgets/overview-configuration/filters/FiltersConfiguration';
 
-const COLUMNS = Object.keys(EVENT_ATTRIBUTES);
 
-// const ATTRIBUTES_FILTER: AttributesFilter = {
-//   created_at: {
-//     configuration: (filterValues, setFilterValues) => <div>filter</div>,
-//     valuesForConfig: (filterValues) => [filterValues.map(({ value }) => value)?.join(',')],
-//     valueFromConfig: (value: string) => value.split(',').map((dateTime) => ({ value: dateTime, label: dateTime, type: 'date' })),
-//     renderValue: (values) => values.replace(',', ' to '),
-//   },
-// };
 
 const WIDGET_MODE_OPTIONS = [
   { label: 'List', value: LIST_MODE },
@@ -107,9 +100,6 @@ const FullHeightCol = styled(Col)`
   overflow: auto;
 `;
 
-const SORTABLE_COLUMNS = Object.entries(EVENT_ATTRIBUTES)
-  .filter(([, { sortable }]) => sortable)
-  .map(([columnName]) => (columnName));
 
 const SubmitOnChange = () => {
   const { values, submitForm } = useFormikContext();
@@ -125,6 +115,9 @@ const SubmitOnChange = () => {
 };
 
 const EventsWidgetEdit = ({ children, onCancel, config, onChange, onSubmit }: EditWidgetComponentProps<EventsWidgetConfig>) => {
+  const filterComponents = usePluginEntities('views.components.widgets.events.filterComponents');
+  const eventAttributes = usePluginEntities('views.components.widgets.events.attributes');
+
   const initialValues = useMemo(() => ({
     mode: config.mode,
     filters: config.filters,
@@ -148,7 +141,8 @@ const EventsWidgetEdit = ({ children, onCancel, config, onChange, onSubmit }: Ed
     );
   };
 
-  const columnTitle = useCallback((column: string) => EVENT_ATTRIBUTES[column]?.title ?? column, []);
+  const columns = eventAttributes.map(({ attribute }) => attribute)
+  const columnTitle = useCallback((column: string) => eventAttributes.find(({ attribute }) => column === attribute)?.title ?? column, []);
 
   return (
     <Formik<FormValues> initialValues={initialValues}
@@ -177,7 +171,6 @@ const EventsWidgetEdit = ({ children, onCancel, config, onChange, onSubmit }: Ed
         };
 
         return (
-
           <StyledForm className="form form-horizontal">
             <SubmitOnChange />
             <FullHeightRow>
@@ -190,17 +183,22 @@ const EventsWidgetEdit = ({ children, onCancel, config, onChange, onSubmit }: Ed
                     </DescriptionBox>
                     {values.mode === LIST_MODE && (
                       <DescriptionBox description="Columns">
-                        <ColumnsConfiguration columns={COLUMNS}
+                        <ColumnsConfiguration columns={columns}
                                               createSelectPlaceholder="Select a new column"
                                               name="fields"
                                               menuPortalTarget={document.body}
                                               columnTitle={columnTitle} />
                       </DescriptionBox>
                     )}
+                    <DescriptionBox description="Filter">
+                      <FiltersConfiguration columnTitle={columnTitle}
+                                            name="filters"
+                                            filterComponents={filterComponents} />
+                    </DescriptionBox>
 
                     {values.mode === LIST_MODE && (
                       <DescriptionBox description="Sorting">
-                        <SortConfiguration columns={SORTABLE_COLUMNS}
+                        <SortConfiguration columns={columns}
                                            name="sort"
                                            columnTitle={columnTitle}
                                            directions={SORT_DIRECTION_OPTIONS} />

@@ -57,6 +57,7 @@ import type { Event } from 'components/events/events/types';
 import type Parameter from 'views/logic/parameters/Parameter';
 import type { UndoRedoState } from 'views/logic/slices/undoRedoSlice';
 import type { SearchExecutors } from 'views/logic/slices/searchExecutionSlice';
+import {FilterComponents, Attributes} from 'views/components/widgets/overview-configuration/filters/types';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> =
   ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
@@ -446,6 +447,8 @@ declare module 'graylog-web-plugin/plugin' {
       key: string,
       useCondition: () => boolean,
     }>;
+    'views.components.widgets.events.filterComponents'?: FilterComponents;
+    'views.components.widgets.events.attributes'?: Attributes;
     'views.components.searchActions'?: Array<SearchAction>;
     'views.components.searchBar'?: Array<() => SearchBarControl | null>;
     'views.components.saveViewForm'?: Array<() => SaveViewControls | null>;

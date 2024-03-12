@@ -21,7 +21,7 @@ import styled from 'styled-components';
 import { Select } from 'components/common';
 import { defaultCompare } from 'logic/DefaultCompare';
 import { Menu } from 'components/bootstrap';
-import { FilterComponents } from 'views/components/widgets/overview-configuration/filters/types';
+import {FilterComponents, Filter} from 'views/components/widgets/overview-configuration/filters/types';
 
 
 const Container = styled.div`
@@ -40,17 +40,19 @@ type Props = {
   filterComponents: FilterComponents,
   columnTitle: (column: string) => string,
   onCreate: (column: string, value: string) => void,
+  selectedFilters: Array<Filter>,
 }
 
-const FilterSelect = ({ filterComponents, columnTitle, onCreate }: Props) => {
+const FilterSelect = ({ filterComponents, columnTitle, onCreate, selectedFilters }: Props) => {
   const [open, setOpen] = useState(false);
   const [selectedColumn, setSelectedColumn] = useState<string>(null);
   const [createValue, setCreateValue] = React.useState<string>();
-  const filterComponent = selectedColumn ? filterComponents[selectedColumn] : undefined;
+  const filterComponent = selectedColumn ? filterComponents.find(({ attribute }) => attribute === selectedColumn) : undefined;
+  const selectedValues = selectedColumn ? selectedFilters.find(({ field }) => field === selectedColumn)?.value : undefined
 
   const filterOptions = useMemo(() => (
-    Object.keys(filterComponents)
-      .map((col) => ({ value: col, label: columnTitle(col) }))
+    filterComponents
+      .map((col) => ({ value: col.attribute, label: columnTitle(col.attribute) }))
       .sort(({ label: label1 }, { label: label2 }) => defaultCompare(label1, label2))
   ), [columnTitle, filterComponents]);
 
@@ -100,7 +102,7 @@ const FilterSelect = ({ filterComponents, columnTitle, onCreate }: Props) => {
           <HiddenButton type="button" />
         </Menu.Target>
         <Menu.Dropdown>
-          {filterComponent?.configuration(filterComponent?.valueFromConfig?.(createValue) ?? createValue, onChange)}
+          {filterComponent?.configuration(selectedValues ?? [], filterComponent?.valueFromConfig?.(createValue) ?? createValue, onChange)}
         </Menu.Dropdown>
       </Menu>
     </Container>

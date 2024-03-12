@@ -121,6 +121,9 @@ import UnknownWidget from './components/widgets/UnknownWidget';
 import NewSearchRedirectPage from './pages/NewSearchRedirectPage';
 import EventsVisualization from './components/widgets/events/EventsVisualization';
 
+import eventsFilterComponents from './components/widgets/events/filters/filterComponents'
+import eventsAttributes from 'views/components/widgets/events/eventsAttributes';
+
 Widget.registerSubtype(AggregationWidget.type, AggregationWidget);
 Widget.registerSubtype(MessagesWidget.type, MessagesWidget);
 Widget.registerSubtype(EventsWidget.type, EventsWidget);
@@ -458,6 +461,8 @@ const exports: PluginExports = {
       sort: 1,
     },
   ],
+  'views.components.widgets.events.filterComponents': eventsFilterComponents,
+  'views.components.widgets.events.attributes': eventsAttributes,
   'views.reducers': viewsReducers,
 };
 
