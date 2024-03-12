@@ -110,6 +110,7 @@
         <commons-codec.version>1.16.1</commons-codec.version>
         <commons-csv.version>1.10.0</commons-csv.version>
         <commons-email.version>1.6.0</commons-email.version>
+        <commons-exec.version>1.4.0</commons-exec.version>
         <commons-lang3.version>3.14.0</commons-lang3.version>
         <commons-net.version>3.10.0</commons-net.version>
         <commons-validator.version>1.8.0</commons-validator.version>
@@ -407,6 +408,13 @@
                 <artifactId>commons-net</artifactId>
                 <version>${commons-net.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-exec</artifactId>
+                <version>${commons-exec.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>io.dropwizard.metrics</groupId>
                 <artifactId>metrics-bom</artifactId>
