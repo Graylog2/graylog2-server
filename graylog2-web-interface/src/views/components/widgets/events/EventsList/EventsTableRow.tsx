@@ -1,11 +1,11 @@
 import * as React from 'react';
 import type * as Immutable from 'immutable';
-import styled, { css } from 'styled-components';
 
-import { IfPermitted, Timestamp } from 'components/common';
+import { IfPermitted, } from 'components/common';
 import IfInteractive from 'views/components/dashboard/IfInteractive';
 import type { EventListItem } from 'views/components/widgets/events/types';
 import usePluginEntities from 'hooks/usePluginEntities';
+import RowActions from 'views/components/widgets/events/EventsList/RowActions';
 
 type Props = {
   event: EventListItem,
@@ -30,7 +30,7 @@ const EventsTableRow = ({ event, fields }: Props) => {
       <IfInteractive>
         <IfPermitted permissions="events:edit">
           <td>
-            Actions
+            <RowActions />
           </td>
         </IfPermitted>
       </IfInteractive>

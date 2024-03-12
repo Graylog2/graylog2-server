@@ -21,6 +21,8 @@ import {qualifyUrl} from 'util/URLUtils';
 import {useQuery} from '@tanstack/react-query';
 import UserNotification from 'preflight/util/UserNotification';
 import {Spinner} from 'components/common';
+import {LinkContainer, Link} from 'components/common/router';
+import Routes from 'routing/Routes';
 
 export const fetchEventDefinitionDetails = async (eventDefinitionId: string): Promise<EventDefinition> => (
   fetch('GET', qualifyUrl(`/events/definitions/${eventDefinitionId}`))
@@ -29,7 +31,7 @@ export const fetchEventDefinitionDetails = async (eventDefinitionId: string): Pr
 
 const useEventDefinitionDetails = (eventDefId: string) => {
   const { data, isFetching } =  useQuery({
-    queryKey: ['get-event-definition-details'],
+    queryKey: ['get-event-definition-details', eventDefId],
     queryFn: () => fetchEventDefinitionDetails(eventDefId),
     onError: (errorThrown) => {
       UserNotification.error(`Loading archives failed with status: ${errorThrown}`);
@@ -50,7 +52,15 @@ const EventDefinitionName = ({ eventDefinitionId }: { eventDefinitionId: string 
     return <Spinner/>
   }
 
-  return <div>{eventDefinition?.title ?? eventDefinitionId}</div>
+  if (eventDefinition) {
+    return (
+      <Link to={Routes.ALERTS.DEFINITIONS.edit(eventDefinition.id)} target="_blank">
+        {eventDefinition.title}
+      </Link>
+    )
+  }
+
+  return <>eventDefinitionId</>
 }
 
 export default EventDefinitionName
