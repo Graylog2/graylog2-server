@@ -24,6 +24,7 @@ import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.searchtypes.events.EventList;
 import org.graylog.plugins.views.search.searchtypes.events.EventSummary;
+import org.graylog.shaded.opensearch2.org.apache.lucene.search.TotalHits;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregations;
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
@@ -39,7 +40,9 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class OSEventListTest {
 
@@ -48,9 +51,10 @@ public class OSEventListTest {
         final OSEventList esEventList = new TestOSEventList();
         final SearchJob searchJob = mock(SearchJob.class);
         final Query query = mock(Query.class);
-        final SearchResponse searchResult = mock(SearchResponse.class);
+        final SearchResponse searchResult = mock(SearchResponse.class, RETURNS_DEEP_STUBS);
         final Aggregations metricAggregation = mock(Aggregations.class);
         final OSGeneratedQueryContext queryContext = mock(OSGeneratedQueryContext.class);
+        when(searchResult.getHits().getTotalHits()).thenReturn(new TotalHits(1000, TotalHits.Relation.EQUAL_TO));
 
         final EventList eventList = EventList.builder()
                 .id("search-type-id")
