@@ -14,27 +14,29 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.security.realm;
+package org.graylog2.indexer.datastream.policy.actions;
 
-import org.apache.shiro.authz.SimpleAuthorizationInfo;
-import org.graylog2.plugin.database.users.User;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
-import java.util.Set;
+/**
+ * Formats byte sizes using accepted OpenSearch values.
+ * <a href="https://opensearch.org/docs/latest/api-reference/units/">...</a>
+ */
+public enum BytesUnit {
+    PEBIBYTES("pb"),
+    TEBIBYTES("tb"),
+    GIBIBYTES("gb"),
+    MEBIBYTES("mb"),
+    KIBIBYTES("kb"),
+    BYTES("b");
 
-public class UserAuthorizationInfo extends SimpleAuthorizationInfo {
-    private final User user;
+    private final String abbreviation;
 
-    public UserAuthorizationInfo(User user) {
-        super();
-        this.user = user;
+    BytesUnit(String abbreviation) {
+        this.abbreviation = abbreviation;
     }
 
-    public UserAuthorizationInfo(Set<String> roles, User user) {
-        super(roles);
-        this.user = user;
-    }
-
-    public User getUser() {
-        return user;
+    public String format(long size) {
+        return f("%d" + abbreviation, size);
     }
 }

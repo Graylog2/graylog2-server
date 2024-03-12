@@ -20,6 +20,8 @@ import com.floreysoft.jmte.Engine;
 import org.graylog2.configuration.EmailConfiguration;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.streams.Stream;
@@ -55,6 +57,7 @@ public class FormattedEmailAlertSenderTest {
 
     private FormattedEmailAlertSender emailAlertSender;
     private final Engine templateEngine = new Engine();
+    private final MessageFactory messageFactory = new TestMessageFactory();
 
     @Before
     public void setUp() throws Exception {
@@ -232,7 +235,7 @@ public class FormattedEmailAlertSenderTest {
         when(checkResult.getTriggeredAt()).thenReturn(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC));
         when(checkResult.getTriggeredCondition()).thenReturn(alertCondition);
 
-        Message message = new Message("Test", "source", new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC));
+        Message message = messageFactory.createMessage("Test", "source", new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC));
         String body = emailAlertSender.buildBody(stream, checkResult, Collections.singletonList(message));
 
         assertThat(body)

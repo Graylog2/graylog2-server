@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.jayway.jsonpath.JsonPath;
 import jakarta.inject.Provider;
+import org.graylog.plugins.views.search.LegacyDecoratorProcessor;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.Search;
@@ -50,6 +51,7 @@ import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivot;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.buckets.OSTimeHandler;
 import org.graylog.testing.jsonpath.JsonPathAssert;
 import org.graylog2.indexer.ranges.MongoIndexRange;
+import org.graylog2.indexer.results.TestResultMessageFactory;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
@@ -87,7 +89,8 @@ public class OpenSearchBackendTest {
     @Before
     public void setup() {
         Map<String, Provider<OSSearchTypeHandler<? extends SearchType>>> handlers = Maps.newHashMap();
-        handlers.put(MessageList.NAME, OSMessageList::new);
+        handlers.put(MessageList.NAME, () -> new OSMessageList(new LegacyDecoratorProcessor.Fake(),
+                new TestResultMessageFactory(), false));
         handlers.put(Pivot.NAME, () -> new OSPivot(Map.of(Time.NAME, new OSTimeHandler()), Map.of(), new EffectiveTimeRangeExtractor()));
 
         usedSearchFiltersToQueryStringsMapper = mock(UsedSearchFiltersToQueryStringsMapper.class);
