@@ -66,16 +66,19 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
     private final Boolean allowLeadingWildcard;
     private final SortOrderMapper sortOrderMapper;
     private final MultiChunkResultRetriever multiChunkResultRetriever;
+    private final OS2ResultMessageFactory resultMessageFactory;
 
     @Inject
     public MoreSearchAdapterOS2(OpenSearchClient client,
                                 @Named("allow_leading_wildcard_searches") Boolean allowLeadingWildcard,
                                 SortOrderMapper sortOrderMapper,
-                                MultiChunkResultRetriever multiChunkResultRetriever) {
+                                MultiChunkResultRetriever multiChunkResultRetriever,
+                                OS2ResultMessageFactory resultMessageFactory) {
         this.client = client;
         this.allowLeadingWildcard = allowLeadingWildcard;
         this.sortOrderMapper = sortOrderMapper;
         this.multiChunkResultRetriever = multiChunkResultRetriever;
+        this.resultMessageFactory = resultMessageFactory;
     }
 
     @Override
@@ -89,7 +92,7 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
         final BoolQueryBuilder filter = boolQuery()
                 .filter(query)
                 .filter(termsQuery(EventDto.FIELD_STREAMS, eventStreams))
-                .filter(requireNonNull(TimeRangeQueryFactory.create(timerange)));
+                .filter(requireNonNull(LegacyTimeRangeQueryFactory.create(timerange)));
 
         if (!isNullOrEmpty(filterString)) {
             filter.filter(queryStringQuery(filterString));
@@ -121,7 +124,7 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
         final SearchResponse searchResult = client.search(searchRequest, "Unable to perform search query");
 
         final List<ResultMessage> hits = Streams.stream(searchResult.getHits())
-                .map(ResultMessageFactory::fromSearchHit)
+                .map(resultMessageFactory::fromSearchHit)
                 .collect(Collectors.toList());
 
         final long total = searchResult.getHits().getTotalHits().value;

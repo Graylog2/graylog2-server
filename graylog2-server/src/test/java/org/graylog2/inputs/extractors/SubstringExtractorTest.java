@@ -18,6 +18,8 @@ package org.graylog2.inputs.extractors;
 
 import org.graylog2.ConfigurationException;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.inputs.Extractor;
 import org.junit.Test;
@@ -30,9 +32,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 public class SubstringExtractorTest extends AbstractExtractorTest {
+    private final MessageFactory messageFactory = new TestMessageFactory();
+
     @Test
     public void testBasicExtraction() throws Exception {
-        Message msg = new Message("The short message", "TestUnit", Tools.nowUTC());
+        Message msg = messageFactory.createMessage("The short message", "TestUnit", Tools.nowUTC());
 
         msg.addField("somefield", "<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001");
 
@@ -46,7 +50,7 @@ public class SubstringExtractorTest extends AbstractExtractorTest {
 
     @Test
     public void testBasicExtractionWithCutStrategy() throws Exception {
-        Message msg = new Message("The short message", "TestUnit", Tools.nowUTC());
+        Message msg = messageFactory.createMessage("The short message", "TestUnit", Tools.nowUTC());
 
         msg.addField("somefield", "<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001");
 
@@ -60,7 +64,7 @@ public class SubstringExtractorTest extends AbstractExtractorTest {
 
     @Test
     public void testBasicExtractionWithCutStrategyCanOverwriteSameField() throws Exception {
-        Message msg = new Message("The short message", "TestUnit", Tools.nowUTC());
+        Message msg = messageFactory.createMessage("The short message", "TestUnit", Tools.nowUTC());
 
         SubstringExtractor x = new SubstringExtractor(metricRegistry, "foo", "foo", 0, Extractor.CursorStrategy.CUT, "message", "message", config(4, 17), "foo", noConverters(), Extractor.ConditionType.NONE, null);
         x.runExtractor(msg);
@@ -70,7 +74,7 @@ public class SubstringExtractorTest extends AbstractExtractorTest {
 
     @Test
     public void testBasicExtractionDoesNotFailOnNonMatch() throws Exception {
-        Message msg = new Message("The short message", "TestUnit", Tools.nowUTC());
+        Message msg = messageFactory.createMessage("The short message", "TestUnit", Tools.nowUTC());
 
         msg.addField("somefield", "<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001");
 
@@ -83,7 +87,7 @@ public class SubstringExtractorTest extends AbstractExtractorTest {
 
     @Test
     public void testBasicExtractionDoesNotFailOnNonMatchWithCutStrategy() throws Exception {
-        Message msg = new Message("The short message", "TestUnit", Tools.nowUTC());
+        Message msg = messageFactory.createMessage("The short message", "TestUnit", Tools.nowUTC());
 
         msg.addField("somefield", "<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001");
 
@@ -96,7 +100,7 @@ public class SubstringExtractorTest extends AbstractExtractorTest {
 
     @Test
     public void testDoesNotFailOnNonExistentSourceField() throws Exception {
-        Message msg = new Message("The short message", "TestUnit", Tools.nowUTC());
+        Message msg = messageFactory.createMessage("The short message", "TestUnit", Tools.nowUTC());
 
         SubstringExtractor x = new SubstringExtractor(metricRegistry, "foo", "foo", 0, Extractor.CursorStrategy.CUT, "LOLIDONTEXIST", "our_result", config(0, 1), "foo", noConverters(), Extractor.ConditionType.NONE, null);
         x.runExtractor(msg);
@@ -104,7 +108,7 @@ public class SubstringExtractorTest extends AbstractExtractorTest {
 
     @Test
     public void testDoesNotFailOnSourceFieldThatIsNotOfTypeString() throws Exception {
-        Message msg = new Message("The short message", "TestUnit", Tools.nowUTC());
+        Message msg = messageFactory.createMessage("The short message", "TestUnit", Tools.nowUTC());
 
         msg.addField("somefield", 9001);
 
@@ -114,7 +118,7 @@ public class SubstringExtractorTest extends AbstractExtractorTest {
 
     @Test
     public void testBasicExtractionWithCutStrategyDoesNotLeaveEmptyFields() throws Exception {
-        Message msg = new Message("The short message", "TestUnit", Tools.nowUTC());
+        Message msg = messageFactory.createMessage("The short message", "TestUnit", Tools.nowUTC());
 
         msg.addField("somefield", "<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001");
 
@@ -152,7 +156,7 @@ public class SubstringExtractorTest extends AbstractExtractorTest {
 
     @Test
     public void testDoesNotRunWhenRegexConditionFails() throws Exception {
-        Message msg = new Message("The short message", "TestUnit", Tools.nowUTC());
+        Message msg = messageFactory.createMessage("The short message", "TestUnit", Tools.nowUTC());
 
         msg.addField("somefield", "<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001");
 
@@ -165,7 +169,7 @@ public class SubstringExtractorTest extends AbstractExtractorTest {
 
     @Test
     public void testDoesNotRunWhenStringConditionFails() throws Exception {
-        Message msg = new Message("The short message", "TestUnit", Tools.nowUTC());
+        Message msg = messageFactory.createMessage("The short message", "TestUnit", Tools.nowUTC());
 
         msg.addField("somefield", "<10> 07 Aug 2013 somesubsystem: this is my message for username9001 id:9001");
 
@@ -178,7 +182,7 @@ public class SubstringExtractorTest extends AbstractExtractorTest {
 
     @Test
     public void testDoesNotCutFromStandardFields() throws Exception {
-        Message msg = new Message("The short message", "TestUnit", Tools.nowUTC());
+        Message msg = messageFactory.createMessage("The short message", "TestUnit", Tools.nowUTC());
 
         SubstringExtractor x = new SubstringExtractor(metricRegistry, "foo", "foo", 0, Extractor.CursorStrategy.CUT, "message", "our_result", config(0, 3), "foo", noConverters(), Extractor.ConditionType.NONE, null);
         x.runExtractor(msg);

@@ -55,6 +55,7 @@ import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.MessageSummary;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
@@ -97,6 +98,7 @@ public class AggregationEventProcessor implements EventProcessor {
     private final NotificationService notificationService;
     private final PermittedStreams permittedStreams;
     private final Set<EventQuerySearchTypeSupplier> eventQueryModifiers;
+    private final MessageFactory messageFactory;
 
     @Inject
     public AggregationEventProcessor(@Assisted EventDefinition eventDefinition,
@@ -107,7 +109,8 @@ public class AggregationEventProcessor implements EventProcessor {
                                      EventStreamService eventStreamService,
                                      Messages messages, NotificationService notificationService,
                                      PermittedStreams permittedStreams,
-                                     Set<EventQuerySearchTypeSupplier> eventQueryModifiers) {
+                                     Set<EventQuerySearchTypeSupplier> eventQueryModifiers,
+                                     MessageFactory messageFactory) {
         this.eventDefinition = eventDefinition;
         this.config = (AggregationEventProcessorConfig) eventDefinition.config();
         this.aggregationSearchFactory = aggregationSearchFactory;
@@ -119,6 +122,7 @@ public class AggregationEventProcessor implements EventProcessor {
         this.notificationService = notificationService;
         this.permittedStreams = permittedStreams;
         this.eventQueryModifiers = eventQueryModifiers;
+        this.messageFactory = messageFactory;
     }
 
     @Override
@@ -400,7 +404,7 @@ public class AggregationEventProcessor implements EventProcessor {
             fields.put("aggregation_key", keyString);
 
             // TODO: Can we find a useful source value?
-            final Message message = new Message(eventMessage, "", result.effectiveTimerange().to());
+            final Message message = messageFactory.createMessage(eventMessage, "", result.effectiveTimerange().to());
             message.addFields(fields);
 
             // Ask any event query modifier for its state and collect it into the event modifier state

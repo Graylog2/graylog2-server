@@ -24,6 +24,10 @@ import type { Sort } from 'stores/PaginationTypes';
 import BulkSelectHead from './BulkSelectHead';
 import type { Column, ColumnRenderer, EntityBase, ColumnRenderersByAttribute } from './types';
 
+const Thead = styled.thead(({ theme }) => css`
+  background-color: ${theme.colors.table.head.background};
+`);
+
 const Th = styled.th<{ $width: number | undefined }>(({ $width }) => css`
   width: ${$width ? `${$width}px` : 'auto'};
 `);
@@ -93,7 +97,7 @@ const TableHead = <Entity extends EntityBase>({
   );
 
   return (
-    <thead>
+    <Thead>
       <tr>
         {displayBulkSelectCol && <BulkSelectHead data={data} />}
         {sortedColumns.map((column) => {
@@ -110,7 +114,7 @@ const TableHead = <Entity extends EntityBase>({
         })}
         {displayActionsCol ? <ActionsHead $width={actionsColWidth}>Actions</ActionsHead> : null}
       </tr>
-    </thead>
+    </Thead>
   );
 };
 

@@ -20,20 +20,25 @@ import com.google.common.collect.Streams;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
 import org.graylog2.indexer.results.ChunkedQueryResult;
 import org.graylog2.indexer.results.ResultMessage;
+import org.graylog2.indexer.results.ResultMessageFactory;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 public abstract class ChunkedQueryResultES7 extends ChunkedQueryResult<ElasticsearchClient, SearchResponse> {
 
-    public ChunkedQueryResultES7(ElasticsearchClient client, SearchResponse initialResult, String query, List<String> fields, int limit) {
+    private final ResultMessageFactory resultMessageFactory;
+
+    public ChunkedQueryResultES7(ResultMessageFactory resultMessageFactory, ElasticsearchClient client,
+                                 SearchResponse initialResult, String query, List<String> fields, int limit) {
         super(client, initialResult, query, fields, limit);
+        this.resultMessageFactory = resultMessageFactory;
     }
 
     @Override
     protected List<ResultMessage> collectMessagesFromResult(SearchResponse response) {
         return Streams.stream(response.getHits())
-                .map(hit -> ResultMessage.parseFromSource(hit.getId(), hit.getIndex(), hit.getSourceAsMap()))
+                .map(hit -> resultMessageFactory.parseFromSource(hit.getId(), hit.getIndex(), hit.getSourceAsMap()))
                 .collect(Collectors.toList());
     }
 

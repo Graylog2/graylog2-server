@@ -26,6 +26,8 @@ import org.graylog.plugins.map.config.DatabaseVendorType;
 import org.graylog.plugins.map.config.GeoIpResolverConfig;
 import org.graylog.plugins.map.config.S3GeoIpFileService;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -78,6 +80,7 @@ public class GeoIpResolverEngineTest {
 
     private InetAddress reservedIp;
     private InetAddress publicIp;
+    private MessageFactory messageFactory = new TestMessageFactory();
 
     @Before
     public void setUp() throws Exception {
@@ -137,7 +140,7 @@ public class GeoIpResolverEngineTest {
         fields.put("_id", java.util.UUID.randomUUID().toString());
         fields.put("source_ip", reservedIp);
 
-        Message message = new Message(fields);
+        Message message = messageFactory.createMessage(fields);
         engine.filter(message);
 
         String fieldNotFoundError = String.format(Locale.ENGLISH, "Field '%s' expected", expectedFieldName);
@@ -176,7 +179,7 @@ public class GeoIpResolverEngineTest {
         fields.put("_id", java.util.UUID.randomUUID().toString());
         fields.put("source_ip", publicIp);
 
-        Message message = new Message(fields);
+        Message message = messageFactory.createMessage(fields);
         engine.filter(message);
 
         for (String field : expectedFields) {
@@ -200,7 +203,7 @@ public class GeoIpResolverEngineTest {
         fields.put("gl2_test", "127.0.0.1");
 
 
-        Message message = new Message(fields);
+        Message message = messageFactory.createMessage(fields);
         List<String> ipFields = engine.getIpAddressFields(message);
 
         //with the Graylog Schema enforced, only the source_ip and destination_ip should be returned
@@ -225,7 +228,7 @@ public class GeoIpResolverEngineTest {
         fields.put("gl2_test", "127.0.0.1");
 
 
-        Message message = new Message(fields);
+        Message message = messageFactory.createMessage(fields);
         List<String> ipFields = engine.getIpAddressFields(message);
 
         //without enforcing the Graylog Schema, all but the gl2_* fields should be returned.
@@ -242,7 +245,7 @@ public class GeoIpResolverEngineTest {
         fields.put("_id", java.util.UUID.randomUUID().toString());
         fields.put("source_ip", publicIp.getHostAddress());
 
-        Message message = new Message(fields);
+        Message message = messageFactory.createMessage(fields);
         engine.filter(message);
 
         String expectedGeoName = maxMindLocationInfo.cityName() + ", " + maxMindLocationInfo.countryIsoCode();
@@ -279,7 +282,7 @@ public class GeoIpResolverEngineTest {
         fields.put("_id", java.util.UUID.randomUUID().toString());
         fields.put("source_ip", publicIp.getHostAddress());
 
-        Message message = new Message(fields);
+        Message message = messageFactory.createMessage(fields);
         engine.filter(message);
 
         String expectedGeoName = ipInfoLocationInfo.cityName() + ", " + ipInfoLocationInfo.countryIsoCode();
@@ -302,7 +305,7 @@ public class GeoIpResolverEngineTest {
         fields.put("_id", java.util.UUID.randomUUID().toString());
         fields.put("source_ip", "127.0.0.1");
 
-        Message message = new Message(fields);
+        Message message = messageFactory.createMessage(fields);
         engine.filter(message);
         Assertions.assertTrue(message.hasField("source_reserved_ip"));
 
@@ -348,7 +351,7 @@ public class GeoIpResolverEngineTest {
         messageFields.put("extracted_ip", "1.2.3.4");
         messageFields.put("ipv6", "2001:4860:4860::8888");
 
-        final Message message = new Message(messageFields);
+        final Message message = messageFactory.createMessage(messageFields);
         final boolean filtered = resolver.filter(message);
 
         assertFalse("Message should not be filtered out", filtered);

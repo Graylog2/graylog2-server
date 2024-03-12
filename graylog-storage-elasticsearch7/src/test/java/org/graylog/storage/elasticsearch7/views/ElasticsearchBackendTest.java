@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import jakarta.inject.Provider;
+import org.graylog.plugins.views.search.LegacyDecoratorProcessor;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.Search;
@@ -40,6 +41,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuil
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESMessageList;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
+import org.graylog2.indexer.results.TestResultMessageFactory;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.junit.Before;
 import org.junit.Test;
@@ -61,7 +63,8 @@ public class ElasticsearchBackendTest {
     @Before
     public void setup() {
         Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> handlers = Maps.newHashMap();
-        handlers.put(MessageList.NAME, ESMessageList::new);
+        handlers.put(MessageList.NAME, () -> new ESMessageList(new LegacyDecoratorProcessor.Fake(),
+                new TestResultMessageFactory(), false));
 
         usedSearchFiltersToQueryStringsMapper = mock(UsedSearchFiltersToQueryStringsMapper.class);
         doReturn(Collections.emptySet()).when(usedSearchFiltersToQueryStringsMapper).map(any());

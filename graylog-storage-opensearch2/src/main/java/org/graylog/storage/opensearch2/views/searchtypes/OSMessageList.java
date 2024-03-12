@@ -16,7 +16,6 @@
  */
 package org.graylog.storage.opensearch2.views.searchtypes;
 
-import com.google.common.annotations.VisibleForTesting;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -39,6 +38,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.sort.SortBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.sort.SortOrder;
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
 import org.graylog2.indexer.results.ResultMessage;
+import org.graylog2.indexer.results.ResultMessageFactory;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
@@ -59,25 +59,23 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 
 public class OSMessageList implements OSSearchTypeHandler<MessageList> {
     private final LegacyDecoratorProcessor decoratorProcessor;
+    private final ResultMessageFactory resultMessageFactory;
     private final boolean allowHighlighting;
 
     @Inject
     public OSMessageList(LegacyDecoratorProcessor decoratorProcessor,
+                         ResultMessageFactory resultMessageFactory,
                          @Named("allow_highlighting") boolean allowHighlighting) {
         this.decoratorProcessor = decoratorProcessor;
+        this.resultMessageFactory = resultMessageFactory;
         this.allowHighlighting = allowHighlighting;
     }
 
-    @VisibleForTesting
-    public OSMessageList() {
-        this(new LegacyDecoratorProcessor.Fake(), false);
-    }
-
-    private static ResultMessage resultMessageFromSearchHit(SearchHit hit) {
+    private ResultMessage resultMessageFromSearchHit(SearchHit hit) {
         final Map<String, List<String>> highlights = hit.getHighlightFields().entrySet()
                 .stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, OSMessageList::highlightsFromFragments));
-        return ResultMessage.parseFromSource(hit.getId(), hit.getIndex(), hit.getSourceAsMap(), highlights);
+        return resultMessageFactory.parseFromSource(hit.getId(), hit.getIndex(), hit.getSourceAsMap(), highlights);
     }
 
     private static List<String> highlightsFromFragments(Map.Entry<String, HighlightField> entry) {
@@ -166,7 +164,7 @@ public class OSMessageList implements OSSearchTypeHandler<MessageList> {
     @Override
     public SearchType.Result doExtractResult(SearchJob job, Query query, MessageList searchType, org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse result, Aggregations aggregations, OSGeneratedQueryContext queryContext) {
         final List<ResultMessageSummary> messages = StreamSupport.stream(result.getHits().spliterator(), false)
-                .map(OSMessageList::resultMessageFromSearchHit)
+                .map(this::resultMessageFromSearchHit)
                 .map((resultMessage) -> ResultMessageSummary.create(resultMessage.highlightRanges, resultMessage.getMessage().getFields(), resultMessage.getIndex()))
                 .collect(Collectors.toList());
 

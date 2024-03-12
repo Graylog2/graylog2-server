@@ -34,7 +34,6 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Map;
 import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.stream.Collectors;
@@ -54,7 +53,6 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
     public synchronized static ContainerizedGraylogBackend createStarted(ContainerizedGraylogBackendServicesProvider servicesProvider,
                                                                          final SearchVersion version,
                                                                          final MongodbServer mongodbVersion,
-                                                                         final int[] extraPorts,
                                                                          final List<URL> mongoDBFixtures,
                                                                          final PluginJarsProvider pluginJarsProvider,
                                                                          final MavenProjectDirProvider mavenProjectDirProvider,
@@ -68,11 +66,10 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
         final Services services = servicesProvider.getServices(version, mongodbVersion, withMailServerEnabled, webhookServerEnabled, enabledFeatureFlags);
         LOG.debug("Done creating backend services");
 
-        return new ContainerizedGraylogBackend().create(services, extraPorts, mongoDBFixtures, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, preImportLicense, configParams);
+        return new ContainerizedGraylogBackend().create(services, mongoDBFixtures, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, preImportLicense, configParams);
     }
 
     private ContainerizedGraylogBackend create(Services services,
-                                               final int[] extraPorts,
                                                final List<URL> mongoDBFixtures,
                                                final PluginJarsProvider pluginJarsProvider,
                                                final MavenProjectDirProvider mavenProjectDirProvider,
@@ -92,7 +89,7 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
 
         var searchServer = services.getSearchServerInstance();
         try {
-            var nodeContainerConfig = new NodeContainerConfig(services.getNetwork(), mongoDB.internalUri(), PASSWORD_SECRET, ROOT_PASSWORD_SHA_2, searchServer.internalUri(), searchServer.version(), extraPorts, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, configParams);
+            var nodeContainerConfig = new NodeContainerConfig(services.getNetwork(), mongoDB.internalUri(), PASSWORD_SECRET, ROOT_PASSWORD_SHA_2, searchServer.internalUri(), searchServer.version(), pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, configParams);
             this.node = NodeInstance.createStarted(nodeContainerConfig);
 
             // ensure that all containers and networks will be removed after all tests finish
