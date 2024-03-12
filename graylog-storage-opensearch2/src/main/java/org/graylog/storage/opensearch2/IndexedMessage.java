@@ -14,12 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search;
+package org.graylog.storage.opensearch2;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.HashMap;
 
-public record SearchJobIdentifier(@JsonProperty("id") String id,
-                                  @JsonProperty("search_id") String searchId,
-                                  @JsonProperty("owner") String owner,
-                                  @JsonProperty("executing_node") String executingNodeId) {}
-
+public class IndexedMessage extends HashMap<String, Object> {
+}
