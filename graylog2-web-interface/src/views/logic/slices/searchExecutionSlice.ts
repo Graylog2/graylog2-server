@@ -149,7 +149,8 @@ export const executeWithExecutionState = (view: View, widgetsToSearch: Array<str
       .then(searchExecutors.resultMapper)
       .then((result) => {
         dispatch(setJobIds(null));
-        if(result.result.result.execution.cancelled) return dispatch(stopLoading())
+        const isCanceled = result?.result?.result?.execution?.cancelled;
+        if(isCanceled) return dispatch(stopLoading())
         return dispatch(finishedLoading(result));
       })
   });
