@@ -33,7 +33,7 @@ const defaultOnUnauthorizedError = (error: FetchError) => ErrorsActions.report(c
 
 const emptyToUndefined = (s: any) => (s && s !== '' ? s : undefined);
 
-const onServerError = async (error: Response & Partial<AbortError> | undefined, onUnauthorized = defaultOnUnauthorizedError) => {
+const onServerError = async (error: Response | undefined, onUnauthorized = defaultOnUnauthorizedError) => {
   const contentType = error.headers?.get('Content-Type');
   const response = await (contentType?.startsWith('application/json') ? error.json().then((body) => body) : error?.text?.());
   const { SessionStore, SessionActions } = importSessionStore();
@@ -52,9 +52,7 @@ const onServerError = async (error: Response & Partial<AbortError> | undefined, 
     ServerAvailabilityActions.reportError(fetchError);
   }
 
-  const shouldThrowError = error?.name !== "AbortError";
-
-  if(shouldThrowError) throw fetchError;
+  throw fetchError;
 };
 
 const maybeStringify = (body: any) => (body && typeof body !== 'string' ? JSON.stringify(body) : body);
