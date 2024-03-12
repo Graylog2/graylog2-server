@@ -42,11 +42,19 @@ public class MigrationHelpers {
     private final RoleService roleService;
     private final UserService userService;
 
+    private final RoleRemover roleRemover;
+
     @Inject
     public MigrationHelpers(final RoleService roleService,
-                            final UserService userService) {
+                            final UserService userService,
+                            final RoleRemover roleRemover) {
         this.roleService = roleService;
         this.userService = userService;
+        this.roleRemover = roleRemover;
+    }
+
+    public void removeBuiltinRole(final String roleName) {
+        this.roleRemover.removeBuiltinRole(roleName);
     }
 
     @Nullable
