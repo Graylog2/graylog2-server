@@ -19,6 +19,8 @@ package org.graylog2.inputs.codecs;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.collect.ImmutableMap;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.syslog4j.server.impl.event.structured.StructuredSyslogServerEvent;
 import org.junit.Before;
@@ -64,10 +66,12 @@ public class StructuredSyslogTest {
     @Mock
     private Timer mockedTimer;
 
+    private final MessageFactory messageFactory = new TestMessageFactory();
+
     @Before
     public void setUp() {
         when(metricRegistry.timer(any(String.class))).thenReturn(mockedTimer);
-        syslogCodec = new SyslogCodec(configuration, metricRegistry);
+        syslogCodec = new SyslogCodec(configuration, metricRegistry, messageFactory);
     }
 
     private StructuredSyslogServerEvent newEvent(String message) {

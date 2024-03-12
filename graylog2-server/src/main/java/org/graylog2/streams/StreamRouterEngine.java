@@ -27,20 +27,20 @@ import com.google.common.util.concurrent.SimpleTimeLimiter;
 import com.google.common.util.concurrent.TimeLimiter;
 import com.google.common.util.concurrent.UncheckedTimeoutException;
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+import org.graylog.failure.ProcessingFailureCause;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.DefaultStream;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.plugin.streams.StreamRuleType;
+import org.graylog2.shared.utilities.ExceptionUtils;
 import org.graylog2.streams.matchers.StreamRuleMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
-
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +50,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import static com.codahale.metrics.MetricRegistry.name;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 /**
  * Stream routing engine to select matching streams for a message.
@@ -305,10 +306,14 @@ public class StreamRouterEngine {
                     return null;
                 }
             } catch (Exception e) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Error matching stream rule <" + rule.getType() + "/" + rule.getValue() + ">: " + e.getMessage(), e);
-                }
                 streamMetrics.markExceptionMeter(streamId);
+                final String error = f("Error matching stream rule <%s> %s <%s/%s> for stream %s",
+                        streamRuleId, rule.getDescription(), rule.getType(), rule.getValue(), stream.getTitle());
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug(error + ": " + e.getMessage(), e);
+                }
+                message.addProcessingError(new Message.ProcessingError(
+                        ProcessingFailureCause.StreamMatchException, error, ExceptionUtils.getRootCauseMessage(e)));
                 return null;
             }
         }
@@ -327,8 +332,12 @@ public class StreamRouterEngine {
             } catch (UncheckedTimeoutException e) {
                 streamFaultManager.registerFailure(stream);
             } catch (Exception e) {
-                LOG.warn("Unexpected error during stream matching", e);
                 streamMetrics.markExceptionMeter(streamId);
+                final String error = f("Error matching stream rule <%s> %s <%s/%s> for stream %s",
+                        streamRuleId, rule.getDescription(), rule.getType(), rule.getValue(), stream.getTitle());
+                LOG.warn(error, e);
+                message.addProcessingError(new Message.ProcessingError(
+                        ProcessingFailureCause.StreamMatchException, error, ExceptionUtils.getRootCauseMessage(e)));
             }
 
             return matchedStream;

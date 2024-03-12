@@ -62,16 +62,19 @@ import static org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.Qu
 public class MoreSearchAdapterES7 implements MoreSearchAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(MoreSearchAdapterES7.class);
     public static final IndicesOptions INDICES_OPTIONS = IndicesOptions.LENIENT_EXPAND_OPEN;
+    private final ES7ResultMessageFactory resultMessageFactory;
     private final ElasticsearchClient client;
     private final Boolean allowLeadingWildcard;
     private final SortOrderMapper sortOrderMapper;
     private final MultiChunkResultRetriever multiChunkResultRetriever;
 
     @Inject
-    public MoreSearchAdapterES7(ElasticsearchClient client,
+    public MoreSearchAdapterES7(ES7ResultMessageFactory resultMessageFactory,
+                                ElasticsearchClient client,
                                 @Named("allow_leading_wildcard_searches") Boolean allowLeadingWildcard,
                                 SortOrderMapper sortOrderMapper,
                                 MultiChunkResultRetriever multiChunkResultRetriever) {
+        this.resultMessageFactory = resultMessageFactory;
         this.client = client;
         this.allowLeadingWildcard = allowLeadingWildcard;
         this.sortOrderMapper = sortOrderMapper;
@@ -121,7 +124,7 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
         final SearchResponse searchResult = client.search(searchRequest, "Unable to perform search query");
 
         final List<ResultMessage> hits = Streams.stream(searchResult.getHits())
-                .map(ResultMessageFactory::fromSearchHit)
+                .map(resultMessageFactory::fromSearchHit)
                 .collect(Collectors.toList());
 
         final long total = searchResult.getHits().getTotalHits().value;

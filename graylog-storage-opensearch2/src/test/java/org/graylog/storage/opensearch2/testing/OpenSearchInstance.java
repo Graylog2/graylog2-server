@@ -73,7 +73,7 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
     private Client client;
     private FixtureImporter fixtureImporter;
     private Adapters adapters;
-    private List<String> featureFlags;
+    private final List<String> featureFlags;
 
     public OpenSearchInstance(final SearchVersion version, final String hostname, final Network network, final String heapSize, final List<String> featureFlags) {
         super(version, hostname, network, heapSize);
@@ -86,7 +86,7 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
         RestHighLevelClient restHighLevelClient = buildRestHighLevelClient();
         final var objectMapper = new ObjectMapperProvider().get();
         final var restClient = buildRestClient();
-        this.openSearchClient = new OpenSearchClient(restHighLevelClient, new OpenSearchClientProvider(restClient, objectMapper).get(), objectMapper);
+        this.openSearchClient = new OpenSearchClient(restHighLevelClient, new OpenSearchClientProvider(restClient, objectMapper).get(), restClient, objectMapper);
         this.client = new ClientOS2(this.openSearchClient, featureFlags);
         this.fixtureImporter = new FixtureImporterOS2(this.openSearchClient);
         adapters = new AdaptersOS2(openSearchClient);
