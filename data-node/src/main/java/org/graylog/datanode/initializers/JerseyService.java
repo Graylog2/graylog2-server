@@ -93,6 +93,7 @@ public class JerseyService extends AbstractIdleService {
     private final TLSProtocolsConfiguration tlsConfiguration;
 
     private HttpServer apiHttpServer = null;
+    private final ExecutorService executorService;
 
     @Inject
     public JerseyService(final Configuration configuration,
@@ -110,6 +111,10 @@ public class JerseyService extends AbstractIdleService {
         this.metricRegistry = requireNonNull(metricRegistry, "metricRegistry");
         this.tlsConfiguration = requireNonNull(tlsConfiguration);
         eventBus.register(this);
+        this.executorService = instrumentedExecutor(
+                "http-worker-executor",
+                "http-worker-%d",
+                configuration.getHttpThreadPoolSize());
     }
 
     @Subscribe
@@ -174,7 +179,6 @@ public class JerseyService extends AbstractIdleService {
         apiHttpServer = setUp(
                 listenUri,
                 sslEngineConfigurator,
-                configuration.getHttpThreadPoolSize(),
                 configuration.getHttpSelectorRunnersCount(),
                 configuration.getHttpMaxHeaderSize(),
                 configuration.isHttpEnableGzip(),
@@ -223,7 +227,6 @@ public class JerseyService extends AbstractIdleService {
 
     private HttpServer setUp(URI listenUri,
                              SSLEngineConfigurator sslEngineConfigurator,
-                             int threadPoolSize,
                              int selectorRunnersCount,
                              int maxHeaderSize,
                              boolean enableGzip,
@@ -245,12 +248,7 @@ public class JerseyService extends AbstractIdleService {
 
         final NetworkListener listener = httpServer.getListener("grizzly");
         listener.setMaxHttpHeaderSize(maxHeaderSize);
-
-        final ExecutorService workerThreadPoolExecutor = instrumentedExecutor(
-                "http-worker-executor",
-                "http-worker-%d",
-                threadPoolSize);
-        listener.getTransport().setWorkerThreadPool(workerThreadPoolExecutor);
+        listener.getTransport().setWorkerThreadPool(executorService);
 
         // The Grizzly default value is equal to `Runtime.getRuntime().availableProcessors()` which doesn't make
         // sense for Graylog because we are not mainly a web server.
