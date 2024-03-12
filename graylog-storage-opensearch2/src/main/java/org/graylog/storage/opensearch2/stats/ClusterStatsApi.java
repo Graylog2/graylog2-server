@@ -19,9 +19,9 @@ package org.graylog.storage.opensearch2.stats;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
-import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
 import org.graylog.storage.opensearch2.PlainJsonApi;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
+import org.opensearch.client.Request;
 
 public class ClusterStatsApi {
     private final ObjectMapper objectMapper;
