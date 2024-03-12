@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useState, useEffect } from 'react';
-import isEqual from 'lodash/isEqual';
 
 import type { MigrationActions, MigrationState, OnTriggerStepFunction } from '../Types';
 import { MIGRATION_STATE } from '../Constants';
@@ -66,7 +65,6 @@ const useRemoteReindexMigrationStatus = (
         if (
           migrationStatus?.progress === 100
           && migrationStatus?.status === 'FINISHED'
-          && !isEqual(migrationStatus, RemoteReindexFinishedStatusActions)
         ) {
           setNextSteps(currentStep?.next_steps.filter((action) => RemoteReindexFinishedStatusActions.includes(action)));
         } else {
