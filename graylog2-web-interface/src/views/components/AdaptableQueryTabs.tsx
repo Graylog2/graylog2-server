@@ -93,7 +93,7 @@ const StyledQueryNav = styled(Nav)(({ theme }) => css`
 
     > li {
       > a {
-        color: ${theme.colors.variant.dark.default};
+        color: ${theme.colors.global.textDefault};
         border: none;
 
         &:hover,

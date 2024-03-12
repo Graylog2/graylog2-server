@@ -18,8 +18,10 @@ package org.graylog.plugins.beats;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
 import org.graylog2.jackson.TypeReferences;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.annotations.Codec;
@@ -33,9 +35,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import jakarta.inject.Inject;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -48,11 +47,13 @@ public class BeatsCodec extends AbstractCodec {
     private static final String MAP_KEY_SEPARATOR = "_";
 
     private final ObjectMapper objectMapper;
+    private final MessageFactory messageFactory;
 
     @Inject
-    public BeatsCodec(@Assisted Configuration configuration, ObjectMapper objectMapper) {
+    public BeatsCodec(@Assisted Configuration configuration, ObjectMapper objectMapper, MessageFactory messageFactory) {
         super(configuration);
         this.objectMapper = requireNonNull(objectMapper);
+        this.messageFactory = messageFactory;
     }
 
     @Nullable
@@ -124,7 +125,7 @@ public class BeatsCodec extends AbstractCodec {
         final String type = String.valueOf(event.get("type"));
         final Object tags = event.get("tags");
 
-        final Message result = new Message(message, hostname, timestamp);
+        final Message result = messageFactory.createMessage(message, hostname, timestamp);
         result.addField("name", name);
         result.addField("type", type);
         result.addField("tags", tags);

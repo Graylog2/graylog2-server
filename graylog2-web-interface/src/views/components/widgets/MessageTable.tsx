@@ -44,6 +44,10 @@ const Table = styled.table(({ theme }) => css`
   width: 100%;
   word-break: break-all;
 
+  > tbody > tr > td {
+    border-color: ${theme.colors.table.row.border};
+  }
+
   @media print {
     font-size: ${theme.fonts.size.body};
     padding-left: 0;
