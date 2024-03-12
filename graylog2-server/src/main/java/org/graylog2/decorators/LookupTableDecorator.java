@@ -20,11 +20,13 @@ import com.google.common.collect.ImmutableMap;
 import com.google.inject.assistedinject.Assisted;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
+import jakarta.inject.Inject;
 import org.graylog2.lookup.LookupTable;
 import org.graylog2.lookup.LookupTableService;
 import org.graylog2.lookup.db.DBLookupTableService;
 import org.graylog2.lookup.dto.LookupTableDto;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.DropdownField;
@@ -33,8 +35,6 @@ import org.graylog2.plugin.decorators.SearchResponseDecorator;
 import org.graylog2.plugin.lookup.LookupResult;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
-
-import jakarta.inject.Inject;
 
 import java.util.List;
 import java.util.Map;
@@ -55,6 +55,7 @@ public class LookupTableDecorator implements SearchResponseDecorator {
     private final String sourceField;
     private final String targetField;
     private final LookupTableService.Function lookupTable;
+    private final MessageFactory messageFactory;
 
     public interface Factory extends SearchResponseDecorator.Factory {
         @Override
@@ -116,7 +117,8 @@ public class LookupTableDecorator implements SearchResponseDecorator {
     }
 
     @Inject
-    public LookupTableDecorator(@Assisted Decorator decorator, LookupTableService lookupTableService) {
+    public LookupTableDecorator(@Assisted Decorator decorator, LookupTableService lookupTableService, MessageFactory messageFactory) {
+        this.messageFactory = messageFactory;
         final String sourceField = (String) decorator.config().get(CK_SOURCE_FIELD);
         final String targetField = (String) decorator.config().get(CK_TARGET_FIELD);
         final String lookupTableName = (String) decorator.config().get(CK_LOOKUP_TABLE_NAME);
@@ -168,7 +170,7 @@ public class LookupTableDecorator implements SearchResponseDecorator {
                         return summary;
                     }
 
-                    final Message message = new Message(ImmutableMap.copyOf(summary.message()));
+                    final Message message = messageFactory.createMessage(ImmutableMap.copyOf(summary.message()));
 
                     message.addField(targetField, result.singleValue());
 

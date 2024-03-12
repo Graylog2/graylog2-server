@@ -20,7 +20,8 @@ import com.google.common.base.Strings;
 import org.graylog.failure.FailureSubmissionService;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.indexer.IndexSet;
-import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.system.processing.ProcessingStatusRecorder;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -41,6 +42,7 @@ public abstract class MessagesBatchIT extends ElasticsearchBaseTest {
 
     protected static final IndexSet indexSet = new MessagesTestIndexSet();
     protected Messages messages;
+    private final MessageFactory messageFactory = new TestMessageFactory();
 
     protected MessagesAdapter createMessagesAdapter() {
         return searchServer().adapters().messagesAdapter();
@@ -91,7 +93,7 @@ public abstract class MessagesBatchIT extends ElasticsearchBaseTest {
 
         final String message = Strings.repeat("A", size);
         for (int i = 0; i < count; i++) {
-            messageList.add(new MessageWithIndex(new Message(i + message, "source", now()), indexSet));
+            messageList.add(new MessageWithIndex(messageFactory.createMessage(i + message, "source", now()), indexSet));
         }
         return messageList;
     }

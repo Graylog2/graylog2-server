@@ -19,6 +19,8 @@ package org.graylog.plugins.beats;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.Resources;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -44,11 +46,12 @@ public class Beats2CodecTest {
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
     private Configuration configuration;
     private Beats2Codec codec;
+    private final MessageFactory messageFactory = new TestMessageFactory();
 
     @Before
     public void setUp() throws Exception {
         configuration = new Configuration(Collections.singletonMap("no_beats_prefix", false));
-        codec = new Beats2Codec(configuration, objectMapper);
+        codec = new Beats2Codec(configuration, objectMapper, messageFactory);
     }
 
     @Test
@@ -59,7 +62,7 @@ public class Beats2CodecTest {
     @Test
     public void decodeMessagesHandlesFilebeatMessagesWithoutPrefix() throws Exception {
         configuration = new Configuration(Collections.singletonMap("no_beats_prefix", true));
-        codec = new Beats2Codec(configuration, objectMapper);
+        codec = new Beats2Codec(configuration, objectMapper, messageFactory);
 
         final Message message = codec.decode(messageFromJson("filebeat.json"));
         assertThat(message).isNotNull();

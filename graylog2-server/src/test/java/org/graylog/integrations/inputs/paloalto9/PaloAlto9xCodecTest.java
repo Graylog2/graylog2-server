@@ -22,14 +22,16 @@ import org.graylog.integrations.inputs.paloalto.PaloAltoMessageBase;
 import org.graylog.integrations.inputs.paloalto.PaloAltoMessageType;
 import org.graylog.integrations.inputs.paloalto.PaloAltoParser;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.journal.RawMessage;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -56,8 +58,10 @@ public class PaloAlto9xCodecTest {
             "field_two", "value_two",
             "field_three", Long.valueOf(3L));
 
+    private final MessageFactory messageFactory = new TestMessageFactory();
+
     // Code Under Test
-    @InjectMocks PaloAlto9xCodec cut;
+    PaloAlto9xCodec cut;
 
     // Mock Objects
     @Mock Configuration mockConfig;
@@ -67,6 +71,11 @@ public class PaloAlto9xCodecTest {
     // Test Objects
     RawMessage in;
     Message out;
+
+    @Before
+    public void setUp() throws Exception {
+        this.cut = new PaloAlto9xCodec(mockConfig, mockRawParser, mockPaloParser, messageFactory);
+    }
 
     // Test Cases
     @Test

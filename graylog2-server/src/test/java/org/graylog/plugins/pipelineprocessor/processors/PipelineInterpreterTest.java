@@ -51,7 +51,9 @@ import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageCollection;
+import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.Messages;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.SuppressForbidden;
@@ -107,6 +109,7 @@ public class PipelineInterpreterTest {
 
     private final RuleService ruleService = Mockito.mock(RuleService.class);
     private final PipelineService pipelineService = Mockito.mock(PipelineService.class);
+    private final MessageFactory messageFactory = new TestMessageFactory();
 
     @Test
     public void testCreateMessage() {
@@ -136,7 +139,7 @@ public class PipelineInterpreterTest {
         ));
 
         final Map<String, Function<?>> functions = ImmutableMap.of(
-                CreateMessage.NAME, new CreateMessage(),
+                CreateMessage.NAME, new CreateMessage(messageFactory),
                 StringConversion.NAME, new StringConversion());
 
         final PipelineInterpreter interpreter = createPipelineInterpreter(ruleService, pipelineService, functions);
@@ -662,7 +665,7 @@ public class PipelineInterpreterTest {
     }
 
     private Message messageInDefaultStream(String message, String source) {
-        final Message msg = new Message(message, source, Tools.nowUTC());
+        final Message msg = messageFactory.createMessage(message, source, Tools.nowUTC());
 
         final Stream mockedStream = mock(Stream.class);
         when(mockedStream.getId()).thenReturn(DEFAULT_STREAM_ID);
