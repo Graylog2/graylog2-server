@@ -100,7 +100,7 @@ const deprecatedVariantStyles = css(({ bsStyle = 'default', theme }) => {
   return css`
     /** NOTE: Deprecated & should be removed in 4.0 */
     border-color: ${borderColor};
-    background: ${theme.colors.table.background};
+    background: ${theme.colors.table.row.background};
 
     & > .panel-heading {
       color: ${theme.utils.contrastingColor(backgroundColor)};

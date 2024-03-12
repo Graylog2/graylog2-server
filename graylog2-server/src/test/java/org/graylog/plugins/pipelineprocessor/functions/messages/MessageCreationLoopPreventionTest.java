@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.eventbus.EventBus;
+import jakarta.inject.Provider;
 import org.graylog.plugins.pipelineprocessor.BaseParserTest;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
@@ -39,7 +40,9 @@ import org.graylog.plugins.pipelineprocessor.processors.ConfigurationStateUpdate
 import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.Messages;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.SuppressForbidden;
@@ -47,8 +50,6 @@ import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.graylog2.streams.StreamService;
 import org.junit.Before;
 import org.junit.Test;
-
-import jakarta.inject.Provider;
 
 import java.util.Collections;
 import java.util.Map;
@@ -66,8 +67,8 @@ import static org.mockito.Mockito.when;
 
 public class MessageCreationLoopPreventionTest extends BaseParserTest {
 
-
-    final CloneMessage cloneMessage = spy(new CloneMessage());
+    private MessageFactory messageFactory = new TestMessageFactory();
+    final CloneMessage cloneMessage = spy(new CloneMessage(messageFactory));
     PipelineInterpreter pipelineInterpreter;
 
     @Before
@@ -225,7 +226,7 @@ public class MessageCreationLoopPreventionTest extends BaseParserTest {
     }
 
     private Message messageInDefaultStream() {
-        final Message msg = new Message("original message", "test", Tools.nowUTC());
+        final Message msg = messageFactory.createMessage("original message", "test", Tools.nowUTC());
         msg.addStream(defaultStream);
         return msg;
     }

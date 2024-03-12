@@ -22,6 +22,17 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import jakarta.inject.Inject;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.glassfish.jersey.server.ChunkedOutput;
 import org.graylog.plugins.views.search.engine.SearchExecutor;
@@ -41,22 +52,9 @@ import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-
-import jakarta.validation.constraints.NotEmpty;
-
-import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.DefaultValue;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-
 import java.util.List;
 
+import static org.graylog2.rest.RestTools.respondWithFile;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
@@ -158,9 +156,7 @@ public class KeywordSearchResource extends SearchResource {
             @QueryParam("fields") @NotEmpty String fields) {
         checkSearchPermission(filter, RestPermissions.SEARCHES_KEYWORD);
         final String filename = "graylog-search-result-keyword-" + keyword + ".csv";
-        return Response
-                .ok(searchKeywordChunked(query, keyword, timezone, limit, offset, batchSize, filter, fields))
-                .header("Content-Disposition", "attachment; filename=" + filename)
+        return respondWithFile(filename, searchKeywordChunked(query, keyword, timezone, limit, offset, batchSize, filter, fields))
                 .build();
     }
 

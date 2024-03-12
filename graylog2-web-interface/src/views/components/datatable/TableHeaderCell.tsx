@@ -19,7 +19,7 @@ import styled, { css } from 'styled-components';
 const TableHeaderCell = styled.th<{ $isNumeric?: boolean, $borderedHeader?: boolean }>(({ $isNumeric, $borderedHeader, theme }) => css`
   && {
     min-width: 50px;
-    border: ${$borderedHeader ? `1px solid ${theme.colors.table.backgroundAlt}` : '0'};
+    border: ${$borderedHeader ? `1px solid ${theme.colors.table.row.backgroundAlt}` : '0'};
     padding: 0 5px;
     vertical-align: middle;
     white-space: nowrap;
