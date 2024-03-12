@@ -28,7 +28,6 @@ const defaultState = { view: { view: createSearch(), activeQuery: 'query-id-1' }
 const mockSearchExecutors: SearchExecutors = {
   resultMapper: (r) => r,
   parse: async () => SearchMetadata.empty(),
-  execute: async () => ({}) as SearchExecutionResult,
   executeJobResult: async () => ({}) as SearchExecutionResult,
   startJob: async () => ({ nodeId: '1111', asyncSearchId: '333333' }),
   cancelJob: async () => null,
