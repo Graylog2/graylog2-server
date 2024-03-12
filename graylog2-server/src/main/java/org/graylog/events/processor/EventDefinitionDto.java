@@ -19,6 +19,7 @@ package org.graylog.events.processor;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
@@ -92,6 +93,7 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
 
     @Override
     @Nullable
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonProperty(FIELD_REMEDIATION_STEPS)
     public abstract String remediationSteps();
 
