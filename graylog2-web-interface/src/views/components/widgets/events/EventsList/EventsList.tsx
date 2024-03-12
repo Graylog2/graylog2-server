@@ -46,8 +46,6 @@ const EventsList = ({ data, config, onConfigChange, setLoadingState }: WidgetCom
     });
   }, [refreshPage]);
 
-  // const refreshCurrentPage = useCallback(() => refreshPage(currentPage, PAGINATION.PER_PAGE), [currentPage, refreshPage]);
-
   const onSortChange = useCallback((newSort: EventsWidgetSortConfig) => {
     const newConfig = config.toBuilder().sort(newSort).build();
 

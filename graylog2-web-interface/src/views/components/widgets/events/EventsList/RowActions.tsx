@@ -15,14 +15,57 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import {IconButton} from 'components/common';
-import {ButtonToolbar} from 'components/bootstrap';
+import {IconButton, ModalSubmit} from 'components/common';
+import {ButtonToolbar, Modal } from 'components/bootstrap';
+import {useState} from 'react';
+import usePluginEntities from 'hooks/usePluginEntities';
 
-const RowActions = () => {
-  return <ButtonToolbar>
-    <IconButton name="open_in_full" title="View event details" />
-    <IconButton name="more_vert" title="Toggle event actions" />
-  </ButtonToolbar>
+const EventDetails = ({ eventId }: { eventId: string }) => {
+  const puggableEventDetails = usePluginEntities('views.components.widgets.events.detailsComponent');
+
+  console.log(puggableEventDetails)
+
+  if (!!puggableEventDetails?.length) {
+    const { component: Component } = puggableEventDetails[0];
+
+    return <Component eventId={eventId} />
+  }
+
+  return <>default</>
+}
+
+const RowActions = ({ eventId }: { eventId: string }) => {
+
+  const [showDetailsModal, setShowDetailsModal] = useState(false)
+
+  const toggleDetailsModal = () => setShowDetailsModal(cur => !cur);
+
+
+  return (
+    <>
+      <ButtonToolbar>
+        <IconButton name="open_in_full" title="View event details" onClick={toggleDetailsModal} />
+        <IconButton name="more_vert" title="Toggle event actions" />
+      </ButtonToolbar>
+      {showDetailsModal && <Modal show={showDetailsModal}
+                                        bsSize="large"
+                                        onHide={toggleDetailsModal}>
+                <Modal.Header closeButton>
+                  <Modal.Title>Event details</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                  <EventDetails eventId={eventId} />
+                </Modal.Body>
+                <Modal.Footer>
+                  <ModalSubmit displayCancel={false}
+                               onSubmit={toggleDetailsModal}
+                               submitButtonType="button"
+                               submitButtonText="Close" />
+                </Modal.Footer>
+      </Modal>}
+    </>
+
+  )
 }
 
 export default RowActions

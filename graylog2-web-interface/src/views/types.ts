@@ -449,6 +449,7 @@ declare module 'graylog-web-plugin/plugin' {
     }>;
     'views.components.widgets.events.filterComponents'?: FilterComponents;
     'views.components.widgets.events.attributes'?: Attributes;
+    'views.components.widgets.events.detailsComponent'?: Array<{ component: React.ComponentType<{ eventId: string }> }>;
     'views.components.searchActions'?: Array<SearchAction>;
     'views.components.searchBar'?: Array<() => SearchBarControl | null>;
     'views.components.saveViewForm'?: Array<() => SaveViewControls | null>;

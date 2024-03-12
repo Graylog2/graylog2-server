@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo, useState } from 'react';
+import {useMemo, useState, useRef} from 'react';
 import styled from 'styled-components';
 
 import { Select } from 'components/common';
@@ -44,11 +44,12 @@ type Props = {
 }
 
 const FilterSelect = ({ filterComponents, columnTitle, onCreate, selectedFilters }: Props) => {
+  const container = useRef(null);
   const [open, setOpen] = useState(false);
   const [selectedColumn, setSelectedColumn] = useState<string>(null);
   const [createValue, setCreateValue] = React.useState<string>();
   const filterComponent = selectedColumn ? filterComponents.find(({ attribute }) => attribute === selectedColumn) : undefined;
-  const selectedValues = selectedColumn ? selectedFilters.find(({ field }) => field === selectedColumn)?.value : undefined
+  const selectedValues = selectedColumn ? selectedFilters.find(({ field }) => field === selectedColumn)?.value : []
 
   const filterOptions = useMemo(() => (
     filterComponents
@@ -77,27 +78,29 @@ const FilterSelect = ({ filterComponents, columnTitle, onCreate, selectedFilters
 
   const onChange = (newValue: unknown, shouldSubmit = false) => {
     const normalizedValue = filterComponent?.valueForConfig?.(newValue) ?? newValue as string;
+    console.log(normalizedValue, newValue)
 
     if (shouldSubmit) {
       onSubmit(selectedColumn, normalizedValue);
     } else {
-      setCreateValue(filterComponent?.valueForConfig?.(newValue) ?? newValue as string);
+      setCreateValue(normalizedValue);
     }
   };
 
+  console.log(container?.current?.offsetWidth)
+
   return (
-    <Container>
+    <Container ref={container}>
       <Select id="filter-select"
               placeholder="Configure a new filter"
               options={filterOptions}
-              persistSelection={false}
               matchProp="label"
               menuPortalTarget={document.body}
               clearable={false}
               size="small"
               onChange={(selectedCol) => onSelectColumn(selectedCol)}
-              value={null} />
-      <Menu position="bottom-start" withinPortal onClose={onClose} opened={open}>
+              value={selectedColumn} />
+      <Menu position="bottom-start" withinPortal onClose={onClose} opened={open} width={container?.current?.offsetWidth}>
         <Menu.Target>
           <HiddenButton type="button" />
         </Menu.Target>

@@ -1,7 +1,6 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
-import { IfPermitted } from 'components/common';
 import { TableHead, TableHeaderCell } from 'views/components/datatable';
 import IfInteractive from 'views/components/dashboard/IfInteractive';
 import type EventsWidgetConfig from 'views/logic/widgets/events/EventsWidgetConfig';
@@ -52,9 +51,7 @@ const EventsTable = ({ events, config, onSortChange, setLoadingState }: Props) =
               </TableHeaderCell>;
             })}
             <IfInteractive>
-              <IfPermitted permissions="events:edit">
-                <ActionsHeader />
-              </IfPermitted>
+              <ActionsHeader />
             </IfInteractive>
           </tr>
         </TableHead>

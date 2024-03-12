@@ -31,6 +31,7 @@ type Props = PropsWithChildren<{
   width?: number,
   withinPortal?: boolean,
   zIndex?: number,
+  offset?: MenuProps['offset'],
 }>
 
 const Menu = ({
@@ -42,6 +43,7 @@ const Menu = ({
   withinPortal,
   position,
   opened,
+  offset,
   onChange,
   portalProps,
   keepMounted,
@@ -57,6 +59,7 @@ const Menu = ({
                position={position}
                withinPortal={withinPortal}
                keepMounted={keepMounted}
+               offset={offset}
                zIndex={zIndex}>
     {children}
   </MantineMenu>

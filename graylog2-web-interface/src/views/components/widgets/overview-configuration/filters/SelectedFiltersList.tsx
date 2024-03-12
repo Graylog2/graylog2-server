@@ -7,6 +7,7 @@ import { IconButton } from 'components/common';
 
 import { FilterComponents, Filter } from 'views/components/widgets/overview-configuration/filters/types';
 import FilterEditButton from 'views/components/widgets/overview-configuration/filters/FilterEditButton';
+import {useRef} from 'react';
 
 const Container = styled.div`
   display: flex;
@@ -41,47 +42,52 @@ type Props = {
   selectedFilters: Immutable.OrderedSet<Filter>,
 }
 
-const SelectedFiltersList = ({ selectedFilters, columnTitle, filterComponents, onDelete, onEdit }: Props) => (
-  <Container>
-    {selectedFilters.toArray().map(({ field: column, value: values }, filterIndex) => {
-      const _columnTitle = columnTitle(column);
-      const filterComponent = filterComponents.find(({ attribute }) => attribute === column);
+const SelectedFiltersList = ({ selectedFilters, columnTitle, filterComponents, onDelete, onEdit }: Props) => {
+  const container = useRef(null)
 
-      return (
-        <FilterContainer key={column}>
-          <Input id={`${column}-filter-configuration`}
-                 label={_columnTitle}
-                 labelClassName="col-sm-3"
-                 wrapperClassName="col-sm-9">
-            {values.map((value, valueIndex) => {
-              const _onEdit = (newValue: string) => {
-                onEdit(filterIndex, valueIndex, newValue);
-              };
+  return (
+    <Container ref={container}>
+      {selectedFilters.toArray().map(({field: column, value: values}, filterIndex) => {
+        const _columnTitle = columnTitle(column);
+        const filterComponent = filterComponents.find(({attribute}) => attribute === column);
 
-              return (
-                <FilterValue key={value}>
-                  <ValueTitle>
-                    {filterComponent?.renderValue(value) ?? value}
-                  </ValueTitle>
-                  <ValueActions>
-                    <FilterEditButton filterComponent={filterComponent}
-                                      onEdit={_onEdit}
-                                      selectedValues={values}
-                                      columnTitle={columnTitle}
-                                      column={column}
-                                      value={value} />
-                    <IconButton name="delete"
-                                onClick={() => onDelete(filterIndex, value)}
-                                title={`Delete ${_columnTitle} filter`} />
-                  </ValueActions>
-                </FilterValue>
-              );
-            })}
-          </Input>
-        </FilterContainer>
-      );
-    })}
-  </Container>
-);
+        return (
+          <FilterContainer key={column}>
+            <Input id={`${column}-filter-configuration`}
+                   label={_columnTitle}
+                   labelClassName="col-sm-3"
+                   wrapperClassName="col-sm-9">
+              {values.map((value, valueIndex) => {
+                const _onEdit = (newValue: string) => {
+                  onEdit(filterIndex, valueIndex, newValue);
+                };
+
+                return (
+                  <FilterValue key={value}>
+                    <ValueTitle>
+                      {filterComponent?.renderValue(value) ?? value}
+                    </ValueTitle>
+                    <ValueActions>
+                      <FilterEditButton filterComponent={filterComponent}
+                                        onEdit={_onEdit}
+                                        selectedValues={values}
+                                        columnTitle={columnTitle}
+                                        containerWidth={container.current?.offsetWidth}
+                                        column={column}
+                                        value={value} />
+                      <IconButton name="delete"
+                                  onClick={() => onDelete(filterIndex, value)}
+                                  title={`Delete ${_columnTitle} filter`} />
+                    </ValueActions>
+                  </FilterValue>
+                );
+              })}
+            </Input>
+          </FilterContainer>
+        );
+      })}
+    </Container>
+  );
+};
 
 export default SelectedFiltersList;
