@@ -18,12 +18,13 @@ package org.graylog2.outputs;
 
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableList;
+import org.graylog.testing.messages.MessagesExtension;
 import org.graylog2.Configuration;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.messages.MessageWithIndex;
 import org.graylog2.indexer.messages.Messages;
-import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
@@ -48,6 +49,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@ExtendWith(MessagesExtension.class)
 public class BlockingBatchedESOutputTest {
 
     private Configuration config;
@@ -62,10 +64,13 @@ public class BlockingBatchedESOutputTest {
     private Cluster cluster;
 
     private BlockingBatchedESOutput output;
+    private MessageFactory messageFactory;
 
     @BeforeEach
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
-    public void setUp() throws Exception {
+    public void setUp(MessageFactory messageFactory) throws Exception {
+        this.messageFactory = messageFactory;
+
         MetricRegistry metricRegistry = new MetricRegistry();
         this.config = new Configuration() {
             @Override
@@ -163,7 +168,7 @@ public class BlockingBatchedESOutputTest {
     private List<MessageWithIndex> buildMessages(final int count) {
         final ImmutableList.Builder<MessageWithIndex> builder = ImmutableList.builder();
         for (int i = 0; i < count; i++) {
-            builder.add(new MessageWithIndex(new Message("message" + i, "test", Tools.nowUTC()), mock(IndexSet.class)));
+            builder.add(new MessageWithIndex(messageFactory.createMessage("message" + i, "test", Tools.nowUTC()), mock(IndexSet.class)));
         }
 
         return builder.build();
