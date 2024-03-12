@@ -54,6 +54,10 @@ const searchExecutionSlice = createSlice({
       ...state,
       isLoading: true,
     }),
+    stopLoading: (state) => ({
+      ...state,
+      isLoading: false,
+    }),
     finishedLoading: (state, action: PayloadAction<SearchExecution['result']>) => ({
       ...state,
       isLoading: false,
@@ -103,7 +107,7 @@ const searchExecutionSlice = createSlice({
   },
 });
 
-export const { loading, finishedLoading, updateGlobalOverride, setWidgetsToSearch, setParameterValues, setParameterBindings, setJobIds } = searchExecutionSlice.actions;
+export const { loading, stopLoading, finishedLoading, updateGlobalOverride, setWidgetsToSearch, setParameterValues, setParameterBindings, setJobIds } = searchExecutionSlice.actions;
 
 export const searchExecutionSliceReducer = searchExecutionSlice.reducer;
 
@@ -112,7 +116,7 @@ export type SearchExecutors = {
   execute: (view: View, widgetsToSearch: string[], executionStateParam: SearchExecutionState, keepQueries?: string[]) => Promise<SearchExecutionResult>,
   resultMapper: (newResult: SearchExecutionResult) => SearchExecutionResult,
   startJob: (view: View, widgetsToSearch: string[], executionStateParam: SearchExecutionState, keepQueries?: string[]) => Promise<JobIds>,
-  executeJobResult: (jobIds: JobIds, view: View, signal: AbortSignal) => Promise<SearchExecutionResult>,
+  executeJobResult: (jobIds: JobIds, view: View) => Promise<SearchExecutionResult>,
   cancelJob: (jobIds: JobIds) => Promise<null>,
 };
 
@@ -121,7 +125,6 @@ export const cancelExecutedJob = () => (dispatch: AppDispatch, getState: () => R
   const jobIds = selectJobIds(state);
 
   if (jobIds) {
-    jobIds.abortController.abort();
     dispatch(setJobIds(null));
 
     searchExecutors.cancelJob(jobIds);
@@ -139,28 +142,16 @@ export const executeWithExecutionState = (view: View, widgetsToSearch: Array<str
     const activeQuery = selectActiveQuery(getState());
 
     return searchExecutors.startJob(view, widgetsToSearch, executionState, [activeQuery]);
-    /*
-    const activeQuery = selectActiveQuery(getState());
-    console.log({ executionState });
-    return searchExecutors.execute(view, widgetsToSearch, executionState, [activeQuery])
-      .then(searchExecutors.resultMapper)
-      .then((result) => dispatch(finishedLoading(result)));
-     */
   })
   .then((jobIds: JobIds) => {
-    const abortController = new AbortController();
-    dispatch(setJobIds({ ...jobIds, abortController }));
+    dispatch(setJobIds(jobIds));
 
-    return searchExecutors.executeJobResult(jobIds, view, abortController.signal)
+    return searchExecutors.executeJobResult(jobIds, view)
       .then(searchExecutors.resultMapper)
       .then((result) => {
         dispatch(setJobIds(null));
-
+        if(result.result.result.execution.cancelled) return dispatch(stopLoading())
         return dispatch(finishedLoading(result));
-      })
-      .catch((e) => {
-        if (e.name === 'AbortError') return Promise.resolve();
-        return e
       })
   });
 

@@ -379,13 +379,13 @@ export type SearchExecutionResult = {
   widgetMapping: WidgetMapping,
 };
 
-export type JobIdsState = JobIds & { abortController: AbortController } | null;
+export type JobIdsState = JobIds | null;
 export interface SearchExecution {
   executionState: SearchExecutionState;
   result: SearchExecutionResult;
   isLoading: boolean;
   widgetsToSearch: Array<string>,
-  jobIds?: JobIds & { abortController: AbortController } | null,
+  jobIds?: JobIds | null,
 }
 
 export interface SearchMetadataState {

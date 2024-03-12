@@ -63,59 +63,25 @@ export const startJob = async (
   return runStartJob(search, executionState).then((res) => ({ asyncSearchId: res.id, nodeId: res.executing_node }));
 };
 
-export const pollJob = (jobIds: JobIds, result: SearchJobType | null, signal: AbortSignal): Promise<SearchJobType> => new Promise((resolve) => {
-  if (result?.execution?.done) {
+export const pollJob = (jobIds: JobIds, result: SearchJobType | null): Promise<SearchJobType> => new Promise((resolve) => {
+  if (result?.execution?.done || result?.execution?.cancelled) {
     return resolve(result);
   } else {
-    return delay(2000)
+    delay(250)
       .then(() => {
-        if (!signal.aborted) {
-          return resolve(runPollJob(jobIds, signal).then((res) => pollJob(jobIds, res, signal)));
+        if (!result?.execution?.cancelled) {
+          resolve(runPollJob(jobIds).then((res) => pollJob(jobIds, res)));
         }
       });
   }
 })
-/*
-const abortHandler = () => {
-  return Promise.reject(new DOMException("Aborted", "AbortError"));
-}
 
-export const executeJobResult5 = async ({ asyncSearchId, nodeId }: JobIds, view: View, signal: AbortSignal): Promise<SearchExecutionResult> => {
+export const executeJobResult = async ({ asyncSearchId, nodeId }: JobIds, view: View): Promise<SearchExecutionResult> => {
   const { widgetMapping } = view;
-  if (signal?.aborted){
-    return abortHandler()
-  }
-
-  signal?.addEventListener("abort", abortHandler);
-
-  return pollJob({ asyncSearchId, nodeId }, null, signal)
-    .then((result) => ({ widgetMapping, result: new SearchResult(result) }))
-    .finally(() => signal?.removeEventListener("abort", abortHandler));
+  return pollJob({ asyncSearchId, nodeId }, null)
+    .then(
+      (result) => ({ widgetMapping, result: new SearchResult(result) }));
 };
-*/
-
-export const executeJobResult = async ({ asyncSearchId, nodeId }: JobIds, view: View, signal: AbortSignal): Promise<SearchExecutionResult> => {
-  return new Promise((resolve, reject) => {
-    const { widgetMapping } = view;
-    const abortHandler = () => {
-      return reject(new DOMException("Aborted", "AbortError"));
-    }
-
-    if (signal?.aborted){
-      return abortHandler();
-    }
-
-    signal?.addEventListener("abort", abortHandler);
-
-    return pollJob({ asyncSearchId, nodeId }, null, signal)
-      .then(
-        (result) => resolve(({ widgetMapping, result: new SearchResult(result) })))
-      .finally(() => signal?.removeEventListener("abort", abortHandler))
-    ;
-  })
-};
-
-
 
 export const cancelJob = (jobIds: JobIds) => runCancelJob(jobIds);
 
