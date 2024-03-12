@@ -130,7 +130,7 @@ public class ESMessageListTest {
     }
 
     @Test
-    public void onlyAddsSecondSortWhenGl2MessageIdAlreadyPresent() {
+    public void onlyAddsSecondSortWhenGl2MessageIdNotAlreadyPresent() {
         final MessageList messageList = someMessageList().toBuilder()
                 .sort(List.of(
                         Sort.create(Message.FIELD_GL2_MESSAGE_ID, Sort.Order.DESC),
