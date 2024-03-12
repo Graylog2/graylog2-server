@@ -113,7 +113,6 @@ export const searchExecutionSliceReducer = searchExecutionSlice.reducer;
 
 export type SearchExecutors = {
   parse: SearchParser,
-  execute: (view: View, widgetsToSearch: string[], executionStateParam: SearchExecutionState, keepQueries?: string[]) => Promise<SearchExecutionResult>,
   resultMapper: (newResult: SearchExecutionResult) => SearchExecutionResult,
   startJob: (view: View, widgetsToSearch: string[], executionStateParam: SearchExecutionState, keepQueries?: string[]) => Promise<JobIds>,
   executeJobResult: (jobIds: JobIds, view: View) => Promise<SearchExecutionResult>,

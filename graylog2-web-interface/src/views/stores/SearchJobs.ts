@@ -20,9 +20,6 @@ import type Search from 'views/logic/search/Search';
 import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import type { SearchErrorResponse } from 'views/logic/SearchError';
 
-const executeQueryUrl = (id: string) => URLUtils.qualifyUrl(`/views/search/${id}/execute`);
-const jobStatusUrl = (jobId: string) => URLUtils.qualifyUrl(`/views/search/status/${jobId}`);
-
 type SearchJobId = string;
 type SearchId = string;
 
@@ -62,16 +59,8 @@ export function runStartJob(search: Search, executionState: SearchExecutionState
   return fetch('POST', startJobUrl(search.id), JSON.stringify(executionState));
 }
 
-export function runSearchJob(search: Search, executionState: SearchExecutionState): Promise<SearchJobType> {
-  return fetch('POST', executeQueryUrl(search.id), JSON.stringify(executionState));
-}
-
 export function runPollJob({ nodeId, asyncSearchId } : JobIds): Promise<SearchJobType | null> {
   return fetch('GET', pollJobUrl(nodeId, asyncSearchId));
-}
-
-export function searchJobStatus(jobId: SearchJobId): Promise<SearchJobType> {
-  return fetch('GET', jobStatusUrl(jobId));
 }
 
 
