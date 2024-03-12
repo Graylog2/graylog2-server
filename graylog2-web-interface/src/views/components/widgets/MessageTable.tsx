@@ -86,7 +86,7 @@ const TableWrapper = styled.div(({ theme }) => css`
 `);
 
 const TableHead = styled.thead(({ theme }) => css`
-  background-color: ${theme.colors.table.head.background};
+  background-color: ${theme.colors.global.contentBackground};
   color: ${theme.utils.readableColor(theme.colors.gray[90])};
   position: sticky;
   top: 0;
