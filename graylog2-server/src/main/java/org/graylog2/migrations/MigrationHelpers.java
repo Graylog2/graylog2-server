@@ -17,6 +17,7 @@
 package org.graylog2.migrations;
 
 import com.mongodb.DuplicateKeyException;
+import jakarta.inject.Inject;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
@@ -30,9 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-
-import jakarta.inject.Inject;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -45,7 +43,8 @@ public class MigrationHelpers {
     private final UserService userService;
 
     @Inject
-    public MigrationHelpers(RoleService roleService, UserService userService) {
+    public MigrationHelpers(final RoleService roleService,
+                            final UserService userService) {
         this.roleService = roleService;
         this.userService = userService;
     }
