@@ -16,13 +16,28 @@
  */
 package org.graylog2.indexer.datastream.policy.actions;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public record RolloverAction(String minIndexAge, String minPrimaryShardSize) implements WrappedAction {
+/**
+ * Formats time values using accepted OpenSearch values.
+ * <a href="https://opensearch.org/docs/latest/api-reference/units/">...</a>
+ */
+public enum TimesUnit {
+    DAYS("d"),
+    HOURS("h"),
+    MINUTES("m"),
+    SECONDS("s"),
+    MILLISECONDS("ms"),
+    MICROSECONDS("micros"),
+    NANOSECONDS("nanos");
 
-    @Override
-    public Type getType() {
-        return Type.ROLLOVER;
+    private final String abbreviation;
+
+    TimesUnit(String abbreviation) {
+        this.abbreviation = abbreviation;
+    }
+
+    public String format(long size) {
+        return f("%d" + this.abbreviation, size);
     }
 }
