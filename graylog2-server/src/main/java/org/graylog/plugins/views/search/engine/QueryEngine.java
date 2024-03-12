@@ -18,6 +18,8 @@ package org.graylog.plugins.views.search.engine;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryMetadata;
 import org.graylog.plugins.views.search.QueryMetadataDecorator;
@@ -27,11 +29,9 @@ import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.errors.QueryError;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.errors.SearchException;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 
 import java.util.Collection;
 import java.util.Objects;
@@ -73,7 +73,7 @@ public class QueryEngine {
     }
 
     @WithSpan
-    public SearchJob execute(SearchJob searchJob, Set<SearchError> validationErrors) {
+    public SearchJob execute(SearchJob searchJob, Set<SearchError> validationErrors, DateTimeZone timezone) {
         final Set<Query> validQueries = searchJob.getSearch().queries()
                 .stream()
                 .filter(query -> !isQueryWithError(validationErrors, query))
@@ -82,7 +82,7 @@ public class QueryEngine {
         validQueries.forEach(query -> searchJob.addQueryResultFuture(query.id(),
                 // generate and run each query, making sure we never let an exception escape
                 // if need be we default to an empty result with a failed state and the wrapped exception
-                CompletableFuture.supplyAsync(() -> prepareAndRun(searchJob, query, validationErrors), queryPool)
+                CompletableFuture.supplyAsync(() -> prepareAndRun(searchJob, query, validationErrors, timezone), queryPool)
                         .handle((queryResult, throwable) -> {
                             if (throwable != null) {
                                 final Throwable cause = throwable.getCause();
@@ -115,12 +115,12 @@ public class QueryEngine {
         return searchJob.seal();
     }
 
-    private QueryResult prepareAndRun(SearchJob searchJob, Query query, Set<SearchError> validationErrors) {
+    private QueryResult prepareAndRun(SearchJob searchJob, Query query, Set<SearchError> validationErrors, DateTimeZone timezone) {
         LOG.debug("[{}] Using {} to generate query", query.id(), backend);
         // with all the results done, we can execute the current query and eventually complete our own result
         // if any of this throws an exception, the handle in #execute will convert it to an error and return a "failed" result instead
         // if the backend already returns a "failed result" then nothing special happens here
-        final GeneratedQueryContext generatedQueryContext = backend.generate(query, validationErrors);
+        final GeneratedQueryContext generatedQueryContext = backend.generate(query, validationErrors, timezone);
         LOG.trace("[{}] Generated query {}, running it on backend {}", query.id(), generatedQueryContext, backend);
         final QueryResult result = backend.run(searchJob, query, generatedQueryContext);
         LOG.debug("[{}] Query returned {}", query.id(), result);
