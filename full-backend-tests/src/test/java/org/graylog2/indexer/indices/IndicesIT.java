@@ -525,7 +525,7 @@ public class IndicesIT extends ContainerMatrixElasticsearchBaseTest {
     public void retrieveIndexStatisticsForIndices() {
         final String index = createRandomIndex("indices_it_");
 
-        final Set<IndexStatistics> indicesStats = indices.getIndexSetStats(Collections.singleton(index));
+        final Set<IndexStatistics> indicesStats = indices.getIndicesStats(Collections.singleton(index));
 
         assertThat(indicesStats).isNotEmpty();
     }

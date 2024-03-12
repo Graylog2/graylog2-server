@@ -28,17 +28,14 @@ import org.graylog2.indexer.IndexSetStatsCreator;
 import org.graylog2.indexer.IndexSetValidator;
 import org.graylog2.indexer.indexset.DefaultIndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetConfig;
-import org.graylog2.indexer.indexset.IndexSetFieldTypeSummaryService;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.jobs.IndexSetCleanupJob;
-import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.graylog2.rest.models.system.indexer.responses.IndexStats;
 import org.graylog2.rest.resources.system.indexer.requests.IndexSetUpdateRequest;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetResponse;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
@@ -63,7 +60,6 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -94,8 +90,6 @@ public class IndexSetsResourceTest {
     private SystemJobManager systemJobManager;
     @Mock
     private ClusterConfigService clusterConfigService;
-    @Mock
-    private IndexSetFieldTypeSummaryService indexSetFieldTypeSummaryService;
 
     public IndexSetsResourceTest() {
         GuiceInjectorHolder.createInjector(Collections.emptyList());
@@ -108,7 +102,7 @@ public class IndexSetsResourceTest {
     @Before
     public void setUp() throws Exception {
         this.permitted = true;
-        this.indexSetsResource = new TestResource(indices, indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, indexSetStatsCreator, clusterConfigService, systemJobManager, () -> permitted, indexSetFieldTypeSummaryService);
+        this.indexSetsResource = new TestResource(indices, indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, indexSetStatsCreator, clusterConfigService, systemJobManager, () -> permitted);
     }
 
     private void notPermitted() {
@@ -143,7 +137,7 @@ public class IndexSetsResourceTest {
         verify(indexSetService, times(1)).getDefault();
         verifyNoMoreInteractions(indexSetService);
 
-        assertThat(list.total()).isEqualTo(0);
+        assertThat(list.total()).isZero();
         assertThat(list.indexSets()).isEmpty();
     }
 
@@ -157,7 +151,7 @@ public class IndexSetsResourceTest {
         verify(indexSetService, times(1)).getDefault();
         verifyNoMoreInteractions(indexSetService);
 
-        assertThat(list.total()).isEqualTo(0);
+        assertThat(list.total()).isZero();
         assertThat(list.indexSets()).isEmpty();
     }
 
@@ -370,7 +364,7 @@ public class IndexSetsResourceTest {
     }
 
     @Test
-    public void updateFailsWhenDefaultSetIsSetReadOnly() throws Exception {
+    public void updateFailsWhenDefaultSetIsSetReadOnly() {
         final String defaultIndexSetId = "defaultIndexSet";
         final IndexSetConfig defaultIndexSetConfig = IndexSetConfig.create(
                 defaultIndexSetId,
@@ -428,7 +422,7 @@ public class IndexSetsResourceTest {
     }
 
     @Test
-    public void delete0() throws Exception {
+    public void delete0() {
         final IndexSet indexSet = mock(IndexSet.class);
         final IndexSetConfig indexSetConfig = mock(IndexSetConfig.class);
 
@@ -485,62 +479,6 @@ public class IndexSetsResourceTest {
     }
 
     @Test
-    public void globalStats() throws Exception {
-        final IndexStatistics indexStatistics = IndexStatistics.create(
-                "prefix_0",
-                IndexStats.create(
-                        IndexStats.TimeAndTotalStats.create(0L, 0L),
-                        IndexStats.TimeAndTotalStats.create(0L, 0L),
-                        IndexStats.TimeAndTotalStats.create(0L, 0L),
-                        IndexStats.TimeAndTotalStats.create(0L, 0L),
-                        IndexStats.TimeAndTotalStats.create(0L, 0L),
-                        IndexStats.TimeAndTotalStats.create(0L, 0L),
-                        IndexStats.TimeAndTotalStats.create(0L, 0L),
-                        0L,
-                        23L,
-                        2L,
-                        IndexStats.DocsStats.create(42L, 0L)
-                ),
-                IndexStats.create(
-                        IndexStats.TimeAndTotalStats.create(0L, 0L),
-                        IndexStats.TimeAndTotalStats.create(0L, 0L),
-                        IndexStats.TimeAndTotalStats.create(0L, 0L),
-                        IndexStats.TimeAndTotalStats.create(0L, 0L),
-                        IndexStats.TimeAndTotalStats.create(0L, 0L),
-                        IndexStats.TimeAndTotalStats.create(0L, 0L),
-                        IndexStats.TimeAndTotalStats.create(0L, 0L),
-                        0L,
-                        23L,
-                        2L,
-                        IndexStats.DocsStats.create(42L, 0L)
-                ),
-                Collections.emptyList()
-        );
-        when(indices.getClosedIndices(anyCollection())).thenReturn(Collections.singleton("closed_index_0"));
-        when(indices.getIndexSetStats(anyCollection())).thenReturn(Collections.singleton(indexStatistics));
-
-        final IndexSetStats indexSetStats = indexSetsResource.globalStats();
-
-        assertThat(indexSetStats).isNotNull();
-        assertThat(indexSetStats.indices()).isEqualTo(2L);
-        assertThat(indexSetStats.documents()).isEqualTo(42L);
-        assertThat(indexSetStats.size()).isEqualTo(23L);
-    }
-
-    @Test
-    public void globalStats0() throws Exception {
-        when(indexSetRegistry.getAll()).thenReturn(Collections.emptySet());
-        when(indices.getIndexSetStats(anyCollection())).thenReturn(Collections.emptySet());
-
-        final IndexSetStats indexSetStats = indexSetsResource.globalStats();
-
-        assertThat(indexSetStats).isNotNull();
-        assertThat(indexSetStats.indices()).isEqualTo(0L);
-        assertThat(indexSetStats.documents()).isEqualTo(0L);
-        assertThat(indexSetStats.size()).isEqualTo(0L);
-    }
-
-    @Test
     public void globalStatsDenied() {
         notPermitted();
 
@@ -555,7 +493,7 @@ public class IndexSetsResourceTest {
     }
 
     @Test
-    public void setDefaultMakesIndexDefaultIfWritable() throws Exception {
+    public void setDefaultMakesIndexDefaultIfWritable() {
         final String indexSetId = "newDefaultIndexSetId";
         final IndexSet indexSet = mock(IndexSet.class);
         final IndexSetConfig indexSetConfig = IndexSetConfig.create(
@@ -592,7 +530,7 @@ public class IndexSetsResourceTest {
     }
 
     @Test
-    public void setDefaultDoesNotDoAnyThingIfNotPermitted() throws Exception {
+    public void setDefaultDoesNotDoAnyThingIfNotPermitted() {
         notPermitted();
 
         expectedException.expect(ForbiddenException.class);
@@ -607,7 +545,7 @@ public class IndexSetsResourceTest {
     }
 
     @Test
-    public void setDefaultDoesNotDoAnythingForInvalidId() throws Exception {
+    public void setDefaultDoesNotDoAnythingForInvalidId() {
         final String nonExistingIndexSetId = "nonExistingId";
 
         when(indexSetService.get(nonExistingIndexSetId)).thenReturn(Optional.empty());
@@ -623,7 +561,7 @@ public class IndexSetsResourceTest {
     }
 
     @Test
-    public void setDefaultDoesNotDoAnythingIfIndexSetIsNotWritable() throws Exception {
+    public void setDefaultDoesNotDoAnythingIfIndexSetIsNotWritable() {
         final String readOnlyIndexSetId = "newDefaultIndexSetId";
         final IndexSet readOnlyIndexSet = mock(IndexSet.class);
         final IndexSetConfig readOnlyIndexSetConfig = IndexSetConfig.create(
@@ -660,7 +598,7 @@ public class IndexSetsResourceTest {
     }
 
     @Test
-    public void setDefaultDoesNotDoAnythingIfIndexSetIsNotElegibleAsDefault() throws Exception {
+    public void setDefaultDoesNotDoAnythingIfIndexSetIsNotEligibleAsDefault() {
         final String readOnlyIndexSetId = "newDefaultIndexSetId";
         final IndexSet readOnlyIndexSet = mock(IndexSet.class);
         final IndexSetConfig readOnlyIndexSetConfig = IndexSetConfig.create(
@@ -699,7 +637,7 @@ public class IndexSetsResourceTest {
     @Test
     public void testSearchIndexSets() {
         final IndexSetConfig indexSetConfig = createTestConfig("id", "title");
-        String searchTitle = "itle";
+        String searchTitle = "Title";
         when(indexSetService.searchByTitle(searchTitle)).thenReturn(Collections.singletonList(indexSetConfig));
         final IndexSetResponse firstPage = indexSetsResource.search(searchTitle, 0, 0, false);
 
@@ -742,8 +680,8 @@ public class IndexSetsResourceTest {
     private static class TestResource extends IndexSetsResource {
         private final Provider<Boolean> permitted;
 
-        TestResource(Indices indices, IndexSetService indexSetService, IndexSetRegistry indexSetRegistry, IndexSetValidator indexSetValidator, IndexSetCleanupJob.Factory indexSetCleanupJobFactory, IndexSetStatsCreator indexSetStatsCreator, ClusterConfigService clusterConfigService, SystemJobManager systemJobManager, Provider<Boolean> permitted, IndexSetFieldTypeSummaryService indexSetFieldTypeSummaryService) {
-            super(indices, indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, indexSetStatsCreator, clusterConfigService, systemJobManager, indexSetFieldTypeSummaryService);
+        TestResource(Indices indices, IndexSetService indexSetService, IndexSetRegistry indexSetRegistry, IndexSetValidator indexSetValidator, IndexSetCleanupJob.Factory indexSetCleanupJobFactory, IndexSetStatsCreator indexSetStatsCreator, ClusterConfigService clusterConfigService, SystemJobManager systemJobManager, Provider<Boolean> permitted) {
+            super(indices, indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, indexSetStatsCreator, clusterConfigService, systemJobManager);
             this.permitted = permitted;
         }
 

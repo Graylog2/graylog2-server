@@ -352,11 +352,11 @@ public class Indices {
         return indicesAdapter.storeSizeInBytes(index);
     }
 
-    public Set<IndexStatistics> getIndexSetStats(final IndexSet indexSet) {
-        return getIndexSetStats(Collections.singleton(indexSet.getIndexWildcard()));
+    public Set<IndexStatistics> getIndicesStats(final IndexSet indexSet) {
+        return getIndicesStats(Collections.singleton(indexSet.getIndexWildcard()));
     }
 
-    public Set<IndexStatistics> getIndexSetStats(final Collection<String> indices) {
+    public Set<IndexStatistics> getIndicesStats(final Collection<String> indices) {
         return indicesAdapter.indicesStats(indices);
     }
 

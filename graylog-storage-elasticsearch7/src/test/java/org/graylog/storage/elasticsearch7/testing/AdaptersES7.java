@@ -27,6 +27,7 @@ import org.graylog.storage.elasticsearch7.IndexToolsAdapterES7;
 import org.graylog.storage.elasticsearch7.IndicesAdapterES7;
 import org.graylog.storage.elasticsearch7.MessagesAdapterES7;
 import org.graylog.storage.elasticsearch7.NodeAdapterES7;
+import org.graylog.storage.elasticsearch7.PlainJsonApi;
 import org.graylog.storage.elasticsearch7.Scroll;
 import org.graylog.storage.elasticsearch7.ScrollResultES7;
 import org.graylog.storage.elasticsearch7.SearchRequestFactory;
@@ -70,7 +71,7 @@ public class AdaptersES7 implements Adapters {
         return new IndicesAdapterES7(
                 client,
                 new StatsApi(objectMapper, client),
-                new ClusterStatsApi(objectMapper, client),
+                new ClusterStatsApi(objectMapper, new PlainJsonApi(objectMapper, client)),
                 new CatApi(objectMapper, client),
                 new ClusterStateApi(objectMapper, client),
                 objectMapper,
