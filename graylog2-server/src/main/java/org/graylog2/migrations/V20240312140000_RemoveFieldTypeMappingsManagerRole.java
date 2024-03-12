@@ -22,11 +22,11 @@ import java.time.ZonedDateTime;
 
 public class V20240312140000_RemoveFieldTypeMappingsManagerRole extends Migration {
 
-    private final RoleRemover helpers;
+    private final RoleRemover roleRemover;
 
     @Inject
     public V20240312140000_RemoveFieldTypeMappingsManagerRole(final RoleRemover roleRemover) {
-        this.helpers = roleRemover;
+        this.roleRemover = roleRemover;
     }
 
     @Override
@@ -36,6 +36,6 @@ public class V20240312140000_RemoveFieldTypeMappingsManagerRole extends Migratio
 
     @Override
     public void upgrade() {
-        helpers.removeBuiltinRole("Field Type Mappings Manager");
+        roleRemover.removeBuiltinRole("Field Type Mappings Manager");
     }
 }
