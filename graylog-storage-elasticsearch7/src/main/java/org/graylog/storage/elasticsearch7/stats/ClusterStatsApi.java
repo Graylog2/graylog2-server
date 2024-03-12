@@ -47,7 +47,7 @@ public class ClusterStatsApi {
     }
 
     private JsonNode clusterStats(String filterPath) {
-        final String endpoint = "/_stats?filter_path=" + filterPath;
+        final String endpoint = "/_cluster/stats?filter_path=" + filterPath;
         final Request request = new Request("GET", endpoint);
         return jsonApi.perform(request, "Couldn't read Elasticsearch cluster stats");
     }

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (C) 2020 Graylog, Inc.
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the Server Side Public License, version 1,
+    as published by MongoDB, Inc.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    Server Side Public License for more details.
+
+    You should have received a copy of the Server Side Public License
+    along with this program. If not, see
+    <http://www.mongodb.com/licensing/server-side-public-license>.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>graylog-parent</artifactId>
+        <groupId>org.graylog</groupId>
+        <version>6.0.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>distribution</artifactId>
+    <name>Graylog Binary Distribution Tarball</name>
+    <description>Module solely performing final assembly step after all other modules artifacts have been built</description>
+
+    <properties>
+        <!--
+           We don't need to sign anything in this module. This fixes a release build error related to setting
+           the <outputDirectory> to a different path: https://issues.apache.org/jira/browse/MGPG-44
+        -->
+        <gpg.skip>true</gpg.skip>
+        <maven.source.skip>true</maven.source.skip>
+        <maven.javadoc.skip>true</maven.javadoc.skip>
+        <maven.install.skip>true</maven.install.skip>
+        <maven.deploy.skip>true</maven.deploy.skip>
+        <maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>generate-server-artifact</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <attach>true</attach>
+                    <appendAssemblyId>true</appendAssemblyId>
+                    <descriptors>
+                        <descriptor>src/main/assembly/graylog.xml</descriptor>
+                    </descriptors>
+                    <!-- to make it easier to collect assemblies, we put them into the _parent's_ build directory -->
+                    <outputDirectory>${project.basedir}/../target/assembly</outputDirectory>
+                    <finalName>graylog-${project.version}-${maven.build.timestamp}</finalName>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    <dependencies>
+        <dependency>
+            <groupId>org.graylog</groupId>
+            <artifactId>graylog-storage-elasticsearch7</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.graylog</groupId>
+            <artifactId>graylog-storage-opensearch2</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+</project>
