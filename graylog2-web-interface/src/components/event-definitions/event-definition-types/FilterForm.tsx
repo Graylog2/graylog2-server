@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import camelCase from 'lodash/camelCase';
 import cloneDeep from 'lodash/cloneDeep';
@@ -30,6 +30,7 @@ import union from 'lodash/union';
 import moment from 'moment';
 import { OrderedMap } from 'immutable';
 
+import FormWarningsContext from 'contexts/FormWarningsContext';
 import { useStore } from 'stores/connect';
 import Store from 'logic/local-storage/Store';
 import { MultiSelect, TimeUnitInput, SearchFiltersFormControls } from 'components/common';
@@ -37,11 +38,13 @@ import Query from 'views/logic/queries/Query';
 import Search from 'views/logic/search/Search';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 import { Alert, ButtonToolbar, ControlLabel, FormGroup, HelpBlock, Input } from 'components/bootstrap';
+import RelativeTime from 'components/common/RelativeTime';
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 import * as FormsUtils from 'util/FormsUtils';
 import { isPermitted } from 'util/PermissionsMixin';
 import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
 import { LookupTablesActions, LookupTablesStore } from 'stores/lookup-tables/LookupTablesStore';
+import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
 import generateId from 'logic/generateId';
 import parseSearch from 'views/logic/slices/parseSearch';
 import useLocation from 'routing/useLocation';
@@ -49,8 +52,10 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import type User from 'logic/users/User';
+import useUserDateTime from 'hooks/useUserDateTime';
 import type { EventDefinition } from 'components/event-definitions/event-definition-types';
 import type { Stream } from 'stores/streams/StreamsStore';
+import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 
 import EditQueryParameterModal from '../event-definition-form/EditQueryParameterModal';
 import commonStyles from '../common/commonStyles.css';
@@ -89,6 +94,11 @@ const FilterForm = ({
   const { execute_every_ms: executeEveryMs, search_within_ms: searchWithinMs } = eventDefinition.config;
   const searchWithin = extractDurationAndUnit(searchWithinMs, TIME_UNITS);
   const executeEvery = extractDurationAndUnit(executeEveryMs, TIME_UNITS);
+  const { userTimezone } = useUserDateTime();
+  const { setFieldWarning, warnings } = useContext(FormWarningsContext);
+  const validationState = (warnings?.queryString) as QueryValidationState;
+  const rangesInWarmTier = validationState?.context?.searched_index_ranges?.filter((range) => range.is_warm_tiered);
+  const searchesWarmTier = rangesInWarmTier?.length > 0;
 
   const { tables } = useStore(LookupTablesStore);
   const { pathname } = useLocation();
@@ -110,11 +120,45 @@ const FilterForm = ({
     [currentUser.permissions],
   );
 
+  const validateQueryString = useCallback(
+    (queryString, streamIds, timeRange, timezone) => {
+      const request = {
+        timeRange: timeRange,
+        queryString: queryString,
+        streams: streamIds,
+      };
+
+      validateQuery(request, timezone).then((result) => {
+        if (result?.status === 'WARNING') {
+          setFieldWarning('queryString', result);
+        }
+      });
+    }, [setFieldWarning]);
+
+  const toTimeRange = (from) => ({
+    type: 'relative',
+    from: from / 1000,
+  });
+
   useEffect(() => {
     if (userCanViewLookupTables()) {
       LookupTablesActions.searchPaginated(1, 0, undefined, false);
     }
   }, [userCanViewLookupTables]);
+
+  useEffect(() => {
+    validateQueryString(
+      eventDefinition.config.query,
+      eventDefinition.config.streams,
+      toTimeRange(eventDefinition.config.search_within_ms),
+      userTimezone);
+  }, [
+    eventDefinition.config.query,
+    eventDefinition.config.streams,
+    eventDefinition.config.search_within_ms,
+    setFieldWarning,
+    userTimezone,
+    validateQueryString]);
 
   const propagateChange = (key, value) => {
     const config = cloneDeep(eventDefinition.config);
@@ -334,6 +378,12 @@ const FilterForm = ({
     );
   };
 
+  const warmTierTimeStamp = () => {
+    const latestWarmTierRangeEnd = rangesInWarmTier.map((range) => range.end).sort((a, b) => b - a)[0];
+
+    return <RelativeTime dateTime={latestWarmTierRangeEnd} />;
+  };
+
   const onlyFilters = eventDefinition._scope === 'ILLUMINATE';
 
   // Ensure deleted streams are still displayed in select
@@ -344,6 +394,12 @@ const FilterForm = ({
     <fieldset>
       <h2 className={commonStyles.title}>Filter</h2>
       <p>Add information to filter the log messages that are relevant for this Event Definition.</p>
+      {searchesWarmTier && (
+      <Alert bsStyle="danger" title="Warm Tier Warning">
+        The selected time range will include data stored in the Warm Tier. Events that must frequently retrieve data from the Warm Tier may cause performance problems.
+        A value for <strong>Search within the last</strong> exceeding the following duration will fall into the Warm Tier: {warmTierTimeStamp()}.
+      </Alert>
+      )}
       {onlyFilters || (
       <Input id="filter-query"
              name="query"
