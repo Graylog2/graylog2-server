@@ -54,7 +54,7 @@ const EventDefinitionName = ({ eventDefinitionId }: { eventDefinitionId: string 
 
   if (eventDefinition) {
     return (
-      <Link to={Routes.ALERTS.DEFINITIONS.edit(eventDefinition.id)} target="_blank">
+      <Link to={Routes.ALERTS.DEFINITIONS.show(eventDefinition.id)} target="_blank">
         {eventDefinition.title}
       </Link>
     )

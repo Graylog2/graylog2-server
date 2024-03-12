@@ -6,6 +6,13 @@ import IfInteractive from 'views/components/dashboard/IfInteractive';
 import type { EventListItem } from 'views/components/widgets/events/types';
 import usePluginEntities from 'hooks/usePluginEntities';
 import RowActions from 'views/components/widgets/events/EventsList/RowActions';
+import styled, { css } from 'styled-components';
+
+const Td = styled.td(({ theme }) => css`
+  && {
+    border-color: ${theme.colors.table.row.border};
+  }
+`)
 
 type Props = {
   event: EventListItem,
@@ -22,16 +29,16 @@ const EventsTableRow = ({ event, fields }: Props) => {
         const columnRenderer = (value: string ) => eventAttributes.find(({ attribute }) => attribute === field)?.displayValue?.(value) ?? value;
 
         return (
-          <td key={field}>
+          <Td key={field}>
             {columnRenderer ? columnRenderer(value) : value}
-          </td>
+          </Td>
         );
       })}
       <IfInteractive>
         <IfPermitted permissions="events:edit">
-          <td>
+          <Td>
             <RowActions />
-          </td>
+          </Td>
         </IfPermitted>
       </IfInteractive>
     </tr>
