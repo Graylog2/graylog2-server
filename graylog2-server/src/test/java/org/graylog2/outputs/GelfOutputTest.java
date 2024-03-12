@@ -20,6 +20,8 @@ import org.graylog2.gelfclient.GelfMessage;
 import org.graylog2.gelfclient.GelfMessageLevel;
 import org.graylog2.gelfclient.transport.GelfTransport;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -35,6 +37,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class GelfOutputTest {
+    private final MessageFactory messageFactory = new TestMessageFactory();
+
     @Test
     public void testWrite() throws Exception {
         final GelfTransport transport = mock(GelfTransport.class);
@@ -64,7 +68,7 @@ public class GelfOutputTest {
         final GelfTransport transport = mock(GelfTransport.class);
         final GelfOutput gelfOutput = new GelfOutput(transport);
         final DateTime now = DateTime.now(DateTimeZone.UTC);
-        final Message message = new Message("Test", "Source", now);
+        final Message message = messageFactory.createMessage("Test", "Source", now);
 
         final GelfMessage gelfMessage = gelfOutput.toGELFMessage(message);
 
@@ -76,7 +80,7 @@ public class GelfOutputTest {
         final GelfTransport transport = mock(GelfTransport.class);
         final GelfOutput gelfOutput = new GelfOutput(transport);
         final DateTime now = DateTime.now(DateTimeZone.UTC);
-        final Message message = new Message("Test", "Source", now);
+        final Message message = messageFactory.createMessage("Test", "Source", now);
         message.addField(Message.FIELD_FULL_MESSAGE, "Full Message");
 
         final GelfMessage gelfMessage = gelfOutput.toGELFMessage(message);
@@ -89,7 +93,7 @@ public class GelfOutputTest {
         final GelfTransport transport = mock(GelfTransport.class);
         final GelfOutput gelfOutput = new GelfOutput(transport);
         final DateTime now = DateTime.now(DateTimeZone.UTC);
-        final Message message = new Message("Test", "Source", now);
+        final Message message = messageFactory.createMessage("Test", "Source", now);
         message.addField("level", 6);
 
         final GelfMessage gelfMessage = gelfOutput.toGELFMessage(message);
@@ -102,7 +106,7 @@ public class GelfOutputTest {
         final GelfTransport transport = mock(GelfTransport.class);
         final GelfOutput gelfOutput = new GelfOutput(transport);
         final DateTime now = DateTime.now(DateTimeZone.UTC);
-        final Message message = new Message("Test", "Source", now);
+        final Message message = messageFactory.createMessage("Test", "Source", now);
         message.addField("level", -1L);
 
         final GelfMessage gelfMessage = gelfOutput.toGELFMessage(message);
@@ -115,7 +119,7 @@ public class GelfOutputTest {
         final GelfTransport transport = mock(GelfTransport.class);
         final GelfOutput gelfOutput = new GelfOutput(transport);
         final DateTime now = DateTime.now(DateTimeZone.UTC);
-        final Message message = new Message("Test", "Source", now);
+        final Message message = messageFactory.createMessage("Test", "Source", now);
         message.addField("level", "6");
 
         final GelfMessage gelfMessage = gelfOutput.toGELFMessage(message);
@@ -128,7 +132,7 @@ public class GelfOutputTest {
         final GelfTransport transport = mock(GelfTransport.class);
         final GelfOutput gelfOutput = new GelfOutput(transport);
         final DateTime now = DateTime.now(DateTimeZone.UTC);
-        final Message message = new Message("Test", "Source", now);
+        final Message message = messageFactory.createMessage("Test", "Source", now);
         message.addField("level", "BOOM");
 
         final GelfMessage gelfMessage = gelfOutput.toGELFMessage(message);
@@ -141,7 +145,7 @@ public class GelfOutputTest {
         final GelfTransport transport = mock(GelfTransport.class);
         final GelfOutput gelfOutput = new GelfOutput(transport);
         final DateTime now = DateTime.now(DateTimeZone.UTC);
-        final Message message = new Message("Test", "Source", now);
+        final Message message = messageFactory.createMessage("Test", "Source", now);
         message.addField("level", "-1");
 
         final GelfMessage gelfMessage = gelfOutput.toGELFMessage(message);
@@ -154,7 +158,7 @@ public class GelfOutputTest {
         final GelfTransport transport = mock(GelfTransport.class);
         final GelfOutput gelfOutput = new GelfOutput(transport);
         final DateTime now = DateTime.now(DateTimeZone.UTC);
-        final Message message = new Message("Test", "Source", now);
+        final Message message = messageFactory.createMessage("Test", "Source", now);
         message.addField("level", new Object());
 
         final GelfMessage gelfMessage = gelfOutput.toGELFMessage(message);
@@ -167,7 +171,7 @@ public class GelfOutputTest {
         final GelfTransport transport = mock(GelfTransport.class);
         final GelfOutput gelfOutput = new GelfOutput(transport);
         final DateTime now = DateTime.now(DateTimeZone.UTC);
-        final Message message = new Message("Test", "Source", now);
+        final Message message = messageFactory.createMessage("Test", "Source", now);
         message.addField("level", null);
 
         final GelfMessage gelfMessage = gelfOutput.toGELFMessage(message);
@@ -180,7 +184,7 @@ public class GelfOutputTest {
         final GelfTransport transport = mock(GelfTransport.class);
         final GelfOutput gelfOutput = new GelfOutput(transport);
         final DateTime now = DateTime.now(DateTimeZone.UTC);
-        final Message message = new Message("Test", "Source", now);
+        final Message message = messageFactory.createMessage("Test", "Source", now);
         message.addField("facility", 42L);
 
         final GelfMessage gelfMessage = gelfOutput.toGELFMessage(message);

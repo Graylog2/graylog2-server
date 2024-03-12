@@ -22,25 +22,10 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import okhttp3.ResponseBody;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.audit.jersey.NoAuditEvent;
-import org.graylog2.cluster.Node;
-import org.graylog2.cluster.NodeNotFoundException;
-import org.graylog2.cluster.NodeService;
-import org.graylog2.rest.RemoteInterfaceProvider;
-import org.graylog2.rest.models.system.loggers.responses.LoggersSummary;
-import org.graylog2.rest.models.system.loggers.responses.SubsystemSummary;
-import org.graylog2.rest.resources.system.logs.RemoteLoggersResource;
-import org.graylog2.shared.rest.HideOnCloud;
-import org.graylog2.shared.rest.resources.ProxiedResource;
-
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
-
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.PUT;
@@ -52,7 +37,18 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.StreamingOutput;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.cluster.Node;
+import org.graylog2.cluster.NodeNotFoundException;
+import org.graylog2.cluster.NodeService;
+import org.graylog2.rest.RemoteInterfaceProvider;
+import org.graylog2.rest.RestTools;
+import org.graylog2.rest.models.system.loggers.responses.LoggersSummary;
+import org.graylog2.rest.models.system.loggers.responses.SubsystemSummary;
+import org.graylog2.rest.resources.system.logs.RemoteLoggersResource;
+import org.graylog2.shared.rest.HideOnCloud;
+import org.graylog2.shared.rest.resources.ProxiedResource;
 
 import java.io.IOException;
 import java.util.Map;
@@ -137,26 +133,6 @@ public class ClusterLoggersResource extends ProxiedResource {
                              @QueryParam("limit") @DefaultValue("1000") @Min(0L) int limit) throws IOException {
 
         var nodeResponse = doNodeApiCall(nodeId, RemoteLoggersResource.class, c -> c.messages(limit), Function.identity(), null);
-
-        if (nodeResponse.isSuccess()) {
-            // we cannot use try-with because the ResponseBody needs to stream the output
-            ResponseBody responseBody = nodeResponse.entity().orElseThrow();
-
-            try {
-                StreamingOutput streamingOutput = output -> {
-                    try {
-                        responseBody.byteStream().transferTo(output);
-                    } catch (Exception e) {
-                        responseBody.close(); // avoid leaking connections on errors
-                    }
-                };
-                var mediaType = MediaType.valueOf(MediaType.TEXT_PLAIN);
-                Response.ResponseBuilder response = Response.ok(streamingOutput, mediaType);
-                return response.build();
-            } catch (Exception e) {
-                responseBody.close();
-            }
-        }
-        return Response.status(nodeResponse.code()).entity(nodeResponse.body()).build();
+        return RestTools.streamResponse(nodeResponse, MediaType.TEXT_PLAIN, null);
     }
 }

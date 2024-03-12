@@ -25,6 +25,7 @@ import org.graylog.plugins.cef.parser.CEFMapping;
 import org.graylog.plugins.cef.parser.MappedMessage;
 import org.graylog.plugins.pipelineprocessor.functions.syslog.SyslogUtils;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.ResolvableInetSocketAddress;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -46,7 +47,6 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.net.InetSocketAddress;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -73,10 +73,12 @@ public class CEFCodec extends AbstractCodec {
     private final Locale locale;
     private final boolean useFullNames;
     private final CEFParser parser;
+    private final MessageFactory messageFactory;
 
     @AssistedInject
-    public CEFCodec(@Assisted Configuration configuration) {
+    public CEFCodec(@Assisted Configuration configuration, MessageFactory messageFactory) {
         super(configuration);
+        this.messageFactory = messageFactory;
         this.parser = CEFParserFactory.create();
 
         DateTimeZone timezone;
@@ -128,7 +130,7 @@ public class CEFCodec extends AbstractCodec {
             final MappedMessage cef = new MappedMessage(parser.parse(s, timezone.toTimeZone(), locale), useFullNames);
 
             // Build standard message.
-            Message result = new Message(buildMessageSummary(cef), decideSource(cef, rawMessage), new DateTime(cef.timestamp()));
+            Message result = messageFactory.createMessage(buildMessageSummary(cef), decideSource(cef, rawMessage), new DateTime(cef.timestamp()));
 
             // Add all extensions.
             result.addFields(cef.mappedExtensions());

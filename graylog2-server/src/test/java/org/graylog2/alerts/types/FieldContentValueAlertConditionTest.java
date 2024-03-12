@@ -24,7 +24,9 @@ import org.graylog2.alerts.AlertConditionTest;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.MongoIndexRange;
 import org.graylog2.indexer.results.ResultMessage;
+import org.graylog2.indexer.results.ResultMessageFactory;
 import org.graylog2.indexer.results.SearchResult;
+import org.graylog2.indexer.results.TestResultMessageFactory;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.plugin.Tools;
@@ -50,6 +52,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 public class FieldContentValueAlertConditionTest extends AlertConditionTest {
+    private final ResultMessageFactory resultMessageFactory = new TestResultMessageFactory();
 
     @Test
     public void testConstructor() throws Exception {
@@ -63,7 +66,7 @@ public class FieldContentValueAlertConditionTest extends AlertConditionTest {
 
     @Test
     public void testRunMatchingMessagesInStream() throws Exception {
-        final ResultMessage searchHit = ResultMessage.parseFromSource("some_id", "graylog_test",
+        final ResultMessage searchHit = resultMessageFactory.parseFromSource("some_id", "graylog_test",
                 Collections.singletonMap("message", "something is in here"));
 
         final DateTime now = DateTime.now(DateTimeZone.UTC);

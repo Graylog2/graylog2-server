@@ -146,7 +146,7 @@ public class OpenSearchExceptionTest {
         RestStatus restStatus = RestStatus.BAD_REQUEST;
         OpenSearchStatusException statusException = new OpenSearchStatusException(
                 "status msg", restStatus, responseException);
-        final var openSearchClient = new OpenSearchClient(restHighLevelClient, this.openSearchClient, new ObjectMapper());
+        final var openSearchClient = new OpenSearchClient(restHighLevelClient, this.openSearchClient, null, new ObjectMapper());
 
         Exception exception = assertThrows(BatchSizeTooLargeException.class, () -> {
             openSearchClient.execute((a, b) -> {throw statusException;});
