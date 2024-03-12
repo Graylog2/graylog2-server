@@ -17,8 +17,11 @@
 package org.graylog2.plugin;
 
 import jakarta.inject.Singleton;
+import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.messages.IndexingResultCallback;
 import org.joda.time.DateTime;
 
+import javax.annotation.Nullable;
 import java.util.Map;
 
 // Intentionally package-private to enforce usage of injected MessageFactory.
@@ -37,5 +40,10 @@ class DefaultMessageFactory implements MessageFactory {
     @Override
     public Message createMessage(final String id, Map<String, Object> newFields) {
         return new Message(id, newFields);
+    }
+
+    @Override
+    public SystemMessage createSystemMessage(IndexSet indexSet, Map<String, Object> fields, @Nullable IndexingResultCallback resultCallback) {
+        return new SystemMessage(indexSet, fields, resultCallback);
     }
 }

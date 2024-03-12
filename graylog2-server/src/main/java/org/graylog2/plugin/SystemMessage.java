@@ -38,7 +38,8 @@ public class SystemMessage extends Message {
     private final IndexSet indexSet;
     private final IndexingResultCallback resultCallback;
 
-    public SystemMessage(IndexSet indexSet, Map<String, Object> fields, @Nullable IndexingResultCallback resultCallback) {
+    // Intentionally package-private to enforce MessageFactory usage.
+    SystemMessage(IndexSet indexSet, Map<String, Object> fields, @Nullable IndexingResultCallback resultCallback) {
         super(fields);
         this.indexSet = indexSet;
         this.resultCallback = resultCallback;
