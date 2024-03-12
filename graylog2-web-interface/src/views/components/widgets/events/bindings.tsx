@@ -26,6 +26,6 @@ export default {
         ),
         renderValue: (value) => <StatusValue statusId={value} />,
       },
-    }
-  ]
+    },
+  ],
 };

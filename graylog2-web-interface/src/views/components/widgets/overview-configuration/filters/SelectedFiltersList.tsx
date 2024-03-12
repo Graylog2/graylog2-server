@@ -1,13 +1,12 @@
 import * as React from 'react';
 import type * as Immutable from 'immutable';
 import styled from 'styled-components';
+import { useRef } from 'react';
 
 import { Input } from 'components/bootstrap';
 import { IconButton } from 'components/common';
-
-import { FilterComponents, Filter } from 'views/components/widgets/overview-configuration/filters/types';
+import type { FilterComponents, Filter } from 'views/components/widgets/overview-configuration/filters/types';
 import FilterEditButton from 'views/components/widgets/overview-configuration/filters/FilterEditButton';
-import {useRef} from 'react';
 
 const Container = styled.div`
   display: flex;
@@ -43,13 +42,13 @@ type Props = {
 }
 
 const SelectedFiltersList = ({ selectedFilters, columnTitle, filterComponents, onDelete, onEdit }: Props) => {
-  const container = useRef(null)
+  const container = useRef(null);
 
   return (
     <Container ref={container}>
-      {selectedFilters.toArray().map(({field: column, value: values}, filterIndex) => {
+      {selectedFilters.toArray().map(({ field: column, value: values }, filterIndex) => {
         const _columnTitle = columnTitle(column);
-        const filterComponent = filterComponents.find(({attribute}) => attribute === column);
+        const filterComponent = filterComponents.find(({ attribute }) => attribute === column);
 
         return (
           <FilterContainer key={column}>

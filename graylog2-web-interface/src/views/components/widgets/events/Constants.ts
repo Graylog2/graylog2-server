@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/prefer-default-export
 import Direction from 'views/logic/aggregationbuilder/Direction';
 
 export const PAGINATION = {

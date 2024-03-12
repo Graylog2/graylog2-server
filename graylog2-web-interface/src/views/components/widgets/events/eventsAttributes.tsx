@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+
 import { Timestamp } from 'components/common';
 import EventDefinitionName from 'views/components/widgets/events/filters/EventDefinitionName';
 
@@ -22,22 +23,22 @@ const eventsAttributes = [
   {
     attribute: 'timestamp',
     title: 'Created At',
-    displayValue: (value) => <Timestamp dateTime={value} />
+    displayValue: (value) => <Timestamp dateTime={value} />,
   },
   {
     attribute: 'alert',
     title: 'Type',
-    displayValue: (value) => value
+    displayValue: (value) => value,
   },
   {
     attribute: 'event_definition_id',
     title: 'Event Definition',
-    displayValue: (value) => <EventDefinitionName eventDefinitionId={value} />
+    displayValue: (value) => <EventDefinitionName eventDefinitionId={value} />,
   },
   {
     attribute: 'message',
     title: 'Description',
-  }
-]
+  },
+];
 
-export default eventsAttributes
+export default eventsAttributes;

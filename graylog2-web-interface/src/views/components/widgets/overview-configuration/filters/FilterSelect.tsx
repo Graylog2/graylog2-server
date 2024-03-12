@@ -15,14 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import {useMemo, useState, useRef} from 'react';
+import { useMemo, useState, useRef } from 'react';
 import styled from 'styled-components';
 
 import { Select } from 'components/common';
 import { defaultCompare } from 'logic/DefaultCompare';
 import { Menu } from 'components/bootstrap';
-import {FilterComponents, Filter} from 'views/components/widgets/overview-configuration/filters/types';
-
+import type { FilterComponents, Filter } from 'views/components/widgets/overview-configuration/filters/types';
 
 const Container = styled.div`
   display: flex;
@@ -49,7 +48,7 @@ const FilterSelect = ({ filterComponents, columnTitle, onCreate, selectedFilters
   const [selectedColumn, setSelectedColumn] = useState<string>(null);
   const [createValue, setCreateValue] = React.useState<string>();
   const filterComponent = selectedColumn ? filterComponents.find(({ attribute }) => attribute === selectedColumn) : undefined;
-  const selectedValues = selectedColumn ? selectedFilters.find(({ field }) => field === selectedColumn)?.value : []
+  const selectedValues = selectedColumn ? selectedFilters.find(({ field }) => field === selectedColumn)?.value : [];
 
   const filterOptions = useMemo(() => (
     filterComponents
@@ -78,7 +77,7 @@ const FilterSelect = ({ filterComponents, columnTitle, onCreate, selectedFilters
 
   const onChange = (newValue: unknown, shouldSubmit = false) => {
     const normalizedValue = filterComponent?.valueForConfig?.(newValue) ?? newValue as string;
-    console.log(normalizedValue, newValue)
+    console.log(normalizedValue, newValue);
 
     if (shouldSubmit) {
       onSubmit(selectedColumn, normalizedValue);
@@ -87,7 +86,7 @@ const FilterSelect = ({ filterComponents, columnTitle, onCreate, selectedFilters
     }
   };
 
-  console.log(container?.current?.offsetWidth)
+  console.log(container?.current?.offsetWidth);
 
   return (
     <Container ref={container}>

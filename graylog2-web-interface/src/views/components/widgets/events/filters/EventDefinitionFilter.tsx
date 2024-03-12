@@ -15,12 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+
 import { Select, Spinner } from 'components/common';
 import useEventDefinitions from 'components/event-definitions/hooks/useEventDefinitions';
 
 type Props = {
   value: string | undefined,
-  onSelect: (newValue: string) =>  void,
+  onSelect: (newValue: string) => void,
   selectedValues: Array<string>,
 }
 
@@ -35,18 +36,20 @@ const EventDefinitionFilter = ({ value, onSelect, selectedValues }: Props) => {
   const eventDefinitionOptions = eventDefinitions?.elements.map(({ title, id }) => ({
     label: title,
     value: id,
-    disabled: selectedValues.includes(id)
-  }))
+    disabled: selectedValues.includes(id),
+  }));
 
   if (isLoadingEventDefinitions) {
-    return <Spinner />
+    return <Spinner />;
   }
 
-  return <Select placeholder="Select event definition"
-                 clearable={false}
-                 options={eventDefinitionOptions}
-                 onChange={onSelect}
-                 value={value} />
-}
+  return (
+    <Select placeholder="Select event definition"
+            clearable={false}
+            options={eventDefinitionOptions}
+            onChange={onSelect}
+            value={value} />
+  );
+};
 
-export default EventDefinitionFilter
+export default EventDefinitionFilter;

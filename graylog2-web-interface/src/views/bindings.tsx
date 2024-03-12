@@ -108,6 +108,7 @@ import useFeature from 'hooks/useFeature';
 import EventsListConfigGenerator from 'views/logic/searchtypes/events/EventsListConfigGenerator';
 import EventsWidgetEdit from 'views/components/widgets/events/EventsWidgetEdit';
 import EventsWidget from 'views/logic/widgets/events/EventsWidget';
+import eventsAttributes from 'views/components/widgets/events/eventsAttributes';
 
 import type { ActionHandlerArguments } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
@@ -120,9 +121,7 @@ import MessageConfigGenerator from './logic/searchtypes/messages/MessageConfigGe
 import UnknownWidget from './components/widgets/UnknownWidget';
 import NewSearchRedirectPage from './pages/NewSearchRedirectPage';
 import EventsVisualization from './components/widgets/events/EventsVisualization';
-
-import eventsFilterComponents from './components/widgets/events/filters/filterComponents'
-import eventsAttributes from 'views/components/widgets/events/eventsAttributes';
+import eventsFilterComponents from './components/widgets/events/filters/filterComponents';
 
 Widget.registerSubtype(AggregationWidget.type, AggregationWidget);
 Widget.registerSubtype(MessagesWidget.type, MessagesWidget);

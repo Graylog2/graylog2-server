@@ -57,7 +57,7 @@ import type { Event } from 'components/events/events/types';
 import type Parameter from 'views/logic/parameters/Parameter';
 import type { UndoRedoState } from 'views/logic/slices/undoRedoSlice';
 import type { SearchExecutors } from 'views/logic/slices/searchExecutionSlice';
-import {FilterComponents, Attributes} from 'views/components/widgets/overview-configuration/filters/types';
+import type { FilterComponents, Attributes } from 'views/components/widgets/overview-configuration/filters/types';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> =
   ArrayType extends readonly (infer ElementType)[] ? ElementType : never;

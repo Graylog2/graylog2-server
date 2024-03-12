@@ -3,7 +3,8 @@ import { useState } from 'react';
 
 import { Menu } from 'components/bootstrap';
 import { IconButton } from 'components/common';
-import { FilterComponent } from './types';
+
+import type { FilterComponent } from './types';
 
 type Props = {
   column: string,
@@ -43,7 +44,7 @@ const FilterEditButton = ({ filterComponent, column, value, columnTitle, onEdit,
   };
 
   if (!filterComponent) {
-    return null
+    return null;
   }
 
   return (

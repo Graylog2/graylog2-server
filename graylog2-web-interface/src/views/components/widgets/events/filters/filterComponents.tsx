@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+
 import EventDefinitionName from 'views/components/widgets/events/filters/EventDefinitionName';
 import EventDefinitionFilter from 'views/components/widgets/events/filters/EventDefinitionFilter';
 import EventTypeFilter from 'views/components/widgets/events/filters/EventTypeFilter';
@@ -25,7 +26,7 @@ const filterComponents = [
       <EventDefinitionFilter value={editValue} onSelect={(newValue) => onChange(newValue, true)} selectedValues={selectedValues} />
     ),
     attribute: 'event_definition_id',
-    renderValue: (value) => <EventDefinitionName eventDefinitionId={value} />
+    renderValue: (value) => <EventDefinitionName eventDefinitionId={value} />,
   },
   {
     attribute: 'alert',
@@ -35,13 +36,11 @@ const filterComponents = [
   },
   {
     attribute: 'timestamp',
-    configuration: () => {
-      return <div />
-    }
+    configuration: () => <div />,
   },
   // {
   //   attribute: 'streams',
   // }
-]
+];
 
-export default filterComponents
+export default filterComponents;

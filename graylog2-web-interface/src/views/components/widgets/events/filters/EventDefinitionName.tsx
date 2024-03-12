@@ -15,22 +15,22 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import {EventDefinition} from 'logic/alerts/types';
+import { useQuery } from '@tanstack/react-query';
+
+import type { EventDefinition } from 'logic/alerts/types';
 import fetch from 'logic/rest/FetchProvider';
-import {qualifyUrl} from 'util/URLUtils';
-import {useQuery} from '@tanstack/react-query';
+import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'preflight/util/UserNotification';
-import {Spinner} from 'components/common';
-import {LinkContainer, Link} from 'components/common/router';
+import { Spinner } from 'components/common';
+import { LinkContainer, Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 
 export const fetchEventDefinitionDetails = async (eventDefinitionId: string): Promise<EventDefinition> => (
   fetch('GET', qualifyUrl(`/events/definitions/${eventDefinitionId}`))
 );
 
-
 const useEventDefinitionDetails = (eventDefId: string) => {
-  const { data, isFetching } =  useQuery({
+  const { data, isFetching } = useQuery({
     queryKey: ['get-event-definition-details', eventDefId],
     queryFn: () => fetchEventDefinitionDetails(eventDefId),
     onError: (errorThrown) => {
@@ -40,16 +40,14 @@ const useEventDefinitionDetails = (eventDefId: string) => {
     keepPreviousData: true,
   });
 
-  return { data, isFetching }
-}
-
-
+  return { data, isFetching };
+};
 
 const EventDefinitionName = ({ eventDefinitionId }: { eventDefinitionId: string }) => {
-  const {data: eventDefinition, isFetching} = useEventDefinitionDetails(eventDefinitionId);
+  const { data: eventDefinition, isFetching } = useEventDefinitionDetails(eventDefinitionId);
 
   if (isFetching) {
-    return <Spinner/>
+    return <Spinner />;
   }
 
   if (eventDefinition) {
@@ -57,10 +55,10 @@ const EventDefinitionName = ({ eventDefinitionId }: { eventDefinitionId: string 
       <Link to={Routes.ALERTS.DEFINITIONS.show(eventDefinition.id)} target="_blank">
         {eventDefinition.title}
       </Link>
-    )
+    );
   }
 
-  return <>eventDefinitionId</>
-}
+  return <>eventDefinitionId</>;
+};
 
-export default EventDefinitionName
+export default EventDefinitionName;

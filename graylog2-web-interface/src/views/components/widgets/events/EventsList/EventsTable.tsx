@@ -7,9 +7,9 @@ import type EventsWidgetConfig from 'views/logic/widgets/events/EventsWidgetConf
 import EventsTableRow from 'views/components/widgets/events/EventsList/EventsTableRow';
 import type { EventListItem } from 'views/components/widgets/events/types';
 import type EventsWidgetSortConfig from 'views/logic/widgets/events/EventsWidgetSortConfig';
+import usePluginEntities from 'hooks/usePluginEntities';
 
 import AttributeSortIcon from './AttributeSortIcon';
-import usePluginEntities from 'hooks/usePluginEntities';
 
 const TableWrapper = styled.div`
   overflow: auto;
@@ -38,17 +38,19 @@ const EventsTable = ({ events, config, onSortChange, setLoadingState }: Props) =
         <TableHead>
           <tr>
             {config.fields.toArray().map((field) => {
-              const eventAttribute = eventAttributes.find(({ attribute }) => field === attribute)
-              const attributeTitle = eventAttribute?.title ?? field
+              const eventAttribute = eventAttributes.find(({ attribute }) => field === attribute);
+              const attributeTitle = eventAttribute?.title ?? field;
 
-              return <TableHeaderCell key={field}>
-                {attributeTitle ?? field}
-                <AttributeSortIcon onSortChange={onSortChange}
-                                   field={field}
-                                   fieldTitle={attributeTitle ?? field}
-                                   activeSort={config.sort}
-                                   setLoadingState={setLoadingState} />
-              </TableHeaderCell>;
+              return (
+                <TableHeaderCell key={field}>
+                  {attributeTitle ?? field}
+                  <AttributeSortIcon onSortChange={onSortChange}
+                                     field={field}
+                                     fieldTitle={attributeTitle ?? field}
+                                     activeSort={config.sort}
+                                     setLoadingState={setLoadingState} />
+                </TableHeaderCell>
+              );
             })}
             <IfInteractive>
               <ActionsHeader />
@@ -56,11 +58,11 @@ const EventsTable = ({ events, config, onSortChange, setLoadingState }: Props) =
           </tr>
         </TableHead>
         <tbody>
-        {events?.map((event) => (
-          <EventsTableRow key={event.id}
-                          event={event}
-                          fields={config.fields} />
-        ))}
+          {events?.map((event) => (
+            <EventsTableRow key={event.id}
+                            event={event}
+                            fields={config.fields} />
+          ))}
         </tbody>
       </table>
     </TableWrapper>

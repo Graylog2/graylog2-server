@@ -37,14 +37,13 @@ import EventsWidgetConfig, {
 // import SortConfiguration from './SortConfiguration';
 // import ColumnsConfiguration from './ColumnsConfiguration';
 
-import { SORT_DIRECTION_OPTIONS } from './Constants';
 import WidgetModeConfiguration from 'views/components/widgets/overview-configuration/WidgetModeConfiguration';
 import ColumnsConfiguration from 'views/components/widgets/overview-configuration/ColumnsConfiguration';
 import SortConfiguration from 'views/components/widgets/overview-configuration/SortConfiguration';
 import usePluginEntities from 'hooks/usePluginEntities';
 import FiltersConfiguration from 'views/components/widgets/overview-configuration/filters/FiltersConfiguration';
 
-
+import { SORT_DIRECTION_OPTIONS } from './Constants';
 
 const WIDGET_MODE_OPTIONS = [
   { label: 'List', value: LIST_MODE },
@@ -100,7 +99,6 @@ const FullHeightCol = styled(Col)`
   overflow: auto;
 `;
 
-
 const SubmitOnChange = () => {
   const { values, submitForm } = useFormikContext();
 
@@ -141,7 +139,7 @@ const EventsWidgetEdit = ({ children, onCancel, config, onChange, onSubmit }: Ed
     );
   };
 
-  const columns = eventAttributes.map(({ attribute }) => attribute)
+  const columns = eventAttributes.map(({ attribute }) => attribute);
   const columnTitle = useCallback((column: string) => eventAttributes.find(({ attribute }) => column === attribute)?.title ?? column, []);
 
   return (

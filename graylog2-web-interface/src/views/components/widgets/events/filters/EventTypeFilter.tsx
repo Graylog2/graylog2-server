@@ -17,6 +17,6 @@
 
 const EventTypeFilter = () => {
 
-}
+};
 
 export default EventTypeFilter;

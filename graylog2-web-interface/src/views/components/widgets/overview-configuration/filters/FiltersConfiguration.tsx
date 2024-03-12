@@ -22,8 +22,7 @@ import FilterSelect
   from 'views/components/widgets/overview-configuration/filters/FilterSelect';
 
 import SelectedFiltersList from './SelectedFiltersList';
-
-import { FilterComponents, Filter } from './types';
+import type { FilterComponents, Filter } from './types';
 
 type Props = {
   columnTitle: (column: string) => string,
