@@ -21,7 +21,6 @@ import ErrorsActions from 'actions/errors/ErrorsActions';
 import { createFromFetchError } from 'logic/errors/ReportedErrors';
 import CancellablePromise from 'logic/rest/CancellablePromise';
 import { ServerAvailabilityActions } from 'stores/sessions/ServerAvailabilityStore';
-import {AbortError} from "fork-ts-checker-webpack-plugin/lib/utils/async/abort-error";
 
 // eslint-disable-next-line global-require
 const importSessionStore = memoize(() => require('stores/sessions/SessionStore'));
@@ -100,8 +99,6 @@ export class Builder {
 
   private accept: string;
 
-  private abortSignal: AbortSignal;
-
   private responseHandler: (response: unknown) => unknown;
 
   private errorHandler: (error: unknown) => unknown;
@@ -139,11 +136,6 @@ export class Builder {
     return this;
   }
 
-  signal(signal: AbortSignal) {
-    this.abortSignal = signal;
-
-    return this;
-  }
   formData(body, acceptedMimeType = 'application/json') {
     this.body = { body };
 
@@ -224,7 +216,6 @@ export class Builder {
       method: this.method,
       headers,
       body: this.body ? this.body.body : undefined,
-      signal: this.abortSignal,
     })).then(this.responseHandler, this.errorHandler)
       .catch(this.errorHandler);
   }
@@ -249,19 +240,6 @@ type Method = 'GET' | 'PUT' | 'POST' | 'DELETE';
 export default function fetch<T = any>(method: Method, url: string, body?: any, requireSession: boolean = true): Promise<T> {
   const promise = () => new Builder(method, url)
     .json(body)
-    .build();
-
-  if (requireSession) {
-    return queuePromiseIfNotLoggedin(promise)();
-  }
-
-  return promise();
-}
-
-export function fetchWithSignal<T = any>(signal: AbortSignal, method: Method, url: string, body?: any, requireSession: boolean = true): Promise<T> {
-  const promise = () => new Builder(method, url)
-    .json(body)
-    .signal(signal)
     .build();
 
   if (requireSession) {
