@@ -52,16 +52,18 @@ export const startJob = async (
 
   return runStartJob(search, executionState).then((res) => ({ asyncSearchId: res.id, nodeId: res.executing_node }));
 };
-
-export const pollJob = (jobIds: JobIds, result: SearchJobType | null): Promise<SearchJobType> => new Promise((resolve) => {
+const getDelayTime = (depth: number = 1): number => {
+  //increase the delay time by 250ms after every 10th usage but not more than 2500ms
+  const curDepth = Math.min(Math.max(1, depth), 100);
+  return (Math.ceil(curDepth/10))*250;
+}
+export const pollJob = (jobIds: JobIds, result: SearchJobType | null, depth: number = 1): Promise<SearchJobType> => new Promise((resolve) => {
   if (result?.execution?.done || result?.execution?.cancelled) {
     return resolve(result);
   } else {
-    delay(250)
+    delay(getDelayTime(depth))
       .then(() => {
-        if (!result?.execution?.cancelled) {
-          resolve(runPollJob(jobIds).then((res) => pollJob(jobIds, res)));
-        }
+          resolve(runPollJob(jobIds).then((res) => pollJob(jobIds, res, depth++)));
       });
   }
 })
