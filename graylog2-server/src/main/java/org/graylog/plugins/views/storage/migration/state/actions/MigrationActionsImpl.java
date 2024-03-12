@@ -154,8 +154,8 @@ public class MigrationActionsImpl implements MigrationActions {
     public void provisionDataNodes() {
         // if we start provisioning DataNodes via the migration, Preflight is definitely done/no option anymore
         var preflight = preflightConfigService.getPreflightConfigResult();
-        if (preflight == null || !preflight.equals(PreflightConfigResult.FINISHED)) {
-            preflightConfigService.setConfigResult(PreflightConfigResult.FINISHED);
+        if (preflight == null || !preflight.equals(PreflightConfigResult.PREPARED)) {
+            preflightConfigService.setConfigResult(PreflightConfigResult.PREPARED);
         }
         final Map<String, DataNodeDto> activeDataNodes = nodeService.allActive();
         activeDataNodes.values().forEach(node -> dataNodeProvisioningService.changeState(node.getNodeId(), DataNodeProvisioningConfig.State.CONFIGURED));
@@ -183,7 +183,7 @@ public class MigrationActionsImpl implements MigrationActions {
     @Override
     public boolean dataNodeStartupFinished() {
         boolean dataNodesAvailable = nodeService.allActive().values().stream().allMatch(node -> node.getDataNodeStatus() == DataNodeStatus.AVAILABLE);
-        if (dataNodesAvailable) { // set preflight config once more to FINISHED to be sure that a Graylog restart will connect to the data nodes
+        if (dataNodesAvailable) { // set preflight config to FINISHED to be sure that a Graylog restart will connect to the data nodes
             var preflight = preflightConfigService.getPreflightConfigResult();
             if (preflight == null || !preflight.equals(PreflightConfigResult.FINISHED)) {
                 preflightConfigService.setConfigResult(PreflightConfigResult.FINISHED);

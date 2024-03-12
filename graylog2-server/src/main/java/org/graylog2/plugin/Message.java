@@ -359,18 +359,21 @@ public class Message implements Messages, Indexable {
         classSizes.put(ZonedDateTime.class, 8);
     }
 
-    public Message(final String message, final String source, final DateTime timestamp) {
+    // Intentionally package-private to enforce MessageFactory usage.
+    Message(final String message, final String source, final DateTime timestamp) {
         fields.put(FIELD_ID, new UUID().toString());
         addRequiredField(FIELD_MESSAGE, message);
         addRequiredField(FIELD_SOURCE, source);
         addRequiredField(FIELD_TIMESTAMP, timestamp);
     }
 
-    public Message(final Map<String, Object> fields) {
+    // Intentionally package-private to enforce MessageFactory usage.
+    Message(final Map<String, Object> fields) {
         this((String) fields.get(FIELD_ID), Maps.filterKeys(fields, not(equalTo(FIELD_ID))));
     }
 
-    private Message(String id, Map<String, Object> newFields) {
+    // Intentionally package-private to enforce MessageFactory usage.
+    Message(String id, Map<String, Object> newFields) {
         Preconditions.checkArgument(id != null, "message id cannot be null");
         fields.put(FIELD_ID, id);
         addFields(newFields);

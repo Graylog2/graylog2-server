@@ -42,10 +42,11 @@ public class MessageSummaryTest {
 
     private Message message;
     private MessageSummary messageSummary;
+    private final MessageFactory messageFactory = new TestMessageFactory();
 
     @Before
     public void setUp() throws Exception {
-        message = new Message("message", "source", DateTime.now(DateTimeZone.UTC));
+        message = messageFactory.createMessage("message", "source", DateTime.now(DateTimeZone.UTC));
         message.addField("streams", STREAM_IDS);
         messageSummary = new MessageSummary(INDEX_NAME, message);
     }
