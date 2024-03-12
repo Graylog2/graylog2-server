@@ -26,6 +26,8 @@ import org.graylog.plugins.pipelineprocessor.ast.statements.Statement;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -57,6 +59,7 @@ public class BaseParserTest {
     @org.junit.Rule
     public TestName name = new TestName();
     protected PipelineRuleParser parser;
+    private MessageFactory messageFactory = new TestMessageFactory();
 
     protected static HashMap<String, Function<?>> commonFunctions() {
         final HashMap<String, Function<?>> functions = Maps.newHashMap();
@@ -124,7 +127,7 @@ public class BaseParserTest {
 
     @Nullable
     protected Message evaluateRule(Rule rule, Consumer<Message> messageModifier) {
-        final Message message = new Message("hello test", "source", DateTime.now(DateTimeZone.UTC));
+        final Message message = messageFactory.createMessage("hello test", "source", DateTime.now(DateTimeZone.UTC));
         message.addStream(defaultStream);
         messageModifier.accept(message);
         return evaluateRule(rule, message);

@@ -19,6 +19,8 @@ package org.graylog2.inputs;
 import com.google.common.io.ByteStreams;
 import org.graylog2.inputs.codecs.gelf.GELFMessageChunk;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.Tools;
 
 import java.io.ByteArrayInputStream;
@@ -32,6 +34,7 @@ import java.util.zip.DeflaterOutputStream;
 import java.util.zip.GZIPOutputStream;
 
 public class TestHelper {
+    private static final MessageFactory messageFactory = new TestMessageFactory();
 
     public static byte[] zlibCompress(String what, int level) throws IOException {
         final ByteArrayInputStream compressMe = new ByteArrayInputStream(what.getBytes(StandardCharsets.UTF_8));
@@ -90,7 +93,7 @@ public class TestHelper {
     }
 
     public static Message simpleLogMessage() {
-        return new Message("bar", "foo", Tools.nowUTC());
+        return messageFactory.createMessage("bar", "foo", Tools.nowUTC());
     }
 
 }
