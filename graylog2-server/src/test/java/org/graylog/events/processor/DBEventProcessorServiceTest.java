@@ -120,7 +120,7 @@ public class DBEventProcessorServiceTest {
         assertThat(dto.id()).isNotBlank();
         assertThat(dto.title()).isEqualTo("Test");
         assertThat(dto.description()).isEqualTo("A test event definition");
-        assertThat(dto.description()).isEqualTo(REMEDIATION_STEPS);
+        assertThat(dto.remediationSteps()).isEqualTo(REMEDIATION_STEPS);
         assertThat(dto.priority()).isEqualTo(3);
         assertThat(dto.keySpec()).isEqualTo(ImmutableList.of("a", "b"));
         assertThat(dto.fieldSpec()).isEmpty();

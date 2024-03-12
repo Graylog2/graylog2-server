@@ -23,6 +23,7 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.graph.MutableGraph;
+import jakarta.annotation.Nullable;
 import org.graylog.events.fields.EventFieldSpec;
 import org.graylog.events.notifications.EventNotificationHandler;
 import org.graylog.events.notifications.EventNotificationSettings;
@@ -39,7 +40,6 @@ import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.entities.DefaultEntityScope;
 import org.joda.time.DateTime;
 
-import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -68,6 +68,7 @@ public abstract class EventDefinitionEntity extends ScopedContentPackEntity impl
     @JsonProperty(FIELD_DESCRIPTION)
     public abstract ValueReference description();
 
+    @Nullable
     @JsonProperty(FIELD_REMEDIATION_STEPS)
     public abstract ValueReference remediationSteps();
 
