@@ -42,7 +42,7 @@ import static com.mongodb.client.model.Projections.include;
  * Bypasses all the checks, removes even read-only roles.
  * Because of that it is placed in migrations module, instead of being added to {@link org.graylog2.users.RoleService}
  */
-public class RoleRemover {
+class RoleRemover {
 
     private static final Logger LOG = LoggerFactory.getLogger(RoleRemover.class);
 
@@ -53,7 +53,7 @@ public class RoleRemover {
         this.mongoConnection = mongoConnection;
     }
 
-    public void removeBuiltinRole(final String roleName) {
+    void removeBuiltinRole(final String roleName) {
         final Bson roleFindingFilter = Filters.eq(RoleServiceImpl.NAME_LOWER, roleName.toLowerCase(Locale.ENGLISH));
         final MongoDatabase mongoDatabase = mongoConnection.getMongoDatabase();
         final MongoCollection<Document> rolesCollection = mongoDatabase.getCollection(RoleServiceImpl.ROLES_COLLECTION_NAME);
