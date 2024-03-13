@@ -9,12 +9,17 @@ import EventsWidgetConfig from './EventsWidgetConfig';
 
 export default class EventsWidget extends Widget {
   constructor(id: string, config: EventsWidgetConfig) {
-    super(id, EventsWidget.type, config);
+    super(id, EventsWidget.type, config, undefined, { range: 0, type: 'relative' });
   }
 
   static type = 'events';
 
   static defaultTitle = 'Untitled Events Overview';
+
+  // eslint-disable-next-line class-methods-use-this
+  get isFixedTimerange() {
+    return true;
+  }
 
   static fromJSON(value: WidgetState) {
     const { id, config } = value;
