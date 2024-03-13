@@ -87,7 +87,8 @@ public class ESEventList implements ESSearchTypeHandler<EventList> {
                 .collect(Collectors.toList());
         final EventList.Result.Builder resultBuilder = EventList.Result.builder()
                 .events(eventSummaries)
-                .id(searchType.id());
+                .id(searchType.id())
+                .totalResults(result.getHits().getTotalHits().value);
         searchType.name().ifPresent(resultBuilder::name);
         return resultBuilder.build();
     }
