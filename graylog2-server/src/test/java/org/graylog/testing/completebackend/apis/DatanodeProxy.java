@@ -38,10 +38,6 @@ public class DatanodeProxy {
         this.graylogApis = graylogApis;
     }
 
-    public GraylogApiResponse getDatanodes() {
-        return new GraylogApiResponse(graylogApis.get("/system/cluster/datanodes", 200));
-    }
-
     /**
      * A datanode becomes leader if the underlying opensearch node becomes leader. This may take a while during the
      * startup. Our periodical checks the leader status every 10s, so in this interval there should appear one leader
@@ -59,7 +55,7 @@ public class DatanodeProxy {
                 .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
                 .withStopStrategy(StopStrategies.stopAfterAttempt(60))
                 .build()
-                .call(this::getDatanodes);
+                .call(() -> graylogApis.system().datanodes());
     }
 
     private boolean isAnyLeader(GraylogApiResponse r) {
