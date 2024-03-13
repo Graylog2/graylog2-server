@@ -34,7 +34,7 @@ export type ClientCertCreateResponse = {
 }
 const createClientCa = (clientCertFormData: ClientCertFormValues) => fetch<ClientCertCreateResponse>(
   'POST',
-  qualifyUrl('ca/clientCert'),
+  qualifyUrl('ca/clientcert'),
   clientCertFormData,
   false,
 );

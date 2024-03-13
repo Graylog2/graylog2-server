@@ -21,7 +21,7 @@ import CreateClientCertificateButton from 'components/datanode/client-certificat
 const ClientCertificateConfig = () => (
   <div>
     <h2>Client Certificate</h2>
-    <p>Generate client certificates for 3rd part tool</p>
+    <p>Generate client certificates for 3rd party tool</p>
     <CreateClientCertificateButton />
   </div>
 );

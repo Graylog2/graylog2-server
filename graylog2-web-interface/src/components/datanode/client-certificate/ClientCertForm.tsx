@@ -60,6 +60,7 @@ const ClientCertForm = ({ onCancel }: Props) => {
                 <FormikInput id="password"
                              placeholder="*******"
                              name="password"
+                             type="password"
                              label="Password"
                              required />
               </Modal.Body>
