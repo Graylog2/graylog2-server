@@ -16,7 +16,7 @@
  */
 package org.graylog2.indexer.results;
 
-import org.apache.shiro.crypto.hash.Md5Hash;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,8 +53,7 @@ public abstract class ChunkedQueryResult<C, R> extends IndexQueryResult implemen
         this.initialResult = initialResult;
         this.fields = fields;
 
-        final Md5Hash md5Hash = new Md5Hash(getOriginalQuery());
-        queryHash = md5Hash.toHex();
+        queryHash = DigestUtils.md5Hex(getOriginalQuery());
         LOG.debug("[{}] Starting {} request for query {}", queryHash, getChunkingMethodName(), getOriginalQuery());
     }
 

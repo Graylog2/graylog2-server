@@ -20,6 +20,7 @@ import org.graylog.events.search.MoreSearchAdapter;
 import org.graylog.events.search.MoreSearchAdapterIT;
 import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
 import org.graylog.storage.opensearch2.MoreSearchAdapterOS2;
+import org.graylog.storage.opensearch2.OS2ResultMessageFactory;
 import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog.storage.opensearch2.Scroll;
 import org.graylog.storage.opensearch2.ScrollResultOS2;
@@ -27,12 +28,16 @@ import org.graylog.storage.opensearch2.SearchRequestFactory;
 import org.graylog.storage.opensearch2.SortOrderMapper;
 import org.graylog.storage.opensearch2.testing.OpenSearchInstance;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
+import org.graylog2.indexer.results.ResultMessageFactory;
+import org.graylog2.indexer.results.TestResultMessageFactory;
 import org.junit.Rule;
 
 public class MoreSearchAdapterOS2UsingScrollIT extends MoreSearchAdapterIT {
 
     @Rule
     public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
+
+    private final ResultMessageFactory resultMessageFactory = new TestResultMessageFactory();
 
     @Override
     protected SearchServerInstance searchServer() {
@@ -46,10 +51,11 @@ public class MoreSearchAdapterOS2UsingScrollIT extends MoreSearchAdapterIT {
         return new MoreSearchAdapterOS2(client, true, sortOrderMapper,
                 new Scroll(client,
                         (initialResult, query, scroll, fields, limit) -> new ScrollResultOS2(
-                                client, initialResult, query, scroll, fields, limit
+                                resultMessageFactory, client, initialResult, query, scroll, fields, limit
                         ),
                         new SearchRequestFactory(sortOrderMapper, false, true, new IgnoreSearchFilters())
-                )
+                ),
+                new OS2ResultMessageFactory(resultMessageFactory)
 
         );
     }

@@ -30,6 +30,8 @@ import org.graylog2.grok.GrokPattern;
 import org.graylog2.grok.GrokPatternRegistry;
 import org.graylog2.grok.GrokPatternService;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.SuppressForbidden;
 import org.junit.BeforeClass;
@@ -46,6 +48,7 @@ import static org.mockito.Mockito.when;
 public class V20220522125200_AddSetGrokToFieldsExtractorFragmentsTest extends BaseFragmentTest {
 
     V20220522125200_AddSetGrokToFieldsExtractorFragments migration;
+    private final MessageFactory messageFactory = new TestMessageFactory();
 
     @BeforeClass
     @SuppressForbidden("Allow using default thread factory")
@@ -74,14 +77,14 @@ public class V20220522125200_AddSetGrokToFieldsExtractorFragmentsTest extends Ba
         Rule testRule = createFragmentSource(fragment, Map.of(
                 "field", "message",
                 "grokPattern", "^%{BASE10NUM:number}\\\\s+"));
-        Message result = evaluateRule(testRule, new Message("99 Problems", "test", Tools.nowUTC()));
+        Message result = evaluateRule(testRule, messageFactory.createMessage("99 Problems", "test", Tools.nowUTC()));
         assertThat(result.getField("number")).isEqualTo("99");
 
         testRule = createFragmentSource(fragment, Map.of(
                 "field", "message",
                 "grokPattern", "^%{BASE10NUM}\\\\s+",
                 "grokNamedOnly", true));
-        final Message inMessage = new Message("99 Problems", "test", Tools.nowUTC());
+        final Message inMessage = messageFactory.createMessage("99 Problems", "test", Tools.nowUTC());
         result = evaluateRule(testRule, inMessage);
         assertThat(result.getFieldCount()).isEqualTo(inMessage.getFieldCount());
     }

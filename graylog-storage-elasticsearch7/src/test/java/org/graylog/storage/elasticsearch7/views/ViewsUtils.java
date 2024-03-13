@@ -16,15 +16,33 @@
  */
 package org.graylog.storage.elasticsearch7.views;
 
+import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.joda.time.DateTimeZone;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-class ViewsUtils {
+import static org.mockito.Mockito.mock;
+
+public class ViewsUtils {
     static List<String> indicesOf(List<SearchRequest> clientRequest) {
         return clientRequest.stream()
                 .map(request -> String.join(",", request.indices()))
                 .collect(Collectors.toList());
+    }
+
+    public static ESGeneratedQueryContext.Factory createTestContextFactory(FieldTypesLookup fieldTypesLookup) {
+        return (elasticsearchBackend, ssb, errors, timezone) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, errors, timezone, fieldTypesLookup);
+    }
+
+    public static ESGeneratedQueryContext.Factory createTestContextFactory() {
+        return createTestContextFactory(mock(FieldTypesLookup.class));
+    }
+
+    public static ESGeneratedQueryContext createTestContext(ElasticsearchBackend backend) {
+        return new ESGeneratedQueryContext(backend, new SearchSourceBuilder(), Collections.emptyList(), DateTimeZone.UTC, mock(FieldTypesLookup.class));
     }
 }

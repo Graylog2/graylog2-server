@@ -27,9 +27,8 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 import QueryValidationActions from 'views/actions/QueryValidationActions';
 import FormWarningsContext from 'contexts/FormWarningsContext';
-import type { IndexRange, QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
+import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 import usePluginEntities from 'hooks/usePluginEntities';
-import { adjustFormat } from 'util/DateTime';
 
 const Container = styled.div`
   margin-left: 5px;
@@ -54,7 +53,7 @@ const ErrorIcon = styled(Icon)<{ $status: string }>(({ theme, $status }) => css`
   font-size: 22px;
 `);
 
-const DocumentationIcon = styled(Icon)`
+export const DocumentationIcon = styled(Icon)`
   margin-left: 5px;
 `;
 
@@ -63,7 +62,7 @@ const Title = styled.div`
   justify-content: space-between;
 `;
 
-const Explanation = styled.div`
+export const Explanation = styled.div`
   display: flex;
   justify-content: space-between;
 
@@ -183,36 +182,6 @@ const deduplicateExplanations = (explanations: Explanations | undefined): Explan
   return deduplicated;
 };
 
-const warmTierExplanations = (searchesWarmTier: boolean, warmTierIndices: Array<IndexRange>) => {
-  if (!searchesWarmTier) return [];
-
-  const formatTimestamp = (timestamp: number) : string => `${adjustFormat(new Date((timestamp)), 'default')}`;
-
-  const timestampInfo = warmTierIndices.map((warmTierIndex) => {
-    const begin = formatTimestamp(warmTierIndex.begin);
-    const end = formatTimestamp(warmTierIndex.end);
-
-    return `${begin} to ${end}`;
-  });
-
-  const timestampString = timestampInfo.join(', ');
-
-  let errorMessage = 'Warm Tier Search: The selected time range includes data stored in the Warm Tier, which can be slow to retrieve.';
-
-  if (timestampString.length > 0) {
-    errorMessage += ` The following interval falls within the Warm Tier: ${timestampString}.`;
-  }
-
-  const explanation = {
-    errorTitle: 'Warm Tier Search',
-    errorType: 'WARM_TIER_WARNING',
-    errorMessage,
-    id: 'indices_warm_tier',
-  };
-
-  return [explanation];
-};
-
 const QueryValidation = () => {
   const plugableValidationExplanation = usePluginEntities('views.elements.validationErrorExplanation');
   const [shakingPopover, shake] = useShakeTemporarily();
@@ -223,11 +192,9 @@ const QueryValidation = () => {
   const { warnings } = useContext(FormWarningsContext);
 
   const validationState = (queryStringErrors ?? warnings?.queryString) as QueryValidationState;
-  const rangesInWarmTier = validationState?.context?.searched_index_ranges?.filter((range) => range.is_warm_tiered);
-  const searchesWarmTier = rangesInWarmTier?.length > 0;
 
   const { status, explanations = [] } = validationState ?? { explanations: [] };
-  const deduplicatedExplanations = useMemo(() => [...deduplicateExplanations(explanations), ...warmTierExplanations(searchesWarmTier, rangesInWarmTier)], [explanations, searchesWarmTier, rangesInWarmTier]);
+  const deduplicatedExplanations = useMemo(() => [...deduplicateExplanations(explanations)], [explanations]);
   const hasExplanations = validationState && (validationState?.status !== 'OK');
 
   return (

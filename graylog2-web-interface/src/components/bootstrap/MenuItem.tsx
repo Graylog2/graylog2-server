@@ -16,11 +16,15 @@
  */
 import * as React from 'react';
 import { useCallback } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import Icon from 'components/common/Icon';
 
 import Menu from './Menu';
+
+const StyledMenuItem = styled(Menu.Item)<{ $variant: 'danger' | undefined }>(({ $variant, theme }) => css`
+  ${$variant ? `color: ${theme.colors.variant.danger};` : ''}
+`);
 
 const IconWrapper = styled.div`
   display: inline-flex;
@@ -48,9 +52,11 @@ type Props<T = undefined> = React.PropsWithChildren<{
   rel?: 'noopener noreferrer',
   target?: '_blank',
   title?: string,
+  variant?: 'danger'
+  closeMenuOnClick?: boolean,
 }>;
 
-const CustomMenuItem = <T, >({ children, className, disabled, divider, eventKey, header, href, icon, id, onClick, onSelect, rel, target, title, 'data-tab-id': dataTabId, component }: Props<T>) => {
+const CustomMenuItem = <T, >({ children, className, disabled, divider, eventKey, header, href, icon, id, onClick, onSelect, rel, target, title, 'data-tab-id': dataTabId, component, variant, closeMenuOnClick }: Props<T>) => {
   const callback = onClick ?? onSelect;
   const _onClick = useCallback(() => callback?.(eventKey), [callback, eventKey]);
 
@@ -63,6 +69,7 @@ const CustomMenuItem = <T, >({ children, className, disabled, divider, eventKey,
   }
 
   const sharedProps = {
+    $variant: variant,
     className,
     'data-tab-id': dataTabId,
     disabled,
@@ -70,29 +77,31 @@ const CustomMenuItem = <T, >({ children, className, disabled, divider, eventKey,
     id,
     onClick: _onClick,
     title,
+    closeMenuOnClick,
   };
 
   if (href) {
     return (
-      <Menu.Item component="a"
-                 href={href}
-                 target={target}
-                 rel={rel}
-                 {...sharedProps}>
+      <StyledMenuItem component="a"
+                      href={href}
+                      target={target}
+                      rel={rel}
+                      {...sharedProps}>
         {children}
-      </Menu.Item>
+      </StyledMenuItem>
     );
   }
 
   return (
-    <Menu.Item component={component} {...sharedProps}>
+    <StyledMenuItem component={component} {...sharedProps}>
       {children}
-    </Menu.Item>
+    </StyledMenuItem>
   );
 };
 
 CustomMenuItem.defaultProps = {
   className: undefined,
+  closeMenuOnClick: undefined,
   component: undefined,
   'data-tab-id': undefined,
   disabled: false,
@@ -107,6 +116,7 @@ CustomMenuItem.defaultProps = {
   rel: undefined,
   target: undefined,
   title: undefined,
+  variant: undefined,
 };
 
 /** @component */

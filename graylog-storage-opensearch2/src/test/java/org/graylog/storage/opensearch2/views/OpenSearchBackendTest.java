@@ -21,13 +21,13 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.jayway.jsonpath.JsonPath;
 import jakarta.inject.Provider;
+import org.graylog.plugins.views.search.LegacyDecoratorProcessor;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
-import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.engine.GeneratedQueryContext;
 import org.graylog.plugins.views.search.engine.monitoring.collection.NoOpStatsCollector;
@@ -50,10 +50,12 @@ import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivot;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.buckets.OSTimeHandler;
 import org.graylog.testing.jsonpath.JsonPathAssert;
 import org.graylog2.indexer.ranges.MongoIndexRange;
+import org.graylog2.indexer.results.TestResultMessageFactory;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -87,17 +89,16 @@ public class OpenSearchBackendTest {
     @Before
     public void setup() {
         Map<String, Provider<OSSearchTypeHandler<? extends SearchType>>> handlers = Maps.newHashMap();
-        handlers.put(MessageList.NAME, OSMessageList::new);
+        handlers.put(MessageList.NAME, () -> new OSMessageList(new LegacyDecoratorProcessor.Fake(),
+                new TestResultMessageFactory(), false));
         handlers.put(Pivot.NAME, () -> new OSPivot(Map.of(Time.NAME, new OSTimeHandler()), Map.of(), new EffectiveTimeRangeExtractor()));
 
         usedSearchFiltersToQueryStringsMapper = mock(UsedSearchFiltersToQueryStringsMapper.class);
         doReturn(Collections.emptySet()).when(usedSearchFiltersToQueryStringsMapper).map(any());
-        final FieldTypesLookup fieldTypesLookup = mock(FieldTypesLookup.class);
-
         backend = new OpenSearchBackend(handlers,
                 null,
                 indexLookup,
-                (elasticsearchBackend, ssb, errors) -> new OSGeneratedQueryContext(elasticsearchBackend, ssb, errors, fieldTypesLookup),
+                ViewsUtils.createTestContextFactory(),
                 usedSearchFiltersToQueryStringsMapper,
                 new NoOpStatsCollector<>(),
                 false);
@@ -110,7 +111,7 @@ public class OpenSearchBackendTest {
                 .query(ElasticsearchQueryString.of(""))
                 .timerange(RelativeRange.create(300))
                 .build();
-        backend.generate(query, Collections.emptySet());
+        backend.generate(query, Collections.emptySet(), DateTimeZone.UTC);
     }
 
     @Test
@@ -148,7 +149,7 @@ public class OpenSearchBackendTest {
                 .timerange(RelativeRange.create(300))
                 .build();
 
-        final OSGeneratedQueryContext queryContext = backend.generate(query, Collections.emptySet());
+        final OSGeneratedQueryContext queryContext = backend.generate(query, Collections.emptySet(), DateTimeZone.UTC);
         final QueryBuilder esQuery = queryContext.searchSourceBuilder(new SearchType.Fallback()).query();
         assertThat(esQuery)
                 .isNotNull()
@@ -201,8 +202,8 @@ public class OpenSearchBackendTest {
                 .timerange(RelativeRange.create(300))
                 .build();
         final Search search = Search.builder().queries(ImmutableSet.of(query)).build();
-        final SearchJob job = new SearchJob("deadbeef", search, "admin");
-        final GeneratedQueryContext generatedQueryContext = backend.generate(query, Set.of());
+        final SearchJob job = new SearchJob("deadbeef", search, "admin", "test-node-id");
+        final GeneratedQueryContext generatedQueryContext = backend.generate(query, Set.of(), DateTimeZone.UTC);
 
         var explainResult = backend.explain(job, query, generatedQueryContext);
         assertThat(explainResult.searchTypes()).isNotNull();
