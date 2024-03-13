@@ -40,6 +40,7 @@ const filterComponents = [
     configuration: (_selectedValues, editValue: Array<string>, onChange: (newValue: Array<string>, shouldSubmit: boolean) => void) => (
       <DateFilter values={editValue} onChange={(newValue) => onChange(newValue, false)} />
     ),
+    valueForConfig: (values: Array<string>) => values.join(','),
     valueFromConfig: (value: string) => (value ? value.split(',') : []),
     renderValue: (values: string) => values.replace(',', ' to '),
   },
