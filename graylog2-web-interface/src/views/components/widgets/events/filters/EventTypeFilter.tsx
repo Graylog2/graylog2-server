@@ -14,12 +14,31 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
+
+import { ListGroup, ListGroupItem } from 'components/bootstrap';
 
 type Props = {
-  value: string,
-  onSelect: (value: string) => void,
+  onSelect: (value: boolean) => void,
+  selectedValues: Array<boolean>
 }
 
-const OwnerFilter = ({ value, onSelect }: Props) => <div onClick={() => onSelect('')}>{value}</div>;
+const EventTypeFilter = ({ onSelect, selectedValues }: Props) => {
+  const disabledAlertOption = selectedValues.includes(true);
+  const disabledEventOption = selectedValues.includes(false);
 
-export default OwnerFilter;
+  return (
+    <ListGroup className="no-bm">
+      <ListGroupItem onClick={() => !disabledAlertOption && onSelect(true)}
+                     disabled={disabledAlertOption}>
+        Alert
+      </ListGroupItem>
+      <ListGroupItem onClick={() => !disabledEventOption && onSelect(false)}
+                     disabled={disabledEventOption}>
+        Event
+      </ListGroupItem>
+    </ListGroup>
+  );
+};
+
+export default EventTypeFilter;

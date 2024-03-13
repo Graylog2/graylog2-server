@@ -29,7 +29,7 @@ const EventDefinitionFilter = ({ value, onSelect, selectedValues }: Props) => {
   const { data: eventDefinitions, isInitialLoading: isLoadingEventDefinitions } = useEventDefinitions({
     query: '',
     page: 1,
-    pageSize: 100,
+    pageSize: 100000,
     sort: { attributeId: 'title', direction: 'asc' },
   });
 
@@ -46,6 +46,7 @@ const EventDefinitionFilter = ({ value, onSelect, selectedValues }: Props) => {
   return (
     <Select placeholder="Select event definition"
             clearable={false}
+            menuIsOpen
             options={eventDefinitionOptions}
             onChange={onSelect}
             value={value} />

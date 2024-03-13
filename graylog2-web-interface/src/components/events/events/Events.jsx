@@ -30,6 +30,7 @@ import { isPermitted } from 'util/PermissionsMixin';
 
 import EventsSearchBar from './EventsSearchBar';
 import EventDetails from './EventDetails';
+import EventTypeLabel from './EventTypeLabel';
 
 const HEADERS = ['Description', 'Key', 'Type', 'Event Definition', 'Timestamp'];
 
@@ -192,7 +193,7 @@ class Events extends React.Component {
             {event.message}
           </td>
           <td>{event.key || <em>none</em>}</td>
-          <td>{event.alert ? <Label bsStyle="warning">Alert</Label> : <Label bsStyle="info">Event</Label>}</td>
+          <td><EventTypeLabel isAlert={event.alert} /></td>
           <td>
             {this.renderLinkToEventDefinition(event, eventDefinitionContext)}
           </td>

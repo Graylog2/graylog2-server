@@ -64,7 +64,7 @@ const SelectedFiltersList = ({ selectedFilters, columnTitle, filterComponents, o
                 return (
                   <FilterValue key={value}>
                     <ValueTitle>
-                      {filterComponent?.renderValue(value) ?? value}
+                      {filterComponent?.renderValue?.(value) ?? value}
                     </ValueTitle>
                     <ValueActions>
                       <FilterEditButton filterComponent={filterComponent}
