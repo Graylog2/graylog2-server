@@ -62,7 +62,7 @@ public class DatanodeOpensearchProxyIT {
 
     @ContainerMatrixTest
     void testTargetSpecificDatanodeInstance() {
-        final List<String> datanodes = apis.datanodeProxy().getDatanodes().properJSONPath().read("elements.*.hostname");
+        final List<String> datanodes = apis.system().datanodes().properJSONPath().read("elements.*.hostname");
         Assertions.assertThat(datanodes).isNotEmpty();
 
         final String hostname = datanodes.iterator().next();
