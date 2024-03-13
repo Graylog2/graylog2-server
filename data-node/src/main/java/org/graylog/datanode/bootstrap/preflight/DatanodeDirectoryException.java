@@ -18,7 +18,7 @@ package org.graylog.datanode.bootstrap.preflight;
 
 import java.io.IOException;
 
-public class DatanodeDirectoryException extends IOException {
+public class DatanodeDirectoryException extends RuntimeException {
     public DatanodeDirectoryException(String message) {
         super(message);
     }
