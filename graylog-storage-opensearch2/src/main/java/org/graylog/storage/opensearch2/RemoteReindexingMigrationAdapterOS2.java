@@ -43,6 +43,7 @@ import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
 import org.graylog2.indexer.indices.Indices;
+import org.graylog2.indexer.migration.IndexerConnectionCheckResult;
 import org.graylog2.indexer.migration.RemoteReindexIndex;
 import org.graylog2.indexer.migration.RemoteReindexMigration;
 import org.joda.time.Duration;
@@ -176,6 +177,16 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     @Override
     public RemoteReindexMigration status(@NotNull String migrationID) {
         return JOBS.getOrDefault(migrationID, RemoteReindexMigration.nonExistent(migrationID));
+    }
+
+    @Override
+    public IndexerConnectionCheckResult checkConnection(URI uri, String username, String password) {
+        try {
+            final List<String> discoveredIndices = getAllIndicesFrom(uri, username, password);
+            return IndexerConnectionCheckResult.success(discoveredIndices);
+        } catch (MalformedURLException e) {
+            return IndexerConnectionCheckResult.failure(e);
+        }
     }
 
     private Set<String> getAllActiveNodeIDs() {
