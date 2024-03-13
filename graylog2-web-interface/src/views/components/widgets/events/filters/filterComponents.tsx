@@ -28,7 +28,7 @@ const filterComponents: FilterComponents = [
       <EventDefinitionFilter value={editValue} onSelect={(newValue) => onChange(newValue)} selectedValues={selectedValues} />
     ),
     attribute: 'event_definition_id',
-    renderValue: (value) => <EventDefinitionName eventDefinitionId={value} />,
+    renderValue: (value) => <EventDefinitionName eventDefinitionId={value} displayAsLink={false} />,
   },
   {
     attribute: 'alert',

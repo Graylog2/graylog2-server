@@ -43,11 +43,20 @@ const useEventDefinitionDetails = (eventDefId: string) => {
   return { data, isFetching };
 };
 
-const EventDefinitionName = ({ eventDefinitionId }: { eventDefinitionId: string }) => {
+type Props = {
+  eventDefinitionId: string,
+  displayAsLink?: boolean,
+}
+
+const EventDefinitionName = ({ eventDefinitionId, displayAsLink }: Props) => {
   const { data: eventDefinition, isFetching } = useEventDefinitionDetails(eventDefinitionId);
 
   if (isFetching) {
     return <Spinner />;
+  }
+
+  if (!displayAsLink) {
+    return <>{eventDefinition.title}</>;
   }
 
   if (eventDefinition) {
@@ -59,6 +68,10 @@ const EventDefinitionName = ({ eventDefinitionId }: { eventDefinitionId: string 
   }
 
   return <>eventDefinitionId</>;
+};
+
+EventDefinitionName.defaultProps = {
+  displayAsLink: true,
 };
 
 export default EventDefinitionName;
