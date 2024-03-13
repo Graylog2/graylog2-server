@@ -47,7 +47,7 @@ const ClientCertificateView = ({ clientCerts }: Props) => (
     <dd>{clientCerts.principal}</dd>
     <dt>Role:</dt>
     <dd>{clientCerts.role}</dd>
-    <dt>Ca certificate <Button bsStyle="info" bsSize="xs" onClick={() => copyToClipboard(clientCerts.ca_certificate)}>Copy to clipboard</Button></dt>
+    <dt>CA certificate <Button bsStyle="info" bsSize="xs" onClick={() => copyToClipboard(clientCerts.ca_certificate)}>Copy to clipboard</Button></dt>
     <dd>
       <Textarea id="ca_certificate"
                 value={clientCerts.ca_certificate}
