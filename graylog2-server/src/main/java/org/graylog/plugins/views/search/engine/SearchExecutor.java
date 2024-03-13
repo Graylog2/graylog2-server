@@ -31,6 +31,7 @@ import org.graylog.plugins.views.search.engine.validation.SearchValidation;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.ExecutionState;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +42,7 @@ import java.util.concurrent.TimeoutException;
 
 public class SearchExecutor {
     private static final Logger LOG = LoggerFactory.getLogger(SearchExecutor.class);
+    private static final DateTimeZone DEFAULT_TIMEZONE = DateTimeZone.UTC;
 
     private final SearchDomain searchDomain;
     private final SearchJobService searchJobService;
@@ -79,7 +81,7 @@ public class SearchExecutor {
 
         final Search normalizedSearch = searchNormalization.postValidation(preValidationSearch, searchUser, executionState);
 
-        final SearchJob searchJob = queryEngine.execute(searchJobService.create(normalizedSearch, searchUser.username()), validationErrors);
+        final SearchJob searchJob = queryEngine.execute(searchJobService.create(normalizedSearch, searchUser.username()), validationErrors, searchUser.timeZone().orElse(DEFAULT_TIMEZONE));
 
         validationErrors.forEach(searchJob::addError);
 
@@ -109,7 +111,8 @@ public class SearchExecutor {
         final Set<SearchError> validationErrors = searchValidation.validate(preValidationSearch, searchUser);
         final Search normalizedSearch = searchNormalization.postValidation(preValidationSearch, searchUser, executionState);
 
-        return queryEngine.explain(searchJobService.create(normalizedSearch, searchUser.username()), validationErrors);
+        return queryEngine.explain(searchJobService.create(normalizedSearch, searchUser.username()), validationErrors,
+                searchUser.timeZone().orElse(DEFAULT_TIMEZONE));
     }
 
     private SearchJob searchJobWithFatalError(SearchJob searchJob, Set<SearchError> validationErrors) {
