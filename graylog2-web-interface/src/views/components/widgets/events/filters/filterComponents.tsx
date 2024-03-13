@@ -20,9 +20,9 @@ import EventDefinitionName from 'views/components/widgets/events/filters/EventDe
 import EventDefinitionFilter from 'views/components/widgets/events/filters/EventDefinitionFilter';
 import EventTypeFilter from 'views/components/widgets/events/filters/EventTypeFilter';
 import DateFilter from 'views/components/widgets/overview-configuration/filters/DateFilter';
-import EventTypeLabel from 'components/events/events/EventTypeLabel';
+import type { FilterComponents } from 'views/components/widgets/overview-configuration/filters/types';
 
-const filterComponents = [
+const filterComponents: FilterComponents = [
   {
     configuration: (selectedValues, editValue: string, onChange: (newValue: string) => void) => (
       <EventDefinitionFilter value={editValue} onSelect={(newValue) => onChange(newValue)} selectedValues={selectedValues} />
@@ -32,10 +32,10 @@ const filterComponents = [
   },
   {
     attribute: 'alert',
-    configuration: (selectedValues, _editValue: string, onChange: (newValue: boolean) => void) => (
-      <EventTypeFilter onSelect={(newValue) => onChange(newValue)} selectedValues={selectedValues} />
+    configuration: (selectedValues, _editValue: string, onChange: (newValue: string) => void) => (
+      <EventTypeFilter onSelect={onChange} selectedValues={selectedValues} />
     ),
-    renderValue: (isAlert: boolean) => <EventTypeLabel isAlert={isAlert} />,
+    renderValue: (isAlert: 'true' | 'false') => (isAlert === 'true' ? 'Alert' : 'Event'),
   },
   {
     attribute: 'timestamp',

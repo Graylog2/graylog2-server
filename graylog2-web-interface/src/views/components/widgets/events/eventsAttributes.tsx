@@ -18,6 +18,7 @@ import * as React from 'react';
 
 import { Timestamp } from 'components/common';
 import EventDefinitionName from 'views/components/widgets/events/filters/EventDefinitionName';
+import EventTypeLabel from 'components/events/events/EventTypeLabel';
 
 const eventsAttributes = [
   {
@@ -28,7 +29,7 @@ const eventsAttributes = [
   {
     attribute: 'alert',
     title: 'Type',
-    displayValue: (value) => value,
+    displayValue: (value) => <EventTypeLabel isAlert={value} />,
   },
   {
     attribute: 'event_definition_id',
