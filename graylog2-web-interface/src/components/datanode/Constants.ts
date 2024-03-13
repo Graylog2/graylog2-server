@@ -196,5 +196,13 @@ export const MIGRATION_ACTIONS = {
     key: 'RETRY_MIGRATE_EXISTING_DATA',
     label: 'Retry migrate existing data',
   },
+  CHECK_REMOTE_INDEXER_CONNECTION: {
+    key: 'CHECK_REMOTE_INDEXER_CONNECTION',
+    label: 'Check connection',
+  },
+  START_REMOTE_REINDEX_MIGRATION: {
+    key: 'START_REMOTE_REINDEX_MIGRATION',
+    label: 'Start migration',
+  },
 };
 export default MIGRATION_STEP;

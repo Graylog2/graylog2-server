@@ -152,8 +152,13 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
 
         //config.put("network.publish_host", Tools.getLocalCanonicalHostname());
 
-        // Uncomment the following line to get DEBUG logs for the underlying Opensearch
-        //config.put("logger.org.opensearch", "debug");
+        if(localConfiguration.getOpensearchDebug() != null && !localConfiguration.getOpensearchDebug().isBlank()) {
+            config.put("logger.org.opensearch", localConfiguration.getOpensearchDebug());
+        }
+
+        if(localConfiguration.getOpensearchAuditLog() != null && !localConfiguration.getOpensearchAuditLog().isBlank()) {
+            config.put("plugins.security.audit.type", localConfiguration.getOpensearchAuditLog());
+        }
 
         // common OpenSearch config parameters from our docs
         config.put("indices.query.bool.max_clause_count", localConfiguration.getIndicesQueryBoolMaxClauseCount().toString());

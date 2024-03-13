@@ -90,7 +90,7 @@ public class PivotAggregationSearch implements AggregationSearch {
 
     private final AggregationEventProcessorConfig config;
     private final AggregationEventProcessorParameters parameters;
-    private final String searchOwner;
+    private final User searchOwner;
     private final List<SearchType> additionalSearchTypes;
     private final SearchJobService searchJobService;
     private final QueryEngine queryEngine;
@@ -104,7 +104,7 @@ public class PivotAggregationSearch implements AggregationSearch {
     @Inject
     public PivotAggregationSearch(@Assisted AggregationEventProcessorConfig config,
                                   @Assisted AggregationEventProcessorParameters parameters,
-                                  @Assisted String searchOwner,
+                                  @Assisted User searchOwner,
                                   @Assisted EventDefinition eventDefinition,
                                   @Assisted List<SearchType> additionalSearchTypes,
                                   SearchJobService searchJobService,
@@ -369,8 +369,9 @@ public class PivotAggregationSearch implements AggregationSearch {
         return results.build();
     }
 
-    private SearchJob getSearchJob(AggregationEventProcessorParameters parameters, String username,
+    private SearchJob getSearchJob(AggregationEventProcessorParameters parameters, User user,
                                    long searchWithinMs, long executeEveryMs) throws EventProcessorException {
+        final var username = user.name();
         Search search = Search.builder()
                 .queries(ImmutableSet.of(getAggregationQuery(parameters, searchWithinMs, executeEveryMs), getSourceStreamsQuery(parameters)))
                 .parameters(config.queryParameters())
@@ -379,7 +380,7 @@ public class PivotAggregationSearch implements AggregationSearch {
         // TODO: Once we introduce "EventProcessor owners" this should only load the permitted streams of the
         //       user who created this EventProcessor.
         search = search.addStreamsToQueriesWithoutStreams(() -> permittedStreams.loadAllMessageStreams((streamId) -> true));
-        final SearchJob searchJob = queryEngine.execute(searchJobService.create(search, username), Collections.emptySet());
+        final SearchJob searchJob = queryEngine.execute(searchJobService.create(search, username), Collections.emptySet(), user.timezone());
         try {
             Uninterruptibles.getUninterruptibly(
                     searchJob.getResultFuture(),
