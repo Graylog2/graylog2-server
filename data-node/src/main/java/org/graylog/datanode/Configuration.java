@@ -263,6 +263,20 @@ public class Configuration extends BaseConfiguration {
         return indicesQueryBoolMaxClauseCount;
     }
 
+    @Parameter(value = "opensearch_logger_org_opensearch")
+    private String opensearchDebug;
+
+    public String getOpensearchDebug() {
+        return opensearchDebug;
+    }
+
+    @Parameter(value = "opensearch_plugins_security_audit_type")
+    private String opensearchAuditLog;
+
+    public String getOpensearchAuditLog() {
+        return opensearchAuditLog;
+    }
+
     public boolean isInsecureStartup() {
         return insecureStartup;
     }

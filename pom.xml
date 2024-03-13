@@ -30,7 +30,7 @@
 
     <groupId>org.graylog</groupId>
     <artifactId>graylog-parent</artifactId>
-    <version>6.0.0-SNAPSHOT</version>
+    <version>6.0.0-alpha.3</version>
     <packaging>pom</packaging>
 
     <name>Graylog Parent POM</name>
@@ -110,12 +110,13 @@
         <commons-codec.version>1.16.1</commons-codec.version>
         <commons-csv.version>1.10.0</commons-csv.version>
         <commons-email.version>1.6.0</commons-email.version>
+        <commons-exec.version>1.4.0</commons-exec.version>
         <commons-lang3.version>3.14.0</commons-lang3.version>
         <commons-net.version>3.10.0</commons-net.version>
         <commons-validator.version>1.8.0</commons-validator.version>
         <commons-io.version>2.15.1</commons-io.version>
         <disruptor.version>4.0.0</disruptor.version>
-        <error-prone.version>2.26.0</error-prone.version>
+        <error-prone.version>2.26.1</error-prone.version>
         <freemarker.version>2.3.32</freemarker.version>
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>4.2.0</geoip2.version>
@@ -128,7 +129,7 @@
         <hamcrest.version>2.2</hamcrest.version>
         <hibernate-validator.version>8.0.1.Final</hibernate-validator.version>
         <hk2.version>3.1.0</hk2.version> <!-- The HK2 version should match the version being used by Jersey -->
-        <jackson.version>2.16.2</jackson.version>
+        <jackson.version>2.17.0</jackson.version>
         <jadconfig.version>0.14.0</jadconfig.version>
         <java-semver.version>0.9.0</java-semver.version>
         <javax.annotation-api.version>1.3.2</javax.annotation-api.version>
@@ -407,6 +408,13 @@
                 <artifactId>commons-net</artifactId>
                 <version>${commons-net.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-exec</artifactId>
+                <version>${commons-exec.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>io.dropwizard.metrics</groupId>
                 <artifactId>metrics-bom</artifactId>

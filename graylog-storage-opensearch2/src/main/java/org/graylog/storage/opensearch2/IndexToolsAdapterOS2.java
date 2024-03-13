@@ -19,37 +19,25 @@ package org.graylog.storage.opensearch2;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import jakarta.inject.Inject;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.action.support.IndicesOptions;
-import org.graylog.shaded.opensearch2.org.opensearch.client.core.CountRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.client.core.CountResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.index.query.BoolQueryBuilder;
-import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.filter.Filter;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.histogram.DateHistogramInterval;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.histogram.ParsedDateHistogram;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.terms.Terms;
-import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
 import org.graylog2.indexer.IndexToolsAdapter;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.opensearch.client.opensearch._types.ExpandWildcard;
+import org.opensearch.client.opensearch._types.FieldValue;
+import org.opensearch.client.opensearch._types.query_dsl.BoolQuery;
+import org.opensearch.client.opensearch._types.query_dsl.Query;
+import org.opensearch.client.opensearch.core.MsearchRequest;
+import org.opensearch.client.opensearch.core.msearch.MultisearchBody;
 
+import java.time.Instant;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-
-import static org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders.boolQuery;
-import static org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders.existsQuery;
-import static org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders.matchAllQuery;
-import static org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders.termsQuery;
 
 public class IndexToolsAdapterOS2 implements IndexToolsAdapter {
     private static final String AGG_DATE_HISTOGRAM = "source_date_histogram";
@@ -64,45 +52,43 @@ public class IndexToolsAdapterOS2 implements IndexToolsAdapter {
 
     @Override
     public Map<DateTime, Map<String, Long>> fieldHistogram(String fieldName, Set<String> indices, Optional<Set<String>> includedStreams, long interval) {
-        final BoolQueryBuilder queryBuilder = buildStreamIdFilter(includedStreams);
+        final var queryBuilder = buildStreamIdFilter(includedStreams);
 
-        final FilterAggregationBuilder the_filter = AggregationBuilders.filter(AGG_FILTER, queryBuilder)
-                .subAggregation(AggregationBuilders.dateHistogram(AGG_DATE_HISTOGRAM)
-                        .field("timestamp")
-                        .subAggregation(AggregationBuilders.terms(AGG_MESSAGE_FIELD).field(fieldName))
-                        .fixedInterval(new DateHistogramInterval(interval + "ms"))
-                        // We use "min_doc_count" here to avoid empty buckets in the histogram result.
-                        // This is needed to avoid out-of-memory errors when creating a histogram for a really large
-                        // date range. See: https://github.com/Graylog2/graylog-plugin-archive/issues/59
-                        .minDocCount(1L));
+        final var body = MultisearchBody.of(builder -> builder.query(query -> query.matchAll(matchAll -> matchAll))
+                .aggregations(AGG_FILTER, aggBuilder -> aggBuilder
+                        .filter(filterBuilder -> filterBuilder.bool(queryBuilder))
+                        .aggregations(AGG_DATE_HISTOGRAM, subAggBuilder -> subAggBuilder.dateHistogram(histogram -> histogram
+                                        // We use "min_doc_count" here to avoid empty buckets in the histogram result.
+                                        // This is needed to avoid out-of-memory errors when creating a histogram for a really large
+                                        // date range. See: https://github.com/Graylog2/graylog-plugin-archive/issues/59
+                                        .minDocCount(1)
+                                        .field("timestamp")
+                                        .fixedInterval(fixedInterval -> fixedInterval.time(interval + "ms")))
+                                .aggregations(AGG_MESSAGE_FIELD, subSubAggBuilder -> subSubAggBuilder.terms(terms -> terms
+                                        .field(fieldName))))));
 
-        final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
-                .query(QueryBuilders.matchAllQuery())
-                .aggregation(the_filter);
+        final var searchResult = client.search(MsearchRequest.of(builder -> builder.index(indices.stream().toList())
+                .searches(searchBuilder -> searchBuilder.body(body).header(header -> header.index(indices.stream().toList())))), "Unable to retrieve field histogram.");
 
-        final SearchRequest searchRequest = new SearchRequest()
-                .source(searchSourceBuilder)
-                .indices(indices.toArray(new String[0]));
-        final SearchResponse searchResult = client.search(searchRequest, "Unable to retrieve field histogram.");
-
-        final Filter filterAggregation = searchResult.getAggregations().get(AGG_FILTER);
-        final ParsedDateHistogram dateHistogram = filterAggregation.getAggregations().get(AGG_DATE_HISTOGRAM);
+        final var filterAggregation = searchResult.result().aggregations().get(AGG_FILTER).filter();
+        final var dateHistogram = filterAggregation.aggregations().get(AGG_DATE_HISTOGRAM).dateHistogram();
 
 
-        final List<ParsedDateHistogram.ParsedBucket> histogramBuckets = (List<ParsedDateHistogram.ParsedBucket>) dateHistogram.getBuckets();
+        final var histogramBuckets =  dateHistogram.buckets().array();
         final Map<DateTime, Map<String, Long>> result = Maps.newHashMapWithExpectedSize(histogramBuckets.size());
 
-        for (ParsedDateHistogram.ParsedBucket bucket : histogramBuckets) {
-            final ZonedDateTime zonedDateTime = (ZonedDateTime) bucket.getKey();
+        for (var bucket : histogramBuckets) {
+            final var instant = Instant.ofEpochMilli(Long.parseLong(bucket.key()));
+            final ZonedDateTime zonedDateTime = instant.atZone(ZoneId.of("UTC"));
             final DateTime date = new DateTime(zonedDateTime.toInstant().toEpochMilli(), DateTimeZone.UTC);
 
-            final Terms sourceFieldAgg = bucket.getAggregations().get(AGG_MESSAGE_FIELD);
-            final List<? extends Terms.Bucket> termBuckets = sourceFieldAgg.getBuckets();
+            final var sourceFieldAgg = bucket.aggregations().get(AGG_MESSAGE_FIELD).sterms();
+            final var termBuckets = sourceFieldAgg.buckets().array();
 
             final HashMap<String, Long> termCounts = Maps.newHashMapWithExpectedSize(termBuckets.size());
 
-            for (Terms.Bucket termBucket : termBuckets) {
-                termCounts.put(termBucket.getKeyAsString(), termBucket.getDocCount());
+            for (var termBucket : termBuckets) {
+                termCounts.put(termBucket.key(), termBucket.docCount());
             }
 
             result.put(date, termCounts);
@@ -113,35 +99,44 @@ public class IndexToolsAdapterOS2 implements IndexToolsAdapter {
 
     @Override
     public long count(Set<String> indices, Optional<Set<String>> includedStreams) {
-        final CountRequest request = new CountRequest(indices.toArray(new String[0]), buildStreamIdFilter(includedStreams))
-                .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN);
+        final var query = Query.of(builder -> builder.bool(buildStreamIdFilter(includedStreams)));
 
-        final CountResponse result = client.execute((c, requestOptions) -> c.count(request, requestOptions), "Unable to count documents of index.");
+        final var result = client.execute((c) -> c.count(countRequest -> countRequest
+                .index(indices.stream().toList())
+                .query(query)
+                .ignoreUnavailable(true)
+                .allowNoIndices(true)
+                .expandWildcards(ExpandWildcard.Open)), "Unable to count documents of index.");
 
-        return result.getCount();
+        return result.count();
     }
 
-    private BoolQueryBuilder buildStreamIdFilter(Optional<Set<String>> includedStreams) {
-        final BoolQueryBuilder queryBuilder = boolQuery().must(matchAllQuery());
+    private BoolQuery buildStreamIdFilter(Optional<Set<String>> includedStreams) {
+        return BoolQuery.of(queryBuilder -> {
+            queryBuilder.must(must -> must.matchAll(matchAll -> matchAll));
 
-        // If the included streams are not present, we do not filter on streams
-        if (includedStreams.isPresent()) {
-            final Set<String> streams = includedStreams.get();
-            final BoolQueryBuilder filterBuilder = boolQuery();
+            // If the included streams are not present, we do not filter on streams
+            if (includedStreams.isPresent()) {
+                final Set<String> streams = includedStreams.get();
+                final var filterBuilder = BoolQuery.of(filter -> {
 
-            // If the included streams set contains the default stream, we also want all documents which do not
-            // have any stream assigned. Those documents have basically been in the "default stream" which didn't
-            // exist in Graylog <2.2.0.
-            if (streams.contains(Stream.DEFAULT_STREAM_ID)) {
-                filterBuilder.should(boolQuery().mustNot(existsQuery(Message.FIELD_STREAMS)));
+                    // If the included streams set contains the default stream, we also want all documents which do not
+                    // have any stream assigned. Those documents have basically been in the "default stream" which didn't
+                    // exist in Graylog <2.2.0.
+                    if (streams.contains(Stream.DEFAULT_STREAM_ID)) {
+                        filter.should(shouldBuilder -> shouldBuilder.bool(bool -> bool.mustNot(mustNot -> mustNot
+                                .exists(exists -> exists.field(Message.FIELD_STREAMS)))));
+                    }
+
+                    // Only select messages which are assigned to the given streams
+                    filter.should(should -> should.terms(terms -> terms.field(Message.FIELD_STREAMS)
+                            .terms(termsField -> termsField.value(streams.stream().map(FieldValue::of).toList()))));
+                    return filter;
+                });
+
+                queryBuilder.filter(Query.of(builder -> builder.bool(filterBuilder)));
             }
-
-            // Only select messages which are assigned to the given streams
-            filterBuilder.should(termsQuery(Message.FIELD_STREAMS, streams));
-
-            queryBuilder.filter(filterBuilder);
-        }
-
-        return queryBuilder;
+            return queryBuilder;
+        });
     }
 }
