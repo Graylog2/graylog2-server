@@ -30,6 +30,7 @@ import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -49,7 +50,7 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
      * @param query the graylog query structure
      * @return a backend specific generated query
      */
-    T generate(Query query, Set<SearchError> validationErrors);
+    T generate(Query query, Set<SearchError> validationErrors, DateTimeZone timezone);
 
     StatsCollector<QueryExecutionStats> getExecutionStatsCollector();
 

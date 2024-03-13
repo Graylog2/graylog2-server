@@ -60,6 +60,7 @@ import org.graylog2.plugin.MessageSummary;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -289,7 +290,7 @@ public class AggregationEventProcessor implements EventProcessor {
 
     private void aggregatedSearch(EventFactory eventFactory, AggregationEventProcessorParameters parameters,
                                   EventConsumer<List<EventWithContext>> eventsConsumer) throws EventProcessorException {
-        final String owner = "event-processor-" + AggregationEventProcessorConfig.TYPE_NAME + "-" + eventDefinition.id();
+        final var owner = new AggregationSearch.User("event-processor-" + AggregationEventProcessorConfig.TYPE_NAME + "-" + eventDefinition.id(), DateTimeZone.UTC);
         final List<SearchType> additionalSearchTypes = eventQueryModifiers.stream()
                 .flatMap(e -> e.additionalSearchTypes(eventDefinition).stream())
                 .toList();
