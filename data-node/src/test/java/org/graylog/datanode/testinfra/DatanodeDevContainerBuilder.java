@@ -21,6 +21,7 @@ import org.graylog.datanode.configuration.OpensearchArchitecture;
 import org.graylog.testing.datanode.DatanodeDockerHooks;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
@@ -174,8 +175,17 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
                 .waitingFor(new LogMessageWaitStrategy()
                         .withRegEx(".*Graylog DataNode datanode up and running.\n")
                         .withStartupTimeout(Duration.ofSeconds(60)));
+
+        final String opensearchDistributionName = "opensearch-" + getOpensearchVersion() + "-linux-" + OpensearchArchitecture.fromOperatingSystem();
+        final Path downloadedOpensearch = getPath().resolve(Path.of("opensearch", opensearchDistributionName));
+
+        if (!Files.exists(downloadedOpensearch)) {
+            throw new RuntimeException("Failed to link opensearch distribution to the datanode docker image, path " + downloadedOpensearch.toAbsolutePath() + " does not exist!");
+        }
+
         container.withFileSystemBind(graylog.toString(), IMAGE_WORKING_DIR + "/graylog-datanode.jar")
-                .withFileSystemBind(getPath().resolve("lib").toString(), IMAGE_WORKING_DIR + "/lib/");
+                .withFileSystemBind(getPath().resolve("lib").toString(), IMAGE_WORKING_DIR + "/lib/")
+                .withFileSystemBind(downloadedOpensearch.toString(), IMAGE_WORKING_DIR + "/" + opensearchDistributionName, BindMode.READ_ONLY);
 
         customizer.ifPresent(c -> c.onContainer(container));
         return container;
@@ -192,13 +202,6 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
     }
 
     private static ImageFromDockerfile createImage() {
-        final String opensearchTarArchive = "opensearch-" + getOpensearchVersion() + "-linux-" + OpensearchArchitecture.fromOperatingSystem();
-        final Path downloadedOpensearch = getPath().resolve(Path.of("opensearch", opensearchTarArchive));
-
-        if (!Files.exists(downloadedOpensearch)) {
-            throw new RuntimeException("Failed to link opensearch distribution to the datanode docker image, path " + downloadedOpensearch.toAbsolutePath() + " does not exist!");
-        }
-
         final Path pluginsDir = getPath().resolve(Path.of("opensearch", "plugins"));
         final List<String> pluginNames = getPluginNames(pluginsDir);
         LOG.debug("Detected following opensearch plugins: " + String.join(", ", pluginNames));
@@ -207,7 +210,7 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
 
         // the following command makes the opensearch tar.gz archive accessible in the docker build context, so it can
         // be later used by the ADD command
-        image.withFileFromPath(opensearchTarArchive, downloadedOpensearch);
+        // image.withFileFromPath(opensearchTarArchive, downloadedOpensearch);
 
         // add plugin files to the docker build context, so they can be used by ADD command later
         pluginNames.forEach(pluginName -> image.withFileFromPath(pluginName, pluginsDir.resolve(pluginName)));
@@ -220,8 +223,8 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
                     .run("mkdir -p opensearch/data")
                     .run("mkdir -p opensearch/logs")
                     .run("mkdir -p config")
-                    .run("mkdir -p plugins")
-                    .add(opensearchTarArchive, "./" + opensearchTarArchive + "/"); // this will automatically extract the tar
+                    .run("mkdir -p plugins");
+            //.add(opensearchTarArchive, "./" + opensearchTarArchive + "/"); // this will automatically extract the tar
 
             pluginNames.forEach(pluginName -> {
                 fileBuilder.add(pluginName, "./plugins/" + pluginName);
