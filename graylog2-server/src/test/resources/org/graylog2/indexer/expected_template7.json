@@ -52,6 +52,10 @@
       "gl2_message_id" : {
         "type" : "keyword"
       },
+      "gl2_second_sort_field": {
+        "type": "alias",
+        "path": "gl2_message_id"
+      },
       "source" : {
         "type" : "text",
         "analyzer" : "analyzer_keyword",

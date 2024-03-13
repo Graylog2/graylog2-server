@@ -390,13 +390,10 @@
             <version>4.4</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-exec -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-exec</artifactId>
-            <version>1.4.0</version>
         </dependency>
-
 
         <dependency>
             <groupId>com.github.stateless4j</groupId>

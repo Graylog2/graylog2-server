@@ -27,7 +27,6 @@ import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
-import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.engine.monitoring.collection.NoOpStatsCollector;
 import org.graylog.plugins.views.search.searchfilters.db.UsedSearchFiltersToQueryStringsMapper;
@@ -43,6 +42,7 @@ import org.graylog.storage.elasticsearch7.views.searchtypes.ESMessageList;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
 import org.graylog2.indexer.results.TestResultMessageFactory;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -68,11 +68,10 @@ public class ElasticsearchBackendTest {
 
         usedSearchFiltersToQueryStringsMapper = mock(UsedSearchFiltersToQueryStringsMapper.class);
         doReturn(Collections.emptySet()).when(usedSearchFiltersToQueryStringsMapper).map(any());
-        final FieldTypesLookup fieldTypesLookup = mock(FieldTypesLookup.class);
         backend = new ElasticsearchBackend(handlers,
                 null,
                 mock(IndexLookup.class),
-                (elasticsearchBackend, ssb, errors) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, errors, fieldTypesLookup),
+                ViewsUtils.createTestContextFactory(),
                 usedSearchFiltersToQueryStringsMapper,
                 new NoOpStatsCollector<>(),
                 false);
@@ -85,7 +84,7 @@ public class ElasticsearchBackendTest {
                 .query(ElasticsearchQueryString.of(""))
                 .timerange(RelativeRange.create(300))
                 .build();
-        backend.generate(query, Collections.emptySet());
+        createContext(query);
     }
 
     @Test
@@ -123,7 +122,7 @@ public class ElasticsearchBackendTest {
                 .timerange(RelativeRange.create(300))
                 .build();
 
-        final ESGeneratedQueryContext queryContext = backend.generate(query, Collections.emptySet());
+        final ESGeneratedQueryContext queryContext = createContext(query);
         final QueryBuilder esQuery = queryContext.searchSourceBuilder(new SearchType.Fallback()).query();
         assertThat(esQuery)
                 .isNotNull()
@@ -142,5 +141,9 @@ public class ElasticsearchBackendTest {
                 .extracting(QueryStringQueryBuilder::queryString)
                 .contains("method:POST")
                 .contains("method:GET");
+    }
+
+    private ESGeneratedQueryContext createContext(Query query) {
+        return backend.generate(query, Collections.emptySet(), DateTimeZone.UTC);
     }
 }
