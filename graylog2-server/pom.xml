@@ -1058,10 +1058,16 @@
                         <configuration>
                             <target>
                                 <move todir="${project.build.directory}/sbom" includeemptydirs="false">
-                                    <fileset dir="${webInterface.path}/target/web/cyclonedx">
+                                    <fileset dir="${webInterface.path}/target/web/cyclonedx-core">
                                         <include name="**/bom.*"/>
                                     </fileset>
                                     <mapper type="glob" from="bom.*" to="graylog-server-${project.version}-frontend-sbom.*" />
+                                </move>
+                                <move todir="${project.build.directory}/sbom" includeemptydirs="false">
+                                    <fileset dir="${webInterface.path}/target/web/cyclonedx-vendor">
+                                        <include name="**/bom.*"/>
+                                    </fileset>
+                                    <mapper type="glob" from="bom.*" to="graylog-server-${project.version}-frontend-vendor-sbom.*" />
                                 </move>
                             </target>
                         </configuration>

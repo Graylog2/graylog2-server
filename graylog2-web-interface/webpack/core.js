@@ -206,7 +206,7 @@ const config = (target, appPath, rootPath, webInterfaceRoot, supportedBrowsers) 
           rootComponentAutodetect: false,
           rootComponentType: 'application',
           rootComponentName: 'graylog-server',
-          outputLocation: '../cyclonedx',
+          outputLocation: '../cyclonedx-core',
           includeWellknown: false,
         }),
       ],
