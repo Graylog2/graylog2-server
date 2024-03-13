@@ -183,9 +183,13 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
             throw new RuntimeException("Failed to link opensearch distribution to the datanode docker image, path " + downloadedOpensearch.toAbsolutePath() + " does not exist!");
         }
 
+        final Path pluginsDir = getPath().resolve(Path.of("opensearch", "plugins"));
+        LOG.debug("Detected following opensearch plugins: {}", String.join(", ", getPluginNames(pluginsDir)));
+
         container.withFileSystemBind(graylog.toString(), IMAGE_WORKING_DIR + "/graylog-datanode.jar")
                 .withFileSystemBind(getPath().resolve("lib").toString(), IMAGE_WORKING_DIR + "/lib/")
-                .withFileSystemBind(downloadedOpensearch.toString(), IMAGE_WORKING_DIR + "/" + opensearchDistributionName, BindMode.READ_ONLY);
+                .withFileSystemBind(downloadedOpensearch.toString(), IMAGE_WORKING_DIR + "/" + opensearchDistributionName, BindMode.READ_WRITE)
+                .withFileSystemBind(pluginsDir.toString(), IMAGE_WORKING_DIR + "/plugins", BindMode.READ_ONLY);
 
         customizer.ifPresent(c -> c.onContainer(container));
         return container;
@@ -202,14 +206,8 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
     }
 
     private static ImageFromDockerfile createImage() {
-        final Path pluginsDir = getPath().resolve(Path.of("opensearch", "plugins"));
-        final List<String> pluginNames = getPluginNames(pluginsDir);
-        LOG.debug("Detected following opensearch plugins: " + String.join(", ", pluginNames));
 
         final ImageFromDockerfile image = new ImageFromDockerfile("local/graylog-datanode:latest", false);
-
-        // add plugin files to the docker build context, so they can be used by ADD command later
-        pluginNames.forEach(pluginName -> image.withFileFromPath(pluginName, pluginsDir.resolve(pluginName)));
 
         return image.withDockerfileFromBuilder(builder ->
         {
@@ -221,9 +219,6 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
                     .run("mkdir -p config")
                     .run("mkdir -p plugins");
 
-            pluginNames.forEach(pluginName -> {
-                fileBuilder.add(pluginName, "./plugins/" + pluginName);
-            });
 
             fileBuilder.run("touch datanode.conf") // create empty configuration file, required but all config comes via env props
                     .run("useradd opensearch")
