@@ -37,7 +37,7 @@ public class DatanodeOpensearchProxyDisabledAllowlistIT {
     void testProtectedPath() {
         // this requests the /_search of the underlying opensearch. By default, it's disabled and should return HTTP 400
         // only if we disable the allowlist it should be accessible
-        final ValidatableResponse response = apis.get("/datanodes/leader/request/_search", 200);
+        final ValidatableResponse response = apis.get("/datanodes/any/request/_search", 200);
         System.out.println(response.extract().body().asString());
     }
 }
