@@ -58,7 +58,7 @@ const StyledTable = styled(Table)<{ $stickyHeader: boolean }>(({ theme, $stickyH
   }
 
   &.table-striped > tbody > tr:nth-of-type(even) > td {
-    background-color: ${theme.colors.table.background};
+    background-color: ${theme.colors.table.row.background};
   }
 
   tr {

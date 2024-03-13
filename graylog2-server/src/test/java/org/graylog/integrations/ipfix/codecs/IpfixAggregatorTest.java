@@ -28,6 +28,8 @@ import org.graylog.integrations.ipfix.IpfixMessage;
 import org.graylog.integrations.ipfix.IpfixParser;
 import org.graylog.integrations.ipfix.Utils;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.graylog2.plugin.journal.RawMessage;
@@ -57,6 +59,7 @@ import static org.assertj.core.api.Assertions.fail;
 public class IpfixAggregatorTest {
     private static final Logger LOG = LoggerFactory.getLogger(IpfixAggregatorTest.class);
     private final InetSocketAddress someAddress = InetSocketAddress.createUnresolved("192.168.1.1", 999);
+    private final MessageFactory messageFactory = new TestMessageFactory();
 
     private InformationElementDefinitions standardDefinition = new InformationElementDefinitions(
             Resources.getResource("ipfix-iana-elements.json")
@@ -106,7 +109,7 @@ public class IpfixAggregatorTest {
         final Map<String, Object> configMap = getIxiaConfigmap();
         final Configuration configuration = new Configuration(configMap);
 
-        final IpfixCodec codec = new IpfixCodec(configuration, ipfixAggregator);
+        final IpfixCodec codec = new IpfixCodec(configuration, ipfixAggregator, messageFactory);
 
         AtomicInteger messageCount = new AtomicInteger();
         try (InputStream stream = Resources.getResource("data-datatemplate.pcap").openStream()) {
@@ -142,7 +145,7 @@ public class IpfixAggregatorTest {
     public void ixFlowTest() throws IOException, URISyntaxException {
         final IpfixAggregator ipfixAggregator = new IpfixAggregator();
         final Map<String, Object> configMap = getIxiaConfigmap();
-        final IpfixCodec codec = new IpfixCodec(new Configuration(configMap), ipfixAggregator);
+        final IpfixCodec codec = new IpfixCodec(new Configuration(configMap), ipfixAggregator, messageFactory);
         final List<Message> messages = new ArrayList<>();
 
         // ixflow.pcap contains 4 packets, the first has the data templates and option templates

@@ -19,6 +19,8 @@ package org.graylog.plugins.beats;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.Resources;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -45,11 +47,12 @@ public class BeatsCodecTest {
     private Configuration configuration;
     private ObjectMapper objectMapper;
     private BeatsCodec codec;
+    private final MessageFactory messageFactory = new TestMessageFactory();
 
     @Before
     public void setUp() throws Exception {
         objectMapper = new ObjectMapperProvider().get();
-        codec = new BeatsCodec(configuration, objectMapper);
+        codec = new BeatsCodec(configuration, objectMapper, messageFactory);
     }
 
     @Test

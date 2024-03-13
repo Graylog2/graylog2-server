@@ -55,7 +55,7 @@ const StyledRow = styled(Row)<{ $hovered: boolean }>(({ theme, $hovered }) => cs
   align-items: center;
   margin: 0;
   height: ${theme.spacings.xl};
-  background-color: ${$hovered ? theme.colors.table.backgroundHover : 'transparent'};
+  background-color: ${$hovered ? theme.colors.table.row.backgroundHover : 'transparent'};
   border-left: solid 1px ${theme.colors.gray[80]};
 `);
 

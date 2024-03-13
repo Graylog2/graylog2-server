@@ -31,6 +31,8 @@ import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.BaseFragmentTest
 import org.graylog2.lookup.LookupTable;
 import org.graylog2.lookup.LookupTableService;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.lookup.LookupResult;
 import org.junit.BeforeClass;
@@ -50,6 +52,7 @@ public class V20230720161500_AddExtractorFragmentsTest extends BaseFragmentTest 
     private static LookupTableService lookupTableService;
     private static LookupTableService.Function lookupServiceFunction;
     private static LookupTable lookupTable;
+    private final MessageFactory messageFactory = new TestMessageFactory();
 
     @BeforeClass
     public static void initialize() {
@@ -81,7 +84,7 @@ public class V20230720161500_AddExtractorFragmentsTest extends BaseFragmentTest 
         RuleFragment fragment = V20230720161500_AddExtractorFragments.createCopyFieldExtractor();
         Map<String, Object> params = Map.of("field", "message", "newField", "copyfield");
         Rule rule = super.createFragmentSource(fragment, params);
-        final Message message = evaluateRule(rule, new Message("Dummy Message", "test", Tools.nowUTC()));
+        final Message message = evaluateRule(rule, messageFactory.createMessage("Dummy Message", "test", Tools.nowUTC()));
         assertThat(message.getField("copyfield")).isEqualTo("Dummy Message");
     }
 
@@ -90,7 +93,7 @@ public class V20230720161500_AddExtractorFragmentsTest extends BaseFragmentTest 
         RuleFragment fragment = V20230720161500_AddExtractorFragments.createRegexExtractor();
         Map<String, Object> params = Map.of("field", "message", "pattern", "^.*(doo...).*$", "newField", "copyfield");
         Rule rule = super.createFragmentSource(fragment, params);
-        final Message message = evaluateRule(rule, new Message("bippitysnickerdoodledoobadoo", "test", Tools.nowUTC()));
+        final Message message = evaluateRule(rule, messageFactory.createMessage("bippitysnickerdoodledoobadoo", "test", Tools.nowUTC()));
         assertThat(message.getField("copyfield")).isEqualTo("doobad");
     }
 
@@ -104,7 +107,7 @@ public class V20230720161500_AddExtractorFragmentsTest extends BaseFragmentTest 
                 "newField", "copyfield"
         );
         Rule rule = super.createFragmentSource(fragment, params);
-        Message message = evaluateRule(rule, new Message("zzzdogzzzdogzzz", "test", Tools.nowUTC()));
+        Message message = evaluateRule(rule, messageFactory.createMessage("zzzdogzzzdogzzz", "test", Tools.nowUTC()));
         assertThat(message.getField("copyfield")).isEqualTo("zzzcatzzzcatzzz");
         params = Map.of(
                 "field", "message",
@@ -114,7 +117,7 @@ public class V20230720161500_AddExtractorFragmentsTest extends BaseFragmentTest 
                 "replaceAll", false
         );
         rule = super.createFragmentSource(fragment, params);
-        message = evaluateRule(rule, new Message("zzzdogzzzdogzzz", "test", Tools.nowUTC()));
+        message = evaluateRule(rule, messageFactory.createMessage("zzzdogzzzdogzzz", "test", Tools.nowUTC()));
         assertThat(message.getField("copyfield2")).isEqualTo("zzzcatzzzdogzzz");
 
     }
@@ -129,7 +132,7 @@ public class V20230720161500_AddExtractorFragmentsTest extends BaseFragmentTest 
                 "newField", "copyfield"
         );
         Rule rule = super.createFragmentSource(fragment, params);
-        Message message = evaluateRule(rule, new Message("cat,dog,mouse", "test", Tools.nowUTC()));
+        Message message = evaluateRule(rule, messageFactory.createMessage("cat,dog,mouse", "test", Tools.nowUTC()));
         assertThat(message.getField("copyfield")).isEqualTo("dog");
     }
 
@@ -142,10 +145,10 @@ public class V20230720161500_AddExtractorFragmentsTest extends BaseFragmentTest 
                 "newField", "copyfield"
         );
         Rule rule = super.createFragmentSource(fragment, params);
-        Message message = evaluateRule(rule, new Message("ExistingKey", "test", Tools.nowUTC()));
+        Message message = evaluateRule(rule, messageFactory.createMessage("ExistingKey", "test", Tools.nowUTC()));
         assertThat(message.getField("copyfield")).isEqualTo("ThisKeysValue");
 
-        message = evaluateRule(rule, new Message("NoKey", "test", Tools.nowUTC()));
+        message = evaluateRule(rule, messageFactory.createMessage("NoKey", "test", Tools.nowUTC()));
         assertThat(message.getField("copyfield")).isNull();
     }
 

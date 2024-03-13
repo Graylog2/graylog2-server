@@ -50,6 +50,7 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
     protected GenericContainer<?> container;
 
     protected static volatile boolean isFirstContainerStart = true;
+    private boolean closed = false;
 
     @Override
     public abstract Client client();
@@ -96,7 +97,11 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
 
     @Override
     public void cleanUp() {
-        client().cleanUp();
+        if (!closed) {
+            client().cleanUp();
+        } else {
+            LOG.debug("Cleanup skipped, client already closed");
+        }
     }
 
     @Override
@@ -108,6 +113,7 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toSet()) // intermediate collect to avoid modifying the containersByVersion while we iterate over it
                 .forEach(containersByVersion::remove);
+        this.closed = true;
     }
 
     @Override
