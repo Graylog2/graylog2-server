@@ -17,9 +17,11 @@
 package org.graylog.testing.completebackend;
 
 import com.google.common.base.Stopwatch;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog2.plugin.Tools;
 import org.graylog2.storage.SearchVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,7 +87,11 @@ public class ContainerizedGraylogBackendServicesProvider implements AutoCloseabl
         private static Services create(SearchVersion searchVersion, MongodbServer mongodbVersion, boolean withMailServerEnabled, boolean withWebhookServerEnabled, List<String> enabledFeatureFlags) {
             final Network network = Network.newNetwork();
 
-            final ExecutorService executorService = Executors.newFixedThreadPool(3);
+            final ExecutorService executorService = Executors.newFixedThreadPool(3, new ThreadFactoryBuilder()
+                    .setNameFormat("container-startup-thread-%d")
+                    .setDaemon(true)
+                    .setUncaughtExceptionHandler(new Tools.LogUncaughtExceptionHandler(LOG))
+                    .build());
 
             final Future<MongoDBInstance> mongodbFuture = executorService.submit(withStopwatch(() -> MongoDBInstance.createStartedWithUniqueName(network, Lifecycle.CLASS, mongodbVersion), "MongoDB"));
             final Future<MailServerContainer> mailServerContainerFuture = executorService.submit(withStopwatch(() -> withMailServerEnabled ? MailServerContainer.createStarted(network) : null, "Mailserver"));

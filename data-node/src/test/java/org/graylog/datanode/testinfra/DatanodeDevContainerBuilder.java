@@ -208,10 +208,6 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
 
         final ImageFromDockerfile image = new ImageFromDockerfile("local/graylog-datanode:latest", false);
 
-        // the following command makes the opensearch tar.gz archive accessible in the docker build context, so it can
-        // be later used by the ADD command
-        // image.withFileFromPath(opensearchTarArchive, downloadedOpensearch);
-
         // add plugin files to the docker build context, so they can be used by ADD command later
         pluginNames.forEach(pluginName -> image.withFileFromPath(pluginName, pluginsDir.resolve(pluginName)));
 
@@ -224,7 +220,6 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
                     .run("mkdir -p opensearch/logs")
                     .run("mkdir -p config")
                     .run("mkdir -p plugins");
-            //.add(opensearchTarArchive, "./" + opensearchTarArchive + "/"); // this will automatically extract the tar
 
             pluginNames.forEach(pluginName -> {
                 fileBuilder.add(pluginName, "./plugins/" + pluginName);
