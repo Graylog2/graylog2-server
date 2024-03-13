@@ -37,6 +37,7 @@ const useRefreshPage = (searchTypeId: string, setLoadingState: React.Dispatch<Re
 };
 
 const EventsList = ({ data, config, onConfigChange, setLoadingState }: WidgetComponentProps<EventsWidgetConfig, EventsListResult>) => {
+  console.log(data);
   const [currentPage, setCurrentPage] = useState(PAGINATION.INITIAL_PAGE);
   const refreshPage = useRefreshPage(data.id, setLoadingState);
 

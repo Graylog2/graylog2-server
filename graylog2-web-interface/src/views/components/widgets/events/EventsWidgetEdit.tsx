@@ -32,11 +32,6 @@ import EventsWidgetConfig, {
   LIST_MODE,
   NUMBER_MODE,
 } from 'views/logic/widgets/events/EventsWidgetConfig';
-// import WidgetModeConfiguration from 'views/components/widgets/events/EventsWidgetEdit/WidgetModeConfiguration';
-//
-// import SortConfiguration from './SortConfiguration';
-// import ColumnsConfiguration from './ColumnsConfiguration';
-
 import WidgetModeConfiguration from 'views/components/widgets/overview-configuration/WidgetModeConfiguration';
 import ColumnsConfiguration from 'views/components/widgets/overview-configuration/ColumnsConfiguration';
 import SortConfiguration from 'views/components/widgets/overview-configuration/SortConfiguration';
