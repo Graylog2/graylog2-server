@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public interface ProxyRequestAdapter {
-    record ProxyRequest(String method, String path, InputStream body) {}
+    record ProxyRequest(String method, String path, InputStream body, String hostname) {}
 
     record ProxyResponse(int status, InputStream response, String contentType) {}
 

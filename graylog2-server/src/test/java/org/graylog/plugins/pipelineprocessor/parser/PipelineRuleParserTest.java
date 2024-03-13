@@ -58,6 +58,8 @@ import org.graylog.plugins.pipelineprocessor.parser.errors.UndeclaredVariable;
 import org.graylog.plugins.pipelineprocessor.parser.errors.WrongNumberOfArgs;
 import org.graylog2.plugin.InstantMillisProvider;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
@@ -83,6 +85,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class PipelineRuleParserTest extends BaseParserTest {
+    private MessageFactory messageFactory = new TestMessageFactory();
 
     @BeforeClass
     public static void registerFunctions() {
@@ -210,7 +213,7 @@ public class PipelineRuleParserTest extends BaseParserTest {
     @Test
     public void messageRef() throws Exception {
         final Rule rule = parseRuleWithOptionalCodegen();
-        Message message = new Message("hello test", "source", DateTime.now(DateTimeZone.UTC));
+        Message message = messageFactory.createMessage("hello test", "source", DateTime.now(DateTimeZone.UTC));
         message.addField("responseCode", 500);
         final Message processedMsg = evaluateRule(rule, message);
 
@@ -221,7 +224,7 @@ public class PipelineRuleParserTest extends BaseParserTest {
     @Test
     public void messageRefQuotedField() throws Exception {
         final Rule rule = parseRuleWithOptionalCodegen();
-        Message message = new Message("hello test", "source", DateTime.now(DateTimeZone.UTC));
+        Message message = messageFactory.createMessage("hello test", "source", DateTime.now(DateTimeZone.UTC));
         message.addField("@specialfieldname", "string");
         evaluateRule(rule, message);
 
@@ -232,7 +235,7 @@ public class PipelineRuleParserTest extends BaseParserTest {
     public void optionalArguments() throws Exception {
         final Rule rule = parseRuleWithOptionalCodegen();
 
-        Message message = new Message("hello test", "source", DateTime.now(DateTimeZone.UTC));
+        Message message = messageFactory.createMessage("hello test", "source", DateTime.now(DateTimeZone.UTC));
         evaluateRule(rule, message);
         assertTrue(actionsTriggered.get());
     }
@@ -263,7 +266,7 @@ public class PipelineRuleParserTest extends BaseParserTest {
     @Test
     public void mapArrayLiteral() {
         final Rule rule = parseRuleWithOptionalCodegen();
-        Message message = new Message("hello test", "source", DateTime.now(DateTimeZone.UTC));
+        Message message = messageFactory.createMessage("hello test", "source", DateTime.now(DateTimeZone.UTC));
         evaluateRule(rule, message);
         assertTrue(actionsTriggered.get());
     }
@@ -271,14 +274,14 @@ public class PipelineRuleParserTest extends BaseParserTest {
     @Test
     public void typedFieldAccess() throws Exception {
         final Rule rule = parseRuleWithOptionalCodegen();
-        evaluateRule(rule, new Message("hallo", "test", DateTime.now(DateTimeZone.UTC)));
+        evaluateRule(rule, messageFactory.createMessage("hallo", "test", DateTime.now(DateTimeZone.UTC)));
         assertTrue("condition should be true", actionsTriggered.get());
     }
 
     @Test
     public void nestedFieldAccess() throws Exception {
         final Rule rule = parseRuleWithOptionalCodegen();
-        evaluateRule(rule, new Message("hello", "world", DateTime.now(DateTimeZone.UTC)));
+        evaluateRule(rule, messageFactory.createMessage("hello", "world", DateTime.now(DateTimeZone.UTC)));
         assertTrue("condition should be true", actionsTriggered.get());
     }
 
@@ -306,7 +309,7 @@ public class PipelineRuleParserTest extends BaseParserTest {
     public void indexedAccess() {
         final Rule rule = parseRuleWithOptionalCodegen();
 
-        evaluateRule(rule, new Message("hallo", "test", DateTime.now(DateTimeZone.UTC)));
+        evaluateRule(rule, messageFactory.createMessage("hallo", "test", DateTime.now(DateTimeZone.UTC)));
         assertTrue("condition should be true", actionsTriggered.get());
     }
 

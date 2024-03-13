@@ -19,15 +19,15 @@ package org.graylog2.decorators;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.assistedinject.Assisted;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
+import jakarta.inject.Inject;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.decorators.SearchResponseDecorator;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
-
-import jakarta.inject.Inject;
 
 import java.util.HashMap;
 import java.util.List;
@@ -44,6 +44,7 @@ public class LinkFieldDecorator implements SearchResponseDecorator {
     private final static UrlValidator URL_VALIDATOR = new UrlValidator(new String[]{"http", "https"}, UrlValidator.ALLOW_LOCAL_URLS + UrlValidator.ALLOW_2_SLASHES);
 
     private final String linkField;
+    private final MessageFactory messageFactory;
 
     public interface Factory extends SearchResponseDecorator.Factory {
         @Override
@@ -80,9 +81,10 @@ public class LinkFieldDecorator implements SearchResponseDecorator {
     }
 
     @Inject
-    public LinkFieldDecorator(@Assisted Decorator decorator) {
+    public LinkFieldDecorator(@Assisted Decorator decorator, MessageFactory messageFactory) {
         this.linkField = (String) requireNonNull(decorator.config().get(CK_LINK_FIELD),
                 CK_LINK_FIELD + " cannot be null");
+        this.messageFactory = messageFactory;
     }
 
     @WithSpan
@@ -93,7 +95,7 @@ public class LinkFieldDecorator implements SearchResponseDecorator {
                     if (!summary.message().containsKey(linkField)) {
                         return summary;
                     }
-                    final Message message = new Message(ImmutableMap.copyOf(summary.message()));
+                    final Message message = messageFactory.createMessage(ImmutableMap.copyOf(summary.message()));
                     final String href = (String) summary.message().get(linkField);
                     if (isValidUrl(href)) {
                         final Map<String, String> decoratedField = new HashMap<>();

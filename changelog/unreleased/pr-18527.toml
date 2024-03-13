@@ -1,0 +1,6 @@
+type = "c"
+message = "Change default second sort order to gl2_second_sort_field."
+
+issues = ["18348"]
+pulls = ["18527"]
+

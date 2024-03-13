@@ -98,7 +98,7 @@ public class SearchExecutorTest {
                                 )
                         )
                 )));
-        when(queryEngine.execute(any(), any())).thenAnswer(invocation -> {
+        when(queryEngine.execute(any(), any(), any())).thenAnswer(invocation -> {
             final SearchJob searchJob = invocation.getArgument(0);
             searchJob.addQueryResultFuture("query", CompletableFuture.completedFuture(QueryResult.emptyResult()));
             searchJob.seal();
@@ -151,7 +151,7 @@ public class SearchExecutorTest {
                 .build();
         this.searchExecutor.execute("search1", searchUser, executionState);
 
-        verify(queryEngine, times(1)).execute(searchJobCaptor.capture(), anySet());
+        verify(queryEngine, times(1)).execute(searchJobCaptor.capture(), anySet(), any());
 
         final SearchJob executedJob = searchJobCaptor.getValue();
 
