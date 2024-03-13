@@ -128,6 +128,7 @@ const StyledButton = styled(MantineButton)<{
       gap: 0.25em;
       overflow: visible;
     }
+
     .mantine-Button-loader {
       visibility: hidden;
     }

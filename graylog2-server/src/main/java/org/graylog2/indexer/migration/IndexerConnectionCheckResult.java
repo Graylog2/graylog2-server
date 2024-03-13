@@ -14,23 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// eslint-disable-next-line no-restricted-imports
-import { Row as BootstrapRow } from 'react-bootstrap';
-import styled, { css } from 'styled-components';
+package org.graylog2.indexer.migration;
 
-export const RowContentStyles = css(({ theme }) => css`
-  background-color: ${theme.colors.global.contentBackground};
-  margin-bottom: ${theme.spacings.xs};
-  border-radius: 6px;
-  box-shadow: rgb(0 0 0 / 4%) 0 3px 5px;
-`);
+import java.net.MalformedURLException;
+import java.util.Collections;
+import java.util.List;
 
-type RowProps = React.ComponentProps<typeof BootstrapRow>;
-const Row: React.ComponentType<RowProps> = styled(BootstrapRow)`
-  &.content {
-    ${RowContentStyles}
-  }
-`;
+public record IndexerConnectionCheckResult(List<String> indices, String error) {
 
-/** @component */
-export default Row;
+    public static IndexerConnectionCheckResult success(List<String> indexNames) {
+        return new IndexerConnectionCheckResult(indexNames, null);
+    }
+
+    public static IndexerConnectionCheckResult failure(MalformedURLException e) {
+        return new IndexerConnectionCheckResult(Collections.emptyList(), e.getMessage());
+    }
+}
