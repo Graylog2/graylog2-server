@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.searchtypes.events;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -33,14 +34,6 @@ import java.util.Set;
 @AutoValue
 @JsonDeserialize(builder = EventSummary.Builder.class)
 public abstract class EventSummary implements CommonEventSummary {
-    private static final String FIELD_ID = "id";
-    private static final String FIELD_STREAMS = "streams";
-    private static final String FIELD_EVENT_TIMESTAMP = "timestamp";
-    private static final String FIELD_MESSAGE = "message";
-    private static final String FIELD_ALERT = "alert";
-    private static final String FIELD_EVENT_DEFINITION_ID = "event_definition_id";
-
-
     @SuppressWarnings("unchecked")
     public static EventSummary parse(Map<String, Object> rawEvent) {
         return EventSummary.builder()
@@ -50,6 +43,9 @@ public abstract class EventSummary implements CommonEventSummary {
                 .streams(ImmutableSet.copyOf((List<String>) rawEvent.get(EventDto.FIELD_SOURCE_STREAMS)))
                 .timestamp(DateTime.parse((String) rawEvent.get(EventDto.FIELD_EVENT_TIMESTAMP), Tools.ES_DATE_FORMAT_FORMATTER))
                 .eventDefinitionId((String) rawEvent.get(EventDto.FIELD_EVENT_DEFINITION_ID))
+                .priority((Integer) rawEvent.get(EventDto.FIELD_PRIORITY))
+                .eventKeys(List.copyOf((List<String>) rawEvent.get(EventDto.FIELD_KEY_TUPLE)))
+                .rawEvent(rawEvent)
                 .build();
     }
 
@@ -64,7 +60,8 @@ public abstract class EventSummary implements CommonEventSummary {
     public static abstract class Builder {
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_EventSummary.Builder();
+            return new AutoValue_EventSummary.Builder()
+                    .rawEvent(Map.of());
         }
 
         @JsonProperty(FIELD_ID)
@@ -84,6 +81,15 @@ public abstract class EventSummary implements CommonEventSummary {
 
         @JsonProperty(FIELD_EVENT_DEFINITION_ID)
         public abstract Builder eventDefinitionId(String eventDefinitionId);
+
+        @JsonProperty(FIELD_PRIORITY)
+        public abstract Builder priority(Integer priority);
+
+        @JsonProperty(FIELD_EVENT_KEYS)
+        public abstract Builder eventKeys(List<String> eventKeys);
+
+        @JsonIgnore
+        public abstract Builder rawEvent(Map<String, Object> rawEvent);
 
         public abstract EventSummary build();
     }
