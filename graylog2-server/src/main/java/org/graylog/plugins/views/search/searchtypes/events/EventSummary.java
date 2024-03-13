@@ -60,7 +60,8 @@ public abstract class EventSummary implements CommonEventSummary {
     public static abstract class Builder {
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_EventSummary.Builder();
+            return new AutoValue_EventSummary.Builder()
+                    .rawEvent(Map.of());
         }
 
         @JsonProperty(FIELD_ID)
