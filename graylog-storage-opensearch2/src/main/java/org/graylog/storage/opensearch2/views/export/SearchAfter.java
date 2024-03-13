@@ -17,22 +17,21 @@
 package org.graylog.storage.opensearch2.views.export;
 
 import com.google.common.collect.Streams;
+import jakarta.inject.Inject;
 import org.graylog.plugins.views.search.export.ExportMessagesCommand;
-import org.graylog2.plugin.Message;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.search.SearchHit;
 import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.sort.SortOrder;
-
-import jakarta.inject.Inject;
+import org.graylog2.plugin.Message;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class SearchAfter implements RequestStrategy {
 
-    static final String DEFAULT_TIEBREAKER_FIELD = Message.FIELD_GL2_MESSAGE_ID;
+    static final String DEFAULT_TIEBREAKER_FIELD = Message.GL2_SECOND_SORT_FIELD;
     static final String EVENTS_TIEBREAKER_FIELD = Message.FIELD_ID;
 
     private final ExportClient client;

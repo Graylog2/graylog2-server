@@ -46,6 +46,7 @@ import org.graylog.plugins.views.storage.migration.DatanodeMigrationBindings;
 import org.graylog.scheduler.JobSchedulerConfiguration;
 import org.graylog.scheduler.JobSchedulerModule;
 import org.graylog.security.SecurityModule;
+import org.graylog.security.certutil.CaModule;
 import org.graylog.tracing.TracingModule;
 import org.graylog2.Configuration;
 import org.graylog2.alerts.AlertConditionBindings;
@@ -211,7 +212,8 @@ public class Server extends ServerBootstrap {
                 new StreamsModule(),
                 new TracingModule(),
                 new DataTieringModule(),
-                new DatanodeMigrationBindings()
+                new DatanodeMigrationBindings(),
+                new CaModule()
         );
 
         if (featureFlags.isOn(FIELD_TYPES_MANAGEMENT_FEATURE)) {
