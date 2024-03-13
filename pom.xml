@@ -665,7 +665,6 @@
                                         <exclude>software.amazon.awssdk:bundle</exclude>
                                         <!-- Ban some javax dependencies after the move to jakarta -->
                                         <exclude>javax.inject:*</exclude>
-                                        <exclude>javax.validation:*</exclude>
                                         <exclude>javax.ws.rs:javax.*</exclude>
                                         <exclude>com.fasterxml.jackson.jaxrs:*</exclude>
                                     </excludes>
@@ -833,6 +832,9 @@
                             javax.annotation.PreDestroy
                             javax.annotation.Priority
                             javax.annotation.PostConstruct
+
+                            @defaultMessage Use jakarta.validation.
+                            javax.validation.**
                         ]]>
 
                     </signatures>
