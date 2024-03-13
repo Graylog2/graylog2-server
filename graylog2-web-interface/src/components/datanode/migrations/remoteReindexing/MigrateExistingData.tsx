@@ -15,17 +15,40 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useState } from 'react';
 import { Formik, Form } from 'formik';
 
-import { Input } from 'components/bootstrap';
+import { Alert, Input } from 'components/bootstrap';
 
 import type { RemoteReindexRequest } from '../../hooks/useRemoteReindexMigrationStatus';
-import type { MigrationStepComponentProps } from '../../Types';
+import type { MigrationActions, MigrationStepComponentProps, StepArgs } from '../../Types';
 import MigrationStepTriggerButtonToolbar from '../common/MigrationStepTriggerButtonToolbar';
 
+export type RemoteReindexCheckConnection = {
+  indices: string[],
+  error: any,
+}
+
 const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => {
+  const [nextSteps, setNextSteps] = useState<MigrationActions[]>(['CHECK_REMOTE_INDEXER_CONNECTION']);
+  const [errorMessage, setErrrorMessage] = useState<string|null>(null);
+  const [indices, setIndices] = useState<string[]|undefined>(undefined);
+
+  const handleTriggerNextStep = async (step: MigrationActions, args?: StepArgs) => {
+    setErrrorMessage(null);
+    return onTriggerStep(step, args).then((data) => {
+      if (step === 'CHECK_REMOTE_INDEXER_CONNECTION') {
+        const checkConnectionResult = data?.response as RemoteReindexCheckConnection;
+        setIndices(checkConnectionResult?.indices)
+      }
+
+      return data;
+    }).catch((error) => setErrrorMessage(error?.message))
+  };
+
+
   const initialValues: RemoteReindexRequest = {
-    hostname: '',
+    hostname: 'http://localhost:9201/',
     user: '',
     password: '',
     synchronous: false,
@@ -61,7 +84,15 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
                  type="password"
                  value={values.password}
                  onChange={handleChange} />
-          <MigrationStepTriggerButtonToolbar nextSteps={currentStep.next_steps} onTriggerStep={onTriggerStep} args={values} />
+          {indices?.map((index) => (
+            <Input type="checkbox"
+                   key={index}
+                   name={index}
+                   id={index}
+                   label={index} />
+          ))}
+          {errorMessage && <Alert bsStyle="danger">{errorMessage}</Alert>}
+          <MigrationStepTriggerButtonToolbar nextSteps={nextSteps || currentStep.next_steps} onTriggerStep={handleTriggerNextStep} args={values} />
         </Form>
       )}
     </Formik>
