@@ -56,6 +56,7 @@ import useUserDateTime from 'hooks/useUserDateTime';
 import type { EventDefinition } from 'components/event-definitions/event-definition-types';
 import type { Stream } from 'stores/streams/StreamsStore';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
+import { indicesInWarmTier, isSearchingWarmTier } from 'views/components/searchbar/queryvalidation/warmTierValidation';
 
 import EditQueryParameterModal from '../event-definition-form/EditQueryParameterModal';
 import commonStyles from '../common/commonStyles.css';
@@ -97,8 +98,7 @@ const FilterForm = ({
   const { userTimezone } = useUserDateTime();
   const { setFieldWarning, warnings } = useContext(FormWarningsContext);
   const validationState = (warnings?.queryString) as QueryValidationState;
-  const rangesInWarmTier = validationState?.context?.searched_index_ranges?.filter((range) => range.is_warm_tiered);
-  const searchesWarmTier = rangesInWarmTier?.length > 0;
+  const warmTierRanges = indicesInWarmTier(validationState);
 
   const { tables } = useStore(LookupTablesStore);
   const { pathname } = useLocation();
@@ -379,7 +379,7 @@ const FilterForm = ({
   };
 
   const warmTierTimeStamp = () => {
-    const latestWarmTierRangeEnd = rangesInWarmTier.map((range) => range.end).sort((a, b) => b - a)[0];
+    const latestWarmTierRangeEnd = warmTierRanges.map((range) => range.end).sort((a, b) => b - a)[0];
 
     return <RelativeTime dateTime={latestWarmTierRangeEnd} />;
   };
@@ -394,7 +394,7 @@ const FilterForm = ({
     <fieldset>
       <h2 className={commonStyles.title}>Filter</h2>
       <p>Add information to filter the log messages that are relevant for this Event Definition.</p>
-      {searchesWarmTier && (
+      {isSearchingWarmTier(warmTierRanges) && (
       <Alert bsStyle="danger" title="Warm Tier Warning">
         The selected time range will include data stored in the Warm Tier. Events that must frequently retrieve data from the Warm Tier may cause performance problems.
         A value for <strong>Search within the last</strong> exceeding the following duration will fall into the Warm Tier: {warmTierTimeStamp()}.
