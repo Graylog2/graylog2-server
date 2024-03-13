@@ -20,7 +20,6 @@ const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const merge = require('webpack-merge');
-const { CycloneDxWebpackPlugin } = require('@cyclonedx/webpack-plugin');
 
 const supportedBrowsers = require('./supportedBrowsers');
 const core = require('./webpack/core');
@@ -102,15 +101,6 @@ const webpackConfig = merge.smart(coreConfig, {
         pluginNames: () => global.pluginNames,
       },
       chunksSortMode: core.sortChunks,
-    }),
-    // Create SBOM files for graylog-server frontend dependencies.
-    new CycloneDxWebpackPlugin({
-      specVersion: '1.5',
-      rootComponentAutodetect: false,
-      rootComponentType: 'application',
-      rootComponentName: 'graylog-server',
-      outputLocation: '../cyclonedx',
-      includeWellknown: false,
     }),
   ],
 });
