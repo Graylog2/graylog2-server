@@ -32,6 +32,9 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
     indices: [],
   };
 
+  // first only show checkConnection then save a state that was successfull, reset that if any field was changed
+  // you can show the list of indicies with checkboxes selected then show the migrate button
+
   return (
     <Formik initialValues={initialValues} onSubmit={() => {}}>
       {({
