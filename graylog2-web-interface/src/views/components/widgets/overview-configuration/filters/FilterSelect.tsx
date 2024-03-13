@@ -75,9 +75,8 @@ const FilterSelect = ({ filterComponents, columnTitle, onCreate, selectedFilters
     onSubmit(selectedColumn, createValue);
   };
 
-  const onChange = (newValue: unknown, shouldSubmit = false) => {
+  const onChange = (newValue: unknown, shouldSubmit = true) => {
     const normalizedValue = filterComponent?.valueForConfig?.(newValue) ?? newValue as string;
-    console.log(normalizedValue, newValue);
 
     if (shouldSubmit) {
       onSubmit(selectedColumn, normalizedValue);
@@ -85,8 +84,6 @@ const FilterSelect = ({ filterComponents, columnTitle, onCreate, selectedFilters
       setCreateValue(normalizedValue);
     }
   };
-
-  console.log(container?.current?.offsetWidth);
 
   return (
     <Container ref={container}>

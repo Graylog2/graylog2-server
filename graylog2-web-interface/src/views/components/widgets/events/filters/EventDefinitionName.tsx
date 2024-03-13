@@ -22,7 +22,7 @@ import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'preflight/util/UserNotification';
 import { Spinner } from 'components/common';
-import { LinkContainer, Link } from 'components/common/router';
+import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 
 export const fetchEventDefinitionDetails = async (eventDefinitionId: string): Promise<EventDefinition> => (

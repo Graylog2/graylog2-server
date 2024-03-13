@@ -15,8 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-const EventTypeFilter = () => {
+type Props = {
+  value: string,
+  onSelect: (value: string) => void,
+}
 
-};
+const OwnerFilter = ({ value, onSelect }: Props) => <div onClick={() => onSelect('')}>{value}</div>;
 
-export default EventTypeFilter;
+export default OwnerFilter;

@@ -26,7 +26,7 @@ const FilterEditButton = ({ filterComponent, column, value, columnTitle, onEdit,
     setOpen(false);
   };
 
-  const onChange = (newValue: unknown, shouldSubmit = false) => {
+  const onChange = (newValue: unknown, shouldSubmit = true) => {
     const normalizedValue = filterComponent?.valueForConfig?.(newValue) ?? newValue as string;
     setEditValue(normalizedValue);
 
@@ -60,7 +60,7 @@ const FilterEditButton = ({ filterComponent, column, value, columnTitle, onEdit,
                     onClick={() => setOpen(true)} />
       </Menu.Target>
       <Menu.Dropdown>
-        {filterComponent?.configuration(selectedValues, filterComponent.valueFromConfig?.(value) ?? value, onChange)}
+        {filterComponent.configuration(selectedValues, filterComponent.valueFromConfig?.(value) ?? value, onChange)}
       </Menu.Dropdown>
     </Menu>
   );

@@ -19,28 +19,30 @@ import * as React from 'react';
 import EventDefinitionName from 'views/components/widgets/events/filters/EventDefinitionName';
 import EventDefinitionFilter from 'views/components/widgets/events/filters/EventDefinitionFilter';
 import EventTypeFilter from 'views/components/widgets/events/filters/EventTypeFilter';
+import DateFilter from 'views/components/widgets/overview-configuration/filters/DateFilter';
 
 const filterComponents = [
   {
-    configuration: (selectedValues, editValue: string, onChange: (newValue: string, shouldSubmit: boolean) => void) => (
-      <EventDefinitionFilter value={editValue} onSelect={(newValue) => onChange(newValue, true)} selectedValues={selectedValues} />
+    configuration: (selectedValues, editValue: string, onChange: (newValue: string) => void) => (
+      <EventDefinitionFilter value={editValue} onSelect={(newValue) => onChange(newValue)} selectedValues={selectedValues} />
     ),
     attribute: 'event_definition_id',
     renderValue: (value) => <EventDefinitionName eventDefinitionId={value} />,
   },
   {
     attribute: 'alert',
-    configuration: (selectedValues, editValue: string, onChange: (newValue: string, shouldSubmit: boolean) => void) => (
-      <EventTypeFilter value={editValue} onSelect={(newValue) => onChange(newValue, true)} selectedValues={selectedValues} />
+    configuration: (_selectedValues, editValue: string, onChange: (newValue: string) => void) => (
+      <EventTypeFilter value={editValue} onSelect={(newValue) => onChange(newValue)} />
     ),
   },
   {
     attribute: 'timestamp',
-    configuration: () => <div />,
+    configuration: (_selectedValues, editValue: Array<string>, onChange: (newValue: Array<string>, shouldSubmit: boolean) => void) => (
+      <DateFilter values={editValue} onChange={(newValue) => onChange(newValue, false)} />
+    ),
+    valueFromConfig: (value: string) => (value ? value.split(',') : []),
+    renderValue: (values: string) => values.replace(',', ' to '),
   },
-  // {
-  //   attribute: 'streams',
-  // }
 ];
 
 export default filterComponents;
