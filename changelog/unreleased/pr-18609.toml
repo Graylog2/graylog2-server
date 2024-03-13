@@ -1,0 +1,5 @@
+type = "c"
+message = "Modified default values for min and max shard size for Time-Size-Optimizing rotation strategy to better match typical node resourcing."
+
+pulls = ["18609"]
+issues = ["Graylog2/graylog-plugin-enterprise/issues/6611"]
