@@ -53,12 +53,11 @@ public class OSEventList implements EventListStrategy {
             filterQueries.forEach(filterQuery -> boolQueryBuilder.filter(QueryBuilders.queryStringQuery(filterQuery)));
         }
 
-        searchSourceBuilder.size(10000);
-        eventList.page().ifPresent(page -> {
+        eventList.page().ifPresentOrElse(page -> {
             final var pageSize = eventList.perPage().orElse(EventList.DEFAULT_PAGE_SIZE);
             searchSourceBuilder.size(pageSize);
-            searchSourceBuilder.from(page * pageSize);
-        });
+            searchSourceBuilder.from((page - 1) * pageSize);
+        }, () -> searchSourceBuilder.size(10000));
     }
 
     private SortOrder toSortOrder(EventList.Direction direction) {
