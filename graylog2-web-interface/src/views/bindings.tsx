@@ -426,9 +426,7 @@ const exports: PluginExports = {
     },
   ],
   'views.reducers': viewsReducers,
-  'views.elements.validationErrorExplanation': [(props) => (
-    <WarmTierQueryValidation {...props} />
-  )],
+  'views.elements.validationErrorExplanation': [WarmTierQueryValidation],
 };
 
 export default exports;
