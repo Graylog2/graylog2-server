@@ -46,6 +46,7 @@ public class KeyValue extends AbstractFunction<Map<String, String>> {
     private final ParameterDescriptor<String, String> duplicateHandlingParam;
     private final ParameterDescriptor<String, CharMatcher> trimCharactersParam;
     private final ParameterDescriptor<String, CharMatcher> trimValueCharactersParam;
+    private final ParameterDescriptor<String, CharMatcher> removeValueCharactersParam;
 
     public KeyValue() {
         valueParam = string("value").description("The string to extract key/value pairs from").build();
@@ -64,6 +65,11 @@ public class KeyValue extends AbstractFunction<Map<String, String>> {
                 .transform(CharMatcher::anyOf)
                 .optional()
                 .description("The characters to trim from values, default is not to trim")
+                .build();
+        removeValueCharactersParam = string("remove_value_chars", CharMatcher.class)
+                .transform(CharMatcher::anyOf)
+                .optional()
+                .description("The characters to remove from values, default is not to remove any")
                 .build();
     }
 
@@ -85,12 +91,13 @@ public class KeyValue extends AbstractFunction<Map<String, String>> {
                 .limit(2)
                 .trimResults();
         return new MapSplitter(outerSplitter,
-                               entrySplitter,
-                               ignoreEmptyValuesParam.optional(args, context).orElse(true),
-                               trimCharactersParam.optional(args, context).orElse(CharMatcher.none()),
-                               trimValueCharactersParam.optional(args, context).orElse(CharMatcher.none()),
-                               allowDupeKeysParam.optional(args, context).orElse(true),
-                               duplicateHandlingParam.optional(args, context).orElse("take_first"))
+                entrySplitter,
+                ignoreEmptyValuesParam.optional(args, context).orElse(true),
+                trimCharactersParam.optional(args, context).orElse(CharMatcher.none()),
+                trimValueCharactersParam.optional(args, context).orElse(CharMatcher.none()),
+                removeValueCharactersParam.optional(args, context).orElse(CharMatcher.none()),
+                allowDupeKeysParam.optional(args, context).orElse(true),
+                duplicateHandlingParam.optional(args, context).orElse("take_first"))
                 .split(value);
     }
 
@@ -107,7 +114,8 @@ public class KeyValue extends AbstractFunction<Map<String, String>> {
                         allowDupeKeysParam,
                         duplicateHandlingParam,
                         trimCharactersParam,
-                        trimValueCharactersParam
+                        trimValueCharactersParam,
+                        removeValueCharactersParam
                 )
                 .description("Extracts key/value pairs from a string")
                 .ruleBuilderEnabled()
@@ -121,6 +129,7 @@ public class KeyValue extends AbstractFunction<Map<String, String>> {
         private final char wrapperChar;
 
         private boolean inWrapper = false;
+        private boolean isEscaped = false;
 
         /**
          * An implementation that doesn't split when the given delimiter char matcher appears in double or single quotes.
@@ -140,9 +149,14 @@ public class KeyValue extends AbstractFunction<Map<String, String>> {
 
         @Override
         public boolean matches(char c) {
-            if (wrapperChar == c) {
+            if (c == '\\') {
+                isEscaped = true; // Remember escape status for the upcoming char
+                return true;
+            }
+            if (wrapperChar == c && !isEscaped) {
                 inWrapper = !inWrapper;
             }
+            isEscaped = false; // Clear escape status
             return !inWrapper;
         }
     }
@@ -154,6 +168,7 @@ public class KeyValue extends AbstractFunction<Map<String, String>> {
         private final boolean ignoreEmptyValues;
         private final CharMatcher keyTrimMatcher;
         private final CharMatcher valueTrimMatcher;
+        private final CharMatcher valueRemoveMatcher;
         private final Boolean allowDupeKeys;
         private final String duplicateHandling;
 
@@ -162,6 +177,7 @@ public class KeyValue extends AbstractFunction<Map<String, String>> {
                     boolean ignoreEmptyValues,
                     CharMatcher keyTrimMatcher,
                     CharMatcher valueTrimMatcher,
+                    CharMatcher valueRemoveMatcher,
                     Boolean allowDupeKeys,
                     String duplicateHandling) {
             this.outerSplitter = outerSplitter;
@@ -169,6 +185,7 @@ public class KeyValue extends AbstractFunction<Map<String, String>> {
             this.ignoreEmptyValues = ignoreEmptyValues;
             this.keyTrimMatcher = keyTrimMatcher;
             this.valueTrimMatcher = valueTrimMatcher;
+            this.valueRemoveMatcher = valueRemoveMatcher;
             this.allowDupeKeys = allowDupeKeys;
             this.duplicateHandling = duplicateHandling;
         }
@@ -204,7 +221,7 @@ public class KeyValue extends AbstractFunction<Map<String, String>> {
 
                 if (entryFields.hasNext()) {
                     String value = entryFields.next();
-                    value = valueTrimMatcher.trimFrom(value);
+                    value = valueRemoveMatcher.removeFrom(valueTrimMatcher.trimFrom(value));
                     // already have a value, concating old+delim+new
                     if (concat) {
                         value = map.get(key) + duplicateHandling + value;

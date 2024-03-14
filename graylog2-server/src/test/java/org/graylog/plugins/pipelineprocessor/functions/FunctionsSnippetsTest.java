@@ -1127,6 +1127,8 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("spacequote5")).isEqualTo("a space 'quote'");
         assertThat(message.getField("spacequote6")).isEqualTo("a space \"quote\"");
         assertThat(message.getField("spacequote7")).isEqualTo("it's a space 'quote'");
+        assertThat(message.getField("spacequote8")).isEqualTo("it's a \"space quote\" with quotes");
+        assertThat(message.getField("spacequote9")).isEqualTo("it's a \\\"space quote\\\" with quotes");
 
         assertThat(message.getField("sq1")).isEqualTo("a");
         assertThat(message.getField("sq2")).isEqualTo("b");

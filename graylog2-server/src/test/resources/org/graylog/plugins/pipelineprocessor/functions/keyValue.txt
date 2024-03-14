@@ -48,6 +48,15 @@ then
         trim_value_chars: "\""
     ));
     set_fields(key_value(
+        value: "spacequote8=\"it's a \\\"space quote\\\" with quotes\"",
+        trim_value_chars: "\"",
+        remove_value_chars: "\\"
+    ));
+    set_fields(key_value(
+        value: "spacequote9=\"it's a \\\"space quote\\\" with quotes\"",
+        trim_value_chars: "\""
+    ));
+    set_fields(key_value(
         value: "sq1=\" a \" sq2=\" b\" sq3=' c  ' sq4=\" ' d ' \" sq5=' \" e\" ' sq6='it\"s a space'",
         trim_value_chars: "\"'"
     ));
