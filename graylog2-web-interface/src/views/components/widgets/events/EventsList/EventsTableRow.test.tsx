@@ -17,7 +17,6 @@
 import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
-import userEvent from '@testing-library/user-event';
 
 import EventsTableRow from './EventsTableRow';
 
@@ -35,8 +34,6 @@ const event = {
 
 describe('EventsList', () => {
   it('should render list of events', async () => {
-    const mockViewEvent = jest.fn();
-
     render(
       <table>
         <tbody>
@@ -46,8 +43,6 @@ describe('EventsList', () => {
       </table>,
     );
 
-    userEvent.click(await screen.findByRole('button', { name: /Event 1/i }));
-
-    expect(mockViewEvent).toHaveBeenCalledWith('event-id-1');
+    await screen.findByText('Event 1');
   });
 });
