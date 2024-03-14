@@ -80,7 +80,7 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
   };
 
   const getInitialValues = (indices: string[] = availableIndices || []): RemoteReindexRequest => ({
-    hostname: 'http://localhost:9201/',
+    hostname: '',
     user: '',
     password: '',
     synchronous: false,
