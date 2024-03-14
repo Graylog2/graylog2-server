@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { useCallback, useState } from 'react';
+import styled from 'styled-components';
 
 import type { WidgetComponentProps } from 'views/types';
 import { PaginatedList } from 'components/common';
@@ -13,6 +14,14 @@ import type EventsWidgetSortConfig from 'views/logic/widgets/events/EventsWidget
 import EventsTable from './EventsTable';
 
 import { PAGINATION } from '../Constants';
+
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: auto;
+  height: 100%;
+`;
 
 const useRefreshPage = (searchTypeId: string, setLoadingState: React.Dispatch<React.SetStateAction<boolean>>) => {
   const dispatch = useAppDispatch();
@@ -53,17 +62,19 @@ const EventsList = ({ data, config, onConfigChange, setLoadingState }: WidgetCom
   }, [config, onConfigChange]);
 
   return (
-    <PaginatedList onChange={handlePageChange}
-                   useQueryParameter={false}
-                   activePage={currentPage}
-                   pageSize={PAGINATION.PER_PAGE}
-                   showPageSizeSelect={false}
-                   totalItems={data.totalResults ?? 0}>
-      <EventsTable config={config}
-                   setLoadingState={setLoadingState}
-                   onSortChange={onSortChange}
-                   events={data.events} />
-    </PaginatedList>
+    <Container>
+      <PaginatedList onChange={handlePageChange}
+                     useQueryParameter={false}
+                     activePage={currentPage}
+                     pageSize={PAGINATION.PER_PAGE}
+                     showPageSizeSelect={false}
+                     totalItems={data.totalResults ?? 0}>
+        <EventsTable config={config}
+                     setLoadingState={setLoadingState}
+                     onSortChange={onSortChange}
+                     events={data.events} />
+      </PaginatedList>
+    </Container>
   );
 };
 

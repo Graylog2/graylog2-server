@@ -4,8 +4,8 @@ import styled, { css } from 'styled-components';
 
 import IfInteractive from 'views/components/dashboard/IfInteractive';
 import type { EventListItem } from 'views/components/widgets/events/types';
-import usePluginEntities from 'hooks/usePluginEntities';
 import RowActions from 'views/components/widgets/events/EventsList/RowActions';
+import useEventAttributes from 'views/components/widgets/events/hooks/useEventAttributes';
 
 const Td = styled.td(({ theme }) => css`
   && {
@@ -19,7 +19,7 @@ type Props = {
 }
 
 const EventsTableRow = ({ event, fields }: Props) => {
-  const eventAttributes = usePluginEntities('views.components.widgets.events.attributes');
+  const eventAttributes = useEventAttributes();
 
   return (
     <tr key={event.id}>

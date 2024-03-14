@@ -20,7 +20,7 @@ import { useState, useRef } from 'react';
 import { IconButton, ModalSubmit } from 'components/common';
 import { ButtonToolbar, Modal, Menu, MenuItem } from 'components/bootstrap';
 import usePluginEntities from 'hooks/usePluginEntities';
-import LinkToReplaySearch from 'components/event-definitions/replay-search/LinkToReplaySearch';
+import Routes from 'routing/Routes';
 
 import EventDetails from './EventDetails';
 
@@ -59,8 +59,8 @@ const RowActions = ({ eventId, hasReplayInfo }: Props) => {
 
   const moreActions = [
     hasReplayInfo ? (
-      <MenuItem>
-        <LinkToReplaySearch id={eventId} isEvent />
+      <MenuItem href={Routes.ALERTS.replay_search(eventId)} target="_blank">
+        Replay search
       </MenuItem>
     ) : null,
     pluggableActions.length ? pluggableActions : null,
