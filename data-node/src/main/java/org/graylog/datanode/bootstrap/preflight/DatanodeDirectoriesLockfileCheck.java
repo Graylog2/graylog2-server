@@ -60,14 +60,7 @@ public class DatanodeDirectoriesLockfileCheck implements PreflightCheck {
     @Override
     public void runCheck() throws PreflightCheckException {
         checkDatanodeLock(directories.getConfigurationTargetDir());
-        checkDirectoryExists(directories.getDataTargetDir());
         checkDatanodeLock(directories.getLogsTargetDir());
-    }
-
-    private void checkDirectoryExists(Path dir) {
-        if (!dir.toFile().exists()) {
-            throw new DatanodeDirectoryException("Directory does not exist: " + dir.toUri());
-        }
     }
 
     public void checkDatanodeLock(Path dir) {

@@ -83,14 +83,4 @@ class DatanodeDirectoriesLockfileCheckTest {
                 .hasMessageContaining("locked for datanode 5ca1ab1e-0000-4000-a000-000000000001, access with datanode 5ca1ab1e-0000-4000-a000-000000000000 rejected");
     }
 
-    @Test
-    void testInvalidDataDirectory(@TempDir Path logsDir,
-                                  @TempDir Path configDir) {
-        final Path dataDir = logsDir.resolve("doesntexist");
-        final PreflightCheck check = new DatanodeDirectoriesLockfileCheck(VALID_NODE_ID, new DatanodeDirectories(dataDir, logsDir, null, configDir, null));
-        Assertions.assertThatThrownBy(check::runCheck)
-                .isInstanceOf(DatanodeDirectoryException.class)
-                .hasMessageStartingWith("Directory does not exist:");
-    }
-
 }
