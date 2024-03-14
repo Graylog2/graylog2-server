@@ -64,6 +64,7 @@ describe('AreaVisualization', () => {
     const wrapper = mount(<AreaVisualization config={config}
                                              data={simpleChartData}
                                              effectiveTimerange={effectiveTimerange}
+                                             setLoadingState={() => {}}
                                              fields={Immutable.List()}
                                              height={1024}
                                              onChange={() => {}}
