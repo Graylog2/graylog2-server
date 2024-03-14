@@ -162,11 +162,17 @@ public class ClusterAdapterOS2 implements ClusterAdapter {
         var current = settings.get(firstKey).toJson();
 
         for (String curKey : keyPath.subList(1, keyPath.size() - 1)) {
+            if (current == null) {
+                return null;
+            }
             current = current.asJsonObject().get(curKey);
         }
 
         final var lastKey = keyPath.get(keyPath.size() - 1);
 
+        if (current == null) {
+            return null;
+        }
         return current.asJsonObject().getString(lastKey, null);
     }
 
