@@ -16,29 +16,26 @@
  */
 package org.graylog2.migrations;
 
-import org.graylog2.shared.security.RestPermissions;
-
 import jakarta.inject.Inject;
 
 import java.time.ZonedDateTime;
-import java.util.Set;
 
-public class V20230905081400_CreateFieldTypeMappingsManagerRole extends Migration {
-    private final MigrationHelpers helpers;
+public class V20240312140000_RemoveFieldTypeMappingsManagerRole extends Migration {
+
+    private final MigrationHelpers migrationHelpers;
 
     @Inject
-    public V20230905081400_CreateFieldTypeMappingsManagerRole(MigrationHelpers migrationHelpers) {
-        this.helpers = migrationHelpers;
+    public V20240312140000_RemoveFieldTypeMappingsManagerRole(final MigrationHelpers migrationHelpers) {
+        this.migrationHelpers = migrationHelpers;
     }
 
     @Override
     public ZonedDateTime createdAt() {
-        return ZonedDateTime.parse("2023-09-05T08:14:00Z");
+        return ZonedDateTime.parse("2024-03-12T14:00:00Z");
     }
 
     @Override
     public void upgrade() {
-        helpers.ensureBuiltinRole("Field Type Mappings Manager", "Grants full control over custom field type mappings for all index sets (built-in)",
-                Set.of(RestPermissions.TYPE_MAPPINGS_CREATE, RestPermissions.TYPE_MAPPINGS_DELETE, RestPermissions.TYPE_MAPPINGS_EDIT, RestPermissions.TYPE_MAPPINGS_READ));
+        migrationHelpers.removeBuiltinRole("Field Type Mappings Manager");
     }
 }

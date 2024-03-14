@@ -68,5 +68,6 @@ public class MigrationsModule extends PluginModule {
         addMigration(V20230531135500_MigrateRemoveObsoleteItemsFromGrantsCollection.class);
         addMigration(V20230601104500_AddSourcesPageV2.class);
         addMigration(V20230904073300_MigrateThemePreferences.class);
+        addMigration(V20240312140000_RemoveFieldTypeMappingsManagerRole.class);
     }
 }
