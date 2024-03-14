@@ -25,17 +25,19 @@ const EventsTableRow = ({ event, fields }: Props) => {
     <tr key={event.id}>
       {fields.toArray().map((field) => {
         const value = event[field];
-        const columnRenderer = (value: string) => eventAttributes.find(({ attribute }) => attribute === field)?.displayValue?.(value) ?? value;
+        const columnRenderer = (val: string) => eventAttributes.find(
+          ({ attribute }) => attribute === field,
+        )?.displayValue?.(val) ?? val;
 
         return (
           <Td key={field}>
-            {columnRenderer ? columnRenderer(value) : value}
+            {columnRenderer(value)}
           </Td>
         );
       })}
       <IfInteractive>
         <Td>
-          <RowActions eventId={event.id} />
+          <RowActions eventId={event.id} hasReplayInfo={!!event.replay_info} />
         </Td>
       </IfInteractive>
     </tr>

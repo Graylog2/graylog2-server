@@ -26,18 +26,7 @@ import type { Event, EventDefinitionContext } from 'components/events/events/typ
 import EventFields from 'components/events/events/EventFields';
 import EventDefinitionLink from 'components/event-definitions/event-definitions/EventDefinitionLink';
 import LinkToReplaySearch from 'components/event-definitions/replay-search/LinkToReplaySearch';
-
-const usePluggableEventActions = (event: Event) => {
-  const pluggableEventActions = usePluginEntities('views.components.eventActions');
-
-  return pluggableEventActions.filter(
-    (perspective) => (perspective.useCondition ? !!perspective.useCondition() : true),
-  ).map(
-    ({ component: PluggableEventAction, key }) => (
-      <PluggableEventAction key={key} event={event} />
-    ),
-  );
-};
+import usePluggableEventActions from 'components/events/events/hooks/usePluggableEventActions';
 
 type Props = {
   event: Event,
@@ -46,7 +35,7 @@ type Props = {
 
 const EventDetails = ({ event, eventDefinitionContext }: Props) => {
   const eventDefinitionTypes = usePluginEntities('eventDefinitionTypes');
-  const pluggableActions = usePluggableEventActions(event);
+  const pluggableActions = usePluggableEventActions(event.id);
 
   const plugin = useMemo(() => {
     if (event.event_definition_type === undefined) {

@@ -9,6 +9,12 @@ export type EventListItem = {
   priority: number,
   status: string | null,
   updated_at: string,
+  replay_info: {
+    timerange_start: string,
+    timerange_end: string,
+    query: string,
+    streams: Array<string>,
+  },
 }
 
 export type AttributeFilter = {
