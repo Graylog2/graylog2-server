@@ -19,6 +19,7 @@ package org.graylog2.indexer.indices.jobs;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import jakarta.inject.Named;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
@@ -26,22 +27,14 @@ import org.graylog2.system.jobs.SystemJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Named;
-
 public class OptimizeIndexJob extends SystemJob {
-    public interface Factory {
-        OptimizeIndexJob create(String index, int maxNumSegments);
-    }
-
     private static final Logger LOG = LoggerFactory.getLogger(OptimizeIndexJob.class);
-
     private final Indices indices;
     private final ActivityWriter activityWriter;
     private final Duration indexOptimizationTimeout;
     private final int indexOptimizationJobs;
     private final String index;
     private final int maxNumSegments;
-
     @AssistedInject
     public OptimizeIndexJob(Indices indices,
                             ActivityWriter activityWriter,
@@ -55,6 +48,10 @@ public class OptimizeIndexJob extends SystemJob {
         this.indexOptimizationJobs = indexOptimizationJobs;
         this.index = index;
         this.maxNumSegments = maxNumSegments;
+    }
+
+    public String getIndex() {
+        return index;
     }
 
     @Override
@@ -112,5 +109,9 @@ public class OptimizeIndexJob extends SystemJob {
     @Override
     public String getInfo() {
         return "Optimizing index " + index + ".";
+    }
+
+    public interface Factory {
+        OptimizeIndexJob create(String index, int maxNumSegments);
     }
 }

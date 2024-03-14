@@ -47,6 +47,7 @@ import org.graylog2.configuration.PathConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.migrations.Migration;
 import org.graylog2.migrations.MigrationType;
+import org.graylog2.plugin.MessageBindings;
 import org.graylog2.plugin.Plugin;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
@@ -422,6 +423,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
 
         result.add(new FreshInstallDetectionModule(isFreshInstallation()));
         result.add(new GenericBindings(isMigrationCommand()));
+        result.add(new MessageBindings());
         result.add(new SecurityBindings());
         result.add(new ServerStatusBindings(capabilities()));
         result.add(new ValidatorModule());

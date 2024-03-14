@@ -53,12 +53,11 @@ public class ESEventList implements ESSearchTypeHandler<EventList> {
             filterQueries.forEach(filterQuery -> boolQueryBuilder.filter(QueryBuilders.queryStringQuery(filterQuery)));
         }
 
-        searchSourceBuilder.size(10000);
-        eventList.page().ifPresent(page -> {
+        eventList.page().ifPresentOrElse(page -> {
             final var pageSize = eventList.perPage().orElse(EventList.DEFAULT_PAGE_SIZE);
             searchSourceBuilder.size(pageSize);
-            searchSourceBuilder.from(page * pageSize);
-        });
+            searchSourceBuilder.from((page - 1) * pageSize);
+        }, () -> searchSourceBuilder.size(10000));
     }
 
     private SortOrder toSortOrder(EventList.Direction direction) {
@@ -87,7 +86,8 @@ public class ESEventList implements ESSearchTypeHandler<EventList> {
                 .collect(Collectors.toList());
         final EventList.Result.Builder resultBuilder = EventList.Result.builder()
                 .events(eventSummaries)
-                .id(searchType.id());
+                .id(searchType.id())
+                .totalResults(result.getHits().getTotalHits().value);
         searchType.name().ifPresent(resultBuilder::name);
         return resultBuilder.build();
     }

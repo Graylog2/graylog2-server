@@ -24,12 +24,10 @@ import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
-import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.engine.monitoring.collection.NoOpStatsCollector;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.MultiSearchResponse;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.elasticsearch7.testing.TestMultisearchResponse;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
@@ -66,14 +64,13 @@ public class ElasticsearchBackendErrorHandlingTest extends ElasticsearchMockedCl
 
     @Before
     public void setUp() throws Exception {
-        final FieldTypesLookup fieldTypesLookup = mock(FieldTypesLookup.class);
         this.backend = new ElasticsearchBackend(
                 ImmutableMap.of(
                         "dummy", () -> mock(DummyHandler.class)
                 ),
                 client,
                 indexLookup,
-                (elasticsearchBackend, ssb, errors) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, errors, fieldTypesLookup),
+                ViewsUtils.createTestContextFactory(),
                 usedSearchFilters -> Collections.emptySet(),
                 new NoOpStatsCollector<>(),
                 false);
@@ -100,12 +97,7 @@ public class ElasticsearchBackendErrorHandlingTest extends ElasticsearchMockedCl
 
         this.searchJob = new SearchJob("job1", search, "admin", "test-node-id");
 
-        this.queryContext = new ESGeneratedQueryContext(
-                this.backend,
-                new SearchSourceBuilder(),
-                Collections.emptySet(),
-                mock(FieldTypesLookup.class)
-        );
+        this.queryContext = ViewsUtils.createTestContext(backend);
 
         searchTypes.forEach(queryContext::searchSourceBuilder);
     }

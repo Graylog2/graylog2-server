@@ -28,6 +28,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.MultiSearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
 import org.graylog.storage.opensearch2.testing.TestMultisearchResponse;
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -127,7 +128,7 @@ public class OpenSearchBackendSearchTypesWithStreamsOverridesTest extends OpenSe
 
     private List<SearchRequest> run(Query query) {
         final SearchJob job = searchJobForQuery(query);
-        final OSGeneratedQueryContext context = this.openSearchBackend.generate(query, Collections.emptySet());
+        final OSGeneratedQueryContext context = this.openSearchBackend.generate(query, Collections.emptySet(), DateTimeZone.UTC);
 
         this.openSearchBackend.doRun(job, query, context);
 

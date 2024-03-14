@@ -19,12 +19,12 @@ package org.graylog.storage.elasticsearch7.views;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import jakarta.inject.Provider;
+import org.graylog.plugins.views.search.LegacyDecoratorProcessor;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
-import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.engine.monitoring.collection.NoOpStatsCollector;
 import org.graylog.plugins.views.search.filter.AndFilter;
@@ -35,9 +35,11 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchR
 import org.graylog.storage.elasticsearch7.testing.TestMultisearchResponse;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESMessageList;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
+import org.graylog2.indexer.results.TestResultMessageFactory;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.joda.time.DateTimeUtils;
+import org.joda.time.DateTimeZone;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -55,14 +57,14 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.storage.elasticsearch7.views.ViewsUtils.indicesOf;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchMockedClientTestBase {
     private static Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> handlers = ImmutableMap.of(
-            MessageList.NAME, ESMessageList::new
+            MessageList.NAME, () -> new ESMessageList(new LegacyDecoratorProcessor.Fake(),
+                    new TestResultMessageFactory(), false)
     );
 
     @Rule
@@ -84,11 +86,10 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchMo
         final MultiSearchResponse response = TestMultisearchResponse.fromFixture("successfulResponseWithSingleQuery.json");
         mockCancellableMSearch(response);
 
-        final FieldTypesLookup fieldTypesLookup = mock(FieldTypesLookup.class);
         this.backend = new ElasticsearchBackend(handlers,
                 client,
                 indexLookup,
-                (elasticsearchBackend, ssb, errors) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, errors, fieldTypesLookup),
+                ViewsUtils.createTestContextFactory(),
                 usedSearchFilters -> Collections.emptySet(),
                 new NoOpStatsCollector<>(),
                 false);
@@ -117,7 +118,7 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchMo
 
     @Test
     public void queryDoesNotFallBackToUsingAllIndicesWhenNoIndexRangesAreReturned() throws Exception {
-        final ESGeneratedQueryContext context = backend.generate(query, Collections.emptySet());
+        final ESGeneratedQueryContext context = createContext(query);
         backend.doRun(job, query, context);
 
         verify(client).cancellableMsearch(clientRequestCaptor.capture());
@@ -132,7 +133,7 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchMo
         final long datetimeFixture = 1530194810;
         DateTimeUtils.setCurrentMillisFixed(datetimeFixture);
 
-        final ESGeneratedQueryContext context = backend.generate(query, Collections.emptySet());
+        final ESGeneratedQueryContext context = createContext(query);
         backend.doRun(job, query, context);
 
         ArgumentCaptor<TimeRange> captor = ArgumentCaptor.forClass(TimeRange.class);
@@ -169,7 +170,7 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchMo
                 .build();
         final Search search = dummySearch(query);
         final SearchJob job = new SearchJob("job1", search, "admin", "test-node-id");
-        final ESGeneratedQueryContext context = backend.generate(query, Collections.emptySet());
+        final ESGeneratedQueryContext context = createContext(query);
 
         when(indexLookup.indexNamesForStreamsInTimeRange(ImmutableSet.of("streamId"), RelativeRange.create(600)))
                 .thenReturn(ImmutableSet.of("index1", "index2"));
@@ -190,7 +191,7 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchMo
                 .build();
         final Search search = dummySearch(query);
         final SearchJob job = new SearchJob("job1", search, "admin", "test-node-id");
-        final ESGeneratedQueryContext context = backend.generate(query, Collections.emptySet());
+        final ESGeneratedQueryContext context = createContext(query);
 
         when(indexLookup.indexNamesForStreamsInTimeRange(ImmutableSet.of("stream1", "stream2"), RelativeRange.create(600)))
                 .thenReturn(ImmutableSet.of("index1", "index2"));
@@ -202,5 +203,9 @@ public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchMo
         final List<SearchRequest> clientRequest = clientRequestCaptor.getValue();
         assertThat(clientRequest).isNotNull();
         assertThat(indicesOf(clientRequest).get(0)).isEqualTo("index1,index2");
+    }
+
+    private ESGeneratedQueryContext createContext(Query query) {
+        return backend.generate(query, Collections.emptySet(), DateTimeZone.UTC);
     }
 }

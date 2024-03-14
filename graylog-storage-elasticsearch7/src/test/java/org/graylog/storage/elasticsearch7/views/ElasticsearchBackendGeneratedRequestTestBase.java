@@ -22,7 +22,6 @@ import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
-import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.engine.monitoring.collection.NoOpStatsCollector;
 import org.graylog.plugins.views.search.searchfilters.model.InlineQueryStringSearchFilter;
@@ -68,9 +67,6 @@ public class ElasticsearchBackendGeneratedRequestTestBase extends ElasticsearchM
     @Mock
     protected IndexLookup indexLookup;
 
-    @Mock
-    protected FieldTypesLookup fieldTypesLookup;
-
     protected Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> elasticSearchTypeHandlers;
 
     @Captor
@@ -88,7 +84,7 @@ public class ElasticsearchBackendGeneratedRequestTestBase extends ElasticsearchM
         this.elasticsearchBackend = new ElasticsearchBackend(elasticSearchTypeHandlers,
                 client,
                 indexLookup,
-                (elasticsearchBackend, ssb, errors) -> new ESGeneratedQueryContext(elasticsearchBackend, ssb, errors, fieldTypesLookup),
+                ViewsUtils.createTestContextFactory(),
                 usedSearchFilters -> usedSearchFilters.stream()
                         .filter(sf -> sf instanceof InlineQueryStringSearchFilter)
                         .map(inlineSf -> ((InlineQueryStringSearchFilter) inlineSf).queryString())

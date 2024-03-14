@@ -40,7 +40,6 @@ public class NodeContainerConfig {
     public final String rootPasswordSha2;
     public final SearchVersion elasticsearchVersion;
     public final String elasticsearchUri;
-    public final int[] extraPorts;
     public final boolean enableDebugging;
     public final boolean skipPackaging;
     public final PluginJarsProvider pluginJarsProvider;
@@ -55,7 +54,6 @@ public class NodeContainerConfig {
                                final String rootPasswordSha2,
                                String elasticsearchUri,
                                SearchVersion elasticsearchVersion,
-                               int[] extraPorts,
                                PluginJarsProvider pluginJarsProvider,
                                MavenProjectDirProvider mavenProjectDirProvider,
                                List<String> enabledFeatureFlags,
@@ -66,7 +64,6 @@ public class NodeContainerConfig {
         this.rootPasswordSha2 = rootPasswordSha2;
         this.elasticsearchUri = elasticsearchUri;
         this.elasticsearchVersion = elasticsearchVersion;
-        this.extraPorts = extraPorts == null ? new int[0] : extraPorts;
         this.enableDebugging = flagFromEnvVar("GRAYLOG_IT_DEBUG_SERVER");
         this.skipPackaging = flagFromEnvVar("GRAYLOG_IT_SKIP_PACKAGING");
         this.pluginJarsProvider = pluginJarsProvider;
@@ -86,7 +83,7 @@ public class NodeContainerConfig {
     }
 
     public Integer[] portsToExpose() {
-        int[] allPorts = ArrayUtils.add(extraPorts, 0, GELF_HTTP_PORT);
+        int[] allPorts = new int[] {GELF_HTTP_PORT};
         allPorts = ArrayUtils.add(allPorts, 0, API_PORT);
 
         if (enableDebugging) {

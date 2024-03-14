@@ -38,6 +38,7 @@ import org.graylog.storage.elasticsearch7.testing.TestMultisearchResponse;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -90,7 +91,7 @@ public class ElasticsearchBackendSearchTypeOverridesTest extends ElasticsearchBa
 
     @Test
     public void overridesInSearchTypeAreIncorporatedIntoGeneratedQueries() throws Exception {
-        final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(query, Collections.emptySet());
+        final ESGeneratedQueryContext queryContext = createContext(query);
         final MultiSearchResponse response = TestMultisearchResponse.fromFixture("successfulMultiSearchResponse.json");
         mockCancellableMSearch(response);
 
@@ -143,7 +144,7 @@ public class ElasticsearchBackendSearchTypeOverridesTest extends ElasticsearchBa
         when(indexLookup.indexNamesForStreamsInTimeRange(ImmutableSet.of("stream1"), tr))
                 .thenReturn(ImmutableSet.of("searchTypeIndex"));
 
-        final ESGeneratedQueryContext queryContext = this.elasticsearchBackend.generate(query, Collections.emptySet());
+        final ESGeneratedQueryContext queryContext = createContext(query);
         final MultiSearchResponse response = TestMultisearchResponse.fromFixture("successfulMultiSearchResponse.json");
         mockCancellableMSearch(response);
 
@@ -155,5 +156,9 @@ public class ElasticsearchBackendSearchTypeOverridesTest extends ElasticsearchBa
                         "searchTypeIndex",
                         "queryIndex"
                 );
+    }
+
+    private ESGeneratedQueryContext createContext(Query query) {
+        return this.elasticsearchBackend.generate(query, Collections.emptySet(), DateTimeZone.UTC);
     }
 }
