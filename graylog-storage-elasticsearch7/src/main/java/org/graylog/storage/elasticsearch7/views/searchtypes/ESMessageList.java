@@ -101,24 +101,27 @@ public class ESMessageList implements ESSearchTypeHandler<MessageList> {
 
         List<Sort> sorts = firstNonNull(messageList.sort(), Collections.singletonList(Sort.create(Message.FIELD_TIMESTAMP, Sort.Order.DESC)));
 
-        // Always add gl2_message_id as a second sort order, if sorting by timestamp is requested.
-        // The gl2_message_id contains a sequence nr that represents the order in which messages were received.
+        // Always add the gl2_second_sort_field alias, if sorting by timestamp is requested.
+        // The alias points to gl2_message_id which contains a sequence nr that represents the order in which messages were received.
         // If messages have identical timestamps, we can still sort them correctly.
         final Optional<Sort> timeStampSort = findSort(sorts, Message.FIELD_TIMESTAMP);
         final Optional<Sort> msgIdSort = findSort(sorts, Message.FIELD_GL2_MESSAGE_ID);
-        if (timeStampSort.isPresent() && msgIdSort.isEmpty()) {
+        final Optional<Sort> secondSortField = findSort(sorts, Message.GL2_SECOND_SORT_FIELD);
+        if (timeStampSort.isPresent() && msgIdSort.isEmpty() && secondSortField.isEmpty()) {
             sorts = new ArrayList<>(sorts);
-            final Sort newMsgIdSort = Sort.create(Message.FIELD_GL2_MESSAGE_ID, timeStampSort.get().order());
+            final Sort newMsgIdSort = Sort.create(Message.GL2_SECOND_SORT_FIELD, timeStampSort.get().order());
             sorts.add(sorts.indexOf(timeStampSort.get()) + 1, newMsgIdSort);
         }
         sorts.forEach(sort -> {
             final FieldSortBuilder fieldSort = SortBuilders.fieldSort(sort.field())
                     .order(toSortOrder(sort.order()));
-            if (sort.field().equals(Message.FIELD_GL2_MESSAGE_ID)) {
-                fieldSort.unmappedType("keyword"); // old indices might not have a mapping for gl2_message_id
+            if (sort.field().equals(Message.GL2_SECOND_SORT_FIELD)) {
+                fieldSort.unmappedType("keyword"); // old indices might not have a mapping for gl2_second_sort_field
+                searchSourceBuilder.sort(fieldSort);
+            } else {
+                final Optional<String> fieldType = queryContext.fieldType(effectiveStreamIds, sort.field());
+                searchSourceBuilder.sort(fieldType.map(fieldSort::unmappedType).orElse(fieldSort));
             }
-            final Optional<String> fieldType = queryContext.fieldType(effectiveStreamIds, sort.field());
-            searchSourceBuilder.sort(fieldType.map(fieldSort::unmappedType).orElse(fieldSort));
         });
     }
 

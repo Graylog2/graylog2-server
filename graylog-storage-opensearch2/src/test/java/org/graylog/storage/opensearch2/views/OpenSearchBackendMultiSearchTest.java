@@ -30,6 +30,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.MultiSearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
 import org.graylog.storage.opensearch2.testing.TestMultisearchResponse;
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -80,7 +81,7 @@ public class OpenSearchBackendMultiSearchTest extends OpenSearchBackendGenerated
 
     @Test
     public void everySearchTypeGeneratesASearchSourceBuilder() {
-        final OSGeneratedQueryContext queryContext = this.openSearchBackend.generate(query, Collections.emptySet());
+        final OSGeneratedQueryContext queryContext = createContext(query);
 
         assertThat(queryContext.searchTypeQueries())
                 .hasSize(2)
@@ -94,7 +95,7 @@ public class OpenSearchBackendMultiSearchTest extends OpenSearchBackendGenerated
                 .collect(Collectors.toList());
         when(client.msearch(any(), any())).thenReturn(items);
 
-        final OSGeneratedQueryContext queryContext = this.openSearchBackend.generate(query, Collections.emptySet());
+        final OSGeneratedQueryContext queryContext = createContext(query);
         final List<SearchRequest> generatedRequest = run(searchJob, query, queryContext, Collections.emptySet());
 
         assertThat(generatedRequest).hasSize(2);
@@ -107,7 +108,7 @@ public class OpenSearchBackendMultiSearchTest extends OpenSearchBackendGenerated
                 .collect(Collectors.toList());
         when(client.msearch(any(), any())).thenReturn(items);
 
-        final OSGeneratedQueryContext queryContext = this.openSearchBackend.generate(query, Collections.emptySet());
+        final OSGeneratedQueryContext queryContext = createContext(query);
         final QueryResult queryResult = this.openSearchBackend.doRun(searchJob, query, queryContext);
 
         assertThat(queryResult.searchTypes()).containsOnlyKeys("pivot1", "pivot2");
@@ -129,7 +130,7 @@ public class OpenSearchBackendMultiSearchTest extends OpenSearchBackendGenerated
 
     @Test
     public void oneFailingSearchTypeReturnsPartialResults() throws Exception {
-        final OSGeneratedQueryContext queryContext = this.openSearchBackend.generate(query, Collections.emptySet());
+        final OSGeneratedQueryContext queryContext = createContext(query);
 
         final MultiSearchResponse response = TestMultisearchResponse.fromFixture("partiallySuccessfulMultiSearchResponse.json");
         final List<MultiSearchResponse.Item> items = Arrays.stream(response.getResponses())
@@ -155,5 +156,9 @@ public class OpenSearchBackendMultiSearchTest extends OpenSearchBackendGenerated
                         PivotResult.Value.create(Collections.singletonList("max(field2)"), 42.0, true, "row-leaf")
                 ).build()
         );
+    }
+
+    private OSGeneratedQueryContext createContext(Query query) {
+        return this.openSearchBackend.generate(query, Collections.emptySet(), DateTimeZone.UTC);
     }
 }

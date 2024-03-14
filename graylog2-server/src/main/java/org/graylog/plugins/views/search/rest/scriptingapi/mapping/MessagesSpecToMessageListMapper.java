@@ -47,7 +47,7 @@ public class MessagesSpecToMessageListMapper implements Function<MessagesRequest
             final Sort.Order order = messagesRequestSpec.sortOrder().toSortOrder();
             return List.of(
                     Sort.create(Message.FIELD_TIMESTAMP, order),
-                    Sort.create(Message.FIELD_GL2_MESSAGE_ID, order)
+                    Sort.create(Message.GL2_SECOND_SORT_FIELD, order)
             );
         } else {
             return List.of(Sort.create(messagesRequestSpec.sort(), messagesRequestSpec.sortOrder().toSortOrder()));
