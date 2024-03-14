@@ -30,6 +30,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.BoolQuery
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.joda.time.DateTimeZone;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -48,12 +49,14 @@ public class ESGeneratedQueryContext implements GeneratedQueryContext {
 
     private final FieldTypesLookup fieldTypes;
     private final MultiBucketsAggregation.Bucket rowBucket;
+    private final DateTimeZone timezone;
 
     @AssistedInject
     public ESGeneratedQueryContext(
             @Assisted ElasticsearchBackend elasticsearchBackend,
             @Assisted SearchSourceBuilder ssb,
             @Assisted Collection<SearchError> validationErrors,
+            @Assisted DateTimeZone timezone,
             FieldTypesLookup fieldTypes) {
         this.elasticsearchBackend = elasticsearchBackend;
         this.ssb = ssb;
@@ -62,6 +65,7 @@ public class ESGeneratedQueryContext implements GeneratedQueryContext {
         this.rowBucket = null;
         this.contextMap = new HashMap<>();
         this.searchTypeQueries = new HashMap<>();
+        this.timezone = timezone;
     }
 
     private ESGeneratedQueryContext(
@@ -71,7 +75,8 @@ public class ESGeneratedQueryContext implements GeneratedQueryContext {
             FieldTypesLookup fieldTypes,
             MultiBucketsAggregation.Bucket rowBucket,
             Map<String, SearchSourceBuilder> searchTypeQueries,
-            Map<Object, Object> contextMap) {
+            Map<Object, Object> contextMap,
+            DateTimeZone timezone) {
         this.elasticsearchBackend = elasticsearchBackend;
         this.ssb = ssb;
         this.fieldTypes = fieldTypes;
@@ -79,13 +84,15 @@ public class ESGeneratedQueryContext implements GeneratedQueryContext {
         this.rowBucket = rowBucket;
         this.searchTypeQueries = searchTypeQueries;
         this.contextMap = contextMap;
+        this.timezone = timezone;
     }
 
     public interface Factory {
         ESGeneratedQueryContext create(
                 ElasticsearchBackend elasticsearchBackend,
                 SearchSourceBuilder ssb,
-                Collection<SearchError> validationErrors
+                Collection<SearchError> validationErrors,
+                DateTimeZone timezone
         );
     }
 
@@ -138,10 +145,15 @@ public class ESGeneratedQueryContext implements GeneratedQueryContext {
     }
 
     public ESGeneratedQueryContext withRowBucket(MultiBucketsAggregation.Bucket rowBucket) {
-        return new ESGeneratedQueryContext(elasticsearchBackend, ssb, errors, fieldTypes, rowBucket, searchTypeQueries, contextMap);
+        return new ESGeneratedQueryContext(elasticsearchBackend, ssb, errors, fieldTypes, rowBucket, searchTypeQueries, contextMap, timezone);
     }
 
     public Optional<MultiBucketsAggregation.Bucket> rowBucket() {
         return Optional.ofNullable(this.rowBucket);
+    }
+
+    @Override
+    public DateTimeZone timezone() {
+        return timezone;
     }
 }

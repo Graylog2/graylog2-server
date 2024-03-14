@@ -120,10 +120,13 @@ class TimeBasedSizeOptimizingStrategyTest {
     void shouldRotateWhenRightSizedAndOverRotationPeriod(String startDate) {
         setClockTo(startDate);
 
-        final DateTime creationDate = clock.nowUTC().minus(elasticsearchConfiguration.getTimeSizeOptimizingRotationPeriod());
-        when(indices.indexCreationDate("index_0")).thenReturn(Optional.of(creationDate));
         final Size timeSizeOptimizingRotationMinSize = elasticsearchConfiguration.getTimeSizeOptimizingRotationMinShardSize();
         when(indices.getStoreSizeInBytes("index_0")).thenReturn(Optional.of(timeSizeOptimizingRotationMinSize.toBytes() + 10));
+        final Size timeSizeOptimizingRotationMaxSize = Size.bytes(timeSizeOptimizingRotationMinSize.toBytes() * 2);
+        when(elasticsearchConfiguration.getTimeSizeOptimizingRotationMaxShardSize()).thenReturn(timeSizeOptimizingRotationMaxSize);
+        final DateTime creationDate = clock.nowUTC().minus(elasticsearchConfiguration.getTimeSizeOptimizingRotationPeriod());
+        when(indices.indexCreationDate("index_0")).thenReturn(Optional.of(creationDate));
+        timeBasedSizeOptimizingStrategy = createStrategy();
 
         final Result result = timeBasedSizeOptimizingStrategy.shouldRotate("index_0", indexSet);
 
@@ -156,14 +159,15 @@ class TimeBasedSizeOptimizingStrategyTest {
     void shouldRotateWhenRightSizedAndOverCustomRotationPeriod(String startDate) {
         setClockTo(startDate);
 
-        final Period customRotationPeriod = Period.hours(12);
-        when(elasticsearchConfiguration.getTimeSizeOptimizingRotationPeriod()).thenReturn(customRotationPeriod);
-        timeBasedSizeOptimizingStrategy = createStrategy();
-
-        final DateTime creationDate = clock.nowUTC().minus(customRotationPeriod);
-        when(indices.indexCreationDate("index_0")).thenReturn(Optional.of(creationDate));
         final Size timeSizeOptimizingRotationMinSize = elasticsearchConfiguration.getTimeSizeOptimizingRotationMinShardSize();
         when(indices.getStoreSizeInBytes("index_0")).thenReturn(Optional.of(timeSizeOptimizingRotationMinSize.toBytes() + 10));
+        final Size timeSizeOptimizingRotationMaxSize = Size.bytes(timeSizeOptimizingRotationMinSize.toBytes() * 2);
+        when(elasticsearchConfiguration.getTimeSizeOptimizingRotationMaxShardSize()).thenReturn(timeSizeOptimizingRotationMaxSize);
+        final Period customRotationPeriod = Period.hours(12);
+        when(elasticsearchConfiguration.getTimeSizeOptimizingRotationPeriod()).thenReturn(customRotationPeriod);
+        final DateTime creationDate = clock.nowUTC().minus(customRotationPeriod);
+        when(indices.indexCreationDate("index_0")).thenReturn(Optional.of(creationDate));
+        timeBasedSizeOptimizingStrategy = createStrategy();
 
         final Result result = timeBasedSizeOptimizingStrategy.shouldRotate("index_0", indexSet);
 
