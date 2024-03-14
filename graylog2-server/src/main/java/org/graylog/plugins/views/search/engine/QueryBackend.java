@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.engine;
 
 import com.google.common.base.Stopwatch;
+import com.google.common.collect.ImmutableMap;
 import org.graylog.plugins.views.search.ExplainResults;
 import org.graylog.plugins.views.search.GlobalOverride;
 import org.graylog.plugins.views.search.Query;
@@ -27,6 +28,8 @@ import org.graylog.plugins.views.search.errors.QueryError;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
+import org.graylog2.indexer.ranges.IndexRange;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
@@ -37,6 +40,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * A search backend that is capable of generating and executing search jobs
@@ -130,7 +134,23 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
      * @param queryContext the generated query by {@link #generate(Query, Set)}
      * @return the explain result for the query
      */
-    ExplainResults.QueryExplainResult doExplain(SearchJob job, Query query, T queryContext);
+    default ExplainResults.QueryExplainResult doExplain(SearchJob job, Query query, T queryContext) {
+        final ImmutableMap.Builder<String, ExplainResults.ExplainResult> builder = ImmutableMap.builder();
+
+        final DateTime nowUTCSharedBetweenSearchTypes = Tools.nowUTC();
+
+        query.searchTypes().forEach(s -> {
+            final Set<ExplainResults.IndexRangeResult> indicesForQuery = indexRangesForStreamsInTimeRange(
+                    query.effectiveStreams(s), query.effectiveTimeRange(s, nowUTCSharedBetweenSearchTypes))
+                    .stream().map(ExplainResults.IndexRangeResult::fromIndexRange).collect(Collectors.toSet());
+            queryContext.getSearchTypeQueryString(s.id())
+                    .ifPresent(queryString -> builder.put(s.id(), new ExplainResults.ExplainResult(queryString, indicesForQuery)));
+        });
+
+        return new ExplainResults.QueryExplainResult(builder.build());
+    }
+
+    Set<IndexRange> indexRangesForStreamsInTimeRange(final Set<String> streamIds, final TimeRange timeRange);
 
     default boolean isSearchTypeWithError(T queryContext, String searchTypeId) {
         return queryContext.errors().stream()
