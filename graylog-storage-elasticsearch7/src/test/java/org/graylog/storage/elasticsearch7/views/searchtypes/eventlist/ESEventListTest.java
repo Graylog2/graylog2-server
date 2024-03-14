@@ -25,6 +25,7 @@ import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.searchtypes.events.CommonEventSummary;
 import org.graylog.plugins.views.search.searchtypes.events.EventList;
 import org.graylog.plugins.views.search.searchtypes.events.EventSummary;
+import org.graylog.shaded.elasticsearch7.org.apache.lucene.search.TotalHits;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.Aggregations;
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
@@ -40,7 +41,9 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ESEventListTest {
 
@@ -49,9 +52,10 @@ public class ESEventListTest {
         final ESEventList esEventList = new TestESEventList();
         final SearchJob searchJob = mock(SearchJob.class);
         final Query query = mock(Query.class);
-        final SearchResponse searchResult = mock(SearchResponse.class);
+        final SearchResponse searchResult = mock(SearchResponse.class, RETURNS_DEEP_STUBS);
         final Aggregations metricAggregation = mock(Aggregations.class);
         final ESGeneratedQueryContext queryContext = mock(ESGeneratedQueryContext.class);
+        when(searchResult.getHits().getTotalHits()).thenReturn(new TotalHits(1000, TotalHits.Relation.EQUAL_TO));
 
         final EventList eventList = EventList.builder()
                 .id("search-type-id")
