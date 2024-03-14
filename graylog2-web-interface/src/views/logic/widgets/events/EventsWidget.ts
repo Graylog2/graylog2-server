@@ -4,12 +4,21 @@ import Widget from 'views/logic/widgets/Widget';
 import type { WidgetState } from 'views/logic/widgets/Widget';
 import isDeepEqual from 'stores/isDeepEqual';
 import isEqualForSearch from 'views/stores/isEqualForSearch';
+import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 
 import EventsWidgetConfig from './EventsWidgetConfig';
 
 export default class EventsWidget extends Widget {
   constructor(id: string, config: EventsWidgetConfig) {
-    super(id, EventsWidget.type, config, undefined, { range: 0, type: 'relative' });
+    super(
+      id,
+      EventsWidget.type,
+      config,
+      undefined,
+      { range: 0, type: 'relative' },
+      createElasticsearchQueryString('*'),
+      [],
+    );
   }
 
   static type = 'events';
@@ -17,7 +26,7 @@ export default class EventsWidget extends Widget {
   static defaultTitle = 'Untitled Events Overview';
 
   // eslint-disable-next-line class-methods-use-this
-  get isFixedTimerange() {
+  get hasFixedFilters() {
     return true;
   }
 

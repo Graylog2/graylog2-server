@@ -23,6 +23,8 @@ import WidgetContext from 'views/components/contexts/WidgetContext';
 import QueryEditModeContext from 'views/components/contexts/QueryEditModeContext';
 import SaveOrCancelButtons from 'views/components/widgets/SaveOrCancelButtons';
 import WidgetEditApplyAllChangesProvider from 'views/components/contexts/WidgetEditApplyAllChangesProvider';
+import useViewType from 'views/hooks/useViewType';
+import View from 'views/logic/views/View';
 
 import WidgetQueryControls from '../WidgetQueryControls';
 import IfDashboard from '../dashboard/IfDashboard';
@@ -56,6 +58,8 @@ type Props = {
 
 const EditWidgetFrame = ({ children, onCancel, onSubmit, displaySubmitActions }: Props) => {
   const widget = useContext(WidgetContext);
+  const viewType = useViewType();
+  const isDashboard = viewType === View.Type.Dashboard;
 
   if (!widget) {
     return <Spinner text="Loading widget ..." />;
@@ -65,13 +69,13 @@ const EditWidgetFrame = ({ children, onCancel, onSubmit, displaySubmitActions }:
     <WidgetEditApplyAllChangesProvider widget={widget}>
       <DisableSubmissionStateProvider>
         <Container>
-          <IfDashboard>
+          {(isDashboard && !widget.hasFixedFilters) && (
             <QueryControls>
               <QueryEditModeContext.Provider value="widget">
                 <WidgetQueryControls />
               </QueryEditModeContext.Provider>
             </QueryControls>
-          </IfDashboard>
+          )}
           <Visualization role="presentation">
             <WidgetOverrideElements>
               {children}

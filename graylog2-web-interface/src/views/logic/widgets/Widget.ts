@@ -87,7 +87,7 @@ class Widget {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  get isFixedTimerange() {
+  get hasFixedFilters() {
     return false;
   }
 
