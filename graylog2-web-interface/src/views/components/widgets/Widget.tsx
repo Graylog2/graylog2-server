@@ -255,7 +255,7 @@ const Widget = ({ id, editing, widget, title, position, onPositionsChange }: Pro
     <WidgetColorContext id={id}>
       <WidgetFrame widgetId={id}>
         <IfDashboard>
-          {isWidgetInWarmTier() && (
+          {!editing && isWidgetInWarmTier() && (
             <WidgetWarmTierAlert />
           )}
         </IfDashboard>
