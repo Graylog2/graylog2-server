@@ -31,6 +31,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggrega
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
 import org.graylog.storage.opensearch2.views.searchtypes.OSEventList;
 import org.graylog2.plugin.Tools;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -73,7 +74,7 @@ public class OSEventListTest {
     private List<EventSummary> stripRawEvents(List<CommonEventSummary> events) {
         return events.stream()
                 .map(event -> (EventSummary) event)
-                .map(event -> event.toBuilder().rawEvent(Map.of()).build())
+                .map(event -> event.toBuilder().rawEvent(null).build())
                 .toList();
     }
 
@@ -88,12 +89,16 @@ public class OSEventListTest {
                 .timestamp(DateTime.parse(timestamp.toString(Tools.ES_DATE_FORMAT_FORMATTER), Tools.ES_DATE_FORMAT_FORMATTER))
                 .alert(false)
                 .eventDefinitionId("deadbeef")
-                .priority(2)
+                .priority(2L)
                 .eventKeys(List.of())
                 .build();
     }
 
     static class TestOSEventList extends OSEventList {
+        public TestOSEventList() {
+            super(new ObjectMapperProvider().get());
+        }
+
         private Map<String, Object> hit(String id, List<String> streams) {
             return ImmutableMap.of(
                     EventDto.FIELD_ID, id,

@@ -18,10 +18,13 @@ package org.graylog.plugins.views.search.searchtypes.events;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.graylog.events.event.EventDto;
+import org.graylog.events.event.EventReplayInfo;
 import org.joda.time.DateTime;
 
+import javax.annotation.Nullable;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 public interface CommonEventSummary {
@@ -34,6 +37,7 @@ public interface CommonEventSummary {
 
     String FIELD_PRIORITY = "priority";
     String FIELD_EVENT_KEYS = "event_keys";
+    String FIELD_REPLAY_INFO = "replay_info";
 
     @JsonProperty(FIELD_ID)
     String id();
@@ -54,11 +58,15 @@ public interface CommonEventSummary {
     String eventDefinitionId();
 
     @JsonProperty(FIELD_PRIORITY)
-    Integer priority();
+    Long priority();
 
     @JsonProperty(FIELD_EVENT_KEYS)
     List<String> eventKeys();
 
+    @JsonProperty(FIELD_REPLAY_INFO)
+    Optional<EventReplayInfo> replayInfo();
+
     @JsonIgnore
-    Map<String, Object> rawEvent();
+    @Nullable
+    EventDto rawEvent();
 }
