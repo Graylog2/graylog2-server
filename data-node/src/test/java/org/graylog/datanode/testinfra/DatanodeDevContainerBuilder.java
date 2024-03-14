@@ -32,11 +32,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
-import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import static org.graylog.datanode.testinfra.DatanodeContainerizedBackend.IMAGE_WORKING_DIR;
 import static org.graylog.testing.completebackend.DefaultPluginJarsProvider.getProjectReposPath;
@@ -183,13 +181,9 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
             throw new RuntimeException("Failed to link opensearch distribution to the datanode docker image, path " + downloadedOpensearch.toAbsolutePath() + " does not exist!");
         }
 
-        final Path pluginsDir = getPath().resolve(Path.of("opensearch", "plugins"));
-        LOG.debug("Detected following opensearch plugins: {}", String.join(", ", getPluginNames(pluginsDir)));
-
         container.withFileSystemBind(graylog.toString(), IMAGE_WORKING_DIR + "/graylog-datanode.jar")
                 .withFileSystemBind(getPath().resolve("lib").toString(), IMAGE_WORKING_DIR + "/lib/")
-                .withFileSystemBind(downloadedOpensearch.toString(), IMAGE_WORKING_DIR + "/" + opensearchDistributionName, BindMode.READ_WRITE)
-                .withFileSystemBind(pluginsDir.toString(), IMAGE_WORKING_DIR + "/plugins", BindMode.READ_ONLY);
+                .withFileSystemBind(downloadedOpensearch.toString(), IMAGE_WORKING_DIR + "/" + opensearchDistributionName, BindMode.READ_ONLY);
 
         customizer.ifPresent(c -> c.onContainer(container));
         return container;
@@ -228,13 +222,5 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
                     .entryPoint("java", "-jar", "graylog-datanode.jar", "datanode", "-f", "datanode.conf");
             builder.build();
         });
-    }
-
-    private static List<String> getPluginNames(Path pluginsDir) {
-        try {
-            return Files.list(pluginsDir).map(p -> p.getFileName().toString()).collect(Collectors.toList());
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to list opensearch plugins", e);
-        }
     }
 }
