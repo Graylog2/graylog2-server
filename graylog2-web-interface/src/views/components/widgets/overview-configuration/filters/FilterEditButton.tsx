@@ -9,25 +9,32 @@ import type { FilterComponent } from './types';
 type Props = {
   column: string,
   columnTitle: (column: string) => string,
+  containerWidth: number
   filterComponent: FilterComponent
+  onDelete: () => void,
   onEdit: (value: string) => void,
   selectedValues: Array<string>,
   value: string
-  containerWidth: number
 }
 
-const FilterEditButton = ({ filterComponent, column, value, columnTitle, onEdit, selectedValues, containerWidth }: Props) => {
+const FilterEditButton = ({ filterComponent, column, value, columnTitle, onEdit, selectedValues, containerWidth, onDelete }: Props) => {
   const [open, setOpen] = useState(false);
   const [editValue, setEditValue] = React.useState<string>(value);
 
   const submitChanges = (newValue: string) => {
-    onEdit(newValue);
+    if (newValue) {
+      onEdit(newValue);
+    } else {
+      onDelete();
+    }
+
     setEditValue(null);
     setOpen(false);
   };
 
   const onChange = (newValue: unknown, shouldSubmit = true) => {
     const normalizedValue = filterComponent?.valueForConfig?.(newValue) ?? newValue as string;
+
     setEditValue(normalizedValue);
 
     if (shouldSubmit) {
@@ -60,7 +67,7 @@ const FilterEditButton = ({ filterComponent, column, value, columnTitle, onEdit,
                     onClick={() => setOpen(true)} />
       </Menu.Target>
       <Menu.Dropdown>
-        {filterComponent.configuration(selectedValues, filterComponent.valueFromConfig?.(value) ?? value, onChange)}
+        {filterComponent.configuration(selectedValues, filterComponent.valueFromConfig?.(editValue) ?? editValue, onChange)}
       </Menu.Dropdown>
     </Menu>
   );

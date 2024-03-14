@@ -71,6 +71,7 @@ const SelectedFiltersList = ({ selectedFilters, columnTitle, filterComponents, o
                       {filterComponent && (
                         <FilterEditButton filterComponent={filterComponent}
                                           onEdit={_onEdit}
+                                          onDelete={() => onDelete(filterIndex, value)}
                                           selectedValues={values}
                                           columnTitle={columnTitle}
                                           containerWidth={container.current?.offsetWidth}

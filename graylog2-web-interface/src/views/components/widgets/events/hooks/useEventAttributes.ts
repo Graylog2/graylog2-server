@@ -14,18 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
-import { useMemo } from 'react';
-
 import usePluginEntities from 'hooks/usePluginEntities';
 
 const useEventAttributes = () => {
   const eventAttributes = usePluginEntities('views.components.widgets.events.attributes');
 
-  return useMemo(() => eventAttributes.filter(({ useCondition }) => (
+  return eventAttributes.filter(({ useCondition }) => (
     // eslint-disable-next-line react-hooks/rules-of-hooks
     typeof useCondition === 'function' ? useCondition() : true),
-  ), [eventAttributes]);
+  );
 };
 
 export default useEventAttributes;
