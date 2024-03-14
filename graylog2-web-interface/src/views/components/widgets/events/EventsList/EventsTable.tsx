@@ -44,11 +44,13 @@ const EventsTable = ({ events, config, onSortChange, setLoadingState }: Props) =
               return (
                 <TableHeaderCell key={field}>
                   {attributeTitle ?? field}
-                  <AttributeSortIcon onSortChange={onSortChange}
-                                     field={field}
-                                     fieldTitle={attributeTitle ?? field}
-                                     activeSort={config.sort}
-                                     setLoadingState={setLoadingState} />
+                  {eventAttribute.sortable && (
+                    <AttributeSortIcon onSortChange={onSortChange}
+                                       field={field}
+                                       fieldTitle={attributeTitle ?? field}
+                                       activeSort={config.sort}
+                                       setLoadingState={setLoadingState} />
+                  )}
                 </TableHeaderCell>
               );
             })}

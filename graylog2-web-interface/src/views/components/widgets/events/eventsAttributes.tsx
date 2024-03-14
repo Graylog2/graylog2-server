@@ -19,22 +19,26 @@ import * as React from 'react';
 import { Timestamp } from 'components/common';
 import EventDefinitionName from 'views/components/widgets/events/filters/EventDefinitionName';
 import EventTypeLabel from 'components/events/events/EventTypeLabel';
+import type { Attributes } from 'views/components/widgets/overview-configuration/filters/types';
 
-const eventsAttributes = [
+const eventsAttributes: Attributes = [
   {
     attribute: 'timestamp',
+    displayValue: (value: string) => <Timestamp dateTime={value} />,
+    sortable: true,
     title: 'Created At',
-    displayValue: (value) => <Timestamp dateTime={value} />,
   },
   {
     attribute: 'alert',
+    displayValue: (value: boolean) => <EventTypeLabel isAlert={value} />,
+    sortable: true,
     title: 'Type',
-    displayValue: (value) => <EventTypeLabel isAlert={value} />,
   },
   {
     attribute: 'event_definition_id',
+    displayValue: (value: string) => <EventDefinitionName eventDefinitionId={value} />,
+    sortable: true,
     title: 'Event Definition',
-    displayValue: (value) => <EventDefinitionName eventDefinitionId={value} />,
   },
   {
     attribute: 'message',

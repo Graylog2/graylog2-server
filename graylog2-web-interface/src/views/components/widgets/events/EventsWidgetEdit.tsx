@@ -134,7 +134,8 @@ const EventsWidgetEdit = ({ children, onCancel, config, onChange, onSubmit }: Ed
   };
 
   const columns = eventAttributes.map(({ attribute }) => attribute);
-  const columnTitle = useCallback((column: string) => eventAttributes.find(({ attribute }) => column === attribute)?.title ?? column, []);
+  const sortableColumns = eventAttributes.filter(({ sortable }) => sortable).map(({ attribute }) => attribute);
+  const columnTitle = useCallback((column: string) => eventAttributes.find(({ attribute }) => column === attribute)?.title ?? column, [eventAttributes]);
 
   return (
     <Formik<FormValues> initialValues={initialValues}
@@ -190,7 +191,7 @@ const EventsWidgetEdit = ({ children, onCancel, config, onChange, onSubmit }: Ed
 
                     {values.mode === LIST_MODE && (
                       <DescriptionBox description="Sorting">
-                        <SortConfiguration columns={columns}
+                        <SortConfiguration columns={sortableColumns}
                                            name="sort"
                                            columnTitle={columnTitle}
                                            directions={SORT_DIRECTION_OPTIONS} />

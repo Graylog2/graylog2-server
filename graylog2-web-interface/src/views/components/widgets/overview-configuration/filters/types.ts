@@ -19,6 +19,7 @@ export type FilterComponents = Array<FilterComponent>
 
 export type Attributes = Array<{
   attribute: string,
+  displayValue?: (value: unknown) => React.ReactNode,
+  sortable?: boolean,
   title: string,
-  displayValue?: (value: string) => React.ReactNode,
 }>
