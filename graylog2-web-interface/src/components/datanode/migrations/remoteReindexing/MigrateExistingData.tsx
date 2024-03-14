@@ -30,7 +30,7 @@ export type RemoteReindexCheckConnection = {
 }
 
 const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => {
-  const [nextSteps, setNextSteps] = useState<MigrationActions[]>(currentStep.next_steps.filter((step) => step === 'CHECK_REMOTE_INDEXER_CONNECTION'));
+  const [nextSteps, setNextSteps] = useState<MigrationActions[]>(['CHECK_REMOTE_INDEXER_CONNECTION']);
   const [errorMessage, setErrrorMessage] = useState<string|null>(null);
   const [availableIndices, setAvailableIndices] = useState<string[]|undefined>(undefined);
   const [isFormDirtyAfterConnectionCheck, setIsFormDirtyAfterConnectionCheck] = useState<boolean>(false);

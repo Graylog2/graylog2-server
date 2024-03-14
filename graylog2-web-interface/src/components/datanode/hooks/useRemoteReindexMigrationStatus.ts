@@ -56,7 +56,7 @@ const useRemoteReindexMigrationStatus = (
   nextSteps: MigrationActions[],
   migrationStatus: RemoteReindexMigration,
 } => {
-  const [nextSteps, setNextSteps] = useState<MigrationActions[]>(currentStep?.next_steps.filter((action) => action === 'RETRY_MIGRATE_EXISTING_DATA'));
+  const [nextSteps, setNextSteps] = useState<MigrationActions[]>(['RETRY_MIGRATE_EXISTING_DATA']);
   const [migrationStatus, setMigrationStatus] = useState<RemoteReindexMigration>(undefined);
 
   useEffect(() => {
