@@ -133,6 +133,12 @@ public class Message implements Messages, Indexable {
     public static final String FIELD_GL2_MESSAGE_ID = "gl2_message_id";
 
     /**
+     * Not a field, but an alias to the field we automatically use to determine the second sort order.
+     * This currently points to {@code gl2_message_id}.
+     */
+    public static final String GL2_SECOND_SORT_FIELD = "gl2_second_sort_field";
+
+    /**
      * Can be set to indicate a message processing error. (e.g. set by the pipeline interpreter when an error occurs)
      */
     public static final String FIELD_GL2_PROCESSING_ERROR = "gl2_processing_error";
@@ -251,7 +257,9 @@ public class Message implements Messages, Indexable {
     private static final ImmutableSet<String> CORE_MESSAGE_FIELDS = ImmutableSet.of(
             FIELD_MESSAGE,
             FIELD_SOURCE,
-            FIELD_TIMESTAMP
+            FIELD_TIMESTAMP,
+            FIELD_GL2_MESSAGE_ID,
+            GL2_SECOND_SORT_FIELD
     );
 
     private static final ImmutableSet<String> ES_FIELDS = ImmutableSet.of(
@@ -273,7 +281,6 @@ public class Message implements Messages, Indexable {
             .build();
     public static final ImmutableSet<String> FIELDS_UNCHANGEABLE_BY_CUSTOM_MAPPINGS = new ImmutableSet.Builder<String>()
             .addAll(RESERVED_SETTABLE_FIELDS)
-            .add(FIELD_GL2_MESSAGE_ID)
             .add(FIELD_STREAMS)
             .add(FIELD_FAILED_MESSAGE_STREAMS)
             .build();

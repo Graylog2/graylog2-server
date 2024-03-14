@@ -26,6 +26,7 @@ import okhttp3.Response;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog2.cluster.nodes.DataNodeDto;
+import org.graylog2.cluster.nodes.NodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.indexer.datanode.ProxyRequestAdapter;
 import org.graylog2.security.IndexerJwtAuthTokenProvider;
@@ -36,31 +37,29 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.Locale;
+import java.util.Objects;
+import java.util.Optional;
 
 @Singleton
 public class DatanodeRestApiProxy implements ProxyRequestAdapter {
 
     private final IndexerJwtAuthTokenProvider authTokenProvider;
-    private final NodeService<DataNodeDto> nodeService;
+    private final DatanodeResolver datanodeResolver;
     private final OkHttpClient httpClient;
 
     @Inject
-    public DatanodeRestApiProxy(IndexerJwtAuthTokenProvider authTokenProvider, NodeService<DataNodeDto> nodeService, OkHttpClient okHttpClient) throws NoSuchAlgorithmException, KeyManagementException {
+    public DatanodeRestApiProxy(IndexerJwtAuthTokenProvider authTokenProvider, DatanodeResolver datanodeResolver, OkHttpClient okHttpClient) throws NoSuchAlgorithmException, KeyManagementException {
         this.authTokenProvider = authTokenProvider;
-        this.nodeService = nodeService;
+        this.datanodeResolver = datanodeResolver;
         httpClient = okHttpClient;
     }
 
     @Override
     public ProxyResponse request(ProxyRequest request) throws IOException {
-        Collection<DataNodeDto> datanodes = nodeService.allActive().values();
-        final String host = datanodes.stream()
-                .filter(node -> node.isLeader())
-                .findFirst()
-                .or(() -> datanodes.stream().findFirst())
+        final String host = datanodeResolver.findByHostname(request.hostname())
                 .map(DataNodeDto::getRestApiAddress)
                 .map(url -> StringUtils.removeEnd(url, "/"))
-                .orElseThrow(() -> new IllegalStateException("No datanode present"));
+                .orElseThrow(() -> new IllegalStateException("No datanode found matching name " + request.hostname()));
 
         final Request.Builder builder = new Request.Builder()
                 .url(host + "/" + request.path())

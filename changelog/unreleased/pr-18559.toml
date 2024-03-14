@@ -1,0 +1,4 @@
+type = "f"
+message = "fix duplicate license warning in DataNodesClusterManagementPage"
+
+pulls = ["18559"]

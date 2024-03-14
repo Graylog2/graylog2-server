@@ -448,7 +448,7 @@ public class AggregationEventProcessorTest {
                 eq(parameters.batchSize()),
                 any(MoreSearch.ScrollCallback.class)
         );
-        verify(searchFactory, never()).create(eq(config), eq(parameters), any(String.class), eq(eventDefinitionDto), eq(List.of()));
+        verify(searchFactory, never()).create(eq(config), eq(parameters), any(AggregationSearch.User.class), eq(eventDefinitionDto), eq(List.of()));
     }
 
     @Test
