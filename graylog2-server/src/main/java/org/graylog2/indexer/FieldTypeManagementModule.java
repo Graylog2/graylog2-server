@@ -16,8 +16,6 @@
  */
 package org.graylog2.indexer;
 
-import org.graylog2.migrations.V20230905081400_CreateFieldTypeMappingsManagerRole;
-import org.graylog2.migrations.V20240118130000_FieldTypeMappingsManagerRoleReceivesProfilePermissions;
 import org.graylog2.plugin.PluginModule;
 import org.graylog2.rest.resources.system.field_types.FieldTypeMappingsResource;
 
@@ -25,7 +23,5 @@ public class FieldTypeManagementModule extends PluginModule {
     @Override
     protected void configure() {
         addSystemRestResource(FieldTypeMappingsResource.class);
-        addMigration(V20230905081400_CreateFieldTypeMappingsManagerRole.class);
-        addMigration(V20240118130000_FieldTypeMappingsManagerRoleReceivesProfilePermissions.class);
     }
 }

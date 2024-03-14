@@ -16,7 +16,10 @@
  */
 package org.graylog.storage.elasticsearch7.views.searchtypes;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
+import jakarta.inject.Inject;
+import org.graylog.events.event.EventDto;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
@@ -38,6 +41,13 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 public class ESEventList implements ESSearchTypeHandler<EventList> {
+    private final ObjectMapper objectMapper;
+
+    @Inject
+    public ESEventList(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
+
     @Override
     public void doGenerateQueryPart(Query query, EventList eventList,
                                     ESGeneratedQueryContext queryContext) {
@@ -53,12 +63,11 @@ public class ESEventList implements ESSearchTypeHandler<EventList> {
             filterQueries.forEach(filterQuery -> boolQueryBuilder.filter(QueryBuilders.queryStringQuery(filterQuery)));
         }
 
-        searchSourceBuilder.size(10000);
-        eventList.page().ifPresent(page -> {
-            final var pageSize = eventList.perPage().orElse(EventList.DEFAULT_PAGE_SIZE);
+        eventList.page().ifPresentOrElse(page -> {
+            final int pageSize = eventList.perPage().orElse(EventList.DEFAULT_PAGE_SIZE);
             searchSourceBuilder.size(pageSize);
-            searchSourceBuilder.from(page * pageSize);
-        });
+            searchSourceBuilder.from((page - 1) * pageSize);
+        }, () -> searchSourceBuilder.size(10000));
     }
 
     private SortOrder toSortOrder(EventList.Direction direction) {
@@ -82,6 +91,7 @@ public class ESEventList implements ESSearchTypeHandler<EventList> {
                 ? query.usedStreamIds()
                 : searchType.streams();
         final List<CommonEventSummary> eventSummaries = extractResult(result).stream()
+                .map(rawEvent -> objectMapper.convertValue(rawEvent, EventDto.class))
                 .map(EventSummary::parse)
                 .filter(eventSummary -> effectiveStreams.containsAll(eventSummary.streams()))
                 .collect(Collectors.toList());

@@ -47,6 +47,7 @@ export const FILTERED_FIELDS = [
   // Our reserved fields.
   'gl2_accounted_message_size',
   'gl2_processing_timestamp',
+  'gl2_processing_duration_ms',
   'gl2_receive_timestamp',
   'gl2_message_id',
   'gl2_source_node',
