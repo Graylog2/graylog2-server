@@ -17,11 +17,11 @@
 package org.graylog.storage.opensearch2.views;
 
 import com.google.common.collect.Maps;
-import com.unboundid.util.NotNull;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Provider;
+import jakarta.validation.constraints.NotNull;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.GlobalOverride;
 import org.graylog.plugins.views.search.Query;
