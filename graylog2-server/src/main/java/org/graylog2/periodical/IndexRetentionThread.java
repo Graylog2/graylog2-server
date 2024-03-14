@@ -17,6 +17,7 @@
 package org.graylog2.periodical;
 
 import org.graylog2.configuration.ElasticsearchConfiguration;
+import org.graylog2.datatiering.DataTieringOrchestrator;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.cluster.Cluster;
@@ -45,6 +46,7 @@ public class IndexRetentionThread extends Periodical {
     private final NodeId nodeId;
     private final NotificationService notificationService;
     private final Map<String, Provider<RetentionStrategy>> retentionStrategyMap;
+    private final DataTieringOrchestrator dataTieringOrchestrator;
 
     @Inject
     public IndexRetentionThread(ElasticsearchConfiguration configuration,
@@ -52,13 +54,15 @@ public class IndexRetentionThread extends Periodical {
                                 Cluster cluster,
                                 NodeId nodeId,
                                 NotificationService notificationService,
-                                Map<String, Provider<RetentionStrategy>> retentionStrategyMap) {
+                                Map<String, Provider<RetentionStrategy>> retentionStrategyMap,
+                                DataTieringOrchestrator dataTieringOrchestrator) {
         this.configuration = configuration;
         this.indexSetRegistry = indexSetRegistry;
         this.cluster = cluster;
         this.nodeId = nodeId;
         this.notificationService = notificationService;
         this.retentionStrategyMap = retentionStrategyMap;
+        this.dataTieringOrchestrator = dataTieringOrchestrator;
     }
 
     @Override
@@ -78,16 +82,20 @@ public class IndexRetentionThread extends Periodical {
                 continue;
             }
             final IndexSetConfig config = indexSet.getConfig();
-            final Provider<RetentionStrategy> retentionStrategyProvider = retentionStrategyMap.get(config.retentionStrategyClass());
+            if (config.dataTiering() != null) {
+                dataTieringOrchestrator.retain(indexSet);
+            } else {
+                final Provider<RetentionStrategy> retentionStrategyProvider = retentionStrategyMap.get(config.retentionStrategyClass());
 
-            if (retentionStrategyProvider == null) {
-                LOG.warn("Retention strategy \"{}\" not found, not running index retention!", config.retentionStrategyClass());
-                retentionProblemNotification("Index Retention Problem!",
-                        "Index retention strategy " + config.retentionStrategyClass() + " not found! Please fix your index retention configuration!");
-                continue;
+                if (retentionStrategyProvider == null) {
+                    LOG.warn("Retention strategy \"{}\" not found, not running index retention!", config.retentionStrategyClass());
+                    retentionProblemNotification("Index Retention Problem!",
+                            "Index retention strategy " + config.retentionStrategyClass() + " not found! Please fix your index retention configuration!");
+                    continue;
+                }
+
+                retentionStrategyProvider.get().retain(indexSet);
             }
-
-            retentionStrategyProvider.get().retain(indexSet);
         }
     }
 

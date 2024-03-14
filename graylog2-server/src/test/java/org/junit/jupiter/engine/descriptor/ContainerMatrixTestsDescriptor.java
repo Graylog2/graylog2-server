@@ -17,6 +17,7 @@
 package org.junit.jupiter.engine.descriptor;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
 import org.graylog.testing.completebackend.DefaultMavenProjectDirProvider;
 import org.graylog.testing.completebackend.DefaultPluginJarsProvider;
 import org.graylog.testing.completebackend.Lifecycle;
@@ -24,6 +25,7 @@ import org.graylog.testing.completebackend.MavenProjectDirProvider;
 import org.graylog.testing.completebackend.PluginJarsProvider;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.SearchServer;
+import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog2.storage.SearchVersion;
 import org.junit.platform.engine.TestDescriptor;
 import org.junit.platform.engine.support.descriptor.AbstractTestDescriptor;
@@ -37,8 +39,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.graylog.testing.containermatrix.ContainerMatrixTestEngine.getSearchVersionOverride;
+import static org.graylog.testing.containermatrix.ContainerMatrixTestEngine.isCompatible;
 
 public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
     public static final String SEGMENT_TYPE = "matrix";
@@ -46,12 +53,12 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
     private final Lifecycle lifecycle;
     private final Class<? extends MavenProjectDirProvider> mavenProjectDirProvider;
     private final Class<? extends PluginJarsProvider> pluginJarsProvider;
-    private final SearchVersion esVersion;
+    private final SearchVersion searchVersion;
     private final MongodbServer mongoVersion;
-    private final Set<Integer> extraPorts = Collections.synchronizedSet(new HashSet<>());
     private final Set<URL> mongoDBFixtures = Collections.synchronizedSet(new HashSet<>());
     private final Set<String> enabledFeatureFlags = Collections.synchronizedSet(new HashSet<>());
     private final boolean withMailServerEnabled;
+    private final boolean withWebhookServerEnabled;
     private final Map<String, String> additionalConfigurationParameters;
 
     public ContainerMatrixTestsDescriptor(TestDescriptor parent,
@@ -62,29 +69,27 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
                                           String pluginJarsProviderId,
                                           SearchVersion esVersion,
                                           MongodbServer mongoVersion,
-                                          Set<Integer> extraPorts,
                                           List<URL> mongoDBFixtures,
-                                          List<String> enabledFeatureFlags, boolean withMailServerEnabled,
-                                          Map<String, String> additionalConfigurationParameters) {
-        super(parent.getUniqueId().append(SEGMENT_TYPE,
-                        createKey(lifecycle, mavenProjectDirProviderId, pluginJarsProviderId, esVersion, mongoVersion, withMailServerEnabled, additionalConfigurationParameters)),
-                createKey(lifecycle, mavenProjectDirProviderId, pluginJarsProviderId, esVersion, mongoVersion, withMailServerEnabled, additionalConfigurationParameters));
+                                          List<String> enabledFeatureFlags, boolean withMailServerEnabled, boolean withWebhookServerEnabled, Map<String, String> additionalConfigurationParameters) {
+        super(
+                parent.getUniqueId().append(SEGMENT_TYPE, createKey(lifecycle, mavenProjectDirProviderId, pluginJarsProviderId, esVersion, mongoVersion, withMailServerEnabled, withWebhookServerEnabled, additionalConfigurationParameters)),
+                createKey(lifecycle, mavenProjectDirProviderId, pluginJarsProviderId, esVersion, mongoVersion, withMailServerEnabled, withWebhookServerEnabled, additionalConfigurationParameters)
+        );
         setParent(parent);
         this.lifecycle = lifecycle;
         this.mavenProjectDirProvider = mavenProjectDirProvider;
         this.pluginJarsProvider = pluginJarsProvider;
-        this.esVersion = esVersion;
+        this.searchVersion = esVersion;
         this.mongoVersion = mongoVersion;
-        this.extraPorts.addAll(extraPorts);
         this.mongoDBFixtures.addAll(mongoDBFixtures);
         this.enabledFeatureFlags.addAll(enabledFeatureFlags);
         this.withMailServerEnabled = withMailServerEnabled;
+        this.withWebhookServerEnabled = withWebhookServerEnabled;
         this.additionalConfigurationParameters = additionalConfigurationParameters;
     }
 
     public ContainerMatrixTestsDescriptor(TestDescriptor parent,
                                           String displayName,
-                                          Set<Integer> extraPorts,
                                           List<URL> mongoDBFixtures) {
         super(parent.getUniqueId().append(SEGMENT_TYPE,
                         displayName),
@@ -93,16 +98,16 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
         this.lifecycle = Lifecycle.VM;
         this.mavenProjectDirProvider = DefaultMavenProjectDirProvider.class;
         this.pluginJarsProvider = DefaultPluginJarsProvider.class;
-        this.esVersion = SearchServer.DEFAULT_VERSION.getSearchVersion();
+        this.searchVersion = SearchServer.DEFAULT_VERSION.getSearchVersion();
         this.mongoVersion = MongodbServer.DEFAULT_VERSION;
-        this.extraPorts.addAll(extraPorts);
         this.mongoDBFixtures.addAll(mongoDBFixtures);
         this.withMailServerEnabled = false;
+        this.withWebhookServerEnabled = false;
         this.additionalConfigurationParameters = new HashMap<>();
     }
 
     protected static String createKey(Lifecycle lifecycle, String mavenProjectDirProvider, String pluginJarsProvider, SearchVersion searchVersion,
-                                      MongodbServer mongoVersion, boolean withMailServerEnabled, Map<String, String> additionalConfigurationParameters) {
+                                      MongodbServer mongoVersion, boolean withMailServerEnabled, boolean withWebhookServerEnabled, Map<String, String> additionalConfigurationParameters) {
         final ImmutableMap.Builder<String, Object> values = ImmutableMap.<String, Object>builder()
                 .put("Lifecycle", lifecycle.name())
                 .put("MavenProjectDirProvider", mavenProjectDirProvider)
@@ -113,6 +118,11 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
         if(withMailServerEnabled) {
             values.put("Mailserver", "enabled");
         }
+
+        if(withWebhookServerEnabled) {
+            values.put("Webhookserver", "enabled");
+        }
+
 
         values.putAll(additionalConfigurationParameters);
 
@@ -132,8 +142,8 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
         return lifecycle;
     }
 
-    public SearchVersion getEsVersion() {
-        return esVersion;
+    public SearchVersion getSearchVersion() {
+        return searchVersion;
     }
 
     public MongodbServer getMongoVersion() {
@@ -143,14 +153,6 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
     @Override
     public Type getType() {
         return Type.CONTAINER;
-    }
-
-    public void addExtraPorts(final int[] ports) {
-        Arrays.stream(ports).forEach(extraPorts::add);
-    }
-
-    public int[] getExtraPorts() {
-        return extraPorts.stream().mapToInt(i -> i).toArray();
     }
 
     public List<URL> getMongoDBFixtures() {
@@ -167,5 +169,57 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
 
     public Map<String, String> getAdditionalConfigurationParameters() {
         return additionalConfigurationParameters;
+    }
+
+    public boolean withEnabledWebhookServer() {
+        return withWebhookServerEnabled;
+    }
+
+    public boolean matches(ContainerMatrixTestsConfiguration config) {
+        return config.serverLifecycle().equals(this.getLifecycle())
+                && config.mavenProjectDirProvider().equals(this.getMavenProjectDirProvider())
+                && config.pluginJarsProvider().equals(this.getPluginJarsProvider())
+                && isMatchingSearchServer(config)
+                && getMongodbServers(config).contains(this.getMongoVersion())
+                && config.withMailServerEnabled() == this.withEnabledMailServer()
+                && config.withWebhookServerEnabled() == this.withEnabledWebhookServer()
+                && featureFlagsMatching(config)
+                && paramsMatching(config);
+    }
+
+    private boolean paramsMatching(ContainerMatrixTestsConfiguration config) {
+        final Map<String, String> params = Arrays.stream(config.additionalConfigurationParameters())
+                .collect(Collectors.toMap(ContainerMatrixTestsConfiguration.ConfigurationParameter::key, ContainerMatrixTestsConfiguration.ConfigurationParameter::value));
+        final Map<String, String> containerParams = this.getAdditionalConfigurationParameters();
+        return containerParams.size() == params.size() && containerParams.entrySet().stream().allMatch(entry -> Objects.equals(params.get(entry.getKey()), entry.getValue()));
+    }
+
+    private boolean featureFlagsMatching(ContainerMatrixTestsConfiguration config) {
+        final List<String> configFlags = Arrays.stream(config.enabledFeatureFlags()).toList();
+        final List<String> containerFlags = this.getEnabledFeatureFlags();
+        return containerFlags.size() == configFlags.size() && containerFlags.containsAll(configFlags);
+    }
+
+
+    private static  Set<MongodbServer> getMongodbServers(ContainerMatrixTestsConfiguration config) {
+        return Sets.newHashSet(config.mongoVersions());
+    }
+
+    private boolean isMatchingSearchServer(ContainerMatrixTestsConfiguration config) {
+        final var optional = getSearchVersionOverride();
+        if(optional.isPresent()) {
+            if(config.searchVersions().length == 0) {
+                return true;
+            } else {
+                final var override = optional.get();
+                return Arrays.stream(config.searchVersions()).anyMatch(version -> isCompatible(override, version));
+            }
+        } else {
+            return getSearchServers(config).contains(this.getSearchVersion());
+        }
+    }
+
+    private static Set<SearchVersion> getSearchServers(ContainerMatrixTestsConfiguration config) {
+        return Stream.of(config.searchVersions()).map(SearchServer::getSearchVersion).collect(Collectors.toSet());
     }
 }

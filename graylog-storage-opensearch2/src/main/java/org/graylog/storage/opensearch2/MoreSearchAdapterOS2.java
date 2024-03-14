@@ -18,10 +18,13 @@ package org.graylog.storage.opensearch2;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Streams;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.EventProcessorException;
 import org.graylog.events.search.MoreSearch;
 import org.graylog.events.search.MoreSearchAdapter;
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.support.IndicesOptions;
@@ -39,9 +42,6 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -61,21 +61,24 @@ import static org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBui
 
 public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(MoreSearchAdapterOS2.class);
-    public static final IndicesOptions INDICES_OPTIONS = IndicesOptions.fromOptions(false, false, true, false);
+    public static final IndicesOptions INDICES_OPTIONS = IndicesOptions.LENIENT_EXPAND_OPEN;
     private final OpenSearchClient client;
     private final Boolean allowLeadingWildcard;
     private final SortOrderMapper sortOrderMapper;
     private final MultiChunkResultRetriever multiChunkResultRetriever;
+    private final OS2ResultMessageFactory resultMessageFactory;
 
     @Inject
     public MoreSearchAdapterOS2(OpenSearchClient client,
                                 @Named("allow_leading_wildcard_searches") Boolean allowLeadingWildcard,
                                 SortOrderMapper sortOrderMapper,
-                                MultiChunkResultRetriever multiChunkResultRetriever) {
+                                MultiChunkResultRetriever multiChunkResultRetriever,
+                                OS2ResultMessageFactory resultMessageFactory) {
         this.client = client;
         this.allowLeadingWildcard = allowLeadingWildcard;
         this.sortOrderMapper = sortOrderMapper;
         this.multiChunkResultRetriever = multiChunkResultRetriever;
+        this.resultMessageFactory = resultMessageFactory;
     }
 
     @Override
@@ -89,7 +92,7 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
         final BoolQueryBuilder filter = boolQuery()
                 .filter(query)
                 .filter(termsQuery(EventDto.FIELD_STREAMS, eventStreams))
-                .filter(requireNonNull(TimeRangeQueryFactory.create(timerange)));
+                .filter(requireNonNull(LegacyTimeRangeQueryFactory.create(timerange)));
 
         if (!isNullOrEmpty(filterString)) {
             filter.filter(queryStringQuery(filterString));
@@ -115,13 +118,13 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Query:\n{}", searchSourceBuilder.toString(new ToXContent.MapParams(Collections.singletonMap("pretty", "true"))));
-            LOG.debug("Execute search: {}", searchRequest.toString());
+            LOG.debug("Execute search: {}", searchRequest);
         }
 
         final SearchResponse searchResult = client.search(searchRequest, "Unable to perform search query");
 
         final List<ResultMessage> hits = Streams.stream(searchResult.getHits())
-                .map(ResultMessageFactory::fromSearchHit)
+                .map(resultMessageFactory::fromSearchHit)
                 .collect(Collectors.toList());
 
         final long total = searchResult.getHits().getTotalHits().value;
@@ -136,13 +139,13 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
     }
 
     @Override
-    public void scrollEvents(String queryString, TimeRange timeRange, Set<String> affectedIndices, Set<String> streams, int batchSize, ScrollEventsCallback resultCallback) throws EventProcessorException {
-        final ChunkCommand chunkCommand = buildScrollCommand(queryString, timeRange, affectedIndices, streams, batchSize);
+    public void scrollEvents(String queryString, TimeRange timeRange, Set<String> affectedIndices, Set<String> streams,
+                             List<UsedSearchFilter> filters, int batchSize, ScrollEventsCallback resultCallback) throws EventProcessorException {
+        final ChunkCommand chunkCommand = buildScrollCommand(queryString, timeRange, affectedIndices, filters, streams, batchSize);
 
         final ChunkedResult chunkedResult = multiChunkResultRetriever.retrieveChunkedResult(chunkCommand);
 
         final AtomicBoolean continueScrolling = new AtomicBoolean(true);
-
         final Stopwatch stopwatch = Stopwatch.createStarted();
         try {
             ResultChunk resultChunk = chunkedResult.nextChunk();
@@ -172,11 +175,13 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
         }
     }
 
-    private ChunkCommand buildScrollCommand(String queryString, TimeRange timeRange, Set<String> affectedIndices, Set<String> streams, int batchSize) {
+    private ChunkCommand buildScrollCommand(String queryString, TimeRange timeRange, Set<String> affectedIndices,
+                                            List<UsedSearchFilter> filters, Set<String> streams, int batchSize) {
         ChunkCommand.Builder commandBuilder = ChunkCommand.builder()
                 .query(queryString)
                 .range(timeRange)
                 .indices(affectedIndices)
+                .filters(filters == null ? Collections.emptyList() : filters)
                 .batchSize(batchSize)
                 // For correlation need the oldest messages to come in first
                 .sorting(new Sorting(Message.FIELD_TIMESTAMP, Sorting.Direction.ASC));

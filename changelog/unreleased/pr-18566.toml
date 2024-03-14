@@ -1,0 +1,5 @@
+type = "added"
+message = "Add UI for Data Node client certificate creation"
+
+issues = ["16466"]
+pulls = ["18566"]

@@ -20,16 +20,28 @@ import com.google.common.collect.ImmutableSet;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.search.engine.QuerySuggestionsService;
+import org.graylog.plugins.views.search.engine.suggestions.FieldValueSuggestionMode;
 import org.graylog.plugins.views.search.engine.suggestions.SuggestionFieldType;
 import org.graylog.plugins.views.search.engine.suggestions.SuggestionRequest;
 import org.graylog.plugins.views.search.engine.suggestions.SuggestionResponse;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.querystrings.LastUsedQueryStringsService;
+import org.graylog.plugins.views.search.querystrings.QueryString;
 import org.graylog.plugins.views.search.rest.suggestions.SuggestionEntryDTO;
 import org.graylog.plugins.views.search.rest.suggestions.SuggestionsDTO;
 import org.graylog.plugins.views.search.rest.suggestions.SuggestionsErrorDTO;
 import org.graylog.plugins.views.search.rest.suggestions.SuggestionsRequestDTO;
+import org.graylog2.Configuration;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeService;
@@ -45,25 +57,22 @@ import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleR
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 
-import jakarta.inject.Inject;
-
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.MediaType;
-
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.graylog.plugins.views.search.engine.suggestions.FieldValueSuggestionMode.OFF;
+import static org.graylog.plugins.views.search.engine.suggestions.FieldValueSuggestionMode.TEXTUAL_ONLY;
+import static org.graylog.plugins.views.search.querystrings.LastUsedQueryStringsService.DEFAULT_LIMIT;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
 @Api(value = "Search/Suggestions", tags = {CLOUD_VISIBLE})
 @Path("/search/suggest")
+@Produces(MediaType.APPLICATION_JSON)
 public class SuggestionsResource extends RestResource implements PluginRestResource {
 
     public static final int SUGGESTIONS_COUNT_MAX = 100;
@@ -74,26 +83,50 @@ public class SuggestionsResource extends RestResource implements PluginRestResou
 
     private final EntityTitleService entityTitleService;
     private final NodeService nodeService;
+    private final LastUsedQueryStringsService lastUsedQueryStringsService;
+    private final FieldValueSuggestionMode fieldValueSuggestionMode;
 
     @Inject
-    public SuggestionsResource(PermittedStreams permittedStreams, QuerySuggestionsService querySuggestionsService, MappedFieldTypesService mappedFieldTypesService, EntityTitleService entityTitleService, NodeService nodeService) {
+    public SuggestionsResource(PermittedStreams permittedStreams,
+                               QuerySuggestionsService querySuggestionsService,
+                               MappedFieldTypesService mappedFieldTypesService,
+                               EntityTitleService entityTitleService,
+                               NodeService nodeService,
+                               LastUsedQueryStringsService lastUsedQueryStringsService,
+                               Configuration configuration) {
         this.permittedStreams = permittedStreams;
         this.querySuggestionsService = querySuggestionsService;
         this.mappedFieldTypesService = mappedFieldTypesService;
         this.entityTitleService = entityTitleService;
         this.nodeService = nodeService;
+        this.lastUsedQueryStringsService = lastUsedQueryStringsService;
+        this.fieldValueSuggestionMode = configuration.getFieldValueSuggestionMode();
+    }
+
+    @GET
+    @Path("/query_strings")
+    @ApiOperation("Suggest last used query strings")
+    public List<QueryString> suggestQueryStrings(@Context SearchUser searchUser,
+                                                 @ApiParam("limit") @QueryParam("limit") Integer limit) {
+        return lastUsedQueryStringsService.get(searchUser.getUser(), Optional.ofNullable(limit).orElse(DEFAULT_LIMIT));
     }
 
     @POST
-    @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation("Suggest field value")
     @NoAuditEvent("Only suggesting field value for query, not changing any data")
     public SuggestionsDTO suggestFieldValue(@ApiParam(name = "validationRequest") SuggestionsRequestDTO suggestionsRequest,
                                             @Context SearchUser searchUser) {
-
+        if (fieldValueSuggestionMode == OFF) {
+            return getNoSuggestionResponse(suggestionsRequest.field(), suggestionsRequest.input());
+        }
         final Set<String> streams = adaptStreams(suggestionsRequest.streams(), searchUser);
         final TimeRange timerange = Optional.ofNullable(suggestionsRequest.timerange()).orElse(defaultTimeRange());
         final String fieldName = suggestionsRequest.field();
+        final SuggestionFieldType suggestionFieldType = getFieldType(streams, timerange, fieldName);
+
+        if (fieldValueSuggestionMode == TEXTUAL_ONLY && suggestionFieldType != SuggestionFieldType.TEXTUAL) {
+            return getNoSuggestionResponse(suggestionsRequest.field(), suggestionsRequest.input());
+        }
 
         final Set<MappedFieldTypeDTO> fieldTypes = mappedFieldTypesService.fieldTypesByStreamIds(streams, timerange);
         var fieldType = fieldTypes.stream().filter(f -> f.name().equals(fieldName))
@@ -103,7 +136,7 @@ public class SuggestionsResource extends RestResource implements PluginRestResou
 
         final SuggestionRequest req = SuggestionRequest.builder()
                 .field(fieldName)
-                .fieldType(getFieldType(streams, timerange, fieldName))
+                .fieldType(suggestionFieldType)
                 .input(suggestionsRequest.input())
                 .streams(streams)
                 .size(Math.min(suggestionsRequest.size(), SUGGESTIONS_COUNT_MAX))
@@ -192,5 +225,13 @@ public class SuggestionsResource extends RestResource implements PluginRestResou
                 .map(MappedFieldTypeDTO::type)
                 .map(SuggestionFieldType::fromFieldType)
                 .orElse(SuggestionFieldType.OTHER);
+    }
+
+    private SuggestionsDTO getNoSuggestionResponse(final String fieldName,
+                                                   final String input) {
+        return SuggestionsDTO.builder(fieldName, input)
+                .suggestions(List.of())
+                .sumOtherDocsCount(0L)
+                .build();
     }
 }

@@ -16,7 +16,9 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { render, waitFor, fireEvent, screen, within } from 'wrappedTestingLibrary';
+import { render, waitFor, fireEvent, screen, within, act } from 'wrappedTestingLibrary';
+import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
+import userEvent from '@testing-library/user-event';
 
 import { paginatedUsers, alice, bob, admin as adminOverview } from 'fixtures/userOverviews';
 import asMock from 'helpers/mocking/AsMock';
@@ -43,8 +45,12 @@ jest.mock('stores/users/UsersStore', () => ({
 const clickMoreActions = async (username: string) => {
   const actions = await screen.findByRole('cell', { name: new RegExp(`edit user ${username}`, 'i') });
 
-  return fireEvent.click(await within(actions).findByRole('button', { name: /more actions/i }));
+  await userEvent.click(await within(actions).findByRole('button', { name: /more actions/i }));
+
+  await screen.findByRole('menu');
 };
+
+const extendedTimeout = applyTimeoutMultiplier(30000);
 
 describe('UsersOverview', () => {
   afterEach(() => {
@@ -77,7 +83,7 @@ describe('UsersOverview', () => {
     fireEvent.change(searchInput, { target: { value: 'username:bob' } });
 
     await waitFor(() => expect(UsersActions.loadUsersPaginated).toHaveBeenCalledWith({ page: 1, perPage: 10, query: 'username:bob' }));
-  });
+  }, extendedTimeout);
 
   describe('should display user', () => {
     it.each`
@@ -123,7 +129,13 @@ describe('UsersOverview', () => {
 
       await clickMoreActions(modifiableUser.fullName);
       const deleteButton = await screen.findByTitle(`Delete user ${modifiableUser.fullName}`);
-      fireEvent.click(deleteButton);
+
+      // eslint-disable-next-line testing-library/no-unnecessary-act
+      await act(async () => {
+        await userEvent.click(deleteButton);
+      });
+
+      await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument());
 
       await waitFor(() => {
         expect(screen.queryByTitle(`Delete user ${modifiableUser.fullName}`)).not.toBeInTheDocument();
@@ -133,7 +145,7 @@ describe('UsersOverview', () => {
       expect(window.confirm).toHaveBeenCalledWith(`Do you really want to delete user ${modifiableUser.fullName}?`);
       expect(UsersActions.delete).toHaveBeenCalledTimes(1);
       expect(UsersActions.delete).toHaveBeenCalledWith(modifiableUser.id, modifiableUser.fullName);
-    });
+    }, extendedTimeout);
 
     it('not be able to delete a "read only" user', async () => {
       asMock(UsersActions.loadUsersPaginated).mockReturnValueOnce(Promise.resolve({ ...paginatedUsers, list: readOnlyUsersList }));
@@ -153,7 +165,7 @@ describe('UsersOverview', () => {
       await waitFor(() => {
         expect(screen.getByTitle(`Edit tokens of user ${modifiableUser.fullName}`)).toBeInTheDocument();
       });
-    });
+    }, extendedTimeout);
 
     it('not see edit link for a "read only" user', async () => {
       asMock(UsersActions.loadUsersPaginated).mockReturnValueOnce(Promise.resolve({ ...paginatedUsers, list: readOnlyUsersList }));

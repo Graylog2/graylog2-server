@@ -17,7 +17,7 @@
 package org.graylog.storage.opensearch2;
 
 import com.google.common.collect.Sets;
-import org.graylog.shaded.opensearch2.org.opensearch.client.Node;
+import org.opensearch.client.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

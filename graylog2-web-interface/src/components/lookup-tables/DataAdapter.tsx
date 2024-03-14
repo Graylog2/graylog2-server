@@ -78,7 +78,7 @@ const DataAdapter = ({ dataAdapter }: Props) => {
         </ConfigSummaryDefinitionListWrapper>
         {(!loadingScopePermissions && scopePermissions?.is_mutable) && (
           <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(adapterName)}>
-            <Button bsStyle="success" role="button" name="edit">Edit</Button>
+            <Button bsStyle="success" role="button" name="edit_square">Edit</Button>
           </LinkContainer>
         )}
       </Col>

@@ -26,19 +26,19 @@ type Props = {
   href?: string,
   children: React.ReactNode,
   target?: string,
-  iconClass?: IconName,
+  iconName?: IconName,
   className?: string,
 };
 
 /**
  * Component that renders a link to an external resource.
  */
-const ExternalLink = ({ children, className, href, iconClass, target }: Props) => {
+const ExternalLink = ({ children, className, href, iconName, target }: Props) => {
   const content = (
     <span>
       {children}
       &nbsp;
-      <Icon name={iconClass} />
+      <Icon name={iconName} />
     </span>
   );
 
@@ -57,7 +57,7 @@ const ExternalLink = ({ children, className, href, iconClass, target }: Props) =
 ExternalLink.defaultProps = {
   href: '',
   target: '_blank',
-  iconClass: 'external-link-alt',
+  iconName: 'open_in_new',
   className: '',
 };
 
@@ -69,7 +69,7 @@ ExternalLink.propTypes = {
   /** Browser window target attribute for the link. */
   target: PropTypes.string,
   /** FontAwesome icon class name to use for the indicator icon. */
-  iconClass: PropTypes.string,
+  iconName: PropTypes.string,
   /** Class name for the link. Can be used to change the styling of the link. */
   className: PropTypes.string,
 };

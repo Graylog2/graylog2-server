@@ -50,6 +50,10 @@ public class GraylogApis implements GraylogRestApi {
     private final Indices indices;
     private final FieldTypes fieldTypes;
     private final Views views;
+    private final SystemApi system;
+    private final EventNotifications eventNotifications;
+    private final EventDefinitions eventDefinitions;
+    private final DatanodeProxy datanodeProxy;
 
     public GraylogApis(GraylogBackend backend) {
         this.backend = backend;
@@ -61,6 +65,10 @@ public class GraylogApis implements GraylogRestApi {
         this.indices = new Indices(this);
         this.fieldTypes = new FieldTypes(this);
         this.views = new Views(this);
+        this.system = new SystemApi(this);
+        this.eventNotifications = new EventNotifications(this);
+        this.eventDefinitions = new EventDefinitions(this);
+        this.datanodeProxy = new DatanodeProxy(this);
     }
 
     public RequestSpecification requestSpecification() {
@@ -112,6 +120,22 @@ public class GraylogApis implements GraylogRestApi {
 
     public Views views() {
         return views;
+    }
+
+    public SystemApi system() {
+        return system;
+    }
+
+    public EventNotifications eventsNotifications() {
+        return eventNotifications;
+    }
+
+    public EventDefinitions eventDefinitions() {
+        return eventDefinitions;
+    }
+
+    public DatanodeProxy datanodeProxy() {
+        return datanodeProxy;
     }
 
     protected RequestSpecification prefix(final Users.User user) {

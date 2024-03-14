@@ -16,9 +16,9 @@
  */
 package org.graylog.storage.opensearch2.ism;
 
-import org.graylog.storage.opensearch2.ism.policy.IsmPolicy;
-import org.graylog.storage.opensearch2.ism.policy.IsmPolicyTest;
 import org.graylog.storage.opensearch2.testing.OpenSearchInstance;
+import org.graylog2.indexer.datastream.policy.IsmPolicy;
+import org.graylog2.indexer.datastream.policy.IsmPolicyTest;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Rule;
 import org.junit.Test;

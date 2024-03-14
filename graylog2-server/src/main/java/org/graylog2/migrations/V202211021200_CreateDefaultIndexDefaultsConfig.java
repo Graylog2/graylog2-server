@@ -16,14 +16,14 @@
  */
 package org.graylog2.migrations;
 
+import jakarta.inject.Inject;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.configuration.IndexSetsDefaultConfiguration;
 import org.graylog2.configuration.IndexSetsDefaultConfigurationFactory;
+import org.graylog2.datatiering.fallback.PlaceholderDataTieringConfig;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.time.ZonedDateTime;
 
@@ -50,13 +50,20 @@ public class V202211021200_CreateDefaultIndexDefaultsConfig extends Migration {
 
     @Override
     public void upgrade() {
-        if (clusterConfigService.get(IndexSetsDefaultConfiguration.class) != null) {
+        IndexSetsDefaultConfiguration indexSetsDefaultConfiguration = clusterConfigService.get(IndexSetsDefaultConfiguration.class);
+
+        if (indexSetsDefaultConfiguration == null) {
+            indexSetsDefaultConfiguration = factory.create();
+        } else if (indexSetsDefaultConfiguration.dataTiering() instanceof PlaceholderDataTieringConfig) {
+            LOG.info("Applying data tiering to Indexset defaults");
+            indexSetsDefaultConfiguration = factory.addDataTieringDefaults(indexSetsDefaultConfiguration);
+        } else {
             LOG.debug("Migration already completed.");
             return;
         }
 
         try {
-            clusterConfigService.write(factory.create());
+            clusterConfigService.write(indexSetsDefaultConfiguration);
             LOG.debug("IndexSetsDefaultConfiguration saved.");
         } catch (Exception e) {
             LOG.error("Unable to write IndexSetsDefaultConfiguration.", e);

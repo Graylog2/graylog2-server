@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableList;
 import org.graylog.events.TestEventProcessorConfig;
 import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
+import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
 import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
@@ -38,7 +39,6 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -66,7 +66,7 @@ public class DBEventProcessorServiceTest {
         objectMapper.registerSubtypes(new NamedType(PersistToStreamsStorageHandler.Config.class, PersistToStreamsStorageHandler.Config.TYPE_NAME));
 
         this.dbService = new DBEventDefinitionService(mongodb.mongoConnection(), new MongoJackObjectMapperProvider(objectMapper),
-                stateService, mock(EntityOwnershipService.class), new EntityScopeService(ENTITY_SCOPES));
+                stateService, mock(EntityOwnershipService.class), new EntityScopeService(ENTITY_SCOPES), new IgnoreSearchFilters());
     }
 
     @Test

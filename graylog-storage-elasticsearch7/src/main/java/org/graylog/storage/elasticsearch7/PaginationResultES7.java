@@ -22,7 +22,9 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchR
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.SearchHit;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.graylog2.indexer.results.ResultMessageFactory;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.List;
 
@@ -30,17 +32,19 @@ public class PaginationResultES7 extends ChunkedQueryResultES7 {
     private SearchRequest initialSearchRequest;
 
     @AssistedInject
-    public PaginationResultES7(ElasticsearchClient client,
+    public PaginationResultES7(ResultMessageFactory resultMessageFactory,
+                               ElasticsearchClient client,
                                SearchRequest initialSearchRequest,
                                @Assisted SearchResponse initialResult,
                                @Assisted("query") String query,
                                @Assisted List<String> fields,
                                @Assisted int limit) {
-        super(client, initialResult, query, fields, limit);
+        super(resultMessageFactory, client, initialResult, query, fields, limit);
         this.initialSearchRequest = initialSearchRequest;
     }
 
     @Override
+    @Nullable
     protected SearchResponse nextSearchResult() throws IOException {
         final SearchSourceBuilder initialQuery = initialSearchRequest.source();
         final SearchHit[] hits = lastSearchResponse.getHits().getHits();

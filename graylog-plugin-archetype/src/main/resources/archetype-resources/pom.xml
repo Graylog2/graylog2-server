@@ -78,7 +78,7 @@
     </distributionManagement>
 
     <repositories>
-        <!-- to make our snapshot releases work with Travis et al -->
+        <!-- to make our snapshot releases work with CI platforms -->
         <repository>
             <id>sonatype-nexus-snapshots</id>
             <name>Sonatype Nexus Snapshots</name>

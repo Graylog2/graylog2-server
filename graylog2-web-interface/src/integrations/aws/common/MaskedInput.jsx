@@ -28,7 +28,7 @@ const MaskedInput = ({ className, label, ...props }) => {
     <LabelWrapper>
       {label}
       <ToggleMask onClick={() => setMasked(!masked)} ariaDescription={`Toggle ${label} field input`}>
-        <Icon name={masked ? 'eye-slash' : 'eye'} />
+        <Icon name={masked ? 'visibility_off' : 'visibility'} />
       </ToggleMask>
     </LabelWrapper>
   );

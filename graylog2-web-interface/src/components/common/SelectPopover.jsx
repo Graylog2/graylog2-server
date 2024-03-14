@@ -26,7 +26,6 @@ import {
   FormGroup,
   ListGroup,
   ListGroupItem,
-  Popover,
 } from 'components/bootstrap';
 import Icon from 'components/common/Icon';
 import OverlayTrigger from 'components/common/OverlayTrigger';
@@ -173,7 +172,7 @@ class SelectPopover extends React.Component {
 
     return (
       <ListGroupItem onClick={this.clearItemSelection}>
-        <Icon name="times" fixedWidth className="text-danger" /> {clearSelectionText}
+        <Icon name="close" className="text-danger" /> {clearSelectionText}
       </ListGroupItem>
     );
   };
@@ -187,15 +186,11 @@ class SelectPopover extends React.Component {
       triggerAction,
       triggerNode,
       disabled,
-      id,
       title,
     } = this.props;
     const { filteredItems, selectedItems } = this.state;
     const popover = (
-      <Popover id={id}
-               title={title}
-               placement={placement}
-               className={style.customPopover}>
+      <>
         {displayDataFilter && this.renderDataFilter(items)}
         {selectedItems.length > 0 && this.renderClearSelectionItem()}
         <IsolatedScroll className={style.scrollableList}>
@@ -211,7 +206,7 @@ class SelectPopover extends React.Component {
             ))}
           </ListGroup>
         </IsolatedScroll>
-      </Popover>
+      </>
     );
 
     return (
@@ -221,6 +216,7 @@ class SelectPopover extends React.Component {
                       trigger={triggerAction}
                       placement={placement}
                       overlay={popover}
+                      title={title}
                       rootClose>
         {triggerNode}
       </OverlayTrigger>

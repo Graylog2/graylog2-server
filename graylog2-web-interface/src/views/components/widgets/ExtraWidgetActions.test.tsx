@@ -60,20 +60,20 @@ describe('ExtraWidgetActions', () => {
 
   afterAll(unloadViewsPlugin);
 
-  it('returns `null` if no action is configured', () => {
+  it('does not render menu items, when no action is configured', () => {
     asMock(useWidgetActions).mockReturnValue([]);
 
-    const { container } = render(<ExtraWidgetActionsWithoutMenu widget={widget} />);
+    render(<ExtraWidgetActionsWithoutMenu widget={widget} />);
 
-    expect(container).toBeEmptyDOMElement();
+    expect(screen.queryByRole('menuitem')).not.toBeInTheDocument();
   });
 
-  it('returns `null` if no action is not hidden', () => {
+  it('does not render menu items, if no action is hidden', () => {
     asMock(useWidgetActions).mockReturnValue([dummyActionWhichIsHidden]);
 
-    const { container } = render(<ExtraWidgetActionsWithoutMenu widget={widget} />);
+    render(<ExtraWidgetActionsWithoutMenu widget={widget} />);
 
-    expect(container).toBeEmptyDOMElement();
+    expect(screen.queryByRole('menuitem')).not.toBeInTheDocument();
   });
 
   it('renders action which has no `isHidden`', async () => {

@@ -54,6 +54,8 @@ import org.graylog.plugins.views.search.filter.AndFilter;
 import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
+import org.graylog.plugins.views.search.querystrings.LastUsedQueryStringsService;
+import org.graylog.plugins.views.search.querystrings.MongoLastUsedQueryStringsService;
 import org.graylog.plugins.views.search.rest.DashboardsResource;
 import org.graylog.plugins.views.search.rest.ExportJobsResource;
 import org.graylog.plugins.views.search.rest.FieldTypesResource;
@@ -61,6 +63,7 @@ import org.graylog.plugins.views.search.rest.MessageExportFormatFilter;
 import org.graylog.plugins.views.search.rest.MessagesResource;
 import org.graylog.plugins.views.search.rest.PivotSeriesFunctionsResource;
 import org.graylog.plugins.views.search.rest.QualifyingViewsResource;
+import org.graylog.plugins.views.search.rest.QueryStringsResource;
 import org.graylog.plugins.views.search.rest.QueryValidationResource;
 import org.graylog.plugins.views.search.rest.SavedSearchesResource;
 import org.graylog.plugins.views.search.rest.SearchMetadataResource;
@@ -72,6 +75,7 @@ import org.graylog.plugins.views.search.rest.contexts.SearchUserBinder;
 import org.graylog.plugins.views.search.rest.exceptionmappers.IllegalTimeRangeExceptionMapper;
 import org.graylog.plugins.views.search.rest.exceptionmappers.MissingCapabilitiesExceptionMapper;
 import org.graylog.plugins.views.search.rest.exceptionmappers.PermissionExceptionMapper;
+import org.graylog.plugins.views.search.rest.remote.SearchJobsStatusResource;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.events.EventList;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
@@ -150,6 +154,7 @@ public class ViewsBindings extends ViewsModule {
         addSystemRestResource(QualifyingViewsResource.class);
         addSystemRestResource(SavedSearchesResource.class);
         addSystemRestResource(SearchResource.class);
+        addSystemRestResource(SearchJobsStatusResource.class);
         addSystemRestResource(SearchMetadataResource.class);
         addSystemRestResource(ViewsResource.class);
         addSystemRestResource(SuggestionsResource.class);
@@ -261,6 +266,9 @@ public class ViewsBindings extends ViewsModule {
         viewResolverBinder();
 
         install(new EngineBindings());
+
+        bind(LastUsedQueryStringsService.class).to(MongoLastUsedQueryStringsService.class);
+        addSystemRestResource(QueryStringsResource.class);
     }
 
     private void registerExportBackendProvider() {
@@ -302,4 +310,5 @@ public class ViewsBindings extends ViewsModule {
         addJerseyExceptionMapper(PermissionExceptionMapper.class);
         addJerseyExceptionMapper(IllegalTimeRangeExceptionMapper.class);
     }
+
 }

@@ -22,8 +22,10 @@ import com.google.common.collect.ImmutableSet;
 import org.graylog.events.event.EventDto;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchJob;
+import org.graylog.plugins.views.search.searchtypes.events.CommonEventSummary;
 import org.graylog.plugins.views.search.searchtypes.events.EventList;
 import org.graylog.plugins.views.search.searchtypes.events.EventSummary;
+import org.graylog.shaded.opensearch2.org.apache.lucene.search.TotalHits;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregations;
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
@@ -34,13 +36,14 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class OSEventListTest {
 
@@ -49,9 +52,10 @@ public class OSEventListTest {
         final OSEventList esEventList = new TestOSEventList();
         final SearchJob searchJob = mock(SearchJob.class);
         final Query query = mock(Query.class);
-        final SearchResponse searchResult = mock(SearchResponse.class);
+        final SearchResponse searchResult = mock(SearchResponse.class, RETURNS_DEEP_STUBS);
         final Aggregations metricAggregation = mock(Aggregations.class);
         final OSGeneratedQueryContext queryContext = mock(OSGeneratedQueryContext.class);
+        when(searchResult.getHits().getTotalHits()).thenReturn(new TotalHits(1000, TotalHits.Relation.EQUAL_TO));
 
         final EventList eventList = EventList.builder()
                 .id("search-type-id")
@@ -59,11 +63,18 @@ public class OSEventListTest {
                 .build();
         final EventList.Result eventResult = (EventList.Result) esEventList.doExtractResult(searchJob, query, eventList, searchResult,
                 metricAggregation, queryContext);
-        assertThat(eventResult.events()).containsExactly(
+        assertThat(stripRawEvents(eventResult.events())).containsExactly(
                 eventSummary("find-1", ImmutableSet.of("stream-id-1")),
                 eventSummary("find-2", ImmutableSet.of("stream-id-2")),
                 eventSummary("find-3", ImmutableSet.of("stream-id-1", "stream-id-2"))
         );
+    }
+
+    private List<EventSummary> stripRawEvents(List<CommonEventSummary> events) {
+        return events.stream()
+                .map(event -> (EventSummary) event)
+                .map(event -> event.toBuilder().rawEvent(Map.of()).build())
+                .toList();
     }
 
     final private static DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
@@ -76,39 +87,36 @@ public class OSEventListTest {
                 .streams(streams)
                 .timestamp(DateTime.parse(timestamp.toString(Tools.ES_DATE_FORMAT_FORMATTER), Tools.ES_DATE_FORMAT_FORMATTER))
                 .alert(false)
+                .eventDefinitionId("deadbeef")
+                .priority(2)
+                .eventKeys(List.of())
                 .build();
     }
 
     static class TestOSEventList extends OSEventList {
-        private Map<String, Object> hit(String id, ArrayList<String> streams) {
+        private Map<String, Object> hit(String id, List<String> streams) {
             return ImmutableMap.of(
                     EventDto.FIELD_ID, id,
                     EventDto.FIELD_MESSAGE, "message",
                     EventDto.FIELD_SOURCE_STREAMS, streams,
                     EventDto.FIELD_EVENT_TIMESTAMP, timestamp.toString(Tools.ES_DATE_FORMAT_FORMATTER),
-                    EventDto.FIELD_ALERT, false
+                    EventDto.FIELD_EVENT_DEFINITION_ID, "deadbeef",
+                    EventDto.FIELD_ALERT, false,
+                    EventDto.FIELD_PRIORITY, 2,
+                    EventDto.FIELD_KEY_TUPLE, List.of()
             );
         }
 
         @Override
         protected List<Map<String, Object>> extractResult(SearchResponse result) {
-            final ArrayList<String> list1 = new ArrayList<>(); list1.add("stream-id-1");
-            final ArrayList<String> list2 = new ArrayList<>(); list2.add("stream-id-2");
-            final ArrayList<String> list3 = new ArrayList<>(); list3.add("stream-id-1"); list3.add("stream-id-2");
-            final ArrayList<String> list4 = new ArrayList<>(); list4.add("stream-id-3");
-            final ArrayList<String> list5 = new ArrayList<>(); list5.add("stream-id-1"); list5.add("stream-id-3");
-            final ArrayList<String> list6 = new ArrayList<>(); list6.add("stream-id-2"); list6.add("stream-id-3");
-            final ArrayList<String> list7 = new ArrayList<>(); list7.add("stream-id-1"); list7.add("stream-id-2");
-            list7.add("stream-id-3");
-
             return ImmutableList.of(
-                    hit("find-1", list1),
-                    hit("find-2", list2),
-                    hit("find-3", list3),
-                    hit("do-not-find-1", list4),
-                    hit("do-not-find-2", list5),
-                    hit("do-not-find-3", list6),
-                    hit("do-not-find-4", list7)
+                    hit("find-1", List.of("stream-id-1")),
+                    hit("find-2", List.of("stream-id-2")),
+                    hit("find-3", List.of("stream-id-1", "stream-id-2")),
+                    hit("do-not-find-1", List.of("stream-id-3")),
+                    hit("do-not-find-2", List.of("stream-id-1", "stream-id-3")),
+                    hit("do-not-find-3", List.of("stream-id-2", "stream-id-3")),
+                    hit("do-not-find-4", List.of("stream-id-1", "stream-id-2", "stream-id-3"))
             );
         }
     }

@@ -16,8 +16,12 @@
  */
 package org.graylog2.indexer.results;
 
+import org.graylog.testing.messages.MessagesExtension;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -25,8 +29,10 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.indexer.results.ChunkedQueryResultTest.ServerlessChunkedQueryResultSimulation.BACKING_RESULT_LIST;
+import static org.mockito.Mockito.doReturn;
 
 
+@ExtendWith(MessagesExtension.class)
 public class ChunkedQueryResultTest {
 
     private static final String INDEX_NAME = "graylog_0";
@@ -34,8 +40,25 @@ public class ChunkedQueryResultTest {
     private ServerlessChunkedQueryResultSimulation toTest;
 
     @Test
-    void emptyResultWhenLimitIsZero() throws Exception {
-        toTest = new ServerlessChunkedQueryResultSimulation("Client",
+    void emptyResultWhenNextSearchResultReturnsNull(ResultMessageFactory resultMessageFactory) throws Exception {
+        toTest = Mockito.spy(new ServerlessChunkedQueryResultSimulation(resultMessageFactory,
+                "Client",
+                List.of(),
+                "",
+                List.of("name"),
+                100,
+                20
+        ));
+        doReturn(null).when(toTest).nextSearchResult();
+
+        final ResultChunk resultChunk = toTest.nextChunk();
+        assertThat(resultChunk).isNull();
+    }
+
+    @Test
+    void emptyResultWhenLimitIsZero(ResultMessageFactory resultMessageFactory) throws Exception {
+        toTest = new ServerlessChunkedQueryResultSimulation(resultMessageFactory,
+                "Client",
                 null,
                 "",
                 List.of("name"),
@@ -48,8 +71,9 @@ public class ChunkedQueryResultTest {
     }
 
     @Test
-    void getsFirstChunkIfInitialResultIsNull() throws Exception {
-        toTest = new ServerlessChunkedQueryResultSimulation("Client",
+    void getsFirstChunkIfInitialResultIsNull(ResultMessageFactory resultMessageFactory) throws Exception {
+        toTest = new ServerlessChunkedQueryResultSimulation(resultMessageFactory,
+                "Client",
                 null,
                 "",
                 List.of("name"),
@@ -68,8 +92,9 @@ public class ChunkedQueryResultTest {
     }
 
     @Test
-    void getsFirstChunkFromInitialResult() throws Exception {
-        toTest = new ServerlessChunkedQueryResultSimulation("Client",
+    void getsFirstChunkFromInitialResult(ResultMessageFactory resultMessageFactory) throws Exception {
+        toTest = new ServerlessChunkedQueryResultSimulation(resultMessageFactory,
+                "Client",
                 List.of("Alice", "Barbara"),
                 "",
                 List.of("name"),
@@ -88,8 +113,9 @@ public class ChunkedQueryResultTest {
     }
 
     @Test
-    void doesNotExceedLimit() throws Exception {
-        toTest = new ServerlessChunkedQueryResultSimulation("Client",
+    void doesNotExceedLimit(ResultMessageFactory resultMessageFactory) throws Exception {
+        toTest = new ServerlessChunkedQueryResultSimulation(resultMessageFactory,
+                "Client",
                 null,
                 "",
                 List.of("name"),
@@ -130,8 +156,9 @@ public class ChunkedQueryResultTest {
     }
 
     @Test
-    void stopsWhenNoMoreResults() throws Exception {
-        toTest = new ServerlessChunkedQueryResultSimulation("Client",
+    void stopsWhenNoMoreResults(ResultMessageFactory resultMessageFactory) throws Exception {
+        toTest = new ServerlessChunkedQueryResultSimulation(resultMessageFactory,
+                "Client",
                 null,
                 "",
                 List.of("name"),
@@ -178,26 +205,30 @@ public class ChunkedQueryResultTest {
         static final List<String> BACKING_RESULT_LIST = List.of("Adam", "Bob", "Cedrick", "Donald", "Elvis", "Fred", "George", "Henry", "Ian");
 
         private int fromIndex;
+        private final ResultMessageFactory resultMessageFactory;
         private final int batchSize;
 
-        public ServerlessChunkedQueryResultSimulation(String client,
+        public ServerlessChunkedQueryResultSimulation(ResultMessageFactory resultMessageFactory,
+                                                      String client,
                                                       List<String> initialResult,
                                                       String query,
                                                       List<String> fields,
                                                       int limit,
                                                       int batchSize) {
             super(client, initialResult, query, fields, limit);
+            this.resultMessageFactory = resultMessageFactory;
             this.batchSize = batchSize;
         }
 
         @Override
         protected List<ResultMessage> collectMessagesFromResult(List<String> result) {
             return result.stream()
-                    .map(res -> ResultMessage.parseFromSource(res, INDEX_NAME, Map.of("name", res)))
+                    .map(res -> resultMessageFactory.parseFromSource(res, INDEX_NAME, Map.of("name", res)))
                     .collect(Collectors.toList());
         }
 
         @Override
+        @Nullable
         protected List<String> nextSearchResult() throws IOException {
             final int toIndex = Math.min(fromIndex + batchSize, BACKING_RESULT_LIST.size());
             if (fromIndex >= toIndex) {

@@ -20,6 +20,7 @@ import isObject from 'lodash/isObject';
 import debounce from 'lodash/debounce';
 
 import { Spinner } from 'components/common';
+import UserNotification from 'util/UserNotification';
 import connect from 'stores/connect';
 import Store from 'logic/local-storage/Store';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
@@ -43,6 +44,8 @@ const fetchEvents = ({ page, pageSize, query, filter, timerange }) => {
     pageSize: pageSize,
     filter: filter,
     timerange: timerange,
+  }).catch((error) => {
+    UserNotification.error(`Fetching alerts failed with status: ${error}`);
   });
 };
 

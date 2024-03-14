@@ -36,6 +36,8 @@ import org.graylog.schema.ThreatFields;
 import org.graylog.schema.UserFields;
 import org.graylog.schema.VendorFields;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.journal.RawMessage;
 import org.joda.time.DateTime;
@@ -57,6 +59,7 @@ public class PaloAlto9xTemplatesTest {
     // this is UTC-5
     private static final String TIMEZONE_STRING = "America/Phoenix";
     private static final DateTimeZone TIMEZONE = DateTimeZone.forID(TIMEZONE_STRING);
+    private final MessageFactory messageFactory = new TestMessageFactory();
     // Code Under Test
     PaloAlto9xCodec cut;
 
@@ -66,7 +69,7 @@ public class PaloAlto9xTemplatesTest {
                 PaloAlto9xCodec.CK_TIMEZONE, TIMEZONE_STRING));
         PaloAltoParser rawParser = new PaloAltoParser();
         PaloAlto9xParser palo9xParser = new PaloAlto9xParser();
-        cut = new PaloAlto9xCodec(config, rawParser, palo9xParser);
+        cut = new PaloAlto9xCodec(config, rawParser, palo9xParser, messageFactory);
     }
 
     @Test

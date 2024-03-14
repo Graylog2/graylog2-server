@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.graylog2.plugin.Message.FIELDS_UNCHANGEABLE_BY_CUSTOM_MAPPINGS;
+import static org.graylog2.plugin.Message.FIELD_GL2_MESSAGE_ID;
 
 /**
  * Representing the message type mapping in Elasticsearch. This is giving ES more
@@ -51,13 +52,13 @@ public abstract class IndexMapping implements IndexMappingTemplate {
     }
 
     public Template messageTemplate(final String indexPattern,
-                                               final String analyzer,
-                                               final Long order,
-                                               final CustomFieldMappings customFieldMappings) {
+                                    final String analyzer,
+                                    final Long order,
+                                    final CustomFieldMappings customFieldMappings) {
         var settings = new Template.Settings(Map.of(
                 "index", Map.of(
                         "analysis", Map.of("analyzer", analyzerKeyword())
-        )
+                )
         ));
         var mappings = mapping(analyzer, customFieldMappings);
 
@@ -69,7 +70,7 @@ public abstract class IndexMapping implements IndexMappingTemplate {
     }
 
     protected Template.Mappings mapping(final String analyzer,
-                                          final CustomFieldMappings customFieldMappings) {
+                                        final CustomFieldMappings customFieldMappings) {
         return new Template.Mappings(ImmutableMap.of(TYPE_MESSAGE, messageMapping(analyzer, customFieldMappings)));
     }
 
@@ -110,7 +111,9 @@ public abstract class IndexMapping implements IndexMappingTemplate {
                 .put(Message.FIELD_GL2_ACCOUNTED_MESSAGE_SIZE, typeLong())
                 .put(Message.FIELD_GL2_RECEIVE_TIMESTAMP, typeTimeWithMillis())
                 .put(Message.FIELD_GL2_PROCESSING_TIMESTAMP, typeTimeWithMillis())
+                .put(Message.FIELD_GL2_PROCESSING_DURATION_MS, typeInteger())
                 .put(Message.FIELD_GL2_MESSAGE_ID, notAnalyzedString())
+                .put(Message.GL2_SECOND_SORT_FIELD, aliasTo(FIELD_GL2_MESSAGE_ID))
                 .put(Message.FIELD_STREAMS, notAnalyzedString())
                 // to support wildcard searches in source we need to lowercase the content (wildcard search lowercases search term)
                 .put(Message.FIELD_SOURCE, analyzedString("analyzer_keyword", true));
@@ -133,6 +136,12 @@ public abstract class IndexMapping implements IndexMappingTemplate {
     Map<String, Object> notAnalyzedString() {
         return ImmutableMap.of("type", "keyword");
     }
+
+    Map<String, Object> aliasTo(String path) {
+        return Map.of("type", "alias",
+                "path", path);
+    }
+
     Map<String, Object> analyzedString(String analyzer, boolean fieldData) {
         return ImmutableMap.of(
                 "type", "text",
@@ -148,6 +157,10 @@ public abstract class IndexMapping implements IndexMappingTemplate {
 
     protected Map<String, Object> typeLong() {
         return ImmutableMap.of("type", "long");
+    }
+
+    protected Map<String, Object> typeInteger() {
+        return ImmutableMap.of("type", "integer");
     }
 
     protected Map<String, Object> type(final String type) {

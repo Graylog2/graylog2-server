@@ -25,7 +25,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
 import org.graylog.shaded.opensearch2.org.opensearch.client.ResponseException;
 import org.graylog.storage.opensearch2.OpenSearchClient;
-import org.graylog.storage.opensearch2.ism.policy.IsmPolicy;
+import org.graylog2.indexer.datastream.policy.IsmPolicy;
 
 import java.io.IOException;
 import java.util.Objects;

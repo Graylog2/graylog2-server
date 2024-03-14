@@ -30,10 +30,10 @@ type Props = {
 const Container = styled.span(({ theme }) => css`
   display: flex;
   padding: 10px;
-  background-color: ${theme.colors.table.background};
+  background-color: ${theme.colors.table.row.background};
 
   &:nth-of-type(even) {
-    background-color: ${theme.colors.table.backgroundAlt};
+    background-color: ${theme.colors.table.row.backgroundAlt};
   }
 `);
 
@@ -52,7 +52,7 @@ const StyledDeleteButton = styled(IconButton)`
 
 const PaginatedItem = ({ item: { name, description }, onDeleteItem, item }: Props) => {
   const deleteButton = typeof onDeleteItem === 'function'
-    ? <StyledDeleteButton onClick={() => onDeleteItem(item)} name="times" title={`Remove ${name}`} />
+    ? <StyledDeleteButton onClick={() => onDeleteItem(item)} name="close" title={`Remove ${name}`} />
     : null;
 
   return (

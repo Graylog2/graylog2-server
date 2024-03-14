@@ -29,8 +29,11 @@ import ToolsStore from 'stores/tools/ToolsStore';
 import type { KeywordTimeRange } from 'views/logic/queries/Query';
 import useUserDateTime from 'hooks/useUserDateTime';
 import { InputDescription } from 'components/common';
+import debounceWithPromise from 'views/logic/debounceWithPromise';
 
 import { EMPTY_RANGE } from '../TimeRangeDisplay';
+
+type KeywordPreview = { from: string, to: string, timezone: string }
 
 const Headline = styled.h3`
   margin-bottom: 5px;
@@ -62,27 +65,41 @@ const _parseKeywordPreview = (data: Pick<KeywordTimeRange, 'from' | 'to' | 'time
 type Props = {
   defaultValue: string,
   disabled: boolean,
-  setValidatingKeyword: (boolean) => void
+  setValidatingKeyword: (isValidating: boolean) => void
 };
+
+const debouncedTestNaturalDate = debounceWithPromise((
+  keyword: string,
+  userTZ: string,
+  mounted: React.RefObject<boolean>,
+  setSuccessfulPreview: (response: KeywordPreview) => void,
+  setFailedPreview: () => void,
+) => ToolsStore.testNaturalDate(keyword, userTZ).then((response) => {
+  if (mounted.current) {
+    setSuccessfulPreview(response);
+  }
+}).catch(() => {
+  setFailedPreview();
+
+  return 'Unable to parse keyword.';
+}), 350);
 
 const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: Props) => {
   const { formatTime, userTimezone } = useUserDateTime();
   const [nextRangeProps, , nextRangeHelpers] = useField('timeRangeTabs.keyword');
   const mounted = useRef(true);
   const keywordRef = useRef<string>();
-  const [keywordPreview, setKeywordPreview] = useState({ from: '', to: '', timezone: '' });
+  const [keywordPreview, setKeywordPreview] = useState<KeywordPreview>({ from: '', to: '', timezone: '' });
 
-  const _setSuccessfulPreview = useCallback((response: { from: string, to: string, timezone: string }) => {
+  const _setSuccessfulPreview = useCallback((response: KeywordPreview) => {
     setValidatingKeyword(false);
 
-    return setKeywordPreview(_parseKeywordPreview(response, formatTime));
+    setKeywordPreview(_parseKeywordPreview(response, formatTime));
   },
   [setValidatingKeyword, formatTime]);
 
   const _setFailedPreview = useCallback(() => {
     setKeywordPreview({ from: EMPTY_RANGE, to: EMPTY_RANGE, timezone: userTimezone });
-
-    return 'Unable to parse keyword.';
   }, [userTimezone]);
 
   const _validateKeyword = useCallback((keyword: string) => {
@@ -97,11 +114,7 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
 
       return trim(keyword) === ''
         ? Promise.resolve('Keyword must not be empty!')
-        : ToolsStore.testNaturalDate(keyword, userTimezone)
-          .then((response) => {
-            if (mounted.current) _setSuccessfulPreview(response);
-          })
-          .catch(_setFailedPreview);
+        : debouncedTestNaturalDate(keyword, userTimezone, mounted, _setSuccessfulPreview, _setFailedPreview);
     }
 
     return undefined;
@@ -125,7 +138,7 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
           keyword,
           ...restPreview,
           ...keywordPreview,
-        });
+        }, false);
       }
     }
   }, [nextRangeProps.value, keywordPreview, nextRangeHelpers]);

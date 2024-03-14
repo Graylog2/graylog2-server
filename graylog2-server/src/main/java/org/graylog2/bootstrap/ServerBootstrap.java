@@ -16,7 +16,6 @@
  */
 package org.graylog2.bootstrap;
 
-import com.github.joschi.jadconfig.guice.NamedConfigParametersModule;
 import com.github.rvesse.airline.annotations.Option;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedSet;
@@ -34,6 +33,7 @@ import org.graylog2.Configuration;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.bindings.ConfigurationModule;
+import org.graylog2.bindings.NamedConfigParametersOverrideModule;
 import org.graylog2.bootstrap.preflight.MongoDBPreflightCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.graylog2.bootstrap.preflight.PreflightCheckService;
@@ -47,6 +47,7 @@ import org.graylog2.configuration.PathConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.migrations.Migration;
 import org.graylog2.migrations.MigrationType;
+import org.graylog2.plugin.MessageBindings;
 import org.graylog2.plugin.Plugin;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
@@ -260,7 +261,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
     private Injector getMongoPreFlightInjector() {
         return Guice.createInjector(
                 new IsDevelopmentBindings(),
-                new NamedConfigParametersModule(jadConfig.getConfigurationBeans()),
+                new NamedConfigParametersOverrideModule(jadConfig.getConfigurationBeans()),
                 new ConfigurationModule(configuration)
         );
     }
@@ -268,7 +269,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
     private Injector getPreflightInjector(List<Module> preflightCheckModules) {
         return Guice.createInjector(
                 new IsDevelopmentBindings(),
-                new NamedConfigParametersModule(jadConfig.getConfigurationBeans()),
+                new NamedConfigParametersOverrideModule(jadConfig.getConfigurationBeans()),
                 new ServerStatusBindings(capabilities()),
                 new ConfigurationModule(configuration),
                 new SystemStatsModule(configuration.isDisableNativeSystemStatsCollector()),
@@ -307,6 +308,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
         LOG.info("Deployment: {}", configuration.getInstallationSource());
         LOG.info("OS: {}", os.getPlatformName());
         LOG.info("Arch: {}", os.getArch());
+        LOG.info("Node ID: {}", nodeId);
 
         try {
             if (configuration.isLeader() && configuration.runMigrations()) {
@@ -421,6 +423,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
 
         result.add(new FreshInstallDetectionModule(isFreshInstallation()));
         result.add(new GenericBindings(isMigrationCommand()));
+        result.add(new MessageBindings());
         result.add(new SecurityBindings());
         result.add(new ServerStatusBindings(capabilities()));
         result.add(new ValidatorModule());

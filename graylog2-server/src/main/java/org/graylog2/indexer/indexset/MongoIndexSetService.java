@@ -19,6 +19,7 @@ package org.graylog2.indexer.indexset;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.mongodb.BasicDBObject;
+import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
@@ -31,8 +32,6 @@ import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
 import org.mongojack.JacksonDBCollection;
 import org.mongojack.WriteResult;
-
-import jakarta.inject.Inject;
 
 import java.util.Iterator;
 import java.util.List;

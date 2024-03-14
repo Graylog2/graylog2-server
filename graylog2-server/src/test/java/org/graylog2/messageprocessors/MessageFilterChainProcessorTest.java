@@ -21,8 +21,10 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import org.graylog.failure.ProcessingFailureCause;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.Messages;
 import org.graylog2.plugin.ServerStatus;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
@@ -51,6 +53,8 @@ public class MessageFilterChainProcessorTest {
     private ServerStatus serverStatus;
     @Mock
     private MessageQueueAcknowledger acknowledger;
+
+    private final MessageFactory messageFactory = new TestMessageFactory();
 
     @Before
     public void setUp() throws Exception {
@@ -116,9 +120,9 @@ public class MessageFilterChainProcessorTest {
                                                                                        Collections.singleton(filterOnlyFirst),
                                                                                        acknowledger,
                                                                                        serverStatus);
-        Message filteredoutMessage = new Message("filtered out", "source", Tools.nowUTC());
+        Message filteredoutMessage = messageFactory.createMessage("filtered out", "source", Tools.nowUTC());
         filteredoutMessage.setJournalOffset(1);
-        Message unfilteredMessage = new Message("filtered out", "source", Tools.nowUTC());
+        Message unfilteredMessage = messageFactory.createMessage("filtered out", "source", Tools.nowUTC());
 
         final Messages messages1 = filterTest.process(filteredoutMessage);
         final Messages messages2 = filterTest.process(unfilteredMessage);
@@ -140,7 +144,7 @@ public class MessageFilterChainProcessorTest {
                 acknowledger,
                 serverStatus);
 
-        final Message message = new Message("message", "source", new DateTime(2016, 1, 1, 0, 0, DateTimeZone.UTC));
+        final Message message = messageFactory.createMessage("message", "source", new DateTime(2016, 1, 1, 0, 0, DateTimeZone.UTC));
         final Message result = Iterables.getFirst(processor.process(message), null);
 
         assertThat(result).isNotNull();
@@ -157,7 +161,7 @@ public class MessageFilterChainProcessorTest {
                 acknowledger,
                 serverStatus);
 
-        final Message message = new Message("message", "source", new DateTime(2016, 1, 1, 0, 0, DateTimeZone.UTC));
+        final Message message = messageFactory.createMessage("message", "source", new DateTime(2016, 1, 1, 0, 0, DateTimeZone.UTC));
         final Messages result = processor.process(message);
 
         assertThat(result).isEmpty();
@@ -172,7 +176,7 @@ public class MessageFilterChainProcessorTest {
                 acknowledger,
                 serverStatus);
 
-        final Message message = new Message("message", "source", new DateTime(2016, 1, 1, 0, 0, DateTimeZone.UTC));
+        final Message message = messageFactory.createMessage("message", "source", new DateTime(2016, 1, 1, 0, 0, DateTimeZone.UTC));
         final Messages result = processor.process(message);
 
         assertThat(result).hasSize(1);

@@ -22,6 +22,7 @@ import org.graylog.integrations.inputs.paloalto.PaloAltoMessageBase;
 import org.graylog.integrations.inputs.paloalto.PaloAltoParser;
 import org.graylog.schema.EventFields;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.BooleanField;
@@ -59,13 +60,16 @@ public class PaloAlto9xCodec implements Codec {
     public static final String NAME = "PaloAlto9x";
 
     private final Configuration configuration;
+    private final MessageFactory messageFactory;
     private final PaloAltoParser rawMessageParser;
     private final PaloAlto9xParser fieldProducer;
     private final DateTimeZone timezone;
 
     @AssistedInject
-    public PaloAlto9xCodec(@Assisted Configuration configuration, PaloAltoParser rawMessageParser, PaloAlto9xParser fieldProducer) {
+    public PaloAlto9xCodec(@Assisted Configuration configuration, PaloAltoParser rawMessageParser, PaloAlto9xParser fieldProducer,
+                           MessageFactory messageFactory) {
         this.configuration = configuration;
+        this.messageFactory = messageFactory;
         String timezoneID = configuration.getString(CK_TIMEZONE);
         // previously existing PA inputs after updating will not have a Time Zone configured, default to UTC
         this.timezone = timezoneID != null ? DateTimeZone.forID(timezoneID) : DateTimeZone.UTC;
@@ -86,7 +90,7 @@ public class PaloAlto9xCodec implements Codec {
             return null;
         }
 
-        Message message = new Message(p.payload(), p.source(), p.timestamp());
+        Message message = messageFactory.createMessage(p.payload(), p.source(), p.timestamp());
 
         switch (p.panType()) {
             case "THREAT":

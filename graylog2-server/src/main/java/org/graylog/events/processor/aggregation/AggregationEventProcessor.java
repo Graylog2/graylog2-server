@@ -24,6 +24,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.primitives.Ints;
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
 import org.graylog.events.conditions.BooleanNumberConditionsVisitor;
 import org.graylog.events.event.Event;
 import org.graylog.events.event.EventFactory;
@@ -40,6 +41,7 @@ import org.graylog.events.processor.EventProcessorParameters;
 import org.graylog.events.processor.EventProcessorPreconditionException;
 import org.graylog.events.processor.EventStreamService;
 import org.graylog.events.search.MoreSearch;
+import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.errors.ParameterExpansionError;
 import org.graylog.plugins.views.search.errors.SearchException;
@@ -53,14 +55,14 @@ import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.MessageSummary;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -96,6 +98,8 @@ public class AggregationEventProcessor implements EventProcessor {
     private final Messages messages;
     private final NotificationService notificationService;
     private final PermittedStreams permittedStreams;
+    private final Set<EventQuerySearchTypeSupplier> eventQueryModifiers;
+    private final MessageFactory messageFactory;
 
     @Inject
     public AggregationEventProcessor(@Assisted EventDefinition eventDefinition,
@@ -105,7 +109,9 @@ public class AggregationEventProcessor implements EventProcessor {
                                      MoreSearch moreSearch,
                                      EventStreamService eventStreamService,
                                      Messages messages, NotificationService notificationService,
-                                     PermittedStreams permittedStreams) {
+                                     PermittedStreams permittedStreams,
+                                     Set<EventQuerySearchTypeSupplier> eventQueryModifiers,
+                                     MessageFactory messageFactory) {
         this.eventDefinition = eventDefinition;
         this.config = (AggregationEventProcessorConfig) eventDefinition.config();
         this.aggregationSearchFactory = aggregationSearchFactory;
@@ -116,6 +122,8 @@ public class AggregationEventProcessor implements EventProcessor {
         this.messages = messages;
         this.notificationService = notificationService;
         this.permittedStreams = permittedStreams;
+        this.eventQueryModifiers = eventQueryModifiers;
+        this.messageFactory = messageFactory;
     }
 
     @Override
@@ -194,7 +202,8 @@ public class AggregationEventProcessor implements EventProcessor {
             LOG.debug("scrollQueryString: {}", scrollQueryString);
 
             final TimeRange timeRange = AbsoluteRange.create(event.getTimerangeStart(), event.getTimerangeEnd());
-            moreSearch.scrollQuery(scrollQueryString.queryString(), config.streams(), config.queryParameters(), timeRange, Math.min(500, Ints.saturatedCast(limit)), callback);
+            moreSearch.scrollQuery(scrollQueryString.queryString(), config.streams(), config.filters(),
+                    config.queryParameters(), timeRange, Math.min(500, Ints.saturatedCast(limit)), callback);
         }
     }
 
@@ -248,6 +257,7 @@ public class AggregationEventProcessor implements EventProcessor {
                         .timerangeEnd(parameters.timerange().getTo())
                         .query(config.query())
                         .streams(event.getSourceStreams())
+                        .filters(config.filters())
                         .build());
 
                 eventsWithContext.add(EventWithContext.create(event, msg));
@@ -262,7 +272,8 @@ public class AggregationEventProcessor implements EventProcessor {
         };
 
         try {
-            moreSearch.scrollQuery(config.query(), streams, config.queryParameters(), parameters.timerange(), parameters.batchSize(), callback);
+            moreSearch.scrollQuery(config.query(), streams, config.filters(), config.queryParameters(),
+                    parameters.timerange(), parameters.batchSize(), callback);
         } catch (EventLimitReachedException e) {
             notificationService.publishIfFirst(notificationService.buildNow()
                     .addType(EVENT_LIMIT_REACHED)
@@ -279,8 +290,11 @@ public class AggregationEventProcessor implements EventProcessor {
 
     private void aggregatedSearch(EventFactory eventFactory, AggregationEventProcessorParameters parameters,
                                   EventConsumer<List<EventWithContext>> eventsConsumer) throws EventProcessorException {
-        final String owner = "event-processor-" + AggregationEventProcessorConfig.TYPE_NAME + "-" + eventDefinition.id();
-        final AggregationSearch search = aggregationSearchFactory.create(config, parameters, owner, eventDefinition);
+        final var owner = new AggregationSearch.User("event-processor-" + AggregationEventProcessorConfig.TYPE_NAME + "-" + eventDefinition.id(), DateTimeZone.UTC);
+        final List<SearchType> additionalSearchTypes = eventQueryModifiers.stream()
+                .flatMap(e -> e.additionalSearchTypes(eventDefinition).stream())
+                .toList();
+        final AggregationSearch search = aggregationSearchFactory.create(config, parameters, owner, eventDefinition, additionalSearchTypes);
         final AggregationResult result = search.doSearch();
 
         if (result.keyResults().isEmpty()) {
@@ -340,6 +354,7 @@ public class AggregationEventProcessor implements EventProcessor {
                     .timerangeEnd(event.getTimerangeEnd())
                     .query(config.query())
                     .streams(sourceStreams)
+                    .filters(config.filters())
                     .build());
             sourceStreams.forEach(event::addSourceStream);
 
@@ -390,11 +405,21 @@ public class AggregationEventProcessor implements EventProcessor {
             fields.put("aggregation_key", keyString);
 
             // TODO: Can we find a useful source value?
-            final Message message = new Message(eventMessage, "", result.effectiveTimerange().to());
+            final Message message = messageFactory.createMessage(eventMessage, "", result.effectiveTimerange().to());
             message.addFields(fields);
 
+            // Ask any event query modifier for its state and collect it into the event modifier state
+            final Map<String, Object> eventModifierState = eventQueryModifiers.stream()
+                    .flatMap(modifier -> modifier.eventModifierData(result.additionalResults()).entrySet().stream())
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
             LOG.debug("Creating event {}/{} - {} {} ({})", eventDefinition.title(), eventDefinition.id(), keyResult.key(), seriesString(keyResult), fields);
-            eventsWithContext.add(EventWithContext.create(event, message));
+
+            eventsWithContext.add(EventWithContext.builder()
+                    .event(event)
+                    .messageContext(message)
+                    .eventModifierState(eventModifierState)
+                    .build());
         }
 
         return eventsWithContext.build();

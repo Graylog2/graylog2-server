@@ -23,6 +23,8 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
+import org.graylog2.datatiering.WarmIndexDeletedEvent;
+import org.graylog2.datatiering.WarmIndexInfo;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IgnoreIndexTemplate;
 import org.graylog2.indexer.IndexMappingFactory;
@@ -115,11 +117,18 @@ public class Indices {
     }
 
     public void delete(String indexName) {
+        Optional<WarmIndexInfo> snapshotInfoOptional = indicesAdapter.getWarmIndexInfo(indexName);
         indicesAdapter.delete(indexName);
+
         eventBus.post(IndicesDeletedEvent.create(indexName));
+        snapshotInfoOptional.ifPresent(snapshotInfo -> eventBus.post(new WarmIndexDeletedEvent(snapshotInfo)));
     }
 
     public void close(String indexName) {
+        indicesAdapter.getWarmIndexInfo(indexName).ifPresent(snapshotInfo -> {
+            throw new UnsupportedOperationException("Close operation not available for warm index: " + snapshotInfo.currentIndexName());
+        });
+
         if (isReopened(indexName)) {
             indicesAdapter.removeAlias(indexName, indexName + REOPENED_ALIAS_SUFFIX);
         }
@@ -346,6 +355,10 @@ public class Indices {
 
     public Set<IndexStatistics> getIndicesStats(final Collection<String> indices) {
         return indicesAdapter.indicesStats(indices);
+    }
+
+    public List<ShardsInfo> getShardsInfo(String indexName) {
+        return indicesAdapter.getShardsInfo(indexName);
     }
 
     public void cycleAlias(String aliasName, String targetIndex) {

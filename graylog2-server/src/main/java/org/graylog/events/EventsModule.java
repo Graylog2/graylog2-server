@@ -186,5 +186,8 @@ public class EventsModule extends PluginModule {
         addMigration(V20230629140000_RenameFieldTypeOfEventDefinitionSeries.class);
 
         serviceBinder().addBinding().to(NotificationSystemEventPublisher.class).in(Scopes.SINGLETON);
+
+        eventModifierBinder(); // Initialize event modifier binding to avoid errors when no modifiers are bound.
+        eventQuerySearchTypeSupplierBinder(); // Initialize binder to avoid errors when no suppliers are bound.
     }
 }

@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.searchtypes.events;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -26,42 +27,25 @@ import org.graylog.events.event.EventDto;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 @AutoValue
 @JsonDeserialize(builder = EventSummary.Builder.class)
-public abstract class EventSummary {
-    private static final String FIELD_ID = "id";
-    private static final String FIELD_STREAMS = "streams";
-    private static final String FIELD_EVENT_TIMESTAMP = "timestamp";
-    private static final String FIELD_MESSAGE = "message";
-    private static final String FIELD_ALERT = "alert";
-
-    @JsonProperty(FIELD_ID)
-    public abstract String id();
-
-    @JsonProperty(FIELD_STREAMS)
-    public abstract Set<String> streams();
-
-    @JsonProperty(FIELD_EVENT_TIMESTAMP)
-    public abstract DateTime timestamp();
-
-    @JsonProperty(FIELD_MESSAGE)
-    public abstract String message();
-
-    @JsonProperty(FIELD_ALERT)
-    public abstract boolean alert();
-
+public abstract class EventSummary implements CommonEventSummary {
     @SuppressWarnings("unchecked")
     public static EventSummary parse(Map<String, Object> rawEvent) {
         return EventSummary.builder()
                 .alert((boolean) rawEvent.get(EventDto.FIELD_ALERT))
                 .id((String) rawEvent.get(EventDto.FIELD_ID))
                 .message((String) rawEvent.get(EventDto.FIELD_MESSAGE))
-                .streams(ImmutableSet.copyOf((ArrayList<String>) rawEvent.get(EventDto.FIELD_SOURCE_STREAMS)))
+                .streams(ImmutableSet.copyOf((List<String>) rawEvent.get(EventDto.FIELD_SOURCE_STREAMS)))
                 .timestamp(DateTime.parse((String) rawEvent.get(EventDto.FIELD_EVENT_TIMESTAMP), Tools.ES_DATE_FORMAT_FORMATTER))
+                .eventDefinitionId((String) rawEvent.get(EventDto.FIELD_EVENT_DEFINITION_ID))
+                .priority((Integer) rawEvent.get(EventDto.FIELD_PRIORITY))
+                .eventKeys(List.copyOf((List<String>) rawEvent.get(EventDto.FIELD_KEY_TUPLE)))
+                .rawEvent(rawEvent)
                 .build();
     }
 
@@ -76,7 +60,8 @@ public abstract class EventSummary {
     public static abstract class Builder {
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_EventSummary.Builder();
+            return new AutoValue_EventSummary.Builder()
+                    .rawEvent(Map.of());
         }
 
         @JsonProperty(FIELD_ID)
@@ -93,6 +78,18 @@ public abstract class EventSummary {
 
         @JsonProperty(FIELD_ALERT)
         public abstract Builder alert(boolean alert);
+
+        @JsonProperty(FIELD_EVENT_DEFINITION_ID)
+        public abstract Builder eventDefinitionId(String eventDefinitionId);
+
+        @JsonProperty(FIELD_PRIORITY)
+        public abstract Builder priority(Integer priority);
+
+        @JsonProperty(FIELD_EVENT_KEYS)
+        public abstract Builder eventKeys(List<String> eventKeys);
+
+        @JsonIgnore
+        public abstract Builder rawEvent(Map<String, Object> rawEvent);
 
         public abstract EventSummary build();
     }

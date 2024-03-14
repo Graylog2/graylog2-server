@@ -58,9 +58,8 @@ const plugin: PluginRegistration = { exports: { visualizationTypes: [dataTable] 
 
 const selectEventConfig = { container: document.body };
 
-const addElement = async (key: 'Grouping' | 'Metric' | 'Sort') => {
-  await userEvent.click(await screen.findByRole('button', { name: 'Add' }));
-  await userEvent.click(await screen.findByRole('menuitem', { name: key }));
+const addGrouping = async () => {
+  await userEvent.click(await screen.findByRole('button', { name: /add a grouping/i }));
 };
 
 const selectField = async (fieldName: string, groupingIndex: number = 0, fieldSelectLabel = 'Add a field') => {
@@ -69,13 +68,14 @@ const selectField = async (fieldName: string, groupingIndex: number = 0, fieldSe
 
   await act(async () => {
     await selectEvent.openMenu(fieldSelection);
-    await selectEvent.select(fieldSelection, fieldName, selectEventConfig);
   });
+
+  await selectEvent.select(fieldSelection, fieldName, selectEventConfig);
 };
 
 const submitWidgetConfigForm = async () => {
   const applyButton = await screen.findByRole('button', { name: /update preview/i });
-  fireEvent.click(applyButton);
+  await userEvent.click(applyButton);
 };
 
 const expectedPivotConfig = { skip_empty_values: undefined, limit: 15 };
@@ -115,7 +115,7 @@ describe('AggregationWizard', () => {
   it('should require group by function when adding a group by element', async () => {
     renderSUT();
 
-    await addElement('Grouping');
+    await addGrouping();
 
     await screen.findByText('Field is required.');
   }, extendedTimeout);
@@ -124,8 +124,10 @@ describe('AggregationWizard', () => {
     const onChange = jest.fn();
     renderSUT({ onChange });
 
-    await addElement('Grouping');
+    await addGrouping();
     await selectField('took_ms');
+
+    await screen.findByText('took_ms');
     await submitWidgetConfigForm();
 
     const pivot = Pivot.createValues(['took_ms'], expectedPivotConfig);
@@ -145,8 +147,9 @@ describe('AggregationWizard', () => {
     const queryFields = Immutable.List([queryFieldTypeMapping]);
     renderSUT({ onChange, fieldTypesList: { all: fields, queryFields: Immutable.Map({ queryId: queryFields }) } });
 
-    await addElement('Grouping');
+    await addGrouping();
     await selectField('status_code');
+    await screen.findByText('status_code');
     await submitWidgetConfigForm();
 
     const pivot = Pivot.createValues(['status_code'], expectedPivotConfig);
@@ -181,10 +184,13 @@ describe('AggregationWizard', () => {
     const onChange = jest.fn();
     renderSUT({ onChange });
 
-    await addElement('Grouping');
+    await addGrouping();
     await selectField('timestamp');
-    await addElement('Grouping');
+    await addGrouping();
     await selectField('took_ms', 1);
+
+    await screen.findByRole('checkbox', { name: /auto/i });
+
     await submitWidgetConfigForm();
 
     const pivot0 = Pivot.create(['timestamp'], 'time', { interval: { type: 'auto', scaling: 1 } });
@@ -204,10 +210,10 @@ describe('AggregationWizard', () => {
     const onChange = jest.fn();
     renderSUT({ onChange });
 
-    await addElement('Grouping');
+    await addGrouping();
     await selectField('timestamp');
 
-    const autoCheckbox = await screen.findByRole('checkbox', { name: 'Auto' });
+    const autoCheckbox = await screen.findByRole('checkbox', { name: /auto/i });
     await screen.findByRole('slider', { name: /interval/i });
 
     await userEvent.click(autoCheckbox);

@@ -65,8 +65,7 @@ public class RecentActivityService extends PaginatedDbService<RecentActivityDTO>
                         .add("capped", true)
                         .add("size", maximum * 1024)
                         .add("max", maximum)
-                        .get(),
-                null);
+                        .get());
         this.grnRegistry = grnRegistry;
         this.permissionAndRoleResolver = permissionAndRoleResolver;
         this.eventBus = eventBus;

@@ -18,164 +18,182 @@ package org.graylog.storage.opensearch2;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
-import com.google.common.io.Resources;
-import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchException;
-import org.graylog.storage.opensearch2.cat.CatApi;
-import org.graylog.storage.opensearch2.cat.IndexSummaryResponse;
-import org.graylog.storage.opensearch2.cat.NodeResponse;
-import org.graylog2.indexer.cluster.health.NodeDiskUsageStats;
-import org.graylog2.indexer.cluster.health.NodeFileDescriptorStats;
-import org.graylog2.indexer.cluster.health.NodeRole;
-import org.graylog2.indexer.cluster.health.SIUnitParser;
-import org.graylog2.indexer.indices.HealthStatus;
+import jakarta.json.Json;
+import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
+import org.graylog2.indexer.cluster.ClusterAdapter;
+import org.graylog2.indexer.cluster.health.ClusterAllocationDiskSettings;
+import org.graylog2.indexer.cluster.health.ClusterAllocationDiskSettingsFactory;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.stubbing.OngoingStubbing;
+import org.opensearch.client.RestClient;
+import org.opensearch.client.json.JsonData;
+import org.opensearch.client.opensearch.cluster.GetClusterSettingsResponse;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class ClusterAdapterOS2Test {
-    private static final String nodeId = "I-sZn-HKQhCtdf1JYPcx1A";
+    private static final ObjectMapper objectMapper = new ObjectMapperProvider().get();
+    private static final Map<String, JsonData> ENABLED_RESPONSE = Map.of("cluster", m(
+            Map.of("routing",
+                    Map.of("allocation",
+                            Map.of("disk",
+                                    Map.of(
+                                            "threshold_enabled", "true",
+                                            "watermark", Map.of(
+                                                    "flood_stage", "95%",
+                                                    "high", "90%",
+                                                    "low", "85%",
+                                                    "enable_for_single_data_node", "false"
+                                            )
+                                    ))))
 
-    private OpenSearchClient client;
-    private CatApi catApi;
-    private PlainJsonApi jsonApi;
-    private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
+    ));
 
-    private ClusterAdapterOS2 clusterAdapter;
+    private static final Map<String, JsonData> DISABLED_RESPONSE = Map.of("cluster", m(
+            Map.of("routing",
+                    Map.of("allocation",
+                            Map.of("disk",
+                                    Map.of(
+                                            "threshold_enabled", "false"
+                                    ))))
 
-    private final static NodeResponse NODE_WITH_CORRECT_INFO = NodeResponse.create("nodeWithCorrectInfo",
-            "nodeWithCorrectInfo",
-            "dimr",
-            null,
-            "182.88.0.2",
-            "45gb",
-            "411.5gb",
-            10.95d,
-            1048576L);
-    private final static NodeResponse NODE_WITH_MISSING_DISK_STATISTICS = NodeResponse.create("nodeWithMissingDiskStatistics",
-            "nodeWithMissingDiskStatistics",
-            "dimr",
-            null,
-            "182.88.0.1",
-            null,
-            null,
-            null,
-            null);
+    ));
+    public static final ClusterAllocationDiskSettings ENABLED_RESULT = ClusterAllocationDiskSettingsFactory.create(
+            true,
+            "85%",
+            "90%",
+            "95%"
+    );
+    public static final ClusterAllocationDiskSettings DISABLED_RESULT = ClusterAllocationDiskSettingsFactory.create(false, null, null, null);
+
+    private org.opensearch.client.opensearch.OpenSearchClient opensearchClient;
+
+    private ClusterAdapter clusterAdapter;
 
     @BeforeEach
-    void setUp() {
-        this.client = mock(OpenSearchClient.class);
-        this.catApi = mock(CatApi.class);
-        this.jsonApi = mock(PlainJsonApi.class);
-
-        this.clusterAdapter = new ClusterAdapterOS2(client, Duration.seconds(1), catApi, jsonApi);
+    void setup() {
+        this.opensearchClient = mock(org.opensearch.client.opensearch.OpenSearchClient.class, RETURNS_DEEP_STUBS);
+        final var client = new OpenSearchClient(mock(RestHighLevelClient.class), opensearchClient, mock(RestClient.class), objectMapper);
+        this.clusterAdapter = new ClusterAdapterOS2(client, Duration.seconds(30), new PlainJsonApi(objectMapper, client));
     }
 
     @Test
-    void handlesMissingHostField() throws Exception {
-        mockNodesResponse();
+    void enabledWatermarkSettingsFromDefaults() throws IOException {
+        final var response = new GetClusterSettingsResponse.Builder()
+                .persistent(Map.of())
+                .transient_(Map.of())
+                .defaults(ENABLED_RESPONSE)
+                .build();
+        whenClusterSettings().thenReturn(response);
 
-        assertThat(this.clusterAdapter.nodeIdToHostName(nodeId)).isEmpty();
+        final var result = clusterAdapter.clusterAllocationDiskSettings();
+
+        assertThat(result).isEqualTo(ENABLED_RESULT);
     }
 
     @Test
-    void returnsNameForNodeId() throws Exception {
-        mockNodesResponse();
+    void enabledWatermarkSettingsFromPersisted() throws IOException {
+        final var response = new GetClusterSettingsResponse.Builder()
+                .persistent(ENABLED_RESPONSE)
+                .transient_(Map.of())
+                .defaults(Map.of())
+                .build();
+        whenClusterSettings().thenReturn(response);
 
-        assertThat(this.clusterAdapter.nodeIdToName(nodeId)).isNotEmpty()
-                .contains("es02");
+        final var result = clusterAdapter.clusterAllocationDiskSettings();
+
+        assertThat(result).isEqualTo(ENABLED_RESULT);
     }
 
     @Test
-    void returnsEmptyOptionalForMissingNodeId() throws Exception {
-        mockNodesResponse();
+    void enabledWatermarkSettingsFromTransient() throws IOException {
+        final var response = new GetClusterSettingsResponse.Builder()
+                .persistent(Map.of())
+                .transient_(ENABLED_RESPONSE)
+                .defaults(Map.of())
+                .build();
+        whenClusterSettings().thenReturn(response);
 
-        assertThat(this.clusterAdapter.nodeIdToName("foobar")).isEmpty();
+        final var result = clusterAdapter.clusterAllocationDiskSettings();
+
+        assertThat(result).isEqualTo(ENABLED_RESULT);
     }
 
     @Test
-    void returnsEmptyOptionalForHealthWhenElasticsearchExceptionThrown() {
-        when(client.execute(any())).thenThrow(new OpenSearchException("Exception"));
-        final Optional<HealthStatus> healthStatus = clusterAdapter.health();
-        assertThat(healthStatus).isEmpty();
+    void disabledWatermarkSettingsFromDefaults() throws IOException {
+        final var response = new GetClusterSettingsResponse.Builder()
+                .persistent(Map.of())
+                .transient_(Map.of())
+                .defaults(DISABLED_RESPONSE)
+                .build();
+        whenClusterSettings().thenReturn(response);
+
+        final var result = clusterAdapter.clusterAllocationDiskSettings();
+
+        assertThat(result).isEqualTo(DISABLED_RESULT);
     }
 
     @Test
-    void testFileDescriptorStats() {
-        doReturn(List.of(NODE_WITH_CORRECT_INFO, NODE_WITH_MISSING_DISK_STATISTICS)).when(catApi).nodes();
-        final Set<NodeFileDescriptorStats> nodeFileDescriptorStats = clusterAdapter.fileDescriptorStats();
+    void disabledWatermarkSettingsFromPersisted() throws IOException {
+        final var response = new GetClusterSettingsResponse.Builder()
+                .persistent(DISABLED_RESPONSE)
+                .transient_(Map.of())
+                .defaults(Map.of())
+                .build();
+        whenClusterSettings().thenReturn(response);
 
-        assertThat(nodeFileDescriptorStats)
-                .hasSize(1)
-                .noneSatisfy(
-                        nodeDescr -> assertThat(nodeDescr.name()).isEqualTo("nodeWithMissingDiskStatistics")
-                )
-                .first()
-                .satisfies(
-                        nodeDescr -> {
-                            assertThat(nodeDescr.name()).isEqualTo("nodeWithCorrectInfo");
-                            assertThat(nodeDescr.ip()).isEqualTo("182.88.0.2");
-                            assertThat(nodeDescr.fileDescriptorMax()).isPresent();
-                            assertThat(nodeDescr.fileDescriptorMax().get()).isEqualTo(1048576L);
-                        }
-                );
+        final var result = clusterAdapter.clusterAllocationDiskSettings();
+
+        assertThat(result).isEqualTo(DISABLED_RESULT);
     }
 
     @Test
-    void testDiskUsageStats() {
-        doReturn(List.of(NODE_WITH_CORRECT_INFO, NODE_WITH_MISSING_DISK_STATISTICS)).when(catApi).nodes();
-        final Set<NodeDiskUsageStats> diskUsageStats = clusterAdapter.diskUsageStats();
+    void disabledWatermarkSettingsFromTransient() throws IOException {
+        final var response = new GetClusterSettingsResponse.Builder()
+                .persistent(Map.of())
+                .transient_(DISABLED_RESPONSE)
+                .defaults(Map.of())
+                .build();
+        whenClusterSettings().thenReturn(response);
 
-        assertThat(diskUsageStats)
-                .hasSize(1)
-                .noneSatisfy(
-                        diskStats -> assertThat(diskStats.name()).isEqualTo("nodeWithMissingDiskStatistics")
-                )
-                .first()
-                .satisfies(
-                        nodeDescr -> {
-                            assertThat(nodeDescr.name()).isEqualTo("nodeWithCorrectInfo");
-                            assertThat(nodeDescr.ip()).isEqualTo("182.88.0.2");
-                            assertThat(nodeDescr.roles()).isEqualTo(NodeRole.parseSymbolString("dimr"));
-                            assertThat(nodeDescr.diskUsed().getBytes()).isEqualTo(SIUnitParser.parseBytesSizeValue("45gb").getBytes());
-                            assertThat(nodeDescr.diskTotal().getBytes()).isEqualTo(SIUnitParser.parseBytesSizeValue("411.5gb").getBytes());
-                            assertThat(nodeDescr.diskUsedPercent()).isEqualTo(10.95d);
-                        }
-                );
+        final var result = clusterAdapter.clusterAllocationDiskSettings();
 
+        assertThat(result).isEqualTo(DISABLED_RESULT);
     }
 
     @Test
-    void testDeflectorHealth() {
-        when(catApi.aliases()).thenReturn(Map.of(
-                "foo_deflector", "foo_42",
-                "bar_deflector", "bar_17",
-                "baz_deflector", "baz_23"
-        ));
+    void missingWatermarkSettings() throws IOException {
+        final var response = new GetClusterSettingsResponse.Builder()
+                .persistent(Map.of())
+                .transient_(Map.of())
+                .defaults(Map.of("cluster", JsonData.of(Json.createObjectBuilder(
+                        Map.of("routing",
+                                Map.of("allocation", Map.of()))).build()
 
-        when(catApi.indices()).thenReturn(List.of(
-                new IndexSummaryResponse("foo_42", "", "RED"),
-                new IndexSummaryResponse("bar_17", "", "YELLOW"),
-                new IndexSummaryResponse("baz_23", "", "GREEN")
-        ));
+                )))
+                .build();
+        whenClusterSettings().thenReturn(response);
 
-        assertThat(clusterAdapter.deflectorHealth(Set.of("foo_deflector", "bar_deflector", "baz_deflector"))).contains(HealthStatus.Red);
+        final var result = clusterAdapter.clusterAllocationDiskSettings();
+
+        assertThat(result).isEqualTo(DISABLED_RESULT);
     }
 
-    private void mockNodesResponse() throws IOException {
-        when(jsonApi.perform(any(), anyString()))
-                .thenReturn(objectMapper.readTree(Resources.getResource("nodes-response-without-host-field.json")));
+    private static JsonData m(Map<String, ?> response) {
+        return JsonData.of(Json.createObjectBuilder(response).build());
+    }
+
+    private OngoingStubbing<GetClusterSettingsResponse> whenClusterSettings() throws IOException {
+        return when(opensearchClient.cluster().getSettings(any(Function.class)));
     }
 }

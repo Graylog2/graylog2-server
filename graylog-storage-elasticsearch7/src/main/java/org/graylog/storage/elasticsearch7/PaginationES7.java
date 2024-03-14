@@ -16,24 +16,28 @@
  */
 package org.graylog.storage.elasticsearch7;
 
+import jakarta.inject.Inject;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.IndicesOptions;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog2.indexer.results.ChunkedResult;
 import org.graylog2.indexer.results.MultiChunkResultRetriever;
+import org.graylog2.indexer.results.ResultMessageFactory;
 import org.graylog2.indexer.searches.ChunkCommand;
-
-import jakarta.inject.Inject;
 
 import java.util.Set;
 
 public class PaginationES7 implements MultiChunkResultRetriever {
+    private final ResultMessageFactory resultMessageFactory;
     private final ElasticsearchClient client;
     private final SearchRequestFactory searchRequestFactory;
 
     @Inject
-    public PaginationES7(final ElasticsearchClient client,
+    public PaginationES7(final ResultMessageFactory resultMessageFactory,
+                         final ElasticsearchClient client,
                          final SearchRequestFactory searchRequestFactory) {
+        this.resultMessageFactory = resultMessageFactory;
         this.client = client;
         this.searchRequestFactory = searchRequestFactory;
     }
@@ -43,12 +47,13 @@ public class PaginationES7 implements MultiChunkResultRetriever {
         final SearchSourceBuilder searchQuery = searchRequestFactory.create(chunkCommand);
         final SearchRequest request = buildSearchRequest(searchQuery, chunkCommand.indices());
         final SearchResponse result = client.search(request, "Unable to perform search-after pagination search");
-        return new PaginationResultES7(client, request, result, searchQuery.toString(), chunkCommand.fields(), chunkCommand.limit().orElse(-1));
+        return new PaginationResultES7(resultMessageFactory, client, request, result, searchQuery.toString(), chunkCommand.fields(), chunkCommand.limit().orElse(-1));
     }
 
     private SearchRequest buildSearchRequest(final SearchSourceBuilder query,
                                              final Set<String> indices) {
         return new SearchRequest(indices.toArray(new String[0]))
-                .source(query);
+                .source(query)
+                .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN);
     }
 }

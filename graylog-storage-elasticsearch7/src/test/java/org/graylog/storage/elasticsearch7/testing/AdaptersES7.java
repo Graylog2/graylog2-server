@@ -18,6 +18,7 @@ package org.graylog.storage.elasticsearch7.testing;
 
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
 import org.graylog.storage.elasticsearch7.ComposableIndexTemplateAdapter;
 import org.graylog.storage.elasticsearch7.CountsAdapterES7;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
@@ -45,6 +46,8 @@ import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerAdapter;
 import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.messages.ChunkedBulkIndexer;
 import org.graylog2.indexer.messages.MessagesAdapter;
+import org.graylog2.indexer.results.ResultMessageFactory;
+import org.graylog2.indexer.results.TestResultMessageFactory;
 import org.graylog2.indexer.searches.SearchesAdapter;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 
@@ -52,6 +55,7 @@ public class AdaptersES7 implements Adapters {
 
     private final ElasticsearchClient client;
     private final ObjectMapper objectMapper;
+    private final ResultMessageFactory resultMessageFactory = new TestResultMessageFactory();
 
     public AdaptersES7(ElasticsearchClient client) {
         this.client = client;
@@ -88,20 +92,20 @@ public class AdaptersES7 implements Adapters {
     @Override
     public SearchesAdapter searchesAdapter() {
         final ScrollResultES7.Factory scrollResultFactory = (initialResult, query, scroll, fields, limit) -> new ScrollResultES7(
-                client, initialResult, query, scroll, fields, limit
+                resultMessageFactory, client, initialResult, query, scroll, fields, limit
         );
         final SortOrderMapper sortOrderMapper = new SortOrderMapper();
         final boolean allowHighlighting = true;
         final boolean allowLeadingWildcardSearches = true;
 
-        final SearchRequestFactory searchRequestFactory = new SearchRequestFactory(sortOrderMapper, allowHighlighting, allowLeadingWildcardSearches);
+        final SearchRequestFactory searchRequestFactory = new SearchRequestFactory(sortOrderMapper, allowHighlighting, allowLeadingWildcardSearches, new IgnoreSearchFilters());
         final Scroll scroll = new Scroll(client, scrollResultFactory, searchRequestFactory);
-        return new SearchesAdapterES7(client, scroll, searchRequestFactory);
+        return new SearchesAdapterES7(resultMessageFactory, client, scroll, searchRequestFactory);
     }
 
     @Override
     public MessagesAdapter messagesAdapter() {
-        return new MessagesAdapterES7(client, new MetricRegistry(), new ChunkedBulkIndexer(), objectMapper);
+        return new MessagesAdapterES7(resultMessageFactory, client, new MetricRegistry(), new ChunkedBulkIndexer(), objectMapper);
     }
 
     @Override

@@ -93,7 +93,7 @@ const StyledQueryNav = styled(Nav)(({ theme }) => css`
 
     > li {
       > a {
-        color: ${theme.colors.variant.dark.default};
+        color: ${theme.colors.global.textDefault};
         border: none;
 
         &:hover,
@@ -144,7 +144,7 @@ const QueryTab = styled(NavItem)`
 
 const MoreTabsLi = ({ menuItems }: { menuItems: OrderedSet<React.ReactNode> }) => (
   <li className={MORE_TABS_LI_CLASS}>
-    <DropdownButton title={<Icon name="ellipsis-h" />}
+    <DropdownButton title={<Icon name="more_horiz" />}
                     className={MORE_TABS_BUTTON_CLASS}
                     id="query-tabs-more"
                     aria-label="More Dashboard Pages"
@@ -392,11 +392,11 @@ const AdaptableQueryTabs = ({
                     onSelect('new');
                   }}
                   className={NEW_TAB_BUTTON_CLASS}>
-          <Icon name="plus" />
+          <Icon name="add" />
         </QueryTab>
       </StyledQueryNav>
       <IconButton title="Open pages configuration"
-                  name="cog"
+                  name="settings"
                   ref={queriesConfigBtn}
                   className="query-config-btn"
                   onClick={() => {

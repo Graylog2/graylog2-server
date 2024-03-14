@@ -28,6 +28,7 @@ export const simpleEventDefinition = {
     series: [],
     streams: ['stream-id-1'],
     type: 'aggregation-v1',
+    filters: [],
   },
   description: '',
   field_spec: {},

@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import MenuItem from 'components/bootstrap/MenuItem';
 
@@ -29,10 +30,10 @@ describe('DropdownButton', () => {
       </DropdownButton>
     ));
 
-    const button = await screen.findByRole('button', { name: 'Click me!' });
-    button.click();
+    const button = await screen.findByRole('button', { name: /click me!/i });
+    await userEvent.click(button);
 
-    await screen.findByRole('menuitem', { name: 'Hey there!' });
+    await screen.findByRole('menuitem', { name: /hey there!/i });
   });
 
   it('click on menu item triggers onClick and closes menu', async () => {
@@ -44,11 +45,11 @@ describe('DropdownButton', () => {
       </DropdownButton>
     ));
 
-    const button = await screen.findByRole('button', { name: 'Click me!' });
-    button.click();
+    const button = await screen.findByRole('button', { name: /click me!/i });
+    await userEvent.click(button);
 
-    const menuitem = await screen.findByRole('menuitem', { name: 'Hey there!' });
-    menuitem.click();
+    const menuitem = await screen.findByRole('menuitem', { name: /hey there!/i });
+    await userEvent.click(menuitem);
 
     await waitFor(() => {
       expect(onClick).toHaveBeenCalled();

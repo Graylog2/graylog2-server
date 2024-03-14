@@ -25,7 +25,6 @@ import com.github.joschi.jadconfig.Repository;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.guava.GuavaConverterFactory;
-import com.github.joschi.jadconfig.guice.NamedConfigParametersModule;
 import com.github.joschi.jadconfig.jodatime.JodaTimeConverterFactory;
 import com.github.joschi.jadconfig.repositories.EnvironmentRepository;
 import com.github.joschi.jadconfig.repositories.PropertiesRepository;
@@ -36,6 +35,7 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import com.google.inject.AbstractModule;
 import com.google.inject.Binder;
 import com.google.inject.CreationException;
 import com.google.inject.Guice;
@@ -50,7 +50,9 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.graylog.datanode.Configuration;
 import org.graylog.datanode.bootstrap.commands.MigrateCmd;
+import org.graylog2.bindings.NamedConfigParametersOverrideModule;
 import org.graylog2.bootstrap.CliCommand;
 import org.graylog2.configuration.PathConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
@@ -184,7 +186,7 @@ public abstract class CmdLineTool implements CliCommand {
      * Things that have to run before the {@link #startCommand()} method is being called.
      * Please note that this happens *before* the configuration file has been parsed.
      */
-    protected void beforeStart(TLSProtocolsConfiguration configuration, PathConfiguration pathConfiguration) {
+    protected void beforeStart(TLSProtocolsConfiguration tlsProtocolsConfiguration, Configuration configuration) {
     }
 
     /**
@@ -261,7 +263,7 @@ public abstract class CmdLineTool implements CliCommand {
         installCommandConfig();
 
         beforeStart();
-        beforeStart(parseAndGetTLSConfiguration(), parseAndGetPathConfiguration(configFile));
+        beforeStart(parseAndGetTLSConfiguration(), parseAndGetConfiguration(configFile));
 
         processConfiguration(jadConfig);
 
@@ -287,7 +289,7 @@ public abstract class CmdLineTool implements CliCommand {
 
         injector = setupInjector(
                 new IsDevelopmentBindings(),
-                new NamedConfigParametersModule(jadConfig.getConfigurationBeans()),
+                new NamedConfigParametersOverrideModule(jadConfig.getConfigurationBeans()),
                 binder -> binder.bind(MetricRegistry.class).toInstance(metricRegistry)
         );
 
@@ -303,6 +305,12 @@ public abstract class CmdLineTool implements CliCommand {
         reporter.start();
 
         startCommand();
+    }
+
+    private Configuration parseAndGetConfiguration(String configFile) {
+        final Configuration configuration = new Configuration();
+        processConfiguration(new JadConfig(getConfigRepositories(configFile), configuration));
+        return configuration;
     }
 
     // Parse only the TLSConfiguration bean
@@ -453,8 +461,8 @@ public abstract class CmdLineTool implements CliCommand {
      * configuration values in modules at binding time.
      */
     protected Injector setupCoreConfigInjector() {
-        final NamedConfigParametersModule configModule =
-                new NamedConfigParametersModule(jadConfig.getConfigurationBeans());
+        final AbstractModule configModule =
+                new NamedConfigParametersOverrideModule(jadConfig.getConfigurationBeans());
 
         Injector coreConfigInjector = null;
         try {
