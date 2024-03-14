@@ -66,12 +66,20 @@ public class MigrationHelpersTest {
     public UserService userService;
     @Mock
     public RoleService roleService;
+    @Mock
+    public RoleRemover roleRemover;
 
     private MigrationHelpers migrationHelpers;
 
     @Before
     public void setUp() throws Exception {
-        this.migrationHelpers = new MigrationHelpers(roleService, userService);
+        this.migrationHelpers = new MigrationHelpers(roleService, userService, roleRemover);
+    }
+
+    @Test
+    public void usesRoleRemoverToRemoveRoles() {
+        migrationHelpers.removeBuiltinRole("John");
+        verify(roleRemover).removeBuiltinRole("John");
     }
 
     @Test
@@ -266,7 +274,7 @@ public class MigrationHelpersTest {
     public void ensureUserWithDuplicates() throws ValidationException {
 
         final TestUserService testUserService = new TestUserService(mongodb.mongoConnection());
-        migrationHelpers = new MigrationHelpers(roleService, testUserService);
+        migrationHelpers = new MigrationHelpers(roleService, testUserService, roleRemover);
 
         assertThat(testUserService.loadAll()).hasSize(2);
         assertThatThrownBy(() -> testUserService.load("test-user")).isInstanceOf(UserServiceImpl.DuplicateUserException.class);
