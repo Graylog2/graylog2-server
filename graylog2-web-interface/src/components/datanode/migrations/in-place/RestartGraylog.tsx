@@ -19,6 +19,7 @@ import React from 'react';
 import type { MigrationStepComponentProps } from 'components/datanode/Types';
 import MigrationStepTriggerButtonToolbar from 'components/datanode/migrations/common/MigrationStepTriggerButtonToolbar';
 import { Space } from 'preflight/components/common';
+import DataNodeList from 'components/datanode/DataNodeList/DataNodeList';
 
 const RestartGraylog = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => (
   <>
@@ -26,6 +27,10 @@ const RestartGraylog = ({ currentStep, onTriggerStep }: MigrationStepComponentPr
     <p>Please remove the <code>elasticsearch_hosts</code> line from your <code>graylog.conf</code></p>
     <p>E.g., <code>elasticsearch_hosts = https://admin:admin@opensearch1:9200,https://admin:admin@opensearch2:9200,https://admin:admin@opensearch3:9200</code></p>
     <Space h="md" />
+    <DataNodeList />
+    <p>Please wait for all data nodes to become 'AVAILABLE'. Please check the data node's log if they do not become
+      available within 1-2 minutes.
+    </p>
     {/* eslint-disable-next-line react/no-unescaped-entities */}
     <p>Once that's done, please restart Graylog to finish the migration.</p>
     <MigrationStepTriggerButtonToolbar nextSteps={currentStep.next_steps} onTriggerStep={onTriggerStep} />
