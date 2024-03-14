@@ -16,10 +16,10 @@
  */
 import * as React from 'react';
 
-import { adjustFormat } from 'util/DateTime';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 import { indicesInWarmTier, isSearchingWarmTier } from 'views/components/searchbar/queryvalidation/warmTierValidation';
 import { Explanation } from 'views/components/searchbar/queryvalidation/QueryValidation';
+import WarmTierErrorMessage from 'views/components/searchbar/queryvalidation/WarmTierErrorMessage';
 
 type Props = {
   validationState: QueryValidationState;
@@ -28,36 +28,11 @@ type Props = {
 const WarmTierQueryValidation = ({ validationState } : Props) => {
   const warmTierIndices = indicesInWarmTier(validationState);
 
-  const warmTierErrorMessage = () => {
-    if (!isSearchingWarmTier(warmTierIndices)) return null;
-
-    const formatTimestamp = (timestamp: number) : string => `${adjustFormat(new Date((timestamp)), 'default')}`;
-
-    const timestampInfo = warmTierIndices.map((warmTierIndex) => {
-      const begin = formatTimestamp(warmTierIndex.begin);
-      const end = formatTimestamp(warmTierIndex.end);
-
-      return `${begin} to ${end}`;
-    });
-
-    const timestampString = timestampInfo.join(', ');
-
-    let errorMessage = 'The selected time range includes data stored in the Warm Tier, which can be slow to retrieve.';
-
-    if (timestampString.length > 0) {
-      errorMessage += ` The following interval falls within the Warm Tier: ${timestampString}.`;
-    }
-
-    return errorMessage;
-  };
-
-  const errorMessage = warmTierErrorMessage();
-
-  if (!errorMessage) return null;
+  if (!isSearchingWarmTier(warmTierIndices)) return null;
 
   return (
     <Explanation>
-      <span><b>Warm Tier Search</b>: {errorMessage}</span>
+      <span><b>Warm Tier Search</b>: <WarmTierErrorMessage warmTierIndices={warmTierIndices} /></span>
     </Explanation>
   );
 };
