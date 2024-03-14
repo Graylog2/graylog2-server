@@ -16,6 +16,7 @@ const event = {
   updated_at: '2024-02-26T15:32:24.666Z',
   priority: null,
   archived: false,
+  replay_info: null,
 };
 
 describe('EventsList', () => {

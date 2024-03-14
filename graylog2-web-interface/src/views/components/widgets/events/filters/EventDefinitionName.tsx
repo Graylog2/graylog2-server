@@ -15,33 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useQuery } from '@tanstack/react-query';
 
-import type { EventDefinition } from 'logic/alerts/types';
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
-import UserNotification from 'preflight/util/UserNotification';
 import { Spinner } from 'components/common';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
-
-export const fetchEventDefinitionDetails = async (eventDefinitionId: string): Promise<EventDefinition> => (
-  fetch('GET', qualifyUrl(`/events/definitions/${eventDefinitionId}`))
-);
-
-const useEventDefinitionDetails = (eventDefId: string) => {
-  const { data, isFetching } = useQuery({
-    queryKey: ['get-event-definition-details', eventDefId],
-    queryFn: () => fetchEventDefinitionDetails(eventDefId),
-    onError: (errorThrown) => {
-      UserNotification.error(`Loading archives failed with status: ${errorThrown}`);
-    },
-    retry: 0,
-    keepPreviousData: true,
-  });
-
-  return { data, isFetching };
-};
+import useEventDefinition from 'components/events/events/hooks/useEventDefinition';
 
 type Props = {
   eventDefinitionId: string,
@@ -49,7 +27,7 @@ type Props = {
 }
 
 const EventDefinitionName = ({ eventDefinitionId, displayAsLink }: Props) => {
-  const { data: eventDefinition, isFetching } = useEventDefinitionDetails(eventDefinitionId);
+  const { data: eventDefinition, isFetching } = useEventDefinition(eventDefinitionId);
 
   if (isFetching) {
     return <Spinner />;

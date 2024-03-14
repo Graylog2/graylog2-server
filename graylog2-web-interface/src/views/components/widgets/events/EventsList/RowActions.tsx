@@ -21,8 +21,8 @@ import { IconButton, ModalSubmit } from 'components/common';
 import { ButtonToolbar, Modal, Menu, MenuItem } from 'components/bootstrap';
 import usePluginEntities from 'hooks/usePluginEntities';
 import LinkToReplaySearch from 'components/event-definitions/replay-search/LinkToReplaySearch';
-import type View from 'views/logic/views/View';
-import { isAnyPermitted } from 'util/PermissionsMixin';
+
+import EventDetails from './EventDetails';
 
 const usePluggableDashboardActions = (eventId: string) => {
   const modalRefs = useRef({});
@@ -45,18 +45,6 @@ const usePluggableDashboardActions = (eventId: string) => {
     ));
 
   return ({ actions, actionModals });
-};
-
-const EventDetails = ({ eventId }: { eventId: string }) => {
-  const puggableEventDetails = usePluginEntities('views.components.widgets.events.detailsComponent');
-
-  if (puggableEventDetails?.length) {
-    const { component: Component } = puggableEventDetails[0];
-
-    return <Component eventId={eventId} />;
-  }
-
-  return <>default</>;
 };
 
 type Props = {
