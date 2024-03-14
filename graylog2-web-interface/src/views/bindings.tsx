@@ -104,7 +104,6 @@ import ChangeFieldType, {
   isChangeFieldTypeHidden,
 } from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldType';
 import AddEventsWidgetActionHandler, { CreateEventsWidget } from 'views/logic/widgets/events/AddEventsWidgetActionHandler';
-import useFeature from 'hooks/useFeature';
 import EventsListConfigGenerator from 'views/logic/searchtypes/events/EventsListConfigGenerator';
 import EventsWidgetEdit from 'views/components/widgets/events/EventsWidgetEdit';
 import EventsWidget from 'views/logic/widgets/events/EventsWidget';
@@ -417,11 +416,6 @@ const exports: PluginExports = {
       type: 'events' as const,
       title: 'Events Overview',
       func: AddEventsWidgetActionHandler,
-      useCondition: () => {
-        const featureIsEnabled = useFeature('security_search_widgets');
-
-        return featureIsEnabled;
-      },
     },
   ],
   'views.completers': [

@@ -31,7 +31,6 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import usePluginEntities from 'hooks/usePluginEntities';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import IfFeatureEnabled from 'components/features/IfFeatureEnabled';
 
 import SectionInfo from '../SectionInfo';
 import SectionSubheadline from '../SectionSubheadline';
@@ -205,24 +204,20 @@ const AddWidgetButton = ({ onClick }: Props) => {
                               setOverflowingComponents={setOverflowingComponents} />
       </Group>
       {!!investigationsCreator?.length && (
-        <IfFeatureEnabled name="security_search_widgets">
-          <Group>
-            <SectionSubheadline>Investigations</SectionSubheadline>
-            <GroupCreateMenuItems creators={investigationsCreator}
-                                  onClick={onClick}
-                                  setOverflowingComponents={setOverflowingComponents} />
-          </Group>
-        </IfFeatureEnabled>
+        <Group>
+          <SectionSubheadline>Investigations</SectionSubheadline>
+          <GroupCreateMenuItems creators={investigationsCreator}
+                                onClick={onClick}
+                                setOverflowingComponents={setOverflowingComponents} />
+        </Group>
       )}
       {!!eventsCreator?.length && (
-        <IfFeatureEnabled name="security_search_widgets">
-          <Group>
-            <SectionSubheadline>Events</SectionSubheadline>
-            <GroupCreateMenuItems creators={eventsCreator}
-                                  onClick={onClick}
-                                  setOverflowingComponents={setOverflowingComponents} />
-          </Group>
-        </IfFeatureEnabled>
+        <Group>
+          <SectionSubheadline>Events</SectionSubheadline>
+          <GroupCreateMenuItems creators={eventsCreator}
+                                onClick={onClick}
+                                setOverflowingComponents={setOverflowingComponents} />
+        </Group>
       )}
       {components}
     </>
