@@ -59,4 +59,8 @@ public interface MigrationActions {
 
     void requestMigrationStatus();
 
+    void calculateTrafficEstimate();
+
+    void verifyRemoteIndexerConnection();
+
 }

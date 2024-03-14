@@ -141,7 +141,6 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
         GenericContainer<?> container = new GenericContainer<>(imageSupplier.get())
                 .withExposedPorts(restPort, openSearchHttpPort)
                 .withNetwork(network)
-                .withEnv("GRAYLOG_DATANODE_DATA_DIR", "data")
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_LOCATION", IMAGE_WORKING_DIR)
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_PLUGINS_LOCATION", IMAGE_WORKING_DIR + "/plugins")
                 .withEnv("GRAYLOG_DATANODE_INSECURE_STARTUP", "true")
@@ -202,7 +201,7 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
 
         final Path pluginsDir = getPath().resolve(Path.of("opensearch", "plugins"));
         final List<String> pluginNames = getPluginNames(pluginsDir);
-        LOG.info("Detected following opensearch plugins: " + String.join(", ", pluginNames));
+        LOG.debug("Detected following opensearch plugins: " + String.join(", ", pluginNames));
 
         final ImageFromDockerfile image = new ImageFromDockerfile("local/graylog-datanode:latest", false);
 

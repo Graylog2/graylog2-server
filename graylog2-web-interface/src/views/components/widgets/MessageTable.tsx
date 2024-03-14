@@ -44,6 +44,10 @@ const Table = styled.table(({ theme }) => css`
   width: 100%;
   word-break: break-all;
 
+  > tbody > tr > td {
+    border-color: ${theme.colors.table.row.border};
+  }
+
   @media print {
     font-size: ${theme.fonts.size.body};
     padding-left: 0;
@@ -82,7 +86,7 @@ const TableWrapper = styled.div(({ theme }) => css`
 `);
 
 const TableHead = styled.thead(({ theme }) => css`
-  background-color: ${theme.colors.gray[90]};
+  background-color: ${theme.colors.table.head.background};
   color: ${theme.utils.readableColor(theme.colors.gray[90])};
   position: sticky;
   top: 0;

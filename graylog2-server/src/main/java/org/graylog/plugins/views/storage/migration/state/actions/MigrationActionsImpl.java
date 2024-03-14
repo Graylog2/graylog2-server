@@ -16,6 +16,8 @@
  */
 package org.graylog.plugins.views.storage.migration.state.actions;
 
+import com.codahale.metrics.Counter;
+import com.codahale.metrics.MetricRegistry;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachineContext;
@@ -30,6 +32,7 @@ import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.cluster.preflight.DataNodeProvisioningService;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
 import org.graylog2.indexer.migration.RemoteReindexMigration;
+import org.graylog2.plugin.GlobalMetricNames;
 import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.system.processing.control.ClusterProcessingControl;
@@ -38,6 +41,7 @@ import org.graylog2.system.processing.control.RemoteProcessingControlResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
@@ -59,13 +63,15 @@ public class MigrationActionsImpl implements MigrationActions {
     private final DataNodeProvisioningService dataNodeProvisioningService;
 
     private final RemoteReindexingMigrationAdapter migrationService;
+    private final MetricRegistry metricRegistry;
 
     @Inject
     public MigrationActionsImpl(final ClusterConfigService clusterConfigService, NodeService<DataNodeDto> nodeService,
                                 final CaService caService, DataNodeProvisioningService dataNodeProvisioningService,
                                 RemoteReindexingMigrationAdapter migrationService,
                                 final ClusterProcessingControlFactory clusterProcessingControlFactory,
-                                final PreflightConfigService preflightConfigService) {
+                                final PreflightConfigService preflightConfigService,
+                                final MetricRegistry metricRegistry) {
         this.clusterConfigService = clusterConfigService;
         this.nodeService = nodeService;
         this.caService = caService;
@@ -73,6 +79,7 @@ public class MigrationActionsImpl implements MigrationActions {
         this.clusterProcessingControlFactory = clusterProcessingControlFactory;
         this.migrationService = migrationService;
         this.preflightConfigService = preflightConfigService;
+        this.metricRegistry = metricRegistry;
     }
 
 
@@ -90,7 +97,8 @@ public class MigrationActionsImpl implements MigrationActions {
 
     @Override
     public void rollingUpgradeSelected() {
-
+        Counter traffic = (Counter) metricRegistry.getMetrics().get(GlobalMetricNames.INPUT_TRAFFIC);
+        getStateMachineContext().addExtendedState(TrafficSnapshot.TRAFFIC_SNAPSHOT, new TrafficSnapshot(traffic.getCount()));
     }
 
     @Override
@@ -147,8 +155,8 @@ public class MigrationActionsImpl implements MigrationActions {
     public void provisionDataNodes() {
         // if we start provisioning DataNodes via the migration, Preflight is definitely done/no option anymore
         var preflight = preflightConfigService.getPreflightConfigResult();
-        if (preflight == null || !preflight.equals(PreflightConfigResult.FINISHED)) {
-            preflightConfigService.setConfigResult(PreflightConfigResult.FINISHED);
+        if (preflight == null || !preflight.equals(PreflightConfigResult.PREPARED)) {
+            preflightConfigService.setConfigResult(PreflightConfigResult.PREPARED);
         }
         final Map<String, DataNodeDto> activeDataNodes = nodeService.allActive();
         activeDataNodes.values().forEach(node -> dataNodeProvisioningService.changeState(node.getNodeId(), DataNodeProvisioningConfig.State.CONFIGURED));
@@ -176,7 +184,7 @@ public class MigrationActionsImpl implements MigrationActions {
     @Override
     public boolean dataNodeStartupFinished() {
         boolean dataNodesAvailable = nodeService.allActive().values().stream().allMatch(node -> node.getDataNodeStatus() == DataNodeStatus.AVAILABLE);
-        if (dataNodesAvailable) { // set preflight config once more to FINISHED to be sure that a Graylog restart will connect to the data nodes
+        if (dataNodesAvailable) { // set preflight config to FINISHED to be sure that a Graylog restart will connect to the data nodes
             var preflight = preflightConfigService.getPreflightConfigResult();
             if (preflight == null || !preflight.equals(PreflightConfigResult.FINISHED)) {
                 preflightConfigService.setConfigResult(PreflightConfigResult.FINISHED);
@@ -201,6 +209,24 @@ public class MigrationActionsImpl implements MigrationActions {
         getStateMachineContext().getExtendedState(MigrationStateMachineContext.KEY_MIGRATION_ID, String.class)
                 .map(migrationService::status)
                 .ifPresent(status -> getStateMachineContext().setResponse(status));
+    }
+
+    @Override
+    public void calculateTrafficEstimate() {
+        Counter currentTraffic = (Counter) metricRegistry.getMetrics().get(GlobalMetricNames.INPUT_TRAFFIC);
+        MigrationStateMachineContext context = getStateMachineContext();
+        if (context.getExtendedState(TrafficSnapshot.ESTIMATED_TRAFFIC_PER_MINUTE) == null) {
+            context.getExtendedState(TrafficSnapshot.TRAFFIC_SNAPSHOT, TrafficSnapshot.class)
+                    .ifPresent(traffic -> context.addExtendedState(TrafficSnapshot.ESTIMATED_TRAFFIC_PER_MINUTE, traffic.calculateEstimatedTrafficPerMinute(currentTraffic.getCount())));
+        }
+    }
+
+    @Override
+    public void verifyRemoteIndexerConnection() {
+        final URI hostname = Objects.requireNonNull(URI.create(getStateMachineContext().getActionArgument("hostname", String.class)), "hostname has to be provided");
+        final String user = getStateMachineContext().getActionArgumentOpt("user", String.class).orElse(null);
+        final String password = getStateMachineContext().getActionArgumentOpt("password", String.class).orElse(null);
+        getStateMachineContext().setResponse(migrationService.checkConnection(hostname, user, password));
     }
 
     @Override

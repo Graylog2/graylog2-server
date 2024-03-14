@@ -172,12 +172,12 @@ public abstract class EventList implements SearchType {
         public abstract Builder streams(Set<String> streams);
 
         @JsonProperty
-        public abstract Builder page(int page);
+        public abstract Builder page(@Nullable Integer page);
 
         abstract Optional<Integer> page();
 
         @JsonProperty
-        public abstract Builder perPage(int pageSize);
+        public abstract Builder perPage(@Nullable Integer pageSize);
 
         abstract Optional<Integer> perPage();
 
@@ -217,14 +217,17 @@ public abstract class EventList implements SearchType {
         @JsonProperty
         public abstract List<CommonEventSummary> events();
 
+        @JsonProperty
+        public abstract long totalResults();
+
         public static Builder builder() {
             return new AutoValue_EventList_Result.Builder().type(EventList.NAME);
         }
 
         abstract Builder toBuilder();
 
-        public Result withEvents(List<CommonEventSummary> events) {
-            return toBuilder().events(events).build();
+        public Result withEvents(List<CommonEventSummary> events, long totalResults) {
+            return toBuilder().events(events).totalResults(totalResults).build();
         }
 
         public static Builder result(String searchTypeId) {
@@ -249,6 +252,9 @@ public abstract class EventList implements SearchType {
 
             @JsonProperty
             public abstract Builder events(List<CommonEventSummary> events);
+
+            @JsonProperty
+            public abstract Builder totalResults(long count);
 
             public abstract Result build();
         }

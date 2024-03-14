@@ -85,7 +85,9 @@ public class MigrationStateMachineBuilder {
         // we now have enough information in the context to start the remote reindex migration. This will move us to the
         // next state that will be active as long as the migration is running and will provide status information to the FE
         config.configure(MigrationState.MIGRATE_EXISTING_DATA) // this state and screen has to request username, password and url of the old cluster
+                .permitReentry(MigrationStep.CHECK_REMOTE_INDEXER_CONNECTION, migrationActions::verifyRemoteIndexerConnection)
                 .permit(MigrationStep.START_REMOTE_REINDEX_MIGRATION, MigrationState.REMOTE_REINDEX_RUNNING, migrationActions::startRemoteReindex);
+
 
         // the state machine will stay in this state till the migration is finished or fails. It should provide
         // current migration status every time we trigger MigrationStep.REQUEST_MIGRATION_STATUS.
@@ -112,6 +114,7 @@ public class MigrationStateMachineBuilder {
                 .permitIf(MigrationStep.CALCULATE_JOURNAL_SIZE, MigrationState.JOURNAL_SIZE_DOWNTIME_WARNING, migrationActions::provisioningFinished);
 
         config.configure(MigrationState.JOURNAL_SIZE_DOWNTIME_WARNING)
+                .onEntry(migrationActions::calculateTrafficEstimate)
                 .permit(MigrationStep.SHOW_STOP_PROCESSING_PAGE, MigrationState.MESSAGE_PROCESSING_STOP, migrationActions::stopMessageProcessing);
 
         config.configure(MigrationState.MESSAGE_PROCESSING_STOP)

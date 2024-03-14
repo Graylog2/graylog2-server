@@ -18,10 +18,12 @@ package org.graylog.aws.inputs.cloudtrail;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
 import org.graylog.aws.AWS;
 import org.graylog.aws.AWSObjectMapper;
 import org.graylog.aws.inputs.cloudtrail.json.CloudTrailRecord;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
@@ -33,17 +35,18 @@ import org.joda.time.DateTime;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import jakarta.inject.Inject;
-
 public class CloudTrailCodec extends AbstractCodec {
     public static final String NAME = "AWSCloudTrail";
 
     private final ObjectMapper objectMapper;
+    private final MessageFactory messageFactory;
 
     @Inject
-    public CloudTrailCodec(@Assisted Configuration configuration, @AWSObjectMapper ObjectMapper objectMapper) {
+    public CloudTrailCodec(@Assisted Configuration configuration, @AWSObjectMapper ObjectMapper objectMapper,
+                           MessageFactory messageFactory) {
         super(configuration);
         this.objectMapper = objectMapper;
+        this.messageFactory = messageFactory;
     }
 
     @Nullable
@@ -52,7 +55,7 @@ public class CloudTrailCodec extends AbstractCodec {
         try {
             final CloudTrailRecord record = objectMapper.readValue(rawMessage.getPayload(), CloudTrailRecord.class);
             final String source = configuration.getString(Config.CK_OVERRIDE_SOURCE, "aws-cloudtrail");
-            final Message message = new Message(record.getConstructedMessage(), source, DateTime.parse(record.eventTime));
+            final Message message = messageFactory.createMessage(record.getConstructedMessage(), source, DateTime.parse(record.eventTime));
 
             message.addFields(record.additionalFieldsAsMap());
             message.addField("full_message", record.getFullMessage());

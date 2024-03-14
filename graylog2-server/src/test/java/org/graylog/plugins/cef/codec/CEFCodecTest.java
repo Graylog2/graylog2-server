@@ -17,6 +17,8 @@
 package org.graylog.plugins.cef.codec;
 
 import org.graylog.plugins.cef.parser.MappedMessage;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.journal.RawMessage;
 import org.junit.Before;
@@ -32,10 +34,11 @@ import static org.mockito.Mockito.when;
 
 public class CEFCodecTest {
     private CEFCodec codec;
+    private final MessageFactory messageFactory = new TestMessageFactory();
 
     @Before
     public void setUp() {
-        codec = new CEFCodec(Configuration.EMPTY_CONFIGURATION);
+        codec = new CEFCodec(Configuration.EMPTY_CONFIGURATION, messageFactory);
     }
 
     @Test
