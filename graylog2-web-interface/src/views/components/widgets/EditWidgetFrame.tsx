@@ -27,7 +27,6 @@ import useViewType from 'views/hooks/useViewType';
 import View from 'views/logic/views/View';
 
 import WidgetQueryControls from '../WidgetQueryControls';
-import IfDashboard from '../dashboard/IfDashboard';
 import WidgetOverrideElements from '../WidgetOverrideElements';
 import DisableSubmissionStateProvider from '../contexts/DisableSubmissionStateProvider';
 

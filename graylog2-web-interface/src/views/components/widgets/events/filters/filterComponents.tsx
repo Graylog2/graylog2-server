@@ -19,7 +19,6 @@ import * as React from 'react';
 import EventDefinitionName from 'views/components/widgets/events/filters/EventDefinitionName';
 import EventDefinitionFilter from 'views/components/widgets/events/filters/EventDefinitionFilter';
 import EventTypeFilter from 'views/components/widgets/events/filters/EventTypeFilter';
-import DateFilter from 'views/components/widgets/overview-configuration/filters/DateFilter';
 import type { FilterComponents } from 'views/components/widgets/overview-configuration/filters/types';
 
 const filterComponents: FilterComponents = [
@@ -37,15 +36,6 @@ const filterComponents: FilterComponents = [
       <EventTypeFilter onSelect={onChange} selectedValues={selectedValues} />
     ),
     renderValue: (isAlert: 'true' | 'false') => (isAlert === 'true' ? 'Alert' : 'Event'),
-  },
-  {
-    attribute: 'timestamp',
-    configuration: (_selectedValues, editValue: Array<string>, onChange: (newValue: Array<string>, shouldSubmit: boolean) => void) => (
-      <DateFilter values={editValue} onChange={(newValue) => onChange(newValue, false)} />
-    ),
-    valueForConfig: (values: Array<string>) => values.join(','),
-    valueFromConfig: (value: string) => (value ? value.split(',') : []),
-    renderValue: (values: string) => values.replace(',', ' to '),
   },
 ];
 

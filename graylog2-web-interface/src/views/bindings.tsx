@@ -219,7 +219,7 @@ const exports: PluginExports = {
       visualizationComponent: EventsVisualization,
       editComponent: EventsWidgetEdit,
       searchTypes: EventsListConfigGenerator,
-      titleGenerator: () => 'Events Overview',
+      titleGenerator: () => EventsWidget.defaultTitle,
       needsControlledHeight: () => false,
       searchResultTransformer: (data: Array<unknown>) => data?.[0],
     },
