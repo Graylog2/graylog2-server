@@ -29,6 +29,7 @@ const filterComponents: FilterComponents = [
     ),
     attribute: 'event_definition_id',
     renderValue: (value) => <EventDefinitionName eventDefinitionId={value} displayAsLink={false} />,
+    allowMultipleValues: true,
   },
   {
     attribute: 'alert',

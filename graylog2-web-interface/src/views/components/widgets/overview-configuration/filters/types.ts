@@ -6,6 +6,7 @@ export type Filter = {
 }
 
 export type FilterComponent = {
+  allowMultipleValues?: boolean,
   attribute: string,
   configuration: (selectedValues: Array<string>, editValue: unknown, onChange: (newValue: unknown, shouldSubmit?: boolean) => void) => React.ReactNode,
   multiEdit?: boolean,

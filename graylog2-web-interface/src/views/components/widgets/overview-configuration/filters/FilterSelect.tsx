@@ -52,9 +52,13 @@ const FilterSelect = ({ filterComponents, columnTitle, onCreate, selectedFilters
 
   const filterOptions = useMemo(() => (
     filterComponents
-      .map((col) => ({ value: col.attribute, label: columnTitle(col.attribute) }))
+      .map((filtComp) => ({
+        value: filtComp.attribute,
+        label: columnTitle(filtComp.attribute),
+        disabled: !filtComp.allowMultipleValues && !!selectedFilters.find(({ field }) => field === filtComp.attribute),
+      }))
       .sort(({ label: label1 }, { label: label2 }) => defaultCompare(label1, label2))
-  ), [columnTitle, filterComponents]);
+  ), [columnTitle, filterComponents, selectedFilters]);
 
   const onSelectColumn = (selectedCol: string) => {
     setSelectedColumn(selectedCol);

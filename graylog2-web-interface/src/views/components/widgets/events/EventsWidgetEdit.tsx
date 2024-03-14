@@ -146,18 +146,20 @@ const EventsWidgetEdit = ({ children, onCancel, config, onChange, onSubmit }: Ed
       {({ setValues, values }) => {
         const onChangeType = (newMode: VisualizationType) => {
           if (newMode !== values.mode) {
+            const defaultSort = {
+              field: EventsWidgetConfig.defaultSort.field,
+              direction: EventsWidgetConfig.defaultSort.direction.direction,
+            };
+
             if (newMode === NUMBER_MODE) {
-              setValues({ ...values, fields: Immutable.OrderedSet(), filters: Immutable.OrderedSet() });
+              setValues({ ...values, fields: Immutable.OrderedSet(), sort: defaultSort });
             }
 
             if (newMode === LIST_MODE) {
               setValues({
                 ...values,
                 fields: EventsWidgetConfig.defaultFields,
-                sort: {
-                  field: EventsWidgetConfig.defaultSort.field,
-                  direction: EventsWidgetConfig.defaultSort.direction.direction,
-                },
+                sort: defaultSort,
               });
             }
           }
@@ -171,7 +173,7 @@ const EventsWidgetEdit = ({ children, onCancel, config, onChange, onSubmit }: Ed
                 <Container>
                   <StickyBottomActions actions={<SaveOrCancelButtons onCancel={onCancel} onSubmit={onSubmit} />}
                                        alignActionsAtBottom>
-                    <DescriptionBox description="Visualization Type">
+                    <DescriptionBox description="Visualization">
                       <WidgetModeConfiguration name="mode" onChange={onChangeType} options={WIDGET_MODE_OPTIONS} />
                     </DescriptionBox>
                     {values.mode === LIST_MODE && (
