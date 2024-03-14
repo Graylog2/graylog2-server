@@ -35,6 +35,7 @@ import { useStore } from 'stores/connect';
 import Store from 'logic/local-storage/Store';
 import { MultiSelect, TimeUnitInput, SearchFiltersFormControls } from 'components/common';
 import Query from 'views/logic/queries/Query';
+import type { RelativeTimeRangeWithEnd, ElasticsearchQueryString } from 'views/logic/queries/Query';
 import Search from 'views/logic/search/Search';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 import { Alert, ButtonToolbar, ControlLabel, FormGroup, HelpBlock, Input } from 'components/bootstrap';
@@ -121,7 +122,10 @@ const FilterForm = ({
   );
 
   const validateQueryString = useCallback(
-    (queryString, streamIds, timeRange, timezone) => {
+    (queryString: ElasticsearchQueryString | string,
+      streamIds: Array<string>,
+      timeRange: RelativeTimeRangeWithEnd,
+      timezone: string) => {
       const request = {
         timeRange: timeRange,
         queryString: queryString,
@@ -131,6 +135,8 @@ const FilterForm = ({
       validateQuery(request, timezone).then((result) => {
         if (result?.status === 'WARNING') {
           setFieldWarning('queryString', result);
+        } else {
+          setFieldWarning('queryString', undefined);
         }
       });
     }, [setFieldWarning]);
@@ -138,7 +144,7 @@ const FilterForm = ({
   const toTimeRange = (from) => ({
     type: 'relative',
     from: from / 1000,
-  });
+  } as RelativeTimeRangeWithEnd);
 
   useEffect(() => {
     if (userCanViewLookupTables()) {
@@ -394,12 +400,6 @@ const FilterForm = ({
     <fieldset>
       <h2 className={commonStyles.title}>Filter</h2>
       <p>Add information to filter the log messages that are relevant for this Event Definition.</p>
-      {isSearchingWarmTier(warmTierRanges) && (
-      <Alert bsStyle="danger" title="Warm Tier Warning">
-        The selected time range will include data stored in the Warm Tier. Events that must frequently retrieve data from the Warm Tier may cause performance problems.
-        A value for <strong>Search within the last</strong> exceeding the following duration will fall into the Warm Tier: {warmTierTimeStamp()}.
-      </Alert>
-      )}
       {onlyFilters || (
       <Input id="filter-query"
              name="query"
@@ -440,6 +440,12 @@ const FilterForm = ({
           <HelpBlock>Select streams the search should include. Searches in all streams if empty.</HelpBlock>
         </FormGroup>
 
+        {isSearchingWarmTier(warmTierRanges) && (
+        <Alert bsStyle="danger" title="Warm Tier Warning">
+          The selected time range will include data stored in the Warm Tier. Events that must frequently retrieve data from the Warm Tier may cause performance problems.
+          A value for <strong>Search within the last</strong> exceeding the following duration will fall into the Warm Tier: {warmTierTimeStamp()}.
+        </Alert>
+        )}
         <FormGroup controlId="search-within" validationState={validation.errors.search_within_ms ? 'error' : null}>
           <TimeUnitInput label="Search within the last"
                          update={handleTimeRangeChange('search_within_ms')}
