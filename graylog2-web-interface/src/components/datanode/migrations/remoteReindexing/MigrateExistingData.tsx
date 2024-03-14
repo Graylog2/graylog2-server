@@ -16,12 +16,12 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
-import { Formik, Form } from 'formik';
+import { Formik, Form, FormikErrors } from 'formik';
 
 import { Alert, Input } from 'components/bootstrap';
 
 import type { RemoteReindexRequest } from '../../hooks/useRemoteReindexMigrationStatus';
-import type { MigrationActions, MigrationStepComponentProps, StepArgs } from '../../Types';
+import type { MigrationActions, MigrationState, MigrationStepComponentProps, StepArgs } from '../../Types';
 import MigrationStepTriggerButtonToolbar from '../common/MigrationStepTriggerButtonToolbar';
 
 export type RemoteReindexCheckConnection = {
@@ -30,39 +30,66 @@ export type RemoteReindexCheckConnection = {
 }
 
 const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => {
-  const [nextSteps, setNextSteps] = useState<MigrationActions[]>(['CHECK_REMOTE_INDEXER_CONNECTION']);
+  const [nextSteps, setNextSteps] = useState<MigrationActions[]>(currentStep.next_steps.filter((step) => step === 'CHECK_REMOTE_INDEXER_CONNECTION'));
   const [errorMessage, setErrrorMessage] = useState<string|null>(null);
-  const [indices, setIndices] = useState<string[]|undefined>(undefined);
+  const [availableIndices, setAvailableIndices] = useState<string[]|undefined>(undefined);
+  const [isFormDirtyAfterConnectionCheck, setIsFormDirtyAfterConnectionCheck] = useState<boolean>(false);
 
   const handleTriggerNextStep = async (step: MigrationActions, args?: StepArgs) => {
     setErrrorMessage(null);
     return onTriggerStep(step, args).then((data) => {
       if (step === 'CHECK_REMOTE_INDEXER_CONNECTION') {
         const checkConnectionResult = data?.response as RemoteReindexCheckConnection;
-        setIndices(checkConnectionResult?.indices)
+        
+        if (checkConnectionResult?.indices?.length) {
+          setAvailableIndices(checkConnectionResult?.indices);
+          setNextSteps(currentStep.next_steps.filter((step) => step === 'START_REMOTE_REINDEX_MIGRATION'));
+          setIsFormDirtyAfterConnectionCheck(false);
+        } else {
+          setErrrorMessage('No available index has been found for remote reindex migration.');
+        }
       }
 
       return data;
-    }).catch((error) => setErrrorMessage(error?.message))
+    }).catch((error) => {
+      setErrrorMessage(error?.message);
+
+      return {} as MigrationState;
+    })
   };
 
+  const resetConnectionCheck = () => {
+    setErrrorMessage(null);
+    setIsFormDirtyAfterConnectionCheck(true);
+    setNextSteps(currentStep.next_steps.filter((step) => step === 'CHECK_REMOTE_INDEXER_CONNECTION'));
+  }
 
-  const initialValues: RemoteReindexRequest = {
+  const handleChange = async (e: React.ChangeEvent<any>, callback: (field: string, value: any, shouldValidate?: boolean) => Promise<void | FormikErrors<RemoteReindexRequest>>) => {
+    await callback(e.target.name, e.target.value);
+    resetConnectionCheck();
+  }
+
+  const getSelectedIndices = (indexToToggle: string, currentIndices: string[]) => {
+    if (currentIndices.includes(indexToToggle)) {
+      return currentIndices.filter((index) => index !== indexToToggle);
+    } else {
+      return [...currentIndices, indexToToggle];
+    }
+  }
+
+  const getInitialValues = (indices: string[] = availableIndices || []): RemoteReindexRequest => ({
     hostname: 'http://localhost:9201/',
     user: '',
     password: '',
     synchronous: false,
-    indices: [],
-  };
-
-  // first only show checkConnection then save a state that was successfull, reset that if any field was changed
-  // you can show the list of indicies with checkboxes selected then show the migrate button
+    indices,
+  });
 
   return (
-    <Formik initialValues={initialValues} onSubmit={() => {}}>
+    <Formik enableReinitialize initialValues={getInitialValues()} onSubmit={() => {}}>
       {({
         values,
-        handleChange,
+        setFieldValue,
       }) => (
         <Form role="form">
           <Input id="hostname"
@@ -70,28 +97,37 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
                  label="Cluster URI"
                  type="text"
                  value={values.hostname}
-                 onChange={handleChange}
+                 onChange={(e) => handleChange(e, setFieldValue)}
                  required />
           <Input id="user"
                  name="user"
                  label="Username"
                  type="text"
                  value={values.user}
-                 onChange={handleChange} />
+                 onChange={(e) => handleChange(e, setFieldValue)} />
           <Input id="password"
                  name="password"
                  label="Password"
                  type="password"
                  value={values.password}
-                 onChange={handleChange} />
-          {indices?.map((index) => (
-            <Input type="checkbox"
-                   key={index}
-                   name={index}
-                   id={index}
-                   label={index} />
-          ))}
-          {errorMessage && <Alert bsStyle="danger">{errorMessage}</Alert>}
+                 onChange={(e) => handleChange(e, setFieldValue)} />
+          {!isFormDirtyAfterConnectionCheck && (availableIndices?.length > 0) && (
+            <Alert title="Valid connection" bsStyle="success">
+              These are the available indices for the remote reindex migration:
+              {availableIndices.map((index) => (
+                <Input type="checkbox"
+                       key={index}
+                       name={index}
+                       id={index}
+                       label={index}
+                       checked={values.indices.includes(index)}
+                       onChange={() => setFieldValue('indices', getSelectedIndices(index, values.indices))} />
+              ))}
+            </Alert>
+          )}
+          {errorMessage && (
+            <Alert bsStyle="danger">{errorMessage}</Alert>
+          )}
           <MigrationStepTriggerButtonToolbar nextSteps={nextSteps || currentStep.next_steps} onTriggerStep={handleTriggerNextStep} args={values} />
         </Form>
       )}
