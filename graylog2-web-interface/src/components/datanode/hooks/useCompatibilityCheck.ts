@@ -25,7 +25,7 @@ type Options = {
 }
 
 const fetchCompatibility = async () => {
-  const url = 'datanodes/rest/indices-directory/compatibility';
+  const url = 'datanodes/leader/rest/indices-directory/compatibility';
 
   return fetch('GET', qualifyUrl(url));
 };
