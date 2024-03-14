@@ -14,15 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer.datanode;
+import React from 'react';
 
-import java.io.IOException;
-import java.io.InputStream;
+import CreateClientCertificateButton from 'components/datanode/client-certificate/CreateClientCertificateButton';
 
-public interface ProxyRequestAdapter {
-    record ProxyRequest(String method, String path, InputStream body, String hostname) {}
-
-    record ProxyResponse(int status, InputStream response, String contentType) {}
-
-    ProxyResponse request(ProxyRequest request) throws IOException;
-}
+const ClientCertificateConfig = () => (
+  <div>
+    <h2>Client Certificate</h2>
+    <p>Generate client certificates for 3rd party tool</p>
+    <CreateClientCertificateButton />
+  </div>
+);
+export default ClientCertificateConfig;

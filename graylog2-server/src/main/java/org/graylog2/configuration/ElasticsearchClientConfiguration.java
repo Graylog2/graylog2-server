@@ -33,91 +33,199 @@ import java.util.List;
 
 public class ElasticsearchClientConfiguration {
     @Parameter(value = "elasticsearch_version", converter = MajorVersionConverter.class, validators = {ElasticsearchVersionValidator.class})
-    SearchVersion elasticsearchVersion;
+    private SearchVersion elasticsearchVersion;
 
     @Parameter(value = "elasticsearch_hosts", converter = URIListConverter.class, validators = {ListOfURIsWithHostAndSchemeValidator.class})
-    List<URI> elasticsearchHosts = new ArrayList<>();
+    private List<URI> elasticsearchHosts = new ArrayList<>();
 
     @Parameter(value = "elasticsearch_connect_timeout", validators = {PositiveDurationValidator.class})
-    Duration elasticsearchConnectTimeout = Duration.seconds(10);
+    private Duration elasticsearchConnectTimeout = Duration.seconds(10);
 
     @Parameter(value = "elasticsearch_socket_timeout", validators = {PositiveDurationValidator.class})
-    Duration elasticsearchSocketTimeout = Duration.seconds(60);
+    private Duration elasticsearchSocketTimeout = Duration.seconds(60);
 
     @Parameter(value = "elasticsearch_idle_timeout")
-    Duration elasticsearchIdleTimeout = Duration.seconds(-1L);
+    private Duration elasticsearchIdleTimeout = Duration.seconds(-1L);
 
     @Parameter(value = "elasticsearch_version_probe_attempts", validators = {PositiveIntegerValidator.class})
-    int elasticsearchVersionProbeAttempts = 0;
+    private int elasticsearchVersionProbeAttempts = 0;
 
     @Parameter(value = "elasticsearch_version_probe_delay", validators = {PositiveDurationValidator.class})
-    Duration elasticsearchVersionProbeDelay = Duration.seconds(5L);
+    private Duration elasticsearchVersionProbeDelay = Duration.seconds(5L);
 
     /**
      * Zero means unlimited attempts, will try until one datanode appears. The elasticsearch_version_probe_attempts
      * fallback property is used because the
      */
     @Parameter(value = "datanode_startup_connection_attempts", fallbackPropertyName = "elasticsearch_version_probe_attempts", validators = {PositiveIntegerValidator.class})
-    int datanodeStartupConnectionAttempts = 0;
+    private int datanodeStartupConnectionAttempts = 0;
 
     /**
      * Seconds between each attempt to access datanode. Too long and you'll be waiting unnecessarily, too short and you
      * will be flooded by error messages in your logs.
      */
     @Parameter(value = "datanode_startup_connection_delay", fallbackPropertyName = "elasticsearch_version_probe_delay", validators = {PositiveDurationValidator.class})
-    Duration datanodeStartupConnectionDelay = Duration.seconds(5L);
+    private Duration datanodeStartupConnectionDelay = Duration.seconds(5L);
 
     @Parameter(value = "elasticsearch_max_total_connections", validators = {PositiveIntegerValidator.class})
-    int elasticsearchMaxTotalConnections = 200;
+    private int elasticsearchMaxTotalConnections = 200;
 
     @Parameter(value = "elasticsearch_max_total_connections_per_route", validators = {PositiveIntegerValidator.class})
-    int elasticsearchMaxTotalConnectionsPerRoute = 20;
+    private int elasticsearchMaxTotalConnectionsPerRoute = 20;
 
     @Parameter(value = "elasticsearch_max_retries", validators = {PositiveIntegerValidator.class})
-    int elasticsearchMaxRetries = 2;
+    private int elasticsearchMaxRetries = 2;
 
     @Parameter(value = "elasticsearch_discovery_enabled")
-    boolean discoveryEnabled = false;
+    private boolean discoveryEnabled = false;
 
     @Parameter(value = "elasticsearch_node_activity_logger_enabled")
-    boolean nodeActivityLogger = false;
+    private boolean nodeActivityLogger = false;
 
     @Parameter(value = "elasticsearch_discovery_filter")
-    String discoveryFilter = null;
+    private String discoveryFilter = null;
 
     @Parameter(value = "elasticsearch_discovery_frequency", validators = {PositiveDurationValidator.class})
-    Duration discoveryFrequency = Duration.seconds(30L);
+    private Duration discoveryFrequency = Duration.seconds(30L);
 
     @Parameter(value = "elasticsearch_discovery_default_scheme", validators = {HttpOrHttpsSchemeValidator.class})
-    String defaultSchemeForDiscoveredNodes = "http";
+    private String defaultSchemeForDiscoveredNodes = "http";
 
     @Parameter(value = "elasticsearch_discovery_default_user")
-    String defaultUserForDiscoveredNodes = null;
+    private String defaultUserForDiscoveredNodes = null;
 
     @Parameter(value = "elasticsearch_discovery_default_password")
-    String defaultPasswordForDiscoveredNodes = null;
+    private String defaultPasswordForDiscoveredNodes = null;
 
     @Parameter(value = "elasticsearch_compression_enabled")
-    boolean compressionEnabled = false;
+    private boolean compressionEnabled = false;
 
     @Parameter(value = "elasticsearch_use_expect_continue")
-    boolean useExpectContinue = true;
+    private boolean useExpectContinue = true;
 
     @Parameter(value = "elasticsearch_mute_deprecation_warnings")
     private boolean muteDeprecationWarnings = false;
 
     @Parameter(value = "indexer_use_jwt_authentication")
-    boolean indexerUseJwtAuthentication = false;
+    private boolean indexerUseJwtAuthentication = false;
 
     @Parameter(value = "indexer_jwt_auth_token_caching_duration")
-    Duration indexerJwtAuthTokenCachingDuration = Duration.seconds(60);
+    private Duration indexerJwtAuthTokenCachingDuration = Duration.seconds(60);
 
     @Parameter(value = "indexer_jwt_auth_token_expiration_duration")
-    Duration indexerJwtAuthTokenExpirationDuration = Duration.seconds(180);
+    private Duration indexerJwtAuthTokenExpirationDuration = Duration.seconds(180);
 
     @Parameter(value = "indexer_max_concurrent_searches")
-    Integer indexerMaxConcurrentSearches = null;
+    private Integer indexerMaxConcurrentSearches = null;
 
     @Parameter(value = "indexer_max_concurrent_shard_requests")
-    Integer indexerMaxConcurrentShardRequests = null;
+    private Integer indexerMaxConcurrentShardRequests = null;
+
+    public SearchVersion elasticsearchVersion() {
+        return elasticsearchVersion;
+    }
+
+    public List<URI> elasticsearchHosts() {
+        return elasticsearchHosts;
+    }
+
+    public Duration elasticsearchConnectTimeout() {
+        return elasticsearchConnectTimeout;
+    }
+
+    public Duration elasticsearchSocketTimeout() {
+        return elasticsearchSocketTimeout;
+    }
+
+    public Duration elasticsearchIdleTimeout() {
+        return elasticsearchIdleTimeout;
+    }
+
+    public int elasticsearchVersionProbeAttempts() {
+        return elasticsearchVersionProbeAttempts;
+    }
+
+    public Duration elasticsearchVersionProbeDelay() {
+        return elasticsearchVersionProbeDelay;
+    }
+
+    public int getDatanodeStartupConnectionAttempts() {
+        return datanodeStartupConnectionAttempts;
+    }
+
+    public Duration getDatanodeStartupConnectionDelay() {
+        return datanodeStartupConnectionDelay;
+    }
+
+    public int elasticsearchMaxTotalConnections() {
+        return elasticsearchMaxTotalConnections;
+    }
+
+    public int elasticsearchMaxTotalConnectionsPerRoute() {
+        return elasticsearchMaxTotalConnectionsPerRoute;
+    }
+
+    public int elasticsearchMaxRetries() {
+        return elasticsearchMaxRetries;
+    }
+
+    public boolean discoveryEnabled() {
+        return discoveryEnabled;
+    }
+
+    public boolean isNodeActivityLogger() {
+        return nodeActivityLogger;
+    }
+
+    public String discoveryFilter() {
+        return discoveryFilter;
+    }
+
+    public Duration discoveryFrequency() {
+        return discoveryFrequency;
+    }
+
+    public String defaultSchemeForDiscoveredNodes() {
+        return defaultSchemeForDiscoveredNodes;
+    }
+
+    public String defaultUserForDiscoveredNodes() {
+        return defaultUserForDiscoveredNodes;
+    }
+
+    public String defaultPasswordForDiscoveredNodes() {
+        return defaultPasswordForDiscoveredNodes;
+    }
+
+    public boolean compressionEnabled() {
+        return compressionEnabled;
+    }
+
+    public boolean useExpectContinue() {
+        return useExpectContinue;
+    }
+
+    public boolean muteDeprecationWarnings() {
+        return muteDeprecationWarnings;
+    }
+
+    public boolean indexerUseJwtAuthentication() {
+        return indexerUseJwtAuthentication;
+    }
+
+    public Duration indexerJwtAuthTokenCachingDuration() {
+        return indexerJwtAuthTokenCachingDuration;
+    }
+
+    public Duration indexerJwtAuthTokenExpirationDuration() {
+        return indexerJwtAuthTokenExpirationDuration;
+    }
+
+    public Integer indexerMaxConcurrentSearches() {
+        return indexerMaxConcurrentSearches;
+    }
+
+    public Integer indexerMaxConcurrentShardRequests() {
+        return indexerMaxConcurrentShardRequests;
+    }
 }
