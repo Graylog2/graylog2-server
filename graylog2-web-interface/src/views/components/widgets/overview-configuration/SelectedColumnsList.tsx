@@ -19,8 +19,8 @@ import styled from 'styled-components';
 import { useCallback, forwardRef, useMemo } from 'react';
 
 import { IconButton, SortableList, Icon } from 'components/common';
-import TextOverflowEllipsis from 'components/common/TextOverflowEllipsis';
 import type { DragHandleProps, DraggableProps } from 'components/common/SortableList';
+import UnknownAttributeTitle from 'views/components/widgets/events/UnknownAttributeTitle';
 
 const ListItemContainer = styled.div`
   display: flex;
@@ -29,7 +29,7 @@ const ListItemContainer = styled.div`
   margin-top: 3px;
 `;
 
-const ColumnTitle = styled(TextOverflowEllipsis)`
+const ColumnTitle = styled.div`
   flex: 1;
 `;
 
@@ -64,7 +64,7 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(({
     <DragHandle {...dragHandleProps} data-testid={`${testIdPrefix}-drag-handle`}>
       <Icon name="drag_indicator" />
     </DragHandle>
-    <ColumnTitle>{item.title}</ColumnTitle>
+    <ColumnTitle>{item.title === 'unknown' ? <UnknownAttributeTitle /> : item.title}</ColumnTitle>
     <div>
       <IconButton name="delete" title={`Remove ${item.title} column`} onClick={onRemove} />
     </div>

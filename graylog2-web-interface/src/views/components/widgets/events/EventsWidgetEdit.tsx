@@ -37,6 +37,7 @@ import ColumnsConfiguration from 'views/components/widgets/overview-configuratio
 import SortConfiguration from 'views/components/widgets/overview-configuration/SortConfiguration';
 import usePluginEntities from 'hooks/usePluginEntities';
 import FiltersConfiguration from 'views/components/widgets/overview-configuration/filters/FiltersConfiguration';
+import useEventAttributes from 'views/components/widgets/events/hooks/useEventAttributes';
 
 import { SORT_DIRECTION_OPTIONS } from './Constants';
 
@@ -108,7 +109,7 @@ const SubmitOnChange = () => {
 
 const EventsWidgetEdit = ({ children, onCancel, config, onChange, onSubmit }: EditWidgetComponentProps<EventsWidgetConfig>) => {
   const filterComponents = usePluginEntities('views.components.widgets.events.filterComponents');
-  const eventAttributes = usePluginEntities('views.components.widgets.events.attributes');
+  const eventAttributes = useEventAttributes();
 
   const initialValues = useMemo(() => ({
     mode: config.mode,
@@ -135,7 +136,7 @@ const EventsWidgetEdit = ({ children, onCancel, config, onChange, onSubmit }: Ed
 
   const columns = eventAttributes.map(({ attribute }) => attribute);
   const sortableColumns = eventAttributes.filter(({ sortable }) => sortable).map(({ attribute }) => attribute);
-  const columnTitle = useCallback((column: string) => eventAttributes.find(({ attribute }) => column === attribute)?.title ?? column, [eventAttributes]);
+  const columnTitle = useCallback((column: string) => eventAttributes.find(({ attribute }) => column === attribute)?.title ?? 'unknown', [eventAttributes]);
 
   return (
     <Formik<FormValues> initialValues={initialValues}

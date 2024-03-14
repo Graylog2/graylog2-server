@@ -88,7 +88,6 @@ const ColumnSelect = ({
             autoFocus={autoFocus}
             menuPortalTarget={menuPortalTarget}
             onChange={onChange} />
-
   );
 };
 

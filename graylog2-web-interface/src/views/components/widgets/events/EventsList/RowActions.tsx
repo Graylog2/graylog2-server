@@ -70,7 +70,7 @@ const RowActions = ({ eventId, hasReplayInfo }: Props) => {
     <>
       <ButtonToolbar>
         <IconButton name="open_in_full" title="View event details" onClick={toggleDetailsModal} />
-        {moreActions.length && (
+        {!!moreActions.length && (
           <Menu position="bottom-end">
             <Menu.Target>
               <IconButton name="more_vert" title="Toggle event actions" />

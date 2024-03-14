@@ -17,7 +17,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { useMemo } from 'react';
-import { Field } from 'formik';
+import { Field, useFormikContext } from 'formik';
 
 import { Select } from 'components/common';
 import { Input } from 'components/bootstrap';
@@ -37,6 +37,7 @@ type Props = {
 }
 
 const SortConfiguration = ({ name: attributeName, directions, columns, columnTitle, directionTitle }: Props) => {
+  const { values } = useFormikContext();
   const columnOptions = useMemo(() => (
     columns
       .map((col) => ({ value: col, label: columnTitle(col) }))
@@ -48,6 +49,8 @@ const SortConfiguration = ({ name: attributeName, directions, columns, columnTit
       .map((col) => ({ value: col, label: directionTitle(col) }))
       .sort(({ label: label1 }, { label: label2 }) => defaultCompare(label1, label2))
   ), [directionTitle, directions]);
+
+  const isUnknownColumn = values[attributeName] && !columns.includes(values[attributeName]);
 
   return (
     <Container>
@@ -65,7 +68,7 @@ const SortConfiguration = ({ name: attributeName, directions, columns, columnTit
                     clearable={false}
                     size="small"
                     onChange={(newColumn) => onChange({ target: { value: newColumn, name } })}
-                    value={value} />
+                    value={isUnknownColumn ? 'Unknown' : value} />
           </Input>
         )}
       </Field>

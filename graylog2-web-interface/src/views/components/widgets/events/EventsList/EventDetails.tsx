@@ -23,6 +23,18 @@ import useEventDefinition from 'components/events/events/hooks/useEventDefinitio
 import { Spinner } from 'components/common';
 import DefaultDetails from 'components/events/events/EventDetails';
 
+export const usePluggableEventDetails = (eventId: string) => {
+  const pluggableEventDetails = usePluginEntities('views.components.widgets.events.detailsComponent');
+
+  return pluggableEventDetails.filter(
+    (perspective) => (perspective.useCondition ? !!perspective.useCondition() : true),
+  ).map(
+    ({ component: PluggableEventAction, key }) => (
+      <PluggableEventAction key={key} eventId={eventId} />
+    ),
+  );
+};
+
 const DefaultDetailsWrapper = ({ eventId }: { eventId: string }) => {
   const { data: event, isLoading } = useEventById(eventId);
   const { data: eventDefinition, isFetching } = useEventDefinition(event?.event_definition_id);
@@ -39,12 +51,10 @@ const DefaultDetailsWrapper = ({ eventId }: { eventId: string }) => {
 };
 
 const EventDetails = ({ eventId }: { eventId: string }) => {
-  const puggableEventDetails = usePluginEntities('views.components.widgets.events.detailsComponent');
+  const puggableEventDetails = usePluggableEventDetails(eventId);
 
   if (puggableEventDetails?.length) {
-    const { component: Component } = puggableEventDetails[0];
-
-    return <Component eventId={eventId} />;
+    return <>{puggableEventDetails}</>;
   }
 
   return <DefaultDetailsWrapper eventId={eventId} />;

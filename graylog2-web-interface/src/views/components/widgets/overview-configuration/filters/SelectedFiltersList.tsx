@@ -7,6 +7,7 @@ import { Input } from 'components/bootstrap';
 import { IconButton } from 'components/common';
 import type { FilterComponents, Filter } from 'views/components/widgets/overview-configuration/filters/types';
 import FilterEditButton from 'views/components/widgets/overview-configuration/filters/FilterEditButton';
+import UnknownAttributeTitle from 'views/components/widgets/events/UnknownAttributeTitle';
 
 const Container = styled.div`
   display: flex;
@@ -53,7 +54,7 @@ const SelectedFiltersList = ({ selectedFilters, columnTitle, filterComponents, o
         return (
           <FilterContainer key={column}>
             <Input id={`${column}-filter-configuration`}
-                   label={_columnTitle}
+                   label={_columnTitle === 'unknown' ? <UnknownAttributeTitle /> : _columnTitle}
                    labelClassName="col-sm-3"
                    wrapperClassName="col-sm-9">
               {values.map((value, valueIndex) => {
@@ -67,13 +68,15 @@ const SelectedFiltersList = ({ selectedFilters, columnTitle, filterComponents, o
                       {filterComponent?.renderValue?.(value) ?? value}
                     </ValueTitle>
                     <ValueActions>
-                      <FilterEditButton filterComponent={filterComponent}
-                                        onEdit={_onEdit}
-                                        selectedValues={values}
-                                        columnTitle={columnTitle}
-                                        containerWidth={container.current?.offsetWidth}
-                                        column={column}
-                                        value={value} />
+                      {filterComponent && (
+                        <FilterEditButton filterComponent={filterComponent}
+                                          onEdit={_onEdit}
+                                          selectedValues={values}
+                                          columnTitle={columnTitle}
+                                          containerWidth={container.current?.offsetWidth}
+                                          column={column}
+                                          value={value} />
+                      )}
                       <IconButton name="delete"
                                   onClick={() => onDelete(filterIndex, value)}
                                   title={`Delete ${_columnTitle} filter`} />

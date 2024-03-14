@@ -24,8 +24,19 @@ import type { Event, EventDefinitionContext } from 'components/events/events/typ
 import EventFields from 'components/events/events/EventFields';
 import EventDefinitionLink from 'components/event-definitions/event-definitions/EventDefinitionLink';
 import LinkToReplaySearch from 'components/event-definitions/replay-search/LinkToReplaySearch';
-import usePluggableEventActions from 'components/events/events/hooks/usePluggableEventActions';
 import PriorityName from 'components/events/events/PriorityName';
+
+export const usePluggableEventActions = (eventId: string) => {
+  const pluggableEventActions = usePluginEntities('views.components.eventActions');
+
+  return pluggableEventActions.filter(
+    (perspective) => (perspective.useCondition ? !!perspective.useCondition() : true),
+  ).map(
+    ({ component: PluggableEventAction, key }) => (
+      <PluggableEventAction key={key} eventId={eventId} />
+    ),
+  );
+};
 
 type Props = {
   event: Event,

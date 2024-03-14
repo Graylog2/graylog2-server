@@ -23,4 +23,5 @@ export type Attributes = Array<{
   displayValue?: (value: unknown) => React.ReactNode,
   sortable?: boolean,
   title: string,
+  useCondition?: () => boolean,
 }>

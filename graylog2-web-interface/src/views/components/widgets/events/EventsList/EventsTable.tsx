@@ -7,7 +7,8 @@ import type EventsWidgetConfig from 'views/logic/widgets/events/EventsWidgetConf
 import EventsTableRow from 'views/components/widgets/events/EventsList/EventsTableRow';
 import type { EventListItem } from 'views/components/widgets/events/types';
 import type EventsWidgetSortConfig from 'views/logic/widgets/events/EventsWidgetSortConfig';
-import usePluginEntities from 'hooks/usePluginEntities';
+import useEventAttributes from 'views/components/widgets/events/hooks/useEventAttributes';
+import UnknownAttributeTitle from 'views/components/widgets/events/UnknownAttributeTitle';
 
 import AttributeSortIcon from './AttributeSortIcon';
 
@@ -30,7 +31,7 @@ type Props = {
 }
 
 const EventsTable = ({ events, config, onSortChange, setLoadingState }: Props) => {
-  const eventAttributes = usePluginEntities('views.components.widgets.events.attributes');
+  const eventAttributes = useEventAttributes();
 
   return (
     <TableWrapper>
@@ -39,15 +40,14 @@ const EventsTable = ({ events, config, onSortChange, setLoadingState }: Props) =
           <tr>
             {config.fields.toArray().map((field) => {
               const eventAttribute = eventAttributes.find(({ attribute }) => field === attribute);
-              const attributeTitle = eventAttribute?.title ?? field;
 
               return (
                 <TableHeaderCell key={field}>
-                  {attributeTitle ?? field}
-                  {eventAttribute.sortable && (
+                  {eventAttribute?.title ?? <UnknownAttributeTitle />}
+                  {eventAttribute?.sortable && (
                     <AttributeSortIcon onSortChange={onSortChange}
                                        field={field}
-                                       fieldTitle={attributeTitle ?? field}
+                                       fieldTitle={eventAttribute.title}
                                        activeSort={config.sort}
                                        setLoadingState={setLoadingState} />
                   )}
