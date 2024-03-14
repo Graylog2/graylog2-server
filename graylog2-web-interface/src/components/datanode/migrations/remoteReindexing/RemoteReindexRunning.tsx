@@ -43,10 +43,10 @@ const RemoteReindexRunning = ({ currentStep, onTriggerStep }: MigrationStepCompo
       {(indicesWithErrors.length > 0) && (
         <Alert title="Migration failed" bsStyle="danger">
           {indicesWithErrors.map((index) => (
-            <>
+            <span key={index.name}>
               <b>{index.name}</b>
               <p>{index.error_msg}</p>
-            </>
+            </span>
           ))}
         </Alert>
       )}
