@@ -16,7 +16,8 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
-import { Formik, Form, FormikErrors } from 'formik';
+import { Formik, Form } from 'formik';
+import type { FormikErrors } from 'formik';
 
 import { Alert, Input } from 'components/bootstrap';
 
@@ -37,13 +38,14 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
 
   const handleTriggerNextStep = async (step: MigrationActions, args?: StepArgs) => {
     setErrrorMessage(null);
+
     return onTriggerStep(step, args).then((data) => {
       if (step === 'CHECK_REMOTE_INDEXER_CONNECTION') {
         const checkConnectionResult = data?.response as RemoteReindexCheckConnection;
-        
+
         if (checkConnectionResult?.indices?.length) {
           setAvailableIndices(checkConnectionResult?.indices);
-          setNextSteps(currentStep.next_steps.filter((step) => step === 'START_REMOTE_REINDEX_MIGRATION'));
+          setNextSteps(currentStep.next_steps.filter((next_step) => next_step === 'START_REMOTE_REINDEX_MIGRATION'));
           setIsFormDirtyAfterConnectionCheck(false);
         } else {
           setErrrorMessage('No available index has been found for remote reindex migration.');
@@ -55,27 +57,27 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
       setErrrorMessage(error?.message);
 
       return {} as MigrationState;
-    })
+    });
   };
 
   const resetConnectionCheck = () => {
     setErrrorMessage(null);
     setIsFormDirtyAfterConnectionCheck(true);
     setNextSteps(currentStep.next_steps.filter((step) => step === 'CHECK_REMOTE_INDEXER_CONNECTION'));
-  }
+  };
 
   const handleChange = async (e: React.ChangeEvent<any>, callback: (field: string, value: any, shouldValidate?: boolean) => Promise<void | FormikErrors<RemoteReindexRequest>>) => {
     await callback(e.target.name, e.target.value);
     resetConnectionCheck();
-  }
+  };
 
   const getSelectedIndices = (indexToToggle: string, currentIndices: string[]) => {
     if (currentIndices.includes(indexToToggle)) {
       return currentIndices.filter((index) => index !== indexToToggle);
-    } else {
-      return [...currentIndices, indexToToggle];
     }
-  }
+
+    return [...currentIndices, indexToToggle];
+  };
 
   const getInitialValues = (indices: string[] = availableIndices || []): RemoteReindexRequest => ({
     hostname: 'http://localhost:9201/',
