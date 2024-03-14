@@ -14,31 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
 
-export type EventReplayInfo = {
-  timerange_start: string,
-  timerange_end: string,
-  query: string,
-  streams: string[],
-};
+import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
+import StringUtils from 'util/StringUtils';
 
-export type Event = {
-  id: string,
-  event_definition_id: string,
-  event_definition_type: string,
+type Props = {
   priority: number,
-  timestamp: string,
-  timerange_start: string,
-  timerange_end: string,
-  key: string,
-  fields: Object[],
-  group_by_fields: {[key: string]: string},
-  source_streams: string[],
-  replay_info: EventReplayInfo | undefined,
-  alert: boolean | undefined,
-};
+}
+const PriorityName = ({ priority }: Props) => (
+  // eslint-disable-next-line react/react-in-jsx-scope
+  <>{StringUtils.capitalizeFirstLetter(EventDefinitionPriorityEnum.properties[priority].name)}</>
+);
 
-export type EventDefinitionContext = {
-  id: string,
-  title: string,
-};
+export default PriorityName;

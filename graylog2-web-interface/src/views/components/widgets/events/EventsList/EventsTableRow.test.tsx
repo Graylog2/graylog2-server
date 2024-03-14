@@ -5,8 +5,6 @@ import userEvent from '@testing-library/user-event';
 
 import EventsTableRow from './EventsTableRow';
 
-jest.mock('security-app/components/Events/hooks/useViewEvent', () => jest.fn());
-
 const event = {
   id: 'ievent-id-1',
   name: 'Event 1',

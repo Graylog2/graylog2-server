@@ -15,18 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo } from 'react';
-import capitalize from 'lodash/capitalize';
 import isEmpty from 'lodash/isEmpty';
 
 import usePluginEntities from 'hooks/usePluginEntities';
 import { Col, Row } from 'components/bootstrap';
 import { Timestamp } from 'components/common';
-import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import type { Event, EventDefinitionContext } from 'components/events/events/types';
 import EventFields from 'components/events/events/EventFields';
 import EventDefinitionLink from 'components/event-definitions/event-definitions/EventDefinitionLink';
 import LinkToReplaySearch from 'components/event-definitions/replay-search/LinkToReplaySearch';
 import usePluggableEventActions from 'components/events/events/hooks/usePluggableEventActions';
+import PriorityName from 'components/events/events/PriorityName';
 
 type Props = {
   event: Event,
@@ -53,7 +52,7 @@ const EventDetails = ({ event, eventDefinitionContext }: Props) => {
           <dd>{event.id}</dd>
           <dt>Priority</dt>
           <dd>
-            {capitalize(EventDefinitionPriorityEnum.properties[event.priority].name)}
+            <PriorityName priority={event.priority} />
           </dd>
           <dt>Timestamp</dt>
           <dd> <Timestamp dateTime={event.timestamp} />

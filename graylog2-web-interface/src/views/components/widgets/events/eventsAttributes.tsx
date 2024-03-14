@@ -20,6 +20,7 @@ import { Timestamp } from 'components/common';
 import EventDefinitionName from 'views/components/widgets/events/filters/EventDefinitionName';
 import EventTypeLabel from 'components/events/events/EventTypeLabel';
 import type { Attributes } from 'views/components/widgets/overview-configuration/filters/types';
+import PriorityName from 'components/events/events/PriorityName';
 
 const eventsAttributes: Attributes = [
   {
@@ -39,6 +40,16 @@ const eventsAttributes: Attributes = [
     displayValue: (value: string) => <EventDefinitionName eventDefinitionId={value} />,
     sortable: true,
     title: 'Event Definition',
+  },
+  {
+    attribute: 'priority',
+    displayValue: (value: number) => <PriorityName priority={value} />,
+    sortable: true,
+    title: 'Priority',
+  },
+  {
+    attribute: 'key',
+    title: 'Key',
   },
   {
     attribute: 'message',
