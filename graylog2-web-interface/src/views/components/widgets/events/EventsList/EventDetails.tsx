@@ -54,6 +54,7 @@ const EventDetails = ({ eventId }: { eventId: string }) => {
   const puggableEventDetails = usePluggableEventDetails(eventId);
 
   if (puggableEventDetails?.length) {
+    // eslint-disable-next-line react/jsx-no-useless-fragment
     return <>{puggableEventDetails}</>;
   }
 

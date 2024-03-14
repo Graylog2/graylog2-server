@@ -34,6 +34,7 @@ const EventDefinitionName = ({ eventDefinitionId, displayAsLink }: Props) => {
   }
 
   if (!displayAsLink) {
+    // eslint-disable-next-line react/jsx-no-useless-fragment
     return <>{eventDefinition.title}</>;
   }
 
@@ -45,7 +46,7 @@ const EventDefinitionName = ({ eventDefinitionId, displayAsLink }: Props) => {
     );
   }
 
-  return <>eventDefinitionId</>;
+  return null;
 };
 
 EventDefinitionName.defaultProps = {

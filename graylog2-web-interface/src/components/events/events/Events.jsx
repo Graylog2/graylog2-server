@@ -22,7 +22,7 @@ import styled, { css } from 'styled-components';
 
 import { Link, LinkContainer } from 'components/common/router';
 import { OverlayTrigger, EmptyEntity, NoSearchResult, NoEntitiesExist, IfPermitted, PaginatedList, Timestamp, Icon } from 'components/common';
-import { Col, Label, Row, Table, Button } from 'components/bootstrap';
+import { Col, Row, Table, Button } from 'components/bootstrap';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 import Routes from 'routing/Routes';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
@@ -93,7 +93,6 @@ export const EVENTS_MAX_OFFSET_LIMIT = 10000;
 
 const priorityFormatter = (eventId, priority) => {
   const priorityName = capitalize(EventDefinitionPriorityEnum.properties[priority].name);
-  let icon;
   let style;
 
   switch (priority) {

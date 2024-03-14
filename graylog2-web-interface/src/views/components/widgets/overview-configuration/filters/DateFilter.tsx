@@ -145,8 +145,6 @@ const DateFilter = ({ values = [], onChange }: Props) => {
     setCurrentDate(isoDate);
   };
 
-  console.log({ values });
-
   return (
     <Column>
       <Row>
