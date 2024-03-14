@@ -15,13 +15,32 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useContext, useMemo } from 'react';
 
 import { Alert } from 'components/bootstrap';
+import useView from 'views/hooks/useView';
+import SearchExplainContext from 'views/components/contexts/SearchExplainContext';
 
-const WidgetWarmTierAlert = () => (
-  <Alert bsStyle="info">
-    This widget is retrieving data from the Warm Tier and may take longer to load.
-  </Alert>
-);
+type Props = {
+  activeQuery: string
+  widgetId: string
+}
+
+const WidgetWarmTierAlert = ({ activeQuery, widgetId } : Props) => {
+  const { getExplainForWidget } = useContext(SearchExplainContext);
+  const view = useView();
+  const explainedWidget = getExplainForWidget(activeQuery, widgetId, view.widgetMapping);
+
+  const isWidgetInWarmTier = useMemo(() => explainedWidget?.searched_index_ranges.some((range) => range.is_warm_tiered),
+    [explainedWidget?.searched_index_ranges]);
+
+  if (!isWidgetInWarmTier) return null;
+
+  return (
+    <Alert bsStyle="info">
+      This widget is retrieving data from the Warm Tier and may take longer to load.
+    </Alert>
+  );
+};
 
 export default WidgetWarmTierAlert;
