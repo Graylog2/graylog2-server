@@ -16,7 +16,7 @@
  */
 import { useState, useEffect } from 'react';
 
-import type { MigrationActions, MigrationState, OnTriggerStepFunction } from '../Types';
+import type { MigrationActions, MigrationState, OnTriggerStepFunction, StepArgs } from '../Types';
 import { MIGRATION_STATE } from '../Constants';
 
 export type MigrationStatus = 'NOT_STARTED'|'STARTING'|'RUNNING'|'ERROR'|'FINISHED';
@@ -55,6 +55,7 @@ const useRemoteReindexMigrationStatus = (
 ) : {
   nextSteps: MigrationActions[],
   migrationStatus: RemoteReindexMigration,
+  handleTriggerStep: OnTriggerStepFunction,
 } => {
   const [nextSteps, setNextSteps] = useState<MigrationActions[]>(['RETRY_MIGRATE_EXISTING_DATA']);
   const [migrationStatus, setMigrationStatus] = useState<RemoteReindexMigration>(undefined);
@@ -86,9 +87,16 @@ const useRemoteReindexMigrationStatus = (
     return () => clearInterval(interval);
   }, [onTriggerStep, migrationStatus, currentStep?.state, currentStep?.next_steps, refetchInterval]);
 
+  const handleTriggerStep = (step: MigrationActions, args?: StepArgs) => onTriggerStep(step, args).then((data) => {
+    setMigrationStatus(undefined);
+
+    return data;
+  });
+
   return ({
     nextSteps,
     migrationStatus,
+    handleTriggerStep,
   });
 };
 
