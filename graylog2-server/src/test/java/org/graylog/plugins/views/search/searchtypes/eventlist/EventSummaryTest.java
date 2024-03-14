@@ -25,6 +25,7 @@ import org.joda.time.DateTimeZone;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -43,6 +44,11 @@ public class EventSummaryTest {
                 .eventDefinitionId("deadbeef")
                 .priority(2)
                 .keyTuple(List.of())
+                .eventDefinitionType("aggregation-v1")
+                .processingTimestamp(now)
+                .streams(Set.of())
+                .source("localhost")
+                .fields(Map.of())
                 .build();
 
         EventSummary eventSummary = EventSummary.parse(rawEvent);
