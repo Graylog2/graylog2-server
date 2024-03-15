@@ -38,6 +38,8 @@ import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.stream.Collectors;
 
+import static org.graylog.testing.graylognode.NodeContainerConfig.flagFromEnvVar;
+
 public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(ContainerizedGraylogBackend.class);
     public static final String PASSWORD_SECRET = "M4lteserKreuzHerrStrack?-warZuKurzDeshalbMussdaNochWasdranHasToBeAtLeastSixtyFourCharactersInLength";
@@ -81,7 +83,10 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
         var mongoDB = services.getMongoDBInstance();
         mongoDB.importFixtures(mongoDBFixtures);
 
-        MavenPackager.packageJarIfNecessary(mavenProjectDirProvider);
+        var skipPackaging = flagFromEnvVar("GRAYLOG_IT_SKIP_PACKAGING");
+        if(!skipPackaging) {
+            MavenPackager.packageJarIfNecessary(mavenProjectDirProvider);
+        }
 
         if (preImportLicense) {
             createLicenses(mongoDB, "GRAYLOG_LICENSE_STRING", "GRAYLOG_SECURITY_LICENSE_STRING");
