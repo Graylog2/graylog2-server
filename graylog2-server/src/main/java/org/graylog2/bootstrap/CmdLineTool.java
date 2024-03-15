@@ -584,7 +584,7 @@ public abstract class CmdLineTool implements CliCommand {
                 LOG.error(UI.wallString("Unable to access file " + rootCause.getMessage()));
                 System.exit(-2);
             } else if (rootCause instanceof UnsupportedSearchException) {
-                final SearchVersion search = ((UnsupportedSearchException)rootCause).getSearchMajorVersion();
+                final SearchVersion search = ((UnsupportedSearchException) rootCause).getSearchMajorVersion();
                 LOG.error(UI.wallString("Unsupported search version: " + search, DocsHelper.PAGE_ES_VERSIONS.toString()));
                 System.exit(-3);
             } else if (rootCause instanceof ElasticsearchProbeException) {
