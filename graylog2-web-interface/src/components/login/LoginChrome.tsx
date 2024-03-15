@@ -17,10 +17,10 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
-import bgImage from 'images/auth/banner-bg.jpg';
 import LoginBox from 'components/login/LoginBox';
 import PublicNotifications from 'components/common/PublicNotifications';
 import graylogLogo from 'images/auth/gl_logo_horiz.svg';
+import backgroundImage from 'images/auth/login-bg.svg';
 
 const Logo = styled.img`
   display: block;
@@ -46,7 +46,7 @@ const BackgroundText = styled.div`
   height: 100%;
   width: 100%;
   padding: 0 30px;
-  background-image: url(${bgImage});
+  background-image: url(${backgroundImage});
   background-position: center;
   background-size: cover;
 `;
