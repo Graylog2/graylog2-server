@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
+import { useCallback } from 'react';
 
 import { TableHead, TableHeaderCell } from 'views/components/datatable';
 import IfInteractive from 'views/components/dashboard/IfInteractive';
@@ -49,9 +50,9 @@ type Props = {
 
 const EventsTable = ({ events, config, onSortChange, setLoadingState }: Props) => {
   const eventAttributes = useEventAttributes();
-  const _onSortChange = (fieldName: string, nextDirection: Direction) => (
+  const _onSortChange = useCallback((fieldName: string, nextDirection: Direction) => (
     onSortChange(new EventsWidgetSortConfig(fieldName, nextDirection))
-  );
+  ), [onSortChange]);
 
   return (
     <TableWrapper>
