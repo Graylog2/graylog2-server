@@ -36,6 +36,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
+import static io.restassured.RestAssured.given;
+
 public abstract class WaitingRestOperation extends RestOperation {
 
     private String lastRecordedResponse;
@@ -86,15 +88,26 @@ public abstract class WaitingRestOperation extends RestOperation {
 
                 parameters.addAuthorizationHeaders(req);
 
+
                 return req.get(formatUrl(parameters, url))
                         .then();
             });
         } catch (Exception e) {
             if (lastRecordedResponse != null) {
                 LOG.warn("Last recorded opensearch response, waiting for {}: {}", formatUrl(parameters, url), lastRecordedResponse);
+                if (lastRecordedResponse.contains("¸\"status\":\"yellow\"")) { // probably unassigned shards, print them
+                    logShardsExplanation();
+                }
             }
             throw e;
         }
+    }
+
+    private void logShardsExplanation() {
+        final RequestSpecification req = RestAssured.given()
+                .accept(ContentType.JSON);
+        final String shardsAllocation = req.get(formatUrl(parameters, "/_cluster/allocation/explain?pretty")).then().extract().body().asString();
+        LOG.warn("Shards allocation explanation: {}", shardsAllocation);
     }
 
 }
