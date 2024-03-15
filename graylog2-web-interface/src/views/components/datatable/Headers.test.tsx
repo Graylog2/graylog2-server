@@ -70,6 +70,7 @@ describe('Headers', () => {
                  rollup={rollup}
                  actualColumnPivotFields={actualColumnPivotFields}
                  fields={Immutable.List(fields)}
+                 setLoadingState={() => {}}
                  sortConfigMap={sortConfigMap}
                  onSortChange={onSortChange}
                  onSetColumnsWidth={() => {}}
