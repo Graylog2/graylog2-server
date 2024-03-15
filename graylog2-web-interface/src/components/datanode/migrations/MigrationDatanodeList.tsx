@@ -22,11 +22,15 @@ import { Alert, Table } from 'components/bootstrap';
 import { DocumentationLink } from 'components/support';
 import useDataNodes from 'components/datanode/hooks/useDataNodes';
 
+type Props = {
+  showProvisioningState?: boolean
+}
+
 const StyledIcon = styled(Icon)`
   margin-right: 0.5em;
 `;
 
-const MigrationDatanodeList = () => {
+const MigrationDatanodeList = ({ showProvisioningState }: Props) => {
   const { data: dataNodes, isInitialLoading } = useDataNodes();
 
   if (isInitialLoading) {
@@ -61,7 +65,7 @@ const MigrationDatanodeList = () => {
                 <tr key={datanode.id}>
                   <td>{datanode.hostname}</td>
                   <td>{datanode.transport_address}</td>
-                  <td>{datanode.status}</td>
+                  <td>{showProvisioningState ? datanode.status : datanode.data_node_status}</td>
                   <td>{datanode.cert_valid_until ? <RelativeTime dateTime={datanode.cert_valid_until} /> : 'No certificate'}</td>
                 </tr>
               ))}
@@ -71,6 +75,10 @@ const MigrationDatanodeList = () => {
       )}
     </div>
   );
+};
+
+MigrationDatanodeList.defaultProps = {
+  showProvisioningState: true,
 };
 
 export default MigrationDatanodeList;
