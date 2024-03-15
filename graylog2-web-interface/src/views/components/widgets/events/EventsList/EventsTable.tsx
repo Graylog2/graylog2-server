@@ -22,9 +22,10 @@ import IfInteractive from 'views/components/dashboard/IfInteractive';
 import type EventsWidgetConfig from 'views/logic/widgets/events/EventsWidgetConfig';
 import EventsTableRow from 'views/components/widgets/events/EventsList/EventsTableRow';
 import type { EventListItem } from 'views/components/widgets/events/types';
-import type EventsWidgetSortConfig from 'views/logic/widgets/events/EventsWidgetSortConfig';
+import EventsWidgetSortConfig from 'views/logic/widgets/events/EventsWidgetSortConfig';
 import useEventAttributes from 'views/components/widgets/events/hooks/useEventAttributes';
 import UnknownAttributeTitle from 'views/components/widgets/events/UnknownAttributeTitle';
+import type Direction from 'views/logic/aggregationbuilder/Direction';
 
 import AttributeSortIcon from '../../overview-configuration/AttributeSortIcon';
 
@@ -48,6 +49,9 @@ type Props = {
 
 const EventsTable = ({ events, config, onSortChange, setLoadingState }: Props) => {
   const eventAttributes = useEventAttributes();
+  const _onSortChange = (fieldName: string, nextDirection: Direction) => (
+    onSortChange(new EventsWidgetSortConfig(fieldName, nextDirection))
+  );
 
   return (
     <TableWrapper>
@@ -61,10 +65,11 @@ const EventsTable = ({ events, config, onSortChange, setLoadingState }: Props) =
                 <TableHeaderCell key={field}>
                   {eventAttribute?.title ?? <UnknownAttributeTitle />}
                   {eventAttribute?.sortable && (
-                    <AttributeSortIcon onSortChange={onSortChange}
-                                       field={field}
-                                       fieldTitle={eventAttribute.title}
-                                       activeSort={config.sort}
+                    <AttributeSortIcon onSortChange={_onSortChange}
+                                       attribute={field}
+                                       attributeTitle={eventAttribute.title}
+                                       activeAttribute={config.sort.field}
+                                       activeDirection={config.sort.direction}
                                        setLoadingState={setLoadingState} />
                   )}
                 </TableHeaderCell>
