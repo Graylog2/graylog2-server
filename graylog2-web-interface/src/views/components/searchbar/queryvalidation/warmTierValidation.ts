@@ -14,16 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.bootstrap.preflight;
 
-import java.io.IOException;
+import type { IndexRange, QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 
-public class DatanodeDirectoryException extends IOException {
-    public DatanodeDirectoryException(String message) {
-        super(message);
-    }
-
-    public DatanodeDirectoryException(String message, IOException cause) {
-        super(message, cause);
-    }
-}
+export const indicesInWarmTier = (validationState: QueryValidationState) => (
+  validationState?.context?.searched_index_ranges?.filter((range) => range.is_warm_tiered)
+);
+export const isSearchingWarmTier = (warmTierRanges: Array<IndexRange>) => warmTierRanges?.length > 0;

@@ -16,6 +16,8 @@
  */
 package org.graylog.plugins.views.search.elasticsearch;
 
+import com.google.common.collect.Sets;
+import jakarta.inject.Inject;
 import org.graylog.plugins.views.search.IndexRangeContainsOneOfStreams;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
@@ -23,9 +25,6 @@ import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamService;
 
-import jakarta.inject.Inject;
-
-import java.util.Collections;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.stream.Collectors;
@@ -52,27 +51,32 @@ public class IndexLookup {
         this.indexRangeContainsOneOfStreams = indexRangeContainsOneOfStreams;
     }
 
-    public Set<String> indexNamesForStreamsInTimeRange(Set<String> streamIds,
+    public Set<String> indexNamesForStreamsInTimeRange(final Set<String> streamIds,
                                                        final TimeRange timeRange) {
-        if (streamIds.isEmpty()) {
-            return Collections.emptySet();
-        }
 
-        Set<String> result = streamIds.stream()
+        Set<String> dataStreamIndices = streamIds.stream()
                 .filter(s -> s.startsWith(Stream.DATASTREAM_PREFIX))
                 .map(s -> s.substring(Stream.DATASTREAM_PREFIX.length()))
                 .collect(Collectors.toSet());
-        streamIds = streamIds.stream().filter(s -> !s.startsWith(Stream.DATASTREAM_PREFIX)).collect(Collectors.toSet());
 
-        final Set<Stream> usedStreams = streamService.loadByIds(streamIds);
-        final SortedSet<IndexRange> candidateIndices = indexRangeService.find(timeRange.getFrom(), timeRange.getTo());
+        final Set<String> candidateIndices = indexRangesForStreamsInTimeRange(streamIds, timeRange).stream().map(IndexRange::indexName).collect(Collectors.toSet());
 
-        result.addAll(candidateIndices.stream()
-                .filter(i -> indexRangeContainsOneOfStreams.test(i, usedStreams))
-                .map(IndexRange::indexName)
-                .collect(Collectors.toSet())
-        );
-        return result;
+        return Sets.union(dataStreamIndices, candidateIndices);
     }
 
+    public Set<IndexRange> indexRangesForStreamsInTimeRange(final Set<String> streamIds,
+                                                            final TimeRange timeRange) {
+
+        if (streamIds.isEmpty()) {
+            return Set.of();
+        }
+        var nonDataStreamIds = streamIds.stream().filter(s -> !s.startsWith(Stream.DATASTREAM_PREFIX)).collect(Collectors.toSet());
+
+        final Set<Stream> usedStreams = streamService.loadByIds(nonDataStreamIds);
+        final SortedSet<IndexRange> candidateIndices = indexRangeService.find(timeRange.getFrom(), timeRange.getTo());
+
+        return candidateIndices.stream()
+                .filter(i -> indexRangeContainsOneOfStreams.test(i, usedStreams))
+                .collect(Collectors.toSet());
+    }
 }
