@@ -103,6 +103,7 @@ import ChangeFieldType, {
   isChangeFieldTypeEnabled,
   isChangeFieldTypeHidden,
 } from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldType';
+import WarmTierQueryValidation from 'views/components/searchbar/queryvalidation/WarmTierQueryValidation';
 
 import type { ActionHandlerArguments } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
@@ -425,6 +426,7 @@ const exports: PluginExports = {
     },
   ],
   'views.reducers': viewsReducers,
+  'views.elements.validationErrorExplanation': [WarmTierQueryValidation],
 };
 
 export default exports;

@@ -15,27 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-export type IndexRange = {
-  index_name: string,
-  begin: number,
-  end: number,
-  is_warm_tiered: boolean
-}
+import type { IndexRange, QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 
-export type QueryValidationState = {
-  status: 'OK' | 'ERROR' | 'WARNING',
-  explanations: Array<{
-    id: string,
-    errorType: string,
-    errorTitle: string,
-    errorMessage: string,
-    beginLine: number,
-    endLine: number,
-    beginColumn: number,
-    endColumn: number,
-    relatedProperty?: string,
-  }>,
-  context: {
-    searched_index_ranges: Array<IndexRange>
-  }
-};
+export const indicesInWarmTier = (validationState: QueryValidationState) => (
+  validationState?.context?.searched_index_ranges?.filter((range) => range.is_warm_tiered)
+);
+export const isSearchingWarmTier = (warmTierRanges: Array<IndexRange>) => warmTierRanges?.length > 0;

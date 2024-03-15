@@ -52,6 +52,7 @@ import ErrorWidget from './ErrorWidget';
 import WidgetColorContext from './WidgetColorContext';
 import WidgetErrorBoundary from './WidgetErrorBoundary';
 import WidgetActionsMenu from './WidgetActionsMenu';
+import WidgetWarmTierAlert from './WidgetWarmTierAlert';
 
 import InteractiveContext from '../contexts/InteractiveContext';
 
@@ -243,6 +244,11 @@ const Widget = ({ id, editing, widget, title, position, onPositionsChange }: Pro
   return (
     <WidgetColorContext id={id}>
       <WidgetFrame widgetId={id}>
+        <IfDashboard>
+          {!editing && (
+            <WidgetWarmTierAlert widgetId={id} activeQuery={activeQuery} />
+          )}
+        </IfDashboard>
         <InteractiveContext.Consumer>
           {(interactive) => (
             <WidgetHeader title={title}
