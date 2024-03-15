@@ -58,6 +58,7 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -114,7 +115,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
     }
 
     @Override
-    public OSGeneratedQueryContext generate(Query query, Set<SearchError> validationErrors) {
+    public OSGeneratedQueryContext generate(Query query, Set<SearchError> validationErrors, DateTimeZone timezone) {
         final BackendQuery backendQuery = query.query();
 
         final Set<SearchType> searchTypes = query.searchTypes();
@@ -140,7 +141,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
 
         final DateTime nowUTCSharedBetweenSearchTypes = Tools.nowUTC();
 
-        final OSGeneratedQueryContext queryContext = queryContextFactory.create(this, searchSourceBuilder, validationErrors);
+        final OSGeneratedQueryContext queryContext = queryContextFactory.create(this, searchSourceBuilder, validationErrors, timezone);
         searchTypes.stream()
                 .filter(searchType -> !isSearchTypeWithError(queryContext, searchType.id()))
                 .forEach(searchType -> {

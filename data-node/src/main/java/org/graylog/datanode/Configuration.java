@@ -25,6 +25,7 @@ import com.github.joschi.jadconfig.converters.IntegerConverter;
 import com.github.joschi.jadconfig.converters.StringListConverter;
 import com.github.joschi.jadconfig.converters.StringSetConverter;
 import com.github.joschi.jadconfig.util.Duration;
+import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
 import com.github.joschi.jadconfig.validators.URIAbsoluteValidator;
@@ -234,11 +235,11 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "metrics_stream")
     private String metricsStream = "gl-datanode-metrics";
 
-    @Parameter(value = "metrics_retention")
-    private String metricsRetention = "14d";
+    @Parameter(value = "metrics_retention", validators = PositiveDurationValidator.class)
+    private Duration metricsRetention = Duration.days(14);
 
-    @Parameter(value = "metrics_daily_retention")
-    private String metricsDailyRetention = "365d";
+    @Parameter(value = "metrics_daily_retention", validators = PositiveDurationValidator.class)
+    private Duration metricsDailyRetention = Duration.days(365);
 
     @Parameter(value = "metrics_daily_index")
     private String metricsDailyIndex = "gl-datanode-metrics-daily";
@@ -260,6 +261,20 @@ public class Configuration extends BaseConfiguration {
 
     public Integer getIndicesQueryBoolMaxClauseCount() {
         return indicesQueryBoolMaxClauseCount;
+    }
+
+    @Parameter(value = "opensearch_logger_org_opensearch")
+    private String opensearchDebug;
+
+    public String getOpensearchDebug() {
+        return opensearchDebug;
+    }
+
+    @Parameter(value = "opensearch_plugins_security_audit_type")
+    private String opensearchAuditLog;
+
+    public String getOpensearchAuditLog() {
+        return opensearchAuditLog;
     }
 
     public boolean isInsecureStartup() {
@@ -424,11 +439,11 @@ public class Configuration extends BaseConfiguration {
         return metricsStream;
     }
 
-    public String getMetricsRetention() {
+    public Duration getMetricsRetention() {
         return metricsRetention;
     }
 
-    public String getMetricsDailyRetention() {
+    public Duration getMetricsDailyRetention() {
         return metricsDailyRetention;
     }
 

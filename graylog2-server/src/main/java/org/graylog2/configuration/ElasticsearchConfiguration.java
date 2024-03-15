@@ -127,7 +127,7 @@ public class ElasticsearchConfiguration {
     private Size timeSizeOptimizingRotationMinShardSize = Size.gigabytes(20);
 
     @Parameter(value = TIME_SIZE_OPTIMIZING_ROTATION_MAX_SHARD_SIZE)
-    private Size timeSizeOptimizingRotationMaxShardSize = Size.gigabytes(50);
+    private Size timeSizeOptimizingRotationMaxShardSize = Size.gigabytes(20);
 
     @Parameter(value = TIME_SIZE_OPTIMIZING_RETENTION_MIN_LIFETIME)
     private Period timeSizeOptimizingRetentionMinLifeTime = IndexLifetimeConfig.DEFAULT_LIFETIME_MIN;

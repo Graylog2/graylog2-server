@@ -43,6 +43,7 @@ import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
 import org.graylog2.indexer.indices.Indices;
+import org.graylog2.indexer.migration.IndexerConnectionCheckResult;
 import org.graylog2.indexer.migration.RemoteReindexIndex;
 import org.graylog2.indexer.migration.RemoteReindexMigration;
 import org.joda.time.Duration;
@@ -135,10 +136,10 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
 
     private void createIndicesInNewCluster(RemoteReindexMigration migration) {
         migration.indices().forEach(index -> {
-            if (this.indices.exists(index.getName())) {
-                index.onError("Can't migrate index " + index.getName() + ", as it already exists in the target indexer.");
-            } else {
+            if (!this.indices.exists(index.getName())) {
                 this.indices.create(index.getName(), indexSetRegistry.getForIndex(index.getName()).orElse(indexSetRegistry.getDefault()));
+            } else {
+                LOG.info("Index {} does already exist in target indexer. Data will be migrated into existing index.", index.getName());
             }
         });
     }
@@ -176,6 +177,16 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     @Override
     public RemoteReindexMigration status(@NotNull String migrationID) {
         return JOBS.getOrDefault(migrationID, RemoteReindexMigration.nonExistent(migrationID));
+    }
+
+    @Override
+    public IndexerConnectionCheckResult checkConnection(URI uri, String username, String password) {
+        try {
+            final List<String> discoveredIndices = getAllIndicesFrom(uri, username, password);
+            return IndexerConnectionCheckResult.success(discoveredIndices);
+        } catch (MalformedURLException e) {
+            return IndexerConnectionCheckResult.failure(e);
+        }
     }
 
     private Set<String> getAllActiveNodeIDs() {
@@ -224,7 +235,8 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         var url = (host.endsWith("/") ? host : host + "/") + "_cat/indices?h=index";
         try (var response = httpClient.newCall(new Request.Builder().url(url).header("Authorization", Credentials.basic(username, password)).build()).execute()) {
             if (response.isSuccessful() && response.body() != null) {
-                return new BufferedReader(new StringReader(response.body().string())).lines().toList();
+                // filtering all indices that start with "." as they indicate a system index - we don't want to reindex those
+                return new BufferedReader(new StringReader(response.body().string())).lines().filter(i -> !i.startsWith(".")).toList();
             } else {
                 throw new RuntimeException("Could not read list of indices from " + host);
             }

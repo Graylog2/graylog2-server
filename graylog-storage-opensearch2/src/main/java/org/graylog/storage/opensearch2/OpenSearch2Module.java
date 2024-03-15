@@ -41,6 +41,7 @@ import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.results.MultiChunkResultRetriever;
 import org.graylog2.indexer.searches.SearchesAdapter;
+import org.graylog2.indexer.security.SecurityAdapter;
 import org.graylog2.migrations.V20170607164210_MigrateReopenedIndicesToAliases;
 import org.graylog2.plugin.VersionAwareModule;
 import org.graylog2.storage.SearchVersion;
@@ -63,6 +64,7 @@ public class OpenSearch2Module extends VersionAwareModule {
         bindForSupportedVersion(ClusterAdapter.class).to(ClusterAdapterOS2.class);
         bindForSupportedVersion(IndicesAdapter.class).to(IndicesAdapterOS2.class);
         bindForSupportedVersion(DataStreamAdapter.class).to(DataStreamAdapterOS2.class);
+        bindForSupportedVersion(SecurityAdapter.class).to(SecurityAdapterOS.class);
         if (useComposableIndexTemplates) {
             bind(IndexTemplateAdapter.class).to(ComposableIndexTemplateAdapter.class);
         } else {
