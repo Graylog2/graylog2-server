@@ -184,7 +184,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         try {
             final List<String> discoveredIndices = getAllIndicesFrom(uri, username, password);
             return IndexerConnectionCheckResult.success(discoveredIndices);
-        } catch (MalformedURLException e) {
+        } catch (Exception e) {
             return IndexerConnectionCheckResult.failure(e);
         }
     }
@@ -235,7 +235,8 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         var url = (host.endsWith("/") ? host : host + "/") + "_cat/indices?h=index";
         try (var response = httpClient.newCall(new Request.Builder().url(url).header("Authorization", Credentials.basic(username, password)).build()).execute()) {
             if (response.isSuccessful() && response.body() != null) {
-                return new BufferedReader(new StringReader(response.body().string())).lines().toList();
+                // filtering all indices that start with "." as they indicate a system index - we don't want to reindex those
+                return new BufferedReader(new StringReader(response.body().string())).lines().filter(i -> !i.startsWith(".")).toList();
             } else {
                 throw new RuntimeException("Could not read list of indices from " + host);
             }

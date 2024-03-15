@@ -78,6 +78,7 @@ describe('HeatmapVisualization', () => {
 
     const wrapper = mount(<WrappedHeatMap data={fixtures.validData}
                                           config={config}
+                                          setLoadingState={() => {}}
                                           effectiveTimerange={effectiveTimerange}
                                           fields={Immutable.List()}
                                           height={1024}
@@ -125,6 +126,7 @@ describe('HeatmapVisualization', () => {
 
     const wrapper = mount(<WrappedHeatMap data={{ chart: [] }}
                                           config={config}
+                                          setLoadingState={() => {}}
                                           effectiveTimerange={effectiveTimerange}
                                           fields={Immutable.List()}
                                           height={1024}

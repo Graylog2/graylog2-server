@@ -14,16 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.bootstrap.preflight;
+import styled, { css } from 'styled-components';
 
-import java.io.IOException;
+import { VISUALIZATION_TABLE_HEADER_HEIGHT } from 'views/Constants';
 
-public class DatanodeDirectoryException extends IOException {
-    public DatanodeDirectoryException(String message) {
-        super(message);
-    }
+const TableHead = styled.thead(({ theme }) => css`
+  background-color: ${theme.colors.table.head.background};
+  height: ${VISUALIZATION_TABLE_HEADER_HEIGHT}px;
+  color: ${theme.utils.readableColor(theme.colors.gray[90])};
+  position: sticky;
+  top: 0;
+  z-index: 1;
+`);
 
-    public DatanodeDirectoryException(String message, IOException cause) {
-        super(message, cause);
-    }
-}
+export default TableHead;
