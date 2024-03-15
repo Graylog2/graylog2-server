@@ -31,6 +31,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.A
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESEventList;
 import org.graylog2.plugin.Tools;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -73,7 +74,7 @@ public class ESEventListTest {
     private List<EventSummary> stripRawEvents(List<CommonEventSummary> events) {
         return events.stream()
                 .map(event -> (EventSummary) event)
-                .map(event -> event.toBuilder().rawEvent(Map.of()).build())
+                .map(event -> event.toBuilder().rawEvent(null).build())
                 .toList();
     }
 
@@ -88,23 +89,32 @@ public class ESEventListTest {
                 .timestamp(DateTime.parse(timestamp.toString(Tools.ES_DATE_FORMAT_FORMATTER), Tools.ES_DATE_FORMAT_FORMATTER))
                 .alert(false)
                 .eventDefinitionId("deadbeef")
-                .priority(2)
+                .priority(2L)
                 .eventKeys(List.of())
                 .build();
     }
 
     static class TestESEventList extends ESEventList {
+        public TestESEventList() {
+            super(new ObjectMapperProvider().get());
+        }
+
         private Map<String, Object> hit(String id, List<String> streams) {
-            return ImmutableMap.of(
-                    EventDto.FIELD_ID, id,
-                    EventDto.FIELD_MESSAGE, "message",
-                    EventDto.FIELD_SOURCE_STREAMS, streams,
-                    EventDto.FIELD_EVENT_TIMESTAMP, timestamp.toString(Tools.ES_DATE_FORMAT_FORMATTER),
-                    EventDto.FIELD_EVENT_DEFINITION_ID, "deadbeef",
-                    EventDto.FIELD_ALERT, false,
-                    EventDto.FIELD_PRIORITY, 2,
-                    EventDto.FIELD_KEY_TUPLE, List.of()
-            );
+            return ImmutableMap.<String, Object>builder()
+                    .put(EventDto.FIELD_ID, id)
+                    .put(EventDto.FIELD_MESSAGE, "message")
+                    .put(EventDto.FIELD_SOURCE_STREAMS, streams)
+                    .put(EventDto.FIELD_EVENT_TIMESTAMP, timestamp.toString(Tools.ES_DATE_FORMAT_FORMATTER))
+                    .put(EventDto.FIELD_EVENT_DEFINITION_ID, "deadbeef")
+                    .put(EventDto.FIELD_ALERT, false)
+                    .put(EventDto.FIELD_PRIORITY, 2)
+                    .put(EventDto.FIELD_KEY_TUPLE, List.of())
+                    .put(EventDto.FIELD_EVENT_DEFINITION_TYPE, "aggregation-v1")
+                    .put(EventDto.FIELD_PROCESSING_TIMESTAMP, timestamp.toString(Tools.ES_DATE_FORMAT_FORMATTER))
+                    .put(EventDto.FIELD_STREAMS, List.of())
+                    .put(EventDto.FIELD_SOURCE, "localhost")
+                    .put(EventDto.FIELD_FIELDS, Map.of())
+                    .build();
         }
 
         @Override

@@ -16,17 +16,15 @@
  */
 import styled, { css } from 'styled-components';
 
-const TableHeaderCell = styled.th<{ $isNumeric?: boolean, $borderedHeader?: boolean }>(({ $isNumeric, $borderedHeader, theme }) => css`
-  && {
-    min-width: 50px;
-    border: ${$borderedHeader ? `1px solid ${theme.colors.table.row.backgroundAlt}` : '0'};
-    padding: 0 5px;
-    vertical-align: middle;
-    white-space: nowrap;
-    font-weight: normal;
-    font-size: ${theme.fonts.size.small};
-    ${$isNumeric ? 'text-align: right' : ''}
-  }
+import { VISUALIZATION_TABLE_HEADER_HEIGHT } from 'views/Constants';
+
+const TableHead = styled.thead(({ theme }) => css`
+  background-color: ${theme.colors.table.head.background};
+  height: ${VISUALIZATION_TABLE_HEADER_HEIGHT}px;
+  color: ${theme.utils.readableColor(theme.colors.gray[90])};
+  position: sticky;
+  top: 0;
+  z-index: 1;
 `);
 
-export default TableHeaderCell;
+export default TableHead;
