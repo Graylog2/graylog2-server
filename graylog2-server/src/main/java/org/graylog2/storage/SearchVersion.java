@@ -147,4 +147,8 @@ public abstract class SearchVersion {
     public boolean isOpenSearch() {
         return this.distribution().equals(Distribution.OPENSEARCH);
     }
+
+    public boolean isDataNode() {
+        return this.distribution().equals(Distribution.DATANODE);
+    }
 }
