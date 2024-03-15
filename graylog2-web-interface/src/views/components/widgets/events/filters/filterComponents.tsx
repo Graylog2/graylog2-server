@@ -20,6 +20,8 @@ import EventDefinitionName from 'views/components/widgets/events/filters/EventDe
 import EventDefinitionFilter from 'views/components/widgets/events/filters/EventDefinitionFilter';
 import EventTypeFilter from 'views/components/widgets/events/filters/EventTypeFilter';
 import type { FilterComponents } from 'views/components/widgets/overview-configuration/filters/types';
+import EventPriorityFilter from 'views/components/widgets/events/filters/EventPriorityFilter';
+import PriorityName from 'components/events/events/PriorityName';
 
 const filterComponents: FilterComponents = [
   {
@@ -36,6 +38,13 @@ const filterComponents: FilterComponents = [
       <EventTypeFilter onSelect={onChange} selectedValues={selectedValues} />
     ),
     renderValue: (isAlert: 'true' | 'false') => (isAlert === 'true' ? 'Alert' : 'Event'),
+  },
+  {
+    attribute: 'priority',
+    configuration: (selectedValues, _editValue: string, onChange: (newValue: string) => void) => (
+      <EventPriorityFilter onSelect={onChange} selectedValues={selectedValues} />
+    ),
+    renderValue: (priority: string) => <PriorityName priority={priority} />,
   },
 ];
 

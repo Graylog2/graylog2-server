@@ -20,7 +20,7 @@ import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnu
 import StringUtils from 'util/StringUtils';
 
 type Props = {
-  priority: number,
+  priority: number | string,
 }
 const PriorityName = ({ priority }: Props) => (
   // eslint-disable-next-line react/react-in-jsx-scope
