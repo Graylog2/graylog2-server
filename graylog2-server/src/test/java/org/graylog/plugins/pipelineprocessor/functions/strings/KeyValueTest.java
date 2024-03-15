@@ -23,6 +23,8 @@ import org.graylog.plugins.pipelineprocessor.ast.expressions.Expression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.StringExpression;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -39,11 +41,12 @@ class KeyValueTest {
     private static KeyValue classUnderTest;
     private static EvaluationContext evaluationContext;
     public static StringExpression valueExpression;
+    private static final MessageFactory messageFactory = new TestMessageFactory();
 
     @BeforeAll
     static void setUp() {
         classUnderTest = new KeyValue();
-        final Message message = new Message("__dummy", "__dummy", DateTime.parse("2010-07-30T16:03:25Z"));
+        final Message message = messageFactory.createMessage("__dummy", "__dummy", DateTime.parse("2010-07-30T16:03:25Z"));
         evaluationContext = new EvaluationContext(message);
         valueExpression = new StringExpression(new CommonToken(0), "test=do test=remi number=12345 i get ignored");
     }
