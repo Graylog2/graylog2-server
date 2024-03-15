@@ -76,6 +76,8 @@ const RemoteReindexingMigration = ({ currentStep, onTriggerStep }: MigrationStep
       case MIGRATION_STATE.PROVISION_DATANODE_CERTIFICATES_PAGE.key:
       case MIGRATION_STATE.PROVISION_DATANODE_CERTIFICATES_RUNNING.key:
         return <CertificatesProvisioning currentStep={currentStep} onTriggerStep={onStepComplete} />;
+      case MIGRATION_STATE.MANUALLY_REMOVE_OLD_CONNECTION_STRING_FROM_CONFIG.key:
+        return <ConnectionStringRemovalStep currentStep={currentStep} onTriggerStep={onStepComplete} />;
       case MIGRATION_STATE.EXISTING_DATA_MIGRATION_QUESTION_PAGE.key:
         return <ExistingDataMigrationQuestion currentStep={currentStep} onTriggerStep={onStepComplete} />;
       case MIGRATION_STATE.MIGRATE_EXISTING_DATA.key:
@@ -84,8 +86,6 @@ const RemoteReindexingMigration = ({ currentStep, onTriggerStep }: MigrationStep
         return <RemoteReindexRunning currentStep={currentStep} onTriggerStep={onStepComplete} />;
       case MIGRATION_STATE.ASK_TO_SHUTDOWN_OLD_CLUSTER.key:
         return <ShutdownClusterStep currentStep={currentStep} onTriggerStep={onStepComplete} />;
-      case MIGRATION_STATE.MANUALLY_REMOVE_OLD_CONNECTION_STRING_FROM_CONFIG.key:
-        return <ConnectionStringRemovalStep currentStep={currentStep} onTriggerStep={onStepComplete} />;
       default:
         return <Welcome currentStep={currentStep} onTriggerStep={onStepComplete} />;
     }
