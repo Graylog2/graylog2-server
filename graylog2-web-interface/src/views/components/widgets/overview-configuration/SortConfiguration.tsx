@@ -50,7 +50,7 @@ const SortConfiguration = ({ name: attributeName, directions, columns, columnTit
       .sort(({ label: label1 }, { label: label2 }) => defaultCompare(label1, label2))
   ), [directionTitle, directions]);
 
-  const isUnknownColumn = values[attributeName] && !columns.includes(values[attributeName]);
+  const isUnknownColumn = values[attributeName].field && !columns.includes(values[attributeName].field);
 
   return (
     <Container>
