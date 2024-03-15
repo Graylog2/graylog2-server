@@ -18,12 +18,19 @@ import * as React from 'react';
 import { useState } from 'react';
 import { Formik, Form } from 'formik';
 import type { FormikErrors } from 'formik';
+import styled from 'styled-components';
 
 import { Alert, Input } from 'components/bootstrap';
 
 import type { RemoteReindexRequest } from '../../hooks/useRemoteReindexMigrationStatus';
 import type { MigrationActions, MigrationState, MigrationStepComponentProps, StepArgs } from '../../Types';
 import MigrationStepTriggerButtonToolbar from '../common/MigrationStepTriggerButtonToolbar';
+
+const IndicesContainer = styled.div`
+  max-height: 100px;
+  overflow-y: auto;
+  margin-top: 5px;
+`;
 
 export type RemoteReindexCheckConnection = {
   indices: string[],
@@ -119,15 +126,17 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
           {(availableIndices.length > 0) && (
             <Alert title="Valid connection" bsStyle="success">
               These are the available indices for the remote reindex migration:
-              {availableIndices.map((index) => (
-                <Input type="checkbox"
-                       key={index}
-                       name={index}
-                       id={index}
-                       label={index}
-                       checked={selectedIndices.includes(index)}
-                       onChange={() => handleSelectIndices(index)} />
-              ))}
+              <IndicesContainer>
+                {availableIndices.map((index) => (
+                  <Input type="checkbox"
+                         key={index}
+                         name={index}
+                         id={index}
+                         label={index}
+                         checked={selectedIndices.includes(index)}
+                         onChange={() => handleSelectIndices(index)} />
+                ))}
+              </IndicesContainer>
             </Alert>
           )}
           {errorMessage && (
