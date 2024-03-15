@@ -112,6 +112,11 @@ public class ESGeneratedQueryContext implements GeneratedQueryContext {
     }
 
     @Override
+    public Optional<String> getSearchTypeQueryString(String id) {
+        return Optional.ofNullable(searchTypeQueries.get(id)).map(SearchSourceBuilder::toString);
+    }
+
+    @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
                 .add("elasticsearch query", ssb)

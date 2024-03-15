@@ -16,13 +16,11 @@
  */
 package org.graylog.storage.elasticsearch7.views;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Provider;
-import org.graylog.plugins.views.search.ExplainResults;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.GlobalOverride;
 import org.graylog.plugins.views.search.Query;
@@ -56,8 +54,10 @@ import org.graylog.storage.elasticsearch7.TimeRangeQueryFactory;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.FieldTypeException;
+import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -221,23 +221,8 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
     }
 
     @Override
-    public ExplainResults.QueryExplainResult doExplain(SearchJob job, Query query, ESGeneratedQueryContext queryContext) {
-        final ImmutableMap.Builder<String, ExplainResults.ExplainResult> builder = ImmutableMap.builder();
-        final Map<String, SearchSourceBuilder> searchTypeQueries = queryContext.searchTypeQueries();
-
-        final DateTime nowUTCSharedBetweenSearchTypes = Tools.nowUTC();
-
-        query.searchTypes().forEach(s -> {
-            final Set<ExplainResults.IndexRangeResult> indicesForQuery = indexLookup.indexRangesForStreamsInTimeRange(
-                            query.effectiveStreams(s), query.effectiveTimeRange(s, nowUTCSharedBetweenSearchTypes))
-                    .stream().map(ExplainResults.IndexRangeResult::fromIndexRange).collect(Collectors.toSet());
-
-            final var queryString = searchTypeQueries.get(s.id()).toString();
-
-            builder.put(s.id(), new ExplainResults.ExplainResult(queryString, indicesForQuery));
-        });
-
-        return new ExplainResults.QueryExplainResult(builder.build());
+    public Set<IndexRange> indexRangesForStreamsInTimeRange(Set<String> streamIds, TimeRange timeRange) {
+        return indexLookup.indexRangesForStreamsInTimeRange(streamIds,timeRange);
     }
 
     @WithSpan
