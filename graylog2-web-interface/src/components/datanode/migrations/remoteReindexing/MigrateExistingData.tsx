@@ -21,6 +21,7 @@ import type { FormikErrors } from 'formik';
 import styled from 'styled-components';
 
 import { Alert, Input } from 'components/bootstrap';
+import { Spinner } from 'components/common';
 
 import type { RemoteReindexRequest } from '../../hooks/useRemoteReindexMigrationStatus';
 import type { MigrationActions, MigrationState, MigrationStepComponentProps, StepArgs } from '../../Types';
@@ -40,37 +41,44 @@ export type RemoteReindexCheckConnection = {
 const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => {
   const [nextSteps, setNextSteps] = useState<MigrationActions[]>(['CHECK_REMOTE_INDEXER_CONNECTION']);
   const [errorMessage, setErrrorMessage] = useState<string|null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [availableIndices, setAvailableIndices] = useState<string[]>([]);
   const [selectedIndices, setSelectedIndices] = useState<string[]>([]);
 
+  const handleConnectionCheck = (step: MigrationActions, data: MigrationState) => {
+    if (step === 'CHECK_REMOTE_INDEXER_CONNECTION') {
+      const checkConnectionResult = data?.response as RemoteReindexCheckConnection;
+
+      if (checkConnectionResult?.indices?.length) {
+        setAvailableIndices(checkConnectionResult.indices);
+        setSelectedIndices(checkConnectionResult.indices);
+        setNextSteps(currentStep.next_steps.filter((next_step) => next_step === 'START_REMOTE_REINDEX_MIGRATION'));
+      } else if (checkConnectionResult?.error) {
+        setErrrorMessage(checkConnectionResult.error);
+      } else {
+        setErrrorMessage('No available index has been found for remote reindex migration.');
+      }
+    }
+  };
+
   const handleTriggerNextStep = async (step: MigrationActions, args?: StepArgs) => {
+    setIsLoading(true);
     setErrrorMessage(null);
 
     return onTriggerStep(step, args).then((data) => {
-      if (step === 'CHECK_REMOTE_INDEXER_CONNECTION') {
-        const checkConnectionResult = data?.response as RemoteReindexCheckConnection;
-
-        if (checkConnectionResult?.indices?.length) {
-          setAvailableIndices(checkConnectionResult.indices);
-          setSelectedIndices(checkConnectionResult.indices);
-          setNextSteps(currentStep.next_steps.filter((next_step) => next_step === 'START_REMOTE_REINDEX_MIGRATION'));
-        } else if (checkConnectionResult?.error) {
-          setErrrorMessage(checkConnectionResult.error);
-        } else {
-          setErrrorMessage('No available index has been found for remote reindex migration.');
-        }
-      }
+      handleConnectionCheck(step, data);
 
       return data;
     }).catch((error) => {
       setErrrorMessage(error?.message);
 
       return {} as MigrationState;
-    });
+    }).finally(() => setIsLoading(false));
   };
 
   const resetConnectionCheck = () => {
     setErrrorMessage(null);
+    setIsLoading(false);
     setAvailableIndices([]);
     setSelectedIndices([]);
     setNextSteps(currentStep.next_steps.filter((step) => step === 'CHECK_REMOTE_INDEXER_CONNECTION'));
@@ -108,6 +116,7 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
                  name="hostname"
                  label="Cluster URI"
                  type="text"
+                 disabled={isLoading}
                  value={values.hostname}
                  onChange={(e) => handleChange(e, setFieldValue)}
                  required />
@@ -115,12 +124,14 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
                  name="user"
                  label="Username"
                  type="text"
+                 disabled={isLoading}
                  value={values.user}
                  onChange={(e) => handleChange(e, setFieldValue)} />
           <Input id="password"
                  name="password"
                  label="Password"
                  type="password"
+                 disabled={isLoading}
                  value={values.password}
                  onChange={(e) => handleChange(e, setFieldValue)} />
           {(availableIndices.length > 0) && (
@@ -133,6 +144,7 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
                          name={index}
                          id={index}
                          label={index}
+                         disabled={isLoading}
                          checked={selectedIndices.includes(index)}
                          onChange={() => handleSelectIndices(index)} />
                 ))}
@@ -142,7 +154,11 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
           {errorMessage && (
             <Alert bsStyle="danger">{errorMessage}</Alert>
           )}
-          <MigrationStepTriggerButtonToolbar nextSteps={nextSteps || currentStep.next_steps} onTriggerStep={handleTriggerNextStep} args={{ ...values, indices: selectedIndices } as RemoteReindexRequest} />
+          {isLoading ? (
+            <Spinner />
+          ) : (
+            <MigrationStepTriggerButtonToolbar nextSteps={nextSteps || currentStep.next_steps} onTriggerStep={handleTriggerNextStep} args={{ ...values, indices: selectedIndices } as RemoteReindexRequest} />
+          )}
         </Form>
       )}
     </Formik>
