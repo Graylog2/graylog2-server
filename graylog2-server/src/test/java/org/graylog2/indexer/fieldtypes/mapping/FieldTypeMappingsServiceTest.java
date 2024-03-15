@@ -50,6 +50,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -181,6 +182,19 @@ class FieldTypeMappingsServiceTest {
     void testThrowsExceptionWhenTryingToSetUnExistingProfile() {
         assertThrows(NotFoundException.class, () -> toTest.setProfile(Set.of(), "000000000000000000000042", false));
     }
+
+    @Test
+    void testThrowsExceptionOnIndexThatCannotHaveFieldTypeChanged() {
+        IndexSetConfig illegalForFieldTypeChange = mock(IndexSetConfig.class);
+        doReturn(Optional.of(illegalForFieldTypeChange)).when(indexSetService).get("existing_index_set");
+
+        assertThrows(BadRequestException.class, () -> toTest.changeFieldType(newCustomMapping,
+                Set.of("existing_index_set"),
+                false));
+
+        verifyNoInteractions(mongoIndexSetService);
+    }
+
 
     @Test
     void testThrowsExceptionWhenTryingToSetProfileWithReservedFields() {
