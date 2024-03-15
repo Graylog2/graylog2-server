@@ -76,6 +76,10 @@ Not affected by this change are the following templates using Freemarker:
 | `disabled_retention_strategies`  | **added** | Disables the specified retention strategies. By default, strategies `none` and `close` are now disabled in new installations.<br/>Strategies can be re-enabled simply by removing from this list.<br/>**Do not extend this list on existing installs!** |
 | `field_value_suggestion_mode`    | **added** | Allows controlling field value suggestions, turning them on, off, or allowing them only for textual fields.                                                                                                                                             |
 
+## OpenSearch Configuration Changes
+
+- Due to a bug in the OpenSearch client, it is recommended to explicitly set `action.destructive_requires_name=true`
+  at cluster level to avoid problems. If you are using Graylog Data Node, this is automatically set for you.
 
 ## Asset Import Changes
 
