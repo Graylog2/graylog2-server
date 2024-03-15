@@ -1,0 +1,5 @@
+type = "f"
+message = "Explicitly set `action.destructive_requires_name` in data node."
+
+pulls = ["18647"]
+issues = ["18619"]
