@@ -95,7 +95,7 @@ public abstract class WaitingRestOperation extends RestOperation {
         } catch (Exception e) {
             if (lastRecordedResponse != null) {
                 LOG.warn("Last recorded opensearch response, waiting for {}: {}", formatUrl(parameters, url), lastRecordedResponse);
-                if (lastRecordedResponse.contains("¸\"status\":\"yellow\"")) { // probably unassigned shards, print them
+                if (lastRecordedResponse.contains("\"status\":\"yellow\"")) { // probably unassigned shards, print them
                     logShardsExplanation();
                 }
             }
