@@ -26,7 +26,7 @@ export type Event = {
   id: string,
   event_definition_id: string,
   event_definition_type: string,
-  priority: string,
+  priority: number,
   timestamp: string,
   timerange_start: string,
   timerange_end: string,

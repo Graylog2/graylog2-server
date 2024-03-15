@@ -28,7 +28,6 @@ import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import TimerangeInfo from 'views/components/widgets/TimerangeInfo';
-import IfDashboard from 'views/components/dashboard/IfDashboard';
 import type WidgetConfig from 'views/logic/widgets/WidgetConfig';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import useWidgetResults from 'views/components/useWidgetResults';
@@ -43,6 +42,9 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
+import useViewType from 'views/hooks/useViewType';
+import View from 'views/logic/views/View';
+import IfDashboard from 'views/components/dashboard/IfDashboard';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
@@ -187,6 +189,7 @@ const setWidgetTitle = (widgetId: string, newTitle: string) => async (dispatch: 
 };
 
 const Widget = ({ id, editing, widget, title, position, onPositionsChange }: Props) => {
+  const viewType = useViewType();
   const fields = useQueryFieldTypes();
   const { stopAutoRefresh } = useAutoRefresh();
   const [loading, setLoading] = useState(false);
@@ -195,6 +198,8 @@ const Widget = ({ id, editing, widget, title, position, onPositionsChange }: Pro
   const dispatch = useAppDispatch();
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
+
+  const isDashboard = viewType === View.Type.Dashboard;
 
   const onToggleEdit = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.WIDGET_EDIT_TOGGLED, {
@@ -286,9 +291,9 @@ const Widget = ({ id, editing, widget, title, position, onPositionsChange }: Pro
           </WidgetErrorBoundary>
         </EditWrapper>
         <WidgetFooter>
-          <IfDashboard>
-            {!editing && <TimerangeInfo widget={widget} activeQuery={activeQuery} widgetId={id} />}
-          </IfDashboard>
+          {((widget.hasFixedFilters || isDashboard) && !editing) && (
+            <TimerangeInfo widget={widget} activeQuery={activeQuery} widgetId={id} hasFixedFilters={widget.hasFixedFilters} />
+          )}
         </WidgetFooter>
       </WidgetFrame>
     </WidgetColorContext>
