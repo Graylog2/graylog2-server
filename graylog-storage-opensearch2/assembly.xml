@@ -39,6 +39,10 @@
                          artifact into a Java module and we would run into
                          class loader issues. -->
                     <exclude>module-info.class</exclude>
+                    <!-- exclude NodeInfoAction since it was monkey-patched in
+                        https://github.com/Graylog2/graylog2-server/pull/18658 .
+                        Should be removed after the bug has been fixed and the patch removed. -->
+                    <exclude>org/opensearch/client/opensearch/nodes/info/NodeInfoAction.class</exclude>
                 </excludes>
             </unpackOptions>
         </dependencySet>
