@@ -48,7 +48,7 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
           setSelectedIndices(checkConnectionResult.indices);
           setNextSteps(currentStep.next_steps.filter((next_step) => next_step === 'START_REMOTE_REINDEX_MIGRATION'));
         } else {
-          if(checkConnectionResult?.error) {
+          if (checkConnectionResult?.error) {
             setErrrorMessage(checkConnectionResult.error);
           } else {
             setErrrorMessage('No available index has been found for remote reindex migration.');
