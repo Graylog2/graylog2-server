@@ -22,10 +22,12 @@ import type { RefreshConfig } from 'views/components/contexts/AutoRefreshContext
 import AutoRefreshContext from 'views/components/contexts/AutoRefreshContext';
 import useAppDispatch from 'stores/useAppDispatch';
 import { execute } from 'views/logic/slices/searchExecutionSlice';
+import useAppSelector from "stores/useAppSelector";
+import {selectJobIds} from "views/logic/slices/searchExecutionSelectors";
 
 const AutoRefreshProvider = ({ children }: React.PropsWithChildren) => {
   const dispatch = useAppDispatch();
-  const refreshSearch = useCallback(() => dispatch(execute()), [dispatch]);
+  const jobIds = useAppSelector(selectJobIds);
 
   const [refreshConfig, setRefreshConfig] = useState<RefreshConfig | null>(null);
   const startAutoRefresh = useCallback((interval: number) => setRefreshConfig({ enabled: true, interval }), []);
@@ -36,13 +38,19 @@ const AutoRefreshProvider = ({ children }: React.PropsWithChildren) => {
     stopAutoRefresh,
   }), [refreshConfig, startAutoRefresh, stopAutoRefresh]);
 
+  const refreshSearch = useCallback(() => {
+    if(!jobIds) {
+      dispatch(execute())
+    }
+  }, [jobIds, dispatch]);
+
   useEffect(() => {
-    const refreshInterval = refreshConfig?.enabled
+    const refreshInterval = refreshConfig?.enabled && !jobIds
       ? setInterval(() => refreshSearch(), refreshConfig.interval)
       : null;
 
     return () => clearInterval(refreshInterval);
-  }, [refreshSearch, refreshConfig?.enabled, refreshConfig?.interval]);
+  }, [jobIds, refreshSearch, refreshConfig?.enabled, refreshConfig?.interval]);
 
   return (
     <AutoRefreshContext.Provider value={contextValue}>

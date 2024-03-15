@@ -55,7 +55,7 @@ const reexecuteSearchTypes = (
 
     return { result: result.updateSearchTypes(updatedSearchTypes), widgetMapping };
   };
-
+  console.log('reexecuteSearchTypes');
   return dispatch(executeWithExecutionState(view, [], executionState, { ...searchExecutors, resultMapper: handleSearchResult }));
 };
 

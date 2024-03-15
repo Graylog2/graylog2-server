@@ -54,8 +54,8 @@ export const startJob = async (
 };
 const getDelayTime = (depth: number = 1): number => {
   //increase the delay time by 250ms after every 10th usage but not more than 2500ms
-  const curDepth = Math.min(Math.max(1, depth), 100);
-  return (Math.ceil(curDepth/10))*250;
+  const curDepth = Math.min(Math.max(1, depth), 500);
+  return (Math.ceil(curDepth/10))*500;
 }
 export const pollJob = (jobIds: JobIds, result: SearchJobType | null, depth: number = 1): Promise<SearchJobType> => new Promise((resolve) => {
   if (result?.execution?.done || result?.execution?.cancelled) {

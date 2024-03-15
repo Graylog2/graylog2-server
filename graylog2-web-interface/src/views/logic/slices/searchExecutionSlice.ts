@@ -160,7 +160,7 @@ export const execute = () => (dispatch: AppDispatch, getState: () => RootState, 
   const view = selectView(state);
   const executionState = selectSearchExecutionState(state);
   const widgetsToSearch = selectWidgetsToSearch(state);
-
+  console.log('execute execute execute');
   return dispatch(executeWithExecutionState(view, widgetsToSearch, executionState, searchExecutors));
 };
 
