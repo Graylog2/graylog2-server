@@ -44,6 +44,7 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import useViewType from 'views/hooks/useViewType';
 import View from 'views/logic/views/View';
+import IfDashboard from 'views/components/dashboard/IfDashboard';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
