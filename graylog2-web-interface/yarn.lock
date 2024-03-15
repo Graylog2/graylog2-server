@@ -3397,7 +3397,7 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react@*", "@types/react@18.0.28", "@types/react@18.2.65", "@types/react@^16", "@types/react@^16.9.11", "@types/react@^16.9.9":
+"@types/react@*", "@types/react@18.0.28", "@types/react@18.2.66", "@types/react@^16", "@types/react@^16.9.11", "@types/react@^16.9.9":
   version "18.0.28"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-18.0.28.tgz#accaeb8b86f4908057ad629a26635fe641480065"
   integrity sha512-RD0ivG1kEztNBdoAK7lekI9M+azSnitIn85h4iOiaLjaTrMjzslhaqCGaI4IyCJ1RljWiLCEu4jyrLLgqxBTew==
@@ -8569,7 +8569,7 @@ graphemer@^1.4.0:
     "@tanstack/react-query" "4.36.1"
     "@types/create-react-class" "15.6.7"
     "@types/jquery" "3.5.29"
-    "@types/react" "18.2.65"
+    "@types/react" "18.2.66"
     babel-preset-graylog "file:packages/babel-preset-graylog"
     create-react-class "15.7.0"
     eslint-config-graylog "file:packages/eslint-config-graylog"
@@ -11109,10 +11109,10 @@ material-colors@^1.2.1:
   resolved "https://registry.yarnpkg.com/material-colors/-/material-colors-1.2.6.tgz#6d1958871126992ceecc72f4bcc4d8f010865f46"
   integrity sha512-6qE4B9deFBIa9YSpOc9O0Sgc43zTeVYbgDT5veRKSlB2+ZuHNoVVxA1L/ckMUayV9Ay9y7Z/SZCLcGteW9i7bg==
 
-material-symbols@^0.15.0:
-  version "0.15.0"
-  resolved "https://registry.yarnpkg.com/material-symbols/-/material-symbols-0.15.0.tgz#d50366c93264496698633be76f5c68b13cb503f8"
-  integrity sha512-216LRlmN8fZb0CoIOaQBmRZ55BptWcd7z//0v7dXQA6aogsvI9Qp1nMQ5jZ44dbgBXntUQzWdB5Q2D+6bJXioA==
+material-symbols@^0.17.0:
+  version "0.17.0"
+  resolved "https://registry.yarnpkg.com/material-symbols/-/material-symbols-0.17.0.tgz#7f87b29497042300db7837ded84102ec233b0a93"
+  integrity sha512-CwDddz58cIH/svt8/wjAegQTp9bfNNIkIPjkkr0MAmA1oMlmUkG+C2ss2/yR22mlDzUX4DnXIq5MrgcpKTXoyA==
 
 math-log2@^1.0.1:
   version "1.0.1"
