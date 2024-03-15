@@ -22,10 +22,10 @@ import org.graylog2.audit.PluginAuditEventTypes;
 import java.util.Set;
 
 public class CaAuditEventTypes implements PluginAuditEventTypes {
-    private static final String NAMESPACE = "ca:";
+    private static final String NAMESPACE = "graylog_ca:";
 
-    public static final String CA_CREATE = NAMESPACE + "create";
-    public static final String CA_UPLOAD = NAMESPACE + "upload";
+    public static final String CA_CREATE = NAMESPACE + "ca:create";
+    public static final String CA_UPLOAD = NAMESPACE + "ca:upload";
     public static final String CLIENTCERT_CREATE = NAMESPACE + "clientcert:create";
     public static final String CLIENTCERT_DELETE = NAMESPACE + "clientcert:delete";
 
