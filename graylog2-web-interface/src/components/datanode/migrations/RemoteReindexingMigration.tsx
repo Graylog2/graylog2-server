@@ -92,7 +92,7 @@ const RemoteReindexingMigration = ({ currentStep, onTriggerStep }: MigrationStep
   };
 
   return (
-    <Col md={6}>
+    <Col>
       <StyledTitle>Remote reindexing migration</StyledTitle>
       <p>Follow these steps to migrate your existing OpenSearch 2.x or 1.3.x cluster to Data Nodes.</p>
       <StyledPanelGroup accordion id="first" activeKey={activeStep} onSelect={() => {}}>
