@@ -62,7 +62,7 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
                                                                          final boolean webhookServerEnabled,
                                                                          Map<String, String> configParams) {
 
-        LOG.debug("Creating Backend services {} {} {} flags <{}>", version, mongodbVersion, withMailServerEnabled ? "mail" : "", enabledFeatureFlags);
+        LOG.debug("Creating backend services {} {} {} flags <{}>", version, mongodbVersion, withMailServerEnabled ? "mail" : "", enabledFeatureFlags);
         final Services services = servicesProvider.getServices(version, mongodbVersion, withMailServerEnabled, webhookServerEnabled, enabledFeatureFlags);
         LOG.debug("Done creating backend services");
 
@@ -88,6 +88,7 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
         }
 
         var searchServer = services.getSearchServerInstance();
+        LOG.info("Running backend with SearchServer version {}", searchServer.version());
         try {
             var nodeContainerConfig = new NodeContainerConfig(services.getNetwork(), mongoDB.internalUri(), PASSWORD_SECRET, ROOT_PASSWORD_SHA_2, searchServer.internalUri(), searchServer.version(), pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, configParams);
             this.node = NodeInstance.createStarted(nodeContainerConfig);
