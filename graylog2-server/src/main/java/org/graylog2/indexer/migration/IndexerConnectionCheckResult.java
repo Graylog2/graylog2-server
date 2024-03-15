@@ -16,7 +16,6 @@
  */
 package org.graylog2.indexer.migration;
 
-import java.net.MalformedURLException;
 import java.util.Collections;
 import java.util.List;
 
@@ -26,7 +25,7 @@ public record IndexerConnectionCheckResult(List<String> indices, String error) {
         return new IndexerConnectionCheckResult(indexNames, null);
     }
 
-    public static IndexerConnectionCheckResult failure(MalformedURLException e) {
+    public static IndexerConnectionCheckResult failure(Exception e) {
         return new IndexerConnectionCheckResult(Collections.emptyList(), e.getMessage());
     }
 }

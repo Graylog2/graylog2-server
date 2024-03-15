@@ -184,7 +184,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         try {
             final List<String> discoveredIndices = getAllIndicesFrom(uri, username, password);
             return IndexerConnectionCheckResult.success(discoveredIndices);
-        } catch (MalformedURLException e) {
+        } catch (Exception e) {
             return IndexerConnectionCheckResult.failure(e);
         }
     }
