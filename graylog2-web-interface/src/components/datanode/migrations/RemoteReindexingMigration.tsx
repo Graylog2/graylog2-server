@@ -31,7 +31,6 @@ import RemoteReindexRunning from './remoteReindexing/RemoteReindexRunning';
 import CertificatesProvisioning from './common/CertificatesProvisioning';
 import MigrateExistingData from './remoteReindexing/MigrateExistingData';
 import ShutdownClusterStep from './remoteReindexing/ShutdownClusterStep';
-import ConnectionStringRemovalStep from './remoteReindexing/ConnectionStringRemovalStep';
 
 const StyledTitle = styled.h3`
   margin-bottom: 10px;
@@ -76,8 +75,6 @@ const RemoteReindexingMigration = ({ currentStep, onTriggerStep }: MigrationStep
       case MIGRATION_STATE.PROVISION_DATANODE_CERTIFICATES_PAGE.key:
       case MIGRATION_STATE.PROVISION_DATANODE_CERTIFICATES_RUNNING.key:
         return <CertificatesProvisioning currentStep={currentStep} onTriggerStep={onStepComplete} />;
-      case MIGRATION_STATE.MANUALLY_REMOVE_OLD_CONNECTION_STRING_FROM_CONFIG.key:
-        return <ConnectionStringRemovalStep currentStep={currentStep} onTriggerStep={onStepComplete} />;
       case MIGRATION_STATE.EXISTING_DATA_MIGRATION_QUESTION_PAGE.key:
         return <ExistingDataMigrationQuestion currentStep={currentStep} onTriggerStep={onStepComplete} />;
       case MIGRATION_STATE.MIGRATE_EXISTING_DATA.key:
