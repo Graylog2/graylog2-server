@@ -213,6 +213,9 @@
                             <Graylog-Plugin-Properties-Path>${project.groupId}.${project.artifactId}</Graylog-Plugin-Properties-Path>
                         </manifestEntries>
                     </archive>
+                    <archiverConfig>
+                        <duplicateBehavior>add</duplicateBehavior>
+                    </archiverConfig>
                 </configuration>
                 <executions>
                     <execution>
