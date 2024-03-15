@@ -94,6 +94,10 @@ public abstract class SearchVersion {
         return create(Distribution.OPENSEARCH, Version.forIntegers(major, minor, patch));
     }
 
+    public static SearchVersion datanode(final int major, final int minor, final int patch) {
+        return create(Distribution.DATANODE, Version.forIntegers(major, minor, patch));
+    }
+
     public String encode() {
         return String.format(Locale.ROOT, "%s:%s", this.distribution().name().toUpperCase(Locale.ROOT), this.version());
     }
