@@ -111,7 +111,7 @@ public abstract class IndexMapping implements IndexMappingTemplate {
                 .put(Message.FIELD_GL2_ACCOUNTED_MESSAGE_SIZE, typeLong())
                 .put(Message.FIELD_GL2_RECEIVE_TIMESTAMP, typeTimeWithMillis())
                 .put(Message.FIELD_GL2_PROCESSING_TIMESTAMP, typeTimeWithMillis())
-                .put(Message.FIELD_GL2_PROCESSING_DURATION_MS, typeInteger())
+                //.put(Message.FIELD_GL2_PROCESSING_DURATION_MS, typeInteger())
                 .put(Message.FIELD_GL2_MESSAGE_ID, notAnalyzedString())
                 .put(Message.GL2_SECOND_SORT_FIELD, aliasTo(FIELD_GL2_MESSAGE_ID))
                 .put(Message.FIELD_STREAMS, notAnalyzedString())
