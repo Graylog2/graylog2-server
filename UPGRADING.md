@@ -247,6 +247,8 @@ throughout the Graylog core code base.
 
 The following REST API changes have been made.
 
-| Endpoint                | Description              |
-|-------------------------|--------------------------|
-| `GET /example/resource` | TODO placeholder comment |
+| Endpoint                                                    | Description                                                                                                                           |
+|-------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------|
+| `POST /views/search/[search_id]/execute`                    | Starts async search execution. Returns data that can be used to poll and cancel the job later on (job's ID and ID of execution node). |
+| `GET /views/searchjobs/[executing_node]/[job_id]/status`    | New, preferred endpoint for job status polling.                                                                                       |
+| `DELETE /views/searchjobs/[executing_node]/[job_id]/cancel` | New endpoint for job cancellation.                                                                                                    |
