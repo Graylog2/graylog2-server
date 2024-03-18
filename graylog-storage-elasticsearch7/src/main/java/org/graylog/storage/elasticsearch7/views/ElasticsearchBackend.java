@@ -54,9 +54,12 @@ import org.graylog.storage.elasticsearch7.TimeRangeQueryFactory;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.FieldTypeException;
+import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -114,7 +117,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
 
     @WithSpan
     @Override
-    public ESGeneratedQueryContext generate(Query query, Set<SearchError> validationErrors) {
+    public ESGeneratedQueryContext generate(Query query, Set<SearchError> validationErrors, DateTimeZone timezone) {
         final BackendQuery backendQuery = query.query();
 
         final Set<SearchType> searchTypes = query.searchTypes();
@@ -141,7 +144,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
 
         final DateTime nowUTCSharedBetweenSearchTypes = Tools.nowUTC();
 
-        final ESGeneratedQueryContext queryContext = queryContextFactory.create(this, searchSourceBuilder, validationErrors);
+        final ESGeneratedQueryContext queryContext = queryContextFactory.create(this, searchSourceBuilder, validationErrors, timezone);
         searchTypes.stream()
                 .filter(searchType -> !isSearchTypeWithError(queryContext, searchType.id()))
                 .forEach(searchType -> {
@@ -215,6 +218,11 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 return Optional.of(QueryBuilders.queryStringQuery(((QueryStringFilter) filter).query()));
         }
         return Optional.empty();
+    }
+
+    @Override
+    public Set<IndexRange> indexRangesForStreamsInTimeRange(Set<String> streamIds, TimeRange timeRange) {
+        return indexLookup.indexRangesForStreamsInTimeRange(streamIds,timeRange);
     }
 
     @WithSpan

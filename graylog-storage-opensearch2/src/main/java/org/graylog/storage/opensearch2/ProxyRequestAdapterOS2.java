@@ -16,51 +16,64 @@
  */
 package org.graylog.storage.opensearch2;
 
-import org.graylog.shaded.opensearch2.org.apache.http.entity.ContentType;
-import org.graylog.shaded.opensearch2.org.apache.http.entity.InputStreamEntity;
+import jakarta.inject.Inject;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.InputStreamEntity;
 import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchException;
-import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
 import org.graylog.shaded.opensearch2.org.opensearch.client.ResponseException;
+import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.indexer.datanode.ProxyRequestAdapter;
-
-import jakarta.inject.Inject;
+import org.graylog2.rest.resources.datanodes.DatanodeResolver;
+import org.jetbrains.annotations.NotNull;
+import org.opensearch.client.RestClient;
 
 import java.io.IOException;
+import java.net.URI;
+import java.util.Collections;
 
 public class ProxyRequestAdapterOS2 implements ProxyRequestAdapter {
-    private final OpenSearchClient client;
+
+    private final RestClientProvider restClientProvider;
+    private final DatanodeResolver datanodeResolver;
 
     @Inject
-    public ProxyRequestAdapterOS2(OpenSearchClient openSearchClient) {
-        this.client = openSearchClient;
+    public ProxyRequestAdapterOS2(RestClientProvider restClientProvider, DatanodeResolver datanodeResolver) {
+        this.restClientProvider = restClientProvider;
+        this.datanodeResolver = datanodeResolver;
     }
 
     @Override
     public ProxyResponse request(ProxyRequest request) throws IOException {
-        final var osRequest = new Request(request.method(), request.path());
-        osRequest.setEntity(new InputStreamEntity(request.body(), ContentType.APPLICATION_JSON));
-
-        try {
-            final var osResponse = client.execute((c, requestOptions) -> {
-                osRequest.setOptions(requestOptions);
-
-                return c.getLowLevelClient().performRequest(osRequest);
-            }, "Unable to proxy request to data node");
-
-            return new ProxyResponse(osResponse.getStatusLine().getStatusCode(), osResponse.getEntity().getContent(), getContentType(osResponse));
+        final org.opensearch.client.Request req = new org.opensearch.client.Request(request.method(), request.path());
+        req.setEntity(new InputStreamEntity(request.body(), ContentType.APPLICATION_JSON));
+        try (
+                RestClient restClient = buildClient(request)
+        ) {
+            final var osResponse = restClient.performRequest(req);
+            return new ProxyResponse(osResponse.getStatusLine().getStatusCode(), osResponse.getEntity().getContent(), osResponse.getEntity().getContentType().getValue());
         } catch (OpenSearchException openSearchException) {
             final var cause = openSearchException.getCause();
             if (cause instanceof ResponseException responseException) {
                 final var response = responseException.getResponse();
                 final var status = response.getStatusLine().getStatusCode();
-                return new ProxyResponse(status, response.getEntity().getContent(), getContentType(response));
+                return getProxyResponse(status, response);
             }
             throw openSearchException;
         }
     }
 
-    private String getContentType(Response response) {
-        return response.getEntity().getContentType().getValue();
+    @NotNull
+    private static ProxyResponse getProxyResponse(int status, Response response) throws IOException {
+        return new ProxyResponse(status, response.getEntity().getContent(), response.getEntity().getContentType().getValue());
+    }
+
+    private RestClient buildClient(ProxyRequest request) {
+        final URI opensearchAddress = datanodeResolver.findByHostname(request.hostname()).map(DataNodeDto::getTransportAddress)
+                .filter(StringUtils::isNotBlank)
+                .map(URI::create)
+                .orElseThrow(() -> new IllegalStateException("No datanode found matching name " + request.hostname()));
+        return restClientProvider.buildBasicRestClient(Collections.singletonList(opensearchAddress));
     }
 }

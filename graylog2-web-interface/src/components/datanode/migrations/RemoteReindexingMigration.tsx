@@ -31,7 +31,6 @@ import RemoteReindexRunning from './remoteReindexing/RemoteReindexRunning';
 import CertificatesProvisioning from './common/CertificatesProvisioning';
 import MigrateExistingData from './remoteReindexing/MigrateExistingData';
 import ShutdownClusterStep from './remoteReindexing/ShutdownClusterStep';
-import ConnectionStringRemovalStep from './remoteReindexing/ConnectionStringRemovalStep';
 
 const StyledTitle = styled.h3`
   margin-bottom: 10px;
@@ -48,7 +47,7 @@ const StyledPanelGroup = styled(PanelGroup)`
     background-color: ${(props) => props.theme.colors.global.contentBackground};
 
     .panel-heading {
-      background-color: ${(props) => props.theme.colors.table.backgroundAlt};
+      background-color: ${(props) => props.theme.colors.table.row.backgroundAlt};
     }
 
     &:not(:first-child) {
@@ -84,15 +83,13 @@ const RemoteReindexingMigration = ({ currentStep, onTriggerStep }: MigrationStep
         return <RemoteReindexRunning currentStep={currentStep} onTriggerStep={onStepComplete} />;
       case MIGRATION_STATE.ASK_TO_SHUTDOWN_OLD_CLUSTER.key:
         return <ShutdownClusterStep currentStep={currentStep} onTriggerStep={onStepComplete} />;
-      case MIGRATION_STATE.MANUALLY_REMOVE_OLD_CONNECTION_STRING_FROM_CONFIG.key:
-        return <ConnectionStringRemovalStep currentStep={currentStep} onTriggerStep={onStepComplete} />;
       default:
         return <Welcome currentStep={currentStep} onTriggerStep={onStepComplete} />;
     }
   };
 
   return (
-    <Col md={6}>
+    <Col>
       <StyledTitle>Remote reindexing migration</StyledTitle>
       <p>Follow these steps to migrate your existing OpenSearch 2.x or 1.3.x cluster to Data Nodes.</p>
       <StyledPanelGroup accordion id="first" activeKey={activeStep} onSelect={() => {}}>

@@ -56,6 +56,11 @@ public class MigrationActionsAdapter implements MigrationActions {
     }
 
     @Override
+    public void verifyRemoteIndexerConnection() {
+
+    }
+
+    @Override
     public boolean runDirectoryCompatibilityCheck() {
         return false;
     }

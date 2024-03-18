@@ -81,4 +81,5 @@ export type EventDefinition = {
   _scope?: string,
   scheduler?: Scheduler,
   state?: 'ENABLED' | 'DISABLED',
+  remediation_steps?: string,
 };

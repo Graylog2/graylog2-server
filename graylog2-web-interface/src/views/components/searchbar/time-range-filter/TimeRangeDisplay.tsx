@@ -38,7 +38,7 @@ const TimeRangeWrapper = styled.div(({ theme }) => css`
   padding: 3px 13px;
   display: flex;
   justify-content: space-around;
-  background-color: ${theme.colors.table.backgroundAlt};
+  background-color: ${theme.colors.table.row.backgroundAlt};
   align-items: center;
 
   > span {

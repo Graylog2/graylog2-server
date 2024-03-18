@@ -34,6 +34,7 @@ const Headline = styled.h2`
 export const StyledPanel = styled(Panel)<{ bsStyle: string }>(({ bsStyle = 'default', theme }) => css`
   &.panel {
     background-color: ${theme.colors.global.contentBackground};
+
     .panel-heading {
       color: ${theme.colors.variant.darker[bsStyle]};
     }

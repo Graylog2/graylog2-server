@@ -98,6 +98,15 @@ const EventDetailsForm = ({ eventDefinition, validation, onChange, canEdit }: Pr
                  readOnly={readOnly}
                  rows={2} />
 
+          <Input id="event-definition-remediation-steps"
+                 name="remediation_steps"
+                 label={<span>Remediation Steps <small className="text-muted">(Optional)</small></span>}
+                 type="textarea"
+                 value={eventDefinition.remediation_steps}
+                 onChange={handleChange}
+                 readOnly={readOnly}
+                 rows={2} />
+
           <FormGroup controlId="event-definition-priority">
             <ControlLabel>Priority</ControlLabel>
             <Select options={priorityOptions}

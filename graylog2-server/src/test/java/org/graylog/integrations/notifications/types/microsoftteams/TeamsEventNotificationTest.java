@@ -34,8 +34,9 @@ import org.graylog.integrations.notifications.types.util.RequestClient;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.notifications.NotificationImpl;
 import org.graylog2.notifications.NotificationService;
-import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.MessageSummary;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
@@ -79,6 +80,7 @@ public class TeamsEventNotificationTest {
 
     private TeamsEventNotificationConfig teamsEventNotificationConfig;
     private EventNotificationContext eventNotificationContext;
+    private MessageFactory messageFactory = new TestMessageFactory();
 
     private final String expectedColor = "#FF2052";
     private final String expectedImage = "iconUrl";
@@ -302,7 +304,7 @@ public class TeamsEventNotificationTest {
 
         List<MessageSummary> messageSummaries = new ArrayList<>();
         for (int i = 0; i < size; i++) {
-            MessageSummary summary = new MessageSummary("graylog_" + i, new Message("Test message_" + i + " : with a colon and another colon : just for good measure", "source" + i, new DateTime(2020, 9, 6, 17, 0, DateTimeZone.UTC)));
+            MessageSummary summary = new MessageSummary("graylog_" + i, messageFactory.createMessage("Test message_" + i + " : with a colon and another colon : just for good measure", "source" + i, new DateTime(2020, 9, 6, 17, 0, DateTimeZone.UTC)));
             messageSummaries.add(summary);
         }
         return ImmutableList.copyOf(messageSummaries);

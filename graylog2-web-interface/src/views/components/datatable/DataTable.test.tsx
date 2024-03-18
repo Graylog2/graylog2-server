@@ -133,10 +133,9 @@ describe('DataTable', () => {
                            to: '2020-01-10T14:23:42.000Z',
                            type: 'absolute',
                          }}
-                         toggleEdit={() => {
-                         }}
-                         onChange={() => {
-                         }}
+                         setLoadingState={() => {}}
+                         toggleEdit={() => {}}
+                         onChange={() => {}}
                          height={200}
                          width={300}
                          {...props} />

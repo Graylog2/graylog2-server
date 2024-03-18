@@ -16,6 +16,10 @@
  */
 package org.graylog.storage.opensearch2.testing;
 
+import com.github.joschi.jadconfig.JadConfig;
+import com.github.joschi.jadconfig.RepositoryException;
+import com.github.joschi.jadconfig.ValidationException;
+import com.github.joschi.jadconfig.repositories.InMemoryRepository;
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.rholder.retry.RetryException;
 import com.github.rholder.retry.RetryerBuilder;
@@ -42,6 +46,7 @@ import org.graylog.testing.elasticsearch.Adapters;
 import org.graylog.testing.elasticsearch.Client;
 import org.graylog.testing.elasticsearch.FixtureImporter;
 import org.graylog.testing.elasticsearch.TestableSearchServerInstance;
+import org.graylog2.configuration.ElasticsearchClientConfiguration;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.system.shutdown.GracefulShutdownService;
@@ -73,7 +78,7 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
     private Client client;
     private FixtureImporter fixtureImporter;
     private Adapters adapters;
-    private List<String> featureFlags;
+    private final List<String> featureFlags;
 
     public OpenSearchInstance(final SearchVersion version, final String hostname, final Network network, final String heapSize, final List<String> featureFlags) {
         super(version, hostname, network, heapSize);
@@ -86,7 +91,7 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
         RestHighLevelClient restHighLevelClient = buildRestHighLevelClient();
         final var objectMapper = new ObjectMapperProvider().get();
         final var restClient = buildRestClient();
-        this.openSearchClient = new OpenSearchClient(restHighLevelClient, new OpenSearchClientProvider(restClient, objectMapper).get(), objectMapper);
+        this.openSearchClient = new OpenSearchClient(restHighLevelClient, new OpenSearchClientProvider(restClient, objectMapper).get(), restClient, objectMapper);
         this.client = new ClientOS2(this.openSearchClient, featureFlags);
         this.fixtureImporter = new FixtureImporterOS2(this.openSearchClient);
         adapters = new AdaptersOS2(openSearchClient);
@@ -98,29 +103,37 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
     }
 
     private RestClient buildRestClient() {
+
+        final ElasticsearchClientConfiguration config = buildconfig(Map.of(
+                "elasticsearch_connect_timeout", "60s",
+                "elasticsearch_socket_timeout", "60s",
+                "elasticsearch_idle_timeout", "60s",
+                "elasticsearch_max_total_connections", "1",
+                "elasticsearch_max_total_connections_per_route", "1",
+                "elasticsearch_max_retries", "1",
+                "elasticsearch_use_expect_continue", "false"
+        ));
+
         return new RestClientProvider(
                 new GracefulShutdownService(),
                 ImmutableList.of(URI.create("http://" + this.getHttpHostAddress())),
-                Duration.seconds(60),
-                Duration.seconds(60),
-                Duration.seconds(60),
-                1,
-                1,
-                1,
-                false,
-                false,
-                null,
-                Duration.seconds(60),
-                "http",
-                false,
-                false,
-                false,
+                config,
                 new org.apache.http.impl.client.BasicCredentialsProvider(),
                 null,
                 false,
-                false,
                 null)
                 .get();
+    }
+
+    private ElasticsearchClientConfiguration buildconfig(Map<String, String> properties) {
+        final ElasticsearchClientConfiguration opensearchConfig = new ElasticsearchClientConfiguration();
+        final JadConfig config = new JadConfig(new InMemoryRepository(properties), opensearchConfig);
+        try {
+            config.process();
+            return opensearchConfig;
+        } catch (RepositoryException | ValidationException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static OpenSearchInstance create() {

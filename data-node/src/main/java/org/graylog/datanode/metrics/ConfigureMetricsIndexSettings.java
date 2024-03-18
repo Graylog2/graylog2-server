@@ -36,6 +36,7 @@ import org.graylog2.indexer.datastream.policy.actions.Action;
 import org.graylog2.indexer.datastream.policy.actions.DeleteAction;
 import org.graylog2.indexer.datastream.policy.actions.RolloverAction;
 import org.graylog2.indexer.datastream.policy.actions.RollupAction;
+import org.graylog2.indexer.datastream.policy.actions.TimesUnit;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -119,7 +120,8 @@ public class ConfigureMetricsIndexSettings implements StateMachineTracer {
         Policy policy = new Policy(null,
                 "Manages rollover, rollup and deletion of data note metrics indices",
                 null,
-                stateOpen.name(), ImmutableList.of(stateOpen, stateRollup, stateDelete));
+                stateOpen.name(), ImmutableList.of(stateOpen, stateRollup, stateDelete),
+                null);
 
         try {
             log.debug("Creating ISM configuration for metrics data stream {}",
@@ -158,12 +160,13 @@ public class ConfigureMetricsIndexSettings implements StateMachineTracer {
         );
         RollupAction rollupAction = new RollupAction(ismRollup);
         final List<Action> actions = ImmutableList.of(new Action(rollupAction));
-        final List<Policy.Transition> transitions = ImmutableList.of(new Policy.Transition(nextState, new Policy.Condition(configuration.getMetricsRetention())));
+        final List<Policy.Transition> transitions = ImmutableList.of(new Policy.Transition(nextState,
+                new Policy.Condition(TimesUnit.DAYS.format(configuration.getMetricsRetention().toDays()))));
         return new Policy.State("rollup", actions, transitions);
     }
 
     private Policy.State ismOpenState(String nextState) {
-        final List<Action> actions = ImmutableList.of(new Action(new RolloverAction("1d")));
+        final List<Action> actions = ImmutableList.of(new Action(new RolloverAction("1d", null)));
         final List<Policy.Transition> transitions = ImmutableList.of(new Policy.Transition(nextState, null));
         return new Policy.State("open", actions, transitions);
     }

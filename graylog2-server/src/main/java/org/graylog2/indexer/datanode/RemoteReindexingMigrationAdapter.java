@@ -17,6 +17,7 @@
 package org.graylog2.indexer.datanode;
 
 import jakarta.validation.constraints.NotNull;
+import org.graylog2.indexer.migration.IndexerConnectionCheckResult;
 import org.graylog2.indexer.migration.RemoteReindexMigration;
 
 import java.net.URI;
@@ -30,4 +31,6 @@ public interface RemoteReindexingMigrationAdapter {
     RemoteReindexMigration start(URI uri, String username, String password, List<String> indices, boolean synchronous);
 
     RemoteReindexMigration status(@NotNull String migrationID);
+
+    IndexerConnectionCheckResult checkConnection(final URI uri, final String username, final String password);
 }
