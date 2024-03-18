@@ -6,6 +6,7 @@
       },
       "title" : "title",
       "description" : "description",
+      "remediation_steps" : "remediation",
       "priority" : 1,
       "alert" : false,
       "config" : {

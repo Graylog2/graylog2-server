@@ -32,6 +32,7 @@ type Props = {
   widget: Widget,
   activeQuery?: string,
   widgetId?: string,
+  hasFixedFilters?: boolean
 };
 
 const Wrapper = styled.div(({ theme }) => css`
@@ -46,7 +47,7 @@ const Wrapper = styled.div(({ theme }) => css`
 
 const getEffectiveWidgetTimerange = (result, activeQuery, searchTypeId) => result?.results?.[activeQuery]?.searchTypes[searchTypeId]?.effective_timerange;
 
-const TimerangeInfo = ({ className, widget, activeQuery, widgetId }: Props) => {
+const TimerangeInfo = ({ className, widget, activeQuery, widgetId, hasFixedFilters }: Props) => {
   const { formatTime } = useUserDateTime();
   const { result, widgetMapping } = useSearchResult() ?? {};
   const globalOverride = useGlobalOverride();
@@ -56,20 +57,31 @@ const TimerangeInfo = ({ className, widget, activeQuery, widgetId }: Props) => {
   const globalTimerangeString = globalOverride?.timerange
     ? `Global Override: ${timerangeToString(globalOverride.timerange, toLocalTimeWithMS)}` : undefined;
 
-  const configuredTimerange = timerangeToString(widget.timerange || DEFAULT_TIMERANGE, toLocalTimeWithMS);
-
   const searchTypeId = widgetId ? widgetMapping?.get(widgetId)?.first() : undefined;
 
+  const configuredTimerange = timerangeToString(widget.timerange || DEFAULT_TIMERANGE, toLocalTimeWithMS);
   const effectiveTimerange = (activeQuery && searchTypeId) ? getEffectiveWidgetTimerange(result, activeQuery, searchTypeId) : undefined;
   const effectiveTimerangeString = effectiveTimerange ? timerangeToString(effectiveTimerange, toInternalTime) : 'Effective widget time range is currently not available.';
-
   const currentWidgetMapping = widgetMapping?.get(widgetId);
+  const timerange = globalTimerangeString || configuredTimerange;
+
+  if (hasFixedFilters) {
+    return (
+      <Wrapper className={className}>
+        <StyledIcon name="warning" title="This widget has fixed filters and its results are independent of the current search." />
+        <TextOverflowEllipsis titleOverride={effectiveTimerangeString}>
+          {timerange}
+        </TextOverflowEllipsis>
+      </Wrapper>
+    );
+  }
 
   return (
     <SearchQueryExecutionInfoHelper currentWidgetMapping={currentWidgetMapping}>
       <Wrapper className={className}>
+        {hasFixedFilters && <StyledIcon name="warning" title="This widget has a fixed time range" />}
         <TextOverflowEllipsis titleOverride={effectiveTimerangeString}>
-          {globalTimerangeString || configuredTimerange}
+          {timerange}
         </TextOverflowEllipsis>
       </Wrapper>
     </SearchQueryExecutionInfoHelper>
@@ -80,6 +92,7 @@ TimerangeInfo.defaultProps = {
   className: undefined,
   activeQuery: undefined,
   widgetId: undefined,
+  hasFixedFilters: undefined,
 };
 
 export default TimerangeInfo;

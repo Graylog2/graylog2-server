@@ -20,7 +20,7 @@ import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import PropTypes from 'prop-types';
 import { useCallback } from 'react';
 
-import type { ListItemType, CustomContentRender, CustomListItemRender } from './ListItem';
+import type { ListItemType, CustomContentRender, CustomListItemRender } from './types';
 import List from './List';
 
 const reorder = <ItemType extends ListItemType>(list: Array<ItemType>, startIndex, endIndex) => {

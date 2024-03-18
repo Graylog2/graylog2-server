@@ -22,30 +22,31 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableSet;
 import org.graylog.events.event.EventDto;
-import org.graylog2.plugin.Tools;
+import org.graylog.events.event.EventReplayInfo;
 import org.joda.time.DateTime;
 
+import javax.annotation.Nullable;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 @AutoValue
 @JsonDeserialize(builder = EventSummary.Builder.class)
 public abstract class EventSummary implements CommonEventSummary {
     @SuppressWarnings("unchecked")
-    public static EventSummary parse(Map<String, Object> rawEvent) {
+    public static EventSummary parse(EventDto event) {
         return EventSummary.builder()
-                .alert((boolean) rawEvent.get(EventDto.FIELD_ALERT))
-                .id((String) rawEvent.get(EventDto.FIELD_ID))
-                .message((String) rawEvent.get(EventDto.FIELD_MESSAGE))
-                .streams(ImmutableSet.copyOf((List<String>) rawEvent.get(EventDto.FIELD_SOURCE_STREAMS)))
-                .timestamp(DateTime.parse((String) rawEvent.get(EventDto.FIELD_EVENT_TIMESTAMP), Tools.ES_DATE_FORMAT_FORMATTER))
-                .eventDefinitionId((String) rawEvent.get(EventDto.FIELD_EVENT_DEFINITION_ID))
-                .priority((Integer) rawEvent.get(EventDto.FIELD_PRIORITY))
-                .eventKeys(List.copyOf((List<String>) rawEvent.get(EventDto.FIELD_KEY_TUPLE)))
-                .rawEvent(rawEvent)
+                .alert(event.alert())
+                .id(event.id())
+                .message(event.message())
+                .streams(event.sourceStreams())
+                .timestamp(event.eventTimestamp())
+                .eventDefinitionId(event.eventDefinitionId())
+                .priority(event.priority())
+                .eventKeys(event.keyTuple())
+                .replayInfo(event.replayInfo())
+                .rawEvent(event)
                 .build();
     }
 
@@ -60,8 +61,7 @@ public abstract class EventSummary implements CommonEventSummary {
     public static abstract class Builder {
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_EventSummary.Builder()
-                    .rawEvent(Map.of());
+            return new AutoValue_EventSummary.Builder();
         }
 
         @JsonProperty(FIELD_ID)
@@ -83,13 +83,16 @@ public abstract class EventSummary implements CommonEventSummary {
         public abstract Builder eventDefinitionId(String eventDefinitionId);
 
         @JsonProperty(FIELD_PRIORITY)
-        public abstract Builder priority(Integer priority);
+        public abstract Builder priority(Long priority);
 
         @JsonProperty(FIELD_EVENT_KEYS)
         public abstract Builder eventKeys(List<String> eventKeys);
 
+        @JsonProperty(FIELD_REPLAY_INFO)
+        public abstract Builder replayInfo(@SuppressWarnings("OptionalUsedAsFieldOrParameterType") Optional<EventReplayInfo> replayInfo);
+
         @JsonIgnore
-        public abstract Builder rawEvent(Map<String, Object> rawEvent);
+        public abstract Builder rawEvent(@Nullable EventDto rawEvent);
 
         public abstract EventSummary build();
     }
