@@ -36,6 +36,8 @@ type Props = PropsWithChildren & {
 
 const TargetContainer = styled.div`
   cursor: pointer;
+  display: flex;
+  margin-right: 10px
 `;
 
 const StyledTable = styled(Table)<{ $stickyHeader: boolean }>(({ theme }) => css`

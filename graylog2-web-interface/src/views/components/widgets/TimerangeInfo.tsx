@@ -17,7 +17,7 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
-import { TextOverflowEllipsis } from 'components/common';
+import { Icon, TextOverflowEllipsis } from 'components/common';
 import type Widget from 'views/logic/widgets/Widget';
 import timerangeToString from 'views/logic/queries/TimeRangeToString';
 import { DEFAULT_TIMERANGE } from 'views/Constants';
@@ -45,6 +45,9 @@ const Wrapper = styled.div(({ theme }) => css`
   margin-right: 10px;
 `);
 
+const StyledIcon = styled(Icon)(({ theme }) => css`
+  color: ${theme.colors.gray[60]}
+`);
 const getEffectiveWidgetTimerange = (result, activeQuery, searchTypeId) => result?.results?.[activeQuery]?.searchTypes[searchTypeId]?.effective_timerange;
 
 const TimerangeInfo = ({ className, widget, activeQuery, widgetId, hasFixedFilters }: Props) => {
