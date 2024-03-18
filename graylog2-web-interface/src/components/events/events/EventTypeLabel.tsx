@@ -14,16 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.bootstrap.preflight;
 
-import java.io.IOException;
+import * as React from 'react';
 
-public class DatanodeDirectoryException extends IOException {
-    public DatanodeDirectoryException(String message) {
-        super(message);
-    }
+import { Label } from 'components/bootstrap';
 
-    public DatanodeDirectoryException(String message, IOException cause) {
-        super(message, cause);
-    }
+type Props = {
+  isAlert: boolean,
 }
+
+const EventTypeLabel = ({ isAlert }: Props) => (
+  isAlert
+    ? <Label bsStyle="warning">Alert</Label>
+    : <Label bsStyle="info">Event</Label>
+);
+
+export default EventTypeLabel;

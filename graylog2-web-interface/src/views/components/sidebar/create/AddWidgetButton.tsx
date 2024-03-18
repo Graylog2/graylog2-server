@@ -31,7 +31,6 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import usePluginEntities from 'hooks/usePluginEntities';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import IfFeatureEnabled from 'components/features/IfFeatureEnabled';
 
 import SectionInfo from '../SectionInfo';
 import SectionSubheadline from '../SectionSubheadline';
@@ -53,7 +52,7 @@ const CreateButton = styled(Button)`
 export type CreatorProps = {
   view: View,
 };
-type CreatorType = 'preset' | 'generic' | 'investigations';
+type CreatorType = 'preset' | 'generic' | 'investigations' | 'events';
 type CreatorFunction = () => (dispatch: AppDispatch, getState: GetState) => unknown;
 
 type FunctionalCreator = {
@@ -183,7 +182,8 @@ const AddWidgetButton = ({ onClick }: Props) => {
   const creators = usePluginEntities('creators');
   const presets = createGroup(creators, 'preset');
   const generic = createGroup(creators, 'generic');
-  const investigations = createGroup(creators, 'investigations');
+  const investigationsCreator = createGroup(creators, 'investigations');
+  const eventsCreator = createGroup(creators, 'events');
   const components: Array<React.ReactNode> = Object.values(overflowingComponents);
 
   return (
@@ -203,15 +203,21 @@ const AddWidgetButton = ({ onClick }: Props) => {
                               onClick={onClick}
                               setOverflowingComponents={setOverflowingComponents} />
       </Group>
-      {!!investigations?.length && (
-        <IfFeatureEnabled name="security_search_widgets">
-          <Group>
-            <SectionSubheadline>Investigations</SectionSubheadline>
-            <GroupCreateMenuItems creators={investigations}
-                                  onClick={onClick}
-                                  setOverflowingComponents={setOverflowingComponents} />
-          </Group>
-        </IfFeatureEnabled>
+      {!!investigationsCreator?.length && (
+        <Group>
+          <SectionSubheadline>Investigations</SectionSubheadline>
+          <GroupCreateMenuItems creators={investigationsCreator}
+                                onClick={onClick}
+                                setOverflowingComponents={setOverflowingComponents} />
+        </Group>
+      )}
+      {!!eventsCreator?.length && (
+        <Group>
+          <SectionSubheadline>Events</SectionSubheadline>
+          <GroupCreateMenuItems creators={eventsCreator}
+                                onClick={onClick}
+                                setOverflowingComponents={setOverflowingComponents} />
+        </Group>
       )}
       {components}
     </>

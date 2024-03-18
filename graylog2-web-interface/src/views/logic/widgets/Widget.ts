@@ -86,6 +86,11 @@ class Widget {
     return false;
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  get hasFixedFilters() {
+    return false;
+  }
+
   equals(other: any): boolean {
     if (other === undefined) {
       return false;

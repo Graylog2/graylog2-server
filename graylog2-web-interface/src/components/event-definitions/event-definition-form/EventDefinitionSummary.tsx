@@ -71,6 +71,8 @@ const EventDefinitionSummary = ({ eventDefinition, notifications, validation, cu
         <dd>{eventDefinition.title || 'No title given'}</dd>
         <dt>Description</dt>
         <dd>{eventDefinition.description || 'No description given'}</dd>
+        <dt>Remediation Steps</dt>
+        <dd>{eventDefinition.remediation_steps || 'No remediation steps given'}</dd>
         <dt>Priority</dt>
         <dd>{upperFirst(EventDefinitionPriorityEnum.properties[eventDefinition.priority].name)}</dd>
       </dl>

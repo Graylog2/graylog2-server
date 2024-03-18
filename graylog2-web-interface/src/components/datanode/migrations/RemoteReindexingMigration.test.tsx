@@ -121,6 +121,7 @@ describe('RemoteReindexingMigration', () => {
     });
 
     await screen.findByText(/Do you want to migrate your existing data?/);
+    await screen.findByText(/line from your Graylog configuration file/);
   });
 
   it('should render MigrateExistingData step', async () => {
@@ -153,15 +154,5 @@ describe('RemoteReindexingMigration', () => {
     });
 
     await screen.findByText(/To finish please shut down your/);
-  });
-
-  it('should render ConnectionStringRemovalStep step', async () => {
-    renderStep(MIGRATION_STATE.MANUALLY_REMOVE_OLD_CONNECTION_STRING_FROM_CONFIG.key);
-
-    await screen.findByRole('button', {
-      name: /8. Remove connection string/i,
-    });
-
-    await screen.findByText(/line from your Graylog configuration file/);
   });
 });
