@@ -93,6 +93,7 @@ const FilterSelect = ({ filterComponents, columnTitle, onCreate, selectedFilters
     <Container ref={container}>
       <Select id="filter-select"
               placeholder="Configure a new filter"
+              aria-label="Configure a new filter"
               options={filterOptions}
               matchProp="label"
               menuPortalTarget={document.body}
