@@ -24,6 +24,7 @@
                         https://github.com/Graylog2/graylog2-server/pull/18658 .
                         Should be removed after the bug has been fixed and the patch removed. -->
                     <exclude>org/opensearch/client/opensearch/nodes/info/NodeInfoAction.class</exclude>
+                    <exclude>org/opensearch/client/opensearch/_types/NodeRole.class</exclude>
                 </excludes>
             </unpackOptions>
         </dependencySet>
