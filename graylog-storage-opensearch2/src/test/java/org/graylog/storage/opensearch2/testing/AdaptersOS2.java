@@ -76,7 +76,7 @@ public class AdaptersOS2 implements Adapters {
 
     @Override
     public NodeAdapter nodeAdapter() {
-        return new NodeAdapterOS2(client);
+        return new NodeAdapterOS2(client, objectMapper);
     }
 
     @Override
