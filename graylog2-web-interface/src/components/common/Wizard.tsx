@@ -120,11 +120,15 @@ const StyledNav: React.ComponentType<any> = styled(Nav)<{$style?: 'stepper'}>(({
     }
     &.nav-pills {
       > li {
+        > a {
+          color: initial;
+        }
+
         &.active > a {
           &,
           &:hover,
           &:focus {
-            color: ${theme.utils.contrastingColor(theme.colors.global.link)};
+            color: ${theme.colors.global.link};
             background-color: initial; 
           }
         }
