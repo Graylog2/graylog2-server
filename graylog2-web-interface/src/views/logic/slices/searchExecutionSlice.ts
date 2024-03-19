@@ -150,9 +150,10 @@ export const executeWithExecutionState = (view: View, widgetsToSearch: Array<str
       .then((result) => {
         dispatch(setJobIds(null));
         const isCanceled = result?.result?.result?.execution?.cancelled;
-        if(isCanceled) return dispatch(stopLoading())
+        if (isCanceled) return dispatch(stopLoading());
+
         return dispatch(finishedLoading(result));
-      })
+      });
   });
 
 export const execute = () => (dispatch: AppDispatch, getState: () => RootState, { searchExecutors }: ExtraArguments) => {

@@ -63,7 +63,6 @@ export function runPollJob({ nodeId, asyncSearchId } : JobIds): Promise<SearchJo
   return fetch('GET', pollJobUrl(nodeId, asyncSearchId));
 }
 
-
 export function runCancelJob({ nodeId, asyncSearchId } : JobIds): Promise<null> {
   return fetch('DELETE', cancelJobUrl(nodeId, asyncSearchId));
 }

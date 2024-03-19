@@ -53,7 +53,6 @@ import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
 import useAppSelector from 'stores/useAppSelector';
 import useParameters from 'views/hooks/useParameters';
 
-
 import ExternalValueActionsProvider from './ExternalValueActionsProvider';
 
 const GridContainer = styled.div<{ $interactive: boolean }>(({ $interactive }) => ($interactive ? css`
