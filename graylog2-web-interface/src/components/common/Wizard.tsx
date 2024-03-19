@@ -32,7 +32,7 @@ const HorizontalCol = styled(Col)`
   margin-bottom: 15px;
 `;
 
-const StyledNav = styled(Nav)<{$style: 'stepper'| undefined}>(({ $style, theme}) => css`
+const StyledNav: React.ComponentType<any> = styled(Nav)<{$style?: 'stepper'}>(({ $style, theme }) => css`
   ${$style === 'stepper' ? `
   &.nav {
    counter-reset: line-number;
@@ -229,7 +229,7 @@ const HorizontalButtonToolbar = styled(ButtonToolbar)`
   padding: 7px;
 `;
 
-const isValidActiveStep = (activeStep: StepKey | null | undefined, steps: Steps) => {
+const isValidActiveStep = (activeStep: StepKey | null | undefined, steps: StepsType) => {
   if (activeStep === undefined || activeStep === null) {
     return false;
   }
@@ -237,7 +237,7 @@ const isValidActiveStep = (activeStep: StepKey | null | undefined, steps: Steps)
   return find(steps, { key: activeStep });
 };
 
-const warnOnInvalidActiveStep = (activeStep: StepKey | null | undefined, steps: Steps) => {
+const warnOnInvalidActiveStep = (activeStep: StepKey | null | undefined, steps: StepsType) => {
   if (activeStep === undefined || activeStep === null) {
     return;
   }
@@ -394,16 +394,16 @@ class Wizard extends React.Component<Props, State> {
 
     return (
       <SubnavigationCol md={2}>
-        <Nav stacked
-             bsStyle="pills"
-             $style={style}
-             activeKey={selectedStep}
-             onSelect={this._wizardChanged as SelectCallback}
-             justified={justified}>
+        <StyledNav stacked
+                   bsStyle="pills"
+                   $style={style}
+                   activeKey={selectedStep}
+                   onSelect={this._wizardChanged as SelectCallback}
+                   justified={justified}>
           {steps.map((navItem) => (
             <NavItem key={navItem.key} eventKey={navItem.key} disabled={navItem.disabled}>{navItem.title}</NavItem>
           ))}
-        </Nav>
+        </StyledNav>
         {!hidePreviousNextButtons && (
           <>
             <br />
