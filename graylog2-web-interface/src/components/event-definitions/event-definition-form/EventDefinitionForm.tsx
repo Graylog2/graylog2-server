@@ -25,8 +25,8 @@ import URI from 'urijs';
 import QS from 'qs';
 
 import { getPathnameWithoutId } from 'util/URLUtils';
-import { Button, Col, Row } from 'components/bootstrap';
-import { ModalSubmit, Wizard } from 'components/common';
+import { Col, Row } from 'components/bootstrap';
+import { Wizard } from 'components/common';
 import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import type User from 'logic/users/User';
@@ -35,6 +35,7 @@ import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import EventDefinitionFormButtons from 'components/event-definitions/event-definition-form/EventDefinitionFormButtons';
 
 import EventDetailsForm from './EventDetailsForm';
 import EventConditionForm from './EventConditionForm';
@@ -181,58 +182,6 @@ const EventDefinitionForm = ({
     setActiveStep(nextStep);
   };
 
-  const renderButtons = () => {
-    if (activeStep === last(STEP_KEYS)) {
-      return (
-        <ModalSubmit onCancel={onCancel}
-                     onSubmit={handleSubmit}
-                     submitButtonText={`${eventDefinition.id ? 'Update' : 'Create'} event definition`} />
-      );
-    }
-
-    const activeStepIndex = STEP_KEYS.indexOf(activeStep);
-
-    const handlePreviousClick = () => {
-      sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_PREVIOUS_CLICKED, {
-        app_pathname: getPathnameWithoutId(pathname),
-        app_section: (action === 'create') ? 'new-event-definition' : 'edit-event-definition',
-        app_action_value: 'previous-button',
-        current_step: steps[activeStepIndex].title,
-      });
-
-      const previousStep = activeStepIndex > 0 ? STEP_KEYS[activeStepIndex - 1] : undefined;
-      setActiveStep(previousStep);
-    };
-
-    const handleNextClick = () => {
-      sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_NEXT_CLICKED, {
-        app_pathname: getPathnameWithoutId(pathname),
-        app_section: (action === 'create') ? 'new-event-definition' : 'edit-event-definition',
-        app_action_value: 'next-button',
-        current_step: steps[activeStepIndex].title,
-      });
-
-      const nextStep = STEP_KEYS[activeStepIndex + 1];
-      setActiveStep(nextStep);
-    };
-
-    return (
-      <div>
-        <Button bsStyle="info"
-                onClick={handlePreviousClick}
-                disabled={activeStepIndex === 0}>
-          Previous
-        </Button>
-        <div className="pull-right">
-          <Button bsStyle="info"
-                  onClick={handleNextClick}>
-            Next
-          </Button>
-        </div>
-      </div>
-    );
-  };
-
   return (
     <Row>
       <Col md={12}>
@@ -245,7 +194,13 @@ const EventDefinitionForm = ({
                   containerClassName=""
                   hidePreviousNextButtons />
         </WizardContainer>
-        {renderButtons()}
+        <EventDefinitionFormButtons activeStep={activeStep}
+                                    setActiveStep={setActiveStep}
+                                    action={action}
+                                    steps={steps}
+                                    stepKeys={STEP_KEYS}
+                                    onSubmit={handleSubmit}
+                                    onCancel={onCancel} />
       </Col>
     </Row>
   );
