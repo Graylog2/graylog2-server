@@ -20,7 +20,6 @@ import com.github.joschi.jadconfig.JadConfig;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.InMemoryRepository;
-import com.github.joschi.jadconfig.util.Duration;
 import com.github.rholder.retry.RetryException;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
@@ -30,6 +29,7 @@ import org.graylog.shaded.opensearch2.org.apache.http.impl.client.BasicCredentia
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.settings.put.UpdateSettingsRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.support.IndicesOptions;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
+import org.graylog.shaded.opensearch2.org.opensearch.client.RestClient;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexResponse;
@@ -38,7 +38,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.Composable
 import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.Template;
 import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
 import org.graylog.storage.opensearch2.OpenSearchClient;
-import org.graylog.storage.opensearch2.RestHighLevelClientProvider;
+import org.graylog.storage.opensearch2.RestClientProvider;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.elasticsearch.Adapters;
 import org.graylog.testing.elasticsearch.Client;
@@ -113,7 +113,7 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
                 new GracefulShutdownService(),
                 ImmutableList.of(URI.create("http://" + this.getHttpHostAddress())),
                 config,
-                new org.apache.http.impl.client.BasicCredentialsProvider(),
+                new BasicCredentialsProvider(),
                 null,
                 false,
                 null)
@@ -197,31 +197,6 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
     @Override
     public SearchServer searchServer() {
         return OPENSEARCH_VERSION;
-    }
-
-    private RestHighLevelClient buildRestClient() {
-        return new RestHighLevelClientProvider(
-                new GracefulShutdownService(),
-                ImmutableList.of(URI.create("http://" + this.getHttpHostAddress())),
-                Duration.seconds(60),
-                Duration.seconds(60),
-                Duration.seconds(60),
-                1,
-                1,
-                1,
-                false,
-                false,
-                null,
-                Duration.seconds(60),
-                "http",
-                false,
-                false,
-                new BasicCredentialsProvider(),
-                null,
-                false,
-                false,
-                null)
-                .get();
     }
 
     @Override
