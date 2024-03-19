@@ -18,6 +18,7 @@ package org.graylog2.indexer.datastream;
 
 import org.graylog2.indexer.fieldtypes.IndexFieldTypesDTO;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
+import org.graylog2.indexer.indexset.IndexSetConfigFactory;
 import org.graylog2.indexer.indices.Template;
 import org.graylog2.plugin.streams.Stream;
 import org.junit.Before;
@@ -45,12 +46,14 @@ public class DataStreamServiceImplTest {
     private DataStreamAdapter dataStreamAdapter;
     @Mock
     private IndexFieldTypesService indexFieldTypesService;
+    @Mock
+    private IndexSetConfigFactory indexSetConfigFactory;
 
     private DataStreamService dataStreamService;
 
     @Before
     public void setUp() {
-        dataStreamService = new DataStreamServiceImpl(dataStreamAdapter, indexFieldTypesService);
+        dataStreamService = new DataStreamServiceImpl(dataStreamAdapter, indexFieldTypesService, indexSetConfigFactory);
     }
 
     @Test

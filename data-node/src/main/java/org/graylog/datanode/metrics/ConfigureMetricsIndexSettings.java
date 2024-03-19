@@ -26,8 +26,11 @@ import org.graylog.datanode.periodicals.MetricsCollector;
 import org.graylog.datanode.process.ProcessEvent;
 import org.graylog.datanode.process.ProcessState;
 import org.graylog.datanode.process.StateMachineTracer;
+import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.settings.put.UpdateSettingsRequest;
 import org.graylog.storage.opensearch2.DataStreamAdapterOS2;
 import org.graylog.storage.opensearch2.ism.IsmApi;
+import org.graylog2.cluster.nodes.DataNodeDto;
+import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.indexer.datastream.DataStreamService;
 import org.graylog2.indexer.datastream.DataStreamServiceImpl;
 import org.graylog2.indexer.datastream.policy.IsmPolicy;
@@ -38,6 +41,7 @@ import org.graylog2.indexer.datastream.policy.actions.RolloverAction;
 import org.graylog2.indexer.datastream.policy.actions.RollupAction;
 import org.graylog2.indexer.datastream.policy.actions.TimesUnit;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
+import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,12 +60,14 @@ public class ConfigureMetricsIndexSettings implements StateMachineTracer {
     private final IndexFieldTypesService indexFieldTypesService;
     private final ObjectMapper objectMapper;
     private DataStreamService dataStreamService;
+    private final NodeService<DataNodeDto> nodeService;
 
-    public ConfigureMetricsIndexSettings(OpensearchProcess process, Configuration configuration, IndexFieldTypesService indexFieldTypesService, ObjectMapper objectMapper) {
+    public ConfigureMetricsIndexSettings(OpensearchProcess process, Configuration configuration, IndexFieldTypesService indexFieldTypesService, ObjectMapper objectMapper, NodeService<DataNodeDto> nodeService) {
         this.process = process;
         this.configuration = configuration;
         this.objectMapper = objectMapper;
         this.indexFieldTypesService = indexFieldTypesService;
+        this.nodeService = nodeService;
     }
 
     @Override
@@ -74,10 +80,16 @@ public class ConfigureMetricsIndexSettings implements StateMachineTracer {
             process.openSearchClient().ifPresent(client -> {
                 if (dataStreamService == null) {
                     final IsmApi ismApi = new IsmApi(client, objectMapper);
+                    int replicas = nodeService.allActive().size() == 1 ? 0 : 1;
+                    IndexSetConfig indexSetConfig = IndexSetConfig.builder().replicas(replicas).build();
                     dataStreamService = new DataStreamServiceImpl(
                             new DataStreamAdapterOS2(client, objectMapper, ismApi),
-                            indexFieldTypesService
+                            indexFieldTypesService,
+                            indexSetConfig
                     );
+                    final UpdateSettingsRequest req = new UpdateSettingsRequest().indices(".opendistro-ism-config");
+                    req.settings(Map.of("number_of_replicas", indexSetConfig.replicas()));
+                    client.execute((c, requestOptions) -> c.indices().putSettings(req, requestOptions));
                 }
                 dataStreamService.createDataStream(configuration.getMetricsStream(),
                         configuration.getMetricsTimestamp(),
