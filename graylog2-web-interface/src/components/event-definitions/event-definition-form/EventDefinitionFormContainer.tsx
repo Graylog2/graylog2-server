@@ -19,6 +19,7 @@ import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import cloneDeep from 'lodash/cloneDeep';
 
+import useActivePerspective from 'components/perspectives/hooks/useActivePerspective';
 import { useStore } from 'stores/connect';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import { ConfirmLeaveDialog, Spinner } from 'components/common';
@@ -30,7 +31,9 @@ import 'components/event-notifications/event-notification-types';
 import type { EventDefinition, EventDefinitionFormControlsProps } from 'components/event-definitions/event-definitions-types';
 import useCurrentUser from 'hooks/useCurrentUser';
 import useEventDefinitionConfigFromLocalStorage from 'components/event-definitions/hooks/useEventDefinitionConfigFromLocalStorage';
+
 import { getPathnameWithoutId } from 'util/URLUtils';
+
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -69,7 +72,9 @@ const EventDefinitionFormContainer = ({
   onCancel,
 }: Props) => {
   const { step } = useQuery();
-  const [activeStep, setActiveStep] = useState(step as string || STEP_KEYS[0]);
+  const { activePerspective } = useActivePerspective();
+  const initialStep = activePerspective?.id === 'security' ? STEP_KEYS[0] : step as string;
+  const [activeStep, setActiveStep] = useState(initialStep || STEP_KEYS[0]);
   const [eventDefinition, setEventDefinition] = useState(eventDefinitionInitial);
   const [validation, setValidation] = useState({ errors: {} });
   const [eventsClusterConfig, setEventsClusterConfig] = useState(undefined);
