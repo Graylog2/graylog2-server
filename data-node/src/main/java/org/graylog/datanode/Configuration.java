@@ -89,7 +89,7 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "opensearch_plugins_location", validators = DirectoryReadableValidator.class)
     private Path opensearchPluginsDir = Path.of("dist/plugins");
 
-    @Parameter(value = "opensearch_data_location", required = true, validators = DirectoryWritableValidator.class)
+    @Parameter(value = "opensearch_data_location", required = true, validators = DirectoryReadableValidator.class)
     private Path opensearchDataLocation = Path.of("datanode/data");
 
     @Parameter(value = "opensearch_logs_location", required = true, validators = DirectoryWritableValidator.class)

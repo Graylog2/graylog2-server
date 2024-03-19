@@ -37,6 +37,9 @@ public abstract class NodeInfo {
     public abstract Object os();
 
     @JsonProperty
+    public abstract Integer allocatedProcessors();
+
+    @JsonProperty
     public abstract Long jvmMemHeapMaxInBytes();
 
     @JsonProperty
@@ -47,6 +50,8 @@ public abstract class NodeInfo {
         public abstract Builder version(String version);
 
         public abstract Builder os(Object os);
+
+        public abstract Builder allocatedProcessors(Integer allocatedProcessors);
 
         public abstract Builder jvmMemHeapMaxInBytes(Long jvmMemHeapMaxInBytes);
 

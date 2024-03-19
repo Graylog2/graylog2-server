@@ -21,6 +21,7 @@ import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.NotFoundException;
+import org.graylog.plugins.views.search.ExplainResults;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchJob;
@@ -116,6 +117,21 @@ public class SearchExecutor {
         }
 
         return searchJob;
+    }
+
+    public ExplainResults explain(String searchId, SearchUser searchUser, ExecutionState executionState) {
+        return searchDomain.getForUser(searchId, searchUser)
+                .map(s -> explain(s, searchUser, executionState))
+                .orElseThrow(() -> new NotFoundException("No search found with id <" + searchId + ">."));
+    }
+
+    public ExplainResults explain(Search search, SearchUser searchUser, ExecutionState executionState) {
+        final Search preValidationSearch = searchNormalization.preValidation(search, searchUser, executionState);
+        final Set<SearchError> validationErrors = searchValidation.validate(preValidationSearch, searchUser);
+        final Search normalizedSearch = searchNormalization.postValidation(preValidationSearch, searchUser, executionState);
+
+        return queryEngine.explain(searchJobService.create(normalizedSearch, searchUser.username()), validationErrors,
+                searchUser.timeZone().orElse(DEFAULT_TIMEZONE));
     }
 
     private SearchJob searchJobWithFatalError(SearchJob searchJob, Set<SearchError> validationErrors) {

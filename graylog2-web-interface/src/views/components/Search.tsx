@@ -40,6 +40,7 @@ import DefaultFieldTypesProvider from 'views/components/contexts/DefaultFieldTyp
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import useSearchPageLayout from 'hooks/useSearchPageLayout';
 import HighlightingRulesProvider from 'views/components/contexts/HighlightingRulesProvider';
+import SearchExplainContextProvider from 'views/components/contexts/SearchExplainContextProvider';
 import SearchPagePreferencesProvider from 'views/components/contexts/SearchPagePreferencesProvider';
 import WidgetFocusProvider from 'views/components/contexts/WidgetFocusProvider';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
@@ -144,66 +145,68 @@ const Search = () => {
     <>
       <SynchronizeUrl />
       <ExternalValueActionsProvider>
-        <WidgetFocusProvider>
-          <WidgetFocusContext.Consumer>
-            {({
-              focusedWidget: { focusing: focusingWidget, editing: editingWidget } = {
-                focusing: false,
-                editing: false,
-              },
-            }) => (
-              <>
-                <IfInteractive>
-                  <IfDashboard>
-                    <WindowLeaveMessage />
-                  </IfDashboard>
-                </IfInteractive>
-                <InteractiveContext.Consumer>
-                  {(interactive) => (
-                    <SearchPagePreferencesProvider>
-                      <DefaultFieldTypesProvider>
-                        <ViewAdditionalContextProvider>
-                          <HighlightingRulesProvider>
-                            <GridContainer id="main-row" $interactive={interactive}>
-                              <IfInteractive>
-                                {showSidebar && (
-                                <ConnectedSidebar>
-                                  <FieldsOverview />
-                                </ConnectedSidebar>
-                                )}
-                              </IfInteractive>
-                              <SearchArea as={SearchAreaContainer}>
+        <SearchExplainContextProvider>
+          <WidgetFocusProvider>
+            <WidgetFocusContext.Consumer>
+              {({
+                focusedWidget: { focusing: focusingWidget, editing: editingWidget } = {
+                  focusing: false,
+                  editing: false,
+                },
+              }) => (
+                <>
+                  <IfInteractive>
+                    <IfDashboard>
+                      <WindowLeaveMessage />
+                    </IfDashboard>
+                  </IfInteractive>
+                  <InteractiveContext.Consumer>
+                    {(interactive) => (
+                      <SearchPagePreferencesProvider>
+                        <DefaultFieldTypesProvider>
+                          <ViewAdditionalContextProvider>
+                            <HighlightingRulesProvider>
+                              <GridContainer id="main-row" $interactive={interactive}>
                                 <IfInteractive>
-                                  <HeaderElements />
-                                  {InfoBar && <InfoBar />}
-                                  <IfDashboard>
-                                    {!editingWidget && <DashboardSearchBar />}
-                                  </IfDashboard>
-                                  <IfSearch>
-                                    <SearchBar />
-                                  </IfSearch>
-
-                                  <QueryBarElements />
-
-                                  <IfDashboard>
-                                    {!focusingWidget && <QueryBar />}
-                                  </IfDashboard>
+                                  {showSidebar && (
+                                  <ConnectedSidebar>
+                                    <FieldsOverview />
+                                  </ConnectedSidebar>
+                                  )}
                                 </IfInteractive>
-                                <HighlightMessageInQuery>
-                                  <SearchResult />
-                                </HighlightMessageInQuery>
-                              </SearchArea>
-                            </GridContainer>
-                          </HighlightingRulesProvider>
-                        </ViewAdditionalContextProvider>
-                      </DefaultFieldTypesProvider>
-                    </SearchPagePreferencesProvider>
-                  )}
-                </InteractiveContext.Consumer>
-              </>
-            )}
-          </WidgetFocusContext.Consumer>
-        </WidgetFocusProvider>
+                                <SearchArea as={SearchAreaContainer}>
+                                  <IfInteractive>
+                                    <HeaderElements />
+                                    {InfoBar && <InfoBar />}
+                                    <IfDashboard>
+                                      {!editingWidget && <DashboardSearchBar />}
+                                    </IfDashboard>
+                                    <IfSearch>
+                                      <SearchBar />
+                                    </IfSearch>
+
+                                    <QueryBarElements />
+
+                                    <IfDashboard>
+                                      {!focusingWidget && <QueryBar />}
+                                    </IfDashboard>
+                                  </IfInteractive>
+                                  <HighlightMessageInQuery>
+                                    <SearchResult />
+                                  </HighlightMessageInQuery>
+                                </SearchArea>
+                              </GridContainer>
+                            </HighlightingRulesProvider>
+                          </ViewAdditionalContextProvider>
+                        </DefaultFieldTypesProvider>
+                      </SearchPagePreferencesProvider>
+                    )}
+                  </InteractiveContext.Consumer>
+                </>
+              )}
+            </WidgetFocusContext.Consumer>
+          </WidgetFocusProvider>
+        </SearchExplainContextProvider>
       </ExternalValueActionsProvider>
     </>
   );
