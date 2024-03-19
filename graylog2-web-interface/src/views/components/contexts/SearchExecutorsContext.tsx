@@ -17,7 +17,7 @@
 import * as React from 'react';
 
 import type { SearchExecutors } from 'views/logic/slices/searchExecutionSlice';
-import { cancelJob, executeJobResult, startJob } from 'views/logic/slices/executeJobResult';
+import { cancelJob, executeJobResult, startJob } from 'views/logic/slices/executeSearch';
 import parseSearch from 'views/logic/slices/parseSearch';
 
 const defaultSearchExecutors: SearchExecutors = {
