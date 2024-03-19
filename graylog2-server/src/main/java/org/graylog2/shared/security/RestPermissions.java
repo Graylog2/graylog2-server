@@ -173,6 +173,9 @@ public class RestPermissions implements PluginPermissions {
     public static final String DATANODE_START = "datanode:start";
     public static final String DATANODE_MIGRATION = "datanode:migration";
 
+    public static final String DATANODE_OPENSEARCH_PROXY = "datanode:opensearchproxy";
+    public static final String DATANODE_REST_PROXY = "datanode:opensearchproxy";
+
     // This is a special permission that ONLY works with GRNs as ID/target
     // TODO does this belong here?
     public static final String ENTITY_OWN = "entity:own";
@@ -205,6 +208,8 @@ public class RestPermissions implements PluginPermissions {
             .add(create(DATANODE_STOP, ""))
             .add(create(DATANODE_START, ""))
             .add(create(DATANODE_MIGRATION, ""))
+            .add(create(DATANODE_OPENSEARCH_PROXY, ""))
+            .add(create(DATANODE_REST_PROXY, ""))
             .add(create(DECORATORS_CREATE, ""))
             .add(create(DECORATORS_EDIT, ""))
             .add(create(DECORATORS_READ, ""))
