@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+import type { ParameterJson } from 'views/logic/parameters/Parameter';
+
 type Provider = {
   type: string,
   template: string,
@@ -30,7 +32,8 @@ type FieldSpec = {
 
 type Notification = {
   notification_id: string,
-};
+  notification_parameters: string
+}
 
 export type Scheduler = {
   data: {
@@ -57,29 +60,67 @@ export type SearchFilter = {
 };
 
 export type EventDefinition = {
+  _scope: string,
   id: string,
-  config?: {
-    type: string,
-    execute_every_ms?: number,
-    search_within_ms?: number,
-    event_limit?: number,
-    sigma_rule_id?: string,
-    streams?: Array<string>
-    filters?: Array<SearchFilter>,
-  },
   title: string,
-  description?: string,
-  matched_at?: string,
-  priority?: number,
-  key_spec?: Array<string>
-  field_spec?: FieldSpec,
-  notification_settings?: {
-    backlog_size: number,
-    grace_period_ms: number,
-  }
-  notifications?: Array<Notification>,
-  _scope?: string,
-  scheduler?: Scheduler,
+  description: string,
+  priority: number,
+  alert: boolean,
   state?: 'ENABLED' | 'DISABLED',
+  config: {
+    type: string,
+    query: string,
+    query_parameters: ParameterJson[],
+    filters: SearchFilter[],
+    streams: string[],
+    group_by: string[],
+    series: Array<{field: string, id: string, type: string}>,
+    conditions: {
+      expression: string | null | {},
+    },
+    search_within_ms: number,
+    execute_every_ms: number,
+  },
+  field_spec: FieldSpec,
+  key_spec: string[],
+  notification_settings: {
+    grace_period_ms: number,
+    backlog_size: number,
+  },
+  notifications: Array<Notification>,
   remediation_steps?: string,
-};
+  storage: Array<{
+    type: string,
+    streams: number[] | string[],
+  }>,
+  updated_at: string | null,
+  matched_at?: string,
+  scheduler?: Scheduler,
+}
+// export type EventDefinition = {
+//   id: string,
+//   config?: {
+//     type: string,
+//     execute_every_ms?: number,
+//     search_within_ms?: number,
+//     event_limit?: number,
+//     sigma_rule_id?: string,
+//     streams?: Array<string>
+//     filters?: Array<SearchFilter>,
+//   },
+//   title: string,
+//   description?: string,
+//   matched_at?: string,
+//   priority?: number,
+//   key_spec?: Array<string>
+//   field_spec?: FieldSpec,
+//   notification_settings?: {
+//     backlog_size: number,
+//     grace_period_ms: number,
+//   }
+//   notifications?: Array<Notification>,
+//   _scope?: string,
+//   scheduler?: Scheduler,
+//   state?: 'ENABLED' | 'DISABLED',
+//   remediation_steps?: string,
+// };

@@ -30,6 +30,7 @@ export const simpleEventDefinition = {
     type: 'aggregation-v1',
     filters: [],
   },
+  updated_at: '2024-02-26T15:32:24.666Z',
   description: '',
   field_spec: {},
   id: 'event-definition-1-id',

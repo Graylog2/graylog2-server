@@ -109,6 +109,7 @@ const EventConditionForm = ({ action, entityTypes, eventDefinition, validation, 
   };
 
   const disabledSelect = () => !formattedEventDefinitionTypes().some((edt) => eventDefinition.config.type === edt.value) && action === 'edit';
+  console.log(disabledSelect(), eventDefinition, formattedEventDefinitionTypes());
   const onlyFilters = () => eventDefinition._scope === 'ILLUMINATE' && action === 'edit';
   const isSigma = () => eventDefinition.config.type === 'sigma-v1' && action === 'edit';
 
