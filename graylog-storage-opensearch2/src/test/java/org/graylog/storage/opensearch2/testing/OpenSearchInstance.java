@@ -29,7 +29,6 @@ import org.graylog.shaded.opensearch2.org.apache.http.impl.client.BasicCredentia
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.settings.put.UpdateSettingsRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.support.IndicesOptions;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
-import org.graylog.shaded.opensearch2.org.opensearch.client.RestClient;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexResponse;
@@ -97,7 +96,7 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
         return this;
     }
 
-    private RestClient buildRestClient() {
+    private RestHighLevelClient buildRestClient() {
 
         final ElasticsearchClientConfiguration config = buildconfig(Map.of(
                 "elasticsearch_connect_timeout", "60s",
