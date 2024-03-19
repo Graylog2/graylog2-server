@@ -330,9 +330,11 @@ const QueryInput = React.forwardRef<Editor, Props>(({
   useShowHotkeysInOverview();
   useImperativeHandle(outerRef, () => innerRef.current, []);
 
+  const offsetLeft = useMemo(() => inputElement?.getBoundingClientRect()?.left, [inputElement]);
+
   return (
     <Container $hasValue={!!value}>
-      <GlobalEditorStyles $width={inputWidth} $offsetLeft={inputElement?.offsetLeft} />
+      <GlobalEditorStyles $width={inputWidth} $offsetLeft={offsetLeft} />
       <BasicQueryInput height={height}
                        className={className}
                        disabled={false}
