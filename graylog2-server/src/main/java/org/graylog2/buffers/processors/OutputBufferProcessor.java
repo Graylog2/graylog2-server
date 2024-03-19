@@ -34,6 +34,7 @@ import org.graylog2.outputs.OutputRouter;
 import org.graylog2.plugin.GlobalMetricNames;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.ServerStatus;
+import org.graylog2.plugin.SystemMessage;
 import org.graylog2.plugin.buffers.MessageEvent;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.shared.buffers.WorkHandler;
@@ -57,6 +58,7 @@ public class OutputBufferProcessor implements WorkHandler<MessageEvent> {
     private static final Logger LOG = LoggerFactory.getLogger(OutputBufferProcessor.class);
 
     private static final String INCOMING_MESSAGES_METRICNAME = name(OutputBufferProcessor.class, "incomingMessages");
+    private static final String INCOMING_SYSTEM_MESSAGES_METRICNAME = name(OutputBufferProcessor.class, "incomingSystemMessages");
     private static final String PROCESS_TIME_METRICNAME = name(OutputBufferProcessor.class, "processTime");
 
     private final ExecutorService executor;
@@ -65,6 +67,7 @@ public class OutputBufferProcessor implements WorkHandler<MessageEvent> {
     private final ServerStatus serverStatus;
 
     private final Meter incomingMessages;
+    private final Meter incomingSystemMessages;
     private final Counter outputThroughput;
     private final Timer processTime;
 
@@ -89,6 +92,7 @@ public class OutputBufferProcessor implements WorkHandler<MessageEvent> {
         this.executor = executorService(globalMetricRegistry, corePoolSize);
 
         this.incomingMessages = globalMetricRegistry.meter(INCOMING_MESSAGES_METRICNAME);
+        this.incomingSystemMessages = globalMetricRegistry.meter(INCOMING_SYSTEM_MESSAGES_METRICNAME);
         this.outputThroughput = globalMetricRegistry.counter(GlobalMetricNames.OUTPUT_THROUGHPUT);
         this.processTime = globalMetricRegistry.timer(PROCESS_TIME_METRICNAME);
     }
@@ -149,14 +153,18 @@ public class OutputBufferProcessor implements WorkHandler<MessageEvent> {
      */
     @Override
     public void onEvent(MessageEvent event) throws Exception {
-        incomingMessages.mark();
-
         final Message msg = event.getMessage();
         if (msg == null) {
             LOG.debug("Skipping null message.");
             return;
         }
         LOG.trace("Processing message <{}> from OutputBuffer.", msg.getId());
+
+        if (msg instanceof SystemMessage) {
+            incomingSystemMessages.mark();
+        } else {
+            incomingMessages.mark();
+        }
 
         final Set<MessageOutput> messageOutputs = outputRouter.getStreamOutputsForMessage(msg);
         msg.recordCounter(serverStatus, "matched-outputs", messageOutputs.size());
