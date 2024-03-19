@@ -16,24 +16,14 @@
  */
 import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
-import type { SearchJobType } from 'views/stores/SearchJobs';
-import { runSearchJob, searchJobStatus } from 'views/stores/SearchJobs';
+import type { SearchJobType, JobIds } from 'views/stores/SearchJobs';
+import { runStartJob, runPollJob, runCancelJob } from 'views/stores/SearchJobs';
 import type View from 'views/logic/views/View';
 import type { SearchExecutionResult } from 'views/types';
 import SearchResult from 'views/logic/SearchResult';
 
 const delay = (ms: number) => new Promise((resolve) => {
   setTimeout(resolve, ms);
-});
-
-const trackJobStatus = (job: SearchJobType): Promise<SearchJobType> => new Promise((resolve) => {
-  if (job?.execution?.done || job?.execution?.completed_exceptionally) {
-    resolve(job);
-  } else {
-    resolve(delay(250)
-      .then(() => searchJobStatus(job.id))
-      .then((jobStatus) => trackJobStatus(jobStatus)));
-  }
 });
 
 export const buildSearchExecutionState = (
@@ -60,19 +50,45 @@ export const buildSearchExecutionState = (
   return executionStateBuilder.build();
 };
 
-const executeSearch = (
+export const startJob = async (
   view: View,
   widgetsToSearch: string[],
   executionStateParam: SearchExecutionState,
   keepQueries: string[] = [],
-): Promise<SearchExecutionResult> => {
-  const { widgetMapping, search } = view;
+): Promise<JobIds> => {
+  const { search } = view;
 
   const executionState = buildSearchExecutionState(view, widgetsToSearch, executionStateParam, keepQueries);
 
-  return runSearchJob(search, executionState)
-    .then((job) => trackJobStatus(job))
-    .then((result) => ({ widgetMapping, result: new SearchResult(result) }));
+  return runStartJob(search, executionState).then((res) => ({ asyncSearchId: res.id, nodeId: res.executing_node }));
 };
 
-export default executeSearch;
+const getDelayTime = (depth: number = 1): number => {
+  // increase the delay time by 250ms after every 10th usage but not more than 2500ms
+  const curDepth = Math.min(Math.max(1, depth), 100);
+
+  return (Math.ceil(curDepth / 10)) * 250;
+};
+
+export const pollJob = (jobIds: JobIds, result: SearchJobType | null, depth: number = 1): Promise<SearchJobType> => new Promise((resolve) => {
+  if (result?.execution?.done || result?.execution?.cancelled) {
+    return resolve(result);
+  }
+
+  delay(getDelayTime(depth))
+    .then(() => {
+      resolve(runPollJob(jobIds).then((res) => pollJob(jobIds, res, depth++)));
+    });
+});
+
+export const executeJobResult = async ({ asyncSearchId, nodeId }: JobIds, view: View): Promise<SearchExecutionResult> => {
+  const { widgetMapping } = view;
+
+  return pollJob({ asyncSearchId, nodeId }, null)
+    .then(
+      (result) => ({ widgetMapping, result: new SearchResult(result) }));
+};
+
+export const cancelJob = (jobIds: JobIds) => runCancelJob(jobIds);
+
+export default executeJobResult;
