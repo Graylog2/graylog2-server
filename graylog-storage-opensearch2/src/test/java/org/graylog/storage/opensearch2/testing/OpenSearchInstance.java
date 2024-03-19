@@ -80,8 +80,8 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
     private Adapters adapters;
     private final List<String> featureFlags;
 
-    public OpenSearchInstance(final SearchVersion version, final String hostname, final Network network, final String heapSize, final List<String> featureFlags) {
-        super(version, hostname, network, heapSize);
+    public OpenSearchInstance(final SearchVersion version, final String hostname, final Network network, final String heapSize, final List<String> featureFlags, Map<String, String> env) {
+        super(version, hostname, network, heapSize, env);
         this.featureFlags = featureFlags;
     }
 
@@ -256,6 +256,8 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
                 .withEnv("START_PERF_ANALYZER", "false")
                 .withNetwork(network)
                 .withNetworkAliases(hostname);
+
+        getContainerEnv().forEach(container::withEnv);
 
         // disabling the performance plugin in 2.0.1 consistently created errors during CI runs, but keeping it running
         // in later versions sometimes created errors on CI, too.

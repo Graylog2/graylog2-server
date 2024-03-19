@@ -17,16 +17,15 @@
 package org.graylog.storage.elasticsearch7.testing;
 
 import org.graylog.testing.completebackend.SearchServerBuilder;
-import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.storage.SearchVersion;
 
-public class OpenSearch13InstanceBuilder  extends SearchServerBuilder {
+public class OpenSearch13InstanceBuilder extends SearchServerBuilder<OpenSearch13Instance> {
     public OpenSearch13InstanceBuilder(SearchVersion version) {
         super(version);
     }
 
     @Override
-    protected SearchServerInstance instantiate() {
-        return new OpenSearch13Instance(getVersion(), getHostname(), getNetwork(), getHeapSize(), getFeatureFlags()).init();
+    protected OpenSearch13Instance instantiate() {
+        return new OpenSearch13Instance(getVersion(), getHostname(), getNetwork(), getHeapSize(), getFeatureFlags(), getEnv()).init();
     }
 }

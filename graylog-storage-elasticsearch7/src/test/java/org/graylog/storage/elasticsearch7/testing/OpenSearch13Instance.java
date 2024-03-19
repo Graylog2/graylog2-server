@@ -40,6 +40,7 @@ import org.testcontainers.utility.DockerImageName;
 import java.net.URI;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import static java.util.Objects.isNull;
 
@@ -55,8 +56,8 @@ public class OpenSearch13Instance extends TestableSearchServerInstance {
     private Adapters adapters;
     private List<String> featureFlags;
 
-    public OpenSearch13Instance(final SearchVersion version, final String hostname, final Network network, final String heapSize, final List<String> featureFlags) {
-        super(version, hostname, network, heapSize);
+    public OpenSearch13Instance(final SearchVersion version, final String hostname, final Network network, final String heapSize, final List<String> featureFlags, Map<String, String> env) {
+        super(version, hostname, network, heapSize, env);
         this.featureFlags = featureFlags;
     }
 

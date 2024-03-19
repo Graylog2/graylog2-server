@@ -30,6 +30,6 @@ public class Elasticsearch7InstanceBuilder  extends SearchServerBuilder<Elastics
 
     @Override
     protected ElasticsearchInstanceES7 instantiate() {
-        return new ElasticsearchInstanceES7(getVersion(), getHostname(), getNetwork(), getHeapSize(), getFeatureFlags()).init();
+        return new ElasticsearchInstanceES7(getVersion(), getHostname(), getNetwork(), getHeapSize(), getFeatureFlags(), getEnv()).init();
     }
 }
