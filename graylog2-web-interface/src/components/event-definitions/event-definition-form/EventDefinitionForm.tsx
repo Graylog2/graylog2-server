@@ -15,9 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type { SyntheticEvent } from 'react';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
-import last from 'lodash/last';
 import defaultTo from 'lodash/defaultTo';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import styled from 'styled-components';
@@ -28,14 +27,13 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import { Col, Row } from 'components/bootstrap';
 import { Wizard } from 'components/common';
 import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
-import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
+import type { EventDefinition, EventDefinitionFormControlsProps } from 'components/event-definitions/event-definitions-types';
 import type User from 'logic/users/User';
-import useQuery from 'routing/useQuery';
 import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import EventDefinitionFormButtons from 'components/event-definitions/event-definition-form/EventDefinitionFormButtons';
+import EventDefinitionFormControls from 'components/event-definitions/event-definition-form/EventDefinitionFormControls';
 
 import EventDetailsForm from './EventDetailsForm';
 import EventConditionForm from './EventConditionForm';
@@ -43,7 +41,7 @@ import FieldsForm from './FieldsForm';
 import NotificationsForm from './NotificationsForm';
 import EventDefinitionSummary from './EventDefinitionSummary';
 
-const STEP_KEYS = ['event-details', 'condition', 'fields', 'notifications', 'summary'];
+export const STEP_KEYS = ['event-details', 'condition', 'fields', 'notifications', 'summary'];
 const STEP_TELEMETRY_KEYS = [
   TELEMETRY_EVENT_TYPE.EVENTDEFINITION_DETAILS.STEP_CLICKED,
   TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.STEP_CLICKED,
@@ -65,6 +63,8 @@ const WizardContainer = styled.div`
 `;
 
 type Props = {
+  activeStep: string,
+  setActiveStep: React.Dispatch<React.SetStateAction<string>>
   action: 'edit' | 'create',
   eventDefinition: EventDefinition,
   currentUser: User,
@@ -81,23 +81,25 @@ type Props = {
   onCancel: () => void,
   onSubmit: () => void
   canEdit: boolean,
+  formControls?: React.ComponentType<EventDefinitionFormControlsProps>
 }
 
 const EventDefinitionForm = ({
   action,
-  eventDefinition,
-  currentUser,
-  validation,
-  entityTypes,
-  notifications,
-  defaults,
-  onChange,
-  onCancel,
-  onSubmit,
+  activeStep,
   canEdit,
+  currentUser,
+  defaults,
+  entityTypes,
+  eventDefinition,
+  formControls: FormControls,
+  notifications,
+  onCancel,
+  onChange,
+  onSubmit,
+  setActiveStep,
+  validation,
 }: Props) => {
-  const { step } = useQuery();
-  const [activeStep, setActiveStep] = useState(step as string || STEP_KEYS[0]);
   const history = useHistory();
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
@@ -117,9 +119,7 @@ const EventDefinitionForm = ({
       event.preventDefault();
     }
 
-    if (activeStep === last(STEP_KEYS)) {
-      onSubmit();
-    }
+    onSubmit();
   };
 
   const defaultStepProps = {
@@ -194,13 +194,13 @@ const EventDefinitionForm = ({
                   containerClassName=""
                   hidePreviousNextButtons />
         </WizardContainer>
-        <EventDefinitionFormButtons activeStep={activeStep}
-                                    setActiveStep={setActiveStep}
-                                    action={action}
-                                    steps={steps}
-                                    stepKeys={STEP_KEYS}
-                                    onSubmit={handleSubmit}
-                                    onCancel={onCancel} />
+        <FormControls activeStep={activeStep}
+                      setActiveStep={setActiveStep}
+                      action={action}
+                      steps={steps}
+                      stepKeys={STEP_KEYS}
+                      onSubmit={handleSubmit}
+                      onCancel={onCancel} />
       </Col>
     </Row>
   );
@@ -221,6 +221,7 @@ EventDefinitionForm.propTypes = {
 
 EventDefinitionForm.defaultProps = {
   action: 'edit',
+  formControls: EventDefinitionFormControls,
 };
 
 export default EventDefinitionForm;

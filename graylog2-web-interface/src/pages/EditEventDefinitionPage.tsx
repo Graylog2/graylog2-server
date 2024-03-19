@@ -14,8 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useCallback } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
 import { Col, Row } from 'components/bootstrap';
@@ -36,6 +36,11 @@ const EditEventDefinitionPage = () => {
   const currentUser = useCurrentUser();
   const [eventDefinition, setEventDefinition] = React.useState<EventDefinition>(undefined);
   const history = useHistory();
+  const navigate = useNavigate();
+
+  const goToOverview = useCallback(() => {
+    navigate(Routes.ALERTS.DEFINITIONS.LIST);
+  }, [navigate]);
 
   React.useEffect(() => {
     if (isPermitted(currentUser.permissions, `eventdefinitions:edit:${params.definitionId}`)) {
@@ -101,7 +106,10 @@ const EditEventDefinitionPage = () => {
       </PageHeader>
       <Row className="content">
         <Col md={12}>
-          <EventDefinitionFormContainer action="edit" eventDefinition={eventDefinition} />
+          <EventDefinitionFormContainer action="edit"
+                                        eventDefinition={eventDefinition}
+                                        onSubmit={goToOverview}
+                                        onCancel={goToOverview} />
         </Col>
       </Row>
     </DocumentTitle>

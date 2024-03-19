@@ -15,7 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+import type React from 'react';
+import { type SyntheticEvent } from 'react';
+
 import type { ParameterJson } from 'views/logic/parameters/Parameter';
+import type { Steps } from 'components/common/Wizard';
 
 type Provider = {
   type: string,
@@ -97,30 +101,13 @@ export type EventDefinition = {
   matched_at?: string,
   scheduler?: Scheduler,
 }
-// export type EventDefinition = {
-//   id: string,
-//   config?: {
-//     type: string,
-//     execute_every_ms?: number,
-//     search_within_ms?: number,
-//     event_limit?: number,
-//     sigma_rule_id?: string,
-//     streams?: Array<string>
-//     filters?: Array<SearchFilter>,
-//   },
-//   title: string,
-//   description?: string,
-//   matched_at?: string,
-//   priority?: number,
-//   key_spec?: Array<string>
-//   field_spec?: FieldSpec,
-//   notification_settings?: {
-//     backlog_size: number,
-//     grace_period_ms: number,
-//   }
-//   notifications?: Array<Notification>,
-//   _scope?: string,
-//   scheduler?: Scheduler,
-//   state?: 'ENABLED' | 'DISABLED',
-//   remediation_steps?: string,
-// };
+
+export type EventDefinitionFormControlsProps = {
+  activeStep: string,
+  setActiveStep: React.Dispatch<React.SetStateAction<string>>
+  onSubmit: (event: SyntheticEvent) => void,
+  onCancel: () => void,
+  stepKeys: Array<string>
+  action: 'edit' | 'create',
+  steps: Steps
+}

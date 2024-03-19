@@ -16,11 +16,9 @@
  */
 import React, { useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { useNavigate } from 'react-router-dom';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import cloneDeep from 'lodash/cloneDeep';
 
-import Routes from 'routing/Routes';
 import { useStore } from 'stores/connect';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import { ConfirmLeaveDialog, Spinner } from 'components/common';
@@ -29,7 +27,7 @@ import { ConfigurationsActions } from 'stores/configurations/ConfigurationsStore
 import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
 import { EventNotificationsActions, EventNotificationsStore } from 'stores/event-notifications/EventNotificationsStore';
 import 'components/event-notifications/event-notification-types';
-import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
+import type { EventDefinition, EventDefinitionFormControlsProps } from 'components/event-definitions/event-definitions-types';
 import useCurrentUser from 'hooks/useCurrentUser';
 import useEventDefinitionConfigFromLocalStorage from 'components/event-definitions/hooks/useEventDefinitionConfigFromLocalStorage';
 import { getPathnameWithoutId } from 'util/URLUtils';
@@ -37,8 +35,9 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useScopePermissions from 'hooks/useScopePermissions';
+import useQuery from 'routing/useQuery';
 
-import EventDefinitionForm from './EventDefinitionForm';
+import EventDefinitionForm, { STEP_KEYS } from './EventDefinitionForm';
 
 const fetchNotifications = () => {
   EventNotificationsActions.listAll();
@@ -47,7 +46,10 @@ const fetchNotifications = () => {
 type Props = {
   action: 'edit' | 'create',
   eventDefinition: EventDefinition,
+  formControls?: React.ComponentType<EventDefinitionFormControlsProps>,
   onEventDefinitionChange: (nextEventDefinition: EventDefinition) => void,
+  onSubmit?: () => void,
+  onCancel?: () => void
 }
 
 const getConditionPlugin = (edType): any => {
@@ -58,7 +60,16 @@ const getConditionPlugin = (edType): any => {
   return PluginStore.exports('eventDefinitionTypes').find((eventDefinitionType) => eventDefinitionType.type === edType) || {};
 };
 
-const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinitionInitial, onEventDefinitionChange }: Props) => {
+const EventDefinitionFormContainer = ({
+  action,
+  eventDefinition: eventDefinitionInitial,
+  onEventDefinitionChange,
+  formControls,
+  onSubmit,
+  onCancel,
+}: Props) => {
+  const { step } = useQuery();
+  const [activeStep, setActiveStep] = useState(step as string || STEP_KEYS[0]);
   const [eventDefinition, setEventDefinition] = useState(eventDefinitionInitial);
   const [validation, setValidation] = useState({ errors: {} });
   const [eventsClusterConfig, setEventsClusterConfig] = useState(undefined);
@@ -69,7 +80,6 @@ const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinition
   const entityTypes = useStore(AvailableEventDefinitionTypesStore);
   const notifications = useStore(EventNotificationsStore);
   const currentUser = useCurrentUser();
-  const navigate = useNavigate();
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
 
@@ -111,7 +121,13 @@ const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinition
 
   const handleSubmitSuccessResponse = () => {
     setIsDirty(false);
-    navigate(Routes.ALERTS.DEFINITIONS.LIST);
+
+    onSubmit();
+  };
+
+  const showValidationErrors = (errors: { errors: unknown }) => {
+    setValidation(errors);
+    setActiveStep(STEP_KEYS[STEP_KEYS.length - 1]);
   };
 
   const handleSubmitFailureResponse = (errorResponse) => {
@@ -119,7 +135,7 @@ const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinition
 
     if (errorResponse.status === 400) {
       if (body && body.failed) {
-        setValidation(body);
+        showValidationErrors(body);
 
         return;
       }
@@ -128,7 +144,7 @@ const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinition
         if (body.message.includes('org.graylog.events.conditions.Expression')
           || body.message.includes('org.graylog.events.conditions.Expr')
           || body.message.includes('org.graylog.events.processor.aggregation.AggregationSeries')) {
-          setValidation({
+          showValidationErrors({
             errors: { conditions: ['Aggregation condition is not valid'] },
           });
 
@@ -136,7 +152,7 @@ const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinition
         }
 
         if (body.message.includes('embryonic')) {
-          setValidation({
+          showValidationErrors({
             errors: { query_parameters: ['Query parameters must be declared'] },
           });
         }
@@ -173,7 +189,7 @@ const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinition
       app_action_value: 'cancel-button',
     });
 
-    navigate(Routes.ALERTS.DEFINITIONS.LIST);
+    onCancel();
   };
 
   if (isLoading || loadingScopePermissions) {
@@ -186,16 +202,19 @@ const EventDefinitionFormContainer = ({ action, eventDefinition: eventDefinition
         <ConfirmLeaveDialog question="Do you really want to abandon this page and lose your changes? This action cannot be undone." />
       )}
       <EventDefinitionForm action={action}
-                           eventDefinition={eventDefinition}
+                           canEdit={scopePermissions.is_mutable}
                            currentUser={currentUser}
-                           validation={validation}
-                           entityTypes={entityTypes}
-                           notifications={notifications.all}
                            defaults={defaults}
-                           onChange={handleChange}
+                           activeStep={activeStep}
+                           setActiveStep={setActiveStep}
+                           entityTypes={entityTypes}
+                           eventDefinition={eventDefinition}
+                           formControls={formControls}
+                           notifications={notifications.all}
                            onCancel={handleCancel}
+                           onChange={handleChange}
                            onSubmit={handleSubmit}
-                           canEdit={scopePermissions.is_mutable} />
+                           validation={validation} />
     </>
   );
 };
@@ -223,6 +242,9 @@ EventDefinitionFormContainer.defaultProps = {
     notifications: [],
     alert: false,
   },
+  formControls: undefined,
+  onCancel: undefined,
+  onSubmit: undefined,
   onEventDefinitionChange: () => {},
 };
 
