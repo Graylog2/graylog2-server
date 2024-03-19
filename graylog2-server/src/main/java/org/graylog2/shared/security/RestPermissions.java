@@ -174,7 +174,7 @@ public class RestPermissions implements PluginPermissions {
     public static final String DATANODE_MIGRATION = "datanode:migration";
 
     public static final String DATANODE_OPENSEARCH_PROXY = "datanode:opensearchproxy";
-    public static final String DATANODE_REST_PROXY = "datanode:opensearchproxy";
+    public static final String DATANODE_REST_PROXY = "datanode:restproxy";
 
     // This is a special permission that ONLY works with GRNs as ID/target
     // TODO does this belong here?
