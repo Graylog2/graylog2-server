@@ -25,6 +25,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
 import org.graylog.shaded.opensearch2.org.opensearch.client.ResponseException;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestClient;
+import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.indexer.datanode.ProxyRequestAdapter;
 import org.graylog2.rest.resources.datanodes.DatanodeResolver;
@@ -50,9 +51,9 @@ public class ProxyRequestAdapterOS2 implements ProxyRequestAdapter {
         final var req = new Request(request.method(), request.path());
         req.setEntity(new InputStreamEntity(request.body(), ContentType.APPLICATION_JSON));
         try (
-                RestClient restClient = buildClient(request)
+                RestHighLevelClient restClient = buildClient(request)
         ) {
-            final var osResponse = restClient.performRequest(req);
+            final var osResponse = restClient.getLowLevelClient().performRequest(req);
             return new ProxyResponse(osResponse.getStatusLine().getStatusCode(), osResponse.getEntity().getContent(), osResponse.getEntity().getContentType().getValue());
         } catch (OpenSearchException openSearchException) {
             final var cause = openSearchException.getCause();
@@ -70,7 +71,7 @@ public class ProxyRequestAdapterOS2 implements ProxyRequestAdapter {
         return new ProxyResponse(status, response.getEntity().getContent(), response.getEntity().getContentType().getValue());
     }
 
-    private RestClient buildClient(ProxyRequest request) {
+    private RestHighLevelClient buildClient(ProxyRequest request) {
         final URI opensearchAddress = datanodeResolver.findByHostname(request.hostname()).map(DataNodeDto::getTransportAddress)
                 .filter(StringUtils::isNotBlank)
                 .map(URI::create)

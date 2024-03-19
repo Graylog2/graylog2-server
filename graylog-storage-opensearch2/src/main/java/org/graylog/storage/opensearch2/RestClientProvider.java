@@ -24,6 +24,7 @@ import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
 import org.graylog.shaded.opensearch2.org.apache.http.HttpRequestInterceptor;
 import org.graylog.shaded.opensearch2.org.apache.http.client.CredentialsProvider;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestClient;
+import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog.shaded.opensearch2.org.opensearch.client.sniff.OpenSearchNodesSniffer;
 import org.graylog2.configuration.ElasticsearchClientConfiguration;
 import org.graylog2.configuration.IndexerHosts;
@@ -40,8 +41,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 @Singleton
-public class RestClientProvider implements Provider<RestClient> {
-    private final Supplier<RestClient> clientSupplier;
+public class RestClientProvider implements Provider<RestHighLevelClient> {
+    private final Supplier<RestHighLevelClient> clientSupplier;
     private final GracefulShutdownService shutdownService;
     private final ElasticsearchClientConfiguration configuration;
     private final CredentialsProvider credentialsProvider;
@@ -69,8 +70,8 @@ public class RestClientProvider implements Provider<RestClient> {
 
 
     @NotNull
-    private RestClient createClient(List<URI> hosts) {
-        final RestClient client = buildBasicRestClient(hosts);
+    private RestHighLevelClient createClient(List<URI> hosts) {
+        final RestHighLevelClient client = buildBasicRestClient(hosts);
 
         var sniffer = SnifferWrapper.create(
                 client,
@@ -100,11 +101,11 @@ public class RestClientProvider implements Provider<RestClient> {
     }
 
     @Override
-    public RestClient get() {
+    public RestHighLevelClient get() {
         return this.clientSupplier.get();
     }
 
-    public RestClient buildBasicRestClient(List<URI> hosts) {
+    public RestHighLevelClient buildBasicRestClient(List<URI> hosts) {
         boolean isJwtAuthentication = runsWithDataNode || configuration.indexerUseJwtAuthentication();
         final HttpHost[] esHosts = hosts.stream().map(uri -> new HttpHost(uri.getHost(), uri.getPort(), uri.getScheme())).toArray(HttpHost[]::new);
         final var restClientBuilder = RestClient.builder(esHosts)
@@ -142,6 +143,6 @@ public class RestClientProvider implements Provider<RestClient> {
                 })
                 .setChunkedEnabled(configuration.compressionEnabled());
 
-        return restClientBuilder.build();
+        return new RestHighLevelClient(restClientBuilder);
     }
 }
