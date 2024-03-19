@@ -106,17 +106,15 @@ const RuleBlockForm = ({
       selectedBlockDict.params.forEach((param: BlockFieldDict) => {
         const initialBlockValue = existingBlock?.function === selectedBlockDict.name ? existingBlock?.params[param.name] : undefined;
 
-        if (!initialBlockValue) {
-          if (param.type === RuleBuilderTypes.Boolean && !initialBlockValue) {
-            newInitialValues[param.name] = false;
-          } else {
-            newInitialValues[param.name] = undefined;
-          }
-        } else {
+        if (
+          initialBlockValue
+          || ((param.type === RuleBuilderTypes.Boolean) && (typeof initialBlockValue === 'boolean'))
+        ) {
           newInitialValues[param.name] = initialBlockValue;
+        } else {
+          newInitialValues[param.name] = param.default_value;
         }
-      },
-      );
+      });
     }
 
     setInitialValues(newInitialValues);

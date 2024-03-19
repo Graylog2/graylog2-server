@@ -30,7 +30,7 @@
 
     <groupId>org.graylog</groupId>
     <artifactId>graylog-parent</artifactId>
-    <version>6.0.0-SNAPSHOT</version>
+    <version>6.0.0-beta.2</version>
     <packaging>pom</packaging>
 
     <name>Graylog Parent POM</name>
@@ -100,7 +100,7 @@
         <auto-value-javabean.version>2.5.2</auto-value-javabean.version>
         <aws-java-sdk-1.version>1.12.675</aws-java-sdk-1.version>
         <aws-java-sdk-2.version>2.25.6</aws-java-sdk-2.version>
-        <aws-kinesis-client.version>2.2.10</aws-kinesis-client.version>
+        <aws-kinesis-client.version>2.5.6</aws-kinesis-client.version>
         <aws-msk-iam-auth.version>2.0.3</aws-msk-iam-auth.version>
         <bouncycastle.version>1.77</bouncycastle.version>
         <byte-buddy.version>1.14.12</byte-buddy.version>
@@ -175,7 +175,7 @@
         <swagger.version>1.6.13</swagger.version>
         <syslog4j.version>0.9.61</syslog4j.version>
         <ulid.version>8.3.0</ulid.version>
-        <unboundid-ldap.version>6.0.11</unboundid-ldap.version>
+        <unboundid-ldap.version>7.0.0</unboundid-ldap.version>
         <uuid.version>3.2.1</uuid.version>
         <validation-api.version>3.0.2</validation-api.version>
         <zstd.version>1.5.5-11</zstd.version>
@@ -188,7 +188,7 @@
         <apacheds-server.version>2.0.0-M24</apacheds-server.version>
         <assertj-core.version>3.25.3</assertj-core.version>
         <assertj-joda-time.version>2.2.0</assertj-joda-time.version>
-        <awaitility.version>4.2.0</awaitility.version>
+        <awaitility.version>4.2.1</awaitility.version>
         <equalsverifier.version>3.15.8</equalsverifier.version>
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.2</junit.version>
@@ -675,7 +675,6 @@
                                         <exclude>software.amazon.awssdk:bundle</exclude>
                                         <!-- Ban some javax dependencies after the move to jakarta -->
                                         <exclude>javax.inject:*</exclude>
-                                        <exclude>javax.validation:*</exclude>
                                         <exclude>javax.ws.rs:javax.*</exclude>
                                         <exclude>com.fasterxml.jackson.jaxrs:*</exclude>
                                     </excludes>
@@ -843,6 +842,9 @@
                             javax.annotation.PreDestroy
                             javax.annotation.Priority
                             javax.annotation.PostConstruct
+
+                            @defaultMessage Use jakarta.validation.
+                            javax.validation.**
                         ]]>
 
                     </signatures>

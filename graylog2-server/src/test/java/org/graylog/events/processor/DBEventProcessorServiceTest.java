@@ -48,6 +48,7 @@ import static org.mockito.Mockito.mock;
 
 public class DBEventProcessorServiceTest {
     public static final Set<EntityScope> ENTITY_SCOPES = Collections.singleton(new DefaultEntityScope());
+    private static final String REMEDIATION_STEPS = "Remediation steps";
     @Rule
     public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
@@ -101,6 +102,7 @@ public class DBEventProcessorServiceTest {
         final EventDefinitionDto newDto = EventDefinitionDto.builder()
                 .title("Test")
                 .description("A test event definition")
+                .remediationSteps(REMEDIATION_STEPS)
                 .config(TestEventProcessorConfig.builder()
                         .message("This is a test event processor")
                         .searchWithinMs(1000)
@@ -118,6 +120,7 @@ public class DBEventProcessorServiceTest {
         assertThat(dto.id()).isNotBlank();
         assertThat(dto.title()).isEqualTo("Test");
         assertThat(dto.description()).isEqualTo("A test event definition");
+        assertThat(dto.remediationSteps()).isEqualTo(REMEDIATION_STEPS);
         assertThat(dto.priority()).isEqualTo(3);
         assertThat(dto.keySpec()).isEqualTo(ImmutableList.of("a", "b"));
         assertThat(dto.fieldSpec()).isEmpty();

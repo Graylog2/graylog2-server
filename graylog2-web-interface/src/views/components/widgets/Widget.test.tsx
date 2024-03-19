@@ -29,6 +29,7 @@ import { duplicateWidget, updateWidgetConfig, updateWidget } from 'views/logic/s
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import { usePlugin } from 'views/test/testPlugins';
+import SearchExplainContext from 'views/components/contexts/SearchExplainContext';
 
 import Widget from './Widget';
 import type { Props as WidgetComponentProps } from './Widget';
@@ -41,6 +42,28 @@ import FieldTypesContext from '../contexts/FieldTypesContext';
 jest.mock('../searchbar/queryinput/QueryInput');
 jest.mock('./WidgetHeader', () => 'widget-header');
 jest.mock('./WidgetColorContext', () => ({ children }) => children);
+
+const searchExplainContext = (searchedIndexRanges = [
+  {
+    index_name: 'aloho_1017',
+    begin: 1709716042283,
+    end: 1709716342274,
+    is_warm_tiered: false,
+  },
+  {
+    index_name: 'aloho_1018',
+    begin: 0,
+    end: 0,
+    is_warm_tiered: false,
+  },
+],
+) => ({
+  explainedSearch: undefined,
+  getExplainForWidget: () => ({
+    query_string: 'foo',
+    searched_index_ranges: searchedIndexRanges,
+  }),
+});
 
 jest.mock('views/components/useWidgetResults');
 
@@ -100,11 +123,18 @@ describe('<Widget />', () => {
     setWidgetEditing?: WidgetFocusContextType['setWidgetEditing'],
     unsetWidgetFocusing?: WidgetFocusContextType['unsetWidgetFocusing'],
     unsetWidgetEditing?: WidgetFocusContextType['unsetWidgetEditing'],
+    searchedIndices?: Array<{
+      index_name: string,
+      begin: number,
+      end: number,
+      is_warm_tiered: boolean
+    }>,
   }
 
   const DummyWidget = ({
     widget: propsWidget = widget,
     focusedWidget = undefined,
+    searchedIndices = undefined,
     setWidgetFocusing = () => {},
     setWidgetEditing = () => {},
     unsetWidgetFocusing = () => {},
@@ -112,19 +142,21 @@ describe('<Widget />', () => {
     ...props
   }: DummyWidgetProps) => (
     <TestStoreProvider>
-      <FieldTypesContext.Provider value={fieldTypes}>
-        {}
-        <WidgetFocusContext.Provider value={{ focusedWidget, setWidgetFocusing, setWidgetEditing, unsetWidgetFocusing, unsetWidgetEditing }}>
-          <WidgetContext.Provider value={propsWidget}>
-            <Widget widget={propsWidget}
-                    id="widgetId"
-                    onPositionsChange={() => {}}
-                    title="Widget Title"
-                    position={new WidgetPosition(1, 1, 1, 1)}
-                    {...props} />
-          </WidgetContext.Provider>
-        </WidgetFocusContext.Provider>
-      </FieldTypesContext.Provider>
+      <SearchExplainContext.Provider value={searchExplainContext(searchedIndices)}>
+        <FieldTypesContext.Provider value={fieldTypes}>
+          {}
+          <WidgetFocusContext.Provider value={{ focusedWidget, setWidgetFocusing, setWidgetEditing, unsetWidgetFocusing, unsetWidgetEditing }}>
+            <WidgetContext.Provider value={propsWidget}>
+              <Widget widget={propsWidget}
+                      id="widgetId"
+                      onPositionsChange={() => {}}
+                      title="Widget Title"
+                      position={new WidgetPosition(1, 1, 1, 1)}
+                      {...props} />
+            </WidgetContext.Provider>
+          </WidgetFocusContext.Provider>
+        </FieldTypesContext.Provider>
+      </SearchExplainContext.Provider>
     </TestStoreProvider>
   );
 
@@ -341,5 +373,31 @@ describe('<Widget />', () => {
     await waitFor(() => expect(updateWidgetButton).not.toBeDisabled());
 
     expect(updateWidget).not.toHaveBeenCalledWith('widgetId', { config: { foo: 42 }, id: 'widgetId', type: 'dummy' });
+  });
+
+  it('shows an info when the widget accesses the Warm Tier', async () => {
+    render(<DummyWidget searchedIndices={
+[
+  {
+    index_name: 'aloho_warm_1016',
+    begin: 1709715731270,
+    end: 1709716042255,
+    is_warm_tiered: true,
+  },
+  {
+    index_name: 'aloho_1017',
+    begin: 1709716042283,
+    end: 1709716342274,
+    is_warm_tiered: false,
+  },
+  {
+    index_name: 'aloho_1018',
+    begin: 0,
+    end: 0,
+    is_warm_tiered: false,
+  }]
+    } />);
+
+    await screen.findByText('This widget is retrieving data from the Warm Tier and may take longer to load.');
   });
 });

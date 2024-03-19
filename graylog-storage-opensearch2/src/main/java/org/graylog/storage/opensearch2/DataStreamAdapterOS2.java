@@ -18,6 +18,7 @@ package org.graylog.storage.opensearch2;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
+import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchException;
 import org.graylog.shaded.opensearch2.org.opensearch.action.support.master.AcknowledgedResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CreateDataStreamRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.DeleteComposableIndexTemplateRequest;
@@ -34,6 +35,7 @@ import org.graylog2.indexer.datastream.DataStreamAdapter;
 import org.graylog2.indexer.datastream.Policy;
 import org.graylog2.indexer.datastream.policy.IsmPolicy;
 import org.graylog2.indexer.indices.Template;
+import org.opensearch.client.ResponseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,12 +93,15 @@ public class DataStreamAdapterOS2 implements DataStreamAdapter {
     @Override
     public void createDataStream(@Nonnull String dataStreamName) {
         CreateDataStreamRequest createDataStreamRequest = new CreateDataStreamRequest(dataStreamName);
-        final GetDataStreamResponse dataStream;
         try {
-            client.execute((c, requestOptions) ->
-                    c.indices().getDataStream(new GetDataStreamRequest(dataStreamName), requestOptions));
-        } catch (IndexNotFoundException e) {
             client.execute((c, requestOptions) -> c.indices().createDataStream(createDataStreamRequest, requestOptions));
+        } catch (OpenSearchException e) {
+            if (e.getDetailedMessage().contains("resource_already_exists_exception")) {
+                // this is expected, ignore the exception
+                log.debug("Data stream {} already exists, won't be created again", createDataStreamRequest.getName());
+            } else {
+                throw e;
+            }
         }
     }
 

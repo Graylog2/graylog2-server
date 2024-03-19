@@ -22,7 +22,7 @@ import styled, { css } from 'styled-components';
 
 import { Link, LinkContainer } from 'components/common/router';
 import { OverlayTrigger, EmptyEntity, NoSearchResult, NoEntitiesExist, IfPermitted, PaginatedList, Timestamp, Icon } from 'components/common';
-import { Col, Label, Row, Table, Button } from 'components/bootstrap';
+import { Col, Row, Table, Button } from 'components/bootstrap';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 import Routes from 'routing/Routes';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
@@ -30,6 +30,7 @@ import { isPermitted } from 'util/PermissionsMixin';
 
 import EventsSearchBar from './EventsSearchBar';
 import EventDetails from './EventDetails';
+import EventTypeLabel from './EventTypeLabel';
 
 const HEADERS = ['Description', 'Key', 'Type', 'Event Definition', 'Timestamp'];
 
@@ -92,7 +93,6 @@ export const EVENTS_MAX_OFFSET_LIMIT = 10000;
 
 const priorityFormatter = (eventId, priority) => {
   const priorityName = capitalize(EventDefinitionPriorityEnum.properties[priority].name);
-  let icon;
   let style;
 
   switch (priority) {
@@ -192,7 +192,7 @@ class Events extends React.Component {
             {event.message}
           </td>
           <td>{event.key || <em>none</em>}</td>
-          <td>{event.alert ? <Label bsStyle="warning">Alert</Label> : <Label bsStyle="info">Event</Label>}</td>
+          <td><EventTypeLabel isAlert={event.alert} /></td>
           <td>
             {this.renderLinkToEventDefinition(event, eventDefinitionContext)}
           </td>

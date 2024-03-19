@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.graylog.plugins</groupId>
         <artifactId>graylog-plugin-parent</artifactId>
-        <version>6.0.0-SNAPSHOT</version>
+        <version>6.0.0-beta.2</version>
         <relativePath>../graylog-plugin-parent</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -210,7 +210,8 @@
                     <descriptors>assembly.xml</descriptors>
                     <archive>
                         <manifestEntries>
-                            <Graylog-Plugin-Properties-Path>${project.groupId}.${project.artifactId}</Graylog-Plugin-Properties-Path>
+                            <Graylog-Plugin-Properties-Path>${project.groupId}.${project.artifactId}
+                            </Graylog-Plugin-Properties-Path>
                         </manifestEntries>
                     </archive>
                 </configuration>
