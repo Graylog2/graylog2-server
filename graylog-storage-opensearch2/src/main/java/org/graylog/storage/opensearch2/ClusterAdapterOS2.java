@@ -311,7 +311,6 @@ public class ClusterAdapterOS2 implements ClusterAdapter {
         return NodeInfo.builder()
                 .version(nodeInfo.version())
                 .os(nodeInfo.os())
-                .allocatedProcessors(nodeInfo.os().allocatedProcessors())
                 .roles(nodeInfo.roles().stream().map(Enum::toString).toList())
                 .jvmMemHeapMaxInBytes(nodeInfo.jvm().mem().heapMaxInBytes())
                 .build();

@@ -16,30 +16,10 @@
             <useTransitiveDependencies>true</useTransitiveDependencies>
             <useStrictFiltering>true</useStrictFiltering>
             <includes>
-                <include>org.opensearch.client:opensearch-java</include>
-            </includes>
-            <unpackOptions>
-                <excludes>
-                    <!-- exclude NodeInfoAction since it was monkey-patched in
-                        https://github.com/Graylog2/graylog2-server/pull/18658 .
-                        Should be removed after the bug has been fixed and the patch removed. -->
-                    <exclude>org/opensearch/client/opensearch/nodes/info/NodeInfoAction.class</exclude>
-                    <exclude>org/opensearch/client/opensearch/nodes/info/NodeInfoBootstrap.class</exclude>
-                    <exclude>org/opensearch/client/opensearch/_types/NodeRole.class</exclude>
-                </excludes>
-            </unpackOptions>
-        </dependencySet>
-        <dependencySet>
-            <outputDirectory>/</outputDirectory>
-            <unpack>true</unpack>
-            <scope>runtime</scope>
-            <useProjectArtifact>true</useProjectArtifact>
-            <useTransitiveDependencies>true</useTransitiveDependencies>
-            <useStrictFiltering>true</useStrictFiltering>
-            <includes>
                 <include>org.graylog:graylog-storage-opensearch2</include>
                 <include>org.graylog.shaded:opensearch2-rest-high-level-client</include>
                 <include>org.graylog.shaded:opensearch2-rest-client-sniffer</include>
+                <include>org.opensearch.client:opensearch-java</include>
                 <include>org.opensearch.client:opensearch-rest-client</include>
                 <include>org.opensearch.client:opensearch-rest-client-sniffer</include>
                 <include>org.apache.httpcomponents:httpasyncclient</include>
