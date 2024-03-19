@@ -122,6 +122,10 @@ const StyledNav: React.ComponentType<any> = styled(Nav)<{$style?: 'stepper'}>(({
       > li {
         > a {
           color: initial;
+
+          &:hover  {
+            color: ${theme.colors.global.link};
+          }
         }
 
         &.active > a {
