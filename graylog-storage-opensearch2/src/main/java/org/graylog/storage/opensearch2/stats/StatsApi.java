@@ -19,9 +19,9 @@ package org.graylog.storage.opensearch2.stats;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
+import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
+import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
 import org.graylog.storage.opensearch2.OpenSearchClient;
-import org.opensearch.client.Request;
-import org.opensearch.client.Response;
 
 import jakarta.inject.Inject;
 
@@ -106,9 +106,9 @@ public class StatsApi {
 
         final Request request = new Request("GET", endpoint.toString());
         prepareRequest.accept(request);
-        return client.executeLowLevel((c, requestOptions) -> {
+        return client.execute((c, requestOptions) -> {
             request.setOptions(requestOptions);
-            final Response response = c.performRequest(request);
+            final Response response = c.getLowLevelClient().performRequest(request);
             return objectMapper.readTree(response.getEntity().getContent());
         }, "Unable to retrieve index stats for " + String.join(",", indices));
     }

@@ -30,21 +30,14 @@ import org.opensearch.client.transport.rest_client.RestClientTransport;
 @Singleton
 public class OpenSearchClientProvider implements Provider<OpenSearchClient> {
     private final RestClientTransport transport;
-    private final ObjectMapper objectMapper;
 
     @Inject
     public OpenSearchClientProvider(RestClient restClient, ObjectMapper objectMapper) {
         this.transport = new RestClientTransport(restClient, new JacksonJsonpMapper(objectMapper));
-        this.objectMapper = objectMapper;
     }
 
     @Override
     public OpenSearchClient get() {
-        return new OpenSearchClient(transport);
-    }
-
-    public OpenSearchClient get(RestClient restClient) {
-        final var transport = new RestClientTransport(restClient, new JacksonJsonpMapper(objectMapper));
         return new OpenSearchClient(transport);
     }
 

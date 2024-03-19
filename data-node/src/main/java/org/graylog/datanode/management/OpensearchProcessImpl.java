@@ -17,6 +17,7 @@
 package org.graylog.datanode.management;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.oxo42.stateless4j.StateMachine;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.http.client.utils.URIBuilder;
@@ -206,10 +207,9 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
                 (config -> {
                     commandLineProcess.start();
                     restClient = Optional.of(createRestClient(config));
-                    final var newRestClient = createNewRestClient(config);
-                    final var transport = new RestClientTransport(newRestClient, new JacksonJsonpMapper(objectMapper));
+                    final var transport = new RestClientTransport(createNewRestClient(config), new JacksonJsonpMapper(objectMapper));
                     final var client = new org.opensearch.client.opensearch.OpenSearchClient(transport);
-                    openSearchClient = restClient.map(c -> new OpenSearchClient(c, client, newRestClient, objectMapper));
+                    openSearchClient = restClient.map(c -> new OpenSearchClient(c, client, objectMapper));
                 }),
                 () -> {throw new IllegalArgumentException("Opensearch configuration required but not supplied!");}
         );
