@@ -35,9 +35,6 @@ import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.security.CustomCAX509TrustManager;
-import org.opensearch.client.RestClient;
-import org.opensearch.client.json.jackson.JacksonJsonpMapper;
-import org.opensearch.client.transport.rest_client.RestClientTransport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,10 +92,6 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
 
     private RestHighLevelClient createRestClient(OpensearchConfiguration configuration) {
         return OpensearchRestClient.build(configuration, datanodeConfiguration, trustManager);
-    }
-
-    private RestClient createNewRestClient(OpensearchConfiguration configuration) {
-        return OpensearchRestClient.buildNewClient(configuration, datanodeConfiguration, trustManager);
     }
 
     @Override
@@ -207,9 +200,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
                 (config -> {
                     commandLineProcess.start();
                     restClient = Optional.of(createRestClient(config));
-                    final var transport = new RestClientTransport(createNewRestClient(config), new JacksonJsonpMapper(objectMapper));
-                    final var client = new org.opensearch.client.opensearch.OpenSearchClient(transport);
-                    openSearchClient = restClient.map(c -> new OpenSearchClient(c, client, objectMapper));
+                    openSearchClient = restClient.map(c -> new OpenSearchClient(c, objectMapper));
                 }),
                 () -> {throw new IllegalArgumentException("Opensearch configuration required but not supplied!");}
         );

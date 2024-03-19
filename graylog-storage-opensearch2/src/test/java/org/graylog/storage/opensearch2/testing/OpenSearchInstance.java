@@ -38,8 +38,6 @@ import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.Composable
 import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.Template;
 import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
 import org.graylog.storage.opensearch2.OpenSearchClient;
-import org.graylog.storage.opensearch2.OpenSearchClientProvider;
-import org.graylog.storage.opensearch2.RestClientProvider;
 import org.graylog.storage.opensearch2.RestHighLevelClientProvider;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.elasticsearch.Adapters;
@@ -50,7 +48,6 @@ import org.graylog2.configuration.ElasticsearchClientConfiguration;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.system.shutdown.GracefulShutdownService;
-import org.opensearch.client.RestClient;
 import org.opensearch.testcontainers.OpensearchContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,10 +85,8 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
     @Override
     public OpenSearchInstance init() {
         super.init();
-        RestHighLevelClient restHighLevelClient = buildRestHighLevelClient();
-        final var objectMapper = new ObjectMapperProvider().get();
-        final var restClient = buildRestClient();
-        this.openSearchClient = new OpenSearchClient(restHighLevelClient, new OpenSearchClientProvider(restClient, objectMapper).get(), objectMapper);
+        RestHighLevelClient restHighLevelClient = buildRestClient();
+        this.openSearchClient = new OpenSearchClient(restHighLevelClient, new ObjectMapperProvider().get());
         this.client = new ClientOS2(this.openSearchClient, featureFlags);
         this.fixtureImporter = new FixtureImporterOS2(this.openSearchClient);
         adapters = new AdaptersOS2(openSearchClient);
@@ -204,7 +199,7 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
         return OPENSEARCH_VERSION;
     }
 
-    private RestHighLevelClient buildRestHighLevelClient() {
+    private RestHighLevelClient buildRestClient() {
         return new RestHighLevelClientProvider(
                 new GracefulShutdownService(),
                 ImmutableList.of(URI.create("http://" + this.getHttpHostAddress())),
