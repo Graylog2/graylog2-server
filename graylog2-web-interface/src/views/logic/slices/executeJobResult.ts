@@ -72,13 +72,13 @@ const getDelayTime = (depth: number = 1): number => {
 
 export const pollJob = (jobIds: JobIds, result: SearchJobType | null, depth: number = 1): Promise<SearchJobType> => new Promise((resolve) => {
   if (result?.execution?.done || result?.execution?.cancelled) {
-    return resolve(result);
+    resolve(result);
+  } else {
+    delay(getDelayTime(depth))
+      .then(() => {
+        resolve(runPollJob(jobIds).then((res) => pollJob(jobIds, res, depth + 1)));
+      });
   }
-
-  delay(getDelayTime(depth))
-    .then(() => {
-      resolve(runPollJob(jobIds).then((res) => pollJob(jobIds, res, depth + 1)));
-    });
 });
 
 export const executeJobResult = async ({ asyncSearchId, nodeId }: JobIds, view: View): Promise<SearchExecutionResult> => {
