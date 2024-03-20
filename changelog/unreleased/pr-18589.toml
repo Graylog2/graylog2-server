@@ -1,5 +1,5 @@
 type = "c"
 message = "Improve parameter description of pipeline function `csv_to_map`"
 
-pulls = [""]
+pulls = ["18707"]
 issues = ["18589"]
