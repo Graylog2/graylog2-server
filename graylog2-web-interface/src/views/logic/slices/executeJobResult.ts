@@ -72,7 +72,7 @@ const getDelayTime = (depth: number = 1): number => {
 
 export const pollJob = (jobIds: JobIds, result: SearchJobType | null, depth: number = 1): Promise<SearchJobType> => new Promise((resolve) => {
   if (result?.execution?.done || result?.execution?.cancelled) {
-    resolve(result);
+    return resolve(result);
   }
 
   delay(getDelayTime(depth))
