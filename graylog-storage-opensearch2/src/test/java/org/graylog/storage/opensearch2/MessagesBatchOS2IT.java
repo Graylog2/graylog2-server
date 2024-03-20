@@ -26,6 +26,10 @@ public class MessagesBatchOS2IT extends MessagesBatchIT {
     @Rule
     public final OpenSearchInstance openSearchInstance = OpenSearchInstanceBuilder.builder()
             .heapSize("256m")
+            // Disable the real memory circuit breaker because it has issues with JDK 21. Turning it off relaxes
+            // the limits in the circuit breaker and makes our test work correctly.
+            // See: https://github.com/opensearch-project/OpenSearch/issues/12694
+            //      https://opensearch.org/docs/latest/install-and-configure/configuring-opensearch/circuit-breaker/#parent-circuit-breaker-settings
             .env("indices.breaker.total.use_real_memory", "false")
             .build();
 
