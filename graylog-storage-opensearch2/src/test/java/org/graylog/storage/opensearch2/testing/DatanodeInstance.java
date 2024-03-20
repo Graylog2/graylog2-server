@@ -28,7 +28,6 @@ import org.testcontainers.utility.DockerImageName;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import static java.util.Objects.isNull;
 
@@ -39,16 +38,8 @@ public class DatanodeInstance extends OpenSearchInstance {
     private final String passwordSecret;
     private final String rootPasswordSha2;
 
-    public DatanodeInstance(final SearchVersion version,
-                            final String hostname,
-                            final Network network,
-                            final String mongoDBUri,
-                            final String passwordSecret,
-                            final String rootPasswordSha2,
-                            final String heapSize,
-                            final List<String> featureFlags,
-                            final Map<String, String> env) {
-        super(version, hostname, network, heapSize, featureFlags, env);
+    public DatanodeInstance(final SearchVersion version, final String hostname, final Network network, final String mongoDBUri, final String passwordSecret, final String rootPasswordSha2, final String heapSize, final List<String> featureFlags) {
+        super(version, hostname, network, heapSize, featureFlags);
         this.mongoDBUri = mongoDBUri;
         this.passwordSecret = passwordSecret;
         this.rootPasswordSha2 = rootPasswordSha2;

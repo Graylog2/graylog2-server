@@ -59,6 +59,10 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
     @Override
     public abstract FixtureImporter fixtureImporter();
 
+    protected TestableSearchServerInstance(final SearchVersion version, final String hostname, final Network network, final String heapSize) {
+        this(version, hostname, network, heapSize, Map.of());
+    }
+
     protected TestableSearchServerInstance(final SearchVersion version, final String hostname, final Network network, final String heapSize, Map<String, String> env) {
         this.version = version;
         this.heapSize = heapSize;

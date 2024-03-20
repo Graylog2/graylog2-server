@@ -80,6 +80,10 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
     private Adapters adapters;
     private final List<String> featureFlags;
 
+    public OpenSearchInstance(final SearchVersion version, final String hostname, final Network network, final String heapSize, final List<String> featureFlags) {
+        this(version, hostname, network, heapSize, featureFlags, Map.of());
+    }
+
     public OpenSearchInstance(final SearchVersion version, final String hostname, final Network network, final String heapSize, final List<String> featureFlags, Map<String, String> env) {
         super(version, hostname, network, heapSize, env);
         this.featureFlags = featureFlags;

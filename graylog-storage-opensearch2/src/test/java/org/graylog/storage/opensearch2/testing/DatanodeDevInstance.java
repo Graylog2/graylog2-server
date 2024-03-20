@@ -24,8 +24,8 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 
+import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
 
 public class DatanodeDevInstance extends OpenSearchInstance {
     private static final Logger LOG = LoggerFactory.getLogger(DatanodeDevInstance.class);
@@ -34,16 +34,8 @@ public class DatanodeDevInstance extends OpenSearchInstance {
     private final String passwordSecret;
     private final String rootPasswordSha2;
 
-    public DatanodeDevInstance(final SearchVersion version,
-                               final String hostname,
-                               final Network network,
-                               final String mongoDBUri,
-                               final String passwordSecret,
-                               final String rootPasswordSha2,
-                               final String heapSize,
-                               final List<String> featureFlags,
-                               final Map<String, String> env) {
-        super(version, hostname, network, heapSize, featureFlags, env);
+    public DatanodeDevInstance(final SearchVersion version, final String hostname, final Network network, final String mongoDBUri, final String passwordSecret, final String rootPasswordSha2, final String heapSize, final List<String> featureFlags) {
+        super(version, hostname, network, heapSize, featureFlags);
         this.mongoDBUri = mongoDBUri;
         this.passwordSecret = passwordSecret;
         this.rootPasswordSha2 = rootPasswordSha2;
