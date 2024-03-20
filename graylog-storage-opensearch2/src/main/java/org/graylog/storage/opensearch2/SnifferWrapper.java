@@ -17,25 +17,26 @@
 package org.graylog.storage.opensearch2;
 
 import com.github.joschi.jadconfig.util.Duration;
-import org.opensearch.client.Node;
-import org.opensearch.client.RestClient;
-import org.opensearch.client.sniff.OpenSearchNodesSniffer;
-import org.opensearch.client.sniff.Sniffer;
+import org.graylog.shaded.opensearch2.org.opensearch.client.Node;
+import org.graylog.shaded.opensearch2.org.opensearch.client.RestClient;
+import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
+import org.graylog.shaded.opensearch2.org.opensearch.client.sniff.OpenSearchNodesSniffer;
+import org.graylog.shaded.opensearch2.org.opensearch.client.sniff.Sniffer;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class SnifferWrapper implements org.opensearch.client.sniff.NodesSniffer {
+public class SnifferWrapper implements org.graylog.shaded.opensearch2.org.opensearch.client.sniff.NodesSniffer {
     private final List<NodesSniffer> sniffers = new CopyOnWriteArrayList();
-    private final RestClient restClient;
-    private final long sniffRequestTimeoutMillis;
-    private final Duration discoveryFrequency;
+    private final RestHighLevelClient restClient;
+    private final  long sniffRequestTimeoutMillis;
+    private final  Duration discoveryFrequency;
     private final OpenSearchNodesSniffer.Scheme scheme;
-    private org.opensearch.client.sniff.NodesSniffer nodesSniffer;
+    private org.graylog.shaded.opensearch2.org.opensearch.client.sniff.NodesSniffer nodesSniffer;
 
-    private SnifferWrapper(RestClient restClient, long sniffRequestTimeoutMillis, Duration discoveryFrequency, OpenSearchNodesSniffer.Scheme scheme) {
+    private SnifferWrapper(RestHighLevelClient restClient, long sniffRequestTimeoutMillis, Duration discoveryFrequency, OpenSearchNodesSniffer.Scheme scheme) {
         this.restClient = restClient;
         this.sniffRequestTimeoutMillis = sniffRequestTimeoutMillis;
         this.discoveryFrequency = discoveryFrequency;
@@ -51,17 +52,17 @@ public class SnifferWrapper implements org.opensearch.client.sniff.NodesSniffer 
         return nodes;
     }
 
-    public static SnifferWrapper create(RestClient restClient, long sniffRequestTimeoutMillis, Duration discoveryFrequency, OpenSearchNodesSniffer.Scheme scheme) {
+    public static SnifferWrapper create(RestHighLevelClient restClient, long sniffRequestTimeoutMillis, Duration discoveryFrequency, OpenSearchNodesSniffer.Scheme scheme) {
         return new SnifferWrapper(restClient, sniffRequestTimeoutMillis, discoveryFrequency, scheme);
     }
 
     public Optional<Sniffer> build() {
-        if (sniffers.isEmpty()) {
+        if(sniffers.isEmpty()) {
             return Optional.empty();
         }
 
-        this.nodesSniffer = new OpenSearchNodesSniffer(restClient, sniffRequestTimeoutMillis, scheme);
-        return Optional.of(Sniffer.builder(restClient)
+        this.nodesSniffer = new OpenSearchNodesSniffer(restClient.getLowLevelClient(), sniffRequestTimeoutMillis, scheme);
+        return Optional.of(Sniffer.builder(restClient.getLowLevelClient())
                 .setSniffIntervalMillis(Math.toIntExact(discoveryFrequency.toMilliseconds()))
                 .setNodesSniffer(this)
                 .build());

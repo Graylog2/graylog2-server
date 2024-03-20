@@ -22,15 +22,14 @@ import org.graylog.testing.completebackend.apis.Streams;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeAll;
 
 import javax.annotation.Nullable;
 import java.util.Set;
 
 import static io.restassured.RestAssured.given;
-import static java.net.HttpURLConnection.HTTP_OK;
 import static org.graylog.testing.completebackend.Lifecycle.CLASS;
+import static org.graylog.testing.completebackend.Lifecycle.VM;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
@@ -130,10 +129,8 @@ public class SuggestionResourceIT {
                 .body(SuggestionsRequest.create("facility", ""))
                 .post("/search/suggest")
                 .then()
-                .log().ifStatusCodeMatches(Matchers.not(HTTP_OK))
-                .statusCode(HTTP_OK)
-                .assertThat()
-                .log().ifValidationFails()
+                .statusCode(200)
+                .assertThat().log().ifValidationFails()
                 .body("suggestions.value[0]", equalTo("test"))
                 .body("suggestions.occurrence[0]", greaterThanOrEqualTo(3));
     }
@@ -146,8 +143,7 @@ public class SuggestionResourceIT {
                 .body(SuggestionsRequest.create("http_response_code", "20"))
                 .post("/search/suggest")
                 .then()
-                .log().ifStatusCodeMatches(Matchers.not(HTTP_OK))
-                .statusCode(HTTP_OK)
+                .statusCode(200)
                 .assertThat().log().ifValidationFails()
                 .body("suggestions.value[0]", equalTo("200"))
                 .body("suggestions.occurrence[0]", greaterThanOrEqualTo(2));
@@ -161,8 +157,7 @@ public class SuggestionResourceIT {
                 .body(SuggestionsRequest.create("streams", ""))
                 .post("/search/suggest")
                 .then()
-                .log().ifStatusCodeMatches(Matchers.not(HTTP_OK))
-                .statusCode(HTTP_OK)
+                .statusCode(200)
                 .assertThat().log().ifValidationFails()
                 .body("suggestions.title", hasItems("Default Stream", "Stream #1", "Stream #2"));
     }
@@ -175,8 +170,7 @@ public class SuggestionResourceIT {
                 .body(SuggestionsRequest.create("gl2_source_node", ""))
                 .post("/search/suggest")
                 .then()
-                .log().ifStatusCodeMatches(Matchers.not(HTTP_OK))
-                .statusCode(HTTP_OK)
+                .statusCode(200)
                 .assertThat().log().ifValidationFails()
                 .body("suggestions.title", not(empty()));
     }
@@ -189,8 +183,7 @@ public class SuggestionResourceIT {
                 .body(SuggestionsRequest.create("gl2_source_input", ""))
                 .post("/search/suggest")
                 .then()
-                .log().ifStatusCodeMatches(Matchers.not(HTTP_OK))
-                .statusCode(HTTP_OK)
+                .statusCode(200)
                 .assertThat().log().ifValidationFails()
                 .body("suggestions.title", hasItems("Integration test GELF input"));
     }
@@ -203,7 +196,7 @@ public class SuggestionResourceIT {
                 .body(SuggestionsRequest.create("source", "", Set.of(stream1Id)))
                 .post("/search/suggest")
                 .then()
-                .statusCode(HTTP_OK)
+                .statusCode(200)
                 .assertThat().log().ifValidationFails()
                 .body("suggestions.value[0]", equalTo("example.org"))
                 .body("suggestions.occurrence[0]", equalTo(3));
@@ -214,8 +207,7 @@ public class SuggestionResourceIT {
                 .body(SuggestionsRequest.create("source", "", Set.of(stream2Id)))
                 .post("/search/suggest")
                 .then()
-                .log().ifStatusCodeMatches(Matchers.not(HTTP_OK))
-                .statusCode(HTTP_OK)
+                .statusCode(200)
                 .assertThat().log().ifValidationFails()
                 .body("suggestions.value[0]", equalTo("foreign.org"))
                 .body("suggestions.occurrence[0]", equalTo(1));
@@ -229,8 +221,7 @@ public class SuggestionResourceIT {
                 .body(SuggestionsRequest.create("message", "foo"))
                 .post("/search/suggest")
                 .then()
-                .log().ifStatusCodeMatches(Matchers.not(HTTP_OK))
-                .statusCode(HTTP_OK)
+                .statusCode(200)
                 .assertThat().log().ifValidationFails()
                 // error types and messages are different for each ES version, so let's just check that there is an error in the response
                 .body("error", notNullValue());
@@ -244,8 +235,7 @@ public class SuggestionResourceIT {
                 .body(SuggestionsRequest.create("facility", "", 1))
                 .post("/search/suggest")
                 .then()
-                .log().ifStatusCodeMatches(Matchers.not(HTTP_OK))
-                .statusCode(HTTP_OK)
+                .statusCode(200)
                 .assertThat().log().ifValidationFails()
                 .body("suggestions.value[0]", equalTo("test"))
                 .body("suggestions.occurrence[0]", greaterThanOrEqualTo(2))
@@ -260,8 +250,7 @@ public class SuggestionResourceIT {
                 .body(SuggestionsRequest.create("facility", "tets"))
                 .post("/search/suggest")
                 .then()
-                .log().ifStatusCodeMatches(Matchers.not(HTTP_OK))
-                .statusCode(HTTP_OK)
+                .statusCode(200)
                 .assertThat().log().ifValidationFails()
                 .body("suggestions.value[0]", equalTo("test"))
                 .body("suggestions.occurrence[0]", greaterThanOrEqualTo(1));

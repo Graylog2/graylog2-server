@@ -44,6 +44,8 @@ import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerAdapter;
 import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.messages.ChunkedBulkIndexer;
 import org.graylog2.indexer.messages.MessagesAdapter;
+import org.graylog2.indexer.results.ResultMessageFactory;
+import org.graylog2.indexer.results.TestResultMessageFactory;
 import org.graylog2.indexer.searches.SearchesAdapter;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 
@@ -51,6 +53,7 @@ public class AdaptersOS2 implements Adapters {
 
     private final OpenSearchClient client;
     private final ObjectMapper objectMapper;
+    private final ResultMessageFactory resultMessageFactory = new TestResultMessageFactory();
 
     public AdaptersOS2(OpenSearchClient client) {
         this.client = client;
@@ -75,7 +78,7 @@ public class AdaptersOS2 implements Adapters {
 
     @Override
     public NodeAdapter nodeAdapter() {
-        return new NodeAdapterOS2(client);
+        return new NodeAdapterOS2(client, objectMapper);
     }
 
     @Override
@@ -86,7 +89,7 @@ public class AdaptersOS2 implements Adapters {
     @Override
     public SearchesAdapter searchesAdapter() {
         final ScrollResultOS2.Factory scrollResultFactory = (initialResult, query, scroll, fields, limit) -> new ScrollResultOS2(
-                client, initialResult, query, scroll, fields, limit
+                resultMessageFactory, client, initialResult, query, scroll, fields, limit
         );
         final SortOrderMapper sortOrderMapper = new SortOrderMapper();
         final boolean allowHighlighting = true;
@@ -97,12 +100,12 @@ public class AdaptersOS2 implements Adapters {
                 new Scroll(client,
                         scrollResultFactory,
                         searchRequestFactory),
-                searchRequestFactory);
+                searchRequestFactory, resultMessageFactory);
     }
 
     @Override
     public MessagesAdapter messagesAdapter() {
-        return new MessagesAdapterOS2(client, new MetricRegistry(), new ChunkedBulkIndexer(), objectMapper);
+        return new MessagesAdapterOS2(resultMessageFactory, client, new MetricRegistry(), new ChunkedBulkIndexer(), objectMapper);
     }
 
     @Override

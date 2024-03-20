@@ -121,6 +121,9 @@ public class OpensearchSecurityConfiguration {
             config.put("plugins.security.ssl.http.truststore_type", TRUSTSTORE_FORMAT);
             config.put("plugins.security.ssl.http.truststore_filepath", TRUSTSTORE_FILE.toString());
             config.put("plugins.security.ssl.http.truststore_password", truststore.passwordAsString());
+
+            // enable client cert auth
+            config.put("plugins.security.ssl.http.clientauth_mode", "OPTIONAL");
         } else {
             config.put("plugins.security.disabled", "true");
             config.put("plugins.security.ssl.http.enabled", "false");
@@ -175,7 +178,7 @@ public class OpensearchSecurityConfiguration {
 
         config.put("plugins.security.enable_snapshot_restore_privilege", "true");
         config.put("plugins.security.check_snapshot_restore_write_privileges", "true");
-        config.put("plugins.security.restapi.roles_enabled", "all_access,security_rest_api_access");
+        config.put("plugins.security.restapi.roles_enabled", "all_access,security_rest_api_access,readall");
         config.put("plugins.security.system_indices.enabled", "true");
         config.put("plugins.security.system_indices.indices", ".plugins-ml-model,.plugins-ml-task,.opendistro-alerting-config,.opendistro-alerting-alert*,.opendistro-anomaly-results*,.opendistro-anomaly-detector*,.opendistro-anomaly-checkpoints,.opendistro-anomaly-detection-state,.opendistro-reports-*,.opensearch-notifications-*,.opensearch-notebooks,.opensearch-observability,.opendistro-asynchronous-search-response*,.replication-metadata-store");
         config.put("node.max_local_storage_nodes", "3");

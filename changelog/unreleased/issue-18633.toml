@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fixed automatic pop-up triggering for clearing notifications on the events definition overview page."
+
+issues = ["18633"]
+pulls = ["18646"]

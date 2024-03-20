@@ -18,7 +18,6 @@ import * as React from 'react';
 import { forwardRef, useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
-import type { DraggableProvidedDraggableProps, DraggableProvidedDragHandleProps } from 'react-beautiful-dnd';
 
 import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'views/Constants';
 import Rule, { ConditionLabelMap } from 'views/logic/views/formatting/highlighting/HighlightingRule';
@@ -33,6 +32,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
+import type { DraggableProps, DragHandleProps } from 'components/common/SortableList';
 
 import ColorPreview from './ColorPreview';
 
@@ -109,8 +109,8 @@ const RuleColorPreview = ({ color, onChange }: RuleColorPreviewProps) => {
 type Props = {
   rule: Rule,
   className?: string,
-  draggableProps?: DraggableProvidedDraggableProps;
-  dragHandleProps?: DraggableProvidedDragHandleProps;
+  draggableProps?: DraggableProps;
+  dragHandleProps?: DragHandleProps;
 };
 
 const HighlightingRule = forwardRef<HTMLDivElement, Props>(({

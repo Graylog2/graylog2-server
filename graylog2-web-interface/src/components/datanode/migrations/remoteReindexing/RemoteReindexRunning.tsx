@@ -15,15 +15,23 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import styled from 'styled-components';
 
 import { ProgressBar } from 'components/common';
+import { Alert } from 'components/bootstrap';
 
 import type { MigrationStepComponentProps } from '../../Types';
 import MigrationStepTriggerButtonToolbar from '../common/MigrationStepTriggerButtonToolbar';
 import useRemoteReindexMigrationStatus from '../../hooks/useRemoteReindexMigrationStatus';
 
+const IndicesContainer = styled.div`
+  max-height: 100px;
+  overflow-y: auto;
+`;
+
 const RemoteReindexRunning = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => {
-  const { nextSteps, migrationStatus } = useRemoteReindexMigrationStatus(currentStep, onTriggerStep);
+  const { nextSteps, migrationStatus, handleTriggerStep } = useRemoteReindexMigrationStatus(currentStep, onTriggerStep);
+  const indicesWithErrors = migrationStatus?.indices.filter((index) => index.status === 'ERROR') || [];
 
   return (
     <>
@@ -38,7 +46,19 @@ const RemoteReindexRunning = ({ currentStep, onTriggerStep }: MigrationStepCompo
         bsStyle: 'info',
         label: `${migrationStatus?.status || ''} ${migrationStatus?.progress || 0}%`,
       }]} />
-      <MigrationStepTriggerButtonToolbar nextSteps={nextSteps || currentStep.next_steps} onTriggerStep={onTriggerStep} />
+      {(indicesWithErrors.length > 0) && (
+        <Alert title="Migration failed" bsStyle="danger">
+          <IndicesContainer>
+            {indicesWithErrors.map((index) => (
+              <span key={index.name}>
+                <b>{index.name}</b>
+                <p>{index.error_msg}</p>
+              </span>
+            ))}
+          </IndicesContainer>
+        </Alert>
+      )}
+      <MigrationStepTriggerButtonToolbar nextSteps={nextSteps || currentStep.next_steps} onTriggerStep={handleTriggerStep} />
     </>
   );
 };
