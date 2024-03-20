@@ -16,42 +16,43 @@
  */
 package org.graylog.storage.opensearch2;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.zafarkhaja.semver.Version;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.storage.SearchVersion;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opensearch.client.opensearch._types.OpenSearchVersionInfo;
-import org.opensearch.client.opensearch.core.InfoResponse;
+
+import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class NodeAdapterOS2Test {
 
     private NodeAdapterOS2 toTest;
-    private OpenSearchClient openSearchClient;
+    private PlainJsonApi jsonApiMock;
     private Request request;
-    private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void setUp() {
-        openSearchClient = mock(OpenSearchClient.class);
-        toTest = new NodeAdapterOS2(openSearchClient);
+        jsonApiMock = mock(PlainJsonApi.class);
+        toTest = new NodeAdapterOS2(jsonApiMock);
         request = new Request("GET", "/?filter_path=version.number,version.distribution");
     }
 
     @Test
-    void testElasticsearchVersionFetching() {
-        mockResponse(responseBuilder()
-                .version(versionBuilder()
-                        .distribution("Elasticsearch")
-                        .number("7.10.2")
-                        .build()).build());
+    void testElasticsearchVersionFetching() throws IOException {
+        mockResponse("{\"version\" : " +
+                " {" +
+                "    \"number\" : \"7.10.2\"" +
+                " }" +
+                "}");
 
         assertThat(toTest.version())
                 .isNotEmpty()
@@ -60,13 +61,13 @@ class NodeAdapterOS2Test {
     }
 
     @Test
-    void testOpensearchVersionFetching() {
-        mockResponse(responseBuilder()
-                .version(versionBuilder()
-                        .distribution("opensearch")
-                        .number("1.3.1")
-                        .build())
-                .build());
+    void testOpensearchVersionFetching() throws IOException {
+        mockResponse("{\"version\" : " +
+                "  {" +
+                "    \"distribution\" : \"opensearch\"," +
+                "    \"number\" : \"1.3.1\"" +
+                "  }" +
+                "}");
 
         assertThat(toTest.version())
                 .isNotEmpty()
@@ -74,26 +75,8 @@ class NodeAdapterOS2Test {
 
     }
 
-    private InfoResponse.Builder responseBuilder() {
-        return new InfoResponse.Builder()
-                .name("node01")
-                .clusterName("testcluster")
-                .clusterUuid("deadbeef")
-                .tagline("The best product for search");
-    }
-
-    private OpenSearchVersionInfo.Builder versionBuilder() {
-        return new OpenSearchVersionInfo.Builder()
-                .buildDate("2021-12-01")
-                .buildHash("deadbeef")
-                .buildSnapshot(false)
-                .buildType("release")
-                .luceneVersion("9.0.0")
-                .minimumWireCompatibilityVersion("7.0.0")
-                .minimumIndexCompatibilityVersion("7.0.0");
-    }
-
-    private void mockResponse(final InfoResponse response) {
-        when(openSearchClient.execute(any(ThrowingFunction.class))).thenReturn(response);
+    private void mockResponse(final String jsonResponseWithVersion) throws IOException {
+        JsonNode jsonNode = objectMapper.readTree(jsonResponseWithVersion);
+        doReturn(jsonNode).when(jsonApiMock).perform(eq(request), anyString());
     }
 }

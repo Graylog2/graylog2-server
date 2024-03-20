@@ -16,14 +16,18 @@
  */
 package org.graylog.storage.opensearch2.fieldtypes.streams;
 
-import org.graylog.storage.opensearch2.IndexedMessage;
+import org.graylog.shaded.opensearch2.org.opensearch.action.search.MultiSearchResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.index.query.ExistsQueryBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregation;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregations;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.MultiBucketsAggregation;
+import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.StreamsForFieldRetriever;
 import org.graylog2.plugin.Message;
-import org.opensearch.client.opensearch._types.aggregations.StringTermsBucket;
-import org.opensearch.client.opensearch.core.MsearchRequest;
-import org.opensearch.client.opensearch.core.msearch.MultiSearchResponseItem;
-import org.opensearch.client.opensearch.core.msearch.RequestItem;
 
 import jakarta.inject.Inject;
 
@@ -46,14 +50,14 @@ public class StreamsForFieldRetrieverOS2 implements StreamsForFieldRetriever {
 
     @Override
     public Map<String, Set<String>> getStreams(final List<String> fieldNames, final String indexName) {
-        final var multiSearchResponse = client.msearch2(fieldNames.stream()
+        final List<MultiSearchResponse.Item> multiSearchResponse = client.msearch(fieldNames.stream()
                         .map(fieldName -> createSearchRequest(fieldName, indexName))
                         .collect(Collectors.toList()),
                 "Unable to retrieve fields types aggregations");
 
 
         final List<Set<String>> streamsPerField = multiSearchResponse.stream()
-                .map(this::retrieveStreamsFromAggregationInResponse)
+                .map(item -> retrieveStreamsFromAggregationInResponse(item.getResponse()))
                 .toList();
 
         Map<String, Set<String>> result = new HashMap<>(fieldNames.size());
@@ -67,35 +71,47 @@ public class StreamsForFieldRetrieverOS2 implements StreamsForFieldRetriever {
 
     @Override
     public Set<String> getStreams(final String fieldName, final String indexName) {
-        final var searchRequest = MsearchRequest.of(builder -> builder.searches(createSearchRequest(fieldName, indexName)));
+        final SearchRequest searchRequest = createSearchRequest(fieldName, indexName);
 
-        final var searchResult = client.search(searchRequest, "Unable to retrieve fields types aggregations");
+        final SearchResponse searchResult = client.search(searchRequest, "Unable to retrieve fields types aggregations");
 
         return retrieveStreamsFromAggregationInResponse(searchResult);
     }
 
-    private Set<String> retrieveStreamsFromAggregationInResponse(final MultiSearchResponseItem<IndexedMessage> searchResult) {
-        final var aggregations = searchResult.result().aggregations();
+    private Set<String> retrieveStreamsFromAggregationInResponse(final SearchResponse searchResult) {
+        final Aggregations aggregations = searchResult.getAggregations();
         if (aggregations != null) {
-            final var streamsAggregation = aggregations.get(Message.FIELD_STREAMS).sterms();
-            final var buckets = streamsAggregation.buckets();
-            if (buckets != null) {
-                return buckets.array().stream()
-                        .map(StringTermsBucket::key)
-                        .collect(Collectors.toSet());
+            final Aggregation streamsAggregation = aggregations.get(Message.FIELD_STREAMS);
+
+            if (streamsAggregation instanceof MultiBucketsAggregation) {
+                final List<? extends MultiBucketsAggregation.Bucket> buckets = ((MultiBucketsAggregation) streamsAggregation).getBuckets();
+                if (buckets != null) {
+                    return buckets.stream()
+                            .map(MultiBucketsAggregation.Bucket::getKeyAsString)
+                            .collect(Collectors.toSet());
+                }
             }
         }
         return Set.of();
     }
 
-    private RequestItem createSearchRequest(final String fieldName, final String indexName) {
-        return RequestItem.of(searchBuilder -> searchBuilder
-                .header(headerBuilder -> headerBuilder.index(indexName))
-                .body(bodyBuilder -> bodyBuilder
-                        .query(queryBuilder -> queryBuilder.exists(existsBuilder -> existsBuilder.field(fieldName)))
-                        .size(0)
-                        .trackTotalHits(trackHitsBuilder -> trackHitsBuilder.enabled(false))
-                        .aggregations(Message.FIELD_STREAMS, aggBuilder -> aggBuilder.terms(termsBuilder -> termsBuilder.field(Message.FIELD_STREAMS).size(SEARCH_MAX_BUCKETS_OS)))));
+    private SearchRequest createSearchRequest(final String fieldName, final String indexName) {
+        final SearchSourceBuilder searchSourceBuilder = createSearchSourceBuilder(fieldName);
+        return new SearchRequest(indexName)
+                .source(searchSourceBuilder);
+    }
+
+    private SearchSourceBuilder createSearchSourceBuilder(final String fieldName) {
+        final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
+                .query(new ExistsQueryBuilder(fieldName))
+                .trackTotalHits(false)
+                .size(0);
+
+        searchSourceBuilder.aggregation(AggregationBuilders
+                .terms(Message.FIELD_STREAMS)
+                .field(Message.FIELD_STREAMS)
+                .size(SEARCH_MAX_BUCKETS_OS));
+        return searchSourceBuilder;
     }
 }
 
