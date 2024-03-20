@@ -88,6 +88,7 @@ const usePaginationAndTableLayout = (entityTableId: string, defaultLayout: Defau
     onColumnsChange,
     onSortChange,
     onPageSizeChange,
+    columnsOrder: defaultLayout.columnsOrder,
   });
 };
 
