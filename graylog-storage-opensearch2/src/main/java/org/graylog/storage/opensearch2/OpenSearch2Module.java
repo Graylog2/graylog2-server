@@ -23,7 +23,6 @@ import org.graylog.plugins.views.migrations.V20200730000000_AddGl2MessageIdField
 import org.graylog.plugins.views.search.engine.QuerySuggestionsService;
 import org.graylog.shaded.opensearch2.org.apache.http.client.CredentialsProvider;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
-import org.graylog.storage.opensearch2.client.LegacyOSCredentialsProvider;
 import org.graylog.storage.opensearch2.client.OSCredentialsProvider;
 import org.graylog.storage.opensearch2.fieldtypes.streams.StreamsForFieldRetrieverOS2;
 import org.graylog.storage.opensearch2.migrations.V20170607164210_MigrateReopenedIndicesToAliasesClusterStateOS2;
@@ -45,8 +44,6 @@ import org.graylog2.indexer.security.SecurityAdapter;
 import org.graylog2.migrations.V20170607164210_MigrateReopenedIndicesToAliases;
 import org.graylog2.plugin.VersionAwareModule;
 import org.graylog2.storage.SearchVersion;
-import org.opensearch.client.RestClient;
-import org.opensearch.client.opensearch.OpenSearchClient;
 
 public class OpenSearch2Module extends VersionAwareModule {
     private final SearchVersion supportedVersion;
@@ -89,12 +86,8 @@ public class OpenSearch2Module extends VersionAwareModule {
 
         install(new FactoryModuleBuilder().build(ScrollResultOS2.Factory.class));
 
-        bind(RestHighLevelClient.class).toProvider(RestHighLevelClientProvider.class);
-        bind(CredentialsProvider.class).toProvider(LegacyOSCredentialsProvider.class);
-
-        bind(RestClient.class).toProvider(RestClientProvider.class);
-        bind(OpenSearchClient.class).toProvider(OpenSearchClientProvider.class);
-        bind(org.apache.http.client.CredentialsProvider.class).toProvider(OSCredentialsProvider.class);
+        bind(RestHighLevelClient.class).toProvider(RestClientProvider.class);
+        bind(CredentialsProvider.class).toProvider(OSCredentialsProvider.class);
     }
 
     private <T> LinkedBindingBuilder<T> bindForSupportedVersion(Class<T> interfaceClass) {
