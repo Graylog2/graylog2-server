@@ -30,9 +30,9 @@ public class ElasticsearchMockedClientTestBase {
     @Mock
     protected ElasticsearchClient client;
 
-    void mockCancellableMSearch(final MultiSearchResponse response) throws Exception {
-        PlainActionFuture<MultiSearchResponse> plainActionFuture = mock(PlainActionFuture.class);
-        doReturn(response).when(plainActionFuture).get();
+    void mockCancellableMSearch(final MultiSearchResponse response) {
+        PlainActionFuture<MultiSearchResponse> plainActionFuture = PlainActionFuture.newFuture();
+        plainActionFuture.onResponse(response);
         doReturn(plainActionFuture).when(client).cancellableMsearch(any());
     }
 }

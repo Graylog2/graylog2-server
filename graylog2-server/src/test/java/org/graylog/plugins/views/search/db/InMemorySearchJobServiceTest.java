@@ -17,77 +17,68 @@
 package org.graylog.plugins.views.search.db;
 
 import jakarta.ws.rs.NotAuthorizedException;
+import org.assertj.core.api.Assertions;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.permissions.SearchUser;
-import org.graylog2.plugin.system.NodeId;
+import org.graylog.plugins.views.search.rest.TestSearchUser;
+import org.graylog2.plugin.system.SimpleNodeId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-
-@ExtendWith(MockitoExtension.class)
 public class InMemorySearchJobServiceTest {
 
     private SearchJobService toTest;
 
-    @Mock
-    private NodeId nodeId;
-    @Mock
-    private Search search;
 
     @BeforeEach
     public void setup() throws Exception {
-        toTest = new InMemorySearchJobService(nodeId);
+        toTest = new InMemorySearchJobService(new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000"));
     }
 
     @Test
     public void testUsersCanLoadTheirOwnJobs() {
-        final SearchJob jannettesJob = toTest.create(search, "Jannette");
-        final Optional<SearchJob> retrievedJob = toTest.load(jannettesJob.getId(), mockSearchUser("Jannette"));
-        assertTrue(retrievedJob.isPresent());
-        assertEquals(jannettesJob, retrievedJob.get());
+        final SearchJob jannettesJob = toTest.create(Search.builder().build(), "Jannette");
+        final Optional<SearchJob> retrievedJob = toTest.load(jannettesJob.getId(), searchUser("Jannette"));
+        Assertions.assertThat(retrievedJob)
+                .isPresent()
+                .hasValue(jannettesJob);
     }
 
     @Test
     public void testThrowsExceptionWhenTryingToLoadJobOfDifferentUser() {
-        final SearchJob jannettesJob = toTest.create(search, "Jannette");
-        assertThrows(NotAuthorizedException.class, () -> toTest.load(jannettesJob.getId(), mockSearchUser("Michelle")));
+        final SearchJob jannettesJob = toTest.create(Search.builder().build(), "Jannette");
+        Assertions.assertThatThrownBy(() -> toTest.load(jannettesJob.getId(), searchUser("Michelle")))
+                .isInstanceOf(NotAuthorizedException.class);
     }
 
     @Test
     public void testAdminCanLoadJobOfDifferentUser() {
-        final SearchJob jannettesJob = toTest.create(search, "Jannette");
-        final Optional<SearchJob> retrievedJob = toTest.load(jannettesJob.getId(), mockAdminSearchUser("Clara"));
-        assertTrue(retrievedJob.isPresent());
-        assertEquals(jannettesJob, retrievedJob.get());
+        final SearchJob jannettesJob = toTest.create(Search.builder().build(), "Jannette");
+        final Optional<SearchJob> retrievedJob = toTest.load(jannettesJob.getId(), adminUser("Clara"));
+        Assertions.assertThat(retrievedJob)
+                .isPresent()
+                .hasValue(jannettesJob);
     }
 
     @Test
     public void testReturnsEmptyOptionalWhenTryingToLoadNonExistingJob() {
         final Optional<SearchJob> retrievedJob = toTest.load("Guadalajara!", null);
-        assertTrue(retrievedJob.isEmpty());
+        Assertions.assertThat(retrievedJob)
+                .isEmpty();
     }
 
-    private SearchUser mockSearchUser(final String username) {
-        final SearchUser searchUser = mock(SearchUser.class);
-        doReturn(username).when(searchUser).username();
-        return searchUser;
+    private SearchUser searchUser(final String username) {
+        return TestSearchUser.builder()
+                .withUser(u -> u.withUsername(username))
+                 .build();
     }
 
-    private SearchUser mockAdminSearchUser(final String username) {
-        final SearchUser searchUser = mockSearchUser(username);
-        doReturn(true).when(searchUser).isAdmin();
-        return searchUser;
+    private SearchUser adminUser(final String username) {
+        return TestSearchUser.builder()
+                .withUser(u -> u.withUsername(username).isLocalAdmin(true))
+                .build();
     }
-
 }
