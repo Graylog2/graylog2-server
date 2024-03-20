@@ -73,7 +73,7 @@ public class NodeContainerConfig {
         this.configParams = configParams;
     }
 
-    private static boolean flagFromEnvVar(String flagName) {
+    public static boolean flagFromEnvVar(String flagName) {
         String flag = System.getenv(flagName);
         return flag != null && flag.equalsIgnoreCase("true");
     }
