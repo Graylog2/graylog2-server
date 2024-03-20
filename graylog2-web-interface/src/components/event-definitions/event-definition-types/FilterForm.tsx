@@ -14,6 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { naturalSortIgnoreCase } from 'util/SortUtils';
+import * as FormsUtils from 'util/FormsUtils';
+import { isPermitted } from 'util/PermissionsMixin';
+import { getPathnameWithoutId } from 'util/URLUtils';
+
 import * as React from 'react';
 import { useCallback, useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
@@ -40,16 +45,12 @@ import Search from 'views/logic/search/Search';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 import { Alert, ButtonToolbar, ControlLabel, FormGroup, HelpBlock, Input } from 'components/bootstrap';
 import RelativeTime from 'components/common/RelativeTime';
-import { naturalSortIgnoreCase } from 'util/SortUtils';
-import * as FormsUtils from 'util/FormsUtils';
-import { isPermitted } from 'util/PermissionsMixin';
 import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
 import { LookupTablesActions, LookupTablesStore } from 'stores/lookup-tables/LookupTablesStore';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
 import generateId from 'logic/generateId';
 import parseSearch from 'views/logic/slices/parseSearch';
 import useLocation from 'routing/useLocation';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import type User from 'logic/users/User';
@@ -216,7 +217,6 @@ const FilterForm = ({
     setQueryParameterStash(merge(queryParameterStash, staleParameters));
 
     config.query_parameters = keptParameters.concat(newParameters);
-    onChange('config', config);
   };
 
   const parseQuery = debounce((queryString, searchFilters = OrderedMap()) => {
