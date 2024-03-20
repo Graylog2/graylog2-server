@@ -92,7 +92,7 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
         final BoolQueryBuilder filter = boolQuery()
                 .filter(query)
                 .filter(termsQuery(EventDto.FIELD_STREAMS, eventStreams))
-                .filter(requireNonNull(LegacyTimeRangeQueryFactory.create(timerange)));
+                .filter(requireNonNull(TimeRangeQueryFactory.create(timerange)));
 
         if (!isNullOrEmpty(filterString)) {
             filter.filter(queryStringQuery(filterString));
