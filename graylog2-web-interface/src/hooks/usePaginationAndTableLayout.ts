@@ -19,6 +19,8 @@ import { useCallback, useMemo, useState } from 'react';
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
 import type { Sort } from 'stores/PaginationTypes';
+import useTableEventHandlers from 'hooks/useTableEventHandlers';
+import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 
 type DefaultLayout = {
   pageSize: number,
@@ -27,7 +29,7 @@ type DefaultLayout = {
   columnsOrder: Array<string>,
 }
 
-const usePaginationAndTableLayout = (entityTableId: string, defaultLayout: DefaultLayout) => {
+const usePaginationAndTableLayout = (entityTableId: string, defaultLayout: DefaultLayout, syncPageSizeFromQuery: boolean = false) => {
   const [query, setQuery] = useState('');
   const [activePage, setActivePage] = useState(1);
   const { layoutConfig, isInitialLoading: isLoadingLayoutPreferences } = useTableLayout({
@@ -36,7 +38,15 @@ const usePaginationAndTableLayout = (entityTableId: string, defaultLayout: Defau
     defaultDisplayedAttributes: defaultLayout.displayedColumns,
     defaultSort: defaultLayout.sort,
   });
+  const paginationQueryParameter = usePaginationQueryParameter(undefined, layoutConfig.pageSize, syncPageSizeFromQuery);
   const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(entityTableId);
+  const {
+    onPageSizeChange,
+    onSearch,
+    onSearchReset,
+    onColumnsChange,
+    onSortChange,
+  } = useTableEventHandlers({ updateTableLayout, paginationQueryParameter, setQuery });
   const searchParams = useMemo(() => ({
     query,
     page: activePage,
@@ -56,34 +66,13 @@ const usePaginationAndTableLayout = (entityTableId: string, defaultLayout: Defau
     }, [updateTableLayout],
   );
 
-  const onPageSizeChange = useCallback((newPageSize: number) => {
-    setActivePage(1);
-    updateTableLayout({ perPage: newPageSize });
-  }, [updateTableLayout]);
-
-  const onSortChange = useCallback((newSort: Sort) => {
-    setActivePage(1);
-    updateTableLayout({ sort: newSort });
-  }, [updateTableLayout]);
-
-  const onSearch = useCallback((newQuery: string) => {
-    setActivePage(1);
-    setQuery(newQuery);
-  }, []);
-
-  const onResetSearch = useCallback(() => onSearch(''), [onSearch]);
-
-  const onColumnsChange = useCallback((displayedAttributes: Array<string>) => {
-    updateTableLayout({ displayedAttributes });
-  }, [updateTableLayout]);
-
   return ({
     activePage,
     isLoadingLayoutPreferences,
     onPageChange,
     layoutConfig,
     onSearch,
-    onResetSearch,
+    onSearchReset,
     searchParams,
     onColumnsChange,
     onSortChange,
