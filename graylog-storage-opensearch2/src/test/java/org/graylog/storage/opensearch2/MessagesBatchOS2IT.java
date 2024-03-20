@@ -25,7 +25,8 @@ import org.junit.Rule;
 public class MessagesBatchOS2IT extends MessagesBatchIT {
     @Rule
     public final OpenSearchInstance openSearchInstance = OpenSearchInstanceBuilder.builder()
-            .env("http.max_content_length", "10mb")
+            .heapSize("256m")
+            .env("indices.breaker.total.use_real_memory", "false")
             .build();
 
     @Override
