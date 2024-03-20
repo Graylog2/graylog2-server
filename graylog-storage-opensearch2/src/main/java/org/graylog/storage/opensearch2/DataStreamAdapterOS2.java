@@ -30,12 +30,10 @@ import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.Composable
 import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.DataStream;
 import org.graylog.shaded.opensearch2.org.opensearch.common.compress.CompressedXContent;
 import org.graylog.storage.opensearch2.ism.IsmApi;
-import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.datastream.DataStreamAdapter;
 import org.graylog2.indexer.datastream.Policy;
 import org.graylog2.indexer.datastream.policy.IsmPolicy;
 import org.graylog2.indexer.indices.Template;
-import org.opensearch.client.ResponseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
