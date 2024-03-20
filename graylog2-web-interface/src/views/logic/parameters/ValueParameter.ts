@@ -44,7 +44,7 @@ export default class ValueParameter extends Parameter {
   }
 
   toJSON(): ParameterJson {
-    const { type, name, title, description, dataType, defaultValue, optional, binding } = this._value;
+    const { type, name, title, description, dataType, defaultValue, optional, binding, embryonic } = this._value;
 
     return {
       type,
@@ -54,6 +54,7 @@ export default class ValueParameter extends Parameter {
       data_type: dataType,
       default_value: defaultValue,
       optional,
+      embryonic,
       binding: binding ? binding.toJSON() : undefined,
     };
   }

@@ -41,6 +41,9 @@ import FieldsForm from './FieldsForm';
 import NotificationsForm from './NotificationsForm';
 import EventDefinitionSummary from './EventDefinitionSummary';
 
+const WizardContainer = styled.div`
+  margin-bottom: 10px;
+`;
 export const STEP_KEYS = ['event-details', 'condition', 'fields', 'notifications', 'summary'];
 const STEP_TELEMETRY_KEYS = [
   TELEMETRY_EVENT_TYPE.EVENTDEFINITION_DETAILS.STEP_CLICKED,
@@ -57,10 +60,6 @@ const getConditionPlugin = (type: string | undefined) => {
 
   return PluginStore.exports('eventDefinitionTypes').find((edt) => edt.type === type) || {};
 };
-
-const WizardContainer = styled.div`
-  margin-bottom: 10px;
-`;
 
 type Props = {
   activeStep: string,

@@ -30,6 +30,7 @@ type InternalState = {
   dataType: string,
   defaultValue: any,
   optional: boolean,
+  embryonic: boolean,
   binding: ParameterBinding | undefined | null,
 };
 
@@ -41,6 +42,7 @@ export type ParameterJson = {
   data_type: string,
   default_value: any,
   optional: boolean,
+  embryonic: boolean,
   binding: ParameterBindingJsonRepresentation | undefined | null,
 };
 
@@ -53,8 +55,8 @@ class Parameter {
 
   static __registrations: { [key: string]: ParameterSubClass } = {};
 
-  constructor(type: string, name: string, title: string, description: string, dataType: string, defaultValue: any, optional: boolean, binding?: ParameterBinding) {
-    this._value = { type, name, title, description, dataType, defaultValue, optional, binding };
+  constructor(type: string, name: string, title: string, description: string, dataType: string, defaultValue: any, optional: boolean, embryonic, binding?: ParameterBinding) {
+    this._value = { type, name, title, description, dataType, defaultValue, optional, embryonic, binding };
   }
 
   get type(): string {
@@ -83,6 +85,10 @@ class Parameter {
 
   get optional(): boolean {
     return this._value.optional;
+  }
+
+  get embryonic(): boolean {
+    return this._value.embryonic;
   }
 
   // screw you eslint, using param.constructor.needsBinding() is ugly
