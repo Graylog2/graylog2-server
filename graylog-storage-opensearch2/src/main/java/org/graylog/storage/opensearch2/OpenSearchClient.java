@@ -134,7 +134,7 @@ public class OpenSearchClient {
         searchRequests.forEach(multiSearchRequest::add);
 
         final PlainActionFuture<MultiSearchResponse> future = new PlainActionFuture<>();
-        client.msearchAsync(multiSearchRequest, legacyRequestOptions(), future);
+        client.msearchAsync(multiSearchRequest, requestOptions(), future);
 
         return future;
     }
