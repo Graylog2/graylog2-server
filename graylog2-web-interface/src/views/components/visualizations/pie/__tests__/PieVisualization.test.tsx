@@ -44,6 +44,7 @@ const SimplePieVisualization = (props: Pick<React.ComponentProps<typeof PieVisua
                         toggleEdit={() => {}}
                         height={800}
                         width={600}
+                        setLoadingState={() => {}}
                         onChange={() => {}}
                         {...props} />
     </FieldTypesContext.Provider>

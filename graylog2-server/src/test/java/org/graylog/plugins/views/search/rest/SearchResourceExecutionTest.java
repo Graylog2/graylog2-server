@@ -168,7 +168,7 @@ public class SearchResourceExecutionTest {
         searchJob.addQueryResultFuture("query", CompletableFuture.completedFuture(QueryResult.emptyResult()));
         searchJob.seal();
 
-        when(queryEngine.execute(any(), any())).thenReturn(searchJob);
+        when(queryEngine.execute(any(), any(), any())).thenReturn(searchJob);
 
         final Response response = this.searchResource.executeSyncJob(search, 100, searchUser);
 
@@ -207,7 +207,7 @@ public class SearchResourceExecutionTest {
 
         final SearchJob searchJob = makeSearchJob(search.toSearch());
 
-        when(queryEngine.execute(any(), any())).thenReturn(searchJob);
+        when(queryEngine.execute(any(), any(), any())).thenReturn(searchJob);
 
         final Response response = this.searchResource.executeSyncJob(search, 100, searchUser);
 
@@ -293,7 +293,7 @@ public class SearchResourceExecutionTest {
 
         persistSearch(search);
 
-        when(queryEngine.execute(any(), any())).thenAnswer(invocation -> {
+        when(queryEngine.execute(any(), any(), any())).thenAnswer(invocation -> {
             final SearchJob searchJob = invocation.getArgument(0);
             searchJob.addQueryResultFuture("query", CompletableFuture.completedFuture(QueryResult.emptyResult()));
             searchJob.seal();

@@ -34,6 +34,7 @@ import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visuali
 import useAppDispatch from 'stores/useAppDispatch';
 import { updateWidgetConfig } from 'views/logic/slices/widgetActions';
 
+import TableHead from './TableHead';
 import DataTableEntry from './DataTableEntry';
 import MessagesTable from './MessagesTable';
 import deduplicateValues from './DeduplicateValues';
@@ -45,12 +46,13 @@ import type { VisualizationComponentProps } from '../aggregationbuilder/Aggregat
 import { makeVisualization, retrieveChartData } from '../aggregationbuilder/AggregationBuilder';
 
 type Props = VisualizationComponentProps & {
-  data: { [key: string]: Rows } & { events?: Events },
-  striped?: boolean,
   bordered?: boolean,
   borderedHeader?: boolean,
-  stickyHeader?: boolean,
   condensed?: boolean,
+  data: { [key: string]: Rows } & { events?: Events },
+  setLoadingState: (loading: boolean) => void
+  stickyHeader?: boolean,
+  striped?: boolean,
 };
 
 const getStylesForPinnedColumns = (tag: 'th'|'td', stickyLeftMarginsByColumnIndex: Array<{index: number, column: string, leftMargin: number}>) => stickyLeftMarginsByColumnIndex.map(({ index, leftMargin }) => `
@@ -61,7 +63,7 @@ const getStylesForPinnedColumns = (tag: 'th'|'td', stickyLeftMarginsByColumnInde
     }
   `).concat((' ; '));
 
-const THead = styled.thead<{
+const THead = styled(TableHead)<{
     $stickyLeftMarginsByColumnIndex: Array<{index: number, column: string, leftMargin: number}>
 }>(({ $stickyLeftMarginsByColumnIndex, theme }) => css`
   background-color: ${theme.colors.global.contentBackground};
@@ -121,15 +123,16 @@ const _extractColumnPivotValues = (rows): Array<Array<string>> => {
 };
 
 const DataTable = ({
-  config,
-  data,
-  fields,
-  striped,
   bordered,
   borderedHeader,
-  stickyHeader,
   condensed,
+  config,
+  data,
   editing,
+  fields,
+  setLoadingState,
+  stickyHeader,
+  striped,
 }: Props) => {
   const formContext = useContext(FormikContext);
   const onRenderComplete = useContext(RenderCompletionCallback);
@@ -275,6 +278,7 @@ const DataTable = ({
                      onSortChange={_onSortChange}
                      sortConfigMap={sortConfigMap}
                      onSetColumnsWidth={onSetColumnsWidth}
+                     setLoadingState={setLoadingState}
                      pinnedColumns={pinnedColumns}
                      togglePin={togglePin} />
           </THead>

@@ -48,6 +48,7 @@ public class ProcessStateMachine extends StateMachine<ProcessState, ProcessEvent
                 .permit(ProcessEvent.PROCESS_PREPARED, ProcessState.PREPARED)
                 // jump to started only allowed to facilitate startup with insecure config
                 .permit(ProcessEvent.PROCESS_STARTED, ProcessState.STARTING)
+                .ignore(ProcessEvent.PROCESS_STOPPED)
                 .ignore(ProcessEvent.HEALTH_CHECK_FAILED);
 
         config.configure(ProcessState.PREPARED)

@@ -24,6 +24,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 import org.graylog.datanode.Configuration;
+import org.graylog.datanode.bootstrap.preflight.DatanodeDirectoriesLockfileCheck;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.metrics.ConfigureMetricsIndexSettings;
 import org.graylog.datanode.process.OpensearchConfiguration;
@@ -58,6 +59,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     private final DataNodeProvisioningService dataNodeProvisioningService;
     private final IndexFieldTypesService indexFieldTypesService;
     private final ClusterEventBus clusterEventBus;
+    private final DatanodeDirectoriesLockfileCheck lockfileCheck;
 
 
     @Inject
@@ -72,13 +74,15 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
                                     final IndexFieldTypesService indexFieldTypesService,
                                     final ObjectMapper objectMapper,
                                     final ProcessStateMachine processStateMachine,
-                                    final ClusterEventBus clusterEventBus) {
+                                    final ClusterEventBus clusterEventBus,
+                                    final DatanodeDirectoriesLockfileCheck lockfileCheck) {
         this.configurationProvider = configurationProvider;
         this.eventBus = eventBus;
         this.nodeId = nodeId;
         this.dataNodeProvisioningService = dataNodeProvisioningService;
         this.indexFieldTypesService = indexFieldTypesService;
         this.clusterEventBus = clusterEventBus;
+        this.lockfileCheck = lockfileCheck;
         this.process = createOpensearchProcess(datanodeConfiguration, trustManager, configuration, nodeService, objectMapper, processStateMachine);
         eventBus.register(this);
     }
@@ -142,7 +146,14 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
         final OpensearchConfiguration config = configurationProvider.get();
         configure();
         if (config.securityConfigured()) {
-            this.process.start();
+
+            try {
+                lockfileCheck.checkDatanodeLock(config.datanodeDirectories().getDataTargetDir());
+                this.process.start();
+            } catch (Exception e) {
+                LOG.error("Could not start up data node", e);
+            }
+
         }
     }
 

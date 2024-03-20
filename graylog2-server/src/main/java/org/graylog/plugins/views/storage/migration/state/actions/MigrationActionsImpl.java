@@ -41,6 +41,7 @@ import org.graylog2.system.processing.control.RemoteProcessingControlResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
@@ -154,8 +155,8 @@ public class MigrationActionsImpl implements MigrationActions {
     public void provisionDataNodes() {
         // if we start provisioning DataNodes via the migration, Preflight is definitely done/no option anymore
         var preflight = preflightConfigService.getPreflightConfigResult();
-        if (preflight == null || !preflight.equals(PreflightConfigResult.FINISHED)) {
-            preflightConfigService.setConfigResult(PreflightConfigResult.FINISHED);
+        if (preflight == null || !preflight.equals(PreflightConfigResult.PREPARED)) {
+            preflightConfigService.setConfigResult(PreflightConfigResult.PREPARED);
         }
         final Map<String, DataNodeDto> activeDataNodes = nodeService.allActive();
         activeDataNodes.values().forEach(node -> dataNodeProvisioningService.changeState(node.getNodeId(), DataNodeProvisioningConfig.State.CONFIGURED));
@@ -183,7 +184,7 @@ public class MigrationActionsImpl implements MigrationActions {
     @Override
     public boolean dataNodeStartupFinished() {
         boolean dataNodesAvailable = nodeService.allActive().values().stream().allMatch(node -> node.getDataNodeStatus() == DataNodeStatus.AVAILABLE);
-        if (dataNodesAvailable) { // set preflight config once more to FINISHED to be sure that a Graylog restart will connect to the data nodes
+        if (dataNodesAvailable) { // set preflight config to FINISHED to be sure that a Graylog restart will connect to the data nodes
             var preflight = preflightConfigService.getPreflightConfigResult();
             if (preflight == null || !preflight.equals(PreflightConfigResult.FINISHED)) {
                 preflightConfigService.setConfigResult(PreflightConfigResult.FINISHED);
@@ -218,6 +219,14 @@ public class MigrationActionsImpl implements MigrationActions {
             context.getExtendedState(TrafficSnapshot.TRAFFIC_SNAPSHOT, TrafficSnapshot.class)
                     .ifPresent(traffic -> context.addExtendedState(TrafficSnapshot.ESTIMATED_TRAFFIC_PER_MINUTE, traffic.calculateEstimatedTrafficPerMinute(currentTraffic.getCount())));
         }
+    }
+
+    @Override
+    public void verifyRemoteIndexerConnection() {
+        final URI hostname = Objects.requireNonNull(URI.create(getStateMachineContext().getActionArgument("hostname", String.class)), "hostname has to be provided");
+        final String user = getStateMachineContext().getActionArgumentOpt("user", String.class).orElse(null);
+        final String password = getStateMachineContext().getActionArgumentOpt("password", String.class).orElse(null);
+        getStateMachineContext().setResponse(migrationService.checkConnection(hostname, user, password));
     }
 
     @Override

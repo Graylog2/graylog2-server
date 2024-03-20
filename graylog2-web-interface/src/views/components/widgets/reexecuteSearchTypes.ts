@@ -30,7 +30,7 @@ import { executeWithExecutionState } from 'views/logic/slices/searchExecutionSli
 
 const reexecuteSearchTypes = (
   searchTypes: SearchTypeOptions,
-  effectiveTimerange: TimeRange,
+  effectiveTimerange?: TimeRange,
 ) => (dispatch: AppDispatch, getState: () => RootState, { searchExecutors }: ExtraArguments) => {
   const state = getState();
   const globalOverride = selectGlobalOverride(state);
