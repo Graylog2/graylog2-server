@@ -41,7 +41,7 @@ const StyledNav: React.ComponentType<any> = styled(Nav)<{$style?: 'stepper'}>(({
       > a {
         position: relative;
         display: flex;
-        padding: 10px 15px;
+        padding: 10px 0px;
         justify-content: center;
         align-items: center;
         &:hover,
