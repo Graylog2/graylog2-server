@@ -56,7 +56,7 @@ const usePaginationQueryParameter = (
   const pageSize = determinePageSize();
 
   const setPagination = useCallback(({ page: newPage = page, pageSize: newPageSize = pageSize }: { page?: number, pageSize?: number }) => {
-    const uri = new URI(query).setSearch({ page: newPage, pageSize: syncPageSizeFromQuery ? String(newPageSize) : undefined });
+    const uri = new URI(query).setSearch({ page: syncPageSizeFromQuery ? String(newPage) : undefined, pageSize: syncPageSizeFromQuery ? String(newPageSize) : undefined });
     navigate(uri.toString());
   }, [navigate, page, pageSize, query, syncPageSizeFromQuery]);
 
