@@ -18,12 +18,12 @@ package org.graylog2.indexer.datastream;
 
 import com.google.common.collect.ImmutableMap;
 import jakarta.inject.Inject;
+import org.graylog2.configuration.IndexSetsDefaultConfiguration;
 import org.graylog2.indexer.fieldtypes.FieldTypeDTO;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypesDTO;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
-import org.graylog2.indexer.indexset.IndexSetConfig;
-import org.graylog2.indexer.indexset.IndexSetConfigFactory;
 import org.graylog2.indexer.indices.Template;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.streams.Stream;
 
 import java.util.List;
@@ -39,19 +39,20 @@ public class DataStreamServiceImpl implements DataStreamService {
     );
     private final DataStreamAdapter dataStreamAdapter;
     private final IndexFieldTypesService indexFieldTypesService;
-    private final IndexSetConfig indexSetConfig;
+    private final int replicas;
 
-    public DataStreamServiceImpl(DataStreamAdapter dataStreamAdapter, IndexFieldTypesService indexFieldTypesService,
-                                 IndexSetConfig indexSetConfig) {
-        this.dataStreamAdapter = dataStreamAdapter;
-        this.indexFieldTypesService = indexFieldTypesService;
-        this.indexSetConfig = indexSetConfig;
-    }
 
     @Inject
     public DataStreamServiceImpl(DataStreamAdapter dataStreamAdapter, IndexFieldTypesService indexFieldTypesService,
-                                 IndexSetConfigFactory indexSetConfigFactory) {
-        this(dataStreamAdapter, indexFieldTypesService, indexSetConfigFactory.createDefault().build());
+                                 ClusterConfigService clusterConfigService) {
+        this(dataStreamAdapter, indexFieldTypesService, clusterConfigService.get(IndexSetsDefaultConfiguration.class).replicas());
+    }
+
+    public DataStreamServiceImpl(DataStreamAdapter dataStreamAdapter, IndexFieldTypesService indexFieldTypesService,
+                                 int replicas) {
+        this.dataStreamAdapter = dataStreamAdapter;
+        this.indexFieldTypesService = indexFieldTypesService;
+        this.replicas = replicas;
     }
 
     @Override
@@ -60,6 +61,7 @@ public class DataStreamServiceImpl implements DataStreamService {
         updateDataStreamTemplate(dataStreamName, timestampField, mappings);
         dataStreamAdapter.createDataStream(dataStreamName);
         dataStreamAdapter.applyIsmPolicy(dataStreamName, ismPolicy);
+        dataStreamAdapter.setNumberOfReplicas(dataStreamName, replicas);
     }
 
     private void updateDataStreamTemplate(String dataStreamName, String timestampField, Map<String, Map<String, String>> mappings) {
@@ -67,7 +69,7 @@ public class DataStreamServiceImpl implements DataStreamService {
                 ? mappings
                 : ImmutableMap.<String, Map<String, String>>builder().putAll(mappings).put(timestampField, TIMESTAMP_TYPE).build();
         Template template = new Template(List.of(dataStreamName + "*"),
-                new Template.Mappings(ImmutableMap.of("properties", effectiveMappings)), 99999L, new Template.Settings(ImmutableMap.of("number_of_replicas", indexSetConfig.replicas())));
+                new Template.Mappings(ImmutableMap.of("properties", effectiveMappings)), 99999L, new Template.Settings(ImmutableMap.of("number_of_replicas", replicas)));
         dataStreamAdapter.ensureDataStreamTemplate(dataStreamName + "-template", template, timestampField);
         createFieldTypes(dataStreamName, effectiveMappings);
     }
