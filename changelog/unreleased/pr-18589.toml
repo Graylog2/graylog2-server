@@ -1,0 +1,5 @@
+type = "c"
+message = "Improve parameter description of pipeline function `csv_to_map`"
+
+pulls = [""]
+issues = ["18589"]
