@@ -158,6 +158,6 @@ describe('usePaginationQueryParameter custom hook', () => {
 
     result.current.setPagination({ page: 4, pageSize: 100 });
 
-    expect(mockNavigate).toHaveBeenCalledWith('example.org');
+    expect(mockNavigate).toHaveBeenCalledWith('example.org?page=4');
   });
 });
