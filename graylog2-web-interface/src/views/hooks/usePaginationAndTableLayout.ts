@@ -27,7 +27,7 @@ type DefaultLayout = {
   columnsOrder: Array<string>,
 }
 
-const usePaginationAndParamsLayout = (entityTableId: string, defaultLayout: DefaultLayout) => {
+const usePaginationAndTableLayout = (entityTableId: string, defaultLayout: DefaultLayout) => {
   const [query, setQuery] = useState('');
   const [activePage, setActivePage] = useState(1);
   const { layoutConfig, isInitialLoading: isLoadingLayoutPreferences } = useTableLayout({
@@ -91,4 +91,4 @@ const usePaginationAndParamsLayout = (entityTableId: string, defaultLayout: Defa
   });
 };
 
-export default usePaginationAndParamsLayout;
+export default usePaginationAndTableLayout;
