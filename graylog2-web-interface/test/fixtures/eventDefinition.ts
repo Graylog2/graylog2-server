@@ -29,6 +29,7 @@ export const simpleEventDefinition = {
     streams: ['stream-id-1'],
     type: 'aggregation-v1',
     filters: [],
+    _is_scheduled: true,
   },
   updated_at: '2024-02-26T15:32:24.666Z',
   description: '',

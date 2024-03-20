@@ -14,8 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { getPathnameWithoutId } from 'util/URLUtils';
-
 import React from 'react';
 import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
@@ -30,6 +28,7 @@ import type User from 'logic/users/User';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import { getPathnameWithoutId } from 'util/URLUtils';
 
 import styles from './EventConditionForm.css';
 

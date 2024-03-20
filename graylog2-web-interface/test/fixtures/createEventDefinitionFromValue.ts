@@ -82,6 +82,7 @@ export const ltParamJSON = {
   lookup_table: 'http_method',
   name: 'newParameter',
   optional: false,
+  embryonic: false,
   title: 'lt',
   type: 'lut-parameter-v1',
 };
@@ -93,6 +94,7 @@ export const valueParameterJSON = {
   description: '',
   name: 'newParameter3',
   optional: false,
+  embryonic: false,
   title: 'New Parameter3',
   type: 'value-parameter-v1',
 };

@@ -84,6 +84,7 @@ export const mockEventDefinitionTwoAggregations:EventDefinition = {
     type: 'aggregation-v1',
     query: 'http_method: GET',
     query_parameters: [],
+    _is_scheduled: true,
     streams: [
       '001',
     ],

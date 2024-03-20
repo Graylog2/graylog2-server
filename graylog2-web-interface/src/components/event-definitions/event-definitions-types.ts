@@ -18,8 +18,8 @@
 import type React from 'react';
 import { type SyntheticEvent } from 'react';
 
-import type { ParameterJson } from 'views/logic/parameters/Parameter';
 import type { Steps } from 'components/common/Wizard';
+import type { LookupTableParameterJson } from 'views/logic/parameters/LookupTableParameter';
 
 type Provider = {
   type: string,
@@ -74,10 +74,11 @@ export type EventDefinition = {
   config: {
     type: string,
     query: string,
-    query_parameters: ParameterJson[],
+    query_parameters: LookupTableParameterJson[],
     filters: SearchFilter[],
     streams: string[],
     group_by: string[],
+    _is_scheduled: boolean,
     series: Array<{field: string, id: string, type: string}>,
     conditions: {
       expression: string | null | {},
