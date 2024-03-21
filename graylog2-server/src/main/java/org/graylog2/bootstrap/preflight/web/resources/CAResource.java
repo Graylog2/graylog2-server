@@ -47,6 +47,7 @@ import org.graylog2.bootstrap.preflight.web.resources.model.CA;
 import org.graylog2.bootstrap.preflight.web.resources.model.CreateCARequest;
 import org.graylog2.bootstrap.preflight.web.resources.model.CreateClientCertRequest;
 import org.graylog2.plugin.rest.ApiError;
+import org.graylog2.shared.security.RestPermissions;
 
 import java.io.IOException;
 import java.security.KeyStoreException;
@@ -82,6 +83,7 @@ public class CAResource {
     @Path("create")
     @AuditEvent(type = CaAuditEventTypes.CA_CREATE)
     @ApiOperation("Creates a CA")
+    @RequiresPermissions(RestPermissions.GRAYLOG_CA_CREATE)
     public void createCA(@ApiParam(name = "request", required = true) @NotNull @Valid CreateCARequest request) throws CACreationException, KeyStoreStorageException, KeyStoreException {
         caService.create(request.organization(), CaService.DEFAULT_VALIDITY, passwordSecret.toCharArray());
     }
@@ -92,6 +94,7 @@ public class CAResource {
     @AuditEvent(type = CaAuditEventTypes.CA_UPLOAD)
     @ApiOperation("Upload a CA")
     @Produces(MediaType.APPLICATION_JSON)
+    @RequiresPermissions(RestPermissions.GRAYLOG_CA_CREATE)
     public Response uploadCA(@ApiParam(name = "password") @FormDataParam("password") String password, @ApiParam(name = "files") @FormDataParam("files") List<FormDataBodyPart> files) {
         try {
             caService.upload(password, files);
@@ -106,7 +109,7 @@ public class CAResource {
     @AuditEvent(type = CaAuditEventTypes.CLIENTCERT_CREATE)
     @ApiOperation("Creates a client certificate")
     @Produces(MediaType.APPLICATION_JSON)
-    @RequiresPermissions("*")
+    @RequiresPermissions(RestPermissions.GRAYLOG_CA_CLIENTCERT_CREATE)
     public Response createClientCert(@ApiParam(name = "request", required = true) @NotNull @Valid CreateClientCertRequest request) {
         try {
             var cert = clientCertGenerator.generateClientCert(request.principal(), request.role(), request.password().toCharArray());
@@ -121,7 +124,7 @@ public class CAResource {
     @AuditEvent(type = CaAuditEventTypes.CLIENTCERT_DELETE)
     @ApiOperation("removes the cert and the user from the role")
     @Produces(MediaType.APPLICATION_JSON)
-    @RequiresPermissions("*")
+    @RequiresPermissions(RestPermissions.GRAYLOG_CA_CLIENTCERT_DELETE)
     public Response deleteClientCert(@ApiParam(name = "role", required = true) @PathParam("role") String role, @ApiParam(name = "principal", required = true) @PathParam("principal") String principal) {
         try {
             clientCertGenerator.removeCertFor(role, principal);
