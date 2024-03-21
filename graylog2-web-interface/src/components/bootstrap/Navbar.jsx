@@ -161,7 +161,7 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
     }
 
     .icon-bar {
-      background-color: ${theme.colors.variant.default};
+      background-color: ${theme.colors.global.textDefault};
       transition: background-color 150ms ease-in-out,
         transform 150ms ease-in 0s,
         opacity 300ms ease-in 0s;
@@ -177,7 +177,7 @@ const Navbar = styled(BootstrapNavbar)(({ theme }) => css`
       border-color: ${theme.colors.variant.default};
       
       .icon-bar {
-        background-color: ${theme.colors.variant.dark.default};
+        background-color: ${theme.colors.global.textDefault};
       }
     }
   }
