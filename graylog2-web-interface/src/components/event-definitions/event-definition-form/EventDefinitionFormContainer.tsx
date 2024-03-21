@@ -70,6 +70,7 @@ const EventDefinitionFormContainer = ({
 }: Props) => {
   const { step } = useQuery();
   const { activePerspective } = useActivePerspective();
+
   const initialStep = activePerspective?.id === 'security' ? STEP_KEYS[0] : step as string;
   const [activeStep, setActiveStep] = useState(initialStep || STEP_KEYS[0]);
   const [eventDefinition, setEventDefinition] = useState(eventDefinitionInitial);

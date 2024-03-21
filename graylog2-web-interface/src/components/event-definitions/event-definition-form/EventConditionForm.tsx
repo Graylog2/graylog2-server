@@ -143,9 +143,10 @@ const EventConditionForm = ({ action, entityTypes, eventDefinition, validation, 
               Configure how Graylog should create Events of this kind. You can later use those Events as input on other
               Conditions, making it possible to build powerful Conditions based on others.
             </p>
-            <FormGroup controlId="event-definition-priority" validationState={validation.errors.config ? 'error' : null}>
-              <ControlLabel>Condition Type</ControlLabel>
+            <FormGroup validationState={validation.errors.config ? 'error' : null}>
+              <ControlLabel htmlFor="event-condition-type-select">Condition Type</ControlLabel>
               <Select placeholder="Select a Condition Type"
+                      inputId="event-condition-type-select"
                       options={formattedEventDefinitionTypes()}
                       value={eventDefinition.config.type}
                       onChange={handleEventDefinitionTypeChange}

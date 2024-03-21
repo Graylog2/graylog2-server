@@ -82,7 +82,6 @@ export const ltParamJSON = {
   lookup_table: 'http_method',
   name: 'newParameter',
   optional: false,
-  embryonic: false,
   title: 'lt',
   type: 'lut-parameter-v1',
 };

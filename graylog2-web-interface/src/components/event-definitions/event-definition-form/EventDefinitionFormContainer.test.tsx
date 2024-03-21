@@ -19,6 +19,7 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import { defaultUser as mockDefaultUser } from 'defaultMockValues';
+import selectEvent from 'react-select-event';
 
 import useLocation from 'routing/useLocation';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -194,6 +195,12 @@ jest.mock('logic/telemetry/useSendTelemetry');
 jest.mock('hooks/useScopePermissions');
 jest.mock('hooks/useCurrentUser');
 
+jest.mock('components/perspectives/hooks/useActivePerspective', () => () => ({
+  id: 'security',
+  title: 'Security',
+  welcomeRoute: '/security',
+}));
+
 describe('EventDefinitionFormContainer', () => {
   beforeEach(() => {
     asMock(useLocation).mockImplementation(() => ({ pathname: '/event-definitions', search: '', hash: '', state: null, key: 'mock-key' }));
@@ -226,18 +233,18 @@ describe('EventDefinitionFormContainer', () => {
 
   it('should render Filters & Aggregation form enabled', async () => {
     render(<EventDefinitionFormContainer action="edit" eventDefinition={mockAggregationEventDefinition} />);
-
-    const tab = await screen.findByRole('button', { name: /filter & aggregation/i });
+    const tab = await screen.findByRole('button', { name: /condition/i });
     userEvent.click(tab);
+    const conditionTypeSelect = await screen.findByLabelText('Condition Type');
 
-    expect(screen.getByRole('textbox', { name: /search query/i })).toBeEnabled();
+    expect(conditionTypeSelect).toBeInTheDocument();
   });
 
   it('Filters & Aggregation should not be accessible for immutable entities', async () => {
     asMock(useScopePermissions).mockImplementation(() => exampleEntityScopeImmutable);
     render(<EventDefinitionFormContainer action="edit" eventDefinition={mockAggregationEventDefinition} />);
 
-    const tab = await screen.findByRole('button', { name: /filter & aggregation/i });
+    const tab = await screen.findByRole('button', { name: /condition/i });
     userEvent.click(tab);
 
     expect(screen.getByText(/cannot be edited/i)).toBeVisible();
