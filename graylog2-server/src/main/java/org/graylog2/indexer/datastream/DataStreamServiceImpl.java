@@ -19,6 +19,7 @@ package org.graylog2.indexer.datastream;
 import com.google.common.collect.ImmutableMap;
 import jakarta.inject.Inject;
 import org.graylog2.configuration.IndexSetsDefaultConfiguration;
+import org.graylog2.configuration.IndexSetsDefaultConfigurationFactory;
 import org.graylog2.indexer.fieldtypes.FieldTypeDTO;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypesDTO;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
@@ -44,8 +45,10 @@ public class DataStreamServiceImpl implements DataStreamService {
 
     @Inject
     public DataStreamServiceImpl(DataStreamAdapter dataStreamAdapter, IndexFieldTypesService indexFieldTypesService,
-                                 ClusterConfigService clusterConfigService) {
-        this(dataStreamAdapter, indexFieldTypesService, clusterConfigService.get(IndexSetsDefaultConfiguration.class).replicas());
+                                 ClusterConfigService clusterConfigService, IndexSetsDefaultConfigurationFactory indexSetsDefaultConfigurationFactory) {
+        this(dataStreamAdapter, indexFieldTypesService, clusterConfigService.get(IndexSetsDefaultConfiguration.class) == null ?
+                indexSetsDefaultConfigurationFactory.create().replicas() :
+                clusterConfigService.get(IndexSetsDefaultConfiguration.class).replicas());
     }
 
     public DataStreamServiceImpl(DataStreamAdapter dataStreamAdapter, IndexFieldTypesService indexFieldTypesService,
