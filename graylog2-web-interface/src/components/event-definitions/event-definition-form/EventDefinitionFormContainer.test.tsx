@@ -19,7 +19,6 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import { defaultUser as mockDefaultUser } from 'defaultMockValues';
-import selectEvent from 'react-select-event';
 
 import useLocation from 'routing/useLocation';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
