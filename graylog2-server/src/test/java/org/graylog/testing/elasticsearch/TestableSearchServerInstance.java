@@ -74,13 +74,13 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
     protected abstract String imageName();
 
     public void createContainer() {
-        this.container = createContainer(version, network, heapSize);
+        this.container = createContainer(version, network, heapSize, env);
     }
 
     @Override
-    public GenericContainer<?> createContainer(SearchVersion version, Network network, String heapSize) {
+    public GenericContainer<?> createContainer(SearchVersion version, Network network, String heapSize, Map<String, String> env) {
         final var image = imageName();
-        final ContainerCacheKey cacheKey = new ContainerCacheKey(version, heapSize);
+        final ContainerCacheKey cacheKey = new ContainerCacheKey(version, heapSize, env);
         if (!containersByVersion.containsKey(cacheKey)) {
             LOG.debug("Creating instance {}", image);
             GenericContainer<?> container = buildContainer(image, network);
