@@ -66,7 +66,7 @@ public class InMemorySearchJobService implements SearchJobService {
         } else if (searchJob.getOwner().equals(searchUser.username()) || searchUser.isAdmin()) {
             return Optional.of(searchJob);
         } else {
-            throw new NotAuthorizedException(StringUtils.f("User %s cannot cancel search job %s that belongs to different user!", searchUser.username(), id));
+            throw new NotAuthorizedException(StringUtils.f("User %s cannot load search job %s that belongs to different user!", searchUser.username(), id));
         }
     }
 }
