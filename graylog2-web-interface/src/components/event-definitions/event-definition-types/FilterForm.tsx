@@ -14,10 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { naturalSortIgnoreCase } from 'util/SortUtils';
-import * as FormsUtils from 'util/FormsUtils';
-import { isPermitted } from 'util/PermissionsMixin';
-import { getPathnameWithoutId } from 'util/URLUtils';
 
 import * as React from 'react';
 import { useCallback, useContext, useEffect, useState } from 'react';
@@ -35,6 +31,10 @@ import union from 'lodash/union';
 import moment from 'moment';
 import { OrderedMap } from 'immutable';
 
+import { getPathnameWithoutId } from 'util/URLUtils';
+import { isPermitted } from 'util/PermissionsMixin';
+import * as FormsUtils from 'util/FormsUtils';
+import { naturalSortIgnoreCase } from 'util/SortUtils';
 import FormWarningsContext from 'contexts/FormWarningsContext';
 import { useStore } from 'stores/connect';
 import Store from 'logic/local-storage/Store';
@@ -217,6 +217,7 @@ const FilterForm = ({
     setQueryParameterStash(merge(queryParameterStash, staleParameters));
 
     config.query_parameters = keptParameters.concat(newParameters);
+    onChange('config', config);
   };
 
   const parseQuery = debounce((queryString, searchFilters = OrderedMap()) => {
