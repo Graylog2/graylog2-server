@@ -19,6 +19,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { NavItem } from 'components/bootstrap';
+import { itemStateIndicatorSelector } from 'components/common/NavItemStateIndicator';
 
 const StyledInactiveNav = styled(NavItem)`
   .navbar-default .navbar-nav > & > a {
@@ -26,6 +27,9 @@ const StyledInactiveNav = styled(NavItem)`
     &:focus {
       background: transparent;
     }
+  }
+  ${itemStateIndicatorSelector} {
+    display: none;
   }
 `;
 
