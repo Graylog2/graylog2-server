@@ -49,8 +49,8 @@ import org.graylog.shaded.opensearch2.org.opensearch.index.query.BoolQueryBuilde
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
-import org.graylog.storage.opensearch2.LegacyTimeRangeQueryFactory;
 import org.graylog.storage.opensearch2.OpenSearchClient;
+import org.graylog.storage.opensearch2.TimeRangeQueryFactory;
 import org.graylog.storage.opensearch2.views.searchtypes.OSSearchTypeHandler;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.FieldTypeException;
@@ -163,7 +163,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                             .must(searchTypeSourceBuilder.query())
                             .must(
                                     Objects.requireNonNull(
-                                            LegacyTimeRangeQueryFactory.create(
+                                            TimeRangeQueryFactory.create(
                                                     query.effectiveTimeRange(searchType, nowUTCSharedBetweenSearchTypes)
                                             ),
                                             "Timerange for search type " + searchType.id() + " cannot be found in query or search type."
