@@ -86,9 +86,6 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "opensearch_location")
     private String opensearchDistributionRoot = "dist";
 
-    @Parameter(value = "opensearch_plugins_location", validators = DirectoryReadableValidator.class)
-    private Path opensearchPluginsDir = Path.of("dist/plugins");
-
     @Parameter(value = "opensearch_data_location", required = true, validators = DirectoryReadableValidator.class)
     private Path opensearchDataLocation = Path.of("datanode/data");
 
@@ -299,11 +296,6 @@ public class Configuration extends BaseConfiguration {
 
     public String getOpensearchDistributionRoot() {
         return opensearchDistributionRoot;
-    }
-
-    @Nullable
-    public Path getOpensearchPluginsDir() {
-        return opensearchPluginsDir;
     }
 
     /**
