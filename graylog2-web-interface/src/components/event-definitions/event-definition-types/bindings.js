@@ -14,13 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import FilterAggregationFormContainer from './FilterAggregationFormContainer';
 import FilterAggregationForm from './FilterAggregationForm';
 import FilterAggregationSummary from './FilterAggregationSummary';
 
-PluginStore.register(new PluginManifest({}, {
+export default {
   eventDefinitionTypes: [
     {
       type: 'aggregation-v1',
@@ -33,4 +32,4 @@ PluginStore.register(new PluginManifest({}, {
       defaultConfig: FilterAggregationForm.defaultConfig,
     },
   ],
-}));
+};
