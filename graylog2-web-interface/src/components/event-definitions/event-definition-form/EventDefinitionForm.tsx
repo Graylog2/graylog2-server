@@ -73,7 +73,7 @@ type Props = {
   notifications: Array<EventNotification>,
   defaults: { default_backlog_size: number },
   onChange: (key: string, value: unknown) => void,
-  onChangeStep?: (step: string) => void,
+  onChangeStep: (step: string) => void,
   onCancel: () => void,
   onSubmit: () => void
   canEdit: boolean,
