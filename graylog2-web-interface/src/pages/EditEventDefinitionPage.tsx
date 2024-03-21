@@ -28,11 +28,13 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import useHistory from 'routing/useHistory';
+import useQuery from 'routing/useQuery';
 
 import StreamPermissionErrorPage from './StreamPermissionErrorPage';
 
 const EditEventDefinitionPage = () => {
   const params = useParams<{definitionId?: string}>();
+  const { step } = useQuery();
   const currentUser = useCurrentUser();
   const [eventDefinition, setEventDefinition] = React.useState<EventDefinition>(undefined);
   const history = useHistory();
@@ -107,6 +109,7 @@ const EditEventDefinitionPage = () => {
       <Row className="content">
         <Col md={12}>
           <EventDefinitionFormContainer action="edit"
+                                        initialStep={step as string}
                                         eventDefinition={eventDefinition}
                                         onSubmit={goToOverview}
                                         onCancel={goToOverview} />

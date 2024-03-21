@@ -19,7 +19,6 @@ import PropTypes from 'prop-types';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import cloneDeep from 'lodash/cloneDeep';
 
-import useActivePerspective from 'components/perspectives/hooks/useActivePerspective';
 import { useStore } from 'stores/connect';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import { ConfirmLeaveDialog, Spinner } from 'components/common';
@@ -35,7 +34,6 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useScopePermissions from 'hooks/useScopePermissions';
-import useQuery from 'routing/useQuery';
 
 import EventDefinitionForm, { STEP_KEYS } from './EventDefinitionForm';
 
@@ -47,9 +45,10 @@ type Props = {
   action: 'edit' | 'create',
   eventDefinition: EventDefinition,
   formControls?: React.ComponentType<EventDefinitionFormControlsProps>,
+  initialStep?: string,
+  onCancel?: () => void
   onEventDefinitionChange: (nextEventDefinition: EventDefinition) => void,
   onSubmit?: () => void,
-  onCancel?: () => void
 }
 
 const getConditionPlugin = (edType): any => {
@@ -63,16 +62,13 @@ const getConditionPlugin = (edType): any => {
 const EventDefinitionFormContainer = ({
   action,
   eventDefinition: eventDefinitionInitial,
-  onEventDefinitionChange,
   formControls,
-  onSubmit,
+  initialStep,
   onCancel,
+  onEventDefinitionChange,
+  onSubmit,
 }: Props) => {
-  const { step } = useQuery();
-  const { activePerspective } = useActivePerspective();
-
-  const initialStep = activePerspective?.id === 'security' ? STEP_KEYS[0] : step as string;
-  const [activeStep, setActiveStep] = useState(initialStep || STEP_KEYS[0]);
+  const [activeStep, setActiveStep] = useState(initialStep);
   const [eventDefinition, setEventDefinition] = useState(eventDefinitionInitial);
   const [validation, setValidation] = useState({ errors: {} });
   const [eventsClusterConfig, setEventsClusterConfig] = useState(undefined);
@@ -246,6 +242,7 @@ EventDefinitionFormContainer.defaultProps = {
     alert: false,
   },
   formControls: undefined,
+  initialStep: STEP_KEYS[0],
   onCancel: undefined,
   onSubmit: undefined,
   onEventDefinitionChange: () => {},
