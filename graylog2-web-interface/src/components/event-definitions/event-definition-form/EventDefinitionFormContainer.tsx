@@ -47,6 +47,7 @@ type Props = {
   formControls?: React.ComponentType<EventDefinitionFormControlsProps>,
   initialStep?: string,
   onCancel?: () => void
+  onChangeStep?: (step: string) => void,
   onEventDefinitionChange: (nextEventDefinition: EventDefinition) => void,
   onSubmit?: () => void,
 }
@@ -65,6 +66,7 @@ const EventDefinitionFormContainer = ({
   formControls,
   initialStep,
   onCancel,
+  onChangeStep,
   onEventDefinitionChange,
   onSubmit,
 }: Props) => {
@@ -191,6 +193,11 @@ const EventDefinitionFormContainer = ({
     onCancel();
   };
 
+  const changeStep = (step: string) => {
+    onChangeStep?.(step);
+    setActiveStep(step);
+  };
+
   if (isLoading || loadingScopePermissions) {
     return <Spinner text="Loading Event information..." />;
   }
@@ -205,13 +212,13 @@ const EventDefinitionFormContainer = ({
                            currentUser={currentUser}
                            defaults={defaults}
                            activeStep={activeStep}
-                           setActiveStep={setActiveStep}
                            entityTypes={entityTypes}
                            eventDefinition={eventDefinition}
                            formControls={formControls}
                            notifications={notifications.all}
                            onCancel={handleCancel}
                            onChange={handleChange}
+                           onChangeStep={changeStep}
                            onSubmit={handleSubmit}
                            validation={validation} />
     </>
@@ -245,6 +252,7 @@ EventDefinitionFormContainer.defaultProps = {
   initialStep: STEP_KEYS[0],
   onCancel: undefined,
   onSubmit: undefined,
+  onChangeStep: undefined,
   onEventDefinitionChange: () => {},
 };
 

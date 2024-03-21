@@ -28,7 +28,7 @@ import type { EventDefinitionFormControlsProps } from 'components/event-definiti
 
 const EventDefinitionFormControls = ({
   activeStep,
-  setActiveStep,
+  onChangeStep,
   onSubmit,
   onCancel,
   stepKeys,
@@ -57,7 +57,7 @@ const EventDefinitionFormControls = ({
     });
 
     const previousStep = activeStepIndex > 0 ? stepKeys[activeStepIndex - 1] : undefined;
-    setActiveStep(previousStep);
+    onChangeStep(previousStep);
   };
 
   const handleNextClick = () => {
@@ -69,7 +69,7 @@ const EventDefinitionFormControls = ({
     });
 
     const nextStep = stepKeys[activeStepIndex + 1];
-    setActiveStep(nextStep);
+    onChangeStep(nextStep);
   };
 
   return (

@@ -15,13 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type { SyntheticEvent } from 'react';
-import React, { useEffect } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import defaultTo from 'lodash/defaultTo';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import styled from 'styled-components';
-import URI from 'urijs';
-import QS from 'qs';
 
 import { getPathnameWithoutId } from 'util/URLUtils';
 import { Col, Row } from 'components/bootstrap';
@@ -29,7 +27,6 @@ import { Wizard } from 'components/common';
 import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
 import type { EventDefinition, EventDefinitionFormControlsProps } from 'components/event-definitions/event-definitions-types';
 import type User from 'logic/users/User';
-import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -63,7 +60,6 @@ const getConditionPlugin = (type: string | undefined) => {
 
 type Props = {
   activeStep: string,
-  setActiveStep: React.Dispatch<React.SetStateAction<string>>
   action: 'edit' | 'create',
   eventDefinition: EventDefinition,
   currentUser: User,
@@ -77,6 +73,7 @@ type Props = {
   notifications: Array<EventNotification>,
   defaults: { default_backlog_size: number },
   onChange: (key: string, value: unknown) => void,
+  onChangeStep?: (step: string) => void,
   onCancel: () => void,
   onSubmit: () => void
   canEdit: boolean,
@@ -95,23 +92,12 @@ const EventDefinitionForm = ({
   notifications,
   onCancel,
   onChange,
+  onChangeStep,
   onSubmit,
-  setActiveStep,
   validation,
 }: Props) => {
-  const history = useHistory();
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
-
-  useEffect(() => {
-    const currentUrl = new URI(window.location.href);
-    const queryParameters = QS.parse(currentUrl.query());
-
-    if (queryParameters.step !== activeStep) {
-      const newUrl = currentUrl.removeSearch('step').addQuery('step', activeStep);
-      history.replace(newUrl.resource());
-    }
-  }, [activeStep, history]);
 
   const handleSubmit = (event: SyntheticEvent) => {
     if (event) {
@@ -170,7 +156,7 @@ const EventDefinitionForm = ({
     },
   ];
 
-  const handleStepChange = (nextStep) => {
+  const handleStepChange = (nextStep: string) => {
     sendTelemetry(STEP_TELEMETRY_KEYS[STEP_KEYS.indexOf(nextStep)], {
       app_pathname: getPathnameWithoutId(pathname),
       app_section: (action === 'create') ? 'new-event-definition' : 'edit-event-definition',
@@ -178,7 +164,7 @@ const EventDefinitionForm = ({
       current_step: steps[STEP_KEYS.indexOf(activeStep)].title,
     });
 
-    setActiveStep(nextStep);
+    onChangeStep(nextStep);
   };
 
   return (
@@ -194,7 +180,7 @@ const EventDefinitionForm = ({
                   hidePreviousNextButtons />
         </WizardContainer>
         <FormControls activeStep={activeStep}
-                      setActiveStep={setActiveStep}
+                      onChangeStep={onChangeStep}
                       action={action}
                       steps={steps}
                       stepKeys={STEP_KEYS}

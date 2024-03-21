@@ -16,6 +16,7 @@
  */
 import React, { useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import URI from 'urijs';
 
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
 import { Col, Row } from 'components/bootstrap';
@@ -78,6 +79,11 @@ const EditEventDefinitionPage = () => {
 
   const missingStreams = streamsWithMissingPermissions();
 
+  const updateURLStepQueryParam = (newStep: string) => {
+    const newUrl = new URI(window.location.href).removeSearch('step').addQuery('step', newStep);
+    history.replace(newUrl.resource());
+  };
+
   if (missingStreams.length > 0) {
     return <StreamPermissionErrorPage error={null} missingStreamIds={missingStreams} />;
   }
@@ -110,6 +116,7 @@ const EditEventDefinitionPage = () => {
         <Col md={12}>
           <EventDefinitionFormContainer action="edit"
                                         initialStep={step as string}
+                                        onChangeStep={updateURLStepQueryParam}
                                         eventDefinition={eventDefinition}
                                         onSubmit={goToOverview}
                                         onCancel={goToOverview} />

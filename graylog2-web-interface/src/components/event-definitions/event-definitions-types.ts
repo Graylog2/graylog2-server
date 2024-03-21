@@ -14,8 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
-import type React from 'react';
 import { type SyntheticEvent } from 'react';
 
 import type { Steps } from 'components/common/Wizard';
@@ -104,11 +102,11 @@ export type EventDefinition = {
 }
 
 export type EventDefinitionFormControlsProps = {
-  activeStep: string,
-  setActiveStep: React.Dispatch<React.SetStateAction<string>>
-  onSubmit: (event: SyntheticEvent) => void,
-  onCancel: () => void,
-  stepKeys: Array<string>
   action: 'edit' | 'create',
-  steps: Steps
+  activeStep: string,
+  onCancel: () => void,
+  onChangeStep: (step: string) => void,
+  onSubmit: (event: SyntheticEvent) => void,
+  stepKeys: Array<string>
+  steps: Steps,
 }
