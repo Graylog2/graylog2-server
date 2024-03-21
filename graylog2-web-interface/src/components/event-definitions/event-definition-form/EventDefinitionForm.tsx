@@ -205,13 +205,11 @@ const EventDefinitionForm = ({
                   containerClassName=""
                   hidePreviousNextButtons />
         </WizardContainer>
-        <FormControls activeStep={activeStep}
-                      activeStepIndex={activeStepIndex}
+        <FormControls activeStepIndex={activeStepIndex}
                       action={action}
                       onOpenPrevPage={openPrevPage}
                       onOpenNextPage={openNextPage}
                       steps={steps}
-                      stepKeys={STEP_KEYS}
                       onSubmit={handleSubmit}
                       onCancel={onCancel} />
       </Col>
