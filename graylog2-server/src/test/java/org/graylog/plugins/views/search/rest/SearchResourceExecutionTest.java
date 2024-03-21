@@ -101,7 +101,7 @@ public class SearchResourceExecutionTest {
                 new PluggableSearchValidation(executionGuard, Collections.emptySet()),
                 new PluggableSearchNormalization(Collections.emptySet()));
 
-        this.searchResource = new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus, nodeId) {
+        this.searchResource = new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus) {
             @Override
             protected User getCurrentUser() {
                 return currentUser;

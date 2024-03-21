@@ -75,7 +75,7 @@ public class SearchResourceTest {
                 .build();
 
         final SearchDomain searchDomain = mockSearchDomain(Optional.of(search));
-        final SearchResource resource = new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus, nodeId);
+        final SearchResource resource = new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus);
         final SearchDTO returnedSearch = resource.getSearch(search.id(), searchUser);
 
         assertThat(returnedSearch.id()).isEqualTo(search.id());
@@ -84,7 +84,7 @@ public class SearchResourceTest {
     @Test
     public void getSearchThrowsNotFoundIfSearchDoesntExist() {
         final SearchDomain searchDomain = mockSearchDomain(Optional.empty());
-        final SearchResource resource = new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus, nodeId);
+        final SearchResource resource = new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus);
         assertThatExceptionOfType(NotFoundException.class)
                 .isThrownBy(() -> resource.getSearch("god", searchUser))
                 .withMessageContaining("god");
@@ -97,7 +97,7 @@ public class SearchResourceTest {
         final SearchDomain searchDomain = mock(SearchDomain.class);
         when(searchDomain.saveForUser(any(), any())).thenReturn(search.toSearch());
 
-        final SearchResource resource = new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus, nodeId);
+        final SearchResource resource = new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus);
         final Response response = resource.createSearch(search, searchUser);
 
         Assertions.assertThat(response.getStatus()).isEqualTo(Response.Status.CREATED.getStatusCode());

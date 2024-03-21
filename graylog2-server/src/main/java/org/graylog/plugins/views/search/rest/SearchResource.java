@@ -50,7 +50,6 @@ import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.rest.PluginRestResource;
-import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -81,19 +80,16 @@ public class SearchResource extends RestResource implements PluginRestResource {
     private final SearchExecutor searchExecutor;
     private final SearchJobService searchJobService;
     private final EventBus serverEventBus;
-    private final NodeId nodeId;
 
     @Inject
     public SearchResource(SearchDomain searchDomain,
                           SearchExecutor searchExecutor,
                           SearchJobService searchJobService,
-                          EventBus serverEventBus,
-                          NodeId nodeId) {
+                          EventBus serverEventBus) {
         this.searchDomain = searchDomain;
         this.searchExecutor = searchExecutor;
         this.searchJobService = searchJobService;
         this.serverEventBus = serverEventBus;
-        this.nodeId = nodeId;
     }
 
     @POST
