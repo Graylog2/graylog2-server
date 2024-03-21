@@ -40,6 +40,10 @@ const CreateEventDefinitionPage = () => {
 
   const pageTitle = useMemo(() => (eventDefinitionTitle ? `New Event Definition "${eventDefinitionTitle}"` : 'New Event Definition'), [eventDefinitionTitle]);
 
+  const goToOverview = useCallback(() => {
+    navigate(Routes.ALERTS.DEFINITIONS.LIST);
+  }, [navigate]);
+
   useEffect(() => {
     if (!isPermitted(currentUser.permissions, 'eventdefinitions:create')) {
       navigate(Routes.NOTFOUND);
@@ -62,7 +66,10 @@ const CreateEventDefinitionPage = () => {
 
       <Row className="content">
         <Col md={12}>
-          <EventDefinitionFormContainer action="create" onEventDefinitionChange={handleEventDefinitionChange} />
+          <EventDefinitionFormContainer action="create"
+                                        onEventDefinitionChange={handleEventDefinitionChange}
+                                        onSubmit={goToOverview}
+                                        onCancel={goToOverview} />
         </Col>
       </Row>
 

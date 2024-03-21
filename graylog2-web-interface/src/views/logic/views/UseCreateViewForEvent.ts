@@ -21,7 +21,7 @@ import uniq from 'lodash/uniq';
 import View from 'views/logic/views/View';
 import type { AbsoluteTimeRange, ElasticsearchQueryString, RelativeTimeRangeStartOnly } from 'views/logic/queries/Query';
 import type { Event } from 'components/events/events/types';
-import type { EventDefinition } from 'logic/alerts/types';
+import type { EventDefinition, SearchFilter } from 'components/event-definitions/event-definitions-types';
 import QueryGenerator from 'views/logic/queries/QueryGenerator';
 import Search from 'views/logic/search/Search';
 import { matchesDecoratorStream } from 'views/logic/views/ViewStateGenerator';
@@ -46,7 +46,6 @@ import { concatQueryStrings, escape } from 'views/logic/queries/QueryHelper';
 import HighlightingRule, { randomColor } from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import { exprToConditionMapper } from 'views/logic/ExpressionConditionMappers';
 import FormattingSettings from 'views/logic/views/formatting/FormattingSettings';
-import type { SearchFilter } from 'components/event-definitions/event-definitions-types';
 
 const AGGREGATION_WIDGET_HEIGHT = 3;
 
