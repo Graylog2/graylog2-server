@@ -16,29 +16,21 @@
  */
 
 import React from 'react';
-import last from 'lodash/last';
 
 import { ModalSubmit } from 'components/common';
 import { Button } from 'components/bootstrap';
-import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import { getPathnameWithoutId } from 'util/URLUtils';
-import useLocation from 'routing/useLocation';
 import type { EventDefinitionFormControlsProps } from 'components/event-definitions/event-definitions-types';
 
 const EventDefinitionFormControls = ({
-  activeStep,
-  onChangeStep,
-  onSubmit,
-  onCancel,
-  stepKeys,
   action,
+  activeStepIndex,
+  onCancel,
+  onOpenNextPage,
+  onOpenPrevPage,
+  onSubmit,
   steps,
 }: EventDefinitionFormControlsProps) => {
-  const sendTelemetry = useSendTelemetry();
-  const { pathname } = useLocation();
-
-  if (activeStep === last(stepKeys)) {
+  if (activeStepIndex === steps.length - 1) {
     return (
       <ModalSubmit onCancel={onCancel}
                    onSubmit={onSubmit}
@@ -46,42 +38,16 @@ const EventDefinitionFormControls = ({
     );
   }
 
-  const activeStepIndex = stepKeys.indexOf(activeStep);
-
-  const handlePreviousClick = () => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_PREVIOUS_CLICKED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: (action === 'create') ? 'new-event-definition' : 'edit-event-definition',
-      app_action_value: 'previous-button',
-      current_step: steps[activeStepIndex].title,
-    });
-
-    const previousStep = activeStepIndex > 0 ? stepKeys[activeStepIndex - 1] : undefined;
-    onChangeStep(previousStep);
-  };
-
-  const handleNextClick = () => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_NEXT_CLICKED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: (action === 'create') ? 'new-event-definition' : 'edit-event-definition',
-      app_action_value: 'next-button',
-      current_step: steps[activeStepIndex].title,
-    });
-
-    const nextStep = stepKeys[activeStepIndex + 1];
-    onChangeStep(nextStep);
-  };
-
   return (
     <div>
       <Button bsStyle="info"
-              onClick={handlePreviousClick}
+              onClick={onOpenPrevPage}
               disabled={activeStepIndex === 0}>
         Previous
       </Button>
       <div className="pull-right">
         <Button bsStyle="info"
-                onClick={handleNextClick}>
+                onClick={onOpenNextPage}>
           Next
         </Button>
       </div>

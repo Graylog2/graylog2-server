@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type { SyntheticEvent } from 'react';
-import React from 'react';
+import * as React from 'react';
 import PropTypes from 'prop-types';
 import defaultTo from 'lodash/defaultTo';
 import { PluginStore } from 'graylog-web-plugin/plugin';
@@ -99,6 +99,8 @@ const EventDefinitionForm = ({
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
 
+  const activeStepIndex = STEP_KEYS.indexOf(activeStep);
+
   const handleSubmit = (event: SyntheticEvent) => {
     if (event) {
       event.preventDefault();
@@ -167,6 +169,30 @@ const EventDefinitionForm = ({
     onChangeStep(nextStep);
   };
 
+  const openPrevPage = () => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_PREVIOUS_CLICKED, {
+      app_pathname: getPathnameWithoutId(pathname),
+      app_section: (action === 'create') ? 'new-event-definition' : 'edit-event-definition',
+      app_action_value: 'previous-button',
+      current_step: steps[activeStepIndex].title,
+    });
+
+    const previousStep = activeStepIndex > 0 ? STEP_KEYS[activeStepIndex - 1] : undefined;
+    onChangeStep(previousStep);
+  };
+
+  const openNextPage = () => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_NEXT_CLICKED, {
+      app_pathname: getPathnameWithoutId(pathname),
+      app_section: (action === 'create') ? 'new-event-definition' : 'edit-event-definition',
+      app_action_value: 'next-button',
+      current_step: steps[activeStepIndex].title,
+    });
+
+    const nextStep = STEP_KEYS[activeStepIndex + 1];
+    onChangeStep(nextStep);
+  };
+
   return (
     <Row>
       <Col md={12}>
@@ -180,8 +206,10 @@ const EventDefinitionForm = ({
                   hidePreviousNextButtons />
         </WizardContainer>
         <FormControls activeStep={activeStep}
-                      onChangeStep={onChangeStep}
+                      activeStepIndex={activeStepIndex}
                       action={action}
+                      onOpenPrevPage={openPrevPage}
+                      onOpenNextPage={openNextPage}
                       steps={steps}
                       stepKeys={STEP_KEYS}
                       onSubmit={handleSubmit}

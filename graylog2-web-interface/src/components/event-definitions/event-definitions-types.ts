@@ -103,10 +103,10 @@ export type EventDefinition = {
 
 export type EventDefinitionFormControlsProps = {
   action: 'edit' | 'create',
-  activeStep: string,
+  activeStepIndex: number,
   onCancel: () => void,
-  onChangeStep: (step: string) => void,
+  onOpenNextPage: () => void,
+  onOpenPrevPage: () => void,
   onSubmit: (event: SyntheticEvent) => void,
-  stepKeys: Array<string>
   steps: Steps,
 }
