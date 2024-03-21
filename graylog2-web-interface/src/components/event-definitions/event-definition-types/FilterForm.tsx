@@ -45,6 +45,7 @@ import Search from 'views/logic/search/Search';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 import { Alert, ButtonToolbar, ControlLabel, FormGroup, HelpBlock, Input } from 'components/bootstrap';
 import RelativeTime from 'components/common/RelativeTime';
+import type { LookupTableParameterJson } from 'views/logic/parameters/LookupTableParameter';
 import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
 import { LookupTablesActions, LookupTablesStore } from 'stores/lookup-tables/LookupTablesStore';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
@@ -65,18 +66,19 @@ import commonStyles from '../common/commonStyles.css';
 
 export const PLUGGABLE_CONTROLS_HIDDEN_KEY = 'pluggableSearchBarControlsAreHidden';
 export const TIME_UNITS = ['HOURS', 'MINUTES', 'SECONDS'];
-
+type LookupTableParameterJsonEmbryonic = Partial<LookupTableParameterJson> & {
+  embryonic?: boolean,
+}
 const LOOKUP_PERMISSIONS = [
   'lookuptables:read',
 ];
 
-const buildNewParameter = (name: string) => ({
+const buildNewParameter = (name: string): LookupTableParameterJsonEmbryonic => ({
   name: name,
   embryonic: true,
   type: 'lut-parameter-v1',
   data_type: 'any',
   title: 'new title',
-  // has no binding, no need to set binding property
 });
 
 type Props = {
@@ -354,7 +356,7 @@ const FilterForm = ({
     const parameterButtons = queryParameters.map((queryParam) => (
       <EditQueryParameterModal key={queryParam.name}
                                queryParameter={LookupTableParameter.fromJSON(queryParam)}
-                               embryonic={!!queryParam.embryonic}
+                               embryonic={!!(queryParam as LookupTableParameterJsonEmbryonic).embryonic}
                                queryParameters={queryParameters}
                                lookupTables={Object.values(tables)}
                                onChange={onChangeQueryParameters} />
@@ -364,7 +366,7 @@ const FilterForm = ({
       return null;
     }
 
-    const hasEmbryonicParameters = !isEmpty(queryParameters.filter((param) => (param.embryonic)));
+    const hasEmbryonicParameters = !isEmpty(queryParameters.filter((param : LookupTableParameterJsonEmbryonic) => (param.embryonic)));
 
     return (
       <FormGroup validationState={validation.errors.query_parameters ? 'error' : null}>

@@ -35,7 +35,7 @@ describe('ValidateOnParameterChange', () => {
   );
 
   const simpleParameters = Immutable.fromJS({
-    foo: ValueParameter.create('source', 'Source parameter', 'The value that source should have', 'string', undefined, false, false, ParameterBinding.empty()),
+    foo: ValueParameter.create('source', 'Source parameter', 'The value that source should have', 'string', undefined, false, ParameterBinding.empty()),
   });
 
   it('should not trigger form validation on mount', async () => {
@@ -50,7 +50,7 @@ describe('ValidateOnParameterChange', () => {
     const { rerender } = render(<SUT parameters={simpleParameters} onValidate={onValidateMock} />);
 
     const updatedParameters = Immutable.fromJS({
-      foo: ValueParameter.create('source', 'Source parameter', 'The value that source should have', 'string', 'default value', false, false, ParameterBinding.empty()),
+      foo: ValueParameter.create('source', 'Source parameter', 'The value that source should have', 'string', 'default value', false, ParameterBinding.empty()),
     });
     rerender(<SUT parameters={updatedParameters} onValidate={onValidateMock} />);
 

@@ -18,4 +18,4 @@
 import ValueParameter from 'views/logic/parameters/ValueParameter';
 
 // eslint-disable-next-line import/prefer-default-export
-export const valueParameter = ValueParameter.create('paraemterName', 'Parameter Title', '', 'any', undefined, false, false);
+export const valueParameter = ValueParameter.create('paraemterName', 'Parameter Title', '', 'any', undefined, false);

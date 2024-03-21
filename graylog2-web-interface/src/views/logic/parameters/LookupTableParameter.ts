@@ -40,14 +40,14 @@ export default class LookupTableParameter extends Parameter {
 
   static Builder: typeof Builder;
 
-  constructor(name: string, title: string, description: string, dataType: string, defaultValue: any, optional: boolean, embryonic: boolean, lookupTable: string, key: string) {
-    super(LookupTableParameter.type, name, title, description, dataType, defaultValue, optional, embryonic);
+  constructor(name: string, title: string, description: string, dataType: string, defaultValue: any, optional: boolean, lookupTable: string, key: string) {
+    super(LookupTableParameter.type, name, title, description, dataType, defaultValue, optional);
     this._value2 = { lookupTable, key };
   }
 
   static create(_type: string, name: string, title: string, description: string, dataType: string, defaultValue: any,
-    optional: boolean, embryonic: boolean, lookupTable: string, key: string): LookupTableParameter {
-    return new LookupTableParameter(name, title, description, dataType, defaultValue, optional, embryonic, lookupTable, key);
+    optional: boolean, lookupTable: string, key: string): LookupTableParameter {
+    return new LookupTableParameter(name, title, description, dataType, defaultValue, optional, lookupTable, key);
   }
 
   toBuilder(): Builder {
@@ -83,7 +83,7 @@ export default class LookupTableParameter extends Parameter {
   }
 
   toJSON(): LookupTableParameterJson {
-    const { type, name, title, description, dataType, defaultValue, optional, embryonic } = this._value;
+    const { type, name, title, description, dataType, defaultValue, optional } = this._value;
     const { lookupTable, key } = this._value2;
 
     return {
@@ -94,7 +94,6 @@ export default class LookupTableParameter extends Parameter {
       data_type: dataType,
       default_value: defaultValue,
       optional,
-      embryonic,
       binding: undefined,
       lookup_table: lookupTable,
       key,
@@ -103,9 +102,9 @@ export default class LookupTableParameter extends Parameter {
 
   // static fromJSON(json: LookupTableParameterJson): Parameter {
   static fromJSON(json: LookupTableParameterJson): LookupTableParameter {
-    const { name, title, description, data_type, default_value, optional, embryonic, lookup_table, key } = json;
+    const { name, title, description, data_type, default_value, optional, lookup_table, key } = json;
 
-    return new LookupTableParameter(name, title, description, data_type, default_value, optional, embryonic, lookup_table, key);
+    return new LookupTableParameter(name, title, description, data_type, default_value, optional, lookup_table, key);
   }
 
   static builder(): Builder {
@@ -161,9 +160,9 @@ class Builder {
   }
 
   build(): LookupTableParameter {
-    const { name, title, description, dataType, defaultValue, optional, embryonic, lookupTable, key } = this.value.toObject();
+    const { name, title, description, dataType, defaultValue, optional, lookupTable, key } = this.value.toObject();
 
-    return new LookupTableParameter(name, title, description, dataType, defaultValue, optional, embryonic, lookupTable, key);
+    return new LookupTableParameter(name, title, description, dataType, defaultValue, optional, lookupTable, key);
   }
 }
 

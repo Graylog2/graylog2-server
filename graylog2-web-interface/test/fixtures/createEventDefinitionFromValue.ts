@@ -93,7 +93,6 @@ export const valueParameterJSON = {
   description: '',
   name: 'newParameter3',
   optional: false,
-  embryonic: false,
   title: 'New Parameter3',
   type: 'value-parameter-v1',
 };
