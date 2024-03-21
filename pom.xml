@@ -172,7 +172,7 @@
         <siv-mode.version>1.5.0</siv-mode.version>
         <slf4j.version>2.0.12</slf4j.version>
         <streamex.version>0.8.2</streamex.version>
-        <swagger.version>1.6.13</swagger.version>
+        <swagger.version>1.6.14</swagger.version>
         <syslog4j.version>0.9.61</syslog4j.version>
         <ulid.version>8.3.0</ulid.version>
         <unboundid-ldap.version>7.0.0</unboundid-ldap.version>
