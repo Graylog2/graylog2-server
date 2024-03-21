@@ -30,8 +30,6 @@ import withPaginationQueryParameter from 'components/common/withPaginationQueryP
 
 import Events, { PAGE_SIZES, EVENTS_MAX_OFFSET_LIMIT } from './Events';
 
-import 'components/event-definitions/event-definition-types';
-
 const LOCAL_STORAGE_ITEM = 'events-last-search';
 const SEARCH_DEBOUNCE_THRESHOLD = 500;
 

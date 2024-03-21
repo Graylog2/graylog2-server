@@ -35,10 +35,6 @@ import type { EventDefinition } from '../event-definitions-types';
 import commonStyles from '../common/commonStyles.css';
 import { SYSTEM_EVENT_DEFINITION_TYPE } from '../constants';
 
-// Import built-in plugins
-import 'components/event-definitions/event-definition-types';
-import 'components/event-notifications/event-notification-types';
-
 type Props = {
   eventDefinition: Omit<EventDefinition, 'id'>,
   notifications: Array<any>,

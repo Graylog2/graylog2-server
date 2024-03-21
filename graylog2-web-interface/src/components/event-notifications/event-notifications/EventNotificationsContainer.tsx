@@ -38,9 +38,6 @@ import BulkActions from './BulkActions';
 import useEventNotifications from '../hooks/useEventNotifications';
 import useNotificationTest from '../hooks/useNotificationTest';
 
-// Import built-in Event Notification Types
-import '../event-notification-types';
-
 const customColumnRenderers = (testResults: TestResults): ColumnRenderers<EventNotification> => ({
   attributes: {
     title: {
