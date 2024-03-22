@@ -20,6 +20,7 @@ import com.google.common.base.Suppliers;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import org.graylog2.cluster.nodes.DataNodeDto;
+import org.graylog2.cluster.nodes.DataNodeStatus;
 import org.graylog2.cluster.nodes.NodeService;
 
 import java.util.function.Supplier;
@@ -44,6 +45,6 @@ public class RunsWithDataNodeDiscoveryProvider implements Provider<Boolean> {
     }
 
     private Boolean doGet() {
-        return !nodeService.allActive().isEmpty();
+        return nodeService.allActive().values().stream().anyMatch(node -> DataNodeStatus.AVAILABLE == node.getDataNodeStatus());
     }
 }
