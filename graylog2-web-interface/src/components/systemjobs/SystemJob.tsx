@@ -68,7 +68,7 @@ const JobWrap = styled.div`
 
 const AcknowledgeButton = styled(Button)(({ theme }) => css`
   && {
-    color: ${theme.colors.variant.light.default};
+    color: ${theme.colors.global.textDefault};
     
     &:hover {
       color: ${theme.colors.variant.default};

@@ -28,7 +28,7 @@ const Thead = styled.thead(({ theme }) => css`
   background-color: ${theme.colors.global.contentBackground};
 `);
 
-const Th = styled.th<{ $width: number | undefined }>(({ $width, theme }) => css`
+export const Th = styled.th<{ $width: number | undefined }>(({ $width, theme }) => css`
   width: ${$width ? `${$width}px` : 'auto'};
   background-color: ${theme.colors.table.head.background};
 `);
@@ -64,7 +64,7 @@ const TableHeader = <Entity extends EntityBase>({
   );
 };
 
-const ActionsHead = styled.th<{ $width: number | undefined }>(({ $width }) => css`
+const ActionsHead = styled(Th)<{ $width: number | undefined }>(({ $width }) => css`
   text-align: right;
   width: ${$width ? `${$width}px` : 'auto'};
 `);
