@@ -32,7 +32,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.index.query.TermsQueryBuild
 import org.graylog.shaded.opensearch2.org.opensearch.search.SearchHit;
 import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.sort.SortOrder;
-import org.graylog.storage.opensearch2.LegacyTimeRangeQueryFactory;
+import org.graylog.storage.opensearch2.TimeRangeQueryFactory;
 import org.graylog2.plugin.Message;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -158,7 +158,7 @@ public class OpenSearchExportBackend implements ExportBackend {
     }
 
     private QueryBuilder timestampFilter(ExportMessagesCommand command) {
-        return requireNonNull(LegacyTimeRangeQueryFactory.create(command.timeRange()));
+        return requireNonNull(TimeRangeQueryFactory.create(command.timeRange()));
     }
 
     private TermsQueryBuilder streamsFilter(ExportMessagesCommand command) {

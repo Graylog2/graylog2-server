@@ -89,8 +89,9 @@ const tableCss = css(({ theme }) => css`
     }
 
     > thead > tr > th {
+      background: ${theme.colors.table.head.background};
       white-space: nowrap;
-      border-bottom-color: ${theme.colors.table.row.backgroundAlt};
+      border-bottom-color: ${theme.colors.table.row.border};
     }
 
     > tbody > tr {

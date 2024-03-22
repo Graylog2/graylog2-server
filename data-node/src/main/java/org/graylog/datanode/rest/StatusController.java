@@ -46,7 +46,8 @@ public class StatusController {
     public DataNodeStatus status() {
         return new DataNodeStatus(
                 version,
-                new StatusResponse(datanodeConfiguration.opensearchDistributionProvider().get().version(), openSearch.processInfo())
+                new StatusResponse(datanodeConfiguration.opensearchDistributionProvider().get().version(),openSearch.processInfo()),
+                datanodeConfiguration.datanodeDirectories()
         );
     }
 

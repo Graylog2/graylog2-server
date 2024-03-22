@@ -14,13 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch2;
+import { DEFAULT_LAYOUT, ENTITY_TABLE_ID } from 'views/components/searchbar/saved-search/Constants';
+import usePaginationAndTableLayout from 'hooks/usePaginationAndTableLayout';
 
-import org.graylog.shaded.opensearch2.org.opensearch.client.Node;
+const useSavedSearchPaginationAndTableLayout = () => usePaginationAndTableLayout(ENTITY_TABLE_ID, DEFAULT_LAYOUT);
 
-import java.io.IOException;
-import java.util.List;
-
-public interface LegacyNodesSniffer {
-    List<Node> sniff(List<Node> nodes) throws IOException;
-}
+export default useSavedSearchPaginationAndTableLayout;
