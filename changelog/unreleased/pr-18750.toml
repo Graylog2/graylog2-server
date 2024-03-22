@@ -1,0 +1,5 @@
+type = "fixed" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+message = "Fix not being able to change log level."
+
+issues = ["18676"]
+pulls = ["18750"]
