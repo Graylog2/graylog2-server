@@ -25,11 +25,12 @@ import BulkSelectHead from './BulkSelectHead';
 import type { Column, ColumnRenderer, EntityBase, ColumnRenderersByAttribute } from './types';
 
 const Thead = styled.thead(({ theme }) => css`
-  background-color: ${theme.colors.table.head.background};
+  background-color: ${theme.colors.global.contentBackground};
 `);
 
-const Th = styled.th<{ $width: number | undefined }>(({ $width }) => css`
+const Th = styled.th<{ $width: number | undefined }>(({ $width, theme }) => css`
   width: ${$width ? `${$width}px` : 'auto'};
+  background-color: ${theme.colors.table.head.background};
 `);
 
 const TableHeader = <Entity extends EntityBase>({

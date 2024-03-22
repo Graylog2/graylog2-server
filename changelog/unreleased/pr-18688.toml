@@ -1,0 +1,15 @@
+type = "c"
+message = "Rename datanode opensearch proxy paths"
+
+pulls = ["18688"]
+
+details.user = """
+Opensearch proxy path is now containing /opensearch/ path instead of /request/:
+
+Before:
+* /api/datanodes/{hostname}/request/{path: .*}
+
+After:
+* /api/datanodes/{hostname}/opensearch/{path: .*}
+
+"""

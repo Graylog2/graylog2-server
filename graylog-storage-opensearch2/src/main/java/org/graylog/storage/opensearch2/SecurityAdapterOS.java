@@ -20,11 +20,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
-import org.apache.http.HttpEntity;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
+import org.graylog.shaded.opensearch2.org.apache.http.HttpEntity;
+import org.graylog.shaded.opensearch2.org.apache.http.entity.ContentType;
+import org.graylog.shaded.opensearch2.org.apache.http.entity.StringEntity;
+import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
 import org.graylog2.indexer.security.SecurityAdapter;
-import org.opensearch.client.Request;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

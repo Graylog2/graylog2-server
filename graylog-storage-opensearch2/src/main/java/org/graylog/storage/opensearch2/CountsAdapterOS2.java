@@ -16,9 +16,13 @@
  */
 package org.graylog.storage.opensearch2;
 
-import jakarta.inject.Inject;
 import org.graylog2.indexer.counts.CountsAdapter;
-import org.opensearch.client.opensearch.core.MsearchRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
+import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
+
+import jakarta.inject.Inject;
 
 import java.util.List;
 
@@ -32,16 +36,15 @@ public class CountsAdapterOS2 implements CountsAdapter {
 
     @Override
     public long totalCount(List<String> indices) {
-        final var request = new MsearchRequest.Builder()
-                .searches(searchBuilder -> searchBuilder
-                        .header(headerBuilder -> headerBuilder.index(indices))
-                        .body(bodyBuilder -> bodyBuilder
-                                .query(queryBuilder -> queryBuilder.matchAll(matchAll -> matchAll))
-                                .size(0)
-                                .trackTotalHits(totalHits -> totalHits.enabled(true))))
-                .build();
-        final var result = client.search(request, "Fetching message count failed for indices ");
+        final SearchSourceBuilder query = new SearchSourceBuilder()
+                .query(QueryBuilders.matchAllQuery())
+                .size(0)
+                .trackTotalHits(true);
+        final SearchRequest searchRequest = new SearchRequest(indices.toArray(new String[0]))
+                .source(query);
 
-        return result.result().hits().total().value();
+        final SearchResponse result = client.search(searchRequest, "Fetching message count failed for indices ");
+
+        return result.getHits().getTotalHits().value;
     }
 }

@@ -124,7 +124,7 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
                     localConfiguration.getOpensearchTransportPort(),
                     localConfiguration.getClustername(),
                     localConfiguration.getDatanodeNodeName(),
-                    List.of("cluster_manager", "data", "ingest", "remote_cluster_client", "search"),
+                    localConfiguration.getNodeRoles() ,
                     localConfiguration.getOpensearchDiscoverySeedHosts(),
                     securityConfiguration,
                     s3RepositoryConfiguration,

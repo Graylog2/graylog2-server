@@ -40,6 +40,7 @@ import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.graylog2.shared.security.RestPermissions;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,8 +53,8 @@ import static org.graylog2.audit.AuditEventTypes.DATANODE_API_REQUEST;
 @Api(value = "DataNodes/API", description = "Proxy direct access to Data Node's API")
 @Produces(MediaType.APPLICATION_JSON)
 @Timed
-@Path("/datanodes/{hostname}/request/{path: .*}")
-@RequiresPermissions("*")
+@Path("/datanodes/{hostname}/opensearch/{path: .*}")
+@RequiresPermissions(RestPermissions.DATANODE_OPENSEARCH_PROXY)
 public class DataNodeApiProxyResource extends RestResource {
     private static final List<Predicate<ProxyRequestAdapter.ProxyRequest>> allowList = List.of(
             request -> request.path().startsWith("_cluster"),

@@ -20,7 +20,6 @@ import { useState, useMemo, useCallback } from 'react';
 import { EntityDataTable, NoSearchResult, PaginatedList, QueryHelper, RelativeTime, SearchForm, Spinner } from 'components/common';
 import type { Sort } from 'stores/PaginationTypes';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
-import 'components/event-definitions/event-definition-types';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';

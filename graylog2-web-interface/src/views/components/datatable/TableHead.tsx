@@ -19,7 +19,7 @@ import styled, { css } from 'styled-components';
 import { VISUALIZATION_TABLE_HEADER_HEIGHT } from 'views/Constants';
 
 const TableHead = styled.thead(({ theme }) => css`
-  background-color: ${theme.colors.table.head.background};
+  background-color: ${theme.colors.global.contentBackground};
   height: ${VISUALIZATION_TABLE_HEADER_HEIGHT}px;
   color: ${theme.utils.readableColor(theme.colors.gray[90])};
   position: sticky;

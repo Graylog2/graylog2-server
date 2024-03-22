@@ -16,21 +16,26 @@
  */
 package org.graylog.storage.opensearch2;
 
-import org.apache.http.HttpException;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpResponseInterceptor;
-import org.apache.http.protocol.HttpContext;
+import org.graylog.shaded.opensearch2.org.apache.http.Header;
+import org.graylog.shaded.opensearch2.org.apache.http.HttpException;
+import org.graylog.shaded.opensearch2.org.apache.http.HttpResponse;
+import org.graylog.shaded.opensearch2.org.apache.http.HttpResponseInterceptor;
+import org.graylog.shaded.opensearch2.org.apache.http.protocol.HttpContext;
+import org.graylog.shaded.opensearch2.org.opensearch.common.joda.JodaDeprecationPatterns;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 // TODO: check, if these messages still need filtering
 public class OpenSearchFilterDeprecationWarningsInterceptor implements HttpResponseInterceptor {
-    private final String[] messagesToFilter = {
+    private String[] messagesToFilter = {
             "setting was deprecated in OpenSearch",
             "but in a future major version, direct access to system indices and their aliases will not be allowed",
             "but in a future major version, direct access to system indices will be prevented by default",
-            "in epoch time formats is deprecated and will not be supported in the next major version of OpenSearch"
+            "in epoch time formats is deprecated and will not be supported in the next major version of OpenSearch",
+            JodaDeprecationPatterns.USE_NEW_FORMAT_SPECIFIERS
     };
 
     private boolean isDeprecationMessage(final String message) {
@@ -43,8 +48,8 @@ public class OpenSearchFilterDeprecationWarningsInterceptor implements HttpRespo
     @Override
     public void process(HttpResponse response, HttpContext context) throws
             HttpException, IOException {
-        final var warnings = Arrays.stream(response.getHeaders("Warning")).filter(header -> !this.isDeprecationMessage(header.getValue())).toList();
+        List<Header> warnings = Arrays.stream(response.getHeaders("Warning")).filter(header -> !this.isDeprecationMessage(header.getValue())).collect(Collectors.toList());
         response.removeHeaders("Warning");
-        warnings.forEach(response::addHeader);
+        warnings.stream().forEach(header -> response.addHeader(header));
     }
 }
