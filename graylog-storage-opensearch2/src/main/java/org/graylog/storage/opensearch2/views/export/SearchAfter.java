@@ -23,6 +23,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.search.SearchHit;
 import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.search.sort.SortBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.sort.SortOrder;
 import org.graylog2.plugin.Message;
 
@@ -59,8 +60,8 @@ public class SearchAfter implements RequestStrategy {
     }
 
     private void configureSort(SearchSourceBuilder source) {
-        source.sort("timestamp", SortOrder.DESC);
-        source.sort(DEFAULT_TIEBREAKER_FIELD, SortOrder.DESC);
+        source.sort(SortBuilders.fieldSort("timestamp").order(SortOrder.DESC));
+        source.sort(SortBuilders.fieldSort(DEFAULT_TIEBREAKER_FIELD).order(SortOrder.DESC).unmappedType("keyword"));
     }
 
     private Object[] lastHitSortFrom(List<SearchHit> hits) {
