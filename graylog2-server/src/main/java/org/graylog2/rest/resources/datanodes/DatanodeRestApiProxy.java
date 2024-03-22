@@ -62,9 +62,9 @@ public class DatanodeRestApiProxy implements ProxyRequestAdapter {
                 .map(url -> StringUtils.removeEnd(url, "/"))
                 .orElseThrow(() -> new IllegalStateException("No datanode found matching name " + request.hostname()));
 
-        final HttpUrl.Builder urlBuilder = new HttpUrl.Builder()
-                .host(host)
-                .addPathSegment(request.path());
+        final HttpUrl.Builder urlBuilder = HttpUrl.parse(host)
+                .newBuilder()
+                .addPathSegments(request.path());
 
         request.queryParameters().forEach((key, values) -> values.forEach(value -> urlBuilder.addQueryParameter(key, value)));
 
