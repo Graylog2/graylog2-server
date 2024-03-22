@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
 import * as React from 'react';
 import { useCallback, useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
@@ -30,6 +31,10 @@ import union from 'lodash/union';
 import moment from 'moment';
 import { OrderedMap } from 'immutable';
 
+import { getPathnameWithoutId } from 'util/URLUtils';
+import { isPermitted } from 'util/PermissionsMixin';
+import * as FormsUtils from 'util/FormsUtils';
+import { naturalSortIgnoreCase } from 'util/SortUtils';
 import FormWarningsContext from 'contexts/FormWarningsContext';
 import { useStore } from 'stores/connect';
 import Store from 'logic/local-storage/Store';
@@ -40,21 +45,18 @@ import Search from 'views/logic/search/Search';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 import { Alert, ButtonToolbar, ControlLabel, FormGroup, HelpBlock, Input } from 'components/bootstrap';
 import RelativeTime from 'components/common/RelativeTime';
-import { naturalSortIgnoreCase } from 'util/SortUtils';
-import * as FormsUtils from 'util/FormsUtils';
-import { isPermitted } from 'util/PermissionsMixin';
+import type { LookupTableParameterJson } from 'views/logic/parameters/LookupTableParameter';
 import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
 import { LookupTablesActions, LookupTablesStore } from 'stores/lookup-tables/LookupTablesStore';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
 import generateId from 'logic/generateId';
 import parseSearch from 'views/logic/slices/parseSearch';
 import useLocation from 'routing/useLocation';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import type User from 'logic/users/User';
 import useUserDateTime from 'hooks/useUserDateTime';
-import type { EventDefinition } from 'components/event-definitions/event-definition-types';
+import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import type { Stream } from 'stores/streams/StreamsStore';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 import { indicesInWarmTier, isSearchingWarmTier } from 'views/components/searchbar/queryvalidation/warmTierValidation';
@@ -64,18 +66,19 @@ import commonStyles from '../common/commonStyles.css';
 
 export const PLUGGABLE_CONTROLS_HIDDEN_KEY = 'pluggableSearchBarControlsAreHidden';
 export const TIME_UNITS = ['HOURS', 'MINUTES', 'SECONDS'];
-
+type LookupTableParameterJsonEmbryonic = Partial<LookupTableParameterJson> & {
+  embryonic?: boolean,
+}
 const LOOKUP_PERMISSIONS = [
   'lookuptables:read',
 ];
 
-const buildNewParameter = (name: string) => ({
+const buildNewParameter = (name: string): LookupTableParameterJsonEmbryonic => ({
   name: name,
   embryonic: true,
   type: 'lut-parameter-v1',
   data_type: 'any',
   title: 'new title',
-  // has no binding, no need to set binding property
 });
 
 type Props = {
@@ -353,7 +356,7 @@ const FilterForm = ({
     const parameterButtons = queryParameters.map((queryParam) => (
       <EditQueryParameterModal key={queryParam.name}
                                queryParameter={LookupTableParameter.fromJSON(queryParam)}
-                               embryonic={!!queryParam.embryonic}
+                               embryonic={!!(queryParam as LookupTableParameterJsonEmbryonic).embryonic}
                                queryParameters={queryParameters}
                                lookupTables={Object.values(tables)}
                                onChange={onChangeQueryParameters} />
@@ -363,7 +366,7 @@ const FilterForm = ({
       return null;
     }
 
-    const hasEmbryonicParameters = !isEmpty(queryParameters.filter((param) => (param.embryonic)));
+    const hasEmbryonicParameters = !isEmpty(queryParameters.filter((param : LookupTableParameterJsonEmbryonic) => (param.embryonic)));
 
     return (
       <FormGroup validationState={validation.errors.query_parameters ? 'error' : null}>

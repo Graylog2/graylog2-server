@@ -86,7 +86,6 @@ const TimerangeInfo = ({ className, widget, activeQuery, widgetId, hasFixedFilte
         <TextOverflowEllipsis titleOverride={effectiveTimerangeString}>
           {timerange}
         </TextOverflowEllipsis>
-        <StyledIcon name="help" />
       </Wrapper>
     </SearchQueryExecutionInfoHelper>
   );

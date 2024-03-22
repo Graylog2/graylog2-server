@@ -17,7 +17,7 @@
 import Immutable from 'immutable';
 
 import type { Event } from 'components/events/events/types';
-import type { EventDefinition } from 'logic/alerts/types';
+import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import type { EventDefinitionAggregation } from 'hooks/useEventDefinition';
 import QueryGenerator from 'views/logic/queries/QueryGenerator';
 import Search from 'views/logic/search/Search';
@@ -84,6 +84,7 @@ export const mockEventDefinitionTwoAggregations:EventDefinition = {
     type: 'aggregation-v1',
     query: 'http_method: GET',
     query_parameters: [],
+    _is_scheduled: true,
     streams: [
       '001',
     ],

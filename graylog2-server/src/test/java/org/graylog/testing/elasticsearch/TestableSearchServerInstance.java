@@ -47,6 +47,7 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
     protected final String heapSize;
     protected final Network network;
     protected final String hostname;
+    private final Map<String, String> env;
     protected GenericContainer<?> container;
 
     protected static volatile boolean isFirstContainerStart = true;
@@ -59,22 +60,27 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
     public abstract FixtureImporter fixtureImporter();
 
     protected TestableSearchServerInstance(final SearchVersion version, final String hostname, final Network network, final String heapSize) {
+        this(version, hostname, network, heapSize, Map.of());
+    }
+
+    protected TestableSearchServerInstance(final SearchVersion version, final String hostname, final Network network, final String heapSize, Map<String, String> env) {
         this.version = version;
         this.heapSize = heapSize;
         this.network = network;
         this.hostname = hostname;
+        this.env = env;
     }
 
     protected abstract String imageName();
 
     public void createContainer() {
-        this.container = createContainer(version, network, heapSize);
+        this.container = createContainer(version, network, heapSize, env);
     }
 
     @Override
-    public GenericContainer<?> createContainer(SearchVersion version, Network network, String heapSize) {
+    public GenericContainer<?> createContainer(SearchVersion version, Network network, String heapSize, Map<String, String> env) {
         final var image = imageName();
-        final ContainerCacheKey cacheKey = new ContainerCacheKey(version, heapSize);
+        final ContainerCacheKey cacheKey = new ContainerCacheKey(version, heapSize, env);
         if (!containersByVersion.containsKey(cacheKey)) {
             LOG.debug("Creating instance {}", image);
             GenericContainer<?> container = buildContainer(image, network);
@@ -143,6 +149,10 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
 
     protected String getEsJavaOpts() {
         return StringUtils.f("-Xms%s -Xmx%s -Dlog4j2.formatMsgNoLookups=true", heapSize, heapSize);
+    }
+
+    protected Map<String, String> getContainerEnv() {
+        return env;
     }
 
     @Override

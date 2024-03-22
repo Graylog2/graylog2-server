@@ -16,10 +16,10 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import type { EventDefinition } from 'logic/alerts/types';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'preflight/util/UserNotification';
+import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 
 export const fetchEventDefinitionDetails = async (eventDefinitionId: string): Promise<EventDefinition> => (
   fetch('GET', qualifyUrl(`/events/definitions/${eventDefinitionId}`))
