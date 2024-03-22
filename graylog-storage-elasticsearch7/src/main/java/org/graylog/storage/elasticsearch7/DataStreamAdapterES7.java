@@ -38,4 +38,9 @@ public class DataStreamAdapterES7 implements DataStreamAdapter {
     public void applyIsmPolicy(@NotNull String dataStreamName, @NotNull Policy policy) {
         throw new UnsupportedOperationException(ERROR_MESSAGE);
     }
+
+    @Override
+    public void setNumberOfReplicas(@NotNull String dataStreamName, @NotNull int replicas) {
+        throw new UnsupportedOperationException(ERROR_MESSAGE);
+    }
 }
