@@ -23,11 +23,10 @@ const getColorStyles = (theme, bsStyle) => {
     return '';
   }
 
-  const backgroundColor = theme.colors.variant[bsStyle];
-  const textColor = theme.utils.contrastingColor(backgroundColor);
+  const { textColor, background } = theme.colors.button[bsStyle];
 
   return css`
-    background-color: ${backgroundColor};
+    background-color: ${background};
     color: ${textColor};
 `;
 };
