@@ -28,8 +28,9 @@ import type { MigrationActions, MigrationState, MigrationStepComponentProps, Ste
 import MigrationStepTriggerButtonToolbar from '../common/MigrationStepTriggerButtonToolbar';
 
 const IndicesContainer = styled.div`
-  max-height: 100px;
-  overflow-y: auto;
+  max-height: 300px;
+  overflow-y: scroll;
+  overflow: -moz-scrollbars-vertical;
   margin-top: 5px;
 `;
 
@@ -136,7 +137,7 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
                  onChange={(e) => handleChange(e, setFieldValue)} />
           {(availableIndices.length > 0) && (
             <Alert title="Valid connection" bsStyle="success">
-              These are the available indices for the remote reindex migration:
+              These are the available <b>{availableIndices.length}</b> indices for the remote reindex migration:
               <IndicesContainer>
                 {availableIndices.map((index) => (
                   <Input type="checkbox"
