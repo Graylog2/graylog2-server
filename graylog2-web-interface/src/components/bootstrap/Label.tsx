@@ -24,7 +24,7 @@ const getColorStyles = (theme: DefaultTheme, bsStyle: string) => {
     return '';
   }
 
-  const { color, background } = theme.colors.button[bsStyle];
+  const { color, background } = theme.colors.button[bsStyle === 'default' ? 'gray' : bsStyle];
 
   return css`
     background-color: ${background};
