@@ -16,6 +16,7 @@
  */
 package org.graylog2.contentpacks;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -26,6 +27,9 @@ import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
 import com.google.common.graph.Traverser;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import org.graylog2.Configuration;
 import org.graylog2.contentpacks.constraints.ConstraintChecker;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
 import org.graylog2.contentpacks.exceptions.EmptyDefaultValueException;
@@ -52,6 +56,7 @@ import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
+import org.graylog2.contentpacks.model.entities.InputEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
@@ -62,9 +67,7 @@ import org.graylog2.utilities.Graphs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
-
+import java.lang.reflect.Method;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
@@ -78,6 +81,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import static org.graylog2.contentpacks.model.ModelTypes.INPUT_V1;
+
 @Singleton
 public class ContentPackService {
     private static final Logger LOG = LoggerFactory.getLogger(ContentPackService.class);
@@ -85,14 +90,27 @@ public class ContentPackService {
     private final ContentPackInstallationPersistenceService contentPackInstallationPersistenceService;
     private final Set<ConstraintChecker> constraintCheckers;
     private final Map<ModelType, EntityWithExcerptFacade<?, ?>> entityFacades;
+    private final ObjectMapper objectMapper;
+    private boolean isCloud = false;
 
     @Inject
     public ContentPackService(ContentPackInstallationPersistenceService contentPackInstallationPersistenceService,
                               Set<ConstraintChecker> constraintCheckers,
-                              Map<ModelType, EntityWithExcerptFacade<?, ?>> entityFacades) {
+                              Map<ModelType, EntityWithExcerptFacade<?, ?>> entityFacades,
+                              ObjectMapper objectMapper,
+                              Configuration configuration) {
+        this(contentPackInstallationPersistenceService, constraintCheckers, entityFacades, objectMapper);
+        isCloud = configuration.isCloud();
+    }
+
+    public ContentPackService(ContentPackInstallationPersistenceService contentPackInstallationPersistenceService,
+                              Set<ConstraintChecker> constraintCheckers,
+                              Map<ModelType, EntityWithExcerptFacade<?, ?>> entityFacades,
+                              ObjectMapper objectMapper) {
         this.contentPackInstallationPersistenceService = contentPackInstallationPersistenceService;
         this.constraintCheckers = constraintCheckers;
         this.entityFacades = entityFacades;
+        this.objectMapper = objectMapper;
     }
 
     public ContentPackInstallation installContentPack(ContentPack contentPack,
@@ -132,6 +150,26 @@ public class ContentPackService {
 
                 final EntityDescriptor entityDescriptor = entity.toEntityDescriptor();
                 final EntityWithExcerptFacade facade = entityFacades.getOrDefault(entity.type(), UnsupportedEntityFacade.INSTANCE);
+
+                //TODO remove this
+                isCloud = true;
+
+                if (isCloud && entity.type().equals(INPUT_V1) && entity instanceof EntityV1 entityV1) {
+                    boolean isCloudCompatible = true;
+                    final InputEntity inputEntity = objectMapper.convertValue(entityV1.data(), InputEntity.class);
+                    try {
+                        final Method isCloudCompatibleMethod =
+                                Class.forName(inputEntity.type().asString() + "$Descriptor").getMethod("isCloudCompatible");
+                        isCloudCompatible = (boolean) isCloudCompatibleMethod.invoke(null);
+                    } catch (Exception e) {
+                        LOG.info("Failed to invoke Descriptor.isCloudCompatible() for {}", inputEntity.type().asString());
+                    }
+                    if (!isCloudCompatible) {
+                        LOG.warn("Ignoring incompatible input {} in cloud", inputEntity.type().asString());
+                        continue;
+                    }
+                }
+
                 @SuppressWarnings({"rawtypes", "unchecked"})
                 final Optional<NativeEntity> existingEntity = facade.findExisting(entity, parameters);
                 if (existingEntity.isPresent()) {

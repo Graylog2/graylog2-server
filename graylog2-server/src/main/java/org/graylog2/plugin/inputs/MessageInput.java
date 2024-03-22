@@ -418,12 +418,12 @@ public abstract class MessageInput implements Stoppable {
         this.nodeId = nodeId;
     }
 
-    public boolean isCloudCompatible() {
-        return descriptor.isCloudCompatible();
+    public static boolean isCloudCompatible() {
+        return Descriptor.isCloudCompatible();
     }
 
-    public boolean isForwarderCompatible() {
-        return descriptor.isForwarderCompatible();
+    public static boolean isForwarderCompatible() {
+        return Descriptor.isForwarderCompatible();
     }
 
     public interface Factory<M> {
@@ -472,11 +472,11 @@ public abstract class MessageInput implements Stoppable {
             super(name, exclusive, linkToDocs);
         }
 
-        public boolean isCloudCompatible() {
+        public static boolean isCloudCompatible() {
             return false;
         }
 
-        public boolean isForwarderCompatible() {
+        public static boolean isForwarderCompatible() {
             return true;
         }
     }

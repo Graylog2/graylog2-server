@@ -183,7 +183,7 @@ public class ContentPackServiceTest {
                 ModelTypes.EVENT_DEFINITION_V1, new EventDefinitionFacade(objectMapper, eventDefinitionHandler, pluginMetaData, jobDefinitionService, eventDefinitionService, userService)
                 );
 
-        contentPackService = new ContentPackService(contentPackInstallationPersistenceService, constraintCheckers, entityFacades);
+        contentPackService = new ContentPackService(contentPackInstallationPersistenceService, constraintCheckers, entityFacades, new ObjectMapper());
 
         Map<String, String> entityData = new HashMap<>(2);
         entityData.put("name", "NAME");
