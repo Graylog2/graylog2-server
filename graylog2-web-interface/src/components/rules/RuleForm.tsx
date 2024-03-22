@@ -39,6 +39,10 @@ const StyledContainer = styled.div`
     & .ace_editor {
       border-radius: 0;
     }
+    
+    & .ace_cursor {
+      border-color: ${({ theme }) => theme.colors.global.textDefault};
+    }
   }
 
   & .ace_tooltip.ace-graylog {
