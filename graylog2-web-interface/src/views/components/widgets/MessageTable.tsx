@@ -140,7 +140,7 @@ const MessageTable = ({ fields, activeQueryId, messages, config, onSortChange, s
             <tr>
               {selectedFields.toSeq().map((selectedFieldName) => {
                 const type = _fieldTypeFor(selectedFieldName, fields);
-                const isCompound = type.properties.has('compound');
+                const isCompound = type.isCompound();
 
                 return (
                   <TableHeaderCell key={selectedFieldName} $isNumeric={type.isNumeric()}>
