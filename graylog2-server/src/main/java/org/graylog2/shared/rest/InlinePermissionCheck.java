@@ -25,6 +25,6 @@ import java.lang.annotation.Target;
  * Marks resource methods that perform permission checks manually in code and thus have no {@link org.apache.shiro.authz.annotation.RequiresPermissions @RequiresPermissions} annotation.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD, ElementType.TYPE})
+@Target({ElementType.METHOD})
 public @interface InlinePermissionCheck {
 }

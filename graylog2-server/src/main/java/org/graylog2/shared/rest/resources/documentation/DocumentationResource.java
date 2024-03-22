@@ -37,6 +37,7 @@ import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.RestTools;
 import org.graylog2.shared.plugins.DocumentationRestResourceClasses;
+import org.graylog2.shared.rest.NoPermissionCheckRequired;
 import org.graylog2.shared.rest.documentation.generator.Generator;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.rest.resources.csp.CSP;
@@ -88,6 +89,7 @@ public class DocumentationResource extends RestResource {
     @Timed
     @ApiOperation(value = "Get API documentation")
     @Produces(MediaType.APPLICATION_JSON)
+    @NoPermissionCheckRequired
     public Response overview() {
         return buildSuccessfulCORSResponse(generator.generateOverview());
     }
@@ -97,6 +99,7 @@ public class DocumentationResource extends RestResource {
     @ApiOperation(value = "Get API documentation with cluster global URI path")
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/global")
+    @NoPermissionCheckRequired
     public Response globalOverview() {
         return buildSuccessfulCORSResponse(generator.generateOverview());
     }
@@ -106,6 +109,7 @@ public class DocumentationResource extends RestResource {
     @ApiOperation(value = "Get detailed API documentation of a single resource")
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{route: .+}")
+    @NoPermissionCheckRequired
     public Response route(@ApiParam(name = "route", value = "Route to fetch. For example /system", required = true)
                           @PathParam("route") String route,
                           @Context HttpHeaders httpHeaders) {

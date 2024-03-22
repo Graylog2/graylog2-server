@@ -22,19 +22,8 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Resources;
-import org.glassfish.jersey.server.ContainerRequest;
-import org.graylog2.plugin.Plugin;
-import org.graylog2.shared.rest.resources.csp.CSP;
-import org.graylog2.shared.rest.resources.csp.CSPDynamicFeature;
-import org.graylog2.web.IndexHtmlGenerator;
-import org.graylog2.web.PluginAssets;
-
-import javax.activation.MimetypesFileTypeMap;
-import javax.annotation.Nonnull;
-
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.Path;
@@ -46,7 +35,16 @@ import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Request;
 import jakarta.ws.rs.core.Response;
+import org.glassfish.jersey.server.ContainerRequest;
+import org.graylog2.plugin.Plugin;
+import org.graylog2.shared.rest.NoPermissionCheckRequired;
+import org.graylog2.shared.rest.resources.csp.CSP;
+import org.graylog2.shared.rest.resources.csp.CSPDynamicFeature;
+import org.graylog2.web.IndexHtmlGenerator;
+import org.graylog2.web.PluginAssets;
 
+import javax.activation.MimetypesFileTypeMap;
+import javax.annotation.Nonnull;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
@@ -122,6 +120,7 @@ public class WebInterfaceAssetsResource {
 
     @Path("assets/{filename: .*}")
     @GET
+    @NoPermissionCheckRequired
     public Response get(@Context ContainerRequest request,
                         @Context HttpHeaders headers,
                         @PathParam("filename") String filename) {
@@ -135,6 +134,7 @@ public class WebInterfaceAssetsResource {
 
     @GET
     @Path("{filename:.*}")
+    @NoPermissionCheckRequired
     public Response getIndex(@Context ContainerRequest request, @Context HttpHeaders headers) {
         final URI originalLocation = request.getRequestUri();
         return get(request, headers, originalLocation.getPath());
