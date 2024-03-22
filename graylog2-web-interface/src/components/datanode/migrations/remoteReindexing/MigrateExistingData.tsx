@@ -31,6 +31,7 @@ const IndicesContainer = styled.div`
   max-height: 300px;
   overflow-y: scroll;
   overflow: -moz-scrollbars-vertical;
+  -ms-overflow-y: scroll;
   margin-top: 5px;
 `;
 
