@@ -291,9 +291,10 @@ const FilterForm = ({
   const handleSearchFiltersChange = (searchFilters) => {
     const { query } = eventDefinition.config;
 
-    debouncedParseQuery(query, searchFilters);
+    const newConfig = getUpdatedConfig('filters', searchFilters.toArray());
+    propagateChange(newConfig);
 
-    propagateChange(getUpdatedConfig('filters', searchFilters.toArray()));
+    debouncedParseQuery(query, newConfig);
   };
 
   const hideFiltersPreview = (value) => {
