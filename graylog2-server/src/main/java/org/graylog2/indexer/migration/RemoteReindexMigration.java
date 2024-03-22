@@ -94,10 +94,14 @@ public class RemoteReindexMigration {
     }
 
     public void finish() {
-        if(finishCallback != null) {
+        if (finishCallback != null) {
             finishCallback.run();
         }
-        status(Status.FINISHED);
+        if (indices.stream().anyMatch(i -> i.getStatus() == Status.ERROR)) {
+            status(Status.ERROR);
+        } else {
+            status(Status.FINISHED);
+        }
     }
 
     /**

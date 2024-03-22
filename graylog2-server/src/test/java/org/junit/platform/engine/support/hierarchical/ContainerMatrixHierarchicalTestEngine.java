@@ -16,6 +16,7 @@
  */
 package org.junit.platform.engine.support.hierarchical;
 
+import com.google.common.base.Stopwatch;
 import org.graylog.testing.completebackend.ContainerizedGraylogBackend;
 import org.graylog.testing.completebackend.ContainerizedGraylogBackendServicesProvider;
 import org.graylog.testing.completebackend.GraylogBackend;
@@ -77,9 +78,9 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
     }
 
     private void executeWithContainerizedGraylogBackend(ExecutionRequest request, ContainerMatrixTestsDescriptor descriptor, ContainerizedGraylogBackendServicesProvider servicesProvider) {
-        SearchVersion esVersion = descriptor.getEsVersion();
+        LOG.debug("Starting containers for " + descriptor.getUniqueId());
+        SearchVersion esVersion = descriptor.getSearchVersion();
         MongodbServer mongoVersion = descriptor.getMongoVersion();
-        int[] extraPorts = descriptor.getExtraPorts();
         List<URL> mongoDBFixtures = descriptor.getMongoDBFixtures();
         List<String> enabledFeatureFlags = descriptor.getEnabledFeatureFlags();
         PluginJarsProvider pluginJarsProvider = instantiateFactory(descriptor.getPluginJarsProvider());
@@ -89,7 +90,7 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
         final Map<String, String> configParams = descriptor.getAdditionalConfigurationParameters();
 
         if (Lifecycle.VM.equals(descriptor.getLifecycle())) {
-            try (ContainerizedGraylogBackend backend = ContainerizedGraylogBackend.createStarted(servicesProvider, esVersion, mongoVersion, extraPorts, mongoDBFixtures, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, ContainerMatrixTestsConfiguration.defaultImportLicenses, withEnabledMailServer, withEnabledWebhookServer, configParams)) {
+            try (ContainerizedGraylogBackend backend = ContainerizedGraylogBackend.createStarted(servicesProvider, esVersion, mongoVersion, mongoDBFixtures, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, ContainerMatrixTestsConfiguration.defaultImportLicenses, withEnabledMailServer, withEnabledWebhookServer, configParams)) {
                 this.execute(request, descriptor.getChildren(), backend);
             } catch (Exception exception) {
                 /* Fail hard if the containerized backend failed to start. */
@@ -104,7 +105,9 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
                     fixtures = ((ContainerMatrixTestClassDescriptor) td).getMongoFixtures();
                     preImportLicense = ((ContainerMatrixTestClassDescriptor) td).isPreImportLicense();
                 }
-                try (ContainerizedGraylogBackend backend = ContainerizedGraylogBackend.createStarted(servicesProvider, esVersion, mongoVersion, extraPorts, fixtures, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, preImportLicense, withEnabledMailServer, withEnabledWebhookServer, configParams)) {
+                final Stopwatch sw = Stopwatch.createStarted();
+                try (ContainerizedGraylogBackend backend = ContainerizedGraylogBackend.createStarted(servicesProvider, esVersion, mongoVersion, fixtures, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, preImportLicense, withEnabledMailServer, withEnabledWebhookServer, configParams)) {
+                    LOG.debug("Containerized testing environment started in {}", sw.elapsed());
                     this.execute(request, Collections.singleton(td), backend);
                 } catch (Exception exception) {
                     /* Fail hard if the containerized backend failed to start. */

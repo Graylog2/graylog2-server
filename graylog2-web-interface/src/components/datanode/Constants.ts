@@ -154,7 +154,6 @@ export const REMOTE_REINDEXING_MIGRATION_STEPS = [
   MIGRATION_STATE.MIGRATE_EXISTING_DATA.key,
   MIGRATION_STATE.REMOTE_REINDEX_RUNNING.key,
   MIGRATION_STATE.ASK_TO_SHUTDOWN_OLD_CLUSTER.key,
-  MIGRATION_STATE.MANUALLY_REMOVE_OLD_CONNECTION_STRING_FROM_CONFIG.key,
 ];
 
 export const MIGRATION_WIZARD_STEPS = [
@@ -178,7 +177,7 @@ export const MIGRATION_ACTIONS = {
   },
   SHOW_RENEWAL_POLICY_CREATION: {
     key: 'SHOW_RENEWAL_POLICY_CREATION',
-    label: 'Configure certificat renewal policy',
+    label: 'Configure certificate renewal policy',
   },
   SHOW_MIGRATION_SELECTION: {
     key: 'SHOW_MIGRATION_SELECTION',
@@ -195,6 +194,14 @@ export const MIGRATION_ACTIONS = {
   RETRY_MIGRATE_EXISTING_DATA: {
     key: 'RETRY_MIGRATE_EXISTING_DATA',
     label: 'Retry migrate existing data',
+  },
+  CHECK_REMOTE_INDEXER_CONNECTION: {
+    key: 'CHECK_REMOTE_INDEXER_CONNECTION',
+    label: 'Check connection',
+  },
+  START_REMOTE_REINDEX_MIGRATION: {
+    key: 'START_REMOTE_REINDEX_MIGRATION',
+    label: 'Start migration',
   },
 };
 export default MIGRATION_STEP;

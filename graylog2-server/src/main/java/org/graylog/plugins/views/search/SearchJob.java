@@ -26,6 +26,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import one.util.streamex.EntryStream;
 import org.graylog.plugins.views.search.errors.SearchError;
+import org.graylog.plugins.views.search.rest.ExecutionInfo;
 
 import java.util.Map;
 import java.util.Optional;
@@ -53,7 +54,7 @@ public class SearchJob implements ParameterProvider {
         this.searchJobIdentifier = new SearchJobIdentifier(id, search.id(), owner, executingNodeId);
     }
 
-    @JsonProperty
+    @JsonIgnore //covered by @JsonUnwrapped
     public String getId() {
         return searchJobIdentifier.id();
     }
@@ -68,12 +69,12 @@ public class SearchJob implements ParameterProvider {
         return searchJobIdentifier;
     }
 
-    @JsonProperty("search_id")
+    @JsonIgnore //covered by @JsonUnwrapped
     public String getSearchId() {
         return searchJobIdentifier.searchId();
     }
 
-    @JsonProperty
+    @JsonIgnore //covered by @JsonUnwrapped
     public String getOwner() {
         return searchJobIdentifier.owner();
     }
@@ -129,18 +130,5 @@ public class SearchJob implements ParameterProvider {
         return getSearch().getParameter(name);
     }
 
-    public static class ExecutionInfo {
-        @JsonProperty("done")
-        public final boolean done;
-        @JsonProperty("cancelled")
-        public final boolean cancelled;
-        @JsonProperty("completed_exceptionally")
-        public final boolean hasErrors;
 
-        ExecutionInfo(boolean done, boolean cancelled, boolean hasErrors) {
-            this.done = done;
-            this.cancelled = cancelled;
-            this.hasErrors = hasErrors;
-        }
-    }
 }

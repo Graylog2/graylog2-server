@@ -19,6 +19,8 @@ package org.graylog2.lookup;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+import com.github.benmanes.caffeine.cache.Ticker;
+import com.google.common.testing.FakeTicker;
 import org.assertj.core.api.Assertions;
 import org.graylog2.lookup.caches.CaffeineLookupCache;
 import org.graylog2.plugin.lookup.LookupCache;
@@ -92,7 +94,28 @@ public class CaffeineLookupCacheTest {
         Assertions.assertThat(value1.singleValue()).isNull();
     }
 
-    private LookupCache buildCache(boolean ignoreNull) throws Exception {
+    @SuppressWarnings("UnstableApiUsage")
+    @Test
+    public void ttlEmpty() throws Exception {
+        FakeTicker ticker = new FakeTicker();
+        LookupCache cache = buildCache(ticker::read, 60, 600, 10);
+        LookupResult lr1 = LookupResult.empty();
+        LookupResult lr2 = LookupResult.single("x");
+        when(loader.call()).thenReturn(lr1).thenReturn(lr2);
+
+        LookupResult value1 = cache.get(LookupCacheKey.createFromJSON("x", "y"), loader);
+        Assertions.assertThat(value1.singleValue()).isNull();
+
+        ticker.advance(3, TimeUnit.SECONDS);
+        LookupResult value2 = cache.get(LookupCacheKey.createFromJSON("x", "y"), loader);
+        Assertions.assertThat(value2.singleValue()).isNull();
+
+        ticker.advance(10, TimeUnit.SECONDS);
+        LookupResult value3 = cache.get(LookupCacheKey.createFromJSON("x", "y"), loader);
+        Assertions.assertThat(value3.singleValue()).isEqualTo("x");
+    }
+
+    private LookupCache buildCache(boolean ignoreNull) {
         when(registry.timer(anyString())).thenReturn(lookupTimer);
         when(registry.meter(anyString())).thenReturn(meter);
 
@@ -104,6 +127,23 @@ public class CaffeineLookupCacheTest {
                 .expireAfterWrite(60)
                 .ignoreNull(ignoreNull)
                 .build();
-        return new CaffeineLookupCache("id", "name", config, 1, registry);
+        return new CaffeineLookupCache("id", "name", config, registry);
+    }
+
+    private LookupCache buildCache(Ticker ticker, long expireAfterAccess, long expireAfterWrite, long ttlEmpty) {
+        when(registry.timer(anyString())).thenReturn(lookupTimer);
+        when(registry.meter(anyString())).thenReturn(meter);
+
+        CaffeineLookupCache.Config config = CaffeineLookupCache.Config.builder()
+                .type(CaffeineLookupCache.NAME)
+                .maxSize(1000)
+                .expireAfterAccess(expireAfterAccess)
+                .expireAfterAccessUnit(TimeUnit.SECONDS)
+                .expireAfterWrite(expireAfterWrite)
+                .ignoreNull(false)
+                .ttlEmpty(ttlEmpty)
+                .ttlEmptyUnit(TimeUnit.SECONDS)
+                .build();
+        return new CaffeineLookupCache("id", "name", config, registry, ticker);
     }
 }

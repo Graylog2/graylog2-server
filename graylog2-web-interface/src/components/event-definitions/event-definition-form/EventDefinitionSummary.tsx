@@ -35,10 +35,6 @@ import type { EventDefinition } from '../event-definitions-types';
 import commonStyles from '../common/commonStyles.css';
 import { SYSTEM_EVENT_DEFINITION_TYPE } from '../constants';
 
-// Import built-in plugins
-import 'components/event-definitions/event-definition-types';
-import 'components/event-notifications/event-notification-types';
-
 type Props = {
   eventDefinition: Omit<EventDefinition, 'id'>,
   notifications: Array<any>,
@@ -71,6 +67,8 @@ const EventDefinitionSummary = ({ eventDefinition, notifications, validation, cu
         <dd>{eventDefinition.title || 'No title given'}</dd>
         <dt>Description</dt>
         <dd>{eventDefinition.description || 'No description given'}</dd>
+        <dt>Remediation Steps</dt>
+        <dd>{eventDefinition.remediation_steps || 'No remediation steps given'}</dd>
         <dt>Priority</dt>
         <dd>{upperFirst(EventDefinitionPriorityEnum.properties[eventDefinition.priority].name)}</dd>
       </dl>

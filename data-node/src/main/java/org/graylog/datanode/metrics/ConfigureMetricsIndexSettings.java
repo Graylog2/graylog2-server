@@ -28,6 +28,8 @@ import org.graylog.datanode.process.ProcessState;
 import org.graylog.datanode.process.StateMachineTracer;
 import org.graylog.storage.opensearch2.DataStreamAdapterOS2;
 import org.graylog.storage.opensearch2.ism.IsmApi;
+import org.graylog2.cluster.nodes.DataNodeDto;
+import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.indexer.datastream.DataStreamService;
 import org.graylog2.indexer.datastream.DataStreamServiceImpl;
 import org.graylog2.indexer.datastream.policy.IsmPolicy;
@@ -36,6 +38,7 @@ import org.graylog2.indexer.datastream.policy.actions.Action;
 import org.graylog2.indexer.datastream.policy.actions.DeleteAction;
 import org.graylog2.indexer.datastream.policy.actions.RolloverAction;
 import org.graylog2.indexer.datastream.policy.actions.RollupAction;
+import org.graylog2.indexer.datastream.policy.actions.TimesUnit;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,12 +58,14 @@ public class ConfigureMetricsIndexSettings implements StateMachineTracer {
     private final IndexFieldTypesService indexFieldTypesService;
     private final ObjectMapper objectMapper;
     private DataStreamService dataStreamService;
+    private final NodeService<DataNodeDto> nodeService;
 
-    public ConfigureMetricsIndexSettings(OpensearchProcess process, Configuration configuration, IndexFieldTypesService indexFieldTypesService, ObjectMapper objectMapper) {
+    public ConfigureMetricsIndexSettings(OpensearchProcess process, Configuration configuration, IndexFieldTypesService indexFieldTypesService, ObjectMapper objectMapper, NodeService<DataNodeDto> nodeService) {
         this.process = process;
         this.configuration = configuration;
         this.objectMapper = objectMapper;
         this.indexFieldTypesService = indexFieldTypesService;
+        this.nodeService = nodeService;
     }
 
     @Override
@@ -73,9 +78,11 @@ public class ConfigureMetricsIndexSettings implements StateMachineTracer {
             process.openSearchClient().ifPresent(client -> {
                 if (dataStreamService == null) {
                     final IsmApi ismApi = new IsmApi(client, objectMapper);
+                    int replicas = nodeService.allActive().size() == 1 ? 0 : 1;
                     dataStreamService = new DataStreamServiceImpl(
                             new DataStreamAdapterOS2(client, objectMapper, ismApi),
-                            indexFieldTypesService
+                            indexFieldTypesService,
+                            replicas
                     );
                 }
                 dataStreamService.createDataStream(configuration.getMetricsStream(),
@@ -119,7 +126,8 @@ public class ConfigureMetricsIndexSettings implements StateMachineTracer {
         Policy policy = new Policy(null,
                 "Manages rollover, rollup and deletion of data note metrics indices",
                 null,
-                stateOpen.name(), ImmutableList.of(stateOpen, stateRollup, stateDelete));
+                stateOpen.name(), ImmutableList.of(stateOpen, stateRollup, stateDelete),
+                null);
 
         try {
             log.debug("Creating ISM configuration for metrics data stream {}",
@@ -158,12 +166,13 @@ public class ConfigureMetricsIndexSettings implements StateMachineTracer {
         );
         RollupAction rollupAction = new RollupAction(ismRollup);
         final List<Action> actions = ImmutableList.of(new Action(rollupAction));
-        final List<Policy.Transition> transitions = ImmutableList.of(new Policy.Transition(nextState, new Policy.Condition(configuration.getMetricsRetention())));
+        final List<Policy.Transition> transitions = ImmutableList.of(new Policy.Transition(nextState,
+                new Policy.Condition(TimesUnit.DAYS.format(configuration.getMetricsRetention().toDays()))));
         return new Policy.State("rollup", actions, transitions);
     }
 
     private Policy.State ismOpenState(String nextState) {
-        final List<Action> actions = ImmutableList.of(new Action(new RolloverAction("1d")));
+        final List<Action> actions = ImmutableList.of(new Action(new RolloverAction("1d", null)));
         final List<Policy.Transition> transitions = ImmutableList.of(new Policy.Transition(nextState, null));
         return new Policy.State("open", actions, transitions);
     }

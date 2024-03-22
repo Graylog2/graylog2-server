@@ -21,7 +21,7 @@ import type { $PropertyType } from 'utility-types';
 
 import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
 import { PanelGroup, Panel } from 'components/bootstrap';
-import type { Step } from 'components/common/Wizard';
+import type { StepType } from 'components/common/Wizard';
 import type { SelectCallback } from 'components/bootstrap/types';
 
 import { STEP_KEY as SERVER_CONFIG_KEY } from './ServerConfigStep';
@@ -38,7 +38,7 @@ const StyledPanelGroup = styled(PanelGroup)`
     background-color: ${(props) => props.theme.colors.global.contentBackground};
 
     .panel-heading {
-      background-color: ${(props) => props.theme.colors.table.backgroundAlt};
+      background-color: ${(props) => props.theme.colors.table.row.backgroundAlt};
     }
 
     &:not(:first-child) {
@@ -58,7 +58,7 @@ type Props = {
 };
 
 const Sidebar = ({ prepareSubmitPayload }: Props) => {
-  const [activeKey, setActiveKey] = useState<$PropertyType<Step, 'key'>>(SERVER_CONFIG_KEY);
+  const [activeKey, setActiveKey] = useState<$PropertyType<StepType, 'key'>>(SERVER_CONFIG_KEY);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { setStepsState, ...stepsState } = useContext(BackendWizardContext);
 

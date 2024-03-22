@@ -25,6 +25,7 @@ import com.github.joschi.jadconfig.converters.IntegerConverter;
 import com.github.joschi.jadconfig.converters.StringListConverter;
 import com.github.joschi.jadconfig.converters.StringSetConverter;
 import com.github.joschi.jadconfig.util.Duration;
+import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
 import com.github.joschi.jadconfig.validators.URIAbsoluteValidator;
@@ -55,7 +56,7 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * Helper class to hold configuration of Graylog
+ * Helper class to hold configuration of DataNode
  */
 @SuppressWarnings("FieldMayBeFinal")
 public class Configuration extends BaseConfiguration {
@@ -85,10 +86,7 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "opensearch_location")
     private String opensearchDistributionRoot = "dist";
 
-    @Parameter(value = "opensearch_plugins_location", validators = DirectoryReadableValidator.class)
-    private Path opensearchPluginsDir = Path.of("dist/plugins");
-
-    @Parameter(value = "opensearch_data_location", required = true, validators = DirectoryWritableValidator.class)
+    @Parameter(value = "opensearch_data_location", required = true, validators = DirectoryReadableValidator.class)
     private Path opensearchDataLocation = Path.of("datanode/data");
 
     @Parameter(value = "opensearch_logs_location", required = true, validators = DirectoryWritableValidator.class)
@@ -99,6 +97,9 @@ public class Configuration extends BaseConfiguration {
 
     @Parameter(value = "config_location", validators = DirectoryReadableValidator.class)
     private Path configLocation = null;
+
+    @Parameter(value = "native_lib_dir", required = true)
+    private Path nativeLibDir = Path.of("native_libs");
 
     @Parameter(value = "process_logs_buffer_size")
     private Integer opensearchProcessLogsBufferSize = 500;
@@ -231,11 +232,11 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "metrics_stream")
     private String metricsStream = "gl-datanode-metrics";
 
-    @Parameter(value = "metrics_retention")
-    private String metricsRetention = "14d";
+    @Parameter(value = "metrics_retention", validators = PositiveDurationValidator.class)
+    private Duration metricsRetention = Duration.days(14);
 
-    @Parameter(value = "metrics_daily_retention")
-    private String metricsDailyRetention = "365d";
+    @Parameter(value = "metrics_daily_retention", validators = PositiveDurationValidator.class)
+    private Duration metricsDailyRetention = Duration.days(365);
 
     @Parameter(value = "metrics_daily_index")
     private String metricsDailyIndex = "gl-datanode-metrics-daily";
@@ -245,7 +246,7 @@ public class Configuration extends BaseConfiguration {
 
     @Parameter(value = "node_search_cache_size")
     private String searchCacheSize = "10gb";
-  
+
     /**
      * https://opensearch.org/docs/latest/tuning-your-cluster/availability-and-recovery/snapshots/snapshot-restore/#shared-file-system
      */
@@ -255,8 +256,25 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "opensearch_indices_query_bool_max_clause_count")
     private Integer indicesQueryBoolMaxClauseCount = 32768;
 
+    @Parameter(value = "node_roles", converter = StringListConverter.class)
+    private List<String> nodeRoles = List.of("cluster_manager", "data", "ingest", "remote_cluster_client", "search");
+
     public Integer getIndicesQueryBoolMaxClauseCount() {
         return indicesQueryBoolMaxClauseCount;
+    }
+
+    @Parameter(value = "opensearch_logger_org_opensearch")
+    private String opensearchDebug;
+
+    public String getOpensearchDebug() {
+        return opensearchDebug;
+    }
+
+    @Parameter(value = "opensearch_plugins_security_audit_type")
+    private String opensearchAuditLog;
+
+    public String getOpensearchAuditLog() {
+        return opensearchAuditLog;
     }
 
     public boolean isInsecureStartup() {
@@ -281,11 +299,6 @@ public class Configuration extends BaseConfiguration {
 
     public String getOpensearchDistributionRoot() {
         return opensearchDistributionRoot;
-    }
-
-    @Nullable
-    public Path getOpensearchPluginsDir() {
-        return opensearchPluginsDir;
     }
 
     /**
@@ -421,11 +434,11 @@ public class Configuration extends BaseConfiguration {
         return metricsStream;
     }
 
-    public String getMetricsRetention() {
+    public Duration getMetricsRetention() {
         return metricsRetention;
     }
 
-    public String getMetricsDailyRetention() {
+    public Duration getMetricsDailyRetention() {
         return metricsDailyRetention;
     }
 
@@ -435,6 +448,10 @@ public class Configuration extends BaseConfiguration {
 
     public String getMetricsPolicy() {
         return metricsPolicy;
+    }
+
+    public Path getNativeLibDir() {
+        return nativeLibDir;
     }
 
     public static class NodeIdFileValidator implements Validator<String> {
@@ -663,8 +680,12 @@ public class Configuration extends BaseConfiguration {
     public String getNodeSearchCacheSize() {
         return searchCacheSize;
     }
-  
+
     public List<String> getPathRepo() {
         return pathRepo;
+    }
+
+    public List<String> getNodeRoles() {
+        return nodeRoles;
     }
 }

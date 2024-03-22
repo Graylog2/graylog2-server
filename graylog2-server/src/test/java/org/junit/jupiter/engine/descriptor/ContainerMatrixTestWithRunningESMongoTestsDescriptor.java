@@ -24,9 +24,8 @@ import java.util.Set;
 
 public class ContainerMatrixTestWithRunningESMongoTestsDescriptor extends ContainerMatrixTestsDescriptor {
     public ContainerMatrixTestWithRunningESMongoTestsDescriptor(TestDescriptor parent,
-                                                                Set<Integer> extraPorts,
                                                                 List<URL> mongoDBFixtures) {
-        super(parent, "Testing with running ES and MongoDB instances.", extraPorts, mongoDBFixtures);
+        super(parent, "Testing with running ES and MongoDB instances.", mongoDBFixtures);
     }
 }
 

@@ -104,7 +104,7 @@ const EventNotificationActions = ({ isTestLoading, notification, refetchEventNot
             </IfPermitted>
             <MenuItem divider />
             <IfPermitted permissions={`eventnotifications:delete:${notification.id}`}>
-              <MenuItem onClick={onDelete}>Delete</MenuItem>
+              <MenuItem onClick={onDelete} variant="danger">Delete</MenuItem>
             </IfPermitted>
           </IfPermitted>
         </MoreActions>

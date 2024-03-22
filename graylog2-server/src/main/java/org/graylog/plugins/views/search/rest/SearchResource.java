@@ -37,6 +37,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
+import org.graylog.plugins.views.search.ExplainResults;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchJob;
@@ -70,8 +71,8 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 public class SearchResource extends RestResource implements PluginRestResource {
     private static final Logger LOG = LoggerFactory.getLogger(SearchResource.class);
     private static final String BASE_PATH = "views/search";
-    private static final String SEARCH_FORMAT_V1 = "application/vnd.graylog.search.v1+json";
-    private static final String SEARCH_FORMAT_V2 = "application/vnd.graylog.search.v2+json";
+    public static final String SEARCH_FORMAT_V1 = "application/vnd.graylog.search.v1+json";
+    public static final String SEARCH_FORMAT_V2 = "application/vnd.graylog.search.v2+json";
 
     private final SearchDomain searchDomain;
     private final SearchExecutor searchExecutor;
@@ -167,6 +168,16 @@ public class SearchResource extends RestResource implements PluginRestResource {
     }
 
     @POST
+    @ApiOperation(value = "Explains how the referenced search would be executed", response = ExplainResults.class)
+    @Path("{id}/explain")
+    @NoAuditEvent("Does not return any actual data")
+    public ExplainResults explainQuery(@ApiParam(name = "id") @PathParam("id") String id,
+                                       @ApiParam ExecutionState executionState,
+                                       @Context SearchUser searchUser) {
+        return searchExecutor.explain(id, searchUser, executionState);
+    }
+
+    @POST
     @ApiOperation(value = "Execute a new synchronous search", notes = "Executes a new search and waits for its result", response = SearchJobDTO.class)
     @Path("sync")
     @NoAuditEvent("Creating audit event manually in method body.")
@@ -220,8 +231,6 @@ public class SearchResource extends RestResource implements PluginRestResource {
 
             }
         }
-
-
         return SearchJobDTO.fromSearchJob(searchJob);
     }
 

@@ -36,6 +36,10 @@ const StopMessageProcessing = ({ currentStep, onTriggerStep }: MigrationStepComp
       </Panel.Heading>
       <Panel.Body>
         <p>Please stop your OpenSearch cluster before proceeding.</p>
+        <p>If you are migrating existing OpenSearch data by pointing the data node to its data directory, make sure that
+          the user running the data node (usually graylog-datanode) has permissions to write to the data directory set
+          in the data node configuration.
+        </p>
       </Panel.Body>
     </StyledHelpPanel>
     <p />

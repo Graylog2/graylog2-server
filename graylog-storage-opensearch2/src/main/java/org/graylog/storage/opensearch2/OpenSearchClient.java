@@ -60,7 +60,6 @@ public class OpenSearchClient {
     private static final Logger LOG = LoggerFactory.getLogger(OpenSearchClient.class);
 
     private final RestHighLevelClient client;
-    private final org.opensearch.client.opensearch.OpenSearchClient openSearchClient;
     private final boolean compressionEnabled;
     private final Optional<Integer> indexerMaxConcurrentSearches;
     private final Optional<Integer> indexerMaxConcurrentShardRequests;
@@ -68,13 +67,11 @@ public class OpenSearchClient {
 
     @Inject
     public OpenSearchClient(RestHighLevelClient client,
-                            org.opensearch.client.opensearch.OpenSearchClient openSearchClient,
                             @Named("elasticsearch_compression_enabled") boolean compressionEnabled,
                             @Named("indexer_max_concurrent_searches") @Nullable Integer indexerMaxConcurrentSearches,
                             @Named("indexer_max_concurrent_shard_requests") @Nullable Integer indexerMaxConcurrentShardRequests,
                             ObjectMapper objectMapper) {
         this.client = client;
-        this.openSearchClient = openSearchClient;
         this.compressionEnabled = compressionEnabled;
         this.indexerMaxConcurrentSearches = Optional.ofNullable(indexerMaxConcurrentSearches);
         this.indexerMaxConcurrentShardRequests = Optional.ofNullable(indexerMaxConcurrentShardRequests);
@@ -82,8 +79,8 @@ public class OpenSearchClient {
     }
 
     @VisibleForTesting
-    public OpenSearchClient(RestHighLevelClient client, org.opensearch.client.opensearch.OpenSearchClient openSearchClient, ObjectMapper objectMapper) {
-        this(client, openSearchClient, false, null, null, objectMapper);
+    public OpenSearchClient(RestHighLevelClient client, ObjectMapper objectMapper) {
+        this(client, false, null, null, objectMapper);
     }
 
     public SearchResponse search(SearchRequest searchRequest, String errorMessage) {
@@ -139,17 +136,6 @@ public class OpenSearchClient {
         }
     }
 
-    public <R> R execute(ThrowingFunction<org.opensearch.client.opensearch.OpenSearchClient, R, IOException> fn, String errorMessage) {
-        try {
-            return fn.apply(openSearchClient);
-        } catch (Exception e) {
-            throw exceptionFrom(e, errorMessage);
-        }
-    }
-
-    public <R> R execute(ThrowingFunction<org.opensearch.client.opensearch.OpenSearchClient, R, IOException> fn) {
-        return execute(fn, "An error occurred: ");
-    }
     @WithSpan
     public <R> R executeWithIOException(ThrowingBiFunction<RestHighLevelClient, RequestOptions, R, IOException> fn, String errorMessage) throws IOException {
         try {

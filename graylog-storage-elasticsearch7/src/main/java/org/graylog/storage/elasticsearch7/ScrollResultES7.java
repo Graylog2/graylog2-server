@@ -22,6 +22,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.ClearSc
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchScrollRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.unit.TimeValue;
+import org.graylog2.indexer.results.ResultMessageFactory;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -38,13 +39,14 @@ public class ScrollResultES7 extends ChunkedQueryResultES7 {
     }
 
     @AssistedInject
-    public ScrollResultES7(ElasticsearchClient client,
+    public ScrollResultES7(ResultMessageFactory resultMessagseFactory,
+                           ElasticsearchClient client,
                            @Assisted SearchResponse initialResult,
                            @Assisted("query") String query,
                            @Assisted("scroll") String scroll,
                            @Assisted List<String> fields,
                            @Assisted int limit) {
-        super(client, initialResult, query, fields, limit);
+        super(resultMessagseFactory, client, initialResult, query, fields, limit);
         this.scroll = scroll;
 
     }

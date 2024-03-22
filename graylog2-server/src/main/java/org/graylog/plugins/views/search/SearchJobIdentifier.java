@@ -18,10 +18,8 @@ package org.graylog.plugins.views.search;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public record SearchJobIdentifier(@JsonProperty String id,
+public record SearchJobIdentifier(@JsonProperty("id") String id,
                                   @JsonProperty("search_id") String searchId,
-                                  @JsonProperty String owner,
-                                  @JsonProperty("executing_node") String executingNodeId) {
+                                  @JsonProperty("owner") String owner,
+                                  @JsonProperty("executing_node") String executingNodeId) {}
 
-
-}

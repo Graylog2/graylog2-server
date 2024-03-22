@@ -54,10 +54,13 @@ import org.graylog.storage.opensearch2.TimeRangeQueryFactory;
 import org.graylog.storage.opensearch2.views.searchtypes.OSSearchTypeHandler;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.FieldTypeException;
+import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -114,7 +117,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
     }
 
     @Override
-    public OSGeneratedQueryContext generate(Query query, Set<SearchError> validationErrors) {
+    public OSGeneratedQueryContext generate(Query query, Set<SearchError> validationErrors, DateTimeZone timezone) {
         final BackendQuery backendQuery = query.query();
 
         final Set<SearchType> searchTypes = query.searchTypes();
@@ -140,7 +143,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
 
         final DateTime nowUTCSharedBetweenSearchTypes = Tools.nowUTC();
 
-        final OSGeneratedQueryContext queryContext = queryContextFactory.create(this, searchSourceBuilder, validationErrors);
+        final OSGeneratedQueryContext queryContext = queryContextFactory.create(this, searchSourceBuilder, validationErrors, timezone);
         searchTypes.stream()
                 .filter(searchType -> !isSearchTypeWithError(queryContext, searchType.id()))
                 .forEach(searchType -> {
@@ -169,7 +172,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
 
                     if (effectiveStreamIds.stream().noneMatch(s -> s.startsWith(Stream.DATASTREAM_PREFIX))) {
                         searchTypeOverrides
-                            .must(QueryBuilders.termsQuery(Message.FIELD_STREAMS, effectiveStreamIds));
+                                .must(QueryBuilders.termsQuery(Message.FIELD_STREAMS, effectiveStreamIds));
                     }
 
                     searchType.query().ifPresent(searchTypeQuery -> {
@@ -218,6 +221,11 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                 return Optional.of(QueryBuilders.queryStringQuery(((QueryStringFilter) filter).query()));
         }
         return Optional.empty();
+    }
+
+    @Override
+    public Set<IndexRange> indexRangesForStreamsInTimeRange(Set<String> streamIds, TimeRange timeRange) {
+        return indexLookup.indexRangesForStreamsInTimeRange(streamIds,timeRange);
     }
 
     @Override

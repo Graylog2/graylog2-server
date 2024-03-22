@@ -128,6 +128,7 @@ const StyledButton = styled(MantineButton)<{
       gap: 0.25em;
       overflow: visible;
     }
+
     .mantine-Button-loader {
       visibility: hidden;
     }
@@ -158,12 +159,11 @@ type Props = React.PropsWithChildren<{
 const Button = React.forwardRef<HTMLButtonElement, Props>(
   ({
     'aria-label': ariaLabel, bsStyle, bsSize, className, 'data-testid': dataTestId, id, onClick, disabled, href,
-    title, form, target, type, rel, role, name, tabIndex, children,
+    title, form, target, type, rel, role, name, tabIndex, children, active,
   }, ref) => {
     const theme = useTheme();
     const style = mapStyle(bsStyle);
     const color = style === 'link' ? 'transparent' : theme.colors.button[style].background;
-
     const sharedProps = {
       id,
       'aria-label': ariaLabel,
@@ -171,6 +171,7 @@ const Button = React.forwardRef<HTMLButtonElement, Props>(
       ...stylesProps(style),
       $bsStyle: style,
       $bsSize: bsSize,
+      variant: active ? 'outline' : 'filled',
       color,
       'data-testid': dataTestId,
       disabled,
