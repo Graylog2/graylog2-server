@@ -1,0 +1,14 @@
+# PLEASE REMOVE COMMENTS AND OPTIONAL FIELDS! THANKS!
+
+# Entry type according to https://keepachangelog.com/en/1.0.0/
+# One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+type = "c"
+message = "REST API permission changes"
+
+pulls = ["18736"]
+
+details.user = """
+A variety of inconsistencies in REST API permission checks have been resolved.
+
+ * The endpoint `DELETE /authz/roles/{roleId}` checked `roles:edit` instead of the correct `roles:delete:{roleId}` permission.
+"""

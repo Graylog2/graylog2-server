@@ -22,30 +22,9 @@ import com.google.common.collect.ImmutableSet;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog2.audit.AuditEventTypes;
-import org.graylog2.audit.jersey.AuditEvent;
-import org.graylog2.database.PaginatedList;
-import org.graylog2.plugin.database.ValidationException;
-import org.graylog2.plugin.database.users.User;
-import org.graylog2.rest.models.PaginatedResponse;
-import org.graylog2.search.SearchQuery;
-import org.graylog2.search.SearchQueryField;
-import org.graylog2.search.SearchQueryParser;
-import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.shared.security.RestPermissions;
-import org.graylog2.shared.users.UserService;
-import org.graylog2.users.PaginatedUserService;
-import org.graylog2.users.UserOverviewDTO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jakarta.inject.Inject;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
-
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
@@ -58,6 +37,25 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog2.audit.AuditEventTypes;
+import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.database.PaginatedList;
+import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.plugin.database.users.User;
+import org.graylog2.rest.models.PaginatedResponse;
+import org.graylog2.search.SearchQuery;
+import org.graylog2.search.SearchQueryField;
+import org.graylog2.search.SearchQueryParser;
+import org.graylog2.shared.rest.InlinePermissionCheck;
+import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.shared.users.UserService;
+import org.graylog2.users.PaginatedUserService;
+import org.graylog2.users.UserOverviewDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.List;
@@ -180,6 +178,7 @@ public class AuthzRolesResource extends RestResource {
     @ApiOperation(value = "Get a single role")
     @Path("{roleId}")
     @Produces(MediaType.APPLICATION_JSON)
+    @InlinePermissionCheck
     public AuthzRoleDTO get(@ApiParam(name = "roleId") @PathParam("roleId") @NotBlank String roleId) {
         checkPermission(RestPermissions.ROLES_READ, roleId);
         return authzRolesService.get(roleId).orElseThrow(
@@ -223,6 +222,7 @@ public class AuthzRolesResource extends RestResource {
     @ApiOperation("Add user to role")
     @AuditEvent(type = AuditEventTypes.ROLE_MEMBERSHIP_UPDATE)
     @Path("{roleId}/assignees")
+    @InlinePermissionCheck
     public void addUser(
             @ApiParam(name = "roleId") @PathParam("roleId") @NotBlank String roleId,
             @ApiParam(name = "usernames") Set<String> usernames) throws ValidationException {
@@ -233,6 +233,7 @@ public class AuthzRolesResource extends RestResource {
     @ApiOperation("Remove user from role")
     @Path("{roleId}/assignee/{username}")
     @AuditEvent(type = AuditEventTypes.ROLE_MEMBERSHIP_DELETE)
+    @InlinePermissionCheck
     public void removeUser(
             @ApiParam(name = "roleId") @PathParam("roleId") @NotBlank String roleId,
             @ApiParam(name = "username") @PathParam("username") @NotBlank String username) throws ValidationException {
@@ -271,7 +272,7 @@ public class AuthzRolesResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation("Delete a role")
     public void delete(@ApiParam(name = "roleId") @PathParam("roleId") @NotBlank String roleId) {
-        checkPermission(RestPermissions.ROLES_EDIT);
+        checkPermission(RestPermissions.ROLES_DELETE, roleId);
         final AuthzRoleDTO roleDTO = authzRolesService.get(roleId).orElseThrow(
                 () -> new NotFoundException("Could not delete role with id: " + roleId));
         if (roleDTO.readOnly()) {
