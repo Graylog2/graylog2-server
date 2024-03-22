@@ -140,7 +140,7 @@ const FilterForm = ({
       };
 
       validateQuery(request, timezone).then((result) => {
-        if (result?.status === 'WARNING') {
+        if (result?.status === 'WARNING' || result?.status === 'ERROR') {
           setFieldWarning('queryString', result);
         } else {
           setFieldWarning('queryString', undefined);
