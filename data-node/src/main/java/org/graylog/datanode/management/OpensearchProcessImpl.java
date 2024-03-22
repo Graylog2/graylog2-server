@@ -23,6 +23,7 @@ import org.apache.commons.exec.ExecuteException;
 import org.apache.http.client.utils.URIBuilder;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
+import org.graylog.datanode.configuration.variants.OpensearchSecurityConfiguration;
 import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog.datanode.process.OpensearchInfo;
 import org.graylog.datanode.process.ProcessEvent;
@@ -134,7 +135,9 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
 
     @Override
     public String getDatanodeRestApiUrl() {
-        final boolean secured = opensearchConfiguration.map(OpensearchConfiguration::securityConfigured).orElse(false);
+        final boolean secured = opensearchConfiguration.map(OpensearchConfiguration::opensearchSecurityConfiguration)
+                .map(OpensearchSecurityConfiguration::securityEnabled)
+                .orElse(false);
         String protocol = secured ? "https" : "http";
         String host = configuration.getHostname();
         final int port = configuration.getDatanodeHttpPort();

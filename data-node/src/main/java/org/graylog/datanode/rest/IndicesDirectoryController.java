@@ -48,7 +48,6 @@ public class IndicesDirectoryController {
         this.indicesDirectoryParser = indicesDirectoryParser;
     }
 
-    @OnlyInSecuredNode
     @GET
     @Path("compatibility")
     public CompatibilityResult status() {
