@@ -26,6 +26,7 @@ type Props = {
   bsStyle?: ColorVariant,
   children: React.ReactNode,
   className?: string,
+  displayIcon?: boolean,
   onDismiss?: () => void,
   style?: CSSProperties,
   title?: React.ReactNode,
@@ -62,7 +63,7 @@ const iconNameForType = (bsStyle: ColorVariant) => {
   }
 };
 
-const Alert = ({ children, bsStyle, title, style, className, onDismiss }: Props) => {
+const Alert = ({ children, bsStyle, title, style, className, onDismiss, displayIcon }: Props) => {
   const displayCloseButton = typeof onDismiss === 'function';
   const iconName = iconNameForType(bsStyle);
 
@@ -73,7 +74,7 @@ const Alert = ({ children, bsStyle, title, style, className, onDismiss }: Props)
                  style={style}
                  onClose={onDismiss}
                  title={title}
-                 icon={<Icon name={iconName} />}
+                 icon={displayIcon && <Icon name={iconName} />}
                  closeButtonLabel={displayCloseButton && 'Close alert'}
                  withCloseButton={displayCloseButton}>
       {children}
@@ -83,6 +84,7 @@ const Alert = ({ children, bsStyle, title, style, className, onDismiss }: Props)
 
 Alert.defaultProps = {
   className: undefined,
+  displayIcon: true,
   onDismiss: undefined,
   style: undefined,
   title: undefined,
