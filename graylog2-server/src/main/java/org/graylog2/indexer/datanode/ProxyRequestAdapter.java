@@ -20,7 +20,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public interface ProxyRequestAdapter {
-    record ProxyRequest(String method, String path, InputStream body, String hostname) {}
+    record ProxyRequest(String method, String path, InputStream body, String hostname,
+                        jakarta.ws.rs.core.MultivaluedMap<String, String> queryParameters) {}
 
     record ProxyResponse(int status, InputStream response, String contentType) {}
 
