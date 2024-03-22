@@ -101,6 +101,7 @@ const FilterForm = ({
   validation,
 } : Props) => {
   const { execute_every_ms: executeEveryMs, search_within_ms: searchWithinMs } = eventDefinition.config;
+  const [currentConfig, setCurrentConfig] = useState(eventDefinition.config);
   const searchWithin = extractDurationAndUnit(searchWithinMs, TIME_UNITS);
   const executeEvery = extractDurationAndUnit(executeEveryMs, TIME_UNITS);
   const { userTimezone } = useUserDateTime();
@@ -176,6 +177,7 @@ const FilterForm = ({
   const getUpdatedConfig = (key, value) => {
     const config = cloneDeep(eventDefinition.config);
     config[key] = value;
+    setCurrentConfig(config);
 
     return config;
   };
@@ -265,7 +267,7 @@ const FilterForm = ({
     });
   };
 
-  const debouncedParseQuery = debounce(parseQuery, 50);
+  const debouncedParseQuery = debounce(parseQuery, 250);
 
   const handleConfigChange = (name: string, config: EventDefinitionConfig) => {
     if (name === '_is_scheduled') {
@@ -424,7 +426,7 @@ const FilterForm = ({
                  including declaring Query Parameters from Lookup Tables by using the <code>$newParameter$</code> syntax.
                </span>
                  )}
-             value={defaultTo(eventDefinition.config.query, '')}
+             value={defaultTo(currentConfig.query, '')}
              onChange={handleQueryChange} />
       )}
 
