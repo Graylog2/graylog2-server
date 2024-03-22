@@ -38,7 +38,7 @@ type Props = {
 const RolesCell = ({ roles }: Props) => (
   <Td>
     {roles.map((role) => (
-      <Role key={role} bsStyle={role === 'Admin' ? 'info' : 'default'}>
+      <Role key={role} bsStyle={role === 'Admin' ? 'info' : 'gray'}>
         {role}
       </Role>
     )).toArray()}
