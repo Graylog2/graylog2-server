@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static com.google.common.collect.ImmutableList.of;
@@ -55,11 +56,11 @@ public class CsvMapConversion extends AbstractFunction<Map> {
     public CsvMapConversion() {
         this.valueParam = string(VALUE).ruleBuilderVariable().description("Map-like value to convert").build();
         this.fieldsParam = string("fieldNames").description("List of field names separated by the <separator> character").build();
-        this.separatorParam = string("separator", Character.class).optional().transform(this::getFirstChar).description("Character to split lines by, will be shortened to first character (default is <,>)").build();
-        this.quoteCharParam = string("quoteChar", Character.class).optional().transform(this::getFirstChar).description("Character used to quote fields (default is <\">)").build();
-        this.escapeCharParam = string("escapeChar", Character.class).optional().transform(this::getFirstChar).description("Character used to escape the separator and quote characters (default is <\\>)").build();
-        this.strictQuotesParam = bool("strictQuotes").optional().description("Ignore content outside of quotes").build();
-        this.trimParam = bool("trimLeadingWhitespace").optional().description("Trim leading whitespace").build();
+        this.separatorParam = string("separator", Character.class).optional().transform(this::getFirstChar).description("Character to split lines by, will be shortened to first character (default is <,>)").defaultValue(Optional.of(String.valueOf(CSVParser.DEFAULT_SEPARATOR))).build();
+        this.quoteCharParam = string("quoteChar", Character.class).optional().transform(this::getFirstChar).description("Character used to quote fields (default is <\">)").defaultValue(Optional.of(String.valueOf(CSVParser.DEFAULT_QUOTE_CHARACTER))).build();
+        this.escapeCharParam = string("escapeChar", Character.class).optional().transform(this::getFirstChar).description("Character used to escape the separator and quote characters (default is <\\>)").defaultValue(Optional.of(String.valueOf(CSVParser.DEFAULT_ESCAPE_CHARACTER))).build();
+        this.strictQuotesParam = bool("strictQuotes").optional().description("Ignore content outside of quotes").defaultValue(Optional.of(false)).build();
+        this.trimParam = bool("trimLeadingWhitespace").optional().description("Trim leading whitespace").defaultValue(Optional.of(false)).build();
     }
 
     private Character getFirstChar(String s) {
