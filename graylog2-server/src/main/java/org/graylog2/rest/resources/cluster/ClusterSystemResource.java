@@ -20,6 +20,16 @@ import com.codahale.metrics.annotation.Timed;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.cluster.Node;
@@ -30,24 +40,13 @@ import org.graylog2.rest.models.system.responses.SystemJVMResponse;
 import org.graylog2.rest.models.system.responses.SystemOverviewResponse;
 import org.graylog2.rest.models.system.responses.SystemProcessBufferDumpResponse;
 import org.graylog2.rest.models.system.responses.SystemThreadDumpResponse;
+import org.graylog2.shared.rest.NoPermissionCheckRequired;
 import org.graylog2.shared.rest.resources.ProxiedResource;
 import org.graylog2.shared.rest.resources.system.RemoteSystemResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import retrofit2.Response;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.WebApplicationException;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.HttpHeaders;
-import jakarta.ws.rs.core.MediaType;
 
 import java.io.IOException;
 import java.util.Map;
@@ -74,6 +73,7 @@ public class ClusterSystemResource extends ProxiedResource {
     @GET
     @Timed
     @ApiOperation(value = "Get system overview of all Graylog nodes")
+    @NoPermissionCheckRequired
     public Map<String, Optional<SystemOverviewResponse>> get() {
         return stripCallResult(requestOnAllNodes(RemoteSystemResource.class, RemoteSystemResource::system));
     }
@@ -82,6 +82,7 @@ public class ClusterSystemResource extends ProxiedResource {
     @Timed
     @ApiOperation(value = "Get JVM information of the given node")
     @Path("{nodeId}/jvm")
+    @NoPermissionCheckRequired
     public SystemJVMResponse jvm(@ApiParam(name = "nodeId", value = "The id of the node to retrieve JVM information.", required = true)
                                  @PathParam("nodeId") String nodeId) throws IOException, NodeNotFoundException {
         final Node targetNode = nodeService.byNodeId(nodeId);
