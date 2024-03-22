@@ -16,6 +16,8 @@
  */
 package org.graylog.datanode.filesystem.index;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.graylog.datanode.filesystem.index.dto.IndexInformation;
 import org.graylog.datanode.filesystem.index.dto.IndexerDirectoryInformation;
 import org.graylog.datanode.filesystem.index.dto.NodeInformation;
@@ -24,9 +26,6 @@ import org.graylog.datanode.filesystem.index.indexreader.ShardStats;
 import org.graylog.datanode.filesystem.index.indexreader.ShardStatsParser;
 import org.graylog.datanode.filesystem.index.statefile.StateFile;
 import org.graylog.datanode.filesystem.index.statefile.StateFileParser;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -74,6 +73,7 @@ public class IndicesDirectoryParser {
             final List<NodeInformation> nodeInformation = nodes.filter(Files::isDirectory)
                     .filter(p -> p.getFileName().toString().matches("\\d+"))
                     .map(this::parseNode)
+                    .filter(node -> !node.isEmpty())
                     .toList();
             return new IndexerDirectoryInformation(path, nodeInformation);
         } catch (IOException e) {
@@ -82,7 +82,11 @@ public class IndicesDirectoryParser {
     }
 
     private NodeInformation parseNode(Path nodePath) {
-        try (Stream<Path> indicesDirs = Files.list(nodePath.resolve("indices"))) {
+        final Path indicesDir = nodePath.resolve("indices");
+        if(!Files.exists(indicesDir)) {
+            return NodeInformation.empty(nodePath);
+        }
+        try (Stream<Path> indicesDirs = Files.list(indicesDir)) {
             final StateFile state = getState(nodePath, "node");
             final List<IndexInformation> indices = indicesDirs
                     .map(this::parseIndex)
