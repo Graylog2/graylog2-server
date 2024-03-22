@@ -16,7 +16,7 @@
  */
 import { type SyntheticEvent } from 'react';
 
-import type { Steps } from 'components/common/Wizard';
+import type { StepsType } from 'components/common/Wizard';
 import type { LookupTableParameterJson } from 'views/logic/parameters/LookupTableParameter';
 
 type Provider = {
@@ -108,5 +108,5 @@ export type EventDefinitionFormControlsProps = {
   onOpenNextPage: () => void,
   onOpenPrevPage: () => void,
   onSubmit: (event: SyntheticEvent) => void,
-  steps: Steps,
+  steps: StepsType,
 }
