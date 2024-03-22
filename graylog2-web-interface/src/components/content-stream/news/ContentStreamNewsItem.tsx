@@ -37,14 +37,14 @@ const StyledImage = styled.img(({ theme }: { theme: DefaultTheme }) => css`
 `);
 const StyledPanelBody = styled(Panel.Body)(({ theme }: { theme: DefaultTheme }) => css`
   flex-grow: 1;
-  background-color: ${theme.colors.table.row.backgroundAlt};
+  background-color: ${theme.colors.newsCards.background};
 
   > a {
     font-weight: bold;
   }
 `);
 const StyledPanelFooter = styled(Panel.Footer)(({ theme }: { theme: DefaultTheme }) => css`
-  background-color: ${theme.colors.table.row.backgroundAlt};
+  background-color: ${theme.colors.newsCards.background};
   border-radius: 0 0 ${theme.spacings.xxs} ${theme.spacings.xxs};
 `);
 const StyledPanel = styled(Panel)(({ theme }: { theme: DefaultTheme }) => css`

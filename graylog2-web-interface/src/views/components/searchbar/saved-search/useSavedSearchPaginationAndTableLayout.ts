@@ -14,20 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer.datastream;
+import { DEFAULT_LAYOUT, ENTITY_TABLE_ID } from 'views/components/searchbar/saved-search/Constants';
+import usePaginationAndTableLayout from 'hooks/usePaginationAndTableLayout';
 
-import org.graylog2.indexer.indices.Template;
+const useSavedSearchPaginationAndTableLayout = () => usePaginationAndTableLayout(ENTITY_TABLE_ID, DEFAULT_LAYOUT);
 
-import javax.annotation.Nonnull;
-
-public interface DataStreamAdapter {
-
-    boolean ensureDataStreamTemplate(@Nonnull String templateName, @Nonnull Template template, @Nonnull String timestampField);
-
-    void createDataStream(String dataStreamName);
-
-    void applyIsmPolicy(@Nonnull String dataStreamName, @Nonnull Policy policy);
-
-    void setNumberOfReplicas(@Nonnull String dataStreamName, @Nonnull int replicas);
-
-}
+export default useSavedSearchPaginationAndTableLayout;
