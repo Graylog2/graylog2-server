@@ -192,6 +192,8 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
                     }
 
                     restClient = Optional.of(createRestClient(config));
+                    openSearchClient = restClient.map(c -> new OpenSearchClient(c, objectMapper));
+
                 }),
                 () -> {throw new IllegalArgumentException("Opensearch configuration required but not supplied!");}
         );

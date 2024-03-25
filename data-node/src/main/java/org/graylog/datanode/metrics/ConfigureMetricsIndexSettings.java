@@ -76,15 +76,13 @@ public class ConfigureMetricsIndexSettings implements StateMachineTracer {
     public void transition(ProcessEvent trigger, ProcessState source, ProcessState destination) {
         if (destination == ProcessState.AVAILABLE && source == ProcessState.STARTING) {
             process.openSearchClient().ifPresent(client -> {
-                if (dataStreamService == null) {
-                    final IsmApi ismApi = new IsmApi(client, objectMapper);
-                    int replicas = nodeService.allActive().size() == 1 ? 0 : 1;
-                    dataStreamService = new DataStreamServiceImpl(
-                            new DataStreamAdapterOS2(client, objectMapper, ismApi),
-                            indexFieldTypesService,
-                            replicas
-                    );
-                }
+                final IsmApi ismApi = new IsmApi(client, objectMapper);
+                int replicas = nodeService.allActive().size() == 1 ? 0 : 1;
+                dataStreamService = new DataStreamServiceImpl(
+                        new DataStreamAdapterOS2(client, objectMapper, ismApi),
+                        indexFieldTypesService,
+                        replicas
+                );
                 dataStreamService.createDataStream(configuration.getMetricsStream(),
                         configuration.getMetricsTimestamp(),
                         createMappings(),
