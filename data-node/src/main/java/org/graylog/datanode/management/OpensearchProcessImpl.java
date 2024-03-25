@@ -17,7 +17,6 @@
 package org.graylog.datanode.management;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.oxo42.stateless4j.StateMachine;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.http.client.utils.URIBuilder;
@@ -180,7 +179,18 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
                     trustManager.refresh();
                     // refresh the seed hosts
                     writeSeedHostsList();
+
+                    boolean startedPreviously = Objects.nonNull(commandLineProcess) && commandLineProcess.processInfo().alive();
+                    if (startedPreviously) {
+                        stop();
+                    }
+
                     commandLineProcess = new OpensearchCommandLineProcess(config, this);
+
+                    if (startedPreviously) {
+                        commandLineProcess.start();
+                    }
+
                     restClient = Optional.of(createRestClient(config));
                 }),
                 () -> {throw new IllegalArgumentException("Opensearch configuration required but not supplied!");}
@@ -199,14 +209,16 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     }
     @Override
     public synchronized void start() {
-        opensearchConfiguration.ifPresentOrElse(
-                (config -> {
-                    commandLineProcess.start();
-                    restClient = Optional.of(createRestClient(config));
-                    openSearchClient = restClient.map(c -> new OpenSearchClient(c, objectMapper));
-                }),
-                () -> {throw new IllegalArgumentException("Opensearch configuration required but not supplied!");}
-        );
+        if (Objects.isNull(commandLineProcess) || !commandLineProcess.processInfo().alive()) {
+            opensearchConfiguration.ifPresentOrElse(
+                    (config -> {
+                        commandLineProcess.start();
+                        restClient = Optional.of(createRestClient(config));
+                        openSearchClient = restClient.map(c -> new OpenSearchClient(c, objectMapper));
+                    }),
+                    () -> {throw new IllegalArgumentException("Opensearch configuration required but not supplied!");}
+            );
+        }
     }
 
     @Override
