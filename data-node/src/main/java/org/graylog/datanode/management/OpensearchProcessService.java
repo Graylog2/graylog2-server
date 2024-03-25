@@ -34,12 +34,10 @@ import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.cluster.preflight.DataNodeProvisioningService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningStateChangeEvent;
-import org.graylog2.configuration.IndexSetsDefaultConfiguration;
 import org.graylog2.datanode.DataNodeLifecycleEvent;
 import org.graylog2.datanode.RemoteReindexAllowlistEvent;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
-import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.security.CustomCAX509TrustManager;
@@ -126,7 +124,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     @SuppressWarnings("unused")
     public void handlePreflightConfigEvent(DataNodeProvisioningStateChangeEvent event) {
         switch (event.state()) {
-            case STARTUP_REQUESTED -> startUp();
+            case STARTUP_REQUESTED -> this.process.start();
             case STORED -> {
                 configure();
                 dataNodeProvisioningService.changeState(event.nodeId(), DataNodeProvisioningConfig.State.STARTUP_PREPARED);
