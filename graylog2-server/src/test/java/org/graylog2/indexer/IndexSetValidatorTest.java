@@ -20,6 +20,8 @@ import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.datatiering.DataTieringChecker;
 import org.graylog2.datatiering.DataTieringConfig;
 import org.graylog2.datatiering.DataTieringOrchestrator;
+import org.graylog2.indexer.indexset.CustomFieldMapping;
+import org.graylog2.indexer.indexset.CustomFieldMappings;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
@@ -38,9 +40,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog2.indexer.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
+import static org.graylog2.indexer.indexset.IndexSetConfig.DEFAULT_INDEX_TEMPLATE_TYPE;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -229,6 +234,68 @@ public class IndexSetValidatorTest {
 
         assertThat(validator.validate(config)).hasValueSatisfying(v ->
                 assertThat(v.message()).contains("contains reserved keyword 'warm_'!"));
+    }
+
+    @Test
+    public void testValidationOfProfilesInIndexSetConfig() {
+        final IndexSet indexSet = mock(IndexSet.class);
+        when(indexSetRegistry.iterator()).thenReturn(Collections.singleton(indexSet).iterator());
+        when(indexSet.getIndexPrefix()).thenReturn("foo");
+
+        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, dataTieringChecker);
+        IndexSetConfig config = testIndexSetConfig().toBuilder().indexTemplateType(EVENT_TEMPLATE_TYPE).fieldTypeProfile("smth").build();
+        assertThat(validator.validate(config)).hasValueSatisfying(v ->
+                assertThat(v.message()).contains("Profiles cannot be set for events and failures index sets"));
+
+        config = testIndexSetConfig().toBuilder().indexTemplateType("failures").fieldTypeProfile("smth").build();
+        assertThat(validator.validate(config)).hasValueSatisfying(v ->
+                assertThat(v.message()).contains("Profiles cannot be set for events and failures index sets"));
+
+        config = testIndexSetConfig().toBuilder().indexTemplateType(EVENT_TEMPLATE_TYPE).fieldTypeProfile("").build();
+        assertThat(validator.validate(config)).isEmpty();
+        config = testIndexSetConfig().toBuilder().indexTemplateType(EVENT_TEMPLATE_TYPE).fieldTypeProfile(null).build();
+        assertThat(validator.validate(config)).isEmpty();
+        config = testIndexSetConfig().toBuilder().indexTemplateType("failures").fieldTypeProfile("").build();
+        assertThat(validator.validate(config)).isEmpty();
+        config = testIndexSetConfig().toBuilder().indexTemplateType("failures").fieldTypeProfile(null).build();
+        assertThat(validator.validate(config)).isEmpty();
+
+        config = testIndexSetConfig().toBuilder().indexTemplateType(DEFAULT_INDEX_TEMPLATE_TYPE).fieldTypeProfile("smth").build();
+        assertThat(validator.validate(config)).isEmpty();
+    }
+
+    @Test
+    public void testValidationOfCustomMappingsInIndexSetConfig() {
+        final IndexSet indexSet = mock(IndexSet.class);
+        when(indexSetRegistry.iterator()).thenReturn(Collections.singleton(indexSet).iterator());
+        when(indexSet.getIndexPrefix()).thenReturn("foo");
+
+        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, dataTieringChecker);
+        IndexSetConfig config = testIndexSetConfig().toBuilder().indexTemplateType(EVENT_TEMPLATE_TYPE)
+                .customFieldMappings(new CustomFieldMappings(List.of(new CustomFieldMapping("john", "long"))))
+                .build();
+        assertThat(validator.validate(config)).hasValueSatisfying(v ->
+                assertThat(v.message()).contains("Custom field mappings cannot be set for events and failures index sets"));
+
+        config = testIndexSetConfig().toBuilder().indexTemplateType("failures")
+                .customFieldMappings(new CustomFieldMappings(List.of(new CustomFieldMapping("john", "long"))))
+                .build();
+        assertThat(validator.validate(config)).hasValueSatisfying(v ->
+                assertThat(v.message()).contains("Custom field mappings cannot be set for events and failures index sets"));
+
+        config = testIndexSetConfig().toBuilder().indexTemplateType(EVENT_TEMPLATE_TYPE)
+                .customFieldMappings(new CustomFieldMappings())
+                .build();
+        assertThat(validator.validate(config)).isEmpty();
+        config = testIndexSetConfig().toBuilder().indexTemplateType("failures")
+                .customFieldMappings(new CustomFieldMappings())
+                .build();
+        assertThat(validator.validate(config)).isEmpty();
+
+        config = testIndexSetConfig().toBuilder().indexTemplateType(DEFAULT_INDEX_TEMPLATE_TYPE)
+                .customFieldMappings(new CustomFieldMappings(List.of(new CustomFieldMapping("john", "long"))))
+                .build();
+        assertThat(validator.validate(config)).isEmpty();
     }
 
     private IndexSetConfig testIndexSetConfig() {
