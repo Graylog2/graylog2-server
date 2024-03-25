@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
+import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -38,8 +39,10 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
+import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -104,8 +107,14 @@ public class DatanodeRestApiProxy implements ProxyRequestAdapter {
                 .map(url -> StringUtils.removeEnd(url, "/"))
                 .orElseThrow(() -> new IllegalStateException("No datanode found matching name " + request.hostname()));
 
+        final HttpUrl.Builder urlBuilder = HttpUrl.parse(host)
+                .newBuilder()
+                .addPathSegments(StringUtils.removeStart(request.path(), "/"));
+
+        request.queryParameters().forEach((key, values) -> values.forEach(value -> urlBuilder.addQueryParameter(key, value)));
+
         final Request.Builder builder = new Request.Builder()
-                .url(host + "/" + StringUtils.removeStart(request.path(), "/"))
+                .url(urlBuilder.build())
                 .addHeader("Authorization", authTokenProvider.get());
 
         switch (request.method().toUpperCase(Locale.ROOT)) {
