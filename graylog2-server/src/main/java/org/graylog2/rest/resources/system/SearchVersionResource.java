@@ -57,7 +57,7 @@ public class SearchVersionResource extends RestResource implements PluginRestRes
     private static final String SUPPORTED_SEARCH_VERSIONS =
             Arrays.stream(SearchVersion.Distribution.values())
                     .map(Enum::toString)
-                    .map(String::toLowerCase)
+                    .map(s -> s.toLowerCase(Locale.ENGLISH))
                     .collect(Collectors.joining(", "));
     final private ElasticsearchVersionProvider versionProvider;
 
