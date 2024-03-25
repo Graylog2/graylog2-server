@@ -91,7 +91,7 @@ public class ContentPackService {
     private final Set<ConstraintChecker> constraintCheckers;
     private final Map<ModelType, EntityWithExcerptFacade<?, ?>> entityFacades;
     private final ObjectMapper objectMapper;
-    private boolean isCloud = false;
+    private final Configuration configuration;
 
     @Inject
     public ContentPackService(ContentPackInstallationPersistenceService contentPackInstallationPersistenceService,
@@ -99,18 +99,11 @@ public class ContentPackService {
                               Map<ModelType, EntityWithExcerptFacade<?, ?>> entityFacades,
                               ObjectMapper objectMapper,
                               Configuration configuration) {
-        this(contentPackInstallationPersistenceService, constraintCheckers, entityFacades, objectMapper);
-        isCloud = configuration.isCloud();
-    }
-
-    public ContentPackService(ContentPackInstallationPersistenceService contentPackInstallationPersistenceService,
-                              Set<ConstraintChecker> constraintCheckers,
-                              Map<ModelType, EntityWithExcerptFacade<?, ?>> entityFacades,
-                              ObjectMapper objectMapper) {
         this.contentPackInstallationPersistenceService = contentPackInstallationPersistenceService;
         this.constraintCheckers = constraintCheckers;
         this.entityFacades = entityFacades;
         this.objectMapper = objectMapper;
+        this.configuration = configuration;
     }
 
     public ContentPackInstallation installContentPack(ContentPack contentPack,
@@ -151,10 +144,7 @@ public class ContentPackService {
                 final EntityDescriptor entityDescriptor = entity.toEntityDescriptor();
                 final EntityWithExcerptFacade facade = entityFacades.getOrDefault(entity.type(), UnsupportedEntityFacade.INSTANCE);
 
-                //TODO remove this
-                isCloud = true;
-
-                if (isCloud && entity.type().equals(INPUT_V1) && entity instanceof EntityV1 entityV1) {
+                if (configuration.isCloud() && entity.type().equals(INPUT_V1) && entity instanceof EntityV1 entityV1) {
                     boolean isCloudCompatible = true;
                     final InputEntity inputEntity = objectMapper.convertValue(entityV1.data(), InputEntity.class);
                     try {

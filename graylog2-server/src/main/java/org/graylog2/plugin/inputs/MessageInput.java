@@ -418,11 +418,11 @@ public abstract class MessageInput implements Stoppable {
         this.nodeId = nodeId;
     }
 
-    public static boolean isCloudCompatible() {
+    public boolean isCloudCompatible() {
         return Descriptor.isCloudCompatible();
     }
 
-    public static boolean isForwarderCompatible() {
+    public boolean isForwarderCompatible() {
         return Descriptor.isForwarderCompatible();
     }
 
