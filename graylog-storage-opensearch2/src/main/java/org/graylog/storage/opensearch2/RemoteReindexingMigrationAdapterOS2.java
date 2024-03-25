@@ -189,6 +189,23 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         }
     }
 
+    public void verifyRemoteReindexAllowlistSetting(String reindexSourceAddress) {
+        final String allowlistSetttingValue = client.execute((restHighLevelClient, requestOptions) -> {
+            final ClusterGetSettingsRequest request = new ClusterGetSettingsRequest();
+            request.includeDefaults(true);
+            final ClusterGetSettingsResponse settings = restHighLevelClient.cluster().getSettings(request, requestOptions);
+            return settings.getSetting("reindex.remote.allowlist");
+        });
+
+        // the value is not proper json, just something like [localhost:9201]. It should be safe to simply use String.contains,
+        // but there is maybe a chance for mismatches and then we'd have to parse the value
+        if (!allowlistSetttingValue.contains(reindexSourceAddress)) {
+            final String message = "Failed to configure reindex.remote.allowlist setting in the datanode cluster. Current setting value: " + allowlistSetttingValue;
+            LOG.error(message);
+            throw new IllegalStateException(message);
+        }
+    }
+
     private Set<String> getAllActiveNodeIDs() {
         return nodeService.allActive().values().stream()
                 .filter(dn -> dn.getDataNodeStatus() == DataNodeStatus.AVAILABLE) // we have to wait till the datanode is not just alive but all started properly and the indexer accepts connections
