@@ -26,6 +26,8 @@ import jakarta.validation.constraints.NotNull;
 import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterGetSettingsRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterGetSettingsResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.common.xcontent.json.JsonXContent;
 import org.graylog.shaded.opensearch2.org.opensearch.core.action.ActionListener;
 import org.graylog.shaded.opensearch2.org.opensearch.core.common.bytes.BytesReference;
@@ -87,6 +89,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     // information available. These limitations are known and accepted for now.
     private static final Map<String, RemoteReindexMigration> JOBS = new ConcurrentHashMap<>();
 
+
     @Inject
     public RemoteReindexingMigrationAdapterOS2(final OpenSearchClient client,
                                                final OkHttpClient httpClient,
@@ -146,8 +149,10 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
 
     private void prepareCluster(URI uri) {
         final var activeNodes = getAllActiveNodeIDs();
-        allowReindexingFrom(uri.getHost() + ":" + uri.getPort());
+        final String reindexSourceAddress = uri.getHost() + ":" + uri.getPort();
+        allowReindexingFrom(reindexSourceAddress);
         waitForClusterRestart(activeNodes);
+        verifyRemoteReindexAllowlistSetting(reindexSourceAddress);
     }
 
     ReindexRequest createReindexRequest(final String index, final BytesReference query, URI uri, String username, String password) {
@@ -213,7 +218,9 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     }
 
     private void waitForClusterRestart(final Set<String> expectedNodes) {
-        // sleeping for some time to let the cluster stop so we can wait for the restart
+        // We are currently unable to detect that datanodes stopped and are starting again. We just hope that
+        // these 10 seconds give them enough time and they will restart the opensearch process in the background
+        // after 10s we'll wait till all the previously known nodes are up and healthy again.
         try {
             Thread.sleep(10 * 1000);
         } catch (InterruptedException e) {
@@ -232,10 +239,14 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         try {
             var successful = retryer.call(callable);
             if (!successful) {
-                LOG.error("Cluster failed to restart after " + CONNECTION_ATTEMPTS * WAIT_BETWEEN_CONNECTION_ATTEMPTS + " seconds.");
+                final String message = "Cluster failed to restart after " + CONNECTION_ATTEMPTS * WAIT_BETWEEN_CONNECTION_ATTEMPTS + " seconds.";
+                LOG.error(message);
+                throw new IllegalStateException(message);
             }
         } catch (ExecutionException | RetryException e) {
-            LOG.error("Cluster failed to restart: " + e.getMessage(), e);
+            final String message = "Cluster failed to restart: " + e.getMessage();
+            LOG.error(message, e);
+            throw new RuntimeException(message);
         }
     }
 
