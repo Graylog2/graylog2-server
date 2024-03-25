@@ -16,7 +16,11 @@
  */
 package org.graylog2.rest.resources.datanodes;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -32,37 +36,76 @@ import org.graylog2.indexer.datanode.ProxyRequestAdapter;
 import org.graylog2.security.IndexerJwtAuthTokenProvider;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.util.Collection;
+import java.io.InputStream;
+import java.time.Duration;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Singleton
 public class DatanodeRestApiProxy implements ProxyRequestAdapter {
 
     private final IndexerJwtAuthTokenProvider authTokenProvider;
+    private final NodeService<DataNodeDto> nodeService;
+    private final ObjectMapper objectMapper;
     private final DatanodeResolver datanodeResolver;
     private final OkHttpClient httpClient;
 
     @Inject
-    public DatanodeRestApiProxy(IndexerJwtAuthTokenProvider authTokenProvider, DatanodeResolver datanodeResolver, OkHttpClient okHttpClient) throws NoSuchAlgorithmException, KeyManagementException {
+    public DatanodeRestApiProxy(IndexerJwtAuthTokenProvider authTokenProvider, NodeService<DataNodeDto> nodeService, ObjectMapper objectMapper, DatanodeResolver datanodeResolver, OkHttpClient okHttpClient, @Named("proxied_requests_default_call_timeout")
+    com.github.joschi.jadconfig.util.Duration defaultProxyTimeout) {
         this.authTokenProvider = authTokenProvider;
+        this.nodeService = nodeService;
+        this.objectMapper = objectMapper;
         this.datanodeResolver = datanodeResolver;
-        httpClient = okHttpClient;
+        httpClient = withTimeout(okHttpClient, defaultProxyTimeout);
+    }
+
+    @NotNull
+    private static OkHttpClient withTimeout(OkHttpClient okHttpClient, com.github.joschi.jadconfig.util.Duration defaultProxyTimeout) {
+        final Duration timeout = Duration.ofMillis(defaultProxyTimeout.toMilliseconds());
+        return okHttpClient.newBuilder()
+                .connectTimeout(timeout)
+                .readTimeout(timeout)
+                .callTimeout(timeout)
+                .build();
+    }
+
+    private ProxyResponse runOnAllNodes(ProxyRequest request) {
+        final Map<String, JsonNode> result = nodeService.allActive().values().stream().parallel().collect(Collectors.toMap(NodeDto::getHostname, n -> {
+            try {
+                final ProxyResponse response = request(new ProxyRequest(request.method(), request.path(), InputStream.nullInputStream(), n.getHostname()));
+                return objectMapper.readValue(response.response(), JsonNode.class);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }));
+
+        try {
+            ByteArrayInputStream bais = new ByteArrayInputStream(objectMapper.writeValueAsBytes(result));
+            return new ProxyResponse(200, bais, "application/json");
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public ProxyResponse request(ProxyRequest request) throws IOException {
+
+        if (Objects.equals(DatanodeResolver.ALL_NODES_KEYWORD, request.hostname())) {
+            return runOnAllNodes(request);
+        }
+
         final String host = datanodeResolver.findByHostname(request.hostname())
                 .map(DataNodeDto::getRestApiAddress)
                 .map(url -> StringUtils.removeEnd(url, "/"))
                 .orElseThrow(() -> new IllegalStateException("No datanode found matching name " + request.hostname()));
 
         final Request.Builder builder = new Request.Builder()
-                .url(host + "/" + request.path())
+                .url(host + "/" + StringUtils.removeStart(request.path(), "/"))
                 .addHeader("Authorization", authTokenProvider.get());
 
         switch (request.method().toUpperCase(Locale.ROOT)) {
