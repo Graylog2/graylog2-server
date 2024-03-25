@@ -115,6 +115,6 @@ public class AdaptersES7 implements Adapters {
 
     @Override
     public IndexFieldTypePollerAdapter indexFieldTypePollerAdapter(final Configuration configuration) {
-        return new IndexFieldTypePollerAdapterES7(new FieldMappingApi(objectMapper, client), configuration, new StreamsForFieldRetrieverES7(client));
+        return new IndexFieldTypePollerAdapterES7(new FieldMappingApi(client), configuration, new StreamsForFieldRetrieverES7(client));
     }
 }
