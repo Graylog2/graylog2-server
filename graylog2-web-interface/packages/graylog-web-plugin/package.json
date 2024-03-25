@@ -51,7 +51,7 @@
     "react-router-dom": "6.22.3",
     "reflux": "0.2.13",
     "styled-components": "6.1.1",
-    "typescript": "5.4.2",
+    "typescript": "5.4.3",
     "use-query-params": "^2.2.0",
     "webpack": "5.90.3",
     "webpack-cli": "5.1.4",
