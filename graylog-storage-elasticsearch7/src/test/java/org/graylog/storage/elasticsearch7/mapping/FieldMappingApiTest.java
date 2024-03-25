@@ -45,6 +45,67 @@ class FieldMappingApiTest {
     }
 
     @Test
+    void testReturnsEmptyMapOnNoMappings() throws Exception {
+        String mappingResponse = """
+                {
+                  "graylog_13": {
+                    "mappings": {
+                      "properties": {
+                      }
+                    }
+                  }
+                }
+                """;
+        doReturn(objectMapper.readTree(mappingResponse))
+                .when(client)
+                .executeRequest(eq(new Request("GET", "/graylog_13/_mapping")), anyString());
+
+        final Map<String, FieldMappingApi.FieldMapping> result = toTest.fieldTypes("graylog_13");
+        assertEquals(Map.of(), result);
+    }
+
+    @Test
+    void testParsesMappingsCorrectly() throws Exception {
+        String mappingResponse = """
+                {
+                  "graylog_42": {
+                    "mappings": {
+                      "properties": {
+                        "action": {
+                          "type": "keyword"
+                        },
+                        "text": {
+                           "type": "text",
+                           "analyzer": "analyzer_keyword",
+                           "fielddata": true
+                        },
+                        "date": {
+                          "type": "date"
+                        },
+                        "number": {
+                          "type": "long",
+                          "fielddata": "false"
+                        }
+                      }
+                    }
+                  }
+                }
+                """;
+        doReturn(objectMapper.readTree(mappingResponse))
+                .when(client)
+                .executeRequest(eq(new Request("GET", "/graylog_42/_mapping")), anyString());
+
+        final Map<String, FieldMappingApi.FieldMapping> expectedResult = Map.of(
+                "text", FieldMappingApi.FieldMapping.create("text", true),
+                "action", FieldMappingApi.FieldMapping.create("keyword", false),
+                "date", FieldMappingApi.FieldMapping.create("date", false),
+                "number", FieldMappingApi.FieldMapping.create("long", false)
+        );
+        final Map<String, FieldMappingApi.FieldMapping> result = toTest.fieldTypes("graylog_42");
+        assertEquals(expectedResult, result);
+    }
+
+    @Test
     void testAliasTypeIsProperlyResolved() throws Exception {
         String mappingResponse = """
                 {
