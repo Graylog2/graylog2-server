@@ -130,6 +130,7 @@ public class IndexerDiscoveryProvider implements Provider<List<URI>> {
     private List<URI> discover() {
         return nodeService.allActive().values().stream()
                 .map(Node::getTransportAddress)
+                .filter(address -> address != null && !address.isBlank())
                 .map(URI::create)
                 .collect(Collectors.toList());
     }
