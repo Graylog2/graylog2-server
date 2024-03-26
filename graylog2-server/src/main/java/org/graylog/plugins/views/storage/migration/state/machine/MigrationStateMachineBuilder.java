@@ -45,12 +45,7 @@ public class MigrationStateMachineBuilder {
                 .permit(MigrationStep.SELECT_MIGRATION, MigrationState.MIGRATION_WELCOME_PAGE, () -> LOG.info("Migration selected in menu, show welcome page"));
 
         config.configure(MigrationState.MIGRATION_WELCOME_PAGE)
-                .permit(MigrationStep.SHOW_DIRECTORY_COMPATIBILITY_CHECK, MigrationState.DIRECTORY_COMPATIBILITY_CHECK_PAGE, () -> LOG.info("Showing directory compatibility check page"))
-                .permit(MigrationStep.SKIP_DIRECTORY_COMPATIBILITY_CHECK, MigrationState.CA_CREATION_PAGE);
-
-        config.configure(MigrationState.DIRECTORY_COMPATIBILITY_CHECK_PAGE)
-                .onEntry(migrationActions::runDirectoryCompatibilityCheck)
-                .permitIf(MigrationStep.SHOW_CA_CREATION, MigrationState.CA_CREATION_PAGE, migrationActions::directoryCompatibilityCheckOk);
+                .permit(MigrationStep.SHOW_CA_CREATION, MigrationState.CA_CREATION_PAGE);
 
         config.configure(MigrationState.CA_CREATION_PAGE)
                 .permitIf(MigrationStep.SHOW_RENEWAL_POLICY_CREATION, MigrationState.RENEWAL_POLICY_CREATION_PAGE, () -> !migrationActions.caDoesNotExist())
@@ -102,9 +97,9 @@ public class MigrationStateMachineBuilder {
         // in place / rolling upgrade branch of the migration
         config.configure(MigrationState.ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE)
                 .onEntry(migrationActions::rollingUpgradeSelected)
-                .permit(MigrationStep.INSTALL_DATANODES_ON_EVERY_NODE, MigrationState.DIRECTORY_COMPATIBILITY_CHECK_PAGE2, () -> LOG.info("Showing directory compatibility check page"));
+                .permit(MigrationStep.INSTALL_DATANODES_ON_EVERY_NODE, MigrationState.DIRECTORY_COMPATIBILITY_CHECK_PAGE, () -> LOG.info("Showing directory compatibility check page"));
 
-        config.configure(MigrationState.DIRECTORY_COMPATIBILITY_CHECK_PAGE2)
+        config.configure(MigrationState.DIRECTORY_COMPATIBILITY_CHECK_PAGE)
                 .permitIf(MigrationStep.SHOW_PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES, MigrationState.PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES, migrationActions::directoryCompatibilityCheckOk);
 
         config.configure(MigrationState.PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES)

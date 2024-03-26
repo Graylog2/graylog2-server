@@ -49,31 +49,15 @@ public class MigrationStateMachineBuilderTest {
     public void testWelcomePage() {
         StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.MIGRATION_WELCOME_PAGE);
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.MIGRATION_WELCOME_PAGE);
-        assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SHOW_DIRECTORY_COMPATIBILITY_CHECK, MigrationStep.SKIP_DIRECTORY_COMPATIBILITY_CHECK);
-        verifyNoMoreInteractions(migrationActions);
-    }
-
-    @Test
-    public void testDirectoryCompatibilityCheck() {
-        StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.MIGRATION_WELCOME_PAGE);
-        stateMachine.fire(MigrationStep.SHOW_DIRECTORY_COMPATIBILITY_CHECK);
-        assertThat(stateMachine.getState()).isEqualTo(MigrationState.DIRECTORY_COMPATIBILITY_CHECK_PAGE);
-        verify(migrationActions).runDirectoryCompatibilityCheck();
-        assertThat(stateMachine.getPermittedTriggers()).isEmpty();
-        verify(migrationActions, times(1)).directoryCompatibilityCheckOk();
-        reset(migrationActions);
-        when(migrationActions.directoryCompatibilityCheckOk()).thenReturn(true);
         assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SHOW_CA_CREATION);
-        verify(migrationActions, times(1)).directoryCompatibilityCheckOk();
         verifyNoMoreInteractions(migrationActions);
     }
 
     @Test
     public void testCaCreationPage() {
         when(migrationActions.directoryCompatibilityCheckOk()).thenReturn(true);
-        StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.DIRECTORY_COMPATIBILITY_CHECK_PAGE);
+        StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.MIGRATION_WELCOME_PAGE);
         stateMachine.fire(MigrationStep.SHOW_CA_CREATION);
-        verify(migrationActions).directoryCompatibilityCheckOk();
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.CA_CREATION_PAGE);
         when(migrationActions.caDoesNotExist()).thenReturn(true);
         assertThat(stateMachine.getPermittedTriggers()).isEmpty();
@@ -191,7 +175,7 @@ public class MigrationStateMachineBuilderTest {
     public void testDirectoryCompatibilityCheckPage2() {
         StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE);
         stateMachine.fire(MigrationStep.INSTALL_DATANODES_ON_EVERY_NODE);
-        assertThat(stateMachine.getState()).isEqualTo(MigrationState.DIRECTORY_COMPATIBILITY_CHECK_PAGE2);
+        assertThat(stateMachine.getState()).isEqualTo(MigrationState.DIRECTORY_COMPATIBILITY_CHECK_PAGE);
         assertThat(stateMachine.getPermittedTriggers()).isEmpty();
         verify(migrationActions, times(1)).directoryCompatibilityCheckOk();
         reset(migrationActions);
@@ -203,7 +187,7 @@ public class MigrationStateMachineBuilderTest {
 
     @Test
     public void testProvisionRollingUpgradeNodesWithCertificates() {
-        StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.DIRECTORY_COMPATIBILITY_CHECK_PAGE2);
+        StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.DIRECTORY_COMPATIBILITY_CHECK_PAGE);
         when(migrationActions.directoryCompatibilityCheckOk()).thenReturn(true);
         stateMachine.fire(MigrationStep.SHOW_PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES);
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES);
