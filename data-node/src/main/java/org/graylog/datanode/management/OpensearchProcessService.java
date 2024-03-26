@@ -26,9 +26,12 @@ import jakarta.inject.Singleton;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.bootstrap.preflight.DatanodeDirectoriesLockfileCheck;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
+import org.graylog.datanode.configuration.variants.InSecureConfiguration;
 import org.graylog.datanode.metrics.ConfigureMetricsIndexSettings;
 import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog.datanode.process.ProcessStateMachine;
+import org.graylog2.bootstrap.preflight.PreflightConfigResult;
+import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
@@ -62,6 +65,8 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     private final ClusterEventBus clusterEventBus;
     private final DatanodeDirectoriesLockfileCheck lockfileCheck;
     private final ClusterConfigService clusterConfigService;
+    private final PreflightConfigService preflightConfigService;
+    private final Configuration configuration;
 
 
     @Inject
@@ -78,8 +83,10 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
                                     final ProcessStateMachine processStateMachine,
                                     final ClusterEventBus clusterEventBus,
                                     final DatanodeDirectoriesLockfileCheck lockfileCheck,
-                                    final ClusterConfigService clusterConfigService) {
+                                    final ClusterConfigService clusterConfigService,
+                                    final PreflightConfigService preflightConfigService) {
         this.configurationProvider = configurationProvider;
+        this.configuration = configuration;
         this.eventBus = eventBus;
         this.nodeId = nodeId;
         this.dataNodeProvisioningService = dataNodeProvisioningService;
@@ -87,6 +94,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
         this.clusterEventBus = clusterEventBus;
         this.lockfileCheck = lockfileCheck;
         this.clusterConfigService = clusterConfigService;
+        this.preflightConfigService = preflightConfigService;
         this.process = createOpensearchProcess(datanodeConfiguration, trustManager, configuration, nodeService, objectMapper, processStateMachine);
         eventBus.register(this);
     }
@@ -145,12 +153,21 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
         }
     }
 
+    private void checkWritePreflightFinishedOnInsecureStartup() {
+        if(configuration.isInsecureStartup()) {
+            var preflight = preflightConfigService.getPreflightConfigResult();
+            if (preflight == null || !preflight.equals(PreflightConfigResult.FINISHED)) {
+                preflightConfigService.setConfigResult(PreflightConfigResult.FINISHED);
+            }
+        }
+    }
+
     @Override
     protected void startUp() {
         final OpensearchConfiguration config = configurationProvider.get();
         configure();
         if (config.securityConfigured()) {
-
+            checkWritePreflightFinishedOnInsecureStartup();
             try {
                 lockfileCheck.checkDatanodeLock(config.datanodeDirectories().getDataTargetDir());
                 this.process.start();
