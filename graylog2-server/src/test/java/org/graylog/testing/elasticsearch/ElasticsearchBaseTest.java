@@ -48,6 +48,8 @@ public abstract class ElasticsearchBaseTest {
     }
 
     public String messageTemplateIndexPattern() {
+        // TODO Check whether we can use graylog_* here.
+        //      This also matches composable ism templates and generates warnings
         return "*";
     }
 
