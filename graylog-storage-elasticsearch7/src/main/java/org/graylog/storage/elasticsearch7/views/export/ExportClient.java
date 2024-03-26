@@ -43,11 +43,8 @@ public class ExportClient {
         try {
             final SearchResponse response = this.client.search(request, errorMessage);
             if (response.getFailedShards() > 0) {
-                final List<Throwable> shardFailures = Arrays.stream(response.getShardFailures())
+                final List<String> errors = Arrays.stream(response.getShardFailures())
                         .map(ShardOperationFailedException::getCause)
-                        .toList();
-                final List<String> errors = shardFailures
-                        .stream()
                         .map(Throwable::getMessage)
                         .distinct()
                         .toList();
