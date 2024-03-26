@@ -15,11 +15,39 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import styled from 'styled-components';
 import type { PropsWithChildren } from 'react';
 import { useState } from 'react';
 
+import { Alert, Button } from 'components/bootstrap';
+import { Icon } from 'components/common';
 import { SideNav, SideNavItem, ContentArea, Container } from 'components/security/page-layout';
 import Routes from 'routing/Routes';
+
+const StyledAlert = styled(Alert)`
+  padding: ${({ theme }) => theme.spacings.lg};
+  margin: ${({ theme }) => theme.spacings.md};
+  margin-top: 0;
+`;
+
+const Banner = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+`;
+
+const LeftItems = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  gap: ${({ theme }) => theme.spacings.md};
+`;
+
+const BoldText = styled.h1`
+  font-weight: bold;
+  color: ${({ theme }) => theme.colors.variant.danger};
+`;
 
 const navItems = [
   {
@@ -70,6 +98,17 @@ const TeaserPageLayout = ({ children }: PropsWithChildren) => {
         ))}
       </SideNav>
       <ContentArea $sideNavIsOpen={showSideBar}>
+        <StyledAlert bsStyle="info" noIcon>
+          <Banner>
+            <LeftItems>
+              <BoldText>Security Demo</BoldText>
+              <span>For more information and booking a full demo of the product visit Graylog website.</span>
+            </LeftItems>
+            <Button bsStyle="primary" role="link" target="_blank" href="https://graylog.org/products/security">
+              Graylog Security <Icon name="open_in_new" />
+            </Button>
+          </Banner>
+        </StyledAlert>
         {children}
       </ContentArea>
     </Container>
