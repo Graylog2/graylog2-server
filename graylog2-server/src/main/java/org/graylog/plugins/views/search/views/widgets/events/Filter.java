@@ -14,9 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { RESERVED_FIELDS } from 'views/Constants';
-import isFilteredField from 'views/logic/IsFilteredField';
+package org.graylog.plugins.views.search.views.widgets.events;
 
-const isReservedField = (fieldName: string) => RESERVED_FIELDS.includes(fieldName) || isFilteredField(fieldName);
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-export default isReservedField;
+import java.util.List;
+
+public record Filter(@JsonProperty(FIELD_FIELD) String field, @JsonProperty(FIELD_VALUE) List<String> value) {
+    private static final String FIELD_FIELD = "field";
+    private static final String FIELD_VALUE = "value";
+
+    @JsonCreator
+    public static Filter create(@JsonProperty(FIELD_FIELD) String field, @JsonProperty(FIELD_VALUE) List<String> value) {
+        return new Filter(field, value);
+    }
+}
