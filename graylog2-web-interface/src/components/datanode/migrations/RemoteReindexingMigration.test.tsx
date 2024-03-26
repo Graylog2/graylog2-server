@@ -70,7 +70,8 @@ jest.mock('components/datanode/hooks/useDataNodes', () => jest.fn(() => ({
       count: 0,
     },
   },
-  refetch: () => {},
+  refetch: () => {
+  },
   isInitialLoading: false,
   error: null,
 })));
@@ -83,7 +84,8 @@ const renderStep = (_state: MigrationStateItem) => {
     response: null,
   } as MigrationState);
 
-  render(<RemoteReindexingMigration onTriggerStep={async () => ({} as MigrationState)} currentStep={getCurrentStep(_state)} />);
+  render(<RemoteReindexingMigration onTriggerStep={async () => ({} as MigrationState)}
+                                    currentStep={getCurrentStep(_state)} />);
 };
 
 describe('RemoteReindexingMigration', () => {
@@ -131,7 +133,8 @@ describe('RemoteReindexingMigration', () => {
       name: /5. Migrate existing data/i,
     });
 
-    await screen.findByLabelText(/Cluster URI/);
+    await screen.findByLabelText(/URI of the host/);
+    await screen.findByLabelText(/Whitelist/);
     await screen.findByLabelText(/Username/);
     await screen.findByLabelText(/Password/);
   });
