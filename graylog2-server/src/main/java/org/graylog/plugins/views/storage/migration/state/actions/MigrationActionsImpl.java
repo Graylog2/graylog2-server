@@ -159,7 +159,8 @@ public class MigrationActionsImpl implements MigrationActions {
         }
         final Map<String, DataNodeDto> activeDataNodes = nodeService.allActive();
         activeDataNodes.values().stream()
-                .filter(node -> Objects.requireNonNull(node.getProvisioningInformation()).status() != DataNodeProvisioningConfig.State.STARTUP_REQUESTED)
+                .filter(node -> node.getDataNodeStatus() != DataNodeStatus.AVAILABLE)
+                .filter(node -> dataNodeProvisioningService.getPreflightConfigFor(node.getNodeId()).map(config -> config.state() != DataNodeProvisioningConfig.State.STARTUP_PREPARED).orElse(true))
                 .forEach(node -> dataNodeProvisioningService.changeState(node.getNodeId(), DataNodeProvisioningConfig.State.CONFIGURED));
     }
 
@@ -167,13 +168,14 @@ public class MigrationActionsImpl implements MigrationActions {
     public void provisionAndStartDataNodes() {
         final Map<String, DataNodeDto> activeDataNodes = nodeService.allActive();
         activeDataNodes.values().stream()
-                .filter(node -> Objects.requireNonNull(node.getProvisioningInformation()).status() != DataNodeProvisioningConfig.State.CONNECTED)
+                .filter(node -> node.getDataNodeStatus() != DataNodeStatus.AVAILABLE)
                 .forEach(node -> dataNodeProvisioningService.changeState(node.getNodeId(), DataNodeProvisioningConfig.State.CONFIGURED));
     }
 
     @Override
     public boolean provisioningFinished() {
-        return nodeService.allActive().values().stream().allMatch(node -> dataNodeProvisioningService.getPreflightConfigFor(node.getNodeId())
+        return nodeService.allActive().values().stream().allMatch(node -> node.getDataNodeStatus() == DataNodeStatus.AVAILABLE ||
+                dataNodeProvisioningService.getPreflightConfigFor(node.getNodeId())
                 .map(dn -> dn.state() == DataNodeProvisioningConfig.State.STARTUP_PREPARED)
                 .orElse(false));
     }
