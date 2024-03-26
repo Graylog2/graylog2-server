@@ -121,6 +121,7 @@ import org.graylog.plugins.views.search.views.widgets.aggregation.ValueConfigDTO
 import org.graylog.plugins.views.search.views.widgets.aggregation.WorldMapVisualizationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.sort.PivotSortConfig;
 import org.graylog.plugins.views.search.views.widgets.aggregation.sort.SeriesSortConfig;
+import org.graylog.plugins.views.search.views.widgets.events.EventsWidgetConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.messagelist.MessageListConfigDTO;
 import org.graylog.plugins.views.startpage.StartPageResource;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityUpdatesListener;
@@ -288,6 +289,8 @@ public class ViewsBindings extends ViewsModule {
 
         registerJacksonSubtype(TimeHistogramConfigDTO.class);
         registerJacksonSubtype(ValueConfigDTO.class);
+
+        registerJacksonSubtype(EventsWidgetConfigDTO.class);
     }
 
     private void registerVisualizationConfigSubtypes() {
