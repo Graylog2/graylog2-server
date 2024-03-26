@@ -110,8 +110,8 @@ public class ContentPackService {
                                                       Map<String, ValueReference> parameters,
                                                       String comment,
                                                       String user) {
-        if (contentPack instanceof ContentPackV1) {
-            return installContentPack((ContentPackV1) contentPack, parameters, comment, user);
+        if (contentPack instanceof ContentPackV1 contentPackV1) {
+            return installContentPack(contentPackV1, parameters, comment, user);
         } else {
             throw new IllegalArgumentException("Unsupported content pack version: " + contentPack.version());
         }
@@ -235,8 +235,8 @@ public class ContentPackService {
     }
 
     public ContentPackUninstallDetails getUninstallDetails(ContentPack contentPack, ContentPackInstallation installation) {
-        if (contentPack instanceof ContentPackV1) {
-            return getUninstallDetails((ContentPackV1) contentPack, installation);
+        if (contentPack instanceof ContentPackV1 contentPackV1) {
+            return getUninstallDetails(contentPackV1, installation);
         } else {
             throw new IllegalArgumentException("Unsupported content pack version: " + contentPack.version());
         }
@@ -328,7 +328,7 @@ public class ContentPackService {
                                 nativeEntityDescriptor);
                     } else if (nativeEntityOptional.isPresent()) {
                         final Object nativeEntity = nativeEntityOptional.get();
-                        LOG.trace("Removing existing native entity for {} ({})", nativeEntityDescriptor);
+                        LOG.trace("Removing existing native entity for {}", nativeEntityDescriptor);
                         try {
                             // The EntityFacade#delete() method expects the actual entity object
                             //noinspection unchecked
@@ -340,7 +340,7 @@ public class ContentPackService {
                             failedEntities.add(nativeEntityDescriptor);
                         }
                     } else {
-                        LOG.trace("Couldn't find existing native entity for {} ({})", nativeEntityDescriptor);
+                        LOG.trace("Couldn't find existing native entity for {}", nativeEntityDescriptor);
                     }
                 }
             }
@@ -477,8 +477,8 @@ public class ContentPackService {
     }
 
     public Set<ConstraintCheckResult> checkConstraints(ContentPack contentPack) {
-        if (contentPack instanceof ContentPackV1) {
-            return checkConstraintsV1((ContentPackV1) contentPack);
+        if (contentPack instanceof ContentPackV1 contentPackV1) {
+            return checkConstraintsV1(contentPackV1);
         } else if (contentPack instanceof LegacyContentPack) {
             return Collections.emptySet();
         } else {

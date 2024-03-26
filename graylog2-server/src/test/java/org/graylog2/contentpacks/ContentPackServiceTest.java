@@ -312,11 +312,11 @@ public class ContentPackServiceTest {
 
         when(configuration.isCloud()).thenReturn(false);
         contentPackService.installContentPack(contentPack, Collections.emptyMap(), "", TEST_USER);
-        assertThat(captor.getValue().entities().size()).isEqualTo(1);
+        assertThat(captor.getValue().entities()).hasSize(1);
 
         when(configuration.isCloud()).thenReturn(true);
         contentPackService.installContentPack(contentPack, Collections.emptyMap(), "", TEST_USER);
-        assertThat(captor.getValue().entities().size()).isEqualTo(0);
+        assertThat(captor.getValue().entities()).isEmpty();
     }
 
     @Test
@@ -429,7 +429,7 @@ public class ContentPackServiceTest {
     }
 
     @Test
-    public void getUninstallDetails() throws NotFoundException {
+    public void getUninstallDetails() {
         /* Test will be uninstalled */
         when(contentPackInstallService.countInstallationOfEntityById(ModelId.of("dead-beef1"))).thenReturn((long) 1);
         ContentPackUninstallDetails expect = ContentPackUninstallDetails.create(nativeEntityDescriptors);
@@ -489,7 +489,7 @@ public class ContentPackServiceTest {
                 .build();
     }
 
-    private EntityV1 createTestViewEntity() throws Exception {
+    private EntityV1 createTestViewEntity() {
         final QueryEntity query = QueryEntity.builder()
                 .id("dead-beef")
                 .timerange(KeywordRange.create("last 5 minutes", "Etc/UTC"))
