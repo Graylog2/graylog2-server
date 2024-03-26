@@ -20,6 +20,7 @@ import com.github.rholder.retry.RetryException;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
+import edu.emory.mathcs.backport.java.util.Arrays;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.validation.constraints.NotNull;
@@ -106,7 +107,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     }
 
     @Override
-    public RemoteReindexMigration start(final URI uri, final String username, final String password, final List<String> indices, final boolean synchronous) {
+    public RemoteReindexMigration start(final String whitelist, final URI uri, final String username, final String password, final List<String> indices, final boolean synchronous) {
         final RemoteReindexMigration migration = new RemoteReindexMigration();
         JOBS.put(migration.id(), migration);
         try {
@@ -114,7 +115,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
             // finish can happen very late, in async code, so we need to handle it as a callback
             // but the async nature causes problems with closed connections :-/
             // migration.setFinishCallback(() -> removeAllowlist(uri.getHost() + ":" + uri.getPort()));
-            doStartMigration(uri, username, password, synchronous, migration);
+            doStartMigration(whitelist, uri, username, password, synchronous, migration);
         } catch (MalformedURLException e) {
             migration.error("Failed to collect indices for migration: " + e.getMessage());
         }
@@ -126,8 +127,9 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         return toReindex.stream().map(indexName -> new RemoteReindexIndex(indexName, Status.NOT_STARTED)).collect(Collectors.toList());
     }
 
-    private void doStartMigration(URI uri, String username, String password, boolean synchronous, RemoteReindexMigration migration) {
-        prepareCluster(uri);
+    private void doStartMigration(final String whitelistAsString, URI uri, String username, String password, boolean synchronous, RemoteReindexMigration migration) {
+        List<String> whitelist = Arrays.asList(whitelistAsString.split(","));
+        prepareCluster(whitelist);
         migration.status(Status.RUNNING);
         createIndicesInNewCluster(migration);
         if (synchronous) {
@@ -147,12 +149,11 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         });
     }
 
-    private void prepareCluster(URI uri) {
+    private void prepareCluster(final List<String> whitelist) {
         final var activeNodes = getAllActiveNodeIDs();
-        final String reindexSourceAddress = uri.getHost() + ":" + uri.getPort();
-        allowReindexingFrom(reindexSourceAddress);
+        allowReindexingFrom(whitelist);
         waitForClusterRestart(activeNodes);
-        verifyRemoteReindexAllowlistSetting(reindexSourceAddress);
+        verifyRemoteReindexAllowlistSetting(whitelist);
     }
 
     ReindexRequest createReindexRequest(final String index, final BytesReference query, URI uri, String username, String password) {
@@ -194,8 +195,8 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         }
     }
 
-    public void verifyRemoteReindexAllowlistSetting(String reindexSourceAddress) {
-        final String allowlistSetttingValue = client.execute((restHighLevelClient, requestOptions) -> {
+    public void verifyRemoteReindexAllowlistSetting(List<String> whitelistEntries) {
+        final String allowlistSettingValue = client.execute((restHighLevelClient, requestOptions) -> {
             final ClusterGetSettingsRequest request = new ClusterGetSettingsRequest();
             request.includeDefaults(true);
             final ClusterGetSettingsResponse settings = restHighLevelClient.cluster().getSettings(request, requestOptions);
@@ -204,8 +205,8 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
 
         // the value is not proper json, just something like [localhost:9201]. It should be safe to simply use String.contains,
         // but there is maybe a chance for mismatches and then we'd have to parse the value
-        if (!allowlistSetttingValue.contains(reindexSourceAddress)) {
-            final String message = "Failed to configure reindex.remote.allowlist setting in the datanode cluster. Current setting value: " + allowlistSetttingValue;
+        if (!whitelistEntries.stream().allMatch(entry -> allowlistSettingValue.contains(entry))) {
+            final String message = "Failed to configure reindex.remote.allowlist setting in the datanode cluster. Current setting value: " + allowlistSettingValue;
             LOG.error(message);
             throw new IllegalStateException(message);
         }
@@ -250,12 +251,12 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         }
     }
 
-    void removeAllowlist(final String host) {
-        eventBus.post(new RemoteReindexAllowlistEvent(host, RemoteReindexAllowlistEvent.ACTION.REMOVE));
+    void removeAllowlist(final List<String> whitelist) {
+        eventBus.post(new RemoteReindexAllowlistEvent(whitelist, RemoteReindexAllowlistEvent.ACTION.REMOVE));
     }
 
-    void allowReindexingFrom(final String host) {
-        eventBus.post(new RemoteReindexAllowlistEvent(host, RemoteReindexAllowlistEvent.ACTION.ADD));
+    void allowReindexingFrom(final List<String> whitelist) {
+        eventBus.post(new RemoteReindexAllowlistEvent(whitelist, RemoteReindexAllowlistEvent.ACTION.ADD));
     }
 
     List<String> getAllIndicesFrom(final URI uri, final String username, final String password) throws MalformedURLException {

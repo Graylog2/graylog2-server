@@ -19,6 +19,10 @@ package org.graylog.plugins.views.storage.migration;
 import java.net.URI;
 import java.util.List;
 
-public record RemoteReindexRequest(URI hostname, String user, String password, List<String> indices,
+public record RemoteReindexRequest(String whitelist,
+                                   URI hostname,
+                                   String user,
+                                   String password,
+                                   List<String> indices,
                                    boolean synchronous) {
 }
