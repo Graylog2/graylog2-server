@@ -61,8 +61,7 @@ public class MigrationActionsAdapter implements MigrationActions {
     }
 
     @Override
-    public boolean runDirectoryCompatibilityCheck() {
-        return false;
+    public void runDirectoryCompatibilityCheck() {
     }
 
     @Override

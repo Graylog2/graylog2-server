@@ -182,21 +182,21 @@ public class MigrationStateMachineBuilderTest {
         stateMachine.fire(MigrationStep.SELECT_ROLLING_UPGRADE_MIGRATION);
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE);
         verify(migrationActions).rollingUpgradeSelected();
-        assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.INSTALL_DATANODES_ON_EVERY_NODE);
+        assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.RUN_DIRECTORY_COMPATIBILITY_CHECK);
         verifyNoMoreInteractions(migrationActions);
     }
 
     @Test
     public void testDirectoryCompatibilityCheckPage2() {
         StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE);
-        stateMachine.fire(MigrationStep.INSTALL_DATANODES_ON_EVERY_NODE);
+        stateMachine.fire(MigrationStep.RUN_DIRECTORY_COMPATIBILITY_CHECK);
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.DIRECTORY_COMPATIBILITY_CHECK_PAGE);
-        assertThat(stateMachine.getPermittedTriggers()).isEmpty();
-        verify(migrationActions, times(1)).directoryCompatibilityCheckOk();
+        assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.RUN_DIRECTORY_COMPATIBILITY_CHECK);
+        verify(migrationActions, times(2)).directoryCompatibilityCheckOk();
         reset(migrationActions);
         when(migrationActions.directoryCompatibilityCheckOk()).thenReturn(true);
         assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SHOW_PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES);
-        verify(migrationActions, times(1)).directoryCompatibilityCheckOk();
+        verify(migrationActions, times(2)).directoryCompatibilityCheckOk();
         verifyNoMoreInteractions(migrationActions);
     }
 

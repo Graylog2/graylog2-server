@@ -18,8 +18,10 @@ package org.graylog.plugins.views.storage.migration.state.actions;
 
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import jakarta.ws.rs.core.MultivaluedHashMap;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachineContext;
 import org.graylog.security.certutil.CaService;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
@@ -30,17 +32,20 @@ import org.graylog2.cluster.nodes.DataNodeStatus;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.cluster.preflight.DataNodeProvisioningService;
+import org.graylog2.indexer.datanode.ProxyRequestAdapter;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
 import org.graylog2.indexer.migration.RemoteReindexMigration;
 import org.graylog2.plugin.GlobalMetricNames;
 import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.rest.resources.datanodes.DatanodeRestApiProxy;
 import org.graylog2.system.processing.control.ClusterProcessingControl;
 import org.graylog2.system.processing.control.ClusterProcessingControlFactory;
 import org.graylog2.system.processing.control.RemoteProcessingControlResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
@@ -64,13 +69,18 @@ public class MigrationActionsImpl implements MigrationActions {
     private final RemoteReindexingMigrationAdapter migrationService;
     private final MetricRegistry metricRegistry;
 
+    private final DatanodeRestApiProxy datanodeProxy;
+    private final ObjectMapper objectMapper;
+
     @Inject
     public MigrationActionsImpl(final ClusterConfigService clusterConfigService, NodeService<DataNodeDto> nodeService,
                                 final CaService caService, DataNodeProvisioningService dataNodeProvisioningService,
                                 RemoteReindexingMigrationAdapter migrationService,
                                 final ClusterProcessingControlFactory clusterProcessingControlFactory,
                                 final PreflightConfigService preflightConfigService,
-                                final MetricRegistry metricRegistry) {
+                                final MetricRegistry metricRegistry,
+                                final DatanodeRestApiProxy datanodeProxy,
+                                final ObjectMapper objectMapper) {
         this.clusterConfigService = clusterConfigService;
         this.nodeService = nodeService;
         this.caService = caService;
@@ -79,13 +89,24 @@ public class MigrationActionsImpl implements MigrationActions {
         this.migrationService = migrationService;
         this.preflightConfigService = preflightConfigService;
         this.metricRegistry = metricRegistry;
+        this.datanodeProxy = datanodeProxy;
+        this.objectMapper = objectMapper;
     }
 
 
     @Override
-    public boolean runDirectoryCompatibilityCheck() {
-        // TODO: add real test
-        return true;
+    public void runDirectoryCompatibilityCheck() {
+        final ProxyRequestAdapter.ProxyRequest request = new ProxyRequestAdapter.ProxyRequest(
+                "GET", "indices-directory/compatibility", null, "any", new MultivaluedHashMap<>());
+        try {
+            ProxyRequestAdapter.ProxyResponse response = datanodeProxy.request(request);
+            CompatibilityResult compatibilityResult = objectMapper.readValue(response.response(), CompatibilityResult.class);
+            getStateMachineContext().addExtendedState(MigrationStateMachineContext.KEY_COMPATIBILITY_CHECK_PASSED,
+                    compatibilityResult.compatibilityErrors().isEmpty());
+            getStateMachineContext().setResponse(compatibilityResult);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -102,8 +123,7 @@ public class MigrationActionsImpl implements MigrationActions {
 
     @Override
     public boolean directoryCompatibilityCheckOk() {
-        // TODO: add real test
-        return true;
+        return getStateMachineContext().getExtendedState(MigrationStateMachineContext.KEY_COMPATIBILITY_CHECK_PASSED, Boolean.class).orElse(false);
     }
 
     @Override

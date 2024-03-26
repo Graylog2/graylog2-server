@@ -170,6 +170,10 @@ export const MIGRATION_ACTIONS = {
     key: 'SHOW_MIGRATION_SELECTION',
     label: 'Go to migration steps',
   },
+  RUN_DIRECTORY_COMPATIBILITY_CHECK: {
+    key: 'INSTALL_DATANODES_ON_EVERY_NODE',
+    label: 'Run directory compatibilty check',
+  },
   PROVISION_DATANODE_CERTIFICATES: {
     key: 'PROVISION_DATANODE_CERTIFICATES',
     label: 'Provision Data Nodes with certificates',
