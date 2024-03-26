@@ -41,7 +41,6 @@ import org.graylog2.system.processing.control.RemoteProcessingControlResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
@@ -142,13 +141,13 @@ public class MigrationActionsImpl implements MigrationActions {
     }
 
     @Override
-    public boolean removalPolicyDoesNotExist() {
+    public boolean renewalPolicyDoesNotExist() {
         return this.clusterConfigService.get(RenewalPolicy.class) == null;
     }
 
     @Override
-    public boolean caAndRemovalPolicyExist() {
-        return !caDoesNotExist() && !removalPolicyDoesNotExist();
+    public boolean caAndRenewalPolicyExist() {
+        return !caDoesNotExist() && !renewalPolicyDoesNotExist();
     }
 
     @Override

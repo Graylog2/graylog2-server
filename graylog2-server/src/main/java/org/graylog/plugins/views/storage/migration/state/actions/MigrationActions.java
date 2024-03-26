@@ -38,8 +38,8 @@ public interface MigrationActions {
 
     void startMessageProcessing();
     boolean caDoesNotExist();
-    boolean removalPolicyDoesNotExist();
-    boolean caAndRemovalPolicyExist();
+    boolean renewalPolicyDoesNotExist();
+    boolean caAndRenewalPolicyExist();
 
     void provisionDataNodes();
 

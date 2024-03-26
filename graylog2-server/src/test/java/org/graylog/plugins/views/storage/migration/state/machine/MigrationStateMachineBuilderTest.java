@@ -49,55 +49,63 @@ public class MigrationStateMachineBuilderTest {
     public void testWelcomePage() {
         StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.MIGRATION_WELCOME_PAGE);
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.MIGRATION_WELCOME_PAGE);
+        assertThat(stateMachine.getPermittedTriggers()).isEmpty();
+        when(migrationActions.caDoesNotExist()).thenReturn(true);
         assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SHOW_CA_CREATION);
-        verifyNoMoreInteractions(migrationActions);
+        when(migrationActions.caDoesNotExist()).thenReturn(false);
+        when(migrationActions.renewalPolicyDoesNotExist()).thenReturn(true);
+        assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SHOW_RENEWAL_POLICY_CREATION);
+        when(migrationActions.caDoesNotExist()).thenReturn(false);
+        when(migrationActions.renewalPolicyDoesNotExist()).thenReturn(false);
+        when(migrationActions.caAndRenewalPolicyExist()).thenReturn(true);
+        assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SHOW_MIGRATION_SELECTION);
     }
 
     @Test
     public void testCaCreationPage() {
         when(migrationActions.directoryCompatibilityCheckOk()).thenReturn(true);
         StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.MIGRATION_WELCOME_PAGE);
+        when(migrationActions.caDoesNotExist()).thenReturn(true);
         stateMachine.fire(MigrationStep.SHOW_CA_CREATION);
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.CA_CREATION_PAGE);
-        when(migrationActions.caDoesNotExist()).thenReturn(true);
         assertThat(stateMachine.getPermittedTriggers()).isEmpty();
-        verify(migrationActions, times(1)).caDoesNotExist();
-        verify(migrationActions, times(1)).caAndRemovalPolicyExist();
+        verify(migrationActions, times(1)).renewalPolicyDoesNotExist();
+        verify(migrationActions, times(1)).caAndRenewalPolicyExist();
         reset(migrationActions);
+        when(migrationActions.renewalPolicyDoesNotExist()).thenReturn(true);
         assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SHOW_RENEWAL_POLICY_CREATION);
-        verify(migrationActions, times(1)).caDoesNotExist();
-        verify(migrationActions, times(1)).caAndRemovalPolicyExist();
+        verify(migrationActions, times(1)).caAndRenewalPolicyExist();
         reset(migrationActions);
-        when(migrationActions.caDoesNotExist()).thenReturn(false);
-        when(migrationActions.caAndRemovalPolicyExist()).thenReturn(true);
-        assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SHOW_RENEWAL_POLICY_CREATION, MigrationStep.SHOW_MIGRATION_SELECTION);
-        verify(migrationActions, times(1)).caDoesNotExist();
-        verify(migrationActions, times(1)).caAndRemovalPolicyExist();
+        when(migrationActions.renewalPolicyDoesNotExist()).thenReturn(false);
+        when(migrationActions.caAndRenewalPolicyExist()).thenReturn(true);
+        assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SHOW_MIGRATION_SELECTION);
+        verify(migrationActions, times(1)).renewalPolicyDoesNotExist();
+        verify(migrationActions, times(1)).caAndRenewalPolicyExist();
         verifyNoMoreInteractions(migrationActions);
     }
 
     @Test
     public void testRenewalPolicyCreationPage() {
-        when(migrationActions.caDoesNotExist()).thenReturn(false);
+        when(migrationActions.renewalPolicyDoesNotExist()).thenReturn(true);
         StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.CA_CREATION_PAGE);
         stateMachine.fire(MigrationStep.SHOW_RENEWAL_POLICY_CREATION);
-        verify(migrationActions).caDoesNotExist();
+        verify(migrationActions).renewalPolicyDoesNotExist();
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.RENEWAL_POLICY_CREATION_PAGE);
         assertThat(stateMachine.getPermittedTriggers()).isEmpty();
-        verify(migrationActions, times(1)).caAndRemovalPolicyExist();
+        verify(migrationActions, times(1)).caAndRenewalPolicyExist();
         reset(migrationActions);
-        when(migrationActions.caAndRemovalPolicyExist()).thenReturn(true);
+        when(migrationActions.caAndRenewalPolicyExist()).thenReturn(true);
         assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SHOW_MIGRATION_SELECTION);
-        verify(migrationActions, times(1)).caAndRemovalPolicyExist();
+        verify(migrationActions, times(1)).caAndRenewalPolicyExist();
         verifyNoMoreInteractions(migrationActions);
     }
 
     @Test
     public void testMigrationSelectionPage() {
-        when(migrationActions.caAndRemovalPolicyExist()).thenReturn(true);
+        when(migrationActions.caAndRenewalPolicyExist()).thenReturn(true);
         StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.CA_CREATION_PAGE);
         stateMachine.fire(MigrationStep.SHOW_MIGRATION_SELECTION);
-        verify(migrationActions).caAndRemovalPolicyExist();
+        verify(migrationActions).caAndRenewalPolicyExist();
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.MIGRATION_SELECTION_PAGE);
         assertThat(stateMachine.getPermittedTriggers())
                 .containsOnly(MigrationStep.SELECT_ROLLING_UPGRADE_MIGRATION, MigrationStep.SELECT_REMOTE_REINDEX_MIGRATION);
