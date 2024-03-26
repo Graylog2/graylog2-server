@@ -128,6 +128,11 @@ public class MigrationStateMachineBuilderTest {
         stateMachine.fire(MigrationStep.DISCOVER_NEW_DATANODES);
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.PROVISION_DATANODE_CERTIFICATES_PAGE);
         assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.PROVISION_DATANODE_CERTIFICATES);
+        verify(migrationActions, times(2)).dataNodeStartupFinished();
+        reset(migrationActions);
+        when(migrationActions.dataNodeStartupFinished()).thenReturn(true);
+        assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SHOW_DATA_MIGRATION_QUESTION);
+        verify(migrationActions, times(2)).dataNodeStartupFinished();
         verifyNoMoreInteractions(migrationActions);
     }
 
@@ -135,7 +140,9 @@ public class MigrationStateMachineBuilderTest {
     public void testProvisionDatanodeCertificatesRunning() {
         StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.PROVISION_DATANODE_CERTIFICATES_PAGE);
         stateMachine.fire(MigrationStep.PROVISION_DATANODE_CERTIFICATES);
+        verify(migrationActions, times(1)).dataNodeStartupFinished();
         verify(migrationActions, times(1)).provisionAndStartDataNodes();
+        reset(migrationActions);
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.PROVISION_DATANODE_CERTIFICATES_RUNNING);
         assertThat(stateMachine.getPermittedTriggers()).isEmpty();
         verify(migrationActions, times(1)).dataNodeStartupFinished();
@@ -200,7 +207,13 @@ public class MigrationStateMachineBuilderTest {
         stateMachine.fire(MigrationStep.SHOW_PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES);
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES);
         verify(migrationActions, times(1)).directoryCompatibilityCheckOk();
+        reset(migrationActions);
         assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.PROVISION_DATANODE_CERTIFICATES);
+        verify(migrationActions, times(2)).provisioningFinished();
+        reset(migrationActions);
+        when(migrationActions.provisioningFinished()).thenReturn(true);
+        assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.CALCULATE_JOURNAL_SIZE);
+        verify(migrationActions, times(2)).provisioningFinished();
         verifyNoMoreInteractions(migrationActions);
     }
 
@@ -208,6 +221,7 @@ public class MigrationStateMachineBuilderTest {
     public void testJournalSizeDowntimeWarning() {
         StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES);
         stateMachine.fire(MigrationStep.PROVISION_DATANODE_CERTIFICATES);
+        verify(migrationActions, times(1)).provisioningFinished();
         Mockito.when(migrationActions.provisioningFinished()).thenReturn(true);
         stateMachine.fire(MigrationStep.CALCULATE_JOURNAL_SIZE);
         verify(migrationActions, times(1)).calculateTrafficEstimate();

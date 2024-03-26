@@ -69,7 +69,8 @@ public class MigrationStateMachineBuilder {
                 });
 
         config.configure(MigrationState.PROVISION_DATANODE_CERTIFICATES_PAGE)
-                .permit(MigrationStep.PROVISION_DATANODE_CERTIFICATES, MigrationState.PROVISION_DATANODE_CERTIFICATES_RUNNING, migrationActions::provisionAndStartDataNodes);
+                .permitIf(MigrationStep.PROVISION_DATANODE_CERTIFICATES, MigrationState.PROVISION_DATANODE_CERTIFICATES_RUNNING, () -> !migrationActions.dataNodeStartupFinished(), migrationActions::provisionAndStartDataNodes)
+                .permitIf(MigrationStep.SHOW_DATA_MIGRATION_QUESTION, MigrationState.EXISTING_DATA_MIGRATION_QUESTION_PAGE, migrationActions::dataNodeStartupFinished);
 
         // This page should contain the "Please restart Graylog to continue with data migration"
         config.configure(MigrationState.PROVISION_DATANODE_CERTIFICATES_RUNNING)
@@ -105,7 +106,8 @@ public class MigrationStateMachineBuilder {
                 .permitIf(MigrationStep.SHOW_PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES, MigrationState.PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES, migrationActions::directoryCompatibilityCheckOk);
 
         config.configure(MigrationState.PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES)
-                .permit(MigrationStep.PROVISION_DATANODE_CERTIFICATES, MigrationState.PROVISION_ROLLING_UPGRADE_NODES_RUNNING, migrationActions::provisionDataNodes);
+                .permitIf(MigrationStep.PROVISION_DATANODE_CERTIFICATES, MigrationState.PROVISION_ROLLING_UPGRADE_NODES_RUNNING, () -> !migrationActions.provisioningFinished(), migrationActions::provisionDataNodes)
+                .permitIf(MigrationStep.CALCULATE_JOURNAL_SIZE, MigrationState.JOURNAL_SIZE_DOWNTIME_WARNING, migrationActions::provisioningFinished);
 
         config.configure(MigrationState.PROVISION_ROLLING_UPGRADE_NODES_RUNNING)
                 .permitIf(MigrationStep.CALCULATE_JOURNAL_SIZE, MigrationState.JOURNAL_SIZE_DOWNTIME_WARNING, migrationActions::provisioningFinished);
