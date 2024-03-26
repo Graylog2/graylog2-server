@@ -18,6 +18,7 @@ package org.graylog2.rest.resources.datanodes;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -61,8 +62,14 @@ public class DatanodeRestApiProxy implements ProxyRequestAdapter {
                 .map(url -> StringUtils.removeEnd(url, "/"))
                 .orElseThrow(() -> new IllegalStateException("No datanode found matching name " + request.hostname()));
 
+        final HttpUrl.Builder urlBuilder = HttpUrl.parse(host)
+                .newBuilder()
+                .addPathSegments(request.path());
+
+        request.queryParameters().forEach((key, values) -> values.forEach(value -> urlBuilder.addQueryParameter(key, value)));
+
         final Request.Builder builder = new Request.Builder()
-                .url(host + "/" + request.path())
+                .url(urlBuilder.build())
                 .addHeader("Authorization", authTokenProvider.get());
 
         switch (request.method().toUpperCase(Locale.ROOT)) {
