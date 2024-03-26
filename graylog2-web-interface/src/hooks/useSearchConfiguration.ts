@@ -14,19 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
-
 import type { SearchesConfig } from 'components/search/SearchConfig';
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
-import ApiRoutes from 'routing/ApiRoutes';
-
-const fetchSearchesConfiguration = () => fetch('GET', qualifyUrl(`${ApiRoutes.ClusterConfigResource.config().url}/org.graylog2.indexer.searches.SearchesClusterConfig`));
+import useClusterConfig from 'hooks/useClusterConfig';
 
 type Result = { config: SearchesConfig, refresh: () => void };
 
 const useSearchConfiguration = (): Result => {
-  const { data: config, refetch } = useQuery(['cluster.config', 'org.graylog2.indexer.searches.SearchesClusterConfig'], fetchSearchesConfiguration);
+  const { data: config, refetch } = useClusterConfig<SearchesConfig>('org.graylog2.indexer.searches.SearchesClusterConfig');
 
   return { config, refresh: refetch };
 };
