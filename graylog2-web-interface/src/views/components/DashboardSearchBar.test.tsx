@@ -20,7 +20,6 @@ import userEvent from '@testing-library/user-event';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
 import mockSearchesClusterConfig from 'fixtures/searchClusterConfig';
-import MockStore from 'helpers/mocking/StoreMock';
 import type { WidgetEditingState, WidgetFocusingState } from 'views/components/contexts/WidgetFocusContext';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import TestStoreProvider from 'views/test/TestStoreProvider';
@@ -43,11 +42,9 @@ jest.mock('views/hooks/useMinimumRefreshInterval', () => () => ({
   isInitialLoading: false,
 }));
 
-jest.mock('views/stores/SearchConfigStore', () => ({
-  SearchConfigStore: MockStore(['getInitialState', () => ({ searchesClusterConfig: mockSearchesClusterConfig })]),
-  SearchConfigActions: {
-    refresh: jest.fn(() => Promise.resolve()),
-  },
+jest.mock('hooks/useSearchConfiguration', () => () => ({
+  config: mockSearchesClusterConfig,
+  refresh: () => {},
 }));
 
 jest.mock('views/components/searchbar/queryvalidation/validateQuery', () => () => Promise.resolve({
