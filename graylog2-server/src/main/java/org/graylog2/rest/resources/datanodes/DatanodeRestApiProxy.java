@@ -39,6 +39,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
@@ -80,7 +81,7 @@ public class DatanodeRestApiProxy implements ProxyRequestAdapter {
     private ProxyResponse runOnAllNodes(ProxyRequest request) {
         final Map<String, JsonNode> result = nodeService.allActive().values().stream().parallel().collect(Collectors.toMap(NodeDto::getHostname, n -> {
             try {
-                final ProxyResponse response = request(new ProxyRequest(request.method(), request.path(), InputStream.nullInputStream(), n.getHostname()));
+                final ProxyResponse response = request(new ProxyRequest(request.method(), request.path(), InputStream.nullInputStream(), n.getHostname(), request.queryParameters()));
                 return objectMapper.readValue(response.response(), JsonNode.class);
             } catch (IOException e) {
                 throw new RuntimeException(e);
