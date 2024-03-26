@@ -30,6 +30,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpStatus;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeDto;
 import org.graylog2.cluster.nodes.NodeService;
@@ -38,12 +39,11 @@ import org.graylog2.security.IndexerJwtAuthTokenProvider;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
+import java.net.http.HttpResponse;
 import java.time.Duration;
-import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -79,21 +79,33 @@ public class DatanodeRestApiProxy implements ProxyRequestAdapter {
     }
 
     private ProxyResponse runOnAllNodes(ProxyRequest request) {
-        final Map<String, JsonNode> result = nodeService.allActive().values().stream().parallel().collect(Collectors.toMap(NodeDto::getHostname, n -> {
-            try {
-                final ProxyResponse response = request(new ProxyRequest(request.method(), request.path(), InputStream.nullInputStream(), n.getHostname(), request.queryParameters()));
-                return objectMapper.readValue(response.response(), JsonNode.class);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }));
-
-        try {
+        try (final ByteArrayOutputStream baos = copyRequestBody(request)) {
+            final Map<String, JsonNode> result = nodeService.allActive().values().stream().parallel().collect(Collectors.toMap(NodeDto::getHostname, n -> {
+                try (InputStream requestBody = new ByteArrayInputStream(baos.toByteArray())) {
+                    final ProxyResponse response = request(new ProxyRequest(request.method(), request.path(), requestBody, n.getHostname(), request.queryParameters()));
+                    return objectMapper.readValue(response.response(), JsonNode.class);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }));
             ByteArrayInputStream bais = new ByteArrayInputStream(objectMapper.writeValueAsBytes(result));
-            return new ProxyResponse(200, bais, "application/json");
+            return new ProxyResponse(HttpStatus.SC_OK, bais, jakarta.ws.rs.core.MediaType.APPLICATION_JSON);
         } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to parse json responses", e);
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @NotNull
+    private static ByteArrayOutputStream copyRequestBody(ProxyRequest request) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try (InputStream requestBody = request.body()) {
+            requestBody.transferTo(baos);
+        } catch (IOException ex) {
+            throw new RuntimeException("Failed to obtain request body", ex);
+        }
+        return baos;
     }
 
     @Override
