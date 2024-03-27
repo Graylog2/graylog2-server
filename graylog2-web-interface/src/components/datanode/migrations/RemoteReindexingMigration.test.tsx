@@ -134,7 +134,7 @@ describe('RemoteReindexingMigration', () => {
     });
 
     await screen.findByLabelText(/URI of the host/);
-    await screen.findByLabelText(/Whitelist/);
+    await screen.findByLabelText(/Allowlist/);
     await screen.findByLabelText(/Username/);
     await screen.findByLabelText(/Password/);
   });

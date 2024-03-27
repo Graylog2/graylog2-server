@@ -195,12 +195,12 @@ public class MigrationActionsImpl implements MigrationActions {
 
     @Override
     public void startRemoteReindex() {
-        final String whitelist = getStateMachineContext().getActionArgumentOpt("whitelist", String.class).orElseThrow(() -> new NullPointerException("whitelist has tp be provided"));
+        final String allowlist = getStateMachineContext().getActionArgumentOpt("allowlist", String.class).orElseThrow(() -> new NullPointerException("allowlist has tp be provided"));
         final URI hostname = Objects.requireNonNull(URI.create(getStateMachineContext().getActionArgument("hostname", String.class)), "hostname has to be provided");
         final String user = getStateMachineContext().getActionArgumentOpt("user", String.class).orElse(null);
         final String password = getStateMachineContext().getActionArgumentOpt("password", String.class).orElse(null);
         final List<String> indices = getStateMachineContext().getActionArgumentOpt("indices", List.class).orElse(Collections.emptyList()); // todo: generics!
-        final RemoteReindexMigration migration = migrationService.start(whitelist, hostname, user, password, indices, false);
+        final RemoteReindexMigration migration = migrationService.start(allowlist, hostname, user, password, indices, false);
         final String migrationID = migration.id();
         getStateMachineContext().addExtendedState(MigrationStateMachineContext.KEY_MIGRATION_ID, migrationID);
     }

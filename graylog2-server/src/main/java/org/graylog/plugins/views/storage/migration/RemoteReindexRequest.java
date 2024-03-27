@@ -19,7 +19,7 @@ package org.graylog.plugins.views.storage.migration;
 import java.net.URI;
 import java.util.List;
 
-public record RemoteReindexRequest(String whitelist,
+public record RemoteReindexRequest(String allowlist,
                                    URI hostname,
                                    String user,
                                    String password,

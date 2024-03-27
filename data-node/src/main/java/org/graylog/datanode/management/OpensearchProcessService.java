@@ -109,7 +109,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
         switch (event.action()) {
             case ADD -> {
                 this.process.stop();
-                configure(Map.of("reindex.remote.whitelist", event.whitelist())); // , "action.auto_create_index", "false"));
+                configure(Map.of("reindex.remote.allowlist", event.allowlist())); // , "action.auto_create_index", "false"));
                 this.process.start();
             }
             case REMOVE -> {

@@ -39,7 +39,7 @@ export type RemoteReindexMigration = {
 }
 
 export type RemoteReindexRequest = {
-  whitelist: string,
+  allowlist: string,
   hostname: string,
   password: string,
   indices: string[],

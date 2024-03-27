@@ -20,7 +20,6 @@ import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
 import org.graylog2.indexer.migration.IndexerConnectionCheckResult;
 import org.graylog2.indexer.migration.RemoteReindexMigration;
 
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.List;
 
@@ -29,7 +28,7 @@ public class RemoteReindexingMigrationAdapterES7 implements RemoteReindexingMigr
     public static final String UNSUPPORTED_MESSAGE = "This operation should never be called. We remote-reindex into the DataNode that contains OpenSearch. This adapter only exists for API completeness";
 
     @Override
-    public RemoteReindexMigration start(String whitelist, URI uri, String username, String password, List<String> indices, boolean synchronous) {
+    public RemoteReindexMigration start(String allowlist, URI uri, String username, String password, List<String> indices, boolean synchronous) {
         throw new UnsupportedOperationException(UNSUPPORTED_MESSAGE);
     }
 

@@ -100,7 +100,7 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
   };
 
   const initialValues: RemoteReindexRequest = {
-    whitelist: '',
+    allowlist: '',
     hostname: '',
     user: '',
     password: '',
@@ -117,12 +117,12 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
         setFieldValue,
       }) => (
         <Form role="form">
-          <Input id="whitelist"
-                 name="whitelist"
-                 label="Whitelist of all machines in the old cluster"
+          <Input id="allowlist"
+                 name="allowlist"
+                 label="Allowlist of all machines in the old cluster"
                  type="text"
                  disabled={isLoading}
-                 value={values.whitelist}
+                 value={values.allowlist}
                  onChange={(e) => handleChange(e, setFieldValue)}
                  required />
           <Input id="hostname"

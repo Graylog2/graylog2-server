@@ -18,7 +18,7 @@ package org.graylog2.datanode;
 
 import java.util.List;
 
-public record RemoteReindexAllowlistEvent(List<String> whitelist, ACTION action) {
+public record RemoteReindexAllowlistEvent(List<String> allowlist, ACTION action) {
     public enum ACTION {
         ADD, REMOVE
     }
