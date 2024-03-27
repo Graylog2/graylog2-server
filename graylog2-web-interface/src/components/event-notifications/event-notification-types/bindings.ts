@@ -14,8 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
-
 import EmailNotificationFormContainer from './EmailNotificationFormContainer';
 import EmailNotificationForm from './EmailNotificationForm';
 import EmailNotificationSummary from './EmailNotificationSummary';
@@ -32,7 +30,7 @@ import HttpNotificationDetails from '../event-notification-details/HttpNotificat
 import LegacyNotificationDetails from '../event-notification-details/LegacyNotificationDetails';
 import HttpNotificationDetailsV2 from '../event-notification-details/HttpNotificationDetailsV2';
 
-PluginStore.register(new PluginManifest({}, {
+export default {
   eventNotificationTypes: [
     {
       type: 'email-notification-v1',
@@ -67,4 +65,4 @@ PluginStore.register(new PluginManifest({}, {
       defaultConfig: LegacyNotificationForm.defaultConfig,
     },
   ],
-}));
+};
