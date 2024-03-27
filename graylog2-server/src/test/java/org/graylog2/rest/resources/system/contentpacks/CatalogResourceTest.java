@@ -16,12 +16,14 @@
  */
 package org.graylog2.rest.resources.system.contentpacks;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.MutableGraph;
 import org.graylog.plugins.views.search.rest.TestSearchUser;
+import org.graylog2.Configuration;
 import org.graylog2.contentpacks.ContentPackInstallationPersistenceService;
 import org.graylog2.contentpacks.ContentPackService;
 import org.graylog2.contentpacks.EntityDescriptorIds;
@@ -69,7 +71,7 @@ public class CatalogResourceTest {
                 mock(ContentPackInstallationPersistenceService.class);
         final Set<ConstraintChecker> constraintCheckers = Collections.emptySet();
         final Map<ModelType, EntityWithExcerptFacade<?, ?>> entityFacades = Collections.singletonMap(ModelType.of("test", "1"), mockEntityFacade);
-        contentPackService = new ContentPackService(contentPackInstallationPersistenceService, constraintCheckers, entityFacades);
+        contentPackService = new ContentPackService(contentPackInstallationPersistenceService, constraintCheckers, entityFacades, new ObjectMapper(), mock(Configuration.class));
     }
 
     @Test

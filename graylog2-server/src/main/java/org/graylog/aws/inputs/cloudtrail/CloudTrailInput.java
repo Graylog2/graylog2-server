@@ -18,14 +18,13 @@ package org.graylog.aws.inputs.cloudtrail;
 
 import com.codahale.metrics.MetricRegistry;
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
-
-import jakarta.inject.Inject;
 
 public class CloudTrailInput extends MessageInput {
     private static final String NAME = "AWS CloudTrail";
@@ -67,13 +66,11 @@ public class CloudTrailInput extends MessageInput {
             super(NAME, false, "");
         }
 
-        @Override
-        public boolean isCloudCompatible() {
+        public static boolean isCloudCompatible() {
             return true;
         }
 
-        @Override
-        public boolean isForwarderCompatible() {
+        public static boolean isForwarderCompatible() {
             return false;
         }
     }

@@ -57,7 +57,6 @@ public abstract class MessageInput implements Stoppable {
     public static final String FIELD_CONFIGURATION = "configuration";
     public static final String FIELD_CREATOR_USER_ID = "creator_user_id";
     public static final String FIELD_CREATED_AT = "created_at";
-    public static final String FIELD_STARTED_AT = "started_at";
     public static final String FIELD_ATTRIBUTES = "attributes";
     public static final String FIELD_STATIC_FIELDS = "static_fields";
     public static final String FIELD_GLOBAL = "global";
@@ -101,7 +100,7 @@ public abstract class MessageInput implements Stoppable {
     private String nodeId;
     private MetricSet transportMetrics;
 
-    public MessageInput(MetricRegistry metricRegistry,
+    protected MessageInput(MetricRegistry metricRegistry,
                         Configuration configuration,
                         Transport transport,
                         LocalMetricRegistry localRegistry, Codec codec, Config config, Descriptor descriptor, ServerStatus serverStatus) {
@@ -289,7 +288,7 @@ public abstract class MessageInput implements Stoppable {
                 || newDesiredState.equals(IOState.Type.STOPPED)) {
             desiredState = newDesiredState;
         } else {
-            LOG.error("Ignoring unexpected desired state " + newDesiredState + " for input " + title);
+            LOG.error("Ignoring unexpected desired state {} for input {}", newDesiredState, title);
         }
     }
 
@@ -338,7 +337,7 @@ public abstract class MessageInput implements Stoppable {
             map.put(FIELD_STATIC_FIELDS, getStaticFields());
         }
 
-        if (!isGlobal()) {
+        if (Boolean.FALSE.equals(isGlobal())) {
             map.put(FIELD_NODE_ID, getNodeId());
         }
 
@@ -368,8 +367,7 @@ public abstract class MessageInput implements Stoppable {
 
     @Override
     public boolean equals(final Object obj) {
-        if (obj instanceof MessageInput) {
-            final MessageInput input = (MessageInput) obj;
+        if (obj instanceof MessageInput input) {
             return this.getPersistId().equals(input.getPersistId());
         } else {
             return false;
@@ -419,11 +417,11 @@ public abstract class MessageInput implements Stoppable {
     }
 
     public boolean isCloudCompatible() {
-        return descriptor.isCloudCompatible();
+        return Descriptor.isCloudCompatible();
     }
 
     public boolean isForwarderCompatible() {
-        return descriptor.isForwarderCompatible();
+        return Descriptor.isForwarderCompatible();
     }
 
     public interface Factory<M> {
@@ -463,8 +461,8 @@ public abstract class MessageInput implements Stoppable {
         }
     }
 
-    public static abstract class Descriptor extends AbstractDescriptor {
-        public Descriptor() {
+    public abstract static class Descriptor extends AbstractDescriptor {
+        protected Descriptor() {
             super();
         }
 
@@ -472,11 +470,11 @@ public abstract class MessageInput implements Stoppable {
             super(name, exclusive, linkToDocs);
         }
 
-        public boolean isCloudCompatible() {
+        public static boolean isCloudCompatible() {
             return false;
         }
 
-        public boolean isForwarderCompatible() {
+        public static boolean isForwarderCompatible() {
             return true;
         }
     }

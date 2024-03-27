@@ -18,6 +18,7 @@ package org.graylog.integrations.aws.inputs;
 
 import com.codahale.metrics.MetricRegistry;
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
 import org.graylog.integrations.aws.codecs.AWSCodec;
 import org.graylog.integrations.aws.service.AWSService;
 import org.graylog.integrations.aws.transports.AWSTransport;
@@ -34,8 +35,6 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import software.amazon.awssdk.regions.Region;
-
-import jakarta.inject.Inject;
 
 /**
  * General AWS input for all types of supported AWS logs.
@@ -90,8 +89,7 @@ public class AWSInput extends MessageInput {
             super(NAME, false, "");
         }
 
-        @Override
-        public boolean isCloudCompatible() {
+        public static boolean isCloudCompatible() {
             return true;
         }
     }
