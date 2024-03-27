@@ -72,10 +72,12 @@ import java.net.URI;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -285,6 +287,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
 
     private void startAsyncTasks(RemoteReindexMigration migration, RemoteReindexRequest request) {
         final int threadsCount = Math.max(1, Math.min(request.threadsCount(), migration.indices().size()));
+
         final ExecutorService executorService = Executors.newFixedThreadPool(threadsCount, new ThreadFactoryBuilder()
                 .setNameFormat("remote-reindex-migration-backend-%d")
                 .setDaemon(true)
@@ -328,28 +331,33 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     }
 
     private void waitForTaskCompleted(RemoteReindexMigration migration, RemoteReindexIndex index) {
-        while (index.getStatus() != Status.FINISHED && index.getStatus() != Status.ERROR) {
-            updateTaskStatus(migration, index);
+        Optional<GetTaskResponse> task;
+        do {
+            task = getTask(index);
+            task.ifPresentOrElse(t -> updateTaskStatus(migration, index, t), () -> LOG.warn("Couldn't find opensearch task for reindex of index {}", index.getName()));
             sleep();
-        }
+        } while (task.map(t -> !t.isCompleted()).orElse(true));
     }
 
     private static void sleep() {
         try {
-            Thread.sleep(TASK_UPDATE_INTERVAL_MILLIS);
+            Thread.sleep(RemoteReindexingMigrationAdapterOS2.TASK_UPDATE_INTERVAL_MILLIS);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void updateTaskStatus(RemoteReindexMigration migration, RemoteReindexIndex index) {
+    private void updateTaskStatus(RemoteReindexMigration migration, RemoteReindexIndex index, GetTaskResponse task) {
+        if(task.isCompleted()) {
+            onTaskFinished(migration, index, task);
+        } else {
+            LOG.debug("Remote reindex of {} is still running", index.getName());
+        }
+    }
+
+    private Optional<GetTaskResponse> getTask(RemoteReindexIndex index) {
         final String[] parts = index.getTaskID().split(":");
-        client.execute((restHighLevelClient, requestOptions) -> restHighLevelClient.tasks().get(new GetTaskRequest(parts[0], Long.parseLong(parts[1])), requestOptions))
-                .ifPresentOrElse(response -> {
-                    if (response.isCompleted()) {
-                        onTaskFinished(migration, index, response);
-                    }
-                }, () -> LOG.warn("Task for reindexing of {} not found!", index.getName()));
+        return client.execute((restHighLevelClient, requestOptions) -> restHighLevelClient.tasks().get(new GetTaskRequest(parts[0], Long.parseLong(parts[1])), requestOptions));
     }
 
     private void onTaskFinished(RemoteReindexMigration migration, RemoteReindexIndex index, GetTaskResponse response) {
