@@ -29,6 +29,7 @@ import jakarta.validation.constraints.NotNull;
 import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import org.apache.commons.lang.time.DurationFormatUtils;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterGetSettingsRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterGetSettingsResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.client.tasks.GetTaskRequest;
@@ -51,10 +52,14 @@ import org.graylog2.indexer.datanode.RemoteReindexRequest;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.migration.IndexerConnectionCheckResult;
+import org.graylog2.indexer.migration.LogEntry;
+import org.graylog2.indexer.migration.LogLevel;
 import org.graylog2.indexer.migration.RemoteReindexIndex;
 import org.graylog2.indexer.migration.RemoteReindexMigration;
 import org.graylog2.indexer.migration.TaskStatus;
 import org.graylog2.plugin.Tools;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,6 +70,7 @@ import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -152,7 +158,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
             if (!this.indices.exists(index.getName())) {
                 this.indices.create(index.getName(), indexSetRegistry.getForIndex(index.getName()).orElse(indexSetRegistry.getDefault()));
             } else {
-                LOG.info("Index {} does already exist in target indexer. Data will be migrated into existing index.", index.getName());
+                logInfo(migration, String.format(Locale.ROOT, "Index %s does already exist in target indexer. Data will be migrated into existing index.", index.getName()));
             }
         });
     }
@@ -294,20 +300,32 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         final String indexName = index.getName();
         try (XContentBuilder builder = JsonXContent.contentBuilder().prettyPrint()) {
             final BytesReference query = BytesReference.bytes(matchAllQuery().toXContent(builder, ToXContent.EMPTY_PARAMS));
-            LOG.info("Executing reindexAsync for " + indexName);
+            logInfo(migration, "Executing async reindex for " + indexName);
             final TaskSubmissionResponse task = client.execute((c, requestOptions) -> c.submitReindexTask(createReindexRequest(indexName, query, uri, username, password), requestOptions));
             migration.indexByName(indexName).ifPresent(i -> i.setTask(task.getTask()));
 
         } catch (IOException e) {
-            LOG.error("Could not reindex index: {} - {}", indexName, e.getMessage(), e);
-            migration.indexByName(indexName).ifPresent(r -> r.onError("Can't migrate index " + indexName + ", " + e.getMessage()));
+            final String message = "Could not reindex index: " + indexName + " - " + e.getMessage();
+            logError(migration, message, e);
+            migration.indexByName(indexName).ifPresent(r -> r.onError(message));
         }
-        waitForTaskCompleted(index);
+        waitForTaskCompleted(migration, index);
     }
 
-    private void waitForTaskCompleted(RemoteReindexIndex index) {
+
+    private void logInfo(RemoteReindexMigration migration, String message) {
+        LOG.info(message);
+        migration.log(new LogEntry(DateTime.now(DateTimeZone.UTC), LogLevel.INFO, message));
+    }
+
+    private void logError(RemoteReindexMigration migration, String message, Exception error) {
+        LOG.error(message, error);
+        migration.log(new LogEntry(DateTime.now(DateTimeZone.UTC), LogLevel.ERROR, message));
+    }
+
+    private void waitForTaskCompleted(RemoteReindexMigration migration, RemoteReindexIndex index) {
         while (index.getStatus() != Status.FINISHED && index.getStatus() != Status.ERROR) {
-            updateTaskStatus(index);
+            updateTaskStatus(migration, index);
             sleep();
         }
     }
@@ -320,15 +338,23 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         }
     }
 
-    private void updateTaskStatus(RemoteReindexIndex index) {
+    private void updateTaskStatus(RemoteReindexMigration migration, RemoteReindexIndex index) {
         final String[] parts = index.getTaskID().split(":");
         client.execute((restHighLevelClient, requestOptions) -> restHighLevelClient.tasks().get(new GetTaskRequest(parts[0], Long.parseLong(parts[1])), requestOptions))
                 .ifPresentOrElse(response -> {
                     if (response.isCompleted()) {
                         final long durationInSec = TimeUnit.SECONDS.convert(response.getTaskInfo().getRunningTimeNanos(), TimeUnit.NANOSECONDS);
-                        index.onFinished(Duration.standardSeconds(durationInSec), getTaskStatus(response));
+                        final Duration duration = Duration.standardSeconds(durationInSec);
+                        final TaskStatus taskStatus = getTaskStatus(response);
+                        final String message = String.format(Locale.ROOT, "Index %s finished migration after %s. Total %d documents, updated %d, created %d, deleted %d.", index.getName(), humanReadable(duration), taskStatus.total(), taskStatus.updated(), taskStatus.created(), taskStatus.deleted());
+                        logInfo(migration, message);
+                        index.onFinished(duration, taskStatus);
                     }
                 }, () -> LOG.warn("Task for reindexing of {} not found!", index.getName()));
+    }
+
+    private String humanReadable(Duration duration) {
+        return DurationFormatUtils.formatDurationWords(duration.getMillis(), true, true);
     }
 
     private TaskStatus getTaskStatus(GetTaskResponse response) {

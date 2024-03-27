@@ -14,10 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch2;
+package org.graylog2.indexer.migration;
 
-public class RemoteReindexNotAllowedException extends IllegalStateException {
-    public RemoteReindexNotAllowedException(String message) {
-        super(message);
+import org.joda.time.DateTime;
+
+import java.util.Locale;
+
+public record LogEntry(DateTime timestamp, LogLevel logLevel, String message) {
+    @Override
+    public String toString() {
+        return String.format(Locale.ROOT, "%s %s : %s", timestamp.toLocalDateTime(), logLevel, message);
     }
 }

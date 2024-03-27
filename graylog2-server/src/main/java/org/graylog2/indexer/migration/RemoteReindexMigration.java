@@ -16,16 +16,17 @@
  */
 package org.graylog2.indexer.migration;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
+import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter.Status;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Queue;
 import java.util.UUID;
 
 /**
@@ -37,6 +38,8 @@ public class RemoteReindexMigration {
     @JsonProperty("id")
     private final String id;
     private List<RemoteReindexIndex> indices = new ArrayList<>();
+
+    private final Queue<LogEntry> logs = new CircularFifoQueue<>(50);
 
     @JsonProperty("error")
     private String error;
@@ -104,5 +107,13 @@ public class RemoteReindexMigration {
         final int done = (int) indices.stream().map(RemoteReindexIndex::getStatus).filter(i -> i == Status.FINISHED || i == Status.ERROR).count();
         float percent = (100.0f / countOfIndices) * done;
         return (int) Math.ceil(percent);
+    }
+
+    public void log(LogEntry log) {
+        this.logs.offer(log);
+    }
+
+    public List<LogEntry> getLogs() {
+        return logs.stream().toList();
     }
 }
