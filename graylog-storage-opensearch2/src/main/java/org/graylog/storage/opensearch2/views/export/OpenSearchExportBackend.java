@@ -16,6 +16,8 @@
  */
 package org.graylog.storage.opensearch2.views.export;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.export.ExportBackend;
@@ -31,15 +33,11 @@ import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.TermsQueryBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.SearchHit;
 import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
-import org.graylog.shaded.opensearch2.org.opensearch.search.sort.SortOrder;
 import org.graylog.storage.opensearch2.TimeRangeQueryFactory;
 import org.graylog2.plugin.Message;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -126,8 +124,7 @@ public class OpenSearchExportBackend implements ExportBackend {
 
         SearchSourceBuilder ssb = new SearchSourceBuilder()
                 .query(query)
-                .size(command.chunkSize())
-                .sort(Message.FIELD_TIMESTAMP, SortOrder.ASC);
+                .size(command.chunkSize());
 
         return requestStrategy.configure(ssb);
     }
