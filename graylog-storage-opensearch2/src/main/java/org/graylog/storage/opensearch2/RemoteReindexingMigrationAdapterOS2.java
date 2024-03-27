@@ -307,7 +307,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         } catch (IOException e) {
             final String message = "Could not reindex index: " + indexName + " - " + e.getMessage();
             logError(migration, message, e);
-            migration.indexByName(indexName).ifPresent(r -> r.onError(duration, message));
+            migration.indexByName(indexName).ifPresent(r -> r.onError(Duration.ZERO, TaskStatus.failure(message)));
         }
         waitForTaskCompleted(migration, index);
     }

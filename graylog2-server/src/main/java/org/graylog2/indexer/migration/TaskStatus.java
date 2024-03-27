@@ -39,4 +39,8 @@ public record TaskStatus(
     public static TaskStatus unknown() {
         return new TaskStatus(-1, -1, -1, -1, -1, -1, -1, Collections.emptyList());
     }
+
+    public static TaskStatus failure(String failure) {
+        return new TaskStatus(-1, -1, -1, -1, -1, -1, -1, Collections.singletonList(failure));
+    }
 }
