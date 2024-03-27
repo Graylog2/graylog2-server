@@ -66,6 +66,7 @@ class ConfigurationRow extends React.Component {
     return (
       <tr>
         <td className={styles.name}>{configuration.name}</td>
+        {/* eslint-disable jsx-a11y/control-has-associated-label */}
         <td className={styles.color}><ColorLabel color={configuration.color} size="small" /></td>
         <td>
           <CollectorIndicator collector={collector.name || 'Unknown collector'}
