@@ -83,7 +83,7 @@ public class ClientCertGenerator {
         this.dataDir = dataDir;
     }
 
-    private Path certFilePath( final String role, final String principal) {
+    private Path certFilePath(final String role, final String principal) {
         var certfile = Base64.getEncoder().encodeToString((role + ":" + principal).getBytes(StandardCharsets.UTF_8));
         return dataDir.resolve(Path.of(certfile + ".cert"));
     }
@@ -93,12 +93,12 @@ public class ClientCertGenerator {
         try (JcaPEMWriter jcaPEMWriter = new JcaPEMWriter(writer)) {
             jcaPEMWriter.writeObject(o);
         }
-        return writer.toString().replace("\n", "");
+        return writer.toString();
     }
 
     public ClientCert generateClientCert(final String principal,
-                                     final String role,
-                                     final char[] privateKeyPassword) throws ClientCertGenerationException {
+                                         final String role,
+                                         final char[] privateKeyPassword) throws ClientCertGenerationException {
         try {
             var renewalPolicy = this.clusterConfigService.get(RenewalPolicy.class);
             var privateKeyEncryptedStorage = new PrivateKeyEncryptedFileStorage(certFilePath(role, principal));
@@ -123,7 +123,7 @@ public class ClientCertGenerator {
 
     public void removeCertFor(final String role, final String principal) throws IOException {
         var certFile = certFilePath(role, principal);
-        if(Files.exists(certFile)) {
+        if (Files.exists(certFile)) {
             Files.delete(certFile);
             securityAdapter.removeUserFromRoleMapping(role, principal);
         }

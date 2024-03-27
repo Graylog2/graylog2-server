@@ -60,8 +60,8 @@ public class SearchAfter implements RequestStrategy {
     }
 
     private void configureSort(SearchSourceBuilder source) {
-        source.sort(SortBuilders.fieldSort("timestamp").order(SortOrder.DESC));
-        source.sort(SortBuilders.fieldSort(DEFAULT_TIEBREAKER_FIELD).order(SortOrder.DESC).unmappedType("keyword"));
+        source.sort(SortBuilders.fieldSort("timestamp").order(SortOrder.ASC));
+        source.sort(SortBuilders.fieldSort(DEFAULT_TIEBREAKER_FIELD).order(SortOrder.ASC).unmappedType("keyword"));
     }
 
     private Object[] lastHitSortFrom(List<SearchHit> hits) {

@@ -26,6 +26,8 @@ import jakarta.validation.constraints.NotNull;
 import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterGetSettingsRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterGetSettingsResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.common.xcontent.json.JsonXContent;
 import org.graylog.shaded.opensearch2.org.opensearch.core.action.ActionListener;
 import org.graylog.shaded.opensearch2.org.opensearch.core.common.bytes.BytesReference;
@@ -87,6 +89,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     // information available. These limitations are known and accepted for now.
     private static final Map<String, RemoteReindexMigration> JOBS = new ConcurrentHashMap<>();
 
+
     @Inject
     public RemoteReindexingMigrationAdapterOS2(final OpenSearchClient client,
                                                final OkHttpClient httpClient,
@@ -146,8 +149,10 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
 
     private void prepareCluster(URI uri) {
         final var activeNodes = getAllActiveNodeIDs();
-        allowReindexingFrom(uri.getHost() + ":" + uri.getPort());
+        final String reindexSourceAddress = uri.getHost() + ":" + uri.getPort();
+        allowReindexingFrom(reindexSourceAddress);
         waitForClusterRestart(activeNodes);
+        verifyRemoteReindexAllowlistSetting(reindexSourceAddress);
     }
 
     ReindexRequest createReindexRequest(final String index, final BytesReference query, URI uri, String username, String password) {
@@ -189,6 +194,23 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         }
     }
 
+    public void verifyRemoteReindexAllowlistSetting(String reindexSourceAddress) {
+        final String allowlistSetttingValue = client.execute((restHighLevelClient, requestOptions) -> {
+            final ClusterGetSettingsRequest request = new ClusterGetSettingsRequest();
+            request.includeDefaults(true);
+            final ClusterGetSettingsResponse settings = restHighLevelClient.cluster().getSettings(request, requestOptions);
+            return settings.getSetting("reindex.remote.allowlist");
+        });
+
+        // the value is not proper json, just something like [localhost:9201]. It should be safe to simply use String.contains,
+        // but there is maybe a chance for mismatches and then we'd have to parse the value
+        if (!allowlistSetttingValue.contains(reindexSourceAddress)) {
+            final String message = "Failed to configure reindex.remote.allowlist setting in the datanode cluster. Current setting value: " + allowlistSetttingValue;
+            LOG.error(message);
+            throw new IllegalStateException(message);
+        }
+    }
+
     private Set<String> getAllActiveNodeIDs() {
         return nodeService.allActive().values().stream()
                 .filter(dn -> dn.getDataNodeStatus() == DataNodeStatus.AVAILABLE) // we have to wait till the datanode is not just alive but all started properly and the indexer accepts connections
@@ -196,7 +218,9 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     }
 
     private void waitForClusterRestart(final Set<String> expectedNodes) {
-        // sleeping for some time to let the cluster stop so we can wait for the restart
+        // We are currently unable to detect that datanodes stopped and are starting again. We just hope that
+        // these 10 seconds give them enough time and they will restart the opensearch process in the background
+        // after 10s we'll wait till all the previously known nodes are up and healthy again.
         try {
             Thread.sleep(10 * 1000);
         } catch (InterruptedException e) {
@@ -215,10 +239,14 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         try {
             var successful = retryer.call(callable);
             if (!successful) {
-                LOG.error("Cluster failed to restart after " + CONNECTION_ATTEMPTS * WAIT_BETWEEN_CONNECTION_ATTEMPTS + " seconds.");
+                final String message = "Cluster failed to restart after " + CONNECTION_ATTEMPTS * WAIT_BETWEEN_CONNECTION_ATTEMPTS + " seconds.";
+                LOG.error(message);
+                throw new IllegalStateException(message);
             }
         } catch (ExecutionException | RetryException e) {
-            LOG.error("Cluster failed to restart: " + e.getMessage(), e);
+            final String message = "Cluster failed to restart: " + e.getMessage();
+            LOG.error(message, e);
+            throw new RuntimeException(message);
         }
     }
 

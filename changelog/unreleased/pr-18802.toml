@@ -1,0 +1,4 @@
+type = "f"
+message = "Remove not yet configured datanodes (empty transport address) from indexer discovery"
+
+pulls = ["18802"]

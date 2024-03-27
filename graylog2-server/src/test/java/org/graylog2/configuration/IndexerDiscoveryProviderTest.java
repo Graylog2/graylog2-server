@@ -57,6 +57,23 @@ class IndexerDiscoveryProviderTest {
 
 
     @Test
+    void testAutomaticDiscoveryOneUnconfigured() {
+        final IndexerDiscoveryProvider provider = new IndexerDiscoveryProvider(
+                Collections.emptyList(),
+                1,
+                Duration.seconds(1),
+                preflightConfig(PreflightConfigResult.FINISHED),
+                nodes("http://localhost:9200", "") // the second node is not configured yet, has no transport address
+        );
+
+        Assertions.assertThat(provider.get())
+                .hasSize(1)
+                .extracting(URI::toString)
+                .contains("http://localhost:9200");
+    }
+
+
+    @Test
     void testPreconfiguredIndexers() {
         final IndexerDiscoveryProvider provider = new IndexerDiscoveryProvider(
                 List.of(URI.create("http://my-host:9200")),
