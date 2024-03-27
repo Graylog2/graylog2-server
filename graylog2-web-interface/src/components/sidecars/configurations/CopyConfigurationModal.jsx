@@ -17,29 +17,26 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-import CloneMenuItem from '../common/CloneMenuItem';
+import CloneMenuModal from '../common/CloneMenuModal';
 
 class CopyConfigurationModal extends React.Component {
   static propTypes = {
     configuration: PropTypes.object.isRequired,
     copyConfiguration: PropTypes.func.isRequired,
     validateConfiguration: PropTypes.func.isRequired,
+    onClose: PropTypes.func.isRequired,
+    showModal: PropTypes.bool,
   };
 
   constructor(props) {
     super(props);
 
     this.state = {
-      showModal: false,
       id: props.configuration.id,
       name: '',
       errorMessage: undefined,
     };
   }
-
-  openModal = () => {
-    this.setState({ showModal: true });
-  };
 
   _getId = (prefixIdName) => {
     const { id } = this.state;
@@ -47,12 +44,9 @@ class CopyConfigurationModal extends React.Component {
     return `${prefixIdName}-${id}`;
   };
 
-  _closeModal = () => {
-    this.setState({ showModal: false });
-  };
-
   _saved = () => {
-    this._closeModal();
+    const { onClose } = this.props;
+    onClose();
     this.setState({ name: '' });
   };
 
@@ -79,19 +73,23 @@ class CopyConfigurationModal extends React.Component {
   };
 
   render() {
-    const { errorMessage, name, showModal } = this.state;
+    const { errorMessage, name } = this.state;
+    const { onClose, showModal } = this.props;
 
     return (
-      <CloneMenuItem onSelect={this.openModal}
-                     onClose={this._closeModal}
-                     onSave={this._save}
-                     id={this._getId('configuration-name')}
-                     onChange={this._changeName}
-                     error={errorMessage}
-                     name={name}
-                     showModal={showModal} />
+      <CloneMenuModal onClose={() => onClose()}
+                      onSave={this._save}
+                      id={this._getId('configuration-name')}
+                      onChange={this._changeName}
+                      error={errorMessage}
+                      name={name}
+                      showModal={showModal} />
     );
   }
 }
+
+CopyConfigurationModal.defaultProps = {
+  showModal: false,
+};
 
 export default CopyConfigurationModal;
