@@ -43,4 +43,8 @@ public record TaskStatus(
     public static TaskStatus failure(String failure) {
         return new TaskStatus(-1, -1, -1, -1, -1, -1, -1, Collections.singletonList(failure));
     }
+
+    public boolean  hasFailures() {
+        return failures() != null && !failures().isEmpty();
+    }
 }

@@ -347,21 +347,33 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         client.execute((restHighLevelClient, requestOptions) -> restHighLevelClient.tasks().get(new GetTaskRequest(parts[0], Long.parseLong(parts[1])), requestOptions))
                 .ifPresentOrElse(response -> {
                     if (response.isCompleted()) {
-                        final long durationInSec = TimeUnit.SECONDS.convert(response.getTaskInfo().getRunningTimeNanos(), TimeUnit.NANOSECONDS);
-                        final Duration duration = Duration.standardSeconds(durationInSec);
-                        final TaskStatus taskStatus = getTaskStatus(response);
-                        if (taskStatus.failures().isEmpty()) {
-                            final String message = String.format(Locale.ROOT, "Index %s finished migration after %s. Total %d documents, updated %d, created %d, deleted %d.", index.getName(), humanReadable(duration), taskStatus.total(), taskStatus.updated(), taskStatus.created(), taskStatus.deleted());
-                            logInfo(migration, message);
-                            index.onFinished(duration, taskStatus);
-                        } else {
-                            final String failures = String.join(", ", taskStatus.failures());
-                            final String message = String.format(Locale.ROOT, "Index %s migration failed after %s. Failures: %s.", index.getName(), humanReadable(duration), failures);
-                            logError(migration, message, null);
-                            index.onError(duration, taskStatus);
-                        }
+                        onTaskFinished(migration, index, response);
                     }
                 }, () -> LOG.warn("Task for reindexing of {} not found!", index.getName()));
+    }
+
+    private void onTaskFinished(RemoteReindexMigration migration, RemoteReindexIndex index, GetTaskResponse response) {
+        final long durationInSec = TimeUnit.SECONDS.convert(response.getTaskInfo().getRunningTimeNanos(), TimeUnit.NANOSECONDS);
+        final Duration duration = Duration.standardSeconds(durationInSec);
+        final TaskStatus taskStatus = getTaskStatus(response);
+        if (taskStatus.hasFailures()) {
+            onTaskFailure(migration, index, taskStatus, duration);
+        } else {
+            onTaskSuccess(migration, index, taskStatus, duration);
+        }
+    }
+
+    private void onTaskFailure(RemoteReindexMigration migration, RemoteReindexIndex index, TaskStatus taskStatus, Duration duration) {
+        final String failures = String.join(", ", taskStatus.failures());
+        final String message = String.format(Locale.ROOT, "Index %s migration failed after %s. Failures: %s.", index.getName(), humanReadable(duration), failures);
+        logError(migration, message, null);
+        index.onError(duration, taskStatus);
+    }
+
+    private void onTaskSuccess(RemoteReindexMigration migration, RemoteReindexIndex index, TaskStatus taskStatus, Duration duration) {
+        final String message = String.format(Locale.ROOT, "Index %s finished migration after %s. Total %d documents, updated %d, created %d, deleted %d.", index.getName(), humanReadable(duration), taskStatus.total(), taskStatus.updated(), taskStatus.created(), taskStatus.deleted());
+        logInfo(migration, message);
+        index.onFinished(duration, taskStatus);
     }
 
     private String humanReadable(Duration duration) {
