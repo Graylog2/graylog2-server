@@ -123,7 +123,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
                         .setHost(httpHost.getHostName())
                         .setPort(httpHost.getPort())
                         .setScheme(httpHost.getSchemeName()).toString())
-                .orElse(""); // TODO: will this cause problems in the nodeservice?
+                .orElse(""); // Empty address will cause problems for opensearch clients. Has to be filtered out in IndexerDiscoveryProvider
         return URI.create(baseUrl);
     }
 
