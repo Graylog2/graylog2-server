@@ -36,7 +36,7 @@ public class ClusterStatsApi {
 
     public IndexSetStats clusterStats() {
         final Request request = new Request("GET", "/_cluster/stats");
-        request.addParameter("filter_path", "indices.count, indices.docs.count, indices.store.size_in_bytes");
+        request.addParameter("filter_path", "indices.count,indices.docs.count,indices.store.size_in_bytes");
         final JsonNode stats = jsonApi.perform(request, "Couldn't read Elasticsearch cluster stats");
 
         final long indicesCount = stats.path("indices").path("count").asLong();
