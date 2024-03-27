@@ -28,8 +28,9 @@ public class RemoteReindexIndex {
     private Status status;
     private final DateTime created;
     private Duration took;
-    private Integer batches;
+    private TaskStatus taskStatus;
     private String errorMsg;
+    private String taskID;
 
     public RemoteReindexIndex(final String name, final Status status) {
         this.name = name;
@@ -55,8 +56,8 @@ public class RemoteReindexIndex {
     }
 
 
-    public Integer getBatches() {
-        return batches;
+     public TaskStatus getTaskStatus() {
+        return taskStatus;
     }
 
 
@@ -69,10 +70,15 @@ public class RemoteReindexIndex {
         this.errorMsg = errorMsg;
     }
 
-    public void onFinished(Duration duration, int batches) {
+    public void onFinished(Duration duration, TaskStatus taskStatus) {
         this.status = Status.FINISHED;
         this.took = duration;
-        this.batches = batches;
+        this.taskStatus = taskStatus;
+    }
+
+    public void setTask(String taskID) {
+        this.status = Status.RUNNING;
+        this.taskID = taskID;
     }
 
     @Override
@@ -81,5 +87,9 @@ public class RemoteReindexIndex {
                 "name='" + name + '\'' +
                 ", status=" + status +
                 '}';
+    }
+
+    public String getTaskID() {
+        return taskID;
     }
 }

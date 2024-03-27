@@ -28,24 +28,21 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Caution: this object will be heavily mutated from outside as the migration progresses.
+ */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RemoteReindexMigration {
 
     @JsonProperty("id")
     private final String id;
     private List<RemoteReindexIndex> indices = new ArrayList<>();
-    @JsonProperty("status")
-    private Status status;
 
     @JsonProperty("error")
     private String error;
 
-    @JsonIgnore
-    private Runnable finishCallback;
-
     private RemoteReindexMigration(@NotNull String migrationID) {
         this.id = migrationID;
-        this.status = Status.NOT_STARTED;
     }
 
     public RemoteReindexMigration() {
@@ -53,12 +50,7 @@ public class RemoteReindexMigration {
     }
 
     public static RemoteReindexMigration nonExistent(String migrationID) {
-        return new RemoteReindexMigration(migrationID).status(Status.NOT_STARTED);
-    }
-
-    public RemoteReindexMigration status(Status status) {
-        this.status = status;
-        return this;
+        return new RemoteReindexMigration(migrationID);
     }
 
     public RemoteReindexMigration setIndices(List<RemoteReindexIndex> indices) {
@@ -84,24 +76,18 @@ public class RemoteReindexMigration {
         return id;
     }
 
-     public RemoteReindexMigration setFinishCallback(Runnable finishCallback) {
-        this.finishCallback = finishCallback;
-        return this;
-    }
-
+    @JsonProperty("status")
     public Status status() {
-        return status;
-    }
-
-    public void finish() {
-        if (finishCallback != null) {
-            finishCallback.run();
+        if (indices.isEmpty()) {
+            return Status.NOT_STARTED;
         }
-        if (indices.stream().anyMatch(i -> i.getStatus() == Status.ERROR)) {
-            status(Status.ERROR);
-        } else {
-            status(Status.FINISHED);
+        if (indices().stream().map(RemoteReindexIndex::getStatus).anyMatch(i -> i == Status.RUNNING)) {
+            return Status.RUNNING;
         }
+        if (indices().stream().map(RemoteReindexIndex::getStatus).anyMatch(i -> i == Status.ERROR)) {
+            return Status.ERROR;
+        }
+        return Status.FINISHED;
     }
 
     /**
@@ -111,7 +97,7 @@ public class RemoteReindexMigration {
     public int progress() {
         final int countOfIndices = indices.size();
 
-        if(indices.isEmpty()) {
+        if (indices.isEmpty()) {
             return 100; // avoid division by zero. No indices == migration is immediately done
         }
 
