@@ -124,7 +124,7 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
                     localConfiguration.getOpensearchTransportPort(),
                     localConfiguration.getClustername(),
                     localConfiguration.getDatanodeNodeName(),
-                    localConfiguration.getNodeRoles() ,
+                    localConfiguration.getNodeRoles(),
                     localConfiguration.getOpensearchDiscoverySeedHosts(),
                     securityConfiguration,
                     s3RepositoryConfiguration,
@@ -152,16 +152,19 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
 
         //config.put("network.publish_host", Tools.getLocalCanonicalHostname());
 
-        if(localConfiguration.getOpensearchDebug() != null && !localConfiguration.getOpensearchDebug().isBlank()) {
+        if (localConfiguration.getOpensearchDebug() != null && !localConfiguration.getOpensearchDebug().isBlank()) {
             config.put("logger.org.opensearch", localConfiguration.getOpensearchDebug());
         }
 
-        if(localConfiguration.getOpensearchAuditLog() != null && !localConfiguration.getOpensearchAuditLog().isBlank()) {
+        if (localConfiguration.getOpensearchAuditLog() != null && !localConfiguration.getOpensearchAuditLog().isBlank()) {
             config.put("plugins.security.audit.type", localConfiguration.getOpensearchAuditLog());
         }
 
         // common OpenSearch config parameters from our docs
         config.put("indices.query.bool.max_clause_count", localConfiguration.getIndicesQueryBoolMaxClauseCount().toString());
+
+        // enable admin access via the REST API
+        config.put("plugins.security.restapi.admin.enabled", "true");
 
         return config.build();
     }
