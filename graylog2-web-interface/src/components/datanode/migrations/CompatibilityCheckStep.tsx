@@ -61,7 +61,7 @@ const CompatibilityCheckStep = ({ currentStep, onTriggerStep }: MigrationStepCom
       <br />
       {!isCompatible && (<p>Your OpenSearch cluster cannot be migrated to this Data Node version because it&apos;s not compatible.</p>)}
       {isCompatible && Object.keys(data).map((hostname) => (
-        <CompatibilityStatus key={hostname} opensearchVersion={data[hostname].opensearch_version} nodeInfo={data[hostname].info} />
+        <CompatibilityStatus key={hostname} hostname={hostname} opensearchVersion={data[hostname].opensearch_version} nodeInfo={data[hostname].info} />
       ))}
       <MigrationStepTriggerButtonToolbar nextSteps={currentStep.next_steps} onTriggerStep={onTriggerStep} />
     </>
