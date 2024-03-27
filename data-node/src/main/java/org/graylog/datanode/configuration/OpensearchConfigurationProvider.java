@@ -97,7 +97,7 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
                 .findFirst();
 
         try {
-            ImmutableMap.Builder<String, String> opensearchProperties = ImmutableMap.builder();
+            ImmutableMap.Builder<String, Object> opensearchProperties = ImmutableMap.builder();
 
             if (localConfiguration.getInitialClusterManagerNodes() != null && !localConfiguration.getInitialClusterManagerNodes().isBlank()) {
                 opensearchProperties.put("cluster.initial_cluster_manager_nodes", localConfiguration.getInitialClusterManagerNodes());
@@ -136,8 +136,8 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
         }
     }
 
-    private ImmutableMap<String, String> commonOpensearchConfig(final Configuration localConfiguration) {
-        final ImmutableMap.Builder<String, String> config = ImmutableMap.builder();
+    private ImmutableMap<String, Object> commonOpensearchConfig(final Configuration localConfiguration) {
+        final ImmutableMap.Builder<String, Object> config = ImmutableMap.builder();
         localConfiguration.getOpensearchNetworkHost().ifPresent(
                 networkHost -> config.put("network.host", networkHost));
         config.put("path.data", datanodeConfiguration.datanodeDirectories().getDataTargetDir().toString());
@@ -146,8 +146,8 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
         config.put("network.bind_host", localConfiguration.getBindAddress());
 
         // https://opensearch.org/docs/latest/tuning-your-cluster/availability-and-recovery/snapshots/snapshot-restore/#shared-file-system
-        if (localConfiguration.getPathRepo() != null && !localConfiguration.getPathRepo().isEmpty()) {
-            config.put("path.repo", String.join(",", localConfiguration.getPathRepo()));
+        if(localConfiguration.getPathRepo() != null && !localConfiguration.getPathRepo().isEmpty()) {
+            config.put("path.repo", localConfiguration.getPathRepo());
         }
 
         //config.put("network.publish_host", Tools.getLocalCanonicalHostname());
