@@ -43,13 +43,12 @@ class MigrationStateMachineTest {
 
         final MigrationStateMachine migrationStateMachine = new MigrationStateMachineProvider(persistence, migrationActions).get();
         migrationStateMachine.trigger(MigrationStep.SELECT_MIGRATION, Collections.emptyMap());
-        migrationStateMachine.trigger(MigrationStep.SHOW_CA_CREATION, Collections.emptyMap());
 
 
         Assertions.assertThat(persistence.getConfiguration())
                 .isPresent()
                 .hasValueSatisfying(configuration -> {
-                    Assertions.assertThat(configuration.currentState()).isEqualTo(MigrationState.CA_CREATION_PAGE);
+                    Assertions.assertThat(configuration.currentState()).isEqualTo(MigrationState.MIGRATION_WELCOME_PAGE);
                 });
     }
 
@@ -59,9 +58,8 @@ class MigrationStateMachineTest {
         final MigrationStateMachineProvider provider = new MigrationStateMachineProvider(persistence, new MigrationActionsAdapter());
         final MigrationStateMachine sm = provider.get();
         sm.trigger(MigrationStep.SELECT_MIGRATION, Collections.emptyMap());
-        sm.trigger(MigrationStep.SHOW_CA_CREATION, Collections.emptyMap());
 
-        Assertions.assertThat(sm.getState()).isEqualTo(MigrationState.CA_CREATION_PAGE);
+        Assertions.assertThat(sm.getState()).isEqualTo(MigrationState.MIGRATION_WELCOME_PAGE);
 
         sm.reset();
 

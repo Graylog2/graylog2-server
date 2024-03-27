@@ -22,7 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record CompatibilityResult(String opensearchVersion,
+public record CompatibilityResult(String hostname, String opensearchVersion,
                                   IndexerDirectoryInformation info,
                                   java.util.List<String> compatibilityErrors) {
 

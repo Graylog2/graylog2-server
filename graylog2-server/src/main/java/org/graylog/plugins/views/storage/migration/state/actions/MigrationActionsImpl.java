@@ -52,6 +52,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Singleton
 public class MigrationActionsImpl implements MigrationActions {
@@ -96,17 +97,19 @@ public class MigrationActionsImpl implements MigrationActions {
 
     @Override
     public void runDirectoryCompatibilityCheck() {
-        final ProxyRequestAdapter.ProxyRequest request = new ProxyRequestAdapter.ProxyRequest(
-                "GET", "indices-directory/compatibility", null, "any", new MultivaluedHashMap<>());
-        try {
-            ProxyRequestAdapter.ProxyResponse response = datanodeProxy.request(request);
-            CompatibilityResult compatibilityResult = objectMapper.readValue(response.response(), CompatibilityResult.class);
-            getStateMachineContext().addExtendedState(MigrationStateMachineContext.KEY_COMPATIBILITY_CHECK_PASSED,
-                    compatibilityResult.compatibilityErrors().isEmpty());
-            getStateMachineContext().setResponse(compatibilityResult);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        List<CompatibilityResult> results = nodeService.allActive().values().stream().map(node -> {
+            final ProxyRequestAdapter.ProxyRequest request = new ProxyRequestAdapter.ProxyRequest(
+                    "GET", "indices-directory/compatibility", null, node.getHostname(), new MultivaluedHashMap<>());
+            try {
+                ProxyRequestAdapter.ProxyResponse response = datanodeProxy.request(request);
+                return objectMapper.readValue(response.response(), CompatibilityResult.class);
+            } catch (IOException e) {
+                return new CompatibilityResult(node.getHostname(), "unknown", new CompatibilityResult.IndexerDirectoryInformation(List.of(), "unknown"), List.of(e.getMessage()));
+            }
+        }).collect(Collectors.toList());
+        getStateMachineContext().addExtendedState(MigrationStateMachineContext.KEY_COMPATIBILITY_CHECK_PASSED,
+                results.stream().allMatch(r -> r.compatibilityErrors().isEmpty()));
+        getStateMachineContext().setResponse(results);
     }
 
     @Override
