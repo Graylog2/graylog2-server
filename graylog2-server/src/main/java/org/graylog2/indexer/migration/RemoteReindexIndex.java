@@ -22,6 +22,9 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RemoteReindexIndex {
     private final String name;
@@ -62,12 +65,16 @@ public class RemoteReindexIndex {
 
 
     public String getErrorMsg() {
-        return errorMsg;
+        return Optional.ofNullable(taskStatus)
+                .map(TaskStatus::failures)
+                .map(failures -> String.join(";", failures))
+                .orElse(null);
     }
 
-    public void onError(String errorMsg) {
+    public void onError(Duration duration, TaskStatus taskStatus) {
         this.status = Status.ERROR;
-        this.errorMsg = errorMsg;
+        this.took = duration;
+        this.taskStatus = taskStatus;
     }
 
     public void onFinished(Duration duration, TaskStatus taskStatus) {

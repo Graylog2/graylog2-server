@@ -307,7 +307,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         } catch (IOException e) {
             final String message = "Could not reindex index: " + indexName + " - " + e.getMessage();
             logError(migration, message, e);
-            migration.indexByName(indexName).ifPresent(r -> r.onError(message));
+            migration.indexByName(indexName).ifPresent(r -> r.onError(duration, message));
         }
         waitForTaskCompleted(migration, index);
     }
@@ -319,7 +319,11 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     }
 
     private void logError(RemoteReindexMigration migration, String message, Exception error) {
-        LOG.error(message, error);
+        if (error != null) {
+            LOG.error(message, error);
+        } else {
+            LOG.error(message);
+        }
         migration.log(new LogEntry(DateTime.now(DateTimeZone.UTC), LogLevel.ERROR, message));
     }
 
@@ -346,9 +350,16 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
                         final long durationInSec = TimeUnit.SECONDS.convert(response.getTaskInfo().getRunningTimeNanos(), TimeUnit.NANOSECONDS);
                         final Duration duration = Duration.standardSeconds(durationInSec);
                         final TaskStatus taskStatus = getTaskStatus(response);
-                        final String message = String.format(Locale.ROOT, "Index %s finished migration after %s. Total %d documents, updated %d, created %d, deleted %d.", index.getName(), humanReadable(duration), taskStatus.total(), taskStatus.updated(), taskStatus.created(), taskStatus.deleted());
-                        logInfo(migration, message);
-                        index.onFinished(duration, taskStatus);
+                        if (taskStatus.failures().isEmpty()) {
+                            final String message = String.format(Locale.ROOT, "Index %s finished migration after %s. Total %d documents, updated %d, created %d, deleted %d.", index.getName(), humanReadable(duration), taskStatus.total(), taskStatus.updated(), taskStatus.created(), taskStatus.deleted());
+                            logInfo(migration, message);
+                            index.onFinished(duration, taskStatus);
+                        } else {
+                            final String failures = String.join(", ", taskStatus.failures());
+                            final String message = String.format(Locale.ROOT, "Index %s migration failed after %s. Failures: %s.", index.getName(), humanReadable(duration), failures);
+                            logError(migration, message, null);
+                            index.onError(duration, taskStatus);
+                        }
                     }
                 }, () -> LOG.warn("Task for reindexing of {} not found!", index.getName()));
     }
