@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix clone modal immediately closing in Sidecar configuration "
+
+issues = ["18811"]
+pulls = ["18828"]
