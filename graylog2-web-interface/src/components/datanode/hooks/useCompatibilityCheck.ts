@@ -31,13 +31,13 @@ const fetchCompatibility = async () => {
 };
 
 const useCompatibilityCheck = ({ enabled }: Options = { enabled: true }): {
-  data: CompatibilityResponseType,
+  data: { [hostname: string]: CompatibilityResponseType },
   error: Error,
   refetch: () => void,
   isInitialLoading: boolean,
   isError: boolean,
 } => {
-  const { data, refetch, isInitialLoading, error, isError } = useQuery<CompatibilityResponseType, Error>(
+  const { data, refetch, isInitialLoading, error, isError } = useQuery<{ [hostname: string]: CompatibilityResponseType }, Error>(
     ['datanodes', 'compatibility'],
     () => fetchCompatibility(),
     {
