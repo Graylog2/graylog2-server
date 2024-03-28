@@ -147,7 +147,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
 
     private void doStartMigration(RemoteReindexMigration migration, RemoteReindexRequest request) {
         try {
-            prepareCluster(request.uri());
+            prepareCluster(request.allowlist());
             createIndicesInNewCluster(migration);
             startAsyncTasks(migration, request);
         } catch (Exception e) {
@@ -166,20 +166,20 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         });
     }
 
-    private void prepareCluster(final List<String> allowlist) {
+    private void prepareCluster(String allowlistAsString) {
         final var activeNodes = getAllActiveNodeIDs();
-        final String reindexSourceAddress = uri.getHost() + ":" + uri.getPort();
+        List<String> allowlist = Arrays.asList(allowlistAsString.split(","));
         try {
-            verifyRemoteReindexAllowlistSetting(reindexSourceAddress);
+            verifyRemoteReindexAllowlistSetting(allowlist);
         } catch (RemoteReindexNotAllowedException e) {
             // this is expected state for fresh datanode cluster - there is no value configured in the reindex.remote.allowlist
             // we have to add it to the configuration and wait till the whole cluster restarts
-            allowReindexingFrom(reindexSourceAddress);
+            allowReindexingFrom(allowlist);
             waitForClusterRestart(activeNodes);
         }
 
         // verify again, just to be sure that all the configuration is in place and vali
-        verifyRemoteReindexAllowlistSetting(reindexSourceAddress);
+        verifyRemoteReindexAllowlistSetting(allowlist);
     }
 
     ReindexRequest createReindexRequest(final String index, final BytesReference query, URI uri, String username, String password) {
@@ -216,8 +216,8 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
 
         // the value is not proper json, just something like [localhost:9201]. It should be safe to simply use String.contains,
         // but there is maybe a chance for mismatches and then we'd have to parse the value
-        final boolean isRemoteReindexAllowed = !allowlistEntries.stream().allMatch(entry -> allowlistSettingValue.contains(entry);
-        if (isRemoteReindexAllowed)) {
+        final boolean isRemoteReindexAllowed = !allowlistEntries.stream().allMatch(entry -> allowlistSettingValue.contains(entry));
+        if (isRemoteReindexAllowed) {
             final String message = "Failed to configure reindex.remote.allowlist setting in the datanode cluster. Current setting value: " + allowlistSettingValue;
             LOG.error(message);
             throw new RemoteReindexNotAllowedException(message);
