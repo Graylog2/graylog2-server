@@ -96,13 +96,37 @@ const disabledStyles = (themeColors: DefaultTheme['colors'], style: StyleProps) 
   `;
 };
 
+const activeStyles = (themeColors: DefaultTheme['colors'], bsStyle: StyleProps) => {
+  switch (bsStyle) {
+    case 'danger':
+    case 'info':
+    case 'success':
+    case 'primary':
+    case 'warning':
+      return css`
+        color: ${themeColors.global.textDefault};
+
+        &:hover {
+        color: ${themeColors.global.textDefault};
+        }
+
+        &:focus {
+        color: ${themeColors.global.textDefault};
+        }
+    `;
+    default: return '';
+  }
+};
+
 const StyledButton = styled(MantineButton)<{
   $bsStyle: StyleProps,
-  $bsSize: BsSize
+  $bsSize: BsSize,
+  $active: boolean
 }>(({
   theme,
   $bsStyle,
   $bsSize,
+  $active,
 }) => {
   const textColor = $bsStyle === 'link' ? theme.colors.global.link : theme.colors.button[$bsStyle].color;
 
@@ -123,6 +147,8 @@ const StyledButton = styled(MantineButton)<{
       color: ${textColor};
       text-decoration: none;
     }
+
+    ${$active && activeStyles(theme.colors, $bsStyle)}
 
     .mantine-Button-label {
       gap: 0.25em;
@@ -169,6 +195,7 @@ const Button = React.forwardRef<HTMLButtonElement, Props>(
       'aria-label': ariaLabel,
       className,
       ...stylesProps(style),
+      $active: active,
       $bsStyle: style,
       $bsSize: bsSize,
       variant: active ? 'outline' : 'filled',
