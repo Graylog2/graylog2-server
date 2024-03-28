@@ -21,6 +21,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.floreysoft.jmte.Engine;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
 import org.graylog2.Configuration;
 import org.graylog2.configuration.ContentStreamConfiguration;
 import org.graylog2.configuration.HttpConfiguration;
@@ -28,16 +34,9 @@ import org.graylog2.configuration.TelemetryConfiguration;
 import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.rest.RestTools;
+import org.graylog2.shared.rest.NoPermissionCheckRequired;
 import org.graylog2.shared.rest.resources.csp.CSP;
 import org.graylog2.web.PluginUISettingsProvider;
-
-import jakarta.inject.Inject;
-
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.HttpHeaders;
 
 import java.io.IOException;
 import java.net.URI;
@@ -81,6 +80,7 @@ public class AppConfigResource {
 
     @GET
     @Produces(MoreMediaTypes.APPLICATION_JAVASCRIPT)
+    @NoPermissionCheckRequired
     public String get(@Context HttpHeaders headers) {
         final URL templateUrl = this.getClass().getResource("/web-interface/config.js.template");
         final String template;
