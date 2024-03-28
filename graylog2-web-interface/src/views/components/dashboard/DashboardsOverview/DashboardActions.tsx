@@ -45,6 +45,7 @@ const _extractErrorMessage = (error: FetchError) => ((error
 type Props = {
   dashboard: View,
   refetchDashboards: () => void,
+  isEvidenceModal?: boolean,
 }
 
 const DeleteItem = styled.span(({ theme }) => css`
@@ -74,7 +75,7 @@ const usePluggableDashboardActions = (dashboard: View) => {
   return ({ actions, actionModals });
 };
 
-const DashboardDeleteAction = ({ dashboard, refetchDashboards }: { dashboard: View, refetchDashboards: () => void }) => {
+const DashboardDeleteAction = ({ dashboard, refetchDashboards, isEvidenceModal }: { dashboard: View, refetchDashboards: () => void, isEvidenceModal?: boolean }) => {
   const { deselectEntity } = useSelectedEntities();
   const paginationQueryParameter = usePaginationQueryParameter();
 
@@ -95,32 +96,38 @@ const DashboardDeleteAction = ({ dashboard, refetchDashboards }: { dashboard: Vi
     }
   }, [dashboard, deselectEntity, refetchDashboards, paginationQueryParameter]);
 
-  return (
+  return isEvidenceModal ? null : (
     <MenuItem onClick={onDashboardDelete}>
       <DeleteItem role="button">Delete</DeleteItem>
     </MenuItem>
   );
 };
 
-const DashboardActions = ({ dashboard, refetchDashboards }: Props) => {
+DashboardDeleteAction.defaultProps = {
+  isEvidenceModal: false,
+};
+
+const DashboardActions = ({ dashboard, refetchDashboards, isEvidenceModal }: Props) => {
   const [showShareModal, setShowShareModal] = useState(false);
   const { actions: pluggableActions, actionModals: pluggableActionModals } = usePluggableDashboardActions(dashboard);
   const currentUser = useCurrentUser();
 
   const moreActions = [
     pluggableActions.length ? pluggableActions : null,
-    pluggableActions.length ? <MenuItem divider key="divider" /> : null,
+    pluggableActions.length && !isEvidenceModal ? <MenuItem divider key="divider" /> : null,
     isAnyPermitted(currentUser.permissions, [`view:edit:${dashboard.id}`, 'view:edit'])
-      ? <DashboardDeleteAction dashboard={dashboard} refetchDashboards={refetchDashboards} key="delete-action" />
+      ? <DashboardDeleteAction dashboard={dashboard} refetchDashboards={refetchDashboards} key="delete-action" isEvidenceModal={isEvidenceModal} />
       : null,
   ].filter(Boolean);
 
   return (
     <>
-      <ShareButton bsSize="xsmall"
-                   entityId={dashboard.id}
-                   entityType="dashboard"
-                   onClick={() => setShowShareModal(true)} />
+      {isEvidenceModal || (
+        <ShareButton bsSize="xsmall"
+                     entityId={dashboard.id}
+                     entityType="dashboard"
+                     onClick={() => setShowShareModal(true)} />
+      )}
       {!!moreActions.length && (
         <MoreActions>
           {moreActions}
@@ -136,6 +143,10 @@ const DashboardActions = ({ dashboard, refetchDashboards }: Props) => {
       {pluggableActionModals}
     </>
   );
+};
+
+DashboardActions.defaultProps = {
+  isEvidenceModal: false,
 };
 
 export default DashboardActions;
