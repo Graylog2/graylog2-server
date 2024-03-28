@@ -69,6 +69,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -146,7 +147,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
 
     private void doStartMigration(RemoteReindexMigration migration, RemoteReindexRequest request) {
         try {
-            prepareCluster(request.uri());
+            prepareCluster(request.allowlist());
             createIndicesInNewCluster(migration);
             startAsyncTasks(migration, request);
         } catch (Exception e) {
@@ -165,20 +166,20 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         });
     }
 
-    private void prepareCluster(URI uri) {
+    private void prepareCluster(String allowlistAsString) {
         final var activeNodes = getAllActiveNodeIDs();
-        final String reindexSourceAddress = uri.getHost() + ":" + uri.getPort();
+        List<String> allowlist = Arrays.asList(allowlistAsString.split(","));
         try {
-            verifyRemoteReindexAllowlistSetting(reindexSourceAddress);
+            verifyRemoteReindexAllowlistSetting(allowlist);
         } catch (RemoteReindexNotAllowedException e) {
             // this is expected state for fresh datanode cluster - there is no value configured in the reindex.remote.allowlist
             // we have to add it to the configuration and wait till the whole cluster restarts
-            allowReindexingFrom(reindexSourceAddress);
+            allowReindexingFrom(allowlist);
             waitForClusterRestart(activeNodes);
         }
 
         // verify again, just to be sure that all the configuration is in place and vali
-        verifyRemoteReindexAllowlistSetting(reindexSourceAddress);
+        verifyRemoteReindexAllowlistSetting(allowlist);
     }
 
     ReindexRequest createReindexRequest(final String index, final BytesReference query, URI uri, String username, String password) {
@@ -205,8 +206,8 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         }
     }
 
-    public void verifyRemoteReindexAllowlistSetting(String reindexSourceAddress) throws RemoteReindexNotAllowedException {
-        final String allowlistSetttingValue = client.execute((restHighLevelClient, requestOptions) -> {
+    public void verifyRemoteReindexAllowlistSetting(List<String> allowlistEntries) throws RemoteReindexNotAllowedException {
+        final String allowlistSettingValue = client.execute((restHighLevelClient, requestOptions) -> {
             final ClusterGetSettingsRequest request = new ClusterGetSettingsRequest();
             request.includeDefaults(true);
             final ClusterGetSettingsResponse settings = restHighLevelClient.cluster().getSettings(request, requestOptions);
@@ -215,9 +216,9 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
 
         // the value is not proper json, just something like [localhost:9201]. It should be safe to simply use String.contains,
         // but there is maybe a chance for mismatches and then we'd have to parse the value
-        final boolean isRemoteReindexAllowed = !allowlistSetttingValue.contains(reindexSourceAddress);
+        final boolean isRemoteReindexAllowed = !allowlistEntries.stream().allMatch(entry -> allowlistSettingValue.contains(entry));
         if (isRemoteReindexAllowed) {
-            final String message = "Failed to configure reindex.remote.allowlist setting in the datanode cluster. Current setting value: " + allowlistSetttingValue;
+            final String message = "Failed to configure reindex.remote.allowlist setting in the datanode cluster. Current setting value: " + allowlistSettingValue;
             LOG.error(message);
             throw new RemoteReindexNotAllowedException(message);
         }
@@ -262,8 +263,8 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         }
     }
 
-    void allowReindexingFrom(final String host) {
-        eventBus.post(new RemoteReindexAllowlistEvent(host, RemoteReindexAllowlistEvent.ACTION.ADD));
+    void allowReindexingFrom(final List<String> allowlist) {
+        eventBus.post(new RemoteReindexAllowlistEvent(allowlist, RemoteReindexAllowlistEvent.ACTION.ADD));
     }
 
     List<String> getAllIndicesFrom(final URI uri, final String username, final String password) throws MalformedURLException {
