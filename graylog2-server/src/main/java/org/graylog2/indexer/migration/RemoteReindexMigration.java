@@ -96,7 +96,7 @@ public class RemoteReindexMigration {
                 .map(relativeProgress -> relativeProgress * indexPortion)
                 .sum();
 
-        return (int) overallProgress;
+         return Math.min((int)Math.ceil(overallProgress), 100);
     }
 
     public List<LogEntry> getLogs() {
