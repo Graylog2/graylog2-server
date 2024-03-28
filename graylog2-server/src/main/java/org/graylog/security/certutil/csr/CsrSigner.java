@@ -16,7 +16,6 @@
  */
 package org.graylog.security.certutil.csr;
 
-import com.google.common.collect.Sets;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.Extension;
@@ -44,7 +43,6 @@ import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -54,12 +52,6 @@ import static org.bouncycastle.asn1.x509.GeneralName.rfc822Name;
 import static org.graylog.security.certutil.CertConstants.SIGNING_ALGORITHM;
 
 public class CsrSigner {
-    private static final Set<GeneralName> localhostAttributes = Set.of(
-            new GeneralName(dNSName, "localhost"),
-            new GeneralName(iPAddress, "127.0.0.1"),
-            new GeneralName(iPAddress, "0:0:0:0:0:0:0:1")
-    );
-
     private final Clock clock;
 
     public CsrSigner() {
@@ -136,7 +128,7 @@ public class CsrSigner {
                 .collect(Collectors.toSet());
         if (!altNames.isEmpty()) {
             builder.addExtension(Extension.subjectAlternativeName, false,
-                    new GeneralNames(Sets.union(localhostAttributes, altNames).toArray(new GeneralName[0])));
+                    new GeneralNames(altNames.toArray(new GeneralName[0])));
         }
 
         ContentSigner signer = new JcaContentSignerBuilder(SIGNING_ALGORITHM).build(caPrivateKey);
