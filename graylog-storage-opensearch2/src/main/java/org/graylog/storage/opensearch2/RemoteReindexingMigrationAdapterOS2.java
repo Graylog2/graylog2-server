@@ -54,6 +54,7 @@ import org.graylog2.indexer.datanode.RemoteReindexMigrationService;
 import org.graylog2.indexer.datanode.RemoteReindexRequest;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
 import org.graylog2.indexer.indices.Indices;
+import org.graylog2.indexer.migration.IndexMigrationProgress;
 import org.graylog2.indexer.migration.IndexerConnectionCheckResult;
 import org.graylog2.indexer.migration.LogEntry;
 import org.graylog2.indexer.migration.LogLevel;
@@ -202,16 +203,23 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     private RemoteReindexIndex taskToIndex(String indexName, GetTaskResponse task) {
         final DateTime created = new DateTime(task.task().startTimeInMillis());
         Duration duration = getDuration(task);
+
+        IndexMigrationProgress progress = toProgress(task.task().status());
+
         if (task.completed()) {
             final String errors = getErrors(task);
             if (errors != null) {
-                return new RemoteReindexIndex(indexName, Status.ERROR, created, duration, errors);
+                return new RemoteReindexIndex(indexName, Status.ERROR, created, duration, progress, errors);
             } else {
-                return new RemoteReindexIndex(indexName, Status.FINISHED, created, duration, null);
+                return new RemoteReindexIndex(indexName, Status.FINISHED, created, duration, progress, null);
             }
         } else {
-            return new RemoteReindexIndex(indexName, Status.RUNNING, created, duration, null);
+            return new RemoteReindexIndex(indexName, Status.RUNNING, created, duration,progress, null);
         }
+    }
+
+    private IndexMigrationProgress toProgress(TaskStatus status) {
+        return new IndexMigrationProgress(status.total(), status.created(), status.updated(), status.deleted());
     }
 
     @Nullable
@@ -403,7 +411,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
             final Duration duration = getDuration(t);
             final String errors = getErrors(t);
             if (errors != null) {
-                onTaskFailure(migration, index, t.task().status(), duration);
+                onTaskFailure(migration, index, errors, duration);
             } else {
                 onTaskSuccess(migration, index, t.task().status(), duration);
             }
@@ -415,9 +423,8 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         return Duration.standardSeconds(durationInSec);
     }
 
-    private void onTaskFailure(MigrationConfiguration migration, String index, TaskStatus taskStatus, Duration duration) {
-        final String failures = String.join(", ", taskStatus.failures());
-        final String message = String.format(Locale.ROOT, "Index %s migration failed after %s. Failures: %s.", index, humanReadable(duration), failures);
+    private void onTaskFailure(MigrationConfiguration migration, String index, String error, Duration duration) {
+        final String message = String.format(Locale.ROOT, "Index %s migration failed after %s: %s.", index, humanReadable(duration), error);
         logError(migration, message, null);
     }
 

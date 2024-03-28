@@ -20,15 +20,14 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.jsonwebtoken.lang.Collections;
 import jakarta.validation.constraints.NotNull;
-import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter.Status;
 
-import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 import java.util.Optional;
-import java.util.Queue;
-import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Caution: this object will be heavily mutated from outside as the migration progresses.
@@ -89,12 +88,27 @@ public class RemoteReindexMigration {
             return 100; // avoid division by zero. No indices == migration is immediately done
         }
 
-        final int done = (int) indices.stream().map(RemoteReindexIndex::status).filter(i -> i == Status.FINISHED || i == Status.ERROR).count();
-        float percent = (100.0f / countOfIndices) * done;
-        return (int) Math.ceil(percent);
+        final double indexPortion = 100.0 / indices.size();
+
+        final double overallProgress = indices.stream()
+                .filter(i -> i.progress() != null)
+                .mapToDouble(i -> i.progress().progressPercent() / 100.0)
+                .map(relativeProgress -> relativeProgress * indexPortion)
+                .sum();
+
+        return (int) overallProgress;
     }
 
     public List<LogEntry> getLogs() {
         return Optional.ofNullable(logs).map(l -> l.stream().toList()).orElse(Collections.emptyList());
+    }
+
+    @JsonProperty("tasks_progress")
+    public Map<String, Integer> getTasksProgress() {
+        return indices.stream()
+                .filter(i -> i.status() == Status.RUNNING)
+                .filter(i -> i.progress() != null)
+                .sorted(Comparator.comparing(RemoteReindexIndex::name))
+                .collect(Collectors.toMap(RemoteReindexIndex::name, i -> i.progress().progressPercent(), (integer, integer2) -> integer, LinkedHashMap::new));
     }
 }

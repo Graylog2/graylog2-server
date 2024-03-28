@@ -203,8 +203,6 @@ public class MigrationActionsImpl implements MigrationActions {
         final int threadsCount = getStateMachineContext().getActionArgumentOpt("threads", Integer.class).orElse(4);
         final String migrationID = migrationService.start(new RemoteReindexRequest(hostname, user, password, indices, threadsCount));
         getStateMachineContext().addExtendedState(MigrationStateMachineContext.KEY_MIGRATION_ID, migrationID);
-
-
     }
 
     @Override

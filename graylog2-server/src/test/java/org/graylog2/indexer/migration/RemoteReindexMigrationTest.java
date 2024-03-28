@@ -45,7 +45,13 @@ class RemoteReindexMigrationTest {
 
     @NotNull
     private static RemoteReindexIndex index(String indexName, RemoteReindexingMigrationAdapter.Status status) {
-        return new RemoteReindexIndex(indexName, status, null, null, null);
+
+        final IndexMigrationProgress progress = switch (status) {
+            case FINISHED -> new IndexMigrationProgress(100, 100, 0, 0);
+            case ERROR -> new IndexMigrationProgress(100, 100, 0, 0);
+            default -> new IndexMigrationProgress(100, 0, 0, 0);
+        };
+        return new RemoteReindexIndex(indexName, status, null, null, progress, null);
     }
 
     @Test
