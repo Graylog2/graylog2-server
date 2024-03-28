@@ -27,7 +27,10 @@ public interface RemoteReindexingMigrationAdapter {
         NOT_STARTED, STARTING, RUNNING, ERROR, FINISHED
     }
 
-    RemoteReindexMigration start(RemoteReindexRequest request);
+    /**
+     * @return ID of the migration, useful for obraining migration process info via {@link #status(String)}
+     */
+    String start(RemoteReindexRequest request);
 
     RemoteReindexMigration status(@NotNull String migrationID);
 

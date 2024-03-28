@@ -16,18 +16,8 @@
  */
 package org.graylog2.indexer.migration;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter.Status;
-import org.joda.time.DateTime;
-import org.joda.time.Duration;
-
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public record RemoteReindexIndex(String name, Status status, DateTime created, Duration took,
-                                 IndexMigrationProgress progress, String errorMsg) {
-
-
-    public static RemoteReindexIndex notStartedYet(String indexName) {
-        return new RemoteReindexIndex(indexName, Status.NOT_STARTED, null, null, null, null);
+public record IndexMigrationProgress(long total, long created, long updated, long deleted) {
+    public int progressPercent() {
+        return (int) Math.min((100.0 / total) * (created + updated + deleted), 100);
     }
-
 }

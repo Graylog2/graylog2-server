@@ -14,20 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer.migration;
+package org.graylog2.indexer.datanode;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter.Status;
-import org.joda.time.DateTime;
-import org.joda.time.Duration;
+import org.graylog2.indexer.migration.LogEntry;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public record RemoteReindexIndex(String name, Status status, DateTime created, Duration took,
-                                 IndexMigrationProgress progress, String errorMsg) {
+import java.util.Optional;
 
+public interface RemoteReindexMigrationService {
 
-    public static RemoteReindexIndex notStartedYet(String indexName) {
-        return new RemoteReindexIndex(indexName, Status.NOT_STARTED, null, null, null, null);
-    }
+    Optional<MigrationConfiguration> getMigration(String migrationId);
 
+    MigrationConfiguration saveMigration(MigrationConfiguration migrationConfiguration);
+
+    void assignTask(String migrationID, String indexName, String taskId);
+
+    void appendLogEntry(String migrationId, LogEntry log);
 }
