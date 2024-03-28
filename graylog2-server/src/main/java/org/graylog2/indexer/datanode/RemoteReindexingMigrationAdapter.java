@@ -20,7 +20,6 @@ import jakarta.validation.constraints.NotNull;
 import org.graylog2.indexer.migration.IndexerConnectionCheckResult;
 import org.graylog2.indexer.migration.RemoteReindexMigration;
 
-import java.net.MalformedURLException;
 import java.net.URI;
 
 public interface RemoteReindexingMigrationAdapter {
