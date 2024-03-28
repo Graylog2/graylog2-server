@@ -61,7 +61,7 @@ const Toggle = styled.label(({ theme }) => css`
     height: 22px;
     border-radius: 30px;
     background-color: ${theme.colors.gray[80]};
-    box-shadow: inset 0 1px 3px 0 rgba(0, 0, 0, 0.2);
+    box-shadow: inset 0 1px 3px 0 rgb(0 0 0 / 20%);
     display: inline-block;
     position: relative;
     cursor: pointer;
@@ -73,7 +73,7 @@ const Toggle = styled.label(({ theme }) => css`
       width: 18px;
       height: 18px;
       background-color: #fcfcfc;
-      box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.25), 0 2px 8px 0 rgba(32, 37, 50, 0.16);
+      box-shadow: 0 2px 3px 0 rgb(0 0 0 / 25%), 0 2px 8px 0 rgb(32 37 50 / 16%);
       position: absolute;
       border-radius: 100%;
       top: 11px;
