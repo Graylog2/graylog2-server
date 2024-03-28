@@ -32,7 +32,6 @@ import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.MultiSearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
-import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import org.graylog.storage.elasticsearch7.testing.TestMultisearchResponse;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESMessageList;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
@@ -51,11 +50,9 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.storage.elasticsearch7.views.ViewsUtils.indicesOf;
@@ -64,7 +61,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class ElasticsearchBackendUsingCorrectIndicesTest {
+public class ElasticsearchBackendUsingCorrectIndicesTest extends ElasticsearchMockedClientTestBase {
     private static Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> handlers = ImmutableMap.of(
             MessageList.NAME, () -> new ESMessageList(new LegacyDecoratorProcessor.Fake(),
                     new TestResultMessageFactory(), false)
@@ -75,9 +72,6 @@ public class ElasticsearchBackendUsingCorrectIndicesTest {
 
     @Mock
     private IndexLookup indexLookup;
-
-    @Mock
-    private ElasticsearchClient client;
 
     @Captor
     private ArgumentCaptor<List<SearchRequest>> clientRequestCaptor;
@@ -90,9 +84,7 @@ public class ElasticsearchBackendUsingCorrectIndicesTest {
     @Before
     public void setupSUT() throws Exception {
         final MultiSearchResponse response = TestMultisearchResponse.fromFixture("successfulResponseWithSingleQuery.json");
-        final List<MultiSearchResponse.Item> items = Arrays.stream(response.getResponses())
-                .collect(Collectors.toList());
-        when(client.msearch(any(), any())).thenReturn(items);
+        mockCancellableMSearch(response);
 
         this.backend = new ElasticsearchBackend(handlers,
                 client,
@@ -129,7 +121,7 @@ public class ElasticsearchBackendUsingCorrectIndicesTest {
         final ESGeneratedQueryContext context = createContext(query);
         backend.doRun(job, query, context);
 
-        verify(client, times(1)).msearch(clientRequestCaptor.capture(), any());
+        verify(client).cancellableMsearch(clientRequestCaptor.capture());
 
         final List<SearchRequest> clientRequest = clientRequestCaptor.getValue();
         assertThat(clientRequest).isNotNull();
@@ -185,7 +177,7 @@ public class ElasticsearchBackendUsingCorrectIndicesTest {
 
         backend.doRun(job, query, context);
 
-        verify(client, times(1)).msearch(clientRequestCaptor.capture(), any());
+        verify(client).cancellableMsearch(clientRequestCaptor.capture());
 
         final List<SearchRequest> clientRequest = clientRequestCaptor.getValue();
         assertThat(clientRequest).isNotNull();
@@ -206,7 +198,7 @@ public class ElasticsearchBackendUsingCorrectIndicesTest {
 
         backend.doRun(job, query, context);
 
-        verify(client, times(1)).msearch(clientRequestCaptor.capture(), any());
+        verify(client).cancellableMsearch(clientRequestCaptor.capture());
 
         final List<SearchRequest> clientRequest = clientRequestCaptor.getValue();
         assertThat(clientRequest).isNotNull();

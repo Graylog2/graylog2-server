@@ -18,6 +18,8 @@ package org.graylog.plugins.views.search.rest;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.core.Response;
 import org.assertj.core.api.Assertions;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
@@ -26,11 +28,10 @@ import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.engine.SearchExecutor;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog2.plugin.system.NodeId;
+import org.graylog2.plugin.system.SimpleNodeId;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
-import jakarta.ws.rs.NotFoundException;
-import jakarta.ws.rs.core.Response;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -48,6 +49,8 @@ public class SearchResourceTest {
     private final SearchJobService searchJobService = Mockito.mock(SearchJobService.class);
     private final EventBus eventBus = Mockito.mock(EventBus.class);
     private final SearchExecutor searchExecutor = Mockito.mock(SearchExecutor.class);
+
+    private final NodeId nodeId = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
 
 
     @Test

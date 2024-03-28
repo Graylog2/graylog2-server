@@ -32,7 +32,6 @@ import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.MultiSearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
-import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog.storage.opensearch2.testing.TestMultisearchResponse;
 import org.graylog.storage.opensearch2.views.searchtypes.OSMessageList;
 import org.graylog.storage.opensearch2.views.searchtypes.OSSearchTypeHandler;
@@ -51,11 +50,9 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.storage.opensearch2.views.ViewsUtils.indicesOf;
@@ -64,7 +61,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class OpenSearchBackendUsingCorrectIndicesTest {
+public class OpenSearchBackendUsingCorrectIndicesTest extends OpensearchMockedClientTestBase {
     private static Map<String, Provider<OSSearchTypeHandler<? extends SearchType>>> handlers = ImmutableMap.of(
             MessageList.NAME, () -> new OSMessageList(new LegacyDecoratorProcessor.Fake(),
                     new TestResultMessageFactory(), false)
@@ -75,9 +72,6 @@ public class OpenSearchBackendUsingCorrectIndicesTest {
 
     @Mock
     private IndexLookup indexLookup;
-
-    @Mock
-    private OpenSearchClient client;
 
     @Captor
     private ArgumentCaptor<List<SearchRequest>> clientRequestCaptor;
@@ -90,9 +84,7 @@ public class OpenSearchBackendUsingCorrectIndicesTest {
     @Before
     public void setupSUT() throws Exception {
         final MultiSearchResponse response = TestMultisearchResponse.fromFixture("successfulResponseWithSingleQuery.json");
-        final List<MultiSearchResponse.Item> items = Arrays.stream(response.getResponses())
-                .collect(Collectors.toList());
-        when(client.msearch(any(), any())).thenReturn(items);
+        mockCancellableMSearch(response);
 
         this.backend = new OpenSearchBackend(handlers,
                 client,
@@ -129,7 +121,7 @@ public class OpenSearchBackendUsingCorrectIndicesTest {
         final OSGeneratedQueryContext context = createContext(query);
         backend.doRun(job, query, context);
 
-        verify(client, times(1)).msearch(clientRequestCaptor.capture(), any());
+        verify(client).cancellableMsearch(clientRequestCaptor.capture());
 
         final List<SearchRequest> clientRequest = clientRequestCaptor.getValue();
         assertThat(clientRequest).isNotNull();
@@ -189,7 +181,7 @@ public class OpenSearchBackendUsingCorrectIndicesTest {
 
         backend.doRun(job, query, context);
 
-        verify(client, times(1)).msearch(clientRequestCaptor.capture(), any());
+        verify(client).cancellableMsearch(clientRequestCaptor.capture());
 
         final List<SearchRequest> clientRequest = clientRequestCaptor.getValue();
         assertThat(clientRequest).isNotNull();
@@ -197,7 +189,7 @@ public class OpenSearchBackendUsingCorrectIndicesTest {
     }
 
     @Test
-    public void queryUsesOnlyIndicesBelongingToStream() throws Exception {
+    public void queryUsesOnlyIndicesBelongingToStream() {
         final Query query = dummyQuery(RelativeRange.create(600)).toBuilder()
                 .filter(AndFilter.and(StreamFilter.ofId("stream1"), StreamFilter.ofId("stream2")))
                 .build();
@@ -210,7 +202,7 @@ public class OpenSearchBackendUsingCorrectIndicesTest {
 
         backend.doRun(job, query, context);
 
-        verify(client, times(1)).msearch(clientRequestCaptor.capture(), any());
+        verify(client).cancellableMsearch(clientRequestCaptor.capture());
 
         final List<SearchRequest> clientRequest = clientRequestCaptor.getValue();
         assertThat(clientRequest).isNotNull();

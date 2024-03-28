@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -64,13 +65,21 @@ public class SearchExecutor {
     }
 
     public SearchJob execute(String searchId, SearchUser searchUser, ExecutionState executionState) {
+        return execute(searchId, searchUser, executionState, false);
+    }
+
+    public SearchJob execute(String searchId, SearchUser searchUser, ExecutionState executionState, boolean async) {
         return searchDomain.getForUser(searchId, searchUser)
-                .map(s -> execute(s, searchUser, executionState))
+                .map(s -> execute(s, searchUser, executionState, async))
                 .orElseThrow(() -> new NotFoundException("No search found with id <" + searchId + ">."));
     }
 
-    @WithSpan
     public SearchJob execute(Search search, SearchUser searchUser, ExecutionState executionState) {
+        return execute(search, searchUser, executionState, false);
+    }
+
+    @WithSpan
+    public SearchJob execute(Search search, SearchUser searchUser, ExecutionState executionState, boolean async) {
         final Search preValidationSearch = searchNormalization.preValidation(search, searchUser, executionState);
 
         final Set<SearchError> validationErrors = searchValidation.validate(preValidationSearch, searchUser);
@@ -86,7 +95,17 @@ public class SearchExecutor {
         validationErrors.forEach(searchJob::addError);
 
         try {
-            Uninterruptibles.getUninterruptibly(searchJob.getResultFuture(), 60000, TimeUnit.MILLISECONDS);
+            if (!async) {
+                final CompletableFuture<Void> resultFuture = searchJob.getResultFuture();
+                /* TODO
+                 * Lines  103-104 mimic the previous behavior (the join was in QueryEngine, that's the difference)
+                 * It also shows some problems in the code, where parts of the code expressed the necessity to wait indefinitely for the results (joins),
+                 * while parts of the code expressed the need to use timeout (see line 104).
+                 * Imho in a separate PR we should decide which way to go, currently we wait indefinitely, as we did so far, and line 104 probably does not have a lot of sense, as it did not have before.
+                 */
+                resultFuture.join();
+                Uninterruptibles.getUninterruptibly(resultFuture, 60000, TimeUnit.MILLISECONDS);
+            }
         } catch (ExecutionException e) {
             LOG.error("Error executing search job <{}>", searchJob.getId(), e);
             throw new InternalServerErrorException("Error executing search job: " + e.getMessage(), e);
