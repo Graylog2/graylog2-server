@@ -19,19 +19,9 @@ package org.graylog2.contentstream.rest;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.audit.AuditEventTypes;
-import org.graylog2.audit.jersey.AuditEvent;
-import org.graylog2.database.NotFoundException;
-import org.graylog2.plugin.database.users.User;
-import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.shared.users.UserService;
-
 import jakarta.inject.Inject;
-
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.PUT;
@@ -39,6 +29,15 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.audit.AuditEventTypes;
+import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.database.NotFoundException;
+import org.graylog2.plugin.database.users.User;
+import org.graylog2.shared.rest.InlinePermissionCheck;
+import org.graylog2.shared.rest.NoPermissionCheckRequired;
+import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.users.UserService;
 
 import java.util.List;
 
@@ -63,6 +62,7 @@ public class ContentStreamResource extends RestResource {
     @GET
     @Path("tags")
     @ApiOperation("Retrieve valid feed tags based on license")
+    @NoPermissionCheckRequired
     public List<String> getContentStreamTags() throws NotFoundException {
         return contentStreamService.getTags();
     }
@@ -70,6 +70,7 @@ public class ContentStreamResource extends RestResource {
     @GET
     @Path("settings/{username}")
     @ApiOperation("Retrieve Content Stream settings for specified user")
+    @InlinePermissionCheck
     public ContentStreamSettings getContentStreamUserSettings(
             @ApiParam(name = "username") @PathParam("username") String username
     ) throws NotFoundException {
@@ -83,6 +84,7 @@ public class ContentStreamResource extends RestResource {
     @Path("settings/{username}")
     @ApiOperation("Update Content Stream settings for specified user")
     @AuditEvent(type = AuditEventTypes.CONTENT_STREAM_USER_SETTINGS_UPDATE)
+    @InlinePermissionCheck
     public ContentStreamSettings setContentStreamUserSettings(
             @ApiParam(name = "username") @PathParam("username") String username,
             @ApiParam(name = "JSON body", value = "Content Stream settings for the specified user.", required = true)
