@@ -17,6 +17,7 @@
 package org.graylog2.indexer.datanode;
 
 import org.assertj.core.api.Assertions;
+import org.assertj.core.api.OptionalAssert;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
@@ -60,10 +61,16 @@ class RemoteReindexMigrationServiceImplTest {
         Assertions.assertThat(migrationService.getMigration(migrationID))
                 .isPresent()
                 .hasValueSatisfying(m -> {
-                    Assertions.assertThat(m.index("index_1")).isPresent().hasValueSatisfying(i -> Assertions.assertThat(i.taskId()).hasValue("task_1"));
-                    Assertions.assertThat(m.index("index_2")).isPresent().hasValueSatisfying(i -> Assertions.assertThat(i.taskId()).hasValue(("task_2")));
-                    Assertions.assertThat(m.index("errors_1")).isPresent().hasValueSatisfying(i -> Assertions.assertThat(i.taskId()).hasValue(("task_3")));
+                    assertIndexAndTaskMapping(m, "index_1", "task_1");
+                    assertIndexAndTaskMapping(m, "index_2", "task_2");
+                    assertIndexAndTaskMapping(m, "errors_1", "task_3");
                 });
+    }
+
+    private static OptionalAssert<IndexMigrationConfiguration> assertIndexAndTaskMapping(MigrationConfiguration m, String indexName, String taskName) {
+        return Assertions.assertThat(m.getConfigForIndexName(indexName))
+                .isPresent()
+                .hasValueSatisfying(i -> Assertions.assertThat(i.taskId()).hasValue(taskName));
     }
 
     @Test

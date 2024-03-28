@@ -31,6 +31,11 @@ import org.mongojack.WriteResult;
 import java.util.Locale;
 import java.util.Optional;
 
+import static org.graylog2.indexer.datanode.IndexMigrationConfiguration.FIELD_INDEX_NAME;
+import static org.graylog2.indexer.datanode.IndexMigrationConfiguration.FIELD_TASK_ID;
+import static org.graylog2.indexer.datanode.MigrationConfiguration.FIELD_INDICES;
+import static org.graylog2.indexer.datanode.MigrationConfiguration.FIELD_LOGS;
+
 public class RemoteReindexMigrationServiceImpl extends PaginatedDbService<MigrationConfiguration> implements RemoteReindexMigrationService {
 
     public static final String COLLECTION_NAME = "remote_reindex_migrations";
@@ -54,9 +59,9 @@ public class RemoteReindexMigrationServiceImpl extends PaginatedDbService<Migrat
     public void assignTask(String migrationID, String indexName, String taskId) {
         final Bson filter = Filters.and(
                 Filters.eq("_id", new ObjectId(migrationID)),
-                Filters.eq("indices.indexName", indexName)
+                Filters.eq(FIELD_INDICES + "." + FIELD_INDEX_NAME, indexName)
         );
-        final Bson update = Updates.set("indices.$.taskId", taskId);
+        final Bson update = Updates.set(FIELD_INDICES + ".$." + FIELD_TASK_ID, taskId);
         if (!db.update(filter, update).isUpdateOfExisting()) {
             throw new IllegalStateException(String.format(Locale.ROOT, "Failed to update migration %s. Index %s doesn't exist in the migration", migrationID, indexName));
         }
@@ -65,7 +70,9 @@ public class RemoteReindexMigrationServiceImpl extends PaginatedDbService<Migrat
     @Override
     public void appendLogEntry(String migrationId, LogEntry log) {
         final Bson filter = Filters.eq("_id", new ObjectId(migrationId));
-        final Bson update = Updates.push("logs", log);
-        final WriteResult<MigrationConfiguration, ObjectId> res = db.update(filter, update);
+        final Bson update = Updates.push(FIELD_LOGS, log);
+        if(db.update(filter, update).getN() != 1) {
+            throw new IllegalStateException("Failed to append log entry:" + log);
+        }
     }
 }

@@ -34,6 +34,6 @@ public record Task(
         @JsonProperty("running_time_in_nanos") long runningTimeInNanos,
         @JsonProperty("cancellable") boolean cancellable,
         @JsonProperty("cancelled") boolean cancelled,
-        @JsonProperty("Headers") Map<String, String> headers
+        @JsonProperty("headers") Map<String, String> headers
 ) {
 }

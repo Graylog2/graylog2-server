@@ -16,41 +16,19 @@
  */
 package org.graylog2.indexer.datanode;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
 
-public class IndexMigrationConfiguration {
+public record IndexMigrationConfiguration(
+        @JsonProperty(FIELD_INDEX_NAME) String indexName,
+        @Nullable @JsonProperty(FIELD_TASK_ID) String nullableTaskID
+) {
     public static final String FIELD_INDEX_NAME = "indexName";
     public static final String FIELD_TASK_ID = "taskId";
-    @JsonProperty(FIELD_INDEX_NAME)
-    private final String indexName;
-
-    @Nullable
-    @JsonProperty(FIELD_TASK_ID)
-    private String taskId;
-
-    @JsonCreator
-    public IndexMigrationConfiguration(@JsonProperty(FIELD_INDEX_NAME) String indexName, @JsonProperty(FIELD_TASK_ID) @Nullable String taskId) {
-        this.indexName = indexName;
-        this.taskId = taskId;
-    }
-
-    public IndexMigrationConfiguration(String indexName) {
-        this.indexName = indexName;
-    }
-
-    public String indexName() {
-        return indexName;
-    }
 
     public Optional<String> taskId() {
-        return Optional.ofNullable(taskId);
-    }
-
-    public void taskId(String taskId) {
-        this.taskId = taskId;
+        return Optional.ofNullable(nullableTaskID);
     }
 }
