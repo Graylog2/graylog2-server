@@ -20,19 +20,20 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.plugin.Capabilities;
-import org.graylog2.plugin.PluginMetaData;
-import org.graylog2.rest.models.system.plugins.responses.PluginList;
-import org.graylog2.rest.models.system.plugins.responses.PluginMetaDataValue;
-import org.graylog2.shared.rest.resources.RestResource;
-
 import jakarta.inject.Inject;
-
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.plugin.Capabilities;
+import org.graylog2.plugin.PluginMetaData;
+import org.graylog2.plugin.system.NodeId;
+import org.graylog2.rest.models.system.plugins.responses.PluginList;
+import org.graylog2.rest.models.system.plugins.responses.PluginMetaDataValue;
+import org.graylog2.shared.rest.InlinePermissionCheck;
+import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
 
 import java.util.List;
 import java.util.Set;
@@ -43,16 +44,20 @@ import java.util.Set;
 @RequiresAuthentication
 public class SystemPluginResource extends RestResource {
     private final Set<PluginMetaData> pluginMetaDataSet;
+    private final NodeId nodeId;
 
     @Inject
-    public SystemPluginResource(Set<PluginMetaData> pluginMetaDataSet) {
+    public SystemPluginResource(Set<PluginMetaData> pluginMetaDataSet, NodeId nodeId) {
         this.pluginMetaDataSet = pluginMetaDataSet;
+        this.nodeId = nodeId;
     }
 
     @GET
     @Timed
     @ApiOperation(value = "List all installed plugins on this node.")
+    @InlinePermissionCheck
     public PluginList list() {
+        checkPermission(RestPermissions.SYSTEM_READ, nodeId.getNodeId());
         final List<PluginMetaDataValue> pluginMetaDataValues = Lists.newArrayList();
 
         for (PluginMetaData pluginMetaData : pluginMetaDataSet) {

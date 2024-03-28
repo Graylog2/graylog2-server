@@ -9,5 +9,5 @@ A variety of inconsistencies in REST API permission checks have been resolved.
  * The endpoint `DELETE /authz/roles/{roleId}` checked `roles:edit` instead of the correct `roles:delete:{roleId}` permission.
  * The endpoint `DELETE /system/jobs/acknowledge/{jobId}` now requires the `systemjobs:read` permission.
  * The endpoints `/cluster/processing/status`, `/cluster/processing/status/persisted`, `/system/processing/status`, `/system/processing/status/persisted` now require `metrics:read` permissions and are deprecated.
-
+ * The endpoints `GET /system/plugins` and `GET /cluster/{nodeId}/plugins` now require the `system:read:{nodeid}` permissions, which are granted by the reader role.
 """
