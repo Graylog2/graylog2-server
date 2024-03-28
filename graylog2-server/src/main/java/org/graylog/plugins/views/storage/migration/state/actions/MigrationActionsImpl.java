@@ -33,6 +33,7 @@ import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.cluster.preflight.DataNodeProvisioningService;
 import org.graylog2.indexer.datanode.ProxyRequestAdapter;
+import org.graylog2.indexer.datanode.RemoteReindexRequest;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
 import org.graylog2.indexer.migration.RemoteReindexMigration;
 import org.graylog2.plugin.GlobalMetricNames;
@@ -227,7 +228,8 @@ public class MigrationActionsImpl implements MigrationActions {
         final String user = getStateMachineContext().getActionArgumentOpt("user", String.class).orElse(null);
         final String password = getStateMachineContext().getActionArgumentOpt("password", String.class).orElse(null);
         final List<String> indices = getStateMachineContext().getActionArgumentOpt("indices", List.class).orElse(Collections.emptyList()); // todo: generics!
-        final RemoteReindexMigration migration = migrationService.start(hostname, user, password, indices, false);
+        final int threadsCount = getStateMachineContext().getActionArgumentOpt("threads", Integer.class).orElse(4);
+        final RemoteReindexMigration migration = migrationService.start(new RemoteReindexRequest(hostname, user, password, indices, threadsCount));
         final String migrationID = migration.id();
         getStateMachineContext().addExtendedState(MigrationStateMachineContext.KEY_MIGRATION_ID, migrationID);
     }

@@ -52,11 +52,14 @@ public class OSEventList implements EventListStrategy {
     public void doGenerateQueryPart(Query query, EventList eventList,
                                     OSGeneratedQueryContext queryContext) {
         final var searchSourceBuilder = queryContext.searchSourceBuilder(eventList);
-        final var sortConfig = eventList.sortWithDefault();
+        final var sortConfig = eventList.sort()
+                .filter(sort -> EventList.KNOWN_ATTRIBUTES.contains(sort.field()))
+                .orElse(EventList.DEFAULT_SORT);
         searchSourceBuilder.sort(sortConfig.field(), toSortOrder(sortConfig.direction()));
         final var queryBuilder = searchSourceBuilder.query();
         if (!eventList.attributes().isEmpty() && queryBuilder instanceof BoolQueryBuilder boolQueryBuilder) {
             final var filterQueries = eventList.attributes().stream()
+                    .filter(attribute -> EventList.KNOWN_ATTRIBUTES.contains(attribute.field()))
                     .flatMap(attribute -> attribute.toQueryStrings().stream())
                     .toList();
 

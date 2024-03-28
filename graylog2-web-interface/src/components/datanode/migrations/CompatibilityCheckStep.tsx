@@ -36,7 +36,8 @@ const CompatibilityCheckStep = ({ currentStep, onTriggerStep }: MigrationStepCom
     return <Spinner text="Loading compatibility check results..." />;
   }
 
-  const isCompatible = data?.compatibility_errors.length === 0;
+  const errors = Object.values(data || {}).flatMap((value) => (value?.compatibility_errors || []));
+  const isCompatible = errors.length === 0;
 
   return (
     <>
@@ -47,7 +48,7 @@ const CompatibilityCheckStep = ({ currentStep, onTriggerStep }: MigrationStepCom
           <>
             <h4>Your existing OpenSearch data cannot be migrated to Data Node.</h4>
             <br />
-            Error: {data?.compatibility_errors.map((error) => <dd key={error}>{error}</dd>)}
+            Error: {errors} {errors.map((error) => <dd key={error}>{error}</dd>)}
           </>
         )}
         {isError && (
@@ -57,9 +58,11 @@ const CompatibilityCheckStep = ({ currentStep, onTriggerStep }: MigrationStepCom
           </>
         )}
       </CompatibilityAlert>
-      {!isCompatible && (<p>Your OpenSearch cluster cannot be migrated to this Data Node version because it&apos;s not compatible</p>)}
-      {isCompatible && <CompatibilityStatus opensearchVersion={data.opensearch_version} nodeInfo={data.info} />}
-
+      <br />
+      {!isCompatible && (<p>Your OpenSearch cluster cannot be migrated to this Data Node version because it&apos;s not compatible.</p>)}
+      {isCompatible && Object.keys(data).map((hostname) => (
+        <CompatibilityStatus key={hostname} hostname={hostname} opensearchVersion={data[hostname].opensearch_version} nodeInfo={data[hostname].info} />
+      ))}
       <MigrationStepTriggerButtonToolbar nextSteps={currentStep.next_steps} onTriggerStep={onTriggerStep} />
     </>
   );

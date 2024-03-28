@@ -25,20 +25,22 @@ import { MIGRATION_STATE } from '../Constants';
 
 jest.mock('components/datanode/hooks/useCompatibilityCheck', () => jest.fn(() => ({
   data: {
-    opensearch_version: '2.10.0',
-    info: {
-      nodes: [{
-        indices: [{
-          index_id: 'prlnhUp_TvSof9U-K3FZ9A',
-          shards: [{ documents_count: 10, name: 'S0', primary: true, min_lucene_version: '9.7.0' }],
-          index_name: '.opendistro_security',
-          creation_date: '2023-11-17T09:57:36.511',
-          index_version_created: '2.10.0',
+    datanode1: {
+      opensearch_version: '2.10.0',
+      info: {
+        nodes: [{
+          indices: [{
+            index_id: 'prlnhUp_TvSof9U-K3FZ9A',
+            shards: [{ documents_count: 10, name: 'S0', primary: true, min_lucene_version: '9.7.0' }],
+            index_name: '.opendistro_security',
+            creation_date: '2023-11-17T09:57:36.511',
+            index_version_created: '2.10.0',
+          }],
         }],
-      }],
-      opensearch_data_location: '/home/tdvorak/bin/datanode/data',
+        opensearch_data_location: '/home/tdvorak/bin/datanode/data',
+      },
+      compatibility_errors: [],
     },
-    compatibility_errors: [],
   },
   isFetching: false,
   isInitialLoading: false,
