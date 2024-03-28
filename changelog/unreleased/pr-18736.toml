@@ -7,4 +7,6 @@ details.user = """
 A variety of inconsistencies in REST API permission checks have been resolved.
 
  * The endpoint `DELETE /authz/roles/{roleId}` checked `roles:edit` instead of the correct `roles:delete:{roleId}` permission.
+ * The endpoint `DELETE /system/jobs/acknowledge/{jobId}` now requires the `systemjobs:read` permission.
+
 """
