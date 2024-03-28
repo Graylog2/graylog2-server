@@ -91,7 +91,7 @@
         <airline.version>3.0.0</airline.version>
         <amqp-client.version>5.20.0</amqp-client.version>
         <antlr.version>4.13.1</antlr.version>
-        <apache-directory-version>1.0.3</apache-directory-version>
+        <apache-directory-version>2.1.6</apache-directory-version>
         <apache-httpclient.version>4.5.14</apache-httpclient.version>
         <apache-httpcore.version>4.4.16</apache-httpcore.version>
         <asm.version>9.6</asm.version>
