@@ -14,12 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.datanode;
+package org.graylog2.indexer.migration;
 
-import java.util.List;
+import org.joda.time.DateTime;
 
-public record RemoteReindexAllowlistEvent(List<String> allowlist, ACTION action) {
-    public enum ACTION {
-        ADD, REMOVE
+import java.util.Locale;
+
+public record LogEntry(DateTime timestamp, LogLevel logLevel, String message) {
+    @Override
+    public String toString() {
+        return String.format(Locale.ROOT, "%s %s : %s", timestamp.toLocalDateTime(), logLevel, message);
     }
 }

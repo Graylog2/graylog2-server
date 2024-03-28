@@ -22,14 +22,18 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RemoteReindexIndex {
     private final String name;
     private Status status;
     private final DateTime created;
     private Duration took;
-    private Integer batches;
+    private TaskStatus taskStatus;
     private String errorMsg;
+    private String taskID;
 
     public RemoteReindexIndex(final String name, final Status status) {
         this.name = name;
@@ -55,24 +59,33 @@ public class RemoteReindexIndex {
     }
 
 
-    public Integer getBatches() {
-        return batches;
+     public TaskStatus getTaskStatus() {
+        return taskStatus;
     }
 
 
     public String getErrorMsg() {
-        return errorMsg;
+        return Optional.ofNullable(taskStatus)
+                .map(TaskStatus::failures)
+                .map(failures -> String.join(";", failures))
+                .orElse(null);
     }
 
-    public void onError(String errorMsg) {
+    public void onError(Duration duration, TaskStatus taskStatus) {
         this.status = Status.ERROR;
-        this.errorMsg = errorMsg;
+        this.took = duration;
+        this.taskStatus = taskStatus;
     }
 
-    public void onFinished(Duration duration, int batches) {
+    public void onFinished(Duration duration, TaskStatus taskStatus) {
         this.status = Status.FINISHED;
         this.took = duration;
-        this.batches = batches;
+        this.taskStatus = taskStatus;
+    }
+
+    public void setTask(String taskID) {
+        this.status = Status.RUNNING;
+        this.taskID = taskID;
     }
 
     @Override
@@ -81,5 +94,9 @@ public class RemoteReindexIndex {
                 "name='" + name + '\'' +
                 ", status=" + status +
                 '}';
+    }
+
+    public String getTaskID() {
+        return taskID;
     }
 }

@@ -21,14 +21,13 @@ import org.graylog2.indexer.migration.IndexerConnectionCheckResult;
 import org.graylog2.indexer.migration.RemoteReindexMigration;
 
 import java.net.URI;
-import java.util.List;
 
 public interface RemoteReindexingMigrationAdapter {
     enum Status {
         NOT_STARTED, STARTING, RUNNING, ERROR, FINISHED
     }
 
-    RemoteReindexMigration start(URI uri, String username, String password, List<String> indices, boolean synchronous);
+    RemoteReindexMigration start(RemoteReindexRequest request);
 
     RemoteReindexMigration status(@NotNull String migrationID);
 

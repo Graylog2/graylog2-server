@@ -18,11 +18,13 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 import { Col, Panel, PanelGroup } from 'components/bootstrap';
-import type { MigrationActions, StepArgs, MigrationStateItem, MigrationStepComponentProps } from 'components/datanode/Types';
-import {
-  IN_PLACE_MIGRATION_STEPS,
-  MIGRATION_STATE,
-} from 'components/datanode/Constants';
+import type {
+  MigrationActions,
+  StepArgs,
+  MigrationStateItem,
+  MigrationStepComponentProps,
+} from 'components/datanode/Types';
+import { IN_PLACE_MIGRATION_STEPS, MIGRATION_STATE } from 'components/datanode/Constants';
 import Welcome from 'components/datanode/migrations/in-place/Welcome';
 import CertificatesProvisioning from 'components/datanode/migrations/common/CertificatesProvisioning';
 import JournalDowntimeWarning from 'components/datanode/migrations/in-place/JournalDowntimeWarning';
@@ -71,7 +73,7 @@ const InPlaceMigration = ({ currentStep, onTriggerStep }: MigrationStepComponent
     switch (step) {
       case MIGRATION_STATE.ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE.key:
         return <Welcome currentStep={currentStep} onTriggerStep={onStepComplete} />;
-      case MIGRATION_STATE.DIRECTORY_COMPATIBILITY_CHECK_PAGE2.key:
+      case MIGRATION_STATE.DIRECTORY_COMPATIBILITY_CHECK_PAGE.key:
         return <CompatibilityCheckStep currentStep={currentStep} onTriggerStep={onStepComplete} />;
       case MIGRATION_STATE.PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES.key:
       case MIGRATION_STATE.PROVISION_ROLLING_UPGRADE_NODES_RUNNING.key:

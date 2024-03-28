@@ -14,12 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.datanode;
+package org.graylog2.indexer.datanode;
 
+import java.net.URI;
 import java.util.List;
 
-public record RemoteReindexAllowlistEvent(List<String> allowlist, ACTION action) {
-    public enum ACTION {
-        ADD, REMOVE
-    }
+public record RemoteReindexRequest(String allowlist,
+                                   URI uri,
+                                   String username,
+                                   String password,
+                                   List<String> indices,
+                                   int threadsCount) {
 }
