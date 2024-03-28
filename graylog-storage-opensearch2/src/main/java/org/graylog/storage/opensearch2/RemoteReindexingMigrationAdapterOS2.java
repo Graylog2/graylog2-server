@@ -202,7 +202,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     }
 
     private RemoteReindexIndex taskToIndex(String indexName, GetTaskResponse task) {
-        final DateTime created = new DateTime(task.task().startTimeInMillis());
+        final DateTime created = new DateTime(task.task().startTimeInMillis(), DateTimeZone.UTC);
         Duration duration = getDuration(task);
 
         IndexMigrationProgress progress = toProgress(task.task().status());
