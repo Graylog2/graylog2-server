@@ -299,6 +299,13 @@ const FilterForm = ({
     debouncedParseQuery(query, newConfig);
   };
 
+  const handleEnabledChange = (event) => {
+    const { name } = event.target;
+    const value = FormsUtils.getValueFromInput(event.target);
+    const newConfig = getUpdatedConfig(name, value);
+    handleConfigChange(name, newConfig);
+  };
+
   const hideFiltersPreview = (value) => {
     Store.set(PLUGGABLE_CONTROLS_HIDDEN_KEY, value);
     setSearchFiltersHidden(value);
@@ -492,7 +499,7 @@ const FilterForm = ({
                label="Enable"
                help="Should this event definition be executed automatically?"
                checked={defaultTo(eventDefinition.config._is_scheduled, true)}
-               onChange={handleConfigChange} />
+               onChange={handleEnabledChange} />
       </>
       )}
     </fieldset>
