@@ -16,15 +16,14 @@
  */
 package org.graylog2.plugin.inputs.transports.util;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
-import com.google.common.collect.Iterators;
-import com.google.common.io.BaseEncoding;
-import com.google.common.io.ByteStreams;
-import io.netty.handler.ssl.PemPrivateKey;
-import io.netty.handler.ssl.PemX509Certificate;
+import com.google.common.collect.ImmutableList;
+import org.bouncycastle.asn1.cms.ContentInfo;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.cms.CMSException;
+import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.openssl.PEMKeyPair;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.PKCS8Generator;
@@ -42,16 +41,6 @@ import org.bouncycastle.util.io.pem.PemObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.crypto.Cipher;
-import javax.crypto.EncryptedPrivateKeyInfo;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.KeyManagerFactory;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -63,142 +52,74 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.KeyFactory;
-import java.security.KeyStore;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.SecureRandom;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.security.spec.EncodedKeySpec;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Collection;
-import java.util.Enumeration;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.List;
 
 public class KeyUtil {
     private static final Logger LOG = LoggerFactory.getLogger(KeyUtil.class);
-    private static final Joiner JOINER = Joiner.on(",").skipNulls();
-    private static final Pattern KEY_PATTERN = Pattern.compile("-{5}BEGIN (?:(RSA|DSA|EC)? )?(ENCRYPTED )?PRIVATE KEY-{5}\\r?\\n([A-Z0-9a-z+/\\r\\n]+={0,2})\\r?\\n-{5}END (?:(?:RSA|DSA|EC)? )?(?:ENCRYPTED )?PRIVATE KEY-{5}\\r?\\n$", Pattern.MULTILINE);
 
-    public static X509Certificate[] loadX509Certificates(Path certificatePath) throws CertificateException, IOException {
-        return loadCertificates(certificatePath).stream()
-                .filter(certificate -> certificate instanceof X509Certificate)
-                .map(certificate -> (X509Certificate) certificate)
-                .toArray(X509Certificate[]::new);
+    public static X509Certificate[] loadX509Certificates(Path certificatePath) throws KeyUtilException {
+        try {
+            return loadCertificates(certificatePath).stream()
+                    .filter(certificate -> certificate instanceof X509Certificate)
+                    .map(certificate -> (X509Certificate) certificate)
+                    .toArray(X509Certificate[]::new);
+        } catch (CertificateException | IOException | CMSException e) {
+            throw new KeyUtilException(e);
+        }
     }
 
-    public static Collection<? extends Certificate> loadCertificates(Path certificatePath) throws CertificateException, IOException {
-        final CertificateFactory cf = CertificateFactory.getInstance("X.509");
+    public static Collection<? extends Certificate> loadCertificates(Path certificatePath) throws CertificateException, IOException, CMSException {
         File certFile = certificatePath.toFile();
 
         if (certFile.isDirectory()) {
-            final ByteArrayOutputStream certStream = new ByteArrayOutputStream();
+            final ImmutableList.Builder<X509Certificate> certs = ImmutableList.builder();
             try (DirectoryStream<Path> ds = Files.newDirectoryStream(certFile.toPath())) {
                 for (Path f : ds) {
-                    certStream.write(Files.readAllBytes(f));
+                    certs.addAll(extractCertsFromPemFile(f));
                 }
             }
-            return cf.generateCertificates(new ByteArrayInputStream(certStream.toByteArray()));
+            return certs.build();
         } else {
-            try (InputStream inputStream = Files.newInputStream(certificatePath)) {
-                return cf.generateCertificates(inputStream);
-            }
+            return extractCertsFromPemFile(certificatePath);
         }
     }
 
-    public static KeyManager[] initKeyStore(File tlsKeyFile, File tlsCertFile, String tlsKeyPassword)
-            throws IOException, GeneralSecurityException {
-        final KeyStore ks = KeyStore.getInstance("JKS");
-        ks.load(null, null);
-        final Collection<? extends Certificate> certChain = loadCertificates(tlsCertFile.toPath());
-        final PrivateKey privateKey = loadPrivateKey(tlsKeyFile, tlsKeyPassword);
-        final char[] password = Strings.nullToEmpty(tlsKeyPassword).toCharArray();
-        ks.setKeyEntry("key", privateKey, password, certChain.toArray(new Certificate[certChain.size()]));
+    private static List<X509Certificate> extractCertsFromPemFile(Path pemFile) throws IOException, CMSException, CertificateException {
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Private key file: {}", tlsKeyFile);
-            LOG.debug("Certificate file: {}", tlsCertFile);
-            LOG.debug("Aliases: {}", join(ks.aliases()));
-        }
+        final ImmutableList.Builder<X509Certificate> certs = ImmutableList.builder();
 
-        final KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-        kmf.init(ks, password);
+        final JcaX509CertificateConverter converter = new JcaX509CertificateConverter();
+        try (InputStream inputStream = Files.newInputStream(pemFile);
+             InputStreamReader fileReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+             PEMParser pemParser = new PEMParser(fileReader)) {
 
-        return kmf.getKeyManagers();
-    }
+            Object object;
+            while ((object = pemParser.readObject()) != null) {
+                if (object instanceof X509CertificateHolder) {
+                    X509CertificateHolder certificateHolder = (X509CertificateHolder) object;
+                    certs.add(converter.getCertificate(certificateHolder));
 
-    private static String join(Enumeration<String> aliases) {
-        return JOINER.join(Iterators.forEnumeration(aliases));
-    }
-
-    @VisibleForTesting
-    protected static PrivateKey loadPrivateKey(File file, String password) throws IOException, GeneralSecurityException {
-        try (final InputStream is = Files.newInputStream(file.toPath())) {
-            final byte[] keyBytes = ByteStreams.toByteArray(is);
-            final String keyString = new String(keyBytes, StandardCharsets.US_ASCII);
-            final Matcher m = KEY_PATTERN.matcher(keyString);
-            byte[] encoded = keyBytes;
-
-            if (m.matches()) {
-                if (!Strings.isNullOrEmpty(m.group(1))) {
-                    throw new IllegalArgumentException("Unsupported key type PKCS#1, please convert to PKCS#8");
-                }
-
-                encoded = BaseEncoding.base64().decode(m.group(3).replaceAll("[\\r\\n]", ""));
-            }
-
-            final EncodedKeySpec keySpec = createKeySpec(encoded, password);
-            if (keySpec == null) {
-                throw new IllegalArgumentException("Unsupported key type: " + file);
-            }
-
-            final String[] keyAlgorithms = {"RSA", "DSA", "EC"};
-            for (String keyAlgorithm : keyAlgorithms) {
-                try {
-                    @SuppressWarnings("InsecureCryptoUsage") final KeyFactory keyFactory = KeyFactory.getInstance(keyAlgorithm);
-                    return keyFactory.generatePrivate(keySpec);
-                } catch (InvalidKeySpecException e) {
-                    LOG.debug("Loading {} private key from \"{}\" failed", keyAlgorithm, file, e);
+                } else if (object instanceof ContentInfo) {
+                    // PKCS#7 Files
+                    ContentInfo contentInfo = (ContentInfo) object;
+                    final CMSSignedData cmsSignedData = new CMSSignedData(contentInfo);
+                    for (X509CertificateHolder ch : cmsSignedData.getCertificates().getMatches(null)) {
+                        certs.add(converter.getCertificate(ch));
+                    }
+                } else {
+                    LOG.debug("Ignoring non certtifacte {} in {}", object.getClass().getCanonicalName(), pemFile);
+                    // TODO remove
+                    LOG.info("Ignoring non certtifacte {} in {}", object.getClass().getCanonicalName(), pemFile);
                 }
             }
-
-            throw new IllegalArgumentException("Unsupported key type: " + file);
         }
-    }
-
-    private static PKCS8EncodedKeySpec createKeySpec(byte[] keyBytes, String password)
-            throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchPaddingException,
-            InvalidKeyException, InvalidAlgorithmParameterException {
-        if (Strings.isNullOrEmpty(password)) {
-            return new PKCS8EncodedKeySpec(keyBytes);
-        }
-
-        final EncryptedPrivateKeyInfo pkInfo = new EncryptedPrivateKeyInfo(keyBytes);
-        final SecretKeyFactory kf = SecretKeyFactory.getInstance(pkInfo.getAlgName());
-        final PBEKeySpec keySpec = new PBEKeySpec(password.toCharArray());
-        final SecretKey secretKey = kf.generateSecret(keySpec);
-
-        @SuppressWarnings("InsecureCryptoUsage") final Cipher cipher = Cipher.getInstance(pkInfo.getAlgName());
-        cipher.init(Cipher.DECRYPT_MODE, secretKey, pkInfo.getAlgParameters());
-
-        return pkInfo.getKeySpec(cipher);
-    }
-
-    public static X509Certificate readCertificate(Path path) throws IOException {
-        final byte[] bytes = Files.readAllBytes(path);
-        return PemX509Certificate.valueOf(bytes);
-    }
-
-    public static PrivateKey readPrivateKey(Path path) throws IOException {
-        final byte[] bytes = Files.readAllBytes(path);
-        return PemPrivateKey.valueOf(bytes);
+        return certs.build();
     }
 
     /**
@@ -216,7 +137,7 @@ public class KeyUtil {
             JceOpenSSLPKCS8EncryptorBuilder encryptorBuilder =
                     new JceOpenSSLPKCS8EncryptorBuilder(PKCS8Generator.AES_256_CBC)
                             .setRandom(new SecureRandom())
-                            .setPasssword(password);
+                            .setPassword(password);
             OutputEncryptor encryptor = encryptorBuilder.build();
 
             // construct object to create the PKCS8 object from the private key and encryptor
@@ -245,7 +166,15 @@ public class KeyUtil {
      * @param keyFile the key file
      * @return the corresponding private key
      */
-    public static PrivateKey privateKeyFromFile(String password, File keyFile) throws IOException, PKCSException, OperatorCreationException {
+    public static PrivateKey privateKeyFromFile(String password, File keyFile) throws KeyUtilException {
+        try {
+            return getPrivateKeyFromFile(password, keyFile);
+        } catch (IOException | PKCSException | OperatorCreationException e) {
+            throw new KeyUtilException(e);
+        }
+    }
+
+    private static PrivateKey getPrivateKeyFromFile(String password, File keyFile) throws IOException, PKCSException, OperatorCreationException {
         PrivateKey privateKey;
 
         JcaPEMKeyConverter converter = new JcaPEMKeyConverter().setProvider("BC");
@@ -268,6 +197,8 @@ public class KeyUtil {
             privateKey = converter.getPrivateKey((PrivateKeyInfo) object);
         } else if (object instanceof PEMKeyPair) {
             privateKey = converter.getPrivateKey(((PEMKeyPair) object).getPrivateKeyInfo());
+        } else if (object == null) {
+            throw new PKCSException("No key found in PEM file <" + keyFile + ">");
         } else {
             throw new PKCSException("Encountered unexpected object type: " + object.getClass().getName());
         }
