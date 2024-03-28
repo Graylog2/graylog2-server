@@ -230,6 +230,8 @@ public class GelfCodec extends AbstractCodec {
                 continue;
             } else if (value.isTextual()) {
                 fieldValue = value.asText();
+            } else if (value.isBoolean()) {
+                fieldValue = value.asBoolean();
             } else {
                 log.debug("Field [{}] has unknown value type. Skipping.", key);
                 continue;
