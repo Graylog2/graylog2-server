@@ -59,6 +59,7 @@ const IndicesConfiguration = ({ indexSet } : Props) => {
         </Col>
         <Col md={6}>
           <IndexMaintenanceStrategiesSummary config={retentionConfig}
+                                             rotationStrategyClass={rotationConfig.strategy}
                                              pluginExports={PluginStore.exports('indexRetentionConfig')} />
         </Col>
       </Row>

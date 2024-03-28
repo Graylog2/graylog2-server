@@ -37,8 +37,6 @@ import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
 import org.graylog2.indexer.migration.RemoteReindexMigration;
 import org.graylog2.shared.security.RestPermissions;
 
-import java.net.MalformedURLException;
-
 @Path("/remote-reindex-migration")
 @RequiresAuthentication
 @Consumes(MediaType.APPLICATION_JSON)
@@ -57,8 +55,8 @@ public class RemoteReindexResource {
     @NoAuditEvent("No Audit Event needed")
     @RequiresPermissions(RestPermissions.DATANODE_MIGRATION)
     @ApiOperation(value = "by remote reindexing", notes = "configure the host/credentials you want to use to migrate data from")
-    public String migrate(@ApiParam(name = "remote configuration") @NotNull @Valid RemoteReindexParams params) throws MalformedURLException {
-        final RemoteReindexRequest req = new RemoteReindexRequest(params.hostname(), params.user(), params.password(), params.indices(), params.threadsCount());
+    public String migrate(@ApiParam(name = "remote configuration") @NotNull @Valid RemoteReindexParams params) {
+        final RemoteReindexRequest req = new RemoteReindexRequest(params.allowlist(), params.hostname(), params.user(), params.password(), params.indices(), params.threadsCount());
         return migrationService.start(req);
     }
 
