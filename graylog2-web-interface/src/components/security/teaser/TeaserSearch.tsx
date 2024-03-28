@@ -26,6 +26,7 @@ import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayout
 import type { SearchJobResult } from 'views/logic/SearchResult';
 import type { SearchJson } from 'views/logic/search/Search';
 import StaticSearch from 'views/components/StaticSearch';
+import Banner from 'components/security/teaser/Banner';
 
 type HotspotMeta = {
   positionX: string,
@@ -81,6 +82,7 @@ const TeaserSearch = ({ searchJson, viewJson, searchJobResult, hotspots }: Props
 
   return (
     <SearchPageLayoutProvider value={searchPageLayout}>
+      <Banner />
       <StaticSearch searchJson={searchJson}
                     viewJson={viewJson}
                     searchJobResult={searchJobResult} />
