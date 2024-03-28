@@ -100,7 +100,7 @@ describe('InPlaceMigration', () => {
   });
 
   it('should render CompatibilityCheckStep step', async () => {
-    renderStep(MIGRATION_STATE.DIRECTORY_COMPATIBILITY_CHECK_PAGE2.key);
+    renderStep(MIGRATION_STATE.DIRECTORY_COMPATIBILITY_CHECK_PAGE.key);
 
     await screen.findByRole('button', {
       name: /2. Directory compatibility check/i,

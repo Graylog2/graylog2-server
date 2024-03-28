@@ -86,7 +86,7 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "opensearch_location")
     private String opensearchDistributionRoot = "dist";
 
-    @Parameter(value = "opensearch_data_location", required = true, validators = DirectoryReadableValidator.class)
+    @Parameter(value = "opensearch_data_location", required = true)
     private Path opensearchDataLocation = Path.of("datanode/data");
 
     @Parameter(value = "opensearch_logs_location", required = true, validators = DirectoryWritableValidator.class)

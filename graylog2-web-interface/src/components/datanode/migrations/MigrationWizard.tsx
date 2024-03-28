@@ -17,7 +17,6 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
-import CompatibilityCheckStep from 'components/datanode/migrations/CompatibilityCheckStep';
 import { Spinner, Wizard } from 'components/common';
 import CAStep from 'components/datanode/migrations/CAStep';
 import ManualMigrationStep from 'components/datanode/migrations/ManualMigrationStep';
@@ -54,11 +53,6 @@ const MigrationWizard = () => {
       key: MIGRATION_STATE.MIGRATION_WELCOME_PAGE.key,
       title: MIGRATION_STATE.MIGRATION_WELCOME_PAGE.description,
       component: <MigrationWelcomeStep currentStep={currentStep} onTriggerStep={onTriggerStep} />,
-    },
-    {
-      key: MIGRATION_STATE.DIRECTORY_COMPATIBILITY_CHECK_PAGE.key,
-      title: MIGRATION_STATE.DIRECTORY_COMPATIBILITY_CHECK_PAGE.description,
-      component: <CompatibilityCheckStep currentStep={currentStep} onTriggerStep={onTriggerStep} />,
     },
     {
       key: MIGRATION_STATE.CA_CREATION_PAGE.key,
