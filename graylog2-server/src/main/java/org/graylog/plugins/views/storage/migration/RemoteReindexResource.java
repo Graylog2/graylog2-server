@@ -32,6 +32,7 @@ import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.indexer.datanode.RemoteReindexRequest;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
 import org.graylog2.indexer.migration.RemoteReindexMigration;
 import org.graylog2.shared.security.RestPermissions;
@@ -54,8 +55,9 @@ public class RemoteReindexResource {
     @NoAuditEvent("No Audit Event needed")
     @RequiresPermissions(RestPermissions.DATANODE_MIGRATION)
     @ApiOperation(value = "by remote reindexing", notes = "configure the host/credentials you want to use to migrate data from")
-    public RemoteReindexMigration migrate(@ApiParam(name = "remote configuration") @NotNull @Valid RemoteReindexRequest request) {
-        return migrationService.start(request.allowlist(), request.hostname(), request.user(), request.password(), request.indices(), request.synchronous());
+    public RemoteReindexMigration migrate(@ApiParam(name = "remote configuration") @NotNull @Valid RemoteReindexParams params) {
+        final RemoteReindexRequest req = new RemoteReindexRequest(params.allowlist(), request.hostname(), params.user(), params.password(), params.indices(), params.threadsCount());
+        return migrationService.start(req);
     }
 
     @GET
