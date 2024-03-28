@@ -50,7 +50,11 @@ public abstract class SearchVersion {
     public abstract Version version();
 
     public SearchVersion major() {
-        return create(distribution(), Version.forIntegers(version().getMajorVersion(), 0, 0));
+        return create(distribution(), version().toBuilder()
+                .setVersionCore(version().majorVersion())
+                .unsetPreReleaseVersion()
+                .unsetBuildMetadata()
+                .build());
     }
 
     public boolean satisfies(final Distribution distribution, final String expression) {
@@ -79,7 +83,7 @@ public abstract class SearchVersion {
     }
 
     public static SearchVersion elasticsearch(final int major, final int minor, final int patch) {
-        return create(Distribution.ELASTICSEARCH, Version.forIntegers(major, minor, patch));
+        return create(Distribution.ELASTICSEARCH, Version.of(major, minor, patch));
     }
 
     public static SearchVersion opensearch(final String version) {
@@ -91,7 +95,7 @@ public abstract class SearchVersion {
     }
 
     public static SearchVersion opensearch(final int major, final int minor, final int patch) {
-        return create(Distribution.OPENSEARCH, Version.forIntegers(major, minor, patch));
+        return create(Distribution.OPENSEARCH, Version.of(major, minor, patch));
     }
 
     public String encode() {
@@ -101,7 +105,7 @@ public abstract class SearchVersion {
     public static SearchVersion decode(final String searchServerIdentifier) {
         final String[] parts = searchServerIdentifier.split(":");
         if (parts.length == 2) {
-            return SearchVersion.create(Distribution.valueOf(parts[0].toUpperCase(Locale.ROOT)), Version.valueOf((parts[1])));
+            return SearchVersion.create(Distribution.valueOf(parts[0].toUpperCase(Locale.ROOT)), Version.parse((parts[1])));
         } else {
             return SearchVersion.elasticsearch(searchServerIdentifier);
         }
@@ -125,7 +129,7 @@ public abstract class SearchVersion {
 
     protected static com.github.zafarkhaja.semver.Version parseVersion(final String version) {
         try {
-            return Version.valueOf(version);
+            return Version.parse(version);
         } catch (Exception e) {
             throw new ElasticsearchException("Unable to parse Elasticsearch version: " + version, e);
         }
