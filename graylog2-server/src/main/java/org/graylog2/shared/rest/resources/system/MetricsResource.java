@@ -25,23 +25,9 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog2.audit.jersey.NoAuditEvent;
-import org.graylog2.rest.models.system.metrics.requests.MetricsReadRequest;
-import org.graylog2.rest.models.system.metrics.responses.MetricNamesResponse;
-import org.graylog2.rest.models.system.metrics.responses.MetricsSummaryResponse;
-import org.graylog2.shared.metrics.MetricUtils;
-import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.shared.security.RestPermissions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jakarta.inject.Inject;
-
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
@@ -49,6 +35,18 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.rest.models.system.metrics.requests.MetricsReadRequest;
+import org.graylog2.rest.models.system.metrics.responses.MetricNamesResponse;
+import org.graylog2.rest.models.system.metrics.responses.MetricsSummaryResponse;
+import org.graylog2.shared.metrics.MetricUtils;
+import org.graylog2.shared.rest.InlinePermissionCheck;
+import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -116,6 +114,7 @@ public class MetricsResource extends RestResource {
             @ApiResponse(code = 400, message = "Malformed body")
     })
     @NoAuditEvent("only used to retrieve multiple metrics")
+    @InlinePermissionCheck
     public MetricsSummaryResponse multipleMetrics(@ApiParam(name = "Requested metrics", required = true)
                                                   @Valid @NotNull MetricsReadRequest request) {
         final Map<String, Metric> metrics = metricRegistry.getMetrics();
@@ -144,6 +143,7 @@ public class MetricsResource extends RestResource {
             @ApiResponse(code = 404, message = "No such metric namespace")
     })
     @Produces(MediaType.APPLICATION_JSON)
+    @InlinePermissionCheck
     public MetricsSummaryResponse byNamespace(@ApiParam(name = "namespace", required = true)
                                               @PathParam("namespace") String namespace) {
         final List<Map<String, Object>> metrics = Lists.newArrayList();

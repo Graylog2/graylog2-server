@@ -22,6 +22,19 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -32,26 +45,11 @@ import org.graylog2.rest.RemoteInterfaceProvider;
 import org.graylog2.rest.models.system.metrics.requests.MetricsReadRequest;
 import org.graylog2.rest.models.system.metrics.responses.MetricNamesResponse;
 import org.graylog2.rest.models.system.metrics.responses.MetricsSummaryResponse;
+import org.graylog2.shared.rest.NoPermissionCheckRequired;
 import org.graylog2.shared.rest.resources.ProxiedResource;
 import org.graylog2.shared.rest.resources.system.RemoteMetricsResource;
 import org.graylog2.shared.security.RestPermissions;
 import retrofit2.Response;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.WebApplicationException;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.HttpHeaders;
-import jakarta.ws.rs.core.MediaType;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
@@ -99,6 +97,7 @@ public class ClusterNodeMetricsResource extends ProxiedResource {
             @ApiResponse(code = 400, message = "Malformed body")
     })
     @NoAuditEvent("only used to get multiple metric values")
+    @NoPermissionCheckRequired
     public MetricsSummaryResponse multipleMetrics(@ApiParam(name = "nodeId", value = "The id of the node whose metrics we want.", required = true)
                                                   @PathParam("nodeId") String nodeId,
                                                   @ApiParam(name = "Requested metrics", required = true)
@@ -118,6 +117,7 @@ public class ClusterNodeMetricsResource extends ProxiedResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such metric namespace")
     })
+    @NoPermissionCheckRequired
     public MetricsSummaryResponse byNamespace(@ApiParam(name = "nodeId", value = "The id of the node whose metrics we want.", required = true)
                                               @PathParam("nodeId") String nodeId,
                                               @ApiParam(name = "namespace", required = true)
