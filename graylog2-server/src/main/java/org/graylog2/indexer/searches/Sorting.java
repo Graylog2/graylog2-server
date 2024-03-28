@@ -19,6 +19,7 @@ package org.graylog2.indexer.searches;
 import org.graylog2.plugin.Message;
 
 import java.util.Locale;
+import java.util.Optional;
 
 public class Sorting {
 
@@ -31,17 +32,35 @@ public class Sorting {
 
     private final String field;
     private final Direction direction;
+    /**
+     * Specifying an unmappedType can be used to allow sorting by unmapped fields, which is not supported by default.
+     * See https://opensearch.org/docs/2.2/opensearch/search/sort/#ignoring-unmapped-fields.
+     */
+    private final String unmappedType;
+
+    public Sorting(String field, Direction direction, String unmappedType) {
+        this.field = field;
+        this.direction = direction;
+        this.unmappedType = unmappedType;
+    }
 
     public Sorting(String field, Direction direction) {
         this.field = field;
         this.direction = direction;
+        this.unmappedType = null;
     }
 
     public String getField() {
         return field;
     }
 
-    public Direction getDirection() { return this.direction; }
+    public Direction getDirection() {
+        return this.direction;
+    }
+
+    public Optional<String> getUnmappedType() {
+        return Optional.ofNullable(this.unmappedType);
+    }
 
     public static Sorting fromApiParam(String param) {
         if (param == null || !param.contains(":")) {

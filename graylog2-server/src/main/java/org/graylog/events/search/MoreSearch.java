@@ -85,7 +85,9 @@ public class MoreSearch {
         checkArgument(forbiddenSourceStreams != null, "forbiddenSourceStreams cannot be null");
 
         final Sorting.Direction sortDirection = parameters.sortDirection() == EventsSearchParameters.SortDirection.ASC ? Sorting.Direction.ASC : Sorting.Direction.DESC;
-        final Sorting sorting = new Sorting(parameters.sortBy(), sortDirection);
+        final Sorting sorting = parameters.sortUnmappedType().isPresent() ?
+                new Sorting(parameters.sortBy(), sortDirection, parameters.sortUnmappedType().get())
+                : new Sorting(parameters.sortBy(), sortDirection);
         final String queryString = parameters.query().trim();
         final Set<String> affectedIndices = getAffectedIndices(eventStreams, parameters.timerange());
 
