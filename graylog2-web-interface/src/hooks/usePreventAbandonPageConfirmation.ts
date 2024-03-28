@@ -14,12 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.datanode;
+import { useEffect } from 'react';
 
-import java.util.List;
+const usePreventAbandonPageConfirmation = () => {
+  useEffect(() => {
+    const handleBeforeUnload = (event) => {
+      event.preventDefault();
+      // eslint-disable-next-line no-param-reassign
+      event.returnValue = '';
+    };
 
-public record RemoteReindexAllowlistEvent(List<String> allowlist, ACTION action) {
-    public enum ACTION {
-        ADD, REMOVE
-    }
-}
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
+};
+
+export default usePreventAbandonPageConfirmation;

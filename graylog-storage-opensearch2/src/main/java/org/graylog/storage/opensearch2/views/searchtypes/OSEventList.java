@@ -31,6 +31,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.index.query.BoolQueryBuilde
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.SearchHit;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregations;
+import org.graylog.shaded.opensearch2.org.opensearch.search.sort.FieldSortBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.sort.SortOrder;
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
 
@@ -52,11 +53,12 @@ public class OSEventList implements EventListStrategy {
     public void doGenerateQueryPart(Query query, EventList eventList,
                                     OSGeneratedQueryContext queryContext) {
         final var searchSourceBuilder = queryContext.searchSourceBuilder(eventList);
-        final var sortConfig = eventList.sortWithDefault();
-        searchSourceBuilder.sort(sortConfig.field(), toSortOrder(sortConfig.direction()));
+        final FieldSortBuilder sortConfig = sortConfig(eventList);
+        searchSourceBuilder.sort(sortConfig);
         final var queryBuilder = searchSourceBuilder.query();
         if (!eventList.attributes().isEmpty() && queryBuilder instanceof BoolQueryBuilder boolQueryBuilder) {
             final var filterQueries = eventList.attributes().stream()
+                    .filter(attribute -> EventList.KNOWN_ATTRIBUTES.contains(attribute.field()))
                     .flatMap(attribute -> attribute.toQueryStrings().stream())
                     .toList();
 
@@ -75,6 +77,13 @@ public class OSEventList implements EventListStrategy {
             case ASC -> SortOrder.ASC;
             case DESC -> SortOrder.DESC;
         };
+    }
+
+    protected FieldSortBuilder sortConfig(EventList eventList) {
+        final var sortConfig = eventList.sort()
+                .filter(sort -> EventList.KNOWN_ATTRIBUTES.contains(sort.field()))
+                .orElse(EventList.DEFAULT_SORT);
+        return new FieldSortBuilder(sortConfig.field()).order(toSortOrder(sortConfig.direction()));
     }
 
     protected List<Map<String, Object>> extractResult(SearchResponse result) {
