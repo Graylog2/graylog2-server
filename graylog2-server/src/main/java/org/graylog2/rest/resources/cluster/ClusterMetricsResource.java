@@ -22,20 +22,10 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.audit.jersey.NoAuditEvent;
-import org.graylog2.cluster.NodeService;
-import org.graylog2.rest.RemoteInterfaceProvider;
-import org.graylog2.rest.models.system.metrics.requests.MetricsReadRequest;
-import org.graylog2.shared.rest.resources.ProxiedResource;
-import org.graylog2.shared.rest.resources.system.RemoteMetricsResource;
-
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-
 import jakarta.ws.rs.NotAuthorizedException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -45,6 +35,14 @@ import jakarta.ws.rs.container.Suspended;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.cluster.NodeService;
+import org.graylog2.rest.RemoteInterfaceProvider;
+import org.graylog2.rest.models.system.metrics.requests.MetricsReadRequest;
+import org.graylog2.shared.rest.NoPermissionCheckRequired;
+import org.graylog2.shared.rest.resources.ProxiedResource;
+import org.graylog2.shared.rest.resources.system.RemoteMetricsResource;
 
 import java.time.Duration;
 import java.util.concurrent.ExecutorService;
@@ -78,6 +76,7 @@ public class ClusterMetricsResource extends ProxiedResource {
             @ApiResponse(code = 400, message = "Malformed body")
     })
     @NoAuditEvent("only used to retrieve metrics of all nodes")
+    @NoPermissionCheckRequired
     public void multipleMetricsAllNodes(@ApiParam(name = "Requested metrics", required = true)
                                         @Valid @NotNull MetricsReadRequest request,
                                         @Suspended AsyncResponse asyncResponse) {
