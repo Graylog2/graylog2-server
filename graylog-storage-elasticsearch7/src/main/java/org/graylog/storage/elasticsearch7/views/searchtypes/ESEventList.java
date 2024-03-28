@@ -31,6 +31,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.BoolQuery
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.SearchHit;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.Aggregations;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.sort.FieldSortBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.sort.SortOrder;
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
 
@@ -52,10 +53,8 @@ public class ESEventList implements ESSearchTypeHandler<EventList> {
     public void doGenerateQueryPart(Query query, EventList eventList,
                                     ESGeneratedQueryContext queryContext) {
         final var searchSourceBuilder = queryContext.searchSourceBuilder(eventList);
-        final var sortConfig = eventList.sort()
-                .filter(sort -> EventList.KNOWN_ATTRIBUTES.contains(sort.field()))
-                .orElse(EventList.DEFAULT_SORT);
-        searchSourceBuilder.sort(sortConfig.field(), toSortOrder(sortConfig.direction()));
+        final FieldSortBuilder sortConfig = sortConfig(eventList);
+        searchSourceBuilder.sort(sortConfig);
         final var queryBuilder = searchSourceBuilder.query();
         if (!eventList.attributes().isEmpty() && queryBuilder instanceof BoolQueryBuilder boolQueryBuilder) {
             final var filterQueries = eventList.attributes().stream()
@@ -78,6 +77,13 @@ public class ESEventList implements ESSearchTypeHandler<EventList> {
             case ASC -> SortOrder.ASC;
             case DESC -> SortOrder.DESC;
         };
+    }
+
+    protected FieldSortBuilder sortConfig(EventList eventList) {
+        final var sortConfig = eventList.sort()
+                .filter(sort -> EventList.KNOWN_ATTRIBUTES.contains(sort.field()))
+                .orElse(EventList.DEFAULT_SORT);
+        return new FieldSortBuilder(sortConfig.field()).order(toSortOrder(sortConfig.direction()));
     }
 
     protected List<Map<String, Object>> extractResult(SearchResponse result) {
