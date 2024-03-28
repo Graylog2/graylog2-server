@@ -199,6 +199,9 @@ public class Configuration extends CaConfiguration {
     @Parameter(value = "is_cloud")
     private boolean isCloud = false;
 
+    @Parameter(value = "cloud_oidc_provider")
+    private String cloudOidcProvider = "okta";
+
     @Parameter(value = "auto_restart_inputs")
     private boolean autoRestartInputs = false;
 
@@ -341,6 +344,8 @@ public class Configuration extends CaConfiguration {
     public boolean isCloud() {
         return isCloud;
     }
+
+    public String getCloudOidcProvider() { return cloudOidcProvider; }
 
     public boolean getAutoRestartInputs() {
         return autoRestartInputs;
