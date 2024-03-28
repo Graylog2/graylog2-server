@@ -24,30 +24,10 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog.scheduler.rest.JobResourceHandlerService;
-import org.graylog.security.UserContext;
-import org.graylog2.audit.AuditEventTypes;
-import org.graylog2.audit.jersey.AuditEvent;
-import org.graylog2.plugin.system.NodeId;
-import org.graylog2.rest.models.system.SystemJobSummary;
-import org.graylog2.rest.models.system.jobs.requests.TriggerRequest;
-import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.shared.security.RestPermissions;
-import org.graylog2.system.jobs.NoSuchJobException;
-import org.graylog2.system.jobs.SystemJob;
-import org.graylog2.system.jobs.SystemJobConcurrencyException;
-import org.graylog2.system.jobs.SystemJobFactory;
-import org.graylog2.system.jobs.SystemJobManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jakarta.inject.Inject;
-
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -61,6 +41,24 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog.scheduler.rest.JobResourceHandlerService;
+import org.graylog.security.UserContext;
+import org.graylog2.audit.AuditEventTypes;
+import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.plugin.system.NodeId;
+import org.graylog2.rest.models.system.SystemJobSummary;
+import org.graylog2.rest.models.system.jobs.requests.TriggerRequest;
+import org.graylog2.shared.rest.InlinePermissionCheck;
+import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.system.jobs.NoSuchJobException;
+import org.graylog2.system.jobs.SystemJob;
+import org.graylog2.system.jobs.SystemJobConcurrencyException;
+import org.graylog2.system.jobs.SystemJobFactory;
+import org.graylog2.system.jobs.SystemJobManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -93,6 +91,7 @@ public class SystemJobResource extends RestResource {
     @Timed
     @ApiOperation(value = "List currently running jobs")
     @Produces(MediaType.APPLICATION_JSON)
+    @InlinePermissionCheck
     public Map<String, List<SystemJobSummary>> list() {
         final List<SystemJobSummary> jobs = Lists.newArrayListWithCapacity(systemJobManager.getRunningJobs().size());
 
@@ -125,6 +124,7 @@ public class SystemJobResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Job not found.")
     })
+    @InlinePermissionCheck
     public SystemJobSummary get(@ApiParam(name = "jobId", required = true)
                                 @PathParam("jobId") @NotEmpty String jobId) {
         // TODO jobId is ephemeral, this is not a good key for permission checks. we should use the name of the job type (but there is no way to get it yet)
@@ -159,6 +159,7 @@ public class SystemJobResource extends RestResource {
             @ApiResponse(code = 403, message = "Maximum concurrency level of this systemjob type reached.")
     })
     @AuditEvent(type = AuditEventTypes.SYSTEM_JOB_START)
+    @InlinePermissionCheck
     public Response trigger(@ApiParam(name = "JSON body", required = true)
                             @Valid @NotNull TriggerRequest tr) {
         // TODO cleanup jobId vs jobName checking in permissions
@@ -188,6 +189,7 @@ public class SystemJobResource extends RestResource {
     @ApiOperation(value = "Cancel running job")
     @Produces(MediaType.APPLICATION_JSON)
     @AuditEvent(type = AuditEventTypes.SYSTEM_JOB_STOP)
+    @InlinePermissionCheck
     public SystemJobSummary cancel(@ApiParam(name = "jobId", required = true) @PathParam("jobId") @NotEmpty String jobId) {
         SystemJob systemJob = systemJobManager.getRunningJobs().get(jobId);
         if (systemJob == null) {
@@ -219,8 +221,11 @@ public class SystemJobResource extends RestResource {
     @Path("/acknowledge/{jobId}")
     @ApiOperation(value = "Acknowledge job with the given ID")
     @AuditEvent(type = AuditEventTypes.SYSTEM_JOB_ACKNOWLEDGE)
+    @InlinePermissionCheck
     public Response acknowledgeJob(@Context UserContext userContext,
                                    @ApiParam(name = "jobId", required = true) @PathParam("jobId") @NotEmpty String jobId) {
+        // SYSTEMJOBS_READ is appropriate because this only dismisses the message that the job has run, it does not cancel the job.
+        checkPermission(RestPermissions.SYSTEMJOBS_READ, jobId);
         final int n = jobResourceHandlerService.acknowledgeJob(userContext, jobId);
         if (n < 1) {
             throw new NotFoundException("System job with ID <" + jobId + "> not found!");
