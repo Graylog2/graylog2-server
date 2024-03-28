@@ -17,12 +17,14 @@
 package org.graylog2.shared.rest.exceptionmappers;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
-import org.graylog2.plugin.rest.ApiError;
-
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
+import org.graylog2.plugin.rest.ApiError;
+
+import java.util.stream.Collectors;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static jakarta.ws.rs.core.Response.status;
@@ -31,8 +33,38 @@ import static jakarta.ws.rs.core.Response.status;
 public class JsonMappingExceptionMapper implements ExceptionMapper<JsonMappingException> {
     @Override
     public Response toResponse(JsonMappingException e) {
-        final String message = firstNonNull(e.getMessage(), "Couldn't process JSON input");
+        final String message = errorWithJsonPath(e);
         final ApiError apiError = ApiError.create(message);
         return status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(apiError).build();
+    }
+
+    private String errorPath(final JsonMappingException e) {
+        final String pathToErrorField = e.getPath().stream()
+                .map(path -> {
+                    final var fieldName = path.getFieldName();
+                    if (fieldName == null && path.getIndex() != -1) {
+                        return "[" + path.getIndex() + "]";
+                    }
+                    return fieldName;
+                })
+                .collect(Collectors.joining("."));
+        return "\"" + pathToErrorField + "\"";
+    }
+
+    private String errorWithJsonPath(final JsonMappingException e) {
+        final var location = "[" + e.getLocation().getLineNr() + ", " + e.getLocation().getColumnNr() + "]";
+        final var quotedPath = errorPath(e);
+        final var messagePrefix = "Error at " + quotedPath + " " + location;
+
+
+        if (e instanceof MismatchedInputException mismatchedInputException) {
+            return messagePrefix + ": Must be of type " + mismatchedInputException.getTargetType().getSimpleName();
+        } else {
+            final var cause = e.getCause();
+            final String problemMessage = firstNonNull(cause, e).getMessage();
+            final String message = firstNonNull(problemMessage, "Couldn't process JSON input");
+
+            return messagePrefix + ": " + message;
+        }
     }
 }
