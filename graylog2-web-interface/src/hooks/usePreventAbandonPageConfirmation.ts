@@ -14,11 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.rest;
+import { useEffect } from 'react';
 
-import org.graylog.datanode.filesystem.index.dto.IndexerDirectoryInformation;
+const usePreventAbandonPageConfirmation = () => {
+  useEffect(() => {
+    const handleBeforeUnload = (event) => {
+      event.preventDefault();
+      // eslint-disable-next-line no-param-reassign
+      event.returnValue = '';
+    };
 
-public record CompatibilityResult(String hostname, String opensearchVersion,
-                                  IndexerDirectoryInformation info,
-                                  java.util.List<String> compatibilityErrors) {
-}
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
+};
+
+export default usePreventAbandonPageConfirmation;
