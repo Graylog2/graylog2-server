@@ -18,6 +18,7 @@ package org.graylog2.indexer.migration;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.jsonwebtoken.lang.Collections;
 import jakarta.validation.constraints.NotNull;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter.Status;
@@ -37,42 +38,26 @@ public class RemoteReindexMigration {
 
     @JsonProperty("id")
     private final String id;
-    private List<RemoteReindexIndex> indices = new ArrayList<>();
+    private final List<RemoteReindexIndex> indices;
 
-    private final Queue<LogEntry> logs = new CircularFifoQueue<>(50);
+    private final List<LogEntry> logs;
 
     @JsonProperty("error")
     private String error;
 
-    private RemoteReindexMigration(@NotNull String migrationID) {
+    public RemoteReindexMigration(@NotNull String migrationID, List<RemoteReindexIndex> indices, List<LogEntry> logs) {
         this.id = migrationID;
-    }
-
-    public RemoteReindexMigration() {
-        this(UUID.randomUUID().toString());
+        this.indices = indices;
+        this.logs = logs;
     }
 
     public static RemoteReindexMigration nonExistent(String migrationID) {
-        return new RemoteReindexMigration(migrationID);
-    }
-
-    public RemoteReindexMigration setIndices(List<RemoteReindexIndex> indices) {
-        this.indices = indices;
-        return this;
-    }
-
-    public RemoteReindexMigration error(String message) {
-        this.error = message;
-        return this;
+        return new RemoteReindexMigration(migrationID, Collections.emptyList(), Collections.emptyList());
     }
 
     @JsonProperty("indices")
     public List<RemoteReindexIndex> indices() {
         return indices;
-    }
-
-    public Optional<RemoteReindexIndex> indexByName(String name) {
-        return indices.stream().filter(i -> Objects.equals(i.getName(), name)).findFirst();
     }
 
     public String id() {
@@ -84,10 +69,10 @@ public class RemoteReindexMigration {
         if (indices.isEmpty()) {
             return Status.NOT_STARTED;
         }
-        if (indices().stream().map(RemoteReindexIndex::getStatus).anyMatch(i -> i == Status.RUNNING)) {
+        if (indices().stream().map(RemoteReindexIndex::status).anyMatch(i -> i == Status.RUNNING)) {
             return Status.RUNNING;
         }
-        if (indices().stream().map(RemoteReindexIndex::getStatus).anyMatch(i -> i == Status.ERROR)) {
+        if (indices().stream().map(RemoteReindexIndex::status).anyMatch(i -> i == Status.ERROR)) {
             return Status.ERROR;
         }
         return Status.FINISHED;
@@ -104,16 +89,12 @@ public class RemoteReindexMigration {
             return 100; // avoid division by zero. No indices == migration is immediately done
         }
 
-        final int done = (int) indices.stream().map(RemoteReindexIndex::getStatus).filter(i -> i == Status.FINISHED || i == Status.ERROR).count();
+        final int done = (int) indices.stream().map(RemoteReindexIndex::status).filter(i -> i == Status.FINISHED || i == Status.ERROR).count();
         float percent = (100.0f / countOfIndices) * done;
         return (int) Math.ceil(percent);
     }
 
-    public void log(LogEntry log) {
-        this.logs.offer(log);
-    }
-
     public List<LogEntry> getLogs() {
-        return logs.stream().toList();
+        return Optional.ofNullable(logs).map(l -> l.stream().toList()).orElse(Collections.emptyList());
     }
 }

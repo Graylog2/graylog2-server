@@ -14,19 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer.migration;
-
-import com.fasterxml.jackson.annotation.JsonInclude;
-import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter.Status;
-import org.joda.time.DateTime;
-import org.joda.time.Duration;
-
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public record RemoteReindexIndex(String name, Status status, DateTime created, Duration took, String errorMsg) {
+package org.graylog.storage.opensearch2;
 
 
-    public static RemoteReindexIndex notStartedYet(String indexName) {
-        return new RemoteReindexIndex(indexName, Status.NOT_STARTED, null, null, null);
-    }
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * This class duplicates the original opensearch GetTaskResponse with one significant exception - it can read the
+ * error of the task, which is missing in the original response
+ * TODO: add link to an feature request issue in opensearch java client
+ */
+@JsonIgnoreProperties(ignoreUnknown = true)
+public record GetTaskResponse(@JsonProperty("completed") boolean completed, @JsonProperty("task") Task task,
+                              @JsonProperty("error") TaskError error) {
 }

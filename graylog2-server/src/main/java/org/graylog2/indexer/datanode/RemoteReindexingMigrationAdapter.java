@@ -20,6 +20,7 @@ import jakarta.validation.constraints.NotNull;
 import org.graylog2.indexer.migration.IndexerConnectionCheckResult;
 import org.graylog2.indexer.migration.RemoteReindexMigration;
 
+import java.net.MalformedURLException;
 import java.net.URI;
 
 public interface RemoteReindexingMigrationAdapter {
@@ -27,7 +28,7 @@ public interface RemoteReindexingMigrationAdapter {
         NOT_STARTED, STARTING, RUNNING, ERROR, FINISHED
     }
 
-    RemoteReindexMigration start(RemoteReindexRequest request);
+    String start(RemoteReindexRequest request);
 
     RemoteReindexMigration status(@NotNull String migrationID);
 

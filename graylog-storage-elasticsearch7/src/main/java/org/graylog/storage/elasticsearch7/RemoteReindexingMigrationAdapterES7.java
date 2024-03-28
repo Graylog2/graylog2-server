@@ -28,7 +28,7 @@ public class RemoteReindexingMigrationAdapterES7 implements RemoteReindexingMigr
     public static final String UNSUPPORTED_MESSAGE = "This operation should never be called. We remote-reindex into the DataNode that contains OpenSearch. This adapter only exists for API completeness";
 
     @Override
-    public RemoteReindexMigration start(RemoteReindexRequest request) {
+    public String start(RemoteReindexRequest request) {
         throw new UnsupportedOperationException(UNSUPPORTED_MESSAGE);
     }
 

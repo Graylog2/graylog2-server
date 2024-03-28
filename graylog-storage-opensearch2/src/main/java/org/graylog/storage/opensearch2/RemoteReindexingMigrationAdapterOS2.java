@@ -16,7 +16,6 @@
  */
 package org.graylog.storage.opensearch2;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.rholder.retry.RetryException;
 import com.github.rholder.retry.RetryerBuilder;
@@ -32,8 +31,8 @@ import okhttp3.Request;
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterGetSettingsRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterGetSettingsResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.client.tasks.GetTaskRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.client.tasks.GetTaskResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
+import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
 import org.graylog.shaded.opensearch2.org.opensearch.client.tasks.TaskSubmissionResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.common.xcontent.json.JsonXContent;
 import org.graylog.shaded.opensearch2.org.opensearch.core.common.bytes.BytesReference;
@@ -41,6 +40,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.core.xcontent.ToXContent;
 import org.graylog.shaded.opensearch2.org.opensearch.core.xcontent.XContentBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.index.reindex.ReindexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.index.reindex.RemoteInfo;
+import org.graylog.shaded.opensearch2.org.opensearch.tasks.Task;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.DataNodeStatus;
 import org.graylog2.cluster.nodes.NodeDto;
@@ -48,6 +48,9 @@ import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.datanode.RemoteReindexAllowlistEvent;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.datanode.IndexMigrationConfiguration;
+import org.graylog2.indexer.datanode.MigrationConfiguration;
+import org.graylog2.indexer.datanode.RemoteReindexMigrationService;
 import org.graylog2.indexer.datanode.RemoteReindexRequest;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
 import org.graylog2.indexer.indices.Indices;
@@ -64,20 +67,21 @@ import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -101,13 +105,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     private final ClusterEventBus eventBus;
     private final ObjectMapper objectMapper;
 
-    // TODO: this should be mongodb-persisted to ensure that any node in the cluster sees the same values. Other approach
-    // would be to use regular graylog job. Then the migration ID would be the job ID
-    // The migration and its status won't survive node restart. In case of graylog cluster with several nodes,
-    // the migration may be started on one and another node won't deliver any status, there will be no migration
-    // information available. These limitations are known and accepted for now.
-    private static final Map<String, RemoteReindexMigration> JOBS = new ConcurrentHashMap<>();
-
+    private final RemoteReindexMigrationService reindexMigrationService;
 
     @Inject
     public RemoteReindexingMigrationAdapterOS2(final OpenSearchClient client,
@@ -116,7 +114,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
                                                final Indices indices,
                                                final IndexSetRegistry indexSetRegistry,
                                                final ClusterEventBus eventBus,
-                                               final ObjectMapper objectMapper) {
+                                               final ObjectMapper objectMapper, RemoteReindexMigrationService reindexMigrationService) {
         this.client = client;
         this.httpClient = httpClient;
         this.nodeService = nodeService;
@@ -124,43 +122,41 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         this.indexSetRegistry = indexSetRegistry;
         this.eventBus = eventBus;
         this.objectMapper = objectMapper;
+        this.reindexMigrationService = reindexMigrationService;
     }
 
     @Override
-    public RemoteReindexMigration start(RemoteReindexRequest request) {
-        final RemoteReindexMigration migration = new RemoteReindexMigration();
-        JOBS.put(migration.id(), migration);
+    public String start(RemoteReindexRequest request) {
+        final MigrationConfiguration migration = reindexMigrationService.saveMigration(MigrationConfiguration.forIndices(collectIndices(request)));
+        doStartMigration(migration, request);
+        return migration.id();
+    }
+
+    private List<String> collectIndices(RemoteReindexRequest request) {
         try {
-            migration.setIndices(collectIndices(request));
-            doStartMigration(migration, request);
+            return isAllIndices(request.indices()) ? getAllIndicesFrom(request.uri(), request.username(), request.password()) : request.indices();
         } catch (MalformedURLException e) {
-            migration.error("Failed to collect indices for migration: " + e.getMessage());
+            throw new RuntimeException(e);
         }
-        return migration;
     }
 
-    private List<RemoteReindexIndex> collectIndices(RemoteReindexRequest request) throws MalformedURLException {
-        final List<String> toReindex = isAllIndices(request.indices()) ? getAllIndicesFrom(request.uri(), request.username(), request.password()) : request.indices();
-        return toReindex.stream().map(indexName -> new RemoteReindexIndex(indexName, Status.NOT_STARTED)).collect(Collectors.toList());
-    }
-
-    private void doStartMigration(RemoteReindexMigration migration, RemoteReindexRequest request) {
+    private void doStartMigration(MigrationConfiguration migration, RemoteReindexRequest request) {
         try {
             prepareCluster(request.uri());
             createIndicesInNewCluster(migration);
             startAsyncTasks(migration, request);
         } catch (Exception e) {
             LOG.error("Failed to start remote reindex migration", e);
-            migration.error(e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 
-    private void createIndicesInNewCluster(RemoteReindexMigration migration) {
+    private void createIndicesInNewCluster(MigrationConfiguration migration) {
         migration.indices().forEach(index -> {
-            if (!this.indices.exists(index.getName())) {
-                this.indices.create(index.getName(), indexSetRegistry.getForIndex(index.getName()).orElse(indexSetRegistry.getDefault()));
+            if (!this.indices.exists(index.indexName())) {
+                this.indices.create(index.indexName(), indexSetRegistry.getForIndex(index.indexName()).orElse(indexSetRegistry.getDefault()));
             } else {
-                logInfo(migration, String.format(Locale.ROOT, "Index %s does already exist in target indexer. Data will be migrated into existing index.", index.getName()));
+                logInfo(migration, String.format(Locale.ROOT, "Index %s does already exist in target indexer. Data will be migrated into existing index.", index.indexName()));
             }
         });
     }
@@ -181,18 +177,51 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         verifyRemoteReindexAllowlistSetting(reindexSourceAddress);
     }
 
-    ReindexRequest createReindexRequest(final String index, final BytesReference query, URI uri, String username, String password) {
+    private ReindexRequest createReindexRequest(final String index, final BytesReference query, URI uri, String username, String password, MigrationConfiguration migration) {
         final ReindexRequest reindexRequest = new ReindexRequest();
         reindexRequest
                 .setRemoteInfo(new RemoteInfo(uri.getScheme(), uri.getHost(), uri.getPort(), uri.getPath(), query, username, password, Map.of(), RemoteInfo.DEFAULT_SOCKET_TIMEOUT, RemoteInfo.DEFAULT_CONNECT_TIMEOUT))
-                .setSourceIndices(index).setDestIndex(index);
-
+                .setSourceIndices(index).setDestIndex(index).setShouldStoreResult(true);
         return reindexRequest;
     }
 
     @Override
     public RemoteReindexMigration status(@NotNull String migrationID) {
-        return JOBS.getOrDefault(migrationID, RemoteReindexMigration.nonExistent(migrationID));
+        return reindexMigrationService.getMigration(migrationID)
+                .map(migrationConfiguration -> {
+                    final List<RemoteReindexIndex> indices = migrationConfiguration.indices()
+                            .parallelStream()
+                            .map(indexConfig -> indexConfig.taskId().flatMap(this::getTask).map(task -> taskToIndex(indexConfig.indexName(), task))
+                                    .orElse(RemoteReindexIndex.notStartedYet(indexConfig.indexName())))
+                            .sorted(Comparator.comparing(RemoteReindexIndex::name))
+                            .collect(Collectors.toList());
+                    return new RemoteReindexMigration(migrationID, indices, migrationConfiguration.logs());
+                }).orElse(RemoteReindexMigration.nonExistent(migrationID));
+    }
+
+    private RemoteReindexIndex taskToIndex(String indexName, GetTaskResponse task) {
+        final DateTime created = new DateTime(task.task().startTimeInMillis());
+        Duration duration = getDuration(task);
+        if (task.completed()) {
+            final String errors = getErrors(task);
+            if (errors != null) {
+                return new RemoteReindexIndex(indexName, Status.ERROR, created, duration, errors);
+            } else {
+                return new RemoteReindexIndex(indexName, Status.FINISHED, created, duration, null);
+            }
+        } else {
+            return new RemoteReindexIndex(indexName, Status.RUNNING, created, duration, null);
+        }
+    }
+
+    @Nullable
+    private String getErrors(GetTaskResponse task) {
+        if (task.error() != null) {
+            return task.error().type() + ": " + task.error().reason();
+        } else if (task.task().status().hasFailures()) {
+            return String.join(";", task.task().status().failures());
+        }
+        return null;
     }
 
     @Override
@@ -285,7 +314,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         return indices == null || indices.isEmpty() || (indices.size() == 1 && "*".equals(indices.get(0)));
     }
 
-    private void startAsyncTasks(RemoteReindexMigration migration, RemoteReindexRequest request) {
+    private void startAsyncTasks(MigrationConfiguration migration, RemoteReindexRequest request) {
         final int threadsCount = Math.max(1, Math.min(request.threadsCount(), migration.indices().size()));
 
         final ExecutorService executorService = Executors.newFixedThreadPool(threadsCount, new ThreadFactoryBuilder()
@@ -294,50 +323,55 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
                 .setUncaughtExceptionHandler(new Tools.LogUncaughtExceptionHandler(LOG))
                 .build());
 
-        migration.indices().stream()
-                .filter(i -> i.getStatus() == Status.NOT_STARTED)
+        migration.indices()
                 .forEach(index -> executorService.submit(() -> executeReindexAsync(migration, request.uri(), request.username(), request.password(), index)));
     }
 
-    private void executeReindexAsync(RemoteReindexMigration migration, URI uri, String username, String password, RemoteReindexIndex index) {
-        final String indexName = index.getName();
+    private void executeReindexAsync(MigrationConfiguration migration, URI uri, String username, String password, IndexMigrationConfiguration index) {
+        final String indexName = index.indexName();
         try (XContentBuilder builder = JsonXContent.contentBuilder().prettyPrint()) {
             final BytesReference query = BytesReference.bytes(matchAllQuery().toXContent(builder, ToXContent.EMPTY_PARAMS));
             logInfo(migration, "Executing async reindex for " + indexName);
-            final TaskSubmissionResponse task = client.execute((c, requestOptions) -> c.submitReindexTask(createReindexRequest(indexName, query, uri, username, password), requestOptions));
-            migration.indexByName(indexName).ifPresent(i -> i.setTask(task.getTask()));
-
-        } catch (IOException e) {
+            final TaskSubmissionResponse task = client.execute((c, requestOptions) -> {
+                final RequestOptions withHeader = requestOptions.toBuilder()
+                        .addHeader(Task.X_OPAQUE_ID, migration.id())
+                        .build();
+                return c.submitReindexTask(createReindexRequest(indexName, query, uri, username, password, migration), withHeader);
+            });
+            reindexMigrationService.assignTask(migration.id(), indexName, task.getTask());
+            waitForTaskCompleted(migration, indexName, task.getTask());
+        } catch (Exception e) {
             final String message = "Could not reindex index: " + indexName + " - " + e.getMessage();
             logError(migration, message, e);
-            migration.indexByName(indexName).ifPresent(r -> r.onError(Duration.ZERO, TaskStatus.failure(message)));
         }
-        waitForTaskCompleted(migration, index);
     }
 
 
-    private void logInfo(RemoteReindexMigration migration, String message) {
+    private void logInfo(MigrationConfiguration migration, String message) {
         LOG.info(message);
-        migration.log(new LogEntry(DateTime.now(DateTimeZone.UTC), LogLevel.INFO, message));
+        reindexMigrationService.appendLogEntry(migration.id(), new LogEntry(DateTime.now(DateTimeZone.UTC), LogLevel.INFO, message));
     }
 
-    private void logError(RemoteReindexMigration migration, String message, Exception error) {
+    private void logError(MigrationConfiguration migration, String message, Exception error) {
         if (error != null) {
             LOG.error(message, error);
         } else {
             LOG.error(message);
         }
-        migration.log(new LogEntry(DateTime.now(DateTimeZone.UTC), LogLevel.ERROR, message));
+        reindexMigrationService.appendLogEntry(migration.id(), new LogEntry(DateTime.now(DateTimeZone.UTC), LogLevel.ERROR, message));
     }
 
-    private void waitForTaskCompleted(RemoteReindexMigration migration, RemoteReindexIndex index) {
-        Optional<GetTaskResponse> task;
-        do {
-            task = getTask(index);
-            task.ifPresentOrElse(t -> updateTaskStatus(migration, index, t), () -> LOG.warn("Couldn't find opensearch task for reindex of index {}", index.getName()));
+    private void waitForTaskCompleted(MigrationConfiguration migration, String indexName, String taskID) {
+        while (taskIsStillRunning(taskID)) {
             sleep();
-        } while (task.map(t -> !t.isCompleted()).orElse(true));
+        }
+        onTaskFinished(migration, indexName, taskID);
     }
+
+    private boolean taskIsStillRunning(String taskID) {
+        return getTask(taskID).map(t -> !t.completed()).orElse(true);
+    }
+
 
     private static void sleep() {
         try {
@@ -347,53 +381,52 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         }
     }
 
-    private void updateTaskStatus(RemoteReindexMigration migration, RemoteReindexIndex index, GetTaskResponse task) {
-        if(task.isCompleted()) {
-            onTaskFinished(migration, index, task);
-        } else {
-            LOG.debug("Remote reindex of {} is still running", index.getName());
+    private Optional<GetTaskResponse> getTask(String taskID) {
+        final Response taskResponse = client.execute((restHighLevelClient, requestOptions) -> restHighLevelClient.getLowLevelClient().performRequest(
+                new org.graylog.shaded.opensearch2.org.opensearch.client.Request("GET", "_tasks/" + taskID)
+        ));
+
+        if (taskResponse.getStatusLine().getStatusCode() == 404) {
+            return Optional.empty();
+        }
+
+        try (InputStream is = taskResponse.getEntity().getContent()) {
+            return Optional.of(objectMapper.readValue(is, GetTaskResponse.class));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    private Optional<GetTaskResponse> getTask(RemoteReindexIndex index) {
-        final String[] parts = index.getTaskID().split(":");
-        return client.execute((restHighLevelClient, requestOptions) -> restHighLevelClient.tasks().get(new GetTaskRequest(parts[0], Long.parseLong(parts[1])), requestOptions));
+    private void onTaskFinished(MigrationConfiguration migration, String index, String taskID) {
+        final Optional<GetTaskResponse> task = getTask(taskID);
+        task.ifPresent(t -> {
+            final Duration duration = getDuration(t);
+            final String errors = getErrors(t);
+            if (errors != null) {
+                onTaskFailure(migration, index, t.task().status(), duration);
+            } else {
+                onTaskSuccess(migration, index, t.task().status(), duration);
+            }
+        });
     }
 
-    private void onTaskFinished(RemoteReindexMigration migration, RemoteReindexIndex index, GetTaskResponse response) {
-        final long durationInSec = TimeUnit.SECONDS.convert(response.getTaskInfo().getRunningTimeNanos(), TimeUnit.NANOSECONDS);
-        final Duration duration = Duration.standardSeconds(durationInSec);
-        final TaskStatus taskStatus = getTaskStatus(response);
-        if (taskStatus.hasFailures()) {
-            onTaskFailure(migration, index, taskStatus, duration);
-        } else {
-            onTaskSuccess(migration, index, taskStatus, duration);
-        }
+    private static Duration getDuration(GetTaskResponse t) {
+        final long durationInSec = TimeUnit.SECONDS.convert(t.task().runningTimeInNanos(), TimeUnit.NANOSECONDS);
+        return Duration.standardSeconds(durationInSec);
     }
 
-    private void onTaskFailure(RemoteReindexMigration migration, RemoteReindexIndex index, TaskStatus taskStatus, Duration duration) {
+    private void onTaskFailure(MigrationConfiguration migration, String index, TaskStatus taskStatus, Duration duration) {
         final String failures = String.join(", ", taskStatus.failures());
-        final String message = String.format(Locale.ROOT, "Index %s migration failed after %s. Failures: %s.", index.getName(), humanReadable(duration), failures);
+        final String message = String.format(Locale.ROOT, "Index %s migration failed after %s. Failures: %s.", index, humanReadable(duration), failures);
         logError(migration, message, null);
-        index.onError(duration, taskStatus);
     }
 
-    private void onTaskSuccess(RemoteReindexMigration migration, RemoteReindexIndex index, TaskStatus taskStatus, Duration duration) {
-        final String message = String.format(Locale.ROOT, "Index %s finished migration after %s. Total %d documents, updated %d, created %d, deleted %d.", index.getName(), humanReadable(duration), taskStatus.total(), taskStatus.updated(), taskStatus.created(), taskStatus.deleted());
+    private void onTaskSuccess(MigrationConfiguration migration, String index, TaskStatus taskStatus, Duration duration) {
+        final String message = String.format(Locale.ROOT, "Index %s finished migration after %s. Total %d documents, updated %d, created %d, deleted %d.", index, humanReadable(duration), taskStatus.total(), taskStatus.updated(), taskStatus.created(), taskStatus.deleted());
         logInfo(migration, message);
-        index.onFinished(duration, taskStatus);
     }
 
     private String humanReadable(Duration duration) {
         return DurationFormatUtils.formatDurationWords(duration.getMillis(), true, true);
-    }
-
-    private TaskStatus getTaskStatus(GetTaskResponse response) {
-        try {
-            return objectMapper.readValue(response.getTaskInfo().getStatus().toString(), TaskStatus.class);
-        } catch (JsonProcessingException e) {
-            LOG.error("Failed to convert TaskStatus", e);
-            return TaskStatus.unknown();
-        }
     }
 }
