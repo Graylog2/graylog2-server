@@ -168,7 +168,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     private void configure(Map<String, String> additionalConfig) {
         final OpensearchConfiguration original = configurationProvider.get();
 
-        final var finalAdditionalConfig = new HashMap<String, String>();
+        final var finalAdditionalConfig = new HashMap<String, Object>();
         finalAdditionalConfig.putAll(original.additionalConfiguration());
         finalAdditionalConfig.putAll(additionalConfig);
 

@@ -115,8 +115,8 @@ public class OpensearchCommandLineProcess implements Closeable {
         opensearchCli.keystore().add("s3.client.default.secret_key", config.s3RepositoryConfiguration().getS3ClientDefaultSecretKey());
     }
 
-    private static Map<String, String> getOpensearchConfigurationArguments(OpensearchConfiguration config) {
-        Map<String, String> allArguments = new LinkedHashMap<>(config.asMap());
+    private static Map<String, Object> getOpensearchConfigurationArguments(OpensearchConfiguration config) {
+        Map<String, Object> allArguments = new LinkedHashMap<>(config.asMap());
 
         // now copy all the environment values to the configuration arguments. Opensearch won't do it for us,
         // because we are using tar distriburion and opensearch does this only for docker dist. See opensearch-env script
