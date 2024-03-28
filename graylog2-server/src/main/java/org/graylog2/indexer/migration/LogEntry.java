@@ -14,22 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer.datanode;
+package org.graylog2.indexer.migration;
 
-import jakarta.validation.constraints.NotNull;
-import org.graylog2.indexer.migration.IndexerConnectionCheckResult;
-import org.graylog2.indexer.migration.RemoteReindexMigration;
+import org.joda.time.DateTime;
 
-import java.net.URI;
+import java.util.Locale;
 
-public interface RemoteReindexingMigrationAdapter {
-    enum Status {
-        NOT_STARTED, STARTING, RUNNING, ERROR, FINISHED
+public record LogEntry(DateTime timestamp, LogLevel logLevel, String message) {
+    @Override
+    public String toString() {
+        return String.format(Locale.ROOT, "%s %s : %s", timestamp.toLocalDateTime(), logLevel, message);
     }
-
-    RemoteReindexMigration start(RemoteReindexRequest request);
-
-    RemoteReindexMigration status(@NotNull String migrationID);
-
-    IndexerConnectionCheckResult checkConnection(final URI uri, final String username, final String password);
 }
