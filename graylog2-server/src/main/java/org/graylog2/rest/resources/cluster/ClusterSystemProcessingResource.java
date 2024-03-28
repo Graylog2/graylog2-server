@@ -27,6 +27,7 @@ import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.rest.RemoteInterfaceProvider;
 import org.graylog2.rest.resources.system.RemoteSystemProcessingResource;
+import org.graylog2.shared.rest.NoPermissionCheckRequired;
 import org.graylog2.shared.rest.resources.ProxiedResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,6 +80,7 @@ public class ClusterSystemProcessingResource extends ProxiedResource {
                           "you might lose messages from inputs which cannot buffer themselves, like AMQP or Kafka-based inputs.")
     @Path("pause")
     @NoAuditEvent("proxy resource, audit event will be emitted on target node")
+    @NoPermissionCheckRequired
     public void pause(@ApiParam(name = "nodeId", value = "The id of the node where processing will be paused.", required = true)
                       @PathParam("nodeId") String nodeId) throws IOException, NodeNotFoundException {
         final Response response = this.getRemoteSystemProcessingResource(nodeId).pause().execute();
@@ -93,6 +95,7 @@ public class ClusterSystemProcessingResource extends ProxiedResource {
     @ApiOperation(value = "Resume message processing on node")
     @Path("resume")
     @NoAuditEvent("proxy resource, audit event will be emitted on target node")
+    @NoPermissionCheckRequired
     public void resume(@ApiParam(name = "nodeId", value = "The id of the node where processing will be resumed.", required = true)
                        @PathParam("nodeId") String nodeId) throws IOException, NodeNotFoundException {
         final Response response = this.getRemoteSystemProcessingResource(nodeId).resume().execute();
