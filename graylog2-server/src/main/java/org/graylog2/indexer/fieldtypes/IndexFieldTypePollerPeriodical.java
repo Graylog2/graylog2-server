@@ -20,6 +20,8 @@ import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.cluster.Cluster;
@@ -36,9 +38,6 @@ import org.graylog2.plugin.periodical.Periodical;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 
 import java.time.Instant;
 import java.util.Collection;
@@ -223,6 +222,11 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
         }
         Instant nextFullRefresh = lastFullRefresh.plusSeconds(fullRefreshInterval.toSeconds());
         return !Instant.now().isBefore(nextFullRefresh);
+    }
+
+    public void triggerFullRefresh() {
+        this.lastFullRefresh = Instant.now().minusSeconds(fullRefreshInterval.toSeconds() + 1);
+        doRun();
     }
 
     private boolean serverIsNotRunning() {
