@@ -28,14 +28,9 @@ jest.mock('stores/configurations/ConfigurationsStore', () => ({
   ConfigurationsStore: MockStore(),
 }));
 
-jest.mock('views/stores/SearchConfigStore', () => ({
-  SearchConfigActions: {
-    refresh: jest.fn(() => Promise.resolve()),
-  },
-  SearchConfigStore: {
-    listen: () => jest.fn(),
-    getInitialState: () => ({ searchesClusterConfig: { ...mockSearchClusterConfig, query_time_range_limit: undefined } }),
-  },
+jest.mock('hooks/useSearchConfiguration', () => () => ({
+  config: { ...mockSearchClusterConfig, query_time_range_limit: undefined },
+  refresh: () => {},
 }));
 
 const selectRangePreset = async (optionLabel: string) => {

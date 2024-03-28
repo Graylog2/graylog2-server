@@ -19,10 +19,8 @@ import { useCallback, useEffect, useContext, useMemo } from 'react';
 import styled, { css } from 'styled-components';
 
 import PageContentLayout from 'components/layout/PageContentLayout';
-import { useStore } from 'stores/connect';
 import Sidebar from 'views/components/sidebar/Sidebar';
 import SearchResult from 'views/components/SearchResult';
-import { SearchConfigActions, SearchConfigStore } from 'views/stores/SearchConfigStore';
 import { StreamsActions } from 'views/stores/StreamsStore';
 import HeaderElements from 'views/components/HeaderElements';
 import QueryBarElements from 'views/components/QueryBarElements';
@@ -52,6 +50,7 @@ import { execute } from 'views/logic/slices/searchExecutionSlice';
 import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
 import useAppSelector from 'stores/useAppSelector';
 import useParameters from 'views/hooks/useParameters';
+import useSearchConfiguration from 'hooks/useSearchConfiguration';
 
 import ExternalValueActionsProvider from './ExternalValueActionsProvider';
 
@@ -93,7 +92,7 @@ const ConnectedSidebar = (props: Omit<React.ComponentProps<typeof Sidebar>, 'res
 
 const ViewAdditionalContextProvider = ({ children }: { children: React.ReactNode }) => {
   const view = useView();
-  const { searchesClusterConfig } = useStore(SearchConfigStore) ?? {};
+  const { config: searchesClusterConfig } = useSearchConfiguration();
   const { parameters, parameterBindings } = useParameters();
   const currentUser = useCurrentUser();
   const contextValue = useMemo(() => ({
@@ -125,8 +124,6 @@ const Search = () => {
   }, [refreshSearch]);
 
   useEffect(() => {
-    SearchConfigActions.refresh();
-
     StreamsActions.refresh();
   }, []);
 

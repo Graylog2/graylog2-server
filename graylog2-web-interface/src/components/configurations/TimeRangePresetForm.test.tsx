@@ -22,18 +22,11 @@ import debounce from 'lodash/debounce';
 import Immutable from 'immutable';
 import { Formik } from 'formik';
 
-import { StoreMock as MockStore, asMock } from 'helpers/mocking';
+import { asMock } from 'helpers/mocking';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import mockSearchesClusterConfig from 'fixtures/searchClusterConfig';
 
 import TimeRangePresetForm from './TimeRangePresetForm';
-
-jest.mock('views/stores/SearchConfigStore', () => ({
-  SearchConfigStore: MockStore(['getInitialState', () => ({ searchesClusterConfig: mockSearchesClusterConfig })]),
-  SearchConfigActions: {
-    refresh: jest.fn(() => Promise.resolve()),
-  },
-}));
 
 jest.mock('hooks/useSearchConfiguration', () => jest.fn());
 jest.mock('lodash/debounce', () => jest.fn());

@@ -54,10 +54,6 @@ jest.mock('stores/inputs/InputsStore', () => ({
   InputsActions: { list: jest.fn(() => Promise.resolve()) },
 }));
 
-jest.mock('views/stores/SearchConfigStore', () => ({
-  SearchConfigStore: MockStore('listSearchesClusterConfig', 'configurations'),
-}));
-
 jest.mock('views/hooks/useAutoRefresh');
 
 const searchTypeResults = {

@@ -48,7 +48,6 @@ import PluggableSearchBarControls from 'views/components/searchbar/PluggableSear
 import useParameters from 'views/hooks/useParameters';
 import ValidateOnParameterChange from 'views/components/searchbar/ValidateOnParameterChange';
 import type { SearchBarControl, HandlerContext } from 'views/types';
-import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import useUserDateTime from 'hooks/useUserDateTime';
 import {
   SEARCH_BAR_GAP,
@@ -69,6 +68,7 @@ import useHandlerContext from 'views/components/useHandlerContext';
 import QueryHistoryButton from 'views/components/searchbar/QueryHistoryButton';
 import type { Editor } from 'views/components/searchbar/queryinput/ace-types';
 import useIsLoading from 'views/hooks/useIsLoading';
+import useSearchConfiguration from 'hooks/useSearchConfiguration';
 
 import SearchBarForm from './searchbar/SearchBarForm';
 
@@ -142,7 +142,7 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
     key: stream.title,
     value: stream.id,
   })));
-  const { searchesClusterConfig: config } = useStore(SearchConfigStore);
+  const { config } = useSearchConfiguration();
   const { userTimezone } = useUserDateTime();
   const { parameters } = useParameters();
   const currentQuery = useCurrentQuery();

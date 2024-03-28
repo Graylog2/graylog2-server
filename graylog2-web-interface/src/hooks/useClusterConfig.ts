@@ -14,15 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { SearchesConfig } from 'components/search/SearchConfig';
-import useClusterConfig from 'hooks/useClusterConfig';
+import { useQuery } from '@tanstack/react-query';
 
-type Result = { config: SearchesConfig, refresh: () => void };
+import { SystemClusterConfig } from '@graylog/server-api';
 
-const useSearchConfiguration = (): Result => {
-  const { data: config, refetch } = useClusterConfig<SearchesConfig>('org.graylog2.indexer.searches.SearchesClusterConfig');
+const useClusterConfig = <T, >(key: string) => useQuery<T>(['system', 'cluster_config', key], () => SystemClusterConfig.read(key) as Promise<T>);
 
-  return { config, refresh: refetch };
-};
-
-export default useSearchConfiguration;
+export default useClusterConfig;

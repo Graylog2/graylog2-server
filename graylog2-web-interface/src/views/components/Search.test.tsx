@@ -20,27 +20,19 @@ import { render, waitFor } from 'wrappedTestingLibrary';
 import mockComponent from 'helpers/mocking/MockComponent';
 import mockAction from 'helpers/mocking/MockAction';
 import { StreamsActions } from 'views/stores/StreamsStore';
-import { SearchConfigActions } from 'views/stores/SearchConfigStore';
 import WindowLeaveMessage from 'views/components/common/WindowLeaveMessage';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { createSearch } from 'fixtures/searches';
 import useViewsPlugin from 'views/test/testViewsPlugin';
+import useSearchConfiguration from 'hooks/useSearchConfiguration';
+import asMock from 'helpers/mocking/AsMock';
+import mockSearchesClusterConfig from 'fixtures/searchClusterConfig';
 
 import OriginalSearch from './Search';
 
 import { useSyncWithQueryParameters } from '../hooks/SyncWithQueryParameters';
 
 jest.mock('views/logic/fieldtypes/useFieldTypes');
-
-jest.mock('views/stores/SearchConfigStore', () => ({
-  SearchConfigStore: {
-    listen: () => jest.fn(),
-    getInitialState: () => ({
-      searchesClusterConfig: {},
-    }),
-  },
-  SearchConfigActions: {},
-}));
 
 jest.mock('views/components/QueryBar', () => mockComponent('QueryBar'));
 jest.mock('views/components/SearchResult', () => mockComponent('SearchResult'));
@@ -62,6 +54,8 @@ jest.mock('routing/withLocation', () => (Component) => (props) => (
 
 jest.mock('views/components/contexts/WidgetFieldTypesContextProvider', () => ({ children }) => children);
 
+jest.mock('hooks/useSearchConfiguration');
+
 const view = createSearch({ queryId: 'foobar' });
 
 const Search = () => (
@@ -75,7 +69,7 @@ describe('Search', () => {
 
   beforeEach(() => {
     StreamsActions.refresh = mockAction();
-    SearchConfigActions.refresh = mockAction();
+    asMock(useSearchConfiguration).mockReturnValue({ config: mockSearchesClusterConfig, refresh: () => {} });
   });
 
   it('register a WindowLeaveMessage', async () => {
@@ -87,7 +81,7 @@ describe('Search', () => {
   it('refreshes search config upon mount', async () => {
     render(<Search />);
 
-    await waitFor(() => expect(SearchConfigActions.refresh).toHaveBeenCalled());
+    await waitFor(() => expect(useSearchConfiguration).toHaveBeenCalled());
   });
 
   it('refreshes Streams upon mount', async () => {
