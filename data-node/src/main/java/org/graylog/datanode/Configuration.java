@@ -86,10 +86,7 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "opensearch_location")
     private String opensearchDistributionRoot = "dist";
 
-    @Parameter(value = "opensearch_plugins_location", validators = DirectoryReadableValidator.class)
-    private Path opensearchPluginsDir = Path.of("dist/plugins");
-
-    @Parameter(value = "opensearch_data_location", required = true, validators = DirectoryReadableValidator.class)
+    @Parameter(value = "opensearch_data_location", required = true)
     private Path opensearchDataLocation = Path.of("datanode/data");
 
     @Parameter(value = "opensearch_logs_location", required = true, validators = DirectoryWritableValidator.class)
@@ -259,6 +256,9 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "opensearch_indices_query_bool_max_clause_count")
     private Integer indicesQueryBoolMaxClauseCount = 32768;
 
+    @Parameter(value = "node_roles", converter = StringListConverter.class)
+    private List<String> nodeRoles = List.of("cluster_manager", "data", "ingest", "remote_cluster_client", "search");
+
     public Integer getIndicesQueryBoolMaxClauseCount() {
         return indicesQueryBoolMaxClauseCount;
     }
@@ -299,11 +299,6 @@ public class Configuration extends BaseConfiguration {
 
     public String getOpensearchDistributionRoot() {
         return opensearchDistributionRoot;
-    }
-
-    @Nullable
-    public Path getOpensearchPluginsDir() {
-        return opensearchPluginsDir;
     }
 
     /**
@@ -688,5 +683,9 @@ public class Configuration extends BaseConfiguration {
 
     public List<String> getPathRepo() {
         return pathRepo;
+    }
+
+    public List<String> getNodeRoles() {
+        return nodeRoles;
     }
 }

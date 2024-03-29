@@ -51,7 +51,7 @@ import static org.graylog2.plugin.streams.Stream.DEFAULT_SYSTEM_EVENTS_STREAM_ID
 public abstract class EventList implements SearchType {
     public static final int DEFAULT_PAGE_SIZE = 10;
     public static final String NAME = "events";
-    private static final Set<String> FILTER_FIELD_ALLOWLIST = Set.of("priority", "event_definition_id");
+    public static final Set<String> KNOWN_ATTRIBUTES = Set.of("priority", "event_definition_id", "alert");
     public static final SortConfig DEFAULT_SORT = new SortConfig(Message.FIELD_TIMESTAMP, Direction.DESC);
 
     public enum Direction {

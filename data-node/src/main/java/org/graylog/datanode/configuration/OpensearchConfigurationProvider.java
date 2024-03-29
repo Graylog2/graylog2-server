@@ -97,7 +97,7 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
                 .findFirst();
 
         try {
-            ImmutableMap.Builder<String, String> opensearchProperties = ImmutableMap.builder();
+            ImmutableMap.Builder<String, Object> opensearchProperties = ImmutableMap.builder();
 
             if (localConfiguration.getInitialClusterManagerNodes() != null && !localConfiguration.getInitialClusterManagerNodes().isBlank()) {
                 opensearchProperties.put("cluster.initial_cluster_manager_nodes", localConfiguration.getInitialClusterManagerNodes());
@@ -124,7 +124,7 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
                     localConfiguration.getOpensearchTransportPort(),
                     localConfiguration.getClustername(),
                     localConfiguration.getDatanodeNodeName(),
-                    List.of("cluster_manager", "data", "ingest", "remote_cluster_client", "search"),
+                    localConfiguration.getNodeRoles(),
                     localConfiguration.getOpensearchDiscoverySeedHosts(),
                     securityConfiguration,
                     s3RepositoryConfiguration,
@@ -136,8 +136,8 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
         }
     }
 
-    private ImmutableMap<String, String> commonOpensearchConfig(final Configuration localConfiguration) {
-        final ImmutableMap.Builder<String, String> config = ImmutableMap.builder();
+    private ImmutableMap<String, Object> commonOpensearchConfig(final Configuration localConfiguration) {
+        final ImmutableMap.Builder<String, Object> config = ImmutableMap.builder();
         localConfiguration.getOpensearchNetworkHost().ifPresent(
                 networkHost -> config.put("network.host", networkHost));
         config.put("path.data", datanodeConfiguration.datanodeDirectories().getDataTargetDir().toString());
@@ -147,21 +147,24 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
 
         // https://opensearch.org/docs/latest/tuning-your-cluster/availability-and-recovery/snapshots/snapshot-restore/#shared-file-system
         if(localConfiguration.getPathRepo() != null && !localConfiguration.getPathRepo().isEmpty()) {
-            config.put("path.repo", String.join(",", localConfiguration.getPathRepo()));
+            config.put("path.repo", localConfiguration.getPathRepo());
         }
 
         //config.put("network.publish_host", Tools.getLocalCanonicalHostname());
 
-        if(localConfiguration.getOpensearchDebug() != null && !localConfiguration.getOpensearchDebug().isBlank()) {
+        if (localConfiguration.getOpensearchDebug() != null && !localConfiguration.getOpensearchDebug().isBlank()) {
             config.put("logger.org.opensearch", localConfiguration.getOpensearchDebug());
         }
 
-        if(localConfiguration.getOpensearchAuditLog() != null && !localConfiguration.getOpensearchAuditLog().isBlank()) {
+        if (localConfiguration.getOpensearchAuditLog() != null && !localConfiguration.getOpensearchAuditLog().isBlank()) {
             config.put("plugins.security.audit.type", localConfiguration.getOpensearchAuditLog());
         }
 
         // common OpenSearch config parameters from our docs
         config.put("indices.query.bool.max_clause_count", localConfiguration.getIndicesQueryBoolMaxClauseCount().toString());
+
+        // enable admin access via the REST API
+        config.put("plugins.security.restapi.admin.enabled", "true");
 
         return config.build();
     }

@@ -16,6 +16,7 @@
  */
 package org.junit.platform.engine.support.hierarchical;
 
+import com.google.common.base.Stopwatch;
 import org.graylog.testing.completebackend.ContainerizedGraylogBackend;
 import org.graylog.testing.completebackend.ContainerizedGraylogBackendServicesProvider;
 import org.graylog.testing.completebackend.GraylogBackend;
@@ -77,6 +78,7 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
     }
 
     private void executeWithContainerizedGraylogBackend(ExecutionRequest request, ContainerMatrixTestsDescriptor descriptor, ContainerizedGraylogBackendServicesProvider servicesProvider) {
+        LOG.debug("Starting containers for " + descriptor.getUniqueId());
         SearchVersion esVersion = descriptor.getSearchVersion();
         MongodbServer mongoVersion = descriptor.getMongoVersion();
         List<URL> mongoDBFixtures = descriptor.getMongoDBFixtures();
@@ -103,7 +105,9 @@ public abstract class ContainerMatrixHierarchicalTestEngine<C extends EngineExec
                     fixtures = ((ContainerMatrixTestClassDescriptor) td).getMongoFixtures();
                     preImportLicense = ((ContainerMatrixTestClassDescriptor) td).isPreImportLicense();
                 }
+                final Stopwatch sw = Stopwatch.createStarted();
                 try (ContainerizedGraylogBackend backend = ContainerizedGraylogBackend.createStarted(servicesProvider, esVersion, mongoVersion, fixtures, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, preImportLicense, withEnabledMailServer, withEnabledWebhookServer, configParams)) {
+                    LOG.debug("Containerized testing environment started in {}", sw.elapsed());
                     this.execute(request, Collections.singleton(td), backend);
                 } catch (Exception exception) {
                     /* Fail hard if the containerized backend failed to start. */

@@ -16,5 +16,9 @@
  */
 package org.graylog.testing.elasticsearch;
 
-public record ContainerCacheKey(org.graylog2.storage.SearchVersion version, String heapSize) {
+import org.graylog2.storage.SearchVersion;
+
+import java.util.Map;
+
+public record ContainerCacheKey(SearchVersion version, String heapSize, Map<String, String> env) {
 }

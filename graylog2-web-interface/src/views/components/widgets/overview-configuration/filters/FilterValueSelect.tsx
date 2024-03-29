@@ -33,6 +33,7 @@ type Props = {
 const FilterValueSelect = ({ value, onChange, options, placeholder }: Props) => (
   <Container>
     <Select placeholder={placeholder}
+            aria-label={placeholder}
             menuIsOpen
             clearable={false}
             onChange={onChange}

@@ -23,6 +23,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchR
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.SearchHit;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.sort.SortBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.sort.SortOrder;
 import org.graylog2.plugin.Message;
 
@@ -59,8 +60,8 @@ public class SearchAfter implements RequestStrategy {
     }
 
     private void configureSort(SearchSourceBuilder source) {
-        source.sort("timestamp", SortOrder.DESC);
-        source.sort(DEFAULT_TIEBREAKER_FIELD, SortOrder.DESC);
+        source.sort(SortBuilders.fieldSort("timestamp").order(SortOrder.ASC));
+        source.sort(SortBuilders.fieldSort(DEFAULT_TIEBREAKER_FIELD).order(SortOrder.ASC).unmappedType("keyword"));
     }
 
     private Object[] lastHitSortFrom(List<SearchHit> hits) {
