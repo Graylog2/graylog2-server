@@ -128,11 +128,13 @@ const DashboardActions = ({ dashboard, refetchDashboards, isEvidenceModal }: Pro
                      entityType="dashboard"
                      onClick={() => setShowShareModal(true)} />
       )}
-      {!!moreActions.length && (
-        <MoreActions>
-          {moreActions}
-        </MoreActions>
-      )}
+      {(!!moreActions.length && isEvidenceModal)
+        ? moreActions[0]
+        : (
+          <MoreActions>
+            {moreActions}
+          </MoreActions>
+        )}
       {showShareModal && (
         <EntityShareModal entityId={dashboard.id}
                           entityType="dashboard"
