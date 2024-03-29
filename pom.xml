@@ -103,7 +103,7 @@
         <aws-kinesis-client.version>2.5.7</aws-kinesis-client.version>
         <aws-msk-iam-auth.version>2.0.3</aws-msk-iam-auth.version>
         <bouncycastle.version>1.77</bouncycastle.version>
-        <byte-buddy.version>1.14.12</byte-buddy.version>
+        <byte-buddy.version>1.14.13</byte-buddy.version>
         <caffeine.version>3.1.8</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
         <classgraph.version>4.8.168</classgraph.version>
