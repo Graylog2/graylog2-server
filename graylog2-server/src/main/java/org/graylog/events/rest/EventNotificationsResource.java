@@ -23,6 +23,23 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import jakarta.inject.Inject;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.events.audit.EventsAuditEventTypes;
@@ -50,32 +67,12 @@ import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
+import org.graylog2.shared.rest.InlinePermissionCheck;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
-import jakarta.inject.Inject;
-
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
-
-import jakarta.validation.constraints.NotBlank;
-
-import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.DefaultValue;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.NotFoundException;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.PUT;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -135,6 +132,7 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     @Path("/paginated")
     @ApiOperation(value = "Get a paginated list of event notifications")
     @Produces(MediaType.APPLICATION_JSON)
+    @InlinePermissionCheck
     public PageListResponse<NotificationDto> getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                                      @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                                      @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
@@ -161,6 +159,7 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     @GET
     @ApiOperation("List all available notifications")
     @Deprecated
+    @InlinePermissionCheck
     public PaginatedResponse<NotificationDto> listNotifications(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                                                 @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                                                 @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query) {
@@ -174,6 +173,7 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     @GET
     @Path("/{notificationId}")
     @ApiOperation("Get a notification")
+    @InlinePermissionCheck
     public NotificationDto get(@ApiParam(name = "notificationId") @PathParam("notificationId") @NotBlank String notificationId) {
         checkPermission(RestPermissions.EVENT_NOTIFICATIONS_READ, notificationId);
         return dbNotificationService.get(notificationId)
@@ -199,6 +199,7 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     @Path("/{notificationId}")
     @ApiOperation("Update existing notification")
     @AuditEvent(type = EventsAuditEventTypes.EVENT_NOTIFICATION_UPDATE)
+    @InlinePermissionCheck
     public Response update(@ApiParam(name = "notificationId") @PathParam("notificationId") @NotBlank String notificationId,
                            @ApiParam(name = "JSON Body") NotificationDto dto,
                            @Context UserContext userContext) {
@@ -254,6 +255,7 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     @Path("/{notificationId}")
     @ApiOperation("Delete a notification")
     @AuditEvent(type = EventsAuditEventTypes.EVENT_NOTIFICATION_DELETE)
+    @InlinePermissionCheck
     public void delete(@ApiParam(name = "notificationId") @PathParam("notificationId") @NotBlank String notificationId,
                        @Context UserContext userContext) {
         checkPermission(RestPermissions.EVENT_NOTIFICATIONS_DELETE, notificationId);
@@ -272,6 +274,7 @@ public class EventNotificationsResource extends RestResource implements PluginRe
             @ApiResponse(code = 500, message = "Error while testing event notification")
     })
     @NoAuditEvent("only used to test event notifications")
+    @InlinePermissionCheck
     public Response test(@ApiParam(name = "notificationId", value = "The event notification id to send a test alert for.", required = true)
                          @PathParam("notificationId") @NotBlank String notificationId) {
         checkPermission(RestPermissions.EVENT_NOTIFICATIONS_EDIT, notificationId);
@@ -294,7 +297,6 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     })
     @NoAuditEvent("only used to test event notifications")
     public Response test(@ApiParam(name = "JSON Body") NotificationDto dto) {
-        checkPermission(RestPermissions.EVENT_NOTIFICATIONS_CREATE);
         final ValidationResult validationResult = dto.validate();
         if (validationResult.failed()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();
