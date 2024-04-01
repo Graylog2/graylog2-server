@@ -18,28 +18,19 @@ package org.graylog.plugins.views.search;
 
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
-import org.graylog.plugins.views.search.engine.BackendQuery;
-import org.graylog.plugins.views.search.engine.SearchConfig;
-import org.graylog.plugins.views.search.errors.IllegalTimeRangeException;
 import org.graylog.plugins.views.search.errors.MissingCapabilitiesException;
 import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.searchtypes.events.EventList;
 import org.graylog.plugins.views.search.views.PluginMetadataSummary;
-import org.graylog2.indexer.searches.SearchesClusterConfig;
 import org.graylog2.plugin.PluginMetaData;
-import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
-import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.graylog2.shared.rest.exceptions.MissingStreamPermissionException;
-import org.joda.time.Period;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -49,7 +40,6 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.graylog.plugins.views.search.TestData.requirementsMap;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class SearchExecutionGuardTest {
     private SearchExecutionGuard sut;
