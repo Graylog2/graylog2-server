@@ -57,6 +57,9 @@ const SourceCodeContainer = styled.div<ContainerProps>(({ $resizable, theme }) =
     .ace_gutter {
       background: ${theme.colors.variant.lighter.default};
     }
+    .ace_cursor {
+      border-color: ${theme.colors.global.textDefault};
+    }
   }
 `);
 
