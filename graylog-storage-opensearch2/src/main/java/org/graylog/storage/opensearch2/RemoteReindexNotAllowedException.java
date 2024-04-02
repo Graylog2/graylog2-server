@@ -14,11 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.storage.migration;
+package org.graylog.storage.opensearch2;
 
-import java.net.URI;
-import java.util.List;
-
-public record RemoteReindexRequest(URI hostname, String user, String password, List<String> indices,
-                                   boolean synchronous) {
+public class RemoteReindexNotAllowedException extends IllegalStateException {
+    public RemoteReindexNotAllowedException(String message) {
+        super(message);
+    }
 }

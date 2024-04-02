@@ -17,19 +17,30 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 
-const DeletionRetentionStrategySummary = ({ config }) => (
+import { TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY } from 'stores/indices/IndicesStore';
+
+const DeletionRetentionStrategySummary = ({ config, rotationStrategyClass }) => (
   <div>
     <dl>
       <dt>Index retention strategy:</dt>
       <dd>Delete</dd>
-      <dt>Max number of indices:</dt>
-      <dd>{config.max_number_of_indices}</dd>
+      {rotationStrategyClass !== TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY && (
+      <>
+        <dt>Max number of indices:</dt>
+        <dd>{config.max_number_of_indices}</dd>
+      </>
+      )}
     </dl>
   </div>
 );
 
 DeletionRetentionStrategySummary.propTypes = {
   config: PropTypes.object.isRequired,
+  rotationStrategyClass: PropTypes.string,
+};
+
+DeletionRetentionStrategySummary.defaultProps = {
+  rotationStrategyClass: undefined,
 };
 
 export default DeletionRetentionStrategySummary;

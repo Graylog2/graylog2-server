@@ -77,4 +77,10 @@ public class DatanodeOpensearchProxyIT {
         final String hostname = datanodes.iterator().next();
         apis.get("/datanodes/" + hostname + "/opensearch/_mapping", 200).assertThat().body("graylog_0.mappings.properties.gl2_accounted_message_size.type", Matchers.equalTo("long"));
     }
+
+    @ContainerMatrixTest
+    void testQueryParameters() {
+        final ValidatableResponse response = apis.get("/datanodes/any/opensearch/_cluster/settings?include_defaults=true", 200);
+        response.assertThat().body("defaults.cluster.name", Matchers.equalTo("datanode-cluster"));
+    }
 }

@@ -16,20 +16,20 @@
  */
 package org.graylog.datanode.rest;
 
+import com.github.joschi.jadconfig.ValidationException;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import org.graylog.datanode.Configuration;
+import org.graylog.datanode.DirectoryReadableValidator;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.filesystem.index.IncompatibleIndexVersionException;
 import org.graylog.datanode.filesystem.index.IndicesDirectoryParser;
 import org.graylog.datanode.filesystem.index.dto.IndexerDirectoryInformation;
 import org.graylog.datanode.filesystem.index.dto.NodeInformation;
-import org.graylog.datanode.rest.config.OnlyInSecuredNode;
 import org.graylog.shaded.opensearch2.org.opensearch.Version;
-
-import jakarta.inject.Inject;
-
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
 
 import java.util.Collections;
 import java.util.List;
@@ -39,11 +39,14 @@ import java.util.Locale;
 @Produces(MediaType.APPLICATION_JSON)
 public class IndicesDirectoryController {
 
+    private final Configuration configuration;
     private final DatanodeConfiguration datanodeConfiguration;
     private final IndicesDirectoryParser indicesDirectoryParser;
+    private final DirectoryReadableValidator directoryReadableValidator = new DirectoryReadableValidator();
 
     @Inject
-    public IndicesDirectoryController(DatanodeConfiguration datanodeConfiguration, IndicesDirectoryParser indicesDirectoryParser) {
+    public IndicesDirectoryController(Configuration configuration, DatanodeConfiguration datanodeConfiguration, IndicesDirectoryParser indicesDirectoryParser) {
+        this.configuration = configuration;
         this.datanodeConfiguration = datanodeConfiguration;
         this.indicesDirectoryParser = indicesDirectoryParser;
     }
@@ -53,16 +56,18 @@ public class IndicesDirectoryController {
     public CompatibilityResult status() {
         final java.nio.file.Path dataTargetDir = datanodeConfiguration.datanodeDirectories().getDataTargetDir();
         final String opensearchVersion = datanodeConfiguration.opensearchDistributionProvider().get().version();
+        final String hostname = configuration.getHostname();
         try {
+            directoryReadableValidator.validate(dataTargetDir.toUri().toString(), dataTargetDir);
             final IndexerDirectoryInformation info = indicesDirectoryParser.parse(dataTargetDir);
             final Version currentVersion = Version.fromString(opensearchVersion);
             final List<String> compatibilityErrors = info.nodes().stream()
                     .filter(node -> !isNodeCompatible(node, currentVersion))
                     .map(node -> String.format(Locale.ROOT, "Current version %s of Opensearch is not compatible with index version %s", currentVersion, node.nodeVersion()))
                     .toList();
-            return new CompatibilityResult(opensearchVersion, info, compatibilityErrors);
-        } catch (IncompatibleIndexVersionException e) {
-            return new CompatibilityResult(opensearchVersion, new IndexerDirectoryInformation(dataTargetDir, Collections.emptyList()), Collections.singletonList(e.getMessage()));
+            return new CompatibilityResult(hostname, opensearchVersion, info, compatibilityErrors);
+        } catch (IncompatibleIndexVersionException | ValidationException e) {
+            return new CompatibilityResult(hostname, opensearchVersion, new IndexerDirectoryInformation(dataTargetDir, Collections.emptyList()), Collections.singletonList(e.getMessage()));
         }
     }
 

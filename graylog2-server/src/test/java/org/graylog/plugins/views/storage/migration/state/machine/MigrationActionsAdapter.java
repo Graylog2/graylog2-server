@@ -61,8 +61,7 @@ public class MigrationActionsAdapter implements MigrationActions {
     }
 
     @Override
-    public boolean runDirectoryCompatibilityCheck() {
-        return false;
+    public void runDirectoryCompatibilityCheck() {
     }
 
     @Override
@@ -106,12 +105,12 @@ public class MigrationActionsAdapter implements MigrationActions {
     }
 
     @Override
-    public boolean removalPolicyDoesNotExist() {
+    public boolean renewalPolicyDoesNotExist() {
         return false;
     }
 
     @Override
-    public boolean caAndRemovalPolicyExist() {
+    public boolean caAndRenewalPolicyExist() {
         return false;
     }
 

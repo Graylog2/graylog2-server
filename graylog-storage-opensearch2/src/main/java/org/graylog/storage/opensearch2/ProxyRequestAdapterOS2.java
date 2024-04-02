@@ -49,6 +49,7 @@ public class ProxyRequestAdapterOS2 implements ProxyRequestAdapter {
     @Override
     public ProxyResponse request(ProxyRequest request) throws IOException {
         final var req = new Request(request.method(), request.path());
+        request.queryParameters().forEach((key, values) -> values.forEach(value -> req.addParameter(key, value)));
         req.setEntity(new InputStreamEntity(request.body(), ContentType.APPLICATION_JSON));
         try (
                 RestHighLevelClient restClient = buildClient(request)

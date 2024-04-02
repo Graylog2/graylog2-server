@@ -19,7 +19,6 @@ package org.graylog2.indexer;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Strings;
 import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.datatiering.DataTieringChecker;
 import org.graylog2.datatiering.DataTieringConfig;
@@ -63,7 +62,6 @@ public class IndexSetValidator {
         this.dataTieringOrchestrator = dataTieringOrchestrator;
         this.dataTieringChecker = dataTieringChecker;
     }
-
     public Optional<Violation> validate(IndexSetConfig newConfig) {
 
         // Don't validate prefix conflicts in case of an update
@@ -77,6 +75,11 @@ public class IndexSetValidator {
         final Violation refreshIntervalViolation = validateRefreshInterval(newConfig.fieldTypeRefreshInterval());
         if (refreshIntervalViolation != null) {
             return Optional.of(refreshIntervalViolation);
+        }
+
+        final Violation fieldMappingViolation = validateMappingChangesAreLegal(newConfig);
+        if (fieldMappingViolation != null) {
+            return Optional.of(fieldMappingViolation);
         }
 
         if (newConfig.dataTiering() != null) {
@@ -121,6 +124,16 @@ public class IndexSetValidator {
 
         return Optional.empty();
 
+    }
+
+    public Violation validateMappingChangesAreLegal(final IndexSetConfig config) {
+        if (!config.canHaveProfile() && config.fieldTypeProfile() != null && !config.fieldTypeProfile().isEmpty()) {
+            return Violation.create("Profiles cannot be set for events and failures index sets");
+        }
+        if (!config.canHaveCustomFieldMappings() && config.customFieldMappings() != null && !config.customFieldMappings().isEmpty()) {
+            return Violation.create("Custom field mappings cannot be set for events and failures index sets");
+        }
+        return null;
     }
 
     @Nullable
