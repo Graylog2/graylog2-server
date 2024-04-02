@@ -19,12 +19,12 @@ package org.graylog.plugins.views.search.engine.validation;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.errors.SearchError;
-import org.graylog.plugins.views.search.permissions.StreamPermissions;
+import org.graylog.plugins.views.search.permissions.SearchUser;
 
 import java.util.Set;
 
 public interface SearchValidation {
-    Set<SearchError> validate(final Search search, final StreamPermissions streamPermissions);
+    Set<SearchError> validate(final Search search, final SearchUser searchUser);
 
-    Set<SearchError> validate(final Query query, final StreamPermissions streamPermissions);
+    Set<SearchError> validate(final Query query, final SearchUser searchUser);
 }
