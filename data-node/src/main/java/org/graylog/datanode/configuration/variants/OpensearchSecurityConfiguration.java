@@ -94,6 +94,7 @@ public class OpensearchSecurityConfiguration {
             System.setProperty("javax.net.ssl.trustStorePassword", truststorePassword);
 
             enableJwtAuthenticationInConfig(opensearchConfigDir, signingKey);
+            opensearchHeap = datanodeConfiguration.opensearchHeap();
         }
         return this;
     }
