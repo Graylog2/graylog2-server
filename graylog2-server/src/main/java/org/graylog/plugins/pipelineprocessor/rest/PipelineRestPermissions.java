@@ -44,6 +44,9 @@ public class PipelineRestPermissions implements PluginPermissions {
     public static final String PIPELINE_CONNECTION_READ = "pipeline_connection:read";
     public static final String PIPELINE_CONNECTION_EDIT = "pipeline_connection:edit";
 
+    /* metrics update */
+    public static final String PIPELINE_RULE_METRICS_EDIT = "pipeline_metrics:edit";
+
 
     @Override
     public Set<Permission> permissions() {
@@ -59,7 +62,9 @@ public class PipelineRestPermissions implements PluginPermissions {
                 create(PIPELINE_RULE_DELETE, "Delete a processing rule"),
 
                 create(PIPELINE_CONNECTION_READ, "Read a pipeline stream connection"),
-                create(PIPELINE_CONNECTION_EDIT, "Update a pipeline stream connections")
+                create(PIPELINE_CONNECTION_EDIT, "Update a pipeline stream connections"),
+
+                create(PIPELINE_RULE_METRICS_EDIT, "Toggle pipeline rule metric recording")
         );
     }
 
@@ -82,7 +87,8 @@ public class PipelineRestPermissions implements PluginPermissions {
                                 PIPELINE_RULE_EDIT,
                                 PIPELINE_RULE_DELETE,
                                 PIPELINE_CONNECTION_READ,
-                                PIPELINE_CONNECTION_EDIT))
+                                PIPELINE_CONNECTION_EDIT,
+                                PIPELINE_RULE_METRICS_EDIT))
         );
     }
 }

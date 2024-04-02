@@ -22,6 +22,21 @@ import com.swrve.ratelimitedlogger.RateLimitedLog;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import jakarta.inject.Inject;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
@@ -40,27 +55,11 @@ import org.graylog2.rest.models.PaginatedResponse;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
+import org.graylog2.shared.rest.InlinePermissionCheck;
+import org.graylog2.shared.rest.NoPermissionCheckRequired;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-
-import jakarta.inject.Inject;
-
-import jakarta.validation.constraints.NotNull;
-
-import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.DefaultValue;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.PUT;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -137,6 +136,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
     @POST
     @Path("/parse")
     @NoAuditEvent("only used to parse a pipeline, no changes made in the system")
+    @NoPermissionCheckRequired
     public PipelineSource parse(@ApiParam(name = "pipeline", required = true) @NotNull PipelineSource pipelineSource) throws ParseException {
         final Pipeline pipeline;
         try {
@@ -162,6 +162,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
 
     @ApiOperation(value = "Get all processing pipelines")
     @GET
+    @InlinePermissionCheck
     public Collection<PipelineSource> getAll() {
         final Collection<PipelineDao> daos = pipelineService.loadAll();
         final ArrayList<PipelineSource> results = Lists.newArrayList();
@@ -178,6 +179,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
     @Path("/paginated")
     @ApiOperation(value = "Get a paginated list of pipelines")
     @Produces(MediaType.APPLICATION_JSON)
+    @InlinePermissionCheck
     public PaginatedResponse<PipelineSource> getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                                      @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                                      @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
@@ -211,6 +213,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
     @ApiOperation(value = "Get a processing pipeline", notes = "It can take up to a second until the change is applied")
     @Path("/{id}")
     @GET
+    @InlinePermissionCheck
     public PipelineSource get(@ApiParam(name = "id") @PathParam("id") String id) throws NotFoundException {
         checkPermission(PipelineRestPermissions.PIPELINE_READ, id);
         final PipelineDao dao = pipelineService.load(id);
@@ -221,6 +224,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
     @Path("/{id}")
     @PUT
     @AuditEvent(type = PipelineProcessorAuditEventTypes.PIPELINE_UPDATE)
+    @InlinePermissionCheck
     public PipelineSource update(@ApiParam(name = "id") @PathParam("id") String id,
                                  @ApiParam(name = "pipeline", required = true) @NotNull PipelineSource update) throws NotFoundException {
         checkPermission(PipelineRestPermissions.PIPELINE_EDIT, id);
@@ -254,6 +258,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
     @Path("/{id}")
     @DELETE
     @AuditEvent(type = PipelineProcessorAuditEventTypes.PIPELINE_DELETE)
+    @InlinePermissionCheck
     public void delete(@ApiParam(name = "id") @PathParam("id") String id) throws NotFoundException {
         checkPermission(PipelineRestPermissions.PIPELINE_DELETE, id);
         pipelineService.load(id);
