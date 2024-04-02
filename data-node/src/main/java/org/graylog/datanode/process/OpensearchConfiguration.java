@@ -92,6 +92,7 @@ public record OpensearchConfiguration(
 
     public Environment getEnv() {
         final Environment env = new Environment(System.getenv());
+        env.put("OPENSEARCH_JAVA_OPTS", "-Xms%s -Xmx%s".formatted(opensearchSecurityConfiguration.getOpensearchHeap(), opensearchSecurityConfiguration.getOpensearchHeap()));
         env.put("OPENSEARCH_PATH_CONF", datanodeDirectories.getOpensearchProcessConfigurationDir().toString());
         return env;
     }
