@@ -136,7 +136,7 @@ const IndexSetFieldTypesList = () => {
 
     refetchFieldTypes();
   }, [indexSetId, refetchFieldTypes, selectedEntitiesData]);
-  const indexFieldTypeChangeAllowed = useMemo(() => !isIndexFieldTypeChangeAllowed(indexSet), [indexSet]);
+  const indexFieldTypeChangeAllowed = useMemo(() => isIndexFieldTypeChangeAllowed(indexSet), [indexSet]);
   const renderActions = useCallback((fieldType: IndexSetFieldType) => (
     <FieldTypeActions fieldType={fieldType}
                       indexSetId={indexSetId}
