@@ -94,16 +94,16 @@
         <apache-directory-version>1.0.3</apache-directory-version>
         <apache-httpclient.version>4.5.14</apache-httpclient.version>
         <apache-httpcore.version>4.4.16</apache-httpcore.version>
-        <asm.version>9.6</asm.version>
+        <asm.version>9.7</asm.version>
         <auto-service.version>1.1.1</auto-service.version>
         <auto-value.version>1.10.4</auto-value.version>
         <auto-value-javabean.version>2.5.2</auto-value-javabean.version>
         <aws-java-sdk-1.version>1.12.675</aws-java-sdk-1.version>
         <aws-java-sdk-2.version>2.25.6</aws-java-sdk-2.version>
-        <aws-kinesis-client.version>2.5.7</aws-kinesis-client.version>
+        <aws-kinesis-client.version>2.5.8</aws-kinesis-client.version>
         <aws-msk-iam-auth.version>2.0.3</aws-msk-iam-auth.version>
         <bouncycastle.version>1.77</bouncycastle.version>
-        <byte-buddy.version>1.14.12</byte-buddy.version>
+        <byte-buddy.version>1.14.13</byte-buddy.version>
         <caffeine.version>3.1.8</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
         <classgraph.version>4.8.168</classgraph.version>
@@ -114,7 +114,7 @@
         <commons-lang3.version>3.14.0</commons-lang3.version>
         <commons-net.version>3.10.0</commons-net.version>
         <commons-validator.version>1.8.0</commons-validator.version>
-        <commons-io.version>2.15.1</commons-io.version>
+        <commons-io.version>2.16.0</commons-io.version>
         <disruptor.version>4.0.0</disruptor.version>
         <error-prone.version>2.26.1</error-prone.version>
         <freemarker.version>2.3.32</freemarker.version>
@@ -163,7 +163,7 @@
         <prometheus-client.version>0.16.0</prometheus-client.version>
         <protobuf.version>3.25.3</protobuf.version>
         <reflections.version>0.10.2</reflections.version>
-        <retrofit.version>2.9.0</retrofit.version>
+        <retrofit.version>2.11.0</retrofit.version>
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
         <shiro.version>2.0.0</shiro.version>
         <snakeyaml.version>2.2</snakeyaml.version>
@@ -178,7 +178,7 @@
         <unboundid-ldap.version>7.0.0</unboundid-ldap.version>
         <uuid.version>3.2.1</uuid.version>
         <validation-api.version>3.0.2</validation-api.version>
-        <zstd.version>1.5.5-11</zstd.version>
+        <zstd.version>1.5.6-1</zstd.version>
         <cron-utils.version>9.2.1</cron-utils.version>
         <asciitable.version>0.3.2</asciitable.version>
         <jjwt.version>0.12.5</jjwt.version>
