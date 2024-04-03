@@ -123,19 +123,26 @@ const newTabTimeRange = ({
   timeRangeTabs,
   formatTime,
   defaultRanges,
+  userTimezone,
 }: {
   activeTab: TimeRangePickerFormValues['activeTab'],
   nextTab: TimeRangePickerFormValues['activeTab'],
   timeRangeTabs: TimeRangePickerFormValues['timeRangeTabs'],
   formatTime: (time: DateTime, format: DateTimeFormats) => string,
   defaultRanges: ReturnType<typeof createDefaultRanges>,
+  userTimezone: string
 }) => {
   if (timeRangeTabs[nextTab]) {
     return timeRangeTabs[nextTab];
   }
 
   if (isTimeRange(timeRangeTabs[activeTab])) {
-    return migrateTimeRangeToNewType(timeRangeTabs[activeTab], nextTab, formatTime);
+    return migrateTimeRangeToNewType({
+      oldTimeRange: timeRangeTabs[activeTab],
+      type: nextTab,
+      formatTime,
+      userTimezone,
+    });
   }
 
   return defaultRanges[nextTab];
@@ -148,7 +155,7 @@ const TimeRangeTabs = ({
 }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const location = useLocation();
-  const { formatTime } = useUserDateTime();
+  const { formatTime, userTimezone } = useUserDateTime();
   const { setValues, values: { activeTab, timeRangeTabs } } = useFormikContext<TimeRangePickerFormValues>();
   const defaultRanges = useMemo(() => createDefaultRanges(formatTime), [formatTime]);
 
@@ -162,6 +169,7 @@ const TimeRangeTabs = ({
           timeRangeTabs,
           formatTime,
           defaultRanges,
+          userTimezone,
         }),
       },
       activeTab: nextTab,
@@ -175,7 +183,7 @@ const TimeRangeTabs = ({
         tab: nextTab,
       },
     });
-  }, [activeTab, defaultRanges, formatTime, location.pathname, sendTelemetry, setValues, timeRangeTabs]);
+  }, [activeTab, defaultRanges, formatTime, location.pathname, sendTelemetry, setValues, timeRangeTabs, userTimezone]);
 
   const tabs = useMemo(() => timeRangeTypeTabs({
     activeTab,

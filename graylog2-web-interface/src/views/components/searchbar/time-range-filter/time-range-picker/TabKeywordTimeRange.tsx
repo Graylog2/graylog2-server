@@ -89,7 +89,7 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
   const [nextRangeProps, , nextRangeHelpers] = useField('timeRangeTabs.keyword');
   const mounted = useRef(true);
   const keywordRef = useRef<string>();
-  const [keywordPreview, setKeywordPreview] = useState<KeywordPreview>({ from: '', to: '', timezone: '' });
+  const [keywordPreview, setKeywordPreview] = useState<KeywordPreview>({ from: '', to: '', timezone: userTimezone });
 
   const _setSuccessfulPreview = useCallback((response: KeywordPreview) => {
     setValidatingKeyword(false);
