@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
@@ -75,7 +75,6 @@ const ColorSwatch = ({ className, color, name, copyText }) => {
       }, 1000);
     });
   };
-
 
   return (
     (
