@@ -20,6 +20,7 @@ import jakarta.inject.Inject;
 import org.graylog2.configuration.IndexSetsDefaultConfiguration;
 import org.graylog2.configuration.IndexSetsDefaultConfigurationFactory;
 import org.graylog2.datatiering.DataTieringChecker;
+import org.graylog2.datatiering.DataTieringConfig;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
@@ -47,6 +48,10 @@ public class IndexSetConfigFactory {
         return ZonedDateTime.now(ZoneOffset.UTC);
     }
 
+    private static DataTieringConfig getDataTieringConfig(IndexSetsDefaultConfiguration defaultConfig) {
+        return defaultConfig.useLegacyRotation() ? null : defaultConfig.dataTiering();
+    }
+
     public IndexSetConfig.Builder createDefault() {
         IndexSetsDefaultConfiguration defaultConfig = clusterConfigService.get(IndexSetsDefaultConfiguration.class);
         if (defaultConfig == null) {
@@ -68,6 +73,6 @@ public class IndexSetConfigFactory {
                 .rotationStrategy(defaultConfig.rotationStrategyConfig())
                 .retentionStrategyClass(defaultConfig.retentionStrategyClass())
                 .retentionStrategy(defaultConfig.retentionStrategyConfig())
-                .dataTiering(dataTieringChecker.isEnabled() ? defaultConfig.dataTiering() : null);
+                .dataTiering(dataTieringChecker.isEnabled() ? getDataTieringConfig(defaultConfig) : null);
     }
 }
