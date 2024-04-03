@@ -143,6 +143,10 @@ const TabKeywordTimeRange = ({ defaultValue, disabled, setValidatingKeyword }: P
     }
   }, [nextRangeProps.value, keywordPreview, nextRangeHelpers]);
 
+  useEffect(() => () => {
+    setValidatingKeyword(false);
+  }, [setValidatingKeyword]);
+
   return (
     <Row className="no-bm">
       <Col sm={5}>
