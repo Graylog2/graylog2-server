@@ -60,8 +60,8 @@ jest.mock('use-query-params', () => ({
 
 jest.mock('stores/indices/IndexSetsStore', () => ({
   IndexSetsActions: {
-    list: jest.fn(),
-    get: jest.fn(),
+    list: jest.fn(() => Promise.resolve()),
+    get: jest.fn(() => Promise.resolve()),
   },
   IndexSetsStore: MockStore(['getInitialState', () => ({
     indexSets: [

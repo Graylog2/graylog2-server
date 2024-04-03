@@ -76,13 +76,6 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
         this.s3RepositoryConfiguration = s3RepositoryConfiguration;
     }
 
-    private boolean isPreflight() {
-        final PreflightConfigResult preflightResult = preflightConfigService.getPreflightConfigResult();
-
-        // if preflight is finished, we assume that there will be some datanode registered via node-service.
-        return preflightResult != PreflightConfigResult.FINISHED;
-    }
-
     @Override
     public OpensearchConfiguration get() {
         //TODO: at some point bind the whole list, for now there is too much experiments with order and prerequisites
