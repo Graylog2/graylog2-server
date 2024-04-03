@@ -16,18 +16,15 @@
  */
 package org.graylog2.indexer.migration;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter.Status;
-import org.joda.time.DateTime;
-import org.joda.time.Duration;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public record RemoteReindexIndex(String name, Status status, DateTime created, Duration took,
-                                 IndexMigrationProgress progress, String errorMsg) {
-
-
-    public static RemoteReindexIndex notStartedYet(String indexName) {
-        return new RemoteReindexIndex(indexName, Status.NOT_STARTED, null, null, null, null);
+class IndexMigrationProgressTest {
+    @Test
+    void testProgressPercent() {
+        Assertions.assertThat(new IndexMigrationProgress(100, 30, 10, 10).progressPercent()).isEqualTo(50);
+        Assertions.assertThat(new IndexMigrationProgress(100, 0, 0, 0).progressPercent()).isEqualTo(0);
+        Assertions.assertThat(new IndexMigrationProgress(100, 100, 0, 0).progressPercent()).isEqualTo(100);
+        Assertions.assertThat(new IndexMigrationProgress(0, 0, 0, 0).progressPercent()).isEqualTo(100);
     }
-
 }

@@ -230,8 +230,7 @@ public class MigrationActionsImpl implements MigrationActions {
         final String password = getStateMachineContext().getActionArgumentOpt("password", String.class).orElse(null);
         final List<String> indices = getStateMachineContext().getActionArgumentOpt("indices", List.class).orElse(Collections.emptyList()); // todo: generics!
         final int threadsCount = getStateMachineContext().getActionArgumentOpt("threads", Integer.class).orElse(4);
-        final RemoteReindexMigration migration = migrationService.start(new RemoteReindexRequest(allowlist, hostname, user, password, indices, threadsCount));
-        final String migrationID = migration.id();
+        final String migrationID = migrationService.start(new RemoteReindexRequest(allowlist, hostname, user, password, indices, threadsCount));
         getStateMachineContext().addExtendedState(MigrationStateMachineContext.KEY_MIGRATION_ID, migrationID);
     }
 
