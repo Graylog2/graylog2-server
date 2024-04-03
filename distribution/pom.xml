@@ -23,7 +23,7 @@
     <parent>
         <artifactId>graylog-parent</artifactId>
         <groupId>org.graylog</groupId>
-        <version>5.1.14-SNAPSHOT</version>
+        <version>5.1.13-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
