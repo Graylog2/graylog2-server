@@ -94,7 +94,6 @@ describe('<Scratchpad />', () => {
 
     const btnCopy = screen.getByRole('button', { name: /copy/i });
 
-
     fireEvent.click(btnCopy);
 
     await screen.findByText(/copied!/i);

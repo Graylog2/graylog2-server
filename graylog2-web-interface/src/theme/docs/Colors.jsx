@@ -14,12 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
-import ClipboardJS from 'clipboard';
 
 import { Tooltip } from 'components/bootstrap';
+import copyToClipboard from 'util/copyToClipboard';
 
 const Name = styled.span`
   flex: 1;
@@ -65,29 +65,17 @@ const Swatch = styled.button(({ color, theme }) => css`
 
 const ColorSwatch = ({ className, color, name, copyText }) => {
   const [opened, setOpened] = useState(false);
-  const swatchRef = useRef();
 
-  useEffect(() => {
-    let clipboard;
+  const copyCallback = () => {
+    copyToClipboard(copyText).then(() => {
+      setOpened(true);
 
-    if (ClipboardJS.isSupported() && !!copyText) {
-      clipboard = new ClipboardJS(swatchRef.current, {});
+      setTimeout(() => {
+        setOpened(false);
+      }, 1000);
+    });
+  };
 
-      clipboard.on('success', () => {
-        setOpened(true);
-
-        setTimeout(() => {
-          setOpened(false);
-        }, 1000);
-      });
-    }
-
-    return () => {
-      if (clipboard) {
-        clipboard.destroy();
-      }
-    };
-  }, [copyText]);
 
   return (
     (
@@ -99,9 +87,7 @@ const ColorSwatch = ({ className, color, name, copyText }) => {
           Copied!
         </StyledTooltip>
         <Swatch color={color}
-                data-clipboard-button
-                data-clipboard-text={copyText}
-                ref={swatchRef}>
+                onClick={() => copyCallback()}>
           <Name>{name}</Name>
           <Value>{color}</Value>
         </Swatch>
