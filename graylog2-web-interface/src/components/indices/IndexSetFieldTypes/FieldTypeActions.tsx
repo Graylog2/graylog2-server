@@ -29,10 +29,9 @@ type Props = {
   fieldType: IndexSetFieldType,
   indexSetId: string,
   onSubmitCallback: (props: FieldTypePutResponse) => void,
-  showEditButton: boolean,
 }
 
-const FieldTypeActions = ({ onSubmitCallback, fieldType, indexSetId, showEditButton }: Props) => {
+const FieldTypeActions = ({ onSubmitCallback, fieldType, indexSetId }: Props) => {
   const [showResetModal, setShowResetModal] = useState<boolean>(false);
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
   const toggleResetModal = () => setShowResetModal((cur) => !cur);
@@ -41,7 +40,6 @@ const FieldTypeActions = ({ onSubmitCallback, fieldType, indexSetId, showEditBut
 
   return (
     <>
-      {showEditButton && (
       <Button onClick={toggleEditModal}
               role="button"
               bsSize="xsmall"
@@ -57,7 +55,6 @@ const FieldTypeActions = ({ onSubmitCallback, fieldType, indexSetId, showEditBut
         )
       }
       </Button>
-      )}
       {showResetButton && (
         <Button onClick={toggleResetModal}
                 role="button"

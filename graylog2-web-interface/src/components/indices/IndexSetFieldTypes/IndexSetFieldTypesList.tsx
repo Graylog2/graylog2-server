@@ -140,9 +140,8 @@ const IndexSetFieldTypesList = () => {
   const renderActions = useCallback((fieldType: IndexSetFieldType) => (
     <FieldTypeActions fieldType={fieldType}
                       indexSetId={indexSetId}
-                      onSubmitCallback={onSubmitCallback}
-                      showEditButton={indexFieldTypeChangeAllowed} />
-  ), [indexSetId, onSubmitCallback, indexFieldTypeChangeAllowed]);
+                      onSubmitCallback={onSubmitCallback} />
+  ), [indexSetId, onSubmitCallback]);
 
   const onSearch = useCallback((val: string) => {
     paginationQueryParameter.resetPage();
@@ -187,7 +186,7 @@ const IndexSetFieldTypesList = () => {
                          setUrlQueryFilters={onChangeFilters}
                          filterValueRenderers={FilterValueRenderers} />
         </SearchForm>
-        <IndexSetProfile disabled={!indexFieldTypeChangeAllowed} />
+        {indexFieldTypeChangeAllowed && <IndexSetProfile />}
       </StyledTopRow>
       {pagination?.total === 0 && (
         <NoEntitiesExist>
@@ -206,7 +205,7 @@ const IndexSetFieldTypesList = () => {
                                             actionsCellWidth={120}
                                             columnRenderers={customColumnRenderers}
                                             columnDefinitions={attributes}
-                                            rowActions={renderActions}
+                                            rowActions={indexFieldTypeChangeAllowed && renderActions}
                                             expandedSectionsRenderer={expandedSections}
                                             bulkSelection={bulkSection} />
       )}

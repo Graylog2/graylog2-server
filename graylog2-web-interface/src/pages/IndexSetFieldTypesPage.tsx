@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
@@ -28,6 +28,7 @@ import IndexSetFieldTypesList from 'components/indices/IndexSetFieldTypes/IndexS
 import ChangeFieldTypeButton from 'components/indices/IndexSetFieldTypes/ChangeFieldTypeButton';
 import useHasTypeMappingPermission from 'hooks/useHasTypeMappingPermission';
 import { IndicesPageNavigation } from 'components/indices';
+import isIndexFieldTypeChangeAllowed from 'components/indices/helpers/isIndexFieldTypeChangeAllowed';
 
 const IndexSetFieldTypesPage = () => {
   const { indexSetId } = useParams();
@@ -44,6 +45,8 @@ const IndexSetFieldTypesPage = () => {
     }
   }, [hasMappingPermission, indexSetId, navigate]);
 
+  const indexFieldTypeChangeAllowed = useMemo(() => isIndexFieldTypeChangeAllowed(indexSet), [indexSet]);
+
   return (
     <DocumentTitle title={`Index Set - ${indexSet ? indexSet.title : ''}`}>
       <IndicesPageNavigation />
@@ -52,7 +55,7 @@ const IndexSetFieldTypesPage = () => {
                     title: 'Index model documentation',
                     path: DocsHelper.PAGES.INDEX_MODEL,
                   }}
-                  actions={<ChangeFieldTypeButton indexSetId={indexSetId} />}>
+                  actions={indexFieldTypeChangeAllowed && <ChangeFieldTypeButton indexSetId={indexSetId} />}>
         <span>
           The data represents field types from 2 last indices and the fields with custom field type. You can modify the current field types configuration for this index set.
         </span>
