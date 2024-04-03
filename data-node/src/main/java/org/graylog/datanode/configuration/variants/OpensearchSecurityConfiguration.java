@@ -75,6 +75,7 @@ public class OpensearchSecurityConfiguration {
      * truststore.
      */
     public OpensearchSecurityConfiguration configure(DatanodeConfiguration datanodeConfiguration, byte[] signingKey) throws GeneralSecurityException, IOException {
+        opensearchHeap = datanodeConfiguration.opensearchHeap();
         if (securityEnabled()) {
 
             logCertificateInformation("transport certificate", transportCertificate);
@@ -94,7 +95,6 @@ public class OpensearchSecurityConfiguration {
             System.setProperty("javax.net.ssl.trustStorePassword", truststorePassword);
 
             enableJwtAuthenticationInConfig(opensearchConfigDir, signingKey);
-            opensearchHeap = datanodeConfiguration.opensearchHeap();
         }
         return this;
     }
