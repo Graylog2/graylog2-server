@@ -82,8 +82,6 @@ public class RemoteReindexMigration {
      */
     @JsonProperty("progress")
     public int progress() {
-        final int countOfIndices = indices.size();
-
         if (indices.isEmpty()) {
             return 100; // avoid division by zero. No indices == migration is immediately done
         }

@@ -18,6 +18,11 @@ package org.graylog2.indexer.migration;
 
 public record IndexMigrationProgress(long total, long created, long updated, long deleted) {
     public int progressPercent() {
+
+        if(total == 0) { // avoid division by zero
+            return 100;
+        }
+
         return (int) Math.min((100.0 / total) * (created + updated + deleted), 100);
     }
 }
