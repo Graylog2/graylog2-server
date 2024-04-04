@@ -152,6 +152,8 @@ const AppRouter = () => {
     enableInputsRoute = AppConfig.isFeatureEnabled('cloud_inputs');
   }
 
+  const enableDataNodeMigration = AppConfig.isFeatureEnabled('data_node_migration');
+
   const router = createBrowserRouter([
     ...pluginRoutesWithNullParent,
 
@@ -254,7 +256,7 @@ const AppRouter = () => {
             !isCloud && { path: RoutePaths.SYSTEM.DATANODES.LIST, element: <DataNodesPage /> },
             !isCloud && { path: RoutePaths.SYSTEM.DATANODES.CLUSTER, element: <DataNodesClusterManagementPage /> },
             !isCloud && { path: RoutePaths.SYSTEM.DATANODES.CONFIGURATION, element: <DataNodesClusterConfigurationPage /> },
-            !isCloud && { path: RoutePaths.SYSTEM.DATANODES.MIGRATION, element: <DataNodesMigrationPage /> },
+            !isCloud && enableDataNodeMigration && { path: RoutePaths.SYSTEM.DATANODES.MIGRATION, element: <DataNodesMigrationPage /> },
             !isCloud && { path: RoutePaths.SYSTEM.DATANODES.SHOW(':dataNodeId'), element: <DataNodePage /> },
 
             !isCloud && { path: RoutePaths.SYSTEM.OUTPUTS, element: <SystemOutputsPage /> },
