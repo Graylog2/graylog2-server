@@ -32,6 +32,7 @@ public class DatanodeResolver {
 
     public static final String LEADER_KEYWORD = "leader";
     public static final String ANY_NODE_KEYWORD = "any";
+    public static final String ALL_NODES_KEYWORD = "all";
     private final NodeService<DataNodeDto> nodeService;
 
     @Inject

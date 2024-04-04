@@ -1,0 +1,5 @@
+type = "c"
+message = "When installing a content pack in cloud, ignore any inputs that are not cloud-compatible."
+
+pulls = ["18688", "Graylog2/graylog-plugin-enterprise#6854"]
+issues = ["Graylog2/graylog-plugin-enterprise#5997"]

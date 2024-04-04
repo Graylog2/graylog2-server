@@ -100,7 +100,6 @@ public class OpensearchCommandLineProcess implements Closeable {
     private void configureS3RepositoryPlugin(OpensearchConfiguration config) {
         if (config.s3RepositoryConfiguration().isRepositoryEnabled()) {
             final OpensearchCli opensearchCli = new OpensearchCli(config);
-            installPlugin(opensearchCli, config, "repository-s3");
             configureS3Credentials(opensearchCli, config);
         } else {
             LOG.info("No S3 repository configuration provided, skipping plugin initialization");
@@ -109,9 +108,6 @@ public class OpensearchCommandLineProcess implements Closeable {
 
     private void configureS3Credentials(OpensearchCli opensearchCli, OpensearchConfiguration config) {
         LOG.info("Creating opensearch keystore");
-        // this always operates on newly created configuration directory, there is no existing keystore present. Otherwise
-        // the command will get stuck. There is currently no timeout, so it will just block the startup forever
-        // TODO: add watchdog and timeout to the underlying command handling.
         final String createdMessage = opensearchCli.keystore().create();
         LOG.info(createdMessage);
         LOG.info("Setting opensearch s3 repository keystore secrets");
@@ -119,19 +115,8 @@ public class OpensearchCommandLineProcess implements Closeable {
         opensearchCli.keystore().add("s3.client.default.secret_key", config.s3RepositoryConfiguration().getS3ClientDefaultSecretKey());
     }
 
-
-    private void installPlugin(OpensearchCli opensearchCli, OpensearchConfiguration config, String pluginName) {
-        final List<String> installedPlugins = opensearchCli.plugin().list();
-        if (!installedPlugins.contains(pluginName)) {
-            opensearchCli.plugin().installFromZip(pluginName, config.opensearchDistribution().version());
-            LOG.info("Successfully installed opensearch plugin " + pluginName);
-        } else {
-            LOG.info("Opensearch plugin " + pluginName + " already installed, skipping");
-        }
-    }
-
-    private static Map<String, String> getOpensearchConfigurationArguments(OpensearchConfiguration config) {
-        Map<String, String> allArguments = new LinkedHashMap<>(config.asMap());
+    private static Map<String, Object> getOpensearchConfigurationArguments(OpensearchConfiguration config) {
+        Map<String, Object> allArguments = new LinkedHashMap<>(config.asMap());
 
         // now copy all the environment values to the configuration arguments. Opensearch won't do it for us,
         // because we are using tar distriburion and opensearch does this only for docker dist. See opensearch-env script

@@ -43,11 +43,11 @@ public record OpensearchConfiguration(
         S3RepositoryConfiguration s3RepositoryConfiguration,
 
         String nodeSearchCacheSize,
-        Map<String, String> additionalConfiguration
+        Map<String, Object> additionalConfiguration
 ) {
-    public Map<String, String> asMap() {
+    public Map<String, Object> asMap() {
 
-        Map<String, String> config = new LinkedHashMap<>();
+        Map<String, Object> config = new LinkedHashMap<>();
 
         config.put("action.auto_create_index", "false");
 
@@ -78,7 +78,7 @@ public record OpensearchConfiguration(
         config.put("discovery.seed_providers", "file");
 
         config.put("node.search.cache.size", nodeSearchCacheSize);
-        if(s3RepositoryConfiguration.isRepositoryEnabled()) {
+        if (s3RepositoryConfiguration.isRepositoryEnabled()) {
             config.putAll(s3RepositoryConfiguration.toOpensearchProperties());
         }
 
@@ -92,17 +92,18 @@ public record OpensearchConfiguration(
 
     public Environment getEnv() {
         final Environment env = new Environment(System.getenv());
+        env.put("OPENSEARCH_JAVA_OPTS", "-Xms%s -Xmx%s".formatted(opensearchSecurityConfiguration.getOpensearchHeap(), opensearchSecurityConfiguration.getOpensearchHeap()));
         env.put("OPENSEARCH_PATH_CONF", datanodeDirectories.getOpensearchProcessConfigurationDir().toString());
         return env;
     }
 
     public HttpHost getRestBaseUrl() {
-        final boolean sslEnabled = Boolean.parseBoolean(asMap().getOrDefault("plugins.security.ssl.http.enabled", "false"));
+        final boolean sslEnabled = Boolean.parseBoolean(asMap().getOrDefault("plugins.security.ssl.http.enabled", "false").toString());
         return new HttpHost(hostname(), httpPort(), sslEnabled ? "https" : "http");
     }
 
     public HttpHost getClusterBaseUrl() {
-        final boolean sslEnabled = Boolean.parseBoolean(asMap().getOrDefault("plugins.security.ssl.http.enabled", "false"));
+        final boolean sslEnabled = Boolean.parseBoolean(asMap().getOrDefault("plugins.security.ssl.http.enabled", "false").toString());
         return new HttpHost(hostname(), transportPort(), sslEnabled ? "https" : "http");
     }
 

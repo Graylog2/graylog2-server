@@ -28,8 +28,10 @@ import type { MigrationActions, MigrationState, MigrationStepComponentProps, Ste
 import MigrationStepTriggerButtonToolbar from '../common/MigrationStepTriggerButtonToolbar';
 
 const IndicesContainer = styled.div`
-  max-height: 100px;
-  overflow-y: auto;
+  max-height: 300px;
+  overflow-y: scroll;
+  overflow: -moz-scrollbars-vertical;
+  -ms-overflow-y: scroll;
   margin-top: 5px;
 `;
 
@@ -40,7 +42,7 @@ export type RemoteReindexCheckConnection = {
 
 const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => {
   const [nextSteps, setNextSteps] = useState<MigrationActions[]>(['CHECK_REMOTE_INDEXER_CONNECTION']);
-  const [errorMessage, setErrrorMessage] = useState<string|null>(null);
+  const [errorMessage, setErrrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [availableIndices, setAvailableIndices] = useState<string[]>([]);
   const [selectedIndices, setSelectedIndices] = useState<string[]>([]);
@@ -98,6 +100,7 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
   };
 
   const initialValues: RemoteReindexRequest = {
+    allowlist: '',
     hostname: '',
     user: '',
     password: '',
@@ -106,15 +109,25 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
   };
 
   return (
-    <Formik initialValues={initialValues} onSubmit={() => {}}>
+    <Formik initialValues={initialValues}
+            onSubmit={() => {
+            }}>
       {({
         values,
         setFieldValue,
       }) => (
         <Form role="form">
+          <Input id="allowlist"
+                 name="allowlist"
+                 label="Allowlist of all machines in the old cluster"
+                 type="text"
+                 disabled={isLoading}
+                 value={values.allowlist}
+                 onChange={(e) => handleChange(e, setFieldValue)}
+                 required />
           <Input id="hostname"
                  name="hostname"
-                 label="Cluster URI"
+                 label="URI of the host to call the remote reindexing command against"
                  type="text"
                  disabled={isLoading}
                  value={values.hostname}
@@ -136,7 +149,7 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
                  onChange={(e) => handleChange(e, setFieldValue)} />
           {(availableIndices.length > 0) && (
             <Alert title="Valid connection" bsStyle="success">
-              These are the available indices for the remote reindex migration:
+              These are the available <b>{availableIndices.length}</b> indices for the remote reindex migration:
               <IndicesContainer>
                 {availableIndices.map((index) => (
                   <Input type="checkbox"
@@ -157,7 +170,9 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
           {isLoading ? (
             <Spinner />
           ) : (
-            <MigrationStepTriggerButtonToolbar nextSteps={nextSteps || currentStep.next_steps} onTriggerStep={handleTriggerNextStep} args={{ ...values, indices: selectedIndices } as RemoteReindexRequest} />
+            <MigrationStepTriggerButtonToolbar nextSteps={nextSteps || currentStep.next_steps}
+                                               onTriggerStep={handleTriggerNextStep}
+                                               args={{ ...values, indices: selectedIndices } as RemoteReindexRequest} />
           )}
         </Form>
       )}

@@ -24,11 +24,12 @@ import { Timestamp } from 'components/common';
 
 const ExecutionInfo = () => {
   const result = useAppSelector(selectCurrentQueryResults);
-  const total = result?.searchTypes && Object.values(result?.searchTypes)?.[0]?.total;
 
   if (isEmpty(result)) {
     return <i>No query executed yet.</i>;
   }
+
+  const total = result?.searchTypes && Object.values(result?.searchTypes)?.find((e) => e.total)?.total;
 
   return (
     <i>

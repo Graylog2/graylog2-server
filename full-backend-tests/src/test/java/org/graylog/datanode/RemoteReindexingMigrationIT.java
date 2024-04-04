@@ -69,37 +69,6 @@ public class RemoteReindexingMigrationIT {
         this.openSearchInstance.close();
     }
 
-    @ContainerMatrixTest
-    void testRemoteReindexingSync() throws ExecutionException, RetryException {
-        final String indexName = createRandomIndex();
-        final String indexName2 = createRandomIndex();
-        final String messageContent = ingestRandomMessage(indexName);
-        final String messageContent2 = ingestRandomMessage(indexName2);
-
-        // flush the newly created document
-        openSearchInstance.client().refreshNode();
-
-        final String request = """
-                {
-                    "hostname": "%s",
-                    "indices": ["%s", "%s"],
-                    "synchronous": true
-                }
-                """.formatted(openSearchInstance.internalUri(), indexName, indexName2);
-
-
-        LOG.info("Requesting remote reindex: " + request);
-
-        final ValidatableResponse migrationResponse = apis.post("/remote-reindex-migration/remoteReindex", request, 200);
-
-        // one document migrated
-        migrationResponse.assertThat().body("indices", Matchers.hasSize(2));
-        migrationResponse.assertThat().body("indices[0].status", Matchers.equalTo("FINISHED"));
-        migrationResponse.assertThat().body("indices[1].status", Matchers.equalTo("FINISHED"));
-
-        Assertions.assertThat(waitForMessage(indexName, messageContent)).containsEntry("message", messageContent);
-        Assertions.assertThat(waitForMessage(indexName2, messageContent2)).containsEntry("message", messageContent2);
-    }
 
     @ContainerMatrixTest
     void testRemoteAsyncReindexing() throws ExecutionException, RetryException {

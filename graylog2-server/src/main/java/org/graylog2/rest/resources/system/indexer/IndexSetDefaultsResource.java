@@ -108,6 +108,13 @@ public class IndexSetDefaultsResource extends RestResource {
             throw new BadRequestException(buildFieldError(IndexSetConfig.FIELD_DATA_TIERING, violation.message()));
         }
 
+        // Any change to the default config can only have been performed without data tiering because there is no UI yet.
+        // Thus we need to switch back to legacy mode, to make the users' changes effective.
+        // TODO remove this once we build a UI for data tiering defaults.
+        config = config.toBuilder().useLegacyRotation(true).build();
+
+        clusterConfigService.write(config);
+
         clusterConfigService.write(config);
         return Response.ok(config).build();
     }

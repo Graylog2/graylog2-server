@@ -26,9 +26,12 @@ import jakarta.inject.Singleton;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.bootstrap.preflight.DatanodeDirectoriesLockfileCheck;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
+import org.graylog.datanode.configuration.variants.InSecureConfiguration;
 import org.graylog.datanode.metrics.ConfigureMetricsIndexSettings;
 import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog.datanode.process.ProcessStateMachine;
+import org.graylog2.bootstrap.preflight.PreflightConfigResult;
+import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
@@ -38,6 +41,7 @@ import org.graylog2.datanode.DataNodeLifecycleEvent;
 import org.graylog2.datanode.RemoteReindexAllowlistEvent;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.security.CustomCAX509TrustManager;
 import org.slf4j.Logger;
@@ -60,6 +64,9 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     private final IndexFieldTypesService indexFieldTypesService;
     private final ClusterEventBus clusterEventBus;
     private final DatanodeDirectoriesLockfileCheck lockfileCheck;
+    private final ClusterConfigService clusterConfigService;
+    private final PreflightConfigService preflightConfigService;
+    private final Configuration configuration;
 
 
     @Inject
@@ -75,14 +82,19 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
                                     final ObjectMapper objectMapper,
                                     final ProcessStateMachine processStateMachine,
                                     final ClusterEventBus clusterEventBus,
-                                    final DatanodeDirectoriesLockfileCheck lockfileCheck) {
+                                    final DatanodeDirectoriesLockfileCheck lockfileCheck,
+                                    final ClusterConfigService clusterConfigService,
+                                    final PreflightConfigService preflightConfigService) {
         this.configurationProvider = configurationProvider;
+        this.configuration = configuration;
         this.eventBus = eventBus;
         this.nodeId = nodeId;
         this.dataNodeProvisioningService = dataNodeProvisioningService;
         this.indexFieldTypesService = indexFieldTypesService;
         this.clusterEventBus = clusterEventBus;
         this.lockfileCheck = lockfileCheck;
+        this.clusterConfigService = clusterConfigService;
+        this.preflightConfigService = preflightConfigService;
         this.process = createOpensearchProcess(datanodeConfiguration, trustManager, configuration, nodeService, objectMapper, processStateMachine);
         eventBus.register(this);
     }
@@ -94,7 +106,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
         process.addStateMachineTracer(watchdog);
         process.addStateMachineTracer(new StateMachineTransitionLogger());
         process.addStateMachineTracer(new OpensearchRemovalTracer(process, configuration.getDatanodeNodeName(), nodeId, clusterEventBus));
-        process.addStateMachineTracer(new ConfigureMetricsIndexSettings(process, configuration, indexFieldTypesService, objectMapper));
+        process.addStateMachineTracer(new ConfigureMetricsIndexSettings(process, configuration, indexFieldTypesService, objectMapper, nodeService));
         process.addStateMachineTracer(new ClusterNodeStateTracer(nodeService, nodeId));
         return process;
     }
@@ -105,7 +117,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
         switch (event.action()) {
             case ADD -> {
                 this.process.stop();
-                configure(Map.of("reindex.remote.whitelist", event.host())); // , "action.auto_create_index", "false"));
+                configure(Map.of("reindex.remote.allowlist", event.allowlist())); // , "action.auto_create_index", "false"));
                 this.process.start();
             }
             case REMOVE -> {
@@ -120,7 +132,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     @SuppressWarnings("unused")
     public void handlePreflightConfigEvent(DataNodeProvisioningStateChangeEvent event) {
         switch (event.state()) {
-            case STARTUP_REQUESTED -> startUp();
+            case STARTUP_REQUESTED -> this.process.start();
             case STORED -> {
                 configure();
                 dataNodeProvisioningService.changeState(event.nodeId(), DataNodeProvisioningConfig.State.STARTUP_PREPARED);
@@ -141,12 +153,21 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
         }
     }
 
+    private void checkWritePreflightFinishedOnInsecureStartup() {
+        if(configuration.isInsecureStartup()) {
+            var preflight = preflightConfigService.getPreflightConfigResult();
+            if (preflight == null || !preflight.equals(PreflightConfigResult.FINISHED)) {
+                preflightConfigService.setConfigResult(PreflightConfigResult.FINISHED);
+            }
+        }
+    }
+
     @Override
     protected void startUp() {
         final OpensearchConfiguration config = configurationProvider.get();
         configure();
         if (config.securityConfigured()) {
-
+            checkWritePreflightFinishedOnInsecureStartup();
             try {
                 lockfileCheck.checkDatanodeLock(config.datanodeDirectories().getDataTargetDir());
                 this.process.start();
@@ -161,10 +182,10 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
         this.configure(Map.of());
     }
 
-    private void configure(Map<String, String> additionalConfig) {
+    private void configure(Map<String, Object> additionalConfig) {
         final OpensearchConfiguration original = configurationProvider.get();
 
-        final var finalAdditionalConfig = new HashMap<String, String>();
+        final var finalAdditionalConfig = new HashMap<String, Object>();
         finalAdditionalConfig.putAll(original.additionalConfiguration());
         finalAdditionalConfig.putAll(additionalConfig);
 

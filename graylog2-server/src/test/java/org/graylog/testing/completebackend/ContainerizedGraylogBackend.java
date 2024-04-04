@@ -16,6 +16,7 @@
  */
 package org.graylog.testing.completebackend;
 
+import com.google.common.base.Stopwatch;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.testing.completebackend.ContainerizedGraylogBackendServicesProvider.Services;
@@ -62,11 +63,15 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
                                                                          final boolean webhookServerEnabled,
                                                                          Map<String, String> configParams) {
 
+        final Stopwatch sw = Stopwatch.createStarted();
         LOG.debug("Creating Backend services {} {} {} flags <{}>", version, mongodbVersion, withMailServerEnabled ? "mail" : "", enabledFeatureFlags);
         final Services services = servicesProvider.getServices(version, mongodbVersion, withMailServerEnabled, webhookServerEnabled, enabledFeatureFlags);
-        LOG.debug("Done creating backend services");
+        LOG.debug(" creating backend services took " + sw.elapsed());
 
-        return new ContainerizedGraylogBackend().create(services, mongoDBFixtures, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, preImportLicense, configParams);
+        final Stopwatch backendSw = Stopwatch.createStarted();
+        final ContainerizedGraylogBackend backend = new ContainerizedGraylogBackend().create(services, mongoDBFixtures, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, preImportLicense, configParams);
+        LOG.debug("Creating dockerized graylog server took {}", backendSw.elapsed());
+        return backend;
     }
 
     private ContainerizedGraylogBackend create(Services services,

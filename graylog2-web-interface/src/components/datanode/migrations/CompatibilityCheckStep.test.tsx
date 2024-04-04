@@ -24,20 +24,22 @@ import type { MigrationState } from 'components/datanode/Types';
 
 jest.mock('components/datanode/hooks/useCompatibilityCheck', () => jest.fn(() => ({
   data: {
-    opensearch_version: '2.10.0',
-    info: {
-      nodes: [{
-        indices: [{
-          index_id: 'prlnhUp_TvSof9U-K3FZ9A',
-          shards: [{ documents_count: 10, name: 'S0', primary: true, min_lucene_version: '9.7.0' }],
-          index_name: '.opendistro_security',
-          creation_date: '2023-11-17T09:57:36.511',
-          index_version_created: '2.10.0',
+    datanode1: {
+      opensearch_version: '2.10.0',
+      info: {
+        nodes: [{
+          indices: [{
+            index_id: 'prlnhUp_TvSof9U-K3FZ9A',
+            shards: [{ documents_count: 10, name: 'S0', primary: true, min_lucene_version: '9.7.0' }],
+            index_name: '.opendistro_security',
+            creation_date: '2023-11-17T09:57:36.511',
+            index_version_created: '2.10.0',
+          }],
         }],
-      }],
-      opensearch_data_location: '/home/tdvorak/bin/datanode/data',
+        opensearch_data_location: '/home/tdvorak/bin/datanode/data',
+      },
+      compatibility_errors: [],
     },
-    compatibility_errors: [],
   },
   isFetching: false,
   isInitialLoading: false,
@@ -65,9 +67,11 @@ describe('CompatibilityCheckStep', () => {
   it('should render Compatibility error', async () => {
     asMock(useCompatibilityCheck).mockReturnValue({
       data: {
-        opensearch_version: '2.10.0',
-        info: null,
-        compatibility_errors: ['org.graylog.shaded.opensearch2.org.apache.lucene.index.IndexFormatTooOldException: Format version is not supported (resource BufferedChecksumIndexInput(ByteBufferIndexInput(path="/index/segments_3"))): This index was initially created with Lucene 7.x while the current version is 9.7.0 and Lucene only supports reading the current and previous major versions. This version of Lucene only supports indexes created with release 8.0 and later by default.'],
+        datanode1: {
+          opensearch_version: '2.10.0',
+          info: null,
+          compatibility_errors: ['org.graylog.shaded.opensearch2.org.apache.lucene.index.IndexFormatTooOldException: Format version is not supported (resource BufferedChecksumIndexInput(ByteBufferIndexInput(path="/index/segments_3"))): This index was initially created with Lucene 7.x while the current version is 9.7.0 and Lucene only supports reading the current and previous major versions. This version of Lucene only supports indexes created with release 8.0 and later by default.'],
+        },
       },
       refetch: () => {},
       isError: false,

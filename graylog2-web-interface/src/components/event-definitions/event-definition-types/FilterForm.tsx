@@ -30,6 +30,7 @@ import max from 'lodash/max';
 import union from 'lodash/union';
 import moment from 'moment';
 import { OrderedMap } from 'immutable';
+import type { $PropertyType } from 'utility-types';
 
 import { getPathnameWithoutId } from 'util/URLUtils';
 import { isPermitted } from 'util/PermissionsMixin';
@@ -60,6 +61,7 @@ import type { EventDefinition } from 'components/event-definitions/event-definit
 import type { Stream } from 'stores/streams/StreamsStore';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 import { indicesInWarmTier, isSearchingWarmTier } from 'views/components/searchbar/queryvalidation/warmTierValidation';
+import type { FiltersType } from 'views/types';
 
 import EditQueryParameterModal from '../event-definition-form/EditQueryParameterModal';
 import commonStyles from '../common/commonStyles.css';
@@ -81,10 +83,12 @@ const buildNewParameter = (name: string): LookupTableParameterJsonEmbryonic => (
   title: 'new title',
 });
 
+type EventDefinitionConfig = $PropertyType<EventDefinition, 'config'>;
+
 type Props = {
   currentUser: User,
   eventDefinition: EventDefinition,
-  onChange: (name: string, config: EventDefinition['config']) => void,
+  onChange: (name: string, config: EventDefinitionConfig) => void,
   streams: Array<Stream>,
   validation: { errors: { [key: string]: Array<string> } }
 }
@@ -97,6 +101,7 @@ const FilterForm = ({
   validation,
 } : Props) => {
   const { execute_every_ms: executeEveryMs, search_within_ms: searchWithinMs } = eventDefinition.config;
+  const [currentConfig, setCurrentConfig] = useState(eventDefinition.config);
   const searchWithin = extractDurationAndUnit(searchWithinMs, TIME_UNITS);
   const executeEvery = extractDurationAndUnit(executeEveryMs, TIME_UNITS);
   const { userTimezone } = useUserDateTime();
@@ -136,7 +141,7 @@ const FilterForm = ({
       };
 
       validateQuery(request, timezone).then((result) => {
-        if (result?.status === 'WARNING') {
+        if (result?.status === 'WARNING' || result?.status === 'ERROR') {
           setFieldWarning('queryString', result);
         } else {
           setFieldWarning('queryString', undefined);
@@ -169,9 +174,15 @@ const FilterForm = ({
     userTimezone,
     validateQueryString]);
 
-  const propagateChange = (key, value) => {
+  const getUpdatedConfig = (key, value) => {
     const config = cloneDeep(eventDefinition.config);
     config[key] = value;
+    setCurrentConfig(config);
+
+    return config;
+  };
+
+  const propagateChange = (config: EventDefinitionConfig) => {
     onChange('config', config);
   };
 
@@ -190,8 +201,7 @@ const FilterForm = ({
     (streamIds) => streamIds.join('-'),
   );
 
-  const syncParamsWithQuery = (paramsInQuery) => {
-    const config = cloneDeep(eventDefinition.config);
+  const syncParamsWithQuery = (paramsInQuery, config: EventDefinitionConfig) => {
     const queryParameters = config?.query_parameters || [];
     const keptParameters = [];
     const staleParameters = {};
@@ -218,11 +228,10 @@ const FilterForm = ({
 
     setQueryParameterStash(merge(queryParameterStash, staleParameters));
 
-    config.query_parameters = keptParameters.concat(newParameters);
-    onChange('config', config);
+    onChange('config', { ...config, query_parameters: keptParameters.concat(newParameters) });
   };
 
-  const parseQuery = debounce((queryString, searchFilters = OrderedMap()) => {
+  const parseQuery = (queryString: string, config: EventDefinitionConfig, searchFilters = OrderedMap()) => {
     if (!userCanViewLookupTables()) {
       return;
     }
@@ -231,7 +240,7 @@ const FilterForm = ({
       .id(queryId)
       .query({ type: 'elasticsearch', query_string: queryString })
       .timerange({ type: 'relative', range: 1000 })
-      .filters(searchFilters.toList())
+      .filters(searchFilters.toList() as FiltersType)
       .searchTypes([{
         id: searchTypeId,
         type: 'messages',
@@ -254,37 +263,47 @@ const FilterForm = ({
       .build();
 
     parseSearch(search).then((res) => {
-      syncParamsWithQuery(res.undeclared);
+      syncParamsWithQuery(res.undeclared, config);
     });
-  }, 250);
+  };
 
-  const handleConfigChange = (event) => {
-    const { name } = event.target;
-    const value = FormsUtils.getValueFromInput(event.target);
+  const debouncedParseQuery = debounce(parseQuery, 250);
 
+  const handleConfigChange = (name: string, config: EventDefinitionConfig) => {
     if (name === '_is_scheduled') {
       sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.FILTER_EXECUTED_AUTOMATICALLY_TOGGLED, {
         app_pathname: getPathnameWithoutId(pathname),
         app_section: 'event-definition-condition',
         app_action_value: 'enable-checkbox',
-        is_scheduled: value,
+        is_scheduled: config._is_scheduled,
       });
     }
 
-    propagateChange(name, value);
+    propagateChange(config);
   };
 
   const handleQueryChange = (event) => {
-    parseQuery(event.target.value);
-    handleConfigChange(event);
+    const { name } = event.target;
+    const value = FormsUtils.getValueFromInput(event.target);
+    const newConfig = getUpdatedConfig(name, value);
+    handleConfigChange(name, newConfig);
+    debouncedParseQuery(value, newConfig);
   };
 
   const handleSearchFiltersChange = (searchFilters) => {
     const { query } = eventDefinition.config;
 
-    parseQuery(query, searchFilters);
+    const newConfig = getUpdatedConfig('filters', searchFilters.toArray());
+    propagateChange(newConfig);
 
-    propagateChange('filters', searchFilters.toArray());
+    debouncedParseQuery(query, newConfig);
+  };
+
+  const handleEnabledChange = (event) => {
+    const { name } = event.target;
+    const value = FormsUtils.getValueFromInput(event.target);
+    const newConfig = getUpdatedConfig(name, value);
+    handleConfigChange(name, newConfig);
   };
 
   const hideFiltersPreview = (value) => {
@@ -299,7 +318,7 @@ const FilterForm = ({
       app_action_value: 'stream-select',
     });
 
-    propagateChange('streams', nextValue);
+    propagateChange(getUpdatedConfig('streams', nextValue));
   };
 
   const handleTimeRangeChange = (fieldName) => (nextValue, nextUnit) => {
@@ -321,7 +340,7 @@ const FilterForm = ({
 
     const durationInMs = moment.duration(max([nextValue, 1]), nextUnit).asMilliseconds();
 
-    propagateChange(fieldName, durationInMs);
+    propagateChange(getUpdatedConfig(fieldName, durationInMs));
 
     const stateFieldName = camelCase(fieldName);
 
@@ -358,7 +377,7 @@ const FilterForm = ({
                                queryParameter={LookupTableParameter.fromJSON(queryParam)}
                                embryonic={!!(queryParam as LookupTableParameterJsonEmbryonic).embryonic}
                                queryParameters={queryParameters}
-                               lookupTables={Object.values(tables)}
+                               lookupTables={Object.values(tables || {})}
                                onChange={onChangeQueryParameters} />
     ));
 
@@ -414,7 +433,7 @@ const FilterForm = ({
                  including declaring Query Parameters from Lookup Tables by using the <code>$newParameter$</code> syntax.
                </span>
                  )}
-             value={defaultTo(eventDefinition.config.query, '')}
+             value={defaultTo(currentConfig.query, '')}
              onChange={handleQueryChange} />
       )}
 
@@ -480,7 +499,7 @@ const FilterForm = ({
                label="Enable"
                help="Should this event definition be executed automatically?"
                checked={defaultTo(eventDefinition.config._is_scheduled, true)}
-               onChange={handleConfigChange} />
+               onChange={handleEnabledChange} />
       </>
       )}
     </fieldset>
