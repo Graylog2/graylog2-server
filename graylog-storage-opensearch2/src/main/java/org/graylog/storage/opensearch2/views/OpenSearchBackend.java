@@ -40,6 +40,7 @@ import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.searchfilters.db.UsedSearchFiltersToQueryStringsMapper;
+import org.graylog.plugins.views.search.searchtypes.events.EventList;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.MultiSearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
@@ -185,7 +186,12 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                             .map(this::translateQueryString)
                             .forEach(searchTypeOverrides::must);
 
-                    searchTypeSourceBuilder.query(searchTypeOverrides);
+                    // do not override search query for the Events Widget
+                    if (EventList.NAME.equals(searchType.type()) && searchType.query().isPresent()) {
+                        searchTypeSourceBuilder.query(translateQueryString(searchType.query().get().queryString()));
+                    } else {
+                        searchTypeSourceBuilder.query(searchTypeOverrides);
+                    }
 
                     searchTypeHandler.get().generateQueryPart(query, searchType, queryContext);
                 });
@@ -225,7 +231,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
 
     @Override
     public Set<IndexRange> indexRangesForStreamsInTimeRange(Set<String> streamIds, TimeRange timeRange) {
-        return indexLookup.indexRangesForStreamsInTimeRange(streamIds,timeRange);
+        return indexLookup.indexRangesForStreamsInTimeRange(streamIds, timeRange);
     }
 
     @Override
