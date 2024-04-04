@@ -36,6 +36,12 @@ particular permissions are required.
 The username/password field was removed from the header of the API browser. If users want to perform API requests with
 different credentials, they must log out of Graylog and re-login with another user.
 
+### Trusted Header Authentication restricted to initial session creation
+
+Trusted Header Authentication can now only be used to authenticate HTTP requests required to establish an initial
+Graylog session in an SSO scenario. It can not be used to authenticate programmatic HTTP requests against the Graylog
+REST API. Other authentication schemes, preferably API tokens, should be employed for the latter.
+
 ### Plugins
 
 Removal of `systemnavigation` web interface plugin. Previously it was possible to register options for the
