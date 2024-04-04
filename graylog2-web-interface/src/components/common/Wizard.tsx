@@ -32,8 +32,114 @@ const HorizontalCol = styled(Col)`
   margin-bottom: 15px;
 `;
 
-const StyledNav = styled(Nav)(({ theme }) => css`
+const StyledNav: React.ComponentType<any> = styled(Nav)<{$style?: 'stepper'}>(({ $style, theme }) => css`
+  ${$style === 'stepper' ? `
   &.nav {
+   counter-reset: line-number;
+    > li {
+      counter-increment: line-number;
+      > a {
+        position: relative;
+        display: flex;
+        padding: 10px 0px;
+        justify-content: center;
+        align-items: center;
+        &:hover,
+        &:focus {
+          background-color: initial;
+        }
+        > div {
+          flex-shrink: 0;
+        }
+        
+        &::before {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          flex-grow: 0; 
+          flex-shrink: 0;
+          background-color: ${theme.colors.global.contentBackground};
+          border-color: ${theme.colors.variant.lighter.default};
+          margin-right: 10px;
+          content: counter(line-number);
+          width: 35px;
+          height: 35px;
+          border-radius: 50%;
+          border: 2px solid;
+          z-index: 2;
+        }
+        &::after {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          background-color: ${theme.colors.global.contentBackground};
+          border-color: ${theme.colors.variant.lighter.default};
+          margin-right: 10px;
+          content: ' ';
+          border: 1px solid ${theme.colors.input.border};
+          width: 100%;
+          flex-shrink: 1;
+          flex-grow: 0;
+          align-self: center;
+          margin: 0 16px;
+        } 
+        &:hover::after {
+          background-color: ${theme.colors.variant.lightest.default};
+        }
+      }
+      &:last-child > a {
+       justify-content: flex-start;
+       &::after {
+        display:none;
+       } 
+      }
+      &.disabled > a {
+        color: ${theme.colors.variant.light.default};
+
+        &:hover,
+        &:focus {
+          color: ${theme.colors.variant.light.default};
+        }
+      }
+    }
+
+    .open > a {
+      &,
+      &:hover,
+      &:focus {
+        background-color: inital;
+        border-color: ${theme.colors.variant.primary};
+      }
+    }
+    &.nav-justified {
+     > li {
+      > a {
+        text-align: left;
+      }
+     }
+    }
+    &.nav-pills {
+      > li {
+        > a {
+          color: initial;
+
+          &:hover  {
+            color: ${theme.colors.global.link};
+          }
+        }
+
+        &.active > a {
+          &,
+          &:hover,
+          &:focus {
+            color: ${theme.colors.global.link};
+            background-color: initial; 
+          }
+        }
+      }
+    } 
+  }
+  ` : `&.nav {
     > li {
       border: 1px solid ${theme.colors.variant.lighter.default};
       border-left: 0;
@@ -124,14 +230,14 @@ const StyledNav = styled(Nav)(({ theme }) => css`
         margin-bottom: 0;
       }
     }
-  }
+  }`}
 `);
 
 const HorizontalButtonToolbar = styled(ButtonToolbar)`
   padding: 7px;
 `;
 
-const isValidActiveStep = (activeStep: StepKey | null | undefined, steps: Steps) => {
+const isValidActiveStep = (activeStep: StepKey | null | undefined, steps: StepsType) => {
   if (activeStep === undefined || activeStep === null) {
     return false;
   }
@@ -139,7 +245,7 @@ const isValidActiveStep = (activeStep: StepKey | null | undefined, steps: Steps)
   return find(steps, { key: activeStep });
 };
 
-const warnOnInvalidActiveStep = (activeStep: StepKey | null | undefined, steps: Steps) => {
+const warnOnInvalidActiveStep = (activeStep: StepKey | null | undefined, steps: StepsType) => {
   if (activeStep === undefined || activeStep === null) {
     return;
   }
@@ -152,16 +258,16 @@ const warnOnInvalidActiveStep = (activeStep: StepKey | null | undefined, steps: 
 
 export type StepKey = number | string;
 
-export type Step = {
+export type StepType = {
   key: StepKey,
   title: React.ReactNode,
   component: React.ReactElement,
   disabled?: boolean,
 };
 
-export type Steps = Array<Step>;
+export type StepsType = Array<StepType>;
 type Props = {
-  steps: Steps,
+  steps: StepsType,
   activeStep: StepKey | null | undefined,
   onStepChange: (StepKey) => void,
   children: React.ReactNode,
@@ -169,6 +275,7 @@ type Props = {
   justified: boolean,
   containerClassName: string,
   hidePreviousNextButtons: boolean,
+  style: 'stepper' | undefined,
 };
 
 type State = {
@@ -210,6 +317,7 @@ class Wizard extends React.Component<Props, State> {
     containerClassName: PropTypes.string,
     /** Indicates if wizard should render next/previous buttons or not */
     hidePreviousNextButtons: PropTypes.bool,
+    style: PropTypes.oneOf(['stepper', undefined]),
   };
 
   static defaultProps = {
@@ -220,6 +328,7 @@ class Wizard extends React.Component<Props, State> {
     justified: false,
     containerClassName: 'content',
     hidePreviousNextButtons: false,
+    style: undefined,
   };
 
   constructor(props: Props) {
@@ -288,20 +397,21 @@ class Wizard extends React.Component<Props, State> {
   };
 
   _renderVerticalStepNav = () => {
-    const { justified, steps, hidePreviousNextButtons } = this.props;
+    const { justified, steps, hidePreviousNextButtons, style } = this.props;
     const selectedStep = this._getSelectedStep();
 
     return (
       <SubnavigationCol md={2}>
-        <Nav stacked
-             bsStyle="pills"
-             activeKey={selectedStep}
-             onSelect={this._wizardChanged as SelectCallback}
-             justified={justified}>
+        <StyledNav stacked
+                   bsStyle="pills"
+                   $style={style}
+                   activeKey={selectedStep}
+                   onSelect={this._wizardChanged as SelectCallback}
+                   justified={justified}>
           {steps.map((navItem) => (
             <NavItem key={navItem.key} eventKey={navItem.key} disabled={navItem.disabled}>{navItem.title}</NavItem>
           ))}
-        </Nav>
+        </StyledNav>
         {!hidePreviousNextButtons && (
           <>
             <br />
@@ -329,7 +439,7 @@ class Wizard extends React.Component<Props, State> {
 
   _renderHorizontalStepNav = () => {
     const selectedStep = this._getSelectedStep();
-    const { justified, steps, hidePreviousNextButtons } = this.props;
+    const { justified, steps, hidePreviousNextButtons, style } = this.props;
 
     return (
       <HorizontalCol sm={12}>
@@ -355,6 +465,7 @@ class Wizard extends React.Component<Props, State> {
         )}
         <StyledNav bsStyle="pills"
                    activeKey={selectedStep}
+                   $style={style}
                    onSelect={this._wizardChanged as SelectCallback}
                    justified={justified}>
           {steps.map((navItem) => (

@@ -17,9 +17,9 @@
 package org.graylog.storage.opensearch2.migrations;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
 import org.graylog.storage.opensearch2.PlainJsonApi;
 import org.graylog2.migrations.V20170607164210_MigrateReopenedIndicesToAliases;
-import org.opensearch.client.Request;
 
 import jakarta.inject.Inject;
 

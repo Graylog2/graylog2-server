@@ -48,8 +48,7 @@ const LogLevelDropdown = createReactClass({
   },
 
   _menuLevelClick(loglevel) {
-    return (event) => {
-      event.preventDefault();
+    return () => {
       this._changeLoglevel(loglevel);
 
       this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.LOGGING.LOG_LEVEL_EDITED, {

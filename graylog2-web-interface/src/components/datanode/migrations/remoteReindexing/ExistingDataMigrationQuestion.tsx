@@ -16,14 +16,20 @@
  */
 import * as React from 'react';
 
+import { Space } from 'preflight/components/common';
+
 import type { MigrationStepComponentProps } from '../../Types';
 import MigrationStepTriggerButtonToolbar from '../common/MigrationStepTriggerButtonToolbar';
 
 const ExistingDataMigrationQuestion = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => (
   <>
-    Do you want to migrate your existing data?
-    <br />
-    <br />
+    <p>Do you want to migrate your existing data?</p>
+    <Space h="md" />
+    <p>Please remove the <code>elasticsearch_hosts</code> line from your Graylog configuration file (<code>graylog.conf</code>).</p>
+    <p>E.g., <code>elasticsearch_hosts = https://admin:admin@opensearch1:9200,https://admin:admin@opensearch2:9200,https://admin:admin@opensearch3:9200</code></p>
+    <Space h="md" />
+    <p>Once that is done please proceed to the next step.</p>
+    <Space h="md" />
     <MigrationStepTriggerButtonToolbar nextSteps={currentStep.next_steps} onTriggerStep={onTriggerStep} />
   </>
 );

@@ -27,6 +27,7 @@ import org.graylog.storage.opensearch2.IndicesAdapterOS2;
 import org.graylog.storage.opensearch2.MessagesAdapterOS2;
 import org.graylog.storage.opensearch2.NodeAdapterOS2;
 import org.graylog.storage.opensearch2.OpenSearchClient;
+import org.graylog.storage.opensearch2.PlainJsonApi;
 import org.graylog.storage.opensearch2.Scroll;
 import org.graylog.storage.opensearch2.ScrollResultOS2;
 import org.graylog.storage.opensearch2.SearchRequestFactory;
@@ -68,6 +69,7 @@ public class AdaptersOS2 implements Adapters {
     public IndicesAdapter indicesAdapter() {
         return new IndicesAdapterOS2(client,
                 new org.graylog.storage.opensearch2.stats.StatsApi(objectMapper, client),
+                new org.graylog.storage.opensearch2.stats.ClusterStatsApi(objectMapper, new PlainJsonApi(objectMapper, client)),
                 new org.graylog.storage.opensearch2.cat.CatApi(objectMapper, client),
                 new org.graylog.storage.opensearch2.cluster.ClusterStateApi(objectMapper, client),
                 new ComposableIndexTemplateAdapter(client, objectMapper)
@@ -76,7 +78,7 @@ public class AdaptersOS2 implements Adapters {
 
     @Override
     public NodeAdapter nodeAdapter() {
-        return new NodeAdapterOS2(client);
+        return new NodeAdapterOS2(client, objectMapper);
     }
 
     @Override

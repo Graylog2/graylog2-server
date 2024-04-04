@@ -22,6 +22,7 @@ import { Button, Col, ControlLabel, FormControl, FormGroup, Row, Input } from 'c
 import { ConfirmLeaveDialog, SourceCodeEditor, FormSubmit } from 'components/common';
 import Routes from 'routing/Routes';
 import useHistory from 'routing/useHistory';
+import usePreventAbandonPageConfirmation from 'hooks/usePreventAbandonPageConfirmation';
 
 import { PipelineRulesContext } from './RuleContext';
 import PipelinesUsingRule from './PipelinesUsingRule';
@@ -50,6 +51,8 @@ const StyledContainer = styled.div`
 `;
 
 const RuleForm = ({ create }: Props) => {
+  usePreventAbandonPageConfirmation();
+
   const {
     description,
     handleDescription,

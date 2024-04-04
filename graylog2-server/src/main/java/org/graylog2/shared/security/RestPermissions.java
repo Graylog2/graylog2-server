@@ -108,7 +108,8 @@ public class RestPermissions implements PluginPermissions {
     public static final String METRICS_READ = "metrics:read";
     public static final String METRICS_READALL = "metrics:readall";
     public static final String METRICS_READHISTORY = "metrics:readhistory";
-    @Deprecated public static final String NODE_SHUTDOWN = "node:shutdown";
+    @Deprecated
+    public static final String NODE_SHUTDOWN = "node:shutdown";
     public static final String MONITORING_READ = "monitoring:read";
     public static final String NOTIFICATIONS_DELETE = "notifications:delete";
     public static final String NOTIFICATIONS_READ = "notifications:read";
@@ -173,6 +174,13 @@ public class RestPermissions implements PluginPermissions {
     public static final String DATANODE_START = "datanode:start";
     public static final String DATANODE_MIGRATION = "datanode:migration";
 
+    public static final String DATANODE_OPENSEARCH_PROXY = "datanode:opensearchproxy";
+    public static final String DATANODE_REST_PROXY = "datanode:restproxy";
+
+    public static final String GRAYLOG_CA_CREATE = "graylog_ca:create";
+    public static final String GRAYLOG_CA_CLIENTCERT_CREATE = "ca_clientcert:create";
+    public static final String GRAYLOG_CA_CLIENTCERT_DELETE = "ca_clientcert:delete";
+
     // This is a special permission that ONLY works with GRNs as ID/target
     // TODO does this belong here?
     public static final String ENTITY_OWN = "entity:own";
@@ -205,6 +213,11 @@ public class RestPermissions implements PluginPermissions {
             .add(create(DATANODE_STOP, ""))
             .add(create(DATANODE_START, ""))
             .add(create(DATANODE_MIGRATION, ""))
+            .add(create(DATANODE_OPENSEARCH_PROXY, ""))
+            .add(create(DATANODE_REST_PROXY, ""))
+            .add(create(GRAYLOG_CA_CREATE, ""))
+            .add(create(GRAYLOG_CA_CLIENTCERT_CREATE, ""))
+            .add(create(GRAYLOG_CA_CLIENTCERT_DELETE, ""))
             .add(create(DECORATORS_CREATE, ""))
             .add(create(DECORATORS_EDIT, ""))
             .add(create(DECORATORS_READ, ""))

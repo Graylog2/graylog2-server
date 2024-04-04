@@ -65,7 +65,9 @@ const getStylesForPinnedColumns = (tag: 'th'|'td', stickyLeftMarginsByColumnInde
 
 const THead = styled(TableHead)<{
     $stickyLeftMarginsByColumnIndex: Array<{index: number, column: string, leftMargin: number}>
-}>(({ $stickyLeftMarginsByColumnIndex }) => css`
+}>(({ $stickyLeftMarginsByColumnIndex, theme }) => css`
+  background-color: ${theme.colors.global.contentBackground};
+
   & tr.pivot-header-row {
     & ${getStylesForPinnedColumns('th', $stickyLeftMarginsByColumnIndex)}
   }

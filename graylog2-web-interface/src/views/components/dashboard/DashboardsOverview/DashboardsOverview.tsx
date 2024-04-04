@@ -32,12 +32,16 @@ import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/ho
 
 import BulkActions from './BulkActions';
 
-const DashboardsOverview = () => {
+type Props = {
+  isEvidenceModal?: boolean,
+};
+
+const DashboardsOverview = ({ isEvidenceModal }: Props) => {
   const [query, setQuery] = useQueryParam('query', StringParam);
   const { layoutConfig, isInitialLoading: isLoadingLayoutPreferences } = useTableLayout({
     entityTableId: ENTITY_TABLE_ID,
     defaultPageSize: DEFAULT_LAYOUT.pageSize,
-    defaultDisplayedAttributes: DEFAULT_LAYOUT.displayedColumns,
+    defaultDisplayedAttributes: DEFAULT_LAYOUT.displayedColumns(isEvidenceModal),
     defaultSort: DEFAULT_LAYOUT.sort,
   });
   const paginationQueryParameter = usePaginationQueryParameter(undefined, layoutConfig.pageSize, false);
@@ -64,8 +68,8 @@ const DashboardsOverview = () => {
   }, [updateTableLayout]);
 
   const renderDashboardActions = useCallback((dashboard: View) => (
-    <DashboardActions dashboard={dashboard} refetchDashboards={refetch} />
-  ), [refetch]);
+    <DashboardActions dashboard={dashboard} refetchDashboards={refetch} isEvidenceModal={isEvidenceModal} />
+  ), [refetch, isEvidenceModal]);
 
   const onReset = useCallback(() => {
     onSearch('');
@@ -108,7 +112,7 @@ const DashboardsOverview = () => {
       )}
       {!!dashboards?.length && (
         <EntityDataTable<View> activeSort={layoutConfig.sort}
-                               bulkSelection={{ actions: <BulkActions /> }}
+                               bulkSelection={isEvidenceModal ? undefined : { actions: <BulkActions /> }}
                                columnDefinitions={attributes}
                                columnRenderers={customColumnRenderers}
                                columnsOrder={DEFAULT_LAYOUT.columnsOrder}
@@ -123,6 +127,10 @@ const DashboardsOverview = () => {
       )}
     </PaginatedList>
   );
+};
+
+DashboardsOverview.defaultProps = {
+  isEvidenceModal: false,
 };
 
 export default DashboardsOverview;
