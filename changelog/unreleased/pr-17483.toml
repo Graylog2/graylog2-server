@@ -1,4 +1,0 @@
-type = "c"
-message = "Allow trusted header authentication only for initial session creation."
-
-pulls = ["17483"]
