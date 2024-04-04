@@ -140,6 +140,7 @@ const MessageTable = ({ fields, activeQueryId, messages, config, onSortChange, s
             <tr>
               {selectedFields.toSeq().map((selectedFieldName) => {
                 const type = _fieldTypeFor(selectedFieldName, fields);
+                const isCompound = type.isCompound();
 
                 return (
                   <TableHeaderCell key={selectedFieldName} $isNumeric={type.isNumeric()}>
@@ -149,7 +150,7 @@ const MessageTable = ({ fields, activeQueryId, messages, config, onSortChange, s
                       {selectedFieldName}
                     </Field>
                     <InteractiveContext.Consumer>
-                      {(interactive) => (interactive && (
+                      {(interactive) => (interactive && !isCompound && (
                         <FieldSortIcon fieldName={selectedFieldName}
                                        onSortChange={onSortChange}
                                        setLoadingState={setLoadingState}

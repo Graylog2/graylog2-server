@@ -26,10 +26,6 @@ import withHistory from 'routing/withHistory';
 
 import EventNotificationForm from './EventNotificationForm';
 
-// Import built-in Event Notification Types
-
-import '../event-notification-types';
-
 const initialValidation = {
   errors: {},
 };

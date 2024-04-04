@@ -39,7 +39,7 @@ class DatanodeDirectoriesLockfileCheckTest {
         final Path logsDirLock = logsDir.resolve(DatanodeDirectoriesLockfileCheck.DATANODE_LOCKFILE);
         final Path configDirLock = configDir.resolve(DatanodeDirectoriesLockfileCheck.DATANODE_LOCKFILE);
 
-        final PreflightCheck check = new DatanodeDirectoriesLockfileCheck(VALID_NODE_ID, new DatanodeDirectories(dataDir, logsDir, null, configDir, null));
+        final PreflightCheck check = new DatanodeDirectoriesLockfileCheck(VALID_NODE_ID, new DatanodeDirectories(dataDir, logsDir, null, configDir));
         check.runCheck();
 
         Assertions.assertThat(Files.readString(logsDirLock)).isEqualTo(VALID_NODE_ID);
@@ -58,7 +58,7 @@ class DatanodeDirectoriesLockfileCheckTest {
         Files.writeString(logsDirLock, VALID_NODE_ID);
         Files.writeString(configDirLock, VALID_NODE_ID);
 
-        final PreflightCheck check = new DatanodeDirectoriesLockfileCheck(VALID_NODE_ID, new DatanodeDirectories(dataDir, logsDir, null, configDir, null));
+        final PreflightCheck check = new DatanodeDirectoriesLockfileCheck(VALID_NODE_ID, new DatanodeDirectories(dataDir, logsDir, null, configDir));
         check.runCheck();
 
         Assertions.assertThat(Files.readString(logsDirLock)).isEqualTo(VALID_NODE_ID);
@@ -76,7 +76,7 @@ class DatanodeDirectoriesLockfileCheckTest {
         Files.writeString(logsDirLock, OTHER_NODE_ID);
         Files.writeString(configDirLock, OTHER_NODE_ID);
 
-        final PreflightCheck check = new DatanodeDirectoriesLockfileCheck(VALID_NODE_ID, new DatanodeDirectories(dataDir, logsDir, null, configDir, null));
+        final PreflightCheck check = new DatanodeDirectoriesLockfileCheck(VALID_NODE_ID, new DatanodeDirectories(dataDir, logsDir, null, configDir));
 
         Assertions.assertThatThrownBy(check::runCheck)
                 .isInstanceOf(DatanodeLockFileException.class)

@@ -25,18 +25,13 @@ import org.graylog.datanode.process.OpensearchConfiguration;
 public class OpensearchCli {
 
     private final OpensearchKeystoreCli keystore;
-    private final OpensearchPluginCli plugin;
 
     public OpensearchCli(OpensearchConfiguration config) {
         this.keystore = new OpensearchKeystoreCli(config);
-        this.plugin = new OpensearchPluginCli(config);
     }
 
     public OpensearchKeystoreCli keystore() {
         return keystore;
     }
 
-    public OpensearchPluginCli plugin() {
-        return plugin;
-    }
 }

@@ -17,12 +17,12 @@
 package org.graylog.datanode.management;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.oxo42.stateless4j.StateMachine;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.http.client.utils.URIBuilder;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
+import org.graylog.datanode.configuration.variants.OpensearchSecurityConfiguration;
 import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog.datanode.process.OpensearchInfo;
 import org.graylog.datanode.process.ProcessEvent;
@@ -123,7 +123,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
                         .setHost(httpHost.getHostName())
                         .setPort(httpHost.getPort())
                         .setScheme(httpHost.getSchemeName()).toString())
-                .orElse(""); // TODO: will this cause problems in the nodeservice?
+                .orElse(""); // Empty address will cause problems for opensearch clients. Has to be filtered out in IndexerDiscoveryProvider
         return URI.create(baseUrl);
     }
 
@@ -134,7 +134,9 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
 
     @Override
     public String getDatanodeRestApiUrl() {
-        final boolean secured = opensearchConfiguration.map(OpensearchConfiguration::securityConfigured).orElse(false);
+        final boolean secured = opensearchConfiguration.map(OpensearchConfiguration::opensearchSecurityConfiguration)
+                .map(OpensearchSecurityConfiguration::securityEnabled)
+                .orElse(false);
         String protocol = secured ? "https" : "http";
         String host = configuration.getHostname();
         final int port = configuration.getDatanodeHttpPort();
@@ -177,8 +179,21 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
                     trustManager.refresh();
                     // refresh the seed hosts
                     writeSeedHostsList();
+
+                    boolean startedPreviously = Objects.nonNull(commandLineProcess) && commandLineProcess.processInfo().alive();
+                    if (startedPreviously) {
+                        stop();
+                    }
+
                     commandLineProcess = new OpensearchCommandLineProcess(config, this);
+
+                    if (startedPreviously) {
+                        commandLineProcess.start();
+                    }
+
                     restClient = Optional.of(createRestClient(config));
+                    openSearchClient = restClient.map(c -> new OpenSearchClient(c, objectMapper));
+
                 }),
                 () -> {throw new IllegalArgumentException("Opensearch configuration required but not supplied!");}
         );
@@ -196,14 +211,16 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     }
     @Override
     public synchronized void start() {
-        opensearchConfiguration.ifPresentOrElse(
-                (config -> {
-                    commandLineProcess.start();
-                    restClient = Optional.of(createRestClient(config));
-                    openSearchClient = restClient.map(c -> new OpenSearchClient(c, objectMapper));
-                }),
-                () -> {throw new IllegalArgumentException("Opensearch configuration required but not supplied!");}
-        );
+        if (Objects.isNull(commandLineProcess) || !commandLineProcess.processInfo().alive()) {
+            opensearchConfiguration.ifPresentOrElse(
+                    (config -> {
+                        commandLineProcess.start();
+                        restClient = Optional.of(createRestClient(config));
+                        openSearchClient = restClient.map(c -> new OpenSearchClient(c, objectMapper));
+                    }),
+                    () -> {throw new IllegalArgumentException("Opensearch configuration required but not supplied!");}
+            );
+        }
     }
 
     @Override

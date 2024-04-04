@@ -34,6 +34,7 @@ export const SOURCE_FIELD = 'source';
 
 export const STREAMS_FIELD = 'streams';
 
+export const GL2_SECOND_SORT_FIELD = 'gl2_second_sort_field';
 export const FILTERED_FIELDS = [
   // ElasticSearch fields.
   '_id',
@@ -46,17 +47,18 @@ export const FILTERED_FIELDS = [
 
   // Our reserved fields.
   'gl2_accounted_message_size',
-  'gl2_processing_timestamp',
+  'gl2_processing_error',
   'gl2_processing_duration_ms',
+  'gl2_processing_timestamp',
   'gl2_receive_timestamp',
-  'gl2_message_id',
-  'gl2_source_node',
-  'gl2_source_input',
-  'gl2_source_collector',
-  'gl2_source_collector_input',
+  'gl2_remote_hostname',
   'gl2_remote_ip',
   'gl2_remote_port',
-  'gl2_remote_hostname',
+  'gl2_source_collector',
+  'gl2_source_collector_input',
+  'gl2_source_input',
+  'gl2_source_node',
+  'gl2_message_id',
   STREAMS_FIELD,
   // TODO Due to be removed in Graylog 3.x
   'gl2_source_radio',
@@ -68,6 +70,7 @@ export const RESERVED_FIELDS = [
   MESSAGE_FIELD,
   TIMESTAMP_FIELD,
   SOURCE_FIELD,
+  GL2_SECOND_SORT_FIELD,
 ];
 
 export const MISSING_BUCKET_NAME = '(Empty Value)';

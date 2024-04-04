@@ -474,7 +474,8 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.hasField("author_first")).isTrue();
         assertThat(message.getField("author_first")).isEqualTo("Nigel Rees");
         assertThat(message.hasField("author_last")).isTrue();
-        assertThat(message.hasField("this_should_exist")).isTrue();
+        assertThat(message.hasField("expected_empty_array")).isTrue();
+        assertThat(message.hasField("suppressed_empty_array")).isFalse();
     }
 
     @Test

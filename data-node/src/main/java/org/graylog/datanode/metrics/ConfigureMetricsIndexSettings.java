@@ -28,6 +28,8 @@ import org.graylog.datanode.process.ProcessState;
 import org.graylog.datanode.process.StateMachineTracer;
 import org.graylog.storage.opensearch2.DataStreamAdapterOS2;
 import org.graylog.storage.opensearch2.ism.IsmApi;
+import org.graylog2.cluster.nodes.DataNodeDto;
+import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.indexer.datastream.DataStreamService;
 import org.graylog2.indexer.datastream.DataStreamServiceImpl;
 import org.graylog2.indexer.datastream.policy.IsmPolicy;
@@ -56,12 +58,14 @@ public class ConfigureMetricsIndexSettings implements StateMachineTracer {
     private final IndexFieldTypesService indexFieldTypesService;
     private final ObjectMapper objectMapper;
     private DataStreamService dataStreamService;
+    private final NodeService<DataNodeDto> nodeService;
 
-    public ConfigureMetricsIndexSettings(OpensearchProcess process, Configuration configuration, IndexFieldTypesService indexFieldTypesService, ObjectMapper objectMapper) {
+    public ConfigureMetricsIndexSettings(OpensearchProcess process, Configuration configuration, IndexFieldTypesService indexFieldTypesService, ObjectMapper objectMapper, NodeService<DataNodeDto> nodeService) {
         this.process = process;
         this.configuration = configuration;
         this.objectMapper = objectMapper;
         this.indexFieldTypesService = indexFieldTypesService;
+        this.nodeService = nodeService;
     }
 
     @Override
@@ -72,13 +76,13 @@ public class ConfigureMetricsIndexSettings implements StateMachineTracer {
     public void transition(ProcessEvent trigger, ProcessState source, ProcessState destination) {
         if (destination == ProcessState.AVAILABLE && source == ProcessState.STARTING) {
             process.openSearchClient().ifPresent(client -> {
-                if (dataStreamService == null) {
-                    final IsmApi ismApi = new IsmApi(client, objectMapper);
-                    dataStreamService = new DataStreamServiceImpl(
-                            new DataStreamAdapterOS2(client, objectMapper, ismApi),
-                            indexFieldTypesService
-                    );
-                }
+                final IsmApi ismApi = new IsmApi(client, objectMapper);
+                int replicas = nodeService.allActive().size() == 1 ? 0 : 1;
+                dataStreamService = new DataStreamServiceImpl(
+                        new DataStreamAdapterOS2(client, objectMapper, ismApi),
+                        indexFieldTypesService,
+                        replicas
+                );
                 dataStreamService.createDataStream(configuration.getMetricsStream(),
                         configuration.getMetricsTimestamp(),
                         createMappings(),
