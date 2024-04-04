@@ -16,21 +16,13 @@
  */
 
 import * as React from 'react';
-import styled from 'styled-components';
 import type { SyntheticEvent } from 'react';
 
 import Button from 'components/bootstrap/Button';
-import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
 import type { IconName } from 'components/common/Icon';
 import Icon from 'components/common/Icon';
 import Spinner from 'components/common/Spinner';
-
-const StyledButtonToolbar = styled(ButtonToolbar)`
-  display: flex;
-  justify-content: flex-end;
-  align-items: end;
-  gap: 0.25em;
-`;
+import { ModalButtonToolbar } from 'components/common';
 
 type WithCancelProps = {
   displayCancel: true,
@@ -85,7 +77,7 @@ const ModalSubmit = (props: Props) => {
   const title = typeof submitButtonText === 'string' ? submitButtonText : undefined;
 
   return (
-    <StyledButtonToolbar className={className}>
+    <ModalButtonToolbar className={className}>
       {leftCol}
       {displayCancel && (
         <Button type="button"
@@ -108,7 +100,7 @@ const ModalSubmit = (props: Props) => {
         {(submitIcon && !(isAsyncSubmit && props.isSubmitting)) && <><Icon name={submitIcon} /> </>}
         {(isAsyncSubmit && props.isSubmitting) ? <Spinner text={props.submitLoadingText} delay={0} /> : submitButtonText}
       </Button>
-    </StyledButtonToolbar>
+    </ModalButtonToolbar>
   );
 };
 
