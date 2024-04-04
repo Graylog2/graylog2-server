@@ -39,8 +39,11 @@ different credentials, they must log out of Graylog and re-login with another us
 ### Trusted Header Authentication restricted to initial session creation
 
 Trusted Header Authentication can now only be used to authenticate HTTP requests required to establish an initial
-Graylog session in an SSO scenario. It can not be used to authenticate programmatic HTTP requests against the Graylog
-REST API. Other authentication schemes, preferably API tokens, should be employed for the latter.
+Graylog session in an SSO scenario. Effectively, this means that only API endpoints starting with the path
+`/system/sessions` can still be authenticated with a trusted header.
+Trusted Header Authentication can not be used anymore to authenticate programmatic HTTP requests against other endpoints
+of the Graylog REST API. Alternative authentication schemes, preferably API tokens, should be employed for these API
+requests.
 
 ### Plugins
 
