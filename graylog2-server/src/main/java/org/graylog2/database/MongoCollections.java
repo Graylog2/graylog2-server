@@ -38,11 +38,11 @@ public class MongoCollections {
     /**
      * Get a MongoCollection configured to use Jackson for serialization/deserialization of objects.
      */
-    public <T> MongoCollection<T> get(String collectionName, Class<T> valueType) {
+    public <T> GraylogMongoCollection<T> get(String collectionName, Class<T> valueType) {
         final MongoCollection<T> collection = mongoConnection.getMongoDatabase().getCollection(collectionName, valueType);
         final CustomJacksonCodecRegistry jacksonCodecRegistry = new CustomJacksonCodecRegistry(this.objectMapper,
                 collection.getCodecRegistry());
         jacksonCodecRegistry.addCodecForClass(valueType);
-        return collection.withCodecRegistry(jacksonCodecRegistry);
+        return new DefaultGraylogMongoCollection<>(collection.withCodecRegistry(jacksonCodecRegistry));
     }
 }
