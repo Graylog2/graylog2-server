@@ -1,0 +1,12 @@
+rule "grokIssue18883"
+when true
+then
+  let e = grok (
+    pattern: "%{DATA:vendor_attack} against (?:server )?%{IP:destination_ip} (from %{IP:source_ip} )?detected(. %{NONNEGINT:packets:long})?",
+    value: "DDOS against server 10.0.1.34 detected.", // broken
+    //value: "DDOS against server 10.0.1.34 detected. 123456", // works
+    only_named_captures: true
+  );
+  set_field(field: "__grok_map", value: e);
+  set_fields(fields: e);
+end

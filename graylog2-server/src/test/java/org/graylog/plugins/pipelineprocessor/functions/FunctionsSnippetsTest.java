@@ -379,7 +379,12 @@ public class FunctionsSnippetsTest extends BaseParserTest {
                 GrokPattern.create("BASE10NUM", "(?<![0-9.+-])(?>[+-]?(?:(?:[0-9]+(?:\\.[0-9]+)?)|(?:\\.[0-9]+)))"),
                 GrokPattern.create("NUMBER", "(?:%{BASE10NUM:UNWANTED})"),
                 GrokPattern.create("UNDERSCORE", "(?<test_field>test)"),
-                GrokPattern.create("NUM", "%{BASE10NUM}")
+                GrokPattern.create("NUM", "%{BASE10NUM}"),
+                GrokPattern.create("DATA", ".*?"),
+                GrokPattern.create("IPV4", "(?<![0-9])(?:(?:[0-1]?[0-9]{1,2}|2[0-4][0-9]|25[0-5])[.](?:[0-1]?[0-9]{1,2}|2[0-4][0-9]|25[0-5])[.](?:[0-1]?[0-9]{1,2}|2[0-4][0-9]|25[0-5])[.](?:[0-1]?[0-9]{1,2}|2[0-4][0-9]|25[0-5]))(?![0-9])"),
+                GrokPattern.create("IPV6", "((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:)))(%.+)?"),
+                GrokPattern.create("IP", "(?:%{IPV6}|%{IPV4})"),
+                GrokPattern.create("NONNEGINT", "\\b(?:[0-9]+)\\b")
         );
         when(grokPatternService.loadAll()).thenReturn(patterns);
         when(grokPatternService.loadByName("GREEDY")).thenReturn(Optional.of(greedyPattern));
@@ -855,6 +860,23 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message).isNotNull();
         assertThat(message.getFieldCount()).isEqualTo(6);
         assertThat(message.getTimestamp()).isEqualTo(DateTime.parse("2015-07-31T10:05:36.773Z"));
+        // named captures only
+        assertThat(message.hasField("num")).isTrue();
+        assertThat(message.hasField("BASE10NUM")).isFalse();
+
+        // Test for issue 5563 and 5794
+        // ensure named groups with underscore work
+        assertThat(message.hasField("test_field")).isTrue();
+    }
+
+    @Test
+    public void grokIssue18883() {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        final Message message = evaluateRule(rule);
+
+        assertThat(message).isNotNull();
+        assertThat(message.getFieldCount()).isEqualTo(7);
+        assertThat(message.getTimestamp()).isNotNull();
         // named captures only
         assertThat(message.hasField("num")).isTrue();
         assertThat(message.hasField("BASE10NUM")).isFalse();
