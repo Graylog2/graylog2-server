@@ -23,7 +23,7 @@ type Props = {
   priority: number | string,
 }
 const PriorityName = ({ priority }: Props) => (
-  // eslint-disable-next-line react/react-in-jsx-scope
+
   <>{StringUtils.capitalizeFirstLetter(EventDefinitionPriorityEnum.properties[priority].name)}</>
 );
 
