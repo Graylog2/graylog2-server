@@ -94,7 +94,7 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
         }
 
         if (preImportLicense) {
-            createLicenses(mongoDB, "GRAYLOG_LICENSE_STRING", "GRAYLOG_SECURITY_LICENSE_STRING");
+            createLicenses(mongoDB, "GRAYLOG_SECURITY_LICENSE_STRING", "GRAYLOG_LICENSE_STRING");
         }
 
         var searchServer = services.getSearchServerInstance();
