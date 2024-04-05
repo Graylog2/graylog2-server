@@ -184,7 +184,9 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
                         .withStartupTimeout(Duration.ofSeconds(60)));
 
         // explicitly configured ENV variables will override those set above
-        env.forEach(container::withEnv);
+        if(env != null) {
+            env.forEach(container::withEnv);
+        }
 
         final String opensearchDistributionName = "opensearch-" + getOpensearchVersion() + "-linux-" + OpensearchArchitecture.fromOperatingSystem();
         final Path downloadedOpensearch = getPath().resolve(Path.of("opensearch", opensearchDistributionName));
