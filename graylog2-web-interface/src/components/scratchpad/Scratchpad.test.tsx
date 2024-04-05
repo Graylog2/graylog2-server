@@ -34,8 +34,6 @@ const SUT = () => (
   </ScratchpadContext.Provider>
 );
 
-jest.mock('clipboard');
-
 describe('<Scratchpad />', () => {
   it('properly renders', async () => {
     render(<SUT />);

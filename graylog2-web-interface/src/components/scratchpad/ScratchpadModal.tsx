@@ -233,7 +233,7 @@ const Scratchpad = () => {
           </StatusMessage>
 
           <ButtonGroup>
-            <Button id="scratchpad-actions" onClick={() => copyCallback()} title="Copy">
+            <Button id="scratchpad-actions" onClick={copyCallback} title="Copy">
               <Icon name="content_copy" />
             </Button>
             <Button onClick={openConfirmClear} title="Clear">

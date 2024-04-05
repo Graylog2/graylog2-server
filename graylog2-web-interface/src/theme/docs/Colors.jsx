@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
@@ -66,7 +66,7 @@ const Swatch = styled.button(({ color, theme }) => css`
 const ColorSwatch = ({ className, color, name, copyText }) => {
   const [opened, setOpened] = useState(false);
 
-  const copyCallback = () => {
+  const copyCallback = useCallback(() => {
     copyToClipboard(copyText).then(() => {
       setOpened(true);
 
@@ -74,7 +74,7 @@ const ColorSwatch = ({ className, color, name, copyText }) => {
         setOpened(false);
       }, 1000);
     });
-  };
+  }, [copyText]);
 
   return (
     (
@@ -86,7 +86,7 @@ const ColorSwatch = ({ className, color, name, copyText }) => {
           Copied!
         </StyledTooltip>
         <Swatch color={color}
-                onClick={() => copyCallback()}>
+                onClick={copyCallback}>
           <Name>{name}</Name>
           <Value>{color}</Value>
         </Swatch>
