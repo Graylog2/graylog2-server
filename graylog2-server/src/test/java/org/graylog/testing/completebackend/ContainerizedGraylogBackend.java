@@ -61,15 +61,15 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
                                                                          final boolean preImportLicense,
                                                                          final boolean withMailServerEnabled,
                                                                          final boolean webhookServerEnabled,
-                                                                         Map<String, String> configParams) {
+                                                                         Map<String, String> env) {
 
         final Stopwatch sw = Stopwatch.createStarted();
         LOG.debug("Creating Backend services {} {} {} flags <{}>", version, mongodbVersion, withMailServerEnabled ? "mail" : "", enabledFeatureFlags);
-        final Services services = servicesProvider.getServices(version, mongodbVersion, withMailServerEnabled, webhookServerEnabled, enabledFeatureFlags);
+        final Services services = servicesProvider.getServices(version, mongodbVersion, withMailServerEnabled, webhookServerEnabled, enabledFeatureFlags, env);
         LOG.debug(" creating backend services took " + sw.elapsed());
 
         final Stopwatch backendSw = Stopwatch.createStarted();
-        final ContainerizedGraylogBackend backend = new ContainerizedGraylogBackend().create(services, mongoDBFixtures, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, preImportLicense, configParams);
+        final ContainerizedGraylogBackend backend = new ContainerizedGraylogBackend().create(services, mongoDBFixtures, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, preImportLicense, env);
         LOG.debug("Creating dockerized graylog server took {}", backendSw.elapsed());
         return backend;
     }

@@ -47,9 +47,11 @@ import org.graylog2.bootstrap.preflight.web.resources.model.CA;
 import org.graylog2.bootstrap.preflight.web.resources.model.CreateCARequest;
 import org.graylog2.bootstrap.preflight.web.resources.model.CreateClientCertRequest;
 import org.graylog2.plugin.rest.ApiError;
+import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
 import java.io.IOException;
+import java.net.URI;
 import java.security.KeyStoreException;
 import java.util.List;
 
@@ -59,7 +61,7 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
 @Api(value = "CA", description = "Certificate Authority", tags = {CLOUD_VISIBLE})
-public class CAResource {
+public class CAResource extends RestResource {
     private final CaService caService;
     private final String passwordSecret;
     private final ClientCertGenerator clientCertGenerator;
@@ -84,8 +86,12 @@ public class CAResource {
     @AuditEvent(type = CaAuditEventTypes.CA_CREATE)
     @ApiOperation("Creates a CA")
     @RequiresPermissions(RestPermissions.GRAYLOG_CA_CREATE)
-    public void createCA(@ApiParam(name = "request", required = true) @NotNull @Valid CreateCARequest request) throws CACreationException, KeyStoreStorageException, KeyStoreException {
-        caService.create(request.organization(), CaService.DEFAULT_VALIDITY, passwordSecret.toCharArray());
+    public Response createCA(@ApiParam(name = "request", required = true) @NotNull @Valid CreateCARequest request) throws CACreationException, KeyStoreStorageException, KeyStoreException {
+        final CA ca = caService.create(request.organization(), CaService.DEFAULT_VALIDITY, passwordSecret.toCharArray());
+        final URI caUri = getUriBuilderToSelf()
+                .path(CAResource.class)
+                .build();
+        return Response.created(caUri).entity(ca).build();
     }
 
     @POST
