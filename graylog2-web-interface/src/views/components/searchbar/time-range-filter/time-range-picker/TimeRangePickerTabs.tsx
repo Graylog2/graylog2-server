@@ -57,7 +57,6 @@ export const timeRangePickerTabs = {
 type TimeRangeTabsArguments = {
   activeTab: SupportedTimeRangeType,
   limitDuration: number,
-  setValidatingKeyword: (status: boolean) => void,
   tabs: Array<SupportedTimeRangeType>,
 }
 
@@ -69,7 +68,6 @@ const StyledTabs = styled(Tabs)`
 const timeRangeTypeTabs = ({
   activeTab,
   limitDuration,
-  setValidatingKeyword,
   tabs,
 }: TimeRangeTabsArguments) => availableTimeRangeTypes
   .filter(({ type }) => tabs.includes(type))
@@ -82,8 +80,7 @@ const timeRangeTypeTabs = ({
            eventKey={type}>
         {type === activeTab && (
           <TimeRangeTypeTab disabled={false}
-                            limitDuration={limitDuration}
-                            setValidatingKeyword={type === 'keyword' ? setValidatingKeyword : undefined} />
+                            limitDuration={limitDuration} />
         )}
       </Tab>
     );
@@ -114,7 +111,6 @@ const createDefaultRanges = (formatTime: (time: DateTime, format: DateTimeFormat
 type Props = {
   limitDuration: number,
   validTypes: Array<'absolute' | 'relative' | 'keyword'>,
-  setValidatingKeyword: (validating: boolean) => void,
 };
 
 const newTabTimeRange = ({
@@ -151,7 +147,6 @@ const newTabTimeRange = ({
 const TimeRangeTabs = ({
   limitDuration,
   validTypes,
-  setValidatingKeyword,
 }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const location = useLocation();
@@ -188,9 +183,8 @@ const TimeRangeTabs = ({
   const tabs = useMemo(() => timeRangeTypeTabs({
     activeTab,
     limitDuration,
-    setValidatingKeyword,
     tabs: validTypes,
-  }), [activeTab, limitDuration, setValidatingKeyword, validTypes]);
+  }), [activeTab, limitDuration, validTypes]);
 
   return (
     <StyledTabs id="dateTimeTypes"

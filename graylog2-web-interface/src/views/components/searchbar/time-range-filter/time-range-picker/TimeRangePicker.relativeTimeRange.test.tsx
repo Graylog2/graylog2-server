@@ -90,6 +90,8 @@ describe('TimeRangePicker relative time range', () => {
 
     await userEvent.type(fromRangeValueInput, '{backspace}7');
     await userEvent.type(toRangeValueInput, '{backspace}6');
+
+    await waitFor(() => expect(submitButton).not.toBeDisabled());
     await userEvent.click(submitButton);
 
     await waitFor(() => expect(setCurrentTimeRangeStub).toHaveBeenCalledTimes(1));
