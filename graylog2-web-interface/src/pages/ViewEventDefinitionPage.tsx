@@ -49,6 +49,7 @@ const ViewEventDefinitionPage = () => {
   const sendTelemetry = useSendTelemetry();
   const navigate = useNavigate();
   const [showSigmaModal, setShowSigmaModal] = useState(false);
+  const [refetch, setRefetch] = useState(true);
 
   const pluggableSigmaModal = usePluginEntities('eventDefinitions.components.editSigmaModal')
     .find((entity: { key: string }) => entity.key === 'coreSigmaModal');
@@ -60,7 +61,7 @@ const ViewEventDefinitionPage = () => {
   const isSystemEventDefinition = (): boolean => eventDefinition?.config?.type === 'system-notifications-v1';
 
   useEffect(() => {
-    if (currentUser && isPermitted(currentUser.permissions, `eventdefinitions:read:${params.definitionId}`)) {
+    if (currentUser && isPermitted(currentUser.permissions, `eventdefinitions:read:${params.definitionId}`) && refetch) {
       EventDefinitionsActions.get(params.definitionId)
         .then(
           (response) => {
@@ -80,8 +81,10 @@ const ViewEventDefinitionPage = () => {
         );
 
       EventNotificationsActions.listAll();
+
+      setRefetch(false);
     }
-  }, [currentUser, history, params]);
+  }, [currentUser, history, params, refetch]);
 
   const handleDuplicateEvent = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_DUPLICATED, {
@@ -99,6 +102,11 @@ const ViewEventDefinitionPage = () => {
     } else {
       navigate(Routes.ALERTS.DEFINITIONS.edit(params.definitionId));
     }
+  };
+
+  const onSigmaModalClose = () => {
+    setRefetch(true);
+    setShowSigmaModal(false);
   };
 
   if (!eventDefinition || !notifications) {
@@ -159,8 +167,8 @@ const ViewEventDefinitionPage = () => {
       )}
       {showSigmaModal && CoreSigmaModal && (
         <CoreSigmaModal ruleId={(eventDefinition.config as SigmaEventDefinitionConfig).sigma_rule_id}
-                        onCancel={() => setShowSigmaModal(false)}
-                        onConfirm={() => setShowSigmaModal(false)} />
+                        onCancel={onSigmaModalClose}
+                        onConfirm={onSigmaModalClose} />
       )}
     </>
   );
