@@ -121,6 +121,7 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
                 .filter(StringUtils::isNotBlank)
                 .map(String::trim)
                 .collect(Collectors.toList());
+        LOG.info("Importing licenses into MongoDB: {}", licenses.size());
         if (!licenses.isEmpty()) {
             ServiceLoader<TestLicenseImporter> loader = ServiceLoader.load(TestLicenseImporter.class);
             loader.forEach(importer -> importer.importLicenses(mongoDBInstance, licenses));
