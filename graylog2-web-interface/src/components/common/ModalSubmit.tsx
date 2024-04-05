@@ -22,7 +22,7 @@ import Button from 'components/bootstrap/Button';
 import type { IconName } from 'components/common/Icon';
 import Icon from 'components/common/Icon';
 import Spinner from 'components/common/Spinner';
-import { ModalButtonToolbar } from 'components/common';
+import ModalButtonToolbar from 'components/common/ModalButtonToolbar';
 
 type WithCancelProps = {
   displayCancel: true,
