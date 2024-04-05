@@ -114,7 +114,7 @@ public class PreflightResource {
     @GET
     @Path("/ca/certificate")
     @Produces(MediaType.TEXT_PLAIN)
-    public String getCaPublicKey() {
+    public String getCaCertificate() {
         try {
             return caService.loadKeyStore().map(ks -> {
                 final Certificate caPublicKey;
