@@ -14,17 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import { useQuery } from '@tanstack/react-query';
 
-import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
-import StringUtils from 'util/StringUtils';
+import { SystemClusterConfig } from '@graylog/server-api';
 
-type Props = {
-  priority: number | string,
-}
-const PriorityName = ({ priority }: Props) => (
+const useClusterConfig = <T, >(key: string) => useQuery<T>(['system', 'cluster_config', key], () => SystemClusterConfig.read(key) as Promise<T>);
 
-  <>{StringUtils.capitalizeFirstLetter(EventDefinitionPriorityEnum.properties[priority].name)}</>
-);
-
-export default PriorityName;
+export default useClusterConfig;

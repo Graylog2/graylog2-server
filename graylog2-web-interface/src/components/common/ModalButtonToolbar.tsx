@@ -14,17 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import styled from 'styled-components';
 
-import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
-import StringUtils from 'util/StringUtils';
+import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
 
-type Props = {
-  priority: number | string,
-}
-const PriorityName = ({ priority }: Props) => (
-
-  <>{StringUtils.capitalizeFirstLetter(EventDefinitionPriorityEnum.properties[priority].name)}</>
-);
-
-export default PriorityName;
+const ModalButtonToolbar = styled(ButtonToolbar)`
+  display: flex;
+  justify-content: flex-end;
+  align-items: end;
+  gap: 0.25em;
+`;
+export default ModalButtonToolbar;
