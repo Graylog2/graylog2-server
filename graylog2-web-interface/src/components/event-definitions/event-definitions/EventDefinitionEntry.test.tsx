@@ -119,7 +119,7 @@ describe('EventDefinitionEntry', () => {
     render(renderSUT('DEFAULT'));
 
     await waitFor(() => {
-      expect(screen.getAllByRole('button', { name: /edit/i })[0]).toBeVisible();
+      expect(screen.getAllByRole('link', { name: /edit/i })[0]).toBeVisible();
     });
   });
 
