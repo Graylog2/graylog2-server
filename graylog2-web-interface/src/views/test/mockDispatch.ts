@@ -29,7 +29,7 @@ const mockSearchExecutors: SearchExecutors = {
   resultMapper: (r) => r,
   parse: async () => SearchMetadata.empty(),
   executeJobResult: async () => ({}) as SearchExecutionResult,
-  startJob: async () => ({ nodeId: '1111', asyncSearchId: '333333' }),
+  startJob: async () => ({ nodeId: 'dummyNodeIdForTesting', asyncSearchId: 'dummySearchIdForTesting' }),
   cancelJob: async () => null,
 };
 

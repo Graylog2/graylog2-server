@@ -112,6 +112,20 @@ const ViewAdditionalContextProvider = ({ children }: { children: React.ReactNode
 
 ViewAdditionalContextProvider.displayName = 'ViewAdditionalContextProvider';
 
+const useOnWindowUnload = () => {
+  const dispatch = useAppDispatch();
+
+  return useEffect(() => {
+    const handleLeavePage = () => dispatch(cancelExecutedJob());
+    window.addEventListener('beforeunload', handleLeavePage);
+
+    return () => {
+      handleLeavePage();
+      window.removeEventListener('beforeunload', handleLeavePage);
+    };
+  }, [dispatch]);
+};
+
 const Search = () => {
   const dispatch = useAppDispatch();
   const refreshSearch = useCallback(() => dispatch(execute()), [dispatch]);
@@ -127,15 +141,7 @@ const Search = () => {
     StreamsActions.refresh();
   }, []);
 
-  useEffect(() => {
-    const handleLeavePage = () => dispatch(cancelExecutedJob());
-    window.addEventListener('beforeunload', handleLeavePage);
-
-    return () => {
-      handleLeavePage();
-      window.removeEventListener('beforeunload', handleLeavePage);
-    };
-  }, [dispatch]);
+  useOnWindowUnload();
 
   return (
     <>
