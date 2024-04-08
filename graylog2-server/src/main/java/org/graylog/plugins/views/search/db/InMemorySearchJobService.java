@@ -20,7 +20,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import jakarta.ws.rs.NotAuthorizedException;
+import jakarta.ws.rs.ForbiddenException;
 import org.bson.types.ObjectId;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
@@ -59,14 +59,14 @@ public class InMemorySearchJobService implements SearchJobService {
 
     @Override
     public Optional<SearchJob> load(final String id,
-                                    final SearchUser searchUser) throws NotAuthorizedException {
+                                    final SearchUser searchUser) throws ForbiddenException {
         final SearchJob searchJob = cache.getIfPresent(id);
         if (searchJob == null) {
             return Optional.empty();
         } else if (searchJob.getOwner().equals(searchUser.username()) || searchUser.isAdmin()) {
             return Optional.of(searchJob);
         } else {
-            throw new NotAuthorizedException(StringUtils.f("User %s cannot load search job %s that belongs to different user!", searchUser.username(), id));
+            throw new ForbiddenException(StringUtils.f("User %s cannot load search job %s that belongs to different user!", searchUser.username(), id));
         }
     }
 }

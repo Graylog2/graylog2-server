@@ -27,7 +27,6 @@ import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.NotAuthorizedException;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -224,24 +223,17 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @Path("status/{jobId}")
     @Produces({MediaType.APPLICATION_JSON, SEARCH_FORMAT_V1})
     public Response jobStatus(@ApiParam(name = "jobId") @PathParam("jobId") String jobId, @Context SearchUser searchUser) {
-        try {
-            final SearchJob searchJob = searchJobService.load(jobId, searchUser).orElseThrow(NotFoundException::new);
-            if (searchJob != null && searchJob.getResultFuture() != null) {
-                try {
-                    // force a "conditional join", to catch fast responses without having to poll
-                    Uninterruptibles.getUninterruptibly(searchJob.getResultFuture(), 5, TimeUnit.MILLISECONDS);
-                } catch (ExecutionException | TimeoutException ignore) {
-
-                }
+        final SearchJob searchJob = searchJobService.load(jobId, searchUser).orElseThrow(NotFoundException::new);
+        if (searchJob.getResultFuture() != null) {
+            try {
+                // force a "conditional join", to catch fast responses without having to poll
+                Uninterruptibles.getUninterruptibly(searchJob.getResultFuture(), 5, TimeUnit.MILLISECONDS);
+            } catch (ExecutionException | TimeoutException ignore) {
             }
-            return Response.ok()
-                    .entity(SearchJobDTO.fromSearchJob(searchJob))
-                    .build();
-        } catch (NotAuthorizedException e) {
-            return Response.status(Response.Status.FORBIDDEN).build();
-        } catch (NotFoundException e) {
-            return Response.status(Response.Status.NOT_FOUND).build();
         }
+        return Response
+                .ok(SearchJobDTO.fromSearchJob(searchJob))
+                .build();
     }
 
     @DELETE
@@ -250,16 +242,9 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @Produces({MediaType.APPLICATION_JSON})
     public Response cancelJob(@PathParam("jobId") String jobId,
                               @Context SearchUser searchUser) {
-
-        try {
-            final SearchJob searchJob = searchJobService.load(jobId, searchUser).orElseThrow(NotFoundException::new);
-            searchJob.cancel();
-            return Response.ok().build();
-        } catch (NotAuthorizedException e) {
-            return Response.status(Response.Status.FORBIDDEN).build();
-        } catch (NotFoundException e) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
+        final SearchJob searchJob = searchJobService.load(jobId, searchUser).orElseThrow(NotFoundException::new);
+        searchJob.cancel();
+        return Response.ok().build();
     }
 
     private void postAuditEvent(SearchJob searchJob) {

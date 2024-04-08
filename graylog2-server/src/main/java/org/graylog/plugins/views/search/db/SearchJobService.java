@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.search.db;
 
+import jakarta.ws.rs.ForbiddenException;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.permissions.SearchUser;
@@ -26,5 +27,5 @@ public interface SearchJobService {
 
     SearchJob create(Search search, String owner);
 
-    Optional<SearchJob> load(String id, SearchUser searchUser);
+    Optional<SearchJob> load(String id, SearchUser searchUser) throws ForbiddenException;
 }

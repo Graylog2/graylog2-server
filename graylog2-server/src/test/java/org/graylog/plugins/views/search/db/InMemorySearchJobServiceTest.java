@@ -16,7 +16,7 @@
  */
 package org.graylog.plugins.views.search.db;
 
-import jakarta.ws.rs.NotAuthorizedException;
+import jakarta.ws.rs.ForbiddenException;
 import org.assertj.core.api.Assertions;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
@@ -51,7 +51,7 @@ public class InMemorySearchJobServiceTest {
     public void testThrowsExceptionWhenTryingToLoadJobOfDifferentUser() {
         final SearchJob jannettesJob = toTest.create(Search.builder().build(), "Jannette");
         Assertions.assertThatThrownBy(() -> toTest.load(jannettesJob.getId(), searchUser("Michelle")))
-                .isInstanceOf(NotAuthorizedException.class);
+                .isInstanceOf(ForbiddenException.class);
     }
 
     @Test
