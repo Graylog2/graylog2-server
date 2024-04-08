@@ -26,20 +26,20 @@ type Props = {
   selectedValues: Array<string>
 }
 
-const EventTypeFilter = ({ onSelect, selectedValues }: Props) => {
+const EventTypeFilter = ({ onSelect, selectedValues }: Props) => (
+  <ListGroup className="no-bm">
+    {Object.keys(EventDefinitionPriorityEnum.properties).map((priority) => {
+      const disabledOption = selectedValues.includes(priority);
 
-  return (
-    <ListGroup className="no-bm">
-      {Object.keys(EventDefinitionPriorityEnum.properties).map((priority) => {
-        const disabledOption = selectedValues.includes(priority);
-        return <ListGroupItem onClick={() => !disabledOption && onSelect(priority)}
-                              disabled={disabledOption}
-                              key={priority}>
+      return (
+        <ListGroupItem onClick={() => !disabledOption && onSelect(priority)}
+                       disabled={disabledOption}
+                       key={priority}>
           <PriorityName priority={Number(priority)} />
         </ListGroupItem>
-      })}
-    </ListGroup>
-  );
-};
+      );
+    })}
+  </ListGroup>
+);
 
 export default EventTypeFilter;
