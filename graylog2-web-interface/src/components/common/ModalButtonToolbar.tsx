@@ -14,15 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { SearchesConfig } from 'components/search/SearchConfig';
-import useClusterConfig from 'hooks/useClusterConfig';
+import styled from 'styled-components';
 
-type Result = { config: SearchesConfig, refresh: () => void };
+import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
 
-const useSearchConfiguration = (): Result => {
-  const { data: config, refetch } = useClusterConfig<SearchesConfig>('org.graylog2.indexer.searches.SearchesClusterConfig');
-
-  return { config, refresh: refetch };
-};
-
-export default useSearchConfiguration;
+const ModalButtonToolbar = styled(ButtonToolbar)`
+  display: flex;
+  justify-content: flex-end;
+  align-items: end;
+  gap: 0.25em;
+`;
+export default ModalButtonToolbar;
