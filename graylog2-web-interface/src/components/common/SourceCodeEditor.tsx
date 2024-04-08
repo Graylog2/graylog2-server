@@ -45,6 +45,25 @@ const SourceCodeContainer = styled.div<ContainerProps>(({ $resizable, theme }) =
   }
 
   ${theme.components.aceEditor}
+  .ace-graylog {
+    .ace_marker-layer {
+      .ace_active-line {
+        background: ${theme.colors.variant.lightest.default};
+      }
+    }
+
+    .ace_gutter-active-line {
+      background-color: ${theme.colors.variant.lightest.default};
+    }
+
+    .ace_gutter {
+      background: ${theme.colors.variant.lighter.default};
+    }
+
+    .ace_cursor {
+      border-color: ${theme.colors.global.textDefault};
+    }
+  }
 `);
 
 const Toolbar = styled.div(({ theme }) => css`

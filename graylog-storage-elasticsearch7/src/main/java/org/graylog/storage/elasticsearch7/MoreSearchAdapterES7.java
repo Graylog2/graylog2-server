@@ -32,6 +32,8 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.common.xcontent.ToXCo
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.sort.FieldSortBuilder;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.sort.SortOrder;
 import org.graylog2.indexer.results.ChunkedResult;
 import org.graylog2.indexer.results.MultiChunkResultRetriever;
 import org.graylog2.indexer.results.ResultChunk;
@@ -104,12 +106,17 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
             filter.filter(boolQuery().mustNot(termsQuery(EventDto.FIELD_SOURCE_STREAMS, forbiddenSourceStreams)));
         }
 
+        final SortOrder order = sortOrderMapper.fromSorting(sorting);
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
                 .query(filter)
                 .from((page - 1) * perPage)
                 .size(perPage)
-                .sort(sorting.getField(), sortOrderMapper.fromSorting(sorting))
                 .trackTotalHits(true);
+        final FieldSortBuilder sortBuilder = new FieldSortBuilder(sorting.getField()).order(order);
+        sorting.getUnmappedType().ifPresent(unmappedType -> sortBuilder
+                .unmappedType(unmappedType)
+                .missing(order.equals(SortOrder.ASC) ? "_first" : "_last"));
+        searchSourceBuilder.sort(sortBuilder);
 
         final Set<String> indices = affectedIndices.isEmpty() ? Collections.singleton("") : affectedIndices;
         final SearchRequest searchRequest = new SearchRequest(indices.toArray(new String[0]))

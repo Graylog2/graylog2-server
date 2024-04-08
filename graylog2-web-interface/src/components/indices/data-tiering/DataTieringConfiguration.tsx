@@ -20,11 +20,12 @@ import { useFormikContext } from 'formik';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import type { IndexSet, IndexSetFormValues } from 'stores/indices/IndexSetsStore';
-import { FormikFormGroup } from 'components/common';
+import { FormikFormGroup, FormikInput } from 'components/common';
+import { Input } from 'components/bootstrap';
 import { DATA_TIERING_TYPE } from 'components/indices/data-tiering';
 
 const dayFields = ['index_lifetime_max', 'index_lifetime_min', 'index_hot_lifetime_min'];
-const hotWarmOnlyFormFields = ['index_hot_lifetime_min', 'warm_tier_enabled', 'archive_before_deletion', 'warm_tier_repository_name'];
+const hotWarmOnlyFormFields = ['index_hot_lifetime_min', 'warm_tier_enabled', 'warm_tier_repository_name'];
 
 export const durationToRoundedDays = (duration: string) => Math.round(moment.duration(duration).asDays());
 
@@ -46,9 +47,12 @@ export const prepareDataTieringInitialValues = (values: IndexSet) : IndexSetForm
 export const prepareDataTieringConfig = (values: IndexSetFormValues, pluginStore) : IndexSet => {
   if (!values.data_tiering) return values as unknown as IndexSet;
 
+  const hotOnlyDefaults = {
+    archive_before_deletion: false,
+  };
+
   const hotWarmDefaultValues = {
     warm_tier_enabled: false,
-    archive_before_deletion: false,
     warm_tier_repository_name: null,
   };
 
@@ -56,6 +60,8 @@ export const prepareDataTieringConfig = (values: IndexSetFormValues, pluginStore
   const dataTieringType = dataTieringPlugin?.type ?? DATA_TIERING_TYPE.HOT_ONLY;
 
   let { data_tiering } = values;
+
+  data_tiering = { ...hotOnlyDefaults, ...data_tiering };
 
   if (dataTieringType === DATA_TIERING_TYPE.HOT_WARM) {
     data_tiering = { ...hotWarmDefaultValues, ...data_tiering };
@@ -130,7 +136,22 @@ const DataTieringConfiguration = () => {
                        validate={validateMinDaysInStorage}
                        help="How many days at minumum your data should be stored."
                        required />
-      {dataTieringPlugin && <dataTieringPlugin.TiersConfigurationFields />}
+
+      {dataTieringPlugin && (
+        <>
+          <Input id="roles-selector-input"
+                 labelClassName="col-sm-3"
+                 wrapperClassName="col-sm-9"
+                 label="Archiving">
+            <FormikInput type="checkbox"
+                         id="data_tiering.archive_before_deletion"
+                         label="Archive before deletion"
+                         name="data_tiering.archive_before_deletion"
+                         help="Archive this index before it is deleted?" />
+          </Input>
+          <dataTieringPlugin.TiersConfigurationFields />
+        </>
+      )}
     </>
   );
 };

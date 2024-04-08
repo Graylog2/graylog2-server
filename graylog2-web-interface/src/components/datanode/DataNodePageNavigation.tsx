@@ -16,15 +16,18 @@
  */
 import * as React from 'react';
 
+import AppConfig from 'util/AppConfig';
 import PageNavigation from 'components/common/PageNavigation';
 import Routes from 'routing/Routes';
 import { Row } from 'components/bootstrap';
+
+const enableDataNodeMigration = AppConfig.isFeatureEnabled('data_node_migration');
 
 const NAV_ITEMS = [
   { title: 'Data Nodes', path: Routes.SYSTEM.DATANODES.LIST, exactPathMatch: true },
   { title: 'Cluster Management', path: Routes.SYSTEM.DATANODES.CLUSTER },
   { title: 'Configuration', path: Routes.SYSTEM.DATANODES.CONFIGURATION },
-  { title: 'Migration', path: Routes.SYSTEM.DATANODES.MIGRATION },
+  enableDataNodeMigration && { title: 'Migration', path: Routes.SYSTEM.DATANODES.MIGRATION },
 ];
 
 const DataNodesPageNavigation = () => (

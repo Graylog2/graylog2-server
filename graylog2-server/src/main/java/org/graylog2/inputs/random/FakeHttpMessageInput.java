@@ -19,14 +19,13 @@ package org.graylog2.inputs.random;
 import com.codahale.metrics.MetricRegistry;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import jakarta.inject.Inject;
 import org.graylog2.inputs.codecs.RandomHttpMessageCodec;
 import org.graylog2.inputs.transports.RandomMessageTransport;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
-
-import jakarta.inject.Inject;
 
 public class FakeHttpMessageInput extends MessageInput {
 
@@ -61,8 +60,7 @@ public class FakeHttpMessageInput extends MessageInput {
             super(NAME, false, "");
         }
 
-        @Override
-        public boolean isCloudCompatible() {
+        public static boolean isCloudCompatible() {
             return true;
         }
     }

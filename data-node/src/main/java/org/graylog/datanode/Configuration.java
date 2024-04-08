@@ -86,7 +86,7 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "opensearch_location")
     private String opensearchDistributionRoot = "dist";
 
-    @Parameter(value = "opensearch_data_location", required = true, validators = DirectoryReadableValidator.class)
+    @Parameter(value = "opensearch_data_location", required = true)
     private Path opensearchDataLocation = Path.of("datanode/data");
 
     @Parameter(value = "opensearch_logs_location", required = true, validators = DirectoryWritableValidator.class)
@@ -114,9 +114,12 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "initial_cluster_manager_nodes")
     private String initialClusterManagerNodes;
 
+    // Initial and maxmium heap must be identical for OpenSearch, otherwise the boot fails. So it's only one config option
+    @Parameter(value = "opensearch_heap")
+    private String opensearchHeap = "1g";
+
     @Parameter(value = "opensearch_http_port", converter = IntegerConverter.class)
     private int opensearchHttpPort = 9200;
-
 
     @Parameter(value = "opensearch_transport_port", converter = IntegerConverter.class)
     private int opensearchTransportPort = 9300;
@@ -687,5 +690,9 @@ public class Configuration extends BaseConfiguration {
 
     public List<String> getNodeRoles() {
         return nodeRoles;
+    }
+
+    public String getOpensearchHeap() {
+        return opensearchHeap;
     }
 }

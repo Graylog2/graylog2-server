@@ -18,7 +18,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
-import { Dropdown } from 'components/bootstrap';
+import { Dropdown, MenuItem } from 'components/bootstrap';
 
 type Props = {
   children: React.ReactNode,
@@ -27,20 +27,18 @@ type Props = {
 };
 
 /* stylelint-disable-next-line property-no-unknown */
-const Toggle = styled.a.attrs({ href: '#' })(({ theme }) => css`
-  &::after {
-    display: block;
-    content: ' ';
-    float: right;
-    width: 0;
-    height: 0;
-    border-color: transparent;
-    border-style: solid;
-    border-width: 5px 0 5px 5px;
-    border-left-color: ${theme.colors.gray[80]};
-    margin-top: 5px;
-    margin-right: -10px;
-  }
+const Caret = styled.span(({ theme }) => css`
+  display: block;
+  content: ' ';
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: ${theme.colors.gray[80]};
+  margin-top: 5px;
+  margin-right: -10px;
 `);
 
 type StyledSubmenuProps = React.PropsWithChildren<{
@@ -49,6 +47,12 @@ type StyledSubmenuProps = React.PropsWithChildren<{
 }>;
 const StyledSubmenu: React.ComponentType<StyledSubmenuProps> = styled(Dropdown)<{ $left: boolean }>(({ $left, theme }) => css`
   position: relative;
+  display: flex;
+  gap: 5px;
+
+  > a {
+    color: ${theme.colors.global.textDefault};
+  }
 
   > .dropdown-menu {
     top: 0;
@@ -57,25 +61,24 @@ const StyledSubmenu: React.ComponentType<StyledSubmenuProps> = styled(Dropdown)<
     margin-top: -6px;
     margin-left: ${$left ? '10px' : '-1px'};
     border-radius: ${$left ? '6px 0 6px 6px' : '0 6px 6px 6px'};
+    background-color: ${theme.colors.global.contentBackground};
   }
 
   &:hover > .dropdown-menu {
     display: block;
   }
-
-  &:hover > ${/* sc-selector */String(Toggle)}::after {
-    border-left-color: ${theme.colors.gray[100]};
-  }
 `);
 
 const DropdownSubmenu = ({ children, left, title }: Props) => (
-  <StyledSubmenu $left={left} as="li">
-    {title && <Toggle>{title}</Toggle>}
+  <MenuItem>
+    <StyledSubmenu $left={left} as="div">
+      {title} <Caret />
 
-    <Dropdown.Menu>
-      {children}
-    </Dropdown.Menu>
-  </StyledSubmenu>
+      <Dropdown.Menu>
+        {children}
+      </Dropdown.Menu>
+    </StyledSubmenu>
+  </MenuItem>
 );
 
 DropdownSubmenu.propTypes = {

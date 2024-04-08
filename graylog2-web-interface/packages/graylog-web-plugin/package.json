@@ -1,6 +1,6 @@
 {
   "name": "graylog-web-plugin",
-  "version": "6.0.0-SNAPSHOT",
+  "version": "6.1.0-SNAPSHOT",
   "description": "Helper code for streamlining Graylog web interface plugin development",
   "main": "index.js",
   "repository": {
@@ -33,7 +33,7 @@
     "@tanstack/react-query": "4.36.1",
     "@types/create-react-class": "15.6.8",
     "@types/jquery": "3.5.29",
-    "@types/react": "18.2.73",
+    "@types/react": "18.2.74",
     "babel-preset-graylog": "file:../babel-preset-graylog",
     "create-react-class": "15.7.0",
     "eslint-config-graylog": "file:../eslint-config-graylog",
@@ -51,7 +51,7 @@
     "react-router-dom": "6.22.3",
     "reflux": "0.2.13",
     "styled-components": "6.1.1",
-    "typescript": "5.4.3",
+    "typescript": "5.4.4",
     "use-query-params": "^2.2.0",
     "webpack": "5.91.0",
     "webpack-cli": "5.1.4",
