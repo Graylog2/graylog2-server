@@ -158,7 +158,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
                                  @ApiParam ExecutionState executionState,
                                  @Context SearchUser searchUser) {
 
-        final SearchJob searchJob = searchExecutor.execute(id, searchUser, executionState, true);
+        final SearchJob searchJob = searchExecutor.executeAsync(id, searchUser, executionState);
 
         postAuditEvent(searchJob);
 
@@ -190,7 +190,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
                                    @QueryParam("timeout") @DefaultValue("60000") long timeout,
                                    @Context SearchUser searchUser) {
         final Search search = searchRequest.toSearch();
-        final SearchJob searchJob = searchExecutor.execute(search, searchUser, ExecutionState.empty());
+        final SearchJob searchJob = searchExecutor.executeSync(search, searchUser, ExecutionState.empty());
 
         postAuditEvent(searchJob);
 
@@ -210,7 +210,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
                                      @QueryParam("timeout") @DefaultValue("60000") long timeout,
                                      @Context SearchUser searchUser) {
         final Search search = searchRequest.toSearch();
-        final SearchJob searchJob = searchExecutor.execute(search, searchUser, ExecutionState.empty());
+        final SearchJob searchJob = searchExecutor.executeSync(search, searchUser, ExecutionState.empty());
 
         postAuditEvent(searchJob);
 
