@@ -23,7 +23,6 @@ import { PluginManifest } from 'graylog-web-plugin/plugin';
 import { StoreMock as MockStore } from 'helpers/mocking';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
 import mockSearchesClusterConfig from 'fixtures/searchClusterConfig';
-import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import FormikInput from 'components/common/FormikInput';
 import Query from 'views/logic/queries/Query';
 import TestStoreProvider from 'views/test/TestStoreProvider';
@@ -32,6 +31,8 @@ import View from 'views/logic/views/View';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import { usePlugin } from 'views/test/testPlugins';
+import asMock from 'helpers/mocking/AsMock';
+import useSearchConfiguration from 'hooks/useSearchConfiguration';
 
 import OriginalSearchBar from './SearchBar';
 
@@ -51,13 +52,6 @@ jest.mock('stores/streams/StreamsStore', () => MockStore(
   ['listStreams', () => ({ then: jest.fn() })],
   'availableStreams',
 ));
-
-jest.mock('views/stores/SearchConfigStore', () => ({
-  SearchConfigStore: MockStore(),
-  SearchConfigActions: {
-    refresh: jest.fn(() => Promise.resolve()),
-  },
-}));
 
 jest.mock('views/components/searchbar/saved-search/SearchActionsMenu', () => jest.fn(() => (
   <div>Saved Search Controls</div>
@@ -125,12 +119,14 @@ const testPlugin = new PluginManifest({}, {
   ],
 });
 
+jest.mock('hooks/useSearchConfiguration');
+
 describe('SearchBar pluggable controls', () => {
   useViewsPlugin();
   usePlugin(testPlugin);
 
   beforeEach(() => {
-    SearchConfigStore.getInitialState = jest.fn(() => ({ searchesClusterConfig: mockSearchesClusterConfig }));
+    asMock(useSearchConfiguration).mockReturnValue({ config: mockSearchesClusterConfig, refresh: () => {} });
   });
 
   it('should render and have initial values', async () => {

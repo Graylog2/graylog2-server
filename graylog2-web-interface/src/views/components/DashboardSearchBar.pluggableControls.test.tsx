@@ -21,13 +21,13 @@ import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import mockSearchesClusterConfig from 'fixtures/searchClusterConfig';
-import MockStore from 'helpers/mocking/StoreMock';
-import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
 import FormikInput from 'components/common/FormikInput';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import useViewsPlugin from 'views/test/testViewsPlugin';
+import asMock from 'helpers/mocking/AsMock';
+import useSearchConfiguration from 'hooks/useSearchConfiguration';
 
 import OriginalDashboardSearchBar from './DashboardSearchBar';
 
@@ -43,17 +43,12 @@ jest.mock('views/hooks/useAutoRefresh', () => () => ({
   stopAutoRefresh: () => {},
 }));
 
-jest.mock('views/stores/SearchConfigStore', () => ({
-  SearchConfigStore: MockStore(['getInitialState', () => ({ searchesClusterConfig: mockSearchesClusterConfig })]),
-  SearchConfigActions: {
-    refresh: jest.fn(() => Promise.resolve()),
-  },
-}));
-
 jest.mock('views/components/searchbar/queryvalidation/validateQuery', () => jest.fn(() => Promise.resolve({
   status: 'OK',
   explanations: [],
 })));
+
+jest.mock('hooks/useSearchConfiguration');
 
 const DashboardSearchBar = () => (
   <TestStoreProvider>
@@ -101,7 +96,7 @@ describe('DashboardSearchBar pluggable controls', () => {
   });
 
   beforeEach(() => {
-    SearchConfigStore.getInitialState = jest.fn(() => ({ searchesClusterConfig: mockSearchesClusterConfig }));
+    asMock(useSearchConfiguration).mockReturnValue(({ config: mockSearchesClusterConfig, refresh: () => {} }));
   });
 
   it('should render and have initial values', async () => {
