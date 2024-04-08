@@ -32,18 +32,6 @@ import WidgetContext from '../contexts/WidgetContext';
 
 jest.mock('views/logic/fieldtypes/useFieldTypes');
 
-jest.mock('views/stores/SearchConfigStore', () => ({
-  SearchConfigActions: {
-    refresh: jest.fn(() => Promise.resolve()),
-  },
-  SearchConfigStore: MockStore(['getInitialState', () => ({
-    searchesClusterConfig: {
-      relative_timerange_options: { P1D: 'Search in last day', PT0S: 'Search in all messages' },
-      query_time_range_limit: 'PT0S',
-    },
-  })]),
-}));
-
 jest.mock('views/stores/StreamsStore', () => ({
   StreamsStore: MockStore(['getInitialState', () => ({
     streams: [

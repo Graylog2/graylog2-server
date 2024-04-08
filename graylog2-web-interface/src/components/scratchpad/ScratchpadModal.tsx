@@ -17,7 +17,6 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import styled, { css } from 'styled-components';
 import chroma from 'chroma-js';
-import ClipboardJS from 'clipboard';
 import debounce from 'lodash/debounce';
 
 import { OverlayTrigger } from 'components/common';
@@ -93,7 +92,6 @@ const StatusMessage = styled.span<{ $visible: boolean }>(({ theme, $visible }) =
 `);
 
 const Scratchpad = () => {
-  const clipboard = useRef<ClipboardJS>();
   const textareaRef = useRef<HTMLTextAreaElement>();
   const statusTimeout = useRef<ReturnType<typeof setTimeout>>();
   const { setScratchpadVisibility, localStorageItem } = useContext(ScratchpadContext);
@@ -167,22 +165,6 @@ const Scratchpad = () => {
   };
 
   useEffect(() => {
-    clipboard.current = new ClipboardJS('[data-clipboard-button]', {});
-
-    clipboard.current.on('success', () => {
-      updateStatusMessage(STATUS_COPIED);
-    });
-
-    return () => {
-      clipboard.current.destroy();
-
-      if (statusTimeout.current) {
-        clearTimeout(statusTimeout.current);
-      }
-    };
-  });
-
-  useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.focus();
       textareaRef.current.value = scratchData;
@@ -251,10 +233,7 @@ const Scratchpad = () => {
           </StatusMessage>
 
           <ButtonGroup>
-            <Button data-clipboard-button
-                    data-clipboard-target={`#${TEXTAREA_ID}`}
-                    id="scratchpad-actions"
-                    title="Copy">
+            <Button id="scratchpad-actions" onClick={copyCallback} title="Copy">
               <Icon name="content_copy" />
             </Button>
             <Button onClick={openConfirmClear} title="Clear">
