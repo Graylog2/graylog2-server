@@ -24,6 +24,8 @@ import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.http.ContentType;
+import io.restassured.response.ValidatableResponse;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.http.HttpStatus;
 import org.assertj.core.api.Assertions;
 import org.graylog.datanode.restoperations.DatanodeOpensearchWait;
@@ -31,6 +33,8 @@ import org.graylog.datanode.restoperations.RestOperationParameters;
 import org.graylog.datanode.testinfra.DatanodeContainerizedBackend;
 import org.graylog.datanode.testinfra.DatanodeDevContainerBuilder;
 import org.graylog.security.certutil.CertConstants;
+import org.graylog.security.certutil.CertutilCa;
+import org.graylog.security.certutil.console.TestableConsole;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.SearchServer;
@@ -39,10 +43,12 @@ import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfi
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.security.IndexerJwtAuthTokenProvider;
 import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -66,54 +72,31 @@ public class DatanodeProvisioningIT {
 
     private final GraylogApis apis;
 
+    @TempDir
+    private Path tempDir;
+
     public DatanodeProvisioningIT(GraylogApis apis) {
         this.apis = apis;
     }
 
     @ContainerMatrixTest
-    void provisionDatanode() throws ExecutionException, RetryException, KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException {
+    void provisionDatanodeGenerateCA() throws ExecutionException, RetryException, KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException {
         final BasicAuthCredentials basicAuth = extractBasicAuthFromLogs(apis.backend().getLogs());
 
-        // First create a self-signed CA in Graylog server
-        given()
-                .spec(apis.requestSpecification())
-                .body("{\"organization\":\"Graylog CA\"}")
-                .auth().basic(basicAuth.username, basicAuth.password)
-                .post("/ca/create")
-                .then()
-                .statusCode(HttpStatus.SC_CREATED);
+        createSelfSignedCA(basicAuth);
 
-        // Configure automatic certificate renewal policy
-        given()
-                .spec(apis.requestSpecification())
-                .body("{\"mode\":\"Automatic\",\"certificate_lifetime\":\"P30D\"}")
-                .auth().basic(basicAuth.username, basicAuth.password)
-                .post("/renewal_policy")
-                .then()
-                .statusCode(HttpStatus.SC_NO_CONTENT);
-
-        // Run the provisioning of datanodes (currently only one node)
-        given()
-                .spec(apis.requestSpecification())
-                .body("")
-                .auth().basic(basicAuth.username, basicAuth.password)
-                .post("/generate")
-                .then()
-                .statusCode(HttpStatus.SC_NO_CONTENT);
-
+        configureAutomaticCertRenewalPolicy(basicAuth);
+        triggerDatanodeProvisioning(basicAuth);
         // Wait till all the datanodes become CONNECTED (=stated with certificates)
-        List<DatanodeStatus> connectedDatanodes = RetryerBuilder.<List<DatanodeStatus>>newBuilder()
-                .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
-                .withStopStrategy(StopStrategies.stopAfterAttempt(60))
-                .retryIfResult(list -> list.isEmpty() || !list.stream().allMatch(node -> node.status().equals(DataNodeProvisioningConfig.State.CONNECTED.name())))
-                .build()
-                .call(() -> getDatanodes(basicAuth));
-
+        final List<DatanodeStatus> connectedDatanodes = waitForDatanodesConnected(basicAuth);
         // verify that we have one connected datanode
         Assertions.assertThat(connectedDatanodes)
                 .hasSize(1);
 
-        // and test the encrypted connection to the underlying opensearch.
+        testEncryptedConnectionToOpensearch(basicAuth);
+    }
+
+    private void testEncryptedConnectionToOpensearch(BasicAuthCredentials basicAuth) throws ExecutionException, RetryException, KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException {
         new DatanodeOpensearchWait(RestOperationParameters.builder()
                 .port(getOpensearchPort())
                 .truststore(keystoreFromApiCertificate(basicAuth))
@@ -121,6 +104,88 @@ public class DatanodeProvisioningIT {
                 .build())
                 .waitForNodesCount(1);
     }
+
+    private List<DatanodeStatus> waitForDatanodesConnected(BasicAuthCredentials basicAuth) throws ExecutionException, RetryException {
+        List<DatanodeStatus> connectedDatanodes = RetryerBuilder.<List<DatanodeStatus>>newBuilder()
+                .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
+                .withStopStrategy(StopStrategies.stopAfterAttempt(60))
+                .retryIfResult(list -> list.isEmpty() || !list.stream().allMatch(node -> node.status().equals(DataNodeProvisioningConfig.State.CONNECTED.name())))
+                .build()
+                .call(() -> getDatanodes(basicAuth));
+        return connectedDatanodes;
+    }
+
+    private ValidatableResponse triggerDatanodeProvisioning(BasicAuthCredentials basicAuth) {
+        return given()
+                .spec(apis.requestSpecification())
+                .body("")
+                .auth().basic(basicAuth.username, basicAuth.password)
+                .post("/generate")
+                .then()
+                .statusCode(HttpStatus.SC_NO_CONTENT);
+    }
+
+    private ValidatableResponse createSelfSignedCA(BasicAuthCredentials basicAuth) {
+        return given()
+                .spec(apis.requestSpecification())
+                .body("{\"organization\":\"Graylog CA\"}")
+                .auth().basic(basicAuth.username, basicAuth.password)
+                .post("/ca/create")
+                .then()
+                .statusCode(HttpStatus.SC_CREATED);
+    }
+
+    private ValidatableResponse configureAutomaticCertRenewalPolicy(BasicAuthCredentials basicAuth) {
+        return given()
+                .spec(apis.requestSpecification())
+                .body("{\"mode\":\"Automatic\",\"certificate_lifetime\":\"P30D\"}")
+                .auth().basic(basicAuth.username, basicAuth.password)
+                .post("/renewal_policy")
+                .then()
+                .statusCode(HttpStatus.SC_NO_CONTENT);
+    }
+
+    @ContainerMatrixTest
+    void provisionDatanodeUploadCA() throws ExecutionException, RetryException, CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException {
+
+        final Path caKeystore = createCA();
+        final BasicAuthCredentials basicAuth = extractBasicAuthFromLogs(apis.backend().getLogs());
+
+        uploadCA(basicAuth, caKeystore);
+        configureAutomaticCertRenewalPolicy(basicAuth);
+        triggerDatanodeProvisioning(basicAuth);
+        // Wait till all the datanodes become CONNECTED (=stated with certificates)
+        final List<DatanodeStatus> connectedDatanodes = waitForDatanodesConnected(basicAuth);
+        // verify that we have one connected datanode
+        Assertions.assertThat(connectedDatanodes)
+                .hasSize(1);
+
+        testEncryptedConnectionToOpensearch(basicAuth);
+    }
+
+    private ValidatableResponse uploadCA(BasicAuthCredentials basicAuth, Path caKeystore) {
+        return given()
+                .spec(apis.requestSpecification())
+                .auth().basic(basicAuth.username, basicAuth.password)
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .multiPart("files", caKeystore.toFile())
+                .multiPart("password", "my-secret-password")
+                .post("/ca/upload")
+                .then()
+                .statusCode(HttpStatus.SC_OK);
+    }
+
+    private Path createCA() {
+        final Path certPath = tempDir.resolve("test-ca.p12");
+
+        final TestableConsole input = TestableConsole.empty()
+                .register(CertutilCa.PROMPT_ENTER_CA_PASSWORD, "my-secret-password");
+
+        final CertutilCa command = new CertutilCa(certPath.toAbsolutePath().toString(), input);
+        command.run();
+        return certPath;
+    }
+
 
     private static String jwtToken() {
         return IndexerJwtAuthTokenProvider.createToken(DatanodeContainerizedBackend.SIGNING_SECRET.getBytes(StandardCharsets.UTF_8), Duration.seconds(600));
