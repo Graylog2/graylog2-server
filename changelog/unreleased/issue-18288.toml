@@ -1,0 +1,5 @@
+type = "f"
+message = "Display field value suggestions when field name is in the middle of the search query."
+
+issues = ["18288"]
+pulls = ["18952"]
