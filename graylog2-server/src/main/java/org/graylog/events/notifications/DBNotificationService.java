@@ -16,46 +16,72 @@
  */
 package org.graylog.events.notifications;
 
+import com.mongodb.client.model.Filters;
+import jakarta.inject.Inject;
+import org.bson.types.ObjectId;
 import org.graylog.security.entities.EntityOwnershipService;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnection;
-import org.graylog2.database.PaginatedDbService;
+import org.graylog2.database.GraylogMongoCollection;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.search.SearchQuery;
 
-import jakarta.inject.Inject;
-
+import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
-public class DBNotificationService extends PaginatedDbService<NotificationDto> {
+import static org.graylog.events.notifications.NotificationDto.FIELD_ID;
+import static org.graylog2.database.MongoUtils.insertedIdAsString;
+import static org.graylog2.database.MongoUtils.stream;
+
+public class DBNotificationService {
     private static final String NOTIFICATION_COLLECTION_NAME = "event_notifications";
 
     private final EntityOwnershipService entityOwnerShipService;
+    private final GraylogMongoCollection<NotificationDto> collection;
 
     @Inject
-    public DBNotificationService(MongoConnection mongoConnection,
-                                 MongoJackObjectMapperProvider mapper,
+    public DBNotificationService(MongoCollections mongoCollections,
                                  EntityOwnershipService entityOwnerShipService) {
-        super(mongoConnection, mapper, NotificationDto.class, NOTIFICATION_COLLECTION_NAME);
+        this.collection = mongoCollections.get(NOTIFICATION_COLLECTION_NAME, NotificationDto.class);
         this.entityOwnerShipService = entityOwnerShipService;
     }
 
     public PaginatedList<NotificationDto> searchPaginated(SearchQuery query, Predicate<NotificationDto> filter,
                                                           String sortByField, String sortOrder, int page, int perPage) {
-        return findPaginatedWithQueryFilterAndSort(query.toDBQuery(), filter,
-                getSortBuilder(sortOrder, sortByField), page, perPage);
+        return collection.findPaginated()
+                .filter(query.toBson())
+                .sort(sortByField, sortOrder)
+                .perPage(perPage)
+                .postProcessedPage(page, filter);
     }
 
     public NotificationDto saveWithOwnership(NotificationDto notificationDto, User user) {
-        final NotificationDto dto = super.save(notificationDto);
+        final NotificationDto dto = save(notificationDto);
         entityOwnerShipService.registerNewEventNotification(dto.id(), user);
         return dto;
     }
 
-    @Override
+    public NotificationDto save(NotificationDto notificationDto) {
+        if (notificationDto.id() != null) {
+            collection.replaceOne(Filters.eq(FIELD_ID, new ObjectId(notificationDto.id())), notificationDto);
+            return notificationDto;
+        } else {
+            var id = insertedIdAsString(collection.insertOne(notificationDto));
+            return notificationDto.toBuilder().id(id).build();
+        }
+    }
+
     public int delete(String id) {
         entityOwnerShipService.unregisterEventNotification(id);
-        return super.delete(id);
+        return (int) collection.deleteOne(Filters.eq(FIELD_ID, new ObjectId(id))).getDeletedCount();
+    }
+
+    public Optional<NotificationDto> get(String id) {
+        return collection.getById(id);
+    }
+
+    public Stream<NotificationDto> streamAll() {
+        return stream(collection.find());
     }
 }
