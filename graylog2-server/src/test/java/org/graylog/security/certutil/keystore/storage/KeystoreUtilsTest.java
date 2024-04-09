@@ -16,6 +16,7 @@
  */
 package org.graylog.security.certutil.keystore.storage;
 
+import org.assertj.core.api.Assertions;
 import org.graylog.security.certutil.CertRequest;
 import org.graylog.security.certutil.CertificateGenerator;
 import org.graylog.security.certutil.KeyPair;
@@ -23,18 +24,19 @@ import org.junit.jupiter.api.Test;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
+import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 
+import static org.graylog.security.certutil.CertConstants.KEY_GENERATION_ALGORITHM;
 import static org.graylog.security.certutil.CertConstants.PKCS12;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class KeystoreUtilsTest {
-
 
     @Test
     void testThrowsExceptionIfNewPasswordIsNull() throws Exception {
@@ -95,5 +97,25 @@ public class KeystoreUtilsTest {
         assertEquals(keyPair1.privateKey(), newKeyStore.getKey("privkey1", newPassword));
         assertEquals(keyPair2.privateKey(), newKeyStore.getKey("privkey2", newPassword));
         assertEquals(keyPair3.privateKey(), newKeyStore.getKey("privkey3", newPassword));
+    }
+
+    @Test
+    void testMatchingPrivatePublicKeysvalid() throws Exception {
+        KeyPairGenerator keyGen = KeyPairGenerator.getInstance(KEY_GENERATION_ALGORITHM);
+        keyGen.initialize(2048);
+        final java.security.KeyPair keyPair = keyGen.genKeyPair();
+        Assertions.assertThat(KeystoreUtils.matchingKeys(keyPair.getPrivate(), keyPair.getPublic())).isTrue();
+    }
+
+    @Test
+    void testMatchingPrivatePublicKeysInvalid() throws Exception {
+        KeyPairGenerator keyGen1 = KeyPairGenerator.getInstance(KEY_GENERATION_ALGORITHM);
+        keyGen1.initialize(2048);
+        final java.security.KeyPair keyPair1 = keyGen1.genKeyPair();
+        KeyPairGenerator keyGen2 = KeyPairGenerator.getInstance(KEY_GENERATION_ALGORITHM);
+        keyGen2.initialize(2048);
+        final java.security.KeyPair keyPair2 = keyGen2.genKeyPair();
+        //mixing keys from different pairs
+        Assertions.assertThat(KeystoreUtils.matchingKeys(keyPair1.getPrivate(), keyPair2.getPublic())).isFalse();
     }
 }
