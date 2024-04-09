@@ -177,7 +177,7 @@ describe('EventsList', () => {
       widgetMapping: Immutable.Map(),
     }));
     asMock(useAppDispatch).mockReturnValue(dispatch);
-    const searchTypePayload = { [data.id]: { page: 1, per_page: 10 } };
+    const searchTypePayload = { [data.id]: { page: 2, per_page: 10 } };
     const secondPageSize = 10;
 
     render(<SimpleEventsList data={{ ...data, totalResults: 10 + secondPageSize }} />);
