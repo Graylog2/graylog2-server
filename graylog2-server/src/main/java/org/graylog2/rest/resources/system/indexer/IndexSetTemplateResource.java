@@ -49,6 +49,7 @@ import static org.graylog2.audit.AuditEventTypes.INDEX_SET_TEMPLATE_CREATE;
 import static org.graylog2.audit.AuditEventTypes.INDEX_SET_TEMPLATE_DELETE;
 import static org.graylog2.audit.AuditEventTypes.INDEX_SET_TEMPLATE_UPDATE;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 @RequiresAuthentication
 @Api(value = "System/IndexSets/Templates", tags = {CLOUD_VISIBLE})
@@ -101,7 +102,7 @@ public class IndexSetTemplateResource extends RestResource {
     @ApiOperation(value = "Creates a new template")
     public IndexSetTemplate create(@ApiParam(name = "templateData") IndexSetTemplateData templateData) {
         checkPermission(RestPermissions.INDEX_SET_TEMPLATES_CREATE);
-        return templateService.save(new IndexSetTemplate(templateData));
+        return templateService.save(new IndexSetTemplate(templateData, false));
     }
 
     @PUT
@@ -112,7 +113,7 @@ public class IndexSetTemplateResource extends RestResource {
         checkPermission(RestPermissions.INDEX_SET_TEMPLATES_EDIT, template.id());
         final boolean updated = templateService.update(template.id(), template);
         if (!updated) {
-            throw new NotFoundException("template does not exist : " + template.id());
+            throw new NotFoundException(f("Template %s does not exist", template.id()));
         }
     }
 
@@ -121,8 +122,18 @@ public class IndexSetTemplateResource extends RestResource {
     @Timed
     @AuditEvent(type = INDEX_SET_TEMPLATE_DELETE)
     @ApiOperation(value = "Removes a template")
-    public void delete(@ApiParam(name = "template_id") @PathParam("template_id") String templateId) {
+    public void delete(@ApiParam(name = "template_id") @PathParam("template_id") String templateId) throws IllegalAccessException {
         checkPermission(RestPermissions.INDEX_SET_TEMPLATES_DELETE, templateId);
+        checkReadOnly(templateId);
         templateService.delete(templateId);
+    }
+
+    private IndexSetTemplate checkReadOnly(String templateId) throws IllegalAccessException {
+        final IndexSetTemplate template = templateService.get(templateId)
+                .orElseThrow(() -> new NotFoundException("No template with id : " + templateId));
+        if (template.isReadOnly()) {
+            throw new IllegalAccessException(f("Template %s is read-only and cannot be deleted", template.name()));
+        }
+        return template;
     }
 }
