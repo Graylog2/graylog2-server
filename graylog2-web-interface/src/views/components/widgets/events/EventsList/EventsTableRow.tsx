@@ -22,6 +22,7 @@ import IfInteractive from 'views/components/dashboard/IfInteractive';
 import type { EventListItem } from 'views/components/widgets/events/types';
 import RowActions from 'views/components/widgets/events/EventsList/RowActions';
 import useEventAttributes from 'views/components/widgets/events/hooks/useEventAttributes';
+import { IfPermitted } from 'components/common';
 
 const Td = styled.td(({ theme }) => css`
   && {
@@ -52,9 +53,11 @@ const EventsTableRow = ({ event, fields }: Props) => {
         );
       })}
       <IfInteractive>
-        <Td>
-          <RowActions eventId={event.id} hasReplayInfo={!!event.replay_info} />
-        </Td>
+        <IfPermitted permissions={['eventdefinitions:read']}>
+          <Td>
+            <RowActions eventId={event.id} hasReplayInfo={!!event.replay_info} />
+          </Td>
+        </IfPermitted>
       </IfInteractive>
     </tr>
   );

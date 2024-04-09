@@ -27,6 +27,7 @@ import EventsWidgetSortConfig from 'views/logic/widgets/events/EventsWidgetSortC
 import useEventAttributes from 'views/components/widgets/events/hooks/useEventAttributes';
 import UnknownAttributeTitle from 'views/components/widgets/events/UnknownAttributeTitle';
 import type Direction from 'views/logic/aggregationbuilder/Direction';
+import { IfPermitted } from 'components/common';
 
 import AttributeSortIcon from '../../overview-configuration/AttributeSortIcon';
 
@@ -77,7 +78,9 @@ const EventsTable = ({ events, config, onSortChange, setLoadingState }: Props) =
               );
             })}
             <IfInteractive>
-              <ActionsHeader />
+              <IfPermitted permissions={['eventdefinitions:read']}>
+                <ActionsHeader />
+              </IfPermitted>
             </IfInteractive>
           </tr>
         </TableHead>
