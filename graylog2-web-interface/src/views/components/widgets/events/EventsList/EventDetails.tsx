@@ -35,7 +35,7 @@ export const usePluggableEventDetails = (eventId: string) => {
   );
 };
 
-const DefaultDetailsWrapper = ({ eventId }: { eventId: string }) => {
+export const EventDetails = ({ eventId }: { eventId: string }) => {
   const { data: event, isLoading } = useEventById(eventId);
   const { data: eventDefinition, isFetching } = useEventDefinition(event?.event_definition_id);
 
@@ -50,7 +50,7 @@ const DefaultDetailsWrapper = ({ eventId }: { eventId: string }) => {
   return <DefaultDetails event={event} eventDefinitionContext={eventDefinition} />;
 };
 
-const EventDetails = ({ eventId }: { eventId: string }) => {
+const EventDetailsWrapper = ({ eventId }: { eventId: string }) => {
   const puggableEventDetails = usePluggableEventDetails(eventId);
 
   if (puggableEventDetails?.length) {
@@ -58,7 +58,7 @@ const EventDetails = ({ eventId }: { eventId: string }) => {
     return <>{puggableEventDetails}</>;
   }
 
-  return <DefaultDetailsWrapper eventId={eventId} />;
+  return <EventDetails eventId={eventId} />;
 };
 
-export default EventDetails;
+export default EventDetailsWrapper;
