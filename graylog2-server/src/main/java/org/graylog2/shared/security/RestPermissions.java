@@ -155,6 +155,10 @@ public class RestPermissions implements PluginPermissions {
     public static final String MAPPING_PROFILES_DELETE = "mappingprofiles:delete";
     public static final String MAPPING_PROFILES_EDIT = "mappingprofiles:edit";
     public static final String MAPPING_PROFILES_READ = "mappingprofiles:read";
+    public static final String INDEX_SET_TEMPLATES_CREATE = "indexset_templates:create";
+    public static final String INDEX_SET_TEMPLATES_DELETE = "indexset_templates:delete";
+    public static final String INDEX_SET_TEMPLATES_EDIT = "indexset_templates:edit";
+    public static final String INDEX_SET_TEMPLATES_READ = "indexset_templates:read";
     public static final String URL_WHITELIST_READ = "urlwhitelist:read";
     public static final String URL_WHITELIST_WRITE = "urlwhitelist:write";
     public static final String USERS_CREATE = "users:create";
