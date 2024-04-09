@@ -163,6 +163,12 @@ public class NodeContainerFactory {
             }
         });
 
+        config.mavenProjectDirProvider.getFilesToAddToBinDir().forEach(filename -> {
+            final Path originalPath = fileCopyBaseDir.resolve(filename);
+            final String containerPath = GRAYLOG_HOME + "/bin/" + originalPath.getFileName();
+            container.addFileSystemBind(originalPath.toString(), containerPath.toString(), BindMode.READ_ONLY);
+        });
+
         addEnabledFeatureFlagsToContainerEnv(config, container);
 
         container.start();
@@ -174,7 +180,6 @@ public class NodeContainerFactory {
         config.mavenProjectDirProvider.getFilesToAddToBinDir().forEach(filename -> {
             final Path originalPath = fileCopyBaseDir.resolve(filename);
             final String containerPath = GRAYLOG_HOME + "/bin/" + originalPath.getFileName();
-            container.copyFileToContainer(MountableFile.forHostPath(originalPath), containerPath);
             if (!containerFileExists(container, containerPath)) {
                 LOG.error("Mandatory file {} does not exist in container at {}", filename, containerPath);
             }
