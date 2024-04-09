@@ -79,7 +79,7 @@ const NavItem = styled.span`
   min-height: ${NAV_ITEM_HEIGHT};
   padding: 0;
 
-  @media (max-width: 991px) {
+  @media (width <= 991px) {
     width: 100%;
   }
 `;

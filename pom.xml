@@ -89,7 +89,7 @@
         <!-- Dependencies -->
         <opensearch.shaded.version>2.12.0-2</opensearch.shaded.version>
         <airline.version>3.0.0</airline.version>
-        <amqp-client.version>5.20.0</amqp-client.version>
+        <amqp-client.version>5.21.0</amqp-client.version>
         <antlr.version>4.13.1</antlr.version>
         <apache-directory-version>1.0.3</apache-directory-version>
         <apache-httpclient.version>4.5.14</apache-httpclient.version>
@@ -102,7 +102,7 @@
         <aws-java-sdk-2.version>2.25.6</aws-java-sdk-2.version>
         <aws-kinesis-client.version>2.5.8</aws-kinesis-client.version>
         <aws-msk-iam-auth.version>2.0.3</aws-msk-iam-auth.version>
-        <bouncycastle.version>1.77</bouncycastle.version>
+        <bouncycastle.version>1.78</bouncycastle.version>
         <byte-buddy.version>1.14.13</byte-buddy.version>
         <caffeine.version>3.1.8</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
@@ -114,7 +114,7 @@
         <commons-lang3.version>3.14.0</commons-lang3.version>
         <commons-net.version>3.10.0</commons-net.version>
         <commons-validator.version>1.8.0</commons-validator.version>
-        <commons-io.version>2.16.0</commons-io.version>
+        <commons-io.version>2.16.1</commons-io.version>
         <disruptor.version>4.0.0</disruptor.version>
         <error-prone.version>2.26.1</error-prone.version>
         <freemarker.version>2.3.32</freemarker.version>
