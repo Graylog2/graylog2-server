@@ -30,7 +30,6 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import static org.graylog.events.notifications.NotificationDto.FIELD_ID;
 import static org.graylog2.database.MongoUtils.insertedIdAsString;
 import static org.graylog2.database.MongoUtils.stream;
 
@@ -64,7 +63,7 @@ public class DBNotificationService {
 
     public NotificationDto save(NotificationDto notificationDto) {
         if (notificationDto.id() != null) {
-            collection.replaceOne(Filters.eq(FIELD_ID, new ObjectId(notificationDto.id())), notificationDto);
+            collection.replaceOne(Filters.eq("_id", new ObjectId(notificationDto.id())), notificationDto);
             return notificationDto;
         } else {
             var id = insertedIdAsString(collection.insertOne(notificationDto));
@@ -74,7 +73,7 @@ public class DBNotificationService {
 
     public int delete(String id) {
         entityOwnerShipService.unregisterEventNotification(id);
-        return (int) collection.deleteOne(Filters.eq(FIELD_ID, new ObjectId(id))).getDeletedCount();
+        return (int) collection.deleteOne(Filters.eq("_id", new ObjectId(id))).getDeletedCount();
     }
 
     public Optional<NotificationDto> get(String id) {
