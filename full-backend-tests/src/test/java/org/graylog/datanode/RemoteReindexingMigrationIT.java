@@ -35,7 +35,7 @@ import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
-import org.hamcrest.Matchers;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.slf4j.Logger;
@@ -84,15 +84,16 @@ public class RemoteReindexingMigrationIT {
 
         final String request = """
                 {
+                    "allowlist": "%s",
                     "hostname": "%s",
                     "indices": ["%s", "%s"],
                     "synchronous": false
                 }
-                """.formatted(openSearchInstance.internalUri(), indexName, indexName2);
+                """.formatted(allowlistValue(openSearchInstance.internalUri()), openSearchInstance.internalUri(), indexName, indexName2);
 
 
         final ValidatableResponse migrationResponse = apis.post("/remote-reindex-migration/remoteReindex", request, 200);
-        final String migrationID = migrationResponse.extract().body().jsonPath().get("id");
+        final String migrationID = migrationResponse.extract().body().asString();
 
         ValidatableResponse response = waitForMigrationFinished(migrationID);
 
@@ -101,6 +102,12 @@ public class RemoteReindexingMigrationIT {
 
         Assertions.assertThat(waitForMessage(indexName, messageContent)).containsEntry("message", messageContent);
         Assertions.assertThat(waitForMessage(indexName2, messageContent2)).containsEntry("message", messageContent2);
+
+    }
+
+    @NotNull
+    private String allowlistValue(String indexerUri) {
+        return indexerUri.replace("http://", "");
 
     }
 
