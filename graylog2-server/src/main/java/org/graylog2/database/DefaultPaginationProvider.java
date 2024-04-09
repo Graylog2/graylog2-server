@@ -26,7 +26,7 @@ import java.util.function.Predicate;
 
 import static org.graylog2.database.MongoUtils.stream;
 
-class PaginationDecorator<T> implements PaginatedCollection<T> {
+class DefaultPaginationProvider<T> implements PaginationProvider<T> {
 
     private final GraylogMongoCollection<T> collection;
     private Bson filter;
@@ -35,24 +35,24 @@ class PaginationDecorator<T> implements PaginatedCollection<T> {
     private boolean includeGrandTotal;
     private Bson grandTotalFilter;
 
-    PaginationDecorator(GraylogMongoCollection<T> collection) {
+    DefaultPaginationProvider(GraylogMongoCollection<T> collection) {
         this.collection = collection;
     }
 
     @Override
-    public PaginatedCollection<T> filter(Bson filter) {
+    public PaginationProvider<T> filter(Bson filter) {
         this.filter = filter;
         return this;
     }
 
     @Override
-    public PaginatedCollection<T> sort(Bson sort) {
+    public PaginationProvider<T> sort(Bson sort) {
         this.sort = sort;
         return this;
     }
 
     @Override
-    public PaginatedCollection<T> sort(String fieldName, String order) {
+    public PaginationProvider<T> sort(String fieldName, String order) {
         if ("desc".equalsIgnoreCase(order)) {
             this.sort = Sorts.descending(fieldName);
         } else {
@@ -62,19 +62,19 @@ class PaginationDecorator<T> implements PaginatedCollection<T> {
     }
 
     @Override
-    public PaginatedCollection<T> perPage(int perPage) {
+    public PaginationProvider<T> perPage(int perPage) {
         this.perPage = perPage;
         return this;
     }
 
     @Override
-    public PaginatedCollection<T> includeGrandTotal(boolean includeGrandTotal) {
+    public PaginationProvider<T> includeGrandTotal(boolean includeGrandTotal) {
         this.includeGrandTotal = includeGrandTotal;
         return this;
     }
 
     @Override
-    public PaginatedCollection<T> grandTotalFilter(Bson grandTotalFilter) {
+    public PaginationProvider<T> grandTotalFilter(Bson grandTotalFilter) {
         this.grandTotalFilter = grandTotalFilter;
         return this;
     }

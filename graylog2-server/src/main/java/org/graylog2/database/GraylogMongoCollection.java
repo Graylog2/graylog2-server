@@ -28,18 +28,42 @@ import java.util.Optional;
  */
 public interface GraylogMongoCollection<T> extends MongoCollection<T> {
     /**
-     * A collection with a limited read-only API to return paginated lists of documents from MongoDB.
+     * Provides pagination for find operations.
      */
-    PaginatedCollection<T> findPaginated();
+    PaginationProvider<T> findPaginated();
 
+    /**
+     * Convenience method to look up a single document by its ID.
+     *
+     * @param id the document's id.
+     * @return the document wrapped in an {@link Optional} if present in the DB, an empty {@link Optional} otherwise.
+     */
     Optional<T> getById(ObjectId id);
 
+    /**
+     * Convenience method to look up a single document by its ID.
+     *
+     * @param id HEX string representation of the document's {@link ObjectId}.
+     * @return the document wrapped in an {@link Optional} if present in the DB, an empty {@link Optional} otherwise.
+     */
     default Optional<T> getById(String id) {
         return getById(new ObjectId(id));
     }
 
+    /**
+     * Convenience method to delete a single document identified by its ID.
+     *
+     * @param id the document's id.
+     * @return true if a document was deleted, false otherwise.
+     */
     boolean deleteById(ObjectId id);
 
+    /**
+     * Convenience method to delete a single document identified by its ID.
+     *
+     * @param id HEX string representation of the document's {@link ObjectId}.
+     * @return true if a document was deleted, false otherwise.
+     */
     default boolean deleteById(String id) {
         return deleteById(new ObjectId(id));
     }

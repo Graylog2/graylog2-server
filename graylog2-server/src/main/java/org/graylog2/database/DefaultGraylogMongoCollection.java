@@ -79,8 +79,8 @@ public class DefaultGraylogMongoCollection<T> implements GraylogMongoCollection<
     }
 
     @Override
-    public PaginatedCollection<T> findPaginated() {
-        return new PaginationDecorator<T>(this);
+    public PaginationProvider<T> findPaginated() {
+        return new DefaultPaginationProvider<T>(this);
     }
 
     @Override

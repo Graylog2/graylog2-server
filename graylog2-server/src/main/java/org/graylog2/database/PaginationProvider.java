@@ -20,14 +20,14 @@ import org.bson.conversions.Bson;
 
 import java.util.function.Predicate;
 
-public interface PaginatedCollection<T> {
+public interface PaginationProvider<T> {
     /**
      * Sets the query filter to apply to the query.
      *
      * @param filter the filter, which may be null.
      * @return this
      */
-    PaginatedCollection<T> filter(Bson filter);
+    PaginationProvider<T> filter(Bson filter);
 
     /**
      * Sets the sort criteria to apply to the query.
@@ -35,7 +35,7 @@ public interface PaginatedCollection<T> {
      * @param sort the sort criteria, which may be null.
      * @return this
      */
-    PaginatedCollection<T> sort(Bson sort);
+    PaginationProvider<T> sort(Bson sort);
 
     /**
      * Sets the sort criteria to apply to the query.
@@ -44,7 +44,7 @@ public interface PaginatedCollection<T> {
      * @param order     "desc" to request descending sort order. Otherwise, by default, ascending order is used.
      * @return this
      */
-    PaginatedCollection<T> sort(String fieldName, String order);
+    PaginationProvider<T> sort(String fieldName, String order);
 
     /**
      * Sets the page size
@@ -52,7 +52,7 @@ public interface PaginatedCollection<T> {
      * @param perPage the number of documents to put on one page
      * @return this
      */
-    PaginatedCollection<T> perPage(int perPage);
+    PaginationProvider<T> perPage(int perPage);
 
     /**
      * Specifies whether to include a grand total number of all documents in the collection. No filters, except, if set,
@@ -62,7 +62,7 @@ public interface PaginatedCollection<T> {
      *                          be included.
      * @return this
      */
-    PaginatedCollection<T> includeGrandTotal(boolean includeGrandTotal);
+    PaginationProvider<T> includeGrandTotal(boolean includeGrandTotal);
 
     /**
      * Sets a filter to be applied to the query to count the grand total of documents in the collection.
@@ -70,7 +70,7 @@ public interface PaginatedCollection<T> {
      * @param grandTotalFilter the filter, which may be null
      * @return this
      */
-    PaginatedCollection<T> grandTotalFilter(Bson grandTotalFilter);
+    PaginationProvider<T> grandTotalFilter(Bson grandTotalFilter);
 
     /**
      * Perform the MongoDB request and return the specified page.
