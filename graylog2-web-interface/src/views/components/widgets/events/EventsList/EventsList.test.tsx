@@ -26,7 +26,7 @@ import SearchResult from 'views/logic/SearchResult';
 import reexecuteSearchTypes from 'views/components/widgets/reexecuteSearchTypes';
 import type { SearchErrorResponse } from 'views/logic/SearchError';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import EventsWidgetConfig from 'views/logic/widgets/events/EventsWidgetConfig';
 
@@ -118,20 +118,14 @@ describe('EventsList', () => {
     totalResults: 1,
   };
 
-  beforeAll(() => {
-    loadViewsPlugin();
+  useViewsPlugin();
 
+  beforeEach(() => {
     asMock(useAutoRefresh).mockReturnValue({
       refreshConfig: null,
       startAutoRefresh: () => {},
       stopAutoRefresh: () => {},
     });
-  });
-
-  afterAll(unloadViewsPlugin);
-
-  afterEach(() => {
-    jest.clearAllMocks();
   });
 
   const clickNextPageButton = () => {
