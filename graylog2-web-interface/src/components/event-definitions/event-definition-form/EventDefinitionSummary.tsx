@@ -74,7 +74,8 @@ const EventDefinitionSummary = ({ eventDefinition, notifications, validation, cu
         <dd>
           <MarkdownPreview show
                            withFullView
-                           height={150}
+                           noBorder
+                           noBackground
                            value={eventDefinition.remediation_steps || 'No remediation steps given'} />
         </dd>
       </dl>

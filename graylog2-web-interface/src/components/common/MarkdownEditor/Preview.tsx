@@ -5,25 +5,24 @@ import { Markdown, Icon } from 'components/common';
 
 import PreviewModal from './PreviewModal';
 
-const Container = styled.div<{ $height: number }>`
+const Container = styled.div<{ $height?: number, $noBackground?: boolean, $noBorder?: boolean }>`
   position: relative;
   padding: 8px 0;
-  background-color: ${({ theme }) => theme.colors.global.contentBackground};
-  border: 1px solid ${({ theme }) => theme.colors.input.border};
+  background-color: ${({ theme, $noBackground }) => ($noBackground ? 'transparent' : theme.colors.global.contentBackground)};
+  ${({ $noBorder }) => (!$noBorder && css`border: 1px solid ${({ theme }) => theme.colors.input.border};`)}
   border-radius: 4px;
   flex-grow: 1;
   overflow: hidden;
 
-  ${({ $height }) => css`
-    height: ${$height}px;
-  `}
+  height: ${({ $height }) => ($height ? `${$height}px` : 'auto')};
+  min-height: 100px;
 `;
 
 const ExpandIcon = styled(Icon)`
   position: absolute;
   bottom: 0;
   right: 0;
-  padding: 8px;
+  padding: 8px 16px;
   cursor: pointer;
   color: ${({ theme }) => theme.colors.input.placeholder};
   z-index: 10;
@@ -110,16 +109,18 @@ const MarkdownStyles = styled.div`
 
 type Props = {
   value: string;
-  height: number;
+  height?: number;
   show: boolean;
   withFullView?: boolean;
+  noBackground?: boolean;
+  noBorder?: boolean;
 };
 
-function Preview({ value, height, show, withFullView }: Props) {
+function Preview({ value, height, show, withFullView, noBackground, noBorder }: Props) {
   const [fullView, setFullView] = React.useState<boolean>(false);
 
   return show && (
-    <Container $height={height}>
+    <Container $height={height} $noBackground={noBackground} $noBorder={noBorder}>
       <MarkdownStyles>
         <Markdown text={value} />
       </MarkdownStyles>
@@ -131,6 +132,9 @@ function Preview({ value, height, show, withFullView }: Props) {
 
 Preview.defaultProps = {
   withFullView: false,
+  noBackground: false,
+  noBorder: false,
+  height: undefined,
 };
 
 export default Preview;
