@@ -132,8 +132,7 @@ public class DataNodeConfigurationPeriodical extends Periodical {
                             CertConstants.DATANODE_KEY_ALIAS
                     );
 
-                    final KeystoreMongoLocation location = new KeystoreMongoLocation(nodeId.getNodeId(), KeystoreMongoCollections.DATA_NODE_KEYSTORE_COLLECTION);
-                    mongoKeyStorage.writeKeyStore(location, nodeKeystore, secret, secret);
+                    mongoKeyStorage.writeKeyStore(KeystoreMongoLocation.datanode(nodeId), nodeKeystore, secret, secret);
 
                     //should be in one transaction, but we miss transactions...
                     dataNodeProvisioningService.changeState(nodeId.getNodeId(), DataNodeProvisioningConfig.State.STORED);

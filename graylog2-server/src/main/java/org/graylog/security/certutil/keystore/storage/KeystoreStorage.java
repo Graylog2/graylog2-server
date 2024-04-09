@@ -21,7 +21,7 @@ import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import java.security.KeyStore;
 import java.util.Optional;
 
-public interface KeystoreStorage<T>{
+public interface KeystoreStorage<T> {
 
     void writeKeyStore(final T location,
                        final KeyStore keyStore,

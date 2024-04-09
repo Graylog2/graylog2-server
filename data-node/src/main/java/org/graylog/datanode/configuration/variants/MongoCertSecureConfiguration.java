@@ -90,7 +90,7 @@ public final class MongoCertSecureConfiguration extends SecureConfiguration {
 
     @NotNull
     private KeystoreMongoLocation getMongoKeystoreLocation() {
-        return new KeystoreMongoLocation(nodeId.getNodeId(), KeystoreMongoCollections.DATA_NODE_KEYSTORE_COLLECTION);
+        return KeystoreMongoLocation.datanode(nodeId);
     }
 
     private void reEncypt(final KeystoreMongoLocation originalLocation,

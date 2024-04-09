@@ -16,6 +16,5 @@
  */
 package org.graylog.security.certutil.keystore.storage.location;
 
-@Deprecated
 public interface KeystoreLocation {
 }
