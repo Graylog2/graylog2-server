@@ -177,14 +177,6 @@ public class NodeContainerFactory {
             LOG.info("Container debug port: " + container.getMappedPort(DEBUG_PORT));
         }
 
-        config.mavenProjectDirProvider.getFilesToAddToBinDir().forEach(filename -> {
-            final Path originalPath = fileCopyBaseDir.resolve(filename);
-            final String containerPath = GRAYLOG_HOME + "/bin/" + originalPath.getFileName();
-            if (!containerFileExists(container, containerPath)) {
-                LOG.error("Mandatory file {} does not exist in container at {}", filename, containerPath);
-            }
-        });
-
         return container;
     }
 
