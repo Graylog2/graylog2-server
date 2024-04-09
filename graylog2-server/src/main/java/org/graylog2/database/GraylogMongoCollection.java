@@ -17,6 +17,9 @@
 package org.graylog2.database;
 
 import com.mongodb.client.MongoCollection;
+import org.bson.types.ObjectId;
+
+import java.util.Optional;
 
 /**
  * A tiny wrapper for mongo collections that provides convenience methods beyond the official MongoDB client API.
@@ -27,5 +30,18 @@ public interface GraylogMongoCollection<T> extends MongoCollection<T> {
     /**
      * A collection with a limited read-only API to return paginated lists of documents from MongoDB.
      */
-    PaginatedCollection<T> paginated();
+    PaginatedCollection<T> findPaginated();
+
+    Optional<T> getById(ObjectId id);
+
+    default Optional<T> getById(String id) {
+        return getById(new ObjectId(id));
+    }
+
+    boolean deleteById(ObjectId id);
+
+    default boolean deleteById(String id) {
+        return deleteById(new ObjectId(id));
+    }
+
 }

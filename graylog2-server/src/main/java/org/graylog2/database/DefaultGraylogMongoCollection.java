@@ -43,6 +43,7 @@ import com.mongodb.client.model.DeleteOptions;
 import com.mongodb.client.model.DropCollectionOptions;
 import com.mongodb.client.model.DropIndexOptions;
 import com.mongodb.client.model.EstimatedDocumentCountOptions;
+import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.FindOneAndDeleteOptions;
 import com.mongodb.client.model.FindOneAndReplaceOptions;
 import com.mongodb.client.model.FindOneAndUpdateOptions;
@@ -65,8 +66,10 @@ import org.bson.codecs.configuration.CodecProvider;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.conversions.Bson;
+import org.bson.types.ObjectId;
 
 import java.util.List;
+import java.util.Optional;
 
 public class DefaultGraylogMongoCollection<T> implements GraylogMongoCollection<T> {
     private final MongoCollection<T> delegate;
@@ -76,8 +79,18 @@ public class DefaultGraylogMongoCollection<T> implements GraylogMongoCollection<
     }
 
     @Override
-    public PaginatedCollection<T> paginated() {
+    public PaginatedCollection<T> findPaginated() {
         return new PaginationDecorator<T>(this);
+    }
+
+    @Override
+    public Optional<T> getById(ObjectId id) {
+        return Optional.ofNullable(delegate.find(Filters.eq("_id", id)).first());
+    }
+
+    @Override
+    public boolean deleteById(ObjectId id) {
+        return delegate.deleteOne(Filters.eq("_id", id)).getDeletedCount() > 0;
     }
 
     /* ==== Only delegated methods below this line ==== */
