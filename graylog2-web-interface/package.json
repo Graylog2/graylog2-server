@@ -81,7 +81,7 @@
     "plotly.js": "2.30.1",
     "posthog-js": "^1.52.0",
     "qs": "^6.3.0",
-    "react-ace": "10.1.0",
+    "react-ace": "11.0.1",
     "react-beautiful-dnd": "^13.1.0",
     "react-color": "^2.14.0",
     "react-day-picker": "^7.4.8",
