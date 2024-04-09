@@ -1,0 +1,92 @@
+import * as React from 'react';
+import ReactDom from 'react-dom';
+import styled from 'styled-components';
+
+import { Button } from 'components/bootstrap';
+import { Icon } from 'components/common';
+
+import Preview from './Preview';
+
+const Backdrop = styled.div`
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1051;
+
+  background-color: rgba(0, 0, 0, 0.5);
+`;
+
+const Content = styled.div`
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 600px;
+  height: 65vh;
+  top: 10vh;
+  padding: 16px;
+
+  background-color: ${({ theme }) => theme.colors.global.contentBackground};
+  border: 1px solid ${({ theme }) => theme.colors.input.border};
+  border-radius: 8px;
+`;
+
+const CloseIcon = styled(Icon)`
+  margin-left: auto;
+  cursor: pointer;
+  color: ${({ theme }) => theme.colors.input.placeholder};
+
+  &:hover {
+    color: ${({ theme }) => theme.colors.global.textDefault};
+  }
+`;
+
+const Row = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  justify-content: stretch;
+  gap: 1rem;
+
+  &#editor-body {
+    flex-grow: 1;
+  }
+`;
+
+type Props = {
+  value: string;
+  show: boolean;
+  onClose: () => void;
+}
+
+function PreviewModal({ value, show, onClose }: Props) {
+  const [height, setHeight] = React.useState<number>(0);
+
+  React.useEffect(() => {
+    const contentHeight = document.getElementById('preview-body')?.scrollHeight;
+    setHeight(contentHeight);
+  }, [show]);
+
+  const Component = React.useMemo(() => (show ? (
+    <Backdrop onClick={() => onClose()}>
+      <Content onClick={(e: React.BaseSyntheticEvent) => e.stopPropagation()}>
+        <Row>
+          <h2 style={{ marginBottom: '1rem' }}>Markdown Preview</h2>
+          <CloseIcon name="close" onClick={() => onClose()} />
+        </Row>
+        <Preview value={value} height={height} show />
+        <Row style={{ justifyContent: 'flex-end', marginTop: '1rem' }}>
+          <Button bsStyle="success" role="button" onClick={() => onClose()}>Close</Button>
+        </Row>
+      </Content>
+    </Backdrop>
+  ) : null), [show, value, height, onClose]);
+
+  return <>{ReactDom.createPortal(Component, document.body)}</>;
+}
+
+export default PreviewModal;
