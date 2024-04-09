@@ -23,8 +23,8 @@ import org.bson.conversions.Bson;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
+
+import static org.graylog2.database.MongoUtils.stream;
 
 class PaginationDecorator<T> implements PaginatedCollection<T> {
 
@@ -99,16 +99,20 @@ class PaginationDecorator<T> implements PaginatedCollection<T> {
 
     @Override
     public PaginatedList<T> postProcessedPage(int pageNumber, Predicate<T> selector) {
-        final int total = Ints.saturatedCast(stream().filter(selector).count());
+        final int total = Ints.saturatedCast(stream(collection.find()
+                .filter(filter)
+                .sort(sort)).filter(selector).count());
 
         final List<T> documents;
         if (perPage > 0) {
-            documents = stream().filter(selector)
+            documents = stream(collection.find().filter(filter).sort(sort))
+                    .filter(selector)
                     .skip(perPage * Math.max(0L, pageNumber - 1))
                     .limit(perPage)
                     .toList();
         } else {
-            documents = stream().filter(selector).toList();
+            documents = stream(collection.find().filter(filter).sort(sort))
+                    .filter(selector).toList();
         }
 
         if (includeGrandTotal) {
@@ -119,10 +123,4 @@ class PaginationDecorator<T> implements PaginatedCollection<T> {
         }
     }
 
-    private Stream<T> stream() {
-        return StreamSupport.stream(collection.find()
-                .filter(filter)
-                .sort(sort)
-                .spliterator(), false);
-    }
 }
