@@ -59,7 +59,7 @@ const RowActions = ({ eventId, hasReplayInfo }: Props) => {
 
   const moreActions = [
     hasReplayInfo ? (
-      <MenuItem href={Routes.ALERTS.replay_search(eventId)} target="_blank">
+      <MenuItem href={Routes.ALERTS.replay_search(eventId)} target="_blank" key="replay-search">
         Replay search
       </MenuItem>
     ) : null,
