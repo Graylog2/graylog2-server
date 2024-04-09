@@ -19,7 +19,6 @@ package org.graylog.security.certutil.keystore.storage;
 import org.graylog.security.certutil.CertRequest;
 import org.graylog.security.certutil.CertificateGenerator;
 import org.graylog.security.certutil.KeyPair;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import javax.crypto.spec.SecretKeySpec;
@@ -34,19 +33,13 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class SinglePasswordKeystoreContentMoverTest {
+public class KeystoreUtilsTest {
 
-    private SinglePasswordKeystoreContentMover toTest;
-
-    @BeforeEach
-    void setUp() {
-        toTest = new SinglePasswordKeystoreContentMover();
-    }
 
     @Test
     void testThrowsExceptionIfNewPasswordIsNull() throws Exception {
         KeyStore originalKeyStore = KeyStore.getInstance(PKCS12);
-        assertThrows(IllegalArgumentException.class, () -> toTest.moveContents(originalKeyStore, "nvmd".toCharArray(), null));
+        assertThrows(IllegalArgumentException.class, () -> KeystoreUtils.newStoreCopyContent(originalKeyStore, "nvmd".toCharArray(), null));
     }
 
     @Test
@@ -70,7 +63,7 @@ public class SinglePasswordKeystoreContentMoverTest {
         final KeyPair keyPair = CertificateGenerator.generate(req);
         originalKeyStore.setKeyEntry("privkey", keyPair.privateKey(), oldPassword, new Certificate[]{keyPair.certificate()});
 
-        final KeyStore newKeyStore = toTest.moveContents(originalKeyStore, oldPassword, newPassword);
+        final KeyStore newKeyStore = KeystoreUtils.newStoreCopyContent(originalKeyStore, oldPassword, newPassword);
         final KeyStore.Entry secretRetrieved = newKeyStore.getEntry("secretEntry", new KeyStore.PasswordProtection(newPassword));
         final Certificate certificateRetrieved = newKeyStore.getCertificate("trusted-certificate");
         final Key privkeyRetrieved = newKeyStore.getKey("privkey", newPassword);
@@ -98,7 +91,7 @@ public class SinglePasswordKeystoreContentMoverTest {
         final KeyPair keyPair3 = CertificateGenerator.generate(req);
         originalKeyStore.setKeyEntry("privkey3", keyPair3.privateKey(), oldPassword, new Certificate[]{keyPair3.certificate()});
 
-        final KeyStore newKeyStore = toTest.moveContents(originalKeyStore, oldPassword, newPassword);
+        final KeyStore newKeyStore = KeystoreUtils.newStoreCopyContent(originalKeyStore, oldPassword, newPassword);
         assertEquals(keyPair1.privateKey(), newKeyStore.getKey("privkey1", newPassword));
         assertEquals(keyPair2.privateKey(), newKeyStore.getKey("privkey2", newPassword));
         assertEquals(keyPair3.privateKey(), newKeyStore.getKey("privkey3", newPassword));

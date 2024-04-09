@@ -16,5 +16,6 @@
  */
 package org.graylog.security.certutil.keystore.storage.location;
 
+@Deprecated
 public record KeystoreMongoLocation(String nodeId, KeystoreMongoCollection collection) implements KeystoreLocation {
 }

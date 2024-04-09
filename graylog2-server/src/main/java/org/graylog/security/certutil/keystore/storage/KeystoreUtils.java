@@ -23,13 +23,10 @@ import java.util.Enumeration;
 
 import static org.graylog.security.certutil.CertConstants.PKCS12;
 
-//Assumption: there is one common password, shared between the keystore and its entries
-public class SinglePasswordKeystoreContentMover implements KeystoreContentMover {
-
-    @Override
-    public KeyStore moveContents(KeyStore originalKeyStore,
-                                 char[] currentPassword,
-                                 final char[] newPassword) throws GeneralSecurityException, IOException {
+public class KeystoreUtils {
+    public static KeyStore newStoreCopyContent(KeyStore originalKeyStore,
+                                               char[] currentPassword,
+                                               final char[] newPassword) throws GeneralSecurityException, IOException {
         if (newPassword == null) {
             throw new IllegalArgumentException("new password cannot be null");
         }

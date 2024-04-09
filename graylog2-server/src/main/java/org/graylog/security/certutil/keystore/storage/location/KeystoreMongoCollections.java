@@ -19,6 +19,7 @@ package org.graylog.security.certutil.keystore.storage.location;
 import java.util.Collection;
 import java.util.List;
 
+@Deprecated
 public interface KeystoreMongoCollections {
 
     KeystoreMongoCollection DATA_NODE_KEYSTORE_COLLECTION = new KeystoreMongoCollection(

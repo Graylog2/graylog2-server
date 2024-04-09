@@ -16,46 +16,50 @@
  */
 package org.graylog.datanode.configuration.variants;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
-import org.graylog.datanode.configuration.certificates.KeystoreReEncryption;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
-import org.graylog.security.certutil.keystore.storage.location.KeystoreFileLocation;
+import org.graylog.security.certutil.keystore.storage.KeystoreFileStorage;
+import org.graylog.security.certutil.keystore.storage.KeystoreMongoStorage;
 import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoCollections;
 import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoLocation;
 import org.graylog2.cluster.certificates.CertificatesService;
 import org.graylog2.plugin.system.NodeId;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.security.GeneralSecurityException;
+import java.security.KeyStore;
+import java.util.Optional;
 
 public final class MongoCertSecureConfiguration extends SecureConfiguration {
 
-    private final KeystoreReEncryption keystoreReEncryption;
+    private final NodeId nodeId;
     private final CertificatesService certificatesService;
 
     private final char[] secret;
-    private final KeystoreMongoLocation mongoLocation;
 
     private final char[] mongoKeystorePassword;
 
+    private final KeystoreMongoStorage mongoKeyStorage;
+    private final KeystoreFileStorage fileKeyStorage;
+
     @Inject
-    public MongoCertSecureConfiguration(final Configuration localConfiguration,
-                                        final DatanodeConfiguration datanodeConfiguration,
-                                        final KeystoreReEncryption keystoreReEncryption,
+    public MongoCertSecureConfiguration(final DatanodeConfiguration datanodeConfiguration,
                                         final NodeId nodeId,
                                         final @Named("password_secret") String passwordSecret,
-                                        final CertificatesService certificatesService
+                                        final CertificatesService certificatesService, KeystoreMongoStorage mongoKeyStore, KeystoreFileStorage fileKeyStore
     ) {
         super(datanodeConfiguration);
-        this.keystoreReEncryption = keystoreReEncryption;
+        this.nodeId = nodeId;
         this.certificatesService = certificatesService;
 
-        this.mongoLocation = new KeystoreMongoLocation(nodeId.getNodeId(), KeystoreMongoCollections.DATA_NODE_KEYSTORE_COLLECTION);
         this.secret = passwordSecret.toCharArray();
+        this.mongoKeyStorage = mongoKeyStore;
+        this.fileKeyStorage = fileKeyStore;
 
         //TODO: matches line 123 of DataNodePreflightGeneratePeriodical, but both need to be changed
         this.mongoKeystorePassword = secret;
@@ -63,22 +67,44 @@ public final class MongoCertSecureConfiguration extends SecureConfiguration {
 
     @Override
     public boolean isConfigured(Configuration localConfiguration) {
-        return certificatesService.hasCert(mongoLocation);
+        return certificatesService.hasCert(getMongoKeystoreLocation());
     }
 
     @Override
     public OpensearchSecurityConfiguration build() throws KeyStoreStorageException, IOException, GeneralSecurityException {
 
-        final KeystoreFileLocation targetTransportKeystoreLocation = getTransportKeystoreLocation();
-        final KeystoreFileLocation targetHttpKeystoreLocation = getHttpKeystoreLocation();
+        final Path targetTransportKeystoreLocation = getTransportKeystoreLocation();
+        final Path targetHttpKeystoreLocation = getHttpKeystoreLocation();
+
 
         // this will take the mongodb-stored keys and persist them on a disk, in the opensearch configuration directory
-        keystoreReEncryption.reEncyptWithSecret(mongoLocation, mongoKeystorePassword, targetTransportKeystoreLocation);
-        keystoreReEncryption.reEncyptWithSecret(mongoLocation, mongoKeystorePassword, targetHttpKeystoreLocation);
+        final KeystoreMongoLocation mongoKeystoreLocation = getMongoKeystoreLocation();
+        reEncypt(mongoKeystoreLocation, mongoKeystorePassword, targetTransportKeystoreLocation, secret);
+        reEncypt(mongoKeystoreLocation, mongoKeystorePassword, targetHttpKeystoreLocation, secret);
 
         return new OpensearchSecurityConfiguration(
-                new KeystoreInformation(targetTransportKeystoreLocation.keystorePath().toAbsolutePath(), secret),
-                new KeystoreInformation(targetHttpKeystoreLocation.keystorePath().toAbsolutePath(), secret)
+                new KeystoreInformation(targetTransportKeystoreLocation.toAbsolutePath(), secret),
+                new KeystoreInformation(targetHttpKeystoreLocation.toAbsolutePath(), secret)
         );
+    }
+
+    @NotNull
+    private KeystoreMongoLocation getMongoKeystoreLocation() {
+        return new KeystoreMongoLocation(nodeId.getNodeId(), KeystoreMongoCollections.DATA_NODE_KEYSTORE_COLLECTION);
+    }
+
+    private void reEncypt(final KeystoreMongoLocation originalLocation,
+                          final char[] originalPassword,
+                          final Path targetLocation,
+                          final char[] newPassword
+    ) throws KeyStoreStorageException {
+
+        final Optional<KeyStore> keyStore = mongoKeyStorage.readKeyStore(originalLocation, originalPassword);
+        if (keyStore.isPresent()) {
+            final KeyStore originalKeystore = keyStore.get();
+            fileKeyStorage.writeKeyStore(targetLocation, originalKeystore, originalPassword, newPassword);
+        } else {
+            throw new KeyStoreStorageException("No keystore present in : " + originalLocation);
+        }
     }
 }
