@@ -11,7 +11,7 @@
   "license": "SSPL-1.0",
   "dependencies": {
     "@jest/types": "29.6.1",
-    "@testing-library/dom": "9.3.4",
+    "@testing-library/dom": "10.0.0",
     "@testing-library/jest-dom": "6.4.2",
     "@testing-library/react": "14.2.2",
     "@testing-library/react-hooks": "^8.0.0",
