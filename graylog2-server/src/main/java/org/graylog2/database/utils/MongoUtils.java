@@ -17,7 +17,7 @@
 package org.graylog2.database.utils;
 
 import com.google.common.collect.Streams;
-import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoIterable;
 import com.mongodb.client.result.InsertOneResult;
 import jakarta.annotation.Nullable;
 import org.bson.BsonObjectId;
@@ -69,17 +69,17 @@ public interface MongoUtils<T> {
     }
 
     /**
-     * Create a stream of entries from the given {@link FindIterable}. Using this method will create a stream that
+     * Create a stream of entries from the given {@link MongoIterable}. Using this method will create a stream that
      * properly closes the underlying MongoDB cursor when the stream is closed.
      * <p>
      * <b> The stream should be closed to free underlying resources.</b>
      *
-     * @param findIterable The iterable to create the stream from.
-     * @param <T>          document type of the underlying collection
+     * @param mongoIterable The iterable to create the stream from.
+     * @param <T>           document type of the underlying collection
      * @return A stream that should be used in a try-with-resources statement or closed manually to free underlying resources.
      */
-    static <T> Stream<T> stream(@Nonnull FindIterable<T> findIterable) {
-        final var cursor = findIterable.cursor();
+    static <T> Stream<T> stream(@Nonnull MongoIterable<T> mongoIterable) {
+        final var cursor = mongoIterable.cursor();
         return Streams.stream(cursor).onClose(cursor::close);
     }
 
