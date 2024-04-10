@@ -80,6 +80,6 @@ public class MongoCollections {
     }
 
     public <T> MongoUtils<T> getUtils(MongoCollection<T> collection) {
-        return new DefaultMongoUtils<>(collection);
+        return new DefaultMongoUtils<>(collection, objectMapper);
     }
 }

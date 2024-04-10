@@ -17,12 +17,13 @@
 package org.graylog2.database.utils;
 
 import com.google.common.collect.Streams;
-import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoIterable;
 import com.mongodb.client.result.InsertOneResult;
 import jakarta.annotation.Nullable;
 import org.bson.BsonObjectId;
 import org.bson.BsonValue;
 import org.bson.types.ObjectId;
+import org.mongojack.InitializationRequiredForTransformation;
 
 import javax.annotation.Nonnull;
 import java.util.Optional;
@@ -69,17 +70,17 @@ public interface MongoUtils<T> {
     }
 
     /**
-     * Create a stream of entries from the given {@link FindIterable}. Using this method will create a stream that
+     * Create a stream of entries from the given {@link MongoIterable}. Using this method will create a stream that
      * properly closes the underlying MongoDB cursor when the stream is closed.
      * <p>
      * <b> The stream should be closed to free underlying resources.</b>
      *
-     * @param findIterable The iterable to create the stream from.
-     * @param <T>          document type of the underlying collection
+     * @param mongoIterable The iterable to create the stream from.
+     * @param <T>           document type of the underlying collection
      * @return A stream that should be used in a try-with-resources statement or closed manually to free underlying resources.
      */
-    static <T> Stream<T> stream(@Nonnull FindIterable<T> findIterable) {
-        final var cursor = findIterable.cursor();
+    static <T> Stream<T> stream(@Nonnull MongoIterable<T> mongoIterable) {
+        final var cursor = mongoIterable.cursor();
         return Streams.stream(cursor).onClose(cursor::close);
     }
 
@@ -114,5 +115,19 @@ public interface MongoUtils<T> {
      * @return true if a document was deleted, false otherwise.
      */
     boolean deleteById(String id);
+
+    /**
+     * Utility method to help moving away from the deprecated MongoJack Bson objects, like
+     * {@link org.mongojack.DBQuery.Query}. These objects require initialization before they can be used as regular
+     * {@link org.bson.conversions.Bson} objects with the MongoDB driver.
+     * <p>
+     * The {@link org.mongojack.JacksonMongoCollection} would usually take care of that, but because we cannot use it,
+     * and instead use a regular {@link org.mongojack.MongoCollection}, we have to use this method.
+     *
+     * @deprecated This method is only meant as an interim solution. Rewrite your deprecated MongoJack objects so that
+     * you don't have to use it.
+     */
+    @Deprecated
+    void initializeLegacyMongoJackBsonObject(InitializationRequiredForTransformation mongoJackBsonObject);
 }
 

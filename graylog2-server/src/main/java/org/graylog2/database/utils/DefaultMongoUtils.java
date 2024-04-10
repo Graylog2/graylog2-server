@@ -16,17 +16,22 @@
  */
 package org.graylog2.database.utils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import org.bson.types.ObjectId;
+import org.graylog2.database.jackson.CustomJacksonCodecRegistry;
+import org.mongojack.InitializationRequiredForTransformation;
 
 import java.util.Optional;
 
 public class DefaultMongoUtils<T> implements MongoUtils<T> {
     private final MongoCollection<T> collection;
+    private final ObjectMapper objectMapper;
 
-    public DefaultMongoUtils(MongoCollection<T> delegate) {
+    public DefaultMongoUtils(MongoCollection<T> delegate, ObjectMapper objectMapper) {
         this.collection = delegate;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -47,6 +52,15 @@ public class DefaultMongoUtils<T> implements MongoUtils<T> {
     @Override
     public boolean deleteById(String id) {
         return deleteById(new ObjectId(id));
+    }
+
+    @Override
+    public void initializeLegacyMongoJackBsonObject(InitializationRequiredForTransformation mongoJackBsonObject) {
+        final CustomJacksonCodecRegistry codecRegistry = new CustomJacksonCodecRegistry(
+                objectMapper,
+                collection.getCodecRegistry());
+        mongoJackBsonObject.initialize(objectMapper, objectMapper.constructType(collection.getDocumentClass()),
+                codecRegistry);
     }
 
 }
