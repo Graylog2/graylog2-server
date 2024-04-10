@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.database;
+package org.graylog2.database.utils;
 
 import com.google.common.collect.Streams;
 import com.mongodb.client.FindIterable;
@@ -28,10 +28,18 @@ import javax.annotation.Nonnull;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public class MongoUtils {
-
-    private MongoUtils() {
-    }
+/**
+ * Utility methods to interact with MongoDB collections.
+ * <p>
+ * Most of the utility methods only work correctly when the collection meets the following criteria, which are
+ * considered best practices:
+ * <ul>
+ *     <li>The documents in the collection have an "_id" field and the value of this field is of type ObjectId</li>
+ * </ul>
+ *
+ * @param <T> Java type of the documents to interact with
+ */
+public interface MongoUtils<T> {
 
     /**
      * Extract the inserted id as an {@link ObjectId} from the insert result.
@@ -40,7 +48,7 @@ public class MongoUtils {
      * @return the inserted object ID, or null if no id was inserted. Fails if the id is not of type {@link ObjectId}.
      */
     @Nullable
-    public static ObjectId insertedId(@Nonnull InsertOneResult result) {
+    static ObjectId insertedId(@Nonnull InsertOneResult result) {
         return Optional.ofNullable(result.getInsertedId())
                 .map(BsonValue::asObjectId)
                 .map(BsonObjectId::getValue)
@@ -54,7 +62,7 @@ public class MongoUtils {
      * @return the inserted object ID as string, or null if no id was inserted. Fails if the id is not of type {@link ObjectId}.
      */
     @Nullable
-    public static String insertedIdAsString(@Nonnull InsertOneResult result) {
+    static String insertedIdAsString(@Nonnull InsertOneResult result) {
         return Optional.ofNullable(insertedId(result))
                 .map(ObjectId::toHexString)
                 .orElse(null);
@@ -70,9 +78,41 @@ public class MongoUtils {
      * @param <T>          document type of the underlying collection
      * @return A stream that should be used in a try-with-resources statement or closed manually to free underlying resources.
      */
-    public static <T> Stream<T> stream(@Nonnull FindIterable<T> findIterable) {
+    static <T> Stream<T> stream(@Nonnull FindIterable<T> findIterable) {
         final var cursor = findIterable.cursor();
         return Streams.stream(cursor).onClose(cursor::close);
     }
+
+    /**
+     * Convenience method to look up a single document by its ID.
+     *
+     * @param id the document's id.
+     * @return the document wrapped in an {@link Optional} if present in the DB, an empty {@link Optional} otherwise.
+     */
+    Optional<T> getById(ObjectId id);
+
+    /**
+     * Convenience method to look up a single document by its ID.
+     *
+     * @param id HEX string representation of the document's {@link ObjectId}.
+     * @return the document wrapped in an {@link Optional} if present in the DB, an empty {@link Optional} otherwise.
+     */
+    Optional<T> getById(String id);
+
+    /**
+     * Convenience method to delete a single document identified by its ID.
+     *
+     * @param id the document's id.
+     * @return true if a document was deleted, false otherwise.
+     */
+    boolean deleteById(ObjectId id);
+
+    /**
+     * Convenience method to delete a single document identified by its ID.
+     *
+     * @param id HEX string representation of the document's {@link ObjectId}.
+     * @return true if a document was deleted, false otherwise.
+     */
+    boolean deleteById(String id);
 }
 

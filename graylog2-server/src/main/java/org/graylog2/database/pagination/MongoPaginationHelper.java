@@ -14,20 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.database;
+package org.graylog2.database.pagination;
 
 import org.bson.conversions.Bson;
+import org.graylog2.database.PaginatedList;
 
 import java.util.function.Predicate;
 
-public interface PaginationProvider<T> {
+public interface MongoPaginationHelper<T> {
     /**
      * Sets the query filter to apply to the query.
      *
      * @param filter the filter, which may be null.
      * @return this
      */
-    PaginationProvider<T> filter(Bson filter);
+    MongoPaginationHelper<T> filter(Bson filter);
 
     /**
      * Sets the sort criteria to apply to the query.
@@ -35,7 +36,7 @@ public interface PaginationProvider<T> {
      * @param sort the sort criteria, which may be null.
      * @return this
      */
-    PaginationProvider<T> sort(Bson sort);
+    MongoPaginationHelper<T> sort(Bson sort);
 
     /**
      * Sets the sort criteria to apply to the query.
@@ -44,7 +45,7 @@ public interface PaginationProvider<T> {
      * @param order     "desc" to request descending sort order. Otherwise, by default, ascending order is used.
      * @return this
      */
-    PaginationProvider<T> sort(String fieldName, String order);
+    MongoPaginationHelper<T> sort(String fieldName, String order);
 
     /**
      * Sets the page size
@@ -52,7 +53,7 @@ public interface PaginationProvider<T> {
      * @param perPage the number of documents to put on one page
      * @return this
      */
-    PaginationProvider<T> perPage(int perPage);
+    MongoPaginationHelper<T> perPage(int perPage);
 
     /**
      * Specifies whether to include a grand total number of all documents in the collection. No filters, except, if set,
@@ -62,7 +63,7 @@ public interface PaginationProvider<T> {
      *                          be included.
      * @return this
      */
-    PaginationProvider<T> includeGrandTotal(boolean includeGrandTotal);
+    MongoPaginationHelper<T> includeGrandTotal(boolean includeGrandTotal);
 
     /**
      * Sets a filter to be applied to the query to count the grand total of documents in the collection.
@@ -70,7 +71,7 @@ public interface PaginationProvider<T> {
      * @param grandTotalFilter the filter, which may be null
      * @return this
      */
-    PaginationProvider<T> grandTotalFilter(Bson grandTotalFilter);
+    MongoPaginationHelper<T> grandTotalFilter(Bson grandTotalFilter);
 
     /**
      * Perform the MongoDB request and return the specified page.
