@@ -22,6 +22,7 @@ import EventsTableRow from './EventsTableRow';
 
 const event = {
   id: 'event-id-1',
+  event_definition_id: 'event-definition-id-1',
   name: 'Event 1',
   status: null,
   assigned_to: null,
