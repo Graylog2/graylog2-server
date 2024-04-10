@@ -82,9 +82,4 @@ public class MongoCollections {
     public <T> MongoUtils<T> getUtils(MongoCollection<T> collection) {
         return new DefaultMongoUtils<>(collection);
     }
-
-    // TODO
-//    public <T> ScopedMongoCollection getScopedCollection(String collectionName, Class<T> valueType) {
-//        return new ScopedMongoCollection<>(getCollection(collectionName, valueType));
-//    }
 }

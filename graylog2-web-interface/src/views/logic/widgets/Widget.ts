@@ -87,7 +87,7 @@ class Widget {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  get hasFixedFilters() {
+  get returnsAllRecords() {
     return false;
   }
 

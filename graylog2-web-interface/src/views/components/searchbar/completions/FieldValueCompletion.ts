@@ -71,7 +71,7 @@ const getFieldNameAndInput = ({
 }) => {
   const nextToken = tokens[currentTokenIdx + 1] ?? null;
 
-  if (isCompleteFieldName(currentToken) && !nextToken) {
+  if (isCompleteFieldName(currentToken) && (!nextToken || isSpace(nextToken))) {
     return {
       fieldName: removeFinalColon(currentToken.value),
       input: '',
@@ -79,7 +79,7 @@ const getFieldNameAndInput = ({
     };
   }
 
-  if ((isTypeTerm(currentToken) || isTypeString(currentToken) || isKeywordOperator(currentToken)) && isCompleteFieldName(prevToken)) {
+  if ((isTypeTerm(currentToken) || isTypeString(currentToken) || isKeywordOperator(currentToken) || isTypeNumber(currentToken)) && isCompleteFieldName(prevToken)) {
     return {
       fieldName: removeFinalColon(prevToken.value),
       input: formatValue(currentToken.value, currentToken.type),
