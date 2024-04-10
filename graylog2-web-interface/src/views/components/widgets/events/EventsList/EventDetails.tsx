@@ -37,7 +37,7 @@ export const usePluggableEventDetails = (eventId: string) => {
   );
 };
 
-export const EventDetails = ({ eventId }: { eventId: string }) => {
+export const DefaultDetailsWrapper = ({ eventId }: { eventId: string }) => {
   const { data: event, isLoading } = useEventById(eventId);
   const currentUser = useCurrentUser();
   const canViewDefinition = isPermitted(currentUser.permissions, `eventdefinitions:read:${event?.event_definition_id}`);
@@ -62,7 +62,7 @@ const EventDetailsWrapper = ({ eventId }: { eventId: string }) => {
     return <>{puggableEventDetails}</>;
   }
 
-  return <EventDetails eventId={eventId} />;
+  return <DefaultDetailsWrapper eventId={eventId} />;
 };
 
 export default EventDetailsWrapper;
