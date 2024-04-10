@@ -20,6 +20,8 @@ import { Spinner } from 'components/common';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import useEventDefinition from 'components/events/events/hooks/useEventDefinition';
+import { isPermitted } from 'util/PermissionsMixin';
+import useCurrentUser from 'hooks/useCurrentUser';
 
 type Props = {
   eventDefinitionId: string,
@@ -27,21 +29,24 @@ type Props = {
 }
 
 const EventDefinitionName = ({ eventDefinitionId, displayAsLink }: Props) => {
-  const { data: eventDefinition, isFetching } = useEventDefinition(eventDefinitionId);
+  const currentUser = useCurrentUser();
+  const canViewDefinition = isPermitted(currentUser.permissions, `eventdefinitions:read:${eventDefinitionId}`);
+  const { data: eventDefinition, isFetching } = useEventDefinition(eventDefinitionId, canViewDefinition);
+  const title = eventDefinition?.title ?? eventDefinitionId;
 
   if (isFetching) {
     return <Spinner />;
   }
 
-  if (!displayAsLink) {
+  if (!displayAsLink || !canViewDefinition) {
     // eslint-disable-next-line react/jsx-no-useless-fragment
-    return <>{eventDefinition.title}</>;
+    return <>{title}</>;
   }
 
   if (eventDefinition) {
     return (
       <Link to={Routes.ALERTS.DEFINITIONS.show(eventDefinition.id)} target="_blank">
-        {eventDefinition.title}
+        {title}
       </Link>
     );
   }
