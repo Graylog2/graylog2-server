@@ -30,15 +30,15 @@ type Props = {
 
 const EventDefinitionName = ({ eventDefinitionId, displayAsLink }: Props) => {
   const currentUser = useCurrentUser();
-  const canViewDefinitions = isPermitted(currentUser.permissions, ['eventdefinitions:read']);
-  const { data: eventDefinition, isFetching } = useEventDefinition(eventDefinitionId, canViewDefinitions);
+  const canViewDefinition = isPermitted(currentUser.permissions, `eventdefinitions:read:${eventDefinitionId}`);
+  const { data: eventDefinition, isFetching } = useEventDefinition(eventDefinitionId, canViewDefinition);
   const title = eventDefinition?.title ?? eventDefinitionId;
 
   if (isFetching) {
     return <Spinner />;
   }
 
-  if (!displayAsLink || !canViewDefinitions) {
+  if (!displayAsLink || !canViewDefinition) {
     // eslint-disable-next-line react/jsx-no-useless-fragment
     return <>{title}</>;
   }
