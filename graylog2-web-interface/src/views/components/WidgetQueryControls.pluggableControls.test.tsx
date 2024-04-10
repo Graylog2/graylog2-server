@@ -20,7 +20,6 @@ import userEvent from '@testing-library/user-event';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 import { PluginManifest } from 'graylog-web-plugin/plugin';
 
-import MockStore from 'helpers/mocking/StoreMock';
 import Widget from 'views/logic/widgets/Widget';
 import mockComponent from 'helpers/mocking/MockComponent';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
@@ -47,16 +46,12 @@ jest.mock('views/components/searchbar/queryinput/BasicQueryInput');
 
 jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
 
-jest.mock('views/stores/SearchConfigStore', () => ({
-  SearchConfigActions: {
-    refresh: jest.fn(() => Promise.resolve()),
+jest.mock('hooks/useSearchConfiguration', () => () => ({
+  config: {
+    relative_timerange_options: { P1D: 'Search in last day', PT0S: 'Search in all messages' },
+    query_time_range_limit: 'PT0S',
   },
-  SearchConfigStore: MockStore(['getInitialState', () => ({
-    searchesClusterConfig: {
-      relative_timerange_options: { P1D: 'Search in last day', PT0S: 'Search in all messages' },
-      query_time_range_limit: 'PT0S',
-    },
-  })]),
+  refresh: () => {},
 }));
 
 jest.mock('moment', () => {

@@ -119,3 +119,4 @@ export { default as Wizard } from './Wizard';
 export { default as SortIcon } from './SortIcon';
 export { default as Toggle } from './Toggle';
 export { default as SearchFiltersFormControls } from './SearchFiltersFormControls';
+export { default as ModalButtonToolbar } from './ModalButtonToolbar';

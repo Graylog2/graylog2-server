@@ -151,7 +151,7 @@ const TeaserPageLayout = ({ children }: PropsWithChildren) => {
                 <BoldText>Security Demo</BoldText>
                 <span>For more information and booking a full demo of the product visit Graylog website.</span>
               </LeftItems>
-              <Button bsStyle="primary" role="link" target="_blank" href="https://graylog.org/products/security">
+              <Button bsStyle="primary" role="link" target="_blank" href="https://graylog.org/explore-security/">
                 Graylog Security <Icon name="open_in_new" />
               </Button>
             </Banner>

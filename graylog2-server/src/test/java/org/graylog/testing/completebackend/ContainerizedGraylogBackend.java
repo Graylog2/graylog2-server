@@ -39,6 +39,8 @@ import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.stream.Collectors;
 
+import static org.graylog.testing.graylognode.NodeContainerConfig.flagFromEnvVar;
+
 public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(ContainerizedGraylogBackend.class);
     public static final String PASSWORD_SECRET = "M4lteserKreuzHerrStrack?-warZuKurzDeshalbMussdaNochWasdranHasToBeAtLeastSixtyFourCharactersInLength";
@@ -61,15 +63,15 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
                                                                          final boolean preImportLicense,
                                                                          final boolean withMailServerEnabled,
                                                                          final boolean webhookServerEnabled,
-                                                                         Map<String, String> configParams) {
+                                                                         Map<String, String> env) {
 
         final Stopwatch sw = Stopwatch.createStarted();
         LOG.debug("Creating Backend services {} {} {} flags <{}>", version, mongodbVersion, withMailServerEnabled ? "mail" : "", enabledFeatureFlags);
-        final Services services = servicesProvider.getServices(version, mongodbVersion, withMailServerEnabled, webhookServerEnabled, enabledFeatureFlags);
+        final Services services = servicesProvider.getServices(version, mongodbVersion, withMailServerEnabled, webhookServerEnabled, enabledFeatureFlags, env);
         LOG.debug(" creating backend services took " + sw.elapsed());
 
         final Stopwatch backendSw = Stopwatch.createStarted();
-        final ContainerizedGraylogBackend backend = new ContainerizedGraylogBackend().create(services, mongoDBFixtures, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, preImportLicense, configParams);
+        final ContainerizedGraylogBackend backend = new ContainerizedGraylogBackend().create(services, mongoDBFixtures, pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, preImportLicense, env);
         LOG.debug("Creating dockerized graylog server took {}", backendSw.elapsed());
         return backend;
     }
@@ -86,13 +88,17 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
         var mongoDB = services.getMongoDBInstance();
         mongoDB.importFixtures(mongoDBFixtures);
 
-        MavenPackager.packageJarIfNecessary(mavenProjectDirProvider);
+        var skipPackaging = flagFromEnvVar("GRAYLOG_IT_SKIP_PACKAGING");
+        if(!skipPackaging) {
+            MavenPackager.packageJarIfNecessary(mavenProjectDirProvider);
+        }
 
         if (preImportLicense) {
             createLicenses(mongoDB, "GRAYLOG_LICENSE_STRING", "GRAYLOG_SECURITY_LICENSE_STRING");
         }
 
         var searchServer = services.getSearchServerInstance();
+        LOG.info("Running backend with SearchServer version {}", searchServer.version());
         try {
             var nodeContainerConfig = new NodeContainerConfig(services.getNetwork(), mongoDB.internalUri(), PASSWORD_SECRET, ROOT_PASSWORD_SHA_2, searchServer.internalUri(), searchServer.version(), pluginJarsProvider, mavenProjectDirProvider, enabledFeatureFlags, configParams);
             this.node = NodeInstance.createStarted(nodeContainerConfig);
