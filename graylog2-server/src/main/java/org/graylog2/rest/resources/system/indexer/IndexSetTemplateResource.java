@@ -52,7 +52,7 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 @RequiresAuthentication
-@Api(value = "System/IndexSets/Templates", tags = {CLOUD_VISIBLE})
+@Api(value = "System/IndexSets/Templates", description = "Indexset Configuration Template Management", tags = {CLOUD_VISIBLE})
 @Path("/system/indices/index_sets/templates")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
