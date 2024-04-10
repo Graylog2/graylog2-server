@@ -25,7 +25,7 @@ export const fetchEventDefinitionDetails = async (eventDefinitionId: string): Pr
   fetch('GET', qualifyUrl(`/events/definitions/${eventDefinitionId}`))
 );
 
-const useEventDefinition = (eventDefId: string) => {
+const useEventDefinition = (eventDefId: string, enabled = true) => {
   const { data, isFetching } = useQuery({
     queryKey: ['get-event-definition-details', eventDefId],
     queryFn: () => fetchEventDefinitionDetails(eventDefId),
@@ -34,7 +34,7 @@ const useEventDefinition = (eventDefId: string) => {
     },
     retry: 0,
     keepPreviousData: true,
-    enabled: !!eventDefId,
+    enabled: !!eventDefId && enabled,
   });
 
   return { data, isFetching };
