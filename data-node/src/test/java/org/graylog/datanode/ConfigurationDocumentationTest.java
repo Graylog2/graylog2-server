@@ -17,6 +17,7 @@
 package org.graylog.datanode;
 
 import com.github.joschi.jadconfig.Parameter;
+import com.github.joschi.jadconfig.ReflectionUtils;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.lang3.ClassUtils;
@@ -28,6 +29,8 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -101,6 +104,16 @@ class ConfigurationDocumentationTest {
         return new ConfigurationField(f.getName(), type, propertyName, defaultValue, required, documentation);
     }
 
+    private static Object getDefaultValue(Field f, Object instance) {
+        final Object defaultValue;
+        try {
+            defaultValue = ReflectionUtils.getFieldValue(instance, f);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+        return defaultValue;
+    }
+
     private static String getType(Field f) {
         if (f.getType().isPrimitive()) {
             return ClassUtils.primitiveToWrapper(f.getType()).getSimpleName();
@@ -109,14 +122,6 @@ class ConfigurationDocumentationTest {
         }
     }
 
-    private static Object getDefaultValue(Field f, Object configurationBean) {
-        try {
-            f.setAccessible(true);
-            return f.get(configurationBean);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     private record ConfigurationField(String fieldName, String type, String configName, Object defaultValue,
                                       boolean required, String documentation) {
