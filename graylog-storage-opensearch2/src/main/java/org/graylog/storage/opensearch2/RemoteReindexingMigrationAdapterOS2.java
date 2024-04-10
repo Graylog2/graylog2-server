@@ -165,7 +165,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
 
     private void prepareCluster(String allowlistAsString) {
         final var activeNodes = getAllActiveNodeIDs();
-        List<String> allowlist = Arrays.asList(allowlistAsString.split(","));
+        List<String> allowlist = Arrays.stream(allowlistAsString.split(",")).map(String::trim).toList();
         try {
             verifyRemoteReindexAllowlistSetting(allowlist);
         } catch (RemoteReindexNotAllowedException e) {
@@ -226,7 +226,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     @Nullable
     private String getErrors(GetTaskResponse task) {
         if (task.error() != null) {
-            return task.error().type() + ": " + task.error().reason();
+            return task.toString();
         } else if (task.task().status().hasFailures()) {
             return String.join(";", task.task().status().failures());
         }

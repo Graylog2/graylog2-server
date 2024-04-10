@@ -20,7 +20,6 @@ import Widget from 'views/logic/widgets/Widget';
 import type { WidgetState } from 'views/logic/widgets/Widget';
 import isDeepEqual from 'stores/isDeepEqual';
 import isEqualForSearch from 'views/stores/isEqualForSearch';
-import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 
 import EventsWidgetConfig from './EventsWidgetConfig';
 
@@ -31,8 +30,8 @@ export default class EventsWidget extends Widget {
       EventsWidget.type,
       config,
       undefined,
-      { range: 0, type: 'relative' },
-      createElasticsearchQueryString('*'),
+      undefined,
+      undefined,
       [],
     );
   }
@@ -40,11 +39,6 @@ export default class EventsWidget extends Widget {
   static type = 'events';
 
   static defaultTitle = 'Untitled Events Overview';
-
-  // eslint-disable-next-line class-methods-use-this
-  get hasFixedFilters() {
-    return true;
-  }
 
   static fromJSON(value: WidgetState) {
     const { id, config } = value;

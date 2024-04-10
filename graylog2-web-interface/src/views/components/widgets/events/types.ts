@@ -20,6 +20,7 @@ export type EventListItem = {
   archived: boolean,
   assigned_to: string | null,
   created_at: string,
+  event_definition_id: string,
   id: string,
   name: string,
   priority: number,

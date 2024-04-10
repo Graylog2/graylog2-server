@@ -58,7 +58,7 @@ export const mockEventData = {
     key_tuple: [],
     key: null,
     priority: 2,
-    fields: [{}],
+    fields: [],
     replay_info: {
       timerange_start: '2023-03-02T13:42:21.266Z',
       timerange_end: '2023-03-02T13:43:21.266Z',

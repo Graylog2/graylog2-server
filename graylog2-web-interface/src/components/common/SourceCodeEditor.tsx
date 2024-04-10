@@ -51,12 +51,15 @@ const SourceCodeContainer = styled.div<ContainerProps>(({ $resizable, theme }) =
         background: ${theme.colors.variant.lightest.default};
       }
     }
+
     .ace_gutter-active-line {
       background-color: ${theme.colors.variant.lightest.default};
     }
+
     .ace_gutter {
       background: ${theme.colors.variant.lighter.default};
     }
+
     .ace_cursor {
       border-color: ${theme.colors.global.textDefault};
     }
@@ -353,7 +356,6 @@ class SourceCodeEditor extends React.Component<Props, State> {
             }}
                        annotations={annotations}
                        // Convert Windows line breaks to Unix. See issue #7889
-                       // @ts-expect-error
                        setOptions={{ newLineMode: 'unix' }}
                        focus={focus}
                        fontSize={fontSize}
