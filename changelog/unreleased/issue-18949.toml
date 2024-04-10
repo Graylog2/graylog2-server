@@ -1,5 +1,5 @@
 type = "fixed"
-message = "Fix event definitions handling in events widget."
+message = "Fix permissions handling in events widget."
 
 issues = ["18949"]
 pulls = ["18953"]
