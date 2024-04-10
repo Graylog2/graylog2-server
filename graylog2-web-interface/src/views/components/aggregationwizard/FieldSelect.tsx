@@ -58,7 +58,7 @@ type Props = {
 const sortByLabel = ({ label: label1 }: { label: string }, { label: label2 }: { label: string }) => defaultCompare(label1, label2);
 
 const UnqualifiedOption = styled.span(({ theme }) => css`
-  color: ${theme.colors.variant.light.default};
+  color: ${theme.colors.gray[70]};
 `);
 
 type OptionRendererProps = {
