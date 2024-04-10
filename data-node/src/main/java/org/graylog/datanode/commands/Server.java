@@ -101,7 +101,7 @@ public class Server extends ServerBootstrap {
     }
 
     @Override
-    protected List<Object> getCommandConfigurationBeans() {
+    public List<Object> getCommandConfigurationBeans() {
         return Arrays.asList(configuration,
                 mongoDbConfiguration,
                 tlsConfiguration,
