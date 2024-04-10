@@ -75,7 +75,7 @@ const useHandlePageChange = (searchTypeId: string, setLoadingState: (loading: bo
     stopAutoRefresh();
     setLoadingState(true);
 
-    dispatch(reexecuteSearchTypes(searchTypePayload)).then((response) => {
+    return dispatch(reexecuteSearchTypes(searchTypePayload)).then((response) => {
       const { result } = response.payload;
       setLoadingState(false);
 
