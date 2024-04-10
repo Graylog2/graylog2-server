@@ -226,7 +226,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     @Nullable
     private String getErrors(GetTaskResponse task) {
         if (task.error() != null) {
-            return task.error().type() + ": " + task.error().reason();
+            return task.toString();
         } else if (task.task().status().hasFailures()) {
             return String.join(";", task.task().status().failures());
         }
