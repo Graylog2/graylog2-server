@@ -94,8 +94,7 @@ public class Server extends ServerBootstrap {
                 new RestBindings(),
                 new DataNodeProvisioningBindings(),
                 new PeriodicalBindings(),
-                new ObjectMapperModule(chainingClassLoader),
-                new PasswordAlgorithmBindings()
+                new ObjectMapperModule(chainingClassLoader)
         );
         return modules.build();
     }
