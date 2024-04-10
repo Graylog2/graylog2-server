@@ -20,12 +20,15 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Sorts;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.pagination.MongoPaginationHelper;
+import org.graylog2.database.utils.MongoUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,18 +38,21 @@ import org.mongojack.ObjectId;
 import java.util.function.Predicate;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog2.database.MongoUtils.insertedId;
-import static org.graylog2.database.MongoUtils.insertedIdAsString;
-import static org.graylog2.database.MongoUtils.stream;
+import static org.graylog2.database.utils.MongoUtils.insertedId;
+import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
+import static org.graylog2.database.utils.MongoUtils.stream;
 
 /**
  * Tests copied and adjusted from PaginagedDbServiceTest
  */
 @ExtendWith(MongoDBExtension.class)
 @ExtendWith(MongoJackExtension.class)
-class GraylogMongoCollectionTest {
+class HelpersAndUtilitiesTest {
 
-    private GraylogMongoCollection<TestDTO> collection;
+    private MongoCollections mongoCollections;
+    private MongoCollection<TestDTO> collection;
+    private MongoUtils<TestDTO> utils;
+    private MongoPaginationHelper<TestDTO> paginationHelper;
 
     @JsonAutoDetect
     public static class TestDTO {
@@ -83,8 +89,10 @@ class GraylogMongoCollectionTest {
 
     @BeforeEach
     void setUp(MongoDBTestService mongoDBTestService, MongoJackObjectMapperProvider objectMapperProvider) {
-        collection = new MongoCollections(objectMapperProvider, mongoDBTestService.mongoConnection())
-                .get("test", TestDTO.class);
+        mongoCollections = new MongoCollections(objectMapperProvider, mongoDBTestService.mongoConnection());
+        collection = mongoCollections.get("test", TestDTO.class);
+        utils = mongoCollections.getUtils(collection);
+        paginationHelper = mongoCollections.getPaginationHelper(collection);
     }
 
     @Test
@@ -96,7 +104,7 @@ class GraylogMongoCollectionTest {
                 .isNotBlank()
                 .matches("^[a-z0-9]{24}$");
 
-        assertThat(collection.getById(id))
+        assertThat(utils.getById(id))
                 .isPresent()
                 .get()
                 .extracting("id", "title")
@@ -107,10 +115,10 @@ class GraylogMongoCollectionTest {
     public void delete() {
         final var id = insertedIdAsString(collection.insertOne(newDto("hello")));
 
-        assertThat(collection.deleteById(id)).isTrue();
-        assertThat(collection.deleteById(id)).isFalse();
+        assertThat(utils.deleteById(id)).isTrue();
+        assertThat(utils.deleteById(id)).isFalse();
 
-        assertThat(collection.getById(id)).isNotPresent();
+        assertThat(utils.getById(id)).isNotPresent();
     }
 
     @Test
@@ -122,7 +130,7 @@ class GraylogMongoCollectionTest {
         collection.insertOne(newDto("hello5"));
 
         final PaginatedList<TestDTO> page1 =
-                collection.findPaginated().sort(Sorts.ascending("title")).perPage(2).page(1);
+                paginationHelper.sort(Sorts.ascending("title")).perPage(2).page(1);
 
         assertThat(page1.pagination().count()).isEqualTo(2);
         assertThat(page1.pagination().total()).isEqualTo(5);
@@ -131,7 +139,7 @@ class GraylogMongoCollectionTest {
                 .containsExactly("hello1", "hello2");
 
         final PaginatedList<TestDTO> page2 =
-                collection.findPaginated().sort(Sorts.ascending("title")).perPage(2).page(2);
+                paginationHelper.sort(Sorts.ascending("title")).perPage(2).page(2);
 
         assertThat(page2.pagination().count()).isEqualTo(2);
         assertThat(page2.pagination().total()).isEqualTo(5);
@@ -140,7 +148,7 @@ class GraylogMongoCollectionTest {
                 .containsExactly("hello3", "hello4");
 
         final PaginatedList<TestDTO> page3 =
-                collection.findPaginated().sort(Sorts.ascending("title")).perPage(2).page(3);
+                paginationHelper.sort(Sorts.ascending("title")).perPage(2).page(3);
 
         assertThat(page3.pagination().count()).isEqualTo(1);
         assertThat(page3.pagination().total()).isEqualTo(5);
@@ -149,7 +157,7 @@ class GraylogMongoCollectionTest {
                 .containsExactly("hello5");
 
         final PaginatedList<TestDTO> page1reverse =
-                collection.findPaginated().sort(Sorts.descending("title")).perPage(2).page(1);
+                paginationHelper.sort(Sorts.descending("title")).perPage(2).page(1);
 
         assertThat(page1reverse.pagination().count()).isEqualTo(2);
         assertThat(page1reverse.pagination().total()).isEqualTo(5);
@@ -170,7 +178,7 @@ class GraylogMongoCollectionTest {
 
         final Predicate<TestDTO> filter = view -> view.title.matches("hello[23456]");
 
-        final PaginatedList<TestDTO> page1 = collection.findPaginated().sort("title", "asc").perPage(2)
+        final PaginatedList<TestDTO> page1 = paginationHelper.sort("title", "asc").perPage(2)
                 .postProcessedPage(1, filter);
 
         assertThat(page1.pagination().count()).isEqualTo(2);
@@ -179,7 +187,7 @@ class GraylogMongoCollectionTest {
                 .extracting("title")
                 .containsExactly("hello2", "hello3");
 
-        final PaginatedList<TestDTO> page2 = collection.findPaginated().sort("title", "asc").perPage(2)
+        final PaginatedList<TestDTO> page2 = paginationHelper.sort("title", "asc").perPage(2)
                 .postProcessedPage(2, filter);
 
         assertThat(page2.pagination().count()).isEqualTo(2);
@@ -188,7 +196,7 @@ class GraylogMongoCollectionTest {
                 .extracting("title")
                 .containsExactly("hello4", "hello5");
 
-        final PaginatedList<TestDTO> page3 = collection.findPaginated().sort("title", "asc").perPage(2)
+        final PaginatedList<TestDTO> page3 = paginationHelper.sort("title", "asc").perPage(2)
                 .postProcessedPage(3, filter);
         assertThat(page3.pagination().count()).isEqualTo(1);
         assertThat(page3.pagination().total()).isEqualTo(5);
@@ -196,7 +204,7 @@ class GraylogMongoCollectionTest {
                 .extracting("title")
                 .containsExactly("hello6");
 
-        final PaginatedList<TestDTO> page4 = collection.findPaginated().sort("title", "asc").perPage(4)
+        final PaginatedList<TestDTO> page4 = paginationHelper.sort("title", "asc").perPage(4)
                 .postProcessedPage(2, filter);
 
         assertThat(page4.pagination().count()).isEqualTo(1);
@@ -205,7 +213,7 @@ class GraylogMongoCollectionTest {
                 .extracting("title")
                 .containsExactly("hello6");
 
-        final PaginatedList<TestDTO> page1reverse = collection.findPaginated().sort("title", "desc")
+        final PaginatedList<TestDTO> page1reverse = paginationHelper.sort("title", "desc")
                 .perPage(2).postProcessedPage(1, filter);
 
         assertThat(page1reverse.pagination().count()).isEqualTo(2);

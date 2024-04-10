@@ -14,45 +14,47 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.database;
+package org.graylog2.database.pagination;
 
 import com.google.common.primitives.Ints;
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Sorts;
 import org.bson.conversions.Bson;
+import org.graylog2.database.PaginatedList;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
-import static org.graylog2.database.MongoUtils.stream;
+import static org.graylog2.database.utils.MongoUtils.stream;
 
-class DefaultPaginationProvider<T> implements PaginationProvider<T> {
+public class DefaultMongoPaginationHelper<T> implements MongoPaginationHelper<T> {
 
-    private final GraylogMongoCollection<T> collection;
+    private final MongoCollection<T> collection;
     private Bson filter;
     private Bson sort;
     private int perPage;
     private boolean includeGrandTotal;
     private Bson grandTotalFilter;
 
-    DefaultPaginationProvider(GraylogMongoCollection<T> collection) {
+    public DefaultMongoPaginationHelper(MongoCollection<T> collection) {
         this.collection = collection;
     }
 
     @Override
-    public PaginationProvider<T> filter(Bson filter) {
+    public MongoPaginationHelper<T> filter(Bson filter) {
         this.filter = filter;
         return this;
     }
 
     @Override
-    public PaginationProvider<T> sort(Bson sort) {
+    public MongoPaginationHelper<T> sort(Bson sort) {
         this.sort = sort;
         return this;
     }
 
     @Override
-    public PaginationProvider<T> sort(String fieldName, String order) {
+    public MongoPaginationHelper<T> sort(String fieldName, String order) {
         if ("desc".equalsIgnoreCase(order)) {
             this.sort = Sorts.descending(fieldName);
         } else {
@@ -62,19 +64,19 @@ class DefaultPaginationProvider<T> implements PaginationProvider<T> {
     }
 
     @Override
-    public PaginationProvider<T> perPage(int perPage) {
+    public MongoPaginationHelper<T> perPage(int perPage) {
         this.perPage = perPage;
         return this;
     }
 
     @Override
-    public PaginationProvider<T> includeGrandTotal(boolean includeGrandTotal) {
+    public MongoPaginationHelper<T> includeGrandTotal(boolean includeGrandTotal) {
         this.includeGrandTotal = includeGrandTotal;
         return this;
     }
 
     @Override
-    public PaginationProvider<T> grandTotalFilter(Bson grandTotalFilter) {
+    public MongoPaginationHelper<T> grandTotalFilter(Bson grandTotalFilter) {
         this.grandTotalFilter = grandTotalFilter;
         return this;
     }
