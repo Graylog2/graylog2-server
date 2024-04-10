@@ -17,7 +17,7 @@
 package org.graylog2.indexer.indexset.template;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.configuration.IndexSetsDefaultConfiguration;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
@@ -28,18 +28,18 @@ import javax.annotation.Nullable;
  * Represents template as it is stored in Mongo.
  */
 public record IndexSetTemplate(@JsonProperty(ID_FIELD_NAME) @Nullable @Id @ObjectId String id,
-                               @JsonProperty(NAME_FIELD_NAME) @Nonnull String name,
+                               @JsonProperty(TITLE_FIELD_NAME) @Nonnull String name,
                                @JsonProperty(DESCRIPTION_FIELD_NAME) String description,
                                @JsonProperty(READ_ONLY_FIELD_NAME) Boolean isReadOnly,
-                               @JsonProperty(INDEX_SET_CONFIG_FIELD_NAME) @Nonnull IndexSetConfig indexSetConfig) {
+                               @JsonProperty(INDEX_SET_CONFIG_FIELD_NAME) @Nonnull IndexSetsDefaultConfiguration indexSetConfig) {
 
     public static final String ID_FIELD_NAME = "id";
-    public static final String NAME_FIELD_NAME = "name";
+    public static final String TITLE_FIELD_NAME = "title";
     public static final String DESCRIPTION_FIELD_NAME = "description";
     public static final String READ_ONLY_FIELD_NAME = "read_only";
     public static final String INDEX_SET_CONFIG_FIELD_NAME = "index_set_config";
 
     public IndexSetTemplate(final IndexSetTemplateData data, boolean isReadOnly) {
-        this(null, data.name(), data.description(), isReadOnly, data.indexSetConfig());
+        this(null, data.title(), data.description(), isReadOnly, data.indexSetConfig());
     }
 }

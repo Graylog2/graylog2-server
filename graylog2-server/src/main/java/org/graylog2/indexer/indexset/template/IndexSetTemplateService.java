@@ -39,20 +39,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static org.graylog2.indexer.indexset.template.IndexSetTemplate.DESCRIPTION_FIELD_NAME;
 import static org.graylog2.indexer.indexset.template.IndexSetTemplate.ID_FIELD_NAME;
 import static org.graylog2.indexer.indexset.template.IndexSetTemplate.INDEX_SET_CONFIG_FIELD_NAME;
-import static org.graylog2.indexer.indexset.template.IndexSetTemplate.NAME_FIELD_NAME;
 import static org.graylog2.indexer.indexset.template.IndexSetTemplate.READ_ONLY_FIELD_NAME;
+import static org.graylog2.indexer.indexset.template.IndexSetTemplate.TITLE_FIELD_NAME;
 
 public class IndexSetTemplateService extends PaginatedDbService<IndexSetTemplate> {
     static final String INDEX_SET_TEMPLATE_MONGO_COLLECTION_NAME = "index_set_templates";
 
     private static final List<EntityAttribute> ATTRIBUTES = List.of(
             EntityAttribute.builder().id(ID_FIELD_NAME).title("Template Id").hidden(true).sortable(true).build(),
-            EntityAttribute.builder().id(NAME_FIELD_NAME).title("Template Name")
+            EntityAttribute.builder().id(TITLE_FIELD_NAME).title("Template Name")
                     .sortable(true)
                     .filterable(true)
                     .searchable(true)
@@ -67,7 +66,7 @@ public class IndexSetTemplateService extends PaginatedDbService<IndexSetTemplate
     );
 
     private static final EntityDefaults DEFAULTS = EntityDefaults.builder()
-            .sort(Sorting.create(IndexSetTemplate.NAME_FIELD_NAME, Sorting.Direction.valueOf("asc".toUpperCase(Locale.ROOT))))
+            .sort(Sorting.create(IndexSetTemplate.TITLE_FIELD_NAME, Sorting.Direction.valueOf("asc".toUpperCase(Locale.ROOT))))
             .build();
 
     private final MongoCollection<IndexSetTemplate> templateCollection;
@@ -78,9 +77,9 @@ public class IndexSetTemplateService extends PaginatedDbService<IndexSetTemplate
                                    final MongoJackObjectMapperProvider mapper,
                                    final MongoCollections mongoCollections) {
         super(mongoConnection, mapper, IndexSetTemplate.class, INDEX_SET_TEMPLATE_MONGO_COLLECTION_NAME);
-        this.db.createIndex(new BasicDBObject(NAME_FIELD_NAME, 1), new BasicDBObject("unique", false));
+        this.db.createIndex(new BasicDBObject(TITLE_FIELD_NAME, 1), new BasicDBObject("unique", false));
         this.templateCollection = mongoCollections.get(INDEX_SET_TEMPLATE_MONGO_COLLECTION_NAME, IndexSetTemplate.class);
-        this.dbQueryCreator = new DbQueryCreator(IndexSetTemplate.NAME_FIELD_NAME, ATTRIBUTES);
+        this.dbQueryCreator = new DbQueryCreator(IndexSetTemplate.TITLE_FIELD_NAME, ATTRIBUTES);
     }
 
     @Override
@@ -92,17 +91,11 @@ public class IndexSetTemplateService extends PaginatedDbService<IndexSetTemplate
     }
 
     @Override
-    public IndexSetTemplate save(final IndexSetTemplate indexSetTemplate) {
-        return super.save(indexSetTemplate);
-    }
-
-    @Override
     public int delete(final String id) {
         if (!ObjectId.isValid(id)) {
             return 0;
         }
-        int numRemoved = super.delete(id);
-        return numRemoved;
+        return super.delete(id);
     }
 
     public boolean update(final String templateId, final IndexSetTemplate updatedTemplate) {
@@ -132,8 +125,7 @@ public class IndexSetTemplateService extends PaginatedDbService<IndexSetTemplate
                 .into(singlePageOfTemplates);
 
         final PaginatedList<IndexSetTemplate> paginated = new PaginatedList<>(
-                singlePageOfTemplates.stream()
-                        .collect(Collectors.toList()),
+                singlePageOfTemplates.stream().toList(),
                 Ints.saturatedCast(total),
                 page,
                 perPage);

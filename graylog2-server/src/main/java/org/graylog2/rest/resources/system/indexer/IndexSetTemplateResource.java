@@ -89,7 +89,7 @@ public class IndexSetTemplateResource extends RestResource {
                                                                 value = "The field to sort the result on",
                                                                 required = true,
                                                                 allowableValues = "name")
-                                                      @DefaultValue(IndexSetTemplate.NAME_FIELD_NAME) @QueryParam("sort") String sort,
+                                                          @DefaultValue(IndexSetTemplate.TITLE_FIELD_NAME) @QueryParam("sort") String sort,
                                                       @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
                                                       @DefaultValue("asc") @QueryParam("order") String order) {
         checkPermission(RestPermissions.INDEX_SET_TEMPLATES_READ);
