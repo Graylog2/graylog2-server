@@ -96,7 +96,7 @@ public class DBJobTriggerServiceTest {
     }
 
     private DBJobTriggerService serviceWithClock(JobSchedulerClock clock) {
-        return new DBJobTriggerService(mongodb.mongoConnection(), mongoCollections, mapperProvider, nodeId, clock, schedulerCapabilitiesService, EXPIRATION_DURATION);
+        return new DBJobTriggerService(mongoCollections, nodeId, clock, schedulerCapabilitiesService, EXPIRATION_DURATION);
     }
 
     @Test

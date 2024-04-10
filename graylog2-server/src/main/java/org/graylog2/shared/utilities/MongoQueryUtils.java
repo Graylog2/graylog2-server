@@ -18,7 +18,8 @@ package org.graylog2.shared.utilities;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
-import org.mongojack.DBQuery;
+import com.mongodb.client.model.Filters;
+import org.bson.conversions.Bson;
 
 import java.util.Set;
 
@@ -55,18 +56,18 @@ public class MongoQueryUtils {
     //
     // TODO Once we can assume to run on a non-EOL MongoDB version (>=4.2) this can probably
     // TODO be replaced with an update inside an aggregation which uses the "$setIsSubset" operator.
-    public static DBQuery.Query getArrayIsContainedQuery(String fieldName, Set<String> queryInput) {
-        final DBQuery.Query[] expressions = getQueryCombinations(queryInput).stream().map(subset -> {
-            if (subset.size() == 0) {
+    public static Bson getArrayIsContainedQuery(String fieldName, Set<String> queryInput) {
+        final var expressions = getQueryCombinations(queryInput).stream().map(subset -> {
+            if (subset.isEmpty()) {
                 // an "$all" query with an empty array never matches
-                return DBQuery.or(DBQuery.notExists(fieldName), DBQuery.is(fieldName, subset));
+                return Filters.or(Filters.not(Filters.exists(fieldName)), Filters.eq(fieldName, subset));
             }
-            return DBQuery.and(
-                    DBQuery.all(fieldName, subset),
-                    DBQuery.size(fieldName, subset.size())
+            return Filters.and(
+                    Filters.all(fieldName, subset),
+                    Filters.size(fieldName, subset.size())
             );
-        }).toArray(DBQuery.Query[]::new);
+        }).toList();
 
-        return DBQuery.or(expressions);
+        return Filters.or(expressions);
     }
 }

@@ -17,8 +17,8 @@
 package org.graylog2.shared.utilities;
 
 import com.google.common.collect.ImmutableSet;
+import org.bson.conversions.Bson;
 import org.junit.jupiter.api.Test;
-import org.mongojack.DBQuery;
 
 import java.util.Set;
 
@@ -44,11 +44,10 @@ class MongoQueryUtilsTest {
 
     @Test
     public void getArrayIsContainedQuery() {
-        final DBQuery.Query query = MongoQueryUtils.getArrayIsContainedQuery("field_1",
+        final Bson query = MongoQueryUtils.getArrayIsContainedQuery("field_1",
                 ImmutableSet.of("IS_LEADER", "HAS_ARCHIVE", "CONSTRAINT_XY"));
 
-        // there is no great way to peek into a query.
         // the DBJobTriggerServiceTest covers this on a higher level
-        assertThat(query.conditions()).hasSize(1);
+        assertThat(query.toBsonDocument().getFirstKey()).isEqualTo("$or");
     }
 }
