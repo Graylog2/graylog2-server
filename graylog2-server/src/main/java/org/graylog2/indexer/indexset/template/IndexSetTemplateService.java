@@ -45,6 +45,7 @@ import static org.graylog2.indexer.indexset.template.IndexSetTemplate.DESCRIPTIO
 import static org.graylog2.indexer.indexset.template.IndexSetTemplate.ID_FIELD_NAME;
 import static org.graylog2.indexer.indexset.template.IndexSetTemplate.INDEX_SET_CONFIG_FIELD_NAME;
 import static org.graylog2.indexer.indexset.template.IndexSetTemplate.NAME_FIELD_NAME;
+import static org.graylog2.indexer.indexset.template.IndexSetTemplate.READ_ONLY_FIELD_NAME;
 
 public class IndexSetTemplateService extends PaginatedDbService<IndexSetTemplate> {
     static final String INDEX_SET_TEMPLATE_MONGO_COLLECTION_NAME = "index_set_templates";
@@ -61,6 +62,7 @@ public class IndexSetTemplateService extends PaginatedDbService<IndexSetTemplate
                     .filterable(true)
                     .searchable(true)
                     .build(),
+            EntityAttribute.builder().id(READ_ONLY_FIELD_NAME).title("Read-only Attribute").sortable(false).build(),
             EntityAttribute.builder().id(INDEX_SET_CONFIG_FIELD_NAME).title("Custom Config").sortable(false).build()
     );
 

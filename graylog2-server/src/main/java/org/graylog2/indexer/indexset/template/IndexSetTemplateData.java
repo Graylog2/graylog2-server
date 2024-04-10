@@ -24,8 +24,10 @@ import javax.annotation.Nonnull;
 import static org.graylog2.indexer.indexset.template.IndexSetTemplate.DESCRIPTION_FIELD_NAME;
 import static org.graylog2.indexer.indexset.template.IndexSetTemplate.INDEX_SET_CONFIG_FIELD_NAME;
 import static org.graylog2.indexer.indexset.template.IndexSetTemplate.NAME_FIELD_NAME;
+import static org.graylog2.indexer.indexset.template.IndexSetTemplate.READ_ONLY_FIELD_NAME;
 
 public record IndexSetTemplateData(@JsonProperty(NAME_FIELD_NAME) String name,
                                    @JsonProperty(DESCRIPTION_FIELD_NAME) String description,
+                                   @JsonProperty(READ_ONLY_FIELD_NAME) Boolean readOnly,
                                    @JsonProperty(INDEX_SET_CONFIG_FIELD_NAME) @Nonnull IndexSetConfig indexSetConfig) {
 }

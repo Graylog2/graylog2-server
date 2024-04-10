@@ -28,7 +28,7 @@ import javax.annotation.Nullable;
  * Represents template as it is stored in Mongo.
  */
 public record IndexSetTemplate(@JsonProperty(ID_FIELD_NAME) @Nullable @Id @ObjectId String id,
-                               @JsonProperty(NAME_FIELD_NAME) String name,
+                               @JsonProperty(NAME_FIELD_NAME) @Nonnull String name,
                                @JsonProperty(DESCRIPTION_FIELD_NAME) String description,
                                @JsonProperty(READ_ONLY_FIELD_NAME) Boolean isReadOnly,
                                @JsonProperty(INDEX_SET_CONFIG_FIELD_NAME) @Nonnull IndexSetConfig indexSetConfig) {
