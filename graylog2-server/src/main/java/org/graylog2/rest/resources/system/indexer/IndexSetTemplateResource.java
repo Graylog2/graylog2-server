@@ -52,7 +52,7 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 @RequiresAuthentication
-@Api(value = "System/IndexSets/Templates", description = "Indexset Configuration Template Management", tags = {CLOUD_VISIBLE})
+@Api(value = "System/IndexSets/Templates", description = "Index-set Configuration Template Management", tags = {CLOUD_VISIBLE})
 @Path("/system/indices/index_sets/templates")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -99,9 +99,11 @@ public class IndexSetTemplateResource extends RestResource {
     @POST
     @Timed
     @AuditEvent(type = INDEX_SET_TEMPLATE_CREATE)
-    @ApiOperation(value = "Creates a new template")
+    @ApiOperation(value = "Creates a new editable template")
     public IndexSetTemplate create(@ApiParam(name = "templateData") IndexSetTemplateData templateData) {
         checkPermission(RestPermissions.INDEX_SET_TEMPLATES_CREATE);
+
+        // Templates created via the API are always writable
         return templateService.save(new IndexSetTemplate(templateData, false));
     }
 
@@ -109,8 +111,9 @@ public class IndexSetTemplateResource extends RestResource {
     @Timed
     @AuditEvent(type = INDEX_SET_TEMPLATE_UPDATE)
     @ApiOperation(value = "Updates existing template")
-    public void update(@ApiParam(name = "template") IndexSetTemplate template) {
+    public void update(@ApiParam(name = "template") IndexSetTemplate template) throws IllegalAccessException {
         checkPermission(RestPermissions.INDEX_SET_TEMPLATES_EDIT, template.id());
+        checkReadOnly(template.id());
         final boolean updated = templateService.update(template.id(), template);
         if (!updated) {
             throw new NotFoundException(f("Template %s does not exist", template.id()));
@@ -132,7 +135,7 @@ public class IndexSetTemplateResource extends RestResource {
         final IndexSetTemplate template = templateService.get(templateId)
                 .orElseThrow(() -> new NotFoundException("No template with id : " + templateId));
         if (template.isReadOnly()) {
-            throw new IllegalAccessException(f("Template %s is read-only and cannot be deleted", template.name()));
+            throw new IllegalAccessException(f("Template %s is read-only and cannot be modified or deleted", template.name()));
         }
         return template;
     }

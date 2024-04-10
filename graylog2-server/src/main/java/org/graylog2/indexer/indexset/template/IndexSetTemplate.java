@@ -30,7 +30,7 @@ import javax.annotation.Nullable;
 public record IndexSetTemplate(@JsonProperty(ID_FIELD_NAME) @Nullable @Id @ObjectId String id,
                                @JsonProperty(TITLE_FIELD_NAME) @Nonnull String name,
                                @JsonProperty(DESCRIPTION_FIELD_NAME) String description,
-                               @JsonProperty(READ_ONLY_FIELD_NAME) Boolean isReadOnly,
+                               @JsonProperty(READ_ONLY_FIELD_NAME) boolean isReadOnly,
                                @JsonProperty(INDEX_SET_CONFIG_FIELD_NAME) @Nonnull IndexSetsDefaultConfiguration indexSetConfig) {
 
     public static final String ID_FIELD_NAME = "id";

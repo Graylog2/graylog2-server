@@ -33,6 +33,7 @@ import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.EntityDefaults;
 import org.graylog2.rest.resources.entities.Sorting;
+import org.graylog2.search.SearchQueryField;
 import org.mongojack.WriteResult;
 
 import java.util.ArrayList;
@@ -50,18 +51,10 @@ public class IndexSetTemplateService extends PaginatedDbService<IndexSetTemplate
     static final String INDEX_SET_TEMPLATE_MONGO_COLLECTION_NAME = "index_set_templates";
 
     private static final List<EntityAttribute> ATTRIBUTES = List.of(
-            EntityAttribute.builder().id(ID_FIELD_NAME).title("Template Id").hidden(true).sortable(true).build(),
-            EntityAttribute.builder().id(TITLE_FIELD_NAME).title("Template Name")
-                    .sortable(true)
-                    .filterable(true)
-                    .searchable(true)
-                    .build(),
-            EntityAttribute.builder().id(DESCRIPTION_FIELD_NAME).title("Template Description")
-                    .sortable(false)
-                    .filterable(true)
-                    .searchable(true)
-                    .build(),
-            EntityAttribute.builder().id(READ_ONLY_FIELD_NAME).title("Read-only Attribute").sortable(false).build(),
+            EntityAttribute.builder().id(ID_FIELD_NAME).type(SearchQueryField.Type.OBJECT_ID).title("Template Id").hidden(true).sortable(true).build(),
+            EntityAttribute.builder().id(TITLE_FIELD_NAME).title("Template Name").sortable(true).filterable(true).searchable(true).build(),
+            EntityAttribute.builder().id(DESCRIPTION_FIELD_NAME).title("Template Description").sortable(false).build(),
+            EntityAttribute.builder().id(READ_ONLY_FIELD_NAME).type(SearchQueryField.Type.BOOLEAN).title("Read-only Attribute").sortable(false).build(),
             EntityAttribute.builder().id(INDEX_SET_CONFIG_FIELD_NAME).title("Custom Config").sortable(false).build()
     );
 
