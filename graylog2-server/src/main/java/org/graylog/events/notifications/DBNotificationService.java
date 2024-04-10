@@ -16,11 +16,11 @@
  */
 package org.graylog.events.notifications;
 
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
 import org.graylog.security.entities.EntityOwnershipService;
-import org.graylog2.database.GraylogMongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.database.users.User;
@@ -30,25 +30,27 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import static org.graylog2.database.MongoUtils.insertedIdAsString;
-import static org.graylog2.database.MongoUtils.stream;
+import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
+import static org.graylog2.database.utils.MongoUtils.stream;
 
 public class DBNotificationService {
     private static final String NOTIFICATION_COLLECTION_NAME = "event_notifications";
 
     private final EntityOwnershipService entityOwnerShipService;
-    private final GraylogMongoCollection<NotificationDto> collection;
+    private final MongoCollections mongoCollections;
+    private final MongoCollection<NotificationDto> collection;
 
     @Inject
     public DBNotificationService(MongoCollections mongoCollections,
                                  EntityOwnershipService entityOwnerShipService) {
-        this.collection = mongoCollections.get(NOTIFICATION_COLLECTION_NAME, NotificationDto.class);
+        this.mongoCollections = mongoCollections;
+        this.collection = mongoCollections.getCollection(NOTIFICATION_COLLECTION_NAME, NotificationDto.class);
         this.entityOwnerShipService = entityOwnerShipService;
     }
 
     public PaginatedList<NotificationDto> searchPaginated(SearchQuery query, Predicate<NotificationDto> filter,
                                                           String sortByField, String sortOrder, int page, int perPage) {
-        return collection.findPaginated()
+        return mongoCollections.getPaginationHelper(collection)
                 .filter(query.toBson())
                 .sort(sortByField, sortOrder)
                 .perPage(perPage)
@@ -77,7 +79,7 @@ public class DBNotificationService {
     }
 
     public Optional<NotificationDto> get(String id) {
-        return collection.getById(id);
+        return mongoCollections.getUtils(collection).getById(id);
     }
 
     public Stream<NotificationDto> streamAll() {
