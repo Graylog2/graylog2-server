@@ -68,7 +68,7 @@ const EditWidgetFrame = ({ children, onCancel, onSubmit, displaySubmitActions }:
     <WidgetEditApplyAllChangesProvider widget={widget}>
       <DisableSubmissionStateProvider>
         <Container>
-          {(isDashboard && !widget.hasFixedFilters) && (
+          {(isDashboard && !widget.returnsAllRecords) && (
             <QueryControls>
               <QueryEditModeContext.Provider value="widget">
                 <WidgetQueryControls />
