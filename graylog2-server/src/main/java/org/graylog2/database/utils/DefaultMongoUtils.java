@@ -28,10 +28,15 @@ import java.util.Optional;
 public class DefaultMongoUtils<T> implements MongoUtils<T> {
     private final MongoCollection<T> collection;
     private final ObjectMapper objectMapper;
+    private final CustomJacksonCodecRegistry codecRegistry;
 
     public DefaultMongoUtils(MongoCollection<T> delegate, ObjectMapper objectMapper) {
         this.collection = delegate;
         this.objectMapper = objectMapper;
+
+        codecRegistry = new CustomJacksonCodecRegistry(
+                objectMapper,
+                collection.getCodecRegistry());
     }
 
     @Override
@@ -56,10 +61,9 @@ public class DefaultMongoUtils<T> implements MongoUtils<T> {
 
     @Override
     public void initializeLegacyMongoJackBsonObject(InitializationRequiredForTransformation mongoJackBsonObject) {
-        final CustomJacksonCodecRegistry codecRegistry = new CustomJacksonCodecRegistry(
+        mongoJackBsonObject.initialize(
                 objectMapper,
-                collection.getCodecRegistry());
-        mongoJackBsonObject.initialize(objectMapper, objectMapper.constructType(collection.getDocumentClass()),
+                objectMapper.constructType(collection.getDocumentClass()),
                 codecRegistry);
     }
 
