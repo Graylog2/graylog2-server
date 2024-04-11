@@ -40,14 +40,14 @@ public class MongoCollections {
     }
 
     /**
-     * Alias for {@link #getCollection(String, Class)}.
+     * Alias for {@link #collection(String, Class)}.
      *
      * @param collectionName Name of the collection
      * @param valueType      Java type of the documents stored in the collection
      * @return A collection using a Jackson codec for serialization and deserialization
      */
     public <T> MongoCollection<T> get(String collectionName, Class<T> valueType) {
-        return getCollection(collectionName, valueType);
+        return collection(collectionName, valueType);
     }
 
     /**
@@ -57,7 +57,7 @@ public class MongoCollections {
      * @param valueType      Java type of the documents stored in the collection
      * @return A collection using a Jackson codec for serialization and deserialization
      */
-    public <T> MongoCollection<T> getCollection(String collectionName, Class<T> valueType) {
+    public <T> MongoCollection<T> collection(String collectionName, Class<T> valueType) {
         final MongoCollection<T> collection = mongoConnection.getMongoDatabase().getCollection(collectionName, valueType);
         final CustomJacksonCodecRegistry jacksonCodecRegistry = new CustomJacksonCodecRegistry(this.objectMapper,
                 collection.getCodecRegistry());
@@ -68,18 +68,28 @@ public class MongoCollections {
     /**
      * Provides a helper to perform find operations on a collection that yield pages of documents.
      */
-    public <T> MongoPaginationHelper<T> getPaginationHelper(String collectionName, Class<T> valueType) {
-        return getPaginationHelper(getCollection(collectionName, valueType));
+    public <T> MongoPaginationHelper<T> paginationHelper(String collectionName, Class<T> valueType) {
+        return paginationHelper(collection(collectionName, valueType));
     }
 
     /**
      * Provides a helper to perform find operations on a collection that yield pages of documents.
      */
-    public <T> MongoPaginationHelper<T> getPaginationHelper(MongoCollection<T> collection) {
+    public <T> MongoPaginationHelper<T> paginationHelper(MongoCollection<T> collection) {
         return new DefaultMongoPaginationHelper<>(collection);
     }
 
-    public <T> MongoUtils<T> getUtils(MongoCollection<T> collection) {
+    /**
+     * Provides utility methods like getting documents by ID, etc.
+     */
+    public <T> MongoUtils<T> utils(String collectionName, Class<T> valueType) {
+        return utils(collection(collectionName, valueType));
+    }
+
+    /**
+     * Provides utility methods like getting documents by ID, etc.
+     */
+    public <T> MongoUtils<T> utils(MongoCollection<T> collection) {
         return new DefaultMongoUtils<>(collection, objectMapper);
     }
 }
