@@ -28,13 +28,10 @@ const Backdrop = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   z-index: 1051;
 
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgb(0 0 0 / 50%);
 `;
 
 const Content = styled.div`
