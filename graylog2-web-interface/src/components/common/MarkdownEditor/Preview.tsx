@@ -49,8 +49,7 @@ const ExpandIcon = styled(Icon)`
 `;
 
 const MarkdownStyles = styled.div`
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden auto;
   height: 100%;
   padding: 0 8px;
 
