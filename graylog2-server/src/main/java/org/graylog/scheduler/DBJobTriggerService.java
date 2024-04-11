@@ -38,6 +38,7 @@ import org.graylog.scheduler.schedule.OnceJobSchedule;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
+import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.utilities.MongoQueryUtils;
 import org.joda.time.DateTime;
@@ -104,8 +105,8 @@ public class DBJobTriggerService {
     private final JobSchedulerClock clock;
     private final SchedulerCapabilitiesService schedulerCapabilitiesService;
     private final Duration lockExpirationDuration;
-    private final MongoCollections mongoCollections;
     private final MongoCollection<JobTriggerDto> collection;
+    private MongoUtils<JobTriggerDto> mongoUtils;
 
     @Inject
     public DBJobTriggerService(MongoCollections mongoCollections,
@@ -117,8 +118,8 @@ public class DBJobTriggerService {
         this.clock = clock;
         this.schedulerCapabilitiesService = schedulerCapabilitiesService;
         this.lockExpirationDuration = lockExpirationDuration;
-        this.mongoCollections = mongoCollections;
         this.collection = mongoCollections.get(COLLECTION_NAME, JobTriggerDto.class);
+        this.mongoUtils = mongoCollections.utils(collection);
 
         collection.createIndex(new BasicDBObject(FIELD_JOB_DEFINITION_ID, 1));
         collection.createIndex(new BasicDBObject(FIELD_LOCK_OWNER, 1));
@@ -158,7 +159,7 @@ public class DBJobTriggerService {
      * @return filled optional when the record exists, an empty optional otherwise
      */
     public Optional<JobTriggerDto> get(String id) {
-        return mongoCollections.getUtils(collection).getById(id);
+        return mongoUtils.getById(id);
     }
 
     /**
@@ -317,7 +318,7 @@ public class DBJobTriggerService {
         if (isNullOrEmpty(triggerId)) {
             throw new IllegalArgumentException("triggerId cannot be null or empty");
         }
-        return mongoCollections.getUtils(collection).deleteById(triggerId);
+        return mongoUtils.deleteById(triggerId);
     }
 
     /**
@@ -350,7 +351,7 @@ public class DBJobTriggerService {
 
     @Deprecated
     public int deleteByQuery(DBQuery.Query query) {
-        mongoCollections.getUtils(collection).initializeLegacyMongoJackBsonObject(query);
+        mongoUtils.initializeLegacyMongoJackBsonObject(query);
         return deleteByQuery((Bson) query);
     }
 
@@ -360,7 +361,7 @@ public class DBJobTriggerService {
 
     @Deprecated
     public long countByQuery(DBQuery.Query query) {
-        mongoCollections.getUtils(collection).initializeLegacyMongoJackBsonObject(query);
+        mongoUtils.initializeLegacyMongoJackBsonObject(query);
         return countByQuery((Bson) query);
     }
 
@@ -553,7 +554,7 @@ public class DBJobTriggerService {
 
     @Deprecated
     public Optional<JobTriggerDto> cancelTriggerByQuery(DBQuery.Query query) {
-        mongoCollections.getUtils(collection).initializeLegacyMongoJackBsonObject(query);
+        mongoUtils.initializeLegacyMongoJackBsonObject(query);
         return cancelTriggerByQuery((Bson) query);
     }
 
@@ -570,7 +571,7 @@ public class DBJobTriggerService {
 
     @Deprecated
     public List<JobTriggerDto> findByQuery(DBQuery.Query query) {
-        mongoCollections.getUtils(collection).initializeLegacyMongoJackBsonObject(query);
+        mongoUtils.initializeLegacyMongoJackBsonObject(query);
         return findByQuery((Bson) query);
     }
 

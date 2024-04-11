@@ -44,13 +44,13 @@ public class DBNotificationService {
     public DBNotificationService(MongoCollections mongoCollections,
                                  EntityOwnershipService entityOwnerShipService) {
         this.mongoCollections = mongoCollections;
-        this.collection = mongoCollections.getCollection(NOTIFICATION_COLLECTION_NAME, NotificationDto.class);
+        this.collection = mongoCollections.collection(NOTIFICATION_COLLECTION_NAME, NotificationDto.class);
         this.entityOwnerShipService = entityOwnerShipService;
     }
 
     public PaginatedList<NotificationDto> searchPaginated(SearchQuery query, Predicate<NotificationDto> filter,
                                                           String sortByField, String sortOrder, int page, int perPage) {
-        return mongoCollections.getPaginationHelper(collection)
+        return mongoCollections.paginationHelper(collection)
                 .filter(query.toBson())
                 .sort(sortByField, sortOrder)
                 .perPage(perPage)
@@ -79,7 +79,7 @@ public class DBNotificationService {
     }
 
     public Optional<NotificationDto> get(String id) {
-        return mongoCollections.getUtils(collection).getById(id);
+        return mongoCollections.utils(collection).getById(id);
     }
 
     public Stream<NotificationDto> streamAll() {
