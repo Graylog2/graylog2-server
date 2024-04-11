@@ -23,6 +23,8 @@ import org.bson.types.ObjectId;
 import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.pagination.MongoPaginationHelper;
+import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.search.SearchQuery;
 
@@ -37,20 +39,22 @@ public class DBNotificationService {
     private static final String NOTIFICATION_COLLECTION_NAME = "event_notifications";
 
     private final EntityOwnershipService entityOwnerShipService;
-    private final MongoCollections mongoCollections;
     private final MongoCollection<NotificationDto> collection;
+    private final MongoUtils<NotificationDto> mongoUtils;
+    private final MongoPaginationHelper<NotificationDto> paginationHelper;
 
     @Inject
     public DBNotificationService(MongoCollections mongoCollections,
                                  EntityOwnershipService entityOwnerShipService) {
-        this.mongoCollections = mongoCollections;
         this.collection = mongoCollections.collection(NOTIFICATION_COLLECTION_NAME, NotificationDto.class);
+        this.mongoUtils = mongoCollections.utils(collection);
+        this.paginationHelper = mongoCollections.paginationHelper(collection);
         this.entityOwnerShipService = entityOwnerShipService;
     }
 
     public PaginatedList<NotificationDto> searchPaginated(SearchQuery query, Predicate<NotificationDto> filter,
                                                           String sortByField, String sortOrder, int page, int perPage) {
-        return mongoCollections.paginationHelper(collection)
+        return paginationHelper
                 .filter(query.toBson())
                 .sort(sortByField, sortOrder)
                 .perPage(perPage)
@@ -79,7 +83,7 @@ public class DBNotificationService {
     }
 
     public Optional<NotificationDto> get(String id) {
-        return mongoCollections.utils(collection).getById(id);
+        return mongoUtils.getById(id);
     }
 
     public Stream<NotificationDto> streamAll() {
