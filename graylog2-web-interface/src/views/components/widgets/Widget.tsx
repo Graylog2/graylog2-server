@@ -291,8 +291,8 @@ const Widget = ({ id, editing, widget, title, position, onPositionsChange }: Pro
           </WidgetErrorBoundary>
         </EditWrapper>
         <WidgetFooter>
-          {((widget.hasFixedFilters || isDashboard) && !editing) && (
-            <TimerangeInfo widget={widget} activeQuery={activeQuery} widgetId={id} hasFixedFilters={widget.hasFixedFilters} />
+          {((widget.returnsAllRecords || isDashboard) && !editing) && (
+            <TimerangeInfo widget={widget} activeQuery={activeQuery} widgetId={id} returnsAllRecords={widget.returnsAllRecords} />
           )}
         </WidgetFooter>
       </WidgetFrame>

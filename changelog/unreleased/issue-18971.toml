@@ -1,0 +1,5 @@
+type = "f"
+message = "Fixing stream filtering in `events` search type."
+
+issues = ["18971"]
+pulls = ["18972"]

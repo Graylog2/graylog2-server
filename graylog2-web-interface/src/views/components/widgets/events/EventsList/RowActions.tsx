@@ -21,6 +21,8 @@ import { IconButton, ModalSubmit } from 'components/common';
 import { ButtonToolbar, Modal, Menu, MenuItem } from 'components/bootstrap';
 import usePluginEntities from 'hooks/usePluginEntities';
 import Routes from 'routing/Routes';
+import { isPermitted } from 'util/PermissionsMixin';
+import useCurrentUser from 'hooks/useCurrentUser';
 
 import EventDetails from './EventDetails';
 
@@ -49,17 +51,19 @@ const usePluggableDashboardActions = (eventId: string) => {
 
 type Props = {
   eventId: string,
-  hasReplayInfo: boolean
+  hasReplayInfo: boolean,
+  eventDefinitionId: string,
 }
 
-const RowActions = ({ eventId, hasReplayInfo }: Props) => {
+const RowActions = ({ eventId, hasReplayInfo, eventDefinitionId }: Props) => {
+  const user = useCurrentUser();
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const toggleDetailsModal = () => setShowDetailsModal((cur) => !cur);
   const { actions: pluggableActions, actionModals: pluggableActionModals } = usePluggableDashboardActions(eventId);
 
   const moreActions = [
-    hasReplayInfo ? (
-      <MenuItem href={Routes.ALERTS.replay_search(eventId)} target="_blank">
+    (hasReplayInfo && isPermitted(user.permissions, `eventdefinitions:read:${eventDefinitionId}`)) ? (
+      <MenuItem href={Routes.ALERTS.replay_search(eventId)} target="_blank" key="replay-search">
         Replay search
       </MenuItem>
     ) : null,

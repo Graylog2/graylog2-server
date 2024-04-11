@@ -1,0 +1,5 @@
+type="f"
+message="Tieing events widget to configured time range."
+
+issues=["18914"]
+pulls=["18954"]
