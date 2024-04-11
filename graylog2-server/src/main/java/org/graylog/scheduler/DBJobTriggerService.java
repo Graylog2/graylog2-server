@@ -18,7 +18,6 @@ package org.graylog.scheduler;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.joschi.jadconfig.util.Duration;
-import com.google.common.collect.Sets;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.MongoCollection;
@@ -46,7 +45,6 @@ import org.mongojack.DBQuery;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -270,39 +268,12 @@ public class DBJobTriggerService {
                 set(FIELD_NEXT_TIME, trigger.nextTime()),
                 set(FIELD_DATA, trigger.data()),
                 set(FIELD_UPDATED_AT, clock.nowUTC()),
-                set(FIELD_CONCURRENCY_RESCHEDULE_COUNT, trigger.concurrencyRescheduleCount()))
+                set(FIELD_CONCURRENCY_RESCHEDULE_COUNT, trigger.concurrencyRescheduleCount()),
+                set(FIELD_SCHEDULE, trigger.schedule()))
         );
 
         if (trigger.endTime().isPresent()) {
             updates.add(set(FIELD_END_TIME, trigger.endTime()));
-        }
-
-        // TODO: can we simplify this now?
-
-        // We cannot just use "update.set(FIELD_SCHEDULE, trigger.schedule()" to update the trigger because mongojack
-        // has an issue with serializing polymorphic classes and "$set": https://github.com/mongojack/mongojack/issues/101
-        // That's why JobSchedule objects have the "toDBUpdate()" method to give us all fields for the specific
-        // schedule implementation. (the fields can be different, depending on the schedule type)
-        final Optional<Map<String, Object>> scheduleUpdate = trigger.schedule().toDBUpdate(FIELD_SCHEDULE + ".");
-        if (scheduleUpdate.isPresent()) {
-            // First load the old trigger so we can compare the scheduler config keys.
-            final JobTriggerDto oldTrigger = get(trigger.id())
-                    .orElseThrow(() -> new IllegalStateException("Couldn't find trigger with ID " + trigger.id()));
-
-            // Compute old and new schedule config keys
-            final Set<String> oldKeys = oldTrigger.schedule().toDBUpdate(FIELD_SCHEDULE + ".")
-                    .orElse(new HashMap<>()).keySet();
-            final Set<String> newKeys = scheduleUpdate.get().keySet();
-
-            // Find out which keys aren't present in the new schedule config.
-            final Sets.SetView<String> toUnset = Sets.difference(oldKeys, newKeys);
-
-            // Remove keys which aren't present in the new schedule config. Otherwise we would have old keys in there
-            // which cannot be parsed for the updated schedule type.
-            toUnset.forEach(key -> updates.add(unset(key)));
-
-            // Then we can set the specific fields.
-            scheduleUpdate.get().forEach((k, v) -> updates.add(set(k, v)));
         }
 
         return collection.updateOne(eq(FIELD_ID, getId(trigger)), combine(updates)).getModifiedCount() > 0;
