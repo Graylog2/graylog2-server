@@ -319,10 +319,7 @@ public class DBJobTriggerServiceTest {
         final JobTriggerDto originalTrigger = dbJobTriggerService.create(JobTriggerDto.Builder.create(clock)
                 .jobDefinitionId("abc-123")
                 .jobDefinitionType("event-processor-execution-v1")
-                .schedule(IntervalJobSchedule.builder()
-                        .interval(15)
-                        .unit(TimeUnit.SECONDS)
-                        .build())
+                .schedule(OnceJobSchedule.create())
                 .build());
 
         assertThat(originalTrigger.id()).isNotBlank();
@@ -352,7 +349,10 @@ public class DBJobTriggerServiceTest {
                         .lastOwner("yolo2")
                         .progress(42)
                         .build())
-                .schedule(OnceJobSchedule.create())
+                .schedule(IntervalJobSchedule.builder()
+                        .interval(15)
+                        .unit(TimeUnit.SECONDS)
+                        .build())
                 .build();
 
         assertThat(dbJobTriggerService.update(updatedTrigger)).isTrue();
