@@ -2622,7 +2622,7 @@
   resolved "https://registry.yarnpkg.com/@plotly/d3/-/d3-3.8.1.tgz#674bf19809ffcc359e0ab388a1051f2dac5e6877"
   integrity sha512-x49ThEu1FRA00kTso4Jdfyf2byaCPLBGmLjAYQz5OzaPyLUhHesX3/Nfv2OHEhynhdy2UB39DLXq6thYe2L2kg==
 
-"@plotly/mapbox-gl@v1.13.4":
+"@plotly/mapbox-gl@1.13.4":
   version "1.13.4"
   resolved "https://registry.yarnpkg.com/@plotly/mapbox-gl/-/mapbox-gl-1.13.4.tgz#cb854d70902dd02af753f728855152efe568524f"
   integrity sha512-sR3/Pe5LqT/fhYgp4rT4aSFf1rTsxMbGiH6Hojc7PH36ny5Bn17iVFUjpzycafETURuFbLZUfjODO8LvSI+5zQ==
@@ -12332,15 +12332,15 @@ pkg-dir@^4.2.0:
   dependencies:
     find-up "^4.0.0"
 
-plotly.js@2.30.1:
-  version "2.30.1"
-  resolved "https://registry.yarnpkg.com/plotly.js/-/plotly.js-2.30.1.tgz#d9606447e65c92a9b523161a8301519ea247b164"
-  integrity sha512-KE3KeM4B6qtjPU7FGOxklmwYua4nWGgr48BRMWZVysZjphlSaQLzvUAieFlUCfPBPfJIRBLxFQy1KHMIQgfwrA==
+plotly.js@2.31.0:
+  version "2.31.0"
+  resolved "https://registry.yarnpkg.com/plotly.js/-/plotly.js-2.31.0.tgz#b4599ae3255a6a05aaf01d1d7b17962123f2ade7"
+  integrity sha512-CRGqEu4hYAIZztg0YSqJe/ODLLGv/ThpFMxzqkrkuvn25637emKL3/P87GFfwage3Bn8D5P+tDGTCdh9Di2dSw==
   dependencies:
     "@plotly/d3" "3.8.1"
     "@plotly/d3-sankey" "0.7.2"
     "@plotly/d3-sankey-circular" "0.33.1"
-    "@plotly/mapbox-gl" v1.13.4
+    "@plotly/mapbox-gl" "1.13.4"
     "@turf/area" "^6.4.0"
     "@turf/bbox" "^6.4.0"
     "@turf/centroid" "^6.0.2"
