@@ -138,6 +138,7 @@ public class Beats2Codec extends AbstractCodec {
                 final JsonNode currentNode = jsonNode.get(i);
                 if (currentNode.isObject()) {
                     final String pathPrefix = currentPath.isEmpty() ? "" : currentPath + MAP_KEY_SEPARATOR + i;
+                    values.add(currentNode);
                     addFlattened(message, pathPrefix, currentNode);
                 } else if (currentNode.isValueNode()) {
                     values.add(valueNode(currentNode));

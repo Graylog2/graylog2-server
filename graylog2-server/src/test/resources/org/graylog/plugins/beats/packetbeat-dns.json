@@ -20,10 +20,45 @@
     "answers": [
       {
         "class": "IN",
-        "data": "216.58.211.46",
-        "name": "www3.l.google.com",
-        "ttl": 845,
-        "type": "A"
+        "data": "2001:4998:124:1507::f001",
+        "name": "yahoo.com",
+        "ttl": "114",
+        "type": "AAAA"
+      },
+      {
+        "class": "IN",
+        "data": "2001:4998:44:3507::8000",
+        "name": "yahoo.com",
+        "ttl": "114",
+        "type": "AAAA"
+      },
+      {
+        "class": "IN",
+        "data": "2001:4998:44:3507::8001",
+        "name": "yahoo.com",
+        "ttl": "114",
+        "type": "AAAA"
+      },
+      {
+        "class": "IN",
+        "data": "2001:4998:24:120d::1:0",
+        "name": "yahoo.com",
+        "ttl": "114",
+        "type": "AAAA"
+      },
+      {
+        "class": "IN",
+        "data": "2001:4998:124:1507::f000",
+        "name": "yahoo.com",
+        "ttl": "114",
+        "type": "AAAA"
+      },
+      {
+        "class": "IN",
+        "data": "2001:4998:24:120d::1:1",
+        "name": "yahoo.com",
+        "ttl": "114",
+        "type": "AAAA"
       }
     ],
     "answers_count": 1,

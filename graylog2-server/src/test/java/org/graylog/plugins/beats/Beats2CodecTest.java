@@ -16,7 +16,10 @@
  */
 package org.graylog.plugins.beats;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.google.common.collect.Lists;
 import com.google.common.io.Resources;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
@@ -34,6 +37,7 @@ import org.mockito.junit.MockitoRule;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -108,8 +112,9 @@ public class Beats2CodecTest {
         assertThat(message.getField("packetbeat_type")).isEqualTo("dns");
         assertThat(message.getField("packetbeat_status")).isEqualTo("OK");
         assertThat(message.getField("packetbeat_method")).isEqualTo("QUERY");
-        assertThat(message.getField("packetbeat_dns_answers_0_type")).isEqualTo("A");
+        assertThat(message.getField("packetbeat_dns_answers_0_type")).isEqualTo("AAAA");
         assertThat(message.getField("packetbeat_dns_flags_recursion_allowed")).isEqualTo(true);
+        assertThat(message.getField("packetbeat_dns_answers")).isEqualTo(dnsAnswersFromJson("packetbeat-dns.json"));
     }
 
     @Test
@@ -326,5 +331,12 @@ public class Beats2CodecTest {
         final URL resource = Resources.getResource(this.getClass(), resourceName);
         final byte[] json = Resources.toByteArray(resource);
         return new RawMessage(json);
+    }
+
+    private ArrayList<JsonNode> dnsAnswersFromJson(String resourceName) throws IOException {
+        final URL resource = Resources.getResource(this.getClass(), resourceName);
+        final byte[] json = Resources.toByteArray(resource);
+        ArrayNode answers = (ArrayNode) objectMapper.readTree(json).get("dns").get("answers");
+        return Lists.newArrayList(answers.elements());
     }
 }
