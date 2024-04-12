@@ -50,7 +50,7 @@ public class MigrationStateMachineBuilder {
                 .permitIf(MigrationStep.SHOW_MIGRATION_SELECTION, MigrationState.MIGRATION_SELECTION_PAGE, migrationActions::caAndRenewalPolicyExist);
 
         config.configure(MigrationState.CA_CREATION_PAGE)
-                .permitIf(MigrationStep.SHOW_RENEWAL_POLICY_CREATION, MigrationState.RENEWAL_POLICY_CREATION_PAGE, migrationActions::renewalPolicyDoesNotExist)
+                .permitIf(MigrationStep.SHOW_RENEWAL_POLICY_CREATION, MigrationState.RENEWAL_POLICY_CREATION_PAGE, () -> !migrationActions.caDoesNotExist() && migrationActions.renewalPolicyDoesNotExist())
                 .permitIf(MigrationStep.SHOW_MIGRATION_SELECTION, MigrationState.MIGRATION_SELECTION_PAGE, migrationActions::caAndRenewalPolicyExist);
 
         config.configure(MigrationState.RENEWAL_POLICY_CREATION_PAGE)

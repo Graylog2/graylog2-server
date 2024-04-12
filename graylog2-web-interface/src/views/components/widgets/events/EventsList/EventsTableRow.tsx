@@ -53,7 +53,7 @@ const EventsTableRow = ({ event, fields }: Props) => {
       })}
       <IfInteractive>
         <Td>
-          <RowActions eventId={event.id} hasReplayInfo={!!event.replay_info} />
+          <RowActions eventId={event.id} eventDefinitionId={event.event_definition_id} hasReplayInfo={!!event.replay_info} />
         </Td>
       </IfInteractive>
     </tr>
