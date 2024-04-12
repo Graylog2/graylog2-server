@@ -49,7 +49,6 @@ const Switch = ({
 }: Props) => (
   <StyledSwitch aria-label={ariaLabel}
                 checked={checked}
-                data-testid={dataTestid}
                 disabled={disabled}
                 id={id}
                 label={label}
@@ -60,7 +59,6 @@ const Switch = ({
 
 Switch.defaultProps = {
   'aria-label': undefined,
-  'data-testid': undefined,
   disabled: undefined,
   id: undefined,
   label: undefined,
