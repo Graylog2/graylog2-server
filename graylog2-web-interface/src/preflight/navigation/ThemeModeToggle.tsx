@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { SyntheticEvent } from 'react';
 import { useEffect, useState } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import defer from 'lodash/defer';
@@ -51,11 +50,9 @@ const ThemeModeToggle = () => {
     }
   }, [loadingTheme, theme]);
 
-  const toggleThemeMode = (event: SyntheticEvent<HTMLInputElement>) => {
-    const { checked } = event.target as HTMLInputElement;
-    event.persist();
+  const toggleThemeMode = (event: React.ChangeEvent<HTMLInputElement>) => {
     setLoadingTheme(true);
-    const newMode = checked ? COLOR_SCHEME_DARK : COLOR_SCHEME_LIGHT;
+    const newMode = event.target.checked ? COLOR_SCHEME_DARK : COLOR_SCHEME_LIGHT;
     defer(() => theme.changeMode(newMode));
   };
 
