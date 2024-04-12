@@ -18,6 +18,7 @@ package org.graylog2.database.jackson.legacy;
 
 import com.google.common.primitives.Ints;
 import com.mongodb.MongoException;
+import com.mongodb.ReadPreference;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.BsonValue;
 import org.bson.codecs.CollectibleCodec;
@@ -38,7 +39,7 @@ public class LegacyUpdateOneResult<T, K> implements WriteResult<T, K> {
     private final Class<K> idType;
 
     public LegacyUpdateOneResult(JacksonMongoCollection<T> collection, T object, UpdateResult updateResult, Class<T> valueType, Class<K> idType) {
-        this.collection = collection;
+        this.collection = collection.withReadPreference(ReadPreference.primary());
         this.object = object;
         this.updateResult = updateResult;
         this.valueType = valueType;
