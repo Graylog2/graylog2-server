@@ -16,6 +16,7 @@
  */
 package org.graylog.storage.elasticsearch7;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.annotations.VisibleForTesting;
@@ -32,7 +33,9 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.MultiSe
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.PlainActionFuture;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Request;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RequestOptions;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Response;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.ResponseException;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
 import org.graylog.storage.errors.ResponseError;
@@ -162,6 +165,13 @@ public class ElasticsearchClient {
         } catch (Exception e) {
             throw exceptionFrom(e, errorMessage);
         }
+    }
+
+    public JsonNode executeRequest(final Request request, final String errorMessage) {
+        return execute((c, requestOptions) -> {
+            final Response response = c.getLowLevelClient().performRequest(request);
+            return objectMapper.readTree(response.getEntity().getContent());
+        }, errorMessage);
     }
 
     private RequestOptions requestOptions() {

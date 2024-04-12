@@ -104,7 +104,11 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
     @Override
     public void cleanUp() {
         if (!closed) {
-            client().cleanUp();
+            try {
+                client().cleanUp();
+            } catch (Exception e) {
+                LOG.warn("Failed to run cleanup of " + searchServer(), e);
+            }
         } else {
             LOG.debug("Cleanup skipped, client already closed");
         }
