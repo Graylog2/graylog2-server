@@ -14,6 +14,58 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
+import type { MantineStyleProp } from '@mantine/core';
 import { Switch as MantineSwitch } from '@mantine/core';
+import styled, { css } from 'styled-components';
 
-export default MantineSwitch;
+const StyledSwitch = styled(MantineSwitch)(({ theme }) => css`
+  .mantine-Switch-label {
+    font-weight: normal;
+    font-size: ${theme.fonts.size.body};
+  }
+`);
+
+type Props = {
+  'aria-label'?: string,
+  checked: boolean,
+  disabled?: boolean,
+  id?: string,
+  label?: string
+  name?: string,
+  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void,
+  style?: MantineStyleProp,
+}
+
+const Switch = ({
+  'aria-label': ariaLabel,
+  checked,
+  disabled,
+  id,
+  label,
+  name,
+  onChange,
+  style,
+}: Props) => (
+  <StyledSwitch aria-label={ariaLabel}
+                checked={checked}
+                data-testid={dataTestid}
+                disabled={disabled}
+                id={id}
+                label={label}
+                name={name}
+                onChange={onChange}
+                style={style} />
+);
+
+Switch.defaultProps = {
+  'aria-label': undefined,
+  'data-testid': undefined,
+  disabled: undefined,
+  id: undefined,
+  label: undefined,
+  name: undefined,
+  style: undefined,
+};
+
+export default Switch;
