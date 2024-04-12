@@ -145,14 +145,14 @@ public class ContentPackService {
                 final EntityWithExcerptFacade facade = entityFacades.getOrDefault(entity.type(), UnsupportedEntityFacade.INSTANCE);
 
                 if (configuration.isCloud() && entity.type().equals(INPUT_V1) && entity instanceof EntityV1 entityV1) {
-                    boolean isCloudCompatible = true;
+                    boolean isCloudCompatible = false;
                     final InputEntity inputEntity = objectMapper.convertValue(entityV1.data(), InputEntity.class);
                     try {
                         final Method isCloudCompatibleMethod =
-                                Class.forName(inputEntity.type().asString() + "$Descriptor").getMethod("isCloudCompatible");
+                                Class.forName(inputEntity.type().asString() + "$Descriptor").getMethod("isStaticCloudCompatible");
                         isCloudCompatible = (boolean) isCloudCompatibleMethod.invoke(null);
                     } catch (Exception e) {
-                        LOG.info("Failed to invoke Descriptor.isCloudCompatible() for {}", inputEntity.type().asString());
+                        LOG.info("Failed to invoke Descriptor.isStaticCloudCompatible() for {}", inputEntity.type().asString());
                     }
                     if (!isCloudCompatible) {
                         LOG.warn("Ignoring incompatible input {} in cloud", inputEntity.type().asString());

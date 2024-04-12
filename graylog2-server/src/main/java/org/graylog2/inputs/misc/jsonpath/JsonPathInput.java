@@ -69,7 +69,12 @@ public class JsonPathInput extends MessageInput {
             super(NAME, false, DocsHelper.PAGE_SENDING_JSONPATH.toString());
         }
 
-        public static boolean isCloudCompatible() {
+        public boolean isCloudCompatible() {
+            return true;
+        }
+
+        // static check for contentpack import
+        public static boolean isStaticCloudCompatible() {
             return true;
         }
     }

@@ -89,7 +89,12 @@ public class AWSInput extends MessageInput {
             super(NAME, false, "");
         }
 
-        public static boolean isCloudCompatible() {
+        public boolean isCloudCompatible() {
+            return true;
+        }
+
+        // static check for contentpack import
+        public static boolean isStaticCloudCompatible() {
             return true;
         }
     }

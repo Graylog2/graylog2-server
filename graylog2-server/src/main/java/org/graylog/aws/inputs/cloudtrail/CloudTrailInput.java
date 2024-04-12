@@ -66,12 +66,17 @@ public class CloudTrailInput extends MessageInput {
             super(NAME, false, "");
         }
 
-        public static boolean isCloudCompatible() {
+        public boolean isForwarderCompatible() {
+            return false;
+        }
+
+        public boolean isCloudCompatible() {
             return true;
         }
 
-        public static boolean isForwarderCompatible() {
-            return false;
+        // static check for contentpack import
+        public static boolean isStaticCloudCompatible() {
+            return true;
         }
     }
 
