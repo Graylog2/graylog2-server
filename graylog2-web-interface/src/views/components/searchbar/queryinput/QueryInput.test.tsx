@@ -21,7 +21,7 @@ import userEvent from '@testing-library/user-event';
 import QueryValidationActions from 'views/actions/QueryValidationActions';
 import { validationError } from 'fixtures/queryValidationState';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 
 import QueryInput from './QueryInput';
 
@@ -56,9 +56,7 @@ describe('QueryInput', () => {
     </TestStoreProvider>
   );
 
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   afterEach(() => {
     jest.clearAllMocks();

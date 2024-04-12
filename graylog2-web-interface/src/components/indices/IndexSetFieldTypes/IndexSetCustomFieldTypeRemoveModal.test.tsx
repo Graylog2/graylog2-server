@@ -20,7 +20,7 @@ import { render, screen, fireEvent } from 'wrappedTestingLibrary';
 import { MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import IndexSetCustomFieldTypeRemoveModal from 'components/indices/IndexSetFieldTypes/IndexSetCustomFieldTypeRemoveModal';
 import useRemoveCustomFieldTypeMutation from 'components/indices/IndexSetFieldTypes/hooks/useRemoveCustomFieldTypeMutation';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
@@ -52,9 +52,7 @@ jest.mock('components/indices/IndexSetFieldTypes/hooks/useIndexProfileWithMappin
 describe('IndexSetFieldTypesList', () => {
   const mockedRemoveCustomFieldTypeMutation = jest.fn(() => Promise.resolve());
 
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   beforeEach(() => {
     asMock(useSelectedEntities).mockReturnValue({

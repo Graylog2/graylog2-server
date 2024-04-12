@@ -34,7 +34,7 @@ import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visuali
 import { asMock } from 'helpers/mocking';
 import useViewType from 'views/hooks/useViewType';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import { updateWidget } from 'views/logic/slices/widgetActions';
 
 import Widget from './Widget';
@@ -77,9 +77,7 @@ jest.mock('views/logic/slices/widgetActions', () => ({
 const selectEventConfig = { container: document.body };
 
 describe('Aggregation Widget', () => {
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   const dataTableWidget = WidgetModel.builder().newId()
     .type('AGGREGATION')
