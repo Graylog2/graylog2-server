@@ -23,7 +23,7 @@ import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
 
 import jakarta.inject.Inject;
 import org.graylog2.streams.StreamService;
-import org.jetbrains.annotations.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.Collection;
 import java.util.Collections;

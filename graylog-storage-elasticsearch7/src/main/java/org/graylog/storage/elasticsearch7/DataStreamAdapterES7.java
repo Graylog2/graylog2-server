@@ -19,7 +19,7 @@ package org.graylog.storage.elasticsearch7;
 import org.graylog2.indexer.datastream.DataStreamAdapter;
 import org.graylog2.indexer.datastream.Policy;
 import org.graylog2.indexer.indices.Template;
-import org.jetbrains.annotations.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 public class DataStreamAdapterES7 implements DataStreamAdapter {
     private static final String ERROR_MESSAGE = "Data Streams not supported in Elastic Search";

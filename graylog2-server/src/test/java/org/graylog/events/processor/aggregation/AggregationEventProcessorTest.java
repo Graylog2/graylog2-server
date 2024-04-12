@@ -52,7 +52,7 @@ import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamMock;
 import org.graylog2.streams.StreamService;
-import org.jetbrains.annotations.NotNull;
+import jakarta.validation.constraints.NotNull;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;

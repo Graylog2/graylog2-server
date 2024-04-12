@@ -28,7 +28,7 @@ import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.common.IndexRotator;
 import org.graylog2.indexer.rotation.common.IndexRotator.Result;
 import org.graylog2.plugin.system.NodeId;
-import org.jetbrains.annotations.NotNull;
+import jakarta.validation.constraints.NotNull;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Days;

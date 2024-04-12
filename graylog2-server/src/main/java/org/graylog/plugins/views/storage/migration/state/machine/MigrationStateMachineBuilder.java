@@ -24,7 +24,7 @@ import com.google.common.annotations.VisibleForTesting;
 import org.graylog.plugins.views.storage.migration.state.actions.MigrationActions;
 import org.graylog.plugins.views.storage.migration.state.persistence.DatanodeMigrationConfiguration;
 import org.graylog.plugins.views.storage.migration.state.persistence.DatanodeMigrationPersistence;
-import org.jetbrains.annotations.NotNull;
+import jakarta.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
