@@ -23,6 +23,7 @@ import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import io.restassured.response.ValidatableResponse;
+import jakarta.validation.constraints.NotNull;
 import org.apache.commons.lang.RandomStringUtils;
 import org.assertj.core.api.Assertions;
 import org.graylog.shaded.opensearch2.org.opensearch.action.index.IndexRequest;
@@ -40,7 +41,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.validation.constraints.NotNull;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
