@@ -140,7 +140,7 @@
         <jbcrypt.version>0.4</jbcrypt.version>
         <jcip-annotations.version>1.0</jcip-annotations.version>
         <jdot.version>1.0</jdot.version>
-        <jersey.version>3.1.5</jersey.version>
+        <jersey.version>3.1.6</jersey.version>
         <jmte.version>7.0.2</jmte.version>
         <joda-time.version>2.12.7</joda-time.version>
         <jool.version>0.9.15</jool.version>
@@ -559,7 +559,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-gpg-plugin</artifactId>
-                    <version>3.2.2</version>
+                    <version>3.2.3</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
