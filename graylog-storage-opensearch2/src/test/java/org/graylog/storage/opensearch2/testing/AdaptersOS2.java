@@ -122,7 +122,7 @@ public class AdaptersOS2 implements Adapters {
 
     @Override
     public IndexFieldTypePollerAdapter indexFieldTypePollerAdapter(final Configuration configuration) {
-        return new IndexFieldTypePollerAdapterOS2(new FieldMappingApi(objectMapper, client), configuration, new StreamsForFieldRetrieverOS2(client));
+        return new IndexFieldTypePollerAdapterOS2(new FieldMappingApi(client), configuration, new StreamsForFieldRetrieverOS2(client));
     }
 
 }

@@ -16,9 +16,11 @@
  */
 package org.graylog2.bootstrap.preflight.web.resources;
 
+import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.graylog.security.certutil.CaService;
+import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.ca.exceptions.CACreationException;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -27,7 +29,6 @@ import org.graylog2.bootstrap.preflight.web.resources.model.CA;
 import org.graylog2.bootstrap.preflight.web.resources.model.CertParameters;
 import org.graylog2.bootstrap.preflight.web.resources.model.CreateCARequest;
 import org.graylog2.cluster.nodes.DataNodeDto;
-import org.graylog2.cluster.nodes.DataNodeEntity;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.cluster.preflight.DataNodeProvisioningService;
@@ -51,8 +52,12 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
+import java.io.IOException;
+import java.io.StringWriter;
+import java.net.URI;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.Certificate;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -106,12 +111,40 @@ public class PreflightResource {
         return caService.get();
     }
 
+    @GET
+    @Path("/ca/certificate")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String getCaCertificate() {
+        try {
+            return caService.loadKeyStore().map(ks -> {
+                final Certificate caPublicKey;
+                try {
+                    caPublicKey = ks.getCertificate(CertConstants.CA_KEY_ALIAS);
+                    return encode(caPublicKey);
+                } catch (KeyStoreException | IOException e) {
+                    throw new RuntimeException("Failed to obtain CA public key", e);
+                }
+            }).orElseThrow(() -> new IllegalStateException("CA keystore not available"));
+        } catch (KeyStoreException | KeyStoreStorageException | NoSuchAlgorithmException e) {
+            throw new RuntimeException("Failed to obtain CA public key", e);
+        }
+    }
+
+    private static String encode(final Object o) throws IOException {
+        var writer = new StringWriter();
+        try (JcaPEMWriter jcaPEMWriter = new JcaPEMWriter(writer)) {
+            jcaPEMWriter.writeObject(o);
+        }
+        return writer.toString();
+    }
+
     @POST
     @Path("/ca/create")
     @NoAuditEvent("No Audit Event needed")
-    public void createCA(@NotNull @Valid CreateCARequest request) throws CACreationException, KeyStoreStorageException, KeyStoreException, NoSuchAlgorithmException {
+    public Response createCA(@NotNull @Valid CreateCARequest request) throws CACreationException, KeyStoreStorageException, KeyStoreException, NoSuchAlgorithmException {
         // TODO: get validity from preflight UI
-        caService.create(request.organization(), CaService.DEFAULT_VALIDITY, passwordSecret.toCharArray());
+        final CA ca = caService.create(request.organization(), CaService.DEFAULT_VALIDITY, passwordSecret.toCharArray());
+        return Response.created(URI.create("/api/ca")).entity(ca).build();
     }
 
     @POST

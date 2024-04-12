@@ -21,7 +21,8 @@ import org.graylog2.storage.SearchVersion;
 
 public class DatanodeDevContainerProvider implements DatanodeDevContainerInterfaceProvider {
     @Override
-    public DatanodeDevContainerBuilder getBuilderFor(SearchVersion version) {
+    public DatanodeDevContainerBuilder
+    getBuilderFor(SearchVersion version) {
         return new DatanodeDevContainerBuilder();
     }
 }

@@ -356,7 +356,6 @@ class SourceCodeEditor extends React.Component<Props, State> {
             }}
                        annotations={annotations}
                        // Convert Windows line breaks to Unix. See issue #7889
-                       // @ts-expect-error
                        setOptions={{ newLineMode: 'unix' }}
                        focus={focus}
                        fontSize={fontSize}

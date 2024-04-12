@@ -32,7 +32,7 @@ type Props = {
   widget: Widget,
   activeQuery?: string,
   widgetId?: string,
-  hasFixedFilters?: boolean
+  returnsAllRecords?: boolean
 };
 
 const Wrapper = styled.div(({ theme }) => css`
@@ -50,7 +50,7 @@ const StyledIcon = styled(Icon)(({ theme }) => css`
 `);
 const getEffectiveWidgetTimerange = (result, activeQuery, searchTypeId) => result?.results?.[activeQuery]?.searchTypes[searchTypeId]?.effective_timerange;
 
-const TimerangeInfo = ({ className, widget, activeQuery, widgetId, hasFixedFilters }: Props) => {
+const TimerangeInfo = ({ className, widget, activeQuery, widgetId, returnsAllRecords }: Props) => {
   const { formatTime } = useUserDateTime();
   const { result, widgetMapping } = useSearchResult() ?? {};
   const globalOverride = useGlobalOverride();
@@ -68,12 +68,12 @@ const TimerangeInfo = ({ className, widget, activeQuery, widgetId, hasFixedFilte
   const currentWidgetMapping = widgetMapping?.get(widgetId);
   const timerange = globalTimerangeString || configuredTimerange;
 
-  if (hasFixedFilters) {
+  if (returnsAllRecords) {
     return (
       <Wrapper className={className}>
-        <StyledIcon name="warning" title="This widget has fixed filters and its results are independent of the current search." />
+        <StyledIcon name="warning" title="The result of this widget is independent of the current search." />
         <TextOverflowEllipsis titleOverride={effectiveTimerangeString}>
-          {timerange}
+          All Time
         </TextOverflowEllipsis>
       </Wrapper>
     );
@@ -82,7 +82,6 @@ const TimerangeInfo = ({ className, widget, activeQuery, widgetId, hasFixedFilte
   return (
     <SearchQueryExecutionInfoHelper currentWidgetMapping={currentWidgetMapping}>
       <Wrapper className={className}>
-        {hasFixedFilters && <StyledIcon name="warning" title="This widget has a fixed time range" />}
         <TextOverflowEllipsis titleOverride={effectiveTimerangeString}>
           {timerange}
         </TextOverflowEllipsis>
@@ -95,7 +94,7 @@ TimerangeInfo.defaultProps = {
   className: undefined,
   activeQuery: undefined,
   widgetId: undefined,
-  hasFixedFilters: undefined,
+  returnsAllRecords: undefined,
 };
 
 export default TimerangeInfo;
