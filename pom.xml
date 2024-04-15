@@ -846,7 +846,7 @@
                             @defaultMessage Use jakarta.validation.
                             javax.validation.**
 
-                            org.jetbrains.annotations.NotNull @ Use jakarta.validation.constraints.NotNull
+                            org.jetbrains.annotations.NotNull @ Use jakarta.annotation.Nonnull
                             org.jetbrains.annotations.Nullable @ Use jakarta.annotation.Nullable
                         ]]>
 
