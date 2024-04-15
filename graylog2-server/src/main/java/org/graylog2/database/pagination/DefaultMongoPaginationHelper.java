@@ -20,6 +20,7 @@ import com.google.common.primitives.Ints;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Sorts;
 import org.bson.conversions.Bson;
+import org.graylog2.database.MongoEntity;
 import org.graylog2.database.PaginatedList;
 
 import java.util.ArrayList;
@@ -28,7 +29,7 @@ import java.util.function.Predicate;
 
 import static org.graylog2.database.utils.MongoUtils.stream;
 
-public class DefaultMongoPaginationHelper<T> implements MongoPaginationHelper<T> {
+public class DefaultMongoPaginationHelper<T extends MongoEntity> implements MongoPaginationHelper<T> {
 
     private final MongoCollection<T> collection;
     private Bson filter;

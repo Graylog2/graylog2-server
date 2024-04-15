@@ -16,13 +16,11 @@
  */
 package org.graylog2.database;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.MoreObjects;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Sorts;
+import jakarta.annotation.Nullable;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
@@ -49,47 +47,20 @@ import static org.graylog2.database.utils.MongoUtils.stream;
 @ExtendWith(MongoJackExtension.class)
 class HelpersAndUtilitiesTest {
 
-    private MongoCollections mongoCollections;
     private MongoCollection<TestDTO> collection;
     private MongoUtils<TestDTO> utils;
     private MongoPaginationHelper<TestDTO> paginationHelper;
 
-    @JsonAutoDetect
-    public static class TestDTO {
-        @ObjectId
-        @Id
-        @JsonProperty("id")
-        public String id;
-
-        @JsonProperty("title")
-        public String title;
-
-        @JsonCreator
-        public TestDTO(@JsonProperty("id") @Id String id, @JsonProperty("title") String title) {
-            this.id = id;
-            this.title = title;
-        }
-
-        @Override
-        public String toString() {
-            return MoreObjects.toStringHelper(this)
-                    .add("id", id)
-                    .add("title", title)
-                    .toString();
-        }
-
-        public TestDTO(String title) {
-            this(null, title);
-        }
-    }
+    public record TestDTO(@Nullable @Id @ObjectId @JsonProperty("id") String id,
+                          @JsonProperty("title") String title) implements MongoEntity {}
 
     private TestDTO newDto(String title) {
-        return new TestDTO(title);
+        return new TestDTO(null, title);
     }
 
     @BeforeEach
     void setUp(MongoDBTestService mongoDBTestService, MongoJackObjectMapperProvider objectMapperProvider) {
-        mongoCollections = new MongoCollections(objectMapperProvider, mongoDBTestService.mongoConnection());
+        final MongoCollections mongoCollections = new MongoCollections(objectMapperProvider, mongoDBTestService.mongoConnection());
         collection = mongoCollections.get("test", TestDTO.class);
         utils = mongoCollections.utils(collection);
         paginationHelper = mongoCollections.paginationHelper(collection);
