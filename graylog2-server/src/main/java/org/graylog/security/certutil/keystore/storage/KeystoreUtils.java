@@ -17,19 +17,21 @@
 package org.graylog.security.certutil.keystore.storage;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.Signature;
 import java.util.Enumeration;
 
 import static org.graylog.security.certutil.CertConstants.PKCS12;
+import static org.graylog.security.certutil.CertConstants.SIGNING_ALGORITHM;
 
-//Assumption: there is one common password, shared between the keystore and its entries
-public class SinglePasswordKeystoreContentMover implements KeystoreContentMover {
-
-    @Override
-    public KeyStore moveContents(KeyStore originalKeyStore,
-                                 char[] currentPassword,
-                                 final char[] newPassword) throws GeneralSecurityException, IOException {
+public class KeystoreUtils {
+    public static KeyStore newStoreCopyContent(KeyStore originalKeyStore,
+                                               char[] currentPassword,
+                                               final char[] newPassword) throws GeneralSecurityException, IOException {
         if (newPassword == null) {
             throw new IllegalArgumentException("new password cannot be null");
         }
@@ -57,4 +59,22 @@ public class SinglePasswordKeystoreContentMover implements KeystoreContentMover 
         }
         return newKeyStore;
     }
+
+    private static final String SAMPLE_CHALLANGE = "Grayloggers! Grayloggers! Grayloggers! Grayloggers!";
+
+    public static boolean matchingKeys(final PrivateKey privateKey,
+                                final PublicKey publicKey) throws GeneralSecurityException {
+        Signature sign = Signature.getInstance(SIGNING_ALGORITHM);
+
+        byte[] bytes = SAMPLE_CHALLANGE.getBytes(StandardCharsets.UTF_8);
+
+        sign.initSign(privateKey);
+        sign.update(bytes);
+        byte[] signature = sign.sign();
+
+        sign.initVerify(publicKey);
+        sign.update(bytes);
+        return sign.verify(signature);
+    }
+
 }
