@@ -31,6 +31,7 @@ import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.DropdownField;
 import org.graylog2.plugin.configuration.fields.NumberField;
 import org.graylog2.plugin.configuration.fields.TextField;
+import org.graylog2.plugin.inputs.CloudCompatible;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
@@ -39,6 +40,7 @@ import software.amazon.awssdk.regions.Region;
 /**
  * General AWS input for all types of supported AWS logs.
  */
+@CloudCompatible
 public class AWSInput extends MessageInput {
 
     public static final String NAME = "AWS Kinesis/CloudWatch";
@@ -89,7 +91,7 @@ public class AWSInput extends MessageInput {
             super(NAME, false, "");
         }
 
-        public static boolean isCloudCompatible() {
+        public boolean isCloudCompatible() {
             return true;
         }
     }
