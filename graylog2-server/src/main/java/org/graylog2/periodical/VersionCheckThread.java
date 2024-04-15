@@ -17,8 +17,10 @@
 package org.graylog2.periodical;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.zafarkhaja.semver.Version;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.net.HttpHeaders;
+import jakarta.inject.Inject;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -33,8 +35,6 @@ import org.graylog2.versioncheck.VersionCheckResponse;
 import org.graylog2.versioncheck.VersionResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.io.IOException;
 import java.net.URI;
@@ -114,10 +114,11 @@ public class VersionCheckThread extends Periodical {
                 final VersionCheckResponse versionCheckResponse = objectMapper.readValue(response.body().byteStream(), VersionCheckResponse.class);
 
                 final VersionResponse version = versionCheckResponse.version;
-                final com.github.zafarkhaja.semver.Version reportedVersion = com.github.zafarkhaja.semver.Version.forIntegers(version.major, version.minor, version.patch);
+                final com.github.zafarkhaja.semver.Version reportedVersion = Version.of(version.major, version.minor, version.patch);
 
                 LOG.debug("Version check reports current version: " + versionCheckResponse);
-                if (reportedVersion.greaterThan(ServerVersion.VERSION.getVersion())) {
+                Version other = ServerVersion.VERSION.getVersion();
+                if (reportedVersion.isHigherThan(other)) {
                     LOG.debug("Reported version is higher than ours ({}). Writing notification.", ServerVersion.VERSION);
 
                     Notification notification = notificationService.buildNow()

@@ -48,40 +48,6 @@ public class VersionTest {
     }
 
     @Test
-    @SuppressWarnings("deprecation")
-    public void testGreaterMinor() throws Exception {
-        Version v = Version.from(0, 20, 0);
-
-        assertTrue(v.greaterMinor(Version.from(0, 19, 0)));
-        assertTrue(v.greaterMinor(Version.from(0, 18, 2)));
-        assertTrue(v.greaterMinor(Version.from(0, 19, 9001)));
-
-        assertFalse(v.greaterMinor(Version.from(0, 20, 0)));
-        assertFalse(v.greaterMinor(Version.from(1, 0, 0)));
-        assertFalse(v.greaterMinor(Version.from(1, 0, 9001)));
-        assertFalse(v.greaterMinor(Version.from(1, 20, 0)));
-        assertFalse(v.greaterMinor(Version.from(1, 1, 0)));
-        assertFalse(v.greaterMinor(Version.from(3, 2, 1)));
-
-        assertTrue(v.greaterMinor(Version.from(0, 19, 0, "rc.1")));
-
-        v = Version.from(1, 5, 0);
-
-        assertTrue(v.greaterMinor(Version.from(0, 19, 0)));
-        assertTrue(v.greaterMinor(Version.from(1, 0, 0)));
-        assertTrue(v.greaterMinor(Version.from(0, 19, 9001)));
-
-        assertFalse(v.greaterMinor(Version.from(1, 6, 0)));
-        assertFalse(v.greaterMinor(Version.from(3, 0, 0)));
-        assertFalse(v.greaterMinor(Version.from(1, 5, 9001)));
-        assertFalse(v.greaterMinor(Version.from(1, 20, 0)));
-        assertFalse(v.greaterMinor(Version.from(1, 20, 5)));
-        assertFalse(v.greaterMinor(Version.from(3, 2, 1)));
-
-        assertTrue(v.greaterMinor(Version.from(0, 19, 0, "rc.1")));
-    }
-
-    @Test
     public void testSameOrHigher() throws Exception {
         Version v = Version.from(0, 20, 2);
 
