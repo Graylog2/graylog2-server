@@ -20,7 +20,6 @@ import { useState, useMemo, useCallback } from 'react';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import { EntityDataTable, NoSearchResult, PaginatedList, QueryHelper, SearchForm, Spinner } from 'components/common';
 import type { EventNotification, TestResults } from 'stores/event-notifications/EventNotificationsStore';
-import type { Sort } from 'stores/PaginationTypes';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
@@ -37,6 +36,7 @@ import BulkActions from './BulkActions';
 
 import useEventNotifications from '../hooks/useEventNotifications';
 import useNotificationTest from '../hooks/useNotificationTest';
+import useTableEventHandlers from '../../common/EntityDataTable/hooks/useTableEventHandlers';
 
 const customColumnRenderers = (testResults: TestResults): ColumnRenderers<EventNotification> => ({
   attributes: {
@@ -80,28 +80,18 @@ const EventNotificationsContainer = () => {
     [paginatedEventNotifications?.attributes],
   );
 
-  const onPageSizeChange = useCallback((newPageSize: number) => {
-    paginationQueryParameter.setPagination({ page: 1, pageSize: newPageSize });
-    updateTableLayout({ perPage: newPageSize });
-  }, [paginationQueryParameter, updateTableLayout]);
-
-  const onSearch = useCallback((newQuery: string) => {
-    paginationQueryParameter.resetPage();
-    setQuery(newQuery);
-  }, [paginationQueryParameter]);
-
-  const onReset = useCallback(() => {
-    onSearch('');
-  }, [onSearch]);
-
-  const onColumnsChange = useCallback((displayedAttributes: Array<string>) => {
-    updateTableLayout({ displayedAttributes });
-  }, [updateTableLayout]);
-
-  const onSortChange = useCallback((newSort: Sort) => {
-    paginationQueryParameter.resetPage();
-    updateTableLayout({ sort: newSort });
-  }, [paginationQueryParameter, updateTableLayout]);
+  const {
+    onColumnsChange,
+    onPageSizeChange,
+    onSearch,
+    onSearchReset,
+    onSortChange,
+  } = useTableEventHandlers({
+    appSection: 'streams-list',
+    paginationQueryParameter,
+    setQuery,
+    updateTableLayout,
+  });
 
   const handleTest = useCallback((notification: EventNotification) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.NOTIFICATIONS.ROW_ACTION_TEST_CLICKED, {
@@ -133,7 +123,7 @@ const EventNotificationsContainer = () => {
                    totalItems={total}>
       <div style={{ marginBottom: 5 }}>
         <SearchForm onSearch={onSearch}
-                    onReset={onReset}
+                    onReset={onSearchReset}
                     queryHelpComponent={<QueryHelper entityName="notification" />} />
       </div>
       <div>
