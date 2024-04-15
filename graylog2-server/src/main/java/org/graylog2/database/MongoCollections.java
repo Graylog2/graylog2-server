@@ -24,7 +24,6 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.jackson.CustomJacksonCodecRegistry;
 import org.graylog2.database.pagination.DefaultMongoPaginationHelper;
 import org.graylog2.database.pagination.MongoPaginationHelper;
-import org.graylog2.database.utils.DefaultMongoUtils;
 import org.graylog2.database.utils.MongoUtils;
 
 @Singleton
@@ -90,6 +89,6 @@ public class MongoCollections {
      * Provides utility methods like getting documents by ID, etc.
      */
     public <T> MongoUtils<T> utils(MongoCollection<T> collection) {
-        return new DefaultMongoUtils<>(collection, objectMapper);
+        return new MongoUtils<>(collection, objectMapper);
     }
 }

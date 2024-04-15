@@ -16,13 +16,17 @@
  */
 package org.graylog2.database.utils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Streams;
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoIterable;
+import com.mongodb.client.model.Filters;
 import com.mongodb.client.result.InsertOneResult;
 import jakarta.annotation.Nullable;
 import org.bson.BsonObjectId;
 import org.bson.BsonValue;
 import org.bson.types.ObjectId;
+import org.graylog2.database.jackson.CustomJacksonCodecRegistry;
 import org.mongojack.InitializationRequiredForTransformation;
 
 import javax.annotation.Nonnull;
@@ -40,7 +44,19 @@ import java.util.stream.Stream;
  *
  * @param <T> Java type of the documents to interact with
  */
-public interface MongoUtils<T> {
+public class MongoUtils<T> {
+    private final MongoCollection<T> collection;
+    private final ObjectMapper objectMapper;
+    private final CustomJacksonCodecRegistry codecRegistry;
+
+    public MongoUtils(MongoCollection<T> delegate, ObjectMapper objectMapper) {
+        this.collection = delegate;
+        this.objectMapper = objectMapper;
+
+        codecRegistry = new CustomJacksonCodecRegistry(
+                objectMapper,
+                collection.getCodecRegistry());
+    }
 
     /**
      * Extract the inserted id as an {@link ObjectId} from the insert result.
@@ -49,7 +65,7 @@ public interface MongoUtils<T> {
      * @return the inserted object ID, or null if no id was inserted. Fails if the id is not of type {@link ObjectId}.
      */
     @Nullable
-    static ObjectId insertedId(@Nonnull InsertOneResult result) {
+    public static ObjectId insertedId(@Nonnull InsertOneResult result) {
         return Optional.ofNullable(result.getInsertedId())
                 .map(BsonValue::asObjectId)
                 .map(BsonObjectId::getValue)
@@ -63,7 +79,7 @@ public interface MongoUtils<T> {
      * @return the inserted object ID as string, or null if no id was inserted. Fails if the id is not of type {@link ObjectId}.
      */
     @Nullable
-    static String insertedIdAsString(@Nonnull InsertOneResult result) {
+    public static String insertedIdAsString(@Nonnull InsertOneResult result) {
         return Optional.ofNullable(insertedId(result))
                 .map(ObjectId::toHexString)
                 .orElse(null);
@@ -79,7 +95,7 @@ public interface MongoUtils<T> {
      * @param <T>           document type of the underlying collection
      * @return A stream that should be used in a try-with-resources statement or closed manually to free underlying resources.
      */
-    static <T> Stream<T> stream(@Nonnull MongoIterable<T> mongoIterable) {
+    public static <T> Stream<T> stream(@Nonnull MongoIterable<T> mongoIterable) {
         final var cursor = mongoIterable.cursor();
         return Streams.stream(cursor).onClose(cursor::close);
     }
@@ -90,7 +106,9 @@ public interface MongoUtils<T> {
      * @param id the document's id.
      * @return the document wrapped in an {@link Optional} if present in the DB, an empty {@link Optional} otherwise.
      */
-    Optional<T> getById(ObjectId id);
+    public Optional<T> getById(ObjectId id) {
+        return Optional.ofNullable(collection.find(Filters.eq("_id", id)).first());
+    }
 
     /**
      * Convenience method to look up a single document by its ID.
@@ -98,7 +116,9 @@ public interface MongoUtils<T> {
      * @param id HEX string representation of the document's {@link ObjectId}.
      * @return the document wrapped in an {@link Optional} if present in the DB, an empty {@link Optional} otherwise.
      */
-    Optional<T> getById(String id);
+    public Optional<T> getById(String id) {
+        return getById(new ObjectId(id));
+    }
 
     /**
      * Convenience method to delete a single document identified by its ID.
@@ -106,7 +126,9 @@ public interface MongoUtils<T> {
      * @param id the document's id.
      * @return true if a document was deleted, false otherwise.
      */
-    boolean deleteById(ObjectId id);
+    public boolean deleteById(ObjectId id) {
+        return collection.deleteOne(Filters.eq("_id", id)).getDeletedCount() > 0;
+    }
 
     /**
      * Convenience method to delete a single document identified by its ID.
@@ -114,7 +136,9 @@ public interface MongoUtils<T> {
      * @param id HEX string representation of the document's {@link ObjectId}.
      * @return true if a document was deleted, false otherwise.
      */
-    boolean deleteById(String id);
+    public boolean deleteById(String id) {
+        return deleteById(new ObjectId(id));
+    }
 
     /**
      * Utility method to help moving away from the deprecated MongoJack Bson objects, like
@@ -128,6 +152,11 @@ public interface MongoUtils<T> {
      * you don't have to use it.
      */
     @Deprecated
-    void initializeLegacyMongoJackBsonObject(InitializationRequiredForTransformation mongoJackBsonObject);
-}
+    public void initializeLegacyMongoJackBsonObject(InitializationRequiredForTransformation mongoJackBsonObject) {
+        mongoJackBsonObject.initialize(
+                objectMapper,
+                objectMapper.constructType(collection.getDocumentClass()),
+                codecRegistry);
+    }
 
+}
