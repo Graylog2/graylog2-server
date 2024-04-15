@@ -17,12 +17,26 @@
 import { useCallback } from 'react';
 
 import type { Sort } from 'stores/PaginationTypes';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useLocation from 'routing/useLocation';
 
-const useTableEventHandlers = ({ updateTableLayout, paginationQueryParameter, setQuery }: { updateTableLayout, paginationQueryParameter, setQuery }) => {
+const useTableEventHandlers = ({ updateTableLayout, paginationQueryParameter, setQuery, appSection }: { updateTableLayout, paginationQueryParameter, setQuery, appSection }) => {
+  const { pathname } = useLocation();
+  const sendTelemetry = useSendTelemetry();
+
   const onPageSizeChange = useCallback((newPageSize: number) => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_LIST.PAGE_SIZE_CHANGED, {
+      app_pathname: getPathnameWithoutId(pathname),
+      app_section: appSection,
+      app_action_value: 'page-size-select',
+      page_size: newPageSize,
+    });
+
     paginationQueryParameter.setPagination({ page: 1, pageSize: newPageSize });
     updateTableLayout({ perPage: newPageSize });
-  }, [paginationQueryParameter, updateTableLayout]);
+  }, [appSection, paginationQueryParameter, pathname, sendTelemetry, updateTableLayout]);
 
   const onSearch = useCallback((newQuery: string) => {
     paginationQueryParameter.resetPage();
@@ -34,13 +48,27 @@ const useTableEventHandlers = ({ updateTableLayout, paginationQueryParameter, se
   }, [onSearch]);
 
   const onColumnsChange = useCallback((displayedAttributes: Array<string>) => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_LIST.COLUMNS_CHANGED, {
+      app_pathname: getPathnameWithoutId(pathname),
+      app_section: appSection,
+      app_action_value: 'columns-select',
+      columns: displayedAttributes,
+    });
+
     updateTableLayout({ displayedAttributes });
-  }, [updateTableLayout]);
+  }, [appSection, pathname, sendTelemetry, updateTableLayout]);
 
   const onSortChange = useCallback((newSort: Sort) => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_LIST.SORT_CHANGED, {
+      app_pathname: getPathnameWithoutId(pathname),
+      app_section: appSection,
+      app_action_value: 'sort-select',
+      sort: newSort,
+    });
+
     paginationQueryParameter.resetPage();
     updateTableLayout({ sort: newSort });
-  }, [paginationQueryParameter, updateTableLayout]);
+  }, [appSection, paginationQueryParameter, pathname, sendTelemetry, updateTableLayout]);
 
   return {
     onPageSizeChange,
