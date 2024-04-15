@@ -26,6 +26,7 @@ import jakarta.annotation.Nullable;
 import org.bson.BsonObjectId;
 import org.bson.BsonValue;
 import org.bson.types.ObjectId;
+import org.graylog2.database.MongoEntity;
 import org.graylog2.database.jackson.CustomJacksonCodecRegistry;
 import org.mongojack.InitializationRequiredForTransformation;
 
@@ -35,16 +36,10 @@ import java.util.stream.Stream;
 
 /**
  * Utility methods to interact with MongoDB collections.
- * <p>
- * Most of the utility methods only work correctly when the collection meets the following criteria, which are
- * considered best practices:
- * <ul>
- *     <li>The documents in the collection have an "_id" field and the value of this field is of type ObjectId</li>
- * </ul>
  *
  * @param <T> Java type of the documents to interact with
  */
-public class MongoUtils<T> {
+public class MongoUtils<T extends MongoEntity> {
     private final MongoCollection<T> collection;
     private final ObjectMapper objectMapper;
     private final CustomJacksonCodecRegistry codecRegistry;
@@ -113,7 +108,7 @@ public class MongoUtils<T> {
     /**
      * Convenience method to look up a single document by its ID.
      *
-     * @param id HEX string representation of the document's {@link ObjectId}.
+     * @param id Hex string representation of the document's {@link ObjectId}.
      * @return the document wrapped in an {@link Optional} if present in the DB, an empty {@link Optional} otherwise.
      */
     public Optional<T> getById(String id) {
@@ -133,7 +128,7 @@ public class MongoUtils<T> {
     /**
      * Convenience method to delete a single document identified by its ID.
      *
-     * @param id HEX string representation of the document's {@link ObjectId}.
+     * @param id Hex string representation of the document's {@link ObjectId}.
      * @return true if a document was deleted, false otherwise.
      */
     public boolean deleteById(String id) {
