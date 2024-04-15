@@ -20,7 +20,7 @@ import { render, waitFor } from 'wrappedTestingLibrary';
 import View from 'views/logic/views/View';
 import OriginalShowDashboardInBigDisplayMode from 'views/pages/ShowDashboardInBigDisplayMode';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import { createSearch } from 'fixtures/searches';
 import { asMock } from 'helpers/mocking';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
@@ -51,12 +51,11 @@ describe('ShowDashboardInBigDisplayMode', () => {
     stopAutoRefresh: () => {},
   };
 
+  useViewsPlugin();
+
   beforeAll(() => {
     asMock(useQuery).mockReturnValue({ interval: '30', refresh: '10' });
-    loadViewsPlugin();
   });
-
-  afterAll(unloadViewsPlugin);
 
   beforeEach(() => {
     jest.clearAllMocks();

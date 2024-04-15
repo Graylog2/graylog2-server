@@ -27,7 +27,7 @@ import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType, { Properties } from 'views/logic/fieldtypes/FieldType';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import { updateHighlightingRule } from 'views/logic/slices/highlightActions';
 
 jest.mock('views/logic/slices/highlightActions', () => ({
@@ -67,9 +67,7 @@ describe('HighlightForm', () => {
     fireEvent.click(elem);
   };
 
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   it('should render for edit', async () => {
     const { findByText } = render(<HighlightFormWithContext onClose={() => {}} rule={rule} />);

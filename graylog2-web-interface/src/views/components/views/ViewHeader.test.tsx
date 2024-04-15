@@ -20,7 +20,7 @@ import userEvent from '@testing-library/user-event';
 
 import OriginalViewHeader from 'views/components/views/ViewHeader';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import { createSearch } from 'fixtures/searches';
 import View from 'views/logic/views/View';
 import onSaveView from 'views/logic/views/OnSaveViewAction';
@@ -56,9 +56,7 @@ describe('ViewHeader', () => {
     asMock(onSaveView).mockReturnValue(async () => {});
   });
 
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   it('Render view type and title', async () => {
     render(<ViewHeader />);
