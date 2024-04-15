@@ -22,6 +22,8 @@ import useEventById from 'hooks/useEventById';
 import useEventDefinition from 'components/events/events/hooks/useEventDefinition';
 import { Spinner } from 'components/common';
 import DefaultDetails from 'components/events/events/EventDetails';
+import { isPermitted } from 'util/PermissionsMixin';
+import useCurrentUser from 'hooks/useCurrentUser';
 
 export const usePluggableEventDetails = (eventId: string) => {
   const pluggableEventDetails = usePluginEntities('views.components.widgets.events.detailsComponent');
@@ -35,9 +37,11 @@ export const usePluggableEventDetails = (eventId: string) => {
   );
 };
 
-const DefaultDetailsWrapper = ({ eventId }: { eventId: string }) => {
+export const DefaultDetailsWrapper = ({ eventId }: { eventId: string }) => {
   const { data: event, isLoading } = useEventById(eventId);
-  const { data: eventDefinition, isFetching } = useEventDefinition(event?.event_definition_id);
+  const currentUser = useCurrentUser();
+  const canViewDefinition = isPermitted(currentUser.permissions, `eventdefinitions:read:${event?.event_definition_id}`);
+  const { data: eventDefinition, isFetching } = useEventDefinition(event?.event_definition_id, canViewDefinition);
 
   if (isFetching) {
     return <Spinner />;
@@ -50,7 +54,7 @@ const DefaultDetailsWrapper = ({ eventId }: { eventId: string }) => {
   return <DefaultDetails event={event} eventDefinitionContext={eventDefinition} />;
 };
 
-const EventDetails = ({ eventId }: { eventId: string }) => {
+const EventDetailsWrapper = ({ eventId }: { eventId: string }) => {
   const puggableEventDetails = usePluggableEventDetails(eventId);
 
   if (puggableEventDetails?.length) {
@@ -61,4 +65,4 @@ const EventDetails = ({ eventId }: { eventId: string }) => {
   return <DefaultDetailsWrapper eventId={eventId} />;
 };
 
-export default EventDetails;
+export default EventDetailsWrapper;

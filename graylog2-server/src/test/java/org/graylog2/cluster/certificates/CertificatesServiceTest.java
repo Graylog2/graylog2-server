@@ -52,25 +52,22 @@ public class CertificatesServiceTest {
 
     @Test
     public void testReadUnExisting() {
-        final Optional<String> result = certificatesService.readCert(
-                new KeystoreMongoLocation("there is no node with this id", DATA_NODE_KEYSTORE_COLLECTION));
+        final Optional<String> result = certificatesService.readCert(KeystoreMongoLocation.datanode("there is no node with this id"));
         assertTrue(result.isEmpty());
     }
 
     @Test
     public void testReadAndWrite() {
-        boolean writeResult = certificatesService.writeCert(new KeystoreMongoLocation("node_id_1", DATA_NODE_KEYSTORE_COLLECTION), "Certificate string representation");
+        boolean writeResult = certificatesService.writeCert(KeystoreMongoLocation.datanode("node_id_1"), "Certificate string representation");
         assertTrue(writeResult);
-        final Optional<String> readResult = certificatesService.readCert(new KeystoreMongoLocation("node_id_1", DATA_NODE_KEYSTORE_COLLECTION));
+        final Optional<String> readResult = certificatesService.readCert(KeystoreMongoLocation.datanode("node_id_1"));
         assertTrue(readResult.isPresent());
         assertEquals("Certificate string representation", readResult.get());
     }
 
     @Test
     public void testHasCertReturnsFalseWhenNoMongoEntry() {
-        assertFalse(certificatesService.hasCert(
-                new KeystoreMongoLocation("there is no node with this id", DATA_NODE_KEYSTORE_COLLECTION)
-        ));
+        assertFalse(certificatesService.hasCert(KeystoreMongoLocation.datanode("there is no node with this id")));
     }
 
     @Test
@@ -78,44 +75,32 @@ public class CertificatesServiceTest {
         //adding document without encrypted certificate
         final MongoCollection<Document> collection = mongoConnection.getMongoDatabase().getCollection(DATA_NODE_KEYSTORE_COLLECTION.collectionName());
         collection.insertOne(new Document(DATA_NODE_KEYSTORE_COLLECTION.identifierField(), "node_id_1"));
-        assertFalse(certificatesService.hasCert(
-                new KeystoreMongoLocation("node_id_1", DATA_NODE_KEYSTORE_COLLECTION)
-        ));
+        assertFalse(certificatesService.hasCert(KeystoreMongoLocation.datanode("node_id_1")));
     }
 
     @Test
     public void testHasCertReturnsTrueWhenProperMongoEntry() {
-        certificatesService.writeCert(new KeystoreMongoLocation("node_id_1", DATA_NODE_KEYSTORE_COLLECTION), "Certificate string representation");
-        assertTrue(certificatesService.hasCert(
-                new KeystoreMongoLocation("node_id_1", DATA_NODE_KEYSTORE_COLLECTION)
-        ));
+        certificatesService.writeCert(KeystoreMongoLocation.datanode("node_id_1"), "Certificate string representation");
+        assertTrue(certificatesService.hasCert(KeystoreMongoLocation.datanode("node_id_1")));
     }
 
     @Test
     public void testCertRemoval() {
-        certificatesService.writeCert(new KeystoreMongoLocation("node_id_4", DATA_NODE_KEYSTORE_COLLECTION), "Certificate string representation 1");
-        certificatesService.writeCert(new KeystoreMongoLocation("node_id_5", DATA_NODE_KEYSTORE_COLLECTION), "Certificate string representation 2");
+        certificatesService.writeCert(KeystoreMongoLocation.datanode("node_id_4"), "Certificate string representation 1");
+        certificatesService.writeCert(KeystoreMongoLocation.datanode("node_id_5"), "Certificate string representation 2");
 
-        assertTrue(certificatesService.hasCert(
-                new KeystoreMongoLocation("node_id_4", DATA_NODE_KEYSTORE_COLLECTION)
-        ));
+        assertTrue(certificatesService.hasCert(KeystoreMongoLocation.datanode("node_id_4")));
 
-        assertTrue(certificatesService.hasCert(
-                new KeystoreMongoLocation("node_id_5", DATA_NODE_KEYSTORE_COLLECTION)
-        ));
+        assertTrue(certificatesService.hasCert(KeystoreMongoLocation.datanode("node_id_5")));
 
-        var result = certificatesService.removeCert(new KeystoreMongoLocation("node_id_4", DATA_NODE_KEYSTORE_COLLECTION));
+        var result = certificatesService.removeCert(KeystoreMongoLocation.datanode("node_id_4"));
         assertTrue("Removal of an existing cert should result in 'true'", result);
 
-        assertFalse(certificatesService.hasCert(
-                new KeystoreMongoLocation("node_id_4", DATA_NODE_KEYSTORE_COLLECTION)
-        ));
+        assertFalse(certificatesService.hasCert(KeystoreMongoLocation.datanode("node_id_4")));
 
-        assertTrue(certificatesService.hasCert(
-                new KeystoreMongoLocation("node_id_5", DATA_NODE_KEYSTORE_COLLECTION)
-        ));
+        assertTrue(certificatesService.hasCert(KeystoreMongoLocation.datanode("node_id_5")));
 
-        result = certificatesService.removeCert(new KeystoreMongoLocation("node_id_6", DATA_NODE_KEYSTORE_COLLECTION));
+        result = certificatesService.removeCert(KeystoreMongoLocation.datanode("node_id_6"));
         assertFalse("Removal of non existing cert should result in 'false'", result);
     }
 

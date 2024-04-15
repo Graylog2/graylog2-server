@@ -16,7 +16,23 @@
  */
 package org.graylog.storage.opensearch2;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public record TaskError(@JsonProperty("type") String type, @JsonProperty("reason") String reason) {
+import javax.annotation.Nullable;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public record TaskError(@JsonProperty("type") String type, @JsonProperty("reason") String reason,
+                        @Nullable @JsonProperty("caused_by") String causedBy) {
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("type='").append(type).append('\'');
+        sb.append(", reason='").append(reason).append('\'');
+        if (causedBy != null) {
+            sb.append(", causedBy='").append(causedBy).append('\'');
+        }
+        return sb.toString();
+    }
 }
