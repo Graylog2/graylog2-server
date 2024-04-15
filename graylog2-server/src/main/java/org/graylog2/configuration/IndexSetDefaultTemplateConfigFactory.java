@@ -18,8 +18,10 @@ package org.graylog2.configuration;
 
 import jakarta.inject.Inject;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.graylog2.datatiering.DataTieringConfig;
 import org.graylog2.datatiering.hotonly.HotOnlyDataTieringConfig;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.template.IndexSetTemplateConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig;
 import org.graylog2.migrations.MaintenanceStrategiesHelper;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
@@ -27,23 +29,23 @@ import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 
 import java.util.concurrent.TimeUnit;
 
-public class IndexSetsDefaultConfigurationFactory {
+public class IndexSetDefaultTemplateConfigFactory {
 
     final private ElasticsearchConfiguration elasticsearchConfiguration;
     final private MaintenanceStrategiesHelper maintenanceStrategiesHelper;
 
     @Inject
-    public IndexSetsDefaultConfigurationFactory(ElasticsearchConfiguration elasticsearchConfiguration, MaintenanceStrategiesHelper maintenanceStrategiesHelper) {
+    public IndexSetDefaultTemplateConfigFactory(ElasticsearchConfiguration elasticsearchConfiguration, MaintenanceStrategiesHelper maintenanceStrategiesHelper) {
         this.elasticsearchConfiguration = elasticsearchConfiguration;
         this.maintenanceStrategiesHelper = maintenanceStrategiesHelper;
     }
 
-    public IndexSetsDefaultConfiguration create() {
+    public IndexSetTemplateConfig create() {
         final ImmutablePair<String, RotationStrategyConfig> rotationConfig =
                 maintenanceStrategiesHelper.readRotationConfigFromServerConf();
         final ImmutablePair<String, RetentionStrategyConfig> retentionConfig =
                 maintenanceStrategiesHelper.readRetentionConfigFromServerConf();
-        return IndexSetsDefaultConfiguration.builder()
+        return IndexSetTemplateConfig.builder()
                 .indexAnalyzer(elasticsearchConfiguration.getAnalyzer())
                 .shards(elasticsearchConfiguration.getShards())
                 .replicas(elasticsearchConfiguration.getReplicas())
@@ -60,17 +62,14 @@ public class IndexSetsDefaultConfigurationFactory {
                 .build();
     }
 
-    public IndexSetsDefaultConfiguration addDataTieringDefaults(IndexSetsDefaultConfiguration oldConfig) {
-        HotOnlyDataTieringConfig dataTieringConfig;
-        if (oldConfig.rotationStrategyConfig() instanceof TimeBasedSizeOptimizingStrategyConfig config) {
+    public DataTieringConfig getDataTieringConfig(RotationStrategyConfig rotationStrategyConfig) {
+        if (rotationStrategyConfig instanceof TimeBasedSizeOptimizingStrategyConfig config) {
             // Take already configured min/max settings from TSO
-            dataTieringConfig = HotOnlyDataTieringConfig.builder()
+            return HotOnlyDataTieringConfig.builder()
                     .indexLifetimeMin(config.indexLifetimeMin())
                     .indexLifetimeMax(config.indexLifetimeMax())
                     .build();
-        } else {
-            dataTieringConfig = maintenanceStrategiesHelper.defaultDataTieringConfig();
         }
-        return oldConfig.toBuilder().dataTiering(dataTieringConfig).build();
+        return maintenanceStrategiesHelper.defaultDataTieringConfig();
     }
 }

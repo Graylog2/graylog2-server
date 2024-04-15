@@ -21,9 +21,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import jakarta.inject.Inject;
-import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;
-import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
@@ -34,88 +32,35 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
-import org.graylog2.configuration.IndexSetsDefaultConfiguration;
-import org.graylog2.indexer.IndexSetValidator;
-import org.graylog2.indexer.indexset.IndexSetConfig;
-import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.indexer.indexset.template.IndexSetDefaultTemplate;
+import org.graylog2.indexer.indexset.template.IndexSetDefaultTemplateService;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
-import org.joda.time.Duration;
 
 import java.io.IOException;
-
-import static org.graylog2.shared.utilities.StringUtils.f;
 
 @RequiresAuthentication
 @Api(value = "System/IndexSetDefaults", description = "Index set defaults")
 @Path("/system/indices/index_set_defaults")
 @Produces(MediaType.APPLICATION_JSON)
 public class IndexSetDefaultsResource extends RestResource {
-    private final IndexSetValidator indexSetValidator;
-    private final ClusterConfigService clusterConfigService;
-    private final Validator validator;
+    private final IndexSetDefaultTemplateService indexSetDefaultTemplateService;
 
     @Inject
-    public IndexSetDefaultsResource(IndexSetValidator indexSetValidator, ClusterConfigService clusterConfigService, Validator validator) {
-        this.indexSetValidator = indexSetValidator;
-        this.clusterConfigService = clusterConfigService;
-        this.validator = validator;
+    public IndexSetDefaultsResource(IndexSetDefaultTemplateService indexSetDefaultTemplateService) {
+        this.indexSetDefaultTemplateService = indexSetDefaultTemplateService;
     }
 
-    private static String buildFieldError(String field, String message) {
-        return f("Invalid value for field [%s]: %s", field, message);
-    }
-
-    /**
-     * Save new {@link IndexSetsDefaultConfiguration} cluster configuration object. This method exists to allow additional validation
-     * before saving with the {@link ClusterConfigService}.
-     */
     @PUT
     @Timed
     @Consumes(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Update index set defaults configuration")
+    @ApiOperation(value = "Set index set default template")
     @RequiresPermissions({RestPermissions.CLUSTER_CONFIG_ENTRY_CREATE, RestPermissions.CLUSTER_CONFIG_ENTRY_EDIT})
     @AuditEvent(type = AuditEventTypes.CLUSTER_CONFIGURATION_UPDATE)
-    public Response update(@ApiParam(name = "body", value = "The payload of the index set defaults configuration", required = true)
-                           @NotNull IndexSetsDefaultConfiguration config) throws IOException {
-        // Validate scalar fields.
-        validator.validate(config).forEach(v -> {
-            throw new BadRequestException(buildFieldError(v.getPropertyPath().toString(), v.getMessage()));
-        });
-
-        // Perform common refresh interval and retention period validations.
-        IndexSetValidator.Violation violation =
-                indexSetValidator.validateRefreshInterval(Duration.standardSeconds(
-                        config.fieldTypeRefreshIntervalUnit().toSeconds(config.fieldTypeRefreshInterval())));
-        if (violation != null) {
-            throw new BadRequestException(buildFieldError(IndexSetsDefaultConfiguration.FIELD_TYPE_REFRESH_INTERVAL, violation.message()));
-        }
-
-        violation = indexSetValidator.validateRotation(config.rotationStrategyConfig());
-
-        if (violation != null) {
-            throw new BadRequestException(buildFieldError(IndexSetsDefaultConfiguration.ROTATION_STRATEGY_CONFIG, violation.message()));
-        }
-
-        violation = indexSetValidator.validateRetentionPeriod(config.rotationStrategyConfig(),
-                config.retentionStrategyConfig());
-        if (violation != null) {
-            throw new BadRequestException(buildFieldError(IndexSetsDefaultConfiguration.RETENTION_STRATEGY_CONFIG, violation.message()));
-        }
-
-        violation = indexSetValidator.validateDataTieringConfig(config.dataTiering());
-        if (violation != null) {
-            throw new BadRequestException(buildFieldError(IndexSetConfig.FIELD_DATA_TIERING, violation.message()));
-        }
-
-        // Any change to the default config can only have been performed without data tiering because there is no UI yet.
-        // Thus we need to switch back to legacy mode, to make the users' changes effective.
-        // TODO remove this once we build a UI for data tiering defaults.
-        config = config.toBuilder().useLegacyRotation(true).build();
-
-        clusterConfigService.write(config);
-
-        clusterConfigService.write(config);
-        return Response.ok(config).build();
+    public Response update(@ApiParam(name = "body", value = "Index set default template id.", required = true)
+                           @NotNull IndexSetDefaultTemplate defaultTemplate) throws IOException {
+        //TODO fix audit events
+        indexSetDefaultTemplateService.setDefault(defaultTemplate);
+        return Response.ok().build();
     }
 }

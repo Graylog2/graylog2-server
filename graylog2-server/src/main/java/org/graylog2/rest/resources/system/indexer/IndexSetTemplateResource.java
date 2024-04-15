@@ -38,7 +38,7 @@ import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
-import org.graylog2.configuration.IndexSetsDefaultConfiguration;
+import org.graylog2.indexer.indexset.template.IndexSetTemplateConfig;
 import org.graylog2.indexer.IndexSetValidator;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.template.IndexSetTemplate;
@@ -143,7 +143,7 @@ public class IndexSetTemplateResource extends RestResource {
         templateService.delete(templateId);
     }
 
-    private void validateConfig(IndexSetsDefaultConfiguration config) {
+    private void validateConfig(IndexSetTemplateConfig config) {
         // Validate scalar fields.
         validator.validate(config).forEach(v -> {
             throw new BadRequestException(buildFieldError(v.getPropertyPath().toString(), v.getMessage()));
@@ -154,18 +154,18 @@ public class IndexSetTemplateResource extends RestResource {
                 indexSetValidator.validateRefreshInterval(Duration.standardSeconds(
                         config.fieldTypeRefreshIntervalUnit().toSeconds(config.fieldTypeRefreshInterval())));
         if (violation != null) {
-            throw new BadRequestException(buildFieldError(IndexSetsDefaultConfiguration.FIELD_TYPE_REFRESH_INTERVAL, violation.message()));
+            throw new BadRequestException(buildFieldError(IndexSetTemplateConfig.FIELD_TYPE_REFRESH_INTERVAL, violation.message()));
         }
 
         violation = indexSetValidator.validateRotation(config.rotationStrategyConfig());
         if (violation != null) {
-            throw new BadRequestException(buildFieldError(IndexSetsDefaultConfiguration.ROTATION_STRATEGY_CONFIG, violation.message()));
+            throw new BadRequestException(buildFieldError(IndexSetTemplateConfig.ROTATION_STRATEGY_CONFIG, violation.message()));
         }
 
         violation = indexSetValidator.validateRetentionPeriod(config.rotationStrategyConfig(),
                 config.retentionStrategyConfig());
         if (violation != null) {
-            throw new BadRequestException(buildFieldError(IndexSetsDefaultConfiguration.RETENTION_STRATEGY_CONFIG, violation.message()));
+            throw new BadRequestException(buildFieldError(IndexSetTemplateConfig.RETENTION_STRATEGY_CONFIG, violation.message()));
         }
 
         violation = indexSetValidator.validateDataTieringConfig(config.dataTiering());

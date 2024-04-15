@@ -17,7 +17,6 @@
 package org.graylog2.indexer.indexset.template;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.graylog2.configuration.IndexSetsDefaultConfiguration;
 
 import javax.annotation.Nonnull;
 
@@ -29,5 +28,5 @@ import static org.graylog2.indexer.indexset.template.IndexSetTemplate.TITLE_FIEL
 public record IndexSetTemplateData(@JsonProperty(TITLE_FIELD_NAME) String title,
                                    @JsonProperty(DESCRIPTION_FIELD_NAME) String description,
                                    @JsonProperty(READ_ONLY_FIELD_NAME) Boolean readOnly,
-                                   @JsonProperty(INDEX_SET_CONFIG_FIELD_NAME) @Nonnull IndexSetsDefaultConfiguration indexSetConfig) {
+                                   @JsonProperty(INDEX_SET_CONFIG_FIELD_NAME) @Nonnull IndexSetTemplateConfig indexSetConfig) {
 }

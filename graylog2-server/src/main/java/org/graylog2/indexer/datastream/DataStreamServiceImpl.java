@@ -18,13 +18,11 @@ package org.graylog2.indexer.datastream;
 
 import com.google.common.collect.ImmutableMap;
 import jakarta.inject.Inject;
-import org.graylog2.configuration.IndexSetsDefaultConfiguration;
-import org.graylog2.configuration.IndexSetsDefaultConfigurationFactory;
 import org.graylog2.indexer.fieldtypes.FieldTypeDTO;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypesDTO;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
+import org.graylog2.indexer.indexset.template.IndexSetDefaultTemplateService;
 import org.graylog2.indexer.indices.Template;
-import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.streams.Stream;
 
 import java.util.List;
@@ -42,13 +40,11 @@ public class DataStreamServiceImpl implements DataStreamService {
     private final IndexFieldTypesService indexFieldTypesService;
     private final int replicas;
 
-
     @Inject
-    public DataStreamServiceImpl(DataStreamAdapter dataStreamAdapter, IndexFieldTypesService indexFieldTypesService,
-                                 ClusterConfigService clusterConfigService, IndexSetsDefaultConfigurationFactory indexSetsDefaultConfigurationFactory) {
-        this(dataStreamAdapter, indexFieldTypesService, clusterConfigService.get(IndexSetsDefaultConfiguration.class) == null ?
-                indexSetsDefaultConfigurationFactory.create().replicas() :
-                clusterConfigService.get(IndexSetsDefaultConfiguration.class).replicas());
+    public DataStreamServiceImpl(DataStreamAdapter dataStreamAdapter,
+                                 IndexFieldTypesService indexFieldTypesService,
+                                 IndexSetDefaultTemplateService indexSetDefaultTemplateService) {
+        this(dataStreamAdapter, indexFieldTypesService, indexSetDefaultTemplateService.createDefaultConfig().replicas());
     }
 
     public DataStreamServiceImpl(DataStreamAdapter dataStreamAdapter, IndexFieldTypesService indexFieldTypesService,
@@ -59,7 +55,7 @@ public class DataStreamServiceImpl implements DataStreamService {
     }
 
     @Override
-    public void createDataStream(String dataStreamName, String timestampField,  Map<String, Map<String, String>> mappings,
+    public void createDataStream(String dataStreamName, String timestampField, Map<String, Map<String, String>> mappings,
                                  Policy ismPolicy) {
         updateDataStreamTemplate(dataStreamName, timestampField, mappings);
         dataStreamAdapter.createDataStream(dataStreamName);

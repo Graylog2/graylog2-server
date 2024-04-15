@@ -17,48 +17,37 @@
 package org.graylog2.indexer.indexset;
 
 import jakarta.inject.Inject;
-import org.graylog2.configuration.IndexSetsDefaultConfiguration;
-import org.graylog2.configuration.IndexSetsDefaultConfigurationFactory;
 import org.graylog2.datatiering.DataTieringChecker;
 import org.graylog2.datatiering.DataTieringConfig;
-import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.indexer.indexset.template.IndexSetDefaultTemplateService;
+import org.graylog2.indexer.indexset.template.IndexSetTemplateConfig;
 import org.joda.time.Duration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
 public class IndexSetConfigFactory {
-    private static final Logger LOG = LoggerFactory.getLogger(IndexSetConfigFactory.class);
-    private final IndexSetsDefaultConfigurationFactory indexSetsDefaultConfigurationFactory;
-    private final ClusterConfigService clusterConfigService;
+
     private final DataTieringChecker dataTieringChecker;
+    private final IndexSetDefaultTemplateService indexSetDefaultTemplateService;
 
     @Inject
-    public IndexSetConfigFactory(IndexSetsDefaultConfigurationFactory indexSetsDefaultConfigurationFactory,
-                                 ClusterConfigService clusterConfigService,
-                                 DataTieringChecker dataTieringChecker) {
-        this.indexSetsDefaultConfigurationFactory = indexSetsDefaultConfigurationFactory;
-        this.clusterConfigService = clusterConfigService;
+    public IndexSetConfigFactory(DataTieringChecker dataTieringChecker,
+                                 IndexSetDefaultTemplateService indexSetDefaultTemplateService) {
         this.dataTieringChecker = dataTieringChecker;
+        this.indexSetDefaultTemplateService = indexSetDefaultTemplateService;
     }
 
     private static ZonedDateTime getCreationDate() {
         return ZonedDateTime.now(ZoneOffset.UTC);
     }
 
-    private static DataTieringConfig getDataTieringConfig(IndexSetsDefaultConfiguration defaultConfig) {
+    private static DataTieringConfig getDataTieringConfig(IndexSetTemplateConfig defaultConfig) {
         return defaultConfig.useLegacyRotation() ? null : defaultConfig.dataTiering();
     }
 
     public IndexSetConfig.Builder createDefault() {
-        IndexSetsDefaultConfiguration defaultConfig = clusterConfigService.get(IndexSetsDefaultConfiguration.class);
-        if (defaultConfig == null) {
-            // Valid case for migrations that existed before in-DB index configuration was established in Graylog 5.1
-            LOG.debug("Could not find IndexSetsDefaultConfiguration. Falling back to server configuration values.");
-            defaultConfig = indexSetsDefaultConfigurationFactory.create();
-        }
+        IndexSetTemplateConfig defaultConfig = indexSetDefaultTemplateService.createDefaultConfig();
 
         return IndexSetConfig.builder()
                 .creationDate(getCreationDate())

@@ -19,9 +19,13 @@ package org.graylog2.migrations;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog2.configuration.ElasticsearchConfiguration;
+import org.graylog2.configuration.IndexSetDefaultTemplateConfigFactory;
 import org.graylog2.configuration.IndexSetsDefaultConfiguration;
-import org.graylog2.configuration.IndexSetsDefaultConfigurationFactory;
 import org.graylog2.datatiering.hotonly.HotOnlyDataTieringConfig;
+import org.graylog2.indexer.indexset.template.IndexSetDefaultTemplate;
+import org.graylog2.indexer.indexset.template.IndexSetDefaultTemplateService;
+import org.graylog2.indexer.indexset.template.IndexSetTemplate;
+import org.graylog2.indexer.indexset.template.IndexSetTemplateConfig;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategy;
 import org.graylog2.indexer.rotation.tso.IndexLifetimeConfig;
@@ -34,15 +38,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
+import static org.graylog2.migrations.V202211021200_CreateDefaultIndexTemplate.TEMPLATE_DESCRIPTION;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class V202211021200_CreateDefaultIndexDefaultsConfigTest {
+class V202211021200_CreateDefaultIndexTemplateTest {
 
-    private final static String DEFAULT_CONFIG = """
+    private final static String CONFIG = """
             {
                 "index_analyzer": "standard",
                 "shards": 4,
@@ -72,6 +75,7 @@ class V202211021200_CreateDefaultIndexDefaultsConfigTest {
                 }
               }
             """;
+    public static final String CONFIG_WITHOUT_DATA_TIERING = CONFIG.formatted("");
     private final static String DATA_TIERING_CONFIG = """
             "data_tiering": {
                   "type": "hot_only",
@@ -79,79 +83,95 @@ class V202211021200_CreateDefaultIndexDefaultsConfigTest {
                   "index_lifetime_max": "P40D"
                 },
             """;
+    public static final String CONFIG_WITH_DATA_TIERING = CONFIG.formatted(DATA_TIERING_CONFIG);
+    public static final String CONFIG_USE_LEGACY_FALSE = CONFIG.formatted(DATA_TIERING_CONFIG +
+            """
+                    "use_legacy_rotation": false,""");
+
     final ObjectMapper objectMapper = new ObjectMapperProvider().get();
     @Mock
     private ElasticsearchConfiguration elasticsearchConfiguration;
     @Mock
     private ClusterConfigService clusterConfigService;
+    @Mock
+    private IndexSetDefaultTemplateService indexSetDefaultTemplateService;
 
-    private IndexSetsDefaultConfigurationFactory defaultConfigurationFactory;
-    private V202211021200_CreateDefaultIndexDefaultsConfig underTest;
+    private IndexSetDefaultTemplateConfigFactory defaultConfigurationFactory;
+    private V202211021200_CreateDefaultIndexTemplate underTest;
 
 
     @BeforeEach
     void setUp() {
-        defaultConfigurationFactory = new IndexSetsDefaultConfigurationFactory(
+        defaultConfigurationFactory = new IndexSetDefaultTemplateConfigFactory(
                 elasticsearchConfiguration, new MaintenanceStrategiesHelper(elasticsearchConfiguration));
-        underTest = new V202211021200_CreateDefaultIndexDefaultsConfig(
+        underTest = new V202211021200_CreateDefaultIndexTemplate(
                 clusterConfigService,
-                defaultConfigurationFactory);
+                defaultConfigurationFactory,
+                indexSetDefaultTemplateService
+        );
+        when(clusterConfigService.get(IndexSetDefaultTemplate.class)).thenReturn(null);
     }
 
     @Test
-    void testNoDefaultConfigurationExists() {
+    void testNoDefaultTemplateAndLegacyConfigExists() {
         mockElasticConfig();
+        IndexSetTemplateConfig defaultConfiguration = defaultConfigurationFactory.create();
 
         underTest.upgrade();
-        IndexSetsDefaultConfiguration defaultConfiguration = defaultConfigurationFactory.create();
 
-        verify(clusterConfigService).write(defaultConfiguration);
+        verify(indexSetDefaultTemplateService).createAndSaveDefault(createTemplate(defaultConfiguration));
         assertThat(defaultConfiguration.useLegacyRotation()).isFalse();
     }
 
     @Test
-    void testDefaultConfigWithoutDataTiering() throws JsonProcessingException {
-        IndexSetsDefaultConfiguration defaultConfiguration = readConfig(DEFAULT_CONFIG.formatted(""));
-        when(clusterConfigService.get(IndexSetsDefaultConfiguration.class)).thenReturn(defaultConfiguration);
-
-        underTest.upgrade();
-
-        IndexSetsDefaultConfiguration expected = defaultConfiguration.toBuilder()
+    void testDefaultConfigWithoutDataTieringExists() throws JsonProcessingException {
+        when(clusterConfigService.get(IndexSetsDefaultConfiguration.class)).thenReturn(readLegacyConfig(CONFIG_WITHOUT_DATA_TIERING));
+        IndexSetTemplateConfig defaultConfiguration = readConfig(CONFIG_WITHOUT_DATA_TIERING).toBuilder()
                 .dataTiering(HotOnlyDataTieringConfig.builder()
                         .indexLifetimeMin(IndexLifetimeConfig.DEFAULT_LIFETIME_MIN)
                         .indexLifetimeMax(IndexLifetimeConfig.DEFAULT_LIFETIME_MAX)
                         .build())
+                .useLegacyRotation(true)
                 .build();
-        verify(clusterConfigService).write(expected);
-        assertThat(expected.useLegacyRotation()).isTrue();
+
+        underTest.upgrade();
+
+        verify(indexSetDefaultTemplateService).createAndSaveDefault(createTemplate(defaultConfiguration));
+        verify(clusterConfigService).remove(IndexSetsDefaultConfiguration.class);
     }
 
     @Test
     void testDefaultConfigWithDataTiering() throws JsonProcessingException {
-        IndexSetsDefaultConfiguration defaultConfiguration = readConfig(DEFAULT_CONFIG.formatted(DATA_TIERING_CONFIG));
-        when(clusterConfigService.get(IndexSetsDefaultConfiguration.class)).thenReturn(defaultConfiguration);
+        when(clusterConfigService.get(IndexSetsDefaultConfiguration.class)).thenReturn(readLegacyConfig(CONFIG_WITH_DATA_TIERING));
+        IndexSetTemplateConfig defaultConfiguration = readConfig(CONFIG_WITH_DATA_TIERING).toBuilder().useLegacyRotation(true).build();
 
         underTest.upgrade();
 
-        verify(clusterConfigService, never()).write(any());
-        assertThat(defaultConfiguration.useLegacyRotation()).isTrue();
+        verify(indexSetDefaultTemplateService).createAndSaveDefault(createTemplate(defaultConfiguration));
+        verify(clusterConfigService).remove(IndexSetsDefaultConfiguration.class);
     }
 
     @Test
     void testDefaultConfigWithDataTieringAndUseLegacyRotation() throws JsonProcessingException {
-        IndexSetsDefaultConfiguration defaultConfiguration = readConfig(DEFAULT_CONFIG.formatted(DATA_TIERING_CONFIG +
-                """
-                        "use_legacy_rotation": false,"""));
-        when(clusterConfigService.get(IndexSetsDefaultConfiguration.class)).thenReturn(defaultConfiguration);
+        when(clusterConfigService.get(IndexSetsDefaultConfiguration.class)).thenReturn(readLegacyConfig(CONFIG_USE_LEGACY_FALSE));
+        IndexSetTemplateConfig defaultConfiguration = readConfig(CONFIG_USE_LEGACY_FALSE);
 
         underTest.upgrade();
 
-        verify(clusterConfigService, never()).write(any());
-        assertThat(defaultConfiguration.useLegacyRotation()).isFalse();
+        verify(indexSetDefaultTemplateService).createAndSaveDefault(createTemplate(defaultConfiguration));
+        verify(clusterConfigService).remove(IndexSetsDefaultConfiguration.class);
     }
 
-    private IndexSetsDefaultConfiguration readConfig(String json) throws JsonProcessingException {
+    private static IndexSetTemplate createTemplate(IndexSetTemplateConfig defaultConfiguration) {
+        return new IndexSetTemplate(null, "Default Template", TEMPLATE_DESCRIPTION, false, defaultConfiguration);
+    }
+
+    private IndexSetsDefaultConfiguration readLegacyConfig(String json) throws JsonProcessingException {
         return objectMapper.readValue(json, IndexSetsDefaultConfiguration.class);
+    }
+
+    private IndexSetTemplateConfig readConfig(String json) throws JsonProcessingException {
+        return objectMapper.readValue(json, IndexSetTemplateConfig.class);
     }
 
     private void mockElasticConfig() {
