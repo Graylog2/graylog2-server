@@ -71,7 +71,8 @@ public class IndexSetDefaultTemplateService {
         Optional<IndexSetTemplate> indexSetTemplate = indexSetTemplateService.get(defaultTemplate.id());
         if (indexSetTemplate.isPresent()) {
             clusterConfigService.write(defaultTemplate);
+        }else{
+            throw new NotFoundException("Index template with id <%s> doesn't exist!".formatted(defaultTemplate.id()));
         }
-        throw new NotFoundException("Index template with id <%s> doesn't exist!".formatted(defaultTemplate.id()));
     }
 }
