@@ -43,6 +43,8 @@ import profileActions from 'components/indices/IndexSetFieldTypeProfiles/helpers
 import { useStore } from 'stores/connect';
 import { IndexSetsStore } from 'stores/indices/IndexSetsStore';
 
+import useTableEventHandlers from '../../common/EntityDataTable/hooks/useTableEventHandlers';
+
 export const ENTITY_TABLE_ID = 'index-set-field-type-profiles';
 export const DEFAULT_LAYOUT = {
   pageSize: 20,
@@ -71,19 +73,19 @@ const ProfilesList = () => {
   }), [paginationQueryParameter.page, layoutConfig.pageSize, layoutConfig.sort, query, urlQueryFilters]);
   const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(ENTITY_TABLE_ID);
 
-  const onPageSizeChange = useCallback((newPageSize: number) => {
-    paginationQueryParameter.resetPage();
-    updateTableLayout({ perPage: newPageSize });
-  }, [paginationQueryParameter, updateTableLayout]);
+  const {
+    onColumnsChange,
+    onPageSizeChange,
+    onSearch,
+    onSearchReset,
+    onSortChange,
+  } = useTableEventHandlers({
+    appSection: 'streams-list',
+    paginationQueryParameter,
+    setQuery,
+    updateTableLayout,
+  });
 
-  const onSortChange = useCallback((newSort: Sort) => {
-    paginationQueryParameter.resetPage();
-    updateTableLayout({ sort: newSort });
-  }, [paginationQueryParameter, updateTableLayout]);
-
-  const onColumnsChange = useCallback((displayedAttributes: Array<string>) => {
-    updateTableLayout({ displayedAttributes });
-  }, [updateTableLayout]);
   const {
     isLoading,
     data: { list, pagination, attributes },
@@ -92,11 +94,6 @@ const ProfilesList = () => {
     { enabled: !isLoadingLayoutPreferences },
   );
 
-  const onSearch = useCallback((val: string) => {
-    paginationQueryParameter.resetPage();
-    setQuery(val);
-  }, [paginationQueryParameter, setQuery]);
-  const onSearchReset = useCallback(() => setQuery(''), [setQuery]);
   const onChangeFilters = useCallback((newUrlQueryFilters: UrlQueryFilters) => {
     paginationQueryParameter.resetPage();
     setUrlQueryFilters(newUrlQueryFilters);
