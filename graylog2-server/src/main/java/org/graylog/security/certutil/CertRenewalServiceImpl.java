@@ -167,7 +167,7 @@ public class CertRenewalServiceImpl implements CertRenewalService {
 
     private Optional<KeyStore> loadKeyStoreForNode(Node node) {
         try {
-            return keystoreMongoStorage.readKeyStore(new KeystoreMongoLocation(node.getNodeId(), KeystoreMongoCollections.DATA_NODE_KEYSTORE_COLLECTION), passwordSecret);
+            return keystoreMongoStorage.readKeyStore(KeystoreMongoLocation.datanode(node.getNodeId()), passwordSecret);
         } catch (KeyStoreStorageException e) {
             return Optional.empty();
         }

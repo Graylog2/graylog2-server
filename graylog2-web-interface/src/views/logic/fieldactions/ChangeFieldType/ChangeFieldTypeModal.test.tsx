@@ -24,7 +24,7 @@ import useFieldTypeUsages from 'views/logic/fieldactions/ChangeFieldType/hooks/u
 import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
 import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import ChangeFieldTypeModal from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldTypeModal';
 import type { Attributes } from 'stores/PaginationTypes';
 import suppressConsole from 'helpers/suppressConsole';
@@ -119,9 +119,7 @@ jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
 describe('ChangeFieldTypeModal', () => {
   const putFieldTypeMutationMock = jest.fn(() => Promise.resolve());
 
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   beforeEach(() => {
     asMock(useFieldTypesForMappings).mockReturnValue({

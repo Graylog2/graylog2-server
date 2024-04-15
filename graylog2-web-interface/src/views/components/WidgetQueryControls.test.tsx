@@ -20,7 +20,7 @@ import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import Widget from 'views/logic/widgets/Widget';
 import mockComponent from 'helpers/mocking/MockComponent';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { asMock } from 'helpers/mocking';
 import useGlobalOverride from 'views/hooks/useGlobalOverride';
@@ -50,9 +50,7 @@ describe('WidgetQueryControls', () => {
     asMock(useGlobalOverride).mockReturnValue(GlobalOverride.empty());
   });
 
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   const config = {
     relative_timerange_options: { P1D: 'Search in last day', PT0S: 'Search in all messages' },

@@ -20,7 +20,7 @@ import { render, screen } from 'wrappedTestingLibrary';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import ChangeFieldType from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldType';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import useInitialSelection from 'views/logic/fieldactions/ChangeFieldType/hooks/useInitialSelection';
 import asMock from 'helpers/mocking/AsMock';
 import useFieldTypeUsages from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages';
@@ -55,13 +55,12 @@ const renderChangeTypeAction = ({
 );
 
 describe('ChangeFieldType', () => {
+  useViewsPlugin();
+
   beforeAll(() => {
-    loadViewsPlugin();
     asMock(useInitialSelection).mockReturnValue(['id-1', 'id-2']);
     asMock(useFieldTypeUsages).mockReturnValue(paginatedFieldUsage);
   });
-
-  afterAll(unloadViewsPlugin);
 
   it('Shows modal', async () => {
     renderChangeTypeAction({});
