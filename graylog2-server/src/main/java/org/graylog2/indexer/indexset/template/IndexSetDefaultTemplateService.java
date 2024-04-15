@@ -19,6 +19,7 @@ package org.graylog2.indexer.indexset.template;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
 import org.graylog2.configuration.IndexSetDefaultTemplateConfigFactory;
+import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,8 +67,11 @@ public class IndexSetDefaultTemplateService {
         return savedTemplate;
     }
 
-    public void setDefault(@NotNull IndexSetDefaultTemplate indexSetTemplate) {
-        //TODO check if template exists
-        clusterConfigService.write(indexSetTemplate);
+    public void setDefault(@NotNull IndexSetDefaultTemplate defaultTemplate) throws NotFoundException {
+        Optional<IndexSetTemplate> indexSetTemplate = indexSetTemplateService.get(defaultTemplate.id());
+        if (indexSetTemplate.isPresent()) {
+            clusterConfigService.write(defaultTemplate);
+        }
+        throw new NotFoundException("Index template with id <%s> doesn't exist!".formatted(defaultTemplate.id()));
     }
 }

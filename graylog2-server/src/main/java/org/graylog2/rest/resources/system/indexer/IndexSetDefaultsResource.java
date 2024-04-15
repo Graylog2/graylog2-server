@@ -32,6 +32,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.indexset.template.IndexSetDefaultTemplate;
 import org.graylog2.indexer.indexset.template.IndexSetDefaultTemplateService;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -60,7 +61,11 @@ public class IndexSetDefaultsResource extends RestResource {
     public Response update(@ApiParam(name = "body", value = "Index set default template id.", required = true)
                            @NotNull IndexSetDefaultTemplate defaultTemplate) throws IOException {
         //TODO fix audit events
-        indexSetDefaultTemplateService.setDefault(defaultTemplate);
+        try {
+            indexSetDefaultTemplateService.setDefault(defaultTemplate);
+        } catch (NotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+        }
         return Response.ok().build();
     }
 }
