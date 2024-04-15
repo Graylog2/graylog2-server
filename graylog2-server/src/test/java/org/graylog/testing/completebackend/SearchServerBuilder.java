@@ -72,6 +72,12 @@ public abstract class SearchServerBuilder<T extends SearchServerInstance> {
         return env;
     }
 
+    public SearchServerBuilder<T> env(Map<String, String> envProperties) {
+        envProperties.forEach(this::env);
+        return this;
+    }
+
+
     public SearchServerBuilder<T> featureFlags(final List<String> featureFlags) {
         this.featureFlags = new ArrayList<>(featureFlags);
         return this;

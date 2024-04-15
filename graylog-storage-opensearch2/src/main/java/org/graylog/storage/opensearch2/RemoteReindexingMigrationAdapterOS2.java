@@ -21,6 +21,7 @@ import com.github.rholder.retry.RetryException;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
+import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -164,8 +165,9 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     }
 
     private void prepareCluster(String allowlistAsString) {
+        Preconditions.checkArgument(allowlistAsString != null, "Allowlist has to be provided in the request.");
         final var activeNodes = getAllActiveNodeIDs();
-        List<String> allowlist = Arrays.asList(allowlistAsString.split(","));
+        List<String> allowlist = Arrays.stream(allowlistAsString.split(",")).map(String::trim).toList();
         try {
             verifyRemoteReindexAllowlistSetting(allowlist);
         } catch (RemoteReindexNotAllowedException e) {
@@ -226,7 +228,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     @Nullable
     private String getErrors(GetTaskResponse task) {
         if (task.error() != null) {
-            return task.error().type() + ": " + task.error().reason();
+            return task.toString();
         } else if (task.task().status().hasFailures()) {
             return String.join(";", task.task().status().failures());
         }

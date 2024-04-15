@@ -14,15 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.certutil.keystore.storage;
+import { useQuery } from '@tanstack/react-query';
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.security.KeyStore;
+import { SystemClusterConfig } from '@graylog/server-api';
 
-public interface KeystoreContentMover {
+const useClusterConfig = <T, >(key: string) => useQuery<T>(['system', 'cluster_config', key], () => SystemClusterConfig.read(key) as Promise<T>);
 
-    KeyStore moveContents(final KeyStore originalKeyStore,
-                          char[] currentPassword,
-                          final char[] newPassword) throws GeneralSecurityException, IOException;
-}
+export default useClusterConfig;

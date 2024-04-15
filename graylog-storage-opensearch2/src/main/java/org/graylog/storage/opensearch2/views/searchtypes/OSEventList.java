@@ -52,10 +52,17 @@ public class OSEventList implements EventListStrategy {
     @Override
     public void doGenerateQueryPart(Query query, EventList eventList,
                                     OSGeneratedQueryContext queryContext) {
+        final Set<String> effectiveStreams = eventList.streams().isEmpty()
+                ? query.usedStreamIds()
+                : eventList.streams();
+
         final var searchSourceBuilder = queryContext.searchSourceBuilder(eventList);
         final FieldSortBuilder sortConfig = sortConfig(eventList);
         searchSourceBuilder.sort(sortConfig);
         final var queryBuilder = searchSourceBuilder.query();
+        if (!effectiveStreams.isEmpty() && queryBuilder instanceof BoolQueryBuilder boolQueryBuilder) {
+            boolQueryBuilder.must(QueryBuilders.termsQuery(EventDto.FIELD_SOURCE_STREAMS, effectiveStreams));
+        }
         if (!eventList.attributes().isEmpty() && queryBuilder instanceof BoolQueryBuilder boolQueryBuilder) {
             final var filterQueries = eventList.attributes().stream()
                     .filter(attribute -> EventList.KNOWN_ATTRIBUTES.contains(attribute.field()))
@@ -96,13 +103,9 @@ public class OSEventList implements EventListStrategy {
     @Override
     public SearchType.Result doExtractResult(SearchJob job, Query query, EventList searchType, SearchResponse result,
                                              Aggregations aggregations, OSGeneratedQueryContext queryContext) {
-        final Set<String> effectiveStreams = searchType.streams().isEmpty()
-                ? query.usedStreamIds()
-                : searchType.streams();
         final List<CommonEventSummary> eventSummaries = extractResult(result).stream()
                 .map(rawEvent -> objectMapper.convertValue(rawEvent, EventDto.class))
                 .map(EventSummary::parse)
-                .filter(eventSummary -> effectiveStreams.containsAll(eventSummary.streams()))
                 .collect(Collectors.toList());
         final EventList.Result.Builder resultBuilder = EventList.Result.builder()
                 .events(eventSummaries)

@@ -18,21 +18,7 @@ import React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
-import { StoreMock as MockStore } from 'helpers/mocking';
-import mockSearchClusterConfig from 'fixtures/searchClusterConfig';
-
 import OriginalTimeRangePicker from './TimeRangePicker';
-
-jest.mock('views/stores/SearchConfigStore', () => ({
-  SearchConfigActions: {
-    refresh: jest.fn(() => Promise.resolve()),
-  },
-  SearchConfigStore: MockStore(
-    'get',
-    'refresh',
-    ['getInitialState', () => ({ searchesClusterConfig: mockSearchClusterConfig })],
-  ),
-}));
 
 jest.mock('stores/tools/ToolsStore', () => ({}));
 

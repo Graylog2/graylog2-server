@@ -14,10 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.certutil.keystore.storage.location;
+import styled from 'styled-components';
 
-import java.nio.file.Path;
+import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
 
-public record KeystoreFileLocation(Path keystorePath) implements KeystoreLocation {
-
-}
+const ModalButtonToolbar = styled(ButtonToolbar)`
+  display: flex;
+  justify-content: flex-end;
+  align-items: end;
+  gap: 0.25em;
+`;
+export default ModalButtonToolbar;
