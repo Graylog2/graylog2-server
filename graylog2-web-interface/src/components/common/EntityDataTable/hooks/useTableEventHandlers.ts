@@ -21,8 +21,20 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
+import type { PaginationQueryParameterResult } from 'hooks/usePaginationQueryParameter';
+import type { TableLayoutPreferences } from 'components/common/EntityDataTable/types';
 
-const useTableEventHandlers = ({ updateTableLayout, paginationQueryParameter, setQuery, appSection }: { updateTableLayout, paginationQueryParameter, setQuery, appSection }) => {
+const useTableEventHandlers = ({
+  updateTableLayout,
+  paginationQueryParameter,
+  setQuery,
+  appSection,
+}: {
+  updateTableLayout: (preferences: TableLayoutPreferences) => void,
+  paginationQueryParameter: PaginationQueryParameterResult,
+  setQuery: (query: string) => void,
+  appSection: string
+}) => {
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
 
