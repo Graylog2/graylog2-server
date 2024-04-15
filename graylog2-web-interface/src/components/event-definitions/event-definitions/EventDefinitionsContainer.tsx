@@ -22,9 +22,9 @@ import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
+import { useTableEventHandlers } from 'components/common/EntityDataTable';
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
-import useTableEventHandlers from 'components/common/EntityDataTable/hooks/useTableEventHandlers';
 
 import EventDefinitionActions from './EventDefinitionActions';
 import SchedulingCell from './SchedulingCell';

@@ -65,7 +65,7 @@ const DashboardsOverview = ({ isEvidenceModal }: Props) => {
     onSearchReset,
     onSortChange,
   } = useTableEventHandlers({
-    appSection: 'streams-list',
+    appSection: 'dashboards-list',
     paginationQueryParameter,
     setQuery,
     updateTableLayout,

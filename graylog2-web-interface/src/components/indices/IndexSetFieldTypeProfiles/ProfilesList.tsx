@@ -24,7 +24,7 @@ import {
   PaginatedList, SearchForm,
   Spinner,
 } from 'components/common';
-import EntityDataTable from 'components/common/EntityDataTable';
+import EntityDataTable, { useTableEventHandlers } from 'components/common/EntityDataTable';
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
 import type { Sort } from 'stores/PaginationTypes';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
@@ -42,8 +42,6 @@ import useCustomColumnRenderers from 'components/indices/IndexSetFieldTypeProfil
 import profileActions from 'components/indices/IndexSetFieldTypeProfiles/helpers/profileActions';
 import { useStore } from 'stores/connect';
 import { IndexSetsStore } from 'stores/indices/IndexSetsStore';
-
-import useTableEventHandlers from '../../common/EntityDataTable/hooks/useTableEventHandlers';
 
 export const ENTITY_TABLE_ID = 'index-set-field-type-profiles';
 export const DEFAULT_LAYOUT = {

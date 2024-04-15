@@ -28,6 +28,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
+import { useTableEventHandlers } from 'components/common/EntityDataTable';
 
 import NotificationConfigTypeCell from './NotificationConfigTypeCell';
 import NotificationTitle from './NotificationTitle';
@@ -36,7 +37,6 @@ import BulkActions from './BulkActions';
 
 import useEventNotifications from '../hooks/useEventNotifications';
 import useNotificationTest from '../hooks/useNotificationTest';
-import useTableEventHandlers from '../../common/EntityDataTable/hooks/useTableEventHandlers';
 
 const customColumnRenderers = (testResults: TestResults): ColumnRenderers<EventNotification> => ({
   attributes: {
