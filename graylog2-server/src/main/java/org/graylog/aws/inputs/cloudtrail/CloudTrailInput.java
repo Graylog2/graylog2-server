@@ -22,10 +22,12 @@ import jakarta.inject.Inject;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.configuration.Configuration;
+import org.graylog2.plugin.inputs.CloudCompatible;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 
+@CloudCompatible
 public class CloudTrailInput extends MessageInput {
     private static final String NAME = "AWS CloudTrail";
 
@@ -71,11 +73,6 @@ public class CloudTrailInput extends MessageInput {
         }
 
         public boolean isCloudCompatible() {
-            return true;
-        }
-
-        // static check for contentpack import
-        public static boolean isStaticCloudCompatible() {
             return true;
         }
     }

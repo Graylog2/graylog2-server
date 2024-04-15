@@ -27,6 +27,7 @@ import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
+import org.graylog2.plugin.inputs.CloudCompatible;
 import org.graylog2.plugin.inputs.MessageInput;
 
 import static org.graylog2.inputs.transports.HttpPollTransport.CK_CONTENT_TYPE;
@@ -35,6 +36,7 @@ import static org.graylog2.inputs.transports.HttpPollTransport.CK_HTTP_METHOD;
 import static org.graylog2.inputs.transports.HttpPollTransport.POST;
 import static org.graylog2.inputs.transports.HttpPollTransport.PUT;
 
+@CloudCompatible
 public class JsonPathInput extends MessageInput {
 
     private static final String NAME = "JSON path value from HTTP API";
@@ -70,11 +72,6 @@ public class JsonPathInput extends MessageInput {
         }
 
         public boolean isCloudCompatible() {
-            return true;
-        }
-
-        // static check for contentpack import
-        public static boolean isStaticCloudCompatible() {
             return true;
         }
     }
