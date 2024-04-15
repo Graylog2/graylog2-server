@@ -23,7 +23,7 @@ import Search from 'views/logic/search/Search';
 import View from 'views/logic/views/View';
 import useQueryIds from 'views/hooks/useQueryIds';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 
 const createView = (queryIds: Array<string>) => View.builder()
   .search(Search.builder()
@@ -47,9 +47,7 @@ describe('useQueryIds', () => {
     jest.clearAllMocks();
   });
 
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   it('tracks query updates', async () => {
     const { result } = renderHook(() => useQueryIds(), { wrapper: createWrapper(['foo']) });

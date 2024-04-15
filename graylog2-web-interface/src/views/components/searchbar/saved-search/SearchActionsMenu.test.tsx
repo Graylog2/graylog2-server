@@ -37,7 +37,7 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import useView from 'views/hooks/useView';
 import useIsDirty from 'views/hooks/useIsDirty';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import useIsNew from 'views/hooks/useIsNew';
 import useHistory from 'routing/useHistory';
 import mockHistory from 'helpers/mocking/mockHistory';
@@ -132,9 +132,7 @@ describe('SearchActionsMenu', () => {
     asMock(useIsNew).mockReturnValue(false);
   });
 
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   describe('Button handling', () => {
     let history;

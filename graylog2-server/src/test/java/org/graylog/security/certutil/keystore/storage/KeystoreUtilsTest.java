@@ -16,37 +16,32 @@
  */
 package org.graylog.security.certutil.keystore.storage;
 
+import org.assertj.core.api.Assertions;
 import org.graylog.security.certutil.CertRequest;
 import org.graylog.security.certutil.CertificateGenerator;
 import org.graylog.security.certutil.KeyPair;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
+import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 
+import static org.graylog.security.certutil.CertConstants.KEY_GENERATION_ALGORITHM;
 import static org.graylog.security.certutil.CertConstants.PKCS12;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class SinglePasswordKeystoreContentMoverTest {
-
-    private SinglePasswordKeystoreContentMover toTest;
-
-    @BeforeEach
-    void setUp() {
-        toTest = new SinglePasswordKeystoreContentMover();
-    }
+public class KeystoreUtilsTest {
 
     @Test
     void testThrowsExceptionIfNewPasswordIsNull() throws Exception {
         KeyStore originalKeyStore = KeyStore.getInstance(PKCS12);
-        assertThrows(IllegalArgumentException.class, () -> toTest.moveContents(originalKeyStore, "nvmd".toCharArray(), null));
+        assertThrows(IllegalArgumentException.class, () -> KeystoreUtils.newStoreCopyContent(originalKeyStore, "nvmd".toCharArray(), null));
     }
 
     @Test
@@ -70,7 +65,7 @@ public class SinglePasswordKeystoreContentMoverTest {
         final KeyPair keyPair = CertificateGenerator.generate(req);
         originalKeyStore.setKeyEntry("privkey", keyPair.privateKey(), oldPassword, new Certificate[]{keyPair.certificate()});
 
-        final KeyStore newKeyStore = toTest.moveContents(originalKeyStore, oldPassword, newPassword);
+        final KeyStore newKeyStore = KeystoreUtils.newStoreCopyContent(originalKeyStore, oldPassword, newPassword);
         final KeyStore.Entry secretRetrieved = newKeyStore.getEntry("secretEntry", new KeyStore.PasswordProtection(newPassword));
         final Certificate certificateRetrieved = newKeyStore.getCertificate("trusted-certificate");
         final Key privkeyRetrieved = newKeyStore.getKey("privkey", newPassword);
@@ -98,9 +93,29 @@ public class SinglePasswordKeystoreContentMoverTest {
         final KeyPair keyPair3 = CertificateGenerator.generate(req);
         originalKeyStore.setKeyEntry("privkey3", keyPair3.privateKey(), oldPassword, new Certificate[]{keyPair3.certificate()});
 
-        final KeyStore newKeyStore = toTest.moveContents(originalKeyStore, oldPassword, newPassword);
+        final KeyStore newKeyStore = KeystoreUtils.newStoreCopyContent(originalKeyStore, oldPassword, newPassword);
         assertEquals(keyPair1.privateKey(), newKeyStore.getKey("privkey1", newPassword));
         assertEquals(keyPair2.privateKey(), newKeyStore.getKey("privkey2", newPassword));
         assertEquals(keyPair3.privateKey(), newKeyStore.getKey("privkey3", newPassword));
+    }
+
+    @Test
+    void testMatchingPrivatePublicKeysvalid() throws Exception {
+        KeyPairGenerator keyGen = KeyPairGenerator.getInstance(KEY_GENERATION_ALGORITHM);
+        keyGen.initialize(2048);
+        final java.security.KeyPair keyPair = keyGen.genKeyPair();
+        Assertions.assertThat(KeystoreUtils.matchingKeys(keyPair.getPrivate(), keyPair.getPublic())).isTrue();
+    }
+
+    @Test
+    void testMatchingPrivatePublicKeysInvalid() throws Exception {
+        KeyPairGenerator keyGen1 = KeyPairGenerator.getInstance(KEY_GENERATION_ALGORITHM);
+        keyGen1.initialize(2048);
+        final java.security.KeyPair keyPair1 = keyGen1.genKeyPair();
+        KeyPairGenerator keyGen2 = KeyPairGenerator.getInstance(KEY_GENERATION_ALGORITHM);
+        keyGen2.initialize(2048);
+        final java.security.KeyPair keyPair2 = keyGen2.genKeyPair();
+        //mixing keys from different pairs
+        Assertions.assertThat(KeystoreUtils.matchingKeys(keyPair1.getPrivate(), keyPair2.getPublic())).isFalse();
     }
 }

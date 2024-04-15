@@ -14,15 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.certutil.keystore.storage;
+package org.graylog2.plugin.inputs;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.security.KeyStore;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public interface KeystoreContentMover {
-
-    KeyStore moveContents(final KeyStore originalKeyStore,
-                          char[] currentPassword,
-                          final char[] newPassword) throws GeneralSecurityException, IOException;
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface CloudCompatible {
 }
