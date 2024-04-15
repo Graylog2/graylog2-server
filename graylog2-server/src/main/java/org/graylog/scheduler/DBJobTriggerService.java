@@ -29,6 +29,7 @@ import com.mongodb.client.model.ReturnDocument;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import one.util.streamex.StreamEx;
+import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog.scheduler.capabilities.SchedulerCapabilitiesService;
@@ -39,7 +40,6 @@ import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.plugin.system.NodeId;
-import org.graylog2.shared.utilities.MongoQueryUtils;
 import org.joda.time.DateTime;
 import org.mongojack.DBQuery;
 
@@ -55,6 +55,7 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static com.mongodb.client.model.Filters.and;
+import static com.mongodb.client.model.Filters.elemMatch;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.exists;
 import static com.mongodb.client.model.Filters.gt;
@@ -104,7 +105,7 @@ public class DBJobTriggerService {
     private final SchedulerCapabilitiesService schedulerCapabilitiesService;
     private final Duration lockExpirationDuration;
     private final MongoCollection<JobTriggerDto> collection;
-    private MongoUtils<JobTriggerDto> mongoUtils;
+    private final MongoUtils<JobTriggerDto> mongoUtils;
 
     @Inject
     public DBJobTriggerService(MongoCollections mongoCollections,
@@ -344,7 +345,10 @@ public class DBJobTriggerService {
     public Optional<JobTriggerDto> nextRunnableTrigger() {
         final DateTime now = clock.nowUTC();
 
-        final var constraintsQuery = MongoQueryUtils.getArrayIsContainedQuery(FIELD_CONSTRAINTS, schedulerCapabilitiesService.getNodeCapabilities());
+        // exclude triggers which require a constraint that is not satisfied by this node
+        final var constraintsQuery = not(
+                elemMatch(FIELD_CONSTRAINTS, new Document("$nin", schedulerCapabilitiesService.getNodeCapabilities()))
+        );
 
         final var filter = or(and(
                         // We cannot lock a trigger that is already locked by another node
