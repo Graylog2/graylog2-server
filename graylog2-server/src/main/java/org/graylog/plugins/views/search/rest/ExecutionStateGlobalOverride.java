@@ -107,7 +107,7 @@ public abstract class ExecutionStateGlobalOverride {
         public abstract Builder searchTypes(ImmutableMap<String, SearchTypeExecutionState> searchTypes);
 
         @JsonProperty
-        public abstract Builder now(DateTime now);
+        public abstract Builder now(@Nullable DateTime now);
 
         public abstract ImmutableMap.Builder<String, SearchTypeExecutionState> searchTypesBuilder();
 
