@@ -42,7 +42,7 @@ public class AggregationWidgetExportResource extends RestResource {
     @ApiOperation(value = "Export widget data")
     @POST
     @NoAuditEvent("") //TODO: do we need an audit event for widget data export???
-    public AggregationWidgetExportResponse export(@ApiParam @Valid PivotResult pivotResult) {
+    public AggregationWidgetExportResponse exportData(@ApiParam @Valid PivotResult pivotResult) {
         return AggregationWidgetExportResponse.fromPivotResult(pivotResult);
     }
 }
