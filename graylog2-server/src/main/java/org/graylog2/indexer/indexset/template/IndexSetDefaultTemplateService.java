@@ -31,18 +31,19 @@ public class IndexSetDefaultTemplateService {
     private static final Logger LOG = LoggerFactory.getLogger(IndexSetDefaultTemplateService.class);
 
     private final ClusterConfigService clusterConfigService;
-
     private final IndexSetTemplateService indexSetTemplateService;
-
     private final IndexSetDefaultTemplateConfigFactory indexSetDefaultTemplateConfigFactory;
+    private final IndexSetTemplateProvider indexSetTemplateProvider;
 
     @Inject
     public IndexSetDefaultTemplateService(ClusterConfigService clusterConfigService,
                                           IndexSetTemplateService indexSetTemplateService,
-                                          IndexSetDefaultTemplateConfigFactory indexSetDefaultTemplateConfigFactory) {
+                                          IndexSetDefaultTemplateConfigFactory indexSetDefaultTemplateConfigFactory,
+                                          IndexSetTemplateProvider indexSetTemplateProvider) {
         this.clusterConfigService = clusterConfigService;
         this.indexSetTemplateService = indexSetTemplateService;
         this.indexSetDefaultTemplateConfigFactory = indexSetDefaultTemplateConfigFactory;
+        this.indexSetTemplateProvider = indexSetTemplateProvider;
     }
 
     public Optional<IndexSetTemplate> getDefaultIndexSetTemplate() {

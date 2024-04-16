@@ -1,0 +1,40 @@
+[
+    {
+      "title": "Simple Cloud Template",
+      "description": "A simple template that is compatible with the Cloud environment.",
+      "read_only": true,
+      "index_set_config": {
+        "index_analyzer": "standard",
+        "shards": 4,
+        "replicas": 0,
+        "index_optimization_max_num_segments": 1,
+        "index_optimization_disabled": false,
+        "field_type_refresh_interval": 5,
+        "field_type_refresh_interval_unit": "SECONDS",
+        "rotation_strategy_class": "org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy",
+        "rotation_strategy_config": {
+          "type": "org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig",
+          "max_docs_per_index": 20000000
+        },
+        "retention_strategy_class": "org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy",
+        "retention_strategy_config": {
+          "type": "org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig",
+          "max_number_of_indices": 10
+        },
+        "data_tiering": {
+          "type": "hot_only",
+          "index_lifetime_min": "P30D",
+          "index_lifetime_max": "P40D"
+        },
+        "use_legacy_rotation": true,
+        "retention_strategy": {
+          "type": "org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig",
+          "max_number_of_indices": 20
+        },
+        "rotation_strategy": {
+          "type": "org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig",
+          "max_docs_per_index": 20000000
+        }
+      }
+    }
+  ]
