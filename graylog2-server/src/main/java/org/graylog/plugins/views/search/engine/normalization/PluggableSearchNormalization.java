@@ -24,6 +24,7 @@ import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.ExecutionState;
 import org.graylog.plugins.views.search.rest.ExecutionStateGlobalOverride;
 import org.graylog2.plugin.Tools;
+import org.joda.time.DateTime;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -68,13 +69,18 @@ public class PluggableSearchNormalization implements SearchNormalization {
     @Override
     public Search preValidation(Search search, SearchUser searchUser, ExecutionState executionState) {
         final Search searchWithStreams = search.addStreamsToQueriesWithoutStreams(() -> searchUser.streams().loadMessageStreamsWithFallback());
-        final var now = Optional.ofNullable(executionState.globalOverride())
-                .flatMap(ExecutionStateGlobalOverride::now)
-                .orElse(Tools.nowUTC());
-        Search normalizedSearch = searchWithStreams.applyExecutionState(firstNonNull(executionState, ExecutionState.empty()))
+        final var now = referenceDateFromOverrideOrNow(executionState);
+        final var normalizedSearch = searchWithStreams.applyExecutionState(firstNonNull(executionState, ExecutionState.empty()))
                 .withReferenceDate(now);
 
         return normalize(normalizedSearch, pluggableNormalizers);
+    }
+
+    private DateTime referenceDateFromOverrideOrNow(ExecutionState executionState) {
+        return Optional.ofNullable(executionState)
+                .map(ExecutionState::globalOverride)
+                .flatMap(ExecutionStateGlobalOverride::now)
+                .orElse(Tools.nowUTC());
     }
 
     @Override
