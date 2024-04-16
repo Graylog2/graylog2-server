@@ -19,7 +19,7 @@ package org.graylog.datanode.initializers;
 import com.github.joschi.jadconfig.util.Duration;
 import org.assertj.core.api.Assertions;
 import org.graylog2.security.IndexerJwtAuthTokenProvider;
-import jakarta.validation.constraints.NotNull;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;

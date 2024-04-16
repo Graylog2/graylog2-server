@@ -18,7 +18,7 @@ package org.graylog.datanode.configuration;
 
 import org.assertj.core.api.Assertions;
 import org.graylog.datanode.OpensearchDistribution;
-import jakarta.validation.constraints.NotNull;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;

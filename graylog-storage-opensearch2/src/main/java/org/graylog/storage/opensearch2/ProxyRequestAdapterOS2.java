@@ -29,7 +29,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.indexer.datanode.ProxyRequestAdapter;
 import org.graylog2.rest.resources.datanodes.DatanodeResolver;
-import jakarta.validation.constraints.NotNull;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.net.URI;
