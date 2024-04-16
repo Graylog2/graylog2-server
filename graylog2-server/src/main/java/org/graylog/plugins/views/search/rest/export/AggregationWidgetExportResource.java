@@ -1,0 +1,48 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+package org.graylog.plugins.views.search.rest.export;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import jakarta.validation.Valid;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog.plugins.views.search.rest.export.response.AggregationWidgetExportResponse;
+import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
+import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.rest.MoreMediaTypes;
+import org.graylog2.shared.rest.resources.RestResource;
+
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+
+@Api(value = "Search/Pivot/Export", tags = {CLOUD_VISIBLE})
+@Path("/views/search/pivot/export")
+@RequiresAuthentication
+@Produces({MoreMediaTypes.TEXT_CSV, MediaType.APPLICATION_JSON})
+public class AggregationWidgetExportResource extends RestResource {
+
+    @ApiOperation(value = "Export widget data")
+    @POST
+    @NoAuditEvent("") //TODO: do we need an audit event for widget data export???
+    public AggregationWidgetExportResponse export(@ApiParam @Valid PivotResult pivotResult) {
+        return AggregationWidgetExportResponse.fromPivotResult(pivotResult);
+    }
+}

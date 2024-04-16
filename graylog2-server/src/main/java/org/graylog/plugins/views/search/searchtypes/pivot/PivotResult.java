@@ -120,6 +120,11 @@ public abstract class PivotResult implements SearchType.Result {
         @AutoValue.Builder
         public abstract static class Builder {
 
+            @JsonCreator
+            public static PivotResult.Row.Builder create() {
+                return new AutoValue_PivotResult_Row.Builder();
+            }
+
             @JsonProperty
             public abstract Builder key(ImmutableList<String> key);
 
