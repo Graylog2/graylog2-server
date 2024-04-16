@@ -19,7 +19,7 @@ import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import { asMock } from 'helpers/mocking';
 import createSearch from 'views/logic/slices/createSearch';
 import useAppSelector from 'stores/useAppSelector';
@@ -70,9 +70,7 @@ describe('QueryTitle', () => {
     </TestStoreProvider>
   );
 
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   describe('duplicate action', () => {
     it('triggers duplication of query', async () => {

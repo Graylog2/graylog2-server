@@ -35,7 +35,7 @@ import SearchResult from 'views/logic/SearchResult';
 import reexecuteSearchTypes from 'views/components/widgets/reexecuteSearchTypes';
 import type { SearchErrorResponse } from 'views/logic/SearchError';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
 
 import type { MessageListResult } from './MessageList';
@@ -97,17 +97,15 @@ describe('MessageList', () => {
     total: 1,
   };
 
-  beforeAll(() => {
-    loadViewsPlugin();
+  useViewsPlugin();
 
+  beforeAll(() => {
     asMock(useAutoRefresh).mockReturnValue({
       refreshConfig: null,
       startAutoRefresh: () => {},
       stopAutoRefresh: () => {},
     });
   });
-
-  afterAll(unloadViewsPlugin);
 
   beforeEach(() => {
     asMock(useActiveQueryId).mockReturnValue('somequery');

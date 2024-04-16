@@ -21,7 +21,7 @@ import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
 import type { QueryId } from 'views/logic/queries/Query';
 import Query from 'views/logic/queries/Query';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { asMock } from 'helpers/mocking';
 import useAppDispatch from 'stores/useAppDispatch';
@@ -55,9 +55,7 @@ describe('CycleQueryTab', () => {
   ]).build();
   const view = View.create().toBuilder().search(search).build();
 
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   beforeEach(() => {
     jest.useFakeTimers();
