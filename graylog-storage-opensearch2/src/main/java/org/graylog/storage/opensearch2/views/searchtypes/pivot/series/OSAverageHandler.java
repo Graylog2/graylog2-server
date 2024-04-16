@@ -48,7 +48,7 @@ public class OSAverageHandler extends OSPivotSeriesSpecHandler<Average, Avg> {
                                                                  OSGeneratedQueryContext OSGeneratedQueryContext) {
         double value = avgAggregation.getValue();
         if (pivotSpec.wholeNumber()) {
-            if (value == Double.POSITIVE_INFINITY) {
+            if (Double.isNaN(value) || Double.isInfinite(value)) {
                 value = 0;
             } else {
                 value = Math.round(value);
