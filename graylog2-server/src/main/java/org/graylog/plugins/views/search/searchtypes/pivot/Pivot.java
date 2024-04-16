@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.SearchType;
+import org.graylog.plugins.views.search.SearchTypeBuilder;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.rest.SearchTypeExecutionState;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
@@ -31,7 +32,6 @@ import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.entities.PivotEntity;
 import org.graylog2.contentpacks.model.entities.SearchTypeEntity;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
-import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -105,14 +105,6 @@ public abstract class Pivot implements SearchType {
         return toBuilder().filters(filters).build();
     }
 
-    @Override
-    public SearchType withReferenceDate(DateTime now) {
-        return timerange()
-                .map(tr -> tr.withReferenceDate(now))
-                .map(tr -> toBuilder().timerange(tr).build())
-                .orElse(this);
-    }
-
     public static Builder builder() {
         return new AutoValue_Pivot.Builder()
                 .type(NAME)
@@ -124,7 +116,7 @@ public abstract class Pivot implements SearchType {
     }
 
     @AutoValue.Builder
-    public static abstract class Builder {
+    public static abstract class Builder implements SearchTypeBuilder {
         @JsonCreator
         public static Builder createDefault() {
             return builder()

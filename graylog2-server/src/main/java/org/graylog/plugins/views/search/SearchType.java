@@ -97,7 +97,14 @@ public interface SearchType extends ContentPackable<SearchTypeEntity>, Exportabl
 
     SearchType withFilters(List<UsedSearchFilter> filters);
 
-    SearchType withReferenceDate(DateTime now);
+    default SearchType withReferenceDate(DateTime now) {
+        return timerange()
+                .map(tr -> tr.withReferenceDate(now))
+                .map(tr -> toBuilder().timerange(tr).build())
+                .orElse(this);
+    }
+
+    SearchTypeBuilder toBuilder();
 
     /**
      * Each search type should declare an implementation of its result conforming to this interface.
@@ -244,8 +251,19 @@ public interface SearchType extends ContentPackable<SearchTypeEntity>, Exportabl
         }
 
         @Override
-        public SearchType withReferenceDate(DateTime now) {
-            return this;
+        public SearchTypeBuilder toBuilder() {
+            final var searchType = this;
+            return new SearchTypeBuilder() {
+                @Override
+                public SearchType build() {
+                    return searchType;
+                }
+
+                @Override
+                public SearchTypeBuilder timerange(DerivedTimeRange timerange) {
+                    return this;
+                }
+            };
         }
     }
 

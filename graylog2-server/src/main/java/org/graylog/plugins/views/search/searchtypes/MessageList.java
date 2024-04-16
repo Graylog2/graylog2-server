@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.SearchType;
+import org.graylog.plugins.views.search.SearchTypeBuilder;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.rest.SearchTypeExecutionState;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
@@ -37,7 +38,6 @@ import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.rest.models.messages.responses.DecorationStats;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
-import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -136,16 +136,8 @@ public abstract class MessageList implements SearchType {
         return toBuilder().filters(filters).build();
     }
 
-    @Override
-    public SearchType withReferenceDate(DateTime now) {
-        return timerange()
-                .map(tr -> tr.withReferenceDate(now))
-                .map(tr -> toBuilder().timerange(tr).build())
-                .orElse(this);
-    }
-
     @AutoValue.Builder
-    public abstract static class Builder {
+    public abstract static class Builder implements SearchTypeBuilder {
         @JsonCreator
         public static Builder createDefault() {
             return builder()
