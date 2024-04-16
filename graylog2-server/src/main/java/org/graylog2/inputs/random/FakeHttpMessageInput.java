@@ -25,8 +25,10 @@ import org.graylog2.inputs.transports.RandomMessageTransport;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.configuration.Configuration;
+import org.graylog2.plugin.inputs.CloudCompatible;
 import org.graylog2.plugin.inputs.MessageInput;
 
+@CloudCompatible
 public class FakeHttpMessageInput extends MessageInput {
 
     private static final String NAME = "Random HTTP message generator";
@@ -60,7 +62,7 @@ public class FakeHttpMessageInput extends MessageInput {
             super(NAME, false, "");
         }
 
-        public static boolean isCloudCompatible() {
+        public boolean isCloudCompatible() {
             return true;
         }
     }
