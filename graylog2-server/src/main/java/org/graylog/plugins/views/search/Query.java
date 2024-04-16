@@ -90,25 +90,10 @@ public abstract class Query implements ContentPackable<QueryEntity>, UsesSearchF
     @JsonIgnore
     public abstract Optional<GlobalOverride> globalOverride();
 
-    @Deprecated
-    /**
-     * @deprecated {@link Query#effectiveTimeRange(SearchType, DateTime)} is preferred, as it prevents problems with slight time differences between different search types.
-     */
     public TimeRange effectiveTimeRange(SearchType searchType) {
         return searchType.timerange()
                 .map(timeRange -> timeRange.effectiveTimeRange(this, searchType))
                 .orElse(this.timerange());
-    }
-
-    public TimeRange effectiveTimeRange(final SearchType searchType, final DateTime nowUTC) {
-        final TimeRange effectiveTimeRange = searchType.timerange()
-                .map(timeRange -> timeRange.effectiveTimeRange(this, searchType))
-                .orElse(this.timerange());
-
-        if (effectiveTimeRange instanceof RelativeRange relativeRange) {
-            return relativeRange.withReferenceDate(nowUTC);
-        }
-        return effectiveTimeRange;
     }
 
     public Set<String> effectiveStreams(SearchType searchType) {

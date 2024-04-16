@@ -56,9 +56,7 @@ import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.FieldTypeException;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.plugin.Message;
-import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
-import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,7 +71,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContext> {
     private static final Logger LOG = LoggerFactory.getLogger(ElasticsearchBackend.class);
@@ -142,8 +139,6 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 .trackTotalHits(true);
 
 
-        final DateTime nowUTCSharedBetweenSearchTypes = Tools.nowUTC();
-
         final ESGeneratedQueryContext queryContext = queryContextFactory.create(this, searchSourceBuilder, validationErrors, timezone);
         searchTypes.stream()
                 .filter(searchType -> !isSearchTypeWithError(queryContext, searchType.id()))
@@ -165,7 +160,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                             .must(
                                     Objects.requireNonNull(
                                             TimeRangeQueryFactory.create(
-                                                    query.effectiveTimeRange(searchType, nowUTCSharedBetweenSearchTypes)
+                                                    query.effectiveTimeRange(searchType)
                                             ),
                                             "Timerange for search type " + searchType.id() + " cannot be found in query or search type."
                                     )
@@ -250,8 +245,8 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                             .filter(s -> s.id().equalsIgnoreCase(searchTypeId)).findFirst()
                             .flatMap(searchType -> {
                                 if (searchType.effectiveStreams().isEmpty()
-                                        && !query.globalOverride().flatMap(GlobalOverride::timerange).isPresent()
-                                        && !searchType.timerange().isPresent()) {
+                                        && query.globalOverride().flatMap(GlobalOverride::timerange).isEmpty()
+                                        && searchType.timerange().isEmpty()) {
                                     return Optional.empty();
                                 }
                                 return Optional.of(indexLookup.indexNamesForStreamsInTimeRange(query.effectiveStreams(searchType), query.effectiveTimeRange(searchType)));
@@ -264,7 +259,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                             .indices(indices.toArray(new String[0]))
                             .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN);
                 })
-                .collect(Collectors.toList());
+                .toList();
 
         final List<MultiSearchResponse.Item> results = client.msearch(searches, "Unable to perform search query: ");
 
@@ -324,13 +319,13 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
         if (searchResponse != null && searchResponse.getFailedShards() > 0) {
             final List<Throwable> shardFailures = Arrays.stream(searchResponse.getShardFailures())
                     .map(ShardOperationFailedException::getCause)
-                    .collect(Collectors.toList());
+                    .toList();
             final List<String> nonNumericFieldErrors = shardFailures
                     .stream()
-                    .filter(shardFailure -> shardFailure.getMessage().contains("Expected numeric type on field"))
                     .map(Throwable::getMessage)
+                    .filter(message -> message.contains("Expected numeric type on field"))
                     .distinct()
-                    .collect(Collectors.toList());
+                    .toList();
             if (!nonNumericFieldErrors.isEmpty()) {
                 return Optional.of(new FieldTypeException("Unable to perform search query: ", nonNumericFieldErrors));
             }
@@ -339,7 +334,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                     .stream()
                     .map(Throwable::getMessage)
                     .distinct()
-                    .collect(Collectors.toList());
+                    .toList();
             return Optional.of(new ElasticsearchException("Unable to perform search query: ", errors));
         }
 
