@@ -46,6 +46,14 @@ public class OSAverageHandler extends OSPivotSeriesSpecHandler<Average, Avg> {
                                                                  Avg avgAggregation,
                                                                  OSSearchTypeHandler<Pivot> searchTypeHandler,
                                                                  OSGeneratedQueryContext OSGeneratedQueryContext) {
-        return Stream.of(OSPivotSeriesSpecHandler.Value.create(pivotSpec.id(), Average.NAME, avgAggregation.getValue()));
+        double value = avgAggregation.getValue();
+        if (pivotSpec.wholeNumber()) {
+            if (value == Double.POSITIVE_INFINITY) {
+                value = 0;
+            } else {
+                value = Math.round(value);
+            }
+        }
+        return Stream.of(OSPivotSeriesSpecHandler.Value.create(pivotSpec.id(), Average.NAME, value));
     }
 }
