@@ -20,15 +20,20 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import jakarta.validation.Valid;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.search.rest.export.response.AggregationWidgetExportResponse;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.rest.MoreMediaTypes;
+import org.graylog2.rest.RestTools;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
@@ -36,13 +41,21 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 @Api(value = "Search/Pivot/Export", tags = {CLOUD_VISIBLE})
 @Path("/views/search/pivot/export")
 @RequiresAuthentication
-@Produces({MoreMediaTypes.TEXT_CSV, MediaType.APPLICATION_JSON})
+@Consumes(MediaType.APPLICATION_JSON)
 public class AggregationWidgetExportResource extends RestResource {
 
     @ApiOperation(value = "Export widget data")
     @POST
     @NoAuditEvent("") //TODO: do we need an audit event for widget data export???
-    public AggregationWidgetExportResponse exportData(@ApiParam @Valid PivotResult pivotResult) {
-        return AggregationWidgetExportResponse.fromPivotResult(pivotResult);
+    @Produces({MoreMediaTypes.TEXT_CSV, MediaType.APPLICATION_JSON})
+    @Path("/{filename}")
+    public Response exportData(@ApiParam @Valid PivotResult pivotResult,
+                               @HeaderParam("Accept") String mediaType,
+                               @ApiParam("filename") @PathParam("filename") String filename) {
+        return RestTools.respondWithFile(
+                        filename,
+                        AggregationWidgetExportResponse.fromPivotResult(pivotResult),
+                        MediaType.valueOf(mediaType))
+                .build();
     }
 }
