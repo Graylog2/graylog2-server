@@ -16,15 +16,17 @@
  */
 package org.graylog.plugins.views.search.engine.normalization;
 
+import jakarta.inject.Inject;
 import org.graylog.plugins.views.search.ParameterProvider;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.ExecutionState;
-
-import jakarta.inject.Inject;
+import org.graylog.plugins.views.search.rest.ExecutionStateGlobalOverride;
+import org.graylog2.plugin.Tools;
 
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
@@ -66,7 +68,11 @@ public class PluggableSearchNormalization implements SearchNormalization {
     @Override
     public Search preValidation(Search search, SearchUser searchUser, ExecutionState executionState) {
         final Search searchWithStreams = search.addStreamsToQueriesWithoutStreams(() -> searchUser.streams().loadMessageStreamsWithFallback());
-        Search normalizedSearch = searchWithStreams.applyExecutionState(firstNonNull(executionState, ExecutionState.empty()));
+        final var now = Optional.ofNullable(executionState.globalOverride())
+                .flatMap(ExecutionStateGlobalOverride::now)
+                .orElse(Tools.nowUTC());
+        Search normalizedSearch = searchWithStreams.applyExecutionState(firstNonNull(executionState, ExecutionState.empty()))
+                .withReferenceDate(now);
 
         return normalize(normalizedSearch, pluggableNormalizers);
     }

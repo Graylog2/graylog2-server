@@ -30,6 +30,7 @@ import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
 import org.graylog2.contentpacks.model.entities.SearchTypeEntity;
+import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -95,6 +96,8 @@ public interface SearchType extends ContentPackable<SearchTypeEntity>, Exportabl
     }
 
     SearchType withFilters(List<UsedSearchFilter> filters);
+
+    SearchType withReferenceDate(DateTime now);
 
     /**
      * Each search type should declare an implementation of its result conforming to this interface.
@@ -238,6 +241,11 @@ public interface SearchType extends ContentPackable<SearchTypeEntity>, Exportabl
         @Override
         public SearchTypeEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
             return null;
+        }
+
+        @Override
+        public SearchType withReferenceDate(DateTime now) {
+            return this;
         }
     }
 

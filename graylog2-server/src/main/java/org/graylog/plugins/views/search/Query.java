@@ -105,8 +105,8 @@ public abstract class Query implements ContentPackable<QueryEntity>, UsesSearchF
                 .map(timeRange -> timeRange.effectiveTimeRange(this, searchType))
                 .orElse(this.timerange());
 
-        if (effectiveTimeRange instanceof RelativeRange) {
-            return ((RelativeRange) effectiveTimeRange).toBuilder().nowUTC(nowUTC).build();
+        if (effectiveTimeRange instanceof RelativeRange relativeRange) {
+            return relativeRange.withReferenceDate(nowUTC);
         }
         return effectiveTimeRange;
     }
@@ -141,15 +141,27 @@ public abstract class Query implements ContentPackable<QueryEntity>, UsesSearchF
             return this;
         }
 
-        if (state.timerange().isPresent() || state.query().isPresent() || !state.searchTypes().isEmpty() || !state.keepSearchTypes().isEmpty() || !state.keepQueries().isEmpty()) {
+        if (state.timerange().isPresent()
+                || state.query().isPresent()
+                || !state.searchTypes().isEmpty()
+                || !state.keepSearchTypes().isEmpty()
+                || !state.keepQueries().isEmpty()
+                || state.now().isPresent()) {
             final Builder builder = toBuilder();
+
+            state.now().ifPresent(now -> {
+                builder.timerange(timerange().withReferenceDate(now));
+            });
 
             if (state.timerange().isPresent() || state.query().isPresent()) {
                 final GlobalOverride.Builder globalOverrideBuilder = globalOverride().map(GlobalOverride::toBuilder)
                         .orElseGet(GlobalOverride::builder);
                 state.timerange().ifPresent(timeRange -> {
-                    globalOverrideBuilder.timerange(timeRange);
-                    builder.timerange(timeRange);
+                    final var timerangeWithNow = state.now()
+                            .map(timeRange::withReferenceDate)
+                            .orElse(timeRange);
+                    globalOverrideBuilder.timerange(timerangeWithNow);
+                    builder.timerange(timerangeWithNow);
                 });
 
                 state.query().ifPresent(query -> {
@@ -169,6 +181,7 @@ public abstract class Query implements ContentPackable<QueryEntity>, UsesSearchF
 
                 builder.searchTypes(ImmutableSet.copyOf(searchTypesWithOverrides));
             }
+
             return builder.build();
         }
         return this;
@@ -247,6 +260,15 @@ public abstract class Query implements ContentPackable<QueryEntity>, UsesSearchF
         return searchTypes().stream()
                 .map(SearchType::id)
                 .anyMatch(id -> id.equals(searchTypeId));
+    }
+
+    public Query withReferenceDate(DateTime now) {
+        return toBuilder()
+                .timerange(timerange().withReferenceDate(now))
+                .searchTypes(searchTypes().stream()
+                        .map(s -> s.withReferenceDate(now))
+                        .collect(toSet()))
+                .build();
     }
 
     @AutoValue.Builder
