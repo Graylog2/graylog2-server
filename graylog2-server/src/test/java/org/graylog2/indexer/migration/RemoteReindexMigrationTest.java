@@ -22,7 +22,7 @@ import com.jayway.jsonpath.JsonPath;
 import org.assertj.core.api.Assertions;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.jetbrains.annotations.NotNull;
+import jakarta.annotation.Nonnull;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -43,7 +43,7 @@ class RemoteReindexMigrationTest {
         Assertions.assertThat(migration.progress()).isEqualTo(60);
     }
 
-    @NotNull
+    @Nonnull
     private static RemoteReindexIndex index(String indexName, RemoteReindexingMigrationAdapter.Status status) {
 
         final IndexMigrationProgress progress = switch (status) {
@@ -88,7 +88,7 @@ class RemoteReindexMigrationTest {
         Assertions.assertThat(progress).isEqualTo(50);
     }
 
-    @NotNull
+    @Nonnull
     private static RemoteReindexMigration withIndices(RemoteReindexIndex... indices) {
         return new RemoteReindexMigration(UUID.randomUUID().toString(), Arrays.asList(indices), Collections.emptyList());
     }

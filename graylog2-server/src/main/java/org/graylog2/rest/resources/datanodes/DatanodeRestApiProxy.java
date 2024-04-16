@@ -36,7 +36,7 @@ import org.graylog2.cluster.nodes.NodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.indexer.datanode.ProxyRequestAdapter;
 import org.graylog2.security.IndexerJwtAuthTokenProvider;
-import org.jetbrains.annotations.NotNull;
+import jakarta.annotation.Nonnull;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -68,7 +68,7 @@ public class DatanodeRestApiProxy implements ProxyRequestAdapter {
         httpClient = withTimeout(okHttpClient, defaultProxyTimeout);
     }
 
-    @NotNull
+    @Nonnull
     private static OkHttpClient withTimeout(OkHttpClient okHttpClient, com.github.joschi.jadconfig.util.Duration defaultProxyTimeout) {
         final Duration timeout = Duration.ofMillis(defaultProxyTimeout.toMilliseconds());
         return okHttpClient.newBuilder()
@@ -97,7 +97,7 @@ public class DatanodeRestApiProxy implements ProxyRequestAdapter {
         }
     }
 
-    @NotNull
+    @Nonnull
     private static ByteArrayOutputStream copyRequestBody(ProxyRequest request) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (InputStream requestBody = request.body()) {
@@ -146,7 +146,7 @@ public class DatanodeRestApiProxy implements ProxyRequestAdapter {
         return response.header("Content-Type");
     }
 
-    @NotNull
+    @Nonnull
     private static RequestBody getBody(ProxyRequest request) throws IOException {
         return RequestBody.create(IOUtils.toByteArray(request.body()), MediaType.parse("application/json"));
     }

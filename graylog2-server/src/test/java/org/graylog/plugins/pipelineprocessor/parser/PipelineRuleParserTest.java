@@ -60,7 +60,7 @@ import org.graylog2.plugin.InstantMillisProvider;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.TestMessageFactory;
-import org.jetbrains.annotations.NotNull;
+import jakarta.annotation.Nonnull;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
@@ -716,13 +716,13 @@ public class PipelineRuleParserTest extends BaseParserTest {
             return ImmutableList.of();
         }
 
-        @NotNull
+        @Nonnull
         @Override
         protected String getRuleBuilderName() {
             return null;
         }
 
-        @NotNull
+        @Nonnull
         @Override
         protected String getRuleBuilderTitle() {
             return null;
