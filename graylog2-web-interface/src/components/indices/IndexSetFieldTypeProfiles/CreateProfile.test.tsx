@@ -20,7 +20,7 @@ import selectEvent from 'react-select-event';
 import userEvent from '@testing-library/user-event';
 
 import asMock from 'helpers/mocking/AsMock';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 import CreateProfile from 'components/indices/IndexSetFieldTypeProfiles/CreateProfile';
@@ -47,9 +47,7 @@ describe('CreateProfile', () => {
   const editMock = jest.fn(() => Promise.resolve());
   const deleteMock = jest.fn(() => Promise.resolve());
 
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   beforeEach(() => {
     asMock(useFieldTypesForMappings).mockReturnValue({

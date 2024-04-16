@@ -27,7 +27,7 @@ import Query, { filtersForQuery } from 'views/logic/queries/Query';
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 import type { SearchExecutionResult } from 'views/types';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import useAppDispatch from 'stores/useAppDispatch';
 import executeSearch from 'views/logic/slices/executeJobResult';
 import generateId from 'logic/generateId';
@@ -57,9 +57,7 @@ describe('DefaultFieldTypesProvider', () => {
     return consume;
   };
 
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   it('provides no field types with empty store', () => {
     asMock(useCurrentQuery).mockReturnValue(Query.builder().id('foobar').build());
