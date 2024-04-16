@@ -17,7 +17,9 @@
 package org.graylog.storage.opensearch2;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.rholder.retry.Attempt;
 import com.github.rholder.retry.RetryException;
+import com.github.rholder.retry.RetryListener;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
@@ -83,7 +85,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -145,9 +146,11 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
 
     private void doStartMigration(MigrationConfiguration migration, RemoteReindexRequest request) {
         try {
-            prepareCluster(request.allowlist());
-            createIndicesInNewCluster(migration);
-            startAsyncTasks(migration, request);
+            new Thread(() -> {
+                prepareCluster(request.allowlist(), migration);
+                createIndicesInNewCluster(migration);
+                startAsyncTasks(migration, request);
+            }).start();
         } catch (Exception e) {
             LOG.error("Failed to start remote reindex migration", e);
             throw new RuntimeException(e);
@@ -164,7 +167,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         });
     }
 
-    private void prepareCluster(String allowlistAsString) {
+    private void prepareCluster(String allowlistAsString, MigrationConfiguration migration) {
         Preconditions.checkArgument(allowlistAsString != null, "Allowlist has to be provided in the request.");
         final var activeNodes = getAllActiveNodeIDs();
         List<String> allowlist = Arrays.stream(allowlistAsString.split(",")).map(String::trim).toList();
@@ -173,12 +176,18 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         } catch (RemoteReindexNotAllowedException e) {
             // this is expected state for fresh datanode cluster - there is no value configured in the reindex.remote.allowlist
             // we have to add it to the configuration and wait till the whole cluster restarts
+            logInfo(migration, "Preparing cluster for remote reindexing, setting allowlist to: " + allowlistAsString);
             allowReindexingFrom(allowlist);
-            waitForClusterRestart(activeNodes);
+            waitForClusterRestart(activeNodes, migration);
         }
 
-        // verify again, just to be sure that all the configuration is in place and vali
-        verifyRemoteReindexAllowlistSetting(allowlist);
+        // verify again, just to be sure that all the configuration is in place and valid
+        try {
+            verifyRemoteReindexAllowlistSetting(allowlist);
+        } catch (RemoteReindexNotAllowedException e) {
+            logError(migration, "Failed to configure datanode cluster for remote reindexing from " + allowlistAsString, e);
+            throw e;
+        }
     }
 
     private ReindexRequest createReindexRequest(final String index, final BytesReference query, URI uri, String username, String password, MigrationConfiguration migration) {
@@ -196,7 +205,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
                     final List<RemoteReindexIndex> indices = migrationConfiguration.indices()
                             .parallelStream()
                             .map(indexConfig -> indexConfig.taskId().flatMap(this::getTask).map(task -> taskToIndex(indexConfig.indexName(), task))
-                                    .orElse(RemoteReindexIndex.notStartedYet(indexConfig.indexName())))
+                                    .orElse(RemoteReindexIndex.noBackgroundTaskYet(indexConfig.indexName())))
                             .sorted(Comparator.comparing(RemoteReindexIndex::name))
                             .collect(Collectors.toList());
                     return new RemoteReindexMigration(migrationID, indices, migrationConfiguration.logs());
@@ -217,7 +226,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
                 return new RemoteReindexIndex(indexName, Status.FINISHED, created, duration, progress, null);
             }
         } else {
-            return new RemoteReindexIndex(indexName, Status.RUNNING, created, duration,progress, null);
+            return new RemoteReindexIndex(indexName, Status.RUNNING, created, duration, progress, null);
         }
     }
 
@@ -269,7 +278,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
                 .map(NodeDto::getNodeId).collect(Collectors.toSet());
     }
 
-    private void waitForClusterRestart(final Set<String> expectedNodes) {
+    private void waitForClusterRestart(final Set<String> expectedNodes, MigrationConfiguration migration) {
         // We are currently unable to detect that datanodes stopped and are starting again. We just hope that
         // these 10 seconds give them enough time and they will restart the opensearch process in the background
         // after 10s we'll wait till all the previously known nodes are up and healthy again.
@@ -279,25 +288,33 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
             LOG.warn("Could not sleep...");
         }
 
-        final var retryer = RetryerBuilder.<Boolean>newBuilder()
+        final var retryer = RetryerBuilder.<Set<String>>newBuilder()
                 .withWaitStrategy(WaitStrategies.fixedWait(WAIT_BETWEEN_CONNECTION_ATTEMPTS, TimeUnit.SECONDS))
                 .withStopStrategy(StopStrategies.stopAfterAttempt(CONNECTION_ATTEMPTS))
-                .retryIfResult(response -> !response)
+                .withRetryListener(new RetryListener() {
+                    @Override
+                    public <V> void onRetry(Attempt<V> attempt) {
+                        if (attempt.hasResult()) {
+                            final Set<String> activeNodes = (Set<String>) attempt.getResult();
+                            final int awaitedNodesCount = expectedNodes.size() - activeNodes.size();
+                            if (awaitedNodesCount > 0) {
+                                final String awaitedNodes = expectedNodes.stream().filter(n -> !activeNodes.contains(n)).collect(Collectors.joining(","));
+                                logInfo(migration, "Waiting for " + awaitedNodesCount + " datanode nodes to reconnect: " + awaitedNodes);
+                            }
+                        } else if (attempt.hasException()) {
+                            logInfo(migration, "Waiting for all data nodes to reconnect, attempt #" + attempt.getAttemptNumber() + ": " + attempt.getExceptionCause().getMessage());
+                        }
+                    }
+                })
                 .retryIfException()
+                .retryIfResult(response -> !response.containsAll(expectedNodes))
                 .build();
-
-        final Callable<Boolean> callable = () -> getAllActiveNodeIDs().containsAll(expectedNodes);
-
         try {
-            var successful = retryer.call(callable);
-            if (!successful) {
-                final String message = "Cluster failed to restart after " + CONNECTION_ATTEMPTS * WAIT_BETWEEN_CONNECTION_ATTEMPTS + " seconds.";
-                LOG.error(message);
-                throw new IllegalStateException(message);
-            }
+            retryer.call(this::getAllActiveNodeIDs);
+            logInfo(migration, "Datanode cluster successfully restarted.");
         } catch (ExecutionException | RetryException e) {
-            final String message = "Cluster failed to restart: " + e.getMessage();
-            LOG.error(message, e);
+            final String message = "Cluster failed to restart after " + CONNECTION_ATTEMPTS * WAIT_BETWEEN_CONNECTION_ATTEMPTS + " seconds.";
+            logError(migration, message, e);
             throw new RuntimeException(message);
         }
     }
