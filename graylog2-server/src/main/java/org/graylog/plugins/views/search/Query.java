@@ -134,10 +134,6 @@ public abstract class Query implements ContentPackable<QueryEntity>, UsesSearchF
                 || state.now().isPresent()) {
             final Builder builder = toBuilder();
 
-            state.now().ifPresent(now -> {
-                builder.timerange(timerange().withReferenceDate(now));
-            });
-
             if (state.timerange().isPresent() || state.query().isPresent()) {
                 final GlobalOverride.Builder globalOverrideBuilder = globalOverride().map(GlobalOverride::toBuilder)
                         .orElseGet(GlobalOverride::builder);
