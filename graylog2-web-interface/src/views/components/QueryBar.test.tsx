@@ -24,7 +24,7 @@ import DashboardPageContext from 'views/components/contexts/DashboardPageContext
 import useQueryIds from 'views/hooks/useQueryIds';
 import useQueryTitles from 'views/hooks/useQueryTitles';
 import useViewMetadata from 'views/hooks/useViewMetadata';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useAppDispatch from 'stores/useAppDispatch';
 import { selectQuery, removeQuery } from 'views/logic/slices/viewSlice';
@@ -67,9 +67,7 @@ const QueryBar = () => (
 describe('QueryBar', () => {
   let oldWindowConfirm;
 
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   beforeEach(() => {
     oldWindowConfirm = window.confirm;

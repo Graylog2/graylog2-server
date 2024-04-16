@@ -22,7 +22,7 @@ import userEvent from '@testing-library/user-event';
 
 import AdaptableQueryTabsConfiguration from 'views/components/AdaptableQueryTabsConfiguration';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import { setQueriesOrder, mergeQueryTitles } from 'views/logic/slices/viewSlice';
 
 jest.mock('views/logic/slices/viewSlice', () => ({
@@ -44,9 +44,7 @@ describe('AdaptableQueryTabsConfiguration', () => {
     window.confirm = oldConfirm;
   });
 
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   const renderConfiguration = () => render((
     <TestStoreProvider>

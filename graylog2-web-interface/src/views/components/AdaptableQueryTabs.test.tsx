@@ -22,7 +22,7 @@ import userEvent from '@testing-library/user-event';
 
 import type { TitlesMap } from 'views/stores/TitleTypes';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import useCurrentQueryId from 'views/logic/queries/useCurrentQueryId';
 import { asMock } from 'helpers/mocking';
 
@@ -90,13 +90,11 @@ describe('AdaptableQueryTabs', () => {
     });
   };
 
-  beforeAll(loadViewsPlugin);
+  useViewsPlugin();
 
   beforeEach(() => {
     asMock(useCurrentQueryId).mockReturnValue('query-id-1');
   });
-
-  afterAll(unloadViewsPlugin);
 
   describe('renders main tabs and more tabs dropdown based on container width', () => {
     // Defaults widths: Container width = 500px, create tab button + more tabs dropdown button with = 215px, width of one main tab = 100px
