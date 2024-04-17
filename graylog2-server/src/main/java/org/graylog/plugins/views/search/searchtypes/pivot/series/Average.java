@@ -39,8 +39,12 @@ public abstract class Average implements SeriesSpec, HasField {
     @Override
     public abstract String id();
 
+    @Override
     @JsonProperty
     public abstract String field();
+
+    @JsonProperty("whole_number")
+    public abstract Boolean wholeNumber();
 
     @Override
     public String literal() {
@@ -55,14 +59,14 @@ public abstract class Average implements SeriesSpec, HasField {
     }
 
     public static Builder builder() {
-        return new AutoValue_Average.Builder().type(NAME);
+        return new AutoValue_Average.Builder().type(NAME).wholeNumber(false);
     }
 
     @AutoValue.Builder
     public abstract static class Builder extends SeriesSpecBuilder<Average, Builder> {
         @JsonCreator
         public static Builder create() {
-            return Average.builder();
+            return Average.builder().wholeNumber(false);
         }
 
         @Override
@@ -72,14 +76,24 @@ public abstract class Average implements SeriesSpec, HasField {
         @JsonProperty
         public abstract Builder field(String field);
 
+        @JsonProperty("whole_number")
+        public abstract Builder wholeNumber(Boolean wholeNumber);
+
         abstract Optional<String> id();
         abstract String field();
+
+        abstract Boolean wholeNumber();
         abstract Average autoBuild();
 
         @Override
         public Average build() {
             if (id().isEmpty()) {
                 id(NAME + "(" + field() + ")");
+            }
+            if (wholeNumber() != null) {
+                wholeNumber(wholeNumber());
+            } else {
+                wholeNumber(false);
             }
             return autoBuild();
         }
