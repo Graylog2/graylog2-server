@@ -16,8 +16,11 @@
  */
 package org.graylog2.indexer.indexset.template;
 
+import com.google.common.collect.ImmutableMap;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
+import org.graylog2.audit.AuditActor;
+import org.graylog2.audit.AuditEventSender;
 import org.graylog2.configuration.IndexSetDefaultTemplateConfigFactory;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -26,6 +29,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 
+import static org.graylog2.audit.AuditEventTypes.ES_INDEX_DEFAULT_TEMPLATE_UPDATE;
+
 public class IndexSetDefaultTemplateService {
 
     private static final Logger LOG = LoggerFactory.getLogger(IndexSetDefaultTemplateService.class);
@@ -33,14 +38,17 @@ public class IndexSetDefaultTemplateService {
     private final ClusterConfigService clusterConfigService;
     private final IndexSetTemplateService indexSetTemplateService;
     private final IndexSetDefaultTemplateConfigFactory indexSetDefaultTemplateConfigFactory;
+    private final AuditEventSender auditEventSender;
 
     @Inject
     public IndexSetDefaultTemplateService(ClusterConfigService clusterConfigService,
                                           IndexSetTemplateService indexSetTemplateService,
-                                          IndexSetDefaultTemplateConfigFactory indexSetDefaultTemplateConfigFactory) {
+                                          IndexSetDefaultTemplateConfigFactory indexSetDefaultTemplateConfigFactory,
+                                          AuditEventSender auditEventSender) {
         this.clusterConfigService = clusterConfigService;
         this.indexSetTemplateService = indexSetTemplateService;
         this.indexSetDefaultTemplateConfigFactory = indexSetDefaultTemplateConfigFactory;
+        this.auditEventSender = auditEventSender;
     }
 
     public Optional<IndexSetTemplate> getDefaultIndexSetTemplate() {
@@ -65,11 +73,15 @@ public class IndexSetDefaultTemplateService {
         return savedTemplate;
     }
 
-    public void setDefault(@NotNull IndexSetDefaultTemplate defaultTemplate) throws NotFoundException {
+    public void setDefault(@NotNull IndexSetDefaultTemplate defaultTemplate, String userName) throws NotFoundException {
         Optional<IndexSetTemplate> indexSetTemplate = indexSetTemplateService.get(defaultTemplate.id());
         if (indexSetTemplate.isPresent()) {
             clusterConfigService.write(defaultTemplate);
-        }else{
+            auditEventSender.success(AuditActor.user(userName), ES_INDEX_DEFAULT_TEMPLATE_UPDATE, ImmutableMap.of(
+                    "template_id", indexSetTemplate.get().id(),
+                    "template_title", indexSetTemplate.get().title()
+            ));
+        } else {
             throw new NotFoundException("Index template with id <%s> doesn't exist!".formatted(defaultTemplate.id()));
         }
     }

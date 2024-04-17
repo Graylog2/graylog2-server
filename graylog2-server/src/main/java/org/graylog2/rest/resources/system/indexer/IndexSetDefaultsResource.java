@@ -30,15 +30,16 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog2.audit.AuditEventTypes;
-import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.indexset.template.IndexSetDefaultTemplate;
 import org.graylog2.indexer.indexset.template.IndexSetDefaultTemplateService;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @RequiresAuthentication
 @Api(value = "System/IndexSetDefaults", description = "Index set defaults")
@@ -57,12 +58,13 @@ public class IndexSetDefaultsResource extends RestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Set index set default template")
     @RequiresPermissions({RestPermissions.CLUSTER_CONFIG_ENTRY_CREATE, RestPermissions.CLUSTER_CONFIG_ENTRY_EDIT})
-    @AuditEvent(type = AuditEventTypes.CLUSTER_CONFIGURATION_UPDATE)
+    @NoAuditEvent("event is handled in service class")
     public Response update(@ApiParam(name = "body", value = "Index set default template id.", required = true)
                            @NotNull IndexSetDefaultTemplate defaultTemplate) throws IOException {
-        //TODO fix audit events
         try {
-            indexSetDefaultTemplateService.setDefault(defaultTemplate);
+            indexSetDefaultTemplateService.setDefault(defaultTemplate, Optional.ofNullable(getCurrentUser())
+                    .map(User::getName)
+                    .orElse("unknown"));
         } catch (NotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
