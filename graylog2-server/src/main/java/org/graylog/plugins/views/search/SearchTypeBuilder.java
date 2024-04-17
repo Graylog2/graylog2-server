@@ -16,10 +16,15 @@
  */
 package org.graylog.plugins.views.search;
 
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
+
+import java.util.List;
 
 public interface SearchTypeBuilder {
     SearchType build();
 
     SearchTypeBuilder timerange(DerivedTimeRange timerange);
+
+    SearchTypeBuilder filters(List<UsedSearchFilter> filters);
 }

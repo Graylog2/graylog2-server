@@ -95,7 +95,9 @@ public interface SearchType extends ContentPackable<SearchTypeEntity>, Exportabl
         return streams();
     }
 
-    SearchType withFilters(List<UsedSearchFilter> filters);
+    default SearchType withFilters(List<UsedSearchFilter> filters) {
+        return this.toBuilder().filters(filters).build();
+    }
 
     default SearchType withReferenceDate(DateTime now) {
         return timerange()
@@ -261,6 +263,11 @@ public interface SearchType extends ContentPackable<SearchTypeEntity>, Exportabl
 
                 @Override
                 public SearchTypeBuilder timerange(DerivedTimeRange timerange) {
+                    return this;
+                }
+
+                @Override
+                public SearchTypeBuilder filters(List<UsedSearchFilter> filters) {
                     return this;
                 }
             };
