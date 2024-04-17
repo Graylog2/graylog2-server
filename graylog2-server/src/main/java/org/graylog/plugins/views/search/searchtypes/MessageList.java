@@ -121,11 +121,6 @@ public abstract class MessageList implements SearchType {
         return this;
     }
 
-    @Override
-    public SearchType withFilter(Filter filter) {
-        return toBuilder().filter(filter).build();
-    }
-
     @AutoValue.Builder
     public abstract static class Builder implements SearchTypeBuilder {
         @JsonCreator

@@ -31,4 +31,6 @@ public interface SearchTypeBuilder {
     SearchTypeBuilder filters(List<UsedSearchFilter> filters);
 
     SearchTypeBuilder query(@Nullable BackendQuery query);
+
+    SearchTypeBuilder filter(@Nullable Filter filter);
 }

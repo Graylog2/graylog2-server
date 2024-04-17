@@ -91,7 +91,9 @@ public interface SearchType extends ContentPackable<SearchTypeEntity>, Exportabl
         return this.toBuilder().query(query).build();
     }
 
-    SearchType withFilter(Filter filter);
+    default SearchType withFilter(Filter filter) {
+        return this.toBuilder().filter(filter).build();
+    }
 
     default Set<String> effectiveStreams() {
         return streams();
@@ -275,6 +277,11 @@ public interface SearchType extends ContentPackable<SearchTypeEntity>, Exportabl
 
                 @Override
                 public SearchTypeBuilder query(@Nullable BackendQuery query) {
+                    return this;
+                }
+
+                @Override
+                public SearchTypeBuilder filter(@Nullable Filter filter) {
                     return this;
                 }
             };

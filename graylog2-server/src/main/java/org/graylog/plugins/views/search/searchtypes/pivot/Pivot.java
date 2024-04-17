@@ -90,11 +90,6 @@ public abstract class Pivot implements SearchType {
         return this;
     }
 
-    @Override
-    public SearchType withFilter(Filter filter) {
-        return toBuilder().filter(filter).build();
-    }
-
     public static Builder builder() {
         return new AutoValue_Pivot.Builder()
                 .type(NAME)
