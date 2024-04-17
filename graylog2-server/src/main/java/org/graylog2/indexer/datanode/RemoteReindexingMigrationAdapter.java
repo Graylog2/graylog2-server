@@ -24,7 +24,7 @@ import java.net.URI;
 
 public interface RemoteReindexingMigrationAdapter {
     enum Status {
-        NOT_STARTED, STARTING, RUNNING, ERROR, FINISHED
+        NOT_STARTED, RUNNING, ERROR, FINISHED
     }
 
     /**
