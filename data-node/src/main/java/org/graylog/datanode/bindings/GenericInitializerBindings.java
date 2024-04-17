@@ -23,7 +23,7 @@ import org.graylog.datanode.configuration.OpensearchConfigurationProvider;
 import org.graylog.datanode.initializers.PeriodicalsService;
 import org.graylog.datanode.management.OpensearchProcess;
 import org.graylog.datanode.management.OpensearchProcessService;
-import org.graylog.datanode.process.OpensearchConfiguration;
+import org.graylog.datanode.state.OpensearchConfiguration;
 import org.graylog.datanode.shutdown.GracefulShutdownService;
 import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.bootstrap.preflight.PreflightConfigServiceImpl;

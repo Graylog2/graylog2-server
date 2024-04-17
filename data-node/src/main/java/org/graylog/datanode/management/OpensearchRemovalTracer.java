@@ -18,9 +18,9 @@ package org.graylog.datanode.management;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import org.graylog.datanode.process.ProcessEvent;
-import org.graylog.datanode.process.ProcessState;
-import org.graylog.datanode.process.StateMachineTracer;
+import org.graylog.datanode.state.DatanodeEvent;
+import org.graylog.datanode.state.DatanodeState;
+import org.graylog.datanode.state.StateMachineTracer;
 import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchStatusException;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
@@ -70,15 +70,15 @@ public class OpensearchRemovalTracer implements StateMachineTracer {
 
 
     @Override
-    public void trigger(ProcessEvent trigger) {
+    public void trigger(DatanodeEvent trigger) {
         LOG.debug("Removal tracer trigger: {}", trigger);
     }
 
     @Override
-    public void transition(ProcessEvent trigger, ProcessState source, ProcessState destination) {
-        if (destination == ProcessState.AVAILABLE && !allocationExcludeChecked) {
+    public void transition(DatanodeEvent trigger, DatanodeState source, DatanodeState destination) {
+        if (destination == DatanodeState.AVAILABLE && !allocationExcludeChecked) {
             checkAllocationEnabledStatus();
-        } else if (trigger == ProcessEvent.PROCESS_REMOVE) {
+        } else if (trigger == DatanodeEvent.PROCESS_REMOVE) {
             triggerRemoval();
         }
     }
@@ -119,11 +119,11 @@ public class OpensearchRemovalTracer implements StateMachineTracer {
                     executorService = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("datanode-removal").build());
                     executorService.scheduleAtFixedRate(this::checkRemovalStatus, 10, 10, TimeUnit.SECONDS);
                 } else {
-                    process.onEvent(ProcessEvent.HEALTH_CHECK_FAILED);
+                    process.onEvent(DatanodeEvent.HEALTH_CHECK_FAILED);
                 }
             } catch (IOException e) {
                 LOG.error("Failed to exclude node from cluster allocation", e);
-                process.onEvent(ProcessEvent.HEALTH_CHECK_FAILED);
+                process.onEvent(DatanodeEvent.HEALTH_CHECK_FAILED);
             }
         });
     }
@@ -141,7 +141,7 @@ public class OpensearchRemovalTracer implements StateMachineTracer {
                     eventBus.post(DataNodeLifecycleEvent.create(nodeId.getNodeId(), DataNodeLifecycleTrigger.REMOVED));
                 }
             } catch (IOException | OpenSearchStatusException e) {
-                process.onEvent(ProcessEvent.HEALTH_CHECK_FAILED);
+                process.onEvent(DatanodeEvent.HEALTH_CHECK_FAILED);
             }
         }
     }

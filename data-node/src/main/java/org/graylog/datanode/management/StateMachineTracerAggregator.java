@@ -16,9 +16,9 @@
  */
 package org.graylog.datanode.management;
 
-import org.graylog.datanode.process.ProcessEvent;
-import org.graylog.datanode.process.ProcessState;
-import org.graylog.datanode.process.StateMachineTracer;
+import org.graylog.datanode.state.DatanodeEvent;
+import org.graylog.datanode.state.DatanodeState;
+import org.graylog.datanode.state.StateMachineTracer;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -36,12 +36,12 @@ public class StateMachineTracerAggregator implements StateMachineTracer {
     }
 
     @Override
-    public void trigger(ProcessEvent processEvent) {
+    public void trigger(DatanodeEvent processEvent) {
         delegates.forEach(d -> d.trigger(processEvent));
     }
 
     @Override
-    public void transition(ProcessEvent processEvent, ProcessState s1, ProcessState s2) {
+    public void transition(DatanodeEvent processEvent, DatanodeState s1, DatanodeState s2) {
         delegates.forEach(d -> d.transition(processEvent, s1, s2));
     }
 }

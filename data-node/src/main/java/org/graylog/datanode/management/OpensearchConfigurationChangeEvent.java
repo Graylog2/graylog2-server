@@ -16,7 +16,7 @@
  */
 package org.graylog.datanode.management;
 
-import org.graylog.datanode.process.OpensearchConfiguration;
+import org.graylog.datanode.state.OpensearchConfiguration;
 
 public record OpensearchConfigurationChangeEvent(OpensearchConfiguration config) {
 }

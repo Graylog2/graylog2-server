@@ -16,7 +16,7 @@
  */
 package org.graylog.datanode.management.opensearch.cli;
 
-import org.graylog.datanode.process.OpensearchConfiguration;
+import org.graylog.datanode.state.OpensearchConfiguration;
 
 /**
  * Collection of opensearch CLI tools. All of them need to have OPENSEARCH_PATH_CONF preconfigured, so they operate

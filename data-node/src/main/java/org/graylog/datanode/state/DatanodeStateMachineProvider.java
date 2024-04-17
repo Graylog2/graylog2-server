@@ -14,21 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.process;
+package org.graylog.datanode.state;
 
 import jakarta.inject.Provider;
 import jakarta.inject.Inject;
 
-public class ProcessStateMachineProvider implements Provider<ProcessStateMachine> {
-    private final ProcessStateMachine processStateMachine;
+public class DatanodeStateMachineProvider implements Provider<DatanodeStateMachine> {
+    private final DatanodeStateMachine datanodeStateMachine;
 
     @Inject
-    public ProcessStateMachineProvider() {
-        this.processStateMachine = ProcessStateMachine.createNew();
+    public DatanodeStateMachineProvider() {
+        this.datanodeStateMachine = DatanodeStateMachine.createNew();
     }
 
     @Override
-    public ProcessStateMachine get() {
-        return processStateMachine;
+    public DatanodeStateMachine get() {
+        return datanodeStateMachine;
     }
 }

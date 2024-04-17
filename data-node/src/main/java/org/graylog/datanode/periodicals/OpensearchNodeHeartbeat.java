@@ -17,8 +17,8 @@
 package org.graylog.datanode.periodicals;
 
 import org.graylog.datanode.management.OpensearchProcess;
-import org.graylog.datanode.process.ProcessEvent;
-import org.graylog.datanode.process.ProcessState;
+import org.graylog.datanode.state.DatanodeEvent;
+import org.graylog.datanode.state.DatanodeState;
 import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchStatusException;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
@@ -49,8 +49,8 @@ public class OpensearchNodeHeartbeat extends Periodical {
     @Override
     // This method is "synchronized" because we are also calling it directly in AutomaticLeaderElectionService
     public synchronized void doRun() {
-        if (!process.isInState(ProcessState.TERMINATED) && !process.isInState(ProcessState.WAITING_FOR_CONFIGURATION)
-                && !process.isInState(ProcessState.REMOVED)) {
+        if (!process.isInState(DatanodeState.TERMINATED) && !process.isInState(DatanodeState.WAITING_FOR_CONFIGURATION)
+                && !process.isInState(DatanodeState.REMOVED)) {
 
             final Optional<RestHighLevelClient> restClient = process.restClient();
             if (restClient.isPresent()) {
@@ -66,11 +66,11 @@ public class OpensearchNodeHeartbeat extends Periodical {
     }
 
     private void onNodeResponse(OpensearchProcess process, MainResponse nodeResponse) {
-        process.onEvent(ProcessEvent.HEALTH_CHECK_OK);
+        process.onEvent(DatanodeEvent.HEALTH_CHECK_OK);
     }
 
     private void onRestError(OpensearchProcess process, Exception e) {
-        process.onEvent(ProcessEvent.HEALTH_CHECK_FAILED);
+        process.onEvent(DatanodeEvent.HEALTH_CHECK_FAILED);
         LOG.warn("Opensearch REST api of process {} unavailable. Cause: {}", process.processInfo().process().pid(), e.getMessage());
     }
 

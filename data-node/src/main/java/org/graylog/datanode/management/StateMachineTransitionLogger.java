@@ -16,9 +16,9 @@
  */
 package org.graylog.datanode.management;
 
-import org.graylog.datanode.process.ProcessEvent;
-import org.graylog.datanode.process.ProcessState;
-import org.graylog.datanode.process.StateMachineTracer;
+import org.graylog.datanode.state.DatanodeEvent;
+import org.graylog.datanode.state.DatanodeState;
+import org.graylog.datanode.state.StateMachineTracer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,12 +27,12 @@ public class StateMachineTransitionLogger implements StateMachineTracer {
     private static final Logger LOG = LoggerFactory.getLogger(StateMachineTransitionLogger.class);
 
     @Override
-    public void trigger(ProcessEvent trigger) {
+    public void trigger(DatanodeEvent trigger) {
 
     }
 
     @Override
-    public void transition(ProcessEvent trigger, ProcessState source, ProcessState destination) {
+    public void transition(DatanodeEvent trigger, DatanodeState source, DatanodeState destination) {
         if (!source.equals(destination)) {
             LOG.debug("Triggered {}, source state: {}, destination: {}", trigger, source, destination);
         }

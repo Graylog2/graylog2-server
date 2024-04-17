@@ -17,8 +17,8 @@
 package org.graylog.datanode.management;
 
 import com.google.common.eventbus.EventBus;
-import org.graylog.datanode.process.ProcessEvent;
-import org.graylog.datanode.process.ProcessState;
+import org.graylog.datanode.state.DatanodeEvent;
+import org.graylog.datanode.state.DatanodeState;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterGetSettingsResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterUpdateSettingsRequest;
@@ -79,7 +79,7 @@ public class OpensearchRemovalTracerTest {
                 .put(OpensearchRemovalTracer.CLUSTER_ROUTING_ALLOCATION_EXCLUDE_SETTING, NODENAME)
                 .build();
         when(clusterClient.getSettings(any(), any())).thenReturn(new ClusterGetSettingsResponse(null, settings, null));
-        classUnderTest.transition(ProcessEvent.HEALTH_CHECK_OK, ProcessState.STARTING, ProcessState.AVAILABLE);
+        classUnderTest.transition(DatanodeEvent.HEALTH_CHECK_OK, DatanodeState.STARTING, DatanodeState.AVAILABLE);
 
         ArgumentCaptor<ClusterUpdateSettingsRequest> settingsRequest =
                 ArgumentCaptor.forClass(ClusterUpdateSettingsRequest.class);
@@ -97,7 +97,7 @@ public class OpensearchRemovalTracerTest {
                 .put(OpensearchRemovalTracer.CLUSTER_ROUTING_ALLOCATION_EXCLUDE_SETTING, "notmynodename")
                 .build();
         when(clusterClient.getSettings(any(), any())).thenReturn(new ClusterGetSettingsResponse(null, settings, null));
-        classUnderTest.transition(ProcessEvent.HEALTH_CHECK_OK, ProcessState.STARTING, ProcessState.AVAILABLE);
+        classUnderTest.transition(DatanodeEvent.HEALTH_CHECK_OK, DatanodeState.STARTING, DatanodeState.AVAILABLE);
         verify(clusterClient).getSettings(any(), any());
         verifyNoMoreInteractions(clusterClient);
         assertTrue(classUnderTest.allocationExcludeChecked);
@@ -108,7 +108,7 @@ public class OpensearchRemovalTracerTest {
         ClusterUpdateSettingsResponse response = mock(ClusterUpdateSettingsResponse.class);
         when(response.isAcknowledged()).thenReturn(true);
         when(clusterClient.putSettings(any(), any())).thenReturn(response);
-        classUnderTest.transition(ProcessEvent.PROCESS_REMOVE, ProcessState.AVAILABLE, ProcessState.REMOVING);
+        classUnderTest.transition(DatanodeEvent.PROCESS_REMOVE, DatanodeState.AVAILABLE, DatanodeState.REMOVING);
 
         ArgumentCaptor<ClusterUpdateSettingsRequest> settingsRequest =
                 ArgumentCaptor.forClass(ClusterUpdateSettingsRequest.class);

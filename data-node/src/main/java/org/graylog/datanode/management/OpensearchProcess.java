@@ -16,8 +16,8 @@
  */
 package org.graylog.datanode.management;
 
-import org.graylog.datanode.process.OpensearchConfiguration;
-import org.graylog.datanode.process.OpensearchInfo;
+import org.graylog.datanode.state.OpensearchConfiguration;
+import org.graylog.datanode.state.OpensearchInfo;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog.storage.opensearch2.OpenSearchClient;
 

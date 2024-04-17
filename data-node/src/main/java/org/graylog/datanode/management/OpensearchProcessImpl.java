@@ -23,13 +23,13 @@ import org.apache.http.client.utils.URIBuilder;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.configuration.variants.OpensearchSecurityConfiguration;
-import org.graylog.datanode.process.OpensearchConfiguration;
-import org.graylog.datanode.process.OpensearchInfo;
-import org.graylog.datanode.process.ProcessEvent;
-import org.graylog.datanode.process.ProcessInformation;
-import org.graylog.datanode.process.ProcessState;
-import org.graylog.datanode.process.ProcessStateMachine;
-import org.graylog.datanode.process.StateMachineTracer;
+import org.graylog.datanode.state.OpensearchConfiguration;
+import org.graylog.datanode.state.OpensearchInfo;
+import org.graylog.datanode.state.DatanodeEvent;
+import org.graylog.datanode.state.ProcessInformation;
+import org.graylog.datanode.state.DatanodeState;
+import org.graylog.datanode.state.DatanodeStateMachine;
+import org.graylog.datanode.state.StateMachineTracer;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog2.cluster.nodes.DataNodeDto;
@@ -63,7 +63,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     private Optional<RestHighLevelClient> restClient = Optional.empty();
     private Optional<OpenSearchClient> openSearchClient = Optional.empty();
 
-    private final ProcessStateMachine processState;
+    private final DatanodeStateMachine processState;
 
     private final DatanodeConfiguration datanodeConfiguration;
 
@@ -79,7 +79,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
 
 
     OpensearchProcessImpl(DatanodeConfiguration datanodeConfiguration, int logsCacheSize, final CustomCAX509TrustManager trustManager,
-                          final Configuration configuration, final NodeService<DataNodeDto> nodeService, ObjectMapper objectMapper, ProcessStateMachine processState) {
+                          final Configuration configuration, final NodeService<DataNodeDto> nodeService, ObjectMapper objectMapper, DatanodeStateMachine processState) {
         this.datanodeConfiguration = datanodeConfiguration;
         this.processState = processState;
         this.stdout = new CircularFifoQueue<>(logsCacheSize);
@@ -143,7 +143,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
         return String.format(Locale.ROOT, "%s://%s:%d", protocol, host, port);
     }
 
-    public void onEvent(ProcessEvent event) {
+    public void onEvent(DatanodeEvent event) {
         LOG.debug("Process event: " + event);
         this.processState.fire(event);
     }
@@ -162,7 +162,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
         return isLeaderNode;
     }
 
-    public boolean isInState(ProcessState expectedState) {
+    public boolean isInState(DatanodeState expectedState) {
         return this.processState.getState().equals(expectedState);
     }
 
@@ -241,7 +241,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
 
     private void stopProcess() {
         if (this.commandLineProcess != null) {
-            onEvent(ProcessEvent.PROCESS_STOPPED);
+            onEvent(DatanodeEvent.PROCESS_STOPPED);
             commandLineProcess.close();
         }
     }
@@ -250,13 +250,13 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     public void onRemove() {
         LOG.info("Starting removal of OpenSearch node");
         if (this.commandLineProcess != null) {
-            onEvent(ProcessEvent.PROCESS_REMOVE);
+            onEvent(DatanodeEvent.PROCESS_REMOVE);
         }
     }
 
     @Override
     public void onReset() {
-        onEvent(ProcessEvent.RESET);
+        onEvent(DatanodeEvent.RESET);
         stop();
         configure();
         start();
@@ -264,7 +264,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
 
     @Override
     public void onStart() {
-        onEvent(ProcessEvent.PROCESS_STARTED);
+        onEvent(DatanodeEvent.PROCESS_STARTED);
     }
 
     @Override
@@ -282,12 +282,12 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     @Override
     public void onProcessComplete(int exitValue) {
         LOG.info("Opensearch process completed with exit code {}", exitValue);
-        onEvent(ProcessEvent.PROCESS_TERMINATED);
+        onEvent(DatanodeEvent.PROCESS_TERMINATED);
     }
 
     @Override
     public void onProcessFailed(ExecuteException e) {
         LOG.warn("Opensearch process failed", e);
-        onEvent(ProcessEvent.PROCESS_TERMINATED);
+        onEvent(DatanodeEvent.PROCESS_TERMINATED);
     }
 }

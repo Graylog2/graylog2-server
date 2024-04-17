@@ -23,7 +23,7 @@ import org.graylog.datanode.Configuration;
 import org.graylog.datanode.management.OpensearchProcess;
 import org.graylog.datanode.metrics.ClusterStatMetricsCollector;
 import org.graylog.datanode.metrics.NodeMetricsCollector;
-import org.graylog.datanode.process.ProcessState;
+import org.graylog.datanode.state.DatanodeState;
 import org.graylog.shaded.opensearch2.org.joda.time.DateTime;
 import org.graylog.shaded.opensearch2.org.joda.time.DateTimeZone;
 import org.graylog.shaded.opensearch2.org.opensearch.action.index.IndexRequest;
@@ -106,7 +106,7 @@ public class MetricsCollector extends Periodical {
 
     @Override
     public void doRun() {
-        if (process.isInState(ProcessState.AVAILABLE)) {
+        if (process.isInState(DatanodeState.AVAILABLE)) {
             process.restClient().ifPresent(client -> {
                 this.nodeStatMetricsCollector = new NodeMetricsCollector(client, objectMapper);
                 this.clusterStatMetricsCollector = new ClusterStatMetricsCollector(client, objectMapper);

@@ -16,9 +16,9 @@
  */
 package org.graylog.datanode.management;
 
-import org.graylog.datanode.process.ProcessEvent;
-import org.graylog.datanode.process.ProcessState;
-import org.graylog.datanode.process.StateMachineTracer;
+import org.graylog.datanode.state.DatanodeEvent;
+import org.graylog.datanode.state.DatanodeState;
+import org.graylog.datanode.state.StateMachineTracer;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
@@ -40,11 +40,11 @@ public class ClusterNodeStateTracer implements StateMachineTracer {
     }
 
     @Override
-    public void trigger(ProcessEvent processEvent) {
+    public void trigger(DatanodeEvent processEvent) {
     }
 
     @Override
-    public void transition(ProcessEvent processEvent, ProcessState source, ProcessState destination) {
+    public void transition(DatanodeEvent processEvent, DatanodeState source, DatanodeState destination) {
         try {
             if (!source.equals(destination)) {
                 log.info("Updating cluster node {} from {} to {} (reason: {})", nodeId.getNodeId(),

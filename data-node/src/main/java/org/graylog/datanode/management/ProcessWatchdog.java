@@ -16,14 +16,12 @@
  */
 package org.graylog.datanode.management;
 
-import org.graylog.datanode.process.FailuresCounter;
-import org.graylog.datanode.process.ProcessEvent;
-import org.graylog.datanode.process.ProcessState;
-import org.graylog.datanode.process.StateMachineTracer;
+import org.graylog.datanode.state.FailuresCounter;
+import org.graylog.datanode.state.DatanodeEvent;
+import org.graylog.datanode.state.DatanodeState;
+import org.graylog.datanode.state.StateMachineTracer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
 
 /**
  * This process watchdog follows transitions of the state machine and will try to restart the process in case of termination.
@@ -43,12 +41,12 @@ public class ProcessWatchdog implements StateMachineTracer {
     }
 
     @Override
-    public void trigger(ProcessEvent trigger) {
+    public void trigger(DatanodeEvent trigger) {
         LOG.debug("Watchdog trigger: {}", trigger);
     }
 
     @Override
-    public void transition(ProcessEvent trigger, ProcessState source, ProcessState destination) {
+    public void transition(DatanodeEvent trigger, DatanodeState source, DatanodeState destination) {
         LOG.debug("Watchdog transition event:{}, source:{}, destination:{}", trigger, source, destination);
         switch (trigger) {
             case PROCESS_STARTED -> activateWatchdog();

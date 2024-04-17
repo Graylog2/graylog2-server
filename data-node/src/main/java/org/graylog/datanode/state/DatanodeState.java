@@ -14,11 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.process;
+package org.graylog.datanode.state;
 
 import org.graylog2.cluster.nodes.DataNodeStatus;
 
-public enum ProcessState {
+public enum DatanodeState {
     /**
      * Fresh created process, not started yet
      */
@@ -63,7 +63,7 @@ public enum ProcessState {
 
     private final DataNodeStatus dataNodeStatus;
 
-    ProcessState(DataNodeStatus dataNodeStatus) {
+    DatanodeState(DataNodeStatus dataNodeStatus) {
         this.dataNodeStatus = dataNodeStatus;
     }
 

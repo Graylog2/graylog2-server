@@ -14,7 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.process;
+package org.graylog.datanode.state;
 
-public record OpensearchInfo(String nodeName, ProcessState state, boolean isLeaderNode, String restBaseUrl, ProcessInformation process) {
+import com.github.oxo42.stateless4j.delegates.Trace;
+
+/**
+ * The tracer allows to observe triggered event (before) and transitions (after) of the {@link DatanodeStateMachine}
+ */
+public interface StateMachineTracer extends Trace<DatanodeState, DatanodeEvent> {
 }

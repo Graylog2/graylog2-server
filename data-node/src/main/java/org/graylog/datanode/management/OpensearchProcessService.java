@@ -26,10 +26,9 @@ import jakarta.inject.Singleton;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.bootstrap.preflight.DatanodeDirectoriesLockfileCheck;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
-import org.graylog.datanode.configuration.variants.InSecureConfiguration;
 import org.graylog.datanode.metrics.ConfigureMetricsIndexSettings;
-import org.graylog.datanode.process.OpensearchConfiguration;
-import org.graylog.datanode.process.ProcessStateMachine;
+import org.graylog.datanode.state.OpensearchConfiguration;
+import org.graylog.datanode.state.DatanodeStateMachine;
 import org.graylog2.bootstrap.preflight.PreflightConfigResult;
 import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.cluster.nodes.DataNodeDto;
@@ -80,7 +79,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
                                     final NodeId nodeId,
                                     final IndexFieldTypesService indexFieldTypesService,
                                     final ObjectMapper objectMapper,
-                                    final ProcessStateMachine processStateMachine,
+                                    final DatanodeStateMachine datanodeStateMachine,
                                     final ClusterEventBus clusterEventBus,
                                     final DatanodeDirectoriesLockfileCheck lockfileCheck,
                                     final ClusterConfigService clusterConfigService,
@@ -95,13 +94,13 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
         this.lockfileCheck = lockfileCheck;
         this.clusterConfigService = clusterConfigService;
         this.preflightConfigService = preflightConfigService;
-        this.process = createOpensearchProcess(datanodeConfiguration, trustManager, configuration, nodeService, objectMapper, processStateMachine);
+        this.process = createOpensearchProcess(datanodeConfiguration, trustManager, configuration, nodeService, objectMapper, datanodeStateMachine);
         eventBus.register(this);
     }
 
     private OpensearchProcess createOpensearchProcess(final DatanodeConfiguration datanodeConfiguration, final CustomCAX509TrustManager trustManager, final Configuration configuration,
-                                                      final NodeService<DataNodeDto> nodeService, final ObjectMapper objectMapper, final ProcessStateMachine processStateMachine) {
-        final OpensearchProcessImpl process = new OpensearchProcessImpl(datanodeConfiguration, datanodeConfiguration.processLogsBufferSize(), trustManager, configuration, nodeService, objectMapper, processStateMachine);
+                                                      final NodeService<DataNodeDto> nodeService, final ObjectMapper objectMapper, final DatanodeStateMachine datanodeStateMachine) {
+        final OpensearchProcessImpl process = new OpensearchProcessImpl(datanodeConfiguration, datanodeConfiguration.processLogsBufferSize(), trustManager, configuration, nodeService, objectMapper, datanodeStateMachine);
         final ProcessWatchdog watchdog = new ProcessWatchdog(process, WATCHDOG_RESTART_ATTEMPTS);
         process.addStateMachineTracer(watchdog);
         process.addStateMachineTracer(new StateMachineTransitionLogger());

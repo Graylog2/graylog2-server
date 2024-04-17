@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.management.OpensearchProcess;
-import org.graylog.datanode.process.ProcessState;
+import org.graylog.datanode.state.DatanodeState;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
@@ -54,7 +54,7 @@ public class ClusterManagerDiscovery extends Periodical {
     @Override
     // This method is "synchronized" because we are also calling it directly in AutomaticLeaderElectionService
     public synchronized void doRun() {
-        if (managedOpenSearch.isInState(ProcessState.AVAILABLE)) {
+        if (managedOpenSearch.isInState(DatanodeState.AVAILABLE)) {
             final Boolean isManagerNode = getClusterStateResponse(managedOpenSearch)
                     .map(r -> r.nodes().get(r.clusterManagerNode()))
                     .map(managerNode -> configuration.getDatanodeNodeName().equals(managerNode.name()))

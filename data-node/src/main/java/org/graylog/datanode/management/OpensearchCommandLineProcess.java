@@ -27,8 +27,8 @@ import com.github.rholder.retry.WaitStrategies;
 import jakarta.validation.constraints.NotNull;
 import org.apache.commons.exec.OS;
 import org.graylog.datanode.management.opensearch.cli.OpensearchCli;
-import org.graylog.datanode.process.OpensearchConfiguration;
-import org.graylog.datanode.process.ProcessInformation;
+import org.graylog.datanode.state.OpensearchConfiguration;
+import org.graylog.datanode.state.ProcessInformation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

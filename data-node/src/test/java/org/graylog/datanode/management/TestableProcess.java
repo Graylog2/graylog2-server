@@ -17,10 +17,10 @@
 package org.graylog.datanode.management;
 
 import com.github.oxo42.stateless4j.StateMachine;
-import org.graylog.datanode.process.ProcessEvent;
-import org.graylog.datanode.process.ProcessState;
-import org.graylog.datanode.process.ProcessStateMachine;
-import org.graylog.datanode.process.StateMachineTracer;
+import org.graylog.datanode.state.DatanodeEvent;
+import org.graylog.datanode.state.DatanodeState;
+import org.graylog.datanode.state.DatanodeStateMachine;
+import org.graylog.datanode.state.StateMachineTracer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,32 +28,32 @@ public class TestableProcess implements ManagableProcess<String> {
 
     private static final Logger LOG = LoggerFactory.getLogger(TestableProcess.class);
 
-    private final StateMachine<ProcessState, ProcessEvent> stateMachine;
+    private final StateMachine<DatanodeState, DatanodeEvent> stateMachine;
 
     public TestableProcess() {
-        this.stateMachine = ProcessStateMachine.createNew();
+        this.stateMachine = DatanodeStateMachine.createNew();
     }
 
     @Override
     public void configure(String ignored) {
         LOG.debug("Preparing process");
-        onEvent(ProcessEvent.PROCESS_PREPARED);
+        onEvent(DatanodeEvent.PROCESS_PREPARED);
     }
 
     @Override
     public void start() {
         LOG.debug("Starting process");
-        onEvent(ProcessEvent.PROCESS_STARTED);
+        onEvent(DatanodeEvent.PROCESS_STARTED);
     }
 
     @Override
     public void stop() {
         LOG.debug("Stopping process process");
-        onEvent(ProcessEvent.PROCESS_STOPPED);
+        onEvent(DatanodeEvent.PROCESS_STOPPED);
     }
 
     @Override
-    public void onEvent(ProcessEvent event) {
+    public void onEvent(DatanodeEvent event) {
         stateMachine.fire(event);
     }
 
@@ -63,7 +63,7 @@ public class TestableProcess implements ManagableProcess<String> {
     }
 
     @Override
-    public boolean isInState(ProcessState state) {
+    public boolean isInState(DatanodeState state) {
         return this.stateMachine.isInState(state);
     }
 }

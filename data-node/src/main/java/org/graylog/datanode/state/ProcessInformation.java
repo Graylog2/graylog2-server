@@ -14,21 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.process;
+package org.graylog.datanode.state;
 
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Test;
+import java.time.Instant;
 
-class FailuresCounterTest {
+public record ProcessInformation(long pid, boolean alive, Instant started) {
 
-    @Test
-    void testCounter() {
-        final FailuresCounter failuresCounter = FailuresCounter.oneBased(3);
-        Assertions.assertThat(failuresCounter.failedTooManyTimes()).isFalse();
-        failuresCounter.increment();
-        failuresCounter.increment();
-        Assertions.assertThat(failuresCounter.failedTooManyTimes()).isTrue();
-        failuresCounter.resetFailuresCounter();
-        Assertions.assertThat(failuresCounter.failedTooManyTimes()).isFalse();
+    public static ProcessInformation empty() {
+        return new ProcessInformation(-1, false, null);
+    }
+
+    public static ProcessInformation create(Process p) {
+        return new ProcessInformation(p.pid(), p.isAlive(), p.info().startInstant().orElse(null));
     }
 }

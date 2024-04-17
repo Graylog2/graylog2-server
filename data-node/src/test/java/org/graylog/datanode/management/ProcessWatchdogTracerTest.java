@@ -17,8 +17,8 @@
 package org.graylog.datanode.management;
 
 import org.assertj.core.api.Assertions;
-import org.graylog.datanode.process.ProcessEvent;
-import org.graylog.datanode.process.ProcessState;
+import org.graylog.datanode.state.DatanodeEvent;
+import org.graylog.datanode.state.DatanodeState;
 import org.junit.jupiter.api.Test;
 
 class ProcessWatchdogTracerTest {
@@ -49,14 +49,14 @@ class ProcessWatchdogTracerTest {
         terminateProcess(process);
 
         Assertions.assertThat(watchdog.isActive()).isFalse();
-        Assertions.assertThat(process.isInState(ProcessState.TERMINATED)).isTrue();
+        Assertions.assertThat(process.isInState(DatanodeState.TERMINATED)).isTrue();
     }
 
     private void terminateProcess(TestableProcess process) {
-        process.onEvent(ProcessEvent.PROCESS_TERMINATED);
+        process.onEvent(DatanodeEvent.PROCESS_TERMINATED);
     }
 
     private boolean isInStartingState(TestableProcess process) {
-        return process.isInState(ProcessState.STARTING);
+        return process.isInState(DatanodeState.STARTING);
     }
 }

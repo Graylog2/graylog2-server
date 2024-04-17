@@ -48,7 +48,7 @@ import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.variants.KeystoreInformation;
 import org.graylog.datanode.configuration.variants.OpensearchSecurityConfiguration;
 import org.graylog.datanode.management.OpensearchConfigurationChangeEvent;
-import org.graylog.datanode.process.OpensearchConfiguration;
+import org.graylog.datanode.state.OpensearchConfiguration;
 import org.graylog.datanode.rest.config.SecuredNodeAnnotationFilter;
 import org.graylog.security.certutil.CertConstants;
 import org.graylog2.bootstrap.preflight.web.BasicAuthFilter;

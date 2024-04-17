@@ -16,7 +16,7 @@
  */
 package org.graylog.datanode.management.opensearch.cli;
 
-import org.graylog.datanode.process.OpensearchConfiguration;
+import org.graylog.datanode.state.OpensearchConfiguration;
 
 import java.util.Collections;
 
