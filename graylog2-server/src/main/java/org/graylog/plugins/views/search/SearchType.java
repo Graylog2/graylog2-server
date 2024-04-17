@@ -87,7 +87,9 @@ public interface SearchType extends ContentPackable<SearchTypeEntity>, Exportabl
 
     SearchType applyExecutionContext(SearchTypeExecutionState executionState);
 
-    SearchType withQuery(BackendQuery query);
+    default SearchType withQuery(BackendQuery query) {
+        return this.toBuilder().query(query).build();
+    }
 
     SearchType withFilter(Filter filter);
 
@@ -268,6 +270,11 @@ public interface SearchType extends ContentPackable<SearchTypeEntity>, Exportabl
 
                 @Override
                 public SearchTypeBuilder filters(List<UsedSearchFilter> filters) {
+                    return this;
+                }
+
+                @Override
+                public SearchTypeBuilder query(@Nullable BackendQuery query) {
                     return this;
                 }
             };

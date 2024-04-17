@@ -16,9 +16,11 @@
  */
 package org.graylog.plugins.views.search;
 
+import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 public interface SearchTypeBuilder {
@@ -27,4 +29,6 @@ public interface SearchTypeBuilder {
     SearchTypeBuilder timerange(DerivedTimeRange timerange);
 
     SearchTypeBuilder filters(List<UsedSearchFilter> filters);
+
+    SearchTypeBuilder query(@Nullable BackendQuery query);
 }

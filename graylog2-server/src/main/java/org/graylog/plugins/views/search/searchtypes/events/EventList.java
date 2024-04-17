@@ -118,11 +118,6 @@ public abstract class EventList implements SearchType {
     }
 
     @Override
-    public SearchType withQuery(BackendQuery query) {
-        return toBuilder().query(query).build();
-    }
-
-    @Override
     public SearchType withFilter(Filter filter) {
         return toBuilder().filter(filter).build();
     }
