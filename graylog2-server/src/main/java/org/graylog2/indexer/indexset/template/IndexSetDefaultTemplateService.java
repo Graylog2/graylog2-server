@@ -33,17 +33,14 @@ public class IndexSetDefaultTemplateService {
     private final ClusterConfigService clusterConfigService;
     private final IndexSetTemplateService indexSetTemplateService;
     private final IndexSetDefaultTemplateConfigFactory indexSetDefaultTemplateConfigFactory;
-    private final IndexSetTemplateProvider indexSetTemplateProvider;
 
     @Inject
     public IndexSetDefaultTemplateService(ClusterConfigService clusterConfigService,
                                           IndexSetTemplateService indexSetTemplateService,
-                                          IndexSetDefaultTemplateConfigFactory indexSetDefaultTemplateConfigFactory,
-                                          IndexSetTemplateProvider indexSetTemplateProvider) {
+                                          IndexSetDefaultTemplateConfigFactory indexSetDefaultTemplateConfigFactory) {
         this.clusterConfigService = clusterConfigService;
         this.indexSetTemplateService = indexSetTemplateService;
         this.indexSetDefaultTemplateConfigFactory = indexSetDefaultTemplateConfigFactory;
-        this.indexSetTemplateProvider = indexSetTemplateProvider;
     }
 
     public Optional<IndexSetTemplate> getDefaultIndexSetTemplate() {

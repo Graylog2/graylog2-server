@@ -29,17 +29,17 @@ import javax.annotation.Nullable;
 public record IndexSetTemplate(@JsonProperty(ID_FIELD_NAME) @Nullable @Id @ObjectId String id,
                                @JsonProperty(TITLE_FIELD_NAME) @Nonnull String title,
                                @JsonProperty(DESCRIPTION_FIELD_NAME) String description,
-                               @JsonProperty(READ_ONLY_FIELD_NAME) boolean isReadOnly,
+                               @JsonProperty(BUILT_IN_FIELD_NAME) boolean isBuiltIn,
                                @JsonProperty(INDEX_SET_CONFIG_FIELD_NAME) @Nonnull IndexSetTemplateConfig indexSetConfig) {
 
     public static final String ID_FIELD_NAME = "id";
     public static final String TITLE_FIELD_NAME = "title";
     public static final String DESCRIPTION_FIELD_NAME = "description";
-    public static final String READ_ONLY_FIELD_NAME = "read_only";
+    public static final String BUILT_IN_FIELD_NAME = "built_in";
     public static final String INDEX_SET_CONFIG_FIELD_NAME = "index_set_config";
 
     public IndexSetTemplate(final IndexSetTemplateData data) {
-        this(null, data.title(), data.description(), data.readOnly(), data.indexSetConfig());
+        this(null, data.title(), data.description(), data.builtIn(), data.indexSetConfig());
     }
 
     public IndexSetTemplate(final IndexSetTemplateData data, boolean isReadOnly) {

@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer.indexset.template;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.Ints;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoCollection;
@@ -29,22 +30,25 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedDbService;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.filtering.DbQueryCreator;
+import org.graylog2.database.jackson.legacy.LegacyDeleteResult;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.EntityDefaults;
 import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.search.SearchQueryField;
+import org.mongojack.DBQuery;
 import org.mongojack.WriteResult;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
+import static org.graylog2.indexer.indexset.template.IndexSetTemplate.BUILT_IN_FIELD_NAME;
 import static org.graylog2.indexer.indexset.template.IndexSetTemplate.DESCRIPTION_FIELD_NAME;
 import static org.graylog2.indexer.indexset.template.IndexSetTemplate.ID_FIELD_NAME;
 import static org.graylog2.indexer.indexset.template.IndexSetTemplate.INDEX_SET_CONFIG_FIELD_NAME;
-import static org.graylog2.indexer.indexset.template.IndexSetTemplate.READ_ONLY_FIELD_NAME;
 import static org.graylog2.indexer.indexset.template.IndexSetTemplate.TITLE_FIELD_NAME;
 
 public class IndexSetTemplateService extends PaginatedDbService<IndexSetTemplate> {
@@ -54,7 +58,7 @@ public class IndexSetTemplateService extends PaginatedDbService<IndexSetTemplate
             EntityAttribute.builder().id(ID_FIELD_NAME).type(SearchQueryField.Type.OBJECT_ID).title("Template Id").hidden(true).sortable(true).build(),
             EntityAttribute.builder().id(TITLE_FIELD_NAME).title("Template Name").sortable(true).filterable(true).searchable(true).build(),
             EntityAttribute.builder().id(DESCRIPTION_FIELD_NAME).title("Template Description").sortable(false).build(),
-            EntityAttribute.builder().id(READ_ONLY_FIELD_NAME).type(SearchQueryField.Type.BOOLEAN).title("Read-only Attribute").sortable(false).build(),
+            EntityAttribute.builder().id(BUILT_IN_FIELD_NAME).type(SearchQueryField.Type.BOOLEAN).title("Built-in Attribute").sortable(false).build(),
             EntityAttribute.builder().id(INDEX_SET_CONFIG_FIELD_NAME).title("Custom Config").sortable(false).build()
     );
 
@@ -89,6 +93,11 @@ public class IndexSetTemplateService extends PaginatedDbService<IndexSetTemplate
             return 0;
         }
         return super.delete(id);
+    }
+
+    public int deleteBuiltIns() {
+        final LegacyDeleteResult<IndexSetTemplate, ObjectId> removed = db.remove(DBQuery.is(BUILT_IN_FIELD_NAME, true));
+        return removed.getN();
     }
 
     public boolean update(final String templateId, final IndexSetTemplate updatedTemplate) {
@@ -129,5 +138,13 @@ public class IndexSetTemplateService extends PaginatedDbService<IndexSetTemplate
                 order,
                 ATTRIBUTES,
                 DEFAULTS);
+    }
+
+    public Collection<IndexSetTemplate> getBuiltIns() {
+        return findByQuery(DBQuery.is(BUILT_IN_FIELD_NAME, true));
+    }
+
+    private Collection<IndexSetTemplate> findByQuery(DBQuery.Query query) {
+        return ImmutableList.copyOf((Iterable<IndexSetTemplate>) db.find(query));
     }
 }

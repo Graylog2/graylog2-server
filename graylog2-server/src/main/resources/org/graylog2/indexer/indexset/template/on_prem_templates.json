@@ -1,8 +1,8 @@
 [
     {
       "title": "Legacy Template",
-      "description": "The legacy default template for on-prem environments.",
-      "read_only": true,
+      "description": "The legacy default template for on-prem environment.",
+      "built_in": true,
       "index_set_config": {
         "index_analyzer": "standard",
         "shards": 4,

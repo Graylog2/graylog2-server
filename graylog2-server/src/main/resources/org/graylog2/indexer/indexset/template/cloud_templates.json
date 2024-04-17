@@ -2,7 +2,7 @@
     {
       "title": "Simple Cloud Template",
       "description": "A simple template that is compatible with the Cloud environment.",
-      "read_only": true,
+      "built_in": true,
       "index_set_config": {
         "index_analyzer": "standard",
         "shards": 4,

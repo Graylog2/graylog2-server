@@ -38,10 +38,10 @@ import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
-import org.graylog2.indexer.indexset.template.IndexSetTemplateConfig;
 import org.graylog2.indexer.IndexSetValidator;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.template.IndexSetTemplate;
+import org.graylog2.indexer.indexset.template.IndexSetTemplateConfig;
 import org.graylog2.indexer.indexset.template.IndexSetTemplateData;
 import org.graylog2.indexer.indexset.template.IndexSetTemplateService;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
@@ -181,7 +181,7 @@ public class IndexSetTemplateResource extends RestResource {
     private void checkReadOnly(String templateId) throws IllegalAccessException {
         final IndexSetTemplate template = templateService.get(templateId)
                 .orElseThrow(() -> new NotFoundException(f("No template with id %s", templateId)));
-        if (template.isReadOnly()) {
+        if (template.isBuiltIn()) {
             throw new IllegalAccessException(f("Template %s <%s> is read-only and cannot be modified or deleted", templateId, template.title()));
         }
     }
