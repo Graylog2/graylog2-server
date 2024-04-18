@@ -40,6 +40,7 @@ import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.indexer.IndexSetValidator;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.template.IndexSetDefaultTemplateService;
 import org.graylog2.indexer.indexset.template.IndexSetTemplate;
 import org.graylog2.indexer.indexset.template.IndexSetTemplateConfig;
 import org.graylog2.indexer.indexset.template.IndexSetTemplateData;
@@ -67,11 +68,17 @@ public class IndexSetTemplateResource extends RestResource {
     private final Validator validator;
     private final IndexSetTemplateService templateService;
 
+    private final IndexSetDefaultTemplateService indexSetDefaultTemplateService;
+
     @Inject
-    public IndexSetTemplateResource(IndexSetValidator indexSetValidator, Validator validator, IndexSetTemplateService templateService) {
+    public IndexSetTemplateResource(IndexSetValidator indexSetValidator,
+                                    Validator validator,
+                                    IndexSetTemplateService templateService,
+                                    IndexSetDefaultTemplateService indexSetDefaultTemplateService) {
         this.indexSetValidator = indexSetValidator;
         this.validator = validator;
         this.templateService = templateService;
+        this.indexSetDefaultTemplateService = indexSetDefaultTemplateService;
     }
 
     @GET
@@ -81,8 +88,7 @@ public class IndexSetTemplateResource extends RestResource {
     @ApiOperation(value = "Gets template by id")
     public IndexSetTemplate retrieveById(@ApiParam(name = "template_id") @PathParam("template_id") String templateId) {
         checkPermission(RestPermissions.INDEX_SET_TEMPLATES_READ, templateId);
-        return templateService.get(templateId)
-                .orElseThrow(() -> new NotFoundException("No template with id : " + templateId));
+        return getIndexSetTemplate(templateId);
     }
 
     @GET
@@ -123,7 +129,7 @@ public class IndexSetTemplateResource extends RestResource {
     @ApiOperation(value = "Updates existing template")
     public void update(@ApiParam(name = "template") IndexSetTemplate template) throws IllegalAccessException {
         checkPermission(RestPermissions.INDEX_SET_TEMPLATES_EDIT, template.id());
-        checkReadOnly(template.id());
+        checkReadOnly(getIndexSetTemplate(template.id()));
         validateConfig(template.indexSetConfig());
 
         final boolean updated = templateService.update(template.id(), template);
@@ -139,7 +145,9 @@ public class IndexSetTemplateResource extends RestResource {
     @ApiOperation(value = "Removes a template")
     public void delete(@ApiParam(name = "template_id") @PathParam("template_id") String templateId) throws IllegalAccessException {
         checkPermission(RestPermissions.INDEX_SET_TEMPLATES_DELETE, templateId);
-        checkReadOnly(templateId);
+        final IndexSetTemplate template = getIndexSetTemplate(templateId);
+        checkReadOnly(template);
+        checkIsDefault(template);
         templateService.delete(templateId);
     }
 
@@ -174,15 +182,24 @@ public class IndexSetTemplateResource extends RestResource {
         }
     }
 
+    private IndexSetTemplate getIndexSetTemplate(String templateId) {
+        return templateService.get(templateId)
+                .orElseThrow(() -> new NotFoundException(f("No template with id %s", templateId)));
+    }
+
     private static String buildFieldError(String field, String message) {
         return f("Invalid value for field [%s]: %s", field, message);
     }
 
-    private void checkReadOnly(String templateId) throws IllegalAccessException {
-        final IndexSetTemplate template = templateService.get(templateId)
-                .orElseThrow(() -> new NotFoundException(f("No template with id %s", templateId)));
+    private void checkIsDefault(IndexSetTemplate template) throws IllegalAccessException {
+        if(indexSetDefaultTemplateService.isDefault(template.id())){
+            throw new IllegalAccessException(f("Template %s <%s> is set as default and cannot be deleted", template.id(), template.title()));
+        }
+    }
+
+    private void checkReadOnly(IndexSetTemplate template) throws IllegalAccessException {
         if (template.isBuiltIn()) {
-            throw new IllegalAccessException(f("Template %s <%s> is read-only and cannot be modified or deleted", templateId, template.title()));
+            throw new IllegalAccessException(f("Template %s <%s> is read-only and cannot be modified or deleted", template, template.title()));
         }
     }
 }

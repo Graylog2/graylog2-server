@@ -27,6 +27,7 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import static org.graylog2.audit.AuditEventTypes.INDEX_SET_DEFAULT_TEMPLATE_UPDATE;
@@ -84,5 +85,12 @@ public class IndexSetDefaultTemplateService {
         } else {
             throw new NotFoundException("Index template with id <%s> doesn't exist!".formatted(defaultTemplate.id()));
         }
+    }
+
+    public boolean isDefault(@NotNull String templateId) {
+        String defaultTemplateId = Optional.ofNullable(clusterConfigService.get(IndexSetDefaultTemplate.class))
+                .map(IndexSetDefaultTemplate::id)
+                .orElse(null);
+        return Objects.equals(defaultTemplateId, templateId);
     }
 }
