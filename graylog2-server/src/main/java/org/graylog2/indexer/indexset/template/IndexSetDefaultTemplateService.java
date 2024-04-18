@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 
-import static org.graylog2.audit.AuditEventTypes.ES_INDEX_DEFAULT_TEMPLATE_UPDATE;
+import static org.graylog2.audit.AuditEventTypes.INDEX_SET_DEFAULT_TEMPLATE_UPDATE;
 
 public class IndexSetDefaultTemplateService {
 
@@ -77,7 +77,7 @@ public class IndexSetDefaultTemplateService {
         Optional<IndexSetTemplate> indexSetTemplate = indexSetTemplateService.get(defaultTemplate.id());
         if (indexSetTemplate.isPresent()) {
             clusterConfigService.write(defaultTemplate);
-            auditEventSender.success(AuditActor.user(userName), ES_INDEX_DEFAULT_TEMPLATE_UPDATE, ImmutableMap.of(
+            auditEventSender.success(AuditActor.user(userName), INDEX_SET_DEFAULT_TEMPLATE_UPDATE, ImmutableMap.of(
                     "template_id", indexSetTemplate.get().id(),
                     "template_title", indexSetTemplate.get().title()
             ));

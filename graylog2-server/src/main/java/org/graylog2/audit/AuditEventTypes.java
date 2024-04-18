@@ -69,7 +69,6 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String ES_INDEX_ROTATION_COMPLETE = PREFIX + "es_index_rotation:complete";
     public static final String ES_INDEX_ROTATION_STRATEGY_UPDATE = PREFIX + "es_index_rotation_strategy:update";
     public static final String ES_INDEX_TEMPLATE_UPDATE = PREFIX + "es_index_template:update";
-    public static final String ES_INDEX_DEFAULT_TEMPLATE_UPDATE = PREFIX + "es_index_default_template:update";
     public static final String ES_WRITE_INDEX_UPDATE = PREFIX + "es_write_index:update";
     public static final String ES_WRITE_INDEX_UPDATE_JOB_START = PREFIX + "es_write_index_update_job:start";
     public static final String EXTRACTOR_CREATE = PREFIX + "extractor:create";
@@ -94,6 +93,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String INDEX_SET_TEMPLATE_CREATE = PREFIX + "index_set_template:create";
     public static final String INDEX_SET_TEMPLATE_DELETE = PREFIX + "index_set_template:delete";
     public static final String INDEX_SET_TEMPLATE_UPDATE = PREFIX + "index_set_template:update";
+    public static final String INDEX_SET_DEFAULT_TEMPLATE_UPDATE = PREFIX + "index_set_default_template:update";
     public static final String LOAD_BALANCER_STATUS_UPDATE = PREFIX + "load_balancer_status:update";
     public static final String LOG_LEVEL_UPDATE = PREFIX + "log_level:update";
     public static final String LOOKUP_ADAPTER_CREATE = PREFIX + "lut_adapter:create";
@@ -217,7 +217,6 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(ES_INDEX_ROTATION_COMPLETE)
             .add(ES_INDEX_ROTATION_STRATEGY_UPDATE)
             .add(ES_INDEX_TEMPLATE_UPDATE)
-            .add(ES_INDEX_DEFAULT_TEMPLATE_UPDATE)
             .add(ES_WRITE_INDEX_UPDATE)
             .add(ES_WRITE_INDEX_UPDATE_JOB_START)
             .add(EXTRACTOR_CREATE)
@@ -241,6 +240,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(INDEX_SET_TEMPLATE_CREATE)
             .add(INDEX_SET_TEMPLATE_DELETE)
             .add(INDEX_SET_TEMPLATE_UPDATE)
+            .add(INDEX_SET_DEFAULT_TEMPLATE_UPDATE)
             .add(LOAD_BALANCER_STATUS_UPDATE)
             .add(LOG_LEVEL_UPDATE)
             .add(LOOKUP_ADAPTER_CREATE)
