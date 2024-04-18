@@ -14,8 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.rest;
+package org.graylog.datanode.opensearch;
 
-import org.graylog.datanode.opensearch.OpensearchInfo;
+import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
 
-public record StatusResponse(String opensearchVersion, OpensearchInfo node) {}
+public record OpensearchConfigurationChangeEvent(OpensearchConfiguration config) {
+}

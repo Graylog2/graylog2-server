@@ -16,9 +16,11 @@
  */
 package org.graylog.datanode.periodicals;
 
-import org.graylog.datanode.management.OpensearchProcess;
-import org.graylog.datanode.state.DatanodeEvent;
-import org.graylog.datanode.state.DatanodeState;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import org.graylog.datanode.opensearch.OpensearchProcess;
+import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
+import org.graylog.datanode.opensearch.statemachine.OpensearchState;
 import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchStatusException;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
@@ -28,10 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
-
 import java.io.IOException;
 import java.util.Optional;
 
@@ -49,8 +47,8 @@ public class OpensearchNodeHeartbeat extends Periodical {
     @Override
     // This method is "synchronized" because we are also calling it directly in AutomaticLeaderElectionService
     public synchronized void doRun() {
-        if (!process.isInState(DatanodeState.TERMINATED) && !process.isInState(DatanodeState.WAITING_FOR_CONFIGURATION)
-                && !process.isInState(DatanodeState.REMOVED)) {
+        if (!process.isInState(OpensearchState.TERMINATED) && !process.isInState(OpensearchState.WAITING_FOR_CONFIGURATION)
+                && !process.isInState(OpensearchState.REMOVED)) {
 
             final Optional<RestHighLevelClient> restClient = process.restClient();
             if (restClient.isPresent()) {
@@ -66,11 +64,11 @@ public class OpensearchNodeHeartbeat extends Periodical {
     }
 
     private void onNodeResponse(OpensearchProcess process, MainResponse nodeResponse) {
-        process.onEvent(DatanodeEvent.HEALTH_CHECK_OK);
+        process.onEvent(OpensearchEvent.HEALTH_CHECK_OK);
     }
 
     private void onRestError(OpensearchProcess process, Exception e) {
-        process.onEvent(DatanodeEvent.HEALTH_CHECK_FAILED);
+        process.onEvent(OpensearchEvent.HEALTH_CHECK_FAILED);
         LOG.warn("Opensearch REST api of process {} unavailable. Cause: {}", process.processInfo().process().pid(), e.getMessage());
     }
 

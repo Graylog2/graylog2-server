@@ -17,19 +17,18 @@
 package org.graylog.datanode.periodicals;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
-import org.graylog.datanode.management.OpensearchProcess;
-import org.graylog.datanode.state.DatanodeState;
+import org.graylog.datanode.opensearch.OpensearchProcess;
+import org.graylog.datanode.opensearch.statemachine.OpensearchState;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog2.plugin.periodical.Periodical;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -54,7 +53,7 @@ public class ClusterManagerDiscovery extends Periodical {
     @Override
     // This method is "synchronized" because we are also calling it directly in AutomaticLeaderElectionService
     public synchronized void doRun() {
-        if (managedOpenSearch.isInState(DatanodeState.AVAILABLE)) {
+        if (managedOpenSearch.isInState(OpensearchState.AVAILABLE)) {
             final Boolean isManagerNode = getClusterStateResponse(managedOpenSearch)
                     .map(r -> r.nodes().get(r.clusterManagerNode()))
                     .map(managerNode -> configuration.getDatanodeNodeName().equals(managerNode.name()))

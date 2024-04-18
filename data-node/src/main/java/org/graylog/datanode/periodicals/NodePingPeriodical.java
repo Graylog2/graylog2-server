@@ -16,9 +16,10 @@
  */
 package org.graylog.datanode.periodicals;
 
+import jakarta.inject.Inject;
 import org.graylog.datanode.Configuration;
-import org.graylog.datanode.management.OpensearchProcess;
-import org.graylog.datanode.state.DatanodeState;
+import org.graylog.datanode.opensearch.OpensearchProcess;
+import org.graylog.datanode.opensearch.statemachine.OpensearchState;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.DataNodeStatus;
 import org.graylog2.cluster.nodes.NodeService;
@@ -28,9 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-
-import jakarta.inject.Inject;
-
 import java.net.URI;
 import java.util.function.Supplier;
 
@@ -44,7 +42,7 @@ public class NodePingPeriodical extends Periodical {
     private final Supplier<String> datanodeRestApiUri;
     private final Supplier<Boolean> isLeader;
     private final Configuration configuration;
-    private final Supplier<DatanodeState> processState;
+    private final Supplier<OpensearchState> processState;
 
 
     @Inject
@@ -69,7 +67,7 @@ public class NodePingPeriodical extends Periodical {
             Supplier<String> opensearchClusterUri,
             Supplier<String> datanodeRestApiUri,
             Supplier<Boolean> isLeader,
-            Supplier<DatanodeState> processState
+            Supplier<OpensearchState> processState
     ) {
         this.nodeService = nodeService;
         this.nodeId = nodeId;

@@ -14,8 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.rest;
+package org.graylog.datanode.opensearch.statemachine;
 
-import org.graylog.datanode.opensearch.OpensearchInfo;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 
-public record StatusResponse(String opensearchVersion, OpensearchInfo node) {}
+public class OpensearchStateMachineProvider implements Provider<OpensearchStateMachine> {
+    private final OpensearchStateMachine opensearchStateMachine;
+
+    @Inject
+    public OpensearchStateMachineProvider() {
+        this.opensearchStateMachine = OpensearchStateMachine.createNew();
+    }
+
+    @Override
+    public OpensearchStateMachine get() {
+        return opensearchStateMachine;
+    }
+}

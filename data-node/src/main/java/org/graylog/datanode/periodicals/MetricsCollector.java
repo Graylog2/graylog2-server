@@ -18,12 +18,13 @@ package org.graylog.datanode.periodicals;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import org.graylog.datanode.Configuration;
-import org.graylog.datanode.management.OpensearchProcess;
+import org.graylog.datanode.opensearch.OpensearchProcess;
 import org.graylog.datanode.metrics.ClusterStatMetricsCollector;
 import org.graylog.datanode.metrics.NodeMetricsCollector;
-import org.graylog.datanode.state.DatanodeState;
+import org.graylog.datanode.opensearch.statemachine.OpensearchState;
 import org.graylog.shaded.opensearch2.org.joda.time.DateTime;
 import org.graylog.shaded.opensearch2.org.joda.time.DateTimeZone;
 import org.graylog.shaded.opensearch2.org.opensearch.action.index.IndexRequest;
@@ -38,7 +39,6 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSource
 import org.graylog.shaded.opensearch2.org.opensearch.search.sort.SortBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.sort.SortOrder;
 import org.graylog2.plugin.periodical.Periodical;
-import jakarta.annotation.Nonnull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,7 +106,7 @@ public class MetricsCollector extends Periodical {
 
     @Override
     public void doRun() {
-        if (process.isInState(DatanodeState.AVAILABLE)) {
+        if (process.isInState(OpensearchState.AVAILABLE)) {
             process.restClient().ifPresent(client -> {
                 this.nodeStatMetricsCollector = new NodeMetricsCollector(client, objectMapper);
                 this.clusterStatMetricsCollector = new ClusterStatMetricsCollector(client, objectMapper);

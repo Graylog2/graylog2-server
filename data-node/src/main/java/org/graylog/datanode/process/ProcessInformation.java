@@ -14,8 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.rest;
+package org.graylog.datanode.process;
 
-import org.graylog.datanode.opensearch.OpensearchInfo;
+import java.time.Instant;
 
-public record StatusResponse(String opensearchVersion, OpensearchInfo node) {}
+public record ProcessInformation(long pid, boolean alive, Instant started) {
+
+    public static ProcessInformation empty() {
+        return new ProcessInformation(-1, false, null);
+    }
+
+    public static ProcessInformation create(Process p) {
+        return new ProcessInformation(p.pid(), p.isAlive(), p.info().startInstant().orElse(null));
+    }
+}

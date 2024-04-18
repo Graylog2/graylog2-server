@@ -14,8 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.rest;
+package org.graylog.datanode.opensearch.cli;
 
-import org.graylog.datanode.opensearch.OpensearchInfo;
+import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
 
-public record StatusResponse(String opensearchVersion, OpensearchInfo node) {}
+/**
+ * Collection of opensearch CLI tools. All of them need to have OPENSEARCH_PATH_CONF preconfigured, so they operate
+ * on the correct version of configuration.
+ */
+public class OpensearchCli {
+
+    private final OpensearchKeystoreCli keystore;
+
+    public OpensearchCli(OpensearchConfiguration config) {
+        this.keystore = new OpensearchKeystoreCli(config);
+    }
+
+    public OpensearchKeystoreCli keystore() {
+        return keystore;
+    }
+
+}

@@ -27,7 +27,7 @@ import org.graylog.datanode.configuration.variants.MongoCertSecureConfiguration;
 import org.graylog.datanode.configuration.variants.OpensearchSecurityConfiguration;
 import org.graylog.datanode.configuration.variants.SecurityConfigurationVariant;
 import org.graylog.datanode.configuration.variants.UploadedCertFilesSecureConfiguration;
-import org.graylog.datanode.state.OpensearchConfiguration;
+import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.nodes.DataNodeDto;

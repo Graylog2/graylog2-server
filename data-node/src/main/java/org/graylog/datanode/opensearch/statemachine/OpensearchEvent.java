@@ -14,8 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.rest;
+package org.graylog.datanode.opensearch.statemachine;
 
-import org.graylog.datanode.opensearch.OpensearchInfo;
-
-public record StatusResponse(String opensearchVersion, OpensearchInfo node) {}
+public enum OpensearchEvent {
+    PROCESS_PREPARED,
+    PROCESS_STARTED,
+    HEALTH_CHECK_OK,
+    HEALTH_CHECK_FAILED,
+    PROCESS_STOPPED,
+    PROCESS_REMOVE,
+    RESET, // user-triggered action
+    PROCESS_TERMINATED // failure from outside, not requested
+}

@@ -17,7 +17,7 @@
 package org.graylog.datanode.periodicals;
 
 import org.graylog.datanode.Configuration;
-import org.graylog.datanode.state.DatanodeState;
+import org.graylog.datanode.opensearch.statemachine.OpensearchState;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
@@ -50,7 +50,7 @@ class NodePingPeriodicalTest {
                 () -> cluster,
                 () -> datanodeRestApi,
                 () -> true,
-                () -> DatanodeState.AVAILABLE
+                () -> OpensearchState.AVAILABLE
         );
 
         task.doRun();
@@ -61,7 +61,7 @@ class NodePingPeriodicalTest {
                 .setTransportAddress(uri.toString())
                 .setClusterAddress(cluster)
                 .setRestApiAddress(datanodeRestApi)
-                .setDataNodeStatus(DatanodeState.AVAILABLE.getDataNodeStatus())
+                .setDataNodeStatus(OpensearchState.AVAILABLE.getDataNodeStatus())
                 .setHostname("localhost")
                 .build()
         ));

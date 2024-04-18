@@ -21,11 +21,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.graylog.datanode.Configuration;
-import org.graylog.datanode.management.OpensearchProcess;
+import org.graylog.datanode.opensearch.OpensearchProcess;
+import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
+import org.graylog.datanode.opensearch.statemachine.OpensearchState;
+import org.graylog.datanode.opensearch.statemachine.tracer.StateMachineTracer;
 import org.graylog.datanode.periodicals.MetricsCollector;
-import org.graylog.datanode.state.DatanodeEvent;
-import org.graylog.datanode.state.DatanodeState;
-import org.graylog.datanode.state.StateMachineTracer;
 import org.graylog.storage.opensearch2.DataStreamAdapterOS2;
 import org.graylog.storage.opensearch2.ism.IsmApi;
 import org.graylog2.cluster.nodes.DataNodeDto;
@@ -69,12 +69,12 @@ public class ConfigureMetricsIndexSettings implements StateMachineTracer {
     }
 
     @Override
-    public void trigger(DatanodeEvent trigger) {
+    public void trigger(OpensearchEvent trigger) {
     }
 
     @Override
-    public void transition(DatanodeEvent trigger, DatanodeState source, DatanodeState destination) {
-        if (destination == DatanodeState.AVAILABLE && source == DatanodeState.STARTING) {
+    public void transition(OpensearchEvent trigger, OpensearchState source, OpensearchState destination) {
+        if (destination == OpensearchState.AVAILABLE && source == OpensearchState.STARTING) {
             process.openSearchClient().ifPresent(client -> {
                 final IsmApi ismApi = new IsmApi(client, objectMapper);
                 int replicas = nodeService.allActive().size() == 1 ? 0 : 1;
