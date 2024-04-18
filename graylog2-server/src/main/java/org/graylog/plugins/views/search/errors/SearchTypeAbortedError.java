@@ -16,8 +16,9 @@
  */
 package org.graylog.plugins.views.search.errors;
 
+import jakarta.validation.constraints.NotNull;
 import org.graylog.plugins.views.search.Query;
-import org.jetbrains.annotations.NotNull;
+
 
 public class SearchTypeAbortedError extends SearchTypeError {
 
