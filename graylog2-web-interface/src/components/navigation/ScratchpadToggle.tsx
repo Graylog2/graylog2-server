@@ -15,18 +15,28 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useContext } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { ScratchpadContext } from 'contexts/ScratchpadProvider';
 import { Icon } from 'components/common';
 import { Button } from 'components/bootstrap';
+import { NAV_ITEM_HEIGHT } from 'theme/constants';
 
-const Toggle = styled(Button)`
-  padding-left: 6px;
-  padding-right: 6px;
+import NavItemStateIndicator, { hoverIndicatorStyles } from '../common/NavItemStateIndicator';
+
+const Toggle = styled(Button)(({ theme }) => css`
+  padding: 0 15px;
   background: none;
   border: 0;
-`;
+  min-height: ${NAV_ITEM_HEIGHT};
+  color: ${theme.colors.global.textDefault};
+  
+  &:hover, &:focus {
+    ${hoverIndicatorStyles(theme)}
+    background: transparent;
+    color: ${theme.colors.variant.darker.default};
+  }
+`);
 
 const ScratchpadToggle = () => {
   const { toggleScratchpadVisibility } = useContext(ScratchpadContext);
@@ -38,7 +48,9 @@ const ScratchpadToggle = () => {
               aria-label="Scratchpad"
               id="scratchpad-toggle"
               onClick={toggleScratchpadVisibility}>
-        <Icon name="edit" size="lg" fixedWidth title="Scratchpad" />
+        <NavItemStateIndicator>
+          <Icon name="edit_square" size="lg" title="Scratchpad" />
+        </NavItemStateIndicator>
       </Toggle>
     </li>
 

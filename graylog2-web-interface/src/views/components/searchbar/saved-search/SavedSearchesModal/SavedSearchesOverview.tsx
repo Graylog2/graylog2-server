@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 
 import {
   PaginatedList,
@@ -27,16 +27,15 @@ import {
 import type View from 'views/logic/views/View';
 import QueryHelper from 'components/common/QueryHelper';
 import EntityDataTable from 'components/common/EntityDataTable';
-import type { Sort } from 'stores/PaginationTypes';
 import useSavedSearches from 'views/hooks/useSavedSearches';
-import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
-import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
 import useColumnRenderers from 'views/components/searchbar/saved-search/useColumnRenderes';
+import useSavedSearchPaginationAndTableLayout
+  from 'views/components/searchbar/saved-search/useSavedSearchPaginationAndTableLayout';
 
 import SearchActions from './SearchActions';
 
 import BulkActions from '../BulkActions';
-import { ENTITY_TABLE_ID, DEFAULT_LAYOUT } from '../Constants';
+import { DEFAULT_LAYOUT } from '../Constants';
 
 type Props = {
   activeSavedSearchId: string,
@@ -49,56 +48,20 @@ const SavedSearchesOverview = ({
   deleteSavedSearch,
   onLoadSavedSearch,
 }: Props) => {
-  const [query, setQuery] = useState('');
-  const [activePage, setActivePage] = useState(1);
-  const { layoutConfig, isInitialLoading: isLoadingLayoutPreferences } = useTableLayout({
-    entityTableId: ENTITY_TABLE_ID,
-    defaultPageSize: DEFAULT_LAYOUT.pageSize,
-    defaultDisplayedAttributes: DEFAULT_LAYOUT.displayedColumns,
-    defaultSort: DEFAULT_LAYOUT.sort,
-  });
-  const searchParams = useMemo(() => ({
-    query,
-    page: activePage,
-    pageSize: layoutConfig.pageSize,
-    sort: layoutConfig.sort,
-  }), [activePage, layoutConfig.pageSize, layoutConfig.sort, query]);
+  const {
+    isLoadingLayoutPreferences,
+    onPageChange,
+    layoutConfig,
+    activePage,
+    onSearch,
+    onResetSearch,
+    searchParams,
+    onColumnsChange,
+    onSortChange,
+    onPageSizeChange,
+  } = useSavedSearchPaginationAndTableLayout();
 
   const { data: paginatedSavedSearches, isInitialLoading: isLoadingSavedSearches, refetch } = useSavedSearches(searchParams, { enabled: !isLoadingLayoutPreferences });
-  const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(ENTITY_TABLE_ID);
-
-  const onPageChange = useCallback(
-    (newPage: number, newPageSize: number) => {
-      if (newPage) {
-        setActivePage(newPage);
-      }
-
-      if (newPageSize) {
-        updateTableLayout({ perPage: newPageSize });
-      }
-    }, [updateTableLayout],
-  );
-
-  const onPageSizeChange = useCallback((newPageSize: number) => {
-    setActivePage(1);
-    updateTableLayout({ perPage: newPageSize });
-  }, [updateTableLayout]);
-
-  const onSortChange = useCallback((newSort: Sort) => {
-    setActivePage(1);
-    updateTableLayout({ sort: newSort });
-  }, [updateTableLayout]);
-
-  const onSearch = useCallback((newQuery: string) => {
-    setActivePage(1);
-    setQuery(newQuery);
-  }, []);
-
-  const onResetSearch = useCallback(() => onSearch(''), [onSearch]);
-
-  const onColumnsChange = useCallback((displayedAttributes: Array<string>) => {
-    updateTableLayout({ displayedAttributes });
-  }, [updateTableLayout]);
 
   const renderSavedSearchActions = useCallback((search: View) => (
     <SearchActions search={search}

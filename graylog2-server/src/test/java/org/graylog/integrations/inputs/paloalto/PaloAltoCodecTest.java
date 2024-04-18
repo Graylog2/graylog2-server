@@ -19,6 +19,8 @@ package org.graylog.integrations.inputs.paloalto;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.journal.RawMessage;
 import org.joda.time.DateTime;
@@ -66,10 +68,12 @@ public class PaloAltoCodecTest {
                     "<14>Aug 22 11:21:04 hq-lx-net-7.dart.org 1,2018/08/22 11:21:04,013201001141,THREAT,wildfire,0,2018/08/22 11:20:55,23.43.62.88,10.4.25.93,23.43.62.88,198.51.223.40,LAN-to-WAN-Known-User,,dart\\dhoftender,web-browsing,vsys1,WAN_L3,LAN_L3,ethernet1/1,ethernet1/6,Panorama,2018/08/22 11:20:55,895841,1,80,50844,80,35947,0x402000,tcp,allow,\"stream.x86.x-none.dat\",Windows Dynamic Link Library (DLL)(52019),benign,informational,server-to-client,6585310726021616809,0x8000000000000000,United States,10.0.0.0-10.255.255.255,0,,0,9e5c336d886db943e0e464efb1e375d2a29d4ba117255bc6aa9a7053b86577c0,wildfire.paloaltonetworks.com,50,,pe,,,,,,11069273395,346,12,0,0,,pa5220-hq-mdf-1,,,,,0,,0,,N/A,unknown,WildFire-0-0,0x0",
                     "<14>Aug 22 11:21:04 hq-lx-net-7.dart.org 1,2018/08/22 11:21:04,013201001141,THREAT,wildfire,0,2018/08/22 11:20:55,23.43.62.88,10.4.25.93,23.43.62.88,198.51.223.40,LAN-to-WAN-Known-User,,dart\\dhoftender,web-browsing,vsys1,WAN_L3,LAN_L3,ethernet1/1,ethernet1/6,Panorama,2018/08/22 11:20:55,895841,1,80,50844,80,35947,0x402000,tcp,allow,\"stream.x86.x-none.dat\",Windows Dynamic Link Library (DLL)(52019),benign,informational,server-to-client,6585310726021616809,0x8000000000000000,United States,10.0.0.0-10.255.255.255,0,,0,9e5c336d886db943e0e464efb1e375d2a29d4ba117255bc6aa9a7053b86577c0,wildfire.paloaltonetworks.com,50,,pe,,,,,,11069273395,346,12,0,0,,pa5220-hq-mdf-1,,,,,0,,0,,N/A,unknown,WildFire-0-0,0x0"};
 
+    private final MessageFactory messageFactory = new TestMessageFactory();
+
     @Test
     public void testAllSyslogFormats() {
 
-        PaloAltoCodec codec = new PaloAltoCodec(Configuration.EMPTY_CONFIGURATION);
+        PaloAltoCodec codec = new PaloAltoCodec(Configuration.EMPTY_CONFIGURATION, messageFactory);
 
         Message message = codec.decode(new RawMessage(SYSLOG_THREAT_MESSAGE.getBytes(StandardCharsets.UTF_8)));
         assertEquals("THREAT", message.getField("type"));
@@ -88,11 +92,11 @@ public class PaloAltoCodecTest {
     public void testMessageWithLineBreak() {
 
         // Verify that a messages with a line break at the end does not break parsing.
-        PaloAltoCodec codec = new PaloAltoCodec(Configuration.EMPTY_CONFIGURATION);
+        PaloAltoCodec codec = new PaloAltoCodec(Configuration.EMPTY_CONFIGURATION, messageFactory);
         Message message = codec.decode(new RawMessage(PANORAMA_WITH_LINE_BREAK.getBytes(StandardCharsets.UTF_8)));
         assertEquals("SYSTEM", message.getField("type"));
 
-        codec = new PaloAltoCodec(Configuration.EMPTY_CONFIGURATION);
+        codec = new PaloAltoCodec(Configuration.EMPTY_CONFIGURATION, messageFactory);
         message = codec.decode(new RawMessage(SYSLOG_WITH_LINE_BREAK.getBytes(StandardCharsets.UTF_8)));
         assertEquals("THREAT", message.getField("type"));
     }
@@ -102,7 +106,7 @@ public class PaloAltoCodecTest {
 
         // Test an extra list of messages.
         for (String threatString : MORE_SYSLOG_THREAT_MESSAGES) {
-            PaloAltoCodec codec = new PaloAltoCodec(Configuration.EMPTY_CONFIGURATION);
+            PaloAltoCodec codec = new PaloAltoCodec(Configuration.EMPTY_CONFIGURATION, messageFactory);
             Message message = codec.decode(new RawMessage(threatString.getBytes(StandardCharsets.UTF_8)));
             assertEquals("THREAT", message.getField("type"));
         }
@@ -112,7 +116,7 @@ public class PaloAltoCodecTest {
     public void syslogValuesTest() {
 
         // Test System message results
-        PaloAltoCodec codec = new PaloAltoCodec(Configuration.EMPTY_CONFIGURATION);
+        PaloAltoCodec codec = new PaloAltoCodec(Configuration.EMPTY_CONFIGURATION, messageFactory);
         Message message = codec.decode(new RawMessage(SYSLOG_THREAT_MESSAGE_NO_HOST_DOUBLE_SPACE_DATE.getBytes(StandardCharsets.UTF_8)));
         assertEquals("THREAT", message.getField("type"));
     }
@@ -121,7 +125,7 @@ public class PaloAltoCodecTest {
     public void valuesTest() {
 
         // Test System message results
-        PaloAltoCodec codec = new PaloAltoCodec(Configuration.EMPTY_CONFIGURATION);
+        PaloAltoCodec codec = new PaloAltoCodec(Configuration.EMPTY_CONFIGURATION, messageFactory);
         Message message = codec.decode(new RawMessage(PANORAMA_SYSTEM_MESSAGE.getBytes(StandardCharsets.UTF_8)));
         assertEquals("SYSTEM", message.getField("type"));
         assertEquals(message.getField("module"), "general");

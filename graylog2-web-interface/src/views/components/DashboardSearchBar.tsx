@@ -20,7 +20,6 @@ import { Field } from 'formik';
 import moment from 'moment';
 import styled, { css } from 'styled-components';
 
-import { useStore } from 'stores/connect';
 import RefreshControls from 'views/components/searchbar/RefreshControls';
 import { Spinner } from 'components/common';
 import ScrollToHint from 'views/components/common/ScrollToHint';
@@ -43,7 +42,6 @@ import {
 } from 'views/logic/searchbar/pluggableSearchBarControlsHandler';
 import type { SearchBarControl, HandlerContext } from 'views/types';
 import usePluginEntities from 'hooks/usePluginEntities';
-import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import useUserDateTime from 'hooks/useUserDateTime';
 import {
   SEARCH_BAR_GAP,
@@ -61,6 +59,8 @@ import type { TimeRange } from 'views/logic/queries/Query';
 import QueryHistoryButton from 'views/components/searchbar/QueryHistoryButton';
 import type { Editor } from 'views/components/searchbar/queryinput/ace-types';
 import useView from 'views/hooks/useView';
+import useIsLoading from 'views/hooks/useIsLoading';
+import useSearchConfiguration from 'hooks/useSearchConfiguration';
 
 import TimeRangeFilter from './searchbar/time-range-filter';
 import type { DashboardFormValues } from './DashboardSearchBarForm';
@@ -109,7 +109,7 @@ const DashboardSearchBar = () => {
   const editorRef = useRef<Editor>(null);
   const view = useView();
   const { userTimezone } = useUserDateTime();
-  const { searchesClusterConfig: config } = useStore(SearchConfigStore);
+  const { config } = useSearchConfiguration();
   const { timerange, query: { query_string: queryString = '' } = {} } = useGlobalOverride() ?? {};
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
   const dispatch = useAppDispatch();
@@ -125,6 +125,7 @@ const DashboardSearchBar = () => {
 
   const { parameters } = useParameters();
   const initialValues = useInitialFormValues(timerange, queryString);
+  const isLoadingExecution = useIsLoading();
 
   if (!config) {
     return <Spinner />;
@@ -142,7 +143,7 @@ const DashboardSearchBar = () => {
                                  onSubmit={submitForm}
                                  validateQueryString={(values) => _validateQueryString(values, pluggableSearchBarControls, userTimezone, handlerContext)}>
               {({ dirty, errors, isSubmitting, isValid, isValidating, handleSubmit, values, setFieldValue, validateForm }) => {
-                const disableSearchSubmit = isSubmitting || isValidating || !isValid;
+                const disableSearchSubmit = isSubmitting || isValidating || !isValid || isLoadingExecution;
 
                 return (
                   <SearchBarContainer>
@@ -159,8 +160,8 @@ const DashboardSearchBar = () => {
                     <SearchQueryRow>
                       <SearchButtonAndQuery>
                         <SearchButton disabled={disableSearchSubmit}
-                                      glyph="filter"
-                                      displaySpinner={isSubmitting}
+                                      glyph="filter_alt"
+                                      displaySpinner={isSubmitting || isLoadingExecution}
                                       dirty={dirty} />
                         <SearchInputAndValidationContainer>
                           <Field name="queryString">

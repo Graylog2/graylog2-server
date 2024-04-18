@@ -45,6 +45,25 @@ const SourceCodeContainer = styled.div<ContainerProps>(({ $resizable, theme }) =
   }
 
   ${theme.components.aceEditor}
+  .ace-graylog {
+    .ace_marker-layer {
+      .ace_active-line {
+        background: ${theme.colors.variant.lightest.default};
+      }
+    }
+
+    .ace_gutter-active-line {
+      background-color: ${theme.colors.variant.lightest.default};
+    }
+
+    .ace_gutter {
+      background: ${theme.colors.variant.lighter.default};
+    }
+
+    .ace_cursor {
+      border-color: ${theme.colors.global.textDefault};
+    }
+  }
 `);
 
 const Toolbar = styled.div(({ theme }) => css`
@@ -293,7 +312,7 @@ class SourceCodeEditor extends React.Component<Props, State> {
           <Toolbar style={{ width: validCssWidth }}>
             <ButtonToolbar>
               <ButtonGroup ref={this.overlayContainerRef}>
-                <ClipboardButton title={<Icon name="copy" fixedWidth />}
+                <ClipboardButton title={<Icon name="content_copy" />}
                                  bsStyle="link"
                                  bsSize="sm"
                                  onSuccess={this.focusEditor}
@@ -302,7 +321,7 @@ class SourceCodeEditor extends React.Component<Props, State> {
                                  disabled={this.isCopyDisabled()} />
                 <OverlayTrigger placement="top" trigger="click" overlay={overlay} rootClose width={250}>
                   <Button bsStyle="link" bsSize="sm" title="Paste (Ctrl+V / &#8984;V)" disabled={this.isPasteDisabled()}>
-                    <Icon name="clipboard" fixedWidth />
+                    <Icon name="content_copy" />
                   </Button>
                 </OverlayTrigger>
               </ButtonGroup>
@@ -312,14 +331,14 @@ class SourceCodeEditor extends React.Component<Props, State> {
                         onClick={this.handleUndo}
                         title="Undo (Ctrl+Z / &#8984;Z)"
                         disabled={this.isUndoDisabled()}>
-                  <Icon name="undo" fixedWidth />
+                  <Icon name="undo" />
                 </Button>
                 <Button bsStyle="link"
                         bsSize="sm"
                         onClick={this.handleRedo}
                         title="Redo (Ctrl+Shift+Z / &#8984;&#8679;Z)"
                         disabled={this.isRedoDisabled()}>
-                  <Icon name="redo" fixedWidth />
+                  <Icon name="redo" />
                 </Button>
               </ButtonGroup>
             </ButtonToolbar>
@@ -337,7 +356,6 @@ class SourceCodeEditor extends React.Component<Props, State> {
             }}
                        annotations={annotations}
                        // Convert Windows line breaks to Unix. See issue #7889
-                       // @ts-expect-error
                        setOptions={{ newLineMode: 'unix' }}
                        focus={focus}
                        fontSize={fontSize}

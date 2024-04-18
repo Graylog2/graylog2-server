@@ -119,7 +119,7 @@ describe('EventDefinitionEntry', () => {
     render(renderSUT('DEFAULT'));
 
     await waitFor(() => {
-      expect(screen.getAllByRole('link', { name: 'Edit' })[0]).toBeVisible();
+      expect(screen.getAllByRole('link', { name: /edit/i })[0]).toBeVisible();
     });
   });
 
@@ -138,7 +138,7 @@ describe('EventDefinitionEntry', () => {
 
     render(renderSUT('DEFAULT'));
 
-    await userEvent.click((await screen.findAllByRole('button', { name: 'More' }))[0]);
+    await userEvent.click((await screen.findAllByRole('button', { name: /more/i }))[0]);
 
     await screen.findByRole('menuitem', { name: /delete/i });
   });

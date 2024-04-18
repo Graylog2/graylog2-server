@@ -75,8 +75,8 @@ const Navigation = React.memo(({ pathname }: Props) => {
           <HelpMenu />
 
           <LinkContainer relativeActive to={Routes.WELCOME}>
-            <NavItem id="welcome-nav-link" aria-label="Welcome">
-              <Icon size="lg" fixedWidth title="Welcome" name="home" />
+            <NavItem id="welcome-nav-link">
+              <Icon size="lg" title="Welcome" name="home" />
             </NavItem>
           </LinkContainer>
 

@@ -21,16 +21,18 @@ import org.graylog.datanode.configuration.OpensearchArchitecture;
 import org.graylog.testing.datanode.DatanodeDockerHooks;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
-import org.testcontainers.images.PullPolicy;
 import org.testcontainers.images.builder.ImageFromDockerfile;
+import org.testcontainers.images.builder.dockerfile.DockerfileBuilder;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.function.Supplier;
@@ -42,6 +44,7 @@ import static org.graylog.testing.completebackend.DefaultPluginJarsProvider.getP
 public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode.DatanodeDevContainerBuilder {
     private static final Logger LOG = LoggerFactory.getLogger(DatanodeDevContainerBuilder.class);
     private static final Supplier<ImageFromDockerfile> imageSupplier = Suppliers.memoize(DatanodeDevContainerBuilder::createImage);
+    public static final String ENV_INSECURE_STARTUP = "GRAYLOG_DATANODE_INSECURE_STARTUP";
 
     private String rootUsername = "admin";
     private String passwordSecret;
@@ -53,6 +56,7 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
     private String nodeName = "node1";
     private Optional<DatanodeDockerHooks> customizer = Optional.empty();
     private Network network;
+    private Map<String, String> env;
 
     protected static Path getPath() {
         return getProjectReposPath().resolve(Path.of("graylog2-server", "data-node", "target"));
@@ -118,14 +122,20 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
         return this;
     }
 
+    @Override
+    public org.graylog.testing.datanode.DatanodeDevContainerBuilder env(Map<String, String> env) {
+        this.env = env;
+        return this;
+    }
+
     public GenericContainer<?> build() {
         final Path graylog = getPath().resolve("graylog-datanode-" + getProjectVersion() + ".jar");
-        if(!Files.exists(graylog)) {
+        if (!Files.exists(graylog)) {
             LOG.info("Searching for {} failed.", graylog.toAbsolutePath());
             LOG.info("Project repos path: {}, absolute path: {}", getProjectReposPath(), getProjectReposPath().toAbsolutePath());
-            if(Files.exists(getPath())) {
+            if (Files.exists(getPath())) {
                 LOG.info("contents of base path {}:", getPath());
-                try(var files = Files.list(getPath())) {
+                try (var files = Files.list(getPath())) {
                     files.forEach(file -> LOG.info("{}", file.toString()));
                 } catch (IOException ex) {
                     LOG.info("listing files failed with exception: {}", ex.getMessage());
@@ -139,9 +149,9 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
         GenericContainer<?> container = new GenericContainer<>(imageSupplier.get())
                 .withExposedPorts(restPort, openSearchHttpPort)
                 .withNetwork(network)
-                .withEnv("GRAYLOG_DATANODE_DATA_DIR", "data")
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_LOCATION", IMAGE_WORKING_DIR)
-                .withEnv("GRAYLOG_DATANODE_INSECURE_STARTUP", "true")
+                .withEnv("GRAYLOG_DATANODE_OPENSEARCH_PLUGINS_LOCATION", IMAGE_WORKING_DIR + "/plugins")
+                .withEnv(ENV_INSECURE_STARTUP, "true")
                 .withEnv("GRAYLOG_DATANODE_CONFIG_LOCATION", IMAGE_WORKING_DIR + "/config") // this is the datanode config dir for certs
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_DATA_LOCATION", IMAGE_WORKING_DIR + "/opensearch/data")
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_LOGS_LOCATION", IMAGE_WORKING_DIR + "/opensearch/logs")
@@ -155,7 +165,7 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_DISCOVERY_SEED_HOSTS", nodeName + ":" + openSearchTransportPort)
 
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_NETWORK_HOST", nodeName)
-                .withEnv("GRAYLOG_DATANODE_CLUSTER_INITIAL_MANAGER_NODES", nodeName)
+                .withEnv("GRAYLOG_DATANODE_INITIAL_CLUSTER_MANAGER_NODES", nodeName)
 
                 .withEnv("GRAYLOG_DATANODE_ROOT_USERNAME", rootUsername)
                 .withEnv("GRAYLOG_DATANODE_PASSWORD_SECRET", passwordSecret)
@@ -172,8 +182,22 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
                 .waitingFor(new LogMessageWaitStrategy()
                         .withRegEx(".*Graylog DataNode datanode up and running.\n")
                         .withStartupTimeout(Duration.ofSeconds(60)));
+
+        // explicitly configured ENV variables will override those set above
+        if(env != null) {
+            env.forEach(container::withEnv);
+        }
+
+        final String opensearchDistributionName = "opensearch-" + getOpensearchVersion() + "-linux-" + OpensearchArchitecture.fromOperatingSystem();
+        final Path downloadedOpensearch = getPath().resolve(Path.of("opensearch", opensearchDistributionName));
+
+        if (!Files.exists(downloadedOpensearch)) {
+            throw new RuntimeException("Failed to link opensearch distribution to the datanode docker image, path " + downloadedOpensearch.toAbsolutePath() + " does not exist!");
+        }
+
         container.withFileSystemBind(graylog.toString(), IMAGE_WORKING_DIR + "/graylog-datanode.jar")
-                .withFileSystemBind(getPath().resolve("lib").toString(), IMAGE_WORKING_DIR + "/lib/");
+                .withFileSystemBind(getPath().resolve("lib").toString(), IMAGE_WORKING_DIR + "/lib/")
+                .withFileSystemBind(downloadedOpensearch.toString(), IMAGE_WORKING_DIR + "/" + opensearchDistributionName, BindMode.READ_ONLY);
 
         customizer.ifPresent(c -> c.onContainer(container));
         return container;
@@ -190,32 +214,27 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
     }
 
     private static ImageFromDockerfile createImage() {
-        final String opensearchTarArchive = "opensearch-" + getOpensearchVersion() + "-linux-" + OpensearchArchitecture.fromOperatingSystem();
-        final Path downloadedOpensearch = getPath().resolve(Path.of("opensearch", opensearchTarArchive));
 
-        if (!Files.exists(downloadedOpensearch)) {
-            throw new RuntimeException("Failed to link opensearch distribution to the datanode docker image, path " + downloadedOpensearch.toAbsolutePath() + " does not exist!");
-        }
+        final ImageFromDockerfile image = new ImageFromDockerfile("local/graylog-datanode:latest", false);
 
-        return new ImageFromDockerfile("local/graylog-datanode:latest", false)
-                // the following command makes the opensearch tar.gz archive accessible in the docker build context, so it can
-                // be later used by the ADD command
-                .withFileFromPath(opensearchTarArchive, downloadedOpensearch)
-                .withDockerfileFromBuilder(builder ->
-                        builder.from("eclipse-temurin:17-jre-jammy")
-                                .workDir(IMAGE_WORKING_DIR)
-                                .run("mkdir -p opensearch/config")
-                                .run("mkdir -p opensearch/data")
-                                .run("mkdir -p opensearch/logs")
-                                .run("mkdir -p config")
+        return image.withDockerfileFromBuilder(builder ->
+        {
+            final DockerfileBuilder fileBuilder = builder.from("eclipse-temurin:17-jre-jammy")
+                    .workDir(IMAGE_WORKING_DIR)
+                    .run("mkdir -p opensearch/config")
+                    .run("mkdir -p opensearch/data")
+                    .run("mkdir -p opensearch/logs")
+                    .run("mkdir -p config")
+                    .run("mkdir -p plugins");
 
-                                .add(opensearchTarArchive, "./" + opensearchTarArchive + "/") // this will automatically extract the tar
-                                .run("touch datanode.conf") // create empty configuration file, required but all config comes via env props
-                                .run("useradd opensearch")
-                                .run("chown -R opensearch:opensearch " + IMAGE_WORKING_DIR)
-                                .user("opensearch")
-                                .expose(DatanodeContainerizedBackend.DATANODE_REST_PORT, DatanodeContainerizedBackend.DATANODE_OPENSEARCH_HTTP_PORT)
-                                .entryPoint("java", "-jar", "graylog-datanode.jar", "datanode", "-f", "datanode.conf")
-                                .build());
+
+            fileBuilder.run("touch datanode.conf") // create empty configuration file, required but all config comes via env props
+                    .run("useradd opensearch")
+                    .run("chown -R opensearch:opensearch " + IMAGE_WORKING_DIR)
+                    .user("opensearch")
+                    .expose(DatanodeContainerizedBackend.DATANODE_REST_PORT, DatanodeContainerizedBackend.DATANODE_OPENSEARCH_HTTP_PORT)
+                    .entryPoint("java", "-jar", "graylog-datanode.jar", "datanode", "-f", "datanode.conf");
+            builder.build();
+        });
     }
 }

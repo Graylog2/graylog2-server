@@ -16,15 +16,23 @@
  */
 package org.graylog.storage.elasticsearch7.views.searchtypes;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
+import jakarta.inject.Inject;
+import org.graylog.events.event.EventDto;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
+import org.graylog.plugins.views.search.searchtypes.events.CommonEventSummary;
 import org.graylog.plugins.views.search.searchtypes.events.EventList;
 import org.graylog.plugins.views.search.searchtypes.events.EventSummary;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.BoolQueryBuilder;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.SearchHit;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.Aggregations;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.sort.FieldSortBuilder;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.sort.SortOrder;
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
 
 import java.util.List;
@@ -34,11 +42,55 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 public class ESEventList implements ESSearchTypeHandler<EventList> {
+    private final ObjectMapper objectMapper;
+
+    @Inject
+    public ESEventList(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
+
     @Override
     public void doGenerateQueryPart(Query query, EventList eventList,
                                     ESGeneratedQueryContext queryContext) {
-        queryContext.searchSourceBuilder(eventList)
-                .size(10000);
+        final Set<String> effectiveStreams = eventList.streams().isEmpty()
+                ? query.usedStreamIds()
+                : eventList.streams();
+
+        final var searchSourceBuilder = queryContext.searchSourceBuilder(eventList);
+        final FieldSortBuilder sortConfig = sortConfig(eventList);
+        searchSourceBuilder.sort(sortConfig);
+        final var queryBuilder = searchSourceBuilder.query();
+        if (!effectiveStreams.isEmpty() && queryBuilder instanceof BoolQueryBuilder boolQueryBuilder) {
+            boolQueryBuilder.must(QueryBuilders.termsQuery(EventDto.FIELD_SOURCE_STREAMS, effectiveStreams));
+        }
+        if (!eventList.attributes().isEmpty() && queryBuilder instanceof BoolQueryBuilder boolQueryBuilder) {
+            final var filterQueries = eventList.attributes().stream()
+                    .filter(attribute -> EventList.KNOWN_ATTRIBUTES.contains(attribute.field()))
+                    .flatMap(attribute -> attribute.toQueryStrings().stream())
+                    .toList();
+
+            filterQueries.forEach(filterQuery -> boolQueryBuilder.filter(QueryBuilders.queryStringQuery(filterQuery)));
+        }
+
+        eventList.page().ifPresentOrElse(page -> {
+            final int pageSize = eventList.perPage().orElse(EventList.DEFAULT_PAGE_SIZE);
+            searchSourceBuilder.size(pageSize);
+            searchSourceBuilder.from((page - 1) * pageSize);
+        }, () -> searchSourceBuilder.size(10000));
+    }
+
+    private SortOrder toSortOrder(EventList.Direction direction) {
+        return switch (direction) {
+            case ASC -> SortOrder.ASC;
+            case DESC -> SortOrder.DESC;
+        };
+    }
+
+    protected FieldSortBuilder sortConfig(EventList eventList) {
+        final var sortConfig = eventList.sort()
+                .filter(sort -> EventList.KNOWN_ATTRIBUTES.contains(sort.field()))
+                .orElse(EventList.DEFAULT_SORT);
+        return new FieldSortBuilder(sortConfig.field()).order(toSortOrder(sortConfig.direction()));
     }
 
     protected List<Map<String, Object>> extractResult(SearchResponse result) {
@@ -54,15 +106,15 @@ public class ESEventList implements ESSearchTypeHandler<EventList> {
         final Set<String> effectiveStreams = searchType.streams().isEmpty()
                 ? query.usedStreamIds()
                 : searchType.streams();
-        final List<EventSummary> eventSummaries = extractResult(result).stream()
+        final List<CommonEventSummary> eventSummaries = extractResult(result).stream()
+                .map(rawEvent -> objectMapper.convertValue(rawEvent, EventDto.class))
                 .map(EventSummary::parse)
-                .filter(eventSummary -> effectiveStreams.containsAll(eventSummary.streams()))
                 .collect(Collectors.toList());
         final EventList.Result.Builder resultBuilder = EventList.Result.builder()
                 .events(eventSummaries)
-                .id(searchType.id());
+                .id(searchType.id())
+                .totalResults(result.getHits().getTotalHits().value);
         searchType.name().ifPresent(resultBuilder::name);
-        return resultBuilder
-                .build();
+        return resultBuilder.build();
     }
 }

@@ -32,6 +32,14 @@
                 <include>*/**</include>
             </includes>
         </fileSet>
+        <fileSet>
+            <directory>${project.build.directory}/sbom</directory>
+            <includes>
+                <include>graylog-data-node-*-sbom.json</include>
+                <include>graylog-data-node-*-sbom.xml</include>
+            </includes>
+            <outputDirectory>sbom</outputDirectory>
+        </fileSet>
 
         <!-- empty directories -->
         <fileSet>

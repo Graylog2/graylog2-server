@@ -22,7 +22,7 @@ import userEvent from '@testing-library/user-event';
 
 import type { TitlesMap } from 'views/stores/TitleTypes';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import useCurrentQueryId from 'views/logic/queries/useCurrentQueryId';
 import { asMock } from 'helpers/mocking';
 
@@ -90,13 +90,11 @@ describe('AdaptableQueryTabs', () => {
     });
   };
 
-  beforeAll(loadViewsPlugin);
+  useViewsPlugin();
 
   beforeEach(() => {
     asMock(useCurrentQueryId).mockReturnValue('query-id-1');
   });
-
-  afterAll(unloadViewsPlugin);
 
   describe('renders main tabs and more tabs dropdown based on container width', () => {
     // Defaults widths: Container width = 500px, create tab button + more tabs dropdown button with = 215px, width of one main tab = 100px
@@ -114,24 +112,24 @@ describe('AdaptableQueryTabs', () => {
       // Displays main tabs
       mainTabs.forEach((tabNr) => {
         expect(screen.getByRole(mainTabRole, {
-          name: `Tab ${tabNr}`,
+          name: new RegExp(`tab ${tabNr}`, 'i'),
         })).toBeInTheDocument();
 
         // Does not display main tabs in dropdown
         expect(screen.queryByRole(dropdownTabRole, {
-          name: `Tab ${tabNr}`,
+          name: new RegExp(`tab ${tabNr}`, 'i'),
         })).not.toBeInTheDocument();
       });
 
       // Displays dropdown tabs
       dropdownTabs.forEach((tabNr) => {
         expect(screen.getByRole(dropdownTabRole, {
-          name: `Tab ${tabNr}`,
+          name: new RegExp(`tab ${tabNr}`, 'i'),
         })).toBeInTheDocument();
 
         // Does not display tabs in dropdown as main tabs
         expect(screen.queryByRole(mainTabRole, {
-          name: `Tab ${tabNr}`,
+          name: new RegExp(`tab ${tabNr}`, 'i'),
         })).not.toBeInTheDocument();
       });
 
@@ -152,12 +150,12 @@ describe('AdaptableQueryTabs', () => {
       // Displays main tabs
       mainTabs.forEach((tabNr) => {
         expect(screen.getByRole(mainTabRole, {
-          name: `Tab ${tabNr}`,
+          name: new RegExp(`tab ${tabNr}`, 'i'),
         })).toBeInTheDocument();
 
         // Does not display main tabs in dropdown
         expect(screen.queryByRole(dropdownTabRole, {
-          name: `Tab ${tabNr}`,
+          name: new RegExp(`tab ${tabNr}`, 'i'),
         })).not.toBeInTheDocument();
       });
 
@@ -174,13 +172,13 @@ describe('AdaptableQueryTabs', () => {
       const mainTabs = [1, 2, 3, 4];
 
       await screen.findByRole(mainTabRole, {
-        name: /Tab 4/i,
+        name: /tab 4/i,
       });
 
       // Displays main tabs
       mainTabs.forEach((tabNr) => {
         expect(screen.getByRole(mainTabRole, {
-          name: `Tab ${tabNr}`,
+          name: new RegExp(`tab ${tabNr}`, 'i'),
         })).toBeInTheDocument();
       });
     });
@@ -193,7 +191,7 @@ describe('AdaptableQueryTabs', () => {
       rerender(<AdaptableQueryTabs {...DEFAULT_PROPS} />);
 
       const newActiveTab = await screen.findByRole(mainTabRole, {
-        name: 'Tab 4',
+        name: /tab 4/i,
       });
 
       // eslint-disable-next-line testing-library/no-node-access
@@ -209,7 +207,7 @@ describe('AdaptableQueryTabs', () => {
       rerender(<AdaptableQueryTabs {...DEFAULT_PROPS} queries={newQueries} />);
       await openMoreTabsDropdown();
 
-      await screen.findByRole(dropdownTabRole, { name: 'Page#5' });
+      await screen.findByRole(dropdownTabRole, { name: /page#5/i });
     });
   });
 
@@ -218,7 +216,7 @@ describe('AdaptableQueryTabs', () => {
     render(<AdaptableQueryTabs {...DEFAULT_PROPS} />);
 
     const tab2 = await screen.findByRole(mainTabRole, {
-      name: 'Tab 2',
+      name: /Tab 2/i,
     });
 
     expect(tab2).toBeVisible();
@@ -231,7 +229,7 @@ describe('AdaptableQueryTabs', () => {
     render(<AdaptableQueryTabs {...DEFAULT_PROPS} onSelect={onSelectStub} />);
 
     const tab2 = await screen.findByRole(mainTabRole, {
-      name: 'Tab 2',
+      name: /Tab 2/i,
     });
     userEvent.click(tab2);
 
@@ -247,7 +245,7 @@ describe('AdaptableQueryTabs', () => {
     await finishInitialRender();
     await openMoreTabsDropdown();
 
-    userEvent.click(await screen.findByRole(dropdownTabRole, { name: 'Tab 4' }));
+    userEvent.click(await screen.findByRole(dropdownTabRole, { name: /tab 4/i }));
 
     await expect(onSelectStub).toHaveBeenCalledTimes(1);
 

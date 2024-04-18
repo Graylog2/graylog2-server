@@ -25,6 +25,7 @@ import org.graylog.testing.completebackend.MavenProjectDirProvider;
 import org.graylog.testing.completebackend.PluginJarsProvider;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog2.storage.SearchVersion;
+import jakarta.annotation.Nonnull;
 import org.junit.jupiter.engine.config.CachingJupiterConfiguration;
 import org.junit.jupiter.engine.config.DefaultJupiterConfiguration;
 import org.junit.jupiter.engine.config.JupiterConfiguration;
@@ -48,7 +49,7 @@ import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -93,14 +94,6 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
                 .collect(Collectors.toSet());
     }
 
-    private Set<Class<? extends MavenProjectDirProvider>> getMavenProjectDirProvider(Set<Class<?>> annotatedClasses) {
-        return get(annotatedClasses, (ContainerMatrixTestsConfiguration annotation) -> Stream.of(annotation.mavenProjectDirProvider()));
-    }
-
-    private Set<Class<? extends PluginJarsProvider>> getPluginJarsProvider(Set<Class<?>> annotatedClasses) {
-        return get(annotatedClasses, (ContainerMatrixTestsConfiguration annotation) -> Stream.of(annotation.pluginJarsProvider()));
-    }
-
     /**
      * Property has to be in the form of Elasticsearch|OpenSearch:x.x.x
      *
@@ -112,10 +105,6 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
             return Optional.empty();
         }
         return Optional.of(SearchVersion.decode(property));
-    }
-
-    private Stream<SearchVersion> defaultOrOverride() {
-        return Stream.of(getSearchVersionOverride().orElse(SearchServer.DEFAULT_VERSION.getSearchVersion()));
     }
 
     /**
@@ -138,30 +127,12 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
         }
     }
 
-    private Set<SearchVersion> getSearchServerVersions(Set<Class<?>> annotatedClasses) {
-        return get(annotatedClasses, (ContainerMatrixTestsConfiguration annotation) -> {
-            if (annotation.searchVersions().length == 0) {
-                return defaultOrOverride();
-            } else {
-                return filterForCompatibleVersionOrDrop(annotation.searchVersions());
-            }
-        });
-    }
-
-    private Set<MongodbServer> getMongoVersions(Set<Class<?>> annotatedClasses) {
-        return get(annotatedClasses, (ContainerMatrixTestsConfiguration annotation) -> Stream.of(annotation.mongoVersions()));
-    }
-
     private Map<String, String> getAdditionalConfigurationParameters(Set<Class<?>> annotatedClasses) {
         return get(annotatedClasses, (ContainerMatrixTestsConfiguration annotation) -> Arrays.stream(annotation.additionalConfigurationParameters()))
                 .stream().collect(Collectors.toMap(
                         ContainerMatrixTestsConfiguration.ConfigurationParameter::key,
                         ContainerMatrixTestsConfiguration.ConfigurationParameter::value
                 ));
-    }
-
-    private Set<Integer> getExtraPorts(Set<Class<?>> annotatedClasses) {
-        return get(annotatedClasses, (ContainerMatrixTestsConfiguration annotation) -> Arrays.stream(annotation.extraPorts()).boxed());
     }
 
     public static List<String> getEnabledFeatureFlags(Lifecycle lifecycle, Class<?> annotatedClass) {
@@ -197,13 +168,6 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
         return urls;
     }
 
-    private List<String> getEnabledFeatureFlags(Lifecycle lifecycle, Set<Class<?>> annotatedClasses) {
-        return annotatedClasses.stream()
-                .map(zclass -> getEnabledFeatureFlags(lifecycle, zclass))
-                .flatMap(Collection::stream)
-                .collect(Collectors.toList());
-    }
-
     private List<URL> getMongoDBFixtures(Set<Class<?>> annotatedClasses) {
         final List<URL> urls = new LinkedList<>();
         for (Class<?> aClass : annotatedClasses) {
@@ -232,92 +196,53 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
                 new DefaultJupiterConfiguration(discoveryRequest.getConfigurationParameters()));
         final ContainerMatrixEngineDescriptor engineDescriptor = new ContainerMatrixEngineDescriptor(uniqueId, "Graylog Container Matrix Tests", configuration);
 
-        final Set<Integer> extraPorts = getExtraPorts(annotatedClasses);
-        final List<URL> mongoDBFixtures = getMongoDBFixtures(annotatedClasses);
-        final boolean withMailServerEnabled = isMailServerRequired(annotatedClasses);
-        final boolean withWebhookServerEnabled = isWebhookServerRequired(annotatedClasses);
-        final Map<String, String> additionalConfig = getAdditionalConfigurationParameters(annotatedClasses);
-
         if (testAgainstRunningESMongoDB()) {
             // if you test from inside an IDE against running containers
             ContainerMatrixTestsDescriptor testsDescriptor = new ContainerMatrixTestWithRunningESMongoTestsDescriptor(
                     engineDescriptor,
-                    extraPorts,
-                    mongoDBFixtures);
+                    getMongoDBFixtures(annotatedClasses));
             new ContainerMatrixTestsDiscoverySelectorResolver(engineDescriptor).resolveSelectors(discoveryRequest, testsDescriptor);
             engineDescriptor.addChild(testsDescriptor);
         } else {
-            // for full tests, create all combinations of tests. First differentiate for maven builds.
-            getMavenProjectDirProvider(annotatedClasses)
-                    .forEach(mavenProjectDirProvider -> getPluginJarsProvider(annotatedClasses)
-                            .forEach(pluginJarsProvider -> {
-                                MavenProjectDirProvider mpdp = instantiateFactory(mavenProjectDirProvider);
-                                PluginJarsProvider pjp = instantiateFactory(pluginJarsProvider);
-                                // now add all grouped tests for Lifecycle.VM
-                                getSearchServerVersions(annotatedClasses)
-                                        .forEach(searchVersion -> getMongoVersions(annotatedClasses)
-                                                .forEach(mongoVersion -> {
-                                                    ContainerMatrixTestsDescriptor testsDescriptor = new ContainerMatrixTestsDescriptor(engineDescriptor,
-                                                            Lifecycle.VM,
-                                                            mavenProjectDirProvider,
-                                                            mpdp.getUniqueId(),
-                                                            pluginJarsProvider,
-                                                            pjp.getUniqueId(),
-                                                            searchVersion,
-                                                            mongoVersion,
-                                                            extraPorts,
-                                                            mongoDBFixtures,
-                                                            getEnabledFeatureFlags(Lifecycle.VM, annotatedClasses),
-                                                            withMailServerEnabled,
-                                                            withWebhookServerEnabled,
-                                                            additionalConfig);
-                                                    new ContainerMatrixTestsDiscoverySelectorResolver(engineDescriptor).resolveSelectors(discoveryRequest, testsDescriptor);
-                                                    engineDescriptor.addChild(testsDescriptor);
-                                                })
-                                        );
-                                // add separate test classes (Lifecycle.CLASS)
-                                getSearchServerVersions(annotatedClasses)
-                                        .forEach(esVersion -> getMongoVersions(annotatedClasses)
-                                                        .forEach(mongoVersion -> {
-                                                            ContainerMatrixTestsDescriptor testsDescriptor = new ContainerMatrixTestsDescriptor(engineDescriptor,
-                                                                    Lifecycle.CLASS,
-                                                                    mavenProjectDirProvider,
-                                                                    mpdp.getUniqueId(),
-                                                                    pluginJarsProvider,
-                                                                    pjp.getUniqueId(),
-                                                                    esVersion,
-                                                                    mongoVersion,
-                                                                    extraPorts,
-                                                                    new ArrayList<>(),
-                                                                    getEnabledFeatureFlags(Lifecycle.CLASS, annotatedClasses), withMailServerEnabled, withWebhookServerEnabled, additionalConfig);
-                                                            new ContainerMatrixTestsDiscoverySelectorResolver(engineDescriptor).resolveSelectors(discoveryRequest, testsDescriptor);
-                                                            engineDescriptor.addChild(testsDescriptor);
-                                                        })
-                                                );
-                                    }
-                            )
-                    );
+            annotatedClasses.stream()
+                    .flatMap(clazz -> testClassToDescriptors(clazz, engineDescriptor))
+                    .forEach(descriptor -> {
+                        new ContainerMatrixTestsDiscoverySelectorResolver(engineDescriptor).resolveSelectors(discoveryRequest, descriptor);
+                        engineDescriptor.addChild(descriptor);
+                    });
         }
 
         return engineDescriptor;
     }
 
-    private boolean isWebhookServerRequired(Set<Class<?>> annotatedClasses) {
-        return annotatedClasses
-                .stream()
-                .map(aClass -> AnnotationSupport.findAnnotation(aClass, ContainerMatrixTestsConfiguration.class))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .anyMatch(ContainerMatrixTestsConfiguration::withWebhookServerEnabled);
-    }
-
-    private boolean isMailServerRequired(Set<Class<?>> annotatedClasses) {
-         return annotatedClasses
-                .stream()
-                .map(aClass -> AnnotationSupport.findAnnotation(aClass, ContainerMatrixTestsConfiguration.class))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .anyMatch(ContainerMatrixTestsConfiguration::withMailServerEnabled);
+    @Nonnull
+    private Stream<ContainerMatrixTestsDescriptor> testClassToDescriptors(Class<?> clazz, ContainerMatrixEngineDescriptor engineDescriptor) {
+        final ContainerMatrixTestsConfiguration annotation = clazz.getAnnotation(ContainerMatrixTestsConfiguration.class);
+        final Class<? extends MavenProjectDirProvider> mavenProjectDirProvider = annotation.mavenProjectDirProvider();
+        final Class<? extends PluginJarsProvider> pluginJarsProvider = annotation.pluginJarsProvider();
+        final Lifecycle lifecycle = annotation.serverLifecycle();
+        final String mavenProjectDirProviderID = instantiateFactory(mavenProjectDirProvider).getUniqueId();
+        final String pluginJarsProviderID = instantiateFactory(pluginJarsProvider).getUniqueId();
+        final List<URL> mongoFixtures = getMongoDBFixtures(Lifecycle.VM, clazz);
+        final Map<String, String> additionalParams = getAdditionalConfigurationParameters(Collections.singleton(clazz));
+        return Arrays.stream(annotation.searchVersions()).flatMap(searchServer ->
+                Arrays.stream(annotation.mongoVersions()).map(mongodbServer ->
+                        new ContainerMatrixTestsDescriptor(
+                                engineDescriptor,
+                                lifecycle,
+                                mavenProjectDirProvider,
+                                mavenProjectDirProviderID,
+                                pluginJarsProvider,
+                                pluginJarsProviderID,
+                                searchServer.getSearchVersion(),
+                                mongodbServer,
+                                mongoFixtures,
+                                Arrays.stream(annotation.enabledFeatureFlags()).collect(Collectors.toList()),
+                                annotation.withMailServerEnabled(),
+                                annotation.withWebhookServerEnabled(),
+                                additionalParams)
+                )
+        ).distinct();
     }
 
     @Override

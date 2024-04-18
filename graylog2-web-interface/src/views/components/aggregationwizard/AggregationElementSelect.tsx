@@ -33,7 +33,7 @@ const AggregationElementSelect = ({ aggregationElements, onSelect, formValues }:
     .map(({ key, title }) => <MenuItem key={`element-select-${key}`} onSelect={() => onSelect(key)}>{title}</MenuItem>);
 
   return (
-    <DropdownButton id="add-aggregation-element" dropup title="Add">
+    <DropdownButton id="add-aggregation-element" title="Add" buttonTitle="Add an element">
       {menuItems}
     </DropdownButton>
   );

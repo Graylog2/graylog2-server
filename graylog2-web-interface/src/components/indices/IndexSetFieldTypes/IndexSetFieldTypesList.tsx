@@ -43,6 +43,9 @@ import OriginFilterValueRenderer from 'components/indices/IndexSetFieldTypes/Ori
 import useCustomColumnRenderers from 'components/indices/IndexSetFieldTypes/hooks/useCustomColumnRenderers';
 import IndexSetProfile from 'components/indices/IndexSetFieldTypes/IndexSetProfile';
 import type { FieldTypePutResponse } from 'views/logic/fieldactions/ChangeFieldType/types';
+import { useStore } from 'stores/connect';
+import { IndexSetsStore } from 'stores/indices/IndexSetsStore';
+import isIndexFieldTypeChangeAllowed from 'components/indices/helpers/isIndexFieldTypeChangeAllowed';
 
 import BulkActions from './BulkActions';
 
@@ -69,7 +72,7 @@ const isEntitySelectable = (fieldType: IndexSetFieldType) => !fieldType.isReserv
 const FilterValueRenderers = {
   is_reserved: (value: 'true' | 'false', title: string) => (
     <>
-      <StyledIcon name={value === 'true' ? 'circle-check' : 'circle-xmark'} $value={value} />
+      <StyledIcon name={value === 'true' ? 'check_circle' : 'cancel'} $value={value} />
       {title}
     </>
   ),
@@ -78,6 +81,7 @@ const FilterValueRenderers = {
 
 const IndexSetFieldTypesList = () => {
   const { indexSetId } = useParams();
+  const { indexSet } = useStore(IndexSetsStore);
   const [selectedEntitiesData, setSelectedEntitiesData] = useState<Record<string, IndexSetFieldType>>({});
   const [urlQueryFilters, setUrlQueryFilters] = useUrlQueryFilters();
   const [query, setQuery] = useQueryParam('query', StringParam);
@@ -132,6 +136,7 @@ const IndexSetFieldTypesList = () => {
 
     refetchFieldTypes();
   }, [indexSetId, refetchFieldTypes, selectedEntitiesData]);
+  const indexFieldTypeChangeAllowed = useMemo(() => isIndexFieldTypeChangeAllowed(indexSet), [indexSet]);
   const renderActions = useCallback((fieldType: IndexSetFieldType) => (
     <FieldTypeActions fieldType={fieldType}
                       indexSetId={indexSetId}
@@ -181,7 +186,7 @@ const IndexSetFieldTypesList = () => {
                          setUrlQueryFilters={onChangeFilters}
                          filterValueRenderers={FilterValueRenderers} />
         </SearchForm>
-        <IndexSetProfile />
+        {indexFieldTypeChangeAllowed && <IndexSetProfile />}
       </StyledTopRow>
       {pagination?.total === 0 && (
         <NoEntitiesExist>
@@ -200,7 +205,7 @@ const IndexSetFieldTypesList = () => {
                                             actionsCellWidth={120}
                                             columnRenderers={customColumnRenderers}
                                             columnDefinitions={attributes}
-                                            rowActions={renderActions}
+                                            rowActions={indexFieldTypeChangeAllowed && renderActions}
                                             expandedSectionsRenderer={expandedSections}
                                             bulkSelection={bulkSection} />
       )}

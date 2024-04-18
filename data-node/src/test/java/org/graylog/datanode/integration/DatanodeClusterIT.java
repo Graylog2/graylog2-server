@@ -18,6 +18,7 @@ package org.graylog.datanode.integration;
 
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.rholder.retry.RetryException;
+import jakarta.validation.constraints.NotNull;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.graylog.datanode.configuration.variants.KeystoreInformation;
 import org.graylog.datanode.restoperations.DatanodeOpensearchWait;
@@ -39,8 +40,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
 
-import jakarta.validation.constraints.NotNull;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -59,6 +58,7 @@ public class DatanodeClusterIT {
 
     private DatanodeContainerizedBackend nodeA;
     private DatanodeContainerizedBackend nodeB;
+    private DatanodeContainerizedBackend nodeC;
 
     @TempDir
     static Path tempDir;
@@ -119,6 +119,9 @@ public class DatanodeClusterIT {
         if (nodeA != null) {
             nodeA.stop();
         }
+        if (nodeC != null) {
+            nodeC.stop();
+        }
         mongoDBTestService.close();
         network.close();
     }
@@ -135,7 +138,7 @@ public class DatanodeClusterIT {
         final KeystoreInformation transportNodeC = DatanodeSecurityTestUtils.generateTransportCert(tempDir, ca, hostnameNodeC);
         final KeystoreInformation httpNodeC = DatanodeSecurityTestUtils.generateHttpCert(tempDir, ca, hostnameNodeC);
 
-        final DatanodeContainerizedBackend nodeC = createDatanodeContainer(
+        nodeC = createDatanodeContainer(
                 network, mongoDBTestService,
                 hostnameNodeC,
                 transportNodeC,
@@ -155,7 +158,7 @@ public class DatanodeClusterIT {
         final KeystoreInformation transportNodeC = DatanodeSecurityTestUtils.generateTransportCert(tempDir, ca, hostnameNodeC);
         final KeystoreInformation httpNodeC = DatanodeSecurityTestUtils.generateHttpCert(tempDir, ca, hostnameNodeC);
 
-        final DatanodeContainerizedBackend nodeC = createDatanodeContainer(
+        nodeC = createDatanodeContainer(
                 network, mongoDBTestService,
                 hostnameNodeC,
                 transportNodeC,
@@ -222,7 +225,7 @@ public class DatanodeClusterIT {
                 datanodeContainer -> {
                     datanodeContainer.withNetwork(network);
                     datanodeContainer.withEnv("GRAYLOG_DATANODE_PASSWORD_SECRET", DatanodeContainerizedBackend.SIGNING_SECRET);
-                    datanodeContainer.withEnv("GRAYLOG_DATANODE_CLUSTER_INITIAL_MANAGER_NODES", hostnameNodeA);
+                    datanodeContainer.withEnv("GRAYLOG_DATANODE_INITIAL_CLUSTER_MANAGER_NODES", hostnameNodeA);
                     datanodeContainer.withEnv("GRAYLOG_DATANODE_OPENSEARCH_DISCOVERY_SEED_HOSTS", hostnameNodeA + ":9300");
 
                     datanodeContainer.withFileSystemBind(transportKeystore.location().toAbsolutePath().toString(), IMAGE_WORKING_DIR + "/config/datanode-transport-certificates.p12");
@@ -269,8 +272,11 @@ public class DatanodeClusterIT {
                     .waitForNodesCount(countOfNodes);
 
         } catch (Exception retryException) {
-            LOG.error("DataNode Container logs from nodeA follow:\n" + nodeA.getLogs());
+            LOG.error("DataNode Container logs from node A follow:\n" + nodeA.getLogs());
             LOG.error("DataNode Container logs from node B follow:\n" + nodeB.getLogs());
+            if (nodeC != null) {
+                LOG.error("DataNode Container logs from node C follow:\n" + nodeC.getLogs());
+            }
             throw retryException;
         }
     }

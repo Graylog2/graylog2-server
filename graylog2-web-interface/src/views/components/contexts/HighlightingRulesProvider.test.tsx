@@ -22,7 +22,7 @@ import { StaticColor } from 'views/logic/views/formatting/highlighting/Highlight
 import ViewState from 'views/logic/views/ViewState';
 import FormattingSettings from 'views/logic/views/formatting/FormattingSettings';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import type View from 'views/logic/views/View';
 import { createSearch } from 'fixtures/searches';
 
@@ -46,9 +46,7 @@ describe('HighlightingRulesProvider', () => {
     return consume;
   };
 
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   it('provides no data when highlighting rules store is empty', () => {
     const consume = renderSUT();

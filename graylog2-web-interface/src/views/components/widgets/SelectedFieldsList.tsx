@@ -17,11 +17,11 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { useState, useCallback, forwardRef, useMemo } from 'react';
-import type { DraggableProvidedDraggableProps, DraggableProvidedDragHandleProps } from 'react-beautiful-dnd';
 
 import { IconButton, SortableList, Icon } from 'components/common';
 import FieldSelect from 'views/components/aggregationwizard/FieldSelect';
 import TextOverflowEllipsis from 'components/common/TextOverflowEllipsis';
+import type { DraggableProps, DragHandleProps } from 'components/common/SortableList';
 
 const ListItemContainer = styled.div`
   display: flex;
@@ -48,8 +48,8 @@ const DragHandle = styled.div`
 
 type ListItemProps = {
   item: { id: string, title: string },
-  draggableProps: DraggableProvidedDraggableProps,
-  dragHandleProps: DraggableProvidedDragHandleProps,
+  draggableProps: DraggableProps,
+  dragHandleProps: DragHandleProps,
   className: string,
   onChange: (fieldName: string) => void,
   onRemove: () => void,
@@ -96,12 +96,12 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(({
       {!isEditing && (
         <>
           <DragHandle {...dragHandleProps} data-testid={`${testIdPrefix}-drag-handle`}>
-            <Icon name="bars" />
+            <Icon name="drag_indicator" />
           </DragHandle>
           <FieldTitle>{item.title}</FieldTitle>
           <div>
-            <IconButton name="edit" title={`Edit ${item.title} field`} onClick={() => setIsEditing(true)} />
-            <IconButton name="trash-alt" title={`Remove ${item.title} field`} onClick={onRemove} />
+            <IconButton name="edit_square" title={`Edit ${item.title} field`} onClick={() => setIsEditing(true)} />
+            <IconButton name="delete" title={`Remove ${item.title} field`} onClick={onRemove} />
           </div>
         </>
       )}

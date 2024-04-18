@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix max. number of indices shown for Index Time Size Optimizing strategy."
+
+issues = ["14845"]
+pulls = ["18804", "graylog-plugin-enterprise#6863"]

@@ -16,6 +16,7 @@
  */
 package org.graylog.storage.opensearch2;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.annotations.VisibleForTesting;
@@ -32,7 +33,9 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.search.MultiSearchRe
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.support.PlainActionFuture;
+import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
+import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
 import org.graylog.shaded.opensearch2.org.opensearch.client.ResponseException;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog.storage.errors.ResponseError;
@@ -59,7 +62,6 @@ public class OpenSearchClient {
     private static final Logger LOG = LoggerFactory.getLogger(OpenSearchClient.class);
 
     private final RestHighLevelClient client;
-    private final org.opensearch.client.opensearch.OpenSearchClient openSearchClient;
     private final boolean compressionEnabled;
     private final Optional<Integer> indexerMaxConcurrentSearches;
     private final Optional<Integer> indexerMaxConcurrentShardRequests;
@@ -67,13 +69,11 @@ public class OpenSearchClient {
 
     @Inject
     public OpenSearchClient(RestHighLevelClient client,
-                            org.opensearch.client.opensearch.OpenSearchClient openSearchClient,
                             @Named("elasticsearch_compression_enabled") boolean compressionEnabled,
                             @Named("indexer_max_concurrent_searches") @Nullable Integer indexerMaxConcurrentSearches,
                             @Named("indexer_max_concurrent_shard_requests") @Nullable Integer indexerMaxConcurrentShardRequests,
                             ObjectMapper objectMapper) {
         this.client = client;
-        this.openSearchClient = openSearchClient;
         this.compressionEnabled = compressionEnabled;
         this.indexerMaxConcurrentSearches = Optional.ofNullable(indexerMaxConcurrentSearches);
         this.indexerMaxConcurrentShardRequests = Optional.ofNullable(indexerMaxConcurrentShardRequests);
@@ -81,8 +81,8 @@ public class OpenSearchClient {
     }
 
     @VisibleForTesting
-    public OpenSearchClient(RestHighLevelClient client, org.opensearch.client.opensearch.OpenSearchClient openSearchClient, ObjectMapper objectMapper) {
-        this(client, openSearchClient, false, null, null, objectMapper);
+    public OpenSearchClient(RestHighLevelClient client, ObjectMapper objectMapper) {
+        this(client, false, null, null, objectMapper);
     }
 
     public SearchResponse search(SearchRequest searchRequest, String errorMessage) {
@@ -113,6 +113,18 @@ public class OpenSearchClient {
                 .collect(Collectors.toList());
     }
 
+    private SearchResponse firstResponseFrom(MultiSearchResponse result, String errorMessage) {
+        checkArgument(result != null);
+        checkArgument(result.getResponses().length == 1);
+
+        final MultiSearchResponse.Item firstResponse = result.getResponses()[0];
+        if (firstResponse.getResponse() == null) {
+            throw exceptionFrom(firstResponse.getFailure(), errorMessage);
+        }
+
+        return firstResponse.getResponse();
+    }
+
     public PlainActionFuture<MultiSearchResponse> cancellableMsearch(final List<SearchRequest> searchRequests) {
         var multiSearchRequest = new MultiSearchRequest();
 
@@ -124,19 +136,8 @@ public class OpenSearchClient {
 
         final PlainActionFuture<MultiSearchResponse> future = new PlainActionFuture<>();
         client.msearchAsync(multiSearchRequest, requestOptions(), future);
+
         return future;
-    }
-
-    private SearchResponse firstResponseFrom(MultiSearchResponse result, String errorMessage) {
-        checkArgument(result != null);
-        checkArgument(result.getResponses().length == 1);
-
-        final MultiSearchResponse.Item firstResponse = result.getResponses()[0];
-        if (firstResponse.getResponse() == null) {
-            throw exceptionFrom(firstResponse.getFailure(), errorMessage);
-        }
-
-        return firstResponse.getResponse();
     }
 
     public <R> R execute(ThrowingBiFunction<RestHighLevelClient, RequestOptions, R, IOException> fn) {
@@ -152,17 +153,6 @@ public class OpenSearchClient {
         }
     }
 
-    public <R> R execute(ThrowingFunction<org.opensearch.client.opensearch.OpenSearchClient, R, IOException> fn, String errorMessage) {
-        try {
-            return fn.apply(openSearchClient);
-        } catch (Exception e) {
-            throw exceptionFrom(e, errorMessage);
-        }
-    }
-
-    public <R> R execute(ThrowingFunction<org.opensearch.client.opensearch.OpenSearchClient, R, IOException> fn) {
-        return execute(fn, "An error occurred: ");
-    }
     @WithSpan
     public <R> R executeWithIOException(ThrowingBiFunction<RestHighLevelClient, RequestOptions, R, IOException> fn, String errorMessage) throws IOException {
         try {
@@ -175,6 +165,13 @@ public class OpenSearchClient {
         } catch (Exception e) {
             throw exceptionFrom(e, errorMessage);
         }
+    }
+
+    public JsonNode executeRequest(final Request request, final String errorMessage) {
+        return execute((c, requestOptions) -> {
+            final Response response = c.getLowLevelClient().performRequest(request);
+            return objectMapper.readTree(response.getEntity().getContent());
+        }, errorMessage);
     }
 
     private RequestOptions requestOptions() {

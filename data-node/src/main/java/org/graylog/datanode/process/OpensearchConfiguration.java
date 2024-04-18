@@ -19,6 +19,7 @@ package org.graylog.datanode.process;
 import org.apache.commons.exec.OS;
 import org.graylog.datanode.OpensearchDistribution;
 import org.graylog.datanode.configuration.DatanodeDirectories;
+import org.graylog.datanode.configuration.S3RepositoryConfiguration;
 import org.graylog.datanode.configuration.variants.OpensearchSecurityConfiguration;
 import org.graylog.datanode.management.Environment;
 import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
@@ -34,14 +35,19 @@ public record OpensearchConfiguration(
         String hostname,
         int httpPort,
         int transportPort,
-        String clusterName, String nodeName, List<String> nodeRoles,
+        String clusterName,
+        String nodeName,
+        List<String> nodeRoles,
         List<String> discoverySeedHosts,
         OpensearchSecurityConfiguration opensearchSecurityConfiguration,
-        Map<String, String> additionalConfiguration
-) {
-    public Map<String, String> asMap() {
+        S3RepositoryConfiguration s3RepositoryConfiguration,
 
-        Map<String, String> config = new LinkedHashMap<>();
+        String nodeSearchCacheSize,
+        Map<String, Object> additionalConfiguration
+) {
+    public Map<String, Object> asMap() {
+
+        Map<String, Object> config = new LinkedHashMap<>();
 
         config.put("action.auto_create_index", "false");
 
@@ -71,6 +77,11 @@ public record OpensearchConfiguration(
 
         config.put("discovery.seed_providers", "file");
 
+        config.put("node.search.cache.size", nodeSearchCacheSize);
+        if (s3RepositoryConfiguration.isRepositoryEnabled()) {
+            config.putAll(s3RepositoryConfiguration.toOpensearchProperties());
+        }
+
         config.putAll(additionalConfiguration);
         return config;
     }
@@ -81,17 +92,18 @@ public record OpensearchConfiguration(
 
     public Environment getEnv() {
         final Environment env = new Environment(System.getenv());
+        env.put("OPENSEARCH_JAVA_OPTS", "-Xms%s -Xmx%s".formatted(opensearchSecurityConfiguration.getOpensearchHeap(), opensearchSecurityConfiguration.getOpensearchHeap()));
         env.put("OPENSEARCH_PATH_CONF", datanodeDirectories.getOpensearchProcessConfigurationDir().toString());
         return env;
     }
 
     public HttpHost getRestBaseUrl() {
-        final boolean sslEnabled = Boolean.parseBoolean(asMap().getOrDefault("plugins.security.ssl.http.enabled", "false"));
+        final boolean sslEnabled = Boolean.parseBoolean(asMap().getOrDefault("plugins.security.ssl.http.enabled", "false").toString());
         return new HttpHost(hostname(), httpPort(), sslEnabled ? "https" : "http");
     }
 
     public HttpHost getClusterBaseUrl() {
-        final boolean sslEnabled = Boolean.parseBoolean(asMap().getOrDefault("plugins.security.ssl.http.enabled", "false"));
+        final boolean sslEnabled = Boolean.parseBoolean(asMap().getOrDefault("plugins.security.ssl.http.enabled", "false").toString());
         return new HttpHost(hostname(), transportPort(), sslEnabled ? "https" : "http");
     }
 

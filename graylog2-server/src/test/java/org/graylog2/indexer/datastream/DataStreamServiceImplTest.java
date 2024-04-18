@@ -50,7 +50,7 @@ public class DataStreamServiceImplTest {
 
     @Before
     public void setUp() {
-        dataStreamService = new DataStreamServiceImpl(dataStreamAdapter, indexFieldTypesService);
+        dataStreamService = new DataStreamServiceImpl(dataStreamAdapter, indexFieldTypesService, 0);
     }
 
     @Test
@@ -64,6 +64,7 @@ public class DataStreamServiceImplTest {
         verify(indexFieldTypesService).upsert(any());
         verify(dataStreamAdapter).createDataStream(name);
         verify(dataStreamAdapter).applyIsmPolicy(name, policy);
+        verify(dataStreamAdapter).setNumberOfReplicas(name, 0);
     }
 
     @SuppressWarnings("unchecked")
@@ -74,7 +75,7 @@ public class DataStreamServiceImplTest {
         dataStreamService.createDataStream("teststream", ts, mappings, mock(Policy.class));
         ArgumentCaptor<Template> templateCaptor = ArgumentCaptor.forClass(Template.class);
         verify(dataStreamAdapter).ensureDataStreamTemplate(anyString(), templateCaptor.capture(), anyString());
-        HashMap<String, Object> fieldMappings = (HashMap<String, Object>) templateCaptor.getValue().mappings().get("properties");
+        Map<String, Object> fieldMappings = (Map<String, Object>) templateCaptor.getValue().mappings().get("properties");
         Map<String, String> timestampMapping = (Map<String, String>) fieldMappings.get(ts);
         assertThat(timestampMapping).isNotNull();
         assertThat(timestampMapping.get("type")).isEqualTo("date");
@@ -90,7 +91,7 @@ public class DataStreamServiceImplTest {
         dataStreamService.createDataStream("teststream", ts, mappings, mock(Policy.class));
         ArgumentCaptor<Template> templateCaptor = ArgumentCaptor.forClass(Template.class);
         verify(dataStreamAdapter).ensureDataStreamTemplate(anyString(), templateCaptor.capture(), anyString());
-        HashMap<String, Object> fieldMappings = (HashMap<String, Object>) templateCaptor.getValue().mappings().get("properties");
+        Map<String, Object> fieldMappings = (Map<String, Object>) templateCaptor.getValue().mappings().get("properties");
         Map<String, String> timestampMapping = (Map<String, String>) fieldMappings.get(ts);
         assertThat(timestampMapping).isNotNull();
         assertThat(timestampMapping.get("type")).isEqualTo("date");
@@ -107,7 +108,7 @@ public class DataStreamServiceImplTest {
         dataStreamService.createDataStream(streamName, "ts", mappings, mock(Policy.class));
         ArgumentCaptor<Template> templateCaptor = ArgumentCaptor.forClass(Template.class);
         verify(dataStreamAdapter).ensureDataStreamTemplate(anyString(), templateCaptor.capture(), anyString());
-        HashMap<String, Object> fieldMappings = (HashMap<String, Object>) templateCaptor.getValue().mappings().get("properties");
+        Map<String, Object> fieldMappings = (Map<String, Object>) templateCaptor.getValue().mappings().get("properties");
         Map<String, String> timestampMapping = (Map<String, String>) fieldMappings.get(customField);
         assertThat(timestampMapping).isNotNull();
         assertThat(timestampMapping.get("type")).isEqualTo("keyword");

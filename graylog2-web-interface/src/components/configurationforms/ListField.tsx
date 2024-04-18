@@ -57,6 +57,7 @@ const ListField = ({ autoFocus, field, onChange, title, typeName, value }: Props
                    name={`configuration[${title}]`}
                    required={isRequired}
                    autoFocus={autoFocus}
+                   className="list-field-select"
                    options={formattedOptions}
                    value={selectValue}
                    placeholder={`${allowCreate ? 'Add' : 'Select'} ${field.human_name}`}

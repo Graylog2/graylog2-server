@@ -70,6 +70,7 @@ describe('Headers', () => {
                  rollup={rollup}
                  actualColumnPivotFields={actualColumnPivotFields}
                  fields={Immutable.List(fields)}
+                 setLoadingState={() => {}}
                  sortConfigMap={sortConfigMap}
                  onSortChange={onSortChange}
                  onSetColumnsWidth={() => {}}
@@ -149,7 +150,7 @@ describe('Headers', () => {
     });
   });
 
-  describe('render sort icon', () => {
+  describe('renders sort icon', () => {
     const series = [
       seriesWithName('foo', 'Total Count'),
       seriesWithName('avg(foo)', 'Average Foness'),
@@ -170,7 +171,7 @@ describe('Headers', () => {
       const ascIcon = wrapper
         .find('FieldSortIcon[fieldName="foo"]')
         .find('button[title="Sort foo Descending"].active')
-        .find('Icon[name="arrow-up-short-wide"]');
+        .find('Icon.sort-icon-asc');
 
       expect(ascIcon).toExist();
     });
@@ -181,7 +182,7 @@ describe('Headers', () => {
       const dscIcon = wrapper
         .find('FieldSortIcon[fieldName="bar"]')
         .find('button[title="Remove bar sort"].active')
-        .find('Icon[name="arrow-down-wide-short"]');
+        .find('Icon.sort-icon-desc');
 
       expect(dscIcon).toExist();
     });
@@ -192,7 +193,7 @@ describe('Headers', () => {
       const inactiveIcon = wrapper
         .find('FieldSortIcon[fieldName="avg(foo)"]')
         .find('button[title="Sort avg(foo) Ascending"]:not(.active)')
-        .find('Icon[name="arrow-down-wide-short"]');
+        .find('Icon.sort-icon-desc');
 
       expect(inactiveIcon).toExist();
     });
@@ -203,11 +204,15 @@ describe('Headers', () => {
       const fooButton = wrapper
         .find('FieldSortIcon[fieldName="foo"]')
         .find('button[title="Sort foo Descending"].active')
-        .find('span').text();
+        .find('span')
+        .at(1)
+        .text();
       const barButton = wrapper
         .find('FieldSortIcon[fieldName="bar"]')
         .find('button[title="Remove bar sort"].active')
-        .find('span').text();
+        .find('span')
+        .at(1)
+        .text();
 
       expect(fooButton).toBe('1');
       expect(barButton).toBe('2');

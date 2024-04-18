@@ -48,7 +48,6 @@ import PluggableSearchBarControls from 'views/components/searchbar/PluggableSear
 import useParameters from 'views/hooks/useParameters';
 import ValidateOnParameterChange from 'views/components/searchbar/ValidateOnParameterChange';
 import type { SearchBarControl, HandlerContext } from 'views/types';
-import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import useUserDateTime from 'hooks/useUserDateTime';
 import {
   SEARCH_BAR_GAP,
@@ -68,6 +67,8 @@ import { updateQuery } from 'views/logic/slices/viewSlice';
 import useHandlerContext from 'views/components/useHandlerContext';
 import QueryHistoryButton from 'views/components/searchbar/QueryHistoryButton';
 import type { Editor } from 'views/components/searchbar/queryinput/ace-types';
+import useIsLoading from 'views/hooks/useIsLoading';
+import useSearchConfiguration from 'hooks/useSearchConfiguration';
 
 import SearchBarForm from './searchbar/SearchBarForm';
 
@@ -141,7 +142,7 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
     key: stream.title,
     value: stream.id,
   })));
-  const { searchesClusterConfig: config } = useStore(SearchConfigStore);
+  const { config } = useSearchConfiguration();
   const { userTimezone } = useUserDateTime();
   const { parameters } = useParameters();
   const currentQuery = useCurrentQuery();
@@ -152,6 +153,7 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
   const _onSubmit = useCallback((values: SearchBarFormValues) => onSubmit(dispatch, values, pluggableSearchBarControls, currentQuery),
     [currentQuery, dispatch, onSubmit, pluggableSearchBarControls]);
   const handlerContext = useHandlerContext();
+  const isLoadingExecution = useIsLoading();
 
   if (!currentQuery || !config) {
     return <Spinner />;
@@ -180,7 +182,7 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
                 setFieldValue,
                 validateForm,
               }) => {
-                const disableSearchSubmit = isSubmitting || isValidating || !isValid;
+                const disableSearchSubmit = isSubmitting || isValidating || !isValid || isLoadingExecution;
 
                 return (
                   <>
@@ -212,7 +214,7 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
                         <SearchButtonAndQuery>
                           <SearchButton disabled={disableSearchSubmit}
                                         dirty={dirty}
-                                        displaySpinner={isSubmitting} />
+                                        displaySpinner={isSubmitting || isLoadingExecution} />
                           <SearchInputAndValidationContainer>
                             <Field name="queryString">
                               {({ field: { name, value, onChange }, meta: { error } }) => (

@@ -53,7 +53,7 @@ const ErrorIcon = styled(Icon)<{ $status: string }>(({ theme, $status }) => css`
   font-size: 22px;
 `);
 
-const DocumentationIcon = styled(Icon)`
+export const DocumentationIcon = styled(Icon)`
   margin-left: 5px;
 `;
 
@@ -62,7 +62,7 @@ const Title = styled.div`
   justify-content: space-between;
 `;
 
-const Explanation = styled.div`
+export const Explanation = styled.div`
   display: flex;
   justify-content: space-between;
 
@@ -194,8 +194,8 @@ const QueryValidation = () => {
   const validationState = (queryStringErrors ?? warnings?.queryString) as QueryValidationState;
 
   const { status, explanations = [] } = validationState ?? { explanations: [] };
-  const deduplicatedExplanations = useMemo(() => deduplicateExplanations(explanations), [explanations]);
-  const hasExplanations = validationState && validationState?.status !== 'OK';
+  const deduplicatedExplanations = useMemo(() => [...deduplicateExplanations(explanations)], [explanations]);
+  const hasExplanations = validationState && (validationState?.status !== 'OK');
 
   return (
     <Popover opened={hasExplanations && showExplanation} position="bottom" width={500} withArrow>
@@ -207,12 +207,12 @@ const QueryValidation = () => {
                                 $clickable
                                 tabIndex={0}
                                 type="button">
-              <ErrorIcon $status={status} name="exclamation-circle" />
+              <ErrorIcon $status={status} name="error" />
             </ExplanationTrigger>
           ) : (
             <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
                                title="Search query syntax documentation"
-                               text={<Icon name="lightbulb" />} />
+                               text={<Icon name="lightbulb_circle" />} />
           )}
         </Container>
       </Popover.Target>
@@ -224,9 +224,11 @@ const QueryValidation = () => {
             {deduplicatedExplanations.map(({ errorType, errorTitle, errorMessage, id }) => (
               <Explanation key={id}>
                 <span><b>{errorTitle}</b>: {errorMessage}</span>
+                {errorType && (
                 <DocumentationLink page={getErrorDocumentationLink(errorType)}
                                    title={`${errorTitle} documentation`}
-                                   text={<DocumentationIcon name="lightbulb" />} />
+                                   text={<DocumentationIcon name="lightbulb_circle" />} />
+                )}
               </Explanation>
             ))}
             {plugableValidationExplanation?.map((PlugableExplanation, index) => (

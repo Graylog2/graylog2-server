@@ -18,7 +18,7 @@ package org.graylog.datanode.configuration;
 
 import org.graylog.datanode.Configuration;
 import org.graylog2.plugin.system.NodeId;
-import org.jetbrains.annotations.NotNull;
+import jakarta.annotation.Nonnull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,8 +34,6 @@ import java.util.Set;
 
 /**
  * This is a collection of pointers to directories used to store data, logs and configuration of the managed opensearch.
- * Each data type is additionally stored in a subdirectory named after the nodeId, to avoid unexpected collisions when
- * running more datanode instances in the same machine.
  */
 public class DatanodeDirectories {
 
@@ -74,8 +72,8 @@ public class DatanodeDirectories {
      * TODO: Remove in 6.0 release
      */
     @Deprecated(forRemoval = true)
-    @NotNull
-    protected static Path backwardsCompatible(@NotNull Path path, NodeId nodeId, String configProperty) {
+    @Nonnull
+    protected static Path backwardsCompatible(@Nonnull Path path, NodeId nodeId, String configProperty) {
         final Path nodeIdSubdir = path.resolve(nodeId.getNodeId());
         if(Files.exists(nodeIdSubdir) && Files.isDirectory(nodeIdSubdir)) {
             LOG.warn("Caution, this datanode instance uses old format of directories. Please configure {} to point directly to {}", configProperty, nodeIdSubdir.toAbsolutePath());
@@ -134,7 +132,7 @@ public class DatanodeDirectories {
         return createRestrictedAccessFile(resolvedPath);
     }
 
-    @NotNull
+    @Nonnull
     private static Path createRestrictedAccessFile(Path resolvedPath) throws IOException {
         Files.deleteIfExists(resolvedPath);
         final Set<PosixFilePermission> permissions = Set.of(PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_READ);

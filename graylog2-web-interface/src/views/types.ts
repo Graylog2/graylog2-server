@@ -53,10 +53,11 @@ import type SearchMetadata from 'views/logic/search/SearchMetadata';
 import type { AppDispatch } from 'stores/useAppDispatch';
 import type SearchResult from 'views/logic/SearchResult';
 import type { WidgetMapping } from 'views/logic/views/types';
-import type { Event } from 'components/events/events/types';
 import type Parameter from 'views/logic/parameters/Parameter';
 import type { UndoRedoState } from 'views/logic/slices/undoRedoSlice';
 import type { SearchExecutors } from 'views/logic/slices/searchExecutionSlice';
+import type { JobIds } from 'views/stores/SearchJobs';
+import type { FilterComponents, Attributes } from 'views/components/widgets/overview-configuration/filters/types';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> =
   ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
@@ -261,8 +262,18 @@ type DashboardActionComponentProps = {
   modalRef: () => unknown,
 }
 
+type EventWidgetActionComponentProps = {
+  eventId: string,
+  modalRef: () => unknown,
+}
+
 type DashboardActionModalProps = {
   dashboard: View,
+  ref: React.Ref<unknown>,
+}
+
+type EventActionModalProps = {
+  eventId: string,
   ref: React.Ref<unknown>,
 }
 
@@ -290,12 +301,19 @@ type DashboardAction = {
   useCondition?: () => boolean,
 }
 
+type EventWidgetAction = {
+  key: string,
+  component: React.ComponentType<EventWidgetActionComponentProps>,
+  modal?: React.ComponentType<EventActionModalProps>,
+  useCondition?: () => boolean,
+}
+
 type AssetInformation = {
   component: React.ComponentType<AssetInformationComponentProps>,
 }
 
 type EventActionComponentProps = {
-  event: Event,
+  eventId: string,
 }
 
 type MessageActionComponentProps = {
@@ -378,11 +396,13 @@ export type SearchExecutionResult = {
   widgetMapping: WidgetMapping,
 };
 
+export type JobIdsState = JobIds | null;
 export interface SearchExecution {
   executionState: SearchExecutionState;
   result: SearchExecutionResult;
   isLoading: boolean;
   widgetsToSearch: Array<string>,
+  jobIds?: JobIds | null,
 }
 
 export interface SearchMetadataState {
@@ -446,6 +466,14 @@ declare module 'graylog-web-plugin/plugin' {
       key: string,
       useCondition: () => boolean,
     }>;
+    'views.components.widgets.events.filterComponents'?: FilterComponents;
+    'views.components.widgets.events.attributes'?: Attributes;
+    'views.components.widgets.events.detailsComponent'?: Array<{
+      component: React.ComponentType<{ eventId: string }>,
+      useCondition: () => boolean,
+      key: string,
+    }>;
+    'views.components.widgets.events.actions'?: Array<EventWidgetAction>;
     'views.components.searchActions'?: Array<SearchAction>;
     'views.components.searchBar'?: Array<() => SearchBarControl | null>;
     'views.components.saveViewForm'?: Array<() => SaveViewControls | null>;

@@ -50,9 +50,6 @@ public class OpenSearchExceptionTest {
     @Mock
     RestHighLevelClient restHighLevelClient;
 
-    @Mock
-    org.opensearch.client.opensearch.OpenSearchClient openSearchClient;
-
     // Verify that an OpenSearchStatusException is translated to a BatchSizeTooLargeException.
     @Test
     public void handle429() throws IOException {
@@ -146,7 +143,7 @@ public class OpenSearchExceptionTest {
         RestStatus restStatus = RestStatus.BAD_REQUEST;
         OpenSearchStatusException statusException = new OpenSearchStatusException(
                 "status msg", restStatus, responseException);
-        final var openSearchClient = new OpenSearchClient(restHighLevelClient, this.openSearchClient, new ObjectMapper());
+        final OpenSearchClient openSearchClient = new OpenSearchClient(restHighLevelClient, new ObjectMapper());
 
         Exception exception = assertThrows(BatchSizeTooLargeException.class, () -> {
             openSearchClient.execute((a, b) -> {throw statusException;});

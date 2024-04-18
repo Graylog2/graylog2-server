@@ -18,12 +18,13 @@ package org.graylog.storage.opensearch2.views;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import jakarta.inject.Provider;
+import org.graylog.plugins.views.search.LegacyDecoratorProcessor;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
-import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.engine.monitoring.collection.NoOpStatsCollector;
 import org.graylog.plugins.views.search.filter.AndFilter;
@@ -31,13 +32,14 @@ import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.MultiSearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
-import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog.storage.opensearch2.testing.TestMultisearchResponse;
 import org.graylog.storage.opensearch2.views.searchtypes.OSMessageList;
 import org.graylog.storage.opensearch2.views.searchtypes.OSSearchTypeHandler;
+import org.graylog2.indexer.results.TestResultMessageFactory;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.joda.time.DateTimeUtils;
+import org.joda.time.DateTimeZone;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -48,25 +50,21 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import jakarta.inject.Provider;
-
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.storage.opensearch2.views.ViewsUtils.indicesOf;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class OpenSearchBackendUsingCorrectIndicesTest {
+public class OpenSearchBackendUsingCorrectIndicesTest extends OpensearchMockedClientTestBase {
     private static Map<String, Provider<OSSearchTypeHandler<? extends SearchType>>> handlers = ImmutableMap.of(
-            MessageList.NAME, OSMessageList::new
+            MessageList.NAME, () -> new OSMessageList(new LegacyDecoratorProcessor.Fake(),
+                    new TestResultMessageFactory(), false)
     );
 
     @Rule
@@ -74,9 +72,6 @@ public class OpenSearchBackendUsingCorrectIndicesTest {
 
     @Mock
     private IndexLookup indexLookup;
-
-    @Mock
-    private OpenSearchClient client;
 
     @Captor
     private ArgumentCaptor<List<SearchRequest>> clientRequestCaptor;
@@ -89,15 +84,12 @@ public class OpenSearchBackendUsingCorrectIndicesTest {
     @Before
     public void setupSUT() throws Exception {
         final MultiSearchResponse response = TestMultisearchResponse.fromFixture("successfulResponseWithSingleQuery.json");
-        final List<MultiSearchResponse.Item> items = Arrays.stream(response.getResponses())
-                .collect(Collectors.toList());
-        when(client.msearch(any(), any())).thenReturn(items);
+        mockCancellableMSearch(response);
 
-        final FieldTypesLookup fieldTypesLookup = mock(FieldTypesLookup.class);
         this.backend = new OpenSearchBackend(handlers,
                 client,
                 indexLookup,
-                (elasticsearchBackend, ssb, errors) -> new OSGeneratedQueryContext(elasticsearchBackend, ssb, errors, fieldTypesLookup),
+                ViewsUtils.createTestContextFactory(),
                 usedSearchFilters -> Collections.emptySet(),
                 new NoOpStatsCollector<>(),
                 false);
@@ -115,7 +107,7 @@ public class OpenSearchBackendUsingCorrectIndicesTest {
                 .id("search1")
                 .queries(ImmutableSet.of(query))
                 .build();
-        this.job = new SearchJob("job1", search, "admin");
+        this.job = new SearchJob("job1", search, "admin", "test-node-id");
     }
 
     @After
@@ -126,10 +118,10 @@ public class OpenSearchBackendUsingCorrectIndicesTest {
 
     @Test
     public void queryDoesNotFallBackToUsingAllIndicesWhenNoIndexRangesAreReturned() throws Exception {
-        final OSGeneratedQueryContext context = backend.generate(query, Collections.emptySet());
+        final OSGeneratedQueryContext context = createContext(query);
         backend.doRun(job, query, context);
 
-        verify(client, times(1)).msearch(clientRequestCaptor.capture(), any());
+        verify(client).cancellableMsearch(clientRequestCaptor.capture());
 
         final List<SearchRequest> clientRequest = clientRequestCaptor.getValue();
         assertThat(clientRequest).isNotNull();
@@ -141,7 +133,7 @@ public class OpenSearchBackendUsingCorrectIndicesTest {
         final long datetimeFixture = 1530194810;
         DateTimeUtils.setCurrentMillisFixed(datetimeFixture);
 
-        final OSGeneratedQueryContext context = backend.generate(query, Collections.emptySet());
+        final OSGeneratedQueryContext context = createContext(query);
         backend.doRun(job, query, context);
 
         ArgumentCaptor<TimeRange> captor = ArgumentCaptor.forClass(TimeRange.class);
@@ -150,6 +142,10 @@ public class OpenSearchBackendUsingCorrectIndicesTest {
                 .indexNamesForStreamsInTimeRange(any(), captor.capture());
 
         assertThat(captor.getValue()).isEqualTo(RelativeRange.create(600));
+    }
+
+    private OSGeneratedQueryContext createContext(Query query) {
+        return backend.generate(query, Collections.emptySet(), DateTimeZone.UTC);
     }
 
     private Query dummyQuery(TimeRange timeRange) {
@@ -177,15 +173,15 @@ public class OpenSearchBackendUsingCorrectIndicesTest {
                 .filter(StreamFilter.ofId(streamId))
                 .build();
         final Search search = dummySearch(query);
-        final SearchJob job = new SearchJob("job1", search, "admin");
-        final OSGeneratedQueryContext context = backend.generate(query, Collections.emptySet());
+        final SearchJob job = new SearchJob("job1", search, "admin", "test-node-id");
+        final OSGeneratedQueryContext context = createContext(query);
 
         when(indexLookup.indexNamesForStreamsInTimeRange(ImmutableSet.of("streamId"), RelativeRange.create(600)))
                 .thenReturn(ImmutableSet.of("index1", "index2"));
 
         backend.doRun(job, query, context);
 
-        verify(client, times(1)).msearch(clientRequestCaptor.capture(), any());
+        verify(client).cancellableMsearch(clientRequestCaptor.capture());
 
         final List<SearchRequest> clientRequest = clientRequestCaptor.getValue();
         assertThat(clientRequest).isNotNull();
@@ -193,20 +189,20 @@ public class OpenSearchBackendUsingCorrectIndicesTest {
     }
 
     @Test
-    public void queryUsesOnlyIndicesBelongingToStream() throws Exception {
+    public void queryUsesOnlyIndicesBelongingToStream() {
         final Query query = dummyQuery(RelativeRange.create(600)).toBuilder()
                 .filter(AndFilter.and(StreamFilter.ofId("stream1"), StreamFilter.ofId("stream2")))
                 .build();
         final Search search = dummySearch(query);
-        final SearchJob job = new SearchJob("job1", search, "admin");
-        final OSGeneratedQueryContext context = backend.generate(query, Collections.emptySet());
+        final SearchJob job = new SearchJob("job1", search, "admin", "test-node-id");
+        final OSGeneratedQueryContext context = createContext(query);
 
         when(indexLookup.indexNamesForStreamsInTimeRange(ImmutableSet.of("stream1", "stream2"), RelativeRange.create(600)))
                 .thenReturn(ImmutableSet.of("index1", "index2"));
 
         backend.doRun(job, query, context);
 
-        verify(client, times(1)).msearch(clientRequestCaptor.capture(), any());
+        verify(client).cancellableMsearch(clientRequestCaptor.capture());
 
         final List<SearchRequest> clientRequest = clientRequestCaptor.getValue();
         assertThat(clientRequest).isNotNull();

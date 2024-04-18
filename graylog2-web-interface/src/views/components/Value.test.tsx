@@ -20,7 +20,7 @@ import userEvent from '@testing-library/user-event';
 
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import useExternalValueActions from 'views/hooks/useExternalValueActions';
 import asMock from 'helpers/mocking/AsMock';
 
@@ -48,9 +48,7 @@ describe('Value', () => {
     });
   });
 
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   describe('actions menu title', () => {
     it('renders without type information but no children', async () => {

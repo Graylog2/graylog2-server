@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.pipelineprocessor.rulebuilder.rest;
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -30,23 +31,28 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class RuleBuilderSimulatorResponse extends Message {
+public class RuleBuilderSimulatorResponse {
 
     private final static String VAR_CONDITION_PREFIX = "gl2_simulator_condition_";
     private final static Pattern OUTPUT_VARIABLE_PATTERN = Pattern.compile("^gl2_simulator_step_(\\d+)_(.*_\\d+)$");
 
     private final List<Pair<String, Object>> simulatorActionVariables;
-    private Map<String, Object> simulatorConditionVariables;
+
+    private final Map<String, Object> simulatorConditionVariables;
+
+    @JsonUnwrapped
+    private final Message simulatorResult;
 
     public RuleBuilderSimulatorResponse(Message simulatorResult) {
-        super(simulatorResult.getFields());
+        this.simulatorResult = simulatorResult;
+
         this.simulatorConditionVariables = new HashMap<>();
         this.simulatorActionVariables = new ArrayList<>(Collections.nCopies(simulatorResult.getFieldCount(), null));
         simulatorResult.getFields().entrySet().stream()
                 .filter(e -> e.getKey().startsWith(VAR_CONDITION_PREFIX))
                 .forEach(e -> {
                     this.simulatorConditionVariables.put(e.getKey().substring(VAR_CONDITION_PREFIX.length()), e.getValue());
-                    this.removeField(e.getKey());
+                    this.simulatorResult.removeField(e.getKey());
                 });
         simulatorResult.getFields().entrySet().stream()
                 .filter(e -> OUTPUT_VARIABLE_PATTERN.matcher(e.getKey()).matches())
@@ -56,7 +62,7 @@ public class RuleBuilderSimulatorResponse extends Message {
                     int actionIndex = Integer.parseInt(matcher.group(1));
                     String variableName = matcher.group(2);
                     this.simulatorActionVariables.set(actionIndex, new ImmutablePair<>(variableName, e.getValue()));
-                    this.removeField(e.getKey());
+                    this.simulatorResult.removeField(e.getKey());
                 });
         Iterables.removeIf(simulatorActionVariables, Predicates.isNull());
     }

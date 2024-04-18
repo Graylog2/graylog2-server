@@ -24,8 +24,13 @@ import type { Sort } from 'stores/PaginationTypes';
 import BulkSelectHead from './BulkSelectHead';
 import type { Column, ColumnRenderer, EntityBase, ColumnRenderersByAttribute } from './types';
 
-const Th = styled.th<{ $width: number | undefined }>(({ $width }) => css`
+const Thead = styled.thead(({ theme }) => css`
+  background-color: ${theme.colors.global.contentBackground};
+`);
+
+export const Th = styled.th<{ $width: number | undefined }>(({ $width, theme }) => css`
   width: ${$width ? `${$width}px` : 'auto'};
+  background-color: ${theme.colors.table.head.background};
 `);
 
 const TableHeader = <Entity extends EntityBase>({
@@ -59,7 +64,7 @@ const TableHeader = <Entity extends EntityBase>({
   );
 };
 
-const ActionsHead = styled.th<{ $width: number | undefined }>(({ $width }) => css`
+const ActionsHead = styled(Th)<{ $width: number | undefined }>(({ $width }) => css`
   text-align: right;
   width: ${$width ? `${$width}px` : 'auto'};
 `);
@@ -93,7 +98,7 @@ const TableHead = <Entity extends EntityBase>({
   );
 
   return (
-    <thead>
+    <Thead>
       <tr>
         {displayBulkSelectCol && <BulkSelectHead data={data} />}
         {sortedColumns.map((column) => {
@@ -110,7 +115,7 @@ const TableHead = <Entity extends EntityBase>({
         })}
         {displayActionsCol ? <ActionsHead $width={actionsColWidth}>Actions</ActionsHead> : null}
       </tr>
-    </thead>
+    </Thead>
   );
 };
 

@@ -20,7 +20,7 @@ import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import { StoreMock as MockStore, asMock } from 'helpers/mocking';
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import StreamsStore from 'stores/streams/StreamsStore';
 import { InputsActions } from 'stores/inputs/InputsStore';
 
@@ -80,11 +80,9 @@ describe('ShowMessagePage', () => {
     forwarder: [{ isLocalNode }],
   });
 
-  beforeAll(loadViewsPlugin);
+  useViewsPlugin();
 
   beforeAll(() => PluginStore.register(testForwarderPlugin));
-
-  afterAll(unloadViewsPlugin);
 
   afterAll(() => PluginStore.unregister(testForwarderPlugin));
 
@@ -101,12 +99,12 @@ describe('ShowMessagePage', () => {
     mockLoadMessage.mockImplementation(() => Promise.resolve(message));
     asMock(InputsActions.get).mockResolvedValue(input);
 
-    const { container } = render(<SimpleShowMessagePage index="graylog_5"
-                                                        messageId="20f683d2-a874-11e9-8a11-0242ac130004" />);
+    render(<SimpleShowMessagePage index="graylog_5"
+                                  messageId="20f683d2-a874-11e9-8a11-0242ac130004" />);
 
     await screen.findByText(/Deprecated field/);
-
-    expect(container).toMatchSnapshot();
+    await screen.findByText(/"id": "20f683d2-a874-11e9-8a11-0242ac130004"/);
+    await screen.findByText(/"index": "graylog_5"/);
   });
 
   it('retrieves field types only for user-accessible streams', async () => {
@@ -131,11 +129,11 @@ describe('ShowMessagePage', () => {
     mockLoadMessage.mockImplementation(() => Promise.resolve(event));
     mockGetInput.mockImplementation(() => Promise.resolve());
 
-    const { container } = render(<SimpleShowMessagePage index="gl-events_0" messageId="01DFZQ64CMGV30NT7DW2P7HQX2" />);
+    render(<SimpleShowMessagePage index="gl-events_0" messageId="01DFZQ64CMGV30NT7DW2P7HQX2" />);
 
     await screen.findByText(/SSH Brute Force/);
-
-    expect(container).toMatchSnapshot();
+    await screen.findByText(/"id": "01DFZQ64CMGV30NT7DW2P7HQX2"/);
+    await screen.findByText(/"index": "gl-events_0"/);
   });
 
   it('does not fetch input when opening message from forwarder', async () => {

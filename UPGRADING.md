@@ -2,7 +2,11 @@ Upgrading to Graylog 6.0.x
 ==========================
 
 ## Breaking Changes
+
 - Default value for `data_dir` configuration option has been removed and must be specified in `graylog.conf`.
+- All plugins must be adjusted to work with Graylog 6.x. **Incompatible plugins will break the server startup.**
+  Detailed descriptions about Java API changes below.
+
 ### Changed default number of process-buffer and output-buffer processors
 
 The default values for the configuration settings `processbuffer_processors` and `outputbuffer_processors` have been
@@ -24,6 +28,14 @@ The name of the `jvm_classes_loaded` metric [has been changed](https://github.co
 Prometheus queries referencing `jvm_classes_loaded` need to be adapted to
 the new name `jvm_classes_currently_loaded`.
 
+### Authentication required to use API browser
+
+Users now have to log in before visiting the API browser. It is sufficient to log in with any user known to Graylog. No
+particular permissions are required.
+
+The username/password field was removed from the header of the API browser. If users want to perform API requests with
+different credentials, they must log out of Graylog and re-login with another user.
+
 ### Plugins
 
 Removal of `systemnavigation` web interface plugin. Previously it was possible to register options for the
@@ -31,6 +43,37 @@ system dropdown in the navigation, by using the `systemnavigation` plugin.
 Now this can be achieved by registering a `navigation` plugin.
 The plugin entity needs the `description` `System` and `children` (array).
 Every child represents a dropdown option and needs a `path` and `description` attribute.
+
+### Template language change
+
+Graylog uses JMTE for a variety of templates (see below for a list of affected features). This library has been updated
+to version 7.0.2, which contains a breaking change, potentially affecting user generated templates.
+
+Previously an if statement in a template could compare a property to an unquoted string. This is no longer possible and will
+likely result in an error:
+
+Valid before: ${if property=somestring}
+Must be changed to: ${if property='somestring'}
+
+No default templates used this form, and no examples using this syntax were provided, so impact is likely to be minimal.
+
+Templates using the JMTE library are potentially affected and should to be checked for compatibility:
+* Decorators on search results
+* Custom event fields
+* HTTP event notifications
+* Script event notifications
+* Slack event notifications
+* MS Teams event notifications
+* Archive directory naming
+* HTTP JsonPath lookup table adapter
+
+Not affected by this change are the following templates using Freemarker:
+* Sidecar configurations
+
+### Enterprise theme customization
+
+In case you are using the enterprise customization feature, you might need to adjust the newly added `gray` color on the customization page, due to some theme structure changes.   
+This should just affect the input and table header colors, other colors should look like before the upgrade.  
 
 ## Configuration File Changes
 | Option                           | Action    | Description                                                                                                                                                                                                                                             |
@@ -158,15 +201,31 @@ The data of the fields is *not* accounted as outgoing traffic.
 
 The following Java Code API changes have been made.
 
-| File/method                                                           | Description                    |
-|-----------------------------------------------------------------------|--------------------------------|
-| `org.graylog2.plugin.Message#addStringFields`                         | Deprecated method removed      |
-| `org.graylog2.plugin.Message#addLongFields`                           | Deprecated method removed      |
-| `org.graylog2.plugin.Message#addDoubleFields`                         | Deprecated method removed      |
-| `org.graylog2.plugin.Message#getValidationErrors`                     | Deprecated method removed      |
-| `org.graylog2.plugin.SingletonMessages`                               | Unused class removed           |
-| `org.graylog.plugins.views.search.engine.LuceneQueryParsingException` | Unused exception class removed |
-| `org.graylog2.indexer.IndexMappingTemplate#toTemplate`                | Method parameter list modified |
+| File/method                                                                     | Description                                     |
+|---------------------------------------------------------------------------------|-------------------------------------------------|
+| `org.graylog2.plugin.MessageFactory.createMessage(String, String, DateTime)`    | New factory method to create `Message` instance |
+| `org.graylog2.plugin.MessageFactory.createMessage(Map<String, Object>)`         | New factory method to create `Message` instance |
+| `org.graylog2.plugin.MessageFactory.createMessage(String, Map<String, Object>)` | New factory method to create `Message` instance |
+| `org.graylog2.plugin.Message(String, String, DateTime)`                         | Constructor became package-private              |
+| `org.graylog2.plugin.Message(Map<String, Object>)`                              | Constructor became package-private              |
+| `org.graylog2.plugin.Message(String, Map<String, Object>)`                      | Constructor became package-private              |
+| `org.graylog2.plugin.Message#addStringFields`                                   | Deprecated method removed                       |
+| `org.graylog2.plugin.Message#addLongFields`                                     | Deprecated method removed                       |
+| `org.graylog2.plugin.Message#addDoubleFields`                                   | Deprecated method removed                       |
+| `org.graylog2.plugin.Message#getValidationErrors`                               | Deprecated method removed                       |
+| `org.graylog2.plugin.SingletonMessages`                                         | Unused class removed                            |
+| `org.graylog.plugins.views.search.engine.LuceneQueryParsingException`           | Unused exception class removed                  |
+| `org.graylog2.indexer.IndexMappingTemplate#toTemplate`                          | Method parameter list modified                  |
+
+### Message Factory
+
+New `org.graylog2.plugin.Message` instances must now be created by using a `org.graylog2.plugin.MessageFactory` method.
+
+The previous constructors on `Message` are now package-private and can't be accessed by code in other packages anymore.
+The package-private constructors in `Message` might change in any release and are not considered a stable API anymore.
+
+Code that creates messages must now inject a `MessageFactory` and use one of the `createMessage()` methods
+to create new `Message` instances.
 
 ### Transition from the `javax` to the `jakarta` namespace
 
@@ -193,6 +252,8 @@ throughout the Graylog core code base.
 
 The following REST API changes have been made.
 
-| Endpoint                | Description              |
-|-------------------------|--------------------------|
-| `GET /example/resource` | TODO placeholder comment |
+| Endpoint                                                    | Description                                                                                                                           |
+|-------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------|
+| `POST /views/search/[search_id]/execute`                    | Starts async search execution. Returns data that can be used to poll and cancel the job later on (job's ID and ID of execution node). |
+| `GET /views/searchjobs/[executing_node]/[job_id]/status`    | New, preferred endpoint for job status polling.                                                                                       |
+| `DELETE /views/searchjobs/[executing_node]/[job_id]/cancel` | New endpoint for job cancellation.                                                                                                    |

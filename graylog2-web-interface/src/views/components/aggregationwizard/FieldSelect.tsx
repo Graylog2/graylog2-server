@@ -18,7 +18,6 @@ import * as React from 'react';
 import { useContext, useMemo } from 'react';
 import * as Immutable from 'immutable';
 import styled, { css } from 'styled-components';
-import type { SelectInstance, GroupBase } from 'react-select';
 
 import { defaultCompare } from 'logic/DefaultCompare';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
@@ -27,6 +26,7 @@ import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldTypeIcon from 'views/components/sidebar/fields/FieldTypeIcon';
 import type FieldType from 'views/logic/fieldtypes/FieldType';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
+import type { SelectRef } from 'components/common/Select/Select';
 
 const FieldName = styled.span`
   display: inline-flex;
@@ -50,7 +50,7 @@ type Props = {
   openMenuOnFocus?: boolean,
   persistSelection?: boolean,
   placeholder?: string,
-  selectRef?: React.Ref<SelectInstance<unknown, boolean, GroupBase<unknown>>>,
+  selectRef?: SelectRef,
   size?: 'normal' | 'small',
   value: string | undefined,
 }
@@ -58,7 +58,7 @@ type Props = {
 const sortByLabel = ({ label: label1 }: { label: string }, { label: label2 }: { label: string }) => defaultCompare(label1, label2);
 
 const UnqualifiedOption = styled.span(({ theme }) => css`
-  color: ${theme.colors.variant.light.default};
+  color: ${theme.colors.gray[70]};
 `);
 
 type OptionRendererProps = {

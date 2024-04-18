@@ -38,9 +38,9 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.indexer.datanode.ProxyRequestAdapter;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -48,13 +48,13 @@ import static org.graylog2.audit.AuditEventTypes.DATANODE_API_REQUEST;
 
 @RequiresAuthentication
 @Api(value = "DataNodes/REST/API", description = "Proxy direct access to Data Node's API")
-@Path("/datanodes/rest/{path: .*}")
+@Path("/datanodes/{hostname}/rest/{path: .*}")
 @Produces(MediaType.APPLICATION_JSON)
 @Timed
-@RequiresPermissions("*")
+@RequiresPermissions(RestPermissions.DATANODE_REST_PROXY)
 public class DataNodeRestApiProxyResource extends RestResource {
     private static final List<Predicate<ProxyRequestAdapter.ProxyRequest>> allowList = List.of(
-            request -> request.path().startsWith("indices-directory")
+            request -> request.path().startsWith("indices-directory") && "GET".equals(request.method())
     );
 
     private final DatanodeRestApiProxy proxyRequestAdapter;
@@ -67,13 +67,16 @@ public class DataNodeRestApiProxyResource extends RestResource {
         this.enableAllowlist = enableAllowlist;
     }
 
+
     @GET
     @ApiOperation(value = "GET request to Data Node's API")
     @AuditEvent(type = DATANODE_API_REQUEST, captureRequestEntity = false, captureResponseEntity = false)
     public Response requestGet(@ApiParam(name = "path", required = true)
                                @PathParam("path") String path,
+                               @ApiParam(name = "hostname", required = true)
+                               @PathParam("hostname") String hostname,
                                @Context ContainerRequestContext requestContext) throws IOException {
-        return request(requestContext.getMethod(), path, requestContext.getEntityStream());
+        return request(requestContext, path, hostname);
     }
 
     @POST
@@ -81,8 +84,10 @@ public class DataNodeRestApiProxyResource extends RestResource {
     @AuditEvent(type = DATANODE_API_REQUEST, captureRequestEntity = false, captureResponseEntity = false)
     public Response requestPost(@ApiParam(name = "path", required = true)
                                 @PathParam("path") String path,
+                                @ApiParam(name = "hostname", required = true)
+                                @PathParam("hostname") String hostname,
                                 @Context ContainerRequestContext requestContext) throws IOException {
-        return request(requestContext.getMethod(), path, requestContext.getEntityStream());
+        return request(requestContext, path, hostname);
     }
 
     @PUT
@@ -90,8 +95,10 @@ public class DataNodeRestApiProxyResource extends RestResource {
     @AuditEvent(type = DATANODE_API_REQUEST, captureRequestEntity = false, captureResponseEntity = false)
     public Response requestPut(@ApiParam(name = "path", required = true)
                                @PathParam("path") String path,
+                               @ApiParam(name = "hostname", required = true)
+                               @PathParam("hostname") String hostname,
                                @Context ContainerRequestContext requestContext) throws IOException {
-        return request(requestContext.getMethod(), path, requestContext.getEntityStream());
+        return request(requestContext, path, hostname);
     }
 
     @DELETE
@@ -99,17 +106,19 @@ public class DataNodeRestApiProxyResource extends RestResource {
     @AuditEvent(type = DATANODE_API_REQUEST, captureRequestEntity = false, captureResponseEntity = false)
     public Response requestDelete(@ApiParam(name = "path", required = true)
                                   @PathParam("path") String path,
+                                  @ApiParam(name = "hostname", required = true)
+                                  @PathParam("hostname") String hostname,
                                   @Context ContainerRequestContext requestContext) throws IOException {
-        return request(requestContext.getMethod(), path, requestContext.getEntityStream());
+        return request(requestContext, path, hostname);
     }
 
-    private Response request(String method, String path, InputStream entityStream) throws IOException {
-        final var request = new ProxyRequestAdapter.ProxyRequest(method, path, entityStream);
+    private Response request(ContainerRequestContext context, String path, String hostname) throws IOException {
+        final var request = new ProxyRequestAdapter.ProxyRequest(context.getMethod(), path, context.getEntityStream(), hostname, context.getUriInfo().getQueryParameters());
         if (enableAllowlist && allowList.stream().noneMatch(condition -> condition.test(request))) {
             return Response.status(Response.Status.BAD_REQUEST).entity("This request is not allowed.").build();
         }
 
         final var response = proxyRequestAdapter.request(request);
-        return Response.status(response.status()).entity(response.response()).build();
+        return Response.status(response.status()).entity(response.response()).type(response.contentType()).build();
     }
 }

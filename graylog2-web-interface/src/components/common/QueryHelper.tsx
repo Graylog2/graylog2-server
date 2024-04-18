@@ -83,7 +83,7 @@ const queryHelpPopover = (commonFields: Props['commonFields'], fieldMap: Props['
 
 const QueryHelper = ({ commonFields, fieldMap, example, entityName }: Props) => (
   <OverlayTrigger trigger="click" rootClose placement="right" overlay={queryHelpPopover(commonFields, fieldMap, example, entityName)} title="Search Syntax Help" width={500}>
-    <QueryHelpButton bsStyle="link"><Icon name="question-circle" /></QueryHelpButton>
+    <QueryHelpButton bsStyle="link"><Icon name="help" /></QueryHelpButton>
   </OverlayTrigger>
 );
 

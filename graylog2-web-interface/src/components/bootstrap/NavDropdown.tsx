@@ -56,9 +56,10 @@ const StyledMenuDropdown = styled(Menu.Dropdown)`
 const DropdownTrigger = styled.button<{ $active: boolean }>(({ theme, $active }) => css`
   background: transparent;
   border: 0;
-  padding: 15px;
+  padding: 0 15px;
+  min-height: ${NAV_ITEM_HEIGHT};
 
-  &:hover {
+  &:hover, &:focus {
     ${hoverIndicatorStyles(theme)}
   }
 
@@ -77,6 +78,10 @@ const NavItem = styled.span`
   align-items: center;
   min-height: ${NAV_ITEM_HEIGHT};
   padding: 0;
+
+  @media (width <= 991px) {
+    width: 100%;
+  }
 `;
 
 type Props = {

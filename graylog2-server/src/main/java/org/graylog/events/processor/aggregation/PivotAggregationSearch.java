@@ -19,6 +19,7 @@ package org.graylog.events.processor.aggregation;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
@@ -65,6 +66,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -73,7 +75,9 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
+import static org.graylog.plugins.views.search.SearchJob.NO_CANCELLATION;
 import static org.graylog.plugins.views.search.SearchJob.NO_CANCELLATION;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -88,7 +92,8 @@ public class PivotAggregationSearch implements AggregationSearch {
 
     private final AggregationEventProcessorConfig config;
     private final AggregationEventProcessorParameters parameters;
-    private final String searchOwner;
+    private final User searchOwner;
+    private final List<SearchType> additionalSearchTypes;
     private final SearchJobService searchJobService;
     private final QueryEngine queryEngine;
     private final EventsConfigurationProvider configurationProvider;
@@ -101,8 +106,9 @@ public class PivotAggregationSearch implements AggregationSearch {
     @Inject
     public PivotAggregationSearch(@Assisted AggregationEventProcessorConfig config,
                                   @Assisted AggregationEventProcessorParameters parameters,
-                                  @Assisted String searchOwner,
+                                  @Assisted User searchOwner,
                                   @Assisted EventDefinition eventDefinition,
+                                  @Assisted List<SearchType> additionalSearchTypes,
                                   SearchJobService searchJobService,
                                   QueryEngine queryEngine,
                                   EventsConfigurationProvider configProvider,
@@ -114,6 +120,7 @@ public class PivotAggregationSearch implements AggregationSearch {
         this.parameters = parameters;
         this.searchOwner = searchOwner;
         this.eventDefinition = eventDefinition;
+        this.additionalSearchTypes = additionalSearchTypes;
         this.searchJobService = searchJobService;
         this.queryEngine = queryEngine;
         this.configurationProvider = configProvider;
@@ -132,6 +139,10 @@ public class PivotAggregationSearch implements AggregationSearch {
         final SearchJob searchJob = getSearchJob(parameters, searchOwner, config.searchWithinMs(), config.executeEveryMs());
         final QueryResult queryResult = searchJob.results().get(QUERY_ID);
         final QueryResult streamQueryResult = searchJob.results().get(STREAMS_QUERY_ID);
+        final Map<String, SearchType.Result> additionalResults = additionalSearchTypes.stream()
+                .filter(searchType -> queryResult.searchTypes().containsKey(searchType.id()))
+                .map(searchType -> queryResult.searchTypes().get(searchType.id()))
+                .collect(toMap(SearchType.Result::id, result -> result));
 
         final Set<SearchError> aggregationErrors = firstNonNull(queryResult.errors(), Collections.emptySet());
         final Set<SearchError> streamErrors = firstNonNull(streamQueryResult.errors(), Collections.emptySet());
@@ -186,6 +197,7 @@ public class PivotAggregationSearch implements AggregationSearch {
                 .effectiveTimerange(pivotResult.effectiveTimerange())
                 .totalAggregatedMessages(pivotResult.total())
                 .sourceStreams(extractSourceStreams(streamsResult))
+                .additionalResults(additionalResults)
                 .build();
     }
 
@@ -359,8 +371,9 @@ public class PivotAggregationSearch implements AggregationSearch {
         return results.build();
     }
 
-    private SearchJob getSearchJob(AggregationEventProcessorParameters parameters, String username,
+    private SearchJob getSearchJob(AggregationEventProcessorParameters parameters, User user,
                                    long searchWithinMs, long executeEveryMs) throws EventProcessorException {
+        final var username = user.name();
         Search search = Search.builder()
                 .queries(ImmutableSet.of(getAggregationQuery(parameters, searchWithinMs, executeEveryMs), getSourceStreamsQuery(parameters)))
                 .parameters(config.queryParameters())
@@ -369,7 +382,7 @@ public class PivotAggregationSearch implements AggregationSearch {
         // TODO: Once we introduce "EventProcessor owners" this should only load the permitted streams of the
         //       user who created this EventProcessor.
         search = search.addStreamsToQueriesWithoutStreams(() -> permittedStreams.loadAllMessageStreams((streamId) -> true));
-        final SearchJob searchJob = queryEngine.execute(searchJobService.create(search, username, NO_CANCELLATION), Collections.emptySet());
+        final SearchJob searchJob = queryEngine.execute(searchJobService.create(search, username, NO_CANCELLATION), Collections.emptySet(), user.timezone());
         try {
             Uninterruptibles.getUninterruptibly(
                     searchJob.getResultFuture(),
@@ -475,7 +488,8 @@ public class PivotAggregationSearch implements AggregationSearch {
         // We always have row groups because of the date range buckets
         pivotBuilder.rowGroups(groupBy);
 
-        final Set<SearchType> searchTypes = Collections.singleton(pivotBuilder.build());
+        final Set<SearchType> searchTypes = Sets.newHashSet(pivotBuilder.build());
+        searchTypes.addAll(additionalSearchTypes);
 
         final Query.Builder queryBuilder = Query.builder()
                 .id(QUERY_ID)

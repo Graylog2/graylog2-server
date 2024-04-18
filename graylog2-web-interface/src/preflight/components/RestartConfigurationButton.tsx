@@ -50,8 +50,7 @@ const ResumeStartupButton = ({ variant, compact, color }: Props) => {
 
   return (
     <Button variant={variant}
-            compact={compact}
-            size="xs"
+            size={compact ? 'compact-xs' : 'xs'}
             color={color}
             onClick={onResumeStartup}>
       {isRestartingConfiguration ? 'restarting...' : 'restart'}

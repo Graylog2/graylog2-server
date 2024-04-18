@@ -78,6 +78,7 @@ const RuleForm = ({ create }: Props) => {
   };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    setIsDirty(false);
     event.preventDefault();
 
     handleSavePipelineRule(handleCancel, handleError);

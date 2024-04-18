@@ -24,10 +24,14 @@ import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 import org.graylog.datanode.Configuration;
+import org.graylog.datanode.bootstrap.preflight.DatanodeDirectoriesLockfileCheck;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
+import org.graylog.datanode.configuration.OpensearchConfigurationProvider;
 import org.graylog.datanode.metrics.ConfigureMetricsIndexSettings;
 import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog.datanode.process.ProcessStateMachine;
+import org.graylog2.bootstrap.preflight.PreflightConfigResult;
+import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
@@ -42,9 +46,6 @@ import org.graylog2.security.CustomCAX509TrustManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @Singleton
 public class OpensearchProcessService extends AbstractIdleService implements Provider<OpensearchProcess> {
 
@@ -52,20 +53,20 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
 
     private static final int WATCHDOG_RESTART_ATTEMPTS = 3;
     private final OpensearchProcess process;
-    private final Provider<OpensearchConfiguration> configurationProvider;
+    private final OpensearchConfigurationProvider configurationProvider;
     private final EventBus eventBus;
-    private final NodeService<DataNodeDto> nodeService;
     private final NodeId nodeId;
     private final DataNodeProvisioningService dataNodeProvisioningService;
     private final IndexFieldTypesService indexFieldTypesService;
-    private final ObjectMapper objectMapper;
-    private final ProcessStateMachine processStateMachine;
     private final ClusterEventBus clusterEventBus;
+    private final DatanodeDirectoriesLockfileCheck lockfileCheck;
+    private final PreflightConfigService preflightConfigService;
+    private final Configuration configuration;
 
 
     @Inject
     public OpensearchProcessService(final DatanodeConfiguration datanodeConfiguration,
-                                    final Provider<OpensearchConfiguration> configurationProvider,
+                                    final OpensearchConfigurationProvider configurationProvider,
                                     final EventBus eventBus,
                                     final CustomCAX509TrustManager trustManager,
                                     final NodeService<DataNodeDto> nodeService,
@@ -75,16 +76,18 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
                                     final IndexFieldTypesService indexFieldTypesService,
                                     final ObjectMapper objectMapper,
                                     final ProcessStateMachine processStateMachine,
-                                    final ClusterEventBus clusterEventBus) {
+                                    final ClusterEventBus clusterEventBus,
+                                    final DatanodeDirectoriesLockfileCheck lockfileCheck,
+                                    final PreflightConfigService preflightConfigService) {
         this.configurationProvider = configurationProvider;
+        this.configuration = configuration;
         this.eventBus = eventBus;
-        this.nodeService = nodeService;
         this.nodeId = nodeId;
         this.dataNodeProvisioningService = dataNodeProvisioningService;
-        this.objectMapper = objectMapper;
         this.indexFieldTypesService = indexFieldTypesService;
-        this.processStateMachine = processStateMachine;
         this.clusterEventBus = clusterEventBus;
+        this.lockfileCheck = lockfileCheck;
+        this.preflightConfigService = preflightConfigService;
         this.process = createOpensearchProcess(datanodeConfiguration, trustManager, configuration, nodeService, objectMapper, processStateMachine);
         eventBus.register(this);
     }
@@ -96,7 +99,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
         process.addStateMachineTracer(watchdog);
         process.addStateMachineTracer(new StateMachineTransitionLogger());
         process.addStateMachineTracer(new OpensearchRemovalTracer(process, configuration.getDatanodeNodeName(), nodeId, clusterEventBus));
-        process.addStateMachineTracer(new ConfigureMetricsIndexSettings(process, configuration, indexFieldTypesService, objectMapper));
+        process.addStateMachineTracer(new ConfigureMetricsIndexSettings(process, configuration, indexFieldTypesService, objectMapper, nodeService));
         process.addStateMachineTracer(new ClusterNodeStateTracer(nodeService, nodeId));
         return process;
     }
@@ -107,7 +110,8 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
         switch (event.action()) {
             case ADD -> {
                 this.process.stop();
-                configure(Map.of("reindex.remote.whitelist", event.host())); // , "action.auto_create_index", "false"));
+                this.configurationProvider.setTransientConfiguration("reindex.remote.allowlist", event.allowlist());
+                configure(); // , "action.auto_create_index", "false"));
                 this.process.start();
             }
             case REMOVE -> {
@@ -122,7 +126,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     @SuppressWarnings("unused")
     public void handlePreflightConfigEvent(DataNodeProvisioningStateChangeEvent event) {
         switch (event.state()) {
-            case STARTUP_REQUESTED -> startUp();
+            case STARTUP_REQUESTED -> this.process.start();
             case STORED -> {
                 configure();
                 dataNodeProvisioningService.changeState(event.nodeId(), DataNodeProvisioningConfig.State.STARTUP_PREPARED);
@@ -143,40 +147,33 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
         }
     }
 
+    private void checkWritePreflightFinishedOnInsecureStartup() {
+        if(configuration.isInsecureStartup()) {
+            var preflight = preflightConfigService.getPreflightConfigResult();
+            if (preflight == null || !preflight.equals(PreflightConfigResult.FINISHED)) {
+                preflightConfigService.setConfigResult(PreflightConfigResult.FINISHED);
+            }
+        }
+    }
+
     @Override
     protected void startUp() {
         final OpensearchConfiguration config = configurationProvider.get();
         configure();
         if (config.securityConfigured()) {
-            this.process.start();
+            checkWritePreflightFinishedOnInsecureStartup();
+            try {
+                lockfileCheck.checkDatanodeLock(config.datanodeDirectories().getDataTargetDir());
+                this.process.start();
+            } catch (Exception e) {
+                LOG.error("Could not start up data node", e);
+            }
+
         }
     }
 
-    protected void configure() {
-        this.configure(Map.of());
-    }
-
-    private void configure(Map<String, String> additionalConfig) {
-        final OpensearchConfiguration original = configurationProvider.get();
-
-        final var finalAdditionalConfig = new HashMap<String, String>();
-        finalAdditionalConfig.putAll(original.additionalConfiguration());
-        finalAdditionalConfig.putAll(additionalConfig);
-
-        final var config = new OpensearchConfiguration(
-                original.opensearchDistribution(),
-                original.datanodeDirectories(),
-                original.bindAddress(),
-                original.hostname(),
-                original.httpPort(),
-                original.transportPort(),
-                original.clusterName(),
-                original.nodeName(),
-                original.nodeRoles(),
-                original.discoverySeedHosts(),
-                original.opensearchSecurityConfiguration(),
-                finalAdditionalConfig);
-
+    private void configure() {
+        final OpensearchConfiguration config = configurationProvider.get();
         if (config.securityConfigured()) {
             this.process.configure(config);
         } else {

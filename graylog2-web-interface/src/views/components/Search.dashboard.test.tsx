@@ -22,7 +22,6 @@ import asMock from 'helpers/mocking/AsMock';
 import mockComponent from 'helpers/mocking/MockComponent';
 import mockAction from 'helpers/mocking/MockAction';
 import { StreamsActions } from 'views/stores/StreamsStore';
-import { SearchConfigActions } from 'views/stores/SearchConfigStore';
 import View from 'views/logic/views/View';
 import Query, { filtersForQuery } from 'views/logic/queries/Query';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
@@ -30,7 +29,7 @@ import useQueryIds from 'views/hooks/useQueryIds';
 import useQueryTitles from 'views/hooks/useQueryTitles';
 import { createSearch } from 'fixtures/searches';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 
 import OriginalSearch from './Search';
 import WidgetFocusProvider from './contexts/WidgetFocusProvider';
@@ -87,7 +86,6 @@ const Search = () => (
 describe('Dashboard Search', () => {
   beforeEach(() => {
     StreamsActions.refresh = mockAction();
-    SearchConfigActions.refresh = mockAction();
 
     asMock(WidgetFocusProvider as React.FunctionComponent).mockImplementation(({ children }: React.PropsWithChildren<{}>) => (
       <WidgetFocusContext.Provider value={{
@@ -107,16 +105,13 @@ describe('Dashboard Search', () => {
     asMock(useQueryTitles).mockReturnValue(mockedQueryTitles);
   });
 
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   it('should list tabs for dashboard pages', async () => {
     render(<Search />);
 
-    await screen.findByRole('button', { name: 'First dashboard page' });
-
-    expect(screen.getByRole('button', { name: 'Second dashboard page' })).toBeInTheDocument();
+    await screen.findByRole('button', { name: /first dashboard page/i });
+    await screen.findByRole('button', { name: /second dashboard page/i });
   });
 
   it('should not list tabs for pages when focusing a widget', async () => {

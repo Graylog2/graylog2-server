@@ -50,7 +50,7 @@ const StageRules = ({ pipeline, stage, rules }: Props) => {
         description: `Rule ${stage.rules[ruleIdx]} has been renamed or removed. This rule will be skipped.`,
       };
 
-      ruleTitle = <span><Icon name="exclamation-triangle" className="text-danger" /> {stage.rules[ruleIdx]}</span>;
+      ruleTitle = <span><Icon name="warning" className="text-danger" /> {stage.rules[ruleIdx]}</span>;
     } else {
       const isRuleBuilder = rule.rule_builder ? '?rule_builder=true' : '';
 

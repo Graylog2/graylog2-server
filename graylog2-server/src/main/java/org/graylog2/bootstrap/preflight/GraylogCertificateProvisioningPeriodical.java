@@ -24,6 +24,9 @@ import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import com.google.common.base.Suppliers;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -47,13 +50,9 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.security.CustomCAX509TrustManager;
 import org.graylog2.security.IndexerJwtAuthTokenProvider;
-import org.jetbrains.annotations.NotNull;
+import jakarta.annotation.Nonnull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-import jakarta.inject.Singleton;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -181,7 +180,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
 
                 // if we're running in post-preflight and new datanodes arrive, they should configure themselves automatically
                 var cfg = preflightConfigService.getPreflightConfigResult();
-                if (cfg.equals(PreflightConfigResult.FINISHED)) {
+                if (cfg.equals(PreflightConfigResult.FINISHED) || cfg.equals(PreflightConfigResult.PREPARED)) {
                     var unconfiguredNodes = nodesByState.getOrDefault(DataNodeProvisioningConfig.State.UNCONFIGURED, List.of());
                     if (renewalPolicy.mode().equals(RenewalPolicy.Mode.AUTOMATIC)) {
                         unconfiguredNodes.forEach(c -> dataNodeProvisioningService.save(c.asConfigured()));
@@ -196,7 +195,8 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                             notificationService.fixed(Notification.Type.DATA_NODE_NEEDS_PROVISIONING);
                         }
                     }
-                } else {
+                }
+                if (!cfg.equals(PreflightConfigResult.PREPARED)) {
                     // if we're running through preflight and reach "STARTUP_PREPARED", we want to request STARTUP of OpenSearch
                     var preparedNodes = nodesByState.getOrDefault(DataNodeProvisioningConfig.State.STARTUP_PREPARED, List.of());
                     if(!preparedNodes.isEmpty()) {
@@ -295,7 +295,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
         }
     }
 
-    @NotNull
+    @Nonnull
     @Override
     protected Logger getLogger() {
         return LOG;

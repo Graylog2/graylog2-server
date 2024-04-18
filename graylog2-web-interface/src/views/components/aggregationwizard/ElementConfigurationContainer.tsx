@@ -17,9 +17,9 @@
 import * as React from 'react';
 import { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
-import type { DraggableProvidedDraggableProps, DraggableProvidedDragHandleProps } from 'react-beautiful-dnd';
 
 import { Icon, IconButton } from 'components/common';
+import type { DraggableProps, DragHandleProps } from 'components/common/SortableList';
 
 const Container = styled.div(({ theme }) => css`
   display: flex;
@@ -54,8 +54,8 @@ type Props = {
   children: React.ReactNode,
   onRemove?: () => void,
   elementTitle: string,
-  draggableProps?: DraggableProvidedDraggableProps;
-  dragHandleProps?: DraggableProvidedDragHandleProps;
+  draggableProps?: DraggableProps;
+  dragHandleProps?: DragHandleProps;
   className?: string,
   testIdPrefix?: string,
 };
@@ -68,10 +68,10 @@ const ElementConfigurationContainer = forwardRef<HTMLDivElement, Props>(({ child
     <ElementActions>
       {dragHandleProps && (
         <DragHandle {...dragHandleProps} data-testid={`${testIdPrefix}-drag-handle`}>
-          <Icon name="bars" />
+          <Icon name="drag_indicator" />
         </DragHandle>
       )}
-      {onRemove && <IconButton onClick={onRemove} name="trash-alt" title={`Remove ${elementTitle}`} />}
+      {onRemove && <IconButton onClick={onRemove} name="delete" title={`Remove ${elementTitle}`} />}
     </ElementActions>
   </Container>
 ));

@@ -18,13 +18,19 @@ package org.graylog.datanode.management;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.github.rholder.retry.Attempt;
+import com.github.rholder.retry.RetryException;
+import com.github.rholder.retry.RetryListener;
+import com.github.rholder.retry.RetryerBuilder;
+import com.github.rholder.retry.StopStrategies;
+import com.github.rholder.retry.WaitStrategies;
+import jakarta.validation.constraints.NotNull;
 import org.apache.commons.exec.OS;
+import org.graylog.datanode.management.opensearch.cli.OpensearchCli;
 import org.graylog.datanode.process.OpensearchConfiguration;
 import org.graylog.datanode.process.ProcessInformation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.validation.constraints.NotNull;
 
 import java.io.BufferedReader;
 import java.io.Closeable;
@@ -36,6 +42,8 @@ import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 public class OpensearchCommandLineProcess implements Closeable {
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchCommandLineProcess.class);
@@ -90,14 +98,33 @@ public class OpensearchCommandLineProcess implements Closeable {
 
     public OpensearchCommandLineProcess(OpensearchConfiguration config, ProcessListener listener) {
         fixJdkOnMac(config);
+        configureS3RepositoryPlugin(config);
         final Path executable = config.opensearchDistribution().getOpensearchExecutable();
         writeOpenSearchConfig(config);
         resultHandler = new CommandLineProcessListener(listener);
         commandLineProcess = new CommandLineProcess(executable, List.of(), resultHandler, config.getEnv());
     }
 
-    private static Map<String, String> getOpensearchConfigurationArguments(OpensearchConfiguration config) {
-        Map<String, String> allArguments = new LinkedHashMap<>(config.asMap());
+    private void configureS3RepositoryPlugin(OpensearchConfiguration config) {
+        if (config.s3RepositoryConfiguration().isRepositoryEnabled()) {
+            final OpensearchCli opensearchCli = new OpensearchCli(config);
+            configureS3Credentials(opensearchCli, config);
+        } else {
+            LOG.info("No S3 repository configuration provided, skipping plugin initialization");
+        }
+    }
+
+    private void configureS3Credentials(OpensearchCli opensearchCli, OpensearchConfiguration config) {
+        LOG.info("Creating opensearch keystore");
+        final String createdMessage = opensearchCli.keystore().create();
+        LOG.info(createdMessage);
+        LOG.info("Setting opensearch s3 repository keystore secrets");
+        opensearchCli.keystore().add("s3.client.default.access_key", config.s3RepositoryConfiguration().getS3ClientDefaultAccessKey());
+        opensearchCli.keystore().add("s3.client.default.secret_key", config.s3RepositoryConfiguration().getS3ClientDefaultSecretKey());
+    }
+
+    private static Map<String, Object> getOpensearchConfigurationArguments(OpensearchConfiguration config) {
+        Map<String, Object> allArguments = new LinkedHashMap<>(config.asMap());
 
         // now copy all the environment values to the configuration arguments. Opensearch won't do it for us,
         // because we are using tar distriburion and opensearch does this only for docker dist. See opensearch-env script
@@ -117,7 +144,29 @@ public class OpensearchCommandLineProcess implements Closeable {
     public void close() {
         commandLineProcess.stop();
         resultHandler.stopListening();
+        waitForProcessTermination();
+    }
 
+    private void waitForProcessTermination() {
+        try {
+            RetryerBuilder.newBuilder()
+                    .retryIfResult(Boolean.TRUE::equals)
+                    .withWaitStrategy(WaitStrategies.fixedWait(100, TimeUnit.MILLISECONDS))
+                    .withStopStrategy(StopStrategies.stopAfterDelay(60, TimeUnit.SECONDS))
+                    .withRetryListener(new RetryListener() {
+                        @Override
+                        public <V> void onRetry(Attempt<V> attempt) {
+                            LOG.info("Process " + commandLineProcess.processInfo().pid() + " still alive, waiting for termination.  Retry #" + attempt.getAttemptNumber());
+                        }
+                    })
+                    .build()
+                    .call(() -> commandLineProcess.processInfo().alive());
+            LOG.info("Process " + commandLineProcess.processInfo().pid() + " successfully terminated.");
+        } catch (ExecutionException | RetryException e) {
+            final String message = "Failed to terminate opensearch process " + commandLineProcess.processInfo().pid();
+            LOG.error(message, e);
+            throw new RuntimeException(message, e);
+        }
     }
 
     @NotNull

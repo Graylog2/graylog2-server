@@ -24,6 +24,7 @@ import io.swagger.annotations.ApiParam;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;
@@ -37,6 +38,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
+import org.graylog.plugins.views.search.ExplainResults;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchJob;
@@ -72,8 +74,8 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 public class SearchResource extends RestResource implements PluginRestResource {
     private static final Logger LOG = LoggerFactory.getLogger(SearchResource.class);
     private static final String BASE_PATH = "views/search";
-    private static final String SEARCH_FORMAT_V1 = "application/vnd.graylog.search.v1+json";
-    private static final String SEARCH_FORMAT_V2 = "application/vnd.graylog.search.v2+json";
+    public static final String SEARCH_FORMAT_V1 = "application/vnd.graylog.search.v1+json";
+    public static final String SEARCH_FORMAT_V2 = "application/vnd.graylog.search.v2+json";
 
     private final SearchDomain searchDomain;
     private final SearchExecutor searchExecutor;
@@ -161,19 +163,29 @@ public class SearchResource extends RestResource implements PluginRestResource {
                                  @ApiParam ExecutionState executionState,
                                  @Context SearchUser searchUser) {
 
-
         final SearchesClusterConfig searchesClusterConfig = clusterConfigService.get(SearchesClusterConfig.class);
         final ExecutionState enrichedExecutionState = executionState == null ?
                 ExecutionState.empty().withDefaultQueryCancellationIfNotSpecified(searchesClusterConfig) : executionState.withDefaultQueryCancellationIfNotSpecified(searchesClusterConfig);
-        final SearchJob searchJob = searchExecutor.execute(id, searchUser, enrichedExecutionState);
+
+        final SearchJob searchJob = searchExecutor.executeAsync(id, searchUser, enrichedExecutionState);
 
         postAuditEvent(searchJob);
 
         final SearchJobDTO searchJobDTO = SearchJobDTO.fromSearchJob(searchJob);
 
-        return Response.created(URI.create(BASE_PATH + "/status/" + searchJobDTO.id()))
+        return Response.created(URI.create(BASE_PATH + "/status/" + searchJobDTO.searchJobIdentifier().id()))
                 .entity(searchJob)
                 .build();
+    }
+
+    @POST
+    @ApiOperation(value = "Explains how the referenced search would be executed", response = ExplainResults.class)
+    @Path("{id}/explain")
+    @NoAuditEvent("Does not return any actual data")
+    public ExplainResults explainQuery(@ApiParam(name = "id") @PathParam("id") String id,
+                                       @ApiParam ExecutionState executionState,
+                                       @Context SearchUser searchUser) {
+        return searchExecutor.explain(id, searchUser, executionState);
     }
 
     @POST
@@ -207,7 +219,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
     private Response executeSyncJobInner(final Search search, final SearchUser searchUser) {
         final SearchesClusterConfig searchesClusterConfig = clusterConfigService.get(SearchesClusterConfig.class);
         final ExecutionState enrichedExecutionState = ExecutionState.empty().withDefaultQueryCancellationIfNotSpecified(searchesClusterConfig);
-        final SearchJob searchJob = searchExecutor.execute(search, searchUser, enrichedExecutionState);
+        final SearchJob searchJob = searchExecutor.executeSync(search, searchUser, enrichedExecutionState);
 
         postAuditEvent(searchJob);
 
@@ -220,19 +232,29 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @ApiOperation(value = "Retrieve the status of an executed query")
     @Path("status/{jobId}")
     @Produces({MediaType.APPLICATION_JSON, SEARCH_FORMAT_V1})
-    public SearchJobDTO jobStatus(@ApiParam(name = "jobId") @PathParam("jobId") String jobId, @Context SearchUser searchUser) {
-        final SearchJob searchJob = searchJobService.load(jobId, searchUser.username()).orElseThrow(NotFoundException::new);
-        if (searchJob != null && searchJob.getResultFuture() != null) {
+    public Response jobStatus(@ApiParam(name = "jobId") @PathParam("jobId") String jobId, @Context SearchUser searchUser) {
+        final SearchJob searchJob = searchJobService.load(jobId, searchUser).orElseThrow(NotFoundException::new);
+        if (searchJob.getResultFuture() != null) {
             try {
                 // force a "conditional join", to catch fast responses without having to poll
                 Uninterruptibles.getUninterruptibly(searchJob.getResultFuture(), 5, TimeUnit.MILLISECONDS);
             } catch (ExecutionException | TimeoutException ignore) {
-
             }
         }
+        return Response
+                .ok(SearchJobDTO.fromSearchJob(searchJob))
+                .build();
+    }
 
-
-        return SearchJobDTO.fromSearchJob(searchJob);
+    @DELETE
+    @Path("cancel/{jobId}")
+    @NoAuditEvent("To be decided if we want to have cancellation of jobs in audit log")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response cancelJob(@PathParam("jobId") String jobId,
+                              @Context SearchUser searchUser) {
+        final SearchJob searchJob = searchJobService.load(jobId, searchUser).orElseThrow(NotFoundException::new);
+        searchJob.cancel();
+        return Response.ok().build();
     }
 
     private void postAuditEvent(SearchJob searchJob) {

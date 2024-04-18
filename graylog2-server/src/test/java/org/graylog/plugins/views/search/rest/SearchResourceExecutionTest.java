@@ -37,6 +37,8 @@ import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.plugin.system.NodeId;
+import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.shared.rest.exceptions.MissingStreamPermissionException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -56,7 +58,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -82,15 +86,19 @@ public class SearchResourceExecutionTest {
 
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private SearchUser searchUser;
+
     @Mock
     private ClusterConfigService clusterConfigService;
+
+    private final NodeId nodeId = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
+
     private SearchResource searchResource;
 
     private SearchJobService searchJobService;
 
     @BeforeEach
     public void setUp() {
-        this.searchJobService = new InMemorySearchJobService();
+        this.searchJobService = new InMemorySearchJobService(nodeId);
         final SearchExecutor searchExecutor = new SearchExecutor(searchDomain,
                 searchJobService,
                 queryEngine,
@@ -160,11 +168,11 @@ public class SearchResourceExecutionTest {
 
         final SearchDTO search = makeSearchDTO();
 
-        final SearchJob searchJob = new SearchJob("deadbeef", search.toSearch(), "peterchen");
+        final SearchJob searchJob = new SearchJob("deadbeef", search.toSearch(), "peterchen", "5ca1ab1e-0000-4000-a000-000000000000");
         searchJob.addQueryResultFuture("query", CompletableFuture.completedFuture(QueryResult.emptyResult()));
         searchJob.seal();
 
-        when(queryEngine.execute(any(), any())).thenReturn(searchJob);
+        when(queryEngine.execute(any(), any(), any())).thenReturn(searchJob);
 
         final Response response = this.searchResource.executeSyncJob(search, 100, searchUser);
 
@@ -203,12 +211,12 @@ public class SearchResourceExecutionTest {
 
         final SearchJob searchJob = makeSearchJob(search.toSearch());
 
-        when(queryEngine.execute(any(), any())).thenReturn(searchJob);
+        when(queryEngine.execute(any(), any(), any())).thenReturn(searchJob);
 
         final Response response = this.searchResource.executeSyncJob(search, 100, searchUser);
 
         final SearchJobDTO responseSearchJob = (SearchJobDTO) response.getEntity();
-        assertThat(responseSearchJob.owner()).isEqualTo("peterchen");
+        assertThat(responseSearchJob.searchJobIdentifier().owner()).isEqualTo("peterchen");
     }
 
     @Test
@@ -289,7 +297,7 @@ public class SearchResourceExecutionTest {
 
         persistSearch(search);
 
-        when(queryEngine.execute(any(), any())).thenAnswer(invocation -> {
+        when(queryEngine.execute(any(), any(), any())).thenAnswer(invocation -> {
             final SearchJob searchJob = invocation.getArgument(0);
             searchJob.addQueryResultFuture("query", CompletableFuture.completedFuture(QueryResult.emptyResult()));
             searchJob.seal();
@@ -310,7 +318,7 @@ public class SearchResourceExecutionTest {
     }
 
     private SearchJob makeSearchJob(Search search) {
-        final SearchJob searchJob = new SearchJob("deadbeef", search, "peterchen");
+        final SearchJob searchJob = new SearchJob("deadbeef", search, "peterchen", "The-best-node");
         searchJob.addQueryResultFuture("query1", CompletableFuture.completedFuture(QueryResult.emptyResult()));
         searchJob.seal();
 

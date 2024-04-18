@@ -22,7 +22,7 @@ import asMock from 'helpers/mocking/AsMock';
 import OriginalExtraWidgetActions from 'views/components/widgets/ExtraWidgetActions';
 import Widget from 'views/logic/widgets/Widget';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import useWidgetActions from 'views/components/widgets/useWidgetActions';
 import wrapWithMenu from 'helpers/components/wrapWithMenu';
 
@@ -56,24 +56,22 @@ describe('ExtraWidgetActions', () => {
     disabled: jest.fn(() => true),
   };
 
-  beforeAll(loadViewsPlugin);
+  useViewsPlugin();
 
-  afterAll(unloadViewsPlugin);
-
-  it('returns `null` if no action is configured', () => {
+  it('does not render menu items, when no action is configured', () => {
     asMock(useWidgetActions).mockReturnValue([]);
 
-    const { container } = render(<ExtraWidgetActionsWithoutMenu widget={widget} />);
+    render(<ExtraWidgetActionsWithoutMenu widget={widget} />);
 
-    expect(container).toBeEmptyDOMElement();
+    expect(screen.queryByRole('menuitem')).not.toBeInTheDocument();
   });
 
-  it('returns `null` if no action is not hidden', () => {
+  it('does not render menu items, if no action is hidden', () => {
     asMock(useWidgetActions).mockReturnValue([dummyActionWhichIsHidden]);
 
-    const { container } = render(<ExtraWidgetActionsWithoutMenu widget={widget} />);
+    render(<ExtraWidgetActionsWithoutMenu widget={widget} />);
 
-    expect(container).toBeEmptyDOMElement();
+    expect(screen.queryByRole('menuitem')).not.toBeInTheDocument();
   });
 
   it('renders action which has no `isHidden`', async () => {

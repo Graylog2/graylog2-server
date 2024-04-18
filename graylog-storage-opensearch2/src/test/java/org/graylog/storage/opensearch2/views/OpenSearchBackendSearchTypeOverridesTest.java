@@ -38,22 +38,19 @@ import org.graylog.storage.opensearch2.testing.TestMultisearchResponse;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.storage.opensearch2.views.ViewsUtils.indicesOf;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 public class OpenSearchBackendSearchTypeOverridesTest extends OpenSearchBackendGeneratedRequestTestBase {
@@ -93,14 +90,12 @@ public class OpenSearchBackendSearchTypeOverridesTest extends OpenSearchBackendG
     }
 
     @Test
-    public void overridesInSearchTypeAreIncorporatedIntoGeneratedQueries() throws IOException {
-        final OSGeneratedQueryContext queryContext = this.openSearchBackend.generate(query, Collections.emptySet());
+    public void overridesInSearchTypeAreIncorporatedIntoGeneratedQueries() throws Exception {
+        final OSGeneratedQueryContext queryContext = createContext(query);
         final MultiSearchResponse response = TestMultisearchResponse.fromFixture("successfulMultiSearchResponse.json");
-        final List<MultiSearchResponse.Item> items = Arrays.stream(response.getResponses())
-                .collect(Collectors.toList());
-        when(client.msearch(any(), any())).thenReturn(items);
+        mockCancellableMSearch(response);
 
-        final List<SearchRequest> generatedRequest = run(searchJob, query, queryContext, Collections.emptySet());
+        final List<SearchRequest> generatedRequest = run(searchJob, query, queryContext);
 
         final DocumentContext pivot1 = parse(generatedRequest.get(0).source().toString());
         final DocumentContext pivot2 = parse(generatedRequest.get(1).source().toString());
@@ -141,7 +136,7 @@ public class OpenSearchBackendSearchTypeOverridesTest extends OpenSearchBackendG
     }
 
     @Test
-    public void timerangeOverridesAffectIndicesSelection() throws IOException, InvalidRangeParametersException {
+    public void timerangeOverridesAffectIndicesSelection() throws Exception {
         when(indexLookup.indexNamesForStreamsInTimeRange(ImmutableSet.of("stream1"), timeRangeForTest()))
                 .thenReturn(ImmutableSet.of("queryIndex"));
 
@@ -149,13 +144,11 @@ public class OpenSearchBackendSearchTypeOverridesTest extends OpenSearchBackendG
         when(indexLookup.indexNamesForStreamsInTimeRange(ImmutableSet.of("stream1"), tr))
                 .thenReturn(ImmutableSet.of("searchTypeIndex"));
 
-        final OSGeneratedQueryContext queryContext = this.openSearchBackend.generate(query, Collections.emptySet());
+        final OSGeneratedQueryContext queryContext = createContext(query);
         final MultiSearchResponse response = TestMultisearchResponse.fromFixture("successfulMultiSearchResponse.json");
-        final List<MultiSearchResponse.Item> items = Arrays.stream(response.getResponses())
-                .collect(Collectors.toList());
-        when(client.msearch(any(), any())).thenReturn(items);
+        mockCancellableMSearch(response);
 
-        final List<SearchRequest> generatedRequest = run(searchJob, query, queryContext, Collections.emptySet());
+        final List<SearchRequest> generatedRequest = run(searchJob, query, queryContext);
 
         assertThat(indicesOf(generatedRequest))
                 .hasSize(2)
@@ -163,5 +156,9 @@ public class OpenSearchBackendSearchTypeOverridesTest extends OpenSearchBackendG
                         "searchTypeIndex",
                         "queryIndex"
                 );
+    }
+
+    private OSGeneratedQueryContext createContext(Query query) {
+        return this.openSearchBackend.generate(query, Collections.emptySet(), DateTimeZone.UTC);
     }
 }

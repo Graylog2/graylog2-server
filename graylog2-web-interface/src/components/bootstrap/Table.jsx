@@ -84,48 +84,49 @@ const tableCss = css(({ theme }) => css`
     > tfoot > tr {
       > th,
       > td {
-        border-top-color: ${theme.colors.table.backgroundAlt};
+        border-top-color: ${theme.colors.table.row.backgroundAlt};
       }
     }
 
     > thead > tr > th {
+      background: ${theme.colors.table.head.background};
       white-space: nowrap;
-      border-bottom-color: ${theme.colors.table.backgroundAlt};
+      border-bottom-color: ${theme.colors.table.row.border};
     }
 
     > tbody > tr {
-      background-color: ${theme.colors.table.background};
+      background-color: ${theme.colors.global.contentBackground};
       transition: background-color 150ms ease-in-out;
     }
 
     > tbody + tbody {
-      border-top-color: ${theme.colors.table.backgroundAlt};
+      border-top-color: ${theme.colors.table.row.backgroundAlt};
     }
 
     .table {
-      background-color: ${theme.colors.table.background};
+      background-color: ${theme.colors.table.row.background};
     }
   }
 
   &.table-bordered {
-    border-color: ${theme.colors.table.backgroundAlt};
+    border-color: ${theme.colors.table.row.backgroundAlt};
 
     > thead > tr,
     > tfoot > tr,
     > tbody > tr {
       > td,
       > th {
-        border-color: ${theme.colors.table.backgroundAlt};
+        border-color: ${theme.colors.table.row.backgroundAlt};
       }
     }
   }
 
   &.table-striped > tbody > tr:nth-of-type(odd) {
-    background-color: ${theme.colors.table.backgroundAlt};
+    background-color: ${theme.colors.table.row.backgroundAlt};
   }
 
   &.table-hover > tbody > tr:hover {
-    background-color: ${theme.colors.table.backgroundHover};
+    background-color: ${theme.colors.table.row.backgroundHover};
   }
 
   ${variantRowStyles}

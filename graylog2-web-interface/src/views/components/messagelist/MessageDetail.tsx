@@ -34,12 +34,11 @@ import type { Input } from 'components/messageloaders/Types';
 import type { Stream } from 'views/stores/StreamsStore';
 import CustomPropTypes from 'views/components/CustomPropTypes';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
-import { useStore } from 'stores/connect';
-import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import FormatReceivedBy from 'views/components/messagelist/FormatReceivedBy';
 import FormatAssetList from 'views/components/messagelist/FormatAssetList';
 import useIsLocalNode from 'views/hooks/useIsLocalNode';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
+import useSearchConfiguration from 'hooks/useSearchConfiguration';
 
 import MessageDetailProviders from './MessageDetailProviders';
 import MessageActions from './MessageActions';
@@ -88,7 +87,7 @@ const MessageDetail = ({
   showTimestamp,
   allStreams,
 }: Props) => {
-  const { searchesClusterConfig } = useStore(SearchConfigStore);
+  const { config: searchesClusterConfig } = useSearchConfiguration();
   const [showOriginal, setShowOriginal] = useState(false);
   const { fields, index, id, decoration_stats: decorationStats } = message;
   const { gl2_source_node, gl2_source_input, associated_assets } = fields;
@@ -144,7 +143,7 @@ const MessageDetail = ({
             <Col md={12}>
               <Header>
                 <MessageDetailsTitle>
-                  <Icon name="envelope" />&nbsp;{messageTitle}
+                  <Icon name="mail" />&nbsp;{messageTitle}
                 </MessageDetailsTitle>
                 <MessageActions index={index}
                                 id={id}

@@ -16,13 +16,10 @@
  */
 package org.graylog2.indexer.datastream.policy.actions;
 
-import javax.annotation.Nonnull;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
-public record RolloverAction(@Nonnull String minIndexAge, boolean copyAlias) implements WrappedAction {
-
-    public RolloverAction(@Nonnull String minIndexAge) {
-        this(minIndexAge, false);
-    }
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public record RolloverAction(String minIndexAge, String minPrimaryShardSize) implements WrappedAction {
 
     @Override
     public Type getType() {

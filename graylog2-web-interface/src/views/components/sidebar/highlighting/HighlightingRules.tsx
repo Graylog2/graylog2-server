@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useCallback, useContext, useState } from 'react';
-import type { DraggableProvidedDraggableProps, DraggableProvidedDragHandleProps } from 'react-beautiful-dnd';
 
 import { DEFAULT_HIGHLIGHT_COLOR } from 'views/Constants';
 import HighlightingRulesContext from 'views/components/contexts/HighlightingRulesContext';
@@ -25,6 +24,7 @@ import { SortableList } from 'components/common';
 import { updateHighlightingRules } from 'views/logic/slices/highlightActions';
 import useAppDispatch from 'stores/useAppDispatch';
 import type HighlightingRuleType from 'views/logic/views/formatting/highlighting/HighlightingRule';
+import type { DraggableProps, DragHandleProps } from 'components/common/SortableList';
 
 import HighlightingRule, { Container, RuleContainer } from './HighlightingRule';
 import ColorPreview from './ColorPreview';
@@ -35,8 +35,8 @@ import SectionSubheadline from '../SectionSubheadline';
 
 type SortableHighlightingRuleProps = {
   item: { id: string, rule: HighlightingRuleType },
-  draggableProps: DraggableProvidedDraggableProps,
-  dragHandleProps: DraggableProvidedDragHandleProps,
+  draggableProps: DraggableProps,
+  dragHandleProps: DragHandleProps,
   className?: string,
   ref: React.Ref<HTMLDivElement>
 }
@@ -72,7 +72,7 @@ const HighlightingRules = () => {
         Any field value can be highlighted by clicking on the value and selecting &quot;Highlight this value&quot;.
         If a term or a value has more than one rule, the first matching rule is used.
       </SectionInfo>
-      <SectionSubheadline>Active highlights <IconButton className="pull-right" name="plus" onClick={() => setShowForm(!showForm)} /> </SectionSubheadline>
+      <SectionSubheadline>Active highlights <IconButton className="pull-right" name="add" onClick={() => setShowForm(!showForm)} /> </SectionSubheadline>
       {showForm && <HighlightForm onClose={() => setShowForm(false)} />}
       <Container $displayBorder={!!rulesWithId?.length}>
         <ColorPreview color={DEFAULT_HIGHLIGHT_COLOR} />

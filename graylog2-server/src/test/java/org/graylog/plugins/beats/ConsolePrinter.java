@@ -30,6 +30,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LoggingHandler;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -73,7 +74,7 @@ public class ConsolePrinter {
 
     public static class BeatsCodecHandler extends SimpleChannelInboundHandler<ByteBuf> {
         private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
-        private final Beats2Codec beatsCodec = new Beats2Codec(Configuration.EMPTY_CONFIGURATION, objectMapper);
+        private final Beats2Codec beatsCodec = new Beats2Codec(Configuration.EMPTY_CONFIGURATION, objectMapper, new TestMessageFactory());
 
         @Override
         protected void channelRead0(ChannelHandlerContext ctx, ByteBuf message) throws Exception {

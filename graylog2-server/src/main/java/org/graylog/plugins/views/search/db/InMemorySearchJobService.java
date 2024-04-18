@@ -20,9 +20,13 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import jakarta.ws.rs.ForbiddenException;
 import org.bson.types.ObjectId;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
+import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog2.plugin.system.NodeId;
+import org.graylog2.shared.utilities.StringUtils;
 
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -32,9 +36,11 @@ import java.util.concurrent.TimeUnit;
 public class InMemorySearchJobService implements SearchJobService {
 
     private final Cache<String, SearchJob> cache;
+    private final NodeId nodeId;
 
     @Inject
-    public InMemorySearchJobService() {
+    public InMemorySearchJobService(final NodeId nodeId) {
+        this.nodeId = nodeId;
         cache = CacheBuilder.newBuilder()
                 .expireAfterAccess(5, TimeUnit.MINUTES)
                 .maximumSize(1000)
@@ -43,21 +49,25 @@ public class InMemorySearchJobService implements SearchJobService {
     }
 
     @Override
-    public SearchJob create(final Search query,
+    public SearchJob create(final Search search,
                             final String owner,
                             final Integer cancelAfterSeconds) {
         final String id = new ObjectId().toHexString();
-        final SearchJob searchJob = new SearchJob(id, query, owner, cancelAfterSeconds);
+        final SearchJob searchJob = new SearchJob(id, search, owner, nodeId.getNodeId(), cancelAfterSeconds);
         cache.put(id, searchJob);
         return searchJob;
     }
 
     @Override
-    public Optional<SearchJob> load(String id, String owner) {
+    public Optional<SearchJob> load(final String id,
+                                    final SearchUser searchUser) throws ForbiddenException {
         final SearchJob searchJob = cache.getIfPresent(id);
-        if (searchJob == null || !searchJob.getOwner().equals(owner)) {
+        if (searchJob == null) {
             return Optional.empty();
+        } else if (searchJob.getOwner().equals(searchUser.username()) || searchUser.isAdmin()) {
+            return Optional.of(searchJob);
+        } else {
+            throw new ForbiddenException(StringUtils.f("User %s cannot load search job %s that belongs to different user!", searchUser.username(), id));
         }
-        return Optional.of(searchJob);
     }
 }

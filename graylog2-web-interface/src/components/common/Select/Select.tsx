@@ -31,7 +31,9 @@ import AsyncCustomMenuList from './AsyncCustomMenuList';
 
 export const CONTROL_CLASS = 'common-select-control';
 
-type Option = { [key: string]: any }
+type Option = { [key: string]: any };
+
+export type SelectRef = React.Ref<SelectInstance<unknown, boolean, GroupBase<unknown>>>
 
 const MultiValueRemove = ({ children, ...props }: React.ComponentProps<typeof Components.MultiValueRemove>) => (
   <Components.MultiValueRemove {...props}>{children}</Components.MultiValueRemove>
@@ -42,7 +44,7 @@ const IndicatorSeparator = () => null;
 const DropdownIndicator = (props) => {
   const {
     /* eslint-disable react/prop-types */
-    children = <Icon name="caret-down" />,
+    children = <Icon name="arrow_drop_down" />,
     getStyles,
     innerProps: { ref, ...restInnerProps },
     /* eslint-enable react/prop-types */
@@ -223,7 +225,7 @@ export type Props<OptionValue> = {
   delimiter?: string,
   disabled?: boolean,
   displayKey: string,
-  forwardedRef?: React.Ref<SelectInstance<unknown, boolean, GroupBase<unknown>>>,
+  forwardedRef?: SelectRef,
   id?: string,
   ignoreAccents?: boolean,
   inputId?: string,
@@ -231,6 +233,7 @@ export type Props<OptionValue> = {
   matchProp?: 'any' | 'label' | 'value',
   multi?: boolean,
   menuPortalTarget?: HTMLElement,
+  menuIsOpen?: boolean,
   name?: string,
   openMenuOnFocus?: boolean,
   onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void,
@@ -242,7 +245,7 @@ export type Props<OptionValue> = {
   placeholder: string,
   persistSelection: boolean,
   // eslint-disable-next-line react/require-default-props
-  ref?: React.Ref<SelectInstance<unknown, boolean, GroupBase<unknown>>>,
+  ref?: SelectRef,
   size?: 'normal' | 'small',
   theme: DefaultTheme,
   required?: boolean,
@@ -403,6 +406,7 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
     inputProps: undefined,
     matchProp: 'any',
     multi: false,
+    menuIsOpen: undefined,
     name: undefined,
     openMenuOnFocus: undefined,
     onReactSelectChange: undefined,

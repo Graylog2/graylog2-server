@@ -44,6 +44,9 @@ public abstract class ParameterDescriptor<T, R> {
     public abstract boolean optional();
 
     @JsonProperty
+    public abstract Optional<T> defaultValue();
+
+    @JsonProperty
     public abstract boolean ruleBuilderVariable();
 
     @JsonProperty
@@ -57,7 +60,7 @@ public abstract class ParameterDescriptor<T, R> {
     public abstract String description();
 
     public static <T, R> Builder<T, R> param() {
-        return ParameterDescriptor.<T, R>builder().optional(false).ruleBuilderVariable(false).allowNegatives(false);
+        return ParameterDescriptor.<T, R>builder().optional(false).defaultValue(Optional.empty()).ruleBuilderVariable(false).allowNegatives(false);
     }
 
     public static Builder<String, String> string(String name) {
@@ -141,6 +144,8 @@ public abstract class ParameterDescriptor<T, R> {
         public abstract Builder<T, R> name(String name);
 
         public abstract Builder<T, R> optional(boolean optional);
+
+        public abstract Builder<T, R> defaultValue(Optional<T> defaultValue);
 
         public abstract Builder<T, R> ruleBuilderVariable(boolean ruleBuilderVariable);
 

@@ -22,6 +22,8 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.multibindings.OptionalBinder;
 import com.google.inject.name.Names;
+import jakarta.ws.rs.container.DynamicFeature;
+import jakarta.ws.rs.ext.ExceptionMapper;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.glassfish.grizzly.http.server.ErrorPageGenerator;
 import org.graylog.scheduler.capabilities.ServerNodeCapabilitiesModule;
@@ -37,6 +39,7 @@ import org.graylog2.bindings.providers.SecureFreemarkerConfigProvider;
 import org.graylog2.bindings.providers.SystemJobFactoryProvider;
 import org.graylog2.bindings.providers.SystemJobManagerProvider;
 import org.graylog2.bootstrap.uncaughtexeptions.DefaultUncaughtExceptionHandlerCreator;
+import org.graylog2.buffers.processors.OutputBufferProcessor;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.cluster.leader.FakeLeaderElectionModule;
 import org.graylog2.cluster.leader.LeaderElectionModule;
@@ -44,7 +47,6 @@ import org.graylog2.cluster.lock.LockServiceModule;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.grok.GrokModule;
 import org.graylog2.grok.GrokPatternRegistry;
-import org.graylog2.indexer.SetIndexReadOnlyJob;
 import org.graylog2.indexer.fieldtypes.FieldTypesModule;
 import org.graylog2.indexer.healing.FixDeflectorByDeleteJob;
 import org.graylog2.indexer.healing.FixDeflectorByMoveJob;
@@ -103,9 +105,6 @@ import org.graylog2.users.RoleServiceImpl;
 import org.graylog2.users.StartPageCleanupListener;
 import org.graylog2.users.UserImpl;
 
-import jakarta.ws.rs.container.DynamicFeature;
-import jakarta.ws.rs.ext.ExceptionMapper;
-
 public class ServerBindings extends Graylog2Module {
     private final Configuration configuration;
     private final boolean isMigrationCommand;
@@ -162,7 +161,6 @@ public class ServerBindings extends Graylog2Module {
         // System Jobs
         install(new FactoryModuleBuilder().build(RebuildIndexRangesJob.Factory.class));
         install(new FactoryModuleBuilder().build(OptimizeIndexJob.Factory.class));
-        install(new FactoryModuleBuilder().build(SetIndexReadOnlyJob.Factory.class));
         install(new FactoryModuleBuilder().build(IndexSetCleanupJob.Factory.class));
         install(new FactoryModuleBuilder().build(CreateNewSingleIndexRangeJob.Factory.class));
         install(new FactoryModuleBuilder().build(FixDeflectorByDeleteJob.Factory.class));
@@ -174,6 +172,8 @@ public class ServerBindings extends Graylog2Module {
         install(new FactoryModuleBuilder().build(EmailRecipients.Factory.class));
 
         install(new FactoryModuleBuilder().build(ProcessBufferProcessor.Factory.class));
+        install(new FactoryModuleBuilder().build(OutputBufferProcessor.Factory.class));
+
         bind(Stream.class).annotatedWith(DefaultStream.class).toProvider(DefaultStreamProvider.class);
         bind(DefaultStreamChangeHandler.class).asEagerSingleton();
     }

@@ -16,6 +16,7 @@
  */
 package org.graylog.storage.elasticsearch7;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.annotations.VisibleForTesting;
@@ -32,7 +33,9 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.MultiSe
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.PlainActionFuture;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Request;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RequestOptions;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Response;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.ResponseException;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
 import org.graylog.storage.errors.ResponseError;
@@ -110,6 +113,18 @@ public class ElasticsearchClient {
                 .collect(Collectors.toList());
     }
 
+    private SearchResponse firstResponseFrom(MultiSearchResponse result, String errorMessage) {
+        checkArgument(result != null);
+        checkArgument(result.getResponses().length == 1);
+
+        final MultiSearchResponse.Item firstResponse = result.getResponses()[0];
+        if (firstResponse.getResponse() == null) {
+            throw exceptionFrom(firstResponse.getFailure(), errorMessage);
+        }
+
+        return firstResponse.getResponse();
+    }
+
     public PlainActionFuture<MultiSearchResponse> cancellableMsearch(final List<SearchRequest> searchRequests) {
         var multiSearchRequest = new MultiSearchRequest();
 
@@ -121,19 +136,8 @@ public class ElasticsearchClient {
 
         final PlainActionFuture<MultiSearchResponse> future = new PlainActionFuture<>();
         client.msearchAsync(multiSearchRequest, requestOptions(), future);
+
         return future;
-    }
-
-    private SearchResponse firstResponseFrom(MultiSearchResponse result, String errorMessage) {
-        checkArgument(result != null);
-        checkArgument(result.getResponses().length == 1);
-
-        final MultiSearchResponse.Item firstResponse = result.getResponses()[0];
-        if (firstResponse.getResponse() == null) {
-            throw exceptionFrom(firstResponse.getFailure(), errorMessage);
-        }
-
-        return firstResponse.getResponse();
     }
 
     public <R> R execute(ThrowingBiFunction<RestHighLevelClient, RequestOptions, R, IOException> fn) {
@@ -161,6 +165,13 @@ public class ElasticsearchClient {
         } catch (Exception e) {
             throw exceptionFrom(e, errorMessage);
         }
+    }
+
+    public JsonNode executeRequest(final Request request, final String errorMessage) {
+        return execute((c, requestOptions) -> {
+            final Response response = c.getLowLevelClient().performRequest(request);
+            return objectMapper.readTree(response.getEntity().getContent());
+        }, errorMessage);
     }
 
     private RequestOptions requestOptions() {

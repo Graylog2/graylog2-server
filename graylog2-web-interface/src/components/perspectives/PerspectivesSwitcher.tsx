@@ -20,7 +20,6 @@ import { useCallback } from 'react';
 
 import Menu from 'components/bootstrap/Menu';
 import Icon from 'components/common/Icon';
-import useFeature from 'hooks/useFeature';
 import usePerspectives from 'components/perspectives/hooks/usePerspectives';
 import useActivePerspective from 'components/perspectives/hooks/useActivePerspective';
 import useHistory from 'routing/useHistory';
@@ -76,7 +75,7 @@ const Switcher = () => {
         <ActivePerspectiveBrand>
           <Menu.Target>
             <DropdownTrigger type="button" title="Change UI perspective">
-              <DropdownIcon name="caret-down" />
+              <DropdownIcon name="arrow_drop_down" />
             </DropdownTrigger>
           </Menu.Target>
         </ActivePerspectiveBrand>
@@ -94,9 +93,8 @@ const Switcher = () => {
 
 const PerspectivesSwitcher = () => {
   const perspectives = usePerspectives();
-  const hasPerspectivesFeature = useFeature('frontend_perspectives');
 
-  if (!hasPerspectivesFeature || perspectives.length === 1) {
+  if (perspectives.length === 1) {
     return (
       <ActivePerspectiveBrand className="navbar-brand" />
     );

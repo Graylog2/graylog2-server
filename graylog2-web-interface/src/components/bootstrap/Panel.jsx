@@ -22,13 +22,14 @@ import { Panel as BootstrapPanel } from 'react-bootstrap';
 
 import deprecationNotice from 'util/deprecationNotice';
 
-const PanelHeading = styled(BootstrapPanel.Heading)`
+const PanelHeading = styled(BootstrapPanel.Heading)(({ theme }) => css`
   .panel-title {
     > a {
+      color: ${theme.colors.global.textDefault};
       display: block;
     }
   }
-`;
+`);
 
 const PanelFooter = styled(BootstrapPanel.Footer)(({ theme }) => css`
   background-color: ${theme.colors.gray[90]};
@@ -100,7 +101,7 @@ const deprecatedVariantStyles = css(({ bsStyle = 'default', theme }) => {
   return css`
     /** NOTE: Deprecated & should be removed in 4.0 */
     border-color: ${borderColor};
-    background: ${theme.colors.table.background};
+    background: ${theme.colors.table.row.background};
 
     & > .panel-heading {
       color: ${theme.utils.contrastingColor(backgroundColor)};
