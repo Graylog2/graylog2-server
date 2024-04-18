@@ -24,6 +24,7 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.SearchType;
+import org.graylog.plugins.views.search.SearchTypeBuilder;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.rest.SearchTypeExecutionState;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
@@ -137,7 +138,7 @@ public abstract class EventList implements SearchType {
     }
 
     @AutoValue.Builder
-    public abstract static class Builder {
+    public abstract static class Builder implements SearchTypeBuilder {
         @JsonCreator
         public static Builder createDefault() {
             return builder()
