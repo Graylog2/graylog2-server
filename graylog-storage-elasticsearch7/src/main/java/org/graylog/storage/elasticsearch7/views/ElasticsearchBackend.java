@@ -21,6 +21,7 @@ import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Provider;
+import jakarta.validation.constraints.NotNull;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.GlobalOverride;
 import org.graylog.plugins.views.search.Query;
@@ -45,6 +46,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.MultiSe
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.IndicesOptions;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.PlainActionFuture;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders;
@@ -73,6 +75,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContext> {
@@ -266,7 +269,9 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 })
                 .collect(Collectors.toList());
 
-        final List<MultiSearchResponse.Item> results = client.msearch(searches, "Unable to perform search query: ");
+        final PlainActionFuture<MultiSearchResponse> mSearchFuture = client.cancellableMsearch(searches);
+        job.setSearchEngineTaskFuture(mSearchFuture);
+        final List<MultiSearchResponse.Item> results = getResults(mSearchFuture, searches.size());
 
         for (SearchType searchType : query.searchTypes()) {
             final String searchTypeId = searchType.id();
@@ -313,6 +318,17 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 .searchTypes(resultsMap)
                 .errors(new HashSet<>(queryContext.errors()))
                 .build();
+    }
+
+
+    @NotNull
+    private static List<MultiSearchResponse.Item> getResults(PlainActionFuture<MultiSearchResponse> mSearchFuture,
+                                                             final int numSearchTypes) {
+        try {
+            return Arrays.asList(mSearchFuture.get().getResponses());
+        } catch (InterruptedException | ExecutionException e) {
+            return Collections.nCopies(numSearchTypes, new MultiSearchResponse.Item(null, e));
+        }
     }
 
     private Optional<ElasticsearchException> checkForFailedShards(MultiSearchResponse.Item multiSearchResponse) {

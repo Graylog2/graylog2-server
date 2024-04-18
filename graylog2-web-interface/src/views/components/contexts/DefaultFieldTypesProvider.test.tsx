@@ -29,7 +29,7 @@ import type { SearchExecutionResult } from 'views/types';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import useAppDispatch from 'stores/useAppDispatch';
-import executeSearch from 'views/logic/slices/executeSearch';
+import executeSearch from 'views/logic/slices/executeJobResult';
 import generateId from 'logic/generateId';
 
 import type { FieldTypes } from './FieldTypesContext';
@@ -38,7 +38,7 @@ import DefaultFieldTypesProvider from './DefaultFieldTypesProvider';
 
 jest.mock('views/logic/queries/useCurrentQuery');
 jest.mock('views/logic/fieldtypes/useFieldTypes', () => jest.fn());
-jest.mock('views/logic/slices/executeSearch');
+jest.mock('views/logic/slices/executeJobResult');
 
 const refetch = () => {};
 
