@@ -88,8 +88,10 @@ public class SearchExecutor {
              * while parts of the code expressed the need to use timeout (see line 104).
              * Imho in a separate PR we should decide which way to go, currently we wait indefinitely, as we did so far, and line 104 probably does not have a lot of sense, as it did not have before.
              */
-            resultFuture.join();
-            Uninterruptibles.getUninterruptibly(resultFuture, 60000, TimeUnit.MILLISECONDS);
+            if (resultFuture != null) {
+                resultFuture.join();
+                Uninterruptibles.getUninterruptibly(resultFuture, 60000, TimeUnit.MILLISECONDS);
+            }
         } catch (ExecutionException e) {
             LOG.error("Error executing search job <{}>", searchJob.getId(), e);
             throw new InternalServerErrorException("Error executing search job: " + e.getMessage(), e);
