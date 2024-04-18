@@ -50,7 +50,7 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.security.CustomCAX509TrustManager;
 import org.graylog2.security.IndexerJwtAuthTokenProvider;
-import org.jetbrains.annotations.NotNull;
+import jakarta.annotation.Nonnull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -295,7 +295,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
         }
     }
 
-    @NotNull
+    @Nonnull
     @Override
     protected Logger getLogger() {
         return LOG;
