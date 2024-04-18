@@ -117,17 +117,11 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
         setFieldValue,
       }) => (
         <Form role="form">
-          <Input id="allowlist"
-                 name="allowlist"
-                 label="Allowlist of all machines in the old cluster"
-                 type="text"
-                 disabled={isLoading}
-                 value={values.allowlist}
-                 onChange={(e) => handleChange(e, setFieldValue)}
-                 required />
           <Input id="hostname"
                  name="hostname"
-                 label="URI of the host to call the remote reindexing command against"
+                 label="Hostname"
+                 help="URI of the host to call the remote reindexing command against"
+                 placeholder="http://example:9200/"
                  type="text"
                  disabled={isLoading}
                  value={values.hostname}
@@ -147,6 +141,16 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
                  disabled={isLoading}
                  value={values.password}
                  onChange={(e) => handleChange(e, setFieldValue)} />
+          <Input id="allowlist"
+                 name="allowlist"
+                 label="Allowlist"
+                 help="Allowlist of all machines in the old cluster"
+                 placeholder="example:9200,example:9201,example:9202"
+                 type="text"
+                 disabled={isLoading}
+                 value={values.allowlist}
+                 onChange={(e) => handleChange(e, setFieldValue)}
+                 required />
           {(availableIndices.length > 0) && (
             <Alert title="Valid connection" bsStyle="success">
               These are the available <b>{availableIndices.length}</b> indices for the remote reindex migration:
