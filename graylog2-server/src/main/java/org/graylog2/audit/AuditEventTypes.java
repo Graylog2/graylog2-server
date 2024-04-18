@@ -217,6 +217,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(ES_INDEX_ROTATION_COMPLETE)
             .add(ES_INDEX_ROTATION_STRATEGY_UPDATE)
             .add(ES_INDEX_TEMPLATE_UPDATE)
+            .add(ES_INDEX_DEFAULT_TEMPLATE_UPDATE)
             .add(ES_WRITE_INDEX_UPDATE)
             .add(ES_WRITE_INDEX_UPDATE_JOB_START)
             .add(EXTRACTOR_CREATE)
