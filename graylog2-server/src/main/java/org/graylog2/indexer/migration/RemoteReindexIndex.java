@@ -26,8 +26,12 @@ public record RemoteReindexIndex(String name, Status status, DateTime created, D
                                  IndexMigrationProgress progress, String errorMsg) {
 
 
-    public static RemoteReindexIndex notStartedYet(String indexName) {
+    public static RemoteReindexIndex noBackgroundTaskYet(String indexName) {
         return new RemoteReindexIndex(indexName, Status.NOT_STARTED, null, null, null, null);
+    }
+
+    public boolean isCompleted() {
+        return status() == Status.FINISHED || status == Status.ERROR;
     }
 
 }

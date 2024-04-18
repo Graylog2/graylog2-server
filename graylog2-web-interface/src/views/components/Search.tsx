@@ -46,7 +46,7 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import SynchronizeUrl from 'views/components/SynchronizeUrl';
 import useView from 'views/hooks/useView';
 import useAppDispatch from 'stores/useAppDispatch';
-import { execute } from 'views/logic/slices/searchExecutionSlice';
+import { cancelExecutedJob, execute } from 'views/logic/slices/searchExecutionSlice';
 import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
 import useAppSelector from 'stores/useAppSelector';
 import useParameters from 'views/hooks/useParameters';
@@ -112,6 +112,20 @@ const ViewAdditionalContextProvider = ({ children }: { children: React.ReactNode
 
 ViewAdditionalContextProvider.displayName = 'ViewAdditionalContextProvider';
 
+const useOnWindowUnload = () => {
+  const dispatch = useAppDispatch();
+
+  return useEffect(() => {
+    const handleLeavePage = () => dispatch(cancelExecutedJob());
+    window.addEventListener('beforeunload', handleLeavePage);
+
+    return () => {
+      handleLeavePage();
+      window.removeEventListener('beforeunload', handleLeavePage);
+    };
+  }, [dispatch]);
+};
+
 const Search = () => {
   const dispatch = useAppDispatch();
   const refreshSearch = useCallback(() => dispatch(execute()), [dispatch]);
@@ -126,6 +140,8 @@ const Search = () => {
   useEffect(() => {
     StreamsActions.refresh();
   }, []);
+
+  useOnWindowUnload();
 
   return (
     <>

@@ -65,16 +65,18 @@ public class RemoteReindexMigration {
 
     @JsonProperty("status")
     public Status status() {
-        if (indices.isEmpty()) {
+        if (indices.isEmpty() || indices.stream().allMatch(i -> i.status() == Status.NOT_STARTED)) {
             return Status.NOT_STARTED;
-        }
-        if (indices().stream().map(RemoteReindexIndex::status).anyMatch(i -> i == Status.RUNNING)) {
+        } else if (indices.stream().allMatch(RemoteReindexIndex::isCompleted)) {
+            // all are now completed, either finished or errored
+            if (indices.stream().anyMatch(i -> i.status() == Status.ERROR)) {
+                return Status.ERROR;
+            } else {
+                return Status.FINISHED;
+            }
+        } else {
             return Status.RUNNING;
         }
-        if (indices().stream().map(RemoteReindexIndex::status).anyMatch(i -> i == Status.ERROR)) {
-            return Status.ERROR;
-        }
-        return Status.FINISHED;
     }
 
     /**
@@ -94,7 +96,7 @@ public class RemoteReindexMigration {
                 .map(relativeProgress -> relativeProgress * indexPortion)
                 .sum();
 
-         return Math.min((int)Math.ceil(overallProgress), 100);
+        return Math.min((int) Math.ceil(overallProgress), 100);
     }
 
     public List<LogEntry> getLogs() {
