@@ -58,7 +58,7 @@ import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.shared.rest.exceptionmappers.JacksonPropertyExceptionMapper;
 import org.graylog2.shared.rest.exceptionmappers.JsonProcessingExceptionMapper;
 import org.graylog2.shared.security.tls.KeyStoreUtils;
-import org.jetbrains.annotations.NotNull;
+import jakarta.annotation.Nonnull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -264,7 +264,7 @@ public class JerseyService extends AbstractIdleService {
         return httpServer;
     }
 
-    @NotNull
+    @Nonnull
     private ContainerRequestFilter createAuthFilter(Configuration configuration) {
         final ContainerRequestFilter basicAuthFilter = new BasicAuthFilter(configuration.getRootUsername(), configuration.getRootPasswordSha2(), "Datanode");
         final AuthTokenValidator tokenVerifier = new JwtTokenValidator(configuration.getPasswordSecret());

@@ -38,7 +38,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSource
 import org.graylog.shaded.opensearch2.org.opensearch.search.sort.SortBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.sort.SortOrder;
 import org.graylog2.plugin.periodical.Periodical;
-import org.jetbrains.annotations.NotNull;
+import jakarta.annotation.Nonnull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,7 +98,7 @@ public class MetricsCollector extends Periodical {
         return 60;
     }
 
-    @NotNull
+    @Nonnull
     @Override
     protected Logger getLogger() {
         return LOG;
