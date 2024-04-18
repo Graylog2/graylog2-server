@@ -16,11 +16,12 @@
  */
 package org.graylog.datanode.process;
 
+import com.github.oxo42.stateless4j.delegates.Trace;
 import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
 import org.graylog.datanode.opensearch.statemachine.OpensearchState;
 import org.graylog.datanode.opensearch.statemachine.tracer.StateMachineTracer;
 
-public interface ManagableProcess<T> {
+public interface ManagableProcess<T, EVENT, STATE> {
 
     void configure(T configuration);
 
@@ -28,10 +29,10 @@ public interface ManagableProcess<T> {
 
     void stop();
 
-    void onEvent(OpensearchEvent event);
+    void onEvent(EVENT event);
 
-    void addStateMachineTracer(StateMachineTracer stateMachineTracer);
+    void addStateMachineTracer(Trace<STATE, EVENT> tracer);
 
-    boolean isInState(OpensearchState state);
+    boolean isInState(STATE state);
 
 }

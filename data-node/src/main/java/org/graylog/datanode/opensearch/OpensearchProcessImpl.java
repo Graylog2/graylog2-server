@@ -17,6 +17,7 @@
 package org.graylog.datanode.opensearch;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.oxo42.stateless4j.delegates.Trace;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.http.client.utils.URIBuilder;
@@ -151,8 +152,8 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     }
 
     @Override
-    public void addStateMachineTracer(StateMachineTracer stateMachineTracer) {
-        this.processState.getTracerAggregator().addTracer(stateMachineTracer);
+    public void addStateMachineTracer(Trace<OpensearchState, OpensearchEvent> stateMachineTracer) {
+        this.processState.getTracerAggregator().addTracer((StateMachineTracer) stateMachineTracer);
     }
 
     public void setLeaderNode(boolean isLeaderNode) {

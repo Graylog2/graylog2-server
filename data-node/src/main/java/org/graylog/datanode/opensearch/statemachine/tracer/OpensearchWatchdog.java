@@ -33,9 +33,9 @@ public class OpensearchWatchdog implements StateMachineTracer {
 
     private boolean active;
     private final FailuresCounter restartCounter;
-    private final ManagableProcess<?> process;
+    private final ManagableProcess<?, ?, ?> process;
 
-    public OpensearchWatchdog(ManagableProcess<?> process, int restartAttemptsCount) {
+    public OpensearchWatchdog(ManagableProcess<?, ?, ?> process, int restartAttemptsCount) {
         this.process = process;
         this.restartCounter = FailuresCounter.zeroBased(restartAttemptsCount);
     }

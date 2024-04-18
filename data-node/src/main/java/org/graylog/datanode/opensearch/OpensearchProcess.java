@@ -17,6 +17,8 @@
 package org.graylog.datanode.opensearch;
 
 import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
+import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
+import org.graylog.datanode.opensearch.statemachine.OpensearchState;
 import org.graylog.datanode.process.ManagableProcess;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog.storage.opensearch2.OpenSearchClient;
@@ -25,7 +27,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
-public interface OpensearchProcess extends ManagableProcess<OpensearchConfiguration> {
+public interface OpensearchProcess extends ManagableProcess<OpensearchConfiguration, OpensearchEvent, OpensearchState> {
 
     OpensearchInfo processInfo();
 

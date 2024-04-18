@@ -17,9 +17,9 @@
 package org.graylog.datanode.opensearch.statemachine.tracer;
 
 import org.assertj.core.api.Assertions;
+import org.graylog.datanode.opensearch.TestableOpensearchProcess;
 import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
 import org.graylog.datanode.opensearch.statemachine.OpensearchState;
-import org.graylog.datanode.process.TestableProcess;
 import org.junit.jupiter.api.Test;
 
 class OpensearchWatchdogTracerTest {
@@ -27,7 +27,7 @@ class OpensearchWatchdogTracerTest {
 
     @Test
     void testLifecycle() {
-        final TestableProcess process = new TestableProcess();
+        final TestableOpensearchProcess process = new TestableOpensearchProcess();
         final OpensearchWatchdog watchdog = new OpensearchWatchdog(process, 3);
         process.addStateMachineTracer(watchdog);
         process.configure("ignored");
@@ -53,11 +53,11 @@ class OpensearchWatchdogTracerTest {
         Assertions.assertThat(process.isInState(OpensearchState.TERMINATED)).isTrue();
     }
 
-    private void terminateProcess(TestableProcess process) {
+    private void terminateProcess(TestableOpensearchProcess process) {
         process.onEvent(OpensearchEvent.PROCESS_TERMINATED);
     }
 
-    private boolean isInStartingState(TestableProcess process) {
+    private boolean isInStartingState(TestableOpensearchProcess process) {
         return process.isInState(OpensearchState.STARTING);
     }
 }

@@ -14,23 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.process;
+package org.graylog.datanode.opensearch;
 
 import com.github.oxo42.stateless4j.StateMachine;
+import com.github.oxo42.stateless4j.delegates.Trace;
 import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
 import org.graylog.datanode.opensearch.statemachine.OpensearchState;
 import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachine;
-import org.graylog.datanode.opensearch.statemachine.tracer.StateMachineTracer;
+import org.graylog.datanode.process.ManagableProcess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TestableProcess implements ManagableProcess<String> {
+public class TestableOpensearchProcess implements ManagableProcess<String, OpensearchEvent, OpensearchState> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TestableProcess.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TestableOpensearchProcess.class);
 
     private final StateMachine<OpensearchState, OpensearchEvent> stateMachine;
 
-    public TestableProcess() {
+    public TestableOpensearchProcess() {
         this.stateMachine = OpensearchStateMachine.createNew();
     }
 
@@ -58,7 +59,7 @@ public class TestableProcess implements ManagableProcess<String> {
     }
 
     @Override
-    public void addStateMachineTracer(StateMachineTracer stateMachineTracer) {
+    public void addStateMachineTracer(Trace<OpensearchState, OpensearchEvent> stateMachineTracer) {
         stateMachine.setTrace(stateMachineTracer);
     }
 
