@@ -38,6 +38,7 @@ import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.database.PaginatedList;
 import org.graylog2.indexer.IndexSetValidator;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.template.IndexSetDefaultTemplateService;
@@ -45,12 +46,14 @@ import org.graylog2.indexer.indexset.template.IndexSetTemplate;
 import org.graylog2.indexer.indexset.template.IndexSetTemplateConfig;
 import org.graylog2.indexer.indexset.template.IndexSetTemplateData;
 import org.graylog2.indexer.indexset.template.IndexSetTemplateService;
+import org.graylog2.indexer.indexset.template.rest.IndexSetTemplateResponse;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.joda.time.Duration;
 
 import java.util.List;
+import java.util.Objects;
 
 import static org.graylog2.audit.AuditEventTypes.INDEX_SET_TEMPLATE_CREATE;
 import static org.graylog2.audit.AuditEventTypes.INDEX_SET_TEMPLATE_DELETE;
@@ -86,7 +89,7 @@ public class IndexSetTemplateResource extends RestResource {
     @Timed
     @NoAuditEvent("No change to the DB")
     @ApiOperation(value = "Gets template by id")
-    public IndexSetTemplate retrieveById(@ApiParam(name = "template_id") @PathParam("template_id") String templateId) {
+    public IndexSetTemplateResponse retrieveById(@ApiParam(name = "template_id") @PathParam("template_id") String templateId) {
         checkPermission(RestPermissions.INDEX_SET_TEMPLATES_READ, templateId);
         return getIndexSetTemplate(templateId);
     }
@@ -96,7 +99,7 @@ public class IndexSetTemplateResource extends RestResource {
     @Timed
     @NoAuditEvent("No change to the DB")
     @ApiOperation(value = "Gets template by id")
-    public PageListResponse<IndexSetTemplate> getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+    public PageListResponse<IndexSetTemplateResponse> getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                                       @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                                       @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
                                                       @ApiParam(name = "filters") @QueryParam("filters") List<String> filters,
@@ -108,7 +111,7 @@ public class IndexSetTemplateResource extends RestResource {
                                                       @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
                                                       @DefaultValue("asc") @QueryParam("order") String order) {
         checkPermission(RestPermissions.INDEX_SET_TEMPLATES_READ);
-        return templateService.getPaginated(query, filters, page, perPage, sort, order);
+        return toPaginatedResponse(templateService.getPaginated(query, filters, page, perPage, sort, order));
     }
 
     @POST
@@ -145,7 +148,7 @@ public class IndexSetTemplateResource extends RestResource {
     @ApiOperation(value = "Removes a template")
     public void delete(@ApiParam(name = "template_id") @PathParam("template_id") String templateId) throws IllegalAccessException {
         checkPermission(RestPermissions.INDEX_SET_TEMPLATES_DELETE, templateId);
-        final IndexSetTemplate template = getIndexSetTemplate(templateId);
+        final IndexSetTemplateResponse template = getIndexSetTemplate(templateId);
         checkReadOnly(template);
         checkIsDefault(template);
         templateService.delete(templateId);
@@ -182,8 +185,9 @@ public class IndexSetTemplateResource extends RestResource {
         }
     }
 
-    private IndexSetTemplate getIndexSetTemplate(String templateId) {
+    private IndexSetTemplateResponse getIndexSetTemplate(String templateId) {
         return templateService.get(templateId)
+                .map(indexSetTemplate -> toResponse(indexSetTemplate, indexSetDefaultTemplateService.getDefaultIndexSetTemplateId()))
                 .orElseThrow(() -> new NotFoundException(f("No template with id %s", templateId)));
     }
 
@@ -191,15 +195,44 @@ public class IndexSetTemplateResource extends RestResource {
         return f("Invalid value for field [%s]: %s", field, message);
     }
 
-    private void checkIsDefault(IndexSetTemplate template) throws IllegalAccessException {
-        if(indexSetDefaultTemplateService.isDefault(template.id())){
+    private void checkIsDefault(IndexSetTemplateResponse template) throws IllegalAccessException {
+        if(template.isDefault()){
             throw new IllegalAccessException(f("Template %s <%s> is set as default and cannot be deleted", template.id(), template.title()));
         }
     }
 
-    private void checkReadOnly(IndexSetTemplate template) throws IllegalAccessException {
+    private void checkReadOnly(IndexSetTemplateResponse template) throws IllegalAccessException {
         if (template.isBuiltIn()) {
             throw new IllegalAccessException(f("Template %s <%s> is read-only and cannot be modified or deleted", template, template.title()));
         }
+    }
+
+    private PageListResponse<IndexSetTemplateResponse> toPaginatedResponse(PageListResponse<IndexSetTemplate> pageListResponse) {
+        return PageListResponse.create(pageListResponse.query(),
+                new PaginatedList<>(
+                        toResponse(pageListResponse.elements()),
+                        pageListResponse.paginationInfo().total(),
+                        pageListResponse.paginationInfo().page(),
+                        pageListResponse.paginationInfo().perPage()),
+                pageListResponse.sort(),
+                pageListResponse.order(),
+                pageListResponse.attributes(),
+                pageListResponse.defaults());
+    }
+
+    private List<IndexSetTemplateResponse> toResponse(List<IndexSetTemplate> templates) {
+        String defaultIndexSetTemplateId = indexSetDefaultTemplateService.getDefaultIndexSetTemplateId();
+        return templates.stream().map(indexSetTemplate -> toResponse(indexSetTemplate, defaultIndexSetTemplateId)).toList();
+    }
+
+    private IndexSetTemplateResponse toResponse(IndexSetTemplate indexSetTemplate, String defaultTemplateId) {
+        return new IndexSetTemplateResponse(
+                indexSetTemplate.id(),
+                indexSetTemplate.title(),
+                indexSetTemplate.description(),
+                indexSetTemplate.isBuiltIn(),
+                Objects.equals(defaultTemplateId, indexSetTemplate.id()),
+                indexSetTemplate.indexSetConfig()
+        );
     }
 }

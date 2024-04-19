@@ -17,6 +17,7 @@
 package org.graylog2.indexer.indexset.template;
 
 import com.google.common.collect.ImmutableMap;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
 import org.graylog2.audit.AuditActor;
@@ -27,7 +28,6 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Objects;
 import java.util.Optional;
 
 import static org.graylog2.audit.AuditEventTypes.INDEX_SET_DEFAULT_TEMPLATE_UPDATE;
@@ -53,7 +53,7 @@ public class IndexSetDefaultTemplateService {
     }
 
     public Optional<IndexSetTemplate> getDefaultIndexSetTemplate() {
-        return Optional.ofNullable(clusterConfigService.get(IndexSetDefaultTemplate.class))
+        return getIndexSetDefaultTemplateConfig()
                 .flatMap(indexSetDefaultTemplate -> indexSetTemplateService.get(indexSetDefaultTemplate.id()));
     }
 
@@ -61,11 +61,6 @@ public class IndexSetDefaultTemplateService {
         return getDefaultIndexSetTemplate()
                 .map(IndexSetTemplate::indexSetConfig)
                 .orElse(createDefault());
-    }
-
-    private IndexSetTemplateConfig createDefault() {
-        LOG.debug("Could not find default configuration. Falling back to server configuration values.");
-        return indexSetDefaultTemplateConfigFactory.create();
     }
 
     public IndexSetTemplate createAndSaveDefault(IndexSetTemplate defaultIndexSetTemplate) {
@@ -87,10 +82,16 @@ public class IndexSetDefaultTemplateService {
         }
     }
 
-    public boolean isDefault(@NotNull String templateId) {
-        String defaultTemplateId = Optional.ofNullable(clusterConfigService.get(IndexSetDefaultTemplate.class))
-                .map(IndexSetDefaultTemplate::id)
-                .orElse(null);
-        return Objects.equals(defaultTemplateId, templateId);
+    public @Nullable String getDefaultIndexSetTemplateId() {
+        return getIndexSetDefaultTemplateConfig().map(IndexSetDefaultTemplate::id).orElse(null);
+    }
+
+    private Optional<IndexSetDefaultTemplate> getIndexSetDefaultTemplateConfig() {
+        return Optional.ofNullable(clusterConfigService.get(IndexSetDefaultTemplate.class));
+    }
+
+    private IndexSetTemplateConfig createDefault() {
+        LOG.debug("Could not find default configuration. Falling back to server configuration values.");
+        return indexSetDefaultTemplateConfigFactory.create();
     }
 }
