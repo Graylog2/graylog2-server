@@ -19,6 +19,8 @@ package org.graylog.plugins.views;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Scopes;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
+import org.graylog.plugins.formatting.units.migrations.V20240422120000_SetInitialUnits;
+import org.graylog.plugins.formatting.units.rest.UnitResource;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
 import org.graylog.plugins.views.favorites.FavoritesResource;
 import org.graylog.plugins.views.migrations.V20181220133700_AddViewsAdminRole;
@@ -164,6 +166,7 @@ public class ViewsBindings extends ViewsModule {
         addSystemRestResource(SuggestionsResource.class);
         addSystemRestResource(QueryValidationResource.class);
         addSystemRestResource(EntitySuggestionResource.class);
+        addSystemRestResource(UnitResource.class);
 
         addPermissions(ViewsRestPermissions.class);
 
@@ -237,6 +240,7 @@ public class ViewsBindings extends ViewsModule {
         addMigration(V20200204122000_MigrateUntypedViewsToDashboards.class);
         addMigration(V20200409083200_RemoveRootQueriesFromMigratedDashboards.class);
         addMigration(V20200730000000_AddGl2MessageIdFieldAliasForEvents.class);
+        addMigration(V20240422120000_SetInitialUnits.class);
 
         addAuditEventTypes(ViewsAuditEventTypes.class);
 

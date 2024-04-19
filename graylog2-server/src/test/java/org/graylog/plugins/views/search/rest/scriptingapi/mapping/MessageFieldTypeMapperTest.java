@@ -30,9 +30,9 @@ class MessageFieldTypeMapperTest {
     @Test
     void testSchemaCreation() {
         final Set<MappedFieldTypeDTO> knownFields = Set.of(
-                MappedFieldTypeDTO.create("age", org.graylog2.indexer.fieldtypes.FieldTypeMapper.LONG_TYPE),
-                MappedFieldTypeDTO.create("salary", org.graylog2.indexer.fieldtypes.FieldTypeMapper.DOUBLE_TYPE),
-                MappedFieldTypeDTO.create("position", org.graylog2.indexer.fieldtypes.FieldTypeMapper.STRING_TYPE)
+                new MappedFieldTypeDTO("age", org.graylog2.indexer.fieldtypes.FieldTypeMapper.LONG_TYPE),
+                new MappedFieldTypeDTO("salary", org.graylog2.indexer.fieldtypes.FieldTypeMapper.DOUBLE_TYPE),
+                new MappedFieldTypeDTO("position", org.graylog2.indexer.fieldtypes.FieldTypeMapper.STRING_TYPE)
         );
 
         final MessageFieldTypeMapper mapper = new MessageFieldTypeMapper(knownFields);

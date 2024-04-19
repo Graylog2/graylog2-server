@@ -14,23 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.rest;
+package org.graylog.plugins.formatting.units.fields;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog.plugins.formatting.units.model.UnitView;
-import org.graylog2.indexer.fieldtypes.FieldTypes;
 
-import javax.annotation.Nullable;
+import java.util.List;
+import java.util.Optional;
 
-@JsonAutoDetect
-public record MappedFieldTypeDTO(@JsonProperty("name") String name,
-                                 @JsonProperty("type") FieldTypes.Type type,
-                                 @JsonProperty("unit") @Nullable UnitView unit
-) {
+public class FieldUnitObtainer {
 
-    public MappedFieldTypeDTO(final String name,
-                              final FieldTypes.Type type) {
-        this(name, type, null);
+    private final List<FieldUnitObtainingMethod> prioritizedMethodList = List.of(new HardcodedFieldUnitObtainingMethod());
+
+    public Optional<UnitView> obtainUnit(final String fieldName) {
+        return prioritizedMethodList.stream()
+                .map(fieldUnitObtainingMethod -> fieldUnitObtainingMethod.obtainUnit(fieldName))
+                .filter(Optional::isPresent)
+                .findFirst()
+                .orElse(Optional.empty());
     }
 }

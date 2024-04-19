@@ -18,6 +18,7 @@ package org.graylog2.indexer.fieldtypes;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import org.graylog.plugins.formatting.units.fields.FieldUnitObtainer;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
 import org.graylog2.Configuration;
@@ -57,6 +58,9 @@ public class MappedFieldTypesServiceImplTest {
     private IndexFieldTypesService indexFieldTypesService;
 
     @Mock
+    private FieldUnitObtainer fieldUnitObtainer;
+
+    @Mock
     private IndexLookup indexLookup;
 
     @Captor
@@ -71,7 +75,7 @@ public class MappedFieldTypesServiceImplTest {
     public void setUp() throws Exception {
         final Configuration withStreamAwarenessOff = spy(new Configuration());
         doReturn(false).when(withStreamAwarenessOff).maintainsStreamAwareFieldTypes();
-        this.mappedFieldTypesService = new MappedFieldTypesServiceImpl(withStreamAwarenessOff, streamService, indexFieldTypesService, new FieldTypeMapper(), indexLookup);
+        this.mappedFieldTypesService = new MappedFieldTypesServiceImpl(withStreamAwarenessOff, streamService, indexFieldTypesService, new FieldTypeMapper(), indexLookup, fieldUnitObtainer);
         when(streamService.indexSetIdsByIds(Collections.singleton("stream1"))).thenReturn(Collections.singleton("indexSetId"));
         when(streamService.indexSetIdsByIds(Collections.singleton("stream2"))).thenReturn(Collections.singleton("indexSetId"));
     }
@@ -80,7 +84,7 @@ public class MappedFieldTypesServiceImplTest {
     public void testDifferenceBetweenStreamAwareAndUnawareFieldTypeRetrieval() {
         final Configuration withStreamAwarenessOn = spy(new Configuration());
         doReturn(true).when(withStreamAwarenessOn).maintainsStreamAwareFieldTypes();
-        MappedFieldTypesServiceImpl streamAwareMappedFieldTypesService = new MappedFieldTypesServiceImpl(withStreamAwarenessOn, streamService, indexFieldTypesService, new FieldTypeMapper(), indexLookup);
+        MappedFieldTypesServiceImpl streamAwareMappedFieldTypesService = new MappedFieldTypesServiceImpl(withStreamAwarenessOn, streamService, indexFieldTypesService, new FieldTypeMapper(), indexLookup, fieldUnitObtainer);
 
         final List<IndexFieldTypesDTO> fieldTypes = ImmutableList.of(
                 createIndexTypes(
@@ -104,33 +108,33 @@ public class MappedFieldTypesServiceImplTest {
         Set<MappedFieldTypeDTO> result = this.mappedFieldTypesService.fieldTypesByStreamIds(Collections.singleton("stream1"), RelativeRange.allTime());
         //All fields are expected
         assertThat(result).containsExactlyInAnyOrder(
-                MappedFieldTypeDTO.create("field1", FieldTypes.Type.createType("string", ImmutableSet.of("enumerable"))),
-                MappedFieldTypeDTO.create("field2", FieldTypes.Type.createType("string", ImmutableSet.of("enumerable"))),
-                MappedFieldTypeDTO.create("field3", FieldTypes.Type.createType("string", ImmutableSet.of("enumerable"))),
-                MappedFieldTypeDTO.create("field4", FieldTypes.Type.createType("string", ImmutableSet.of("enumerable")))
+                new MappedFieldTypeDTO("field1", FieldTypes.Type.createType("string", ImmutableSet.of("enumerable"))),
+                new MappedFieldTypeDTO("field2", FieldTypes.Type.createType("string", ImmutableSet.of("enumerable"))),
+                new MappedFieldTypeDTO("field3", FieldTypes.Type.createType("string", ImmutableSet.of("enumerable"))),
+                new MappedFieldTypeDTO("field4", FieldTypes.Type.createType("string", ImmutableSet.of("enumerable")))
         );
 
         result = streamAwareMappedFieldTypesService.fieldTypesByStreamIds(Collections.singleton("stream1"), RelativeRange.allTime());
         //Stream-aware approach excludes field2, as it is present in stream2 only
         assertThat(result).containsExactlyInAnyOrder(
-                MappedFieldTypeDTO.create("field1", FieldTypes.Type.createType("string", ImmutableSet.of("enumerable"))),
-                MappedFieldTypeDTO.create("field3", FieldTypes.Type.createType("string", ImmutableSet.of("enumerable"))),
-                MappedFieldTypeDTO.create("field4", FieldTypes.Type.createType("string", ImmutableSet.of("enumerable")))
+                new MappedFieldTypeDTO("field1", FieldTypes.Type.createType("string", ImmutableSet.of("enumerable"))),
+                new MappedFieldTypeDTO("field3", FieldTypes.Type.createType("string", ImmutableSet.of("enumerable"))),
+                new MappedFieldTypeDTO("field4", FieldTypes.Type.createType("string", ImmutableSet.of("enumerable")))
         );
 
         result = this.mappedFieldTypesService.fieldTypesByStreamIds(Collections.singleton("stream2"), RelativeRange.allTime());
         //Field3 is excludes, as it is present only in "testIndex", ignored during indexLookup phase
         assertThat(result).containsExactlyInAnyOrder(
-                MappedFieldTypeDTO.create("field1", FieldTypes.Type.createType("string", ImmutableSet.of("enumerable"))),
-                MappedFieldTypeDTO.create("field2", FieldTypes.Type.createType("string", ImmutableSet.of("enumerable"))),
-                MappedFieldTypeDTO.create("field4", FieldTypes.Type.createType("string", ImmutableSet.of("enumerable")))
+                new MappedFieldTypeDTO("field1", FieldTypes.Type.createType("string", ImmutableSet.of("enumerable"))),
+                new MappedFieldTypeDTO("field2", FieldTypes.Type.createType("string", ImmutableSet.of("enumerable"))),
+                new MappedFieldTypeDTO("field4", FieldTypes.Type.createType("string", ImmutableSet.of("enumerable")))
         );
 
         //Stream-aware approach excludes, additionally to field3, field4 as well, as it is present in stream1 only
         result = streamAwareMappedFieldTypesService.fieldTypesByStreamIds(Collections.singleton("stream2"), RelativeRange.allTime());
         assertThat(result).containsExactlyInAnyOrder(
-                MappedFieldTypeDTO.create("field1", FieldTypes.Type.createType("string", ImmutableSet.of("enumerable"))),
-                MappedFieldTypeDTO.create("field2", FieldTypes.Type.createType("string", ImmutableSet.of("enumerable")))
+                new MappedFieldTypeDTO("field1", FieldTypes.Type.createType("string", ImmutableSet.of("enumerable"))),
+                new MappedFieldTypeDTO("field2", FieldTypes.Type.createType("string", ImmutableSet.of("enumerable")))
         );
     }
 
@@ -153,7 +157,7 @@ public class MappedFieldTypesServiceImplTest {
 
         final Set<MappedFieldTypeDTO> result = this.mappedFieldTypesService.fieldTypesByStreamIds(Collections.singleton("stream1"), RelativeRange.allTime());
         assertThat(result).containsExactlyInAnyOrder(
-                MappedFieldTypeDTO.create("field1", FieldTypes.Type.createType("string", ImmutableSet.of()))
+                new MappedFieldTypeDTO("field1", FieldTypes.Type.createType("string", ImmutableSet.of()))
         );
     }
 
@@ -178,8 +182,8 @@ public class MappedFieldTypesServiceImplTest {
 
         final Set<MappedFieldTypeDTO> result = this.mappedFieldTypesService.fieldTypesByStreamIds(Collections.singleton("stream1"), RelativeRange.allTime());
         assertThat(result).containsExactlyInAnyOrder(
-                MappedFieldTypeDTO.create("field2", FieldTypes.Type.createType("long", ImmutableSet.of("numeric", "enumerable"))),
-                MappedFieldTypeDTO.create("field1", FieldTypes.Type.createType("compound(long,string)", ImmutableSet.of("compound")))
+                new MappedFieldTypeDTO("field2", FieldTypes.Type.createType("long", ImmutableSet.of("numeric", "enumerable"))),
+                new MappedFieldTypeDTO("field1", FieldTypes.Type.createType("compound(long,string)", ImmutableSet.of("compound")))
         );
     }
 
