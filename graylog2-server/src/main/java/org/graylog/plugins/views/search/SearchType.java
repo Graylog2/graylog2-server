@@ -87,15 +87,21 @@ public interface SearchType extends ContentPackable<SearchTypeEntity>, Exportabl
 
     SearchType applyExecutionContext(SearchTypeExecutionState executionState);
 
-    SearchType withQuery(BackendQuery query);
+    default SearchType withQuery(BackendQuery query) {
+        return this.toBuilder().query(query).build();
+    }
 
-    SearchType withFilter(Filter filter);
+    default SearchType withFilter(Filter filter) {
+        return this.toBuilder().filter(filter).build();
+    }
 
     default Set<String> effectiveStreams() {
         return streams();
     }
 
-    SearchType withFilters(List<UsedSearchFilter> filters);
+    default SearchType withFilters(List<UsedSearchFilter> filters) {
+        return this.toBuilder().filters(filters).build();
+    }
 
     default SearchType withReferenceDate(DateTime now) {
         return timerange()
@@ -261,6 +267,21 @@ public interface SearchType extends ContentPackable<SearchTypeEntity>, Exportabl
 
                 @Override
                 public SearchTypeBuilder timerange(DerivedTimeRange timerange) {
+                    return this;
+                }
+
+                @Override
+                public SearchTypeBuilder filters(List<UsedSearchFilter> filters) {
+                    return this;
+                }
+
+                @Override
+                public SearchTypeBuilder query(@Nullable BackendQuery query) {
+                    return this;
+                }
+
+                @Override
+                public SearchTypeBuilder filter(@Nullable Filter filter) {
                     return this;
                 }
             };
