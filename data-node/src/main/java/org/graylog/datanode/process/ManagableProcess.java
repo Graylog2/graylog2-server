@@ -14,8 +14,25 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.rest;
+package org.graylog.datanode.process;
 
-import org.graylog.datanode.opensearch.OpensearchInfo;
+import com.github.oxo42.stateless4j.delegates.Trace;
+import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
+import org.graylog.datanode.opensearch.statemachine.OpensearchState;
+import org.graylog.datanode.opensearch.statemachine.tracer.StateMachineTracer;
 
-public record StatusResponse(String opensearchVersion, OpensearchInfo node) {}
+public interface ManagableProcess<T, EVENT, STATE> {
+
+    void configure(T configuration);
+
+    void start();
+
+    void stop();
+
+    void onEvent(EVENT event);
+
+    void addStateMachineTracer(Trace<STATE, EVENT> tracer);
+
+    boolean isInState(STATE state);
+
+}

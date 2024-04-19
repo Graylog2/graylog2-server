@@ -14,8 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.rest;
+package org.graylog.datanode.opensearch.statemachine;
 
-import org.graylog.datanode.opensearch.OpensearchInfo;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-public record StatusResponse(String opensearchVersion, OpensearchInfo node) {}
+class FailuresCounterTest {
+
+    @Test
+    void testCounter() {
+        final FailuresCounter failuresCounter = FailuresCounter.oneBased(3);
+        Assertions.assertThat(failuresCounter.failedTooManyTimes()).isFalse();
+        failuresCounter.increment();
+        failuresCounter.increment();
+        Assertions.assertThat(failuresCounter.failedTooManyTimes()).isTrue();
+        failuresCounter.resetFailuresCounter();
+        Assertions.assertThat(failuresCounter.failedTooManyTimes()).isFalse();
+    }
+}

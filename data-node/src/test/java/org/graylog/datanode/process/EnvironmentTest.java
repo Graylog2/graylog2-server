@@ -14,8 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.rest;
+package org.graylog.datanode.process;
 
-import org.graylog.datanode.opensearch.OpensearchInfo;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-public record StatusResponse(String opensearchVersion, OpensearchInfo node) {}
+import java.util.Map;
+
+class EnvironmentTest {
+
+    @Test
+    void testFiltering() {
+        final Environment env = new Environment(Map.of("USER", "test", "JAVA_HOME", "/path/to/jre"));
+        Assertions.assertThat(env.getEnv())
+                 .doesNotContainKey("JAVA_HOME")
+                .containsKey("USER");
+    }
+}

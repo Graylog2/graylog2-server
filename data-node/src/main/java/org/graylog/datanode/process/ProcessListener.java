@@ -14,8 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.rest;
+package org.graylog.datanode.process;
 
-import org.graylog.datanode.opensearch.OpensearchInfo;
+import org.apache.commons.exec.ExecuteResultHandler;
 
-public record StatusResponse(String opensearchVersion, OpensearchInfo node) {}
+public interface ProcessListener extends ExecuteResultHandler {
+    void onStart();
+    void onStdOut(String line);
+    void onStdErr(String line);
+}
