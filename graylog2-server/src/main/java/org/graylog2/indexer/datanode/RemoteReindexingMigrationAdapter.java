@@ -24,10 +24,13 @@ import java.net.URI;
 
 public interface RemoteReindexingMigrationAdapter {
     enum Status {
-        NOT_STARTED, STARTING, RUNNING, ERROR, FINISHED
+        NOT_STARTED, RUNNING, ERROR, FINISHED
     }
 
-    RemoteReindexMigration start(RemoteReindexRequest request);
+    /**
+     * @return ID of the migration, useful for obraining migration process info via {@link #status(String)}
+     */
+    String start(RemoteReindexRequest request);
 
     RemoteReindexMigration status(@NotNull String migrationID);
 

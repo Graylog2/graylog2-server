@@ -35,7 +35,7 @@ import { loadDashboard } from 'views/logic/views/Actions';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import useDashboards from 'views/components/dashboard/hooks/useDashboards';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import createSearch from 'views/logic/slices/createSearch';
 import { duplicateWidget, removeWidget } from 'views/logic/slices/widgetActions';
 import useViewType from 'views/hooks/useViewType';
@@ -144,9 +144,7 @@ describe('<WidgetActionsMenu />', () => {
     </TestStoreProvider>
   );
 
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   beforeEach(() => {
     jest.clearAllMocks();

@@ -19,6 +19,7 @@ package org.graylog2.indexer.migration;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
+import jakarta.annotation.Nonnull;
 import org.assertj.core.api.Assertions;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -26,25 +27,38 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.UUID;
 
 class RemoteReindexMigrationTest {
 
     @Test
     void testProgress() {
         final RemoteReindexMigration migration = withIndices(
-                new RemoteReindexIndex("one", RemoteReindexingMigrationAdapter.Status.FINISHED),
-                new RemoteReindexIndex("two", RemoteReindexingMigrationAdapter.Status.FINISHED),
-                new RemoteReindexIndex("three", RemoteReindexingMigrationAdapter.Status.ERROR),
-                new RemoteReindexIndex("four", RemoteReindexingMigrationAdapter.Status.RUNNING),
-                new RemoteReindexIndex("five", RemoteReindexingMigrationAdapter.Status.NOT_STARTED)
+                index("one", RemoteReindexingMigrationAdapter.Status.FINISHED),
+                index("two", RemoteReindexingMigrationAdapter.Status.FINISHED),
+                index("three", RemoteReindexingMigrationAdapter.Status.ERROR),
+                index("four", RemoteReindexingMigrationAdapter.Status.RUNNING),
+                index("five", RemoteReindexingMigrationAdapter.Status.NOT_STARTED)
         );
         Assertions.assertThat(migration.progress()).isEqualTo(60);
+    }
+
+    @NotNull
+    private static RemoteReindexIndex index(String indexName, RemoteReindexingMigrationAdapter.Status status) {
+
+        final IndexMigrationProgress progress = switch (status) {
+            case FINISHED -> new IndexMigrationProgress(100, 100, 0, 0);
+            case ERROR -> new IndexMigrationProgress(100, 100, 0, 0);
+            default -> new IndexMigrationProgress(100, 0, 0, 0);
+        };
+        return new RemoteReindexIndex(indexName, status, null, null, progress, null);
     }
 
     @Test
     void testProgressOneIndex() {
         final RemoteReindexMigration migration = withIndices(
-                new RemoteReindexIndex("one", RemoteReindexingMigrationAdapter.Status.FINISHED)
+                index("one", RemoteReindexingMigrationAdapter.Status.FINISHED)
         );
         Assertions.assertThat(migration.progress()).isEqualTo(100);
     }
@@ -52,7 +66,7 @@ class RemoteReindexMigrationTest {
     @Test
     void testProgressOneIndexNotStarted() {
         final RemoteReindexMigration migration = withIndices(
-                new RemoteReindexIndex("one", RemoteReindexingMigrationAdapter.Status.NOT_STARTED)
+                index("one", RemoteReindexingMigrationAdapter.Status.NOT_STARTED)
         );
         Assertions.assertThat(migration.progress()).isEqualTo(0);
     }
@@ -67,18 +81,54 @@ class RemoteReindexMigrationTest {
     void testSerializeToJson() throws JsonProcessingException {
         final ObjectMapper mapper = new ObjectMapperProvider().get();
         final RemoteReindexMigration migration = withIndices(
-                new RemoteReindexIndex("one", RemoteReindexingMigrationAdapter.Status.FINISHED),
-                new RemoteReindexIndex("two", RemoteReindexingMigrationAdapter.Status.RUNNING)
+                index("one", RemoteReindexingMigrationAdapter.Status.FINISHED),
+                index("two", RemoteReindexingMigrationAdapter.Status.RUNNING)
         );
         final String serialized = mapper.writeValueAsString(migration);
         final Integer progress = JsonPath.parse(serialized).read("progress");
         Assertions.assertThat(progress).isEqualTo(50);
     }
 
-    @NotNull
+    @Nonnull
     private static RemoteReindexMigration withIndices(RemoteReindexIndex... indices) {
-        final RemoteReindexMigration migration = new RemoteReindexMigration();
-        migration.setIndices(Arrays.asList(indices));
-        return migration;
+        return new RemoteReindexMigration(UUID.randomUUID().toString(), Arrays.asList(indices), Collections.emptyList());
+    }
+
+    @Test
+    void testStatusNotStarted() {
+        final RemoteReindexMigration migration = withIndices(
+                index("one", RemoteReindexingMigrationAdapter.Status.NOT_STARTED),
+                index("two", RemoteReindexingMigrationAdapter.Status.NOT_STARTED)
+        );
+        Assertions.assertThat(migration.status()).isEqualTo(RemoteReindexingMigrationAdapter.Status.NOT_STARTED);
+    }
+
+    @Test
+    void testStatusCompletedWithError() {
+        final RemoteReindexMigration migration = withIndices(
+                index("one", RemoteReindexingMigrationAdapter.Status.FINISHED),
+                index("two", RemoteReindexingMigrationAdapter.Status.ERROR)
+        );
+        Assertions.assertThat(migration.status()).isEqualTo(RemoteReindexingMigrationAdapter.Status.ERROR);
+    }
+
+
+    @Test
+    void testStatusRunningWithError() {
+        final RemoteReindexMigration migration = withIndices(
+                index("one", RemoteReindexingMigrationAdapter.Status.FINISHED),
+                index("two", RemoteReindexingMigrationAdapter.Status.ERROR),
+                index("three", RemoteReindexingMigrationAdapter.Status.RUNNING)
+        );
+        Assertions.assertThat(migration.status()).isEqualTo(RemoteReindexingMigrationAdapter.Status.RUNNING);
+    }
+
+    @Test
+    void testStatusFinished() {
+        final RemoteReindexMigration migration = withIndices(
+                index("one", RemoteReindexingMigrationAdapter.Status.FINISHED),
+                index("two", RemoteReindexingMigrationAdapter.Status.FINISHED)
+        );
+        Assertions.assertThat(migration.status()).isEqualTo(RemoteReindexingMigrationAdapter.Status.FINISHED);
     }
 }

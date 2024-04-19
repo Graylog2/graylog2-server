@@ -162,6 +162,8 @@ const EventDefinitionFormContainer = ({
   };
 
   const handleSubmit = () => {
+    setIsDirty(false);
+
     if (action === 'create') {
       sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_SUMMARY.CREATE_CLICKED, {
         app_pathname: getPathnameWithoutId(pathname),

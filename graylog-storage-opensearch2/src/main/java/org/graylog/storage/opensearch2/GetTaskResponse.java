@@ -14,15 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.certutil.keystore.storage;
+package org.graylog.storage.opensearch2;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.security.KeyStore;
 
-public interface KeystoreContentMover {
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-    KeyStore moveContents(final KeyStore originalKeyStore,
-                          char[] currentPassword,
-                          final char[] newPassword) throws GeneralSecurityException, IOException;
+/**
+ * This class duplicates the original opensearch GetTaskResponse with one significant exception - it can read the
+ * error of the task, which is missing in the original response
+ * TODO: add link to an feature request issue in opensearch java client
+ */
+@JsonIgnoreProperties(ignoreUnknown = true)
+public record GetTaskResponse(@JsonProperty("completed") boolean completed, @JsonProperty("task") Task task,
+                              @JsonProperty("error") TaskError error) {
 }

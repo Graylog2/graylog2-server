@@ -323,9 +323,7 @@ public class StreamResource extends RestResource {
             stream.setTitle(cr.title().strip());
         }
 
-        if (!Strings.isNullOrEmpty(cr.description())) {
-            stream.setDescription(cr.description());
-        }
+        stream.setDescription(cr.description());
 
         if (cr.matchingType() != null) {
             try {

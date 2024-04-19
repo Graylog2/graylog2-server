@@ -14,22 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
-const usePreventAbandonPageConfirmation = () => {
-  useEffect(() => {
-    const handleBeforeUnload = (event) => {
-      event.preventDefault();
-      // eslint-disable-next-line no-param-reassign
-      event.returnValue = '';
-    };
+import { SystemClusterConfig } from '@graylog/server-api';
 
-    window.addEventListener('beforeunload', handleBeforeUnload);
+const useClusterConfig = <T, >(key: string) => useQuery<T>(['system', 'cluster_config', key], () => SystemClusterConfig.read(key) as Promise<T>);
 
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-    };
-  }, []);
-};
-
-export default usePreventAbandonPageConfirmation;
+export default useClusterConfig;

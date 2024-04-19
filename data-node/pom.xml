@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.graylog</groupId>
         <artifactId>graylog-project-parent</artifactId>
-        <version>6.0.0-SNAPSHOT</version>
+        <version>6.1.0-SNAPSHOT</version>
         <relativePath>../graylog-project-parent</relativePath>
     </parent>
 
@@ -661,9 +661,14 @@
                         </goals>
                         <configuration>
                             <executable>bash</executable>
+                            <environmentVariables>
+                                <OPENSEARCH_JAVA_HOME>${java.home}</OPENSEARCH_JAVA_HOME><!-- no matter which architecture we configure, we need our own jdk to run the script -->
+                                <BIN>${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/bin/opensearch-plugin</BIN>
+                                <FILE>file://${project.build.directory}/opensearch-plugins/repository-s3-${opensearch.version}.zip</FILE>
+                            </environmentVariables>
                             <arguments>
                                 <argument>-c</argument>
-                                <argument>${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-x64/bin/opensearch-plugin install --batch file://${project.build.directory}/opensearch-plugins/repository-s3-${opensearch.version}.zip</argument>
+                                <argument>$BIN list repository-s3 | grep -q repository-s3 || $BIN install --batch $FILE</argument>
                             </arguments>
                         </configuration>
                     </execution>
@@ -675,9 +680,14 @@
                         </goals>
                         <configuration>
                             <executable>bash</executable>
+                            <environmentVariables>
+                                <OPENSEARCH_JAVA_HOME>${java.home}</OPENSEARCH_JAVA_HOME><!-- no matter which architecture we configure, we need our own jdk to run the script -->
+                                <BIN>${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/bin/opensearch-plugin</BIN>
+                                <FILE>file://${project.build.directory}/opensearch-plugins/repository-s3-${opensearch.version}.zip</FILE>
+                            </environmentVariables>
                             <arguments>
                                 <argument>-c</argument>
-                                <argument>${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64/bin/opensearch-plugin install --batch file://${project.build.directory}/opensearch-plugins/repository-s3-${opensearch.version}.zip</argument>
+                                <argument>$BIN list repository-s3 | grep -q repository-s3 || $BIN install --batch $FILE</argument>
                             </arguments>
                         </configuration>
                     </execution>

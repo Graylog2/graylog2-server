@@ -72,8 +72,8 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
                                           List<URL> mongoDBFixtures,
                                           List<String> enabledFeatureFlags, boolean withMailServerEnabled, boolean withWebhookServerEnabled, Map<String, String> additionalConfigurationParameters) {
         super(
-                parent.getUniqueId().append(SEGMENT_TYPE, createKey(lifecycle, mavenProjectDirProviderId, pluginJarsProviderId, esVersion, mongoVersion, withMailServerEnabled, withWebhookServerEnabled, additionalConfigurationParameters)),
-                createKey(lifecycle, mavenProjectDirProviderId, pluginJarsProviderId, esVersion, mongoVersion, withMailServerEnabled, withWebhookServerEnabled, additionalConfigurationParameters)
+                parent.getUniqueId().append(SEGMENT_TYPE, createKey(lifecycle, mavenProjectDirProviderId, pluginJarsProviderId, esVersion, mongoVersion, withMailServerEnabled, withWebhookServerEnabled, additionalConfigurationParameters, enabledFeatureFlags)),
+                createKey(lifecycle, mavenProjectDirProviderId, pluginJarsProviderId, esVersion, mongoVersion, withMailServerEnabled, withWebhookServerEnabled, additionalConfigurationParameters, enabledFeatureFlags)
         );
         setParent(parent);
         this.lifecycle = lifecycle;
@@ -107,7 +107,7 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
     }
 
     protected static String createKey(Lifecycle lifecycle, String mavenProjectDirProvider, String pluginJarsProvider, SearchVersion searchVersion,
-                                      MongodbServer mongoVersion, boolean withMailServerEnabled, boolean withWebhookServerEnabled, Map<String, String> additionalConfigurationParameters) {
+                                      MongodbServer mongoVersion, boolean withMailServerEnabled, boolean withWebhookServerEnabled, Map<String, String> additionalConfigurationParameters, List<String> enabledFeatureFlags) {
         final ImmutableMap.Builder<String, Object> values = ImmutableMap.<String, Object>builder()
                 .put("Lifecycle", lifecycle.name())
                 .put("MavenProjectDirProvider", mavenProjectDirProvider)
@@ -123,8 +123,11 @@ public class ContainerMatrixTestsDescriptor extends AbstractTestDescriptor {
             values.put("Webhookserver", "enabled");
         }
 
-
         values.putAll(additionalConfigurationParameters);
+
+        if(!enabledFeatureFlags.isEmpty()) {
+            values.put("Featureflags", enabledFeatureFlags.stream().collect(Collectors.joining(",")));
+        }
 
         return values.build().entrySet().stream().map(pair -> String.format(Locale.ROOT, "%s: %s", pair.getKey(), pair.getValue()))
                 .collect(Collectors.joining(", "));

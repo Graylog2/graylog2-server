@@ -14,10 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.certutil.keystore.storage.location;
+package org.graylog2.indexer.migration;
 
-import java.nio.file.Path;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-public record KeystoreFileLocation(Path keystorePath) implements KeystoreLocation {
-
+class IndexMigrationProgressTest {
+    @Test
+    void testProgressPercent() {
+        Assertions.assertThat(new IndexMigrationProgress(100, 30, 10, 10).progressPercent()).isEqualTo(50);
+        Assertions.assertThat(new IndexMigrationProgress(100, 0, 0, 0).progressPercent()).isEqualTo(0);
+        Assertions.assertThat(new IndexMigrationProgress(100, 100, 0, 0).progressPercent()).isEqualTo(100);
+        Assertions.assertThat(new IndexMigrationProgress(0, 0, 0, 0).progressPercent()).isEqualTo(100);
+    }
 }

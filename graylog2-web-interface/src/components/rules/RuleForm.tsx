@@ -22,7 +22,6 @@ import { Button, Col, ControlLabel, FormControl, FormGroup, Row, Input } from 'c
 import { ConfirmLeaveDialog, SourceCodeEditor, FormSubmit } from 'components/common';
 import Routes from 'routing/Routes';
 import useHistory from 'routing/useHistory';
-import usePreventAbandonPageConfirmation from 'hooks/usePreventAbandonPageConfirmation';
 
 import { PipelineRulesContext } from './RuleContext';
 import PipelinesUsingRule from './PipelinesUsingRule';
@@ -40,10 +39,6 @@ const StyledContainer = styled.div`
     & .ace_editor {
       border-radius: 0;
     }
-    
-    & .ace_cursor {
-      border-color: ${({ theme }) => theme.colors.global.textDefault};
-    }
   }
 
   & .ace_tooltip.ace-graylog {
@@ -55,8 +50,6 @@ const StyledContainer = styled.div`
 `;
 
 const RuleForm = ({ create }: Props) => {
-  usePreventAbandonPageConfirmation();
-
   const {
     description,
     handleDescription,
@@ -85,6 +78,7 @@ const RuleForm = ({ create }: Props) => {
   };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    setIsDirty(false);
     event.preventDefault();
 
     handleSavePipelineRule(handleCancel, handleError);

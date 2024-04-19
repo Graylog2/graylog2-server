@@ -30,6 +30,7 @@ import org.testcontainers.containers.Network;
 import javax.annotation.Nullable;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
@@ -60,9 +61,9 @@ public class ContainerizedGraylogBackendServicesProvider implements AutoCloseabl
         servicesCache = new ConcurrentHashMap<>();
     }
 
-    public Services getServices(SearchVersion searchVersion, MongodbServer mongodbVersion, final boolean withMailServerEnabled, final boolean webhookServerEnabled, List<String> enabledFeatureFlags) {
-        var lookupKey = Services.buildLookupKey(searchVersion, mongodbVersion, withMailServerEnabled, webhookServerEnabled, enabledFeatureFlags);
-        return servicesCache.computeIfAbsent(lookupKey, (k) -> Services.create(searchVersion, mongodbVersion, withMailServerEnabled, webhookServerEnabled, enabledFeatureFlags));
+    public Services getServices(SearchVersion searchVersion, MongodbServer mongodbVersion, final boolean withMailServerEnabled, final boolean webhookServerEnabled, List<String> enabledFeatureFlags, Map<String, String> configParams) {
+        var lookupKey = Services.buildLookupKey(searchVersion, mongodbVersion, withMailServerEnabled, webhookServerEnabled, enabledFeatureFlags, configParams);
+        return servicesCache.computeIfAbsent(lookupKey, (k) -> Services.create(searchVersion, mongodbVersion, withMailServerEnabled, webhookServerEnabled, enabledFeatureFlags, configParams));
     }
 
     @Override
@@ -84,7 +85,7 @@ public class ContainerizedGraylogBackendServicesProvider implements AutoCloseabl
         private final WebhookServerContainer webhookServerInstance;
 
 
-        private static Services create(SearchVersion searchVersion, MongodbServer mongodbVersion, boolean withMailServerEnabled, boolean withWebhookServerEnabled, List<String> enabledFeatureFlags) {
+        private static Services create(SearchVersion searchVersion, MongodbServer mongodbVersion, boolean withMailServerEnabled, boolean withWebhookServerEnabled, List<String> enabledFeatureFlags, Map<String, String> envProperties) {
             final Network network = Network.newNetwork();
 
             final ExecutorService executorService = Executors.newFixedThreadPool(3, new ThreadFactoryBuilder()
@@ -112,6 +113,7 @@ public class ContainerizedGraylogBackendServicesProvider implements AutoCloseabl
                         .passwordSecret(PASSWORD_SECRET)
                         .rootPasswordSha2(ROOT_PASSWORD_SHA_2)
                         .featureFlags(enabledFeatureFlags)
+                        .env(envProperties)
                         .build();
                 LOG.debug("Startup of the search server {} took {}", searchVersion, searchServerSw.elapsed());
                 return new Services(network, searchServer, mongoDB, emailServerInstance, webhookServerInstance);
@@ -140,13 +142,14 @@ public class ContainerizedGraylogBackendServicesProvider implements AutoCloseabl
             this.webhookServerInstance = webhookServerInstance;
         }
 
-        private static String buildLookupKey(SearchVersion searchVersion, MongodbServer mongodbVersion, boolean withMailServerEnabled, boolean webhookServerEnabled, List<String> enabledFeatureFlags) {
+        private static String buildLookupKey(SearchVersion searchVersion, MongodbServer mongodbVersion, boolean withMailServerEnabled, boolean webhookServerEnabled, List<String> enabledFeatureFlags, Map<String, String> configParams) {
             List<String> parts = new LinkedList<>();
             parts.add(searchVersion.toString());
             parts.add(mongodbVersion.toString());
             parts.add(withMailServerEnabled ? "mail" : "nomail");
             parts.add(webhookServerEnabled ? "webhooks" : "nowebhooks");
             parts.addAll(enabledFeatureFlags);
+            parts.addAll(configParams.entrySet().stream().map(e -> e.getKey() + ":" + e.getValue()).toList());
             return String.join("-", parts);
         }
 

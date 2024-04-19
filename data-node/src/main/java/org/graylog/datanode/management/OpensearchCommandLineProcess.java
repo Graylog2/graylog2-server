@@ -18,6 +18,12 @@ package org.graylog.datanode.management;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.github.rholder.retry.Attempt;
+import com.github.rholder.retry.RetryException;
+import com.github.rholder.retry.RetryListener;
+import com.github.rholder.retry.RetryerBuilder;
+import com.github.rholder.retry.StopStrategies;
+import com.github.rholder.retry.WaitStrategies;
 import jakarta.validation.constraints.NotNull;
 import org.apache.commons.exec.OS;
 import org.graylog.datanode.management.opensearch.cli.OpensearchCli;
@@ -36,6 +42,8 @@ import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 public class OpensearchCommandLineProcess implements Closeable {
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchCommandLineProcess.class);
@@ -136,7 +144,29 @@ public class OpensearchCommandLineProcess implements Closeable {
     public void close() {
         commandLineProcess.stop();
         resultHandler.stopListening();
+        waitForProcessTermination();
+    }
 
+    private void waitForProcessTermination() {
+        try {
+            RetryerBuilder.newBuilder()
+                    .retryIfResult(Boolean.TRUE::equals)
+                    .withWaitStrategy(WaitStrategies.fixedWait(100, TimeUnit.MILLISECONDS))
+                    .withStopStrategy(StopStrategies.stopAfterDelay(60, TimeUnit.SECONDS))
+                    .withRetryListener(new RetryListener() {
+                        @Override
+                        public <V> void onRetry(Attempt<V> attempt) {
+                            LOG.info("Process " + commandLineProcess.processInfo().pid() + " still alive, waiting for termination.  Retry #" + attempt.getAttemptNumber());
+                        }
+                    })
+                    .build()
+                    .call(() -> commandLineProcess.processInfo().alive());
+            LOG.info("Process " + commandLineProcess.processInfo().pid() + " successfully terminated.");
+        } catch (ExecutionException | RetryException e) {
+            final String message = "Failed to terminate opensearch process " + commandLineProcess.processInfo().pid();
+            LOG.error(message, e);
+            throw new RuntimeException(message, e);
+        }
     }
 
     @NotNull

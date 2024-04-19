@@ -114,9 +114,12 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "initial_cluster_manager_nodes")
     private String initialClusterManagerNodes;
 
+    // Initial and maxmium heap must be identical for OpenSearch, otherwise the boot fails. So it's only one config option
+    @Parameter(value = "opensearch_heap")
+    private String opensearchHeap = "1g";
+
     @Parameter(value = "opensearch_http_port", converter = IntegerConverter.class)
     private int opensearchHttpPort = 9200;
-
 
     @Parameter(value = "opensearch_transport_port", converter = IntegerConverter.class)
     private int opensearchTransportPort = 9300;
@@ -277,6 +280,11 @@ public class Configuration extends BaseConfiguration {
         return opensearchAuditLog;
     }
 
+     /**
+     * The insecure flag causes problems on many places. We should replace it with autosecurity option, that would
+     * configure all the CA and certs automatically.
+     */
+    @Deprecated
     public boolean isInsecureStartup() {
         return insecureStartup;
     }
@@ -687,5 +695,9 @@ public class Configuration extends BaseConfiguration {
 
     public List<String> getNodeRoles() {
         return nodeRoles;
+    }
+
+    public String getOpensearchHeap() {
+        return opensearchHeap;
     }
 }

@@ -24,9 +24,11 @@ import org.graylog.storage.opensearch2.CountsAdapterOS2;
 import org.graylog.storage.opensearch2.IndexFieldTypePollerAdapterOS2;
 import org.graylog.storage.opensearch2.IndexToolsAdapterOS2;
 import org.graylog.storage.opensearch2.IndicesAdapterOS2;
+import org.graylog.storage.opensearch2.LegacyIndexTemplateAdapter;
 import org.graylog.storage.opensearch2.MessagesAdapterOS2;
 import org.graylog.storage.opensearch2.NodeAdapterOS2;
 import org.graylog.storage.opensearch2.OpenSearchClient;
+import org.graylog.storage.opensearch2.PlainJsonApi;
 import org.graylog.storage.opensearch2.Scroll;
 import org.graylog.storage.opensearch2.ScrollResultOS2;
 import org.graylog.storage.opensearch2.SearchRequestFactory;
@@ -48,14 +50,20 @@ import org.graylog2.indexer.results.TestResultMessageFactory;
 import org.graylog2.indexer.searches.SearchesAdapter;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 
+import java.util.List;
+
+import static org.graylog2.indexer.Constants.COMPOSABLE_INDEX_TEMPLATES_FEATURE;
+
 public class AdaptersOS2 implements Adapters {
 
     private final OpenSearchClient client;
+    private final List<String> featureFlags;
     private final ObjectMapper objectMapper;
     private final ResultMessageFactory resultMessageFactory = new TestResultMessageFactory();
 
-    public AdaptersOS2(OpenSearchClient client) {
+    public AdaptersOS2(OpenSearchClient client, List<String> featureFlags) {
         this.client = client;
+        this.featureFlags = featureFlags;
         this.objectMapper = new ObjectMapperProvider().get();
     }
 
@@ -68,9 +76,10 @@ public class AdaptersOS2 implements Adapters {
     public IndicesAdapter indicesAdapter() {
         return new IndicesAdapterOS2(client,
                 new org.graylog.storage.opensearch2.stats.StatsApi(objectMapper, client),
+                new org.graylog.storage.opensearch2.stats.ClusterStatsApi(objectMapper, new PlainJsonApi(objectMapper, client)),
                 new org.graylog.storage.opensearch2.cat.CatApi(objectMapper, client),
                 new org.graylog.storage.opensearch2.cluster.ClusterStateApi(objectMapper, client),
-                new ComposableIndexTemplateAdapter(client, objectMapper)
+                featureFlags.contains(COMPOSABLE_INDEX_TEMPLATES_FEATURE) ? new ComposableIndexTemplateAdapter(client, objectMapper) : new LegacyIndexTemplateAdapter(client)
         );
     }
 
@@ -113,7 +122,7 @@ public class AdaptersOS2 implements Adapters {
 
     @Override
     public IndexFieldTypePollerAdapter indexFieldTypePollerAdapter(final Configuration configuration) {
-        return new IndexFieldTypePollerAdapterOS2(new FieldMappingApi(objectMapper, client), configuration, new StreamsForFieldRetrieverOS2(client));
+        return new IndexFieldTypePollerAdapterOS2(new FieldMappingApi(client), configuration, new StreamsForFieldRetrieverOS2(client));
     }
 
 }

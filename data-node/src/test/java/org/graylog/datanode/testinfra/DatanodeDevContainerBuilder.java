@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.function.Supplier;
@@ -43,6 +44,7 @@ import static org.graylog.testing.completebackend.DefaultPluginJarsProvider.getP
 public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode.DatanodeDevContainerBuilder {
     private static final Logger LOG = LoggerFactory.getLogger(DatanodeDevContainerBuilder.class);
     private static final Supplier<ImageFromDockerfile> imageSupplier = Suppliers.memoize(DatanodeDevContainerBuilder::createImage);
+    public static final String ENV_INSECURE_STARTUP = "GRAYLOG_DATANODE_INSECURE_STARTUP";
 
     private String rootUsername = "admin";
     private String passwordSecret;
@@ -54,6 +56,7 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
     private String nodeName = "node1";
     private Optional<DatanodeDockerHooks> customizer = Optional.empty();
     private Network network;
+    private Map<String, String> env;
 
     protected static Path getPath() {
         return getProjectReposPath().resolve(Path.of("graylog2-server", "data-node", "target"));
@@ -119,6 +122,12 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
         return this;
     }
 
+    @Override
+    public org.graylog.testing.datanode.DatanodeDevContainerBuilder env(Map<String, String> env) {
+        this.env = env;
+        return this;
+    }
+
     public GenericContainer<?> build() {
         final Path graylog = getPath().resolve("graylog-datanode-" + getProjectVersion() + ".jar");
         if (!Files.exists(graylog)) {
@@ -142,7 +151,7 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
                 .withNetwork(network)
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_LOCATION", IMAGE_WORKING_DIR)
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_PLUGINS_LOCATION", IMAGE_WORKING_DIR + "/plugins")
-                .withEnv("GRAYLOG_DATANODE_INSECURE_STARTUP", "true")
+                .withEnv(ENV_INSECURE_STARTUP, "true")
                 .withEnv("GRAYLOG_DATANODE_CONFIG_LOCATION", IMAGE_WORKING_DIR + "/config") // this is the datanode config dir for certs
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_DATA_LOCATION", IMAGE_WORKING_DIR + "/opensearch/data")
                 .withEnv("GRAYLOG_DATANODE_OPENSEARCH_LOGS_LOCATION", IMAGE_WORKING_DIR + "/opensearch/logs")
@@ -173,6 +182,11 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
                 .waitingFor(new LogMessageWaitStrategy()
                         .withRegEx(".*Graylog DataNode datanode up and running.\n")
                         .withStartupTimeout(Duration.ofSeconds(60)));
+
+        // explicitly configured ENV variables will override those set above
+        if(env != null) {
+            env.forEach(container::withEnv);
+        }
 
         final String opensearchDistributionName = "opensearch-" + getOpensearchVersion() + "-linux-" + OpensearchArchitecture.fromOperatingSystem();
         final Path downloadedOpensearch = getPath().resolve(Path.of("opensearch", opensearchDistributionName));
