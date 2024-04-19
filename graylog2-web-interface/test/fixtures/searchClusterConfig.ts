@@ -179,6 +179,7 @@ const searchClusterConfig: SearchesConfig = {
     PT3M: '3 minutes',
   },
   default_auto_refresh_option: 'PT5S',
+  cancel_after_seconds: 0,
 };
 
 export default searchClusterConfig;
