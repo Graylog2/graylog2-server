@@ -14,22 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
 import * as React from 'react';
 
-import PageNavigation from 'components/common/PageNavigation';
+import { Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
-import { Row } from 'components/bootstrap';
+import { LinkContainer } from 'components/common/router';
 
-const NAV_ITEMS = [
-  { title: 'Indices & Index Sets', path: Routes.SYSTEM.INDICES.LIST, exactPathMatch: true },
-  { title: 'Field Type Profiles', path: Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW, exactPathMatch: false },
-  { title: 'Index Set Templates', path: Routes.SYSTEM.INDICES.TEMPLATES.OVERVIEW, exactPathMatch: false },
-];
-
-const IndicesPageNavigation = () => (
-  <Row>
-    <PageNavigation items={NAV_ITEMS} />
-  </Row>
+const CreateIndexSetTemplateButton = () => (
+  <LinkContainer to={Routes.SYSTEM.INDICES.TEMPLATES.CREATE}>
+    <Button bsStyle="success">Create template</Button>
+  </LinkContainer>
 );
 
-export default IndicesPageNavigation;
+export default CreateIndexSetTemplateButton;

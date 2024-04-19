@@ -58,6 +58,9 @@ const IndexSetPage = loadAsync(() => import('./IndexSetPage'));
 const IndexSetFieldTypeProfileCreatePage = loadAsync(() => import('./IndexSetFieldTypeProfileCreatePage'));
 const IndexSetFieldTypeProfileEditPage = loadAsync(() => import('./IndexSetFieldTypeProfileEditPage'));
 const IndexSetFieldTypeProfilesPage = loadAsync(() => import('./IndexSetFieldTypeProfilesPage'));
+const IndexSetTemplatesPage = loadAsync(() => import('./IndexSetTemplatesPage'));
+const IndexSetTemplateCreatePage = loadAsync(() => import('./IndexSetTemplateCreatePage'));
+const IndexSetTemplateEditPage = loadAsync(() => import('./IndexSetTemplateEditPage'));
 const IndicesPage = loadAsync(() => import('./IndicesPage'));
 const InputsPage = loadAsync(() => import('./InputsPage'));
 const KeyboardShortcutsPage = loadAsync(() => import('./KeyboardShortcutsPage'));
@@ -150,6 +153,9 @@ export {
   IndexSetFieldTypeProfileCreatePage,
   IndexSetFieldTypeProfileEditPage,
   IndexSetFieldTypeProfilesPage,
+  IndexSetTemplatesPage,
+  IndexSetTemplateCreatePage,
+  IndexSetTemplateEditPage,
   IndicesPage,
   InputsPage,
   KeyboardShortcutsPage,
