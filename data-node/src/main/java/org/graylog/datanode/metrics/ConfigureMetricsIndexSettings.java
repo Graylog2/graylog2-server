@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.inject.Inject;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.opensearch.OpensearchProcess;
 import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
@@ -60,6 +61,7 @@ public class ConfigureMetricsIndexSettings implements StateMachineTracer {
     private DataStreamService dataStreamService;
     private final NodeService<DataNodeDto> nodeService;
 
+    @Inject
     public ConfigureMetricsIndexSettings(OpensearchProcess process, Configuration configuration, IndexFieldTypesService indexFieldTypesService, ObjectMapper objectMapper, NodeService<DataNodeDto> nodeService) {
         this.process = process;
         this.configuration = configuration;

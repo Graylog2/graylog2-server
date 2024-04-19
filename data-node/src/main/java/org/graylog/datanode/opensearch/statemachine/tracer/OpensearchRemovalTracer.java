@@ -18,6 +18,7 @@ package org.graylog.datanode.opensearch.statemachine.tracer;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.google.inject.Inject;
 import org.graylog.datanode.opensearch.OpensearchProcess;
 import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
 import org.graylog.datanode.opensearch.statemachine.OpensearchState;
@@ -61,6 +62,7 @@ public class OpensearchRemovalTracer implements StateMachineTracer {
     boolean allocationExcludeChecked = false;
     ScheduledExecutorService executorService;
 
+    @Inject
     public OpensearchRemovalTracer(OpensearchProcess process, String nodeName, NodeId nodeId, EventBus eventBus) {
         this.process = process;
         this.nodeName = nodeName;

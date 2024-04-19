@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.opensearch.statemachine.tracer;
 
+import com.google.inject.Inject;
 import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
 import org.graylog.datanode.opensearch.statemachine.OpensearchState;
 import org.graylog2.cluster.NodeNotFoundException;
@@ -33,6 +34,7 @@ public class ClusterNodeStateTracer implements StateMachineTracer {
     private final NodeService<DataNodeDto> nodeService;
     private final NodeId nodeId;
 
+    @Inject
     public ClusterNodeStateTracer(NodeService<DataNodeDto> nodeService, NodeId nodeId) {
         this.nodeService = nodeService;
         this.nodeId = nodeId;

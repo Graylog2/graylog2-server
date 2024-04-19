@@ -18,6 +18,7 @@ package org.graylog.datanode.opensearch;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.oxo42.stateless4j.delegates.Trace;
+import com.google.inject.Inject;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.http.client.utils.URIBuilder;
@@ -55,7 +56,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
+public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
 
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchProcessImpl.class);
     public static final Path UNICAST_HOSTS_FILE = Path.of("unicast_hosts.txt");
@@ -80,12 +81,13 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     private final ObjectMapper objectMapper;
 
 
-    OpensearchProcessImpl(DatanodeConfiguration datanodeConfiguration, int logsCacheSize, final CustomCAX509TrustManager trustManager,
+    @Inject
+    OpensearchProcessImpl(DatanodeConfiguration datanodeConfiguration, final CustomCAX509TrustManager trustManager,
                           final Configuration configuration, final NodeService<DataNodeDto> nodeService, ObjectMapper objectMapper, OpensearchStateMachine processState) {
         this.datanodeConfiguration = datanodeConfiguration;
         this.processState = processState;
-        this.stdout = new CircularFifoQueue<>(logsCacheSize);
-        this.stderr = new CircularFifoQueue<>(logsCacheSize);
+        this.stdout = new CircularFifoQueue<>(datanodeConfiguration.processLogsBufferSize());
+        this.stderr = new CircularFifoQueue<>(datanodeConfiguration.processLogsBufferSize());
         this.trustManager = trustManager;
         this.nodeService = nodeService;
         this.configuration = configuration;

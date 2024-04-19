@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.opensearch.statemachine.tracer;
 
+import com.google.inject.Inject;
 import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
 import org.graylog.datanode.opensearch.statemachine.OpensearchState;
 import org.slf4j.Logger;
@@ -24,6 +25,10 @@ import org.slf4j.LoggerFactory;
 public class StateMachineTransitionLogger implements StateMachineTracer {
 
     private static final Logger LOG = LoggerFactory.getLogger(StateMachineTransitionLogger.class);
+
+    @Inject
+    public StateMachineTransitionLogger() {
+    }
 
     @Override
     public void trigger(OpensearchEvent trigger) {

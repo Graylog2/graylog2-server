@@ -16,10 +16,11 @@
  */
 package org.graylog.datanode.opensearch.statemachine.tracer;
 
+import com.google.inject.Inject;
+import org.graylog.datanode.opensearch.OpensearchProcess;
 import org.graylog.datanode.opensearch.statemachine.FailuresCounter;
 import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
 import org.graylog.datanode.opensearch.statemachine.OpensearchState;
-import org.graylog.datanode.process.ManagableProcess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,9 +34,14 @@ public class OpensearchWatchdog implements StateMachineTracer {
 
     private boolean active;
     private final FailuresCounter restartCounter;
-    private final ManagableProcess<?, ?, ?> process;
+    private final OpensearchProcess process;
 
-    public OpensearchWatchdog(ManagableProcess<?, ?, ?> process, int restartAttemptsCount) {
+    @Inject
+    public OpensearchWatchdog(OpensearchProcess process) {
+        this(process, 3);
+    }
+
+    public OpensearchWatchdog(OpensearchProcess process, int restartAttemptsCount) {
         this.process = process;
         this.restartCounter = FailuresCounter.zeroBased(restartAttemptsCount);
     }
