@@ -15,10 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
 
 import { ProgressBar } from 'components/common';
-import { Alert } from 'components/bootstrap';
+import { Alert, BootstrapModalWrapper, Button, Modal } from 'components/bootstrap';
 
 import type { MigrationStepComponentProps } from '../../Types';
 import MigrationStepTriggerButtonToolbar from '../common/MigrationStepTriggerButtonToolbar';
@@ -29,9 +30,23 @@ const IndicesContainer = styled.div`
   overflow-y: auto;
 `;
 
+const LogsContainer = styled.div`
+  word-break: break-all;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+  max-height: 500px;
+
+  & td {
+    min-width: 64px;
+    vertical-align: text-top;
+    padding-bottom: 4px;
+  }
+`;
+
 const RemoteReindexRunning = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => {
   const { nextSteps, migrationStatus, handleTriggerStep } = useRemoteReindexMigrationStatus(currentStep, onTriggerStep);
   const indicesWithErrors = migrationStatus?.indices.filter((index) => index.status === 'ERROR') || [];
+  const [showLogView, setShowLogView] = useState<boolean>(false);
 
   return (
     <>
@@ -58,7 +73,34 @@ const RemoteReindexRunning = ({ currentStep, onTriggerStep }: MigrationStepCompo
           </IndicesContainer>
         </Alert>
       )}
-      <MigrationStepTriggerButtonToolbar nextSteps={nextSteps || currentStep.next_steps} onTriggerStep={handleTriggerStep} />
+      <MigrationStepTriggerButtonToolbar nextSteps={nextSteps || currentStep.next_steps} onTriggerStep={handleTriggerStep}>
+        <Button bsStyle="default" bsSize="small" onClick={() => setShowLogView(true)}>Log View</Button>
+      </MigrationStepTriggerButtonToolbar>
+      <BootstrapModalWrapper showModal={showLogView}
+                             onHide={() => setShowLogView(false)}
+                             bsSize="large">
+        <Modal.Header closeButton>
+          <Modal.Title>Remote Reindex Migration Logs</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <pre>
+            {migrationStatus?.logs ? (
+              <LogsContainer>
+                <table>
+                  <tbody>
+                    {migrationStatus.logs.map((log) => (
+                      <tr title={new Date(log.timestamp).toLocaleString()}>
+                        <td>[{log.log_level}]</td>
+                        <td>{log.message}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </LogsContainer>
+            ) : ('<no logs>')}
+          </pre>
+        </Modal.Body>
+      </BootstrapModalWrapper>
     </>
   );
 };
