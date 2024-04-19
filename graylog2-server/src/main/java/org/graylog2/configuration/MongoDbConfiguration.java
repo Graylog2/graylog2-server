@@ -34,7 +34,7 @@ public class MongoDbConfiguration {
     @Parameter(value = "mongodb_uri", required = true, validator = StringNotBlankValidator.class)
     private String uri = "mongodb://localhost/graylog";
 
-    @Documentation("How many attempts should the search version probe run before giving up. " +
+    @Documentation("Maximum number of attempts to connect to MongoDB on boot for the version probe." +
             "Default 0 means retry indefinitely until a connection can be established")
     @Parameter(value = "mongodb_version_probe_attempts", validators = {PositiveIntegerValidator.class})
     int mongodbVersionProbeAttempts = 0;
