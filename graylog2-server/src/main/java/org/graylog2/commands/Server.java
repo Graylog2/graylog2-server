@@ -208,7 +208,7 @@ public class Server extends ServerBootstrap {
                 new MapWidgetModule(),
                 new SearchFiltersModule(),
                 new ScopedEntitiesModule(),
-                new ScriptingApiModule(featureFlags),
+                new ScriptingApiModule(),
                 new StreamsModule(),
                 new TracingModule(),
                 new DataTieringModule(),
