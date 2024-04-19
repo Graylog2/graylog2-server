@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.deser.BeanDeserializerModifier;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
@@ -117,7 +118,7 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
                                 @JacksonSubTypes Set<NamedType> subtypes,
                                 EncryptedValueService encryptedValueService,
                                 GRNRegistry grnRegistry,
-                                InputConfigurationBeanDeserializerModifier inputConfigurationBeanDeserializerModifier) {
+                                BeanDeserializerModifier beanDeserializerModifier) {
         final ObjectMapper mapper = new ObjectMapper();
         final TypeFactory typeFactory = mapper.getTypeFactory().withClassLoader(classLoader);
         final AutoValueSubtypeResolver subtypeResolver = new AutoValueSubtypeResolver();
@@ -157,7 +158,7 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
                         .addDeserializer(Requirement.class, new SemverRequirementDeserializer())
                         .addDeserializer(GRN.class, new GRNDeserializer(grnRegistry))
                         .addDeserializer(EncryptedValue.class, new EncryptedValueDeserializer(encryptedValueService))
-                        .setDeserializerModifier(inputConfigurationBeanDeserializerModifier)
+                        .setDeserializerModifier(beanDeserializerModifier)
                         .setSerializerModifier(JacksonModelValidator.getBeanSerializerModifier())
                 );
 
