@@ -31,7 +31,6 @@ import org.joda.time.Duration;
 
 import javax.annotation.Nullable;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -113,6 +112,11 @@ public abstract class OffsetRange extends TimeRange implements DerivableTimeRang
                 .flatMap(GlobalOverride::timerange)
                 .orElseGet(() -> timeRangeOfSource(source(), id(), query, searchType));
         return deriveTimeRange(referenceTimeRange);
+    }
+
+    @Override
+    public TimeRange withReferenceDate(DateTime now) {
+        return this;
     }
 
     @AutoValue.Builder

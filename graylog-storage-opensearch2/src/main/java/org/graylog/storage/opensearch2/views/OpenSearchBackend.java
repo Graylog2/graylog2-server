@@ -59,10 +59,8 @@ import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.FieldTypeException;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.plugin.Message;
-import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.streams.Stream;
-import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -146,8 +144,6 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                 .size(0)
                 .trackTotalHits(true);
 
-        final DateTime nowUTCSharedBetweenSearchTypes = Tools.nowUTC();
-
         final OSGeneratedQueryContext queryContext = queryContextFactory.create(this, searchSourceBuilder, validationErrors, timezone);
         searchTypes.stream()
                 .filter(searchType -> !isSearchTypeWithError(queryContext, searchType.id()))
@@ -169,7 +165,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                             .must(
                                     Objects.requireNonNull(
                                             TimeRangeQueryFactory.create(
-                                                    query.effectiveTimeRange(searchType, nowUTCSharedBetweenSearchTypes)
+                                                    query.effectiveTimeRange(searchType)
                                             ),
                                             "Timerange for search type " + searchType.id() + " cannot be found in query or search type."
                                     )
@@ -258,8 +254,8 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                             .filter(s -> s.id().equalsIgnoreCase(searchTypeId)).findFirst()
                             .flatMap(searchType -> {
                                 if (searchType.effectiveStreams().isEmpty()
-                                        && !query.globalOverride().flatMap(GlobalOverride::timerange).isPresent()
-                                        && !searchType.timerange().isPresent()) {
+                                        && query.globalOverride().flatMap(GlobalOverride::timerange).isEmpty()
+                                        && searchType.timerange().isEmpty()) {
                                     return Optional.empty();
                                 }
                                 return Optional.of(indexLookup.indexNamesForStreamsInTimeRange(query.effectiveStreams(searchType), query.effectiveTimeRange(searchType)));
@@ -276,7 +272,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                     }
                     return searchRequest;
                 })
-                .collect(Collectors.toList());
+                .toList();
 
         final PlainActionFuture<MultiSearchResponse> mSearchFuture = client.cancellableMsearch(searches);
         job.setSearchEngineTaskFuture(mSearchFuture);
@@ -349,13 +345,13 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
         if (searchResponse != null && searchResponse.getFailedShards() > 0) {
             final List<Throwable> shardFailures = Arrays.stream(searchResponse.getShardFailures())
                     .map(ShardOperationFailedException::getCause)
-                    .collect(Collectors.toList());
+                    .toList();
             final List<String> nonNumericFieldErrors = shardFailures
                     .stream()
-                    .filter(shardFailure -> shardFailure.getMessage().contains("Expected numeric type on field"))
                     .map(Throwable::getMessage)
+                    .filter(message -> message.contains("Expected numeric type on field"))
                     .distinct()
-                    .collect(Collectors.toList());
+                    .toList();
             if (!nonNumericFieldErrors.isEmpty()) {
                 return Optional.of(new FieldTypeException("Unable to perform search query: ", nonNumericFieldErrors));
             }
@@ -364,7 +360,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                     .stream()
                     .map(Throwable::getMessage)
                     .distinct()
-                    .collect(Collectors.toList());
+                    .toList();
             return Optional.of(new ElasticsearchException("Unable to perform search query: ", errors));
         }
 

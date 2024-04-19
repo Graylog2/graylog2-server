@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.SearchType;
+import org.graylog.plugins.views.search.SearchTypeBuilder;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.rest.SearchTypeExecutionState;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
@@ -89,21 +90,6 @@ public abstract class Pivot implements SearchType {
         return this;
     }
 
-    @Override
-    public SearchType withQuery(BackendQuery query) {
-        return toBuilder().query(query).build();
-    }
-
-    @Override
-    public SearchType withFilter(Filter filter) {
-        return toBuilder().filter(filter).build();
-    }
-
-    @Override
-    public SearchType withFilters(List<UsedSearchFilter> filters) {
-        return toBuilder().filters(filters).build();
-    }
-
     public static Builder builder() {
         return new AutoValue_Pivot.Builder()
                 .type(NAME)
@@ -115,7 +101,7 @@ public abstract class Pivot implements SearchType {
     }
 
     @AutoValue.Builder
-    public static abstract class Builder {
+    public static abstract class Builder implements SearchTypeBuilder {
         @JsonCreator
         public static Builder createDefault() {
             return builder()
