@@ -45,6 +45,11 @@ public class TimeRangesTest {
             public DateTime getTo() {
                 return null;
             }
+
+            @Override
+            public TimeRange withReferenceDate(DateTime now) {
+                return this;
+            }
         })).isEqualTo(0);
         assertThat(TimeRanges.toSeconds(new TimeRange() {
             @Override
@@ -60,6 +65,11 @@ public class TimeRangesTest {
             @Override
             public DateTime getTo() {
                 return DateTime.now(DateTimeZone.UTC);
+            }
+
+            @Override
+            public TimeRange withReferenceDate(DateTime now) {
+                return this;
             }
         })).isEqualTo(0);
     }
