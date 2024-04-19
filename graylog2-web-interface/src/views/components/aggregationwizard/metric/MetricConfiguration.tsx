@@ -30,6 +30,7 @@ import { Properties } from 'views/logic/fieldtypes/FieldType';
 import useAggregationFunctions from 'views/hooks/useAggregationFunctions';
 import { percentileOptions, percentageStrategyOptions } from 'views/Constants';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import UnitMetricPopover from 'views/components/aggregationwizard/metric/UnitMetricPopover';
 
 import FieldSelect from '../FieldSelect';
 
@@ -38,6 +39,10 @@ type Props = {
 }
 
 const Wrapper = styled.div``;
+
+const FieldContainer = styled.div`
+  position: relative;
+`;
 
 const sortByLabel = ({ label: label1 }: { label: string }, { label: label2 }: { label: string }) => defaultCompare(label1, label2);
 
@@ -89,6 +94,8 @@ const Metric = ({ index }: Props) => {
     }
   }, [functionIsSettled, metricsError, index, metricFieldSelectRef]);
 
+  const showUnitType = '';
+
   return (
     <Wrapper data-testid={`metric-${index}`}>
       <Field name={`metrics.${index}.function`}>
@@ -110,25 +117,28 @@ const Metric = ({ index }: Props) => {
         )}
       </Field>
       {hasFieldOption && (
-      <Field name={`metrics.${index}.field`}>
-        {({ field: { name, value, onChange }, meta: { error } }) => (
-          <Input id="metric-field"
-                 label="Field"
-                 error={error}
-                 labelClassName="col-sm-3"
-                 wrapperClassName="col-sm-9">
-            <FieldSelect id="metric-field-select"
-                         selectRef={metricFieldSelectRef}
-                         menuPortalTarget={document.body}
-                         onChange={(fieldName) => onChange({ target: { name, value: fieldName } })}
-                         clearable={!isFieldRequired}
-                         isFieldQualified={isFieldQualified}
-                         name={name}
-                         value={value}
-                         ariaLabel="Select a field" />
-          </Input>
-        )}
-      </Field>
+        <FieldContainer>
+          <Field name={`metrics.${index}.field`}>
+            {({ field: { name, value, onChange }, meta: { error } }) => (
+              <Input id="metric-field"
+                     label="Field"
+                     error={error}
+                     labelClassName="col-sm-3"
+                     wrapperClassName="col-sm-9">
+                <FieldSelect id="metric-field-select"
+                             selectRef={metricFieldSelectRef}
+                             menuPortalTarget={document.body}
+                             onChange={(fieldName) => onChange({ target: { name, value: fieldName } })}
+                             clearable={!isFieldRequired}
+                             isFieldQualified={isFieldQualified}
+                             name={name}
+                             value={value}
+                             ariaLabel="Select a field" />
+              </Input>
+            )}
+          </Field>
+          <UnitMetricPopover index={index} />
+        </FieldContainer>
       )}
       {isPercentile && (
         <Field name={`metrics.${index}.percentile`}>

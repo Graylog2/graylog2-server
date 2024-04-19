@@ -98,6 +98,7 @@ const XYPlot = ({
   }
 
   const layout = { ...defaultLayout, ...plotLayout };
+  console.log({ layout });
   const dispatch = useAppDispatch();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const _onZoom = useCallback(config.isTimeline

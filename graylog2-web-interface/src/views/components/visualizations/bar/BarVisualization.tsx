@@ -43,6 +43,7 @@ type ChartDefinition = {
   z?: Array<Array<any>>,
   opacity?: number,
   originalName: string,
+  unit?: string,
 };
 
 const setChartColor = (chart: ChartConfig, colors: ColorMapper) => ({ marker: { color: colors.get(chart.originalName ?? chart.name) } });
@@ -76,6 +77,18 @@ type Layout = {
   barmode?: string;
 };
 
+const addHoverTemplateWithUnit = (chart: ChartDefinition): ChartDefinition => {
+  const unit = 'Gb';
+
+  return ({ ...chart, hovertemplate: `<span>%{y} ${unit}</span>` });
+};
+
+const addUnitsToYAxisTitle = (layout: Layout, chart: ChartDefinition): Layout => {
+  const units = 'B, Sec';
+
+  return ({ ...layout, yaxis: { title: { text: units } } });
+};
+
 const BarVisualization = makeVisualization(({
   config,
   data,
@@ -83,7 +96,7 @@ const BarVisualization = makeVisualization(({
   height,
 }: VisualizationComponentProps) => {
   const visualizationConfig = (config.visualizationConfig ?? BarVisualizationConfig.empty()) as BarVisualizationConfig;
-  const _layout: Layout = {};
+  const _layout: Layout = { yaxis: { title: { text: 'Bytes, milliseconds' } } };
 
   if (visualizationConfig && visualizationConfig.barmode) {
     _layout.barmode = visualizationConfig?.barmode;
@@ -113,13 +126,20 @@ const BarVisualization = makeVisualization(({
 
   const { eventChartData, shapes } = useEvents(config, data.events);
 
-  const chartDataResult = eventChartData ? [..._chartDataResult, eventChartData] : _chartDataResult;
   const layout = shapes ? { ..._layout, shapes } : _layout;
+
+  const chartData = useMemo(() => {
+    const chartDataResult = eventChartData ? [..._chartDataResult, eventChartData] : _chartDataResult;
+    console.log({ chartDataResult });
+    const withWidth = defineSingleDateBarWidth(chartDataResult, config, effectiveTimerange?.from, effectiveTimerange?.to);
+
+    return withWidth.map((chart) => addHoverTemplateWithUnit(chart));
+  }, [_chartDataResult, config, effectiveTimerange?.from, effectiveTimerange?.to, eventChartData]);
 
   return (
     <XYPlot config={config}
             axisType={visualizationConfig.axisType}
-            chartData={defineSingleDateBarWidth(chartDataResult, config, effectiveTimerange?.from, effectiveTimerange?.to)}
+            chartData={chartData}
             effectiveTimerange={effectiveTimerange}
             setChartColor={setChartColor}
             height={height}
