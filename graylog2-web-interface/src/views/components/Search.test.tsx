@@ -39,6 +39,7 @@ jest.mock('views/components/SearchResult', () => mockComponent('SearchResult'));
 jest.mock('views/stores/StreamsStore');
 jest.mock('views/components/common/WindowLeaveMessage', () => jest.fn(mockComponent('WindowLeaveMessage')));
 jest.mock('views/components/SearchBar', () => mockComponent('SearchBar'));
+jest.mock('hooks/useHotkey', () => jest.fn());
 
 const mockRefreshSearch = jest.fn();
 
