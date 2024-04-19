@@ -32,12 +32,14 @@ import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import org.apache.commons.lang.time.DurationFormatUtils;
+import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchException;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterGetSettingsRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterGetSettingsResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
+import org.graylog.shaded.opensearch2.org.opensearch.client.ResponseException;
 import org.graylog.shaded.opensearch2.org.opensearch.client.tasks.TaskSubmissionResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.cluster.health.ClusterHealthStatus;
 import org.graylog.shaded.opensearch2.org.opensearch.common.xcontent.json.JsonXContent;
@@ -391,18 +393,27 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     }
 
     private Optional<GetTaskResponse> getTask(String taskID) {
-        final Response taskResponse = client.execute((restHighLevelClient, requestOptions) -> restHighLevelClient.getLowLevelClient().performRequest(
-                new org.graylog.shaded.opensearch2.org.opensearch.client.Request("GET", "_tasks/" + taskID)
-        ));
+        try {
+            final Response taskResponse = client.execute((restHighLevelClient, requestOptions) -> restHighLevelClient.getLowLevelClient().performRequest(
+                    new org.graylog.shaded.opensearch2.org.opensearch.client.Request("GET", "_tasks/" + taskID)
+            ));
 
-        if (taskResponse.getStatusLine().getStatusCode() == 404) {
-            return Optional.empty();
-        }
+            if (taskResponse.getStatusLine().getStatusCode() == 404) {
+                return Optional.empty();
+            }
 
-        try (InputStream is = taskResponse.getEntity().getContent()) {
-            return Optional.of(objectMapper.readValue(is, GetTaskResponse.class));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            try (InputStream is = taskResponse.getEntity().getContent()) {
+                return Optional.of(objectMapper.readValue(is, GetTaskResponse.class));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        } catch (OpenSearchException e) {
+            if (e.getCause() != null && e.getCause() instanceof ResponseException responseException) {
+                if (responseException.getResponse().getStatusLine().getStatusCode() == 404) {
+                    return Optional.empty();
+                }
+            }
+            throw e;
         }
     }
 
