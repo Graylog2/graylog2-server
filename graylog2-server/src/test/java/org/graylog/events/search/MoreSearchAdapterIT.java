@@ -21,7 +21,7 @@ import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
-import org.jetbrains.annotations.NotNull;
+import jakarta.annotation.Nonnull;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
@@ -200,7 +200,7 @@ public abstract class MoreSearchAdapterIT extends ElasticsearchBaseTest {
         assertThat(allResults).isEmpty();
     }
 
-    @NotNull
+    @Nonnull
     private MoreSearchAdapter.ScrollEventsCallback getCountingAndCollectingScrollEventsCallback(AtomicInteger count,
                                                                                                 Collection<ResultMessage> allResults) {
         return (chunkResults, requestContinue) -> {

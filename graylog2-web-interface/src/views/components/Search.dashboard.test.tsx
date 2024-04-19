@@ -29,7 +29,7 @@ import useQueryIds from 'views/hooks/useQueryIds';
 import useQueryTitles from 'views/hooks/useQueryTitles';
 import { createSearch } from 'fixtures/searches';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 
 import OriginalSearch from './Search';
 import WidgetFocusProvider from './contexts/WidgetFocusProvider';
@@ -105,9 +105,7 @@ describe('Dashboard Search', () => {
     asMock(useQueryTitles).mockReturnValue(mockedQueryTitles);
   });
 
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   it('should list tabs for dashboard pages', async () => {
     render(<Search />);

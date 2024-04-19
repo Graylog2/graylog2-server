@@ -20,12 +20,12 @@ import com.google.common.eventbus.EventBus;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.multibindings.OptionalBinder;
+import jakarta.ws.rs.container.DynamicFeature;
+import jakarta.ws.rs.ext.ExceptionMapper;
 import org.graylog.datanode.Configuration;
-import org.graylog.datanode.process.ProcessStateMachine;
-import org.graylog.datanode.process.ProcessStateMachineProvider;
+import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachine;
+import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachineProvider;
 import org.graylog.datanode.shared.system.activities.DataNodeActivityWriter;
-import org.graylog.security.certutil.keystore.storage.KeystoreContentMover;
-import org.graylog.security.certutil.keystore.storage.SinglePasswordKeystoreContentMover;
 import org.graylog2.bindings.providers.ClusterEventBusProvider;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.cluster.nodes.DataNodeClusterService;
@@ -39,9 +39,6 @@ import org.graylog2.plugin.cluster.RandomUUIDClusterIdFactory;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.shared.bindings.providers.EventBusProvider;
 import org.graylog2.shared.system.activities.ActivityWriter;
-
-import jakarta.ws.rs.container.DynamicFeature;
-import jakarta.ws.rs.ext.ExceptionMapper;
 
 public class ServerBindings extends Graylog2Module {
     private final Configuration configuration;
@@ -71,7 +68,7 @@ public class ServerBindings extends Graylog2Module {
         bind(ClusterEventBus.class).toProvider(ClusterEventBusProvider.class).asEagerSingleton();
         bind(EventBus.class).toProvider(EventBusProvider.class).asEagerSingleton();
         bind(InputConfigurationBeanDeserializerModifier.class).toInstance(InputConfigurationBeanDeserializerModifier.withoutConfig());
-        bind(ProcessStateMachine.class).toProvider(ProcessStateMachineProvider.class).asEagerSingleton();
+        bind(OpensearchStateMachine.class).toProvider(OpensearchStateMachineProvider.class).asEagerSingleton();
     }
 
     private void bindFactoryModules() {
@@ -80,7 +77,6 @@ public class ServerBindings extends Graylog2Module {
 
     private void bindSingletons() {
         bind(ClusterConfigService.class).to(ClusterConfigServiceImpl.class).asEagerSingleton();
-        bind(KeystoreContentMover.class).to(SinglePasswordKeystoreContentMover.class).asEagerSingleton();
     }
 
     private void bindInterfaces() {

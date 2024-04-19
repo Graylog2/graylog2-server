@@ -24,7 +24,7 @@ import Widget from 'views/logic/widgets/Widget';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import { ALL_MESSAGES_TIMERANGE } from 'views/Constants';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import useSearchResult from 'views/hooks/useSearchResult';
 import type { SearchExecutionResult } from 'views/types';
 import useGlobalOverride from 'views/hooks/useGlobalOverride';
@@ -77,9 +77,7 @@ const TimerangeInfo = (props: React.ComponentProps<typeof OriginalTimerangeInfo>
 describe('TimerangeInfo', () => {
   const widget = Widget.empty();
 
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   beforeEach(() => {
     asMock(useSearchResult).mockReturnValue(mockSearchStoreState());

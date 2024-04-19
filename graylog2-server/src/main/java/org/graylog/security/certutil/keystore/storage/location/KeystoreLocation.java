@@ -16,5 +16,5 @@
  */
 package org.graylog.security.certutil.keystore.storage.location;
 
-public sealed interface KeystoreLocation permits KeystoreMongoLocation, KeystoreFileLocation {
+public interface KeystoreLocation {
 }

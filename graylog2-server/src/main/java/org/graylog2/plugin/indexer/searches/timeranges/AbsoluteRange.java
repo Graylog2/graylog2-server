@@ -68,6 +68,11 @@ public abstract class AbsoluteRange extends TimeRange {
         return to();
     }
 
+    @Override
+    public TimeRange withReferenceDate(DateTime now) {
+        return this;
+    }
+
     @AutoValue.Builder
     public abstract static class Builder {
         public abstract AbsoluteRange build();

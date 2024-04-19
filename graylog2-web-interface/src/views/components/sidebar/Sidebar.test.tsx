@@ -25,7 +25,7 @@ import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import useViewTitle from 'views/hooks/useViewTitle';
 import useViewMetadata from 'views/hooks/useViewMetadata';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import useGlobalOverride from 'views/hooks/useGlobalOverride';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 
@@ -85,9 +85,7 @@ describe('<Sidebar />', () => {
     </TestStoreProvider>,
   );
 
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   beforeEach(() => {
     asMock(useViewType).mockReturnValue(View.Type.Search);

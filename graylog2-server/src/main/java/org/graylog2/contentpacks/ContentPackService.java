@@ -62,12 +62,12 @@ import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.contentpacks.model.entities.references.ValueType;
 import org.graylog2.contentpacks.model.parameters.Parameter;
+import org.graylog2.plugin.inputs.CloudCompatible;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.utilities.Graphs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Method;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
@@ -145,17 +145,11 @@ public class ContentPackService {
                 final EntityWithExcerptFacade facade = entityFacades.getOrDefault(entity.type(), UnsupportedEntityFacade.INSTANCE);
 
                 if (configuration.isCloud() && entity.type().equals(INPUT_V1) && entity instanceof EntityV1 entityV1) {
-                    boolean isCloudCompatible = true;
                     final InputEntity inputEntity = objectMapper.convertValue(entityV1.data(), InputEntity.class);
-                    try {
-                        final Method isCloudCompatibleMethod =
-                                Class.forName(inputEntity.type().asString() + "$Descriptor").getMethod("isCloudCompatible");
-                        isCloudCompatible = (boolean) isCloudCompatibleMethod.invoke(null);
-                    } catch (Exception e) {
-                        LOG.info("Failed to invoke Descriptor.isCloudCompatible() for {}", inputEntity.type().asString());
-                    }
-                    if (!isCloudCompatible) {
-                        LOG.warn("Ignoring incompatible input {} in cloud", inputEntity.type().asString());
+                    String className = inputEntity.type().asString();
+                    Class inputClass = Class.forName(className);
+                    if (inputClass.getAnnotation(CloudCompatible.class) == null) {
+                        LOG.warn("Ignoring incompatible input {} in cloud", className);
                         continue;
                     }
                 }
