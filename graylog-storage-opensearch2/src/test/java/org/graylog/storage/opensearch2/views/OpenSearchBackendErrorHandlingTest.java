@@ -28,7 +28,6 @@ import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.engine.monitoring.collection.NoOpStatsCollector;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.MultiSearchResponse;
-import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog.storage.opensearch2.testing.TestMultisearchResponse;
 import org.graylog.storage.opensearch2.views.searchtypes.OSSearchTypeHandler;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
@@ -39,10 +38,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -51,12 +47,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class OpenSearchBackendErrorHandlingTest {
+public class OpenSearchBackendErrorHandlingTest extends OpensearchMockedClientTestBase {
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
-
-    @Mock
-    private OpenSearchClient client;
 
     @Mock
     protected IndexLookup indexLookup;
@@ -110,11 +103,9 @@ public class OpenSearchBackendErrorHandlingTest {
     }
 
     @Test
-    public void deduplicateShardErrorsOnSearchTypeLevel() throws IOException {
+    public void deduplicateShardErrorsOnSearchTypeLevel() throws Exception {
         final MultiSearchResponse multiSearchResult = TestMultisearchResponse.fromFixture("errorhandling/failureOnSearchTypeLevel.json");
-        final List<MultiSearchResponse.Item> items = Arrays.stream(multiSearchResult.getResponses())
-                .collect(Collectors.toList());
-        when(client.msearch(any(), any())).thenReturn(items);
+        mockCancellableMSearch(multiSearchResult);
 
         final QueryResult queryResult = this.backend.doRun(searchJob, query, queryContext);
 
@@ -128,11 +119,9 @@ public class OpenSearchBackendErrorHandlingTest {
     }
 
     @Test
-    public void deduplicateNumericShardErrorsOnSearchTypeLevel() throws IOException {
+    public void deduplicateNumericShardErrorsOnSearchTypeLevel() throws Exception {
         final MultiSearchResponse multiSearchResult = TestMultisearchResponse.fromFixture("errorhandling/numericFailureOnSearchTypeLevel.json");
-        final List<MultiSearchResponse.Item> items = Arrays.stream(multiSearchResult.getResponses())
-                .collect(Collectors.toList());
-        when(client.msearch(any(), any())).thenReturn(items);
+        mockCancellableMSearch(multiSearchResult);
 
         final QueryResult queryResult = this.backend.doRun(searchJob, query, queryContext);
 

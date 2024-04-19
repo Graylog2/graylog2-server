@@ -314,6 +314,10 @@ public class Configuration {
         return opensearchAuditLog;
     }
 
+     /**
+     * The insecure flag causes problems on many places. We should replace it with autosecurity option, that would
+     * configure all the CA and certs automatically.
+     */
     @Deprecated
     public boolean isInsecureStartup() {
         return insecureStartup;

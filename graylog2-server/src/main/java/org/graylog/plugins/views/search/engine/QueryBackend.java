@@ -29,7 +29,6 @@ import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.errors.SearchTypeError;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog2.indexer.ranges.IndexRange;
-import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
@@ -137,11 +136,9 @@ public interface QueryBackend<T extends GeneratedQueryContext> {
     default ExplainResults.QueryExplainResult doExplain(SearchJob job, Query query, T queryContext) {
         final ImmutableMap.Builder<String, ExplainResults.ExplainResult> builder = ImmutableMap.builder();
 
-        final DateTime nowUTCSharedBetweenSearchTypes = Tools.nowUTC();
-
         query.searchTypes().forEach(s -> {
             final Set<ExplainResults.IndexRangeResult> indicesForQuery = indexRangesForStreamsInTimeRange(
-                    query.effectiveStreams(s), query.effectiveTimeRange(s, nowUTCSharedBetweenSearchTypes))
+                    query.effectiveStreams(s), query.effectiveTimeRange(s))
                     .stream().map(ExplainResults.IndexRangeResult::fromIndexRange).collect(Collectors.toSet());
             queryContext.getSearchTypeQueryString(s.id())
                     .ifPresent(queryString -> builder.put(s.id(), new ExplainResults.ExplainResult(queryString, indicesForQuery)));

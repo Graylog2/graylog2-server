@@ -17,6 +17,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
+import Alert from 'components/bootstrap/Alert';
 import DocsHelper from 'util/DocsHelper';
 import Section from 'preflight/components/common/Section';
 import DataNodesOverview from 'preflight/components/Setup/DataNodesOverview';
@@ -34,6 +35,9 @@ type Props = {
 
 const Setup = ({ setIsWaitingForStartup }: Props) => (
   <>
+    <Alert bsStyle="warning">
+      Data Node is currently in beta. Feel free to check it out and tell us about your experience!
+    </Alert>
     <Section title="Welcome!" titleOrder={1} dataTestid="welcome-section">
       <P>
         It looks like you are starting Graylog for the first time and have not configured a data node.<br />

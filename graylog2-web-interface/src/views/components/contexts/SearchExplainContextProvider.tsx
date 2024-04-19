@@ -21,7 +21,7 @@ import { useMutation } from '@tanstack/react-query';
 import useAppSelector from 'stores/useAppSelector';
 import SearchExplainContext from 'views/components/contexts/SearchExplainContext';
 import type { SearchExplainContextType, WidgetExplain } from 'views/components/contexts/SearchExplainContext';
-import { buildSearchExecutionState } from 'views/logic/slices/executeSearch';
+import { buildSearchExecutionState } from 'views/logic/slices/executeJobResult';
 import type { WidgetMapping } from 'views/logic/views/types';
 import {
   selectWidgetsToSearch,

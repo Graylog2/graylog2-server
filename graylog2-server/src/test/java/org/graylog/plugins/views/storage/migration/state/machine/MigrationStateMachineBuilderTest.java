@@ -18,7 +18,7 @@ package org.graylog.plugins.views.storage.migration.state.machine;
 
 import com.github.oxo42.stateless4j.StateMachine;
 import org.graylog.plugins.views.storage.migration.state.actions.MigrationActions;
-import org.jetbrains.annotations.NotNull;
+import jakarta.annotation.Nonnull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -296,7 +296,7 @@ public class MigrationStateMachineBuilderTest {
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.FINISHED);
     }
 
-    @NotNull
+    @Nonnull
     private StateMachine<MigrationState, MigrationStep> getStateMachine(MigrationState initialState) {
         return MigrationStateMachineBuilder.buildWithTestState(initialState, migrationActions);
     }
