@@ -122,7 +122,6 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static org.graylog2.audit.AuditEventTypes.NODE_SHUTDOWN_INITIATE;
-import static org.graylog2.indexer.Constants.FIELD_TYPES_MANAGEMENT_FEATURE;
 import static org.graylog2.plugin.ServerStatus.Capability.CLOUD;
 import static org.graylog2.plugin.ServerStatus.Capability.MASTER;
 import static org.graylog2.plugin.ServerStatus.Capability.SERVER;
@@ -216,9 +215,8 @@ public class Server extends ServerBootstrap {
                 new CaModule()
         );
 
-        if (featureFlags.isOn(FIELD_TYPES_MANAGEMENT_FEATURE)) {
-            modules.add(new FieldTypeManagementModule());
-        }
+        modules.add(new FieldTypeManagementModule());
+
         return modules.build();
     }
 
