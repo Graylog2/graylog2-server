@@ -30,12 +30,8 @@ import recentMessagesTimeRange from 'util/TimeRangeHelper';
 import style from './SidecarRow.css';
 
 const SidecarTR = styled.tr(({ inactive, theme }) => css`
-  color: ${inactive ? theme.utils.contrastingColor(theme.colors.table.row.background, 'AA') : 'currentColor'};
-  opacity: ${inactive ? 0.9 : 1};
-
-  &:nth-of-type(2n+1) {
-    color: ${inactive ? theme.utils.contrastingColor(theme.colors.table.row.backgroundAlt, 'AA') : 'currentColor'};
-  }
+  color: ${inactive ? theme.utils.contrastingColor(theme.colors.global.contentBackground, 'AA') : 'currentColor'};
+  opacity: ${inactive ? 0.8 : 1};
 
   td:not(:last-child) {
     font-style: ${inactive ? 'italic' : 'normal'};
