@@ -119,7 +119,7 @@ public class SearchJob implements ParameterProvider {
 
     @JsonProperty("execution")
     public ExecutionInfo execution() {
-        final boolean isDone = searchEngineTaskFuture != null && searchEngineTaskFuture.isDone() && resultFuture != null && resultFuture.isDone();
+        final boolean isDone = (resultFuture == null || resultFuture.isDone()) && (searchEngineTaskFuture == null || searchEngineTaskFuture.isDone());
         final boolean isCancelled = (searchEngineTaskFuture != null && searchEngineTaskFuture.isCancelled()) || (resultFuture != null && resultFuture.isCancelled());
         return new ExecutionInfo(isDone, isCancelled, !errors.isEmpty());
     }
