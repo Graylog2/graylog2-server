@@ -24,7 +24,7 @@
     "eslint-plugin-graylog": "file:../eslint-plugin-graylog",
     "eslint-plugin-import": "2.25.3",
     "eslint-plugin-jest": "28.2.0",
-    "eslint-plugin-jest-dom": "5.2.0",
+    "eslint-plugin-jest-dom": "5.4.0",
     "eslint-plugin-jest-formatting": "3.1.0",
     "eslint-plugin-jsx-a11y": "6.8.0",
     "eslint-plugin-react": "7.34.1",
