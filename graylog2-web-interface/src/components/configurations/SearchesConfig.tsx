@@ -138,7 +138,7 @@ const SearchesConfig = () => {
     setFormConfig({ ...formConfig, query_time_range_limit: queryTimeRangeLimit });
   };
 
-  const onCancelAfterSecondsChanged = ({ target: { value } }) => {
+  const onCancelAfterSecondsChanged = ({ target: { value } }: { target: { value: number | null }}) => {
     setFormConfig({ ...formConfig, cancel_after_seconds: value });
   };
 
@@ -278,7 +278,7 @@ const SearchesConfig = () => {
         <dt>Cancellation timeout</dt>
         <dd>{cancellationTimeout(viewConfig)}</dd>
         <dd>The time in seconds per widget after which search execution will be canceled automatically.
-          That minimizes amount of executed searches and improves performance.
+          This minimizes the amount of executed searches and improves performance.
         </dd>
       </dl>
 
@@ -356,7 +356,7 @@ const SearchesConfig = () => {
                    name="cancel_after_seconds_checkbox"
                    checked={showCancelAfterSeconds}
                    onChange={onCheckedCancelAfterSeconds}
-                   help="The time in seconds per widget after which search execution will be canceled automatically. That minimizes amount of executed searches and improves performance." />
+                   help="The time in seconds per widget after which search execution will be canceled automatically. This minimizes the amount of executed searches and improves performance." />
             {showCancelAfterSeconds && (
               <Input id="cancel_after_seconds"
                      type="number"
