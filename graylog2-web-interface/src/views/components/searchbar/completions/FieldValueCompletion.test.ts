@@ -129,6 +129,41 @@ describe('FieldValueCompletion', () => {
       expect(suggestions).toEqual(expectedSuggestions);
     });
 
+    it('returns suggestions for field name which is in the middle of the query', async () => {
+      const currentToken = createCurrentToken('keyword', 'http_method:', 2, 8);
+      const prevToken = {
+        type: 'text',
+        value: ' ',
+      };
+
+      const completer = new FieldValueCompletion();
+
+      const suggestions = await completer.getCompletions({
+        ...requestDefaults,
+        currentToken,
+        prevToken,
+        tokens: [
+          {
+            type: 'term',
+            value: 'example',
+          },
+          prevToken,
+          currentToken,
+          {
+            type: 'text',
+            value: ' ',
+          },
+          {
+            type: 'term',
+            value: 'query',
+          },
+        ],
+        currentTokenIdx: 2,
+      });
+
+      expect(suggestions).toEqual(expectedSuggestions);
+    });
+
     it('returns suggestions, field value is a quoted string', async () => {
       const currentToken = createCurrentToken('string', '"P"', 1, 12);
       const prevToken = {
