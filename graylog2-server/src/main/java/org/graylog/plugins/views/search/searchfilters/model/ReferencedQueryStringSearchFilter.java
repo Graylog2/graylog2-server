@@ -21,6 +21,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog2.contentpacks.EntityDescriptorIds;
+import org.graylog2.contentpacks.model.entities.SearchFilterEntity;
+import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
 import javax.annotation.Nullable;
 
@@ -32,6 +35,9 @@ public abstract class ReferencedQueryStringSearchFilter implements ReferencedSea
     @JsonProperty(ID_FIELD)
     @Override
     public abstract String id();
+
+    @JsonProperty(TYPE)
+    public abstract String type();
 
     @JsonProperty(TITLE_FIELD)
     @Nullable
@@ -74,6 +80,9 @@ public abstract class ReferencedQueryStringSearchFilter implements ReferencedSea
         @JsonProperty
         public abstract Builder id(String id);
 
+        @JsonProperty(TYPE)
+        public abstract Builder type(String type);
+
         @JsonProperty(TITLE_FIELD)
         public abstract Builder title(String title);
 
@@ -107,6 +116,15 @@ public abstract class ReferencedQueryStringSearchFilter implements ReferencedSea
                 .negation(this.negation())
                 .title(this.title())
                 .disabled(this.disabled())
+                .build();
+    }
+
+    @Override
+    public SearchFilterEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
+        return SearchFilterEntity.builder()
+                .id(ValueReference.of(id()))
+                .title(ValueReference.of(title()))
+                .searchFilter(this)
                 .build();
     }
 }
