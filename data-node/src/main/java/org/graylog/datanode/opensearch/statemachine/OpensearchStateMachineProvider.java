@@ -18,6 +18,7 @@ package org.graylog.datanode.opensearch.statemachine;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
+import org.graylog.datanode.opensearch.OpensearchProcess;
 import org.graylog.datanode.opensearch.statemachine.tracer.StateMachineTracer;
 import org.graylog.datanode.opensearch.statemachine.tracer.StateMachineTracerAggregator;
 
@@ -27,10 +28,11 @@ public class OpensearchStateMachineProvider implements Provider<OpensearchStateM
     private final OpensearchStateMachine opensearchStateMachine;
 
     @Inject
-    public OpensearchStateMachineProvider(Set<StateMachineTracer> tracer) {
+    public OpensearchStateMachineProvider(Set<StateMachineTracer> tracer, OpensearchProcess process) {
         this.opensearchStateMachine = OpensearchStateMachine.createNew();
         StateMachineTracerAggregator aggregator = opensearchStateMachine.getTracerAggregator();
         tracer.forEach(aggregator::addTracer);
+        opensearchStateMachine.setOpensearchProcess(process);
     }
 
     @Override

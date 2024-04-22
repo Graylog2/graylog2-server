@@ -18,7 +18,7 @@ package org.graylog.datanode.opensearch;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.oxo42.stateless4j.delegates.Trace;
-import com.google.inject.Inject;
+import jakarta.inject.Inject;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.http.client.utils.URIBuilder;

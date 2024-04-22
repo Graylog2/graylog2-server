@@ -16,7 +16,7 @@
  */
 package org.graylog.datanode.opensearch.statemachine.tracer;
 
-import com.google.inject.Inject;
+import jakarta.inject.Inject;
 import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
 import org.graylog.datanode.opensearch.statemachine.OpensearchState;
 import org.graylog2.cluster.NodeNotFoundException;

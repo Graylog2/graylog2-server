@@ -18,6 +18,7 @@ package org.graylog.datanode.opensearch.statemachine;
 
 import com.github.oxo42.stateless4j.StateMachine;
 import com.github.oxo42.stateless4j.StateMachineConfig;
+import org.graylog.datanode.opensearch.OpensearchProcess;
 import org.graylog.datanode.opensearch.statemachine.tracer.StateMachineTracerAggregator;
 
 public class OpensearchStateMachine extends StateMachine<OpensearchState, OpensearchEvent> {
@@ -29,6 +30,7 @@ public class OpensearchStateMachine extends StateMachine<OpensearchState, Opense
     public static final int MAX_REBOOT_FAILURES = 3;
 
     StateMachineTracerAggregator tracerAggregator = new StateMachineTracerAggregator();
+    private OpensearchProcess process;
 
     public OpensearchStateMachine(OpensearchState initialState, StateMachineConfig<OpensearchState, OpensearchEvent> config) {
         super(initialState, config);
@@ -119,5 +121,9 @@ public class OpensearchStateMachine extends StateMachine<OpensearchState, Opense
 
     public StateMachineTracerAggregator getTracerAggregator() {
         return tracerAggregator;
+    }
+
+    public void setOpensearchProcess(OpensearchProcess process) {
+        this.process = process;
     }
 }
