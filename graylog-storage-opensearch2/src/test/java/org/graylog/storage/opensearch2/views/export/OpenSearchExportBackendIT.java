@@ -32,7 +32,7 @@ import org.graylog.testing.elasticsearch.SkipDefaultIndexTemplate;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
-import org.jetbrains.annotations.NotNull;
+import jakarta.annotation.Nonnull;
 import org.joda.time.DateTimeZone;
 import org.junit.After;
 import org.junit.Before;
@@ -278,7 +278,7 @@ public class OpenSearchExportBackendIT extends ElasticsearchBaseTest {
                 .isInstanceOf(ExportException.class);
     }
 
-    @NotNull
+    @Nonnull
     private static Map<String, Object> mappingWithOutAlias() {
         return Map.of("properties",
                 Map.of(
@@ -295,7 +295,7 @@ public class OpenSearchExportBackendIT extends ElasticsearchBaseTest {
         );
     }
 
-    @NotNull
+    @Nonnull
     private static Map<String, Object> mappingWithAlias() {
         return Map.of("properties",
                 Map.of(

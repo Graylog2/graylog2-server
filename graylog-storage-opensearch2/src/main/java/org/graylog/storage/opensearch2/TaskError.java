@@ -23,7 +23,7 @@ import javax.annotation.Nullable;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record TaskError(@JsonProperty("type") String type, @JsonProperty("reason") String reason,
-                        @Nullable @JsonProperty("caused_by") String causedBy) {
+                        @Nullable @JsonProperty("caused_by") Object causedBy) {
 
     @Override
     public String toString() {

@@ -24,6 +24,7 @@ import io.swagger.annotations.ApiParam;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;
@@ -156,7 +157,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
                                  @ApiParam ExecutionState executionState,
                                  @Context SearchUser searchUser) {
 
-        final SearchJob searchJob = searchExecutor.execute(id, searchUser, executionState);
+        final SearchJob searchJob = searchExecutor.executeAsync(id, searchUser, executionState);
 
         postAuditEvent(searchJob);
 
@@ -188,7 +189,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
                                    @QueryParam("timeout") @DefaultValue("60000") long timeout,
                                    @Context SearchUser searchUser) {
         final Search search = searchRequest.toSearch();
-        final SearchJob searchJob = searchExecutor.execute(search, searchUser, ExecutionState.empty());
+        final SearchJob searchJob = searchExecutor.executeSync(search, searchUser, ExecutionState.empty());
 
         postAuditEvent(searchJob);
 
@@ -208,7 +209,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
                                      @QueryParam("timeout") @DefaultValue("60000") long timeout,
                                      @Context SearchUser searchUser) {
         final Search search = searchRequest.toSearch();
-        final SearchJob searchJob = searchExecutor.execute(search, searchUser, ExecutionState.empty());
+        final SearchJob searchJob = searchExecutor.executeSync(search, searchUser, ExecutionState.empty());
 
         postAuditEvent(searchJob);
 
@@ -221,17 +222,29 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @ApiOperation(value = "Retrieve the status of an executed query")
     @Path("status/{jobId}")
     @Produces({MediaType.APPLICATION_JSON, SEARCH_FORMAT_V1})
-    public SearchJobDTO jobStatus(@ApiParam(name = "jobId") @PathParam("jobId") String jobId, @Context SearchUser searchUser) {
-        final SearchJob searchJob = searchJobService.load(jobId, searchUser.username()).orElseThrow(NotFoundException::new);
-        if (searchJob != null && searchJob.getResultFuture() != null) {
+    public Response jobStatus(@ApiParam(name = "jobId") @PathParam("jobId") String jobId, @Context SearchUser searchUser) {
+        final SearchJob searchJob = searchJobService.load(jobId, searchUser).orElseThrow(NotFoundException::new);
+        if (searchJob.getResultFuture() != null) {
             try {
                 // force a "conditional join", to catch fast responses without having to poll
                 Uninterruptibles.getUninterruptibly(searchJob.getResultFuture(), 5, TimeUnit.MILLISECONDS);
             } catch (ExecutionException | TimeoutException ignore) {
-
             }
         }
-        return SearchJobDTO.fromSearchJob(searchJob);
+        return Response
+                .ok(SearchJobDTO.fromSearchJob(searchJob))
+                .build();
+    }
+
+    @DELETE
+    @Path("cancel/{jobId}")
+    @NoAuditEvent("To be decided if we want to have cancellation of jobs in audit log")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Response cancelJob(@PathParam("jobId") String jobId,
+                              @Context SearchUser searchUser) {
+        final SearchJob searchJob = searchJobService.load(jobId, searchUser).orElseThrow(NotFoundException::new);
+        searchJob.cancel();
+        return Response.ok().build();
     }
 
     private void postAuditEvent(SearchJob searchJob) {

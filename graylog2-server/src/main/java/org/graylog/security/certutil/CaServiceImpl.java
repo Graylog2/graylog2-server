@@ -27,14 +27,12 @@ import org.graylog.security.certutil.ca.exceptions.CACreationException;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog.security.certutil.keystore.storage.KeystoreFileStorage;
 import org.graylog.security.certutil.keystore.storage.KeystoreMongoStorage;
-import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoCollections;
 import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoLocation;
 import org.graylog2.Configuration;
 import org.graylog2.bootstrap.preflight.web.resources.model.CA;
 import org.graylog2.bootstrap.preflight.web.resources.model.CAType;
 import org.graylog2.cluster.certificates.CertificatesService;
 import org.graylog2.events.ClusterEventBus;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
