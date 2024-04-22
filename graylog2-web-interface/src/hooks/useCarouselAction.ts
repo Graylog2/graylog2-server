@@ -16,9 +16,27 @@
  */
 import EmblaCarousel from 'embla-carousel';
 import { useCallback, useMemo, useState, useEffect } from 'react';
+import type { EmblaCarouselType } from 'embla-carousel';
 
 const useCarouselAction = (carouselElementClass: string) => {
   const [carousel, setCarousel] = useState<HTMLElement>(undefined);
+  const [nextBtnDisabled, setNextBtnDisabled] = useState(true);
+  const [prevBtnDisabled, setPrevBtnDisabled] = useState(true);
+
+  const emblaApi = useMemo(() => carousel && EmblaCarousel(carousel, { containScroll: 'trimSnaps' }), [carousel]);
+
+  const onSelect = useCallback(() => {
+    setPrevBtnDisabled(!emblaApi.canScrollPrev());
+    setNextBtnDisabled(!emblaApi.canScrollNext());
+  }, [emblaApi]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+
+    onSelect();
+    emblaApi.on('reInit', onSelect);
+    emblaApi.on('select', onSelect);
+  }, [emblaApi, onSelect]);
 
   useEffect(() => {
     if (!carousel) {
@@ -27,8 +45,6 @@ const useCarouselAction = (carouselElementClass: string) => {
       }, 200);
     }
   }, [carousel, carouselElementClass]);
-
-  const emblaApi = useMemo(() => carousel && EmblaCarousel(carousel, { containScroll: 'trimSnaps' }), [carousel]);
 
   const scrollPrev = useCallback(() => {
     if (emblaApi) emblaApi.scrollPrev();
@@ -40,6 +56,8 @@ const useCarouselAction = (carouselElementClass: string) => {
   return {
     scrollNext,
     scrollPrev,
+    nextBtnDisabled,
+    prevBtnDisabled,
   };
 };
 

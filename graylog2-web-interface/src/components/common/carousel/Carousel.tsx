@@ -22,6 +22,7 @@ import CarouselSlide from 'components/common/carousel/CarouselSlide';
 
 type Props = {
   children: React.ReactNode,
+  className?: string
 };
 
 const StyledDiv = styled.div`
@@ -37,16 +38,20 @@ const StyledDiv = styled.div`
   }
 `;
 
-const Carousel = ({ children }: Props) => {
+const Carousel = ({ children, className }: Props) => {
   const [emblaRef] = useEmblaCarousel({ containScroll: 'trimSnaps' });
 
   return (
-    <StyledDiv className="carousel" ref={emblaRef}>
+    <StyledDiv className={`carousel ${className}`} ref={emblaRef}>
       <div className="carousel-container">
         {children}
       </div>
     </StyledDiv>
   );
+};
+
+Carousel.defaultProps = {
+  className: undefined,
 };
 
 Carousel.Slide = CarouselSlide;
