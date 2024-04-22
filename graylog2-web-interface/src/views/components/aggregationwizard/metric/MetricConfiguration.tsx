@@ -94,7 +94,8 @@ const Metric = ({ index }: Props) => {
     }
   }, [functionIsSettled, metricsError, index, metricFieldSelectRef]);
 
-  const showUnitType = '';
+  const showUnitType = ['sum', 'max', 'min', 'avg'].includes(currentFunction);
+  console.log({ currentFunction });
 
   return (
     <Wrapper data-testid={`metric-${index}`}>
@@ -137,7 +138,7 @@ const Metric = ({ index }: Props) => {
               </Input>
             )}
           </Field>
-          <UnitMetricPopover index={index} />
+          {showUnitType && <UnitMetricPopover index={index} />}
         </FieldContainer>
       )}
       {isPercentile && (

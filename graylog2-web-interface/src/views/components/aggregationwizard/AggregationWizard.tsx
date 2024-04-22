@@ -103,6 +103,8 @@ const validateForm = (formValues: WidgetConfigFormValues) => {
 const AggregationWizard = ({ onChange, config, children, onSubmit, onCancel }: EditWidgetComponentProps<AggregationWidgetConfig> & { children: React.ReactElement }) => {
   const initialFormValues = _initialFormValues(config);
 
+  console.log({ initialFormValues, config });
+
   return (
     <WidgetConfigForm onSubmit={(formValues: WidgetConfigFormValues) => _onSubmit(formValues, onChange, config)}
                       initialValues={initialFormValues}
