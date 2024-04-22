@@ -83,6 +83,7 @@ const SearchesConfig = () => {
   const [analysisDisabledFieldsUpdate, setAnalysisDisabledFieldsUpdate] = useState<string | undefined>(undefined);
   const [defaultAutoRefreshOptionUpdate, setDefaultAutoRefreshOptionUpdate] = useState<string | undefined>(undefined);
   const [timeRangePresetsUpdated, setTimeRangePresetsUpdated] = useState<Immutable.List<TimeRangePreset>>(undefined);
+  const [showCancelAfterSeconds, setShowCancelAfterSeconds] = useState(false);
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
 
@@ -91,6 +92,7 @@ const SearchesConfig = () => {
       const config = getConfig(ConfigurationType.SEARCHES_CLUSTER_CONFIG, configuration);
       setViewConfig(config);
       setFormConfig(config);
+      setShowCancelAfterSeconds(!!config?.cancel_after_seconds);
     });
   }, [configuration]);
 
@@ -136,8 +138,6 @@ const SearchesConfig = () => {
     setFormConfig({ ...formConfig, query_time_range_limit: queryTimeRangeLimit });
   };
 
-  const isCancelAfterSecondsEnabled = (config: { cancel_after_seconds: number }) => !!config?.cancel_after_seconds;
-
   const onCancelAfterSecondsChanged = ({ target: { value } }) => {
     setFormConfig({ ...formConfig, cancel_after_seconds: value });
   };
@@ -145,12 +145,13 @@ const SearchesConfig = () => {
   const onCheckedCancelAfterSeconds = () => {
     let cancelAfterSeconds: number | null;
 
-    if (isCancelAfterSecondsEnabled(formConfig)) {
+    if (showCancelAfterSeconds) {
       cancelAfterSeconds = null;
     } else {
       cancelAfterSeconds = 30;
     }
 
+    setShowCancelAfterSeconds((cur) => !cur);
     setFormConfig({ ...formConfig, cancel_after_seconds: cancelAfterSeconds });
   };
 
@@ -353,10 +354,10 @@ const SearchesConfig = () => {
                    type="checkbox"
                    label="Enable query cancellation timeout"
                    name="cancel_after_seconds_checkbox"
-                   checked={isCancelAfterSecondsEnabled(formConfig)}
+                   checked={showCancelAfterSeconds}
                    onChange={onCheckedCancelAfterSeconds}
                    help="The time in seconds per widget after which search execution will be canceled automatically. That minimizes amount of executed searches and improves performance." />
-            {isCancelAfterSecondsEnabled(formConfig) && (
+            {showCancelAfterSeconds && (
               <Input id="cancel_after_seconds"
                      type="number"
                      label="Cancellation timeout"
@@ -364,6 +365,7 @@ const SearchesConfig = () => {
                      min="1"
                      step="1"
                      pattern="\d+"
+                     required
                      value={formConfig.cancel_after_seconds}
                      onChange={onCancelAfterSecondsChanged} />
             )}
