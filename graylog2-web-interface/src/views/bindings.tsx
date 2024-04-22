@@ -101,7 +101,6 @@ import CreateEventDefinition from 'views/logic/valueactions/createEventDefinitio
 import ChangeFieldType, {
   ChangeFieldTypeHelp,
   isChangeFieldTypeEnabled,
-  isChangeFieldTypeHidden,
 } from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldType';
 import AddEventsWidgetActionHandler, { CreateEventsWidget } from 'views/logic/widgets/events/AddEventsWidgetActionHandler';
 import EventsListConfigGenerator from 'views/logic/searchtypes/events/EventsListConfigGenerator';
@@ -322,7 +321,6 @@ const exports: PluginExports = {
       type: 'change-field-type',
       title: 'Change field type',
       isEnabled: isChangeFieldTypeEnabled,
-      isHidden: isChangeFieldTypeHidden,
       resetFocus: false,
       component: ChangeFieldType,
       help: ChangeFieldTypeHelp,
