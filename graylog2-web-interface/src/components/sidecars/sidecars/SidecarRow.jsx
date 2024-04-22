@@ -31,7 +31,7 @@ import style from './SidecarRow.css';
 
 const SidecarTR = styled.tr(({ inactive, theme }) => css`
   color: ${inactive ? theme.utils.contrastingColor(theme.colors.global.contentBackground, 'AA') : 'currentColor'};
-  opacity: ${inactive ? 0.8 : 1};
+  opacity: ${inactive ? 0.9 : 1};
 
   td:not(:last-child) {
     font-style: ${inactive ? 'italic' : 'normal'};
