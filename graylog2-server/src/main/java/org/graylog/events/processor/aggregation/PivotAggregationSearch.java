@@ -78,7 +78,6 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
 import static org.graylog.plugins.views.search.SearchJob.NO_CANCELLATION;
-import static org.graylog.plugins.views.search.SearchJob.NO_CANCELLATION;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class PivotAggregationSearch implements AggregationSearch {
