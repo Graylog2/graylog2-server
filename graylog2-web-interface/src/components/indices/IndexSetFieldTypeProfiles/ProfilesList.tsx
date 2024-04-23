@@ -78,7 +78,7 @@ const ProfilesList = () => {
     onSearchReset,
     onSortChange,
   } = useTableEventHandlers({
-    appSection: 'streams-list',
+    appSection: 'index-set-field-types-profile-list',
     paginationQueryParameter,
     setQuery,
     updateTableLayout,

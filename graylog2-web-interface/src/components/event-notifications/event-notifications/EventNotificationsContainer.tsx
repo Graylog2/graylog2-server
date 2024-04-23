@@ -87,7 +87,7 @@ const EventNotificationsContainer = () => {
     onSearchReset,
     onSortChange,
   } = useTableEventHandlers({
-    appSection: 'streams-list',
+    appSection: 'event-notification-list',
     paginationQueryParameter,
     setQuery,
     updateTableLayout,
