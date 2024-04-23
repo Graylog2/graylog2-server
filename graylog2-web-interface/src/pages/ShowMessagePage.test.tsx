@@ -20,7 +20,7 @@ import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import { StoreMock as MockStore, asMock } from 'helpers/mocking';
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import StreamsStore from 'stores/streams/StreamsStore';
 import { InputsActions } from 'stores/inputs/InputsStore';
 
@@ -80,11 +80,9 @@ describe('ShowMessagePage', () => {
     forwarder: [{ isLocalNode }],
   });
 
-  beforeAll(loadViewsPlugin);
+  useViewsPlugin();
 
   beforeAll(() => PluginStore.register(testForwarderPlugin));
-
-  afterAll(unloadViewsPlugin);
 
   afterAll(() => PluginStore.unregister(testForwarderPlugin));
 

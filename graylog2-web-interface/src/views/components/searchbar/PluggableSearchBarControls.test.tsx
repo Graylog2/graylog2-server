@@ -24,7 +24,6 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import PluggableSearchBarControls from './PluggableSearchBarControls';
 
 jest.mock('hooks/usePluginEntities');
-jest.mock('hooks/useFeature', () => (key) => key === 'search_filter');
 
 jest.mock('logic/local-storage/Store', () => ({
   get: jest.fn(),

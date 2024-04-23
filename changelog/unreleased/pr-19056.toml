@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Actively wait for opensearch process termination in the datanode."
+
+pulls = ["19056"]

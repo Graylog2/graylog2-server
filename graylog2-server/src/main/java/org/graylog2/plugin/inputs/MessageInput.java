@@ -417,11 +417,11 @@ public abstract class MessageInput implements Stoppable {
     }
 
     public boolean isCloudCompatible() {
-        return Descriptor.isCloudCompatible();
+        return descriptor.isCloudCompatible();
     }
 
     public boolean isForwarderCompatible() {
-        return Descriptor.isForwarderCompatible();
+        return descriptor.isForwarderCompatible();
     }
 
     public interface Factory<M> {
@@ -470,11 +470,11 @@ public abstract class MessageInput implements Stoppable {
             super(name, exclusive, linkToDocs);
         }
 
-        public static boolean isCloudCompatible() {
+        public boolean isCloudCompatible() {
             return false;
         }
 
-        public static boolean isForwarderCompatible() {
+        public boolean isForwarderCompatible() {
             return true;
         }
     }

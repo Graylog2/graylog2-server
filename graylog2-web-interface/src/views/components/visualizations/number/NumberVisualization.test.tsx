@@ -26,7 +26,7 @@ import Series from 'views/logic/aggregationbuilder/Series';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type { CurrentViewType } from 'views/components/CustomPropTypes';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 
 import NumberVisualization from './NumberVisualization';
 
@@ -83,9 +83,7 @@ describe('NumberVisualization', () => {
     </TestStoreProvider>
   );
 
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   it('should render a number visualization', () => {
     const wrapper = mount(<SimplifiedNumberVisualization />);

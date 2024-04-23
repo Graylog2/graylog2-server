@@ -23,11 +23,12 @@ import mockSearchesClusterConfig from 'fixtures/searchClusterConfig';
 import type { WidgetEditingState, WidgetFocusingState } from 'views/components/contexts/WidgetFocusContext';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import { execute, setGlobalOverride } from 'views/logic/slices/searchExecutionSlice';
 
 import OriginalDashboardSearchBar from './DashboardSearchBar';
 
+jest.mock('hooks/useHotkey', () => jest.fn());
 jest.mock('views/components/searchbar/queryinput/QueryInput');
 jest.mock('views/components/DashboardActionsMenu', () => () => <span>View Actions</span>);
 
@@ -69,9 +70,7 @@ describe('DashboardSearchBar', () => {
     jest.clearAllMocks();
   });
 
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   it('should render the DashboardSearchBar', async () => {
     render(<DashboardSearchBar />);

@@ -94,14 +94,13 @@ public class Server extends ServerBootstrap {
                 new RestBindings(),
                 new DataNodeProvisioningBindings(),
                 new PeriodicalBindings(),
-                new ObjectMapperModule(chainingClassLoader),
-                new PasswordAlgorithmBindings()
+                new ObjectMapperModule(chainingClassLoader)
         );
         return modules.build();
     }
 
     @Override
-    protected List<Object> getCommandConfigurationBeans() {
+    public List<Object> getCommandConfigurationBeans() {
         return Arrays.asList(configuration,
                 mongoDbConfiguration,
                 tlsConfiguration,

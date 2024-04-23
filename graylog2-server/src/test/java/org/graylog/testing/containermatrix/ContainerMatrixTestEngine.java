@@ -25,7 +25,7 @@ import org.graylog.testing.completebackend.MavenProjectDirProvider;
 import org.graylog.testing.completebackend.PluginJarsProvider;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog2.storage.SearchVersion;
-import org.jetbrains.annotations.NotNull;
+import jakarta.annotation.Nonnull;
 import org.junit.jupiter.engine.config.CachingJupiterConfiguration;
 import org.junit.jupiter.engine.config.DefaultJupiterConfiguration;
 import org.junit.jupiter.engine.config.JupiterConfiguration;
@@ -215,7 +215,7 @@ public class ContainerMatrixTestEngine extends ContainerMatrixHierarchicalTestEn
         return engineDescriptor;
     }
 
-    @NotNull
+    @Nonnull
     private Stream<ContainerMatrixTestsDescriptor> testClassToDescriptors(Class<?> clazz, ContainerMatrixEngineDescriptor engineDescriptor) {
         final ContainerMatrixTestsConfiguration annotation = clazz.getAnnotation(ContainerMatrixTestsConfiguration.class);
         final Class<? extends MavenProjectDirProvider> mavenProjectDirProvider = annotation.mavenProjectDirProvider();

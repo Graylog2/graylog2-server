@@ -56,6 +56,7 @@ import type { WidgetMapping } from 'views/logic/views/types';
 import type Parameter from 'views/logic/parameters/Parameter';
 import type { UndoRedoState } from 'views/logic/slices/undoRedoSlice';
 import type { SearchExecutors } from 'views/logic/slices/searchExecutionSlice';
+import type { JobIds } from 'views/stores/SearchJobs';
 import type { FilterComponents, Attributes } from 'views/components/widgets/overview-configuration/filters/types';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> =
@@ -395,11 +396,13 @@ export type SearchExecutionResult = {
   widgetMapping: WidgetMapping,
 };
 
+export type JobIdsState = JobIds | null;
 export interface SearchExecution {
   executionState: SearchExecutionState;
   result: SearchExecutionResult;
   isLoading: boolean;
   widgetsToSearch: Array<string>,
+  jobIds?: JobIds | null,
 }
 
 export interface SearchMetadataState {
