@@ -34,6 +34,7 @@ jest.mock('stores/configurations/ConfigurationsStore', () => ({
 }));
 
 jest.mock('hooks/useCurrentUser');
+jest.mock('hooks/useHotkey', () => jest.fn());
 
 describe('TimeRangeFilter', () => {
   beforeEach(() => {

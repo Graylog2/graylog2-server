@@ -18,7 +18,7 @@ package org.graylog.datanode.configuration;
 
 import org.assertj.core.api.Assertions;
 import org.graylog.datanode.OpensearchDistribution;
-import org.jetbrains.annotations.NotNull;
+import jakarta.annotation.Nonnull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -95,7 +95,7 @@ class OpensearchDistributionProviderTest {
         Assertions.assertThat(dist.architecture()).isEqualTo(OpensearchArchitecture.x64);
     }
 
-    @NotNull
+    @Nonnull
     private OpensearchDistributionProvider provider(Path dir, OpensearchArchitecture arch) {
         return new OpensearchDistributionProvider(dir, arch);
     }
