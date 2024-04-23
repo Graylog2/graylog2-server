@@ -22,7 +22,8 @@ import java.util.List;
 /**
  * Comparator of lists of strings, with following features:
  * - shorter lists always come before longer lists,
- * - if lists have the same sizes, the first non-equal element decides which list goes first.
+ * - if lists have the same sizes, the first non-equal element decides which list goes first,
+ * - comparison of elements is case-insensitive.
  */
 public class ListOfStringsComparator implements Comparator<List<String>> {
 

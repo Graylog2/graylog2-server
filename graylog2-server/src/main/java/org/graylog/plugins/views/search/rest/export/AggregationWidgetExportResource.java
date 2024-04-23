@@ -46,7 +46,7 @@ public class AggregationWidgetExportResource extends RestResource {
 
     @ApiOperation(value = "Export widget data")
     @POST
-    @NoAuditEvent("") //TODO: do we need an audit event for widget data export???
+    @NoAuditEvent("Exporting widget data does not need audit event")
     @Produces({MoreMediaTypes.TEXT_CSV, MediaType.APPLICATION_JSON})
     @Path("/{filename}")
     public Response exportData(@ApiParam @Valid PivotResult pivotResult,
