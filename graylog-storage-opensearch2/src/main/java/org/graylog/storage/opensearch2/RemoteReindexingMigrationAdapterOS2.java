@@ -17,7 +17,9 @@
 package org.graylog.storage.opensearch2;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.rholder.retry.Attempt;
 import com.github.rholder.retry.RetryException;
+import com.github.rholder.retry.RetryListener;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
@@ -30,11 +32,16 @@ import okhttp3.Credentials;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import org.apache.commons.lang.time.DurationFormatUtils;
+import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchException;
+import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterGetSettingsRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterGetSettingsResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
+import org.graylog.shaded.opensearch2.org.opensearch.client.ResponseException;
 import org.graylog.shaded.opensearch2.org.opensearch.client.tasks.TaskSubmissionResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.cluster.health.ClusterHealthStatus;
 import org.graylog.shaded.opensearch2.org.opensearch.common.xcontent.json.JsonXContent;
 import org.graylog.shaded.opensearch2.org.opensearch.core.common.bytes.BytesReference;
 import org.graylog.shaded.opensearch2.org.opensearch.core.xcontent.ToXContent;
@@ -42,10 +49,6 @@ import org.graylog.shaded.opensearch2.org.opensearch.core.xcontent.XContentBuild
 import org.graylog.shaded.opensearch2.org.opensearch.index.reindex.ReindexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.index.reindex.RemoteInfo;
 import org.graylog.shaded.opensearch2.org.opensearch.tasks.Task;
-import org.graylog2.cluster.nodes.DataNodeDto;
-import org.graylog2.cluster.nodes.DataNodeStatus;
-import org.graylog2.cluster.nodes.NodeDto;
-import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.datanode.RemoteReindexAllowlistEvent;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.IndexSetRegistry;
@@ -69,6 +72,8 @@ import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jakarta.annotation.Nonnull;
+
 import javax.annotation.Nullable;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -82,8 +87,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -102,7 +105,6 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
 
     private final OpenSearchClient client;
     private final OkHttpClient httpClient;
-    private final NodeService<DataNodeDto> nodeService;
     private final Indices indices;
     private final IndexSetRegistry indexSetRegistry;
     private final ClusterEventBus eventBus;
@@ -113,14 +115,12 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     @Inject
     public RemoteReindexingMigrationAdapterOS2(final OpenSearchClient client,
                                                final OkHttpClient httpClient,
-                                               final NodeService<DataNodeDto> nodeService,
                                                final Indices indices,
                                                final IndexSetRegistry indexSetRegistry,
                                                final ClusterEventBus eventBus,
                                                final ObjectMapper objectMapper, RemoteReindexMigrationService reindexMigrationService) {
         this.client = client;
         this.httpClient = httpClient;
-        this.nodeService = nodeService;
         this.indices = indices;
         this.indexSetRegistry = indexSetRegistry;
         this.eventBus = eventBus;
@@ -145,9 +145,11 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
 
     private void doStartMigration(MigrationConfiguration migration, RemoteReindexRequest request) {
         try {
-            prepareCluster(request.allowlist());
-            createIndicesInNewCluster(migration);
-            startAsyncTasks(migration, request);
+            new Thread(() -> {
+                prepareCluster(request.allowlist(), migration);
+                createIndicesInNewCluster(migration);
+                startAsyncTasks(migration, request);
+            }).start();
         } catch (Exception e) {
             LOG.error("Failed to start remote reindex migration", e);
             throw new RuntimeException(e);
@@ -164,21 +166,18 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         });
     }
 
-    private void prepareCluster(String allowlistAsString) {
+    private void prepareCluster(String allowlistAsString, MigrationConfiguration migration) {
         Preconditions.checkArgument(allowlistAsString != null, "Allowlist has to be provided in the request.");
-        final var activeNodes = getAllActiveNodeIDs();
         List<String> allowlist = Arrays.stream(allowlistAsString.split(",")).map(String::trim).toList();
-        try {
-            verifyRemoteReindexAllowlistSetting(allowlist);
-        } catch (RemoteReindexNotAllowedException e) {
+        if (!isRemoteReindexAllowed(allowlist)) {
             // this is expected state for fresh datanode cluster - there is no value configured in the reindex.remote.allowlist
             // we have to add it to the configuration and wait till the whole cluster restarts
+            logInfo(migration, "Preparing cluster for remote reindexing, setting allowlist to: " + allowlistAsString);
             allowReindexingFrom(allowlist);
-            waitForClusterRestart(activeNodes);
+            waitForClusterRestart(allowlist, migration);
+        } else {
+            logInfo(migration, "Remote reindex allowlist already configured, skipping cluster configuration and restart.");
         }
-
-        // verify again, just to be sure that all the configuration is in place and vali
-        verifyRemoteReindexAllowlistSetting(allowlist);
     }
 
     private ReindexRequest createReindexRequest(final String index, final BytesReference query, URI uri, String username, String password, MigrationConfiguration migration) {
@@ -196,7 +195,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
                     final List<RemoteReindexIndex> indices = migrationConfiguration.indices()
                             .parallelStream()
                             .map(indexConfig -> indexConfig.taskId().flatMap(this::getTask).map(task -> taskToIndex(indexConfig.indexName(), task))
-                                    .orElse(RemoteReindexIndex.notStartedYet(indexConfig.indexName())))
+                                    .orElse(RemoteReindexIndex.noBackgroundTaskYet(indexConfig.indexName())))
                             .sorted(Comparator.comparing(RemoteReindexIndex::name))
                             .collect(Collectors.toList());
                     return new RemoteReindexMigration(migrationID, indices, migrationConfiguration.logs());
@@ -217,7 +216,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
                 return new RemoteReindexIndex(indexName, Status.FINISHED, created, duration, progress, null);
             }
         } else {
-            return new RemoteReindexIndex(indexName, Status.RUNNING, created, duration,progress, null);
+            return new RemoteReindexIndex(indexName, Status.RUNNING, created, duration, progress, null);
         }
     }
 
@@ -245,60 +244,61 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         }
     }
 
-    public void verifyRemoteReindexAllowlistSetting(List<String> allowlistEntries) throws RemoteReindexNotAllowedException {
+    private boolean isRemoteReindexAllowed(List<String> allowlistEntries) {
         final String allowlistSettingValue = client.execute((restHighLevelClient, requestOptions) -> {
             final ClusterGetSettingsRequest request = new ClusterGetSettingsRequest();
             request.includeDefaults(true);
             final ClusterGetSettingsResponse settings = restHighLevelClient.cluster().getSettings(request, requestOptions);
             return settings.getSetting("reindex.remote.allowlist");
         });
-
         // the value is not proper json, just something like [localhost:9201]. It should be safe to simply use String.contains,
         // but there is maybe a chance for mismatches and then we'd have to parse the value
-        final boolean isRemoteReindexAllowed = !allowlistEntries.stream().allMatch(entry -> allowlistSettingValue.contains(entry));
-        if (isRemoteReindexAllowed) {
-            final String message = "Failed to configure reindex.remote.allowlist setting in the datanode cluster. Current setting value: " + allowlistSettingValue;
-            LOG.error(message);
-            throw new RemoteReindexNotAllowedException(message);
-        }
+        return allowlistEntries.stream().allMatch(allowlistSettingValue::contains);
     }
 
-    private Set<String> getAllActiveNodeIDs() {
-        return nodeService.allActive().values().stream()
-                .filter(dn -> dn.getDataNodeStatus() == DataNodeStatus.AVAILABLE) // we have to wait till the datanode is not just alive but all started properly and the indexer accepts connections
-                .map(NodeDto::getNodeId).collect(Collectors.toSet());
-    }
-
-    private void waitForClusterRestart(final Set<String> expectedNodes) {
-        // We are currently unable to detect that datanodes stopped and are starting again. We just hope that
-        // these 10 seconds give them enough time and they will restart the opensearch process in the background
-        // after 10s we'll wait till all the previously known nodes are up and healthy again.
-        try {
-            Thread.sleep(10 * 1000);
-        } catch (InterruptedException e) {
-            LOG.warn("Could not sleep...");
-        }
-
-        final var retryer = RetryerBuilder.<Boolean>newBuilder()
+    private void waitForClusterRestart(List<String> allowlist, MigrationConfiguration migration) {
+        final var retryer = RetryerBuilder.<RemoteReindexConfigurationStatus>newBuilder()
                 .withWaitStrategy(WaitStrategies.fixedWait(WAIT_BETWEEN_CONNECTION_ATTEMPTS, TimeUnit.SECONDS))
                 .withStopStrategy(StopStrategies.stopAfterAttempt(CONNECTION_ATTEMPTS))
-                .retryIfResult(response -> !response)
+                .withRetryListener(createClusterRestartWaitListener(migration))
                 .retryIfException()
+                .retryIfResult(status -> !status.isClusterReady())
                 .build();
-
-        final Callable<Boolean> callable = () -> getAllActiveNodeIDs().containsAll(expectedNodes);
-
         try {
-            var successful = retryer.call(callable);
-            if (!successful) {
-                final String message = "Cluster failed to restart after " + CONNECTION_ATTEMPTS * WAIT_BETWEEN_CONNECTION_ATTEMPTS + " seconds.";
-                LOG.error(message);
-                throw new IllegalStateException(message);
-            }
+            retryer.call(() -> remoteReindexClusterState(allowlist));
+            logInfo(migration, "Datanode cluster successfully reconfigured and restarted.");
         } catch (ExecutionException | RetryException e) {
-            final String message = "Cluster failed to restart: " + e.getMessage();
-            LOG.error(message, e);
+            final String message = "Cluster failed to restart after " + CONNECTION_ATTEMPTS * WAIT_BETWEEN_CONNECTION_ATTEMPTS + " seconds.";
+            logError(migration, message, e);
             throw new RuntimeException(message);
+        }
+    }
+
+    @Nonnull
+    private RetryListener createClusterRestartWaitListener(MigrationConfiguration migration) {
+        return new RetryListener() {
+            @Override
+            public <V> void onRetry(Attempt<V> attempt) {
+                if (attempt.hasResult()) {
+                    final RemoteReindexConfigurationStatus status = (RemoteReindexConfigurationStatus) attempt.getResult();
+                    final String message = String.format(Locale.ROOT, "Waiting for datanode cluster to reconfigure and restart, attempt %d. Cluster health: %s, allowlist configured: %b.", attempt.getAttemptNumber(), status.status(), status.allowlistConfigured());
+                    logInfo(migration, message);
+                } else {
+                    logInfo(migration, "Waiting for datanode cluster to reconfigure and restart, attempt #" + attempt.getAttemptNumber());
+                }
+            }
+        };
+    }
+
+    private RemoteReindexConfigurationStatus remoteReindexClusterState(List<String> allowlist) {
+        final ClusterHealthResponse clusterHealth = client.execute((restHighLevelClient, requestOptions) -> restHighLevelClient.cluster().health(new ClusterHealthRequest(), RequestOptions.DEFAULT));
+        final boolean remoteReindexAllowed = isRemoteReindexAllowed(allowlist);
+        return new RemoteReindexConfigurationStatus(remoteReindexAllowed, clusterHealth.getStatus());
+    }
+
+    private record RemoteReindexConfigurationStatus(boolean allowlistConfigured, ClusterHealthStatus status) {
+        private boolean isClusterReady() {
+            return allowlistConfigured && status.equals(ClusterHealthStatus.GREEN);
         }
     }
 
@@ -393,18 +393,27 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     }
 
     private Optional<GetTaskResponse> getTask(String taskID) {
-        final Response taskResponse = client.execute((restHighLevelClient, requestOptions) -> restHighLevelClient.getLowLevelClient().performRequest(
-                new org.graylog.shaded.opensearch2.org.opensearch.client.Request("GET", "_tasks/" + taskID)
-        ));
+        try {
+            final Response taskResponse = client.execute((restHighLevelClient, requestOptions) -> restHighLevelClient.getLowLevelClient().performRequest(
+                    new org.graylog.shaded.opensearch2.org.opensearch.client.Request("GET", "_tasks/" + taskID)
+            ));
 
-        if (taskResponse.getStatusLine().getStatusCode() == 404) {
-            return Optional.empty();
-        }
+            if (taskResponse.getStatusLine().getStatusCode() == 404) {
+                return Optional.empty();
+            }
 
-        try (InputStream is = taskResponse.getEntity().getContent()) {
-            return Optional.of(objectMapper.readValue(is, GetTaskResponse.class));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            try (InputStream is = taskResponse.getEntity().getContent()) {
+                return Optional.of(objectMapper.readValue(is, GetTaskResponse.class));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        } catch (OpenSearchException e) {
+            if (e.getCause() != null && e.getCause() instanceof ResponseException responseException) {
+                if (responseException.getResponse().getStatusLine().getStatusCode() == 404) {
+                    return Optional.empty();
+                }
+            }
+            throw e;
         }
     }
 

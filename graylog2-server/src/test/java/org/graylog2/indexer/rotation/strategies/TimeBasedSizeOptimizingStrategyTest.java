@@ -28,7 +28,7 @@ import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.common.IndexRotator;
 import org.graylog2.indexer.rotation.common.IndexRotator.Result;
 import org.graylog2.plugin.system.NodeId;
-import org.jetbrains.annotations.NotNull;
+import jakarta.annotation.Nonnull;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Days;
@@ -196,7 +196,7 @@ class TimeBasedSizeOptimizingStrategyTest {
         assertThat(result.shouldRotate()).isEqualTo(false);
     }
 
-    @NotNull
+    @Nonnull
     private TimeBasedSizeOptimizingStrategy createStrategy() {
         IndexRotator indexRotator = new IndexRotator(indices, auditEventSender, nodeId);
         return new TimeBasedSizeOptimizingStrategy(indices, elasticsearchConfiguration, clock, indexRotator);

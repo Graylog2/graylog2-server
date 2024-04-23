@@ -19,7 +19,7 @@ package org.graylog.datanode.initializers;
 import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.core.MultivaluedHashMap;
 import org.glassfish.jersey.server.ContainerRequest;
-import org.jetbrains.annotations.NotNull;
+import jakarta.annotation.Nonnull;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -45,7 +45,7 @@ class DatanodeAuthFilterTest {
         Mockito.verify(request, Mockito.never()).abortWith(Mockito.any());
     }
 
-    @NotNull
+    @Nonnull
     private static AuthTokenValidator tokenValidator(String expectedTokenValue) {
         return token -> {
             if (!expectedTokenValue.equals(token)) {
