@@ -111,8 +111,8 @@ function Editor({ id, value, height, readOnly, onChange, onFullMode }: Props) {
             <SourceCodeEditor id={id ?? 'md-editor'}
                               mode="markdown"
                               theme="light"
-                              toolbar={false}
-                              resizable={false}
+                              toolbar="false"
+                              resizable="false"
                               readOnly={readOnly}
                               height={height}
                               value={localValue}
