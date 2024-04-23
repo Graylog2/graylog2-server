@@ -75,7 +75,7 @@
             <outputDirectory>.</outputDirectory>
         </file>
         <file>
-            <source>${project.basedir}/../misc/datanode.conf</source>
+            <source>${project.build.directory}/datanode.conf.example</source>
             <destName>datanode.conf.example</destName>
             <outputDirectory>.</outputDirectory>
         </file>

@@ -654,6 +654,34 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <executions>
                     <execution>
+                        <id>generate-csv-docs</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>org.graylog.datanode.docs.GenerateConfigDocumentation</mainClass>
+                            <arguments>
+                                <argument>csv</argument>
+                                <argument>${project.build.directory}/datanode-conf-docs.csv</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-conf-example</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>org.graylog.datanode.docs.GenerateConfigDocumentation</mainClass>
+                            <arguments>
+                                <argument>conf</argument>
+                                <argument>${project.build.directory}/datanode.conf.example</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>install-required-opensearch-plugins-x64</id>
                         <phase>prepare-package</phase>
                         <goals>
