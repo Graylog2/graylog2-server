@@ -16,7 +16,7 @@
  */
 package org.graylog.datanode.rest;
 
-import org.graylog.datanode.management.OpensearchProcess;
+import org.graylog.datanode.opensearch.OpensearchProcess;
 
 import jakarta.inject.Inject;
 

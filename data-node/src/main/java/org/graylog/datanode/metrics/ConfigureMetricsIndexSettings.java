@@ -21,11 +21,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.graylog.datanode.Configuration;
-import org.graylog.datanode.management.OpensearchProcess;
+import org.graylog.datanode.opensearch.OpensearchProcess;
+import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
+import org.graylog.datanode.opensearch.statemachine.OpensearchState;
+import org.graylog.datanode.opensearch.statemachine.tracer.StateMachineTracer;
 import org.graylog.datanode.periodicals.MetricsCollector;
-import org.graylog.datanode.process.ProcessEvent;
-import org.graylog.datanode.process.ProcessState;
-import org.graylog.datanode.process.StateMachineTracer;
 import org.graylog.storage.opensearch2.DataStreamAdapterOS2;
 import org.graylog.storage.opensearch2.ism.IsmApi;
 import org.graylog2.cluster.nodes.DataNodeDto;
@@ -69,12 +69,12 @@ public class ConfigureMetricsIndexSettings implements StateMachineTracer {
     }
 
     @Override
-    public void trigger(ProcessEvent trigger) {
+    public void trigger(OpensearchEvent trigger) {
     }
 
     @Override
-    public void transition(ProcessEvent trigger, ProcessState source, ProcessState destination) {
-        if (destination == ProcessState.AVAILABLE && source == ProcessState.STARTING) {
+    public void transition(OpensearchEvent trigger, OpensearchState source, OpensearchState destination) {
+        if (destination == OpensearchState.AVAILABLE && source == OpensearchState.STARTING) {
             process.openSearchClient().ifPresent(client -> {
                 final IsmApi ismApi = new IsmApi(client, objectMapper);
                 int replicas = nodeService.allActive().size() == 1 ? 0 : 1;

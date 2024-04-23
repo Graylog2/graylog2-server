@@ -179,6 +179,14 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
                 .orElseThrow(() -> new IllegalArgumentException("Search " + id() + " doesn't have a query for search type " + searchTypeId));
     }
 
+    public Search withReferenceDate(DateTime now) {
+        return toBuilder()
+                .queries(queries().stream()
+                        .map(q -> q.withReferenceDate(now))
+                        .collect(ImmutableSet.toImmutableSet()))
+                .build();
+    }
+
 
     @AutoValue.Builder
     @JsonPOJOBuilder(withPrefix = "")

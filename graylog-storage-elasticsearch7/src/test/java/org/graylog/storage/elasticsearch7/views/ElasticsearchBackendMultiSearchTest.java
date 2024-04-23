@@ -38,15 +38,11 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
 public class ElasticsearchBackendMultiSearchTest extends ElasticsearchBackendGeneratedRequestTestBase {
     @Rule
@@ -91,12 +87,10 @@ public class ElasticsearchBackendMultiSearchTest extends ElasticsearchBackendGen
     @Test
     public void everySearchTypeGeneratesOneESQuery() throws Exception {
         final MultiSearchResponse response = TestMultisearchResponse.fromFixture("successfulMultiSearchResponse.json");
-        final List<MultiSearchResponse.Item> items = Arrays.stream(response.getResponses())
-                .collect(Collectors.toList());
-        when(client.msearch(any(), any())).thenReturn(items);
+        mockCancellableMSearch(response);
 
         final ESGeneratedQueryContext queryContext = createContext(query);
-        final List<SearchRequest> generatedRequest = run(searchJob, query, queryContext, Collections.emptySet());
+        final List<SearchRequest> generatedRequest = run(searchJob, query, queryContext);
 
         assertThat(generatedRequest).hasSize(2);
     }
@@ -104,9 +98,7 @@ public class ElasticsearchBackendMultiSearchTest extends ElasticsearchBackendGen
     @Test
     public void multiSearchResultsAreAssignedToSearchTypes() throws Exception {
         final MultiSearchResponse response = TestMultisearchResponse.fromFixture("successfulMultiSearchResponse.json");
-        final List<MultiSearchResponse.Item> items = Arrays.stream(response.getResponses())
-                .collect(Collectors.toList());
-        when(client.msearch(any(), any())).thenReturn(items);
+        mockCancellableMSearch(response);
 
         final ESGeneratedQueryContext queryContext = createContext(query);
         final QueryResult queryResult = this.elasticsearchBackend.doRun(searchJob, query, queryContext);
@@ -133,9 +125,7 @@ public class ElasticsearchBackendMultiSearchTest extends ElasticsearchBackendGen
         final ESGeneratedQueryContext queryContext = createContext(query);
 
         final MultiSearchResponse response = TestMultisearchResponse.fromFixture("partiallySuccessfulMultiSearchResponse.json");
-        final List<MultiSearchResponse.Item> items = Arrays.stream(response.getResponses())
-                .collect(Collectors.toList());
-        when(client.msearch(any(), any())).thenReturn(items);
+        mockCancellableMSearch(response);
 
         final QueryResult queryResult = this.elasticsearchBackend.doRun(searchJob, query, queryContext);
 

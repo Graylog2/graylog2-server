@@ -16,18 +16,17 @@
  */
 package org.graylog.plugins.views;
 
-import au.com.bytecode.opencsv.CSVParser;
+import  au.com.bytecode.opencsv.CSVParser;
 import io.restassured.http.Header;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.ValidatableResponse;
-import org.graylog.plugins.views.search.rest.scriptingapi.ScriptingApiModule;
+import jakarta.ws.rs.core.MediaType;
 import org.graylog.testing.completebackend.apis.GraylogApiResponse;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.apis.Sharing;
 import org.graylog.testing.completebackend.apis.SharingRequest;
 import org.graylog.testing.completebackend.apis.Streams;
 import org.graylog.testing.completebackend.apis.Users;
-import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
@@ -37,8 +36,6 @@ import org.hamcrest.Matchers;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
-
-import jakarta.ws.rs.core.MediaType;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -58,8 +55,7 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.hasEntry;
 
 @ContainerMatrixTestsConfiguration(serverLifecycle = CLASS,
-                                   searchVersions = {SearchServer.ES7, SearchServer.OS2},
-                                   enabledFeatureFlags = ScriptingApiModule.FEATURE_FLAG)
+                                   searchVersions = {SearchServer.ES7, SearchServer.OS2})
 public class ScriptingApiResourceIT {
 
     public static final String DEFAULT_STREAM = "000000000000000000000001";

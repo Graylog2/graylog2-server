@@ -16,6 +16,6 @@
  */
 package org.graylog.datanode.rest;
 
-import org.graylog.datanode.process.OpensearchInfo;
+import org.graylog.datanode.opensearch.OpensearchInfo;
 
 public record StatusResponse(String opensearchVersion, OpensearchInfo node) {}

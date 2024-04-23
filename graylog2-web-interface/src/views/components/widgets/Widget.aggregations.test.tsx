@@ -47,6 +47,7 @@ import FieldTypesContext from '../contexts/FieldTypesContext';
 const testTimeout = applyTimeoutMultiplier(60000);
 const mockedUnixTime = 1577836800000; // 2020-01-01 00:00:00.000
 
+jest.mock('hooks/useHotkey', () => jest.fn());
 jest.mock('./WidgetHeader', () => 'widget-header');
 jest.mock('./WidgetColorContext', () => ({ children }) => children);
 jest.mock('views/logic/fieldtypes/useFieldTypes');
