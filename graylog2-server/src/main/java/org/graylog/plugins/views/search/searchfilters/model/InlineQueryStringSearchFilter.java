@@ -22,10 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog2.contentpacks.EntityDescriptorIds;
-import org.graylog2.contentpacks.exceptions.ContentPackException;
-import org.graylog2.contentpacks.model.entities.SearchFilterEntity;
-import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
@@ -40,10 +36,8 @@ public abstract class InlineQueryStringSearchFilter implements UsedSearchFilter,
     public abstract String title();
 
     @JsonProperty(ID_FIELD)
-    public abstract String id();
-
-    @JsonProperty(TYPE)
-    public abstract String type();
+    @JsonInclude(JsonInclude.Include.NON_ABSENT)
+    public abstract Optional<String> id();
 
     @JsonProperty(DESCRIPTION_FIELD)
     @Nullable
@@ -78,10 +72,7 @@ public abstract class InlineQueryStringSearchFilter implements UsedSearchFilter,
         public abstract Builder title(String title);
 
         @JsonProperty(ID_FIELD)
-        public abstract Builder id(String id);
-
-        @JsonProperty(TYPE)
-        public abstract Builder type(String type);
+        public abstract Builder id(@Nullable String id);
 
         @JsonProperty(DESCRIPTION_FIELD)
         public abstract Builder description(String description);
@@ -105,8 +96,4 @@ public abstract class InlineQueryStringSearchFilter implements UsedSearchFilter,
         public abstract InlineQueryStringSearchFilter build();
     }
 
-    @Override
-    public SearchFilterEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
-        throw new ContentPackException("Inline search filters cannot be used with content pack entities.");
-    }
 }

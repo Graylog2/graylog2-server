@@ -16,13 +16,9 @@
  */
 package org.graylog.plugins.views.search.searchfilters.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import org.graylog2.contentpacks.EntityDescriptorIds;
-import org.graylog2.contentpacks.model.entities.SearchFilterEntity;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonTypeInfo(
@@ -46,16 +42,7 @@ public interface UsedSearchFilter {
     String INLINE_QUERY_STRING_SEARCH_FILTER = "inlineQueryString";
     String REFERENCED_SEARCH_FILTER = "referenced";
 
-    @JsonProperty(ID_FIELD)
-    String id();
-
-    @JsonProperty(TYPE)
-    String type();
-
     boolean negation();
 
     boolean disabled();
-
-    @JsonIgnore
-    SearchFilterEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds);
 }
