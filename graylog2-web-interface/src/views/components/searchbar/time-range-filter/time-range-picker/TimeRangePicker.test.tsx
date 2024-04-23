@@ -28,6 +28,7 @@ import { adminUser } from 'fixtures/users';
 import OriginalTimeRangePicker from './TimeRangePicker';
 
 jest.mock('hooks/useCurrentUser');
+jest.mock('hooks/useHotkey', () => jest.fn());
 jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
 
 jest.mock('stores/tools/ToolsStore', () => ({
