@@ -49,6 +49,10 @@ import useLocation from 'routing/useLocation';
 import useParameters from 'views/hooks/useParameters';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import ExtractWidgetIntoNewView from 'views/logic/views/ExtractWidgetIntoNewView';
+import AggregationWidgetExportDropdown from 'views/components/widgets/AggregationWidgetExportDropdown';
+import type { Extension, Result } from 'util/AggregationWidgetExportUtils';
+import { exportWidget } from 'util/AggregationWidgetExportUtils';
+import useWidgetResults from 'views/components/useWidgetResults';
 
 import ReplaySearchButton from './ReplaySearchButton';
 import ExtraWidgetActions from './ExtraWidgetActions';
@@ -154,6 +158,7 @@ const WidgetActionsMenu = ({
 }: Props) => {
   const widget = useContext(WidgetContext);
   const view = useView();
+  const { error: errors, widgetData: widgetResult } = useWidgetResults(widget.id);
   const { query, timerange, streams } = useContext(DrilldownContext);
   const { setWidgetFocusing, unsetWidgetFocusing } = useContext(WidgetFocusContext);
   const [showCopyToDashboard, setShowCopyToDashboard] = useState(false);
@@ -222,6 +227,14 @@ const WidgetActionsMenu = ({
     return setWidgetFocusing(widget.id);
   }, [pathname, sendTelemetry, setWidgetFocusing, widget.id]);
 
+  const onExportAggregationWidget = useCallback((extension: Extension) => {
+    const widgetTitle = view.getWidgetTitleByWidget(widget);
+
+    return exportWidget(widgetTitle, (widgetResult as {chart: Result}).chart as Result, extension);
+  }, [view, widget, widgetResult]);
+
+  const showExportAggregationWidgetAction = widgetResult && widget.type === 'AGGREGATION' && !errors?.length;
+
   return (
     <Container className="widget-actions-menu">
       <IfInteractive>
@@ -232,6 +245,18 @@ const WidgetActionsMenu = ({
                               parameterBindings={parameterBindings}
                               parameters={parameters} />
         </IfDashboard>
+        {
+          showExportAggregationWidgetAction && (
+            <AggregationWidgetExportDropdown>
+              <MenuItem onSelect={() => onExportAggregationWidget('csv')}>
+                CSV
+              </MenuItem>
+              <MenuItem onSelect={() => onExportAggregationWidget('json')}>
+                JSON
+              </MenuItem>
+            </AggregationWidgetExportDropdown>
+          )
+        }
         {isFocused && (
           <IconButton name="fullscreen_exit"
                       title="Un-focus widget"

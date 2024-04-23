@@ -24,17 +24,18 @@ import StopPropagation from 'views/components/common/StopPropagation';
 type Props = {
   children: React.ReactNode,
   element: React.ReactNode,
-  'data-testid'?: string
+  'data-testid'?: string,
+  header?: string,
 };
 
-const ActionDropdown = ({ children, element, 'data-testid': dataTestid }: Props) => (
+const ActionDropdown = ({ children, element, 'data-testid': dataTestid, header }: Props) => (
   <StopPropagation data-testid={dataTestid}>
     <Menu position="bottom" withinPortal>
       <Menu.Target>
         {element}
       </Menu.Target>
       <Menu.Dropdown>
-        <MenuItem header>Actions</MenuItem>
+        <MenuItem header>{header}</MenuItem>
         {children}
       </Menu.Dropdown>
     </Menu>
@@ -49,6 +50,7 @@ ActionDropdown.propTypes = {
 
 ActionDropdown.defaultProps = {
   'data-testid': undefined,
+  header: 'Action',
 };
 
 export default ActionDropdown;
