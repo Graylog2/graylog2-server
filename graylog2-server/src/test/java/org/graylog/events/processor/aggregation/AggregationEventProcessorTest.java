@@ -19,6 +19,7 @@ package org.graylog.events.processor.aggregation;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import jakarta.annotation.Nonnull;
 import org.graylog.events.conditions.Expr;
 import org.graylog.events.event.Event;
 import org.graylog.events.event.EventFactory;
@@ -52,7 +53,6 @@ import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamMock;
 import org.graylog2.streams.StreamService;
-import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
@@ -62,7 +62,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -234,7 +233,7 @@ public class AggregationEventProcessorTest {
                 .build();
 
         final EventQuerySearchTypeSupplier queryModifier = new EventQuerySearchTypeSupplier() {
-            @NotNull
+            @Nonnull
             @Override
             public Set<SearchType> additionalSearchTypes(EventDefinition eventDefinition) {
                 fail("Should not be called in this test, we only look at the result in isolation");

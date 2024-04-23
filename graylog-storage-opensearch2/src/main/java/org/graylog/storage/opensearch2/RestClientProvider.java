@@ -32,7 +32,7 @@ import org.graylog2.configuration.RunsWithDataNode;
 import org.graylog2.security.IndexerJwtAuthTokenProvider;
 import org.graylog2.security.TrustManagerAndSocketFactoryProvider;
 import org.graylog2.system.shutdown.GracefulShutdownService;
-import org.jetbrains.annotations.NotNull;
+import jakarta.annotation.Nonnull;
 
 import java.net.URI;
 import java.util.List;
@@ -69,7 +69,7 @@ public class RestClientProvider implements Provider<RestHighLevelClient> {
     }
 
 
-    @NotNull
+    @Nonnull
     private RestHighLevelClient createClient(List<URI> hosts) {
         final RestHighLevelClient client = buildBasicRestClient(hosts);
 
