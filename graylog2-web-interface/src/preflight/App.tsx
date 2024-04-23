@@ -29,10 +29,12 @@ const App = () => {
   return (
     <AppShell padding="md" header={{ height: 80 }}>
       <Navigation />
-      <ErrorBoundary>
-        {!isWaitingForStartup && <Setup setIsWaitingForStartup={setIsWaitingForStartup} />}
-        {isWaitingForStartup && <WaitingForStartup />}
-      </ErrorBoundary>
+      <AppShell.Main>
+        <ErrorBoundary>
+          {!isWaitingForStartup && <Setup setIsWaitingForStartup={setIsWaitingForStartup} />}
+          {isWaitingForStartup && <WaitingForStartup />}
+        </ErrorBoundary>
+      </AppShell.Main>
     </AppShell>
   );
 };

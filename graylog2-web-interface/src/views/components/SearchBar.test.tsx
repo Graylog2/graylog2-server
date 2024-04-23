@@ -31,6 +31,7 @@ import useSearchConfiguration from 'hooks/useSearchConfiguration';
 
 import OriginalSearchBar from './SearchBar';
 
+jest.mock('hooks/useHotkey', () => jest.fn());
 jest.mock('views/logic/fieldtypes/useFieldTypes');
 
 jest.mock('stores/streams/StreamsStore', () => MockStore(
