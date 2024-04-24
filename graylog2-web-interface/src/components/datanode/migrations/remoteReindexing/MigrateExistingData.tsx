@@ -159,7 +159,7 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
                  required />
           {(availableIndices.length > 0) && (
             <Alert title="Valid connection" bsStyle="success">
-              These are the available <b>{availableIndices.length}</b> indices for the remote reindex migration:
+              Below are the available indices for the remote reindex migration, <b>{selectedIndices.length}/{availableIndices.length}</b> are selected.
               <IndicesContainer>
                 {availableIndices.map((index) => (
                   <Input type="checkbox"
