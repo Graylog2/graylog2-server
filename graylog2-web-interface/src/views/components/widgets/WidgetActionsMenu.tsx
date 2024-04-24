@@ -170,6 +170,11 @@ const WidgetActionsMenu = ({
   const sendTelemetry = useSendTelemetry();
   const { parameters, parameterBindings } = useParameters();
 
+  const supportedAggregationExportFormats: Array<{id: Extension, title: string}> = [
+    { id: 'csv', title: 'CSV' },
+    { id: 'json', title: 'JSON' },
+  ];
+
   const onDuplicate = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.DUPLICATE, {
       app_pathname: getPathnameWithoutId(pathname),
@@ -248,12 +253,13 @@ const WidgetActionsMenu = ({
         {
           showExportAggregationWidgetAction && (
             <AggregationWidgetExportDropdown>
-              <MenuItem onSelect={() => onExportAggregationWidget('csv')}>
-                CSV
-              </MenuItem>
-              <MenuItem onSelect={() => onExportAggregationWidget('json')}>
-                JSON
-              </MenuItem>
+              {
+                supportedAggregationExportFormats.map(({ id, title: extensionTitle }) => (
+                  <MenuItem key={id} onSelect={() => onExportAggregationWidget(id)}>
+                    {extensionTitle}
+                  </MenuItem>
+                ))
+              }
             </AggregationWidgetExportDropdown>
           )
         }
