@@ -20,7 +20,7 @@ import { Formik, Form } from 'formik';
 import type { FormikErrors } from 'formik';
 import styled from 'styled-components';
 
-import { Alert, Input } from 'components/bootstrap';
+import { Alert, Input, Row, Col } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 
 import type { RemoteReindexRequest } from '../../hooks/useRemoteReindexMigrationStatus';
@@ -127,20 +127,26 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
                  value={values.hostname}
                  onChange={(e) => handleChange(e, setFieldValue)}
                  required />
-          <Input id="user"
-                 name="user"
-                 label="Username"
-                 type="text"
-                 disabled={isLoading}
-                 value={values.user}
-                 onChange={(e) => handleChange(e, setFieldValue)} />
-          <Input id="password"
-                 name="password"
-                 label="Password"
-                 type="password"
-                 disabled={isLoading}
-                 value={values.password}
-                 onChange={(e) => handleChange(e, setFieldValue)} />
+          <Row>
+            <Col md={6}>
+              <Input id="user"
+                     name="user"
+                     label="Username"
+                     type="text"
+                     disabled={isLoading}
+                     value={values.user}
+                     onChange={(e) => handleChange(e, setFieldValue)} />
+            </Col>
+            <Col md={6}>
+              <Input id="password"
+                     name="password"
+                     label="Password"
+                     type="password"
+                     disabled={isLoading}
+                     value={values.password}
+                     onChange={(e) => handleChange(e, setFieldValue)} />
+            </Col>
+          </Row>
           <Input id="allowlist"
                  name="allowlist"
                  label="Allowlist"
