@@ -1,0 +1,5 @@
+type="a"
+message="Adds export into csv and json actions for aggregation widget"
+
+issues=["19139"]
+pulls=["19140"]
