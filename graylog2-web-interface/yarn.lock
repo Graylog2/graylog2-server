@@ -1585,26 +1585,26 @@
   resolved "https://registry.yarnpkg.com/@csstools/selector-specificity/-/selector-specificity-3.0.2.tgz#ea61ba7bb24be3502c6aaa3190ed231f4633a81e"
   integrity sha512-RpHaZ1h9LE7aALeQXmXrJkRG84ZxIsctEN2biEUmFyKpzFM3zZ35eUMcIzZFsw/2olQE6v69+esEqU2f1MKycg==
 
-"@cyclonedx/cyclonedx-library@^5||^6":
-  version "6.4.0"
-  resolved "https://registry.yarnpkg.com/@cyclonedx/cyclonedx-library/-/cyclonedx-library-6.4.0.tgz#c1d42ae8fd544ed189d7fe5bdfef97718b5afc6f"
-  integrity sha512-+fowwJDvglwWdWKYvMxdXyu1P8BUVt8sSSpisyvZjRNq+GOM8A8mop23G+aYWcUTjUrDFD2TnMuyyDfM2XdH1g==
+"@cyclonedx/cyclonedx-library@^6.5.0":
+  version "6.5.1"
+  resolved "https://registry.yarnpkg.com/@cyclonedx/cyclonedx-library/-/cyclonedx-library-6.5.1.tgz#d7516a570fd978248843df1c36c9698f18c02d01"
+  integrity sha512-tzZwpLaOPS8ofNNyOFUDiLICGZvnO5bSPeItBoGusfzSfjT94dOYBiicAIQwtOX1eHiWhqyE8bQw81S9oE4bsA==
   dependencies:
     packageurl-js ">=0.0.6 <0.0.8 || ^1"
     spdx-expression-parse "^3.0.1 || ^4"
   optionalDependencies:
     ajv "^8.12.0"
-    ajv-formats "^2.1.1"
+    ajv-formats "^3.0.1"
     ajv-formats-draft2019 "^1.6.1"
     libxmljs2 "^0.31 || ^0.32 || ^0.33"
     xmlbuilder2 "^3.0.2"
 
 "@cyclonedx/webpack-plugin@^3.9.1":
-  version "3.9.2"
-  resolved "https://registry.yarnpkg.com/@cyclonedx/webpack-plugin/-/webpack-plugin-3.9.2.tgz#bdc8b56eafa60841b1fac54704f6a11460e567bc"
-  integrity sha512-pxUkQ94eed6G9FgcYZxOFGTjkPADCAHxfgoHBuXgQoq2fehLK8PSoGVITFykTrfDjOCowRTGVMCpkcKU8MlxTg==
+  version "3.10.0"
+  resolved "https://registry.yarnpkg.com/@cyclonedx/webpack-plugin/-/webpack-plugin-3.10.0.tgz#8d52e56e64712c348b0e7673151140a7a2052e81"
+  integrity sha512-ClZkD26QxicwBYY053g04IK6IJoElXxIpUwQ6+W5aZvjggZ8Erz/y3jJtB28PSNqPEB1kX32b0T6lKtFYspCtA==
   dependencies:
-    "@cyclonedx/cyclonedx-library" "^5||^6"
+    "@cyclonedx/cyclonedx-library" "^6.5.0"
     normalize-package-data "^3||^4||^5||^6"
     xmlbuilder2 "^3.0.2"
 
@@ -4027,6 +4027,13 @@ ajv-formats@^2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/ajv-formats/-/ajv-formats-2.1.1.tgz#6e669400659eb74973bbf2e33327180a0996b520"
   integrity sha512-Wx0Kx52hxE7C18hkMEggYlEifqWZtYaRgouJor+WMdPnQyEK13vgEWyVNup7SoeeoLMsr4kf5h6dOW11I15MUA==
+  dependencies:
+    ajv "^8.0.0"
+
+ajv-formats@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/ajv-formats/-/ajv-formats-3.0.1.tgz#3d5dc762bca17679c3c2ea7e90ad6b7532309578"
+  integrity sha512-8iUql50EUR+uUcdRQ3HDqa6EVyo3docL8g5WJ3FNcWmu62IbkGUue/pEyLBW8VGKKucTPgqeks4fIU1DA4yowQ==
   dependencies:
     ajv "^8.0.0"
 
