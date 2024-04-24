@@ -20,7 +20,7 @@ import ActionDropdown from 'views/components/common/ActionDropdown';
 import { IconButton } from 'components/common';
 
 const AggregationWidgetExportDropdown = ({ children }: React.PropsWithChildren) => {
-  const widgetActionDropdownCaret = <IconButton data-testid="aggregationWidgetExportDropdown" name="download" title="Export widget" />;
+  const widgetActionDropdownCaret = <IconButton name="download" title="Open export widget options" />;
 
   return (
     <ActionDropdown element={widgetActionDropdownCaret} header="Export to file">

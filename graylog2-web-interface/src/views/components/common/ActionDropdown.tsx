@@ -50,7 +50,7 @@ ActionDropdown.propTypes = {
 
 ActionDropdown.defaultProps = {
   'data-testid': undefined,
-  header: 'Action',
+  header: 'Actions',
 };
 
 export default ActionDropdown;

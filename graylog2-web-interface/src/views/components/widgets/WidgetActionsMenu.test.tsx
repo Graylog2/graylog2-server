@@ -40,6 +40,7 @@ import createSearch from 'views/logic/slices/createSearch';
 import { duplicateWidget, removeWidget } from 'views/logic/slices/widgetActions';
 import useViewType from 'views/hooks/useViewType';
 import fetchSearch from 'views/logic/views/fetchSearch';
+import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 
 import WidgetActionsMenu from './WidgetActionsMenu';
 
@@ -423,6 +424,30 @@ describe('<WidgetActionsMenu />', () => {
 
         console.trace = oldConsoleTrace;
         /* eslint-enable no-console */
+      });
+    });
+
+    describe('Export aggregation widget', () => {
+      it('does not display export aggregation action if widget is an aggregation', async () => {
+        const messagesWidget = MessagesWidget.builder()
+          .id('widgetId')
+          .config({})
+          .build();
+        render(<DummyWidget title="Dummy Widget" widget={messagesWidget} />);
+        const exportButton = screen.queryByRole('button', { name: /open export widget options/i });
+
+        expect(exportButton).toBeNull();
+      });
+
+      it('allows export for aggregation widget', async () => {
+        const aggregationWidget = AggregationWidget.builder()
+          .id('widgetId')
+          .config({})
+          .build();
+
+        render(<DummyWidget title="Dummy Widget" widget={aggregationWidget} />);
+
+        screen.findByRole('button', { name: /open export widget options/i });
       });
     });
   });
