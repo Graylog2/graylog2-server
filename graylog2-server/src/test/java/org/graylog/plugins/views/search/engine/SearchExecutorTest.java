@@ -113,7 +113,7 @@ public class SearchExecutorTest {
         when(searchDomain.getForUser(eq("search1"), eq(searchUser))).thenReturn(Optional.empty());
 
         assertThatExceptionOfType(NotFoundException.class)
-                .isThrownBy(() -> this.searchExecutor.executeSync("search1", searchUser, ExecutionState.empty()))
+                .isThrownBy(() -> this.searchExecutor.executeSync("search1", searchUser, searchUser, searchUser, searchUser, searchUser, ExecutionState.empty()))
                 .withMessage("No search found with id <search1>.");
     }
 
@@ -130,7 +130,7 @@ public class SearchExecutorTest {
 
         when(searchDomain.getForUser(eq("search1"), eq(searchUser))).thenReturn(Optional.of(search));
 
-        final SearchJob searchJob = this.searchExecutor.executeSync("search1", searchUser, ExecutionState.empty());
+        final SearchJob searchJob = this.searchExecutor.executeSync("search1", searchUser, searchUser, searchUser, searchUser, searchUser, ExecutionState.empty());
         assertThat(searchJob.getSearch().queries())
                 .are(new Condition<>(query -> query.usedStreamIds().equals(Collections.singleton("somestream")), "All accessible streams have been added"));
     }
@@ -149,7 +149,7 @@ public class SearchExecutorTest {
         final ExecutionState executionState = ExecutionState.builder()
                 .setGlobalOverride(ExecutionStateGlobalOverride.builder().timerange(absoluteRange).build())
                 .build();
-        this.searchExecutor.executeSync("search1", searchUser, executionState);
+        this.searchExecutor.executeSync("search1", searchUser, searchUser, searchUser, searchUser, searchUser, executionState);
 
         verify(queryEngine, times(1)).execute(searchJobCaptor.capture(), anySet(), any());
 
@@ -175,7 +175,7 @@ public class SearchExecutorTest {
         when(searchDomain.getForUser(eq("search1"), eq(searchUser))).thenReturn(Optional.of(search));
 
         assertThatExceptionOfType(MissingStreamPermissionException.class)
-                .isThrownBy(() -> this.searchExecutor.executeSync("search1", searchUser, ExecutionState.empty()));
+                .isThrownBy(() -> this.searchExecutor.executeSync("search1", searchUser, searchUser, searchUser, searchUser, searchUser, ExecutionState.empty()));
     }
 
     @Test

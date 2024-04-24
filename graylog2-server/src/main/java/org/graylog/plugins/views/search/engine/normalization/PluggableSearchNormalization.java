@@ -23,6 +23,7 @@ import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.ExecutionState;
 import org.graylog.plugins.views.search.rest.ExecutionStateGlobalOverride;
+import org.graylog.security.HasStreams;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 
@@ -67,7 +68,7 @@ public class PluggableSearchNormalization implements SearchNormalization {
     }
 
     @Override
-    public Search preValidation(Search search, SearchUser searchUser, ExecutionState executionState) {
+    public Search preValidation(Search search, HasStreams searchUser, ExecutionState executionState) {
         final Search searchWithStreams = search.addStreamsToQueriesWithoutStreams(() -> searchUser.streams().loadMessageStreamsWithFallback());
         final var now = referenceDateFromOverrideOrNow(executionState);
         final var normalizedSearch = searchWithStreams.applyExecutionState(firstNonNull(executionState, ExecutionState.empty()))
@@ -84,12 +85,12 @@ public class PluggableSearchNormalization implements SearchNormalization {
     }
 
     @Override
-    public Search postValidation(Search search, SearchUser searchUser, ExecutionState executionState) {
+    public Search postValidation(Search search, ExecutionState executionState) {
         return normalize(search, postValidationNormalizers);
     }
 
     @Override
-    public Query preValidation(final Query query, final ParameterProvider parameterProvider, SearchUser searchUser, ExecutionState executionState) {
+    public Query preValidation(final Query query, final ParameterProvider parameterProvider, HasStreams searchUser, ExecutionState executionState) {
         Query normalizedQuery = query;
         if (!query.hasStreams()) {
             normalizedQuery = query.addStreamsToFilter(searchUser.streams().loadMessageStreamsWithFallback());

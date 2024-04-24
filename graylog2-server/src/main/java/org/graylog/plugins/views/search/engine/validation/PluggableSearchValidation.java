@@ -22,6 +22,8 @@ import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchExecutionGuard;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.permissions.StreamPermissions;
+import org.graylog.security.HasPermissions;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -38,19 +40,19 @@ public class PluggableSearchValidation implements SearchValidation {
     }
 
     @Override
-    public Set<SearchError> validate(final Search search, final SearchUser searchUser) {
-        this.executionGuard.check(search, searchUser::canReadStream);
+    public Set<SearchError> validate(final Search search, final HasPermissions permissions) {
+        this.executionGuard.check(search, permissions::canReadStream);
 
         return this.pluggableSearchValidators.stream()
-                .flatMap(validator -> validator.validate(search, searchUser).stream())
+                .flatMap(validator -> validator.validate(search, permissions).stream())
                 .collect(Collectors.toSet());
     }
 
     @Override
-    public Set<SearchError> validate(final Query query, final SearchUser searchUser) {
-        this.executionGuard.checkUserIsPermittedToSeeStreams(query.streamIdsForPermissionsCheck(), searchUser::canReadStream);
+    public Set<SearchError> validate(final Query query, final HasPermissions permissions) {
+        this.executionGuard.checkUserIsPermittedToSeeStreams(query.streamIdsForPermissionsCheck(), permissions::canReadStream);
         return this.pluggableSearchValidators.stream()
-                .flatMap(validator -> validator.validate(query, searchUser).stream())
+                .flatMap(validator -> validator.validate(query, permissions).stream())
                 .collect(Collectors.toSet());
     }
 }

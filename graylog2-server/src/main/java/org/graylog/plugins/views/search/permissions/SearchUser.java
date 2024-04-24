@@ -24,6 +24,9 @@ import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewLike;
 import org.graylog.plugins.views.search.views.ViewResolver;
 import org.graylog.plugins.views.search.views.ViewResolverDecoder;
+import org.graylog.security.HasPermissions;
+import org.graylog.security.UserDetails;
+import org.graylog.security.HasStreams;
 import org.graylog.security.HasUser;
 import org.graylog2.database.DbEntity;
 import org.graylog2.plugin.database.users.User;
@@ -37,7 +40,7 @@ import java.util.Optional;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
-public class SearchUser implements SearchPermissions, StreamPermissions, ViewPermissions, EntityPermissions, HasUser {
+public class SearchUser implements SearchPermissions, StreamPermissions, ViewPermissions, EntityPermissions, HasUser, HasStreams, HasPermissions, UserDetails {
     private static final Logger LOG = LoggerFactory.getLogger(SearchUser.class);
     private final User currentUser;
     private final Predicate<String> isPermitted;
@@ -54,10 +57,12 @@ public class SearchUser implements SearchPermissions, StreamPermissions, ViewPer
         this.viewResolvers = viewResolvers;
     }
 
+    @Override
     public Optional<DateTimeZone> timeZone() {
         return Optional.ofNullable(this.currentUser.getTimeZone());
     }
 
+    @Override
     public String username() {
         return this.currentUser.getName();
     }
@@ -111,10 +116,12 @@ public class SearchUser implements SearchPermissions, StreamPermissions, ViewPer
         return DbEntity.ALL_ALLOWED.equals(readPermission) || isPermitted(readPermission, idAsString);
     }
 
+    @Override
     public boolean isPermitted(String permission) {
         return this.isPermitted.test(permission);
     }
 
+    @Override
     public boolean isPermitted(String permission, String entityId) {
         return this.isPermittedEntity.test(permission, entityId);
     }
@@ -128,6 +135,7 @@ public class SearchUser implements SearchPermissions, StreamPermissions, ViewPer
         return this.currentUser.isLocalAdmin() || isPermitted("*");
     }
 
+    @Override
     public UserStreams streams() {
         return this.userStreams;
     }

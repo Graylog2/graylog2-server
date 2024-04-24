@@ -29,8 +29,13 @@ import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.engine.normalization.SearchNormalization;
 import org.graylog.plugins.views.search.engine.validation.SearchValidation;
 import org.graylog.plugins.views.search.errors.SearchError;
+import org.graylog.plugins.views.search.permissions.SearchPermissions;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.permissions.ViewPermissions;
 import org.graylog.plugins.views.search.rest.ExecutionState;
+import org.graylog.security.HasPermissions;
+import org.graylog.security.UserDetails;
+import org.graylog.security.HasStreams;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,21 +69,29 @@ public class SearchExecutor {
         this.searchNormalization = searchNormalization;
     }
 
-    public SearchJob executeSync(String searchId, SearchUser searchUser, ExecutionState executionState) {
-        return searchDomain.getForUser(searchId, searchUser)
-                .map(s -> executeSync(s, searchUser, executionState))
+    public SearchJob executeSync(String searchId, ViewPermissions viewPermissions, SearchPermissions searchPermissions, HasPermissions permissions, HasStreams streams, UserDetails name, ExecutionState executionState) {
+        return searchDomain.getForUser(searchId, viewPermissions, searchPermissions, name)
+                .map(s -> executeSync(s, permissions, streams, name, executionState))
                 .orElseThrow(() -> new NotFoundException("No search found with id <" + searchId + ">."));
     }
 
     public SearchJob executeAsync(String searchId, SearchUser searchUser, ExecutionState executionState) {
-        return searchDomain.getForUser(searchId, searchUser)
-                .map(s -> executeAsync(s, searchUser, executionState))
+        return executeAsync(searchId, searchUser, searchUser, searchUser, searchUser, searchUser, executionState);
+    }
+
+    public SearchJob executeAsync(String searchId, ViewPermissions viewPermissions, SearchPermissions searchPermissions, HasPermissions permissions, HasStreams streams, UserDetails name, ExecutionState executionState) {
+        return searchDomain.getForUser(searchId, viewPermissions, searchPermissions, name)
+                .map(s -> executeAsync(s, permissions, streams, name, executionState))
                 .orElseThrow(() -> new NotFoundException("No search found with id <" + searchId + ">."));
     }
 
     @WithSpan
     public SearchJob executeSync(Search search, SearchUser searchUser, ExecutionState executionState) {
-        final SearchJob searchJob = prepareAndExecuteSearchJob(search, searchUser, executionState);
+        return this.executeSync(search, searchUser, searchUser, searchUser, executionState);
+    }
+
+    public SearchJob executeSync(Search search, HasPermissions permissions, HasStreams streams, UserDetails name, ExecutionState executionState) {
+        final SearchJob searchJob = prepareAndExecuteSearchJob(search, permissions, streams, name, executionState);
 
         try {
             final CompletableFuture<Void> resultFuture = searchJob.getResultFuture();
@@ -106,40 +119,46 @@ public class SearchExecutor {
     }
 
     @WithSpan
-    public SearchJob executeAsync(Search search, SearchUser searchUser, ExecutionState executionState) {
-        return prepareAndExecuteSearchJob(search, searchUser, executionState);
+    protected SearchJob executeAsync(Search search, HasPermissions permissions, HasStreams streams, UserDetails details, ExecutionState executionState) {
+        return prepareAndExecuteSearchJob(search, permissions, streams, details, executionState);
     }
 
     private SearchJob prepareAndExecuteSearchJob(final Search search,
-                                                 final SearchUser searchUser,
+                                                 HasPermissions permissions,
+                                                 HasStreams streams,
+                                                 UserDetails details,
                                                  final ExecutionState executionState) {
-        final Search preValidationSearch = searchNormalization.preValidation(search, searchUser, executionState);
+        final Search preValidationSearch = searchNormalization.preValidation(search, streams, executionState);
 
-        final Set<SearchError> validationErrors = searchValidation.validate(preValidationSearch, searchUser);
+        final Set<SearchError> validationErrors = searchValidation.validate(preValidationSearch, permissions);
 
         if (hasFatalError(validationErrors)) {
-            return searchJobWithFatalError(searchJobService.create(preValidationSearch, searchUser.username()), validationErrors);
+            return searchJobWithFatalError(searchJobService.create(preValidationSearch, details.username()), validationErrors);
         }
 
-        final Search normalizedSearch = searchNormalization.postValidation(preValidationSearch, searchUser, executionState);
-        final SearchJob searchJob = queryEngine.execute(searchJobService.create(normalizedSearch, searchUser.username()), validationErrors, searchUser.timeZone().orElse(DEFAULT_TIMEZONE));
+        final Search normalizedSearch = searchNormalization.postValidation(preValidationSearch, executionState);
+        final SearchJob searchJob = queryEngine.execute(searchJobService.create(normalizedSearch, details.username()), validationErrors, details.timeZone().orElse(DEFAULT_TIMEZONE));
         validationErrors.forEach(searchJob::addError);
         return searchJob;
     }
 
     public ExplainResults explain(String searchId, SearchUser searchUser, ExecutionState executionState) {
-        return searchDomain.getForUser(searchId, searchUser)
-                .map(s -> explain(s, searchUser, executionState))
+        return this.explain(searchId, searchUser, searchUser, searchUser, searchUser, searchUser, executionState);
+    }
+
+    public ExplainResults explain(String searchId, HasStreams searchUser, ViewPermissions viewPermissions, SearchPermissions searchPermissions, HasPermissions permissions, UserDetails name, ExecutionState executionState) {
+        return searchDomain.getForUser(searchId, viewPermissions, searchPermissions, name)
+                .map(s -> explain(s, searchUser, permissions, name, executionState))
                 .orElseThrow(() -> new NotFoundException("No search found with id <" + searchId + ">."));
     }
 
-    public ExplainResults explain(Search search, SearchUser searchUser, ExecutionState executionState) {
+    public ExplainResults explain(Search search, HasStreams searchUser, HasPermissions permissions, UserDetails details, ExecutionState executionState) {
         final Search preValidationSearch = searchNormalization.preValidation(search, searchUser, executionState);
-        final Set<SearchError> validationErrors = searchValidation.validate(preValidationSearch, searchUser);
-        final Search normalizedSearch = searchNormalization.postValidation(preValidationSearch, searchUser, executionState);
+        final Set<SearchError> validationErrors = searchValidation.validate(preValidationSearch, permissions);
+        final Search normalizedSearch = searchNormalization.postValidation(preValidationSearch, executionState);
 
-        return queryEngine.explain(searchJobService.create(normalizedSearch, searchUser.username()), validationErrors,
-                searchUser.timeZone().orElse(DEFAULT_TIMEZONE));
+        return queryEngine.explain(searchJobService.create(normalizedSearch, details.username()), validationErrors,
+                details.timeZone().orElse(DEFAULT_TIMEZONE));
     }
 
     private SearchJob searchJobWithFatalError(SearchJob searchJob, Set<SearchError> validationErrors) {

@@ -20,11 +20,12 @@ import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.security.HasPermissions;
 
 import java.util.Set;
 
 public interface SearchValidation {
-    Set<SearchError> validate(final Search search, final SearchUser searchUser);
+    Set<SearchError> validate(final Search search, final HasPermissions searchUser);
 
-    Set<SearchError> validate(final Query query, final SearchUser searchUser);
+    Set<SearchError> validate(final Query query, final HasPermissions searchUser);
 }
