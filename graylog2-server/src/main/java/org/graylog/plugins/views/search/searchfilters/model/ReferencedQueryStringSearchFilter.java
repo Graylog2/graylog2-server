@@ -109,4 +109,8 @@ public abstract class ReferencedQueryStringSearchFilter implements ReferencedSea
                 .disabled(this.disabled())
                 .build();
     }
+
+    public ReferencedSearchFilter withId(String id) {
+        return builder().id(id).build();
+    }
 }

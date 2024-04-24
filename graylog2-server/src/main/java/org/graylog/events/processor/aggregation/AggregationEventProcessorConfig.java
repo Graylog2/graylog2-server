@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.MutableGraph;
 import org.graylog.events.contentpack.entities.AggregationEventProcessorConfigEntity;
@@ -35,6 +34,7 @@ import org.graylog.events.processor.EventProcessorSchedulerConfig;
 import org.graylog.events.processor.SearchFilterableConfig;
 import org.graylog.plugins.views.search.Parameter;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
+import org.graylog.plugins.views.search.searchfilters.model.UsesSearchFilters;
 import org.graylog.plugins.views.search.searchtypes.pivot.HasField;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.scheduler.clock.JobSchedulerClock;
@@ -63,7 +63,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 @AutoValue
 @JsonTypeName(AggregationEventProcessorConfig.TYPE_NAME)
 @JsonDeserialize(builder = AggregationEventProcessorConfig.Builder.class)
-public abstract class AggregationEventProcessorConfig implements EventProcessorConfig, SearchFilterableConfig {
+public abstract class AggregationEventProcessorConfig implements EventProcessorConfig, SearchFilterableConfig, UsesSearchFilters {
     public static final String TYPE_NAME = "aggregation-v1";
 
     private static final String FIELD_QUERY = "query";
@@ -277,7 +277,7 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
         return AggregationEventProcessorConfigEntity.builder()
                 .type(type())
                 .query(ValueReference.of(query()))
-                .filters(ImmutableList.copyOf(filters()))
+                .filters(exportFilters(entityDescriptorIds))
                 .streams(streamRefs)
                 .groupBy(groupBy())
                 .series(series().stream().map(SeriesSpecEntity::fromNativeEntity).toList())
@@ -297,6 +297,7 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
                     .build();
             mutableGraph.putEdge(entityDescriptor, depStream);
         });
+        filters().forEach(filter -> filter.resolveNativeEntity(entityDescriptor, mutableGraph));
     }
 
     @Override

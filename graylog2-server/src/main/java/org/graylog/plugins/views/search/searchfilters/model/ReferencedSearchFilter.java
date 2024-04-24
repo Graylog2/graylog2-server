@@ -16,9 +16,33 @@
  */
 package org.graylog.plugins.views.search.searchfilters.model;
 
+import com.google.common.graph.MutableGraph;
+import org.graylog2.contentpacks.model.ModelId;
+import org.graylog2.contentpacks.model.ModelTypes;
+import org.graylog2.contentpacks.model.entities.Entity;
+import org.graylog2.contentpacks.model.entities.EntityDescriptor;
+import org.graylog2.contentpacks.model.entities.EntityV1;
+
+import java.util.Map;
+
 public interface ReferencedSearchFilter extends UsedSearchFilter {
 
     String id();
 
     InlineQueryStringSearchFilter toInlineRepresentation();
+
+    ReferencedSearchFilter withId(String id);
+
+    @Override
+    default void resolveForInstallation(EntityV1 parentEntity, Map<EntityDescriptor, Entity> entities, MutableGraph<Entity> graph) {
+        final Entity filterEntity = entities.get(EntityDescriptor.create(ModelId.of(id()), ModelTypes.SEARCH_FILTER_V1));
+        if (filterEntity != null) {
+            graph.putEdge(parentEntity, filterEntity);
+        }
+    }
+
+    @Override
+    default void resolveNativeEntity(EntityDescriptor entityDescriptor, MutableGraph<EntityDescriptor> mutableGraph) {
+        mutableGraph.putEdge(entityDescriptor, EntityDescriptor.create(id(), ModelTypes.SEARCH_FILTER_V1));
+    }
 }
