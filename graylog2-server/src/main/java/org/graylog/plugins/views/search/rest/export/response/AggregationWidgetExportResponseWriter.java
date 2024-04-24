@@ -61,7 +61,7 @@ public class AggregationWidgetExportResponseWriter implements MessageBodyWriter<
         }
     }
 
-    private void writeCsv(final AggregationWidgetExportResponse widgetExportResponse,
+    public static void writeCsv(final AggregationWidgetExportResponse widgetExportResponse,
                           final OutputStream outputStream) throws IOException {
         try (final CSVWriter csvWriter = new CSVWriter(new PrintWriter(outputStream, true, StandardCharsets.UTF_8))) {
 
