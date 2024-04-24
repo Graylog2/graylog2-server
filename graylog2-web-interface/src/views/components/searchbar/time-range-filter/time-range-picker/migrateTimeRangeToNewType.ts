@@ -45,23 +45,35 @@ const getDefaultAbsoluteToRange = (oldTimeRange: RelativeTimeRangeClassified | A
 };
 
 const migrationStrategies = {
-  absolute: (
+  absolute: ({
+    oldTimeRange,
+    formatTime,
+  }: {
     oldTimeRange: RelativeTimeRangeClassified | AbsoluteTimeRange | KeywordTimeRange | NoTimeRangeOverride | undefined | null,
     formatTime: (dateTime: DateTime, tz: string) => string,
+  },
   ) => ({
     type: 'absolute',
     from: formatTime(moment().subtract(getDefaultAbsoluteFromRange(oldTimeRange), 'seconds'), 'complete'),
     to: formatTime(moment().subtract(getDefaultAbsoluteToRange(oldTimeRange), 'seconds'), 'complete'),
   }),
   relative: () => ({ type: 'relative', from: classifyFromRange(DEFAULT_RELATIVE_FROM), to: RELATIVE_CLASSIFIED_ALL_TIME_RANGE }),
-  keyword: () => ({ type: 'keyword', keyword: 'Last five minutes' }),
+  keyword: ({ userTimezone }: { userTimezone: string }) => ({ type: 'keyword', keyword: 'Last five minutes', timezone: userTimezone }),
   disabled: () => undefined,
 };
 
 const migrateTimeRangeToNewType = (
-  oldTimeRange: RelativeTimeRangeClassified | AbsoluteTimeRange | KeywordTimeRange | NoTimeRangeOverride | undefined | null,
-  type: string,
-  formatTime: (dateTime: DateTime, tz: string) => string,
+  {
+    oldTimeRange,
+    type,
+    formatTime,
+    userTimezone,
+  }: {
+    oldTimeRange: RelativeTimeRangeClassified | AbsoluteTimeRange | KeywordTimeRange | NoTimeRangeOverride | undefined | null,
+    type: string,
+    formatTime: (dateTime: DateTime, tz: string) => string,
+    userTimezone: string,
+  },
 ): RelativeTimeRangeClassified | AbsoluteTimeRange | KeywordTimeRange | NoTimeRangeOverride | undefined | null => {
   const oldType = oldTimeRange && 'type' in oldTimeRange ? oldTimeRange.type : 'disabled';
 
@@ -73,7 +85,7 @@ const migrateTimeRangeToNewType = (
     throw new Error(`Invalid time range type: ${type}`);
   }
 
-  return migrationStrategies[type](oldTimeRange, formatTime);
+  return migrationStrategies[type]({ oldTimeRange, formatTime, userTimezone });
 };
 
 export default migrateTimeRangeToNewType;
