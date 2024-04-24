@@ -55,7 +55,7 @@
     "@reduxjs/toolkit": "^2.2.0",
     "@tanstack/query-sync-storage-persister": "^4.33.0",
     "@tanstack/react-query-persist-client": "^4.33.0",
-    "ace-builds": "1.32.9",
+    "ace-builds": "1.33.1",
     "bootstrap": "3.4.1",
     "bson-objectid": "^2.0.3",
     "chroma-js": "^2.0.3",

@@ -32,6 +32,9 @@ import java.util.Set;
  * which needs to happen after a `jdk.tls.disabledAlgorithms` setting is applied.
  */
 public class TLSProtocolsConfiguration {
+
+    @Documentation("allowed TLS protocols for system wide TLS enabled servers. (e.g. message inputs, http interface)." +
+            "Setting this to an empty value, leaves it up to system libraries and the used JDK to chose a default.")
     @Parameter(value = "enabled_tls_protocols", converter = StringSetConverter.class)
     private Set<String> enabledTlsProtocols = null;
 

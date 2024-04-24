@@ -20,10 +20,13 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import jakarta.ws.rs.ForbiddenException;
 import org.bson.types.ObjectId;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
+import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.shared.utilities.StringUtils;
 
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -55,11 +58,15 @@ public class InMemorySearchJobService implements SearchJobService {
     }
 
     @Override
-    public Optional<SearchJob> load(String id, String owner) {
+    public Optional<SearchJob> load(final String id,
+                                    final SearchUser searchUser) throws ForbiddenException {
         final SearchJob searchJob = cache.getIfPresent(id);
-        if (searchJob == null || !searchJob.getOwner().equals(owner)) {
+        if (searchJob == null) {
             return Optional.empty();
+        } else if (searchJob.getOwner().equals(searchUser.username()) || searchUser.isAdmin()) {
+            return Optional.of(searchJob);
+        } else {
+            throw new ForbiddenException(StringUtils.f("User %s cannot load search job %s that belongs to different user!", searchUser.username(), id));
         }
-        return Optional.of(searchJob);
     }
 }
