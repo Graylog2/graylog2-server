@@ -88,6 +88,9 @@ describe('TimeRangePicker', () => {
     render(<TimeRangePicker {...defaultProps} />);
 
     const applyButton = screen.getByRole('button', { name: /update time range/i });
+
+    await waitFor(() => expect(applyButton).not.toBeDisabled());
+
     fireEvent.click(applyButton);
 
     await waitFor(() => expect(defaultProps.setCurrentTimeRange).toHaveBeenCalled());
