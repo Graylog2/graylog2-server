@@ -38,12 +38,12 @@ const StyledDiv = styled.div`
   }
 `;
 
-const Carousel = ({ children, className }: Props) => {
+const Carousel = ({ children, className, containerRef }: Props) => {
   const [emblaRef] = useEmblaCarousel({ containScroll: 'trimSnaps' });
 
   return (
     <StyledDiv className={`carousel ${className}`} ref={emblaRef}>
-      <div className="carousel-container">
+      <div className="carousel-container" ref={containerRef}>
         {children}
       </div>
     </StyledDiv>
@@ -52,6 +52,7 @@ const Carousel = ({ children, className }: Props) => {
 
 Carousel.defaultProps = {
   className: undefined,
+  containerRef: undefined,
 };
 
 Carousel.Slide = CarouselSlide;
