@@ -40,7 +40,6 @@ public class NodePingPeriodical extends Periodical {
     private final Supplier<URI> opensearchBaseUri;
     private final Supplier<String> opensearchClusterUri;
     private final Supplier<String> datanodeRestApiUri;
-    private final Supplier<Boolean> isLeader;
     private final Configuration configuration;
     private final Supplier<OpensearchState> processState;
 
@@ -54,7 +53,6 @@ public class NodePingPeriodical extends Periodical {
                 managedOpenSearch::getOpensearchBaseUrl,
                 managedOpenSearch::getOpensearchClusterUrl,
                 managedOpenSearch::getDatanodeRestApiUrl,
-                managedOpenSearch::isLeaderNode,
                 () -> managedOpenSearch.processInfo().state()
         );
     }
@@ -66,7 +64,6 @@ public class NodePingPeriodical extends Periodical {
             Supplier<URI> opensearchBaseUri,
             Supplier<String> opensearchClusterUri,
             Supplier<String> datanodeRestApiUri,
-            Supplier<Boolean> isLeader,
             Supplier<OpensearchState> processState
     ) {
         this.nodeService = nodeService;
@@ -74,7 +71,6 @@ public class NodePingPeriodical extends Periodical {
         this.opensearchBaseUri = opensearchBaseUri;
         this.opensearchClusterUri = opensearchClusterUri;
         this.datanodeRestApiUri = datanodeRestApiUri;
-        this.isLeader = isLeader;
         this.configuration = configuration;
         this.processState = processState;
     }
@@ -124,7 +120,6 @@ public class NodePingPeriodical extends Periodical {
     public void doRun() {
         final DataNodeDto dto = DataNodeDto.Builder.builder()
                 .setId(nodeId.getNodeId())
-                .setLeader(isLeader.get())
                 .setTransportAddress(opensearchBaseUri.get().toString())
                 .setClusterAddress(opensearchClusterUri.get())
                 .setDataNodeStatus(processState.get().getDataNodeStatus())
@@ -139,7 +134,6 @@ public class NodePingPeriodical extends Periodical {
     private void registerServer() {
         final boolean registrationSucceeded = nodeService.registerServer(DataNodeDto.Builder.builder()
                 .setId(nodeId.getNodeId())
-                .setLeader(isLeader.get())
                 .setTransportAddress(opensearchBaseUri.get().toString())
                 .setClusterAddress(opensearchClusterUri.get())
                 .setHostname(configuration.getHostname())
