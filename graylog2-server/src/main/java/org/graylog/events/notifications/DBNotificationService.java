@@ -17,9 +17,7 @@
 package org.graylog.events.notifications;
 
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.Filters;
 import jakarta.inject.Inject;
-import org.bson.types.ObjectId;
 import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
@@ -32,6 +30,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import static org.graylog2.database.utils.MongoUtils.idEq;
 import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
 import static org.graylog2.database.utils.MongoUtils.stream;
 
@@ -69,17 +68,17 @@ public class DBNotificationService {
 
     public NotificationDto save(NotificationDto notificationDto) {
         if (notificationDto.id() != null) {
-            collection.replaceOne(Filters.eq("_id", new ObjectId(notificationDto.id())), notificationDto);
+            collection.replaceOne(idEq(notificationDto.id()), notificationDto);
             return notificationDto;
         } else {
-            var id = insertedIdAsString(collection.insertOne(notificationDto));
+            final var id = insertedIdAsString(collection.insertOne(notificationDto));
             return notificationDto.toBuilder().id(id).build();
         }
     }
 
     public int delete(String id) {
         entityOwnerShipService.unregisterEventNotification(id);
-        return (int) collection.deleteOne(Filters.eq("_id", new ObjectId(id))).getDeletedCount();
+        return (int) collection.deleteOne(idEq(id)).getDeletedCount();
     }
 
     public Optional<NotificationDto> get(String id) {

@@ -73,6 +73,7 @@ import static com.mongodb.client.model.Updates.set;
 import static com.mongodb.client.model.Updates.unset;
 import static java.util.Objects.requireNonNull;
 import static org.graylog.scheduler.JobSchedulerConfiguration.LOCK_EXPIRATION_DURATION;
+import static org.graylog2.database.utils.MongoUtils.idEq;
 import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
 import static org.graylog2.database.utils.MongoUtils.stream;
 
@@ -277,7 +278,7 @@ public class DBJobTriggerService {
             updates.add(set(FIELD_END_TIME, trigger.endTime()));
         }
 
-        return collection.updateOne(eq(FIELD_ID, getId(trigger)), combine(updates)).getModifiedCount() > 0;
+        return collection.updateOne(idEq(getId(trigger)), combine(updates)).getModifiedCount() > 0;
     }
 
     /**
@@ -405,7 +406,7 @@ public class DBJobTriggerService {
         final var filter = and(
                 // Make sure that the owner still owns the trigger
                 eq(FIELD_LOCK_OWNER, nodeId),
-                eq(FIELD_ID, getId(trigger)),
+                idEq(getId(trigger)),
                 // Only release running triggers. The trigger might have been paused while the trigger was running
                 // so we don't want to set it to RUNNABLE again.
                 // TODO: This is an issue. If a user set it to PAUSED, we will not unlock it. Figure something out.
@@ -481,7 +482,7 @@ public class DBJobTriggerService {
         final var filter = and(
                 // Make sure that the owner still owns the trigger
                 eq(FIELD_LOCK_OWNER, nodeId),
-                eq(FIELD_ID, getId(trigger))
+                idEq(getId(trigger))
         );
         final var update = combine(
                 unset(FIELD_LOCK_OWNER),
@@ -510,7 +511,7 @@ public class DBJobTriggerService {
      * @param progress the job progress in percent (0-100)
      */
     public int updateProgress(JobTriggerDto trigger, int progress) {
-        final var filter = eq(FIELD_ID, new ObjectId(requireNonNull(trigger.id())));
+        final var filter = idEq(requireNonNull(trigger.id()));
         final var update = set(FIELD_PROGRESS, progress);
         return (int) collection.updateOne(filter, update).getModifiedCount();
     }
