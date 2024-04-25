@@ -28,10 +28,13 @@ import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.engine.SearchExecutor;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -43,12 +46,20 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 public class SearchResourceTest {
 
+
     private final SearchUser searchUser = TestSearchUser.builder().build();
-    private final SearchJobService searchJobService = Mockito.mock(SearchJobService.class);
-    private final EventBus eventBus = Mockito.mock(EventBus.class);
-    private final SearchExecutor searchExecutor = Mockito.mock(SearchExecutor.class);
+    @Mock
+    private SearchJobService searchJobService;
+    @Mock
+    private EventBus eventBus;
+    @Mock
+    private SearchExecutor searchExecutor;
+
+    @Mock
+    private ClusterConfigService clusterConfigService;
 
     private final NodeId nodeId = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
 
@@ -75,7 +86,7 @@ public class SearchResourceTest {
                 .build();
 
         final SearchDomain searchDomain = mockSearchDomain(Optional.of(search));
-        final SearchResource resource = new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus);
+        final SearchResource resource = new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus, clusterConfigService);
         final SearchDTO returnedSearch = resource.getSearch(search.id(), searchUser);
 
         assertThat(returnedSearch.id()).isEqualTo(search.id());
@@ -84,7 +95,7 @@ public class SearchResourceTest {
     @Test
     public void getSearchThrowsNotFoundIfSearchDoesntExist() {
         final SearchDomain searchDomain = mockSearchDomain(Optional.empty());
-        final SearchResource resource = new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus);
+        final SearchResource resource = new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus, clusterConfigService);
         assertThatExceptionOfType(NotFoundException.class)
                 .isThrownBy(() -> resource.getSearch("god", searchUser))
                 .withMessageContaining("god");
@@ -97,7 +108,7 @@ public class SearchResourceTest {
         final SearchDomain searchDomain = mock(SearchDomain.class);
         when(searchDomain.saveForUser(any(), any())).thenReturn(search.toSearch());
 
-        final SearchResource resource = new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus);
+        final SearchResource resource = new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus, clusterConfigService);
         final Response response = resource.createSearch(search, searchUser);
 
         Assertions.assertThat(response.getStatus()).isEqualTo(Response.Status.CREATED.getStatusCode());

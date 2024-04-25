@@ -28,6 +28,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
+import static org.graylog.plugins.views.search.SearchJob.NO_CANCELLATION;
+
 public class InMemorySearchJobServiceTest {
 
     private SearchJobService toTest;
@@ -40,7 +42,7 @@ public class InMemorySearchJobServiceTest {
 
     @Test
     public void testUsersCanLoadTheirOwnJobs() {
-        final SearchJob jannettesJob = toTest.create(Search.builder().build(), "Jannette");
+        final SearchJob jannettesJob = toTest.create(Search.builder().build(), "Jannette", NO_CANCELLATION);
         final Optional<SearchJob> retrievedJob = toTest.load(jannettesJob.getId(), searchUser("Jannette"));
         Assertions.assertThat(retrievedJob)
                 .isPresent()
@@ -49,14 +51,14 @@ public class InMemorySearchJobServiceTest {
 
     @Test
     public void testThrowsExceptionWhenTryingToLoadJobOfDifferentUser() {
-        final SearchJob jannettesJob = toTest.create(Search.builder().build(), "Jannette");
+        final SearchJob jannettesJob = toTest.create(Search.builder().build(), "Jannette", NO_CANCELLATION);
         Assertions.assertThatThrownBy(() -> toTest.load(jannettesJob.getId(), searchUser("Michelle")))
                 .isInstanceOf(ForbiddenException.class);
     }
 
     @Test
     public void testAdminCanLoadJobOfDifferentUser() {
-        final SearchJob jannettesJob = toTest.create(Search.builder().build(), "Jannette");
+        final SearchJob jannettesJob = toTest.create(Search.builder().build(), "Jannette", NO_CANCELLATION);
         final Optional<SearchJob> retrievedJob = toTest.load(jannettesJob.getId(), adminUser("Clara"));
         Assertions.assertThat(retrievedJob)
                 .isPresent()
@@ -73,7 +75,7 @@ public class InMemorySearchJobServiceTest {
     private SearchUser searchUser(final String username) {
         return TestSearchUser.builder()
                 .withUser(u -> u.withUsername(username))
-                 .build();
+                .build();
     }
 
     private SearchUser adminUser(final String username) {

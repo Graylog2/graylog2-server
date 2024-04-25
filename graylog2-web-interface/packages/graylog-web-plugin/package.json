@@ -37,7 +37,7 @@
     "babel-preset-graylog": "file:../babel-preset-graylog",
     "create-react-class": "15.7.0",
     "eslint-config-graylog": "file:../eslint-config-graylog",
-    "formik": "2.4.5",
+    "formik": "2.4.6",
     "history": "^5.3.0",
     "html-webpack-plugin": "^5.5.0",
     "jest-preset-graylog": "file:../jest-preset-graylog",
