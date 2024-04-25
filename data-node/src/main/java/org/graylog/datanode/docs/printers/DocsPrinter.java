@@ -14,22 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.docs;
+package org.graylog.datanode.docs.printers;
+
+import org.graylog.datanode.docs.ConfigurationEntry;
 
 import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
 
-public interface ConfigurationDocumentationPrinter extends Flushable, Closeable {
+public interface DocsPrinter extends Flushable, Closeable {
     void writeHeader() throws IOException;
 
-    void writeField(ConfigurationField configurationField) throws IOException;
-
-
-    record ConfigurationField(Class<?> bean, String fieldName, String type, String configName, Object defaultValue,
-                              boolean required, String documentation) {
-        public boolean isPriority() {
-            return required && defaultValue == null;
-        }
-    }
+    void writeField(ConfigurationEntry configurationEntry) throws IOException;
 }

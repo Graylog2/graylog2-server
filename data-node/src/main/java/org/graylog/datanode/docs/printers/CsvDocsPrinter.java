@@ -14,33 +14,36 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.docs;
+package org.graylog.datanode.docs.printers;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.graylog.datanode.docs.ConfigurationEntry;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 
-public class CsvConfigurationDocumentationPrinter implements ConfigurationDocumentationPrinter {
+public class CsvDocsPrinter implements DocsPrinter {
 
+    public static final String HEADER_PARAMETER = "Parameter";
+    public static final String HEADER_TYPE = "Type";
+    public static final String HEADER_REQUIRED = "Required";
+    public static final String HEADER_DEFAULT_VALUE = "Default value";
+    public static final String HEADER_DESCRIPTION = "Description";
+    public static final String[] HEADERS = {HEADER_PARAMETER, HEADER_TYPE, HEADER_REQUIRED, HEADER_DEFAULT_VALUE, HEADER_DESCRIPTION};
     private final CSVPrinter csvPRinter;
 
-    public CsvConfigurationDocumentationPrinter(OutputStreamWriter streamWriter) {
-        try {
-            this.csvPRinter = new CSVPrinter(streamWriter, CSVFormat.EXCEL);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public CsvDocsPrinter(OutputStreamWriter streamWriter) throws IOException {
+        this.csvPRinter = new CSVPrinter(streamWriter, CSVFormat.EXCEL);
     }
 
     @Override
     public void writeHeader() throws IOException {
-        csvPRinter.printRecord("Parameter", "Type", "Required", "Default value", "Description");
+        csvPRinter.printRecord(HEADERS);
     }
 
     @Override
-    public void writeField(ConfigurationField f) throws IOException {
+    public void writeField(ConfigurationEntry f) throws IOException {
         this.csvPRinter.printRecord(f.configName(), f.type(), f.required(), f.defaultValue(), f.documentation());
     }
 
