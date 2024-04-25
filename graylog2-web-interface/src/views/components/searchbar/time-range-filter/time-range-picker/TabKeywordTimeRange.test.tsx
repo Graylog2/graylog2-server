@@ -15,12 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { asElement, fireEvent, render, waitFor } from 'wrappedTestingLibrary';
+import { asElement, fireEvent, render, waitFor, screen } from 'wrappedTestingLibrary';
 import { Formik, Form } from 'formik';
 import { act } from 'react-dom/test-utils';
 
 import asMock from 'helpers/mocking/AsMock';
 import ToolsStore from 'stores/tools/ToolsStore';
+import { EMPTY_RANGE } from 'views/components/searchbar/time-range-filter/TimeRangeDisplay';
 
 import OriginalTabKeywordTimeRange from './TabKeywordTimeRange';
 
@@ -30,9 +31,12 @@ jest.mock('stores/tools/ToolsStore', () => ({
 
 jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
 
-const TabKeywordTimeRange = ({ defaultValue, ...props }: { defaultValue: string } & React.ComponentProps<typeof TabKeywordTimeRange>) => (
-  <Formik initialValues={{ timeRangeTabs: { keyword: { type: 'keyword', keyword: defaultValue } }, activeTab: 'keyword' }}
+const TabKeywordTimeRange = ({ keyword, ...props }: { keyword: string } & React.ComponentProps<typeof TabKeywordTimeRange>) => (
+  <Formik initialValues={{ timeRangeTabs: { keyword: { type: 'keyword', keyword } }, activeTab: 'keyword' }}
           onSubmit={() => {}}
+          validate={(values) => (values.timeRangeTabs.keyword.keyword === 'invalid'
+            ? { timeRangeTabs: { keyword: { keyword: 'validation error' } } }
+            : {})}
           validateOnMount>
     <Form>
       <OriginalTabKeywordTimeRange {...props as React.ComponentProps<typeof TabKeywordTimeRange>} />
@@ -81,13 +85,13 @@ describe('TabKeywordTimeRange', () => {
   };
 
   it('renders value passed to it', async () => {
-    const { getByDisplayValue } = await asyncRender(<TabKeywordTimeRange defaultValue="Last hour" />);
+    await asyncRender(<TabKeywordTimeRange keyword="Last hour" />);
 
-    expect(getByDisplayValue('Last hour')).not.toBeNull();
+    await screen.findByDisplayValue('Last hour');
   });
 
   it('calls onChange if value changes', async () => {
-    const { getByDisplayValue } = await asyncRender(<TabKeywordTimeRange defaultValue="Last hour" />);
+    const { getByDisplayValue } = await asyncRender(<TabKeywordTimeRange keyword="Last hour" />);
     const input = getByDisplayValue('Last hour');
 
     await changeInput(input, 'last year');
@@ -98,72 +102,31 @@ describe('TabKeywordTimeRange', () => {
   it('calls testNaturalDate', async () => {
     expect(ToolsStore.testNaturalDate).not.toHaveBeenCalled();
 
-    await asyncRender(<TabKeywordTimeRange defaultValue="Last hour" />);
+    await asyncRender(<TabKeywordTimeRange keyword="Last hour" />);
 
     expect(ToolsStore.testNaturalDate).toHaveBeenCalledWith('Last hour', 'Europe/Berlin');
   });
 
-  it('sets validation state to error if initial value is empty', async () => {
-    const { container } = render(<TabKeywordTimeRange defaultValue=" " />);
+  it('does not call testNaturalDate when keyword is empty', async () => {
+    expect(ToolsStore.testNaturalDate).not.toHaveBeenCalled();
 
-    await waitFor(() => expect(findValidationState(container)).toEqual('error'));
+    await asyncRender(<TabKeywordTimeRange keyword="   " />);
+
+    expect(ToolsStore.testNaturalDate).not.toHaveBeenCalled();
   });
 
-  it('sets validation state to error if parsing fails initially', async () => {
+  it('shows validation errors', async () => {
     asMock(ToolsStore.testNaturalDate).mockImplementation(() => Promise.reject());
 
-    const { container } = render(<TabKeywordTimeRange defaultValue="invalid" />);
+    const { container } = render(<TabKeywordTimeRange keyword="invalid" />);
 
     await waitFor(() => expect(findValidationState(container)).toEqual('error'));
-  });
-
-  it('sets validation state to error if parsing fails after changing input', async () => {
-    asMock(ToolsStore.testNaturalDate).mockImplementation(() => Promise.reject());
-
-    const { container, getByDisplayValue } = render(<TabKeywordTimeRange defaultValue="last week" />);
-    const input = getByDisplayValue('last week');
-
-    await changeInput(input, 'invalid');
-
-    await waitFor(() => expect(findValidationState(container)).toEqual('error'));
-  });
-
-  it('resets validation state if parsing succeeds after changing input', async () => {
-    const { container, getByDisplayValue } = render(<TabKeywordTimeRange defaultValue="last week" />);
-    const input = getByDisplayValue('last week');
-
-    await changeInput(input, 'last hour');
-
-    await waitFor(() => expect(findValidationState(container)).toEqual(null));
   });
 
   it('does not show keyword preview if parsing fails', async () => {
     asMock(ToolsStore.testNaturalDate).mockImplementation(() => Promise.reject());
-    const { queryByText } = await asyncRender(<TabKeywordTimeRange defaultValue="invalid" />);
+    await asyncRender(<TabKeywordTimeRange keyword="invalid" />);
 
-    expect(queryByText('Preview:')).toBeNull();
-  });
-
-  it('does not show keyword preview if parsing fails after changing input', async () => {
-    const { getByDisplayValue, queryByText } = await asyncRender(<TabKeywordTimeRange defaultValue="last week" />);
-
-    asMock(ToolsStore.testNaturalDate).mockImplementation(() => Promise.reject());
-    const input = getByDisplayValue('last week');
-
-    await changeInput(input, 'invalid');
-
-    expect(queryByText('Preview:')).toBeNull();
-  });
-
-  it('shows error message if parsing fails after changing input', async () => {
-    const { getByDisplayValue, queryByText } = await asyncRender(<TabKeywordTimeRange defaultValue="last week" />);
-
-    asMock(ToolsStore.testNaturalDate).mockImplementation(() => Promise.reject());
-    const input = getByDisplayValue('last week');
-
-    await changeInput(input, 'invalid');
-
-    // eslint-disable-next-line testing-library/prefer-presence-queries
-    expect(queryByText('Unable to parse keyword.')).not.toBeNull();
+    await waitFor(() => expect(screen.getAllByText(EMPTY_RANGE).length).toEqual(2));
   });
 });

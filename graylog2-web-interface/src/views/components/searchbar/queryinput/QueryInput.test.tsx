@@ -26,6 +26,7 @@ import useViewsPlugin from 'views/test/testViewsPlugin';
 import QueryInput from './QueryInput';
 
 jest.mock('views/logic/fieldtypes/useFieldTypes');
+jest.mock('hooks/useHotkey', () => jest.fn());
 
 jest.mock('views/actions/QueryValidationActions', () => ({
   displayValidationErrors: jest.fn(),
