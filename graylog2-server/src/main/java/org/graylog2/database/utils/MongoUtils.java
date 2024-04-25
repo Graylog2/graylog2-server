@@ -121,7 +121,7 @@ public class MongoUtils<T extends MongoEntity> {
      * @return the document wrapped in an {@link Optional} if present in the DB, an empty {@link Optional} otherwise.
      */
     public Optional<T> getById(ObjectId id) {
-        return Optional.ofNullable(collection.find(Filters.eq("_id", id)).first());
+        return Optional.ofNullable(collection.find(idEq(id)).first());
     }
 
     /**
@@ -141,7 +141,7 @@ public class MongoUtils<T extends MongoEntity> {
      * @return true if a document was deleted, false otherwise.
      */
     public boolean deleteById(ObjectId id) {
-        return collection.deleteOne(Filters.eq("_id", id)).getDeletedCount() > 0;
+        return collection.deleteOne(idEq(id)).getDeletedCount() > 0;
     }
 
     /**
