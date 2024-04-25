@@ -122,7 +122,7 @@ public abstract class SearchesClusterConfig {
                                                @JsonProperty("auto_refresh_timerange_options") @Nullable Map<Period, String> autoRefreshTimerangeOptions,
                                                @JsonProperty("default_auto_refresh_option") Period defaultAutoRefreshOption,
                                                @JsonProperty("quick_access_timerange_presets") @Nullable List<TimerangePreset> quickAccessTimerangePresets,
-                                               @JsonProperty("cancel_after_interval") @Nullable Integer cancelAfterSeconds
+                                               @JsonProperty("cancel_after_seconds") @Nullable Integer cancelAfterSeconds
     ) {
         return builder()
                 .quickAccessTimerangePresets(quickAccessTimerangePresets == null ? List.of() : quickAccessTimerangePresets)
