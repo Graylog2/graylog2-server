@@ -137,7 +137,7 @@ public abstract class WidgetDTO implements ContentPackable<WidgetEntity>, UsesSe
                 .id(this.id())
                 .config(this.config())
                 .filter(this.filter())
-                .filters(exportFilters(entityDescriptorIds))
+                .filters(filters().stream().map(filter -> filter.toContentPackEntity(entityDescriptorIds)).toList())
                 .streams(mappedStreams)
                 .type(this.type());
         if (this.query().isPresent()) {

@@ -277,7 +277,7 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
         return AggregationEventProcessorConfigEntity.builder()
                 .type(type())
                 .query(ValueReference.of(query()))
-                .filters(exportFilters(entityDescriptorIds))
+                .filters(filters().stream().map(filter -> filter.toContentPackEntity(entityDescriptorIds)).toList())
                 .streams(streamRefs)
                 .groupBy(groupBy())
                 .series(series().stream().map(SeriesSpecEntity::fromNativeEntity).toList())

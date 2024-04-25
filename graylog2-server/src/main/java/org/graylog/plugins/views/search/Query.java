@@ -325,7 +325,7 @@ public abstract class Query implements ContentPackable<QueryEntity>, UsesSearchF
                 .searchTypes(searchTypes().stream().map(s -> s.toContentPackEntity(entityDescriptorIds))
                         .collect(Collectors.toSet()))
                 .filter(shallowMappedFilter(entityDescriptorIds))
-                .filters(exportFilters(entityDescriptorIds))
+                .filters(filters().stream().map(filter -> filter.toContentPackEntity(entityDescriptorIds)).toList())
                 .query(query())
                 .id(id())
                 .globalOverride(globalOverride().orElse(null))

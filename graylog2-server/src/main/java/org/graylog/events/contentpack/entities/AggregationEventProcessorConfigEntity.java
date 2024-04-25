@@ -27,7 +27,6 @@ import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog.events.processor.aggregation.AggregationConditions;
 import org.graylog.events.processor.aggregation.AggregationEventProcessorConfig;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
-import org.graylog.plugins.views.search.searchfilters.model.UsesSearchFilters;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
@@ -158,7 +157,7 @@ public abstract class AggregationEventProcessorConfigEntity implements EventProc
                 .type(type())
                 .query(query().asString(parameters))
                 .streams(streamSet)
-                .filters(UsesSearchFilters.createNativeFilters(filters(), nativeEntities))
+                .filters(filters().stream().map(filter -> filter.toNativeEntity(parameters, nativeEntities)).toList())
                 .groupBy(groupBy())
                 .series(series().stream().map(s -> s.toNativeEntity()).toList())
                 .conditions(conditions().orElse(null))
