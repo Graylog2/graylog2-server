@@ -20,8 +20,13 @@ import com.github.oxo42.stateless4j.StateMachine;
 import com.github.oxo42.stateless4j.StateMachineConfig;
 import org.graylog.datanode.opensearch.OpensearchProcess;
 import org.graylog.datanode.opensearch.statemachine.tracer.StateMachineTracerAggregator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class OpensearchStateMachine extends StateMachine<OpensearchState, OpensearchEvent> {
+
+    private final Logger log = LoggerFactory.getLogger(OpensearchStateMachine.class);
+
     /**
      * How many times can the OS rest api call fail before we switch to the failed state
      */
@@ -38,6 +43,7 @@ public class OpensearchStateMachine extends StateMachine<OpensearchState, Opense
     }
 
     public static OpensearchStateMachine createNew(OpensearchProcess process) {
+        OpensearchStateMachine.process = process;
         final FailuresCounter restFailureCounter = FailuresCounter.oneBased(MAX_REST_TEMPORARY_FAILURES);
         final FailuresCounter startupFailuresCounter = FailuresCounter.oneBased(MAX_REST_STARTUP_FAILURES);
         final FailuresCounter rebootCounter = FailuresCounter.oneBased(MAX_REBOOT_FAILURES);
@@ -107,7 +113,7 @@ public class OpensearchStateMachine extends StateMachine<OpensearchState, Opense
                 .ignore(OpensearchEvent.PROCESS_TERMINATED); // final state, all following terminate events are ignored
 
         config.configure(OpensearchState.REMOVING)
-                .onEntry(process::onRemove)
+                .onEntry(process::remove)
                 .ignore(OpensearchEvent.HEALTH_CHECK_OK)
                 .permit(OpensearchEvent.HEALTH_CHECK_FAILED, OpensearchState.FAILED)
                 .permit(OpensearchEvent.PROCESS_STOPPED, OpensearchState.REMOVED);
@@ -116,16 +122,24 @@ public class OpensearchStateMachine extends StateMachine<OpensearchState, Opense
                 .permit(OpensearchEvent.RESET, OpensearchState.WAITING_FOR_CONFIGURATION)
                 .ignore(OpensearchEvent.PROCESS_STOPPED);
 
-        OpensearchStateMachine opensearchStateMachine = new OpensearchStateMachine(OpensearchState.WAITING_FOR_CONFIGURATION, config);
-        opensearchStateMachine.setOpensearchProcess(process);
-        return opensearchStateMachine;
+        return new OpensearchStateMachine(OpensearchState.WAITING_FOR_CONFIGURATION, config);
     }
 
     public StateMachineTracerAggregator getTracerAggregator() {
         return tracerAggregator;
     }
 
-    public void setOpensearchProcess(OpensearchProcess process) {
-        this.process = process;
+    public void fire(OpensearchEvent trigger, OpensearchEvent errorEvent) {
+        try {
+            super.fire(trigger);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            super.fire(errorEvent);
+        }
+    }
+
+    @Override
+    public void fire(OpensearchEvent trigger) {
+        fire(trigger, OpensearchEvent.HEALTH_CHECK_FAILED);
     }
 }

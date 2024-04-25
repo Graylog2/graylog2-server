@@ -247,6 +247,9 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
         }
     }
 
+    /**
+     * reset allocation exclude status on restart to allow removed nodes to rejoin the cluster
+     */
     private void checkAllocationEnabledStatus() {
         if (restClient().isPresent()) {
             ClusterClient clusterClient = restClient().get().cluster();
@@ -263,7 +266,7 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
                 }
                 allocationExcludeChecked = true;
             } catch (IOException e) {
-                LOG.error("Error getting cluster settings from OpenSearch");
+                throw new RuntimeException("Error getting cluster settings from OpenSearch", e);
             }
         }
     }
@@ -293,7 +296,7 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
     }
 
     @Override
-    public void onRemove() {
+    public void remove() {
         LOG.info("Starting removal of OpenSearch node");
         restClient().ifPresent(client -> {
             final ClusterClient clusterClient = client.cluster();
@@ -309,11 +312,10 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
                     executorService = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("datanode-removal").build());
                     executorService.scheduleAtFixedRate(this::checkRemovalStatus, 10, 10, TimeUnit.SECONDS);
                 } else {
-                    onEvent(OpensearchEvent.HEALTH_CHECK_FAILED);
+                    throw new RuntimeException("Failed to exclude node from cluster allocation");
                 }
             } catch (IOException e) {
-                LOG.error("Failed to exclude node from cluster allocation", e);
-                onEvent(OpensearchEvent.HEALTH_CHECK_FAILED);
+                throw new RuntimeException("Failed to exclude node from cluster allocation", e);
             }
         });
     }
@@ -334,7 +336,7 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
                     eventBus.post(DataNodeLifecycleEvent.create(nodeId.getNodeId(), DataNodeLifecycleTrigger.REMOVED));
                 }
             } catch (IOException | OpenSearchStatusException e) {
-                onEvent(OpensearchEvent.HEALTH_CHECK_FAILED);
+                throw new RuntimeException("Error checking removal status", e);
             }
         }
     }
