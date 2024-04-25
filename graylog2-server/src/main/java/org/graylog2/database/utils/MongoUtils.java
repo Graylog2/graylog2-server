@@ -23,8 +23,6 @@ import com.mongodb.client.MongoIterable;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.result.InsertOneResult;
 import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
-import org.bson.BsonObjectId;
 import org.bson.BsonValue;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
@@ -36,7 +34,8 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
- * Utility methods to interact with MongoDB collections.
+ * Utility methods to interact with MongoDB collections of document types that extend {@link MongoEntity}. Some static
+ * methods cannot enforce that type constraint but may fail if, if used with other document types.
  *
  * @param <T> Java type of the documents to interact with
  */
@@ -55,30 +54,29 @@ public class MongoUtils<T extends MongoEntity> {
     }
 
     /**
-     * Extract the inserted id as an {@link ObjectId} from the insert result.
+     * Extract the inserted id of type {@link ObjectId} from the insert result.
      *
-     * @param result Result of the insertOne operation
-     * @return the inserted object ID, or null if no id was inserted. Fails if the id is not of type {@link ObjectId}.
+     * @param result Result object for inserting a document of type MongoEntity.
+     * @return the inserted object ID. Fails if the id was not stored as an {@link ObjectId}.
      */
-    @Nullable
     public static ObjectId insertedId(@Nonnull InsertOneResult result) {
-        return Optional.ofNullable(result.getInsertedId())
-                .map(BsonValue::asObjectId)
-                .map(BsonObjectId::getValue)
-                .orElse(null);
+        final BsonValue insertedId = result.getInsertedId();
+        if (insertedId == null) {
+            // this should only happen when inserting RawBsonDocuments
+            throw new IllegalArgumentException("Inserted ID is null. Make sure that you are inserting documents of " +
+                    "type <? extends MongoEntity>.");
+        }
+        return insertedId.asObjectId().getValue();
     }
 
     /**
      * Extract the inserted id as a String from the insert result.
      *
-     * @param result Result of the insertOne operation
-     * @return the inserted object ID as string, or null if no id was inserted. Fails if the ID is not of type {@link ObjectId}.
+     * @param result Result object for inserting a document of type MongoEntity.
+     * @return the inserted object ID as string. Fails if the id was not stored as an {@link ObjectId}.
      */
-    @Nullable
     public static String insertedIdAsString(@Nonnull InsertOneResult result) {
-        return Optional.ofNullable(insertedId(result))
-                .map(ObjectId::toHexString)
-                .orElse(null);
+        return insertedId(result).toHexString();
     }
 
     /**
