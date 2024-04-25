@@ -14,18 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.engine.validation;
+package org.graylog.security;
 
-import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.Search;
-import org.graylog.plugins.views.search.errors.SearchError;
-import org.graylog.plugins.views.search.permissions.SearchUser;
-import org.graylog.security.HasPermissions;
+import org.joda.time.DateTimeZone;
 
-import java.util.Set;
+import java.util.Optional;
 
-public interface SearchValidation {
-    Set<SearchError> validate(final Search search, final HasPermissions searchUser);
+public interface UserDetails {
+    Optional<DateTimeZone> timeZone();
 
-    Set<SearchError> validate(final Query query, final HasPermissions searchUser);
+    String username();
 }

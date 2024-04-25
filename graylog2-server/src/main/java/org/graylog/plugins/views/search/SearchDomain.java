@@ -20,11 +20,13 @@ import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.errors.PermissionException;
 import org.graylog.plugins.views.search.permissions.SearchPermissions;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.permissions.ViewPermissions;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewResolver;
 import org.graylog.plugins.views.search.views.ViewService;
 
 import jakarta.inject.Inject;
+import org.graylog.security.UserDetails;
 
 import java.util.HashSet;
 import java.util.List;
@@ -52,16 +54,20 @@ public class SearchDomain {
     }
 
     public Optional<Search> getForUser(String id, SearchUser searchUser) {
+        return this.getForUser(id, searchUser, searchUser, searchUser);
+    }
+
+    public Optional<Search> getForUser(String id, ViewPermissions viewPermissions, SearchPermissions searchPermissions, UserDetails name) {
         final Optional<Search> search = dbService.get(id);
 
-        search.ifPresent(s -> checkPermission(searchUser, s));
+        search.ifPresent(s -> checkPermission(viewPermissions, searchPermissions, name, s));
 
         return search;
     }
 
-    private void checkPermission(SearchUser searchUser, Search search) {
-        if (!hasReadPermissionFor(searchUser, searchUser::canReadView, search)) {
-            throw new PermissionException("User " + searchUser.username() + " does not have permission to load search " + search.id());
+    private void checkPermission(ViewPermissions viewPermissions, SearchPermissions searchPermissions, UserDetails name, Search search) {
+        if (!hasReadPermissionFor(searchPermissions, viewPermissions::canReadView, search)) {
+            throw new PermissionException("User " + name.username() + " does not have permission to load search " + search.id());
         }
     }
 
