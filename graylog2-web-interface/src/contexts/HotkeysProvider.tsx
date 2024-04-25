@@ -25,7 +25,6 @@ import Immutable from 'immutable';
 
 import type { ScopeName, ActiveHotkeys, HotkeyCollections, Options } from 'contexts/HotkeysContext';
 import HotkeysContext from 'contexts/HotkeysContext';
-import useFeature from 'hooks/useFeature';
 
 const viewActions = {
   undo: { keys: 'mod+shift+z', description: 'Undo last action' },
@@ -121,20 +120,12 @@ type Props = {
   children: React.ReactElement,
 }
 
-const HotkeysProvider = ({ children }: Props) => {
-  const hasHotkeysFeatureFlag = useFeature('frontend_hotkeys');
-
-  if (!hasHotkeysFeatureFlag) {
-    return children;
-  }
-
-  return (
-    <OriginalHotkeysProvider>
-      <CustomHotkeysProvider>
-        {children}
-      </CustomHotkeysProvider>
-    </OriginalHotkeysProvider>
-  );
-};
+const HotkeysProvider = ({ children }: Props) => (
+  <OriginalHotkeysProvider>
+    <CustomHotkeysProvider>
+      {children}
+    </CustomHotkeysProvider>
+  </OriginalHotkeysProvider>
+);
 
 export default HotkeysProvider;

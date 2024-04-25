@@ -20,6 +20,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import jakarta.inject.Inject;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -67,8 +68,8 @@ public class SearchJobsStatusResource extends ProxiedResource implements PluginR
     @ApiOperation(value = "Retrieve the status of an executed query")
     @Path("{nodeId}/{jobId}/status")
     @Produces({MediaType.APPLICATION_JSON, SEARCH_FORMAT_V1})
-    public void asyncSearchJobStatus(@ApiParam(name = "jobId") @PathParam("jobId") String jobId,
-                                     @ApiParam(name = "nodeId") @PathParam("nodeId") String nodeId,
+    public void asyncSearchJobStatus(@ApiParam(name = "jobId", required = true) @NotBlank @PathParam("jobId") String jobId,
+                                     @ApiParam(name = "nodeId", required = true) @NotBlank @PathParam("nodeId") String nodeId,
                                      @Context SearchUser searchUser,
                                      @Suspended AsyncResponse asyncResponse) {
         processAsync(asyncResponse,
@@ -84,11 +85,12 @@ public class SearchJobsStatusResource extends ProxiedResource implements PluginR
     }
 
     @DELETE
+    @ApiOperation(value = "Cancels search job")
     @Path("{nodeId}/{jobId}/cancel")
     @Produces({MediaType.APPLICATION_JSON})
     @NoAuditEvent("this is a proxy resource, the event will be triggered on the individual nodes")
-    public void cancelAsyncSearchJob(@ApiParam(name = "jobId") @PathParam("jobId") String jobId,
-                                     @ApiParam(name = "nodeId") @PathParam("nodeId") String nodeId,
+    public void cancelAsyncSearchJob(@ApiParam(name = "jobId", required = true) @NotBlank @PathParam("jobId") String jobId,
+                                     @ApiParam(name = "nodeId", required = true) @NotBlank @PathParam("nodeId") String nodeId,
                                      @Context SearchUser searchUser,
                                      @Suspended AsyncResponse asyncResponse) {
         processAsync(asyncResponse,

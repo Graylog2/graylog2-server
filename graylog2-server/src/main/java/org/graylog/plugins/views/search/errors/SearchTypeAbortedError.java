@@ -14,17 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.configuration;
+package org.graylog.plugins.views.search.errors;
 
-import com.github.joschi.jadconfig.Parameter;
-import org.graylog2.configuration.PathConfiguration;
+import jakarta.validation.constraints.NotNull;
+import org.graylog.plugins.views.search.Query;
 
-public class BaseConfiguration {
-    @Parameter(value = "async_eventbus_processors")
-    private int asyncEventbusProcessors = 2;
 
-    public int getAsyncEventbusProcessors() {
-        return asyncEventbusProcessors;
+public class SearchTypeAbortedError extends SearchTypeError {
+
+    public SearchTypeAbortedError(@NotNull Query query, @NotNull String searchTypeId, Throwable throwable) {
+        super(query, searchTypeId, throwable);
     }
-
 }
