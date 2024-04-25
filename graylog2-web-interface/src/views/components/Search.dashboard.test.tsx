@@ -35,6 +35,7 @@ import OriginalSearch from './Search';
 import WidgetFocusProvider from './contexts/WidgetFocusProvider';
 import WidgetFocusContext from './contexts/WidgetFocusContext';
 
+jest.mock('hooks/useHotkey', () => jest.fn());
 jest.mock('views/logic/fieldtypes/useFieldTypes');
 jest.mock('hooks/useElementDimensions', () => () => ({ width: 1024, height: 768 }));
 
