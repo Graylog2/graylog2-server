@@ -56,7 +56,6 @@ class NodePingPeriodicalTest {
 
         Mockito.verify(nodeService).ping(Mockito.eq(DataNodeDto.Builder.builder()
                 .setId(nodeID.getNodeId())
-                .setLeader(true)
                 .setTransportAddress(uri.toString())
                 .setClusterAddress(cluster)
                 .setRestApiAddress(datanodeRestApi)
