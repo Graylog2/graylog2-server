@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix rules editor showing warning when saving."
+
+issues = ["19008"]
+pulls = ["19059"]

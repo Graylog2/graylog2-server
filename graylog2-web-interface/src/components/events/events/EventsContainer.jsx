@@ -17,6 +17,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import isObject from 'lodash/isObject';
+import debounce from 'lodash/debounce';
 
 import { Spinner } from 'components/common';
 import UserNotification from 'util/UserNotification';
@@ -29,9 +30,8 @@ import withPaginationQueryParameter from 'components/common/withPaginationQueryP
 
 import Events, { PAGE_SIZES, EVENTS_MAX_OFFSET_LIMIT } from './Events';
 
-import 'components/event-definitions/event-definition-types';
-
 const LOCAL_STORAGE_ITEM = 'events-last-search';
+const SEARCH_DEBOUNCE_THRESHOLD = 500;
 
 const fetchEvents = ({ page, pageSize, query, filter, timerange }) => {
   Store.set(LOCAL_STORAGE_ITEM, { filter: filter, timerange: timerange });
@@ -96,7 +96,7 @@ class EventsContainer extends React.Component {
     }
   };
 
-  handleQueryChange = (nextQuery, callback = () => {}) => {
+  handleQueryChange = debounce((nextQuery, callback = () => {}) => {
     const { events } = this.props;
     const { resetPage, pageSize } = this.props.paginationQueryParameter;
 
@@ -110,7 +110,7 @@ class EventsContainer extends React.Component {
     });
 
     promise.finally(callback);
-  };
+  }, SEARCH_DEBOUNCE_THRESHOLD);
 
   handleAlertFilterChange = (nextAlertFilter) => () => {
     const { events } = this.props;

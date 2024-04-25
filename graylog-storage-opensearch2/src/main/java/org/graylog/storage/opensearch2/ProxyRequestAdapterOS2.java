@@ -18,16 +18,18 @@ package org.graylog.storage.opensearch2;
 
 import jakarta.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.InputStreamEntity;
+import org.graylog.shaded.opensearch2.org.apache.http.entity.ContentType;
+import org.graylog.shaded.opensearch2.org.apache.http.entity.InputStreamEntity;
 import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchException;
+import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
 import org.graylog.shaded.opensearch2.org.opensearch.client.ResponseException;
+import org.graylog.shaded.opensearch2.org.opensearch.client.RestClient;
+import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.indexer.datanode.ProxyRequestAdapter;
 import org.graylog2.rest.resources.datanodes.DatanodeResolver;
-import org.jetbrains.annotations.NotNull;
-import org.opensearch.client.RestClient;
+import jakarta.annotation.Nonnull;
 
 import java.io.IOException;
 import java.net.URI;
@@ -46,12 +48,13 @@ public class ProxyRequestAdapterOS2 implements ProxyRequestAdapter {
 
     @Override
     public ProxyResponse request(ProxyRequest request) throws IOException {
-        final org.opensearch.client.Request req = new org.opensearch.client.Request(request.method(), request.path());
+        final var req = new Request(request.method(), request.path());
+        request.queryParameters().forEach((key, values) -> values.forEach(value -> req.addParameter(key, value)));
         req.setEntity(new InputStreamEntity(request.body(), ContentType.APPLICATION_JSON));
         try (
-                RestClient restClient = buildClient(request)
+                RestHighLevelClient restClient = buildClient(request)
         ) {
-            final var osResponse = restClient.performRequest(req);
+            final var osResponse = restClient.getLowLevelClient().performRequest(req);
             return new ProxyResponse(osResponse.getStatusLine().getStatusCode(), osResponse.getEntity().getContent(), osResponse.getEntity().getContentType().getValue());
         } catch (OpenSearchException openSearchException) {
             final var cause = openSearchException.getCause();
@@ -64,12 +67,12 @@ public class ProxyRequestAdapterOS2 implements ProxyRequestAdapter {
         }
     }
 
-    @NotNull
+    @Nonnull
     private static ProxyResponse getProxyResponse(int status, Response response) throws IOException {
         return new ProxyResponse(status, response.getEntity().getContent(), response.getEntity().getContentType().getValue());
     }
 
-    private RestClient buildClient(ProxyRequest request) {
+    private RestHighLevelClient buildClient(ProxyRequest request) {
         final URI opensearchAddress = datanodeResolver.findByHostname(request.hostname()).map(DataNodeDto::getTransportAddress)
                 .filter(StringUtils::isNotBlank)
                 .map(URI::create)

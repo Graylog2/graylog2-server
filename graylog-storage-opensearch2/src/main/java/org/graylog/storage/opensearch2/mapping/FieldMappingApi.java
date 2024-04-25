@@ -17,29 +17,22 @@
 package org.graylog.storage.opensearch2.mapping;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.Streams;
+import jakarta.inject.Inject;
+import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
 import org.graylog.storage.opensearch2.OpenSearchClient;
-import org.opensearch.client.Request;
-import org.opensearch.client.Response;
 
 import javax.annotation.Nullable;
-
-import jakarta.inject.Inject;
-
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class FieldMappingApi {
-    private final ObjectMapper objectMapper;
     private final OpenSearchClient client;
 
     @Inject
-    public FieldMappingApi(ObjectMapper objectMapper,
-                           OpenSearchClient client) {
-        this.objectMapper = objectMapper;
+    public FieldMappingApi(OpenSearchClient client) {
         this.client = client;
     }
 
@@ -54,20 +47,23 @@ public class FieldMappingApi {
         }
     }
 
-    public Map<String, FieldMapping> fieldTypes(String index) {
-        final JsonNode result = client.executeLowLevel((restClient, requestOptions) -> {
-            final var request = request(index);
-            request.setOptions(requestOptions);
-            final Response response = restClient.performRequest(request);
-            return objectMapper.readTree(response.getEntity().getContent());
-        }, "Unable to retrieve field types of index " + index);
+    public Map<String, FieldMapping> fieldTypes(final String index) {
+        final JsonNode result = client.executeRequest(request(index), "Unable to retrieve field types of index " + index);
         final JsonNode fields = result.path(index).path("mappings").path("properties");
         //noinspection UnstableApiUsage
         return Streams.stream(fields.fields())
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> FieldMapping.create(
-                        entry.getValue().path("type").asText(),
-                        entry.getValue().path("fielddata").asBoolean()
-                )));
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> {
+                    final JsonNode entryValue = entry.getValue();
+                    String type = entryValue.path("type").asText();
+                    if ("alias".equals(type)) {
+                        String aliasPath = entryValue.path("path").asText();
+                        type = fields.path(aliasPath).path("type").asText();
+                    }
+                    return FieldMapping.create(
+                            type,
+                            entryValue.path("fielddata").asBoolean()
+                    );
+                }));
     }
 
     private Request request(String index) {

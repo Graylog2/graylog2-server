@@ -17,30 +17,29 @@
 package org.graylog.datanode.configuration;
 
 import com.google.common.collect.ImmutableMap;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.variants.InSecureConfiguration;
 import org.graylog.datanode.configuration.variants.MongoCertSecureConfiguration;
 import org.graylog.datanode.configuration.variants.OpensearchSecurityConfiguration;
 import org.graylog.datanode.configuration.variants.SecurityConfigurationVariant;
 import org.graylog.datanode.configuration.variants.UploadedCertFilesSecureConfiguration;
-import org.graylog.datanode.process.OpensearchConfiguration;
+import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
-import org.graylog2.bootstrap.preflight.PreflightConfigResult;
-import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-import jakarta.inject.Provider;
-import jakarta.inject.Singleton;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Singleton
@@ -52,8 +51,12 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
     private final DatanodeConfiguration datanodeConfiguration;
     private final byte[] signingKey;
     private final NodeService<DataNodeDto> nodeService;
-    private final PreflightConfigService preflightConfigService;
     private final S3RepositoryConfiguration s3RepositoryConfiguration;
+
+    /**
+     * This configuration won't survive datanode restart. But it can be repeatedly provided to the managed opensearch
+     */
+    private final Map<String, Object> transientConfiguration = new ConcurrentHashMap<>();
 
     @Inject
     public OpensearchConfigurationProvider(final Configuration localConfiguration,
@@ -62,7 +65,6 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
                                            final MongoCertSecureConfiguration mongoCertSecureConfiguration,
                                            final InSecureConfiguration inSecureConfiguration,
                                            final NodeService<DataNodeDto> nodeService,
-                                           final PreflightConfigService preflightConfigService,
                                            final @Named("password_secret") String passwordSecret,
                                            final S3RepositoryConfiguration s3RepositoryConfiguration) {
         this.localConfiguration = localConfiguration;
@@ -72,15 +74,7 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
         this.inSecureConfiguration = inSecureConfiguration;
         this.signingKey = passwordSecret.getBytes(StandardCharsets.UTF_8);
         this.nodeService = nodeService;
-        this.preflightConfigService = preflightConfigService;
         this.s3RepositoryConfiguration = s3RepositoryConfiguration;
-    }
-
-    private boolean isPreflight() {
-        final PreflightConfigResult preflightResult = preflightConfigService.getPreflightConfigResult();
-
-        // if preflight is finished, we assume that there will be some datanode registered via node-service.
-        return preflightResult != PreflightConfigResult.FINISHED;
     }
 
     @Override
@@ -97,7 +91,7 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
                 .findFirst();
 
         try {
-            ImmutableMap.Builder<String, String> opensearchProperties = ImmutableMap.builder();
+            ImmutableMap.Builder<String, Object> opensearchProperties = ImmutableMap.builder();
 
             if (localConfiguration.getInitialClusterManagerNodes() != null && !localConfiguration.getInitialClusterManagerNodes().isBlank()) {
                 opensearchProperties.put("cluster.initial_cluster_manager_nodes", localConfiguration.getInitialClusterManagerNodes());
@@ -124,7 +118,7 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
                     localConfiguration.getOpensearchTransportPort(),
                     localConfiguration.getClustername(),
                     localConfiguration.getDatanodeNodeName(),
-                    List.of("cluster_manager", "data", "ingest", "remote_cluster_client", "search"),
+                    localConfiguration.getNodeRoles(),
                     localConfiguration.getOpensearchDiscoverySeedHosts(),
                     securityConfiguration,
                     s3RepositoryConfiguration,
@@ -136,8 +130,8 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
         }
     }
 
-    private ImmutableMap<String, String> commonOpensearchConfig(final Configuration localConfiguration) {
-        final ImmutableMap.Builder<String, String> config = ImmutableMap.builder();
+    private ImmutableMap<String, Object> commonOpensearchConfig(final Configuration localConfiguration) {
+        final ImmutableMap.Builder<String, Object> config = ImmutableMap.builder();
         localConfiguration.getOpensearchNetworkHost().ifPresent(
                 networkHost -> config.put("network.host", networkHost));
         config.put("path.data", datanodeConfiguration.datanodeDirectories().getDataTargetDir().toString());
@@ -147,23 +141,31 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
 
         // https://opensearch.org/docs/latest/tuning-your-cluster/availability-and-recovery/snapshots/snapshot-restore/#shared-file-system
         if(localConfiguration.getPathRepo() != null && !localConfiguration.getPathRepo().isEmpty()) {
-            config.put("path.repo", String.join(",", localConfiguration.getPathRepo()));
+            config.put("path.repo", localConfiguration.getPathRepo());
         }
 
         //config.put("network.publish_host", Tools.getLocalCanonicalHostname());
 
-        if(localConfiguration.getOpensearchDebug() != null && !localConfiguration.getOpensearchDebug().isBlank()) {
+        if (localConfiguration.getOpensearchDebug() != null && !localConfiguration.getOpensearchDebug().isBlank()) {
             config.put("logger.org.opensearch", localConfiguration.getOpensearchDebug());
         }
 
-        if(localConfiguration.getOpensearchAuditLog() != null && !localConfiguration.getOpensearchAuditLog().isBlank()) {
+        if (localConfiguration.getOpensearchAuditLog() != null && !localConfiguration.getOpensearchAuditLog().isBlank()) {
             config.put("plugins.security.audit.type", localConfiguration.getOpensearchAuditLog());
         }
 
         // common OpenSearch config parameters from our docs
         config.put("indices.query.bool.max_clause_count", localConfiguration.getIndicesQueryBoolMaxClauseCount().toString());
 
+        // enable admin access via the REST API
+        config.put("plugins.security.restapi.admin.enabled", "true");
+
+        config.putAll(transientConfiguration);
+
         return config.build();
     }
 
+    public void setTransientConfiguration(String key, Object value) {
+        this.transientConfiguration.put(key, value);
+    }
 }

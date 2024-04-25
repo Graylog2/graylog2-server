@@ -32,16 +32,21 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 
 @JsonAutoDetect
 // execution must come before results, as it signals the overall "done" state
 @JsonPropertyOrder({"execution", "results"})
 public class SearchJob implements ParameterProvider {
 
+    public static final Integer NO_CANCELLATION = 0;
+
     @JsonUnwrapped
     private SearchJobIdentifier searchJobIdentifier;
 
     private final Search search;
+
+    private Future<?> searchEngineTaskFuture;
 
     private CompletableFuture<Void> resultFuture;
 
@@ -49,9 +54,24 @@ public class SearchJob implements ParameterProvider {
 
     private Set<SearchError> errors = Sets.newHashSet();
 
-    public SearchJob(String id, Search search, String owner, String executingNodeId) {
+    private final Integer cancelAfterSeconds;
+
+    public SearchJob(String id,
+                     Search search,
+                     String owner,
+                     String executingNodeId) {
+
+        this(id, search, owner, executingNodeId, NO_CANCELLATION);
+    }
+
+    public SearchJob(String id,
+                     Search search,
+                     String owner,
+                     String executingNodeId,
+                     Integer cancelAfterSeconds) {
         this.search = search;
         this.searchJobIdentifier = new SearchJobIdentifier(id, search.id(), owner, executingNodeId);
+        this.cancelAfterSeconds = cancelAfterSeconds != null ? cancelAfterSeconds : NO_CANCELLATION;
     }
 
     @JsonIgnore //covered by @JsonUnwrapped
@@ -62,6 +82,11 @@ public class SearchJob implements ParameterProvider {
     @JsonIgnore
     public Search getSearch() {
         return search;
+    }
+
+    @JsonProperty("cancel_after_seconds")
+    public Integer getCancelAfterSeconds() {
+        return cancelAfterSeconds;
     }
 
     @JsonIgnore
@@ -94,6 +119,17 @@ public class SearchJob implements ParameterProvider {
         queryResults.put(queryId, resultFuture);
     }
 
+    @JsonIgnore
+    public void setSearchEngineTaskFuture(final Future<?> searchEngineTaskFuture) {
+        this.searchEngineTaskFuture = searchEngineTaskFuture;
+    }
+
+    public void cancel() {
+        if (this.searchEngineTaskFuture != null) {
+            this.searchEngineTaskFuture.cancel(true);
+        }
+    }
+
     @JsonProperty("results")
     public Map<String, QueryResult> results() {
         return EntryStream.of(queryResults)
@@ -105,8 +141,8 @@ public class SearchJob implements ParameterProvider {
 
     @JsonProperty("execution")
     public ExecutionInfo execution() {
-        final boolean isDone = resultFuture != null && resultFuture.isDone();
-        final boolean isCancelled = resultFuture != null && resultFuture.isCancelled();
+        final boolean isDone = (resultFuture == null || resultFuture.isDone()) && (searchEngineTaskFuture == null || searchEngineTaskFuture.isDone());
+        final boolean isCancelled = (searchEngineTaskFuture != null && searchEngineTaskFuture.isCancelled()) || (resultFuture != null && resultFuture.isCancelled());
         return new ExecutionInfo(isDone, isCancelled, !errors.isEmpty());
     }
 

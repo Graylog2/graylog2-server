@@ -24,7 +24,7 @@ import com.google.common.annotations.VisibleForTesting;
 import org.graylog.plugins.views.storage.migration.state.actions.MigrationActions;
 import org.graylog.plugins.views.storage.migration.state.persistence.DatanodeMigrationConfiguration;
 import org.graylog.plugins.views.storage.migration.state.persistence.DatanodeMigrationPersistence;
-import org.jetbrains.annotations.NotNull;
+import jakarta.annotation.Nonnull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +32,7 @@ public class MigrationStateMachineBuilder {
 
     private static final Logger LOG = LoggerFactory.getLogger(MigrationStateMachineBuilder.class);
 
-    @NotNull
+    @Nonnull
     private static StateMachineConfig<MigrationState, MigrationStep> configureStates(MigrationActions migrationActions) {
 
         // All actions which can fail should be performed on transition to make sure that there is no state change on error.
@@ -45,19 +45,16 @@ public class MigrationStateMachineBuilder {
                 .permit(MigrationStep.SELECT_MIGRATION, MigrationState.MIGRATION_WELCOME_PAGE, () -> LOG.info("Migration selected in menu, show welcome page"));
 
         config.configure(MigrationState.MIGRATION_WELCOME_PAGE)
-                .permit(MigrationStep.SHOW_DIRECTORY_COMPATIBILITY_CHECK, MigrationState.DIRECTORY_COMPATIBILITY_CHECK_PAGE, () -> LOG.info("Showing directory compatibility check page"))
-                .permit(MigrationStep.SKIP_DIRECTORY_COMPATIBILITY_CHECK, MigrationState.CA_CREATION_PAGE);
-
-        config.configure(MigrationState.DIRECTORY_COMPATIBILITY_CHECK_PAGE)
-                .onEntry(migrationActions::runDirectoryCompatibilityCheck)
-                .permitIf(MigrationStep.SHOW_CA_CREATION, MigrationState.CA_CREATION_PAGE, migrationActions::directoryCompatibilityCheckOk);
+                .permitIf(MigrationStep.SHOW_CA_CREATION, MigrationState.CA_CREATION_PAGE, migrationActions::caDoesNotExist)
+                .permitIf(MigrationStep.SHOW_RENEWAL_POLICY_CREATION, MigrationState.RENEWAL_POLICY_CREATION_PAGE, () -> !migrationActions.caDoesNotExist() && migrationActions.renewalPolicyDoesNotExist())
+                .permitIf(MigrationStep.SHOW_MIGRATION_SELECTION, MigrationState.MIGRATION_SELECTION_PAGE, migrationActions::caAndRenewalPolicyExist);
 
         config.configure(MigrationState.CA_CREATION_PAGE)
-                .permitIf(MigrationStep.SHOW_RENEWAL_POLICY_CREATION, MigrationState.RENEWAL_POLICY_CREATION_PAGE, () -> !migrationActions.caDoesNotExist())
-                .permitIf(MigrationStep.SHOW_MIGRATION_SELECTION, MigrationState.MIGRATION_SELECTION_PAGE, migrationActions::caAndRemovalPolicyExist);
+                .permitIf(MigrationStep.SHOW_RENEWAL_POLICY_CREATION, MigrationState.RENEWAL_POLICY_CREATION_PAGE, () -> !migrationActions.caDoesNotExist() && migrationActions.renewalPolicyDoesNotExist())
+                .permitIf(MigrationStep.SHOW_MIGRATION_SELECTION, MigrationState.MIGRATION_SELECTION_PAGE, migrationActions::caAndRenewalPolicyExist);
 
         config.configure(MigrationState.RENEWAL_POLICY_CREATION_PAGE)
-                .permitIf(MigrationStep.SHOW_MIGRATION_SELECTION, MigrationState.MIGRATION_SELECTION_PAGE, migrationActions::caAndRemovalPolicyExist);
+                .permitIf(MigrationStep.SHOW_MIGRATION_SELECTION, MigrationState.MIGRATION_SELECTION_PAGE, migrationActions::caAndRenewalPolicyExist);
 
         // Major decision - remote reindexing or rolling upgrade(in-place)?
         config.configure(MigrationState.MIGRATION_SELECTION_PAGE)
@@ -72,7 +69,8 @@ public class MigrationStateMachineBuilder {
                 });
 
         config.configure(MigrationState.PROVISION_DATANODE_CERTIFICATES_PAGE)
-                .permit(MigrationStep.PROVISION_DATANODE_CERTIFICATES, MigrationState.PROVISION_DATANODE_CERTIFICATES_RUNNING, migrationActions::provisionAndStartDataNodes);
+                .permitIf(MigrationStep.PROVISION_DATANODE_CERTIFICATES, MigrationState.PROVISION_DATANODE_CERTIFICATES_RUNNING, () -> !migrationActions.dataNodeStartupFinished(), migrationActions::provisionAndStartDataNodes)
+                .permitIf(MigrationStep.SHOW_DATA_MIGRATION_QUESTION, MigrationState.EXISTING_DATA_MIGRATION_QUESTION_PAGE, migrationActions::dataNodeStartupFinished);
 
         // This page should contain the "Please restart Graylog to continue with data migration"
         config.configure(MigrationState.PROVISION_DATANODE_CERTIFICATES_RUNNING)
@@ -102,13 +100,16 @@ public class MigrationStateMachineBuilder {
         // in place / rolling upgrade branch of the migration
         config.configure(MigrationState.ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE)
                 .onEntry(migrationActions::rollingUpgradeSelected)
-                .permit(MigrationStep.INSTALL_DATANODES_ON_EVERY_NODE, MigrationState.DIRECTORY_COMPATIBILITY_CHECK_PAGE2, () -> LOG.info("Showing directory compatibility check page"));
+                .permit(MigrationStep.RUN_DIRECTORY_COMPATIBILITY_CHECK, MigrationState.DIRECTORY_COMPATIBILITY_CHECK_PAGE, migrationActions::runDirectoryCompatibilityCheck);
 
-        config.configure(MigrationState.DIRECTORY_COMPATIBILITY_CHECK_PAGE2)
+        config.configure(MigrationState.DIRECTORY_COMPATIBILITY_CHECK_PAGE)
+                .permitReentryIf(MigrationStep.RUN_DIRECTORY_COMPATIBILITY_CHECK, () -> !migrationActions.directoryCompatibilityCheckOk(), migrationActions::runDirectoryCompatibilityCheck)
                 .permitIf(MigrationStep.SHOW_PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES, MigrationState.PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES, migrationActions::directoryCompatibilityCheckOk);
 
+
         config.configure(MigrationState.PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES)
-                .permit(MigrationStep.PROVISION_DATANODE_CERTIFICATES, MigrationState.PROVISION_ROLLING_UPGRADE_NODES_RUNNING, migrationActions::provisionDataNodes);
+                .permitIf(MigrationStep.PROVISION_DATANODE_CERTIFICATES, MigrationState.PROVISION_ROLLING_UPGRADE_NODES_RUNNING, () -> !migrationActions.provisioningFinished(), migrationActions::provisionDataNodes)
+                .permitIf(MigrationStep.CALCULATE_JOURNAL_SIZE, MigrationState.JOURNAL_SIZE_DOWNTIME_WARNING, migrationActions::provisioningFinished);
 
         config.configure(MigrationState.PROVISION_ROLLING_UPGRADE_NODES_RUNNING)
                 .permitIf(MigrationStep.CALCULATE_JOURNAL_SIZE, MigrationState.JOURNAL_SIZE_DOWNTIME_WARNING, migrationActions::provisioningFinished);

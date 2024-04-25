@@ -101,8 +101,13 @@ import CreateEventDefinition from 'views/logic/valueactions/createEventDefinitio
 import ChangeFieldType, {
   ChangeFieldTypeHelp,
   isChangeFieldTypeEnabled,
-  isChangeFieldTypeHidden,
 } from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldType';
+import AddEventsWidgetActionHandler, { CreateEventsWidget } from 'views/logic/widgets/events/AddEventsWidgetActionHandler';
+import EventsListConfigGenerator from 'views/logic/searchtypes/events/EventsListConfigGenerator';
+import EventsWidgetEdit from 'views/components/widgets/events/EventsWidgetEdit';
+import EventsWidget from 'views/logic/widgets/events/EventsWidget';
+import eventsAttributes from 'views/components/widgets/events/eventsAttributes';
+import WarmTierQueryValidation from 'views/components/searchbar/queryvalidation/WarmTierQueryValidation';
 
 import type { ActionHandlerArguments } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
@@ -114,9 +119,12 @@ import ValueParameter from './logic/parameters/ValueParameter';
 import MessageConfigGenerator from './logic/searchtypes/messages/MessageConfigGenerator';
 import UnknownWidget from './components/widgets/UnknownWidget';
 import NewSearchRedirectPage from './pages/NewSearchRedirectPage';
+import EventsVisualization from './components/widgets/events/EventsVisualization';
+import eventsFilterComponents from './components/widgets/events/filters/filterComponents';
 
 Widget.registerSubtype(AggregationWidget.type, AggregationWidget);
 Widget.registerSubtype(MessagesWidget.type, MessagesWidget);
+Widget.registerSubtype(EventsWidget.type, EventsWidget);
 VisualizationConfig.registerSubtype(WorldMapVisualization.type, WorldMapVisualizationConfig);
 VisualizationConfig.registerSubtype(BarVisualization.type, BarVisualizationConfig);
 VisualizationConfig.registerSubtype(NumberVisualization.type, NumberVisualizationConfig);
@@ -200,6 +208,19 @@ const exports: PluginExports = {
 
         return AggregationWidget.defaultTitle;
       },
+    },
+    {
+      type: 'EVENTS',
+      displayName: 'Events',
+      defaultHeight: 4,
+      defaultWidth: 6,
+      hasEditSubmitButton: true,
+      visualizationComponent: EventsVisualization,
+      editComponent: EventsWidgetEdit,
+      searchTypes: EventsListConfigGenerator,
+      titleGenerator: () => EventsWidget.defaultTitle,
+      needsControlledHeight: () => false,
+      searchResultTransformer: (data: Array<unknown>) => data?.[0],
     },
     {
       type: 'default',
@@ -300,7 +321,6 @@ const exports: PluginExports = {
       type: 'change-field-type',
       title: 'Change field type',
       isEnabled: isChangeFieldTypeEnabled,
-      isHidden: isChangeFieldTypeHidden,
       resetFocus: false,
       component: ChangeFieldType,
       help: ChangeFieldTypeHelp,
@@ -370,6 +390,10 @@ const exports: PluginExports = {
     title: 'Custom Aggregation',
     func: CreateCustomAggregation,
     icon: () => <Icon name="monitoring" />,
+  }, {
+    title: 'Events Overview',
+    func: CreateEventsWidget,
+    icon: () => <Icon name="report" type="regular" />,
   }],
   creators: [
     {
@@ -386,6 +410,11 @@ const exports: PluginExports = {
       type: 'generic',
       title: 'Aggregation',
       func: AddCustomAggregation,
+    },
+    {
+      type: 'events' as const,
+      title: 'Events Overview',
+      func: AddEventsWidgetActionHandler,
     },
   ],
   'views.completers': [
@@ -424,7 +453,10 @@ const exports: PluginExports = {
       sort: 1,
     },
   ],
+  'views.components.widgets.events.filterComponents': eventsFilterComponents,
+  'views.components.widgets.events.attributes': eventsAttributes,
   'views.reducers': viewsReducers,
+  'views.elements.validationErrorExplanation': [WarmTierQueryValidation],
 };
 
 export default exports;

@@ -32,7 +32,7 @@ import FieldSortIcon from 'views/components/widgets/FieldSortIcon';
 import Field from 'views/components/Field';
 import MessageTableProviders from 'views/components/messagelist/MessageTableProviders';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
-import { TableHeaderCell } from 'views/components/datatable';
+import { TableHeaderCell, TableHead } from 'views/components/datatable';
 
 import InteractiveContext from '../contexts/InteractiveContext';
 
@@ -82,18 +82,6 @@ const TableWrapper = styled.div(({ theme }) => css`
     &.table-responsive {
       overflow-y: auto;
     }
-  }
-`);
-
-const TableHead = styled.thead(({ theme }) => css`
-  background-color: ${theme.colors.table.head.background};
-  color: ${theme.utils.readableColor(theme.colors.gray[90])};
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  
-  && > tr > th {
-    min-width: 50px;
   }
 `);
 
@@ -152,6 +140,7 @@ const MessageTable = ({ fields, activeQueryId, messages, config, onSortChange, s
             <tr>
               {selectedFields.toSeq().map((selectedFieldName) => {
                 const type = _fieldTypeFor(selectedFieldName, fields);
+                const isCompound = type.isCompound();
 
                 return (
                   <TableHeaderCell key={selectedFieldName} $isNumeric={type.isNumeric()}>
@@ -161,7 +150,7 @@ const MessageTable = ({ fields, activeQueryId, messages, config, onSortChange, s
                       {selectedFieldName}
                     </Field>
                     <InteractiveContext.Consumer>
-                      {(interactive) => (interactive && (
+                      {(interactive) => (interactive && !isCompound && (
                         <FieldSortIcon fieldName={selectedFieldName}
                                        onSortChange={onSortChange}
                                        setLoadingState={setLoadingState}

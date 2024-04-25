@@ -47,8 +47,11 @@ import org.graylog2.bootstrap.preflight.web.resources.model.CA;
 import org.graylog2.bootstrap.preflight.web.resources.model.CreateCARequest;
 import org.graylog2.bootstrap.preflight.web.resources.model.CreateClientCertRequest;
 import org.graylog2.plugin.rest.ApiError;
+import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
 
 import java.io.IOException;
+import java.net.URI;
 import java.security.KeyStoreException;
 import java.util.List;
 
@@ -58,7 +61,7 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
 @Api(value = "CA", description = "Certificate Authority", tags = {CLOUD_VISIBLE})
-public class CAResource {
+public class CAResource extends RestResource {
     private final CaService caService;
     private final String passwordSecret;
     private final ClientCertGenerator clientCertGenerator;
@@ -82,8 +85,13 @@ public class CAResource {
     @Path("create")
     @AuditEvent(type = CaAuditEventTypes.CA_CREATE)
     @ApiOperation("Creates a CA")
-    public void createCA(@ApiParam(name = "request", required = true) @NotNull @Valid CreateCARequest request) throws CACreationException, KeyStoreStorageException, KeyStoreException {
-        caService.create(request.organization(), CaService.DEFAULT_VALIDITY, passwordSecret.toCharArray());
+    @RequiresPermissions(RestPermissions.GRAYLOG_CA_CREATE)
+    public Response createCA(@ApiParam(name = "request", required = true) @NotNull @Valid CreateCARequest request) throws CACreationException, KeyStoreStorageException, KeyStoreException {
+        final CA ca = caService.create(request.organization(), CaService.DEFAULT_VALIDITY, passwordSecret.toCharArray());
+        final URI caUri = getUriBuilderToSelf()
+                .path(CAResource.class)
+                .build();
+        return Response.created(caUri).entity(ca).build();
     }
 
     @POST
@@ -92,6 +100,7 @@ public class CAResource {
     @AuditEvent(type = CaAuditEventTypes.CA_UPLOAD)
     @ApiOperation("Upload a CA")
     @Produces(MediaType.APPLICATION_JSON)
+    @RequiresPermissions(RestPermissions.GRAYLOG_CA_CREATE)
     public Response uploadCA(@ApiParam(name = "password") @FormDataParam("password") String password, @ApiParam(name = "files") @FormDataParam("files") List<FormDataBodyPart> files) {
         try {
             caService.upload(password, files);
@@ -106,7 +115,7 @@ public class CAResource {
     @AuditEvent(type = CaAuditEventTypes.CLIENTCERT_CREATE)
     @ApiOperation("Creates a client certificate")
     @Produces(MediaType.APPLICATION_JSON)
-    @RequiresPermissions("*")
+    @RequiresPermissions(RestPermissions.GRAYLOG_CA_CLIENTCERT_CREATE)
     public Response createClientCert(@ApiParam(name = "request", required = true) @NotNull @Valid CreateClientCertRequest request) {
         try {
             var cert = clientCertGenerator.generateClientCert(request.principal(), request.role(), request.password().toCharArray());
@@ -121,7 +130,7 @@ public class CAResource {
     @AuditEvent(type = CaAuditEventTypes.CLIENTCERT_DELETE)
     @ApiOperation("removes the cert and the user from the role")
     @Produces(MediaType.APPLICATION_JSON)
-    @RequiresPermissions("*")
+    @RequiresPermissions(RestPermissions.GRAYLOG_CA_CLIENTCERT_DELETE)
     public Response deleteClientCert(@ApiParam(name = "role", required = true) @PathParam("role") String role, @ApiParam(name = "principal", required = true) @PathParam("principal") String principal) {
         try {
             clientCertGenerator.removeCertFor(role, principal);

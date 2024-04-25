@@ -24,11 +24,10 @@ import debounce from 'lodash/debounce';
 import { Button, Input } from 'components/bootstrap';
 import { Icon, SortableList } from 'components/common';
 import type { TimeRange } from 'views/logic/queries/Query';
-import { useStore } from 'stores/connect';
-import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import TimeRangeFilter from 'views/components/searchbar/time-range-filter';
 import TimeRangeInputSettingsContext from 'views/components/contexts/TimeRangeInputSettingsContext';
 import generateId from 'logic/generateId';
+import useSearchConfiguration from 'hooks/useSearchConfiguration';
 
 export type TimeRangePreset = {
   timerange: TimeRange,
@@ -118,7 +117,7 @@ const TimeRangePresetForm = ({ options, onUpdate }: {
     onUpdate(newState);
   }, [onUpdate, options]);
 
-  const { searchesClusterConfig: config } = useStore(SearchConfigStore);
+  const { config } = useSearchConfiguration();
   const limitDuration = useMemo(() => moment.duration(config?.query_time_range_limit).asSeconds() ?? 0, [config?.query_time_range_limit]);
 
   const onRemove = useCallback((idx: number) => {

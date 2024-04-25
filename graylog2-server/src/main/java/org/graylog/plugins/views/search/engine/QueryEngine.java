@@ -20,6 +20,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import org.graylog.plugins.views.search.ExplainResults;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryMetadata;
 import org.graylog.plugins.views.search.QueryMetadataDecorator;
@@ -34,14 +35,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
-
-import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 
 @Singleton
 public class QueryEngine {
@@ -72,6 +72,17 @@ public class QueryEngine {
                 .orElse(parsedMetadata);
     }
 
+    public ExplainResults explain(SearchJob searchJob, Set<SearchError> validationErrors, DateTimeZone timezone) {
+        final Map<String, ExplainResults.QueryExplainResult> queries = searchJob.getSearch().queries().stream()
+                .collect(Collectors.toMap(Query::id, q -> {
+                    final GeneratedQueryContext generatedQueryContext = backend.generate(q, Set.of(), timezone);
+
+                    return backend.explain(searchJob, q, generatedQueryContext);
+                }));
+
+        return new ExplainResults(searchJob.getSearchId(), new ExplainResults.SearchResult(queries), validationErrors);
+    }
+
     @WithSpan
     public SearchJob execute(SearchJob searchJob, Set<SearchError> validationErrors, DateTimeZone timezone) {
         final Set<Query> validQueries = searchJob.getSearch().queries()
@@ -99,17 +110,6 @@ public class QueryEngine {
                             return queryResult;
                         })
         ));
-
-        validQueries.forEach(query -> {
-            final CompletableFuture<QueryResult> queryResultFuture = searchJob.getQueryResultFuture(query.id());
-            if (!queryResultFuture.isDone()) {
-                // this is not going to throw an exception, because we will always replace it with a placeholder "FAILED" result above
-                final QueryResult result = queryResultFuture.join();
-
-            } else {
-                LOG.debug("[{}] Not generating query for query {}", defaultIfEmpty(query.id(), "root"), query);
-            }
-        });
 
         LOG.debug("Search job {} executing", searchJob.getId());
         return searchJob.seal();

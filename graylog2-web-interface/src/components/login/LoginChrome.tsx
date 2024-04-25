@@ -17,17 +17,22 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
-import bgImage from 'images/auth/banner-bg.jpg';
 import LoginBox from 'components/login/LoginBox';
 import PublicNotifications from 'components/common/PublicNotifications';
-import graylogLogo from 'images/auth/gl_logo_horiz.svg';
+import backgroundImage from 'images/auth/login-bg.svg';
+import { Logo } from 'components/perspectives/DefaultBrand';
 
-const Logo = styled.img`
+const LogoContainer = styled.div`
   display: block;
   height: 5rem;
   width: auto;
   margin: auto;
   margin-bottom: 1.5rem;
+  
+  svg {
+    width: 100%;
+    height: 75px;
+  }
 `;
 
 const Background = styled.div`
@@ -46,7 +51,7 @@ const BackgroundText = styled.div`
   height: 100%;
   width: 100%;
   padding: 0 30px;
-  background-image: url(${bgImage});
+  background-image: url(${backgroundImage});
   background-position: center;
   background-size: cover;
 `;
@@ -108,7 +113,9 @@ const LoginChrome = ({ children }: Props) => (
       </NotificationsContainer>
       <BackgroundText>
         <TextContainer>
-          <Logo alt="logo" src={graylogLogo} />
+          <LogoContainer>
+            <Logo color="#ffffff" />
+          </LogoContainer>
           <Claim>Data. Insights. <Highlight>Answers.</Highlight></Claim>
         </TextContainer>
       </BackgroundText>

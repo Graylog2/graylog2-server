@@ -28,7 +28,7 @@ import {
   PaginatedList, SearchForm,
   Spinner,
 } from 'components/common';
-import EntityDataTable from 'components/common/EntityDataTable';
+import EntityDataTable, { useTableEventHandlers } from 'components/common/EntityDataTable';
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
 import type { Sort } from 'stores/PaginationTypes';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
@@ -43,6 +43,9 @@ import OriginFilterValueRenderer from 'components/indices/IndexSetFieldTypes/Ori
 import useCustomColumnRenderers from 'components/indices/IndexSetFieldTypes/hooks/useCustomColumnRenderers';
 import IndexSetProfile from 'components/indices/IndexSetFieldTypes/IndexSetProfile';
 import type { FieldTypePutResponse } from 'views/logic/fieldactions/ChangeFieldType/types';
+import { useStore } from 'stores/connect';
+import { IndexSetsStore } from 'stores/indices/IndexSetsStore';
+import isIndexFieldTypeChangeAllowed from 'components/indices/helpers/isIndexFieldTypeChangeAllowed';
 
 import BulkActions from './BulkActions';
 
@@ -78,6 +81,7 @@ const FilterValueRenderers = {
 
 const IndexSetFieldTypesList = () => {
   const { indexSetId } = useParams();
+  const { indexSet } = useStore(IndexSetsStore);
   const [selectedEntitiesData, setSelectedEntitiesData] = useState<Record<string, IndexSetFieldType>>({});
   const [urlQueryFilters, setUrlQueryFilters] = useUrlQueryFilters();
   const [query, setQuery] = useQueryParam('query', StringParam);
@@ -98,19 +102,19 @@ const IndexSetFieldTypesList = () => {
   }), [paginationQueryParameter.page, layoutConfig.pageSize, layoutConfig.sort, query, urlQueryFilters]);
   const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(ENTITY_TABLE_ID);
 
-  const onPageSizeChange = useCallback((newPageSize: number) => {
-    paginationQueryParameter.resetPage();
-    updateTableLayout({ perPage: newPageSize });
-  }, [paginationQueryParameter, updateTableLayout]);
+  const {
+    onColumnsChange,
+    onPageSizeChange,
+    onSearch,
+    onSearchReset,
+    onSortChange,
+  } = useTableEventHandlers({
+    appSection: 'index-set-field-types-list',
+    paginationQueryParameter,
+    setQuery,
+    updateTableLayout,
+  });
 
-  const onSortChange = useCallback((newSort: Sort) => {
-    paginationQueryParameter.resetPage();
-    updateTableLayout({ sort: newSort });
-  }, [paginationQueryParameter, updateTableLayout]);
-
-  const onColumnsChange = useCallback((displayedAttributes: Array<string>) => {
-    updateTableLayout({ displayedAttributes });
-  }, [updateTableLayout]);
   const {
     isLoading,
     data: { list, pagination, attributes },
@@ -132,17 +136,13 @@ const IndexSetFieldTypesList = () => {
 
     refetchFieldTypes();
   }, [indexSetId, refetchFieldTypes, selectedEntitiesData]);
+  const indexFieldTypeChangeAllowed = useMemo(() => isIndexFieldTypeChangeAllowed(indexSet), [indexSet]);
   const renderActions = useCallback((fieldType: IndexSetFieldType) => (
     <FieldTypeActions fieldType={fieldType}
                       indexSetId={indexSetId}
                       onSubmitCallback={onSubmitCallback} />
   ), [indexSetId, onSubmitCallback]);
 
-  const onSearch = useCallback((val: string) => {
-    paginationQueryParameter.resetPage();
-    setQuery(val);
-  }, [paginationQueryParameter, setQuery]);
-  const onSearchReset = useCallback(() => setQuery(''), [setQuery]);
   const onChangeFilters = useCallback((newUrlQueryFilters: UrlQueryFilters) => {
     paginationQueryParameter.resetPage();
     setUrlQueryFilters(newUrlQueryFilters);
@@ -181,7 +181,7 @@ const IndexSetFieldTypesList = () => {
                          setUrlQueryFilters={onChangeFilters}
                          filterValueRenderers={FilterValueRenderers} />
         </SearchForm>
-        <IndexSetProfile />
+        {indexFieldTypeChangeAllowed && <IndexSetProfile />}
       </StyledTopRow>
       {pagination?.total === 0 && (
         <NoEntitiesExist>
@@ -200,7 +200,7 @@ const IndexSetFieldTypesList = () => {
                                             actionsCellWidth={120}
                                             columnRenderers={customColumnRenderers}
                                             columnDefinitions={attributes}
-                                            rowActions={renderActions}
+                                            rowActions={indexFieldTypeChangeAllowed && renderActions}
                                             expandedSectionsRenderer={expandedSections}
                                             bulkSelection={bulkSection} />
       )}

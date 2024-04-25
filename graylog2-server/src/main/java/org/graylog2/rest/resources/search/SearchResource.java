@@ -21,6 +21,8 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.ForbiddenException;
 import org.glassfish.jersey.server.ChunkedOutput;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryResult;
@@ -56,9 +58,6 @@ import org.joda.time.DateTime;
 import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.ForbiddenException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -96,7 +95,7 @@ public abstract class SearchResource extends RestResource {
 
         final Optional<String> streamId = Searches.extractStreamId(filter);
 
-        final SearchJob searchJob = searchExecutor.execute(search, searchUser, ExecutionState.empty());
+        final SearchJob searchJob = searchExecutor.executeSync(search, searchUser, ExecutionState.empty());
 
         return extractSearchResponse(searchJob, query, decorate, fieldList, timeRange, streamId);
     }

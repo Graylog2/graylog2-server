@@ -16,7 +16,10 @@
  */
 package org.graylog.storage.opensearch2.views.searchtypes;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
+import jakarta.inject.Inject;
+import org.graylog.events.event.EventDto;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
@@ -28,6 +31,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.index.query.BoolQueryBuilde
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.SearchHit;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregations;
+import org.graylog.shaded.opensearch2.org.opensearch.search.sort.FieldSortBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.sort.SortOrder;
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
 
@@ -38,15 +42,30 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 public class OSEventList implements EventListStrategy {
+    private final ObjectMapper objectMapper;
+
+    @Inject
+    public OSEventList(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
+
     @Override
     public void doGenerateQueryPart(Query query, EventList eventList,
                                     OSGeneratedQueryContext queryContext) {
+        final Set<String> effectiveStreams = eventList.streams().isEmpty()
+                ? query.usedStreamIds()
+                : eventList.streams();
+
         final var searchSourceBuilder = queryContext.searchSourceBuilder(eventList);
-        final var sortConfig = eventList.sortWithDefault();
-        searchSourceBuilder.sort(sortConfig.field(), toSortOrder(sortConfig.direction()));
+        final FieldSortBuilder sortConfig = sortConfig(eventList);
+        searchSourceBuilder.sort(sortConfig);
         final var queryBuilder = searchSourceBuilder.query();
+        if (!effectiveStreams.isEmpty() && queryBuilder instanceof BoolQueryBuilder boolQueryBuilder) {
+            boolQueryBuilder.must(QueryBuilders.termsQuery(EventDto.FIELD_SOURCE_STREAMS, effectiveStreams));
+        }
         if (!eventList.attributes().isEmpty() && queryBuilder instanceof BoolQueryBuilder boolQueryBuilder) {
             final var filterQueries = eventList.attributes().stream()
+                    .filter(attribute -> EventList.KNOWN_ATTRIBUTES.contains(attribute.field()))
                     .flatMap(attribute -> attribute.toQueryStrings().stream())
                     .toList();
 
@@ -54,7 +73,7 @@ public class OSEventList implements EventListStrategy {
         }
 
         eventList.page().ifPresentOrElse(page -> {
-            final var pageSize = eventList.perPage().orElse(EventList.DEFAULT_PAGE_SIZE);
+            final int pageSize = eventList.perPage().orElse(EventList.DEFAULT_PAGE_SIZE);
             searchSourceBuilder.size(pageSize);
             searchSourceBuilder.from((page - 1) * pageSize);
         }, () -> searchSourceBuilder.size(10000));
@@ -67,6 +86,13 @@ public class OSEventList implements EventListStrategy {
         };
     }
 
+    protected FieldSortBuilder sortConfig(EventList eventList) {
+        final var sortConfig = eventList.sort()
+                .filter(sort -> EventList.KNOWN_ATTRIBUTES.contains(sort.field()))
+                .orElse(EventList.DEFAULT_SORT);
+        return new FieldSortBuilder(sortConfig.field()).order(toSortOrder(sortConfig.direction()));
+    }
+
     protected List<Map<String, Object>> extractResult(SearchResponse result) {
         return StreamSupport.stream(result.getHits().spliterator(), false)
                 .map(SearchHit::getSourceAsMap)
@@ -77,12 +103,9 @@ public class OSEventList implements EventListStrategy {
     @Override
     public SearchType.Result doExtractResult(SearchJob job, Query query, EventList searchType, SearchResponse result,
                                              Aggregations aggregations, OSGeneratedQueryContext queryContext) {
-        final Set<String> effectiveStreams = searchType.streams().isEmpty()
-                ? query.usedStreamIds()
-                : searchType.streams();
         final List<CommonEventSummary> eventSummaries = extractResult(result).stream()
+                .map(rawEvent -> objectMapper.convertValue(rawEvent, EventDto.class))
                 .map(EventSummary::parse)
-                .filter(eventSummary -> effectiveStreams.containsAll(eventSummary.streams()))
                 .collect(Collectors.toList());
         final EventList.Result.Builder resultBuilder = EventList.Result.builder()
                 .events(eventSummaries)

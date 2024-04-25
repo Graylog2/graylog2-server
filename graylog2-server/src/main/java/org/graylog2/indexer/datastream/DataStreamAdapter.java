@@ -28,4 +28,6 @@ public interface DataStreamAdapter {
 
     void applyIsmPolicy(@Nonnull String dataStreamName, @Nonnull Policy policy);
 
+    void setNumberOfReplicas(@Nonnull String dataStreamName, @Nonnull int replicas);
+
 }

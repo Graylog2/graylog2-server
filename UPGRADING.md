@@ -70,6 +70,11 @@ Templates using the JMTE library are potentially affected and should to be check
 Not affected by this change are the following templates using Freemarker:
 * Sidecar configurations
 
+### Enterprise theme customization
+
+In case you are using the enterprise customization feature, you might need to adjust the newly added `gray` color on the customization page, due to some theme structure changes.   
+This should just affect the input and table header colors, other colors should look like before the upgrade.  
+
 ## Configuration File Changes
 | Option                           | Action    | Description                                                                                                                                                                                                                                             |
 |----------------------------------|-----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -247,6 +252,8 @@ throughout the Graylog core code base.
 
 The following REST API changes have been made.
 
-| Endpoint                | Description              |
-|-------------------------|--------------------------|
-| `GET /example/resource` | TODO placeholder comment |
+| Endpoint                                                    | Description                                                                                                                           |
+|-------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------|
+| `POST /views/search/[search_id]/execute`                    | Starts async search execution. Returns data that can be used to poll and cancel the job later on (job's ID and ID of execution node). |
+| `GET /views/searchjobs/[executing_node]/[job_id]/status`    | New, preferred endpoint for job status polling.                                                                                       |
+| `DELETE /views/searchjobs/[executing_node]/[job_id]/cancel` | New endpoint for job cancellation.                                                                                                    |

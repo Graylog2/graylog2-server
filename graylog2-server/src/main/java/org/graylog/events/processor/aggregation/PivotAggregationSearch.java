@@ -77,6 +77,7 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
+import static org.graylog.plugins.views.search.SearchJob.NO_CANCELLATION;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class PivotAggregationSearch implements AggregationSearch {
@@ -380,7 +381,7 @@ public class PivotAggregationSearch implements AggregationSearch {
         // TODO: Once we introduce "EventProcessor owners" this should only load the permitted streams of the
         //       user who created this EventProcessor.
         search = search.addStreamsToQueriesWithoutStreams(() -> permittedStreams.loadAllMessageStreams((streamId) -> true));
-        final SearchJob searchJob = queryEngine.execute(searchJobService.create(search, username), Collections.emptySet(), user.timezone());
+        final SearchJob searchJob = queryEngine.execute(searchJobService.create(search, username, NO_CANCELLATION), Collections.emptySet(), user.timezone());
         try {
             Uninterruptibles.getUninterruptibly(
                     searchJob.getResultFuture(),

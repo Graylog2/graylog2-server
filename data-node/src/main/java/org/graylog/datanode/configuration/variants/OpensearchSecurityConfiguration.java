@@ -56,6 +56,7 @@ public class OpensearchSecurityConfiguration {
     private final KeystoreInformation transportCertificate;
     private final KeystoreInformation httpCertificate;
     private KeystoreInformation truststore;
+    private String opensearchHeap;
 
     public OpensearchSecurityConfiguration(KeystoreInformation transportCertificate, KeystoreInformation httpCertificate) {
         this.transportCertificate = transportCertificate;
@@ -74,6 +75,7 @@ public class OpensearchSecurityConfiguration {
      * truststore.
      */
     public OpensearchSecurityConfiguration configure(DatanodeConfiguration datanodeConfiguration, byte[] signingKey) throws GeneralSecurityException, IOException {
+        opensearchHeap = datanodeConfiguration.opensearchHeap();
         if (securityEnabled()) {
 
             logCertificateInformation("transport certificate", transportCertificate);
@@ -114,7 +116,7 @@ public class OpensearchSecurityConfiguration {
             config.put("plugins.security.ssl.http.enabled", "true");
 
             config.put("plugins.security.ssl.http.keystore_type", KEYSTORE_FORMAT);
-            config.put("plugins.security.ssl.http.keystore_filepath",  httpCertificate.location().getFileName().toString());  // todo: this should be computed as a relative path
+            config.put("plugins.security.ssl.http.keystore_filepath", httpCertificate.location().getFileName().toString());  // todo: this should be computed as a relative path
             config.put("plugins.security.ssl.http.keystore_password", httpCertificate.passwordAsString());
             config.put("plugins.security.ssl.http.keystore_alias", CertConstants.DATANODE_KEY_ALIAS);
 
@@ -133,8 +135,8 @@ public class OpensearchSecurityConfiguration {
 
     private Map<String, Object> filterConfigurationMap(final Map<String, Object> map, final String... keys) {
         Map<String, Object> result = map;
-        for(final String key: List.of(keys)) {
-            result = (Map<String, Object>)result.get(key);
+        for (final String key : List.of(keys)) {
+            result = (Map<String, Object>) result.get(key);
         }
         return result;
     }
@@ -191,9 +193,9 @@ public class OpensearchSecurityConfiguration {
         try (final FileInputStream is = new FileInputStream(keystore.location().toFile())) {
             instance.load(is, keystore.password());
             final Enumeration<String> aliases = instance.aliases();
-            while(aliases.hasMoreElements()) {
+            while (aliases.hasMoreElements()) {
                 final Certificate cert = instance.getCertificate(aliases.nextElement());
-                if(cert instanceof X509Certificate x509Certificate) {
+                if (cert instanceof X509Certificate x509Certificate) {
                     final String alternativeNames = x509Certificate.getSubjectAlternativeNames()
                             .stream()
                             .map(san -> san.get(1))
@@ -203,5 +205,9 @@ public class OpensearchSecurityConfiguration {
                 }
             }
         }
+    }
+
+    public String getOpensearchHeap() {
+        return opensearchHeap;
     }
 }

@@ -18,7 +18,8 @@ package org.graylog.storage.opensearch2;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.opensearch.client.Request;
+import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
+import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
 
 import jakarta.inject.Inject;
 
@@ -34,9 +35,9 @@ public class PlainJsonApi {
     }
 
     public JsonNode perform(Request request, String errorMessage) {
-        return client.executeLowLevel((restClient, requestOptions) -> {
+        return client.execute((c, requestOptions) -> {
             request.setOptions(requestOptions);
-            final var response = restClient.performRequest(request);
+            final Response response = c.getLowLevelClient().performRequest(request);
             return objectMapper.readTree(response.getEntity().getContent());
         }, errorMessage);
     }

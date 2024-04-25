@@ -1,0 +1,12 @@
+type = "c"
+message = "Compute indices overview statistics using `_cluster/stats` to reduce the amount of data returned."
+
+pulls = ["18564"]
+issues = ["Graylog2/graylog-plugin-enterprise#6100"]
+
+details.user = """
+The System/Indices overview page displays some highlevel statistics. When there are a very large number
+of indices and shards, this may result in a ContentTooLongException.
+
+Graylog now avoids this by using a different API which eliminates all the extraneous data.
+"""

@@ -16,34 +16,40 @@
  */
 package org.graylog.storage.opensearch2;
 
-import jakarta.inject.Inject;
+import com.google.common.collect.ImmutableMap;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.engine.QuerySuggestionsService;
 import org.graylog.plugins.views.search.engine.suggestions.SuggestionEntry;
 import org.graylog.plugins.views.search.engine.suggestions.SuggestionError;
+import org.graylog.plugins.views.search.engine.suggestions.SuggestionFieldType;
 import org.graylog.plugins.views.search.engine.suggestions.SuggestionRequest;
 import org.graylog.plugins.views.search.engine.suggestions.SuggestionResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.index.query.BoolQueryBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
+import org.graylog.shaded.opensearch2.org.opensearch.index.query.ScriptQueryBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.script.Script;
+import org.graylog.shaded.opensearch2.org.opensearch.script.ScriptType;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.terms.ParsedTerms;
+import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.search.suggest.SuggestBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.search.suggest.SuggestBuilders;
+import org.graylog.shaded.opensearch2.org.opensearch.search.suggest.term.TermSuggestion;
+import org.graylog.shaded.opensearch2.org.opensearch.search.suggest.term.TermSuggestionBuilder;
 import org.graylog.storage.errors.ResponseError;
 import org.graylog2.plugin.Message;
-import org.opensearch.client.json.JsonData;
-import org.opensearch.client.opensearch._types.FieldValue;
-import org.opensearch.client.opensearch._types.aggregations.LongTermsBucket;
-import org.opensearch.client.opensearch._types.aggregations.StringTermsBucket;
-import org.opensearch.client.opensearch._types.query_dsl.Query;
-import org.opensearch.client.opensearch.core.MsearchRequest;
-import org.opensearch.client.opensearch.core.msearch.MultisearchBody;
-import org.opensearch.client.opensearch.core.search.Suggest;
-import org.opensearch.client.opensearch.core.search.Suggester;
+
+import jakarta.inject.Inject;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class QuerySuggestionsOS2 implements QuerySuggestionsService {
-    private static final String AGG_FIELD_VALUES = "fieldvalues";
-    private static final String AGG_CORRECTIONS = "corrections";
 
     private final OpenSearchClient client;
     private final IndexLookup indexLookup;
@@ -57,50 +63,28 @@ public class QuerySuggestionsOS2 implements QuerySuggestionsService {
     @Override
     public SuggestionResponse suggest(SuggestionRequest req) {
         final Set<String> affectedIndices = indexLookup.indexNamesForStreamsInTimeRange(req.streams(), req.timerange());
-        final var suggestionBuilder = Suggester.of(suggesterBuilder -> suggesterBuilder
-                .suggesters(AGG_CORRECTIONS, builder -> builder
-                        .text(req.input())
-                        .term(termSuggesterBuilder -> termSuggesterBuilder
-                                .field(req.field())
-                                .size(req.size()))));
-        final var query = Query.of(queryBuilder -> queryBuilder.bool(boolBuilder -> boolBuilder
-                .filter(filterBuilder -> filterBuilder.terms(termsBuilder -> termsBuilder.field(Message.FIELD_STREAMS)
-                        .terms(termsQueryBuilder -> termsQueryBuilder.value(req.streams().stream().map(FieldValue::of).toList()))))
-                .filter(filterBuilder -> filterBuilder.range(TimeRangeQueryFactory.create(req.timerange())))
-                .filter(filterBuilder -> filterBuilder.exists(existsBuilder -> existsBuilder.field(req.field())))
-                .filter(getPrefixQuery(req))));
-        final var searchRequest = MultisearchBody.of(builder -> builder
-                .size(0)
+        final TermSuggestionBuilder suggestionBuilder = SuggestBuilders.termSuggestion(req.field()).text(req.input()).size(req.size());
+        final BoolQueryBuilder query = QueryBuilders.boolQuery()
+                .filter(QueryBuilders.termsQuery(Message.FIELD_STREAMS, req.streams()))
+                .filter(TimeRangeQueryFactory.create(req.timerange()))
+                .filter(QueryBuilders.existsQuery(req.field()))
+                .filter(getPrefixQuery(req));
+        final SearchSourceBuilder search = new SearchSourceBuilder()
                 .query(query)
-                .suggest(suggestionBuilder)
-                .aggregations(AGG_FIELD_VALUES, aggBuilder -> aggBuilder
-                        .terms(termsBuilder -> termsBuilder
-                                .field(req.field())
-                                .size(req.size()))));
+                .size(0)
+                .aggregation(AggregationBuilders.terms("fieldvalues").field(req.field()).size(req.size()))
+                .suggest(new SuggestBuilder().addSuggestion("corrections", suggestionBuilder));
 
-        final MsearchRequest msearchRequest = new MsearchRequest.Builder().searches(searchesBuilder -> searchesBuilder
-                        .header(headerBuilder -> headerBuilder.index(affectedIndices.stream().toList()))
-                        .body(searchRequest))
-                .build();
         try {
-            final var resultItem = client.search(msearchRequest, "Failed to execute aggregation");
-            final var result = resultItem.result();
-            final var rawAgg = result.aggregations().get(AGG_FIELD_VALUES);
-            final var fieldValues = rawAgg.isSterms() ? rawAgg.sterms() : rawAgg.lterms();
-            final List<SuggestionEntry> entries = fieldValues.buckets().array()
-                    .stream()
-                    .map(b -> new SuggestionEntry(b instanceof StringTermsBucket sBucket ? sBucket.key() : ((LongTermsBucket) b).key(), b.docCount()))
-                    .collect(Collectors.toList());
+            final SearchResponse result = client.singleSearch(new SearchRequest(affectedIndices.toArray(new String[]{})).source(search), "Failed to execute aggregation");
+            final ParsedTerms fieldValues = result.getAggregations().get("fieldvalues");
+            final List<SuggestionEntry> entries = fieldValues.getBuckets().stream().map(b -> new SuggestionEntry(b.getKeyAsString(), b.getDocCount())).collect(Collectors.toList());
 
             if (!entries.isEmpty()) {
-                return SuggestionResponse.forSuggestions(req.field(), req.input(), entries, fieldValues.sumOtherDocCount());
+                return SuggestionResponse.forSuggestions(req.field(), req.input(), entries, fieldValues.getSumOfOtherDocCounts());
             } else {
-                final var suggestion = result.suggest().get(AGG_CORRECTIONS);
-                final List<SuggestionEntry> corrections = suggestion.stream()
-                        .filter(Suggest::isTerm)
-                        .map(Suggest::term)
-                        .flatMap(e -> e.options().stream()).map(o -> new SuggestionEntry(o.text(), o.freq()))
-                        .collect(Collectors.toList());
+                TermSuggestion suggestion = result.getSuggest().getSuggestion("corrections");
+                final List<SuggestionEntry> corrections = suggestion.getEntries().stream().flatMap(e -> e.getOptions().stream()).map(o -> new SuggestionEntry(o.getText().string(), o.getFreq())).collect(Collectors.toList());
                 return SuggestionResponse.forSuggestions(req.field(), req.input(), corrections, null);
             }
 
@@ -112,10 +96,9 @@ public class QuerySuggestionsOS2 implements QuerySuggestionsService {
         }
     }
 
-    private Query getPrefixQuery(SuggestionRequest req) {
+    private QueryBuilder getPrefixQuery(SuggestionRequest req) {
         return switch (req.fieldType()) {
-            case TEXTUAL ->
-                    Query.of(queryBuilder -> queryBuilder.prefix(prefixBuilder -> prefixBuilder.field(req.field()).value(req.input())));
+            case TEXTUAL -> QueryBuilders.prefixQuery(req.field(), req.input());
             default -> getScriptedPrefixQuery(req);
         };
     }
@@ -125,14 +108,11 @@ public class QuerySuggestionsOS2 implements QuerySuggestionsService {
      * TODO: would it make sense to switch between this scripted implementation and the standard prefix
      * query based on our information about the field type? Would it be faster?
      */
-    private static Query getScriptedPrefixQuery(SuggestionRequest req) {
-        return Query.of(queryBuilder -> queryBuilder
-                .script(scriptQueryBuilder -> scriptQueryBuilder
-                        .script(scriptBuilder -> scriptBuilder
-                                .inline(inlineBuilder -> inlineBuilder
-                                        .lang("painless")
-                                        .source("String val = doc[params.field].value.toString(); return val.startsWith(params.input);")
-                                        .params(Map.of("field", JsonData.of(req.field()), "input", JsonData.of(req.input())))))));
+    private static ScriptQueryBuilder getScriptedPrefixQuery(SuggestionRequest req) {
+        final Script script = new Script(ScriptType.INLINE, "painless",
+                "String val = doc[params.field].value.toString(); return val.startsWith(params.input);",
+                ImmutableMap.of("field", req.field(), "input", req.input()));
+        return QueryBuilders.scriptQuery(script);
     }
 
     private Optional<SuggestionError> tryResponseException(org.graylog.shaded.opensearch2.org.opensearch.OpenSearchException exception) {

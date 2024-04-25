@@ -1,0 +1,5 @@
+type = "c"
+    message = "Adds a new optional parameter `exclude_empty_arrays` for pipeline function `select_jsonpath`."
+
+pulls = ["18674"]
+issues = ["17805"]

@@ -23,21 +23,30 @@ import org.graylog.plugins.views.search.export.ExportException;
 import org.graylog.plugins.views.search.export.ExportMessagesCommand;
 import org.graylog.plugins.views.search.export.SimpleMessageChunk;
 import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
+import org.graylog.shaded.opensearch2.org.opensearch.action.support.master.AcknowledgedResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutMappingRequest;
 import org.graylog.storage.opensearch2.testing.OpenSearchInstance;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
+import org.graylog.testing.elasticsearch.SkipDefaultIndexTemplate;
 import org.graylog2.indexer.ElasticsearchException;
+import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
+import jakarta.annotation.Nonnull;
 import org.joda.time.DateTimeZone;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 
 
@@ -46,6 +55,11 @@ public class OpenSearchExportBackendIT extends ElasticsearchBaseTest {
     private IndexLookup indexLookup;
     private OpenSearchExportBackend backend;
     private OpenSearchExportITHelper helper;
+
+    @Override
+    public String messageTemplateIndexPattern() {
+        return "graylog_*";
+    }
 
     @Rule
     public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
@@ -62,7 +76,12 @@ public class OpenSearchExportBackendIT extends ElasticsearchBaseTest {
         helper = new OpenSearchExportITHelper(indexLookup, backend);
     }
 
-    public RequestStrategy requestStrategy() {
+    @After
+    public void afterEach() {
+        openSearchInstance.cleanUp();
+    }
+
+    private RequestStrategy requestStrategy() {
         final ExportClient exportClient = new ExportClient(openSearchInstance.openSearchClient());
         return new SearchAfter(exportClient);
     }
@@ -91,6 +110,7 @@ public class OpenSearchExportBackendIT extends ElasticsearchBaseTest {
         ExportMessagesCommand command = helper.commandBuilderWithAllTestDefaultStreams()
                 .queryString(ElasticsearchQueryString.of("Ha Ho"))
                 .build();
+        helper.mockIndexLookupFor(command, "graylog_0", "graylog_1");
 
         helper.runWithExpectedResultIgnoringSort(command, "timestamp,source,message",
                 "graylog_0, 2015-01-01T04:00:00.000Z, source-2, Ho",
@@ -198,6 +218,7 @@ public class OpenSearchExportBackendIT extends ElasticsearchBaseTest {
         importFixture("messages.json");
 
         ExportMessagesCommand command = helper.commandBuilderWithAllTestDefaultStreams().build();
+        helper.mockIndexLookupFor(command, "graylog_0", "graylog_1");
 
         helper.runWithExpectedResult(command, "timestamp,source,message",
                 "graylog_0, 2015-01-01T01:00:00.000Z, source-1, Ha",
@@ -221,5 +242,92 @@ public class OpenSearchExportBackendIT extends ElasticsearchBaseTest {
                 "graylog_0, 2015-01-01T14:30:00.000+10:30, source-2, Ho");
     }
 
+    @Test
+    @SkipDefaultIndexTemplate
+    public void canExportWithMissingFieldOnSort() {
+
+        createIndicesWithMapping(mappingWithOutAlias(), "graylog_0");
+        createIndicesWithMapping(mappingWithAlias(), "graylog_1");
+
+        importFixture("messages-with-old-field-types.json");
+
+        ExportMessagesCommand command = helper.commandBuilderWithAllTestDefaultStreams().build();
+        helper.mockIndexLookupFor(command, "graylog_0", "graylog_1");
+
+        helper.runWithExpectedResult(command, "timestamp,source,message",
+                "graylog_1, 2015-01-01T01:00:00.000Z, source-1, Ha",
+                "graylog_0, 2015-01-01T01:59:59.999Z, source-2, This message has no gl2_second_sort_field alias"
+        );
+    }
+
+    @Test
+    @SkipDefaultIndexTemplate
+    public void reportsShardErrors() {
+        createIndicesWithMapping(mappingWithOutAlias(), "graylog_0");
+        createIndicesWithMapping(mappingWithAlias(), "graylog_1");
+        // no mapping for graylog_2 so we will have a message with the wrong timestamp field type
+
+        importFixture("messages-with-old-field-types.json");
+
+        ExportMessagesCommand command = helper.commandBuilderWithAllTestDefaultStreams().build();
+
+        helper.mockIndexLookupFor(command, "graylog_0", "graylog_1", "graylog_2");
+
+        assertThatThrownBy(() ->
+                helper.runWithExpectedResult(command, "timestamp,source,message", "ignored, ignored, ignored, ignored"))
+                .isInstanceOf(ExportException.class);
+    }
+
+    @Nonnull
+    private static Map<String, Object> mappingWithOutAlias() {
+        return Map.of("properties",
+                Map.of(
+                        Message.FIELD_TIMESTAMP,
+                        Map.of("type", "date",
+                                "format", "uuuu-MM-dd HH:mm:ss.SSS"
+                        )
+                        ,
+                        Message.FIELD_GL2_MESSAGE_ID,
+                        Map.of("type", "keyword"),
+                        Message.FIELD_STREAMS,
+                        Map.of("type", "keyword")
+                )
+        );
+    }
+
+    @Nonnull
+    private static Map<String, Object> mappingWithAlias() {
+        return Map.of("properties",
+                Map.of(
+                        Message.FIELD_TIMESTAMP,
+                        Map.of("type", "date",
+                                "format", "uuuu-MM-dd HH:mm:ss.SSS"
+                        )
+                        ,
+                        Message.FIELD_GL2_MESSAGE_ID,
+                        Map.of("type", "keyword")
+                        ,
+                        Message.FIELD_STREAMS,
+                        Map.of("type", "keyword"),
+                        Message.GL2_SECOND_SORT_FIELD,
+                        Map.of("type", "alias",
+                                "path", Message.FIELD_GL2_MESSAGE_ID)
+                )
+        );
+    }
+
+    private void createIndicesWithMapping(Map<String, Object> mapping, String... indices) {
+        for (String index : indices) {
+            client().createIndex(index);
+        }
+
+        final PutMappingRequest putMappingRequest = new PutMappingRequest(indices).source(mapping);
+        final AcknowledgedResponse acknowledgedResponse = openSearchInstance.openSearchClient()
+                .execute((c, opt) -> c.indices().putMapping(putMappingRequest, opt));
+
+        if (!acknowledgedResponse.isAcknowledged()) {
+            throw new RuntimeException("Failed to add mapping for indices " + Arrays.toString(indices));
+        }
+    }
 
 }

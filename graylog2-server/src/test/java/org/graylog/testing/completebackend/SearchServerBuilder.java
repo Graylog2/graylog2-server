@@ -21,7 +21,9 @@ import org.graylog2.storage.SearchVersion;
 import org.testcontainers.containers.Network;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public abstract class SearchServerBuilder<T extends SearchServerInstance> {
     public static final String DEFAULT_HEAP_SIZE = "2g";
@@ -29,6 +31,7 @@ public abstract class SearchServerBuilder<T extends SearchServerInstance> {
     private String hostname = "indexer";
     private Network network;
     private String heapSize = DEFAULT_HEAP_SIZE;
+    private final Map<String, String> env = new HashMap<>();
     private List<String> featureFlags = List.of();
     private String mongoDbUri;
     private String passwordSecret;
@@ -59,6 +62,21 @@ public abstract class SearchServerBuilder<T extends SearchServerInstance> {
     public String getHeapSize() {
         return heapSize;
     }
+
+    public SearchServerBuilder<T> env(final String key, final String value) {
+        this.env.put(key, value);
+        return this;
+    }
+
+    public Map<String, String> getEnv() {
+        return env;
+    }
+
+    public SearchServerBuilder<T> env(Map<String, String> envProperties) {
+        envProperties.forEach(this::env);
+        return this;
+    }
+
 
     public SearchServerBuilder<T> featureFlags(final List<String> featureFlags) {
         this.featureFlags = new ArrayList<>(featureFlags);

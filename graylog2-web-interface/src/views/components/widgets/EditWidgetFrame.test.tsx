@@ -22,7 +22,7 @@ import MockStore from 'helpers/mocking/StoreMock';
 import Widget from 'views/logic/widgets/Widget';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import { execute } from 'views/logic/slices/searchExecutionSlice';
 import { updateWidget } from 'views/logic/slices/widgetActions';
 
@@ -31,18 +31,7 @@ import EditWidgetFrame from './EditWidgetFrame';
 import WidgetContext from '../contexts/WidgetContext';
 
 jest.mock('views/logic/fieldtypes/useFieldTypes');
-
-jest.mock('views/stores/SearchConfigStore', () => ({
-  SearchConfigActions: {
-    refresh: jest.fn(() => Promise.resolve()),
-  },
-  SearchConfigStore: MockStore(['getInitialState', () => ({
-    searchesClusterConfig: {
-      relative_timerange_options: { P1D: 'Search in last day', PT0S: 'Search in all messages' },
-      query_time_range_limit: 'PT0S',
-    },
-  })]),
-}));
+jest.mock('hooks/useHotkey', () => jest.fn());
 
 jest.mock('views/stores/StreamsStore', () => ({
   StreamsStore: MockStore(['getInitialState', () => ({
@@ -89,9 +78,7 @@ describe('EditWidgetFrame', () => {
       </TestStoreProvider>
     ));
 
-    beforeAll(loadViewsPlugin);
-
-    afterAll(unloadViewsPlugin);
+    useViewsPlugin();
 
     it('refreshes search after clicking on search button, when there are no changes', async () => {
       renderSUT();
