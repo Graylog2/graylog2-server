@@ -25,7 +25,6 @@ import java.util.Optional;
 
 public interface SearchJobService {
 
-    SearchJob create(Search search, String owner);
-
+    SearchJob create(Search search, String owner, Integer cancelAfterSeconds);
     Optional<SearchJob> load(String id, SearchUser searchUser) throws ForbiddenException;
 }

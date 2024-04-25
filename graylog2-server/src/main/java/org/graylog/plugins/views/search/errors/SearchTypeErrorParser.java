@@ -20,6 +20,7 @@ import org.graylog.plugins.views.search.Query;
 import org.graylog2.indexer.ElasticsearchException;
 
 import java.util.Locale;
+import java.util.concurrent.TimeoutException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,6 +29,10 @@ public class SearchTypeErrorParser {
     private static final int MAX_DEPTH_OF_EXCEPTION_CAUSE_ANALYSIS = 10;
 
     public static SearchTypeError parse(Query query, String searchTypeId, ElasticsearchException ex) {
+
+        if (isSearchTypeAbortedError(ex)) {
+            return new SearchTypeAbortedError(query, searchTypeId, ex);
+        }
 
         Throwable possibleResultWindowException = ex;
         int attempt = 0;
@@ -41,6 +46,15 @@ public class SearchTypeErrorParser {
         }
 
         return new SearchTypeError(query, searchTypeId, ex);
+    }
+
+    private static boolean isSearchTypeAbortedError(ElasticsearchException ex) {
+        return ex != null &&
+                (
+                        ex.getMessage().contains("type=task_cancelled_exception")
+                                || (ex.getCause() != null && ex.getCause() instanceof TimeoutException)
+                );
+
     }
 
     private static Integer parseResultLimit(Throwable throwable) {

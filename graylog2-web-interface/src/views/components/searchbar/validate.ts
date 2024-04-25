@@ -36,11 +36,12 @@ const validate = async <T extends FormValues>(
   pluggableSearchBarControls: Array<() => SearchBarControl>,
   formatTime: (dateTime: DateTime, format: string) => string,
   context: HandlerContext,
+  userTimezone: string,
 ) => {
   const { timerange: nextTimeRange } = values;
   let errors = {};
 
-  const timeRangeErrors = validateTimeRange(nextTimeRange, limitDuration, formatTime);
+  const timeRangeErrors = await validateTimeRange(nextTimeRange, limitDuration, formatTime, userTimezone, false);
 
   if (!isEmpty(timeRangeErrors)) {
     errors = { ...errors, timerange: timeRangeErrors };
