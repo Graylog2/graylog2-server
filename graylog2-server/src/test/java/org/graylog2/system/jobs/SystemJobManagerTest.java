@@ -21,7 +21,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.common.util.concurrent.Uninterruptibles;
 import org.assertj.core.api.Assertions;
 import org.graylog2.system.activities.SystemMessageActivityWriter;
-import org.jetbrains.annotations.NotNull;
+import jakarta.annotation.Nonnull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
@@ -119,7 +119,7 @@ public class SystemJobManagerTest {
         assertEquals(1, manager.concurrentJobs(job1.getClass()));
     }
 
-    @NotNull
+    @Nonnull
     private static Callable<Optional<String>> wrapJobCatchException(SystemJobManager manager, LongRunningJob job1) {
         return () -> {
             try {

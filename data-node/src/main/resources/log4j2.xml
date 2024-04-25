@@ -8,7 +8,7 @@
     <Loggers>
         <!-- Application Loggers -->
         <Logger name="org.graylog.datanode" level="info"/>
-        <Logger name="org.graylog.datanode.management.StateMachineTransitionLogger" level="debug"/>
+        <Logger name="org.graylog.datanode.opensearch.statemachine.tracer.StateMachineTransitionLogger" level="debug"/>
         <Root level="info">
             <AppenderRef ref="STDOUT"/>
         </Root>

@@ -42,7 +42,7 @@ import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.security.IndexerJwtAuthTokenProvider;
-import org.jetbrains.annotations.NotNull;
+import jakarta.annotation.Nonnull;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.ByteArrayInputStream;
@@ -191,7 +191,7 @@ public class DatanodeProvisioningIT {
         return IndexerJwtAuthTokenProvider.createToken(DatanodeContainerizedBackend.SIGNING_SECRET.getBytes(StandardCharsets.UTF_8), Duration.seconds(600));
     }
 
-    @NotNull
+    @Nonnull
     private KeyStore keystoreFromApiCertificate(BasicAuthCredentials basicAuth) throws KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException {
         final byte[] certificate = given()
                 .spec(apis.requestSpecification())

@@ -23,29 +23,17 @@ import org.graylog.plugins.views.search.rest.scriptingapi.response.decorators.Id
 import org.graylog.plugins.views.search.rest.scriptingapi.response.decorators.NodeTitleDecorator;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.decorators.TitleDecorator;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.writers.TabularResponseWriter;
-import org.graylog2.featureflag.FeatureFlags;
 
 public class ScriptingApiModule extends ViewsModule {
-
-    public static final String FEATURE_FLAG = "scripting_api_preview";
-    private final FeatureFlags featureFlags;
-
-    public ScriptingApiModule(final FeatureFlags featureFlags) {
-        this.featureFlags = featureFlags;
-    }
-
     @Override
     protected void configure() {
-        if (featureFlags.isOn(FEATURE_FLAG)) {
-            addSystemRestResource(ScriptingApiResource.class);
-            jerseyAdditionalComponentsBinder().addBinding().toInstance(TabularResponseWriter.class);
+        addSystemRestResource(ScriptingApiResource.class);
+        jerseyAdditionalComponentsBinder().addBinding().toInstance(TabularResponseWriter.class);
 
-            final Multibinder<FieldDecorator> fieldDecoratorBinder = Multibinder.newSetBinder(binder(), FieldDecorator.class);
+        final Multibinder<FieldDecorator> fieldDecoratorBinder = Multibinder.newSetBinder(binder(), FieldDecorator.class);
 
-            fieldDecoratorBinder.addBinding().to(TitleDecorator.class);
-            fieldDecoratorBinder.addBinding().to(NodeTitleDecorator.class);
-            fieldDecoratorBinder.addBinding().to(IdDecorator.class);
-
-        }
+        fieldDecoratorBinder.addBinding().to(TitleDecorator.class);
+        fieldDecoratorBinder.addBinding().to(NodeTitleDecorator.class);
+        fieldDecoratorBinder.addBinding().to(IdDecorator.class);
     }
 }

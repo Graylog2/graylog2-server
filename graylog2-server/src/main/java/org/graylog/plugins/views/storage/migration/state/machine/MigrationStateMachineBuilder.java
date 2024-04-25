@@ -24,7 +24,7 @@ import com.google.common.annotations.VisibleForTesting;
 import org.graylog.plugins.views.storage.migration.state.actions.MigrationActions;
 import org.graylog.plugins.views.storage.migration.state.persistence.DatanodeMigrationConfiguration;
 import org.graylog.plugins.views.storage.migration.state.persistence.DatanodeMigrationPersistence;
-import org.jetbrains.annotations.NotNull;
+import jakarta.annotation.Nonnull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +32,7 @@ public class MigrationStateMachineBuilder {
 
     private static final Logger LOG = LoggerFactory.getLogger(MigrationStateMachineBuilder.class);
 
-    @NotNull
+    @Nonnull
     private static StateMachineConfig<MigrationState, MigrationStep> configureStates(MigrationActions migrationActions) {
 
         // All actions which can fail should be performed on transition to make sure that there is no state change on error.

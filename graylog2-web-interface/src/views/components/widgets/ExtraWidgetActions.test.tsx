@@ -22,7 +22,7 @@ import asMock from 'helpers/mocking/AsMock';
 import OriginalExtraWidgetActions from 'views/components/widgets/ExtraWidgetActions';
 import Widget from 'views/logic/widgets/Widget';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import useWidgetActions from 'views/components/widgets/useWidgetActions';
 import wrapWithMenu from 'helpers/components/wrapWithMenu';
 
@@ -56,9 +56,7 @@ describe('ExtraWidgetActions', () => {
     disabled: jest.fn(() => true),
   };
 
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   it('does not render menu items, when no action is configured', () => {
     asMock(useWidgetActions).mockReturnValue([]);

@@ -16,6 +16,7 @@
  */
 package org.graylog2.database.jackson.legacy;
 
+import com.mongodb.ReadPreference;
 import com.mongodb.client.result.InsertOneResult;
 import org.bson.BsonValue;
 import org.mongojack.JacksonMongoCollection;
@@ -34,7 +35,7 @@ public class LegacyInsertOneResult<T, K> implements WriteResult<T, K> {
 
     public LegacyInsertOneResult(JacksonMongoCollection<T> collection, InsertOneResult insertOneResult,
                                  Class<K> idType) {
-        this.collection = collection;
+        this.collection = collection.withReadPreference(ReadPreference.primary());
         this.insertOneResult = insertOneResult;
         this.idType = idType;
     }
