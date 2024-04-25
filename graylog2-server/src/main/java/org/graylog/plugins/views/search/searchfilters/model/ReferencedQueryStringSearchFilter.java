@@ -24,7 +24,9 @@ import com.google.auto.value.AutoValue;
 import com.google.common.graph.MutableGraph;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelTypes;
+import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
+import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 
 import javax.annotation.Nullable;
@@ -122,11 +124,14 @@ public abstract class ReferencedQueryStringSearchFilter implements ReferencedSea
     }
 
     @Override
-    public UsedSearchFilter toNativeEntity(Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> nativeEntities) {
+    public UsedSearchFilter toNativeEntity(Map<String, ValueReference> parameters,
+                                           Map<EntityDescriptor, Object> nativeEntities) {
         final DBSearchFilter dbFilter = (DBSearchFilter) nativeEntities.get(EntityDescriptor.create(id(), ModelTypes.SEARCH_FILTER_V1));
         if (dbFilter != null) {
+            // If this filter references a newly imported filter, update this filter with the ID of the new filter created in MongoDB.
             return this.withId(dbFilter.id());
         } else {
+            // Otherwise return this filter as it is in the parent entity.
             return this;
         }
     }
@@ -135,8 +140,11 @@ public abstract class ReferencedQueryStringSearchFilter implements ReferencedSea
     public UsedSearchFilter toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
         final Optional<String> entityId = entityDescriptorIds.get(EntityDescriptor.create(id(), ModelTypes.SEARCH_FILTER_V1));
         if(entityId.isPresent()) {
+            // If this filter references a filter we are exporting,
+            // update this filter with the exported filter so that we can reference the new filter created on import.
             return this.withId(entityId.get());
         } else {
+            // Otherwise return this filter as it is in the parent entity.
             return this;
         }
     }
@@ -144,5 +152,13 @@ public abstract class ReferencedQueryStringSearchFilter implements ReferencedSea
     @Override
     public void resolveNativeEntity(EntityDescriptor entityDescriptor, MutableGraph<EntityDescriptor> mutableGraph) {
         mutableGraph.putEdge(entityDescriptor, EntityDescriptor.create(id(), ModelTypes.SEARCH_FILTER_V1));
+    }
+
+    @Override
+    public void resolveForInstallation(EntityV1 entity,
+                                       Map<String, ValueReference> parameters,
+                                       Map<EntityDescriptor, Entity> entities,
+                                       MutableGraph<Entity> graph) {
+        graph.putEdge(entity, entities.get(EntityDescriptor.create(id(), ModelTypes.SEARCH_FILTER_V1)));
     }
 }

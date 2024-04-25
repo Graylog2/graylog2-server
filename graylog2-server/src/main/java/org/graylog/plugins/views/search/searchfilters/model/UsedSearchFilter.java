@@ -53,11 +53,15 @@ public interface UsedSearchFilter extends NativeEntityConverter<UsedSearchFilter
 
     boolean disabled();
 
+    // This method should only be overridden for referenced filters as those will be exported as separate entities in content packs.
+    // Inline filters will not be updated during import/export.
     @Override
     default UsedSearchFilter toNativeEntity(Map<String, ValueReference> parameters, Map<EntityDescriptor, Object> nativeEntities) {
         return this;
     }
 
+    // This method should only be overridden for referenced filters as those will be exported as separate entities in content packs.
+    // Inline filters will not be updated during import/export.
     @Override
     default UsedSearchFilter toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
         return this;

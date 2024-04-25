@@ -176,5 +176,7 @@ public abstract class AggregationEventProcessorConfigEntity implements EventProc
                 .map(id -> resolveStreamEntity(id, entities))
                 .filter(Objects::nonNull)
                 .forEach(stream -> graph.putEdge(entity, stream));
+
+        filters().forEach(filter -> filter.resolveForInstallation(entity, parameters, entities, graph));
     }
 }
