@@ -119,7 +119,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
         if (nodeId.getNodeId().equals(event.nodeId())) {
             switch (event.trigger()) {
                 case REMOVE -> stateMachine.fire(OpensearchEvent.PROCESS_REMOVE);
-                case RESET -> process.onReset();
+                case RESET -> stateMachine.fire(OpensearchEvent.RESET);
                 case STOP -> this.shutDown();
                 case START -> this.startUp();
             }

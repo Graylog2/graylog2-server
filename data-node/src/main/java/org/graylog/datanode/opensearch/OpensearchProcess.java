@@ -43,6 +43,6 @@ public interface OpensearchProcess extends ManagableProcess<OpensearchConfigurat
 
     void remove();
 
-    void onReset();
+    void reset();
 
 }

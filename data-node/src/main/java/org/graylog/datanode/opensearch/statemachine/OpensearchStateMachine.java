@@ -119,7 +119,7 @@ public class OpensearchStateMachine extends StateMachine<OpensearchState, Opense
                 .permit(OpensearchEvent.PROCESS_STOPPED, OpensearchState.REMOVED);
 
         config.configure(OpensearchState.REMOVED)
-                .permit(OpensearchEvent.RESET, OpensearchState.WAITING_FOR_CONFIGURATION)
+                .permit(OpensearchEvent.RESET, OpensearchState.WAITING_FOR_CONFIGURATION, process::reset)
                 .ignore(OpensearchEvent.PROCESS_STOPPED);
 
         return new OpensearchStateMachine(OpensearchState.WAITING_FOR_CONFIGURATION, config);
