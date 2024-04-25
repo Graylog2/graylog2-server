@@ -34,7 +34,6 @@ import org.graylog.events.processor.EventProcessorSchedulerConfig;
 import org.graylog.events.processor.SearchFilterableConfig;
 import org.graylog.plugins.views.search.Parameter;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
-import org.graylog.plugins.views.search.searchfilters.model.UsesSearchFilters;
 import org.graylog.plugins.views.search.searchtypes.pivot.HasField;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.scheduler.clock.JobSchedulerClock;
@@ -63,7 +62,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 @AutoValue
 @JsonTypeName(AggregationEventProcessorConfig.TYPE_NAME)
 @JsonDeserialize(builder = AggregationEventProcessorConfig.Builder.class)
-public abstract class AggregationEventProcessorConfig implements EventProcessorConfig, SearchFilterableConfig, UsesSearchFilters {
+public abstract class AggregationEventProcessorConfig implements EventProcessorConfig, SearchFilterableConfig {
     public static final String TYPE_NAME = "aggregation-v1";
 
     private static final String FIELD_QUERY = "query";

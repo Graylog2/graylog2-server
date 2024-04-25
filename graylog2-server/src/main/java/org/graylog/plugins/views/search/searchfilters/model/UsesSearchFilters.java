@@ -16,45 +16,9 @@
  */
 package org.graylog.plugins.views.search.searchfilters.model;
 
-import org.graylog2.contentpacks.EntityDescriptorIds;
-import org.graylog2.contentpacks.model.ModelTypes;
-import org.graylog2.contentpacks.model.entities.EntityDescriptor;
-
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public interface UsesSearchFilters {
-    List<UsedSearchFilter> filters();
 
-//    default List<UsedSearchFilter> exportFilters(EntityDescriptorIds entityDescriptorIds) {
-//        final List<UsedSearchFilter> filters = new ArrayList<>();
-//        for (UsedSearchFilter filter : filters()) {
-//            UsedSearchFilter toUse = filter;
-//            if (filter instanceof ReferencedSearchFilter referencedFilter) {
-//                final String entityId = entityDescriptorIds.get(EntityDescriptor.create(referencedFilter.id(), ModelTypes.SEARCH_FILTER_V1))
-//                        .orElse(referencedFilter.id());
-//                if(entityId != null) {
-//                    toUse = referencedFilter.withId(entityId);
-//                }
-//            }
-//            filters.add(toUse);
-//        }
-//        return filters;
-//    }
-//
-//    static List<UsedSearchFilter> createNativeFilters(List<UsedSearchFilter> usedFilters, Map<EntityDescriptor, Object> nativeEntities) {
-//        final List<UsedSearchFilter> filters = new ArrayList<>();
-//        for (UsedSearchFilter filter : usedFilters) {
-//            UsedSearchFilter toUse = filter;
-//            if (filter instanceof ReferencedSearchFilter referencedFilter) {
-//                final DBSearchFilter dbFilter = (DBSearchFilter) nativeEntities.get(EntityDescriptor.create(referencedFilter.id(), ModelTypes.SEARCH_FILTER_V1));
-//                if (dbFilter != null) {
-//                    toUse = referencedFilter.withId(dbFilter.id());
-//                }
-//            }
-//            filters.add(toUse);
-//        }
-//        return filters;
-//    }
+    List<UsedSearchFilter> filters();
 }
