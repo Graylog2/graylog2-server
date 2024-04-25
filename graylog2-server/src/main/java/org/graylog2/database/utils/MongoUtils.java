@@ -22,15 +22,16 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoIterable;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.result.InsertOneResult;
+import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import org.bson.BsonObjectId;
 import org.bson.BsonValue;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog2.database.MongoEntity;
 import org.graylog2.database.jackson.CustomJacksonCodecRegistry;
 import org.mongojack.InitializationRequiredForTransformation;
 
-import javax.annotation.Nonnull;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -71,13 +72,33 @@ public class MongoUtils<T extends MongoEntity> {
      * Extract the inserted id as a String from the insert result.
      *
      * @param result Result of the insertOne operation
-     * @return the inserted object ID as string, or null if no id was inserted. Fails if the id is not of type {@link ObjectId}.
+     * @return the inserted object ID as string, or null if no id was inserted. Fails if the ID is not of type {@link ObjectId}.
      */
     @Nullable
     public static String insertedIdAsString(@Nonnull InsertOneResult result) {
         return Optional.ofNullable(insertedId(result))
                 .map(ObjectId::toHexString)
                 .orElse(null);
+    }
+
+    /**
+     * Create a query constraint to match a document's ID against the given Hex string.
+     *
+     * @param id Hex string representation of an {@link ObjectId}
+     * @return An 'eq' filter.
+     */
+    public static Bson idEq(@Nonnull String id) {
+        return idEq(new ObjectId(id));
+    }
+
+    /**
+     * Create a query constraint to match a document's ID.
+     *
+     * @param id ID to match
+     * @return An 'eq' filter.
+     */
+    public static Bson idEq(@Nonnull ObjectId id) {
+        return Filters.eq("_id", id);
     }
 
     /**
