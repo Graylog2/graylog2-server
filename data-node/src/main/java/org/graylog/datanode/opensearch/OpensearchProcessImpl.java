@@ -18,6 +18,8 @@ package org.graylog.datanode.opensearch;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.oxo42.stateless4j.delegates.Trace;
+import com.google.common.eventbus.EventBus;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import jakarta.inject.Inject;
 import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.apache.commons.exec.ExecuteException;
@@ -34,10 +36,23 @@ import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachine;
 import org.graylog.datanode.opensearch.statemachine.tracer.StateMachineTracer;
 import org.graylog.datanode.process.ProcessInformation;
 import org.graylog.datanode.process.ProcessListener;
+import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchStatusException;
+import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterGetSettingsRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterGetSettingsResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterUpdateSettingsRequest;
+import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterUpdateSettingsResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.client.ClusterClient;
+import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
+import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
 import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
+import org.graylog2.datanode.DataNodeLifecycleEvent;
+import org.graylog2.datanode.DataNodeLifecycleTrigger;
+import org.graylog2.plugin.system.NodeId;
 import org.graylog2.security.CustomCAX509TrustManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +69,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
@@ -79,11 +97,19 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
     private final NodeService<DataNodeDto> nodeService;
     private final Configuration configuration;
     private final ObjectMapper objectMapper;
+    private final String nodeName;
+    private final NodeId nodeId;
+    private final EventBus eventBus;
 
+
+    static final String CLUSTER_ROUTING_ALLOCATION_EXCLUDE_SETTING = "cluster.routing.allocation.exclude._name";
+    boolean allocationExcludeChecked = false;
+    ScheduledExecutorService executorService;
 
     @Inject
     OpensearchProcessImpl(DatanodeConfiguration datanodeConfiguration, final CustomCAX509TrustManager trustManager,
-                          final Configuration configuration, final NodeService<DataNodeDto> nodeService, ObjectMapper objectMapper, OpensearchStateMachine processState) {
+                          final Configuration configuration, final NodeService<DataNodeDto> nodeService,
+                          ObjectMapper objectMapper, OpensearchStateMachine processState, String nodeName, NodeId nodeId, EventBus eventBus) {
         this.datanodeConfiguration = datanodeConfiguration;
         this.processState = processState;
         this.stdout = new CircularFifoQueue<>(datanodeConfiguration.processLogsBufferSize());
@@ -92,6 +118,9 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
         this.nodeService = nodeService;
         this.configuration = configuration;
         this.objectMapper = objectMapper;
+        this.nodeName = nodeName;
+        this.nodeId = nodeId;
+        this.eventBus = eventBus;
     }
 
     private RestHighLevelClient createRestClient(OpensearchConfiguration configuration) {
@@ -218,6 +247,28 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
         }
     }
 
+    private void checkAllocationEnabledStatus() {
+        if (restClient().isPresent()) {
+            ClusterClient clusterClient = restClient().get().cluster();
+            try {
+                final ClusterGetSettingsResponse settings =
+                        clusterClient.getSettings(new ClusterGetSettingsRequest(), RequestOptions.DEFAULT);
+                final String setting = settings.getSetting(CLUSTER_ROUTING_ALLOCATION_EXCLUDE_SETTING);
+                if (nodeName.equals(setting)) {
+                    ClusterUpdateSettingsRequest updateSettings = new ClusterUpdateSettingsRequest();
+                    updateSettings.transientSettings(Settings.builder()
+                            .putNull(CLUSTER_ROUTING_ALLOCATION_EXCLUDE_SETTING)
+                            .build());
+                    clusterClient.putSettings(updateSettings, RequestOptions.DEFAULT);
+                }
+                allocationExcludeChecked = true;
+            } catch (IOException e) {
+                LOG.error("Error getting cluster settings from OpenSearch");
+            }
+        }
+    }
+
+
     @Override
     public synchronized void stop() {
         stopProcess();
@@ -244,8 +295,47 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
     @Override
     public void onRemove() {
         LOG.info("Starting removal of OpenSearch node");
-        if (this.commandLineProcess != null) {
-            onEvent(OpensearchEvent.PROCESS_REMOVE);
+        restClient().ifPresent(client -> {
+            final ClusterClient clusterClient = client.cluster();
+            ClusterUpdateSettingsRequest settings = new ClusterUpdateSettingsRequest();
+            settings.transientSettings(Settings.builder()
+                    .put(CLUSTER_ROUTING_ALLOCATION_EXCLUDE_SETTING, nodeName)
+                    .build());
+            try {
+                final ClusterUpdateSettingsResponse response =
+                        clusterClient.putSettings(settings, RequestOptions.DEFAULT);
+                if (response.isAcknowledged()) {
+                    allocationExcludeChecked = false; // reset to rejoin cluster in case of failure
+                    executorService = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("datanode-removal").build());
+                    executorService.scheduleAtFixedRate(this::checkRemovalStatus, 10, 10, TimeUnit.SECONDS);
+                } else {
+                    onEvent(OpensearchEvent.HEALTH_CHECK_FAILED);
+                }
+            } catch (IOException e) {
+                LOG.error("Failed to exclude node from cluster allocation", e);
+                onEvent(OpensearchEvent.HEALTH_CHECK_FAILED);
+            }
+        });
+    }
+
+    /**
+     * started by onRemove() to check if all shards have been relocated
+     */
+    void checkRemovalStatus() {
+        final Optional<RestHighLevelClient> restClient = restClient();
+        if (restClient.isPresent()) {
+            try {
+                final ClusterClient clusterClient = restClient.get().cluster();
+                final ClusterHealthResponse health = clusterClient
+                        .health(new ClusterHealthRequest(), RequestOptions.DEFAULT);
+                if (health.getRelocatingShards() == 0) {
+                    stop(); // todo: fire state machine trigger instead of calling stop
+                    executorService.shutdown();
+                    eventBus.post(DataNodeLifecycleEvent.create(nodeId.getNodeId(), DataNodeLifecycleTrigger.REMOVED));
+                }
+            } catch (IOException | OpenSearchStatusException e) {
+                onEvent(OpensearchEvent.HEALTH_CHECK_FAILED);
+            }
         }
     }
 
@@ -259,6 +349,9 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
 
     @Override
     public void onStart() {
+        if (!allocationExcludeChecked) {
+            this.checkAllocationEnabledStatus();
+        }
         onEvent(OpensearchEvent.PROCESS_STARTED);
     }
 

@@ -28,7 +28,6 @@ import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
 import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachine;
 import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachineProvider;
 import org.graylog.datanode.opensearch.statemachine.tracer.ClusterNodeStateTracer;
-import org.graylog.datanode.opensearch.statemachine.tracer.OpensearchRemovalTracer;
 import org.graylog.datanode.opensearch.statemachine.tracer.OpensearchWatchdog;
 import org.graylog.datanode.opensearch.statemachine.tracer.StateMachineTracer;
 import org.graylog.datanode.opensearch.statemachine.tracer.StateMachineTransitionLogger;
@@ -49,7 +48,6 @@ public class OpensearchProcessBindings extends AbstractModule {
         // tracer
         Multibinder<StateMachineTracer> tracerBinder = Multibinder.newSetBinder(binder(), StateMachineTracer.class);
         tracerBinder.addBinding().to(ClusterNodeStateTracer.class).asEagerSingleton();
-        tracerBinder.addBinding().to(OpensearchRemovalTracer.class).asEagerSingleton();
         tracerBinder.addBinding().to(OpensearchWatchdog.class).asEagerSingleton();
         tracerBinder.addBinding().to(StateMachineTransitionLogger.class).asEagerSingleton();
         tracerBinder.addBinding().to(ConfigureMetricsIndexSettings.class).asEagerSingleton();

@@ -30,15 +30,14 @@ public class OpensearchStateMachine extends StateMachine<OpensearchState, Opense
     public static final int MAX_REBOOT_FAILURES = 3;
 
     StateMachineTracerAggregator tracerAggregator = new StateMachineTracerAggregator();
-    private OpensearchProcess process;
+    private static OpensearchProcess process;
 
     public OpensearchStateMachine(OpensearchState initialState, StateMachineConfig<OpensearchState, OpensearchEvent> config) {
         super(initialState, config);
         setTrace(tracerAggregator);
     }
 
-    public static OpensearchStateMachine createNew() {
-
+    public static OpensearchStateMachine createNew(OpensearchProcess process) {
         final FailuresCounter restFailureCounter = FailuresCounter.oneBased(MAX_REST_TEMPORARY_FAILURES);
         final FailuresCounter startupFailuresCounter = FailuresCounter.oneBased(MAX_REST_STARTUP_FAILURES);
         final FailuresCounter rebootCounter = FailuresCounter.oneBased(MAX_REBOOT_FAILURES);
@@ -108,6 +107,7 @@ public class OpensearchStateMachine extends StateMachine<OpensearchState, Opense
                 .ignore(OpensearchEvent.PROCESS_TERMINATED); // final state, all following terminate events are ignored
 
         config.configure(OpensearchState.REMOVING)
+                .onEntry(process::onRemove)
                 .ignore(OpensearchEvent.HEALTH_CHECK_OK)
                 .permit(OpensearchEvent.HEALTH_CHECK_FAILED, OpensearchState.FAILED)
                 .permit(OpensearchEvent.PROCESS_STOPPED, OpensearchState.REMOVED);
@@ -116,7 +116,9 @@ public class OpensearchStateMachine extends StateMachine<OpensearchState, Opense
                 .permit(OpensearchEvent.RESET, OpensearchState.WAITING_FOR_CONFIGURATION)
                 .ignore(OpensearchEvent.PROCESS_STOPPED);
 
-        return new OpensearchStateMachine(OpensearchState.WAITING_FOR_CONFIGURATION, config);
+        OpensearchStateMachine opensearchStateMachine = new OpensearchStateMachine(OpensearchState.WAITING_FOR_CONFIGURATION, config);
+        opensearchStateMachine.setOpensearchProcess(process);
+        return opensearchStateMachine;
     }
 
     public StateMachineTracerAggregator getTracerAggregator() {

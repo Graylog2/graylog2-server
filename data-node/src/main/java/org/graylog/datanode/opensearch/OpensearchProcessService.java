@@ -26,6 +26,8 @@ import org.graylog.datanode.Configuration;
 import org.graylog.datanode.bootstrap.preflight.DatanodeDirectoriesLockfileCheck;
 import org.graylog.datanode.configuration.OpensearchConfigurationProvider;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
+import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
+import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachine;
 import org.graylog2.bootstrap.preflight.PreflightConfigResult;
 import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
@@ -54,19 +56,21 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     private final PreflightConfigService preflightConfigService;
     private final Configuration configuration;
 
+    private final OpensearchStateMachine stateMachine;
+
 
     @Inject
     public OpensearchProcessService(
-                                    final OpensearchConfigurationProvider configurationProvider,
-                                    final EventBus eventBus,
-                                    final Configuration configuration,
-                                    final DataNodeProvisioningService dataNodeProvisioningService,
-                                    final NodeId nodeId,
-                                    final IndexFieldTypesService indexFieldTypesService,
-                                    final ClusterEventBus clusterEventBus,
-                                    final DatanodeDirectoriesLockfileCheck lockfileCheck,
-                                    final PreflightConfigService preflightConfigService,
-                                    final OpensearchProcess process) {
+            final OpensearchConfigurationProvider configurationProvider,
+            final EventBus eventBus,
+            final Configuration configuration,
+            final DataNodeProvisioningService dataNodeProvisioningService,
+            final NodeId nodeId,
+            final IndexFieldTypesService indexFieldTypesService,
+            final ClusterEventBus clusterEventBus,
+            final DatanodeDirectoriesLockfileCheck lockfileCheck,
+            final PreflightConfigService preflightConfigService,
+            final OpensearchProcess process, OpensearchStateMachine stateMachine) {
         this.configurationProvider = configurationProvider;
         this.configuration = configuration;
         this.eventBus = eventBus;
@@ -75,6 +79,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
         this.lockfileCheck = lockfileCheck;
         this.preflightConfigService = preflightConfigService;
         this.process = process;
+        this.stateMachine = stateMachine;
         eventBus.register(this);
     }
 
@@ -113,7 +118,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     public void handleNodeLifecycleEvent(DataNodeLifecycleEvent event) {
         if (nodeId.getNodeId().equals(event.nodeId())) {
             switch (event.trigger()) {
-                case REMOVE -> process.onRemove();
+                case REMOVE -> stateMachine.fire(OpensearchEvent.PROCESS_REMOVE);
                 case RESET -> process.onReset();
                 case STOP -> this.shutDown();
                 case START -> this.startUp();
