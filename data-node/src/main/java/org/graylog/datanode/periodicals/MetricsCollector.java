@@ -21,9 +21,9 @@ import com.google.common.collect.ImmutableMap;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import org.graylog.datanode.Configuration;
-import org.graylog.datanode.opensearch.OpensearchProcess;
 import org.graylog.datanode.metrics.ClusterStatMetricsCollector;
 import org.graylog.datanode.metrics.NodeMetricsCollector;
+import org.graylog.datanode.opensearch.OpensearchProcess;
 import org.graylog.datanode.opensearch.statemachine.OpensearchState;
 import org.graylog.shaded.opensearch2.org.joda.time.DateTime;
 import org.graylog.shaded.opensearch2.org.joda.time.DateTimeZone;
@@ -63,14 +63,11 @@ public class MetricsCollector extends Periodical {
     private ClusterStatMetricsCollector clusterStatMetricsCollector;
     private final ObjectMapper objectMapper;
 
-    private final RestHighLevelClient client;
-
     @Inject
-    public MetricsCollector(OpensearchProcess process, Configuration configuration, ObjectMapper objectMapper, RestHighLevelClient client) {
+    public MetricsCollector(OpensearchProcess process, Configuration configuration, ObjectMapper objectMapper) {
         this.process = process;
         this.configuration = configuration;
         this.objectMapper = objectMapper;
-        this.client = client;
     }
 
     @Override
@@ -125,7 +122,7 @@ public class MetricsCollector extends Periodical {
                 indexRequest.source(metrics);
                 indexDocument(client, indexRequest);
 
-                if (isManagerNode()) {
+                if (isManagerNode(process)) {
                     metrics = new HashMap<>(clusterStatMetricsCollector.getClusterMetrics(getPreviousMetricsForCluster(client)));
                     metrics.put(configuration.getMetricsTimestamp(), new DateTime(DateTimeZone.UTC));
                     indexRequest.source(metrics);
@@ -135,8 +132,9 @@ public class MetricsCollector extends Periodical {
         }
     }
 
-    public boolean isManagerNode() {
-        return requestClusterState(client)
+    public boolean isManagerNode(OpensearchProcess process) {
+        return process.restClient()
+                .flatMap(this::requestClusterState)
                 .map(r -> r.nodes().get(r.clusterManagerNode()))
                 .map(managerNode -> configuration.getDatanodeNodeName().equals(managerNode.name()))
                 .orElse(false);
