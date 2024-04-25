@@ -102,7 +102,7 @@
         <aws-java-sdk-2.version>2.25.6</aws-java-sdk-2.version>
         <aws-kinesis-client.version>2.5.8</aws-kinesis-client.version>
         <aws-msk-iam-auth.version>2.0.3</aws-msk-iam-auth.version>
-        <bouncycastle.version>1.78</bouncycastle.version>
+        <bouncycastle.version>1.78.1</bouncycastle.version>
         <byte-buddy.version>1.14.14</byte-buddy.version>
         <caffeine.version>3.1.8</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
