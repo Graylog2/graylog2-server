@@ -108,6 +108,7 @@ function Editor({ id, value, height, readOnly, onChange, onFullMode }: Props) {
         </TabsRow>
         {!showPreview && (
           <EditorStyles>
+            {/* @ts-ignore */}
             <SourceCodeEditor id={id ?? 'md-editor'}
                               mode="markdown"
                               theme="light"
