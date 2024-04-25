@@ -53,14 +53,16 @@ const TrafficGraph = ({ width, traffic, layoutExtension }: Props) => {
     },
     yaxis: {
       title: {
-        text: 'Bytes',
+        text: 'Days',
       },
       rangemode: 'tozero',
-      hoverformat: '.4s',
-      tickformat: 's',
+      // hoverformat: '.4%S',
+      type: 'date',
+      tickformat: '%S',
     },
     ...layoutExtension,
   };
+  console.log({ layoutExtension, layout, chartData });
 
   return (
     <div style={{ height: '200px', width: width }}>

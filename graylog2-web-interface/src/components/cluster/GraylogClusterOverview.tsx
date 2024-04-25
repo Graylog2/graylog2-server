@@ -153,6 +153,7 @@ const GraylogClusterTrafficGraph = () => {
     sumOutput = <small>Last {graphDays} days: {NumberUtils.formatBytes(bytesOut)}</small>;
 
     const unixTraffic = formatTrafficData(traffic.output);
+    console.log({ unixTraffic, to: traffic.output });
 
     trafficGraph = (
       <TrafficGraphComponent traffic={unixTraffic}
