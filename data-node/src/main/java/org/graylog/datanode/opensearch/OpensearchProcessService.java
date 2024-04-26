@@ -135,6 +135,9 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
         }
     }
 
+    /**
+     * triggered when starting the service
+     */
     @Override
     protected void startUp() {
         final OpensearchConfiguration config = configurationProvider.get();

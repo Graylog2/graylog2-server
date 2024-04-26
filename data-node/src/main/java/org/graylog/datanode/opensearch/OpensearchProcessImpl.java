@@ -203,21 +203,6 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
                     trustManager.refresh();
                     // refresh the seed hosts
                     writeSeedHostsList();
-
-                    boolean startedPreviously = Objects.nonNull(commandLineProcess) && commandLineProcess.processInfo().alive();
-                    if (startedPreviously) {
-                        stop();
-                    }
-
-                    commandLineProcess = new OpensearchCommandLineProcess(config, this);
-
-                    if (startedPreviously) {
-                        commandLineProcess.start();
-                    }
-
-                    restClient = Optional.of(createRestClient(config));
-                    openSearchClient = restClient.map(c -> new OpenSearchClient(c, objectMapper));
-
                 }),
                 () -> {throw new IllegalArgumentException("Opensearch configuration required but not supplied!");}
         );
@@ -238,7 +223,17 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
         if (Objects.isNull(commandLineProcess) || !commandLineProcess.processInfo().alive()) {
             opensearchConfiguration.ifPresentOrElse(
                     (config -> {
-                        commandLineProcess.start();
+                        boolean startedPreviously = Objects.nonNull(commandLineProcess) && commandLineProcess.processInfo().alive();
+                        if (startedPreviously) {
+                            stop();
+                        }
+
+                        commandLineProcess = new OpensearchCommandLineProcess(config, this);
+
+                        if (startedPreviously) {
+                            commandLineProcess.start();
+                        }
+
                         restClient = Optional.of(createRestClient(config));
                         openSearchClient = restClient.map(c -> new OpenSearchClient(c, objectMapper));
                     }),
