@@ -334,4 +334,9 @@ public abstract class Query implements ContentPackable<QueryEntity>, UsesSearchF
                 .timerange(timerange())
                 .build();
     }
+
+    @Override
+    public void resolveNativeEntity(EntityDescriptor entityDescriptor, MutableGraph<EntityDescriptor> mutableGraph) {
+        filters().forEach(filter -> filter.resolveNativeEntity(entityDescriptor, mutableGraph));
+    }
 }
