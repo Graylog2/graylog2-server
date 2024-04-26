@@ -18,6 +18,7 @@ import React from 'react';
 
 import { DocumentTitle, PageHeader } from 'components/common';
 import { Row, Col } from 'components/bootstrap';
+import IndexSetTemplatesList from 'components/indices/IndexSetTemplates/IndexSetTemplatesList';
 import CreateIndexSetTemplateButton from 'components/indices/IndexSetTemplates/CreateIndexSetTemplateButton';
 import { IndicesPageNavigation } from 'components/indices';
 
@@ -33,7 +34,7 @@ const IndexSetTemplatesPage = () => (
 
     <Row className="content">
       <Col md={12}>
-        List here
+        <IndexSetTemplatesList />
       </Col>
     </Row>
   </DocumentTitle>

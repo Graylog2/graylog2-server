@@ -16,24 +16,32 @@
  */
 import React from 'react';
 
-import { DocumentTitle, PageHeader } from 'components/common';
+import useParams from 'routing/useParams';
+import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { Col, Row } from 'components/bootstrap';
 import { IndicesPageNavigation } from 'components/indices';
+import EditTemplate from 'components/indices/IndexSetTemplates/EditTemplate';
+import useTemplate from 'components/indices/IndexSetTemplates/hooks/useTemplate';
 
-const IndexSetTemplateEditPage = () => (
-  <DocumentTitle title="Edit Index Set Template">
-    <IndicesPageNavigation />
-    <PageHeader title="Edit Index Set Template">
-      <span>
-        Some description
-      </span>
-    </PageHeader>
-    <Row className="content">
-      <Col md={12}>
-        Edit form
-      </Col>
-    </Row>
-  </DocumentTitle>
-);
+const IndexSetTemplateEditPage = () => {
+  const { templateId } = useParams();
+  const { data, isFetching } = useTemplate(templateId);
+
+  return (
+    <DocumentTitle title="Edit Index Set Template">
+      <IndicesPageNavigation />
+      <PageHeader title="Edit Index Set Template">
+        <span>
+          Some description
+        </span>
+      </PageHeader>
+      <Row className="content">
+        <Col md={12}>
+          {!isFetching ? <EditTemplate template={data} /> : <Spinner />}
+        </Col>
+      </Row>
+    </DocumentTitle>
+  );
+};
 
 export default IndexSetTemplateEditPage;

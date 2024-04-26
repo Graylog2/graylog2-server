@@ -19,6 +19,7 @@ import React from 'react';
 import { DocumentTitle, PageHeader } from 'components/common';
 import { Col, Row } from 'components/bootstrap';
 import { IndicesPageNavigation } from 'components/indices';
+import CreateTemplate from 'components/indices/IndexSetTemplates/CreateTemplate';
 
 const IndexSetTemplateCreatePage = () => (
   <DocumentTitle title="Create Index Set Template">
@@ -30,7 +31,7 @@ const IndexSetTemplateCreatePage = () => (
     </PageHeader>
     <Row className="content">
       <Col md={12}>
-        Creation form
+        <CreateTemplate />
       </Col>
     </Row>
   </DocumentTitle>

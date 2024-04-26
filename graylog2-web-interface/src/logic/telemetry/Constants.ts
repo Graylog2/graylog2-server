@@ -473,6 +473,14 @@ export const TELEMETRY_EVENT_TYPE = {
     CHANGE_FOR_INDEX_REMOVED: 'Index Set Field Type Profile Change For Index Removed',
     CREATE_PROFILE_FROM_SELECTED_RAN: 'Index Set Field Type Profile Create From Selected Ran',
   },
+  INDEX_SET_TEMPLATE: {
+    NEW_OPENED: 'Index Set Template Create Opened',
+    NEW_CANCELED: 'Index Set Template Create Canceled',
+    CREATED: 'Index Set Template Created',
+    EDIT_OPENED: 'Index Set Template Edit Opened',
+    EDIT_CANCELED: 'Index Set Template Edit Canceled',
+    EDIT: 'Index Set Template Edited',
+  },
 } as const;
 
 type ExtractObjectValues<T extends object> = {
