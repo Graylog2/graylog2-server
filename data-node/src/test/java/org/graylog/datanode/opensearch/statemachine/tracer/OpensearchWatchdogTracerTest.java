@@ -16,19 +16,26 @@
  */
 package org.graylog.datanode.opensearch.statemachine.tracer;
 
+import org.graylog.datanode.opensearch.OpensearchProcess;
 import org.graylog.datanode.opensearch.TestableOpensearchProcess;
 import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
 import org.graylog.datanode.opensearch.statemachine.OpensearchState;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 // TODO: fix test / TestableOpenProcess
+@ExtendWith(MockitoExtension.class)
 class OpensearchWatchdogTracerTest {
 
+    @Mock
+    OpensearchProcess opensearchProcess;
 
     @Test
     void testLifecycle() {
-        final TestableOpensearchProcess process = new TestableOpensearchProcess();
-//        final OpensearchWatchdog watchdog = new OpensearchWatchdog(process, 3);
+//        final TestableOpensearchProcess process = new TestableOpensearchProcess(opensearchProcess);
+//        final OpensearchWatchdog watchdog = new OpensearchWatchdog(opensearchProcess, 3);
 //        process.addStateMachineTracer(watchdog);
 //        process.configure("ignored");
 //        process.start();

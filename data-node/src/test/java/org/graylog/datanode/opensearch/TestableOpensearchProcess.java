@@ -22,6 +22,9 @@ import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
 import org.graylog.datanode.opensearch.statemachine.OpensearchState;
 import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachine;
 import org.graylog.datanode.process.ManagableProcess;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,8 +34,8 @@ public class TestableOpensearchProcess implements ManagableProcess<String, Opens
 
     private final StateMachine<OpensearchState, OpensearchEvent> stateMachine;
 
-    public TestableOpensearchProcess() {
-        this.stateMachine = OpensearchStateMachine.createNew();
+    public TestableOpensearchProcess(OpensearchProcess opensearchProcess) {
+        this.stateMachine = OpensearchStateMachine.createNew(opensearchProcess);
     }
 
     @Override

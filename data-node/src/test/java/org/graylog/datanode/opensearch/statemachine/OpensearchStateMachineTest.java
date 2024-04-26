@@ -17,14 +17,22 @@
 package org.graylog.datanode.opensearch.statemachine;
 
 import com.github.oxo42.stateless4j.StateMachine;
+import org.graylog.datanode.opensearch.OpensearchProcess;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+@ExtendWith(MockitoExtension.class)
 class OpensearchStateMachineTest {
+
+    @Mock
+    OpensearchProcess opensearchProcess;
 
     @Test
     void testOptimalScenario() {
-        final StateMachine<OpensearchState, OpensearchEvent> machine = OpensearchStateMachine.createNew();
+        final StateMachine<OpensearchState, OpensearchEvent> machine = OpensearchStateMachine.createNew(opensearchProcess);
         Assertions.assertEquals(machine.getState(), OpensearchState.WAITING_FOR_CONFIGURATION);
 
         machine.fire(OpensearchEvent.PROCESS_PREPARED);
@@ -42,7 +50,7 @@ class OpensearchStateMachineTest {
 
     @Test
     void testRestFailing() {
-        final StateMachine<OpensearchState, OpensearchEvent> machine = OpensearchStateMachine.createNew();
+        final StateMachine<OpensearchState, OpensearchEvent> machine = OpensearchStateMachine.createNew(opensearchProcess);
         Assertions.assertEquals(machine.getState(), OpensearchState.WAITING_FOR_CONFIGURATION);
 
         machine.fire(OpensearchEvent.PROCESS_PREPARED);
@@ -70,7 +78,7 @@ class OpensearchStateMachineTest {
 
     @Test
     void testStartupFailure() {
-        final StateMachine<OpensearchState, OpensearchEvent> machine = OpensearchStateMachine.createNew();
+        final StateMachine<OpensearchState, OpensearchEvent> machine = OpensearchStateMachine.createNew(opensearchProcess);
         Assertions.assertEquals(machine.getState(), OpensearchState.WAITING_FOR_CONFIGURATION);
 
         machine.fire(OpensearchEvent.PROCESS_PREPARED);
@@ -92,7 +100,7 @@ class OpensearchStateMachineTest {
 
     @Test
     void testStartupFailureResolved() {
-        final StateMachine<OpensearchState, OpensearchEvent> machine = OpensearchStateMachine.createNew();
+        final StateMachine<OpensearchState, OpensearchEvent> machine = OpensearchStateMachine.createNew(opensearchProcess);
         Assertions.assertEquals(machine.getState(), OpensearchState.WAITING_FOR_CONFIGURATION);
 
         machine.fire(OpensearchEvent.PROCESS_PREPARED);
@@ -114,7 +122,7 @@ class OpensearchStateMachineTest {
 
     @Test
     void testSuccessfullRemoval() {
-        final StateMachine<OpensearchState, OpensearchEvent> machine = OpensearchStateMachine.createNew();
+        final StateMachine<OpensearchState, OpensearchEvent> machine = OpensearchStateMachine.createNew(opensearchProcess);
         Assertions.assertEquals(machine.getState(), OpensearchState.WAITING_FOR_CONFIGURATION);
 
         machine.fire(OpensearchEvent.PROCESS_PREPARED);
@@ -136,7 +144,7 @@ class OpensearchStateMachineTest {
 
     @Test
     void testFailingRemoval() {
-        final StateMachine<OpensearchState, OpensearchEvent> machine = OpensearchStateMachine.createNew();
+        final StateMachine<OpensearchState, OpensearchEvent> machine = OpensearchStateMachine.createNew(opensearchProcess);
         Assertions.assertEquals(machine.getState(), OpensearchState.WAITING_FOR_CONFIGURATION);
 
         machine.fire(OpensearchEvent.PROCESS_PREPARED);
