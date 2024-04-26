@@ -16,7 +16,6 @@
  */
 import EmblaCarousel from 'embla-carousel';
 import { useCallback, useMemo, useState, useEffect } from 'react';
-import type { EmblaCarouselType } from 'embla-carousel';
 
 const useCarouselAction = (carouselElementClass: string) => {
   const [carousel, setCarousel] = useState<HTMLElement>(undefined);

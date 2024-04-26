@@ -23,6 +23,7 @@ import CarouselSlide from 'components/common/carousel/CarouselSlide';
 type Props = {
   children: React.ReactNode,
   className?: string
+  containerRef?: React.Ref<HTMLDivElement>
 };
 
 const StyledDiv = styled.div`
