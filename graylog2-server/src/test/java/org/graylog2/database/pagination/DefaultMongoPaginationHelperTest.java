@@ -18,8 +18,9 @@ package org.graylog2.database.pagination;
 
 import com.google.common.collect.Lists;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Collation;
+import com.mongodb.client.model.CollationCaseFirst;
 import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.Sorts;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog.testing.mongodb.MongoDBExtension;
@@ -33,11 +34,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Predicates.alwaysTrue;
+import static com.mongodb.client.model.Sorts.ascending;
+import static com.mongodb.client.model.Sorts.descending;
+import static java.util.Locale.ENGLISH;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MongoDBExtension.class)
@@ -82,26 +87,26 @@ class DefaultMongoPaginationHelperTest {
 
     @Test
     void testSort() {
-        assertThat(paginationHelper.sort(Sorts.ascending("_id")).page(1))
-                .isEqualTo(paginationHelper.sort(Sorts.ascending("_id")).page(1, alwaysTrue()))
+        assertThat(paginationHelper.sort(ascending("_id")).page(1))
+                .isEqualTo(paginationHelper.sort(ascending("_id")).page(1, alwaysTrue()))
                 .isEqualTo(paginationHelper.sort("_id", "asc").page(1))
                 .isEqualTo(paginationHelper.sort("_id", "asc").page(1, alwaysTrue()))
                 .containsExactlyElementsOf(DTOs);
 
-        assertThat(paginationHelper.sort(Sorts.ascending("name")).page(1))
-                .isEqualTo(paginationHelper.sort(Sorts.ascending("name")).page(1, alwaysTrue()))
+        assertThat(paginationHelper.sort(ascending("name")).page(1))
+                .isEqualTo(paginationHelper.sort(ascending("name")).page(1, alwaysTrue()))
                 .isEqualTo(paginationHelper.sort("name", "asc").page(1))
                 .isEqualTo(paginationHelper.sort("name", "asc").page(1, alwaysTrue()))
                 .containsExactlyElementsOf(DTOs);
 
-        assertThat(paginationHelper.sort(Sorts.descending("_id")).page(1))
-                .isEqualTo(paginationHelper.sort(Sorts.descending("_id")).page(1, alwaysTrue()))
+        assertThat(paginationHelper.sort(descending("_id")).page(1))
+                .isEqualTo(paginationHelper.sort(descending("_id")).page(1, alwaysTrue()))
                 .isEqualTo(paginationHelper.sort("_id", "desc").page(1))
                 .isEqualTo(paginationHelper.sort("_id", "desc").page(1, alwaysTrue()))
                 .containsExactlyElementsOf(Lists.reverse(DTOs));
 
-        assertThat(paginationHelper.sort(Sorts.descending("name")).page(1))
-                .isEqualTo(paginationHelper.sort(Sorts.descending("name")).page(1, alwaysTrue()))
+        assertThat(paginationHelper.sort(descending("name")).page(1))
+                .isEqualTo(paginationHelper.sort(descending("name")).page(1, alwaysTrue()))
                 .isEqualTo(paginationHelper.sort("name", "desc").page(1))
                 .isEqualTo(paginationHelper.sort("name", "desc").page(1, alwaysTrue()))
                 .containsExactlyElementsOf(Lists.reverse(DTOs));
@@ -154,7 +159,7 @@ class DefaultMongoPaginationHelperTest {
         final Predicate<DTO> selector = dto -> dto.name().equalsIgnoreCase("a");
         final MongoPaginationHelper<DTO> helper = paginationHelper
                 .filter(filter)
-                .sort(Sorts.descending("_id"))
+                .sort(descending("_id"))
                 .includeGrandTotal(true)
                 .perPage(1);
 
@@ -167,6 +172,17 @@ class DefaultMongoPaginationHelperTest {
             assertThat(pagination.perPage()).isEqualTo(1);
         });
         assertThat(helper.page(2, selector).grandTotal()).contains(16L);
+    }
+
+    @Test
+    void testCollation() {
+        final Collation upperFirstCollation = Collation.builder().locale("en").collationCaseFirst(CollationCaseFirst.UPPER).build();
+        final Comparator<String> upperFirstComparator = (a, b) -> a.toLowerCase(ENGLISH).equals(b.toLowerCase(ENGLISH)) ?
+                a.compareTo(b) :
+                a.toLowerCase(ENGLISH).compareTo(b.toLowerCase(ENGLISH));
+
+        assertThat(paginationHelper.collation(upperFirstCollation).sort(ascending("name")).page(1))
+                .containsExactlyElementsOf(DTOs.stream().sorted(Comparator.comparing(DTO::name, upperFirstComparator)).toList());
     }
 
 }

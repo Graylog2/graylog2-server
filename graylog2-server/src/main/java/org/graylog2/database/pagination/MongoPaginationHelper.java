@@ -16,6 +16,7 @@
  */
 package org.graylog2.database.pagination;
 
+import com.mongodb.client.model.Collation;
 import org.bson.conversions.Bson;
 import org.graylog2.database.MongoEntity;
 import org.graylog2.database.PaginatedList;
@@ -73,6 +74,14 @@ public interface MongoPaginationHelper<T extends MongoEntity> {
      * @return A new pagination helper with the setting applied
      */
     MongoPaginationHelper<T> grandTotalFilter(Bson grandTotalFilter);
+
+    /**
+     * Sets a collation to be used in the find operation
+     *
+     * @param collation The collation to set. If null, uses the default server collation
+     * @return A new pagination helper with the setting applied
+     */
+    MongoPaginationHelper<T> collation(Collation collation);
 
     /**
      * Perform the MongoDB request and return the specified page.

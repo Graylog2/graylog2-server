@@ -18,6 +18,7 @@ package org.graylog2.database.pagination;
 
 import com.google.common.primitives.Ints;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Collation;
 import com.mongodb.client.model.Sorts;
 import org.bson.conversions.Bson;
 import org.graylog2.database.MongoEntity;
@@ -37,29 +38,33 @@ public class DefaultMongoPaginationHelper<T extends MongoEntity> implements Mong
     private final int perPage;
     private final boolean includeGrandTotal;
     private final Bson grandTotalFilter;
+    private final Collation collation;
 
     public DefaultMongoPaginationHelper(MongoCollection<T> collection) {
-        this(collection, null, null, 0, false, null);
+        this(collection, null, null, 0, false, null, null);
     }
 
     private DefaultMongoPaginationHelper(MongoCollection<T> collection, Bson filter, Bson sort, int perPage,
-                                         boolean includeGrandTotal, Bson grandTotalFilter) {
+                                         boolean includeGrandTotal, Bson grandTotalFilter, Collation collation) {
         this.collection = collection;
         this.filter = filter;
         this.sort = sort;
         this.perPage = perPage;
         this.includeGrandTotal = includeGrandTotal;
         this.grandTotalFilter = grandTotalFilter;
+        this.collation = collation;
     }
 
     @Override
     public MongoPaginationHelper<T> filter(Bson filter) {
-        return new DefaultMongoPaginationHelper<>(collection, filter, sort, perPage, includeGrandTotal, grandTotalFilter);
+        return new DefaultMongoPaginationHelper<>(collection, filter, sort, perPage, includeGrandTotal,
+                grandTotalFilter, collation);
     }
 
     @Override
     public MongoPaginationHelper<T> sort(Bson sort) {
-        return new DefaultMongoPaginationHelper<>(collection, filter, sort, perPage, includeGrandTotal, grandTotalFilter);
+        return new DefaultMongoPaginationHelper<>(collection, filter, sort, perPage, includeGrandTotal,
+                grandTotalFilter, collation);
     }
 
     @Override
@@ -70,22 +75,32 @@ public class DefaultMongoPaginationHelper<T extends MongoEntity> implements Mong
         } else {
             sort = Sorts.ascending(fieldName);
         }
-        return new DefaultMongoPaginationHelper<>(collection, filter, sort, perPage, includeGrandTotal, grandTotalFilter);
+        return new DefaultMongoPaginationHelper<>(collection, filter, sort, perPage, includeGrandTotal,
+                grandTotalFilter, collation);
     }
 
     @Override
     public MongoPaginationHelper<T> perPage(int perPage) {
-        return new DefaultMongoPaginationHelper<>(collection, filter, sort, perPage, includeGrandTotal, grandTotalFilter);
+        return new DefaultMongoPaginationHelper<>(collection, filter, sort, perPage, includeGrandTotal,
+                grandTotalFilter, collation);
     }
 
     @Override
     public MongoPaginationHelper<T> includeGrandTotal(boolean includeGrandTotal) {
-        return new DefaultMongoPaginationHelper<>(collection, filter, sort, perPage, includeGrandTotal, grandTotalFilter);
+        return new DefaultMongoPaginationHelper<>(collection, filter, sort, perPage, includeGrandTotal,
+                grandTotalFilter, collation);
     }
 
     @Override
     public MongoPaginationHelper<T> grandTotalFilter(Bson grandTotalFilter) {
-        return new DefaultMongoPaginationHelper<>(collection, filter, sort, perPage, includeGrandTotal, grandTotalFilter);
+        return new DefaultMongoPaginationHelper<>(collection, filter, sort, perPage, includeGrandTotal,
+                grandTotalFilter, collation);
+    }
+
+    @Override
+    public MongoPaginationHelper<T> collation(Collation collation) {
+        return new DefaultMongoPaginationHelper<>(collection, filter, sort, perPage, includeGrandTotal,
+                grandTotalFilter, collation);
     }
 
     @Override
@@ -95,6 +110,7 @@ public class DefaultMongoPaginationHelper<T extends MongoEntity> implements Mong
                 .sort(sort)
                 .skip(perPage * Math.max(0, pageNumber - 1))
                 .limit(perPage)
+                .collation(collation)
                 .into(new ArrayList<>());
         final int total = Ints.saturatedCast(collection.countDocuments(filter));
 
@@ -114,13 +130,13 @@ public class DefaultMongoPaginationHelper<T extends MongoEntity> implements Mong
 
         final List<T> documents;
         if (perPage > 0) {
-            documents = stream(collection.find().filter(filter).sort(sort))
+            documents = stream(collection.find().filter(filter).sort(sort).collation(collation))
                     .filter(selector)
                     .skip(perPage * Math.max(0L, pageNumber - 1))
                     .limit(perPage)
                     .toList();
         } else {
-            documents = stream(collection.find().filter(filter).sort(sort))
+            documents = stream(collection.find().filter(filter).sort(sort).collation(collation))
                     .filter(selector).toList();
         }
 
