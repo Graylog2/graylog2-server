@@ -16,6 +16,7 @@
  */
 package org.graylog2.database.pagination;
 
+import com.mongodb.client.model.Collation;
 import org.bson.conversions.Bson;
 import org.graylog2.database.MongoEntity;
 import org.graylog2.database.PaginatedList;
@@ -27,7 +28,7 @@ public interface MongoPaginationHelper<T extends MongoEntity> {
      * Sets the query filter to apply to the query.
      *
      * @param filter the filter, which may be null.
-     * @return this
+     * @return A new pagination helper with the setting applied
      */
     MongoPaginationHelper<T> filter(Bson filter);
 
@@ -35,7 +36,7 @@ public interface MongoPaginationHelper<T extends MongoEntity> {
      * Sets the sort criteria to apply to the query.
      *
      * @param sort the sort criteria, which may be null.
-     * @return this
+     * @return A new pagination helper with the setting applied
      */
     MongoPaginationHelper<T> sort(Bson sort);
 
@@ -44,7 +45,7 @@ public interface MongoPaginationHelper<T extends MongoEntity> {
      *
      * @param fieldName the name of the field to sort by.
      * @param order     "desc" to request descending sort order. Otherwise, by default, ascending order is used.
-     * @return this
+     * @return A new pagination helper with the setting applied
      */
     MongoPaginationHelper<T> sort(String fieldName, String order);
 
@@ -52,7 +53,7 @@ public interface MongoPaginationHelper<T extends MongoEntity> {
      * Sets the page size
      *
      * @param perPage the number of documents to put on one page
-     * @return this
+     * @return A new pagination helper with the setting applied
      */
     MongoPaginationHelper<T> perPage(int perPage);
 
@@ -62,7 +63,7 @@ public interface MongoPaginationHelper<T extends MongoEntity> {
      *
      * @param includeGrandTotal true if a grand total should be included. Otherwise, by default, no grand total will
      *                          be included.
-     * @return this
+     * @return A new pagination helper with the setting applied
      */
     MongoPaginationHelper<T> includeGrandTotal(boolean includeGrandTotal);
 
@@ -70,9 +71,17 @@ public interface MongoPaginationHelper<T extends MongoEntity> {
      * Sets a filter to be applied to the query to count the grand total of documents in the collection.
      *
      * @param grandTotalFilter the filter, which may be null
-     * @return this
+     * @return A new pagination helper with the setting applied
      */
     MongoPaginationHelper<T> grandTotalFilter(Bson grandTotalFilter);
+
+    /**
+     * Sets a collation to be used in the find operation
+     *
+     * @param collation The collation to set. If null, uses the default server collation
+     * @return A new pagination helper with the setting applied
+     */
+    MongoPaginationHelper<T> collation(Collation collation);
 
     /**
      * Perform the MongoDB request and return the specified page.
@@ -83,15 +92,15 @@ public interface MongoPaginationHelper<T extends MongoEntity> {
     PaginatedList<T> page(int pageNumber);
 
     /**
-     * Perform the MongoDB request but post process the list of results by only keeping elements matching
-     * the given selector.
+     * Perform the MongoDB request but apply the given predicate to each document in the list of results and only keep
+     * documents matching the predicate.
      * <p>
      * <b>This is a potentially expensive operation because the selector can only be applied after the documents
      * have been fetched from MongoDB and this might result in a full collection scan. Use with care!</b>
      *
      * @param pageNumber The number of the page to be returned.
-     * @param selector   predicate to filter documents after fetching them from MongoDB.
+     * @param selector   predicate to filter documents <b>after</b> fetching them from MongoDB.
      * @return a paginated list of documents
      */
-    PaginatedList<T> postProcessedPage(int pageNumber, Predicate<T> selector);
+    PaginatedList<T> page(int pageNumber, Predicate<T> selector);
 }
