@@ -46,6 +46,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.support.IndicesOptions;
 import org.graylog.shaded.opensearch2.org.opensearch.action.support.PlainActionFuture;
+import org.graylog.shaded.opensearch2.org.opensearch.common.unit.TimeValue;
 import org.graylog.shaded.opensearch2.org.opensearch.core.action.ShardOperationFailedException;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilder;
@@ -75,6 +76,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> {
@@ -224,7 +226,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
 
     @Override
     public Set<IndexRange> indexRangesForStreamsInTimeRange(Set<String> streamIds, TimeRange timeRange) {
-        return indexLookup.indexRangesForStreamsInTimeRange(streamIds,timeRange);
+        return indexLookup.indexRangesForStreamsInTimeRange(streamIds, timeRange);
     }
 
     @Override
@@ -261,10 +263,14 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                             .orElse(affectedIndices);
 
                     Set<String> indices = affectedIndicesForSearchType.isEmpty() ? Collections.singleton("") : affectedIndicesForSearchType;
-                    return new SearchRequest()
+                    final SearchRequest searchRequest = new SearchRequest()
                             .source(searchTypeQueries.get(searchTypeId))
                             .indices(indices.toArray(new String[0]))
                             .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN);
+                    if (!SearchJob.NO_CANCELLATION.equals(job.getCancelAfterSeconds())) {
+                        searchRequest.setCancelAfterTimeInterval(new TimeValue(job.getCancelAfterSeconds(), TimeUnit.SECONDS));
+                    }
+                    return searchRequest;
                 })
                 .toList();
 

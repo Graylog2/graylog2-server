@@ -93,7 +93,9 @@ describe('TimeRangeFilter', () => {
     });
     fireEvent.change(fromValue, { target: { value: 30 } });
 
-    fireEvent.click(await screen.findByRole('button', { name: 'Update time range' }));
+    const submitButton = await screen.findByRole('button', { name: 'Update time range' });
+    await waitFor(() => expect(submitButton).toBeEnabled());
+    fireEvent.click(submitButton);
 
     await waitFor(() => expect(onChange).toHaveBeenCalledWith({
       from: 1800,

@@ -34,7 +34,10 @@ Small components should be functional components. When a component is more compl
 you want to use (class or a functional component with react hooks). When you don’t have a preference, use a functional component.
 
 ### Type definitions
-- We use TypeScript for new components, and we also define `PropType` definitions. Static types add better type support for the development, integrating with your IDE, while `PropType` definitions are present at runtime.
+- We use TypeScript for new React components, using static types for props.
+- Due to support for `PropTypes` being dropped with React 19, we do not use them anymore.
+- Also, in functional components, `defaultProps` should now be avoided in favor of [default parameters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Default_parameters). See [here](https://react.dev/blog/2024/04/25/react-19-upgrade-guide) for details.
+- When touching existing components, they should be migrated to functional, typed components. Exceptions for this are bugfixes, where the effort for migrating components exceeds the actual fix or could have unforeseen consequences.
 - Names of unused parameters
   - Sometimes you need to define a parameter which is not being used, for example when you just want to use the second parameter. To satisfy TypeScript the parameter name needs to be prefixed with underscore.
   - Instead of defining just `_`, use a more meaningful name, like `_theParameterName`. (Related to [this discussion](https://github.com/Graylog2/graylog2-server/pull/12176#pullrequestreview-940555887)).
@@ -47,7 +50,7 @@ you want to use (class or a functional component with react hooks). When you don
 #### Modules
 - Modules with one export should use default export.
 - When a module has several exports, you should use the default export only if one of the exports serves the main purpose of the module.
-- Sometimes, specially when working on a folder containing common components, it may be useful to add an index.js file with all exports of that folder, allowing consumers of those exports to combine several imports in the same line.
+- Sometimes, specially when working on a folder containing common components, it may be useful to add an `index.ts` file with all exports of that folder, allowing consumers of those exports to combine several imports in the same line.
 - The downside of this is that it might introduce cyclic dependencies (which can be resolved by babel/webpack by proxying, but should be avoided)
 
 ### React components
@@ -81,13 +84,17 @@ you want to use (class or a functional component with react hooks). When you don
   - Helps you find the best queries to select elements
 
 ### Injecting stores
-When writing new code, you should prefer injecting stores into your components with CombinedProvider instead of using StoreProvider
-and ActionsProvider. The *Providers use a registration system using a key in the window object to ensure that stores are loaded and initialized only once (making them effectively singletons) across core & plugins.
-Newer code (views) is testing a different approach: Instead of importing stores differently, it uses a `singleton()` wrapper that exports stores while tracking them centrally. The benefit is that:
-- Tracking usages of stores across the code base & refactoring support of your favorite IDE still works
-- (Re-)Moving a store that is still in use will fail at compile time, not at runtime
-- Type information of the stores/actions is kept
+*Using Reflux is generally discouraged and we are slowly refactoring away all of its usages.*
 
+When writing new code, state management should be handled either through a component state (`useState`), a context (if shared across multiple components in a complex hierarchy) or redux (if the state itself is complex). Generally, the simplest way should be picked for managing the state.
+
+For dealing with existing Reflux stores:
+
+ - Ideally, the Reflux store should be replaced with:
+   - `react-query` if it is used to cache API access
+   - `useState`/`useContext` if it is managing state
+ - If this is not possible (yet), the state should be accessed using `useStore`
+ 
 ### Important to know
 
 #### Session timeouts

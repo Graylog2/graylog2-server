@@ -18,6 +18,7 @@ package org.graylog.plugins.views.search.rest.export.response;
 
 import au.com.bytecode.opencsv.CSVWriter;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.WebApplicationException;
@@ -36,14 +37,17 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Provider
-@Produces({MoreMediaTypes.TEXT_CSV, MediaType.APPLICATION_JSON})
+@Produces({MoreMediaTypes.TEXT_CSV, MediaType.APPLICATION_JSON, MoreMediaTypes.APPLICATION_YAML})
 public class AggregationWidgetExportResponseWriter implements MessageBodyWriter<AggregationWidgetExportResponse> {
 
     private final ObjectMapper objectMapper;
+    private final YAMLMapper yamlMapper;
 
     @Inject
-    public AggregationWidgetExportResponseWriter(ObjectMapper objectMapper) {
+    public AggregationWidgetExportResponseWriter(final ObjectMapper objectMapper,
+                                                 final YAMLMapper yamlMapper) {
         this.objectMapper = objectMapper;
+        this.yamlMapper = yamlMapper;
     }
 
 
@@ -57,6 +61,7 @@ public class AggregationWidgetExportResponseWriter implements MessageBodyWriter<
         switch (mediaType.toString()) {
             case MoreMediaTypes.TEXT_CSV -> writeCsv(widgetExportResponse, outputStream);
             case MediaType.APPLICATION_JSON -> objectMapper.writeValue(outputStream, widgetExportResponse);
+            case MoreMediaTypes.APPLICATION_YAML -> yamlMapper.writeValue(outputStream, widgetExportResponse);
             default -> throw new IllegalArgumentException("Media type " + mediaType + " not supported");
         }
     }
