@@ -193,6 +193,7 @@ public abstract class ViewFacade implements EntityWithExcerptFacade<ViewDTO, Vie
                 orElseThrow(() -> new NoSuchElementException("Could not find search with id " + viewSummaryDTO.searchId()));
         search.usedStreamIds().stream().map(s -> EntityDescriptor.create(s, ModelTypes.STREAM_REF_V1))
                 .forEach(streamDescriptor -> mutableGraph.putEdge(entityDescriptor, streamDescriptor));
+        search.resolveNativeEntity(entityDescriptor, mutableGraph);
         return ImmutableGraph.copyOf(mutableGraph);
     }
 
