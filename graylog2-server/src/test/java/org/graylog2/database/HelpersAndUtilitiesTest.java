@@ -150,7 +150,7 @@ class HelpersAndUtilitiesTest {
         final Predicate<TestDTO> filter = view -> view.title.matches("hello[23456]");
 
         final PaginatedList<TestDTO> page1 = paginationHelper.sort("title", "asc").perPage(2)
-                .postProcessedPage(1, filter);
+                .page(1, filter);
 
         assertThat(page1.pagination().count()).isEqualTo(2);
         assertThat(page1.pagination().total()).isEqualTo(5);
@@ -159,7 +159,7 @@ class HelpersAndUtilitiesTest {
                 .containsExactly("hello2", "hello3");
 
         final PaginatedList<TestDTO> page2 = paginationHelper.sort("title", "asc").perPage(2)
-                .postProcessedPage(2, filter);
+                .page(2, filter);
 
         assertThat(page2.pagination().count()).isEqualTo(2);
         assertThat(page2.pagination().total()).isEqualTo(5);
@@ -168,7 +168,7 @@ class HelpersAndUtilitiesTest {
                 .containsExactly("hello4", "hello5");
 
         final PaginatedList<TestDTO> page3 = paginationHelper.sort("title", "asc").perPage(2)
-                .postProcessedPage(3, filter);
+                .page(3, filter);
         assertThat(page3.pagination().count()).isEqualTo(1);
         assertThat(page3.pagination().total()).isEqualTo(5);
         assertThat(page3.delegate())
@@ -176,7 +176,7 @@ class HelpersAndUtilitiesTest {
                 .containsExactly("hello6");
 
         final PaginatedList<TestDTO> page4 = paginationHelper.sort("title", "asc").perPage(4)
-                .postProcessedPage(2, filter);
+                .page(2, filter);
 
         assertThat(page4.pagination().count()).isEqualTo(1);
         assertThat(page4.pagination().total()).isEqualTo(5);
@@ -185,7 +185,7 @@ class HelpersAndUtilitiesTest {
                 .containsExactly("hello6");
 
         final PaginatedList<TestDTO> page1reverse = paginationHelper.sort("title", "desc")
-                .perPage(2).postProcessedPage(1, filter);
+                .perPage(2).page(1, filter);
 
         assertThat(page1reverse.pagination().count()).isEqualTo(2);
         assertThat(page1reverse.pagination().total()).isEqualTo(5);

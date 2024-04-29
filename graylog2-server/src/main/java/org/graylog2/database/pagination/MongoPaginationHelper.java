@@ -83,15 +83,15 @@ public interface MongoPaginationHelper<T extends MongoEntity> {
     PaginatedList<T> page(int pageNumber);
 
     /**
-     * Perform the MongoDB request but post process the list of results by only keeping elements matching
-     * the given selector.
+     * Perform the MongoDB request but apply the given predicate to each document in the list of results and only keep
+     * documents matching the predicate.
      * <p>
      * <b>This is a potentially expensive operation because the selector can only be applied after the documents
      * have been fetched from MongoDB and this might result in a full collection scan. Use with care!</b>
      *
      * @param pageNumber The number of the page to be returned.
-     * @param selector   predicate to filter documents after fetching them from MongoDB.
+     * @param selector   predicate to filter documents <b>after</b> fetching them from MongoDB.
      * @return a paginated list of documents
      */
-    PaginatedList<T> postProcessedPage(int pageNumber, Predicate<T> selector);
+    PaginatedList<T> page(int pageNumber, Predicate<T> selector);
 }
