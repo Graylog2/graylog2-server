@@ -120,7 +120,7 @@ public abstract class ReferencedQueryStringSearchFilter implements ReferencedSea
     }
 
     public ReferencedSearchFilter withId(String id) {
-        return builder().id(id).build();
+        return toBuilder().id(id).build();
     }
 
     @Override
