@@ -21,7 +21,7 @@ import type { FormikErrors } from 'formik';
 import styled from 'styled-components';
 
 import { Alert, Input, Row, Col } from 'components/bootstrap';
-import { Spinner } from 'components/common';
+import { SearchForm, Spinner } from 'components/common';
 
 import type { RemoteReindexRequest } from '../../hooks/useRemoteReindexMigrationStatus';
 import type { MigrationActions, MigrationState, MigrationStepComponentProps, StepArgs } from '../../Types';
@@ -32,7 +32,10 @@ const IndicesContainer = styled.div`
   overflow-y: scroll;
   overflow: -moz-scrollbars-vertical;
   -ms-overflow-y: scroll;
-  margin-top: 5px;
+`;
+
+const SearchContainer = styled.div`
+  margin-top: 12px;
 `;
 
 export type RemoteReindexCheckConnection = {
@@ -46,6 +49,7 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [availableIndices, setAvailableIndices] = useState<string[]>([]);
   const [selectedIndices, setSelectedIndices] = useState<string[]>([]);
+  const [queryIndex, setQueryIndex] = useState<string>('');
 
   const handleConnectionCheck = (step: MigrationActions, data: MigrationState) => {
     if (step === 'CHECK_REMOTE_INDEXER_CONNECTION') {
@@ -99,9 +103,13 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
     }
   };
 
+  const filteredIndices = queryIndex ? availableIndices.filter((index) => index.includes(queryIndex)) : availableIndices;
+  const filteredSelectedIndices = selectedIndices.filter((index) => filteredIndices.includes(index));
+  const areAllIndicesSelected = filteredSelectedIndices.length === filteredIndices.length;
+
   const initialValues: RemoteReindexRequest = {
     allowlist: '',
-    hostname: '',
+    hostname: 'http://localhost:9201/',
     user: '',
     password: '',
     synchronous: false,
@@ -159,16 +167,34 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
                  required />
           {(availableIndices.length > 0) && (
             <Alert title="Valid connection" bsStyle="success">
-              Below are the available indices for the remote reindex migration, <b>{selectedIndices.length}/{availableIndices.length}</b> are selected.
+              Below are the available indices for the remote reindex migration, <b>{filteredSelectedIndices.length}/{filteredIndices.length}</b> are selected.
+              <SearchContainer>
+                <SearchForm onSearch={setQueryIndex}
+                            query={queryIndex} />
+              </SearchContainer>
+              {(filteredIndices.length === 0) ? 'No indices have been found' : (
+                <Input type="checkbox"
+                       formGroupClassName=""
+                       label={<b>{areAllIndicesSelected ? 'Unselect all' : 'Select all'}</b>}
+                       disabled={isLoading}
+                       checked={areAllIndicesSelected}
+                       onChange={() => {
+                         if (areAllIndicesSelected) {
+                           setSelectedIndices([]);
+                         } else {
+                           setSelectedIndices(availableIndices);
+                         }
+                       }} />
+              )}
               <IndicesContainer>
-                {availableIndices.map((index) => (
+                {filteredIndices.map((index) => (
                   <Input type="checkbox"
                          key={index}
                          name={index}
                          id={index}
                          label={index}
                          disabled={isLoading}
-                         checked={selectedIndices.includes(index)}
+                         checked={filteredSelectedIndices.includes(index)}
                          onChange={() => handleSelectIndices(index)} />
                 ))}
               </IndicesContainer>
@@ -182,7 +208,7 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
           ) : (
             <MigrationStepTriggerButtonToolbar nextSteps={nextSteps || currentStep.next_steps}
                                                onTriggerStep={handleTriggerNextStep}
-                                               args={{ ...values, indices: selectedIndices } as RemoteReindexRequest} />
+                                               args={{ ...values, indices: filteredSelectedIndices } as RemoteReindexRequest} />
           )}
         </Form>
       )}
