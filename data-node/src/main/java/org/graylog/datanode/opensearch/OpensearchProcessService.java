@@ -88,15 +88,15 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     public void handleRemoteReindexAllowlistEvent(RemoteReindexAllowlistEvent event) {
         switch (event.action()) {
             case ADD -> {
-                this.process.stop();
+                stateMachine.fire(OpensearchEvent.PROCESS_STOPPED);
                 this.configurationProvider.setTransientConfiguration("reindex.remote.allowlist", event.allowlist());
                 configure(); // , "action.auto_create_index", "false"));
-                this.process.start();
+                stateMachine.fire(OpensearchEvent.PROCESS_STARTED);
             }
             case REMOVE -> {
-                this.process.stop();
+                stateMachine.fire(OpensearchEvent.PROCESS_STOPPED);
                 configure();
-                this.process.start();
+                stateMachine.fire(OpensearchEvent.PROCESS_STARTED);
             }
         }
     }
@@ -105,10 +105,11 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     @SuppressWarnings("unused")
     public void handlePreflightConfigEvent(DataNodeProvisioningStateChangeEvent event) {
         switch (event.state()) {
-            case STARTUP_REQUESTED -> this.process.start();
+            case STARTUP_REQUESTED -> stateMachine.fire(OpensearchEvent.PROCESS_STARTED);
             case STORED -> {
                 configure();
                 dataNodeProvisioningService.changeState(event.nodeId(), DataNodeProvisioningConfig.State.STARTUP_PREPARED);
+                stateMachine.fire(OpensearchEvent.PROCESS_STARTED);
             }
         }
     }
@@ -121,7 +122,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
                 case REMOVE -> stateMachine.fire(OpensearchEvent.PROCESS_REMOVE);
                 case RESET -> stateMachine.fire(OpensearchEvent.RESET);
                 case STOP -> this.shutDown();
-                case START -> this.startUp();
+                case START -> stateMachine.fire(OpensearchEvent.PROCESS_STARTED);
             }
         }
     }
@@ -146,7 +147,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
             checkWritePreflightFinishedOnInsecureStartup();
             try {
                 lockfileCheck.checkDatanodeLock(config.datanodeDirectories().getDataTargetDir());
-                this.process.start();
+                stateMachine.fire(OpensearchEvent.PROCESS_STARTED);
             } catch (Exception e) {
                 LOG.error("Could not start up data node", e);
             }
@@ -169,13 +170,13 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
                     """;
             LOG.info(noConfigMessage);
         }
-        eventBus.post(new OpensearchConfigurationChangeEvent(config));
+        eventBus.post(new OpensearchConfigurationChangeEvent(config)); //refresh jersey
     }
 
 
     @Override
     protected void shutDown() {
-        this.process.stop();
+        stateMachine.fire(OpensearchEvent.PROCESS_STOPPED);
     }
 
     @Override

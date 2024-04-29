@@ -68,6 +68,7 @@ public class OpensearchStateMachine extends StateMachine<OpensearchState, Opense
         // the startupFailuresCounter keeps track of failed REST status calls and allow failures during the
         // startup period
         config.configure(OpensearchState.STARTING)
+                .onEntry(process::start)
                 .permitDynamic(OpensearchEvent.HEALTH_CHECK_FAILED,
                         () -> startupFailuresCounter.failedTooManyTimes() ? OpensearchState.FAILED : OpensearchState.STARTING,
                         startupFailuresCounter::increment)
@@ -79,6 +80,7 @@ public class OpensearchStateMachine extends StateMachine<OpensearchState, Opense
         config.configure(OpensearchState.AVAILABLE)
                 .onEntry(restFailureCounter::resetFailuresCounter)
                 .onEntry(rebootCounter::resetFailuresCounter)
+                .onEntry(process::available)
                 .permitReentry(OpensearchEvent.HEALTH_CHECK_OK)
                 .permit(OpensearchEvent.HEALTH_CHECK_FAILED, OpensearchState.NOT_RESPONDING)
                 .permit(OpensearchEvent.PROCESS_STOPPED, OpensearchState.TERMINATED)
@@ -107,6 +109,7 @@ public class OpensearchStateMachine extends StateMachine<OpensearchState, Opense
 
         // final state, the process is not alive anymore, terminated on the operating system level
         config.configure(OpensearchState.TERMINATED)
+                .onEntry(process::stop)
                 .permit(OpensearchEvent.PROCESS_STARTED, OpensearchState.STARTING, rebootCounter::increment)
                 .ignore(OpensearchEvent.HEALTH_CHECK_FAILED)
                 .ignore(OpensearchEvent.PROCESS_STOPPED)

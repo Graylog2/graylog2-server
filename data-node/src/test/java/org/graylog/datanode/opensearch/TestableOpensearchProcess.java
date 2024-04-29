@@ -17,14 +17,10 @@
 package org.graylog.datanode.opensearch;
 
 import com.github.oxo42.stateless4j.StateMachine;
-import com.github.oxo42.stateless4j.delegates.Trace;
 import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
 import org.graylog.datanode.opensearch.statemachine.OpensearchState;
 import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachine;
 import org.graylog.datanode.process.ManagableProcess;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,11 +55,6 @@ public class TestableOpensearchProcess implements ManagableProcess<String, Opens
     @Override
     public void onEvent(OpensearchEvent event) {
         stateMachine.fire(event);
-    }
-
-    @Override
-    public void addStateMachineTracer(Trace<OpensearchState, OpensearchEvent> stateMachineTracer) {
-        stateMachine.setTrace(stateMachineTracer);
     }
 
     @Override

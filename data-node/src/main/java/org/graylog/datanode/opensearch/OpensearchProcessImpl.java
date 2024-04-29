@@ -17,7 +17,6 @@
 package org.graylog.datanode.opensearch;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.oxo42.stateless4j.delegates.Trace;
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import jakarta.inject.Inject;
@@ -33,7 +32,6 @@ import org.graylog.datanode.opensearch.rest.OpensearchRestClient;
 import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
 import org.graylog.datanode.opensearch.statemachine.OpensearchState;
 import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachine;
-import org.graylog.datanode.opensearch.statemachine.tracer.StateMachineTracer;
 import org.graylog.datanode.process.ProcessInformation;
 import org.graylog.datanode.process.ProcessListener;
 import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchStatusException;
@@ -181,11 +179,6 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
         this.processState.fire(event);
     }
 
-    @Override
-    public void addStateMachineTracer(Trace<OpensearchState, OpensearchEvent> stateMachineTracer) {
-        this.processState.getTracerAggregator().addTracer((StateMachineTracer) stateMachineTracer);
-    }
-
     public boolean isInState(OpensearchState expectedState) {
         return this.processState.getState().equals(expectedState);
     }
@@ -220,7 +213,6 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
     }
     @Override
     public synchronized void start() {
-        if (Objects.isNull(commandLineProcess) || !commandLineProcess.processInfo().alive()) {
             opensearchConfiguration.ifPresentOrElse(
                     (config -> {
                         boolean startedPreviously = Objects.nonNull(commandLineProcess) && commandLineProcess.processInfo().alive();
@@ -229,17 +221,13 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
                         }
 
                         commandLineProcess = new OpensearchCommandLineProcess(config, this);
-
-                        if (startedPreviously) {
-                            commandLineProcess.start();
-                        }
+                        commandLineProcess.start();
 
                         restClient = Optional.of(createRestClient(config));
                         openSearchClient = restClient.map(c -> new OpenSearchClient(c, objectMapper));
                     }),
                     () -> {throw new IllegalArgumentException("Opensearch configuration required but not supplied!");}
             );
-        }
     }
 
     /**
@@ -285,7 +273,6 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
 
     private void stopProcess() {
         if (this.commandLineProcess != null) {
-            onEvent(OpensearchEvent.PROCESS_STOPPED);
             commandLineProcess.close();
         }
     }
@@ -345,10 +332,6 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
 
     @Override
     public void onStart() {
-        if (!allocationExcludeChecked) {
-            this.checkAllocationEnabledStatus();
-        }
-        onEvent(OpensearchEvent.PROCESS_STARTED);
     }
 
     @Override
@@ -374,4 +357,12 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
         LOG.warn("Opensearch process failed", e);
         onEvent(OpensearchEvent.PROCESS_TERMINATED);
     }
+
+    @Override
+    public void available() {
+        if (!allocationExcludeChecked) {
+            this.checkAllocationEnabledStatus();
+        }
+    }
+
 }
