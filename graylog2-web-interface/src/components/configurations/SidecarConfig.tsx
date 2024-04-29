@@ -149,7 +149,7 @@ const SidecarConfig = () => {
                             label="Update interval (as ISO8601 Duration)"
                             help="Time between Sidecar update requests."
                             validator={updateIntervalValidator}
-                            errorText="invalid (min: 1 second, lower: inactive/expiration threshold)"
+                            errorText="invalid (min: 1 second. This value must be less than Inactive threshold)"
                             required />
         </fieldset>
         <Input type="checkbox"
