@@ -14,11 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.opensearch;
+package org.graylog2.shared.bindings.providers;
 
-import org.graylog.datanode.opensearch.statemachine.OpensearchState;
-import org.graylog.datanode.process.ProcessInformation;
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
+import jakarta.inject.Provider;
 
-public record OpensearchInfo(String nodeName, OpensearchState state, String restBaseUrl,
-                             ProcessInformation process) {
+public class YamlMapperProvider implements Provider<YAMLMapper> {
+
+    private final YAMLMapper objectMapper;
+
+    public YamlMapperProvider() {
+        this.objectMapper = new YAMLMapper();
+    }
+
+    @Override
+    public YAMLMapper get() {
+        return objectMapper;
+    }
 }
