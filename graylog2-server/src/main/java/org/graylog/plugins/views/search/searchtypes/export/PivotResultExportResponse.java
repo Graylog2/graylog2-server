@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.rest.export.response;
+package org.graylog.plugins.views.search.searchtypes.export;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
@@ -26,10 +26,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-public record AggregationWidgetExportResponse(@JsonProperty List<String> header,
-                                              @JsonProperty List<List<String>> dataRows) {
+public record PivotResultExportResponse(@JsonProperty List<String> header,
+                                        @JsonProperty List<List<Object>> dataRows) {
 
-    public static AggregationWidgetExportResponse fromPivotResult(final PivotResult pivotResult) {
+    public static PivotResultExportResponse fromPivotResult(final PivotResult pivotResult) {
 
         final Collection<PivotResult.Row> rows = pivotResult.rows();
 
@@ -51,28 +51,27 @@ public record AggregationWidgetExportResponse(@JsonProperty List<String> header,
         header.addAll(Collections.nCopies(longestRowKey, ""));
         columns.forEach(column -> header.add(column.toString()));
 
-        final List<List<String>> dataRows = rows.stream()
+        final List<List<Object>> dataRows = rows.stream()
                 .filter(row -> "leaf".equals(row.source()))
                 .map(row -> {
                     final ImmutableList<String> key = row.key();
-                    final List<String> values = columns.stream()
+                    final List<Object> values = columns.stream()
                             .map(metric -> row.values()
                                     .stream()
                                     .filter(value -> value.key().equals(metric))
                                     .filter(value -> value.value() != null)
                                     .findFirst()
-                                    .map(value -> value.value().toString())
+                                    .map(value -> value.value())
                                     .orElse("")
                             ).toList();
 
-                    List<String> dataRow = new ArrayList<>();
+                    List<Object> dataRow = new ArrayList<>();
                     dataRow.addAll(key);
                     dataRow.addAll(values);
                     return dataRow;
                 })
                 .toList();
 
-        return new AggregationWidgetExportResponse(header, dataRows);
-
+        return new PivotResultExportResponse(header, dataRows);
     }
 }
