@@ -21,7 +21,7 @@ import jakarta.inject.Provider;
 
 public class YamlMapperProvider implements Provider<YAMLMapper> {
 
-    protected final YAMLMapper objectMapper;
+    private final YAMLMapper objectMapper;
 
     public YamlMapperProvider() {
         this.objectMapper = new YAMLMapper();
