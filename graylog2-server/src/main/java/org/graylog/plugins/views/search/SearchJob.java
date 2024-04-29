@@ -39,6 +39,8 @@ import java.util.concurrent.Future;
 @JsonPropertyOrder({"execution", "results"})
 public class SearchJob implements ParameterProvider {
 
+    public static final Integer NO_CANCELLATION = 0;
+
     @JsonUnwrapped
     private SearchJobIdentifier searchJobIdentifier;
 
@@ -52,9 +54,24 @@ public class SearchJob implements ParameterProvider {
 
     private Set<SearchError> errors = Sets.newHashSet();
 
-    public SearchJob(String id, Search search, String owner, String executingNodeId) {
+    private final Integer cancelAfterSeconds;
+
+    public SearchJob(String id,
+                     Search search,
+                     String owner,
+                     String executingNodeId) {
+
+        this(id, search, owner, executingNodeId, NO_CANCELLATION);
+    }
+
+    public SearchJob(String id,
+                     Search search,
+                     String owner,
+                     String executingNodeId,
+                     Integer cancelAfterSeconds) {
         this.search = search;
         this.searchJobIdentifier = new SearchJobIdentifier(id, search.id(), owner, executingNodeId);
+        this.cancelAfterSeconds = cancelAfterSeconds != null ? cancelAfterSeconds : NO_CANCELLATION;
     }
 
     @JsonIgnore //covered by @JsonUnwrapped
@@ -65,6 +82,11 @@ public class SearchJob implements ParameterProvider {
     @JsonIgnore
     public Search getSearch() {
         return search;
+    }
+
+    @JsonProperty("cancel_after_seconds")
+    public Integer getCancelAfterSeconds() {
+        return cancelAfterSeconds;
     }
 
     @JsonIgnore
