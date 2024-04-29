@@ -18,6 +18,7 @@ package org.graylog.plugins.views.search.rest.export.response;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.Resources;
+import org.graylog.plugins.views.search.searchtypes.export.PivotResultExportResponse;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.Test;
@@ -26,16 +27,16 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class AggregationWidgetExportResponseTest {
+class PivotResultExportResponseTest {
 
     @Test
     void testCreationFromPivotResult() throws Exception {
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         final byte[] bytes = Resources.toByteArray(Resources.getResource("org/graylog/plugins/views/search/rest/export/response/sample_pivot_result.json"));
         final PivotResult pivotResult = objectMapper.readValue(bytes, PivotResult.class);
-        final AggregationWidgetExportResponse response = AggregationWidgetExportResponse.fromPivotResult(pivotResult);
+        final PivotResultExportResponse response = PivotResultExportResponse.fromPivotResult(pivotResult);
 
-        final AggregationWidgetExportResponse expectedResponse = new AggregationWidgetExportResponse(
+        final PivotResultExportResponse expectedResponse = new PivotResultExportResponse(
                 List.of("", "[count()]", "[max(http_response_code)]", "[DELETE, count()]", "[DELETE, max(http_response_code)]", "[GET, count()]", "[GET, max(http_response_code)]", "[POST, count()]", "[POST, max(http_response_code)]", "[PUT, count()]", "[PUT, max(http_response_code)]"),
                 List.of(
                         List.of("index", "1507337", "504", "75322", "504", "1296526", "504", "75163", "504", "60326", "504"),
