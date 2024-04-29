@@ -32,54 +32,60 @@ import static org.graylog2.database.utils.MongoUtils.stream;
 public class DefaultMongoPaginationHelper<T extends MongoEntity> implements MongoPaginationHelper<T> {
 
     private final MongoCollection<T> collection;
-    private Bson filter;
-    private Bson sort;
-    private int perPage;
-    private boolean includeGrandTotal;
-    private Bson grandTotalFilter;
+    private final Bson filter;
+    private final Bson sort;
+    private final int perPage;
+    private final boolean includeGrandTotal;
+    private final Bson grandTotalFilter;
 
     public DefaultMongoPaginationHelper(MongoCollection<T> collection) {
+        this(collection, null, null, 0, false, null);
+    }
+
+    private DefaultMongoPaginationHelper(MongoCollection<T> collection, Bson filter, Bson sort, int perPage,
+                                         boolean includeGrandTotal, Bson grandTotalFilter) {
         this.collection = collection;
+        this.filter = filter;
+        this.sort = sort;
+        this.perPage = perPage;
+        this.includeGrandTotal = includeGrandTotal;
+        this.grandTotalFilter = grandTotalFilter;
     }
 
     @Override
     public MongoPaginationHelper<T> filter(Bson filter) {
-        this.filter = filter;
-        return this;
+        return new DefaultMongoPaginationHelper<>(collection, filter, sort, perPage, includeGrandTotal, grandTotalFilter);
     }
 
     @Override
     public MongoPaginationHelper<T> sort(Bson sort) {
-        this.sort = sort;
-        return this;
+        return new DefaultMongoPaginationHelper<>(collection, filter, sort, perPage, includeGrandTotal, grandTotalFilter);
     }
 
     @Override
     public MongoPaginationHelper<T> sort(String fieldName, String order) {
+        Bson sort;
         if ("desc".equalsIgnoreCase(order)) {
-            this.sort = Sorts.descending(fieldName);
+            sort = Sorts.descending(fieldName);
         } else {
-            this.sort = Sorts.ascending(fieldName);
+            sort = Sorts.ascending(fieldName);
         }
-        return this;
+        return new DefaultMongoPaginationHelper<>(collection, filter, sort, perPage, includeGrandTotal, grandTotalFilter);
     }
 
     @Override
     public MongoPaginationHelper<T> perPage(int perPage) {
-        this.perPage = perPage;
-        return this;
+        return new DefaultMongoPaginationHelper<>(collection, filter, sort, perPage, includeGrandTotal, grandTotalFilter);
     }
 
     @Override
     public MongoPaginationHelper<T> includeGrandTotal(boolean includeGrandTotal) {
-        this.includeGrandTotal = includeGrandTotal;
-        return this;
+        return new DefaultMongoPaginationHelper<>(collection, filter, sort, perPage, includeGrandTotal, grandTotalFilter);
     }
 
     @Override
     public MongoPaginationHelper<T> grandTotalFilter(Bson grandTotalFilter) {
-        this.grandTotalFilter = grandTotalFilter;
-        return this;
+        return new DefaultMongoPaginationHelper<>(collection, filter, sort, perPage, includeGrandTotal, grandTotalFilter);
     }
 
     @Override

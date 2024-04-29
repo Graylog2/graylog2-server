@@ -27,7 +27,7 @@ public interface MongoPaginationHelper<T extends MongoEntity> {
      * Sets the query filter to apply to the query.
      *
      * @param filter the filter, which may be null.
-     * @return this
+     * @return A new pagination helper with the setting applied
      */
     MongoPaginationHelper<T> filter(Bson filter);
 
@@ -35,7 +35,7 @@ public interface MongoPaginationHelper<T extends MongoEntity> {
      * Sets the sort criteria to apply to the query.
      *
      * @param sort the sort criteria, which may be null.
-     * @return this
+     * @return A new pagination helper with the setting applied
      */
     MongoPaginationHelper<T> sort(Bson sort);
 
@@ -44,7 +44,7 @@ public interface MongoPaginationHelper<T extends MongoEntity> {
      *
      * @param fieldName the name of the field to sort by.
      * @param order     "desc" to request descending sort order. Otherwise, by default, ascending order is used.
-     * @return this
+     * @return A new pagination helper with the setting applied
      */
     MongoPaginationHelper<T> sort(String fieldName, String order);
 
@@ -52,7 +52,7 @@ public interface MongoPaginationHelper<T extends MongoEntity> {
      * Sets the page size
      *
      * @param perPage the number of documents to put on one page
-     * @return this
+     * @return A new pagination helper with the setting applied
      */
     MongoPaginationHelper<T> perPage(int perPage);
 
@@ -62,7 +62,7 @@ public interface MongoPaginationHelper<T extends MongoEntity> {
      *
      * @param includeGrandTotal true if a grand total should be included. Otherwise, by default, no grand total will
      *                          be included.
-     * @return this
+     * @return A new pagination helper with the setting applied
      */
     MongoPaginationHelper<T> includeGrandTotal(boolean includeGrandTotal);
 
@@ -70,7 +70,7 @@ public interface MongoPaginationHelper<T extends MongoEntity> {
      * Sets a filter to be applied to the query to count the grand total of documents in the collection.
      *
      * @param grandTotalFilter the filter, which may be null
-     * @return this
+     * @return A new pagination helper with the setting applied
      */
     MongoPaginationHelper<T> grandTotalFilter(Bson grandTotalFilter);
 
