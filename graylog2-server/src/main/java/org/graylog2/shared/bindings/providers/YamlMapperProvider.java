@@ -18,12 +18,8 @@ package org.graylog2.shared.bindings.providers;
 
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import jakarta.inject.Provider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class YamlMapperProvider implements Provider<YAMLMapper> {
-
-    private static final Logger LOG = LoggerFactory.getLogger(YamlMapperProvider.class);
 
     protected final YAMLMapper objectMapper;
 
