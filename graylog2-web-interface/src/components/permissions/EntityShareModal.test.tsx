@@ -176,7 +176,10 @@ describe('EntityShareModal', () => {
         await act(async () => { await selectEvent.select(capabilitySelect, capability.title); });
 
         // Submit form
-        const submitButton = await screen.findByText('Add Collaborator');
+        const submitButton = await screen.findByRole('button', {
+          name: /add collaborator/i,
+          hidden: true,
+        });
 
         fireEvent.click(submitButton);
 
