@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.graph.MutableGraph;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.plugins.views.search.views.PluginMetadataSummary;
 import org.graylog.plugins.views.search.views.ViewDTO;
@@ -184,5 +185,13 @@ public abstract class ViewEntity implements NativeEntityConverter<ViewDTO.Builde
                 .requires(this.requires());
         this.owner().ifPresent(viewBuilder::owner);
         return viewBuilder;
+    }
+
+    @Override
+    public void resolveForInstallation(EntityV1 entity,
+                                       Map<String, ValueReference> parameters,
+                                       Map<EntityDescriptor, Entity> entities,
+                                       MutableGraph<Entity> graph) {
+        state().entrySet().forEach(state -> state.getValue().resolveForInstallation(entity, parameters, entities, graph));
     }
 }
