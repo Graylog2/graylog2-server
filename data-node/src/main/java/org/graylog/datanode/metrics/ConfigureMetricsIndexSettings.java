@@ -25,6 +25,7 @@ import org.graylog.datanode.Configuration;
 import org.graylog.datanode.opensearch.OpensearchProcess;
 import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
 import org.graylog.datanode.opensearch.statemachine.OpensearchState;
+import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachine;
 import org.graylog.datanode.opensearch.statemachine.tracer.StateMachineTracer;
 import org.graylog.datanode.periodicals.MetricsCollector;
 import org.graylog.storage.opensearch2.DataStreamAdapterOS2;
@@ -177,4 +178,8 @@ public class ConfigureMetricsIndexSettings implements StateMachineTracer {
         return new Policy.State("open", actions, transitions);
     }
 
+    @Override
+    public void setStateMachine(OpensearchStateMachine stateMachine) {
+        
+    }
 }

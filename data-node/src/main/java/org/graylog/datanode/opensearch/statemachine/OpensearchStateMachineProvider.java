@@ -31,7 +31,10 @@ public class OpensearchStateMachineProvider implements Provider<OpensearchStateM
     public OpensearchStateMachineProvider(Set<StateMachineTracer> tracer, OpensearchProcess process) {
         this.opensearchStateMachine = OpensearchStateMachine.createNew(process);
         StateMachineTracerAggregator aggregator = opensearchStateMachine.getTracerAggregator();
-        tracer.forEach(aggregator::addTracer);
+        tracer.forEach(t -> {
+            t.setStateMachine(opensearchStateMachine);
+            aggregator.addTracer(t);
+        });
     }
 
     @Override

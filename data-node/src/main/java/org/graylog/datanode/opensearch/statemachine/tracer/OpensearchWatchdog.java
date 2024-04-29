@@ -34,15 +34,14 @@ public class OpensearchWatchdog implements StateMachineTracer {
 
     private boolean active;
     private final FailuresCounter restartCounter;
-    private final OpensearchStateMachine stateMachine;
+    private OpensearchStateMachine stateMachine;
 
     @Inject
-    public OpensearchWatchdog(OpensearchStateMachine stateMachine) {
-        this(stateMachine, 3);
+    public OpensearchWatchdog() {
+        this(3);
     }
 
-    public OpensearchWatchdog(OpensearchStateMachine stateMachine, int restartAttemptsCount) {
-        this.stateMachine = stateMachine;
+    public OpensearchWatchdog(int restartAttemptsCount) {
         this.restartCounter = FailuresCounter.zeroBased(restartAttemptsCount);
     }
 
@@ -79,7 +78,7 @@ public class OpensearchWatchdog implements StateMachineTracer {
             if (!restartCounter.failedTooManyTimes()) {
                 try {
                     LOG.info("Detected terminated process, restarting. Attempt #{}", restartCounter.failuresCount() + 1);
-                    stateMachine.fire(OpensearchEvent.PROCESS_STARTED);
+                    this.stateMachine.fire(OpensearchEvent.PROCESS_STARTED);
                 } catch (Exception e) {
                     LOG.warn("Failed to restart process", e);
                 } finally {
@@ -95,5 +94,10 @@ public class OpensearchWatchdog implements StateMachineTracer {
 
     public boolean isActive() {
         return active;
+    }
+
+    @Override
+    public void setStateMachine(OpensearchStateMachine stateMachine) {
+        this.stateMachine = stateMachine;
     }
 }

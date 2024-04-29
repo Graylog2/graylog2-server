@@ -35,7 +35,8 @@ class OpensearchWatchdogTracerTest {
     @Test
     void testLifecycle() {
         OpensearchStateMachine stateMachine = OpensearchStateMachine.createNew(opensearchProcess);
-        final OpensearchWatchdog watchdog = new OpensearchWatchdog(stateMachine, 3);
+        final OpensearchWatchdog watchdog = new OpensearchWatchdog(3);
+        watchdog.setStateMachine(stateMachine);
         stateMachine.getTracerAggregator().addTracer(watchdog);
         stateMachine.fire(OpensearchEvent.PROCESS_STARTED);
 
