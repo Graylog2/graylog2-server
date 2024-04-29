@@ -19,6 +19,6 @@ package org.graylog.datanode.opensearch;
 import org.graylog.datanode.opensearch.statemachine.OpensearchState;
 import org.graylog.datanode.process.ProcessInformation;
 
-public record OpensearchInfo(String nodeName, OpensearchState state, boolean isLeaderNode, String restBaseUrl,
+public record OpensearchInfo(String nodeName, OpensearchState state, String restBaseUrl,
                              ProcessInformation process) {
 }
