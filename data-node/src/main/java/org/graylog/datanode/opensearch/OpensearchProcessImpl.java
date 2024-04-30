@@ -70,7 +70,6 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
 
     private final DatanodeConfiguration datanodeConfiguration;
 
-    private boolean isLeaderNode;
     private OpensearchCommandLineProcess commandLineProcess;
 
     private final Queue<String> stdout;
@@ -116,7 +115,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     }
 
     public OpensearchInfo processInfo() {
-        return new OpensearchInfo(configuration.getDatanodeNodeName(), processState.getState(), isLeaderNode, getOpensearchBaseUrl().toString(), commandLineProcess != null ? commandLineProcess.processInfo() : ProcessInformation.empty());
+        return new OpensearchInfo(configuration.getDatanodeNodeName(), processState.getState(),  getOpensearchBaseUrl().toString(), commandLineProcess != null ? commandLineProcess.processInfo() : ProcessInformation.empty());
     }
 
     @Override
@@ -154,15 +153,6 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     @Override
     public void addStateMachineTracer(Trace<OpensearchState, OpensearchEvent> stateMachineTracer) {
         this.processState.getTracerAggregator().addTracer((StateMachineTracer) stateMachineTracer);
-    }
-
-    public void setLeaderNode(boolean isLeaderNode) {
-        this.isLeaderNode = isLeaderNode;
-    }
-
-    @Override
-    public boolean isLeaderNode() {
-        return isLeaderNode;
     }
 
     public boolean isInState(OpensearchState expectedState) {
