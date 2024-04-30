@@ -105,11 +105,15 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
     @SuppressWarnings("unused")
     public void handlePreflightConfigEvent(DataNodeProvisioningStateChangeEvent event) {
         switch (event.state()) {
-            case STARTUP_REQUESTED -> stateMachine.fire(OpensearchEvent.PROCESS_STARTED);
+            case STARTUP_REQUESTED -> {
+                LOG.info("Startup requested by Graylog server");
+                stateMachine.fire(OpensearchEvent.PROCESS_STARTED);
+            }
             case STORED -> {
+                LOG.info("Provisioning ready, configuring and starting OpenSearch");
                 configure();
                 dataNodeProvisioningService.changeState(event.nodeId(), DataNodeProvisioningConfig.State.STARTUP_PREPARED);
-                stateMachine.fire(OpensearchEvent.PROCESS_STARTED);
+                stateMachine.fire(OpensearchEvent.PROCESS_PREPARED);
             }
         }
     }
@@ -144,6 +148,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
         final OpensearchConfiguration config = configurationProvider.get();
         configure();
         if (config.securityConfigured()) {
+            LOG.info("OpenSearch starting up");
             checkWritePreflightFinishedOnInsecureStartup();
             try {
                 lockfileCheck.checkDatanodeLock(config.datanodeDirectories().getDataTargetDir());
