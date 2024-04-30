@@ -14,17 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.db;
+package org.graylog2.shared.bindings.providers;
 
-import jakarta.ws.rs.ForbiddenException;
-import org.graylog.plugins.views.search.Search;
-import org.graylog.plugins.views.search.SearchJob;
-import org.graylog.plugins.views.search.permissions.SearchUser;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import jakarta.inject.Provider;
 
-import java.util.Optional;
+public class XmlMapperProvider implements Provider<XmlMapper> {
 
-public interface SearchJobService {
+    private final XmlMapper objectMapper;
 
-    SearchJob create(Search search, String owner, Integer cancelAfterSeconds);
-    Optional<SearchJob> load(String id, SearchUser searchUser) throws ForbiddenException;
+    public XmlMapperProvider() {
+        this.objectMapper = new XmlMapper.Builder(new XmlMapper())
+                .defaultUseWrapper(true)
+                .build();
+
+    }
+
+    @Override
+    public XmlMapper get() {
+        return objectMapper;
+    }
 }

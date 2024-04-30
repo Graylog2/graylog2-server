@@ -14,17 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.db;
+package org.graylog.plugins.views.search.errors;
 
-import jakarta.ws.rs.ForbiddenException;
-import org.graylog.plugins.views.search.Search;
-import org.graylog.plugins.views.search.SearchJob;
-import org.graylog.plugins.views.search.permissions.SearchUser;
+import jakarta.validation.constraints.NotNull;
+import org.graylog.plugins.views.search.Query;
 
-import java.util.Optional;
 
-public interface SearchJobService {
+public class SearchTypeAbortedError extends SearchTypeError {
 
-    SearchJob create(Search search, String owner, Integer cancelAfterSeconds);
-    Optional<SearchJob> load(String id, SearchUser searchUser) throws ForbiddenException;
+    public SearchTypeAbortedError(@NotNull Query query, @NotNull String searchTypeId, Throwable throwable) {
+        super(query, searchTypeId, throwable);
+    }
 }

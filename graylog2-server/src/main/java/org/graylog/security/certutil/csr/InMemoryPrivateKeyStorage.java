@@ -14,17 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.db;
+package org.graylog.security.certutil.csr;
 
-import jakarta.ws.rs.ForbiddenException;
-import org.graylog.plugins.views.search.Search;
-import org.graylog.plugins.views.search.SearchJob;
-import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.security.certutil.privatekey.PrivateKeyEncryptedStorage;
 
-import java.util.Optional;
+import java.security.PrivateKey;
 
-public interface SearchJobService {
+public class InMemoryPrivateKeyStorage implements PrivateKeyEncryptedStorage {
 
-    SearchJob create(Search search, String owner, Integer cancelAfterSeconds);
-    Optional<SearchJob> load(String id, SearchUser searchUser) throws ForbiddenException;
+    private PrivateKey privateKey;
+
+    @Override
+    public void writeEncryptedKey(char[] password, PrivateKey privateKey) {
+        this.privateKey = privateKey;
+    }
+
+    @Override
+    public PrivateKey readEncryptedKey(char[] password) {
+        return privateKey;
+    }
 }

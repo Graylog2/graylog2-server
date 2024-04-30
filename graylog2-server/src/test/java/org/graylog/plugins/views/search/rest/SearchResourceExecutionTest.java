@@ -35,6 +35,7 @@ import org.graylog.plugins.views.search.engine.validation.PluggableSearchValidat
 import org.graylog.plugins.views.search.events.SearchJobExecutionEvent;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
@@ -86,6 +87,9 @@ public class SearchResourceExecutionTest {
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private SearchUser searchUser;
 
+    @Mock
+    private ClusterConfigService clusterConfigService;
+
     private final NodeId nodeId = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
 
     private SearchResource searchResource;
@@ -101,7 +105,7 @@ public class SearchResourceExecutionTest {
                 new PluggableSearchValidation(executionGuard, Collections.emptySet()),
                 new PluggableSearchNormalization(Collections.emptySet()));
 
-        this.searchResource = new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus) {
+        this.searchResource = new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus, clusterConfigService) {
             @Override
             protected User getCurrentUser() {
                 return currentUser;
