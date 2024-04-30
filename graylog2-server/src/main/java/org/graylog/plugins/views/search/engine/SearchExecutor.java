@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -63,30 +64,34 @@ public class SearchExecutor {
         this.searchNormalization = searchNormalization;
     }
 
-    public SearchJob execute(String searchId, SearchUser searchUser, ExecutionState executionState) {
+    public SearchJob executeSync(String searchId, SearchUser searchUser, ExecutionState executionState) {
         return searchDomain.getForUser(searchId, searchUser)
-                .map(s -> execute(s, searchUser, executionState))
+                .map(s -> executeSync(s, searchUser, executionState))
+                .orElseThrow(() -> new NotFoundException("No search found with id <" + searchId + ">."));
+    }
+
+    public SearchJob executeAsync(String searchId, SearchUser searchUser, ExecutionState executionState) {
+        return searchDomain.getForUser(searchId, searchUser)
+                .map(s -> executeAsync(s, searchUser, executionState))
                 .orElseThrow(() -> new NotFoundException("No search found with id <" + searchId + ">."));
     }
 
     @WithSpan
-    public SearchJob execute(Search search, SearchUser searchUser, ExecutionState executionState) {
-        final Search preValidationSearch = searchNormalization.preValidation(search, searchUser, executionState);
-
-        final Set<SearchError> validationErrors = searchValidation.validate(preValidationSearch, searchUser);
-
-        if (hasFatalError(validationErrors)) {
-            return searchJobWithFatalError(searchJobService.create(preValidationSearch, searchUser.username()), validationErrors);
-        }
-
-        final Search normalizedSearch = searchNormalization.postValidation(preValidationSearch, searchUser, executionState);
-
-        final SearchJob searchJob = queryEngine.execute(searchJobService.create(normalizedSearch, searchUser.username()), validationErrors, searchUser.timeZone().orElse(DEFAULT_TIMEZONE));
-
-        validationErrors.forEach(searchJob::addError);
+    public SearchJob executeSync(Search search, SearchUser searchUser, ExecutionState executionState) {
+        final SearchJob searchJob = prepareAndExecuteSearchJob(search, searchUser, executionState);
 
         try {
-            Uninterruptibles.getUninterruptibly(searchJob.getResultFuture(), 60000, TimeUnit.MILLISECONDS);
+            final CompletableFuture<Void> resultFuture = searchJob.getResultFuture();
+            /* TODO
+             * Lines  103-104 mimic the previous behavior (the join was in QueryEngine, that's the difference)
+             * It also shows some problems in the code, where parts of the code expressed the necessity to wait indefinitely for the results (joins),
+             * while parts of the code expressed the need to use timeout (see line 104).
+             * Imho in a separate PR we should decide which way to go, currently we wait indefinitely, as we did so far, and line 104 probably does not have a lot of sense, as it did not have before.
+             */
+            if (resultFuture != null) {
+                resultFuture.join();
+                Uninterruptibles.getUninterruptibly(resultFuture, 60000, TimeUnit.MILLISECONDS);
+            }
         } catch (ExecutionException e) {
             LOG.error("Error executing search job <{}>", searchJob.getId(), e);
             throw new InternalServerErrorException("Error executing search job: " + e.getMessage(), e);
@@ -97,6 +102,28 @@ public class SearchExecutor {
             throw e;
         }
 
+        return searchJob;
+    }
+
+    @WithSpan
+    public SearchJob executeAsync(Search search, SearchUser searchUser, ExecutionState executionState) {
+        return prepareAndExecuteSearchJob(search, searchUser, executionState);
+    }
+
+    private SearchJob prepareAndExecuteSearchJob(final Search search,
+                                                 final SearchUser searchUser,
+                                                 final ExecutionState executionState) {
+        final Search preValidationSearch = searchNormalization.preValidation(search, searchUser, executionState);
+
+        final Set<SearchError> validationErrors = searchValidation.validate(preValidationSearch, searchUser);
+
+        if (hasFatalError(validationErrors)) {
+            return searchJobWithFatalError(searchJobService.create(preValidationSearch, searchUser.username(), executionState.cancelAfterSeconds()), validationErrors);
+        }
+
+        final Search normalizedSearch = searchNormalization.postValidation(preValidationSearch, searchUser, executionState);
+        final SearchJob searchJob = queryEngine.execute(searchJobService.create(normalizedSearch, searchUser.username(), executionState.cancelAfterSeconds()), validationErrors, searchUser.timeZone().orElse(DEFAULT_TIMEZONE));
+        validationErrors.forEach(searchJob::addError);
         return searchJob;
     }
 
@@ -111,7 +138,7 @@ public class SearchExecutor {
         final Set<SearchError> validationErrors = searchValidation.validate(preValidationSearch, searchUser);
         final Search normalizedSearch = searchNormalization.postValidation(preValidationSearch, searchUser, executionState);
 
-        return queryEngine.explain(searchJobService.create(normalizedSearch, searchUser.username()), validationErrors,
+        return queryEngine.explain(searchJobService.create(normalizedSearch, searchUser.username(), executionState.cancelAfterSeconds()), validationErrors,
                 searchUser.timeZone().orElse(DEFAULT_TIMEZONE));
     }
 

@@ -19,7 +19,7 @@ package org.graylog.datanode.initializers;
 import com.github.joschi.jadconfig.util.Duration;
 import org.assertj.core.api.Assertions;
 import org.graylog2.security.IndexerJwtAuthTokenProvider;
-import org.jetbrains.annotations.NotNull;
+import jakarta.annotation.Nonnull;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
@@ -61,7 +61,7 @@ class JwtTokenValidatorTest {
         return header + token.substring(token.indexOf('.'), token.lastIndexOf('.') + 1);
     }
 
-    @NotNull
+    @Nonnull
     private static String generateToken(String signingKey) {
         return IndexerJwtAuthTokenProvider.createToken(signingKey.getBytes(StandardCharsets.UTF_8), Duration.seconds(180));
     }

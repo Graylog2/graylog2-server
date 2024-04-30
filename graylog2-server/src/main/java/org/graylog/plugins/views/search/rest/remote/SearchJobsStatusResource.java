@@ -20,7 +20,9 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import jakarta.inject.Inject;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -34,6 +36,7 @@ import jakarta.ws.rs.core.Response;
 import okhttp3.ResponseBody;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.RemoteInterfaceProvider;
@@ -65,8 +68,8 @@ public class SearchJobsStatusResource extends ProxiedResource implements PluginR
     @ApiOperation(value = "Retrieve the status of an executed query")
     @Path("{nodeId}/{jobId}/status")
     @Produces({MediaType.APPLICATION_JSON, SEARCH_FORMAT_V1})
-    public void asyncSearchJobStatus(@ApiParam(name = "jobId") @PathParam("jobId") String jobId,
-                                     @ApiParam(name = "nodeId") @PathParam("nodeId") String nodeId,
+    public void asyncSearchJobStatus(@ApiParam(name = "jobId", required = true) @NotBlank @PathParam("jobId") String jobId,
+                                     @ApiParam(name = "nodeId", required = true) @NotBlank @PathParam("nodeId") String nodeId,
                                      @Context SearchUser searchUser,
                                      @Suspended AsyncResponse asyncResponse) {
         processAsync(asyncResponse,
@@ -74,6 +77,27 @@ public class SearchJobsStatusResource extends ProxiedResource implements PluginR
                     try {
                         final NodeResponse<ResponseBody> nodeResponse = requestOnNode(nodeId, r -> r.jobStatus(jobId), RemoteSearchJobsStatusInterface.class);
                         return RestTools.streamResponse(nodeResponse, MediaType.APPLICATION_JSON, null);
+                    } catch (IOException e) {
+                        return Response.serverError().entity(e.getMessage()).build();
+                    }
+                }
+        );
+    }
+
+    @DELETE
+    @ApiOperation(value = "Cancels search job")
+    @Path("{nodeId}/{jobId}/cancel")
+    @Produces({MediaType.APPLICATION_JSON})
+    @NoAuditEvent("this is a proxy resource, the event will be triggered on the individual nodes")
+    public void cancelAsyncSearchJob(@ApiParam(name = "jobId", required = true) @NotBlank @PathParam("jobId") String jobId,
+                                     @ApiParam(name = "nodeId", required = true) @NotBlank @PathParam("nodeId") String nodeId,
+                                     @Context SearchUser searchUser,
+                                     @Suspended AsyncResponse asyncResponse) {
+        processAsync(asyncResponse,
+                () -> {
+                    try {
+                        final NodeResponse<Void> nodeResponse = requestOnNode(nodeId, r -> r.cancelJob(jobId), RemoteSearchJobsStatusInterface.class);
+                        return Response.status(Response.Status.fromStatusCode(nodeResponse.code())).build();
                     } catch (IOException e) {
                         return Response.serverError().entity(e.getMessage()).build();
                     }

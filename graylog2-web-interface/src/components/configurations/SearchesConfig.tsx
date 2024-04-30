@@ -83,6 +83,7 @@ const SearchesConfig = () => {
   const [analysisDisabledFieldsUpdate, setAnalysisDisabledFieldsUpdate] = useState<string | undefined>(undefined);
   const [defaultAutoRefreshOptionUpdate, setDefaultAutoRefreshOptionUpdate] = useState<string | undefined>(undefined);
   const [timeRangePresetsUpdated, setTimeRangePresetsUpdated] = useState<Immutable.List<TimeRangePreset>>(undefined);
+  const [showCancelAfterSeconds, setShowCancelAfterSeconds] = useState(false);
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
 
@@ -91,6 +92,7 @@ const SearchesConfig = () => {
       const config = getConfig(ConfigurationType.SEARCHES_CLUSTER_CONFIG, configuration);
       setViewConfig(config);
       setFormConfig(config);
+      setShowCancelAfterSeconds(!!config?.cancel_after_seconds);
     });
   }, [configuration]);
 
@@ -134,6 +136,23 @@ const SearchesConfig = () => {
     }
 
     setFormConfig({ ...formConfig, query_time_range_limit: queryTimeRangeLimit });
+  };
+
+  const onCancelAfterSecondsChanged = ({ target: { value } }: { target: { value: number | null }}) => {
+    setFormConfig({ ...formConfig, cancel_after_seconds: value });
+  };
+
+  const onCheckedCancelAfterSeconds = () => {
+    let cancelAfterSeconds: number | null;
+
+    if (showCancelAfterSeconds) {
+      cancelAfterSeconds = null;
+    } else {
+      cancelAfterSeconds = 30;
+    }
+
+    setShowCancelAfterSeconds((cur) => !cur);
+    setFormConfig({ ...formConfig, cancel_after_seconds: cancelAfterSeconds });
   };
 
   const openModal = () => {
@@ -240,6 +259,8 @@ const SearchesConfig = () => {
     ? formDefaultAutoRefreshOptionUpdate(config)
     : autoRefreshOptions[0]?.period);
 
+  const cancellationTimeout = (config) => (config.cancel_after_seconds ? `${config.cancel_after_seconds} seconds` : 'disabled');
+
   return (
     <div>
       <h2>Search Configuration</h2>
@@ -250,6 +271,14 @@ const SearchesConfig = () => {
         <dd>The maximum time users can query data in the past. This prevents users from accidentally creating queries
           which
           span a lot of data and would need a long time and many resources to complete (if at all).
+        </dd>
+      </dl>
+
+      <dl className="deflist">
+        <dt>Cancellation timeout</dt>
+        <dd>{cancellationTimeout(viewConfig)}</dd>
+        <dd>The time in seconds per widget after which search execution will be canceled automatically.
+          This minimizes the amount of executed searches and improves performance.
         </dd>
       </dl>
 
@@ -319,6 +348,26 @@ const SearchesConfig = () => {
                                 help={'The maximum time range for searches. (i.e. "P30D" for 30 days, "PT24H" for 24 hours)'}
                                 validator={queryTimeRangeLimitValidator}
                                 required />
+            )}
+            <label htmlFor="cancel_after_seconds_checkbox">Query Cancellation Timeout</label>
+            <Input id="cancel_after_seconds_checkbox"
+                   type="checkbox"
+                   label="Enable query cancellation timeout"
+                   name="cancel_after_seconds_checkbox"
+                   checked={showCancelAfterSeconds}
+                   onChange={onCheckedCancelAfterSeconds}
+                   help="The time in seconds per widget after which search execution will be canceled automatically. This minimizes the amount of executed searches and improves performance." />
+            {showCancelAfterSeconds && (
+              <Input id="cancel_after_seconds"
+                     type="number"
+                     label="Cancellation timeout"
+                     name="cancel_after_seconds"
+                     min="1"
+                     step="1"
+                     pattern="\d+"
+                     required
+                     value={formConfig.cancel_after_seconds}
+                     onChange={onCancelAfterSecondsChanged} />
             )}
             <TimeRangePresetForm options={timeRangePresets} onUpdate={onTimeRangePresetsUpdate} />
             <TimeRangeOptionsForm options={surroundingTimeRangeOptionsUpdate || buildTimeRangeOptions(formConfig.surrounding_timerange_options)}

@@ -39,8 +39,6 @@ const testTimeout = applyTimeoutMultiplier(30000);
 
 jest.mock('views/components/searchbar/queryvalidation/QueryValidation', () => mockComponent('QueryValidation'));
 
-jest.mock('hooks/useFeature', () => (key: string) => key === 'search_filter');
-
 jest.mock('views/components/searchbar/queryinput/QueryInput');
 jest.mock('views/components/searchbar/queryinput/BasicQueryInput');
 

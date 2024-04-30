@@ -17,30 +17,29 @@
 package org.graylog.datanode.configuration;
 
 import com.google.common.collect.ImmutableMap;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Provider;
+import jakarta.inject.Singleton;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.variants.InSecureConfiguration;
 import org.graylog.datanode.configuration.variants.MongoCertSecureConfiguration;
 import org.graylog.datanode.configuration.variants.OpensearchSecurityConfiguration;
 import org.graylog.datanode.configuration.variants.SecurityConfigurationVariant;
 import org.graylog.datanode.configuration.variants.UploadedCertFilesSecureConfiguration;
-import org.graylog.datanode.process.OpensearchConfiguration;
+import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
-import org.graylog2.bootstrap.preflight.PreflightConfigResult;
-import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-import jakarta.inject.Provider;
-import jakarta.inject.Singleton;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Singleton
@@ -52,8 +51,12 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
     private final DatanodeConfiguration datanodeConfiguration;
     private final byte[] signingKey;
     private final NodeService<DataNodeDto> nodeService;
-    private final PreflightConfigService preflightConfigService;
     private final S3RepositoryConfiguration s3RepositoryConfiguration;
+
+    /**
+     * This configuration won't survive datanode restart. But it can be repeatedly provided to the managed opensearch
+     */
+    private final Map<String, Object> transientConfiguration = new ConcurrentHashMap<>();
 
     @Inject
     public OpensearchConfigurationProvider(final Configuration localConfiguration,
@@ -62,7 +65,6 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
                                            final MongoCertSecureConfiguration mongoCertSecureConfiguration,
                                            final InSecureConfiguration inSecureConfiguration,
                                            final NodeService<DataNodeDto> nodeService,
-                                           final PreflightConfigService preflightConfigService,
                                            final @Named("password_secret") String passwordSecret,
                                            final S3RepositoryConfiguration s3RepositoryConfiguration) {
         this.localConfiguration = localConfiguration;
@@ -72,7 +74,6 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
         this.inSecureConfiguration = inSecureConfiguration;
         this.signingKey = passwordSecret.getBytes(StandardCharsets.UTF_8);
         this.nodeService = nodeService;
-        this.preflightConfigService = preflightConfigService;
         this.s3RepositoryConfiguration = s3RepositoryConfiguration;
     }
 
@@ -159,7 +160,12 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
         // enable admin access via the REST API
         config.put("plugins.security.restapi.admin.enabled", "true");
 
+        config.putAll(transientConfiguration);
+
         return config.build();
     }
 
+    public void setTransientConfiguration(String key, Object value) {
+        this.transientConfiguration.put(key, value);
+    }
 }
