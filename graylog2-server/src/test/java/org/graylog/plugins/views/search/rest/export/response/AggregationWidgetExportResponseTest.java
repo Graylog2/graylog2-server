@@ -18,6 +18,7 @@ package org.graylog.plugins.views.search.rest.export.response;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.Resources;
+import org.graylog.plugins.views.search.rest.export.response.AggregationWidgetExportResponse.DataRow;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.Test;
@@ -38,10 +39,10 @@ class AggregationWidgetExportResponseTest {
         final AggregationWidgetExportResponse expectedResponse = new AggregationWidgetExportResponse(
                 List.of("", "[count()]", "[max(http_response_code)]", "[DELETE, count()]", "[DELETE, max(http_response_code)]", "[GET, count()]", "[GET, max(http_response_code)]", "[POST, count()]", "[POST, max(http_response_code)]", "[PUT, count()]", "[PUT, max(http_response_code)]"),
                 List.of(
-                        List.of("index", "1507337", "504", "75322", "504", "1296526", "504", "75163", "504", "60326", "504"),
-                        List.of("show", "444038", "504", "22229", "504", "381846", "504", "22271", "504", "17692", "504"),
-                        List.of("login", "377715", "504", "18773", "204", "325040", "200", "18761", "504", "15141", "504"),
-                        List.of("edit", "68699", "504", "3540", "504", "58912", "504", "3488", "504", "2759", "504")
+                        new DataRow(List.of("index", "1507337", "504", "75322", "504", "1296526", "504", "75163", "504", "60326", "504")),
+                        new DataRow(List.of("show", "444038", "504", "22229", "504", "381846", "504", "22271", "504", "17692", "504")),
+                        new DataRow(List.of("login", "377715", "504", "18773", "204", "325040", "200", "18761", "504", "15141", "504")),
+                        new DataRow(List.of("edit", "68699", "504", "3540", "504", "58912", "504", "3488", "504", "2759", "504"))
                 )
         );
 
