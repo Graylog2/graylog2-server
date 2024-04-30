@@ -76,7 +76,7 @@ public interface MongoPaginationHelper<T extends MongoEntity> {
     MongoPaginationHelper<T> grandTotalFilter(Bson grandTotalFilter);
 
     /**
-     * Sets a collation to be used in the find operation
+     * Sets a collation to be used in the find operation.
      *
      * @param collation The collation to set. If null, uses the default server collation
      * @return A new pagination helper with the setting applied
