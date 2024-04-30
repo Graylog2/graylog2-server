@@ -23,6 +23,7 @@ import jakarta.ws.rs.BadRequestException;
 import org.bson.conversions.Bson;
 
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Sort order for querying MongoDB to be used as a query param in REST resources.
@@ -57,7 +58,7 @@ public enum SortOrder {
     // Jersey will look for a #fromString method to deserialize a query parameter
     @JsonCreator
     public static SortOrder fromString(String order) {
-        return switch (order.toLowerCase()) {
+        return switch (order.toLowerCase(Locale.ENGLISH)) {
             case "asc" -> ASCENDING;
             case "desc" -> DESCENDING;
             // throwing an IllegalArgumentException here would have Jersey abort with a 404
