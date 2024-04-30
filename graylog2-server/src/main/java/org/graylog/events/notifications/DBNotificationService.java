@@ -18,6 +18,7 @@ package org.graylog.events.notifications;
 
 import com.mongodb.client.MongoCollection;
 import jakarta.inject.Inject;
+import org.bson.conversions.Bson;
 import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
@@ -52,10 +53,10 @@ public class DBNotificationService {
     }
 
     public PaginatedList<NotificationDto> searchPaginated(SearchQuery query, Predicate<NotificationDto> filter,
-                                                          String sortByField, String sortOrder, int page, int perPage) {
+                                                          Bson sort, int page, int perPage) {
         return paginationHelper
                 .filter(query.toBson())
-                .sort(sortByField, sortOrder)
+                .sort(sort)
                 .perPage(perPage)
                 .page(page, filter);
     }
