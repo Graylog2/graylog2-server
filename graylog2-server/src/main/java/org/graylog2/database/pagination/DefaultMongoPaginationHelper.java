@@ -29,6 +29,13 @@ import java.util.function.Predicate;
 
 import static org.graylog2.database.utils.MongoUtils.stream;
 
+/**
+ * Default implementation for pagination support.
+ * <p>
+ * Objects of this class are immutable and can be re-used.
+ *
+ * @param <T> Type of documents in the underlying MongoDB collection.
+ */
 public class DefaultMongoPaginationHelper<T extends MongoEntity> implements MongoPaginationHelper<T> {
 
     private final MongoCollection<T> collection;
