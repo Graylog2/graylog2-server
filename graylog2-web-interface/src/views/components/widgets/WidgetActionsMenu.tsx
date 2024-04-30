@@ -245,7 +245,7 @@ const WidgetActionsMenu = ({
     const widgetTitle = view.getWidgetTitleByWidget(widget);
 
     return exportWidget(widgetTitle, (widgetResult as {chart: Result}).chart as Result, extension);
-  }, [view, widget, widgetResult]);
+  }, [view, widget, widgetResult, sendTelemetry, pathname]);
 
   const showExportAggregationWidgetAction = widgetResult && widget.type === AggregationWidget.type && !errors?.length;
 
