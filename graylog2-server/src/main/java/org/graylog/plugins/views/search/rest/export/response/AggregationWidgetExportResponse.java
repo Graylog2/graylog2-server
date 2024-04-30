@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.rest.export.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog.plugins.views.search.util.ListOfStringsComparator;
@@ -27,7 +28,11 @@ import java.util.Collections;
 import java.util.List;
 
 public record AggregationWidgetExportResponse(@JsonProperty List<String> header,
-                                              @JsonProperty List<List<String>> dataRows) {
+                                              @JsonProperty @JacksonXmlElementWrapper(useWrapping = false) List<DataRow> dataRows) {
+
+    public record DataRow(@JacksonXmlElementWrapper(useWrapping = false) List<String> row) {
+
+    }
 
     public static AggregationWidgetExportResponse fromPivotResult(final PivotResult pivotResult) {
 
@@ -51,7 +56,7 @@ public record AggregationWidgetExportResponse(@JsonProperty List<String> header,
         header.addAll(Collections.nCopies(longestRowKey, ""));
         columns.forEach(column -> header.add(column.toString()));
 
-        final List<List<String>> dataRows = rows.stream()
+        final List<DataRow> dataRows = rows.stream()
                 .filter(row -> "leaf".equals(row.source()))
                 .map(row -> {
                     final ImmutableList<String> key = row.key();
@@ -68,7 +73,7 @@ public record AggregationWidgetExportResponse(@JsonProperty List<String> header,
                     List<String> dataRow = new ArrayList<>();
                     dataRow.addAll(key);
                     dataRow.addAll(values);
-                    return dataRow;
+                    return new DataRow(dataRow);
                 })
                 .toList();
 
