@@ -23,6 +23,14 @@ import org.graylog2.database.PaginatedList;
 
 import java.util.function.Predicate;
 
+/**
+ * A utility class that provides paged access to a MongoDB collection.
+ * <p>
+ * Implementing classes should be immutable
+ * so that instances can be re-used.
+ *
+ * @param <T> Type of documents in the underlying MongoDB collection.
+ */
 public interface MongoPaginationHelper<T extends MongoEntity> {
     /**
      * Sets the query filter to apply to the query.
