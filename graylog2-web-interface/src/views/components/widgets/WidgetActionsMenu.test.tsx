@@ -41,6 +41,7 @@ import { duplicateWidget, removeWidget } from 'views/logic/slices/widgetActions'
 import useViewType from 'views/hooks/useViewType';
 import fetchSearch from 'views/logic/views/fetchSearch';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
+import useWidgetResults from 'views/components/useWidgetResults';
 
 import WidgetActionsMenu from './WidgetActionsMenu';
 
@@ -49,6 +50,7 @@ import type { WidgetFocusContextType } from '../contexts/WidgetFocusContext';
 import WidgetFocusContext from '../contexts/WidgetFocusContext';
 
 jest.mock('views/components/dashboard/hooks/useDashboards');
+jest.mock('views/components/useWidgetResults');
 jest.mock('views/logic/views/CopyWidgetToDashboard', () => jest.fn());
 jest.mock('views/logic/views/Actions');
 jest.mock('views/logic/slices/createSearch');
@@ -429,6 +431,7 @@ describe('<WidgetActionsMenu />', () => {
 
     describe('Export aggregation widget', () => {
       it('does not display export aggregation action if widget is an aggregation', async () => {
+        asMock(useWidgetResults).mockReturnValue({ widgetData: {}, error: [] });
         const messagesWidget = MessagesWidget.builder()
           .id('widgetId')
           .config({})
@@ -440,6 +443,7 @@ describe('<WidgetActionsMenu />', () => {
       });
 
       it('allows export for aggregation widget', async () => {
+        asMock(useWidgetResults).mockReturnValue({ widgetData: {}, error: [] });
         const aggregationWidget = AggregationWidget.builder()
           .id('widgetId')
           .config({})
@@ -447,7 +451,7 @@ describe('<WidgetActionsMenu />', () => {
 
         render(<DummyWidget title="Dummy Widget" widget={aggregationWidget} />);
 
-        screen.findByRole('button', { name: /open export widget options/i });
+        await screen.findByRole('button', { name: /open export widget options/i });
       });
     });
   });

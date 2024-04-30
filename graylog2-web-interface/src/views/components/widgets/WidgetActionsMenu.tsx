@@ -53,6 +53,7 @@ import AggregationWidgetExportDropdown from 'views/components/widgets/Aggregatio
 import type { Extension, Result } from 'util/AggregationWidgetExportUtils';
 import { exportWidget } from 'util/AggregationWidgetExportUtils';
 import useWidgetResults from 'views/components/useWidgetResults';
+import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 
 import ReplaySearchButton from './ReplaySearchButton';
 import ExtraWidgetActions from './ExtraWidgetActions';
@@ -173,6 +174,8 @@ const WidgetActionsMenu = ({
   const supportedAggregationExportFormats: Array<{id: Extension, title: string}> = [
     { id: 'csv', title: 'CSV' },
     { id: 'json', title: 'JSON' },
+    { id: 'yaml', title: 'YAML' },
+    { id: 'xml', title: 'XML' },
   ];
 
   const onDuplicate = useCallback(() => {
@@ -238,7 +241,7 @@ const WidgetActionsMenu = ({
     return exportWidget(widgetTitle, (widgetResult as {chart: Result}).chart as Result, extension);
   }, [view, widget, widgetResult]);
 
-  const showExportAggregationWidgetAction = widgetResult && widget.type === 'AGGREGATION' && !errors?.length;
+  const showExportAggregationWidgetAction = widgetResult && widget.type === AggregationWidget.type && !errors?.length;
 
   return (
     <Container className="widget-actions-menu">

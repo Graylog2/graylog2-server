@@ -19,8 +19,9 @@ import { fetchFileWithBlob } from 'util/FileDownloadUtils';
 import { qualifyUrl } from 'util/URLUtils';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
+import { escape } from 'views/logic/queries/QueryHelper';
 
-export type Extension = 'csv' | 'json';
+export type Extension = 'csv' | 'json' | 'yaml' | 'xml';
 
 export type Result = {
   total: number,
@@ -31,9 +32,11 @@ export type Result = {
 const mimeTypeMapper: Record<Extension, string> = {
   csv: 'text/csv',
   json: 'application/json',
+  yaml: 'application/yaml',
+  xml: 'application/xml',
 };
 
-const getUrl = (fileName: string) => qualifyUrl(`views/search/pivot/export/${fileName}`);
+const getUrl = (fileName: string) => qualifyUrl(`views/search/pivot/export/${escape(fileName)}`);
 
 export const exportWidget = (widgetTitle: string, widgetResults: Result, extension: Extension) => {
   const fileName = `${widgetTitle}_${widgetResults.effective_timerange.from}-${widgetResults.effective_timerange.to}.${extension}`;
