@@ -41,7 +41,7 @@ public class MongoCollections {
     /**
      * Get a MongoCollection configured to use Jackson for serialization/deserialization of objects.
      * <p>
-     * <b>Prefer using {@link #collection(String, Class)} to get a more strictly typed collection </b>
+     * <b>Prefer using {@link #collection(String, Class)} to get a more strictly typed collection!</b>
      *
      * @param collectionName Name of the collection
      * @param valueType      Java type of the documents stored in the collection
