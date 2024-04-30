@@ -57,7 +57,7 @@ public class DBNotificationService {
                 .filter(query.toBson())
                 .sort(sortByField, sortOrder)
                 .perPage(perPage)
-                .postProcessedPage(page, filter);
+                .page(page, filter);
     }
 
     public NotificationDto saveWithOwnership(NotificationDto notificationDto, User user) {
