@@ -109,7 +109,7 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
 
   const initialValues: RemoteReindexRequest = {
     allowlist: '',
-    hostname: 'http://localhost:9201/',
+    hostname: '',
     user: '',
     password: '',
     synchronous: false,
@@ -159,7 +159,7 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
                  name="allowlist"
                  label="Allowlist"
                  help="Allowlist of all machines in the old cluster"
-                 placeholder="example:9200,example:9201,example:9202"
+                 placeholder="example:9200,example:9201,example:9202 or REGEX (Regular expression)"
                  type="text"
                  disabled={isLoading}
                  value={values.allowlist}
@@ -182,7 +182,7 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
                          if (areAllIndicesSelected) {
                            setSelectedIndices([]);
                          } else {
-                           setSelectedIndices(availableIndices);
+                           setSelectedIndices(filteredIndices);
                          }
                        }} />
               )}
