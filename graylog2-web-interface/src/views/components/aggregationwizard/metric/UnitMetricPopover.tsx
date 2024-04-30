@@ -22,10 +22,8 @@ import Select from 'components/common/Select';
 import Popover from 'components/common/Popover';
 import { HoverForHelp, IconButton } from 'components/common';
 import { Input } from 'components/bootstrap';
-import FieldSelect from 'views/components/aggregationwizard/FieldSelect';
 import type { Unit } from 'hooks/useFieldUnitTypes';
 import useFieldUnitTypes from 'hooks/useFieldUnitTypes';
-import useFieldUnits from 'hooks/useFieldUnits';
 
 const UnitButton = styled(IconButton)`
   position: absolute;
@@ -46,13 +44,13 @@ const UnitMetricPopover = ({ index }: { index: number }) => {
   const [show, setShow] = useState(false);
   const { setFieldValue, values } = useFormikContext();
   const unitTypes = useFieldUnitTypes();
-  const currentUnitType = useMemo<string>(() => values?.metrics?.[index]?.unit_type, [values, index]);
+  const currentUnitType = useMemo<string>(() => values?.metrics?.[index]?.unitType, [values, index]);
   const unitTypesOptions = useMemo(() => Object.keys(unitTypes).map((key) => ({ value: key, label: key })), [unitTypes]);
   const unitOptions = useMemo(() => currentUnitType && unitTypes[currentUnitType]
     .map(({ name, abbrev }: Unit) => ({ value: name, label: abbrev })), [unitTypes, currentUnitType]);
   const toggleShow = () => setShow((cur) => !cur);
   const onUnitTypeChange = useCallback((val: string) => {
-    setFieldValue(`metrics.${index}.unit_type`, val);
+    setFieldValue(`metrics.${index}.unitType`, val);
     setFieldValue(`metrics.${index}.unit`, undefined);
   }, [index, setFieldValue]);
 
@@ -68,7 +66,7 @@ const UnitMetricPopover = ({ index }: { index: number }) => {
       </Popover.Target>
       <Popover.Dropdown title="Metrics Unit Settings">
         <Container>
-          <Field name={`metrics.${index}.unit_type`}>
+          <Field name={`metrics.${index}.unitType`}>
             {({ field: { name, value }, meta: { error } }) => (
               <Input id="metric-unit-type-field"
                      label="Type"

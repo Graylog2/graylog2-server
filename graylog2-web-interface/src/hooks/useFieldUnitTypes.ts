@@ -17,6 +17,8 @@
 
 import { useMemo } from 'react';
 
+import type { MetricUnitType } from 'views/types';
+
 const fileSizes = [
   { id: 'bytes', name: 'B' },
   { id: 'k_bytes', name: 'KB' },
@@ -35,19 +37,18 @@ const times = [
   { id: 'y', name: 'years' },
 ];
 
-type UnitType = 'size' | 'time' | 'percent';
 type UnitConversionAction = 'MULTIPLY' | 'DIVIDE'
 
 export type Unit = {
   abbrev: string,
   name: string,
-  unit_type: UnitType,
+  unit_type: MetricUnitType,
   conversion?: {
     value: number,
     action: UnitConversionAction
   }
 }
-type FieldUnitTypes = Record<UnitType, Array<Unit>>
+type FieldUnitTypes = Record<MetricUnitType, Array<Unit>>
 
 const useFieldUnitTypes = () => useMemo<FieldUnitTypes>(() => ({
   size: [

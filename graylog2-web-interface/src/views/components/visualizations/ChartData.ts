@@ -116,6 +116,8 @@ export const extractSeries = (keyJoiner: KeyJoiner = _defaultKeyJoiner, leafValu
     }
   });
 
+  console.log({ valuesBySeries });
+
   return { valuesBySeries, xLabels };
 };
 
@@ -174,6 +176,7 @@ export const chartData = (
   }: ChartDataConfig,
 ): Array<ChartDefinition> => {
   const { rowPivots, columnPivots, series } = config;
+  console.log({ series });
 
   return flow([
     transformKeys(rowPivots, columnPivots, formatTime),

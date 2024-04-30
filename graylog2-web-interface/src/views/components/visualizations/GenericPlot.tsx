@@ -227,16 +227,20 @@ class GenericPlot extends React.Component<GenericPlotProps, State> {
             <InteractiveContext.Consumer>
               {(interactive) => (
                 <RenderCompletionCallback.Consumer>
-                  {(onRenderComplete) => (
-                    <StyledPlot data={newChartData}
-                                useResizeHandler
-                                layout={interactive ? plotLayout : merge({}, nonInteractiveLayout, plotLayout)}
-                                style={style}
-                                onAfterPlot={onRenderComplete}
-                                onClick={interactive ? null : () => false}
-                                onRelayout={interactive ? this._onRelayout : () => false}
-                                config={config} />
-                  )}
+                  {(onRenderComplete) => {
+                    console.log({ newChartData, LY: interactive ? plotLayout : merge({}, nonInteractiveLayout, plotLayout) });
+
+                    return (
+                      <StyledPlot data={newChartData}
+                                  useResizeHandler
+                                  layout={interactive ? plotLayout : merge({}, nonInteractiveLayout, plotLayout)}
+                                  style={style}
+                                  onAfterPlot={onRenderComplete}
+                                  onClick={interactive ? null : () => false}
+                                  onRelayout={interactive ? this._onRelayout : () => false}
+                                  config={config} />
+                    );
+                  }}
                 </RenderCompletionCallback.Consumer>
               )}
             </InteractiveContext.Consumer>

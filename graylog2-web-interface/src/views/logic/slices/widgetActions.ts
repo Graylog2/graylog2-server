@@ -55,6 +55,7 @@ export const updateWidgets = (newWidgets: Immutable.List<Widget>) => (dispatch: 
     .build();
 
   const newViewStateNormalized = normalizeViewState(newViewState);
+  console.log('updateWidgets updateWidgets updateWidgets', { newViewStateNormalized, newViewState });
 
   return dispatch(updateViewState(activeQuery, newViewStateNormalized));
 };

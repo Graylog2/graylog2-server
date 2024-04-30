@@ -18,6 +18,7 @@ import type { AggregationWidgetConfigBuilder } from 'views/logic/aggregationbuil
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Series, { parseSeries } from 'views/logic/aggregationbuilder/Series';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
+import SeriesUnit from 'views/logic/aggregationbuilder/SeriesUnit';
 
 import MetricsConfiguration from './MetricsConfiguration';
 
@@ -81,6 +82,8 @@ const metricsToSeries = (formMetrics: Array<MetricFormValues>) => formMetrics
   .map((metric) => Series.create(metric.function, emptyToUndefined(metric.field), parameterForMetric(metric))
     .toBuilder()
     .config(SeriesConfig.empty().toBuilder().name(metric.name).build())
+    .unit(SeriesUnit.empty().toBuilder().unit(metric.unit).unitType(metric.unitType)
+      .build())
     .build());
 
 export const seriesToMetrics = (series: Array<Series>) => series.map((s: Series) => {
@@ -90,6 +93,8 @@ export const seriesToMetrics = (series: Array<Series>) => series.map((s: Series)
     function: func,
     field,
     name: s.config?.name,
+    unit: s.unit.unit,
+    unitType: s.unit.unitType,
   };
 
   if (percentile) {

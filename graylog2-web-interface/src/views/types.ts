@@ -439,6 +439,8 @@ export interface WidgetCreator {
   icon: React.ComponentType<{}>,
 }
 
+export type MetricUnitType = 'size' | 'time' | 'percent';
+
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
     creators?: Array<Creator>;

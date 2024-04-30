@@ -83,11 +83,14 @@ export const updateWidgetAggregationElements = (formValues: WidgetConfigFormValu
     return toConfig;
   }).reduce((prevConfig, toConfig) => toConfig(formValues, prevConfig), oldConfig.toBuilder());
 
+  console.log('!!!!!!oooooo!!!!!!!!!!', { newConfig });
+
   return newConfig.build();
 };
 
 const _onSubmit = (formValues: WidgetConfigFormValues, onConfigChange: (newConfig: AggregationWidgetConfig) => void, oldConfig: AggregationWidgetConfig) => {
   const newConfig = updateWidgetAggregationElements(formValues, oldConfig);
+  console.log({ formValues, newConfig });
 
   return onConfigChange(newConfig);
 };
