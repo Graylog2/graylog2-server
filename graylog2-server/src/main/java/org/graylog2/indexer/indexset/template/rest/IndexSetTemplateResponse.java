@@ -33,8 +33,12 @@ public record IndexSetTemplateResponse(@JsonProperty(ID_FIELD_NAME) @Nonnull Str
                                        @JsonProperty(DESCRIPTION_FIELD_NAME) String description,
                                        @JsonProperty(BUILT_IN_FIELD_NAME) boolean isBuiltIn,
                                        @JsonProperty(DEFAULT_FIELD_NAME) boolean isDefault,
+                                       @JsonProperty(ENABLED_FIELD_NAME) boolean enabled,
+                                       @JsonProperty(DISABLED_REASON_FIELD_NAME) String disabledReason,
                                        @JsonProperty(INDEX_SET_CONFIG_FIELD_NAME) @Nonnull IndexSetTemplateConfig indexSetConfig) {
 
     public static final String DEFAULT_FIELD_NAME = "default";
+    public static final String ENABLED_FIELD_NAME = "enabled";
+    public static final String DISABLED_REASON_FIELD_NAME = "disabled_reason";
 
 }

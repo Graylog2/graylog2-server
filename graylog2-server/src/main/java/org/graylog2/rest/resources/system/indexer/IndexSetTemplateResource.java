@@ -46,6 +46,8 @@ import org.graylog2.indexer.indexset.template.IndexSetTemplate;
 import org.graylog2.indexer.indexset.template.IndexSetTemplateConfig;
 import org.graylog2.indexer.indexset.template.IndexSetTemplateData;
 import org.graylog2.indexer.indexset.template.IndexSetTemplateService;
+import org.graylog2.indexer.indexset.template.requirement.IndexSetTemplateRequirement;
+import org.graylog2.indexer.indexset.template.requirement.IndexSetTemplateRequirementsChecker;
 import org.graylog2.indexer.indexset.template.rest.IndexSetTemplateResponse;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -70,18 +72,20 @@ public class IndexSetTemplateResource extends RestResource {
     private final IndexSetValidator indexSetValidator;
     private final Validator validator;
     private final IndexSetTemplateService templateService;
-
     private final IndexSetDefaultTemplateService indexSetDefaultTemplateService;
+    private final IndexSetTemplateRequirementsChecker indexSetTemplateRequirementsChecker;
 
     @Inject
     public IndexSetTemplateResource(IndexSetValidator indexSetValidator,
                                     Validator validator,
                                     IndexSetTemplateService templateService,
-                                    IndexSetDefaultTemplateService indexSetDefaultTemplateService) {
+                                    IndexSetDefaultTemplateService indexSetDefaultTemplateService,
+                                    IndexSetTemplateRequirementsChecker indexSetTemplateRequirementsChecker) {
         this.indexSetValidator = indexSetValidator;
         this.validator = validator;
         this.templateService = templateService;
         this.indexSetDefaultTemplateService = indexSetDefaultTemplateService;
+        this.indexSetTemplateRequirementsChecker = indexSetTemplateRequirementsChecker;
     }
 
     @GET
@@ -226,12 +230,15 @@ public class IndexSetTemplateResource extends RestResource {
     }
 
     private IndexSetTemplateResponse toResponse(IndexSetTemplate indexSetTemplate, String defaultTemplateId) {
+        IndexSetTemplateRequirement.Result result = indexSetTemplateRequirementsChecker.check(indexSetTemplate);
         return new IndexSetTemplateResponse(
                 indexSetTemplate.id(),
                 indexSetTemplate.title(),
                 indexSetTemplate.description(),
                 indexSetTemplate.isBuiltIn(),
                 Objects.equals(defaultTemplateId, indexSetTemplate.id()),
+                result.fulfilled(),
+                result.reason(),
                 indexSetTemplate.indexSetConfig()
         );
     }
