@@ -50,7 +50,7 @@ public interface MongoPaginationHelper<T extends MongoEntity> {
     MongoPaginationHelper<T> sort(String fieldName, String order);
 
     /**
-     * Sets the page size
+     * Sets the page size.
      *
      * @param perPage the number of documents to put on one page
      * @return A new pagination helper with the setting applied
