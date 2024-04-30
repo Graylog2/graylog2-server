@@ -236,6 +236,12 @@ const WidgetActionsMenu = ({
   }, [pathname, sendTelemetry, setWidgetFocusing, widget.id]);
 
   const onExportAggregationWidget = useCallback((extension: Extension) => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.EXPORT, {
+      app_pathname: getPathnameWithoutId(pathname),
+      app_section: 'search-widget',
+      app_action_value: { extension },
+    });
+
     const widgetTitle = view.getWidgetTitleByWidget(widget);
 
     return exportWidget(widgetTitle, (widgetResult as {chart: Result}).chart as Result, extension);
