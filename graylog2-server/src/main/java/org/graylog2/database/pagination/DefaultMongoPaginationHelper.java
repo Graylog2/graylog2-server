@@ -19,7 +19,6 @@ package org.graylog2.database.pagination;
 import com.google.common.primitives.Ints;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Collation;
-import com.mongodb.client.model.Sorts;
 import org.bson.conversions.Bson;
 import org.graylog2.database.MongoEntity;
 import org.graylog2.database.PaginatedList;
@@ -63,18 +62,6 @@ public class DefaultMongoPaginationHelper<T extends MongoEntity> implements Mong
 
     @Override
     public MongoPaginationHelper<T> sort(Bson sort) {
-        return new DefaultMongoPaginationHelper<>(collection, filter, sort, perPage, includeGrandTotal,
-                grandTotalFilter, collation);
-    }
-
-    @Override
-    public MongoPaginationHelper<T> sort(String fieldName, String order) {
-        Bson sort;
-        if ("desc".equalsIgnoreCase(order)) {
-            sort = Sorts.descending(fieldName);
-        } else {
-            sort = Sorts.ascending(fieldName);
-        }
         return new DefaultMongoPaginationHelper<>(collection, filter, sort, perPage, includeGrandTotal,
                 grandTotalFilter, collation);
     }

@@ -27,6 +27,7 @@ import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.pagination.MongoPaginationHelper;
 import org.graylog2.database.utils.MongoUtils;
+import org.graylog2.rest.models.SortOrder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -149,7 +150,7 @@ class HelpersAndUtilitiesTest {
 
         final Predicate<TestDTO> filter = view -> view.title.matches("hello[23456]");
 
-        final PaginatedList<TestDTO> page1 = paginationHelper.sort("title", "asc").perPage(2)
+        final PaginatedList<TestDTO> page1 = paginationHelper.sort(SortOrder.ASCENDING.toBsonSort("title")).perPage(2)
                 .page(1, filter);
 
         assertThat(page1.pagination().count()).isEqualTo(2);
@@ -158,7 +159,7 @@ class HelpersAndUtilitiesTest {
                 .extracting("title")
                 .containsExactly("hello2", "hello3");
 
-        final PaginatedList<TestDTO> page2 = paginationHelper.sort("title", "asc").perPage(2)
+        final PaginatedList<TestDTO> page2 = paginationHelper.sort(SortOrder.ASCENDING.toBsonSort("title")).perPage(2)
                 .page(2, filter);
 
         assertThat(page2.pagination().count()).isEqualTo(2);
@@ -167,7 +168,7 @@ class HelpersAndUtilitiesTest {
                 .extracting("title")
                 .containsExactly("hello4", "hello5");
 
-        final PaginatedList<TestDTO> page3 = paginationHelper.sort("title", "asc").perPage(2)
+        final PaginatedList<TestDTO> page3 = paginationHelper.sort(SortOrder.ASCENDING.toBsonSort("title")).perPage(2)
                 .page(3, filter);
         assertThat(page3.pagination().count()).isEqualTo(1);
         assertThat(page3.pagination().total()).isEqualTo(5);
@@ -175,7 +176,7 @@ class HelpersAndUtilitiesTest {
                 .extracting("title")
                 .containsExactly("hello6");
 
-        final PaginatedList<TestDTO> page4 = paginationHelper.sort("title", "asc").perPage(4)
+        final PaginatedList<TestDTO> page4 = paginationHelper.sort(SortOrder.ASCENDING.toBsonSort("title")).perPage(4)
                 .page(2, filter);
 
         assertThat(page4.pagination().count()).isEqualTo(1);
@@ -184,7 +185,7 @@ class HelpersAndUtilitiesTest {
                 .extracting("title")
                 .containsExactly("hello6");
 
-        final PaginatedList<TestDTO> page1reverse = paginationHelper.sort("title", "desc")
+        final PaginatedList<TestDTO> page1reverse = paginationHelper.sort(SortOrder.DESCENDING.toBsonSort("title"))
                 .perPage(2).page(1, filter);
 
         assertThat(page1reverse.pagination().count()).isEqualTo(2);

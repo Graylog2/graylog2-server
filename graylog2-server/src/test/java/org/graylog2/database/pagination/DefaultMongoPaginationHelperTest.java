@@ -30,6 +30,7 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoEntity;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.rest.models.SortOrder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -89,26 +90,26 @@ class DefaultMongoPaginationHelperTest {
     void testSort() {
         assertThat(paginationHelper.sort(ascending("_id")).page(1))
                 .isEqualTo(paginationHelper.sort(ascending("_id")).page(1, alwaysTrue()))
-                .isEqualTo(paginationHelper.sort("_id", "asc").page(1))
-                .isEqualTo(paginationHelper.sort("_id", "asc").page(1, alwaysTrue()))
+                .isEqualTo(paginationHelper.sort(SortOrder.ASCENDING.toBsonSort("_id")).page(1))
+                .isEqualTo(paginationHelper.sort(SortOrder.ASCENDING.toBsonSort("_id")).page(1, alwaysTrue()))
                 .containsExactlyElementsOf(DTOs);
 
         assertThat(paginationHelper.sort(ascending("name")).page(1))
                 .isEqualTo(paginationHelper.sort(ascending("name")).page(1, alwaysTrue()))
-                .isEqualTo(paginationHelper.sort("name", "asc").page(1))
-                .isEqualTo(paginationHelper.sort("name", "asc").page(1, alwaysTrue()))
+                .isEqualTo(paginationHelper.sort(SortOrder.ASCENDING.toBsonSort("name")).page(1))
+                .isEqualTo(paginationHelper.sort(SortOrder.ASCENDING.toBsonSort("name")).page(1, alwaysTrue()))
                 .containsExactlyElementsOf(DTOs);
 
         assertThat(paginationHelper.sort(descending("_id")).page(1))
                 .isEqualTo(paginationHelper.sort(descending("_id")).page(1, alwaysTrue()))
-                .isEqualTo(paginationHelper.sort("_id", "desc").page(1))
-                .isEqualTo(paginationHelper.sort("_id", "desc").page(1, alwaysTrue()))
+                .isEqualTo(paginationHelper.sort(SortOrder.DESCENDING.toBsonSort("_id")).page(1))
+                .isEqualTo(paginationHelper.sort(SortOrder.DESCENDING.toBsonSort("_id")).page(1, alwaysTrue()))
                 .containsExactlyElementsOf(Lists.reverse(DTOs));
 
         assertThat(paginationHelper.sort(descending("name")).page(1))
                 .isEqualTo(paginationHelper.sort(descending("name")).page(1, alwaysTrue()))
-                .isEqualTo(paginationHelper.sort("name", "desc").page(1))
-                .isEqualTo(paginationHelper.sort("name", "desc").page(1, alwaysTrue()))
+                .isEqualTo(paginationHelper.sort(SortOrder.DESCENDING.toBsonSort("name")).page(1))
+                .isEqualTo(paginationHelper.sort(SortOrder.DESCENDING.toBsonSort("name")).page(1, alwaysTrue()))
                 .containsExactlyElementsOf(Lists.reverse(DTOs));
     }
 

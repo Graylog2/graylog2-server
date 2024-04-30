@@ -41,15 +41,6 @@ public interface MongoPaginationHelper<T extends MongoEntity> {
     MongoPaginationHelper<T> sort(Bson sort);
 
     /**
-     * Sets the sort criteria to apply to the query.
-     *
-     * @param fieldName the name of the field to sort by.
-     * @param order     "desc" to request descending sort order. Otherwise, by default, ascending order is used.
-     * @return A new pagination helper with the setting applied
-     */
-    MongoPaginationHelper<T> sort(String fieldName, String order);
-
-    /**
      * Sets the page size.
      *
      * @param perPage the number of documents to put on one page
