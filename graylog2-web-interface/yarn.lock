@@ -7190,7 +7190,7 @@ eslint-config-airbnb@19.0.4:
     eslint-config-airbnb "19.0.4"
     eslint-import-resolver-webpack "0.13.8"
     eslint-plugin-compat "4.2.0"
-    eslint-plugin-graylog "file:../../../../.cache/yarn/v6/npm-eslint-config-graylog-1.3.0-4e4ad357-9ba0-4513-9d82-b7430f4a1ac9-1714478864848/node_modules/eslint-plugin-graylog"
+    eslint-plugin-graylog "file:packages/eslint-plugin-graylog"
     eslint-plugin-import "2.25.3"
     eslint-plugin-jest "28.3.0"
     eslint-plugin-jest-dom "5.4.0"
@@ -8651,13 +8651,13 @@ graphemer@^1.4.0:
     "@types/create-react-class" "15.6.8"
     "@types/jquery" "3.5.29"
     "@types/react" "18.3.1"
-    babel-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-6.1.0-SNAPSHOT-1d1ed9f7-1f7f-453e-9cab-28982f248e6d-1714478864649/node_modules/babel-preset-graylog"
+    babel-preset-graylog "file:packages/babel-preset-graylog"
     create-react-class "15.7.0"
-    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-6.1.0-SNAPSHOT-1d1ed9f7-1f7f-453e-9cab-28982f248e6d-1714478864649/node_modules/eslint-config-graylog"
+    eslint-config-graylog "file:packages/eslint-config-graylog"
     formik "2.4.6"
     history "^5.3.0"
     html-webpack-plugin "^5.5.0"
-    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-6.1.0-SNAPSHOT-1d1ed9f7-1f7f-453e-9cab-28982f248e6d-1714478864649/node_modules/jest-preset-graylog"
+    jest-preset-graylog "file:packages/jest-preset-graylog"
     jquery "3.7.1"
     moment "2.30.1"
     moment-timezone "0.5.45"
@@ -11190,10 +11190,10 @@ material-colors@^1.2.1:
   resolved "https://registry.yarnpkg.com/material-colors/-/material-colors-1.2.6.tgz#6d1958871126992ceecc72f4bcc4d8f010865f46"
   integrity sha512-6qE4B9deFBIa9YSpOc9O0Sgc43zTeVYbgDT5veRKSlB2+ZuHNoVVxA1L/ckMUayV9Ay9y7Z/SZCLcGteW9i7bg==
 
-material-symbols@^0.15.0:
-  version "0.15.0"
-  resolved "https://registry.yarnpkg.com/material-symbols/-/material-symbols-0.15.0.tgz#d50366c93264496698633be76f5c68b13cb503f8"
-  integrity sha512-216LRlmN8fZb0CoIOaQBmRZ55BptWcd7z//0v7dXQA6aogsvI9Qp1nMQ5jZ44dbgBXntUQzWdB5Q2D+6bJXioA==
+material-symbols@^0.17.4:
+  version "0.17.4"
+  resolved "https://registry.yarnpkg.com/material-symbols/-/material-symbols-0.17.4.tgz#d44f9c47860487e74b2e9735425d49d99933ec01"
+  integrity sha512-5zI+rSzAidMJxAIrQCVwnp4rMjFnx8aQg68lfFXtaDeksZzJ7m8eDl16y9bRNxMosuYbLKeDHDbOWHPJJTSLhQ==
 
 math-log2@^1.0.1:
   version "1.0.1"
