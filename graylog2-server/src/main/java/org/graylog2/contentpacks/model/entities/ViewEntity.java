@@ -193,5 +193,6 @@ public abstract class ViewEntity implements NativeEntityConverter<ViewDTO.Builde
                                        Map<EntityDescriptor, Entity> entities,
                                        MutableGraph<Entity> graph) {
         state().entrySet().forEach(state -> state.getValue().resolveForInstallation(entity, parameters, entities, graph));
+        search().resolveForInstallation(entity, parameters, entities, graph);
     }
 }
