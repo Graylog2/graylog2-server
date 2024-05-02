@@ -19,6 +19,7 @@ package org.graylog.plugins.views.search.searchtypes.export;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.google.common.collect.ImmutableList;
+import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog.plugins.views.search.util.ListOfStringsComparator;
 
@@ -78,5 +79,17 @@ public record ExportTabularResultResponse(@JsonProperty List<String> header,
                 .toList();
 
         return new ExportTabularResultResponse(header, dataRows);
+    }
+
+    public static ExportTabularResultResponse fromMessageListResult(final MessageList.Result m) {
+        if(m.messages().isEmpty()) {
+            return new ExportTabularResultResponse(List.of(), List.of());
+        }
+
+        final var first = m.messages().get(0);
+
+        final var header = first.message().keySet().stream().toList();
+        final var rows = m.messages().stream().map(message -> new DataRow(header.stream().map(key -> message.message().get(key)).toList())).toList();
+        return new ExportTabularResultResponse(header, rows);
     }
 }
