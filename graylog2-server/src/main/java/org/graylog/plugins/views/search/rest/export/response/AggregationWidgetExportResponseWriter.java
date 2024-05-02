@@ -80,7 +80,7 @@ public class AggregationWidgetExportResponseWriter implements MessageBodyWriter<
 
             csvWriter.writeNext(widgetExportResponse.header().toArray(new String[0]));
             for (AggregationWidgetExportResponse.DataRow row : widgetExportResponse.dataRows()) {
-                csvWriter.writeNext(row.row().toArray(new String[0]));
+                csvWriter.writeNext(row.row().stream().map(obj -> obj == null ? "" : obj.toString()).toList().toArray(new String[0]));
             }
 
         }
