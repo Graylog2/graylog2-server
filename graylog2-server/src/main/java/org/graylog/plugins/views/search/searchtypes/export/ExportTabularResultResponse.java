@@ -68,7 +68,7 @@ public record ExportTabularResultResponse(@JsonProperty List<String> header,
                                     .filter(value -> value.value() != null)
                                     .findFirst()
                                     .map(value -> value.value())
-                                    .orElse("")
+                                    .orElse(null)
                             ).toList();
 
                     List<Object> dataRow = new ArrayList<>();
