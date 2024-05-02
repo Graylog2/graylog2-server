@@ -19,6 +19,7 @@ import { useCallback } from 'react';
 import styled, { css } from 'styled-components';
 
 import Icon from 'components/common/Icon';
+import useHistory from 'routing/useHistory';
 
 import Menu from './Menu';
 
@@ -56,9 +57,12 @@ type Props<T = undefined> = React.PropsWithChildren<{
   closeMenuOnClick?: boolean,
 }>;
 
+const isAbsoluteUrl = (href: string) => /^(?:[a-z][a-z0-9+.-]*:|\/\/)/i.test(href);
+
 const CustomMenuItem = <T, >({ children, className, disabled, divider, eventKey, header, href, icon, id, onClick, onSelect, rel, target, title, 'data-tab-id': dataTabId, component, variant, closeMenuOnClick }: Props<T>) => {
   const callback = onClick ?? onSelect;
   const _onClick = useCallback(() => callback?.(eventKey), [callback, eventKey]);
+  const history = useHistory();
 
   if (divider) {
     return <Menu.Divider role="separator" className={className} id={id} />;
@@ -81,12 +85,25 @@ const CustomMenuItem = <T, >({ children, className, disabled, divider, eventKey,
   };
 
   if (href) {
+    if (isAbsoluteUrl(href) || rel || target) {
+      return (
+        <StyledMenuItem component="a"
+                        href={href}
+                        target={target}
+                        rel={rel}
+                        {...sharedProps}>
+          {children}
+        </StyledMenuItem>
+      );
+    }
+
+    const _onClickHref = () => history.push(href);
+
     return (
       <StyledMenuItem component="a"
-                      href={href}
-                      target={target}
-                      rel={rel}
-                      {...sharedProps}>
+                      {...sharedProps}
+                      onClick={_onClickHref}>
+
         {children}
       </StyledMenuItem>
     );
