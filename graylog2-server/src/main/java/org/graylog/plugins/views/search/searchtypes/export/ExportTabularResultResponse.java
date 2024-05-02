@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.searchtypes.export;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog.plugins.views.search.util.ListOfStringsComparator;
@@ -27,7 +28,11 @@ import java.util.Collections;
 import java.util.List;
 
 public record ExportTabularResultResponse(@JsonProperty List<String> header,
-                                          @JsonProperty List<List<Object>> dataRows) {
+                                          @JsonProperty @JacksonXmlElementWrapper(useWrapping = false) List<DataRow> dataRows) {
+
+    public record DataRow(@JacksonXmlElementWrapper(useWrapping = false) List<Object> row) {
+
+    }
 
     public static ExportTabularResultResponse fromPivotResult(final PivotResult pivotResult) {
 
@@ -68,7 +73,7 @@ public record ExportTabularResultResponse(@JsonProperty List<String> header,
                     List<Object> dataRow = new ArrayList<>();
                     dataRow.addAll(key);
                     dataRow.addAll(values);
-                    return dataRow;
+                    return new DataRow(dataRow);
                 })
                 .toList();
 

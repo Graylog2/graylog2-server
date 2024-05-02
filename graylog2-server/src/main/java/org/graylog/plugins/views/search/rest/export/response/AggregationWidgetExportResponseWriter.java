@@ -18,6 +18,7 @@ package org.graylog.plugins.views.search.rest.export.response;
 
 import au.com.bytecode.opencsv.CSVWriter;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Produces;
@@ -35,20 +36,26 @@ import java.io.PrintWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 
 @Provider
-@Produces({MoreMediaTypes.TEXT_CSV, MediaType.APPLICATION_JSON, MoreMediaTypes.APPLICATION_YAML})
+@Produces({MoreMediaTypes.TEXT_CSV,
+        MediaType.APPLICATION_JSON,
+        MoreMediaTypes.APPLICATION_YAML,
+        MediaType.APPLICATION_XML})
 public class AggregationWidgetExportResponseWriter implements MessageBodyWriter<ExportTabularResultResponse> {
 
     private final ObjectMapper objectMapper;
     private final YAMLMapper yamlMapper;
 
+    private final XmlMapper xmlMapper;
+
     @Inject
     public AggregationWidgetExportResponseWriter(final ObjectMapper objectMapper,
-                                                 final YAMLMapper yamlMapper) {
+                                                 final YAMLMapper yamlMapper,
+                                                 final XmlMapper xmlMapper) {
         this.objectMapper = objectMapper;
         this.yamlMapper = yamlMapper;
+        this.xmlMapper = xmlMapper;
     }
 
 
@@ -63,6 +70,7 @@ public class AggregationWidgetExportResponseWriter implements MessageBodyWriter<
             case MoreMediaTypes.TEXT_CSV -> writeCsv(widgetExportResponse, outputStream);
             case MediaType.APPLICATION_JSON -> objectMapper.writeValue(outputStream, widgetExportResponse);
             case MoreMediaTypes.APPLICATION_YAML -> yamlMapper.writeValue(outputStream, widgetExportResponse);
+            case MediaType.APPLICATION_XML -> xmlMapper.writeValue(outputStream, widgetExportResponse);
             default -> throw new IllegalArgumentException("Media type " + mediaType + " not supported");
         }
     }
