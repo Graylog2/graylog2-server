@@ -85,25 +85,19 @@ const CustomMenuItem = <T, >({ children, className, disabled, divider, eventKey,
   };
 
   if (href) {
-    if (isAbsoluteUrl(href) || rel || target) {
-      return (
-        <StyledMenuItem component="a"
-                        href={href}
-                        target={target}
-                        rel={rel}
-                        {...sharedProps}>
-          {children}
-        </StyledMenuItem>
-      );
-    }
-
-    const _onClickHref = () => history.push(href);
+    const _onClickHref: React.MouseEventHandler<HTMLAnchorElement> = (isAbsoluteUrl(href) || rel || target) ? undefined
+      : (e) => {
+        history.push(href);
+        e.preventDefault();
+      };
 
     return (
       <StyledMenuItem component="a"
+                      href={href}
+                      target={target}
+                      rel={rel}
                       {...sharedProps}
                       onClick={_onClickHref}>
-
         {children}
       </StyledMenuItem>
     );
