@@ -20,6 +20,9 @@ import org.graylog2.indexer.indexset.template.IndexSetTemplate;
 
 public interface IndexSetTemplateRequirement {
 
+    /**
+     * The priority determines the order in which a requirement check is executed in order to display the most relevant check results first.
+     */
     int priority();
 
     Result check(IndexSetTemplate indexSetTemplate);
