@@ -78,12 +78,10 @@ public class AggregationWidgetExportResponseWriter implements MessageBodyWriter<
     public static void writeCsv(final ExportTabularResultResponse widgetExportResponse,
                           final OutputStream outputStream) throws IOException {
         try (final CSVWriter csvWriter = new CSVWriter(new PrintWriter(outputStream, true, StandardCharsets.UTF_8))) {
-
             csvWriter.writeNext(widgetExportResponse.header().toArray(new String[0]));
-            for (List<Object> row : widgetExportResponse.dataRows()) {
-                csvWriter.writeNext(row.stream().map(Object::toString).toList().toArray(new String[0]));
+            for (ExportTabularResultResponse.DataRow row : widgetExportResponse.dataRows()) {
+                csvWriter.writeNext(row.row().stream().map(obj -> obj == null ? "" : obj.toString()).toList().toArray(new String[0]));
             }
-
         }
     }
 }

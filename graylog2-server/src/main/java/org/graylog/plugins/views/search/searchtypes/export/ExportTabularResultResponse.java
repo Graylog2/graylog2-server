@@ -56,7 +56,7 @@ public record ExportTabularResultResponse(@JsonProperty List<String> header,
         header.addAll(Collections.nCopies(longestRowKey, ""));
         columns.forEach(column -> header.add(column.toString()));
 
-        final List<List<Object>> dataRows = rows.stream()
+        final List<DataRow> dataRows = rows.stream()
                 .filter(row -> "leaf".equals(row.source()))
                 .map(row -> {
                     final ImmutableList<String> key = row.key();
