@@ -47,11 +47,8 @@ export const prepareDataTieringInitialValues = (values: IndexSet) : IndexSetForm
 export const prepareDataTieringConfig = (values: IndexSetFormValues, pluginStore) : IndexSet => {
   if (!values.data_tiering) return values as unknown as IndexSet;
 
-  const hotOnlyDefaults = {
-    archive_before_deletion: false,
-  };
-
   const hotWarmDefaultValues = {
+    archive_before_deletion: false,
     warm_tier_enabled: false,
     warm_tier_repository_name: null,
   };
@@ -60,8 +57,6 @@ export const prepareDataTieringConfig = (values: IndexSetFormValues, pluginStore
   const dataTieringType = dataTieringPlugin?.type ?? DATA_TIERING_TYPE.HOT_ONLY;
 
   let { data_tiering } = values;
-
-  data_tiering = { ...hotOnlyDefaults, ...data_tiering };
 
   if (dataTieringType === DATA_TIERING_TYPE.HOT_WARM) {
     data_tiering = { ...hotWarmDefaultValues, ...data_tiering };
