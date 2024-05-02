@@ -174,13 +174,12 @@ public class DBJobTriggerService {
         }
     }
 
-    public String upsertForJobDefinition(JobTriggerDto triggerDto, String jobDefinitionId) {
+    public JobTriggerDto upsertForJobDefinition(JobTriggerDto dto, String jobDefinitionId) {
         if (isNullOrEmpty(jobDefinitionId)) {
             throw new IllegalArgumentException("jobDefinitionId cannot be null or empty");
         }
-        // The `multi` parameter is set to false, so this will only update one trigger definition,
-        // which is the expected condition currently.
-        return db.update(forJobDefinitionQuery(jobDefinitionId), triggerDto, true, false).getUpsertedId().toString();
+        final BasicDBObject none = new BasicDBObject();
+        return db.findAndModify(forJobDefinitionQuery(jobDefinitionId), none, none, false, dto, true, true);
     }
 
     private static Query forJobDefinitionQuery(String jobDefinitionId) {
