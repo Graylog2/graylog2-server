@@ -26,10 +26,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-public record PivotResultExportResponse(@JsonProperty List<String> header,
-                                        @JsonProperty List<List<Object>> dataRows) {
+public record ExportTabularResultResponse(@JsonProperty List<String> header,
+                                          @JsonProperty List<List<Object>> dataRows) {
 
-    public static PivotResultExportResponse fromPivotResult(final PivotResult pivotResult) {
+    public static ExportTabularResultResponse fromPivotResult(final PivotResult pivotResult) {
 
         final Collection<PivotResult.Row> rows = pivotResult.rows();
 
@@ -72,6 +72,6 @@ public record PivotResultExportResponse(@JsonProperty List<String> header,
                 })
                 .toList();
 
-        return new PivotResultExportResponse(header, dataRows);
+        return new ExportTabularResultResponse(header, dataRows);
     }
 }

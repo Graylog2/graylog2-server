@@ -29,7 +29,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog.plugins.views.search.searchtypes.export.PivotResultExportResponse;
+import org.graylog.plugins.views.search.searchtypes.export.ExportTabularResultResponse;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.rest.MoreMediaTypes;
@@ -54,7 +54,7 @@ public class AggregationWidgetExportResource extends RestResource {
                                @ApiParam("filename") @PathParam("filename") String filename) {
         return RestTools.respondWithFile(
                         filename,
-                        PivotResultExportResponse.fromPivotResult(pivotResult),
+                        ExportTabularResultResponse.fromPivotResult(pivotResult),
                         MediaType.valueOf(mediaType))
                 .build();
     }

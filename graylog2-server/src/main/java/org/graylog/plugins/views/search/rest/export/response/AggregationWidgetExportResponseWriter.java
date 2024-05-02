@@ -26,7 +26,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.ext.MessageBodyWriter;
 import jakarta.ws.rs.ext.Provider;
-import org.graylog.plugins.views.search.searchtypes.export.PivotResultExportResponse;
+import org.graylog.plugins.views.search.searchtypes.export.ExportTabularResultResponse;
 import org.graylog2.rest.MoreMediaTypes;
 
 import java.io.IOException;
@@ -39,7 +39,7 @@ import java.util.List;
 
 @Provider
 @Produces({MoreMediaTypes.TEXT_CSV, MediaType.APPLICATION_JSON, MoreMediaTypes.APPLICATION_YAML})
-public class AggregationWidgetExportResponseWriter implements MessageBodyWriter<PivotResultExportResponse> {
+public class AggregationWidgetExportResponseWriter implements MessageBodyWriter<ExportTabularResultResponse> {
 
     private final ObjectMapper objectMapper;
     private final YAMLMapper yamlMapper;
@@ -54,11 +54,11 @@ public class AggregationWidgetExportResponseWriter implements MessageBodyWriter<
 
     @Override
     public boolean isWriteable(Class<?> aClass, Type type, Annotation[] annotations, MediaType mediaType) {
-        return aClass.equals(PivotResultExportResponse.class);
+        return aClass.equals(ExportTabularResultResponse.class);
     }
 
     @Override
-    public void writeTo(PivotResultExportResponse widgetExportResponse, Class<?> aClass, Type type, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> multivaluedMap, OutputStream outputStream) throws IOException, WebApplicationException {
+    public void writeTo(ExportTabularResultResponse widgetExportResponse, Class<?> aClass, Type type, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> multivaluedMap, OutputStream outputStream) throws IOException, WebApplicationException {
         switch (mediaType.toString()) {
             case MoreMediaTypes.TEXT_CSV -> writeCsv(widgetExportResponse, outputStream);
             case MediaType.APPLICATION_JSON -> objectMapper.writeValue(outputStream, widgetExportResponse);
@@ -67,7 +67,7 @@ public class AggregationWidgetExportResponseWriter implements MessageBodyWriter<
         }
     }
 
-    public static void writeCsv(final PivotResultExportResponse widgetExportResponse,
+    public static void writeCsv(final ExportTabularResultResponse widgetExportResponse,
                           final OutputStream outputStream) throws IOException {
         try (final CSVWriter csvWriter = new CSVWriter(new PrintWriter(outputStream, true, StandardCharsets.UTF_8))) {
 
