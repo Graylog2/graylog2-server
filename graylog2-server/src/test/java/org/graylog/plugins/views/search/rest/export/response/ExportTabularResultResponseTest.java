@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.graylog.plugins.views.search.searchtypes.export.ExportTabularResultResponse.DataRow;
 
 class ExportTabularResultResponseTest {
 
