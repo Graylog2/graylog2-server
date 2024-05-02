@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.views.search.rest.export.response;
 
-import au.com.bytecode.opencsv.CSVWriter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
@@ -27,15 +26,14 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.ext.MessageBodyWriter;
 import jakarta.ws.rs.ext.Provider;
+import org.graylog.plugins.views.search.searchtypes.export.CSVWriter;
 import org.graylog.plugins.views.search.searchtypes.export.ExportTabularResultResponse;
 import org.graylog2.rest.MoreMediaTypes;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.nio.charset.StandardCharsets;
 
 @Provider
 @Produces({MoreMediaTypes.TEXT_CSV,
@@ -67,21 +65,11 @@ public class AggregationWidgetExportResponseWriter implements MessageBodyWriter<
     @Override
     public void writeTo(ExportTabularResultResponse widgetExportResponse, Class<?> aClass, Type type, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> multivaluedMap, OutputStream outputStream) throws IOException, WebApplicationException {
         switch (mediaType.toString()) {
-            case MoreMediaTypes.TEXT_CSV -> writeCsv(widgetExportResponse, outputStream);
+            case MoreMediaTypes.TEXT_CSV -> CSVWriter.writeCsv(widgetExportResponse, outputStream);
             case MediaType.APPLICATION_JSON -> objectMapper.writeValue(outputStream, widgetExportResponse);
             case MoreMediaTypes.APPLICATION_YAML -> yamlMapper.writeValue(outputStream, widgetExportResponse);
             case MediaType.APPLICATION_XML -> xmlMapper.writeValue(outputStream, widgetExportResponse);
             default -> throw new IllegalArgumentException("Media type " + mediaType + " not supported");
-        }
-    }
-
-    public static void writeCsv(final ExportTabularResultResponse widgetExportResponse,
-                          final OutputStream outputStream) throws IOException {
-        try (final CSVWriter csvWriter = new CSVWriter(new PrintWriter(outputStream, true, StandardCharsets.UTF_8))) {
-            csvWriter.writeNext(widgetExportResponse.header().toArray(new String[0]));
-            for (ExportTabularResultResponse.DataRow row : widgetExportResponse.dataRows()) {
-                csvWriter.writeNext(row.row().stream().map(obj -> obj == null ? "" : obj.toString()).toList().toArray(new String[0]));
-            }
         }
     }
 }
