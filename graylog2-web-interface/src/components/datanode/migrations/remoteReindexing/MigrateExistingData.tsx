@@ -167,7 +167,7 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
                  required />
           {(availableIndices.length > 0) && (
             <Alert title="Valid connection" bsStyle="success">
-              Below are the available indices for the remote reindex migration, <b>{filteredSelectedIndices.length}/{filteredIndices.length}</b> are selected.
+              Below are the available indices for the remote reindex migration, <b>{filteredSelectedIndices.length}/{availableIndices.length}</b> are selected.
               <SearchContainer>
                 <SearchForm onSearch={setQueryIndex}
                             query={queryIndex} />
