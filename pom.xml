@@ -101,7 +101,7 @@
         <aws-java-sdk-1.version>1.12.675</aws-java-sdk-1.version>
         <aws-java-sdk-2.version>2.25.6</aws-java-sdk-2.version>
         <aws-kinesis-client.version>2.5.8</aws-kinesis-client.version>
-        <aws-msk-iam-auth.version>2.0.3</aws-msk-iam-auth.version>
+        <aws-msk-iam-auth.version>2.1.0</aws-msk-iam-auth.version>
         <bouncycastle.version>1.78.1</bouncycastle.version>
         <byte-buddy.version>1.14.14</byte-buddy.version>
         <caffeine.version>3.1.8</caffeine.version>
@@ -504,7 +504,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-install-plugin</artifactId>
-                    <version>3.1.1</version>
+                    <version>3.1.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -544,7 +544,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
-                    <version>3.1.1</version>
+                    <version>3.1.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>

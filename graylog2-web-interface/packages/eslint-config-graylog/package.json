@@ -15,20 +15,20 @@
   "dependencies": {
     "@babel/eslint-parser": "7.16.5",
     "@tanstack/eslint-plugin-query": "4.36.1",
-    "@typescript-eslint/eslint-plugin": "7.7.1",
-    "@typescript-eslint/parser": "7.7.1",
+    "@typescript-eslint/eslint-plugin": "7.8.0",
+    "@typescript-eslint/parser": "7.8.0",
     "eslint": "8.57.0",
     "eslint-config-airbnb": "19.0.4",
     "eslint-import-resolver-webpack": "0.13.8",
     "eslint-plugin-compat": "4.2.0",
     "eslint-plugin-graylog": "file:../eslint-plugin-graylog",
     "eslint-plugin-import": "2.25.3",
-    "eslint-plugin-jest": "28.2.0",
+    "eslint-plugin-jest": "28.3.0",
     "eslint-plugin-jest-dom": "5.4.0",
     "eslint-plugin-jest-formatting": "3.1.0",
     "eslint-plugin-jsx-a11y": "6.8.0",
     "eslint-plugin-react": "7.34.1",
-    "eslint-plugin-react-hooks": "4.6.1",
+    "eslint-plugin-react-hooks": "4.6.2",
     "eslint-plugin-testing-library": "6.2.2"
   }
 }

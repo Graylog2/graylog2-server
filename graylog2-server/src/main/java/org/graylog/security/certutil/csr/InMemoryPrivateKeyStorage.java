@@ -14,11 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.opensearch;
+package org.graylog.security.certutil.csr;
 
-import org.graylog.datanode.opensearch.statemachine.OpensearchState;
-import org.graylog.datanode.process.ProcessInformation;
+import org.graylog.security.certutil.privatekey.PrivateKeyEncryptedStorage;
 
-public record OpensearchInfo(String nodeName, OpensearchState state, String restBaseUrl,
-                             ProcessInformation process) {
+import java.security.PrivateKey;
+
+public class InMemoryPrivateKeyStorage implements PrivateKeyEncryptedStorage {
+
+    private PrivateKey privateKey;
+
+    @Override
+    public void writeEncryptedKey(char[] password, PrivateKey privateKey) {
+        this.privateKey = privateKey;
+    }
+
+    @Override
+    public PrivateKey readEncryptedKey(char[] password) {
+        return privateKey;
+    }
 }
