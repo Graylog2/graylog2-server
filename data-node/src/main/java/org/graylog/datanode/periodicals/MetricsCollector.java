@@ -31,9 +31,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.index.IndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.index.IndexResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
-import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog.shaded.opensearch2.org.opensearch.core.action.ActionListener;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
@@ -52,7 +50,6 @@ import java.lang.management.MemoryUsage;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 
 public class MetricsCollector extends Periodical {
 
@@ -122,33 +119,13 @@ public class MetricsCollector extends Periodical {
                 indexRequest.source(metrics);
                 indexDocument(client, indexRequest);
 
-                if (isManagerNode(process)) {
+                if (process.isManagerNode()) {
                     metrics = new HashMap<>(clusterStatMetricsCollector.getClusterMetrics(getPreviousMetricsForCluster(client)));
                     metrics.put(configuration.getMetricsTimestamp(), new DateTime(DateTimeZone.UTC));
                     indexRequest.source(metrics);
                     indexDocument(client, indexRequest);
                 }
             });
-        }
-    }
-
-    public boolean isManagerNode(OpensearchProcess process) {
-        return process.restClient()
-                .flatMap(this::requestClusterState)
-                .map(r -> r.nodes().get(r.clusterManagerNode()))
-                .map(managerNode -> configuration.getDatanodeNodeName().equals(managerNode.name()))
-                .orElse(false);
-    }
-
-
-    private Optional<ClusterStateResponse> requestClusterState(RestHighLevelClient client) {
-        try {
-            final Response response = client.getLowLevelClient().performRequest(new Request("GET", "_cluster/state/"));
-            final ClusterStateResponse state = objectMapper.readValue(response.getEntity().getContent(), ClusterStateResponse.class);
-            return Optional.of(state);
-        } catch (IOException e) {
-            LOG.warn("Failed to obtain cluster state response", e);
-            return Optional.empty();
         }
     }
 
