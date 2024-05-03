@@ -414,6 +414,11 @@
                 <artifactId>commons-exec</artifactId>
                 <version>${commons-exec.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-csv</artifactId>
+                <version>${commons-csv.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>io.dropwizard.metrics</groupId>
