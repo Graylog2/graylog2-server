@@ -47,7 +47,8 @@ public class TelemetrySubmissionPeriodical extends Periodical {
             final var telemetryMetrics = metricsProviders.entrySet()
                     .stream()
                     .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().get()));
-            telemetryMetrics.forEach((key, value) -> telemetryClient.capture(key, value.metrics()));
+            telemetryMetrics.forEach((key, value) -> value.map(TelemetryEvent::metrics)
+                    .ifPresent(metrics -> telemetryClient.capture(key, metrics)));
         }
     }
 
