@@ -13,9 +13,11 @@ import java.util.Map;
 public class TelemetryClient {
     private final PostHog posthog;
     private final ClusterId clusterId;
+    private final boolean isEnabled;
 
     @Inject
     public TelemetryClient(TelemetryConfiguration telemetryConfiguration, ClusterConfigService clusterConfigService) {
+        this.isEnabled = telemetryConfiguration.isTelemetryEnabled();
         this.posthog = new PostHog.Builder(telemetryConfiguration.getTelemetryApiKey())
                 .host(telemetryConfiguration.getTelemetryApiHost())
                 .build();
@@ -23,6 +25,8 @@ public class TelemetryClient {
     }
 
     public void capture(String eventType, Map<String, Object> event) {
-        this.posthog.capture(clusterId.clusterId(), eventType, event);
+        if (isEnabled) {
+            this.posthog.capture(clusterId.clusterId(), eventType, event);
+        }
     }
 }
