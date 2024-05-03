@@ -1555,19 +1555,6 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void removeField() {
-        final Rule rule = parser.parseRule(ruleForTest(), true);
-        final Message message = messageFactory.createMessage("test", "test", Tools.nowUTC());
-        evaluateRule(rule, message);
-
-        assertThat(message.getField("f1")).isNull();
-        assertThat(message.getField("i1")).isNull();
-        assertThat(message.getField("i2")).isNull();
-        assertThat(message.getField("f2")).isEqualTo("f2");
-        assertThat(message.getField("f3")).isEqualTo("f3");
-    }
-
-    @Test
     public void setField() {
         final Rule rule = parser.parseRule(ruleForTest(), true);
         final Message message = messageFactory.createMessage("test", "test", Tools.nowUTC());
@@ -1674,5 +1661,42 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("remove_missing")).isEqualTo(Arrays.asList(1L, 2L, 3L));
         assertThat(message.getField("remove_only_one")).isEqualTo(Arrays.asList(1L, 2L));
         assertThat(message.getField("remove_all")).isEqualTo(List.of(1L));
+    }
+
+    @Test
+    public void removeField() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final Message message = messageFactory.createMessage("test", "test", Tools.nowUTC());
+        evaluateRule(rule, message);
+
+        assertThat(message.getField("a.1")).isNull();
+        assertThat(message.getField("f1")).isNull();
+        assertThat(message.getField("f2")).isEqualTo("f2");
+        assertThat(message.getField("i1")).isEqualTo("i1");
+    }
+
+    @Test
+    public void removeFieldRegex() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final Message message = messageFactory.createMessage("test", "test", Tools.nowUTC());
+        evaluateRule(rule, message);
+
+        assertThat(message.getField("f1")).isNull();
+        assertThat(message.getField("i1")).isNull();
+        assertThat(message.getField("i2")).isNull();
+        assertThat(message.getField("a.1")).isEqualTo("a.1");
+        assertThat(message.getField("f2")).isEqualTo("f2");
+    }
+
+    @Test
+    public void removeFieldInvert() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final Message message = messageFactory.createMessage("test", "test", Tools.nowUTC());
+        evaluateRule(rule, message);
+
+        assertThat(message.getField("a.1")).isNull();
+        assertThat(message.getField("i1")).isNull();
+        assertThat(message.getField("f1")).isEqualTo("f1");
+        assertThat(message.getField("f2")).isEqualTo("f2");
     }
 }
