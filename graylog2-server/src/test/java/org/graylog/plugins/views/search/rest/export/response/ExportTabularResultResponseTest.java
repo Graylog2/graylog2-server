@@ -18,6 +18,7 @@ package org.graylog.plugins.views.search.rest.export.response;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.Resources;
+import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.export.ExportTabularResultResponse;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -48,6 +49,23 @@ class ExportTabularResultResponseTest {
         );
 
         assertEquals(expectedResponse, response);
+    }
 
+    @Test
+    void testCreationFromMessageList() throws Exception {
+        final ObjectMapper objectMapper = new ObjectMapperProvider().get();
+        final byte[] bytes = Resources.toByteArray(Resources.getResource("org/graylog/plugins/views/search/rest/export/response/sample_message_list_result.json"));
+        final MessageList.Result messageListResult = objectMapper.readValue(bytes, MessageList.Result.class);
+        final ExportTabularResultResponse response = ExportTabularResultResponse.fromMessageListResult(messageListResult);
+
+        final ExportTabularResultResponse expectedResponse = new ExportTabularResultResponse(
+                List.of("sequence_nr","ingest_time","gl2_receive_timestamp","took_ms","source"),
+                List.of(
+                        new DataRow(List.of(277, "2024-05-06T12:35:52.284Z", "2024-05-06 12:35:52.284", 48, "example.org")),
+                        new DataRow(List.of(278, "2024-05-06T12:35:52.284Z", "2024-05-06 12:35:52.284", 49, "example.org"))
+                )
+        );
+
+        assertEquals(expectedResponse, response);
     }
 }
