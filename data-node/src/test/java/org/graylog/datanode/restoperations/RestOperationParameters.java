@@ -18,9 +18,11 @@ package org.graylog.datanode.restoperations;
 
 import com.google.auto.value.AutoValue;
 import io.restassured.specification.RequestSpecification;
+import jakarta.inject.Provider;
 
 import javax.annotation.Nullable;
 import java.security.KeyStore;
+import java.util.function.Supplier;
 
 @AutoValue
 public abstract class RestOperationParameters {
@@ -30,33 +32,21 @@ public abstract class RestOperationParameters {
     @Nullable
     abstract KeyStore truststore();
 
-    @Nullable
-    abstract String username();
-
-    @Nullable
-    abstract String password();
-
-    @Nullable
-    abstract String jwtToken();
-
+    abstract Provider<String> jwtTokenProvider();
 
     private static final int DEFAULT_ATTEMPTS_COUNT = 160;
 
     abstract int attempts_count();
 
     public void addAuthorizationHeaders(RequestSpecification req) {
-        if (jwtToken() != null) {
-            req.header("Authorization", "Bearer " + jwtToken());
-        } else if (username() != null && password() != null) {
-            req.auth().basic(username(), password());
+        if (jwtTokenProvider() != null) {
+            req.header("Authorization", jwtTokenProvider().get());
         }
     }
 
     public String formatCurlAuthentication() {
-        if (jwtToken() != null) {
-            return "-H \"Authorization: Bearer " + jwtToken() + "\"";
-        } else if (username() != null && password() != null) {
-            return "-u \"" + username() + ":" + password() + "\"";
+        if (jwtTokenProvider() != null) {
+            return "-H \"Authorization: " + jwtTokenProvider().get() + "\"";
         }
         return "";
     }
@@ -74,12 +64,7 @@ public abstract class RestOperationParameters {
 
         public abstract Builder truststore(KeyStore truststore);
 
-        public abstract Builder username(String username);
-
-        public abstract Builder password(String password);
-
-        public abstract Builder jwtToken(String jwtToken);
-
+        public abstract Builder jwtTokenProvider(Provider<String> jwtToken);
 
         public abstract Builder attempts_count(int attempts_count);
 

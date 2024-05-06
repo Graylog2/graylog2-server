@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.integration;
 
+import com.github.joschi.jadconfig.util.Duration;
 import com.github.rholder.retry.RetryException;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.graylog.datanode.configuration.variants.KeystoreInformation;
@@ -24,6 +25,7 @@ import org.graylog.datanode.restoperations.DatanodeStatusChangeOperation;
 import org.graylog.datanode.restoperations.RestOperationParameters;
 import org.graylog.datanode.testinfra.DatanodeContainerizedBackend;
 import org.graylog2.plugin.Tools;
+import org.graylog2.security.IndexerJwtAuthTokenProvider;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,13 +50,10 @@ public class DatanodeLifecycleIT {
     private DatanodeContainerizedBackend backend;
     private KeyStore trustStore;
     private String containerHostname;
-    private String restAdminUsername;
+
 
     @BeforeEach
     void setUp() throws IOException, GeneralSecurityException {
-
-        restAdminUsername = RandomStringUtils.randomAlphanumeric(10);
-
         containerHostname = "graylog-datanode-host-" + RandomStringUtils.random(8, "0123456789abcdef");
         // first generate a self-signed CA
         KeystoreInformation ca = DatanodeSecurityTestUtils.generateCa(tempDir);
@@ -89,8 +88,6 @@ public class DatanodeLifecycleIT {
             datanodeContainer.withEnv("GRAYLOG_DATANODE_HOSTNAME", containerHostname);
 
             datanodeContainer.withEnv("GRAYLOG_DATANODE_SINGLE_NODE_ONLY", "true");
-
-            datanodeContainer.withEnv("GRAYLOG_DATANODE_ROOT_USERNAME", restAdminUsername);
         }).start();
     }
 
@@ -100,12 +97,11 @@ public class DatanodeLifecycleIT {
     }
 
     @Test
-    void testRestartByEventBus() throws ExecutionException, RetryException, InterruptedException {
+    void testRestartByEventBus() {
         final RestOperationParameters restParameters = RestOperationParameters.builder()
                 .port(backend.getDatanodeRestPort())
                 .truststore(trustStore)
-                .username(restAdminUsername)
-                .password(ROOT_PASSWORD_PLAINTEXT)
+                .jwtTokenProvider(DatanodeContainerizedBackend.JWT_AUTH_TOKEN_PROVIDER)
                 .build();
         final DatanodeRestApiWait waitApi = new DatanodeRestApiWait(restParameters);
         final DatanodeStatusChangeOperation statusApi = new DatanodeStatusChangeOperation(restParameters);
