@@ -131,7 +131,7 @@ interface LogoutHook {
 
 type DataTiering = {
   type: string,
-  TiersConfigurationFields: React.ComponentType<{}>,
+  TiersConfigurationFields: React.ComponentType<{valuesPrefix?: string}>,
   TiersSummary: React.ComponentType<{
     config: DataTieringConfig
   }>,

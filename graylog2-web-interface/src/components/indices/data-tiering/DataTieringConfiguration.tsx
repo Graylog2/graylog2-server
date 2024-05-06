@@ -19,34 +19,29 @@ import moment from 'moment';
 import { useFormikContext } from 'formik';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import type { IndexSet, IndexSetFormValues } from 'stores/indices/IndexSetsStore';
-import { FormikFormGroup, FormikInput } from 'components/common';
-import { Input } from 'components/bootstrap';
+import { FormikInput } from 'components/common';
 import { DATA_TIERING_TYPE } from 'components/indices/data-tiering';
+import type { DataTieringConfig, DataTieringFormValues } from 'components/indices/data-tiering';
 
 const dayFields = ['index_lifetime_max', 'index_lifetime_min', 'index_hot_lifetime_min'];
 const hotWarmOnlyFormFields = ['index_hot_lifetime_min', 'warm_tier_enabled', 'warm_tier_repository_name'];
 
 export const durationToRoundedDays = (duration: string) => Math.round(moment.duration(duration).asDays());
 
-export const prepareDataTieringInitialValues = (values: IndexSet) : IndexSetFormValues => {
-  if (!values.data_tiering) return values as unknown as IndexSetFormValues;
-
-  let { data_tiering } = values;
+export const prepareDataTieringInitialValues = (config: DataTieringConfig) : DataTieringFormValues => {
+  let formValues = { ...config };
 
   dayFields.forEach((field) => {
-    if (data_tiering[field]) {
-      const numberValue = durationToRoundedDays(data_tiering[field]);
-      data_tiering = { ...data_tiering, [field]: numberValue };
+    if (formValues[field]) {
+      const numberValue = durationToRoundedDays(formValues[field]);
+      formValues = { ...formValues, [field]: numberValue };
     }
   });
 
-  return { ...values, data_tiering } as unknown as IndexSetFormValues;
+  return formValues as unknown as DataTieringFormValues;
 };
 
-export const prepareDataTieringConfig = (values: IndexSetFormValues, pluginStore) : IndexSet => {
-  if (!values.data_tiering) return values as unknown as IndexSet;
-
+export const prepareDataTieringConfig = (formValues: DataTieringFormValues, pluginStore) : DataTieringConfig => {
   const hotOnlyDefaults = {
     archive_before_deletion: false,
   };
@@ -59,35 +54,55 @@ export const prepareDataTieringConfig = (values: IndexSetFormValues, pluginStore
   const dataTieringPlugin = pluginStore.exports('dataTiering').find((plugin) => (plugin.type === DATA_TIERING_TYPE.HOT_WARM));
   const dataTieringType = dataTieringPlugin?.type ?? DATA_TIERING_TYPE.HOT_ONLY;
 
-  let { data_tiering } = values;
-
-  data_tiering = { ...hotOnlyDefaults, ...data_tiering };
+  let config = { };
 
   if (dataTieringType === DATA_TIERING_TYPE.HOT_WARM) {
-    data_tiering = { ...hotWarmDefaultValues, ...data_tiering };
+    config = { ...hotWarmDefaultValues, ...formValues };
   }
 
   if (dataTieringType === DATA_TIERING_TYPE.HOT_ONLY) {
+    config = { ...hotOnlyDefaults, ...formValues };
+
     hotWarmOnlyFormFields.forEach((field) => {
-      delete data_tiering[field];
+      delete config[field];
     });
   }
 
   dayFields.forEach((field) => {
-    if (data_tiering[field]) {
-      data_tiering = { ...data_tiering, [field]: `P${data_tiering[field]}D` };
+    if (config[field]) {
+      config = { ...config, [field]: `P${config[field]}D` };
     }
   });
 
-  data_tiering = { ...data_tiering, type: dataTieringType };
-
-  return { ...values, data_tiering } as unknown as IndexSet;
+  return { ...config, type: dataTieringType } as unknown as DataTieringConfig;
 };
 
-const DataTieringConfiguration = () => {
+type DataTiering = {
+  data_tiering: DataTieringFormValues
+}
+
+type FormValues<T extends string | undefined> = T extends undefined ? DataTiering : T extends string ? { [Key in T]: DataTiering } : never
+
+const DataTieringConfiguration = <ValuesPrefix extends string | undefined, >({ valuesPrefix } : { valuesPrefix?: ValuesPrefix }) => {
   const dataTieringPlugin = PluginStore.exports('dataTiering').find((plugin) => (plugin.type === 'hot_warm'));
 
-  const { values } = useFormikContext<IndexSetFormValues>();
+  const { values } = useFormikContext<FormValues<ValuesPrefix>>();
+
+  const formValue = (field: keyof DataTieringFormValues) => {
+    if (valuesPrefix) {
+      return values[valuesPrefix as string]?.data_tiering?.[field];
+    }
+
+    return values?.data_tiering?.[field];
+  };
+
+  const fieldName = (field: keyof DataTieringFormValues) => {
+    if (valuesPrefix) {
+      return `${valuesPrefix}.data_tiering.${field}`;
+    }
+
+    return `data_tiering.${field}`;
+  };
 
   const validateMaxDaysInStorage = (value) => {
     if (value < 0) {
@@ -104,11 +119,11 @@ const DataTieringConfiguration = () => {
       errors.push('Negative numbers are not allowed.');
     }
 
-    if (value > values?.data_tiering?.index_lifetime_max) {
+    if (value > formValue('index_lifetime_max')) {
       errors.push('Min. days in storage needs to be smaller than max. days in storage.');
     }
 
-    if (values?.data_tiering?.warm_tier_enabled && value < values?.data_tiering?.index_hot_lifetime_min) {
+    if (formValue('warm_tier_enabled') && value < formValue('index_hot_lifetime_min')) {
       errors.push('Min. days in storage needs to be bigger than min. days in hot tier.');
     }
 
@@ -121,39 +136,40 @@ const DataTieringConfiguration = () => {
 
   return (
     <>
-      <FormikFormGroup type="number"
-                       label="Max. days in storage"
-                       name="data_tiering.index_lifetime_max"
-                       min={0}
-                       help="After how many days your data should be deleted."
-                       validate={validateMaxDaysInStorage}
-                       required />
-      <FormikFormGroup type="number"
-                       label="Min. days in storage"
-                       name="data_tiering.index_lifetime_min"
-                       min={0}
-                       max={values?.data_tiering?.index_lifetime_max}
-                       validate={validateMinDaysInStorage}
-                       help="How many days at minumum your data should be stored."
-                       required />
+      <FormikInput type="number"
+                   id="data-tiering-index-lifetime-max"
+                   label="Max. days in storage"
+                   name={fieldName('index_lifetime_max')}
+                   min={0}
+                   help="After how many days your data should be deleted."
+                   validate={validateMaxDaysInStorage}
+                   required />
+      <FormikInput type="number"
+                   id="data-tiering-index-lifetime-min"
+                   label="Min. days in storage"
+                   name={fieldName('index_lifetime_min')}
+                   min={0}
+                   max={formValue('index_lifetime_max')}
+                   validate={validateMinDaysInStorage}
+                   help="How many days at minumum your data should be stored."
+                   required />
 
       {dataTieringPlugin && (
         <>
-          <Input id="roles-selector-input"
-                 labelClassName="col-sm-3"
-                 wrapperClassName="col-sm-9"
-                 label="Archiving">
-            <FormikInput type="checkbox"
-                         id="data_tiering.archive_before_deletion"
-                         label="Archive before deletion"
-                         name="data_tiering.archive_before_deletion"
-                         help="Archive this index before it is deleted?" />
-          </Input>
-          <dataTieringPlugin.TiersConfigurationFields />
+          <FormikInput type="checkbox"
+                       id="data_tiering.archive_before_deletion"
+                       label="Archive before deletion"
+                       name={fieldName('archive_before_deletion')}
+                       help="Archive this index before it is deleted?" />
+          <dataTieringPlugin.TiersConfigurationFields valuesPrefix={valuesPrefix} />
         </>
       )}
     </>
   );
+};
+
+DataTieringConfiguration.defaultProps = {
+  valuesPrefix: undefined,
 };
 
 export default DataTieringConfiguration;

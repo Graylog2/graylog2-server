@@ -16,7 +16,6 @@
  */
 import React, { useMemo, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import omit from 'lodash/omit';
 
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -62,7 +61,7 @@ const EditTemplate = ({
     navigate(Routes.SYSTEM.INDICES.TEMPLATES.OVERVIEW);
   }, [navigate, sendTelemetry, telemetryPathName]);
 
-  const initialValues = useMemo(() => omit(template, ['id']), [template]);
+  const initialValues = useMemo(() => template, [template]);
 
   return (
     <TemplateForm onCancel={onCancel} submitButtonText="Update template" submitLoadingText="Updating template..." onSubmit={onSubmit} initialValues={initialValues} />

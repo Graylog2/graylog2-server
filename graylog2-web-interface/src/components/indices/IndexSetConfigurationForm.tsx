@@ -219,7 +219,7 @@ const IndexSetConfigurationForm = ({
       return legacyConfig;
     }
 
-    const configWithDataTiering = prepareDataTieringConfig(values, PluginStore);
+    const configWithDataTiering = { ...values, data_tiering: prepareDataTieringConfig(values.data_tiering, PluginStore) };
 
     if (loadingIndexDefaultsConfig || !indexDefaultsConfig) return { ...configWithDataTiering, use_legacy_rotation: false };
 
@@ -259,12 +259,20 @@ const IndexSetConfigurationForm = ({
 
   if (loadingIndexDefaultsConfig) return (<Spinner />);
 
+  const prepareInitialValues = () => {
+    if (indexSet.data_tiering) {
+      return { ...indexSet, data_tiering: prepareDataTieringInitialValues(indexSet.data_tiering) };
+    }
+
+    return indexSet as unknown as IndexSetFormValues;
+  };
+
   return (
     <Row>
       <Col md={8}>
         <Formik onSubmit={saveConfiguration}
                 enableReinitialize
-                initialValues={prepareDataTieringInitialValues(indexSet)}>
+                initialValues={prepareInitialValues()}>
           {({ isValid, setFieldValue, isSubmitting, values }) => (
             <IndexRetentionProvider>
               <Form>

@@ -15,10 +15,20 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+import type { IndexSetsDefaultConfiguration, IndexSetsDefaultConfigurationFormValues } from 'stores/indices/IndexSetsStore';
+
 export type IndexSetTemplate = {
   id: string,
   title: string,
   description: string,
   built_in: boolean,
-  index_set_config: any,
+  index_set_config: IndexSetsDefaultConfiguration,
+}
+
+export type IndexSetTemplateFormValues = {
+  id: string,
+  title: string,
+  description: string,
+  built_in: boolean,
+  index_set_config: IndexSetsDefaultConfigurationFormValues,
 }

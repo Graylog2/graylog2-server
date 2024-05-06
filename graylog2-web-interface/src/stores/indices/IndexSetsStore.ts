@@ -73,7 +73,7 @@ type IndexSetConfig = {
   use_legacy_rotation?: boolean
 }
 
-export type IndexSetsDefaultConfiguration = Pick<IndexSetConfig,
+type IndexSetDefaultFields = Pick<IndexSetConfig,
   'index_prefix' |
   'index_analyzer' |
   'shards' |
@@ -83,11 +83,20 @@ export type IndexSetsDefaultConfiguration = Pick<IndexSetConfig,
   'field_type_refresh_interval' |
   'rotation_strategy_class' |
   'retention_strategy_class'
-> & {
+>
+
+export type IndexSetsDefaultConfiguration = IndexSetDefaultFields & {
   rotation_strategy_config: RotationStrategyConfig,
   retention_strategy_config: RetentionStrategyConfig,
   field_type_refresh_interval_unit: 'seconds' | 'minutes',
   data_tiering: DataTieringConfig
+}
+
+export type IndexSetsDefaultConfigurationFormValues = IndexSetDefaultFields & {
+  rotation_strategy_config: RotationStrategyConfig,
+  retention_strategy_config: RetentionStrategyConfig,
+  field_type_refresh_interval_unit: 'seconds' | 'minutes',
+  data_tiering: DataTieringFormValues
 }
 
 export type IndexSet = IndexSetConfig & { data_tiering?: DataTieringConfig };
