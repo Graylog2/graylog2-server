@@ -25,6 +25,7 @@ import jakarta.inject.Inject;
 import org.bson.BsonDocument;
 import org.bson.BsonDocumentWriter;
 import org.bson.codecs.EncoderContext;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog2.database.MongoCollections;
 
@@ -47,21 +48,24 @@ public class DBCustomJobDefinitionService {
 
     public JobDefinitionDto findOrCreate(JobDefinitionDto dto) {
         var jobDefinitionId = new ObjectId(requireNonNull(dto.id(), "Job definition ID cannot be null"));
+        return executeFindOrCreate(dto, Filters.and(
+                Filters.eq("_id", jobDefinitionId),
+                Filters.eq(f("%s.%s", JobDefinitionDto.FIELD_CONFIG, JobDefinitionConfig.TYPE_FIELD), dto.config().type())
+        ));
+    }
 
+    public JobDefinitionDto findByConfigFieldOrCreate(String configField, String configValue, JobDefinitionDto defaultValue) {
+        return executeFindOrCreate(defaultValue,
+                Filters.eq(f("%s.%s", JobDefinitionDto.FIELD_CONFIG, configField), configValue));
+    }
+
+    private JobDefinitionDto executeFindOrCreate(JobDefinitionDto dto, Bson filters) {
         final var codec = db.getCodecRegistry().get(JobDefinitionDto.class);
         try (final var writer = new BsonDocumentWriter(new BsonDocument())) {
             // Convert the DTO class to a Bson object, so we can use it with $setOnInsert
             codec.encode(writer, dto, EncoderContext.builder().build());
-
-            return db.findOneAndUpdate(
-                    Filters.and(
-                            Filters.eq("_id", jobDefinitionId),
-                            Filters.eq(f("%s.%s", JobDefinitionDto.FIELD_CONFIG, JobDefinitionConfig.TYPE_FIELD), dto.config().type())
-                    ),
-                    Updates.setOnInsert(writer.getDocument()),
-                    new FindOneAndUpdateOptions()
-                            .returnDocument(ReturnDocument.AFTER)
-                            .upsert(true)
+            return db.findOneAndUpdate(filters, Updates.setOnInsert(writer.getDocument()),
+                    new FindOneAndUpdateOptions().returnDocument(ReturnDocument.AFTER).upsert(true)
             );
         }
     }
