@@ -18,7 +18,6 @@ package org.graylog.scheduler;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mongodb.BasicDBObject;
 import jakarta.inject.Inject;
 import one.util.streamex.StreamEx;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -59,11 +58,12 @@ public class DBJobDefinitionService extends PaginatedDbService<JobDefinitionDto>
      * @return the job definition with the given config field, or an empty optional
      */
     public Optional<JobDefinitionDto> getByConfigField(String configField, Object value) {
-        return Optional.ofNullable(db.findOne(byConfigFieldFilter(configField, value)));
+        final String field = String.format(Locale.US, "%s.%s", JobDefinitionDto.FIELD_CONFIG, configField);
+        return Optional.ofNullable(db.findOne(byConfigFieldFilter(field, value)));
     }
 
     private static DBQuery.Query byConfigFieldFilter(String field, Object value) {
-        return DBQuery.is(String.format(Locale.US, "%s.%s", JobDefinitionDto.FIELD_CONFIG, field), value);
+        return DBQuery.is(field, value);
     }
 
     public List<JobDefinitionDto> getByQuery(DBQuery.Query query) {
@@ -89,8 +89,7 @@ public class DBJobDefinitionService extends PaginatedDbService<JobDefinitionDto>
         return jobDefinition -> objectMapper.convertValue(jobDefinition.config(), JsonNode.class).path(key).asText();
     }
 
-    public JobDefinitionDto upsertByConfigField(JobDefinitionDto dto, String field, Object fieldValue) {
-        final BasicDBObject none = new BasicDBObject();
-        return db.findAndModify(byConfigFieldFilter(field, fieldValue), none, none, false, dto, true, true);
+    public String upsertByConfigField(JobDefinitionDto dto, String field, Object fieldValue) {
+        return db.update(byConfigFieldFilter(field, fieldValue), dto, true, false).getUpsertedId().toString();
     }
 }
