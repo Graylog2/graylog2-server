@@ -27,10 +27,8 @@ import com.google.common.eventbus.Subscribe;
 import com.google.common.net.HostAndPort;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.container.DynamicFeature;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.ext.ContextResolver;
@@ -52,7 +50,6 @@ import org.graylog.datanode.opensearch.OpensearchConfigurationChangeEvent;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
 import org.graylog.datanode.rest.config.SecuredNodeAnnotationFilter;
 import org.graylog.security.certutil.CertConstants;
-import org.graylog2.bootstrap.preflight.web.BasicAuthFilter;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.rest.MoreMediaTypes;
@@ -235,7 +232,7 @@ public class JerseyService extends AbstractIdleService {
         final ResourceConfig resourceConfig = buildResourceConfig(additionalResources);
 
         if (isSecuredInstance) {
-            resourceConfig.register(createAuthFilter(configuration));
+            resourceConfig.register(new JwtTokenAuthFilter(configuration.getPasswordSecret()));
         }
         resourceConfig.register(new SecuredNodeAnnotationFilter(configuration.isInsecureStartup()));
 
@@ -262,13 +259,6 @@ public class JerseyService extends AbstractIdleService {
         }
 
         return httpServer;
-    }
-
-    @Nonnull
-    private ContainerRequestFilter createAuthFilter(Configuration configuration) {
-        final ContainerRequestFilter basicAuthFilter = new BasicAuthFilter(configuration.getRootUsername(), configuration.getRootPasswordSha2(), "Datanode");
-        final AuthTokenValidator tokenVerifier = new JwtTokenValidator(configuration.getPasswordSecret());
-        return new DatanodeAuthFilter(basicAuthFilter, tokenVerifier);
     }
 
     private SSLEngineConfigurator buildSslEngineConfigurator(KeystoreInformation keystoreInformation)

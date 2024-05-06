@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.MutableGraph;
 import org.graylog.events.processor.EventProcessorConfig;
@@ -158,7 +157,7 @@ public abstract class AggregationEventProcessorConfigEntity implements EventProc
                 .type(type())
                 .query(query().asString(parameters))
                 .streams(streamSet)
-                .filters(ImmutableList.copyOf(filters()))
+                .filters(filters().stream().map(filter -> filter.toNativeEntity(parameters, nativeEntities)).toList())
                 .groupBy(groupBy())
                 .series(series().stream().map(s -> s.toNativeEntity()).toList())
                 .conditions(conditions().orElse(null))
@@ -177,5 +176,7 @@ public abstract class AggregationEventProcessorConfigEntity implements EventProc
                 .map(id -> resolveStreamEntity(id, entities))
                 .filter(Objects::nonNull)
                 .forEach(stream -> graph.putEdge(entity, stream));
+
+        filters().forEach(filter -> filter.resolveForInstallation(entity, parameters, entities, graph));
     }
 }

@@ -116,6 +116,6 @@ public class DashboardV1Facade extends ViewFacade {
 
         final DashboardEntity dashboardEntity = objectMapper.convertValue(entity.data(), DashboardEntity.class);
         final ViewEntity viewEntity = entityConverter.convert(dashboardEntity, parameters);
-        return resolveViewEntity(entity, viewEntity, entities);
+        return resolveViewEntity(entity, viewEntity, parameters, entities);
     }
 }

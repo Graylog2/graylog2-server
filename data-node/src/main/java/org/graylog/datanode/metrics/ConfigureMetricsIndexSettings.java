@@ -74,7 +74,7 @@ public class ConfigureMetricsIndexSettings implements StateMachineTracer {
 
     @Override
     public void transition(OpensearchEvent trigger, OpensearchState source, OpensearchState destination) {
-        if (destination == OpensearchState.AVAILABLE && source == OpensearchState.STARTING) {
+        if (destination == OpensearchState.AVAILABLE && source == OpensearchState.STARTING && process.isManagerNode()) {
             process.openSearchClient().ifPresent(client -> {
                 final IsmApi ismApi = new IsmApi(client, objectMapper);
                 int replicas = nodeService.allActive().size() == 1 ? 0 : 1;
