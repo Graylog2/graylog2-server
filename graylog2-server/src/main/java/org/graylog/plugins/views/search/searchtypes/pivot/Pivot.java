@@ -21,13 +21,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import com.google.common.graph.MutableGraph;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.SearchType;
+import org.graylog.plugins.views.search.SearchTypeBuilder;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.rest.SearchTypeExecutionState;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog2.contentpacks.EntityDescriptorIds;
+import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.PivotEntity;
 import org.graylog2.contentpacks.model.entities.SearchTypeEntity;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
@@ -89,21 +92,6 @@ public abstract class Pivot implements SearchType {
         return this;
     }
 
-    @Override
-    public SearchType withQuery(BackendQuery query) {
-        return toBuilder().query(query).build();
-    }
-
-    @Override
-    public SearchType withFilter(Filter filter) {
-        return toBuilder().filter(filter).build();
-    }
-
-    @Override
-    public SearchType withFilters(List<UsedSearchFilter> filters) {
-        return toBuilder().filters(filters).build();
-    }
-
     public static Builder builder() {
         return new AutoValue_Pivot.Builder()
                 .type(NAME)
@@ -115,7 +103,7 @@ public abstract class Pivot implements SearchType {
     }
 
     @AutoValue.Builder
-    public static abstract class Builder {
+    public static abstract class Builder implements SearchTypeBuilder {
         @JsonCreator
         public static Builder createDefault() {
             return builder()
@@ -203,7 +191,7 @@ public abstract class Pivot implements SearchType {
                 .columnGroups(columnGroups())
                 .rowGroups(rowGroups())
                 .filter(filter())
-                .filters(filters())
+                .filters(filters().stream().map(filter -> filter.toContentPackEntity(entityDescriptorIds)).toList())
                 .query(query().orElse(null))
                 .id(id())
                 .name(name().orElse(null))
@@ -211,5 +199,10 @@ public abstract class Pivot implements SearchType {
                 .series(series())
                 .type(type());
         return builder.build();
+    }
+
+    @Override
+    public void resolveNativeEntity(EntityDescriptor entityDescriptor, MutableGraph<EntityDescriptor> mutableGraph) {
+        filters().forEach(filter -> filter.resolveNativeEntity(entityDescriptor, mutableGraph));
     }
 }

@@ -17,6 +17,7 @@
 package org.graylog2.database.jackson.legacy;
 
 import com.mongodb.MongoException;
+import com.mongodb.ReadPreference;
 import com.mongodb.client.result.InsertManyResult;
 import org.bson.BsonValue;
 import org.mongojack.JacksonMongoCollection;
@@ -35,7 +36,7 @@ public class LegacyInsertManyResult<T, K> implements WriteResult<T, K> {
 
     public LegacyInsertManyResult(JacksonMongoCollection<T> collection, InsertManyResult insertManyResult,
                                   Class<K> idType) {
-        this.collection = collection;
+        this.collection = collection.withReadPreference(ReadPreference.primary());
         this.insertOneResult = insertManyResult;
         this.idType = idType;
     }

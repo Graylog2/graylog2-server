@@ -24,13 +24,14 @@ import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import validateQuery from 'views/components/searchbar/queryvalidation/validateQuery';
 import mockSearchesClusterConfig from 'fixtures/searchClusterConfig';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useAppDispatch from 'stores/useAppDispatch';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 
 import OriginalSearchBar from './SearchBar';
 
+jest.mock('hooks/useHotkey', () => jest.fn());
 jest.mock('views/logic/fieldtypes/useFieldTypes');
 
 jest.mock('stores/streams/StreamsStore', () => MockStore(
@@ -72,9 +73,7 @@ const SearchBar = () => (
 );
 
 describe('SearchBar', () => {
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   beforeEach(() => {
     asMock(useSearchConfiguration).mockReturnValue({ config: mockSearchesClusterConfig, refresh: () => {} });

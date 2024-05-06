@@ -18,19 +18,22 @@ package org.graylog.datanode.periodicals;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import org.graylog.datanode.Configuration;
-import org.graylog.datanode.management.OpensearchProcess;
 import org.graylog.datanode.metrics.ClusterStatMetricsCollector;
 import org.graylog.datanode.metrics.NodeMetricsCollector;
-import org.graylog.datanode.process.ProcessState;
+import org.graylog.datanode.opensearch.OpensearchProcess;
+import org.graylog.datanode.opensearch.statemachine.OpensearchState;
 import org.graylog.shaded.opensearch2.org.joda.time.DateTime;
 import org.graylog.shaded.opensearch2.org.joda.time.DateTimeZone;
 import org.graylog.shaded.opensearch2.org.opensearch.action.index.IndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.index.IndexResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
+import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog.shaded.opensearch2.org.opensearch.core.action.ActionListener;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
@@ -38,7 +41,6 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSource
 import org.graylog.shaded.opensearch2.org.opensearch.search.sort.SortBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.sort.SortOrder;
 import org.graylog2.plugin.periodical.Periodical;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +52,7 @@ import java.lang.management.MemoryUsage;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 public class MetricsCollector extends Periodical {
 
@@ -59,7 +62,6 @@ public class MetricsCollector extends Periodical {
     private NodeMetricsCollector nodeStatMetricsCollector;
     private ClusterStatMetricsCollector clusterStatMetricsCollector;
     private final ObjectMapper objectMapper;
-    private boolean isLeader;
 
     @Inject
     public MetricsCollector(OpensearchProcess process, Configuration configuration, ObjectMapper objectMapper) {
@@ -98,7 +100,7 @@ public class MetricsCollector extends Periodical {
         return 60;
     }
 
-    @NotNull
+    @Nonnull
     @Override
     protected Logger getLogger() {
         return LOG;
@@ -106,12 +108,10 @@ public class MetricsCollector extends Periodical {
 
     @Override
     public void doRun() {
-        if (process.isInState(ProcessState.AVAILABLE)) {
+        if (process.isInState(OpensearchState.AVAILABLE)) {
             process.restClient().ifPresent(client -> {
                 this.nodeStatMetricsCollector = new NodeMetricsCollector(client, objectMapper);
                 this.clusterStatMetricsCollector = new ClusterStatMetricsCollector(client, objectMapper);
-                this.isLeader = process.isLeaderNode();
-
                 final IndexRequest indexRequest = new IndexRequest(configuration.getMetricsStream());
                 Map<String, Object> metrics = new HashMap<String, Object>();
                 metrics.put(configuration.getMetricsTimestamp(), new DateTime(DateTimeZone.UTC));
@@ -122,14 +122,33 @@ public class MetricsCollector extends Periodical {
                 indexRequest.source(metrics);
                 indexDocument(client, indexRequest);
 
-                if (isLeader) {
+                if (isManagerNode(process)) {
                     metrics = new HashMap<>(clusterStatMetricsCollector.getClusterMetrics(getPreviousMetricsForCluster(client)));
                     metrics.put(configuration.getMetricsTimestamp(), new DateTime(DateTimeZone.UTC));
                     indexRequest.source(metrics);
                     indexDocument(client, indexRequest);
                 }
-
             });
+        }
+    }
+
+    public boolean isManagerNode(OpensearchProcess process) {
+        return process.restClient()
+                .flatMap(this::requestClusterState)
+                .map(r -> r.nodes().get(r.clusterManagerNode()))
+                .map(managerNode -> configuration.getDatanodeNodeName().equals(managerNode.name()))
+                .orElse(false);
+    }
+
+
+    private Optional<ClusterStateResponse> requestClusterState(RestHighLevelClient client) {
+        try {
+            final Response response = client.getLowLevelClient().performRequest(new Request("GET", "_cluster/state/"));
+            final ClusterStateResponse state = objectMapper.readValue(response.getEntity().getContent(), ClusterStateResponse.class);
+            return Optional.of(state);
+        } catch (IOException e) {
+            LOG.warn("Failed to obtain cluster state response", e);
+            return Optional.empty();
         }
     }
 

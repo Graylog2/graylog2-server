@@ -17,7 +17,7 @@
 package org.graylog.datanode.periodicals;
 
 import org.graylog.datanode.Configuration;
-import org.graylog.datanode.process.ProcessState;
+import org.graylog.datanode.opensearch.statemachine.OpensearchState;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
@@ -30,7 +30,7 @@ import java.net.URI;
 class NodePingPeriodicalTest {
 
     @Test
-    void doRun() throws NodeNotFoundException {
+    void doRun() {
 
         final SimpleNodeId nodeID = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
         final URI uri = URI.create("http://localhost:9200");
@@ -49,19 +49,17 @@ class NodePingPeriodicalTest {
                 () -> uri,
                 () -> cluster,
                 () -> datanodeRestApi,
-                () -> true,
-                () -> ProcessState.AVAILABLE
+                () -> OpensearchState.AVAILABLE
         );
 
         task.doRun();
 
         Mockito.verify(nodeService).ping(Mockito.eq(DataNodeDto.Builder.builder()
                 .setId(nodeID.getNodeId())
-                .setLeader(true)
                 .setTransportAddress(uri.toString())
                 .setClusterAddress(cluster)
                 .setRestApiAddress(datanodeRestApi)
-                .setDataNodeStatus(ProcessState.AVAILABLE.getDataNodeStatus())
+                .setDataNodeStatus(OpensearchState.AVAILABLE.getDataNodeStatus())
                 .setHostname("localhost")
                 .build()
         ));

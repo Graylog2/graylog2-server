@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Remove datanode leader flag. It's neither needed nor used."
+
+issues = ["18861"]
+pulls = ["19170"]

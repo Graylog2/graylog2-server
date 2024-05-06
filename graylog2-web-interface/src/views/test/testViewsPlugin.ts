@@ -20,8 +20,8 @@ import viewsBindings from 'views/bindings';
 
 const testViewsPlugin = new PluginManifest({}, viewsBindings);
 
-export const loadViewsPlugin = () => PluginStore.register(testViewsPlugin);
-export const unloadViewsPlugin = () => PluginStore.unregister(testViewsPlugin);
+const loadViewsPlugin = () => PluginStore.register(testViewsPlugin);
+const unloadViewsPlugin = () => PluginStore.unregister(testViewsPlugin);
 
 const useViewsPlugin = () => {
   beforeAll(loadViewsPlugin);

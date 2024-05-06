@@ -24,7 +24,7 @@ import { renderHook } from 'wrappedTestingLibrary/hooks';
 import { asMock, StoreMock as MockStore } from 'helpers/mocking';
 import fetch from 'logic/rest/FetchProvider';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import SearchExplainContextProvider from 'views/components/contexts/SearchExplainContextProvider';
 import SearchExplainContext from 'views/components/contexts/SearchExplainContext';
 
@@ -108,9 +108,7 @@ const mockData = {
 };
 
 describe('SearchExplainContextProvider', () => {
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   afterEach(() => {
     jest.clearAllMocks();

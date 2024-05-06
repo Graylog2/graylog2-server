@@ -34,7 +34,7 @@ import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visuali
 import { asMock } from 'helpers/mocking';
 import useViewType from 'views/hooks/useViewType';
 import TestStoreProvider from 'views/test/TestStoreProvider';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import { updateWidget } from 'views/logic/slices/widgetActions';
 
 import Widget from './Widget';
@@ -47,6 +47,7 @@ import FieldTypesContext from '../contexts/FieldTypesContext';
 const testTimeout = applyTimeoutMultiplier(60000);
 const mockedUnixTime = 1577836800000; // 2020-01-01 00:00:00.000
 
+jest.mock('hooks/useHotkey', () => jest.fn());
 jest.mock('./WidgetHeader', () => 'widget-header');
 jest.mock('./WidgetColorContext', () => ({ children }) => children);
 jest.mock('views/logic/fieldtypes/useFieldTypes');
@@ -77,9 +78,7 @@ jest.mock('views/logic/slices/widgetActions', () => ({
 const selectEventConfig = { container: document.body };
 
 describe('Aggregation Widget', () => {
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   const dataTableWidget = WidgetModel.builder().newId()
     .type('AGGREGATION')
@@ -219,6 +218,7 @@ describe('Aggregation Widget', () => {
       await userEvent.click(absoluteTabButton);
 
       const applyTimeRangeChangesButton = await screen.findByRole('button', { name: 'Update time range' });
+      await waitFor(() => expect(applyTimeRangeChangesButton).not.toBeDisabled());
       await userEvent.click(applyTimeRangeChangesButton);
 
       const timeRangeDisplay = await screen.findByLabelText('Search Time Range, Opens Time Range Selector On Click');

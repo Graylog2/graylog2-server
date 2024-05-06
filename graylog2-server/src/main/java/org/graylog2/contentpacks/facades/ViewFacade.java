@@ -187,12 +187,16 @@ public abstract class ViewFacade implements EntityWithExcerptFacade<ViewDTO, Vie
         mutableGraph.addNode(entityDescriptor);
 
         final ModelId modelId = entityDescriptor.id();
+        final ViewDTO view = viewService.get(modelId.id()).
+                orElseThrow(() -> new NoSuchElementException("Could not find view with id " + modelId.id()));
+        view.resolveNativeEntity(entityDescriptor, mutableGraph);
         final ViewSummaryDTO viewSummaryDTO = viewSummaryService.get(modelId.id()).
                 orElseThrow(() -> new NoSuchElementException("Could not find view with id " + modelId.id()));
         final Search search = searchDbService.get(viewSummaryDTO.searchId()).
                 orElseThrow(() -> new NoSuchElementException("Could not find search with id " + viewSummaryDTO.searchId()));
         search.usedStreamIds().stream().map(s -> EntityDescriptor.create(s, ModelTypes.STREAM_REF_V1))
                 .forEach(streamDescriptor -> mutableGraph.putEdge(entityDescriptor, streamDescriptor));
+        search.resolveNativeEntity(entityDescriptor, mutableGraph);
         return ImmutableGraph.copyOf(mutableGraph);
     }
 
@@ -202,19 +206,21 @@ public abstract class ViewFacade implements EntityWithExcerptFacade<ViewDTO, Vie
                                                 Map<String, ValueReference> parameters,
                                                 Map<EntityDescriptor, Entity> entities) {
         ensureV1(entity);
-        return resolveEntityV1((EntityV1) entity, entities);
+        return resolveEntityV1((EntityV1) entity, parameters, entities);
     }
 
     @SuppressWarnings("UnstableApiUsage")
     private Graph<Entity> resolveEntityV1(EntityV1 entity,
+                                          Map<String, ValueReference> parameters,
                                           Map<EntityDescriptor, Entity> entities) {
         final ViewEntity viewEntity = objectMapper.convertValue(entity.data(), ViewEntity.class);
-        return resolveViewEntity(entity, viewEntity, entities);
+        return resolveViewEntity(entity, viewEntity, parameters, entities);
     }
 
     @SuppressWarnings("UnstableApiUsage")
     protected Graph<Entity> resolveViewEntity(EntityV1 entity,
                                               ViewEntity viewEntity,
+                                              Map<String, ValueReference> parameters,
                                               Map<EntityDescriptor, Entity> entities) {
         final MutableGraph<Entity> mutableGraph = GraphBuilder.directed().build();
         mutableGraph.addNode(entity);
@@ -228,6 +234,7 @@ public abstract class ViewFacade implements EntityWithExcerptFacade<ViewDTO, Vie
                 .map(id -> resolveStreamEntity(id, entities))
                 .filter(Objects::nonNull)
                 .forEach(stream -> mutableGraph.putEdge(entity, stream));
+        viewEntity.resolveForInstallation(entity, parameters, entities, mutableGraph);
         return ImmutableGraph.copyOf(mutableGraph);
     }
 }

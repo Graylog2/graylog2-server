@@ -40,4 +40,6 @@ public abstract class TimeRange {
 
     @JsonIgnore
     public abstract DateTime getTo();
+
+    public abstract TimeRange withReferenceDate(DateTime now);
 }

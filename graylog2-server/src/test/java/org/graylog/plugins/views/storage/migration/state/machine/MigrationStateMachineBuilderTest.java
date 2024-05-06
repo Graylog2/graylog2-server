@@ -18,7 +18,7 @@ package org.graylog.plugins.views.storage.migration.state.machine;
 
 import com.github.oxo42.stateless4j.StateMachine;
 import org.graylog.plugins.views.storage.migration.state.actions.MigrationActions;
-import org.jetbrains.annotations.NotNull;
+import jakarta.annotation.Nonnull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -69,16 +69,21 @@ public class MigrationStateMachineBuilderTest {
         stateMachine.fire(MigrationStep.SHOW_CA_CREATION);
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.CA_CREATION_PAGE);
         assertThat(stateMachine.getPermittedTriggers()).isEmpty();
+        verify(migrationActions, times(2)).caDoesNotExist();
+        verify(migrationActions, times(1)).caAndRenewalPolicyExist();
+        reset(migrationActions);
+        when(migrationActions.caDoesNotExist()).thenReturn(false);
+        when(migrationActions.renewalPolicyDoesNotExist()).thenReturn(true);
+        assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SHOW_RENEWAL_POLICY_CREATION);
+        verify(migrationActions, times(1)).caDoesNotExist();
         verify(migrationActions, times(1)).renewalPolicyDoesNotExist();
         verify(migrationActions, times(1)).caAndRenewalPolicyExist();
         reset(migrationActions);
-        when(migrationActions.renewalPolicyDoesNotExist()).thenReturn(true);
-        assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SHOW_RENEWAL_POLICY_CREATION);
-        verify(migrationActions, times(1)).caAndRenewalPolicyExist();
-        reset(migrationActions);
+        when(migrationActions.caDoesNotExist()).thenReturn(false);
         when(migrationActions.renewalPolicyDoesNotExist()).thenReturn(false);
         when(migrationActions.caAndRenewalPolicyExist()).thenReturn(true);
         assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SHOW_MIGRATION_SELECTION);
+        verify(migrationActions, times(1)).caDoesNotExist();
         verify(migrationActions, times(1)).renewalPolicyDoesNotExist();
         verify(migrationActions, times(1)).caAndRenewalPolicyExist();
         verifyNoMoreInteractions(migrationActions);
@@ -291,7 +296,7 @@ public class MigrationStateMachineBuilderTest {
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.FINISHED);
     }
 
-    @NotNull
+    @Nonnull
     private StateMachine<MigrationState, MigrationStep> getStateMachine(MigrationState initialState) {
         return MigrationStateMachineBuilder.buildWithTestState(initialState, migrationActions);
     }

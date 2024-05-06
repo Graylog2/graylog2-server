@@ -86,6 +86,11 @@ public abstract class KeywordRange extends TimeRange {
         }
     }
 
+    @Override
+    public TimeRange withReferenceDate(DateTime now) {
+        return this;
+    }
+
     @AutoValue.Builder
     public abstract static class Builder {
         public abstract Builder keyword(String keyword);

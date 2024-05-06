@@ -26,6 +26,7 @@ import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
+import com.google.common.graph.MutableGraph;
 import com.google.common.graph.Traverser;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.engine.BackendQuery;
@@ -40,6 +41,7 @@ import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.searchfilters.model.UsesSearchFilters;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
+import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.QueryEntity;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
@@ -90,25 +92,10 @@ public abstract class Query implements ContentPackable<QueryEntity>, UsesSearchF
     @JsonIgnore
     public abstract Optional<GlobalOverride> globalOverride();
 
-    @Deprecated
-    /**
-     * @deprecated {@link Query#effectiveTimeRange(SearchType, DateTime)} is preferred, as it prevents problems with slight time differences between different search types.
-     */
     public TimeRange effectiveTimeRange(SearchType searchType) {
         return searchType.timerange()
                 .map(timeRange -> timeRange.effectiveTimeRange(this, searchType))
                 .orElse(this.timerange());
-    }
-
-    public TimeRange effectiveTimeRange(final SearchType searchType, final DateTime nowUTC) {
-        final TimeRange effectiveTimeRange = searchType.timerange()
-                .map(timeRange -> timeRange.effectiveTimeRange(this, searchType))
-                .orElse(this.timerange());
-
-        if (effectiveTimeRange instanceof RelativeRange) {
-            return ((RelativeRange) effectiveTimeRange).toBuilder().nowUTC(nowUTC).build();
-        }
-        return effectiveTimeRange;
     }
 
     public Set<String> effectiveStreams(SearchType searchType) {
@@ -141,15 +128,23 @@ public abstract class Query implements ContentPackable<QueryEntity>, UsesSearchF
             return this;
         }
 
-        if (state.timerange().isPresent() || state.query().isPresent() || !state.searchTypes().isEmpty() || !state.keepSearchTypes().isEmpty() || !state.keepQueries().isEmpty()) {
+        if (state.timerange().isPresent()
+                || state.query().isPresent()
+                || !state.searchTypes().isEmpty()
+                || !state.keepSearchTypes().isEmpty()
+                || !state.keepQueries().isEmpty()
+                || state.now().isPresent()) {
             final Builder builder = toBuilder();
 
             if (state.timerange().isPresent() || state.query().isPresent()) {
                 final GlobalOverride.Builder globalOverrideBuilder = globalOverride().map(GlobalOverride::toBuilder)
                         .orElseGet(GlobalOverride::builder);
                 state.timerange().ifPresent(timeRange -> {
-                    globalOverrideBuilder.timerange(timeRange);
-                    builder.timerange(timeRange);
+                    final var timerangeWithNow = state.now()
+                            .map(timeRange::withReferenceDate)
+                            .orElse(timeRange);
+                    globalOverrideBuilder.timerange(timerangeWithNow);
+                    builder.timerange(timerangeWithNow);
                 });
 
                 state.query().ifPresent(query -> {
@@ -169,6 +164,7 @@ public abstract class Query implements ContentPackable<QueryEntity>, UsesSearchF
 
                 builder.searchTypes(ImmutableSet.copyOf(searchTypesWithOverrides));
             }
+
             return builder.build();
         }
         return this;
@@ -249,6 +245,15 @@ public abstract class Query implements ContentPackable<QueryEntity>, UsesSearchF
                 .anyMatch(id -> id.equals(searchTypeId));
     }
 
+    public Query withReferenceDate(DateTime now) {
+        return toBuilder()
+                .timerange(timerange().withReferenceDate(now))
+                .searchTypes(searchTypes().stream()
+                        .map(s -> s.withReferenceDate(now))
+                        .collect(toSet()))
+                .build();
+    }
+
     @AutoValue.Builder
     @JsonPOJOBuilder(withPrefix = "")
     public abstract static class Builder {
@@ -322,11 +327,16 @@ public abstract class Query implements ContentPackable<QueryEntity>, UsesSearchF
                 .searchTypes(searchTypes().stream().map(s -> s.toContentPackEntity(entityDescriptorIds))
                         .collect(Collectors.toSet()))
                 .filter(shallowMappedFilter(entityDescriptorIds))
-                .filters(filters())
+                .filters(filters().stream().map(filter -> filter.toContentPackEntity(entityDescriptorIds)).toList())
                 .query(query())
                 .id(id())
                 .globalOverride(globalOverride().orElse(null))
                 .timerange(timerange())
                 .build();
+    }
+
+    @Override
+    public void resolveNativeEntity(EntityDescriptor entityDescriptor, MutableGraph<EntityDescriptor> mutableGraph) {
+        filters().forEach(filter -> filter.resolveNativeEntity(entityDescriptor, mutableGraph));
     }
 }

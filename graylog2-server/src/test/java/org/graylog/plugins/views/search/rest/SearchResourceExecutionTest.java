@@ -35,8 +35,10 @@ import org.graylog.plugins.views.search.engine.validation.PluggableSearchValidat
 import org.graylog.plugins.views.search.events.SearchJobExecutionEvent;
 import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.shared.rest.exceptions.MissingStreamPermissionException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -58,6 +60,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -85,7 +88,9 @@ public class SearchResourceExecutionTest {
     private SearchUser searchUser;
 
     @Mock
-    private NodeId nodeId;
+    private ClusterConfigService clusterConfigService;
+
+    private final NodeId nodeId = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
 
     private SearchResource searchResource;
 
@@ -93,7 +98,6 @@ public class SearchResourceExecutionTest {
 
     @BeforeEach
     public void setUp() {
-        doReturn("The-best-node").when(nodeId).getNodeId();
         this.searchJobService = new InMemorySearchJobService(nodeId);
         final SearchExecutor searchExecutor = new SearchExecutor(searchDomain,
                 searchJobService,
@@ -101,7 +105,7 @@ public class SearchResourceExecutionTest {
                 new PluggableSearchValidation(executionGuard, Collections.emptySet()),
                 new PluggableSearchNormalization(Collections.emptySet()));
 
-        this.searchResource = new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus) {
+        this.searchResource = new SearchResource(searchDomain, searchExecutor, searchJobService, eventBus, clusterConfigService) {
             @Override
             protected User getCurrentUser() {
                 return currentUser;
@@ -164,7 +168,7 @@ public class SearchResourceExecutionTest {
 
         final SearchDTO search = makeSearchDTO();
 
-        final SearchJob searchJob = new SearchJob("deadbeef", search.toSearch(), "peterchen", "The-best-node");
+        final SearchJob searchJob = new SearchJob("deadbeef", search.toSearch(), "peterchen", "5ca1ab1e-0000-4000-a000-000000000000");
         searchJob.addQueryResultFuture("query", CompletableFuture.completedFuture(QueryResult.emptyResult()));
         searchJob.seal();
 

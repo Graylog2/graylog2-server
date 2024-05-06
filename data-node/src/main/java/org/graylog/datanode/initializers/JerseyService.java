@@ -27,6 +27,7 @@ import com.google.common.eventbus.Subscribe;
 import com.google.common.net.HostAndPort;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.ws.rs.container.ContainerRequestFilter;
@@ -47,8 +48,8 @@ import org.glassfish.jersey.server.model.Resource;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.variants.KeystoreInformation;
 import org.graylog.datanode.configuration.variants.OpensearchSecurityConfiguration;
-import org.graylog.datanode.management.OpensearchConfigurationChangeEvent;
-import org.graylog.datanode.process.OpensearchConfiguration;
+import org.graylog.datanode.opensearch.OpensearchConfigurationChangeEvent;
+import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
 import org.graylog.datanode.rest.config.SecuredNodeAnnotationFilter;
 import org.graylog.security.certutil.CertConstants;
 import org.graylog2.bootstrap.preflight.web.BasicAuthFilter;
@@ -58,7 +59,6 @@ import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.shared.rest.exceptionmappers.JacksonPropertyExceptionMapper;
 import org.graylog2.shared.rest.exceptionmappers.JsonProcessingExceptionMapper;
 import org.graylog2.shared.security.tls.KeyStoreUtils;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -264,7 +264,7 @@ public class JerseyService extends AbstractIdleService {
         return httpServer;
     }
 
-    @NotNull
+    @Nonnull
     private ContainerRequestFilter createAuthFilter(Configuration configuration) {
         final ContainerRequestFilter basicAuthFilter = new BasicAuthFilter(configuration.getRootUsername(), configuration.getRootPasswordSha2(), "Datanode");
         final AuthTokenValidator tokenVerifier = new JwtTokenValidator(configuration.getPasswordSecret());
