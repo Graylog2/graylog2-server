@@ -152,6 +152,7 @@ describe('<WidgetActionsMenu />', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     asMock(createSearch).mockImplementation(async (s) => s);
+    asMock(useWidgetResults).mockReturnValue({ widgetData: {}, error: [] });
   });
 
   it('is updating widget focus context on focus', async () => {
@@ -431,7 +432,6 @@ describe('<WidgetActionsMenu />', () => {
 
     describe('Export aggregation widget', () => {
       it('does not display export aggregation action if widget is an aggregation', async () => {
-        asMock(useWidgetResults).mockReturnValue({ widgetData: {}, error: [] });
         const messagesWidget = MessagesWidget.builder()
           .id('widgetId')
           .config({})
@@ -443,7 +443,6 @@ describe('<WidgetActionsMenu />', () => {
       });
 
       it('allows export for aggregation widget', async () => {
-        asMock(useWidgetResults).mockReturnValue({ widgetData: {}, error: [] });
         const aggregationWidget = AggregationWidget.builder()
           .id('widgetId')
           .config({})
