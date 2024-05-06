@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix manage extractors link for local input"
+
+issues = [19111]
+pulls = ["19260"]
