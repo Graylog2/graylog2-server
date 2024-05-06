@@ -52,7 +52,7 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props
   const [, setAceLoaded] = useState(false);
   const [ruleSource, setRuleSource] = useState(rule?.source);
   const [description, setDescription] = useState(rule?.description);
-  const [rawMessageToSimulate, setRawMessageToSimulate] = useState(DEFAULT_SIMULATOR_JSON_MESSAGE);
+  const [rawMessageToSimulate, setRawMessageToSimulate] = useState('');
   const [ruleSimulationResult, setRuleSimulationResult] = useState(null);
 
   useEffect(() => {
@@ -184,6 +184,6 @@ PipelineRulesProvider.defaultProps = {
   rule: {
     description: '',
     source: '',
-    simulator_message: DEFAULT_SIMULATOR_JSON_MESSAGE,
+    simulator_message: '',
   },
 };
