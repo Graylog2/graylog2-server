@@ -6,5 +6,5 @@ then
   set_field(field: "f2", value: "f2");
   set_field(field: "i1", value: "i1");
 
-  remove_field(field:"f1", invert:true);
+  remove_field(field:"f.", is_regex:true, invert:true);
 end

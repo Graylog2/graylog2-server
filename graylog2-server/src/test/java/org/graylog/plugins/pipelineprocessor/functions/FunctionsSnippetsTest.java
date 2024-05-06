@@ -1697,6 +1697,18 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("a.1")).isNull();
         assertThat(message.getField("i1")).isNull();
         assertThat(message.getField("f1")).isEqualTo("f1");
+        assertThat(message.getField("f2")).isNull();
+    }
+
+    @Test
+    public void removeFieldInvertRegex() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final Message message = messageFactory.createMessage("test", "test", Tools.nowUTC());
+        evaluateRule(rule, message);
+
+        assertThat(message.getField("a.1")).isNull();
+        assertThat(message.getField("i1")).isNull();
+        assertThat(message.getField("f1")).isEqualTo("f1");
         assertThat(message.getField("f2")).isEqualTo("f2");
     }
 }

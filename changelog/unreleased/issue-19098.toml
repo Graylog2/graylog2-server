@@ -2,7 +2,7 @@ type="f"
 message="Fix performance and functional regression in pipeline function `remove_field` by introducing optional parameter `is_regex`."
 
 details.user="""
-GL 6.0 added regex-matching to the pipeline function `remove_field`. This breaks existing pipeline rules that call
+GL 5.1 added regex-matching to the pipeline function `remove_field`. This breaks existing pipeline rules that call
 `remove_field` with a field name containing a regex reserved character, notably `.`. Performance of existing rules
 may also be degraded.
 Both issues are addressed by introducing a new optional parameter `is_regex`, which is `false` by default; thus reverting
@@ -11,4 +11,4 @@ If regex-matching is desired, the `remove_field` must now be called with paramet
 """
 
 issues=["19098"]
-pulls=[""]
+pulls=["19259"]

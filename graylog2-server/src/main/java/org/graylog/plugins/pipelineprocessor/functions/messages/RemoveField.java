@@ -62,7 +62,7 @@ public class RemoveField extends AbstractFunction<Void> {
         } else {
             if (Boolean.TRUE.equals(invert)) {
                 message.getFieldNames().stream()
-                        .filter(f -> f.equals(fieldOrPattern))
+                        .filter(f -> !f.equals(fieldOrPattern))
                         .toList() // required to avoid ConcurrentModificationException
                         .forEach(message::removeField);
             } else {
