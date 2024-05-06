@@ -108,7 +108,7 @@
         <cef-parser.version>0.0.1.10</cef-parser.version>
         <classgraph.version>4.8.172</classgraph.version>
         <commons-codec.version>1.17.0</commons-codec.version>
-        <commons-csv.version>1.10.0</commons-csv.version>
+        <commons-csv.version>1.11.0</commons-csv.version>
         <commons-email.version>1.6.0</commons-email.version>
         <commons-exec.version>1.4.0</commons-exec.version>
         <commons-lang3.version>3.14.0</commons-lang3.version>
@@ -116,7 +116,7 @@
         <commons-validator.version>1.8.0</commons-validator.version>
         <commons-io.version>2.16.1</commons-io.version>
         <disruptor.version>4.0.0</disruptor.version>
-        <error-prone.version>2.26.1</error-prone.version>
+        <error-prone.version>2.27.1</error-prone.version>
         <freemarker.version>2.3.32</freemarker.version>
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>4.2.0</geoip2.version>
@@ -579,7 +579,7 @@
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>4.8.4.0</version>
+                    <version>4.8.5.0</version>
                 </plugin>
                 <plugin>
                     <groupId>de.thetaphi</groupId>

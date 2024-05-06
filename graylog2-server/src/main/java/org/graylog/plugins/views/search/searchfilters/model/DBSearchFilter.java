@@ -16,11 +16,10 @@
  */
 package org.graylog.plugins.views.search.searchfilters.model;
 
-public interface ReferencedSearchFilter extends UsedSearchFilter {
-
+/**
+ * Signature for Search Filter objects that are stored in MongoDB (Enterprise Feature).
+ * Exposes ID field to for use outside of Enterprise Plugin.
+ */
+public interface DBSearchFilter {
     String id();
-
-    InlineQueryStringSearchFilter toInlineRepresentation();
-
-    ReferencedSearchFilter withId(String id);
 }
