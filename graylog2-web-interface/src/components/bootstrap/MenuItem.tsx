@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useCallback } from 'react';
 import styled, { css } from 'styled-components';
+import { Link } from 'react-router-dom';
 
 import Icon from 'components/common/Icon';
 import useHistory from 'routing/useHistory';
@@ -85,19 +86,10 @@ const CustomMenuItem = <T, >({ children, className, disabled, divider, eventKey,
   };
 
   if (href) {
-    const _onClickHref: React.MouseEventHandler<HTMLAnchorElement> = (isAbsoluteUrl(href) || rel || target) ? undefined
-      : (e) => {
-        history.push(href);
-        e.preventDefault();
-      };
+    const linkProps = (isAbsoluteUrl(href) || rel || target) ? { href, target, rel } : { component: Link, to: href };
 
     return (
-      <StyledMenuItem component="a"
-                      href={href}
-                      target={target}
-                      rel={rel}
-                      {...sharedProps}
-                      onClick={_onClickHref}>
+      <StyledMenuItem {...linkProps} {...sharedProps}>
         {children}
       </StyledMenuItem>
     );
