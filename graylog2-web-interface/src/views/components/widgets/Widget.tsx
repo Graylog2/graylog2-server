@@ -121,20 +121,6 @@ const Visualization = ({
   if (data) {
     const { config, filter } = widget;
 
-    console.log({
-      title,
-      id,
-      widget,
-      fields,
-      queryId,
-      editing,
-      setLoadingState,
-      onToggleEdit,
-      onWidgetConfigChange,
-      config,
-      filter,
-    });
-
     return (
       <VisComponent config={config}
                     data={data as WidgetResults}
@@ -252,7 +238,7 @@ const Widget = ({ id, editing, widget, title, position, onPositionsChange }: Pro
       app_action_value: 'widget-edit-update-button',
     });
 
-    console.log('Widget component', { id, newWidgetConfig });
+    // console.log('Widget component', { id, newWidgetConfig });
 
     return dispatch(updateWidgetConfig(id, newWidgetConfig)).then(() => {
     });

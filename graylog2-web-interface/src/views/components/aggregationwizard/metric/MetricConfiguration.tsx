@@ -95,7 +95,7 @@ const Metric = ({ index }: Props) => {
   }, [functionIsSettled, metricsError, index, metricFieldSelectRef]);
 
   const showUnitType = ['sum', 'max', 'min', 'avg'].includes(currentFunction);
-  console.log({ currentFunction });
+  // console.log({ currentFunction });
 
   return (
     <Wrapper data-testid={`metric-${index}`}>

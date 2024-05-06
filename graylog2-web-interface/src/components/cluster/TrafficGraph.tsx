@@ -74,8 +74,9 @@ const TrafficGraph = ({ width, traffic, layoutExtension }: Props) => {
       // side: 'right',
       overlaying: 'y',
       // rangemode: 'tozero',
-      hoverformat: '.4s',
+      hoverformat: '.2s',
       tickformat: 's',
+      ticksuffix: 'bytes',
       autoshift: true,
     },
     yaxis3: {

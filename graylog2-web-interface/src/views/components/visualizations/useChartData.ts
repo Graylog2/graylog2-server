@@ -26,12 +26,16 @@ import useMapKeys from 'views/components/visualizations/useMapKeys';
 const useChartData = (rows: Rows, config: Optional<ChartDataConfig, 'formatTime'>) => {
   const { formatTime } = useUserDateTime();
   const mapKeys = useMapKeys();
+  // console.log('useChartData', { rows, config });
 
-  return useMemo(() => chartData(rows, {
+  const res = useMemo(() => chartData(rows, {
     formatTime,
     mapKeys,
     ...config,
   }), [config, formatTime, mapKeys, rows]);
+  // console.log('useChartData', { rows, config, res });
+
+  return res;
 };
 
 export default useChartData;
