@@ -449,4 +449,8 @@ public abstract class PluginModule extends Graylog2Module {
     protected void addTelemetryMetricProvider(String eventId, Class<? extends TelemetryMetricSupplier> eventSupplier) {
         telemetryMetricSupplierBinder().addBinding(eventId).to(eventSupplier);
     }
+
+    protected void addTelemetryMetricProvider(String eventId, TelemetryMetricSupplier eventSupplier) {
+        telemetryMetricSupplierBinder().addBinding(eventId).toInstance(eventSupplier);
+    }
 }
