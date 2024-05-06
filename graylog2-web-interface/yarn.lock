@@ -2834,26 +2834,32 @@
   resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-4.36.1.tgz#79f8c1a539d47c83104210be2388813a7af2e524"
   integrity sha512-DJSilV5+ytBP1FbFcEJovv4rnnm/CokuVvrBEtW/Va9DvuJ3HksbXUJEpI0aV1KtuL4ZoO9AVE6PyNLzF7tLeA==
 
-"@tanstack/query-persist-client-core@4.36.1":
-  version "4.36.1"
-  resolved "https://registry.yarnpkg.com/@tanstack/query-persist-client-core/-/query-persist-client-core-4.36.1.tgz#4d7284994bdc2a15fe6cbe7161be21e03033fe12"
-  integrity sha512-eocgCeI7D7TRv1IUUBMfVwOI0wdSmMkBIbkKhqEdTrnUHUQEeOaYac8oeZk2cumAWJdycu6P/wB+WqGynTnzXg==
-  dependencies:
-    "@tanstack/query-core" "4.36.1"
+"@tanstack/query-core@5.34.2":
+  version "5.34.2"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-5.34.2.tgz#ccaafad3be1126966e0e2064ff4acbfccad7add0"
+  integrity sha512-FM1UXldYcoMiWmVbpewV14EVpnr/ETBbdF84tmCktx29e2bXBFhGtAfyDHUD4X1FehaV5tC9GkXZUMZRQV3lcA==
 
-"@tanstack/query-sync-storage-persister@^4.33.0":
-  version "4.36.1"
-  resolved "https://registry.yarnpkg.com/@tanstack/query-sync-storage-persister/-/query-sync-storage-persister-4.36.1.tgz#bf5d800d54416bc88f150792a53e25ed8aa8769f"
-  integrity sha512-yMEt5hWe2+1eclf1agMtXHnPIkxEida0lYWkfdhR8U6KXk/lO4Vca6piJmhKI85t0NHlx3l/z6zX+t/Fn5O9NA==
+"@tanstack/query-persist-client-core@5.34.2":
+  version "5.34.2"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-persist-client-core/-/query-persist-client-core-5.34.2.tgz#61a9a73e8237f1cbdb5c8dce2681ec5baaa4459f"
+  integrity sha512-vDbQqDv31BUTGXNfVUnjKNLwc4ZjZM3j450w1ZGQ65oirmtxC7wkaqEI+oLLlOsuQ/C2Gl9w4UuebIoGiFYyMQ==
   dependencies:
-    "@tanstack/query-persist-client-core" "4.36.1"
+    "@tanstack/query-core" "5.34.2"
 
-"@tanstack/react-query-persist-client@^4.33.0":
-  version "4.36.1"
-  resolved "https://registry.yarnpkg.com/@tanstack/react-query-persist-client/-/react-query-persist-client-4.36.1.tgz#d96fa44cdc661534379623423da596a7b5dc13a7"
-  integrity sha512-32I5b9aAu4NCiXZ7Te/KEQLfHbYeTNriVPrKYcvEThnZ9tlW01vLcSoxpUIsMYRsembvJUUAkzYBAiZHLOd6pQ==
+"@tanstack/query-sync-storage-persister@^5.34.2":
+  version "5.34.2"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-sync-storage-persister/-/query-sync-storage-persister-5.34.2.tgz#c53f6acda66d41acf65e89820e22579fe069c287"
+  integrity sha512-0EH50a/FMU5ZA0YjPYNtxPTxOEbjPFY0yo0LrZQeljD8DoxrptP5ubvpVzTTTZrdO6IlTlNlnp/BRWIp4Jlg2A==
   dependencies:
-    "@tanstack/query-persist-client-core" "4.36.1"
+    "@tanstack/query-core" "5.34.2"
+    "@tanstack/query-persist-client-core" "5.34.2"
+
+"@tanstack/react-query-persist-client@^5.34.2":
+  version "5.34.2"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-query-persist-client/-/react-query-persist-client-5.34.2.tgz#fec8562e52a433b82985f76e6c4a047bb0490a82"
+  integrity sha512-Lufug8i/g4R+dA+4zqTEDESr8W/0b+HfdFuSYXvj60Enz2xUYNPAVvka30Wp8A91a7624lySckpXePHLaut8bA==
+  dependencies:
+    "@tanstack/query-persist-client-core" "5.34.2"
 
 "@tanstack/react-query@4.36.1":
   version "4.36.1"
@@ -7190,7 +7196,7 @@ eslint-config-airbnb@19.0.4:
     eslint-config-airbnb "19.0.4"
     eslint-import-resolver-webpack "0.13.8"
     eslint-plugin-compat "4.2.0"
-    eslint-plugin-graylog "file:../../../../.cache/yarn/v6/npm-eslint-config-graylog-1.3.0-ed7824d5-7cac-4c48-bc32-ecf0c3acce63-1714694944166/node_modules/eslint-plugin-graylog"
+    eslint-plugin-graylog "file:packages/eslint-plugin-graylog"
     eslint-plugin-import "2.25.3"
     eslint-plugin-jest "28.3.0"
     eslint-plugin-jest-dom "5.4.0"
@@ -8651,13 +8657,13 @@ graphemer@^1.4.0:
     "@types/create-react-class" "15.6.8"
     "@types/jquery" "3.5.29"
     "@types/react" "18.3.1"
-    babel-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-6.1.0-SNAPSHOT-7aca40a6-226c-446a-8bfc-e150f8213fde-1714694944031/node_modules/babel-preset-graylog"
+    babel-preset-graylog "file:packages/babel-preset-graylog"
     create-react-class "15.7.0"
-    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-6.1.0-SNAPSHOT-7aca40a6-226c-446a-8bfc-e150f8213fde-1714694944031/node_modules/eslint-config-graylog"
+    eslint-config-graylog "file:packages/eslint-config-graylog"
     formik "2.4.6"
     history "^5.3.0"
     html-webpack-plugin "^5.5.0"
-    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-6.1.0-SNAPSHOT-7aca40a6-226c-446a-8bfc-e150f8213fde-1714694944031/node_modules/jest-preset-graylog"
+    jest-preset-graylog "file:packages/jest-preset-graylog"
     jquery "3.7.1"
     moment "2.30.1"
     moment-timezone "0.5.45"
@@ -14810,7 +14816,7 @@ styled-components@6.1.1:
   version "1.0.0"
   dependencies:
     postcss-styled-syntax "0.6.4"
-    stylelint "16.4.0"
+    stylelint "16.5.0"
     stylelint-config-recommended "14.0.0"
     stylelint-config-standard "36.0.0"
     stylelint-config-styled-components "0.1.1"
@@ -14832,10 +14838,10 @@ stylelint-config-styled-components@0.1.1:
   resolved "https://registry.yarnpkg.com/stylelint-config-styled-components/-/stylelint-config-styled-components-0.1.1.tgz#b408388d7c687833ab4be4c4e6522d97d2827ede"
   integrity sha512-z5Xz/9GmvxO6e/DLzBMwkB85zHxEEjN6K7Cj80Bi+o/9vR9eS3GX3E9VuMnX9WLFYulqbqLtTapGGY28JBiy9Q==
 
-stylelint@16.4.0:
-  version "16.4.0"
-  resolved "https://registry.yarnpkg.com/stylelint/-/stylelint-16.4.0.tgz#8811005be82ca06224bc9bc3b4cf2fce30b347ae"
-  integrity sha512-uSx7VMuXwLuYcNSIg+0/fFNv0WinsfLAqsVVy7h7p80clKOHiGE8pfY6UjqwylTHiJrRIahTl6a8FPxGezhWoA==
+stylelint@16.5.0:
+  version "16.5.0"
+  resolved "https://registry.yarnpkg.com/stylelint/-/stylelint-16.5.0.tgz#4e3aff7cc2294fa54da729b972a6c38bf2a584a0"
+  integrity sha512-IlCBtVrG+qTy3v+tZTk50W8BIomjY/RUuzdrDqdnlCYwVuzXtPbiGfxYqtyYAyOMcb+195zRsuHn6tgfPmFfbw==
   dependencies:
     "@csstools/css-parser-algorithms" "^2.6.1"
     "@csstools/css-tokenizer" "^2.2.4"
