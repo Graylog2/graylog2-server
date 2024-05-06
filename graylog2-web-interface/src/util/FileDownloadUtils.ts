@@ -18,23 +18,26 @@
 import { fetchFile } from 'logic/rest/FetchProvider';
 import UserNotification from 'preflight/util/UserNotification';
 
+export const createLinkAndDownload = (href: string, fileName: string) => {
+  const a = document.createElement('a');
+  a.href = href;
+  a.download = fileName;
+
+  if (document.body) {
+    document.body.appendChild(a);
+  }
+
+  a.click();
+  a.remove();
+};
+
 export const downloadBLOB = (contents: BlobPart, metadata: { fileName: string, contentType: string }) => {
   // create blob from contents and meta data
   const blob = new Blob([contents], { type: metadata.contentType });
 
   // eslint-disable-next-line compat/compat
   const href = window.URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = href;
-  a.download = metadata.fileName;
-
-  if (document.body) {
-    document.body.appendChild(a);
-  }
-
-  // perform download
-  a.click();
-  a.remove();
+  createLinkAndDownload(href, metadata.fileName);
 };
 
 export const fetchFileWithBlob = async <Body>(method: string, url: string, body: Body | undefined, mimeType: string, fileName: string) => fetchFile(method, url, body, mimeType)
