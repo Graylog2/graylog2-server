@@ -18,11 +18,10 @@ package org.graylog.datanode.restoperations;
 
 import com.google.auto.value.AutoValue;
 import io.restassured.specification.RequestSpecification;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Provider;
 
-import javax.annotation.Nullable;
 import java.security.KeyStore;
-import java.util.function.Supplier;
 
 @AutoValue
 public abstract class RestOperationParameters {
@@ -32,6 +31,7 @@ public abstract class RestOperationParameters {
     @Nullable
     abstract KeyStore truststore();
 
+    @Nullable
     abstract Provider<String> jwtTokenProvider();
 
     private static final int DEFAULT_ATTEMPTS_COUNT = 160;
