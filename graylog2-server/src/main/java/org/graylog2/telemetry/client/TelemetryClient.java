@@ -23,17 +23,18 @@ import org.graylog2.configuration.TelemetryConfiguration;
 import org.graylog2.telemetry.cluster.TelemetryClusterService;
 
 import java.util.Map;
+import java.util.function.Supplier;
 
 @Singleton
 public class TelemetryClient {
-    private final PostHog posthog;
+    private final Supplier<PostHog> posthog;
     private final String clusterId;
     private final boolean isEnabled;
 
     @Inject
     public TelemetryClient(TelemetryConfiguration telemetryConfiguration, TelemetryClusterService telemetryClusterService) {
         this.isEnabled = telemetryConfiguration.isTelemetryEnabled();
-        this.posthog = new PostHog.Builder(telemetryConfiguration.getTelemetryApiKey())
+        this.posthog = () -> new PostHog.Builder(telemetryConfiguration.getTelemetryApiKey())
                 .host(telemetryConfiguration.getTelemetryApiHost())
                 .build();
         this.clusterId = telemetryClusterService.getClusterId();
@@ -41,7 +42,9 @@ public class TelemetryClient {
 
     public void capture(String eventType, Map<String, Object> event) {
         if (isEnabled) {
-            this.posthog.capture(clusterId, eventType, event);
+            final var client = this.posthog.get();
+            client.capture(clusterId, eventType, event);
+            client.shutdown();
         }
     }
 
