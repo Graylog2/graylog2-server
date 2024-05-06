@@ -195,11 +195,13 @@ describe('<WidgetActionsMenu />', () => {
       .type('dummy')
       .config({})
       .build();
-    const { queryByText } = render(<DummyWidget title="Dummy Widget" widget={dummyWidget} />);
+    render(<DummyWidget title="Dummy Widget" widget={dummyWidget} />);
 
     await openActionDropdown();
 
-    expect(queryByText('Export')).toBeNull();
+    const exportButton = screen.queryByRole('button', { name: /Export all search results/i });
+
+    expect(exportButton).toBeNull();
   });
 
   it('allows export for message tables', async () => {
@@ -210,9 +212,7 @@ describe('<WidgetActionsMenu />', () => {
 
     render(<DummyWidget title="Dummy Widget" widget={messagesWidget} />);
 
-    await openActionDropdown();
-
-    const exportButton = screen.getByText('Export');
+    const exportButton = screen.queryByRole('button', { name: /Export all search results/i });
 
     fireEvent.click(exportButton);
 

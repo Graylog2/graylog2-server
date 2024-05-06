@@ -49,12 +49,10 @@ import useLocation from 'routing/useLocation';
 import useParameters from 'views/hooks/useParameters';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import ExtractWidgetIntoNewView from 'views/logic/views/ExtractWidgetIntoNewView';
-import AggregationWidgetExportDropdown from 'views/components/widgets/AggregationWidgetExportDropdown';
 import type { Extension, Result } from 'util/AggregationWidgetExportUtils';
 import { exportWidget } from 'util/AggregationWidgetExportUtils';
 import useWidgetResults from 'views/components/useWidgetResults';
-import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
-import { supportedAggregationExportFormats } from 'views/Constants';
+import ExportWidgetAction from 'views/components/widgets/ExportWidgetAction/ExportWidgetAction';
 
 import ReplaySearchButton from './ReplaySearchButton';
 import ExtraWidgetActions from './ExtraWidgetActions';
@@ -160,7 +158,7 @@ const WidgetActionsMenu = ({
 }: Props) => {
   const widget = useContext(WidgetContext);
   const view = useView();
-  const { error: errors, widgetData: widgetResult } = useWidgetResults(widget.id);
+  const { widgetData: widgetResult } = useWidgetResults(widget.id);
   const { query, timerange, streams } = useContext(DrilldownContext);
   const { setWidgetFocusing, unsetWidgetFocusing } = useContext(WidgetFocusContext);
   const [showCopyToDashboard, setShowCopyToDashboard] = useState(false);
@@ -241,7 +239,7 @@ const WidgetActionsMenu = ({
     return exportWidget(widgetTitle, (widgetResult as {chart: Result}).chart as Result, extension);
   }, [view, widget, widgetResult, sendTelemetry, pathname]);
 
-  const showExportAggregationWidgetAction = widgetResult && widget.type === AggregationWidget.type && !errors?.length;
+  const showMessageExportModal = () => setShowExport(true);
 
   return (
     <Container className="widget-actions-menu">
@@ -253,19 +251,7 @@ const WidgetActionsMenu = ({
                               parameterBindings={parameterBindings}
                               parameters={parameters} />
         </IfDashboard>
-        {
-          showExportAggregationWidgetAction && (
-            <AggregationWidgetExportDropdown>
-              {
-                supportedAggregationExportFormats.map(({ id, title: extensionTitle }) => (
-                  <MenuItem key={id} onSelect={() => onExportAggregationWidget(id)}>
-                    {extensionTitle}
-                  </MenuItem>
-                ))
-              }
-            </AggregationWidgetExportDropdown>
-          )
-        }
+        <ExportWidgetAction widget={widget} showMessageExportModal={showMessageExportModal} onExportAggregationWidget={onExportAggregationWidget} />
         {isFocused && (
           <IconButton name="fullscreen_exit"
                       title="Un-focus widget"
@@ -297,7 +283,6 @@ const WidgetActionsMenu = ({
               Copy to Dashboard
             </MenuItem>
           </IfSearch>
-          {widget.isExportable && <MenuItem onSelect={() => setShowExport(true)}>Export</MenuItem>}
           <IfDashboard>
             <MenuItem onSelect={() => setShowMoveWidgetToTab(true)}>
               Move to Page
