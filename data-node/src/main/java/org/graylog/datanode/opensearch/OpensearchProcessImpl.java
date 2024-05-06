@@ -32,6 +32,7 @@ import org.graylog.datanode.opensearch.rest.OpensearchRestClient;
 import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
 import org.graylog.datanode.opensearch.statemachine.OpensearchState;
 import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachine;
+import org.graylog.datanode.periodicals.ClusterStateResponse;
 import org.graylog.datanode.process.ProcessInformation;
 import org.graylog.datanode.process.ProcessListener;
 import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchStatusException;
@@ -42,7 +43,9 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settin
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterUpdateSettingsRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterUpdateSettingsResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.client.ClusterClient;
+import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
+import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
 import org.graylog.storage.opensearch2.OpenSearchClient;
@@ -358,10 +361,31 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
         onEvent(OpensearchEvent.PROCESS_TERMINATED);
     }
 
+
     @Override
     public void available() {
         if (!allocationExcludeChecked) {
             this.checkAllocationEnabledStatus();
+        }
+    }
+
+    @Override
+    public boolean isManagerNode() {
+        return restClient()
+                .flatMap(this::requestClusterState)
+                .map(r -> r.nodes().get(r.clusterManagerNode()))
+                .map(managerNode -> configuration.getDatanodeNodeName().equals(managerNode.name()))
+                .orElse(false);
+    }
+
+    private Optional<ClusterStateResponse> requestClusterState(RestHighLevelClient client) {
+        try {
+            final Response response = client.getLowLevelClient().performRequest(new Request("GET", "_cluster/state/"));
+            final ClusterStateResponse state = objectMapper.readValue(response.getEntity().getContent(), ClusterStateResponse.class);
+            return Optional.of(state);
+        } catch (IOException e) {
+            LOG.warn("Failed to obtain cluster state response", e);
+            return Optional.empty();
         }
     }
 

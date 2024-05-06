@@ -30,7 +30,7 @@ import java.util.List;
 public record AggregationWidgetExportResponse(@JsonProperty List<String> header,
                                               @JsonProperty @JacksonXmlElementWrapper(useWrapping = false) List<DataRow> dataRows) {
 
-    public record DataRow(@JacksonXmlElementWrapper(useWrapping = false) List<String> row) {
+    public record DataRow(@JacksonXmlElementWrapper(useWrapping = false) List<Object> row) {
 
     }
 
@@ -60,17 +60,17 @@ public record AggregationWidgetExportResponse(@JsonProperty List<String> header,
                 .filter(row -> "leaf".equals(row.source()))
                 .map(row -> {
                     final ImmutableList<String> key = row.key();
-                    final List<String> values = columns.stream()
+                    final List<Object> values = columns.stream()
                             .map(metric -> row.values()
                                     .stream()
                                     .filter(value -> value.key().equals(metric))
                                     .filter(value -> value.value() != null)
                                     .findFirst()
-                                    .map(value -> value.value().toString())
-                                    .orElse("")
+                                    .map(value -> value.value())
+                                    .orElse(null)
                             ).toList();
 
-                    List<String> dataRow = new ArrayList<>();
+                    List<Object> dataRow = new ArrayList<>();
                     dataRow.addAll(key);
                     dataRow.addAll(values);
                     return new DataRow(dataRow);

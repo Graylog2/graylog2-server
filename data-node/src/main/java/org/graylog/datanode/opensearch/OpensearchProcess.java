@@ -46,4 +46,6 @@ public interface OpensearchProcess extends ManagableProcess<OpensearchConfigurat
     void reset();
 
     void available();
+    boolean isManagerNode();
+
 }

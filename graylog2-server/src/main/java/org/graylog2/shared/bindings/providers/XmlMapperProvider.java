@@ -16,17 +16,39 @@
  */
 package org.graylog2.shared.bindings.providers;
 
+import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import jakarta.inject.Inject;
 import jakarta.inject.Provider;
+import org.graylog.grn.GRNRegistry;
+import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
+import org.graylog2.plugin.inject.JacksonSubTypes;
+import org.graylog2.security.encryption.EncryptedValueService;
+import org.graylog2.shared.bindings.providers.config.ObjectMapperConfiguration;
+import org.graylog2.shared.plugins.GraylogClassLoader;
+
+import java.util.Set;
 
 public class XmlMapperProvider implements Provider<XmlMapper> {
 
     private final XmlMapper objectMapper;
 
-    public XmlMapperProvider() {
-        this.objectMapper = new XmlMapper.Builder(new XmlMapper())
+    @Inject
+    public XmlMapperProvider(@GraylogClassLoader final ClassLoader classLoader,
+                             @JacksonSubTypes final Set<NamedType> subtypes,
+                             final EncryptedValueService encryptedValueService,
+                             final GRNRegistry grnRegistry,
+                             final InputConfigurationBeanDeserializerModifier inputConfigurationBeanDeserializerModifier) {
+        final XmlMapper mapper = new XmlMapper.Builder(new XmlMapper())
                 .defaultUseWrapper(true)
                 .build();
+
+        this.objectMapper = ObjectMapperConfiguration.configureMapper(mapper,
+                classLoader,
+                subtypes,
+                encryptedValueService,
+                grnRegistry,
+                inputConfigurationBeanDeserializerModifier);
 
     }
 
