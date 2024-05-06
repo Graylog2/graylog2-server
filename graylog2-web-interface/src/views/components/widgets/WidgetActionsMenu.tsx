@@ -54,6 +54,7 @@ import type { Extension, Result } from 'util/AggregationWidgetExportUtils';
 import { exportWidget } from 'util/AggregationWidgetExportUtils';
 import useWidgetResults from 'views/components/useWidgetResults';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
+import { supportedAggregationExportFormats } from 'views/Constants';
 
 import ReplaySearchButton from './ReplaySearchButton';
 import ExtraWidgetActions from './ExtraWidgetActions';
@@ -170,13 +171,6 @@ const WidgetActionsMenu = ({
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
   const { parameters, parameterBindings } = useParameters();
-
-  const supportedAggregationExportFormats: Array<{id: Extension, title: string}> = [
-    { id: 'csv', title: 'CSV' },
-    { id: 'json', title: 'JSON' },
-    { id: 'yaml', title: 'YAML' },
-    { id: 'xml', title: 'XML' },
-  ];
 
   const onDuplicate = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.DUPLICATE, {
