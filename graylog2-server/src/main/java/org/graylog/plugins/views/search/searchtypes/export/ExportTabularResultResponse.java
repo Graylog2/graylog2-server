@@ -89,7 +89,12 @@ public record ExportTabularResultResponse(@JsonProperty List<String> header,
         final var first = m.messages().get(0);
 
         final var header = first.message().keySet().stream().toList();
-        final var rows = m.messages().stream().map(message -> new DataRow(header.stream().map(key -> message.message().get(key)).toList())).toList();
+        final var rows = m.messages()
+                            .stream()
+                            .map(message ->
+                                    new DataRow(header.stream().map(key -> message.message().get(key)).toList())
+                            )
+                            .toList();
         return new ExportTabularResultResponse(header, rows);
     }
 }
