@@ -18,7 +18,6 @@ package org.graylog.scheduler;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.inject.Inject;
 import one.util.streamex.StreamEx;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
@@ -26,6 +25,8 @@ import org.graylog2.database.PaginatedDbService;
 import org.graylog2.database.PaginatedList;
 import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
+
+import jakarta.inject.Inject;
 
 import java.util.Collection;
 import java.util.List;
@@ -59,11 +60,7 @@ public class DBJobDefinitionService extends PaginatedDbService<JobDefinitionDto>
      */
     public Optional<JobDefinitionDto> getByConfigField(String configField, Object value) {
         final String field = String.format(Locale.US, "%s.%s", JobDefinitionDto.FIELD_CONFIG, configField);
-        return Optional.ofNullable(db.findOne(byConfigFieldFilter(field, value)));
-    }
-
-    private static DBQuery.Query byConfigFieldFilter(String field, Object value) {
-        return DBQuery.is(field, value);
+        return Optional.ofNullable(db.findOne(DBQuery.is(field, value)));
     }
 
     public List<JobDefinitionDto> getByQuery(DBQuery.Query query) {
@@ -87,9 +84,5 @@ public class DBJobDefinitionService extends PaginatedDbService<JobDefinitionDto>
         // Since JobDefinitionDto#config() is a pluggable interface type and we don't have methods we can access,
         // convert the value to a JsonNode and access the group key with that.
         return jobDefinition -> objectMapper.convertValue(jobDefinition.config(), JsonNode.class).path(key).asText();
-    }
-
-    public String upsertByConfigField(JobDefinitionDto dto, String field, Object fieldValue) {
-        return db.update(byConfigFieldFilter(field, fieldValue), dto, true, false).getUpsertedId().toString();
     }
 }
