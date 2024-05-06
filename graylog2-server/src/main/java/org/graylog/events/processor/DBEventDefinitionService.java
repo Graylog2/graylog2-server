@@ -17,7 +17,6 @@
 package org.graylog.events.processor;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Streams;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
 import org.bson.types.ObjectId;
@@ -35,7 +34,6 @@ import org.graylog2.plugin.database.users.User;
 import org.graylog2.search.SearchQuery;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.mongojack.DBCursor;
 import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
 import org.mongojack.DBUpdate;
@@ -73,17 +71,13 @@ public class DBEventDefinitionService extends ScopedDbService<EventDefinitionDto
                                                              String sortByField, String sortOrder, int page, int perPage) {
         final DBQuery.Query dbQuery = query.toDBQuery();
         final DBSort.SortBuilder sortBuilder = getSortBuilder(sortOrder, sortByField);
-        final DBCursor<EventDefinitionDto> cursor = db.find(dbQuery)
-                .sort(sortBuilder)
-                .limit(perPage)
-                .skip(perPage * Math.max(0, page - 1));
-
+        final PaginatedList<EventDefinitionDto> list = findPaginatedWithQueryFilterAndSort(dbQuery, filter,
+                sortBuilder, page, perPage);
         return new PaginatedList<>(
-                Streams.stream((Iterable<EventDefinitionDto>) cursor)
-                        .filter(filter)
+                list.stream()
                         .map(this::getEventDefinitionWithRefetchedFilters)
                         .collect(Collectors.toList()),
-                cursor.count(),
+                list.pagination().total(),
                 page,
                 perPage
         );
