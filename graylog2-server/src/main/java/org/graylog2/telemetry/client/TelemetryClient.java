@@ -23,13 +23,17 @@ import okhttp3.OkHttpClient;
 import org.graylog2.configuration.TelemetryConfiguration;
 import org.graylog2.telemetry.cluster.TelemetryClusterService;
 import org.graylog2.telemetry.scheduler.TelemetryEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
+import java.io.IOException;
 import java.util.Map;
 
 @Singleton
 public class TelemetryClient {
+    private static final Logger LOG = LoggerFactory.getLogger(TelemetryClient.class);
     private final PosthogAPI posthog;
     private final String clusterId;
     private final boolean isEnabled;
@@ -49,14 +53,17 @@ public class TelemetryClient {
         this.clusterId = telemetryClusterService.getClusterId();
     }
 
-    public void capture(Map<String, TelemetryEvent> events) {
+    public void capture(Map<String, TelemetryEvent> events) throws IOException {
         if (isEnabled) {
             final var batch = events.entrySet()
                     .stream()
                     .map(entry -> PosthogAPI.Event.create(clusterId, entry.getKey(), entry.getValue().metrics()))
                     .toList();
             final var request = new PosthogAPI.BatchRequest(apiKey, batch);
-            posthog.batchSend(request);
+            final var response = posthog.batchSend(request).execute();
+            if (!response.isSuccessful()) {
+                throw new RuntimeException("Submitting telemetry failed with status " + response.code() + " - message: " + response.message());
+            }
         }
     }
 
