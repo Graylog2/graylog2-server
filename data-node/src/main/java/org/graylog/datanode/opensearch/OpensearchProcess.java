@@ -45,4 +45,6 @@ public interface OpensearchProcess extends ManagableProcess<OpensearchConfigurat
 
     void onReset();
 
+    boolean isManagerNode();
+
 }

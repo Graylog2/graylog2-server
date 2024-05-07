@@ -1,0 +1,4 @@
+type = "added"
+message = "Conversion of MessageList into a tabular representation for exports. Added XLSXWriter"
+
+pulls = ["19162"]

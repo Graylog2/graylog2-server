@@ -133,10 +133,10 @@ describe('RemoteReindexingMigration', () => {
       name: /5. Migrate existing data/i,
     });
 
-    await screen.findByLabelText(/URI of the host/);
-    await screen.findByLabelText(/Allowlist/);
+    await screen.findByLabelText(/Hostname/);
     await screen.findByLabelText(/Username/);
     await screen.findByLabelText(/Password/);
+    await screen.findByLabelText(/Allowlist/);
   });
 
   it('should render RemoteReindexRunning step', async () => {

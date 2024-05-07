@@ -132,6 +132,7 @@ class IndexSetDeletionForm extends React.Component {
 
     if (this._isDeletable()) {
       this.props.onDelete(this.props.indexSet, this.state.deleteIndices);
+      this.close();
     }
   };
 
