@@ -1,0 +1,5 @@
+type = "fixed"
+message = "remove preflight resume startup"
+
+pulls = ["19228"]
+issues=["Graylog2/graylog-plugin-enterprise#7009"]
