@@ -128,13 +128,12 @@ const InputListItem = createReactClass({
           </Button>
         </LinkContainer>,
       );
-    } 
+    }
 
     if (this.isPermitted(this.props.permissions, [`inputs:edit:${this.props.input.id}`])) {
-
       if (!AppConfig.isCloud()) {
         let extractorRoute;
-        
+
         if (this.props.input.global) {
           extractorRoute = Routes.global_input_extractors(this.props.input.id);
         } else {
