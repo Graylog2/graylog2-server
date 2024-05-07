@@ -25,6 +25,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.graylog2.plugin.Message;
 
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.type;
@@ -49,9 +50,10 @@ public class RemoveField extends AbstractFunction<Void> {
         final Message message = messageParam.optional(args, context).orElse(context.currentMessage());
         final Boolean invert = invertParam.optional(args, context).orElse(false);
 
+        final var pattern = Pattern.compile(fieldOrPattern);
         message.getFieldNames().stream()
                 .filter(f -> {
-                    boolean condition = f.matches(fieldOrPattern);
+                    boolean condition = pattern.matcher(f).matches();
                     return invert ? !condition : condition;
                 })
                 .collect(Collectors.toList()) // required to avoid ConcurrentModificationException
@@ -67,7 +69,9 @@ public class RemoveField extends AbstractFunction<Void> {
                 .name(NAME)
                 .returnType(Void.class)
                 .params(ImmutableList.of(fieldParam, messageParam, invertParam))
-                .description("Removes the named field from message, unless the field is reserved. If no specific message is provided, it removes the field from the currently processed message.")
+                .description("Removes the named field from message, unless the field is reserved. " +
+                        "If no specific message is provided, it uses the currently processed message." +
+                        "This function is deprecated - use the more performant remove_single_field or remove_multiple_fields.")
                 .ruleBuilderEnabled()
                 .ruleBuilderName("Remove field (deprecated)")
                 .ruleBuilderTitle("Remove field '${field}'")

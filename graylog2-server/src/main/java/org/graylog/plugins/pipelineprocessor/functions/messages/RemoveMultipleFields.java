@@ -26,13 +26,14 @@ import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGrou
 import org.graylog2.plugin.Message;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.type;
 
 public class RemoveMultipleFields extends AbstractFunction<Void> {
     public static final String NAME = "remove_multiple_fields";
-    public static final String REGEX_PATTERN = "pattern";
-    public static final String LIST_OF_NAMES = "names";
+    private static final String REGEX_PATTERN = "pattern";
+    private static final String LIST_OF_NAMES = "names";
     private final ParameterDescriptor<String, String> regexParam;
     private final ParameterDescriptor<List, List> namesParam;
     private final ParameterDescriptor<Message, Message> messageParam;
@@ -56,15 +57,16 @@ public class RemoveMultipleFields extends AbstractFunction<Void> {
     }
 
     private void removeRegex(Message message, String regex) {
+        final var pattern = Pattern.compile(regex);
         message.getFieldNames().stream()
-                .filter(name -> name.matches(regex))
+                .filter(name -> pattern.matcher(name).matches())
                 .toList() // required to avoid ConcurrentModificationException
                 .forEach(message::removeField);
     }
 
     private void removeNames(Message message, List names) {
         for (Object name : names) {
-            message.removeField((String) name);
+            message.removeField(String.valueOf(name));
         }
     }
 
