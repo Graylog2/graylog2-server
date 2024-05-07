@@ -20,7 +20,6 @@ import styled, { css } from 'styled-components';
 import { Link } from 'react-router-dom';
 
 import Icon from 'components/common/Icon';
-import useHistory from 'routing/useHistory';
 
 import Menu from './Menu';
 
@@ -58,12 +57,9 @@ type Props<T = undefined> = React.PropsWithChildren<{
   closeMenuOnClick?: boolean,
 }>;
 
-const isAbsoluteUrl = (href: string) => /^(?:[a-z][a-z0-9+.-]*:|\/\/)/i.test(href);
-
 const CustomMenuItem = <T, >({ children, className, disabled, divider, eventKey, header, href, icon, id, onClick, onSelect, rel, target, title, 'data-tab-id': dataTabId, component, variant, closeMenuOnClick }: Props<T>) => {
   const callback = onClick ?? onSelect;
   const _onClick = useCallback(() => callback?.(eventKey), [callback, eventKey]);
-  const history = useHistory();
 
   if (divider) {
     return <Menu.Divider role="separator" className={className} id={id} />;
@@ -86,10 +82,8 @@ const CustomMenuItem = <T, >({ children, className, disabled, divider, eventKey,
   };
 
   if (href) {
-    const linkProps = (isAbsoluteUrl(href) || rel || target) ? { href, target, rel } : { component: Link, to: href };
-
     return (
-      <StyledMenuItem {...linkProps} {...sharedProps}>
+      <StyledMenuItem component={Link} to={href} rel={rel} target={target} {...sharedProps}>
         {children}
       </StyledMenuItem>
     );
