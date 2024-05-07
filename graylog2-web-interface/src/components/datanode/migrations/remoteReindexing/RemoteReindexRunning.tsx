@@ -76,31 +76,33 @@ const RemoteReindexRunning = ({ currentStep, onTriggerStep }: MigrationStepCompo
       <MigrationStepTriggerButtonToolbar nextSteps={nextSteps || currentStep.next_steps} onTriggerStep={handleTriggerStep}>
         <Button bsStyle="default" bsSize="small" onClick={() => setShowLogView(true)}>Log View</Button>
       </MigrationStepTriggerButtonToolbar>
-      <BootstrapModalWrapper showModal={showLogView}
-                             onHide={() => setShowLogView(false)}
-                             bsSize="large">
-        <Modal.Header closeButton>
-          <Modal.Title>Remote Reindex Migration Logs</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <pre>
-            {migrationStatus?.logs ? (
-              <LogsContainer>
-                <table>
-                  <tbody>
-                    {migrationStatus.logs.map((log) => (
-                      <tr title={new Date(log.timestamp).toLocaleString()}>
-                        <td>[{log.log_level}]</td>
-                        <td>{log.message}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </LogsContainer>
-            ) : ('<no logs>')}
-          </pre>
-        </Modal.Body>
-      </BootstrapModalWrapper>
+      {showLogView && (
+        <BootstrapModalWrapper showModal={showLogView}
+                               onHide={() => setShowLogView(false)}
+                               bsSize="large">
+          <Modal.Header closeButton>
+            <Modal.Title>Remote Reindex Migration Logs</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <pre>
+              {migrationStatus?.logs ? (
+                <LogsContainer>
+                  <table>
+                    <tbody>
+                      {migrationStatus.logs.map((log) => (
+                        <tr title={new Date(log.timestamp).toLocaleString()}>
+                          <td>[{log.log_level}]</td>
+                          <td>{log.message}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </LogsContainer>
+              ) : ('No logs.')}
+            </pre>
+          </Modal.Body>
+        </BootstrapModalWrapper>
+      )}
     </>
   );
 };
