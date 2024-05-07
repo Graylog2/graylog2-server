@@ -17,7 +17,6 @@
 package org.graylog.datanode;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.github.joschi.jadconfig.util.Duration;
 import com.github.rholder.retry.RetryException;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
@@ -42,14 +41,12 @@ import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
-import org.graylog2.security.IndexerJwtAuthTokenProvider;
 import org.junit.jupiter.api.io.TempDir;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -106,7 +103,6 @@ public class DatanodeProvisioningIT {
                     .port(getOpensearchPort())
                     .truststore(keystoreFromApiCertificate(basicAuth))
                     .jwtTokenProvider(DatanodeContainerizedBackend.JWT_AUTH_TOKEN_PROVIDER)
-                    .attempts_count(3)
                     .build())
                     .waitForNodesCount(1);
         } catch (Exception e) {
