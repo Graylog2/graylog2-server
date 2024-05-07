@@ -18,6 +18,7 @@ package org.graylog.datanode.integration;
 
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.rholder.retry.RetryException;
+import jakarta.inject.Provider;
 import jakarta.validation.constraints.NotNull;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.graylog.datanode.configuration.variants.KeystoreInformation;
@@ -27,7 +28,6 @@ import org.graylog.datanode.restoperations.DatanodeStatusChangeOperation;
 import org.graylog.datanode.restoperations.OpensearchTestIndexCreation;
 import org.graylog.datanode.restoperations.RestOperationParameters;
 import org.graylog.datanode.testinfra.DatanodeContainerizedBackend;
-import org.graylog.testing.completebackend.ContainerizedGraylogBackend;
 import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.security.IndexerJwtAuthTokenProvider;
@@ -67,13 +67,8 @@ public class DatanodeClusterIT {
     private KeystoreInformation ca;
     private Network network;
     private MongoDBTestService mongoDBTestService;
-    private String restAdminUsername;
-
     @BeforeEach
     void setUp() throws GeneralSecurityException, IOException {
-
-        restAdminUsername = RandomStringUtils.randomAlphanumeric(10);
-
         // first generate a self-signed CA
         ca = DatanodeSecurityTestUtils.generateCa(tempDir);
 
@@ -168,11 +163,10 @@ public class DatanodeClusterIT {
         nodeC.start();
         waitForNodesCount(3);
 
-        String jwtToken = IndexerJwtAuthTokenProvider.createToken(DatanodeContainerizedBackend.SIGNING_SECRET.getBytes(StandardCharsets.UTF_8), Duration.seconds(600));
         OpensearchTestIndexCreation osIndexClient = new OpensearchTestIndexCreation(RestOperationParameters.builder()
                 .port(nodeA.getOpensearchRestPort())
                 .truststore(trustStore)
-                .jwtToken(jwtToken)
+                .jwtTokenProvider(DatanodeContainerizedBackend.JWT_AUTH_TOKEN_PROVIDER)
                 .build());
 
         // create index and get primary and replica shard node
@@ -190,8 +184,7 @@ public class DatanodeClusterIT {
         final RestOperationParameters datanodeRestParameters = RestOperationParameters.builder()
                 .port(primary.get().getDatanodeRestPort())
                 .truststore(trustStore)
-                .username(restAdminUsername)
-                .password(ContainerizedGraylogBackend.ROOT_PASSWORD_PLAINTEXT)
+                .jwtTokenProvider(DatanodeContainerizedBackend.JWT_AUTH_TOKEN_PROVIDER)
                 .build();
         new DatanodeRestApiWait(datanodeRestParameters)
                 .waitForAvailableStatus();
@@ -201,11 +194,10 @@ public class DatanodeClusterIT {
 
         // check that primary shard node is gone and there are still a primary and a secondary
         waitForNodesCount(replica.get(), 2);
-        jwtToken = IndexerJwtAuthTokenProvider.createToken(DatanodeContainerizedBackend.SIGNING_SECRET.getBytes(StandardCharsets.UTF_8), Duration.seconds(600));
         osIndexClient = new OpensearchTestIndexCreation(RestOperationParameters.builder()
                 .port(replica.get().getOpensearchRestPort())
                 .truststore(trustStore)
-                .jwtToken(jwtToken)
+                .jwtTokenProvider(DatanodeContainerizedBackend.JWT_AUTH_TOKEN_PROVIDER)
                 .build());
         List<String> newShardNodes = osIndexClient.getShardNodes();
         Assertions.assertEquals(newShardNodes.size(), 2);
@@ -249,9 +241,6 @@ public class DatanodeClusterIT {
                     datanodeContainer.withCreateContainerCmdModifier(createContainerCmd -> createContainerCmd.withName(hostname));
                     datanodeContainer.withEnv("GRAYLOG_DATANODE_HOSTNAME", hostname);
                     datanodeContainer.withEnv("GRAYLOG_DATANODE_MONGODB_URI", mongodb.internalUri());
-
-                    datanodeContainer.withEnv("GRAYLOG_DATANODE_ROOT_USERNAME", restAdminUsername);
-
                 });
     }
 
@@ -261,13 +250,11 @@ public class DatanodeClusterIT {
     }
 
     private void waitForNodesCount(DatanodeContainerizedBackend node, final int countOfNodes) throws ExecutionException, RetryException {
-        final String jwtToken = IndexerJwtAuthTokenProvider.createToken(DatanodeContainerizedBackend.SIGNING_SECRET.getBytes(StandardCharsets.UTF_8), Duration.seconds(120));
-
         try {
             new DatanodeOpensearchWait(RestOperationParameters.builder()
                     .port(node.getOpensearchRestPort())
                     .truststore(trustStore)
-                    .jwtToken(jwtToken)
+                    .jwtTokenProvider(DatanodeContainerizedBackend.JWT_AUTH_TOKEN_PROVIDER)
                     .build())
                     .waitForNodesCount(countOfNodes);
 
