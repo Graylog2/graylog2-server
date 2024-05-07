@@ -1,15 +1,16 @@
-type="c"
-message="Introduce new pipeline functions `remove_single_field` and `remove_multiple_fields` to replace remove_field."
+type="a"
+message="Introduce new pipeline functions `remove_single_field` and `remove_multiple_fields` to (eventually) replace `remove_field`."
 
 details.user="""
 GL 5.1 added regex-matching to the pipeline function `remove_field`. This breaks existing pipeline rules that call
 `remove_field` with a field name containing a regex reserved character, notably `.`. Performance of existing rules
 may also be degraded.
-Both issues are addressed by introducing more specific functions:
+Both issues are addressed by introducing alternate, more specific functions:
 `remove_single_field` removes just a single field specified by name. It is simple and fast.
 `remove_multiple_fields` removes fields matching a regex pattern and/or list of names. Depending on the
 complexity of the matching it is slower.
+'remove_field' will be deprecated and removed in the next major version. Do not use it.
 """
 
 issues=["19098"]
-pulls=[""]
+pulls=["19268"]
