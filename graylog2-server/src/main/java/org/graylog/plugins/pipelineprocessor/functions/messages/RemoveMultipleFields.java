@@ -76,8 +76,8 @@ public class RemoveMultipleFields extends AbstractFunction<Void> {
                 .params(ImmutableList.of(regexParam, namesParam, messageParam))
                 .description("Removes the specified field(s) from message, unless the field name is reserved. If no specific message is provided, it uses the currently processed message.")
                 .ruleBuilderEnabled()
-                .ruleBuilderName("Remove fields")
-                .ruleBuilderTitle("Remove multiple fields")
+                .ruleBuilderName("Remove field - multiple")
+                .ruleBuilderTitle("Remove multiple fields by regex<#if pattern??> '${pattern}'</#if> or name list<#if names??> '${names}'</#if>")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.MESSAGE)
                 .build();
     }

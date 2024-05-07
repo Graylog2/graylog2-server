@@ -55,8 +55,8 @@ public class RemoveSingleField extends AbstractFunction<Void> {
                 .params(ImmutableList.of(fieldParam, messageParam))
                 .description("Removes a field from a message")
                 .ruleBuilderEnabled()
-                .ruleBuilderName("Remove field")
-                .ruleBuilderTitle("Remove field '${field}'")
+                .ruleBuilderName("Remove field - single")
+                .ruleBuilderTitle("Remove the single field '${field}'")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.MESSAGE)
                 .build();
     }
