@@ -415,13 +415,6 @@
                 </exclusions>
             </dependency>
 
-            <!-- Integrations plugin -->
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-csv</artifactId>
-                <version>${commons-csv.version}</version>
-            </dependency>
-
             <!-- Test dependencies -->
             <dependency>
                 <groupId>junit</groupId>

@@ -1,0 +1,32 @@
+{
+  "id": "9de6bd46-ba54-437c-bc97-c00df9242f8d",
+  "messages": [
+    {
+      "highlight_ranges": {},
+      "message": {
+        "sequence_nr": 277,
+        "ingest_time": "2024-05-06T12:35:52.284Z",
+        "gl2_receive_timestamp": "2024-05-06 12:35:52.284",
+        "took_ms": 48,
+        "source": "example.org"
+      },
+      "index": "graylog_3",
+      "decoration_stats": null
+    },
+    {
+      "highlight_ranges": {},
+      "message": {
+        "sequence_nr": 278,
+        "ingest_time": "2024-05-06T12:35:52.284Z",
+        "gl2_receive_timestamp": "2024-05-06 12:35:52.284",
+        "took_ms": 49,
+        "source": "example.org"
+      },
+      "index": "graylog_3",
+      "decoration_stats": null
+    }
+  ],
+
+  "effective_timerange":{"from":"2024-05-06T12:30:53.252Z","to":"2024-05-06T12:35:53.252Z","type":"absolute"},
+  "total_results":8693,"type":"messages"
+}
