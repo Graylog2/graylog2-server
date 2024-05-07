@@ -24,6 +24,7 @@ import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import com.google.common.base.Suppliers;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
@@ -50,7 +51,6 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.security.CustomCAX509TrustManager;
 import org.graylog2.security.IndexerJwtAuthTokenProvider;
-import jakarta.annotation.Nonnull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -99,7 +99,6 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
     private final String passwordSecret;
     private final Supplier<OkHttpClient> okHttpClient;
     private final PreflightConfigService preflightConfigService;
-    private final IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider;
     private final NotificationService notificationService;
     private final ExecutorService executor;
 
@@ -127,19 +126,24 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
         this.csrSigner = csrSigner;
         this.clusterConfigService = clusterConfigService;
         this.preflightConfigService = preflightConfigService;
-        this.indexerJwtAuthTokenProvider = indexerJwtAuthTokenProvider;
         this.notificationService = notificationService;
         this.executor = Executors.newFixedThreadPool(THREADPOOL_THREADS, new ThreadFactoryBuilder().setNameFormat("provisioning-connectivity-check-task").build());
-        this.okHttpClient = Suppliers.memoize(() -> buildConnectivityCheckOkHttpClient(trustManager));
+        this.okHttpClient = Suppliers.memoize(() -> buildConnectivityCheckOkHttpClient(trustManager, indexerJwtAuthTokenProvider));
     }
 
     // building a httpclient to check the connectivity to OpenSearch - TODO: maybe replace it with a VersionProbe already?
-    private static OkHttpClient buildConnectivityCheckOkHttpClient(final X509TrustManager trustManager) {
+    private static OkHttpClient buildConnectivityCheckOkHttpClient(final X509TrustManager trustManager, IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider) {
         try {
             final var clientBuilder = new OkHttpClient.Builder();
             final var sslContext = SSLContext.getInstance("TLS");
             sslContext.init(null, new TrustManager[]{trustManager}, new SecureRandom());
             clientBuilder.sslSocketFactory(sslContext.getSocketFactory(), trustManager);
+
+            clientBuilder.authenticator((route, response) -> response.request()
+                    .newBuilder()
+                    .header("Authorization", indexerJwtAuthTokenProvider.get())
+                    .build());
+
             return clientBuilder.build();
         } catch (NoSuchAlgorithmException | KeyManagementException ex) {
             LOG.error("Could not set Graylog CA trust manager: {}", ex.getMessage(), ex);
@@ -264,15 +268,11 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                 .retryIfResult(response -> !response.isSuccessful())
                 .retryIfException()
                 .build();
+
         final Callable<Response> callable = () -> {
             final var node = nodeService.byNodeId(nodeId);
             final var request = new Request.Builder().url(node.getTransportAddress()).build();
-            final var builder = okHttpClient.get().newBuilder()
-                    .authenticator((route, response) -> response.request()
-                            .newBuilder()
-                            .header("Authorization", indexerJwtAuthTokenProvider.get())
-                            .build());
-            final var call = builder.build().newCall(request);
+            final var call = okHttpClient.get().newCall(request);
             return call.execute();
         };
         try (Response response = retryer.call(callable)) {
