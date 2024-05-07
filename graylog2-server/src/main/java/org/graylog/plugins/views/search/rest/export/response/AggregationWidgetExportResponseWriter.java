@@ -28,6 +28,7 @@ import jakarta.ws.rs.ext.MessageBodyWriter;
 import jakarta.ws.rs.ext.Provider;
 import org.graylog.plugins.views.search.searchtypes.export.CSVWriter;
 import org.graylog.plugins.views.search.searchtypes.export.ExportTabularResultResponse;
+import org.graylog.plugins.views.search.searchtypes.export.XLSXWriter;
 import org.graylog2.rest.MoreMediaTypes;
 
 import java.io.IOException;
@@ -39,7 +40,8 @@ import java.lang.reflect.Type;
 @Produces({MoreMediaTypes.TEXT_CSV,
         MediaType.APPLICATION_JSON,
         MoreMediaTypes.APPLICATION_YAML,
-        MediaType.APPLICATION_XML})
+        MediaType.APPLICATION_XML,
+        MoreMediaTypes.APPLICATION_XLS})
 public class AggregationWidgetExportResponseWriter implements MessageBodyWriter<ExportTabularResultResponse> {
 
     private final ObjectMapper objectMapper;
@@ -69,6 +71,7 @@ public class AggregationWidgetExportResponseWriter implements MessageBodyWriter<
             case MediaType.APPLICATION_JSON -> objectMapper.writeValue(outputStream, widgetExportResponse);
             case MoreMediaTypes.APPLICATION_YAML -> yamlMapper.writeValue(outputStream, widgetExportResponse);
             case MediaType.APPLICATION_XML -> xmlMapper.writeValue(outputStream, widgetExportResponse);
+            case MoreMediaTypes.APPLICATION_XLS -> XLSXWriter.writeXlsx(widgetExportResponse, outputStream);
             default -> throw new IllegalArgumentException("Media type " + mediaType + " not supported");
         }
     }
