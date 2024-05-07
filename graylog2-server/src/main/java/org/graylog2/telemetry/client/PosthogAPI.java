@@ -39,6 +39,6 @@ public interface PosthogAPI {
         }
     }
 
-    @POST
+    @POST("/batch")
     Call<Void> batchSend(@Body BatchRequest batchRequest);
 }
