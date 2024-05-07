@@ -134,7 +134,7 @@ public class OpensearchStateMachine extends StateMachine<OpensearchState, Opense
         return tracerAggregator;
     }
 
-    public void fire(OpensearchEvent trigger, OpensearchEvent errorEvent) {
+    private void fire(OpensearchEvent trigger, OpensearchEvent errorEvent) {
         try {
             super.fire(trigger);
         } catch (Exception e) {
