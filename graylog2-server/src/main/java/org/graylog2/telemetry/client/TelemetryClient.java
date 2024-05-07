@@ -16,35 +16,47 @@
  */
 package org.graylog2.telemetry.client;
 
-import com.posthog.java.PostHog;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import okhttp3.OkHttpClient;
 import org.graylog2.configuration.TelemetryConfiguration;
 import org.graylog2.telemetry.cluster.TelemetryClusterService;
+import org.graylog2.telemetry.scheduler.TelemetryEvent;
+import retrofit2.Retrofit;
+import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import java.util.Map;
-import java.util.function.Supplier;
 
 @Singleton
 public class TelemetryClient {
-    private final Supplier<PostHog> posthog;
+    private final PosthogAPI posthog;
     private final String clusterId;
     private final boolean isEnabled;
+    private final String apiKey;
 
     @Inject
-    public TelemetryClient(TelemetryConfiguration telemetryConfiguration, TelemetryClusterService telemetryClusterService) {
+    public TelemetryClient(TelemetryConfiguration telemetryConfiguration, TelemetryClusterService telemetryClusterService,
+                           OkHttpClient okHttpClient, ObjectMapper objectMapper) {
         this.isEnabled = telemetryConfiguration.isTelemetryEnabled();
-        this.posthog = () -> new PostHog.Builder(telemetryConfiguration.getTelemetryApiKey())
-                .host(telemetryConfiguration.getTelemetryApiHost())
-                .build();
+        this.apiKey = telemetryConfiguration.getTelemetryApiKey();
+        this.posthog = new Retrofit.Builder()
+                .baseUrl(telemetryConfiguration.getTelemetryApiHost())
+                .addConverterFactory(JacksonConverterFactory.create(objectMapper))
+                .client(okHttpClient)
+                .build()
+                .create(PosthogAPI.class);
         this.clusterId = telemetryClusterService.getClusterId();
     }
 
-    public void capture(String eventType, Map<String, Object> event) {
+    public void capture(Map<String, TelemetryEvent> events) {
         if (isEnabled) {
-            final var client = this.posthog.get();
-            client.capture(clusterId, eventType, event);
-            client.shutdown();
+            final var batch = events.entrySet()
+                    .stream()
+                    .map(entry -> PosthogAPI.Event.create(clusterId, entry.getKey(), entry.getValue().metrics()))
+                    .toList();
+            final var request = new PosthogAPI.BatchRequest(apiKey, batch);
+            posthog.batchSend(request);
         }
     }
 

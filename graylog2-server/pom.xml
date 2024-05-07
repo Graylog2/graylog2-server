@@ -829,10 +829,6 @@
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-sts</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.posthog.java</groupId>
-            <artifactId>posthog</artifactId>
-        </dependency>
     </dependencies>
 
     <build>

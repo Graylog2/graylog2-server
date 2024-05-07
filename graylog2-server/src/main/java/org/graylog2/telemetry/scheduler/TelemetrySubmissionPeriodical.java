@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import java.util.AbstractMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -46,10 +47,19 @@ public class TelemetrySubmissionPeriodical extends Periodical {
         if (telemetryClient.isEnabled()) {
             final var telemetryMetrics = metricsProviders.entrySet()
                     .stream()
-                    .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().get()));
-            telemetryMetrics.forEach((key, value) -> value.map(TelemetryEvent::metrics)
-                    .ifPresent(metrics -> telemetryClient.capture(key, metrics)));
+                    .map(entry -> entry(entry.getKey(), entry.getValue().get()))
+                    .flatMap(entry -> entry.getValue().map(metrics -> entry(entry.getKey(), metrics)).stream())
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+            try {
+                telemetryClient.capture(telemetryMetrics);
+            } catch (Exception e) {
+                LOG.warn("Error while submitting telemetry: ", e);
+            }
         }
+    }
+
+    private <K, V> Map.Entry<K, V> entry(K key, V value) {
+        return new AbstractMap.SimpleEntry<>(key, value);
     }
 
     @Override

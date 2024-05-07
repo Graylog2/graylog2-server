@@ -160,7 +160,6 @@
         <opentelemetry.version>1.32.0</opentelemetry.version>
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
         <pkts.version>3.0.10</pkts.version>
-        <posthog-client.version>1.1.1</posthog-client.version>
         <prometheus-client.version>0.16.0</prometheus-client.version>
         <protobuf.version>3.25.3</protobuf.version>
         <reflections.version>0.10.2</reflections.version>
@@ -496,11 +495,6 @@
                 <groupId>org.graylog.autovalue</groupId>
                 <artifactId>auto-value-javabean</artifactId>
                 <version>${auto-value-javabean.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.posthog.java</groupId>
-                <artifactId>posthog</artifactId>
-                <version>${posthog-client.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
