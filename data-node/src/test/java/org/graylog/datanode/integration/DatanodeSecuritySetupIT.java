@@ -43,7 +43,6 @@ import java.util.concurrent.ExecutionException;
 
 import static io.restassured.RestAssured.given;
 import static org.graylog.datanode.testinfra.DatanodeContainerizedBackend.IMAGE_WORKING_DIR;
-import static org.graylog.testing.completebackend.ContainerizedGraylogBackend.ROOT_PASSWORD_PLAINTEXT;
 
 public class DatanodeSecuritySetupIT {
     private static final Logger LOG = LoggerFactory.getLogger(DatanodeSecuritySetupIT.class);
@@ -53,13 +52,9 @@ public class DatanodeSecuritySetupIT {
     private DatanodeContainerizedBackend backend;
     private KeyStore trustStore;
     private String containerHostname;
-    private String restAdminUsername;
 
     @BeforeEach
     void setUp() throws IOException, GeneralSecurityException {
-
-        restAdminUsername = RandomStringUtils.randomAlphanumeric(10);
-
         containerHostname = "graylog-datanode-host-" + RandomStringUtils.random(8, "0123456789abcdef");
         // first generate a self-signed CA
         KeystoreInformation ca = DatanodeSecurityTestUtils.generateCa(tempDir);
@@ -94,8 +89,6 @@ public class DatanodeSecuritySetupIT {
             datanodeContainer.withEnv("GRAYLOG_DATANODE_HOSTNAME", containerHostname);
 
             datanodeContainer.withEnv("GRAYLOG_DATANODE_SINGLE_NODE_ONLY", "true");
-
-            datanodeContainer.withEnv("GRAYLOG_DATANODE_ROOT_USERNAME", restAdminUsername);
         }).start();
     }
 
@@ -106,12 +99,10 @@ public class DatanodeSecuritySetupIT {
 
     @Test
     void testSecuredSetup() throws ExecutionException, RetryException {
-        final String jwtAuthToken = IndexerJwtAuthTokenProvider.createToken(DatanodeContainerizedBackend.SIGNING_SECRET.getBytes(StandardCharsets.UTF_8), Duration.seconds(120));
-
-        waitForOpensearchAvailableStatus(backend.getDatanodeRestPort(), trustStore, restAdminUsername, ROOT_PASSWORD_PLAINTEXT);
+        waitForOpensearchAvailableStatus(backend.getDatanodeRestPort(), trustStore);
 
         try {
-            given().header( "Authorization", "Bearer " + jwtAuthToken)
+            given().header( "Authorization", DatanodeContainerizedBackend.JWT_AUTH_TOKEN_PROVIDER.get())
                     .trustStore(trustStore)
                     .get("https://localhost:" + backend.getOpensearchRestPort())
                     .then().assertThat()
@@ -123,15 +114,14 @@ public class DatanodeSecuritySetupIT {
         }
     }
 
-    private ValidatableResponse waitForOpensearchAvailableStatus(final Integer datanodeRestPort, final KeyStore trustStore, String authUsername, String authPassword) throws ExecutionException, RetryException {
+    private ValidatableResponse waitForOpensearchAvailableStatus(final Integer datanodeRestPort, final KeyStore trustStore) throws ExecutionException, RetryException {
 
         try {
             return new DatanodeRestApiWait(
                     RestOperationParameters.builder()
                             .port(datanodeRestPort)
                             .truststore(trustStore)
-                            .username(authUsername)
-                            .password(authPassword)
+                            .jwtTokenProvider(DatanodeContainerizedBackend.JWT_AUTH_TOKEN_PROVIDER)
                             .build())
                     .waitForAvailableStatus();
         } catch (Exception ex) {

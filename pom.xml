@@ -125,17 +125,17 @@
         <guava-retrying.version>2.0.0</guava-retrying.version>
         <guava.version>33.1.0-jre</guava.version>
         <guice.version>7.0.0</guice.version>
-        <HdrHistogram.version>2.1.12</HdrHistogram.version>
+        <HdrHistogram.version>2.2.1</HdrHistogram.version>
         <hamcrest.version>2.2</hamcrest.version>
         <hibernate-validator.version>8.0.1.Final</hibernate-validator.version>
         <hk2.version>3.1.0</hk2.version> <!-- The HK2 version should match the version being used by Jersey -->
-        <jackson.version>2.17.0</jackson.version>
+        <jackson.version>2.17.1</jackson.version>
         <jadconfig.version>0.14.0</jadconfig.version>
         <java-semver.version>0.9.0</java-semver.version>
         <javax.annotation-api.version>1.3.2</javax.annotation-api.version>
         <jakarta.annotation-api.version>3.0.0</jakarta.annotation-api.version>
         <jakarta.inject.version>2.0.1</jakarta.inject.version>
-        <jakarta.ws.rs-api.version>3.1.0</jakarta.ws.rs-api.version>
+        <jakarta.ws.rs-api.version>4.0.0</jakarta.ws.rs-api.version>
         <jaxb-api.version>2.3.1</jaxb-api.version>
         <jbcrypt.version>0.4</jbcrypt.version>
         <jcip-annotations.version>1.0</jcip-annotations.version>
@@ -150,7 +150,7 @@
         <log4j.version>2.23.1</log4j.version>
         <lucene.version>9.10.0</lucene.version>
         <metrics.version>4.2.25</metrics.version>
-        <mongodb-driver.version>5.0.1</mongodb-driver.version>
+        <mongodb-driver.version>5.1.0</mongodb-driver.version>
         <mongojack.version>4.11.0</mongojack.version>
         <natty.version>0.13</natty.version>
         <netty.version>4.1.109.Final</netty.version>
@@ -183,6 +183,7 @@
         <asciitable.version>0.3.2</asciitable.version>
         <jjwt.version>0.12.5</jjwt.version>
         <stateless4j.version>2.6.0</stateless4j.version>
+        <poi.version>5.2.5</poi.version>
 
         <!-- Test dependencies -->
         <apacheds-server.version>2.0.0-M24</apacheds-server.version>
@@ -414,6 +415,11 @@
                 <artifactId>commons-exec</artifactId>
                 <version>${commons-exec.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-csv</artifactId>
+                <version>${commons-csv.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>io.dropwizard.metrics</groupId>
@@ -579,7 +585,7 @@
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>4.8.4.0</version>
+                    <version>4.8.5.0</version>
                 </plugin>
                 <plugin>
                     <groupId>de.thetaphi</groupId>
