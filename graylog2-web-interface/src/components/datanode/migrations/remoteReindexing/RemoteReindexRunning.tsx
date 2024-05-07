@@ -16,7 +16,8 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
+import type { ColorVariant } from '@graylog/sawmill';
 
 import { ProgressBar } from 'components/common';
 import { Alert, BootstrapModalWrapper, Button, Modal } from 'components/bootstrap';
@@ -42,6 +43,21 @@ const LogsContainer = styled.div`
     padding-bottom: 4px;
   }
 `;
+
+const StyledLog = styled.span<{ $colorVariant: ColorVariant }>(({ $colorVariant, theme }) => css`
+  color: ${$colorVariant ? theme.colors.variant[$colorVariant] : 'inherit'};
+`);
+
+const getColorVariantFromLogLevel = (logLovel: string): ColorVariant|undefined => {
+  switch (logLovel) {
+    case 'ERROR':
+      return 'danger';
+    case 'WARNING':
+      return 'warning';
+    default:
+      return undefined;
+  }
+};
 
 const RemoteReindexRunning = ({ currentStep, onTriggerStep }: MigrationStepComponentProps) => {
   const { nextSteps, migrationStatus, handleTriggerStep } = useRemoteReindexMigrationStatus(currentStep, onTriggerStep);
@@ -91,8 +107,8 @@ const RemoteReindexRunning = ({ currentStep, onTriggerStep }: MigrationStepCompo
                     <tbody>
                       {migrationStatus.logs.map((log) => (
                         <tr title={new Date(log.timestamp).toLocaleString()}>
-                          <td>[{log.log_level}]</td>
-                          <td>{log.message}</td>
+                          <td width={80}>[<StyledLog $colorVariant={getColorVariantFromLogLevel(log.log_level)}>{log.log_level}</StyledLog>]</td>
+                          <td><StyledLog $colorVariant={getColorVariantFromLogLevel(log.log_level)}>{log.message}</StyledLog></td>
                         </tr>
                       ))}
                     </tbody>
