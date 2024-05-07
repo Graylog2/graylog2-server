@@ -28,7 +28,6 @@ import { List, Grid, Space } from 'preflight/components/common';
 import Alert from 'components/bootstrap/Alert';
 import RenewalPolicyConfiguration from 'preflight/components/ConfigurationWizard/RenewalPolicyConfiguration';
 import type { ConfigurationStep } from 'preflight/types';
-import ResumeStartupButton from 'preflight/components/ResumeStartupButton';
 import RestartConfigurationButton from 'preflight/components/RestartConfigurationButton';
 import type FetchError from 'logic/errors/FetchError';
 
@@ -132,15 +131,7 @@ const ConfigurationWizard = ({ setIsWaitingForStartup }: Props) => {
           })}
         </List>
         <Space h="md" />
-        You can always
-        {' '}
-        <ResumeStartupButton setIsWaitingForStartup={setIsWaitingForStartup}
-                             compact
-                             variant="light">
-          resume startup
-        </ResumeStartupButton>
-        {' '}
-        or <RestartConfigurationButton compact variant="light" color="red" /> the configuration
+        You can always{' '}<RestartConfigurationButton compact variant="light" color="red" /> the configuration
       </Grid.Col>
       <Grid.Col span={{ base: 12, md: 6, orderMd: 1 }}>
         {activeStepKey === CONFIGURATION_STEPS.CA_CONFIGURATION.key && <CAConfiguration />}

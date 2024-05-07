@@ -1,0 +1,5 @@
+type="a"
+message="Adds export into csv, json, yaml and xml actions for aggregation widget. Also we change placment of message widget export action"
+
+issues=["19139"]
+pulls=["19140"]

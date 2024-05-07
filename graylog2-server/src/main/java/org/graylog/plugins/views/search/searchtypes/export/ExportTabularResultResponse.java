@@ -14,11 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.rest.export.response;
+package org.graylog.plugins.views.search.searchtypes.export;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.google.common.collect.ImmutableList;
+import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog.plugins.views.search.util.ListOfStringsComparator;
 
@@ -27,14 +28,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-public record AggregationWidgetExportResponse(@JsonProperty List<String> header,
-                                              @JsonProperty @JacksonXmlElementWrapper(useWrapping = false) List<DataRow> dataRows) {
+public record ExportTabularResultResponse(@JsonProperty List<String> header,
+                                          @JsonProperty @JacksonXmlElementWrapper(useWrapping = false) List<DataRow> dataRows) {
 
-    public record DataRow(@JacksonXmlElementWrapper(useWrapping = false) List<String> row) {
+    public record DataRow(@JacksonXmlElementWrapper(useWrapping = false) List<Object> row) {
 
     }
 
-    public static AggregationWidgetExportResponse fromPivotResult(final PivotResult pivotResult) {
+    public static ExportTabularResultResponse fromPivotResult(final PivotResult pivotResult) {
 
         final Collection<PivotResult.Row> rows = pivotResult.rows();
 
@@ -60,24 +61,40 @@ public record AggregationWidgetExportResponse(@JsonProperty List<String> header,
                 .filter(row -> "leaf".equals(row.source()))
                 .map(row -> {
                     final ImmutableList<String> key = row.key();
-                    final List<String> values = columns.stream()
+                    final List<Object> values = columns.stream()
                             .map(metric -> row.values()
                                     .stream()
                                     .filter(value -> value.key().equals(metric))
                                     .filter(value -> value.value() != null)
                                     .findFirst()
-                                    .map(value -> value.value().toString())
-                                    .orElse("")
+                                    .map(value -> value.value())
+                                    .orElse(null)
                             ).toList();
 
-                    List<String> dataRow = new ArrayList<>();
+                    List<Object> dataRow = new ArrayList<>();
                     dataRow.addAll(key);
                     dataRow.addAll(values);
                     return new DataRow(dataRow);
                 })
                 .toList();
 
-        return new AggregationWidgetExportResponse(header, dataRows);
+        return new ExportTabularResultResponse(header, dataRows);
+    }
 
+    public static ExportTabularResultResponse fromMessageListResult(final MessageList.Result m) {
+        if(m.messages().isEmpty()) {
+            return new ExportTabularResultResponse(List.of(), List.of());
+        }
+
+        final var first = m.messages().get(0);
+
+        final var header = first.message().keySet().stream().toList();
+        final var rows = m.messages()
+                            .stream()
+                            .map(message ->
+                                    new DataRow(header.stream().map(key -> message.message().get(key)).toList())
+                            )
+                            .toList();
+        return new ExportTabularResultResponse(header, rows);
     }
 }

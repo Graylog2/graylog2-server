@@ -100,7 +100,7 @@ public class DatanodeProvisioningIT {
         new DatanodeOpensearchWait(RestOperationParameters.builder()
                 .port(getOpensearchPort())
                 .truststore(keystoreFromApiCertificate(basicAuth))
-                .jwtToken(jwtToken())
+                .jwtTokenProvider(DatanodeContainerizedBackend.JWT_AUTH_TOKEN_PROVIDER)
                 .build())
                 .waitForNodesCount(1);
     }
@@ -184,11 +184,6 @@ public class DatanodeProvisioningIT {
         final CertutilCa command = new CertutilCa(certPath.toAbsolutePath().toString(), input);
         command.run();
         return certPath;
-    }
-
-
-    private static String jwtToken() {
-        return IndexerJwtAuthTokenProvider.createToken(DatanodeContainerizedBackend.SIGNING_SECRET.getBytes(StandardCharsets.UTF_8), Duration.seconds(600));
     }
 
     @Nonnull
