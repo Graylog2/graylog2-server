@@ -23,7 +23,6 @@ import Section from 'preflight/components/common/Section';
 import DataNodesOverview from 'preflight/components/Setup/DataNodesOverview';
 import DocumentationLink from 'components/support/DocumentationLink';
 import ConfigurationWizard from 'preflight/components/ConfigurationWizard';
-import ResumeStartupButton from 'preflight/components/ResumeStartupButton';
 
 const P = styled.p`
   max-width: 700px;
@@ -46,9 +45,6 @@ const Setup = ({ setIsWaitingForStartup }: Props) => (
       <P>
         You can either implement a <DocumentationLink page={DocsHelper.PAGES.GRAYLOG_DATA_NODE} text="Graylog data node" /> (recommended) or you can configure an <DocumentationLink page={DocsHelper.PAGES.OPEN_SEARCH_SETUP} text="OpenSearch" /> node manually.
         For the manual OpenSearch configuration you need to adjust the Graylog configuration and restart the Graylog server. After the restart this page will not show up again.
-      </P>
-      <P>
-        You can always skip the configuration and <ResumeStartupButton variant="light" compact setIsWaitingForStartup={setIsWaitingForStartup}>resume startup</ResumeStartupButton>.
       </P>
     </Section>
     <Section title="Graylog Data Nodes" titleOrder={2}>
