@@ -35,7 +35,6 @@ public class OpensearchStateMachine extends StateMachine<OpensearchState, Opense
     public static final int MAX_REBOOT_FAILURES = 3;
 
     StateMachineTracerAggregator tracerAggregator = new StateMachineTracerAggregator();
-    private static OpensearchProcess process;
 
     public OpensearchStateMachine(OpensearchState initialState, StateMachineConfig<OpensearchState, OpensearchEvent> config) {
         super(initialState, config);
@@ -43,7 +42,6 @@ public class OpensearchStateMachine extends StateMachine<OpensearchState, Opense
     }
 
     public static OpensearchStateMachine createNew(OpensearchProcess process) {
-        OpensearchStateMachine.process = process;
         final FailuresCounter restFailureCounter = FailuresCounter.oneBased(MAX_REST_TEMPORARY_FAILURES);
         final FailuresCounter startupFailuresCounter = FailuresCounter.oneBased(MAX_REST_STARTUP_FAILURES);
         final FailuresCounter rebootCounter = FailuresCounter.oneBased(MAX_REBOOT_FAILURES);
