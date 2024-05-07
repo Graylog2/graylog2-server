@@ -19,24 +19,14 @@ package org.graylog.plugins.formatting.units.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import org.mongojack.Id;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonTypeName(DerivedUnit.TYPE)
 public record DerivedUnit(@JsonProperty(value = ABBREVIATION, required = true) String abbrev,
                           @JsonProperty(value = NAME, required = true) String name,
                           @JsonProperty(value = UNIT_TYPE, required = true) String unitType,
-                          @JsonProperty(value = "conversion", required = true) Conversion conversion) implements Unit, UnitView {
+                          @JsonProperty(value = "conversion", required = true) Conversion conversion) implements Unit {
 
     public static final String TYPE = "derived";
 
-    @Id
-    public String id() {
-        return unitType() + "." + name();
-    }
-
-    @Override
-    public UnitView asUnitView() {
-        return this;
-    }
 }

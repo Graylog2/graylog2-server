@@ -16,31 +16,25 @@
  */
 package org.graylog.plugins.formatting.units.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-/**
- * Unit, stored in MongoDB.
- */
 @JsonSubTypes({
         @JsonSubTypes.Type(value = BaseUnit.class),
         @JsonSubTypes.Type(value = DerivedUnit.class),
 })
-@JsonTypeInfo(use = JsonTypeInfo.Id.DEDUCTION)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = Unit.TYPE)
 public interface Unit {
 
     String UNIT_TYPE = "unit_type";
     String ABBREVIATION = "abbrev";
     String NAME = "name";
+    String TYPE = "type";
 
     String abbrev();
 
     String name();
 
     String unitType();
-
-    @JsonIgnore
-    UnitView asUnitView();
 
 }

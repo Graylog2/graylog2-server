@@ -18,23 +18,16 @@ package org.graylog.plugins.formatting.units.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.mongojack.Id;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonTypeName(BaseUnit.TYPE)
 public record BaseUnit(@JsonProperty(value = ABBREVIATION, required = true) String abbrev,
                        @JsonProperty(value = NAME, required = true) String name,
-                       @JsonProperty(value = UNIT_TYPE, required = true) String unitType,
-                       boolean generateCommonUpScaleUnits,
-                       boolean generateCommonDownScaleUnits) implements Unit {
+                       @JsonProperty(value = UNIT_TYPE, required = true) String unitType
+) implements Unit {
 
-    @Id
-    public String id() {
-        return unitType() + ".base";
-    }
+    public static final String TYPE = "base";
 
-    @Override
-    public UnitView asUnitView() {
-        return new BaseUnitView(this);
-    }
 }

@@ -14,20 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.formatting.units.model;
+package org.graylog.plugins.formatting.units;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import org.graylog.plugins.formatting.units.model.SupportedUnits;
+import org.graylog.plugins.formatting.units.provider.SupportedUnitsProvider;
+import org.graylog2.plugin.inject.Graylog2Module;
 
-/**
- * View of {@link org.graylog.plugins.formatting.units.model.Unit}, presented via API.
- */
-@JsonTypeInfo(
-        use = JsonTypeInfo.Id.NAME,
-        property = "type")
-@JsonSubTypes({
-        @JsonSubTypes.Type(value = BaseUnitView.class, name = BaseUnitView.TYPE),
-        @JsonSubTypes.Type(value = DerivedUnit.class, name = DerivedUnit.TYPE),
-})
-public interface UnitView {
+public class UnitsModule extends Graylog2Module {
+
+    @Override
+    protected void configure() {
+        super.configure();
+        bind(SupportedUnits.class).toProvider(SupportedUnitsProvider.class).asEagerSingleton();
+    }
 }

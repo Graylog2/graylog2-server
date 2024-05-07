@@ -18,7 +18,7 @@ package org.graylog.plugins.views.search.rest;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.graylog.plugins.formatting.units.model.UnitView;
+import org.graylog.plugins.formatting.units.model.UnitId;
 import org.graylog2.indexer.fieldtypes.FieldTypes;
 
 import javax.annotation.Nullable;
@@ -26,7 +26,7 @@ import javax.annotation.Nullable;
 @JsonAutoDetect
 public record MappedFieldTypeDTO(@JsonProperty("name") String name,
                                  @JsonProperty("type") FieldTypes.Type type,
-                                 @JsonProperty("unit") @Nullable UnitView unit
+                                 @JsonProperty("unit") @Nullable UnitId unit
 ) {
 
     public MappedFieldTypeDTO(final String name,

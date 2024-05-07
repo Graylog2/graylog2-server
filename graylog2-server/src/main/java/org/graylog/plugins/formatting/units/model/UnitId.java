@@ -16,27 +16,11 @@
  */
 package org.graylog.plugins.formatting.units.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import static org.graylog.plugins.formatting.units.model.Unit.ABBREVIATION;
-import static org.graylog.plugins.formatting.units.model.Unit.NAME;
 import static org.graylog.plugins.formatting.units.model.Unit.UNIT_TYPE;
 
-
-/**
- * {@link BaseUnit} has some inner configuration fields, like `generateCommon...Units` family of properties, that no one needs to know about.
- */
-@JsonIgnoreProperties(ignoreUnknown = true)
-@JsonTypeName(BaseUnitView.TYPE)
-public record BaseUnitView(@JsonProperty(value = ABBREVIATION, required = true) String abbrev,
-                           @JsonProperty(value = NAME, required = true) String name,
-                           @JsonProperty(value = UNIT_TYPE, required = true) String unitType) implements UnitView {
-
-    public static final String TYPE = "base";
-
-    public BaseUnitView(final BaseUnit baseUnit) {
-        this(baseUnit.abbrev(), baseUnit.name(), baseUnit.unitType());
-    }
+public record UnitId(@JsonProperty(value = UNIT_TYPE, required = true) String unitType,
+                     @JsonProperty(value = ABBREVIATION, required = true) String abbrev) {
 }

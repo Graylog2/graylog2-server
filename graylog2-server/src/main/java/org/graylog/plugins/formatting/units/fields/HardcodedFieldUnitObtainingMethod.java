@@ -16,27 +16,43 @@
  */
 package org.graylog.plugins.formatting.units.fields;
 
-import org.graylog.plugins.formatting.units.model.BaseUnitView;
-import org.graylog.plugins.formatting.units.model.Conversion;
-import org.graylog.plugins.formatting.units.model.DerivedUnit;
-import org.graylog.plugins.formatting.units.model.UnitView;
+import jakarta.inject.Inject;
+import org.graylog.plugins.formatting.units.model.SupportedUnits;
+import org.graylog.plugins.formatting.units.model.Unit;
+import org.graylog.plugins.formatting.units.model.UnitId;
 
 import java.util.Optional;
 
-import static org.graylog.plugins.formatting.units.model.Conversion.ConversionAction.DIVIDE;
+import static org.graylog.schema.HttpFields.HTTP_BYTES;
+import static org.graylog.schema.HttpFields.HTTP_RESPONSE_BYTES;
+import static org.graylog.schema.NetworkFields.NETWORK_BYTES;
+import static org.graylog.schema.NetworkFields.NETWORK_DATA_BYTES;
+import static org.graylog.schema.NetworkFields.NETWORK_HEADER_BYTES;
+import static org.graylog.schema.SourceFields.SOURCE_BYTES_SENT;
 import static org.graylog2.plugin.Message.FIELD_GL2_ACCOUNTED_MESSAGE_SIZE;
 import static org.graylog2.plugin.Message.FIELD_GL2_PROCESSING_DURATION_MS;
 
 public class HardcodedFieldUnitObtainingMethod implements FieldUnitObtainingMethod {
 
+    private final SupportedUnits supportedUnits;
+
+
+    @Inject
+    public HardcodedFieldUnitObtainingMethod(final SupportedUnits supportedUnits) {
+        this.supportedUnits = supportedUnits;
+    }
+
     @Override
-    public Optional<UnitView> obtainUnit(final String fieldName) {
-        //TODO: complete list
-        //TODO: take units from DB instead of creating from scratch
+    public Optional<Unit> obtainUnit(final String fieldName) {
         return switch (fieldName) {
-            case FIELD_GL2_PROCESSING_DURATION_MS ->
-                    Optional.of(new DerivedUnit("ms", "millisecond", "time", new Conversion(1000, DIVIDE)));
-            case FIELD_GL2_ACCOUNTED_MESSAGE_SIZE -> Optional.of(new BaseUnitView("b", "byte", "size"));
+            case FIELD_GL2_PROCESSING_DURATION_MS -> supportedUnits.getUnit(new UnitId("time", "ms"));
+            case FIELD_GL2_ACCOUNTED_MESSAGE_SIZE,
+                    HTTP_BYTES,
+                    HTTP_RESPONSE_BYTES,
+                    NETWORK_BYTES,
+                    NETWORK_DATA_BYTES,
+                    NETWORK_HEADER_BYTES,
+                    SOURCE_BYTES_SENT -> supportedUnits.getUnit(new UnitId("size", "B"));
             default -> Optional.empty();
         };
 

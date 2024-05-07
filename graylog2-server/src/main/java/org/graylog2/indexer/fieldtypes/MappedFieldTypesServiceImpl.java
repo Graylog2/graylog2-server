@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import jakarta.inject.Inject;
 import org.graylog.plugins.formatting.units.fields.FieldUnitObtainer;
+import org.graylog.plugins.formatting.units.model.UnitId;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
 import org.graylog2.Configuration;
@@ -81,7 +82,9 @@ public class MappedFieldTypesServiceImpl implements MappedFieldTypesService {
         final FieldTypes.Type mappedFieldType = fieldTypeMapper.mapType(fieldType).orElse(UNKNOWN_TYPE);
         return new MappedFieldTypeDTO(fieldType.fieldName(),
                 mappedFieldType,
-                fieldUnitObtainer.obtainUnit(fieldType.fieldName()).orElse(null));
+                fieldUnitObtainer.obtainUnit(fieldType.fieldName())
+                        .map(unit -> new UnitId(unit.unitType(), unit.abbrev()))
+                        .orElse(null));
     }
 
     private Set<MappedFieldTypeDTO> mergeCompoundFieldTypes(java.util.stream.Stream<MappedFieldTypeDTO> stream) {
@@ -112,7 +115,9 @@ public class MappedFieldTypesServiceImpl implements MappedFieldTypesService {
                             : commonProperties;
                     return new MappedFieldTypeDTO(fieldName,
                             createType(resultingFieldType, properties),
-                            fieldUnitObtainer.obtainUnit(fieldName).orElse(null));
+                            fieldUnitObtainer.obtainUnit(fieldName)
+                                    .map(unit -> new UnitId(unit.unitType(), unit.abbrev()))
+                                    .orElse(null));
 
                 })
                 .collect(Collectors.toSet());

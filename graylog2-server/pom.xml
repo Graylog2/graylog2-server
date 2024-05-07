@@ -1238,6 +1238,21 @@
                         <artifactId>maven-resources-plugin</artifactId>
                         <executions>
                             <execution>
+                                <id>copy-units-data</id>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <phase>compile</phase>
+                                <configuration>
+                                    <outputDirectory>src/main/resources/units</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>${basedir}/../graylog-shared-resources/units</directory>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                            <execution>
                                 <id>copy-web-ui-assets</id>
                                 <goals>
                                     <goal>copy-resources</goal>

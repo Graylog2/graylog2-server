@@ -26,6 +26,7 @@ import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.spi.Message;
 import com.mongodb.MongoException;
+import jakarta.inject.Inject;
 import org.graylog.enterprise.EnterpriseModule;
 import org.graylog.events.EventsModule;
 import org.graylog.events.processor.EventDefinitionConfiguration;
@@ -33,6 +34,7 @@ import org.graylog.grn.GRNTypesModule;
 import org.graylog.metrics.prometheus.PrometheusExporterConfiguration;
 import org.graylog.metrics.prometheus.PrometheusMetricsModule;
 import org.graylog.plugins.cef.CEFInputModule;
+import org.graylog.plugins.formatting.units.UnitsModule;
 import org.graylog.plugins.map.MapWidgetModule;
 import org.graylog.plugins.map.config.GeoIpProcessorConfig;
 import org.graylog.plugins.netflow.NetFlowPluginModule;
@@ -111,8 +113,6 @@ import org.graylog2.system.processing.ProcessingStatusConfig;
 import org.graylog2.system.shutdown.GracefulShutdown;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -210,6 +210,7 @@ public class Server extends ServerBootstrap {
                 new ScriptingApiModule(),
                 new StreamsModule(),
                 new TracingModule(),
+                new UnitsModule(),
                 new DataTieringModule(),
                 new DatanodeMigrationBindings(),
                 new CaModule()

@@ -16,11 +16,11 @@
  */
 package org.graylog.plugins.formatting.units.fields;
 
-import org.graylog.plugins.formatting.units.model.UnitView;
+import org.graylog.plugins.formatting.units.model.Unit;
 
 import java.util.Optional;
 
 public interface FieldUnitObtainingMethod {
 
-    Optional<UnitView> obtainUnit(final String fieldName);
+    Optional<Unit> obtainUnit(final String fieldName);
 }

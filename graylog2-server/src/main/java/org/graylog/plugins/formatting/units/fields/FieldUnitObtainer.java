@@ -16,16 +16,22 @@
  */
 package org.graylog.plugins.formatting.units.fields;
 
-import org.graylog.plugins.formatting.units.model.UnitView;
+import jakarta.inject.Inject;
+import org.graylog.plugins.formatting.units.model.Unit;
 
 import java.util.List;
 import java.util.Optional;
 
 public class FieldUnitObtainer {
 
-    private final List<FieldUnitObtainingMethod> prioritizedMethodList = List.of(new HardcodedFieldUnitObtainingMethod());
+    private final List<FieldUnitObtainingMethod> prioritizedMethodList;
 
-    public Optional<UnitView> obtainUnit(final String fieldName) {
+    @Inject
+    public FieldUnitObtainer(final HardcodedFieldUnitObtainingMethod hardcodedFieldUnitObtainingMethod) {
+        prioritizedMethodList = List.of(hardcodedFieldUnitObtainingMethod);
+    }
+
+    public Optional<Unit> obtainUnit(final String fieldName) {
         return prioritizedMethodList.stream()
                 .map(fieldUnitObtainingMethod -> fieldUnitObtainingMethod.obtainUnit(fieldName))
                 .filter(Optional::isPresent)
