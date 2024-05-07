@@ -183,6 +183,7 @@
         <asciitable.version>0.3.2</asciitable.version>
         <jjwt.version>0.12.5</jjwt.version>
         <stateless4j.version>2.6.0</stateless4j.version>
+        <poi.version>5.2.5</poi.version>
 
         <!-- Test dependencies -->
         <apacheds-server.version>2.0.0-M24</apacheds-server.version>
@@ -413,6 +414,11 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-exec</artifactId>
                 <version>${commons-exec.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-csv</artifactId>
+                <version>${commons-csv.version}</version>
             </dependency>
 
             <dependency>
