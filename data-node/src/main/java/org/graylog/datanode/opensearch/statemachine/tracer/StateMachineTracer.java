@@ -26,6 +26,7 @@ import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachine;
  */
 public interface StateMachineTracer extends Trace<OpensearchState, OpensearchEvent> {
 
-    void setStateMachine(OpensearchStateMachine stateMachine);
+    default void setStateMachine(OpensearchStateMachine stateMachine) {
+    }
 
 }

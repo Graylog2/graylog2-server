@@ -45,8 +45,4 @@ public class StateMachineTracerAggregator implements StateMachineTracer {
         delegates.forEach(d -> d.transition(processEvent, s1, s2));
     }
 
-    @Override
-    public void setStateMachine(OpensearchStateMachine stateMachine) {
-        
-    }
 }
