@@ -157,6 +157,7 @@ const RuleSimulation = ({ rule: currentRule, onSaveMessage }: Props) => {
                placeholder={getPlaceHolderByType()}
                value={rawMessageToSimulate}
                onChange={handleRawMessageChange}
+               title="Message string, Key Value Pairs or JSON"
                help="Enter a normal string to simulate the message field, Key-Value pairs or a JSON to simulate the whole message."
                error={errorMessage}
                rows={4} />

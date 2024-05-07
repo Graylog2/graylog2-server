@@ -120,7 +120,7 @@ describe('RuleForm', () => {
       </PipelineRulesContextProvider>,
     );
 
-    const rawMessageInput = await screen.findByTitle('Message string or JSON');
+    const rawMessageInput = await screen.findByTitle('Message string, Key Value Pairs or JSON');
 
     expect(rawMessageInput).toHaveValue('');
 
