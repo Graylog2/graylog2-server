@@ -26,6 +26,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Set;
+
 @ExtendWith(MockitoExtension.class)
 class OpensearchWatchdogTracerTest {
 
@@ -34,10 +36,8 @@ class OpensearchWatchdogTracerTest {
 
     @Test
     void testLifecycle() {
-        OpensearchStateMachine stateMachine = OpensearchStateMachine.createNew(opensearchProcess);
         final OpensearchWatchdog watchdog = new OpensearchWatchdog(3);
-        watchdog.setStateMachine(stateMachine);
-        stateMachine.getTracerAggregator().addTracer(watchdog);
+        OpensearchStateMachine stateMachine = OpensearchStateMachine.createNew(opensearchProcess, Set.of(watchdog));
         stateMachine.fire(OpensearchEvent.PROCESS_STARTED);
 
         // both process and watchdog are running now. Let's stop the process and see if the watchdog will restart it

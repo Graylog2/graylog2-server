@@ -19,9 +19,12 @@ package org.graylog.datanode.opensearch.statemachine;
 import com.github.oxo42.stateless4j.StateMachine;
 import com.github.oxo42.stateless4j.StateMachineConfig;
 import org.graylog.datanode.opensearch.OpensearchProcess;
+import org.graylog.datanode.opensearch.statemachine.tracer.StateMachineTracer;
 import org.graylog.datanode.opensearch.statemachine.tracer.StateMachineTracerAggregator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Set;
 
 public class OpensearchStateMachine extends StateMachine<OpensearchState, OpensearchEvent> {
 
@@ -41,7 +44,7 @@ public class OpensearchStateMachine extends StateMachine<OpensearchState, Opense
         setTrace(tracerAggregator);
     }
 
-    public static OpensearchStateMachine createNew(OpensearchProcess process) {
+    public static OpensearchStateMachine createNew(OpensearchProcess process, Set<StateMachineTracer> tracer) {
         final FailuresCounter restFailureCounter = FailuresCounter.oneBased(MAX_REST_TEMPORARY_FAILURES);
         final FailuresCounter startupFailuresCounter = FailuresCounter.oneBased(MAX_REST_STARTUP_FAILURES);
         final FailuresCounter rebootCounter = FailuresCounter.oneBased(MAX_REBOOT_FAILURES);
@@ -125,7 +128,12 @@ public class OpensearchStateMachine extends StateMachine<OpensearchState, Opense
                 .permit(OpensearchEvent.RESET, OpensearchState.WAITING_FOR_CONFIGURATION, process::reset)
                 .ignore(OpensearchEvent.PROCESS_STOPPED);
 
-        return new OpensearchStateMachine(OpensearchState.WAITING_FOR_CONFIGURATION, config);
+        OpensearchStateMachine stateMachine = new OpensearchStateMachine(OpensearchState.WAITING_FOR_CONFIGURATION, config);
+        tracer.forEach(t -> {
+            t.setStateMachine(stateMachine);
+            stateMachine.getTracerAggregator().addTracer(t);
+        });
+        return stateMachine;
     }
 
     public StateMachineTracerAggregator getTracerAggregator() {
