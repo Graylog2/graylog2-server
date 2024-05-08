@@ -28,7 +28,7 @@ import jakarta.ws.rs.core.Response;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.StringTokenizer;
+import java.util.function.Predicate;
 
 public class BasicAuthFilter implements ContainerRequestFilter {
 
@@ -37,12 +37,14 @@ public class BasicAuthFilter implements ContainerRequestFilter {
     private final String adminUsername;
     private final String adminPasswordHash;
     private final String realm;
+    private final Predicate<String> bypassAuthForLogin;
 
 
-    public BasicAuthFilter(String adminUsername, String adminPasswordHash, String realm) {
+    public BasicAuthFilter(String adminUsername, String adminPasswordHash, String realm, Predicate<String> bypassLogin) {
         this.adminUsername = adminUsername;
         this.adminPasswordHash = adminPasswordHash;
         this.realm = realm;
+        this.bypassAuthForLogin = bypassLogin;
     }
 
     @Override
@@ -52,6 +54,12 @@ public class BasicAuthFilter implements ContainerRequestFilter {
         final List<String> authorization = headers.get(AUTHORIZATION_PROPERTY);
 
         if (authorization == null || authorization.isEmpty()) {
+
+            final String path = requestContext.getUriInfo().getPath();
+            if(bypassAuthForLogin.test(path)) { // the only url that doesn't require basic auth
+                return;
+            }
+
             abortRequestUnauthorized(requestContext, "You cannot access this resource, missing authorization header!");
             return;
         }

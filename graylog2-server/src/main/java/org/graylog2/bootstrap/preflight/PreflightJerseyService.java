@@ -63,6 +63,7 @@ import static java.util.Objects.requireNonNull;
 
 public class PreflightJerseyService extends AbstractIdleService {
     private static final Logger LOG = LoggerFactory.getLogger(PreflightJerseyService.class);
+    private static final String LOGIN_PATH_NO_BASIC_AUTH = "login";
 
     private final HttpConfiguration configuration;
     private final Set<Class<?>> systemRestResources;
@@ -203,7 +204,7 @@ public class PreflightJerseyService extends AbstractIdleService {
     private BasicAuthFilter createBasicAuthFilter(Configuration localConfiguration, PreflightConfigService preflightConfigService) {
         final String username = localConfiguration.getRootUsername();
         final String preflightPassword = preflightConfigService.getPreflightPassword();
-        return new BasicAuthFilter(username, DigestUtils.sha256Hex(preflightPassword), "preflight-config");
+        return new BasicAuthFilter(username, DigestUtils.sha256Hex(preflightPassword), "preflight-config", LOGIN_PATH_NO_BASIC_AUTH::equals);
     }
 
     private Map<String, MediaType> mediaTypeMappings() {

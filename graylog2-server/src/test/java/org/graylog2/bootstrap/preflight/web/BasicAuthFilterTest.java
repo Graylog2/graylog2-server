@@ -20,6 +20,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.assertj.core.api.Assertions;
 import org.glassfish.jersey.server.ContainerRequest;
 import jakarta.annotation.Nonnull;
+import org.glassfish.jersey.server.ExtendedUriInfo;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
@@ -33,14 +34,38 @@ import java.util.Base64;
 import java.util.Collections;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 
 class BasicAuthFilterTest {
 
+
+    @Test
+    void testLoginPath() throws IOException {
+        final BasicAuthFilter filter = new BasicAuthFilter("admin", DigestUtils.sha256Hex("admin"), "junit-test", "login"::equals);
+        final ContainerRequest request = mockRequest("login", null, null);
+        filter.filter(request);
+        final ArgumentCaptor<Response> captor = ArgumentCaptor.forClass(Response.class);
+        Mockito.verify(request, never()).abortWith(captor.capture());
+    }
+
+    @Test
+    void testMissingCredentials() throws IOException {
+        final BasicAuthFilter filter = new BasicAuthFilter("admin", DigestUtils.sha256Hex("admin"), "junit-test", path -> false);
+        final ContainerRequest request = mockRequest("/", null, null);
+        filter.filter(request);
+        final ArgumentCaptor<Response> captor = ArgumentCaptor.forClass(Response.class);
+        Mockito.verify(request, times(1)).abortWith(captor.capture());
+        final Response response = captor.getValue();
+        Assertions.assertThat(response.getStatusInfo().getStatusCode()).isEqualTo(401);
+        Assertions.assertThat(response.getStatusInfo().getReasonPhrase()).isEqualTo("Unauthorized");
+        Assertions.assertThat(response.getEntity()).isEqualTo("You cannot access this resource, missing authorization header!");
+    }
+
     @Test
     void testInvalidCredentials() throws IOException {
-        final BasicAuthFilter filter = new BasicAuthFilter("admin", DigestUtils.sha256Hex("admin"), "junit-test");
-        final ContainerRequest request = mockRequest("admin", "admin1");
+        final BasicAuthFilter filter = new BasicAuthFilter("admin", DigestUtils.sha256Hex("admin"), "junit-test", path -> false);
+        final ContainerRequest request = mockRequest("/", "admin", "admin1");
         filter.filter(request);
         final ArgumentCaptor<Response> captor = ArgumentCaptor.forClass(Response.class);
         Mockito.verify(request, times(1)).abortWith(captor.capture());
@@ -52,8 +77,8 @@ class BasicAuthFilterTest {
 
     @Test
     void testMissingPassword() throws IOException {
-        final BasicAuthFilter filter = new BasicAuthFilter("admin", DigestUtils.sha256Hex("admin"), "junit-test");
-        final ContainerRequest request = mockRequest("admin", "");
+        final BasicAuthFilter filter = new BasicAuthFilter("admin", DigestUtils.sha256Hex("admin"), "junit-test", path -> false);
+        final ContainerRequest request = mockRequest("/", "admin", "");
         filter.filter(request);
         final ArgumentCaptor<Response> captor = ArgumentCaptor.forClass(Response.class);
         Mockito.verify(request, times(1)).abortWith(captor.capture());
@@ -65,16 +90,23 @@ class BasicAuthFilterTest {
 
     @Test
     void testCorrectCredentials() throws IOException {
-        final BasicAuthFilter filter = new BasicAuthFilter("admin", DigestUtils.sha256Hex("admin"), "junit-test");
-        final ContainerRequest request = mockRequest("admin", "admin");
+        final BasicAuthFilter filter = new BasicAuthFilter("admin", DigestUtils.sha256Hex("admin"), "junit-test", path -> false);
+        final ContainerRequest request = mockRequest("/", "admin", "admin");
         filter.filter(request);
         Mockito.verify(request, Mockito.never()).abortWith(Mockito.any());
     }
 
-    private static ContainerRequest mockRequest(String username, String password) {
+    private static ContainerRequest mockRequest(String path, String username, String password) {
         final ContainerRequest request = mock(ContainerRequest.class);
+
+        final ExtendedUriInfo uriInfo = mock(ExtendedUriInfo.class);
+        Mockito.when(uriInfo.getPath()).thenReturn(path);
+        Mockito.when(request.getUriInfo()).thenReturn(uriInfo);
+
         final MultivaluedHashMap<String, String> headers = new MultivaluedHashMap<>();
-        headers.put("Authorization", Collections.singletonList("Basic " + base64(username, password)));
+        if (username != null && password != null) {
+            headers.put("Authorization", Collections.singletonList("Basic " + base64(username, password)));
+        }
         Mockito.when(request.getHeaders()).thenReturn(headers);
         return request;
     }
