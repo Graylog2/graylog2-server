@@ -1569,7 +1569,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     @Test
     public void removeSingleField() {
         final Rule rule = parser.parseRule(ruleForTest(), true);
-        final Message message = messageFactory.createMessage("test", "test", Tools.nowUTC());
+        final Message message = new Message("test", "test", Tools.nowUTC());
         evaluateRule(rule, message);
 
         assertThat(message.getField("a.1")).isNull();
@@ -1581,7 +1581,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     @Test
     public void removeFieldsByName() {
         final Rule rule = parser.parseRule(ruleForTest(), true);
-        final Message message = messageFactory.createMessage("test", "test", Tools.nowUTC());
+        final Message message = new Message("test", "test", Tools.nowUTC());
         evaluateRule(rule, message);
 
         assertThat(message.getField("a.1")).isNull();
@@ -1593,7 +1593,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     @Test
     public void removeFieldsByRegex() {
         final Rule rule = parser.parseRule(ruleForTest(), true);
-        final Message message = messageFactory.createMessage("test", "test", Tools.nowUTC());
+        final Message message = new Message("test", "test", Tools.nowUTC());
         evaluateRule(rule, message);
 
         assertThat(message.getField("a.1")).isNull();
