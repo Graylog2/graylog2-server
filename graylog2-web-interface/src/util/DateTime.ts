@@ -105,7 +105,7 @@ export const relativeDifference = (dateTime: DateTime) => {
 };
 
 /**
- * Returns the time, relative to the provided date time, in days.
+ * Returns the time difference, relative to the provided date time, in days.
  */
 export const relativeDifferenceDays = (dateTime: DateTime) => {
   const eventDateObject = toDateObject(dateTime);

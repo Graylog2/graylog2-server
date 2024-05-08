@@ -60,6 +60,14 @@ public abstract class MoreMediaTypes {
      */
     public final static String APPLICATION_NDJSON = "application/x-ndjson";
     /**
+     * A {@link MediaType} constant representing {@value #APPLICATION_YAML} media type.
+     */
+    public final static String APPLICATION_YAML = "application/yaml";
+    /**
+     * A {@link MediaType} constant representing {@value #APPLICATION_XLS} media type.
+     */
+    public final static String APPLICATION_XLS = "application/vnd.ms-excel";
+    /**
      * A {@link MediaType} constant representing {@value #APPLICATION_NDJSON} media type.
      */
     public final static MediaType APPLICATION_NDJSON_TYPE = new MediaType("application", "x-ndjson");

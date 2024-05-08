@@ -118,11 +118,11 @@ public class SearchExecutor {
         final Set<SearchError> validationErrors = searchValidation.validate(preValidationSearch, searchUser);
 
         if (hasFatalError(validationErrors)) {
-            return searchJobWithFatalError(searchJobService.create(preValidationSearch, searchUser.username()), validationErrors);
+            return searchJobWithFatalError(searchJobService.create(preValidationSearch, searchUser.username(), executionState.cancelAfterSeconds()), validationErrors);
         }
 
         final Search normalizedSearch = searchNormalization.postValidation(preValidationSearch, searchUser, executionState);
-        final SearchJob searchJob = queryEngine.execute(searchJobService.create(normalizedSearch, searchUser.username()), validationErrors, searchUser.timeZone().orElse(DEFAULT_TIMEZONE));
+        final SearchJob searchJob = queryEngine.execute(searchJobService.create(normalizedSearch, searchUser.username(), executionState.cancelAfterSeconds()), validationErrors, searchUser.timeZone().orElse(DEFAULT_TIMEZONE));
         validationErrors.forEach(searchJob::addError);
         return searchJob;
     }
@@ -138,7 +138,7 @@ public class SearchExecutor {
         final Set<SearchError> validationErrors = searchValidation.validate(preValidationSearch, searchUser);
         final Search normalizedSearch = searchNormalization.postValidation(preValidationSearch, searchUser, executionState);
 
-        return queryEngine.explain(searchJobService.create(normalizedSearch, searchUser.username()), validationErrors,
+        return queryEngine.explain(searchJobService.create(normalizedSearch, searchUser.username(), executionState.cancelAfterSeconds()), validationErrors,
                 searchUser.timeZone().orElse(DEFAULT_TIMEZONE));
     }
 

@@ -74,6 +74,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContext> {
@@ -221,7 +223,7 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
 
     @Override
     public Set<IndexRange> indexRangesForStreamsInTimeRange(Set<String> streamIds, TimeRange timeRange) {
-        return indexLookup.indexRangesForStreamsInTimeRange(streamIds,timeRange);
+        return indexLookup.indexRangesForStreamsInTimeRange(streamIds, timeRange);
     }
 
     @WithSpan
@@ -265,9 +267,10 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 })
                 .toList();
 
+        //ES does not support per-request cancel_after_time_interval. We have to use simplified solution - the whole multi-search will be cancelled if it takes more than configured max. exec. time.
         final PlainActionFuture<MultiSearchResponse> mSearchFuture = client.cancellableMsearch(searches);
         job.setSearchEngineTaskFuture(mSearchFuture);
-        final List<MultiSearchResponse.Item> results = getResults(mSearchFuture, searches.size());
+        final List<MultiSearchResponse.Item> results = getResults(mSearchFuture, job.getCancelAfterSeconds(), searches.size());
 
         for (SearchType searchType : query.searchTypes()) {
             final String searchTypeId = searchType.id();
@@ -316,13 +319,17 @@ public class ElasticsearchBackend implements QueryBackend<ESGeneratedQueryContex
                 .build();
     }
 
-
     @NotNull
     private static List<MultiSearchResponse.Item> getResults(PlainActionFuture<MultiSearchResponse> mSearchFuture,
+                                                             final Integer cancelAfterSeconds,
                                                              final int numSearchTypes) {
         try {
-            return Arrays.asList(mSearchFuture.get().getResponses());
-        } catch (InterruptedException | ExecutionException e) {
+            if (!SearchJob.NO_CANCELLATION.equals(cancelAfterSeconds)) {
+                return Arrays.asList(mSearchFuture.get(cancelAfterSeconds, TimeUnit.SECONDS).getResponses());
+            } else {
+                return Arrays.asList(mSearchFuture.get().getResponses());
+            }
+        } catch (TimeoutException | InterruptedException | ExecutionException e) {
             return Collections.nCopies(numSearchTypes, new MultiSearchResponse.Item(null, e));
         }
     }

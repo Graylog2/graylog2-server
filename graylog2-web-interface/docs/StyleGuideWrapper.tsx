@@ -26,6 +26,9 @@ import User from '../src/logic/users/User';
 import UserDateTimeProvider from '../src/contexts/UserDateTimeProvider';
 /* eslint-enable import/no-relative-packages */
 
+import '@graylog/sawmill/fonts';
+import '@mantine/core/styles.css';
+
 export const adminUser = User.builder()
   .id('admin-id')
   .username('admin')

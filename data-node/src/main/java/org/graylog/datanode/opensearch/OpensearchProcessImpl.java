@@ -31,8 +31,11 @@ import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
 import org.graylog.datanode.opensearch.statemachine.OpensearchState;
 import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachine;
 import org.graylog.datanode.opensearch.statemachine.tracer.StateMachineTracer;
+import org.graylog.datanode.periodicals.ClusterStateResponse;
 import org.graylog.datanode.process.ProcessInformation;
 import org.graylog.datanode.process.ProcessListener;
+import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
+import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog2.cluster.nodes.DataNodeDto;
@@ -70,7 +73,6 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
 
     private final DatanodeConfiguration datanodeConfiguration;
 
-    private boolean isLeaderNode;
     private OpensearchCommandLineProcess commandLineProcess;
 
     private final Queue<String> stdout;
@@ -116,7 +118,7 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     }
 
     public OpensearchInfo processInfo() {
-        return new OpensearchInfo(configuration.getDatanodeNodeName(), processState.getState(), isLeaderNode, getOpensearchBaseUrl().toString(), commandLineProcess != null ? commandLineProcess.processInfo() : ProcessInformation.empty());
+        return new OpensearchInfo(configuration.getDatanodeNodeName(), processState.getState(),  getOpensearchBaseUrl().toString(), commandLineProcess != null ? commandLineProcess.processInfo() : ProcessInformation.empty());
     }
 
     @Override
@@ -154,15 +156,6 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
     @Override
     public void addStateMachineTracer(Trace<OpensearchState, OpensearchEvent> stateMachineTracer) {
         this.processState.getTracerAggregator().addTracer((StateMachineTracer) stateMachineTracer);
-    }
-
-    public void setLeaderNode(boolean isLeaderNode) {
-        this.isLeaderNode = isLeaderNode;
-    }
-
-    @Override
-    public boolean isLeaderNode() {
-        return isLeaderNode;
     }
 
     public boolean isInState(OpensearchState expectedState) {
@@ -293,4 +286,25 @@ class OpensearchProcessImpl implements OpensearchProcess, ProcessListener {
         LOG.warn("Opensearch process failed", e);
         onEvent(OpensearchEvent.PROCESS_TERMINATED);
     }
+
+    @Override
+    public boolean isManagerNode() {
+        return restClient()
+                .flatMap(this::requestClusterState)
+                .map(r -> r.nodes().get(r.clusterManagerNode()))
+                .map(managerNode -> configuration.getDatanodeNodeName().equals(managerNode.name()))
+                .orElse(false);
+    }
+    
+    private Optional<ClusterStateResponse> requestClusterState(RestHighLevelClient client) {
+        try {
+            final Response response = client.getLowLevelClient().performRequest(new Request("GET", "_cluster/state/"));
+            final ClusterStateResponse state = objectMapper.readValue(response.getEntity().getContent(), ClusterStateResponse.class);
+            return Optional.of(state);
+        } catch (IOException e) {
+            LOG.warn("Failed to obtain cluster state response", e);
+            return Optional.empty();
+        }
+    }
+
 }
