@@ -320,7 +320,7 @@ public class DBJobTriggerService {
      * internal data structure of triggers.
      */
     public int deleteByQuery(Bson query) {
-        return (int) collection.deleteMany(query).getDeletedCount();
+        return Ints.saturatedCast(collection.deleteMany(query).getDeletedCount());
     }
 
     @Deprecated
@@ -468,7 +468,7 @@ public class DBJobTriggerService {
                 unset(FIELD_LOCK_OWNER),
                 set(FIELD_STATUS, JobTriggerStatus.RUNNABLE));
 
-        return (int) collection.updateMany(filter, update).getModifiedCount();
+        return Ints.saturatedCast(collection.updateMany(filter, update).getModifiedCount());
     }
 
     /**
@@ -514,7 +514,7 @@ public class DBJobTriggerService {
     public int updateProgress(JobTriggerDto trigger, int progress) {
         final var filter = idEq(requireNonNull(trigger.id()));
         final var update = set(FIELD_PROGRESS, progress);
-        return (int) collection.updateOne(filter, update).getModifiedCount();
+        return Ints.saturatedCast(collection.updateOne(filter, update).getModifiedCount());
     }
 
     /**
