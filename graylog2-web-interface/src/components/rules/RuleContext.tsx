@@ -29,6 +29,23 @@ export const DEFAULT_SIMULATOR_JSON_MESSAGE = 'message: test\nsource: unknown\n'
 
 export const PipelineRulesContext = createContext(undefined);
 
+export enum SimulationFieldType {
+  Simple = 'Simple',
+  KeyValue = 'KeyValue',
+  JSON = 'JSON',
+}
+
+const getMessageToSimulate = (rawMessage: string, messageType: SimulationFieldType) => {
+  switch (messageType) {
+    case SimulationFieldType.JSON:
+    case SimulationFieldType.KeyValue:
+      return jsonifyText(rawMessage);
+    case SimulationFieldType.Simple:
+    default:
+      return JSON.stringify({ message: rawMessage });
+  }
+};
+
 const savePipelineRule = (nextRule: RuleType, callback: (rule: RuleType) => void = () => {}, onError: (error: object) => void = () => {}) => {
   let promise;
 
@@ -52,7 +69,7 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props
   const [, setAceLoaded] = useState(false);
   const [ruleSource, setRuleSource] = useState(rule?.source);
   const [description, setDescription] = useState(rule?.description);
-  const [rawMessageToSimulate, setRawMessageToSimulate] = useState(DEFAULT_SIMULATOR_JSON_MESSAGE);
+  const [rawMessageToSimulate, setRawMessageToSimulate] = useState('');
   const [ruleSimulationResult, setRuleSimulationResult] = useState(null);
 
   useEffect(() => {
@@ -83,8 +100,8 @@ export const PipelineRulesProvider = ({ children, usedInPipelines, rule }: Props
     RulesActions.parse(nextRule, callback);
   }, [rule, description, rawMessageToSimulate]);
 
-  const simulateRule = useCallback((_rule: RuleType, messageString: string = rawMessageToSimulate, callback: React.Dispatch<any> | (() => void) = setRuleSimulationResult) => {
-    const messageToSimulate = jsonifyText(messageString);
+  const simulateRule = useCallback((_rule: RuleType, simulationType: SimulationFieldType, messageString: string = rawMessageToSimulate, callback: React.Dispatch<any> | (() => void) = setRuleSimulationResult) => {
+    const messageToSimulate = getMessageToSimulate(messageString, simulationType);
     RulesActions.simulate(messageToSimulate, _rule, callback);
   }, [rawMessageToSimulate, setRuleSimulationResult]);
 
@@ -184,6 +201,6 @@ PipelineRulesProvider.defaultProps = {
   rule: {
     description: '',
     source: '',
-    simulator_message: DEFAULT_SIMULATOR_JSON_MESSAGE,
+    simulator_message: '',
   },
 };
