@@ -172,15 +172,15 @@ public class IndexSetTemplateResource extends RestResource {
             throw new BadRequestException(buildFieldError(IndexSetTemplateConfig.FIELD_TYPE_REFRESH_INTERVAL, violation.message()));
         }
 
-        violation = indexSetValidator.validateRotation(config.rotationStrategyConfig());
+        violation = indexSetValidator.validateRotation(config.rotationStrategy());
         if (violation != null) {
-            throw new BadRequestException(buildFieldError(IndexSetTemplateConfig.ROTATION_STRATEGY_CONFIG, violation.message()));
+            throw new BadRequestException(buildFieldError(IndexSetTemplateConfig.ROTATION_STRATEGY, violation.message()));
         }
 
-        violation = indexSetValidator.validateRetentionPeriod(config.rotationStrategyConfig(),
-                config.retentionStrategyConfig());
+        violation = indexSetValidator.validateRetentionPeriod(config.rotationStrategy(),
+                config.retentionStrategy());
         if (violation != null) {
-            throw new BadRequestException(buildFieldError(IndexSetTemplateConfig.RETENTION_STRATEGY_CONFIG, violation.message()));
+            throw new BadRequestException(buildFieldError(IndexSetTemplateConfig.RETENTION_STRATEGY, violation.message()));
         }
 
         violation = indexSetValidator.validateDataTieringConfig(config.dataTiering());

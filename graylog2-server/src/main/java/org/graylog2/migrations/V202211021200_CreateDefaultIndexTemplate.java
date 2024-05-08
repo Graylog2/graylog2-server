@@ -89,7 +89,7 @@ public class V202211021200_CreateDefaultIndexTemplate extends Migration {
                 .rotationStrategyClass(legacyDefaultConfig.rotationStrategyClass())
                 .rotationStrategy(legacyDefaultConfig.rotationStrategyConfig())
                 .retentionStrategyClass(legacyDefaultConfig.retentionStrategyClass())
-                .retentionStrategyConfig(legacyDefaultConfig.retentionStrategyConfig())
+                .retentionStrategy(legacyDefaultConfig.retentionStrategyConfig())
                 .dataTiering(dataTieringConfig)
                 .useLegacyRotation(legacyDefaultConfig.useLegacyRotation())
                 .build();

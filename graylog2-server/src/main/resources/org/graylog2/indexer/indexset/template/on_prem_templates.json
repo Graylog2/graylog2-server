@@ -12,12 +12,12 @@
         "field_type_refresh_interval": 5,
         "field_type_refresh_interval_unit": "SECONDS",
         "rotation_strategy_class": "org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy",
-        "rotation_strategy_config": {
+        "rotation_strategy": {
           "type": "org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig",
           "max_docs_per_index": 20000000
         },
         "retention_strategy_class": "org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy",
-        "retention_strategy_config": {
+        "retention_strategy": {
           "type": "org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig",
           "max_number_of_indices": 10
         },
@@ -26,15 +26,7 @@
           "index_lifetime_min": "P30D",
           "index_lifetime_max": "P40D"
         },
-        "use_legacy_rotation": true,
-        "retention_strategy": {
-          "type": "org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig",
-          "max_number_of_indices": 20
-        },
-        "rotation_strategy": {
-          "type": "org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig",
-          "max_docs_per_index": 20000000
-        }
+        "use_legacy_rotation": true
       }
     }
   ]

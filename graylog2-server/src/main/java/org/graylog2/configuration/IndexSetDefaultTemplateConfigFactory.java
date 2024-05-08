@@ -54,9 +54,9 @@ public class IndexSetDefaultTemplateConfigFactory {
                 .fieldTypeRefreshInterval(IndexSetConfig.DEFAULT_FIELD_TYPE_REFRESH_INTERVAL.getStandardSeconds())
                 .fieldTypeRefreshIntervalUnit(TimeUnit.SECONDS)
                 .rotationStrategyClass(rotationConfig.left)
-                .rotationStrategyConfig(rotationConfig.right)
+                .rotationStrategy(rotationConfig.right)
                 .retentionStrategyClass(retentionConfig.left)
-                .retentionStrategyConfig(retentionConfig.right)
+                .retentionStrategy(retentionConfig.right)
                 .useLegacyRotation(false)
                 .dataTiering(maintenanceStrategiesHelper.defaultDataTieringConfig())
                 .build();

@@ -47,10 +47,8 @@ public abstract class IndexSetTemplateConfig implements PluginConfigBean {
     public static final String FIELD_TYPE_REFRESH_INTERVAL = "field_type_refresh_interval";
     public static final String FIELD_TYPE_REFRESH_INTERVAL_UNIT = "field_type_refresh_interval_unit";
     public static final String ROTATION_STRATEGY_CLASS = "rotation_strategy_class";
-    public static final String ROTATION_STRATEGY_CONFIG = "rotation_strategy_config";
     public static final String ROTATION_STRATEGY = "rotation_strategy"; // alias for rotation_strategy_config
     public static final String RETENTION_STRATEGY_CLASS = "retention_strategy_class";
-    public static final String RETENTION_STRATEGY_CONFIG = "retention_strategy_config";
     public static final String RETENTION_STRATEGY = "retention_strategy"; // alias for retention_strategy_config
 
     public static final String FIELD_USE_LEGACY_ROTATION = "use_legacy_rotation";
@@ -94,30 +92,16 @@ public abstract class IndexSetTemplateConfig implements PluginConfigBean {
     public abstract String rotationStrategyClass();
 
     @NotNull
-    @JsonProperty(ROTATION_STRATEGY_CONFIG)
-    public abstract RotationStrategyConfig rotationStrategyConfig();
-
-    @NotNull
     @JsonProperty(ROTATION_STRATEGY)
-    // alias for ROTATION_STRATEGY_CONFIG
-    public RotationStrategyConfig rotationStrategy() {
-        return rotationStrategyConfig();
-    }
+    public abstract RotationStrategyConfig rotationStrategy();
 
     @NotBlank
     @JsonProperty(RETENTION_STRATEGY_CLASS)
     public abstract String retentionStrategyClass();
 
     @NotNull
-    @JsonProperty(RETENTION_STRATEGY_CONFIG)
-    public abstract RetentionStrategyConfig retentionStrategyConfig();
-
-    @NotNull
     @JsonProperty(RETENTION_STRATEGY)
-    // alias for RETENTION_STRATEGY_CONFIG
-    public RetentionStrategyConfig retentionStrategy() {
-        return retentionStrategyConfig();
-    }
+    public abstract RetentionStrategyConfig retentionStrategy();
 
     @NotNull
     @JsonProperty(FIELD_DATA_TIERING)
@@ -163,26 +147,14 @@ public abstract class IndexSetTemplateConfig implements PluginConfigBean {
         @JsonProperty(ROTATION_STRATEGY_CLASS)
         public abstract Builder rotationStrategyClass(String rotationStrategyClass);
 
-        @JsonProperty(ROTATION_STRATEGY_CONFIG)
-        public abstract Builder rotationStrategyConfig(RotationStrategyConfig rotationStrategyConfig);
-
         @JsonProperty(ROTATION_STRATEGY)
-        // alias for ROTATION_STRATEGY_CONFIG
-        public Builder rotationStrategy(RotationStrategyConfig rotationStrategyConfig) {
-            return rotationStrategyConfig(rotationStrategyConfig);
-        }
+        public abstract Builder rotationStrategy(RotationStrategyConfig rotationStrategyConfig) ;
 
         @JsonProperty(RETENTION_STRATEGY_CLASS)
         public abstract Builder retentionStrategyClass(String retentionStrategyClass);
 
-        @JsonProperty(RETENTION_STRATEGY_CONFIG)
-        public abstract Builder retentionStrategyConfig(RetentionStrategyConfig retentionStrategyConfig);
-
         @JsonProperty(RETENTION_STRATEGY)
-        // alias for RETENTION_STRATEGY_CONFIG
-        public Builder retentionStrategy(RetentionStrategyConfig retentionStrategyConfig) {
-            return retentionStrategyConfig(retentionStrategyConfig);
-        }
+        public abstract Builder retentionStrategy(RetentionStrategyConfig retentionStrategyConfig);
 
         @JsonProperty(FIELD_DATA_TIERING)
         public abstract Builder dataTiering(DataTieringConfig dataTiering);

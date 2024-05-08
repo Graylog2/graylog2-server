@@ -59,9 +59,9 @@ public class IndexSetConfigFactory {
                 .fieldTypeRefreshInterval(Duration.standardSeconds(
                         defaultConfig.fieldTypeRefreshIntervalUnit().toSeconds(defaultConfig.fieldTypeRefreshInterval())))
                 .rotationStrategyClass(defaultConfig.rotationStrategyClass())
-                .rotationStrategy(defaultConfig.rotationStrategyConfig())
+                .rotationStrategy(defaultConfig.rotationStrategy())
                 .retentionStrategyClass(defaultConfig.retentionStrategyClass())
-                .retentionStrategy(defaultConfig.retentionStrategyConfig())
+                .retentionStrategy(defaultConfig.retentionStrategy())
                 .dataTiering(dataTieringChecker.isEnabled() ? getDataTieringConfig(defaultConfig) : null);
     }
 }
