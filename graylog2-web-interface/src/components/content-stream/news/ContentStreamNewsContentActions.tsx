@@ -16,7 +16,7 @@
  */
 import React from 'react';
 
-import useCarouselAction from 'hooks/useCarouselAction';
+import useCarouselAction from 'components/common/carousel/hooks/useCarouselAction';
 import { Icon } from 'components/common';
 import { Button } from 'components/bootstrap';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';

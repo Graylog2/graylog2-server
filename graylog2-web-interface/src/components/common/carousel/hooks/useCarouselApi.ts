@@ -14,28 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+
+import { useState, useMemo, useEffect } from 'react';
 import EmblaCarousel from 'embla-carousel';
-import { useCallback, useMemo, useState, useEffect } from 'react';
 
-const useCarouselAction = (carouselElementClass: string) => {
+const useCarouselApi = (carouselElementClass: string) => {
   const [carousel, setCarousel] = useState<HTMLElement>(undefined);
-  const [nextBtnDisabled, setNextBtnDisabled] = useState(true);
-  const [prevBtnDisabled, setPrevBtnDisabled] = useState(true);
-
   const emblaApi = useMemo(() => carousel && EmblaCarousel(carousel, { containScroll: 'trimSnaps' }), [carousel]);
-
-  const onSelect = useCallback(() => {
-    setPrevBtnDisabled(!emblaApi.canScrollPrev());
-    setNextBtnDisabled(!emblaApi.canScrollNext());
-  }, [emblaApi]);
-
-  useEffect(() => {
-    if (!emblaApi) return;
-
-    onSelect();
-    emblaApi.on('reInit', onSelect);
-    emblaApi.on('select', onSelect);
-  }, [emblaApi, onSelect]);
 
   useEffect(() => {
     if (!carousel) {
@@ -45,19 +30,7 @@ const useCarouselAction = (carouselElementClass: string) => {
     }
   }, [carousel, carouselElementClass]);
 
-  const scrollPrev = useCallback(() => {
-    if (emblaApi) emblaApi.scrollPrev();
-  }, [emblaApi]);
-  const scrollNext = useCallback(() => {
-    if (emblaApi) emblaApi.scrollNext();
-  }, [emblaApi]);
-
-  return {
-    scrollNext,
-    scrollPrev,
-    nextBtnDisabled,
-    prevBtnDisabled,
-  };
+  return emblaApi;
 };
 
-export default useCarouselAction;
+export default useCarouselApi;
