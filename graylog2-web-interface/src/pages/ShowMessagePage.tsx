@@ -18,6 +18,7 @@ import PropTypes from 'prop-types';
 import React, { useEffect, useMemo, useState } from 'react';
 import * as Immutable from 'immutable';
 
+import useMessage from 'views/hooks/useMessage';
 import DocumentTitle from 'components/common/DocumentTitle';
 import Spinner from 'components/common/Spinner';
 import { Col, Row } from 'components/bootstrap';
@@ -27,12 +28,10 @@ import withParams from 'routing/withParams';
 import type { Stream } from 'views/stores/StreamsStore';
 import type { Input } from 'components/messageloaders/Types';
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
-import type { Message } from 'views/components/messagelist/Types';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import WindowDimensionsContextProvider from 'contexts/WindowDimensionsContextProvider';
 import StreamsStore from 'stores/streams/StreamsStore';
 import { InputsActions } from 'stores/inputs/InputsStore';
-import { MessagesActions } from 'stores/messages/MessagesStore';
 import { NodesActions } from 'stores/nodes/NodesStore';
 import { isLocalNode } from 'views/hooks/useIsLocalNode';
 import PluggableStoreProvider from 'components/PluggableStoreProvider';
@@ -64,17 +63,13 @@ const useStreams = () => {
   return { streams, allStreams };
 };
 
-const useMessage = (index: string, messageId: string) => {
-  const [message, setMessage] = useState<Message | undefined>();
+const useInputs = (sourceInputId, gl2SourceNode) => {
   const [inputs, setInputs] = useState<Immutable.Map<string, Input>>(Immutable.Map());
 
   useEffect(() => {
-    const fetchData = async () => {
-      const _message = await MessagesActions.loadMessage(index, messageId);
-      setMessage(_message);
-
-      if (_message.source_input_id && (await isLocalNode(_message.fields.gl2_source_node))) {
-        const input = await InputsActions.get(_message.source_input_id);
+    const fetchInputs = async () => {
+      if (sourceInputId && (await isLocalNode(gl2SourceNode))) {
+        const input = await InputsActions.get(sourceInputId);
 
         if (input) {
           const newInputs = Immutable.Map({ [input.id]: input });
@@ -84,10 +79,10 @@ const useMessage = (index: string, messageId: string) => {
       }
     };
 
-    fetchData();
-  }, [index, messageId, setMessage, setInputs]);
+    fetchInputs();
+  }, [setInputs, sourceInputId, gl2SourceNode]);
 
-  return { message, inputs };
+  return inputs;
 };
 
 type FieldTypesProviderProps = {
@@ -122,7 +117,8 @@ const ShowMessagePage = ({ params: { index, messageId } }: Props) => {
   }
 
   const { streams, allStreams } = useStreams();
-  const { message, inputs } = useMessage(index, messageId);
+  const { data: message } = useMessage(messageId, index);
+  const inputs = useInputs(message?.source_input_id, message?.fields.gl2_source_node);
 
   useEffect(() => { NodesActions.list(); }, []);
 
