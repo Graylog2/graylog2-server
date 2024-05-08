@@ -34,23 +34,24 @@ public class RemoveField extends AbstractFunction<Void> {
     public static final String NAME = "remove_field";
     public static final String FIELD = "field";
     public static final String INVERT = "invert";
-    private final ParameterDescriptor<String, String> fieldParam;
+    private final ParameterDescriptor<String, Pattern> fieldParam;
     private final ParameterDescriptor<Message, Message> messageParam;
     private final ParameterDescriptor<Boolean, Boolean> invertParam;
 
     public RemoveField() {
-        fieldParam = ParameterDescriptor.string(FIELD).description("The field(s) to remove (name or regex)").build();
+        fieldParam = ParameterDescriptor.string(FIELD, Pattern.class)
+                .transform(Pattern::compile)
+                .description("The field(s) to remove (name or regex)").build();
         messageParam = type("message", Message.class).optional().description("The message to use, defaults to '$message'").build();
         invertParam = ParameterDescriptor.bool(INVERT).optional().description("Invert: keep matching field(s) and remove all others").build();
     }
 
     @Override
     public Void evaluate(FunctionArgs args, EvaluationContext context) {
-        final String fieldOrPattern = fieldParam.required(args, context);
+        final Pattern pattern = fieldParam.required(args, context);
         final Message message = messageParam.optional(args, context).orElse(context.currentMessage());
         final Boolean invert = invertParam.optional(args, context).orElse(false);
 
-        final var pattern = Pattern.compile(fieldOrPattern);
         message.getFieldNames().stream()
                 .filter(f -> {
                     boolean condition = pattern.matcher(f).matches();

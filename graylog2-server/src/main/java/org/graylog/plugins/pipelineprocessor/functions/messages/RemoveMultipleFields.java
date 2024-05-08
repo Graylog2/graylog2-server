@@ -34,12 +34,15 @@ public class RemoveMultipleFields extends AbstractFunction<Void> {
     public static final String NAME = "remove_multiple_fields";
     private static final String REGEX_PATTERN = "pattern";
     private static final String LIST_OF_NAMES = "names";
-    private final ParameterDescriptor<String, String> regexParam;
+    private final ParameterDescriptor<String, Pattern> regexParam;
     private final ParameterDescriptor<List, List> namesParam;
     private final ParameterDescriptor<Message, Message> messageParam;
 
     public RemoveMultipleFields() {
-        regexParam = ParameterDescriptor.string(REGEX_PATTERN).optional().description("A regex specifying field names to be removed").build();
+        regexParam = ParameterDescriptor.string(REGEX_PATTERN, Pattern.class)
+                .optional()
+                .transform(Pattern::compile)
+                .description("A regex specifying field names to be removed").build();
         namesParam = type(LIST_OF_NAMES, List.class).optional().description("A list of field names to be removed").build();
         messageParam = type("message", Message.class).optional().description("The message to use, defaults to '$message'").build();
     }
@@ -56,8 +59,7 @@ public class RemoveMultipleFields extends AbstractFunction<Void> {
         return null;
     }
 
-    private void removeRegex(Message message, String regex) {
-        final var pattern = Pattern.compile(regex);
+    private void removeRegex(Message message, Pattern pattern) {
         message.getFieldNames().stream()
                 .filter(name -> pattern.matcher(name).matches())
                 .toList() // required to avoid ConcurrentModificationException
