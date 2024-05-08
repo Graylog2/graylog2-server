@@ -100,6 +100,8 @@ import org.graylog.plugins.pipelineprocessor.functions.messages.HasField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.NormalizeFields;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveFromStream;
+import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveMultipleFields;
+import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveSingleField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RenameField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RouteToStream;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
@@ -1457,20 +1459,20 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     @Test
     public void removeField() {
         final Rule rule = parser.parseRule(ruleForTest(), true);
-        final Message message = messageFactory.createMessage("test", "test", Tools.nowUTC());
+        final Message message = new Message("test", "test", Tools.nowUTC());
         evaluateRule(rule, message);
 
         assertThat(message.getField("f1")).isNull();
-        assertThat(message.getField("i1")).isNull();
-        assertThat(message.getField("i2")).isNull();
-        assertThat(message.getField("f2")).isEqualTo("f2");
-        assertThat(message.getField("f3")).isEqualTo("f3");
+        assertThat(message.getField("f2")).isNull();
+        assertThat(message.getField("f3")).isNull();
+        assertThat(message.getField("i1")).isEqualTo("i1");
+        assertThat(message.getField("i2")).isEqualTo("i2");
     }
 
     @Test
     public void removeSingleField() {
         final Rule rule = parser.parseRule(ruleForTest(), true);
-        final Message message = messageFactory.createMessage("test", "test", Tools.nowUTC());
+        final Message message = new Message("test", "test", Tools.nowUTC());
         evaluateRule(rule, message);
 
         assertThat(message.getField("a.1")).isNull();
@@ -1482,7 +1484,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     @Test
     public void removeFieldsByName() {
         final Rule rule = parser.parseRule(ruleForTest(), true);
-        final Message message = messageFactory.createMessage("test", "test", Tools.nowUTC());
+        final Message message = new Message("test", "test", Tools.nowUTC());
         evaluateRule(rule, message);
 
         assertThat(message.getField("a.1")).isNull();
@@ -1494,7 +1496,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     @Test
     public void removeFieldsByRegex() {
         final Rule rule = parser.parseRule(ruleForTest(), true);
-        final Message message = messageFactory.createMessage("test", "test", Tools.nowUTC());
+        final Message message = new Message("test", "test", Tools.nowUTC());
         evaluateRule(rule, message);
 
         assertThat(message.getField("a.1")).isNull();

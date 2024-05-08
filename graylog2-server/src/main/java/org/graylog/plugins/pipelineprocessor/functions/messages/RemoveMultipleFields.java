@@ -22,7 +22,6 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
-import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.graylog2.plugin.Message;
 
 import java.util.List;
@@ -79,10 +78,6 @@ public class RemoveMultipleFields extends AbstractFunction<Void> {
                 .returnType(Void.class)
                 .params(ImmutableList.of(regexParam, namesParam, messageParam))
                 .description("Removes the specified field(s) from message, unless the field name is reserved. If no specific message is provided, it uses the currently processed message.")
-                .ruleBuilderEnabled()
-                .ruleBuilderName("Remove field - multiple")
-                .ruleBuilderTitle("Remove multiple fields by<#if pattern??> regex '${pattern}'</#if><#if pattern?? && names??> or</#if><#if names??> name list '${names}'</#if>")
-                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.MESSAGE)
                 .build();
     }
 }

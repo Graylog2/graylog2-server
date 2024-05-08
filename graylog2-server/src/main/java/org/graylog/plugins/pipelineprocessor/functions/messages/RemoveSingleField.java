@@ -22,7 +22,6 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
-import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.graylog2.plugin.Message;
 
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.type;
@@ -54,10 +53,6 @@ public class RemoveSingleField extends AbstractFunction<Void> {
                 .returnType(Void.class)
                 .params(ImmutableList.of(fieldParam, messageParam))
                 .description("Removes a field from a message")
-                .ruleBuilderEnabled()
-                .ruleBuilderName("Remove field - single")
-                .ruleBuilderTitle("Remove the single field '${field}'")
-                .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.MESSAGE)
                 .build();
     }
 }
