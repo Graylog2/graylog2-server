@@ -40,6 +40,8 @@ import createSearch from 'views/logic/slices/createSearch';
 import { duplicateWidget, removeWidget } from 'views/logic/slices/widgetActions';
 import useViewType from 'views/hooks/useViewType';
 import fetchSearch from 'views/logic/views/fetchSearch';
+import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
+import useWidgetResults from 'views/components/useWidgetResults';
 
 import WidgetActionsMenu from './WidgetActionsMenu';
 
@@ -48,6 +50,7 @@ import type { WidgetFocusContextType } from '../contexts/WidgetFocusContext';
 import WidgetFocusContext from '../contexts/WidgetFocusContext';
 
 jest.mock('views/components/dashboard/hooks/useDashboards');
+jest.mock('views/components/useWidgetResults');
 jest.mock('views/logic/views/CopyWidgetToDashboard', () => jest.fn());
 jest.mock('views/logic/views/Actions');
 jest.mock('views/logic/slices/createSearch');
@@ -149,6 +152,7 @@ describe('<WidgetActionsMenu />', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     asMock(createSearch).mockImplementation(async (s) => s);
+    asMock(useWidgetResults).mockReturnValue({ widgetData: {}, error: [] });
   });
 
   it('is updating widget focus context on focus', async () => {
@@ -191,11 +195,13 @@ describe('<WidgetActionsMenu />', () => {
       .type('dummy')
       .config({})
       .build();
-    const { queryByText } = render(<DummyWidget title="Dummy Widget" widget={dummyWidget} />);
+    render(<DummyWidget title="Dummy Widget" widget={dummyWidget} />);
 
     await openActionDropdown();
 
-    expect(queryByText('Export')).toBeNull();
+    const exportButton = screen.queryByRole('button', { name: /Export all search results/i });
+
+    expect(exportButton).toBeNull();
   });
 
   it('allows export for message tables', async () => {
@@ -206,9 +212,7 @@ describe('<WidgetActionsMenu />', () => {
 
     render(<DummyWidget title="Dummy Widget" widget={messagesWidget} />);
 
-    await openActionDropdown();
-
-    const exportButton = screen.getByText('Export');
+    const exportButton = screen.queryByRole('button', { name: /Export all search results/i });
 
     fireEvent.click(exportButton);
 
@@ -423,6 +427,30 @@ describe('<WidgetActionsMenu />', () => {
 
         console.trace = oldConsoleTrace;
         /* eslint-enable no-console */
+      });
+    });
+
+    describe('Export aggregation widget', () => {
+      it('does not display export aggregation action if widget is an aggregation', async () => {
+        const messagesWidget = MessagesWidget.builder()
+          .id('widgetId')
+          .config({})
+          .build();
+        render(<DummyWidget title="Dummy Widget" widget={messagesWidget} />);
+        const exportButton = screen.queryByRole('button', { name: /open export widget options/i });
+
+        expect(exportButton).toBeNull();
+      });
+
+      it('allows export for aggregation widget', async () => {
+        const aggregationWidget = AggregationWidget.builder()
+          .id('widgetId')
+          .config({})
+          .build();
+
+        render(<DummyWidget title="Dummy Widget" widget={aggregationWidget} />);
+
+        await screen.findByRole('button', { name: /open export widget options/i });
       });
     });
   });

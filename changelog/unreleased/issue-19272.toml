@@ -1,0 +1,5 @@
+type="f"
+message="Reuse http client for datanode connection checks during preflight configuration."
+
+issues=["19272"]
+pulls=["19273"]
