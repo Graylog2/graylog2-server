@@ -1993,10 +1993,10 @@
   resolved "https://registry.yarnpkg.com/@floating-ui/utils/-/utils-0.2.1.tgz#16308cea045f0fc777b6ff20a9f25474dd8293d2"
   integrity sha512-9TANp6GPoMtYzQdt54kfAyMmz1+osLlXdg2ENroU7zzrtflTLrrC/lgrIfaSe+Wu0b89GKccT7vxXA0MoAIO+Q==
 
-"@graylog/sawmill@2.0.15":
-  version "2.0.15"
-  resolved "https://registry.yarnpkg.com/@graylog/sawmill/-/sawmill-2.0.15.tgz#21b5cd7802507e687e79146f23e232dea77b8e1e"
-  integrity sha512-5WpSivXp1v4DPy3FzqLyKmcd9wezAtz5PMfHmtYAjv2wn8x/kG3KQwRzzzPbJtnL296Ig2Sb4Voe9kxwQtITQw==
+"@graylog/sawmill@2.0.16":
+  version "2.0.16"
+  resolved "https://registry.yarnpkg.com/@graylog/sawmill/-/sawmill-2.0.16.tgz#3d657d5713c62aa10db9423dec3d48d5c1e350f5"
+  integrity sha512-q/aLuEhdBSM1huQPRcmLBYmAdxzrnI6uEye7gf1fZbyov4k94VrFzJMdQ7Bvbop+X7R9w6LHoG+PgT+U2Y94ag==
   dependencies:
     "@openfonts/dm-sans_latin" "^1.0.2"
     "@openfonts/source-sans-pro_latin" "^1.44.2"
@@ -8588,7 +8588,7 @@ graphemer@^1.4.0:
 "graylog-web-plugin@file:packages/graylog-web-plugin":
   version "6.1.0-SNAPSHOT"
   dependencies:
-    "@graylog/sawmill" "2.0.15"
+    "@graylog/sawmill" "2.0.16"
     "@tanstack/react-query" "4.36.1"
     "@types/create-react-class" "15.6.8"
     "@types/jquery" "3.5.29"
@@ -12525,9 +12525,9 @@ postcss@^8.4.38:
     source-map-js "^1.2.0"
 
 posthog-js@^1.52.0:
-  version "1.130.2"
-  resolved "https://registry.yarnpkg.com/posthog-js/-/posthog-js-1.130.2.tgz#b0360d77a4dfbb2bc809a7207253a4f7c2b5340d"
-  integrity sha512-QR/j9Xs/STK3+VJgqiByeXFKT17LGZZvJtrCdgFhwydp8WfisJw7zrSy7rVDjYS0UeKJJ/3cO/qtlXD3dR2+Eg==
+  version "1.131.0"
+  resolved "https://registry.yarnpkg.com/posthog-js/-/posthog-js-1.131.0.tgz#abecad3a8e2e45050afc15a65e88e6baad393b68"
+  integrity sha512-kws38w7MM9dAV1UowbHoIHNgTywwV6rdt0PSptqbkevpUPBfyNaJoTh9G29rkkJuw0+GhaO+qdUXy6QYk7SqzA==
   dependencies:
     fflate "^0.4.8"
     preact "^10.19.3"
