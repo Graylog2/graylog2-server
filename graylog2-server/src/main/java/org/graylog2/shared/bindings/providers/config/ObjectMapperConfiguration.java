@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.deser.BeanDeserializerModifier;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
@@ -41,7 +42,6 @@ import org.graylog.grn.GRNRegistry;
 import org.graylog2.database.ObjectIdSerializer;
 import org.graylog2.jackson.AutoValueSubtypeResolver;
 import org.graylog2.jackson.DeserializationProblemHandlerModule;
-import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
 import org.graylog2.jackson.JacksonModelValidator;
 import org.graylog2.jackson.JodaDurationCompatSerializer;
 import org.graylog2.jackson.JodaTimePeriodKeyDeserializer;
@@ -70,7 +70,7 @@ public class ObjectMapperConfiguration {
                                                              final Set<NamedType> subtypes,
                                                              final EncryptedValueService encryptedValueService,
                                                              final GRNRegistry grnRegistry,
-                                                             final InputConfigurationBeanDeserializerModifier inputConfigurationBeanDeserializerModifier) {
+                                                             final BeanDeserializerModifier beanDeserializerModifier) {
 
         final TypeFactory typeFactory = mapper.getTypeFactory().withClassLoader(classLoader);
         final AutoValueSubtypeResolver subtypeResolver = new AutoValueSubtypeResolver();
@@ -109,7 +109,7 @@ public class ObjectMapperConfiguration {
                         .addDeserializer(Requirement.class, new SemverRequirementDeserializer())
                         .addDeserializer(GRN.class, new GRNDeserializer(grnRegistry))
                         .addDeserializer(EncryptedValue.class, new EncryptedValueDeserializer(encryptedValueService))
-                        .setDeserializerModifier(inputConfigurationBeanDeserializerModifier)
+                        .setDeserializerModifier(beanDeserializerModifier)
                         .setSerializerModifier(JacksonModelValidator.getBeanSerializerModifier())
                 );
 
