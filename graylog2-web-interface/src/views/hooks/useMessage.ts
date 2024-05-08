@@ -19,10 +19,11 @@ import { useQuery } from '@tanstack/react-query';
 import { MessagesActions } from 'stores/messages/MessagesStore';
 import type { Message } from 'views/components/messagelist/Types';
 
-const useMessage = (id: string, index: string): { data: Message | undefined, isInitialLoading: boolean } => {
+const useMessage = (id: string, index: string, enabled = true): { data: Message | undefined, isInitialLoading: boolean } => {
   const { data, isInitialLoading } = useQuery({
     queryKey: ['messages', index, id],
     queryFn: () => MessagesActions.loadMessage(index, id),
+    enabled,
   });
 
   return { data, isInitialLoading };
