@@ -18,6 +18,7 @@ package org.graylog2.telemetry.scheduler;
 
 import com.github.joschi.jadconfig.util.Duration;
 import jakarta.inject.Inject;
+import org.graylog2.configuration.TelemetryConfiguration;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.telemetry.client.TelemetryClient;
 import org.slf4j.Logger;
@@ -34,12 +35,15 @@ public class TelemetrySubmissionPeriodical extends Periodical {
     private final TelemetryClient telemetryClient;
     private final Map<String, TelemetryMetricSupplier> metricsProviders;
     private static final Duration runPeriod = Duration.days(1);
+    private final boolean isEnabled;
 
     @Inject
     public TelemetrySubmissionPeriodical(TelemetryClient telemetryClient,
+                                         TelemetryConfiguration telemetryConfiguration,
                                          Map<String, TelemetryMetricSupplier> metricsProviders) {
         this.telemetryClient = telemetryClient;
         this.metricsProviders = metricsProviders;
+        this.isEnabled = telemetryConfiguration.isTelemetryEnabled();
     }
 
     @Override
@@ -74,7 +78,7 @@ public class TelemetrySubmissionPeriodical extends Periodical {
 
     @Override
     public boolean startOnThisNode() {
-        return true;
+        return isEnabled;
     }
 
     @Override
