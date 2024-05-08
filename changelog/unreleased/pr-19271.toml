@@ -1,0 +1,5 @@
+type = "a"
+message = "Show maximum available time for restarting Graylog during in-place migration."
+
+issues = ["19270"]
+pulls = ["19271"]

@@ -38,18 +38,21 @@ public class SearchesCleanUpJob extends Periodical {
 
     private final ViewSummaryService viewSummaryService;
     private final SearchDbService searchDbService;
-    private final Instant mustNotBeOlderThan;
+    private final Duration maximumSearchAge;
     private final Map<String, ViewResolver> viewResolvers;
+    private final Set<StaticReferencedSearch> staticReferencedSearches;
 
     @Inject
     public SearchesCleanUpJob(ViewSummaryService viewSummaryService,
                               SearchDbService searchDbService,
                               @Named("views_maximum_search_age") Duration maximumSearchAge,
-                              Map<String, ViewResolver> viewResolvers) {
+                              Map<String, ViewResolver> viewResolvers,
+                              Set<StaticReferencedSearch> staticReferencedSearches) {
         this.viewSummaryService = viewSummaryService;
         this.searchDbService = searchDbService;
-        this.mustNotBeOlderThan = Instant.now().minus(maximumSearchAge);
+        this.maximumSearchAge = maximumSearchAge;
         this.viewResolvers = viewResolvers;
+        this.staticReferencedSearches = staticReferencedSearches;
     }
 
     @Override
@@ -94,8 +97,9 @@ public class SearchesCleanUpJob extends Periodical {
 
     @Override
     public void doRun() {
+        final Instant mustBeOlderThan = Instant.now().minus(maximumSearchAge);
         searchDbService.getExpiredSearches(findReferencedSearchIds(),
-                mustNotBeOlderThan).forEach(searchDbService::delete);
+                mustBeOlderThan).forEach(searchDbService::delete);
     }
 
     private Set<String> findReferencedSearchIds() {
@@ -103,6 +107,7 @@ public class SearchesCleanUpJob extends Periodical {
         toKeepViewIds.addAll(viewSummaryService.streamAll().map(ViewSummaryDTO::searchId).collect(Collectors.toSet()));
         toKeepViewIds.addAll(viewResolvers
                 .values().stream().flatMap(vr -> vr.getSearchIds().stream()).collect(Collectors.toSet()));
+        toKeepViewIds.addAll(staticReferencedSearches.stream().map(StaticReferencedSearch::id).toList());
         return toKeepViewIds;
     }
 }

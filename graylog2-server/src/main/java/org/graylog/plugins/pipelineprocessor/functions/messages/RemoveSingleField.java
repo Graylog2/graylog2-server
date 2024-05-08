@@ -25,57 +25,38 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.graylog2.plugin.Message;
 
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.type;
 
-public class RemoveField extends AbstractFunction<Void> {
-    public static final String NAME = "remove_field";
+public class RemoveSingleField extends AbstractFunction<Void> {
+    public static final String NAME = "remove_single_field";
     public static final String FIELD = "field";
-    public static final String INVERT = "invert";
-    private final ParameterDescriptor<String, Pattern> fieldParam;
+    private final ParameterDescriptor<String, String> fieldParam;
     private final ParameterDescriptor<Message, Message> messageParam;
-    private final ParameterDescriptor<Boolean, Boolean> invertParam;
 
-    public RemoveField() {
-        fieldParam = ParameterDescriptor.string(FIELD, Pattern.class)
-                .transform(Pattern::compile)
-                .description("The field(s) to remove (name or regex)").build();
+    public RemoveSingleField() {
+        fieldParam = ParameterDescriptor.string(FIELD).description("The field to remove").build();
         messageParam = type("message", Message.class).optional().description("The message to use, defaults to '$message'").build();
-        invertParam = ParameterDescriptor.bool(INVERT).optional().description("Invert: keep matching field(s) and remove all others").build();
     }
 
     @Override
     public Void evaluate(FunctionArgs args, EvaluationContext context) {
-        final Pattern pattern = fieldParam.required(args, context);
+        final String field = fieldParam.required(args, context);
         final Message message = messageParam.optional(args, context).orElse(context.currentMessage());
-        final Boolean invert = invertParam.optional(args, context).orElse(false);
 
-        message.getFieldNames().stream()
-                .filter(f -> {
-                    boolean condition = pattern.matcher(f).matches();
-                    return invert ? !condition : condition;
-                })
-                .collect(Collectors.toList()) // required to avoid ConcurrentModificationException
-                .forEach(message::removeField);
-
+        message.removeField(field);
         return null;
     }
-
 
     @Override
     public FunctionDescriptor<Void> descriptor() {
         return FunctionDescriptor.<Void>builder()
                 .name(NAME)
                 .returnType(Void.class)
-                .params(ImmutableList.of(fieldParam, messageParam, invertParam))
-                .description("Removes the named field from message, unless the field is reserved. " +
-                        "If no specific message is provided, it uses the currently processed message. " +
-                        "This function is deprecated - use the more performant remove_single_field or remove_multiple_fields.")
+                .params(ImmutableList.of(fieldParam, messageParam))
+                .description("Removes a field from a message")
                 .ruleBuilderEnabled()
-                .ruleBuilderName("Remove field (deprecated)")
-                .ruleBuilderTitle("Remove field '${field}'")
+                .ruleBuilderName("Remove field - single")
+                .ruleBuilderTitle("Remove the single field '${field}'")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.MESSAGE)
                 .build();
     }
