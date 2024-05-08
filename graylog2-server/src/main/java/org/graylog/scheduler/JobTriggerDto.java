@@ -24,6 +24,7 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.scheduler.clock.JobSchedulerSystemClock;
+import org.graylog2.database.MongoEntity;
 import org.joda.time.DateTime;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
@@ -35,7 +36,7 @@ import java.util.Set;
 @AutoValue
 @JsonDeserialize(builder = JobTriggerDto.Builder.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public abstract class JobTriggerDto {
+public abstract class JobTriggerDto implements MongoEntity {
     public static final String FIELD_ID = "id";
 
     public static final String FIELD_JOB_DEFINITION_TYPE = "job_definition_type";

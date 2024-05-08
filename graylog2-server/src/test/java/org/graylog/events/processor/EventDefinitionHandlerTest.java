@@ -109,7 +109,7 @@ public class EventDefinitionHandlerTest {
         this.clock = new JobSchedulerTestClock(DateTime.now(DateTimeZone.UTC));
         this.eventDefinitionService = spy(new DBEventDefinitionService(mongodb.mongoConnection(), mapperProvider, stateService, mock(EntityOwnershipService.class), new EntityScopeService(ENTITY_SCOPES), new IgnoreSearchFilters()));
         this.jobDefinitionService = spy(new DBJobDefinitionService(mongodb.mongoConnection(), mapperProvider));
-        this.jobTriggerService = spy(new DBJobTriggerService(mongodb.mongoConnection(), new MongoCollections(mapperProvider, mongodb.mongoConnection()), mapperProvider, nodeId, clock, schedulerCapabilitiesService, Duration.minutes(5)));
+        this.jobTriggerService = spy(new DBJobTriggerService(new MongoCollections(mapperProvider, mongodb.mongoConnection()), nodeId, clock, schedulerCapabilitiesService, Duration.minutes(5)));
 
         this.handler = new EventDefinitionHandler(eventDefinitionService, jobDefinitionService, jobTriggerService, clock);
     }
@@ -353,9 +353,9 @@ public class EventDefinitionHandlerTest {
         assertThat(jobTriggerService.getOneForJob(newJobDefinition.id()))
                 .isPresent()
                 .hasValueSatisfying(trigger -> {
-            final IntervalJobSchedule schedule = (IntervalJobSchedule) trigger.schedule();
-            assertThat(schedule.interval()).isEqualTo(550000);
-        });
+                    final IntervalJobSchedule schedule = (IntervalJobSchedule) trigger.schedule();
+                    assertThat(schedule.interval()).isEqualTo(550000);
+                });
     }
 
     @Test
@@ -539,10 +539,12 @@ public class EventDefinitionHandlerTest {
         public String getName() {
             return NAME;
         }
+
         @Override
         public boolean isMutable() {
             return false;
         }
+
         @Override
         public boolean isDeletable() {
             return false;
