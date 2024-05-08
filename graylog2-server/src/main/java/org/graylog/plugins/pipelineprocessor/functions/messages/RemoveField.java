@@ -71,7 +71,7 @@ public class RemoveField extends AbstractFunction<Void> {
                 .returnType(Void.class)
                 .params(ImmutableList.of(fieldParam, messageParam, invertParam))
                 .description("Removes the named field from message, unless the field is reserved. " +
-                        "If no specific message is provided, it uses the currently processed message." +
+                        "If no specific message is provided, it uses the currently processed message. " +
                         "This function is deprecated - use the more performant remove_single_field or remove_multiple_fields.")
                 .ruleBuilderEnabled()
                 .ruleBuilderName("Remove field (deprecated)")
