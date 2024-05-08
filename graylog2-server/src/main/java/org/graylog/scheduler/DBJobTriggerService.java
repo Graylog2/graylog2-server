@@ -18,6 +18,7 @@ package org.graylog.scheduler;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.joschi.jadconfig.util.Duration;
+import com.google.common.primitives.Ints;
 import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Accumulators;
@@ -311,7 +312,7 @@ public class DBJobTriggerService {
                 eq(FIELD_SCHEDULE + "." + JobSchedule.TYPE_FIELD, OnceJobSchedule.TYPE_NAME),
                 lt(FIELD_UPDATED_AT, clock.nowUTC().minus(unit.toMillis(timeValue)))
         );
-        return (int) collection.deleteMany(filter).getDeletedCount();
+        return Ints.saturatedCast(collection.deleteMany(filter).getDeletedCount());
     }
 
     /**
