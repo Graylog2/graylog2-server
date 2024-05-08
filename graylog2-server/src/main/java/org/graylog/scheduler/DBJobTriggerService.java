@@ -18,13 +18,13 @@ package org.graylog.scheduler;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.joschi.jadconfig.util.Duration;
-import com.mongodb.BasicDBObject;
 import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Accumulators;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.FindOneAndUpdateOptions;
+import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.ReturnDocument;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -121,14 +121,14 @@ public class DBJobTriggerService {
         this.collection = mongoCollections.get(COLLECTION_NAME, JobTriggerDto.class);
         this.mongoUtils = mongoCollections.utils(collection);
 
-        collection.createIndex(new BasicDBObject(FIELD_JOB_DEFINITION_ID, 1));
-        collection.createIndex(new BasicDBObject(FIELD_LOCK_OWNER, 1));
-        collection.createIndex(new BasicDBObject(FIELD_STATUS, 1));
-        collection.createIndex(new BasicDBObject(FIELD_START_TIME, 1));
-        collection.createIndex(new BasicDBObject(FIELD_END_TIME, 1));
-        collection.createIndex(new BasicDBObject(FIELD_NEXT_TIME, 1));
-        collection.createIndex(new BasicDBObject(FIELD_CONSTRAINTS, 1));
-        collection.createIndex(new BasicDBObject(FIELD_JOB_DEFINITION_TYPE, 1));
+        collection.createIndex(Indexes.ascending(FIELD_JOB_DEFINITION_ID));
+        collection.createIndex(Indexes.ascending(FIELD_LOCK_OWNER));
+        collection.createIndex(Indexes.ascending(FIELD_STATUS));
+        collection.createIndex(Indexes.ascending(FIELD_START_TIME));
+        collection.createIndex(Indexes.ascending(FIELD_END_TIME));
+        collection.createIndex(Indexes.ascending(FIELD_NEXT_TIME));
+        collection.createIndex(Indexes.ascending(FIELD_CONSTRAINTS));
+        collection.createIndex(Indexes.ascending(FIELD_JOB_DEFINITION_TYPE));
     }
 
     @SuppressWarnings("unused")
