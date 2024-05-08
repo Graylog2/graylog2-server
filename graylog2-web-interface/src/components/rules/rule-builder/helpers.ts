@@ -43,7 +43,7 @@ const jsonifyText = (text: string): string => {
 
       return rawMessageToJson;
     } catch {
-      return text;
+      return JSON.stringify({ message: text });
     }
   }
 };
