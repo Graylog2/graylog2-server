@@ -48,17 +48,17 @@ public class TelemetrySubmissionPeriodical extends Periodical {
 
     @Override
     public void doRun() {
-        if (telemetryClient.isEnabled()) {
-            final var telemetryMetrics = metricsProviders.entrySet()
-                    .stream()
-                    .map(entry -> entry(entry.getKey(), entry.getValue().get()))
-                    .flatMap(entry -> entry.getValue().map(metrics -> entry(entry.getKey(), metrics)).stream())
-                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-            try {
+        final var telemetryMetrics = metricsProviders.entrySet()
+                .stream()
+                .map(entry -> entry(entry.getKey(), entry.getValue().get()))
+                .flatMap(entry -> entry.getValue().map(metrics -> entry(entry.getKey(), metrics)).stream())
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        try {
+            if (!telemetryMetrics.isEmpty()) {
                 telemetryClient.capture(telemetryMetrics);
-            } catch (Exception e) {
-                LOG.warn("Error while submitting telemetry: ", e);
             }
+        } catch (Exception e) {
+            LOG.warn("Error while submitting telemetry: ", e);
         }
     }
 
