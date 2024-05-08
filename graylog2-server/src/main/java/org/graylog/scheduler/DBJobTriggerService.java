@@ -23,7 +23,6 @@ import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Accumulators;
 import com.mongodb.client.model.Aggregates;
-import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.FindOneAndUpdateOptions;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.ReturnDocument;
@@ -60,6 +59,7 @@ import static com.mongodb.client.model.Filters.elemMatch;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.exists;
 import static com.mongodb.client.model.Filters.gt;
+import static com.mongodb.client.model.Filters.gte;
 import static com.mongodb.client.model.Filters.in;
 import static com.mongodb.client.model.Filters.lt;
 import static com.mongodb.client.model.Filters.lte;
@@ -573,7 +573,7 @@ public class DBJobTriggerService {
                                 or(
                                         not(exists(FIELD_END_TIME)),
                                         eq(FIELD_END_TIME, null),
-                                        Filters.gte(FIELD_END_TIME, now)
+                                        gte(FIELD_END_TIME, now)
                                 )
                         )
                 ),
