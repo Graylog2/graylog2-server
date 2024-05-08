@@ -221,6 +221,8 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(SetFields.NAME, new SetFields());
         functions.put(RenameField.NAME, new RenameField());
         functions.put(RemoveField.NAME, new RemoveField());
+        functions.put(RemoveSingleField.NAME, new RemoveSingleField());
+        functions.put(RemoveMultipleFields.NAME, new RemoveMultipleFields());
         functions.put(NormalizeFields.NAME, new NormalizeFields());
 
         functions.put(DropMessage.NAME, new DropMessage());
@@ -1388,7 +1390,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("one_entropy")).isEqualTo(1.0D);
     }
 
-    @   Test
+    @Test
     public void notExpressionTypeCheck() {
         try {
             Rule rule = parser.parseRule(ruleForTest(), true);
@@ -1450,5 +1452,54 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("k4")).isEqualTo("v4");
         assertThat(message.getField("k_5")).isEqualTo("v_5");
         assertThat(message.getField("k_6")).isEqualTo("will be added with clean_fields param");
+    }
+
+    @Test
+    public void removeField() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final Message message = messageFactory.createMessage("test", "test", Tools.nowUTC());
+        evaluateRule(rule, message);
+
+        assertThat(message.getField("f1")).isNull();
+        assertThat(message.getField("i1")).isNull();
+        assertThat(message.getField("i2")).isNull();
+        assertThat(message.getField("f2")).isEqualTo("f2");
+        assertThat(message.getField("f3")).isEqualTo("f3");
+    }
+
+    @Test
+    public void removeSingleField() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final Message message = messageFactory.createMessage("test", "test", Tools.nowUTC());
+        evaluateRule(rule, message);
+
+        assertThat(message.getField("a.1")).isNull();
+        assertThat(message.getField("f1")).isNull();
+        assertThat(message.getField("a_1")).isEqualTo("a_1");
+        assertThat(message.getField("f2")).isEqualTo("f2");
+    }
+
+    @Test
+    public void removeFieldsByName() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final Message message = messageFactory.createMessage("test", "test", Tools.nowUTC());
+        evaluateRule(rule, message);
+
+        assertThat(message.getField("a.1")).isNull();
+        assertThat(message.getField("f1")).isNull();
+        assertThat(message.getField("a_1")).isEqualTo("a_1");
+        assertThat(message.getField("f2")).isEqualTo("f2");
+    }
+
+    @Test
+    public void removeFieldsByRegex() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final Message message = messageFactory.createMessage("test", "test", Tools.nowUTC());
+        evaluateRule(rule, message);
+
+        assertThat(message.getField("a.1")).isNull();
+        assertThat(message.getField("a_1")).isNull();
+        assertThat(message.getField("f2")).isNull();
+        assertThat(message.getField("f1")).isEqualTo("f1");
     }
 }
