@@ -22,7 +22,10 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Strings;
+import jakarta.annotation.Nullable;
+import org.graylog.plugins.formatting.units.model.UnitId;
 import org.graylog.plugins.views.search.searchtypes.pivot.HasField;
+import org.graylog.plugins.views.search.searchtypes.pivot.MayHaveUnit;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 
 import java.util.Optional;
@@ -30,7 +33,7 @@ import java.util.Optional;
 @AutoValue
 @JsonTypeName(Sum.NAME)
 @JsonDeserialize(builder = Sum.Builder.class)
-public abstract class Sum implements SeriesSpec, HasField {
+public abstract class Sum implements SeriesSpec, HasField, MayHaveUnit {
     public static final String NAME = "sum";
 
     @Override
@@ -41,6 +44,10 @@ public abstract class Sum implements SeriesSpec, HasField {
 
     @JsonProperty
     public abstract String field();
+
+    @Override
+    @Nullable
+    public abstract UnitId unit();
 
     @Override
     public String literal() {
@@ -71,6 +78,10 @@ public abstract class Sum implements SeriesSpec, HasField {
 
         @JsonProperty
         public abstract Builder field(String field);
+
+        @JsonProperty
+        @Nullable
+        public abstract Builder unit(UnitId unit);
 
         abstract Optional<String> id();
         abstract String field();

@@ -21,7 +21,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import jakarta.annotation.Nullable;
+import org.graylog.plugins.formatting.units.model.UnitId;
 import org.graylog.plugins.views.search.searchtypes.pivot.HasField;
+import org.graylog.plugins.views.search.searchtypes.pivot.MayHaveUnit;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 
 import java.util.Optional;
@@ -29,7 +32,7 @@ import java.util.Optional;
 @AutoValue
 @JsonTypeName(Percentile.NAME)
 @JsonDeserialize(builder = Percentile.Builder.class)
-public abstract class Percentile implements SeriesSpec, HasField {
+public abstract class Percentile implements SeriesSpec, HasField, MayHaveUnit {
     public static final String NAME = "percentile";
 
     @Override
@@ -40,6 +43,10 @@ public abstract class Percentile implements SeriesSpec, HasField {
 
     @JsonProperty
     public abstract String field();
+
+    @Override
+    @Nullable
+    public abstract UnitId unit();
 
     @JsonProperty
     public abstract Double percentile();
@@ -76,6 +83,10 @@ public abstract class Percentile implements SeriesSpec, HasField {
 
         @JsonProperty
         public abstract Builder percentile(Double percentile);
+
+        @JsonProperty
+        @Nullable
+        public abstract Builder unit(UnitId unit);
 
         abstract Optional<String> id();
         abstract String field();

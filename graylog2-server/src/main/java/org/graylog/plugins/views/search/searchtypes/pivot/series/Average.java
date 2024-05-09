@@ -22,7 +22,10 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Strings;
+import jakarta.annotation.Nullable;
+import org.graylog.plugins.formatting.units.model.UnitId;
 import org.graylog.plugins.views.search.searchtypes.pivot.HasField;
+import org.graylog.plugins.views.search.searchtypes.pivot.MayHaveUnit;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 
 import java.util.Optional;
@@ -30,7 +33,7 @@ import java.util.Optional;
 @AutoValue
 @JsonTypeName(Average.NAME)
 @JsonDeserialize(builder = Average.Builder.class)
-public abstract class Average implements SeriesSpec, HasField {
+public abstract class Average implements SeriesSpec, HasField, MayHaveUnit {
     public static final String NAME = "avg";
 
     @Override
@@ -38,6 +41,10 @@ public abstract class Average implements SeriesSpec, HasField {
 
     @Override
     public abstract String id();
+
+    @Override
+    @Nullable
+    public abstract UnitId unit();
 
     @Override
     @JsonProperty
@@ -76,12 +83,15 @@ public abstract class Average implements SeriesSpec, HasField {
         @JsonProperty
         public abstract Builder field(String field);
 
+        @JsonProperty
+        @Nullable
+        public abstract Builder unit(UnitId unit);
+
         @JsonProperty("whole_number")
         public abstract Builder wholeNumber(Boolean wholeNumber);
 
         abstract Optional<String> id();
         abstract String field();
-
         abstract Boolean wholeNumber();
         abstract Average autoBuild();
 
