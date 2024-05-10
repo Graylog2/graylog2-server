@@ -54,22 +54,27 @@ public class SupportedUnitsProvider implements Provider<SupportedUnits> {
             new DerivedUnit("h", "hour", "time", new Conversion(60 * 60, MULTIPLY)),
             new DerivedUnit("d", "day", "time", new Conversion(24 * 60 * 60, MULTIPLY)),
             new DerivedUnit("m", "month", "time", new Conversion(30 * 24 * 60 * 60, MULTIPLY)),
-            
+
             new BaseUnit("%", "percent", "percent")
     );
     private static final String SUPPORTED_UNITS_RES_FILE_LOCATION = "/units/supported_units.json";
     private SupportedUnits supportedUnitsMemoized;
 
+    private final ObjectMapper objectMapper;
+
     @Inject
     public SupportedUnitsProvider(final ObjectMapper objectMapper) {
-        try {
-            this.supportedUnitsMemoized = loadFromFile(objectMapper);
-        } catch (Exception ex) {
-            this.supportedUnitsMemoized = useFallback();
-        }
+        this.objectMapper = objectMapper;
     }
 
     public SupportedUnits get() {
+        if (this.supportedUnitsMemoized == null) {
+            try {
+                this.supportedUnitsMemoized = loadFromFile(objectMapper);
+            } catch (Exception ex) {
+                this.supportedUnitsMemoized = useFallback();
+            }
+        }
         return supportedUnitsMemoized;
     }
 
