@@ -103,4 +103,8 @@ public abstract class MoreMediaTypes {
      * A {@link MediaType} constant representing {@value #APPLICATION_NDGELF} media type.
      */
     public final static MediaType APPLICATION_NDGELF_TYPE = new MediaType("application", "gelf+x-ndjson");
+
+    public final static MediaType APPLICATION_JAVASCRIPT_MODULE_TYPE = new MediaType("application", "javascript+module");
+
+    public final static MediaType APPLICATION_GL_PIPELINE_RULE_TYPE = new MediaType("application", "x-graylog-pipeline-rule");
 }

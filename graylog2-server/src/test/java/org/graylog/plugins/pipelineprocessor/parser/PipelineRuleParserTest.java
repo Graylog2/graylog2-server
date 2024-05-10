@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
+import jakarta.annotation.Nonnull;
 import org.graylog.plugins.pipelineprocessor.BaseParserTest;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
@@ -60,7 +61,6 @@ import org.graylog2.plugin.InstantMillisProvider;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.TestMessageFactory;
-import jakarta.annotation.Nonnull;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
@@ -76,7 +76,9 @@ import java.util.Map;
 import java.util.Optional;
 
 import static com.google.common.collect.ImmutableList.of;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.graylog.plugins.pipelineprocessor.functions.FunctionsSnippetsTest.GRAYLOG_EPOCH;
+import static org.graylog.plugins.pipelineprocessor.parser.RuleContentType.JAVASCRIPT_MODULE;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -408,6 +410,15 @@ public class PipelineRuleParserTest extends BaseParserTest {
             assertEquals(1, e.getErrors().size());
             assertEquals(SyntaxError.class, Iterables.getOnlyElement(e.getErrors()).getClass());
         }
+    }
+
+    @Test
+    public void jsTest() {
+        final var source = """
+                export default {"foo" : "bar"};
+                """;
+        assertThatThrownBy(() -> parser.parseRule(JAVASCRIPT_MODULE, source, false))
+                .isInstanceOf(UnsupportedOperationException.class);
     }
 
     public static class CustomObject {
