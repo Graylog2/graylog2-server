@@ -107,8 +107,6 @@ export const extractSeries = (keyJoiner: KeyJoiner = _defaultKeyJoiner, leafValu
   const flatLeafs = flattenLeafs(leafs, leafValueMatcher);
   const valuesBySeries = {};
 
-  // console.log({ flatLeafs });
-
   flatLeafs.forEach(([key, value]) => {
     const joinedKey = keyJoiner(value.key);
     const targetIdx = xLabels.findIndex((l) => isEqual(l, key));
@@ -117,8 +115,6 @@ export const extractSeries = (keyJoiner: KeyJoiner = _defaultKeyJoiner, leafValu
       set(valuesBySeries, [joinedKey, targetIdx], value.value);
     }
   });
-
-  // console.log({ valuesBySeries });
 
   return { valuesBySeries, xLabels };
 };
@@ -130,11 +126,8 @@ export const generateChart = (
   mapKeys: KeyMapper = (key) => key,
 ): ((results: ExtractedSeries) => Array<ChartDefinition>) => {
   const columnFields = config.columnPivots.flatMap((pivot) => pivot.fields);
-  // console.log({ chartType, config });
 
   return (results: ExtractedSeries) => {
-    // console.log('ExtractedSeries', { results });
-
     const allCharts = results.map(([value, x, values, z]) => ({
       type: chartType,
       name: value.split(keySeparator).map((key, idx) => (columnFields[idx] ? mapKeys(key, columnFields[idx]) : key)).join(humanSeparator),
@@ -144,12 +137,7 @@ export const generateChart = (
       originalName: value,
     }));
 
-    return allCharts.map((args, idx) => {
-      const chart = generator({ ...args, idx, total: allCharts.length, config });
-      console.log('GENERATECHART GENERATECHART', { args, idx, allCharts, config, chart });
-
-      return chart;
-    });
+    return allCharts.map((args, idx) => generator({ ...args, idx, total: allCharts.length, config }));
   };
 };
 
@@ -187,14 +175,11 @@ export const chartData = (
 ): Array<ChartDefinition> => {
   const { rowPivots, columnPivots, series } = config;
 
-  const chData = flow([
+  return flow([
     transformKeys(rowPivots, columnPivots, formatTime),
     extractSeries(series.length === 1 ? doNotSuffixTraceForSingleSeries : undefined, leafValueMatcher),
     customSeriesFormatter,
     removeNulls(),
     generateChart(chartType, generator, config, mapKeys),
   ])(data);
-  // console.log({ series, chData });
-
-  return chData;
 };

@@ -83,14 +83,11 @@ export const updateWidgetAggregationElements = (formValues: WidgetConfigFormValu
     return toConfig;
   }).reduce((prevConfig, toConfig) => toConfig(formValues, prevConfig), oldConfig.toBuilder());
 
-  console.log('!!!!!!oooooo!!!!!!!!!!', { newConfig });
-
   return newConfig.build();
 };
 
 const _onSubmit = (formValues: WidgetConfigFormValues, onConfigChange: (newConfig: AggregationWidgetConfig) => void, oldConfig: AggregationWidgetConfig) => {
   const newConfig = updateWidgetAggregationElements(formValues, oldConfig);
-  console.log({ formValues, newConfig });
 
   return onConfigChange(newConfig);
 };
@@ -105,8 +102,6 @@ const validateForm = (formValues: WidgetConfigFormValues) => {
 
 const AggregationWizard = ({ onChange, config, children, onSubmit, onCancel }: EditWidgetComponentProps<AggregationWidgetConfig> & { children: React.ReactElement }) => {
   const initialFormValues = _initialFormValues(config);
-
-  console.log({ initialFormValues, config });
 
   return (
     <WidgetConfigForm onSubmit={(formValues: WidgetConfigFormValues) => _onSubmit(formValues, onChange, config)}

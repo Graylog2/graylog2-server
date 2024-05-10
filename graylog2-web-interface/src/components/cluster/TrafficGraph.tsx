@@ -37,8 +37,7 @@ const TrafficGraph = ({ width, traffic, layoutExtension }: Props) => {
     y: Object.values(traffic),
   }];
   const layout = {
-    showlegend: true,
-    barmode: 'overlay',
+    showlegend: false,
     margin: {
       l: 60,
     },
@@ -47,74 +46,25 @@ const TrafficGraph = ({ width, traffic, layoutExtension }: Props) => {
       title: {
         text: 'Time',
       },
-      domain: [0.05, 0.95],
     },
     hovermode: 'x',
+    hoverlabel: {
+      namelength: -1,
+    },
     yaxis: {
       title: {
-        text: 'Days',
+        text: 'Bytes',
       },
-      // side: 'left',
-      // rangemode: 'tozero',
-      type: 'date',
-      tickformatstops: [
-        { dtickrange: [0, 1000], value: '%S ms' }, // Milliseconds
-        { dtickrange: [1000, 60000], value: '%M Min %S sec' }, // Seconds and minutes
-        { dtickrange: [60000, 3600000], value: '%H H %M Min' }, // Minutes and hours
-        { dtickrange: [3600000, 999999986400000], value: '%d days' }, // Hours and days
-        // Add more custom tick formats as needed
-      ],
-      autoshift: true,
-    },
-    yaxis2: {
-      title: {
-        text: 'Size',
-      },
-      position: 0.05,
-      // side: 'right',
-      overlaying: 'y',
-      // rangemode: 'tozero',
-      hoverformat: '.2s',
+      rangemode: 'tozero',
+      hoverformat: '.4s',
       tickformat: 's',
-      ticksuffix: 'bytes',
-      autoshift: true,
     },
-    yaxis3: {
-      title: {
-        text: 'Numbers',
-      },
-      overlaying: 'y',
-      position: 0.95,
-      anchor: 'free',
-      side: 'right',
-      // rangemode: 'tozero',
-      autoshift: true,
-    },
-    updatemenus: layoutExtension.updatemenus && [...layoutExtension.updatemenus, ...layoutExtension.updatemenus, ...layoutExtension.updatemenus],
-    annotations: layoutExtension.updatemenus && [...layoutExtension.annotations, ...layoutExtension.annotations, ...layoutExtension.annotations],
-    shapes: layoutExtension.updatemenus && [...layoutExtension.shapes, ...layoutExtension.shapes, ...layoutExtension.shapes],
+    ...layoutExtension,
   };
-  console.log({ layoutExtension, layout, chartData });
 
   return (
     <div style={{ height: '200px', width: width }}>
-      <GenericPlot chartData={[
-        {
-          ...chartData[0],
-          type: 'scatter',
-          y: chartData[0].y.map((v) => v * Math.random()),
-          text: chartData[0].y.map((v) => {
-            if (v > 1000000) return `${v / 1000} sec`;
-
-            return 'OOOFFFFOOOOOO';
-          }),
-          hovertemplate: 'Y-axis 1: %{text}<extra></extra>',
-          yaxis: 'y1',
-          hoverinfo: 'y',
-        },
-        { ...chartData[0], type: 'scatter', hoverinfo: 'y', yaxis: 'y2' },
-        { ...chartData[0], type: 'scatter', hoverinfo: 'y', yaxis: 'y3', y: chartData[0].y.map((v) => v * Math.random()) },
-      ]}
+      <GenericPlot chartData={chartData}
                    layout={layout} />
     </div>
   );

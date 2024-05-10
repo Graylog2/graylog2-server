@@ -122,8 +122,6 @@ const XYPlot = ({
     });
   }
 
-  console.log('XYPlot', { layout, chartData });
-
   return (
     <PlotLegend config={config} chartData={chartData}>
       <GenericPlot chartData={chartData}

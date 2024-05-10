@@ -17,24 +17,6 @@
 
 import { useMemo } from 'react';
 
-const fileSizes = [
-  { id: 'bytes', name: 'B' },
-  { id: 'k_bytes', name: 'KB' },
-  { id: 'm_bytes', name: 'MB' },
-  { id: 'g_bytes', name: 'GB' },
-  { id: 't_bytes', name: 'TB' },
-];
-
-const times = [
-  { id: 'ms', name: 'MS' },
-  { id: 's', name: 'Seconds' },
-  { id: 'min', name: 'Minutes' },
-  { id: 'h', name: 'Hours' },
-  { id: 'd', name: 'Days' },
-  { id: 'mon', name: 'Months' },
-  { id: 'y', name: 'years' },
-];
-
 type UnitType = 'file_size' | 'time' | 'percentage'
 
 type FieldUnits = Record<string, { unit_type: UnitType, unit: string }>

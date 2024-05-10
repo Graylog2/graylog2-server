@@ -28,14 +28,11 @@ const useChartData = (rows: Rows, config: Optional<ChartDataConfig, 'formatTime'
   const mapKeys = useMapKeys();
   // console.log('useChartData', { rows, config });
 
-  const res = useMemo(() => chartData(rows, {
+  return useMemo(() => chartData(rows, {
     formatTime,
     mapKeys,
     ...config,
   }), [config, formatTime, mapKeys, rows]);
-  // console.log('useChartData', { rows, config, res });
-
-  return res;
 };
 
 export default useChartData;

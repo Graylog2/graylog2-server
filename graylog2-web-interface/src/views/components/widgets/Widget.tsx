@@ -238,8 +238,6 @@ const Widget = ({ id, editing, widget, title, position, onPositionsChange }: Pro
       app_action_value: 'widget-edit-update-button',
     });
 
-    // console.log('Widget component', { id, newWidgetConfig });
-
     return dispatch(updateWidgetConfig(id, newWidgetConfig)).then(() => {
     });
   }, [dispatch, id, pathname, sendTelemetry]);
