@@ -76,7 +76,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static com.google.common.collect.ImmutableList.of;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.plugins.pipelineprocessor.functions.FunctionsSnippetsTest.GRAYLOG_EPOCH;
 import static org.graylog.plugins.pipelineprocessor.parser.RuleContentType.JAVASCRIPT_MODULE;
 import static org.junit.Assert.assertArrayEquals;
@@ -415,10 +415,25 @@ public class PipelineRuleParserTest extends BaseParserTest {
     @Test
     public void jsTest() {
         final var source = """
-                export default {"foo" : "bar"};
+                export default {
+                    "name" : "javascript test",
+                    "when" : (msg) => {
+                        return msg.getField("run_rule");
+                    },
+                    "then" : (msg) => {
+                        msg.addField("processed_by", "javascript test");
+                    }
+                };
                 """;
-        assertThatThrownBy(() -> parser.parseRule(JAVASCRIPT_MODULE, source, false))
-                .isInstanceOf(UnsupportedOperationException.class);
+        final var rule = parser.parseRule(JAVASCRIPT_MODULE, source, false);
+        assertThat(rule.name()).isEqualTo("javascript test");
+
+        Message message = messageFactory.createMessage("hello test", "source", DateTime.now(DateTimeZone.UTC));
+        message.addField("run_rule", true);
+
+        final var processedMessage = evaluateRule(rule, message);
+        assertThat(processedMessage).isNotNull();
+        assertThat(processedMessage.getField("processed_by")).isEqualTo("javascript test");
     }
 
     public static class CustomObject {
