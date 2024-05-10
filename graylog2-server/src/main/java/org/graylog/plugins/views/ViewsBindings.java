@@ -275,6 +275,10 @@ public class ViewsBindings extends ViewsModule {
 
         bind(LastUsedQueryStringsService.class).to(MongoLastUsedQueryStringsService.class);
         addSystemRestResource(QueryStringsResource.class);
+
+        // The Set<StaticReferencedSearch> binder must be explicitly initialized to avoid an initialization error when
+        // no values are bound.
+        staticReferencedSearchBinder();
     }
 
     private void registerExportBackendProvider() {

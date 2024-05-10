@@ -20,6 +20,7 @@ export type Message = {
   fields: { [key: string]: any },
   formatted_fields?: { [key: string]: any },
   highlight_ranges?: { [key: string]: any },
+  source_input_id?: string,
   decoration_stats?: {
     added_fields: { [key: string]: any },
     changed_fields: { [key: string]: any },

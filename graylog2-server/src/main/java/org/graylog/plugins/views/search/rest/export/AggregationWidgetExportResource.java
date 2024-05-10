@@ -50,7 +50,8 @@ public class AggregationWidgetExportResource extends RestResource {
     @Produces({MoreMediaTypes.TEXT_CSV,
             MediaType.APPLICATION_JSON,
             MoreMediaTypes.APPLICATION_YAML,
-            MediaType.APPLICATION_XML})
+            MediaType.APPLICATION_XML,
+            MoreMediaTypes.APPLICATION_XLS})
     @Path("/{filename}")
     public Response exportData(@ApiParam @Valid PivotResult pivotResult,
                                @HeaderParam("Accept") String mediaType,

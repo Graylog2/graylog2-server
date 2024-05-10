@@ -22,6 +22,9 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.jackson.CustomJacksonCodecRegistry;
+import org.graylog2.database.pagination.DefaultMongoPaginationHelper;
+import org.graylog2.database.pagination.MongoPaginationHelper;
+import org.graylog2.database.utils.MongoUtils;
 
 @Singleton
 public class MongoCollections {
@@ -37,6 +40,12 @@ public class MongoCollections {
 
     /**
      * Get a MongoCollection configured to use Jackson for serialization/deserialization of objects.
+     * <p>
+     * <b>Prefer using {@link #collection(String, Class)} to get a more strictly typed collection!</b>
+     *
+     * @param collectionName Name of the collection
+     * @param valueType      Java type of the documents stored in the collection
+     * @return A collection using a Jackson codec for serialization and deserialization
      */
     public <T> MongoCollection<T> get(String collectionName, Class<T> valueType) {
         final MongoCollection<T> collection = mongoConnection.getMongoDatabase().getCollection(collectionName, valueType);
@@ -44,5 +53,44 @@ public class MongoCollections {
                 collection.getCodecRegistry());
         jacksonCodecRegistry.addCodecForClass(valueType);
         return collection.withCodecRegistry(jacksonCodecRegistry);
+    }
+
+    /**
+     * Get a MongoCollection configured to use Jackson for serialization/deserialization of objects.
+     *
+     * @param collectionName Name of the collection
+     * @param valueType      Java type of the documents stored in the collection
+     * @return A collection using a Jackson codec for serialization and deserialization
+     */
+    public <T extends MongoEntity> MongoCollection<T> collection(String collectionName, Class<T> valueType) {
+        return get(collectionName, valueType);
+    }
+
+    /**
+     * Provides a helper to perform find operations on a collection that yield pages of documents.
+     */
+    public <T extends MongoEntity> MongoPaginationHelper<T> paginationHelper(String collectionName, Class<T> valueType) {
+        return paginationHelper(collection(collectionName, valueType));
+    }
+
+    /**
+     * Provides a helper to perform find operations on a collection that yield pages of documents.
+     */
+    public <T extends MongoEntity> MongoPaginationHelper<T> paginationHelper(MongoCollection<T> collection) {
+        return new DefaultMongoPaginationHelper<>(collection);
+    }
+
+    /**
+     * Provides utility methods like getting documents by ID, etc.
+     */
+    public <T extends MongoEntity> MongoUtils<T> utils(String collectionName, Class<T> valueType) {
+        return utils(collection(collectionName, valueType));
+    }
+
+    /**
+     * Provides utility methods like getting documents by ID, etc.
+     */
+    public <T extends MongoEntity> MongoUtils<T> utils(MongoCollection<T> collection) {
+        return new MongoUtils<>(collection, objectMapper);
     }
 }
