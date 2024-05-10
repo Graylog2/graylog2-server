@@ -18,7 +18,6 @@ package org.graylog2.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog2.datatiering.hotonly.HotOnlyDataTieringConfig;
-import org.graylog2.indexer.indexset.template.IndexSetTemplateConfig;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
@@ -37,7 +36,7 @@ class IndexSetsDefaultConfigurationTest {
     void testConvert() {
         // Verify that JSON annotation in class are properly defined so that the
         // ClusterConfigService can perform needed payload conversions on reads/writes.
-        final IndexSetTemplateConfig indexConfig = IndexSetTemplateConfig.builder()
+        final IndexSetsDefaultConfiguration indexConfig = IndexSetsDefaultConfiguration.builder()
                 .indexAnalyzer("standard")
                 .shards(1)
                 .replicas(0)
@@ -57,6 +56,6 @@ class IndexSetsDefaultConfigurationTest {
                 .build();
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         final Map<?, ?> map = objectMapper.convertValue(indexConfig, HashMap.class);
-        objectMapper.convertValue(map, IndexSetTemplateConfig.class);
+        objectMapper.convertValue(map, IndexSetsDefaultConfiguration.class);
     }
 }
