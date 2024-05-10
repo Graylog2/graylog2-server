@@ -20,11 +20,23 @@ import com.swrve.ratelimitedlogger.RateLimitedLog;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import jakarta.inject.Inject;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.audit.PipelineProcessorAuditEventTypes;
+import org.graylog.plugins.pipelineprocessor.parser.RuleContentType;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineRestPermissions;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineRuleService;
 import org.graylog.plugins.pipelineprocessor.rest.RuleResource;
@@ -41,20 +53,6 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
-
-import jakarta.inject.Inject;
-
-import jakarta.validation.constraints.NotNull;
-
-import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.PUT;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -166,11 +164,11 @@ public class RuleBuilderResource extends RestResource implements PluginRestResou
         RuleSource ruleSourceConditions = RuleSource.builder()
                 .source(ruleBuilderParser.generateSimulatorRuleSourceEvaluatingConditions(simulateRuleBuilderRequest.ruleBuilderDto().ruleBuilder()))
                 .build();
-        final Rule rule1 = pipelineRuleService.parseRuleOrThrow(ruleSourceConditions.id(), ruleSourceConditions.source(), true);
+        final Rule rule1 = pipelineRuleService.parseRuleOrThrow(RuleContentType.GL_PIPELINE_LANGUAGE, ruleSourceConditions.id(), ruleSourceConditions.source(), true);
         final Message conditionResult = ruleSimulator.simulate(rule1, message);
 
         RuleSource ruleSource = toRuleSource(simulateRuleBuilderRequest.ruleBuilderDto(), true);
-        final Rule rule2 = pipelineRuleService.parseRuleOrThrow(ruleSource.id(), ruleSource.source(), true);
+        final Rule rule2 = pipelineRuleService.parseRuleOrThrow(RuleContentType.GL_PIPELINE_LANGUAGE, ruleSource.id(), ruleSource.source(), true);
 
         final Message result = ruleSimulator.simulate(rule2, conditionResult);
 

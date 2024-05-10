@@ -22,6 +22,20 @@ import com.swrve.ratelimitedlogger.RateLimitedLog;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import jakarta.inject.Inject;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
@@ -36,6 +50,7 @@ import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigService;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
+import org.graylog.plugins.pipelineprocessor.parser.RuleContentType;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.RuleBuilderService;
 import org.graylog.plugins.pipelineprocessor.simulator.RuleSimulator;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -54,24 +69,6 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import javax.annotation.Nonnull;
-
-import jakarta.inject.Inject;
-
-import jakarta.validation.constraints.NotNull;
-
-import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.DefaultValue;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.PUT;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.core.MediaType;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -136,13 +133,13 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @RequiresPermissions(PipelineRestPermissions.PIPELINE_RULE_CREATE)
     @AuditEvent(type = PipelineProcessorAuditEventTypes.RULE_CREATE)
     public RuleSource createFromParser(@ApiParam(name = "rule", required = true) @NotNull RuleSource ruleSource) throws ParseException {
-        final Rule rule = pipelineRuleService.parseRuleOrThrow(ruleSource.id(), ruleSource.source(), false);
+        final Rule rule = pipelineRuleService.parseRuleOrThrow(RuleContentType.GL_PIPELINE_LANGUAGE, ruleSource.id(), ruleSource.source(), false);
         final DateTime now = DateTime.now(DateTimeZone.UTC);
         final RuleDao newRuleSource = RuleDao.builder()
                 .title(rule.name()) // use the name from the parsed rule source.
                 .description(ruleSource.description())
-                .source(ruleSource.source()
-                )
+                .contentType(ruleSource.contentType())
+                .source(ruleSource.source())
                 .createdAt(now)
                 .modifiedAt(now)
                 .ruleBuilder(ruleSource.ruleBuilder())
@@ -166,7 +163,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @Path("/parse")
     @NoAuditEvent("only used to parse a rule, no changes made in the system")
     public RuleSource parse(@ApiParam(name = "rule", required = true) @NotNull RuleSource ruleSource) throws ParseException {
-        final Rule rule = pipelineRuleService.parseRuleOrThrow(ruleSource.id(), ruleSource.source(), true);
+        final Rule rule = pipelineRuleService.parseRuleOrThrow(RuleContentType.GL_PIPELINE_LANGUAGE, ruleSource.id(), ruleSource.source(), true);
         final DateTime now = DateTime.now(DateTimeZone.UTC);
         return RuleSource.builder()
                 .title(rule.name())
@@ -185,7 +182,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     public Message simulate(
             @ApiParam(name = "request", required = true) @NotNull SimulateRuleRequest request
     ) {
-        final Rule rule = pipelineRuleService.parseRuleOrThrow(request.ruleSource().id(), request.ruleSource().source(), true);
+        final Rule rule = pipelineRuleService.parseRuleOrThrow(request.ruleSource().contentType(), request.ruleSource().id(), request.ruleSource().source(), true);
         Message message = ruleSimulator.createMessage(request.message());
         return ruleSimulator.simulate(rule, message);
     }
@@ -291,10 +288,11 @@ public class RuleResource extends RestResource implements PluginRestResource {
         checkPermission(PipelineRestPermissions.PIPELINE_RULE_EDIT, id);
 
         final RuleDao ruleDao = ruleService.load(id);
-        final Rule rule = pipelineRuleService.parseRuleOrThrow(id, update.source(), false);
+        final Rule rule = pipelineRuleService.parseRuleOrThrow(update.contentType(), id, update.source(), false);
         final RuleDao toSave = ruleDao.toBuilder()
                 .title(rule.name())
                 .description(update.description())
+                .contentType(update.contentType())
                 .source(update.source())
                 .modifiedAt(DateTime.now(DateTimeZone.UTC))
                 .ruleBuilder(update.ruleBuilder())

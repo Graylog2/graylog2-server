@@ -16,15 +16,14 @@
  */
 package org.graylog.plugins.pipelineprocessor.rest;
 
+import jakarta.inject.Inject;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.core.Response;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
-
-import jakarta.inject.Inject;
-
-import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.core.Response;
+import org.graylog.plugins.pipelineprocessor.parser.RuleContentType;
 
 public class PipelineRuleService {
 
@@ -35,9 +34,9 @@ public class PipelineRuleService {
         this.pipelineRuleParser = pipelineRuleParser;
     }
 
-    public Rule parseRuleOrThrow(String ruleId, String source, boolean silent) {
+    public Rule parseRuleOrThrow(RuleContentType contentType, String ruleId, String source, boolean silent) {
         try {
-            return pipelineRuleParser.parseRule(ruleId, source, silent);
+            return pipelineRuleParser.parseRule(contentType, ruleId, source, silent);
         } catch (ParseException e) {
             throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(e.getErrors()).build());
         }

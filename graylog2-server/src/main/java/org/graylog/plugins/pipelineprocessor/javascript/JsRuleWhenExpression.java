@@ -17,6 +17,7 @@
 package org.graylog.plugins.pipelineprocessor.javascript;
 
 import jakarta.annotation.Nullable;
+import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.Token;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.Expression;
@@ -44,7 +45,7 @@ public class JsRuleWhenExpression implements LogicalExpression {
 
     @Override
     public Token getStartToken() {
-        return null;
+        return new CommonToken(-1);
     }
 
     @Override
