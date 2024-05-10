@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import jakarta.annotation.Nullable;
 import org.graylog.plugins.formatting.units.model.UnitId;
 import org.graylog.plugins.views.search.searchtypes.pivot.HasField;
 import org.graylog.plugins.views.search.searchtypes.pivot.MayHaveUnit;
@@ -45,8 +44,7 @@ public abstract class Percentile implements SeriesSpec, HasField, MayHaveUnit {
     public abstract String field();
 
     @Override
-    @Nullable
-    public abstract UnitId unit();
+    public abstract Optional<UnitId> unit();
 
     @JsonProperty
     public abstract Double percentile();
@@ -85,8 +83,7 @@ public abstract class Percentile implements SeriesSpec, HasField, MayHaveUnit {
         public abstract Builder percentile(Double percentile);
 
         @JsonProperty
-        @Nullable
-        public abstract Builder unit(UnitId unit);
+        public abstract Builder unit(Optional<UnitId> unit);
 
         abstract Optional<String> id();
         abstract String field();

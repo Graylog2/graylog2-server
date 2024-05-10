@@ -18,7 +18,9 @@ package org.graylog.plugins.views.search.searchtypes.pivot;
 
 import org.graylog.plugins.formatting.units.model.UnitId;
 
+import java.util.Optional;
+
 public interface MayHaveUnit {
 
-    UnitId unit();
+    Optional<UnitId> unit();
 }

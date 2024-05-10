@@ -48,8 +48,7 @@ public abstract class Percentage implements SeriesSpec, HasOptionalField, MayHav
     public abstract String id();
 
     @Override
-    @jakarta.annotation.Nullable
-    public abstract UnitId unit();
+    public abstract Optional<UnitId> unit();
 
 
     @JsonProperty
@@ -72,7 +71,7 @@ public abstract class Percentage implements SeriesSpec, HasOptionalField, MayHav
 
     public static Builder builder() {
         return new AutoValue_Percentage.Builder()
-                .unit(new UnitId("percent", "%"))
+                .unit(Optional.of(new UnitId("percent", "%")))
                 .type(Percentage.NAME);
     }
 
@@ -94,8 +93,7 @@ public abstract class Percentage implements SeriesSpec, HasOptionalField, MayHav
         public abstract Builder field(@Nullable String field);
 
         @JsonProperty
-        @jakarta.annotation.Nullable
-        public abstract Builder unit(UnitId unit);
+        public abstract Builder unit(Optional<UnitId> unit);
 
         @JsonProperty("field")
         public Builder nonEmptyField(@Nullable String field) {

@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Strings;
-import jakarta.annotation.Nullable;
 import org.graylog.plugins.formatting.units.model.UnitId;
 import org.graylog.plugins.views.search.searchtypes.pivot.HasField;
 import org.graylog.plugins.views.search.searchtypes.pivot.MayHaveUnit;
@@ -43,8 +42,7 @@ public abstract class Average implements SeriesSpec, HasField, MayHaveUnit {
     public abstract String id();
 
     @Override
-    @Nullable
-    public abstract UnitId unit();
+    public abstract Optional<UnitId> unit();
 
     @Override
     @JsonProperty
@@ -84,8 +82,7 @@ public abstract class Average implements SeriesSpec, HasField, MayHaveUnit {
         public abstract Builder field(String field);
 
         @JsonProperty
-        @Nullable
-        public abstract Builder unit(UnitId unit);
+        public abstract Builder unit(Optional<UnitId> unit);
 
         @JsonProperty("whole_number")
         public abstract Builder wholeNumber(Boolean wholeNumber);
