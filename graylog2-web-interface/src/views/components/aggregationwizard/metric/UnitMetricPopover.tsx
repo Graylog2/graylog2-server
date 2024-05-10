@@ -16,16 +16,16 @@
  */
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { styled } from 'styled-components';
-import { Field, useFormikContext, getIn } from 'formik';
+import { Field, useFormikContext } from 'formik';
 
 import Select from 'components/common/Select';
 import Popover from 'components/common/Popover';
-import { HoverForHelp, IconButton } from 'components/common';
-import { Input } from 'components/bootstrap';
+import { HoverForHelp } from 'components/common';
+import { Input, Label } from 'components/bootstrap';
 import type { Unit } from 'hooks/useFieldUnitTypes';
 import useFieldUnitTypes from 'hooks/useFieldUnitTypes';
 
-const UnitButton = styled(IconButton)`
+const UnitButton = styled.div`
   position: absolute;
   left: calc(100% + 5px);
   top: 0;
@@ -50,19 +50,30 @@ const UnitMetricPopover = ({ index }: { index: number }) => {
     .map(({ name, abbrev }: Unit) => ({ value: name, label: abbrev })), [unitTypes, currentUnitType]);
   const toggleShow = () => setShow((cur) => !cur);
   const onUnitTypeChange = useCallback((val: string) => {
-    setFieldValue(`metrics.${index}.unitType`, val);
+    setFieldValue(`metrics.${index}.unitType`, val || undefined);
     setFieldValue(`metrics.${index}.unit`, undefined);
   }, [index, setFieldValue]);
 
   useEffect(() => {
   }, []);
 
+  const badgeLabel = useMemo(() => {
+    const curUnitType = values?.metrics?.[index]?.unitType;
+    const curUnit = values?.metrics?.[index]?.unit;
+
+    return unitTypes[curUnitType]?.find(({ name }) => name === curUnit)?.abbrev || '-';
+  }, [index, unitTypes, values?.metrics]);
+
   return (
     <Popover position="right" opened={show} withArrow>
       <Popover.Target>
-        <UnitButton name="line_axis"
-                    onClick={toggleShow}
-                    title="Unit settings" />
+        <UnitButton>
+          <Label onClick={toggleShow}
+                 title="Unit settings"
+                 role="button">
+            {badgeLabel}
+          </Label>
+        </UnitButton>
       </Popover.Target>
       <Popover.Dropdown title="Metrics Unit Settings">
         <Container>
