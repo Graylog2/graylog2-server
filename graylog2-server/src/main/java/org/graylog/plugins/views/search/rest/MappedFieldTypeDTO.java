@@ -29,8 +29,7 @@ public record MappedFieldTypeDTO(@JsonProperty("name") String name,
                                  @JsonProperty("unit") @Nullable UnitId unit
 ) {
 
-    public MappedFieldTypeDTO(final String name,
-                              final FieldTypes.Type type) {
-        this(name, type, null);
+    public static MappedFieldTypeDTO create(String name, FieldTypes.Type type) {
+        return new AutoValue_MappedFieldTypeDTO(name, type);
     }
 }

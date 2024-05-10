@@ -48,7 +48,7 @@ public class TestValidationContext {
     }
 
     public TestValidationContext knownMappedField(final String name, final String type) {
-        this.fields.add(new MappedFieldTypeDTO(name, FieldTypes.Type.builder().type(type).build()));
+        this.fields.add(MappedFieldTypeDTO.create(name, FieldTypes.Type.builder().type(type).build()));
         return this;
     }
 

@@ -43,7 +43,7 @@ public class FieldTypesResourceTest {
 
         final MappedFieldTypesService fieldTypesService = (streamIds, timeRange) -> {
             // for each streamID return a field that's called exactly like the streamID
-            return streamIds.stream().map(streamID -> new MappedFieldTypeDTO(streamID, FieldTypes.Type.builder().type("text").build())).collect(Collectors.toSet());
+            return streamIds.stream().map(streamID -> MappedFieldTypeDTO.create(streamID, FieldTypes.Type.builder().type("text").build())).collect(Collectors.toSet());
         };
 
         final FieldTypesResource resource = new FieldTypesResource(fieldTypesService);
@@ -65,7 +65,7 @@ public class FieldTypesResourceTest {
 
         final MappedFieldTypesService fieldTypesService = (streamIds, timeRange) -> {
             if (ImmutableSet.of("2323", "4242").equals(streamIds) && timeRange.equals(RelativeRange.allTime())) {
-                return Collections.singleton(new MappedFieldTypeDTO("foobar",
+                return Collections.singleton(MappedFieldTypeDTO.create("foobar",
                         FieldTypes.Type.createType("long", ImmutableSet.of("numeric", "enumerable"))));
             } else {
                 return Collections.emptySet();
@@ -98,7 +98,7 @@ public class FieldTypesResourceTest {
         final MappedFieldTypesService mappedFieldTypesService = (streamIds, timeRange) -> {
             if (timeRange.equals(RelativeRange.create(250))) {
                 final FieldTypes.Type fieldType = FieldTypes.Type.createType("long", ImmutableSet.of("numeric", "enumerable"));
-                final MappedFieldTypeDTO field = new MappedFieldTypeDTO("foobar", fieldType);
+                final MappedFieldTypeDTO field = MappedFieldTypeDTO.create("foobar", fieldType);
                 return Collections.singleton(field);
             } else {
                 throw new AssertionError("Expected relative range of 250");
@@ -127,7 +127,7 @@ public class FieldTypesResourceTest {
         final MappedFieldTypesService fieldTypesService = (streamIds, timeRange) -> {
             // for each streamID return a field that's called exactly like the streamID
             return streamIds.stream()
-                    .map(streamID -> new MappedFieldTypeDTO(streamID, FieldTypes.Type.builder().type("text").build()))
+                    .map(streamID -> MappedFieldTypeDTO.create(streamID, FieldTypes.Type.builder().type("text").build()))
                     .collect(Collectors.toSet());
         };
 
@@ -151,7 +151,7 @@ public class FieldTypesResourceTest {
         final MappedFieldTypesService fieldTypesService = (streamIds, timeRange) -> {
             if (ImmutableSet.of("2323", "4242").equals(streamIds) && timeRange.equals(RelativeRange.allTime())) {
                 final FieldTypes.Type fieldType = FieldTypes.Type.createType("long", ImmutableSet.of("numeric", "enumerable"));
-                final MappedFieldTypeDTO field = new MappedFieldTypeDTO("foobar", fieldType);
+                final MappedFieldTypeDTO field = MappedFieldTypeDTO.create("foobar", fieldType);
                 return Collections.singleton(field);
             } else {
                 throw new AssertionError("Expected allTime range and 2323, 4242 stream IDs");
