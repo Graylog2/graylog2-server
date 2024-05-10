@@ -50,7 +50,6 @@ import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigService;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
-import org.graylog.plugins.pipelineprocessor.parser.RuleContentType;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.RuleBuilderService;
 import org.graylog.plugins.pipelineprocessor.simulator.RuleSimulator;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -133,7 +132,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @RequiresPermissions(PipelineRestPermissions.PIPELINE_RULE_CREATE)
     @AuditEvent(type = PipelineProcessorAuditEventTypes.RULE_CREATE)
     public RuleSource createFromParser(@ApiParam(name = "rule", required = true) @NotNull RuleSource ruleSource) throws ParseException {
-        final Rule rule = pipelineRuleService.parseRuleOrThrow(RuleContentType.GL_PIPELINE_LANGUAGE, ruleSource.id(), ruleSource.source(), false);
+        final Rule rule = pipelineRuleService.parseRuleOrThrow(ruleSource.contentType(), ruleSource.id(), ruleSource.source(), false);
         final DateTime now = DateTime.now(DateTimeZone.UTC);
         final RuleDao newRuleSource = RuleDao.builder()
                 .title(rule.name()) // use the name from the parsed rule source.
@@ -163,7 +162,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @Path("/parse")
     @NoAuditEvent("only used to parse a rule, no changes made in the system")
     public RuleSource parse(@ApiParam(name = "rule", required = true) @NotNull RuleSource ruleSource) throws ParseException {
-        final Rule rule = pipelineRuleService.parseRuleOrThrow(RuleContentType.GL_PIPELINE_LANGUAGE, ruleSource.id(), ruleSource.source(), true);
+        final Rule rule = pipelineRuleService.parseRuleOrThrow(ruleSource.contentType(), ruleSource.id(), ruleSource.source(), true);
         final DateTime now = DateTime.now(DateTimeZone.UTC);
         return RuleSource.builder()
                 .title(rule.name())

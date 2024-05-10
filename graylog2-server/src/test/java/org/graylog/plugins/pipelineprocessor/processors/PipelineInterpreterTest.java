@@ -47,6 +47,7 @@ import org.graylog.plugins.pipelineprocessor.functions.messages.HasField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
+import org.graylog.plugins.pipelineprocessor.parser.RuleContentType;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.Message;
@@ -78,28 +79,33 @@ import static org.mockito.Mockito.when;
 
 public class PipelineInterpreterTest {
     private static final RuleDao RULE_TRUE = RuleDao.create("true", "true", "true",
+            RuleContentType.GL_PIPELINE_LANGUAGE,
             "rule \"true\"\n" +
                     "when true\n" +
                     "then\n" +
                     "end", null, null, null, null);
     private static final RuleDao RULE_FALSE = RuleDao.create("false", "false", "false",
+            RuleContentType.GL_PIPELINE_LANGUAGE,
             "rule \"false\"\n" +
                     "when false\n" +
                     "then\n" +
                     "end", null, null, null, null);
     private static final RuleDao RULE_ADD_FOOBAR = RuleDao.create("add_foobar", "add_foobar", "add_foobar",
+            RuleContentType.GL_PIPELINE_LANGUAGE,
             "rule \"add_foobar\"\n" +
                     "when true\n" +
                     "then\n" +
                     "  set_field(\"foobar\", \"covfefe\");\n" +
                     "end", null, null, null, null);
     private static final java.util.function.Function<String, RuleDao> RULE_SET_FIELD = (name) -> RuleDao.create("false", "false", "false",
+            RuleContentType.GL_PIPELINE_LANGUAGE,
             "rule \"" + name + "\"\n" +
                     "when true\n" +
                     "then\n" +
                     "  set_field(\"" + name + "\", \"value\");" +
                     "end", null, null, null, null);
     private static final RuleDao RULE_DROP_MESSAGE = RuleDao.create("false", "false", "false",
+            RuleContentType.GL_PIPELINE_LANGUAGE,
             "rule \"drop_message\"\n" +
                     "when true\n" +
                     "then\n" +
@@ -118,6 +124,7 @@ public class PipelineInterpreterTest {
                 RuleDao.create("abc",
                         "title",
                         "description",
+                        RuleContentType.GL_PIPELINE_LANGUAGE,
                         "rule \"creates message\"\n" +
                                 "when to_string($message.message) == \"original message\"\n" +
                                 "then\n" +
@@ -434,6 +441,7 @@ public class PipelineInterpreterTest {
         ruleService.save(RuleDao.create("abc",
                 "title",
                 "description",
+                RuleContentType.GL_PIPELINE_LANGUAGE,
                 "rule \"match_all\"\n" +
                         "when true\n" +
                         "then\n" +
@@ -527,6 +535,7 @@ public class PipelineInterpreterTest {
         // given
         when(ruleService.loadAll()).thenReturn(ImmutableList.of(RuleDao.create("broken_condition", "broken_condition",
                 "broken_condition",
+                RuleContentType.GL_PIPELINE_LANGUAGE,
                 "rule \"broken_condition\"\n" +
                         "when\n" +
                         "    to_double($message.num * $message.num) > 0.0\n" +
@@ -572,6 +581,7 @@ public class PipelineInterpreterTest {
         // given
         when(ruleService.loadAll()).thenReturn(ImmutableList.of(RuleDao.create("broken_statement", "broken_statement",
                 "broken_statement",
+                RuleContentType.GL_PIPELINE_LANGUAGE,
                 "rule \"broken_statement\"\n" +
                         "when\n" +
                         "    has_field(\"num\")\n" +
@@ -618,6 +628,7 @@ public class PipelineInterpreterTest {
         // given
         when(ruleService.loadAll()).thenReturn(ImmutableList.of(RuleDao.create("valid_rule", "valid_rule",
                 "valid_rule",
+                RuleContentType.GL_PIPELINE_LANGUAGE,
                 "rule \"valid_rule\"\n" +
                         "when\n" +
                         "    has_field(\"num\")\n" +

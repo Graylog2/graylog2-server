@@ -36,6 +36,7 @@ import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineStreamCon
 import org.graylog.plugins.pipelineprocessor.functions.conversion.LongConversion;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
+import org.graylog.plugins.pipelineprocessor.parser.RuleContentType;
 import org.graylog.plugins.pipelineprocessor.processors.ConfigurationStateUpdater;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
@@ -80,6 +81,7 @@ public class MessageCreationLoopPreventionTest extends BaseParserTest {
                 RuleDao.create("r1",
                         "title",
                         "description",
+                        RuleContentType.GL_PIPELINE_LANGUAGE,
                         ruleForTest(),
                         Tools.nowUTC(),
                         null, null, null)

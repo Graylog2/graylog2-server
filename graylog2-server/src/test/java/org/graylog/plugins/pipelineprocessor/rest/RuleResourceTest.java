@@ -25,6 +25,7 @@ import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigService;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
+import org.graylog.plugins.pipelineprocessor.parser.RuleContentType;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.RuleBuilderService;
 import org.graylog.plugins.pipelineprocessor.simulator.RuleSimulator;
 import org.graylog2.streams.StreamService;
@@ -141,7 +142,7 @@ public class RuleResourceTest {
     }
 
     public RuleDao ruleDao(String id, String title) {
-        return RuleDao.create(id, title, null, f("""
+        return RuleDao.create(id, title, null, RuleContentType.GL_PIPELINE_LANGUAGE, f("""
                 rule "%s"
                 when true
                 then
