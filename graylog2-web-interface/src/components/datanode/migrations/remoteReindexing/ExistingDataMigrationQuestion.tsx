@@ -28,7 +28,7 @@ const ExistingDataMigrationQuestion = ({ currentStep, onTriggerStep }: Migration
     <p>Please remove the <code>elasticsearch_hosts</code> line from your Graylog configuration file (<code>graylog.conf</code>).</p>
     <p>E.g., <code>elasticsearch_hosts = https://admin:admin@opensearch1:9200,https://admin:admin@opensearch2:9200,https://admin:admin@opensearch3:9200</code></p>
     <Space h="md" />
-    <p>Once that is done please proceed to the next step.</p>
+    <p>Once that is done please restart Graylog to finish the migration.</p>
     <Space h="md" />
     <MigrationStepTriggerButtonToolbar nextSteps={currentStep.next_steps} onTriggerStep={onTriggerStep} />
   </>

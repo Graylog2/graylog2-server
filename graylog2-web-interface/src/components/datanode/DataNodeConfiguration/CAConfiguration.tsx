@@ -15,10 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import styled from 'styled-components';
 
-import { Tabs, Tab } from 'components/bootstrap';
+import { Tabs, Tab, Alert } from 'components/bootstrap';
 import CACreateForm from 'components/datanode/DataNodeConfiguration/CACreateForm';
 import CAUpload from 'components/datanode/DataNodeConfiguration/CAUpload';
+import DocumentationLink from 'components/support/DocumentationLink';
+
+const StyledAlert = styled(Alert)`
+  margin-top: 10px;
+  margin-bottom: 10px;
+`;
 
 const TAB_KEYS = ['create', 'upload'];
 const CAConfiguration = () => (
@@ -28,6 +35,12 @@ const CAConfiguration = () => (
       In this step you can either upload or create a new certificate authority.<br />
       The certificate authority will provision and manage certificates for your Data Nodes more easily.
     </p>
+    <StyledAlert bsStyle="info" title="Reusing certificates">
+      If your existing cluster uses certificates, by default these will get replaced with the Graylog CA
+      and automatically generated certificates during provisioning of the data nodes in the next step.
+      If you want to include your own CA, you can upload an existing certificate.
+      Please see <DocumentationLink page="graylog-data-node" text="Graylog Data Node - Getting Started" /> for more information.
+    </StyledAlert>
     <Tabs defaultActiveKey={TAB_KEYS[0]} id="ca-configurations">
       <Tab eventKey={TAB_KEYS[0]} title="Create new CA">
         <CACreateForm />

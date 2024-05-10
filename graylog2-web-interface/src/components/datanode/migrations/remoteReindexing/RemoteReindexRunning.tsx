@@ -66,7 +66,7 @@ const RemoteReindexRunning = ({ currentStep, onTriggerStep }: MigrationStepCompo
 
   return (
     <>
-      We are currently migrating your existing data asynchronically,
+      We are currently migrating your existing data asynchronically (Graylog can be used while the reindexing is running),
       once the data migration is finished you will be automatically transitioned to the next step.
       <br />
       <br />

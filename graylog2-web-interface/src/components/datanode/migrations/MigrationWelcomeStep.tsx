@@ -24,7 +24,6 @@ import MigrationDatanodeList from 'components/datanode/migrations/MigrationDatan
 import MigrationStepTriggerButtonToolbar from 'components/datanode/migrations/common/MigrationStepTriggerButtonToolbar';
 import type { MigrationStepComponentProps } from 'components/datanode/Types';
 import MigrationError from 'components/datanode/migrations/common/MigrationError';
-import InPlaceMigrationInfo from 'components/datanode/migrations/common/InPlaceMigrationInfo';
 
 const Headline = styled.h2`
   margin-top: 5px;
@@ -66,6 +65,34 @@ const MigrationWelcomeStep = ({ currentStep, onTriggerStep }: MigrationStepCompo
     <Col md={6}>
       <StyledHelpPanel bsStyle="info">
         <Panel.Heading>
+          <Panel.Title componentClass="h3"><Icon name="info" /> Methods for migration</Panel.Title>
+        </Panel.Heading>
+        <Panel.Body>
+          <p>
+            During the migration, you can choose between two options for migrating your existing ElasticSearch or OpenSearch data to the data nodes.
+            You should choose between them based on your individual prerequisites and requirements.
+          </p>
+          <p>
+            If you are already running <code>OpenSearch (1.x or 2.x)</code> as your search backend, you can choose <code>in-place migration</code>.
+            In this migration scenario, the data node’s OpenSearch will use the existing data directory of OpenSearch to serve all data previously available in your existing OpenSearch.
+            This is the recommended method if you want to quickly migrate to data node.
+          </p>
+          <p>
+            If you are running <code>ElasticSearch</code> as your search backend or want to selectively migrate data
+            (e.g. if you use your search backend non-exclusively for Graylog), you should choose the <code>remote reindexing migration</code>.
+            In this scenario, all data will be copied from your existing search backend to data node’s OpenSearch.
+            Depending on your setup, this can take some time and imposes additional disk space for the copied data to be available.
+            During the remote reindexing, Graylog is ingesting data into data node and can be used,
+            but will only serve the data from the old search backend as it becomes available.
+          </p>
+          <p>
+            If you don’t plan to migrate any existing data or only want to migrate a small subset of data
+            we recommend you choose the remote reindexing migration and either skip the data migration or choose only the selected indices for migration.
+          </p>
+        </Panel.Body>
+      </StyledHelpPanel>
+      {/* <StyledHelpPanel bsStyle="info">
+        <Panel.Heading>
           <Panel.Title componentClass="h3"><Icon name="info" /> Migrating Elasticsearch 7.10</Panel.Title>
         </Panel.Heading>
         <Panel.Body>
@@ -87,7 +114,7 @@ const MigrationWelcomeStep = ({ currentStep, onTriggerStep }: MigrationStepCompo
           </p>
         </Panel.Body>
       </StyledHelpPanel>
-      <InPlaceMigrationInfo />
+      <InPlaceMigrationInfo /> */}
     </Col>
   </Row>
 );
