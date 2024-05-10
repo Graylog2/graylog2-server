@@ -30,6 +30,6 @@ public record MappedFieldTypeDTO(@JsonProperty("name") String name,
 ) {
 
     public static MappedFieldTypeDTO create(String name, FieldTypes.Type type) {
-        return new AutoValue_MappedFieldTypeDTO(name, type);
+        return new MappedFieldTypeDTO(name, type, null);
     }
 }
