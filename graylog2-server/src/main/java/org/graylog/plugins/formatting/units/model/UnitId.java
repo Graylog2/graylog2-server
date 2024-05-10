@@ -23,4 +23,8 @@ import static org.graylog.plugins.formatting.units.model.Unit.UNIT_TYPE;
 
 public record UnitId(@JsonProperty(value = UNIT_TYPE, required = true) String unitType,
                      @JsonProperty(value = ABBREVIATION, required = true) String abbrev) {
+
+    public UnitId(final Unit unit) {
+        this(unit.unitType(), unit.abbrev());
+    }
 }

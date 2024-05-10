@@ -83,7 +83,7 @@ public class MappedFieldTypesServiceImpl implements MappedFieldTypesService {
         return new MappedFieldTypeDTO(fieldType.fieldName(),
                 mappedFieldType,
                 fieldUnitObtainer.obtainUnit(fieldType.fieldName())
-                        .map(unit -> new UnitId(unit.unitType(), unit.abbrev()))
+                        .map(UnitId::new)
                         .orElse(null));
     }
 
@@ -116,7 +116,7 @@ public class MappedFieldTypesServiceImpl implements MappedFieldTypesService {
                     return new MappedFieldTypeDTO(fieldName,
                             createType(resultingFieldType, properties),
                             fieldUnitObtainer.obtainUnit(fieldName)
-                                    .map(unit -> new UnitId(unit.unitType(), unit.abbrev()))
+                                    .map(UnitId::new)
                                     .orElse(null));
 
                 })

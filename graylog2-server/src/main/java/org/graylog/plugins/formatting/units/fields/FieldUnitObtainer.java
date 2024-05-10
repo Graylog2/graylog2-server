@@ -33,9 +33,7 @@ public class FieldUnitObtainer {
 
     public Optional<Unit> obtainUnit(final String fieldName) {
         return prioritizedMethodList.stream()
-                .map(fieldUnitObtainingMethod -> fieldUnitObtainingMethod.obtainUnit(fieldName))
-                .filter(Optional::isPresent)
-                .findFirst()
-                .orElse(Optional.empty());
+                .flatMap(fieldUnitObtainingMethod -> fieldUnitObtainingMethod.obtainUnit(fieldName).stream())
+                .findFirst();
     }
 }
