@@ -16,7 +16,7 @@
  */
 package org.graylog2.indexer.indexset.template.requirement;
 
-import com.google.inject.Inject;
+import jakarta.inject.Inject;
 import org.graylog2.indexer.indexset.template.IndexSetTemplate;
 
 import java.util.Comparator;
