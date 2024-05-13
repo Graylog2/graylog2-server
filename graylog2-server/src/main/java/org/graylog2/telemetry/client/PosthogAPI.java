@@ -17,6 +17,7 @@
 package org.graylog2.telemetry.client;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.collect.ImmutableMap;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
@@ -34,8 +35,14 @@ public interface PosthogAPI {
                  @JsonProperty("distinct_id") String distinctId,
                  @JsonProperty("event") String event,
                  @JsonProperty("properties") Map<String, Object> properties) {
-        public static Event create(String distinctId, String event, Map<String, Object> properties) {
-            return new Event(UUID.randomUUID().toString(), Instant.now().toString(), distinctId, event, properties);
+        public static Event create(String clusterId, String event, Map<String, Object> properties) {
+            final var groups = Map.of("cluster", clusterId);
+            final var propertiesWithGroups = ImmutableMap.<String, Object>builder()
+                    .putAll(properties)
+                    .put("$groups", groups)
+                    .put("cluster_id", clusterId)
+                    .build();
+            return new Event(UUID.randomUUID().toString(), Instant.now().toString(), clusterId, event, propertiesWithGroups);
         }
     }
 
