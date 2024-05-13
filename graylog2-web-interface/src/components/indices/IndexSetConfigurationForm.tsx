@@ -256,8 +256,6 @@ const IndexSetConfigurationForm = ({
 
   const onCancel = () => history.push(cancelLink);
 
-  console.log('==hellooo');
-
   if (loadingIndexDefaultsConfig) return (<Spinner />);
 
   const prepareInitialValues = () => {
@@ -267,8 +265,6 @@ const IndexSetConfigurationForm = ({
 
     return indexSet as unknown as IndexSetFormValues;
   };
-
-  console.log('==hellooo');
 
   return (
     <Row>

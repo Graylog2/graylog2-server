@@ -206,8 +206,6 @@ const IndexMaintenanceStrategiesConfiguration = ({
     }
   }, [config, setMaxNumberOfIndices]);
 
-  console.log('===config', config);
-
   const retentionIsNotNoop = retentionStrategyClass !== NOOP_RETENTION_STRATEGY;
   const isArchiveRetention = retentionStrategyClass !== ARCHIVE_RETENTION_STRATEGY;
   const shouldShowMaxRetentionWarning = maxRetentionPeriod && rotationStrategyClass === TIME_BASED_ROTATION_STRATEGY && retentionIsNotNoop;

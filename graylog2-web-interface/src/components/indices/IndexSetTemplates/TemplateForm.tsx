@@ -17,7 +17,6 @@
 
 import styled, { css } from 'styled-components';
 import React, { useEffect, useState } from 'react';
-import type { Dispatch, SetStateAction } from 'react';
 import { Formik, Form } from 'formik';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
@@ -54,7 +53,7 @@ type RetentionConfigProps = {
   retentionStrategies: Array<any>,
   retentionStrategiesContext: RetentionStrategyContext,
   indexSetRetentionStrategy?: RetentionStrategyConfig,
-  IndexSetRetentionStrategyClass?: string
+  indexSetRetentionStrategyClass?: string
 }
 
 const TIME_UNITS = ['SECONDS', 'MINUTES'];
@@ -82,10 +81,8 @@ const getRetentionConfigState = (strategy: string, data: RetentionStrategyConfig
   retention_strategy: data,
 });
 
-const RotationStrategies = ({ rotationStrategies, indexSetRotationStrategy, indexSetRotationStrategyClass }: RotationStrategiesProps) => {
+const RotationConfig = ({ rotationStrategies, indexSetRotationStrategy, indexSetRotationStrategyClass }: RotationStrategiesProps) => {
   if (!rotationStrategies) return <Spinner />;
-
-  console.log('===indexSetRotationStrategy', indexSetRotationStrategy);
 
   return (
     <IndexMaintenanceStrategiesConfiguration title="Index Rotation Configuration"
@@ -102,9 +99,13 @@ const RotationStrategies = ({ rotationStrategies, indexSetRotationStrategy, inde
   );
 };
 
-const RetentionConfig = ({ retentionStrategies, retentionStrategiesContext, indexSetRetentionStrategy, IndexSetRetentionStrategyClass }: RetentionConfigProps) => {
+RotationConfig.defaultProps = {
+  indexSetRotationStrategy: undefined,
+  indexSetRotationStrategyClass: undefined,
+};
+
+const RetentionConfig = ({ retentionStrategies, retentionStrategiesContext, indexSetRetentionStrategy, indexSetRetentionStrategyClass }: RetentionConfigProps) => {
   if (!retentionStrategies) return <Spinner />;
-  console.log('===indexSetRetentionStrategy', indexSetRetentionStrategy);
 
   return (
     <IndexMaintenanceStrategiesConfiguration title="Index Retention Configuration"
@@ -116,10 +117,15 @@ const RetentionConfig = ({ retentionStrategies, retentionStrategiesContext, inde
                                              retentionStrategiesContext={retentionStrategiesContext}
                                              activeConfig={{
                                                config: indexSetRetentionStrategy,
-                                               strategy: IndexSetRetentionStrategyClass,
+                                               strategy: indexSetRetentionStrategyClass,
                                              }}
                                              getState={getRetentionConfigState} />
   );
+};
+
+RetentionConfig.defaultProps = {
+  indexSetRetentionStrategy: undefined,
+  indexSetRetentionStrategyClass: undefined,
 };
 
 const validate = (formValues: IndexSetTemplateFormValues) => {
@@ -198,10 +204,10 @@ const TemplateForm = ({ initialValues, submitButtonText, submitLoadingText, onCa
   const prepareInitialValues = () => {
     const values = { ...defaultValues, ...initialValues };
 
-    const { rotation_strategy, rotation_stategy_class, retention_strategy, retention_strategy_class } = values.index_set_config;
+    const { rotation_strategy, rotation_strategy_class, retention_strategy, retention_strategy_class } = values.index_set_config;
 
     delete values.index_set_config.rotation_strategy;
-    delete values.index_set_config.rotation_stategy_class;
+    delete values.index_set_config.rotation_strategy_class;
     delete values.index_set_config.retention_strategy;
     delete values.index_set_config.retention_strategy_class;
 
@@ -210,7 +216,7 @@ const TemplateForm = ({ initialValues, submitButtonText, submitLoadingText, onCa
     return {
       ...values,
       rotation_strategy,
-      rotation_stategy_class,
+      rotation_strategy_class,
       retention_strategy,
       retention_strategy_class,
       index_set_config: {
@@ -277,9 +283,9 @@ const TemplateForm = ({ initialValues, submitButtonText, submitLoadingText, onCa
 
             <>
               <ConfigSegmentsTitle>Rotation and Retention</ConfigSegmentsTitle>
-              <SegmentedControl data={retentionConfigSegments}
-                                value={selectedRetentionSegment}
-                                handleChange={setSelectedRetentionSegment as Dispatch<SetStateAction<string>>} />
+              <SegmentedControl<RetentionConfigSegment> data={retentionConfigSegments}
+                                                        value={selectedRetentionSegment}
+                                                        onChange={setSelectedRetentionSegment} />
 
               {selectedRetentionSegment === 'data_tiering' ? (
                 <ConfigSegment>
@@ -289,8 +295,8 @@ const TemplateForm = ({ initialValues, submitButtonText, submitLoadingText, onCa
               )
                 : (
                   <ConfigSegment>
-                    <RotationStrategies rotationStrategies={rotationStrategies} indexSetRotationStrategy={values.rotation_strategy} indexSetRotationStrategyClass={values.rotation_strategy_class} />
-                    <RetentionConfig retentionStrategies={retentionStrategies} retentionStrategiesContext={retentionStrategiesContext} indexSetRetentionStrategy={values.retention_strategy} IndexSetRetentionStrategyClass={values.retention_strategy_class} />
+                    <RotationConfig rotationStrategies={rotationStrategies} indexSetRotationStrategy={values.rotation_strategy} indexSetRotationStrategyClass={values.rotation_strategy_class} />
+                    <RetentionConfig retentionStrategies={retentionStrategies} retentionStrategiesContext={retentionStrategiesContext} indexSetRetentionStrategy={values.retention_strategy} indexSetRetentionStrategyClass={values.retention_strategy_class} />
                   </ConfigSegment>
                 )}
 

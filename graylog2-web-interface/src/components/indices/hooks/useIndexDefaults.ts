@@ -20,12 +20,12 @@ import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
-import type { IndexSetsDefaultConfiguration } from 'stores/indices/IndexSetsStore';
+import type { IndexSetsLegacyDefaultConfiguration } from 'stores/indices/IndexSetsStore';
 
-const fetchIndexDefaults: () => Promise<IndexSetsDefaultConfiguration> = () => fetch('GET', qualifyUrl(`${ApiRoutes.ClusterConfigResource.config().url}/org.graylog2.configuration.IndexSetsDefaultConfiguration`));
+const fetchIndexDefaults: () => Promise<IndexSetsLegacyDefaultConfiguration> = () => fetch('GET', qualifyUrl(`${ApiRoutes.ClusterConfigResource.config().url}/org.graylog2.configuration.IndexSetsDefaultConfiguration`));
 
 const useIndexDefaults = () => {
-  const { data, isLoading } = useQuery<IndexSetsDefaultConfiguration, Error>(
+  const { data, isLoading } = useQuery<IndexSetsLegacyDefaultConfiguration, Error>(
     ['index-defaults'],
     fetchIndexDefaults,
     {

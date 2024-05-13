@@ -39,7 +39,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import type { IndexSetsDefaultConfiguration } from 'stores/indices/IndexSetsStore';
+import type { IndexSetsLegacyDefaultConfiguration } from 'stores/indices/IndexSetsStore';
 
 import FormikInput from '../common/FormikInput';
 
@@ -56,13 +56,13 @@ const StyledDefList = styled.dl.attrs({ className: 'deflist' })(({ theme }) => c
 
 const IndexSetsDefaultsConfig = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
-  const [viewConfig, setViewConfig] = useState<IndexSetsDefaultConfiguration | undefined>(undefined);
-  const [formConfig, setFormConfig] = useState<IndexSetsDefaultConfiguration | undefined>(undefined);
+  const [viewConfig, setViewConfig] = useState<IndexSetsLegacyDefaultConfiguration | undefined>(undefined);
+  const [formConfig, setFormConfig] = useState<IndexSetsLegacyDefaultConfiguration | undefined>(undefined);
   const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
   const [rotationStrategies, setRotationStrategies] = useState<MaintenanceOptions>();
   const [retentionStrategies, setRetentionStrategies] = useState<MaintenanceOptions>();
 
-  const handleSaveConfig = async (configToSave: IndexSetsDefaultConfiguration) => (
+  const handleSaveConfig = async (configToSave: IndexSetsLegacyDefaultConfiguration) => (
     ConfigurationsActions.updateIndexSetDefaults(ConfigurationType.INDEX_SETS_DEFAULTS_CONFIG, configToSave)
   );
 

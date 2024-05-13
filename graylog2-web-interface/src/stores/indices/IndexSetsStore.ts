@@ -87,15 +87,19 @@ type IndexSetDefaultFields = Pick<IndexSetConfig,
 
 export type IndexSetsDefaultConfiguration = IndexSetDefaultFields & {
   rotation_strategy?: RotationStrategyConfig,
-  rotation_stategy_class?: string,
   retention_strategy?: RetentionStrategyConfig,
-  retention_strategy_class?: string,
+  field_type_refresh_interval_unit: 'seconds' | 'minutes',
+  data_tiering: DataTieringConfig
+}
+
+export type IndexSetsLegacyDefaultConfiguration = IndexSetDefaultFields & {
+  rotation_strategy_config?: RotationStrategyConfig,
+  retention_strategy_config?: RetentionStrategyConfig,
   field_type_refresh_interval_unit: 'seconds' | 'minutes',
   data_tiering: DataTieringConfig
 }
 
 export type IndexSetsDefaultConfigurationFormValues = IndexSetDefaultFields & {
-
   field_type_refresh_interval_unit: 'seconds' | 'minutes',
   data_tiering: DataTieringFormValues
 }
