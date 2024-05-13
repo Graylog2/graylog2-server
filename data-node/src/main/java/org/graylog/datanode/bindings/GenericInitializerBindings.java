@@ -19,11 +19,7 @@ package org.graylog.datanode.bindings;
 import com.google.common.util.concurrent.Service;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
-import org.graylog.datanode.configuration.OpensearchConfigurationProvider;
 import org.graylog.datanode.initializers.PeriodicalsService;
-import org.graylog.datanode.opensearch.OpensearchProcess;
-import org.graylog.datanode.opensearch.OpensearchProcessService;
-import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
 import org.graylog.datanode.shutdown.GracefulShutdownService;
 import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.bootstrap.preflight.PreflightConfigServiceImpl;
@@ -31,19 +27,10 @@ import org.graylog2.bootstrap.preflight.PreflightConfigServiceImpl;
 public class GenericInitializerBindings extends AbstractModule {
     @Override
     protected void configure() {
-//        bind(ProcessingStatusRecorder.class).to(MongoDBProcessingStatusRecorderService.class).asEagerSingleton();
         bind(PreflightConfigService.class).to(PreflightConfigServiceImpl.class);
-        bind(OpensearchConfiguration.class).toProvider(OpensearchConfigurationProvider.class);
 
         Multibinder<Service> serviceBinder = Multibinder.newSetBinder(binder(), Service.class);
-
-        // this service both starts and provides the opensearch process
-        serviceBinder.addBinding().to(OpensearchProcessService.class).asEagerSingleton();
-        bind(OpensearchProcess.class).toProvider(OpensearchProcessService.class);
-
         serviceBinder.addBinding().to(PeriodicalsService.class);
         serviceBinder.addBinding().to(GracefulShutdownService.class).asEagerSingleton();
-
-//        serviceBinder.addBinding().to(MongoDBProcessingStatusRecorderService.class).asEagerSingleton();
     }
 }

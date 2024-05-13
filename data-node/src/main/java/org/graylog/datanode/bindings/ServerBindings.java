@@ -23,8 +23,6 @@ import com.google.inject.multibindings.OptionalBinder;
 import jakarta.ws.rs.container.DynamicFeature;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import org.graylog.datanode.Configuration;
-import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachine;
-import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachineProvider;
 import org.graylog.datanode.shared.system.activities.DataNodeActivityWriter;
 import org.graylog2.bindings.providers.ClusterEventBusProvider;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
@@ -68,7 +66,6 @@ public class ServerBindings extends Graylog2Module {
         bind(ClusterEventBus.class).toProvider(ClusterEventBusProvider.class).asEagerSingleton();
         bind(EventBus.class).toProvider(EventBusProvider.class).asEagerSingleton();
         bind(InputConfigurationBeanDeserializerModifier.class).toInstance(InputConfigurationBeanDeserializerModifier.withoutConfig());
-        bind(OpensearchStateMachine.class).toProvider(OpensearchStateMachineProvider.class).asEagerSingleton();
     }
 
     private void bindFactoryModules() {
