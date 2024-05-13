@@ -167,6 +167,7 @@ public class MigrationStateMachineBuilderTest {
         stateMachine.fire(MigrationStep.SHOW_MIGRATE_EXISTING_DATA);
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.MIGRATE_EXISTING_DATA);
         assertThat(stateMachine.getPermittedTriggers()).contains(MigrationStep.START_REMOTE_REINDEX_MIGRATION);
+        verify(migrationActions, times(1)).getElasticsearchHosts();
         stateMachine.fire(MigrationStep.START_REMOTE_REINDEX_MIGRATION);
         verify(migrationActions, times(1)).startRemoteReindex();
         reset(migrationActions);

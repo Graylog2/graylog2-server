@@ -66,6 +66,11 @@ public class MigrationActionsAdapter implements MigrationActions {
     }
 
     @Override
+    public void getElasticsearchHosts() {
+
+    }
+
+    @Override
     public void runDirectoryCompatibilityCheck() {
     }
 

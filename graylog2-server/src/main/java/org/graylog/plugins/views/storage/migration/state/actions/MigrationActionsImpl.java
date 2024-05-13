@@ -20,6 +20,7 @@ import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import jakarta.ws.rs.core.MultivaluedHashMap;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachineContext;
@@ -73,6 +74,7 @@ public class MigrationActionsImpl implements MigrationActions {
 
     private final DatanodeRestApiProxy datanodeProxy;
     private final ElasticsearchVersionProvider searchVersionProvider;
+    private final List<URI> elasticsearchHosts;
     private final ObjectMapper objectMapper;
 
     @Inject
@@ -84,6 +86,7 @@ public class MigrationActionsImpl implements MigrationActions {
                                 final MetricRegistry metricRegistry,
                                 final DatanodeRestApiProxy datanodeProxy,
                                 ElasticsearchVersionProvider searchVersionProvider,
+                                @Named("elasticsearch_hosts") List<URI> elasticsearchHosts,
                                 final ObjectMapper objectMapper) {
         this.clusterConfigService = clusterConfigService;
         this.nodeService = nodeService;
@@ -95,6 +98,7 @@ public class MigrationActionsImpl implements MigrationActions {
         this.metricRegistry = metricRegistry;
         this.datanodeProxy = datanodeProxy;
         this.searchVersionProvider = searchVersionProvider;
+        this.elasticsearchHosts = elasticsearchHosts;
         this.objectMapper = objectMapper;
     }
 
@@ -265,6 +269,14 @@ public class MigrationActionsImpl implements MigrationActions {
     @Override
     public boolean isCompatibleInPlaceMigrationVersion() {
         return !searchVersionProvider.get().isElasticsearch();
+    }
+
+    @Override
+    public void getElasticsearchHosts() {
+        getStateMachineContext().setResponse(Map.of(
+                "elasticsearch_hosts", elasticsearchHosts.stream().map(URI::toString).collect(Collectors.joining(",")),
+                "allowlist_hosts", elasticsearchHosts.stream().map(host -> host.getHost() + ":" + host.getPort()).collect(Collectors.joining(","))
+        ));
     }
 
     @Override
