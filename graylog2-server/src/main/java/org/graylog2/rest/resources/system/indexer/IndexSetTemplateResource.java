@@ -38,7 +38,6 @@ import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
-import org.graylog2.database.PaginatedList;
 import org.graylog2.indexer.IndexSetValidator;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.template.IndexSetDefaultTemplateService;
@@ -104,16 +103,16 @@ public class IndexSetTemplateResource extends RestResource {
     @NoAuditEvent("No change to the DB")
     @ApiOperation(value = "Gets template by id")
     public PageListResponse<IndexSetTemplateResponse> getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                                      @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-                                                      @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
-                                                      @ApiParam(name = "filters") @QueryParam("filters") List<String> filters,
-                                                      @ApiParam(name = "sort",
-                                                                value = "The field to sort the result on",
-                                                                required = true,
-                                                                allowableValues = "name")
-                                                          @DefaultValue(IndexSetTemplate.TITLE_FIELD_NAME) @QueryParam("sort") String sort,
-                                                      @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
-                                                      @DefaultValue("asc") @QueryParam("order") String order) {
+                                                              @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                                              @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
+                                                              @ApiParam(name = "filters") @QueryParam("filters") List<String> filters,
+                                                              @ApiParam(name = "sort",
+                                                                        value = "The field to sort the result on",
+                                                                        required = true,
+                                                                        allowableValues = "name")
+                                                              @DefaultValue(IndexSetTemplate.TITLE_FIELD_NAME) @QueryParam("sort") String sort,
+                                                              @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
+                                                              @DefaultValue("asc") @QueryParam("order") String order) {
         checkPermission(RestPermissions.INDEX_SET_TEMPLATES_READ);
         return toPaginatedResponse(templateService.getPaginated(query, filters, page, perPage, sort, order));
     }
@@ -200,7 +199,7 @@ public class IndexSetTemplateResource extends RestResource {
     }
 
     private void checkIsDefault(IndexSetTemplateResponse template) throws IllegalAccessException {
-        if(template.isDefault()){
+        if (template.isDefault()) {
             throw new IllegalAccessException(f("Template %s <%s> is set as default and cannot be deleted", template.id(), template.title()));
         }
     }
@@ -212,14 +211,13 @@ public class IndexSetTemplateResource extends RestResource {
     }
 
     private PageListResponse<IndexSetTemplateResponse> toPaginatedResponse(PageListResponse<IndexSetTemplate> pageListResponse) {
-        return PageListResponse.create(pageListResponse.query(),
-                new PaginatedList<>(
-                        toResponse(pageListResponse.elements()),
-                        pageListResponse.paginationInfo().total(),
-                        pageListResponse.paginationInfo().page(),
-                        pageListResponse.paginationInfo().perPage()),
+        return PageListResponse.create(
+                pageListResponse.query(),
+                pageListResponse.paginationInfo(),
+                pageListResponse.total(),
                 pageListResponse.sort(),
                 pageListResponse.order(),
+                toResponse(pageListResponse.elements()),
                 pageListResponse.attributes(),
                 pageListResponse.defaults());
     }
