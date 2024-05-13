@@ -68,12 +68,12 @@ export const getFormatSettings = (unitTypeKey: MetricUnitType | 'withoutUnit') =
     case 'time':
       return ({
         type: 'date',
+        // tickformat: '%S',
         tickformatstops: [
-          { dtickrange: [0, 1000], value: '%S ms' }, // Milliseconds
-          { dtickrange: [1000, 60000], value: '%M Min %S sec' }, // Seconds and minutes
-          { dtickrange: [60000, 3600000], value: '%H H %M Min' }, // Minutes and hours
-          { dtickrange: [3600000, Number.MAX_SAFE_INTEGER], value: '%d days' }, // Hours and days
-          // Add more custom tick formats as needed
+          { dtickrange: [0, 1000], value: '%Lms', name: 'seconds' }, //
+          { dtickrange: [1000, 60000], value: '%Ss', name: 'seconds' }, //
+          { dtickrange: [60000, 3600000], value: '%Mm', name: 'minutes' }, //
+          { dtickrange: [3600000, Infinity], value: '%Hh', name: 'hours' },
         ],
       });
     default:

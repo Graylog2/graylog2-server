@@ -98,7 +98,7 @@ const XYPlot = ({
     defaultLayout.legend = { y: yLegendPosition(height) };
   }
 
-  const layout = merge(defaultLayout, plotLayout);
+  const layout = { ...defaultLayout, ...plotLayout };
   // console.log({ layout });
   const dispatch = useAppDispatch();
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -121,6 +121,8 @@ const XYPlot = ({
       type: config.sort.length > 0 ? 'category' : undefined,
     });
   }
+
+  console.log('!!!QQQQ!!!!!!', { layout });
 
   return (
     <PlotLegend config={config} chartData={chartData}>
