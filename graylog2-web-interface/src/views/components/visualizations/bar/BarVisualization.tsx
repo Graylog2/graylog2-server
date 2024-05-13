@@ -34,7 +34,7 @@ import {
   generateDomain,
   generateYAxis,
   getTraceOffsetSettings,
-} from 'views/components/visualizations/bar/layoytGenerators';
+} from 'views/components/visualizations/layoytGenerators';
 
 import type { Generator } from '../ChartData';
 import XYPlot from '../XYPlot';
@@ -109,7 +109,7 @@ const BarVisualization = makeVisualization(({
 
     const offsetSettings = getTraceOffsetSettings(barmode, { yaxis, totalAxis, axisNumber, traceIndex: idx, totalTraces: total });
 
-    return ({
+    const getData = () => ({
       type,
       name,
       x: _mapKeys(labels),
@@ -119,6 +119,8 @@ const BarVisualization = makeVisualization(({
       originalName,
       ...offsetSettings,
     });
+
+    return getData();
   },
   [_mapKeys, barmode, layouts, mapperAxisNumber, visualizationConfig?.opacity, yAxisMapper]);
 

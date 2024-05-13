@@ -21,10 +21,10 @@ import type { MetricUnitType } from 'views/types';
 import type Series from 'views/logic/aggregationbuilder/Series';
 import type { BarMode } from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
 
-const AXIS_STEP = 0.05;
+const Y_POSITION_AXIS_STEP = 0.05;
 
-const getPosition = (axisCount: number) => {
-  const diff = Math.floor(axisCount / 2) * AXIS_STEP;
+const getYAxisPosition = (axisCount: number) => {
+  const diff = Math.floor(axisCount / 2) * Y_POSITION_AXIS_STEP;
 
   if (axisCount % 2 === 0) {
     return 1 - diff;
@@ -33,7 +33,7 @@ const getPosition = (axisCount: number) => {
   return diff;
 };
 
-const getSide = (axisCount: number) => {
+const getYAxisSide = (axisCount: number) => {
   if (axisCount % 2 === 0) {
     return 'right';
   }
@@ -41,9 +41,9 @@ const getSide = (axisCount: number) => {
   return 'left';
 };
 
-const getPositioningSettings = (axisCount: number) => ({
-  position: getPosition(axisCount),
-  side: getSide(axisCount),
+const getYAxisPositioningSettings = (axisCount: number) => ({
+  position: getYAxisPosition(axisCount),
+  side: getYAxisSide(axisCount),
   overlaying: axisCount > 1 ? 'y' : undefined,
 });
 
@@ -62,12 +62,12 @@ export const getFormatSettings = (unitTypeKey: MetricUnitType | 'withoutUnit') =
       });
     case 'size':
       return ({
-        tickformat: 's',
-        hoverformat: '.4s',
-        ticksuffix: 'bytes',
+        tickformat: '.2s',
+        ticksuffix: 'B',
       });
     case 'time':
       return ({
+        type: 'date',
         tickformatstops: [
           { dtickrange: [0, 1000], value: '%S ms' }, // Milliseconds
           { dtickrange: [1000, 60000], value: '%M Min %S sec' }, // Seconds and minutes
@@ -85,7 +85,7 @@ export const getFormatSettings = (unitTypeKey: MetricUnitType | 'withoutUnit') =
 
 export const getUnitLayout = (unitTypeKey: MetricUnitType | 'withoutUnit', axisCount: number) => ({
   ...getFormatSettings(unitTypeKey),
-  ...getPositioningSettings(axisCount),
+  ...getYAxisPositioningSettings(axisCount),
   ...defaultSettings,
 });
 
@@ -129,7 +129,7 @@ export const generateDomain = (yAxisCount: number) => {
   const leftAxisCount = Math.ceil(yAxisCount / 2);
   const rightAxisCount = Math.floor(yAxisCount / 2);
 
-  return [leftAxisCount * AXIS_STEP, 1 - rightAxisCount * AXIS_STEP];
+  return [leftAxisCount * Y_POSITION_AXIS_STEP, 1 - rightAxisCount * Y_POSITION_AXIS_STEP];
 };
 
 const getWidth = (total: number) => (total <= 1 ? undefined : 1 / total);
@@ -151,7 +151,7 @@ type AdditionalSettings = {
 }
 
 export const getTraceOffsetSettings = (barmode: BarMode, { yaxis, totalAxis, axisNumber, traceIndex, totalTraces }: AdditionalSettings) => {
-  if (barmode === 'stack' || barmode === 'relative') {
+  if (barmode === 'stack' || barmode === 'relative' || barmode === 'overlay') {
     const width = getWidth(totalAxis);
     const offset = getOffset(axisNumber, totalAxis);
 
