@@ -16,6 +16,19 @@
  */
 package org.graylog2.bootstrap.preflight.web.resources;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -35,22 +48,6 @@ import org.graylog2.cluster.preflight.DataNodeProvisioningService;
 import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.rest.ApiError;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -140,7 +137,7 @@ public class PreflightResource {
 
     @POST
     @Path("/ca/create")
-    @NoAuditEvent("No Audit Event needed")
+    @NoAuditEvent("No Auditing during preflight")
     public Response createCA(@NotNull @Valid CreateCARequest request) throws CACreationException, KeyStoreStorageException, KeyStoreException, NoSuchAlgorithmException {
         // TODO: get validity from preflight UI
         final CA ca = caService.create(request.organization(), CaService.DEFAULT_VALIDITY, passwordSecret.toCharArray());
@@ -150,7 +147,7 @@ public class PreflightResource {
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Path("/ca/upload")
-    @NoAuditEvent("No Audit Event needed")
+    @NoAuditEvent("No Auditing during preflight")
     public Response uploadCA(@FormDataParam("password") String password, @FormDataParam("files") List<FormDataBodyPart> bodyParts) {
         try {
             caService.upload(password, bodyParts);
@@ -162,7 +159,7 @@ public class PreflightResource {
 
     @DELETE
     @Path("/startOver")
-    @NoAuditEvent("No Audit Event needed")
+    @NoAuditEvent("No Auditing during preflight")
     public void startOver() {
         caService.startOver();
         clusterConfigService.remove(RenewalPolicy.class);
@@ -171,7 +168,7 @@ public class PreflightResource {
 
     @DELETE
     @Path("/startOver/{nodeID}")
-    @NoAuditEvent("No Audit Event needed")
+    @NoAuditEvent("No Auditing during preflight")
     public void startOver(@PathParam("nodeID") String nodeID) {
         //TODO:  reset a specific datanode
         dataNodeProvisioningService.delete(nodeID);
@@ -179,7 +176,7 @@ public class PreflightResource {
 
     @POST
     @Path("/generate")
-    @NoAuditEvent("No Audit Event needed")
+    @NoAuditEvent("No Auditing during preflight")
     public void generate() {
         final Map<String, DataNodeDto> activeDataNodes = nodeService.allActive();
         activeDataNodes.values().forEach(node -> dataNodeProvisioningService.changeState(node.getNodeId(), DataNodeProvisioningConfig.State.CONFIGURED));
@@ -188,7 +185,7 @@ public class PreflightResource {
     @POST
     @Path("/{nodeID}")
     @Consumes(MediaType.APPLICATION_JSON)
-    @NoAuditEvent("No Audit Event needed")
+    @NoAuditEvent("No Auditing during preflight")
     public void addParameters(@PathParam("nodeID") String nodeID,
                               @NotNull CertParameters params) {
         var cfg = dataNodeProvisioningService.getPreflightConfigFor(nodeID);

@@ -16,6 +16,12 @@
  */
 package org.graylog2.bootstrap.preflight.web.resources;
 
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.bootstrap.preflight.ConfigurationStatus;
 import org.graylog2.bootstrap.preflight.PreflightConfig;
@@ -23,14 +29,6 @@ import org.graylog2.bootstrap.preflight.PreflightConfigResult;
 import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.bootstrap.preflight.PreflightConstants;
 import org.graylog2.plugin.Version;
-
-import jakarta.inject.Inject;
-
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
 
 
 @Path(PreflightConstants.API_PREFIX + "status")
@@ -50,16 +48,16 @@ public class PreflightStatusResource {
         return new ConfigurationStatus(version.toString());
     }
 
-    @NoAuditEvent("No audit event yet")
     @POST
     @Path("/finish-config")
+    @NoAuditEvent("No Auditing during preflight")
     public PreflightConfig finishConfig() {
         return preflightConfigService.setConfigResult(PreflightConfigResult.FINISHED);
     }
 
-    @NoAuditEvent("No audit event yet")
     @POST
     @Path("/skip-config")
+    @NoAuditEvent("No Auditing during preflight")
     public PreflightConfig skipConfig() {
         return preflightConfigService.setConfigResult(PreflightConfigResult.SKIPPED);
     }
