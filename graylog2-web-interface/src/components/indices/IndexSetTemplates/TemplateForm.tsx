@@ -15,21 +15,24 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { styled } from 'styled-components';
-import React from 'react';
+import styled, { css } from 'styled-components';
+import React, { useEffect, useState } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
 import { Formik, Form } from 'formik';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import { useStore } from 'stores/connect';
+import type {
+  RotationStrategyConfig,
+  RetentionStrategyConfig,
+  RetentionStrategyContext,
+} from 'components/indices/Types';
 import type { IndexSetTemplateFormValues, IndexSetTemplate } from 'components/indices/IndexSetTemplates/types';
-import { FormikInput, FormSubmit, InputOptionalInfo, TimeUnitInput } from 'components/common';
+import { Col, SegmentedControl } from 'components/bootstrap';
+import { FormikInput, FormSubmit, InputOptionalInfo, Spinner, TimeUnitInput } from 'components/common';
+import { IndicesConfigurationActions, IndicesConfigurationStore } from 'stores/indices/IndicesConfigurationStore';
+import IndexMaintenanceStrategiesConfiguration from 'components/indices/IndexMaintenanceStrategiesConfiguration';
 import { prepareDataTieringConfig, prepareDataTieringInitialValues, DataTieringConfiguration } from 'components/indices/data-tiering';
-import { Col } from 'components/bootstrap';
-
-const TIME_UNITS = ['SECONDS', 'MINUTES'];
-
-const StyledFormSubmit = styled(FormSubmit)`
-  margin-top: 30px;
-`;
 
 type Props = {
   initialValues?: IndexSetTemplate,
@@ -39,35 +42,115 @@ type Props = {
   onSubmit: (template: IndexSetTemplate) => void
 }
 
+type RetentionConfigSegment = 'data_tiering' | 'legacy';
+
+type RotationStrategiesProps = {
+  rotationStrategies: Array<any>,
+  indexSetRotationStrategy?: RotationStrategyConfig,
+  indexSetRotationStrategyClass?: string
+}
+
+type RetentionConfigProps = {
+  retentionStrategies: Array<any>,
+  retentionStrategiesContext: RetentionStrategyContext,
+  indexSetRetentionStrategy?: RetentionStrategyConfig,
+  IndexSetRetentionStrategyClass?: string
+}
+
+const TIME_UNITS = ['SECONDS', 'MINUTES'];
+
+const StyledFormSubmit = styled(FormSubmit)`
+  margin-top: 30px;
+`;
+
+const ConfigSegmentsTitle = styled.h2(({ theme }) => css`
+  margin-bottom: ${theme.spacings.sm};
+`);
+
+const ConfigSegment = styled.div(({ theme }) => css`
+  margin-bottom: ${theme.spacings.xs};
+  margin-top: ${theme.spacings.md};
+`);
+
+const getRotationConfigState = (strategy: string, data: RotationStrategyConfig) => ({
+  rotation_strategy_class: strategy,
+  rotation_strategy: data,
+});
+
+const getRetentionConfigState = (strategy: string, data: RetentionStrategyConfig) => ({
+  retention_strategy_class: strategy,
+  retention_strategy: data,
+});
+
+const RotationStrategies = ({ rotationStrategies, indexSetRotationStrategy, indexSetRotationStrategyClass }: RotationStrategiesProps) => {
+  if (!rotationStrategies) return <Spinner />;
+
+  console.log('===indexSetRotationStrategy', indexSetRotationStrategy);
+
+  return (
+    <IndexMaintenanceStrategiesConfiguration title="Index Rotation Configuration"
+                                             name="rotation"
+                                             description="Graylog uses multiple indices to store documents in. You can configure the strategy it uses to determine when to rotate the currently active write index."
+                                             selectPlaceholder="Select rotation strategy"
+                                             pluginExports={PluginStore.exports('indexRotationConfig')}
+                                             strategies={rotationStrategies}
+                                             activeConfig={{
+                                               config: indexSetRotationStrategy,
+                                               strategy: indexSetRotationStrategyClass,
+                                             }}
+                                             getState={getRotationConfigState} />
+  );
+};
+
+const RetentionConfig = ({ retentionStrategies, retentionStrategiesContext, indexSetRetentionStrategy, IndexSetRetentionStrategyClass }: RetentionConfigProps) => {
+  if (!retentionStrategies) return <Spinner />;
+  console.log('===indexSetRetentionStrategy', indexSetRetentionStrategy);
+
+  return (
+    <IndexMaintenanceStrategiesConfiguration title="Index Retention Configuration"
+                                             name="retention"
+                                             description="Graylog uses a retention strategy to clean up old indices."
+                                             selectPlaceholder="Select retention strategy"
+                                             pluginExports={PluginStore.exports('indexRetentionConfig')}
+                                             strategies={retentionStrategies}
+                                             retentionStrategiesContext={retentionStrategiesContext}
+                                             activeConfig={{
+                                               config: indexSetRetentionStrategy,
+                                               strategy: IndexSetRetentionStrategyClass,
+                                             }}
+                                             getState={getRetentionConfigState} />
+  );
+};
+
 const validate = (formValues: IndexSetTemplateFormValues) => {
-  const errors: {
+  let errors: {
     title?: string,
-    index_set_config: {
+    index_set_config?: {
       index_analyzer?: string,
       shards?: string,
       replicas?: string,
       index_optimization_max_num_segments?: string,
     }
-  } = { index_set_config: {} };
+  } = { };
 
   if (!formValues.title) {
     errors.title = 'Template title is required';
   }
 
   if (!formValues.index_set_config.index_analyzer) {
-    errors.index_set_config.index_analyzer = 'Index analyzer is required';
+    errors = { ...errors, index_set_config: { ...errors.index_set_config, index_analyzer: 'Index analyzer is required' } };
   }
 
   if (!formValues.index_set_config.shards) {
-    errors.index_set_config.shards = 'Shards is required';
+    errors = { ...errors, index_set_config: { ...errors.index_set_config, shards: 'Shards is required' } };
   }
 
   if (!formValues.index_set_config.replicas) {
-    errors.index_set_config.replicas = 'Replicas is required';
+    errors = { ...errors, index_set_config: { ...errors.index_set_config, replicas: 'Replicas is required' } };
   }
 
   if (!formValues.index_set_config.index_optimization_max_num_segments) {
-    errors.index_set_config.index_optimization_max_num_segments = 'Max. number of segments is required';
+    errors = { ...errors, index_set_config: { ...errors.index_set_config, index_optimization_max_num_segments: 'Max. number of segments is required' } };
   }
 
   return errors;
@@ -77,6 +160,22 @@ const TemplateForm = ({ initialValues, submitButtonText, submitLoadingText, onCa
   const defaultValues = {
     index_set_config: {},
   };
+
+  const retentionConfigSegments: Array<{value: RetentionConfigSegment, label: string}> = [
+    { value: 'data_tiering', label: 'Data Tiering' },
+    { value: 'legacy', label: 'Legacy (Deprecated)' },
+  ];
+
+  const [selectedRetentionSegment, setSelectedRetentionSegment] = useState<RetentionConfigSegment>('data_tiering');
+
+  useEffect(() => {
+    if (selectedRetentionSegment === 'legacy') {
+      IndicesConfigurationActions.loadRotationStrategies();
+      IndicesConfigurationActions.loadRetentionStrategies();
+    }
+  }, [selectedRetentionSegment]);
+
+  const { rotationStrategies, retentionStrategies, retentionStrategiesContext } = useStore(IndicesConfigurationStore, (state) => state);
 
   const handleSubmit = (values: IndexSetTemplateFormValues) => {
     let template = {};
@@ -99,17 +198,27 @@ const TemplateForm = ({ initialValues, submitButtonText, submitLoadingText, onCa
   const prepareInitialValues = () => {
     const values = { ...defaultValues, ...initialValues };
 
-    if (values.index_set_config.data_tiering) {
-      return {
-        ...values,
-        index_set_config: {
-          ...values.index_set_config,
-          data_tiering: prepareDataTieringInitialValues(values.index_set_config.data_tiering),
-        },
-      };
-    }
+    const { rotation_strategy, rotation_stategy_class, retention_strategy, retention_strategy_class } = values.index_set_config;
 
-    return values as unknown as IndexSetTemplateFormValues;
+    delete values.index_set_config.rotation_strategy;
+    delete values.index_set_config.rotation_stategy_class;
+    delete values.index_set_config.retention_strategy;
+    delete values.index_set_config.retention_strategy_class;
+
+    const data_tiering = prepareDataTieringInitialValues(values.index_set_config.data_tiering);
+
+    return {
+      ...values,
+      rotation_strategy,
+      rotation_stategy_class,
+      retention_strategy,
+      retention_strategy_class,
+      index_set_config: {
+        use_legacy_rotation: false,
+        ...values.index_set_config,
+        data_tiering,
+      },
+    } as unknown as IndexSetTemplateFormValues;
   };
 
   return (
@@ -166,7 +275,26 @@ const TemplateForm = ({ initialValues, submitButtonText, submitLoadingText, onCa
                            hideCheckbox
                            units={TIME_UNITS} />
 
-            <DataTieringConfiguration valuesPrefix="index_set_config" />
+            <>
+              <ConfigSegmentsTitle>Rotation and Retention</ConfigSegmentsTitle>
+              <SegmentedControl data={retentionConfigSegments}
+                                value={selectedRetentionSegment}
+                                handleChange={setSelectedRetentionSegment as Dispatch<SetStateAction<string>>} />
+
+              {selectedRetentionSegment === 'data_tiering' ? (
+                <ConfigSegment>
+                  <h3>Data Tiering Configuration</h3>
+                  <DataTieringConfiguration valuesPrefix="index_set_config" />
+                </ConfigSegment>
+              )
+                : (
+                  <ConfigSegment>
+                    <RotationStrategies rotationStrategies={rotationStrategies} indexSetRotationStrategy={values.rotation_strategy} indexSetRotationStrategyClass={values.rotation_strategy_class} />
+                    <RetentionConfig retentionStrategies={retentionStrategies} retentionStrategiesContext={retentionStrategiesContext} indexSetRetentionStrategy={values.retention_strategy} IndexSetRetentionStrategyClass={values.retention_strategy_class} />
+                  </ConfigSegment>
+                )}
+
+            </>
 
             <StyledFormSubmit submitButtonText={submitButtonText}
                               onCancel={onCancel}

@@ -70,12 +70,12 @@ type Props = {
     configComponent: React.ComponentType<ConfigComponentProps>
   }>,
   strategies: Strategies,
-  retentionStrategiesContext: {
+  retentionStrategiesContext?: {
     max_index_retention_period?: string,
   },
   activeConfig: {
-    strategy: string,
-    config: StrategyConfig,
+    strategy?: string,
+    config?: StrategyConfig,
   },
   getState: (strategy: string, data: StrategyConfig) => {
     rotation_strategy_config?: StrategyConfig,
@@ -206,6 +206,8 @@ const IndexMaintenanceStrategiesConfiguration = ({
     }
   }, [config, setMaxNumberOfIndices]);
 
+  console.log('===config', config);
+
   const retentionIsNotNoop = retentionStrategyClass !== NOOP_RETENTION_STRATEGY;
   const isArchiveRetention = retentionStrategyClass !== ARCHIVE_RETENTION_STRATEGY;
   const shouldShowMaxRetentionWarning = maxRetentionPeriod && rotationStrategyClass === TIME_BASED_ROTATION_STRATEGY && retentionIsNotNoop;
@@ -261,7 +263,13 @@ const IndexMaintenanceStrategiesConfiguration = ({
     const isSelectedItemInList = availableStrategies.filter((availableStrategy) => availableStrategy.type === newStrategy).length > 0;
 
     if (!isSelectedItemInList) {
-      return [...availableStrategies, pluginExports.find((pluginOptions) => pluginOptions.type === newStrategy)].map((pluginOptions) => ({ value: pluginOptions.type, label: pluginOptions.displayName }));
+      const selectedItemStrategy = pluginExports.find((pluginOptions) => pluginOptions.type === newStrategy);
+
+      if (selectedItemStrategy) {
+        return [...availableStrategies, selectedItemStrategy].map((pluginOptions) => ({ value: pluginOptions.type, label: pluginOptions.displayName }));
+      }
+
+      return availableStrategies.map((pluginOptions) => ({ value: pluginOptions.type, label: pluginOptions.displayName }));
     }
 
     return availableStrategies
@@ -273,7 +281,7 @@ const IndexMaintenanceStrategiesConfiguration = ({
   const getActiveSelection = () => newStrategy;
 
   const shouldShowInvalidRetentionWarning = () => (
-    name === RETENTION && !getStrategyJsonSchema(getActiveSelection(), strategies)
+    !!newStrategy && name === RETENTION && !getStrategyJsonSchema(getActiveSelection(), strategies)
   );
 
   return (

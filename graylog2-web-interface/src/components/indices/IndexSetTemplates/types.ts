@@ -16,6 +16,7 @@
  */
 
 import type { IndexSetsDefaultConfiguration, IndexSetsDefaultConfigurationFormValues } from 'stores/indices/IndexSetsStore';
+import type { RetentionStrategyConfig, RotationStrategyConfig } from 'components/indices/Types';
 
 export type IndexSetTemplate = {
   id: string,
@@ -30,5 +31,9 @@ export type IndexSetTemplateFormValues = {
   title: string,
   description: string,
   built_in: boolean,
+  rotation_strategy?: RotationStrategyConfig,
+  rotation_strategy_class?: string,
+  retention_strategy?: RetentionStrategyConfig,
+  retention_strategy_class?: string,
   index_set_config: IndexSetsDefaultConfigurationFormValues,
 }

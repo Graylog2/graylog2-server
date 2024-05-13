@@ -57,7 +57,7 @@ export const prepareDataTieringConfig = (formValues: DataTieringFormValues, plug
   let config = { };
 
   if (dataTieringType === DATA_TIERING_TYPE.HOT_WARM) {
-    config = { ...hotWarmDefaultValues, ...formValues };
+    config = { ...hotOnlyDefaults, ...hotWarmDefaultValues, ...formValues };
   }
 
   if (dataTieringType === DATA_TIERING_TYPE.HOT_ONLY) {
