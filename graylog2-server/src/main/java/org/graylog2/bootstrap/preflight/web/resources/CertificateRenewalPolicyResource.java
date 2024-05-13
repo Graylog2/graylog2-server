@@ -23,8 +23,10 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.bootstrap.preflight.PreflightConstants;
+import org.graylog2.bootstrap.preflight.PreflightWebModule;
 import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 
@@ -39,11 +41,13 @@ public class CertificateRenewalPolicyResource {
     }
 
     @GET
+    @RequiresPermissions(PreflightWebModule.PERMISSION_PREFLIGHT_ONLY)
     public RenewalPolicy get() {
         return this.clusterConfigService.get(RenewalPolicy.class);
     }
 
     @POST
+    @RequiresPermissions(PreflightWebModule.PERMISSION_PREFLIGHT_ONLY)
     @NoAuditEvent("No Auditing during preflight")
     public void set(@NotNull RenewalPolicy renewalPolicy) {
         this.clusterConfigService.write(renewalPolicy);

@@ -22,12 +22,14 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.bootstrap.preflight.ConfigurationStatus;
 import org.graylog2.bootstrap.preflight.PreflightConfig;
 import org.graylog2.bootstrap.preflight.PreflightConfigResult;
 import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.bootstrap.preflight.PreflightConstants;
+import org.graylog2.bootstrap.preflight.PreflightWebModule;
 import org.graylog2.plugin.Version;
 
 
@@ -44,12 +46,14 @@ public class PreflightStatusResource {
     }
 
     @GET
+    @RequiresPermissions(PreflightWebModule.PERMISSION_PREFLIGHT_ONLY)
     public ConfigurationStatus status() {
         return new ConfigurationStatus(version.toString());
     }
 
     @POST
     @Path("/finish-config")
+    @RequiresPermissions(PreflightWebModule.PERMISSION_PREFLIGHT_ONLY)
     @NoAuditEvent("No Auditing during preflight")
     public PreflightConfig finishConfig() {
         return preflightConfigService.setConfigResult(PreflightConfigResult.FINISHED);
@@ -57,6 +61,7 @@ public class PreflightStatusResource {
 
     @POST
     @Path("/skip-config")
+    @RequiresPermissions(PreflightWebModule.PERMISSION_PREFLIGHT_ONLY)
     @NoAuditEvent("No Auditing during preflight")
     public PreflightConfig skipConfig() {
         return preflightConfigService.setConfigResult(PreflightConfigResult.SKIPPED);
