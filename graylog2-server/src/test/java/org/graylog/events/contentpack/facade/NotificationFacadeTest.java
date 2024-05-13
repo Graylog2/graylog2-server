@@ -48,6 +48,7 @@ import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.shared.SuppressForbidden;
@@ -118,7 +119,7 @@ public class NotificationFacadeTest {
         stateService = mock(DBEventProcessorStateService.class);
         eventDefinitionService = new DBEventDefinitionService(mongodb.mongoConnection(), mapperProvider, stateService, mock(EntityOwnershipService.class), null, new IgnoreSearchFilters());
 
-        notificationService = new DBNotificationService(mongodb.mongoConnection(), mapperProvider, mock(EntityOwnershipService.class));
+        notificationService = new DBNotificationService(new MongoCollections(mapperProvider, mongodb.mongoConnection()), mock(EntityOwnershipService.class));
         notificationResourceHandler = new NotificationResourceHandler(notificationService, jobDefinitionService, eventDefinitionService, Maps.newHashMap());
         facade = new NotificationFacade(objectMapper, notificationResourceHandler, notificationService, userService);
     }
@@ -170,10 +171,10 @@ public class NotificationFacadeTest {
         when(userService.load("kmerz")).thenReturn(kmerzUser);
 
         final NativeEntity<NotificationDto> nativeEntity = facade.createNativeEntity(
-            entityV1,
-            ImmutableMap.of(),
-            ImmutableMap.of(),
-            "kmerz");
+                entityV1,
+                ImmutableMap.of(),
+                ImmutableMap.of(),
+                "kmerz");
         assertThat(nativeEntity).isNotNull();
 
         final NotificationDto notificationDto = nativeEntity.entity();
