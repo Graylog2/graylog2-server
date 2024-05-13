@@ -7132,7 +7132,7 @@ eslint-config-airbnb@19.0.4:
     eslint-config-airbnb "19.0.4"
     eslint-import-resolver-webpack "0.13.8"
     eslint-plugin-compat "4.2.0"
-    eslint-plugin-graylog "file:../../../../.cache/yarn/v6/npm-eslint-config-graylog-1.3.0-45708d2b-76e1-47f8-a620-fe3ef0dd2433-1715300515218/node_modules/eslint-plugin-graylog"
+    eslint-plugin-graylog "file:packages/eslint-plugin-graylog"
     eslint-plugin-import "2.25.3"
     eslint-plugin-jest "28.5.0"
     eslint-plugin-jest-dom "5.4.0"
@@ -8593,13 +8593,13 @@ graphemer@^1.4.0:
     "@types/create-react-class" "15.6.8"
     "@types/jquery" "3.5.30"
     "@types/react" "18.3.1"
-    babel-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-6.1.0-SNAPSHOT-27e1a847-5987-4597-83b0-f74c1891927f-1715300514876/node_modules/babel-preset-graylog"
+    babel-preset-graylog "file:packages/babel-preset-graylog"
     create-react-class "15.7.0"
-    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-6.1.0-SNAPSHOT-27e1a847-5987-4597-83b0-f74c1891927f-1715300514876/node_modules/eslint-config-graylog"
+    eslint-config-graylog "file:packages/eslint-config-graylog"
     formik "2.4.6"
     history "^5.3.0"
     html-webpack-plugin "^5.5.0"
-    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-6.1.0-SNAPSHOT-27e1a847-5987-4597-83b0-f74c1891927f-1715300514876/node_modules/jest-preset-graylog"
+    jest-preset-graylog "file:packages/jest-preset-graylog"
     jquery "3.7.1"
     moment "2.30.1"
     moment-timezone "0.5.45"
@@ -12525,9 +12525,9 @@ postcss@^8.4.38:
     source-map-js "^1.2.0"
 
 posthog-js@^1.52.0:
-  version "1.131.3"
-  resolved "https://registry.yarnpkg.com/posthog-js/-/posthog-js-1.131.3.tgz#bd3e6123dc715f089825a92d3ec62480b7ec0a76"
-  integrity sha512-ds/TADDS+rT/WgUyeW4cJ+X+fX+O1KdkOyssNI/tP90PrFf0IJsck5B42YOLhfz87U2vgTyBaKHkdlMgWuOFog==
+  version "1.131.4"
+  resolved "https://registry.yarnpkg.com/posthog-js/-/posthog-js-1.131.4.tgz#b29de94a26132e7cb5abcc16c7b57fd6d918e277"
+  integrity sha512-pKa1p6Q9jRU6s+xSluqGifODMncWTXRaeQw7yVet5U+0U56P0srdMO8NpzllIgDjYL9WLgUjDInucOBw5Cl/tA==
   dependencies:
     fflate "^0.4.8"
     preact "^10.19.3"
