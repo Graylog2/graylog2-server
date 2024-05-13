@@ -17,8 +17,8 @@
 package org.graylog.plugins.views.storage.migration.state.machine;
 
 import com.github.oxo42.stateless4j.StateMachine;
-import org.graylog.plugins.views.storage.migration.state.actions.MigrationActions;
 import jakarta.annotation.Nonnull;
+import org.graylog.plugins.views.storage.migration.state.actions.MigrationActions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -192,39 +192,31 @@ public class MigrationStateMachineBuilderTest {
     }
 
     @Test
-    public void testDirectoryCompatibilityCheckPage2() {
+    public void testDirectoryCompatibilityCheckPage() {
         StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE);
         stateMachine.fire(MigrationStep.RUN_DIRECTORY_COMPATIBILITY_CHECK);
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.DIRECTORY_COMPATIBILITY_CHECK_PAGE);
         assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.RUN_DIRECTORY_COMPATIBILITY_CHECK);
-        verify(migrationActions, times(2)).directoryCompatibilityCheckOk();
+        verify(migrationActions, times(3)).directoryCompatibilityCheckOk();
         reset(migrationActions);
         when(migrationActions.directoryCompatibilityCheckOk()).thenReturn(true);
-        assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SHOW_PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES);
-        verify(migrationActions, times(2)).directoryCompatibilityCheckOk();
-        verifyNoMoreInteractions(migrationActions);
-    }
-
-    @Test
-    public void testProvisionRollingUpgradeNodesWithCertificates() {
-        StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.DIRECTORY_COMPATIBILITY_CHECK_PAGE);
-        when(migrationActions.directoryCompatibilityCheckOk()).thenReturn(true);
-        stateMachine.fire(MigrationStep.SHOW_PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES);
-        assertThat(stateMachine.getState()).isEqualTo(MigrationState.PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES);
-        verify(migrationActions, times(1)).directoryCompatibilityCheckOk();
-        reset(migrationActions);
         assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.PROVISION_DATANODE_CERTIFICATES);
+        verify(migrationActions, times(3)).directoryCompatibilityCheckOk();
         verify(migrationActions, times(2)).provisioningFinished();
+        verifyNoMoreInteractions(migrationActions);
         reset(migrationActions);
+        when(migrationActions.directoryCompatibilityCheckOk()).thenReturn(true);
         when(migrationActions.provisioningFinished()).thenReturn(true);
         assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.CALCULATE_JOURNAL_SIZE);
+        verify(migrationActions, times(3)).directoryCompatibilityCheckOk();
         verify(migrationActions, times(2)).provisioningFinished();
         verifyNoMoreInteractions(migrationActions);
     }
 
     @Test
     public void testJournalSizeDowntimeWarning() {
-        StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES);
+        StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.DIRECTORY_COMPATIBILITY_CHECK_PAGE);
+        when(migrationActions.directoryCompatibilityCheckOk()).thenReturn(true);
         stateMachine.fire(MigrationStep.PROVISION_DATANODE_CERTIFICATES);
         verify(migrationActions, times(1)).provisioningFinished();
         Mockito.when(migrationActions.provisioningFinished()).thenReturn(true);

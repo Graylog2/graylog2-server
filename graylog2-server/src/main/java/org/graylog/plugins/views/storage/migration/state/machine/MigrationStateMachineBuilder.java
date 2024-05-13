@@ -104,12 +104,8 @@ public class MigrationStateMachineBuilder {
 
         config.configure(MigrationState.DIRECTORY_COMPATIBILITY_CHECK_PAGE)
                 .permitReentryIf(MigrationStep.RUN_DIRECTORY_COMPATIBILITY_CHECK, () -> !migrationActions.directoryCompatibilityCheckOk(), migrationActions::runDirectoryCompatibilityCheck)
-                .permitIf(MigrationStep.SHOW_PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES, MigrationState.PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES, migrationActions::directoryCompatibilityCheckOk);
-
-
-        config.configure(MigrationState.PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES)
-                .permitIf(MigrationStep.PROVISION_DATANODE_CERTIFICATES, MigrationState.PROVISION_ROLLING_UPGRADE_NODES_RUNNING, () -> !migrationActions.provisioningFinished(), migrationActions::provisionDataNodes)
-                .permitIf(MigrationStep.CALCULATE_JOURNAL_SIZE, MigrationState.JOURNAL_SIZE_DOWNTIME_WARNING, migrationActions::provisioningFinished);
+                .permitIf(MigrationStep.PROVISION_DATANODE_CERTIFICATES, MigrationState.PROVISION_ROLLING_UPGRADE_NODES_RUNNING, () -> migrationActions.directoryCompatibilityCheckOk() && !migrationActions.provisioningFinished(), migrationActions::provisionDataNodes)
+                .permitIf(MigrationStep.CALCULATE_JOURNAL_SIZE, MigrationState.JOURNAL_SIZE_DOWNTIME_WARNING, () -> migrationActions.directoryCompatibilityCheckOk() && migrationActions.provisioningFinished());
 
         config.configure(MigrationState.PROVISION_ROLLING_UPGRADE_NODES_RUNNING)
                 .permitIf(MigrationStep.CALCULATE_JOURNAL_SIZE, MigrationState.JOURNAL_SIZE_DOWNTIME_WARNING, migrationActions::provisioningFinished);
