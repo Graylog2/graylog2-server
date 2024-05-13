@@ -43,6 +43,7 @@ import org.mockito.ArgumentCaptor;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -87,7 +88,7 @@ public class SearchesCleanUpJobWithDBServicesTest {
                 )
         );
         this.searchesCleanUpJob = new SearchesCleanUpJob(viewService, searchDbService, Duration.standardDays(4),
-                new HashMap<>());
+                new HashMap<>(), new HashSet<>());
     }
 
     @After

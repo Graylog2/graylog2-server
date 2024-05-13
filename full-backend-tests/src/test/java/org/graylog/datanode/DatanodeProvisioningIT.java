@@ -17,7 +17,6 @@
 package org.graylog.datanode;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.github.joschi.jadconfig.util.Duration;
 import com.github.rholder.retry.RetryException;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
@@ -25,6 +24,7 @@ import com.github.rholder.retry.WaitStrategies;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
+import jakarta.annotation.Nonnull;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.http.HttpStatus;
 import org.assertj.core.api.Assertions;
@@ -41,13 +41,12 @@ import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
-import org.graylog2.security.IndexerJwtAuthTokenProvider;
-import jakarta.annotation.Nonnull;
 import org.junit.jupiter.api.io.TempDir;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -69,6 +68,8 @@ import static io.restassured.RestAssured.given;
                                            @ContainerMatrixTestsConfiguration.ConfigurationParameter(key = "GRAYLOG_ELASTICSEARCH_HOSTS", value = ""),
                                    })
 public class DatanodeProvisioningIT {
+
+    private final Logger log = LoggerFactory.getLogger(DatanodeProvisioningIT.class);
 
     private final GraylogApis apis;
 
@@ -97,21 +98,32 @@ public class DatanodeProvisioningIT {
     }
 
     private void testEncryptedConnectionToOpensearch(BasicAuthCredentials basicAuth) throws ExecutionException, RetryException, KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException {
-        new DatanodeOpensearchWait(RestOperationParameters.builder()
-                .port(getOpensearchPort())
-                .truststore(keystoreFromApiCertificate(basicAuth))
-                .jwtToken(jwtToken())
-                .build())
-                .waitForNodesCount(1);
+        try {
+            new DatanodeOpensearchWait(RestOperationParameters.builder()
+                    .port(getOpensearchPort())
+                    .truststore(keystoreFromApiCertificate(basicAuth))
+                    .jwtTokenProvider(DatanodeContainerizedBackend.JWT_AUTH_TOKEN_PROVIDER)
+                    .build())
+                    .waitForNodesCount(1);
+        } catch (Exception e) {
+            log.error("Could not connect to Opensearch\n" + apis.backend().getSearchLogs());
+            throw e;
+        }
     }
 
     private List<DatanodeStatus> waitForDatanodesConnected(BasicAuthCredentials basicAuth) throws ExecutionException, RetryException {
-        List<DatanodeStatus> connectedDatanodes = RetryerBuilder.<List<DatanodeStatus>>newBuilder()
-                .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
-                .withStopStrategy(StopStrategies.stopAfterAttempt(60))
-                .retryIfResult(list -> list.isEmpty() || !list.stream().allMatch(node -> node.status().equals(DataNodeProvisioningConfig.State.CONNECTED.name())))
-                .build()
-                .call(() -> getDatanodes(basicAuth));
+        List<DatanodeStatus> connectedDatanodes = null;
+        try {
+            connectedDatanodes = RetryerBuilder.<List<DatanodeStatus>>newBuilder()
+                    .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
+                    .withStopStrategy(StopStrategies.stopAfterAttempt(60))
+                    .retryIfResult(list -> list.isEmpty() || !list.stream().allMatch(node -> node.status().equals(DataNodeProvisioningConfig.State.CONNECTED.name())))
+                    .build()
+                    .call(() -> getDatanodes(basicAuth));
+        } catch (ExecutionException | RetryException | IllegalStateException e) {
+            log.error("Datanode not started:\n" + apis.backend().getSearchLogs());
+            throw e;
+        }
         return connectedDatanodes;
     }
 
@@ -184,11 +196,6 @@ public class DatanodeProvisioningIT {
         final CertutilCa command = new CertutilCa(certPath.toAbsolutePath().toString(), input);
         command.run();
         return certPath;
-    }
-
-
-    private static String jwtToken() {
-        return IndexerJwtAuthTokenProvider.createToken(DatanodeContainerizedBackend.SIGNING_SECRET.getBytes(StandardCharsets.UTF_8), Duration.seconds(600));
     }
 
     @Nonnull

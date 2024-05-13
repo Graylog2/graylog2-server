@@ -48,6 +48,22 @@ public abstract class MoreMediaTypes {
      */
     public final static MediaType TEXT_CSV_TYPE = new MediaType("text", "csv");
     /**
+     * A {@code String} constant representing {@value #APPLICATION_PDF} media type.
+     */
+    public final static String APPLICATION_PDF = "application/pdf";
+    /**
+     * A {@link MediaType} constant representing {@value #APPLICATION_PDF} media type.
+     */
+    public final static MediaType APPLICATION_PDF_TYPE = new MediaType("application", "pdf");
+    /**
+     * A {@code String} constant representing {@value #APPLICATION_ZIP} media type.
+     */
+    public final static String APPLICATION_ZIP = "application/zip";
+    /**
+     * A {@link MediaType} constant representing {@value #APPLICATION_ZIP} media type.
+     */
+    public final static MediaType APPLICATION_ZIP_TYPE = new MediaType("application", "zip");
+    /**
      * A {@code String} constant representing {@value #APPLICATION_JSON} media type.
      */
     public final static String APPLICATION_JSON = "application/json";
@@ -59,6 +75,14 @@ public abstract class MoreMediaTypes {
      * A {@code String} constant representing {@value #APPLICATION_NDJSON} media type.
      */
     public final static String APPLICATION_NDJSON = "application/x-ndjson";
+    /**
+     * A {@link MediaType} constant representing {@value #APPLICATION_YAML} media type.
+     */
+    public final static String APPLICATION_YAML = "application/yaml";
+    /**
+     * A {@link MediaType} constant representing {@value #APPLICATION_XLS} media type.
+     */
+    public final static String APPLICATION_XLS = "application/vnd.ms-excel";
     /**
      * A {@link MediaType} constant representing {@value #APPLICATION_NDJSON} media type.
      */

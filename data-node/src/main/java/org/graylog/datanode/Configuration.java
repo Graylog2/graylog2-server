@@ -173,16 +173,6 @@ public class Configuration {
     private String datanodeHttpCertificatePassword;
 
     @Documentation("""
-            You MUST specify a hash password for the root user (which you only need to initially set up the
-            system and in case you lose connectivity to your authentication backend).
-            This password cannot be changed using the API or via the web interface. If you need to change it,
-            modify it in this file.
-            Create one by using for example: echo -n yourpassword | shasum -a 256
-            """)
-    @Parameter(value = "root_password_sha2", required = true)
-    private String rootPasswordSha2;
-
-    @Documentation("""
             You MUST set a secret to secure/pepper the stored user passwords here. Use at least 64 characters.
             Generate one by using for example: pwgen -N 1 -s 96
             ATTENTION: This value must be the same on all Graylog and Datanode nodes in the cluster.
@@ -212,10 +202,6 @@ public class Configuration {
             """)
     @Parameter(value = "node_id_file", validators = NodeIdFileValidator.class)
     private String nodeIdFile = "data/node-id";
-
-    @Documentation("The default root user is named 'admin'")
-    @Parameter(value = "root_username")
-    private String rootUsername = "admin";
 
     @Documentation("HTTP bind address. The network interface used by the Graylog DataNode to bind all services.")
     @Parameter(value = "bind_address", required = true)
@@ -419,10 +405,6 @@ public class Configuration {
         if (passwordSecret == null || passwordSecret.length() < 64) {
             throw new ValidationException("The minimum length for \"password_secret\" is 64 characters.");
         }
-    }
-
-    public String getRootUsername() {
-        return rootUsername;
     }
 
     public String getDatanodeNodeName() {
@@ -686,11 +668,6 @@ public class Configuration {
         // bindaddress is configured as the hostname
         return bindAddress;
     }
-
-    public String getRootPasswordSha2() {
-        return rootPasswordSha2;
-    }
-
 
     public String getNodeSearchCacheSize() {
         return searchCacheSize;

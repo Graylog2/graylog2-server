@@ -20,6 +20,7 @@ import type { TimeRange, RelativeTimeRangeWithEnd, RelativeTimeRange } from 'vie
 import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
 import type { ArrayElement } from 'views/types';
 import type { AutoTimeConfig } from 'views/logic/aggregationbuilder/Pivot';
+import type { Extension } from 'util/AggregationWidgetExportUtils';
 
 export type SearchBarFormValues = {
   timerange: TimeRange,
@@ -162,3 +163,10 @@ export const VISUALIZATION_TABLE_HEADER_HEIGHT = 28;
 
 export const keySeparator = '\u2E31';
 export const humanSeparator = '-';
+
+export const supportedAggregationExportFormats: Array<{id: Extension, title: string}> = [
+  { id: 'csv', title: 'CSV' },
+  { id: 'json', title: 'JSON' },
+  { id: 'yaml', title: 'YAML' },
+  { id: 'xml', title: 'XML' },
+];
