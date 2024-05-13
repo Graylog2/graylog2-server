@@ -41,6 +41,8 @@ public class RestPermissions implements PluginPermissions {
     public static final String AUTH_SERVICE_GLOBAL_CONFIG_EDIT = "authserviceglobalconfig:edit";
     public static final String AUTH_SERVICE_TEST_BACKEND_EXECUTE = "authservicetestbackend:execute";
     public static final String BUFFERS_READ = "buffers:read";
+    public static final String GRAYLOG_CA_CLIENTCERT_CREATE = "ca_clientcert:create";
+    public static final String GRAYLOG_CA_CLIENTCERT_DELETE = "ca_clientcert:delete";
     public static final String CATALOG_LIST = "catalog:list";
     public static final String CATALOG_RESOLVE = "catalog:resolve";
     public static final String CLUSTER_CONFIG_ENTRY_CREATE = "clusterconfigentry:create";
@@ -52,6 +54,13 @@ public class RestPermissions implements PluginPermissions {
     public static final String CONTENT_PACK_READ = "contentpack:read";
     public static final String CONTENT_PACK_INSTALL = "contentpack:install";
     public static final String CONTENT_PACK_UNINSTALL = "contentpack:uninstall";
+    public static final String DATANODE_OPENSEARCH_PROXY = "datanode:opensearchproxy";
+    public static final String DATANODE_REMOVE = "datanode:remove";
+    public static final String DATANODE_RESET = "datanode:reset";
+    public static final String DATANODE_REST_PROXY = "datanode:restproxy";
+    public static final String DATANODE_STOP = "datanode:stop";
+    public static final String DATANODE_START = "datanode:start";
+    public static final String DATANODE_MIGRATION = "datanode:migration";
     public static final String DASHBOARDS_CREATE = "dashboards:create";
     public static final String DASHBOARDS_EDIT = "dashboards:edit";
     public static final String DASHBOARDS_READ = "dashboards:read";
@@ -72,6 +81,7 @@ public class RestPermissions implements PluginPermissions {
     public static final String EVENT_NOTIFICATIONS_READ = "eventnotifications:read";
     public static final String FIELDNAMES_READ = "fieldnames:read";
     public static final String GRANTS_OVERVIEW_READ = "grantsoverview:read";
+    public static final String GRAYLOG_CA_CREATE = "graylog_ca:create";
     public static final String INDEXERCLUSTER_READ = "indexercluster:read";
     public static final String INDEXRANGES_READ = "indexranges:read";
     public static final String INDEXRANGES_REBUILD = "indexranges:rebuild";
@@ -146,7 +156,6 @@ public class RestPermissions implements PluginPermissions {
     public static final String THREADS_DUMP = "threads:dump";
     public static final String PROCESSBUFFER_DUMP = "processbuffer:dump";
     public static final String THROUGHPUT_READ = "throughput:read";
-
     public static final String TYPE_MAPPINGS_CREATE = "typemappings:create";
     public static final String TYPE_MAPPINGS_DELETE = "typemappings:delete";
     public static final String TYPE_MAPPINGS_EDIT = "typemappings:edit";
@@ -167,19 +176,6 @@ public class RestPermissions implements PluginPermissions {
     public static final String USERS_TOKENCREATE = "users:tokencreate";
     public static final String USERS_TOKENLIST = "users:tokenlist";
     public static final String USERS_TOKENREMOVE = "users:tokenremove";
-
-    public static final String DATANODE_REMOVE = "datanode:remove";
-    public static final String DATANODE_RESET = "datanode:reset";
-    public static final String DATANODE_STOP = "datanode:stop";
-    public static final String DATANODE_START = "datanode:start";
-    public static final String DATANODE_MIGRATION = "datanode:migration";
-
-    public static final String DATANODE_OPENSEARCH_PROXY = "datanode:opensearchproxy";
-    public static final String DATANODE_REST_PROXY = "datanode:restproxy";
-
-    public static final String GRAYLOG_CA_CREATE = "graylog_ca:create";
-    public static final String GRAYLOG_CA_CLIENTCERT_CREATE = "ca_clientcert:create";
-    public static final String GRAYLOG_CA_CLIENTCERT_DELETE = "ca_clientcert:delete";
 
     // This is a special permission that ONLY works with GRNs as ID/target
     // TODO does this belong here?
