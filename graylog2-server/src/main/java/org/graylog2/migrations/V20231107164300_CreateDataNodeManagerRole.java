@@ -16,9 +16,8 @@
  */
 package org.graylog2.migrations;
 
-import org.graylog2.shared.security.RestPermissions;
-
 import jakarta.inject.Inject;
+import org.graylog2.shared.security.RestPermissions;
 
 import java.time.ZonedDateTime;
 import java.util.Set;
@@ -39,6 +38,6 @@ public class V20231107164300_CreateDataNodeManagerRole extends Migration {
     @Override
     public void upgrade() {
         helpers.ensureBuiltinRole("Data Node Manager", "Grants control to manage the data node cluster (built-in)",
-                Set.of(RestPermissions.DATANODE_REMOVE, RestPermissions.DATANODE_RESET, RestPermissions.DATANODE_STOP, RestPermissions.DATANODE_START));
+                Set.of(RestPermissions.DATANODE_READ, RestPermissions.DATANODE_REMOVE, RestPermissions.DATANODE_RESET, RestPermissions.DATANODE_STOP, RestPermissions.DATANODE_START));
     }
 }

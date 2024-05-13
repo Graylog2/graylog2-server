@@ -92,6 +92,7 @@ public class DataNodeManagementResource extends RestResource {
     @GET
     @Path("configured")
     @ApiOperation("Returns whether this Graylog is running against a data node search backend")
+    @RequiresPermissions(RestPermissions.DATANODE_READ)
     public Boolean runsWithDataNode() {
         return runsWithDataNode;
     }
@@ -99,6 +100,7 @@ public class DataNodeManagementResource extends RestResource {
     @GET
     @Path("{nodeId}")
     @ApiOperation("Get data node information")
+    @RequiresPermissions(RestPermissions.DATANODE_READ)
     public DataNodeDto getDataNode(@ApiParam(name = "nodeId", required = true) @PathParam("nodeId") String nodeId) {
         try {
             return certRenewalService.addProvisioningInformation(nodeService.byNodeId(nodeId));

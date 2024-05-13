@@ -55,6 +55,7 @@ public class RestPermissions implements PluginPermissions {
     public static final String CONTENT_PACK_INSTALL = "contentpack:install";
     public static final String CONTENT_PACK_UNINSTALL = "contentpack:uninstall";
     public static final String DATANODE_OPENSEARCH_PROXY = "datanode:opensearchproxy";
+    public static final String DATANODE_READ = "datanode:read";
     public static final String DATANODE_REMOVE = "datanode:remove";
     public static final String DATANODE_RESET = "datanode:reset";
     public static final String DATANODE_REST_PROXY = "datanode:restproxy";
@@ -205,6 +206,7 @@ public class RestPermissions implements PluginPermissions {
             .add(create(DASHBOARDS_CREATE, ""))
             .add(create(DASHBOARDS_EDIT, ""))
             .add(create(DASHBOARDS_READ, ""))
+            .add(create(DATANODE_READ, ""))
             .add(create(DATANODE_REMOVE, ""))
             .add(create(DATANODE_RESET, ""))
             .add(create(DATANODE_STOP, ""))
