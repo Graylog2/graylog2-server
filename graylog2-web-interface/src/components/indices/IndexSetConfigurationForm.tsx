@@ -260,7 +260,7 @@ const IndexSetConfigurationForm = ({
 
   const prepareInitialValues = () => {
     if (indexSet.data_tiering) {
-      return { ...indexSet, data_tiering: prepareDataTieringInitialValues(indexSet.data_tiering) };
+      return { ...indexSet, data_tiering: prepareDataTieringInitialValues(indexSet.data_tiering, PluginStore) };
     }
 
     return indexSet as unknown as IndexSetFormValues;

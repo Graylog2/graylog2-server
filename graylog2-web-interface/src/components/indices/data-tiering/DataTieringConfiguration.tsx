@@ -26,9 +26,36 @@ import type { DataTieringConfig, DataTieringFormValues } from 'components/indice
 const dayFields = ['index_lifetime_max', 'index_lifetime_min', 'index_hot_lifetime_min'];
 const hotWarmOnlyFormFields = ['index_hot_lifetime_min', 'warm_tier_enabled', 'warm_tier_repository_name'];
 
+const DATA_TIERING_HOT_ONLY_DEFAULTS = {
+  archive_before_deletion: false,
+  index_lifetime_max: 40,
+  index_lifetime_min: 30,
+};
+
+const DATA_TIERING_HOT_WARM_DEFAULTS = {
+  archive_before_deletion: false,
+  warm_tier_enabled: false,
+  warm_tier_repository_name: null,
+};
+
 export const durationToRoundedDays = (duration: string) => Math.round(moment.duration(duration).asDays());
 
-export const prepareDataTieringInitialValues = (config: DataTieringConfig) : DataTieringFormValues => {
+const dataTieringFormValuesWithDefaults = (values: DataTieringFormValues, pluginStore) : DataTieringFormValues => {
+  const dataTieringPlugin = pluginStore.exports('dataTiering').find((plugin) => (plugin.type === DATA_TIERING_TYPE.HOT_WARM));
+  const dataTieringType = dataTieringPlugin?.type ?? DATA_TIERING_TYPE.HOT_ONLY;
+
+  if (dataTieringType === DATA_TIERING_TYPE.HOT_WARM) {
+    const hotWarmDefaults = { ...DATA_TIERING_HOT_ONLY_DEFAULTS, ...DATA_TIERING_HOT_WARM_DEFAULTS, ...values };
+
+    return hotWarmDefaults;
+  }
+
+  const hotOnlyDefaults = { ...DATA_TIERING_HOT_ONLY_DEFAULTS, ...values };
+
+  return hotOnlyDefaults;
+};
+
+export const prepareDataTieringInitialValues = (config: DataTieringConfig, pluginStore) : DataTieringFormValues => {
   let formValues = { ...config };
 
   dayFields.forEach((field) => {
@@ -38,32 +65,16 @@ export const prepareDataTieringInitialValues = (config: DataTieringConfig) : Dat
     }
   });
 
-  return formValues as unknown as DataTieringFormValues;
+  return dataTieringFormValuesWithDefaults(formValues as unknown as DataTieringFormValues, pluginStore);
 };
 
 export const prepareDataTieringConfig = (formValues: DataTieringFormValues, pluginStore) : DataTieringConfig => {
-  const hotOnlyDefaults = {
-    archive_before_deletion: false,
-  };
-
-  const hotWarmDefaultValues = {
-    archive_before_deletion: false,
-    warm_tier_enabled: false,
-    warm_tier_repository_name: null,
-  };
-
   const dataTieringPlugin = pluginStore.exports('dataTiering').find((plugin) => (plugin.type === DATA_TIERING_TYPE.HOT_WARM));
   const dataTieringType = dataTieringPlugin?.type ?? DATA_TIERING_TYPE.HOT_ONLY;
 
-  let config = { };
-
-  if (dataTieringType === DATA_TIERING_TYPE.HOT_WARM) {
-    config = { ...hotOnlyDefaults, ...hotWarmDefaultValues, ...formValues };
-  }
+  let config = dataTieringFormValuesWithDefaults(formValues, pluginStore);
 
   if (dataTieringType === DATA_TIERING_TYPE.HOT_ONLY) {
-    config = { ...hotOnlyDefaults, ...formValues };
-
     hotWarmOnlyFormFields.forEach((field) => {
       delete config[field];
     });

@@ -15,8 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import type { IndexSetsDefaultConfiguration, IndexSetsDefaultConfigurationFormValues } from 'stores/indices/IndexSetsStore';
+import type { IndexSetDefaultFields, IndexSetsDefaultConfigurationFormValues } from 'stores/indices/IndexSetsStore';
 import type { RetentionStrategyConfig, RotationStrategyConfig } from 'components/indices/Types';
+import type { DataTieringConfig } from 'components/indices/data-tiering';
+
+type IndexSetsDefaultConfiguration = IndexSetDefaultFields & {
+  rotation_strategy?: RotationStrategyConfig,
+  retention_strategy?: RetentionStrategyConfig,
+  field_type_refresh_interval_unit: 'seconds' | 'minutes',
+  data_tiering: DataTieringConfig
+}
 
 export type IndexSetTemplate = {
   id: string,

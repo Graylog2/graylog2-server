@@ -163,10 +163,6 @@ const validate = (formValues: IndexSetTemplateFormValues) => {
 };
 
 const TemplateForm = ({ initialValues, submitButtonText, submitLoadingText, onCancel, onSubmit }: Props) => {
-  const defaultValues = {
-    index_set_config: {},
-  };
-
   const retentionConfigSegments: Array<{value: RetentionConfigSegment, label: string}> = [
     { value: 'data_tiering', label: 'Data Tiering' },
     { value: 'legacy', label: 'Legacy (Deprecated)' },
@@ -185,24 +181,30 @@ const TemplateForm = ({ initialValues, submitButtonText, submitLoadingText, onCa
 
   const handleSubmit = (values: IndexSetTemplateFormValues) => {
     let template = {};
+    const { retention_strategy, retention_strategy_class, rotation_strategy, rotation_strategy_class, ...other } = values;
 
-    template = { ...values };
+    const index_set_config = { ...values.index_set_config };
 
-    if (values.index_set_config.data_tiering) {
-      template = {
-        ...values,
-        index_set_config: {
-          ...values.index_set_config,
-          data_tiering: prepareDataTieringConfig(values.index_set_config.data_tiering, PluginStore),
-        },
-      };
-    }
+    template = { ...other };
+
+    template = {
+      ...template,
+      index_set_config: {
+        ...index_set_config,
+        retention_strategy: selectedRetentionSegment === 'legacy' ? retention_strategy : undefined,
+        retention_strategy_class: selectedRetentionSegment === 'legacy' ? retention_strategy_class : undefined,
+        rotation_strategy: selectedRetentionSegment === 'legacy' ? rotation_strategy : undefined,
+        rotation_strategy_class: selectedRetentionSegment === 'legacy' ? rotation_strategy_class : undefined,
+        use_legacy_rotation: selectedRetentionSegment === 'legacy',
+        data_tiering: prepareDataTieringConfig(index_set_config.data_tiering, PluginStore),
+      },
+    };
 
     onSubmit(template as unknown as IndexSetTemplate);
   };
 
   const prepareInitialValues = () => {
-    const values = { ...defaultValues, ...initialValues };
+    const values = { index_set_config: {}, ...initialValues };
 
     const { rotation_strategy, rotation_strategy_class, retention_strategy, retention_strategy_class } = values.index_set_config;
 
@@ -211,7 +213,7 @@ const TemplateForm = ({ initialValues, submitButtonText, submitLoadingText, onCa
     delete values.index_set_config.retention_strategy;
     delete values.index_set_config.retention_strategy_class;
 
-    const data_tiering = prepareDataTieringInitialValues(values.index_set_config.data_tiering);
+    const data_tiering = prepareDataTieringInitialValues(values.index_set_config.data_tiering, PluginStore);
 
     return {
       ...values,
@@ -220,6 +222,13 @@ const TemplateForm = ({ initialValues, submitButtonText, submitLoadingText, onCa
       retention_strategy,
       retention_strategy_class,
       index_set_config: {
+        index_analyzer: 'standard',
+        shards: 4,
+        replicas: 1,
+        index_optimization_max_num_segments: 1,
+        index_optimization_disabled: false,
+        field_type_refresh_interval: 1,
+        field_type_refresh_interval_unit: 'SECONDS',
         use_legacy_rotation: false,
         ...values.index_set_config,
         data_tiering,
@@ -312,10 +321,6 @@ const TemplateForm = ({ initialValues, submitButtonText, submitLoadingText, onCa
       </Formik>
     </Col>
   );
-};
-
-TemplateForm.defaultProps = {
-  initialValues: { title: '', description: '' },
 };
 
 export default TemplateForm;

@@ -73,7 +73,7 @@ type IndexSetConfig = {
   use_legacy_rotation?: boolean
 }
 
-type IndexSetDefaultFields = Pick<IndexSetConfig,
+export type IndexSetDefaultFields = Pick<IndexSetConfig,
   'index_prefix' |
   'index_analyzer' |
   'shards' |
