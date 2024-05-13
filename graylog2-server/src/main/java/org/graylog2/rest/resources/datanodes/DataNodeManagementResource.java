@@ -50,6 +50,7 @@ import org.graylog2.rest.bulk.BulkExecutor;
 import org.graylog2.rest.bulk.SequentialBulkExecutor;
 import org.graylog2.rest.bulk.model.BulkOperationRequest;
 import org.graylog2.rest.bulk.model.BulkOperationResponse;
+import org.graylog2.shared.rest.NoPermissionCheckRequired;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
@@ -127,6 +128,7 @@ public class DataNodeManagementResource extends RestResource {
     @Timed
     @ApiOperation(value = "Remove multiple nodes from the cluster", response = BulkOperationResponse.class)
     @NoAuditEvent("Audit events triggered manually")
+    @NoPermissionCheckRequired
     public Response bulkRemove(@ApiParam(name = "Entities to remove", required = true) final BulkOperationRequest bulkOperationRequest,
                                @Context UserContext userContext) {
 
@@ -173,6 +175,7 @@ public class DataNodeManagementResource extends RestResource {
     @Timed
     @ApiOperation(value = "Stop multiple nodes in the cluster", response = BulkOperationResponse.class)
     @NoAuditEvent("Audit events triggered manually")
+    @NoPermissionCheckRequired
     public Response bulkStop(@ApiParam(name = "Entities to stop", required = true) final BulkOperationRequest bulkOperationRequest,
                              @Context UserContext userContext) {
 
@@ -205,6 +208,7 @@ public class DataNodeManagementResource extends RestResource {
     @Timed
     @ApiOperation(value = "Start multiple nodes in the cluster", response = BulkOperationResponse.class)
     @NoAuditEvent("Audit events triggered manually")
+    @NoPermissionCheckRequired
     public Response bulkStart(@ApiParam(name = "Entities to start", required = true) final BulkOperationRequest bulkOperationRequest,
                               @Context UserContext userContext) {
 

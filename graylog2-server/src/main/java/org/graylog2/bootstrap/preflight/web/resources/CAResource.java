@@ -47,6 +47,7 @@ import org.graylog2.bootstrap.preflight.web.resources.model.CA;
 import org.graylog2.bootstrap.preflight.web.resources.model.CreateCARequest;
 import org.graylog2.bootstrap.preflight.web.resources.model.CreateClientCertRequest;
 import org.graylog2.plugin.rest.ApiError;
+import org.graylog2.shared.rest.NoPermissionCheckRequired;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
@@ -77,6 +78,7 @@ public class CAResource extends RestResource {
 
     @GET
     @ApiOperation("Returns the CA")
+    @NoPermissionCheckRequired
     public CA get() throws KeyStoreStorageException {
         return caService.get();
     }

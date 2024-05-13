@@ -84,6 +84,7 @@ import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
+import org.graylog2.shared.rest.InlinePermissionCheck;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
@@ -166,6 +167,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @Path("/paginated")
     @ApiOperation(value = "Get a paginated list of event definitions")
     @Produces(MediaType.APPLICATION_JSON)
+    @InlinePermissionCheck
     public PageListResponse<EventDefinitionDto> getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                                         @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                                         @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
@@ -210,6 +212,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @GET
     @ApiOperation("List event definitions")
     @Deprecated
+    @InlinePermissionCheck
     public PaginatedResponse<EventDefinitionDto> list(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                                       @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                                       @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query) {
@@ -229,6 +232,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @GET
     @Path("{definitionId}")
     @ApiOperation("Get an event definition")
+    @InlinePermissionCheck
     public EventDefinitionDto get(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_READ, definitionId);
         return dbService.get(definitionId)
@@ -238,6 +242,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @GET
     @Path("{definitionId}/with-context")
     @ApiOperation("Get an event definition")
+    @InlinePermissionCheck
     public Map<String, Object> getWithContext(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_READ, definitionId);
         return dbService.get(definitionId)
@@ -273,6 +278,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @Path("{definitionId}")
     @ApiOperation("Update existing event definition")
     @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_UPDATE)
+    @InlinePermissionCheck
     public Response update(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId,
                            @ApiParam("schedule") @QueryParam("schedule") @DefaultValue("true") boolean schedule,
                            @ApiParam(name = "JSON Body") EventDefinitionDto dto,
@@ -301,6 +307,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @Path("{definitionId}")
     @ApiOperation("Delete event definition")
     @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_DELETE)
+    @InlinePermissionCheck
     public EventDefinitionDto delete(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId,
                                      @Context UserContext userContext) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_DELETE, definitionId);
@@ -332,6 +339,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @Timed
     @ApiOperation(value = "Delete multiple event definitions", response = BulkOperationResponse.class)
     @NoAuditEvent("Audit events triggered manually")
+    @InlinePermissionCheck
     public Response bulkDelete(@ApiParam(name = "Entities to remove", required = true) final BulkOperationRequest bulkOperationRequest,
                                @Context UserContext userContext) {
 
@@ -349,6 +357,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @Consumes(MediaType.WILDCARD)
     @ApiOperation("Enable event definition")
     @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_UPDATE)
+    @InlinePermissionCheck
     public EventDefinitionDto schedule(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId,
                                        @Context UserContext userContext) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_EDIT, definitionId);
@@ -364,6 +373,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @Timed
     @ApiOperation(value = "Enable multiple event definitions", response = BulkOperationResponse.class)
     @NoAuditEvent("Audit events triggered manually")
+    @InlinePermissionCheck
     public Response bulkSchedule(@ApiParam(name = "Event definitions to enable", required = true) final BulkOperationRequest bulkOperationRequest,
                                  @Context UserContext userContext) {
 
@@ -380,6 +390,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @Consumes(MediaType.WILDCARD)
     @ApiOperation("Disable event definition")
     @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_UPDATE)
+    @InlinePermissionCheck
     public EventDefinitionDto unschedule(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId,
                                          @Context UserContext userContext) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_EDIT, definitionId);
@@ -395,6 +406,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @Timed
     @ApiOperation(value = "Disable multiple event definitions", response = BulkOperationResponse.class)
     @NoAuditEvent("Audit events triggered manually")
+    @InlinePermissionCheck
     public Response bulkUnschedule(@ApiParam(name = "Event definitions to disable", required = true) final BulkOperationRequest bulkOperationRequest,
                                    @Context UserContext userContext) {
 
@@ -411,6 +423,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @Consumes(MediaType.WILDCARD)
     @ApiOperation("Clear queued notifications for event")
     @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_CLEAR_NOTIFICATION_QUEUE)
+    @InlinePermissionCheck
     public void clearNotificationQueue(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_EDIT, definitionId);
         eventDefinitionHandler.deleteNotificationJobTriggers(definitionId);
@@ -420,6 +433,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @ApiOperation("Execute event definition")
     @Path("{definitionId}/execute")
     @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_EXECUTE)
+    @InlinePermissionCheck
     public void execute(@ApiParam(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId,
                         @ApiParam(name = "parameters", required = true) @NotNull EventProcessorParameters parameters) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_EXECUTE, definitionId);

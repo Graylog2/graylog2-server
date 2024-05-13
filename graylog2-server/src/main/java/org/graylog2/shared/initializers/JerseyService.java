@@ -60,6 +60,7 @@ import org.graylog2.shared.rest.EmbeddingControlFilter;
 import org.graylog2.shared.rest.NodeIdResponseFilter;
 import org.graylog2.shared.rest.NotAuthorizedResponseFilter;
 import org.graylog2.shared.rest.OptionalResponseFilter;
+import org.graylog2.shared.rest.PermissionCheckProcessor;
 import org.graylog2.shared.rest.PrintModelProcessor;
 import org.graylog2.shared.rest.RequestIdFilter;
 import org.graylog2.shared.rest.RestAccessLogFilter;
@@ -285,7 +286,8 @@ public class JerseyService extends AbstractIdleService {
                         EmbeddingControlFilter.class,
                         OptionalResponseFilter.class,
                         ContentTypeOptionFilter.class,
-                        SlidingExpirationCookieFilter.class)
+                        SlidingExpirationCookieFilter.class,
+                        PermissionCheckProcessor.class)
                 // Replacing this with a lambda leads to missing subtypes - https://github.com/Graylog2/graylog2-server/pull/10617#discussion_r630236360
                 .register(new ContextResolver<ObjectMapper>() {
                     @Override

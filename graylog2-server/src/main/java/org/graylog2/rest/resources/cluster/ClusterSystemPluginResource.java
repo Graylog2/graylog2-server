@@ -20,21 +20,8 @@ import com.codahale.metrics.annotation.Timed;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.cluster.Node;
-import org.graylog2.cluster.NodeNotFoundException;
-import org.graylog2.cluster.NodeService;
-import org.graylog2.rest.RemoteInterfaceProvider;
-import org.graylog2.rest.models.system.plugins.responses.PluginList;
-import org.graylog2.shared.rest.resources.ProxiedResource;
-import org.graylog2.shared.rest.resources.system.RemoteSystemPluginResource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import retrofit2.Response;
-
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -43,6 +30,18 @@ import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.cluster.Node;
+import org.graylog2.cluster.NodeNotFoundException;
+import org.graylog2.cluster.NodeService;
+import org.graylog2.rest.RemoteInterfaceProvider;
+import org.graylog2.rest.models.system.plugins.responses.PluginList;
+import org.graylog2.shared.rest.NoPermissionCheckRequired;
+import org.graylog2.shared.rest.resources.ProxiedResource;
+import org.graylog2.shared.rest.resources.system.RemoteSystemPluginResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import retrofit2.Response;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
@@ -67,7 +66,8 @@ public class ClusterSystemPluginResource extends ProxiedResource {
     @GET
     @Timed
     @ApiOperation(value = "List all installed plugins on the given node")
-    public PluginList list(@ApiParam(name = "nodeId", value = "The id of the node where processing will be paused.", required = true)
+    @NoPermissionCheckRequired
+    public PluginList list(@ApiParam(name = "nodeId", value = "The id of the node to get the plugin list from.", required = true)
                            @PathParam("nodeId") String nodeId) throws IOException, NodeNotFoundException {
         final Node targetNode = nodeService.byNodeId(nodeId);
 

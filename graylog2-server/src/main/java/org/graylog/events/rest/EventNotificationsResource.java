@@ -68,6 +68,7 @@ import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
+import org.graylog2.shared.rest.InlinePermissionCheck;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
@@ -132,6 +133,7 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     @Path("/paginated")
     @ApiOperation(value = "Get a paginated list of event notifications")
     @Produces(MediaType.APPLICATION_JSON)
+    @InlinePermissionCheck
     public PageListResponse<NotificationDto> getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                                      @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                                      @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
@@ -158,6 +160,7 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     @GET
     @ApiOperation("List all available notifications")
     @Deprecated
+    @InlinePermissionCheck
     public PaginatedResponse<NotificationDto> listNotifications(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                                                 @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                                                 @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query) {
@@ -171,6 +174,7 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     @GET
     @Path("/{notificationId}")
     @ApiOperation("Get a notification")
+    @InlinePermissionCheck
     public NotificationDto get(@ApiParam(name = "notificationId") @PathParam("notificationId") @NotBlank String notificationId) {
         checkPermission(RestPermissions.EVENT_NOTIFICATIONS_READ, notificationId);
         return dbNotificationService.get(notificationId)
@@ -196,6 +200,7 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     @Path("/{notificationId}")
     @ApiOperation("Update existing notification")
     @AuditEvent(type = EventsAuditEventTypes.EVENT_NOTIFICATION_UPDATE)
+    @InlinePermissionCheck
     public Response update(@ApiParam(name = "notificationId") @PathParam("notificationId") @NotBlank String notificationId,
                            @ApiParam(name = "JSON Body") NotificationDto dto,
                            @Context UserContext userContext) {
@@ -251,6 +256,7 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     @Path("/{notificationId}")
     @ApiOperation("Delete a notification")
     @AuditEvent(type = EventsAuditEventTypes.EVENT_NOTIFICATION_DELETE)
+    @InlinePermissionCheck
     public void delete(@ApiParam(name = "notificationId") @PathParam("notificationId") @NotBlank String notificationId,
                        @Context UserContext userContext) {
         checkPermission(RestPermissions.EVENT_NOTIFICATIONS_DELETE, notificationId);
@@ -269,6 +275,7 @@ public class EventNotificationsResource extends RestResource implements PluginRe
             @ApiResponse(code = 500, message = "Error while testing event notification")
     })
     @NoAuditEvent("only used to test event notifications")
+    @InlinePermissionCheck
     public Response test(@ApiParam(name = "notificationId", value = "The event notification id to send a test alert for.", required = true)
                          @PathParam("notificationId") @NotBlank String notificationId) {
         checkPermission(RestPermissions.EVENT_NOTIFICATIONS_EDIT, notificationId);
@@ -291,7 +298,6 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     })
     @NoAuditEvent("only used to test event notifications")
     public Response test(@ApiParam(name = "JSON Body") NotificationDto dto) {
-        checkPermission(RestPermissions.EVENT_NOTIFICATIONS_CREATE);
         final ValidationResult validationResult = dto.validate();
         if (validationResult.failed()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();

@@ -22,6 +22,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.plugin.ServerStatus;
+import org.graylog2.shared.rest.InlinePermissionCheck;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.system.shutdown.GracefulShutdown;
@@ -64,6 +65,7 @@ public class SystemShutdownResource extends RestResource {
     @Path("/shutdown")
     @AuditEvent(type = AuditEventTypes.NODE_SHUTDOWN_INITIATE)
     @Deprecated
+    @InlinePermissionCheck
     public Response shutdown() {
         checkPermission(RestPermissions.NODE_SHUTDOWN, serverStatus.getNodeId().toString());
 

@@ -19,19 +19,19 @@ package org.graylog2.rest.resources.system.processing;
 import com.codahale.metrics.annotation.Timed;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.rest.models.system.processing.ProcessingStatusSummary;
-import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.system.processing.DBProcessingStatusService;
-import org.graylog2.system.processing.ProcessingStatusRecorder;
-
 import jakarta.inject.Inject;
-
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog2.rest.models.system.processing.ProcessingStatusSummary;
+import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.system.processing.DBProcessingStatusService;
+import org.graylog2.system.processing.ProcessingStatusRecorder;
 
 @Api(value = "System/Processing/Status")
 @Path("/system/processing/status")
@@ -51,6 +51,8 @@ public class SystemProcessingStatusResource extends RestResource {
     @GET
     @Timed
     @ApiOperation(value = "Get processing status summary from node")
+    @Deprecated
+    @RequiresPermissions(RestPermissions.METRICS_READ)
     public ProcessingStatusSummary getStatus() {
         return ProcessingStatusSummary.of(processingStatusRecorder);
     }
@@ -59,6 +61,8 @@ public class SystemProcessingStatusResource extends RestResource {
     @Path("/persisted")
     @Timed
     @ApiOperation(value = "Get persisted processing status summary from node")
+    @Deprecated
+    @RequiresPermissions(RestPermissions.METRICS_READ)
     public ProcessingStatusSummary getPersistedStatus() {
         return dbService.get().map(ProcessingStatusSummary::of)
                 .orElseThrow(() -> new NotFoundException("No processing status persisted yet"));

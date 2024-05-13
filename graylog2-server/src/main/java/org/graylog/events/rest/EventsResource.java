@@ -19,6 +19,14 @@ package org.graylog.events.rest;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.search.EventsSearchFilter;
@@ -29,17 +37,8 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.shared.rest.InlinePermissionCheck;
 import org.graylog2.shared.rest.resources.RestResource;
-
-import jakarta.inject.Inject;
-
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
 
 import java.util.Optional;
 
@@ -63,6 +62,7 @@ public class EventsResource extends RestResource implements PluginRestResource {
     @Path("/search")
     @ApiOperation("Search events")
     @NoAuditEvent("Doesn't change any data, only searches for events")
+    @InlinePermissionCheck
     public EventsSearchResult search(@ApiParam(name = "JSON body") final EventsSearchParameters request) {
         return searchService.search(firstNonNull(request, EventsSearchParameters.empty()), getSubject());
     }
@@ -70,6 +70,7 @@ public class EventsResource extends RestResource implements PluginRestResource {
     @GET
     @Path("{event_id}")
     @ApiOperation("Get event by ID")
+    @InlinePermissionCheck
     public Optional<EventsSearchResult.Event> getById(@ApiParam(name = "event_id") @PathParam("event_id") final String eventId) {
 
         final EventsSearchParameters parameters = EventsSearchParameters.builder()
