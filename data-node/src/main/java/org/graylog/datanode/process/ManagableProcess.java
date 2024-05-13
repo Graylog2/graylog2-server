@@ -31,8 +31,6 @@ public interface ManagableProcess<T, EVENT, STATE> {
 
     void onEvent(EVENT event);
 
-    void addStateMachineTracer(Trace<STATE, EVENT> tracer);
-
     boolean isInState(STATE state);
 
 }

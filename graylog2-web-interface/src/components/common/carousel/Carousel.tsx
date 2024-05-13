@@ -40,7 +40,7 @@ const StyledDiv = styled.div`
 `;
 
 const Carousel = ({ children, className, containerRef }: Props) => {
-  const [emblaRef] = useEmblaCarousel({ containScroll: 'trimSnaps' });
+  const [emblaRef] = useEmblaCarousel({ containScroll: 'trimSnaps', watchDrag: false });
 
   return (
     <StyledDiv className={`carousel ${className}`} ref={emblaRef}>

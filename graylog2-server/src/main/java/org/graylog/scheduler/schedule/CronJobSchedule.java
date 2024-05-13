@@ -34,7 +34,6 @@ import javax.annotation.Nullable;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Map;
 import java.util.Optional;
 import java.util.TimeZone;
 
@@ -85,14 +84,6 @@ public abstract class CronJobSchedule implements JobSchedule {
         return new DateTime(t.toInstant().toEpochMilli(), tz);
     }
 
-    @Override
-    public Optional<Map<String, Object>> toDBUpdate(String fieldPrefix) {
-        return Optional.of(java.util.Map.of(
-                fieldPrefix + JobSchedule.TYPE_FIELD, type(),
-                fieldPrefix + FIELD_CRON_EXPRESSION, cronExpression(),
-                fieldPrefix + FIELD_TIMEZONE, timezone().orElse(DEFAULT_TIMEZONE) // always store a TZ together with the cron expression
-        ));
-    }
     public static CronJobSchedule.Builder builder() {
         return CronJobSchedule.Builder.create();
     }

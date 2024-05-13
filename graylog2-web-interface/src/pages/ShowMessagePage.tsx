@@ -63,7 +63,7 @@ const useStreams = () => {
   return { streams, allStreams };
 };
 
-const useInputs = (sourceInputId, gl2SourceNode) => {
+const useInputs = (sourceInputId: string | undefined, gl2SourceNode: string | undefined) => {
   const [inputs, setInputs] = useState<Immutable.Map<string, Input>>(Immutable.Map());
 
   useEffect(() => {

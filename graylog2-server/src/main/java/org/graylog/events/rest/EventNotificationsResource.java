@@ -23,6 +23,23 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import jakarta.inject.Inject;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.events.audit.EventsAuditEventTypes;
@@ -43,6 +60,7 @@ import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.rest.models.PaginatedResponse;
+import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.EntityDefaults;
@@ -53,29 +71,8 @@ import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
-import jakarta.inject.Inject;
-
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
-
-import jakarta.validation.constraints.NotBlank;
-
-import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.DefaultValue;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.NotFoundException;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.PUT;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -144,14 +141,14 @@ public class EventNotificationsResource extends RestResource implements PluginRe
                                                                allowableValues = "title,description,type")
                                                      @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
                                                      @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
-                                                     @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") String order) {
+                                                     @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") SortOrder order) {
         final SearchQuery searchQuery = searchQueryParser.parse(query);
         if ("type".equals(sort)) {
             sort = "config.type";
         }
         final PaginatedList<NotificationDto> result = dbNotificationService.searchPaginated(searchQuery, notification -> {
             return isPermitted(RestPermissions.EVENT_NOTIFICATIONS_READ, notification.id());
-        }, sort, order, page, perPage);
+        }, order.toBsonSort(sort), page, perPage);
 
 
         return PageListResponse.create(query, result.pagination(),
@@ -167,7 +164,7 @@ public class EventNotificationsResource extends RestResource implements PluginRe
         final SearchQuery searchQuery = searchQueryParser.parse(query);
         final PaginatedList<NotificationDto> result = dbNotificationService.searchPaginated(searchQuery, notification -> {
             return isPermitted(RestPermissions.EVENT_NOTIFICATIONS_READ, notification.id());
-        }, "title", "asc", page, perPage);
+        }, SortOrder.ASCENDING.toBsonSort("title"), page, perPage);
         return PaginatedResponse.create("notifications", result, query);
     }
 
