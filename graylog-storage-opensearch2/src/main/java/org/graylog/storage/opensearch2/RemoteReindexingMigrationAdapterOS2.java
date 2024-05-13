@@ -25,6 +25,7 @@ import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.validation.constraints.NotNull;
@@ -71,8 +72,6 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.annotation.Nonnull;
 
 import javax.annotation.Nullable;
 import java.io.BufferedReader;
@@ -312,7 +311,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         try (var response = httpClient.newCall(new Request.Builder().url(url).header("Authorization", Credentials.basic(username, password)).build()).execute()) {
             if (response.isSuccessful() && response.body() != null) {
                 // filtering all indices that start with "." as they indicate a system index - we don't want to reindex those
-                return new BufferedReader(new StringReader(response.body().string())).lines().filter(i -> !i.startsWith(".")).toList();
+                return new BufferedReader(new StringReader(response.body().string())).lines().filter(i -> !i.startsWith(".")).sorted().toList();
             } else {
                 throw new RuntimeException("Could not read list of indices from " + host);
             }
