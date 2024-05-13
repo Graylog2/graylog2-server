@@ -34,8 +34,10 @@ import static org.graylog.plugins.pipelineprocessor.parser.RuleContentType.JAVAS
 public class JavaScriptRuleParser {
 
     private final Context.Builder contextBuilder;
+    private final FunctionRegistry functionRegistry;
 
-    public JavaScriptRuleParser() {
+    public JavaScriptRuleParser(FunctionRegistry functionRegistry) {
+        this.functionRegistry = functionRegistry;
         contextBuilder = jsContextBuilder();
     }
 
@@ -54,7 +56,7 @@ public class JavaScriptRuleParser {
                 .mimeType(JAVASCRIPT_MODULE.mimeType())
                 .build();
 
-        final JsRule jsRule = new JsRule(parsedSource, contextBuilder::build);
+        final JsRule jsRule = new JsRule(parsedSource, contextBuilder::build, functionRegistry);
         return Rule.builder()
                 .id(id)
                 .name(jsRule.name())

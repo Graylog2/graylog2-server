@@ -421,7 +421,7 @@ public class PipelineRuleParserTest extends BaseParserTest {
                         return msg.getField("run_rule");
                     },
                     "then" : (msg) => {
-                        msg.addField("processed_by", "javascript test");
+                        functions.set_field({"field" : "processed_by", "value" : "javascript test"});
                     }
                 };
                 """;

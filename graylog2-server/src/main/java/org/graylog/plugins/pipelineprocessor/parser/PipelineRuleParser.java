@@ -34,7 +34,7 @@ public class PipelineRuleParser {
     @Inject
     public PipelineRuleParser(FunctionRegistry functionRegistry) {
         this.pipelineLanguageRuleParser = new PipelineLanguageRuleParser(functionRegistry);
-        this.javaScriptRuleParser = new JavaScriptRuleParser();
+        this.javaScriptRuleParser = new JavaScriptRuleParser(functionRegistry);
     }
 
     public Rule parseRule(String rule, boolean silent) throws ParseException {
