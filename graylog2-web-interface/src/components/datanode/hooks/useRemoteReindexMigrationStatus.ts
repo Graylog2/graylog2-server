@@ -74,7 +74,7 @@ const useRemoteReindexMigrationStatus = (
       if (currentStep?.state === MIGRATION_STATE.REMOTE_REINDEX_RUNNING.key) {
         if (
           migrationStatus?.progress === 100
-          && migrationStatus?.status === 'FINISHED'
+          && (migrationStatus?.status === 'FINISHED' || migrationStatus?.status === 'ERROR')
         ) {
           setNextSteps(currentStep?.next_steps.filter((action) => RemoteReindexFinishedStatusActions.includes(action)));
         } else {
