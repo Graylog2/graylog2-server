@@ -31,12 +31,13 @@ import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.rules.TestName;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestInfo;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -56,8 +57,8 @@ public class BaseParserTest {
     protected static FunctionRegistry functionRegistry;
     protected static Stream defaultStream;
 
-    @org.junit.Rule
-    public TestName name = new TestName();
+    protected TestInfo testInfo;
+
     protected PipelineRuleParser parser;
     private MessageFactory messageFactory = new TestMessageFactory();
 
@@ -82,7 +83,7 @@ public class BaseParserTest {
         return functions;
     }
 
-    @BeforeClass
+    @BeforeAll
     public static void init() {
         defaultStream = mock(Stream.class, "Default stream");
         when(defaultStream.isPaused()).thenReturn(false);
@@ -90,8 +91,9 @@ public class BaseParserTest {
         when(defaultStream.getId()).thenReturn(Stream.DEFAULT_STREAM_ID);
     }
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    public void setup(TestInfo testInfo) {
+        this.testInfo = testInfo;
         parser = new PipelineRuleParser(functionRegistry);
         // initialize before every test!
         actionsTriggered.set(false);
@@ -135,7 +137,8 @@ public class BaseParserTest {
 
     protected String ruleForTest() {
         try {
-            final URL resource = this.getClass().getResource(name.getMethodName().concat(".txt"));
+            final var testMethodName = testInfo.getTestMethod().map(Method::getName).orElseThrow();
+            final URL resource = this.getClass().getResource(testMethodName.concat(".txt"));
             final Path path = Paths.get(resource.toURI());
             final byte[] bytes = Files.readAllBytes(path);
             return new String(bytes, StandardCharsets.UTF_8);

@@ -64,10 +64,9 @@ import org.graylog2.plugin.TestMessageFactory;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -79,17 +78,17 @@ import static com.google.common.collect.ImmutableList.of;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.plugins.pipelineprocessor.functions.FunctionsSnippetsTest.GRAYLOG_EPOCH;
 import static org.graylog.plugins.pipelineprocessor.parser.RuleContentType.JAVASCRIPT_MODULE;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
-public class PipelineRuleParserTest extends BaseParserTest {
+class PipelineRuleParserTest extends BaseParserTest {
     private MessageFactory messageFactory = new TestMessageFactory();
 
-    @BeforeClass
+    @BeforeAll
     public static void registerFunctions() {
         final Map<String, Function<?>> functions = commonFunctions();
         functions.put("nein", new NeinFunction());
@@ -125,7 +124,7 @@ public class PipelineRuleParserTest extends BaseParserTest {
         functionRegistry = new FunctionRegistry(functions);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         parser = null;
     }
@@ -135,51 +134,48 @@ public class PipelineRuleParserTest extends BaseParserTest {
     }
 
     @Test
-    public void basicRule() throws Exception {
+    void basicRule() throws Exception {
         final Rule rule = parseRuleWithOptionalCodegen();
-        Assert.assertNotNull("rule should be successfully parsed", rule);
+        assertNotNull(rule, "rule should be successfully parsed");
     }
 
     @Test
-    public void undeclaredIdentifier() throws Exception {
+    void undeclaredIdentifier() throws Exception {
         try {
             parseRuleWithOptionalCodegen();
             fail("should throw error: undeclared variable x");
         } catch (ParseException e) {
-            assertEquals(2,
-                    e.getErrors().size()); // undeclared var and incompatible type, but we only care about the undeclared one here
-            assertTrue("Should find error UndeclaredVariable",
-                    e.getErrors().stream().anyMatch(error -> error instanceof UndeclaredVariable));
+            assertEquals(2, e.getErrors().size()); // undeclared var and incompatible type, but we only care about the undeclared one here
+            assertTrue(e.getErrors().stream().anyMatch(error -> error instanceof UndeclaredVariable), "Should find error UndeclaredVariable");
         }
     }
 
     @Test
-    public void declaredFunction() throws Exception {
-        assertNotNull("Should not fail to resolve function 'false'", parseRuleWithOptionalCodegen());
+    void declaredFunction() throws Exception {
+        assertNotNull(parseRuleWithOptionalCodegen(), "Should not fail to resolve function 'false'");
     }
 
     @Test
-    public void undeclaredFunction() throws Exception {
+    void undeclaredFunction() throws Exception {
         try {
             parseRuleWithOptionalCodegen();
             fail("should throw error: undeclared function 'unknown'");
         } catch (ParseException e) {
-            assertTrue("Should find error UndeclaredFunction",
-                    e.getErrors().stream().anyMatch(input -> input instanceof UndeclaredFunction));
+            assertTrue(e.getErrors().stream().anyMatch(input -> input instanceof UndeclaredFunction), "Should find error UndeclaredFunction");
         }
     }
 
     @Test
-    public void singleArgFunction() throws Exception {
+    void singleArgFunction() throws Exception {
         final Rule rule = parseRuleWithOptionalCodegen();
         final Message message = evaluateRule(rule);
 
         assertNotNull(message);
-        assertTrue("actions should have triggered", actionsTriggered.get());
+        assertTrue(actionsTriggered.get(), "actions should have triggered");
     }
 
     @Test
-    public void positionalArguments() throws Exception {
+    void positionalArguments() throws Exception {
         final Rule rule = parseRuleWithOptionalCodegen();
         evaluateRule(rule);
 
@@ -187,33 +183,32 @@ public class PipelineRuleParserTest extends BaseParserTest {
     }
 
     @Test
-    public void inferVariableType() throws Exception {
+    void inferVariableType() throws Exception {
         final Rule rule = parseRuleWithOptionalCodegen();
         evaluateRule(rule);
     }
 
     @Test
-    public void invalidArgType() throws Exception {
+    void invalidArgType() throws Exception {
         try {
             parseRuleWithOptionalCodegen();
             fail("Should have thrown parse exception");
         } catch (ParseException e) {
             assertEquals(2, e.getErrors().size());
-            assertTrue("Should only find IncompatibleArgumentType errors",
-                    e.getErrors().stream().allMatch(input -> input instanceof IncompatibleArgumentType));
+            assertTrue(e.getErrors().stream().allMatch(input -> input instanceof IncompatibleArgumentType), "Should only find IncompatibleArgumentType errors");
         }
     }
 
     @Test
-    public void booleanValuedFunctionAsCondition() throws Exception {
+    void booleanValuedFunctionAsCondition() throws Exception {
         final Rule rule = parseRuleWithOptionalCodegen();
 
         evaluateRule(rule);
-        assertTrue("actions should have triggered", actionsTriggered.get());
+        assertTrue(actionsTriggered.get(), "actions should have triggered");
     }
 
     @Test
-    public void messageRef() throws Exception {
+    void messageRef() throws Exception {
         final Rule rule = parseRuleWithOptionalCodegen();
         Message message = messageFactory.createMessage("hello test", "source", DateTime.now(DateTimeZone.UTC));
         message.addField("responseCode", 500);
@@ -224,7 +219,7 @@ public class PipelineRuleParserTest extends BaseParserTest {
     }
 
     @Test
-    public void messageRefQuotedField() throws Exception {
+    void messageRefQuotedField() throws Exception {
         final Rule rule = parseRuleWithOptionalCodegen();
         Message message = messageFactory.createMessage("hello test", "source", DateTime.now(DateTimeZone.UTC));
         message.addField("@specialfieldname", "string");
@@ -234,7 +229,7 @@ public class PipelineRuleParserTest extends BaseParserTest {
     }
 
     @Test
-    public void optionalArguments() throws Exception {
+    void optionalArguments() throws Exception {
         final Rule rule = parseRuleWithOptionalCodegen();
 
         Message message = messageFactory.createMessage("hello test", "source", DateTime.now(DateTimeZone.UTC));
@@ -243,7 +238,7 @@ public class PipelineRuleParserTest extends BaseParserTest {
     }
 
     @Test
-    public void optionalParamsMustBeNamed() throws Exception {
+    void optionalParamsMustBeNamed() throws Exception {
         try {
             parseRuleWithOptionalCodegen();
             fail("Should have thrown parse exception");
@@ -255,7 +250,7 @@ public class PipelineRuleParserTest extends BaseParserTest {
     }
 
     @Test
-    public void requiredParameter() {
+    void requiredParameter() {
         try {
             parseRuleWithOptionalCodegen();
             fail("Should have thrown parse exception");
@@ -266,7 +261,7 @@ public class PipelineRuleParserTest extends BaseParserTest {
     }
 
     @Test
-    public void mapArrayLiteral() {
+    void mapArrayLiteral() {
         final Rule rule = parseRuleWithOptionalCodegen();
         Message message = messageFactory.createMessage("hello test", "source", DateTime.now(DateTimeZone.UTC));
         evaluateRule(rule, message);
@@ -274,21 +269,21 @@ public class PipelineRuleParserTest extends BaseParserTest {
     }
 
     @Test
-    public void typedFieldAccess() throws Exception {
+    void typedFieldAccess() throws Exception {
         final Rule rule = parseRuleWithOptionalCodegen();
         evaluateRule(rule, messageFactory.createMessage("hallo", "test", DateTime.now(DateTimeZone.UTC)));
-        assertTrue("condition should be true", actionsTriggered.get());
+        assertTrue(actionsTriggered.get(), "condition should be true");
     }
 
     @Test
-    public void nestedFieldAccess() throws Exception {
+    void nestedFieldAccess() throws Exception {
         final Rule rule = parseRuleWithOptionalCodegen();
         evaluateRule(rule, messageFactory.createMessage("hello", "world", DateTime.now(DateTimeZone.UTC)));
-        assertTrue("condition should be true", actionsTriggered.get());
+        assertTrue(actionsTriggered.get(), "condition should be true");
     }
 
     @Test
-    public void pipelineDeclaration() throws Exception {
+    void pipelineDeclaration() throws Exception {
         final List<Pipeline> pipelines = parser.parsePipelines(ruleForTest());
         assertEquals(1, pipelines.size());
         final Pipeline pipeline = Iterables.getOnlyElement(pipelines);
@@ -303,20 +298,19 @@ public class PipelineRuleParserTest extends BaseParserTest {
 
         assertEquals(Stage.Match.EITHER, stage2.match());
         assertEquals(2, stage2.stage());
-        assertArrayEquals(new Object[]{"parse_cisco_time", "extract_src_dest", "normalize_src_dest", "lookup_ips", "resolve_ips"},
-                stage2.ruleReferences().toArray());
+        assertArrayEquals(new Object[]{"parse_cisco_time", "extract_src_dest", "normalize_src_dest", "lookup_ips", "resolve_ips"}, stage2.ruleReferences().toArray());
     }
 
     @Test
-    public void indexedAccess() {
+    void indexedAccess() {
         final Rule rule = parseRuleWithOptionalCodegen();
 
         evaluateRule(rule, messageFactory.createMessage("hallo", "test", DateTime.now(DateTimeZone.UTC)));
-        assertTrue("condition should be true", actionsTriggered.get());
+        assertTrue(actionsTriggered.get(), "condition should be true");
     }
 
     @Test
-    public void indexedAccessWrongType() {
+    void indexedAccessWrongType() {
         try {
             parseRuleWithOptionalCodegen();
             fail("Should have thrown parse exception");
@@ -327,7 +321,7 @@ public class PipelineRuleParserTest extends BaseParserTest {
     }
 
     @Test
-    public void indexedAccessWrongIndexType() {
+    void indexedAccessWrongIndexType() {
         try {
             parseRuleWithOptionalCodegen();
             fail("Should have thrown parse exception");
@@ -338,7 +332,7 @@ public class PipelineRuleParserTest extends BaseParserTest {
     }
 
     @Test
-    public void arithmetic() {
+    void arithmetic() {
         final Rule rule = parseRuleWithOptionalCodegen();
         evaluateRule(rule);
 
@@ -346,7 +340,7 @@ public class PipelineRuleParserTest extends BaseParserTest {
     }
 
     @Test
-    public void mismatchedNumericTypes() {
+    void mismatchedNumericTypes() {
         try {
             parseRuleWithOptionalCodegen();
             fail("Should have thrown parse exception");
@@ -357,7 +351,7 @@ public class PipelineRuleParserTest extends BaseParserTest {
     }
 
     @Test
-    public void booleanNot() {
+    void booleanNot() {
         final Rule rule = parseRuleWithOptionalCodegen();
         evaluateRule(rule);
 
@@ -365,7 +359,7 @@ public class PipelineRuleParserTest extends BaseParserTest {
     }
 
     @Test
-    public void dateArithmetic() {
+    void dateArithmetic() {
         final InstantMillisProvider clock = new InstantMillisProvider(GRAYLOG_EPOCH);
         DateTimeUtils.setCurrentMillisProvider(clock);
         try {
@@ -380,7 +374,7 @@ public class PipelineRuleParserTest extends BaseParserTest {
     }
 
     @Test
-    public void invalidDateAddition() {
+    void invalidDateAddition() {
         try {
             parseRuleWithOptionalCodegen();
             fail("Should have thrown parse exception");
@@ -391,7 +385,7 @@ public class PipelineRuleParserTest extends BaseParserTest {
     }
 
     @Test
-    public void issue185() {
+    void issue185() {
         try {
             parseRuleWithOptionalCodegen();
             fail("Should have thrown parse exception");
@@ -402,7 +396,7 @@ public class PipelineRuleParserTest extends BaseParserTest {
     }
 
     @Test
-    public void invalidIdentifier() {
+    void invalidIdentifier() {
         try {
             parseRuleWithOptionalCodegen();
             fail("Should have thrown parse exception");
@@ -413,7 +407,7 @@ public class PipelineRuleParserTest extends BaseParserTest {
     }
 
     @Test
-    public void jsTest() {
+    void jsTest() {
         final var source = """
                 export default {
                     "name" : "javascript test",
