@@ -14,23 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.process;
+import { useQuery } from '@tanstack/react-query';
 
-import com.github.oxo42.stateless4j.delegates.Trace;
-import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
-import org.graylog.datanode.opensearch.statemachine.OpensearchState;
-import org.graylog.datanode.opensearch.statemachine.tracer.StateMachineTracer;
+import { MessagesActions } from 'stores/messages/MessagesStore';
+import type { Message } from 'views/components/messagelist/Types';
 
-public interface ManagableProcess<T, EVENT, STATE> {
+const useMessage = (id: string, index: string, enabled = true): { data: Message | undefined, isInitialLoading: boolean } => {
+  const { data, isInitialLoading } = useQuery({
+    queryKey: ['messages', index, id],
+    queryFn: () => MessagesActions.loadMessage(index, id),
+    enabled,
+  });
 
-    void configure(T configuration);
+  return { data, isInitialLoading };
+};
 
-    void start();
-
-    void stop();
-
-    void onEvent(EVENT event);
-
-    boolean isInState(STATE state);
-
-}
+export default useMessage;
