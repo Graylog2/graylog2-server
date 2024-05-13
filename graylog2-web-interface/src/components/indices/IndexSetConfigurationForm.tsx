@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState, useCallback } from 'react';
-import type { Dispatch, SetStateAction } from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import { Formik, Form, Field } from 'formik';
@@ -350,9 +349,9 @@ const IndexSetConfigurationForm = ({
                 ) : (
                   <>
                     <ConfigSegmentsTitle>Rotation and Retention</ConfigSegmentsTitle>
-                    <SegmentedControl data={retentionConfigSegments}
-                                      value={selectedRetentionSegment}
-                                      handleChange={setSelectedRetentionSegment as Dispatch<SetStateAction<string>>} />
+                    <SegmentedControl<RetentionConfigSegment> data={retentionConfigSegments}
+                                                              value={selectedRetentionSegment}
+                                                              onChange={setSelectedRetentionSegment} />
 
                     {selectedRetentionSegment === 'data_tiering' ? (
                       <ConfigSegment>

@@ -1,0 +1,15 @@
+rule "remove_single_field"
+when true
+then
+  set_field(field: "a.1", value: "a.1");
+  set_field(field: "a_1", value: "a_1");
+  set_field(field: "f1", value: "f1");
+  set_field(field: "f2", value: "f2");
+
+  remove_single_field(field:"a.1");
+  remove_single_field(field:"f1");
+
+  // invalid - should be NO-OP
+  remove_single_field(field:"f.");
+  remove_single_field(field:"dummy");
+end

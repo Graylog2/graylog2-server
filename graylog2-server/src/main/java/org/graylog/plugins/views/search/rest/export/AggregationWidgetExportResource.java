@@ -29,7 +29,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog.plugins.views.search.rest.export.response.AggregationWidgetExportResponse;
+import org.graylog.plugins.views.search.searchtypes.export.ExportTabularResultResponse;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.rest.MoreMediaTypes;
@@ -47,14 +47,18 @@ public class AggregationWidgetExportResource extends RestResource {
     @ApiOperation(value = "Export widget data")
     @POST
     @NoAuditEvent("Exporting widget data does not need audit event")
-    @Produces({MoreMediaTypes.TEXT_CSV, MediaType.APPLICATION_JSON, MoreMediaTypes.APPLICATION_YAML})
+    @Produces({MoreMediaTypes.TEXT_CSV,
+            MediaType.APPLICATION_JSON,
+            MoreMediaTypes.APPLICATION_YAML,
+            MediaType.APPLICATION_XML,
+            MoreMediaTypes.APPLICATION_XLS})
     @Path("/{filename}")
     public Response exportData(@ApiParam @Valid PivotResult pivotResult,
                                @HeaderParam("Accept") String mediaType,
                                @ApiParam("filename") @PathParam("filename") String filename) {
         return RestTools.respondWithFile(
                         filename,
-                        AggregationWidgetExportResponse.fromPivotResult(pivotResult),
+                        ExportTabularResultResponse.fromPivotResult(pivotResult),
                         MediaType.valueOf(mediaType))
                 .build();
     }

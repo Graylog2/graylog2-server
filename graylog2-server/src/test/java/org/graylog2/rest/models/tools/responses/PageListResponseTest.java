@@ -18,6 +18,7 @@ package org.graylog2.rest.models.tools.responses;
 
 import com.google.common.collect.ImmutableList;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.EntityDefaults;
 import org.graylog2.rest.resources.entities.Sorting;
@@ -46,7 +47,7 @@ class PageListResponseTest {
         assertThat(pageListResponse.paginationInfo().total()).isEqualTo(500);
         assertThat(pageListResponse.paginationInfo().perPage()).isEqualTo(5);
         assertThat(pageListResponse.sort()).isEqualTo("whatever");
-        assertThat(pageListResponse.order()).isEqualTo("asc");
+        assertThat(pageListResponse.order()).isEqualTo(SortOrder.ASCENDING);
         assertTrue(pageListResponse.elements().containsAll(ImmutableList.of("1", "2")));
         assertEquals(pageListResponse.attributes(), List.of(EntityAttribute.builder().title("some_attr").id("some_id").build()));
         assertEquals(pageListResponse.defaults(), EntityDefaults.builder().sort(Sorting.create("some_id", Sorting.Direction.ASC)).build());

@@ -47,6 +47,7 @@ export const prepareDataTieringConfig = (formValues: DataTieringFormValues, plug
   };
 
   const hotWarmDefaultValues = {
+    archive_before_deletion: false,
     warm_tier_enabled: false,
     warm_tier_repository_name: null,
   };
