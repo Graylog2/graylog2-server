@@ -112,8 +112,12 @@ public class MigrationStateMachineBuilderTest {
         stateMachine.fire(MigrationStep.SHOW_MIGRATION_SELECTION);
         verify(migrationActions).caAndRenewalPolicyExist();
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.MIGRATION_SELECTION_PAGE);
+        assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.SELECT_REMOTE_REINDEX_MIGRATION);
+        reset(migrationActions);
+        when(migrationActions.isCompatibleInPlaceMigrationVersion()).thenReturn(true);
         assertThat(stateMachine.getPermittedTriggers())
                 .containsOnly(MigrationStep.SELECT_ROLLING_UPGRADE_MIGRATION, MigrationStep.SELECT_REMOTE_REINDEX_MIGRATION);
+        verify(migrationActions, times(1)).isCompatibleInPlaceMigrationVersion();
         verifyNoMoreInteractions(migrationActions);
     }
 

@@ -61,6 +61,11 @@ public class MigrationActionsAdapter implements MigrationActions {
     }
 
     @Override
+    public boolean isCompatibleInPlaceMigrationVersion() {
+        return true;
+    }
+
+    @Override
     public void runDirectoryCompatibilityCheck() {
     }
 

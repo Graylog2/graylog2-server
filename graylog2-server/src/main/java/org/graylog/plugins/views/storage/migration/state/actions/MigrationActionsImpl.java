@@ -35,11 +35,11 @@ import org.graylog2.cluster.preflight.DataNodeProvisioningService;
 import org.graylog2.indexer.datanode.ProxyRequestAdapter;
 import org.graylog2.indexer.datanode.RemoteReindexRequest;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
-import org.graylog2.indexer.migration.RemoteReindexMigration;
 import org.graylog2.plugin.GlobalMetricNames;
 import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.rest.resources.datanodes.DatanodeRestApiProxy;
+import org.graylog2.storage.providers.ElasticsearchVersionProvider;
 import org.graylog2.system.processing.control.ClusterProcessingControl;
 import org.graylog2.system.processing.control.ClusterProcessingControlFactory;
 import org.graylog2.system.processing.control.RemoteProcessingControlResource;
@@ -72,6 +72,7 @@ public class MigrationActionsImpl implements MigrationActions {
     private final MetricRegistry metricRegistry;
 
     private final DatanodeRestApiProxy datanodeProxy;
+    private final ElasticsearchVersionProvider searchVersionProvider;
     private final ObjectMapper objectMapper;
 
     @Inject
@@ -82,6 +83,7 @@ public class MigrationActionsImpl implements MigrationActions {
                                 final PreflightConfigService preflightConfigService,
                                 final MetricRegistry metricRegistry,
                                 final DatanodeRestApiProxy datanodeProxy,
+                                ElasticsearchVersionProvider searchVersionProvider,
                                 final ObjectMapper objectMapper) {
         this.clusterConfigService = clusterConfigService;
         this.nodeService = nodeService;
@@ -92,6 +94,7 @@ public class MigrationActionsImpl implements MigrationActions {
         this.preflightConfigService = preflightConfigService;
         this.metricRegistry = metricRegistry;
         this.datanodeProxy = datanodeProxy;
+        this.searchVersionProvider = searchVersionProvider;
         this.objectMapper = objectMapper;
     }
 
@@ -257,6 +260,11 @@ public class MigrationActionsImpl implements MigrationActions {
         final String user = getStateMachineContext().getActionArgumentOpt("user", String.class).orElse(null);
         final String password = getStateMachineContext().getActionArgumentOpt("password", String.class).orElse(null);
         getStateMachineContext().setResponse(migrationService.checkConnection(hostname, user, password));
+    }
+
+    @Override
+    public boolean isCompatibleInPlaceMigrationVersion() {
+        return !searchVersionProvider.get().isElasticsearch();
     }
 
     @Override
