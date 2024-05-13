@@ -21,7 +21,6 @@ import org.graylog.plugins.views.storage.migration.RemoteReindexResource;
 import org.graylog.security.rest.CAResource;
 import org.graylog.security.rest.CertificateRenewalResource;
 import org.graylog2.Configuration;
-import org.graylog2.bootstrap.preflight.web.resources.DataNodeProvisioningResource;
 import org.graylog2.contentstream.rest.ContentStreamResource;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.rest.resources.cluster.ClusterDeflectorResource;
@@ -163,7 +162,6 @@ public class RestResourcesModule extends Graylog2Module {
         addSystemRestResource(DataNodeManagementResource.class);
         addSystemRestResource(RemoteReindexResource.class);
         addSystemRestResource(CAResource.class);
-        addSystemRestResource(DataNodeProvisioningResource.class);
     }
 
     private void addDebugResources() {
