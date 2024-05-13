@@ -64,11 +64,6 @@ public class MigrationStateMachineBuilder {
         // remote reindexing branch of the migration
         config.configure(MigrationState.REMOTE_REINDEX_WELCOME_PAGE)
                 .onEntry(migrationActions::reindexUpgradeSelected)
-                .permit(MigrationStep.DISCOVER_NEW_DATANODES, MigrationState.PROVISION_DATANODE_CERTIFICATES_PAGE, () -> {
-                    LOG.info("Remote Reindexing selected");
-                });
-
-        config.configure(MigrationState.PROVISION_DATANODE_CERTIFICATES_PAGE)
                 .permitIf(MigrationStep.PROVISION_DATANODE_CERTIFICATES, MigrationState.PROVISION_DATANODE_CERTIFICATES_RUNNING, () -> !migrationActions.dataNodeStartupFinished(), migrationActions::provisionAndStartDataNodes)
                 .permitIf(MigrationStep.SHOW_DATA_MIGRATION_QUESTION, MigrationState.EXISTING_DATA_MIGRATION_QUESTION_PAGE, migrationActions::dataNodeStartupFinished);
 

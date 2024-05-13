@@ -123,15 +123,6 @@ public class MigrationStateMachineBuilderTest {
         stateMachine.fire(MigrationStep.SELECT_REMOTE_REINDEX_MIGRATION);
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.REMOTE_REINDEX_WELCOME_PAGE);
         verify(migrationActions).reindexUpgradeSelected();
-        assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.DISCOVER_NEW_DATANODES);
-        verifyNoMoreInteractions(migrationActions);
-    }
-
-    @Test
-    public void testProvisionDatanodeCertificatesPage() {
-        StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.REMOTE_REINDEX_WELCOME_PAGE);
-        stateMachine.fire(MigrationStep.DISCOVER_NEW_DATANODES);
-        assertThat(stateMachine.getState()).isEqualTo(MigrationState.PROVISION_DATANODE_CERTIFICATES_PAGE);
         assertThat(stateMachine.getPermittedTriggers()).containsOnly(MigrationStep.PROVISION_DATANODE_CERTIFICATES);
         verify(migrationActions, times(2)).dataNodeStartupFinished();
         reset(migrationActions);
@@ -143,7 +134,7 @@ public class MigrationStateMachineBuilderTest {
 
     @Test
     public void testProvisionDatanodeCertificatesRunning() {
-        StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.PROVISION_DATANODE_CERTIFICATES_PAGE);
+        StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.REMOTE_REINDEX_WELCOME_PAGE);
         stateMachine.fire(MigrationStep.PROVISION_DATANODE_CERTIFICATES);
         verify(migrationActions, times(1)).dataNodeStartupFinished();
         verify(migrationActions, times(1)).provisionAndStartDataNodes();
