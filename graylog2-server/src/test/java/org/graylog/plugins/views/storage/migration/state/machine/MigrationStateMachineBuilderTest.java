@@ -179,6 +179,7 @@ public class MigrationStateMachineBuilderTest {
     @Test
     public void testRollingUpgradeMigrationWelcomePage() {
         StateMachine<MigrationState, MigrationStep> stateMachine = getStateMachine(MigrationState.MIGRATION_SELECTION_PAGE);
+        when(migrationActions.isCompatibleInPlaceMigrationVersion()).thenReturn(true);
         stateMachine.fire(MigrationStep.SELECT_ROLLING_UPGRADE_MIGRATION);
         assertThat(stateMachine.getState()).isEqualTo(MigrationState.ROLLING_UPGRADE_MIGRATION_WELCOME_PAGE);
         verify(migrationActions).rollingUpgradeSelected();
