@@ -82,6 +82,7 @@ public class RestPermissions implements PluginPermissions {
     public static final String FIELDNAMES_READ = "fieldnames:read";
     public static final String GRANTS_OVERVIEW_READ = "grantsoverview:read";
     public static final String GRAYLOG_CA_CREATE = "graylog_ca:create";
+    public static final String GRAYLOG_CA_READ = "graylog_ca:read";
     public static final String INDEXERCLUSTER_READ = "indexercluster:read";
     public static final String INDEXRANGES_READ = "indexranges:read";
     public static final String INDEXRANGES_REBUILD = "indexranges:rebuild";
@@ -212,6 +213,7 @@ public class RestPermissions implements PluginPermissions {
             .add(create(DATANODE_OPENSEARCH_PROXY, ""))
             .add(create(DATANODE_REST_PROXY, ""))
             .add(create(GRAYLOG_CA_CREATE, ""))
+            .add(create(GRAYLOG_CA_READ, ""))
             .add(create(GRAYLOG_CA_CLIENTCERT_CREATE, ""))
             .add(create(GRAYLOG_CA_CLIENTCERT_DELETE, ""))
             .add(create(DECORATORS_CREATE, ""))

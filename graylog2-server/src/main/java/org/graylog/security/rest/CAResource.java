@@ -77,6 +77,7 @@ public class CAResource extends RestResource {
 
     @GET
     @ApiOperation("Returns the CA")
+    @RequiresPermissions(RestPermissions.GRAYLOG_CA_READ)
     public CA get() throws KeyStoreStorageException {
         return caService.get();
     }
