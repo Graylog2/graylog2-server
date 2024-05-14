@@ -28,13 +28,13 @@ import org.graylog.datanode.bindings.ConfigurationModule;
 import org.graylog.datanode.bindings.DatanodeConfigurationBindings;
 import org.graylog.datanode.bindings.GenericBindings;
 import org.graylog.datanode.bindings.GenericInitializerBindings;
+import org.graylog.datanode.bindings.OpensearchProcessBindings;
 import org.graylog.datanode.bindings.PreflightChecksBindings;
 import org.graylog.datanode.bindings.SchedulerBindings;
 import org.graylog2.bindings.NamedConfigParametersOverrideModule;
 import org.graylog2.bootstrap.preflight.MongoDBPreflightCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.graylog2.bootstrap.preflight.PreflightCheckService;
-import org.graylog2.configuration.PathConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.plugin.Plugin;
 import org.graylog2.plugin.Tools;
@@ -269,6 +269,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
         result.add(new GenericBindings(isMigrationCommand()));
         result.add(new SchedulerBindings());
         result.add(new GenericInitializerBindings());
+        result.add(new OpensearchProcessBindings());
         result.add(new DatanodeConfigurationBindings());
 
         return result;
