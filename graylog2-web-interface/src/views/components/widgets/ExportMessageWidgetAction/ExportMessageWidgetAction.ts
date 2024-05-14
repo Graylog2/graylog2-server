@@ -21,7 +21,7 @@ import ExportMessageWidgetActionComponent
   from 'views/components/widgets/ExportMessageWidgetAction/ExportMessageWidgetActionComponent';
 
 const ExportMessageWidgetAction: WidgetActionType = {
-  type: 'export-widget-action',
+  type: 'export-messages-widget-action',
   position: 'menu',
   isHidden: (w: Widget) => (w.type !== MessagesWidget.type),
   component: ExportMessageWidgetActionComponent,
