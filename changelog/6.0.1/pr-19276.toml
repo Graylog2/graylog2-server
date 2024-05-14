@@ -1,0 +1,4 @@
+type="f"
+message="Fixing full page refreshes for menu items with href."
+
+pulls=["19276"]

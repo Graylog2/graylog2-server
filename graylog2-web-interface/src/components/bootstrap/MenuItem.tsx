@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useCallback } from 'react';
 import styled, { css } from 'styled-components';
+import { Link } from 'react-router-dom';
 
 import Icon from 'components/common/Icon';
 
@@ -82,11 +83,7 @@ const CustomMenuItem = <T, >({ children, className, disabled, divider, eventKey,
 
   if (href) {
     return (
-      <StyledMenuItem component="a"
-                      href={href}
-                      target={target}
-                      rel={rel}
-                      {...sharedProps}>
+      <StyledMenuItem component={Link} to={href} rel={rel} target={target} {...sharedProps}>
         {children}
       </StyledMenuItem>
     );

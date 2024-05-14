@@ -219,6 +219,7 @@ describe('Aggregation Widget', () => {
       await userEvent.click(absoluteTabButton);
 
       const applyTimeRangeChangesButton = await screen.findByRole('button', { name: 'Update time range' });
+      await waitFor(() => expect(applyTimeRangeChangesButton).not.toBeDisabled());
       await userEvent.click(applyTimeRangeChangesButton);
 
       const timeRangeDisplay = await screen.findByLabelText('Search Time Range, Opens Time Range Selector On Click');
