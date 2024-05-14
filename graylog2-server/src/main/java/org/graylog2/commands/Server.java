@@ -26,6 +26,7 @@ import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.spi.Message;
 import com.mongodb.MongoException;
+import jakarta.inject.Inject;
 import org.graylog.enterprise.EnterpriseModule;
 import org.graylog.events.EventsModule;
 import org.graylog.events.processor.EventDefinitionConfiguration;
@@ -109,10 +110,9 @@ import org.graylog2.storage.VersionAwareStorageModule;
 import org.graylog2.streams.StreamsModule;
 import org.graylog2.system.processing.ProcessingStatusConfig;
 import org.graylog2.system.shutdown.GracefulShutdown;
+import org.graylog2.telemetry.TelemetryModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -212,7 +212,8 @@ public class Server extends ServerBootstrap {
                 new TracingModule(),
                 new DataTieringModule(),
                 new DatanodeMigrationBindings(),
-                new CaModule()
+                new CaModule(),
+                new TelemetryModule()
         );
 
         modules.add(new FieldTypeManagementModule());
