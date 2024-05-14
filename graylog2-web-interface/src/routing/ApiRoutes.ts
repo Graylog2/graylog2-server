@@ -276,6 +276,7 @@ const ApiRoutes = {
     delete: (streamId: string) => ({ url: `/streams/${streamId}` }),
     pause: (streamId: string) => ({ url: `/streams/${streamId}/pause` }),
     resume: (streamId: string) => ({ url: `/streams/${streamId}/resume` }),
+    stream_connected_pipelines: (streamId: string) => ({ url: `/streams/${streamId}/pipelines` }),
     testMatch: (streamId: string) => ({ url: `/streams/${streamId}/testMatch` }),
   },
   StreamOutputsApiController: {

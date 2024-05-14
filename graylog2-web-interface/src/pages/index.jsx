@@ -96,6 +96,7 @@ const StartPage = loadAsync(() => import('./StartPage'));
 const StreamEditPage = loadAsync(() => import('./StreamEditPage'));
 const StreamOutputsPage = loadAsync(() => import('./StreamOutputsPage'));
 const StreamsPage = loadAsync(() => import('./StreamsPage'));
+const StreamDetailsPage = loadAsync(() => import('./StreamDetailsPage'));
 const SystemOutputsPage = loadAsync(() => import('./SystemOutputsPage'));
 const SystemOverviewPage = loadAsync(() => import('./SystemOverviewPage'));
 const SystemLogsPage = loadAsync(() => import('./SystemLogsPage'));
@@ -187,6 +188,7 @@ export {
   SimulatorPage,
   StartPage,
   StreamEditPage,
+  StreamDetailsPage,
   StreamOutputsPage,
   StreamsPage,
   SystemOutputsPage,
