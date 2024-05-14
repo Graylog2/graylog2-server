@@ -20,14 +20,12 @@ import jakarta.inject.Inject;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.graylog2.datatiering.DataTieringConfig;
 import org.graylog2.datatiering.hotonly.HotOnlyDataTieringConfig;
-import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.SimpleIndexSetConfig;
 import org.graylog2.indexer.indexset.template.IndexSetTemplateConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig;
 import org.graylog2.migrations.MaintenanceStrategiesHelper;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
-
-import java.util.concurrent.TimeUnit;
 
 public class IndexSetDefaultTemplateConfigFactory {
 
@@ -51,8 +49,7 @@ public class IndexSetDefaultTemplateConfigFactory {
                 .replicas(elasticsearchConfiguration.getReplicas())
                 .indexOptimizationDisabled(elasticsearchConfiguration.isDisableIndexOptimization())
                 .indexOptimizationMaxNumSegments(elasticsearchConfiguration.getIndexOptimizationMaxNumSegments())
-                .fieldTypeRefreshInterval(IndexSetConfig.DEFAULT_FIELD_TYPE_REFRESH_INTERVAL.getStandardSeconds())
-                .fieldTypeRefreshIntervalUnit(TimeUnit.SECONDS)
+                .fieldTypeRefreshInterval(SimpleIndexSetConfig.DEFAULT_FIELD_TYPE_REFRESH_INTERVAL)
                 .rotationStrategyClass(rotationConfig.left)
                 .rotationStrategy(rotationConfig.right)
                 .retentionStrategyClass(retentionConfig.left)

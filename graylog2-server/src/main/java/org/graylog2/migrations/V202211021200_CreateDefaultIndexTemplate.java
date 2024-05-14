@@ -22,15 +22,16 @@ import org.graylog2.configuration.IndexSetDefaultTemplateConfigFactory;
 import org.graylog2.configuration.IndexSetsDefaultConfiguration;
 import org.graylog2.datatiering.DataTieringConfig;
 import org.graylog2.datatiering.fallback.PlaceholderDataTieringConfig;
-import org.graylog2.indexer.indexset.template.IndexSetDefaultTemplate;
 import org.graylog2.indexer.indexset.template.IndexSetDefaultTemplateService;
 import org.graylog2.indexer.indexset.template.IndexSetTemplate;
 import org.graylog2.indexer.indexset.template.IndexSetTemplateConfig;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.ZonedDateTime;
+import java.util.Optional;
 
 /**
  * Create initial index set default configuration based on {@link ElasticsearchConfiguration} values.
@@ -59,8 +60,8 @@ public class V202211021200_CreateDefaultIndexTemplate extends Migration {
 
     @Override
     public void upgrade() {
-        IndexSetDefaultTemplate indexSetDefaultTemplate = clusterConfigService.get(IndexSetDefaultTemplate.class);
-        if (indexSetDefaultTemplate == null) {
+        Optional<IndexSetTemplate> defaultIndexSetTemplate = indexSetDefaultTemplateService.getDefaultIndexSetTemplate();
+        if (defaultIndexSetTemplate.isEmpty()) {
             IndexSetsDefaultConfiguration legacyDefaultConfig = clusterConfigService.get(IndexSetsDefaultConfiguration.class);
             if (legacyDefaultConfig == null) {
                 saveDefaultTemplate(factory.create());
@@ -78,14 +79,15 @@ public class V202211021200_CreateDefaultIndexTemplate extends Migration {
         if (legacyDefaultConfig.dataTiering() instanceof PlaceholderDataTieringConfig) {
             dataTieringConfig = factory.getDataTieringConfig(legacyDefaultConfig.rotationStrategyConfig());
         }
+
         return IndexSetTemplateConfig.builder()
                 .indexAnalyzer(legacyDefaultConfig.indexAnalyzer())
                 .shards(legacyDefaultConfig.shards())
                 .replicas(legacyDefaultConfig.replicas())
                 .indexOptimizationMaxNumSegments(legacyDefaultConfig.indexOptimizationMaxNumSegments())
                 .indexOptimizationDisabled(legacyDefaultConfig.indexOptimizationDisabled())
-                .fieldTypeRefreshInterval(legacyDefaultConfig.fieldTypeRefreshInterval())
-                .fieldTypeRefreshIntervalUnit(legacyDefaultConfig.fieldTypeRefreshIntervalUnit())
+                .fieldTypeRefreshInterval(Duration.standardSeconds(
+                        legacyDefaultConfig.fieldTypeRefreshIntervalUnit().toSeconds(legacyDefaultConfig.fieldTypeRefreshInterval())))
                 .rotationStrategyClass(legacyDefaultConfig.rotationStrategyClass())
                 .rotationStrategy(legacyDefaultConfig.rotationStrategyConfig())
                 .retentionStrategyClass(legacyDefaultConfig.retentionStrategyClass())

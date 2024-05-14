@@ -45,10 +45,12 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.datatiering.DataTieringConfig;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.IndexSetStatsCreator;
 import org.graylog2.indexer.IndexSetValidator;
+import org.graylog2.indexer.IndexSetValidator.Violation;
 import org.graylog2.indexer.indexset.DefaultIndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
@@ -238,9 +240,10 @@ public class IndexSetsResource extends RestResource {
     public IndexSetSummary save(@ApiParam(name = "Index set configuration", required = true)
                                 @Valid @NotNull IndexSetSummary indexSet) {
         try {
+            checkDataTieringNotNull(indexSet.useLegacyRotation(), indexSet.dataTiering());
             final IndexSetConfig indexSetConfig = indexSet.toIndexSetConfig(true);
 
-            final Optional<IndexSetValidator.Violation> violation = indexSetValidator.validate(indexSetConfig);
+            final Optional<Violation> violation = indexSetValidator.validate(indexSetConfig);
             if (violation.isPresent()) {
                 throw new BadRequestException(violation.get().message());
             }
@@ -278,9 +281,11 @@ public class IndexSetsResource extends RestResource {
             throw new ClientErrorException("Default index set must be writable.", Response.Status.CONFLICT);
         }
 
+        checkDataTieringNotNull(updateRequest.useLegacyRotation(), updateRequest.dataTiering());
+
         final IndexSetConfig indexSetConfig = updateRequest.toIndexSetConfig(id, oldConfig);
 
-        final Optional<IndexSetValidator.Violation> violation = indexSetValidator.validate(indexSetConfig);
+        final Optional<Violation> violation = indexSetValidator.validate(indexSetConfig);
         if (violation.isPresent()) {
             throw new BadRequestException(violation.get().message());
         }
@@ -288,6 +293,13 @@ public class IndexSetsResource extends RestResource {
         final IndexSetConfig savedObject = indexSetService.save(indexSetConfig);
 
         return IndexSetSummary.fromIndexSetConfig(savedObject, isDefaultSet);
+    }
+
+    private void checkDataTieringNotNull(Boolean useLegacyRotation, DataTieringConfig dataTieringConfig) {
+        Violation violation = indexSetValidator.checkDataTieringNotNull(useLegacyRotation, dataTieringConfig);
+        if (violation != null) {
+            throw new BadRequestException(violation.message());
+        }
     }
 
     @PUT

@@ -18,24 +18,26 @@ package org.graylog2.migrations;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.configuration.IndexSetDefaultTemplateConfigFactory;
 import org.graylog2.configuration.IndexSetsDefaultConfiguration;
 import org.graylog2.datatiering.hotonly.HotOnlyDataTieringConfig;
-import org.graylog2.indexer.indexset.template.IndexSetDefaultTemplate;
 import org.graylog2.indexer.indexset.template.IndexSetDefaultTemplateService;
 import org.graylog2.indexer.indexset.template.IndexSetTemplate;
 import org.graylog2.indexer.indexset.template.IndexSetTemplateConfig;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategy;
-import org.graylog2.indexer.rotation.tso.IndexLifetimeConfig;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.joda.time.Period;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.migrations.V202211021200_CreateDefaultIndexTemplate.TEMPLATE_DESCRIPTION;
@@ -52,18 +54,8 @@ class V202211021200_CreateDefaultIndexTemplateTest {
                 "replicas": 0,
                 "index_optimization_max_num_segments": 1,
                 "index_optimization_disabled": false,
-                "field_type_refresh_interval": 5,
-                "field_type_refresh_interval_unit": "SECONDS",
                 "rotation_strategy_class": "org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy",
-                "rotation_strategy_config": {
-                  "type": "org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig",
-                  "max_docs_per_index": 10000000
-                },
                 "retention_strategy_class": "org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy",
-                "retention_strategy_config": {
-                  "type": "org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig",
-                  "max_number_of_indices": 5
-                },
                 %s
                 "retention_strategy": {
                   "type": "org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig",
@@ -75,7 +67,7 @@ class V202211021200_CreateDefaultIndexTemplateTest {
                 }
               }
             """;
-    public static final String CONFIG_WITHOUT_DATA_TIERING = CONFIG.formatted("");
+    private static final String CONFIG_WITHOUT_DATA_TIERING = CONFIG.formatted("");
     private final static String DATA_TIERING_CONFIG = """
             "data_tiering": {
                   "type": "hot_only",
@@ -83,12 +75,14 @@ class V202211021200_CreateDefaultIndexTemplateTest {
                   "index_lifetime_max": "P40D"
                 },
             """;
-    public static final String CONFIG_WITH_DATA_TIERING = CONFIG.formatted(DATA_TIERING_CONFIG);
-    public static final String CONFIG_USE_LEGACY_FALSE = CONFIG.formatted(DATA_TIERING_CONFIG +
+    private static final String CONFIG_WITH_DATA_TIERING = CONFIG.formatted(DATA_TIERING_CONFIG);
+    private static final String CONFIG_USE_LEGACY_FALSE = CONFIG.formatted(DATA_TIERING_CONFIG +
             """
                     "use_legacy_rotation": false,""");
+    private static final Period MIN_LIFETIME_DAYS = Period.days(1);
+    private static final Period MAX_LIFETIME_DAYS = Period.days(2);
 
-    final ObjectMapper objectMapper = new ObjectMapperProvider().get();
+    private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
     @Mock
     private ElasticsearchConfiguration elasticsearchConfiguration;
     @Mock
@@ -109,7 +103,7 @@ class V202211021200_CreateDefaultIndexTemplateTest {
                 defaultConfigurationFactory,
                 indexSetDefaultTemplateService
         );
-        when(clusterConfigService.get(IndexSetDefaultTemplate.class)).thenReturn(null);
+        when(indexSetDefaultTemplateService.getDefaultIndexSetTemplate()).thenReturn(Optional.empty());
     }
 
     @Test
@@ -125,11 +119,12 @@ class V202211021200_CreateDefaultIndexTemplateTest {
 
     @Test
     void testDefaultConfigWithoutDataTieringExists() throws JsonProcessingException {
+        mockLifeTimeDaysElasticConfig();
         when(clusterConfigService.get(IndexSetsDefaultConfiguration.class)).thenReturn(readLegacyConfig(CONFIG_WITHOUT_DATA_TIERING));
         IndexSetTemplateConfig defaultConfiguration = readConfig(CONFIG_WITHOUT_DATA_TIERING).toBuilder()
                 .dataTiering(HotOnlyDataTieringConfig.builder()
-                        .indexLifetimeMin(IndexLifetimeConfig.DEFAULT_LIFETIME_MIN)
-                        .indexLifetimeMax(IndexLifetimeConfig.DEFAULT_LIFETIME_MAX)
+                        .indexLifetimeMin(MIN_LIFETIME_DAYS)
+                        .indexLifetimeMax(MAX_LIFETIME_DAYS)
                         .build())
                 .useLegacyRotation(true)
                 .build();
@@ -167,16 +162,27 @@ class V202211021200_CreateDefaultIndexTemplateTest {
     }
 
     private IndexSetsDefaultConfiguration readLegacyConfig(String json) throws JsonProcessingException {
-        return objectMapper.readValue(json, IndexSetsDefaultConfiguration.class);
+        ObjectNode node = objectMapper.readValue(json, ObjectNode.class);
+        node.put("field_type_refresh_interval", 5);
+        node.put("field_type_refresh_interval_unit", "SECONDS");
+        return objectMapper.convertValue(node, IndexSetsDefaultConfiguration.class);
     }
 
     private IndexSetTemplateConfig readConfig(String json) throws JsonProcessingException {
-        return objectMapper.readValue(json, IndexSetTemplateConfig.class);
+        ObjectNode node = objectMapper.readValue(json, ObjectNode.class);
+        node.put("field_type_refresh_interval", 5000);
+        return objectMapper.convertValue(node, IndexSetTemplateConfig.class);
     }
 
     private void mockElasticConfig() {
         when(elasticsearchConfiguration.getRotationStrategy()).thenReturn(SizeBasedRotationStrategy.NAME);
         when(elasticsearchConfiguration.getRetentionStrategy()).thenReturn(DeletionRetentionStrategy.NAME);
         when(elasticsearchConfiguration.getAnalyzer()).thenReturn("analyzer");
+        mockLifeTimeDaysElasticConfig();
+    }
+
+    private void mockLifeTimeDaysElasticConfig() {
+        when(elasticsearchConfiguration.getTimeSizeOptimizingRetentionMinLifeTime()).thenReturn(MIN_LIFETIME_DAYS);
+        when(elasticsearchConfiguration.getTimeSizeOptimizingRetentionMaxLifeTime()).thenReturn(MAX_LIFETIME_DAYS);
     }
 }

@@ -38,11 +38,7 @@ public record IndexSetTemplate(@JsonProperty(ID_FIELD_NAME) @Nullable @Id @Objec
     public static final String BUILT_IN_FIELD_NAME = "built_in";
     public static final String INDEX_SET_CONFIG_FIELD_NAME = "index_set_config";
 
-    public IndexSetTemplate(final IndexSetTemplateData data) {
-        this(null, data.title(), data.description(), data.builtIn(), data.indexSetConfig());
-    }
-
-    public IndexSetTemplate(final IndexSetTemplateData data, boolean isReadOnly) {
-        this(null, data.title(), data.description(), isReadOnly, data.indexSetConfig());
+    public IndexSetTemplate(final IndexSetTemplateRequest data) {
+        this(null, data.title(), data.description(), false, data.indexSetConfig());
     }
 }

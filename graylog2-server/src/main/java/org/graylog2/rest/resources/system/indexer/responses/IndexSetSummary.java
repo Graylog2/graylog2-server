@@ -37,12 +37,12 @@ import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.Optional;
 
-import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_DATA_TIERING;
+import static org.graylog2.indexer.indexset.SimpleIndexSetConfig.FIELD_DATA_TIERING;
 import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_PROFILE_ID;
-import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_RETENTION_STRATEGY;
-import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_RETENTION_STRATEGY_CLASS;
-import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_ROTATION_STRATEGY;
-import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_ROTATION_STRATEGY_CLASS;
+import static org.graylog2.indexer.indexset.SimpleIndexSetConfig.FIELD_RETENTION_STRATEGY;
+import static org.graylog2.indexer.indexset.SimpleIndexSetConfig.FIELD_RETENTION_STRATEGY_CLASS;
+import static org.graylog2.indexer.indexset.SimpleIndexSetConfig.FIELD_ROTATION_STRATEGY;
+import static org.graylog2.indexer.indexset.SimpleIndexSetConfig.FIELD_ROTATION_STRATEGY_CLASS;
 
 @AutoValue
 @WithBeanGetter

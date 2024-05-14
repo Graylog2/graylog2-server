@@ -20,13 +20,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.annotation.Nonnull;
 
-import static org.graylog2.indexer.indexset.template.IndexSetTemplate.BUILT_IN_FIELD_NAME;
 import static org.graylog2.indexer.indexset.template.IndexSetTemplate.DESCRIPTION_FIELD_NAME;
 import static org.graylog2.indexer.indexset.template.IndexSetTemplate.INDEX_SET_CONFIG_FIELD_NAME;
 import static org.graylog2.indexer.indexset.template.IndexSetTemplate.TITLE_FIELD_NAME;
 
-public record IndexSetTemplateData(@JsonProperty(TITLE_FIELD_NAME) String title,
-                                   @JsonProperty(DESCRIPTION_FIELD_NAME) String description,
-                                   @JsonProperty(BUILT_IN_FIELD_NAME) Boolean builtIn,
-                                   @JsonProperty(INDEX_SET_CONFIG_FIELD_NAME) @Nonnull IndexSetTemplateConfig indexSetConfig) {
+public record IndexSetTemplateRequest(@JsonProperty(TITLE_FIELD_NAME) String title,
+                                      @JsonProperty(DESCRIPTION_FIELD_NAME) String description,
+                                      @JsonProperty(INDEX_SET_CONFIG_FIELD_NAME) @Nonnull IndexSetTemplateConfig indexSetConfig) {
 }

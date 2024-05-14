@@ -51,46 +51,44 @@ import static org.graylog2.shared.security.RestPermissions.INDEXSETS_READ;
 @JsonAutoDetect
 @DbEntity(collection = MongoIndexSetService.COLLECTION_NAME,
           readPermission = INDEXSETS_READ)
-public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
-    public static final String FIELD_INDEX_PREFIX = "index_prefix";
-    public static final String FIELD_CREATION_DATE = "creation_date";
-    public static final String FIELD_INDEX_TEMPLATE_TYPE = "index_template_type";
-    public static final String FIELD_REGULAR = "regular";
-    public static final String FIELD_PROFILE_ID = "field_type_profile";
-    public static final String FIELD_ROTATION_STRATEGY_CLASS = "rotation_strategy_class";
-    public static final String FIELD_ROTATION_STRATEGY = "rotation_strategy";
-    public static final String FIELD_RETENTION_STRATEGY_CLASS = "retention_strategy_class";
-    public static final String FIELD_RETENTION_STRATEGY = "retention_strategy";
-    public static final String FIELD_DATA_TIERING = "data_tiering";
+public abstract class IndexSetConfig implements Comparable<IndexSetConfig>, SimpleIndexSetConfig {
     public static final String INDEX_PREFIX_REGEX = "^[a-z0-9][a-z0-9_+-]*$";
-
     public static final String DEFAULT_INDEX_TEMPLATE_TYPE = MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE;
 
-    public static final Duration DEFAULT_FIELD_TYPE_REFRESH_INTERVAL = Duration.standardSeconds(5L);
+    public static final String FIELD_REGULAR = "regular";
+    public static final String FIELD_INDEX_PREFIX = "index_prefix";
+    public static final String FIELD_INDEX_MATCH_PATTERN = "index_match_pattern";
+    public static final String FIELD_INDEX_WILDCARD = "index_wildcard";
+    public static final String FIELD_CREATION_DATE = "creation_date";
+    public static final String FIELD_INDEX_TEMPLATE_NAME = "index_template_name";
+    public static final String FIELD_INDEX_TEMPLATE_TYPE = "index_template_type";
+    public static final String FIELD_TYPE_REFRESH_INTERVAL = "field_type_refresh_interval";
+    public static final String FIELD_CUSTOM_FIELD_MAPPINGS = "custom_field_mappings";
+    public static final String FIELD_PROFILE_ID = "field_type_profile";
 
     @JsonCreator
     public static IndexSetConfig create(@Id @ObjectId @JsonProperty("_id") @Nullable String id,
-                                        @JsonProperty("title") @NotBlank String title,
-                                        @JsonProperty("description") @Nullable String description,
-                                        @JsonProperty("writable") @Nullable Boolean isWritable,
+                                        @JsonProperty(FIELD_TITLE) @NotBlank String title,
+                                        @JsonProperty(FIELD_DESCRIPTION) @Nullable String description,
+                                        @JsonProperty(FIELD_WRITABLE) @Nullable Boolean isWritable,
                                         @JsonProperty(FIELD_REGULAR) @Nullable Boolean isRegular,
                                         @JsonProperty(FIELD_INDEX_PREFIX) @Pattern(regexp = INDEX_PREFIX_REGEX) String indexPrefix,
-                                        @JsonProperty("index_match_pattern") @Nullable String indexMatchPattern,
-                                        @JsonProperty("index_wildcard") @Nullable String indexWildcard,
-                                        @JsonProperty("shards") @Min(1) int shards,
-                                        @JsonProperty("replicas") @Min(0) int replicas,
+                                        @JsonProperty(FIELD_INDEX_MATCH_PATTERN) @Nullable String indexMatchPattern,
+                                        @JsonProperty(FIELD_INDEX_WILDCARD) @Nullable String indexWildcard,
+                                        @JsonProperty(FIELD_SHARDS) @Min(1) int shards,
+                                        @JsonProperty(FIELD_REPLICAS) @Min(0) int replicas,
                                         @JsonProperty(FIELD_ROTATION_STRATEGY_CLASS) @Nullable String rotationStrategyClass,
                                         @JsonProperty(FIELD_ROTATION_STRATEGY) @Nullable RotationStrategyConfig rotationStrategy,
                                         @JsonProperty(FIELD_RETENTION_STRATEGY_CLASS) @Nullable String retentionStrategyClass,
                                         @JsonProperty(FIELD_RETENTION_STRATEGY) @Nullable RetentionStrategyConfig retentionStrategy,
                                         @JsonProperty(FIELD_CREATION_DATE) @NotNull ZonedDateTime creationDate,
-                                        @JsonProperty("index_analyzer") @Nullable String indexAnalyzer,
-                                        @JsonProperty("index_template_name") @Nullable String indexTemplateName,
+                                        @JsonProperty(FIELD_INDEX_ANALYZER) @Nullable String indexAnalyzer,
+                                        @JsonProperty(FIELD_INDEX_TEMPLATE_NAME) @Nullable String indexTemplateName,
                                         @JsonProperty(FIELD_INDEX_TEMPLATE_TYPE) @Nullable String indexTemplateType,
-                                        @JsonProperty("index_optimization_max_num_segments") @Nullable Integer maxNumSegments,
-                                        @JsonProperty("index_optimization_disabled") @Nullable Boolean indexOptimizationDisabled,
-                                        @JsonProperty("field_type_refresh_interval") @Nullable Duration fieldTypeRefreshInterval,
-                                        @JsonProperty("custom_field_mappings") @Nullable CustomFieldMappings customFieldMappings,
+                                        @JsonProperty(FIELD_INDEX_OPTIMIZATION_MAX_NUM_SEGMENTS) @Nullable Integer maxNumSegments,
+                                        @JsonProperty(FIELD_INDEX_OPTIMIZATION_DISABLED) @Nullable Boolean indexOptimizationDisabled,
+                                        @JsonProperty(FIELD_TYPE_REFRESH_INTERVAL) @Nullable Duration fieldTypeRefreshInterval,
+                                        @JsonProperty(FIELD_CUSTOM_FIELD_MAPPINGS) @Nullable CustomFieldMappings customFieldMappings,
                                         @JsonProperty(FIELD_PROFILE_ID) @ValidObjectId @Nullable String fieldTypeProfile,
                                         @JsonProperty(FIELD_DATA_TIERING) @Nullable DataTieringConfig dataTiering
     ) {
@@ -198,15 +196,15 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     @ObjectId
     public abstract String id();
 
-    @JsonProperty("title")
+    @JsonProperty(FIELD_TITLE)
     @NotBlank
     public abstract String title();
 
-    @JsonProperty("description")
+    @JsonProperty(FIELD_DESCRIPTION)
     @Nullable
     public abstract String description();
 
-    @JsonProperty("writable")
+    @JsonProperty(FIELD_WRITABLE)
     public abstract boolean isWritable();
 
     /**
@@ -222,47 +220,23 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     @SizeInBytes(message = "Index prefix must have a length in bytes between {min} and {max}", min = 1, max = 250)
     public abstract String indexPrefix();
 
-    @JsonProperty("index_match_pattern")
+    @JsonProperty(FIELD_INDEX_MATCH_PATTERN)
     @Nullable
     public abstract String indexMatchPattern();
 
-    @JsonProperty("index_wildcard")
+    @JsonProperty(FIELD_INDEX_WILDCARD)
     @Nullable
     public abstract String indexWildcard();
-
-    @JsonProperty("shards")
-    @Min(1)
-    public abstract int shards();
-
-    @JsonProperty("replicas")
-    @Min(0)
-    public abstract int replicas();
-
-    @JsonProperty(FIELD_ROTATION_STRATEGY_CLASS)
-    @Nullable
-    public abstract String rotationStrategyClass();
-
-    @JsonProperty(FIELD_ROTATION_STRATEGY)
-    @Nullable
-    public abstract RotationStrategyConfig rotationStrategy();
-
-    @JsonProperty(FIELD_RETENTION_STRATEGY_CLASS)
-    @Nullable
-    public abstract String retentionStrategyClass();
-
-    @JsonProperty(FIELD_RETENTION_STRATEGY)
-    @Nullable
-    public abstract RetentionStrategyConfig retentionStrategy();
 
     @JsonProperty(FIELD_CREATION_DATE)
     @NotNull
     public abstract ZonedDateTime creationDate();
 
-    @JsonProperty("index_analyzer")
+    @JsonProperty(FIELD_INDEX_ANALYZER)
     @NotBlank
     public abstract String indexAnalyzer();
 
-    @JsonProperty("index_template_name")
+    @JsonProperty(FIELD_INDEX_TEMPLATE_NAME)
     @NotBlank
     public abstract String indexTemplateName();
 
@@ -270,26 +244,12 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     @NotBlank
     public abstract Optional<String> indexTemplateType();
 
-    @JsonProperty("index_optimization_max_num_segments")
-    @Min(1L)
-    public abstract int indexOptimizationMaxNumSegments();
-
-    @JsonProperty("index_optimization_disabled")
-    public abstract boolean indexOptimizationDisabled();
-
-    @JsonProperty("field_type_refresh_interval")
-    public abstract Duration fieldTypeRefreshInterval();
-
-    @JsonProperty("custom_field_mappings")
+    @JsonProperty(FIELD_CUSTOM_FIELD_MAPPINGS)
     public abstract CustomFieldMappings customFieldMappings();
 
     @JsonProperty(FIELD_PROFILE_ID)
     @Nullable
     public abstract String fieldTypeProfile();
-
-    @Nullable
-    @JsonProperty(FIELD_DATA_TIERING)
-    public abstract DataTieringConfig dataTiering();
 
     @JsonIgnore
     public boolean isRegularIndex() {

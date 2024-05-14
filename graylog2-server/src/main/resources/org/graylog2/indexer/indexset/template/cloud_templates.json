@@ -9,8 +9,7 @@
         "replicas": 0,
         "index_optimization_max_num_segments": 1,
         "index_optimization_disabled": false,
-        "field_type_refresh_interval": 5,
-        "field_type_refresh_interval_unit": "SECONDS",
+        "field_type_refresh_interval": 5000,
         "rotation_strategy_class": "org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy",
         "rotation_strategy": {
           "type": "org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig",

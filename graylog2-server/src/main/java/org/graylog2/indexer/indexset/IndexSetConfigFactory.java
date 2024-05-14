@@ -21,7 +21,6 @@ import org.graylog2.datatiering.DataTieringChecker;
 import org.graylog2.datatiering.DataTieringConfig;
 import org.graylog2.indexer.indexset.template.IndexSetDefaultTemplateService;
 import org.graylog2.indexer.indexset.template.IndexSetTemplateConfig;
-import org.joda.time.Duration;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -56,8 +55,7 @@ public class IndexSetConfigFactory {
                 .replicas(defaultConfig.replicas())
                 .indexOptimizationDisabled(defaultConfig.indexOptimizationDisabled())
                 .indexOptimizationMaxNumSegments(defaultConfig.indexOptimizationMaxNumSegments())
-                .fieldTypeRefreshInterval(Duration.standardSeconds(
-                        defaultConfig.fieldTypeRefreshIntervalUnit().toSeconds(defaultConfig.fieldTypeRefreshInterval())))
+                .fieldTypeRefreshInterval(defaultConfig.fieldTypeRefreshInterval())
                 .rotationStrategyClass(defaultConfig.rotationStrategyClass())
                 .rotationStrategy(defaultConfig.rotationStrategy())
                 .retentionStrategyClass(defaultConfig.retentionStrategyClass())

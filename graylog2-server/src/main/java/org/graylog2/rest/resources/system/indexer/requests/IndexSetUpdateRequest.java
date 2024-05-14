@@ -23,6 +23,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import org.graylog2.datatiering.DataTieringConfig;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.SimpleIndexSetConfig;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.graylog2.validation.ValidObjectId;
@@ -30,31 +31,27 @@ import org.joda.time.Duration;
 
 import javax.annotation.Nullable;
 
-import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_DATA_TIERING;
 import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_PROFILE_ID;
-import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_RETENTION_STRATEGY;
-import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_RETENTION_STRATEGY_CLASS;
-import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_ROTATION_STRATEGY;
-import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_ROTATION_STRATEGY_CLASS;
+import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_TYPE_REFRESH_INTERVAL;
 import static org.graylog2.rest.resources.system.indexer.responses.IndexSetSummary.FIELD_USE_LEGACY_ROTATION;
 
 @JsonAutoDetect
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record IndexSetUpdateRequest(@JsonProperty("title") @NotBlank String title,
-                                    @JsonProperty("description") @Nullable String description,
-                                    @JsonProperty("writable") boolean isWritable,
-                                    @JsonProperty("shards") @Min(1) int shards,
-                                    @JsonProperty("replicas") @Min(0) int replicas,
+public record IndexSetUpdateRequest(@JsonProperty(FIELD_TITLE) @NotBlank String title,
+                                    @JsonProperty(FIELD_DESCRIPTION) @Nullable String description,
+                                    @JsonProperty(FIELD_WRITABLE) boolean isWritable,
+                                    @JsonProperty(FIELD_SHARDS) @Min(1) int shards,
+                                    @JsonProperty(FIELD_REPLICAS) @Min(0) int replicas,
                                     @JsonProperty(FIELD_ROTATION_STRATEGY_CLASS) @Nullable String rotationStrategyClass,
                                     @JsonProperty(FIELD_ROTATION_STRATEGY) @Nullable RotationStrategyConfig rotationStrategy,
                                     @JsonProperty(FIELD_RETENTION_STRATEGY_CLASS) @Nullable String retentionStrategyClass,
                                     @JsonProperty(FIELD_RETENTION_STRATEGY) @Nullable RetentionStrategyConfig retentionStrategy,
-                                    @JsonProperty("index_optimization_max_num_segments") @Min(1L) int indexOptimizationMaxNumSegments,
-                                    @JsonProperty("index_optimization_disabled") boolean indexOptimizationDisabled,
-                                    @JsonProperty("field_type_refresh_interval") Duration fieldTypeRefreshInterval,
+                                    @JsonProperty(FIELD_INDEX_OPTIMIZATION_MAX_NUM_SEGMENTS) @Min(1L) int indexOptimizationMaxNumSegments,
+                                    @JsonProperty(FIELD_INDEX_OPTIMIZATION_DISABLED) boolean indexOptimizationDisabled,
+                                    @JsonProperty(FIELD_TYPE_REFRESH_INTERVAL) Duration fieldTypeRefreshInterval,
                                     @JsonProperty(FIELD_PROFILE_ID) @ValidObjectId @Nullable String fieldTypeProfile,
                                     @JsonProperty(FIELD_DATA_TIERING) @Nullable DataTieringConfig dataTiering,
-                                    @JsonProperty(FIELD_USE_LEGACY_ROTATION) @Nullable Boolean useLegacyRotation) {
+                                    @JsonProperty(FIELD_USE_LEGACY_ROTATION) @Nullable Boolean useLegacyRotation) implements SimpleIndexSetConfig {
 
 
     public static IndexSetUpdateRequest fromIndexSetConfig(final IndexSetConfig indexSet) {

@@ -20,8 +20,10 @@ import com.codahale.metrics.annotation.Timed;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.validation.Validator;
+import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -39,11 +41,11 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.indexer.IndexSetValidator;
-import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.SimpleIndexSetConfig;
 import org.graylog2.indexer.indexset.template.IndexSetDefaultTemplateService;
 import org.graylog2.indexer.indexset.template.IndexSetTemplate;
 import org.graylog2.indexer.indexset.template.IndexSetTemplateConfig;
-import org.graylog2.indexer.indexset.template.IndexSetTemplateData;
+import org.graylog2.indexer.indexset.template.IndexSetTemplateRequest;
 import org.graylog2.indexer.indexset.template.IndexSetTemplateService;
 import org.graylog2.indexer.indexset.template.requirement.IndexSetTemplateRequirement;
 import org.graylog2.indexer.indexset.template.requirement.IndexSetTemplateRequirementsChecker;
@@ -51,7 +53,6 @@ import org.graylog2.indexer.indexset.template.rest.IndexSetTemplateResponse;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
-import org.joda.time.Duration;
 
 import java.util.List;
 import java.util.Objects;
@@ -121,26 +122,29 @@ public class IndexSetTemplateResource extends RestResource {
     @Timed
     @AuditEvent(type = INDEX_SET_TEMPLATE_CREATE)
     @ApiOperation(value = "Creates a new editable template")
-    public IndexSetTemplate create(@ApiParam(name = "templateData") IndexSetTemplateData templateData) {
+    public IndexSetTemplateResponse create(@ApiParam(name = "request") IndexSetTemplateRequest templateData) {
         checkPermission(RestPermissions.INDEX_SET_TEMPLATES_CREATE);
         validateConfig(templateData.indexSetConfig());
 
-        // Templates created via the API are always writable
-        return templateService.save(new IndexSetTemplate(templateData, false));
+        return toResponse(templateService.save(new IndexSetTemplate(templateData)));
     }
 
     @PUT
+    @Path("{id}")
     @Timed
     @AuditEvent(type = INDEX_SET_TEMPLATE_UPDATE)
     @ApiOperation(value = "Updates existing template")
-    public void update(@ApiParam(name = "template") IndexSetTemplate template) throws IllegalAccessException {
-        checkPermission(RestPermissions.INDEX_SET_TEMPLATES_EDIT, template.id());
-        checkReadOnly(getIndexSetTemplate(template.id()));
+    public void update(@ApiParam(name = "id", required = true)
+                       @PathParam("id") String id,
+                       @ApiParam(name = "request")
+                       @NotNull IndexSetTemplateRequest template) throws IllegalAccessException {
+        checkPermission(RestPermissions.INDEX_SET_TEMPLATES_EDIT, id);
+        checkReadOnly(getIndexSetTemplate(id));
         validateConfig(template.indexSetConfig());
 
-        final boolean updated = templateService.update(template.id(), template);
+        final boolean updated = templateService.update(id, new IndexSetTemplate(template));
         if (!updated) {
-            throw new NotFoundException(f("Template %s <%s> does not exist", template.id(), template.title()));
+            throw new NotFoundException(f("Template %s <%s> does not exist", id, template.title()));
         }
     }
 
@@ -158,44 +162,42 @@ public class IndexSetTemplateResource extends RestResource {
     }
 
     private void validateConfig(IndexSetTemplateConfig config) {
+        IndexSetValidator.Violation violation = indexSetValidator.checkDataTieringNotNull(config.useLegacyRotation(), config.dataTiering());
+        if (violation != null) {
+            throw new BadRequestException(violation.message());
+        }
         // Validate scalar fields.
         validator.validate(config).forEach(v -> {
-            throw new BadRequestException(buildFieldError(v.getPropertyPath().toString(), v.getMessage()));
+            throw new BadRequestException(f("Invalid value for field [%s]: %s", v.getPropertyPath().toString(), v.getMessage()));
         });
 
         // Perform common refresh interval and retention period validations.
-        IndexSetValidator.Violation violation =
-                indexSetValidator.validateRefreshInterval(Duration.standardSeconds(
-                        config.fieldTypeRefreshIntervalUnit().toSeconds(config.fieldTypeRefreshInterval())));
+        violation = indexSetValidator.validateRefreshInterval(config.fieldTypeRefreshInterval());
         if (violation != null) {
-            throw new BadRequestException(buildFieldError(IndexSetTemplateConfig.FIELD_TYPE_REFRESH_INTERVAL, violation.message()));
+            throw new BadRequestException(violation.message());
         }
 
-        violation = indexSetValidator.validateRotation(config.rotationStrategy());
-        if (violation != null) {
-            throw new BadRequestException(buildFieldError(IndexSetTemplateConfig.ROTATION_STRATEGY, violation.message()));
-        }
-
-        violation = indexSetValidator.validateRetentionPeriod(config.rotationStrategy(),
-                config.retentionStrategy());
-        if (violation != null) {
-            throw new BadRequestException(buildFieldError(IndexSetTemplateConfig.RETENTION_STRATEGY, violation.message()));
-        }
-
-        violation = indexSetValidator.validateDataTieringConfig(config.dataTiering());
-        if (violation != null) {
-            throw new BadRequestException(buildFieldError(IndexSetConfig.FIELD_DATA_TIERING, violation.message()));
+        if (config.useLegacyRotation()) {
+            violation = indexSetValidator.validateStrategyFields(config);
+            if (violation != null) {
+                throw new BadRequestException(violation.message());
+            }
+        } else {
+            violation = indexSetValidator.validateDataTieringConfig(config.dataTiering());
+            if (violation != null) {
+                throw new BadRequestException(f("Invalid value for field [%s]: %s", SimpleIndexSetConfig.FIELD_DATA_TIERING, violation.message()));
+            }
         }
     }
 
     private IndexSetTemplateResponse getIndexSetTemplate(String templateId) {
         return templateService.get(templateId)
-                .map(indexSetTemplate -> toResponse(indexSetTemplate, indexSetDefaultTemplateService.getDefaultIndexSetTemplateId()))
+                .map(this::toResponse)
                 .orElseThrow(() -> new NotFoundException(f("No template with id %s", templateId)));
     }
 
-    private static String buildFieldError(String field, String message) {
-        return f("Invalid value for field [%s]: %s", field, message);
+    private @Nonnull IndexSetTemplateResponse toResponse(IndexSetTemplate indexSetTemplate) {
+        return toResponse(indexSetTemplate, indexSetDefaultTemplateService.getDefaultIndexSetTemplateId());
     }
 
     private void checkIsDefault(IndexSetTemplateResponse template) throws IllegalAccessException {
