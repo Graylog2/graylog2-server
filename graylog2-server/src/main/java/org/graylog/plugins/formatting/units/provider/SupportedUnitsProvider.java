@@ -50,7 +50,6 @@ public class SupportedUnitsProvider implements Provider<SupportedUnits> {
     }
 
     private SupportedUnits loadFromFile(final ObjectMapper objectMapper) throws IOException {
-        return objectMapper.readValue(getClass().getResource(SUPPORTED_UNITS_RES_FILE_LOCATION), SupportedUnits.class);
+        return objectMapper.readValue(SupportedUnitsProvider.class.getResourceAsStream(SUPPORTED_UNITS_RES_FILE_LOCATION), SupportedUnits.class);    
     }
-
 }
