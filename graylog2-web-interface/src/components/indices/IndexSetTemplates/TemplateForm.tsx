@@ -324,3 +324,7 @@ const TemplateForm = ({ initialValues, submitButtonText, submitLoadingText, onCa
 };
 
 export default TemplateForm;
+
+TemplateForm.defaultProps = {
+  initialValues: undefined,
+};
