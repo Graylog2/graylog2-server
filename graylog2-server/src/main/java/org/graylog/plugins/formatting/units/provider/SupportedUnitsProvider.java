@@ -28,7 +28,7 @@ import java.io.IOException;
 @Singleton
 public class SupportedUnitsProvider implements Provider<SupportedUnits> {
 
-    private static final String SUPPORTED_UNITS_RES_FILE_LOCATION = "/units/supported_units.json";
+    private static final String SUPPORTED_UNITS_RES_FILE_LOCATION = "supported_units.json";
     private SupportedUnits supportedUnitsMemoized;
 
     private final ObjectMapper objectMapper;
@@ -50,6 +50,6 @@ public class SupportedUnitsProvider implements Provider<SupportedUnits> {
     }
 
     private SupportedUnits loadFromFile(final ObjectMapper objectMapper) throws IOException {
-        return objectMapper.readValue(SupportedUnitsProvider.class.getResourceAsStream(SUPPORTED_UNITS_RES_FILE_LOCATION), SupportedUnits.class);    
+        return objectMapper.readValue(SupportedUnitsProvider.class.getResourceAsStream(SUPPORTED_UNITS_RES_FILE_LOCATION), SupportedUnits.class);
     }
 }
