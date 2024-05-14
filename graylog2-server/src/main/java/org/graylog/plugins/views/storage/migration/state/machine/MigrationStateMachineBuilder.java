@@ -21,10 +21,10 @@ import com.github.oxo42.stateless4j.StateMachineConfig;
 import com.github.oxo42.stateless4j.delegates.Action1;
 import com.github.oxo42.stateless4j.delegates.Func;
 import com.google.common.annotations.VisibleForTesting;
+import jakarta.annotation.Nonnull;
 import org.graylog.plugins.views.storage.migration.state.actions.MigrationActions;
 import org.graylog.plugins.views.storage.migration.state.persistence.DatanodeMigrationConfiguration;
 import org.graylog.plugins.views.storage.migration.state.persistence.DatanodeMigrationPersistence;
-import jakarta.annotation.Nonnull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,14 +47,17 @@ public class MigrationStateMachineBuilder {
         config.configure(MigrationState.MIGRATION_WELCOME_PAGE)
                 .permitIf(MigrationStep.SHOW_CA_CREATION, MigrationState.CA_CREATION_PAGE, migrationActions::caDoesNotExist)
                 .permitIf(MigrationStep.SHOW_RENEWAL_POLICY_CREATION, MigrationState.RENEWAL_POLICY_CREATION_PAGE, () -> !migrationActions.caDoesNotExist() && migrationActions.renewalPolicyDoesNotExist())
-                .permitIf(MigrationStep.SHOW_MIGRATION_SELECTION, MigrationState.MIGRATION_SELECTION_PAGE, migrationActions::caAndRenewalPolicyExist);
+                .permitIf(MigrationStep.SHOW_MIGRATION_SELECTION, MigrationState.MIGRATION_SELECTION_PAGE, () -> migrationActions.caAndRenewalPolicyExist() && migrationActions.isCompatibleInPlaceMigrationVersion())
+                .permitIf(MigrationStep.SELECT_REMOTE_REINDEX_MIGRATION, MigrationState.REMOTE_REINDEX_WELCOME_PAGE, () -> migrationActions.caAndRenewalPolicyExist() && !migrationActions.isCompatibleInPlaceMigrationVersion());
 
         config.configure(MigrationState.CA_CREATION_PAGE)
                 .permitIf(MigrationStep.SHOW_RENEWAL_POLICY_CREATION, MigrationState.RENEWAL_POLICY_CREATION_PAGE, () -> !migrationActions.caDoesNotExist() && migrationActions.renewalPolicyDoesNotExist())
-                .permitIf(MigrationStep.SHOW_MIGRATION_SELECTION, MigrationState.MIGRATION_SELECTION_PAGE, migrationActions::caAndRenewalPolicyExist);
+                .permitIf(MigrationStep.SHOW_MIGRATION_SELECTION, MigrationState.MIGRATION_SELECTION_PAGE, () -> migrationActions.caAndRenewalPolicyExist() && migrationActions.isCompatibleInPlaceMigrationVersion())
+                .permitIf(MigrationStep.SELECT_REMOTE_REINDEX_MIGRATION, MigrationState.REMOTE_REINDEX_WELCOME_PAGE, () -> migrationActions.caAndRenewalPolicyExist() && !migrationActions.isCompatibleInPlaceMigrationVersion());
 
         config.configure(MigrationState.RENEWAL_POLICY_CREATION_PAGE)
-                .permitIf(MigrationStep.SHOW_MIGRATION_SELECTION, MigrationState.MIGRATION_SELECTION_PAGE, migrationActions::caAndRenewalPolicyExist);
+                .permitIf(MigrationStep.SHOW_MIGRATION_SELECTION, MigrationState.MIGRATION_SELECTION_PAGE, () -> migrationActions.caAndRenewalPolicyExist() && migrationActions.isCompatibleInPlaceMigrationVersion())
+                .permitIf(MigrationStep.SELECT_REMOTE_REINDEX_MIGRATION, MigrationState.REMOTE_REINDEX_WELCOME_PAGE, () -> migrationActions.caAndRenewalPolicyExist() && !migrationActions.isCompatibleInPlaceMigrationVersion());
 
         // Major decision - remote reindexing or rolling upgrade(in-place)?
         config.configure(MigrationState.MIGRATION_SELECTION_PAGE)
