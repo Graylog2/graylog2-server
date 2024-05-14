@@ -27,10 +27,19 @@ export type Contexts = {
 
 export type WidgetAction = (w: Widget, contexts: Contexts) => (dispatch: AppDispatch, getState: GetState) => Promise<unknown>;
 
-export type WidgetActionType = {
+export type WidgetDropdownActionType = {
   type: string,
   title: (w: Widget) => React.ReactNode,
   isHidden?: (w: Widget) => boolean,
   action: WidgetAction,
   disabled?: () => boolean,
+};
+
+export type WidgetMenuActionComponentProps = {disabled: boolean, widget: Widget, contexts: Contexts}
+
+export type WidgetMenuActionType = {
+  type: string,
+  isHidden?: (w: Widget) => boolean,
+  disabled?: () => boolean,
+  component: React.ComponentType<WidgetMenuActionComponentProps>
 };

@@ -22,7 +22,7 @@ import type { Reducer, AnyAction } from '@reduxjs/toolkit';
 import type Widget from 'views/logic/widgets/Widget';
 import type { ActionDefinition } from 'views/components/actions/ActionHandler';
 import type { VisualizationComponent } from 'views/components/aggregationbuilder/AggregationBuilder';
-import type { WidgetActionType } from 'views/components/widgets/Types';
+import type { WidgetDropdownActionType, WidgetMenuActionType } from 'views/components/widgets/Types';
 import type { Creator } from 'views/components/sidebar/create/AddWidgetButton';
 import type { ViewHook } from 'views/logic/hooks/ViewHook';
 import type WidgetConfig from 'views/logic/widgets/WidgetConfig';
@@ -490,7 +490,8 @@ declare module 'graylog-web-plugin/plugin' {
     'views.hooks.copyPageToDashboard'?: Array<CopyParamsToView>;
     'views.hooks.removingWidget'?: Array<RemovingWidgetHook>;
     'views.overrides.widgetEdit'?: Array<React.ComponentType<OverrideProps>>;
-    'views.widgets.actions'?: Array<WidgetActionType>;
+    'views.widgets.dropdownActions'?: Array<WidgetDropdownActionType>;
+    'views.widgets.menuActions'?: Array<WidgetMenuActionType>;
     'views.reducers'?: Array<ViewsReducer>;
     'views.requires.provided'?: Array<string>;
     'views.queryInput.commands'?: Array<CustomCommand>;

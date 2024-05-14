@@ -16,6 +16,6 @@
  */
 import usePluginEntities from 'hooks/usePluginEntities';
 
-const useWidgetActions = () => usePluginEntities('views.widgets.actions');
+const useMenuWidgetActions = () => usePluginEntities('views.widgets.menuActions');
 
-export default useWidgetActions;
+export default useMenuWidgetActions;

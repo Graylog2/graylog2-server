@@ -14,19 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import type Widget from 'views/logic/widgets/Widget';
+import type { WidgetMenuActionType } from 'views/components/widgets/Types';
+import MessagesWidget from 'views/logic/widgets/MessagesWidget';
+import ExportMessageWidgetActionComponent
+  from 'views/components/widgets/ExportMessageWidgetAction/ExportMessageWidgetActionComponent';
 
-import ActionDropdown from 'views/components/common/ActionDropdown';
-import { IconButton } from 'components/common';
-
-const AggregationWidgetExportDropdown = ({ children }: React.PropsWithChildren) => {
-  const widgetActionDropdownCaret = <IconButton name="download" title="Open export widget options" />;
-
-  return (
-    <ActionDropdown element={widgetActionDropdownCaret} header="Export to file">
-      {children}
-    </ActionDropdown>
-  );
+const ExportMessageWidgetAction: WidgetMenuActionType = {
+  type: 'export-widget-action',
+  isHidden: (w: Widget) => (w.type !== MessagesWidget.type),
+  component: ExportMessageWidgetActionComponent,
 };
 
-export default AggregationWidgetExportDropdown;
+export default ExportMessageWidgetAction;

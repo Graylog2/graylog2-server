@@ -21,7 +21,7 @@ import type Widget from 'views/logic/widgets/Widget';
 import { MenuItem } from 'components/bootstrap';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import useAppDispatch from 'stores/useAppDispatch';
-import useWidgetActions from 'views/components/widgets/useWidgetActions';
+import useDropdownWidgetActions from 'views/components/widgets/useDropdownWidgetActions';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
@@ -31,9 +31,9 @@ type Props = {
   widget: Widget,
 };
 
-const ExtraWidgetActions = ({ widget }: Props) => {
+const ExtraDropdownWidgetActions = ({ widget }: Props) => {
   const widgetFocusContext = useContext(WidgetFocusContext);
-  const pluginWidgetActions = useWidgetActions();
+  const pluginWidgetActions = useDropdownWidgetActions();
   const dispatch = useAppDispatch();
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
@@ -64,4 +64,4 @@ const ExtraWidgetActions = ({ widget }: Props) => {
     : null;
 };
 
-export default ExtraWidgetActions;
+export default ExtraDropdownWidgetActions;
