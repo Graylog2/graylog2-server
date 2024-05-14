@@ -117,7 +117,7 @@ public class ConfigFileDocsPrinter implements DocsPrinter {
 
                 """;
 
-        return String.format(Locale.ROOT, template, formatDocumentation(field), forceFillIn ? "" : "# ", field.configName(), wrapValue(field.defaultValue()));
+        return String.format(Locale.ROOT, template, formatDocumentation(field), forceFillIn ? "" : "#", field.configName(), wrapValue(field.defaultValue()));
     }
 
     private String wrapValue(Object value) {

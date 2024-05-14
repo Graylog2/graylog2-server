@@ -17,7 +17,9 @@
 package org.graylog.datanode.docs;
 
 import com.github.joschi.jadconfig.Parameter;
+import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
+import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -59,7 +61,7 @@ class GenerateConfigDocumentationTest {
         final CSVParser parser = new CSVParser(new FileReader(file.toFile(), StandardCharsets.UTF_8), csvFormat);
         final List<CSVRecord> lines = parser.getRecords();
         Assertions.assertThat(lines)
-                .hasSize(1) // one entry only, the invisible should not be present in the output
+                .hasSize(3) // one entry only, the invisible should not be present in the output
                 .anySatisfy(line -> {
                     Assertions.assertThat(line.get(CsvDocsPrinter.HEADER_DEFAULT_VALUE)).isEqualTo("data/node-id");
                     Assertions.assertThat(line.get(CsvDocsPrinter.HEADER_PARAMETER)).isEqualTo("node_id_file");
@@ -67,6 +69,12 @@ class GenerateConfigDocumentationTest {
                     Assertions.assertThat(line.get(CsvDocsPrinter.HEADER_REQUIRED)).isEqualTo("false");
                     Assertions.assertThat(line.get(CsvDocsPrinter.HEADER_DESCRIPTION)).contains("The auto-generated node ID will be stored in this file and read after restarts");
                 });
+
+        // Assert order of the lines. Required password_secret without default value has to go first. Then the rest follows
+        // order of the properties in the class.
+        Assertions.assertThat(lines.get(0).get(CsvDocsPrinter.HEADER_PARAMETER)).isEqualTo("password_secret");
+        Assertions.assertThat(lines.get(1).get(CsvDocsPrinter.HEADER_PARAMETER)).isEqualTo("node_id_file");
+        Assertions.assertThat(lines.get(2).get(CsvDocsPrinter.HEADER_PARAMETER)).isEqualTo("indexer_jwt_auth_token_caching_duration");
     }
 
     @Test
@@ -76,7 +84,7 @@ class GenerateConfigDocumentationTest {
         generator.generateDocumentation(format, () -> List.of(new DummyConfiguration()));
         final String content = Files.readString(file);
         Assertions.assertThat(content).contains("The auto-generated node ID will be stored in this file and read after restarts");
-        Assertions.assertThat(content).contains("# node_id_file = data/node-id");
+        Assertions.assertThat(content).contains("#node_id_file = data/node-id");
     }
 
     private static class DummyConfiguration {
@@ -90,5 +98,22 @@ class GenerateConfigDocumentationTest {
         @Documentation(visible = false)
         @Parameter(value = "timeout_sec", validators = PositiveIntegerValidator.class)
         private Integer timeoutSec;
+
+        @Documentation("""
+            You MUST set a secret to secure/pepper the stored user passwords here. Use at least 64 characters.
+            Generate one by using for example: pwgen -N 1 -s 96
+            ATTENTION: This value must be the same on all Graylog and Datanode nodes in the cluster.
+            Changing this value after installation will render all user sessions and encrypted values
+            in the database invalid. (e.g. encrypted access tokens)
+            """)
+        @Parameter(value = "password_secret", required = true, validators = StringNotBlankValidator.class)
+        private String passwordSecret;
+
+        @Documentation("""
+            communication between Graylog and OpenSearch is secured by JWT.
+            This configuration defines interval between token regenerations.
+            """)
+        @Parameter(value = "indexer_jwt_auth_token_caching_duration")
+        Duration indexerJwtAuthTokenCachingDuration = Duration.seconds(60);
     }
 }
