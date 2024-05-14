@@ -26,6 +26,7 @@ import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
 import jakarta.annotation.Nonnull;
 import jakarta.ws.rs.core.MediaType;
+import org.apache.commons.lang.RandomStringUtils;
 import org.apache.http.HttpStatus;
 import org.assertj.core.api.Assertions;
 import org.graylog.datanode.restoperations.DatanodeOpensearchWait;
@@ -45,6 +46,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.security.auth.x500.X500Principal;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -54,6 +56,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -84,7 +87,7 @@ public class DatanodeProvisioningIT {
     void provisionDatanodeGenerateCA() throws ExecutionException, RetryException, KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException {
         final BasicAuthCredentials basicAuth = extractBasicAuthFromLogs(apis.backend().getLogs());
 
-        createSelfSignedCA(basicAuth);
+        final String caSubjectName = createSelfSignedCA(basicAuth);
 
         configureAutomaticCertRenewalPolicy(basicAuth);
         triggerDatanodeProvisioning(basicAuth);
@@ -94,14 +97,22 @@ public class DatanodeProvisioningIT {
         Assertions.assertThat(connectedDatanodes)
                 .hasSize(1);
 
-        testEncryptedConnectionToOpensearch(basicAuth);
+        final KeyStore truststore = keystoreFromApiCertificate(basicAuth);
+        verifySubjectName(truststore, caSubjectName);
+
+        testEncryptedConnectionToOpensearch(truststore);
     }
 
-    private void testEncryptedConnectionToOpensearch(BasicAuthCredentials basicAuth) throws ExecutionException, RetryException, KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException {
+    private static void verifySubjectName(KeyStore truststore, String caSubjectName) throws KeyStoreException {
+        final X500Principal subject = ((X509Certificate) truststore.getCertificate("ca")).getSubjectX500Principal();
+        Assertions.assertThat(subject.getName()).isEqualTo("CN=" + caSubjectName);
+    }
+
+    private void testEncryptedConnectionToOpensearch(KeyStore truststore) throws ExecutionException, RetryException, KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException {
         try {
             new DatanodeOpensearchWait(RestOperationParameters.builder()
                     .port(getOpensearchPort())
-                    .truststore(keystoreFromApiCertificate(basicAuth))
+                    .truststore(truststore)
                     .jwtTokenProvider(DatanodeContainerizedBackend.JWT_AUTH_TOKEN_PROVIDER)
                     .build())
                     .waitForNodesCount(1);
@@ -137,14 +148,16 @@ public class DatanodeProvisioningIT {
                 .statusCode(HttpStatus.SC_NO_CONTENT);
     }
 
-    private ValidatableResponse createSelfSignedCA(BasicAuthCredentials basicAuth) {
-        return given()
+    private String createSelfSignedCA(BasicAuthCredentials basicAuth) {
+        String subject = "Graylog CA generated " + RandomStringUtils.randomAlphanumeric(10);
+        given()
                 .spec(apis.requestSpecification())
-                .body("{\"organization\":\"Graylog CA\"}")
+                .body("{\"organization\":\"" + subject + "\"}")
                 .auth().basic(basicAuth.username, basicAuth.password)
                 .post("/ca/create")
                 .then()
                 .statusCode(HttpStatus.SC_CREATED);
+        return subject;
     }
 
     private ValidatableResponse configureAutomaticCertRenewalPolicy(BasicAuthCredentials basicAuth) {
@@ -172,7 +185,10 @@ public class DatanodeProvisioningIT {
         Assertions.assertThat(connectedDatanodes)
                 .hasSize(1);
 
-        testEncryptedConnectionToOpensearch(basicAuth);
+        final KeyStore truststore = keystoreFromApiCertificate(basicAuth);
+        verifySubjectName(truststore, CertutilCa.DEFAULT_ORGANIZATION_NAME);
+
+        testEncryptedConnectionToOpensearch(truststore);
     }
 
     private ValidatableResponse uploadCA(BasicAuthCredentials basicAuth, Path caKeystore) {
