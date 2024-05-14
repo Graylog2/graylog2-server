@@ -35,8 +35,9 @@ const useCarouselRef = (carouselId: string) => {
 };
 
 /*
- * Carousel component based on embla carousel. Needs to be wrapped in CarouselProvider.
- * The CarouselProvider also allows configuring the carousel.
+ * Carousel component based on embla carousel. It needs to be wrapped with the CarouselProvider.
+ * The CarouselProvider allows accessing the carouselApi object in all children, like the carousel navigation components.
+ * The CarouselProvider also maintains the carousel configuration options.
  */
 
 type Props = {
