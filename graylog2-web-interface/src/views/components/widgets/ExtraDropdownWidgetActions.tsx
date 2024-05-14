@@ -21,7 +21,7 @@ import type Widget from 'views/logic/widgets/Widget';
 import { MenuItem } from 'components/bootstrap';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import useAppDispatch from 'stores/useAppDispatch';
-import useDropdownWidgetActions from 'views/components/widgets/useDropdownWidgetActions';
+import useWidgetActions from 'views/components/widgets/useWidgetActions';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
@@ -33,12 +33,12 @@ type Props = {
 
 const ExtraDropdownWidgetActions = ({ widget }: Props) => {
   const widgetFocusContext = useContext(WidgetFocusContext);
-  const pluginWidgetActions = useDropdownWidgetActions();
+  const pluginWidgetActions = useWidgetActions();
   const dispatch = useAppDispatch();
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
   const extraWidgetActions = useMemo(() => pluginWidgetActions
-    .filter(({ isHidden = () => false }) => !isHidden(widget))
+    .filter(({ isHidden = () => false, position }) => !isHidden(widget) && (position === 'dropdown' || position === undefined))
     .map(({ title, action, type, disabled = () => false }) => {
       const _onSelect = () => {
         sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.SEARCH_WIDGET_EXTRA_ACTION, {

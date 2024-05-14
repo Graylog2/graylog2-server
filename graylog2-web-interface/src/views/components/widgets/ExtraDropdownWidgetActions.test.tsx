@@ -23,11 +23,11 @@ import OriginalExtraWidgetActions from 'views/components/widgets/ExtraDropdownWi
 import Widget from 'views/logic/widgets/Widget';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
-import useDropdownWidgetActions from 'views/components/widgets/useDropdownWidgetActions';
+import useWidgetActions from 'views/components/widgets/useWidgetActions';
 import wrapWithMenu from 'helpers/components/wrapWithMenu';
 import type { WidgetDropdownActionType } from 'views/components/widgets/Types';
 
-jest.mock('views/components/widgets/useDropdownWidgetActions');
+jest.mock('views/components/widgets/useWidgetActions');
 
 const ExtraWidgetActionsWithoutMenu = (props: React.ComponentProps<typeof OriginalExtraWidgetActions>) => (
   <TestStoreProvider>
@@ -60,7 +60,7 @@ describe('ExtraWidgetActions', () => {
   useViewsPlugin();
 
   it('does not render menu items, when no action is configured', () => {
-    asMock(useDropdownWidgetActions).mockReturnValue([]);
+    asMock(useWidgetActions).mockReturnValue([]);
 
     render(<ExtraWidgetActionsWithoutMenu widget={widget} />);
 
@@ -68,7 +68,7 @@ describe('ExtraWidgetActions', () => {
   });
 
   it('does not render menu items, if no action is hidden', () => {
-    asMock(useDropdownWidgetActions).mockReturnValue([dummyActionWhichIsHidden]);
+    asMock(useWidgetActions).mockReturnValue([dummyActionWhichIsHidden]);
 
     render(<ExtraWidgetActionsWithoutMenu widget={widget} />);
 
@@ -76,7 +76,7 @@ describe('ExtraWidgetActions', () => {
   });
 
   it('renders action which has no `isHidden`', async () => {
-    asMock(useDropdownWidgetActions).mockReturnValue([dummyActionWithoutIsHidden]);
+    asMock(useWidgetActions).mockReturnValue([dummyActionWithoutIsHidden]);
 
     render(<ExtraWidgetActions widget={widget} />);
 
@@ -84,7 +84,7 @@ describe('ExtraWidgetActions', () => {
   });
 
   it('renders action where `isHidden` returns `false`', async () => {
-    asMock(useDropdownWidgetActions).mockReturnValue([dummyActionWhichIsNotHidden]);
+    asMock(useWidgetActions).mockReturnValue([dummyActionWhichIsNotHidden]);
 
     render(<ExtraWidgetActions widget={widget} />);
 
@@ -92,7 +92,7 @@ describe('ExtraWidgetActions', () => {
   });
 
   it('clicking menu item triggers action', async () => {
-    asMock(useDropdownWidgetActions).mockReturnValue([dummyActionWhichIsNotHidden]);
+    asMock(useWidgetActions).mockReturnValue([dummyActionWhichIsNotHidden]);
 
     render(<ExtraWidgetActions widget={widget} />);
 
@@ -111,7 +111,7 @@ describe('ExtraWidgetActions', () => {
   });
 
   it('renders divider if at least one action is present', async () => {
-    asMock(useDropdownWidgetActions).mockReturnValue([dummyActionWithoutIsHidden]);
+    asMock(useWidgetActions).mockReturnValue([dummyActionWithoutIsHidden]);
 
     render(<ExtraWidgetActions widget={widget} />);
 
@@ -119,7 +119,7 @@ describe('ExtraWidgetActions', () => {
   });
 
   it('renders a disabled action disabled', async () => {
-    asMock(useDropdownWidgetActions).mockReturnValue([dummyActionWhichIsDisabled]);
+    asMock(useWidgetActions).mockReturnValue([dummyActionWhichIsDisabled]);
 
     render(<ExtraWidgetActions widget={widget} />);
 

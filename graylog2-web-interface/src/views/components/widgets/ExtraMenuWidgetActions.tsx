@@ -22,7 +22,7 @@ import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import useAppDispatch from 'stores/useAppDispatch';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
-import useMenuWidgetActions from 'views/components/widgets/useMenuWidgetActions';
+import useWidgetActions from 'views/components/widgets/useWidgetActions';
 
 type Props = {
   widget: Widget,
@@ -30,16 +30,15 @@ type Props = {
 
 const ExtraMenuWidgetActions = ({ widget }: Props) => {
   const widgetFocusContext = useContext(WidgetFocusContext);
-  const pluginWidgetActions = useMenuWidgetActions();
+  const pluginWidgetActions = useWidgetActions();
 
   const dispatch = useAppDispatch();
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
   const extraWidgetActions = useMemo(() => pluginWidgetActions
-    .filter(({ isHidden = () => false }) => !isHidden(widget))
+    .filter(({ isHidden = () => false, position }) => !isHidden(widget) && position === 'menu')
     .map(({ component: Component, type, disabled = () => false }) => (
       <Component widget={widget} contexts={{ widgetFocusContext }} key={`${type}-${widget.id}`} disabled={disabled()} />)), [dispatch, pathname, pluginWidgetActions, sendTelemetry, widget, widgetFocusContext]);
-  console.log({ pluginWidgetActions, extraWidgetActions });
 
   return extraWidgetActions.length > 0
     ? (

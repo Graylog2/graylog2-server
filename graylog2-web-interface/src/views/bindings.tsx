@@ -458,7 +458,7 @@ const exports: PluginExports = {
   'views.components.widgets.events.attributes': eventsAttributes,
   'views.reducers': viewsReducers,
   'views.elements.validationErrorExplanation': [WarmTierQueryValidation],
-  'views.widgets.menuActions': [ExportMessageWidgetAction],
+  'views.widgets.actions': [ExportMessageWidgetAction],
 };
 
 export default exports;

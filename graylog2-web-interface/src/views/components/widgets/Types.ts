@@ -27,19 +27,28 @@ export type Contexts = {
 
 export type WidgetAction = (w: Widget, contexts: Contexts) => (dispatch: AppDispatch, getState: GetState) => Promise<unknown>;
 
-export type WidgetDropdownActionType = {
+type WidgetActionPositionType = 'menu' | 'dropdown';
+
+type WidgetBaseActionType = {
   type: string,
-  title: (w: Widget) => React.ReactNode,
   isHidden?: (w: Widget) => boolean,
-  action: WidgetAction,
   disabled?: () => boolean,
+}
+
+type WidgetDropdownActionType = {
+  title: (w: Widget) => React.ReactNode,
+  action: WidgetAction,
+  position: WidgetActionPositionType | undefined,
+  component?: never
 };
 
 export type WidgetMenuActionComponentProps = {disabled: boolean, widget: Widget, contexts: Contexts}
 
 export type WidgetMenuActionType = {
-  type: string,
-  isHidden?: (w: Widget) => boolean,
-  disabled?: () => boolean,
-  component: React.ComponentType<WidgetMenuActionComponentProps>
+  component: React.ComponentType<WidgetMenuActionComponentProps>,
+  position: WidgetActionPositionType
+  title?: never,
+  action?: never,
 };
+
+export type WidgetActionType = (WidgetDropdownActionType | WidgetMenuActionType) & WidgetBaseActionType;

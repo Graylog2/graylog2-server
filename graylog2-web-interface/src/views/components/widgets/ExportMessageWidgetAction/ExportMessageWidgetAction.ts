@@ -15,13 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type Widget from 'views/logic/widgets/Widget';
-import type { WidgetMenuActionType } from 'views/components/widgets/Types';
+import type { WidgetActionType } from 'views/components/widgets/Types';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import ExportMessageWidgetActionComponent
   from 'views/components/widgets/ExportMessageWidgetAction/ExportMessageWidgetActionComponent';
 
-const ExportMessageWidgetAction: WidgetMenuActionType = {
+const ExportMessageWidgetAction: WidgetActionType = {
   type: 'export-widget-action',
+  position: 'menu',
   isHidden: (w: Widget) => (w.type !== MessagesWidget.type),
   component: ExportMessageWidgetActionComponent,
 };
