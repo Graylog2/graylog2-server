@@ -24,7 +24,7 @@ import { CAROUSEL_ID } from 'components/content-stream/ContentStreamNews';
 import useCarouselActions from 'components/common/carousel/hooks/useCarouselActions';
 
 const ContentStreamNewsContentActions = () => {
-  const { scrollPrev, scrollNext } = useCarouselActions(CAROUSEL_ID);
+  const { scrollPrev, scrollNext, nextBtnDisabled, prevBtnDisabled } = useCarouselActions(CAROUSEL_ID);
   const sendTelemetry = useSendTelemetry();
 
   const handlePrev = () => {
@@ -47,8 +47,12 @@ const ContentStreamNewsContentActions = () => {
 
   return (
     <>
-      <Button onClick={() => handlePrev()}><Icon name="chevron_left" /></Button>
-      <Button onClick={() => handleNext()}><Icon name="chevron_right" /></Button>
+      <Button onClick={() => handlePrev()} disabled={prevBtnDisabled}>
+        <Icon name="chevron_left" />
+      </Button>
+      <Button onClick={() => handleNext()} disabled={nextBtnDisabled}>
+        <Icon name="chevron_right" />
+      </Button>
     </>
   );
 };

@@ -38,8 +38,8 @@ const useCarouselActions = (carouselId: string) => {
   }, [carouselApi, onSelect]);
 
   return {
-    scrollNext: carouselApi?.scrollNext,
-    scrollPrev: carouselApi?.scrollPrev,
+    scrollNext: carouselApi?.scrollNext ? carouselApi.scrollNext : () => {},
+    scrollPrev: carouselApi?.scrollPrev ? carouselApi.scrollPrev : () => {},
     nextBtnDisabled,
     prevBtnDisabled,
   };
