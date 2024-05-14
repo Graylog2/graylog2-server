@@ -126,8 +126,6 @@ class TimeBasedRotationStrategyConfiguration extends React.Component {
       <div>
         <Input id="rotation-period"
                type="text"
-               labelClassName="col-sm-3"
-               wrapperClassName="col-sm-9"
                ref={(rotationPeriodRef) => { this.inputs.rotation_period = rotationPeriodRef; }}
                label="Rotation period (ISO8601 Duration)"
                onChange={this._onPeriodUpdate('rotation_period')}
@@ -136,10 +134,6 @@ class TimeBasedRotationStrategyConfiguration extends React.Component {
                addonAfter={this._formatDuration()}
                bsStyle={this._validationState()}
                required />
-        <Input id="rotate-empty-index-sets"
-               labelClassName="col-sm-3"
-               wrapperClassName="col-sm-9"
-               label="Empty index set">
           <Input id="rotate-empty-index-sets-checkbox"
                  type="checkbox"
                  ref={(rotateEmptyIndexSetRef) => { this.inputs.rotate_empty_index_set = rotateEmptyIndexSetRef; }}
@@ -147,7 +141,6 @@ class TimeBasedRotationStrategyConfiguration extends React.Component {
                  onChange={this._onRotateEmptyIndexSetUpdate('rotate_empty_index_set')}
                  checked={rotateEmptyIndexSet}
                  help="Apply the rotation strategy even when the index set is empty (not recommended)." />
-        </Input>
       </div>
     );
   }

@@ -95,8 +95,6 @@ const StyledSelect = styled(Select)`
 `;
 const StyledAlert = styled(Alert)`
   overflow: auto;
-  margin-right: 15px;
-  margin-left: 15px;
 `;
 
 const getStrategyJsonSchema = (selectedStrategy: string, strategies: Strategies) : JsonSchema | undefined => {
@@ -311,8 +309,6 @@ const IndexMaintenanceStrategiesConfiguration = ({
       <Row>
         <Col md={12}>
           <Input id="strategy-select"
-                 labelClassName="col-sm-3"
-                 wrapperClassName="col-sm-9"
                  label={selectPlaceholder}>
             <StyledSelect placeholder={selectPlaceholder}
                           options={getAvailableSelectOptions()}

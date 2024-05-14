@@ -27,8 +27,8 @@ import type {
   RetentionStrategyContext,
 } from 'components/indices/Types';
 import type { IndexSetTemplateFormValues, IndexSetTemplate } from 'components/indices/IndexSetTemplates/types';
-import { Col, SegmentedControl } from 'components/bootstrap';
-import { FormikInput, FormSubmit, InputOptionalInfo, Spinner, TimeUnitInput } from 'components/common';
+import { Col, Row, SegmentedControl } from 'components/bootstrap';
+import { FormikInput, FormSubmit, InputOptionalInfo, Section, Spinner, TimeUnitInput } from 'components/common';
 import { IndicesConfigurationActions, IndicesConfigurationStore } from 'stores/indices/IndicesConfigurationStore';
 import IndexMaintenanceStrategiesConfiguration from 'components/indices/IndexMaintenanceStrategiesConfiguration';
 import { prepareDataTieringConfig, prepareDataTieringInitialValues, DataTieringConfiguration } from 'components/indices/data-tiering';
@@ -58,16 +58,13 @@ type RetentionConfigProps = {
 
 const TIME_UNITS = ['SECONDS', 'MINUTES'];
 
-const StyledFormSubmit = styled(FormSubmit)`
-  margin-top: 30px;
-`;
-
-const ConfigSegmentsTitle = styled.h2(({ theme }) => css`
-  margin-bottom: ${theme.spacings.sm};
+const ConfigSegment = styled.div(({ theme }) => css`
+  margin-top: ${theme.spacings.md};
 `);
 
-const ConfigSegment = styled.div(({ theme }) => css`
-  margin-bottom: ${theme.spacings.xs};
+const SubmitWrapper = styled.div(({ theme }) => css`
+  display: flex;
+  justify-content: flex-end;
   margin-top: ${theme.spacings.md};
 `);
 
@@ -237,89 +234,97 @@ const TemplateForm = ({ initialValues, submitButtonText, submitLoadingText, onCa
   };
 
   return (
-    <Col lg={8}>
-      <Formik<IndexSetTemplateFormValues> initialValues={prepareInitialValues()}
-                                          onSubmit={handleSubmit}
-                                          validate={validate}
-                                          validateOnChange>
-        {({ isSubmitting, isValid, isValidating, setFieldValue, values }) => (
-          <Form>
-            <FormikInput name="title"
-                         label="Template title"
-                         id="index-set-template-title"
-                         help="A descriptive title of the template"
-                         required />
-            <FormikInput name="description"
-                         id="index-set-template-description"
-                         label={<>Description <InputOptionalInfo /></>}
-                         type="textarea"
-                         help="Longer description for template"
-                         rows={6} />
-            <FormikInput name="index_set_config.index_analyzer"
-                         label="Index Analyzer"
-                         id="index-set-template-index-analyzer"
-                         help="Index Analyzer" />
-            <FormikInput name="index_set_config.shards"
-                         label="Shards"
-                         type="number"
-                         id="index-set-template-shards"
-                         help="Number of shards used per index in this index set" />
-            <FormikInput name="index_set_config.replicas"
-                         label="Replicas"
-                         type="number"
-                         id="index-set-template-replicas"
-                         help="Number of replicas used per index in this index set" />
-            <FormikInput name="index_set_config.index_optimization_max_num_segments"
-                         label="Max. number of segments"
-                         type="number"
-                         id="index-set-template-index-optimization-max-num-segments"
-                         help="Maximum number of segments per index after optimization (force merge)" />
-            <FormikInput type="checkbox"
-                         name="index_set_config.index_optimization_disabled"
-                         id="index-set-template-index-optimization-disabled"
-                         label="Disable index optimization after rotation"
-                         help="Disable Elasticsearch index optimization (force merge) after rotation" />
-            <TimeUnitInput label="Field type refresh interval"
-                           update={(value, unit) => {
-                             setFieldValue('index_set_config.field_type_refresh_interval', value);
-                             setFieldValue('index_set_config.field_type_refresh_interval_unit', unit);
-                           }}
-                           value={values.index_set_config.field_type_refresh_interval}
-                           unit={values.index_set_config.field_type_refresh_interval_unit}
-                           enabled
-                           hideCheckbox
-                           units={TIME_UNITS} />
+    <Row>
+      <Col md={12}>
+        <Formik<IndexSetTemplateFormValues> initialValues={prepareInitialValues()}
+                                            onSubmit={handleSubmit}
+                                            validate={validate}
+                                            validateOnChange>
+          {({ isSubmitting, isValid, isValidating, setFieldValue, values }) => (
+            <Form>
+              <Section title="Configuration Information">
 
-            <>
-              <ConfigSegmentsTitle>Rotation and Retention</ConfigSegmentsTitle>
-              <SegmentedControl<RetentionConfigSegment> data={retentionConfigSegments}
-                                                        value={selectedRetentionSegment}
-                                                        onChange={setSelectedRetentionSegment} />
+                <FormikInput name="title"
+                             label="Template title"
+                             id="index-set-template-title"
+                             help="A descriptive title of the template"
+                             required />
+                <FormikInput name="description"
+                             id="index-set-template-description"
+                             label={<>Description <InputOptionalInfo /></>}
+                             type="textarea"
+                             help="Longer description for template"
+                             rows={6} />
+              </Section>
+              <Section title="Details">
 
-              {selectedRetentionSegment === 'data_tiering' ? (
-                <ConfigSegment>
-                  <h3>Data Tiering Configuration</h3>
-                  <DataTieringConfiguration valuesPrefix="index_set_config" />
-                </ConfigSegment>
-              )
-                : (
+                <FormikInput name="index_set_config.index_analyzer"
+                             label="Index Analyzer"
+                             id="index-set-template-index-analyzer"
+                             help="Index Analyzer" />
+                <FormikInput name="index_set_config.shards"
+                             label="Shards"
+                             type="number"
+                             id="index-set-template-shards"
+                             help="Number of shards used per index in this index set" />
+                <FormikInput name="index_set_config.replicas"
+                             label="Replicas"
+                             type="number"
+                             id="index-set-template-replicas"
+                             help="Number of replicas used per index in this index set" />
+                <FormikInput name="index_set_config.index_optimization_max_num_segments"
+                             label="Max. number of segments"
+                             type="number"
+                             id="index-set-template-index-optimization-max-num-segments"
+                             help="Maximum number of segments per index after optimization (force merge)" />
+                <FormikInput type="checkbox"
+                             name="index_set_config.index_optimization_disabled"
+                             id="index-set-template-index-optimization-disabled"
+                             label="Disable index optimization after rotation"
+                             help="Disable Elasticsearch index optimization (force merge) after rotation" />
+                <TimeUnitInput label="Field type refresh interval"
+                               update={(value, unit) => {
+                                 setFieldValue('index_set_config.field_type_refresh_interval', value);
+                                 setFieldValue('index_set_config.field_type_refresh_interval_unit', unit);
+                               }}
+                               value={values.index_set_config.field_type_refresh_interval}
+                               unit={values.index_set_config.field_type_refresh_interval_unit}
+                               enabled
+                               hideCheckbox
+                               units={TIME_UNITS} />
+              </Section>
+
+              <Section title="Rotation & Retention">
+
+                <SegmentedControl<RetentionConfigSegment> data={retentionConfigSegments}
+                                                          value={selectedRetentionSegment}
+                                                          onChange={setSelectedRetentionSegment} />
+
+                {selectedRetentionSegment === 'data_tiering' ? (
                   <ConfigSegment>
-                    <RotationConfig rotationStrategies={rotationStrategies} indexSetRotationStrategy={values.rotation_strategy} indexSetRotationStrategyClass={values.rotation_strategy_class} />
-                    <RetentionConfig retentionStrategies={retentionStrategies} retentionStrategiesContext={retentionStrategiesContext} indexSetRetentionStrategy={values.retention_strategy} indexSetRetentionStrategyClass={values.retention_strategy_class} />
+                    <DataTieringConfiguration valuesPrefix="index_set_config" />
                   </ConfigSegment>
-                )}
+                )
+                  : (
+                    <ConfigSegment>
+                      <RotationConfig rotationStrategies={rotationStrategies} indexSetRotationStrategy={values.rotation_strategy} indexSetRotationStrategyClass={values.rotation_strategy_class} />
+                      <RetentionConfig retentionStrategies={retentionStrategies} retentionStrategiesContext={retentionStrategiesContext} indexSetRetentionStrategy={values.retention_strategy} indexSetRetentionStrategyClass={values.retention_strategy_class} />
+                    </ConfigSegment>
+                  )}
 
-            </>
-
-            <StyledFormSubmit submitButtonText={submitButtonText}
-                              onCancel={onCancel}
-                              disabledSubmit={isValidating || !isValid}
-                              isSubmitting={isSubmitting}
-                              submitLoadingText={submitLoadingText} />
-          </Form>
-        )}
-      </Formik>
-    </Col>
+              </Section>
+              <SubmitWrapper>
+                <FormSubmit submitButtonText={submitButtonText}
+                            onCancel={onCancel}
+                            disabledSubmit={isValidating || !isValid}
+                            isSubmitting={isSubmitting}
+                            submitLoadingText={submitLoadingText} />
+              </SubmitWrapper>
+            </Form>
+          )}
+        </Formik>
+      </Col>
+    </Row>
   );
 };
 

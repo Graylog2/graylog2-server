@@ -38,8 +38,6 @@ const ClosingRetentionStrategyConfiguration = ({ updateConfig }) => {
       <Input type="number"
              id="max-number-of-indices"
              label="Max number of indices"
-             labelClassName="col-sm-3"
-             wrapperClassName="col-sm-9"
              onChange={_onInputUpdate('max_number_of_indices')}
              value={maxNumberOfIndices}
              help={<span>Maximum number of indices to keep before <strong>closing</strong> the oldest ones</span>}
