@@ -17,6 +17,7 @@
 package org.graylog.plugins.formatting.units.provider;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.io.Resources;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
@@ -28,7 +29,7 @@ import java.io.IOException;
 @Singleton
 public class SupportedUnitsProvider implements Provider<SupportedUnits> {
 
-    private static final String SUPPORTED_UNITS_RES_FILE_LOCATION = "supported_units.json";
+    private static final String SUPPORTED_UNITS_RES_FILE_LOCATION = "units/supported_units.json";
     private SupportedUnits supportedUnitsMemoized;
 
     private final ObjectMapper objectMapper;
@@ -50,6 +51,6 @@ public class SupportedUnitsProvider implements Provider<SupportedUnits> {
     }
 
     private SupportedUnits loadFromFile(final ObjectMapper objectMapper) throws IOException {
-        return objectMapper.readValue(SupportedUnitsProvider.class.getResourceAsStream(SUPPORTED_UNITS_RES_FILE_LOCATION), SupportedUnits.class);
+        return objectMapper.readValue(Resources.getResource(SUPPORTED_UNITS_RES_FILE_LOCATION), SupportedUnits.class);
     }
 }
