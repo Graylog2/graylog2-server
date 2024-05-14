@@ -16,14 +16,15 @@
  */
 import React from 'react';
 
-import useCarouselAction from 'hooks/useCarouselAction';
 import { Icon } from 'components/common';
 import { Button } from 'components/bootstrap';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import { CAROUSEL_ID } from 'components/content-stream/ContentStreamNews';
+import useCarouselActions from 'components/common/carousel/hooks/useCarouselActions';
 
 const ContentStreamNewsContentActions = () => {
-  const { scrollPrev, scrollNext } = useCarouselAction('.carousel');
+  const { scrollPrev, scrollNext } = useCarouselActions(CAROUSEL_ID);
   const sendTelemetry = useSendTelemetry();
 
   const handlePrev = () => {

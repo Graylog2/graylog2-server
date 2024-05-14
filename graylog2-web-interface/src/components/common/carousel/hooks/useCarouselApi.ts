@@ -14,55 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useContext } from 'react';
-import styled from 'styled-components';
 
-import CarouselSlide from 'components/common/carousel/CarouselSlide';
+import { useContext } from 'react';
+
 import CarouselApiContext from 'components/common/carousel/CarouselContext';
 
-const useCarouselRef = (carouselId: string) => {
+const useCarouselApi = (carouselId: string) => {
   const carouselApiContext = useContext(CarouselApiContext);
 
   if (!carouselApiContext) {
-    throw new Error('Carousel component needs to be used inside CarouselProvider.');
+    throw new Error('useCarouselApi hook needs to be used inside CarouselApiProvider.');
   }
 
   if (!carouselApiContext[carouselId]) {
     throw new Error(`CarouselApiContext does not contain anything for carousel id ${carouselId}`);
   }
 
-  return carouselApiContext[carouselId].ref;
+  return carouselApiContext[carouselId].api;
 };
 
-type Props = {
-  children: React.ReactNode,
-  carouselId: string
-};
-
-const StyledDiv = styled.div`
-  &.carousel {
-    overflow: hidden;
-
-    .carousel-container {
-      backface-visibility: hidden;
-      display: flex;
-      flex-direction: row;
-      height: auto;
-    }
-  }
-`;
-
-const Carousel = ({ children, carouselId }: Props) => {
-  const carouselRef = useCarouselRef(carouselId);
-
-  return (
-    <StyledDiv className="carousel" ref={carouselRef}>
-      <div className="carousel-container">
-        {children}
-      </div>
-    </StyledDiv>
-  );
-};
-
-Carousel.Slide = CarouselSlide;
-export default Carousel;
+export default useCarouselApi;

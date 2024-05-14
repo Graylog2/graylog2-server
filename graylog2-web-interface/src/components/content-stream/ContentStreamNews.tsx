@@ -23,6 +23,8 @@ import { Spinner, ExternalLink } from 'components/common';
 import ContentStreamNewsItem from 'components/content-stream/news/ContentStreamNewsItem';
 import { Alert } from 'components/bootstrap';
 
+export const CAROUSEL_ID = 'content-stream-news';
+
 const ContentStreamNews = () => {
   const { feedList, isLoadingFeed, error } = useContentStream();
 
@@ -46,7 +48,7 @@ const ContentStreamNews = () => {
   }
 
   return (
-    <Carousel>
+    <Carousel carouselId="content-stream-news">
       {feedList?.map((feed) => <ContentStreamNewsItem key={feed?.guid['#text'] || feed?.title} feed={feed} />)}
     </Carousel>
   );
