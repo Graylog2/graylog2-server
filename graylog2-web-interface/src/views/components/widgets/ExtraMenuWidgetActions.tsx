@@ -22,6 +22,7 @@ import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import useWidgetActions from 'views/components/widgets/useWidgetActions';
 import ExportWidgetPlugAction from 'views/components/widgets/ExportWidgetAction/ExportWidgetPlugAction';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
+import type { WidgetActionType } from 'views/components/widgets/Types';
 
 type Props = {
   widget: Widget,
@@ -31,7 +32,7 @@ const ExtraMenuWidgetActions = ({ widget }: Props) => {
   const widgetFocusContext = useContext(WidgetFocusContext);
   const pluginWidgetActions = useWidgetActions();
 
-  const extraWidgetActions = useMemo(() => {
+  const extraWidgetActions = useMemo<Array<WidgetActionType>>(() => {
     const filtratedActions = pluginWidgetActions
       .filter(({ isHidden = () => false, position }) => !isHidden(widget) && position === 'menu');
 
@@ -41,18 +42,19 @@ const ExtraMenuWidgetActions = ({ widget }: Props) => {
       filtratedActions.push(ExportWidgetPlugAction);
     }
 
-    return filtratedActions.map(({ component: Component, type, disabled = () => false }) => (
+    return filtratedActions;
+  },
+  [pluginWidgetActions, widget, widgetFocusContext]);
+
+  return (
+    <>{extraWidgetActions.map(({ component: Component, type, disabled = () => false }) => (
       <Component widget={widget}
                  contexts={{ widgetFocusContext }}
                  key={`${type}-${widget.id}`}
                  disabled={disabled()} />
-    ));
-  },
-  [pluginWidgetActions, widget, widgetFocusContext]);
-
-  return extraWidgetActions.length > 0
-    ? extraWidgetActions
-    : null;
+    ))}
+    </>
+  );
 };
 
 export default ExtraMenuWidgetActions;

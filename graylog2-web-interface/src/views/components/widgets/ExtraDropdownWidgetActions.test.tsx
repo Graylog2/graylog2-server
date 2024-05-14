@@ -25,7 +25,7 @@ import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import useWidgetActions from 'views/components/widgets/useWidgetActions';
 import wrapWithMenu from 'helpers/components/wrapWithMenu';
-import type { WidgetDropdownActionType } from 'views/components/widgets/Types';
+import type { WidgetActionType } from 'views/components/widgets/Types';
 
 jest.mock('views/components/widgets/useWidgetActions');
 
@@ -39,7 +39,7 @@ const ExtraWidgetActions = wrapWithMenu(ExtraWidgetActionsWithoutMenu);
 
 describe('ExtraWidgetActions', () => {
   const widget = Widget.empty();
-  const dummyActionWithoutIsHidden: WidgetDropdownActionType = {
+  const dummyActionWithoutIsHidden: WidgetActionType = {
     type: 'dummy-action',
     title: () => 'Dummy Action',
     action: jest.fn(() => async () => {}),
@@ -56,10 +56,15 @@ describe('ExtraWidgetActions', () => {
     ...dummyActionWithoutIsHidden,
     disabled: jest.fn(() => true),
   };
-
+  const dummyActionWithMenuPosition: WidgetActionType = {
+    position: 'menu',
+    type: 'dummy-action',
+    title: () => 'Dummy Action',
+    action: jest.fn(() => async () => {}),
+  };
   useViewsPlugin();
 
-  it('does not render menu items, when no action is configured', () => {
+  it('does not render dropdown items, when no action is configured', () => {
     asMock(useWidgetActions).mockReturnValue([]);
 
     render(<ExtraWidgetActionsWithoutMenu widget={widget} />);
@@ -67,7 +72,7 @@ describe('ExtraWidgetActions', () => {
     expect(screen.queryByRole('menuitem')).not.toBeInTheDocument();
   });
 
-  it('does not render menu items, if no action is hidden', () => {
+  it('does not render dropdown items, if no action is hidden', () => {
     asMock(useWidgetActions).mockReturnValue([dummyActionWhichIsHidden]);
 
     render(<ExtraWidgetActionsWithoutMenu widget={widget} />);
@@ -91,7 +96,7 @@ describe('ExtraWidgetActions', () => {
     await screen.findByText('Dummy Action');
   });
 
-  it('clicking menu item triggers action', async () => {
+  it('clicking dropdown item triggers action', async () => {
     asMock(useWidgetActions).mockReturnValue([dummyActionWhichIsNotHidden]);
 
     render(<ExtraWidgetActions widget={widget} />);
@@ -126,5 +131,13 @@ describe('ExtraWidgetActions', () => {
     const menuItem = await screen.findByRole('menuitem');
 
     expect(menuItem).toBeDisabled();
+  });
+
+  it('does not render dropdown items, when action has menu position', () => {
+    asMock(useWidgetActions).mockReturnValue([dummyActionWithMenuPosition]);
+
+    render(<ExtraWidgetActionsWithoutMenu widget={widget} />);
+
+    expect(screen.queryByRole('menuitem')).not.toBeInTheDocument();
   });
 });

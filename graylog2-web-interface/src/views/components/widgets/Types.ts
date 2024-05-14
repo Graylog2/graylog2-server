@@ -38,7 +38,7 @@ type WidgetBaseActionType = {
 type WidgetDropdownActionType = {
   title: (w: Widget) => React.ReactNode,
   action: WidgetAction,
-  position: WidgetActionPositionType | undefined,
+  position?: WidgetActionPositionType,
   component?: never
 };
 
