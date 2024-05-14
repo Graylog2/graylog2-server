@@ -74,6 +74,7 @@ const Carousel = ({ children, className, containerRef, carouselId }: Props) => {
 Carousel.defaultProps = {
   className: undefined,
   containerRef: undefined,
+  options: undefined,
 };
 
 Carousel.Slide = CarouselSlide;
