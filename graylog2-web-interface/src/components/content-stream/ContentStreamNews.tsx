@@ -17,9 +17,8 @@
 import React from 'react';
 import isEmpty from 'lodash/isEmpty';
 
-import Carousel from 'components/common/carousel/Carousel';
+import { Carousel, Spinner, ExternalLink } from 'components/common';
 import useContentStream from 'components/content-stream/hook/useContentStream';
-import { Spinner, ExternalLink } from 'components/common';
 import ContentStreamNewsItem from 'components/content-stream/news/ContentStreamNewsItem';
 import { Alert } from 'components/bootstrap';
 

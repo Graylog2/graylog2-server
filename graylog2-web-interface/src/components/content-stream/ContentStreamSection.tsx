@@ -27,7 +27,7 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import ToggleActionButton from 'components/content-stream/ToggleActionButton';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import CarouselProvider from 'components/common/carousel/CarouselProvider';
+import { CarouselProvider } from 'components/common/Carousel';
 
 const StyledNewsSectionComponent = styled(SectionComponent)<{ $enabled: boolean }>(({ $enabled, theme }) => css`
   overflow: hidden;

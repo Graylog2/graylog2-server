@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useMemo } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
 
-import CarouselApiContext from 'components/common/carousel/CarouselContext';
+import CarouselApiContext from './CarouselContext';
 
 type Props = React.PropsWithChildren<{
   carouselId: string

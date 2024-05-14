@@ -17,7 +17,7 @@
 
 import { useContext } from 'react';
 
-import CarouselApiContext from 'components/common/carousel/CarouselContext';
+import CarouselApiContext from '../CarouselContext';
 
 const useCarouselApi = (carouselId: string) => {
   const carouselApiContext = useContext(CarouselApiContext);

@@ -17,22 +17,27 @@
 import React, { useContext } from 'react';
 import styled from 'styled-components';
 
-import CarouselSlide from 'components/common/carousel/CarouselSlide';
-import CarouselApiContext from 'components/common/carousel/CarouselContext';
+import CarouselSlide from './CarouselSlide';
+import CarouselContext from './CarouselContext';
 
 const useCarouselRef = (carouselId: string) => {
-  const carouselApiContext = useContext(CarouselApiContext);
+  const carouselApiContext = useContext(CarouselContext);
 
   if (!carouselApiContext) {
     throw new Error('Carousel component needs to be used inside CarouselProvider.');
   }
 
   if (!carouselApiContext[carouselId]) {
-    throw new Error(`CarouselApiContext does not contain anything for carousel id ${carouselId}`);
+    throw new Error(`CarouselContext does not contain anything for carousel id ${carouselId}`);
   }
 
   return carouselApiContext[carouselId].ref;
 };
+
+/*
+ * Carousel component based on embla carousel. Needs to be wrapped in CarouselProvider.
+ * The CarouselProvider also allows configuring the carousel.
+ */
 
 type Props = {
   children: React.ReactNode,

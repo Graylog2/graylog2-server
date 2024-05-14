@@ -21,7 +21,7 @@ import { Button } from 'components/bootstrap';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { CAROUSEL_ID } from 'components/content-stream/ContentStreamNews';
-import useCarouselActions from 'components/common/carousel/hooks/useCarouselActions';
+import { useCarouselActions } from 'components/common/Carousel';
 
 const ContentStreamNewsContentActions = () => {
   const { scrollPrev, scrollNext, nextBtnDisabled, prevBtnDisabled } = useCarouselActions(CAROUSEL_ID);
