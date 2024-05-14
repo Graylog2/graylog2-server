@@ -76,7 +76,7 @@ class GenerateConfigDocumentationTest {
         generator.generateDocumentation(format, () -> List.of(new DummyConfiguration()));
         final String content = Files.readString(file);
         Assertions.assertThat(content).contains("The auto-generated node ID will be stored in this file and read after restarts");
-        Assertions.assertThat(content).contains("# node_id_file=data/node-id");
+        Assertions.assertThat(content).contains("# node_id_file = data/node-id");
     }
 
     private static class DummyConfiguration {

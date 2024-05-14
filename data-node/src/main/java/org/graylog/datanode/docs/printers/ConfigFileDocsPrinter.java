@@ -113,7 +113,7 @@ public class ConfigFileDocsPrinter implements DocsPrinter {
 
         String template = """
                 %s
-                %s%s=%s
+                %s%s = %s
 
                 """;
 
