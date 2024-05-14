@@ -196,7 +196,7 @@ const TemplateForm = ({ initialValues, submitButtonText, submitLoadingText, onCa
         rotation_strategy: selectedRetentionSegment === 'legacy' ? rotation_strategy : undefined,
         rotation_strategy_class: selectedRetentionSegment === 'legacy' ? rotation_strategy_class : undefined,
         use_legacy_rotation: selectedRetentionSegment === 'legacy',
-        data_tiering: prepareDataTieringConfig(index_set_config.data_tiering, PluginStore),
+        data_tiering: selectedRetentionSegment === 'legacy' ? undefined : prepareDataTieringConfig(index_set_config.data_tiering, PluginStore),
       },
     };
 
