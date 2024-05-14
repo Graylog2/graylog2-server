@@ -41,6 +41,7 @@ import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog2.cluster.nodes.DataNodeStatus;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.junit.jupiter.api.io.TempDir;
 import org.slf4j.Logger;
@@ -128,7 +129,10 @@ public class DatanodeProvisioningIT {
             connectedDatanodes = RetryerBuilder.<List<DatanodeStatus>>newBuilder()
                     .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
                     .withStopStrategy(StopStrategies.stopAfterAttempt(60))
-                    .retryIfResult(list -> list.isEmpty() || !list.stream().allMatch(node -> node.status().equals(DataNodeProvisioningConfig.State.CONNECTED.name())))
+                    .retryIfResult(list -> list.isEmpty() || !list.stream().allMatch(node ->
+                            node.status().equals(DataNodeProvisioningConfig.State.CONNECTED.name()) &&
+                                    node.dataNodeStatus().equals(DataNodeStatus.AVAILABLE.name())
+                    ))
                     .build()
                     .call(() -> getDatanodes(basicAuth));
         } catch (ExecutionException | RetryException | IllegalStateException e) {
@@ -263,7 +267,8 @@ public class DatanodeProvisioningIT {
             @JsonProperty("status") String status,
             @JsonProperty("error_msg") String errorMsg,
             @JsonProperty("hostname") String hostname,
-            @JsonProperty("short_node_id") String shortNodeId
+            @JsonProperty("short_node_id") String shortNodeId,
+            @JsonProperty("data_node_status") String dataNodeStatus
     ) {
     }
 }
