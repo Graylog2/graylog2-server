@@ -22,10 +22,10 @@ import styled, { css } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import AppConfig from 'util/AppConfig';
-import { FormikFormGroup, FormikInput, FormSubmit, Spinner, TimeUnitInput } from 'components/common';
+import { FormikInput, FormSubmit, Spinner, TimeUnitInput } from 'components/common';
 import useIndexDefaults from 'components/indices/hooks/useIndexDefaults';
 import HideOnCloud from 'util/conditional/HideOnCloud';
-import { Col, Row, Input, SegmentedControl } from 'components/bootstrap';
+import { Col, Row, SegmentedControl } from 'components/bootstrap';
 import IndexMaintenanceStrategiesConfiguration from 'components/indices/IndexMaintenanceStrategiesConfiguration';
 import 'components/indices/rotation';
 import 'components/indices/retention';
@@ -160,17 +160,19 @@ const ReadOnlyConfig = () => {
 
   return (
     <span>
-      <FormikFormGroup type="text"
-                       label="Index prefix"
-                       name="index_prefix"
-                       help={indexPrefixHelp}
-                       validate={_validateIndexPrefix}
-                       required />
-      <FormikFormGroup type="text"
-                       label="Analyzer"
-                       name="index_analyzer"
-                       help="Elasticsearch analyzer for this index set."
-                       required />
+      <FormikInput type="text"
+                   id="index-prefix"
+                   label="Index prefix"
+                   name="index_prefix"
+                   help={indexPrefixHelp}
+                   validate={_validateIndexPrefix}
+                   required />
+      <FormikInput type="text"
+                   id="index-analyzer"
+                   label="Analyzer"
+                   name="index_analyzer"
+                   help="Elasticsearch analyzer for this index set."
+                   required />
     </span>
   );
 };
@@ -277,61 +279,57 @@ const IndexSetConfigurationForm = ({
               <Form>
                 <Row>
                   <Col md={12}>
-                    <FormikFormGroup type="text"
-                                     label="Title"
-                                     name="title"
-                                     help="Descriptive name of the index set."
-                                     required />
-                    <FormikFormGroup type="text"
-                                     label="Description"
-                                     name="description"
-                                     help="Add a description of this index set."
-                                     required />
+                    <FormikInput type="text"
+                                 label="Title"
+                                 id="title"
+                                 name="title"
+                                 help="Descriptive name of the index set."
+                                 required />
+                    <FormikInput type="text"
+                                 id="description"
+                                 label="Description"
+                                 name="description"
+                                 help="Add a description of this index set."
+                                 required />
                     {create && <ReadOnlyConfig />}
                     <HideOnCloud>
-                      <FormikFormGroup type="number"
-                                       label="Index shards"
-                                       name="shards"
-                                       help="Number of Elasticsearch shards used per index in this index set."
-                                       required />
-                      <FormikFormGroup type="number"
-                                       label="Index replicas"
-                                       name="replicas"
-                                       help="Number of Elasticsearch replicas used per index in this index set."
-                                       required />
-                      <FormikFormGroup type="number"
-                                       label="Max. number of segments"
-                                       name="index_optimization_max_num_segments"
-                                       minLength={1}
-                                       help="Maximum number of segments per Elasticsearch index after optimization (force merge)."
-                                       required />
-                      <Input id="roles-selector-input"
-                             labelClassName="col-sm-3"
-                             wrapperClassName="col-sm-9"
-                             label="Index optimization after rotation">
-                        <FormikInput type="checkbox"
-                                     id="index_optimization_disabled"
-                                     label="Disable index optimization after rotation"
-                                     name="index_optimization_disabled"
-                                     help="Disable Elasticsearch index optimization (force merge) after rotation." />
-                      </Input>
+                      <FormikInput type="number"
+                                   id="shards"
+                                   label="Index shards"
+                                   name="shards"
+                                   help="Number of Elasticsearch shards used per index in this index set."
+                                   required />
+                      <FormikInput type="number"
+                                   id="replicas"
+                                   label="Index replicas"
+                                   name="replicas"
+                                   help="Number of Elasticsearch replicas used per index in this index set."
+                                   required />
+                      <FormikInput type="number"
+                                   id="max-number-segments"
+                                   label="Max. number of segments"
+                                   name="index_optimization_max_num_segments"
+                                   minLength={1}
+                                   help="Maximum number of segments per Elasticsearch index after optimization (force merge)."
+                                   required />
+                      <FormikInput type="checkbox"
+                                   id="index_optimization_disabled"
+                                   label="Disable index optimization after rotation"
+                                   name="index_optimization_disabled"
+                                   help="Disable Elasticsearch index optimization (force merge) after rotation." />
                       <Field name="field_type_refresh_interval">
                         {({ field: { name, value, onChange } }) => (
-                          <Input id="roles-selector-input"
-                                 labelClassName="col-sm-3"
-                                 wrapperClassName="col-sm-9"
-                                 label="Field type refresh interval">
-                            <TimeUnitInput id="field-type-refresh-interval"
-                                           type="number"
-                                           help="How often the field type information for the active write index will be updated."
-                                           value={moment.duration(value, 'milliseconds').as(fieldTypeRefreshIntervalUnit)}
-                                           unit={fieldTypeRefreshIntervalUnit.toUpperCase()}
-                                           units={['SECONDS', 'MINUTES']}
-                                           required
-                                           update={(intervalValue: number, unit: Unit) => onFieldTypeRefreshIntervalChange(
-                                             intervalValue, unit, name, onChange, setFieldValue,
-                                           )} />
-                          </Input>
+                          <TimeUnitInput id="field-type-refresh-interval"
+                                         label="Field type refresh interval"
+                                         type="number"
+                                         help="How often the field type information for the active write index will be updated."
+                                         value={moment.duration(value, 'milliseconds').as(fieldTypeRefreshIntervalUnit)}
+                                         unit={fieldTypeRefreshIntervalUnit.toUpperCase()}
+                                         units={['SECONDS', 'MINUTES']}
+                                         required
+                                         update={(intervalValue: number, unit: Unit) => onFieldTypeRefreshIntervalChange(
+                                           intervalValue, unit, name, onChange, setFieldValue,
+                                         )} />
                         )}
                       </Field>
                     </HideOnCloud>
