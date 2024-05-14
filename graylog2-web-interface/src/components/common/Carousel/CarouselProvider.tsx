@@ -15,26 +15,28 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo } from 'react';
+import { useMemo, useContext } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
 
-import CarouselApiContext from './CarouselContext';
+import CarouselContext from './CarouselContext';
 
 type Props = React.PropsWithChildren<{
   carouselId: string
 }>
 
 const CarouselProvider = ({ carouselId, children } : Props) => {
+  const existingContextValue = useContext(CarouselContext);
   const [ref, api] = useEmblaCarousel({ containScroll: 'trimSnaps' });
 
   const value = useMemo(() => ({
+    ...(existingContextValue ?? {}),
     [carouselId]: { ref, api },
-  }), [api, carouselId, ref]);
+  }), [api, carouselId, existingContextValue, ref]);
 
   return (
-    <CarouselApiContext.Provider value={value}>
+    <CarouselContext.Provider value={value}>
       {children}
-    </CarouselApiContext.Provider>
+    </CarouselContext.Provider>
   );
 };
 

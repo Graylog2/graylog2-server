@@ -24,8 +24,8 @@ const useCarouselActions = (carouselId: string) => {
   const canScrollPrev = useCallback(() => !!carouselApi?.canScrollPrev(), [carouselApi]);
   const canScrollNext = useCallback(() => !!carouselApi?.canScrollNext(), [carouselApi]);
 
-  const [nextBtnDisabled, setNextBtnDisabled] = useState(!canScrollPrev());
-  const [prevBtnDisabled, setPrevBtnDisabled] = useState(!canScrollPrev());
+  const [nextBtnDisabled, setNextBtnDisabled] = useState(false);
+  const [prevBtnDisabled, setPrevBtnDisabled] = useState(false);
 
   const onSelect = useCallback(() => {
     setPrevBtnDisabled(!canScrollPrev());
@@ -33,8 +33,10 @@ const useCarouselActions = (carouselId: string) => {
   }, [canScrollNext, canScrollPrev]);
 
   useEffect(() => {
-    carouselApi?.on('reInit', onSelect);
-    carouselApi?.on('select', onSelect);
+    if (carouselApi) {
+      carouselApi.on('reInit', onSelect);
+      carouselApi.on('select', onSelect);
+    }
   }, [carouselApi, onSelect]);
 
   return {

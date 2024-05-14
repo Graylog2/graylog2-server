@@ -21,17 +21,17 @@ import CarouselSlide from './CarouselSlide';
 import CarouselContext from './CarouselContext';
 
 const useCarouselRef = (carouselId: string) => {
-  const carouselApiContext = useContext(CarouselContext);
+  const carouselContext = useContext(CarouselContext);
 
-  if (!carouselApiContext) {
+  if (!carouselContext) {
     throw new Error('Carousel component needs to be used inside CarouselProvider.');
   }
 
-  if (!carouselApiContext[carouselId]) {
+  if (!carouselContext[carouselId]) {
     throw new Error(`CarouselContext does not contain anything for carousel id ${carouselId}`);
   }
 
-  return carouselApiContext[carouselId].ref;
+  return carouselContext[carouselId].ref;
 };
 
 /*

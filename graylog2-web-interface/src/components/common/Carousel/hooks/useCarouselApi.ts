@@ -17,20 +17,20 @@
 
 import { useContext } from 'react';
 
-import CarouselApiContext from '../CarouselContext';
+import CarouselContext from '../CarouselContext';
 
 const useCarouselApi = (carouselId: string) => {
-  const carouselApiContext = useContext(CarouselApiContext);
+  const carouselContext = useContext(CarouselContext);
 
-  if (!carouselApiContext) {
+  if (!carouselContext) {
     throw new Error('useCarouselApi hook needs to be used inside CarouselApiProvider.');
   }
 
-  if (!carouselApiContext[carouselId]) {
-    throw new Error(`CarouselApiContext does not contain anything for carousel id ${carouselId}`);
+  if (!carouselContext[carouselId]) {
+    throw new Error(`CarouselContext does not contain anything for carousel id ${carouselId}`);
   }
 
-  return carouselApiContext[carouselId].api;
+  return carouselContext[carouselId].api;
 };
 
 export default useCarouselApi;
