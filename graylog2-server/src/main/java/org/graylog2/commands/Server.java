@@ -111,6 +111,7 @@ import org.graylog2.storage.VersionAwareStorageModule;
 import org.graylog2.streams.StreamsModule;
 import org.graylog2.system.processing.ProcessingStatusConfig;
 import org.graylog2.system.shutdown.GracefulShutdown;
+import org.graylog2.telemetry.TelemetryModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -213,7 +214,8 @@ public class Server extends ServerBootstrap {
                 new UnitsModule(),
                 new DataTieringModule(),
                 new DatanodeMigrationBindings(),
-                new CaModule()
+                new CaModule(),
+                new TelemetryModule()
         );
 
         modules.add(new FieldTypeManagementModule());
