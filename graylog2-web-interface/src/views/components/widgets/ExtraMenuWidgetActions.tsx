@@ -19,10 +19,9 @@ import { useContext, useMemo } from 'react';
 
 import type Widget from 'views/logic/widgets/Widget';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
-import useAppDispatch from 'stores/useAppDispatch';
-import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
 import useWidgetActions from 'views/components/widgets/useWidgetActions';
+import ExportWidgetPlugAction from 'views/components/widgets/ExportWidgetAction/ExportWidgetPlugAction';
+import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 
 type Props = {
   widget: Widget,
@@ -32,20 +31,27 @@ const ExtraMenuWidgetActions = ({ widget }: Props) => {
   const widgetFocusContext = useContext(WidgetFocusContext);
   const pluginWidgetActions = useWidgetActions();
 
-  const dispatch = useAppDispatch();
-  const sendTelemetry = useSendTelemetry();
-  const { pathname } = useLocation();
-  const extraWidgetActions = useMemo(() => pluginWidgetActions
-    .filter(({ isHidden = () => false, position }) => !isHidden(widget) && position === 'menu')
-    .map(({ component: Component, type, disabled = () => false }) => (
-      <Component widget={widget} contexts={{ widgetFocusContext }} key={`${type}-${widget.id}`} disabled={disabled()} />)), [dispatch, pathname, pluginWidgetActions, sendTelemetry, widget, widgetFocusContext]);
+  const extraWidgetActions = useMemo(() => {
+    const filtratedActions = pluginWidgetActions
+      .filter(({ isHidden = () => false, position }) => !isHidden(widget) && position === 'menu');
+
+    const hasExportAction = filtratedActions.some(({ type }) => type === 'export-widget-action');
+
+    if (!hasExportAction && widget.type === AggregationWidget.type) {
+      filtratedActions.push(ExportWidgetPlugAction);
+    }
+
+    return filtratedActions.map(({ component: Component, type, disabled = () => false }) => (
+      <Component widget={widget}
+                 contexts={{ widgetFocusContext }}
+                 key={`${type}-${widget.id}`}
+                 disabled={disabled()} />
+    ));
+  },
+  [pluginWidgetActions, widget, widgetFocusContext]);
 
   return extraWidgetActions.length > 0
-    ? (
-      <>
-        {extraWidgetActions}
-      </>
-    )
+    ? extraWidgetActions
     : null;
 };
 

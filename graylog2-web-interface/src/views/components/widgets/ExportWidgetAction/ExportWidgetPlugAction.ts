@@ -14,17 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type Widget from 'views/logic/widgets/Widget';
 import type { WidgetActionType } from 'views/components/widgets/Types';
-import MessagesWidget from 'views/logic/widgets/MessagesWidget';
-import ExportMessageWidgetActionComponent
-  from 'views/components/widgets/ExportMessageWidgetAction/ExportMessageWidgetActionComponent';
+import ExportWidgetPlug from 'views/components/widgets/ExportWidgetAction/ExportWidgetPlug';
 
 const ExportMessageWidgetAction: WidgetActionType = {
-  type: 'export-messages-widget-action',
+  type: 'export-widget-action-plug',
   position: 'menu',
-  isHidden: (w: Widget) => (w.type !== MessagesWidget.type),
-  component: ExportMessageWidgetActionComponent,
+  component: ExportWidgetPlug,
 };
 
 export default ExportMessageWidgetAction;

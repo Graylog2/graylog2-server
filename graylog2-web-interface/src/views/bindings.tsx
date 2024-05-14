@@ -108,7 +108,7 @@ import EventsWidgetEdit from 'views/components/widgets/events/EventsWidgetEdit';
 import EventsWidget from 'views/logic/widgets/events/EventsWidget';
 import eventsAttributes from 'views/components/widgets/events/eventsAttributes';
 import WarmTierQueryValidation from 'views/components/searchbar/queryvalidation/WarmTierQueryValidation';
-import ExportMessageWidgetAction from 'views/components/widgets/ExportMessageWidgetAction/ExportMessageWidgetAction';
+import ExportMessageWidgetAction from 'views/components/widgets/ExportWidgetAction/ExportMessageWidgetAction';
 
 import type { ActionHandlerArguments } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
