@@ -38,6 +38,11 @@ const SearchContainer = styled.div`
   margin-top: 12px;
 `;
 
+type MigrateExistingDataResponse = {
+  elasticsearch_hosts: string,
+  allowlist_hosts: string,
+}
+
 export type RemoteReindexCheckConnection = {
   indices: string[],
   error: any,
@@ -108,8 +113,8 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
   const areAllIndicesSelected = filteredSelectedIndices.length === filteredIndices.length;
 
   const initialValues: RemoteReindexRequest = {
-    allowlist: '',
-    hostname: '',
+    allowlist: (currentStep.response as MigrateExistingDataResponse)?.allowlist_hosts || '',
+    hostname: (currentStep.response as MigrateExistingDataResponse)?.elasticsearch_hosts || '',
     user: '',
     password: '',
     synchronous: false,
@@ -128,7 +133,7 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
           <Input id="hostname"
                  name="hostname"
                  label="Hostname"
-                 help="URI of the host to call the remote reindexing command against"
+                 help="URI of the host to call the remote reindexing command against (http://example:9200)"
                  placeholder="http://example:9200/"
                  type="text"
                  disabled={isLoading}
@@ -158,8 +163,8 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
           <Input id="allowlist"
                  name="allowlist"
                  label="Allowlist"
-                 help="Allowlist of all machines in the old cluster"
-                 placeholder="example:9200,example:9201,example:9202 or REGEX (Regular expression)"
+                 help="Allowlist of all machines in the old cluster (example:9200,example:9201,example:9202 or Regular expression)"
+                 placeholder="example:9200,example:9201,example:9202 or Regular expression"
                  type="text"
                  disabled={isLoading}
                  value={values.allowlist}
