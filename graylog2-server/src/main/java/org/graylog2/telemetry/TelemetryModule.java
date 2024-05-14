@@ -14,23 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+package org.graylog2.telemetry;
 
-import { useState, useMemo, useEffect } from 'react';
-import EmblaCarousel from 'embla-carousel';
+import org.graylog2.plugin.PluginModule;
+import org.graylog2.telemetry.scheduler.TelemetrySubmissionPeriodical;
 
-const useCarouselApi = (carouselElementClass: string) => {
-  const [carousel, setCarousel] = useState<HTMLElement>(undefined);
-  const emblaApi = useMemo(() => carousel && EmblaCarousel(carousel, { containScroll: 'trimSnaps' }), [carousel]);
-
-  useEffect(() => {
-    if (!carousel) {
-      setInterval(() => {
-        setCarousel(document.querySelector<HTMLElement>(carouselElementClass));
-      }, 200);
+public class TelemetryModule extends PluginModule {
+    @Override
+    protected void configure() {
+        // Initializing binder so it can be injected with no actual bindings
+        telemetryMetricSupplierBinder();
+        
+        addPeriodical(TelemetrySubmissionPeriodical.class);
     }
-  }, [carousel, carouselElementClass]);
-
-  return emblaApi;
-};
-
-export default useCarouselApi;
+}

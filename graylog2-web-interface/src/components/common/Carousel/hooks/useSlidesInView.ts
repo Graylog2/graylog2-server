@@ -20,8 +20,8 @@ import { useCallback, useEffect, useState } from 'react';
 
 import useCarouselApi from './useCarouselApi';
 
-const useSlidesInView = () => {
-  const carouselApi = useCarouselApi('.carousel');
+const useSlidesInView = (carouselId: string) => {
+  const carouselApi = useCarouselApi(carouselId);
   const [slidesInView, setSlidesInView] = useState<number[]>([]);
 
   const updateSlidesInView = useCallback((emblaApi: EmblaCarouselType) => {

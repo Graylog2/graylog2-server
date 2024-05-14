@@ -14,16 +14,36 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components';
-import useEmblaCarousel from 'embla-carousel-react';
 
-import CarouselSlide from 'components/common/carousel/CarouselSlide';
+import CarouselSlide from './CarouselSlide';
+import CarouselContext from './CarouselContext';
+
+const useCarouselRef = (carouselId: string) => {
+  const carouselContext = useContext(CarouselContext);
+
+  if (!carouselContext) {
+    throw new Error('Carousel component needs to be used inside CarouselProvider.');
+  }
+
+  if (!carouselContext[carouselId]) {
+    throw new Error(`CarouselContext does not contain anything for carousel id ${carouselId}`);
+  }
+
+  return carouselContext[carouselId].ref;
+};
+
+/*
+ * Carousel component based on embla carousel. Needs to be wrapped in CarouselProvider.
+ * The CarouselProvider also allows configuring the carousel.
+ */
 
 type Props = {
   children: React.ReactNode,
   className?: string
   containerRef?: React.Ref<HTMLDivElement>
+  carouselId: string
 };
 
 const StyledDiv = styled.div`
@@ -39,11 +59,11 @@ const StyledDiv = styled.div`
   }
 `;
 
-const Carousel = ({ children, className, containerRef }: Props) => {
-  const [emblaRef] = useEmblaCarousel({ containScroll: 'trimSnaps', watchDrag: false });
+const Carousel = ({ children, className, containerRef, carouselId }: Props) => {
+  const carouselRef = useCarouselRef(carouselId);
 
   return (
-    <StyledDiv className={`carousel ${className}`} ref={emblaRef}>
+    <StyledDiv className={`carousel ${className}`} ref={carouselRef}>
       <div className="carousel-container" ref={containerRef}>
         {children}
       </div>
