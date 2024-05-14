@@ -1,0 +1,24 @@
+rule "array_remove"
+when
+    true
+then
+
+
+    let json = parse_json(to_string($message.json));
+    let selectedPath = select_jsonpath(json: json,
+                paths: {
+                long: "$.long",
+                double: "$.double",
+                string: "$.string",
+                list: "$.list"
+                });
+
+    set_field("selectedPath", selectedPath);
+
+    set_field("json_long", selectedPath.long);
+    set_field("json_double", selectedPath.double);
+    set_field("json_string", selectedPath.string);
+    set_field("json_list", selectedPath.list);
+
+    trigger_test();
+end

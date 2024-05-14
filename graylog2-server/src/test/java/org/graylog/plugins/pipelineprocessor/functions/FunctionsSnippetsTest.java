@@ -47,6 +47,7 @@ import org.graylog.plugins.pipelineprocessor.functions.conversion.IsString;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.LongConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.MapConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversion;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.ValueType;
 import org.graylog.plugins.pipelineprocessor.functions.dates.DateConversion;
 import org.graylog.plugins.pipelineprocessor.functions.dates.FlexParseDate;
 import org.graylog.plugins.pipelineprocessor.functions.dates.FormatDate;
@@ -374,6 +375,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(IsIp.NAME, new IsIp());
         functions.put(IsJson.NAME, new IsJson());
         functions.put(IsUrl.NAME, new IsUrl());
+        functions.put(ValueType.NAME, new ValueType());
         functions.put(Debug.NAME, new Debug(loggerMock));
 
         final GrokPatternService grokPatternService = mock(GrokPatternService.class);
@@ -1713,5 +1715,21 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("remove_missing")).isEqualTo(Arrays.asList(1L, 2L, 3L));
         assertThat(message.getField("remove_only_one")).isEqualTo(Arrays.asList(1L, 2L));
         assertThat(message.getField("remove_all")).isEqualTo(List.of(1L));
+    }
+
+    @Test
+    public void valueType() throws IOException {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        final Message message = messageFactory.createMessage("message", "source", DateTime.now(DateTimeZone.UTC));
+
+        try (InputStream inputStream = getClass().getResourceAsStream("json-types.json")) {
+            String jsonString = IOUtils.toString(Objects.requireNonNull(inputStream), StandardCharsets.UTF_8);
+            message.addField("json", jsonString);
+            evaluateRule(rule, message);
+            assertThat(actionsTriggered.get()).isTrue();
+        }
+
+        assertThat(message).isNotNull();
+        System.out.println(message.getFields());
     }
 }

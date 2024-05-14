@@ -1,0 +1,6 @@
+{
+  "long": 4,
+  "double": 4.0,
+  "string": "hello",
+  "list": ["one", "two", "three"]
+}
