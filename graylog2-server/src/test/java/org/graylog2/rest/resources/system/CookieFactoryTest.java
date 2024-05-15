@@ -24,6 +24,7 @@ import jakarta.ws.rs.core.NewCookie;
 import jakarta.ws.rs.ext.RuntimeDelegate;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.graylog2.configuration.HttpConfiguration;
+import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.rest.models.system.sessions.responses.SessionResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,6 +48,9 @@ class CookieFactoryTest {
     @Mock
     ContainerRequest containerRequest;
 
+    @Mock
+    FeatureFlags featureFlags;
+
     @BeforeEach
     void setUp() {
         when(sessionResponse.getAuthenticationToken()).thenReturn("secret-auth-value");
@@ -56,7 +60,7 @@ class CookieFactoryTest {
 
     @Test
     void defaultPath() {
-        final CookieFactory cookieFactory = new CookieFactory(new HttpConfiguration());
+        final CookieFactory cookieFactory = new CookieFactory(new HttpConfiguration(), featureFlags);
         final NewCookie cookie = cookieFactory.createAuthenticationCookie(sessionResponse, containerRequest);
 
         assertThat(cookie.getPath()).isEqualTo("/");
@@ -71,7 +75,7 @@ class CookieFactoryTest {
 
         System.out.println(httpConfiguration.getHttpExternalUri());
 
-        final CookieFactory cookieFactory = new CookieFactory(httpConfiguration);
+        final CookieFactory cookieFactory = new CookieFactory(httpConfiguration, featureFlags);
         final NewCookie cookie = cookieFactory.createAuthenticationCookie(sessionResponse, containerRequest);
 
         assertThat(cookie.getPath()).isEqualTo("/path/from/config/");
@@ -82,7 +86,7 @@ class CookieFactoryTest {
         containerRequest.getHeaders().put(HttpConfiguration.OVERRIDE_HEADER,
                 List.of("http://graylog.local/path/from/request/"));
 
-        final CookieFactory cookieFactory = new CookieFactory(new HttpConfiguration());
+        final CookieFactory cookieFactory = new CookieFactory(new HttpConfiguration(), featureFlags);
         final NewCookie cookie = cookieFactory.createAuthenticationCookie(sessionResponse, containerRequest);
 
         assertThat(cookie.getPath()).isEqualTo("/path/from/request/");
@@ -93,7 +97,7 @@ class CookieFactoryTest {
         containerRequest.getHeaders().put(HttpConfiguration.OVERRIDE_HEADER,
                 List.of("http://graylog.local/path/;authentication=overridden-auth-value;"));
 
-        final CookieFactory cookieFactory = new CookieFactory(new HttpConfiguration());
+        final CookieFactory cookieFactory = new CookieFactory(new HttpConfiguration(), featureFlags);
         final NewCookie cookie = cookieFactory.createAuthenticationCookie(sessionResponse, containerRequest);
 
 
