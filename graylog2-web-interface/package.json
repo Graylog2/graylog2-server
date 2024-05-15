@@ -71,7 +71,7 @@
     "leaflet": "^1.5.1",
     "lodash": "^4.17.4",
     "marked": "^12.0.0",
-    "material-symbols": "^0.15.0",
+    "material-symbols": "^0.18.0",
     "md5": "^2.2.1",
     "moment-duration-format": "2.3.2",
     "moment-precise-range-plugin": "^1.3.0",
