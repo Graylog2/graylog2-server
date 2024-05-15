@@ -42,7 +42,7 @@ describe('ExtraMenuWidgetActions', () => {
   const dummyActionWithoutIsHidden: WidgetActionType = {
     position: 'menu',
     type: 'dummy-action',
-    component: ({ disabled }) => <button title="dummy action" disabled={disabled} />,
+    component: ({ disabled }) => <button type="button" title="dummy action" disabled={disabled}>dummy action</button>,
   };
   const dummyActionWhichIsHidden = {
     ...dummyActionWithoutIsHidden,
@@ -63,7 +63,7 @@ describe('ExtraMenuWidgetActions', () => {
   const dummyExportActionWithMenuPosition: WidgetActionType = {
     position: 'menu',
     type: 'export-widget-action',
-    component: ({ disabled }) => <button title="dummy export action" disabled={disabled} />,
+    component: ({ disabled }) => <button type="button" title="dummy export action" disabled={disabled}>dummy export action</button>,
   };
   useViewsPlugin();
 

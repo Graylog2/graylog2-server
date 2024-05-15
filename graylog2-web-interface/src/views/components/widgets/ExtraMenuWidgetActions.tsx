@@ -44,7 +44,7 @@ const ExtraMenuWidgetActions = ({ widget }: Props) => {
 
     return filtratedActions;
   },
-  [pluginWidgetActions, widget, widgetFocusContext]);
+  [pluginWidgetActions, widget]);
 
   return (
     <>{extraWidgetActions.map(({ component: Component, type, disabled = () => false }) => (
