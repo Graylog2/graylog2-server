@@ -16,8 +16,9 @@
  */
 
 import styled, { css } from 'styled-components';
+import moment from 'moment';
 import React, { useEffect, useState } from 'react';
-import { Formik, Form } from 'formik';
+import { Formik, Form, Field } from 'formik';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { useStore } from 'stores/connect';
@@ -26,6 +27,7 @@ import type {
   RetentionStrategyConfig,
   RetentionStrategyContext,
 } from 'components/indices/Types';
+import useIndexSetTemplateDefaults from 'components/indices/IndexSetTemplates/hooks/useIndexSetTemplateDefaults';
 import type { IndexSetTemplateFormValues, IndexSetTemplate } from 'components/indices/IndexSetTemplates/types';
 import { Col, Row, SegmentedControl } from 'components/bootstrap';
 import { FormikInput, FormSubmit, InputOptionalInfo, Section, Spinner, TimeUnitInput } from 'components/common';
@@ -55,6 +57,8 @@ type RetentionConfigProps = {
   indexSetRetentionStrategy?: RetentionStrategyConfig,
   indexSetRetentionStrategyClass?: string
 }
+
+type Unit = 'seconds' | 'minutes';
 
 const TIME_UNITS = ['SECONDS', 'MINUTES'];
 
@@ -148,10 +152,6 @@ const validate = (formValues: IndexSetTemplateFormValues) => {
     errors = { ...errors, index_set_config: { ...errors.index_set_config, shards: 'Shards is required' } };
   }
 
-  if (!formValues.index_set_config.replicas) {
-    errors = { ...errors, index_set_config: { ...errors.index_set_config, replicas: 'Replicas is required' } };
-  }
-
   if (!formValues.index_set_config.index_optimization_max_num_segments) {
     errors = { ...errors, index_set_config: { ...errors.index_set_config, index_optimization_max_num_segments: 'Max. number of segments is required' } };
   }
@@ -165,7 +165,10 @@ const TemplateForm = ({ initialValues, submitButtonText, submitLoadingText, onCa
     { value: 'legacy', label: 'Legacy (Deprecated)' },
   ];
 
+  const { loadingIndexSetTemplateDefaults, indexSetTemplateDefaults } = useIndexSetTemplateDefaults();
+
   const [selectedRetentionSegment, setSelectedRetentionSegment] = useState<RetentionConfigSegment>('data_tiering');
+  const [fieldTypeRefreshIntervalUnit, setFieldTypeRefreshIntervalUnit] = useState<Unit>('seconds');
 
   useEffect(() => {
     if (selectedRetentionSegment === 'legacy') {
@@ -201,7 +204,7 @@ const TemplateForm = ({ initialValues, submitButtonText, submitLoadingText, onCa
   };
 
   const prepareInitialValues = () => {
-    const values = { index_set_config: {}, ...initialValues };
+    const values = { index_set_config: indexSetTemplateDefaults, ...initialValues };
 
     const { rotation_strategy, rotation_strategy_class, retention_strategy, retention_strategy_class } = values.index_set_config;
 
@@ -219,19 +222,26 @@ const TemplateForm = ({ initialValues, submitButtonText, submitLoadingText, onCa
       retention_strategy,
       retention_strategy_class,
       index_set_config: {
-        index_analyzer: 'standard',
-        shards: 4,
-        replicas: 1,
-        index_optimization_max_num_segments: 1,
-        index_optimization_disabled: false,
-        field_type_refresh_interval: 1,
-        field_type_refresh_interval_unit: 'SECONDS',
-        use_legacy_rotation: false,
         ...values.index_set_config,
         data_tiering,
       },
     } as unknown as IndexSetTemplateFormValues;
   };
+
+  const onFieldTypeRefreshIntervalChange = (
+    intervalValue: number,
+    unit: Unit,
+    name: string,
+    onChange: (name: string, value: number) => void,
+    setFieldValue: (key: string, value: number) => void) => {
+    onChange(name, moment.duration(intervalValue, unit).asMilliseconds());
+    setFieldValue(name, moment.duration(intervalValue, unit).asMilliseconds());
+    setFieldTypeRefreshIntervalUnit(unit);
+  };
+
+  if (loadingIndexSetTemplateDefaults) return (<Spinner />);
+
+  if (!indexSetTemplateDefaults) return null;
 
   return (
     <Row>
@@ -282,16 +292,21 @@ const TemplateForm = ({ initialValues, submitButtonText, submitLoadingText, onCa
                              id="index-set-template-index-optimization-disabled"
                              label="Disable index optimization after rotation"
                              help="Disable Elasticsearch index optimization (force merge) after rotation" />
-                <TimeUnitInput label="Field type refresh interval"
-                               update={(value, unit) => {
-                                 setFieldValue('index_set_config.field_type_refresh_interval', value);
-                                 setFieldValue('index_set_config.field_type_refresh_interval_unit', unit);
-                               }}
-                               value={values.index_set_config.field_type_refresh_interval}
-                               unit={values.index_set_config.field_type_refresh_interval_unit}
-                               enabled
-                               hideCheckbox
-                               units={TIME_UNITS} />
+                <Field name="index_set_config.field_type_refresh_interval">
+                  {({ field: { name, value, onChange } }) => (
+                    <TimeUnitInput id="field-type-refresh-interval"
+                                   label="Field type refresh interval"
+                                   type="number"
+                                   help="How often the field type information for the active write index will be updated."
+                                   value={moment.duration(value, 'milliseconds').as(fieldTypeRefreshIntervalUnit)}
+                                   unit={fieldTypeRefreshIntervalUnit.toUpperCase()}
+                                   units={TIME_UNITS}
+                                   required
+                                   update={(intervalValue: number, unit: Unit) => onFieldTypeRefreshIntervalChange(
+                                     intervalValue, unit, name, onChange, setFieldValue,
+                                   )} />
+                  )}
+                </Field>
               </Section>
 
               <Section title="Rotation & Retention">
