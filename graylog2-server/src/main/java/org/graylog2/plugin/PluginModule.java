@@ -35,6 +35,7 @@ import org.graylog.events.processor.modifier.EventModifier;
 import org.graylog.events.processor.storage.EventStorageHandler;
 import org.graylog.grn.GRNDescriptorProvider;
 import org.graylog.grn.GRNType;
+import org.graylog.plugins.views.search.db.StaticReferencedSearch;
 import org.graylog.plugins.views.search.export.ExportFormat;
 import org.graylog.scheduler.Job;
 import org.graylog.scheduler.JobDefinitionConfig;
@@ -71,6 +72,7 @@ import org.graylog2.plugin.validate.ClusterConfigValidator;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.graylog2.shared.messageq.MessageQueueReader;
 import org.graylog2.shared.messageq.MessageQueueWriter;
+import org.graylog2.telemetry.scheduler.TelemetryMetricSupplier;
 import org.graylog2.web.PluginUISettingsProvider;
 
 import java.util.Collections;
@@ -438,5 +440,17 @@ public abstract class PluginModule extends Graylog2Module {
     protected void addEntityScope(Class<? extends EntityScope> entityScopeType) {
         Multibinder<EntityScope> scopeBinder = Multibinder.newSetBinder(binder(), EntityScope.class);
         scopeBinder.addBinding().to(entityScopeType);
+    }
+
+    protected MapBinder<String, TelemetryMetricSupplier> telemetryMetricSupplierBinder() {
+        return MapBinder.newMapBinder(binder(), String.class, TelemetryMetricSupplier.class);
+    }
+
+    protected void addTelemetryMetricProvider(String eventId, Class<? extends TelemetryMetricSupplier> eventSupplier) {
+        telemetryMetricSupplierBinder().addBinding(eventId).to(eventSupplier);
+    }
+
+    protected void addTelemetryMetricProvider(String eventId, TelemetryMetricSupplier eventSupplier) {
+        telemetryMetricSupplierBinder().addBinding(eventId).toInstance(eventSupplier);
     }
 }

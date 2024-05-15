@@ -1,0 +1,15 @@
+rule "remove_fields_by_name"
+when true
+then
+  set_field(field: "a.1", value: "a.1");
+  set_field(field: "a_1", value: "a_1");
+  set_field(field: "f1", value: "f1");
+  set_field(field: "f2", value: "f2");
+
+  remove_multiple_fields(names:["a.1", "f1"]);
+
+  // invalid - should be NOOP
+  remove_multiple_fields(names:["dummy"]);
+  remove_multiple_fields(names:[]);
+  remove_multiple_fields();
+end
