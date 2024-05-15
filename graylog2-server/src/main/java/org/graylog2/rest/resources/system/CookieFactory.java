@@ -23,6 +23,7 @@ import jakarta.inject.Singleton;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.NewCookie;
 import org.graylog2.configuration.HttpConfiguration;
+import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.rest.RestTools;
 import org.graylog2.rest.models.system.sessions.responses.SessionResponse;
 
@@ -40,10 +41,13 @@ public class CookieFactory {
     private static final String HEADER_X_FORWARDED_PROTO = "X-Forwarded-Proto";
     private static final CharMatcher PATH_MATCHER = ascii().and(isNot(';')).and(javaIsoControl().negate());
     private final URI httpExternalUri;
+    private final boolean isTrainingInstance;
 
     @Inject
-    public CookieFactory(HttpConfiguration httpConfiguration) {
+    public CookieFactory(HttpConfiguration httpConfiguration,
+                         FeatureFlags featureFlags) {
         httpExternalUri = httpConfiguration.getHttpExternalUri();
+        isTrainingInstance = featureFlags.isOn("training_instance");
     }
 
     NewCookie createAuthenticationCookie(SessionResponse token, ContainerRequestContext requestContext) {
@@ -70,9 +74,9 @@ public class CookieFactory {
                 .path(basePath)
                 .maxAge(maxAge)
                 .expiry(validUntil)
-                .secure(isSecure)
+                .secure(isTrainingInstance || isSecure)
                 .httpOnly(true)
-                .sameSite(NewCookie.SameSite.STRICT)
+                .sameSite(isTrainingInstance ? NewCookie.SameSite.NONE : NewCookie.SameSite.STRICT)
                 .build();
     }
 
