@@ -70,9 +70,9 @@ public class CookieFactory {
                 .path(basePath)
                 .maxAge(maxAge)
                 .expiry(validUntil)
-                .secure(isSecure)
+                .secure(true)
                 .httpOnly(true)
-                .sameSite(NewCookie.SameSite.STRICT)
+                .sameSite(NewCookie.SameSite.NONE)
                 .build();
     }
 
