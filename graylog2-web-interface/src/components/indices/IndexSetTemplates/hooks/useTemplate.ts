@@ -28,19 +28,16 @@ const INITIAL_DATA: IndexSetTemplate = {
   id: null,
   description: null,
   built_in: false,
+  default: false,
+  enabled: true,
+  disabled_reason: '',
   index_set_config: null,
 };
 
 const fetchIndexSetTemplate = async (id: string) => {
   const url = qualifyUrl(`/system/indices/index_sets/templates/${id}`);
 
-  return fetch('GET', url).then((template: IndexSetTemplate) => ({
-    id: template.id,
-    title: template.title,
-    description: template.description,
-    built_in: template.built_in,
-    index_set_config: template.index_set_config,
-  }));
+  return fetch('GET', url).then((template: IndexSetTemplate) => (template));
 };
 
 const useTemplate = (id: string): {

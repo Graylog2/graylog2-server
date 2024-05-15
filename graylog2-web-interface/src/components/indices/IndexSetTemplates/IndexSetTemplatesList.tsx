@@ -35,13 +35,14 @@ import type { IndexSetTemplate }
 import useTemplates
   from 'components/indices/IndexSetTemplates/hooks/useTemplates';
 import TemplateActions from 'components/indices/IndexSetTemplates/TemplateActions';
+import customColumnRenderers from 'components/indices/IndexSetTemplates/helpers/customColumnRenderers';
 
 export const ENTITY_TABLE_ID = 'index-set-template';
 export const DEFAULT_LAYOUT = {
   pageSize: 20,
   sort: { attributeId: 'title', direction: 'asc' } as Sort,
-  displayedColumns: ['title', 'description'],
-  columnsOrder: ['title', 'description'],
+  displayedColumns: ['title', 'description', 'built_in'],
+  columnsOrder: ['title', 'built_in', 'description'],
 };
 
 const IndexSetTemplatesList = () => {
@@ -97,7 +98,7 @@ const IndexSetTemplatesList = () => {
     setUrlQueryFilters(newUrlQueryFilters);
   }, [paginationQueryParameter, setUrlQueryFilters]);
 
-  const templateActions = useCallback(({ id, title }: IndexSetTemplate) => <TemplateActions templateId={id} templateTitle={title} />, []);
+  const templateActions = useCallback(({ id, title, built_in, default: isDefault }: IndexSetTemplate) => <TemplateActions id={id} title={title} built_in={built_in} isDefault={isDefault} />, []);
 
   if (isLoadingLayoutPreferences || isLoading) {
     return <Spinner />;
@@ -132,6 +133,7 @@ const IndexSetTemplatesList = () => {
                                            pageSize={searchParams.pageSize}
                                            onPageSizeChange={onPageSizeChange}
                                            actionsCellWidth={120}
+                                           columnRenderers={customColumnRenderers}
                                            columnDefinitions={attributes}
                                            rowActions={templateActions} />
       )}

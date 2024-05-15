@@ -23,27 +23,55 @@ import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSele
 import MoreActions from 'components/common/EntityDataTable/MoreActions';
 import useTemplateMutation from 'components/indices/IndexSetTemplates/hooks/useTemplateMutation';
 
-const TemplateActions = ({ templateId, templateTitle }: { templateId: string, templateTitle: string }) => {
+type Props = {
+  id: string,
+  title: string,
+  built_in: boolean,
+  isDefault: boolean,
+}
+
+const TemplateActions = ({ id, title, built_in, isDefault } : Props) => {
   const { deselectEntity } = useSelectedEntities();
-  const { deleteTemplate } = useTemplateMutation();
+  const { deleteTemplate, setAsDefault } = useTemplateMutation();
 
   const onDelete = () => {
     // eslint-disable-next-line no-alert
-    if (window.confirm(`You are about to delete template: "${templateTitle}". Are you sure?`)) {
-      deleteTemplate(templateId).then(() => {
-        deselectEntity(templateId);
+    if (window.confirm(`You are about to delete template: "${title}". Are you sure?`)) {
+      deleteTemplate(id).then(() => {
+        deselectEntity(id);
       });
     }
   };
 
+  const onSetAsDefault = () => {
+    setAsDefault(id).then(() => {
+      deselectEntity(id);
+    });
+  };
+
+  if (built_in) {
+    return (!isDefault && (
+      <ButtonToolbar>
+        <Button bsSize="xs" onClick={onSetAsDefault}>
+          Set as default
+        </Button>
+      </ButtonToolbar>
+    ));
+  }
+
   return (
     <ButtonToolbar>
-      <LinkContainer to={Routes.SYSTEM.INDICES.TEMPLATES.edit(templateId)}>
+      <LinkContainer to={Routes.SYSTEM.INDICES.TEMPLATES.edit(id)}>
         <Button bsSize="xs">
           Edit
         </Button>
       </LinkContainer>
       <MoreActions>
+        {!isDefault && (
+        <MenuItem onSelect={onSetAsDefault}>
+          Set as default
+        </MenuItem>
+        )}
         <MenuItem onSelect={onDelete}>
           Delete
         </MenuItem>

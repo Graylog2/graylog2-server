@@ -27,7 +27,7 @@ export const urlPrefix = '/system/indices/index_sets/templates';
 
 const putTemplate = async ({ template, id }: { template: IndexSetTemplate, id: string }) => {
   const url = qualifyUrl(`${urlPrefix}/${id}`);
-  const body: Omit<IndexSetTemplate, 'id' | 'built_in'> = {
+  const body: Omit<IndexSetTemplate, 'id' | 'built_in' | 'default' | 'enabled' | 'disabled_reason'> = {
     title: template.title,
     description: template.description,
     index_set_config: template.index_set_config,
@@ -36,9 +36,18 @@ const putTemplate = async ({ template, id }: { template: IndexSetTemplate, id: s
   return fetch('PUT', url, body);
 };
 
+const putTemplateDefault = async (id : string) => {
+  const url = qualifyUrl('/system/indices/index_set_defaults');
+  const body: Pick<IndexSetTemplate, 'id'> = {
+    id,
+  };
+
+  return fetch('PUT', url, body);
+};
+
 const postTemplate = async (template: IndexSetTemplate) => {
   const url = qualifyUrl(urlPrefix);
-  const body: Omit<IndexSetTemplate, 'id' | 'built_in'> = {
+  const body: Omit<IndexSetTemplate, 'id' | 'built_in' | 'default' | 'enabled' | 'disabled_reason'> = {
     title: template.title,
     description: template.description,
     index_set_config: template.index_set_config,
@@ -67,6 +76,7 @@ const useTemplate = () => {
       return queryClient.refetchQueries({ queryKey: ['indexSetTemplates'], type: 'active' });
     },
   });
+
   const put = useMutation(putTemplate, {
     onError: (errorThrown) => {
       UserNotification.error(`Updating index set template failed with status: ${errorThrown}`,
@@ -78,6 +88,19 @@ const useTemplate = () => {
       return queryClient.refetchQueries({ queryKey: ['indexSetTemplates'], type: 'active' });
     },
   });
+
+  const setAsDefault = useMutation(putTemplateDefault, {
+    onError: (errorThrown) => {
+      UserNotification.error(`Setting template as default failed with status: ${errorThrown}`,
+        'Could set template as default');
+    },
+    onSuccess: () => {
+      UserNotification.success('Template has successfully been set as default.', 'Success!');
+
+      return queryClient.refetchQueries({ queryKey: ['indexSetTemplates'], type: 'active' });
+    },
+  });
+
   const remove = useMutation(deleteProfile, {
     onError: (errorThrown) => {
       UserNotification.error(`Deleting index set template failed with status: ${errorThrown}`,
@@ -97,6 +120,7 @@ const useTemplate = () => {
     isCreateLoading: post.isLoading,
     isLoading: post.mutateAsync || post.isLoading || remove.isLoading,
     deleteTemplate: remove.mutateAsync,
+    setAsDefault: setAsDefault.mutateAsync,
   });
 };
 

@@ -31,6 +31,9 @@ export type IndexSetTemplate = {
   title: string,
   description: string,
   built_in: boolean,
+  default: boolean,
+  enabled: boolean,
+  disabled_reason: string,
   index_set_config: IndexSetsDefaultConfiguration,
 }
 
@@ -38,7 +41,6 @@ export type IndexSetTemplateFormValues = {
   id: string,
   title: string,
   description: string,
-  built_in: boolean,
   rotation_strategy?: RotationStrategyConfig,
   rotation_strategy_class?: string,
   retention_strategy?: RetentionStrategyConfig,
