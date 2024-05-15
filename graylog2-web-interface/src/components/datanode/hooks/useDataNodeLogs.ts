@@ -24,36 +24,28 @@ const fetchDataNodeLogsStdout = async (hostname: string) => fetch('GET', qualify
 const fetchDataNodeLogsStderr = async (hostname: string) => fetch('GET', qualifyUrl(`/datanodes/${hostname}/rest/logs/stderr`));
 
 const useDataNodeLogs = (hostname: string) : {
-  stdout: any,
-  stderr: any,
+  stdout: string[],
+  stderr: string[],
 } => {
   const { data: stdout } = useQuery(
-    ['datanode'],
+    ['datanode_stdout_logs'],
     () => fetchDataNodeLogsStdout(hostname),
     {
       onError: (errorThrown) => {
-        console.error('fetchDataNodeLogsStdout', errorThrown);
-
         UserNotification.error(`Loading Data Node stdout logs failed with status: ${errorThrown}`,
           'Could not load Data Node stdout logs');
       },
-      notifyOnChangeProps: ['data', 'error'],
-      refetchInterval: 5000,
     },
   );
 
   const { data: stderr } = useQuery(
-    ['datanode'],
+    ['datanode_stderr_logs'],
     () => fetchDataNodeLogsStderr(hostname),
     {
       onError: (errorThrown) => {
-        console.error('fetchDataNodeLogsStderr', errorThrown);
-
         UserNotification.error(`Loading Data Node stderr logs failed with status: ${errorThrown}`,
           'Could not load Data Node stderr logs');
       },
-      notifyOnChangeProps: ['data', 'error'],
-      refetchInterval: 5000,
     },
   );
 
