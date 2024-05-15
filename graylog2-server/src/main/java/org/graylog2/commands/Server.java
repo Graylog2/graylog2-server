@@ -34,6 +34,7 @@ import org.graylog.grn.GRNTypesModule;
 import org.graylog.metrics.prometheus.PrometheusExporterConfiguration;
 import org.graylog.metrics.prometheus.PrometheusMetricsModule;
 import org.graylog.plugins.cef.CEFInputModule;
+import org.graylog.plugins.formatting.units.UnitsModule;
 import org.graylog.plugins.map.MapWidgetModule;
 import org.graylog.plugins.map.config.GeoIpProcessorConfig;
 import org.graylog.plugins.netflow.NetFlowPluginModule;
@@ -210,6 +211,7 @@ public class Server extends ServerBootstrap {
                 new ScriptingApiModule(),
                 new StreamsModule(),
                 new TracingModule(),
+                new UnitsModule(),
                 new DataTieringModule(),
                 new DatanodeMigrationBindings(),
                 new CaModule(),
