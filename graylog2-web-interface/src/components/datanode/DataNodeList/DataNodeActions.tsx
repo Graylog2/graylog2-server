@@ -173,7 +173,8 @@ const DataNodeActions = ({ dataNode, displayAs }: Props) => {
       {showLogsDialog && (
         <BootstrapModalWrapper showModal={showLogsDialog}
                                onHide={() => setShowLogsDialog(false)}
-                               bsSize="large">
+                               bsSize="large"
+                               backdrop>
           <Modal.Header closeButton>
             <Modal.Title>{dataNode.hostname} logs</Modal.Title>
           </Modal.Header>
