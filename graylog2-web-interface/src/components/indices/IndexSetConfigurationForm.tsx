@@ -21,9 +21,9 @@ import { Formik, Form, Field } from 'formik';
 import styled, { css } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import useIndexSetTemplateDefaults from 'components/indices/IndexSetTemplates/hooks/useIndexSetTemplateDefaults';
 import AppConfig from 'util/AppConfig';
 import { FormikInput, FormSubmit, Section, Spinner, TimeUnitInput } from 'components/common';
-import useIndexDefaults from 'components/indices/hooks/useIndexDefaults';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import { Col, Row, SegmentedControl } from 'components/bootstrap';
 import IndexMaintenanceStrategiesConfiguration from 'components/indices/IndexMaintenanceStrategiesConfiguration';
@@ -188,7 +188,7 @@ const IndexSetConfigurationForm = ({
   const history = useHistory();
 
   const [fieldTypeRefreshIntervalUnit, setFieldTypeRefreshIntervalUnit] = useState<Unit>('seconds');
-  const { loadingIndexDefaultsConfig, indexDefaultsConfig } = useIndexDefaults();
+  const { loadingIndexSetTemplateDefaults, indexSetTemplateDefaults } = useIndexSetTemplateDefaults();
   const [indexSet] = useIndexSet(initialIndexSet);
   const isCloud = AppConfig.isCloud();
   const enableDataTieringCloud = useFeature('data_tiering_cloud');
@@ -207,7 +207,7 @@ const IndexSetConfigurationForm = ({
   const [selectedRetentionSegment, setSelectedRetentionSegment] = useState<RetentionConfigSegment>(initialSegment());
 
   const prepareRetentionConfigBeforeSubmit = useCallback((values: IndexSetFormValues) : IndexSet => {
-    const legacyConfig = { ...values, data_tiering: indexDefaultsConfig.data_tiering, use_legacy_rotation: true };
+    const legacyConfig = { ...values, data_tiering: indexSetTemplateDefaults.data_tiering, use_legacy_rotation: true };
 
     if (isCloud && !enableDataTieringCloud) {
       return legacyConfig;
@@ -219,17 +219,17 @@ const IndexSetConfigurationForm = ({
 
     const configWithDataTiering = { ...values, data_tiering: prepareDataTieringConfig(values.data_tiering, PluginStore) };
 
-    if (loadingIndexDefaultsConfig || !indexDefaultsConfig) return { ...configWithDataTiering, use_legacy_rotation: false };
+    if (loadingIndexSetTemplateDefaults || !indexSetTemplateDefaults) return { ...configWithDataTiering, use_legacy_rotation: false };
 
-    const legacyDefaultConfig = {
-      rotation_strategy_class: indexDefaultsConfig.rotation_strategy_class,
-      rotation_strategy: indexDefaultsConfig.rotation_strategy_config as RotationStrategyConfig,
-      retention_strategy_class: indexDefaultsConfig.retention_strategy_class,
-      retention_strategy: indexDefaultsConfig.retention_strategy_config as RetentionStrategyConfig,
+    const legacyindexSetTemplateDefaults = {
+      rotation_strategy_class: indexSetTemplateDefaults.rotation_strategy_class,
+      rotation_strategy: indexSetTemplateDefaults.rotation_strategy as RotationStrategyConfig,
+      retention_strategy_class: indexSetTemplateDefaults.retention_strategy_class,
+      retention_strategy: indexSetTemplateDefaults.retention_strategy as RetentionStrategyConfig,
     };
 
-    return { ...configWithDataTiering, ...legacyDefaultConfig, use_legacy_rotation: false };
-  }, [loadingIndexDefaultsConfig, indexDefaultsConfig, selectedRetentionSegment, enableDataTieringCloud, isCloud]);
+    return { ...configWithDataTiering, ...legacyindexSetTemplateDefaults, use_legacy_rotation: false };
+  }, [loadingIndexSetTemplateDefaults, indexSetTemplateDefaults, selectedRetentionSegment, enableDataTieringCloud, isCloud]);
 
   const saveConfiguration = (values: IndexSetFormValues) => onUpdate(prepareRetentionConfigBeforeSubmit(values));
 
@@ -255,7 +255,7 @@ const IndexSetConfigurationForm = ({
 
   const onCancel = () => history.push(cancelLink);
 
-  if (loadingIndexDefaultsConfig) return (<Spinner />);
+  if (loadingIndexSetTemplateDefaults) return (<Spinner />);
 
   const prepareInitialValues = () => {
     if (indexSet.data_tiering) {

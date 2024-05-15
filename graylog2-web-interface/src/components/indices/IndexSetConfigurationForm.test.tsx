@@ -16,10 +16,10 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
+import useIndexSetTemplateDefaults from 'src/components/indices/IndexSetTemplates/hooks/useIndexSetTemplateDefaults';
 
 import asMock from 'helpers/mocking/AsMock';
 import useProfileOptions from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileOptions';
-import useIndexDefaults from 'components/indices/hooks/useIndexDefaults';
 import { DATA_TIERING_TYPE } from 'components/indices/data-tiering';
 
 import IndexSetConfigurationForm from './IndexSetConfigurationForm';
@@ -213,7 +213,7 @@ const rotationStrategies = [
   },
 ];
 
-const indexDefaultsConfig = {
+const indexSetTemplateDefaults = {
   index_prefix: 'default_index_prefix',
   index_analyzer: 'default_index_analyser',
   shards: 1,
@@ -241,12 +241,12 @@ const indexDefaultsConfig = {
 };
 
 jest.mock('components/indices/IndexSetFieldTypeProfiles/hooks/useProfileOptions', () => jest.fn());
-jest.mock('components/indices/hooks/useIndexDefaults', () => jest.fn());
+jest.mock('components/indices/hooks/useIndexSetTemplateDefaults', () => jest.fn());
 
 describe('IndexSetConfigurationForm', () => {
   beforeEach(() => {
     asMock(useProfileOptions).mockReturnValue(({ isLoading: false, options: [], refetch: () => {} }));
-    asMock(useIndexDefaults).mockReturnValue(({ loadingIndexDefaultsConfig: false, indexDefaultsConfig }));
+    asMock(useIndexSetTemplateDefaults).mockReturnValue(({ loadingIndexSetTemplateDefaults: false, indexSetTemplateDefaults }));
   });
 
   const onSave = jest.fn();

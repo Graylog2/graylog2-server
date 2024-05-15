@@ -19,27 +19,26 @@ import { useQuery } from '@tanstack/react-query';
 import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
-import ApiRoutes from 'routing/ApiRoutes';
-import type { IndexSetsLegacyDefaultConfiguration } from 'stores/indices/IndexSetsStore';
+import type { IndexSetTemplate } from 'components/indices/IndexSetTemplates/types';
 
-const fetchIndexDefaults: () => Promise<IndexSetsLegacyDefaultConfiguration> = () => fetch('GET', qualifyUrl(`${ApiRoutes.ClusterConfigResource.config().url}/org.graylog2.configuration.IndexSetsDefaultConfiguration`));
+const fetchIndexSetTemplateDefaults: () => Promise<IndexSetTemplate['index_set_config']> = () => fetch('GET', qualifyUrl('/system/indices/index_sets/templates/default_config'));
 
-const useIndexDefaults = () => {
-  const { data, isLoading } = useQuery<IndexSetsLegacyDefaultConfiguration, Error>(
-    ['index-defaults'],
-    fetchIndexDefaults,
+const useIndexSetTemplateDefaults = () => {
+  const { data, isLoading } = useQuery<IndexSetTemplate['index_set_config'], Error>(
+    ['index-templates-defaults'],
+    fetchIndexSetTemplateDefaults,
     {
       onError: (fetchError: Error) => {
-        UserNotification.error(`Error fetching index defaults: ${fetchError.message}`);
+        UserNotification.error(`Error fetching index default template: ${fetchError.message}`);
       },
       retry: 1,
     },
   );
 
   return {
-    loadingIndexDefaultsConfig: isLoading,
-    indexDefaultsConfig: data,
+    loadingIndexSetTemplateDefaults: isLoading,
+    indexSetTemplateDefaults: data,
   };
 };
 
-export default useIndexDefaults;
+export default useIndexSetTemplateDefaults;
