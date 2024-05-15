@@ -19,14 +19,15 @@
 import moment from 'moment-timezone';
 
 import {
-  relativeDifference,
-  formatAsBrowserTime,
-  adjustFormat,
-  toUTCFromTz,
   DATE_TIME_FORMATS,
+  adjustFormat,
+  formatAsBrowserTime,
   getBrowserTimezone,
   parseFromIsoString,
+  relativeDifference,
+  relativeDifferenceDays,
   toDateObject,
+  toUTCFromTz,
 } from 'util/DateTime';
 
 const mockRootTimeZone = 'America/Chicago';
@@ -167,6 +168,12 @@ describe('DateTime utils', () => {
     it('should throw an error for an invalid date', () => {
       relativeDifference(invalidDate);
       expectErrorForInvalidDate();
+    });
+  });
+
+  describe('relativeDifferenceDays', () => {
+    it('should return relative difference for time in days', () => {
+      expect(relativeDifferenceDays('2019-01-01T10:00:00.000Z')).toBe(364);
     });
   });
 

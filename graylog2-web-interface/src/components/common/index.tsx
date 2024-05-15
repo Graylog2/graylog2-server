@@ -27,7 +27,7 @@ export { default as BrowserTime } from './BrowserTime';
 export { default as BrandIcon } from './BrandIcon';
 export { default as Card } from './Card';
 export { default as Center } from './Center';
-export { default as Carousel } from 'components/common/carousel/Carousel';
+export { default as Carousel } from './Carousel';
 export { default as ClipboardButton } from './ClipboardButton';
 export { default as ColorPicker } from './ColorPicker';
 export { default as ColorPickerPopover } from './ColorPickerPopover';

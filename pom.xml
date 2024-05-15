@@ -205,7 +205,7 @@
         <yarn.version>v1.22.19</yarn.version>
 
         <!-- Plugin versions -->
-        <license-maven.version>4.3</license-maven.version>
+        <license-maven.version>4.5</license-maven.version>
         <download-maven-plugin.version>1.6.8.1</download-maven-plugin.version>
     </properties>
 
@@ -290,10 +290,22 @@
                 <classifier>osx-x86_64</classifier>
             </dependency>
             <dependency>
+              <groupId>io.netty</groupId>
+              <artifactId>netty-tcnative-boringssl-static</artifactId>
+              <version>${netty-tcnative-boringssl-static.version}</version>
+              <classifier>osx-aarch_64</classifier>
+            </dependency>
+            <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-tcnative-boringssl-static</artifactId>
                 <version>${netty-tcnative-boringssl-static.version}</version>
                 <classifier>linux-x86_64</classifier>
+            </dependency>
+            <dependency>
+              <groupId>io.netty</groupId>
+              <artifactId>netty-tcnative-boringssl-static</artifactId>
+              <version>${netty-tcnative-boringssl-static.version}</version>
+              <classifier>linux-aarch_64</classifier>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
