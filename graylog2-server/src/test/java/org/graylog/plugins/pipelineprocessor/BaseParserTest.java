@@ -25,6 +25,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.statements.Statement;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
+import org.graylog.plugins.pipelineprocessor.parser.RuleContentType;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.TestMessageFactory;
@@ -136,9 +137,13 @@ public class BaseParserTest {
     }
 
     protected String ruleForTest() {
+        return ruleForTest(RuleContentType.GL_PIPELINE_LANGUAGE);
+    }
+
+    protected String ruleForTest(RuleContentType contentType) {
         try {
             final var testMethodName = testInfo.getTestMethod().map(Method::getName).orElseThrow();
-            final URL resource = this.getClass().getResource(testMethodName.concat(".txt"));
+            final URL resource = this.getClass().getResource(testMethodName.concat(contentType.extension()));
             final Path path = Paths.get(resource.toURI());
             final byte[] bytes = Files.readAllBytes(path);
             return new String(bytes, StandardCharsets.UTF_8);

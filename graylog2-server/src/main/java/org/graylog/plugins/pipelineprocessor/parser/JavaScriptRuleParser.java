@@ -18,12 +18,17 @@ package org.graylog.plugins.pipelineprocessor.parser;
 
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Engine;
+import org.graalvm.polyglot.HostAccess;
 import org.graalvm.polyglot.Source;
+import org.graalvm.polyglot.Value;
+import org.graalvm.polyglot.io.IOAccess;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.javascript.JsRule;
 import org.graylog.plugins.pipelineprocessor.javascript.JsRuleParseError;
 import org.graylog.plugins.pipelineprocessor.javascript.JsRuleStatement;
 import org.graylog.plugins.pipelineprocessor.javascript.JsRuleWhenExpression;
+import org.graylog.plugins.pipelineprocessor.javascript.MessageProxy;
+import org.graylog2.plugin.Message;
 
 import java.io.IOException;
 import java.util.Set;
@@ -70,8 +75,15 @@ public class JavaScriptRuleParser {
                 .option("engine.WarnInterpreterOnly", "false").build();
         return Context.newBuilder("js")
                 .engine(engine)
-                .allowAllAccess(true) // TODO: be restrictive
-                .option("js.foreign-object-prototype", "true") // still needed?
+                .allowHostAccess(HostAccess.newBuilder()
+                        .allowAccessAnnotatedBy(HostAccess.Export.class)
+                        .targetTypeMapping(Value.class, Message.class, Value::isProxyObject,
+                                value -> ((MessageProxy) value.asProxyObject()).getDelegate())
+                        .build())
+                .allowHostClassLoading(false)
+                .allowHostClassLookup(className -> false)
+                .allowIO(IOAccess.NONE)
+                .option("js.foreign-object-prototype", "true")
                 .allowExperimentalOptions(true)
                 .option("js.esm-eval-returns-exports", "true");
     }

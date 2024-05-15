@@ -412,10 +412,10 @@ class PipelineRuleParserTest extends BaseParserTest {
                 export default {
                     "name" : "javascript test",
                     "when" : (msg) => {
-                        return msg.getField("run_rule");
+                        return msg.run_rule;
                     },
                     "then" : (msg) => {
-                        functions.set_field({"field" : "processed_by", "value" : "javascript test"});
+                        functions.set_field('processed_by', 'javascript test', null, null, msg, null, null);
                     }
                 };
                 """;

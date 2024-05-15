@@ -19,17 +19,23 @@ package org.graylog.plugins.pipelineprocessor.parser;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum RuleContentType {
-    GL_PIPELINE_LANGUAGE("application/x-graylog-pipeline-language"),
-    JAVASCRIPT_MODULE("application/javascript+module");
+    GL_PIPELINE_LANGUAGE("application/x-graylog-pipeline-language", ".txt"),
+    JAVASCRIPT_MODULE("application/javascript+module", ".js");
 
     private final String mimeType;
+    private final String extension;
 
-    RuleContentType(String mimeType) {
+    RuleContentType(String mimeType, String extension) {
         this.mimeType = mimeType;
+        this.extension = extension;
     }
 
     @JsonValue
     public String mimeType() {
         return mimeType;
+    }
+
+    public String extension() {
+        return extension;
     }
 }

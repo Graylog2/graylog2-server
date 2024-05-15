@@ -152,6 +152,7 @@ import org.graylog.plugins.pipelineprocessor.functions.urls.UrlDecode;
 import org.graylog.plugins.pipelineprocessor.functions.urls.UrlEncode;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
+import org.graylog.plugins.pipelineprocessor.parser.RuleContentType;
 import org.graylog2.grok.GrokPattern;
 import org.graylog2.grok.GrokPatternRegistry;
 import org.graylog2.grok.GrokPatternService;
@@ -175,6 +176,8 @@ import org.joda.time.Period;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
@@ -194,6 +197,7 @@ import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
+import static org.assertj.core.api.InstanceOfAssertFactories.list;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -525,8 +529,9 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.hasField("this_should_exist")).isTrue();
     }
 
-    @Test
-    void json() {
+    @ParameterizedTest
+    @EnumSource(RuleContentType.class)
+    void json(RuleContentType contentType) {
         final String flatJson = "{\"str\":\"foobar\",\"int\":42,\"float\":2.5,\"bool\":true,\"array\":[1,2,3]}";
         final String nestedJson = "{\n" +
                 "    \"store\": {\n" +
@@ -544,7 +549,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
                 "    \"expensive\": 10\n" +
                 "}";
 
-        final Rule rule = parser.parseRule(ruleForTest(), false);
+        final Rule rule = parser.parseRule(contentType, ruleForTest(contentType), false);
         final Message message = messageFactory.createMessage("JSON", "test", Tools.nowUTC());
         message.addField("flat_json", flatJson);
         message.addField("nested_json", nestedJson);
@@ -847,9 +852,10 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(clonedMessage.getTimestamp()).isEqualTo(origMessage.getTimestamp());
     }
 
-    @Test
-    void grok() {
-        final Rule rule = parser.parseRule(ruleForTest(), false);
+    @ParameterizedTest
+    @EnumSource(RuleContentType.class)
+    void grok(RuleContentType contentType) {
+        final Rule rule = parser.parseRule(contentType, ruleForTest(contentType), false);
         final Message message = evaluateRule(rule);
 
         assertThat(message).isNotNull();
@@ -1697,16 +1703,28 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         }
     }
 
-    @Test
-    void arrayRemove() {
-        final Rule rule = parser.parseRule(ruleForTest(), false);
+    @ParameterizedTest
+    @EnumSource(RuleContentType.class)
+    void arrayRemove(RuleContentType contentType) {
+        final Rule rule = parser.parseRule(contentType, ruleForTest(contentType), false);
         final Message message = evaluateRule(rule);
         assertThat(actionsTriggered.get()).isTrue();
         assertThat(message).isNotNull();
-        assertThat(message.getField("remove_number")).isEqualTo(Arrays.asList(1L, 3L));
+        assertThat(message.getField("remove_number")).asInstanceOf(list(Number.class)).satisfiesExactly(
+                n -> assertThat(n.longValue()).isEqualTo(1L),
+                n -> assertThat(n.longValue()).isEqualTo(3L));
         assertThat(message.getField("remove_string")).isEqualTo(Arrays.asList("one", "three"));
-        assertThat(message.getField("remove_missing")).isEqualTo(Arrays.asList(1L, 2L, 3L));
-        assertThat(message.getField("remove_only_one")).isEqualTo(Arrays.asList(1L, 2L));
-        assertThat(message.getField("remove_all")).isEqualTo(List.of(1L));
+        assertThat(message.getField("remove_missing"))
+                .asInstanceOf(list(Number.class)).satisfiesExactly(
+                        n -> assertThat(n.longValue()).isEqualTo(1L),
+                        n -> assertThat(n.longValue()).isEqualTo(2L),
+                        n -> assertThat(n.longValue()).isEqualTo(3L));
+        assertThat(message.getField("remove_only_one"))
+                .asInstanceOf(list(Number.class)).satisfiesExactly(
+                        n -> assertThat(n.longValue()).isEqualTo(1L),
+                        n -> assertThat(n.longValue()).isEqualTo(2L));
+        assertThat(message.getField("remove_all"))
+                .asInstanceOf(list(Number.class)).satisfiesExactly(
+                        n -> assertThat(n.longValue()).isEqualTo(1L));
     }
 }

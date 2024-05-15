@@ -45,13 +45,18 @@ public class JsRule {
 
     public Boolean when(EvaluationContext pipelineEvaluationContext) {
         try (final Context ctx = newContext(pipelineEvaluationContext)) {
-            return evaluate(source, ctx).when().execute(pipelineEvaluationContext.currentMessage()).asBoolean();
+            return evaluate(source, ctx)
+                    .when()
+                    .execute(new MessageProxy(pipelineEvaluationContext.currentMessage()))
+                    .asBoolean();
         }
     }
 
     public Object then(EvaluationContext pipelineEvaluationContext) {
         try (final Context ctx = newContext(pipelineEvaluationContext)) {
-            evaluate(source, ctx).then().execute(pipelineEvaluationContext.currentMessage());
+            evaluate(source, ctx)
+                    .then()
+                    .execute(new MessageProxy(pipelineEvaluationContext.currentMessage()));
         }
         return null;
     }

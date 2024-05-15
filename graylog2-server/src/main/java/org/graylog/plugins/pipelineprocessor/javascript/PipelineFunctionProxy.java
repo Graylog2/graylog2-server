@@ -16,9 +16,11 @@
  */
 package org.graylog.plugins.pipelineprocessor.javascript;
 
+import com.google.common.primitives.Ints;
 import jakarta.annotation.Nullable;
 import org.antlr.v4.runtime.CommonToken;
 import org.graalvm.polyglot.Value;
+import org.graalvm.polyglot.proxy.ProxyExecutable;
 import org.graalvm.polyglot.proxy.ProxyObject;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.ConstantExpression;
@@ -28,9 +30,13 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class PipelineFunctionProxy implements ProxyObject {
 
@@ -43,9 +49,9 @@ public class PipelineFunctionProxy implements ProxyObject {
     }
 
     @Override
-    public java.util.function.Function<Map<String, Object>, ?> getMember(String key) {
+    public ProxyExecutable getMember(String key) {
         final Function<?> function = functionRegistry.resolve(key);
-        return (Map<String, Object> args) -> function.evaluate(transformArgs(function, args), evaluationContext);
+        return arguments -> function.evaluate(transformArgs(function, arguments), evaluationContext);
     }
 
     @Override
@@ -63,33 +69,49 @@ public class PipelineFunctionProxy implements ProxyObject {
         throw new UnsupportedOperationException("Access to pipeline functions is read-only.");
     }
 
-    private FunctionArgs transformArgs(Function<?> function, Map<String, Object> args) {
-        final Map<String, Expression> expressionMap = function.descriptor().params().stream()
-                .filter(descriptor -> args.containsKey(descriptor.name()))
-                .collect(Collectors.toMap(ParameterDescriptor::name,
-                        descriptor -> toExpression(args.get(descriptor.name()), descriptor)));
+    private FunctionArgs transformArgs(Function<?> function, Value... args) {
+        final var functionName = function.descriptor().name();
+        final var params = function.descriptor().params();
+
+        if (args.length != params.size()) {
+            throw new IllegalArgumentException(
+                    f("Number of arguments for function %s does not match. Expected %d but got %d.",
+                            functionName,
+                            params.size(), args.length));
+        }
+
+        final Map<String, Expression> expressionMap = new HashMap<>();
+        for (int i = 0; i < args.length; i++) {
+            final Value arg = args[i];
+            final ParameterDescriptor<?, ?> paramDescriptor = params.get(i);
+            expressionMap.put(
+                    paramDescriptor.name(),
+                    new ParameterExpression(convert(arg, paramDescriptor.type()), paramDescriptor.type()));
+        }
 
         return new FunctionArgs(function, expressionMap);
     }
 
-    private ParameterExpression toExpression(Object value, ParameterDescriptor<?, ?> descriptor) {
-        final Class<?> targetType = descriptor.type();
-        if (value instanceof Number number) {
-            if (targetType == Integer.class) {
-                return new ParameterExpression(number.intValue(), targetType);
-            }
-            if (targetType == Long.class) {
-                return new ParameterExpression(number.longValue(), targetType);
-            }
-            if (targetType == Float.class) {
-                return new ParameterExpression(number.floatValue(), targetType);
-            }
-            if (targetType == Double.class) {
-                return new ParameterExpression(number.doubleValue(), targetType);
-            }
+    private <T> T convert(Value value, Class<T> targetType) {
+        if (value.isHostObject()) {
+            return value.asHostObject();
         }
 
-        return new ParameterExpression(value, targetType);
+        if (value.hasArrayElements() && targetType.isAssignableFrom(List.class)) {
+            final List<Object> list = new ArrayList<>(Ints.saturatedCast(value.getArraySize()));
+            for (int i = 0; i < value.getArraySize(); i++) {
+                list.add(convert(value.getArrayElement(i), Object.class));
+            }
+            return targetType.cast(list);
+        }
+
+        if (value.hasMembers() && targetType.isAssignableFrom(Map.class)) {
+            final Map<?, ?> map = value.getMemberKeys().stream()
+                    .collect(Collectors.toMap(k -> k, k -> convert(value.getMember(k), Object.class)));
+            return targetType.cast(map);
+        }
+
+        return value.as(targetType);
     }
 
     private static class ParameterExpression extends ConstantExpression {
