@@ -44,6 +44,7 @@ import org.graylog2.bootstrap.preflight.web.resources.model.CA;
 import org.graylog2.bootstrap.preflight.web.resources.model.CertParameters;
 import org.graylog2.bootstrap.preflight.web.resources.model.CreateCARequest;
 import org.graylog2.cluster.nodes.DataNodeDto;
+import org.graylog2.cluster.nodes.DataNodeStatus;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.cluster.preflight.DataNodeProvisioningService;
@@ -86,7 +87,7 @@ public class PreflightResource {
     }
 
     record DataNode(String nodeId, String transportAddress, DataNodeProvisioningConfig.State status, String errorMsg,
-                    String hostname, String shortNodeId) {}
+                    String hostname, String shortNodeId, DataNodeStatus dataNodeStatus) {}
 
     @GET
     @Path("/data_nodes")
@@ -101,7 +102,8 @@ public class PreflightResource {
                     n.getTransportAddress(),
                     preflight != null ? preflight.state() : null, preflight != null ? preflight.errorMsg() : null,
                     n.getHostname(),
-                    n.getShortNodeId());
+                    n.getShortNodeId(),
+                    n.getDataNodeStatus());
         }).collect(Collectors.toList());
     }
 
