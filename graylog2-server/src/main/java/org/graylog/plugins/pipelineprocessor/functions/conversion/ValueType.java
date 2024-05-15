@@ -24,7 +24,6 @@ public class ValueType extends AbstractFunction<String> {
         if (value == null) {
             return null;
         }
-        System.out.println(value);
         return value.getClass().getSimpleName();
     }
 

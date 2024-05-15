@@ -1719,17 +1719,21 @@ public class FunctionsSnippetsTest extends BaseParserTest {
 
     @Test
     public void valueType() throws IOException {
-        final Rule rule = parser.parseRule(ruleForTest(), false);
-        final Message message = messageFactory.createMessage("message", "source", DateTime.now(DateTimeZone.UTC));
+//        final Rule rule = parser.parseRule(ruleForTest(), false);
+//        final Message message = messageFactory.createMessage("message", "source", DateTime.now(DateTimeZone.UTC));
+//
+//        try (InputStream inputStream = getClass().getResourceAsStream("with-arrays.json")) {
+//            String jsonString = IOUtils.toString(Objects.requireNonNull(inputStream), StandardCharsets.UTF_8);
+//            message.addField("json", jsonString);
+//            evaluateRule(rule, message);
+//            assertThat(actionsTriggered.get()).isTrue();
+//        }
 
-        try (InputStream inputStream = getClass().getResourceAsStream("json-types.json")) {
-            String jsonString = IOUtils.toString(Objects.requireNonNull(inputStream), StandardCharsets.UTF_8);
-            message.addField("json", jsonString);
-            evaluateRule(rule, message);
-            assertThat(actionsTriggered.get()).isTrue();
-        }
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        final Message message = evaluateRule(rule);
 
         assertThat(message).isNotNull();
+        assertThat(message.getField("json_int")).isEqualTo("Integer");
         System.out.println(message.getFields());
     }
 }
