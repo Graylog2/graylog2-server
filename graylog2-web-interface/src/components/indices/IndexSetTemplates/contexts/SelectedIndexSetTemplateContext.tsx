@@ -15,21 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import type { SetStateAction } from 'react';
 
-import PageNavigation from 'components/common/PageNavigation';
-import Routes from 'routing/Routes';
-import { Row } from 'components/bootstrap';
+import { singleton } from 'logic/singleton';
+import type { IndexSetTemplate } from 'components/indices/IndexSetTemplates/types';
 
-const NAV_ITEMS = [
-  { title: 'Indices & Index Sets', path: Routes.SYSTEM.INDICES.LIST, exactPathMatch: true },
-  { title: 'Field Type Profiles', path: Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW, exactPathMatch: false },
-  { title: 'Index Set Templates', path: Routes.SYSTEM.INDICES.TEMPLATES.OVERVIEW, exactPathMatch: false }, // TODO: don't show on cloud
-];
+type ContextValue = {
+  selectedIndexSetTemplate: IndexSetTemplate,
+  setSelectedIndexSetTemplate: (template: SetStateAction<IndexSetTemplate>) => void,
+} | undefined
 
-const IndicesPageNavigation = () => (
-  <Row>
-    <PageNavigation items={NAV_ITEMS} />
-  </Row>
-);
+const SelectedIndexSetTemplateContext = React.createContext<ContextValue>(undefined);
 
-export default IndicesPageNavigation;
+export default singleton('contexts.SelectedIndexSetTemplateContext', () => SelectedIndexSetTemplateContext);

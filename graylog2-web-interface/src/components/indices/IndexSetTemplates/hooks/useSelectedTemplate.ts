@@ -14,24 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import PropTypes from 'prop-types';
-import React from 'react';
+import { useContext } from 'react';
 
-import { Icon } from 'components/common';
+import SelectedIndexSetTemplateContext from 'components/indices/IndexSetTemplates/contexts/SelectedIndexSetTemplateContext';
 
-type Props = {
-  builtIn: boolean,
+const useSelectedTemplate = () => {
+  const contextValue = useContext(SelectedIndexSetTemplateContext);
+
+  if (!contextValue) {
+    throw new Error('useSelectedTemplate hook needs to be used inside SelectedIndexSetTemplateContext.Provider');
+  }
+
+  return contextValue;
 };
 
-const BuiltInCell = ({ builtIn }: Props) => {
-  if (!builtIn) return null;
-
-  return (<Icon name="check_circle" />
-  );
-};
-
-export default BuiltInCell;
-
-BuiltInCell.propTypes = {
-  builtIn: PropTypes.bool.isRequired,
-};
+export default useSelectedTemplate;

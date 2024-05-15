@@ -41,7 +41,7 @@ export const ENTITY_TABLE_ID = 'index-set-template';
 export const DEFAULT_LAYOUT = {
   pageSize: 20,
   sort: { attributeId: 'title', direction: 'asc' } as Sort,
-  displayedColumns: ['title', 'description', 'built_in'],
+  displayedColumns: ['title', 'built_in', 'description'],
   columnsOrder: ['title', 'built_in', 'description'],
 };
 

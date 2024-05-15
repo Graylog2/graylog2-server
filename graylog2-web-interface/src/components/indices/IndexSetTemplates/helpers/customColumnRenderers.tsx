@@ -31,7 +31,7 @@ const customColumnRenderers: ColumnRenderers<IndexSetTemplate> = {
     },
     built_in: {
       renderCell: (built_in: boolean, _template) => (
-        <BuiltInCell built_in={built_in} />
+        <BuiltInCell builtIn={built_in} />
       ),
     },
   },
