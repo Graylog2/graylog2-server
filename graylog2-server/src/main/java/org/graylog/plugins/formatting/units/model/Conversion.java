@@ -14,22 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.rest;
+package org.graylog.plugins.formatting.units.model;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.graylog.plugins.formatting.units.model.UnitId;
-import org.graylog2.indexer.fieldtypes.FieldTypes;
 
-import javax.annotation.Nullable;
+public record Conversion(
+        @JsonProperty(value = "value", required = true) long value,
+        @JsonProperty(value = "action", required = true) ConversionAction action) {
 
-@JsonAutoDetect
-public record MappedFieldTypeDTO(@JsonProperty("name") String name,
-                                 @JsonProperty("type") FieldTypes.Type type,
-                                 @JsonProperty("unit") @Nullable UnitId unit
-) {
 
-    public static MappedFieldTypeDTO create(String name, FieldTypes.Type type) {
-        return new MappedFieldTypeDTO(name, type, null);
+    public enum ConversionAction {
+        MULTIPLY, DIVIDE
     }
 }

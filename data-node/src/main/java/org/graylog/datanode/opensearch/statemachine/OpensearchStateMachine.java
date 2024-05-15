@@ -28,7 +28,7 @@ import java.util.Set;
 
 public class OpensearchStateMachine extends StateMachine<OpensearchState, OpensearchEvent> {
 
-    private final Logger log = LoggerFactory.getLogger(OpensearchStateMachine.class);
+    private static final Logger LOG = LoggerFactory.getLogger(OpensearchStateMachine.class);
 
     /**
      * How many times can the OS rest api call fail before we switch to the failed state
@@ -69,7 +69,7 @@ public class OpensearchStateMachine extends StateMachine<OpensearchState, Opense
         // the startupFailuresCounter keeps track of failed REST status calls and allow failures during the
         // startup period
         config.configure(OpensearchState.STARTING)
-                .onEntry(process::start)
+                .onEntryFrom(OpensearchEvent.PROCESS_STARTED, process::start) // we don't want to re-trigger start from OpensearchEvent.HEALTH_CHECK_FAILED bellow
                 .permitDynamic(OpensearchEvent.HEALTH_CHECK_FAILED,
                         () -> startupFailuresCounter.failedTooManyTimes() ? OpensearchState.FAILED : OpensearchState.STARTING,
                         startupFailuresCounter::increment)
@@ -144,7 +144,7 @@ public class OpensearchStateMachine extends StateMachine<OpensearchState, Opense
         try {
             super.fire(trigger);
         } catch (Exception e) {
-            log.error(e.getMessage());
+            LOG.error(e.getMessage());
             super.fire(errorEvent);
         }
     }
