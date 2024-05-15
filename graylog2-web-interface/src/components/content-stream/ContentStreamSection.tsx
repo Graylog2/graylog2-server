@@ -19,7 +19,7 @@ import styled, { css } from 'styled-components';
 
 import SectionGrid from 'components/common/Section/SectionGrid';
 import SectionComponent from 'components/common/Section/SectionComponent';
-import ContentStreamNews from 'components/content-stream/ContentStreamNews';
+import ContentStreamNews, { CAROUSEL_ID } from 'components/content-stream/ContentStreamNews';
 import ContentStreamNewsFooter from 'components/content-stream/news/ContentStreamNewsFooter';
 import ContentStreamReleasesSection from 'components/content-stream/ContentStreamReleasesSection';
 import useContentStreamSettings from 'components/content-stream/hook/useContentStreamSettings';
@@ -27,6 +27,7 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import ToggleActionButton from 'components/content-stream/ToggleActionButton';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import { CarouselProvider } from 'components/common/Carousel';
 
 const StyledNewsSectionComponent = styled(SectionComponent)<{ $enabled: boolean }>(({ $enabled, theme }) => css`
   overflow: hidden;
@@ -113,10 +114,10 @@ const ContentStreamSection = () => {
                                                         isOpen={contentStreamEnabled} />
                                   )}>
         {contentStreamEnabled && (
-          <>
+          <CarouselProvider carouselId={CAROUSEL_ID}>
             <ContentStreamNews />
             <ContentStreamNewsFooter />
-          </>
+          </CarouselProvider>
         )}
       </StyledNewsSectionComponent>
       <StyledReleaseSectionComponent title="Releases"
