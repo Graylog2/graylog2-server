@@ -26,9 +26,8 @@ import type {
 export const urlPrefix = '/system/indices/index_sets/templates';
 
 const putTemplate = async ({ template, id }: { template: IndexSetTemplate, id: string }) => {
-  const url = qualifyUrl(urlPrefix);
-  const body: IndexSetTemplate = {
-    id,
+  const url = qualifyUrl(`${urlPrefix}/${id}`);
+  const body: Omit<IndexSetTemplate, 'id'> = {
     title: template.title,
     description: template.description,
     built_in: template.built_in,
