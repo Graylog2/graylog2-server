@@ -17,7 +17,6 @@
 import React, { useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 
-import type { Shapes } from 'views/logic/searchtypes/events/EventHandler';
 import toPlotly from 'views/logic/aggregationbuilder/visualizations/Interpolation';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
 import { makeVisualization, retrieveChartData } from 'views/components/aggregationbuilder/AggregationBuilder';
@@ -27,6 +26,7 @@ import useChartData from 'views/components/visualizations/useChartData';
 import useEvents from 'views/components/visualizations/useEvents';
 import { keySeparator, humanSeparator } from 'views/Constants';
 import useMapKeys from 'views/components/visualizations/useMapKeys';
+import { generateDomain, generateYAxis } from 'views/components/visualizations/layoytGenerators';
 
 import type { Generator } from '../ChartData';
 import XYPlot from '../XYPlot';
@@ -38,6 +38,12 @@ const AreaVisualization = makeVisualization(({
   height,
 }: VisualizationComponentProps) => {
   const visualizationConfig = (config.visualizationConfig || AreaVisualizationConfig.empty()) as AreaVisualizationConfig;
+  const { layouts, yAxisMapper } = useMemo(() => generateYAxis(config.series), [config.series]);
+  const _layout = useMemo(() => ({
+    ...layouts,
+    hovermode: 'x',
+    xaxis: { domain: generateDomain(Object.keys(layouts)?.length) },
+  }), [layouts]);
   const { interpolation = 'linear' } = visualizationConfig;
   const mapKeys = useMapKeys();
   const rowPivotFields = useMemo(() => config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [], [config?.rowPivots]);
@@ -46,15 +52,20 @@ const AreaVisualization = makeVisualization(({
       .map((l, i) => mapKeys(l, rowPivotFields[i]))
       .join(humanSeparator),
     ), [mapKeys, rowPivotFields]);
-  const chartGenerator: Generator = useCallback(({ type, name, labels, values, originalName }) => ({
-    type,
-    name,
-    x: _mapKeys(labels),
-    y: values,
-    fill: 'tozeroy',
-    line: { shape: toPlotly(interpolation) },
-    originalName,
-  }), [_mapKeys, interpolation]);
+  const chartGenerator: Generator = useCallback(({ type, name, labels, values, originalName }) => {
+    const yaxis = yAxisMapper[name];
+
+    return ({
+      type,
+      name,
+      yaxis,
+      x: _mapKeys(labels),
+      y: values,
+      fill: 'tozeroy',
+      line: { shape: toPlotly(interpolation) },
+      originalName,
+    });
+  }, [_mapKeys, interpolation]);
 
   const rows = useMemo(() => retrieveChartData(data), [data]);
 
@@ -67,7 +78,7 @@ const AreaVisualization = makeVisualization(({
   const { eventChartData, shapes } = useEvents(config, data.events);
 
   const chartDataResult = eventChartData ? [..._chartDataResult, eventChartData] : _chartDataResult;
-  const layout: { shapes?: Shapes } = shapes ? { shapes } : {};
+  const layout = shapes ? { ..._layout, shapes } : _layout;
 
   return (
     <XYPlot config={config}

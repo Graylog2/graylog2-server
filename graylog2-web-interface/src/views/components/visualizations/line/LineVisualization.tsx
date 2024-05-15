@@ -27,6 +27,7 @@ import useEvents from 'views/components/visualizations/useEvents';
 import { DEFAULT_AXIS_TYPE } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 import useMapKeys from 'views/components/visualizations/useMapKeys';
 import { keySeparator, humanSeparator } from 'views/Constants';
+import { generateDomain, generateYAxis } from 'views/components/visualizations/layoytGenerators';
 
 import type { Generator } from '../ChartData';
 import XYPlot from '../XYPlot';
@@ -37,6 +38,12 @@ const LineVisualization = makeVisualization(({
   effectiveTimerange,
   height,
 }: VisualizationComponentProps) => {
+  const { layouts, yAxisMapper } = useMemo(() => generateYAxis(config.series), [config.series]);
+  const _layout = useMemo(() => ({
+    ...layouts,
+    hovermode: 'x',
+    xaxis: { domain: generateDomain(Object.keys(layouts)?.length) },
+  }), [layouts]);
   const visualizationConfig = (config.visualizationConfig ?? LineVisualizationConfig.empty()) as LineVisualizationConfig;
   const { interpolation = 'linear', axisType = DEFAULT_AXIS_TYPE } = visualizationConfig;
   const mapKeys = useMapKeys();
@@ -46,14 +53,19 @@ const LineVisualization = makeVisualization(({
       .map((l, i) => mapKeys(l, rowPivotFields[i]))
       .join(humanSeparator),
     ), [mapKeys, rowPivotFields]);
-  const chartGenerator: Generator = useCallback(({ type, name, labels, values, originalName }) => ({
-    type,
-    name,
-    x: _mapKeys(labels),
-    y: values,
-    originalName,
-    line: { shape: toPlotly(interpolation) },
-  }), [_mapKeys, interpolation]);
+  const chartGenerator: Generator = useCallback(({ type, name, labels, values, originalName }) => {
+    const yaxis = yAxisMapper[name];
+
+    return ({
+      type,
+      name,
+      yaxis,
+      x: _mapKeys(labels),
+      y: values,
+      originalName,
+      line: { shape: toPlotly(interpolation) },
+    });
+  }, [_mapKeys, interpolation]);
 
   const rows = useMemo(() => retrieveChartData(data), [data]);
   const _chartDataResult = useChartData(rows, {
@@ -65,7 +77,7 @@ const LineVisualization = makeVisualization(({
   const { eventChartData, shapes } = useEvents(config, data.events);
 
   const chartDataResult = eventChartData ? [..._chartDataResult, eventChartData] : _chartDataResult;
-  const layout = shapes ? { shapes } : {};
+  const layout = shapes ? { ..._layout, shapes } : _layout;
 
   return (
     <XYPlot config={config}

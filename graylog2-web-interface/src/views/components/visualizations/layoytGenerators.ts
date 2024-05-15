@@ -150,7 +150,7 @@ type AdditionalSettings = {
   totalTraces: number,
 }
 
-export const getTraceOffsetSettings = (barmode: BarMode, { yaxis, totalAxis, axisNumber, traceIndex, totalTraces }: AdditionalSettings) => {
+export const getBarChartTraceOffsetSettings = (barmode: BarMode, { yaxis, totalAxis, axisNumber, traceIndex, totalTraces }: AdditionalSettings) => {
   if (barmode === 'stack' || barmode === 'relative' || barmode === 'overlay') {
     const width = getWidth(totalAxis);
     const offset = getOffset(axisNumber, totalAxis);

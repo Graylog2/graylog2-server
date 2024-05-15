@@ -33,7 +33,7 @@ import type ColorMapper from 'views/components/visualizations/ColorMapper';
 import {
   generateDomain,
   generateYAxis,
-  getTraceOffsetSettings,
+  getBarChartTraceOffsetSettings,
 } from 'views/components/visualizations/layoytGenerators';
 
 import type { Generator } from '../ChartData';
@@ -107,7 +107,7 @@ const BarVisualization = makeVisualization(({
     const axisNumber = mapperAxisNumber?.[name];
     const totalAxis = Object.keys(layouts).length;
 
-    const offsetSettings = getTraceOffsetSettings(barmode, { yaxis, totalAxis, axisNumber, traceIndex: idx, totalTraces: total });
+    const offsetSettings = getBarChartTraceOffsetSettings(barmode, { yaxis, totalAxis, axisNumber, traceIndex: idx, totalTraces: total });
 
     const getData = () => ({
       type,
