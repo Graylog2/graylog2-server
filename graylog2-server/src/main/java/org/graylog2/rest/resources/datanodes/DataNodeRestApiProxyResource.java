@@ -116,7 +116,10 @@ public class DataNodeRestApiProxyResource extends RestResource {
     private Response request(ContainerRequestContext context, String path, String hostname) throws IOException {
         final var request = new ProxyRequestAdapter.ProxyRequest(context.getMethod(), path, context.getEntityStream(), hostname, context.getUriInfo().getQueryParameters());
         if (enableAllowlist && allowList.stream().noneMatch(condition -> condition.test(request))) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("This request is not allowed.").build();
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("This request is not allowed.")
+                    .type(MediaType.TEXT_PLAIN_TYPE)
+                    .build();
         }
 
         final var response = proxyRequestAdapter.request(request);
