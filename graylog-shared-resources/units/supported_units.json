@@ -1,0 +1,128 @@
+{
+  "units": {
+    "size": [
+      {
+        "type": "base",
+        "abbrev": "b",
+        "name": "byte",
+        "unit_type": "size"
+      },
+      {
+        "type": "derived",
+        "abbrev": "kb",
+        "name": "kilobyte",
+        "unit_type": "size",
+        "conversion": {
+          "value": 1000,
+          "action": "MULTIPLY"
+        }
+      },
+      {
+        "type": "derived",
+        "abbrev": "Mb",
+        "name": "megabyte",
+        "unit_type": "size",
+        "conversion": {
+          "value": 1000000,
+          "action": "MULTIPLY"
+        }
+      },
+      {
+        "type": "derived",
+        "abbrev": "Gb",
+        "name": "gigabyte",
+        "unit_type": "size",
+        "conversion": {
+          "value": 1000000000,
+          "action": "MULTIPLY"
+        }
+      }
+    ],
+    "time": [
+      {
+        "type": "derived",
+        "abbrev": "ns",
+        "name": "nanosecond",
+        "unit_type": "time",
+        "conversion": {
+          "value": 1000000000,
+          "action": "DIVIDE"
+        }
+      },
+      {
+        "type": "derived",
+        "abbrev": "μs",
+        "name": "microsecond",
+        "unit_type": "time",
+        "conversion": {
+          "value": 1000000,
+          "action": "DIVIDE"
+        }
+      },
+      {
+        "type": "derived",
+        "abbrev": "ms",
+        "name": "millisecond",
+        "unit_type": "time",
+        "conversion": {
+          "value": 1000,
+          "action": "DIVIDE"
+        }
+      },
+      {
+        "type": "base",
+        "abbrev": "s",
+        "name": "second",
+        "unit_type": "time"
+      },
+      {
+        "type": "derived",
+        "abbrev": "min",
+        "name": "minute",
+        "unit_type": "time",
+        "conversion": {
+          "value": 60,
+          "action": "MULTIPLY"
+        }
+      },
+      {
+        "type": "derived",
+        "abbrev": "h",
+        "name": "hour",
+        "unit_type": "time",
+        "conversion": {
+          "value": 3600,
+          "action": "MULTIPLY"
+        }
+      },
+      {
+        "type": "derived",
+        "abbrev": "d",
+        "name": "day",
+        "unit_type": "time",
+        "conversion": {
+          "value": 86400,
+          "action": "MULTIPLY"
+        }
+      },
+      {
+        "type": "derived",
+        "abbrev": "m",
+        "name": "month",
+        "unit_type": "time",
+        "conversion": {
+          "value": 2592000,
+          "action": "MULTIPLY"
+        }
+      }
+    ],
+    "percent": [
+      {
+        "type": "base",
+        "abbrev": "%",
+        "name": "percent",
+        "unit_type": "percent"
+      }
+    ]
+  }
+}

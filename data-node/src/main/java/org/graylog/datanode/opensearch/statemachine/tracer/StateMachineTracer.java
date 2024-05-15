@@ -25,4 +25,8 @@ import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachine;
  * The tracer allows to observe triggered event (before) and transitions (after) of the {@link OpensearchStateMachine}
  */
 public interface StateMachineTracer extends Trace<OpensearchState, OpensearchEvent> {
+
+    default void setStateMachine(OpensearchStateMachine stateMachine) {
+    }
+
 }

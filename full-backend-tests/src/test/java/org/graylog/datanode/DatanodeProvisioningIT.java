@@ -17,7 +17,6 @@
 package org.graylog.datanode;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.github.joschi.jadconfig.util.Duration;
 import com.github.rholder.retry.RetryException;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
@@ -25,7 +24,9 @@ import com.github.rholder.retry.WaitStrategies;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
+import jakarta.annotation.Nonnull;
 import jakarta.ws.rs.core.MediaType;
+import org.apache.commons.lang.RandomStringUtils;
 import org.apache.http.HttpStatus;
 import org.assertj.core.api.Assertions;
 import org.graylog.datanode.restoperations.DatanodeOpensearchWait;
@@ -40,14 +41,15 @@ import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog2.cluster.nodes.DataNodeStatus;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
-import org.graylog2.security.IndexerJwtAuthTokenProvider;
-import jakarta.annotation.Nonnull;
 import org.junit.jupiter.api.io.TempDir;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.security.auth.x500.X500Principal;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -55,6 +57,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -70,6 +73,8 @@ import static io.restassured.RestAssured.given;
                                    })
 public class DatanodeProvisioningIT {
 
+    private final Logger log = LoggerFactory.getLogger(DatanodeProvisioningIT.class);
+
     private final GraylogApis apis;
 
     @TempDir
@@ -83,7 +88,7 @@ public class DatanodeProvisioningIT {
     void provisionDatanodeGenerateCA() throws ExecutionException, RetryException, KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException {
         final BasicAuthCredentials basicAuth = extractBasicAuthFromLogs(apis.backend().getLogs());
 
-        createSelfSignedCA(basicAuth);
+        final String caSubjectName = createSelfSignedCA(basicAuth);
 
         configureAutomaticCertRenewalPolicy(basicAuth);
         triggerDatanodeProvisioning(basicAuth);
@@ -93,25 +98,47 @@ public class DatanodeProvisioningIT {
         Assertions.assertThat(connectedDatanodes)
                 .hasSize(1);
 
-        testEncryptedConnectionToOpensearch(basicAuth);
+        final KeyStore truststore = keystoreFromApiCertificate(basicAuth);
+        verifySubjectName(truststore, caSubjectName);
+
+        testEncryptedConnectionToOpensearch(truststore);
     }
 
-    private void testEncryptedConnectionToOpensearch(BasicAuthCredentials basicAuth) throws ExecutionException, RetryException, KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException {
-        new DatanodeOpensearchWait(RestOperationParameters.builder()
-                .port(getOpensearchPort())
-                .truststore(keystoreFromApiCertificate(basicAuth))
-                .jwtTokenProvider(DatanodeContainerizedBackend.JWT_AUTH_TOKEN_PROVIDER)
-                .build())
-                .waitForNodesCount(1);
+    private static void verifySubjectName(KeyStore truststore, String caSubjectName) throws KeyStoreException {
+        final X500Principal subject = ((X509Certificate) truststore.getCertificate("ca")).getSubjectX500Principal();
+        Assertions.assertThat(subject.getName()).isEqualTo("CN=" + caSubjectName);
+    }
+
+    private void testEncryptedConnectionToOpensearch(KeyStore truststore) throws ExecutionException, RetryException, KeyStoreException, CertificateException, IOException, NoSuchAlgorithmException {
+        try {
+            new DatanodeOpensearchWait(RestOperationParameters.builder()
+                    .port(getOpensearchPort())
+                    .truststore(truststore)
+                    .jwtTokenProvider(DatanodeContainerizedBackend.JWT_AUTH_TOKEN_PROVIDER)
+                    .build())
+                    .waitForNodesCount(1);
+        } catch (Exception e) {
+            log.error("Could not connect to Opensearch\n" + apis.backend().getSearchLogs());
+            throw e;
+        }
     }
 
     private List<DatanodeStatus> waitForDatanodesConnected(BasicAuthCredentials basicAuth) throws ExecutionException, RetryException {
-        List<DatanodeStatus> connectedDatanodes = RetryerBuilder.<List<DatanodeStatus>>newBuilder()
-                .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
-                .withStopStrategy(StopStrategies.stopAfterAttempt(60))
-                .retryIfResult(list -> list.isEmpty() || !list.stream().allMatch(node -> node.status().equals(DataNodeProvisioningConfig.State.CONNECTED.name())))
-                .build()
-                .call(() -> getDatanodes(basicAuth));
+        List<DatanodeStatus> connectedDatanodes = null;
+        try {
+            connectedDatanodes = RetryerBuilder.<List<DatanodeStatus>>newBuilder()
+                    .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
+                    .withStopStrategy(StopStrategies.stopAfterAttempt(60))
+                    .retryIfResult(list -> list.isEmpty() || !list.stream().allMatch(node ->
+                            node.status().equals(DataNodeProvisioningConfig.State.CONNECTED.name()) &&
+                                    node.dataNodeStatus().equals(DataNodeStatus.AVAILABLE.name())
+                    ))
+                    .build()
+                    .call(() -> getDatanodes(basicAuth));
+        } catch (ExecutionException | RetryException | IllegalStateException e) {
+            log.error("Datanode not started:\n" + apis.backend().getSearchLogs());
+            throw e;
+        }
         return connectedDatanodes;
     }
 
@@ -125,14 +152,16 @@ public class DatanodeProvisioningIT {
                 .statusCode(HttpStatus.SC_NO_CONTENT);
     }
 
-    private ValidatableResponse createSelfSignedCA(BasicAuthCredentials basicAuth) {
-        return given()
+    private String createSelfSignedCA(BasicAuthCredentials basicAuth) {
+        String subject = "Graylog CA generated " + RandomStringUtils.randomAlphanumeric(10);
+        given()
                 .spec(apis.requestSpecification())
-                .body("{\"organization\":\"Graylog CA\"}")
+                .body("{\"organization\":\"" + subject + "\"}")
                 .auth().basic(basicAuth.username, basicAuth.password)
                 .post("/ca/create")
                 .then()
                 .statusCode(HttpStatus.SC_CREATED);
+        return subject;
     }
 
     private ValidatableResponse configureAutomaticCertRenewalPolicy(BasicAuthCredentials basicAuth) {
@@ -160,7 +189,10 @@ public class DatanodeProvisioningIT {
         Assertions.assertThat(connectedDatanodes)
                 .hasSize(1);
 
-        testEncryptedConnectionToOpensearch(basicAuth);
+        final KeyStore truststore = keystoreFromApiCertificate(basicAuth);
+        verifySubjectName(truststore, CertutilCa.DEFAULT_ORGANIZATION_NAME);
+
+        testEncryptedConnectionToOpensearch(truststore);
     }
 
     private ValidatableResponse uploadCA(BasicAuthCredentials basicAuth, Path caKeystore) {
@@ -235,7 +267,8 @@ public class DatanodeProvisioningIT {
             @JsonProperty("status") String status,
             @JsonProperty("error_msg") String errorMsg,
             @JsonProperty("hostname") String hostname,
-            @JsonProperty("short_node_id") String shortNodeId
+            @JsonProperty("short_node_id") String shortNodeId,
+            @JsonProperty("data_node_status") String dataNodeStatus
     ) {
     }
 }
