@@ -19,6 +19,7 @@ import PropTypes from 'prop-types';
 import type { DefaultTheme } from 'styled-components';
 import styled, { css, withTheme } from 'styled-components';
 import merge from 'lodash/merge';
+import type * as Plotly from 'plotly.js';
 
 import Plot from 'views/components/visualizations/plotly/AsyncPlot';
 import type ColorMapper from 'views/components/visualizations/ColorMapper';
@@ -47,6 +48,18 @@ const StyledPlot = styled(Plot)(({ theme }) => css`
     }
   }
 `);
+
+export type OnClickMarkerEvent = {
+  x: string,
+  y: string,
+}
+
+export type OnHoverMarkerEvent = {
+  positionX: number,
+  positionY: number,
+  x: string,
+  y: string,
+}
 
 type LegendConfig = {
   name: string,
@@ -82,6 +95,9 @@ type Props = {
   layout: {},
   onZoom: (from: string, to: string) => boolean,
   setChartColor?: (data: ChartConfig, color: ColorMapper) => ChartColor,
+  onClickMarker?: (event: OnClickMarkerEvent) => void
+  onHoverMarker?: (event: OnHoverMarkerEvent) => void,
+  onUnhoverMarker?: () => void,
 };
 
 type GenericPlotProps = Props & { theme: DefaultTheme };
@@ -116,6 +132,9 @@ class GenericPlot extends React.Component<GenericPlotProps, State> {
     layout: {},
     onZoom: () => true,
     setChartColor: undefined,
+    onClickMarker: (_event) => {},
+    onHoverMarker: (_event) => {},
+    onUnhoverMarker: () => {},
   };
 
   constructor(props: GenericPlotProps) {
@@ -144,7 +163,7 @@ class GenericPlot extends React.Component<GenericPlotProps, State> {
   };
 
   render() {
-    const { chartData, layout, setChartColor, theme } = this.props;
+    const { chartData, layout, setChartColor, theme, onClickMarker, onHoverMarker, onUnhoverMarker } = this.props;
     const fontSettings = {
       color: theme.colors.global.textDefault,
       size: ROOT_FONT_SIZE * Number(theme.fonts.size.small.replace(/rem|em/i, '')),
@@ -191,6 +210,24 @@ class GenericPlot extends React.Component<GenericPlotProps, State> {
     };
     const plotLayout = merge({}, defaultLayout, layout);
 
+    const _onHoverMarker = (event: unknown) => {
+      const { points } = event as { points: Array<{ bbox: { x0: number, y0: number }, y: string, x: string }> };
+
+      onHoverMarker?.({
+        positionX: points[0].bbox.x0,
+        positionY: points[0].bbox.y0,
+        x: points[0].x,
+        y: points[0].y,
+      });
+    };
+
+    const _onMarkerClick = ({ points }: Readonly<Plotly.PlotMouseEvent>) => {
+      onClickMarker?.({
+        x: points[0].x as string,
+        y: points[0].y as string,
+      });
+    };
+
     return (
       <ChartColorContext.Consumer>
         {({ colors }) => {
@@ -200,7 +237,7 @@ class GenericPlot extends React.Component<GenericPlotProps, State> {
           }));
 
           const newChartData = chartData.map((chart) => {
-            if (setChartColor && !!colors?.size) {
+            if (setChartColor && 'size' in colors && !!colors.size) {
               const conf = setChartColor(chart, colors);
 
               if (chart.type === 'pie') {
@@ -233,7 +270,9 @@ class GenericPlot extends React.Component<GenericPlotProps, State> {
                                 layout={interactive ? plotLayout : merge({}, nonInteractiveLayout, plotLayout)}
                                 style={style}
                                 onAfterPlot={onRenderComplete}
-                                onClick={interactive ? null : () => false}
+                                onClick={interactive ? _onMarkerClick : () => false}
+                                onHover={_onHoverMarker}
+                                onUnhover={onUnhoverMarker}
                                 onRelayout={interactive ? this._onRelayout : () => false}
                                 config={config} />
                   )}

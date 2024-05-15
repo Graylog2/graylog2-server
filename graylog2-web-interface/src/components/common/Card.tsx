@@ -22,25 +22,40 @@ import { Card as MantineCard } from '@mantine/core';
 const Container = styled(MantineCard)(({ theme }) => css`
   background-color: ${theme.colors.cards.background};
   border-color: ${theme.colors.cards.border};
+  
+  &:focus {
+    outline: 5px auto Highlight;
+    outline: 5px auto -webkit-focus-ring-color;
+  }
 `);
 
 type Props = React.PropsWithChildren<{
   className?: string,
   padding?: 'sm',
+  id?: string,
+  tabIndex?: number
 }>
 
 /**
  * Simple card component.
  */
-const Card = ({ children, className, padding }: Props) => (
-  <Container className={className} shadow="sm" padding={padding} radius="md" withBorder>
+const Card = ({ children, className, padding, id, tabIndex }: Props) => (
+  <Container className={className}
+             shadow="sm"
+             padding={padding}
+             radius="md"
+             withBorder
+             tabIndex={tabIndex}
+             id={id}>
     {children}
   </Container>
 );
 
 Card.defaultProps = {
   className: undefined,
+  id: undefined,
   padding: undefined,
+  tabIndex: undefined,
 };
 
 export default Card;
