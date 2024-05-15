@@ -17,82 +17,90 @@
 package org.graylog2.streams;
 
 import com.google.common.collect.ImmutableSet;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Updates;
+import com.mongodb.client.result.UpdateResult;
+import jakarta.inject.Inject;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.DbEntity;
-import org.graylog2.database.MongoConnection;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.outputs.events.OutputChangedEvent;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.rest.models.streams.outputs.requests.CreateOutputRequest;
-import org.mongojack.DBQuery;
-import org.mongojack.DBUpdate;
-import org.mongojack.JacksonDBCollection;
-import org.mongojack.WriteResult;
 
-import jakarta.inject.Inject;
-
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
+import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.in;
+import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
+
 public class OutputServiceImpl implements OutputService {
-    private final JacksonDBCollection<OutputImpl, String> coll;
-    private final DBCollection dbCollection;
+
+    private final MongoCollection<OutputImpl> collection;
+    private final MongoUtils<OutputImpl> mongoUtils;
     private final StreamService streamService;
     private final ClusterEventBus clusterEventBus;
 
+
     @Inject
-    public OutputServiceImpl(MongoConnection mongoConnection,
-                             MongoJackObjectMapperProvider mapperProvider,
+    public OutputServiceImpl(MongoCollections mongoCollections,
                              StreamService streamService,
                              ClusterEventBus clusterEventBus) {
         this.streamService = streamService;
         final String collectionName = OutputImpl.class.getAnnotation(DbEntity.class).collection();
-        this.dbCollection = mongoConnection.getDatabase().getCollection(collectionName);
-        this.coll = JacksonDBCollection.wrap(dbCollection, OutputImpl.class, String.class, mapperProvider.get());
+        this.collection = mongoCollections.collection(collectionName, OutputImpl.class);
+        this.mongoUtils = mongoCollections.utils(collection);
         this.clusterEventBus = clusterEventBus;
     }
 
     @Override
     public Output load(String streamOutputId) throws NotFoundException {
-        final Output output = coll.findOneById(streamOutputId);
-        if (output == null) {
+        final Optional<OutputImpl> output = mongoUtils.getById(streamOutputId);
+        if (output.isEmpty()) {
             throw new NotFoundException("Couldn't find output with id " + streamOutputId);
         }
 
-        return output;
+        return output.get();
     }
 
     @Override
     public Set<Output> loadAll() {
-        try (org.mongojack.DBCursor<OutputImpl> outputs = coll.find()) {
-            return ImmutableSet.copyOf((Iterable<OutputImpl>) outputs);
-        }
+        return ImmutableSet.copyOf(collection.find());
     }
 
     @Override
     public Set<Output> loadByIds(Collection<String> ids) {
-        final DBQuery.Query query = DBQuery.in(OutputImpl.FIELD_ID, ids);
-        try (org.mongojack.DBCursor<OutputImpl> dbCursor = coll.find(query)) {
-            return ImmutableSet.copyOf((Iterable<? extends Output>) dbCursor);
-        }
+        List<ObjectId> objIds = ids.stream()
+                .map(ObjectId::new)
+                .toList();
+        final Bson query = in(OutputImpl.FIELD_ID, objIds);
+        return ImmutableSet.copyOf(collection.find(query));
     }
 
     @Override
     public Output create(Output request) throws ValidationException {
         final OutputImpl outputImpl = implOrFail(request);
-        final WriteResult<OutputImpl, String> writeResult = coll.save(outputImpl);
+        final String id = insertedIdAsString(collection.insertOne(outputImpl));
 
-        return writeResult.getSavedObject();
+        return OutputImpl.create(id,
+                outputImpl.getTitle(),
+                outputImpl.getType(),
+                outputImpl.getCreatorUserId(),
+                outputImpl.getConfiguration(),
+                outputImpl.getCreatedAt(),
+                outputImpl.getContentPack());
     }
 
     @Override
@@ -103,7 +111,7 @@ public class OutputServiceImpl implements OutputService {
 
     @Override
     public void destroy(Output model) throws NotFoundException {
-        coll.removeById(model.getId());
+        mongoUtils.deleteById(model.getId());
 
         // Removing the output from all streams will emit a StreamsChangedEvent for affected streams.
         // The OutputRegistry will handle this event and stop the output.
@@ -112,36 +120,39 @@ public class OutputServiceImpl implements OutputService {
 
     @Override
     public Output update(String id, Map<String, Object> deltas) {
-        DBUpdate.Builder update = new DBUpdate.Builder();
-        for (Map.Entry<String, Object> fields : deltas.entrySet()) {
-            update = update.set(fields.getKey(), fields.getValue());
+        List<Bson> updates = new ArrayList<>();
+        for (Map.Entry<String, Object> field : deltas.entrySet()) {
+            updates.add(Updates.set(field.getKey(), field.getValue()));
         }
 
-        final OutputImpl updatedOutput =
-                coll.findAndModify(DBQuery.is(OutputImpl.FIELD_ID, id), null, null, false, update, true, false);
+        UpdateResult result = collection.updateOne(eq(OutputImpl.FIELD_ID, new ObjectId(id)), Updates.combine(updates));
+        if (result.getUpsertedId() != null) {
+            final Optional<OutputImpl> updatedOutput = mongoUtils.getById(id);
+            if (updatedOutput.isEmpty()) {
+                return null;
+            }
+            this.clusterEventBus.post(OutputChangedEvent.create(updatedOutput.get().getId()));
 
-        this.clusterEventBus.post(OutputChangedEvent.create(updatedOutput.getId()));
-
-        return updatedOutput;
+            return updatedOutput.get();
+        }
+        return null;
     }
 
     @Override
     public long count() {
-        return coll.count();
+        return collection.countDocuments();
     }
 
     @Override
     public Map<String, Long> countByType() {
         final Map<String, Long> outputsCountByType = new HashMap<>();
-        try (DBCursor outputTypes = dbCollection.find(null, new BasicDBObject(OutputImpl.FIELD_TYPE, 1))) {
+        final Iterable<OutputImpl> outputs = collection.find();
 
-            for (DBObject outputType : outputTypes) {
-                final String type = (String) outputType.get(OutputImpl.FIELD_TYPE);
-                if (type != null) {
-                    final Long oldValue = outputsCountByType.get(type);
-                    final Long newValue = (oldValue == null) ? 1 : oldValue + 1;
-                    outputsCountByType.put(type, newValue);
-                }
+        for (OutputImpl output : outputs) {
+            final String type = output.getType();
+            if (type != null) {
+                final Long oldValue = outputsCountByType.getOrDefault(type, 0L);
+                outputsCountByType.put(type, oldValue + 1);
             }
         }
 

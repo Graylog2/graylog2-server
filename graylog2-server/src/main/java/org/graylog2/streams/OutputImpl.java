@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog2.database.DbEntity;
+import org.graylog2.database.MongoEntity;
 import org.graylog2.plugin.streams.Output;
 import org.mongojack.ObjectId;
 
@@ -34,7 +35,7 @@ import static org.graylog2.shared.security.RestPermissions.OUTPUTS_READ;
 @JsonAutoDetect
 @DbEntity(collection = "outputs",
           readPermission = OUTPUTS_READ)
-public abstract class OutputImpl implements Output {
+public abstract class OutputImpl implements Output, MongoEntity {
     static final String FIELD_ID = "_id";
     static final String FIELD_TITLE = "title";
     static final String FIELD_TYPE = "type";
@@ -81,7 +82,7 @@ public abstract class OutputImpl implements Output {
                                     @JsonProperty(FIELD_CONFIGURATION) Map<String, Object> configuration,
                                     @JsonProperty(FIELD_CREATED_AT) Date created_at,
                                     @JsonProperty(FIELD_CONTENT_PACK) @Nullable String content_pack) {
-        return new AutoValue_OutputImpl(_id, title, type, creator_user_id, configuration, created_at, content_pack);
+        return new AutoValue_OutputImpl(_id, _id, title, type, creator_user_id, configuration, created_at, content_pack);
 
     }
 }
