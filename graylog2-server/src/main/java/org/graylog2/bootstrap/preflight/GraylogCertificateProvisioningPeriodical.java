@@ -151,97 +151,108 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
         }
     }
 
-    private RenewalPolicy getRenewalPolicy() {
-        return this.clusterConfigService.get(RenewalPolicy.class);
+    private Optional<RenewalPolicy> getRenewalPolicy() {
+        return Optional.ofNullable(this.clusterConfigService.get(RenewalPolicy.class));
     }
 
     @Override
     public void doRun() {
         LOG.debug("checking if there are configuration steps to take care of");
+        // only load nodes that are in a state that need sth done
+        final var nodes = dataNodeProvisioningService.findAllNodesThatNeedAttention();
+        if (!nodes.isEmpty()) {
+            getKeyStore().ifPresentOrElse(
+                    caKeystore -> runWithCA(nodes, caKeystore),
+                    () -> LOG.debug("No CA keystore available, skipping provisioning.")
+            );
+        }
 
-        try {
-            // only load nodes that are in a state that need sth done
-            final var nodes = dataNodeProvisioningService.findAllNodesThatNeedAttention();
-            if (!nodes.isEmpty()) {
+    }
 
-                final var password = configuration.configuredCaExists()
-                        ? configuration.getCaPassword().toCharArray()
-                        : passwordSecret.toCharArray();
-                final Optional<KeyStore> optKey = caService.loadKeyStore();
-                if (optKey.isEmpty()) {
-                    LOG.debug("No keystore available.");
-                    return;
+    private void runWithCA(List<DataNodeProvisioningConfig> nodes, KeyStore caKeystore) {
+        getRenewalPolicy().ifPresentOrElse(
+                renewalPolicy -> runProvisioning(nodes, caKeystore, renewalPolicy),
+                () -> LOG.debug("No renewal policy available, skipping provisioning.")
+        );
+    }
+
+    private void runProvisioning(List<DataNodeProvisioningConfig> nodes, KeyStore caKeystore, RenewalPolicy renewalPolicy) {
+        var nodesByState = nodes.stream().collect(Collectors.groupingBy(node -> Optional.ofNullable(node.state())
+                .orElse(DataNodeProvisioningConfig.State.UNCONFIGURED)));
+
+        // if we're running in post-preflight and new datanodes arrive, they should configure themselves automatically
+        var cfg = preflightConfigService.getPreflightConfigResult();
+        if (cfg.equals(PreflightConfigResult.FINISHED) || cfg.equals(PreflightConfigResult.PREPARED)) {
+            var unconfiguredNodes = nodesByState.getOrDefault(DataNodeProvisioningConfig.State.UNCONFIGURED, List.of());
+            if (renewalPolicy.mode().equals(RenewalPolicy.Mode.AUTOMATIC)) {
+                unconfiguredNodes.forEach(c -> dataNodeProvisioningService.save(c.asConfigured()));
+            } else {
+                var hasUnconfiguredNodes = !unconfiguredNodes.isEmpty();
+                if (hasUnconfiguredNodes) {
+                    var notification = notificationService.buildNow()
+                            .addType(Notification.Type.DATA_NODE_NEEDS_PROVISIONING)
+                            .addSeverity(Notification.Severity.URGENT);
+                    notificationService.publishIfFirst(notification);
+                } else {
+                    notificationService.fixed(Notification.Type.DATA_NODE_NEEDS_PROVISIONING);
                 }
-
-                final var renewalPolicy = getRenewalPolicy();
-                if (renewalPolicy == null) {
-                    LOG.debug("No renewal policy available.");
-                    return;
-                }
-
-                var nodesByState = nodes.stream().collect(Collectors.groupingBy(node -> Optional.ofNullable(node.state())
-                        .orElse(DataNodeProvisioningConfig.State.UNCONFIGURED)));
-
-                // if we're running in post-preflight and new datanodes arrive, they should configure themselves automatically
-                var cfg = preflightConfigService.getPreflightConfigResult();
-                if (cfg.equals(PreflightConfigResult.FINISHED) || cfg.equals(PreflightConfigResult.PREPARED)) {
-                    var unconfiguredNodes = nodesByState.getOrDefault(DataNodeProvisioningConfig.State.UNCONFIGURED, List.of());
-                    if (renewalPolicy.mode().equals(RenewalPolicy.Mode.AUTOMATIC)) {
-                        unconfiguredNodes.forEach(c -> dataNodeProvisioningService.save(c.asConfigured()));
-                    } else {
-                        var hasUnconfiguredNodes = !unconfiguredNodes.isEmpty();
-                        if (hasUnconfiguredNodes) {
-                            var notification = notificationService.buildNow()
-                                    .addType(Notification.Type.DATA_NODE_NEEDS_PROVISIONING)
-                                    .addSeverity(Notification.Severity.URGENT);
-                            notificationService.publishIfFirst(notification);
-                        } else {
-                            notificationService.fixed(Notification.Type.DATA_NODE_NEEDS_PROVISIONING);
-                        }
-                    }
-                }
-                if (!cfg.equals(PreflightConfigResult.PREPARED)) {
-                    // if we're running through preflight and reach "STARTUP_PREPARED", we want to request STARTUP of OpenSearch
-                    var preparedNodes = nodesByState.getOrDefault(DataNodeProvisioningConfig.State.STARTUP_PREPARED, List.of());
-                    if (!preparedNodes.isEmpty()) {
-                        preparedNodes.forEach(c -> dataNodeProvisioningService.save(c.asStartupTrigger()));
-                        // waiting one iteration after writing the new state, so we return from execution here and skip the rest of the periodical
-                        return;
-                    }
-                }
-
-                final var caKeystore = optKey.get();
-                final var nodesWithCSR = nodesByState.getOrDefault(DataNodeProvisioningConfig.State.CSR, List.of());
-                final var hasNodesWithCSR = !nodesWithCSR.isEmpty();
-                if (hasNodesWithCSR) {
-                    var caPrivateKey = (PrivateKey) caKeystore.getKey(CA_KEY_ALIAS, password);
-                    var caCertificate = (X509Certificate) caKeystore.getCertificate(CA_KEY_ALIAS);
-                    nodesWithCSR.forEach(c -> {
-                        try {
-                            var csr = csrStorage.readCsr(c.nodeId());
-                            if (csr.isEmpty()) {
-                                LOG.error("Node in CSR state, but no CSR present : " + c.nodeId());
-                                dataNodeProvisioningService.save(c.asError("Node in CSR state, but no CSR present"));
-                            } else {
-                                var cert = csrSigner.sign(caPrivateKey, caCertificate, csr.get(), renewalPolicy);
-                                final List<X509Certificate> caCertificates = List.of(caCertificate);
-                                certMongoStorage.writeCertChain(new CertificateChain(cert, caCertificates), c.nodeId());
-                            }
-                        } catch (Exception e) {
-                            LOG.error("Could not sign CSR: " + e.getMessage(), e);
-                            dataNodeProvisioningService.save(c.asError(e.getMessage()));
-                        }
-                    });
-                }
-
-                nodesByState.getOrDefault(DataNodeProvisioningConfig.State.STARTUP_REQUESTED, List.of())
-                        .forEach(c -> {
-                            dataNodeProvisioningService.save(c.asConnecting());
-                            executor.submit(() -> checkConnectivity(c));
-                        });
             }
-        } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException |
-                 KeyStoreStorageException e) {
+        }
+        if (!cfg.equals(PreflightConfigResult.PREPARED)) {
+            // if we're running through preflight and reach "STARTUP_PREPARED", we want to request STARTUP of OpenSearch
+            var preparedNodes = nodesByState.getOrDefault(DataNodeProvisioningConfig.State.STARTUP_PREPARED, List.of());
+            if (!preparedNodes.isEmpty()) {
+                preparedNodes.forEach(c -> dataNodeProvisioningService.save(c.asStartupTrigger()));
+                // waiting one iteration after writing the new state, so we return from execution here and skip the rest of the periodical
+                return;
+            }
+        }
+
+        final var nodesWithCSR = nodesByState.getOrDefault(DataNodeProvisioningConfig.State.CSR, List.of());
+        final var hasNodesWithCSR = !nodesWithCSR.isEmpty();
+        if (hasNodesWithCSR) {
+            try {
+                var caPrivateKey = (PrivateKey) caKeystore.getKey(CA_KEY_ALIAS, getCAPassword());
+                var caCertificate = (X509Certificate) caKeystore.getCertificate(CA_KEY_ALIAS);
+                nodesWithCSR.forEach(c -> {
+                    try {
+                        var csr = csrStorage.readCsr(c.nodeId());
+                        if (csr.isEmpty()) {
+                            LOG.error("Node in CSR state, but no CSR present : " + c.nodeId());
+                            dataNodeProvisioningService.save(c.asError("Node in CSR state, but no CSR present"));
+                        } else {
+                            var cert = csrSigner.sign(caPrivateKey, caCertificate, csr.get(), renewalPolicy);
+                            final List<X509Certificate> caCertificates = List.of(caCertificate);
+                            certMongoStorage.writeCertChain(new CertificateChain(cert, caCertificates), c.nodeId());
+                        }
+                    } catch (Exception e) {
+                        LOG.error("Could not sign CSR: " + e.getMessage(), e);
+                        dataNodeProvisioningService.save(c.asError(e.getMessage()));
+                    }
+                });
+            } catch (UnrecoverableKeyException | KeyStoreException | NoSuchAlgorithmException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        nodesByState.getOrDefault(DataNodeProvisioningConfig.State.STARTUP_REQUESTED, List.of())
+                .forEach(c -> {
+                    dataNodeProvisioningService.save(c.asConnecting());
+                    executor.submit(() -> checkConnectivity(c));
+                });
+    }
+
+    @Nonnull
+    private char[] getCAPassword() {
+        return configuration.configuredCaExists()
+                ? configuration.getCaPassword().toCharArray()
+                : passwordSecret.toCharArray();
+    }
+
+    private Optional<KeyStore> getKeyStore() {
+        try {
+            return caService.loadKeyStore();
+        } catch (KeyStoreException | KeyStoreStorageException | NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
     }
@@ -345,6 +356,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
      * This record serves as a DTO for retry logic. We can't use the original Response, as we are having problems
      * closing the response between repeats and failure recoveries. Rather close the response ASAP and provide
      * only necessary information to the retryer.
+     *
      * @param success Could we connect to the datanode URL?
      * @param message What was the error message if not?
      */
