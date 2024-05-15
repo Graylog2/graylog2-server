@@ -99,6 +99,15 @@ public class IndexSetTemplateResource extends RestResource {
     }
 
     @GET
+    @Path("/default_config")
+    @Timed
+    @NoAuditEvent("No change to the DB")
+    @ApiOperation(value = "Gets default template")
+    public IndexSetTemplateConfig getDefaultConfig() {
+        return indexSetDefaultTemplateService.createDefaultConfig();
+    }
+
+    @GET
     @Path("/paginated")
     @Timed
     @NoAuditEvent("No change to the DB")
