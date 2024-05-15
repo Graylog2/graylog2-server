@@ -27,10 +27,9 @@ export const urlPrefix = '/system/indices/index_sets/templates';
 
 const putTemplate = async ({ template, id }: { template: IndexSetTemplate, id: string }) => {
   const url = qualifyUrl(`${urlPrefix}/${id}`);
-  const body: Omit<IndexSetTemplate, 'id'> = {
+  const body: Omit<IndexSetTemplate, 'id' | 'built_in'> = {
     title: template.title,
     description: template.description,
-    built_in: template.built_in,
     index_set_config: template.index_set_config,
   };
 
@@ -39,10 +38,9 @@ const putTemplate = async ({ template, id }: { template: IndexSetTemplate, id: s
 
 const postTemplate = async (template: IndexSetTemplate) => {
   const url = qualifyUrl(urlPrefix);
-  const body: Omit<IndexSetTemplate, 'id'> = {
+  const body: Omit<IndexSetTemplate, 'id' | 'built_in'> = {
     title: template.title,
     description: template.description,
-    built_in: template.built_in,
     index_set_config: template.index_set_config,
   };
 
