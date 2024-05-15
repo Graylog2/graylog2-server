@@ -30,6 +30,7 @@ import {
   stopDataNode,
   startDataNode,
 } from '../hooks/useDataNodes';
+import useDataNodeLogs from '../hooks/useDataNodeLogs';
 
 const ActionButton = styled(Button)`
   margin-left: 4px;
@@ -63,6 +64,9 @@ const DIALOG_TEXT = {
 };
 
 const DataNodeActions = ({ dataNode, displayAs }: Props) => {
+  const logs = useDataNodeLogs(dataNode?.hostname);
+  console.log(logs);
+
   const [showDialog, setShowDialog] = useState(false);
   const [dialogType, setDialogType] = useState(null);
 
