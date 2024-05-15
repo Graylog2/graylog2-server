@@ -16,6 +16,19 @@
  */
 package org.graylog2.bootstrap.preflight.web.resources;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -29,28 +42,13 @@ import org.graylog2.bootstrap.preflight.web.resources.model.CA;
 import org.graylog2.bootstrap.preflight.web.resources.model.CertParameters;
 import org.graylog2.bootstrap.preflight.web.resources.model.CreateCARequest;
 import org.graylog2.cluster.nodes.DataNodeDto;
+import org.graylog2.cluster.nodes.DataNodeStatus;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.cluster.preflight.DataNodeProvisioningService;
 import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.rest.ApiError;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -87,7 +85,7 @@ public class PreflightResource {
     }
 
     record DataNode(String nodeId, String transportAddress, DataNodeProvisioningConfig.State status, String errorMsg,
-                    String hostname, String shortNodeId) {}
+                    String hostname, String shortNodeId, DataNodeStatus dataNodeStatus) {}
 
     @GET
     @Path("/data_nodes")
@@ -101,7 +99,8 @@ public class PreflightResource {
                     n.getTransportAddress(),
                     preflight != null ? preflight.state() : null, preflight != null ? preflight.errorMsg() : null,
                     n.getHostname(),
-                    n.getShortNodeId());
+                    n.getShortNodeId(),
+                    n.getDataNodeStatus());
         }).collect(Collectors.toList());
     }
 
