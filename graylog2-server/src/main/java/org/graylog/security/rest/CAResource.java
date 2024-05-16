@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.bootstrap.preflight.web.resources;
+package org.graylog.security.rest;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -77,6 +77,7 @@ public class CAResource extends RestResource {
 
     @GET
     @ApiOperation("Returns the CA")
+    @RequiresPermissions(RestPermissions.GRAYLOG_CA_READ)
     public CA get() throws KeyStoreStorageException {
         return caService.get();
     }
