@@ -144,7 +144,7 @@ public class OpensearchConfigurationProvider implements Provider<OpensearchConfi
             config.put("path.repo", localConfiguration.getPathRepo());
         }
 
-        //config.put("network.publish_host", Tools.getLocalCanonicalHostname());
+        config.put("network.publish_host", localConfiguration.getHostname());
 
         if (localConfiguration.getOpensearchDebug() != null && !localConfiguration.getOpensearchDebug().isBlank()) {
             config.put("logger.org.opensearch", localConfiguration.getOpensearchDebug());

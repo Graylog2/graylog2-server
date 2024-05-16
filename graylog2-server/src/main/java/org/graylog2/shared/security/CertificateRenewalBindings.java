@@ -22,7 +22,7 @@ import org.graylog.security.certutil.CaServiceImpl;
 import org.graylog.security.certutil.CertRenewalService;
 import org.graylog.security.certutil.CertRenewalServiceImpl;
 import org.graylog.security.certutil.CheckForCertRenewalJob;
-import org.graylog2.bootstrap.preflight.web.resources.CertificateRenewalResource;
+import org.graylog.security.rest.CertificateRenewalResource;
 import org.graylog2.plugin.PluginModule;
 
 public class CertificateRenewalBindings  extends PluginModule {
