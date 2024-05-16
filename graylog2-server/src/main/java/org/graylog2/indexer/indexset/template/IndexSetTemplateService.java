@@ -56,7 +56,7 @@ public class IndexSetTemplateService extends PaginatedDbService<IndexSetTemplate
 
     private static final List<EntityAttribute> ATTRIBUTES = List.of(
             EntityAttribute.builder().id(ID_FIELD_NAME).type(SearchQueryField.Type.OBJECT_ID).title("Template Id").hidden(true).sortable(true).build(),
-            EntityAttribute.builder().id(TITLE_FIELD_NAME).title("Template Name").sortable(true).filterable(true).searchable(true).build(),
+            EntityAttribute.builder().id(TITLE_FIELD_NAME).title("Template Name").sortable(true).searchable(true).build(),
             EntityAttribute.builder().id(DESCRIPTION_FIELD_NAME).title("Template Description").sortable(false).build(),
             EntityAttribute.builder().id(BUILT_IN_FIELD_NAME).type(SearchQueryField.Type.BOOLEAN).title("Is Built-in").sortable(false).build(),
             EntityAttribute.builder().id(INDEX_SET_CONFIG_FIELD_NAME).title("Custom Config").sortable(false).build()
