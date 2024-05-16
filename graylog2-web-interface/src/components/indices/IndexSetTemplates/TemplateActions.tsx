@@ -50,13 +50,7 @@ const TemplateActions = ({ id, title, built_in, isDefault } : Props) => {
   };
 
   if (built_in) {
-    return (!isDefault && (
-      <ButtonToolbar>
-        <Button bsSize="xs" onClick={onSetAsDefault}>
-          Set as default
-        </Button>
-      </ButtonToolbar>
-    ));
+    return null;
   }
 
   return (
@@ -66,16 +60,16 @@ const TemplateActions = ({ id, title, built_in, isDefault } : Props) => {
           Edit
         </Button>
       </LinkContainer>
+      {!isDefault && (
       <MoreActions>
-        {!isDefault && (
         <MenuItem onSelect={onSetAsDefault}>
           Set as default
         </MenuItem>
-        )}
         <MenuItem onSelect={onDelete}>
           Delete
         </MenuItem>
       </MoreActions>
+      )}
     </ButtonToolbar>
   );
 };
