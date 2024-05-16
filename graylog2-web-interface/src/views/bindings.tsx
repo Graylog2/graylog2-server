@@ -109,6 +109,7 @@ import EventsWidget from 'views/logic/widgets/events/EventsWidget';
 import eventsAttributes from 'views/components/widgets/events/eventsAttributes';
 import WarmTierQueryValidation from 'views/components/searchbar/queryvalidation/WarmTierQueryValidation';
 import ExportMessageWidgetAction from 'views/components/widgets/ExportWidgetAction/ExportMessageWidgetAction';
+import ExportWidgetAction from 'views/components/widgets/ExportWidgetAction/ExportWidgetAction';
 
 import type { ActionHandlerArguments } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
@@ -458,7 +459,7 @@ const exports: PluginExports = {
   'views.components.widgets.events.attributes': eventsAttributes,
   'views.reducers': viewsReducers,
   'views.elements.validationErrorExplanation': [WarmTierQueryValidation],
-  'views.widgets.actions': [ExportMessageWidgetAction],
+  'views.widgets.actions': [ExportMessageWidgetAction, ExportWidgetAction],
 };
 
 export default exports;

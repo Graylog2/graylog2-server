@@ -20,8 +20,6 @@ import { useContext, useMemo } from 'react';
 import type Widget from 'views/logic/widgets/Widget';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import useWidgetActions from 'views/components/widgets/useWidgetActions';
-import ExportWidgetPlugAction from 'views/components/widgets/ExportWidgetAction/ExportWidgetPlugAction';
-import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 import type { WidgetActionType } from 'views/components/widgets/Types';
 
 type Props = {
@@ -32,18 +30,8 @@ const ExtraMenuWidgetActions = ({ widget }: Props) => {
   const widgetFocusContext = useContext(WidgetFocusContext);
   const pluginWidgetActions = useWidgetActions();
 
-  const extraWidgetActions = useMemo<Array<WidgetActionType>>(() => {
-    const filtratedActions = pluginWidgetActions
-      .filter(({ isHidden = () => false, position }) => !isHidden(widget) && position === 'menu');
-
-    const hasExportAction = filtratedActions.some(({ type }) => type === 'export-widget-action');
-
-    if (!hasExportAction && widget.type === AggregationWidget.type) {
-      filtratedActions.push(ExportWidgetPlugAction);
-    }
-
-    return filtratedActions;
-  },
+  const extraWidgetActions = useMemo<Array<WidgetActionType>>(() => pluginWidgetActions
+    .filter(({ isHidden = () => false, position }) => !isHidden(widget) && position === 'menu'),
   [pluginWidgetActions, widget]);
 
   return (
