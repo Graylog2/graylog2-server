@@ -224,7 +224,7 @@ public class HttpConfiguration {
         return httpCookieSameSiteStrict;
     }
 
-    public boolean httpCookieSecureOverride() {
+    public boolean getHttpCookieSecureOverride() {
         return httpCookieSecureOverride;
     }
 

@@ -46,7 +46,7 @@ public class CookieFactory {
     @Inject
     public CookieFactory(HttpConfiguration httpConfiguration) {
         httpExternalUri = httpConfiguration.getHttpExternalUri();
-        httpCookieSecureOverride = httpConfiguration.httpCookieSecureOverride();
+        httpCookieSecureOverride = httpConfiguration.getHttpCookieSecureOverride();
         httpCookieSameSiteStrict = httpConfiguration.getHttpCookieSameSiteStrict();
     }
 
