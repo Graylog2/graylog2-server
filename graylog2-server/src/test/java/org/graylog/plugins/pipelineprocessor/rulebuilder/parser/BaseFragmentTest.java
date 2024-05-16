@@ -26,7 +26,7 @@ import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
 import org.graylog2.bindings.providers.SecureFreemarkerConfigProvider;
 import org.graylog2.plugin.Message;
 import org.graylog2.shared.utilities.StringUtils;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +41,7 @@ public class BaseFragmentTest extends BaseParserTest {
     private static final Logger log = LoggerFactory.getLogger(BaseFragmentTest.class);
     Configuration configuration;
 
-    @Before
+    @BeforeEach
     public void initializeFreemarkerConfig() {
         SecureFreemarkerConfigProvider secureFreemarkerConfigProvider = new SecureFreemarkerConfigProvider();
         this.configuration = secureFreemarkerConfigProvider.get();
