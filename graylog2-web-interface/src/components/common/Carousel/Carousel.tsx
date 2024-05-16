@@ -20,6 +20,8 @@ import styled from 'styled-components';
 import CarouselSlide from './CarouselSlide';
 import CarouselContext from './CarouselContext';
 
+export const CAROUSEL_CONTAINER_CLASS_NAME = 'carousel-container';
+
 const useCarouselRef = (carouselId: string) => {
   const carouselContext = useContext(CarouselContext);
 
@@ -51,7 +53,7 @@ const StyledDiv = styled.div`
   &.carousel {
     overflow: hidden;
 
-    .carousel-container {
+    .${CAROUSEL_CONTAINER_CLASS_NAME} {
       backface-visibility: hidden;
       display: flex;
       flex-direction: row;
@@ -65,7 +67,7 @@ const Carousel = ({ children, className, containerRef, carouselId }: Props) => {
 
   return (
     <StyledDiv className={`carousel ${className}`} ref={carouselRef}>
-      <div className="carousel-container" ref={containerRef}>
+      <div className={CAROUSEL_CONTAINER_CLASS_NAME} ref={containerRef}>
         {children}
       </div>
     </StyledDiv>

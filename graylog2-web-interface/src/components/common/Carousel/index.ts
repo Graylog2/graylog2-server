@@ -15,7 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import Carousel from './Carousel';
+import Carousel, { CAROUSEL_CONTAINER_CLASS_NAME } from './Carousel';
+
+export { CAROUSEL_CONTAINER_CLASS_NAME };
 
 export { default as useCarouselApi } from './hooks/useCarouselApi';
 export { default as useCarouselActions } from './hooks/useCarouselActions';
