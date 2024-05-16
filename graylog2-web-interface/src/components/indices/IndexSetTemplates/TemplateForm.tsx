@@ -172,7 +172,8 @@ const TemplateForm = ({ initialValues, submitButtonText, submitLoadingText, onCa
 
   const { loadingIndexSetTemplateDefaults, indexSetTemplateDefaults } = useIndexSetTemplateDefaults();
 
-  const [selectedRetentionSegment, setSelectedRetentionSegment] = useState<RetentionConfigSegment>('data_tiering');
+  const initialSelectedSegment = initialValues?.index_set_config?.use_legacy_rotation ? 'legacy' : 'data_tiering';
+  const [selectedRetentionSegment, setSelectedRetentionSegment] = useState<RetentionConfigSegment>(initialSelectedSegment);
   const [fieldTypeRefreshIntervalUnit, setFieldTypeRefreshIntervalUnit] = useState<Unit>('seconds');
 
   useEffect(() => {

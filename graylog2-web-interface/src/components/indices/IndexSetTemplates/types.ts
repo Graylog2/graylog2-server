@@ -23,6 +23,7 @@ type IndexSetsDefaultConfiguration = IndexSetDefaultFields & {
   rotation_strategy?: RotationStrategyConfig,
   retention_strategy?: RetentionStrategyConfig,
   field_type_refresh_interval_unit: 'seconds' | 'minutes',
+  use_legacy_rotation: boolean,
   data_tiering: DataTieringConfig
 }
 
