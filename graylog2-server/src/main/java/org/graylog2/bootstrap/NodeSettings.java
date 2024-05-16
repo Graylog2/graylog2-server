@@ -30,7 +30,29 @@ public abstract class NodeSettings {
 
     public abstract boolean withEventBus();
 
+    public abstract boolean withScheduler();
+
     public abstract Set<ServerStatus.Capability> capabilities();
+
+    public static NodeSettings minimalNode() {
+        return NodeSettings.builder()
+                .withPlugins(false)
+                .withMongoDb(false)
+                .withEventBus(false)
+                .withScheduler(false)
+                .capabilities(Set.of())
+                .build();
+    }
+
+    public static NodeSettings fullNode() {
+        return NodeSettings.builder()
+                .withPlugins(true)
+                .withMongoDb(true)
+                .withEventBus(true)
+                .withScheduler(true)
+                .capabilities(Set.of())
+                .build();
+    }
 
     public static Builder builder() {
         return new AutoValue_NodeSettings.Builder();
@@ -45,6 +67,8 @@ public abstract class NodeSettings {
         public abstract Builder withMongoDb(boolean withMongoDb);
 
         public abstract Builder withEventBus(boolean withEventBus);
+
+        public abstract Builder withScheduler(boolean withScheduler);
 
         public abstract NodeSettings build();
     }

@@ -63,9 +63,6 @@ public abstract class BaseConfiguration extends PathConfiguration {
     @Parameter(value = "inputbuffer_wait_strategy", required = true)
     private String inputBufferWaitStrategy = "blocking";
 
-    @Parameter(value = "async_eventbus_processors")
-    private int asyncEventbusProcessors = 2;
-
     @Parameter(value = "udp_recvbuffer_sizes", required = true, validator = PositiveIntegerValidator.class)
     private int udpRecvBufferSizes = 1048576;
 
@@ -143,10 +140,6 @@ public abstract class BaseConfiguration extends PathConfiguration {
 
     public WaitStrategy getInputBufferWaitStrategy() {
         return getWaitStrategy(inputBufferWaitStrategy, "inputbuffer_wait_strategy");
-    }
-
-    public int getAsyncEventbusProcessors() {
-        return asyncEventbusProcessors;
     }
 
     public boolean isMessageJournalEnabled() {

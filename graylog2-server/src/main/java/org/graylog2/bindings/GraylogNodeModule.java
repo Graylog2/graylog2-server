@@ -17,9 +17,12 @@
 package org.graylog2.bindings;
 
 import com.google.common.collect.Lists;
+import com.google.common.eventbus.EventBus;
 import com.google.inject.Scopes;
 import org.graylog2.MinimalNodeConfiguration;
+import org.graylog2.audit.AuditBindings;
 import org.graylog2.bootstrap.NodeSettings;
+import org.graylog2.configuration.EventBusConfiguration;
 import org.graylog2.configuration.MongoDbConfiguration;
 import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
 import org.graylog2.plugin.LocalMetricRegistry;
@@ -29,6 +32,7 @@ import org.graylog2.plugin.system.NodeId;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.shared.bindings.ObjectMapperModule;
 import org.graylog2.shared.bindings.SchedulerBindings;
+import org.graylog2.shared.bindings.providers.EventBusProvider;
 
 import java.util.List;
 
@@ -53,17 +57,19 @@ public class GraylogNodeModule extends Graylog2Module {
     @Override
     protected void configure() {
         install(new MinimalNodeConfigurationModule(configuration));
-//        install(new ServerStatusBindings(nodeSettings.capabilities()));
+        // install(new ServerStatusBindings(nodeSettings.capabilities())); TODO: Create MinimalServerStatus without processing/message stuff
         if (nodeSettings.withMongoDb()) {
             install(new MongoDbConnectionModule());
             install(new ObjectMapperModule());
         }
-//        install(new SchedulerBindings());
-//        install(new AuditBindings());
+        if (nodeSettings.withScheduler()) {
+            install(new SchedulerBindings());
+        }
+        install(new AuditBindings());
 
-//        if (nodeSettings.withEventBus()) {
-//            bind(EventBus.class).toProvider(EventBusProvider.class).in(Scopes.SINGLETON);
-//        }
+        if (nodeSettings.withEventBus()) {
+            bind(EventBus.class).toProvider(EventBusProvider.class).in(Scopes.SINGLETON);
+        }
         // ensure we always create a new LocalMetricRegistry, they are meant to be separate from each other
         bind(LocalMetricRegistry.class).in(Scopes.NO_SCOPE);
         bind(NodeId.class).toProvider(FilePersistedNodeIdProvider.class).asEagerSingleton();
@@ -76,6 +82,9 @@ public class GraylogNodeModule extends Graylog2Module {
         List<Object> configurationBeans = Lists.newArrayList(configuration);
         if (nodeSettings.withMongoDb()) {
             configurationBeans.add(new MongoDbConfiguration());
+        }
+        if (nodeSettings.withEventBus()) {
+            configurationBeans.add(new EventBusConfiguration());
         }
         return configurationBeans;
     }

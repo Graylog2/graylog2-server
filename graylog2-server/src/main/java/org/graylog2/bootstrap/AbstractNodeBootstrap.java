@@ -143,7 +143,7 @@ public abstract class AbstractNodeBootstrap<NodeConfiguration extends MinimalNod
     protected final NodeSettings nodeSettings;
 
     protected AbstractNodeBootstrap(String commandName, NodeConfiguration configuration) {
-        this(commandName, configuration, NodeSettings.builder().withPlugins(true).build());
+        this(commandName, configuration, NodeSettings.fullNode());
     }
 
     protected AbstractNodeBootstrap(String commandName, NodeConfiguration configuration, NodeSettings nodeSettings) {

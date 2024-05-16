@@ -18,9 +18,9 @@ package org.graylog2.commands;
 
 import com.github.rvesse.airline.annotations.Command;
 import com.google.inject.Module;
+import jakarta.validation.constraints.NotNull;
 import org.graylog2.bootstrap.NodeSettings;
 import org.graylog2.featureflag.FeatureFlags;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +40,7 @@ public class ExampleCommand extends AbstractNodeCommand {
         super(NodeSettings.builder()
                 .withPlugins(false)
                 .withMongoDb(true)
+                .withScheduler(true)
                 .withEventBus(true)
                 .capabilities(Set.of())
                 .build());
