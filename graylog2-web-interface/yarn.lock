@@ -3353,10 +3353,10 @@
   resolved "https://registry.yarnpkg.com/@types/parse-json/-/parse-json-4.0.0.tgz#2f8bb441434d163b35fb8ffdccd7138927ffb8c0"
   integrity sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA==
 
-"@types/plotly.js@*", "@types/plotly.js@2.29.3":
-  version "2.29.3"
-  resolved "https://registry.yarnpkg.com/@types/plotly.js/-/plotly.js-2.29.3.tgz#e14236e4e85edfcfd739046998be6fd04dba8e1d"
-  integrity sha512-TAwVyX4vUWpcEoNfrZV9b9V5jRfeWZP3Tkv0lJvN6xkf0s0qzMdSdXkRavy5+017ZgSWOGbHyQgyOZJozeDEbA==
+"@types/plotly.js@*", "@types/plotly.js@2.29.4":
+  version "2.29.4"
+  resolved "https://registry.yarnpkg.com/@types/plotly.js/-/plotly.js-2.29.4.tgz#9f240007767d9b4b0b56377cfc971bc5db1ba375"
+  integrity sha512-zmhKLPGTPai9NqgWSBGRgpAQOB6lgjA16+8X48XfVHFfhqrQyPBGV43FTsa4/d0DCydhiCNd4qSKXtF+mkaT9g==
 
 "@types/prop-types@*":
   version "15.7.3"
