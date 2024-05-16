@@ -135,6 +135,7 @@ const IndexSetTemplatesList = () => {
                                            actionsCellWidth={120}
                                            columnRenderers={customColumnRenderers}
                                            columnDefinitions={attributes}
+                                           entityAttributesAreCamelCase={false}
                                            rowActions={templateActions} />
       )}
     </PaginatedList>

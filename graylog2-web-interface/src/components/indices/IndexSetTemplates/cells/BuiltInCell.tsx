@@ -26,8 +26,7 @@ type Props = {
 const BuiltInCell = ({ builtIn }: Props) => {
   if (!builtIn) return null;
 
-  return (<Icon name="check_circle" />
-  );
+  return (<Icon name="check_circle" />);
 };
 
 export default BuiltInCell;
