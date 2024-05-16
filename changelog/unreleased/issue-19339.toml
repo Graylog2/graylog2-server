@@ -1,5 +1,0 @@
-type="a"
-message="Migrate export widget feture to enterprise"
-
-issues=["19339", "graylog-plugin-enterprise#7272"]
-pulls=["19340", "graylog-plugin-enterprise#7273"]
