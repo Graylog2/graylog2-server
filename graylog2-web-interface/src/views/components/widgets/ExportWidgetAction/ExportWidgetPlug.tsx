@@ -20,7 +20,7 @@ import { IconButton, OverlayTrigger } from 'components/common';
 
 const title = 'Export widget';
 const Explanation = () => (
-  <span>Export Aggregation widget feature is available for the enterprise version.
+  <span>Export aggregation widget feature is available for the enterprise version.
     Graylog provides options to export your data into most popular file formats such as
     CSV, JSON, YAML, XML etc.
   </span>
