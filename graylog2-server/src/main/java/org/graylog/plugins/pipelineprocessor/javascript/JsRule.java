@@ -22,8 +22,7 @@ import org.graalvm.polyglot.Value;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Supplier;
 
 public class JsRule {
@@ -31,13 +30,8 @@ public class JsRule {
     private final Supplier<Context> polyglotContextSupplier;
     private final FunctionRegistry functionRegistry;
 
-    private final AtomicReference<Context> polyglotContext = new AtomicReference<>();
-    private final AtomicReference<EvaluatedRule> evaluatedRule = new AtomicReference<>();
-
-    // TODO: this effectively synchronizes all pipeline processors on this single lock and will become a choke point
-    //   This needs to go away!!
-    //   We should probably have one context per thread instead
-    private final ReentrantLock contextLock = new ReentrantLock();
+    private final ThreadLocal<EvaluatedRule> evaluatedRule = new ThreadLocal<>();
+    private final CopyOnWriteArrayList<Context> openContexts = new CopyOnWriteArrayList<>();
 
     private record EvaluatedRule(Value name, Value when, Value then) {}
 
@@ -47,18 +41,15 @@ public class JsRule {
         this.functionRegistry = functionRegistry;
     }
 
-    public void initialize() {
+    private void initialize() {
         final Context context = polyglotContextSupplier.get();
         context.initialize("js");
-        polyglotContext.set(context);
-        evaluatedRule.set(withinPolyglotContext(() -> evaluate(source, context)));
+        evaluatedRule.set(evaluate(source, context));
+        openContexts.add(context);
     }
 
     public void shutDown() {
-        final var context = polyglotContext.get();
-        if (context != null) {
-            context.close();
-        }
+        openContexts.forEach(Context::close);
     }
 
     public String name() {
@@ -68,45 +59,21 @@ public class JsRule {
     public Boolean when(EvaluationContext pipelineEvaluationContext) {
         final var messageProxy = new MessageProxy(pipelineEvaluationContext.currentMessage());
         final var functionsProxy = new PipelineFunctionProxy(functionRegistry, pipelineEvaluationContext);
-        return withinPolyglotContext(() -> getRule().when().execute(messageProxy, functionsProxy).asBoolean());
+        return getRule().when().execute(messageProxy, functionsProxy).asBoolean();
     }
 
     public Void then(EvaluationContext pipelineEvaluationContext) {
         final var messageProxy = new MessageProxy(pipelineEvaluationContext.currentMessage());
         final var functionsProxy = new PipelineFunctionProxy(functionRegistry, pipelineEvaluationContext);
-        withinPolyglotContext(() -> getRule().then().execute(messageProxy, functionsProxy));
+        getRule().then().execute(messageProxy, functionsProxy);
         return null;
     }
 
-    private <T> T withinPolyglotContext(Supplier<T> toBeWrapped) {
-        final var ctxt = getPolyglotContext();
-        contextLock.lock();
-        try {
-            try {
-                ctxt.enter();
-                return toBeWrapped.get();
-            } finally {
-                ctxt.leave();
-            }
-        } finally {
-            contextLock.unlock();
-        }
-    }
-
     private EvaluatedRule getRule() {
-        final var rule = evaluatedRule.get();
-        if (rule == null) {
-            throw new IllegalStateException("Rule is not initialized yet. Call #initialize before using it.");
+        if (evaluatedRule.get() == null) {
+            initialize();
         }
-        return rule;
-    }
-
-    private Context getPolyglotContext() {
-        final var context = polyglotContext.get();
-        if (context == null) {
-            throw new IllegalStateException("Rule is not initialized yet. Call #initialize before using it.");
-        }
-        return context;
+        return evaluatedRule.get();
     }
 
     private EvaluatedRule evaluate(Source source, Context context) {
