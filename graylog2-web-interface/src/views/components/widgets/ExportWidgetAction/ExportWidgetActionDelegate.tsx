@@ -16,13 +16,12 @@
  */
 import React from 'react';
 
-import usePluginEntities from 'hooks/usePluginEntities';
 import type { WidgetMenuActionComponentProps } from 'views/components/widgets/Types';
 import ExportWidgetPlug from 'views/components/widgets/ExportWidgetAction/ExportWidgetPlug';
+import useWidgetExportActionComponent from 'views/components/widgets/useWidgetExportActionComponent';
 
 const ExportWidgetActionDelegate = ({ widget, contexts, disabled }: WidgetMenuActionComponentProps) => {
-  const exportAction = usePluginEntities('views.components.widgets.exportAction')?.[0];
-  const ExportActionComponent = exportAction && exportAction();
+  const ExportActionComponent = useWidgetExportActionComponent();
   if (!ExportActionComponent) return <ExportWidgetPlug />;
 
   return <ExportActionComponent widget={widget} contexts={contexts} disabled={disabled} />;

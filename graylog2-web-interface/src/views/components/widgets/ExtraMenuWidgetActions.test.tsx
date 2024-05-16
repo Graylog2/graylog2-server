@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
-import userEvent from '@testing-library/user-event';
 
 import asMock from 'helpers/mocking/AsMock';
 import OriginalExtraMenuWidgetActions from 'views/components/widgets/ExtraMenuWidgetActions';
@@ -25,7 +24,6 @@ import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import useWidgetActions from 'views/components/widgets/useWidgetActions';
 import type { WidgetActionType } from 'views/components/widgets/Types';
-import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 
 jest.mock('views/components/widgets/useWidgetActions');
 
@@ -37,8 +35,6 @@ const ExtraMenuWidgetActions = (props: React.ComponentProps<typeof OriginalExtra
 
 describe('ExtraMenuWidgetActions', () => {
   const widget = Widget.empty();
-  const aggregationWidget = AggregationWidget.empty();
-  const plugExplanation = /export aggregation widget feature is available for the enterprise version\. graylog provides option to export your data into most popular file formats such as csv, json, yaml, xml etc\./i;
   const dummyActionWithoutIsHidden: WidgetActionType = {
     position: 'menu',
     type: 'dummy-action',
@@ -60,43 +56,7 @@ describe('ExtraMenuWidgetActions', () => {
     ...dummyActionWithoutIsHidden,
     position: 'dropdown',
   };
-  const dummyExportActionWithMenuPosition: WidgetActionType = {
-    position: 'menu',
-    type: 'export-widget-action',
-    component: ({ disabled }) => <button type="button" title="dummy export action" disabled={disabled}>dummy export action</button>,
-  };
   useViewsPlugin();
-
-  it('Render export plug for aggregation widget when no widget export action provided', async () => {
-    asMock(useWidgetActions).mockReturnValue([]);
-
-    render(<ExtraMenuWidgetActions widget={aggregationWidget} />);
-    const exportButton = await screen.findByRole('button', { name: /export widget/i });
-    userEvent.click(exportButton);
-
-    await screen.findByText(plugExplanation);
-  });
-
-  it('Do not render export plug for non aggregation widget when no widget export action provided', async () => {
-    asMock(useWidgetActions).mockReturnValue([]);
-
-    render(<ExtraMenuWidgetActions widget={widget} />);
-    const exportButton = screen.queryByRole('button', { name: /export widget/i });
-
-    expect(exportButton).toBeNull();
-  });
-
-  it('Render original export instead of plug for aggregation widget when widget export action provided', async () => {
-    asMock(useWidgetActions).mockReturnValue([dummyExportActionWithMenuPosition]);
-
-    render(<ExtraMenuWidgetActions widget={aggregationWidget} />);
-    const exportButton = await screen.findByRole('button', { name: /dummy export action/i });
-    userEvent.click(exportButton);
-
-    const plugText = screen.queryByText(plugExplanation);
-
-    expect(plugText).toBeNull();
-  });
 
   it('renders action which has no `isHidden`', async () => {
     asMock(useWidgetActions).mockReturnValue([dummyActionWithoutIsHidden]);

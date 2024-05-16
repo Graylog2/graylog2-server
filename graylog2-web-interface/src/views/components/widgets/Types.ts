@@ -42,7 +42,7 @@ type WidgetDropdownActionType = {
   component?: never
 };
 
-export type WidgetMenuActionComponentProps = {disabled: boolean, widget: Widget, contexts: Contexts}
+export type WidgetMenuActionComponentProps = {disabled?: boolean, widget: Widget, contexts?: Contexts}
 
 export type WidgetMenuActionType = {
   component: React.ComponentType<WidgetMenuActionComponentProps>,
