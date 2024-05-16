@@ -47,7 +47,7 @@ import org.graylog.plugins.pipelineprocessor.functions.conversion.IsString;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.LongConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.MapConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversion;
-import org.graylog.plugins.pipelineprocessor.functions.conversion.ValueType;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.FieldValueType;
 import org.graylog.plugins.pipelineprocessor.functions.dates.DateConversion;
 import org.graylog.plugins.pipelineprocessor.functions.dates.FlexParseDate;
 import org.graylog.plugins.pipelineprocessor.functions.dates.FormatDate;
@@ -375,7 +375,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(IsIp.NAME, new IsIp());
         functions.put(IsJson.NAME, new IsJson());
         functions.put(IsUrl.NAME, new IsUrl());
-        functions.put(ValueType.NAME, new ValueType());
+        functions.put(FieldValueType.NAME, new FieldValueType());
         functions.put(Debug.NAME, new Debug(loggerMock));
 
         final GrokPatternService grokPatternService = mock(GrokPatternService.class);

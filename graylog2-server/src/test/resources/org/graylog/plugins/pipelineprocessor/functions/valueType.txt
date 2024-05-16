@@ -1,13 +1,7 @@
-rule "array_remove"
+rule "field_value_type"
 when
     true
 then
-
-
-    let json_int = parse_json("4");
-
-    set_field("json_int", value_type(json_int));
-
-
+    set_field("type", field_value_type("field"));
     trigger_test();
 end
