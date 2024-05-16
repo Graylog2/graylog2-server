@@ -18,13 +18,14 @@ package org.graylog2.commands;
 
 import com.github.rvesse.airline.annotations.Command;
 import com.google.inject.Module;
+import org.graylog2.bootstrap.NodeSettings;
 import org.graylog2.featureflag.FeatureFlags;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -34,6 +35,15 @@ import java.util.List;
 @Command(name = "example", description = "Start an example node for a Graylog cluster")
 public class ExampleCommand extends AbstractNodeCommand {
     private static final Logger LOG = LoggerFactory.getLogger(ExampleCommand.class);
+
+    public ExampleCommand() {
+        super(NodeSettings.builder()
+                .withPlugins(false)
+                .withMongoDb(true)
+                .withEventBus(true)
+                .capabilities(Set.of())
+                .build());
+    }
 
     @Override
     public void run() {
@@ -52,13 +62,9 @@ public class ExampleCommand extends AbstractNodeCommand {
         LOG.info("Stopping example node");
     }
 
+    @NotNull
     @Override
-    protected List<Object> getCommandConfigurationBeans() {
-        return List.of();
-    }
-
-    @Override
-    protected @Nonnull List<Module> getNodeCommandBindings(final FeatureFlags featureFlags) {
+    protected List<Module> getNodeCommandBindings(FeatureFlags featureFlags) {
         return List.of();
     }
 
@@ -67,4 +73,5 @@ public class ExampleCommand extends AbstractNodeCommand {
     protected List<Object> getNodeCommandConfigurationBeans() {
         return List.of();
     }
+
 }

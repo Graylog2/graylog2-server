@@ -19,39 +19,39 @@ package org.graylog2.commands;
 import com.google.common.collect.Lists;
 import com.google.inject.Binder;
 import com.google.inject.Module;
-import org.graylog2.Configuration;
+import org.graylog2.MinimalNodeConfiguration;
 import org.graylog2.bindings.GraylogNodeModule;
-import org.graylog2.bootstrap.CmdLineTool;
-import org.graylog2.configuration.MongoDbConfiguration;
+import org.graylog2.bootstrap.AbstractNodeBootstrap;
+import org.graylog2.bootstrap.NodeSettings;
 import org.graylog2.configuration.PathConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.featureflag.FeatureFlags;
-import org.graylog2.plugin.Plugin;
 
 import javax.annotation.Nonnull;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Inherit from this command to create new standalone node types.
  */
-public abstract class AbstractNodeCommand extends CmdLineTool {
-    protected static final Configuration configuration = new Configuration();
+public abstract class AbstractNodeCommand extends AbstractNodeBootstrap<MinimalNodeConfiguration> {
+    protected static final MinimalNodeConfiguration configuration = new MinimalNodeConfiguration();
 
-    public AbstractNodeCommand() {
-        this(null);
+    private final GraylogNodeModule nodeModule;
+
+    public AbstractNodeCommand(NodeSettings nodeSettings) {
+        this(null, nodeSettings);
     }
 
-    public AbstractNodeCommand(final String commandName) {
-        super(commandName, configuration);
+    public AbstractNodeCommand(final String commandName, final NodeSettings nodeSettings) {
+        super(commandName, configuration, nodeSettings);
+        this.nodeModule = new GraylogNodeModule(configuration, nodeSettings);
     }
 
     @Override
     protected List<Module> getCommandBindings(final FeatureFlags featureFlags) {
         final List<Module> modules = Lists.newArrayList(
                 Binder::requireExplicitBindings,
-                new GraylogNodeModule(configuration, capabilities())
+                nodeModule
         );
         modules.addAll(getNodeCommandBindings(featureFlags));
         return modules;
@@ -61,21 +61,12 @@ public abstract class AbstractNodeCommand extends CmdLineTool {
 
     @Override
     protected List<Object> getCommandConfigurationBeans() {
-        final List<Object> modules = Lists.newArrayList(
-                configuration,
-                new MongoDbConfiguration()
-        );
-        modules.addAll(getNodeCommandConfigurationBeans());
-        return modules;
+        final List<Object> configurationBeans = nodeModule.getConfigurationBeans();
+        configurationBeans.addAll(getNodeCommandConfigurationBeans());
+        return configurationBeans;
     }
 
     protected abstract @Nonnull List<Object> getNodeCommandConfigurationBeans();
-
-    @Override
-    protected Set<Plugin> loadPlugins() {
-        // these commands do not need plugins, which could cause problems because of not loaded config beans
-        return Collections.emptySet();
-    }
 
     @Override
     protected void beforeStart(TLSProtocolsConfiguration tlsProtocolsConfiguration, PathConfiguration pathConfiguration) {

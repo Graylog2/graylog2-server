@@ -14,11 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2;
+package org.graylog2.bindings;
 
-/**
- * Helper class to hold configuration shared by all Graylog node types
- */
-public class BaseConfiguration {
+import com.google.inject.Binder;
+import com.google.inject.Module;
+import org.graylog2.MinimalNodeConfiguration;
 
+import static java.util.Objects.requireNonNull;
+
+public class MinimalNodeConfigurationModule implements Module {
+    private final MinimalNodeConfiguration configuration;
+
+    public MinimalNodeConfigurationModule(MinimalNodeConfiguration configuration) {
+        this.configuration = requireNonNull(configuration);
+    }
+
+    @Override
+    public void configure(Binder binder) {
+        binder.bind(MinimalNodeConfiguration.class).toInstance(configuration);
+    }
 }

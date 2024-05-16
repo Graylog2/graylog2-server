@@ -54,8 +54,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.graylog2.Configuration;
+import org.graylog2.MinimalNodeConfiguration;
 import org.graylog2.bindings.NamedConfigParametersOverrideModule;
-import org.graylog2.bootstrap.commands.MigrateCmd;
 import org.graylog2.configuration.PathConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.featureflag.FeatureFlags;
@@ -99,7 +99,7 @@ import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.nullToEmpty;
 
-public abstract class CmdLineTool implements CliCommand {
+public abstract class AbstractNodeBootstrap<NodeConfiguration extends MinimalNodeConfiguration> implements CliCommand {
 
     public static final String GRAYLOG_ENVIRONMENT_VAR_PREFIX = "GRAYLOG_";
     public static final String GRAYLOG_SYSTEM_PROP_PREFIX = "graylog.";
@@ -109,14 +109,14 @@ public abstract class CmdLineTool implements CliCommand {
         System.setProperty("java.util.logging.manager", "org.apache.logging.log4j.jul.LogManager");
     }
 
-    private static final Logger LOG = LoggerFactory.getLogger(CmdLineTool.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractNodeBootstrap.class);
 
     protected static final Version version = Version.CURRENT_CLASSPATH;
     protected static final String FILE_SEPARATOR = System.getProperty("file.separator");
     protected static final String TMPDIR = System.getProperty("java.io.tmpdir", "/tmp");
 
     protected final JadConfig jadConfig;
-    protected final Configuration configuration;
+    protected final NodeConfiguration configuration;
     protected final ChainingClassLoader chainingClassLoader;
 
     @Option(name = "--dump-config", description = "Show the effective Graylog configuration and exit")
@@ -140,12 +140,13 @@ public abstract class CmdLineTool implements CliCommand {
     protected Injector bootstrapConfigInjector;
     protected FeatureFlags featureFlags;
     protected PluginLoader pluginLoader;
+    protected final NodeSettings nodeSettings;
 
-    protected CmdLineTool(Configuration configuration) {
-        this(null, configuration);
+    protected AbstractNodeBootstrap(String commandName, NodeConfiguration configuration) {
+        this(commandName, configuration, NodeSettings.builder().withPlugins(true).build());
     }
 
-    protected CmdLineTool(String commandName, Configuration configuration) {
+    protected AbstractNodeBootstrap(String commandName, NodeConfiguration configuration, NodeSettings nodeSettings) {
         jadConfig = new JadConfig();
         jadConfig.addConverterFactory(new GuavaConverterFactory());
         jadConfig.addConverterFactory(new JodaTimeConverterFactory());
@@ -160,6 +161,7 @@ public abstract class CmdLineTool implements CliCommand {
             this.commandName = commandName;
         }
         this.configuration = configuration;
+        this.nodeSettings = nodeSettings;
         this.chainingClassLoader = new ChainingClassLoader(this.getClass().getClassLoader());
     }
 
@@ -187,10 +189,6 @@ public abstract class CmdLineTool implements CliCommand {
     protected abstract List<Module> getCommandBindings(FeatureFlags featureFlags);
 
     protected abstract List<Object> getCommandConfigurationBeans();
-
-    public boolean isMigrationCommand() {
-        return commandName.equals(MigrateCmd.MIGRATION_COMMAND);
-    }
 
     /**
      * Things that have to run before the {@link #startCommand()} method is being called.
@@ -276,10 +274,14 @@ public abstract class CmdLineTool implements CliCommand {
         MetricRegistry metricRegistry = MetricRegistryFactory.create();
         featureFlags = getFeatureFlags(metricRegistry);
 
-        pluginLoader = getPluginLoader(getPluginPath(configFile).toFile(), chainingClassLoader);
+        if (nodeSettings.withPlugins()) {
+            pluginLoader = getPluginLoader(getPluginPath(configFile).toFile(), chainingClassLoader);
+        }
 
         installCommandConfig();
-        installPluginBootstrapConfig(pluginLoader);
+        if (nodeSettings.withPlugins()) {
+            installPluginBootstrapConfig(pluginLoader);
+        }
 
         if (isDumpDefaultConfig()) {
             dumpDefaultConfigAndExit();
@@ -294,10 +296,12 @@ public abstract class CmdLineTool implements CliCommand {
 
         bootstrapConfigInjector = setupBootstrapConfigInjector();
 
-        final Set<Plugin> plugins = loadPlugins();
-
-        installPluginConfig(plugins);
-        processConfiguration(jadConfig);
+        Set<Plugin> plugins = new HashSet<>();
+        if (nodeSettings.withPlugins()) {
+            plugins = loadPlugins();
+            installPluginConfig(plugins);
+            processConfiguration(jadConfig);
+        }
 
         if (isDumpConfig()) {
             dumpCurrentConfigAndExit();
@@ -604,4 +608,5 @@ public abstract class CmdLineTool implements CliCommand {
     protected Set<ServerStatus.Capability> capabilities() {
         return Collections.emptySet();
     }
+
 }

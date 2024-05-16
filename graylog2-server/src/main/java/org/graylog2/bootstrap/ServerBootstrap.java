@@ -34,6 +34,7 @@ import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.bindings.ConfigurationModule;
 import org.graylog2.bindings.NamedConfigParametersOverrideModule;
+import org.graylog2.bootstrap.commands.MigrateCmd;
 import org.graylog2.bootstrap.preflight.MongoDBPreflightCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.graylog2.bootstrap.preflight.PreflightCheckService;
@@ -94,7 +95,7 @@ import static org.graylog2.audit.AuditEventTypes.NODE_STARTUP_COMPLETE;
 import static org.graylog2.audit.AuditEventTypes.NODE_STARTUP_INITIATE;
 import static org.graylog2.bootstrap.preflight.PreflightWebModule.FEATURE_FLAG_PREFLIGHT_WEB_ENABLED;
 
-public abstract class ServerBootstrap extends CmdLineTool {
+public abstract class ServerBootstrap extends AbstractNodeBootstrap<Configuration> {
     private static final Logger LOG = LoggerFactory.getLogger(ServerBootstrap.class);
     private boolean isFreshInstallation;
 
@@ -441,6 +442,10 @@ public abstract class ServerBootstrap extends CmdLineTool {
     protected void annotateProvisionException(ProvisionException e) {
         annotateInjectorExceptions(e.getErrorMessages());
         throw e;
+    }
+
+    public boolean isMigrationCommand() {
+        return commandName.equals(MigrateCmd.MIGRATION_COMMAND);
     }
 
     protected abstract Class<? extends Runnable> shutdownHook();

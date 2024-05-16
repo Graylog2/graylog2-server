@@ -21,7 +21,7 @@ import com.google.inject.Module;
 import org.graylog2.Configuration;
 import org.graylog2.audit.AuditBindings;
 import org.graylog2.bindings.ConfigurationModule;
-import org.graylog2.bootstrap.CmdLineTool;
+import org.graylog2.bootstrap.AbstractNodeBootstrap;
 import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.plugin.KafkaJournalConfiguration;
 import org.graylog2.plugin.Plugin;
@@ -37,7 +37,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-public abstract class AbstractJournalCommand extends CmdLineTool {
+public abstract class AbstractJournalCommand extends AbstractNodeBootstrap {
     protected static final Configuration configuration = new Configuration();
     protected final KafkaJournalConfiguration kafkaJournalConfiguration = new KafkaJournalConfiguration();
     protected LocalKafkaJournal journal;

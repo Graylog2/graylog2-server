@@ -16,11 +16,9 @@
  */
 package org.graylog2.cluster.nodes;
 
-import org.graylog2.Configuration;
-import org.graylog2.cluster.NodeNotFoundException;
-import org.graylog2.database.MongoConnection;
-
 import jakarta.inject.Inject;
+import org.graylog2.Configuration;
+import org.graylog2.database.MongoConnection;
 
 public class ServerNodeClusterService extends AbstractNodeService<ServerNodeEntity, ServerNodeDto> {
 
