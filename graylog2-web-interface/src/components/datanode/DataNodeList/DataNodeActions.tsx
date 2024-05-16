@@ -77,12 +77,12 @@ const DIALOG_TEXT = {
 };
 
 const DataNodeActions = ({ dataNode, displayAs }: Props) => {
-  const logs = useDataNodeLogs(dataNode?.hostname);
-
   const [showLogsDialog, setShowLogsDialog] = useState(false);
   const [logsType, setLogsType] = useState<'stdout'|'stderr'>('stdout');
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [dialogType, setDialogType] = useState(null);
+
+  const logs = useDataNodeLogs(dataNode?.hostname, showLogsDialog);
 
   const updateState = ({ show, type }) => {
     setShowConfirmDialog(show);

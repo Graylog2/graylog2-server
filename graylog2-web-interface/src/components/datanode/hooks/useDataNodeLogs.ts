@@ -23,7 +23,7 @@ import fetch from 'logic/rest/FetchProvider';
 const fetchDataNodeLogsStdout = async (hostname: string) => fetch('GET', qualifyUrl(`/datanodes/${hostname}/rest/logs/stdout`));
 const fetchDataNodeLogsStderr = async (hostname: string) => fetch('GET', qualifyUrl(`/datanodes/${hostname}/rest/logs/stderr`));
 
-const useDataNodeLogs = (hostname: string) : {
+const useDataNodeLogs = (hostname: string, enabled: boolean) : {
   stdout: string[],
   stderr: string[],
 } => {
@@ -35,6 +35,7 @@ const useDataNodeLogs = (hostname: string) : {
         UserNotification.error(`Loading Data Node stdout logs failed with status: ${errorThrown}`,
           'Could not load Data Node stdout logs');
       },
+      enabled,
     },
   );
 
@@ -46,6 +47,7 @@ const useDataNodeLogs = (hostname: string) : {
         UserNotification.error(`Loading Data Node stderr logs failed with status: ${errorThrown}`,
           'Could not load Data Node stderr logs');
       },
+      enabled,
     },
   );
 
