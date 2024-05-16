@@ -50,7 +50,7 @@ const SelectIndexSetTemplateModal = ({ hideModal, show }: Props) => {
       <Modal.Header closeButton>
         <Modal.Title>Index Set Strategy</Modal.Title>
       </Modal.Header>
-      Select a template apprpriate to the requirements for this data (and available storage).
+      Select a template appropriate to the requirements for this data (and available storage).
 
     </Modal>
   );

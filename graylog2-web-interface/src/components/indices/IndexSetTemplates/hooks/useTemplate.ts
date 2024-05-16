@@ -52,7 +52,7 @@ const useTemplate = (id: string): {
     {
       onError: (errorThrown) => {
         UserNotification.error(`Loading index set template failed with status: ${errorThrown}`,
-          'Could not load index fset template');
+          'Could not load index set template');
       },
       keepPreviousData: true,
       enabled: !!id,
