@@ -2,18 +2,18 @@
 
 const when = (msg) => true;
 
-const then = (msg) => {
-  functions.set_field('remove_number', [1, 2, 3].filter(v => v !== 2), null, null, null, null, null);
-  functions.set_field('remove_string', ["one", "two", "three"].filter(v => v !== "two"), null, null, null, null, null);
-  functions.set_field('remove_missing', [1, 2, 3].filter(v => v !== 4), null, null, null, null, null);
+const then = (msg, {set_field, trigger_test}) => {
+  set_field('remove_number', [1, 2, 3].filter(v => v !== 2), null, null, null, null, null);
+  set_field('remove_string', ["one", "two", "three"].filter(v => v !== "two"), null, null, null, null, null);
+  set_field('remove_missing', [1, 2, 3].filter(v => v !== 4), null, null, null, null, null);
 
   let array = [1, 2, 2];
   array.splice(array.indexOf(2), 1);
-  functions.set_field('remove_only_one', array, null, null, null, null, null);
+  set_field('remove_only_one', array, null, null, null, null, null);
 
-  functions.set_field('remove_all', [1, 2, 2].filter(v => v !== 2), null, null, null, null, null);
+  set_field('remove_all', [1, 2, 2].filter(v => v !== 2), null, null, null, null, null);
 
-  functions.trigger_test();
+  trigger_test();
 };
 
 export default { 'name': 'array_remove', 'when': when, 'then': then };

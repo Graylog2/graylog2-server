@@ -22,57 +22,94 @@ import org.graalvm.polyglot.Value;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
 public class JsRule {
     private final Source source;
-    private final Supplier<Context> graalContextSupplier;
+    private final Supplier<Context> polyglotContextSupplier;
     private final FunctionRegistry functionRegistry;
 
-    private record DefaultExport(Value name, Value when, Value then) {}
+    private final AtomicReference<Context> polyglotContext = new AtomicReference<>();
+    private final AtomicReference<EvaluatedRule> evaluatedRule = new AtomicReference<>();
 
-    public JsRule(Source source, Supplier<Context> graalContextSupplier, FunctionRegistry functionRegistry) {
+    // TODO: this effectively synchronizes all pipeline processors on this single lock and will become a choke point
+    //   This needs to go away!!
+    //   We should probably have one context per thread instead
+    private final ReentrantLock contextLock = new ReentrantLock();
+
+    private record EvaluatedRule(Value name, Value when, Value then) {}
+
+    public JsRule(Source source, Supplier<Context> polyglotContextSupplier, FunctionRegistry functionRegistry) {
         this.source = source;
-        this.graalContextSupplier = graalContextSupplier;
+        this.polyglotContextSupplier = polyglotContextSupplier;
         this.functionRegistry = functionRegistry;
     }
 
-    public String name() {
-        try (final Context ctx = newContext()) {
-            return evaluate(source, ctx).name().asString();
+    public void initialize() {
+        final Context context = polyglotContextSupplier.get();
+        context.initialize("js");
+        polyglotContext.set(context);
+        evaluatedRule.set(withinPolyglotContext(() -> evaluate(source, context)));
+    }
+
+    public void shutDown() {
+        final var context = polyglotContext.get();
+        if (context != null) {
+            context.close();
         }
+    }
+
+    public String name() {
+        return getRule().name().asString();
     }
 
     public Boolean when(EvaluationContext pipelineEvaluationContext) {
-        try (final Context ctx = newContext(pipelineEvaluationContext)) {
-            return evaluate(source, ctx)
-                    .when()
-                    .execute(new MessageProxy(pipelineEvaluationContext.currentMessage()))
-                    .asBoolean();
-        }
+        final var messageProxy = new MessageProxy(pipelineEvaluationContext.currentMessage());
+        final var functionsProxy = new PipelineFunctionProxy(functionRegistry, pipelineEvaluationContext);
+        return withinPolyglotContext(() -> getRule().when().execute(messageProxy, functionsProxy).asBoolean());
     }
 
-    public Object then(EvaluationContext pipelineEvaluationContext) {
-        try (final Context ctx = newContext(pipelineEvaluationContext)) {
-            evaluate(source, ctx)
-                    .then()
-                    .execute(new MessageProxy(pipelineEvaluationContext.currentMessage()));
-        }
+    public Void then(EvaluationContext pipelineEvaluationContext) {
+        final var messageProxy = new MessageProxy(pipelineEvaluationContext.currentMessage());
+        final var functionsProxy = new PipelineFunctionProxy(functionRegistry, pipelineEvaluationContext);
+        withinPolyglotContext(() -> getRule().then().execute(messageProxy, functionsProxy));
         return null;
     }
 
-    private Context newContext() {
-        return graalContextSupplier.get();
+    private <T> T withinPolyglotContext(Supplier<T> toBeWrapped) {
+        final var ctxt = getPolyglotContext();
+        contextLock.lock();
+        try {
+            try {
+                ctxt.enter();
+                return toBeWrapped.get();
+            } finally {
+                ctxt.leave();
+            }
+        } finally {
+            contextLock.unlock();
+        }
     }
 
-    private Context newContext(EvaluationContext pipelineEvaluationContext) {
-        final Context context = graalContextSupplier.get();
-        context.getBindings("js")
-                .putMember("functions", new PipelineFunctionProxy(functionRegistry, pipelineEvaluationContext));
+    private EvaluatedRule getRule() {
+        final var rule = evaluatedRule.get();
+        if (rule == null) {
+            throw new IllegalStateException("Rule is not initialized yet. Call #initialize before using it.");
+        }
+        return rule;
+    }
+
+    private Context getPolyglotContext() {
+        final var context = polyglotContext.get();
+        if (context == null) {
+            throw new IllegalStateException("Rule is not initialized yet. Call #initialize before using it.");
+        }
         return context;
     }
 
-    private DefaultExport evaluate(Source source, Context context) {
+    private EvaluatedRule evaluate(Source source, Context context) {
         final Value result = context.eval(source);
 
         final Value defaultExport = result.getMember("default");
@@ -80,6 +117,6 @@ public class JsRule {
         final Value name = defaultExport.getMember("name");
         final Value when = defaultExport.getMember("when");
         final Value then = defaultExport.getMember("then");
-        return new DefaultExport(name, when, then);
+        return new EvaluatedRule(name, when, then);
     }
 }

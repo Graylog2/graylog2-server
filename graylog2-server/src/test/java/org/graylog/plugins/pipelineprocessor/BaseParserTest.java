@@ -112,14 +112,18 @@ public class BaseParserTest {
 
     protected Message evaluateRule(Rule rule, Message message) {
         final EvaluationContext context = new EvaluationContext(message);
-        if (rule.when().evaluateBool(context)) {
+        try {
+            if (rule.when().evaluateBool(context)) {
 
-            for (Statement statement : rule.then()) {
-                statement.evaluate(context);
+                for (Statement statement : rule.then()) {
+                    statement.evaluate(context);
+                }
+                return context.currentMessage();
+            } else {
+                return null;
             }
-            return context.currentMessage();
-        } else {
-            return null;
+        } finally {
+            rule.shutDownHook().run();
         }
     }
 

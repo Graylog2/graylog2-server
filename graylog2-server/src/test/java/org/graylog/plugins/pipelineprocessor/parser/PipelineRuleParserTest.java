@@ -73,6 +73,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static com.google.common.collect.ImmutableList.of;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -407,27 +408,46 @@ class PipelineRuleParserTest extends BaseParserTest {
     }
 
     @Test
-    void jsTest() {
+    void jsTest() throws InterruptedException {
         final var source = """
                 export default {
                     "name" : "javascript test",
                     "when" : (msg) => {
                         return msg.run_rule;
                     },
-                    "then" : (msg) => {
-                        functions.set_field('processed_by', 'javascript test', null, null, msg, null, null);
+                    "then" : (msg, {set_field}) => {
+                        set_field('processed', msg.message.replace('orig', 'new'), null, null, msg, null, null);
                     }
                 };
                 """;
-        final var rule = parser.parseRule(JAVASCRIPT_MODULE, source, false);
+
+        final Rule rule = parser.parseRule(JAVASCRIPT_MODULE, source, false);
         assertThat(rule.name()).isEqualTo("javascript test");
 
-        Message message = messageFactory.createMessage("hello test", "source", DateTime.now(DateTimeZone.UTC));
-        message.addField("run_rule", true);
+        // Test multithreaded rule execution
+        final CopyOnWriteArrayList<Message> processedMessages = new CopyOnWriteArrayList<>();
 
-        final var processedMessage = evaluateRule(rule, message);
-        assertThat(processedMessage).isNotNull();
-        assertThat(processedMessage.getField("processed_by")).isEqualTo("javascript test");
+        final var thread1 = new Thread(() -> {
+            final Message msg = messageFactory.createMessage("orig msg1", "source", DateTime.now(DateTimeZone.UTC));
+            msg.addField("run_rule", true);
+            processedMessages.add(evaluateRule(rule, msg));
+        });
+
+        final var thread2 = new Thread(() -> {
+            final Message msg = messageFactory.createMessage("orig msg2", "source", DateTime.now(DateTimeZone.UTC));
+            msg.addField("run_rule", true);
+            processedMessages.add(evaluateRule(rule, msg));
+        });
+
+        thread1.start();
+        thread2.start();
+        thread1.join();
+        thread2.join();
+
+        assertThat(processedMessages).extracting(m -> m.getField("processed"))
+                .containsExactlyInAnyOrder("new msg1", "new msg2");
+
+        rule.shutDownHook().run();
     }
 
     public static class CustomObject {
@@ -733,7 +753,7 @@ class PipelineRuleParserTest extends BaseParserTest {
 
         @Override
         protected ImmutableList<ParameterDescriptor> params() {
-            return ImmutableList.of();
+            return of();
         }
 
         @Nonnull

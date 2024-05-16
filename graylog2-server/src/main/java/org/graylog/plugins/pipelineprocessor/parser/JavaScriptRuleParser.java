@@ -62,11 +62,16 @@ public class JavaScriptRuleParser {
                 .build();
 
         final JsRule jsRule = new JsRule(parsedSource, contextBuilder::build, functionRegistry);
+
+        jsRule.initialize();
+
         return Rule.builder()
                 .id(id)
                 .name(jsRule.name())
                 .when(new JsRuleWhenExpression(jsRule))
                 .then(singleton(new JsRuleStatement(jsRule)))
+                .initializer(jsRule::initialize)
+                .shutDownHook(jsRule::shutDown)
                 .build();
     }
 

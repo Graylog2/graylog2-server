@@ -141,7 +141,18 @@ public class ConfigurationStateUpdater {
 
         final RuleMetricsConfigDto ruleMetricsConfig = ruleMetricsConfigService.get();
         final PipelineInterpreter.State newState = stateFactory.newState(currentPipelines, streamPipelineConnections, ruleMetricsConfig);
-        latestState.set(newState);
+
+        // TODO: I don't expect this to work as intended.
+        //  Wouldn't we need to keep the context open until we can be sure that it's not accessed anymore? I.e. that
+        //  there are no messages in the process buffer that are evaluated in a pipeline that is still using the old
+        //   state
+        final PipelineInterpreter.State oldState = latestState.getAndSet(newState);
+        if (oldState != null) {
+            oldState.getCurrentPipelines().values().stream().flatMap(pipeline ->
+                    pipeline.stages().stream().flatMap(stage ->
+                            stage.getRules().stream())).forEach(rule -> rule.shutDownHook().run());
+        }
+
         return newState;
     }
 

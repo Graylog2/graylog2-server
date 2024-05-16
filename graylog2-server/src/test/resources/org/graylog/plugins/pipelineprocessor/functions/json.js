@@ -1,25 +1,25 @@
 "use strict";
 
 const when = (msg) => true;
-const then = (msg) => {
+const then = (msg, {set_fields}) => {
   let json = JSON.parse(msg.flat_json);
-  functions.set_fields(json, null, null, null, null);
+  set_fields(json, null, null, null, null);
 
     // Don't fail on invalid input
     try {
       let invalid_json = JSON.parse('#FOOBAR#');
-      functions.set_fields(invalid_json, null, null, null, null);
+      set_fields(invalid_json, null, null, null, null);
     } catch {}
 
     // Don't fail on empty input
     try {
       let empty_json = JSON.parse("");
-      functions.set_fields(empty_json, null, null, null, null);
+      set_fields(empty_json, null, null, null, null);
     } catch {}
 
     // Don't fail on nested input
     let nested_json = JSON.parse(msg.nested_json);
-    functions.set_fields(nested_json, null, null, null, null);
+    set_fields(nested_json, null, null, null, null);
 };
 
 export default { 'name': 'json', 'when': when, 'then': then };
