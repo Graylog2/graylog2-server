@@ -23,7 +23,6 @@ import jakarta.inject.Singleton;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.core.NewCookie;
 import org.graylog2.configuration.HttpConfiguration;
-import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.rest.RestTools;
 import org.graylog2.rest.models.system.sessions.responses.SessionResponse;
 
@@ -41,13 +40,14 @@ public class CookieFactory {
     private static final String HEADER_X_FORWARDED_PROTO = "X-Forwarded-Proto";
     private static final CharMatcher PATH_MATCHER = ascii().and(isNot(';')).and(javaIsoControl().negate());
     private final URI httpExternalUri;
-    private final boolean isTrainingInstance;
+    private final boolean httpCookieSecureOverride;
+    private final boolean httpCookieSameSiteStrict;
 
     @Inject
-    public CookieFactory(HttpConfiguration httpConfiguration,
-                         FeatureFlags featureFlags) {
+    public CookieFactory(HttpConfiguration httpConfiguration) {
         httpExternalUri = httpConfiguration.getHttpExternalUri();
-        isTrainingInstance = featureFlags.isOn("training_instance");
+        httpCookieSecureOverride = httpConfiguration.httpCookieSecureOverride();
+        httpCookieSameSiteStrict = httpConfiguration.getHttpCookieSameSiteStrict();
     }
 
     NewCookie createAuthenticationCookie(SessionResponse token, ContainerRequestContext requestContext) {
@@ -74,9 +74,9 @@ public class CookieFactory {
                 .path(basePath)
                 .maxAge(maxAge)
                 .expiry(validUntil)
-                .secure(isTrainingInstance || isSecure)
+                .secure(isSecure || httpCookieSecureOverride)
                 .httpOnly(true)
-                .sameSite(isTrainingInstance ? NewCookie.SameSite.NONE : NewCookie.SameSite.STRICT)
+                .sameSite(httpCookieSameSiteStrict ? NewCookie.SameSite.STRICT : NewCookie.SameSite.NONE)
                 .build();
     }
 
