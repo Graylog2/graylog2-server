@@ -31,7 +31,7 @@ export type Event = {
   timerange_start: string,
   timerange_end: string,
   key: string,
-  fields: Object[],
+  fields: Record<string, string>,
   group_by_fields: {[key: string]: string},
   source_streams: string[],
   replay_info: EventReplayInfo | undefined,
