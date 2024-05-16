@@ -14,22 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.rest;
+package org.graylog.plugins.formatting.units.model;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.graylog.plugins.formatting.units.model.UnitId;
-import org.graylog2.indexer.fieldtypes.FieldTypes;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 
-import javax.annotation.Nullable;
 
-@JsonAutoDetect
-public record MappedFieldTypeDTO(@JsonProperty("name") String name,
-                                 @JsonProperty("type") FieldTypes.Type type,
-                                 @JsonProperty("unit") @Nullable UnitId unit
-) {
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonTypeName(BaseUnit.TYPE)
+public record BaseUnit(@JsonProperty(value = ABBREVIATION, required = true) String abbrev,
+                       @JsonProperty(value = NAME, required = true) String name,
+                       @JsonProperty(value = UNIT_TYPE, required = true) String unitType
+) implements Unit {
 
-    public static MappedFieldTypeDTO create(String name, FieldTypes.Type type) {
-        return new MappedFieldTypeDTO(name, type, null);
-    }
+    public static final String TYPE = "base";
+
 }

@@ -34,8 +34,8 @@ import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.SuppressForbidden;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 import java.util.Set;
@@ -45,12 +45,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class V20220522125200_AddSetGrokToFieldsExtractorFragmentsTest extends BaseFragmentTest {
+class V20220522125200_AddSetGrokToFieldsExtractorFragmentsTest extends BaseFragmentTest {
 
     V20220522125200_AddSetGrokToFieldsExtractorFragments migration;
     private final MessageFactory messageFactory = new TestMessageFactory();
 
-    @BeforeClass
+    @BeforeAll
     @SuppressForbidden("Allow using default thread factory")
     public static void initialize() {
         final Map<String, Function<?>> functions = commonFunctions();
@@ -71,7 +71,7 @@ public class V20220522125200_AddSetGrokToFieldsExtractorFragmentsTest extends Ba
 
 
     @Test
-    public void testGrokExtract() {
+    void testGrokExtract() {
         final RuleFragment fragment = V20220522125200_AddSetGrokToFieldsExtractorFragments.createSetGrokToFieldsFragment();
 
         Rule testRule = createFragmentSource(fragment, Map.of(
