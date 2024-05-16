@@ -71,15 +71,19 @@ public class IndexSetDefaultTemplateService {
 
     public void setDefault(@NotNull IndexSetDefaultTemplate defaultTemplate, String userName) throws NotFoundException {
         Optional<IndexSetTemplate> indexSetTemplate = indexSetTemplateService.get(defaultTemplate.id());
-        if (indexSetTemplate.isPresent()) {
-            clusterConfigService.write(defaultTemplate);
-            auditEventSender.success(AuditActor.user(userName), INDEX_SET_DEFAULT_TEMPLATE_UPDATE, ImmutableMap.of(
-                    "template_id", indexSetTemplate.get().id(),
-                    "template_title", indexSetTemplate.get().title()
-            ));
-        } else {
+        if (indexSetTemplate.isEmpty()) {
             throw new NotFoundException("Index template with id <%s> doesn't exist!".formatted(defaultTemplate.id()));
         }
+        if (indexSetTemplate.get().isBuiltIn()) {
+            throw new IllegalArgumentException("Built-in templates cannot be set as default!");
+        }
+
+        clusterConfigService.write(defaultTemplate);
+        auditEventSender.success(AuditActor.user(userName), INDEX_SET_DEFAULT_TEMPLATE_UPDATE, ImmutableMap.of(
+                "template_id", indexSetTemplate.get().id(),
+                "template_title", indexSetTemplate.get().title()
+        ));
+
     }
 
     public @Nullable String getDefaultIndexSetTemplateId() {

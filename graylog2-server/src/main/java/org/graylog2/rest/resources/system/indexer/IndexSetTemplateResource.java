@@ -211,13 +211,13 @@ public class IndexSetTemplateResource extends RestResource {
 
     private void checkIsDefault(IndexSetTemplateResponse template) throws IllegalAccessException {
         if (template.isDefault()) {
-            throw new IllegalAccessException(f("Template %s <%s> is set as default and cannot be deleted", template.id(), template.title()));
+            throw new IllegalAccessException(f("Template %s <%s> is set as default and cannot be deleted", template.title(), template.id()));
         }
     }
 
     private void checkReadOnly(IndexSetTemplateResponse template) throws IllegalAccessException {
         if (template.isBuiltIn()) {
-            throw new IllegalAccessException(f("Template %s <%s> is read-only and cannot be modified or deleted", template, template.title()));
+            throw new IllegalAccessException(f("Template %s <%s> is read-only and cannot be modified or deleted", template.title(), template.id()));
         }
     }
 

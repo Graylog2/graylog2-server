@@ -67,6 +67,8 @@ public class IndexSetDefaultsResource extends RestResource {
                     .orElse("unknown"));
         } catch (NotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+        } catch (IllegalArgumentException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
         return Response.ok().build();
     }
