@@ -251,13 +251,6 @@ const IndexSetConfigurationForm = ({
 
   if (!indexSet) return null;
 
-  const {
-    rotation_strategy: indexSetRotationStrategy,
-    rotation_strategy_class: indexSetRotationStrategyClass,
-    retention_strategy: indexSetRetentionStrategy,
-    retention_strategy_class: IndexSetRetentionStrategyClass,
-  } = indexSet;
-
   const onCancel = () => history.push(cancelLink);
 
   if (loadingIndexSetTemplateDefaults) return (<Spinner />);
@@ -276,7 +269,7 @@ const IndexSetConfigurationForm = ({
         <Formik onSubmit={saveConfiguration}
                 enableReinitialize
                 initialValues={prepareInitialValues()}>
-          {({ isValid, setFieldValue, isSubmitting }) => (
+          {({ isValid, setFieldValue, isSubmitting, values }) => (
             <IndexRetentionProvider>
               <Form>
                 <FlexWrapper>
@@ -342,8 +335,8 @@ const IndexSetConfigurationForm = ({
                   <Section title="Rotation & Retention">
                     {isCloud && !enableDataTieringCloud ? (
                       <>
-                        {indexSet.writable && <RotationStrategies rotationStrategies={rotationStrategies} indexSetRotationStrategy={indexSetRotationStrategy} indexSetRotationStrategyClass={indexSetRotationStrategyClass} />}
-                        {indexSet.writable && <RetentionConfig retentionStrategies={retentionStrategies} retentionStrategiesContext={retentionStrategiesContext} indexSetRetentionStrategy={indexSetRetentionStrategy} IndexSetRetentionStrategyClass={IndexSetRetentionStrategyClass} />}
+                        {indexSet.writable && <RotationStrategies rotationStrategies={rotationStrategies} indexSetRotationStrategy={values.rotation_strategy} indexSetRotationStrategyClass={values.rotation_strategy_class} />}
+                        {indexSet.writable && <RetentionConfig retentionStrategies={retentionStrategies} retentionStrategiesContext={retentionStrategiesContext} indexSetRetentionStrategy={values.retention_strategy} IndexSetRetentionStrategyClass={values.retention_strategy_class} />}
                       </>
                     ) : (
                       <>
@@ -358,8 +351,8 @@ const IndexSetConfigurationForm = ({
                         )
                           : (
                             <ConfigSegment>
-                              {indexSet.writable && <RotationStrategies rotationStrategies={rotationStrategies} indexSetRotationStrategy={indexSetRotationStrategy} indexSetRotationStrategyClass={indexSetRotationStrategyClass} />}
-                              {indexSet.writable && <RetentionConfig retentionStrategies={retentionStrategies} retentionStrategiesContext={retentionStrategiesContext} indexSetRetentionStrategy={indexSetRetentionStrategy} IndexSetRetentionStrategyClass={IndexSetRetentionStrategyClass} />}
+                              {indexSet.writable && <RotationStrategies rotationStrategies={rotationStrategies} indexSetRotationStrategy={values.rotation_strategy} indexSetRotationStrategyClass={values.rotation_strategy_class} />}
+                              {indexSet.writable && <RetentionConfig retentionStrategies={retentionStrategies} retentionStrategiesContext={retentionStrategiesContext} indexSetRetentionStrategy={values.retention_strategy} IndexSetRetentionStrategyClass={values.retention_strategy_class} />}
                             </ConfigSegment>
                           )}
 

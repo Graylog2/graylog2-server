@@ -33,6 +33,7 @@ import { Col, Row, SegmentedControl } from 'components/bootstrap';
 import { FormikInput, FormSubmit, InputOptionalInfo, Section, Spinner, TimeUnitInput } from 'components/common';
 import { IndicesConfigurationActions, IndicesConfigurationStore } from 'stores/indices/IndicesConfigurationStore';
 import IndexMaintenanceStrategiesConfiguration from 'components/indices/IndexMaintenanceStrategiesConfiguration';
+import IndexRetentionProvider from 'components/indices/contexts/IndexRetentionProvider';
 import { prepareDataTieringConfig, prepareDataTieringInitialValues, DataTieringConfiguration } from 'components/indices/data-tiering';
 
 type Props = {
@@ -257,94 +258,94 @@ const TemplateForm = ({ initialValues, submitButtonText, submitLoadingText, onCa
                                             validate={validate}
                                             validateOnChange>
           {({ isSubmitting, isValid, isValidating, setFieldValue, values }) => (
-            <Form>
-              <FlexWrapper>
+            <IndexRetentionProvider>
+              <Form>
+                <FlexWrapper>
+                  <Section title="Configuration Information">
 
-                <Section title="Configuration Information">
+                    <FormikInput name="title"
+                                 label="Template title"
+                                 id="index-set-template-title"
+                                 help="A descriptive title of the template"
+                                 required />
+                    <FormikInput name="description"
+                                 id="index-set-template-description"
+                                 label={<>Description <InputOptionalInfo /></>}
+                                 type="textarea"
+                                 help="Longer description for template"
+                                 rows={6} />
+                  </Section>
+                  <Section title="Details">
 
-                  <FormikInput name="title"
-                               label="Template title"
-                               id="index-set-template-title"
-                               help="A descriptive title of the template"
-                               required />
-                  <FormikInput name="description"
-                               id="index-set-template-description"
-                               label={<>Description <InputOptionalInfo /></>}
-                               type="textarea"
-                               help="Longer description for template"
-                               rows={6} />
-                </Section>
-                <Section title="Details">
+                    <FormikInput name="index_set_config.index_analyzer"
+                                 label="Index Analyzer"
+                                 id="index-set-template-index-analyzer"
+                                 help="Index Analyzer" />
+                    <FormikInput name="index_set_config.shards"
+                                 label="Shards"
+                                 type="number"
+                                 id="index-set-template-shards"
+                                 help="Number of shards used per index in this index set" />
+                    <FormikInput name="index_set_config.replicas"
+                                 label="Replicas"
+                                 type="number"
+                                 id="index-set-template-replicas"
+                                 help="Number of replicas used per index in this index set" />
+                    <FormikInput name="index_set_config.index_optimization_max_num_segments"
+                                 label="Max. number of segments"
+                                 type="number"
+                                 id="index-set-template-index-optimization-max-num-segments"
+                                 help="Maximum number of segments per index after optimization (force merge)" />
+                    <FormikInput type="checkbox"
+                                 name="index_set_config.index_optimization_disabled"
+                                 id="index-set-template-index-optimization-disabled"
+                                 label="Disable index optimization after rotation"
+                                 help="Disable Elasticsearch index optimization (force merge) after rotation" />
+                    <Field name="index_set_config.field_type_refresh_interval">
+                      {({ field: { name, value, onChange } }) => (
+                        <TimeUnitInput id="field-type-refresh-interval"
+                                       label="Field type refresh interval"
+                                       type="number"
+                                       help="How often the field type information for the active write index will be updated."
+                                       value={moment.duration(value, 'milliseconds').as(fieldTypeRefreshIntervalUnit)}
+                                       unit={fieldTypeRefreshIntervalUnit.toUpperCase()}
+                                       units={TIME_UNITS}
+                                       required
+                                       update={(intervalValue: number, unit: Unit) => onFieldTypeRefreshIntervalChange(
+                                         intervalValue, unit, name, onChange, setFieldValue,
+                                       )} />
+                      )}
+                    </Field>
+                  </Section>
 
-                  <FormikInput name="index_set_config.index_analyzer"
-                               label="Index Analyzer"
-                               id="index-set-template-index-analyzer"
-                               help="Index Analyzer" />
-                  <FormikInput name="index_set_config.shards"
-                               label="Shards"
-                               type="number"
-                               id="index-set-template-shards"
-                               help="Number of shards used per index in this index set" />
-                  <FormikInput name="index_set_config.replicas"
-                               label="Replicas"
-                               type="number"
-                               id="index-set-template-replicas"
-                               help="Number of replicas used per index in this index set" />
-                  <FormikInput name="index_set_config.index_optimization_max_num_segments"
-                               label="Max. number of segments"
-                               type="number"
-                               id="index-set-template-index-optimization-max-num-segments"
-                               help="Maximum number of segments per index after optimization (force merge)" />
-                  <FormikInput type="checkbox"
-                               name="index_set_config.index_optimization_disabled"
-                               id="index-set-template-index-optimization-disabled"
-                               label="Disable index optimization after rotation"
-                               help="Disable Elasticsearch index optimization (force merge) after rotation" />
-                  <Field name="index_set_config.field_type_refresh_interval">
-                    {({ field: { name, value, onChange } }) => (
-                      <TimeUnitInput id="field-type-refresh-interval"
-                                     label="Field type refresh interval"
-                                     type="number"
-                                     help="How often the field type information for the active write index will be updated."
-                                     value={moment.duration(value, 'milliseconds').as(fieldTypeRefreshIntervalUnit)}
-                                     unit={fieldTypeRefreshIntervalUnit.toUpperCase()}
-                                     units={TIME_UNITS}
-                                     required
-                                     update={(intervalValue: number, unit: Unit) => onFieldTypeRefreshIntervalChange(
-                                       intervalValue, unit, name, onChange, setFieldValue,
-                                     )} />
-                    )}
-                  </Field>
-                </Section>
+                  <Section title="Rotation & Retention">
+                    <SegmentedControl<RetentionConfigSegment> data={retentionConfigSegments}
+                                                              value={selectedRetentionSegment}
+                                                              onChange={setSelectedRetentionSegment} />
 
-                <Section title="Rotation & Retention">
-                  <SegmentedControl<RetentionConfigSegment> data={retentionConfigSegments}
-                                                            value={selectedRetentionSegment}
-                                                            onChange={setSelectedRetentionSegment} />
-
-                  {selectedRetentionSegment === 'data_tiering' ? (
-                    <ConfigSegment>
-                      <DataTieringConfiguration valuesPrefix="index_set_config" />
-                    </ConfigSegment>
-                  )
-                    : (
+                    {selectedRetentionSegment === 'data_tiering' ? (
                       <ConfigSegment>
-                        <RotationConfig rotationStrategies={rotationStrategies} indexSetRotationStrategy={values.rotation_strategy} indexSetRotationStrategyClass={values.rotation_strategy_class} />
-                        <RetentionConfig retentionStrategies={retentionStrategies} retentionStrategiesContext={retentionStrategiesContext} indexSetRetentionStrategy={values.retention_strategy} indexSetRetentionStrategyClass={values.retention_strategy_class} />
+                        <DataTieringConfiguration valuesPrefix="index_set_config" />
                       </ConfigSegment>
-                    )}
+                    )
+                      : (
+                        <ConfigSegment>
+                          <RotationConfig rotationStrategies={rotationStrategies} indexSetRotationStrategy={values.rotation_strategy} indexSetRotationStrategyClass={values.rotation_strategy_class} />
+                          <RetentionConfig retentionStrategies={retentionStrategies} retentionStrategiesContext={retentionStrategiesContext} indexSetRetentionStrategy={values.retention_strategy} indexSetRetentionStrategyClass={values.retention_strategy_class} />
+                        </ConfigSegment>
+                      )}
 
-                </Section>
-                <SubmitWrapper>
-                  <FormSubmit submitButtonText={submitButtonText}
-                              onCancel={onCancel}
-                              disabledSubmit={isValidating || !isValid}
-                              isSubmitting={isSubmitting}
-                              submitLoadingText={submitLoadingText} />
-                </SubmitWrapper>
-              </FlexWrapper>
-
-            </Form>
+                  </Section>
+                  <SubmitWrapper>
+                    <FormSubmit submitButtonText={submitButtonText}
+                                onCancel={onCancel}
+                                disabledSubmit={isValidating || !isValid}
+                                isSubmitting={isSubmitting}
+                                submitLoadingText={submitLoadingText} />
+                  </SubmitWrapper>
+                </FlexWrapper>
+              </Form>
+            </IndexRetentionProvider>
           )}
         </Formik>
       </Col>

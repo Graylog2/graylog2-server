@@ -19,12 +19,12 @@ import { useQuery } from '@tanstack/react-query';
 import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
-import type { IndexSetTemplate } from 'components/indices/IndexSetTemplates/types';
+import type { IndexSetsDefaultConfiguration } from 'components/indices/IndexSetTemplates/types';
 
-const fetchIndexSetTemplateDefaults: () => Promise<IndexSetTemplate['index_set_config']> = () => fetch('GET', qualifyUrl('/system/indices/index_sets/templates/default_config'));
+const fetchIndexSetTemplateDefaults: () => Promise<IndexSetsDefaultConfiguration> = () => fetch('GET', qualifyUrl('/system/indices/index_sets/templates/default_config'));
 
 const useIndexSetTemplateDefaults = () => {
-  const { data, isLoading } = useQuery<IndexSetTemplate['index_set_config'], Error>(
+  const { data, isLoading } = useQuery<IndexSetsDefaultConfiguration, Error>(
     ['index-templates-defaults'],
     fetchIndexSetTemplateDefaults,
     {

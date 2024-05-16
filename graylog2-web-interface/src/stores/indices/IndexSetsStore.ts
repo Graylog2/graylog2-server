@@ -49,7 +49,7 @@ export const IndexSetPropType = PropTypes.shape({
   default: PropTypes.bool.isRequired,
 });
 
-type IndexSetConfig = {
+export type IndexSetConfig = {
   can_be_default?: boolean,
   id?: string,
   title: string,
@@ -71,37 +71,6 @@ type IndexSetConfig = {
   writable: boolean,
   default?: boolean,
   use_legacy_rotation?: boolean
-}
-
-export type IndexSetDefaultFields = Pick<IndexSetConfig,
-  'index_prefix' |
-  'index_analyzer' |
-  'shards' |
-  'replicas' |
-  'index_optimization_max_num_segments' |
-  'index_optimization_disabled' |
-  'field_type_refresh_interval' |
-  'rotation_strategy_class' |
-  'retention_strategy_class'
->
-
-export type IndexSetsDefaultConfiguration = IndexSetDefaultFields & {
-  rotation_strategy?: RotationStrategyConfig,
-  retention_strategy?: RetentionStrategyConfig,
-  field_type_refresh_interval_unit: 'seconds' | 'minutes',
-  data_tiering: DataTieringConfig
-}
-
-export type IndexSetsLegacyDefaultConfiguration = IndexSetDefaultFields & {
-  rotation_strategy_config?: RotationStrategyConfig,
-  retention_strategy_config?: RetentionStrategyConfig,
-  field_type_refresh_interval_unit: 'seconds' | 'minutes',
-  data_tiering: DataTieringConfig
-}
-
-export type IndexSetsDefaultConfigurationFormValues = IndexSetDefaultFields & {
-  field_type_refresh_interval_unit: 'seconds' | 'minutes',
-  data_tiering: DataTieringFormValues
 }
 
 export type IndexSet = IndexSetConfig & { data_tiering?: DataTieringConfig };

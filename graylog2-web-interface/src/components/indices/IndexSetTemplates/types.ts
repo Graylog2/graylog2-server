@@ -15,16 +15,33 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import type { IndexSetDefaultFields, IndexSetsDefaultConfigurationFormValues } from 'stores/indices/IndexSetsStore';
+import type { IndexSetConfig } from 'stores/indices/IndexSetsStore';
 import type { RetentionStrategyConfig, RotationStrategyConfig } from 'components/indices/Types';
-import type { DataTieringConfig } from 'components/indices/data-tiering';
+import type { DataTieringConfig, DataTieringFormValues } from 'components/indices/data-tiering';
 
-type IndexSetsDefaultConfiguration = IndexSetDefaultFields & {
-  rotation_strategy?: RotationStrategyConfig,
-  retention_strategy?: RetentionStrategyConfig,
+type IndexSetDefaultFields = Pick<IndexSetConfig,
+  'index_prefix' |
+  'index_analyzer' |
+  'shards' |
+  'replicas' |
+  'index_optimization_max_num_segments' |
+  'index_optimization_disabled' |
+  'field_type_refresh_interval'
+>
+
+export type IndexSetsDefaultConfiguration = IndexSetDefaultFields & {
+  rotation_strategy_class?: string | null,
+  rotation_strategy?: RotationStrategyConfig | null,
+  retention_strategy_class?: string | null,
+  retention_strategy?: RetentionStrategyConfig | null,
   field_type_refresh_interval_unit: 'seconds' | 'minutes',
   use_legacy_rotation: boolean,
   data_tiering: DataTieringConfig
+}
+
+type IndexSetsDefaultConfigurationFormValues = IndexSetDefaultFields & {
+  field_type_refresh_interval_unit: 'seconds' | 'minutes',
+  data_tiering: DataTieringFormValues
 }
 
 export type IndexSetTemplate = {
