@@ -17,16 +17,16 @@
 package org.graylog.datanode.bindings;
 
 import com.google.inject.AbstractModule;
+import org.graylog.datanode.OpensearchDistribution;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.configuration.DatanodeConfigurationProvider;
+import org.graylog.datanode.configuration.OpensearchDistributionProvider;
 import org.graylog.datanode.filesystem.index.indexreader.ShardStatsParser;
 import org.graylog.datanode.filesystem.index.indexreader.ShardStatsParserImpl;
 import org.graylog.datanode.filesystem.index.statefile.StateFileParser;
 import org.graylog.datanode.filesystem.index.statefile.StateFileParserImpl;
 import org.graylog2.plugin.system.FilePersistedNodeIdProvider;
 import org.graylog2.plugin.system.NodeId;
-import org.graylog.datanode.configuration.OpensearchDistributionProvider;
-import org.graylog.datanode.OpensearchDistribution;
 
 public class DatanodeConfigurationBindings extends AbstractModule {
     @Override

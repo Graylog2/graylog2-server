@@ -187,7 +187,10 @@ public class Configuration {
     @Parameter(value = "datanode_http_port", required = true)
     private int datanodeHttpPort = DATANODE_DEFAULT_PORT;
 
-    @Documentation(visible = false)
+    @Documentation("""
+            Set a hostname that this datanode should use for inter-node communication and for communication between this
+            datanode and graylog server. The hostname should be valid DNS resolvable name accessible from outside of this machine.
+            """)
     @Parameter(value = "hostname")
     private String hostname = null;
 

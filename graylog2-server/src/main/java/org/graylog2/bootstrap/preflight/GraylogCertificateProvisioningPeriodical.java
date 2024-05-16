@@ -23,6 +23,8 @@ import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import com.google.common.base.Suppliers;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
@@ -36,14 +38,13 @@ import org.graylog.security.certutil.CaService;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog.security.certutil.cert.CertificateChain;
 import org.graylog.security.certutil.cert.storage.CertChainMongoStorage;
-import org.graylog.security.certutil.cert.storage.CertChainStorage;
 import org.graylog.security.certutil.csr.CsrSigner;
-import org.graylog.security.certutil.csr.storage.CsrMongoStorage;
 import org.graylog2.Configuration;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.cluster.preflight.DataNodeProvisioningService;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.certificates.RenewalPolicy;
@@ -63,7 +64,6 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.SecureRandom;
-import java.security.UnrecoverableKeyException;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.util.List;
@@ -91,8 +91,6 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
     private final NodeService<DataNodeDto> nodeService;
 
     private final CaConfiguration configuration;
-    private final CsrMongoStorage csrStorage;
-    private final CertChainStorage certMongoStorage;
     private final CaService caService;
     private final CsrSigner csrSigner;
     private final ClusterConfigService clusterConfigService;
@@ -100,11 +98,11 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
     private final Supplier<OkHttpClient> okHttpClient;
     private final PreflightConfigService preflightConfigService;
     private final NotificationService notificationService;
+    private final ClusterEventBus clusterEventBus;
     private final ExecutorService executor;
 
     @Inject
     public GraylogCertificateProvisioningPeriodical(final DataNodeProvisioningService dataNodeProvisioningService,
-                                                    final CsrMongoStorage csrStorage,
                                                     final CertChainMongoStorage certMongoStorage,
                                                     final CaService caService,
                                                     final Configuration configuration,
@@ -115,10 +113,10 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                                                     final IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider,
                                                     final PreflightConfigService preflightConfigService,
                                                     final NotificationService notificationService,
-                                                    final CustomCAX509TrustManager trustManager) {
+                                                    final CustomCAX509TrustManager trustManager,
+                                                    final EventBus eventBus,
+                                                    final ClusterEventBus clusterEventBus) {
         this.dataNodeProvisioningService = dataNodeProvisioningService;
-        this.csrStorage = csrStorage;
-        this.certMongoStorage = certMongoStorage;
         this.caService = caService;
         this.passwordSecret = passwordSecret;
         this.configuration = configuration;
@@ -127,8 +125,10 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
         this.clusterConfigService = clusterConfigService;
         this.preflightConfigService = preflightConfigService;
         this.notificationService = notificationService;
+        this.clusterEventBus = clusterEventBus;
         this.executor = Executors.newFixedThreadPool(THREADPOOL_THREADS, new ThreadFactoryBuilder().setNameFormat("provisioning-connectivity-check-task").build());
         this.okHttpClient = Suppliers.memoize(() -> buildConnectivityCheckOkHttpClient(trustManager, indexerJwtAuthTokenProvider));
+        eventBus.register(this);
     }
 
     // building a httpclient to check the connectivity to OpenSearch - TODO: maybe replace it with a VersionProbe already?
@@ -204,42 +204,34 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
             if (!preparedNodes.isEmpty()) {
                 preparedNodes.forEach(c -> dataNodeProvisioningService.save(c.asStartupTrigger()));
                 // waiting one iteration after writing the new state, so we return from execution here and skip the rest of the periodical
-                return;
             }
         }
+    }
 
-        final var nodesWithCSR = nodesByState.getOrDefault(DataNodeProvisioningConfig.State.CSR, List.of());
-        final var hasNodesWithCSR = !nodesWithCSR.isEmpty();
-        if (hasNodesWithCSR) {
-            try {
-                var caPrivateKey = (PrivateKey) caKeystore.getKey(CA_KEY_ALIAS, getCAPassword());
-                var caCertificate = (X509Certificate) caKeystore.getCertificate(CA_KEY_ALIAS);
-                nodesWithCSR.forEach(c -> {
-                    try {
-                        var csr = csrStorage.readCsr(c.nodeId());
-                        if (csr.isEmpty()) {
-                            LOG.error("Node in CSR state, but no CSR present : " + c.nodeId());
-                            dataNodeProvisioningService.save(c.asError("Node in CSR state, but no CSR present"));
-                        } else {
-                            var cert = csrSigner.sign(caPrivateKey, caCertificate, csr.get(), renewalPolicy);
-                            final List<X509Certificate> caCertificates = List.of(caCertificate);
-                            certMongoStorage.writeCertChain(new CertificateChain(cert, caCertificates), c.nodeId());
-                        }
-                    } catch (Exception e) {
-                        LOG.error("Could not sign CSR: " + e.getMessage(), e);
-                        dataNodeProvisioningService.save(c.asError(e.getMessage()));
-                    }
-                });
-            } catch (UnrecoverableKeyException | KeyStoreException | NoSuchAlgorithmException e) {
-                throw new RuntimeException(e);
-            }
-        }
+    @Subscribe
+    public void signCsrListener(CertificateSigningRequestEvent event) {
+        LOG.info("Received CertificateSigningRequestEvent for node " + event.nodeId());
+        getKeyStore().ifPresentOrElse(caKeystore -> {
+            getRenewalPolicy().ifPresentOrElse(renewalPolicy -> {
+                try {
+                    var caPrivateKey = (PrivateKey) caKeystore.getKey(CA_KEY_ALIAS, getCAPassword());
+                    var caCertificate = (X509Certificate) caKeystore.getCertificate(CA_KEY_ALIAS);
+                    var cert = csrSigner.sign(caPrivateKey, caCertificate, event.decodeCsr(), renewalPolicy);
+                    final CertificateChain certChain = new CertificateChain(cert, List.of(caCertificate));
 
-        nodesByState.getOrDefault(DataNodeProvisioningConfig.State.STARTUP_REQUESTED, List.of())
-                .forEach(c -> {
-                    dataNodeProvisioningService.save(c.asConnecting());
-                    executor.submit(() -> checkConnectivity(c));
-                });
+                    LOG.info("Posted CertificateSignedEvent for node " + event.nodeId());
+                    clusterEventBus.post(CertificateSignedEvent.fromCertChain(event.nodeId(), certChain));
+
+                    dataNodeProvisioningService.getPreflightConfigFor(event.nodeId())
+                            .ifPresent(cfg -> {
+                                dataNodeProvisioningService.save(cfg.asConnecting());
+                                executor.submit(() -> checkConnectivity(cfg));
+                            });
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }, () -> LOG.warn("Couldn't sign certificate, no renewal policy configured"));
+        }, () -> LOG.warn("Couldn't sign certificate, no CA configured"));
     }
 
     @Nonnull

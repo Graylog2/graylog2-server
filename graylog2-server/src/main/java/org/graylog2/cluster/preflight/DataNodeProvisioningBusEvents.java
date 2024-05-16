@@ -20,6 +20,7 @@ import com.google.common.eventbus.EventBus;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import org.graylog2.events.ClusterEventBus;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,7 +34,7 @@ public class DataNodeProvisioningBusEvents implements DataNodeProvisioningServic
     private final EventBus eventBus;
 
     @Inject
-    public DataNodeProvisioningBusEvents(@Named(DELEGATE_NAME) DataNodeProvisioningService delegate, EventBus eventBus) {
+    public DataNodeProvisioningBusEvents(@Named(DELEGATE_NAME) DataNodeProvisioningService delegate, ClusterEventBus eventBus) {
         this.delegate = delegate;
         this.eventBus = eventBus;
     }

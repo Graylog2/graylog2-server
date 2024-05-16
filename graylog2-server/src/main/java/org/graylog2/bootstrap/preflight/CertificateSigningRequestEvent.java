@@ -14,54 +14,34 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.security.certutil.csr.storage;
+package org.graylog2.bootstrap.preflight;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
-import org.bouncycastle.operator.OperatorException;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
-import org.graylog2.cluster.preflight.DataNodeProvisioningService;
-
-import jakarta.inject.Inject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.Optional;
 
-public class CsrMongoStorage {
+public record CertificateSigningRequestEvent(String nodeId, String csr) {
 
-    private DataNodeProvisioningService mongoService;
-
-    @Inject
-    public CsrMongoStorage(final DataNodeProvisioningService mongoService) {
-        this.mongoService = mongoService;
-    }
-
-    public void writeCsr(PKCS10CertificationRequest csr, String nodeId) throws IOException, OperatorException {
+    public static CertificateSigningRequestEvent fromCsr(String nodeId, PKCS10CertificationRequest csr) throws IOException {
         try (StringWriter writer = new StringWriter()) {
             try (JcaPEMWriter jcaPEMWriter = new JcaPEMWriter(writer)) {
                 jcaPEMWriter.writeObject(csr);
             }
-            mongoService.writeCsr(nodeId, writer.toString());
+            return new CertificateSigningRequestEvent(nodeId, writer.toString());
         }
     }
 
-
-    public Optional<PKCS10CertificationRequest> readCsr(String nodeId) throws IOException {
-        final var nodeCsr = mongoService.getPreflightConfigFor(nodeId)
-                .flatMap(cfg -> Optional.ofNullable(cfg.csr()));
-        if (nodeCsr.isEmpty()) {
-            return Optional.empty();
-        }
-        final var csr = nodeCsr.get();
+    @JsonIgnore
+    public PKCS10CertificationRequest decodeCsr() throws IOException {
         final var pemReader = new BufferedReader(new StringReader(csr));
         final var pemParser = new PEMParser(pemReader);
         final var parsedObj = pemParser.readObject();
-        if (parsedObj instanceof PKCS10CertificationRequest) {
-            return Optional.of((PKCS10CertificationRequest) parsedObj);
-        }
-        return Optional.empty();
+        return (PKCS10CertificationRequest) parsedObj;
     }
 }

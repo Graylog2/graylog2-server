@@ -111,7 +111,7 @@ public class DataNodeProvisioningServiceImpl extends PaginatedDbService<DataNode
                 DBQuery.is(FIELD_NODEID, nodeId),
                 new DBUpdate.Builder()
                         .set(FIELD_STATE, state),
-                false,
+                true,
                 false);
 
         if (result.getN() != 1) {
