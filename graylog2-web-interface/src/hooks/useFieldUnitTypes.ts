@@ -19,8 +19,11 @@ import { useMemo } from 'react';
 
 import type { MetricUnitType } from 'views/types';
 
+import supportedUnits from '../../../graylog-shared-resources/units/supported_units.json';
+
 type UnitConversionAction = 'MULTIPLY' | 'DIVIDE'
 
+const units = supportedUnits.units as FieldUnitTypes;
 export type Unit = {
   abbrev: string,
   name: string,
@@ -28,122 +31,10 @@ export type Unit = {
   conversion?: {
     value: number,
     action: UnitConversionAction
-  }
+  } | undefined
 }
 type FieldUnitTypes = Record<MetricUnitType, Array<Unit>>
 
-const useFieldUnitTypes = () => useMemo<FieldUnitTypes>(() => ({
-  size: [
-    {
-      abbrev: 'b',
-      name: 'byte',
-      unit_type: 'size',
-    },
-    {
-      abbrev: 'kb',
-      name: 'kilobyte',
-      unit_type: 'size',
-      conversion: {
-        value: 1000,
-        action: 'MULTIPLY',
-      },
-    },
-    {
-      abbrev: 'Mb',
-      name: 'megabyte',
-      unit_type: 'size',
-      conversion: {
-        value: 1000000,
-        action: 'MULTIPLY',
-      },
-    },
-    {
-      abbrev: 'Gb',
-      name: 'gigabyte',
-      unit_type: 'size',
-      conversion: {
-        value: 1000000000,
-        action: 'MULTIPLY',
-      },
-    },
-  ],
-  time: [
-    {
-      abbrev: 'ns',
-      name: 'nanosecond',
-      unit_type: 'time',
-      conversion: {
-        value: 1000000000,
-        action: 'DIVIDE',
-      },
-    },
-    {
-      abbrev: 'μs',
-      name: 'microsecond',
-      unit_type: 'time',
-      conversion: {
-        value: 1000000,
-        action: 'DIVIDE',
-      },
-    },
-    {
-      abbrev: 'ms',
-      name: 'millisecond',
-      unit_type: 'time',
-      conversion: {
-        value: 1000,
-        action: 'DIVIDE',
-      },
-    },
-    {
-      abbrev: 's',
-      name: 'second',
-      unit_type: 'time',
-    },
-    {
-      abbrev: 'min',
-      name: 'minute',
-      unit_type: 'time',
-      conversion: {
-        value: 60,
-        action: 'MULTIPLY',
-      },
-    },
-    {
-      abbrev: 'h',
-      name: 'hour',
-      unit_type: 'time',
-      conversion: {
-        value: 3600,
-        action: 'MULTIPLY',
-      },
-    },
-    {
-      abbrev: 'd',
-      name: 'day',
-      unit_type: 'time',
-      conversion: {
-        value: 86400,
-        action: 'MULTIPLY',
-      },
-    },
-    {
-      abbrev: 'm',
-      name: 'month',
-      unit_type: 'time',
-      conversion: {
-        value: 2592000,
-        action: 'MULTIPLY',
-      },
-    },
-  ],
-  percent: [
-    {
-      abbrev: '%',
-      name: 'percent',
-      unit_type: 'percent',
-    },
-  ],
-}), []);
+const useFieldUnitTypes = () => useMemo<FieldUnitTypes>(() => units, []);
 
 export default useFieldUnitTypes;

@@ -441,6 +441,10 @@ export interface WidgetCreator {
 
 export type MetricUnitType = 'size' | 'time' | 'percent';
 
+export type MetricUnitsFormValues = {
+  metrics: Array<{ unit: string, unitType: MetricUnitType }>
+}
+
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
     creators?: Array<Creator>;
