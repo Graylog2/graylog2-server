@@ -109,7 +109,6 @@ const FieldsForm = ({ currentUser, eventDefinition, validation, onChange, canEdi
     <Row>
       <Col md={12}>
         <h2 className={commonStyles.title}>Event Fields <small>(optional)</small></h2>
-
         {!canEditCondition ? (
           <p>
             The event fields of this event definition type cannot be edited.

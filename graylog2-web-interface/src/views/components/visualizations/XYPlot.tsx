@@ -152,6 +152,7 @@ XYPlot.defaultProps = {
   effectiveTimerange: undefined,
   onZoom: undefined,
   height: undefined,
+  onClick: undefined,
 };
 
 export default XYPlot;

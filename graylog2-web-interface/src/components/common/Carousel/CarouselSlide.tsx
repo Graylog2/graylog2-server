@@ -20,10 +20,9 @@ import styled, { css } from 'styled-components';
 
 export interface CarouselSlideProps extends React.ComponentPropsWithoutRef<'div'> {
   children?: React.ReactNode;
-
-  size?: string | number;
-
+  className?: string,
   gap?: number;
+  size?: string | number;
 }
 
 const StyledSlide = styled.div<{ $size?: string | number, $gap?: number }>(({ $size, $gap, theme }: {
@@ -38,16 +37,17 @@ const StyledSlide = styled.div<{ $size?: string | number, $gap?: number }>(({ $s
   position: relative;
 `);
 
-const CarouselSlide = ({ children, size, gap }: CarouselSlideProps) => (
-  <StyledSlide $size={size} $gap={gap}>
+const CarouselSlide = ({ children, size, gap, className }: CarouselSlideProps) => (
+  <StyledSlide $size={size} $gap={gap} className={className}>
     {children}
   </StyledSlide>
 );
 
 CarouselSlide.defaultProps = {
   children: undefined,
-  size: undefined,
+  className: undefined,
   gap: undefined,
+  size: undefined,
 };
 
 export default CarouselSlide;
