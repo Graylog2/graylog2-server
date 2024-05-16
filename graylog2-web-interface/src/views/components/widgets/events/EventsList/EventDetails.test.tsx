@@ -36,7 +36,7 @@ describe('EventDetails', () => {
   beforeEach(() => {
     asMock(usePluginEntities).mockReturnValue([]);
     asMock(useCurrentUser).mockReturnValue(adminUser);
-    asMock(useEventDefinition).mockReturnValue({ data: undefined, isFetching: false });
+    asMock(useEventDefinition).mockReturnValue({ data: undefined, isFetching: false, isInitialLoading: false });
 
     asMock(useEventById).mockImplementation(() => ({
       data: mockEventData.event,

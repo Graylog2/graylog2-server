@@ -52,7 +52,7 @@ public class HardcodedFieldUnitObtainingMethod implements FieldUnitObtainingMeth
                     NETWORK_BYTES,
                     NETWORK_DATA_BYTES,
                     NETWORK_HEADER_BYTES,
-                    SOURCE_BYTES_SENT -> supportedUnits.getUnit(new UnitId("size", "B"));
+                    SOURCE_BYTES_SENT -> supportedUnits.getUnit(new UnitId("size", "b"));
             default -> Optional.empty();
         };
 

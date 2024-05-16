@@ -31,14 +31,14 @@ type Props = {
   widget: Widget,
 };
 
-const ExtraWidgetActions = ({ widget }: Props) => {
+const ExtraDropdownWidgetActions = ({ widget }: Props) => {
   const widgetFocusContext = useContext(WidgetFocusContext);
   const pluginWidgetActions = useWidgetActions();
   const dispatch = useAppDispatch();
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
   const extraWidgetActions = useMemo(() => pluginWidgetActions
-    .filter(({ isHidden = () => false }) => !isHidden(widget))
+    .filter(({ isHidden = () => false, position }) => !isHidden(widget) && (position === 'dropdown' || position === undefined))
     .map(({ title, action, type, disabled = () => false }) => {
       const _onSelect = () => {
         sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.SEARCH_WIDGET_EXTRA_ACTION, {
@@ -64,4 +64,4 @@ const ExtraWidgetActions = ({ widget }: Props) => {
     : null;
 };
 
-export default ExtraWidgetActions;
+export default ExtraDropdownWidgetActions;
