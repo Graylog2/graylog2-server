@@ -21,6 +21,7 @@ import styled from 'styled-components';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import type { ValueRenderer, ValueRendererProps } from 'views/components/messagelist/decoration/ValueRenderer';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
+import type SeriesUnit from 'views/logic/aggregationbuilder/SeriesUnit';
 
 import ValueActions from './actions/ValueActions';
 import TypeSpecificValue from './TypeSpecificValue';
@@ -31,6 +32,7 @@ type Props = {
   value: any,
   render?: ValueRenderer,
   type: FieldType,
+  unit?: SeriesUnit,
 };
 
 const ValueActionTitle = styled.span`
@@ -39,11 +41,12 @@ const ValueActionTitle = styled.span`
 
 const defaultRenderer: ValueRenderer = ({ value }: ValueRendererProps) => value;
 
-const InteractiveValue = ({ field, value, render, type }: Props) => {
+const InteractiveValue = ({ field, value, render, type, unit }: Props) => {
   const queryId = useActiveQueryId();
   const RenderComponent: ValueRenderer = useMemo(() => render ?? ((props: ValueRendererProps) => props.value), [render]);
   const Component = useCallback(({ value: componentValue }) => <RenderComponent field={field} value={componentValue} />, [RenderComponent, field]);
   const element = <TypeSpecificValue field={field} value={value} type={type} render={Component} />;
+  console.log({ unit });
 
   return (
     <ValueActions element={element} field={field} queryId={queryId} type={type} value={value}>
@@ -56,18 +59,20 @@ const InteractiveValue = ({ field, value, render, type }: Props) => {
 
 InteractiveValue.defaultProps = {
   render: defaultRenderer,
+  unit: undefined,
 };
 
-const Value = ({ field, value, render = defaultRenderer, type = FieldType.Unknown }: Props) => (
+const Value = ({ field, value, render = defaultRenderer, type = FieldType.Unknown, unit }: Props) => (
   <InteractiveContext.Consumer>
     {(interactive) => ((interactive)
-      ? <InteractiveValue field={field} value={value} render={render} type={type} />
+      ? <InteractiveValue field={field} value={value} render={render} type={type} unit={unit} />
       : <span><TypeSpecificValue field={field} value={value} render={render} type={type} /></span>)}
   </InteractiveContext.Consumer>
 );
 
 Value.defaultProps = {
   render: defaultRenderer,
+  unit: undefined,
 };
 
 export default Value;

@@ -29,6 +29,7 @@ import { parseSeries } from 'views/logic/aggregationbuilder/Series';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
+import type SeriesUnit from 'views/logic/aggregationbuilder/SeriesUnit';
 
 import TableDataCell from './TableDataCell';
 
@@ -51,13 +52,13 @@ type Props = {
 
 const _c = (field, value, path, source) => ({ field, value, path, source });
 
-type ColumnProps = { field: string, value: any, type: FieldType, valuePath: ValuePath, source: string | undefined | null };
+type ColumnProps = { field: string, value: any, type: FieldType, valuePath: ValuePath, source: string | undefined | null, unit: SeriesUnit };
 
 const flattenValuePath = (valuePath: ValuePath) => valuePath.flatMap((path) => Object.entries(path))
   .map(([key, value]) => `${key}:${value}`)
   .join('-');
 
-const Column = ({ field, value, type, valuePath, source }: ColumnProps) => {
+const Column = ({ field, value, type, valuePath, source, unit }: ColumnProps) => {
   const additionalContextValue = useMemo(() => ({ valuePath }), [valuePath]);
 
   return (
@@ -69,6 +70,7 @@ const Column = ({ field, value, type, valuePath, source }: ColumnProps) => {
               <Value field={source ?? field}
                      type={type}
                      value={value}
+                     unit={unit}
                      render={DecoratedValue} />
             ) : null}
         </CustomHighlighting>
@@ -122,6 +124,7 @@ const DataTableEntry = ({ columnPivots, fields, series, columnPivotValues, value
     <tr className={`fields-row ${classes}`}>
       {columns.map(({ field, value, path, source }, idx) => {
         const key = `${activeQuery}-${field}=${value}-${idx}`;
+        const curSeries = series?.find((s) => s.function === source);
 
         return (
           <Column key={key}
@@ -129,7 +132,8 @@ const DataTableEntry = ({ columnPivots, fields, series, columnPivotValues, value
                   value={value}
                   type={fieldTypeFor(columnNameToField(field, series), types)}
                   valuePath={path.slice()}
-                  source={source} />
+                  source={source}
+                  unit={curSeries?.unit} />
         );
       })}
     </tr>

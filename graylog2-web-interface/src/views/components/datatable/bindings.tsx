@@ -31,7 +31,12 @@ const dataTable: VisualizationType<typeof DataTable.type> = {
   config: {
     createConfig: () => ({ pinnedColumns: [] }),
     fromConfig: (config: DataTableVisualizationConfig | undefined) => ({ pinnedColumns: config?.pinnedColumns.toJS() ?? [] }),
-    toConfig: (formValues: DataTableVisualizationConfigFormValues) => DataTableVisualizationConfig.create(formValues.pinnedColumns),
+    toConfig: (formValues: DataTableVisualizationConfigFormValues) => {
+      const res = DataTableVisualizationConfig.create(formValues.pinnedColumns);
+      console.log({ res });
+
+      return res;
+    },
     fields: [{
       name: 'pinnedColumns',
       title: 'Pinned Columns',

@@ -44,11 +44,11 @@ const Container = styled.div`
 const UnitMetricPopover = ({ index }: { index: number }) => {
   const [show, setShow] = useState(false);
   const { setFieldValue, values } = useFormikContext<MetricUnitsFormValues>();
-  const unitTypes = useFieldUnitTypes();
+  const { units } = useFieldUnitTypes();
   const currentUnitType = useMemo<string>(() => values?.metrics?.[index]?.unitType, [values, index]);
-  const unitTypesOptions = useMemo(() => Object.keys(unitTypes).map((key) => ({ value: key, label: key })), [unitTypes]);
-  const unitOptions = useMemo(() => currentUnitType && unitTypes[currentUnitType]
-    .map(({ name }: Unit) => ({ value: name, label: name })), [unitTypes, currentUnitType]);
+  const unitTypesOptions = useMemo(() => Object.keys(units).map((key) => ({ value: key, label: key })), [units]);
+  const unitOptions = useMemo(() => currentUnitType && units[currentUnitType]
+    .map(({ name }: Unit) => ({ value: name, label: name })), [units, currentUnitType]);
   const toggleShow = () => setShow((cur) => !cur);
   const onUnitTypeChange = useCallback((val: string) => {
     setFieldValue(`metrics.${index}.unitType`, val || undefined);
@@ -62,8 +62,8 @@ const UnitMetricPopover = ({ index }: { index: number }) => {
     const curUnitType = values?.metrics?.[index]?.unitType;
     const curUnit = values?.metrics?.[index]?.unit;
 
-    return unitTypes[curUnitType]?.find(({ name }) => name === curUnit)?.abbrev || '-';
-  }, [index, unitTypes, values?.metrics]);
+    return units[curUnitType]?.find(({ name }) => name === curUnit)?.abbrev || '-';
+  }, [index, units, values?.metrics]);
 
   return (
     <Popover position="right" opened={show} withArrow>
