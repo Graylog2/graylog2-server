@@ -111,13 +111,12 @@ public class DataNodeProvisioningServiceImpl extends PaginatedDbService<DataNode
                 DBQuery.is(FIELD_NODEID, nodeId),
                 new DBUpdate.Builder()
                         .set(FIELD_STATE, state),
-                true,
+                false,
                 false);
 
         if (result.getN() != 1) {
             throw new RuntimeException(StringUtils.f("Failed to change node %s state", nodeId));
         }
-
     }
 
     public void deleteAll() {

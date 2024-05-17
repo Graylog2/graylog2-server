@@ -100,23 +100,36 @@ public class DataNodeConfigurationEventHandler {
         this.mongoKeyStorage = mongoKeyStorage;
         this.clusterEventBus = clusterEventBus;
         eventBus.register(this);
+        writeInitialConfig(dataNodeProvisioningService, nodeId);
     }
+
+    private void writeInitialConfig(DataNodeProvisioningService dataNodeProvisioningService, NodeId nodeId) {
+        final Optional<DataNodeProvisioningConfig> existingConfig = dataNodeProvisioningService.getPreflightConfigFor(nodeId.getNodeId());
+        if (existingConfig.isEmpty()) {
+            writeInitialProvisioningConfig();
+        }
+    }
+
 
     @Subscribe
     public void doRun(DataNodeProvisioningStateChangeEvent event) {
-        LOG.info("Received DataNodeProvisioningStateChangeEvent with state " + event.state());
-        final DataNodeProvisioningConfig cfg = dataNodeProvisioningService
-                .getPreflightConfigFor(nodeId.getNodeId())
-                .orElseGet(this::writeInitialProvisioningConfig);
+        if (nodeId.getNodeId().equals(event.nodeId())) {
+            LOG.info("Received DataNodeProvisioningStateChangeEvent with state " + event.state());
 
-        Optional.ofNullable(event.state()).ifPresent(state -> {
-            switch (state) {
-                case CONFIGURED -> writeCsr(cfg);
-                case SIGNED -> LOG.warn("Ignoring state, will be handled by events");
-                case STARTUP_TRIGGER ->
-                        dataNodeProvisioningService.changeState(nodeId.getNodeId(), DataNodeProvisioningConfig.State.STARTUP_REQUESTED);
-            }
-        });
+            final DataNodeProvisioningConfig cfg = dataNodeProvisioningService.getPreflightConfigFor(nodeId.getNodeId()).orElseThrow(() -> new IllegalStateException("No preflight configuration found for node " + nodeId.getNodeId()));
+
+
+            Optional.ofNullable(event.state()).ifPresent(state -> {
+                switch (state) {
+                    case CONFIGURED -> writeCsr(cfg);
+                    case SIGNED -> LOG.warn("Ignoring state, will be handled by events");
+                    case STARTUP_TRIGGER ->
+                            dataNodeProvisioningService.changeState(nodeId.getNodeId(), DataNodeProvisioningConfig.State.STARTUP_REQUESTED);
+                }
+            });
+        } else {
+            LOG.debug("Ignoring DataNodeProvisioningStateChangeEvent, it's not intended for this datanode");
+        }
     }
 
     @Subscribe
@@ -167,6 +180,7 @@ public class DataNodeConfigurationEventHandler {
     }
 
     private DataNodeProvisioningConfig writeInitialProvisioningConfig() {
+        LOG.info("Writing initial provisioning config for datanode " + nodeId.getNodeId());
         return dataNodeProvisioningService.save(DataNodeProvisioningConfig.builder()
                 .nodeId(nodeId.getNodeId())
                 .state(DataNodeProvisioningConfig.State.UNCONFIGURED)

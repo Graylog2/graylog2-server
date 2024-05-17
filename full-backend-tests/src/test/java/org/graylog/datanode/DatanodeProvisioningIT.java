@@ -18,7 +18,9 @@ package org.graylog.datanode;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.joschi.jadconfig.util.Duration;
+import com.github.rholder.retry.Attempt;
 import com.github.rholder.retry.RetryException;
+import com.github.rholder.retry.RetryListener;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
@@ -125,22 +127,28 @@ public class DatanodeProvisioningIT {
     }
 
     private List<DatanodeStatus> waitForDatanodesConnected(BasicAuthCredentials basicAuth) throws ExecutionException, RetryException {
-        List<DatanodeStatus> connectedDatanodes = null;
         try {
-            connectedDatanodes = RetryerBuilder.<List<DatanodeStatus>>newBuilder()
+            return RetryerBuilder.<List<DatanodeStatus>>newBuilder()
                     .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
                     .withStopStrategy(StopStrategies.stopAfterAttempt(60))
                     .retryIfResult(list -> list.isEmpty() || !list.stream().allMatch(node ->
                             node.status().equals(DataNodeProvisioningConfig.State.CONNECTED.name()) &&
                                     node.dataNodeStatus().equals(DataNodeStatus.AVAILABLE.name())
                     ))
+                    .withRetryListener(new RetryListener() {
+                        @Override
+                        public <V> void onRetry(Attempt<V> attempt) {
+                            if(attempt.hasResult()) {
+                                log.info("Current datanodes: " + attempt.getResult());
+                            }
+                        }
+                    })
                     .build()
                     .call(() -> getDatanodes(basicAuth));
         } catch (ExecutionException | RetryException | IllegalStateException e) {
             log.error("Datanode not started:\n" + apis.backend().getSearchLogs());
             throw e;
         }
-        return connectedDatanodes;
     }
 
     private ValidatableResponse triggerDatanodeProvisioning(BasicAuthCredentials basicAuth) {
@@ -246,7 +254,7 @@ public class DatanodeProvisioningIT {
                 .auth().basic(basicAuth.username, basicAuth.password)
                 .get("/data_nodes")
                 .then()
-                .extract().body().as(new TypeRef<List<DatanodeStatus>>() {});
+                .extract().body().as(new TypeRef<>() {});
 
     }
 
