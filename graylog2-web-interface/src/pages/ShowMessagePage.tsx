@@ -117,7 +117,7 @@ const ShowMessagePage = ({ params: { index, messageId } }: Props) => {
   }
 
   const { streams, allStreams } = useStreams();
-  const { data: message } = useMessage(messageId, index);
+  const { data: message } = useMessage(index, messageId);
   const inputs = useInputs(message?.source_input_id, message?.fields.gl2_source_node);
 
   useEffect(() => { NodesActions.list(); }, []);
