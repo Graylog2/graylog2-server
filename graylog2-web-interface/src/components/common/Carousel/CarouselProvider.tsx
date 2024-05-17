@@ -21,12 +21,13 @@ import useEmblaCarousel from 'embla-carousel-react';
 import CarouselContext from './CarouselContext';
 
 type Props = React.PropsWithChildren<{
-  carouselId: string
+  carouselId: string,
+  options?: Partial<{ align: 'start' }>
 }>
 
-const CarouselProvider = ({ carouselId, children } : Props) => {
+const CarouselProvider = ({ carouselId, children, options } : Props) => {
   const existingContextValue = useContext(CarouselContext);
-  const [ref, api] = useEmblaCarousel({ containScroll: 'trimSnaps' });
+  const [ref, api] = useEmblaCarousel(options);
 
   const value = useMemo(() => ({
     ...(existingContextValue ?? {}),
@@ -38,6 +39,10 @@ const CarouselProvider = ({ carouselId, children } : Props) => {
       {children}
     </CarouselContext.Provider>
   );
+};
+
+CarouselProvider.defaultProps = {
+  options: {},
 };
 
 export default CarouselProvider;

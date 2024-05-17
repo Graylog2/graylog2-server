@@ -29,6 +29,7 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -38,6 +39,7 @@ import org.graylog.security.certutil.ca.exceptions.CACreationException;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.bootstrap.preflight.PreflightConstants;
+import org.graylog2.bootstrap.preflight.PreflightWebModule;
 import org.graylog2.bootstrap.preflight.web.resources.model.CA;
 import org.graylog2.bootstrap.preflight.web.resources.model.CertParameters;
 import org.graylog2.bootstrap.preflight.web.resources.model.CreateCARequest;
@@ -89,6 +91,7 @@ public class PreflightResource {
 
     @GET
     @Path("/data_nodes")
+    @RequiresPermissions(PreflightWebModule.PERMISSION_PREFLIGHT_ONLY)
     public List<DataNode> listDataNodes() {
         final Map<String, DataNodeDto> activeDataNodes = nodeService.allActive();
         final var preflightDataNodes = dataNodeProvisioningService.streamAll().collect(Collectors.toMap(DataNodeProvisioningConfig::nodeId, Function.identity()));
@@ -106,6 +109,7 @@ public class PreflightResource {
 
     @GET
     @Path("/ca")
+    @RequiresPermissions(PreflightWebModule.PERMISSION_PREFLIGHT_ONLY)
     public CA get() throws KeyStoreStorageException {
         return caService.get();
     }
@@ -113,6 +117,7 @@ public class PreflightResource {
     @GET
     @Path("/ca/certificate")
     @Produces(MediaType.TEXT_PLAIN)
+    @RequiresPermissions(PreflightWebModule.PERMISSION_PREFLIGHT_ONLY)
     public String getCaCertificate() {
         try {
             return caService.loadKeyStore().map(ks -> {
@@ -139,7 +144,8 @@ public class PreflightResource {
 
     @POST
     @Path("/ca/create")
-    @NoAuditEvent("No Audit Event needed")
+    @RequiresPermissions(PreflightWebModule.PERMISSION_PREFLIGHT_ONLY)
+    @NoAuditEvent("No Auditing during preflight")
     public Response createCA(@NotNull @Valid CreateCARequest request) throws CACreationException, KeyStoreStorageException, KeyStoreException, NoSuchAlgorithmException {
         // TODO: get validity from preflight UI
         final CA ca = caService.create(request.organization(), CaService.DEFAULT_VALIDITY, passwordSecret.toCharArray());
@@ -149,7 +155,8 @@ public class PreflightResource {
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Path("/ca/upload")
-    @NoAuditEvent("No Audit Event needed")
+    @RequiresPermissions(PreflightWebModule.PERMISSION_PREFLIGHT_ONLY)
+    @NoAuditEvent("No Auditing during preflight")
     public Response uploadCA(@FormDataParam("password") String password, @FormDataParam("files") List<FormDataBodyPart> bodyParts) {
         try {
             caService.upload(password, bodyParts);
@@ -161,7 +168,8 @@ public class PreflightResource {
 
     @DELETE
     @Path("/startOver")
-    @NoAuditEvent("No Audit Event needed")
+    @RequiresPermissions(PreflightWebModule.PERMISSION_PREFLIGHT_ONLY)
+    @NoAuditEvent("No Auditing during preflight")
     public void startOver() {
         caService.startOver();
         clusterConfigService.remove(RenewalPolicy.class);
@@ -170,7 +178,8 @@ public class PreflightResource {
 
     @DELETE
     @Path("/startOver/{nodeID}")
-    @NoAuditEvent("No Audit Event needed")
+    @RequiresPermissions(PreflightWebModule.PERMISSION_PREFLIGHT_ONLY)
+    @NoAuditEvent("No Auditing during preflight")
     public void startOver(@PathParam("nodeID") String nodeID) {
         //TODO:  reset a specific datanode
         dataNodeProvisioningService.delete(nodeID);
@@ -178,7 +187,8 @@ public class PreflightResource {
 
     @POST
     @Path("/generate")
-    @NoAuditEvent("No Audit Event needed")
+    @RequiresPermissions(PreflightWebModule.PERMISSION_PREFLIGHT_ONLY)
+    @NoAuditEvent("No Auditing during preflight")
     public void generate() {
         final Map<String, DataNodeDto> activeDataNodes = nodeService.allActive();
         activeDataNodes.values().forEach(node -> dataNodeProvisioningService.changeState(node.getNodeId(), DataNodeProvisioningConfig.State.CONFIGURED));
@@ -187,7 +197,8 @@ public class PreflightResource {
     @POST
     @Path("/{nodeID}")
     @Consumes(MediaType.APPLICATION_JSON)
-    @NoAuditEvent("No Audit Event needed")
+    @RequiresPermissions(PreflightWebModule.PERMISSION_PREFLIGHT_ONLY)
+    @NoAuditEvent("No Auditing during preflight")
     public void addParameters(@PathParam("nodeID") String nodeID,
                               @NotNull CertParameters params) {
         var cfg = dataNodeProvisioningService.getPreflightConfigFor(nodeID);

@@ -14,8 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-window.IntersectionObserver = jest.fn(() => ({
-  observe: jest.fn(),
-  unobserve: jest.fn(),
-  disconnect: jest.fn(),
-}));
+import type Widget from 'views/logic/widgets/Widget';
+import type { WidgetActionType } from 'views/components/widgets/Types';
+import MessagesWidget from 'views/logic/widgets/MessagesWidget';
+import ExportMessageWidgetActionComponent
+  from 'views/components/widgets/ExportWidgetAction/ExportMessageWidgetActionComponent';
+
+const ExportMessageWidgetAction: WidgetActionType = {
+  type: 'export-messages-widget-action',
+  position: 'menu',
+  isHidden: (w: Widget) => (w.type !== MessagesWidget.type),
+  component: ExportMessageWidgetActionComponent,
+};
+
+export default ExportMessageWidgetAction;

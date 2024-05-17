@@ -14,8 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-window.IntersectionObserver = jest.fn(() => ({
-  observe: jest.fn(),
-  unobserve: jest.fn(),
-  disconnect: jest.fn(),
-}));
+import usePluginEntities from 'hooks/usePluginEntities';
+
+const useWidgetExportActionComponent = () => {
+  const exportAction = usePluginEntities('views.components.widgets.exportAction')?.[0];
+
+  return exportAction && exportAction();
+};
+
+export default useWidgetExportActionComponent;
