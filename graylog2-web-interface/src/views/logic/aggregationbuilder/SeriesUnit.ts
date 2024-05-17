@@ -23,13 +23,13 @@ export type SeriesUnitJson = {
   unit_type: MetricUnitType,
 };
 
-type InternalState = {
+export type SeriesUnitState = {
   unit: string,
   unitType: MetricUnitType,
 };
 
 export default class SeriesUnit {
-  private readonly _value: InternalState;
+  private readonly _value: SeriesUnitState;
 
   constructor(unitType: MetricUnitType, unit: string) {
     this._value = { unitType, unit };

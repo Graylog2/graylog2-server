@@ -134,19 +134,6 @@ const DataTable = ({
   stickyHeader,
   striped,
 }: Props) => {
-  console.log({
-    bordered,
-    borderedHeader,
-    condensed,
-    config,
-    data,
-    editing,
-    fields,
-    setLoadingState,
-    stickyHeader,
-    striped,
-  });
-
   const formContext = useContext(FormikContext);
   const onRenderComplete = useContext(RenderCompletionCallback);
   const widget = useContext(WidgetContext);
