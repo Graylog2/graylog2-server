@@ -78,12 +78,15 @@ const MigrationWelcomeStep = ({ currentStep, onTriggerStep }: MigrationStepCompo
             This is the recommended method if you want to quickly migrate to data node.
           </p>
           <p>
-            If you are running <code>ElasticSearch</code> as your search backend or want to selectively migrate data
-            (e.g. if you use your search backend non-exclusively for Graylog), you should choose the <code>remote reindexing migration</code>.
+            If you want to selectively migrate data (e.g. if you use your search backend non-exclusively for Graylog),
+            you should choose the <code>remote reindexing migration</code>.
             In this scenario, all data will be copied from your existing search backend to data node’s OpenSearch.
             Depending on your setup, this can take some time and imposes additional disk space for the copied data to be available.
             During the remote reindexing, Graylog is ingesting data into data node and can be used,
             but will only serve the data from the old search backend as it becomes available.
+          </p>
+          <p>
+            If you are running <code>ElasticSearch</code> as your search backend <code>remote reindexing migration</code> will automatically be chosen.
           </p>
           <p>
             If you don’t plan to migrate any existing data or only want to migrate a small subset of data
