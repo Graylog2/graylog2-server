@@ -80,6 +80,7 @@ public class GraylogNodeModule extends Graylog2Module {
 
     public List<Object> getConfigurationBeans() {
         List<Object> configurationBeans = Lists.newArrayList(configuration);
+        //todo: if possible, these ifs should be removed and necessary configurations resolved somehow
         if (nodeSettings.withMongoDb()) {
             configurationBeans.add(new MongoDbConfiguration());
         }

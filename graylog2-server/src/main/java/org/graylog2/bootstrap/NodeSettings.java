@@ -26,6 +26,8 @@ public abstract class NodeSettings {
 
     public abstract String name();
 
+    // todo change this to a list of enabled options, this way we could do validation of dependent options here directly
+
     public abstract boolean withPlugins();
 
     public abstract boolean withMongoDb();

@@ -35,6 +35,7 @@ public class Main {
                 .withDescription("Open source, centralized log management")
                 .withDefaultCommand(CliCommandHelp.class)
                 .withCommands(ImmutableSet.of(
+                        // todo: move certutil commands into a provider
                         CertutilCa.class,
                         CertutilCert.class,
                         CertutilHttp.class,
