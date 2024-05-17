@@ -172,12 +172,11 @@ import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 import org.joda.time.Period;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -195,8 +194,6 @@ import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -211,8 +208,6 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 public class FunctionsSnippetsTest extends BaseParserTest {
-    @org.junit.Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     public static final DateTime GRAYLOG_EPOCH = DateTime.parse("2010-07-30T16:03:25Z");
     private static final EventBus eventBus = new EventBus();
@@ -227,7 +222,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     private static Logger loggerMock;
     private static MessageFactory messageFactory = new TestMessageFactory();
 
-    @BeforeClass
+    @BeforeAll
     @SuppressForbidden("Allow using default thread factory")
     public static void registerFunctions() {
         final Map<String, Function<?>> functions = commonFunctions();
@@ -423,7 +418,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void stringConcat() {
+    void stringConcat() {
         final Rule rule = parser.parseRule(ruleForTest(), false);
         final Message message = evaluateRule(rule, messageFactory.createMessage("Dummy Message", "test", Tools.nowUTC()));
 
@@ -432,7 +427,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void jsonpath() {
+    void jsonpath() {
         final String json = "{\n" +
                 "    \"store\": {\n" +
                 "        \"book\": [\n" +
@@ -482,7 +477,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void jsonpathFromMessageField() {
+    void jsonpathFromMessageField() {
         final String json = "{\n" +
                 "    \"store\": {\n" +
                 "        \"book\": [\n" +
@@ -531,7 +526,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void json() {
+    void json() {
         final String flatJson = "{\"str\":\"foobar\",\"int\":42,\"float\":2.5,\"bool\":true,\"array\":[1,2,3]}";
         final String nestedJson = "{\n" +
                 "    \"store\": {\n" +
@@ -568,7 +563,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void flattenJson() {
+    void flattenJson() {
         final String nestedJson = "{\n" +
                 "    \"store\": {\n" +
                 "        \"book\": {\n" +
@@ -603,7 +598,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void substring() {
+    void substring() {
         final Rule rule = parser.parseRule(ruleForTest(), false);
         evaluateRule(rule);
 
@@ -611,7 +606,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void dates() {
+    void dates() {
         final InstantMillisProvider clock = new InstantMillisProvider(GRAYLOG_EPOCH);
         DateTimeUtils.setCurrentMillisProvider(clock);
 
@@ -653,7 +648,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void datesUnixTimestamps() {
+    void datesUnixTimestamps() {
         final Rule rule = parser.parseRule(ruleForTest(), false);
         evaluateRule(rule);
 
@@ -661,7 +656,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void digests() {
+    void digests() {
         final Rule rule = parser.parseRule(ruleForTest(), false);
         evaluateRule(rule);
 
@@ -669,7 +664,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void grok_exists() {
+    void grok_exists() {
         final Rule rule = parser.parseRule(ruleForTest(), false);
         evaluateRule(rule);
 
@@ -677,7 +672,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void grok_exists_not() {
+    void grok_exists_not() {
         final Rule rule = parser.parseRule(ruleForTest(), false);
         evaluateRule(rule);
 
@@ -685,7 +680,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void encodings() {
+    void encodings() {
         final Rule rule = parser.parseRule(ruleForTest(), false);
         evaluateRule(rule);
 
@@ -693,24 +688,24 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void regexMatch() {
+    void regexMatch() {
         final Rule rule = parser.parseRule(ruleForTest(), false);
         final Message message = evaluateRule(rule);
-        assertNotNull(message);
-        assertTrue(message.hasField("matched_regex"));
-        assertTrue(message.hasField("group_1"));
+        Assertions.assertNotNull(message);
+        Assertions.assertTrue(message.hasField("matched_regex"));
+        Assertions.assertTrue(message.hasField("group_1"));
         assertThat((String) message.getField("named_group")).isEqualTo("cd.e");
     }
 
     @Test
-    public void regexReplace() {
+    void regexReplace() {
         final Rule rule = parser.parseRule(ruleForTest(), false);
         evaluateRule(rule);
         assertThat(actionsTriggered.get()).isTrue();
     }
 
     @Test
-    public void strings() {
+    void strings() {
         final Rule rule = parser.parseRule(ruleForTest(), false);
         final Message message = evaluateRule(rule);
 
@@ -723,7 +718,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void stringLength() {
+    void stringLength() {
         final Rule rule = parser.parseRule(ruleForTest(), false);
         final Message message = evaluateRule(rule);
 
@@ -735,7 +730,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void split() {
+    void split() {
         final Rule rule = parser.parseRule(ruleForTest(), false);
         final Message message = evaluateRule(rule);
 
@@ -756,7 +751,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void ipMatching() {
+    void ipMatching() {
         final Rule rule = parser.parseRule(ruleForTest(), false);
         final Message in = messageFactory.createMessage("test", "test", Tools.nowUTC());
         in.addField("ip", "192.168.1.20");
@@ -769,7 +764,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void evalErrorSuppressed() {
+    void evalErrorSuppressed() {
         final Rule rule = parser.parseRule(ruleForTest(), false);
 
         final Message message = messageFactory.createMessage("test", "test", Tools.nowUTC());
@@ -782,7 +777,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void newlyCreatedMessage() {
+    void newlyCreatedMessage() {
         final Message message = messageFactory.createMessage("test", "test", Tools.nowUTC());
         message.addField("foo", "bar");
         message.addStream(mock(Stream.class));
@@ -804,7 +799,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void clonedMessage() {
+    void clonedMessage() {
         final Message message = messageFactory.createMessage("test", "test", Tools.nowUTC());
         message.addField("foo", "bar");
         message.addStream(mock(Stream.class));
@@ -832,7 +827,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void clonedMessageWithInvalidTimestamp() {
+    void clonedMessageWithInvalidTimestamp() {
         final Message message = messageFactory.createMessage("test", "test", Tools.nowUTC());
         message.addField("timestamp", "foobar");
         final Rule rule = parser.parseRule(ruleForTest(), false);
@@ -853,7 +848,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void grok() {
+    void grok() {
         final Rule rule = parser.parseRule(ruleForTest(), false);
         final Message message = evaluateRule(rule);
 
@@ -870,7 +865,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void urls() {
+    void urls() {
         final Rule rule = parser.parseRule(ruleForTest(), false);
         final Message message = evaluateRule(rule);
 
@@ -892,7 +887,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void syslog() {
+    void syslog() {
         final Rule rule = parser.parseRule(ruleForTest(), false);
         final Message message = evaluateRule(rule);
 
@@ -944,7 +939,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void ipMatchingIssue28() {
+    void ipMatchingIssue28() {
         final Rule rule = parser.parseRule(ruleForTest(), false);
         final Message in = messageFactory.createMessage("some message", "somehost.graylog.org", Tools.nowUTC());
         evaluateRule(rule, in);
@@ -953,7 +948,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void fieldRenaming() {
+    void fieldRenaming() {
         final Rule rule = parser.parseRule(ruleForTest(), false);
 
         final Message in = messageFactory.createMessage("some message", "somehost.graylog.org", Tools.nowUTC());
@@ -968,7 +963,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void normalizeFields() {
+    void normalizeFields() {
         final Rule rule = parser.parseRule(ruleForTest(), false);
 
         final Message in = messageFactory.createMessage("some message", "somehost.graylog.org", Tools.nowUTC());
@@ -990,7 +985,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void debug() {
+    void debug() {
         final Rule rule = parser.parseRule(ruleForTest(), false);
         final Message in = messageFactory.createMessage("some message", "somehost.graylog.org", Tools.nowUTC());
         in.addField("somefield", "somevalue");
@@ -1006,7 +1001,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void comparisons() {
+    void comparisons() {
         final Rule rule = parser.parseRule(ruleForTest(), false);
         final EvaluationContext context = contextForRuleEval(rule, messageFactory.createMessage("", "", Tools.nowUTC()));
         assertThat(context.hasEvaluationErrors()).isFalse();
@@ -1015,7 +1010,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void conversions() {
+    void conversions() {
         final Rule rule = parser.parseRule(ruleForTest(), false);
 
         final EvaluationContext context = contextForRuleEval(rule, messageFactory.createMessage("test", "test", Tools.nowUTC()));
@@ -1023,7 +1018,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(context.evaluationErrors()).isEmpty();
         final Message message = context.currentMessage();
 
-        assertNotNull(message);
+        Assertions.assertNotNull(message);
         assertThat(message.getField("string_1")).isEqualTo("1");
         assertThat(message.getField("string_2")).isEqualTo("2");
         // special case, Message doesn't allow adding fields with empty string values
@@ -1080,7 +1075,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void fieldPrefixSuffix() {
+    void fieldPrefixSuffix() {
         final Rule rule = parser.parseRule(ruleForTest(), false);
 
         final Message message = evaluateRule(rule);
@@ -1100,7 +1095,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void keyValue() {
+    void keyValue() {
         final Rule rule = parser.parseRule(ruleForTest(), true);
 
         final EvaluationContext context = contextForRuleEval(rule, messageFactory.createMessage("", "", Tools.nowUTC()));
@@ -1153,7 +1148,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void keyValueFailure() {
+    void keyValueFailure() {
         final Rule rule = parser.parseRule(ruleForTest(), true);
         final EvaluationContext context = contextForRuleEval(rule, messageFactory.createMessage("", "", Tools.nowUTC()));
 
@@ -1161,7 +1156,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void timezones() {
+    void timezones() {
         final InstantMillisProvider clock = new InstantMillisProvider(GRAYLOG_EPOCH);
         DateTimeUtils.setCurrentMillisProvider(clock);
         try {
@@ -1175,7 +1170,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void dateArithmetic() {
+    void dateArithmetic() {
         final InstantMillisProvider clock = new InstantMillisProvider(GRAYLOG_EPOCH);
         DateTimeUtils.setCurrentMillisProvider(clock);
         try {
@@ -1207,7 +1202,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void routeToStream() {
+    void routeToStream() {
         final Rule rule = parser.parseRule(ruleForTest(), true);
         final Message message = evaluateRule(rule);
 
@@ -1221,7 +1216,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void routeToStreamRemoveDefault() {
+    void routeToStreamRemoveDefault() {
         final Rule rule = parser.parseRule(ruleForTest(), true);
         final Message message = evaluateRule(rule);
 
@@ -1235,7 +1230,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void removeFromStream() {
+    void removeFromStream() {
         final Rule rule = parser.parseRule(ruleForTest(), true);
         final Message message = evaluateRule(rule, msg -> msg.addStream(otherStream));
 
@@ -1244,7 +1239,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void removeFromStreamRetainDefault() {
+    void removeFromStreamRetainDefault() {
         final Rule rule = parser.parseRule(ruleForTest(), true);
         final Message message = evaluateRule(rule, msg -> msg.addStream(otherStream));
 
@@ -1253,7 +1248,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void int2ipv4() {
+    void int2ipv4() {
         final Rule rule = parser.parseRule(ruleForTest(), true);
         evaluateRule(rule);
 
@@ -1261,7 +1256,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void accountingSize() {
+    void accountingSize() {
         final Rule rule = parser.parseRule(ruleForTest(), true);
         final Message message = evaluateRule(rule);
 
@@ -1270,7 +1265,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void metricCounter() {
+    void metricCounter() {
         final Rule rule = parser.parseRule(ruleForTest(), true);
         evaluateRule(rule);
 
@@ -1278,7 +1273,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void lookupSetValue() {
+    void lookupSetValue() {
         doReturn(LookupResult.single(123)).when(lookupTable).setValue(any(), any());
 
         final Rule rule = parser.parseRule(ruleForTest(), true);
@@ -1291,7 +1286,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void lookupSetValueWithTtl() {
+    void lookupSetValueWithTtl() {
         doReturn(LookupResult.single(123)).when(lookupTable).setValueWithTtl(any(), any(), any());
 
         final Rule rule = parser.parseRule(ruleForTest(), true);
@@ -1304,7 +1299,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void lookupClearKey() {
+    void lookupClearKey() {
         // Stub method call to avoid having verifyNoMoreInteractions() fail
         doNothing().when(lookupTable).clearKey(any());
 
@@ -1316,7 +1311,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void lookupSetStringList() {
+    void lookupSetStringList() {
         final ImmutableList<String> testList = ImmutableList.of("foo", "bar");
 
         doReturn(LookupResult.withoutTTL().stringListValue(testList).build()).when(lookupTable).setStringList(any(), any());
@@ -1331,7 +1326,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void lookupSetStringListWithTtl() {
+    void lookupSetStringListWithTtl() {
         final ImmutableList<String> testList = ImmutableList.of("foo", "bar");
 
         doReturn(LookupResult.withoutTTL().stringListValue(testList).build()).when(lookupTable).setStringListWithTtl(any(), any(), any());
@@ -1346,7 +1341,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void lookupAddStringList() {
+    void lookupAddStringList() {
         final ImmutableList<String> testList = ImmutableList.of("foo", "bar");
         doReturn(LookupResult.withoutTTL().stringListValue(testList).build()).when(lookupTable).addStringList(any(), any(), anyBoolean());
 
@@ -1360,7 +1355,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void lookupRemoveStringList() {
+    void lookupRemoveStringList() {
         final ImmutableList<String> testList = ImmutableList.of("foo", "bar");
         final ImmutableList<String> result = ImmutableList.of("bonk");
         doReturn(LookupResult.withoutTTL().stringListValue(result).build()).when(lookupTable).removeStringList(any(), any());
@@ -1375,7 +1370,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void lookupHasValue() {
+    void lookupHasValue() {
         doReturn(null).when(lookupTable).lookup(any());
         doReturn(LookupResult.withoutTTL().single("present").build()).when(lookupTable).lookup("present");
         doReturn(LookupResult.withoutTTL().build()).when(lookupTable).lookup("empty");
@@ -1392,7 +1387,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void lookupAssignTtl() {
+    void lookupAssignTtl() {
         doReturn(LookupResult.single(123L)).when(lookupTable).assignTtl(any(), any());
 
         final Rule rule = parser.parseRule(ruleForTest(), true);
@@ -1405,7 +1400,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void lookupAll() throws IOException {
+    void lookupAll() throws IOException {
         doReturn(LookupResult.single("val1")).when(lookupTable).lookup("one");
         doReturn(LookupResult.single("val2")).when(lookupTable).lookup("two");
         doReturn(LookupResult.single("val3")).when(lookupTable).lookup("three");
@@ -1432,7 +1427,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void firstNonNull() {
+    void firstNonNull() {
         final Rule rule = parser.parseRule(ruleForTest(), true);
         final Message message = evaluateRule(rule);
 
@@ -1446,7 +1441,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void stringEntropy() {
+    void stringEntropy() {
         final Rule rule = parser.parseRule(ruleForTest(), false);
         final Message message = evaluateRule(rule);
         assertThat(actionsTriggered.get()).isTrue();
@@ -1456,7 +1451,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void notExpressionTypeCheck() {
+    void notExpressionTypeCheck() {
         try {
             Rule rule = parser.parseRule(ruleForTest(), true);
             Message in = messageFactory.createMessage("test", "source", Tools.nowUTC());
@@ -1470,7 +1465,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void dateConversion() {
+    void dateConversion() {
         final Rule rule = parser.parseRule(ruleForTest(), true);
         Message message = messageFactory.createMessage("test", "source", DateTime.parse("2010-01-01T10:00:00Z"));
         evaluateRule(rule, message);
@@ -1482,7 +1477,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void mapSet() {
+    void mapSet() {
         final Rule rule = parser.parseRule(ruleForTest(), true);
         Message message = messageFactory.createMessage("test", "source", DateTime.parse("2010-01-01T10:00:00Z"));
         evaluateRule(rule, message);
@@ -1492,7 +1487,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void mapGet() {
+    void mapGet() {
         final Rule rule = parser.parseRule(ruleForTest(), true);
         Message message = messageFactory.createMessage("test", "source", DateTime.parse("2010-01-01T10:00:00Z"));
         evaluateRule(rule, message);
@@ -1503,7 +1498,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void mapRemove() {
+    void mapRemove() {
         final Rule rule = parser.parseRule(ruleForTest(), true);
         Message message = messageFactory.createMessage("test", "source", DateTime.parse("2010-01-01T10:00:00Z"));
         evaluateRule(rule, message);
@@ -1512,7 +1507,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void listGet() {
+    void listGet() {
         final Rule rule = parser.parseRule(ruleForTest(), true);
         Message message = messageFactory.createMessage("test", "source", DateTime.parse("2010-01-01T10:00:00Z"));
         evaluateRule(rule, message);
@@ -1522,7 +1517,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void ipAnonymize() {
+    void ipAnonymize() {
         final Rule rule = parser.parseRule(ruleForTest(), true);
         Message message = messageFactory.createMessage("test", "source", DateTime.parse("2010-01-01T10:00:00Z"));
         evaluateRule(rule, message);
@@ -1531,7 +1526,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void listCount() {
+    void listCount() {
         final Rule rule = parser.parseRule(ruleForTest(), true);
         Message message = messageFactory.createMessage("test", "source", DateTime.parse("2010-01-01T10:00:00Z"));
         evaluateRule(rule, message);
@@ -1540,7 +1535,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void csvMap() {
+    void csvMap() {
         final Rule rule = parser.parseRule(ruleForTest(), true);
         Message message = messageFactory.createMessage("test", "source", DateTime.parse("2010-01-01T10:00:00Z"));
         evaluateRule(rule, message);
@@ -1558,7 +1553,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void removeField() {
+    void removeField() {
         final Rule rule = parser.parseRule(ruleForTest(), true);
         final Message message = messageFactory.createMessage("test", "test", Tools.nowUTC());
         evaluateRule(rule, message);
@@ -1571,7 +1566,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void removeSingleField() {
+    void removeSingleField() {
         final Rule rule = parser.parseRule(ruleForTest(), true);
         final Message message = messageFactory.createMessage("test", "test", Tools.nowUTC());
         evaluateRule(rule, message);
@@ -1583,7 +1578,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void removeFieldsByName() {
+    void removeFieldsByName() {
         final Rule rule = parser.parseRule(ruleForTest(), true);
         final Message message = messageFactory.createMessage("test", "test", Tools.nowUTC());
         evaluateRule(rule, message);
@@ -1595,7 +1590,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void removeFieldsByRegex() {
+    void removeFieldsByRegex() {
         final Rule rule = parser.parseRule(ruleForTest(), true);
         final Message message = messageFactory.createMessage("test", "test", Tools.nowUTC());
         evaluateRule(rule, message);
@@ -1607,7 +1602,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void setField() {
+    void setField() {
         final Rule rule = parser.parseRule(ruleForTest(), true);
         final Message message = messageFactory.createMessage("test", "test", Tools.nowUTC());
         evaluateRule(rule, message);
@@ -1620,7 +1615,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void setFields() {
+    void setFields() {
         final Rule rule = parser.parseRule(ruleForTest(), true);
         final Message message = messageFactory.createMessage("test", "test", Tools.nowUTC());
         message.addField("json_field_map", "{ " +
@@ -1645,7 +1640,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void arrayContains() throws IOException {
+    void arrayContains() throws IOException {
         final Rule rule = parser.parseRule(ruleForTest(), false);
         final Message message = messageFactory.createMessage("message", "source", DateTime.now(DateTimeZone.UTC));
         try (InputStream inputStream = getClass().getResourceAsStream("with-arrays.json")) {
@@ -1677,7 +1672,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void stringArrayAdd() throws IOException {
+    void stringArrayAdd() throws IOException {
         final Rule rule = parser.parseRule(ruleForTest(), false);
         final Message message = messageFactory.createMessage("hello test", "source", DateTime.now(DateTimeZone.UTC));
         try (InputStream inputStream = getClass().getResourceAsStream("with-arrays.json")) {
@@ -1703,7 +1698,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
-    public void arrayRemove() {
+    void arrayRemove() {
         final Rule rule = parser.parseRule(ruleForTest(), false);
         final Message message = evaluateRule(rule);
         assertThat(actionsTriggered.get()).isTrue();

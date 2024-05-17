@@ -16,20 +16,15 @@
  */
 import React from 'react';
 
-type Props = {
-  fields: Record<string, string>,
+import type { WidgetMenuActionComponentProps } from 'views/components/widgets/Types';
+import ExportWidgetPlug from 'views/components/widgets/ExportWidgetAction/ExportWidgetPlug';
+import useWidgetExportActionComponent from 'views/components/widgets/useWidgetExportActionComponent';
+
+const ExportWidgetActionDelegate = ({ widget, contexts, disabled }: WidgetMenuActionComponentProps) => {
+  const ExportActionComponent = useWidgetExportActionComponent();
+  if (!ExportActionComponent) return <ExportWidgetPlug />;
+
+  return <ExportActionComponent widget={widget} contexts={contexts} disabled={disabled} />;
 };
 
-const EventFields = ({ fields }: Props) => {
-  const fieldNames = Object.keys(fields);
-
-  return (
-    <ul>
-      {fieldNames.map((fieldName) => (
-        <li key={fieldName}><b>{fieldName}</b> {fields[fieldName]}</li>
-      ))}
-    </ul>
-  );
-};
-
-export default EventFields;
+export default ExportWidgetActionDelegate;
