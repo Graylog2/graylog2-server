@@ -41,7 +41,6 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.indexer.IndexSetValidator;
-import org.graylog2.indexer.indexset.SimpleIndexSetConfig;
 import org.graylog2.indexer.indexset.template.IndexSetDefaultTemplateService;
 import org.graylog2.indexer.indexset.template.IndexSetTemplate;
 import org.graylog2.indexer.indexset.template.IndexSetTemplateConfig;
@@ -194,7 +193,7 @@ public class IndexSetTemplateResource extends RestResource {
         } else {
             violation = indexSetValidator.validateDataTieringConfig(config.dataTiering());
             if (violation != null) {
-                throw new BadRequestException(f("Invalid value for field [%s]: %s", SimpleIndexSetConfig.FIELD_DATA_TIERING, violation.message()));
+                throw new BadRequestException(violation.message());
             }
         }
     }
