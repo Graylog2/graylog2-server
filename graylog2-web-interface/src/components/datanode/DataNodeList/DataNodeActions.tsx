@@ -19,9 +19,11 @@ import { useState } from 'react';
 import styled from 'styled-components';
 
 import { ConfirmDialog } from 'components/common';
-import { BootstrapModalWrapper, Button, ButtonGroup, MenuItem, Modal } from 'components/bootstrap';
+import { Button, MenuItem } from 'components/bootstrap';
 import type { DataNode } from 'preflight/types';
 import MoreActions from 'components/common/EntityDataTable/MoreActions';
+
+import DataNodeLogsDialog from './DataNodeLogsDialog';
 
 import {
   rejoinDataNode,
@@ -30,23 +32,9 @@ import {
   stopDataNode,
   startDataNode,
 } from '../hooks/useDataNodes';
-import useDataNodeLogs from '../hooks/useDataNodeLogs';
 
 const ActionButton = styled(Button)`
   margin-left: 4px;
-`;
-
-const LogsContainer = styled.div`
-  word-break: break-all;
-  overflow-wrap: break-word;
-  white-space: pre-wrap;
-  max-height: 500px;
-
-  & td {
-    min-width: 64px;
-    vertical-align: text-top;
-    padding-bottom: 4px;
-  }
 `;
 
 type Props = {
@@ -78,11 +66,8 @@ const DIALOG_TEXT = {
 
 const DataNodeActions = ({ dataNode, displayAs }: Props) => {
   const [showLogsDialog, setShowLogsDialog] = useState(false);
-  const [logsType, setLogsType] = useState<'stdout'|'stderr'>('stdout');
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [dialogType, setDialogType] = useState(null);
-
-  const logs = useDataNodeLogs(dataNode?.hostname, showLogsDialog);
 
   const updateState = ({ show, type }) => {
     setShowConfirmDialog(show);
@@ -171,29 +156,9 @@ const DataNodeActions = ({ dataNode, displayAs }: Props) => {
         </ConfirmDialog>
       )}
       {showLogsDialog && (
-        <BootstrapModalWrapper showModal={showLogsDialog}
-                               onHide={() => setShowLogsDialog(false)}
-                               bsSize="large"
-                               backdrop>
-          <Modal.Header closeButton>
-            <Modal.Title>{dataNode.hostname} logs</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <ButtonGroup>
-              <Button active={logsType === 'stdout'} onClick={() => setLogsType('stdout')}>STDOUT</Button>
-              <Button active={logsType === 'stderr'} onClick={() => setLogsType('stderr')}>STDERR</Button>
-            </ButtonGroup>
-            <pre>
-              {logs[logsType] ? (
-                <LogsContainer>
-                  <table>
-                    <tbody>{logs[logsType]?.map((log) => (<tr><td>{log}</td></tr>))}</tbody>
-                  </table>
-                </LogsContainer>
-              ) : ('No logs.')}
-            </pre>
-          </Modal.Body>
-        </BootstrapModalWrapper>
+        <DataNodeLogsDialog show={showLogsDialog}
+                            hostname={dataNode?.hostname}
+                            onHide={() => setShowLogsDialog(false)} />
       )}
     </>
   );
