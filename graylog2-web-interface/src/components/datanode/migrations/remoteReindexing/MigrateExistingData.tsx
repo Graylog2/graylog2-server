@@ -38,11 +38,6 @@ const SearchContainer = styled.div`
   margin-top: 12px;
 `;
 
-type MigrateExistingDataResponse = {
-  elasticsearch_hosts: string,
-  allowlist_hosts: string,
-}
-
 export type RemoteReindexCheckConnection = {
   indices: string[],
   error: any,
@@ -113,8 +108,8 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
   const areAllIndicesSelected = filteredSelectedIndices.length === filteredIndices.length;
 
   const initialValues: RemoteReindexRequest = {
-    allowlist: (currentStep.response as MigrateExistingDataResponse)?.allowlist_hosts || '',
-    hostname: (currentStep.response as MigrateExistingDataResponse)?.elasticsearch_hosts || '',
+    allowlist: '',
+    hostname: '',
     user: '',
     password: '',
     synchronous: false,
