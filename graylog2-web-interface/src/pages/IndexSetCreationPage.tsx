@@ -14,11 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 
-import AppConfig from 'util/AppConfig';
-import { Button, Row, Col } from 'components/bootstrap';
+import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { IndexSetConfigurationForm, IndicesPageNavigation } from 'components/indices';
 import DocsHelper from 'util/DocsHelper';
@@ -27,8 +26,6 @@ import connect from 'stores/connect';
 import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import { IndicesConfigurationActions, IndicesConfigurationStore } from 'stores/indices/IndicesConfigurationStore';
-import SelectIndexSetTemplateProvider from 'components/indices/IndexSetTemplates/contexts/SelectedIndexSetTemplateProvider';
-import SelectIndexSetTemplateModal from 'components/indices/IndexSetTemplates/SelectIndexSetTemplateModal';
 import {
   RetentionStrategyPropType,
   RotationStrategyPropType,
@@ -47,19 +44,9 @@ type Props = {
   retentionStrategiesContext?: RetentionStrategyContext | null | undefined,
 }
 
-const SelectTemplateButton = ({ onClick } : {onClick : () => void}) => {
-  const isCloud = AppConfig.isCloud();
-  if (isCloud) return null;
-
-  return (
-    <Button onClick={onClick}>Select Template</Button>);
-};
-
 const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, retentionStrategiesContext }: Props) => {
-  const isCloud = AppConfig.isCloud();
   const history = useHistory();
   const sendTelemetry = useSendTelemetry();
-  const [showSelectTemplateModal, setShowSelectTemplateModal] = useState<boolean>(true);
 
   useEffect(() => {
     IndicesConfigurationActions.loadRotationStrategies();
@@ -87,38 +74,34 @@ const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, retenti
   }
 
   return (
-    <SelectIndexSetTemplateProvider>
-      <DocumentTitle title="Create Index Set">
-        <IndicesPageNavigation />
-        <div>
-          <PageHeader title="Create Index Set"
-                      documentationLink={{
-                        title: 'Index model documentation',
-                        path: DocsHelper.PAGES.INDEX_MODEL,
-                      }}
-                      actions={<SelectTemplateButton onClick={() => setShowSelectTemplateModal(true)} />}>
-            <span>
-              Create a new index set that will let you configure the retention, sharding, and replication of messages
-              coming from one or more streams.
-            </span>
-          </PageHeader>
+    <DocumentTitle title="Create Index Set">
+      <IndicesPageNavigation />
+      <div>
+        <PageHeader title="Create Index Set"
+                    documentationLink={{
+                      title: 'Index model documentation',
+                      path: DocsHelper.PAGES.INDEX_MODEL,
+                    }}>
+          <span>
+            Create a new index set that will let you configure the retention, sharding, and replication of messages
+            coming from one or more streams.
+          </span>
+        </PageHeader>
 
-          <Row className="content">
-            <Col md={12}>
-              <IndexSetConfigurationForm retentionStrategiesContext={retentionStrategiesContext}
-                                         rotationStrategies={rotationStrategies}
-                                         retentionStrategies={retentionStrategies}
-                                         submitButtonText="Create index set"
-                                         submitLoadingText="Creating index set..."
-                                         create
-                                         cancelLink={Routes.SYSTEM.INDICES.LIST}
-                                         onUpdate={_saveConfiguration} />
-            </Col>
-          </Row>
-        </div>
-      </DocumentTitle>
-      {!isCloud && showSelectTemplateModal && (<SelectIndexSetTemplateModal show={showSelectTemplateModal} hideModal={() => setShowSelectTemplateModal(false)} />)}
-    </SelectIndexSetTemplateProvider>
+        <Row className="content">
+          <Col md={12}>
+            <IndexSetConfigurationForm retentionStrategiesContext={retentionStrategiesContext}
+                                       rotationStrategies={rotationStrategies}
+                                       retentionStrategies={retentionStrategies}
+                                       submitButtonText="Create index set"
+                                       submitLoadingText="Creating index set..."
+                                       create
+                                       cancelLink={Routes.SYSTEM.INDICES.LIST}
+                                       onUpdate={_saveConfiguration} />
+          </Col>
+        </Row>
+      </div>
+    </DocumentTitle>
   );
 };
 
