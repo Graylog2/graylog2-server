@@ -17,12 +17,12 @@
 
 import { useMemo } from 'react';
 
-type UnitType = 'file_size' | 'time' | 'percentage'
+import type { MetricUnitType } from 'views/types';
 
-type FieldUnits = Record<string, { unit_type: UnitType, unit: string }>
+type FieldUnits = Record<string, { unit_type: MetricUnitType, unit: string }>
 
 const useFieldUnits = () => useMemo<FieldUnits>(() => ({
-  http_response_code: { unit_type: 'file_size', unit: 'bytes' },
+  http_response_code: { unit_type: 'size', unit: 'bytes' },
 }), []);
 
 export default useFieldUnits;
