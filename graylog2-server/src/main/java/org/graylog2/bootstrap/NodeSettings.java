@@ -24,6 +24,8 @@ import java.util.Set;
 @AutoValue
 public abstract class NodeSettings {
 
+    public abstract String name();
+
     public abstract boolean withPlugins();
 
     public abstract boolean withMongoDb();
@@ -32,26 +34,46 @@ public abstract class NodeSettings {
 
     public abstract boolean withScheduler();
 
+    public abstract boolean withTlsAndJettyNativeConfigured();
+
     public abstract Set<ServerStatus.Capability> capabilities();
 
-    public static NodeSettings minimalNode() {
-        return NodeSettings.builder()
+    public abstract String defaultConfigFile();
+
+    public abstract String defaultFeatureFlagFile();
+
+    public static NodeSettings minimalNode(String name) {
+        return minimalNodeBuilder(name).build();
+    }
+
+    public static Builder minimalNodeBuilder(String name) {
+        Builder builder = NodeSettings.builder()
+                .name(name)
                 .withPlugins(false)
                 .withMongoDb(false)
                 .withEventBus(false)
                 .withScheduler(false)
-                .capabilities(Set.of())
+                .withTlsAndJettyNativeConfigured(false)
+                .capabilities(Set.of());
+        return builder;
+    }
+
+    public static NodeSettings fullNode(String name) {
+        Builder builder = fullNodeBuilder(name);
+        return builder
                 .build();
     }
 
-    public static NodeSettings fullNode() {
-        return NodeSettings.builder()
+    public static Builder fullNodeBuilder(String name) {
+        Builder builder = NodeSettings.builder()
+                .name(name)
                 .withPlugins(true)
                 .withMongoDb(true)
                 .withEventBus(true)
                 .withScheduler(true)
-                .capabilities(Set.of())
-                .build();
+                .withTlsAndJettyNativeConfigured(true)
+                .capabilities(Set.of());
+        return builder;
     }
 
     public static Builder builder() {
@@ -60,9 +82,9 @@ public abstract class NodeSettings {
 
     @AutoValue.Builder
     public abstract static class Builder {
-        public abstract Builder withPlugins(boolean withPlugins);
+        public abstract Builder name(String name);
 
-        public abstract Builder capabilities(Set<ServerStatus.Capability> capabilities);
+        public abstract Builder withPlugins(boolean withPlugins);
 
         public abstract Builder withMongoDb(boolean withMongoDb);
 
@@ -70,6 +92,15 @@ public abstract class NodeSettings {
 
         public abstract Builder withScheduler(boolean withScheduler);
 
+        public abstract Builder withTlsAndJettyNativeConfigured(boolean withTlsAndJettyNativeConfigured);
+
+        public abstract Builder capabilities(Set<ServerStatus.Capability> capabilities);
+
+        public abstract Builder defaultConfigFile(String defaultConfigFile);
+
+        public abstract Builder defaultFeatureFlagFile(String defaultFeatureFlagFile);
+
         public abstract NodeSettings build();
     }
+
 }

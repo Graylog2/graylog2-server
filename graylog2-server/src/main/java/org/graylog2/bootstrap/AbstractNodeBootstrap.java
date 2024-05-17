@@ -92,6 +92,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -119,20 +120,20 @@ public abstract class AbstractNodeBootstrap<NodeConfiguration extends MinimalNod
     protected final NodeConfiguration configuration;
     protected final ChainingClassLoader chainingClassLoader;
 
-    @Option(name = "--dump-config", description = "Show the effective Graylog configuration and exit")
+    @Option(name = "--dump-config", description = "Show the effective configuration and exit")
     protected boolean dumpConfig = false;
 
     @Option(name = "--dump-default-config", description = "Show the default configuration and exit")
     protected boolean dumpDefaultConfig = false;
 
-    @Option(name = {"-d", "--debug"}, description = "Run Graylog in debug mode")
+    @Option(name = {"-d", "--debug"}, description = "Run in debug mode")
     private boolean debug = false;
 
-    @Option(name = {"-f", "--configfile"}, description = "Configuration file for Graylog")
-    private String configFile = "/etc/graylog/server/server.conf";
+    @Option(name = {"-f", "--configfile"}, description = "Configuration file")
+    private String configFile = "";
 
-    @Option(name = {"-ff", "--featureflagfile"}, description = "Configuration file for Graylog feature flags")
-    private String customFeatureFlagFile = "/etc/graylog/server/feature-flag.conf";
+    @Option(name = {"-ff", "--featureflagfile"}, description = "Configuration file for feature flags")
+    private String customFeatureFlagFile = "";
 
     protected String commandName = "command";
 
@@ -142,8 +143,11 @@ public abstract class AbstractNodeBootstrap<NodeConfiguration extends MinimalNod
     protected PluginLoader pluginLoader;
     protected final NodeSettings nodeSettings;
 
+    @Deprecated
     protected AbstractNodeBootstrap(String commandName, NodeConfiguration configuration) {
-        this(commandName, configuration, NodeSettings.fullNode());
+        this(commandName, configuration, NodeSettings.fullNodeBuilder("Graylog")
+                .defaultConfigFile("/etc/graylog/server/server.conf")
+                .defaultFeatureFlagFile("/etc/graylog/server/feature-flag.conf").build());
     }
 
     protected AbstractNodeBootstrap(String commandName, NodeConfiguration configuration, NodeSettings nodeSettings) {
@@ -162,6 +166,12 @@ public abstract class AbstractNodeBootstrap<NodeConfiguration extends MinimalNod
         }
         this.configuration = configuration;
         this.nodeSettings = nodeSettings;
+        if ("".equals(this.configFile)) {
+            this.configFile = nodeSettings.defaultConfigFile();
+        }
+        if ("".equals(this.customFeatureFlagFile)) {
+            this.customFeatureFlagFile = nodeSettings.defaultFeatureFlagFile();
+        }
         this.chainingClassLoader = new ChainingClassLoader(this.getClass().getClassLoader());
     }
 
@@ -290,8 +300,9 @@ public abstract class AbstractNodeBootstrap<NodeConfiguration extends MinimalNod
         installConfigRepositories();
 
         beforeStart();
-        beforeStart(parseAndGetTLSConfiguration(), parseAndGetPathConfiguration(configFile));
-
+        if (nodeSettings.withTlsAndJettyNativeConfigured()) {
+            beforeStart(parseAndGetTLSConfiguration(), parseAndGetPathConfiguration(configFile));
+        }
         processConfiguration(jadConfig);
 
         bootstrapConfigInjector = setupBootstrapConfigInjector();
@@ -475,9 +486,9 @@ public abstract class AbstractNodeBootstrap<NodeConfiguration extends MinimalNod
 
     protected Collection<Repository> getConfigRepositories(String configFile) {
         return Arrays.asList(
-                new EnvironmentRepository(GRAYLOG_ENVIRONMENT_VAR_PREFIX),
-                new SystemPropertiesRepository(GRAYLOG_SYSTEM_PROP_PREFIX),
-                // Legacy prefixes
+                new EnvironmentRepository(getGraylogEnvironmentVarPrefix()),
+                new SystemPropertiesRepository(getGraylogSystemPropPrefix()),
+                // Legacy prefixes TODO: can we remove these?
                 new EnvironmentRepository("GRAYLOG2_"),
                 new SystemPropertiesRepository("graylog2."),
                 new PropertiesRepository(configFile)
@@ -486,7 +497,8 @@ public abstract class AbstractNodeBootstrap<NodeConfiguration extends MinimalNod
 
     private String dumpConfiguration(final Map<String, String> configMap) {
         final StringBuilder sb = new StringBuilder();
-        sb.append("# Configuration of graylog2-").append(commandName).append(" ").append(version).append(System.lineSeparator());
+        sb.append("# Configuration of ").append(nodeSettings.name()).append("-").append(commandName).append(" ")
+                .append(version).append(System.lineSeparator());
         sb.append("# Generated on ").append(Tools.nowUTC()).append(System.lineSeparator());
 
         for (Map.Entry<String, String> entry : configMap.entrySet()) {
@@ -603,6 +615,14 @@ public abstract class AbstractNodeBootstrap<NodeConfiguration extends MinimalNod
                 }
             }
         }
+    }
+
+    private String getGraylogEnvironmentVarPrefix() {
+        return nodeSettings.name().toUpperCase(Locale.ROOT).replace(" ", "_") + "_";
+    }
+
+    private String getGraylogSystemPropPrefix() {
+        return nodeSettings.name().toLowerCase(Locale.ROOT).replace(" ", ".") + ".";
     }
 
     protected Set<ServerStatus.Capability> capabilities() {
