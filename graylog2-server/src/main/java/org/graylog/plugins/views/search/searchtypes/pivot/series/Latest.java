@@ -27,6 +27,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.HasField;
 import org.graylog.plugins.views.search.searchtypes.pivot.MayHaveUnit;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 
+import javax.annotation.Nullable;
 import java.util.Optional;
 
 @AutoValue
@@ -78,7 +79,7 @@ public abstract class Latest implements SeriesSpec, HasField, MayHaveUnit {
         public abstract Builder field(String field);
 
         @JsonProperty
-        public abstract Builder unit(Optional<UnitId> unit);
+        public abstract Builder unit(@Nullable UnitId unit);
 
         abstract Optional<String> id();
         abstract String field();

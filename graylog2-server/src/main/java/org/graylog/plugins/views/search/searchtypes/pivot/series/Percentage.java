@@ -71,7 +71,7 @@ public abstract class Percentage implements SeriesSpec, HasOptionalField, MayHav
 
     public static Builder builder() {
         return new AutoValue_Percentage.Builder()
-                .unit(Optional.of(new UnitId("percent", "%")))
+                .unit(new UnitId("percent", "%"))
                 .type(Percentage.NAME);
     }
 
@@ -93,7 +93,7 @@ public abstract class Percentage implements SeriesSpec, HasOptionalField, MayHav
         public abstract Builder field(@Nullable String field);
 
         @JsonProperty
-        public abstract Builder unit(Optional<UnitId> unit);
+        public abstract Builder unit(@Nullable UnitId unit);
 
         @JsonProperty("field")
         public Builder nonEmptyField(@Nullable String field) {
