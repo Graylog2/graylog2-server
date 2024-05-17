@@ -32,10 +32,11 @@ import org.graylog.datanode.bindings.OpensearchProcessBindings;
 import org.graylog.datanode.bindings.PreflightChecksBindings;
 import org.graylog.datanode.bindings.SchedulerBindings;
 import org.graylog2.bindings.NamedConfigParametersOverrideModule;
+import org.graylog2.bootstrap.AbstractNodeBootstrap;
+import org.graylog2.bootstrap.NodeSettings;
 import org.graylog2.bootstrap.preflight.MongoDBPreflightCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
 import org.graylog2.bootstrap.preflight.PreflightCheckService;
-import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.plugin.Plugin;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.bindings.FreshInstallDetectionModule;
@@ -61,15 +62,16 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
-public abstract class ServerBootstrap extends CmdLineTool {
+public abstract class ServerBootstrap extends AbstractNodeBootstrap<Configuration> {
     private static final Logger LOG = LoggerFactory.getLogger(ServerBootstrap.class);
     private boolean isFreshInstallation;
-    protected Configuration configuration;
 
     protected ServerBootstrap(String commandName, Configuration configuration) {
-        super(commandName);
+        super(commandName, configuration, NodeSettings.minimalNodeBuilder("Graylog Datanode")
+                .defaultConfigFile("/etc/graylog/datanode/datanode.conf")
+                .defaultFeatureFlagFile("/etc/graylog/datanode/feature-flag.conf")
+                .build());
         this.commandName = commandName;
-        this.configuration = configuration;
     }
 
     @Option(name = {"-p", "--pidfile"}, description = "File containing the PID of Graylog DataNode")
@@ -94,22 +96,6 @@ public abstract class ServerBootstrap extends CmdLineTool {
 
     private void registerFreshInstallation() {
         this.isFreshInstallation = true;
-    }
-
-    @Override
-    protected void beforeStart(TLSProtocolsConfiguration tlsProtocolsConfiguration, Configuration configuration) {
-        super.beforeStart(tlsProtocolsConfiguration, configuration);
-
-        // Do not use a PID file if the user requested not to
-        if (!isNoPidFile()) {
-            savePidFile(getPidFile());
-        }
-        // This needs to run before the first SSLContext is instantiated,
-        // because it sets up the default SSLAlgorithmConstraints
-        applySecuritySettings(tlsProtocolsConfiguration);
-
-        // Set these early in the startup because netty's NativeLibraryUtil uses a static initializer
-        setNettyNativeDefaults(configuration);
     }
 
     @Override
@@ -266,7 +252,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
     protected List<Module> getSharedBindingsModules() {
         final List<Module> result = super.getSharedBindingsModules();
         result.add(new FreshInstallDetectionModule(isFreshInstallation()));
-        result.add(new GenericBindings(isMigrationCommand()));
+        result.add(new GenericBindings(false));
         result.add(new SchedulerBindings());
         result.add(new GenericInitializerBindings());
         result.add(new OpensearchProcessBindings());
