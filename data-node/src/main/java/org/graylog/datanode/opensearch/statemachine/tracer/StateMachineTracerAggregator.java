@@ -18,6 +18,7 @@ package org.graylog.datanode.opensearch.statemachine.tracer;
 
 import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
 import org.graylog.datanode.opensearch.statemachine.OpensearchState;
+import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachine;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -43,4 +44,5 @@ public class StateMachineTracerAggregator implements StateMachineTracer {
     public void transition(OpensearchEvent processEvent, OpensearchState s1, OpensearchState s2) {
         delegates.forEach(d -> d.transition(processEvent, s1, s2));
     }
+
 }

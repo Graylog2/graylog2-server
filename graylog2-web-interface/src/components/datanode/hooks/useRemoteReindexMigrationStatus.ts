@@ -21,6 +21,12 @@ import { MIGRATION_STATE } from '../Constants';
 
 export type MigrationStatus = 'NOT_STARTED'|'STARTING'|'RUNNING'|'ERROR'|'FINISHED';
 
+export type RemoteReindexLog = {
+  timestamp: string,
+  log_level: string,
+  message: string,
+}
+
 export type RemoteReindexIndex = {
   took: string,
   batches: number,
@@ -36,6 +42,8 @@ export type RemoteReindexMigration = {
   error: string,
   status: MigrationStatus,
   progress: number,
+  logs: RemoteReindexLog[]
+  tasks_progress: { [task: string]: number }
 }
 
 export type RemoteReindexRequest = {

@@ -31,6 +31,7 @@ import TimeRangePresetForm from './TimeRangePresetForm';
 jest.mock('hooks/useSearchConfiguration', () => jest.fn());
 jest.mock('lodash/debounce', () => jest.fn());
 jest.mock('logic/generateId', () => jest.fn(() => 'tr-id-3'));
+jest.mock('hooks/useHotkey', () => jest.fn());
 
 const mockOnUpdate = jest.fn();
 

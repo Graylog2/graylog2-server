@@ -35,8 +35,8 @@ import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.lookup.LookupResult;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
@@ -46,7 +46,7 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class V20230720161500_AddExtractorFragmentsTest extends BaseFragmentTest {
+class V20230720161500_AddExtractorFragmentsTest extends BaseFragmentTest {
 
 
     private static LookupTableService lookupTableService;
@@ -54,7 +54,7 @@ public class V20230720161500_AddExtractorFragmentsTest extends BaseFragmentTest 
     private static LookupTable lookupTable;
     private final MessageFactory messageFactory = new TestMessageFactory();
 
-    @BeforeClass
+    @BeforeAll
     public static void initialize() {
         final Map<String, Function<?>> functions = commonFunctions();
         functions.put(GetField.NAME, new GetField());
@@ -80,7 +80,7 @@ public class V20230720161500_AddExtractorFragmentsTest extends BaseFragmentTest 
 
 
     @Test
-    public void testCopyField() {
+    void testCopyField() {
         RuleFragment fragment = V20230720161500_AddExtractorFragments.createCopyFieldExtractor();
         Map<String, Object> params = Map.of("field", "message", "newField", "copyfield");
         Rule rule = super.createFragmentSource(fragment, params);
@@ -89,7 +89,7 @@ public class V20230720161500_AddExtractorFragmentsTest extends BaseFragmentTest 
     }
 
     @Test
-    public void testRegex() {
+    void testRegex() {
         RuleFragment fragment = V20230720161500_AddExtractorFragments.createRegexExtractor();
         Map<String, Object> params = Map.of("field", "message", "pattern", "^.*(doo...).*$", "newField", "copyfield");
         Rule rule = super.createFragmentSource(fragment, params);
@@ -98,7 +98,7 @@ public class V20230720161500_AddExtractorFragmentsTest extends BaseFragmentTest 
     }
 
     @Test
-    public void testRegexReplacement() {
+    void testRegexReplacement() {
         RuleFragment fragment = V20230720161500_AddExtractorFragments.createRegexReplacementExtractor();
         Map<String, Object> params = Map.of(
                 "field", "message",
@@ -123,7 +123,7 @@ public class V20230720161500_AddExtractorFragmentsTest extends BaseFragmentTest 
     }
 
     @Test
-    public void testSplitIndex() {
+    void testSplitIndex() {
         RuleFragment fragment = V20230720161500_AddExtractorFragments.createSplitIndexExtractor();
         Map<String, Object> params = Map.of(
                 "field", "message",
@@ -137,7 +137,7 @@ public class V20230720161500_AddExtractorFragmentsTest extends BaseFragmentTest 
     }
 
     @Test
-    public void testLookup() {
+    void testLookup() {
         RuleFragment fragment = V20230720161500_AddExtractorFragments.createLookupExtractor();
         Map<String, Object> params = Map.of(
                 "field", "message",

@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix data stream replicas and creation on single/multi-node data node setups."
+
+issues = ["18830", "19010"]
+pulls = ["19241"]

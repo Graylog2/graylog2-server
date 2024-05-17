@@ -37,11 +37,12 @@ public record SearchJobDTO(
 
 
     public static SearchJobDTO fromSearchJob(final SearchJob searchJob) {
+        final ExecutionInfo executionInfo = searchJob.execution();
         return new SearchJobDTO(
                 searchJob.getSearchJobIdentifier(),
                 searchJob.getErrors(),
                 searchJob.results(),
-                searchJob.execution());
+                executionInfo);
     }
 
 }

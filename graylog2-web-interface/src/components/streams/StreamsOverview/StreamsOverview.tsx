@@ -42,7 +42,8 @@ import useUrlQueryFilters from 'components/common/EntityFilters/hooks/useUrlQuer
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 
 import CustomColumnRenderers from './ColumnRenderers';
-import useTableEventHandlers from './hooks/useTableEventHandlers';
+
+import useTableEventHandlers from '../../common/EntityDataTable/hooks/useTableEventHandlers';
 
 const useRefetchStreamsOnStoreChange = (refetchStreams: () => void) => {
   useEffect(() => {
@@ -80,15 +81,16 @@ const StreamsOverview = ({ indexSets }: Props) => {
   }, { enabled: !isLoadingLayoutPreferences });
   const { entityActions, expandedSections, bulkActions } = useTableElements({ indexSets });
   const {
+    onColumnsChange,
     onPageSizeChange,
     onSearch,
     onSearchReset,
-    onColumnsChange,
     onSortChange,
   } = useTableEventHandlers({
+    appSection: 'streams-list',
     paginationQueryParameter,
-    updateTableLayout,
     setQuery,
+    updateTableLayout,
   });
 
   const onChangeFilters = useCallback((newUrlQueryFilters: UrlQueryFilters) => {

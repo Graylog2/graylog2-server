@@ -1,0 +1,11 @@
+type = "f"
+message = "Fixing several smaller bugs with keyword time range tab."
+
+issues = ["18809"]
+pulls = ["18879"]
+
+details.user = """
+Before this change the time range picker submit button could be disabled after switching between the keyword tab and other tabs without any further changes.
+Just opening the keyword tab and saving the keyword time range resulted in an error.
+When opening the keyword tab, with the default time range, the time range preview was not shown.
+"""

@@ -31,6 +31,7 @@ import EditWidgetFrame from './EditWidgetFrame';
 import WidgetContext from '../contexts/WidgetContext';
 
 jest.mock('views/logic/fieldtypes/useFieldTypes');
+jest.mock('hooks/useHotkey', () => jest.fn());
 
 jest.mock('views/stores/StreamsStore', () => ({
   StreamsStore: MockStore(['getInitialState', () => ({

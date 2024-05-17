@@ -40,7 +40,7 @@ const mockFieldTypeUsages = {
   },
   total: 1,
   sort: 'index_set_title',
-  order: 'desc',
+  order: 'desc' as 'asc' | 'desc',
   elements: [
     {
       index_set_id: '0001',

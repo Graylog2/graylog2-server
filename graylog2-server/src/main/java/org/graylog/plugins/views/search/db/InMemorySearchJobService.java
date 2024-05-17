@@ -50,9 +50,10 @@ public class InMemorySearchJobService implements SearchJobService {
 
     @Override
     public SearchJob create(final Search search,
-                            final String owner) {
+                            final String owner,
+                            final Integer cancelAfterSeconds) {
         final String id = new ObjectId().toHexString();
-        final SearchJob searchJob = new SearchJob(id, search, owner, nodeId.getNodeId());
+        final SearchJob searchJob = new SearchJob(id, search, owner, nodeId.getNodeId(), cancelAfterSeconds);
         cache.put(id, searchJob);
         return searchJob;
     }

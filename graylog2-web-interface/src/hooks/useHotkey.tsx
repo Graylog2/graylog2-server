@@ -21,7 +21,6 @@ import { useEffect, useMemo, useCallback } from 'react';
 
 import type { ScopeName, HotkeyCollections, Options, HotkeysEvent } from 'contexts/HotkeysContext';
 import useHotkeysContext from 'hooks/useHotkeysContext';
-import useFeature from 'hooks/useFeature';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { getPathnameWithoutId } from 'util/URLUtils';
@@ -70,34 +69,23 @@ const useHotkey = <T extends HTMLElement>({
   dependencies,
   telemetryAppPathname,
 }: HotkeysProps) => {
-  const hasHotkeysFeatureFlag = useFeature('frontend_hotkeys');
-
-  if (!hasHotkeysFeatureFlag) {
-    return null;
-  }
-
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const location = useLocation();
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const sendTelemetry = useSendTelemetry();
 
   const {
     hotKeysCollections,
     addActiveHotkey,
     removeActiveHotkey,
-    // eslint-disable-next-line react-hooks/rules-of-hooks
   } = useHotkeysContext();
 
   catchErrors(hotKeysCollections, actionKey, scope);
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const mergedOptions = useMemo(() => ({
     ...defaultOptions,
     ...options,
     scopes: scope,
   }), [options, scope]);
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const callbackWithTelemetry = useCallback((event: KeyboardEvent, handler: HotkeysEvent) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SHORTCUT_TYPED, {
       app_pathname: telemetryAppPathname ?? getPathnameWithoutId(location.pathname),
@@ -107,7 +95,6 @@ const useHotkey = <T extends HTMLElement>({
     callback(event, handler);
   }, [actionKey, callback, hotKeysCollections, location.pathname, scope, sendTelemetry, telemetryAppPathname]);
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     addActiveHotkey({
       scope,

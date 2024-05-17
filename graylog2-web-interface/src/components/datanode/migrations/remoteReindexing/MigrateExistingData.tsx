@@ -20,8 +20,8 @@ import { Formik, Form } from 'formik';
 import type { FormikErrors } from 'formik';
 import styled from 'styled-components';
 
-import { Alert, Input } from 'components/bootstrap';
-import { Spinner } from 'components/common';
+import { Alert, Input, Row, Col } from 'components/bootstrap';
+import { SearchForm, Spinner } from 'components/common';
 
 import type { RemoteReindexRequest } from '../../hooks/useRemoteReindexMigrationStatus';
 import type { MigrationActions, MigrationState, MigrationStepComponentProps, StepArgs } from '../../Types';
@@ -32,7 +32,10 @@ const IndicesContainer = styled.div`
   overflow-y: scroll;
   overflow: -moz-scrollbars-vertical;
   -ms-overflow-y: scroll;
-  margin-top: 5px;
+`;
+
+const SearchContainer = styled.div`
+  margin-top: 12px;
 `;
 
 export type RemoteReindexCheckConnection = {
@@ -46,6 +49,7 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [availableIndices, setAvailableIndices] = useState<string[]>([]);
   const [selectedIndices, setSelectedIndices] = useState<string[]>([]);
+  const [queryIndex, setQueryIndex] = useState<string>('');
 
   const handleConnectionCheck = (step: MigrationActions, data: MigrationState) => {
     if (step === 'CHECK_REMOTE_INDEXER_CONNECTION') {
@@ -99,6 +103,10 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
     }
   };
 
+  const filteredIndices = queryIndex ? availableIndices.filter((index) => index.includes(queryIndex)) : availableIndices;
+  const filteredSelectedIndices = selectedIndices.filter((index) => filteredIndices.includes(index));
+  const areAllIndicesSelected = filteredSelectedIndices.length === filteredIndices.length;
+
   const initialValues: RemoteReindexRequest = {
     allowlist: '',
     hostname: '',
@@ -117,48 +125,76 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
         setFieldValue,
       }) => (
         <Form role="form">
-          <Input id="allowlist"
-                 name="allowlist"
-                 label="Allowlist of all machines in the old cluster"
-                 type="text"
-                 disabled={isLoading}
-                 value={values.allowlist}
-                 onChange={(e) => handleChange(e, setFieldValue)}
-                 required />
           <Input id="hostname"
                  name="hostname"
-                 label="URI of the host to call the remote reindexing command against"
+                 label="Hostname"
+                 help="URI of the host to call the remote reindexing command against"
+                 placeholder="http://example:9200/"
                  type="text"
                  disabled={isLoading}
                  value={values.hostname}
                  onChange={(e) => handleChange(e, setFieldValue)}
                  required />
-          <Input id="user"
-                 name="user"
-                 label="Username"
+          <Row>
+            <Col md={6}>
+              <Input id="user"
+                     name="user"
+                     label="Username"
+                     type="text"
+                     disabled={isLoading}
+                     value={values.user}
+                     onChange={(e) => handleChange(e, setFieldValue)} />
+            </Col>
+            <Col md={6}>
+              <Input id="password"
+                     name="password"
+                     label="Password"
+                     type="password"
+                     disabled={isLoading}
+                     value={values.password}
+                     onChange={(e) => handleChange(e, setFieldValue)} />
+            </Col>
+          </Row>
+          <Input id="allowlist"
+                 name="allowlist"
+                 label="Allowlist"
+                 help="Allowlist of all machines in the old cluster"
+                 placeholder="example:9200,example:9201,example:9202 or REGEX (Regular expression)"
                  type="text"
                  disabled={isLoading}
-                 value={values.user}
-                 onChange={(e) => handleChange(e, setFieldValue)} />
-          <Input id="password"
-                 name="password"
-                 label="Password"
-                 type="password"
-                 disabled={isLoading}
-                 value={values.password}
-                 onChange={(e) => handleChange(e, setFieldValue)} />
+                 value={values.allowlist}
+                 onChange={(e) => handleChange(e, setFieldValue)}
+                 required />
           {(availableIndices.length > 0) && (
             <Alert title="Valid connection" bsStyle="success">
-              These are the available <b>{availableIndices.length}</b> indices for the remote reindex migration:
+              Below are the available indices for the remote reindex migration, <b>{filteredSelectedIndices.length}/{availableIndices.length}</b> are selected.
+              <SearchContainer>
+                <SearchForm onSearch={setQueryIndex}
+                            query={queryIndex} />
+              </SearchContainer>
+              {(filteredIndices.length === 0) ? 'No indices have been found' : (
+                <Input type="checkbox"
+                       formGroupClassName=""
+                       label={<b>{areAllIndicesSelected ? 'Unselect all' : 'Select all'}</b>}
+                       disabled={isLoading}
+                       checked={areAllIndicesSelected}
+                       onChange={() => {
+                         if (areAllIndicesSelected) {
+                           setSelectedIndices([]);
+                         } else {
+                           setSelectedIndices(filteredIndices);
+                         }
+                       }} />
+              )}
               <IndicesContainer>
-                {availableIndices.map((index) => (
+                {filteredIndices.map((index) => (
                   <Input type="checkbox"
                          key={index}
                          name={index}
                          id={index}
                          label={index}
                          disabled={isLoading}
-                         checked={selectedIndices.includes(index)}
+                         checked={filteredSelectedIndices.includes(index)}
                          onChange={() => handleSelectIndices(index)} />
                 ))}
               </IndicesContainer>
@@ -172,7 +208,7 @@ const MigrateExistingData = ({ currentStep, onTriggerStep }: MigrationStepCompon
           ) : (
             <MigrationStepTriggerButtonToolbar nextSteps={nextSteps || currentStep.next_steps}
                                                onTriggerStep={handleTriggerNextStep}
-                                               args={{ ...values, indices: selectedIndices } as RemoteReindexRequest} />
+                                               args={{ ...values, indices: filteredSelectedIndices } as RemoteReindexRequest} />
           )}
         </Form>
       )}

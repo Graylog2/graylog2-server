@@ -49,9 +49,10 @@ import useLocation from 'routing/useLocation';
 import useParameters from 'views/hooks/useParameters';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import ExtractWidgetIntoNewView from 'views/logic/views/ExtractWidgetIntoNewView';
+import ExtraMenuWidgetActions from 'views/components/widgets/ExtraMenuWidgetActions';
 
 import ReplaySearchButton from './ReplaySearchButton';
-import ExtraWidgetActions from './ExtraWidgetActions';
+import ExtraDropdownWidgetActions from './ExtraDropdownWidgetActions';
 import CopyToDashboard from './CopyToDashboardForm';
 import MoveWidgetToTabModal from './MoveWidgetToTabModal';
 import WidgetActionDropdown from './WidgetActionDropdown';
@@ -232,6 +233,7 @@ const WidgetActionsMenu = ({
                               parameterBindings={parameterBindings}
                               parameters={parameters} />
         </IfDashboard>
+        <ExtraMenuWidgetActions widget={widget} />
         {isFocused && (
           <IconButton name="fullscreen_exit"
                       title="Un-focus widget"
@@ -263,13 +265,12 @@ const WidgetActionsMenu = ({
               Copy to Dashboard
             </MenuItem>
           </IfSearch>
-          {widget.isExportable && <MenuItem onSelect={() => setShowExport(true)}>Export</MenuItem>}
           <IfDashboard>
             <MenuItem onSelect={() => setShowMoveWidgetToTab(true)}>
               Move to Page
             </MenuItem>
           </IfDashboard>
-          <ExtraWidgetActions widget={widget} />
+          <ExtraDropdownWidgetActions widget={widget} />
           <MenuItem divider />
           <MenuItem onSelect={onDelete}>
             Delete

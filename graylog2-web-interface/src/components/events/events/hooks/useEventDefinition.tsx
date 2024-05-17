@@ -26,7 +26,7 @@ export const fetchEventDefinitionDetails = async (eventDefinitionId: string): Pr
 );
 
 const useEventDefinition = (eventDefId: string, enabled = true) => {
-  const { data, isFetching } = useQuery({
+  const { data, isFetching, isInitialLoading } = useQuery({
     queryKey: ['get-event-definition-details', eventDefId],
     queryFn: () => fetchEventDefinitionDetails(eventDefId),
     onError: (errorThrown) => {
@@ -37,7 +37,7 @@ const useEventDefinition = (eventDefId: string, enabled = true) => {
     enabled: !!eventDefId && enabled,
   });
 
-  return { data, isFetching };
+  return { data, isFetching, isInitialLoading };
 };
 
 export default useEventDefinition;

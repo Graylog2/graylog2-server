@@ -53,7 +53,6 @@ public class GraylogApis implements GraylogRestApi {
     private final SystemApi system;
     private final EventNotifications eventNotifications;
     private final EventDefinitions eventDefinitions;
-    private final DatanodeProxy datanodeProxy;
 
     public GraylogApis(GraylogBackend backend) {
         this.backend = backend;
@@ -68,7 +67,6 @@ public class GraylogApis implements GraylogRestApi {
         this.system = new SystemApi(this);
         this.eventNotifications = new EventNotifications(this);
         this.eventDefinitions = new EventDefinitions(this);
-        this.datanodeProxy = new DatanodeProxy(this);
     }
 
     public RequestSpecification requestSpecification() {
@@ -132,10 +130,6 @@ public class GraylogApis implements GraylogRestApi {
 
     public EventDefinitions eventDefinitions() {
         return eventDefinitions;
-    }
-
-    public DatanodeProxy datanodeProxy() {
-        return datanodeProxy;
     }
 
     protected RequestSpecification prefix(final Users.User user) {

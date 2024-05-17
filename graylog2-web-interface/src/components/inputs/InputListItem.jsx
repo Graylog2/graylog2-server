@@ -137,7 +137,7 @@ const InputListItem = createReactClass({
         if (this.props.input.global) {
           extractorRoute = Routes.global_input_extractors(this.props.input.id);
         } else {
-          extractorRoute = Routes.local_input_extractors(this.props.currentNode.node_id, this.props.input.id);
+          extractorRoute = Routes.local_input_extractors(this.props.currentNode?.node?.node_id, this.props.input.id);
         }
 
         actions.push(

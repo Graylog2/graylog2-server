@@ -28,7 +28,7 @@ import {
   PaginatedList, SearchForm,
   Spinner,
 } from 'components/common';
-import EntityDataTable from 'components/common/EntityDataTable';
+import EntityDataTable, { useTableEventHandlers } from 'components/common/EntityDataTable';
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
 import type { Sort } from 'stores/PaginationTypes';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
@@ -102,19 +102,19 @@ const IndexSetFieldTypesList = () => {
   }), [paginationQueryParameter.page, layoutConfig.pageSize, layoutConfig.sort, query, urlQueryFilters]);
   const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(ENTITY_TABLE_ID);
 
-  const onPageSizeChange = useCallback((newPageSize: number) => {
-    paginationQueryParameter.resetPage();
-    updateTableLayout({ perPage: newPageSize });
-  }, [paginationQueryParameter, updateTableLayout]);
+  const {
+    onColumnsChange,
+    onPageSizeChange,
+    onSearch,
+    onSearchReset,
+    onSortChange,
+  } = useTableEventHandlers({
+    appSection: 'index-set-field-types-list',
+    paginationQueryParameter,
+    setQuery,
+    updateTableLayout,
+  });
 
-  const onSortChange = useCallback((newSort: Sort) => {
-    paginationQueryParameter.resetPage();
-    updateTableLayout({ sort: newSort });
-  }, [paginationQueryParameter, updateTableLayout]);
-
-  const onColumnsChange = useCallback((displayedAttributes: Array<string>) => {
-    updateTableLayout({ displayedAttributes });
-  }, [updateTableLayout]);
   const {
     isLoading,
     data: { list, pagination, attributes },
@@ -143,11 +143,6 @@ const IndexSetFieldTypesList = () => {
                       onSubmitCallback={onSubmitCallback} />
   ), [indexSetId, onSubmitCallback]);
 
-  const onSearch = useCallback((val: string) => {
-    paginationQueryParameter.resetPage();
-    setQuery(val);
-  }, [paginationQueryParameter, setQuery]);
-  const onSearchReset = useCallback(() => setQuery(''), [setQuery]);
   const onChangeFilters = useCallback((newUrlQueryFilters: UrlQueryFilters) => {
     paginationQueryParameter.resetPage();
     setUrlQueryFilters(newUrlQueryFilters);

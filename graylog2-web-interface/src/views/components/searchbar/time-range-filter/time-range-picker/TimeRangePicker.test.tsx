@@ -28,6 +28,7 @@ import { adminUser } from 'fixtures/users';
 import OriginalTimeRangePicker from './TimeRangePicker';
 
 jest.mock('hooks/useCurrentUser');
+jest.mock('hooks/useHotkey', () => jest.fn());
 jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);
 
 jest.mock('stores/tools/ToolsStore', () => ({
@@ -76,6 +77,9 @@ describe('TimeRangePicker', () => {
     render(<TimeRangePicker {...defaultProps} />);
 
     const applyButton = screen.getByRole('button', { name: /update time range/i });
+
+    await waitFor(() => expect(applyButton).not.toBeDisabled());
+
     fireEvent.click(applyButton);
 
     await waitFor(() => expect(defaultProps.setCurrentTimeRange).toHaveBeenCalled());

@@ -173,9 +173,9 @@ public class SearchDbService {
         return Streams.stream((Iterable<SearchSummary>) summarydb.find());
     }
 
-    public Set<String> getExpiredSearches(final Set<String> neverDeleteIds, final Instant mustNotBeOlderThan) {
+    public Set<String> getExpiredSearches(final Set<String> neverDeleteIds, final Instant mustBeOlderThan) {
         return this.findSummaries()
-                .filter(search -> !neverDeleteIds.contains(search.id()) && search.createdAt().isBefore(mustNotBeOlderThan))
+                .filter(search -> !neverDeleteIds.contains(search.id()) && search.createdAt().isBefore(mustBeOlderThan))
                 .map(search -> search.id())
                 .collect(Collectors.toSet());
     }

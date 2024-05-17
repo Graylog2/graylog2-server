@@ -49,7 +49,7 @@ type Props = {
 const _isFunction = (children: Props['children']): children is (props: FormikProps<DashboardFormValues>) => React.ReactElement => isFunction(children);
 
 const DashboardSearchForm = ({ initialValues, limitDuration, onSubmit, validateQueryString, children }: Props) => {
-  const { formatTime } = useUserDateTime();
+  const { formatTime, userTimezone } = useUserDateTime();
   const { setFieldWarning } = useContext(FormWarningsContext);
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
 
@@ -63,8 +63,16 @@ const DashboardSearchForm = ({ initialValues, limitDuration, onSubmit, validateQ
   const { enableReinitialize, onSubmit: _onSubmit } = useSearchBarSubmit(_initialValues, onSubmit);
 
   const handlerContext = useHandlerContext();
-  const _validate = useCallback((values: DashboardFormValues) => validate(values, limitDuration, setFieldWarning, validateQueryString, pluggableSearchBarControls, formatTime, handlerContext),
-    [limitDuration, setFieldWarning, validateQueryString, pluggableSearchBarControls, formatTime, handlerContext]);
+  const _validate = useCallback((values: DashboardFormValues) => validate(
+    values,
+    limitDuration,
+    setFieldWarning,
+    validateQueryString,
+    pluggableSearchBarControls,
+    formatTime,
+    handlerContext,
+    userTimezone,
+  ), [limitDuration, setFieldWarning, validateQueryString, pluggableSearchBarControls, formatTime, handlerContext, userTimezone]);
 
   return (
     <Formik<DashboardFormValues> initialValues={_initialValues}

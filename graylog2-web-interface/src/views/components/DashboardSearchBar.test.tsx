@@ -28,6 +28,7 @@ import { execute, setGlobalOverride } from 'views/logic/slices/searchExecutionSl
 
 import OriginalDashboardSearchBar from './DashboardSearchBar';
 
+jest.mock('hooks/useHotkey', () => jest.fn());
 jest.mock('views/components/searchbar/queryinput/QueryInput');
 jest.mock('views/components/DashboardActionsMenu', () => () => <span>View Actions</span>);
 

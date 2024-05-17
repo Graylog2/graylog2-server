@@ -21,6 +21,8 @@ import { ScratchpadContext } from 'contexts/ScratchpadProvider';
 
 import Scratchpad from './Scratchpad';
 
+jest.mock('hooks/useHotkey', () => jest.fn());
+
 const setScratchpadVisibility = jest.fn();
 document.execCommand = jest.fn();
 

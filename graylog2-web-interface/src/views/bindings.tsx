@@ -101,7 +101,6 @@ import CreateEventDefinition from 'views/logic/valueactions/createEventDefinitio
 import ChangeFieldType, {
   ChangeFieldTypeHelp,
   isChangeFieldTypeEnabled,
-  isChangeFieldTypeHidden,
 } from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldType';
 import AddEventsWidgetActionHandler, { CreateEventsWidget } from 'views/logic/widgets/events/AddEventsWidgetActionHandler';
 import EventsListConfigGenerator from 'views/logic/searchtypes/events/EventsListConfigGenerator';
@@ -109,6 +108,8 @@ import EventsWidgetEdit from 'views/components/widgets/events/EventsWidgetEdit';
 import EventsWidget from 'views/logic/widgets/events/EventsWidget';
 import eventsAttributes from 'views/components/widgets/events/eventsAttributes';
 import WarmTierQueryValidation from 'views/components/searchbar/queryvalidation/WarmTierQueryValidation';
+import ExportMessageWidgetAction from 'views/components/widgets/ExportWidgetAction/ExportMessageWidgetAction';
+import ExportWidgetAction from 'views/components/widgets/ExportWidgetAction/ExportWidgetAction';
 
 import type { ActionHandlerArguments } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
@@ -322,7 +323,6 @@ const exports: PluginExports = {
       type: 'change-field-type',
       title: 'Change field type',
       isEnabled: isChangeFieldTypeEnabled,
-      isHidden: isChangeFieldTypeHidden,
       resetFocus: false,
       component: ChangeFieldType,
       help: ChangeFieldTypeHelp,
@@ -459,6 +459,7 @@ const exports: PluginExports = {
   'views.components.widgets.events.attributes': eventsAttributes,
   'views.reducers': viewsReducers,
   'views.elements.validationErrorExplanation': [WarmTierQueryValidation],
+  'views.widgets.actions': [ExportMessageWidgetAction, ExportWidgetAction],
 };
 
 export default exports;

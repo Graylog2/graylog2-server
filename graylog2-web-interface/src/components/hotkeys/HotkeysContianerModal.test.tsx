@@ -21,8 +21,6 @@ import userEvent from '@testing-library/user-event';
 import HotkeysModalContainer from 'components/hotkeys/HotkeysModalContainer';
 import HotkeysProvider from 'contexts/HotkeysProvider';
 
-jest.mock('hooks/useFeature', () => (featureFlag: string) => featureFlag === 'frontend_hotkeys');
-
 describe('HotkeysModalContainer', () => {
   it('should render hotkeys modal after pressing keyboard shortcut', async () => {
     render(

@@ -64,8 +64,12 @@ public interface JobSchedule {
      *
      * @param fieldPrefix the field prefix to use for the map key
      * @return filled optional with a map, empty optional if there is no update data
+     * @deprecated This method won't be called by the persistence layer anymore.
      */
-    Optional<Map<String, Object>> toDBUpdate(String fieldPrefix);
+    @Deprecated
+    default Optional<Map<String, Object>> toDBUpdate(String fieldPrefix) {
+        return Optional.empty();
+    }
 
     interface Builder<SELF> {
         @JsonProperty(TYPE_FIELD)
@@ -80,11 +84,6 @@ public interface JobSchedule {
 
         @Override
         public Optional<DateTime> calculateNextTime(DateTime lastExecutionTime, DateTime lastNextTime, JobSchedulerClock clock) {
-            return Optional.empty();
-        }
-
-        @Override
-        public Optional<Map<String, Object>> toDBUpdate(String fieldPrefix) {
             return Optional.empty();
         }
     }

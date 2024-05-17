@@ -36,8 +36,8 @@ const StyledNavbar = styled(Navbar)(({ theme }) => css`
       align-items: center;
     }
 
-    .navbar-nav > li {
-      > a {
+    .navbar-nav > li, .navbar-nav > span {
+      > * {
         font-family: ${theme.fonts.family.navigation};
         font-size: ${theme.fonts.size.navigation};
 
@@ -47,7 +47,7 @@ const StyledNavbar = styled(Navbar)(({ theme }) => css`
       }
 
       &.active {
-        > a {
+        > * {
           ${activeIndicatorStyles(theme)}
           &:hover,
           &:focus {

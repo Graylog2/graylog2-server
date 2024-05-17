@@ -24,6 +24,7 @@ import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import com.google.common.base.Suppliers;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
@@ -50,7 +51,6 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.security.CustomCAX509TrustManager;
 import org.graylog2.security.IndexerJwtAuthTokenProvider;
-import jakarta.annotation.Nonnull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -99,7 +99,6 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
     private final String passwordSecret;
     private final Supplier<OkHttpClient> okHttpClient;
     private final PreflightConfigService preflightConfigService;
-    private final IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider;
     private final NotificationService notificationService;
     private final ExecutorService executor;
 
@@ -127,19 +126,24 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
         this.csrSigner = csrSigner;
         this.clusterConfigService = clusterConfigService;
         this.preflightConfigService = preflightConfigService;
-        this.indexerJwtAuthTokenProvider = indexerJwtAuthTokenProvider;
         this.notificationService = notificationService;
         this.executor = Executors.newFixedThreadPool(THREADPOOL_THREADS, new ThreadFactoryBuilder().setNameFormat("provisioning-connectivity-check-task").build());
-        this.okHttpClient = Suppliers.memoize(() -> buildConnectivityCheckOkHttpClient(trustManager));
+        this.okHttpClient = Suppliers.memoize(() -> buildConnectivityCheckOkHttpClient(trustManager, indexerJwtAuthTokenProvider));
     }
 
     // building a httpclient to check the connectivity to OpenSearch - TODO: maybe replace it with a VersionProbe already?
-    private static OkHttpClient buildConnectivityCheckOkHttpClient(final X509TrustManager trustManager) {
+    private static OkHttpClient buildConnectivityCheckOkHttpClient(final X509TrustManager trustManager, IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider) {
         try {
             final var clientBuilder = new OkHttpClient.Builder();
             final var sslContext = SSLContext.getInstance("TLS");
             sslContext.init(null, new TrustManager[]{trustManager}, new SecureRandom());
             clientBuilder.sslSocketFactory(sslContext.getSocketFactory(), trustManager);
+
+            clientBuilder.authenticator((route, response) -> response.request()
+                    .newBuilder()
+                    .header("Authorization", indexerJwtAuthTokenProvider.get())
+                    .build());
+
             return clientBuilder.build();
         } catch (NoSuchAlgorithmException | KeyManagementException ex) {
             LOG.error("Could not set Graylog CA trust manager: {}", ex.getMessage(), ex);
@@ -199,7 +203,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                 if (!cfg.equals(PreflightConfigResult.PREPARED)) {
                     // if we're running through preflight and reach "STARTUP_PREPARED", we want to request STARTUP of OpenSearch
                     var preparedNodes = nodesByState.getOrDefault(DataNodeProvisioningConfig.State.STARTUP_PREPARED, List.of());
-                    if(!preparedNodes.isEmpty()) {
+                    if (!preparedNodes.isEmpty()) {
                         preparedNodes.forEach(c -> dataNodeProvisioningService.save(c.asStartupTrigger()));
                         // waiting one iteration after writing the new state, so we return from execution here and skip the rest of the periodical
                         return;
@@ -245,7 +249,7 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
     private void checkConnectivity(final DataNodeProvisioningConfig config) {
         LOG.info("Starting connectivity check with node {}, silencing error messages for {} seconds.", config.nodeId(), DELAY_BEFORE_SHOWING_EXCEPTIONS.getSeconds());
         final var nodeId = config.nodeId();
-        final var retryer = RetryerBuilder.<Response>newBuilder()
+        final var retryer = RetryerBuilder.<ConnectionResponse>newBuilder()
                 .withWaitStrategy(WaitStrategies.fixedWait(WAIT_BETWEEN_CONNECTION_ATTEMPTS, TimeUnit.SECONDS))
                 .withStopStrategy(StopStrategies.stopAfterAttempt(CONNECTION_ATTEMPTS))
                 .withRetryListener(new RetryListener() {
@@ -261,23 +265,24 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
                         }
                     }
                 })
-                .retryIfResult(response -> !response.isSuccessful())
+                .retryIfResult(response -> !response.success())
                 .retryIfException()
                 .build();
-        final Callable<Response> callable = () -> {
+
+        final Callable<ConnectionResponse> callable = () -> {
             final var node = nodeService.byNodeId(nodeId);
             final var request = new Request.Builder().url(node.getTransportAddress()).build();
-            final var builder = okHttpClient.get().newBuilder()
-                    .authenticator((route, response) -> response.request()
-                            .newBuilder()
-                            .header("Authorization", indexerJwtAuthTokenProvider.get())
-                            .build());
-            final var call = builder.build().newCall(request);
-            return call.execute();
+            final var call = okHttpClient.get().newCall(request);
+            try (Response response = call.execute()) { // always close the response here
+                final boolean success = response.isSuccessful();
+                final String message = response.message();
+                return new ConnectionResponse(success, message); // and deliver only necessary information, without holding the original response
+            }
         };
-        try (Response response = retryer.call(callable)) {
-            var success = response.isSuccessful();
-            if (success) {
+
+        try {
+            final ConnectionResponse response = retryer.call(callable);
+            if (response.success()) {
                 dataNodeProvisioningService.save(config.asConnected());
                 LOG.info("Connectivity check successful with node {}", nodeId);
             } else {
@@ -335,4 +340,13 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
     public int getPeriodSeconds() {
         return 2;
     }
+
+    /**
+     * This record serves as a DTO for retry logic. We can't use the original Response, as we are having problems
+     * closing the response between repeats and failure recoveries. Rather close the response ASAP and provide
+     * only necessary information to the retryer.
+     * @param success Could we connect to the datanode URL?
+     * @param message What was the error message if not?
+     */
+    private record ConnectionResponse(boolean success, String message) {}
 }

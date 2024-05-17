@@ -232,6 +232,6 @@ describe('RuleBuilder', () => {
   it('simulator parser should support raw message string', () => {
     const rawMessageString = 'long raw message string bla bla bla';
 
-    expect(jsonifyText(rawMessageString)).toEqual(rawMessageString);
+    expect(jsonifyText(rawMessageString)).toEqual(JSON.stringify({ message: rawMessageString }));
   });
 });

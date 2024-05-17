@@ -39,6 +39,7 @@ jest.mock('util/AppConfig', () => ({
   isFeatureEnabled: jest.fn(() => false),
 }));
 
+jest.mock('hooks/useHotkey', () => jest.fn());
 jest.mock('views/hooks/useViewType');
 jest.mock('views/hooks/useActiveQueryId');
 jest.mock('views/hooks/useViewTitle');

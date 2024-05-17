@@ -33,6 +33,7 @@ import OriginalDashboardSearchBar from './DashboardSearchBar';
 
 const testTimeout = applyTimeoutMultiplier(30000);
 
+jest.mock('hooks/useHotkey', () => jest.fn());
 jest.mock('views/logic/fieldtypes/useFieldTypes');
 jest.mock('views/components/DashboardActionsMenu', () => () => <span>View Actions</span>);
 jest.mock('views/logic/debounceWithPromise', () => (fn: any) => fn);

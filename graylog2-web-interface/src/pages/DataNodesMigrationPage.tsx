@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect } from 'react';
+import styled from 'styled-components';
 
 import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
@@ -25,6 +26,12 @@ import useMigrationWizardStep from 'components/datanode/hooks/useMigrationWizard
 import useTriggerMigrationState from 'components/datanode/hooks/useTriggerMigrationState';
 import { MIGRATION_STATE } from 'components/datanode/Constants';
 import ResetMigrationButton from 'components/datanode/migrations/common/ResetMigrationButton';
+
+const WizardContainer = styled(Col)`
+  .nav > li > a  {
+    pointer-events: none;
+  }
+`;
 
 const DataNodesMigrationPage = () => {
   const { step: currentStep, isLoading } = useMigrationWizardStep();
@@ -50,9 +57,9 @@ const DataNodesMigrationPage = () => {
         </span>
       </PageHeader>
       <Row className="content">
-        <Col md={12}>
+        <WizardContainer md={12}>
           <MigrationWizard />
-        </Col>
+        </WizardContainer>
       </Row>
     </DocumentTitle>
   );

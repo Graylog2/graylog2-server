@@ -17,10 +17,9 @@
 import React, { useCallback, useMemo } from 'react';
 import { useQueryParam, StringParam } from 'use-query-params';
 
-import type { Sort } from 'stores/PaginationTypes';
 import { PaginatedList, SearchForm, Spinner, NoSearchResult, NoEntitiesExist } from 'components/common';
 import QueryHelper from 'components/common/QueryHelper';
-import EntityDataTable from 'components/common/EntityDataTable';
+import EntityDataTable, { useTableEventHandlers } from 'components/common/EntityDataTable';
 import type View from 'views/logic/views/View';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import useDashboards from 'views/components/dashboard/hooks/useDashboards';
@@ -58,32 +57,23 @@ const DashboardsOverview = ({ isEvidenceModal }: Props) => {
   const customColumnRenderers = useColumnRenderers({ searchParams });
   const { data: paginatedDashboards, isInitialLoading: isLoadingDashboards, refetch } = useDashboards(searchParams, { enabled: !isLoadingLayoutPreferences });
   const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(ENTITY_TABLE_ID);
-  const onSearch = useCallback((newQuery: string) => {
-    paginationQueryParameter.resetPage();
-    setQuery(newQuery);
-  }, [paginationQueryParameter, setQuery]);
 
-  const onColumnsChange = useCallback((displayedAttributes: Array<string>) => {
-    updateTableLayout({ displayedAttributes });
-  }, [updateTableLayout]);
+  const {
+    onColumnsChange,
+    onPageSizeChange,
+    onSearch,
+    onSearchReset,
+    onSortChange,
+  } = useTableEventHandlers({
+    appSection: 'dashboards-list',
+    paginationQueryParameter,
+    setQuery,
+    updateTableLayout,
+  });
 
   const renderDashboardActions = useCallback((dashboard: View) => (
     <DashboardActions dashboard={dashboard} refetchDashboards={refetch} isEvidenceModal={isEvidenceModal} />
   ), [refetch, isEvidenceModal]);
-
-  const onReset = useCallback(() => {
-    onSearch('');
-  }, [onSearch]);
-
-  const onPageSizeChange = (newPageSize: number) => {
-    paginationQueryParameter.resetPage();
-    updateTableLayout({ perPage: newPageSize });
-  };
-
-  const onSortChange = useCallback((newSort: Sort) => {
-    updateTableLayout({ sort: newSort });
-    paginationQueryParameter.resetPage();
-  }, [paginationQueryParameter, updateTableLayout]);
 
   if (isLoadingDashboards || isLoadingLayoutPreferences) {
     return <Spinner />;
@@ -98,7 +88,7 @@ const DashboardsOverview = ({ isEvidenceModal }: Props) => {
       <div style={{ marginBottom: 5 }}>
         <SearchForm onSearch={onSearch}
                     queryHelpComponent={<QueryHelper entityName="dashboard" commonFields={['id', 'title', 'description', 'summary']} />}
-                    onReset={onReset}
+                    onReset={onSearchReset}
                     query={query}
                     topMargin={0} />
       </div>

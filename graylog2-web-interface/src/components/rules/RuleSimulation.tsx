@@ -14,11 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import PropTypes from 'prop-types';
 
-import { Button, ControlLabel, FormGroup, Input } from 'components/bootstrap';
+import { Button, ControlLabel, FormGroup, Input, ButtonGroup } from 'components/bootstrap';
 import MessageShow from 'components/search/MessageShow';
 import type { RuleType } from 'stores/rules/RulesStore';
 import useLocation from 'routing/useLocation';
@@ -26,7 +26,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
-import { DEFAULT_SIMULATOR_JSON_MESSAGE, PipelineRulesContext } from './RuleContext';
+import { PipelineRulesContext, SimulationFieldType } from './RuleContext';
 import type { RuleBuilderRule } from './rule-builder/types';
 import { useRuleBuilder } from './rule-builder/RuleBuilderContext';
 import { hasRuleBuilderErrors } from './rule-builder/helpers';
@@ -77,6 +77,8 @@ const RuleSimulation = ({ rule: currentRule, onSaveMessage }: Props) => {
   const [highlightedOutput] = useRuleBuilder().useHighlightedOutput;
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
+  const [simulationFieldType, setSimulationFieldType] = useState(SimulationFieldType.JSON);
+  const [simulationErrorMessage, setSimulationErrorMessage] = useState(undefined);
 
   useEffect(() => () => {
     setRuleSimulationResult(null);
@@ -86,13 +88,43 @@ const RuleSimulation = ({ rule: currentRule, onSaveMessage }: Props) => {
     if (hasRuleBuilderErrors(currentRule)) {
       setRuleSimulationResult(null);
     } else if (currentRule) {
-      simulateRule(currentRule);
+      simulateRule(currentRule, simulationFieldType);
     }
-  }, [currentRule, setRuleSimulationResult, simulateRule]);
+  }, [currentRule, setRuleSimulationResult, simulateRule, simulationFieldType]);
 
   const is_rule_builder = Boolean(currentRule?.rule_builder);
-  const errorMessage = hasRuleBuilderErrors(currentRule) ? 'Could not run the rule simulation. Please fix the rule builder errors.' : undefined;
+  const ruleErrorMessage = hasRuleBuilderErrors(currentRule) ? 'Could not run the rule simulation. Please fix the rule builder errors.' : undefined;
   const conditionsOutputKeys = Object.keys(ruleSimulationResult?.simulator_condition_variables || {}).sort((a, b) => Number(a) - Number(b));
+
+  const getPlaceHolderByType = () => {
+    switch (simulationFieldType) {
+      case SimulationFieldType.Simple:
+        return 'simple message field';
+      case SimulationFieldType.KeyValue:
+        return 'message: test\nsource: unknown\n';
+      case SimulationFieldType.JSON:
+        return '{\n\tmessage: test\n\tsource: unknown\n}';
+      default:
+        return 'simple message field';
+    }
+  };
+
+  const validateFieldType = () => {
+    setSimulationErrorMessage(undefined);
+
+    if (simulationFieldType === SimulationFieldType.JSON) {
+      try {
+        JSON.parse(rawMessageToSimulate);
+      } catch {
+        setSimulationErrorMessage('Invalid JSON!');
+      }
+    }
+  };
+
+  const handleFieldTypeChange = (fieldType: SimulationFieldType) => {
+    setSimulationFieldType(fieldType);
+    setSimulationErrorMessage(undefined);
+  };
 
   const handleRawMessageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRawMessageToSimulate(event.target.value);
@@ -107,7 +139,8 @@ const RuleSimulation = ({ rule: currentRule, onSaveMessage }: Props) => {
       event_details: { is_rule_builder },
     });
 
-    simulateRule(currentRule || rule);
+    validateFieldType();
+    simulateRule(currentRule || rule, simulationFieldType);
   };
 
   const handleResetRuleSimulation = () => {
@@ -118,6 +151,7 @@ const RuleSimulation = ({ rule: currentRule, onSaveMessage }: Props) => {
       event_details: { is_rule_builder },
     });
 
+    setSimulationErrorMessage(undefined);
     setRawMessageToSimulate('');
     onSaveMessage(null);
     setRuleSimulationResult(null);
@@ -127,18 +161,23 @@ const RuleSimulation = ({ rule: currentRule, onSaveMessage }: Props) => {
     <StyledFormGroup>
       <ControlLabel>Rule Simulation <small className="text-muted">(Optional)</small></ControlLabel>
       <div>
+        <ButtonGroup>
+          <Button active={simulationFieldType === SimulationFieldType.JSON} onClick={() => handleFieldTypeChange(SimulationFieldType.JSON)}>JSON</Button>
+          <Button active={simulationFieldType === SimulationFieldType.KeyValue} onClick={() => handleFieldTypeChange(SimulationFieldType.KeyValue)}>Key Value</Button>
+          <Button active={simulationFieldType === SimulationFieldType.Simple} onClick={() => handleFieldTypeChange(SimulationFieldType.Simple)}>Simple Message</Button>
+        </ButtonGroup>
         <Input id="message"
                type="textarea"
-               placeholder={DEFAULT_SIMULATOR_JSON_MESSAGE}
+               placeholder={getPlaceHolderByType()}
                value={rawMessageToSimulate}
                onChange={handleRawMessageChange}
-               title="Message string or JSON"
+               title="Simple message field, Key-Value pairs or JSON"
                help="Enter a normal string to simulate the message field, Key-Value pairs or a JSON to simulate the whole message."
-               error={errorMessage}
-               rows={3} />
+               error={ruleErrorMessage || simulationErrorMessage}
+               rows={4} />
         <Button bsStyle="info"
                 bsSize="xsmall"
-                disabled={!rawMessageToSimulate || Boolean(errorMessage)}
+                disabled={!rawMessageToSimulate || Boolean(ruleErrorMessage)}
                 onClick={handleRunRuleSimulation}>
           Run rule simulation
         </Button>

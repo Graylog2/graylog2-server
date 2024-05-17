@@ -75,6 +75,8 @@ import org.graylog.plugins.views.search.rest.contexts.SearchUserBinder;
 import org.graylog.plugins.views.search.rest.exceptionmappers.IllegalTimeRangeExceptionMapper;
 import org.graylog.plugins.views.search.rest.exceptionmappers.MissingCapabilitiesExceptionMapper;
 import org.graylog.plugins.views.search.rest.exceptionmappers.PermissionExceptionMapper;
+import org.graylog.plugins.views.search.rest.export.AggregationWidgetExportResource;
+import org.graylog.plugins.views.search.rest.export.response.AggregationWidgetExportResponseWriter;
 import org.graylog.plugins.views.search.rest.remote.SearchJobsStatusResource;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.events.EventList;
@@ -145,6 +147,7 @@ public class ViewsBindings extends ViewsModule {
     protected void configure() {
         registerExportBackendProvider();
 
+        addSystemRestResource(AggregationWidgetExportResource.class);
         addSystemRestResource(DashboardsResource.class);
         addSystemRestResource(StartPageResource.class);
         addSystemRestResource(FavoritesResource.class);
@@ -254,6 +257,8 @@ public class ViewsBindings extends ViewsModule {
 
         addExportFormat(() -> MoreMediaTypes.TEXT_CSV_TYPE);
 
+
+        jerseyAdditionalComponentsBinder().addBinding().toInstance(AggregationWidgetExportResponseWriter.class);
         jerseyAdditionalComponentsBinder().addBinding().toInstance(SimpleMessageChunkCsvWriter.class);
         jerseyAdditionalComponentsBinder().addBinding().toInstance(MessageExportFormatFilter.class);
         jerseyAdditionalComponentsBinder().addBinding().toInstance(SearchUserBinder.class);
@@ -270,6 +275,10 @@ public class ViewsBindings extends ViewsModule {
 
         bind(LastUsedQueryStringsService.class).to(MongoLastUsedQueryStringsService.class);
         addSystemRestResource(QueryStringsResource.class);
+
+        // The Set<StaticReferencedSearch> binder must be explicitly initialized to avoid an initialization error when
+        // no values are bound.
+        staticReferencedSearchBinder();
     }
 
     private void registerExportBackendProvider() {

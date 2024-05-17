@@ -38,8 +38,7 @@ import OriginalSearchBar from './SearchBar';
 
 const testTimeout = applyTimeoutMultiplier(30000);
 
-jest.mock('hooks/useFeature', () => (key: string) => key === 'search_filter');
-
+jest.mock('hooks/useHotkey', () => jest.fn());
 jest.mock('views/logic/fieldtypes/useFieldTypes');
 
 jest.mock('views/hooks/useAutoRefresh', () => () => ({
