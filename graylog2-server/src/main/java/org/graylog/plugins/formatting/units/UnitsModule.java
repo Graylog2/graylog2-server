@@ -14,19 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+package org.graylog.plugins.formatting.units;
 
-import ActionDropdown from 'views/components/common/ActionDropdown';
-import { IconButton } from 'components/common';
+import org.graylog.plugins.formatting.units.model.SupportedUnits;
+import org.graylog.plugins.formatting.units.provider.SupportedUnitsProvider;
+import org.graylog2.plugin.inject.Graylog2Module;
 
-const AggregationWidgetExportDropdown = ({ children }: React.PropsWithChildren) => {
-  const widgetActionDropdownCaret = <IconButton name="download" title="Open export widget options" />;
+public class UnitsModule extends Graylog2Module {
 
-  return (
-    <ActionDropdown element={widgetActionDropdownCaret} header="Export to file">
-      {children}
-    </ActionDropdown>
-  );
-};
-
-export default AggregationWidgetExportDropdown;
+    @Override
+    protected void configure() {
+        super.configure();
+        bind(SupportedUnits.class).toProvider(SupportedUnitsProvider.class).asEagerSingleton();
+    }
+}

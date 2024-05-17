@@ -875,6 +875,13 @@
                     <include>**/*.properties</include>
                 </includes>
             </resource>
+            <resource>
+                <directory>../graylog-shared-resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>units/**/*</include>
+                </includes>
+            </resource>
         </resources>
         <testResources>
             <testResource>
