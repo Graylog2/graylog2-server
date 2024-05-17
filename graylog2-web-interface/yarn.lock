@@ -2459,41 +2459,41 @@
   integrity sha512-Hcv+nVC0kZnQ3tD9GVu5xSMR4VVYOteQIr/hwFPVEvPdlXqgGEuRjiheChHgdM+JyqdgNcmzZOX/tnl0JOiI7A==
 
 "@mantine/core@^7.5.2":
-  version "7.6.0"
-  resolved "https://registry.yarnpkg.com/@mantine/core/-/core-7.6.0.tgz#e544b0a1efc6250be98aa66f37e61c647d3e08d9"
-  integrity sha512-TZNoOqk13r4KDO0MuvyKUqI9Z57QilEk+LAKO4bSWoCvIfvPijv+QuSVoUlqk8Y0aI1OBUbMAvUMkTOBDtA5Tw==
+  version "7.9.1"
+  resolved "https://registry.yarnpkg.com/@mantine/core/-/core-7.9.1.tgz#778a9117267ef7db37e6f18dfff47be5d322fbc9"
+  integrity sha512-UXK11t1fAQ2ROQ9HTIZfyU52XdwS8sFJ2SRUh5uHMWSahJo3wTdKzaCvYN7wg+ONM9p6ENT0hC0dfv5qXoKU4w==
   dependencies:
     "@floating-ui/react" "^0.26.9"
     clsx "2.1.0"
     react-number-format "^5.3.1"
     react-remove-scroll "^2.5.7"
     react-textarea-autosize "8.5.3"
-    type-fest "^3.13.1"
+    type-fest "^4.12.0"
 
 "@mantine/dropzone@^7.5.2":
-  version "7.6.0"
-  resolved "https://registry.yarnpkg.com/@mantine/dropzone/-/dropzone-7.6.0.tgz#04a1100ee06e38306db823e0787e6394ac9f9569"
-  integrity sha512-rY6IbfusOzcNZVVtLBzAXrs/ttbFBPaQLJx/HGPyt/drma1steCx8vUY/li8lbAm6BmaIYLA9GMXARF3cif6hA==
+  version "7.9.1"
+  resolved "https://registry.yarnpkg.com/@mantine/dropzone/-/dropzone-7.9.1.tgz#f6ef155064e61a1bec1cc75bd671219b97d6047d"
+  integrity sha512-ts4NRbWa2hB9kBGFgHHn+KwHg0mLllpXfrgqaNcX6TkH0ybPPIysMQeX5YIfYl9BRoqfLMGgCxYiuWHTPX6o8Q==
   dependencies:
     react-dropzone-esm "15.0.1"
 
 "@mantine/hooks@^7.5.2":
-  version "7.6.0"
-  resolved "https://registry.yarnpkg.com/@mantine/hooks/-/hooks-7.6.0.tgz#2a939d9d6a182b39e626997d961dc34720eb9a79"
-  integrity sha512-TUYM1uC2bF2DkkOfL8/fQQuwrNPQufg5H2uYoV9WaPyWtR+MlZs8UgbucVpOD2dEdVJjkfPOcQfi8Wim0gktmw==
+  version "7.9.1"
+  resolved "https://registry.yarnpkg.com/@mantine/hooks/-/hooks-7.9.1.tgz#9946432d017d56afe28f3980d1c64af0153a2128"
+  integrity sha512-nb2Ar+2HfGxLjGZgObapeUeqcQsUWJ+rvj4X2KNTUy3+YpvLIMD3CqREowWHF7/5OTGh4BCyBqQNZ9JFpnMeHQ==
 
 "@mantine/notifications@^7.5.2":
-  version "7.6.0"
-  resolved "https://registry.yarnpkg.com/@mantine/notifications/-/notifications-7.6.0.tgz#507a388406dd83d4ae9b507ddb60ee7c6c078111"
-  integrity sha512-zFo8Uyu8w7bdbkyWt4fNcHlhwm/UlFhdYflf5LFeEki5/ZxNvX1TDqEuaS2bDitnpzOi409BgCE9V0Shlj7RKw==
+  version "7.9.1"
+  resolved "https://registry.yarnpkg.com/@mantine/notifications/-/notifications-7.9.1.tgz#fe2f1325b7d67aea226d023aefb0a0d439d03a81"
+  integrity sha512-+fzc/+conYQMqE72eaKcxaOrLijsWExRO6Rp+QVgsmp3Hf57yksRdEbVE259PrWq3jaVI8G4XIMeKdYK0tB5Pw==
   dependencies:
-    "@mantine/store" "7.6.0"
+    "@mantine/store" "7.9.1"
     react-transition-group "4.4.5"
 
-"@mantine/store@7.6.0":
-  version "7.6.0"
-  resolved "https://registry.yarnpkg.com/@mantine/store/-/store-7.6.0.tgz#ba9ea1f5f49ad4d8ad616a054bb803057a1bf46c"
-  integrity sha512-S9QhuENdqLkwwsI9+KDFL64lY42FZqzQ55s2UTvV7jVDPkI3k13H76myL8X0IPSp952PuV3GwjOlh4RCWyk/4w==
+"@mantine/store@7.9.1":
+  version "7.9.1"
+  resolved "https://registry.yarnpkg.com/@mantine/store/-/store-7.9.1.tgz#f1291bb9dce35bf8baa6ea627938637d62a3c83c"
+  integrity sha512-m15k51F4n6R08Iii+TWG64lofiYB9hhEGS+3y+9DZHuY+hSmTmQX9J5WKVNYJ3jmV24QG96EjEQNuLBcG2atSg==
 
 "@mapbox/geojson-rewind@^0.5.2":
   version "0.5.2"
@@ -8631,7 +8631,7 @@ graphemer@^1.4.0:
 "graylog-web-plugin@file:packages/graylog-web-plugin":
   version "6.1.0-SNAPSHOT"
   dependencies:
-    "@graylog/sawmill" "2.0.16"
+    "@graylog/sawmill" "2.0.17"
     "@tanstack/react-query" "4.36.1"
     "@types/create-react-class" "15.6.8"
     "@types/jquery" "3.5.30"
@@ -15353,10 +15353,10 @@ type-fest@^0.8.1:
   resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-0.8.1.tgz#09e249ebde851d3b1e48d27c105444667f17b83d"
   integrity sha512-4dbzIzqvjtgiM5rw1k5rEHtBANKmdudhGyBEajN01fEyhaAIhsoKNy6y7+IN93IfpFtwY9iqi7kD+xwKhQsNJA==
 
-type-fest@^3.13.1:
-  version "3.13.1"
-  resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-3.13.1.tgz#bb744c1f0678bea7543a2d1ec24e83e68e8c8706"
-  integrity sha512-tLq3bSNx+xSpwvAJnzrK0Ep5CLNWjvFTOp71URMaAEWBfRb9nnJiBoUe0tF8bI4ZFO3omgBR6NvnbzVUT3Ly4g==
+type-fest@^4.12.0:
+  version "4.18.2"
+  resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-4.18.2.tgz#8d765c42e7280a11f4d04fb77a00dacc417c8b05"
+  integrity sha512-+suCYpfJLAe4OXS6+PPXjW3urOS4IoP9waSiLuXfLgqZODKw/aWwASvzqE886wA0kQgGy0mIWyhd87VpqIy6Xg==
 
 type-is@~1.6.18:
   version "1.6.18"
