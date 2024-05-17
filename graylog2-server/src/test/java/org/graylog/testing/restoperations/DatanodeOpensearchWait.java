@@ -14,23 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.restoperations;
+package org.graylog.testing.restoperations;
 
 import com.github.rholder.retry.RetryException;
 import io.restassured.response.ValidatableResponse;
 
 import java.util.concurrent.ExecutionException;
 
-public class OpensearchTestIndexCreationWait extends WaitingRestOperation {
+public class DatanodeOpensearchWait extends WaitingRestOperation {
 
-    public OpensearchTestIndexCreationWait(RestOperationParameters waitingRestOperationParameters) {
+    public DatanodeOpensearchWait(RestOperationParameters waitingRestOperationParameters) {
         super(waitingRestOperationParameters);
     }
 
-    public ValidatableResponse waitForIndexCreation() throws ExecutionException, RetryException {
-        return waitForResponse("/_cat/shards/" + OpensearchTestIndexCreation.IT_TEST_INDEX + "?h=node,state&format=json",
-                input -> input.extract().body().jsonPath().getList("state").size() != 2,
-                input -> input.extract().body().jsonPath().getList("state").stream().anyMatch(s -> !s.equals("STARTED"))
+    public ValidatableResponse waitForNodesCount(int countOfNodes) throws ExecutionException, RetryException {
+        return waitForResponse("/_cluster/health",
+                input -> !input.extract().body().path("discovered_cluster_manager").equals(true),
+                input -> !input.extract().body().path("status").equals("green"),
+                input -> !input.extract().body().path("number_of_nodes").equals(countOfNodes)
         );
     }
 

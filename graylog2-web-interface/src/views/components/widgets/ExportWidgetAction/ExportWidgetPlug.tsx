@@ -14,8 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-window.IntersectionObserver = jest.fn(() => ({
-  observe: jest.fn(),
-  unobserve: jest.fn(),
-  disconnect: jest.fn(),
-}));
+import React from 'react';
+
+import { IconButton, OverlayTrigger } from 'components/common';
+
+const title = 'Export widget';
+const Explanation = () => (
+  <span>Export aggregation widget feature is available for the enterprise version.
+    Graylog provides options to export your data into most popular file formats such as
+    CSV, JSON, YAML, XML etc.
+  </span>
+);
+
+const ExportWidgetPlug = () => (
+  <OverlayTrigger trigger="click" title={title} overlay={<Explanation />} placement="bottom">
+    <IconButton name="download" title={title} />
+  </OverlayTrigger>
+);
+
+export default ExportWidgetPlug;

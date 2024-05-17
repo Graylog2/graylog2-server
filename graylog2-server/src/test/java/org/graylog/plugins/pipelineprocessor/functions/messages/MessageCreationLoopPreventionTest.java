@@ -48,8 +48,8 @@ import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.graylog2.streams.StreamService;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.Map;
@@ -57,7 +57,7 @@ import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -65,13 +65,13 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class MessageCreationLoopPreventionTest extends BaseParserTest {
+class MessageCreationLoopPreventionTest extends BaseParserTest {
 
     private MessageFactory messageFactory = new TestMessageFactory();
     final CloneMessage cloneMessage = spy(new CloneMessage(messageFactory));
     PipelineInterpreter pipelineInterpreter;
 
-    @Before
+    @BeforeEach
     @SuppressForbidden("Allow using default thread factory")
     public void createPipelineInterpreter() {
         // load rule from resource file
@@ -147,7 +147,7 @@ public class MessageCreationLoopPreventionTest extends BaseParserTest {
 
     // make sure a naive call to clone_message() will not cause a loop
     @Test
-    public void loopPreventionBasic() {
+    void loopPreventionBasic() {
         Message msg = messageInDefaultStream();
         final Messages processed = pipelineInterpreter.process(msg);
 
@@ -158,7 +158,7 @@ public class MessageCreationLoopPreventionTest extends BaseParserTest {
 
     // make sure a call to clone_message() with 'preventLoops' set will stop after cloning once
     @Test
-    public void loopPreventionParam() {
+    void loopPreventionParam() {
         Message msg = messageInDefaultStream();
         final Messages processed = pipelineInterpreter.process(msg);
 
@@ -169,7 +169,7 @@ public class MessageCreationLoopPreventionTest extends BaseParserTest {
 
     // make sure possible existing workarounds for loop prevention will still work
     @Test
-    public void loopPreventionWorkaround1() {
+    void loopPreventionWorkaround1() {
         Message msg = messageInDefaultStream();
         final Messages processed = pipelineInterpreter.process(msg);
 
@@ -180,7 +180,7 @@ public class MessageCreationLoopPreventionTest extends BaseParserTest {
 
     // make sure possible existing workarounds for loop prevention will still work
     @Test
-    public void loopPreventionWorkaround2() {
+    void loopPreventionWorkaround2() {
         Message msg = messageInDefaultStream();
         final Messages processed = pipelineInterpreter.process(msg);
 
@@ -191,7 +191,7 @@ public class MessageCreationLoopPreventionTest extends BaseParserTest {
 
     // make sure possible existing recursive calls of clone message will still work
     @Test
-    public void loopPreventionRecursive() {
+    void loopPreventionRecursive() {
         Message msg = messageInDefaultStream();
         msg.addField("cycle", 5);
         final Messages processed = pipelineInterpreter.process(msg);
@@ -203,7 +203,7 @@ public class MessageCreationLoopPreventionTest extends BaseParserTest {
 
     // possible existing recursive calls which exceed MAX_CLONES will stop creating clones with an error
     @Test
-    public void loopPreventionRecursiveFail() {
+    void loopPreventionRecursiveFail() {
         Message msg = messageInDefaultStream();
         msg.addField("cycle", 110);
         final Messages processed = pipelineInterpreter.process(msg);
@@ -215,7 +215,7 @@ public class MessageCreationLoopPreventionTest extends BaseParserTest {
 
     // recursive calls of clone message can exceed MAX_CLONES if preventLoops is explicitly set to 'false'
     @Test
-    public void loopPreventionRecursiveParam() {
+    void loopPreventionRecursiveParam() {
         Message msg = messageInDefaultStream();
         msg.addField("cycle", 110);
         final Messages processed = pipelineInterpreter.process(msg);

@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.restoperations;
+package org.graylog.testing.restoperations;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
