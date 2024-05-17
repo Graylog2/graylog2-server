@@ -183,6 +183,7 @@ import org.slf4j.Logger;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -1714,21 +1715,32 @@ public class FunctionsSnippetsTest extends BaseParserTest {
 
     @Test
     public void valueType() throws IOException {
-//        final Rule rule = parser.parseRule(ruleForTest(), false);
-//        final Message message = messageFactory.createMessage("message", "source", DateTime.now(DateTimeZone.UTC));
-//
-//        try (InputStream inputStream = getClass().getResourceAsStream("with-arrays.json")) {
-//            String jsonString = IOUtils.toString(Objects.requireNonNull(inputStream), StandardCharsets.UTF_8);
-//            message.addField("json", jsonString);
-//            evaluateRule(rule, message);
-//            assertThat(actionsTriggered.get()).isTrue();
-//        }
-
         final Rule rule = parser.parseRule(ruleForTest(), false);
-        final Message message = evaluateRule(rule);
+        final Message message = messageFactory.createMessage("message", "source", DateTime.now(DateTimeZone.UTC));
 
-        assertThat(message).isNotNull();
-        assertThat(message.getField("json_int")).isEqualTo("Integer");
-        System.out.println(message.getFields());
+        evaluateRule(rule, message);
+        assertThat(message.getField("type")).isEqualTo(null);
+
+        message.addField("field", true);
+        evaluateRule(rule, message);
+        assertThat(message.getField("type")).isEqualTo("boolean");
+
+        message.addField("field", 1);
+        evaluateRule(rule, message);
+        assertThat(message.getField("type")).isEqualTo("number");
+
+        message.addField("field", 1.1);
+        evaluateRule(rule, message);
+        assertThat(message.getField("type")).isEqualTo("number");
+
+        message.addField("field", "hello");
+        evaluateRule(rule, message);
+        assertThat(message.getField("type")).isEqualTo("string");
+
+        message.addField("field", new ArrayList<>(List.of("hello")));
+        evaluateRule(rule, message);
+        assertThat(message.getField("type")).isEqualTo("list");
+
+        System.out.println("type: " + message.getField("type"));
     }
 }

@@ -9,14 +9,21 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.graylog2.plugin.Message;
 
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.type;
 
 public class FieldValueType extends AbstractFunction<String> {
     public static final String NAME = "field_value_type";
     public static final String FIELD = "field";
 
-    public static final String BOOLEAN = "boolean";
-    public static final String COLLECTION = "boolean";
+    public static final String NULL = "null";
+    public static final String NUMBER = "number";
+    public static final String LIST = "list";
+    public static final String MAP = "map";
+    public static final String COLLECTION = "collection";
 
     private final ParameterDescriptor<String, String> fieldParam;
     private final ParameterDescriptor<Message, Message> messageParam;
@@ -32,7 +39,19 @@ public class FieldValueType extends AbstractFunction<String> {
         final Message message = messageParam.optional(args, context).orElse(context.currentMessage());
         final var value = message.getField(field);
 
-        return value.getClass().getSimpleName();
+        if (value instanceof Number) {
+            return NUMBER;
+        }
+
+        if (value instanceof List) {
+            return LIST;
+        }
+
+        if (value instanceof Map) {
+            return MAP;
+        }
+
+        return value.getClass().getSimpleName().toLowerCase(Locale.ROOT);
     }
 
     @Override
