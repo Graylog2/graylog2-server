@@ -30,7 +30,9 @@ import org.graylog2.database.MongoEntity;
 import org.graylog2.database.jackson.CustomJacksonCodecRegistry;
 import org.mongojack.InitializationRequiredForTransformation;
 
+import java.util.Collection;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -40,7 +42,7 @@ import java.util.stream.Stream;
  * @param <T> Java type of the documents to interact with
  */
 public class MongoUtils<T extends MongoEntity> {
-    private final MongoCollection<T> collection;
+    final MongoCollection<T> collection;
     private final ObjectMapper objectMapper;
     private final CustomJacksonCodecRegistry codecRegistry;
 
@@ -97,6 +99,26 @@ public class MongoUtils<T extends MongoEntity> {
      */
     public static Bson idEq(@Nonnull ObjectId id) {
         return Filters.eq("_id", id);
+    }
+
+    /**
+     * Create a query constraint to match a document's ID against the given list of Hex strings.
+     *
+     * @param ids Collection of hex string representations of an {@link ObjectId}
+     * @return An 'in' filter.
+     */
+    public static Bson stringIdsIn(Collection<String> ids) {
+        return idsIn(ids.stream().map(ObjectId::new).collect(Collectors.toSet()));
+    }
+
+    /**
+     * Create a query constraint to match a document's ID against a list of IDs.
+     *
+     * @param ids IDs to match
+     * @return An 'in' filter.
+     */
+    public static Bson idsIn(Collection<ObjectId> ids) {
+        return Filters.in("_id", ids);
     }
 
     /**

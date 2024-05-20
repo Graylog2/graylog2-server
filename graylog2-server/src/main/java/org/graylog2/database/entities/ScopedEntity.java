@@ -17,6 +17,7 @@
 package org.graylog2.database.entities;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.graylog2.database.MongoEntity;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
@@ -26,11 +27,11 @@ import javax.annotation.Nullable;
  * Entity base class, which can be used to enforce that each entity implementation
  * has the required id and _scope fields.
  */
-
-public abstract class ScopedEntity {
+public abstract class ScopedEntity implements MongoEntity {
     public static final String FIELD_ID = "id";
     public static final String FIELD_SCOPE = "_scope";
 
+    @Override
     @Id
     @ObjectId
     @Nullable
