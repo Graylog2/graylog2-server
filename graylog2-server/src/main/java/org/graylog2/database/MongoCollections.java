@@ -21,6 +21,7 @@ import com.mongodb.client.MongoCollection;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.database.entities.ScopedEntity;
 import org.graylog2.database.jackson.CustomJacksonCodecRegistry;
@@ -28,6 +29,8 @@ import org.graylog2.database.pagination.DefaultMongoPaginationHelper;
 import org.graylog2.database.pagination.MongoPaginationHelper;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.database.utils.ScopedEntityMongoUtils;
+
+import java.util.Set;
 
 @Singleton
 public class MongoCollections {
@@ -43,6 +46,12 @@ public class MongoCollections {
         this.objectMapper = objectMapperProvider.get();
         this.mongoConnection = mongoConnection;
         this.entityScopeService = entityScopeService;
+    }
+
+    public MongoCollections(MongoJackObjectMapperProvider objectMapperProvider, MongoConnection mongoConnection) {
+        this.objectMapper = objectMapperProvider.get();
+        this.mongoConnection = mongoConnection;
+        this.entityScopeService = new EntityScopeService(Set.of(new DefaultEntityScope()));
     }
 
     /**

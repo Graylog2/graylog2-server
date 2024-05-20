@@ -25,14 +25,11 @@ import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoEntity;
-import org.graylog2.database.entities.DefaultEntityScope;
-import org.graylog2.database.entities.EntityScopeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.List;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -52,9 +49,7 @@ class MongoUtilsTest {
 
     @BeforeEach
     void setUp(MongoDBTestService mongoDBTestService, MongoJackObjectMapperProvider objectMapperProvider) {
-        mongoCollections = new MongoCollections(objectMapperProvider,
-                mongoDBTestService.mongoConnection(),
-                new EntityScopeService(Set.of(new DefaultEntityScope())));
+        mongoCollections = new MongoCollections(objectMapperProvider, mongoDBTestService.mongoConnection());
         collection = mongoCollections.get("test", DTO.class);
         utils = mongoCollections.utils(collection);
     }
