@@ -183,7 +183,6 @@ import org.slf4j.Logger;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -244,6 +243,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(RemoveSingleField.NAME, new RemoveSingleField());
         functions.put(RemoveMultipleFields.NAME, new RemoveMultipleFields());
         functions.put(NormalizeFields.NAME, new NormalizeFields());
+        functions.put(FieldValueType.NAME, new FieldValueType());
 
         functions.put(DropMessage.NAME, new DropMessage());
         functions.put(CreateMessage.NAME, new CreateMessage(messageFactory));
@@ -371,7 +371,6 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(IsIp.NAME, new IsIp());
         functions.put(IsJson.NAME, new IsJson());
         functions.put(IsUrl.NAME, new IsUrl());
-        functions.put(FieldValueType.NAME, new FieldValueType());
         functions.put(Debug.NAME, new Debug(loggerMock));
 
         final GrokPatternService grokPatternService = mock(GrokPatternService.class);
