@@ -1,0 +1,5 @@
+type = "a"
+message = "Added a pipeline function `field_value_type` to identify the value type for a message field."
+
+issues = ["graylog-plugin-enterprise#7132"]
+pulls = ["19395"]
