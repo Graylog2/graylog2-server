@@ -1,0 +1,35 @@
+rule "field_value_type"
+when
+    true
+then
+    set_field("null_type", field_value_type("non_existent_field"));
+
+    set_field("boolean", true);
+    set_field("boolean_type", field_value_type("boolean"));
+
+    set_field("string", "hello");
+    set_field("string_type", field_value_type("string"));
+
+    set_field("double", 1.0);
+    set_field("double_type", field_value_type("double"));
+
+    set_field("long", to_long("1L"));
+    set_field("long_type", field_value_type("long"));
+
+    set_field("list", ["one", "two", "three"]);
+    set_field("list_type", field_value_type("list"));
+
+    set_field("map", to_map({foo:"bar"}));
+    set_field("map_type", field_value_type("map"));
+
+    set_field("value_node", parse_json("[\"Ford\", \"BMW\", \"Fiat\"]")[0]);
+    set_field("value_node_type", field_value_type("value_node"));
+
+    set_field("array_node", parse_json("[\"Ford\", \"BMW\", \"Fiat\"]"));
+    set_field("array_node_type", field_value_type("array_node"));
+
+    set_field("object_node", parse_json("{\"foo\": \"bar\"}"));
+    set_field("object_node_type", field_value_type("object_node"));
+
+    trigger_test();
+end

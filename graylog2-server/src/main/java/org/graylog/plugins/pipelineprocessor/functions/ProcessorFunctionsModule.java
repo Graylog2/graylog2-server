@@ -27,6 +27,7 @@ import org.graylog.plugins.pipelineprocessor.functions.arrays.StringArrayAdd;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.BooleanConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.CsvMapConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.DoubleConversion;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.FieldValueType;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsBoolean;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsCollection;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsDouble;
@@ -184,6 +185,7 @@ public class ProcessorFunctionsModule extends PluginModule {
         addMessageProcessorFunction(RemoveSingleField.NAME, RemoveSingleField.class);
         addMessageProcessorFunction(RemoveMultipleFields.NAME, RemoveMultipleFields.class);
         addMessageProcessorFunction(NormalizeFields.NAME, NormalizeFields.class);
+        addMessageProcessorFunction(FieldValueType.NAME, FieldValueType.class);
 
         addMessageProcessorFunction(DropMessage.NAME, DropMessage.class);
         addMessageProcessorFunction(CreateMessage.NAME, CreateMessage.class);

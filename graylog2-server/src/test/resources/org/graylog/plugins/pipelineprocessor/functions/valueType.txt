@@ -1,7 +1,0 @@
-rule "field_value_type"
-when
-    true
-then
-    set_field("type", field_value_type("field"));
-    trigger_test();
-end

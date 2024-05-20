@@ -1,5 +1,9 @@
 package org.graylog.plugins.pipelineprocessor.functions.conversion;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.ValueNode;
 import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
@@ -9,6 +13,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.graylog2.plugin.Message;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -19,17 +24,21 @@ public class FieldValueType extends AbstractFunction<String> {
     public static final String NAME = "field_value_type";
     public static final String FIELD = "field";
 
-    public static final String NULL = "null";
-    public static final String NUMBER = "number";
+    public static final String BOOLEAN = "boolean";
+    public static final String STRING = "string";
+    public static final String DOUBLE = "double";
+    public static final String LONG = "long";
     public static final String LIST = "list";
     public static final String MAP = "map";
-    public static final String COLLECTION = "collection";
+    public static final String VALUE_NODE = "value_node";
+    public static final String ARRAY_NODE = "array_node";
+    public static final String OBJECT_NODE = "object_node";
 
     private final ParameterDescriptor<String, String> fieldParam;
     private final ParameterDescriptor<Message, Message> messageParam;
 
     public FieldValueType() {
-        fieldParam = ParameterDescriptor.string(FIELD).description("The field whose value to get the type name of").build();
+        fieldParam = ParameterDescriptor.string(FIELD).description("The field to get the value type of").build();
         messageParam = type("message", Message.class).optional().description("The message to use, defaults to '$message'").ruleBuilderVariable().build();
     }
 
@@ -39,16 +48,32 @@ public class FieldValueType extends AbstractFunction<String> {
         final Message message = messageParam.optional(args, context).orElse(context.currentMessage());
         final var value = message.getField(field);
 
-        if (value instanceof Number) {
-            return NUMBER;
+        if (value instanceof Boolean) {
+            return BOOLEAN;
         }
-
+        if (value instanceof String) {
+            return STRING;
+        }
+        if (value instanceof Double) {
+            return DOUBLE;
+        }
+        if (value instanceof Long) {
+            return LONG;
+        }
         if (value instanceof List) {
             return LIST;
         }
-
         if (value instanceof Map) {
             return MAP;
+        }
+        if (value instanceof ValueNode) {
+            return VALUE_NODE;
+        }
+        if (value instanceof ArrayNode) {
+            return ARRAY_NODE;
+        }
+        if (value instanceof ObjectNode) {
+            return OBJECT_NODE;
         }
 
         return value.getClass().getSimpleName().toLowerCase(Locale.ROOT);
