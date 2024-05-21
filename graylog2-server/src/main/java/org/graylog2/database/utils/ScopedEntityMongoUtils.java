@@ -65,7 +65,7 @@ public class ScopedEntityMongoUtils<T extends ScopedEntity> {
     /**
      * Convenience method to delete a single document identified by its ID after performing mutability checks.
      *
-     * @param id the document's id.
+     * @param id Hex string representation of the document's {@link ObjectId}.
      * @return true if a document was deleted, false otherwise.
      */
     public boolean deleteById(String id) {
@@ -75,7 +75,7 @@ public class ScopedEntityMongoUtils<T extends ScopedEntity> {
     /**
      * Convenience method to delete a single document identified by its ID after performing mutability checks.
      *
-     * @param id Hex string representation of the document's {@link ObjectId}.
+     * @param id the document's id.
      * @return true if a document was deleted, false otherwise.
      */
     public boolean deleteById(ObjectId id) {
@@ -109,7 +109,7 @@ public class ScopedEntityMongoUtils<T extends ScopedEntity> {
                 .orElseGet(() -> entityScopeService.isMutable(scopedEntity));
     }
 
-    public final boolean isDeletable(ScopedEntity scopedEntity) {
+    public final boolean isDeletable(T scopedEntity) {
         Objects.requireNonNull(scopedEntity, "Entity must not be null");
 
         // First, check whether this entity has been persisted, if so, the persisted entity's scope takes precedence.
