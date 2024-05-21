@@ -97,14 +97,14 @@ class MongoUtilsTest {
 
     @Test
     void testIdsIn() {
-        String missingId1 = "6627add0ee216425dd6df36a";
-        String missingId2 = "6627add0ee216425dd6df36b";
-        String idA = "6627add0ee216425dd6df37a";
-        String idB = "6627add0ee216425dd6df37b";
-        String idC = "6627add0ee216425dd6df37c";
-        String idD = "6627add0ee216425dd6df37d";
-        String idE = "6627add0ee216425dd6df37e";
-        String idF = "6627add0ee216425dd6df37f";
+        final String missingId1 = "6627add0ee216425dd6df36a";
+        final String missingId2 = "6627add0ee216425dd6df36b";
+        final String idA = "6627add0ee216425dd6df37a";
+        final String idB = "6627add0ee216425dd6df37b";
+        final String idC = "6627add0ee216425dd6df37c";
+        final String idD = "6627add0ee216425dd6df37d";
+        final String idE = "6627add0ee216425dd6df37e";
+        final String idF = "6627add0ee216425dd6df37f";
         final var a = new DTO(idA, "a");
         final var b = new DTO(idB, "b");
         final var c = new DTO(idC, "c");
