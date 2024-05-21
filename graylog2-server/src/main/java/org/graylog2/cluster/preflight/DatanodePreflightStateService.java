@@ -16,23 +16,10 @@
  */
 package org.graylog2.cluster.preflight;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
-@Deprecated
-public interface DataNodeProvisioningService extends DatanodePreflightStateService {
-
-    List<DataNodeProvisioningConfig> findAllNodesThatNeedAttention();
-
-    void writeCsr(String nodeId, String csr);
-
-    void writeCert(String nodeId, String cert);
-
-    Optional<String> readCert(String nodeId);
-
-    Stream<DataNodeProvisioningConfig> streamAll();
-
-    int delete(String id);
-    void deleteAll();
+public interface DatanodePreflightStateService {
+    Optional<DataNodeProvisioningConfig> getPreflightConfigFor(String nodeId);
+    DataNodeProvisioningConfig save(DataNodeProvisioningConfig config);
+    void changeState(String nodeId, DataNodeProvisioningConfig.State state);
 }

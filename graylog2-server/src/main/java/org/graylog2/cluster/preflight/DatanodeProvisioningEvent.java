@@ -16,23 +16,12 @@
  */
 package org.graylog2.cluster.preflight;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
+public enum DatanodeProvisioningEvent {
+    CREATE_PRIVATE_KEY,
+    CERTIFICATE_RECEIVED,
 
-@Deprecated
-public interface DataNodeProvisioningService extends DatanodePreflightStateService {
+    STARTUP_REQUESTED,
 
-    List<DataNodeProvisioningConfig> findAllNodesThatNeedAttention();
-
-    void writeCsr(String nodeId, String csr);
-
-    void writeCert(String nodeId, String cert);
-
-    Optional<String> readCert(String nodeId);
-
-    Stream<DataNodeProvisioningConfig> streamAll();
-
-    int delete(String id);
-    void deleteAll();
+    CONNECTING_FAILED,
+    CONNECTING_SUCCEEDED
 }
