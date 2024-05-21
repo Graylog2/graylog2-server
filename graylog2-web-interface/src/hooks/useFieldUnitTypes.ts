@@ -18,6 +18,9 @@
 import { useCallback, useMemo } from 'react';
 import minBy from 'lodash/minBy';
 import maxBy from 'lodash/maxBy';
+import omit from 'lodash/omit';
+import set from 'lodash/set';
+import mapValues from 'lodash/mapValues';
 
 import type { MetricUnitType } from 'views/types';
 import type { SeriesUnitState } from 'views/logic/aggregationbuilder/SeriesUnit';
@@ -26,8 +29,9 @@ import supportedUnits from '../../../graylog-shared-resources/units/supported_un
 
 type UnitConversionAction = 'MULTIPLY' | 'DIVIDE'
 
-const sourceUnits = supportedUnits.units as FieldUnitTypes;
+const sourceUnits = supportedUnits.units as FieldUnitTypesJson;
 export type UnitJson = {
+  type: 'base' | 'derived',
   abbrev: string,
   name: string,
   unit_type: MetricUnitType,
@@ -36,17 +40,38 @@ export type UnitJson = {
     action: UnitConversionAction
   } | undefined
 }
-type FieldUnitTypes = Record<MetricUnitType, Array<UnitJson>>
+export type Unit = {
+  type: 'base' | 'derived',
+  abbrev: string,
+  name: string,
+  unitType: MetricUnitType,
+  conversion?: {
+    value: number,
+    action: UnitConversionAction
+  } | undefined
+}
+type FieldUnitTypesJson = Record<MetricUnitType, Array<UnitJson>>
+type FieldUnitTypes = Record<MetricUnitType, Array<Unit>>
 type ConversionParams = SeriesUnitState;
-type ConvertedResult = { value: number | null, unit: SeriesUnitState };
+type ConvertedResult = { value: number | null, unit: Unit };
 
-const _getBaseUnit = (units: FieldUnitTypes, unitType: MetricUnitType): UnitJson => units[unitType].find(({ conversion }) => !conversion);
+const unitFromJson = (unitJson: UnitJson): Unit => set<Unit>(omit(unitJson, 'unit_type'), 'unitType', unitJson.unit_type);
+
+const _getBaseUnit = (units: FieldUnitTypes, unitType: MetricUnitType): Unit => units[unitType].find(({ type }) => type === 'base');
 
 const _convertValueToBaseUnit = (units: FieldUnitTypes, value: number, params: ConversionParams): ConvertedResult => {
   const unit = units[params.unitType].find(({ name }) => params.unit === name);
   const baseUnit = _getBaseUnit(units, params.unitType);
-  if (baseUnit.name === params.unit) return ({ value, unit: { unitType: baseUnit.unit_type, unit: baseUnit.name } });
-  const res: ConvertedResult = ({ value: null, unit: { unitType: baseUnit.unit_type, unit: baseUnit.name } });
+  const res: ConvertedResult = ({
+    value: null,
+    unit: baseUnit,
+  });
+
+  if (baseUnit.name === params.unit) {
+    res.value = value;
+
+    return res;
+  }
 
   if (unit?.conversion?.action === 'MULTIPLY') {
     res.value = value * unit.conversion.value;
@@ -60,11 +85,15 @@ const _convertValueToBaseUnit = (units: FieldUnitTypes, value: number, params: C
 };
 
 const _convertValueToUnit = (units: FieldUnitTypes, value: number, fromParams: ConversionParams, toParams: ConversionParams): ConvertedResult => {
-  if (fromParams.unitType === toParams.unitType && fromParams.unit === toParams.unit) return ({ value, unit: { unitType: fromParams.unitType, unit: fromParams.unit } });
+  if (fromParams.unitType === toParams.unitType && fromParams.unit === toParams.unit) {
+    const unit = units[toParams.unitType].find(({ name }) => toParams.unit === name);
+
+    return ({ value, unit });
+  }
 
   const baseValue = _convertValueToBaseUnit(units, value, fromParams);
   const unit = units[toParams.unitType].find(({ name }) => toParams.unit === name);
-  const res: ConvertedResult = ({ value: null, unit: { unitType: unit.unit_type, unit: unit.name } });
+  const res: ConvertedResult = ({ value: null, unit });
 
   if (unit?.conversion?.action === 'MULTIPLY') {
     res.value = baseValue.value / unit.conversion.value;
@@ -77,13 +106,12 @@ const _convertValueToUnit = (units: FieldUnitTypes, value: number, fromParams: C
   return res;
 };
 
-const _getPrettifiedValue = (units: FieldUnitTypes, value: number, params: ConversionParams) => {
+const _getPrettifiedValue = (units: FieldUnitTypes, value: number, params: ConversionParams): ConvertedResult => {
   const currentUnit = units?.[params?.unitType] ?? null;
-  if (!(value && currentUnit)) return ({ value, unit: currentUnit });
+  if (!(value && currentUnit)) return ({ value, unit: currentUnit ? currentUnit.find(({ name }) => name === params.unit) : null });
 
-  const allConvertedValues = Object.values(currentUnit).map((unit) => _convertValueToUnit(units, value, params, { unit: unit.name, unitType: unit.unit_type }));
+  const allConvertedValues = Object.values(currentUnit).map((unit) => _convertValueToUnit(units, value, params, { unit: unit.name, unitType: unit.unitType }));
 
-  console.log({ allConvertedValues });
   const filtratedValues = allConvertedValues.filter(({ value: val }) => val >= 1);
 
   if (filtratedValues.length > 0) {
@@ -96,7 +124,7 @@ const _getPrettifiedValue = (units: FieldUnitTypes, value: number, params: Conve
 };
 
 const useFieldUnitTypes = () => {
-  const units = useMemo<FieldUnitTypes>(() => sourceUnits, []);
+  const units = useMemo<FieldUnitTypes>(() => mapValues(sourceUnits, (unitsJson: Array<UnitJson>):Array<Unit> => unitsJson.map((unitJson) => unitFromJson(unitJson))), []);
   const getBaseUnit = useCallback((fieldType: MetricUnitType) => _getBaseUnit(units, fieldType), [units]);
   const convertValueToBaseUnit = useCallback((value: number, params: ConversionParams) => _convertValueToBaseUnit(units, value, params), [units]);
   const convertValueToUnit = useCallback((value: number, fromParams: ConversionParams, toParams: ConversionParams) => _convertValueToUnit(units, value, fromParams, toParams), [units]);

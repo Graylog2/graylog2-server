@@ -43,6 +43,10 @@ export default class SeriesUnit {
     return this._value.unit;
   }
 
+  get isDefined() {
+    return this._value.unit && this._value.unitType;
+  }
+
   toJSON() {
     const { unit, unitType } = this._value;
 

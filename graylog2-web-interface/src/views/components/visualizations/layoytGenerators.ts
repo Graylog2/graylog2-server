@@ -70,7 +70,7 @@ export const getFormatSettings = (unitTypeKey: MetricUnitType | 'withoutUnit') =
         type: 'date',
         // tickformat: '%S',
         tickformatstops: [
-          { dtickrange: [0, 1000], value: '%Lms', name: 'seconds' }, //
+          { dtickrange: [0, 1000], value: '%Lms', name: 'milliseconds' }, //
           { dtickrange: [1000, 60000], value: '%Ss', name: 'seconds' }, //
           { dtickrange: [60000, 3600000], value: '%Mm', name: 'minutes' }, //
           { dtickrange: [3600000, Infinity], value: '%Hh', name: 'hours' },
