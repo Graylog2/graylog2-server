@@ -17,6 +17,7 @@
 package org.graylog.datanode;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.github.joschi.jadconfig.util.Duration;
 import com.github.rholder.retry.RetryException;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
@@ -29,20 +30,20 @@ import jakarta.ws.rs.core.MediaType;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.http.HttpStatus;
 import org.assertj.core.api.Assertions;
-import org.graylog.testing.restoperations.DatanodeOpensearchWait;
-import org.graylog.testing.restoperations.RestOperationParameters;
-import org.graylog.datanode.testinfra.DatanodeContainerizedBackend;
-import org.graylog.datanode.testinfra.DatanodeDevContainerBuilder;
 import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.CertutilCa;
 import org.graylog.security.certutil.console.TestableConsole;
+import org.graylog.testing.completebackend.ContainerizedGraylogBackend;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
 import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.restoperations.DatanodeOpensearchWait;
+import org.graylog.testing.restoperations.RestOperationParameters;
 import org.graylog2.cluster.nodes.DataNodeStatus;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
+import org.graylog2.security.IndexerJwtAuthTokenProvider;
 import org.junit.jupiter.api.io.TempDir;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,7 +69,7 @@ import static io.restassured.RestAssured.given;
 
 @ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, searchVersions = SearchServer.DATANODE_DEV,
                                    additionalConfigurationParameters = {
-                                           @ContainerMatrixTestsConfiguration.ConfigurationParameter(key = DatanodeDevContainerBuilder.ENV_INSECURE_STARTUP, value = "false"),
+                                           @ContainerMatrixTestsConfiguration.ConfigurationParameter(key = "GRAYLOG_DATANODE_INSECURE_STARTUP", value = "false"),
                                            @ContainerMatrixTestsConfiguration.ConfigurationParameter(key = "GRAYLOG_ELASTICSEARCH_HOSTS", value = ""),
                                    })
 public class DatanodeProvisioningIT {
@@ -114,7 +115,7 @@ public class DatanodeProvisioningIT {
             new DatanodeOpensearchWait(RestOperationParameters.builder()
                     .port(getOpensearchPort())
                     .truststore(truststore)
-                    .jwtTokenProvider(DatanodeContainerizedBackend.JWT_AUTH_TOKEN_PROVIDER)
+                    .jwtTokenProvider(new IndexerJwtAuthTokenProvider(ContainerizedGraylogBackend.PASSWORD_SECRET, Duration.seconds(120), Duration.seconds(60)))
                     .build())
                     .waitForNodesCount(1);
         } catch (Exception e) {
