@@ -25,6 +25,16 @@ const StyledButtonToolbar = styled(ButtonToolbar)`
   flex-wrap: wrap;
 `;
 
+const getSortedNextSteps = (nextSteps: MigrationActions[]) => nextSteps.reduce((sortedNextSteps, step) => {
+  if (!MIGRATION_ACTIONS[step]?.label) {
+    return [step, ...sortedNextSteps];
+  }
+
+  sortedNextSteps.push(step);
+
+  return sortedNextSteps;
+}, []);
+
 type Props = {
     nextSteps?: Array<MigrationActions>,
     disabled?: boolean,
@@ -41,7 +51,7 @@ const MigrationStepTriggerButtonToolbar = ({ nextSteps, disabled, onTriggerStep,
 
   return (
     <StyledButtonToolbar>
-      {nextSteps.map((step) => <Button key={step} bsStyle="success" bsSize="small" disabled={disabled} onClick={() => onTriggerStep(step, args)}>{MIGRATION_ACTIONS[step]?.label || 'Next'}</Button>)}
+      {getSortedNextSteps(nextSteps).map((step, index) => <Button key={step} bsStyle={index ? 'default' : 'success'} bsSize="small" disabled={disabled} onClick={() => onTriggerStep(step, args)}>{MIGRATION_ACTIONS[step]?.label || 'Next'}</Button>)}
       {children}
     </StyledButtonToolbar>
   );
