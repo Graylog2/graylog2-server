@@ -1,5 +1,21 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
 import * as React from 'react';
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
 import { useQueryParam, StringParam } from 'use-query-params';
 import { useQuery } from '@tanstack/react-query';
 
@@ -11,6 +27,9 @@ import { Spinner, PaginatedList, SearchForm, NoSearchResult, EntityDataTable } f
 import type { Attribute, SearchParams } from 'stores/PaginationTypes';
 import type { EntityBase } from 'components/common/EntityDataTable/types';
 import UserNotification from 'util/UserNotification';
+import EntityFilters from 'components/common/EntityFilters';
+import useUrlQueryFilters from 'components/common/EntityFilters/hooks/useUrlQueryFilters';
+import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 
 type PaginatedResponse<T> = {
   list: Array<T>,
@@ -22,14 +41,18 @@ type PaginatedResponse<T> = {
 
 type Props<T> = {
   actionsCellWidth?: React.ComponentProps<typeof EntityDataTable>['actionsCellWidth'],
+  bulkSelection?: React.ComponentProps<typeof EntityDataTable>['bulkSelection'],
   columnRenderers: React.ComponentProps<typeof EntityDataTable>['columnRenderers'],
   columnsOrder: React.ComponentProps<typeof EntityDataTable>['columnsOrder'],
   entityActions: React.ComponentProps<typeof EntityDataTable>['rowActions'],
+  expandedSectionsRenderer?: React.ComponentProps<typeof EntityDataTable>['expandedSectionsRenderer'],
   fetchData: (options: SearchParams) => Promise<PaginatedResponse<T>>,
+  filterValueRenderers?: React.ComponentProps<typeof EntityFilters>['filterValueRenderers'],
   humanName: string,
   keyFn: (options: SearchParams) => Array<unknown>,
   queryHelpComponent?: React.ReactNode,
   tableLayout: Parameters<typeof useTableLayout>[0],
+  additionalAttributes?: Array<Attribute>,
 }
 
 const INITIAL_DATA = {
@@ -44,11 +67,12 @@ const INITIAL_DATA = {
  * It contains all the required logic to e.g. sync the URL query params.
  * It should not be used when there are multiple entity tables on the page or when the table is rendered in a modal.
  */
-
 const PageEntityTable = <T extends EntityBase>({
   actionsCellWidth, columnsOrder, entityActions, tableLayout, fetchData, keyFn,
-  humanName, columnRenderers, queryHelpComponent,
+  humanName, columnRenderers, queryHelpComponent, filterValueRenderers,
+  expandedSectionsRenderer, bulkSelection, additionalAttributes,
 }: Props<T>) => {
+  const [urlQueryFilters, setUrlQueryFilters] = useUrlQueryFilters();
   const [query, setQuery] = useQueryParam('query', StringParam);
   const { layoutConfig, isInitialLoading: isLoadingLayoutPreferences } = useTableLayout(tableLayout);
   const paginationQueryParameter = usePaginationQueryParameter(undefined, layoutConfig.pageSize, false);
@@ -58,9 +82,10 @@ const PageEntityTable = <T extends EntityBase>({
     page: paginationQueryParameter.page,
     pageSize: layoutConfig.pageSize,
     sort: layoutConfig.sort,
-  }), [layoutConfig.pageSize, layoutConfig.sort, paginationQueryParameter.page, query]);
+    filters: urlQueryFilters,
+  }), [layoutConfig.pageSize, layoutConfig.sort, paginationQueryParameter.page, query, urlQueryFilters]);
   const fetchKey = useMemo(() => keyFn(fetchOptions), [fetchOptions, keyFn]);
-  const { data: paginatedReports = INITIAL_DATA, isInitialLoading: isLoadingReports } = useQuery(
+  const { data: paginatedEntities = INITIAL_DATA, isInitialLoading: isLoadingReports } = useQuery(
     fetchKey,
     () => fetchData(fetchOptions),
     {
@@ -71,6 +96,11 @@ const PageEntityTable = <T extends EntityBase>({
       keepPreviousData: true,
     },
   );
+
+  const onChangeFilters = useCallback((newUrlQueryFilters: UrlQueryFilters) => {
+    paginationQueryParameter.resetPage();
+    setUrlQueryFilters(newUrlQueryFilters);
+  }, [paginationQueryParameter, setUrlQueryFilters]);
 
   const {
     onPageSizeChange,
@@ -86,15 +116,15 @@ const PageEntityTable = <T extends EntityBase>({
   });
 
   const columnDefinitions = useMemo(
-    () => ([...(paginatedReports?.attributes ?? [])]),
-    [paginatedReports?.attributes],
+    () => ([...(paginatedEntities?.attributes ?? []), ...additionalAttributes]),
+    [additionalAttributes, paginatedEntities?.attributes],
   );
 
   if (isLoadingLayoutPreferences || isLoadingReports) {
     return <Spinner />;
   }
 
-  const { list, pagination: { total } } = paginatedReports;
+  const { list, pagination: { total } } = paginatedEntities;
 
   return (
     <PaginatedList pageSize={layoutConfig.pageSize}
@@ -104,7 +134,14 @@ const PageEntityTable = <T extends EntityBase>({
         <SearchForm onSearch={onSearch}
                     onReset={onSearchReset}
                     query={query}
-                    queryHelpComponent={queryHelpComponent} />
+                    queryHelpComponent={queryHelpComponent}>
+          <div style={{ marginBottom: 5 }}>
+            <EntityFilters attributes={paginatedEntities?.attributes}
+                           urlQueryFilters={urlQueryFilters}
+                           setUrlQueryFilters={onChangeFilters}
+                           filterValueRenderers={filterValueRenderers} />
+          </div>
+        </SearchForm>
       </div>
       <div>
         {list?.length === 0 ? (
@@ -113,6 +150,8 @@ const PageEntityTable = <T extends EntityBase>({
           <EntityDataTable<T> data={list}
                               visibleColumns={layoutConfig.displayedAttributes}
                               columnsOrder={columnsOrder}
+                              expandedSectionsRenderer={expandedSectionsRenderer}
+                              bulkSelection={bulkSelection}
                               onColumnsChange={onColumnsChange}
                               onSortChange={onSortChange}
                               onPageSizeChange={onPageSizeChange}
@@ -131,7 +170,11 @@ const PageEntityTable = <T extends EntityBase>({
 
 PageEntityTable.defaultProps = {
   actionsCellWidth: 160,
+  bulkSelection: undefined,
+  expandedSectionsRenderer: undefined,
+  filterValueRenderers: undefined,
   queryHelpComponent: undefined,
+  additionalAttributes: [],
 };
 
 export default PageEntityTable;
