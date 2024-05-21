@@ -30,12 +30,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.graylog2.database.utils.MongoUtils.idEq;
 import static org.graylog2.database.utils.MongoUtils.insertedId;
 import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
+import static org.graylog2.database.utils.MongoUtils.stringIdsIn;
 
 @ExtendWith(MongoDBExtension.class)
 @ExtendWith(MongoJackExtension.class)
@@ -91,5 +93,34 @@ class MongoUtilsTest {
         assertThat(collection.find(idEq(new ObjectId(a.id()))).first()).isEqualTo(a);
         assertThat(collection.find(idEq(b.id())).first()).isEqualTo(b);
         assertThat(collection.find(idEq(new ObjectId(b.id()))).first()).isEqualTo(b);
+    }
+
+    @Test
+    void testIdsIn() {
+        String missingId1 = "6627add0ee216425dd6df36a";
+        String missingId2 = "6627add0ee216425dd6df36b";
+        String idA = "6627add0ee216425dd6df37a";
+        String idB = "6627add0ee216425dd6df37b";
+        String idC = "6627add0ee216425dd6df37c";
+        String idD = "6627add0ee216425dd6df37d";
+        String idE = "6627add0ee216425dd6df37e";
+        String idF = "6627add0ee216425dd6df37f";
+        final var a = new DTO(idA, "a");
+        final var b = new DTO(idB, "b");
+        final var c = new DTO(idC, "c");
+        final var d = new DTO(idD, "d");
+        final var e = new DTO(idE, "e");
+        final var f = new DTO(idF, "f");
+        collection.insertMany(List.of(a, b, c, d, e, f));
+
+        assertThat(collection.find(stringIdsIn(Set.of(idA, idF)))).contains(a, f);
+        assertThat(collection.find(stringIdsIn(Set.of(idA, idF)))).hasSize(2);
+        assertThat(collection.find(stringIdsIn(Set.of(missingId1, missingId2)))).hasSize(0);
+        assertThat(collection.find(stringIdsIn(Set.of(idA, idB, missingId1, missingId2)))).contains(a, b);
+        assertThat(collection.find(stringIdsIn(Set.of(idA, idB, missingId1, missingId2)))).hasSize(2);
+        assertThat(collection.find(stringIdsIn(Set.of(idA, idB, idC, idD, idE, idF)))).hasSize(6);
+        assertThat(collection.find(stringIdsIn(Set.of(idA, idB, idC, idD, idE, idF)))).contains(a, b, c, d, e, f);
+        assertThat(collection.find(stringIdsIn(Set.of(idA, idB, idC, idD, idE, idF, missingId1, missingId2)))).hasSize(6);
+        assertThat(collection.find(stringIdsIn(Set.of(idA, idB, idC, idD, idE, idF, missingId1, missingId2)))).contains(a, b, c, d, e, f);
     }
 }
