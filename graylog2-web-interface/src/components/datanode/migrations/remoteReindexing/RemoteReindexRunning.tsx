@@ -113,7 +113,8 @@ const RemoteReindexRunning = ({ currentStep, onTriggerStep }: MigrationStepCompo
       {showLogView && (
         <BootstrapModalWrapper showModal={showLogView}
                                onHide={() => setShowLogView(false)}
-                               bsSize="large">
+                               bsSize="large"
+                               backdrop>
           <Modal.Header closeButton>
             <Modal.Title>Remote Reindex Migration Logs</Modal.Title>
           </Modal.Header>
