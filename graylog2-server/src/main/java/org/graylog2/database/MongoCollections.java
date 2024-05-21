@@ -36,8 +36,7 @@ public class MongoCollections {
     private final MongoConnection mongoConnection;
 
     @Inject
-    public MongoCollections(MongoJackObjectMapperProvider objectMapperProvider,
-                            MongoConnection mongoConnection) {
+    public MongoCollections(MongoJackObjectMapperProvider objectMapperProvider, MongoConnection mongoConnection) {
         this.objectMapper = objectMapperProvider.get();
         this.mongoConnection = mongoConnection;
     }
