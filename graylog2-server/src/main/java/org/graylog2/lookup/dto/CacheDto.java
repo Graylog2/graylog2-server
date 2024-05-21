@@ -16,10 +16,12 @@
  */
 package org.graylog2.lookup.dto;
 
+import com.google.auto.value.AutoValue;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.google.auto.value.AutoValue;
+
 import org.graylog2.database.entities.ScopedEntity;
 import org.graylog2.plugin.lookup.LookupCacheConfiguration;
 

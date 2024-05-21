@@ -42,7 +42,7 @@ import java.util.stream.Stream;
  * @param <T> Java type of the documents to interact with
  */
 public class MongoUtils<T extends MongoEntity> {
-    final MongoCollection<T> collection;
+    private final MongoCollection<T> collection;
     private final ObjectMapper objectMapper;
     private final CustomJacksonCodecRegistry codecRegistry;
 

@@ -21,7 +21,6 @@ import com.mongodb.client.MongoCollection;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.database.entities.ScopedEntity;
 import org.graylog2.database.jackson.CustomJacksonCodecRegistry;
@@ -30,28 +29,17 @@ import org.graylog2.database.pagination.MongoPaginationHelper;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.database.utils.ScopedEntityMongoUtils;
 
-import java.util.Set;
-
 @Singleton
 public class MongoCollections {
 
     private final ObjectMapper objectMapper;
     private final MongoConnection mongoConnection;
-    private final EntityScopeService entityScopeService;
 
     @Inject
     public MongoCollections(MongoJackObjectMapperProvider objectMapperProvider,
-                            MongoConnection mongoConnection,
-                            EntityScopeService entityScopeService) {
+                            MongoConnection mongoConnection) {
         this.objectMapper = objectMapperProvider.get();
         this.mongoConnection = mongoConnection;
-        this.entityScopeService = entityScopeService;
-    }
-
-    public MongoCollections(MongoJackObjectMapperProvider objectMapperProvider, MongoConnection mongoConnection) {
-        this.objectMapper = objectMapperProvider.get();
-        this.mongoConnection = mongoConnection;
-        this.entityScopeService = new EntityScopeService(Set.of(new DefaultEntityScope()));
     }
 
     /**
@@ -111,9 +99,9 @@ public class MongoCollections {
     }
 
     /**
-     * Provides typical utility methods and mutability checks for ScopedEntity objects
+     * Provides utility methods for creating, updating, and deleting ScopedEntity objects
      */
-    public <T extends ScopedEntity> ScopedEntityMongoUtils<T> scopedEntityUtils(MongoCollection<T> collection) {
-        return new ScopedEntityMongoUtils<>(collection, objectMapper, entityScopeService);
+    public <T extends ScopedEntity> ScopedEntityMongoUtils<T> scopedEntityUtils(MongoCollection<T> collection, EntityScopeService entityScopeService) {
+        return new ScopedEntityMongoUtils<>(collection, entityScopeService);
     }
 }

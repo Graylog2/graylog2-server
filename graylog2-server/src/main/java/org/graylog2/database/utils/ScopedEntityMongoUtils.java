@@ -16,7 +16,6 @@
  */
 package org.graylog2.database.utils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.MongoCollection;
 import org.bson.types.ObjectId;
 import org.graylog2.database.entities.EntityScopeService;
@@ -25,13 +24,16 @@ import org.graylog2.database.entities.ScopedEntity;
 import java.util.Objects;
 import java.util.Optional;
 
-public class ScopedEntityMongoUtils<T extends ScopedEntity> extends MongoUtils<T> {
+import static org.graylog2.database.utils.MongoUtils.idEq;
+import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
+
+public class ScopedEntityMongoUtils<T extends ScopedEntity> {
+    private final MongoCollection<T> collection;
     private final EntityScopeService entityScopeService;
 
     public ScopedEntityMongoUtils(MongoCollection<T> delegate,
-                                  ObjectMapper objectMapper,
                                   EntityScopeService entityScopeService) {
-        super(delegate, objectMapper);
+        this.collection = delegate;
         this.entityScopeService = entityScopeService;
     }
 
@@ -66,7 +68,6 @@ public class ScopedEntityMongoUtils<T extends ScopedEntity> extends MongoUtils<T
      * @param id the document's id.
      * @return true if a document was deleted, false otherwise.
      */
-    @Override
     public boolean deleteById(String id) {
         return deleteById(new ObjectId(id));
     }
@@ -77,9 +78,9 @@ public class ScopedEntityMongoUtils<T extends ScopedEntity> extends MongoUtils<T
      * @param id Hex string representation of the document's {@link ObjectId}.
      * @return true if a document was deleted, false otherwise.
      */
-    @Override
     public boolean deleteById(ObjectId id) {
-        final T entity = getById(id).orElseThrow(() -> new IllegalArgumentException("Entity not found"));
+        final T entity = Optional.ofNullable(collection.find(idEq(id)).first())
+                .orElseThrow(() -> new IllegalArgumentException("Entity not found"));
         ensureDeletability(entity);
         ensureMutability(entity);
         return collection.deleteOne(idEq(id)).getDeletedCount() > 0;
@@ -101,7 +102,8 @@ public class ScopedEntityMongoUtils<T extends ScopedEntity> extends MongoUtils<T
 
         // First, check whether this entity has been persisted, if so, the persisted entity's scope takes precedence.
         // Else, the entity does not exist in the database, This could be a new entity--check it
-        Optional<T> current = getById(scopedEntity.id());
+        Optional<T> current = scopedEntity.id() == null ? Optional.empty()
+                : Optional.ofNullable(collection.find(idEq(scopedEntity.id())).first());
         return current
                 .map(t -> entityScopeService.isMutable(t, scopedEntity))
                 .orElseGet(() -> entityScopeService.isMutable(scopedEntity));
@@ -112,7 +114,8 @@ public class ScopedEntityMongoUtils<T extends ScopedEntity> extends MongoUtils<T
 
         // First, check whether this entity has been persisted, if so, the persisted entity's scope takes precedence.
         // Else, the entity does not exist in the database, This could be a new entity--check it
-        Optional<T> current = getById(scopedEntity.id());
+        Optional<T> current = scopedEntity.id() == null ? Optional.empty()
+                : Optional.ofNullable(collection.find(idEq(scopedEntity.id())).first());
         return current
                 .map(entityScopeService::isDeletable)
                 .orElseGet(() -> entityScopeService.isDeletable(scopedEntity));
