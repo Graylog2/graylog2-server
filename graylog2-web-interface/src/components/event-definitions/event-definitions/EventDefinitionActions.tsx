@@ -98,6 +98,18 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
 
   const isSigmaEventDefinition = (): boolean => eventDefinition?.config?.type === 'sigma-v1';
 
+  const getDeleteActionTitle = () => {
+    if (isSystemEventDefinition()) {
+      return 'System Event Definition cannot be deleted';
+    }
+
+    if (isSigmaEventDefinition()) {
+      return 'Sigma Rules must be deleted from the Sigma Rules page';
+    }
+
+    return undefined;
+  };
+
   const pluggableSigmaModal = usePluginEntities('eventDefinitions.components.editSigmaModal')
     .find((entity: { key: string }) => entity.key === 'coreSigmaModal');
 
@@ -260,9 +272,7 @@ const EventDefinitionActions = ({ eventDefinition, refetchEventDefinitions }: Pr
             <IfPermitted permissions={`eventdefinitions:delete:${eventDefinition.id}`}>
               <MenuItem divider />
               <MenuItem disabled={isSystemEventDefinition() || isSigmaEventDefinition()}
-                        title={isSystemEventDefinition() ? 'System Event Definition cannot be deleted'
-                          : isSigmaEventDefinition() ? 'Sigma Rules must be deleted from the Sigma Rules page'
-                            : undefined}
+                        title={getDeleteActionTitle()}
                         onClick={isSystemEventDefinition() || isSigmaEventDefinition() ? undefined : () => handleAction(DIALOG_TYPES.DELETE, eventDefinition)}
                         data-testid="delete-button">Delete
               </MenuItem>
