@@ -61,37 +61,6 @@ const MarkdownStyles = styled.div`
       margin-bottom: 8px;
     }
 
-    & > hr {
-      margin: 16px 0;
-      border: none;
-      border-bottom: 1px solid ${({ theme }) => theme.colors.brand.tertiary};
-    }
-
-    & > h1 {
-      font-size: 5cqw;
-      font-weight: bold;
-    }
-
-    & > h2 {
-      font-size: 4cqw;
-      font-weight: normal;
-    }
-
-    & > h3 {
-      font-size: 3.5cqw;
-      font-weight: bold;
-    }
-
-    & > h4 {
-      font-size: 3.5cqw;
-      font-weight: normal;
-    }
-
-    & > h5, & > h6 {
-      font-size: 3cqw;
-      font-weight: normal;
-    }
-
     & ul, & ol {
       padding-left: 1.5rem;
       margin: 8px 0;
