@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.startpage;
 
 import com.google.common.eventbus.EventBus;
+import jakarta.inject.Inject;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNTypes;
@@ -33,8 +34,6 @@ import org.graylog2.database.PaginatedList;
 import org.graylog2.rest.models.PaginatedResponse;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-
-import jakarta.inject.Inject;
 
 import java.util.List;
 import java.util.Optional;
@@ -91,9 +90,13 @@ public class StartPageService {
                                 title,
                                 i.userName(),
                                 i.timestamp()))
-
+                        .orElse(new RecentActivity(i.id(),
+                                i.activityType(),
+                                i.itemGrn(),
+                                i.itemTitle(),
+                                i.userName(),
+                                i.timestamp()))
                 )
-                .flatMap(Optional::stream)
                 .toList();
         return PaginatedResponse.create("recentActivity", new PaginatedList<>(mapped, items.pagination().total(), page, perPage));
     }
