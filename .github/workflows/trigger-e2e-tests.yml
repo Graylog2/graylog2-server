@@ -26,7 +26,7 @@ jobs:
       - name: Trigger E2E Tests
         if: steps.check.outputs.run_e2e == 'true'
         run: |
-          gh workflow run -R Graylog2/e2e-tests trigger-e2e-tests.yml --ref main
+          gh workflow run -R Graylog2/e2e-tests run-e2e-tests.yml --ref main
             -f caller_repo=${{ github.repository }} \
             -f caller_pr_nr=${{ github.event.pull_request.number }} \
             -f caller_base_branch=${{ github.event.pull_request.base.ref }} \
