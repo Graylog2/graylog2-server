@@ -15,23 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useParams } from 'react-router-dom';
 
-import {  Spinner } from 'components/common';
-import useStream from 'hooks/useStream';
-import StreamDetails from 'components/streams/StreamDetails/StreamDetails';
+// type Props = {}
 
-const StreamDetailsPage = () => {
-  const { streamId } = useParams<{ streamId: string }>();
-  const { data: stream, isInitialLoading } = useStream(streamId);
+const StreamProcessingRoutingDestinations = () => (
+  <h2>Data Routing - Destination</h2>
+);
 
-  if (isInitialLoading) {
-    return <Spinner />;
-  }
-
-  return (
-    <StreamDetails stream={stream} />
-  );
-};
-
-export default StreamDetailsPage;
+export default StreamProcessingRoutingDestinations;

@@ -14,24 +14,3 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import { useParams } from 'react-router-dom';
-
-import {  Spinner } from 'components/common';
-import useStream from 'hooks/useStream';
-import StreamDetails from 'components/streams/StreamDetails/StreamDetails';
-
-const StreamDetailsPage = () => {
-  const { streamId } = useParams<{ streamId: string }>();
-  const { data: stream, isInitialLoading } = useStream(streamId);
-
-  if (isInitialLoading) {
-    return <Spinner />;
-  }
-
-  return (
-    <StreamDetails stream={stream} />
-  );
-};
-
-export default StreamDetailsPage;

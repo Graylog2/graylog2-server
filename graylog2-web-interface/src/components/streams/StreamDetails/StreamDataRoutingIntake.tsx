@@ -15,30 +15,55 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import styled, { css } from 'styled-components';
 
-import type { Stream } from 'stores/streams/StreamsStore';
+import { type Stream } from 'stores/streams/StreamsStore';
 import SectionComponent from 'components/common/Section/SectionComponent';
-import { ListGroup, ListGroupItem } from 'components/bootstrap';
-import StreamRule from 'components/streamrules/StreamRule';
+import { Table } from 'components/bootstrap';
+import DetailsStreamRule from 'components/streamrules/DetailsStreamRule';
+import { IfPermitted } from 'components/common';
+import CreateStreamRuleButton from 'components/streamrules/CreateStreamRuleButton';
 
 type Props = {
   stream: Stream,
 }
 
+export const Headline = styled.h2(({ theme }) => css`
+  margin-top: ${theme.spacings.sm};
+  margin-bottom: ${theme.spacings.xs};
+`);
+
 const StreamDataRoutingInstake = ({ stream }: Props) => {
   const hasStreamRules = !!stream.rules?.length;
 
   return (
-    <SectionComponent title="Data Routing - Intake">
-      <ListGroup componentClass="ul">
-        {hasStreamRules && stream.rules.map((streamRule) => (
-          <StreamRule key={streamRule.id}
-                      stream={stream}
-                      streamRule={streamRule} />
-        ))}
+    <SectionComponent title="Stream rules"
+                      headerActions={(
+                        <IfPermitted permissions="streams:create">
+                          <CreateStreamRuleButton bsStyle="success"
+                                                  streamId={stream.id} />
+                        </IfPermitted>
+                      )}>
+      <Table condensed>
+        <thead>
+          <tr>
+            <th>Rule</th>
+          </tr>
+        </thead>
+        <tbody>
+          {hasStreamRules && stream.rules.map((streamRule) => (
+            <DetailsStreamRule key={streamRule.id}
+                               stream={stream}
+                               streamRule={streamRule} />
+          ))}
 
-        {!hasStreamRules && <ListGroupItem>No rules defined.</ListGroupItem>}
-      </ListGroup>
+          {!hasStreamRules && (
+          <tr>
+            <td>No rules defined.</td>
+          </tr>
+          )}
+        </tbody>
+      </Table>
     </SectionComponent>
   );
 };

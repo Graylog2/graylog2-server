@@ -30,17 +30,15 @@ const StreamDataRoutingProcessing = () => {
 
   return (
     <SectionComponent title="Data Routing - Processing">
-      <Table striped bordered condensed>
+      <Table condensed>
         <thead>
           <tr>
-            <th>#</th>
             <th>Pipeline</th>
           </tr>
         </thead>
         <tbody>
-          {hasConnectedPipelines && connectedPipelines.map((pipeline, idx) => (
+          {hasConnectedPipelines && connectedPipelines.map((pipeline) => (
             <tr key={pipeline.id}>
-              <td>{idx + 1}</td>
               <td>
                 <Link to={Routes.SYSTEM.PIPELINES.PIPELINE(pipeline.id)} target="_blank">{pipeline.title}</Link>
               </td>
