@@ -225,21 +225,32 @@ public class Indices {
     }
 
     public boolean create(String indexName, IndexSet indexSet) {
-        final IndexSettings indexSettings = IndexSettings.create(
+        return create(indexName, () -> {
+            // Make sure our index template exists before creating an index!
+            ensureIndexTemplate(indexSet);
+            indicesAdapter.create(indexName, createIndexSettings(indexSet));
+        });
+    }
+
+    public boolean create(String indexName, IndexSet indexSet, Map<String, Object> indexMapping) {
+        return create(indexName, () -> indicesAdapter.create(indexName, createIndexSettings(indexSet), indexMapping));
+    }
+
+    private IndexSettings createIndexSettings(IndexSet indexSet) {
+        return IndexSettings.create(
                 indexSet.getConfig().shards(),
                 indexSet.getConfig().replicas()
         );
+    }
 
+    private boolean create(String indexName, Runnable action) {
         try {
-            // Make sure our index template exists before creating an index!
-            ensureIndexTemplate(indexSet);
-            indicesAdapter.create(indexName, indexSettings);
+            action.run();
         } catch (Exception e) {
             LOG.warn("Couldn't create index {}. Error: {}", indexName, e.getMessage(), e);
             auditEventSender.failure(AuditActor.system(nodeId), ES_INDEX_CREATE, ImmutableMap.of("indexName", indexName));
             return false;
         }
-
         auditEventSender.success(AuditActor.system(nodeId), ES_INDEX_CREATE, ImmutableMap.of("indexName", indexName));
         return true;
     }
@@ -421,5 +432,9 @@ public class Indices {
 
     public void refresh(String... indices) {
         indicesAdapter.refresh(indices);
+    }
+
+    public Map<String, Object> indexMapping(String index) {
+        return indicesAdapter.getIndexMapping(index);
     }
 }
