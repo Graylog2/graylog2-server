@@ -17,10 +17,13 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 
+import Routes from 'routing/Routes';
+import { Link } from 'components/common/router';
 import { Badge } from 'components/bootstrap';
 
 type Props = {
   title: string,
+  id: string,
   isDefault: boolean
 }
 
@@ -28,11 +31,11 @@ const StyledBadge = styled(Badge)(({ theme }) => css`
   margin-left: ${theme.spacings.xs};
 `);
 
-const TitleCell = ({ title, isDefault }: Props) => (
-  <>
+const TitleCell = ({ title, id, isDefault }: Props) => (
+  <Link to={Routes.SYSTEM.INDICES.TEMPLATES.view(id)}>
     <span>{title}</span>
     {isDefault && (<StyledBadge>Default</StyledBadge>)}
-  </>
+  </Link>
 );
 
 export default TitleCell;

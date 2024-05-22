@@ -17,7 +17,6 @@
 
 import { useEffect, useState } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
-import moment from 'moment';
 
 import useIndexSetTemplateDefaults from 'components/indices/IndexSetTemplates/hooks/useIndexSetTemplateDefaults';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
@@ -49,7 +48,7 @@ const useIndexSet = (initialIndexSet?: IndexSet) :[IndexSet, Dispatch<SetStateAc
       index_analyzer: indexSetTemplateDefaults.index_analyzer,
       index_optimization_max_num_segments: indexSetTemplateDefaults.index_optimization_max_num_segments,
       index_optimization_disabled: indexSetTemplateDefaults.index_optimization_disabled,
-      field_type_refresh_interval: moment.duration(indexSetTemplateDefaults.field_type_refresh_interval, indexSetTemplateDefaults.field_type_refresh_interval_unit).asMilliseconds(),
+      field_type_refresh_interval: indexSetTemplateDefaults.field_type_refresh_interval,
     };
 
     if (initialIndexSet) {

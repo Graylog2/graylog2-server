@@ -28,7 +28,7 @@ const IndexSetTemplatesPage = () => (
     <PageHeader title="Index Set Templates"
                 actions={<CreateIndexSetTemplateButton />}>
       <span>
-        Some text
+        View and manage your Index Set Templates
       </span>
     </PageHeader>
 

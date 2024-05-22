@@ -17,27 +17,41 @@
 import React from 'react';
 
 import useParams from 'routing/useParams';
+import Routes from 'routing/Routes';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-import { Col, Row } from 'components/bootstrap';
+import { LinkContainer } from 'components/common/router';
+import { Button, Col, Row } from 'components/bootstrap';
 import { IndicesPageNavigation } from 'components/indices';
-import EditTemplate from 'components/indices/IndexSetTemplates/EditTemplate';
+import TemplateDetails from 'components/indices/IndexSetTemplates/TemplateDetails';
 import useTemplate from 'components/indices/IndexSetTemplates/hooks/useTemplate';
 
-const IndexSetTemplateEditPage = () => {
+const IndexSetTemplatePage = () => {
   const { templateId } = useParams();
   const { data, isFetching } = useTemplate(templateId);
 
+  const title = !isFetching ? data.title : 'Index Set Template';
+
   return (
-    <DocumentTitle title="Edit Index Set Template">
+    <DocumentTitle title={title}>
       <IndicesPageNavigation />
-      <PageHeader title="Edit Index Set Template" />
+      <PageHeader title={title}
+                  actions={(
+                    <LinkContainer to={Routes.SYSTEM.INDICES.TEMPLATES.OVERVIEW}>
+                      <Button>Overview</Button>
+                    </LinkContainer>
+)}>
+        <span>
+          {!isFetching && data.description ? data.description : 'Viewing Index Set Template Details'}
+        </span>
+
+      </PageHeader>
       <Row className="content">
         <Col md={12}>
-          {!isFetching ? <EditTemplate template={data} /> : <Spinner />}
+          {!isFetching ? <TemplateDetails template={data} /> : <Spinner />}
         </Col>
       </Row>
     </DocumentTitle>
   );
 };
 
-export default IndexSetTemplateEditPage;
+export default IndexSetTemplatePage;

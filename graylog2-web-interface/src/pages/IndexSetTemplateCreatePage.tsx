@@ -24,11 +24,7 @@ import CreateTemplate from 'components/indices/IndexSetTemplates/CreateTemplate'
 const IndexSetTemplateCreatePage = () => (
   <DocumentTitle title="Create Index Set Template">
     <IndicesPageNavigation />
-    <PageHeader title="Create Index Set Template">
-      <span>
-        Some description
-      </span>
-    </PageHeader>
+    <PageHeader title="Create Index Set Template" />
     <Row className="content">
       <Col md={12}>
         <CreateTemplate />

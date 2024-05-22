@@ -34,13 +34,11 @@ export type IndexSetsDefaultConfiguration = IndexSetDefaultFields & {
   rotation_strategy?: RotationStrategyConfig | null,
   retention_strategy_class?: string | null,
   retention_strategy?: RetentionStrategyConfig | null,
-  field_type_refresh_interval_unit: 'seconds' | 'minutes',
   use_legacy_rotation: boolean,
   data_tiering: DataTieringConfig
 }
 
 type IndexSetsDefaultConfigurationFormValues = IndexSetDefaultFields & {
-  field_type_refresh_interval_unit: 'seconds' | 'minutes',
   data_tiering: DataTieringFormValues
 }
 
