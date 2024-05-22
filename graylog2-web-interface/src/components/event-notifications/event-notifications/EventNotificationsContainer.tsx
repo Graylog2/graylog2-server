@@ -72,7 +72,7 @@ const EventNotificationsContainer = () => {
     queryClient.invalidateQueries(keyFn());
   }, [getNotificationTest, pathname, queryClient, sendTelemetry]);
 
-  const renderEventDefinitionActions = useCallback((listItem: EventNotification) => (
+  const renderEvenNotificationActions = useCallback((listItem: EventNotification) => (
     <EventNotificationActions notification={listItem}
                               isTestLoading={isLoadingTest}
                               onTest={handleTest} />
@@ -82,7 +82,7 @@ const EventNotificationsContainer = () => {
     <PageEntityTable<EventNotification> humanName="event notifications"
                                         columnsOrder={COLUMNS_ORDER}
                                         queryHelpComponent={<QueryHelper entityName="notification" />}
-                                        entityActions={renderEventDefinitionActions}
+                                        entityActions={renderEvenNotificationActions}
                                         tableLayout={DEFAULT_LAYOUT}
                                         fetchData={fetchEventNotifications}
                                         keyFn={keyFn}
