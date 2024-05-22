@@ -19,42 +19,42 @@ import * as Immutable from 'immutable';
 import type { MetricUnitType } from 'views/types';
 
 export type SeriesUnitJson = {
-  unit: string,
+  abbrev: string,
   unit_type: MetricUnitType,
 };
 
 export type SeriesUnitState = {
-  unit: string,
+  abbrev: string,
   unitType: MetricUnitType,
 };
 
 export default class SeriesUnit {
   private readonly _value: SeriesUnitState;
 
-  constructor(unitType: MetricUnitType, unit: string) {
-    this._value = { unitType, unit };
+  constructor(unitType: MetricUnitType, abbrev: string) {
+    this._value = { unitType, abbrev };
   }
 
   get unitType() {
     return this._value.unitType;
   }
 
-  get unit() {
-    return this._value.unit;
+  get abbrev() {
+    return this._value.abbrev;
   }
 
   get isDefined() {
-    return this._value.unit && this._value.unitType;
+    return this._value.abbrev && this._value.unitType;
   }
 
   toJSON() {
-    const { unit, unitType } = this._value;
+    const { abbrev, unitType } = this._value;
 
-    return { unit, unit_type: unitType };
+    return { abbrev, unit_type: unitType };
   }
 
   static fromJSON(value: SeriesUnitJson) {
-    return new SeriesUnit(value?.unit_type, value?.unit);
+    return new SeriesUnit(value?.unit_type, value?.abbrev);
   }
 
   static empty() {
@@ -76,8 +76,8 @@ class Builder {
     this.value = value;
   }
 
-  unit(newUnit: string) {
-    return new Builder(this.value.set('unit', newUnit));
+  abbrev(newUnit: string) {
+    return new Builder(this.value.set('abbrev', newUnit));
   }
 
   unitType(newUnitType: MetricUnitType) {
@@ -85,8 +85,8 @@ class Builder {
   }
 
   build() {
-    const { unit, unitType } = this.value.toObject();
+    const { abbrev, unitType } = this.value.toObject();
 
-    return new SeriesUnit(unitType, unit);
+    return new SeriesUnit(unitType, abbrev);
   }
 }

@@ -82,7 +82,7 @@ const metricsToSeries = (formMetrics: Array<MetricFormValues>) => formMetrics
   .map((metric) => Series.create(metric.function, emptyToUndefined(metric.field), parameterForMetric(metric))
     .toBuilder()
     .config(SeriesConfig.empty().toBuilder().name(metric.name).build())
-    .unit(SeriesUnit.empty().toBuilder().unit(metric.unit).unitType(metric.unitType)
+    .unit(SeriesUnit.empty().toBuilder().abbrev(metric.unitAbbrev).unitType(metric.unitType)
       .build())
     .build());
 
@@ -93,7 +93,7 @@ export const seriesToMetrics = (series: Array<Series>) => series.map((s: Series)
     function: func,
     field,
     name: s.config?.name,
-    unit: s.unit.unit,
+    unitAbbrev: s.unit.abbrev,
     unitType: s.unit.unitType,
   };
 

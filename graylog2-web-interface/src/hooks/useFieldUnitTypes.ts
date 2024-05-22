@@ -60,14 +60,14 @@ const unitFromJson = (unitJson: UnitJson): Unit => set<Unit>(omit(unitJson, 'uni
 const _getBaseUnit = (units: FieldUnitTypes, unitType: MetricUnitType): Unit => units[unitType].find(({ type }) => type === 'base');
 
 const _convertValueToBaseUnit = (units: FieldUnitTypes, value: number, params: ConversionParams): ConvertedResult => {
-  const unit = units[params.unitType].find(({ name }) => params.unit === name);
+  const unit = units[params.unitType].find(({ abbrev }) => params.abbrev === abbrev);
   const baseUnit = _getBaseUnit(units, params.unitType);
   const res: ConvertedResult = ({
     value: null,
     unit: baseUnit,
   });
 
-  if (baseUnit.name === params.unit) {
+  if (baseUnit.abbrev === params.abbrev) {
     res.value = value;
 
     return res;
@@ -85,14 +85,14 @@ const _convertValueToBaseUnit = (units: FieldUnitTypes, value: number, params: C
 };
 
 const _convertValueToUnit = (units: FieldUnitTypes, value: number, fromParams: ConversionParams, toParams: ConversionParams): ConvertedResult => {
-  if (fromParams.unitType === toParams.unitType && fromParams.unit === toParams.unit) {
-    const unit = units[toParams.unitType].find(({ name }) => toParams.unit === name);
+  if (fromParams.unitType === toParams.unitType && fromParams.abbrev === toParams.abbrev) {
+    const unit = units[toParams.unitType].find(({ abbrev }) => toParams.abbrev === abbrev);
 
     return ({ value, unit });
   }
 
   const baseValue = _convertValueToBaseUnit(units, value, fromParams);
-  const unit = units[toParams.unitType].find(({ name }) => toParams.unit === name);
+  const unit = units[toParams.unitType].find(({ abbrev }) => toParams.abbrev === abbrev);
   const res: ConvertedResult = ({ value: null, unit });
 
   if (unit?.conversion?.action === 'MULTIPLY') {
@@ -108,9 +108,9 @@ const _convertValueToUnit = (units: FieldUnitTypes, value: number, fromParams: C
 
 const _getPrettifiedValue = (units: FieldUnitTypes, value: number, params: ConversionParams): ConvertedResult => {
   const currentUnit = units?.[params?.unitType] ?? null;
-  if (!(value && currentUnit)) return ({ value, unit: currentUnit ? currentUnit.find(({ name }) => name === params.unit) : null });
+  if (!(value && currentUnit)) return ({ value, unit: currentUnit ? currentUnit.find(({ abbrev }) => abbrev === params.abbrev) : null });
 
-  const allConvertedValues = Object.values(currentUnit).map((unit) => _convertValueToUnit(units, value, params, { unit: unit.name, unitType: unit.unitType }));
+  const allConvertedValues = Object.values(currentUnit).map((unit) => _convertValueToUnit(units, value, params, { abbrev: unit.abbrev, unitType: unit.unitType }));
 
   const filtratedValues = allConvertedValues.filter(({ value: val }) => val >= 1);
 

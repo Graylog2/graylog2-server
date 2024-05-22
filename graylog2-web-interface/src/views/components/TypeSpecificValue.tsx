@@ -60,7 +60,7 @@ type FormattedValueProps = Omit<TypeSpecificValueProps, 'type'>;
 
 const ValueWithUnitRenderer = ({ value, unit }: { value: number, unit: SeriesUnit}) => {
   const { getPrettifiedValue } = useFieldUnitTypes();
-  const prettified = getPrettifiedValue(value, { unit: unit.unit, unitType: unit.unitType });
+  const prettified = getPrettifiedValue(value, { abbrev: unit.abbrev, unitType: unit.unitType });
 
   return <span title={value.toString()}>{`${prettified.value.toFixed(VALUE_WITH_UNIT_DIGITS)} ${prettified.unit.abbrev}`}</span>;
 };

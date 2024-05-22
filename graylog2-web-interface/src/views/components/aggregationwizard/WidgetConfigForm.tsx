@@ -43,7 +43,7 @@ export type MetricFormValues = {
   percentile?: number | undefined,
   strategy?: string,
   unitType?: MetricUnitType,
-  unit?: string,
+  unitAbbrev?: string,
 };
 
 export type GroupingDirection = 'row' | 'column';

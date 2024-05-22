@@ -48,22 +48,21 @@ const UnitMetricPopover = ({ index }: { index: number }) => {
   const currentUnitType = useMemo<string>(() => values?.metrics?.[index]?.unitType, [values, index]);
   const unitTypesOptions = useMemo(() => Object.keys(units).map((key) => ({ value: key, label: key })), [units]);
   const unitOptions = useMemo(() => currentUnitType && units[currentUnitType]
-    .map(({ name }: UnitJson) => ({ value: name, label: name })), [units, currentUnitType]);
+    .map(({ abbrev, name }: UnitJson) => ({ value: abbrev, label: name })), [units, currentUnitType]);
   const toggleShow = () => setShow((cur) => !cur);
   const onUnitTypeChange = useCallback((val: string) => {
     setFieldValue(`metrics.${index}.unitType`, val || undefined);
-    setFieldValue(`metrics.${index}.unit`, undefined);
+    setFieldValue(`metrics.${index}.unitAbbrev`, undefined);
   }, [index, setFieldValue]);
 
   useEffect(() => {
   }, []);
 
   const badgeLabel = useMemo(() => {
-    const curUnitType = values?.metrics?.[index]?.unitType;
-    const curUnit = values?.metrics?.[index]?.unit;
+    const curUnit = values?.metrics?.[index]?.unitAbbrev;
 
-    return units[curUnitType]?.find(({ name }) => name === curUnit)?.abbrev || '-';
-  }, [index, units, values?.metrics]);
+    return curUnit || '-';
+  }, [index, values?.metrics]);
 
   return (
     <Popover position="right" opened={show} withArrow>
@@ -96,7 +95,7 @@ const UnitMetricPopover = ({ index }: { index: number }) => {
             )}
           </Field>
           {currentUnitType && (
-          <Field name={`metrics.${index}.unit`}>
+          <Field name={`metrics.${index}.unitAbbrev`}>
             {({ field: { name, value, onChange }, meta: { error } }) => (
               <Input id="metric-unit-field"
                      label={<span>Unit <HoverForHelp displayLeftMargin>Field value unit which is used in Data Base</HoverForHelp></span>}
