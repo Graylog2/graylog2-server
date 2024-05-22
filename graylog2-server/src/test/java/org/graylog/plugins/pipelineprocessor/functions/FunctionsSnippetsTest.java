@@ -1715,19 +1715,23 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     @Test
     public void fieldValueType() {
         final Rule rule = parser.parseRule(ruleForTest(), false);
-        final Message message = evaluateRule(rule);
+        final Message message = messageFactory.createMessage("message", "source", DateTime.now(DateTimeZone.UTC));
+        // Add a random field type we don't explicitly handle.
+        message.addField("unmapped_type_field", rule);
+        evaluateRule(rule, message);
 
         assertThat(actionsTriggered.get()).isTrue();
         assertThat(message).isNotNull();
-        assertThat(message.getField("null_type")).isEqualTo(null);
-        assertThat(message.getField("boolean_type")).isEqualTo(FieldValueType.BOOLEAN);
-        assertThat(message.getField("string_type")).isEqualTo(FieldValueType.STRING);
-        assertThat(message.getField("double_type")).isEqualTo(FieldValueType.DOUBLE);
-        assertThat(message.getField("long_type")).isEqualTo(FieldValueType.LONG);
-        assertThat(message.getField("list_type")).isEqualTo(FieldValueType.LIST);
-        assertThat(message.getField("map_type")).isEqualTo(FieldValueType.MAP);
-        assertThat(message.getField("value_node_type")).isEqualTo(FieldValueType.VALUE_NODE);
-        assertThat(message.getField("array_node_type")).isEqualTo(FieldValueType.ARRAY_NODE);
-        assertThat(message.getField("object_node_type")).isEqualTo(FieldValueType.OBJECT_NODE);
+        assertThat(message.getField("unmapped_type_field_type")).isEqualTo("autovalue_rule");
+        assertThat(message.getField("null_type")).isEqualTo("null");
+        assertThat(message.getField("boolean_type")).isEqualTo(FieldValueType.Type.BOOLEAN.getName());
+        assertThat(message.getField("string_type")).isEqualTo(FieldValueType.Type.STRING.getName());
+        assertThat(message.getField("double_type")).isEqualTo(FieldValueType.Type.DOUBLE.getName());
+        assertThat(message.getField("long_type")).isEqualTo(FieldValueType.Type.LONG.getName());
+        assertThat(message.getField("list_type")).isEqualTo(FieldValueType.Type.LIST.getName());
+        assertThat(message.getField("map_type")).isEqualTo(FieldValueType.Type.MAP.getName());
+        assertThat(message.getField("value_node_type")).isEqualTo(FieldValueType.Type.VALUE_NODE.getName());
+        assertThat(message.getField("array_node_type")).isEqualTo(FieldValueType.Type.ARRAY_NODE.getName());
+        assertThat(message.getField("object_node_type")).isEqualTo(FieldValueType.Type.OBJECT_NODE.getName());
     }
 }

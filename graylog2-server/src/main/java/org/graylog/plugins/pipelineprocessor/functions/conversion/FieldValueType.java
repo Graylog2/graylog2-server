@@ -38,15 +38,44 @@ public class FieldValueType extends AbstractFunction<String> {
     public static final String NAME = "field_value_type";
     public static final String FIELD = "field";
 
-    public static final String BOOLEAN = "boolean";
-    public static final String STRING = "string";
-    public static final String DOUBLE = "double";
-    public static final String LONG = "long";
-    public static final String LIST = "list";
-    public static final String MAP = "map";
-    public static final String VALUE_NODE = "value_node";
-    public static final String ARRAY_NODE = "array_node";
-    public static final String OBJECT_NODE = "object_node";
+    public enum Type {
+        BOOLEAN(Boolean.class, "boolean"),
+        STRING(String.class, "string"),
+        DOUBLE(Double.class, "double"),
+        LONG(Long.class, "long"),
+        LIST(List.class, "list"),
+        MAP(Map.class,"map"),
+        VALUE_NODE(ValueNode.class, "value_node"),
+        ARRAY_NODE(ArrayNode.class, "array_node"),
+        OBJECT_NODE(ObjectNode.class, "object_node"),
+        NULL(Type.class, "null"),;
+
+        private final Class<?> classType;
+        private final String name;
+
+        Type(Class<?> classType, String name) {
+            this.classType = classType;
+            this.name = name;
+        }
+
+        public String getName() {
+            return this.name;
+        }
+
+        public static Type forValue(Object value){
+            if (value == null) {
+                return NULL;
+            }
+
+            for (Type type: values()) {
+                if (type.classType.isInstance(value)) {
+                    return type;
+                }
+            }
+
+            throw new IllegalArgumentException("No Type value mapped for " + value.getClass().getTypeName());
+        }
+    }
 
     private final ParameterDescriptor<String, String> fieldParam;
     private final ParameterDescriptor<Message, Message> messageParam;
@@ -62,35 +91,11 @@ public class FieldValueType extends AbstractFunction<String> {
         final Message message = messageParam.optional(args, context).orElse(context.currentMessage());
         final var value = message.getField(field);
 
-        if (value instanceof Boolean) {
-            return BOOLEAN;
+        try {
+            return Type.forValue(value).getName();
+        } catch (IllegalArgumentException e) {
+            return value.getClass().getSimpleName().toLowerCase(Locale.ROOT);
         }
-        if (value instanceof String) {
-            return STRING;
-        }
-        if (value instanceof Double) {
-            return DOUBLE;
-        }
-        if (value instanceof Long) {
-            return LONG;
-        }
-        if (value instanceof List) {
-            return LIST;
-        }
-        if (value instanceof Map) {
-            return MAP;
-        }
-        if (value instanceof ValueNode) {
-            return VALUE_NODE;
-        }
-        if (value instanceof ArrayNode) {
-            return ARRAY_NODE;
-        }
-        if (value instanceof ObjectNode) {
-            return OBJECT_NODE;
-        }
-
-        return value.getClass().getSimpleName().toLowerCase(Locale.ROOT);
     }
 
     @Override

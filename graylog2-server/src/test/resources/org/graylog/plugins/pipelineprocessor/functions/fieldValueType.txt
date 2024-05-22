@@ -4,6 +4,8 @@ when
 then
     set_field("null_type", field_value_type("non_existent_field"));
 
+    set_field("unmapped_type_field_type", field_value_type("unmapped_type_field"));
+
     set_field("boolean", true);
     set_field("boolean_type", field_value_type("boolean"));
 
