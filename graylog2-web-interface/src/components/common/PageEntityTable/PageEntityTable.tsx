@@ -54,6 +54,7 @@ type Props<T> = {
   queryHelpComponent?: React.ReactNode,
   tableLayout: Parameters<typeof useTableLayout>[0],
   additionalAttributes?: Array<Attribute>,
+  entityAttributesAreCamelCase?: boolean,
 }
 
 const INITIAL_DATA = {
@@ -72,6 +73,7 @@ const PageEntityTable = <T extends EntityBase>({
   actionsCellWidth, columnsOrder, entityActions, tableLayout, fetchData, keyFn,
   humanName, columnRenderers, queryHelpComponent, filterValueRenderers,
   expandedSectionsRenderer, bulkSelection, additionalAttributes,
+  entityAttributesAreCamelCase,
 }: Props<T>) => {
   const [urlQueryFilters, setUrlQueryFilters] = useUrlQueryFilters();
   const [query, setQuery] = useQueryParam('query', StringParam);
@@ -163,7 +165,7 @@ const PageEntityTable = <T extends EntityBase>({
                                 actionsCellWidth={actionsCellWidth}
                                 columnRenderers={columnRenderers}
                                 columnDefinitions={columnDefinitions}
-                                entityAttributesAreCamelCase={false} />
+                                entityAttributesAreCamelCase={entityAttributesAreCamelCase} />
           )}
         </div>
       </PaginatedList>
@@ -178,6 +180,7 @@ PageEntityTable.defaultProps = {
   filterValueRenderers: undefined,
   queryHelpComponent: undefined,
   additionalAttributes: [],
+  entityAttributesAreCamelCase: undefined,
 };
 
 export default PageEntityTable;
