@@ -15,14 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import type { Sort } from 'stores/PaginationTypes';
+import PageEntityTable from './PageEntityTable';
+import useTableFetchContext from './useTableFetchContext';
 
-// eslint-disable-next-line import/prefer-default-export
-export const DEFAULT_LAYOUT = (isEvidenceModal: boolean) => ({
-  entityTableId: 'dashboards',
-  defaultPageSize: 20,
-  defaultSort: { attributeId: 'title', direction: 'asc' } as Sort,
-  defaultDisplayedAttributes: isEvidenceModal ? ['title', 'description', 'summary'] : ['title', 'description', 'summary', 'favorite'],
-});
+export { useTableFetchContext };
 
-export const COLUMNS_ORDER = ['title', 'summary', 'description', 'owner', 'created_at', 'favorite'];
+export default PageEntityTable;

@@ -253,7 +253,6 @@ const EntityDataTable = <Entity extends EntityBase>({
 
   return (
     <SelectedEntitiesProvider<Entity> initialSelection={initialSelection} onChangeSelection={onChangeSelection}>
-
       <ExpandedSectionsProvider>
         <ActionsRow>
           <div>

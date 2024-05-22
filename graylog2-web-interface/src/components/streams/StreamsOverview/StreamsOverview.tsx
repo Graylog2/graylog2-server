@@ -26,7 +26,7 @@ import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import { keyFn, fetchStreams, KEY_PREFIX } from 'components/streams/hooks/useStreams';
 import {
   DEFAULT_LAYOUT,
-  ADDITIONAL_ATTRIBUTES,
+  ADDITIONAL_ATTRIBUTES, COLUMNS_ORDER,
 } from 'components/streams/StreamsOverview/Constants';
 import FilterValueRenderers from 'components/streams/StreamsOverview/FilterValueRenderers';
 import useTableElements from 'components/streams/StreamsOverview/hooks/useTableComponents';
@@ -59,7 +59,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
 
   return (
     <PageEntityTable<Stream> humanName="streams"
-                             columnsOrder={DEFAULT_LAYOUT.columnsOrder}
+                             columnsOrder={COLUMNS_ORDER}
                              additionalAttributes={ADDITIONAL_ATTRIBUTES}
                              queryHelpComponent={<QueryHelper entityName="stream" />}
                              entityActions={entityActions}

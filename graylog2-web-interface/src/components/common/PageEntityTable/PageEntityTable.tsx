@@ -30,6 +30,7 @@ import UserNotification from 'util/UserNotification';
 import EntityFilters from 'components/common/EntityFilters';
 import useUrlQueryFilters from 'components/common/EntityFilters/hooks/useUrlQueryFilters';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
+import TableFetchContextProvider from 'components/common/PageEntityTable/TableFetchContextProvider';
 
 type PaginatedResponse<T> = {
   list: Array<T>,
@@ -85,7 +86,7 @@ const PageEntityTable = <T extends EntityBase>({
     filters: urlQueryFilters,
   }), [layoutConfig.pageSize, layoutConfig.sort, paginationQueryParameter.page, query, urlQueryFilters]);
   const fetchKey = useMemo(() => keyFn(fetchOptions), [fetchOptions, keyFn]);
-  const { data: paginatedEntities = INITIAL_DATA, isInitialLoading: isLoadingReports } = useQuery(
+  const { data: paginatedEntities = INITIAL_DATA, isInitialLoading: isLoadingReports, refetch } = useQuery(
     fetchKey,
     () => fetchData(fetchOptions),
     {
@@ -127,44 +128,46 @@ const PageEntityTable = <T extends EntityBase>({
   const { list, pagination: { total } } = paginatedEntities;
 
   return (
-    <PaginatedList pageSize={layoutConfig.pageSize}
-                   showPageSizeSelect={false}
-                   totalItems={total}>
-      <div style={{ marginBottom: 5 }}>
-        <SearchForm onSearch={onSearch}
-                    onReset={onSearchReset}
-                    query={query}
-                    queryHelpComponent={queryHelpComponent}>
-          <div style={{ marginBottom: 5 }}>
-            <EntityFilters attributes={paginatedEntities?.attributes}
-                           urlQueryFilters={urlQueryFilters}
-                           setUrlQueryFilters={onChangeFilters}
-                           filterValueRenderers={filterValueRenderers} />
-          </div>
-        </SearchForm>
-      </div>
-      <div>
-        {list?.length === 0 ? (
-          <NoSearchResult>No {humanName} have been found</NoSearchResult>
-        ) : (
-          <EntityDataTable<T> data={list}
-                              visibleColumns={layoutConfig.displayedAttributes}
-                              columnsOrder={columnsOrder}
-                              expandedSectionsRenderer={expandedSectionsRenderer}
-                              bulkSelection={bulkSelection}
-                              onColumnsChange={onColumnsChange}
-                              onSortChange={onSortChange}
-                              onPageSizeChange={onPageSizeChange}
-                              pageSize={layoutConfig.pageSize}
-                              activeSort={layoutConfig.sort}
-                              rowActions={entityActions}
-                              actionsCellWidth={actionsCellWidth}
-                              columnRenderers={columnRenderers}
-                              columnDefinitions={columnDefinitions}
-                              entityAttributesAreCamelCase={false} />
-        )}
-      </div>
-    </PaginatedList>
+    <TableFetchContextProvider refetch={refetch} searchParams={fetchOptions}>
+      <PaginatedList pageSize={layoutConfig.pageSize}
+                     showPageSizeSelect={false}
+                     totalItems={total}>
+        <div style={{ marginBottom: 5 }}>
+          <SearchForm onSearch={onSearch}
+                      onReset={onSearchReset}
+                      query={query}
+                      queryHelpComponent={queryHelpComponent}>
+            <div style={{ marginBottom: 5 }}>
+              <EntityFilters attributes={paginatedEntities?.attributes}
+                             urlQueryFilters={urlQueryFilters}
+                             setUrlQueryFilters={onChangeFilters}
+                             filterValueRenderers={filterValueRenderers} />
+            </div>
+          </SearchForm>
+        </div>
+        <div>
+          {list?.length === 0 ? (
+            <NoSearchResult>No {humanName} have been found</NoSearchResult>
+          ) : (
+            <EntityDataTable<T> data={list}
+                                visibleColumns={layoutConfig.displayedAttributes}
+                                columnsOrder={columnsOrder}
+                                expandedSectionsRenderer={expandedSectionsRenderer}
+                                bulkSelection={bulkSelection}
+                                onColumnsChange={onColumnsChange}
+                                onSortChange={onSortChange}
+                                onPageSizeChange={onPageSizeChange}
+                                pageSize={layoutConfig.pageSize}
+                                activeSort={layoutConfig.sort}
+                                rowActions={entityActions}
+                                actionsCellWidth={actionsCellWidth}
+                                columnRenderers={columnRenderers}
+                                columnDefinitions={columnDefinitions}
+                                entityAttributesAreCamelCase={false} />
+          )}
+        </div>
+      </PaginatedList>
+    </TableFetchContextProvider>
   );
 };
 
