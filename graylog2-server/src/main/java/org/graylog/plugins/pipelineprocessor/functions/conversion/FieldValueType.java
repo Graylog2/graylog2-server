@@ -48,6 +48,7 @@ public class FieldValueType extends AbstractFunction<String> {
         VALUE_NODE(ValueNode.class, "value_node"),
         ARRAY_NODE(ArrayNode.class, "array_node"),
         OBJECT_NODE(ObjectNode.class, "object_node"),
+        // Use 'Type' class as a stand in to avoid null pointer in the 'isInstance' checks.
         NULL(Type.class, "null"),;
 
         private final Class<?> classType;
