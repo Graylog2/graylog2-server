@@ -49,13 +49,10 @@ import useLocation from 'routing/useLocation';
 import useParameters from 'views/hooks/useParameters';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import ExtractWidgetIntoNewView from 'views/logic/views/ExtractWidgetIntoNewView';
-import type { Extension, Result } from 'util/AggregationWidgetExportUtils';
-import { exportWidget } from 'util/AggregationWidgetExportUtils';
-import useWidgetResults from 'views/components/useWidgetResults';
-import ExportWidgetAction from 'views/components/widgets/ExportWidgetAction/ExportWidgetAction';
+import ExtraMenuWidgetActions from 'views/components/widgets/ExtraMenuWidgetActions';
 
 import ReplaySearchButton from './ReplaySearchButton';
-import ExtraWidgetActions from './ExtraWidgetActions';
+import ExtraDropdownWidgetActions from './ExtraDropdownWidgetActions';
 import CopyToDashboard from './CopyToDashboardForm';
 import MoveWidgetToTabModal from './MoveWidgetToTabModal';
 import WidgetActionDropdown from './WidgetActionDropdown';
@@ -158,7 +155,6 @@ const WidgetActionsMenu = ({
 }: Props) => {
   const widget = useContext(WidgetContext);
   const view = useView();
-  const { widgetData: widgetResult } = useWidgetResults(widget.id);
   const { query, timerange, streams } = useContext(DrilldownContext);
   const { setWidgetFocusing, unsetWidgetFocusing } = useContext(WidgetFocusContext);
   const [showCopyToDashboard, setShowCopyToDashboard] = useState(false);
@@ -227,20 +223,6 @@ const WidgetActionsMenu = ({
     return setWidgetFocusing(widget.id);
   }, [pathname, sendTelemetry, setWidgetFocusing, widget.id]);
 
-  const onExportAggregationWidget = useCallback((extension: Extension) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.EXPORT, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'search-widget',
-      app_action_value: { extension },
-    });
-
-    const widgetTitle = view.getWidgetTitleByWidget(widget);
-
-    return exportWidget(widgetTitle, (widgetResult as {chart: Result}).chart as Result, extension);
-  }, [view, widget, widgetResult, sendTelemetry, pathname]);
-
-  const showMessageExportModal = () => setShowExport(true);
-
   return (
     <Container className="widget-actions-menu">
       <IfInteractive>
@@ -251,7 +233,7 @@ const WidgetActionsMenu = ({
                               parameterBindings={parameterBindings}
                               parameters={parameters} />
         </IfDashboard>
-        <ExportWidgetAction widget={widget} showMessageExportModal={showMessageExportModal} onExportAggregationWidget={onExportAggregationWidget} />
+        <ExtraMenuWidgetActions widget={widget} />
         {isFocused && (
           <IconButton name="fullscreen_exit"
                       title="Un-focus widget"
@@ -288,7 +270,7 @@ const WidgetActionsMenu = ({
               Move to Page
             </MenuItem>
           </IfDashboard>
-          <ExtraWidgetActions widget={widget} />
+          <ExtraDropdownWidgetActions widget={widget} />
           <MenuItem divider />
           <MenuItem onSelect={onDelete}>
             Delete

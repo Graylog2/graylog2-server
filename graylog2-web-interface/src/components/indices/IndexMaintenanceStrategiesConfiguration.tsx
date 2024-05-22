@@ -194,6 +194,7 @@ const IndexMaintenanceStrategiesConfiguration = ({
       rotation_strategy_class: rotationStrategyClass,
       retention_strategy_class: retentionStrategyClass,
     },
+    errors,
   } = useFormikContext<IndexMaintenanceStrategiesFormValues>();
 
   const [maxNumberOfIndices, setMaxNumberOfIndices] = useIndexRetention().useMaxNumberOfIndices;
@@ -309,6 +310,8 @@ const IndexMaintenanceStrategiesConfiguration = ({
       <Row>
         <Col md={12}>
           <Input id="strategy-select"
+                 error={errors[`${name}_strategy_class`]}
+                 name={`${name}_strategy_class`}
                  label={selectPlaceholder}>
             <StyledSelect placeholder={selectPlaceholder}
                           options={getAvailableSelectOptions()}
