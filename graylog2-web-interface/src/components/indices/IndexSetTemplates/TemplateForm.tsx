@@ -135,9 +135,11 @@ RetentionConfig.defaultProps = {
   indexSetRetentionStrategyClass: undefined,
 };
 
-const validate = (formValues: IndexSetTemplateFormValues) => {
+const validate = (formValues: IndexSetTemplateFormValues, usesLegacyRetention: boolean) => {
   let errors: {
     title?: string,
+    retention_strategy_class?: string,
+    rotation_strategy_class?: string,
     index_set_config?: {
       index_analyzer?: string,
       shards?: string,
@@ -160,6 +162,16 @@ const validate = (formValues: IndexSetTemplateFormValues) => {
 
   if (!formValues.index_set_config.index_optimization_max_num_segments) {
     errors = { ...errors, index_set_config: { ...errors.index_set_config, index_optimization_max_num_segments: 'Max. number of segments is required' } };
+  }
+
+  if (usesLegacyRetention) {
+    if (!formValues.retention_strategy_class) {
+      errors = { ...errors, retention_strategy_class: 'Please select a retention strategy' };
+    }
+
+    if (!formValues.rotation_strategy_class) {
+      errors = { ...errors, rotation_strategy_class: 'Please select a rotation strategy' };
+    }
   }
 
   return errors;
@@ -255,7 +267,7 @@ const TemplateForm = ({ initialValues, submitButtonText, submitLoadingText, onCa
       <Col md={12}>
         <Formik<IndexSetTemplateFormValues> initialValues={prepareInitialValues()}
                                             onSubmit={handleSubmit}
-                                            validate={validate}
+                                            validate={(values) => validate(values, selectedRetentionSegment === 'legacy')}
                                             validateOnChange>
           {({ isSubmitting, isValid, isValidating, setFieldValue, values }) => (
             <IndexRetentionProvider>
