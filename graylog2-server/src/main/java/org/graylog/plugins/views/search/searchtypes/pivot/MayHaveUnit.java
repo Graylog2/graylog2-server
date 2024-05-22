@@ -16,11 +16,13 @@
  */
 package org.graylog.plugins.views.search.searchtypes.pivot;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog.plugins.formatting.units.model.UnitId;
 
 import java.util.Optional;
 
 public interface MayHaveUnit {
 
+    @JsonProperty
     Optional<UnitId> unit();
 }
