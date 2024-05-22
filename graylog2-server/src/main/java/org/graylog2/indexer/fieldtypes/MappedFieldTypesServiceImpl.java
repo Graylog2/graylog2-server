@@ -18,13 +18,14 @@ package org.graylog2.indexer.fieldtypes;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
+import jakarta.inject.Inject;
+import org.graylog.plugins.formatting.units.fields.FieldUnitObtainer;
+import org.graylog.plugins.formatting.units.model.UnitId;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
 import org.graylog2.Configuration;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.streams.StreamService;
-
-import jakarta.inject.Inject;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -44,6 +45,7 @@ public class MappedFieldTypesServiceImpl implements MappedFieldTypesService {
     private final FieldTypeMapper fieldTypeMapper;
     private final IndexLookup indexLookup;
     private final boolean streamAwareFieldTypes;
+    private final FieldUnitObtainer fieldUnitObtainer;
 
 
     @Inject
@@ -51,12 +53,14 @@ public class MappedFieldTypesServiceImpl implements MappedFieldTypesService {
                                        final StreamService streamService,
                                        final IndexFieldTypesService indexFieldTypesService,
                                        final FieldTypeMapper fieldTypeMapper,
-                                       final IndexLookup indexLookup) {
+                                       final IndexLookup indexLookup,
+                                       final FieldUnitObtainer fieldUnitObtainer) {
         this.streamService = streamService;
         this.indexFieldTypesService = indexFieldTypesService;
         this.fieldTypeMapper = fieldTypeMapper;
         this.indexLookup = indexLookup;
         this.streamAwareFieldTypes = configuration.maintainsStreamAwareFieldTypes();
+        this.fieldUnitObtainer = fieldUnitObtainer;
     }
 
     @Override
@@ -76,7 +80,11 @@ public class MappedFieldTypesServiceImpl implements MappedFieldTypesService {
 
     private MappedFieldTypeDTO mapPhysicalFieldType(FieldTypeDTO fieldType) {
         final FieldTypes.Type mappedFieldType = fieldTypeMapper.mapType(fieldType).orElse(UNKNOWN_TYPE);
-        return MappedFieldTypeDTO.create(fieldType.fieldName(), mappedFieldType);
+        return new MappedFieldTypeDTO(fieldType.fieldName(),
+                mappedFieldType,
+                fieldUnitObtainer.obtainUnit(fieldType.fieldName())
+                        .map(UnitId::new)
+                        .orElse(null));
     }
 
     private Set<MappedFieldTypeDTO> mergeCompoundFieldTypes(java.util.stream.Stream<MappedFieldTypeDTO> stream) {
@@ -105,7 +113,11 @@ public class MappedFieldTypesServiceImpl implements MappedFieldTypesService {
                     final Set<String> properties = distinctTypes.size() > 1
                             ? Sets.union(commonProperties, Collections.singleton(PROP_COMPOUND_TYPE))
                             : commonProperties;
-                    return MappedFieldTypeDTO.create(fieldName, createType(resultingFieldType, properties));
+                    return new MappedFieldTypeDTO(fieldName,
+                            createType(resultingFieldType, properties),
+                            fieldUnitObtainer.obtainUnit(fieldName)
+                                    .map(UnitId::new)
+                                    .orElse(null));
 
                 })
                 .collect(Collectors.toSet());
