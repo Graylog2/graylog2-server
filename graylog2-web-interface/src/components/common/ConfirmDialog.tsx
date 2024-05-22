@@ -63,7 +63,7 @@ const ConfirmDialog = ({
                      submitButtonType="button"
                      disabledSubmit={btnConfirmDisabled}
                      submitButtonText={btnConfirmText}
-                     displayCancel={hideCancelButton as any} />
+                     displayCancel={!hideCancelButton as any} />
       </Modal.Footer>
     </Modal>
   );

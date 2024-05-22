@@ -63,4 +63,7 @@ public interface MigrationActions {
 
     void verifyRemoteIndexerConnection();
 
+    boolean isCompatibleInPlaceMigrationVersion();
+
+    void getElasticsearchHosts();
 }

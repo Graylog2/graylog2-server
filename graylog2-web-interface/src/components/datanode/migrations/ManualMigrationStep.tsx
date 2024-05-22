@@ -32,11 +32,15 @@ import RemoteReindexingMigration from 'components/datanode/migrations/RemoteRein
 import MigrationError from 'components/datanode/migrations/common/MigrationError';
 
 const ManualMigrationStep = () => {
-  const migrationTypeOptions = [{ label: 'In-Place migration', value: 'SELECT_ROLLING_UPGRADE_MIGRATION' }, { label: 'Remote Re-indexing Migration', value: 'SELECT_REMOTE_REINDEX_MIGRATION' }];
   const { currentStep } = useMigrationState();
   const { onTriggerNextState } = useTriggerMigrationState();
 
   const onMigrationStepChange = async (step: MigrationActions, args?: StepArgs = {}) => onTriggerNextState({ step, args });
+
+  const migrationTypeOptions = [
+    { label: 'In-Place migration', value: 'SELECT_ROLLING_UPGRADE_MIGRATION' },
+    { label: 'Remote Re-indexing Migration', value: 'SELECT_REMOTE_REINDEX_MIGRATION' },
+  ].filter((path) => currentStep.next_steps.includes(path.value));
 
   return (
     <>
