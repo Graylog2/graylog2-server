@@ -44,6 +44,7 @@ type Props = {
   searchPageLayout?: SearchPreferencesLayout,
   sections?: Array<SidebarSection>,
   actions?: Array<SidebarAction>,
+  forceSideBarPinned?: boolean,
 };
 
 const Container = styled.div`
@@ -79,7 +80,7 @@ const _selectSidebarSection = (sectionKey, activeSectionKey, setActiveSectionKey
   setActiveSectionKey(sectionKey);
 };
 
-const Sidebar = ({ searchPageLayout, results, children, sections, actions }: Props) => {
+const Sidebar = ({ searchPageLayout, results, children, sections, actions, forceSideBarPinned }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const location = useLocation();
   const queryId = useActiveQueryId();
@@ -107,12 +108,13 @@ const Sidebar = ({ searchPageLayout, results, children, sections, actions }: Pro
       <SidebarNavigation activeSection={activeSection}
                          selectSidebarSection={selectSidebarSection}
                          sections={sections}
-                         sidebarIsPinned={sidebarIsPinned}
+                         sidebarIsPinned={sidebarIsPinned || forceSideBarPinned}
                          actions={actions} />
       {activeSection && !!SectionContent && (
         <ContentColumn closeSidebar={toggleSidebar}
                        searchPageLayout={searchPageLayout}
-                       sectionTitle={activeSection.title}>
+                       sectionTitle={activeSection.title}
+                       hidePinnedToggle={forceSideBarPinned}>
           <SectionContent results={results}
                           queryId={queryId}
                           sidebarChildren={children}
@@ -138,6 +140,7 @@ Sidebar.defaultProps = {
   sections: sidebarSections,
   actions: sidebarActions,
   searchPageLayout: undefined,
+  forceSideBarPinned: false,
 };
 
 const SidebarWithContext = ({ children, ...props }: React.ComponentProps<typeof Sidebar>) => (
