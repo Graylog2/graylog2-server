@@ -21,7 +21,9 @@ import type { MetricUnitType } from 'views/types';
 import type Series from 'views/logic/aggregationbuilder/Series';
 import type { BarMode } from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
 
-const Y_POSITION_AXIS_STEP = 0.05;
+const Y_POSITION_AXIS_STEP = 0.08;
+type DefaulAxisKey = 'withoutUnit';
+const DEFAULT_AXIS_KEY = 'withoutUnit';
 
 const getYAxisPosition = (axisCount: number) => {
   const diff = Math.floor(axisCount / 2) * Y_POSITION_AXIS_STEP;
@@ -54,7 +56,7 @@ const defaultSettings = {
   rangemode: 'tozero',
 };
 
-export const getFormatSettings = (unitTypeKey: MetricUnitType | 'withoutUnit') => {
+export const getFormatSettings = (unitTypeKey: MetricUnitType | DefaulAxisKey) => {
   switch (unitTypeKey) {
     case 'percent':
       return ({
@@ -83,41 +85,56 @@ export const getFormatSettings = (unitTypeKey: MetricUnitType | 'withoutUnit') =
   }
 };
 
-export const getUnitLayout = (unitTypeKey: MetricUnitType | 'withoutUnit', axisCount: number) => ({
+const getTitleSettings = (unitType: string): { title: { text: string }} | {} => {
+  if (!unitType || unitType === DEFAULT_AXIS_KEY) return {};
+
+  return ({
+    title: { text: unitType, automargin: true, yref: 'container' },
+  });
+};
+
+export const getUnitLayout = (unitTypeKey: MetricUnitType | DefaulAxisKey, axisCount: number) => ({
   ...getFormatSettings(unitTypeKey),
   ...getYAxisPositioningSettings(axisCount),
   ...defaultSettings,
 });
 
-export const generateYAxis = (series: Array<Series>): { mapperAxisNumber: Record<string, number>, layouts: Record<string, unknown>, yAxisMapper: Record<string, string>} => {
+type SeriesName = string;
+type AxisName = string;
+
+export const generateYAxis = (series: Array<Series>): { mapperAxisNumber: Record<string, number>, layouts: Record<string, unknown>, yAxisMapper: Record<SeriesName, AxisName>} => {
   let axisCount = 1;
   const unitLayout: {} | Record<MetricUnitType, { layout: Record<string, unknown>, axisKeyName: string}> = {};
   const mapper = {};
   const mapperAxisNumber = {};
+  const mapperAxisSeries = {};
 
   series.forEach((s: Series) => {
     const seriesName = s.config.name || s.function;
     const { unitType } = s.unit;
-    const unitTypeKey = unitType || 'withoutUnit';
+    const unitTypeKey = unitType || DEFAULT_AXIS_KEY;
 
     if (!unitLayout[unitTypeKey]) {
       const axisNameNumberPart = axisCount > 1 ? axisCount : '';
-      unitLayout[unitTypeKey] = { layout: getUnitLayout(unitTypeKey, axisCount), axisCount, axisKeyName: `yaxis${axisNameNumberPart}` };
+      const axisKeyName = `yaxis${axisNameNumberPart}`;
+      unitLayout[unitTypeKey] = { layout: getUnitLayout(unitTypeKey, axisCount), axisCount, axisKeyName };
 
       mapper[seriesName] = `y${axisNameNumberPart}`;
       mapperAxisNumber[seriesName] = axisCount;
+      mapperAxisSeries[axisKeyName] = [seriesName];
       axisCount += 1;
     } else {
       const currentAxisCount = unitLayout[unitTypeKey].axisCount;
       const axisNameNumberPart = currentAxisCount > 1 ? currentAxisCount : '';
       mapper[seriesName] = `y${axisNameNumberPart}`;
       mapperAxisNumber[seriesName] = currentAxisCount;
+      mapperAxisSeries[`yaxis${axisNameNumberPart}`].push(seriesName);
     }
   });
 
   return ({
-    layouts: transform(unitLayout, (res, { layout, axisKeyName }) => {
-      res[axisKeyName] = layout;
+    layouts: transform(unitLayout, (res, { layout, axisKeyName }, key) => {
+      res[axisKeyName] = { ...layout, ...getTitleSettings(key) };
     }),
     yAxisMapper: mapper,
     mapperAxisNumber,
