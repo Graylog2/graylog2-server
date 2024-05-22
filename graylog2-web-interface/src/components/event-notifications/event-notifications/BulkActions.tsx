@@ -31,18 +31,16 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useLocation from 'routing/useLocation';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
+import { useTableFetchContext } from 'components/common/PageEntityTable';
 
-type Props = {
-  refetchEventNotifications: () => void,
-};
-
-const BulkActions = ({ refetchEventNotifications }: Props) => {
+const BulkActions = () => {
   const queryClient = useQueryClient();
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
   const { selectedEntities, setSelectedEntities } = useSelectedEntities();
   const selectedItemsAmount = selectedEntities?.length;
   const descriptor = StringUtils.pluralize(selectedItemsAmount, 'event notification', 'event notifications');
+  const { refetch: refetchEventNotifications } = useTableFetchContext();
 
   const onDelete = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.NOTIFICATIONS.BULK_ACTION_DELETE_CLICKED, {

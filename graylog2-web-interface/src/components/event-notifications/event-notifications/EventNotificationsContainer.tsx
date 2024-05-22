@@ -15,27 +15,30 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useMemo, useCallback } from 'react';
+import { useMemo, useCallback } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
-import { EntityDataTable, NoSearchResult, PaginatedList, QueryHelper, SearchForm, Spinner } from 'components/common';
+import {
+  QueryHelper,
+  PageEntityTable,
+} from 'components/common';
 import type { EventNotification, TestResults } from 'stores/event-notifications/EventNotificationsStore';
-import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
-import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
-import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
-import { ENTITY_TABLE_ID, DEFAULT_LAYOUT } from 'components/event-notifications/event-notifications/Constants';
+import {
+  DEFAULT_LAYOUT,
+  COLUMNS_ORDER,
+} from 'components/event-notifications/event-notifications/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
-import { useTableEventHandlers } from 'components/common/EntityDataTable';
 
 import NotificationConfigTypeCell from './NotificationConfigTypeCell';
 import NotificationTitle from './NotificationTitle';
 import EventNotificationActions from './EventNotificationActions';
 import BulkActions from './BulkActions';
 
-import useEventNotifications from '../hooks/useEventNotifications';
+import { keyFn, fetchEventNotifications } from '../hooks/useEventNotifications';
 import useNotificationTest from '../hooks/useNotificationTest';
 
 const customColumnRenderers = (testResults: TestResults): ColumnRenderers<EventNotification> => ({
@@ -52,46 +55,11 @@ const customColumnRenderers = (testResults: TestResults): ColumnRenderers<EventN
 });
 
 const EventNotificationsContainer = () => {
-  const [query, setQuery] = useState('');
-  const { layoutConfig, isInitialLoading: isLoadingLayoutPreferences } = useTableLayout({
-    entityTableId: ENTITY_TABLE_ID,
-    defaultPageSize: DEFAULT_LAYOUT.pageSize,
-    defaultDisplayedAttributes: DEFAULT_LAYOUT.displayedColumns,
-    defaultSort: DEFAULT_LAYOUT.sort,
-  });
-  const paginationQueryParameter = usePaginationQueryParameter(undefined, layoutConfig.pageSize, false);
-  const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(ENTITY_TABLE_ID);
-  const {
-    data: paginatedEventNotifications,
-    refetch: refetchEventNotifications,
-    isInitialLoading: isLoadingEventNotifications,
-  } = useEventNotifications({
-    query,
-    page: paginationQueryParameter.page,
-    pageSize: layoutConfig.pageSize,
-    sort: layoutConfig.sort,
-  });
   const { isLoadingTest, testResults, getNotificationTest } = useNotificationTest();
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
   const columnRenderers = useMemo(() => customColumnRenderers(testResults), [testResults]);
-  const columnDefinitions = useMemo(
-    () => ([...(paginatedEventNotifications?.attributes ?? [])]),
-    [paginatedEventNotifications?.attributes],
-  );
-
-  const {
-    onColumnsChange,
-    onPageSizeChange,
-    onSearch,
-    onSearchReset,
-    onSortChange,
-  } = useTableEventHandlers({
-    appSection: 'event-notification-list',
-    paginationQueryParameter,
-    setQuery,
-    updateTableLayout,
-  });
+  const queryClient = useQueryClient();
 
   const handleTest = useCallback((notification: EventNotification) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.NOTIFICATIONS.ROW_ACTION_TEST_CLICKED, {
@@ -101,51 +69,25 @@ const EventNotificationsContainer = () => {
     });
 
     getNotificationTest(notification);
-    refetchEventNotifications();
-  }, [getNotificationTest, pathname, refetchEventNotifications, sendTelemetry]);
+    queryClient.invalidateQueries(keyFn());
+  }, [getNotificationTest, pathname, queryClient, sendTelemetry]);
 
   const renderEventDefinitionActions = useCallback((listItem: EventNotification) => (
     <EventNotificationActions notification={listItem}
-                              refetchEventNotification={refetchEventNotifications}
                               isTestLoading={isLoadingTest}
                               onTest={handleTest} />
-  ), [handleTest, isLoadingTest, refetchEventNotifications]);
-
-  if (isLoadingLayoutPreferences || isLoadingEventNotifications) {
-    return <Spinner />;
-  }
-
-  const { elements, pagination: { total } } = paginatedEventNotifications;
+  ), [handleTest, isLoadingTest]);
 
   return (
-    <PaginatedList pageSize={layoutConfig.pageSize}
-                   showPageSizeSelect={false}
-                   totalItems={total}>
-      <div style={{ marginBottom: 5 }}>
-        <SearchForm onSearch={onSearch}
-                    onReset={onSearchReset}
-                    queryHelpComponent={<QueryHelper entityName="notification" />} />
-      </div>
-      <div>
-        {elements?.length === 0 ? (
-          <NoSearchResult>No notification has been found</NoSearchResult>
-        ) : (
-          <EntityDataTable<EventNotification> data={elements}
-                                              visibleColumns={layoutConfig.displayedAttributes}
-                                              columnsOrder={DEFAULT_LAYOUT.columnsOrder}
-                                              onColumnsChange={onColumnsChange}
-                                              onSortChange={onSortChange}
-                                              bulkSelection={{ actions: <BulkActions refetchEventNotifications={refetchEventNotifications} /> }}
-                                              activeSort={layoutConfig.sort}
-                                              onPageSizeChange={onPageSizeChange}
-                                              pageSize={layoutConfig.pageSize}
-                                              rowActions={renderEventDefinitionActions}
-                                              actionsCellWidth={160}
-                                              columnRenderers={columnRenderers}
-                                              columnDefinitions={columnDefinitions} />
-        )}
-      </div>
-    </PaginatedList>
+    <PageEntityTable<EventNotification> humanName="event notifications"
+                                        columnsOrder={COLUMNS_ORDER}
+                                        queryHelpComponent={<QueryHelper entityName="notification" />}
+                                        entityActions={renderEventDefinitionActions}
+                                        tableLayout={DEFAULT_LAYOUT}
+                                        fetchData={fetchEventNotifications}
+                                        keyFn={keyFn}
+                                        bulkSelection={{ actions: <BulkActions /> }}
+                                        columnRenderers={columnRenderers} />
   );
 };
 

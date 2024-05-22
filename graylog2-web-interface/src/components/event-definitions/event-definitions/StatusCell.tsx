@@ -21,6 +21,7 @@ import styled, { css } from 'styled-components';
 import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
 import { Label, BootstrapModalConfirm } from 'components/bootstrap';
 import { Icon } from 'components/common';
+import { useTableFetchContext } from 'components/common/PageEntityTable';
 
 import type { EventDefinition } from '../event-definitions-types';
 
@@ -46,12 +47,11 @@ const _title = (disabled: boolean, disabledChange: boolean, description: string)
 
 type Props ={
   eventDefinition: EventDefinition,
-  refetchEventDefinitions: () => void,
 }
 
-const StatusCell = ({ eventDefinition, refetchEventDefinitions } : Props) => {
+const StatusCell = ({ eventDefinition } : Props) => {
   const [showConfirmDisableModal, setShowConfirmDisableModal] = useState<boolean>(false);
-
+  const { refetch: refetchEventDefinitions } = useTableFetchContext();
   const isEnabled = eventDefinition?.state === 'ENABLED';
   const disableChange = eventDefinition?.config?.type === 'system-notifications-v1';
   const description = isEnabled ? 'enabled' : 'disabled';
