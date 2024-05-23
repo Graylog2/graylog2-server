@@ -29,7 +29,7 @@ import { Col, Row, SegmentedControl } from 'components/bootstrap';
 import IndexMaintenanceStrategiesConfiguration from 'components/indices/IndexMaintenanceStrategiesConfiguration';
 import 'components/indices/rotation';
 import 'components/indices/retention';
-import { DataTieringConfiguration, prepareDataTieringConfig, prepareDataTieringInitialValues } from 'components/indices/data-tiering';
+import { DataTieringConfiguration, DataTieringVisualisation, prepareDataTieringConfig, prepareDataTieringInitialValues } from 'components/indices/data-tiering';
 import type { IndexSet, IndexSetFormValues } from 'stores/indices/IndexSetsStore';
 import { IndexSetPropType } from 'stores/indices/IndexSetsStore';
 import type {
@@ -345,9 +345,14 @@ const IndexSetConfigurationForm = ({
                                                                   onChange={setSelectedRetentionSegment} />
 
                         {selectedRetentionSegment === 'data_tiering' ? (
-                          <ConfigSegment>
+                          <>
+                            <DataTieringVisualisation minDays={values.data_tiering?.index_lifetime_min}
+                                                      maxDays={values.data_tiering?.index_lifetime_max}
+                                                      minDaysInHot={values.data_tiering?.index_hot_lifetime_min}
+                                                      warmTierEnabled={values.data_tiering?.warm_tier_enabled}
+                                                      archiveData={values.data_tiering?.archive_before_deletion} />
                             <DataTieringConfiguration />
-                          </ConfigSegment>
+                          </>
                         )
                           : (
                             <ConfigSegment>
