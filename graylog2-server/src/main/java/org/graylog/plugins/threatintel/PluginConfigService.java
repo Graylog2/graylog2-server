@@ -145,12 +145,8 @@ public class PluginConfigService {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
             ConfigVersions<?> that = (ConfigVersions<?>) o;
             return Objects.equals(previous, that.previous) &&
                     Objects.equals(current, that.current);
