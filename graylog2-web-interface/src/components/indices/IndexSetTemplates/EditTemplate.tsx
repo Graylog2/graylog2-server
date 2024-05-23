@@ -45,7 +45,7 @@ const EditTemplate = ({
     editTemplate({ template: newTemplate, id: template.id }).then(() => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_TEMPLATE.EDIT, {
         app_pathname: telemetryPathName,
-        app_action_value: 'edit-new-index-set-template-edited', // TODO: add template name
+        app_action_value: 'edit-new-index-set-template-edited',
       });
 
       navigate(Routes.SYSTEM.INDICES.TEMPLATES.OVERVIEW);
