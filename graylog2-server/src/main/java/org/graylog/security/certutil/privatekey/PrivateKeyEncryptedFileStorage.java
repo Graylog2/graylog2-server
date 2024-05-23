@@ -56,7 +56,6 @@ public record PrivateKeyEncryptedFileStorage(Path privateKeyFilename) implements
                 .setProvider(BouncyCastleProvider.PROVIDER_NAME)
                 .build(password)));
         pemWriter.close();
-
     }
 
     @Override

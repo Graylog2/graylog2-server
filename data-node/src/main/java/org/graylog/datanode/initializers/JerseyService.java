@@ -44,7 +44,7 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.server.model.Resource;
 import org.graylog.datanode.Configuration;
-import org.graylog.datanode.configuration.variants.KeystoreInformation;
+import org.graylog.security.certutil.csr.FilesystemKeystoreInformation;
 import org.graylog.datanode.configuration.variants.OpensearchSecurityConfiguration;
 import org.graylog.datanode.opensearch.OpensearchConfigurationChangeEvent;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
@@ -261,7 +261,7 @@ public class JerseyService extends AbstractIdleService {
         return httpServer;
     }
 
-    private SSLEngineConfigurator buildSslEngineConfigurator(KeystoreInformation keystoreInformation)
+    private SSLEngineConfigurator buildSslEngineConfigurator(FilesystemKeystoreInformation keystoreInformation)
             throws GeneralSecurityException, IOException {
         if (keystoreInformation == null || !Files.isRegularFile(keystoreInformation.location()) || !Files.isReadable(keystoreInformation.location())) {
             throw new IllegalArgumentException("Unreadable to read private key");
@@ -282,7 +282,7 @@ public class JerseyService extends AbstractIdleService {
         return sslEngineConfigurator;
     }
 
-    private static KeyStore readKeystore(KeystoreInformation keystoreInformation) {
+    private static KeyStore readKeystore(FilesystemKeystoreInformation keystoreInformation) {
         try (var in = Files.newInputStream(keystoreInformation.location())) {
             KeyStore caKeystore = KeyStore.getInstance(CertConstants.PKCS12);
             caKeystore.load(in, keystoreInformation.password());

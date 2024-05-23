@@ -17,7 +17,7 @@
 package org.graylog.datanode.integration;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.graylog.datanode.configuration.variants.KeystoreInformation;
+import org.graylog.security.certutil.csr.FilesystemKeystoreInformation;
 import org.graylog.testing.restoperations.DatanodeRestApiWait;
 import org.graylog.testing.restoperations.DatanodeStatusChangeOperation;
 import org.graylog.testing.restoperations.RestOperationParameters;
@@ -51,13 +51,13 @@ public class DatanodeLifecycleIT {
     void setUp() throws IOException, GeneralSecurityException {
         containerHostname = "graylog-datanode-host-" + RandomStringUtils.random(8, "0123456789abcdef");
         // first generate a self-signed CA
-        KeystoreInformation ca = DatanodeSecurityTestUtils.generateCa(tempDir);
+        FilesystemKeystoreInformation ca = DatanodeSecurityTestUtils.generateCa(tempDir);
         trustStore = DatanodeSecurityTestUtils.buildTruststore(ca);
 
         // use the CA to generate transport certificate keystore
-        final KeystoreInformation transportCert = DatanodeSecurityTestUtils.generateTransportCert(tempDir, ca, containerHostname);
+        final FilesystemKeystoreInformation transportCert = DatanodeSecurityTestUtils.generateTransportCert(tempDir, ca, containerHostname);
         // use the CA to generate HTTP certificate keystore
-        final KeystoreInformation httpCert = DatanodeSecurityTestUtils.generateHttpCert(tempDir, ca, containerHostname, Tools.getLocalCanonicalHostname());
+        final FilesystemKeystoreInformation httpCert = DatanodeSecurityTestUtils.generateHttpCert(tempDir, ca, containerHostname, Tools.getLocalCanonicalHostname());
 
         backend = new DatanodeContainerizedBackend(containerHostname, datanodeContainer -> {
             // provide the keystore files to the docker container

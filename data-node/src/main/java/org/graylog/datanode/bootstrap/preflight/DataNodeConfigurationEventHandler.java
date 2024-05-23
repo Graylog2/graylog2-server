@@ -24,16 +24,14 @@ import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
+import org.graylog.datanode.configuration.DatanodeDirectories;
+import org.graylog.datanode.configuration.DatanodeKeystore;
+import org.graylog.datanode.configuration.DatanodeKeystoreException;
 import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.cert.CertificateChain;
-import org.graylog.security.certutil.cert.storage.CertChainMongoStorage;
-import org.graylog.security.certutil.cert.storage.CertChainStorage;
-import org.graylog.security.certutil.csr.CertificateAndPrivateKeyMerger;
 import org.graylog.security.certutil.csr.CsrGenerator;
+import org.graylog.security.certutil.csr.FilesystemKeystoreInformation;
 import org.graylog.security.certutil.csr.exceptions.CSRGenerationException;
-import org.graylog.security.certutil.keystore.storage.KeystoreMongoStorage;
-import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoLocation;
-import org.graylog.security.certutil.privatekey.PrivateKeyEncryptedFileStorage;
 import org.graylog2.bootstrap.preflight.CertificateSignedEvent;
 import org.graylog2.bootstrap.preflight.CertificateSigningRequestEvent;
 import org.graylog2.cluster.NodeNotFoundException;
@@ -45,19 +43,28 @@ import org.graylog2.cluster.preflight.DataNodeProvisioningStateChangeEvent;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.SuppressForbidden;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.nio.file.Path;
+import java.security.Key;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static org.graylog.datanode.bootstrap.preflight.KeystoreCheck.KEYSTORE_FILE;
+import static org.graylog.security.certutil.CertConstants.PKCS12;
 
 @Singleton
 public class DataNodeConfigurationEventHandler {
@@ -66,24 +73,22 @@ public class DataNodeConfigurationEventHandler {
     private final DataNodeProvisioningService dataNodeProvisioningService;
     private final NodeService<DataNodeDto> nodeService;
     private final NodeId nodeId;
-    private final PrivateKeyEncryptedFileStorage privateKeyEncryptedStorage;
     private final CsrGenerator csrGenerator;
-    private final CertChainStorage certMongoStorage;
-    private final CertificateAndPrivateKeyMerger certificateAndPrivateKeyMerger;
     private final char[] passwordSecret;
 
-    private final KeystoreMongoStorage mongoKeyStorage;
+
+    private final DatanodeKeystore datanodeKeystore;
     private final ClusterEventBus clusterEventBus;
+    private final DatanodeDirectories datanodeDirectories;
 
     @Inject
     public DataNodeConfigurationEventHandler(final DataNodeProvisioningService dataNodeProvisioningService,
                                              final NodeService<DataNodeDto> nodeService,
                                              final NodeId nodeId,
                                              final CsrGenerator csrGenerator,
-                                             final CertChainMongoStorage certMongoStorage,
-                                             final CertificateAndPrivateKeyMerger certificateAndPrivateKeyMerger,
                                              final @Named("password_secret") String passwordSecret,
-                                             final DatanodeConfiguration datanodeConfiguration, KeystoreMongoStorage mongoKeyStorage,
+                                             final DatanodeConfiguration datanodeConfiguration,
+                                             final DatanodeKeystore datanodeKeystore,
                                              final ClusterEventBus clusterEventBus,
                                              final EventBus eventBus
 
@@ -92,12 +97,9 @@ public class DataNodeConfigurationEventHandler {
         this.nodeService = nodeService;
         this.nodeId = nodeId;
         this.csrGenerator = csrGenerator;
-        this.certMongoStorage = certMongoStorage;
-        this.certificateAndPrivateKeyMerger = certificateAndPrivateKeyMerger;
-        // TODO: merge with real storage
-        this.privateKeyEncryptedStorage = new PrivateKeyEncryptedFileStorage(datanodeConfiguration.datanodeDirectories().createConfigurationFile(Path.of("privateKey.cert")));
+        this.datanodeDirectories = datanodeConfiguration.datanodeDirectories();
         this.passwordSecret = passwordSecret.toCharArray();
-        this.mongoKeyStorage = mongoKeyStorage;
+        this.datanodeKeystore = datanodeKeystore;
         this.clusterEventBus = clusterEventBus;
         eventBus.register(this);
         writeInitialConfig(dataNodeProvisioningService, nodeId);
@@ -135,27 +137,22 @@ public class DataNodeConfigurationEventHandler {
     @Subscribe
     public void certificateSignedListener(CertificateSignedEvent event) {
 
+        if (!nodeId.getNodeId().equals(event.nodeId())) {
+            // not for this datanode, ignoring
+            return;
+        }
         LOG.info("Received CertificateSignedEvent for node " + event.nodeId());
-
         try {
-            final CertificateChain certificateChain = event.readCertChain();
-            final char[] secret = passwordSecret;
-            KeyStore nodeKeystore = certificateAndPrivateKeyMerger.merge(
-                    certificateChain,
-                    privateKeyEncryptedStorage,
-                    secret,
-                    secret,
-                    CertConstants.DATANODE_KEY_ALIAS
-            );
-
-            mongoKeyStorage.writeKeyStore(KeystoreMongoLocation.datanode(nodeId), nodeKeystore, secret, secret);
-            certMongoStorage.writeCertChain(certificateChain, nodeId.getNodeId());
-
+            replaceCertificatesInKeystore(event.readCertChain());
             //should be in one transaction, but we miss transactions...
             dataNodeProvisioningService.changeState(nodeId.getNodeId(), DataNodeProvisioningConfig.State.STORED);
         } catch (Exception ex) {
             LOG.error("Config entry in signed state, but wrong certificate data present in Mongo", ex);
         }
+    }
+
+    private void replaceCertificatesInKeystore(CertificateChain certificateChain) throws DatanodeKeystoreException {
+        datanodeKeystore.replaceCertificatesInKeystore(certificateChain);
     }
 
     private void writeCsr(DataNodeProvisioningConfig cfg) {
@@ -165,7 +162,10 @@ public class DataNodeConfigurationEventHandler {
                     .addAll(Optional.ofNullable(cfg.altNames()).orElse(Collections.emptyList()))
                     .addAll(determineAltNames())
                     .build();
-            final var csr = csrGenerator.generateCSR(passwordSecret, node.getHostname(), altNames, privateKeyEncryptedStorage);
+
+            FilesystemKeystoreInformation keystore = new FilesystemKeystoreInformation(datanodeDirectories.getConfigurationTargetDir().resolve("keystore.jks"), passwordSecret);
+
+            final var csr = csrGenerator.generateCSR(keystore, node.getHostname(), altNames);
             postCsrEvent(csr);
             LOG.info("created CSR for this node");
         } catch (CSRGenerationException | IOException | NodeNotFoundException ex) {

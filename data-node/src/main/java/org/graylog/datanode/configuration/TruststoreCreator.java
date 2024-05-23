@@ -16,7 +16,7 @@
  */
 package org.graylog.datanode.configuration;
 
-import org.graylog.datanode.configuration.variants.KeystoreInformation;
+import org.graylog.security.certutil.csr.FilesystemKeystoreInformation;
 import org.graylog.security.certutil.CertConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,14 +44,14 @@ public class TruststoreCreator {
         return new TruststoreCreator();
     }
 
-    public TruststoreCreator addRootCert(final String name, KeystoreInformation keystoreInformation,
+    public TruststoreCreator addRootCert(final String name, FilesystemKeystoreInformation keystoreInformation,
                                          final String alias) throws IOException, GeneralSecurityException {
         final X509Certificate rootCert = findRootCert(keystoreInformation.location(), keystoreInformation.password(), alias);
         rootCertificates.put(name, rootCert);
         return this;
     }
 
-    public KeystoreInformation persist(final Path truststorePath, final char[] truststorePassword) throws IOException, GeneralSecurityException {
+    public FilesystemKeystoreInformation persist(final Path truststorePath, final char[] truststorePassword) throws IOException, GeneralSecurityException {
         KeyStore trustStore = KeyStore.getInstance(CertConstants.PKCS12);
         trustStore.load(null, null);
 
@@ -63,7 +63,7 @@ public class TruststoreCreator {
         try (final FileOutputStream fileOutputStream = new FileOutputStream(truststorePath.toFile())) {
             trustStore.store(fileOutputStream, truststorePassword);
         }
-        return new KeystoreInformation(truststorePath, truststorePassword);
+        return new FilesystemKeystoreInformation(truststorePath, truststorePassword);
     }
 
 

@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.function.Supplier;
 
-public sealed abstract class SecureConfiguration implements SecurityConfigurationVariant permits MongoCertSecureConfiguration, UploadedCertFilesSecureConfiguration {
+public sealed abstract class SecureConfiguration implements SecurityConfigurationVariant permits LocalKeystoreSecureConfiguration, UploadedCertFilesSecureConfiguration {
 
     /**
      * This filename is used only internally - we copy user-provided certificates to this location and

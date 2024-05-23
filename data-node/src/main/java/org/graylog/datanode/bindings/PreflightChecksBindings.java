@@ -23,6 +23,7 @@ import org.graylog.datanode.bootstrap.preflight.OpenSearchPreconditionsCheck;
 import org.graylog.datanode.bootstrap.preflight.OpensearchBinPreflightCheck;
 import org.graylog.datanode.bootstrap.preflight.OpensearchConfigSync;
 import org.graylog.datanode.bootstrap.preflight.OpensearchDataDirCompatibilityCheck;
+import org.graylog.datanode.bootstrap.preflight.KeystoreCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheck;
 
 public class PreflightChecksBindings extends AbstractModule {
@@ -35,6 +36,7 @@ public class PreflightChecksBindings extends AbstractModule {
         addPreflightCheck(DatanodeDirectoriesLockfileCheck.class);
         addPreflightCheck(OpenSearchPreconditionsCheck.class);
         addPreflightCheck(OpensearchDataDirCompatibilityCheck.class);
+        addPreflightCheck(KeystoreCheck.class);
     }
 
 

@@ -26,26 +26,30 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
-public class DatanodePreflightStateMachineProvider implements Provider<StateMachine<DataNodeProvisioningConfig.State, DatanodeProvisioningEvent>> {
+public class DatanodeProvisioningStateMachineProvider implements Provider<StateMachine<DataNodeProvisioningConfig.State, DatanodeProvisioningEvent>> {
 
     public static final TriggerWithParameters1<String, DatanodeProvisioningEvent> TRIGGER_CERTIFICATE_RECEIVED = new TriggerWithParameters1<>(DatanodeProvisioningEvent.CERTIFICATE_RECEIVED, String.class);
+    public static final TriggerWithParameters1<String, DatanodeProvisioningEvent> TRIGGER_CONNECTING_FAILED = new TriggerWithParameters1<>(DatanodeProvisioningEvent.CONNECTING_FAILED, String.class);
     public static final DataNodeProvisioningConfig.State INITIAL_STATE = DataNodeProvisioningConfig.State.UNCONFIGURED;
     private final NodeId nodeId;
     private final DatanodePreflightStateService dataNodeProvisioningService;
     private final DatanodeProvisioningActions datanodePreflightActions;
 
-    public DatanodePreflightStateMachineProvider(NodeId nodeId, DatanodePreflightStateService dataNodeProvisioningService, DatanodeProvisioningActions datanodePreflightActions) {
+    public DatanodeProvisioningStateMachineProvider(NodeId nodeId, DatanodePreflightStateService dataNodeProvisioningService, DatanodeProvisioningActions datanodePreflightActions) {
         this.nodeId = nodeId;
         this.dataNodeProvisioningService = dataNodeProvisioningService;
         this.datanodePreflightActions = datanodePreflightActions;
     }
 
-    private static final Logger LOG = LoggerFactory.getLogger(DatanodePreflightStateMachineProvider.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DatanodeProvisioningStateMachineProvider.class);
 
     @Override
     public StateMachine<DataNodeProvisioningConfig.State, DatanodeProvisioningEvent> get() {
         StateMachineConfig<DataNodeProvisioningConfig.State, DatanodeProvisioningEvent> config = new StateMachineConfig<>();
+
+        final AtomicInteger failuresCounter = new AtomicInteger();
 
         config.configure(DataNodeProvisioningConfig.State.UNCONFIGURED)
                 .permit(DatanodeProvisioningEvent.CREATE_PRIVATE_KEY,
@@ -68,18 +72,27 @@ public class DatanodePreflightStateMachineProvider implements Provider<StateMach
                 .onEntryFrom(TRIGGER_CERTIFICATE_RECEIVED, datanodePreflightActions::onCertificateReceivedEvent)
                 .permit(DatanodeProvisioningEvent.STARTUP_REQUESTED, DataNodeProvisioningConfig.State.CONNECTING);
 
+        config.setTriggerParameters(DatanodeProvisioningEvent.CONNECTING_FAILED, String.class);
         config.configure(DataNodeProvisioningConfig.State.CONNECTING)
-                .onEntry(() -> LOG.info("connection check triggered"))
-                .permit(DatanodeProvisioningEvent.CONNECTING_FAILED, DataNodeProvisioningConfig.State.ERROR)
+                .onEntry(failuresCounter::incrementAndGet)
+                .onEntryFrom(TRIGGER_CONNECTING_FAILED, this::persistConnectionFailure)
+                .permitReentry(DatanodeProvisioningEvent.CONNECTING_FAILED)
+                .permitDynamic(DatanodeProvisioningEvent.CONNECTING_FAILED, () -> failuresCounter.get() > 40 ? DataNodeProvisioningConfig.State.ERROR : DataNodeProvisioningConfig.State.CONNECTING)
                 .permit(DatanodeProvisioningEvent.CONNECTING_SUCCEEDED, DataNodeProvisioningConfig.State.CONNECTED);
 
         config.configure(DataNodeProvisioningConfig.State.ERROR) // terminal state
-                .onEntry(() -> LOG.error("Shit happended"));
+                .onEntry(() -> LOG.error("Something went wrong."));
 
         config.configure(DataNodeProvisioningConfig.State.CONNECTED) // terminal state
                 .onEntry(() -> LOG.error("Everything went well"));
 
         return new StateMachine<>(INITIAL_STATE, this::getCurrentState, this::persistState, config);
+    }
+
+    private void persistConnectionFailure(String message) {
+        dataNodeProvisioningService.getPreflightConfigFor(nodeId.getNodeId())
+                .map(cfg -> cfg.toBuilder().errorMsg(message).build())
+                .ifPresent(dataNodeProvisioningService::save);
     }
 
 

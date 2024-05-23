@@ -20,6 +20,9 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.graylog.security.certutil.CaService;
+import org.graylog.security.certutil.CertRequest;
+import org.graylog.security.certutil.CertificateGenerator;
+import org.graylog.security.certutil.KeyPair;
 import org.graylog.security.certutil.csr.exceptions.ClientCertGenerationException;
 import org.graylog2.indexer.security.SecurityAdapter;
 import org.graylog2.plugin.certificates.RenewalPolicy;
@@ -28,8 +31,12 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.time.Duration;
 import java.util.List;
 
 import static org.graylog.security.certutil.CertConstants.CA_KEY_ALIAS;
@@ -68,14 +75,25 @@ public class ClientCertGenerator {
             var caPrivateKey = (PrivateKey) caKeystore.getKey(CA_KEY_ALIAS, passwordSecret.toCharArray());
             var caCertificate = (X509Certificate) caKeystore.getCertificate(CA_KEY_ALIAS);
 
-            var privateKeyEncryptedStorage = new InMemoryPrivateKeyStorage();
-            var csr = csrGenerator.generateCSR(privateKeyPassword, principal, List.of(principal), privateKeyEncryptedStorage);
-            var pk = privateKeyEncryptedStorage.readEncryptedKey(privateKeyPassword);
+            final KeyPair keyPair = CertificateGenerator.generate(CertRequest.selfSigned(principal).isCA(false).validity(Duration.ofDays(10 * 365)));
+
+            var csr = csrGenerator.generateCSR(new KeystoreInformation() {
+                @Override
+                public KeyStore loadKeystore() throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException {
+                    return keyPair.toKeystore("datanode", passwordSecret.toCharArray());
+                }
+
+                @Override
+                public char[] password() {
+                    return privateKeyPassword;
+                }
+            }, principal, List.of(principal));
+
             var cert = csrSigner.sign(caPrivateKey, caCertificate, csr, renewalPolicy);
 
             securityAdapter.addUserToRoleMapping(role, principal);
 
-            return new ClientCert(principal, role, serializeAsPEM(caCertificate), serializeAsPEM(pk), serializeAsPEM(cert));
+            return new ClientCert(principal, role, serializeAsPEM(caCertificate), serializeAsPEM(keyPair.privateKey()), serializeAsPEM(cert));
         } catch (Exception e) {
             throw new ClientCertGenerationException("Failed to generate client certificate: " + e.getMessage(), e);
         }

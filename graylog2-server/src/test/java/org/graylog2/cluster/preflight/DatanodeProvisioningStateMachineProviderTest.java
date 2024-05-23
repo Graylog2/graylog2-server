@@ -28,14 +28,17 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
-class DatanodePreflightStateMachineProviderTest {
+class DatanodeProvisioningStateMachineProviderTest {
 
+
+    public static final String NODE_ID = "5ca1ab1e-0000-4000-a000-000000000000";
 
     @Test
     void testStateMachine() throws IOException {
 
         final DatanodeProvisioningActions preflightActions = Mockito.mock(DatanodeProvisioningActions.class);
-        final DatanodePreflightStateMachineProvider provider = new DatanodePreflightStateMachineProvider(new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000"), new InMemoryDatanodePreflightStateService(), preflightActions);
+        final InMemoryDatanodeProvisioningStateService provisioningStateService = new InMemoryDatanodeProvisioningStateService();
+        final DatanodeProvisioningStateMachineProvider provider = new DatanodeProvisioningStateMachineProvider(new SimpleNodeId(NODE_ID), provisioningStateService, preflightActions);
         final StateMachine<DataNodeProvisioningConfig.State, DatanodeProvisioningEvent> stateMachine = provider.get();
 
 
@@ -52,7 +55,7 @@ class DatanodePreflightStateMachineProviderTest {
 
 
         final ArgumentCaptor<String> certificateCaptor = ArgumentCaptor.forClass(String.class);
-        stateMachine.fire(DatanodePreflightStateMachineProvider.TRIGGER_CERTIFICATE_RECEIVED, "!this is cert!");
+        stateMachine.fire(DatanodeProvisioningStateMachineProvider.TRIGGER_CERTIFICATE_RECEIVED, "!this is cert!");
 
         Mockito.verify(preflightActions, Mockito.times(1)).onCertificateReceivedEvent(certificateCaptor.capture());
 
@@ -61,24 +64,30 @@ class DatanodePreflightStateMachineProviderTest {
         Assertions.assertThat(stateMachine.getState()).isEqualTo(DataNodeProvisioningConfig.State.STARTUP_PREPARED);
 
         stateMachine.fire(DatanodeProvisioningEvent.STARTUP_REQUESTED);
-        stateMachine.fire(DatanodeProvisioningEvent.CONNECTING_SUCCEEDED);
+        stateMachine.fire(DatanodeProvisioningStateMachineProvider.TRIGGER_CONNECTING_FAILED, "!this is error message!");
+
+        Assertions.assertThat(provisioningStateService.getPreflightConfigFor(NODE_ID))
+                .map(DataNodeProvisioningConfig::errorMsg)
+                .hasValue("!this is error message!");
 
         Assertions.assertThat(stateMachine.getState()).isEqualTo(DataNodeProvisioningConfig.State.CONNECTED);
 
     }
 
-    private static class InMemoryDatanodePreflightStateService implements DatanodePreflightStateService {
+    private static class InMemoryDatanodeProvisioningStateService implements DatanodePreflightStateService {
 
         private DataNodeProvisioningConfig.State state;
+        private String errorMessage;
 
         @Override
         public Optional<DataNodeProvisioningConfig> getPreflightConfigFor(String nodeId) {
-            return Optional.ofNullable(state).map(s -> DataNodeProvisioningConfig.builder().nodeId(nodeId).state(s).build());
+            return Optional.ofNullable(state).map(s -> DataNodeProvisioningConfig.builder().nodeId(nodeId).state(s).errorMsg(errorMessage).build());
         }
 
         @Override
         public DataNodeProvisioningConfig save(DataNodeProvisioningConfig config) {
             this.state = config.state();
+            this.errorMessage = config.errorMsg();
             return config;
         }
 
