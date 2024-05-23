@@ -52,19 +52,13 @@ import static org.graylog2.shared.security.RestPermissions.INDEXSETS_READ;
 @DbEntity(collection = MongoIndexSetService.COLLECTION_NAME,
           readPermission = INDEXSETS_READ)
 public abstract class IndexSetConfig implements Comparable<IndexSetConfig>, SimpleIndexSetConfig {
-    public static final String INDEX_PREFIX_REGEX = "^[a-z0-9][a-z0-9_+-]*$";
     public static final String DEFAULT_INDEX_TEMPLATE_TYPE = MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE;
 
     public static final String FIELD_REGULAR = "regular";
-    public static final String FIELD_INDEX_PREFIX = "index_prefix";
     public static final String FIELD_INDEX_MATCH_PATTERN = "index_match_pattern";
     public static final String FIELD_INDEX_WILDCARD = "index_wildcard";
-    public static final String FIELD_CREATION_DATE = "creation_date";
     public static final String FIELD_INDEX_TEMPLATE_NAME = "index_template_name";
-    public static final String FIELD_INDEX_TEMPLATE_TYPE = "index_template_type";
-    public static final String FIELD_TYPE_REFRESH_INTERVAL = "field_type_refresh_interval";
     public static final String FIELD_CUSTOM_FIELD_MAPPINGS = "custom_field_mappings";
-    public static final String FIELD_PROFILE_ID = "field_type_profile";
 
     @JsonCreator
     public static IndexSetConfig create(@Id @ObjectId @JsonProperty("_id") @Nullable String id,
@@ -113,9 +107,9 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig>, Simp
                 .shards(shards)
                 .replicas(replicas)
                 .rotationStrategyClass(rotationStrategyClass)
-                .rotationStrategy(rotationStrategy)
+                .rotationStrategyConfig(rotationStrategy)
                 .retentionStrategyClass(retentionStrategyClass)
-                .retentionStrategy(retentionStrategy)
+                .retentionStrategyConfig(retentionStrategy)
                 .creationDate(creationDate)
                 .indexAnalyzer(isNullOrEmpty(indexAnalyzer) ? "standard" : indexAnalyzer)
                 .indexTemplateName(isNullOrEmpty(indexTemplateName) ? indexPrefix + "-template" : indexTemplateName)
@@ -125,7 +119,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig>, Simp
                 .fieldTypeRefreshInterval(fieldTypeRefreshIntervalValue)
                 .customFieldMappings(customFieldMappings == null ? new CustomFieldMappings() : customFieldMappings)
                 .fieldTypeProfile(fieldTypeProfile)
-                .dataTiering(dataTiering)
+                .dataTieringConfig(dataTiering)
                 .build();
     }
 
@@ -311,11 +305,13 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig>, Simp
 
         public abstract Builder rotationStrategyClass(@Nullable String rotationStrategyClass);
 
-        public abstract Builder rotationStrategy(@Nullable RotationStrategyConfig rotationStrategy);
+        @JsonProperty(FIELD_ROTATION_STRATEGY)
+        public abstract Builder rotationStrategyConfig(@Nullable RotationStrategyConfig rotationStrategy);
 
         public abstract Builder retentionStrategyClass(@Nullable String retentionStrategyClass);
 
-        public abstract Builder retentionStrategy(@Nullable RetentionStrategyConfig retentionStrategy);
+        @JsonProperty(FIELD_RETENTION_STRATEGY)
+        public abstract Builder retentionStrategyConfig(@Nullable RetentionStrategyConfig retentionStrategy);
 
         public abstract Builder creationDate(ZonedDateTime creationDate);
 
@@ -335,7 +331,8 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig>, Simp
 
         public abstract Builder fieldTypeProfile(String fieldTypeProfile);
 
-        public abstract Builder dataTiering(@Nullable DataTieringConfig dataTiering);
+        @JsonProperty(FIELD_DATA_TIERING)
+        public abstract Builder dataTieringConfig(@Nullable DataTieringConfig dataTiering);
 
         public abstract IndexSetConfig build();
     }

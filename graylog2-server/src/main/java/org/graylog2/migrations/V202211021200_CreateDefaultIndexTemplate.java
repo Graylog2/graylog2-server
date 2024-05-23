@@ -89,10 +89,10 @@ public class V202211021200_CreateDefaultIndexTemplate extends Migration {
                 .fieldTypeRefreshInterval(Duration.standardSeconds(
                         legacyDefaultConfig.fieldTypeRefreshIntervalUnit().toSeconds(legacyDefaultConfig.fieldTypeRefreshInterval())))
                 .rotationStrategyClass(legacyDefaultConfig.rotationStrategyClass())
-                .rotationStrategy(legacyDefaultConfig.rotationStrategyConfig())
+                .rotationStrategyConfig(legacyDefaultConfig.rotationStrategyConfig())
                 .retentionStrategyClass(legacyDefaultConfig.retentionStrategyClass())
-                .retentionStrategy(legacyDefaultConfig.retentionStrategyConfig())
-                .dataTiering(dataTieringConfig)
+                .retentionStrategyConfig(legacyDefaultConfig.retentionStrategyConfig())
+                .dataTieringConfig(dataTieringConfig)
                 .useLegacyRotation(legacyDefaultConfig.useLegacyRotation())
                 .build();
     }

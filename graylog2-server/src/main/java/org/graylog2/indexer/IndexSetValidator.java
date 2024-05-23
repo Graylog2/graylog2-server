@@ -91,8 +91,8 @@ public class IndexSetValidator {
         if (refreshIntervalViolation != null) {
             return refreshIntervalViolation;
         }
-        if (newConfig.dataTiering() != null) {
-            return validateDataTieringConfig(newConfig.dataTiering());
+        if (newConfig.dataTieringConfig() != null) {
+            return validateDataTieringConfig(newConfig.dataTieringConfig());
         } else {
             return validateStrategyFields(newConfig);
         }
@@ -100,7 +100,7 @@ public class IndexSetValidator {
 
 
     public Violation validateStrategyFields(SimpleIndexSetConfig newConfig) {
-        if (newConfig.retentionStrategy() == null) {
+        if (newConfig.retentionStrategyConfig() == null) {
             return Violation.create(FIELD_RETENTION_STRATEGY + " cannot be null!");
         }
 
@@ -108,7 +108,7 @@ public class IndexSetValidator {
             return Violation.create(FIELD_RETENTION_STRATEGY_CLASS + " cannot be null!");
         }
 
-        if (newConfig.rotationStrategy() == null) {
+        if (newConfig.rotationStrategyConfig() == null) {
             return Violation.create(FIELD_ROTATION_STRATEGY + " cannot be null!");
         }
 
@@ -116,18 +116,18 @@ public class IndexSetValidator {
             return Violation.create(FIELD_ROTATION_STRATEGY_CLASS + " cannot be null!");
         }
 
-        final Violation rotationViolation = validateRotation(newConfig.rotationStrategy());
+        final Violation rotationViolation = validateRotation(newConfig.rotationStrategyConfig());
         if (rotationViolation != null) {
             return rotationViolation;
         }
 
-        final Violation retentionConfigViolation = validateRetentionConfig(newConfig.retentionStrategy());
+        final Violation retentionConfigViolation = validateRetentionConfig(newConfig.retentionStrategyConfig());
         if (retentionConfigViolation != null) {
             return retentionConfigViolation;
         }
 
-        return validateRetentionPeriod(newConfig.rotationStrategy(),
-                newConfig.retentionStrategy());
+        return validateRetentionPeriod(newConfig.rotationStrategyConfig(),
+                newConfig.retentionStrategyConfig());
     }
 
 

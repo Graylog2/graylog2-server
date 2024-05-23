@@ -43,6 +43,9 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
+import static org.graylog2.indexer.indexset.SimpleIndexSetConfig.FIELD_CREATION_DATE;
+import static org.graylog2.indexer.indexset.SimpleIndexSetConfig.FIELD_INDEX_PREFIX;
+import static org.graylog2.indexer.indexset.SimpleIndexSetConfig.FIELD_PROFILE_ID;
 
 public class MongoIndexSetService implements IndexSetService {
     public static final String COLLECTION_NAME = "index_sets";
@@ -78,8 +81,8 @@ public class MongoIndexSetService implements IndexSetService {
         this.clusterConfigService = clusterConfigService;
         this.clusterEventBus = requireNonNull(clusterEventBus);
 
-        this.collection.getDbCollection().createIndex(DBSort.asc(IndexSetConfig.FIELD_INDEX_PREFIX), null, true);
-        this.collection.getDbCollection().createIndex(DBSort.desc(IndexSetConfig.FIELD_CREATION_DATE));
+        this.collection.getDbCollection().createIndex(DBSort.asc(FIELD_INDEX_PREFIX), null, true);
+        this.collection.getDbCollection().createIndex(DBSort.desc(FIELD_CREATION_DATE));
     }
 
     /**
@@ -183,8 +186,8 @@ public class MongoIndexSetService implements IndexSetService {
     @Override
     public void removeReferencesToProfile(final String profileId) {
         collection.update(
-                new BasicDBObject(IndexSetConfig.FIELD_PROFILE_ID, profileId),
-                new BasicDBObject("$unset", new BasicDBObject(IndexSetConfig.FIELD_PROFILE_ID, "1")),
+                new BasicDBObject(FIELD_PROFILE_ID, profileId),
+                new BasicDBObject("$unset", new BasicDBObject(FIELD_PROFILE_ID, "1")),
                 false,
                 true
         );

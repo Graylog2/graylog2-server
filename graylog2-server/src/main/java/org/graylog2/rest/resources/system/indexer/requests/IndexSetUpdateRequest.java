@@ -31,10 +31,6 @@ import org.joda.time.Duration;
 
 import javax.annotation.Nullable;
 
-import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_PROFILE_ID;
-import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_TYPE_REFRESH_INTERVAL;
-import static org.graylog2.rest.resources.system.indexer.responses.IndexSetSummary.FIELD_USE_LEGACY_ROTATION;
-
 @JsonAutoDetect
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record IndexSetUpdateRequest(@JsonProperty(FIELD_TITLE) @NotBlank String title,
@@ -43,14 +39,14 @@ public record IndexSetUpdateRequest(@JsonProperty(FIELD_TITLE) @NotBlank String 
                                     @JsonProperty(FIELD_SHARDS) @Min(1) int shards,
                                     @JsonProperty(FIELD_REPLICAS) @Min(0) int replicas,
                                     @JsonProperty(FIELD_ROTATION_STRATEGY_CLASS) @Nullable String rotationStrategyClass,
-                                    @JsonProperty(FIELD_ROTATION_STRATEGY) @Nullable RotationStrategyConfig rotationStrategy,
+                                    @JsonProperty(FIELD_ROTATION_STRATEGY) @Nullable RotationStrategyConfig rotationStrategyConfig,
                                     @JsonProperty(FIELD_RETENTION_STRATEGY_CLASS) @Nullable String retentionStrategyClass,
-                                    @JsonProperty(FIELD_RETENTION_STRATEGY) @Nullable RetentionStrategyConfig retentionStrategy,
+                                    @JsonProperty(FIELD_RETENTION_STRATEGY) @Nullable RetentionStrategyConfig retentionStrategyConfig,
                                     @JsonProperty(FIELD_INDEX_OPTIMIZATION_MAX_NUM_SEGMENTS) @Min(1L) int indexOptimizationMaxNumSegments,
                                     @JsonProperty(FIELD_INDEX_OPTIMIZATION_DISABLED) boolean indexOptimizationDisabled,
                                     @JsonProperty(FIELD_TYPE_REFRESH_INTERVAL) Duration fieldTypeRefreshInterval,
                                     @JsonProperty(FIELD_PROFILE_ID) @ValidObjectId @Nullable String fieldTypeProfile,
-                                    @JsonProperty(FIELD_DATA_TIERING) @Nullable DataTieringConfig dataTiering,
+                                    @JsonProperty(FIELD_DATA_TIERING) @Nullable DataTieringConfig dataTieringConfig,
                                     @JsonProperty(FIELD_USE_LEGACY_ROTATION) @Nullable Boolean useLegacyRotation) implements SimpleIndexSetConfig {
 
 
@@ -62,15 +58,15 @@ public record IndexSetUpdateRequest(@JsonProperty(FIELD_TITLE) @NotBlank String 
                 indexSet.shards(),
                 indexSet.replicas(),
                 indexSet.rotationStrategyClass(),
-                indexSet.rotationStrategy(),
+                indexSet.rotationStrategyConfig(),
                 indexSet.retentionStrategyClass(),
-                indexSet.retentionStrategy(),
+                indexSet.retentionStrategyConfig(),
                 indexSet.indexOptimizationMaxNumSegments(),
                 indexSet.indexOptimizationDisabled(),
                 indexSet.fieldTypeRefreshInterval(),
                 indexSet.fieldTypeProfile(),
-                indexSet.dataTiering(),
-                indexSet.dataTiering() == null);
+                indexSet.dataTieringConfig(),
+                indexSet.dataTieringConfig() == null);
 
     }
 
@@ -87,9 +83,9 @@ public record IndexSetUpdateRequest(@JsonProperty(FIELD_TITLE) @NotBlank String 
                 .shards(shards())
                 .replicas(replicas())
                 .rotationStrategyClass(rotationStrategyClass())
-                .rotationStrategy(rotationStrategy())
+                .rotationStrategyConfig(rotationStrategyConfig())
                 .retentionStrategyClass(retentionStrategyClass())
-                .retentionStrategy(retentionStrategy())
+                .retentionStrategyConfig(retentionStrategyConfig())
                 .creationDate(oldConfig.creationDate())
                 .indexAnalyzer(oldConfig.indexAnalyzer())
                 .indexTemplateName(oldConfig.indexTemplateName())
@@ -99,7 +95,7 @@ public record IndexSetUpdateRequest(@JsonProperty(FIELD_TITLE) @NotBlank String 
                 .fieldTypeRefreshInterval(fieldTypeRefreshInterval())
                 .fieldTypeProfile(fieldTypeProfile())
                 .customFieldMappings(oldConfig.customFieldMappings())
-                .dataTiering(Boolean.FALSE.equals(useLegacyRotation()) ? dataTiering() : null)
+                .dataTieringConfig(Boolean.FALSE.equals(useLegacyRotation()) ? dataTieringConfig() : null)
                 .build();
     }
 }
