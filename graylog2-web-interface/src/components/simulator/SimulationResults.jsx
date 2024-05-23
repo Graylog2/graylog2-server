@@ -66,7 +66,7 @@ class SimulationResults extends React.Component {
     const { viewOption } = this.state;
 
     return (
-      <MenuItem key={option} eventKey={option} active={viewOption === option}>
+      <MenuItem key={option} onSelect={() => this._changeViewOptions(option)} active={viewOption === option}>
         {text}
       </MenuItem>
     );
@@ -148,7 +148,6 @@ class SimulationResults extends React.Component {
           <div className="pull-right">
             <DropdownButton id="simulation-view-options"
                             title="More results"
-                            onSelect={this._changeViewOptions}
                             bsStyle="default"
                             bsSize="small"
                             pullRight>
