@@ -36,7 +36,7 @@ import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexTemplateNotFoundException;
 import org.graylog2.indexer.indexset.CustomFieldMappings;
 import org.graylog2.indexer.indexset.IndexSetConfig;
-import org.graylog2.indexer.indexset.TemplateIndexSetConfig;
+import org.graylog2.indexer.indexset.IndexSetMappingTemplate;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
@@ -204,15 +204,15 @@ public class Indices {
     }
 
     public Template getIndexTemplate(IndexSet indexSet) {
-        final TemplateIndexSetConfig templateIndexSetConfig = getTemplateIndexSetConfig(indexSet, indexSet.getConfig(), profileService);
+        final IndexSetMappingTemplate indexSetMappingTemplate = getTemplateIndexSetConfig(indexSet, indexSet.getConfig(), profileService);
         return indexMappingFactory.createIndexMapping(indexSet.getConfig())
-                .toTemplate(templateIndexSetConfig);
+                .toTemplate(indexSetMappingTemplate);
     }
 
     Template buildTemplate(IndexSet indexSet, IndexSetConfig indexSetConfig) throws IgnoreIndexTemplate {
-        final TemplateIndexSetConfig templateIndexSetConfig = getTemplateIndexSetConfig(indexSet, indexSetConfig, profileService);
+        final IndexSetMappingTemplate indexSetMappingTemplate = getTemplateIndexSetConfig(indexSet, indexSetConfig, profileService);
         return indexMappingFactory.createIndexMapping(indexSetConfig)
-                .toTemplate(templateIndexSetConfig, 0L);
+                .toTemplate(indexSetMappingTemplate, 0L);
     }
 
     public void deleteIndexTemplate(IndexSet indexSet) {
@@ -244,7 +244,7 @@ public class Indices {
         return true;
     }
 
-    public TemplateIndexSetConfig getTemplateIndexSetConfig(
+    public IndexSetMappingTemplate getTemplateIndexSetConfig(
             final IndexSet indexSet,
             final IndexSetConfig indexSetConfig,
             final IndexFieldTypeProfileService profileService) {
@@ -253,13 +253,13 @@ public class Indices {
         if (profileId != null && !profileId.isEmpty()) {
             final Optional<IndexFieldTypeProfile> fieldTypeProfile = profileService.get(profileId);
             if (fieldTypeProfile.isPresent() && !fieldTypeProfile.get().customFieldMappings().isEmpty()) {
-                return new TemplateIndexSetConfig(indexSetConfig.indexAnalyzer(),
+                return new IndexSetMappingTemplate(indexSetConfig.indexAnalyzer(),
                         indexSet.getIndexWildcard(),
                         fieldTypeProfile.get().customFieldMappings().mergeWith(customFieldMappings));
             }
         }
 
-        return new TemplateIndexSetConfig(indexSetConfig.indexAnalyzer(),
+        return new IndexSetMappingTemplate(indexSetConfig.indexAnalyzer(),
                 indexSet.getIndexWildcard(),
                 customFieldMappings);
     }
