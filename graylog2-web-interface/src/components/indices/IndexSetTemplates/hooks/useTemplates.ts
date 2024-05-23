@@ -43,14 +43,7 @@ const fetchIndexSetTemplates = async (searchParams: SearchParams) => {
 
   return fetch('GET', url).then(
     ({ elements, total, attributes }) => ({
-      list: elements.map((template: IndexSetTemplate) => ({
-        id: template.id,
-        title: template.title,
-        description: template.description,
-        built_in: template.built_in,
-        default: template.default,
-        enabled: template.enabled,
-      })),
+      list: elements,
       pagination: { total },
       attributes,
     }));
