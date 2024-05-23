@@ -26,7 +26,7 @@ import useChartData from 'views/components/visualizations/useChartData';
 import useEvents from 'views/components/visualizations/useEvents';
 import { keySeparator, humanSeparator } from 'views/Constants';
 import useMapKeys from 'views/components/visualizations/useMapKeys';
-import { generateDomain, generateYAxis } from 'views/components/visualizations/layoytGenerators';
+import { generateDomain, generateYAxis } from 'views/components/visualizations/utils/chartLayoytGenerators';
 
 import type { Generator } from '../ChartData';
 import XYPlot from '../XYPlot';

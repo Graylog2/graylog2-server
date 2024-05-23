@@ -27,7 +27,7 @@ import ScatterVisualizationConfig from 'views/logic/aggregationbuilder/visualiza
 import type { Generator } from 'views/components/visualizations/ChartData';
 import useMapKeys from 'views/components/visualizations/useMapKeys';
 import { keySeparator, humanSeparator } from 'views/Constants';
-import { generateDomain, generateYAxis } from 'views/components/visualizations/layoytGenerators';
+import { generateDomain, generateYAxis } from 'views/components/visualizations/utils/chartLayoytGenerators';
 
 import XYPlot from '../XYPlot';
 

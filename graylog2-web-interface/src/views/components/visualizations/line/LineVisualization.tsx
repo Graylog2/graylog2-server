@@ -27,7 +27,7 @@ import useEvents from 'views/components/visualizations/useEvents';
 import { DEFAULT_AXIS_TYPE } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 import useMapKeys from 'views/components/visualizations/useMapKeys';
 import { keySeparator, humanSeparator } from 'views/Constants';
-import { generateDomain, generateYAxis } from 'views/components/visualizations/layoytGenerators';
+import { generateDomain, generateYAxis } from 'views/components/visualizations/utils/chartLayoytGenerators';
 
 import type { Generator } from '../ChartData';
 import XYPlot from '../XYPlot';

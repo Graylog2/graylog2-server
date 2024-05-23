@@ -70,12 +70,18 @@ export const getFormatSettings = (unitTypeKey: MetricUnitType | DefaulAxisKey) =
     case 'time':
       return ({
         type: 'date',
-        // tickformat: '%S',
+        // tickformat: '.3f',
+        // tick0: 0,
+        // dtick: 8640000, // milliseconds
+
         tickformatstops: [
-          { dtickrange: [0, 1000], value: '%Lms', name: 'milliseconds' }, //
-          { dtickrange: [1000, 60000], value: '%Ss', name: 'seconds' }, //
-          { dtickrange: [60000, 3600000], value: '%Mm', name: 'minutes' }, //
-          { dtickrange: [3600000, Infinity], value: '%Hh', name: 'hours' },
+          { dtickrange: [0, 1000], value: '%L ms', name: 'milliseconds' }, //
+          { dtickrange: [1000, 60000], value: '%S s', name: 'seconds' }, //
+          { dtickrange: [60000, 3600000], value: '%-M min', name: 'minutes' }, //
+          { dtickrange: [3600000, 86400000], value: '%-H hr', name: 'hours' },
+          { dtickrange: [86400000, 2629746000], value: '%-d d', name: 'days' },
+          { dtickrange: [2629746000, 31556952000], value: '%-m mon', name: 'months' },
+          { dtickrange: [31556952000, Infinity], value: '%-y y', name: 'years' },
         ],
       });
     default:
@@ -83,14 +89,6 @@ export const getFormatSettings = (unitTypeKey: MetricUnitType | DefaulAxisKey) =
         tickformat: ',~r',
       });
   }
-};
-
-const getTitleSettings = (unitType: string): { title: { text: string }} | {} => {
-  if (!unitType || unitType === DEFAULT_AXIS_KEY) return {};
-
-  return ({
-    title: { text: unitType, automargin: true, yref: 'container' },
-  });
 };
 
 export const getUnitLayout = (unitTypeKey: MetricUnitType | DefaulAxisKey, axisCount: number) => ({
@@ -107,7 +105,6 @@ export const generateYAxis = (series: Array<Series>): { mapperAxisNumber: Record
   const unitLayout: {} | Record<MetricUnitType, { layout: Record<string, unknown>, axisKeyName: string}> = {};
   const mapper = {};
   const mapperAxisNumber = {};
-  const mapperAxisSeries = {};
 
   series.forEach((s: Series) => {
     const seriesName = s.config.name || s.function;
@@ -121,20 +118,18 @@ export const generateYAxis = (series: Array<Series>): { mapperAxisNumber: Record
 
       mapper[seriesName] = `y${axisNameNumberPart}`;
       mapperAxisNumber[seriesName] = axisCount;
-      mapperAxisSeries[axisKeyName] = [seriesName];
       axisCount += 1;
     } else {
       const currentAxisCount = unitLayout[unitTypeKey].axisCount;
       const axisNameNumberPart = currentAxisCount > 1 ? currentAxisCount : '';
       mapper[seriesName] = `y${axisNameNumberPart}`;
       mapperAxisNumber[seriesName] = currentAxisCount;
-      mapperAxisSeries[`yaxis${axisNameNumberPart}`].push(seriesName);
     }
   });
 
   return ({
-    layouts: transform(unitLayout, (res, { layout, axisKeyName }, key) => {
-      res[axisKeyName] = { ...layout, ...getTitleSettings(key) };
+    layouts: transform(unitLayout, (res, { layout, axisKeyName }) => {
+      res[axisKeyName] = layout;
     }),
     yAxisMapper: mapper,
     mapperAxisNumber,

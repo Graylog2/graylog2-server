@@ -52,8 +52,8 @@ export type Unit = {
 }
 type FieldUnitTypesJson = Record<MetricUnitType, Array<UnitJson>>
 type FieldUnitTypes = Record<MetricUnitType, Array<Unit>>
-type ConversionParams = SeriesUnitState;
-type ConvertedResult = { value: number | null, unit: Unit };
+export type ConversionParams = SeriesUnitState;
+export type ConvertedResult = { value: number | null, unit: Unit };
 
 const unitFromJson = (unitJson: UnitJson): Unit => set<Unit>(omit(unitJson, 'unit_type'), 'unitType', unitJson.unit_type);
 
@@ -95,6 +95,12 @@ const _convertValueToUnit = (units: FieldUnitTypes, value: number, fromParams: C
   const unit = units[toParams.unitType].find(({ abbrev }) => toParams.abbrev === abbrev);
   const res: ConvertedResult = ({ value: null, unit });
 
+  if (baseValue.unit.abbrev === toParams.abbrev) {
+    res.value = baseValue.value;
+
+    return res;
+  }
+
   if (unit?.conversion?.action === 'MULTIPLY') {
     res.value = baseValue.value / unit.conversion.value;
   }
@@ -123,11 +129,13 @@ const _getPrettifiedValue = (units: FieldUnitTypes, value: number, params: Conve
   return maxBy(filtratedValuesLower, ({ value: val }) => val);
 };
 
+export type ConvertValueToUnit = (value: number, fromParams: ConversionParams, toParams: ConversionParams) => ConvertedResult
+
 const useFieldUnitTypes = () => {
   const units = useMemo<FieldUnitTypes>(() => mapValues(sourceUnits, (unitsJson: Array<UnitJson>):Array<Unit> => unitsJson.map((unitJson) => unitFromJson(unitJson))), []);
   const getBaseUnit = useCallback((fieldType: MetricUnitType) => _getBaseUnit(units, fieldType), [units]);
   const convertValueToBaseUnit = useCallback((value: number, params: ConversionParams) => _convertValueToBaseUnit(units, value, params), [units]);
-  const convertValueToUnit = useCallback((value: number, fromParams: ConversionParams, toParams: ConversionParams) => _convertValueToUnit(units, value, fromParams, toParams), [units]);
+  const convertValueToUnit: ConvertValueToUnit = useCallback((value, fromParams, toParams) => _convertValueToUnit(units, value, fromParams, toParams), [units]);
   const getPrettifiedValue = useCallback((value: number, params: ConversionParams) => _getPrettifiedValue(units, value, params), [units]);
 
   return { units, getBaseUnit, convertValueToBaseUnit, convertValueToUnit, getPrettifiedValue };

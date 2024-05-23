@@ -1,0 +1,46 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+import type { ConvertValueToUnit, ConversionParams } from 'hooks/useFieldUnitTypes';
+import type SeriesUnit from 'views/logic/aggregationbuilder/SeriesUnit';
+import type { MetricUnitType } from 'views/types';
+
+const chartLayoutBaseUnitTypes: Record<MetricUnitType, string> = {
+  size: 'b',
+  percent: '%',
+  time: 'ms',
+};
+
+const dataConvertor = (values: Array<number>, convertValueToUnit: ConvertValueToUnit, unit: SeriesUnit) => {
+  if (!unit.isDefined) return values;
+  const from: ConversionParams = { abbrev: unit.abbrev, unitType: unit.unitType };
+  const to: ConversionParams = { abbrev: chartLayoutBaseUnitTypes[unit.unitType], unitType: unit.unitType };
+
+  const res = values.map((v) => {
+    const converted = convertValueToUnit(v, from, to);
+    console.log({ converted, v, from, to });
+
+    if (unit.unitType === 'time') return new Date(converted.value);
+
+    return converted.value;
+  });
+
+  console.log({ from, to, res });
+
+  return res;
+};
+
+export default dataConvertor;
