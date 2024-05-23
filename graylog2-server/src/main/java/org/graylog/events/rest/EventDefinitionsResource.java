@@ -77,6 +77,7 @@ import org.graylog2.rest.bulk.SequentialBulkExecutor;
 import org.graylog2.rest.bulk.model.BulkOperationRequest;
 import org.graylog2.rest.bulk.model.BulkOperationResponse;
 import org.graylog2.rest.models.PaginatedResponse;
+import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.EntityDefaults;
@@ -175,7 +176,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                                                                   allowableValues = "title,description,priority,status")
                                                         @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
                                                         @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
-                                                        @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") String order) {
+                                                            @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") SortOrder order) {
 
         SearchQuery searchQuery;
         try {
@@ -186,9 +187,12 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         if ("status".equals(sort)) {
             sort = "alert";
         }
-        final PaginatedList<EventDefinitionDto> result = dbService.searchPaginated(searchQuery, event -> {
-            return isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, event.id());
-        }, sort, order, page, perPage);
+        final PaginatedList<EventDefinitionDto> result = dbService.searchPaginated(
+                searchQuery,
+                event -> isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, event.id()),
+                order.toBsonSort(sort),
+                page,
+                perPage);
         PaginatedList<EventDefinitionDto> definitionDtos = new PaginatedList<>(
                 result.delegate(), result.pagination().total(), result.pagination().page(), result.pagination().perPage()
         );
@@ -219,9 +223,12 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         } catch (IllegalArgumentException e) {
             throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
         }
-        final PaginatedList<EventDefinitionDto> result = dbService.searchPaginated(searchQuery, event -> {
-            return isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, event.id());
-        }, "title", "asc", page, perPage);
+        final PaginatedList<EventDefinitionDto> result = dbService.searchPaginated(
+                searchQuery,
+                event -> isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, event.id()),
+                SortOrder.ASCENDING.toBsonSort("title"),
+                page,
+                perPage);
         final ImmutableMap<String, Object> context = contextService.contextFor(result.delegate());
         return PaginatedResponse.create("event_definitions", result, query, context);
     }

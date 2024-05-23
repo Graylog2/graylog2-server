@@ -33,6 +33,7 @@ import org.graylog2.contentpacks.model.entities.LookupDataAdapterEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.references.ReferenceMapUtils;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.lookup.db.DBDataAdapterService;
@@ -66,10 +67,10 @@ public class LookupDataAdapterFacadeTest {
     @Before
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
     public void setUp() throws Exception {
+        final MongoCollections mongoCollections = new MongoCollections(new MongoJackObjectMapperProvider(objectMapper), mongodb.mongoConnection());
         final ClusterEventBus clusterEventBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
         dataAdapterService = new DBDataAdapterService(
-                mongodb.mongoConnection(),
-                new MongoJackObjectMapperProvider(objectMapper),
+                mongoCollections,
                 EntityScopeTestUtil.getEntityScopeService(),
                 clusterEventBus);
         pluginMetaData = new HashSet<>();
