@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
-import useIndexSetTemplateDefaults from 'src/components/indices/IndexSetTemplates/hooks/useIndexSetTemplateDefaults';
 
+import useIndexSetTemplateDefaults from 'components/indices/IndexSetTemplates/hooks/useIndexSetTemplateDefaults';
 import asMock from 'helpers/mocking/AsMock';
 import useProfileOptions from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileOptions';
 import { DATA_TIERING_TYPE } from 'components/indices/data-tiering';
@@ -242,7 +242,7 @@ const indexSetTemplateDefaults = {
 };
 
 jest.mock('components/indices/IndexSetFieldTypeProfiles/hooks/useProfileOptions', () => jest.fn());
-jest.mock('components/indices/hooks/useIndexSetTemplateDefaults', () => jest.fn());
+jest.mock('components/indices/IndexSetTemplates/hooks/useIndexSetTemplateDefaults', () => jest.fn());
 
 describe('IndexSetConfigurationForm', () => {
   beforeEach(() => {
