@@ -103,7 +103,7 @@ public class IndexSetTemplateResource extends RestResource {
     @NoAuditEvent("No change to the DB")
     @ApiOperation(value = "Gets default template")
     public IndexSetTemplateConfig getDefaultConfig() {
-        return indexSetDefaultTemplateService.createDefaultConfig();
+        return indexSetDefaultTemplateService.getOrCreateDefaultConfig();
     }
 
     @GET

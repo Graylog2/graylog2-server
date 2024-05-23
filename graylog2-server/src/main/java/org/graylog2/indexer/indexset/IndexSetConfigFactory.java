@@ -46,7 +46,7 @@ public class IndexSetConfigFactory {
     }
 
     public IndexSetConfig.Builder createDefault() {
-        IndexSetTemplateConfig defaultConfig = indexSetDefaultTemplateService.createDefaultConfig();
+        IndexSetTemplateConfig defaultConfig = indexSetDefaultTemplateService.getOrCreateDefaultConfig();
 
         return IndexSetConfig.builder()
                 .creationDate(getCreationDate())
