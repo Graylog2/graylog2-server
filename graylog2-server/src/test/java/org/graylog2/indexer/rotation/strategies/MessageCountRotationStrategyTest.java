@@ -24,7 +24,7 @@ import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.rotation.common.IndexRotator;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
-import org.jetbrains.annotations.NotNull;
+import jakarta.annotation.Nonnull;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -94,7 +94,7 @@ public class MessageCountRotationStrategyTest {
         reset(indexSet);
     }
 
-    @NotNull
+    @Nonnull
     private MessageCountRotationStrategy createStrategy() {
         return new MessageCountRotationStrategy(indices, new IndexRotator(indices, auditEventSender, nodeId));
     }

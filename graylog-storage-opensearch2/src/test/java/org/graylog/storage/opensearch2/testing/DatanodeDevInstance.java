@@ -26,6 +26,7 @@ import org.testcontainers.containers.Network;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 
 public class DatanodeDevInstance extends OpenSearchInstance {
     private static final Logger LOG = LoggerFactory.getLogger(DatanodeDevInstance.class);
@@ -34,8 +35,8 @@ public class DatanodeDevInstance extends OpenSearchInstance {
     private final String passwordSecret;
     private final String rootPasswordSha2;
 
-    public DatanodeDevInstance(final SearchVersion version, final String hostname, final Network network, final String mongoDBUri, final String passwordSecret, final String rootPasswordSha2, final String heapSize, final List<String> featureFlags) {
-        super(version, hostname, network, heapSize, featureFlags);
+    public DatanodeDevInstance(final SearchVersion version, final String hostname, final Network network, final String mongoDBUri, final String passwordSecret, final String rootPasswordSha2, final String heapSize, final List<String> featureFlags, Map<String, String> env) {
+        super(version, hostname, network, heapSize, featureFlags, env);
         this.mongoDBUri = mongoDBUri;
         this.passwordSecret = passwordSecret;
         this.rootPasswordSha2 = rootPasswordSha2;
@@ -61,8 +62,16 @@ public class DatanodeDevInstance extends OpenSearchInstance {
     public GenericContainer<?> buildContainer(String image, Network network) {
         var builder = DatanodeDevContainerInstanceProvider.getBuilderFor(this.version()).orElseThrow(() -> new UnsupportedOperationException("Can not build container for Search version " + this.version() + " - not supported."));
 
-        builder.nodeName(hostname).passwordSecret(passwordSecret).rootPasswordSha2(rootPasswordSha2).network(network).mongoDbUri(mongoDBUri).restPort(8999).openSearchHttpPort(9200).openSearchTransportPort(9300);
-
-        return builder.build();
+        return builder
+                .nodeName(hostname)
+                .passwordSecret(passwordSecret)
+                .rootPasswordSha2(rootPasswordSha2)
+                .network(network)
+                .mongoDbUri(mongoDBUri)
+                .restPort(8999)
+                .openSearchHttpPort(9200)
+                .openSearchTransportPort(9300)
+                .env(getContainerEnv())
+                .build();
     }
 }

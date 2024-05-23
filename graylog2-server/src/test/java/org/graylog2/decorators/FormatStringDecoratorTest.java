@@ -22,6 +22,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Range;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.Tools;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.rest.models.system.indexer.responses.IndexRangeSummary;
@@ -35,6 +37,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.rest.models.messages.responses.ResultMessageSummary.create;
 
 public class FormatStringDecoratorTest {
+    private final MessageFactory messageFactory = new TestMessageFactory();
     private final Engine templateEngine = new Engine();
 
     @Test
@@ -42,7 +45,7 @@ public class FormatStringDecoratorTest {
 
         final DecoratorImpl decorator = getDecoratorConfig("${field_a}: ${field_b}", "message", true);
 
-        final FormatStringDecorator formatStringDecorator = new FormatStringDecorator(decorator, templateEngine);
+        final FormatStringDecorator formatStringDecorator = new FormatStringDecorator(decorator, templateEngine, messageFactory);
         final SearchResponse searchResponse = getSearchResponse();
 
         final SearchResponse response = formatStringDecorator.apply(searchResponse);
@@ -58,7 +61,7 @@ public class FormatStringDecoratorTest {
     public void formatAllowEmptyValues() {
         final DecoratorImpl decorator = getDecoratorConfig("${field_a}: ${field_b}", "message", false);
 
-        final FormatStringDecorator formatStringDecorator = new FormatStringDecorator(decorator, templateEngine);
+        final FormatStringDecorator formatStringDecorator = new FormatStringDecorator(decorator, templateEngine, messageFactory);
         final SearchResponse searchResponse = getSearchResponse();
 
         final SearchResponse response = formatStringDecorator.apply(searchResponse);

@@ -29,7 +29,6 @@ import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.container.DynamicFeature;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.ext.ContextResolver;
@@ -47,18 +46,16 @@ import org.glassfish.jersey.server.model.Resource;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.variants.KeystoreInformation;
 import org.graylog.datanode.configuration.variants.OpensearchSecurityConfiguration;
-import org.graylog.datanode.management.OpensearchConfigurationChangeEvent;
-import org.graylog.datanode.process.OpensearchConfiguration;
+import org.graylog.datanode.opensearch.OpensearchConfigurationChangeEvent;
+import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
 import org.graylog.datanode.rest.config.SecuredNodeAnnotationFilter;
 import org.graylog.security.certutil.CertConstants;
-import org.graylog2.bootstrap.preflight.web.BasicAuthFilter;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.shared.rest.exceptionmappers.JacksonPropertyExceptionMapper;
 import org.graylog2.shared.rest.exceptionmappers.JsonProcessingExceptionMapper;
 import org.graylog2.shared.security.tls.KeyStoreUtils;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,6 +90,7 @@ public class JerseyService extends AbstractIdleService {
     private final TLSProtocolsConfiguration tlsConfiguration;
 
     private HttpServer apiHttpServer = null;
+    private final ExecutorService executorService;
 
     @Inject
     public JerseyService(final Configuration configuration,
@@ -110,6 +108,10 @@ public class JerseyService extends AbstractIdleService {
         this.metricRegistry = requireNonNull(metricRegistry, "metricRegistry");
         this.tlsConfiguration = requireNonNull(tlsConfiguration);
         eventBus.register(this);
+        this.executorService = instrumentedExecutor(
+                "http-worker-executor",
+                "http-worker-%d",
+                configuration.getHttpThreadPoolSize());
     }
 
     @Subscribe
@@ -174,7 +176,6 @@ public class JerseyService extends AbstractIdleService {
         apiHttpServer = setUp(
                 listenUri,
                 sslEngineConfigurator,
-                configuration.getHttpThreadPoolSize(),
                 configuration.getHttpSelectorRunnersCount(),
                 configuration.getHttpMaxHeaderSize(),
                 configuration.isHttpEnableGzip(),
@@ -223,7 +224,6 @@ public class JerseyService extends AbstractIdleService {
 
     private HttpServer setUp(URI listenUri,
                              SSLEngineConfigurator sslEngineConfigurator,
-                             int threadPoolSize,
                              int selectorRunnersCount,
                              int maxHeaderSize,
                              boolean enableGzip,
@@ -232,7 +232,7 @@ public class JerseyService extends AbstractIdleService {
         final ResourceConfig resourceConfig = buildResourceConfig(additionalResources);
 
         if (isSecuredInstance) {
-            resourceConfig.register(createAuthFilter(configuration));
+            resourceConfig.register(new JwtTokenAuthFilter(configuration.getPasswordSecret()));
         }
         resourceConfig.register(new SecuredNodeAnnotationFilter(configuration.isInsecureStartup()));
 
@@ -245,12 +245,7 @@ public class JerseyService extends AbstractIdleService {
 
         final NetworkListener listener = httpServer.getListener("grizzly");
         listener.setMaxHttpHeaderSize(maxHeaderSize);
-
-        final ExecutorService workerThreadPoolExecutor = instrumentedExecutor(
-                "http-worker-executor",
-                "http-worker-%d",
-                threadPoolSize);
-        listener.getTransport().setWorkerThreadPool(workerThreadPoolExecutor);
+        listener.getTransport().setWorkerThreadPool(executorService);
 
         // The Grizzly default value is equal to `Runtime.getRuntime().availableProcessors()` which doesn't make
         // sense for Graylog because we are not mainly a web server.
@@ -264,13 +259,6 @@ public class JerseyService extends AbstractIdleService {
         }
 
         return httpServer;
-    }
-
-    @NotNull
-    private ContainerRequestFilter createAuthFilter(Configuration configuration) {
-        final ContainerRequestFilter basicAuthFilter = new BasicAuthFilter(configuration.getRootUsername(), configuration.getRootPasswordSha2(), "Datanode");
-        final AuthTokenValidator tokenVerifier = new JwtTokenValidator(configuration.getPasswordSecret());
-        return new DatanodeAuthFilter(basicAuthFilter, tokenVerifier);
     }
 
     private SSLEngineConfigurator buildSslEngineConfigurator(KeystoreInformation keystoreInformation)

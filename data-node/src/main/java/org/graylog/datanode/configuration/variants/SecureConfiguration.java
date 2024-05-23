@@ -18,7 +18,6 @@ package org.graylog.datanode.configuration.variants;
 
 import com.google.common.base.Suppliers;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
-import org.graylog.security.certutil.keystore.storage.location.KeystoreFileLocation;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -41,14 +40,13 @@ public sealed abstract class SecureConfiguration implements SecurityConfiguratio
      */
     private static final Path TARGET_DATANODE_TRANSPORT_KEYSTORE_FILENAME = Path.of("transport-keystore.p12");
 
-    private final Supplier<KeystoreFileLocation> httpKeystoreLocation;
-    private final Supplier<KeystoreFileLocation> transportKeystoreLocation;
+    private final Supplier<Path> httpKeystoreLocation;
+    private final Supplier<Path> transportKeystoreLocation;
 
     public SecureConfiguration(final DatanodeConfiguration datanodeConfiguration) {
         this.httpKeystoreLocation = Suppliers.memoize(() -> {
             try {
-                final Path filePath = datanodeConfiguration.datanodeDirectories().createOpensearchProcessConfigurationFile(TARGET_DATANODE_HTTP_KEYSTORE_FILENAME);
-                return new KeystoreFileLocation(filePath);
+                return datanodeConfiguration.datanodeDirectories().createOpensearchProcessConfigurationFile(TARGET_DATANODE_HTTP_KEYSTORE_FILENAME);
             } catch (IOException e) {
                 throw new RuntimeException("Failed to create http keystore file", e);
             }
@@ -56,20 +54,19 @@ public sealed abstract class SecureConfiguration implements SecurityConfiguratio
 
         this.transportKeystoreLocation = Suppliers.memoize(() -> {
             try {
-                final Path filePath = datanodeConfiguration.datanodeDirectories().createOpensearchProcessConfigurationFile(TARGET_DATANODE_TRANSPORT_KEYSTORE_FILENAME);
-                return new KeystoreFileLocation(filePath);
+                return datanodeConfiguration.datanodeDirectories().createOpensearchProcessConfigurationFile(TARGET_DATANODE_TRANSPORT_KEYSTORE_FILENAME);
             } catch (IOException e) {
                 throw new RuntimeException("Failed to create transport keystore file", e);
             }
         });
     }
 
-    KeystoreFileLocation getHttpKeystoreLocation() {
+    Path getHttpKeystoreLocation() {
         return httpKeystoreLocation.get();
     }
 
 
-    KeystoreFileLocation getTransportKeystoreLocation() {
+    Path getTransportKeystoreLocation() {
         return transportKeystoreLocation.get();
     }
 }

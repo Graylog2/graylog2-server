@@ -28,6 +28,8 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.SearchHits;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
 import org.graylog.testing.jsonpath.JsonPathAssert;
+import org.graylog2.indexer.results.TestResultMessageFactory;
+import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.junit.Test;
@@ -45,7 +47,8 @@ public class ESMessageListTest {
 
     @Test
     public void includesCustomNameInResultIfPresent() {
-        final ESMessageList esMessageList = new ESMessageList();
+        final ESMessageList esMessageList = new ESMessageList(new LegacyDecoratorProcessor.Fake(),
+                new TestResultMessageFactory(), false);
         final MessageList messageList = someMessageList().toBuilder().name("customResult").build();
 
         final org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse result =
@@ -103,7 +106,7 @@ public class ESMessageListTest {
     }
 
     @Test
-    public void addsGl2MessageIdtoSort() {
+    public void addsGl2SecondSort() {
         final MessageList messageList = someMessageListWithSorting("stream1", "timestamp", Sort.Order.ASC);
         final ESGeneratedQueryContext context = mockQueryContext(messageList);
 
@@ -111,12 +114,12 @@ public class ESMessageListTest {
         final DocumentContext doc = JsonPath.parse(queryContext.searchSourceBuilder(messageList).toString());
 
         JsonPathAssert.assertThat(doc).jsonPathAsString("$.sort[0].timestamp.order").isEqualTo("asc");
-        JsonPathAssert.assertThat(doc).jsonPathAsString("$.sort[1].gl2_message_id.order").isEqualTo("asc");
-        JsonPathAssert.assertThat(doc).jsonPathAsString("$.sort[1].gl2_message_id.unmapped_type").isEqualTo("keyword");
+        JsonPathAssert.assertThat(doc).jsonPathAsString("$.sort[1].gl2_second_sort_field.order").isEqualTo("asc");
+        JsonPathAssert.assertThat(doc).jsonPathAsString("$.sort[1].gl2_second_sort_field.unmapped_type").isEqualTo("keyword");
     }
 
     @Test
-    public void addsGl2MessageIdtoSortWithOrder() {
+    public void addsGl2SecondSortWithOrder() {
         final MessageList messageList = someMessageListWithSorting("stream1", "timestamp", Sort.Order.DESC);
         final ESGeneratedQueryContext context = mockQueryContext(messageList);
 
@@ -124,14 +127,15 @@ public class ESMessageListTest {
         final DocumentContext doc = JsonPath.parse(queryContext.searchSourceBuilder(messageList).toString());
 
         JsonPathAssert.assertThat(doc).jsonPathAsString("$.sort[0].timestamp.order").isEqualTo("desc");
-        JsonPathAssert.assertThat(doc).jsonPathAsString("$.sort[1].gl2_message_id.order").isEqualTo("desc");
+        JsonPathAssert.assertThat(doc).jsonPathAsString("$.sort[1].gl2_second_sort_field.order").isEqualTo("desc");
+        JsonPathAssert.assertThat(doc).jsonPathAsString("$.sort[1].gl2_second_sort_field.unmapped_type").isEqualTo("keyword");
     }
 
     @Test
-    public void onlyAddsGl2MessageIdWhenNotAlreadyPresent() {
+    public void onlyAddsSecondSortWhenGl2MessageIdNotAlreadyPresent() {
         final MessageList messageList = someMessageList().toBuilder()
                 .sort(List.of(
-                        Sort.create("gl2_message_id", Sort.Order.DESC),
+                        Sort.create(Message.FIELD_GL2_MESSAGE_ID, Sort.Order.DESC),
                         Sort.create("timestamp", Sort.Order.ASC)
                 ))
                 .build();
@@ -144,6 +148,22 @@ public class ESMessageListTest {
         JsonPathAssert.assertThat(doc).jsonPathAsString("$.sort[1].timestamp.order").isEqualTo("asc");
     }
 
+    @Test
+    public void onlyAddsSecondSortWhenNotAlreadyPresent() {
+        final MessageList messageList = someMessageList().toBuilder()
+                .sort(List.of(
+                        Sort.create(Message.GL2_SECOND_SORT_FIELD, Sort.Order.DESC),
+                        Sort.create("timestamp", Sort.Order.ASC)
+                ))
+                .build();
+        final ESGeneratedQueryContext context = mockQueryContext(messageList);
+        final ESGeneratedQueryContext queryContext = generateQueryPartWithContextFor(messageList, true, context);
+        final DocumentContext doc = JsonPath.parse(queryContext.searchSourceBuilder(messageList).toString());
+
+        assertThat((List<?>) doc.read("$.sort")).hasSize(2);
+        JsonPathAssert.assertThat(doc).jsonPathAsString("$.sort[0].gl2_second_sort_field.order").isEqualTo("desc");
+        JsonPathAssert.assertThat(doc).jsonPathAsString("$.sort[1].timestamp.order").isEqualTo("asc");
+    }
 
     private Query someQuery() {
         return Query.builder()
@@ -207,6 +227,7 @@ public class ESMessageListTest {
                                                                     ESGeneratedQueryContext context) {
         ESMessageList sut = new ESMessageList(
                 new LegacyDecoratorProcessor.Fake(),
+                new TestResultMessageFactory(),
                 allowHighlighting);
 
         sut.doGenerateQueryPart(someQuery(), messageList, context);

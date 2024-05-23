@@ -27,6 +27,6 @@ public class ProxyRequestAdapterES7 implements ProxyRequestAdapter {
 
     @Override
     public ProxyResponse request(ProxyRequest request) throws IOException {
-        return new ProxyResponse(400, new ByteArrayInputStream(ERROR_MESSAGE.getBytes(StandardCharsets.UTF_8)));
+        return new ProxyResponse(400, new ByteArrayInputStream(ERROR_MESSAGE.getBytes(StandardCharsets.UTF_8)), "text/plain");
     }
 }

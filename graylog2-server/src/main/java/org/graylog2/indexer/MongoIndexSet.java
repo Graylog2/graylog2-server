@@ -182,9 +182,13 @@ public class MongoIndexSet implements IndexSet {
         }
     }
 
+    public static boolean indexHasWarmInfix(String indexName) {
+        return indexName.contains("_" + WARM_INDEX_INFIX);
+    }
+
     private int indexPrefixLength(String indexName) {
         int length = config.indexPrefix().length() + 1;
-        if (indexName.contains("_" + WARM_INDEX_INFIX)) {
+        if (indexHasWarmInfix(indexName)) {
             length += WARM_INDEX_INFIX.length();
         }
         return length;

@@ -17,7 +17,7 @@
 
 import { useMemo } from 'react';
 
-import type { EventDefinition } from 'logic/alerts/types';
+import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import type { EventDefinitionAggregation } from 'hooks/useEventDefinition';
 import type { ElasticsearchQueryString, RelativeTimeRangeStartOnly } from 'views/logic/queries/Query';
 import { ViewGenerator } from 'views/logic/views/UseCreateViewForEvent';

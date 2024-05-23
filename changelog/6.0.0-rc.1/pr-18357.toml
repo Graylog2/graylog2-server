@@ -1,0 +1,4 @@
+type = "a"
+message = "Add support for searchable snapshots in data node"
+
+pulls = ["18357"]

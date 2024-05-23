@@ -62,6 +62,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSource
 import org.graylog.storage.opensearch2.blocks.BlockSettingsParser;
 import org.graylog.storage.opensearch2.cat.CatApi;
 import org.graylog.storage.opensearch2.cluster.ClusterStateApi;
+import org.graylog.storage.opensearch2.stats.ClusterStatsApi;
 import org.graylog.storage.opensearch2.stats.StatsApi;
 import org.graylog2.datatiering.WarmIndexInfo;
 import org.graylog2.indexer.IndexNotFoundException;
@@ -76,6 +77,7 @@ import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.indexer.searches.IndexRangeStats;
 import org.graylog2.plugin.Message;
+import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -102,6 +104,7 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(IndicesAdapterOS2.class);
     private final OpenSearchClient client;
     private final StatsApi statsApi;
+    private final ClusterStatsApi clusterStatsApi;
     private final CatApi catApi;
     private final ClusterStateApi clusterStateApi;
     private final IndexTemplateAdapter indexTemplateAdapter;
@@ -109,11 +112,13 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     @Inject
     public IndicesAdapterOS2(OpenSearchClient client,
                              StatsApi statsApi,
+                             ClusterStatsApi clusterStatsApi,
                              CatApi catApi,
                              ClusterStateApi clusterStateApi,
                              IndexTemplateAdapter indexTemplateAdapter) {
         this.client = client;
         this.statsApi = statsApi;
+        this.clusterStatsApi = clusterStatsApi;
         this.catApi = catApi;
         this.clusterStateApi = clusterStateApi;
         this.indexTemplateAdapter = indexTemplateAdapter;
@@ -382,6 +387,11 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     @Override
     public JsonNode getIndexStats(Collection<String> indices) {
         return statsApi.indexStatsWithDocsAndStore(indices);
+    }
+
+    @Override
+    public IndexSetStats getIndexSetStats() {
+        return clusterStatsApi.clusterStats();
     }
 
     @Override

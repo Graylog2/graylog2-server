@@ -1,0 +1,5 @@
+type="f"
+message="Fix log4j memory appender buffer size configuration."
+
+issues=["19003"]
+pulls=["19208"]

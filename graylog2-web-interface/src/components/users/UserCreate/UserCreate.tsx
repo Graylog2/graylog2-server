@@ -38,6 +38,9 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import useIsGlobalTimeoutEnabled from 'hooks/useIsGlobalTimeoutEnabled';
+import { Link } from 'components/common/router';
+import { Headline } from 'components/common/Section/SectionComponent';
 
 import TimezoneFormGroup from './TimezoneFormGroup';
 import TimeoutFormGroup from './TimeoutFormGroup';
@@ -47,10 +50,6 @@ import EmailFormGroup from './EmailFormGroup';
 import PasswordFormGroup, { validatePasswords } from './PasswordFormGroup';
 import UsernameFormGroup from './UsernameFormGroup';
 import ServiceAccountFormGroup from './ServiceAccountFormGroup';
-
-import { Headline } from '../../common/Section/SectionComponent';
-import useIsGlobalTimeoutEnabled from '../../../hooks/useIsGlobalTimeoutEnabled';
-import { Link } from '../../common/router';
 
 const GlobalTimeoutMessage = styled(ReadOnlyFormGroup)`
   margin-bottom: 20px;
@@ -82,17 +81,14 @@ const _onSubmit = (history: HistoryFunction, formData, roles, setSubmitError) =>
   }, (error) => setSubmitError(error));
 };
 
-const _validateUsername = async (errors: { [name: string]: string }, username: string) => {
-  const newErrors = { ...errors };
+const _validateUsername = async (username: string) => {
+  const user = await UsersActions.loadByUsername(username).catch(() => {});
 
-  try {
-    await UsersActions.loadByUsername(username);
-    newErrors.username = 'Username is already taken';
-    // eslint-disable-next-line no-empty
-  } catch (error) {
+  if (user) {
+    return { username: 'Username is already taken' };
   }
 
-  return newErrors;
+  return {};
 };
 
 const debounceTimeoutMs = 600;
@@ -104,7 +100,7 @@ const _validate = async (values) => {
   const { password, password_repeat: passwordRepeat, username } = values;
 
   if (username) {
-    errors = await debouncedValidateUsername(errors, username);
+    errors = { ...errors, ...(await debouncedValidateUsername(username)) };
   }
 
   if (isCloud && oktaUserForm) {
@@ -209,8 +205,9 @@ const UserCreate = () => {
       <Col lg={8}>
         <Formik onSubmit={onSubmit}
                 validate={_validate}
+                validateOnBlur={false}
                 initialValues={{}}>
-          {({ isSubmitting, isValid }) => (
+          {({ isSubmitting, isValidating, isValid }) => (
             <Form className="form form-horizontal">
               <div>
                 <Headline>Profile</Headline>
@@ -285,7 +282,7 @@ const UserCreate = () => {
               )}
               <Row>
                 <Col md={9} mdOffset={3}>
-                  <FormSubmit disabledSubmit={!isValid || !hasValidRole}
+                  <FormSubmit disabledSubmit={!isValid || !hasValidRole || isValidating}
                               submitButtonText="Create user"
                               submitLoadingText="Creating user..."
                               isSubmitting={isSubmitting}

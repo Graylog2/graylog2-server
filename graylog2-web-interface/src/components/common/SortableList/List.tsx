@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 
-import type { ListItemType, CustomContentRender, CustomListItemRender } from './ListItem';
+import type { CustomContentRender, CustomListItemRender, ListItemType } from './types';
 import SortableListItem from './SortableListItem';
 
 export type Props<ItemType extends ListItemType> = {

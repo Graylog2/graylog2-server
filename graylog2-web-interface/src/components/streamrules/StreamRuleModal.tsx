@@ -208,7 +208,7 @@ const StreamRuleModal = ({
                       Regular expressions use Java syntax. <DocumentationLink page={DocsHelper.PAGES.STREAMS}
                                                                               title="More information"
                                                                               text={(
-                                                                                <Icon name="lightbulb"
+                                                                                <Icon name="lightbulb_circle"
                                                                                       type="regular" />
                                                                               )} />
                     </Well>

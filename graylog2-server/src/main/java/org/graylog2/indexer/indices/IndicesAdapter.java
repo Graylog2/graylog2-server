@@ -22,6 +22,7 @@ import org.graylog2.datatiering.WarmIndexInfo;
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.indexer.searches.IndexRangeStats;
+import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nonnull;
@@ -96,6 +97,8 @@ public interface IndicesAdapter {
     Optional<IndexStatistics> getIndexStats(String index);
 
     JsonNode getIndexStats(Collection<String> index);
+
+    IndexSetStats getIndexSetStats();
 
     List<ShardsInfo> getShardsInfo(String indexName);
 

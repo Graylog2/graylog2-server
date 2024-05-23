@@ -51,9 +51,6 @@ updates:
           - "< 5"
     rebase-strategy: "disabled"
     groups:
-      fontawesome:
-        patterns:
-          - "@fortawesome/*"
       mantine:
         patterns:
           - "@mantine/*"

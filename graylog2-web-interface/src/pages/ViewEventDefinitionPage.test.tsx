@@ -82,7 +82,7 @@ describe('<ViewEventDefinitionPage />', () => {
 
     render(<ViewEventDefinitionPage />);
 
-    await screen.findAllByRole('link', {
+    await screen.findAllByRole('button', {
       name: /edit event definition/i,
     });
   });

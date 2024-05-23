@@ -29,24 +29,25 @@ type Props = {
   onDismiss?: () => void,
   style?: CSSProperties,
   title?: React.ReactNode,
+  noIcon?: boolean,
 }
 
 const StyledAlert = styled(MantineAlert)<{ $bsStyle: ColorVariant }>(({ $bsStyle, theme }) => css`
-  margin: ${theme.mantine.spacing.md} 0;
-  border: 1px solid ${theme.mantine.other.shades.lighter($bsStyle)};
+  margin: ${theme.spacings.md} 0;
+  border: 1px solid ${theme.colors.variant.lighter[$bsStyle]};
 
   .mantine-Alert-message {
-    color: ${theme.mantine.other.colors.global.textDefault};
-    font-size: ${theme.mantine.fontSizes.md};
+    color: ${theme.colors.global.textDefault};
+    font-size: ${theme.fonts.size.body};
   }
 
   .mantine-Alert-title {
-    font-size: ${theme.mantine.fontSizes.md};
-    color: ${theme.mantine.other.colors.global.textDefault};
+    font-size: ${theme.fonts.size.body};
+    color: ${theme.colors.global.textDefault};
   }
 
   .mantine-Alert-closeButton {
-    color: ${theme.mantine.other.colors.global.textDefault};
+    color: ${theme.colors.global.textDefault};
   },
 `);
 
@@ -62,7 +63,7 @@ const iconNameForType = (bsStyle: ColorVariant) => {
   }
 };
 
-const Alert = ({ children, bsStyle, title, style, className, onDismiss }: Props) => {
+const Alert = ({ children, bsStyle, title, style, className, onDismiss, noIcon }: Props) => {
   const displayCloseButton = typeof onDismiss === 'function';
   const iconName = iconNameForType(bsStyle);
 
@@ -73,7 +74,7 @@ const Alert = ({ children, bsStyle, title, style, className, onDismiss }: Props)
                  style={style}
                  onClose={onDismiss}
                  title={title}
-                 icon={<Icon name={iconName} />}
+                 icon={noIcon ? null : <Icon name={iconName} />}
                  closeButtonLabel={displayCloseButton && 'Close alert'}
                  withCloseButton={displayCloseButton}>
       {children}
@@ -87,6 +88,7 @@ Alert.defaultProps = {
   style: undefined,
   title: undefined,
   bsStyle: 'default',
+  noIcon: false,
 };
 
 export default Alert;

@@ -26,6 +26,8 @@ import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersExc
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
+import java.util.Optional;
+
 @AutoValue
 @JsonAutoDetect
 @JsonDeserialize(builder = EventsSearchParameters.Builder.class)
@@ -37,6 +39,7 @@ public abstract class EventsSearchParameters {
     private static final String FIELD_FILTER = "filter";
     private static final String FIELD_SORT_BY = "sort_by";
     private static final String FIELD_SORT_DIRECTION = "sort_direction";
+    private static final String FIELD_SORT_UNMAPPED_TYPE = "sort_unmapped_type";
 
     public enum SortDirection {
         @JsonProperty("asc")
@@ -65,6 +68,9 @@ public abstract class EventsSearchParameters {
 
     @JsonProperty(FIELD_SORT_DIRECTION)
     public abstract SortDirection sortDirection();
+
+    @JsonProperty(FIELD_SORT_UNMAPPED_TYPE)
+    public abstract Optional<String> sortUnmappedType();
 
     public static Builder builder() {
         return Builder.create();
@@ -116,6 +122,9 @@ public abstract class EventsSearchParameters {
 
         @JsonProperty(FIELD_SORT_DIRECTION)
         public abstract Builder sortDirection(SortDirection sortDirection);
+
+        @JsonProperty(FIELD_SORT_UNMAPPED_TYPE)
+        public abstract Builder sortUnmappedType(String sortUnmappedType);
 
         public abstract EventsSearchParameters build();
     }

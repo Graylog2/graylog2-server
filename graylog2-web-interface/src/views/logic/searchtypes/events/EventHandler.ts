@@ -51,8 +51,26 @@ export const eventsDisplayName = 'Alerts';
 type TimeFormatter = (timestamp: string) => string;
 
 export default {
-  convert(events: Array<Event>) {
-    return events;
+  convert({
+    events,
+    total_results,
+    id,
+    type,
+    name,
+  }: {
+    events: Array<Event>,
+    total_results: number,
+    id: string,
+    type: string,
+    name: string
+  }) {
+    return {
+      events,
+      totalResults: total_results,
+      id,
+      type,
+      name,
+    };
   },
 
   toVisualizationData(events: Events, formatTime: TimeFormatter): { eventChartData: ChartDefinition, shapes: Shapes } {

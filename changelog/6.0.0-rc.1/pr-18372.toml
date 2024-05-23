@@ -1,0 +1,5 @@
+type = "a"
+message = "Allow adding aggregations to event processor for use with EventModifiers"
+
+pulls = ["18372"]
+

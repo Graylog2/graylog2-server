@@ -25,5 +25,6 @@ export type SearchesConfig = {
   analysis_disabled_fields: Array<string>,
   auto_refresh_timerange_options: { [key: string]: string },
   default_auto_refresh_option: string,
-  quick_access_timerange_presets: Array<{ description: string, timerange: TimeRange, id: string}>
+  quick_access_timerange_presets: Array<{ description: string, timerange: TimeRange, id: string}>,
+  cancel_after_seconds: number,
 };

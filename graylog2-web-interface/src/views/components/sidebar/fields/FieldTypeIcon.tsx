@@ -23,7 +23,7 @@ import FieldType from 'views/logic/fieldtypes/FieldType';
 
 import styles from './FieldTypeIcon.css';
 
-const iconClass = (type: string) => {
+const iconName = (type: string) => {
   switch (type) {
     case 'string':
       return 'text_fields';
@@ -65,7 +65,7 @@ type Props = {
 };
 
 const FieldTypeIcon = ({ type, monospace }: Props) => {
-  const icon = <Icon name={iconClass(type.type)} className={styles.fieldTypeIcon} />;
+  const icon = <Icon name={iconName(type.type)} className={styles.fieldTypeIcon} />;
 
   return monospace ? <IconWrapper>{icon}</IconWrapper> : icon;
 };

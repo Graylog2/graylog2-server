@@ -16,6 +16,7 @@
  */
 package org.graylog2.bootstrap.preflight;
 
+import jakarta.annotation.Nullable;
 import org.graylog2.cluster.Node;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
@@ -23,7 +24,6 @@ import org.graylog2.plugin.database.Persisted;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.validators.ValidationResult;
 import org.graylog2.plugin.database.validators.Validator;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;

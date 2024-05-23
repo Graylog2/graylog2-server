@@ -80,7 +80,7 @@ const detailsPopover = (scheduler: Scheduler, clearNotifications: () => void) =>
     <DetailTitle>Queued notifications:</DetailTitle>
     <DetailValue>{scheduler.queued_notifications}
       {scheduler.queued_notifications > 0 && (
-        <Button bsStyle="link" bsSize="xsmall" onClick={clearNotifications}>
+        <Button bsStyle="link" bsSize="xsmall" onClick={() => clearNotifications()}>
           clear
         </Button>
       )}

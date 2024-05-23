@@ -16,6 +16,9 @@
  */
 package org.graylog2.indexer.fieldtypes.mapping;
 
+import jakarta.inject.Inject;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.NotFoundException;
 import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.indexset.CustomFieldMapping;
 import org.graylog2.indexer.indexset.CustomFieldMappings;
@@ -29,9 +32,6 @@ import org.graylog2.rest.bulk.model.BulkOperationResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.NotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -70,6 +70,7 @@ public class FieldTypeMappingsService {
                                 final boolean rotateImmediately) {
         checkFieldTypeCanBeChanged(customMapping.fieldName());
         checkType(customMapping);
+        checkAllIndicesSupportFieldTypeChange(customMapping.fieldName(), indexSetsIds);
 
         for (String indexSetId : indexSetsIds) {
             try {
@@ -90,6 +91,8 @@ public class FieldTypeMappingsService {
                            final String profileId,
                            final boolean rotateImmediately) {
         checkProfile(profileId);
+        checkAllIndicesSupportProfileChange(indexSetsIds);
+
         for (String indexSetId : indexSetsIds) {
             try {
                 indexSetService.get(indexSetId).ifPresent(indexSetConfig -> {
@@ -236,5 +239,38 @@ public class FieldTypeMappingsService {
         if (FIELDS_UNCHANGEABLE_BY_CUSTOM_MAPPINGS.contains(fieldName)) {
             throw new BadRequestException("Unable to change field type of " + fieldName + ", not allowed to change type of these fields: " + FIELDS_UNCHANGEABLE_BY_CUSTOM_MAPPINGS);
         }
+
+    }
+
+    private void checkAllIndicesSupportFieldTypeChange(final String fieldName, final Set<String> indexSetsIds) {
+        final List<IndexSetConfig> indexSetConfigs = filterOutIndicesThatCannotHaveFieldTypeChanged(indexSetsIds);
+        if (!indexSetConfigs.isEmpty()) {
+            throw new BadRequestException("Unable to change field type of " + fieldName + ", not allowed to change type in indices : " + indexSetConfigs.stream().map(IndexSetConfig::title).toList());
+        }
+    }
+
+    private void checkAllIndicesSupportProfileChange(final Set<String> indexSetsIds) {
+        final List<IndexSetConfig> indexSetConfigs = filterOutIndicesThatCannotHaveProfileSet(indexSetsIds);
+        if (!indexSetConfigs.isEmpty()) {
+            throw new BadRequestException("Unable to change profile in indices : " + indexSetConfigs.stream().map(IndexSetConfig::title).toList());
+        }
+    }
+
+    private List<IndexSetConfig> filterOutIndicesThatCannotHaveFieldTypeChanged(final Set<String> indexSetsIds) {
+        return indexSetsIds.stream()
+                .map(indexSetService::get)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .filter(index -> !index.canHaveCustomFieldMappings())
+                .toList();
+    }
+
+    private List<IndexSetConfig> filterOutIndicesThatCannotHaveProfileSet(final Set<String> indexSetsIds) {
+        return indexSetsIds.stream()
+                .map(indexSetService::get)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .filter(index -> !index.canHaveProfile())
+                .toList();
     }
 }

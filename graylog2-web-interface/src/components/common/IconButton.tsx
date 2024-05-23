@@ -19,7 +19,7 @@ import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import Icon from 'components/common/Icon';
-import type { IconName, RotateProp } from 'components/common/Icon';
+import type { IconName, RotateProp, IconType } from 'components/common/Icon';
 
 const Wrapper = styled.button<{ disabled: boolean }>(({ theme, disabled }) => css`
   display: inline-flex;
@@ -48,6 +48,7 @@ type Props = {
   onClick?: () => void,
   className?: string,
   name: IconName,
+  iconType?: IconType,
   disabled?: boolean,
   rotation?: RotateProp,
   'data-testid'?: string
@@ -65,6 +66,7 @@ const IconButton = React.forwardRef<HTMLButtonElement, Props>(({
   focusable,
   className,
   disabled,
+  iconType,
   'data-testid': dataTestId,
   ...rest
 }: Props, ref) => (
@@ -76,7 +78,7 @@ const IconButton = React.forwardRef<HTMLButtonElement, Props>(({
            className={className}
            type="button"
            disabled={disabled}>
-    <Icon {...rest} />
+    <Icon type={iconType} {...rest} />
   </Wrapper>
 ));
 
@@ -95,6 +97,7 @@ IconButton.defaultProps = {
   name: undefined,
   disabled: false,
   rotation: undefined,
+  iconType: undefined,
   'data-testid': undefined,
 };
 

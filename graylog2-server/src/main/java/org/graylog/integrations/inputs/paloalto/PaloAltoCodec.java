@@ -19,6 +19,7 @@ package org.graylog.integrations.inputs.paloalto;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
@@ -49,16 +50,18 @@ public class PaloAltoCodec implements Codec {
     private static final Logger LOG = LoggerFactory.getLogger(PaloAltoCodec.class);
 
     private final Configuration configuration;
+    private final MessageFactory messageFactory;
     private final PaloAltoParser parser;
     private final PaloAltoTemplates templates;
 
     @AssistedInject
-    public PaloAltoCodec(@Assisted Configuration configuration) {
+    public PaloAltoCodec(@Assisted Configuration configuration, MessageFactory messageFactory) {
         this.configuration = configuration;
+        this.messageFactory = messageFactory;
         this.parser = new PaloAltoParser();
         this.templates = PaloAltoTemplates.newInstance(configuration.getString(CK_SYSTEM_TEMPLATE, PaloAltoTemplateDefaults.SYSTEM_TEMPLATE),
-                                                       configuration.getString(CK_THREAT_TEMPLATE, PaloAltoTemplateDefaults.THREAT_TEMPLATE),
-                                                       configuration.getString(CK_TRAFFIC_TEMPLATE, PaloAltoTemplateDefaults.TRAFFIC_TEMPLATE));
+                configuration.getString(CK_THREAT_TEMPLATE, PaloAltoTemplateDefaults.THREAT_TEMPLATE),
+                configuration.getString(CK_TRAFFIC_TEMPLATE, PaloAltoTemplateDefaults.TRAFFIC_TEMPLATE));
     }
 
     @Nullable
@@ -78,7 +81,7 @@ public class PaloAltoCodec implements Codec {
             return null;
         }
 
-        Message message = new Message(p.payload(), p.source(), p.timestamp());
+        Message message = messageFactory.createMessage(p.payload(), p.source(), p.timestamp());
 
         switch (p.panType()) {
             case "THREAT":

@@ -18,7 +18,7 @@ package org.graylog.datanode.rest;
 
 import org.graylog.datanode.filesystem.index.dto.IndexerDirectoryInformation;
 
-public record CompatibilityResult(String opensearchVersion,
+public record CompatibilityResult(String hostname, String opensearchVersion,
                                   IndexerDirectoryInformation info,
                                   java.util.List<String> compatibilityErrors) {
 }

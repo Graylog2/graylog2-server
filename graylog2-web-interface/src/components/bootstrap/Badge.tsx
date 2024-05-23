@@ -20,11 +20,11 @@ import { Badge as MantineBadge } from '@mantine/core';
 import styled, { css } from 'styled-components';
 
 const StyledBadge = styled(MantineBadge)<{ color: ColorVariant }>(({ theme, color }) => css`
-  color: ${theme.mantine.other.colors.contrast[color]};
+  color: ${theme.colors.contrast[color]};
   text-transform: none;
 
   .mantine-Badge-label {
-    font-size: ${theme.mantine.fontSizes.sm};
+    font-size: ${theme.fonts.size.small};
   }
 `);
 

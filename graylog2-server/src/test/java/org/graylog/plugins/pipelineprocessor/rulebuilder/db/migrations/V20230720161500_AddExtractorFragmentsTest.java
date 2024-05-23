@@ -31,10 +31,12 @@ import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.BaseFragmentTest
 import org.graylog2.lookup.LookupTable;
 import org.graylog2.lookup.LookupTableService;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.lookup.LookupResult;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
@@ -44,14 +46,15 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class V20230720161500_AddExtractorFragmentsTest extends BaseFragmentTest {
+class V20230720161500_AddExtractorFragmentsTest extends BaseFragmentTest {
 
 
     private static LookupTableService lookupTableService;
     private static LookupTableService.Function lookupServiceFunction;
     private static LookupTable lookupTable;
+    private final MessageFactory messageFactory = new TestMessageFactory();
 
-    @BeforeClass
+    @BeforeAll
     public static void initialize() {
         final Map<String, Function<?>> functions = commonFunctions();
         functions.put(GetField.NAME, new GetField());
@@ -77,25 +80,25 @@ public class V20230720161500_AddExtractorFragmentsTest extends BaseFragmentTest 
 
 
     @Test
-    public void testCopyField() {
+    void testCopyField() {
         RuleFragment fragment = V20230720161500_AddExtractorFragments.createCopyFieldExtractor();
         Map<String, Object> params = Map.of("field", "message", "newField", "copyfield");
         Rule rule = super.createFragmentSource(fragment, params);
-        final Message message = evaluateRule(rule, new Message("Dummy Message", "test", Tools.nowUTC()));
+        final Message message = evaluateRule(rule, messageFactory.createMessage("Dummy Message", "test", Tools.nowUTC()));
         assertThat(message.getField("copyfield")).isEqualTo("Dummy Message");
     }
 
     @Test
-    public void testRegex() {
+    void testRegex() {
         RuleFragment fragment = V20230720161500_AddExtractorFragments.createRegexExtractor();
         Map<String, Object> params = Map.of("field", "message", "pattern", "^.*(doo...).*$", "newField", "copyfield");
         Rule rule = super.createFragmentSource(fragment, params);
-        final Message message = evaluateRule(rule, new Message("bippitysnickerdoodledoobadoo", "test", Tools.nowUTC()));
+        final Message message = evaluateRule(rule, messageFactory.createMessage("bippitysnickerdoodledoobadoo", "test", Tools.nowUTC()));
         assertThat(message.getField("copyfield")).isEqualTo("doobad");
     }
 
     @Test
-    public void testRegexReplacement() {
+    void testRegexReplacement() {
         RuleFragment fragment = V20230720161500_AddExtractorFragments.createRegexReplacementExtractor();
         Map<String, Object> params = Map.of(
                 "field", "message",
@@ -104,7 +107,7 @@ public class V20230720161500_AddExtractorFragmentsTest extends BaseFragmentTest 
                 "newField", "copyfield"
         );
         Rule rule = super.createFragmentSource(fragment, params);
-        Message message = evaluateRule(rule, new Message("zzzdogzzzdogzzz", "test", Tools.nowUTC()));
+        Message message = evaluateRule(rule, messageFactory.createMessage("zzzdogzzzdogzzz", "test", Tools.nowUTC()));
         assertThat(message.getField("copyfield")).isEqualTo("zzzcatzzzcatzzz");
         params = Map.of(
                 "field", "message",
@@ -114,13 +117,13 @@ public class V20230720161500_AddExtractorFragmentsTest extends BaseFragmentTest 
                 "replaceAll", false
         );
         rule = super.createFragmentSource(fragment, params);
-        message = evaluateRule(rule, new Message("zzzdogzzzdogzzz", "test", Tools.nowUTC()));
+        message = evaluateRule(rule, messageFactory.createMessage("zzzdogzzzdogzzz", "test", Tools.nowUTC()));
         assertThat(message.getField("copyfield2")).isEqualTo("zzzcatzzzdogzzz");
 
     }
 
     @Test
-    public void testSplitIndex() {
+    void testSplitIndex() {
         RuleFragment fragment = V20230720161500_AddExtractorFragments.createSplitIndexExtractor();
         Map<String, Object> params = Map.of(
                 "field", "message",
@@ -129,12 +132,12 @@ public class V20230720161500_AddExtractorFragmentsTest extends BaseFragmentTest 
                 "newField", "copyfield"
         );
         Rule rule = super.createFragmentSource(fragment, params);
-        Message message = evaluateRule(rule, new Message("cat,dog,mouse", "test", Tools.nowUTC()));
+        Message message = evaluateRule(rule, messageFactory.createMessage("cat,dog,mouse", "test", Tools.nowUTC()));
         assertThat(message.getField("copyfield")).isEqualTo("dog");
     }
 
     @Test
-    public void testLookup() {
+    void testLookup() {
         RuleFragment fragment = V20230720161500_AddExtractorFragments.createLookupExtractor();
         Map<String, Object> params = Map.of(
                 "field", "message",
@@ -142,10 +145,10 @@ public class V20230720161500_AddExtractorFragmentsTest extends BaseFragmentTest 
                 "newField", "copyfield"
         );
         Rule rule = super.createFragmentSource(fragment, params);
-        Message message = evaluateRule(rule, new Message("ExistingKey", "test", Tools.nowUTC()));
+        Message message = evaluateRule(rule, messageFactory.createMessage("ExistingKey", "test", Tools.nowUTC()));
         assertThat(message.getField("copyfield")).isEqualTo("ThisKeysValue");
 
-        message = evaluateRule(rule, new Message("NoKey", "test", Tools.nowUTC()));
+        message = evaluateRule(rule, messageFactory.createMessage("NoKey", "test", Tools.nowUTC()));
         assertThat(message.getField("copyfield")).isNull();
     }
 

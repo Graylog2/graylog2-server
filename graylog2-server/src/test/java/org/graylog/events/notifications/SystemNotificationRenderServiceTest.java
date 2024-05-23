@@ -155,4 +155,22 @@ class SystemNotificationRenderServiceTest {
                     });
         }
     }
+
+    @Test
+    void htmlEscapingWithSubstitutionTest() {
+        notification = new NotificationImpl()
+                .addNode("node")
+                .addType(Notification.Type.GENERIC)
+                .addDetail("title", "Test: <123>")
+                .addDetail("description", "Test: <abc>")
+                .addTimestamp(DateTime.now(DateTimeZone.UTC));
+        when(notificationService.getByTypeAndKey(any(), any())).thenReturn(Optional.of(notification));
+
+        SystemNotificationRenderService.RenderResponse renderResponse =
+                renderService.render(notification.getType(), null, SystemNotificationRenderService.Format.HTML, null);
+
+        // HTML-escaping applied
+        assertThat(renderResponse.title).contains("Test: &lt;123&gt;");
+        assertThat(renderResponse.description).contains("Test: &lt;abc&gt");
+    }
 }

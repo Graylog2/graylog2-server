@@ -17,7 +17,9 @@
 package org.graylog2.shared.messageq.localkafka;
 
 import com.google.common.collect.ImmutableList;
+import org.graylog.testing.messages.MessagesExtension;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
 import org.graylog2.shared.journal.LocalKafkaJournal;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.joda.time.DateTime;
@@ -33,6 +35,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 @ExtendWith(MockitoExtension.class)
+@ExtendWith(MessagesExtension.class)
 public class LocalKafkaMessageQueueAcknowledgerTest {
 
     @Mock
@@ -57,39 +60,39 @@ public class LocalKafkaMessageQueueAcknowledgerTest {
     }
 
     @Test
-    void acknowledgeMessage() {
-        final Message message = new Message("message", "source", DateTime.now(UTC));
+    void acknowledgeMessage(MessageFactory messageFactory) {
+        final Message message = messageFactory.createMessage("message", "source", DateTime.now(UTC));
         message.setMessageQueueId(1L);
         acknowledger.acknowledge(message);
         verify(kafkaJournal).markJournalOffsetCommitted(1L);
     }
 
     @Test
-    void acknowledgeMessageWithoutMessageQueueId() {
-        final Message message = new Message("message", "source", DateTime.now(UTC));
+    void acknowledgeMessageWithoutMessageQueueId(MessageFactory messageFactory) {
+        final Message message = messageFactory.createMessage("message", "source", DateTime.now(UTC));
         acknowledger.acknowledge(message);
         verifyNoMoreInteractions(kafkaJournal);
     }
 
     @Test
-    void acknowledgeMessageWithWrongTypeOfMessageQueueId() {
-        final Message message = new Message("message", "source", DateTime.now(UTC));
+    void acknowledgeMessageWithWrongTypeOfMessageQueueId(MessageFactory messageFactory) {
+        final Message message = messageFactory.createMessage("message", "source", DateTime.now(UTC));
         message.setMessageQueueId("foo");
         acknowledger.acknowledge(message);
         verifyNoMoreInteractions(kafkaJournal);
     }
 
     @Test
-    void acknowledgeMessages() {
-        final Message firstMessage = new Message("message", "source", DateTime.now(UTC));
+    void acknowledgeMessages(MessageFactory messageFactory) {
+        final Message firstMessage = messageFactory.createMessage("message", "source", DateTime.now(UTC));
         firstMessage.setMessageQueueId(1L);
 
-        final Message nullOffsetMessage = new Message("message", "source", DateTime.now(UTC));
+        final Message nullOffsetMessage = messageFactory.createMessage("message", "source", DateTime.now(UTC));
 
-        final Message secondMessage = new Message("message", "source", DateTime.now(UTC));
+        final Message secondMessage = messageFactory.createMessage("message", "source", DateTime.now(UTC));
         secondMessage.setMessageQueueId(2L);
 
-        final Message wrongOffsetTypeMessage = new Message("message", "source", DateTime.now(UTC));
+        final Message wrongOffsetTypeMessage = messageFactory.createMessage("message", "source", DateTime.now(UTC));
         wrongOffsetTypeMessage.setMessageQueueId("foo");
 
         acknowledger.acknowledge(ImmutableList.of(firstMessage, nullOffsetMessage, secondMessage, wrongOffsetTypeMessage));

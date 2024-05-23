@@ -45,6 +45,7 @@ const StyledIcon = styled(Icon)<{ $type: Type, $displayLeftMargin: boolean }>(({
   color: ${$type === 'error' ? theme.colors.variant.danger : 'inherit'};
   margin: 0;
   margin-left: ${$displayLeftMargin ? '0.3em' : 0};
+  pointer-events: auto !important;
 `);
 
 const iconName = (type: Type) => {
@@ -93,6 +94,7 @@ const HoverForHelp = ({
                   testId={testId}>
     <StyledIcon className={`${className} ${pullRight ? 'pull-right' : ''}`}
                 name={iconName(type)}
+                type="regular"
                 $type={type}
                 $displayLeftMargin={displayLeftMargin}
                 size={iconSize} />

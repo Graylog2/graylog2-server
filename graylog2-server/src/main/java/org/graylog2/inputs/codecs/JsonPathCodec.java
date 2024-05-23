@@ -32,6 +32,7 @@ import com.google.inject.assistedinject.AssistedInject;
 import com.jayway.jsonpath.JsonPath;
 import jakarta.inject.Inject;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.BooleanField;
@@ -64,10 +65,12 @@ public class JsonPathCodec extends AbstractCodec {
     private final JsonPath jsonPath;
     private final boolean flatten;
     private final ObjectMapper objectMapper;
+    private final MessageFactory messageFactory;
 
     @AssistedInject
-    public JsonPathCodec(@Assisted Configuration configuration, ObjectMapper objectMapper) {
+    public JsonPathCodec(@Assisted Configuration configuration, ObjectMapper objectMapper, MessageFactory messageFactory) {
         super(configuration);
+        this.messageFactory = messageFactory;
         final String pathString = configuration.getString(CK_PATH);
         jsonPath = pathString == null ? null : JsonPath.compile(pathString);
         flatten = configuration.getBoolean(CK_FLATTEN);
@@ -95,7 +98,7 @@ public class JsonPathCodec extends AbstractCodec {
             fields = read(json);
         }
 
-        final Message message = new Message(buildShortMessage(fields),
+        final Message message = messageFactory.createMessage(buildShortMessage(fields),
                 configuration.getString(CK_SOURCE),
                 rawMessage.getTimestamp());
         message.addFields(fields);

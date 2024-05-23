@@ -30,6 +30,7 @@ import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
 import org.graylog2.contentpacks.model.entities.SearchTypeEntity;
+import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -86,15 +87,30 @@ public interface SearchType extends ContentPackable<SearchTypeEntity>, Exportabl
 
     SearchType applyExecutionContext(SearchTypeExecutionState executionState);
 
-    SearchType withQuery(BackendQuery query);
+    default SearchType withQuery(BackendQuery query) {
+        return this.toBuilder().query(query).build();
+    }
 
-    SearchType withFilter(Filter filter);
+    default SearchType withFilter(Filter filter) {
+        return this.toBuilder().filter(filter).build();
+    }
 
     default Set<String> effectiveStreams() {
         return streams();
     }
 
-    SearchType withFilters(List<UsedSearchFilter> filters);
+    default SearchType withFilters(List<UsedSearchFilter> filters) {
+        return this.toBuilder().filters(filters).build();
+    }
+
+    default SearchType withReferenceDate(DateTime now) {
+        return timerange()
+                .map(tr -> tr.withReferenceDate(now))
+                .map(tr -> toBuilder().timerange(tr).build())
+                .orElse(this);
+    }
+
+    SearchTypeBuilder toBuilder();
 
     /**
      * Each search type should declare an implementation of its result conforming to this interface.
@@ -238,6 +254,37 @@ public interface SearchType extends ContentPackable<SearchTypeEntity>, Exportabl
         @Override
         public SearchTypeEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
             return null;
+        }
+
+        @Override
+        public SearchTypeBuilder toBuilder() {
+            final var searchType = this;
+            return new SearchTypeBuilder() {
+                @Override
+                public SearchType build() {
+                    return searchType;
+                }
+
+                @Override
+                public SearchTypeBuilder timerange(DerivedTimeRange timerange) {
+                    return this;
+                }
+
+                @Override
+                public SearchTypeBuilder filters(List<UsedSearchFilter> filters) {
+                    return this;
+                }
+
+                @Override
+                public SearchTypeBuilder query(@Nullable BackendQuery query) {
+                    return this;
+                }
+
+                @Override
+                public SearchTypeBuilder filter(@Nullable Filter filter) {
+                    return this;
+                }
+            };
         }
     }
 

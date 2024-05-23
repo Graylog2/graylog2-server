@@ -24,6 +24,8 @@ import { IndexerClusterHealth } from 'components/indexers';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import DocsHelper from 'util/DocsHelper';
 
+import Alert from '../components/bootstrap/Alert';
+
 const DataNodesPage = () => (
   <DocumentTitle title="Data Nodes">
     <DataNodesPageNavigation />
@@ -37,6 +39,9 @@ const DataNodesPage = () => (
       </span>
     </PageHeader>
     <HideOnCloud>
+      <Alert bsStyle="warning">
+        Data Node is currently in beta. Feel free to check it out and tell us about your experience!
+      </Alert>
       <IndexerClusterHealth minimal />
     </HideOnCloud>
     <Row className="content">

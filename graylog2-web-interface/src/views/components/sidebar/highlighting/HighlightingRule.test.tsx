@@ -20,7 +20,7 @@ import userEvent from '@testing-library/user-event';
 
 import Rule from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import { StaticColor } from 'views/logic/views/formatting/highlighting/HighlightingColor';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import { asMock } from 'helpers/mocking';
 import useAppDispatch from 'stores/useAppDispatch';
 import mockDispatch from 'views/test/mockDispatch';
@@ -38,9 +38,7 @@ jest.mock('views/logic/slices/highlightActions', () => ({
 }));
 
 describe('HighlightingRule', () => {
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   const rule = Rule.create('response_time', '250', undefined, StaticColor.create('#f44242'));
   const view = createSearch();

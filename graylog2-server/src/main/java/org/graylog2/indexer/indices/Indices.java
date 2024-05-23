@@ -21,6 +21,9 @@ import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import jakarta.validation.constraints.NotNull;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.datatiering.WarmIndexDeletedEvent;
@@ -43,14 +46,10 @@ import org.graylog2.indexer.indices.events.IndicesReopenedEvent;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.indexer.searches.IndexRangeStats;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
-
-import jakarta.validation.constraints.NotNull;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -138,6 +137,10 @@ public class Indices {
 
     public long numberOfMessages(String indexName) throws IndexNotFoundException {
         return indicesAdapter.numberOfMessages(indexName);
+    }
+
+    public IndexSetStats getIndexSetStats() {
+        return indicesAdapter.getIndexSetStats();
     }
 
     public JsonNode getIndexStats(final IndexSet indexSet) {

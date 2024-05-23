@@ -54,11 +54,11 @@ const StyledTable = styled(Table)(({ theme }) => css`
 
   && {
     > tbody:nth-of-type(even) > tr {
-      background-color: ${theme.colors.table.background};
+      background-color: ${theme.colors.table.row.backgroundAlt};
     }
 
     > tbody:nth-of-type(odd) > tr {
-      background-color: ${theme.colors.table.backgroundAlt};
+      background-color: ${theme.colors.table.row.background};
     }
   }
 `);

@@ -17,6 +17,14 @@
                 <include>UPGRADING.rst</include>
             </includes>
         </fileSet>
+        <fileSet>
+            <directory>${project.basedir}/../graylog2-server/target/sbom</directory>
+            <includes>
+                <include>graylog-server-*-sbom.json</include>
+                <include>graylog-server-*-sbom.xml</include>
+            </includes>
+            <outputDirectory>sbom</outputDirectory>
+        </fileSet>
 
         <!-- empty directories -->
         <fileSet>

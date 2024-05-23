@@ -18,6 +18,9 @@ package org.graylog.plugins.views.search.engine;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import org.graylog.plugins.views.search.ExplainResults;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.QueryMetadata;
 import org.graylog.plugins.views.search.QueryMetadataDecorator;
@@ -27,21 +30,18 @@ import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.errors.QueryError;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.errors.SearchException;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
-
 import java.util.Collection;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
-
-import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 
 @Singleton
 public class QueryEngine {
@@ -72,8 +72,19 @@ public class QueryEngine {
                 .orElse(parsedMetadata);
     }
 
+    public ExplainResults explain(SearchJob searchJob, Set<SearchError> validationErrors, DateTimeZone timezone) {
+        final Map<String, ExplainResults.QueryExplainResult> queries = searchJob.getSearch().queries().stream()
+                .collect(Collectors.toMap(Query::id, q -> {
+                    final GeneratedQueryContext generatedQueryContext = backend.generate(q, Set.of(), timezone);
+
+                    return backend.explain(searchJob, q, generatedQueryContext);
+                }));
+
+        return new ExplainResults(searchJob.getSearchId(), new ExplainResults.SearchResult(queries), validationErrors);
+    }
+
     @WithSpan
-    public SearchJob execute(SearchJob searchJob, Set<SearchError> validationErrors) {
+    public SearchJob execute(SearchJob searchJob, Set<SearchError> validationErrors, DateTimeZone timezone) {
         final Set<Query> validQueries = searchJob.getSearch().queries()
                 .stream()
                 .filter(query -> !isQueryWithError(validationErrors, query))
@@ -82,7 +93,7 @@ public class QueryEngine {
         validQueries.forEach(query -> searchJob.addQueryResultFuture(query.id(),
                 // generate and run each query, making sure we never let an exception escape
                 // if need be we default to an empty result with a failed state and the wrapped exception
-                CompletableFuture.supplyAsync(() -> prepareAndRun(searchJob, query, validationErrors), queryPool)
+                CompletableFuture.supplyAsync(() -> prepareAndRun(searchJob, query, validationErrors, timezone), queryPool)
                         .handle((queryResult, throwable) -> {
                             if (throwable != null) {
                                 final Throwable cause = throwable.getCause();
@@ -100,27 +111,16 @@ public class QueryEngine {
                         })
         ));
 
-        validQueries.forEach(query -> {
-            final CompletableFuture<QueryResult> queryResultFuture = searchJob.getQueryResultFuture(query.id());
-            if (!queryResultFuture.isDone()) {
-                // this is not going to throw an exception, because we will always replace it with a placeholder "FAILED" result above
-                final QueryResult result = queryResultFuture.join();
-
-            } else {
-                LOG.debug("[{}] Not generating query for query {}", defaultIfEmpty(query.id(), "root"), query);
-            }
-        });
-
         LOG.debug("Search job {} executing", searchJob.getId());
         return searchJob.seal();
     }
 
-    private QueryResult prepareAndRun(SearchJob searchJob, Query query, Set<SearchError> validationErrors) {
+    private QueryResult prepareAndRun(SearchJob searchJob, Query query, Set<SearchError> validationErrors, DateTimeZone timezone) {
         LOG.debug("[{}] Using {} to generate query", query.id(), backend);
         // with all the results done, we can execute the current query and eventually complete our own result
         // if any of this throws an exception, the handle in #execute will convert it to an error and return a "failed" result instead
         // if the backend already returns a "failed result" then nothing special happens here
-        final GeneratedQueryContext generatedQueryContext = backend.generate(query, validationErrors);
+        final GeneratedQueryContext generatedQueryContext = backend.generate(query, validationErrors, timezone);
         LOG.trace("[{}] Generated query {}, running it on backend {}", query.id(), generatedQueryContext, backend);
         final QueryResult result = backend.run(searchJob, query, generatedQueryContext);
         LOG.debug("[{}] Query returned {}", query.id(), result);

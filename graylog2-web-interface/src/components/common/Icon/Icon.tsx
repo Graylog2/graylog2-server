@@ -18,9 +18,7 @@
 import React from 'react';
 import styled, { css, keyframes } from 'styled-components';
 
-import type { SizeProp, RotateProp, IconName, FlipProp } from './types';
-
-type IconTypes = 'regular' | 'solid';
+import type { SizeProp, RotateProp, IconName, FlipProp, IconType } from './types';
 
 const sizeMap = {
   xs: '.938em',
@@ -59,6 +57,7 @@ const StyledSpan = styled.span<{
   font-size: ${sizeMap[$size] ?? '1.15em'};
   transform: rotate(${$rotation}deg) scaleY(${$flip === 'horizontal' || $flip === 'both' ? -1 : 1}) scaleX(${$flip === 'vertical' || $flip === 'both' ? -1 : 1});
   animation: ${$spin ? css`${spinAnimation} 2s infinite linear` : 'none'};
+  vertical-align: middle;
 `);
 
 type Props = {
@@ -74,7 +73,7 @@ type Props = {
    * The type regular is needed to outlined icon.
    * Not all icons can be outlined.
    * */
-  type?: IconTypes,
+  type?: IconType,
   style?: React.CSSProperties,
   onClick?: (event: React.MouseEvent) => void,
   onMouseEnter?: (event: React.MouseEvent) => void,

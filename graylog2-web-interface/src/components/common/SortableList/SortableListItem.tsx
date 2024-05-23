@@ -20,8 +20,8 @@ import styled, { css } from 'styled-components';
 
 import { Portal } from 'components/common';
 
+import type { CustomListItemRender, ListItemType, CustomContentRender } from './types';
 import ListItem from './ListItem';
-import type { ListItemType, CustomContentRender, CustomListItemRender } from './ListItem';
 
 type Props<ItemType extends ListItemType> = {
   alignItemContent?: 'flex-start' | 'center'

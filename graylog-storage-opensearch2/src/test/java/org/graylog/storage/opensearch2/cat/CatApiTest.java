@@ -19,7 +19,6 @@ package org.graylog.storage.opensearch2.cat;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.storage.opensearch2.OpenSearchClient;
-import org.graylog.storage.opensearch2.ThrowingBiFunction;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.Test;
 
@@ -58,7 +57,7 @@ class CatApiTest {
         final OpenSearchClient client = mock(OpenSearchClient.class);
         final CatApi toTest = new CatApi(objectMapper, client);
 
-        when(client.execute(any(ThrowingBiFunction.class), anyString()))
+        when(client.execute(any(), anyString()))
                 .thenReturn(objectMapper.readValue(SAMPLE_CAT_NODES_RESPONSE, new TypeReference<List<NodeResponse>>() {}));
 
         final List<NodeResponse> nodes = toTest.nodes();

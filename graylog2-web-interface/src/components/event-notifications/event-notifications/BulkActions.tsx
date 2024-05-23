@@ -89,7 +89,7 @@ const BulkActions = ({ refetchEventNotifications }: Props) => {
 
   return (
     <BulkActionsDropdown>
-      <MenuItem onSelect={() => onDelete()}>Delete</MenuItem>
+      <MenuItem onSelect={() => onDelete()} variant="danger">Delete</MenuItem>
     </BulkActionsDropdown>
   );
 };

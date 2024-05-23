@@ -27,6 +27,24 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.bson.types.ObjectId;
@@ -46,6 +64,7 @@ import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.indexset.MongoIndexSetService;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.Persisted;
 import org.graylog2.plugin.database.ValidationException;
@@ -82,27 +101,6 @@ import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.ISODateTimeFormat;
-
-import jakarta.inject.Inject;
-
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-
-import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.DefaultValue;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.PUT;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
 
 import java.net.URI;
 import java.util.Arrays;
@@ -147,6 +145,7 @@ public class StreamResource extends RestResource {
             .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.valueOf(DEFAULT_SORT_DIRECTION.toUpperCase(Locale.ROOT))))
             .build();
     private final PaginatedStreamService paginatedStreamService;
+    private final MessageFactory messageFactory;
     private final StreamService streamService;
     private final StreamRuleService streamRuleService;
     private final StreamRouterEngine.Factory streamRouterEngineFactory;
@@ -165,12 +164,14 @@ public class StreamResource extends RestResource {
                           StreamRouterEngine.Factory streamRouterEngineFactory,
                           IndexSetRegistry indexSetRegistry,
                           RecentActivityService recentActivityService,
-                          AuditEventSender auditEventSender) {
+                          AuditEventSender auditEventSender,
+                          MessageFactory messageFactory) {
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
         this.streamRouterEngineFactory = streamRouterEngineFactory;
         this.indexSetRegistry = indexSetRegistry;
         this.paginatedStreamService = paginatedStreamService;
+        this.messageFactory = messageFactory;
         this.dbQueryCreator = new DbQueryCreator(StreamImpl.FIELD_TITLE, attributes);
         this.recentActivityService = recentActivityService;
         final SuccessContextCreator<Stream> successAuditLogContextCreator = (entity, entityClass) ->
@@ -322,9 +323,7 @@ public class StreamResource extends RestResource {
             stream.setTitle(cr.title().strip());
         }
 
-        if (!Strings.isNullOrEmpty(cr.description())) {
-            stream.setDescription(cr.description());
-        }
+        stream.setDescription(cr.description());
 
         if (cr.matchingType() != null) {
             try {
@@ -511,7 +510,7 @@ public class StreamResource extends RestResource {
         final String timeStamp = firstNonNull((String) m.get(Message.FIELD_TIMESTAMP),
                 DateTime.now(DateTimeZone.UTC).toString(ISODateTimeFormat.dateTime()));
         m.put(Message.FIELD_TIMESTAMP, Tools.dateTimeFromString(timeStamp));
-        final Message message = new Message(m);
+        final Message message = messageFactory.createMessage(m);
 
         final ExecutorService executor = Executors.newSingleThreadExecutor(
                 new ThreadFactoryBuilder()

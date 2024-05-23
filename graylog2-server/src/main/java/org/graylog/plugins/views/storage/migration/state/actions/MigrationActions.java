@@ -22,7 +22,7 @@ import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateM
  * Set of callbacks used during the migration in different states.
  */
 public interface MigrationActions {
-    boolean runDirectoryCompatibilityCheck();
+    void runDirectoryCompatibilityCheck();
 
     boolean isOldClusterStopped();
 
@@ -38,8 +38,8 @@ public interface MigrationActions {
 
     void startMessageProcessing();
     boolean caDoesNotExist();
-    boolean removalPolicyDoesNotExist();
-    boolean caAndRemovalPolicyExist();
+    boolean renewalPolicyDoesNotExist();
+    boolean caAndRenewalPolicyExist();
 
     void provisionDataNodes();
 
@@ -59,4 +59,11 @@ public interface MigrationActions {
 
     void requestMigrationStatus();
 
+    void calculateTrafficEstimate();
+
+    void verifyRemoteIndexerConnection();
+
+    boolean isCompatibleInPlaceMigrationVersion();
+
+    void getElasticsearchHosts();
 }

@@ -34,14 +34,16 @@ import java.net.InetAddress;
  */
 public class IPinfoIPLocationDatabaseAdapter implements IPLocationDatabaseAdapter {
     private final Reader reader;
+    private final boolean disableIpInfoDbTypeCheck;
 
-    public IPinfoIPLocationDatabaseAdapter(File databaseFile) throws IOException {
+    public IPinfoIPLocationDatabaseAdapter(File databaseFile, boolean disableIpInfoDbTypeCheck) throws IOException {
         this.reader = new Reader(databaseFile, Reader.FileMode.MEMORY_MAPPED, NoCache.getInstance());
+        this.disableIpInfoDbTypeCheck = disableIpInfoDbTypeCheck;
     }
 
     private <T> T get(InetAddress ipAddress, String type, Class<T> valueClass) throws IOException, AddressNotFoundException {
         final String databaseType = reader.getMetadata().getDatabaseType();
-        if (!databaseType.contains(type)) {
+        if (!disableIpInfoDbTypeCheck && (!databaseType.contains("ipinfo") || !databaseType.contains(type))) {
             final String caller = Thread.currentThread().getStackTrace()[2].getMethodName();
             throw new UnsupportedOperationException("Invalid attempt to open a \"" + databaseType + "\" database using the " + caller + " method");
         }
@@ -56,12 +58,12 @@ public class IPinfoIPLocationDatabaseAdapter implements IPLocationDatabaseAdapte
 
     @Override
     public IPinfoStandardLocation ipInfoStandardLocation(InetAddress ipAddress) throws IOException, AddressNotFoundException {
-        return get(ipAddress, "ipinfo standard_location", IPinfoStandardLocation.class);
+        return get(ipAddress, "standard_location", IPinfoStandardLocation.class);
     }
 
     @Override
     public IPinfoASN ipInfoASN(InetAddress ipAddress) throws IOException, AddressNotFoundException {
-        return get(ipAddress, "ipinfo asn", IPinfoASN.class);
+        return get(ipAddress, "asn", IPinfoASN.class);
     }
 
     @Override

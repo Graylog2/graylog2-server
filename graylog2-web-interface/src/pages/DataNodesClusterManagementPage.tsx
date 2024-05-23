@@ -24,7 +24,7 @@ import DataNodesPageNavigation from 'components/datanode/DataNodePageNavigation'
 import ClusterManagementOverview from 'components/datanode/ClusterManagement/ClusterManagementOverview';
 
 const StyledCol = styled(Col)`
-  footer, .query-tab-create, .query-config-btn, .fa-star, .react-resizable-handle, button:has(.fa-copy), button:has(.fa-chevron-down), .widget-drag-handle, .widget-actions-menu {
+  footer, .license-notification-container, .query-tab-create, .query-config-btn, .fa-star, .react-resizable-handle, button:has(.fa-copy), button:has(.fa-chevron-down), .widget-drag-handle, .widget-actions-menu {
     display: none;
   }
   

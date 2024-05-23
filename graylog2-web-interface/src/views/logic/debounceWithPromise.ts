@@ -14,16 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import debounce from 'lodash/debounce';
+import debounce from 'p-debounce';
 
-type PromiseReturnType<T> = T extends (...args: any[]) => Promise<infer R> ? R : never;
-
-const debounceWithPromise = <T extends (...args: any[]) => Promise<any>>(fn: T, delay: number) => {
-  const debouncedFn = debounce((resolve: PromiseReturnType<T>, ...args: Parameters<T>) => fn(...args).then(resolve), delay);
-
-  return (...args: Parameters<T>) => new Promise<PromiseReturnType<T>>((resolve: PromiseReturnType<T>) => {
-    debouncedFn(resolve, ...args);
-  });
-};
+const debounceWithPromise = debounce;
 
 export default debounceWithPromise;

@@ -22,6 +22,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.Resources;
 import org.assertj.core.api.AbstractObjectAssert;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.journal.RawMessage;
 import org.joda.time.DateTime;
@@ -50,6 +52,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(Parameterized.class)
 public class CEFCodecFixturesTest {
+    private final MessageFactory messageFactory = new TestMessageFactory();
+
     public static class Fixture {
         public String testString;
         public String description;
@@ -124,7 +128,7 @@ public class CEFCodecFixturesTest {
 
     @Before
     public void setUp() {
-        final CEFCodec codec = new CEFCodec(new Configuration(fixture.codecConfiguration));
+        final CEFCodec codec = new CEFCodec(new Configuration(fixture.codecConfiguration), messageFactory);
 
         message = codec.decode(rawMessage);
         assertThat(message).isNotNull();

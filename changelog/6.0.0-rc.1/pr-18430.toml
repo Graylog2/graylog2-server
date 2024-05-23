@@ -1,0 +1,8 @@
+type = "changed"
+message = "Update Apache Shiro to 2.0.0"
+
+pulls = ["18430"]
+
+details.user = """
+The Apache Shiro authentication and authorization library has been updated to the latest release.
+"""

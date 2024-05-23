@@ -83,6 +83,7 @@ public class FieldTypeMapper {
 
     private static final Map<String, FieldTypes.Type> FIELD_MAP = Map.of(
             Message.FIELD_STREAMS, STREAMS_TYPE,
+            Message.FIELD_FAILED_MESSAGE_STREAMS, STREAMS_TYPE,
             Message.FIELD_GL2_SOURCE_INPUT, INPUT_TYPE,
             Message.FIELD_GL2_SOURCE_NODE, NODE_TYPE
     );

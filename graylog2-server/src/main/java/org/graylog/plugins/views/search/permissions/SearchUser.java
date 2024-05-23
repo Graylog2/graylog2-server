@@ -111,11 +111,11 @@ public class SearchUser implements SearchPermissions, StreamPermissions, ViewPer
         return DbEntity.ALL_ALLOWED.equals(readPermission) || isPermitted(readPermission, idAsString);
     }
 
-    private boolean isPermitted(String permission) {
+    public boolean isPermitted(String permission) {
         return this.isPermitted.test(permission);
     }
 
-    private boolean isPermitted(String permission, String entityId) {
+    public boolean isPermitted(String permission, String entityId) {
         return this.isPermittedEntity.test(permission, entityId);
     }
 

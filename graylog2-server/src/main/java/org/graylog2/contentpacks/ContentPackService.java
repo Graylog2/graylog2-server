@@ -16,6 +16,7 @@
  */
 package org.graylog2.contentpacks;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -26,6 +27,9 @@ import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.ImmutableGraph;
 import com.google.common.graph.MutableGraph;
 import com.google.common.graph.Traverser;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import org.graylog2.Configuration;
 import org.graylog2.contentpacks.constraints.ConstraintChecker;
 import org.graylog2.contentpacks.exceptions.ContentPackException;
 import org.graylog2.contentpacks.exceptions.EmptyDefaultValueException;
@@ -52,18 +56,17 @@ import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
+import org.graylog2.contentpacks.model.entities.InputEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.contentpacks.model.entities.references.ValueType;
 import org.graylog2.contentpacks.model.parameters.Parameter;
+import org.graylog2.plugin.inputs.CloudCompatible;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.utilities.Graphs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 
 import java.time.Instant;
 import java.util.Collection;
@@ -78,6 +81,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import static org.graylog2.contentpacks.model.ModelTypes.INPUT_V1;
+
 @Singleton
 public class ContentPackService {
     private static final Logger LOG = LoggerFactory.getLogger(ContentPackService.class);
@@ -85,22 +90,28 @@ public class ContentPackService {
     private final ContentPackInstallationPersistenceService contentPackInstallationPersistenceService;
     private final Set<ConstraintChecker> constraintCheckers;
     private final Map<ModelType, EntityWithExcerptFacade<?, ?>> entityFacades;
+    private final ObjectMapper objectMapper;
+    private final Configuration configuration;
 
     @Inject
     public ContentPackService(ContentPackInstallationPersistenceService contentPackInstallationPersistenceService,
                               Set<ConstraintChecker> constraintCheckers,
-                              Map<ModelType, EntityWithExcerptFacade<?, ?>> entityFacades) {
+                              Map<ModelType, EntityWithExcerptFacade<?, ?>> entityFacades,
+                              ObjectMapper objectMapper,
+                              Configuration configuration) {
         this.contentPackInstallationPersistenceService = contentPackInstallationPersistenceService;
         this.constraintCheckers = constraintCheckers;
         this.entityFacades = entityFacades;
+        this.objectMapper = objectMapper;
+        this.configuration = configuration;
     }
 
     public ContentPackInstallation installContentPack(ContentPack contentPack,
                                                       Map<String, ValueReference> parameters,
                                                       String comment,
                                                       String user) {
-        if (contentPack instanceof ContentPackV1) {
-            return installContentPack((ContentPackV1) contentPack, parameters, comment, user);
+        if (contentPack instanceof ContentPackV1 contentPackV1) {
+            return installContentPack(contentPackV1, parameters, comment, user);
         } else {
             throw new IllegalArgumentException("Unsupported content pack version: " + contentPack.version());
         }
@@ -132,6 +143,17 @@ public class ContentPackService {
 
                 final EntityDescriptor entityDescriptor = entity.toEntityDescriptor();
                 final EntityWithExcerptFacade facade = entityFacades.getOrDefault(entity.type(), UnsupportedEntityFacade.INSTANCE);
+
+                if (configuration.isCloud() && entity.type().equals(INPUT_V1) && entity instanceof EntityV1 entityV1) {
+                    final InputEntity inputEntity = objectMapper.convertValue(entityV1.data(), InputEntity.class);
+                    String className = inputEntity.type().asString();
+                    Class inputClass = Class.forName(className);
+                    if (inputClass.getAnnotation(CloudCompatible.class) == null) {
+                        LOG.warn("Ignoring incompatible input {} in cloud", className);
+                        continue;
+                    }
+                }
+
                 @SuppressWarnings({"rawtypes", "unchecked"})
                 final Optional<NativeEntity> existingEntity = facade.findExisting(entity, parameters);
                 if (existingEntity.isPresent()) {
@@ -207,8 +229,8 @@ public class ContentPackService {
     }
 
     public ContentPackUninstallDetails getUninstallDetails(ContentPack contentPack, ContentPackInstallation installation) {
-        if (contentPack instanceof ContentPackV1) {
-            return getUninstallDetails((ContentPackV1) contentPack, installation);
+        if (contentPack instanceof ContentPackV1 contentPackV1) {
+            return getUninstallDetails(contentPackV1, installation);
         } else {
             throw new IllegalArgumentException("Unsupported content pack version: " + contentPack.version());
         }
@@ -300,7 +322,7 @@ public class ContentPackService {
                                 nativeEntityDescriptor);
                     } else if (nativeEntityOptional.isPresent()) {
                         final Object nativeEntity = nativeEntityOptional.get();
-                        LOG.trace("Removing existing native entity for {} ({})", nativeEntityDescriptor);
+                        LOG.trace("Removing existing native entity for {}", nativeEntityDescriptor);
                         try {
                             // The EntityFacade#delete() method expects the actual entity object
                             //noinspection unchecked
@@ -312,7 +334,7 @@ public class ContentPackService {
                             failedEntities.add(nativeEntityDescriptor);
                         }
                     } else {
-                        LOG.trace("Couldn't find existing native entity for {} ({})", nativeEntityDescriptor);
+                        LOG.trace("Couldn't find existing native entity for {}", nativeEntityDescriptor);
                     }
                 }
             }
@@ -449,8 +471,8 @@ public class ContentPackService {
     }
 
     public Set<ConstraintCheckResult> checkConstraints(ContentPack contentPack) {
-        if (contentPack instanceof ContentPackV1) {
-            return checkConstraintsV1((ContentPackV1) contentPack);
+        if (contentPack instanceof ContentPackV1 contentPackV1) {
+            return checkConstraintsV1(contentPackV1);
         } else if (contentPack instanceof LegacyContentPack) {
             return Collections.emptySet();
         } else {

@@ -24,8 +24,6 @@ import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import org.graylog.security.certutil.CaService;
 import org.graylog.security.certutil.CaServiceImpl;
-import org.graylog.security.certutil.keystore.storage.KeystoreContentMover;
-import org.graylog.security.certutil.keystore.storage.SinglePasswordKeystoreContentMover;
 import org.graylog2.Configuration;
 import org.graylog2.bindings.providers.ClusterEventBusProvider;
 import org.graylog2.bindings.providers.MongoConnectionProvider;
@@ -61,6 +59,9 @@ import static java.util.Objects.requireNonNull;
 public class PreflightWebModule extends Graylog2Module {
 
     public static final String FEATURE_FLAG_PREFLIGHT_WEB_ENABLED = "preflight_web";
+    public static final String PERMISSION_PREFLIGHT_ONLY = "preflight:only";
+    // this permission is never checked during preflight, but makes sure that the rest resources are not accidentally
+    // bound during regular startup of Graylog and available without permissions.
 
     private final Configuration configuration;
 
@@ -75,7 +76,6 @@ public class PreflightWebModule extends Graylog2Module {
         bind(MongoConnection.class).toProvider(MongoConnectionProvider.class);
         bind(new TypeLiteral<NodeService<ServerNodeDto>>() {}).to(ServerNodeClusterService.class);
         bind(new TypeLiteral<NodeService<DataNodeDto>>() {}).to(DataNodeClusterService.class);
-        bind(KeystoreContentMover.class).to(SinglePasswordKeystoreContentMover.class).asEagerSingleton();
         bind(ClusterConfigService.class).to(ClusterConfigServiceImpl.class);
         bind(CaService.class).to(CaServiceImpl.class);
 

@@ -24,11 +24,10 @@ import Spinner from 'components/common/Spinner';
 import QueryHelper from 'components/common/QueryHelper';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
-import EntityDataTable from 'components/common/EntityDataTable';
+import EntityDataTable, { useTableEventHandlers } from 'components/common/EntityDataTable';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
 import type { Sort } from 'stores/PaginationTypes';
-import useTableEventHandlers from 'hooks/useTableEventHandlers';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 
@@ -50,7 +49,6 @@ const columnDefinitions = [
   { id: 'hostname', title: 'Name', sortable: true, permissions: [] },
   { id: 'transport_address', title: 'Transport address' },
   { id: 'status', title: 'Status', sortable: false },
-  { id: 'is_leader', title: 'Is leader', sortable: true },
   { id: 'cert_valid_until', title: 'Certificate valid until', sortable: false },
 ];
 
@@ -114,6 +112,7 @@ const DataNodeList = () => {
     paginationQueryParameter,
     updateTableLayout,
     setQuery,
+    appSection: 'data-node-list',
   });
 
   if (isLoadingLayoutPreferences || isInitialLoadingDataNodes) {

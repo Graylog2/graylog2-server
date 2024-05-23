@@ -14,21 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import type { DefaultTheme } from 'styled-components';
 import styled, { css } from 'styled-components';
 // eslint-disable-next-line no-restricted-imports
 import { Label as BootstrapLabel } from 'react-bootstrap';
 
-const getColorStyles = (theme, bsStyle) => {
+const getColorStyles = (theme: DefaultTheme, bsStyle: string) => {
   if (!bsStyle) {
     return '';
   }
 
-  const backgroundColor = theme.colors.variant[bsStyle];
-  const textColor = theme.utils.contrastingColor(backgroundColor);
+  const { color, background } = theme.colors.button[bsStyle === 'default' ? 'gray' : bsStyle];
 
   return css`
-    background-color: ${backgroundColor};
-    color: ${textColor};
+    background-color: ${background};
+    color: ${color};
+    font-weight: normal;
 `;
 };
 

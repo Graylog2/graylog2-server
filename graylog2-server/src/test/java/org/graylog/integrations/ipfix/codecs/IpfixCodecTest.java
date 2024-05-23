@@ -18,15 +18,16 @@ package org.graylog.integrations.ipfix.codecs;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
+import jakarta.validation.constraints.NotNull;
 import org.graylog.integrations.ipfix.InformationElementDefinitions;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.configuration.Configuration;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-
-import jakarta.validation.constraints.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,11 +50,12 @@ public class IpfixCodecTest {
 
     private IpfixCodec codec;
     private IpfixAggregator ipfixAggregator;
+    private final MessageFactory messageFactory = new TestMessageFactory();
 
     @Before
     public void setUp() throws Exception {
         ipfixAggregator = new IpfixAggregator();
-        codec = new IpfixCodec(Configuration.EMPTY_CONFIGURATION, ipfixAggregator);
+        codec = new IpfixCodec(Configuration.EMPTY_CONFIGURATION, ipfixAggregator, messageFactory);
     }
 
     @Ignore("Invalid CK_IPFIX_DEFINITION_PATH does not throw IOException, feature not ready.")
@@ -65,7 +67,7 @@ public class IpfixCodecTest {
                 IpfixCodec.CK_IPFIX_DEFINITION_PATH, definitionsFile.getAbsolutePath());
         final Configuration configuration = new Configuration(configMap);
         assertThatExceptionOfType(IOException.class)
-                .isThrownBy(() -> new IpfixCodec(configuration, ipfixAggregator))
+                .isThrownBy(() -> new IpfixCodec(configuration, ipfixAggregator, messageFactory))
                 .withMessageEndingWith("(No such file or directory)");
     }
 

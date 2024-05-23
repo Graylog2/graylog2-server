@@ -44,7 +44,7 @@ import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.shared.rest.exceptionmappers.AnyExceptionClassMapper;
 import org.graylog2.shared.rest.exceptionmappers.JacksonPropertyExceptionMapper;
 import org.graylog2.shared.rest.exceptionmappers.JsonProcessingExceptionMapper;
-import org.jetbrains.annotations.NotNull;
+import jakarta.annotation.Nonnull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -199,7 +199,7 @@ public class PreflightJerseyService extends AbstractIdleService {
                 .register(createBasicAuthFilter(localConfiguration, preflightConfigService));
     }
 
-    @NotNull
+    @Nonnull
     private BasicAuthFilter createBasicAuthFilter(Configuration localConfiguration, PreflightConfigService preflightConfigService) {
         final String username = localConfiguration.getRootUsername();
         final String preflightPassword = preflightConfigService.getPreflightPassword();

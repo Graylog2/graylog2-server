@@ -19,6 +19,8 @@ package org.graylog2.inputs.codecs;
 import com.fasterxml.jackson.core.JsonParseException;
 import org.graylog2.inputs.TestHelper;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.journal.RawMessage;
 import org.joda.time.DateTime;
@@ -51,9 +53,11 @@ public class GelfCodecTest {
 
     private GelfCodec codec;
 
+    private final MessageFactory messageFactory = new TestMessageFactory();
+
     @Before
     public void setUp() {
-        codec = new GelfCodec(new Configuration(Collections.emptyMap()), aggregator);
+        codec = new GelfCodec(new Configuration(Collections.emptyMap()), aggregator, messageFactory);
     }
 
     @Test(expected = IllegalStateException.class)
@@ -128,7 +132,7 @@ public class GelfCodecTest {
         expectedException.expectCause(isA(JsonParseException.class));
 
         final Configuration configuration = new Configuration(Collections.singletonMap("decompress_size_limit", 100));
-        final GelfCodec codec = new GelfCodec(configuration, aggregator);
+        final GelfCodec codec = new GelfCodec(configuration, aggregator, messageFactory);
         final String json = "{"
             + "\"version\": \"1.1\","
             + "\"host\": \"example.org\","

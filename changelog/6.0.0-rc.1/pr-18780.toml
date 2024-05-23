@@ -1,0 +1,13 @@
+type = "a"
+message = "Add 'all' keyword for datanode rest api proxy, aggregating responses from all connected datanodes"
+
+pulls = ["18780"]
+
+details.user = """
+Datanode rest proxy path is supporting 'all' keyword:
+
+* /api/datanodes/all/rest/{path: .*}
+
+The result will be a map of hostname -> response_content for each datanode.
+
+"""

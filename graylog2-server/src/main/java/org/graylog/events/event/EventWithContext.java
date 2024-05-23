@@ -20,6 +20,7 @@ import com.google.auto.value.AutoValue;
 import org.graylog2.plugin.Message;
 
 import javax.annotation.Nullable;
+import java.util.Map;
 import java.util.Optional;
 
 @AutoValue
@@ -29,6 +30,8 @@ public abstract class EventWithContext {
     public abstract Optional<Message> messageContext();
 
     public abstract Optional<Event> eventContext();
+
+    public abstract Map<String, Object> eventModifierState();
 
     public static EventWithContext create(Event event) {
         return builder().event(event).build();
@@ -51,7 +54,7 @@ public abstract class EventWithContext {
     }
 
     public static Builder builder() {
-        return new AutoValue_EventWithContext.Builder();
+        return new AutoValue_EventWithContext.Builder().eventModifierState(Map.of());
     }
 
     public abstract Builder toBuilder();
@@ -63,6 +66,8 @@ public abstract class EventWithContext {
         public abstract Builder messageContext(@Nullable Message message);
 
         public abstract Builder eventContext(@Nullable Event event);
+
+        public abstract Builder eventModifierState(Map<String, Object> eventModifierState);
 
         public abstract EventWithContext build();
     }

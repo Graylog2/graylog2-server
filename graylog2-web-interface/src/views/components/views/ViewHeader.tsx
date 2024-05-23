@@ -158,7 +158,7 @@ const ViewHeader = () => {
             return (
               <TitleWrapper key={`${label}_${link}`}>
                 <CrumbLink link={link} label={label} dataTestId={dataTestId} />
-                {!theLast && <StyledIcon name="keyboard_arrow_right" />}
+                {!theLast && <StyledIcon name="chevron_right" />}
                 {isSavedView && theLast && (
                   <>
                     <FavoriteIcon isFavorite={view.favorite} grn={createGRN(view.type, view.id)} onChange={onChangeFavorite} />

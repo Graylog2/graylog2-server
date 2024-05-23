@@ -28,9 +28,10 @@ interface IndexRotationConfigComponentProps extends SystemConfigurationComponent
 
 type IndexRotationSummaryComponentProps = {
   config: IndexRotationConfigProp;
+  rotationStrategyClass?: string;
 };
 
-type IndexRotationConfig = {
+export type IndexRotationConfig = {
   type: string;
   displayName: string;
   configComponent: React.ComponentType<IndexRotationConfigComponentProps>;

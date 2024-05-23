@@ -26,7 +26,7 @@ import useFetchView from 'views/hooks/useFetchView';
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
 import useProcessHooksForView from 'views/logic/views/UseProcessHooksForView';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 
 import ShowViewPage from './ShowViewPage';
@@ -66,9 +66,7 @@ describe('ShowViewPage', () => {
     </StreamsContext.Provider>
   );
 
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   beforeEach(() => {
     asMock(useQuery).mockReturnValue({});

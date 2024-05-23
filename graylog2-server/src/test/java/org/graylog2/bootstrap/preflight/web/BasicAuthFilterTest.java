@@ -19,7 +19,7 @@ package org.graylog2.bootstrap.preflight.web;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.assertj.core.api.Assertions;
 import org.glassfish.jersey.server.ContainerRequest;
-import org.jetbrains.annotations.NotNull;
+import jakarta.annotation.Nonnull;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
@@ -79,7 +79,7 @@ class BasicAuthFilterTest {
         return request;
     }
 
-    @NotNull
+    @Nonnull
     private static String base64(String username, String password) {
         final String value = username + ":" + password;
         return new String(Base64.getEncoder().encode(value.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8);

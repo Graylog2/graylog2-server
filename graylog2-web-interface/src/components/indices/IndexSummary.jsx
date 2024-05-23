@@ -87,7 +87,7 @@ class IndexSummary extends React.Component {
       return <span className="index-more-actions"><Icon name="arrow_drop_down" /> Hide Details / Actions</span>;
     }
 
-    return <span className="index-more-actions"><Icon name="arrow_rightght" /> Show Details / Actions</span>;
+    return <span className="index-more-actions"><Icon name="arrow_right" /> Show Details / Actions</span>;
   };
 
   _toggleShowDetails = (event) => {

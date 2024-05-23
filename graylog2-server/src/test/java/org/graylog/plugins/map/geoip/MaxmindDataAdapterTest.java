@@ -40,12 +40,12 @@ import static org.mockito.Mockito.when;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-                            MaxmindDataAdapterTest.CityDatabaseTest.class,
-                            MaxmindDataAdapterTest.CountryDatabaseTest.class,
-                            MaxmindDataAdapterTest.AsnDatabaseTest.class,
-                            MaxmindDataAdapterTest.IPinfoStandardLocationDatabaseTest.class,
-                            MaxmindDataAdapterTest.IPinfoASNDatabaseTest.class,
-                    })
+        MaxmindDataAdapterTest.CityDatabaseTest.class,
+        MaxmindDataAdapterTest.CountryDatabaseTest.class,
+        MaxmindDataAdapterTest.AsnDatabaseTest.class,
+        MaxmindDataAdapterTest.IPinfoStandardLocationDatabaseTest.class,
+        MaxmindDataAdapterTest.IPinfoASNDatabaseTest.class,
+})
 public class MaxmindDataAdapterTest {
     private static final String GEO_LITE2_CITY_MMDB = "/GeoLite2-City.mmdb";
     private static final String GEO_LITE2_COUNTRY_MMDB = "/GeoLite2-Country.mmdb";
@@ -78,7 +78,7 @@ public class MaxmindDataAdapterTest {
                     .path(getTestDatabasePath(DB_PATH.get(databaseType)))
                     .type("test")
                     .build();
-            adapter = new MaxmindDataAdapter("test", "test", config, new MetricRegistry());
+            adapter = new MaxmindDataAdapter("test", "test", config, false, new MetricRegistry());
 
             adapter.doStart();
         }

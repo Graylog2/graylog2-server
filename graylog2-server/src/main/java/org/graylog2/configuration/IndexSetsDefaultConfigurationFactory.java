@@ -55,6 +55,7 @@ public class IndexSetsDefaultConfigurationFactory {
                 .rotationStrategyConfig(rotationConfig.right)
                 .retentionStrategyClass(retentionConfig.left)
                 .retentionStrategyConfig(retentionConfig.right)
+                .useLegacyRotation(false)
                 .dataTiering(maintenanceStrategiesHelper.defaultDataTieringConfig())
                 .build();
     }

@@ -16,12 +16,11 @@
  */
 package org.graylog.datanode.integration;
 
-import com.github.rholder.retry.RetryException;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.graylog.datanode.configuration.variants.KeystoreInformation;
-import org.graylog.datanode.restoperations.DatanodeRestApiWait;
-import org.graylog.datanode.restoperations.DatanodeStatusChangeOperation;
-import org.graylog.datanode.restoperations.RestOperationParameters;
+import org.graylog.testing.restoperations.DatanodeRestApiWait;
+import org.graylog.testing.restoperations.DatanodeStatusChangeOperation;
+import org.graylog.testing.restoperations.RestOperationParameters;
 import org.graylog.datanode.testinfra.DatanodeContainerizedBackend;
 import org.graylog2.plugin.Tools;
 import org.junit.jupiter.api.AfterEach;
@@ -35,10 +34,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
-import java.util.concurrent.ExecutionException;
 
 import static org.graylog.datanode.testinfra.DatanodeContainerizedBackend.IMAGE_WORKING_DIR;
-import static org.graylog.testing.completebackend.ContainerizedGraylogBackend.ROOT_PASSWORD_PLAINTEXT;
 
 public class DatanodeLifecycleIT {
     private static final Logger LOG = LoggerFactory.getLogger(DatanodeLifecycleIT.class);
@@ -48,13 +45,10 @@ public class DatanodeLifecycleIT {
     private DatanodeContainerizedBackend backend;
     private KeyStore trustStore;
     private String containerHostname;
-    private String restAdminUsername;
+
 
     @BeforeEach
     void setUp() throws IOException, GeneralSecurityException {
-
-        restAdminUsername = RandomStringUtils.randomAlphanumeric(10);
-
         containerHostname = "graylog-datanode-host-" + RandomStringUtils.random(8, "0123456789abcdef");
         // first generate a self-signed CA
         KeystoreInformation ca = DatanodeSecurityTestUtils.generateCa(tempDir);
@@ -89,8 +83,6 @@ public class DatanodeLifecycleIT {
             datanodeContainer.withEnv("GRAYLOG_DATANODE_HOSTNAME", containerHostname);
 
             datanodeContainer.withEnv("GRAYLOG_DATANODE_SINGLE_NODE_ONLY", "true");
-
-            datanodeContainer.withEnv("GRAYLOG_DATANODE_ROOT_USERNAME", restAdminUsername);
         }).start();
     }
 
@@ -100,12 +92,11 @@ public class DatanodeLifecycleIT {
     }
 
     @Test
-    void testRestartByEventBus() throws ExecutionException, RetryException, InterruptedException {
+    void testRestartByEventBus() {
         final RestOperationParameters restParameters = RestOperationParameters.builder()
                 .port(backend.getDatanodeRestPort())
                 .truststore(trustStore)
-                .username(restAdminUsername)
-                .password(ROOT_PASSWORD_PLAINTEXT)
+                .jwtTokenProvider(DatanodeContainerizedBackend.JWT_AUTH_TOKEN_PROVIDER)
                 .build();
         final DatanodeRestApiWait waitApi = new DatanodeRestApiWait(restParameters);
         final DatanodeStatusChangeOperation statusApi = new DatanodeStatusChangeOperation(restParameters);

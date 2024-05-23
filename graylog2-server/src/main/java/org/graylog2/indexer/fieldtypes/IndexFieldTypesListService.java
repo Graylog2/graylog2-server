@@ -33,7 +33,7 @@ import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetFieldType;
-import org.jetbrains.annotations.NotNull;
+import jakarta.annotation.Nonnull;
 
 import java.util.Collection;
 import java.util.List;
@@ -116,7 +116,7 @@ public class IndexFieldTypesListService {
         return getFilteredList(indexSetId, fieldNameQuery);
     }
 
-    @NotNull
+    @Nonnull
     private List<IndexSetFieldType> getFilteredList(String indexSetId, String fieldNameQuery, List<String> filters, String sort, Sorting.Direction order) {
         final Optional<IndexSetConfig> indexSetConfig = indexSetService.get(indexSetId);
         final Optional<IndexSet> mongoIndexSet = indexSetConfig.map(indexSetFactory::create);
@@ -151,7 +151,7 @@ public class IndexFieldTypesListService {
                 .toList();
     }
 
-    @NotNull
+    @Nonnull
     private Map<String, List<IndexSetFieldType>> getFilteredList(Set<String> indexSetIds, Collection<String> fieldNames) {
         final var indexSetConfigs = indexSetService.findByIds(indexSetIds);
         final var mongoIndexSets = indexSetConfigs.stream().collect(Collectors.toMap(IndexSetConfig::id, indexSetFactory::create));

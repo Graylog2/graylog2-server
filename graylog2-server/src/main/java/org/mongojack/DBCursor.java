@@ -21,7 +21,7 @@ import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCursor;
 import org.bson.Document;
 import org.bson.conversions.Bson;
-import org.jetbrains.annotations.NotNull;
+import jakarta.annotation.Nonnull;
 
 import javax.annotation.concurrent.NotThreadSafe;
 import java.io.Closeable;
@@ -106,7 +106,7 @@ public class DBCursor<T> implements Closeable, Iterator<T>, Iterable<T> {
         return Ints.saturatedCast(collection.countDocuments(filter));
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public Iterator<T> iterator() {
         return new DBCursor<>(collection, filter, () -> findIterable);

@@ -27,6 +27,7 @@ public record DatanodeConfiguration(
         OpensearchDistributionProvider opensearchDistributionProvider,
         DatanodeDirectories datanodeDirectories,
         int processLogsBufferSize,
+        String opensearchHeap,
         IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider
 ) {
 }

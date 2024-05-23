@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix CertificatesProvisioning no support for remote reindex migration"
+
+issues = ["18411"]
+pulls = ["18410"]

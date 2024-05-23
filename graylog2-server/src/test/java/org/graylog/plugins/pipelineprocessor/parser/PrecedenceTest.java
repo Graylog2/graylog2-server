@@ -28,17 +28,21 @@ import org.graylog.plugins.pipelineprocessor.ast.expressions.OrExpression;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversion;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.Tools;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-public class PrecedenceTest extends BaseParserTest {
+class PrecedenceTest extends BaseParserTest {
+    private MessageFactory messageFactory = new TestMessageFactory();
 
-    @BeforeClass
+    @BeforeAll
     public static void registerFunctions() {
         final Map<String, Function<?>> functions = commonFunctions();
 
@@ -110,15 +114,17 @@ public class PrecedenceTest extends BaseParserTest {
         assertThat(and.right()).isInstanceOf(BooleanExpression.class);
     }
 
-    @Test(expected = ParseException.class)
+    @Test
     public void literalsMustBeQuotedInFieldref() {
-        final Rule rule = parseRule("rule \"test\" when to_string($message.true) == to_string($message.false) then end");
+        assertThatThrownBy(() ->
+                parseRule("rule \"test\" when to_string($message.true) == to_string($message.false) then end")).
+                isInstanceOf(ParseException.class);
     }
 
     @Test
     public void quotedLiteralInFieldRef() {
         final Rule rule = parseRule("rule \"test\" when to_string($message.`true`) == \"true\" then end");
-        final Message message = new Message("hallo", "test", Tools.nowUTC());
+        final Message message = messageFactory.createMessage("hallo", "test", Tools.nowUTC());
         message.addField("true", "true");
         final Message result = evaluateRule(rule, message);
 

@@ -1,0 +1,4 @@
+type = "f"
+message = "Do not display info for dashboard query filter in aggregation builder, when dashboard query is empty"
+
+pulls = ["18241"]

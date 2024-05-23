@@ -27,14 +27,14 @@ type Props = {
   disabled: boolean,
 };
 
-const StyledAceEditor = styled(AceEditor)<Props>(({ $scTheme, $height, disabled, value }) => css`
+const StyledAceEditor = styled(AceEditor)<Props>(({ $scTheme, $height, disabled }) => css`
   &.ace-queryinput {
     ${$height ? `height: ${$height}px !important` : ''}
     min-height: 34px;
     width: 100% !important;
     background-color: ${$scTheme.colors.input.background};
     color: ${$scTheme.utils.contrastingColor($scTheme.colors.input.background, 'AAA')};
-    border: 1px solid ${$scTheme.colors.variant.light.default};
+    border: 1px solid ${$scTheme.colors.input.border};
     border-radius: ${INPUT_BORDER_RADIUS};
 
     &.ace_multiselect .ace_selection.ace_start {
@@ -54,10 +54,6 @@ const StyledAceEditor = styled(AceEditor)<Props>(({ $scTheme, $height, disabled,
     .ace_cursor {
       color: ${$scTheme.colors.gray[50]};
       display: ${disabled ? 'none' : 'block'} !important;
-    }
-
-    .ace_hidden-cursors {
-      display: ${value ? 'block' : 'none'};
     }
 
     .ace_marker-layer .ace_selection {

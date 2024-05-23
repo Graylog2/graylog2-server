@@ -20,9 +20,11 @@ import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import { StoreMock as MockStore, asMock } from 'helpers/mocking';
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import StreamsStore from 'stores/streams/StreamsStore';
 import { InputsActions } from 'stores/inputs/InputsStore';
+import useMessage from 'views/hooks/useMessage';
+import type { Message } from 'views/components/messagelist/Types';
 
 import ShowMessagePage from './ShowMessagePage';
 import { message, event, input } from './ShowMessagePage.fixtures';
@@ -30,7 +32,6 @@ import { message, event, input } from './ShowMessagePage.fixtures';
 jest.mock('views/components/messagelist/MessageDetail',
   () => (props) => <span>{JSON.stringify(props, null, 2)}</span>);
 
-const mockLoadMessage = jest.fn();
 const mockGetInput = jest.fn();
 const mockListNodes = jest.fn();
 
@@ -39,9 +40,7 @@ jest.mock('stores/nodes/NodesStore', () => ({
   NodesStore: MockStore(['getInitialState', () => ({ nodes: {} })]),
 }));
 
-jest.mock('stores/messages/MessagesStore', () => ({
-  MessagesActions: { loadMessage: (...args) => mockLoadMessage(...args) },
-}));
+jest.mock('views/hooks/useMessage');
 
 jest.mock('stores/inputs/InputsStore', () => ({
   InputsActions: {
@@ -67,12 +66,14 @@ const SimpleShowMessagePage = ({ index, messageId }: SimpleShowMessagePageProps)
 
 describe('ShowMessagePage', () => {
   const isLocalNode = jest.fn();
+  const messageHookReturnValue = (data: Message) => ({ data, isInitialLoading: false });
 
   beforeEach(() => {
     jest.clearAllMocks();
     asMock(useFieldTypes).mockReturnValue({ data: [], refetch: () => {} });
     asMock(StreamsStore.listStreams).mockResolvedValue([]);
     asMock(isLocalNode).mockResolvedValue(true);
+    asMock(useMessage).mockReturnValue(messageHookReturnValue(message));
   });
 
   const testForwarderPlugin = new PluginManifest({}, {
@@ -80,16 +81,13 @@ describe('ShowMessagePage', () => {
     forwarder: [{ isLocalNode }],
   });
 
-  beforeAll(loadViewsPlugin);
+  useViewsPlugin();
 
   beforeAll(() => PluginStore.register(testForwarderPlugin));
-
-  afterAll(unloadViewsPlugin);
 
   afterAll(() => PluginStore.unregister(testForwarderPlugin));
 
   it('triggers a node list refresh on mount', async () => {
-    mockLoadMessage.mockImplementation(() => Promise.resolve(message));
     mockGetInput.mockImplementation(() => Promise.resolve(input));
 
     render(<SimpleShowMessagePage index="graylog_5" messageId="20f683d2-a874-11e9-8a11-0242ac130004" />);
@@ -98,7 +96,6 @@ describe('ShowMessagePage', () => {
   });
 
   it('renders for generic message', async () => {
-    mockLoadMessage.mockImplementation(() => Promise.resolve(message));
     asMock(InputsActions.get).mockResolvedValue(input);
 
     render(<SimpleShowMessagePage index="graylog_5"
@@ -110,9 +107,14 @@ describe('ShowMessagePage', () => {
   });
 
   it('retrieves field types only for user-accessible streams', async () => {
-    const messageWithMultipleStreams = { ...message };
-    messageWithMultipleStreams.fields.streams = ['000000000000000000000001', 'deadbeef'];
-    mockLoadMessage.mockImplementation(() => Promise.resolve(messageWithMultipleStreams));
+    const messageWithMultipleStreams = {
+      ...message,
+      fields: {
+        ...message.fields,
+        streams: ['000000000000000000000001', 'deadbeef'],
+      },
+    };
+    asMock(useMessage).mockReturnValue(messageHookReturnValue(messageWithMultipleStreams));
     asMock(StreamsStore.listStreams).mockResolvedValue([{ id: 'deadbeef' }]);
     mockGetInput.mockImplementation(() => Promise.resolve(input));
 
@@ -128,7 +130,7 @@ describe('ShowMessagePage', () => {
   });
 
   it('renders for generic event', async () => {
-    mockLoadMessage.mockImplementation(() => Promise.resolve(event));
+    asMock(useMessage).mockReturnValue(messageHookReturnValue(event));
     mockGetInput.mockImplementation(() => Promise.resolve());
 
     render(<SimpleShowMessagePage index="gl-events_0" messageId="01DFZQ64CMGV30NT7DW2P7HQX2" />);
@@ -139,7 +141,6 @@ describe('ShowMessagePage', () => {
   });
 
   it('does not fetch input when opening message from forwarder', async () => {
-    mockLoadMessage.mockImplementation(() => Promise.resolve(message));
     mockGetInput.mockImplementation(() => Promise.resolve());
     asMock(isLocalNode).mockResolvedValue(false);
 

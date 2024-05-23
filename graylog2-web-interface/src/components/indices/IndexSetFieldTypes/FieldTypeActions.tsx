@@ -47,12 +47,12 @@ const FieldTypeActions = ({ onSubmitCallback, fieldType, indexSetId }: Props) =>
               title={`Edit field type for ${fieldType.fieldName}`}
               tabIndex={0}>
         Edit {
-          fieldType.isReserved && (
-            <HoverForHelp displayLeftMargin title="Reserved field is not editable" pullRight={false}>
-              We use reserved fields internally and expect a certain structure from them. Changing the field type for
-              reserved fields might impact the stability of Graylog
-            </HoverForHelp>
-          )
+        fieldType.isReserved && (
+          <HoverForHelp displayLeftMargin title="Reserved field is not editable" pullRight={false}>
+            We use reserved fields internally and expect a certain structure from them. Changing the field type for
+            reserved fields might impact the stability of Graylog
+          </HoverForHelp>
+        )
       }
       </Button>
       {showResetButton && (

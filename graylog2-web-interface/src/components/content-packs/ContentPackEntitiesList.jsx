@@ -27,10 +27,10 @@ import ContentPackEntitiesListStyle from './ContentPackEntitiesList.css';
 
 const EntityIcon = ({ entity }) => {
   if (!entity.fromServer) {
-    return <span><Icon title="Content Pack" name="archive" className={ContentPackEntitiesListStyle.contentPackEntity} /></span>;
+    return <span><Icon title="Content Pack" name="inventory_2" className={ContentPackEntitiesListStyle.contentPackEntity} /></span>;
   }
 
-  return <span><Icon title="dns" name="server" /></span>;
+  return <span><Icon title="Server" name="dns" /></span>;
 };
 
 EntityIcon.propTypes = {

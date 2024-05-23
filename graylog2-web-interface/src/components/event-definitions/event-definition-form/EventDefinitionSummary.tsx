@@ -23,6 +23,7 @@ import moment from 'moment';
 
 import 'moment-duration-format';
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
+import { MarkdownPreview } from 'components/common/MarkdownEditor';
 import { Alert, Col, Row } from 'components/bootstrap';
 import { isPermitted } from 'util/PermissionsMixin';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
@@ -34,10 +35,6 @@ import styles from './EventDefinitionSummary.css';
 import type { EventDefinition } from '../event-definitions-types';
 import commonStyles from '../common/commonStyles.css';
 import { SYSTEM_EVENT_DEFINITION_TYPE } from '../constants';
-
-// Import built-in plugins
-import 'components/event-definitions/event-definition-types';
-import 'components/event-notifications/event-notification-types';
 
 type Props = {
   eventDefinition: Omit<EventDefinition, 'id'>,
@@ -73,6 +70,14 @@ const EventDefinitionSummary = ({ eventDefinition, notifications, validation, cu
         <dd>{eventDefinition.description || 'No description given'}</dd>
         <dt>Priority</dt>
         <dd>{upperFirst(EventDefinitionPriorityEnum.properties[eventDefinition.priority].name)}</dd>
+        <dt style={{ margin: '16px 0 0' }}>Remediation Steps</dt>
+        <dd>
+          <MarkdownPreview show
+                           withFullView
+                           noBorder
+                           noBackground
+                           value={eventDefinition.remediation_steps || 'No remediation steps given'} />
+        </dd>
       </dl>
     </>
   );

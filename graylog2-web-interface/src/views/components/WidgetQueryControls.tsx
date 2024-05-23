@@ -24,12 +24,11 @@ import { useIsFetching } from '@tanstack/react-query';
 
 import WidgetEditApplyAllChangesContext from 'views/components/contexts/WidgetEditApplyAllChangesContext';
 import { StreamsStore } from 'views/stores/StreamsStore';
-import connect, { useStore } from 'stores/connect';
+import connect from 'stores/connect';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import type Widget from 'views/logic/widgets/Widget';
 import type { SearchBarFormValues } from 'views/Constants';
 import { DEFAULT_TIMERANGE } from 'views/Constants';
-import { SearchConfigStore } from 'views/stores/SearchConfigStore';
 import type GlobalOverride from 'views/logic/search/GlobalOverride';
 import WidgetContext from 'views/components/contexts/WidgetContext';
 import { PropagateDisableSubmissionState } from 'views/components/aggregationwizard';
@@ -65,6 +64,7 @@ import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
 import { normalizeFromSearchBarForBackend } from 'views/logic/queries/NormalizeTimeRange';
 import QueryHistoryButton from 'views/components/searchbar/QueryHistoryButton';
 import type { Editor } from 'views/components/searchbar/queryinput/ace-types';
+import useSearchConfiguration from 'hooks/useSearchConfiguration';
 
 import TimeRangeOverrideInfo from './searchbar/WidgetTimeRangeOverride';
 import TimeRangeFilter from './searchbar/time-range-filter';
@@ -166,12 +166,12 @@ const WidgetQueryControls = ({ availableStreams }: Props) => {
   const globalOverride = useGlobalOverride();
   const widget = useContext(WidgetContext);
   const { userTimezone } = useUserDateTime();
-  const config = useStore(SearchConfigStore, ({ searchesClusterConfig }) => searchesClusterConfig);
+  const { config } = useSearchConfiguration();
   const isValidatingQuery = !!useIsFetching(['validateSearchQuery']);
   const pluggableSearchBarControls = usePluginEntities('views.components.searchBar');
   const limitDuration = moment.duration(config?.query_time_range_limit).asSeconds() ?? 0;
   const hasTimeRangeOverride = globalOverride?.timerange !== undefined;
-  const hasQueryOverride = globalOverride?.query !== undefined;
+  const hasQueryOverride = !!globalOverride?.query?.query_string;
   const formRef = useRef(null);
   const { parameters } = useParameters();
   const handlerContext = useHandlerContext();

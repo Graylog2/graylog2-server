@@ -20,8 +20,6 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 import okhttp3.OkHttpClient;
 import org.graylog.security.certutil.CaService;
 import org.graylog.security.certutil.CaServiceImpl;
-import org.graylog.security.certutil.keystore.storage.KeystoreContentMover;
-import org.graylog.security.certutil.keystore.storage.SinglePasswordKeystoreContentMover;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.plugin.inject.Graylog2Module;
@@ -47,7 +45,6 @@ public class ServerPreflightChecksModule extends Graylog2Module {
 
         bind(X509TrustManager.class).to(CustomCAX509TrustManager.class).asEagerSingleton();
 
-        bind(KeystoreContentMover.class).to(SinglePasswordKeystoreContentMover.class).asEagerSingleton();
         bind(OkHttpClient.class).toProvider(OkHttpClientProvider.class).asEagerSingleton();
         bind(ElasticsearchVersionProvider.class).asEagerSingleton();
         bind(NodeId.class).toProvider(FilePersistedNodeIdProvider.class).asEagerSingleton();

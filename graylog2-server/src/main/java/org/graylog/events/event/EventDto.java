@@ -53,7 +53,7 @@ public abstract class EventDto {
     public static final String FIELD_SCORES = "scores";
     public static final String FIELD_FIELDS = "fields";
     private static final String FIELD_GROUP_BY_FIELDS = "group_by_fields";
-    private static final String FIELD_REPLAY_INFO = "replay_info";
+    public static final String FIELD_REPLAY_INFO = "replay_info";
 
     @JsonProperty(FIELD_ID)
     public abstract String id();

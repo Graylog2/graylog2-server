@@ -31,7 +31,7 @@ import type { MaintenanceOptions, RotationStrategyConfig, RetentionStrategyConfi
 import { IndicesConfigurationActions } from 'stores/indices/IndicesConfigurationStore';
 import IndexMaintenanceStrategiesConfiguration from 'components/indices/IndexMaintenanceStrategiesConfiguration';
 import { Button, Col, Modal, Row } from 'components/bootstrap';
-import { IfPermitted, TimeUnitInput, Spinner } from 'components/common';
+import { IfPermitted, TimeUnitInput, Spinner, ModalSubmit } from 'components/common';
 import IndexMaintenanceStrategiesSummary from 'components/indices/IndexMaintenanceStrategiesSummary';
 import IndexRetentionProvider from 'components/indices/contexts/IndexRetentionProvider';
 import { TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY } from 'stores/indices/IndicesStore';
@@ -242,11 +242,10 @@ const IndexSetsDefaultsConfig = () => {
                     </Modal.Body>
 
                     <Modal.Footer>
-                      <Button type="button" onClick={resetConfig}>Cancel</Button>
-                      <Button type="submit"
-                              bsStyle="success"
-                              disabled={isSubmitting}>{isSubmitting ? 'Updating configuration' : 'Update configuration'}
-                      </Button>
+                      <ModalSubmit submitButtonText="Update configuration"
+                                   isSubmitting={isSubmitting}
+                                   submitLoadingText="Updating configuration"
+                                   onCancel={resetConfig} />
                     </Modal.Footer>
                   </Form>
                 )}

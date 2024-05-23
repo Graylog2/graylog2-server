@@ -66,9 +66,9 @@ const StyledBootstrapPagination = styled(BootstrapPagination)(({ theme }) => css
         &,
         &:hover,
         &:focus {
-          color: ${theme.utils.contrastingColor(theme.colors.variant.lightest.info)};
-          background-color: ${theme.colors.variant.lightest.info};
-          border-color: ${theme.colors.variant.lighter.info};
+          color: ${theme.colors.pagination.active.color};
+          background-color: ${theme.colors.pagination.active.background};
+          border-color: ${theme.colors.pagination.active.border};
           z-index: 1;
         }
       }
@@ -141,7 +141,7 @@ const UltimatePagination = createUltimatePagination({
                                   title={title}
                                   aria-label={title}
                                   className="pagination-control">
-          <Icon name="keyboard_arrow_left" />
+          <Icon name="chevron_left" />
         </BootstrapPagination.Prev>
       );
     },
@@ -154,7 +154,7 @@ const UltimatePagination = createUltimatePagination({
                                   title={title}
                                   aria-label={title}
                                   className="pagination-control">
-          <Icon name="keyboard_arrow_right" />
+          <Icon name="chevron_right" />
         </BootstrapPagination.Next>
       );
     },

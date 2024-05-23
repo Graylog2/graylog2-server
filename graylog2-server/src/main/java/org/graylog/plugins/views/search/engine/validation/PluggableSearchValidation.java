@@ -16,13 +16,12 @@
  */
 package org.graylog.plugins.views.search.engine.validation;
 
+import jakarta.inject.Inject;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchExecutionGuard;
 import org.graylog.plugins.views.search.errors.SearchError;
-import org.graylog.plugins.views.search.permissions.StreamPermissions;
-
-import jakarta.inject.Inject;
+import org.graylog.plugins.views.search.permissions.SearchUser;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -39,19 +38,19 @@ public class PluggableSearchValidation implements SearchValidation {
     }
 
     @Override
-    public Set<SearchError> validate(final Search search, final StreamPermissions streamPermissions) {
-        this.executionGuard.check(search, streamPermissions::canReadStream);
+    public Set<SearchError> validate(final Search search, final SearchUser searchUser) {
+        this.executionGuard.check(search, searchUser::canReadStream);
 
         return this.pluggableSearchValidators.stream()
-                .flatMap(validator -> validator.validate(search).stream())
+                .flatMap(validator -> validator.validate(search, searchUser).stream())
                 .collect(Collectors.toSet());
     }
 
     @Override
-    public Set<SearchError> validate(final Query query, final StreamPermissions streamPermissions) {
-        this.executionGuard.checkUserIsPermittedToSeeStreams(query.streamIdsForPermissionsCheck(), streamPermissions::canReadStream);
+    public Set<SearchError> validate(final Query query, final SearchUser searchUser) {
+        this.executionGuard.checkUserIsPermittedToSeeStreams(query.streamIdsForPermissionsCheck(), searchUser::canReadStream);
         return this.pluggableSearchValidators.stream()
-                .flatMap(validator -> validator.validate(query).stream())
+                .flatMap(validator -> validator.validate(query, searchUser).stream())
                 .collect(Collectors.toSet());
     }
 }

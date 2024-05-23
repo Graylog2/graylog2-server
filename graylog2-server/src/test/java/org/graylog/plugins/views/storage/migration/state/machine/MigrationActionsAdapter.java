@@ -51,8 +51,27 @@ public class MigrationActionsAdapter implements MigrationActions {
     }
 
     @Override
-    public boolean runDirectoryCompatibilityCheck() {
-        return false;
+    public void calculateTrafficEstimate() {
+
+    }
+
+    @Override
+    public void verifyRemoteIndexerConnection() {
+
+    }
+
+    @Override
+    public boolean isCompatibleInPlaceMigrationVersion() {
+        return true;
+    }
+
+    @Override
+    public void getElasticsearchHosts() {
+
+    }
+
+    @Override
+    public void runDirectoryCompatibilityCheck() {
     }
 
     @Override
@@ -96,12 +115,12 @@ public class MigrationActionsAdapter implements MigrationActions {
     }
 
     @Override
-    public boolean removalPolicyDoesNotExist() {
+    public boolean renewalPolicyDoesNotExist() {
         return false;
     }
 
     @Override
-    public boolean caAndRemovalPolicyExist() {
+    public boolean caAndRenewalPolicyExist() {
         return false;
     }
 

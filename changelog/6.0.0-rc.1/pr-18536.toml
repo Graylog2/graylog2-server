@@ -1,0 +1,13 @@
+type = "c"
+message = "Datanode opensearch proxy endpoints support targetting specific nodes"
+
+pulls = ["18536"]
+
+details.user = """
+Both proxy URLs now contain a hostname path parameter:
+
+* /api/datanodes/{hostname}/request/{path: .*} for Opensearch APIs
+* /api/datanodes/{hostname}/rest/{path: .*} for Datanode rest APIs
+
+The hostname path parameter can be either a real hostname of the datanode or one of "leader" and "any" keywords.
+"""

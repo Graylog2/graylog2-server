@@ -43,6 +43,7 @@ import java.time.ZonedDateTime;
 import java.util.Optional;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.graylog2.indexer.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
 import static org.graylog2.shared.security.RestPermissions.INDEXSETS_READ;
 
 @AutoValue
@@ -295,6 +296,24 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
         final String indexTemplate = indexTemplateType().orElse(null);
         return isWritable() && (indexTemplate == null || DEFAULT_INDEX_TEMPLATE_TYPE.equals(indexTemplate) ||
                 isRegular().orElse(false));
+    }
+
+    @JsonIgnore
+    public boolean canHaveCustomFieldMappings() {
+        final String indexTemplateType = this.indexTemplateType().orElse(null);
+        if (EVENT_TEMPLATE_TYPE.equals(indexTemplateType) || "failures".equals(indexTemplateType)) {
+            return false;
+        }
+        return true;
+    }
+
+    @JsonIgnore
+    public boolean canHaveProfile() {
+        final String indexTemplateType = this.indexTemplateType().orElse(null);
+        if (EVENT_TEMPLATE_TYPE.equals(indexTemplateType) || "failures".equals(indexTemplateType)) {
+            return false;
+        }
+        return true;
     }
 
     @Override

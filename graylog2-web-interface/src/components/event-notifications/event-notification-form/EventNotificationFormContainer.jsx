@@ -26,10 +26,6 @@ import withHistory from 'routing/withHistory';
 
 import EventNotificationForm from './EventNotificationForm';
 
-// Import built-in Event Notification Types
-
-import '../event-notification-types';
-
 const initialValidation = {
   errors: {},
 };
@@ -103,6 +99,8 @@ class EventNotificationFormContainer extends React.Component {
     const { action, embedded, onSubmit, history } = this.props;
     const { notification } = this.state;
 
+    this.setState({ isDirty: false });
+
     let promise;
 
     if (action === 'create') {
@@ -110,11 +108,9 @@ class EventNotificationFormContainer extends React.Component {
 
       promise.then(
         () => {
-          this.setState({ isDirty: false }, () => {
-            if (!embedded) {
-              history.push(Routes.ALERTS.NOTIFICATIONS.LIST);
-            }
-          });
+          if (!embedded) {
+            history.push(Routes.ALERTS.NOTIFICATIONS.LIST);
+          }
         },
         (errorResponse) => {
           const { body } = errorResponse.additional;
@@ -130,11 +126,9 @@ class EventNotificationFormContainer extends React.Component {
 
       promise.then(
         () => {
-          this.setState({ isDirty: false }, () => {
-            if (!embedded) {
-              history.push(Routes.ALERTS.NOTIFICATIONS.LIST);
-            }
-          });
+          if (!embedded) {
+            history.push(Routes.ALERTS.NOTIFICATIONS.LIST);
+          }
         },
         (errorResponse) => {
           const { body } = errorResponse.additional;

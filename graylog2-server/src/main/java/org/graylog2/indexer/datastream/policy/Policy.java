@@ -30,10 +30,11 @@ public record Policy(@Nullable String policyId,
                      @Nonnull String description,
                      @Nullable String lastUpdatedTime,
                      @Nonnull String defaultState,
-                     @Nonnull List<State> states) {
+                     @Nonnull List<State> states,
+                     @Nullable IsmTemplate ismTemplate) {
 
     public Policy(@Nonnull String description, @Nonnull String defaultState, @Nonnull List<State> states) {
-        this(null, description, null, defaultState, states);
+        this(null, description, null, defaultState, states, null);
     }
 
 
@@ -45,4 +46,10 @@ public record Policy(@Nullable String policyId,
 
     public record Condition(String minIndexAge) {}
 
+    /**
+     * ISM Template property with index pattern and priority. This must be specified in order for automatically rolled-over
+     * data streams indexes to continue to be managed by the policy.
+     */
+    public record IsmTemplate(List<String> indexPatterns, int priority) {
+    }
 }

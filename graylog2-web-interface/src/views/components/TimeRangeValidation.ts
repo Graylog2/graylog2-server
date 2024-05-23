@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import moment from 'moment';
+import trim from 'lodash/trim';
 
 import type {
   TimeRange,
@@ -26,30 +27,22 @@ import type {
 import { isTypeAbsolute, isTypeRelativeWithEnd, isTypeKeyword } from 'views/typeGuards/timeRange';
 import type { DateTime } from 'util/DateTime';
 import { isValidDate, toDateObject } from 'util/DateTime';
+import debounceWithPromise from 'views/logic/debounceWithPromise';
+import ToolsStore from 'stores/tools/ToolsStore';
 
 const invalidDateFormatError = 'Format must be: YYYY-MM-DD [HH:mm:ss[.SSS]].';
 const rangeLimitError = 'Range is outside limit duration.';
 const dateLimitError = 'Date is outside limit duration.';
 const timeRangeError = 'The "Until" date must come after the "From" date.';
 
-const exceedsDuration = (timeRange: TimeRange, limitDuration, formatTime: (dateTime: DateTime, format: string) => string) => {
+const exceedsDuration = (dateTime: DateTime, limitDuration: number, formatTime: (dateTime: DateTime, format: string) => string) => {
   if (limitDuration === 0) {
     return false;
   }
 
-  switch (timeRange?.type) {
-    case 'absolute':
-    case 'keyword': { // eslint-disable-line padding-line-between-statements
-      const durationFrom = timeRange.from;
+  const durationLimit = formatTime(toDateObject(new Date()).subtract(Number(limitDuration), 'seconds'), 'complete');
 
-      const durationLimit = formatTime(toDateObject(new Date()).subtract(Number(limitDuration), 'seconds'), 'complete');
-
-      return moment(durationFrom).isBefore(durationLimit);
-    }
-
-    default:
-      return false;
-  }
+  return moment(dateTime).isBefore(durationLimit);
 };
 
 const validateAbsoluteTimeRange = (timeRange: AbsoluteTimeRange, limitDuration: number, formatTime: (dateTime: DateTime, format: string) => string) => {
@@ -70,7 +63,7 @@ const validateAbsoluteTimeRange = (timeRange: AbsoluteTimeRange, limitDuration: 
     errors = { ...errors, to: timeRangeError };
   }
 
-  if (exceedsDuration(timeRange, limitDuration, formatTime)) {
+  if (exceedsDuration(timeRange.from, limitDuration, formatTime)) {
     errors = { ...errors, from: dateLimitError };
   }
 
@@ -105,19 +98,50 @@ const validateRelativeTimeRangeWithEnd = (timeRange: RelativeTimeRangeWithEnd, l
   return errors;
 };
 
-const validateKeywordTimeRange = (timeRange: KeywordTimeRange, limitDuration: number, formatTime: (dateTime: DateTime, format: string) => string) => {
+const debouncedTestNaturalDate = debounceWithPromise(ToolsStore.testNaturalDate, 350);
+
+const validateKeywordTimeRange = async (
+  timeRange: KeywordTimeRange, limitDuration: number,
+  formatTime: (dateTime: DateTime, format: string) => string,
+  userTimezone: string,
+  testKeyword: boolean,
+) => {
   let errors: { keyword?: string } = {};
 
-  if (exceedsDuration(timeRange, limitDuration, formatTime)) {
-    errors = { keyword: rangeLimitError };
+  if (trim(timeRange.keyword) === '') {
+    errors = { keyword: 'Keyword must not be empty!' };
+
+    return errors;
+  }
+
+  if (testKeyword) {
+    const actualTimeRange = await debouncedTestNaturalDate(timeRange.keyword, userTimezone).catch(() => undefined);
+
+    if (!actualTimeRange) {
+      errors = { keyword: 'Unable to parse keyword' };
+
+      return errors;
+    }
+
+    if (exceedsDuration(formatTime(actualTimeRange.from, 'complete'), limitDuration, formatTime)) {
+      errors = { keyword: rangeLimitError };
+
+      return errors;
+    }
   }
 
   return errors;
 };
 
-const validateTimeRange = (timeRange: TimeRange | NoTimeRangeOverride, limitDuration: number, formatTime: (dateTime: DateTime, format: string) => string) => {
+const validateTimeRange = (
+  timeRange: TimeRange | NoTimeRangeOverride,
+  limitDuration: number,
+  formatTime: (dateTime: DateTime, format: string) => string,
+  userTimezone: string,
+  testKeyword = true,
+) => {
   if (isTypeKeyword(timeRange)) {
-    return validateKeywordTimeRange(timeRange, limitDuration, formatTime);
+    return validateKeywordTimeRange(timeRange, limitDuration, formatTime, userTimezone, testKeyword);
   }
 
   if (isTypeRelativeWithEnd(timeRange)) {

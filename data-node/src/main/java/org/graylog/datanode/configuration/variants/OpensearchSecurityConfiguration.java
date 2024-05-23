@@ -56,6 +56,7 @@ public class OpensearchSecurityConfiguration {
     private final KeystoreInformation transportCertificate;
     private final KeystoreInformation httpCertificate;
     private KeystoreInformation truststore;
+    private String opensearchHeap;
 
     public OpensearchSecurityConfiguration(KeystoreInformation transportCertificate, KeystoreInformation httpCertificate) {
         this.transportCertificate = transportCertificate;
@@ -74,6 +75,7 @@ public class OpensearchSecurityConfiguration {
      * truststore.
      */
     public OpensearchSecurityConfiguration configure(DatanodeConfiguration datanodeConfiguration, byte[] signingKey) throws GeneralSecurityException, IOException {
+        opensearchHeap = datanodeConfiguration.opensearchHeap();
         if (securityEnabled()) {
 
             logCertificateInformation("transport certificate", transportCertificate);
@@ -114,13 +116,16 @@ public class OpensearchSecurityConfiguration {
             config.put("plugins.security.ssl.http.enabled", "true");
 
             config.put("plugins.security.ssl.http.keystore_type", KEYSTORE_FORMAT);
-            config.put("plugins.security.ssl.http.keystore_filepath",  httpCertificate.location().getFileName().toString());  // todo: this should be computed as a relative path
+            config.put("plugins.security.ssl.http.keystore_filepath", httpCertificate.location().getFileName().toString());  // todo: this should be computed as a relative path
             config.put("plugins.security.ssl.http.keystore_password", httpCertificate.passwordAsString());
             config.put("plugins.security.ssl.http.keystore_alias", CertConstants.DATANODE_KEY_ALIAS);
 
             config.put("plugins.security.ssl.http.truststore_type", TRUSTSTORE_FORMAT);
             config.put("plugins.security.ssl.http.truststore_filepath", TRUSTSTORE_FILE.toString());
             config.put("plugins.security.ssl.http.truststore_password", truststore.passwordAsString());
+
+            // enable client cert auth
+            config.put("plugins.security.ssl.http.clientauth_mode", "OPTIONAL");
         } else {
             config.put("plugins.security.disabled", "true");
             config.put("plugins.security.ssl.http.enabled", "false");
@@ -130,8 +135,8 @@ public class OpensearchSecurityConfiguration {
 
     private Map<String, Object> filterConfigurationMap(final Map<String, Object> map, final String... keys) {
         Map<String, Object> result = map;
-        for(final String key: List.of(keys)) {
-            result = (Map<String, Object>)result.get(key);
+        for (final String key : List.of(keys)) {
+            result = (Map<String, Object>) result.get(key);
         }
         return result;
     }
@@ -175,7 +180,7 @@ public class OpensearchSecurityConfiguration {
 
         config.put("plugins.security.enable_snapshot_restore_privilege", "true");
         config.put("plugins.security.check_snapshot_restore_write_privileges", "true");
-        config.put("plugins.security.restapi.roles_enabled", "all_access,security_rest_api_access");
+        config.put("plugins.security.restapi.roles_enabled", "all_access,security_rest_api_access,readall");
         config.put("plugins.security.system_indices.enabled", "true");
         config.put("plugins.security.system_indices.indices", ".plugins-ml-model,.plugins-ml-task,.opendistro-alerting-config,.opendistro-alerting-alert*,.opendistro-anomaly-results*,.opendistro-anomaly-detector*,.opendistro-anomaly-checkpoints,.opendistro-anomaly-detection-state,.opendistro-reports-*,.opensearch-notifications-*,.opensearch-notebooks,.opensearch-observability,.opendistro-asynchronous-search-response*,.replication-metadata-store");
         config.put("node.max_local_storage_nodes", "3");
@@ -188,9 +193,9 @@ public class OpensearchSecurityConfiguration {
         try (final FileInputStream is = new FileInputStream(keystore.location().toFile())) {
             instance.load(is, keystore.password());
             final Enumeration<String> aliases = instance.aliases();
-            while(aliases.hasMoreElements()) {
+            while (aliases.hasMoreElements()) {
                 final Certificate cert = instance.getCertificate(aliases.nextElement());
-                if(cert instanceof X509Certificate x509Certificate) {
+                if (cert instanceof X509Certificate x509Certificate) {
                     final String alternativeNames = x509Certificate.getSubjectAlternativeNames()
                             .stream()
                             .map(san -> san.get(1))
@@ -200,5 +205,9 @@ public class OpensearchSecurityConfiguration {
                 }
             }
         }
+    }
+
+    public String getOpensearchHeap() {
+        return opensearchHeap;
     }
 }

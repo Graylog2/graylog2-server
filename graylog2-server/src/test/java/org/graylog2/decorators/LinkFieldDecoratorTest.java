@@ -20,6 +20,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.Tools;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.rest.models.system.indexer.responses.IndexRangeSummary;
@@ -33,6 +35,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class LinkFieldDecoratorTest {
+    private final MessageFactory messageFactory = new TestMessageFactory();
 
     private static final String TEST_FIELD = "test_field";
     private LinkFieldDecorator decorator;
@@ -41,7 +44,7 @@ public class LinkFieldDecoratorTest {
     public void setUp() throws Exception {
         final HashMap<String, Object> config = new HashMap<>();
         config.put(LinkFieldDecorator.CK_LINK_FIELD, TEST_FIELD);
-        decorator = new LinkFieldDecorator(DecoratorImpl.create("id", "link", config, Optional.empty(), 0));
+        decorator = new LinkFieldDecorator(DecoratorImpl.create("id", "link", config, Optional.empty(), 0), messageFactory);
     }
 
     @Test

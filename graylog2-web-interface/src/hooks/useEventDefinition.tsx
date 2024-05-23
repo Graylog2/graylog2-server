@@ -21,7 +21,7 @@ import isEqual from 'lodash/isEqual';
 import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
-import type { EventDefinition } from 'logic/alerts/types';
+import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import type FetchError from 'logic/errors/FetchError';
 
 export type ValueExpr = '>' | '<' | '>=' | '<=' | '==';

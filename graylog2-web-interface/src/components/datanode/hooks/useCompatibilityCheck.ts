@@ -25,19 +25,19 @@ type Options = {
 }
 
 const fetchCompatibility = async () => {
-  const url = 'datanodes/rest/indices-directory/compatibility';
+  const url = 'datanodes/all/rest/indices-directory/compatibility';
 
   return fetch('GET', qualifyUrl(url));
 };
 
 const useCompatibilityCheck = ({ enabled }: Options = { enabled: true }): {
-  data: CompatibilityResponseType,
+  data: { [hostname: string]: CompatibilityResponseType },
   error: Error,
   refetch: () => void,
   isInitialLoading: boolean,
   isError: boolean,
 } => {
-  const { data, refetch, isInitialLoading, error, isError } = useQuery<CompatibilityResponseType, Error>(
+  const { data, refetch, isInitialLoading, error, isError } = useQuery<{ [hostname: string]: CompatibilityResponseType }, Error>(
     ['datanodes', 'compatibility'],
     () => fetchCompatibility(),
     {

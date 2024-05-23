@@ -16,17 +16,18 @@
  */
 package org.graylog2.shared.bindings;
 
+import com.google.inject.Scopes;
 import com.google.inject.multibindings.Multibinder;
+import jakarta.ws.rs.container.DynamicFeature;
 import org.graylog2.Configuration;
 import org.graylog2.plugin.PluginModule;
 import org.graylog2.rest.resources.RestResourcesModule;
+import org.graylog2.rest.resources.system.CookieFactory;
 import org.graylog2.shared.rest.resources.RestResourcesSharedModule;
 import org.graylog2.shared.security.ShiroSecurityBinding;
 import org.graylog2.web.IndexHtmlGenerator;
 import org.graylog2.web.IndexHtmlGeneratorProvider;
 import org.graylog2.web.resources.WebResourcesModule;
-
-import jakarta.ws.rs.container.DynamicFeature;
 
 public class RestApiBindings extends PluginModule {
     private final Configuration configuration;
@@ -48,6 +49,7 @@ public class RestApiBindings extends PluginModule {
         jobResourceHandlerBinder();
 
         bind(IndexHtmlGenerator.class).toProvider(IndexHtmlGeneratorProvider.class);
+        bind(CookieFactory.class).in(Scopes.SINGLETON);
 
         // Install all resource modules
         install(new WebResourcesModule());

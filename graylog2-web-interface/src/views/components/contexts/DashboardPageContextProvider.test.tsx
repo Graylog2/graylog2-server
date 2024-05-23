@@ -19,7 +19,7 @@ import { render } from 'wrappedTestingLibrary';
 
 import useLocation from 'routing/useLocation';
 import { asMock } from 'helpers/mocking';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 
 import type { DashboardPageContextType } from './DashboardPageContext';
@@ -44,9 +44,7 @@ const emptyLocation = {
 };
 
 describe('DashboardPageContextProvider', () => {
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   beforeEach(() => {
     asMock(useLocation).mockReturnValue(emptyLocation);

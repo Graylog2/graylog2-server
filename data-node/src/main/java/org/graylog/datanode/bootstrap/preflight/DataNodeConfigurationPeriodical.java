@@ -17,6 +17,9 @@
 package org.graylog.datanode.bootstrap.preflight;
 
 import com.google.common.collect.ImmutableList;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import org.bouncycastle.operator.OperatorException;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.security.certutil.CertConstants;
@@ -27,7 +30,7 @@ import org.graylog.security.certutil.csr.CertificateAndPrivateKeyMerger;
 import org.graylog.security.certutil.csr.CsrGenerator;
 import org.graylog.security.certutil.csr.exceptions.CSRGenerationException;
 import org.graylog.security.certutil.csr.storage.CsrMongoStorage;
-import org.graylog.security.certutil.keystore.storage.SmartKeystoreStorage;
+import org.graylog.security.certutil.keystore.storage.KeystoreMongoStorage;
 import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoCollections;
 import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoLocation;
 import org.graylog.security.certutil.privatekey.PrivateKeyEncryptedFileStorage;
@@ -41,10 +44,6 @@ import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.SuppressForbidden;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-import jakarta.inject.Singleton;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -68,8 +67,9 @@ public class DataNodeConfigurationPeriodical extends Periodical {
     private final CsrGenerator csrGenerator;
     private final CertChainStorage certMongoStorage;
     private final CertificateAndPrivateKeyMerger certificateAndPrivateKeyMerger;
-    private final SmartKeystoreStorage keystoreStorage;
     private final char[] passwordSecret;
+
+    private final KeystoreMongoStorage mongoKeyStorage;
 
     @Inject
     public DataNodeConfigurationPeriodical(final DataNodeProvisioningService dataNodeProvisioningService,
@@ -79,9 +79,8 @@ public class DataNodeConfigurationPeriodical extends Periodical {
                                            final CsrGenerator csrGenerator,
                                            final CertChainMongoStorage certMongoStorage,
                                            final CertificateAndPrivateKeyMerger certificateAndPrivateKeyMerger,
-                                           final SmartKeystoreStorage keystoreStorage,
                                            final @Named("password_secret") String passwordSecret,
-                                           final DatanodeConfiguration datanodeConfiguration) throws IOException {
+                                           final DatanodeConfiguration datanodeConfiguration, KeystoreMongoStorage mongoKeyStorage) throws IOException {
         this.dataNodeProvisioningService = dataNodeProvisioningService;
         this.nodeService = nodeService;
         this.nodeId = nodeId;
@@ -89,10 +88,10 @@ public class DataNodeConfigurationPeriodical extends Periodical {
         this.csrGenerator = csrGenerator;
         this.certMongoStorage = certMongoStorage;
         this.certificateAndPrivateKeyMerger = certificateAndPrivateKeyMerger;
-        this.keystoreStorage = keystoreStorage;
         // TODO: merge with real storage
         this.privateKeyEncryptedStorage = new PrivateKeyEncryptedFileStorage(datanodeConfiguration.datanodeDirectories().createConfigurationFile(Path.of("privateKey.cert")));
         this.passwordSecret = passwordSecret.toCharArray();
+        this.mongoKeyStorage = mongoKeyStorage;
     }
 
     @Override
@@ -133,8 +132,7 @@ public class DataNodeConfigurationPeriodical extends Periodical {
                             CertConstants.DATANODE_KEY_ALIAS
                     );
 
-                    final KeystoreMongoLocation location = new KeystoreMongoLocation(nodeId.getNodeId(), KeystoreMongoCollections.DATA_NODE_KEYSTORE_COLLECTION);
-                    keystoreStorage.writeKeyStore(location, nodeKeystore, secret, secret);
+                    mongoKeyStorage.writeKeyStore(KeystoreMongoLocation.datanode(nodeId), nodeKeystore, secret, secret);
 
                     //should be in one transaction, but we miss transactions...
                     dataNodeProvisioningService.changeState(nodeId.getNodeId(), DataNodeProvisioningConfig.State.STORED);

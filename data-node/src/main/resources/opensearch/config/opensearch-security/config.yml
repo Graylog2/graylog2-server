@@ -123,7 +123,7 @@ config:
         description: "Authenticate via Json Web Token"
         http_enabled: true
         transport_enabled: true
-        order: 0
+        order: 1
         http_authenticator:
           type: jwt
           challenge: false
@@ -137,9 +137,9 @@ config:
           type: noop
       clientcert_auth_domain:
         description: "Authenticate via SSL client certificates"
-        http_enabled: false
-        transport_enabled: false
-        order: 2
+        http_enabled: true
+        transport_enabled: true
+        order: 0
         http_authenticator:
           type: clientcert
           config:

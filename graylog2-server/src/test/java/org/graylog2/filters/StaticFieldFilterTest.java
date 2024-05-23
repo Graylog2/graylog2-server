@@ -21,6 +21,8 @@ import com.google.common.eventbus.EventBus;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.shared.SuppressForbidden;
@@ -40,6 +42,7 @@ import static org.mockito.Mockito.when;
 public class StaticFieldFilterTest {
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
+    private final MessageFactory messageFactory = new TestMessageFactory();
 
     @Mock
     private InputService inputService;
@@ -49,7 +52,7 @@ public class StaticFieldFilterTest {
     @Test
     @SuppressForbidden("Executors#newSingleThreadExecutor() is okay for tests")
     public void testFilter() throws Exception {
-        Message msg = new Message("hello", "junit", Tools.nowUTC());
+        Message msg = messageFactory.createMessage("hello", "junit", Tools.nowUTC());
         msg.setSourceInputId("someid");
 
         when(input.getId()).thenReturn("someid");
@@ -70,7 +73,7 @@ public class StaticFieldFilterTest {
     @Test
     @SuppressForbidden("Executors#newSingleThreadExecutor() is okay for tests")
     public void testFilterIsNotOverwritingExistingKeys() {
-        Message msg = new Message("hello", "junit", Tools.nowUTC());
+        Message msg = messageFactory.createMessage("hello", "junit", Tools.nowUTC());
         msg.addField("foo", "IWILLSURVIVE");
 
         final StaticFieldFilter filter = new StaticFieldFilter(inputService, new EventBus(), Executors.newSingleThreadScheduledExecutor());

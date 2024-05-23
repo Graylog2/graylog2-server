@@ -18,7 +18,7 @@ import { renderHook } from 'wrappedTestingLibrary/hooks';
 
 import asMock from 'helpers/mocking/AsMock';
 import { MockStore } from 'helpers/mocking';
-import { loadViewsPlugin, unloadViewsPlugin } from 'views/test/testViewsPlugin';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
 import useProfile from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfile';
 import useIndexProfileWithMappingsByField
@@ -41,9 +41,7 @@ jest.mock('components/indices/IndexSetFieldTypeProfiles/hooks/useProfile', () =>
 const renderUseIndexProfileWithMappingsByField = () => renderHook(() => useIndexProfileWithMappingsByField());
 
 describe('useRemoveCustomFieldTypeMutation', () => {
-  beforeAll(loadViewsPlugin);
-
-  afterAll(unloadViewsPlugin);
+  useViewsPlugin();
 
   beforeEach(() => {
     asMock(useFieldTypesForMappings).mockReturnValue({

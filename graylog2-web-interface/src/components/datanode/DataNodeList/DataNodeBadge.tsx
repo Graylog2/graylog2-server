@@ -19,15 +19,14 @@ import styled from 'styled-components';
 
 import type { DataNodeStatus } from 'preflight/types';
 import { Badge } from 'preflight/components/common';
-import Icon from 'preflight/components/common/Icon';
-
-import Spinner from '../../common/Spinner';
+import Icon from 'components/common/Icon';
+import Spinner from 'components/common/Spinner';
 
 const NodeId = styled(Badge)`
   margin-right: 3px;
 `;
 
-const SecureIcon: React.ComponentType<{ name: 'lock' | 'unlock' }> = styled(Icon)`
+const SecureIcon: React.ComponentType<{ name: 'lock' | 'lock_open' }> = styled(Icon)`
   margin-right: 3px;
 `;
 
@@ -55,7 +54,7 @@ const colorByState = (status: DataNodeStatus, address: string) => {
   return isSecure(address) ? 'green' : 'red';
 };
 
-const lockIcon = (address: string) => (isSecure(address) ? 'lock' : 'unlock');
+const lockIcon = (address: string) => (isSecure(address) ? 'lock' : 'lock_open');
 const isConnecting = (status: DataNodeStatus) => status === 'CONNECTING';
 const ConnectingSpinner = () => <Spinner text="" />;
 

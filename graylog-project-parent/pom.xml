@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.graylog</groupId>
         <artifactId>graylog-parent</artifactId>
-        <version>6.0.0-SNAPSHOT</version>
+        <version>6.1.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>graylog-project-parent</artifactId>
@@ -415,13 +415,6 @@
                 </exclusions>
             </dependency>
 
-            <!-- Integrations plugin -->
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-csv</artifactId>
-                <version>${commons-csv.version}</version>
-            </dependency>
-
             <!-- Test dependencies -->
             <dependency>
                 <groupId>junit</groupId>
@@ -615,7 +608,7 @@
                                 <plugin>
                                     <groupId>com.h3xstream.findsecbugs</groupId>
                                     <artifactId>findsecbugs-plugin</artifactId>
-                                    <version>1.12.0</version>
+                                    <version>1.13.0</version>
                                 </plugin>
                                 <plugin>
                                     <groupId>com.mebigfatguy.fb-contrib</groupId>

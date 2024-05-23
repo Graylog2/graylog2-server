@@ -42,8 +42,8 @@ export const validateQuery = (
   }: ValidationQuery,
   userTimezone: string,
 ): Promise<QueryValidationState> => {
-  if (!queryExists(queryString) && !queryExists(filter)) {
-    return Promise.resolve({ status: 'OK', explanations: [] });
+  if (!queryExists(queryString) && !queryExists(filter) && !timeRange && streams?.length === 0) {
+    return Promise.resolve({ status: 'OK', explanations: [], context: { searched_index_ranges: [] } });
   }
 
   const payload = {
@@ -80,6 +80,7 @@ export const validateQuery = (
       return ({
         status: result.status,
         explanations,
+        context: result.context,
       } as const);
     }
 
@@ -90,6 +91,7 @@ export const validateQuery = (
     return ({
       status: 'OK',
       explanations: [],
+      context: { searched_index_ranges: [] },
     });
   });
 };

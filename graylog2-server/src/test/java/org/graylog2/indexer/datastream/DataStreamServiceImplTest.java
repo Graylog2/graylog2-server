@@ -50,7 +50,7 @@ public class DataStreamServiceImplTest {
 
     @Before
     public void setUp() {
-        dataStreamService = new DataStreamServiceImpl(dataStreamAdapter, indexFieldTypesService);
+        dataStreamService = new DataStreamServiceImpl(dataStreamAdapter, indexFieldTypesService, 0);
     }
 
     @Test
@@ -64,6 +64,7 @@ public class DataStreamServiceImplTest {
         verify(indexFieldTypesService).upsert(any());
         verify(dataStreamAdapter).createDataStream(name);
         verify(dataStreamAdapter).applyIsmPolicy(name, policy);
+        verify(dataStreamAdapter).setNumberOfReplicas(name, 0);
     }
 
     @SuppressWarnings("unchecked")

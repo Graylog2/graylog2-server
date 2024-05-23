@@ -19,14 +19,14 @@ package org.graylog2.decorators;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.assistedinject.Assisted;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
+import jakarta.inject.Inject;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.decorators.SearchResponseDecorator;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
-
-import jakarta.inject.Inject;
 
 import java.util.List;
 import java.util.Map;
@@ -53,6 +53,7 @@ public class SyslogSeverityMapperDecorator implements SearchResponseDecorator {
 
     private final String sourceField;
     private final String targetField;
+    private final MessageFactory messageFactory;
 
     public interface Factory extends SearchResponseDecorator.Factory {
         @Override
@@ -94,9 +95,10 @@ public class SyslogSeverityMapperDecorator implements SearchResponseDecorator {
     }
 
     @Inject
-    public SyslogSeverityMapperDecorator(@Assisted Decorator decorator) {
+    public SyslogSeverityMapperDecorator(@Assisted Decorator decorator, MessageFactory messageFactory) {
         this.sourceField = (String) requireNonNull(decorator.config().get(CK_SOURCE_FIELD), CK_SOURCE_FIELD + " cannot be null");
         this.targetField = (String) requireNonNull(decorator.config().get(CK_TARGET_FIELD), CK_TARGET_FIELD + " cannot be null");
+        this.messageFactory = messageFactory;
     }
 
     @WithSpan
@@ -117,7 +119,7 @@ public class SyslogSeverityMapperDecorator implements SearchResponseDecorator {
                         return summary;
                     }
 
-                    final Message message = new Message(ImmutableMap.copyOf(summary.message()));
+                    final Message message = messageFactory.createMessage(ImmutableMap.copyOf(summary.message()));
 
                     message.addField(targetField, severity);
 

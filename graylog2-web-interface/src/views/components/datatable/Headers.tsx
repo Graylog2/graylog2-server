@@ -45,12 +45,14 @@ const CenteredTh = styled(TableHeaderCell)`
 `;
 
 const PinIcon = styled.button(({ theme }) => css`
+  display: inline-flex;
   border: 0;
   background: transparent;
   padding: 5px;
   cursor: pointer;
   position: relative;
   color: ${theme.colors.gray[70]};
+  vertical-align: middle;
 
   &.active {
     color: ${theme.colors.gray[20]};
@@ -72,6 +74,7 @@ type HeaderFilterProps = {
   onSetColumnsWidth?: (props: { field: string, offsetWidth: number }) => void
   isPinned?: boolean | undefined,
   showPinIcon?: boolean,
+  setLoadingState: (loading: boolean) => void,
   togglePin: (field: string) => void,
 }
 
@@ -91,6 +94,7 @@ const HeaderField = ({
   isPinned,
   showPinIcon = false,
   togglePin,
+  setLoadingState,
 }: HeaderFilterProps) => {
   const type = fieldTypeFor(field, fields);
   const thRef = useRef(null);
@@ -114,11 +118,11 @@ const HeaderField = ({
       <Field name={field} queryId={activeQuery} type={type}>{title}</Field>
       {showPinIcon && <PinIcon data-testid={`pin-${prefix}${field}`} type="button" onClick={_togglePin} className={isPinned ? 'active' : ''}><Icon name="push_pin" /></PinIcon>}
       {sortable && sortType && (
-      <FieldSortIcon fieldName={field}
-                     onSortChange={onSortChange}
-                     setLoadingState={() => {}}
-                     sortConfigMap={sortConfigMap}
-                     type={sortType} />
+        <FieldSortIcon fieldName={field}
+                       onSortChange={onSortChange}
+                       setLoadingState={setLoadingState}
+                       sortConfigMap={sortConfigMap}
+                       type={sortType} />
       )}
     </TableHeaderCell>
   );
@@ -222,7 +226,8 @@ type Props = {
   sortConfigMap: OrderedMap<string, SortConfig>;
   onSetColumnsWidth: (props: { field: string, offsetWidth: number }) => void,
   pinnedColumns?: Immutable.Set<string>
-  togglePin: (field: string) => void
+  togglePin: (field: string) => void,
+  setLoadingState: (loading: boolean) => void,
 };
 
 const Headers = ({
@@ -238,6 +243,7 @@ const Headers = ({
   onSetColumnsWidth,
   pinnedColumns,
   togglePin,
+  setLoadingState,
 }: Props) => {
   const activeQuery = useActiveQueryId();
   const rowFieldNames = rowPivots.flatMap((pivot) => pivot.fields);
@@ -260,7 +266,8 @@ const Headers = ({
                  onSetColumnsWidth={onSetColumnsWidth}
                  isPinned={pinnedColumns.has(`${prefix}${field}`)}
                  showPinIcon={showPinIcon}
-                 togglePin={togglePin} />
+                 togglePin={togglePin}
+                 setLoadingState={setLoadingState} />
   );
 
   const rowPivotFields = rowFieldNames.map((fieldName) => headerField({ field: fieldName, sortable: interactive, sortType: SortConfig.PIVOT_TYPE, showPinIcon: interactive }));

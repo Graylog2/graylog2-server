@@ -18,6 +18,8 @@ package org.graylog2.shared.buffers.processors;
 
 import de.huxhorn.sulky.ulid.ULID;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageFactory;
+import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 import org.junit.Test;
@@ -30,6 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class MessageULIDGeneratorTest {
+    private final MessageFactory messageFactory = new TestMessageFactory();
 
     @Test
     public void simpleGenerate() {
@@ -96,7 +99,7 @@ public class MessageULIDGeneratorTest {
     public void doesNotAcceptTooLargeTimestamp() {
         final MessageULIDGenerator generator = new MessageULIDGenerator(new ULID());
         final DateTime largeDate = DateTime.parse("+10889-08-02T05:31:50.656Z");
-        final Message message = new Message("foo", "source", largeDate);
+        final Message message = messageFactory.createMessage("foo", "source", largeDate);
 
         assertThatThrownBy(() -> {
             generator.createULID(message);

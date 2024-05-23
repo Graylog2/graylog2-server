@@ -21,7 +21,7 @@ import styled, { css } from 'styled-components';
 
 import Routes from 'routing/Routes';
 import { Table, BootstrapModalWrapper, Button, Modal } from 'components/bootstrap';
-import { SearchForm, Icon } from 'components/common';
+import { SearchForm, Icon, ModalSubmit } from 'components/common';
 import CollectorIndicator from 'components/sidecars/common/CollectorIndicator';
 import ColorLabel from 'components/sidecars/common/ColorLabel';
 import { Link } from 'components/common/router';
@@ -268,13 +268,11 @@ const CollectorConfigurationModal = ({
         </ConfigurationContainer>
       </Modal.Body>
       <Modal.Footer>
-        <Button type="button" onClick={onCancel}>Cancel</Button>
-        <Button type="button" onClick={onReset}>Reset</Button>
-        <Button type="submit"
-                bsStyle="primary"
-                disabled={isNotDirty}
-                onClick={() => onSave(selectedConfigurations, partiallySelectedConfigurations)}>Save
-        </Button>
+        <ModalSubmit submitButtonText="Save"
+                     disabledSubmit={isNotDirty}
+                     onSubmit={() => onSave(selectedConfigurations, partiallySelectedConfigurations)}
+                     onCancel={onCancel}
+                     leftCol={<Button type="button" onClick={onReset}>Reset</Button>} />
       </Modal.Footer>
     </BootstrapModalWrapper>
   );

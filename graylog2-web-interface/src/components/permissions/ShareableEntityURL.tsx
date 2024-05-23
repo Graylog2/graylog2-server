@@ -18,24 +18,8 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 
 import { ClipboardButton, Icon } from 'components/common';
-import { Alert, FormGroup, InputGroup, FormControl } from 'components/bootstrap';
+import { FormGroup, InputGroup, FormControl } from 'components/bootstrap';
 import useShowRouteFromGRN from 'routing/hooks/useShowRouteFromGRN';
-
-const Container = styled(Alert)`
-  display: flex;
-  margin-top: 20px;
-`;
-
-const VerticalCenter = styled.div`
-  height: 34px;
-  display: flex;
-  align-items: center;
-`;
-
-const URLColumn = styled.div`
-  margin-left: 10px;
-  flex: 1;
-`;
 
 const StyledFormControl = styled(FormControl)(({ theme }) => css`
   &[readonly] {
@@ -61,26 +45,21 @@ const ShareableEntityURL = ({ entityGRN }: Props) => {
   const entityUrl = `${window.location.origin.toString()}${entityRoute}`;
 
   return (
-    <Container>
-      <VerticalCenter>
-        <b>Sharable URL:</b>
-      </VerticalCenter>
-      <URLColumn>
-        <FormGroup>
-          <InputGroup>
-            <StyledFormControl type="text" value={entityUrl} readOnly />
-            <InputGroupAddon>
-              <StyledClipboardButton text={entityUrl}
-                                     buttonTitle="Copy parameter to clipboard"
-                                     title={<Icon name="content_copy" />} />
-            </InputGroupAddon>
-          </InputGroup>
-        </FormGroup>
-        <div>
-          You or anyone authorized to view can access this link.
-        </div>
-      </URLColumn>
-    </Container>
+    <div>
+      <FormGroup>
+        <InputGroup>
+          <StyledFormControl type="text" value={entityUrl} readOnly />
+          <InputGroupAddon>
+            <StyledClipboardButton text={entityUrl}
+                                   buttonTitle="Copy parameter to clipboard"
+                                   title={<Icon name="content_copy" />} />
+          </InputGroupAddon>
+        </InputGroup>
+      </FormGroup>
+      <div>
+        You or anyone authorized to view can access this link.
+      </div>
+    </div>
   );
 };
 
