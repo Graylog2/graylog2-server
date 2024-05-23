@@ -25,18 +25,22 @@ import type { EntityBase } from '../types';
 
 type Props<Entity extends EntityBase> = React.PropsWithChildren<{
   initialSelection?: Array<string>,
-  onChangeSelection: (selectedEntities: Array<Entity['id']>) => void
+  onChangeSelection: (selectedEntities: Array<Entity['id']>, data: Readonly<Array<Entity>>) => void,
+  data: Readonly<Array<Entity>>,
 }>
 
-const SelectedEntitiesProvider = <Entity extends EntityBase>({ children, initialSelection, onChangeSelection }: Props<Entity>) => {
+const SelectedEntitiesProvider = <Entity extends EntityBase>({ children, initialSelection, onChangeSelection, data }: Props<Entity>) => {
   const [selectedEntities, setSelectedEntities] = useState<Array<Entity['id']>>(initialSelection);
 
   const _setSelectedEntities = useCallback((setSelectedEntitiesArgument: SetStateAction<Array<Entity['id']>>) => {
     const newState = isFunction(setSelectedEntitiesArgument) ? setSelectedEntitiesArgument(selectedEntities) : setSelectedEntitiesArgument;
 
     setSelectedEntities(newState);
-    if (onChangeSelection) onChangeSelection(newState);
-  }, [onChangeSelection, selectedEntities]);
+
+    if (onChangeSelection) {
+      onChangeSelection(newState, data);
+    }
+  }, [data, onChangeSelection, selectedEntities]);
 
   const deselectEntity = useCallback((targetEntityId: EntityBase['id']) => (
     _setSelectedEntities((cur) => cur.filter((entityId) => entityId !== targetEntityId))

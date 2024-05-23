@@ -32,6 +32,7 @@ jest.mock('views/components/dashboard/hooks/useDashboards', () => () => ({
     list: [],
   },
   refetch: () => {},
+  keyFn: () => [],
 }));
 
 jest.mock('routing/Routes', () => ({

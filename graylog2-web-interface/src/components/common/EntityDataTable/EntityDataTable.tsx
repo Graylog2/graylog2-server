@@ -161,7 +161,7 @@ type Props<Entity extends EntityBase> = {
     /** Supported bulk actions */
     actions?: React.ReactNode,
     /** Callback which runs on selection change */
-    onChangeSelection?: (selectedEntities: Array<Entity['id']>) => void,
+    onChangeSelection?: (selectedEntities: Array<Entity['id']>, data: Readonly<Array<Entity>>) => void,
     /** Initial selected items */
     initialSelection?: Array<Entity['id']>,
     isEntitySelectable?: (entity: Entity) => boolean
@@ -252,7 +252,7 @@ const EntityDataTable = <Entity extends EntityBase>({
   const selectableData = useMemo(() => data.filter(_isEntitySelectable), [data, _isEntitySelectable]);
 
   return (
-    <SelectedEntitiesProvider<Entity> initialSelection={initialSelection} onChangeSelection={onChangeSelection}>
+    <SelectedEntitiesProvider<Entity> initialSelection={initialSelection} onChangeSelection={onChangeSelection} data={data}>
       <ExpandedSectionsProvider>
         <ActionsRow>
           <div>

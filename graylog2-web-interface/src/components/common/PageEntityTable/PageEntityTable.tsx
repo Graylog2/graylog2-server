@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useMemo, useCallback } from 'react';
 import { useQueryParam, StringParam } from 'use-query-params';
 import { useQuery } from '@tanstack/react-query';
+import styled from 'styled-components';
 
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
@@ -31,6 +32,14 @@ import EntityFilters from 'components/common/EntityFilters';
 import useUrlQueryFilters from 'components/common/EntityFilters/hooks/useUrlQueryFilters';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import TableFetchContextProvider from 'components/common/PageEntityTable/TableFetchContextProvider';
+
+const SearchRow = styled.div`
+  margin-bottom: 5px;
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+`;
 
 type PaginatedResponse<T> = {
   list: Array<T>,
@@ -55,6 +64,7 @@ type Props<T> = {
   tableLayout: Parameters<typeof useTableLayout>[0],
   additionalAttributes?: Array<Attribute>,
   entityAttributesAreCamelCase?: boolean,
+  topRightCol?: React.ReactNode,
 }
 
 const INITIAL_DATA = {
@@ -73,7 +83,7 @@ const PageEntityTable = <T extends EntityBase>({
   actionsCellWidth, columnsOrder, entityActions, tableLayout, fetchData, keyFn,
   humanName, columnRenderers, queryHelpComponent, filterValueRenderers,
   expandedSectionsRenderer, bulkSelection, additionalAttributes,
-  entityAttributesAreCamelCase,
+  entityAttributesAreCamelCase, topRightCol,
 }: Props<T>) => {
   const [urlQueryFilters, setUrlQueryFilters] = useUrlQueryFilters();
   const [query, setQuery] = useQueryParam('query', StringParam);
@@ -134,7 +144,7 @@ const PageEntityTable = <T extends EntityBase>({
       <PaginatedList pageSize={layoutConfig.pageSize}
                      showPageSizeSelect={false}
                      totalItems={total}>
-        <div style={{ marginBottom: 5 }}>
+        <SearchRow>
           <SearchForm onSearch={onSearch}
                       onReset={onSearchReset}
                       query={query}
@@ -146,7 +156,8 @@ const PageEntityTable = <T extends EntityBase>({
                              filterValueRenderers={filterValueRenderers} />
             </div>
           </SearchForm>
-        </div>
+          {topRightCol}
+        </SearchRow>
         <div>
           {list?.length === 0 ? (
             <NoSearchResult>No {humanName} have been found</NoSearchResult>
@@ -175,12 +186,13 @@ const PageEntityTable = <T extends EntityBase>({
 
 PageEntityTable.defaultProps = {
   actionsCellWidth: 160,
+  additionalAttributes: [],
   bulkSelection: undefined,
+  entityAttributesAreCamelCase: undefined,
   expandedSectionsRenderer: undefined,
   filterValueRenderers: undefined,
   queryHelpComponent: undefined,
-  additionalAttributes: [],
-  entityAttributesAreCamelCase: undefined,
+  topRightCol: undefined,
 };
 
 export default PageEntityTable;
