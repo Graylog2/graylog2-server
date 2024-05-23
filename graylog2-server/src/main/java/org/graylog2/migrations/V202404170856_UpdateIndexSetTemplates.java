@@ -20,9 +20,6 @@ import jakarta.inject.Inject;
 import org.graylog2.indexer.indexset.template.IndexSetTemplate;
 import org.graylog2.indexer.indexset.template.IndexSetTemplateProvider;
 import org.graylog2.indexer.indexset.template.IndexSetTemplateService;
-import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.time.ZonedDateTime;
 
@@ -30,13 +27,11 @@ import java.time.ZonedDateTime;
  * Update the set of built-in indexset templates.
  */
 public class V202404170856_UpdateIndexSetTemplates extends Migration {
-    private static final Logger LOG = LoggerFactory.getLogger(V202404170856_UpdateIndexSetTemplates.class);
     private final IndexSetTemplateService indexSetTemplateService;
     private final IndexSetTemplateProvider indexSetTemplateProvider;
 
     @Inject
-    public V202404170856_UpdateIndexSetTemplates(final ClusterConfigService clusterConfigService,
-                                                 IndexSetTemplateService indexSetTemplateService,
+    public V202404170856_UpdateIndexSetTemplates(IndexSetTemplateService indexSetTemplateService,
                                                  IndexSetTemplateProvider indexSetTemplateProvider) {
         this.indexSetTemplateService = indexSetTemplateService;
         this.indexSetTemplateProvider = indexSetTemplateProvider;
