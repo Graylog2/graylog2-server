@@ -40,7 +40,7 @@ const CreateTemplate = () => {
   const onSubmit = useCallback((template: IndexSetTemplate) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_TEMPLATE.CREATED, {
       app_pathname: telemetryPathName,
-      app_action_value: 'create-new-index-set-template-created', // TODO: Add template name
+      app_action_value: 'create-new-index-set-template-created',
     });
 
     createTemplate(template).then(() => {

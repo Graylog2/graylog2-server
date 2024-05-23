@@ -30,7 +30,9 @@ const IndexSetTemplateEditPage = () => {
   return (
     <DocumentTitle title="Edit Index Set Template">
       <IndicesPageNavigation />
-      <PageHeader title="Edit Index Set Template" />
+      <PageHeader title="Edit Index Set Template">
+        <span>Edit an existing Index Set Template. This is a set of configuration that can be applied when creating a new Index Set.</span>
+      </PageHeader>
       <Row className="content">
         <Col md={12}>
           {!isFetching ? <EditTemplate template={data} /> : <Spinner />}
