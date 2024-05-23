@@ -27,7 +27,7 @@ import useViewsPlugin from 'views/test/testViewsPlugin';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
 import { profile1, attributes, profile2 } from 'fixtures/indexSetFieldTypeProfiles';
 import ProfilesList from 'components/indices/IndexSetFieldTypeProfiles/ProfilesList';
-import useProfiles from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfiles';
+import useFetchEntities from 'components/common/PageEntityTable/useFetchEntities';
 
 const getData = (list = [profile1]) => (
   {
@@ -49,7 +49,7 @@ const renderIndexSetFieldTypeProfilesList = () => render(
 
 jest.mock('routing/useParams', () => jest.fn());
 
-jest.mock('components/indices/IndexSetFieldTypeProfiles/hooks/useProfiles', () => jest.fn());
+jest.mock('components/common/PageEntityTable/useFetchEntities', () => jest.fn());
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings', () => jest.fn());
 
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
@@ -83,8 +83,8 @@ describe('IndexSetFieldTypesList', () => {
   });
 
   it('Shows list of field type profiles with correct data', async () => {
-    asMock(useProfiles).mockReturnValue({
-      isLoading: false,
+    asMock(useFetchEntities).mockReturnValue({
+      isInitialLoading: false,
       refetch: () => {},
       data: getData([profile1, profile2]),
     });
@@ -106,8 +106,8 @@ describe('IndexSetFieldTypesList', () => {
   });
 
   it('Shows list of Custom Field Mappings for profile', async () => {
-    asMock(useProfiles).mockReturnValue({
-      isLoading: false,
+    asMock(useFetchEntities).mockReturnValue({
+      isInitialLoading: false,
       refetch: () => {},
       data: getData([profile1, profile2]),
     });

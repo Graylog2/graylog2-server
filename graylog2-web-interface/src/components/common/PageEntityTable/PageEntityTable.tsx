@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { useMemo, useCallback } from 'react';
 import { useQueryParam, StringParam } from 'use-query-params';
-import { useQuery } from '@tanstack/react-query';
 import styled from 'styled-components';
 
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
@@ -27,11 +26,12 @@ import { useTableEventHandlers } from 'components/common/EntityDataTable';
 import { Spinner, PaginatedList, SearchForm, NoSearchResult, EntityDataTable } from 'components/common';
 import type { Attribute, SearchParams } from 'stores/PaginationTypes';
 import type { EntityBase } from 'components/common/EntityDataTable/types';
-import UserNotification from 'util/UserNotification';
 import EntityFilters from 'components/common/EntityFilters';
 import useUrlQueryFilters from 'components/common/EntityFilters/hooks/useUrlQueryFilters';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import TableFetchContextProvider from 'components/common/PageEntityTable/TableFetchContextProvider';
+import type { PaginatedResponse } from 'components/common/PageEntityTable/useFetchEntities';
+import useFetchEntities from 'components/common/PageEntityTable/useFetchEntities';
 
 const SearchRow = styled.div`
   margin-bottom: 5px;
@@ -40,14 +40,6 @@ const SearchRow = styled.div`
   justify-content: space-between;
   align-items: center;
 `;
-
-type PaginatedResponse<T> = {
-  list: Array<T>,
-  pagination: {
-    total: number
-  },
-  attributes: Array<Attribute>,
-}
 
 type Props<T> = {
   actionsCellWidth?: React.ComponentProps<typeof EntityDataTable>['actionsCellWidth'],
@@ -98,17 +90,12 @@ const PageEntityTable = <T extends EntityBase>({
     filters: urlQueryFilters,
   }), [layoutConfig.pageSize, layoutConfig.sort, paginationQueryParameter.page, query, urlQueryFilters]);
   const fetchKey = useMemo(() => keyFn(fetchOptions), [fetchOptions, keyFn]);
-  const { data: paginatedEntities = INITIAL_DATA, isInitialLoading: isLoadingReports, refetch } = useQuery(
-    fetchKey,
-    () => fetchData(fetchOptions),
-    {
-      enabled: !isLoadingLayoutPreferences,
-      onError: (error) => {
-        UserNotification.error(`Fetching ${humanName} failed with status: ${error}`, `Could not retrieve ${humanName}`);
-      },
-      keepPreviousData: true,
-    },
-  );
+
+  const {
+    data: paginatedEntities = INITIAL_DATA,
+    isInitialLoading: isLoadingEntities,
+    refetch,
+  } = useFetchEntities<T>({ fetchKey, searchParams: fetchOptions, enabled: !isLoadingLayoutPreferences, fetchData, humanName });
 
   const onChangeFilters = useCallback((newUrlQueryFilters: UrlQueryFilters) => {
     paginationQueryParameter.resetPage();
@@ -133,14 +120,14 @@ const PageEntityTable = <T extends EntityBase>({
     [additionalAttributes, paginatedEntities?.attributes],
   );
 
-  if (isLoadingLayoutPreferences || isLoadingReports) {
+  if (isLoadingLayoutPreferences || isLoadingEntities) {
     return <Spinner />;
   }
 
-  const { list, pagination: { total } } = paginatedEntities;
+  const { list, pagination: { total }, attributes } = paginatedEntities;
 
   return (
-    <TableFetchContextProvider refetch={refetch} searchParams={fetchOptions}>
+    <TableFetchContextProvider refetch={refetch} searchParams={fetchOptions} attributes={attributes}>
       <PaginatedList pageSize={layoutConfig.pageSize}
                      showPageSizeSelect={false}
                      totalItems={total}>
@@ -150,7 +137,7 @@ const PageEntityTable = <T extends EntityBase>({
                       query={query}
                       queryHelpComponent={queryHelpComponent}>
             <div style={{ marginBottom: 5 }}>
-              <EntityFilters attributes={paginatedEntities?.attributes}
+              <EntityFilters attributes={attributes}
                              urlQueryFilters={urlQueryFilters}
                              setUrlQueryFilters={onChangeFilters}
                              filterValueRenderers={filterValueRenderers} />
@@ -160,7 +147,7 @@ const PageEntityTable = <T extends EntityBase>({
         </SearchRow>
         <div>
           {list?.length === 0 ? (
-            <NoSearchResult>No {humanName} have been found</NoSearchResult>
+            <NoSearchResult>No {humanName} have been found.</NoSearchResult>
           ) : (
             <EntityDataTable<T> data={list}
                                 visibleColumns={layoutConfig.displayedAttributes}

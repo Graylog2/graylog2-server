@@ -18,20 +18,22 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import { useMemo } from 'react';
 
-import type { SearchParams } from 'stores/PaginationTypes';
+import type { SearchParams, Attribute } from 'stores/PaginationTypes';
 
 import TableFetchContext from './TableFetchContext';
 
 type Props = React.PropsWithChildren<{
-  searchParams: SearchParams,
+  attributes: Array<Attribute>,
   refetch: () => void,
+  searchParams: SearchParams,
 }>
 
-const TableFetchContextProvider = ({ children, searchParams, refetch }: Props) => {
+const TableFetchContextProvider = ({ children, searchParams, refetch, attributes }: Props) => {
   const contextValue = useMemo(() => ({
     searchParams,
     refetch,
-  }), [searchParams, refetch]);
+    attributes,
+  }), [searchParams, refetch, attributes]);
 
   return (
     <TableFetchContext.Provider value={contextValue}>

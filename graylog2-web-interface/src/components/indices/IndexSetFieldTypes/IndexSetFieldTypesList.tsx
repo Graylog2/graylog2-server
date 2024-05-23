@@ -64,8 +64,7 @@ const IndexSetFieldTypesList = () => {
   const { indexSetId } = useParams();
   const { indexSet } = useStore(IndexSetsStore);
   const [selectedEntitiesData, setSelectedEntitiesData] = useState<Record<string, IndexSetFieldType>>({});
-
-  const customColumnRenderers = useCustomColumnRenderers([]);
+  const customColumnRenderers = useCustomColumnRenderers();
 
   const onSubmitCallback = useCallback((response: FieldTypePutResponse, refetchFieldTypes: () => void) => {
     const newEntityFieldName = response?.[indexSetId]?.fieldName;
