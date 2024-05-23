@@ -187,14 +187,11 @@ public class IndexSetTemplateResource extends RestResource {
 
         if (config.useLegacyRotation()) {
             violation = indexSetValidator.validateStrategyFields(config);
-            if (violation != null) {
-                throw new BadRequestException(violation.message());
-            }
         } else {
             violation = indexSetValidator.validateDataTieringConfig(config.dataTiering());
-            if (violation != null) {
-                throw new BadRequestException(violation.message());
-            }
+        }
+        if (violation != null) {
+            throw new BadRequestException(violation.message());
         }
     }
 
