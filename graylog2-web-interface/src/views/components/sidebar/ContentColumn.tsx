@@ -149,7 +149,7 @@ const ContentColumn = ({ children, sectionTitle, closeSidebar, searchPageLayout,
             <CenterVertical>
               <Title onClick={closeSidebar}>{title}</Title>
             </CenterVertical>
-            {!forceSideBarPinned ?? (
+            {!forceSideBarPinned && (
             <CenterVertical>
               <OverlayToggle $sidebarIsPinned={sidebarIsPinned}>
                 <IconButton onClick={() => toggleSidebarPinning(searchPageLayout)}
