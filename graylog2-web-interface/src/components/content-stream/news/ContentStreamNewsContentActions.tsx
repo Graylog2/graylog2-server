@@ -16,14 +16,15 @@
  */
 import React from 'react';
 
-import useCarouselAction from 'hooks/useCarouselAction';
 import { Icon } from 'components/common';
 import { Button } from 'components/bootstrap';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import { CAROUSEL_ID } from 'components/content-stream/ContentStreamNews';
+import { useCarouselActions } from 'components/common/Carousel';
 
 const ContentStreamNewsContentActions = () => {
-  const { scrollPrev, scrollNext } = useCarouselAction('.carousel');
+  const { scrollPrev, scrollNext, nextBtnDisabled, prevBtnDisabled } = useCarouselActions(CAROUSEL_ID);
   const sendTelemetry = useSendTelemetry();
 
   const handlePrev = () => {
@@ -46,8 +47,12 @@ const ContentStreamNewsContentActions = () => {
 
   return (
     <>
-      <Button onClick={() => handlePrev()}><Icon name="chevron_left" /></Button>
-      <Button onClick={() => handleNext()}><Icon name="chevron_right" /></Button>
+      <Button onClick={() => handlePrev()} disabled={prevBtnDisabled}>
+        <Icon name="chevron_left" />
+      </Button>
+      <Button onClick={() => handleNext()} disabled={nextBtnDisabled}>
+        <Icon name="chevron_right" />
+      </Button>
     </>
   );
 };

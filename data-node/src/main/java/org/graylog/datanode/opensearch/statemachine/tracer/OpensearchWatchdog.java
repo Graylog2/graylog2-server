@@ -16,10 +16,11 @@
  */
 package org.graylog.datanode.opensearch.statemachine.tracer;
 
+import jakarta.inject.Inject;
 import org.graylog.datanode.opensearch.statemachine.FailuresCounter;
 import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
 import org.graylog.datanode.opensearch.statemachine.OpensearchState;
-import org.graylog.datanode.process.ManagableProcess;
+import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,10 +34,14 @@ public class OpensearchWatchdog implements StateMachineTracer {
 
     private boolean active;
     private final FailuresCounter restartCounter;
-    private final ManagableProcess<?, ?, ?> process;
+    private OpensearchStateMachine stateMachine;
 
-    public OpensearchWatchdog(ManagableProcess<?, ?, ?> process, int restartAttemptsCount) {
-        this.process = process;
+    @Inject
+    public OpensearchWatchdog() {
+        this(3);
+    }
+
+    public OpensearchWatchdog(int restartAttemptsCount) {
         this.restartCounter = FailuresCounter.zeroBased(restartAttemptsCount);
     }
 
@@ -73,7 +78,7 @@ public class OpensearchWatchdog implements StateMachineTracer {
             if (!restartCounter.failedTooManyTimes()) {
                 try {
                     LOG.info("Detected terminated process, restarting. Attempt #{}", restartCounter.failuresCount() + 1);
-                    process.start();
+                    this.stateMachine.fire(OpensearchEvent.PROCESS_STARTED);
                 } catch (Exception e) {
                     LOG.warn("Failed to restart process", e);
                 } finally {
@@ -89,5 +94,10 @@ public class OpensearchWatchdog implements StateMachineTracer {
 
     public boolean isActive() {
         return active;
+    }
+
+    @Override
+    public void setStateMachine(OpensearchStateMachine stateMachine) {
+        this.stateMachine = stateMachine;
     }
 }

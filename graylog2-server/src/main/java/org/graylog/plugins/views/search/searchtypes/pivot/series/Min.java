@@ -22,15 +22,18 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Strings;
+import org.graylog.plugins.formatting.units.model.UnitId;
 import org.graylog.plugins.views.search.searchtypes.pivot.HasField;
+import org.graylog.plugins.views.search.searchtypes.pivot.MayHaveUnit;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 
+import javax.annotation.Nullable;
 import java.util.Optional;
 
 @AutoValue
 @JsonTypeName(Min.NAME)
 @JsonDeserialize(builder = Min.Builder.class)
-public abstract class Min implements SeriesSpec, HasField {
+public abstract class Min implements SeriesSpec, HasField, MayHaveUnit {
     public static final String NAME = "min";
 
     @Override
@@ -38,6 +41,9 @@ public abstract class Min implements SeriesSpec, HasField {
 
     @Override
     public abstract String id();
+
+    @Override
+    public abstract Optional<UnitId> unit();
 
     @JsonProperty
     public abstract String field();
@@ -71,6 +77,9 @@ public abstract class Min implements SeriesSpec, HasField {
 
         @JsonProperty
         public abstract Builder field(String field);
+
+        @JsonProperty
+        public abstract Builder unit(@Nullable UnitId unit);
 
         abstract Optional<String> id();
         abstract String field();

@@ -20,6 +20,7 @@ import UserNotification from 'util/UserNotification';
 import ApiRoutes from 'routing/ApiRoutes';
 import type { QueryString, TimeRange } from 'views/logic/queries/Query';
 import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import { createLinkAndDownload } from 'util/FileDownloadUtils';
 
 export type ExportPayload = {
   timerange?: TimeRange | undefined | null,
@@ -31,12 +32,8 @@ export type ExportPayload = {
 };
 
 const downloadFile = (exportJobId: string, filename: string) => {
-  const link = document.createElement('a');
-  link.download = filename;
-  link.href = qualifyUrl(ApiRoutes.MessagesController.jobResults(exportJobId, filename).url);
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+  const href = qualifyUrl(ApiRoutes.MessagesController.jobResults(exportJobId, filename).url);
+  createLinkAndDownload(href, filename);
 };
 
 export const exportSearchMessages = (exportPayload: ExportPayload, searchId: string, mimeType: string, filename?: string) => {

@@ -23,7 +23,7 @@ import ContentStreamNews from 'components/content-stream/ContentStreamNews';
 import { asMock } from 'helpers/mocking';
 import useContentStream from 'components/content-stream/hook/useContentStream';
 
-jest.mock('components/common/carousel/Carousel', () => mockComponent('MockCarousel'));
+jest.mock('components/common/Carousel/Carousel', () => mockComponent('MockCarousel'));
 
 jest.mock('components/content-stream/news/ContentStreamNewsItem', () => ({ feed }: { feed: FeedItem }) => <div>{feed.title}</div>);
 

@@ -99,19 +99,11 @@ describe('RemoteReindexingMigration', () => {
     await screen.findByRole('heading', { name: /Welcome/i });
   });
 
-  it('should render CertificatesProvisioning page step', async () => {
-    renderStep(MIGRATION_STATE.PROVISION_DATANODE_CERTIFICATES_PAGE.key);
-
-    await screen.findByRole('button', {
-      name: /2. Provision Data Node with certificates/i,
-    });
-  });
-
   it('should render CertificatesProvisioning running step', async () => {
     renderStep(MIGRATION_STATE.PROVISION_DATANODE_CERTIFICATES_RUNNING.key);
 
     await screen.findByRole('button', {
-      name: /3. Provision the Data Node's certificate./i,
+      name: /2. Provision the Data Node's certificate./i,
     });
   });
 
@@ -119,7 +111,7 @@ describe('RemoteReindexingMigration', () => {
     renderStep(MIGRATION_STATE.EXISTING_DATA_MIGRATION_QUESTION_PAGE.key);
 
     await screen.findByRole('button', {
-      name: /4. Migrate existing data question/i,
+      name: /3. Migrate existing data question/i,
     });
 
     await screen.findByText(/Do you want to migrate your existing data?/);
@@ -130,20 +122,20 @@ describe('RemoteReindexingMigration', () => {
     renderStep(MIGRATION_STATE.MIGRATE_EXISTING_DATA.key);
 
     await screen.findByRole('button', {
-      name: /5. Migrate existing data/i,
+      name: /4. Migrate existing data/i,
     });
 
-    await screen.findByLabelText(/URI of the host/);
-    await screen.findByLabelText(/Allowlist/);
+    await screen.findByLabelText(/Hostname/);
     await screen.findByLabelText(/Username/);
     await screen.findByLabelText(/Password/);
+    await screen.findByLabelText(/Allowlist/);
   });
 
   it('should render RemoteReindexRunning step', async () => {
     renderStep(MIGRATION_STATE.REMOTE_REINDEX_RUNNING.key);
 
     await screen.findByRole('button', {
-      name: /6. Remote reindexing migration running/i,
+      name: /5. Remote reindexing migration running/i,
     });
 
     await screen.findByText(/We are currently migrating your existing data asynchronically/);
@@ -153,7 +145,7 @@ describe('RemoteReindexingMigration', () => {
     renderStep(MIGRATION_STATE.ASK_TO_SHUTDOWN_OLD_CLUSTER.key);
 
     await screen.findByRole('button', {
-      name: /7. Shut down old cluster/i,
+      name: /6. Shut down old cluster/i,
     });
 
     await screen.findByText(/To finish please shut down your/);

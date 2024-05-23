@@ -59,6 +59,9 @@ import static java.util.Objects.requireNonNull;
 public class PreflightWebModule extends Graylog2Module {
 
     public static final String FEATURE_FLAG_PREFLIGHT_WEB_ENABLED = "preflight_web";
+    public static final String PERMISSION_PREFLIGHT_ONLY = "preflight:only";
+    // this permission is never checked during preflight, but makes sure that the rest resources are not accidentally
+    // bound during regular startup of Graylog and available without permissions.
 
     private final Configuration configuration;
 

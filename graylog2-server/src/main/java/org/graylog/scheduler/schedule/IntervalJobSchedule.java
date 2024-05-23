@@ -22,14 +22,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableMap;
+import jakarta.validation.constraints.Min;
 import org.graylog.scheduler.JobSchedule;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.joda.time.DateTime;
 
-import jakarta.validation.constraints.Min;
-
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -53,15 +50,6 @@ public abstract class IntervalJobSchedule implements JobSchedule {
     @Override
     public Optional<DateTime> calculateNextTime(DateTime lastExecutionTime, DateTime lastNextTime, JobSchedulerClock clock) {
         return Optional.of(lastNextTime.plus(unit().toMillis(interval())));
-    }
-
-    @Override
-    public Optional<Map<String, Object>> toDBUpdate(String fieldPrefix) {
-        return Optional.of(ImmutableMap.of(
-                fieldPrefix + JobSchedule.TYPE_FIELD, type(),
-                fieldPrefix + FIELD_INTERVAL, interval(),
-                fieldPrefix + FIELD_UNIT, unit()
-        ));
     }
 
     public static Builder builder() {

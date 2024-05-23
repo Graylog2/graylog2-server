@@ -86,6 +86,12 @@ public class HttpConfiguration {
     @Parameter(value = "http_allow_embedding")
     private boolean httpAllowEmbedding = false;
 
+    @Parameter(value = "http_cookie_secure_override")
+    private boolean httpCookieSecureOverride = false;
+
+    @Parameter(value = "http_cookie_same_site_strict")
+    private boolean httpCookieSameSiteStrict = true;
+
     public HostAndPort getHttpBindAddress() {
         return httpBindAddress
                 .requireBracketsForIPv6()
@@ -212,6 +218,14 @@ public class HttpConfiguration {
 
     public String getHttpTlsKeyPassword() {
         return httpTlsKeyPassword;
+    }
+
+    public boolean getHttpCookieSameSiteStrict() {
+        return httpCookieSameSiteStrict;
+    }
+
+    public boolean getHttpCookieSecureOverride() {
+        return httpCookieSecureOverride;
     }
 
     public URI getHttpExternalUri() {

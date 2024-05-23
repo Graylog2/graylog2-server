@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
 
 import { Spinner, Wizard } from 'components/common';
 import CAStep from 'components/datanode/migrations/CAStep';
@@ -27,14 +26,6 @@ import useMigrationWizardStep from 'components/datanode/hooks/useMigrationWizard
 import MigrationWelcomeStep from 'components/datanode/migrations/MigrationWelcomeStep';
 import CertificateRenewalStep from 'components/datanode/migrations/CertificateRenewalStep';
 import MigrationFinishedStep from 'components/datanode/migrations/MigrationFinishedStep';
-
-const StyledWizard = styled(Wizard)`
-  .migration-wizard{
-    .nav > li > a {
-      background-color: red !important;
-    }
-  }
-`;
 
 const MigrationWizard = () => {
   const { step: currentStep, isLoading } = useMigrationWizardStep();
@@ -77,13 +68,13 @@ const MigrationWizard = () => {
   ];
 
   return (
-    <StyledWizard steps={steps}
-                  activeStep={activeStep}
-                  onStepChange={() => {}}
-                  horizontal
-                  justified
-                  containerClassName="migration-wizard"
-                  hidePreviousNextButtons />
+    <Wizard steps={steps}
+            activeStep={activeStep}
+            onStepChange={() => {}}
+            horizontal
+            justified
+            containerClassName="migration-wizard"
+            hidePreviousNextButtons />
   );
 };
 

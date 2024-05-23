@@ -27,10 +27,12 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.common.graph.MutableGraph;
 import org.graylog.plugins.views.search.rest.ExecutionState;
 import org.graylog.plugins.views.search.views.PluginMetadataSummary;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
+import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.SearchEntity;
 import org.graylog2.shared.rest.exceptions.MissingStreamPermissionException;
 import org.joda.time.DateTime;
@@ -247,5 +249,10 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
             searchEntityBuilder.owner(this.owner().get());
         }
         return searchEntityBuilder.build();
+    }
+
+    @Override
+    public void resolveNativeEntity(EntityDescriptor entityDescriptor, MutableGraph<EntityDescriptor> mutableGraph) {
+        queries().forEach(query -> query.resolveNativeEntity(entityDescriptor, mutableGraph));
     }
 }

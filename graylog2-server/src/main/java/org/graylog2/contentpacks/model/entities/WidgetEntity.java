@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
+import com.google.common.graph.MutableGraph;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
@@ -153,7 +154,7 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
         final WidgetDTO.Builder widgetBuilder = WidgetDTO.builder()
                 .config(this.config())
                 .filter(this.filter())
-                .filters(convertSearchFilters(this.filters()))
+                .filters(filters().stream().map(filter -> filter.toNativeEntity(parameters, nativeEntities)).toList())
                 .id(this.id())
                 .streams(this.streams().stream()
                         .map(id -> resolveStreamEntityObject(id, nativeEntities))
@@ -175,6 +176,14 @@ public abstract class WidgetEntity implements NativeEntityConverter<WidgetDTO> {
             widgetBuilder.timerange(this.timerange().get());
         }
         return widgetBuilder.build();
+    }
+
+    @Override
+    public void resolveForInstallation(EntityV1 entity,
+                                       Map<String, ValueReference> parameters,
+                                       Map<EntityDescriptor, Entity> entities,
+                                       MutableGraph<Entity> graph) {
+        filters().forEach(filter -> filter.resolveForInstallation(entity, parameters, entities, graph));
     }
 
     public List<SearchTypeEntity> createSearchTypeEntity() {

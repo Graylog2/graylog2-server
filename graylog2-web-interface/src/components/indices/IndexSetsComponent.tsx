@@ -140,6 +140,7 @@ const IndexSetsComponent = () => {
 
     IndexSetsActions.delete(indexSet, deleteIndices).then(() => {
       resetPage();
+      loadData(page);
     });
   };
 
