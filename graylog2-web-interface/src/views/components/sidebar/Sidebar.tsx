@@ -84,7 +84,7 @@ const Sidebar = ({ searchPageLayout, results, children, sections, actions, force
   const sendTelemetry = useSendTelemetry();
   const location = useLocation();
   const queryId = useActiveQueryId();
-  const sidebarIsPinned = searchPageLayout?.config.sidebar.isPinned ?? false;
+  const sidebarIsPinned = searchPageLayout?.config.sidebar.isPinned || forceSideBarPinned;
   const initialSectionKey = sections[0].key;
   const [activeSectionKey, setActiveSectionKey] = useState<string | undefined>(sidebarIsPinned ? initialSectionKey : null);
   const activeSection = sections.find((section) => section.key === activeSectionKey);
@@ -108,7 +108,7 @@ const Sidebar = ({ searchPageLayout, results, children, sections, actions, force
       <SidebarNavigation activeSection={activeSection}
                          selectSidebarSection={selectSidebarSection}
                          sections={sections}
-                         sidebarIsPinned={sidebarIsPinned || forceSideBarPinned}
+                         sidebarIsPinned={sidebarIsPinned}
                          actions={actions} />
       {activeSection && !!SectionContent && (
         <ContentColumn closeSidebar={toggleSidebar}
@@ -118,7 +118,7 @@ const Sidebar = ({ searchPageLayout, results, children, sections, actions, force
           <SectionContent results={results}
                           queryId={queryId}
                           sidebarChildren={children}
-                          sidebarIsPinned={sidebarIsPinned || forceSideBarPinned}
+                          sidebarIsPinned={sidebarIsPinned}
                           toggleSidebar={toggleSidebar} />
         </ContentColumn>
       )}
