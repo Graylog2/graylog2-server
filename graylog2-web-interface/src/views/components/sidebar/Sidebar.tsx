@@ -118,7 +118,7 @@ const Sidebar = ({ searchPageLayout, results, children, sections, actions, force
           <SectionContent results={results}
                           queryId={queryId}
                           sidebarChildren={children}
-                          sidebarIsPinned={sidebarIsPinned}
+                          sidebarIsPinned={sidebarIsPinned || forceSideBarPinned}
                           toggleSidebar={toggleSidebar} />
         </ContentColumn>
       )}
