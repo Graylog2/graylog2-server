@@ -26,7 +26,7 @@ type Props = {
   closeSidebar: () => void,
   searchPageLayout: SearchPreferencesLayout | undefined | null,
   sectionTitle: string,
-  hidePinnedToggle: boolean,
+  forceSideBarPinned: boolean,
 };
 
 export const Container = styled.div<{ $sidebarIsPinned: boolean }>(({ theme, $sidebarIsPinned }) => css`
@@ -137,8 +137,8 @@ const toggleSidebarPinning = (searchPageLayout) => {
   togglePinning();
 };
 
-const ContentColumn = ({ children, sectionTitle, closeSidebar, searchPageLayout, hidePinnedToggle }: Props) => {
-  const sidebarIsPinned = searchPageLayout?.config.sidebar.isPinned;
+const ContentColumn = ({ children, sectionTitle, closeSidebar, searchPageLayout, forceSideBarPinned }: Props) => {
+  const sidebarIsPinned = searchPageLayout?.config.sidebar.isPinned || forceSideBarPinned;
   const title = useViewTitle();
 
   return (
@@ -149,7 +149,7 @@ const ContentColumn = ({ children, sectionTitle, closeSidebar, searchPageLayout,
             <CenterVertical>
               <Title onClick={closeSidebar}>{title}</Title>
             </CenterVertical>
-            {!hidePinnedToggle ?? (
+            {!forceSideBarPinned ?? (
             <CenterVertical>
               <OverlayToggle $sidebarIsPinned={sidebarIsPinned}>
                 <IconButton onClick={() => toggleSidebarPinning(searchPageLayout)}
