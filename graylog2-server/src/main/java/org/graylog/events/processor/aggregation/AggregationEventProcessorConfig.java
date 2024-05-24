@@ -67,7 +67,6 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
 
     private static final String FIELD_QUERY = "query";
     private static final String FIELD_QUERY_PARAMETERS = "query_parameters";
-    private static final String FIELD_FILTERS = "filters";
     private static final String FIELD_STREAMS = "streams";
     private static final String FIELD_GROUP_BY = "group_by";
     static final String FIELD_SERIES = "series";

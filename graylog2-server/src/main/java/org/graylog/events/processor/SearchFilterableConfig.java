@@ -21,5 +21,7 @@ import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import java.util.List;
 
 public interface SearchFilterableConfig {
+    String FIELD_FILTERS = "filters";
+
     List<UsedSearchFilter> filters();
 }
