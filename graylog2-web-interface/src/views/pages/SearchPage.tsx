@@ -42,6 +42,7 @@ type Props = React.PropsWithChildren<{
   loadView?: (history: HistoryFunction, viewId: string) => unknown,
   executionState?: SearchExecutionState,
   searchResult?: SearchExecutionResult,
+  forceSideBarPinned?: boolean,
 }>;
 
 const SearchPageTitle = ({ children }: { children: React.ReactNode }) => {
@@ -62,6 +63,7 @@ const SearchPage = ({
   loadView: _loadView = defaultLoadView,
   executionState: initialExecutionState,
   searchResult,
+  forceSideBarPinned,
 }: Props) => {
   const query = useQuery();
   const initialQuery = query?.page as string;
@@ -90,7 +92,7 @@ const SearchPage = ({
                 <AutoRefreshProvider>
                   {children}
                   <IfUserHasAccessToAnyStream>
-                    <Search />
+                    <Search forceSideBarPinned={forceSideBarPinned} />
                   </IfUserHasAccessToAnyStream>
                 </AutoRefreshProvider>
               </ViewLoaderContext.Provider>
@@ -107,6 +109,7 @@ SearchPage.defaultProps = {
   loadView: defaultLoadView,
   executionState: SearchExecutionState.empty(),
   searchResult: undefined,
+  forceSideBarPinned: false,
 };
 
 export default React.memo(SearchPage);

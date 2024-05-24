@@ -21,10 +21,13 @@ import com.mongodb.client.MongoCollection;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.entities.EntityScopeService;
+import org.graylog2.database.entities.ScopedEntity;
 import org.graylog2.database.jackson.CustomJacksonCodecRegistry;
 import org.graylog2.database.pagination.DefaultMongoPaginationHelper;
 import org.graylog2.database.pagination.MongoPaginationHelper;
 import org.graylog2.database.utils.MongoUtils;
+import org.graylog2.database.utils.ScopedEntityMongoUtils;
 
 @Singleton
 public class MongoCollections {
@@ -92,5 +95,12 @@ public class MongoCollections {
      */
     public <T extends MongoEntity> MongoUtils<T> utils(MongoCollection<T> collection) {
         return new MongoUtils<>(collection, objectMapper);
+    }
+
+    /**
+     * Provides utility methods for creating, updating, and deleting ScopedEntity objects
+     */
+    public <T extends ScopedEntity> ScopedEntityMongoUtils<T> scopedEntityUtils(MongoCollection<T> collection, EntityScopeService entityScopeService) {
+        return new ScopedEntityMongoUtils<>(collection, entityScopeService);
     }
 }
