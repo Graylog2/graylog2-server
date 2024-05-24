@@ -122,8 +122,6 @@ const XYPlot = ({
     });
   }
 
-  console.log('!!!QQQQ!!!!!!', { layout });
-
   return (
     <PlotLegend config={config} chartData={chartData}>
       <GenericPlot chartData={chartData}

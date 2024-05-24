@@ -112,7 +112,6 @@ const BarVisualization = makeVisualization(({
     const totalAxis = Object.keys(layouts).length;
 
     const offsetSettings = getBarChartTraceOffsetSettings(barmode, { yaxis, totalAxis, axisNumber, traceIndex: idx, totalTraces: total });
-    console.log({ values, type, name, labels, originalName });
     const curUnit = getSeriesUnit(config.series, name || originalName);
 
     const getData = () => ({

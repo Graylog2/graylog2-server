@@ -16,6 +16,6 @@
  */
 import type Series from 'views/logic/aggregationbuilder/Series';
 
-const getSeriesUnit = (series: Array<Series>, seriesName: string) => series.find((s) => s.config.name === seriesName || s.function === seriesName).unit;
+const getSeriesUnit = (series: Array<Series>, seriesName: string) => series.find((s) => s.config.name === seriesName || s.function === seriesName)?.unit;
 
 export default getSeriesUnit;

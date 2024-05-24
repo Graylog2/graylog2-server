@@ -25,6 +25,8 @@ import type Pivot from 'views/logic/aggregationbuilder/Pivot';
 import type NumberVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
 import type { TimeUnit } from 'views/Constants';
 import generateId from 'logic/generateId';
+import type SeriesUnit from 'views/logic/aggregationbuilder/SeriesUnit';
+import isFunctionAllowsUnit from 'views/logic/isFunctionAllowsUnit';
 
 import type SortConfig from '../../aggregationbuilder/SortConfig';
 
@@ -88,6 +90,7 @@ const formatPivot = (pivot: Pivot): FormattedPivot => {
 
 type FormattedSeries = $Shape<{
   id: string,
+  unit?: SeriesUnit,
 } & Definition>;
 
 const generateConfig = (id: string, name: string, {
@@ -105,7 +108,18 @@ const generateConfig = (id: string, name: string, {
     rollup: rollupForBackendQuery,
     row_groups: rowPivots.map(formatPivot),
     column_groups: columnPivots.map(formatPivot),
-    series: series.map<FormattedSeries>((s) => ({ id: s.effectiveName, ...parseSeries(s.function) })),
+    series: series.map<FormattedSeries>((s) => {
+      const res: FormattedSeries = ({
+        id: s.effectiveName,
+        ...parseSeries(s.function),
+      });
+
+      if (isFunctionAllowsUnit(res.type) && s?.unit?.isDefined) {
+        res.unit = s.unit;
+      }
+
+      return res;
+    }),
     sort,
   },
 });

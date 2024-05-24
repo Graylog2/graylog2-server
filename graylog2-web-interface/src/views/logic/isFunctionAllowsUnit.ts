@@ -14,15 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+const ALLOWED_UNIT_FUNCTIONS = ['sum', 'latest', 'avg', 'min', 'max', 'percentage', 'stddev', 'variance', 'sumofsquares', 'percentile'];
 
-import { useMemo } from 'react';
+const isFunctionAllowsUnit = (func: string) => ALLOWED_UNIT_FUNCTIONS.includes(func);
 
-import type { MetricUnitType } from 'views/types';
-
-type FieldUnits = Record<string, { unit_type: MetricUnitType, unit: string }>
-
-const useFieldUnits = () => useMemo<FieldUnits>(() => ({
-  http_response_code: { unit_type: 'size', unit: 'bytes' },
-}), []);
-
-export default useFieldUnits;
+export default isFunctionAllowsUnit;

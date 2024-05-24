@@ -25,20 +25,17 @@ const chartLayoutBaseUnitTypes: Record<MetricUnitType, string> = {
 };
 
 const dataConvertor = (values: Array<number>, convertValueToUnit: ConvertValueToUnit, unit: SeriesUnit) => {
-  if (!unit.isDefined) return values;
+  if (!unit?.isDefined) return values;
   const from: ConversionParams = { abbrev: unit.abbrev, unitType: unit.unitType };
   const to: ConversionParams = { abbrev: chartLayoutBaseUnitTypes[unit.unitType], unitType: unit.unitType };
 
   const res = values.map((v) => {
     const converted = convertValueToUnit(v, from, to);
-    console.log({ converted, v, from, to });
 
     if (unit.unitType === 'time') return new Date(converted.value);
 
     return converted.value;
   });
-
-  console.log({ from, to, res });
 
   return res;
 };
