@@ -1,0 +1,8 @@
+type = "f"
+message = "Removed `Delete` and `Duplicate` options for Sigma event definitions."
+
+pulls = ["19404"]
+
+details.user = """
+Sigma event definitions are automatically deleted or duplicated when their parent Sigma rule is deleted or duplicated.
+"""
