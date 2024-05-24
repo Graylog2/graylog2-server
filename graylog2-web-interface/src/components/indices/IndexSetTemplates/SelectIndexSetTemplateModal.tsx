@@ -18,9 +18,10 @@ import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Row, Col, Modal, SegmentedControl } from 'components/bootstrap';
-import { ModalSubmit, Spinner, Select } from 'components/common';
+import { ModalSubmit, Spinner, Select, Section } from 'components/common';
 import useSelectedIndexSetTemplate from 'components/indices/IndexSetTemplates/hooks/useSelectedTemplate';
 import useTemplates from 'components/indices/IndexSetTemplates/hooks/useTemplates';
+import TemplateDetails from 'components/indices/IndexSetTemplates/TemplateDetails';
 import IndexSetTemplateCard from 'components/indices/IndexSetTemplates/IndexSetTemplateCard';
 import type { IndexSetTemplate } from 'components/indices/IndexSetTemplates/types';
 import type { Sort } from 'stores/PaginationTypes';
@@ -35,7 +36,7 @@ type TemplateCategorySegment = 'built_in' | 'custom';
 const FlexWrapper = styled.div(({ theme }) => css`
   display: flex;
   flex-direction: column;
-  gap: ${theme.spacings.sm};
+  gap: ${theme.spacings.md};
 `);
 
 const SelectIndexSetTemplateModal = ({ hideModal, show }: Props) => {
@@ -95,7 +96,7 @@ const SelectIndexSetTemplateModal = ({ hideModal, show }: Props) => {
     }
   };
 
-  const customTemplateSelectValue = () => customList.find((template) => template.id === tempSelectedTemplate?.id)?.id;
+  const selectedCustomTemplate = customList.find((template) => template.id === tempSelectedTemplate?.id);
 
   return (
     <Modal show={show}
@@ -135,11 +136,28 @@ const SelectIndexSetTemplateModal = ({ hideModal, show }: Props) => {
               )}
               {selectedTemplateCategory === 'custom' && (
                 isLoadingCustom ? (<Spinner />) : (
-                  <Select clearable={false}
-                          onChange={handleCustomSelect}
-                          options={customList.map((template) => ({ label: template.title, value: template.id }))}
-                          placeholder="Select a template"
-                          value={customTemplateSelectValue()} />
+                  <Row>
+                    <Col md={5}>
+                      <FlexWrapper>
+                        <Select clearable={false}
+                                onChange={handleCustomSelect}
+                                options={customList.map((template) => ({ label: template.title, value: template.id }))}
+                                placeholder="Select a template"
+                                value={selectedCustomTemplate?.id} />
+                        {selectedCustomTemplate?.description && (
+                        <Section title="Description">
+                          <p>{selectedCustomTemplate?.description}</p>
+                        </Section>
+                        )}
+                      </FlexWrapper>
+
+                    </Col>
+                    <Col md={7}>
+                      {selectedCustomTemplate && (
+                        <TemplateDetails template={selectedCustomTemplate} />
+                      )}
+                    </Col>
+                  </Row>
                 )
               )}
             </Col>

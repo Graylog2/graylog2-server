@@ -18,7 +18,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { Button } from 'components/bootstrap';
+import { Button, Col, Row } from 'components/bootstrap';
 import { Card } from 'components/common';
 import type { IndexSetTemplate } from 'components/indices/IndexSetTemplates/types';
 import { prepareDataTieringInitialValues, DataTieringVisualisation } from 'components/indices/data-tiering';
@@ -40,13 +40,18 @@ const IndexSetTemplateCard = ({ template, handleCardClick, isSelected }: Props) 
   return (
     <Card>
       <h3>{template.title}</h3>
-      <p>{template.description}</p>
+      {template.index_set_config.use_legacy_rotation && (<p>{template.description}</p>)}
       {!template.index_set_config.use_legacy_rotation && (
-      <DataTieringVisualisation minDays={dataTieringConfig.index_lifetime_min}
-                                maxDays={dataTieringConfig.index_lifetime_max}
-                                minDaysInHot={dataTieringConfig.index_hot_lifetime_min}
-                                warmTierEnabled={dataTieringConfig.warm_tier_enabled}
-                                archiveData={dataTieringConfig.archive_before_deletion} />
+        <Row>
+          <Col md={7}>
+            <DataTieringVisualisation minDays={dataTieringConfig.index_lifetime_min}
+                                      maxDays={dataTieringConfig.index_lifetime_max}
+                                      minDaysInHot={dataTieringConfig.index_hot_lifetime_min}
+                                      warmTierEnabled={dataTieringConfig.warm_tier_enabled}
+                                      archiveData={dataTieringConfig.archive_before_deletion} />
+          </Col>
+          <Col md={5}>{template.description}</Col>
+        </Row>
       )}
       <ButtonWrapper>
         <Button onClick={() => handleCardClick(template)} disabled={isSelected}>{isSelected ? 'Selected' : 'Select'}</Button>
