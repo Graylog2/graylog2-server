@@ -19,6 +19,7 @@ import { useEffect, useState } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
 
 import useIndexSetTemplateDefaults from 'components/indices/IndexSetTemplates/hooks/useIndexSetTemplateDefaults';
+import useSelectedIndexSetTemplate from 'components/indices/IndexSetTemplates/hooks/useSelectedTemplate';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import type {
   RotationStrategyConfig,
@@ -28,6 +29,7 @@ import type {
 const useIndexSet = (initialIndexSet?: IndexSet) :[IndexSet, Dispatch<SetStateAction<IndexSet>>] => {
   const { loadingIndexSetTemplateDefaults, indexSetTemplateDefaults } = useIndexSetTemplateDefaults();
   const [indexSet, setIndexSet] = useState(initialIndexSet);
+  const { selectedIndexSetTemplate } = useSelectedIndexSetTemplate();
 
   useEffect(() => {
     if (loadingIndexSetTemplateDefaults || !indexSetTemplateDefaults) return;
@@ -54,10 +56,25 @@ const useIndexSet = (initialIndexSet?: IndexSet) :[IndexSet, Dispatch<SetStateAc
     if (initialIndexSet) {
       const initialIndexWithoutNullValues = Object.fromEntries(Object.entries(initialIndexSet).filter(([_, v]) => v != null));
       setIndexSet({ ...defaultIndexSet, ...initialIndexWithoutNullValues });
+    } else if (selectedIndexSetTemplate) {
+      const indexSetTemplateConfig = selectedIndexSetTemplate.index_set_config;
+
+      if (indexSetTemplateConfig.use_legacy_rotation) {
+        indexSetTemplateConfig.data_tiering = indexSetTemplateDefaults.data_tiering;
+      } else {
+        indexSetTemplateConfig.rotation_strategy_class = indexSetTemplateDefaults.rotation_strategy_class;
+        indexSetTemplateConfig.rotation_strategy = indexSetTemplateDefaults.rotation_strategy as RotationStrategyConfig;
+        indexSetTemplateConfig.retention_strategy_class = indexSetTemplateDefaults.retention_strategy_class;
+        indexSetTemplateConfig.retention_strategy = indexSetTemplateDefaults.retention_strategy as RetentionStrategyConfig;
+      }
+
+      const indexSetTemplateConfigWithoutNullValues = Object.fromEntries(Object.entries(indexSetTemplateConfig).filter(([_, v]) => v != null));
+
+      setIndexSet({ ...defaultIndexSet, ...indexSetTemplateConfigWithoutNullValues });
     } else {
       setIndexSet({ ...defaultIndexSet });
     }
-  }, [loadingIndexSetTemplateDefaults, indexSetTemplateDefaults, initialIndexSet]);
+  }, [loadingIndexSetTemplateDefaults, indexSetTemplateDefaults, initialIndexSet, selectedIndexSetTemplate]);
 
   return [indexSet, setIndexSet];
 };

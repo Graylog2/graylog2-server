@@ -14,38 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
+import React, { useState } from 'react';
 
 import AppConfig from 'util/AppConfig';
 import { Button, Row, Col } from 'components/bootstrap';
-import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-import { IndexSetConfigurationForm, IndicesPageNavigation } from 'components/indices';
+import { DocumentTitle, PageHeader } from 'components/common';
+import { CreateIndexSet, IndicesPageNavigation } from 'components/indices';
 import DocsHelper from 'util/DocsHelper';
-import Routes from 'routing/Routes';
-import connect from 'stores/connect';
-import { IndexSetsActions, IndexSetsStore } from 'stores/indices/IndexSetsStore';
-import type { IndexSet } from 'stores/indices/IndexSetsStore';
-import { IndicesConfigurationActions, IndicesConfigurationStore } from 'stores/indices/IndicesConfigurationStore';
 import SelectIndexSetTemplateProvider from 'components/indices/IndexSetTemplates/contexts/SelectedIndexSetTemplateProvider';
-import SelectIndexSetTemplateModal from 'components/indices/IndexSetTemplates/SelectIndexSetTemplateModal';
-import {
-  RetentionStrategyPropType,
-  RotationStrategyPropType,
-} from 'components/indices/Types';
-import type {
-  RetentionStrategy, RotationStrategy, RetentionStrategyContext,
-} from 'components/indices/Types';
-import { adjustFormat } from 'util/DateTime';
-import useHistory from 'routing/useHistory';
-import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-
-type Props = {
-  retentionStrategies?: Array<RetentionStrategy> | null | undefined,
-  rotationStrategies?: Array<RotationStrategy> | null | undefined,
-  retentionStrategiesContext?: RetentionStrategyContext | null | undefined,
-}
 
 const SelectTemplateButton = ({ onClick } : {onClick : () => void}) => {
   const isCloud = AppConfig.isCloud();
@@ -55,36 +31,8 @@ const SelectTemplateButton = ({ onClick } : {onClick : () => void}) => {
     <Button onClick={onClick}>Select Template</Button>);
 };
 
-const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, retentionStrategiesContext }: Props) => {
-  const isCloud = AppConfig.isCloud();
-  const history = useHistory();
-  const sendTelemetry = useSendTelemetry();
+const IndexSetCreationPage = () => {
   const [showSelectTemplateModal, setShowSelectTemplateModal] = useState<boolean>(true);
-
-  useEffect(() => {
-    IndicesConfigurationActions.loadRotationStrategies();
-    IndicesConfigurationActions.loadRetentionStrategies();
-  }, []);
-
-  const _saveConfiguration = (indexSetItem: IndexSet) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.INDICES.INDEX_SET_CREATED, {
-      app_pathname: 'indexsets',
-    });
-
-    const copy = indexSetItem;
-
-    copy.creation_date = adjustFormat(new Date(), 'internal');
-
-    return IndexSetsActions.create(copy).then(() => {
-      history.push(Routes.SYSTEM.INDICES.LIST);
-    });
-  };
-
-  const _isLoading = () => !rotationStrategies || !retentionStrategies;
-
-  if (_isLoading()) {
-    return <Spinner />;
-  }
 
   return (
     <SelectIndexSetTemplateProvider>
@@ -105,49 +53,14 @@ const IndexSetCreationPage = ({ retentionStrategies, rotationStrategies, retenti
 
           <Row className="content">
             <Col md={12}>
-              <IndexSetConfigurationForm retentionStrategiesContext={retentionStrategiesContext}
-                                         rotationStrategies={rotationStrategies}
-                                         retentionStrategies={retentionStrategies}
-                                         submitButtonText="Create index set"
-                                         submitLoadingText="Creating index set..."
-                                         create
-                                         cancelLink={Routes.SYSTEM.INDICES.LIST}
-                                         onUpdate={_saveConfiguration} />
+              <CreateIndexSet showSelectTemplateModal={showSelectTemplateModal}
+                              setShowSelectTemplateModal={setShowSelectTemplateModal} />
             </Col>
           </Row>
         </div>
       </DocumentTitle>
-      {!isCloud && showSelectTemplateModal && (<SelectIndexSetTemplateModal show={showSelectTemplateModal} hideModal={() => setShowSelectTemplateModal(false)} />)}
     </SelectIndexSetTemplateProvider>
   );
 };
 
-IndexSetCreationPage.propTypes = {
-  retentionStrategies: PropTypes.arrayOf(RetentionStrategyPropType),
-  rotationStrategies: PropTypes.arrayOf(RotationStrategyPropType),
-  retentionStrategiesContext: PropTypes.shape({
-    max_index_retention_period: PropTypes.string,
-  }),
-};
-
-IndexSetCreationPage.defaultProps = {
-  retentionStrategies: undefined,
-  rotationStrategies: undefined,
-  retentionStrategiesContext: {
-    max_index_retention_period: undefined,
-  },
-};
-
-export default connect(
-  IndexSetCreationPage,
-  {
-    indexSets: IndexSetsStore,
-    indicesConfigurations: IndicesConfigurationStore,
-  },
-  ({ indexSets, indicesConfigurations }) => ({
-    indexSet: indexSets.indexSet,
-    rotationStrategies: indicesConfigurations.rotationStrategies,
-    retentionStrategies: indicesConfigurations.retentionStrategies,
-    retentionStrategiesContext: indicesConfigurations.retentionStrategiesContext,
-  }),
-);
+export default IndexSetCreationPage;

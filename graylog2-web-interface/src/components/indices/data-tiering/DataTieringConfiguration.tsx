@@ -169,7 +169,7 @@ const DataTieringConfiguration = <ValuesPrefix extends string | undefined, >({ v
       {dataTieringPlugin && (
         <>
           <FormikInput type="checkbox"
-                       id="data_tiering.archive_before_deletion"
+                       id="data_tiering-archive-before-deletion"
                        label="Archive before deletion"
                        name={fieldName('archive_before_deletion')}
                        help="Archive this index before it is deleted?" />

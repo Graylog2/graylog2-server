@@ -95,6 +95,8 @@ const SelectIndexSetTemplateModal = ({ hideModal, show }: Props) => {
     }
   };
 
+  const customTemplateSelectValue = () => customList.find((template) => template.id === tempSelectedTemplate?.id)?.id;
+
   return (
     <Modal show={show}
            title="Index Set Strategy"
@@ -137,7 +139,7 @@ const SelectIndexSetTemplateModal = ({ hideModal, show }: Props) => {
                           onChange={handleCustomSelect}
                           options={customList.map((template) => ({ label: template.title, value: template.id }))}
                           placeholder="Select a template"
-                          value={tempSelectedTemplate?.id} />
+                          value={customTemplateSelectValue()} />
                 )
               )}
             </Col>
