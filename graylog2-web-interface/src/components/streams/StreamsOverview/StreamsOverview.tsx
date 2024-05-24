@@ -64,7 +64,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
                              queryHelpComponent={<QueryHelper entityName="stream" />}
                              entityActions={entityActions}
                              tableLayout={DEFAULT_LAYOUT}
-                             fetchData={fetchStreams}
+                             fetchEntities={fetchStreams}
                              keyFn={keyFn}
                              expandedSectionsRenderer={expandedSections}
                              bulkSelection={{ actions: bulkActions }}

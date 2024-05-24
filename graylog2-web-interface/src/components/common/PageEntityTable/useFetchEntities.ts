@@ -32,13 +32,13 @@ export type PaginatedResponse<T> = {
 const useFetchEntities = <T>({
   fetchKey,
   searchParams,
-  fetchData,
+  fetchEntities,
   enabled,
   humanName,
 }: {
   fetchKey: Array<unknown>,
   searchParams: SearchParams,
-  fetchData: (searchParams: SearchParams) => Promise<PaginatedResponse<T>>
+  fetchEntities: (searchParams: SearchParams) => Promise<PaginatedResponse<T>>
   enabled: boolean,
   humanName: string
 }): {
@@ -48,7 +48,7 @@ const useFetchEntities = <T>({
 } => {
   const { data, isInitialLoading, refetch } = useQuery(
     fetchKey,
-    () => fetchData(searchParams),
+    () => fetchEntities(searchParams),
     {
       enabled,
       onError: (error) => {

@@ -77,7 +77,7 @@ const EventDefinitionsContainer = () => {
                                       additionalAttributes={ADDITIONAL_ATTRIBUTES}
                                       queryHelpComponent={<QueryHelper entityName="event definition" />}
                                       tableLayout={DEFAULT_LAYOUT}
-                                      fetchData={fetchEventDefinitions}
+                                      fetchEntities={fetchEventDefinitions}
                                       entityActions={renderEventDefinitionActions}
                                       keyFn={keyFn}
                                       entityAttributesAreCamelCase={false}

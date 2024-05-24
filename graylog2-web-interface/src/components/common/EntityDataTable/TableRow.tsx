@@ -46,7 +46,7 @@ type Props<Entity extends EntityBase> = {
   displayActions: boolean,
   entity: Entity,
   index: number,
-  rowActions?: (entity: Entity) => React.ReactNode,
+  actions?: (entity: Entity) => React.ReactNode,
   entityAttributesAreCamelCase: boolean,
   isEntitySelectable: (entity: Entity) => boolean,
 };
@@ -57,7 +57,7 @@ const TableRow = <Entity extends EntityBase>({
   displaySelect,
   displayActions,
   entity,
-  rowActions,
+  actions,
   index,
   actionsRef,
   entityAttributesAreCamelCase,
@@ -75,7 +75,7 @@ const TableRow = <Entity extends EntityBase>({
     }));
   }, [entity.id, setSelectedEntities]);
 
-  const actionButtons = displayActions ? <ButtonToolbar>{rowActions(entity)}</ButtonToolbar> : null;
+  const actionButtons = displayActions ? <ButtonToolbar>{actions(entity)}</ButtonToolbar> : null;
 
   const isSelectDisabled = useMemo(() => !(displaySelect && isEntitySelectable(entity)), [displaySelect, entity, isEntitySelectable]);
 
@@ -113,7 +113,7 @@ const TableRow = <Entity extends EntityBase>({
 };
 
 TableRow.defaultProps = {
-  rowActions: undefined,
+  actions: undefined,
 };
 
 export default React.memo(TableRow);

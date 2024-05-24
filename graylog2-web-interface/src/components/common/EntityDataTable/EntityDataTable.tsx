@@ -173,7 +173,7 @@ type Props<Entity extends EntityBase> = {
   /** Define default columns order. Column ids need to be snake case. */
   columnsOrder?: Array<string>,
   /** The table data. */
-  data: Readonly<Array<Entity>>,
+  entities: Readonly<Array<Entity>>,
   /** Allows you to extend a row with additional information * */
   expandedSectionsRenderer?: {
     [sectionName: string]: ExpandedSectionRenderer<Entity>
@@ -187,7 +187,7 @@ type Props<Entity extends EntityBase> = {
   /** Active page size */
   pageSize?: number
   /** Actions for each row. */
-  rowActions?: (entity: Entity) => React.ReactNode,
+  entityActions?: (entity: Entity) => React.ReactNode,
   /** Which columns should be displayed. */
   visibleColumns: Array<string>,
 };
@@ -208,17 +208,17 @@ const EntityDataTable = <Entity extends EntityBase>({
   columnDefinitions,
   columnRenderers: customColumnRenderers,
   columnsOrder,
-  data,
+  entities,
   expandedSectionsRenderer,
   onColumnsChange,
   onPageSizeChange,
   onSortChange,
   pageSize,
-  rowActions,
+  entityActions,
   visibleColumns,
 }: Props<Entity>) => {
   const currentUser = useCurrentUser();
-  const displayActionsCol = typeof rowActions === 'function';
+  const displayActionsCol = typeof entityActions === 'function';
   const displayBulkAction = !!actions;
   const displayBulkSelectCol = typeof onChangeSelection === 'function' || displayBulkAction;
   const displayPageSizeSelect = typeof onPageSizeChange === 'function';
@@ -249,10 +249,10 @@ const EntityDataTable = <Entity extends EntityBase>({
     fixedActionsCellWidth,
   });
 
-  const selectableData = useMemo(() => data.filter(_isEntitySelectable), [data, _isEntitySelectable]);
+  const selectableData = useMemo(() => entities.filter(_isEntitySelectable), [entities, _isEntitySelectable]);
 
   return (
-    <SelectedEntitiesProvider<Entity> initialSelection={initialSelection} onChangeSelection={onChangeSelection} data={data}>
+    <SelectedEntitiesProvider<Entity> initialSelection={initialSelection} onChangeSelection={onChangeSelection} entities={entities}>
       <ExpandedSectionsProvider>
         <ActionsRow>
           <div>
@@ -282,14 +282,14 @@ const EntityDataTable = <Entity extends EntityBase>({
                        displayBulkSelectCol={displayBulkSelectCol}
                        activeSort={activeSort}
                        displayActionsCol={displayActionsCol} />
-            {data.map((entity, index) => (
+            {entities.map((entity, index) => (
               <tbody key={`table-row-${entity.id}`} data-testid={`table-row-${entity.id}`}>
                 <TableRow entity={entity}
                           index={index}
                           entityAttributesAreCamelCase={entityAttributesAreCamelCase}
                           actionsRef={actionsRef}
                           columnRenderersByAttribute={columnRenderersByAttribute}
-                          rowActions={rowActions}
+                          actions={entityActions}
                           displaySelect={displayBulkSelectCol}
                           isEntitySelectable={_isEntitySelectable}
                           displayActions={displayActionsCol}
@@ -315,7 +315,7 @@ EntityDataTable.defaultProps = {
   expandedSectionsRenderer: undefined,
   onPageSizeChange: undefined,
   pageSize: undefined,
-  rowActions: undefined,
+  entityActions: undefined,
   entityAttributesAreCamelCase: true,
   bulkSelection: {},
 };

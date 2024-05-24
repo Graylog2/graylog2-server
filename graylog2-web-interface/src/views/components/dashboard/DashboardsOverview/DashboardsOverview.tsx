@@ -43,7 +43,7 @@ const DashboardsOverview = ({ isEvidenceModal }: Props) => {
                            queryHelpComponent={<QueryHelper entityName="dashboard" commonFields={['id', 'title', 'description', 'summary']} />}
                            entityActions={renderDashboardActions}
                            tableLayout={DEFAULT_LAYOUT(isEvidenceModal)}
-                           fetchData={fetchDashboards}
+                           fetchEntities={fetchDashboards}
                            keyFn={keyFn}
                            bulkSelection={{ actions: <BulkActions /> }}
                            columnRenderers={customColumnRenderers} />

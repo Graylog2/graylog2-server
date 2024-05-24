@@ -84,7 +84,7 @@ const EventNotificationsContainer = () => {
                                         queryHelpComponent={<QueryHelper entityName="notification" />}
                                         entityActions={renderEvenNotificationActions}
                                         tableLayout={DEFAULT_LAYOUT}
-                                        fetchData={fetchEventNotifications}
+                                        fetchEntities={fetchEventNotifications}
                                         keyFn={keyFn}
                                         bulkSelection={{ actions: <BulkActions /> }}
                                         columnRenderers={columnRenderers} />

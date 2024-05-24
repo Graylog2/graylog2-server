@@ -26,10 +26,10 @@ import type { EntityBase } from '../types';
 type Props<Entity extends EntityBase> = React.PropsWithChildren<{
   initialSelection?: Array<string>,
   onChangeSelection: (selectedEntities: Array<Entity['id']>, data: Readonly<Array<Entity>>) => void,
-  data: Readonly<Array<Entity>>,
+  entities: Readonly<Array<Entity>>,
 }>
 
-const SelectedEntitiesProvider = <Entity extends EntityBase>({ children, initialSelection, onChangeSelection, data }: Props<Entity>) => {
+const SelectedEntitiesProvider = <Entity extends EntityBase>({ children, initialSelection, onChangeSelection, entities }: Props<Entity>) => {
   const [selectedEntities, setSelectedEntities] = useState<Array<Entity['id']>>(initialSelection);
 
   const _setSelectedEntities = useCallback((setSelectedEntitiesArgument: SetStateAction<Array<Entity['id']>>) => {
@@ -38,9 +38,9 @@ const SelectedEntitiesProvider = <Entity extends EntityBase>({ children, initial
     setSelectedEntities(newState);
 
     if (onChangeSelection) {
-      onChangeSelection(newState, data);
+      onChangeSelection(newState, entities);
     }
-  }, [data, onChangeSelection, selectedEntities]);
+  }, [entities, onChangeSelection, selectedEntities]);
 
   const deselectEntity = useCallback((targetEntityId: EntityBase['id']) => (
     _setSelectedEntities((cur) => cur.filter((entityId) => entityId !== targetEntityId))

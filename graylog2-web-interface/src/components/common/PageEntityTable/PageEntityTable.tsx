@@ -46,9 +46,9 @@ type Props<T> = {
   bulkSelection?: React.ComponentProps<typeof EntityDataTable>['bulkSelection'],
   columnRenderers: React.ComponentProps<typeof EntityDataTable>['columnRenderers'],
   columnsOrder: React.ComponentProps<typeof EntityDataTable>['columnsOrder'],
-  entityActions: React.ComponentProps<typeof EntityDataTable>['rowActions'],
+  entityActions: React.ComponentProps<typeof EntityDataTable>['entityActions'],
   expandedSectionsRenderer?: React.ComponentProps<typeof EntityDataTable>['expandedSectionsRenderer'],
-  fetchData: (options: SearchParams) => Promise<PaginatedResponse<T>>,
+  fetchEntities: (options: SearchParams) => Promise<PaginatedResponse<T>>,
   filterValueRenderers?: React.ComponentProps<typeof EntityFilters>['filterValueRenderers'],
   humanName: string,
   keyFn: (options: SearchParams) => Array<unknown>,
@@ -72,7 +72,7 @@ const INITIAL_DATA = {
  * It should not be used when there are multiple entity tables on the page or when the table is rendered in a modal.
  */
 const PageEntityTable = <T extends EntityBase>({
-  actionsCellWidth, columnsOrder, entityActions, tableLayout, fetchData, keyFn,
+  actionsCellWidth, columnsOrder, entityActions, tableLayout, fetchEntities, keyFn,
   humanName, columnRenderers, queryHelpComponent, filterValueRenderers,
   expandedSectionsRenderer, bulkSelection, additionalAttributes,
   entityAttributesAreCamelCase, topRightCol,
@@ -95,7 +95,7 @@ const PageEntityTable = <T extends EntityBase>({
     data: paginatedEntities = INITIAL_DATA,
     isInitialLoading: isLoadingEntities,
     refetch,
-  } = useFetchEntities<T>({ fetchKey, searchParams: fetchOptions, enabled: !isLoadingLayoutPreferences, fetchData, humanName });
+  } = useFetchEntities<T>({ fetchKey, searchParams: fetchOptions, enabled: !isLoadingLayoutPreferences, fetchEntities, humanName });
 
   const onChangeFilters = useCallback((newUrlQueryFilters: UrlQueryFilters) => {
     paginationQueryParameter.resetPage();
@@ -149,7 +149,7 @@ const PageEntityTable = <T extends EntityBase>({
           {list?.length === 0 ? (
             <NoSearchResult>No {humanName} have been found.</NoSearchResult>
           ) : (
-            <EntityDataTable<T> data={list}
+            <EntityDataTable<T> entities={list}
                                 visibleColumns={layoutConfig.displayedAttributes}
                                 columnsOrder={columnsOrder}
                                 expandedSectionsRenderer={expandedSectionsRenderer}
@@ -159,7 +159,7 @@ const PageEntityTable = <T extends EntityBase>({
                                 onPageSizeChange={onPageSizeChange}
                                 pageSize={layoutConfig.pageSize}
                                 activeSort={layoutConfig.sort}
-                                rowActions={entityActions}
+                                entityActions={entityActions}
                                 actionsCellWidth={actionsCellWidth}
                                 columnRenderers={columnRenderers}
                                 columnDefinitions={columnDefinitions}

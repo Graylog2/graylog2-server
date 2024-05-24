@@ -82,7 +82,7 @@ const IndexSetFieldTypesList = () => {
                       onSubmitCallback={onSubmitCallback} />
   ), [indexSetId, onSubmitCallback]);
 
-  const bulkSection = useMemo(() => ({
+  const bulkSelection = useMemo(() => ({
     onChangeSelection: (selectedItemsIds: Array<string>, list: Array<IndexSetFieldType>) => {
       setSelectedEntitiesData((cur) => {
         const selectedItemsIdsSet = new Set(selectedItemsIds);
@@ -103,9 +103,9 @@ const IndexSetFieldTypesList = () => {
                                         entityActions={indexFieldTypeChangeAllowed && renderActions}
                                         tableLayout={DEFAULT_LAYOUT}
                                         topRightCol={indexFieldTypeChangeAllowed && <IndexSetProfile />}
-                                        fetchData={(searchParams) => fetchIndexSetFieldTypes(indexSetId, searchParams)}
+                                        fetchEntities={(searchParams) => fetchIndexSetFieldTypes(indexSetId, searchParams)}
                                         keyFn={keyFn}
-                                        bulkSelection={bulkSection}
+                                        bulkSelection={bulkSelection}
                                         expandedSectionsRenderer={expandedSections}
                                         filterValueRenderers={FilterValueRenderers}
                                         columnRenderers={customColumnRenderers} />

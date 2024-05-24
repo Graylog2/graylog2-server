@@ -52,7 +52,7 @@ const ProfilesList = () => {
                                                columnsOrder={COLUMNS_ORDER}
                                                entityActions={profileActions}
                                                tableLayout={DEFAULT_LAYOUT}
-                                               fetchData={fetchIndexSetFieldTypeProfiles}
+                                               fetchEntities={fetchIndexSetFieldTypeProfiles}
                                                keyFn={keyFn}
                                                expandedSectionsRenderer={expandedSectionsRenderer}
                                                columnRenderers={customColumnRenderers} />

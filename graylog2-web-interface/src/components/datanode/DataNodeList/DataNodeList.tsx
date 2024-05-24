@@ -86,7 +86,7 @@ const DataNodeList = () => (
                              )}
                              entityActions={entityActions}
                              tableLayout={DEFAULT_LAYOUT}
-                             fetchData={fetchDataNodes}
+                             fetchEntities={fetchDataNodes}
                              keyFn={keyFn}
                              columnRenderers={columnRenderers} />
 

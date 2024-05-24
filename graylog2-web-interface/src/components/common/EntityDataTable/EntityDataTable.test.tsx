@@ -55,7 +55,7 @@ describe('<EntityDataTable />', () => {
 
   it('should render selected columns and table headers', async () => {
     render(<EntityDataTable visibleColumns={visibleColumns}
-                            data={data}
+                            entities={data}
                             onColumnsChange={() => {}}
                             onSortChange={() => {}}
                             columnDefinitions={columnDefinitions} />);
@@ -72,7 +72,7 @@ describe('<EntityDataTable />', () => {
 
   it('should render default cell renderer', async () => {
     render(<EntityDataTable visibleColumns={visibleColumns}
-                            data={data}
+                            entities={data}
                             onSortChange={() => {}}
                             onColumnsChange={() => {}}
                             columnDefinitions={columnDefinitions} />);
@@ -83,7 +83,7 @@ describe('<EntityDataTable />', () => {
 
   it('should render custom cell and header renderer', async () => {
     render(<EntityDataTable visibleColumns={visibleColumns}
-                            data={data}
+                            entities={data}
                             onSortChange={() => {}}
                             onColumnsChange={() => {}}
                             columnRenderers={{
@@ -102,7 +102,7 @@ describe('<EntityDataTable />', () => {
 
   it('should merge attribute and type column renderers renderer', async () => {
     render(<EntityDataTable visibleColumns={visibleColumns}
-                            data={data}
+                            entities={data}
                             onSortChange={() => {}}
                             onColumnsChange={() => {}}
                             columnRenderers={{
@@ -128,10 +128,10 @@ describe('<EntityDataTable />', () => {
 
   it('should render row actions', async () => {
     render(<EntityDataTable<{ id: string, title: string }> visibleColumns={visibleColumns}
-                                                           data={data}
+                                                           entities={data}
                                                            onSortChange={() => {}}
                                                            onColumnsChange={() => {}}
-                                                           rowActions={(row) => `Custom actions for ${row.title}`}
+                                                           entityActions={(entity) => `Custom actions for ${entity.title}`}
                                                            columnDefinitions={columnDefinitions} />);
 
     await screen.findByText('Custom actions for Entity title');
@@ -141,7 +141,7 @@ describe('<EntityDataTable />', () => {
     asMock(useCurrentUser).mockReturnValue(defaultUser.toBuilder().permissions(Immutable.List()).build());
 
     render(<EntityDataTable visibleColumns={visibleColumns}
-                            data={data}
+                            entities={data}
                             onSortChange={() => {}}
                             onColumnsChange={() => {}}
                             columnDefinitions={columnDefinitions} />);
@@ -152,7 +152,7 @@ describe('<EntityDataTable />', () => {
 
   it('should display active sort', async () => {
     render(<EntityDataTable visibleColumns={visibleColumns}
-                            data={data}
+                            entities={data}
                             onSortChange={() => {}}
                             onColumnsChange={() => {}}
                             activeSort={{
@@ -168,7 +168,7 @@ describe('<EntityDataTable />', () => {
     const onSortChange = jest.fn();
 
     render(<EntityDataTable visibleColumns={visibleColumns}
-                            data={data}
+                            entities={data}
                             onSortChange={onSortChange}
                             onColumnsChange={() => {}}
                             columnDefinitions={columnDefinitions} />);
@@ -192,7 +192,7 @@ describe('<EntityDataTable />', () => {
     asMock(useCurrentUser).mockReturnValue(defaultUser.toBuilder().permissions(Immutable.List()).build());
 
     render(<EntityDataTable visibleColumns={visibleColumns}
-                            data={data}
+                            entities={data}
                             onSortChange={() => {}}
                             onColumnsChange={() => {}}
                             bulkSelection={{ actions: <BulkActions /> }}
@@ -214,7 +214,7 @@ describe('<EntityDataTable />', () => {
     asMock(useCurrentUser).mockReturnValue(defaultUser.toBuilder().permissions(Immutable.List()).build());
 
     render(<EntityDataTable visibleColumns={visibleColumns}
-                            data={data}
+                            entities={data}
                             onSortChange={() => {}}
                             onColumnsChange={() => {}}
                             bulkSelection={{ actions: <div /> }}
@@ -240,7 +240,7 @@ describe('<EntityDataTable />', () => {
     const onColumnsChange = jest.fn();
 
     render(<EntityDataTable visibleColumns={['description', 'status']}
-                            data={data}
+                            entities={data}
                             onSortChange={() => {}}
                             onColumnsChange={onColumnsChange}
                             columnDefinitions={columnDefinitions} />);
@@ -264,7 +264,7 @@ describe('<EntityDataTable />', () => {
     ];
 
     render(<EntityDataTable visibleColumns={[...visibleColumns, 'created_at']}
-                            data={dataWithCamelCaseAttributes}
+                            entities={dataWithCamelCaseAttributes}
                             onSortChange={() => {}}
                             onColumnsChange={() => {}}
                             columnRenderers={{
