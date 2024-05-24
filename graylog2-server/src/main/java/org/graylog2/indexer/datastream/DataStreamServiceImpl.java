@@ -44,7 +44,7 @@ public class DataStreamServiceImpl implements DataStreamService {
     public DataStreamServiceImpl(DataStreamAdapter dataStreamAdapter,
                                  IndexFieldTypesService indexFieldTypesService,
                                  IndexSetDefaultTemplateService indexSetDefaultTemplateService) {
-        this(dataStreamAdapter, indexFieldTypesService, indexSetDefaultTemplateService.createDefaultConfig().replicas());
+        this(dataStreamAdapter, indexFieldTypesService, indexSetDefaultTemplateService.getOrCreateDefaultConfig().replicas());
     }
 
     public DataStreamServiceImpl(DataStreamAdapter dataStreamAdapter, IndexFieldTypesService indexFieldTypesService,

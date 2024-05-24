@@ -29,14 +29,10 @@ import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.joda.time.Duration;
 
-import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_TYPE_REFRESH_INTERVAL;
-
 @JsonAutoDetect
 @AutoValue
 @JsonDeserialize(builder = IndexSetTemplateConfig.Builder.class)
 public abstract class IndexSetTemplateConfig implements SimpleIndexSetConfig {
-
-    public static final String FIELD_USE_LEGACY_ROTATION = "use_legacy_rotation";
 
     public static Builder builder() {
         return Builder.create();
@@ -83,16 +79,16 @@ public abstract class IndexSetTemplateConfig implements SimpleIndexSetConfig {
         public abstract Builder rotationStrategyClass(String rotationStrategyClass);
 
         @JsonProperty(FIELD_ROTATION_STRATEGY)
-        public abstract Builder rotationStrategy(RotationStrategyConfig rotationStrategyConfig) ;
+        public abstract Builder rotationStrategyConfig(RotationStrategyConfig rotationStrategyConfig);
 
         @JsonProperty(FIELD_RETENTION_STRATEGY_CLASS)
         public abstract Builder retentionStrategyClass(String retentionStrategyClass);
 
         @JsonProperty(FIELD_RETENTION_STRATEGY)
-        public abstract Builder retentionStrategy(RetentionStrategyConfig retentionStrategyConfig);
+        public abstract Builder retentionStrategyConfig(RetentionStrategyConfig retentionStrategyConfig);
 
         @JsonProperty(FIELD_DATA_TIERING)
-        public abstract Builder dataTiering(DataTieringConfig dataTiering);
+        public abstract Builder dataTieringConfig(DataTieringConfig dataTiering);
 
         @JsonProperty(FIELD_USE_LEGACY_ROTATION)
         public abstract Builder useLegacyRotation(boolean useLegacyRotation);

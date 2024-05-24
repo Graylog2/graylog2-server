@@ -30,7 +30,7 @@ public class EnterprisePluginRequirement implements IndexSetTemplateRequirement 
 
     @Override
     public Result check(IndexSetTemplate indexSetTemplate) {
-        if (indexSetTemplate.indexSetConfig().dataTiering() instanceof FallbackDataTieringConfig) {
+        if (indexSetTemplate.indexSetConfig().dataTieringConfig() instanceof FallbackDataTieringConfig) {
             return new Result(false, TEXT);
         }
         return new Result(true, "");

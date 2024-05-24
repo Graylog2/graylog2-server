@@ -109,8 +109,8 @@ class TimeBasedSizeOptimizingRotationAndRetentionTest {
                 .indexTemplateName(elasticsearchConfiguration.getDefaultIndexTemplateName())
                 .indexOptimizationMaxNumSegments(elasticsearchConfiguration.getIndexOptimizationMaxNumSegments())
                 .indexOptimizationDisabled(elasticsearchConfiguration.isDisableIndexOptimization())
-                .rotationStrategy(rotationStrategyConfig)
-                .retentionStrategy(deletionRetention)
+                .rotationStrategyConfig(rotationStrategyConfig)
+                .retentionStrategyConfig(deletionRetention)
                 .build(), clock);
 
         lenient().when(indices.indexCreationDate(anyString())).thenAnswer(a -> {

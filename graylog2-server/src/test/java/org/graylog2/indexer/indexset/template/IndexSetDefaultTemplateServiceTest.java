@@ -17,7 +17,6 @@
 package org.graylog2.indexer.indexset.template;
 
 import org.graylog2.audit.AuditEventSender;
-import org.graylog2.configuration.IndexSetDefaultTemplateConfigFactory;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.junit.jupiter.api.Test;
@@ -40,8 +39,6 @@ class IndexSetDefaultTemplateServiceTest {
     private ClusterConfigService clusterConfigService;
     @Mock
     private IndexSetTemplateService indexSetTemplateService;
-    @Mock
-    private IndexSetDefaultTemplateConfigFactory indexSetDefaultTemplateConfigFactory;
     @Mock
     private AuditEventSender auditEventSender;
     @Mock

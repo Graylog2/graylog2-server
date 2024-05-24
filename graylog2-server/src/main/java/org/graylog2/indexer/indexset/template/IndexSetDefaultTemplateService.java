@@ -57,7 +57,7 @@ public class IndexSetDefaultTemplateService {
                 .flatMap(indexSetDefaultTemplate -> indexSetTemplateService.get(indexSetDefaultTemplate.id()));
     }
 
-    public IndexSetTemplateConfig createDefaultConfig() {
+    public IndexSetTemplateConfig getOrCreateDefaultConfig() {
         return getDefaultIndexSetTemplate()
                 .map(IndexSetTemplate::indexSetConfig)
                 .orElse(createDefault());

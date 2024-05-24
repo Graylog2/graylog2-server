@@ -26,7 +26,7 @@ import org.graylog2.indexer.TestIndexSet;
 import org.graylog2.indexer.indexset.CustomFieldMapping;
 import org.graylog2.indexer.indexset.CustomFieldMappings;
 import org.graylog2.indexer.indexset.IndexSetConfig;
-import org.graylog2.indexer.indexset.TemplateIndexSetConfig;
+import org.graylog2.indexer.indexset.IndexSetMappingTemplate;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
@@ -165,7 +165,7 @@ class IndicesTest {
         underTest.getIndexTemplate(testIndexSet);
 
         verify(indexMappingTemplateMock).toTemplate(
-                new TemplateIndexSetConfig("standard", "test_*",
+                new IndexSetMappingTemplate("standard", "test_*",
                         new CustomFieldMappings(List.of(
                                 new CustomFieldMapping("f1", "string"), //from individual custom mapping
                                 new CustomFieldMapping("f2", "long"), //from individual custom mapping
@@ -196,7 +196,7 @@ class IndicesTest {
         underTest.getIndexTemplate(testIndexSet);
 
         verify(indexMappingTemplateMock).toTemplate(
-                new TemplateIndexSetConfig("standard", "test_*",
+                new IndexSetMappingTemplate("standard", "test_*",
                         individualCustomFieldMappings)
         );
     }
@@ -217,7 +217,7 @@ class IndicesTest {
         underTest.getIndexTemplate(testIndexSet);
 
         verify(indexMappingTemplateMock).toTemplate(
-                new TemplateIndexSetConfig("standard", "test_*",
+                new IndexSetMappingTemplate("standard", "test_*",
                         individualCustomFieldMappings)
         );
     }
@@ -246,7 +246,7 @@ class IndicesTest {
         underTest.buildTemplate(testIndexSet, testIndexSet.getConfig());
 
         verify(indexMappingTemplateMock).toTemplate(
-                new TemplateIndexSetConfig("standard", "test_*",
+                new IndexSetMappingTemplate("standard", "test_*",
                         new CustomFieldMappings(List.of(
                                 new CustomFieldMapping("f1", "string"), //from individual custom mapping
                                 new CustomFieldMapping("f2", "long"), //from individual custom mapping
@@ -270,9 +270,9 @@ class IndicesTest {
                 .shards(1)
                 .replicas(0)
                 .rotationStrategyClass(MessageCountRotationStrategy.class.getCanonicalName())
-                .rotationStrategy(MessageCountRotationStrategyConfig.createDefault())
+                .rotationStrategyConfig(MessageCountRotationStrategyConfig.createDefault())
                 .retentionStrategyClass(DeletionRetentionStrategy.class.getCanonicalName())
-                .retentionStrategy(DeletionRetentionStrategyConfig.createDefault())
+                .retentionStrategyConfig(DeletionRetentionStrategyConfig.createDefault())
                 .indexAnalyzer("standard")
                 .indexTemplateName(indexTemplaNameName)
                 .indexTemplateType(indexTemplateType)

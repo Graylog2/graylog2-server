@@ -240,7 +240,7 @@ public class IndexSetsResource extends RestResource {
     public IndexSetSummary save(@ApiParam(name = "Index set configuration", required = true)
                                 @Valid @NotNull IndexSetSummary indexSet) {
         try {
-            checkDataTieringNotNull(indexSet.useLegacyRotation(), indexSet.dataTiering());
+            checkDataTieringNotNull(indexSet.useLegacyRotation(), indexSet.dataTieringConfig());
             final IndexSetConfig indexSetConfig = indexSet.toIndexSetConfig(true);
 
             final Optional<Violation> violation = indexSetValidator.validate(indexSetConfig);
@@ -281,7 +281,7 @@ public class IndexSetsResource extends RestResource {
             throw new ClientErrorException("Default index set must be writable.", Response.Status.CONFLICT);
         }
 
-        checkDataTieringNotNull(updateRequest.useLegacyRotation(), updateRequest.dataTiering());
+        checkDataTieringNotNull(updateRequest.useLegacyRotation(), updateRequest.dataTieringConfig());
 
         final IndexSetConfig indexSetConfig = updateRequest.toIndexSetConfig(id, oldConfig);
 

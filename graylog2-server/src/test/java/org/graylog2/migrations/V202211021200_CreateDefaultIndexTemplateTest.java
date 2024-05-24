@@ -122,7 +122,7 @@ class V202211021200_CreateDefaultIndexTemplateTest {
         mockLifeTimeDaysElasticConfig();
         when(clusterConfigService.get(IndexSetsDefaultConfiguration.class)).thenReturn(readLegacyConfig(CONFIG_WITHOUT_DATA_TIERING));
         IndexSetTemplateConfig defaultConfiguration = readConfig(CONFIG_WITHOUT_DATA_TIERING).toBuilder()
-                .dataTiering(HotOnlyDataTieringConfig.builder()
+                .dataTieringConfig(HotOnlyDataTieringConfig.builder()
                         .indexLifetimeMin(MIN_LIFETIME_DAYS)
                         .indexLifetimeMax(MAX_LIFETIME_DAYS)
                         .build())

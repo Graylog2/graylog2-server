@@ -42,11 +42,11 @@ public class IndexSetConfigFactory {
     }
 
     private static DataTieringConfig getDataTieringConfig(IndexSetTemplateConfig defaultConfig) {
-        return defaultConfig.useLegacyRotation() ? null : defaultConfig.dataTiering();
+        return defaultConfig.useLegacyRotation() ? null : defaultConfig.dataTieringConfig();
     }
 
     public IndexSetConfig.Builder createDefault() {
-        IndexSetTemplateConfig defaultConfig = indexSetDefaultTemplateService.createDefaultConfig();
+        IndexSetTemplateConfig defaultConfig = indexSetDefaultTemplateService.getOrCreateDefaultConfig();
 
         return IndexSetConfig.builder()
                 .creationDate(getCreationDate())
@@ -57,9 +57,9 @@ public class IndexSetConfigFactory {
                 .indexOptimizationMaxNumSegments(defaultConfig.indexOptimizationMaxNumSegments())
                 .fieldTypeRefreshInterval(defaultConfig.fieldTypeRefreshInterval())
                 .rotationStrategyClass(defaultConfig.rotationStrategyClass())
-                .rotationStrategy(defaultConfig.rotationStrategy())
+                .rotationStrategyConfig(defaultConfig.rotationStrategyConfig())
                 .retentionStrategyClass(defaultConfig.retentionStrategyClass())
-                .retentionStrategy(defaultConfig.retentionStrategy())
-                .dataTiering(dataTieringChecker.isEnabled() ? getDataTieringConfig(defaultConfig) : null);
+                .retentionStrategyConfig(defaultConfig.retentionStrategyConfig())
+                .dataTieringConfig(dataTieringChecker.isEnabled() ? getDataTieringConfig(defaultConfig) : null);
     }
 }

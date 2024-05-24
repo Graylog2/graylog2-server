@@ -25,8 +25,6 @@ import org.joda.time.Duration;
 
 import javax.annotation.Nullable;
 
-import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_TYPE_REFRESH_INTERVAL;
-
 public interface SimpleIndexSetConfig {
 
     Duration DEFAULT_FIELD_TYPE_REFRESH_INTERVAL = Duration.standardSeconds(5L);
@@ -43,6 +41,13 @@ public interface SimpleIndexSetConfig {
     String FIELD_INDEX_OPTIMIZATION_MAX_NUM_SEGMENTS = "index_optimization_max_num_segments";
     String FIELD_INDEX_OPTIMIZATION_DISABLED = "index_optimization_disabled";
     String FIELD_DATA_TIERING = "data_tiering";
+    String INDEX_PREFIX_REGEX = "^[a-z0-9][a-z0-9_+-]*$";
+    String FIELD_INDEX_PREFIX = "index_prefix";
+    String FIELD_CREATION_DATE = "creation_date";
+    String FIELD_INDEX_TEMPLATE_TYPE = "index_template_type";
+    String FIELD_TYPE_REFRESH_INTERVAL = "field_type_refresh_interval";
+    String FIELD_USE_LEGACY_ROTATION = "use_legacy_rotation";
+    String FIELD_PROFILE_ID = "field_type_profile";
 
     @Min(1)
     @JsonProperty(FIELD_SHARDS)
@@ -68,7 +73,7 @@ public interface SimpleIndexSetConfig {
 
     @Nullable
     @JsonProperty(FIELD_ROTATION_STRATEGY)
-    RotationStrategyConfig rotationStrategy();
+    RotationStrategyConfig rotationStrategyConfig();
 
     @Nullable
     @JsonProperty(FIELD_RETENTION_STRATEGY_CLASS)
@@ -76,10 +81,10 @@ public interface SimpleIndexSetConfig {
 
     @Nullable
     @JsonProperty(FIELD_RETENTION_STRATEGY)
-    RetentionStrategyConfig retentionStrategy();
+    RetentionStrategyConfig retentionStrategyConfig();
 
     @Nullable
     @JsonProperty(FIELD_DATA_TIERING)
-    DataTieringConfig dataTiering();
+    DataTieringConfig dataTieringConfig();
 
 }

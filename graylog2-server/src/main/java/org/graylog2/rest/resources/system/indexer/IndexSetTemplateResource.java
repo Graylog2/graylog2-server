@@ -103,7 +103,7 @@ public class IndexSetTemplateResource extends RestResource {
     @NoAuditEvent("No change to the DB")
     @ApiOperation(value = "Gets default template")
     public IndexSetTemplateConfig getDefaultConfig() {
-        return indexSetDefaultTemplateService.createDefaultConfig();
+        return indexSetDefaultTemplateService.getOrCreateDefaultConfig();
     }
 
     @GET
@@ -170,7 +170,7 @@ public class IndexSetTemplateResource extends RestResource {
     }
 
     private void validateConfig(IndexSetTemplateConfig config) {
-        IndexSetValidator.Violation violation = indexSetValidator.checkDataTieringNotNull(config.useLegacyRotation(), config.dataTiering());
+        IndexSetValidator.Violation violation = indexSetValidator.checkDataTieringNotNull(config.useLegacyRotation(), config.dataTieringConfig());
         if (violation != null) {
             throw new BadRequestException(violation.message());
         }
@@ -187,14 +187,11 @@ public class IndexSetTemplateResource extends RestResource {
 
         if (config.useLegacyRotation()) {
             violation = indexSetValidator.validateStrategyFields(config);
-            if (violation != null) {
-                throw new BadRequestException(violation.message());
-            }
         } else {
-            violation = indexSetValidator.validateDataTieringConfig(config.dataTiering());
-            if (violation != null) {
-                throw new BadRequestException(violation.message());
-            }
+            violation = indexSetValidator.validateDataTieringConfig(config.dataTieringConfig());
+        }
+        if (violation != null) {
+            throw new BadRequestException(violation.message());
         }
     }
 

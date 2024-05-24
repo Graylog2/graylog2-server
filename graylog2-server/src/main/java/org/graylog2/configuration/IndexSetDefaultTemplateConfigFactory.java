@@ -51,11 +51,11 @@ public class IndexSetDefaultTemplateConfigFactory {
                 .indexOptimizationMaxNumSegments(elasticsearchConfiguration.getIndexOptimizationMaxNumSegments())
                 .fieldTypeRefreshInterval(SimpleIndexSetConfig.DEFAULT_FIELD_TYPE_REFRESH_INTERVAL)
                 .rotationStrategyClass(rotationConfig.left)
-                .rotationStrategy(rotationConfig.right)
+                .rotationStrategyConfig(rotationConfig.right)
                 .retentionStrategyClass(retentionConfig.left)
-                .retentionStrategy(retentionConfig.right)
+                .retentionStrategyConfig(retentionConfig.right)
                 .useLegacyRotation(false)
-                .dataTiering(maintenanceStrategiesHelper.defaultDataTieringConfig())
+                .dataTieringConfig(maintenanceStrategiesHelper.defaultDataTieringConfig())
                 .build();
     }
 
