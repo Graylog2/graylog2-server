@@ -45,7 +45,7 @@ jest.mock('stores/users/CurrentUserStore', () => ({
   ),
 }));
 
-jest.mock('views/components/dashboard/hooks/useDashboards', () => () => ({
+jest.mock('components/common/PageEntityTable/useFetchEntities', () => () => ({
   data: {
     list: [],
     pagination: { total: 0 },
