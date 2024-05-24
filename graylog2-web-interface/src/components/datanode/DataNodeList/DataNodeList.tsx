@@ -39,7 +39,6 @@ const DEFAULT_LAYOUT = {
 const COLUMNS_ORDER = ['hostname', 'transport_address', 'status', 'is_leader', 'cert_valid_until'];
 
 const additionalAttributes = [
-  { id: 'hostname', title: 'Name', sortable: true, permissions: [] },
   { id: 'transport_address', title: 'Transport address' },
   { id: 'status', title: 'Status', sortable: false },
   { id: 'cert_valid_until', title: 'Certificate valid until', sortable: false },
