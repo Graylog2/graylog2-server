@@ -18,10 +18,9 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 
 import { type Stream } from 'stores/streams/StreamsStore';
-import SectionComponent from 'components/common/Section/SectionComponent';
 import { Table } from 'components/bootstrap';
 import DetailsStreamRule from 'components/streamrules/DetailsStreamRule';
-import { IfPermitted } from 'components/common';
+import { IfPermitted, Section } from 'components/common';
 import CreateStreamRuleButton from 'components/streamrules/CreateStreamRuleButton';
 
 type Props = {
@@ -37,8 +36,8 @@ const StreamDataRoutingInstake = ({ stream }: Props) => {
   const hasStreamRules = !!stream.rules?.length;
 
   return (
-    <SectionComponent title="Stream rules"
-                      headerActions={(
+    <Section title="Stream rules"
+                      actions={(
                         <IfPermitted permissions="streams:create">
                           <CreateStreamRuleButton bsStyle="success"
                                                   streamId={stream.id} />
@@ -64,7 +63,7 @@ const StreamDataRoutingInstake = ({ stream }: Props) => {
           )}
         </tbody>
       </Table>
-    </SectionComponent>
+    </Section>
   );
 };
 

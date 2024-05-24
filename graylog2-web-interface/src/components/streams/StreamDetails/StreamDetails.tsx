@@ -18,6 +18,8 @@ import type { Stream } from 'stores/streams/StreamsStore';
 import StreamDataRoutingIntake from './StreamDataRoutingIntake';
 import StreamDataRoutingProcessing from './StreamDataRoutingProcessing';
 import StreamDataRoutingDestinations from './StreamDataRoutingDestinations';
+import SectionGrid from 'components/common/Section/SectionGrid';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 type Props = {
   stream: Stream,
@@ -86,11 +88,17 @@ const FullHeightCol = styled(Col)`
   height: 100%;
 `;
 
+const StyledSectionGrid = styled(SectionGrid)`
+  align-items: center;
+`;
 const StreamDetails = ({ stream }: Props) => {
   const navigate = useNavigate();
   const [currentSegment, setCurrentSegment] = useState<DetailsSegments>(INTAKE_SEGMENT);
+  const DataWarehouseJobComponent = PluginStore.exports('dataWarehouse')?.[0]?.DataWarehouseJobs;
 
   return (
+    <>
+    <DataWarehouseJobComponent />
     <Container>
       <Header>
         <LeftCol>
@@ -107,29 +115,30 @@ const StreamDetails = ({ stream }: Props) => {
           </IfPermitted>
         </LeftCol>
         <RightCol>
-          Right
         </RightCol>
       </Header>
 
       <Row className="content no-bm">
         <Col xs={12}>
-          <h3>Data Routing</h3>
-          <MainDetailsRow>
-            <SegmentedControl<DetailsSegments> data={SEGMENTS_DETAILS}
-                                               value={currentSegment}
-                                               onChange={setCurrentSegment} />
-          </MainDetailsRow>
+          <StyledSectionGrid $columns='1fr 8fr'>
+            <h3>Data Routing</h3>
+            <MainDetailsRow>
+              <SegmentedControl<DetailsSegments> data={SEGMENTS_DETAILS}
+                                                value={currentSegment}
+                                                onChange={setCurrentSegment} />
+            </MainDetailsRow>
+          </StyledSectionGrid>
         </Col>
       </Row>
       <SegmentContainer className="content">
         <FullHeightCol xs={12}>
           {currentSegment === INTAKE_SEGMENT && <StreamDataRoutingIntake stream={stream} />}
           {currentSegment === PROCESSING_SEGMENT && <StreamDataRoutingProcessing />}
-          {currentSegment === DESTINATIONS_SEGMENT && <StreamDataRoutingDestinations />}
+          {currentSegment === DESTINATIONS_SEGMENT && <StreamDataRoutingDestinations stream={stream}/>}
         </FullHeightCol>
       </SegmentContainer>
     </Container>
-
+    </>
   );
 };
 

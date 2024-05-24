@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useState, useCallback } from 'react';
 
 import { ShareButton, IfPermitted, HoverForHelp } from 'components/common';
-import { ButtonToolbar, MenuItem } from 'components/bootstrap';
+import { Button, ButtonToolbar, MenuItem } from 'components/bootstrap';
 import type { Stream, StreamRule } from 'stores/streams/StreamsStore';
 import StreamsStore from 'stores/streams/StreamsStore';
 import Routes from 'routing/Routes';
@@ -36,6 +36,7 @@ import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSele
 import MoreActions from 'components/common/EntityDataTable/MoreActions';
 
 import StreamModal from '../StreamModal';
+import { LinkContainer } from 'components/common/router';
 
 const DefaultStreamHelp = () => (
   <HoverForHelp displayLeftMargin>Action not available for the default
@@ -155,6 +156,9 @@ const StreamActions = ({
 
   return (
     <ButtonToolbar>
+      <LinkContainer to={Routes.stream_view(stream.id)}>
+        <Button bsStyle="default" bsSize='xsmall'>View details</Button>
+      </LinkContainer>
       <ShareButton entityId={stream.id}
                    entityType="stream"
                    onClick={toggleEntityShareModal}

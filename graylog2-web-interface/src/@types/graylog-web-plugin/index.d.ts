@@ -171,6 +171,7 @@ interface PluginDataWarehouse {
     }
   }>,
   StreamDataWarehouse: React.ComponentType<{}>,
+  DataWarehouseJobs: React.ComponentType<{}>,
 }
 
 
