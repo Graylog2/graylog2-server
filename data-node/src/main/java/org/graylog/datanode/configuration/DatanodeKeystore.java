@@ -19,8 +19,13 @@ package org.graylog.datanode.configuration;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.KeyPair;
 import org.graylog.security.certutil.cert.CertificateChain;
+import org.graylog.security.certutil.csr.CsrGenerator;
+import org.graylog.security.certutil.csr.InMemoryKeystoreInformation;
+import org.graylog.security.certutil.csr.exceptions.CSRGenerationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +40,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.util.List;
 
 import static org.graylog.security.certutil.CertConstants.PKCS12;
 
@@ -49,7 +55,11 @@ public class DatanodeKeystore {
 
     @Inject
     public DatanodeKeystore(DatanodeConfiguration configuration, final @Named("password_secret") String passwordSecret) {
-        this.datanodeDirectories = configuration.datanodeDirectories();
+        this(configuration.datanodeDirectories(),  passwordSecret);
+    }
+
+    DatanodeKeystore(DatanodeDirectories datanodeDirectories, String passwordSecret) {
+        this.datanodeDirectories = datanodeDirectories;
         this.passwordSecret = passwordSecret;
     }
 
@@ -113,5 +123,10 @@ public class DatanodeKeystore {
         } catch (IOException | CertificateException | KeyStoreException | NoSuchAlgorithmException e) {
             throw new DatanodeKeystoreException(e);
         }
+    }
+
+    public PKCS10CertificationRequest createCertificateSigningRequest(String hostname, List<String> altNames) throws DatanodeKeystoreException, CSRGenerationException {
+        final InMemoryKeystoreInformation keystore = new InMemoryKeystoreInformation(loadKeystore(), passwordSecret.toCharArray());
+        return CsrGenerator.generateCSR(keystore, CertConstants.DATANODE_KEY_ALIAS, hostname, altNames);
     }
 }

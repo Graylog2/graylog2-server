@@ -45,16 +45,16 @@ public class CsrGenerator {
      * @param altNames List of alternative names to be stored in CSR
      * @return A new CSR, instance of {@link PKCS10CertificationRequest}
      */
-    public PKCS10CertificationRequest generateCSR(KeystoreInformation keystoreInformation,
-                                                  final String principalName,
-                                                  final List<String> altNames) throws CSRGenerationException {
+    public static PKCS10CertificationRequest generateCSR(KeystoreInformation keystoreInformation, String alias,
+                                                         final String principalName,
+                                                         final List<String> altNames) throws CSRGenerationException {
         try {
 
             final KeyStore keystore = keystoreInformation.loadKeystore();
 
             final var p10Builder = new JcaPKCS10CertificationRequestBuilder(
                     new X500Principal("CN=" + principalName),
-                    keystore.getCertificate("datanode").getPublicKey()
+                    keystore.getCertificate(alias).getPublicKey()
             );
 
             final var names = new ArrayList<>(List.of(principalName));
@@ -76,7 +76,7 @@ public class CsrGenerator {
                     new Extensions(subjectAltNames));
 
             JcaContentSignerBuilder csBuilder = new JcaContentSignerBuilder(SIGNING_ALGORITHM);
-            ContentSigner signer = csBuilder.build((PrivateKey) keystore.getKey("datanode", keystoreInformation.password()));
+            ContentSigner signer = csBuilder.build((PrivateKey) keystore.getKey(alias, keystoreInformation.password()));
             return p10Builder.build(signer);
 
         } catch (Exception e) {

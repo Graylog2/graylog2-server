@@ -20,6 +20,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.graylog.security.certutil.CaService;
+import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.CertRequest;
 import org.graylog.security.certutil.CertificateGenerator;
 import org.graylog.security.certutil.KeyPair;
@@ -31,20 +32,17 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
 import java.util.List;
 
 import static org.graylog.security.certutil.CertConstants.CA_KEY_ALIAS;
+import static org.graylog.security.certutil.CertConstants.DATANODE_KEY_ALIAS;
 
 public class ClientCertGenerator {
     private final CaService caService;
     private final String passwordSecret;
-    private final CsrGenerator csrGenerator;
     private final CsrSigner csrSigner;
     private final ClusterConfigService clusterConfigService;
     private final SecurityAdapter securityAdapter;
@@ -52,13 +50,11 @@ public class ClientCertGenerator {
     @Inject
     public ClientCertGenerator(final CaService caService,
                                @Named("password_secret") final String passwordSecret,
-                               final CsrGenerator csrGenerator,
                                final CsrSigner csrSigner,
                                final ClusterConfigService clusterConfigService,
                                final SecurityAdapter securityAdapter) {
         this.caService = caService;
         this.passwordSecret = passwordSecret;
-        this.csrGenerator = csrGenerator;
         this.csrSigner = csrSigner;
         this.clusterConfigService = clusterConfigService;
         this.securityAdapter = securityAdapter;
@@ -72,22 +68,16 @@ public class ClientCertGenerator {
 
             final KeyStore caKeystore = caService.loadKeyStore().orElseThrow(()-> new IllegalStateException("No CA configured"));
 
-            var caPrivateKey = (PrivateKey) caKeystore.getKey(CA_KEY_ALIAS, passwordSecret.toCharArray());
+            final char[] keystorePAss = passwordSecret.toCharArray();
+            var caPrivateKey = (PrivateKey) caKeystore.getKey(CA_KEY_ALIAS, keystorePAss);
             var caCertificate = (X509Certificate) caKeystore.getCertificate(CA_KEY_ALIAS);
 
             final KeyPair keyPair = CertificateGenerator.generate(CertRequest.selfSigned(principal).isCA(false).validity(Duration.ofDays(10 * 365)));
 
-            var csr = csrGenerator.generateCSR(new KeystoreInformation() {
-                @Override
-                public KeyStore loadKeystore() throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException {
-                    return keyPair.toKeystore("datanode", passwordSecret.toCharArray());
-                }
 
-                @Override
-                public char[] password() {
-                    return privateKeyPassword;
-                }
-            }, principal, List.of(principal));
+            final KeyStore keystore = keyPair.toKeystore(CertConstants.DATANODE_KEY_ALIAS, keystorePAss);
+            final InMemoryKeystoreInformation keystoreInformation = new InMemoryKeystoreInformation(keystore, keystorePAss);
+            var csr = CsrGenerator.generateCSR(keystoreInformation, CertConstants.DATANODE_KEY_ALIAS, principal, List.of(principal));
 
             var cert = csrSigner.sign(caPrivateKey, caCertificate, csr, renewalPolicy);
 

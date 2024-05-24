@@ -45,14 +45,12 @@ public class CertutilCsr implements CliCommand {
 
     private final CommandLineConsole console;
     private final CsrStorage csrStorage;
-    private final CsrGenerator csrGenerator;
 
     public static final CommandLineConsole.Prompt PROMPT_ENTER_PASSWORD_TO_PROTECT_YOUR_PRIVATE_KEY = CommandLineConsole.prompt("Enter password to protect your private key : ");
 
     public CertutilCsr() {
         this.console = new SystemConsole();
         this.csrStorage = new CsrFileStorage(csrFilename);
-        this.csrGenerator = new CsrGenerator();
     }
 
     public CertutilCsr(final Path keystore,
@@ -62,7 +60,6 @@ public class CertutilCsr implements CliCommand {
         this.csrFilename = csrFilename;
         this.console = console;
         this.csrStorage = new CsrFileStorage(csrFilename);
-        this.csrGenerator = new CsrGenerator();
     }
 
     @Override
@@ -80,8 +77,9 @@ public class CertutilCsr implements CliCommand {
             final FilesystemKeystoreInformation keystoreInformation = new FilesystemKeystoreInformation(this.keystore, privKeyPassword);
 
             console.printLine("Generating CSR for the datanode");
-            final PKCS10CertificationRequest csr = csrGenerator.generateCSR(
+            final PKCS10CertificationRequest csr = CsrGenerator.generateCSR(
                     keystoreInformation,
+                    CertConstants.DATANODE_KEY_ALIAS,
                     "localhost",
                     List.of("data-node"));
             csrStorage.writeCsr(csr);
