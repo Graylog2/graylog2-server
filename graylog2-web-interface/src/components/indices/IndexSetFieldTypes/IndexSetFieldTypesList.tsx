@@ -107,6 +107,7 @@ const IndexSetFieldTypesList = () => {
                                         keyFn={keyFn}
                                         bulkSelection={bulkSelection}
                                         expandedSectionsRenderer={expandedSections}
+                                        entityAttributesAreCamelCase
                                         filterValueRenderers={FilterValueRenderers}
                                         columnRenderers={customColumnRenderers} />
   );

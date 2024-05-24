@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import { useMemo } from 'react';
 
 import type { SearchParams, Attribute } from 'stores/PaginationTypes';
@@ -40,10 +39,6 @@ const TableFetchContextProvider = ({ children, searchParams, refetch, attributes
       {children}
     </TableFetchContext.Provider>
   );
-};
-
-TableFetchContextProvider.propTypes = {
-  children: PropTypes.node.isRequired,
 };
 
 export default TableFetchContextProvider;

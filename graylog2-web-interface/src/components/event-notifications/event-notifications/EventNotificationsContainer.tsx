@@ -87,6 +87,7 @@ const EventNotificationsContainer = () => {
                                         fetchEntities={fetchEventNotifications}
                                         keyFn={keyFn}
                                         bulkSelection={{ actions: <BulkActions /> }}
+                                        entityAttributesAreCamelCase
                                         columnRenderers={columnRenderers} />
   );
 };

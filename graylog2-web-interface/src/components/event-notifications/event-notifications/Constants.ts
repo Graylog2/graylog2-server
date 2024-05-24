@@ -16,7 +16,6 @@
  */
 import type { Sort } from 'stores/PaginationTypes';
 
-export const ENTITY_TABLE_ID = 'event_notifications';
 export const DEFAULT_LAYOUT = {
   entityTableId: 'event_notifications',
   defaultPageSize: 20,

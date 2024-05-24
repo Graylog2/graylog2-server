@@ -45,6 +45,7 @@ const DashboardsOverview = ({ isEvidenceModal }: Props) => {
                            tableLayout={DEFAULT_LAYOUT(isEvidenceModal)}
                            fetchEntities={fetchDashboards}
                            keyFn={keyFn}
+                           entityAttributesAreCamelCase
                            bulkSelection={{ actions: <BulkActions /> }}
                            columnRenderers={customColumnRenderers} />
   );

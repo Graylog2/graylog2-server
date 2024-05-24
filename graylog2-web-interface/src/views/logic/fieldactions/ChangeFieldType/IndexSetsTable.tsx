@@ -126,6 +126,7 @@ const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes, initialSelect
                                            entities={list}
                                            onColumnsChange={onColumnsChange}
                                            onPageSizeChange={onPageSizeChange}
+                                           entityAttributesAreCamelCase
                                            onSortChange={onSortChange}
                                            pageSize={layoutConfig.pageSize}
                                            visibleColumns={layoutConfig.displayedAttributes} />

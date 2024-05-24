@@ -54,6 +54,7 @@ const ProfilesList = () => {
                                                tableLayout={DEFAULT_LAYOUT}
                                                fetchEntities={fetchIndexSetFieldTypeProfiles}
                                                keyFn={keyFn}
+                                               entityAttributesAreCamelCase
                                                expandedSectionsRenderer={expandedSectionsRenderer}
                                                columnRenderers={customColumnRenderers} />
   );

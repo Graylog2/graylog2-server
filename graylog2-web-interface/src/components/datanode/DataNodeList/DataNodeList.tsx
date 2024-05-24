@@ -30,7 +30,7 @@ import DataNodeStatusCell from './DataNodeStatusCell';
 import { fetchDataNodes, keyFn } from '../hooks/useDataNodes';
 
 const DEFAULT_LAYOUT = {
-  entityTableId: 'data-nodes',
+  entityTableId: 'datanodes',
   defaultPageSize: 10,
   defaultSort: { attributeId: 'hostname', direction: 'asc' } as Sort,
   defaultDisplayedAttributes: ['hostname', 'transport_address', 'status', 'is_leader', 'cert_valid_until'],
@@ -88,6 +88,7 @@ const DataNodeList = () => (
                              tableLayout={DEFAULT_LAYOUT}
                              fetchEntities={fetchDataNodes}
                              keyFn={keyFn}
+                             entityAttributesAreCamelCase={false}
                              columnRenderers={columnRenderers} />
 
 );

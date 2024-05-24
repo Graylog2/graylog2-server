@@ -58,6 +58,7 @@ describe('<EntityDataTable />', () => {
                             entities={data}
                             onColumnsChange={() => {}}
                             onSortChange={() => {}}
+                            entityAttributesAreCamelCase
                             columnDefinitions={columnDefinitions} />);
 
     await screen.findByRole('columnheader', { name: /title/i });
@@ -74,6 +75,7 @@ describe('<EntityDataTable />', () => {
     render(<EntityDataTable visibleColumns={visibleColumns}
                             entities={data}
                             onSortChange={() => {}}
+                            entityAttributesAreCamelCase
                             onColumnsChange={() => {}}
                             columnDefinitions={columnDefinitions} />);
 
@@ -85,6 +87,7 @@ describe('<EntityDataTable />', () => {
     render(<EntityDataTable visibleColumns={visibleColumns}
                             entities={data}
                             onSortChange={() => {}}
+                            entityAttributesAreCamelCase
                             onColumnsChange={() => {}}
                             columnRenderers={{
                               attributes: {
@@ -104,6 +107,7 @@ describe('<EntityDataTable />', () => {
     render(<EntityDataTable visibleColumns={visibleColumns}
                             entities={data}
                             onSortChange={() => {}}
+                            entityAttributesAreCamelCase
                             onColumnsChange={() => {}}
                             columnRenderers={{
                               attributes: {
@@ -130,6 +134,7 @@ describe('<EntityDataTable />', () => {
     render(<EntityDataTable<{ id: string, title: string }> visibleColumns={visibleColumns}
                                                            entities={data}
                                                            onSortChange={() => {}}
+                                                           entityAttributesAreCamelCase
                                                            onColumnsChange={() => {}}
                                                            entityActions={(entity) => `Custom actions for ${entity.title}`}
                                                            columnDefinitions={columnDefinitions} />);
@@ -143,6 +148,7 @@ describe('<EntityDataTable />', () => {
     render(<EntityDataTable visibleColumns={visibleColumns}
                             entities={data}
                             onSortChange={() => {}}
+                            entityAttributesAreCamelCase
                             onColumnsChange={() => {}}
                             columnDefinitions={columnDefinitions} />);
 
@@ -154,6 +160,7 @@ describe('<EntityDataTable />', () => {
     render(<EntityDataTable visibleColumns={visibleColumns}
                             entities={data}
                             onSortChange={() => {}}
+                            entityAttributesAreCamelCase
                             onColumnsChange={() => {}}
                             activeSort={{
                               attributeId: 'description',
@@ -169,6 +176,7 @@ describe('<EntityDataTable />', () => {
 
     render(<EntityDataTable visibleColumns={visibleColumns}
                             entities={data}
+                            entityAttributesAreCamelCase
                             onSortChange={onSortChange}
                             onColumnsChange={() => {}}
                             columnDefinitions={columnDefinitions} />);
@@ -194,6 +202,7 @@ describe('<EntityDataTable />', () => {
     render(<EntityDataTable visibleColumns={visibleColumns}
                             entities={data}
                             onSortChange={() => {}}
+                            entityAttributesAreCamelCase
                             onColumnsChange={() => {}}
                             bulkSelection={{ actions: <BulkActions /> }}
                             columnDefinitions={columnDefinitions} />);
@@ -216,6 +225,7 @@ describe('<EntityDataTable />', () => {
     render(<EntityDataTable visibleColumns={visibleColumns}
                             entities={data}
                             onSortChange={() => {}}
+                            entityAttributesAreCamelCase
                             onColumnsChange={() => {}}
                             bulkSelection={{ actions: <div /> }}
                             columnDefinitions={columnDefinitions} />);
@@ -242,6 +252,7 @@ describe('<EntityDataTable />', () => {
     render(<EntityDataTable visibleColumns={['description', 'status']}
                             entities={data}
                             onSortChange={() => {}}
+                            entityAttributesAreCamelCase
                             onColumnsChange={onColumnsChange}
                             columnDefinitions={columnDefinitions} />);
 
@@ -266,6 +277,7 @@ describe('<EntityDataTable />', () => {
     render(<EntityDataTable visibleColumns={[...visibleColumns, 'created_at']}
                             entities={dataWithCamelCaseAttributes}
                             onSortChange={() => {}}
+                            entityAttributesAreCamelCase
                             onColumnsChange={() => {}}
                             columnRenderers={{
                               attributes: {

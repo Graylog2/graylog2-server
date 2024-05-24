@@ -110,6 +110,7 @@ const SavedSearchesOverview = ({
                                bulkSelection={{ actions: <BulkActions /> }}
                                onSortChange={onSortChange}
                                activeSort={layoutConfig.sort}
+                               entityAttributesAreCamelCase
                                pageSize={searchParams.pageSize}
                                onPageSizeChange={onPageSizeChange}
                                actionsCellWidth={120}

@@ -55,7 +55,7 @@ type Props<T> = {
   queryHelpComponent?: React.ReactNode,
   tableLayout: Parameters<typeof useTableLayout>[0],
   additionalAttributes?: Array<Attribute>,
-  entityAttributesAreCamelCase?: boolean,
+  entityAttributesAreCamelCase: boolean,
   topRightCol?: React.ReactNode,
 }
 
