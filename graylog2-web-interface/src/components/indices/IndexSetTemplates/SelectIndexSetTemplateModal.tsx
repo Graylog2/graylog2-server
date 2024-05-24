@@ -16,6 +16,7 @@
  */
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Row, Col, Modal, SegmentedControl } from 'components/bootstrap';
 import { ModalSubmit, Spinner, Select, Section } from 'components/common';
@@ -24,6 +25,7 @@ import useTemplates from 'components/indices/IndexSetTemplates/hooks/useTemplate
 import TemplateDetails from 'components/indices/IndexSetTemplates/TemplateDetails';
 import IndexSetTemplateCard from 'components/indices/IndexSetTemplates/IndexSetTemplateCard';
 import type { IndexSetTemplate } from 'components/indices/IndexSetTemplates/types';
+import { DATA_TIERING_TYPE } from 'components/indices/data-tiering';
 import type { Sort } from 'stores/PaginationTypes';
 
 type Props = {
@@ -97,6 +99,7 @@ const SelectIndexSetTemplateModal = ({ hideModal, show }: Props) => {
   };
 
   const selectedCustomTemplate = customList.find((template) => template.id === tempSelectedTemplate?.id);
+  const dataTieringPlugin = PluginStore.exports('dataTiering').find((plugin) => (plugin.type === DATA_TIERING_TYPE.HOT_WARM));
 
   return (
     <Modal show={show}
@@ -111,6 +114,7 @@ const SelectIndexSetTemplateModal = ({ hideModal, show }: Props) => {
           <Row>
             <Col md={12}>
               Select a template appropriate to the requirements for this data (and available storage).
+              {tempSelectedTemplate?.index_set_config.data_tiering?.warm_tier_enabled && dataTieringPlugin && <dataTieringPlugin.WarmTierReadinessInfo />}
             </Col>
           </Row>
           <Row>
@@ -124,7 +128,7 @@ const SelectIndexSetTemplateModal = ({ hideModal, show }: Props) => {
             <Col md={12}>
               {selectedTemplateCategory === 'built_in' && (
                 <FlexWrapper>
-                  {isLoadingBuiltIn ? (<Spinner />) : (
+                  {isLoadingBuiltIn ? (<div><Spinner /></div>) : (
                     builtInList.map((template) => (
                       <IndexSetTemplateCard template={template}
                                             handleCardClick={handleCardClick}
