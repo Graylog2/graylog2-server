@@ -175,7 +175,6 @@ PageEntityTable.defaultProps = {
   actionsCellWidth: 160,
   additionalAttributes: [],
   bulkSelection: undefined,
-  entityAttributesAreCamelCase: undefined,
   expandedSectionsRenderer: undefined,
   filterValueRenderers: undefined,
   queryHelpComponent: undefined,

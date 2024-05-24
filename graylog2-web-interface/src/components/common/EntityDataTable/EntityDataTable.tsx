@@ -156,7 +156,7 @@ type Props<Entity extends EntityBase> = {
    * The column ids are always snake case. By default, entity attributes are camel case.
    * This prop controls if the column ids need to be transformed to camel case to connect them with the entity attributes.
    */
-  entityAttributesAreCamelCase?: boolean,
+  entityAttributesAreCamelCase: boolean,
   bulkSelection?: {
     /** Supported bulk actions */
     actions?: React.ReactNode,
@@ -316,7 +316,6 @@ EntityDataTable.defaultProps = {
   onPageSizeChange: undefined,
   pageSize: undefined,
   entityActions: undefined,
-  entityAttributesAreCamelCase: true,
   bulkSelection: {},
 };
 
