@@ -16,7 +16,6 @@
  */
 package org.graylog2.database.indices;
 
-import com.mongodb.BasicDBObject;
 import com.mongodb.client.ListIndexesIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Collation;
@@ -102,7 +101,7 @@ public class MongoDbIndexTools<T> {
     }
 
     private void dropIndex(final String sortField) {
-        this.db.dropIndex(new BasicDBObject(sortField, 1));
+        this.db.dropIndex(Indexes.ascending(sortField));
     }
 
     private void createSingleFieldIndex(final String sortField) {
@@ -119,7 +118,7 @@ public class MongoDbIndexTools<T> {
         }
         return MongoUtils.stream(existingIndices)
                 .filter(info ->
-                        info.get(INDEX_NAME_KEY).equals(sortField + "_1")
+                        info.get("key", Document.class).containsKey(sortField)
                 )
                 .findFirst();
     }
