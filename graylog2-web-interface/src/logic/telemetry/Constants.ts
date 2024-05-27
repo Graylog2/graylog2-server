@@ -479,10 +479,10 @@ export const TELEMETRY_EVENT_TYPE = {
   },
   INDEX_SET_TEMPLATE: {
     NEW_OPENED: 'Index Set Template Create Opened',
-    NEW_CANCELED: 'Index Set Template Create Canceled',
+    NEW_CANCELLED: 'Index Set Template Create Cancelled',
     CREATED: 'Index Set Template Created',
     EDIT_OPENED: 'Index Set Template Edit Opened',
-    EDIT_CANCELED: 'Index Set Template Edit Canceled',
+    EDIT_CANCELLED: 'Index Set Template Edit Cancelled',
     EDIT: 'Index Set Template Edited',
     SELECTED: 'Index Set Template Selected',
     SELECT_OPENED: 'Index Set Template Selected Opened',

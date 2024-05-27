@@ -53,7 +53,7 @@ const CreateTemplate = () => {
   }, [sendTelemetry, telemetryPathName]);
 
   const onCancel = useCallback(() => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_TEMPLATE.NEW_CANCELED, { app_pathname: telemetryPathName, app_action_value: 'create-new-index-set-template-cancelled' });
+    sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_TEMPLATE.NEW_CANCELLED, { app_pathname: telemetryPathName, app_action_value: 'create-new-index-set-template-cancelled' });
     history.goBack();
   }, [history, sendTelemetry, telemetryPathName]);
 
