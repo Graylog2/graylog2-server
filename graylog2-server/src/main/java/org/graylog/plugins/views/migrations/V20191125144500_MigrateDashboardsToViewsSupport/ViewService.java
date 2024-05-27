@@ -16,33 +16,33 @@
  */
 package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport;
 
+import com.mongodb.client.MongoCollection;
+import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnection;
-import org.mongojack.JacksonDBCollection;
-
-import jakarta.inject.Inject;
+import org.graylog2.database.MongoCollections;
+import org.graylog2.database.utils.MongoUtils;
 
 class ViewService {
-    protected final JacksonDBCollection<View, ObjectId> db;
+
+    private final MongoCollection<View> db;
+    private final MongoUtils<View> mongoUtils;
 
     @Inject
-    ViewService(MongoConnection mongoConnection, MongoJackObjectMapperProvider mapper) {
-        this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection("views"),
-                View.class,
-                ObjectId.class,
-                mapper.get());
+    ViewService(MongoCollections mongoCollections, MongoJackObjectMapperProvider mapper) {
+        this.db = mongoCollections.get("views", View.class);
+        this.mongoUtils = new MongoUtils<>(db, mapper.get());
     }
 
     public ObjectId save(View view) {
-        return db.insert(view).getSavedId();
+        return MongoUtils.insertedId(db.insertOne(view));
     }
 
     public void remove(ObjectId viewId) {
-        db.removeById(viewId);
+        mongoUtils.deleteById(viewId);
     }
 
     long count() {
-        return db.count();
+        return db.countDocuments();
     }
 }
