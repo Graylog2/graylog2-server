@@ -94,6 +94,18 @@ public class DatanodeKeystore {
         }
     }
 
+    public KeyStore create(KeyStore keystore) throws DatanodeKeystoreException {
+        try {
+            final Path keystorePath = datanodeDirectories.createConfigurationFile(DATANODE_KEYSTORE_FILE);
+            try (FileOutputStream fos = new FileOutputStream(keystorePath.toFile())) {
+                keystore.store(fos, passwordSecret.toCharArray());
+            }
+            return keystore;
+        } catch (Exception e) {
+            throw new DatanodeKeystoreException(e);
+        }
+    }
+
     public void replaceCertificatesInKeystore(CertificateChain certificateChain) throws DatanodeKeystoreException {
         try {
             final KeyStore keystore = loadKeystore();

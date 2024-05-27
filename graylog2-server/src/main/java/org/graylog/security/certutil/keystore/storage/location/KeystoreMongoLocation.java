@@ -34,10 +34,12 @@ public class KeystoreMongoLocation implements KeystoreLocation {
         return new KeystoreMongoLocation(CA_KEYSTORE_ID, KeystoreMongoCollections.GRAYLOG_CA_KEYSTORE_COLLECTION);
     }
 
+    @Deprecated
     public static KeystoreMongoLocation datanode(NodeId nodeId) {
         return datanode(nodeId.getNodeId());
     }
 
+    @Deprecated
     public static KeystoreMongoLocation datanode(String nodeId) {
         return new KeystoreMongoLocation(nodeId, KeystoreMongoCollections.DATA_NODE_KEYSTORE_COLLECTION);
     }

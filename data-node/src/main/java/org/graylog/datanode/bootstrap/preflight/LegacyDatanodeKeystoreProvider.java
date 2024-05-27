@@ -1,0 +1,99 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+package org.graylog.datanode.bootstrap.preflight;
+
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import org.graylog.security.certutil.CertConstants;
+import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
+import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoLocation;
+import org.graylog2.cluster.certificates.CertificatesService;
+import org.graylog2.plugin.system.NodeId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.ByteArrayInputStream;
+import java.security.Key;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.Certificate;
+import java.util.Base64;
+import java.util.Optional;
+
+import static org.graylog.security.certutil.CertConstants.PKCS12;
+
+/**
+ * Remove in 7.0 release. All legacy mongodb stored keystores for datanodes should be migrated to local files
+ * or recreated from scratch.
+ */
+@Deprecated(forRemoval = true)
+public class LegacyDatanodeKeystoreProvider {
+
+    private static final Logger LOG = LoggerFactory.getLogger(LegacyDatanodeKeystoreProvider.class);
+
+    private final CertificatesService certificatesService;
+    private final NodeId nodeId;
+    private final String passwordSecret;
+
+    @Inject
+    public LegacyDatanodeKeystoreProvider(CertificatesService certificatesService, NodeId nodeId, final @Named("password_secret") String passwordSecret) {
+        this.certificatesService = certificatesService;
+        this.nodeId = nodeId;
+        this.passwordSecret = passwordSecret;
+    }
+
+    public Optional<KeyStore> get() throws KeyStoreStorageException {
+        return loadKeystore().filter(this::isValidKeyAndCert);
+    }
+
+    private boolean isValidKeyAndCert(KeyStore keystore) {
+        try {
+            final Key privateKey = keystore.getKey(CertConstants.DATANODE_KEY_ALIAS, passwordSecret.toCharArray());
+            if (privateKey != null) {
+                final Certificate[] certChain = keystore.getCertificateChain(CertConstants.DATANODE_KEY_ALIAS);
+                if (certChain.length > 1) { // TODO: better validation
+                    // the certificate is signed, it makes sense to persist it
+                    return true;
+                }
+            }
+        } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException e) {
+            LOG.warn("Failed to obtain legacy keystore, ignoring", e);
+        }
+        return false;
+    }
+
+    private Optional<KeyStore> loadKeystore() throws KeyStoreStorageException {
+        final Optional<String> keystoreAsString = readEncodedCertFromDatabase();
+        if (keystoreAsString.isPresent()) {
+            try (ByteArrayInputStream bais = new ByteArrayInputStream(Base64.getDecoder().decode(keystoreAsString.get()))) {
+                KeyStore keyStore = KeyStore.getInstance(PKCS12);
+                keyStore.load(bais, passwordSecret.toCharArray());
+                return Optional.of(keyStore);
+            } catch (Exception ex) {
+                throw new KeyStoreStorageException("Failed to load keystore from Mongo collection for node " + nodeId.getNodeId(), ex);
+            }
+        }
+        return Optional.empty();
+    }
+
+    private Optional<String> readEncodedCertFromDatabase() {
+        KeystoreMongoLocation location = KeystoreMongoLocation.datanode(nodeId);
+        return certificatesService.readCert(location);
+    }
+}

@@ -91,7 +91,6 @@ public class DataNodeConfigurationEventHandler {
 
             final DataNodeProvisioningConfig cfg = dataNodeProvisioningService.getPreflightConfigFor(nodeId.getNodeId()).orElseThrow(() -> new IllegalStateException("No preflight configuration found for node " + nodeId.getNodeId()));
 
-
             Optional.ofNullable(event.state()).ifPresent(state -> {
                 switch (state) {
                     case CONFIGURED -> writeCsr(cfg);
@@ -115,7 +114,9 @@ public class DataNodeConfigurationEventHandler {
         LOG.info("Received CertificateSignedEvent for node " + event.nodeId());
         try {
             datanodeKeystore.replaceCertificatesInKeystore(event.readCertChain());
-            //should be in one transaction, but we miss transactions...
+            // Following state change will trigger an DataNodeProvisioningStateChangeEvent which will notify
+            // OpensearchProcessService and it will rebuild opensearch configuration and start the opensearch
+            // process with the just received certificate
             dataNodeProvisioningService.changeState(nodeId.getNodeId(), DataNodeProvisioningConfig.State.STORED);
         } catch (Exception ex) {
             LOG.error("Config entry in signed state, but wrong certificate data present in Mongo", ex);

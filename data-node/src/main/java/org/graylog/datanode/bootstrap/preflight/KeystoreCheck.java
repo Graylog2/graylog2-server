@@ -25,8 +25,11 @@ import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.CertRequest;
 import org.graylog.security.certutil.CertificateGenerator;
 import org.graylog.security.certutil.KeyPair;
+import org.graylog.security.certutil.keystore.storage.KeystoreMongoStorage;
+import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoLocation;
 import org.graylog2.bootstrap.preflight.PreflightCheck;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
+import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +39,7 @@ import java.nio.file.Path;
 import java.security.KeyStore;
 import java.security.Security;
 import java.time.Duration;
+import java.util.Optional;
 
 /**
  * This check verifies that each datanode has a private key configured. It may be needed right now, but at the moment
@@ -52,20 +56,26 @@ public class KeystoreCheck implements PreflightCheck {
     }
 
     private final DatanodeKeystore datanodeKeystore;
+    private final LegacyDatanodeKeystoreProvider legacyDatanodeKeystoreProvider;
 
     @Inject
-    public KeystoreCheck(DatanodeKeystore datanodeKeystore) {
-
+    public KeystoreCheck(DatanodeKeystore datanodeKeystore, LegacyDatanodeKeystoreProvider legacyDatanodeKeystoreProvider) {
         this.datanodeKeystore = datanodeKeystore;
+        this.legacyDatanodeKeystoreProvider = legacyDatanodeKeystoreProvider;
     }
 
     @Override
     public void runCheck() throws PreflightCheckException {
-
         if (!datanodeKeystore.exists()) {
             LOG.info("Creating keystore for this data node");
             try {
-                datanodeKeystore.create(generateKeyPair());
+                final Optional<KeyStore> legacyKeystore = legacyDatanodeKeystoreProvider.get();
+                if(legacyKeystore.isPresent()) {
+                    LOG.info("Legacy keystore discovered, converting to local file");
+                    datanodeKeystore.create(legacyKeystore.get());
+                } else {
+                    datanodeKeystore.create(generateKeyPair());
+                }
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
