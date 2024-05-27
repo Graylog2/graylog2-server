@@ -43,14 +43,14 @@ const IndexSetTemplateCard = ({ template, handleCardClick, isSelected }: Props) 
       {template.index_set_config.use_legacy_rotation && (<p>{template.description}</p>)}
       {!template.index_set_config.use_legacy_rotation && (
         <Row>
-          <Col md={7}>
+          <Col md={8}>
             <DataTieringVisualisation minDays={dataTieringConfig.index_lifetime_min}
                                       maxDays={dataTieringConfig.index_lifetime_max}
                                       minDaysInHot={dataTieringConfig.index_hot_lifetime_min}
                                       warmTierEnabled={dataTieringConfig.warm_tier_enabled}
                                       archiveData={dataTieringConfig.archive_before_deletion} />
           </Col>
-          <Col md={5}>{template.description}</Col>
+          <Col md={4}>{template.description}</Col>
         </Row>
       )}
       <ButtonWrapper>
