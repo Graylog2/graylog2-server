@@ -15,13 +15,34 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { Button, FormikInput, Space } from 'preflight/components/common';
+import { Formik, Form } from 'formik';
 
 import LoginChrome from 'components/login/LoginChrome';
 
-const PreflightLoginPage = () => (
-  <LoginChrome>
-    here login form
-  </LoginChrome>
-);
+const PreflightLoginPage = () => {
+  console.log('test');
+
+  return (
+    <LoginChrome>
+      <Formik initialValues={{ username: '', password: '' }} onSubmit={(formValues) => console.log(formValues)}>
+        <Form>
+          <FormikInput placeholder="Username"
+                       label="Username"
+                       name="username"
+                       type="text"
+                       required />
+          <FormikInput placeholder="Password"
+                       label="Password"
+                       name="password"
+                       type="password"
+                       required />
+          <Space h="md" />
+          <Button type="submit">Sign in</Button>
+        </Form>
+      </Formik>
+    </LoginChrome>
+  );
+};
 
 export default PreflightLoginPage;
