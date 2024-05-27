@@ -45,7 +45,7 @@ const EditTemplate = ({
     editTemplate({ template: newTemplate, id: template.id }).then(() => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_TEMPLATE.EDIT, {
         app_pathname: telemetryPathName,
-        app_action_value: 'edit-new-index-set-template-edited',
+        app_action_value: 'edit-index-set-template-edited',
       });
 
       navigate(Routes.SYSTEM.INDICES.TEMPLATES.OVERVIEW);
@@ -53,11 +53,11 @@ const EditTemplate = ({
   }, [editTemplate, navigate, template.id, sendTelemetry, telemetryPathName]);
 
   useEffect(() => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_TEMPLATE.EDIT_OPENED, { app_pathname: telemetryPathName, app_action_value: 'edit-new-index-set-template-opened' });
+    sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_TEMPLATE.EDIT_OPENED, { app_pathname: telemetryPathName, app_action_value: 'edit-index-set-template-opened' });
   }, [sendTelemetry, telemetryPathName]);
 
   const onCancel = useCallback(() => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_TEMPLATE.EDIT_CANCELED, { app_pathname: telemetryPathName, app_action_value: 'edit-new-index-set-template-cancelled' });
+    sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_TEMPLATE.EDIT_CANCELLED, { app_pathname: telemetryPathName, app_action_value: 'edit-index-set-template-cancelled' });
     navigate(Routes.SYSTEM.INDICES.TEMPLATES.OVERVIEW);
   }, [navigate, sendTelemetry, telemetryPathName]);
 
