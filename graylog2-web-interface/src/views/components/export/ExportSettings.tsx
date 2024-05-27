@@ -86,7 +86,8 @@ const ExportSettings = ({
                                  displaySortableListOverlayInPortal
                                  selectedFields={value.map(({ field }) => field)}
                                  showSelectAllRest
-                                 showDeSelectAll />
+                                 showDeSelectAll
+                                 showListCollapseButton />
           </>
         )}
       </Field>
