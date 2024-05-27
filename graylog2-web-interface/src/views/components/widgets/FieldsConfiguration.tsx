@@ -31,6 +31,8 @@ type Props = {
   selectSize?: 'normal' | 'small',
   selectedFields: Array<string>,
   testPrefix?: string,
+  showSelectAllRest?: boolean,
+  showDeSelectAll?: boolean,
 }
 
 const FieldsConfiguration = ({
@@ -42,10 +44,20 @@ const FieldsConfiguration = ({
   selectSize,
   selectedFields,
   testPrefix,
+  showSelectAllRest,
+  showDeSelectAll,
 }: Props) => {
   const onAddField = useCallback((newField: string) => (
     onChange([...selectedFields, newField])
   ), [onChange, selectedFields]);
+
+  const onSelectAllRest = (newFields: Array<string>) => {
+    onChange([...selectedFields, ...newFields]);
+  };
+
+  const onDeselectAll = () => {
+    onChange([]);
+  };
 
   return (
     <>
@@ -65,7 +77,11 @@ const FieldsConfiguration = ({
                    menuPortalTarget={menuPortalTarget}
                    excludedFields={selectedFields ?? []}
                    placeholder={createSelectPlaceholder}
-                   ariaLabel={createSelectPlaceholder} />
+                   ariaLabel={createSelectPlaceholder}
+                   onSelectAllRest={showSelectAllRest && onSelectAllRest}
+                   showSelectAllRest={showSelectAllRest}
+                   onDeSelectAll={onDeselectAll}
+                   showDeSelectAll={showDeSelectAll && !!selectedFields.length} />
     </>
   );
 };
@@ -77,6 +93,8 @@ FieldsConfiguration.defaultProps = {
   selectSize: undefined,
   menuPortalTarget: undefined,
   testPrefix: '',
+  showSelectAllRest: false,
+  showDeSelectAll: false,
 };
 
 export default FieldsConfiguration;
