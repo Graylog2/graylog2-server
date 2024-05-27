@@ -23,8 +23,18 @@ import Setup from 'preflight/components/Setup';
 import WaitingForStartup from 'preflight/components/WaitingForStartup';
 import ErrorBoundary from 'preflight/components/ErrorBoundary';
 
+import PreflightLoginPage from './PreflightLoginPage';
+
 const App = () => {
+  const isLoggedIn = false;
+
   const [isWaitingForStartup, setIsWaitingForStartup] = useState(false);
+
+  if (!isLoggedIn) {
+    return (
+      <PreflightLoginPage />
+    );
+  }
 
   return (
     <AppShell padding="md" header={{ height: 80 }}>
