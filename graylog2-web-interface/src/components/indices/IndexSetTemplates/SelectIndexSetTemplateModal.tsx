@@ -14,10 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useLocation from 'routing/useLocation';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { Row, Col, Modal, SegmentedControl } from 'components/bootstrap';
 import { ModalSubmit, Spinner, Select, Section } from 'components/common';
 import useSelectedIndexSetTemplate from 'components/indices/IndexSetTemplates/hooks/useSelectedTemplate';
@@ -46,6 +50,9 @@ const SelectIndexSetTemplateModal = ({ hideModal, show }: Props) => {
   const [tempSelectedTemplate, setTempSelectedTemplate] = useState<IndexSetTemplate | undefined>(selectedIndexSetTemplate);
   const initialTemplateCategory = (selectedIndexSetTemplate && !selectedIndexSetTemplate.built_in) ? 'custom' : 'built_in';
   const [selectedTemplateCategory, setSelectedTemplateCategory] = useState<TemplateCategorySegment>(initialTemplateCategory);
+  const sendTelemetry = useSendTelemetry();
+  const { pathname } = useLocation();
+  const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
 
   const templateCategorySegments: Array<{value: TemplateCategorySegment, label: string}> = [
     { value: 'built_in', label: 'Default Templates' },
@@ -81,7 +88,24 @@ const SelectIndexSetTemplateModal = ({ hideModal, show }: Props) => {
     }, { enabled: true },
   );
 
+  const trackSelectedTemplate = () => {
+    let template_name = 'custom';
+
+    if (tempSelectedTemplate.built_in) {
+      template_name = tempSelectedTemplate.title;
+    }
+
+    sendTelemetry(
+      TELEMETRY_EVENT_TYPE.INDEX_SET_TEMPLATE.SELECTED,
+      {
+        app_pathname: telemetryPathName,
+        app_action_value: 'select-index-set-template-submitted',
+        template_name,
+      });
+  };
+
   const handleSubmit = () => {
+    trackSelectedTemplate();
     setSelectedIndexSetTemplate(tempSelectedTemplate);
     hideModal();
   };
