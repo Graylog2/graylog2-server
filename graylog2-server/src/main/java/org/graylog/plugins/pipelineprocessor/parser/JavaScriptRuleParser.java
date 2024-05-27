@@ -85,9 +85,20 @@ public class JavaScriptRuleParser {
                 .allowHostClassLoading(false)
                 .allowHostClassLookup(className -> false)
                 .allowIO(IOAccess.NONE)
-                .option("js.foreign-object-prototype", "true")
                 .allowExperimentalOptions(true)
-                .option("js.esm-eval-returns-exports", "true");
+                .option("js.strict", "true")
+                .option("js.esm-eval-returns-exports", "true")
+                .option("js.global-arguments", "false")
+                .option("js.graal-builtin", "false")
+                .option("js.java-package-globals", "false")
+                .option("js.load", "false")
+                .option("js.polyglot-builtin", "false")
+                .option("js.print", "false")
+                .option("js.regexp-static-result", "false")
+                .option("js.timezone", "UTC")
+                .option("js.disable-eval", "true")
+                .option("js.disable-with", "true")
+                .option("js.locale", "US");
     }
 }
 
