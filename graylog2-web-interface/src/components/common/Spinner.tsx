@@ -23,7 +23,7 @@ import type { IconName } from 'components/common/Icon';
 import Icon from './Icon';
 import Delayed from './Delayed';
 
-const Container = styled.div`
+const Container = styled.span`
   display: inline-flex;
   align-items: center;
   vertical-align: baseline;
