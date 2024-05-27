@@ -125,22 +125,22 @@ class TimeBasedRotationStrategyConfiguration extends React.Component {
     return (
       <div>
         <Input id="rotation-period"
-                type="text"
-                ref={(rotationPeriodRef) => { this.inputs.rotation_period = rotationPeriodRef; }}
-                label="Rotation period (ISO8601 Duration)"
-                onChange={this._onPeriodUpdate('rotation_period')}
-                value={rotationPeriod}
-                help={`How long an index gets written to before it is rotated. (i.e. "P1D" for 1 day, "PT6H" for 6 hours).${maxRotationPeriodHelpText}`}
-                addonAfter={this._formatDuration()}
-                bsStyle={this._validationState()}
+               type="text"
+               ref={(rotationPeriodRef) => { this.inputs.rotation_period = rotationPeriodRef; }}
+               label="Rotation period (ISO8601 Duration)"
+               onChange={this._onPeriodUpdate('rotation_period')}
+               value={rotationPeriod}
+               help={`How long an index gets written to before it is rotated. (i.e. "P1D" for 1 day, "PT6H" for 6 hours).${maxRotationPeriodHelpText}`}
+               addonAfter={this._formatDuration()}
+               bsStyle={this._validationState()}
                required />
         <Input id="rotate-empty-index-sets-checkbox"
-                type="checkbox"
-                ref={(rotateEmptyIndexSetRef) => { this.inputs.rotate_empty_index_set = rotateEmptyIndexSetRef; }}
-                label="Rotate empty index set"
-                onChange={this._onRotateEmptyIndexSetUpdate('rotate_empty_index_set')}
-                checked={rotateEmptyIndexSet}
-                help="Apply the rotation strategy even when the index set is empty (not recommended)." />
+               type="checkbox"
+               ref={(rotateEmptyIndexSetRef) => { this.inputs.rotate_empty_index_set = rotateEmptyIndexSetRef; }}
+               label="Rotate empty index set"
+               onChange={this._onRotateEmptyIndexSetUpdate('rotate_empty_index_set')}
+               checked={rotateEmptyIndexSet}
+               help="Apply the rotation strategy even when the index set is empty (not recommended)." />
       </div>
     );
   }
