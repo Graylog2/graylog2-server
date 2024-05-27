@@ -23,8 +23,13 @@ import type { IconName } from 'components/common/Icon';
 import Icon from './Icon';
 import Delayed from './Delayed';
 
+const Container = styled.div`
+  display: inline-flex;
+  align-items: center;
+  vertical-align: baseline;
+`;
+
 const StyledIcon = styled(Icon)<{ $displayMargin: boolean }>(({ $displayMargin }) => css`
-  vertical-align: bottom;
   ${$displayMargin ? 'margin-right: 6px;' : ''}
 `);
 
@@ -39,7 +44,9 @@ type Props = {
  */
 const Spinner = ({ name, text, delay, ...rest }: Props) => (
   <Delayed delay={delay}>
-    <StyledIcon {...rest} name={name} $displayMargin={!!text?.trim()} spin />{text}
+    <Container>
+      <StyledIcon {...rest} name={name} $displayMargin={!!text?.trim()} spin />{text}
+    </Container>
   </Delayed>
 );
 
