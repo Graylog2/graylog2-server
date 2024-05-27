@@ -115,11 +115,7 @@ const SelectIndexSetTemplateModal = ({ hideModal, show }: Props) => {
   };
 
   const handleCustomSelect = (selectedTemplateId) => {
-    console.log('===selectedTemplateId', selectedTemplateId);
-
     const templateToSelect = customList.find((template) => template.id === selectedTemplateId);
-
-    console.log('===templateToSelect', templateToSelect);
 
     if (templateToSelect) {
       setTempSelectedTemplate(templateToSelect);
