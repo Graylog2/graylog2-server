@@ -2,17 +2,17 @@
 
 const when = (msg) => true;
 
-const then = (msg, {grok, set_fields}) => {
+const then = (msg, {grok}) => {
   let matches = grok('%{GREEDY:timestamp;date;yyyy-MM-dd\'T\'HH:mm:ss.SSSX}', '2015-07-31T10:05:36.773Z', false);
-  set_fields(matches, null, null, null, null);
+  Object.assign(msg, matches);
 
   // only named captures
   let matches1 = grok('%{NUM:num}', '10', true);
-  set_fields(matches1, null, null, null, null);
+  Object.assign(msg, matches1);
 
   //test for underscore
   let matches2 = grok('%{UNDERSCORE}', 'test', true);
-  set_fields(matches2, null, null, null, null);
+  Object.assign(msg, matches2);
 };
 
 export default { 'name': 'grok', 'when': when, 'then': then };

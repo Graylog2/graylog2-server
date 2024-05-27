@@ -49,9 +49,7 @@ public class MessageProxy implements ProxyObject {
 
     @Override
     public void putMember(String key, Value value) {
-        // TODO: allow adding directly to the message, without having to use the set_field function.
-        //   We'll probably have to take care of type conversions, like in the PipelineFunctionProxy
-        throw new UnsupportedOperationException("putMember() not supported at the moment.");
+        delegate.addField(key, TypeConverter.convert(value, Object.class));
     }
 
     @Override

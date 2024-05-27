@@ -416,7 +416,9 @@ class PipelineRuleParserTest extends BaseParserTest {
                         return msg.run_rule;
                     },
                     "then" : (msg, {set_field}) => {
-                        set_field('processed', msg.message.replace('orig', 'new'), null, null, msg, null, null);
+                        let value = msg.message.replace('orig', 'new');
+                        set_field('set_by_set_field', value, null, null, msg, null, null);
+                        msg.set_directly = value;
                     }
                 };
                 """;
@@ -444,7 +446,9 @@ class PipelineRuleParserTest extends BaseParserTest {
         thread1.join();
         thread2.join();
 
-        assertThat(processedMessages).extracting(m -> m.getField("processed"))
+        assertThat(processedMessages).extracting(m -> m.getField("set_by_set_field"))
+                .containsExactlyInAnyOrder("new msg1", "new msg2");
+        assertThat(processedMessages).extracting(m -> m.getField("set_directly"))
                 .containsExactlyInAnyOrder("new msg1", "new msg2");
 
         rule.shutDownHook().run();

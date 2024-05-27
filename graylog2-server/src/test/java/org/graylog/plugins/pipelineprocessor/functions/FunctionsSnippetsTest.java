@@ -1607,9 +1607,10 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("f1")).isEqualTo("f1");
     }
 
-    @Test
-    void setField() {
-        final Rule rule = parser.parseRule(ruleForTest(), true);
+    @ParameterizedTest
+    @EnumSource(RuleContentType.class)
+    void setField(RuleContentType contentType) {
+        final Rule rule = parser.parseRule(contentType, ruleForTest(contentType), true);
         final Message message = messageFactory.createMessage("test", "test", Tools.nowUTC());
         evaluateRule(rule, message);
 

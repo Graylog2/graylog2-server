@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.pipelineprocessor.javascript;
 
-import com.google.common.primitives.Ints;
 import jakarta.annotation.Nullable;
 import org.antlr.v4.runtime.CommonToken;
 import org.graalvm.polyglot.Value;
@@ -30,11 +29,9 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -51,7 +48,17 @@ public class PipelineFunctionProxy implements ProxyObject {
     @Override
     public ProxyExecutable getMember(String key) {
         final Function<?> function = functionRegistry.resolve(key);
-        return arguments -> function.evaluate(transformArgs(function, arguments), evaluationContext);
+        return arguments -> evaluateFunction(arguments, function);
+    }
+
+    private Object evaluateFunction(Value[] arguments, Function<?> function) {
+        var result = function.evaluate(transformArgs(function, arguments), evaluationContext);
+        // Without this, a ForwardingMap like GrokMatch.GrokResult won't behave correctly
+        if (result instanceof Map<?, ?> map) {
+            //noinspection unchecked
+            return ProxyObject.fromMap((Map<String, Object>) map);
+        }
+        return result;
     }
 
     @Override
@@ -86,32 +93,10 @@ public class PipelineFunctionProxy implements ProxyObject {
             final ParameterDescriptor<?, ?> paramDescriptor = params.get(i);
             expressionMap.put(
                     paramDescriptor.name(),
-                    new ParameterExpression(convert(arg, paramDescriptor.type()), paramDescriptor.type()));
+                    new ParameterExpression(TypeConverter.convert(arg, paramDescriptor.type()), paramDescriptor.type()));
         }
 
         return new FunctionArgs(function, expressionMap);
-    }
-
-    private <T> T convert(Value value, Class<T> targetType) {
-        if (value.isHostObject()) {
-            return value.asHostObject();
-        }
-
-        if (value.hasArrayElements() && targetType.isAssignableFrom(List.class)) {
-            final List<Object> list = new ArrayList<>(Ints.saturatedCast(value.getArraySize()));
-            for (int i = 0; i < value.getArraySize(); i++) {
-                list.add(convert(value.getArrayElement(i), Object.class));
-            }
-            return targetType.cast(list);
-        }
-
-        if (value.hasMembers() && targetType.isAssignableFrom(Map.class)) {
-            final Map<?, ?> map = value.getMemberKeys().stream()
-                    .collect(Collectors.toMap(k -> k, k -> convert(value.getMember(k), Object.class)));
-            return targetType.cast(map);
-        }
-
-        return value.as(targetType);
     }
 
     private static class ParameterExpression extends ConstantExpression {
