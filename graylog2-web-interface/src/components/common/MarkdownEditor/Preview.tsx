@@ -58,37 +58,13 @@ const MarkdownStyles = styled.div`
   & > div {
     & > h1, & > h2, & > h3, & > h4, & > h5, & > h6 {
       margin-bottom: 8px;
+      font-family: ${({ theme }) => theme.fonts.family.body};
     }
 
     & > hr {
       margin: 16px 0;
       border: none;
       border-bottom: 1px solid ${({ theme }) => theme.colors.brand.tertiary};
-    }
-
-    & > h1 {
-      font-size: 5cqw;
-      font-weight: bold;
-    }
-
-    & > h2 {
-      font-size: 4cqw;
-      font-weight: normal;
-    }
-
-    & > h3 {
-      font-size: 3.5cqw;
-      font-weight: bold;
-    }
-
-    & > h4 {
-      font-size: 3.5cqw;
-      font-weight: normal;
-    }
-
-    & > h5, & > h6 {
-      font-size: 3cqw;
-      font-weight: normal;
     }
 
     & ul, & ol {
