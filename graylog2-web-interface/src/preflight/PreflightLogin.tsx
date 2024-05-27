@@ -15,30 +15,44 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { Button, FormikInput, Space } from 'preflight/components/common';
 import { Formik, Form } from 'formik';
 
+import { Button, FormikInput, Space } from 'preflight/components/common';
 import LoginChrome from 'components/login/LoginChrome';
+import useHistory from 'routing/useHistory';
 
-const PreflightLoginPage = () => (
-  <LoginChrome>
-    <Formik initialValues={{ username: '', password: '' }} onSubmit={(formValues) => { window.open(`${window.location.protocol}//${formValues.username}:${formValues.password}@${window.location.host}`); }}>
-      <Form>
-        <FormikInput placeholder="Username"
-                     label="Username"
-                     name="username"
-                     type="text"
-                     required />
-        <FormikInput placeholder="Password"
-                     label="Password"
-                     name="password"
-                     type="password"
-                     required />
-        <Space h="md" />
-        <Button type="submit">Sign in</Button>
-      </Form>
-    </Formik>
-  </LoginChrome>
-);
+import { setBasicAuth } from './hooks/useAuthStatus';
+
+const PreflightLoginPage = () => {
+  const history = useHistory();
+
+  return (
+    <LoginChrome>
+      <Formik initialValues={{ username: '', password: '' }}
+              onSubmit={({ username, password }) => {
+                const isBasicAuthSet = setBasicAuth(username, password);
+
+                if (isBasicAuthSet) {
+                  history.push('/');
+                }
+              }}>
+        <Form>
+          <FormikInput placeholder="Username"
+                       label="Username"
+                       name="username"
+                       type="text"
+                       required />
+          <FormikInput placeholder="Password"
+                       label="Password"
+                       name="password"
+                       type="password"
+                       required />
+          <Space h="md" />
+          <Button type="submit">Sign in</Button>
+        </Form>
+      </Formik>
+    </LoginChrome>
+  );
+};
 
 export default PreflightLoginPage;

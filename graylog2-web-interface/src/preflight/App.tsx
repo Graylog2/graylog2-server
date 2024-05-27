@@ -27,9 +27,9 @@ const App = () => {
   return (
     <Router>
       <Routes>
-        <Route path="/login" element={isAuthenticated ? <Navigate to="/" replace /> : <PreflightLogin />} />
-        <Route path="/" element={isAuthenticated ? <PreflightApp /> : <Navigate to="/login" replace />} />
-        <Route path="*" element={isAuthenticated ? <Navigate to="/" replace /> : <Navigate to="/login" replace />} />
+        <Route path="/login" element={isAuthenticated ? <Navigate to="/" /> : <PreflightLogin />} />
+        <Route path="/" element={isAuthenticated ? <PreflightApp /> : <Navigate to="/login" />} />
+        <Route path="*" element={<Navigate to={isAuthenticated ? '/' : '/login'} />} />
       </Routes>
     </Router>
   );

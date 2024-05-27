@@ -14,25 +14,36 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
 import { useQuery } from '@tanstack/react-query';
 
-import { qualifyUrl } from 'util/URLUtils';
-import fetch from 'logic/rest/FetchProvider';
+export const setBasicAuth = async (username: string, password: string) => {
+  try {
+    const response = await fetch('/api/data_nodes', {
+      method: 'GET',
+      headers: {
+        Authorization: `Basic ${btoa(`${username}:${password}`)}`,
+      },
+    });
 
-const fetchAuthStatus = () => (
-  fetch('GET', qualifyUrl('/api/data_nodes'), undefined, false)
-);
+    if (response.ok) {
+      return true;
+    }
+
+    return false;
+  } catch (error) {
+    return false;
+  }
+};
+
+const fetchAuthStatus = () => fetch('/api/data_nodes');
 
 const useAuthStatus = (): boolean => {
-  const { data, error } = useQuery(
+  const { data, error, isFetching } = useQuery(
     ['auth-status'],
     fetchAuthStatus,
   );
 
-  console.log(data, error);
-
-  return !!data && !error;
+  return !!data && !error && !isFetching;
 };
 
 export default useAuthStatus;
