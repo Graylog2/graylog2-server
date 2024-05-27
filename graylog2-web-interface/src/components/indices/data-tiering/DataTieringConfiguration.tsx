@@ -35,6 +35,7 @@ const DATA_TIERING_HOT_ONLY_DEFAULTS = {
 const DATA_TIERING_HOT_WARM_DEFAULTS = {
   archive_before_deletion: false,
   warm_tier_enabled: false,
+  index_hot_lifetime_min: 10,
   warm_tier_repository_name: null,
 };
 
