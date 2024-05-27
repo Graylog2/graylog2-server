@@ -18,6 +18,8 @@ package org.graylog2.streams;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
+import org.graylog2.rest.resources.streams.StreamDeletionGuard;
+import org.graylog2.rest.resources.streams.DefaultStreamDeletionGuard;
 import org.graylog2.streams.input.StreamRuleInputsProvider;
 import org.graylog2.streams.input.StreamRuleServerInputsProvider;
 
@@ -30,5 +32,8 @@ public class StreamsModule extends AbstractModule {
 
         Multibinder<StreamRuleInputsProvider> uriBinder = Multibinder.newSetBinder(binder(), StreamRuleInputsProvider.class);
         uriBinder.addBinding().to(StreamRuleServerInputsProvider.class);
+
+        Multibinder<StreamDeletionGuard> streamDeletionGuardMultibinder = Multibinder.newSetBinder(binder(), StreamDeletionGuard.class);
+        streamDeletionGuardMultibinder.addBinding().to(DefaultStreamDeletionGuard.class);
     }
 }
