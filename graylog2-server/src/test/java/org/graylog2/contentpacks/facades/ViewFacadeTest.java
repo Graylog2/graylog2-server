@@ -87,7 +87,6 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -240,8 +239,7 @@ public class ViewFacadeTest {
     public void itShouldCreateADTOFromAnEntity() throws Exception {
         final StreamImpl stream = new StreamImpl(Collections.emptyMap());
         final Entity viewEntity = createViewEntity();
-        final Map<EntityDescriptor, Object> nativeEntities = new HashMap<>(1);
-        nativeEntities.put(EntityDescriptor.create(newStreamId, ModelTypes.STREAM_V1), stream);
+        final Map<EntityDescriptor, Object> nativeEntities = Map.of(EntityDescriptor.create(newStreamId, ModelTypes.STREAM_V1), stream);
         final UserImpl fakeUser = new UserImpl(mock(PasswordAlgorithmFactory.class), new Permissions(ImmutableSet.of()),
                 mock(ClusterConfigService.class), ImmutableMap.of("username", "testuser"));
         when(userService.load("testuser")).thenReturn(fakeUser);
