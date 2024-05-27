@@ -19,6 +19,7 @@ package org.graylog.plugins.views.search.db;
 import com.google.common.collect.ImmutableSet;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.ReplaceOptions;
 import jakarta.inject.Inject;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
@@ -98,7 +99,8 @@ public class SearchDbService {
         if (searchToSave.id() != null) {
             db.replaceOne(
                     MongoUtils.idEq(search.id()),
-                    searchToSave
+                    searchToSave,
+                    new ReplaceOptions().upsert(true)
             );
 
             return searchToSave;
