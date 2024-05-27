@@ -21,7 +21,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import { Col, Row } from 'components/bootstrap';
 import { Section, Icon } from 'components/common';
 import IndexMaintenanceStrategiesSummary from 'components/indices/IndexMaintenanceStrategiesSummary';
-import { DataTieringSummary } from 'components/indices/data-tiering';
+import { DataTieringSummary, DATA_TIERING_TYPE } from 'components/indices/data-tiering';
 import type { IndexSetTemplate } from 'components/indices/IndexSetTemplates/types';
 
 type Props = {
@@ -50,6 +50,10 @@ const RotationSummaryWrapper = styled.div(({ theme }) => css`
   margin-bottom: ${theme.spacings.sm};
 `);
 
+const WarmTierSummaryWrapper = styled.div(({ theme }) => css`
+  margin-top: ${theme.spacings.sm};
+`);
+
 const formatRefreshInterval = (intervalInMs : number) => {
   const intervalInSeconds = intervalInMs / 1000;
 
@@ -62,51 +66,62 @@ const formatRefreshInterval = (intervalInMs : number) => {
 
 const TemplateDetails = ({
   template,
-}: Props) => (
-  <Row>
-    <Col md={12}>
-      <FlexWrapper>
-        <Section title="Details">
-          <dl>
-            <dt>Index Analyzer:</dt>
-            <dd>{template.index_set_config.index_analyzer}</dd>
-            <dt>Shards:</dt>
-            <dd>{template.index_set_config.shards}</dd>
-            <dt>Replicas:</dt>
-            <dd>{template.index_set_config.replicas}</dd>
-            <dt>Max. number of segments:</dt>
-            <dd>{template.index_set_config.index_optimization_max_num_segments}</dd>
-            <dt>Index optimization after rotation:</dt>
-            <dd><Icon name={template.index_set_config.index_optimization_disabled ? 'cancel' : 'check_circle'} /></dd>
-            <dt>Field type refresh interval:</dt>
-            <dd>{formatRefreshInterval(template.index_set_config.field_type_refresh_interval)}</dd>
-          </dl>
-        </Section>
+}: Props) => {
+  const dataTieringPlugin = PluginStore.exports('dataTiering').find((plugin) => (plugin.type === DATA_TIERING_TYPE.HOT_WARM));
 
-        <Section title="Rotation & Retention">
-          {template.index_set_config.use_legacy_rotation ? (
-            <>
-              <RotationSummaryWrapper>
+  return (
+    <Row>
+      <Col md={12}>
+        <FlexWrapper>
+          <Section title="Details">
+            <dl>
+              <dt>Index Analyzer:</dt>
+              <dd>{template.index_set_config.index_analyzer}</dd>
+              <dt>Shards:</dt>
+              <dd>{template.index_set_config.shards}</dd>
+              <dt>Replicas:</dt>
+              <dd>{template.index_set_config.replicas}</dd>
+              <dt>Max. number of segments:</dt>
+              <dd>{template.index_set_config.index_optimization_max_num_segments}</dd>
+              <dt>Index optimization after rotation:</dt>
+              <dd><Icon name={template.index_set_config.index_optimization_disabled ? 'cancel' : 'check_circle'} /></dd>
+              <dt>Field type refresh interval:</dt>
+              <dd>{formatRefreshInterval(template.index_set_config.field_type_refresh_interval)}</dd>
+            </dl>
+          </Section>
+
+          <Section title="Rotation & Retention">
+            {template.index_set_config.use_legacy_rotation ? (
+              <>
+                <RotationSummaryWrapper>
+                  <IndexMaintenanceStrategiesSummary config={{
+                    strategy: template.index_set_config.rotation_strategy_class,
+                    config: template.index_set_config.rotation_strategy,
+                  }}
+                                                     pluginExports={PluginStore.exports('indexRotationConfig')} />
+                </RotationSummaryWrapper>
                 <IndexMaintenanceStrategiesSummary config={{
-                  strategy: template.index_set_config.rotation_strategy_class,
-                  config: template.index_set_config.rotation_strategy,
+                  strategy: template.index_set_config.retention_strategy_class,
+                  config: template.index_set_config.retention_strategy,
                 }}
-                                                   pluginExports={PluginStore.exports('indexRotationConfig')} />
-              </RotationSummaryWrapper>
-              <IndexMaintenanceStrategiesSummary config={{
-                strategy: template.index_set_config.retention_strategy_class,
-                config: template.index_set_config.retention_strategy,
-              }}
-                                                 rotationStrategyClass={template.index_set_config.rotation_strategy_class}
-                                                 pluginExports={PluginStore.exports('indexRetentionConfig')} />
-            </>
-          ) : (
-            <DataTieringSummary config={template.index_set_config.data_tiering} />
-          )}
-        </Section>
-      </FlexWrapper>
-    </Col>
-  </Row>
-);
+                                                   rotationStrategyClass={template.index_set_config.rotation_strategy_class}
+                                                   pluginExports={PluginStore.exports('indexRetentionConfig')} />
+              </>
+            ) : (
+              <>
+                <DataTieringSummary config={template.index_set_config.data_tiering} />
+                {dataTieringPlugin && (
+                  <WarmTierSummaryWrapper>
+                    <dataTieringPlugin.TiersSummary config={template.index_set_config.data_tiering} />
+                  </WarmTierSummaryWrapper>
+                )}
+              </>
+            )}
+          </Section>
+        </FlexWrapper>
+      </Col>
+    </Row>
+  );
+};
 
 export default TemplateDetails;

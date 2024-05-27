@@ -134,13 +134,13 @@ class TimeBasedRotationStrategyConfiguration extends React.Component {
                addonAfter={this._formatDuration()}
                bsStyle={this._validationState()}
                required />
-          <Input id="rotate-empty-index-sets-checkbox"
-                 type="checkbox"
-                 ref={(rotateEmptyIndexSetRef) => { this.inputs.rotate_empty_index_set = rotateEmptyIndexSetRef; }}
-                 label="Rotate empty index set"
-                 onChange={this._onRotateEmptyIndexSetUpdate('rotate_empty_index_set')}
-                 checked={rotateEmptyIndexSet}
-                 help="Apply the rotation strategy even when the index set is empty (not recommended)." />
+        <Input id="rotate-empty-index-sets-checkbox"
+               type="checkbox"
+               ref={(rotateEmptyIndexSetRef) => { this.inputs.rotate_empty_index_set = rotateEmptyIndexSetRef; }}
+               label="Rotate empty index set"
+               onChange={this._onRotateEmptyIndexSetUpdate('rotate_empty_index_set')}
+               checked={rotateEmptyIndexSet}
+               help="Apply the rotation strategy even when the index set is empty (not recommended)." />
       </div>
     );
   }
