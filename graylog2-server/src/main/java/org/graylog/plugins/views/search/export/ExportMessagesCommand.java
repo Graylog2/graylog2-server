@@ -40,6 +40,8 @@ public abstract class ExportMessagesCommand {
     public static final ElasticsearchQueryString DEFAULT_QUERY = ElasticsearchQueryString.empty();
     public static final Set<String> DEFAULT_STREAMS = ImmutableSet.of();
     public static final LinkedHashSet<String> DEFAULT_FIELDS = linkedHashSetOf("timestamp", "source", "message");
+
+    public static final LinkedHashSet<String> ALL_FIELDS = new LinkedHashSet<>();
     public static final int DEFAULT_CHUNK_SIZE = 1000;
     public static final DateTimeZone DEFAULT_TIME_ZONE = DateTimeZone.UTC;
 
