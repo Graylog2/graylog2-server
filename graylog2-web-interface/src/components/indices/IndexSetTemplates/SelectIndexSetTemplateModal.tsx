@@ -115,11 +115,26 @@ const SelectIndexSetTemplateModal = ({ hideModal, show }: Props) => {
   };
 
   const handleCustomSelect = (selectedTemplateId) => {
+    console.log('===selectedTemplateId', selectedTemplateId);
+
     const templateToSelect = customList.find((template) => template.id === selectedTemplateId);
+
+    console.log('===templateToSelect', templateToSelect);
 
     if (templateToSelect) {
       setTempSelectedTemplate(templateToSelect);
     }
+  };
+
+  const handleClose = () => {
+    sendTelemetry(
+      TELEMETRY_EVENT_TYPE.INDEX_SET_TEMPLATE.SELECT_CLOSED,
+      {
+        app_pathname: telemetryPathName,
+        app_action_value: 'select-index-set-template-cancelled',
+      });
+
+    hideModal();
   };
 
   const selectedCustomTemplate = customList.find((template) => template.id === tempSelectedTemplate?.id);
@@ -129,7 +144,7 @@ const SelectIndexSetTemplateModal = ({ hideModal, show }: Props) => {
     <Modal show={show}
            title="Index Set Strategy"
            bsSize="large"
-           onHide={hideModal}>
+           onHide={handleClose}>
       <Modal.Header closeButton>
         <Modal.Title>Index Set Strategy</Modal.Title>
       </Modal.Header>

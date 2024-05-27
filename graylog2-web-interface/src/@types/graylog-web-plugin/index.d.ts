@@ -135,7 +135,7 @@ type DataTiering = {
   TiersSummary: React.ComponentType<{
     config: DataTieringConfig
   }>,
-  WarmTierReadinessInfo: WarmTierReadinessInfo,
+  WarmTierReadinessInfo: React.ComponentType,
 }
 
 type FieldValueProvider = {
