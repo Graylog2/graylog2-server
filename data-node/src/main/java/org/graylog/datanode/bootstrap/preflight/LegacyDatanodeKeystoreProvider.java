@@ -18,6 +18,7 @@ package org.graylog.datanode.bootstrap.preflight;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import org.graylog.datanode.configuration.DatanodeKeystore;
 import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoLocation;
@@ -32,7 +33,6 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
-import java.security.cert.Certificate;
 import java.util.Base64;
 import java.util.Optional;
 
@@ -64,18 +64,15 @@ public class LegacyDatanodeKeystoreProvider {
 
     private boolean isValidKeyAndCert(KeyStore keystore) {
         try {
-            final Key privateKey = keystore.getKey(CertConstants.DATANODE_KEY_ALIAS, passwordSecret.toCharArray());
-            if (privateKey != null) {
-                final Certificate[] certChain = keystore.getCertificateChain(CertConstants.DATANODE_KEY_ALIAS);
-                if (certChain.length > 1) { // TODO: better validation
-                    // the certificate is signed, it makes sense to persist it
-                    return true;
-                }
-            }
+            return hasPrivateKey(keystore) && DatanodeKeystore.isSignedCertificateChain(keystore);
         } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException e) {
-            LOG.warn("Failed to obtain legacy keystore, ignoring", e);
+            LOG.warn("Failed to obtain legacy keystore, ignoring it", e);
+            return false;
         }
-        return false;
+    }
+
+    private boolean hasPrivateKey(KeyStore keystore) throws KeyStoreException, NoSuchAlgorithmException, UnrecoverableKeyException {
+        return keystore.getKey(CertConstants.DATANODE_KEY_ALIAS, passwordSecret.toCharArray()) != null;
     }
 
     private Optional<KeyStore> loadKeystore() throws KeyStoreStorageException {

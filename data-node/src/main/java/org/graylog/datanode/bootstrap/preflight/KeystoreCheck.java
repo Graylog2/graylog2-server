@@ -45,6 +45,9 @@ import java.util.Optional;
  * This check verifies that each datanode has a private key configured. It may be needed right now, but at the moment
  * we'll start provisioning and create certificate signing requests, we may be sure that there is one private key
  * available.
+ * ·<br>
+ * Additionally, this check is able to restore existing keystore persisted in mongodb. It may hold valid certificate
+ * that we want to reuse. Otherwise, the node would undergo signing again.
  */
 public class KeystoreCheck implements PreflightCheck {
 
@@ -85,7 +88,7 @@ public class KeystoreCheck implements PreflightCheck {
     }
 
     private static KeyPair generateKeyPair() throws Exception {
-        final CertRequest certRequest = CertRequest.selfSigned(DatanodeKeystore.DATANODE_KEY_ALIAS) // todo: should we use the hostname as alias?
+        final CertRequest certRequest = CertRequest.selfSigned(DatanodeKeystore.DATANODE_KEY_ALIAS)
                 .isCA(false)
                 .validity(Duration.ofDays(99 * 365));
 

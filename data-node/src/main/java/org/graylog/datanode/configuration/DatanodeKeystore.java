@@ -55,7 +55,7 @@ public class DatanodeKeystore {
 
     @Inject
     public DatanodeKeystore(DatanodeConfiguration configuration, final @Named("password_secret") String passwordSecret) {
-        this(configuration.datanodeDirectories(),  passwordSecret);
+        this(configuration.datanodeDirectories(), passwordSecret);
     }
 
     DatanodeKeystore(DatanodeDirectories datanodeDirectories, String passwordSecret) {
@@ -69,11 +69,16 @@ public class DatanodeKeystore {
 
     public boolean hasSignedCertificate() throws DatanodeKeystoreException {
         try {
-            return loadKeystore().getCertificateChain(DATANODE_KEY_ALIAS).length > 1; // TODO: proper certificates check!!!
+            final KeyStore keystore = loadKeystore();
+            return isSignedCertificateChain(keystore);
         } catch (KeyStoreException e) {
             throw new DatanodeKeystoreException(e);
         }
 
+    }
+
+    public static boolean isSignedCertificateChain(KeyStore keystore) throws KeyStoreException {
+        return keystore.getCertificateChain(DATANODE_KEY_ALIAS).length > 1;  // TODO: proper certificates check!!!
     }
 
     @Nonnull
