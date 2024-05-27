@@ -17,33 +17,32 @@
 package org.graylog2.database.indices;
 
 import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
+import com.mongodb.client.ListIndexesIterable;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Collation;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import org.bson.Document;
 import org.bson.conversions.Bson;
-import org.bson.types.ObjectId;
-import org.mongojack.JacksonDBCollection;
+import org.graylog2.database.utils.MongoUtils;
 
 import java.time.Duration;
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-public class MongoDbIndexTools {
+public class MongoDbIndexTools<T> {
 
     static final String INDEX_NAME_KEY = "name";
     static final String COLLATION_KEY = "collation";
     static final String UNIQUE_KEY = "unique";
     static final String LOCALE_KEY = "locale";
 
-    private final JacksonDBCollection<?, ObjectId> db;
+    private final MongoCollection<T> db;
 
-    public MongoDbIndexTools(final JacksonDBCollection<?, ObjectId> db) {
+    public MongoDbIndexTools(final MongoCollection<T> db) {
         this.db = db;
     }
 
@@ -77,10 +76,10 @@ public class MongoDbIndexTools {
         if (!sortFields.containsAll(caseInsensitiveStringSortFields)) {
             throw new IllegalArgumentException("Case Insensitive String Sort Fields should be a subset of all Sort Fields ");
         }
-        final List<DBObject> existingIndices = db.getIndexInfo();
+        final var existingIndices = db.listIndexes();
         for (String sortField : sortFields) {
             if (!sortField.equals(idField)) { //id has index by default
-                final Optional<DBObject> existingIndex = getExistingIndex(existingIndices, sortField);
+                final var existingIndex = getExistingIndex(existingIndices, sortField);
                 if (caseInsensitiveStringSortFields.contains(sortField)) { //index string fields with collation for more efficient case-insensitive sorting
                     if (existingIndex.isEmpty()) {
                         createCaseInsensitiveStringIndex(sortField);
@@ -107,18 +106,18 @@ public class MongoDbIndexTools {
     }
 
     private void createSingleFieldIndex(final String sortField) {
-        this.db.createIndex(new BasicDBObject(sortField, 1), new BasicDBObject(UNIQUE_KEY, false));
+        this.db.createIndex(Indexes.ascending(sortField), new IndexOptions().unique(false));
     }
 
     private void createCaseInsensitiveStringIndex(final String sortField) {
-        this.db.createIndex(new BasicDBObject(sortField, 1), new BasicDBObject(COLLATION_KEY, new BasicDBObject(LOCALE_KEY, "en")));
+        this.db.createIndex(Indexes.ascending(sortField), new IndexOptions().collation(Collation.builder().locale("en").build()));
     }
 
-    private Optional<DBObject> getExistingIndex(final List<DBObject> existingIndices, final String sortField) {
+    private Optional<Document> getExistingIndex(final ListIndexesIterable<Document> existingIndices, final String sortField) {
         if (existingIndices == null) {
             return Optional.empty();
         }
-        return existingIndices.stream()
+        return MongoUtils.stream(existingIndices)
                 .filter(info ->
                         info.get(INDEX_NAME_KEY).equals(sortField + "_1")
                 )
@@ -126,6 +125,6 @@ public class MongoDbIndexTools {
     }
 
     public void createUniqueIndex(final String field) {
-        this.db.createIndex(new BasicDBObject(field, 1), new BasicDBObject(UNIQUE_KEY, true));
+        this.db.createIndex(Indexes.ascending(field), new IndexOptions().unique(true));
     }
 }

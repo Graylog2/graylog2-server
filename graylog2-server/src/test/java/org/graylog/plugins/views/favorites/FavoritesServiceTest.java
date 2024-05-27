@@ -34,6 +34,7 @@ import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.users.events.UserDeletedEvent;
 import org.junit.jupiter.api.BeforeEach;
@@ -91,7 +92,7 @@ public class FavoritesServiceTest {
 
         this.testUserService = testUserService;
         this.grnRegistry = grnRegistry;
-        this.favoritesService = new FavoritesService(mongodb.mongoConnection(),
+        this.favoritesService = new FavoritesService(new MongoCollections(mongoJackObjectMapperProvider, mongodb.mongoConnection()),
                 new EventBus(),
                 mongoJackObjectMapperProvider,
                 null,

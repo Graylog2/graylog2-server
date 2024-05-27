@@ -34,7 +34,6 @@ import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.CommonMongoJackObjectMapperProvider;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
-import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.UserService;
@@ -76,7 +75,7 @@ class ViewOwnershipToGrantsMigrationTest {
 
         final EntityOwnershipService entityOwnershipService = new EntityOwnershipService(grantService, grnRegistry);
         final MongoCollections mongoCollections = new MongoCollections(new CommonMongoJackObjectMapperProvider(objectMapperProvider), mongodb.mongoConnection());
-        final TestViewService viewService = new TestViewService(mongodb.mongoConnection(), objectMapperProvider, clusterConfigService, entityOwnershipService, viewSummaryService, mongoCollections);
+        final TestViewService viewService = new TestViewService(objectMapperProvider, clusterConfigService, entityOwnershipService, viewSummaryService, mongoCollections);
 
         this.migration = new ViewOwnerShipToGrantsMigration(userService, grantService, "admin", viewService, grnRegistry);
     }
@@ -135,13 +134,12 @@ class ViewOwnershipToGrantsMigrationTest {
     }
 
     public static class TestViewService extends ViewService {
-        public TestViewService(MongoConnection mongoConnection,
-                               MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
+        public TestViewService(MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
                                ClusterConfigService clusterConfigService,
                                EntityOwnershipService entityOwnerShipService,
                                ViewSummaryService viewSummaryService,
                                MongoCollections mongoCollections) {
-            super(mongoConnection, mongoJackObjectMapperProvider, clusterConfigService, view -> new ViewRequirements(Collections.emptySet(), view), entityOwnerShipService, viewSummaryService, mongoCollections);
+            super(mongoJackObjectMapperProvider, clusterConfigService, view -> new ViewRequirements(Collections.emptySet(), view), entityOwnerShipService, viewSummaryService, mongoCollections);
         }
     }
 }

@@ -27,6 +27,7 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.rest.models.SortOrder;
 import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.After;
@@ -78,7 +79,6 @@ public class ViewServiceUsesViewRequirementsTest {
         final MongoCollections mongoCollections = new MongoCollections(new CommonMongoJackObjectMapperProvider(mapper),
                 mongodb.mongoConnection());
         this.viewService = new ViewService(
-                mongodb.mongoConnection(),
                 objectMapperProvider,
                 clusterConfigService,
                 viewRequirementsFactory,
@@ -166,7 +166,7 @@ public class ViewServiceUsesViewRequirementsTest {
                 searchUser,
                 searchQueryParser.parse("*"),
                 view -> true,
-                "desc",
+                SortOrder.DESCENDING,
                 "title",
                 1,
                 5

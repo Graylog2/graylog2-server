@@ -17,19 +17,19 @@
 package org.graylog2.database.indices;
 
 import com.mongodb.BasicDBObject;
-import org.bson.types.ObjectId;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.Collation;
+import com.mongodb.client.model.IndexOptions;
+import com.mongodb.client.model.Indexes;
+import org.bson.conversions.Bson;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mongojack.JacksonDBCollection;
 
 import java.util.List;
 
-import static org.graylog2.database.indices.MongoDbIndexTools.COLLATION_KEY;
-import static org.graylog2.database.indices.MongoDbIndexTools.LOCALE_KEY;
-import static org.graylog2.database.indices.MongoDbIndexTools.UNIQUE_KEY;
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
@@ -41,7 +41,7 @@ class MongoDbIndexToolsTest {
 
     private MongoDbIndexTools toTest;
     @Mock
-    private JacksonDBCollection<?, ObjectId> db;
+    private MongoCollection<?> db;
 
     @BeforeEach
     void setUp() {
@@ -58,7 +58,7 @@ class MongoDbIndexToolsTest {
         toTest.prepareIndices("id", List.of("id"), List.of());
 
         verify(db, never()).createIndex(any());
-        verify(db, never()).createIndex(any(), any());
+        verify(db, never()).createIndex(any(Bson.class), any(IndexOptions.class));
     }
 
     @Test
@@ -66,11 +66,11 @@ class MongoDbIndexToolsTest {
         doReturn(List.of(BasicDBObject.parse("""
                 {v: 2, key: { number: 1 }, name: 'number_1'}
                 """)))
-                .when(db).getIndexInfo();
+                .when(db).listIndexes();
 
         toTest.prepareIndices("id", List.of("number"), List.of());
         verify(db, never()).createIndex(any());
-        verify(db, never()).createIndex(any(), any());
+        verify(db, never()).createIndex(any(Bson.class), any(IndexOptions.class));
     }
 
     @Test
@@ -87,27 +87,27 @@ class MongoDbIndexToolsTest {
                                  }
                                }
                 """)))
-                .when(db).getIndexInfo();
+                .when(db).listIndexes();
 
         toTest.prepareIndices("id", List.of("summary"), List.of("summary"));
         verify(db, never()).createIndex(any());
-        verify(db, never()).createIndex(any(), any());
+        verify(db, never()).createIndex(any(Bson.class), any(IndexOptions.class));
     }
 
     @Test
     void createsSimpleIndexIfDoesNotExists() {
-        doReturn(List.of()).when(db).getIndexInfo();
+        doReturn(List.of()).when(db).listIndexes();
 
         toTest.prepareIndices("id", List.of("number"), List.of());
-        verify(db).createIndex(new BasicDBObject("number", 1), new BasicDBObject(UNIQUE_KEY, false));
+        verify(db).createIndex(Indexes.ascending("number"), new IndexOptions().unique(false));
     }
 
     @Test
     void createsCollationIndexIfDoesNotExists() {
-        doReturn(List.of()).when(db).getIndexInfo();
+        doReturn(List.of()).when(db).listIndexes();
 
         toTest.prepareIndices("id", List.of("summary"), List.of("summary"));
-        verify(db).createIndex(new BasicDBObject("summary", 1), new BasicDBObject(COLLATION_KEY, new BasicDBObject(LOCALE_KEY, "en")));
+        verify(db).createIndex(Indexes.ascending("summary"), new IndexOptions().collation(Collation.builder().locale("en").build()));
     }
 
     @Test
@@ -125,21 +125,21 @@ class MongoDbIndexToolsTest {
                                  }
                                }
                 """)))
-                .when(db).getIndexInfo();
+                .when(db).listIndexes();
 
         toTest.prepareIndices("id", List.of("number"), List.of());
-        verify(db).dropIndex(new BasicDBObject("number", 1));
-        verify(db).createIndex(new BasicDBObject("number", 1), new BasicDBObject(UNIQUE_KEY, false));
+        verify(db).dropIndex(Indexes.ascending("number"));
+        verify(db).createIndex(Indexes.ascending("number"), new IndexOptions().unique(false));
     }
 
     @Test
     void replacesWrongSimpleIndexWithProperOne() {
         //summary should not have collation index, but a simple one!
         doReturn(List.of(BasicDBObject.parse("{v: 2, key: { summary: 1 }, name: 'summary_1'}))")))
-                .when(db).getIndexInfo();
+                .when(db).listIndexes();
 
         toTest.prepareIndices("id", List.of("summary"), List.of("summary"));
-        verify(db).dropIndex(new BasicDBObject("summary", 1));
-        verify(db).createIndex(new BasicDBObject("summary", 1), new BasicDBObject(COLLATION_KEY, new BasicDBObject(LOCALE_KEY, "en")));
+        verify(db).dropIndex(Indexes.ascending("summary"));
+        verify(db).createIndex(Indexes.ascending("summary"), new IndexOptions().collation(Collation.builder().locale("en").build()));
     }
 }

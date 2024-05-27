@@ -120,7 +120,7 @@ public class DashboardV1FacadeTest {
         searchDbService = new ViewFacadeTest.TestSearchDBService(mongoConnection, mapper);
         final MongoCollections mongoCollections = new MongoCollections(
                 new CommonMongoJackObjectMapperProvider(() -> objectMapper), mongoConnection);
-        viewService = new ViewFacadeTest.TestViewService(mongoConnection, mapper, null, mongoCollections);
+        viewService = new ViewFacadeTest.TestViewService(mapper, null, mongoCollections);
         viewSummaryService = new ViewFacadeTest.TestViewSummaryService(mongoConnection, mapper, mongoCollections);
         userService = mock(UserService.class);
         final UserImpl fakeUser = new UserImpl(mock(PasswordAlgorithmFactory.class), new Permissions(ImmutableSet.of()),

@@ -29,6 +29,7 @@ import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.system.SimpleNodeId;
+import org.graylog2.rest.models.SortOrder;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
 import org.graylog2.security.RestrictedChainingClassLoader;
@@ -71,7 +72,6 @@ public class ViewServiceTest {
                 new ClusterEventBus()
         );
         this.dbService = new ViewService(
-                mongodb.mongoConnection(),
                 objectMapperProvider,
                 clusterConfigService,
                 view -> new ViewRequirements(Collections.emptySet(), view),
@@ -153,7 +153,7 @@ public class ViewServiceTest {
         final PaginatedList<ViewDTO> result1 = dbService.searchPaginated(
                 searchUser,
                 queryParser.parse("A B D"),
-                view -> true, "desc",
+                view -> true, SortOrder.DESCENDING,
                 "title",
                 1,
                 5
@@ -169,7 +169,7 @@ public class ViewServiceTest {
         final PaginatedList<ViewDTO> result2 = dbService.searchPaginated(
                 searchUser,
                 queryParser.parse("A B D"),
-                view -> view.title().contains("B") || view.title().contains("D"), "desc",
+                view -> view.title().contains("B") || view.title().contains("D"), SortOrder.DESCENDING,
                 "title",
                 1,
                 5
@@ -204,7 +204,7 @@ public class ViewServiceTest {
                 searchUser,
                 queryParser.parse(""),
                 view -> true,
-                "desc",
+                SortOrder.DESCENDING,
                 "owner",
                 1,
                 3
@@ -222,7 +222,7 @@ public class ViewServiceTest {
                 searchUser,
                 queryParser.parse(""),
                 view -> true,
-                "asc",
+                SortOrder.ASCENDING,
                 "owner",
                 1,
                 3
@@ -256,7 +256,7 @@ public class ViewServiceTest {
         final PaginatedList<ViewDTO> result1 = dbService.searchPaginatedByType(
                 ViewDTO.Type.DASHBOARD,
                 queryParser.parse("A B D"),
-                view -> true, "desc",
+                view -> true, SortOrder.DESCENDING,
                 "title",
                 1,
                 5
@@ -272,7 +272,7 @@ public class ViewServiceTest {
         final PaginatedList<ViewDTO> result2 = dbService.searchPaginatedByType(
                 ViewDTO.Type.DASHBOARD,
                 queryParser.parse("A B D"),
-                view -> view.title().contains("B") || view.title().contains("D"), "desc",
+                view -> view.title().contains("B") || view.title().contains("D"), SortOrder.DESCENDING,
                 "title",
                 1,
                 5
@@ -288,7 +288,7 @@ public class ViewServiceTest {
         final PaginatedList<ViewDTO> result3 = dbService.searchPaginatedByType(
                 ViewDTO.Type.SEARCH,
                 queryParser.parse(""),
-                view -> true, "asc",
+                view -> true, SortOrder.ASCENDING,
                 "title",
                 1,
                 5
