@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.Graph;
+import jakarta.ws.rs.NotFoundException;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchRequirements;
@@ -85,8 +86,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import jakarta.ws.rs.NotFoundException;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -106,7 +105,7 @@ public class ViewFacadeTest {
     public static class TestSearchDBService extends SearchDbService {
         protected TestSearchDBService(MongoConnection mongoConnection,
                                       MongoJackObjectMapperProvider mapper) {
-            super(mongoConnection, mapper, dto -> new SearchRequirements(Collections.emptySet(), dto), new IgnoreSearchFilters());
+            super(new MongoCollections(mapper, mongoConnection), dto -> new SearchRequirements(Collections.emptySet(), dto), new IgnoreSearchFilters(), mapper);
         }
     }
 

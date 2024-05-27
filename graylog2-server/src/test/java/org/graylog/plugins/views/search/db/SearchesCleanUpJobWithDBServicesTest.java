@@ -81,10 +81,10 @@ public class SearchesCleanUpJobWithDBServicesTest {
         );
         this.searchDbService = spy(
                 new SearchDbService(
-                        mongodb.mongoConnection(),
-                        mapperProvider,
+                        new MongoCollections(mapperProvider, mongodb.mongoConnection()),
                         dto -> new SearchRequirements(Collections.emptySet(), dto),
-                        new IgnoreSearchFilters()
+                        new IgnoreSearchFilters(),
+                        mapperProvider
                 )
         );
         this.searchesCleanUpJob = new SearchesCleanUpJob(viewService, searchDbService, Duration.standardDays(4),
