@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { styled } from 'styled-components';
 import { Field, useFormikContext } from 'formik';
 
@@ -25,12 +25,7 @@ import { Input, Label } from 'components/bootstrap';
 import type { UnitJson } from 'hooks/useFieldUnitTypes';
 import useFieldUnitTypes from 'hooks/useFieldUnitTypes';
 import type { MetricUnitsFormValues } from 'views/types';
-
-const UnitButton = styled.div`
-  position: absolute;
-  left: calc(100% + 5px);
-  top: 0;
-`;
+import UnitContainer from 'views/components/aggregationwizard/metric/UnitContainer';
 
 const Container = styled.div`
   display: flex;
@@ -55,9 +50,6 @@ const UnitMetricPopover = ({ index }: { index: number }) => {
     setFieldValue(`metrics.${index}.unitAbbrev`, undefined);
   }, [index, setFieldValue]);
 
-  useEffect(() => {
-  }, []);
-
   const badgeLabel = useMemo(() => {
     const curUnit = values?.metrics?.[index]?.unitAbbrev;
 
@@ -67,13 +59,13 @@ const UnitMetricPopover = ({ index }: { index: number }) => {
   return (
     <Popover position="right" opened={show} withArrow>
       <Popover.Target>
-        <UnitButton>
+        <UnitContainer>
           <Label onClick={toggleShow}
                  title="Unit settings"
                  role="button">
             {badgeLabel}
           </Label>
-        </UnitButton>
+        </UnitContainer>
       </Popover.Target>
       <Popover.Dropdown title="Metrics Unit Settings">
         <Container>

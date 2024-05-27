@@ -21,6 +21,8 @@ import maxBy from 'lodash/maxBy';
 import omit from 'lodash/omit';
 import set from 'lodash/set';
 import mapValues from 'lodash/mapValues';
+import get from 'lodash/get';
+import keyBy from 'lodash/keyBy';
 
 import type { MetricUnitType } from 'views/types';
 import type { SeriesUnitState } from 'views/logic/aggregationbuilder/SeriesUnit';
@@ -137,8 +139,10 @@ const useFieldUnitTypes = () => {
   const convertValueToBaseUnit = useCallback((value: number, params: ConversionParams) => _convertValueToBaseUnit(units, value, params), [units]);
   const convertValueToUnit: ConvertValueToUnit = useCallback((value, fromParams, toParams) => _convertValueToUnit(units, value, fromParams, toParams), [units]);
   const getPrettifiedValue = useCallback((value: number, params: ConversionParams) => _getPrettifiedValue(units, value, params), [units]);
+  const unitsByAbbrev = useMemo(() => mapValues(units, (list) => keyBy(list, 'abbrev')), [units]);
+  const getUnitInfo = useCallback((unitType: MetricUnitType, abbrev: string) => get(unitsByAbbrev, [unitType, abbrev]), [unitsByAbbrev]);
 
-  return { units, getBaseUnit, convertValueToBaseUnit, convertValueToUnit, getPrettifiedValue };
+  return { units, unitsByAbbrev, getUnitInfo, getBaseUnit, convertValueToBaseUnit, convertValueToUnit, getPrettifiedValue };
 };
 
 export default useFieldUnitTypes;

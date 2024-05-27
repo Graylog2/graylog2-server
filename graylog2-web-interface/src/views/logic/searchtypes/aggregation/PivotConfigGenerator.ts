@@ -26,7 +26,6 @@ import type NumberVisualizationConfig from 'views/logic/aggregationbuilder/visua
 import type { TimeUnit } from 'views/Constants';
 import generateId from 'logic/generateId';
 import type SeriesUnit from 'views/logic/aggregationbuilder/SeriesUnit';
-import isFunctionAllowsUnit from 'views/logic/isFunctionAllowsUnit';
 
 import type SortConfig from '../../aggregationbuilder/SortConfig';
 
@@ -113,10 +112,6 @@ const generateConfig = (id: string, name: string, {
         id: s.effectiveName,
         ...parseSeries(s.function),
       });
-
-      if (isFunctionAllowsUnit(res.type) && s?.unit?.isDefined) {
-        res.unit = s.unit;
-      }
 
       return res;
     }),

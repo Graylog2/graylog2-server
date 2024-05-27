@@ -30,7 +30,9 @@ import { Properties } from 'views/logic/fieldtypes/FieldType';
 import useAggregationFunctions from 'views/hooks/useAggregationFunctions';
 import { percentileOptions, percentageStrategyOptions } from 'views/Constants';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
-import UnitMetricPopover from 'views/components/aggregationwizard/metric/UnitMetricPopover';
+import isFunctionAllowsUnit from 'views/logic/isFunctionAllowsUnit';
+import useFieldTypesUnits from 'views/hooks/useFieldTypesUnits';
+import MetricUnit from 'views/components/aggregationwizard/metric/MetricUnit';
 
 import FieldSelect from '../FieldSelect';
 
@@ -55,6 +57,7 @@ const hasProperty = (fieldType: FieldTypeMapping, properties: Array<Property>) =
 };
 
 const Metric = ({ index }: Props) => {
+  const preDefinedFieldTypes = useFieldTypesUnits();
   const metricFieldSelectRef = useRef(null);
   const { data: functions, isLoading } = useAggregationFunctions();
   const functionOptions = useMemo(() => (isLoading ? [] : Object.values(functions)
@@ -81,7 +84,7 @@ const Metric = ({ index }: Props) => {
   }, [requiresNumericField]);
 
   const [functionIsSettled, setFunctionIsSettled] = useState<boolean>(false);
-  const onFunctionChange = useCallback((newValue) => {
+  const onFunctionChange = useCallback((newValue: string) => {
     setFieldValue(`metrics.${index}.function`, newValue);
     setFunctionIsSettled(true);
   }, [setFieldValue, index]);
@@ -94,8 +97,19 @@ const Metric = ({ index }: Props) => {
     }
   }, [functionIsSettled, metricsError, index, metricFieldSelectRef]);
 
-  const showUnitType = ['sum', 'max', 'min', 'avg'].includes(currentFunction);
-  // console.log({ currentFunction });
+  const onFieldChange = useCallback((newValue: string) => {
+    setFieldValue(`metrics.${index}.field`, newValue);
+
+    if (preDefinedFieldTypes?.[newValue]) {
+      setFieldValue(`metrics.${index}.unitType`, preDefinedFieldTypes[newValue].unitType);
+      setFieldValue(`metrics.${index}.unitAbbrev`, preDefinedFieldTypes[newValue].abbrev);
+    } else {
+      setFieldValue(`metrics.${index}.unitType`, undefined);
+      setFieldValue(`metrics.${index}.unitAbbrev`, undefined);
+    }
+  }, [index, preDefinedFieldTypes, setFieldValue]);
+
+  const showUnitType = isFunctionAllowsUnit(currentFunction);
 
   return (
     <Wrapper data-testid={`metric-${index}`}>
@@ -120,7 +134,7 @@ const Metric = ({ index }: Props) => {
       {hasFieldOption && (
         <FieldContainer>
           <Field name={`metrics.${index}.field`}>
-            {({ field: { name, value, onChange }, meta: { error } }) => (
+            {({ field: { name, value }, meta: { error } }) => (
               <Input id="metric-field"
                      label="Field"
                      error={error}
@@ -129,7 +143,7 @@ const Metric = ({ index }: Props) => {
                 <FieldSelect id="metric-field-select"
                              selectRef={metricFieldSelectRef}
                              menuPortalTarget={document.body}
-                             onChange={(fieldName) => onChange({ target: { name, value: fieldName } })}
+                             onChange={onFieldChange}
                              clearable={!isFieldRequired}
                              isFieldQualified={isFieldQualified}
                              name={name}
@@ -138,7 +152,7 @@ const Metric = ({ index }: Props) => {
               </Input>
             )}
           </Field>
-          {showUnitType && <UnitMetricPopover index={index} />}
+          {showUnitType && <MetricUnit index={index} predefinedValue={preDefinedFieldTypes?.[metrics[index]?.field]} />}
         </FieldContainer>
       )}
       {isPercentile && (
