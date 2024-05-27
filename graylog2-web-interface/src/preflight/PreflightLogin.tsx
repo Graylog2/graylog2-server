@@ -20,29 +20,25 @@ import { Formik, Form } from 'formik';
 
 import LoginChrome from 'components/login/LoginChrome';
 
-const PreflightLoginPage = () => {
-  console.log('test');
-
-  return (
-    <LoginChrome>
-      <Formik initialValues={{ username: '', password: '' }} onSubmit={(formValues) => console.log(formValues)}>
-        <Form>
-          <FormikInput placeholder="Username"
-                       label="Username"
-                       name="username"
-                       type="text"
-                       required />
-          <FormikInput placeholder="Password"
-                       label="Password"
-                       name="password"
-                       type="password"
-                       required />
-          <Space h="md" />
-          <Button type="submit">Sign in</Button>
-        </Form>
-      </Formik>
-    </LoginChrome>
-  );
-};
+const PreflightLoginPage = () => (
+  <LoginChrome>
+    <Formik initialValues={{ username: '', password: '' }} onSubmit={(formValues) => { window.open(`${window.location.protocol}//${formValues.username}:${formValues.password}@${window.location.host}`); }}>
+      <Form>
+        <FormikInput placeholder="Username"
+                     label="Username"
+                     name="username"
+                     type="text"
+                     required />
+        <FormikInput placeholder="Password"
+                     label="Password"
+                     name="password"
+                     type="password"
+                     required />
+        <Space h="md" />
+        <Button type="submit">Sign in</Button>
+      </Form>
+    </Formik>
+  </LoginChrome>
+);
 
 export default PreflightLoginPage;

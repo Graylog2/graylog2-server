@@ -15,37 +15,23 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { AppShell } from '@mantine/core';
-import { useState } from 'react';
+import { BrowserRouter as Router, Route, Navigate, Routes } from 'react-router-dom';
 
-import Navigation from 'preflight/navigation/Navigation';
-import Setup from 'preflight/components/Setup';
-import WaitingForStartup from 'preflight/components/WaitingForStartup';
-import ErrorBoundary from 'preflight/components/ErrorBoundary';
-
-import PreflightLoginPage from './PreflightLoginPage';
+import PreflightLogin from './PreflightLogin';
+import PreflightApp from './PreflightApp';
+import useAuthStatus from './hooks/useAuthStatus';
 
 const App = () => {
-  const isLoggedIn = false;
-
-  const [isWaitingForStartup, setIsWaitingForStartup] = useState(false);
-
-  if (!isLoggedIn) {
-    return (
-      <PreflightLoginPage />
-    );
-  }
+  const isAuthenticated = useAuthStatus();
 
   return (
-    <AppShell padding="md" header={{ height: 80 }}>
-      <Navigation />
-      <AppShell.Main>
-        <ErrorBoundary>
-          {!isWaitingForStartup && <Setup setIsWaitingForStartup={setIsWaitingForStartup} />}
-          {isWaitingForStartup && <WaitingForStartup />}
-        </ErrorBoundary>
-      </AppShell.Main>
-    </AppShell>
+    <Router>
+      <Routes>
+        <Route path="/login" element={isAuthenticated ? <Navigate to="/" replace /> : <PreflightLogin />} />
+        <Route path="/" element={isAuthenticated ? <PreflightApp /> : <Navigate to="/login" replace />} />
+        <Route path="*" element={isAuthenticated ? <Navigate to="/" replace /> : <Navigate to="/login" replace />} />
+      </Routes>
+    </Router>
   );
 };
 
