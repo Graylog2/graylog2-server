@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Button, Col, Row } from 'components/bootstrap';
@@ -34,13 +34,25 @@ const ButtonWrapper = styled.div`
   justify-content: end;
 `;
 
+const StyledCard = styled(Card)<{ $selected: boolean }>(({ $selected, theme }) => css`
+  display: flex;
+  gap: ${theme.spacings.sm};
+  ${$selected && `border-color: ${theme.colors.contrast.default};`}
+`);
+
+const Description = styled.p`
+  margin-bottom: 0;
+`;
+
 const IndexSetTemplateCard = ({ template, handleCardClick, isSelected }: Props) => {
   const dataTieringConfig = prepareDataTieringInitialValues(template.index_set_config.data_tiering, PluginStore);
 
   return (
-    <Card>
+    <StyledCard $selected={isSelected}>
       <h3>{template.title}</h3>
-      {template.index_set_config.use_legacy_rotation && (<p>{template.description}</p>)}
+      {template.index_set_config.use_legacy_rotation && (
+        <Description>{template.description}</Description>
+      )}
       {!template.index_set_config.use_legacy_rotation && (
         <Row>
           <Col md={8}>
@@ -50,13 +62,15 @@ const IndexSetTemplateCard = ({ template, handleCardClick, isSelected }: Props) 
                                       warmTierEnabled={dataTieringConfig.warm_tier_enabled}
                                       archiveData={dataTieringConfig.archive_before_deletion} />
           </Col>
-          <Col md={4}>{template.description}</Col>
+          <Col md={4}>
+            <Description>{template.description}</Description>
+          </Col>
         </Row>
       )}
       <ButtonWrapper>
         <Button onClick={() => handleCardClick(template)} disabled={isSelected}>{isSelected ? 'Selected' : 'Select'}</Button>
       </ButtonWrapper>
-    </Card>
+    </StyledCard>
   );
 };
 
