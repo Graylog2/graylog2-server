@@ -79,7 +79,7 @@ public class FavoritesService {
     }
 
     public void save(FavoritesForUserDTO favorite) {
-        this.db.insertOne(favorite);
+        this.db.replaceOne(MongoUtils.idEq(favorite.id()), favorite);
     }
 
     public void addFavoriteItemFor(final String in, final SearchUser searchUser) {
