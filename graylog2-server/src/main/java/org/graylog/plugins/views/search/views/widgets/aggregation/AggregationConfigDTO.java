@@ -23,11 +23,13 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog.plugins.formatting.units.model.UnitId;
 import org.graylog.plugins.views.search.views.WidgetConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.sort.SortConfigDTO;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
 
@@ -50,6 +52,9 @@ public abstract class AggregationConfigDTO implements WidgetConfigDTO {
 
     @JsonProperty(FIELD_ROW_PIVOTS)
     public abstract List<PivotDTO> rowPivots();
+
+    @JsonProperty(WidgetConfigDTO.UNIT_SETTINGS_PROPERTY)
+    public abstract Map<String, UnitId> unitSettings();
 
     @JsonProperty(FIELD_COLUMN_PIVOTS)
     public abstract List<PivotDTO> columnPivots();
@@ -109,6 +114,9 @@ public abstract class AggregationConfigDTO implements WidgetConfigDTO {
     public static abstract class Builder {
         @JsonProperty(FIELD_ROW_PIVOTS)
         public abstract Builder rowPivots(List<PivotDTO> rowPivots);
+
+        @JsonProperty(WidgetConfigDTO.UNIT_SETTINGS_PROPERTY)
+        public abstract Builder unitSettings(Map<String, UnitId> unitSettings);
 
         abstract List<PivotDTO> rowPivots();
 
@@ -179,6 +187,7 @@ public abstract class AggregationConfigDTO implements WidgetConfigDTO {
         @JsonCreator
         public static Builder builder() {
             return new AutoValue_AggregationConfigDTO.Builder()
+                    .unitSettings(Map.of())
                     .eventAnnotation(false)
                     .rollup(true);
         }

@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
+import org.graylog.plugins.formatting.units.model.UnitId;
 import org.graylog.plugins.views.search.views.WidgetConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.sort.SortConfigDTO;
 import org.graylog2.decorators.Decorator;
@@ -31,6 +32,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @AutoValue
 @JsonTypeName(MessageListConfigDTO.NAME)
@@ -45,6 +47,9 @@ public abstract class MessageListConfigDTO implements WidgetConfigDTO {
 
     @JsonProperty(FIELD_FIELDS)
     public abstract ImmutableSet<String> fields();
+
+    @JsonProperty(WidgetConfigDTO.UNIT_SETTINGS_PROPERTY)
+    public abstract Map<String, UnitId> unitSettings();
 
     @JsonProperty(FIELD_SHOW_MESSAGE_ROW)
     public abstract boolean showMessageRow();
@@ -63,6 +68,9 @@ public abstract class MessageListConfigDTO implements WidgetConfigDTO {
     public abstract static class Builder {
         @JsonProperty(FIELD_FIELDS)
         public abstract Builder fields(ImmutableSet<String> fields);
+
+        @JsonProperty(WidgetConfigDTO.UNIT_SETTINGS_PROPERTY)
+        public abstract Builder unitSettings(Map<String, UnitId> unitSettings);
 
         @JsonProperty(FIELD_SHOW_MESSAGE_ROW)
         public abstract Builder showMessageRow(boolean showMessageRow);
@@ -85,6 +93,7 @@ public abstract class MessageListConfigDTO implements WidgetConfigDTO {
         @JsonCreator
         public static Builder builder() {
             return new AutoValue_MessageListConfigDTO.Builder()
+                    .unitSettings(Map.of())
                     .decorators(Collections.emptyList())
                     .sort(Collections.emptyList());
         }

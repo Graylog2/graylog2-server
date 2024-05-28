@@ -20,4 +20,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
 @JsonAutoDetect
 public interface WidgetConfigDTO {
+
+    String UNIT_SETTINGS_PROPERTY = "units";
 }
