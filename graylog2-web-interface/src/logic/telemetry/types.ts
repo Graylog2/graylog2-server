@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-// This interface allows extending the event type keys via 'declare module'
 import type { ExtractObjectValues } from 'util/UtilityTypes';
 import type { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
