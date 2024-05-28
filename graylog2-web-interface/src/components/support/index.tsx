@@ -14,5 +14,5 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// eslint-disable-next-line import/prefer-default-export
 export { default as DocumentationLink } from './DocumentationLink';
+export { default as SupportSources } from './SupportSources';
