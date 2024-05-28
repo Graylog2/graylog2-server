@@ -58,9 +58,9 @@ public class SearchDbService {
                               SearchFiltersReFetcher searchFiltersRefetcher,
                               MongoJackObjectMapperProvider mongoJackObjectMapperProvider) {
         this.searchRequirementsFactory = searchRequirementsFactory;
-        db = mongoCollections.get("searches", Search.class);
+        db = mongoCollections.collection("searches", Search.class);
         db.createIndex(Indexes.ascending(Search.FIELD_CREATED_AT));
-        summarydb = mongoCollections.get("searches", SearchSummary.class);
+        summarydb = mongoCollections.collection("searches", SearchSummary.class);
         this.searchFiltersRefetcher = searchFiltersRefetcher;
         this.mongoUtils = new MongoUtils<>(db, mongoJackObjectMapperProvider.get());
     }

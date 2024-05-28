@@ -41,7 +41,7 @@ public class LastOpenedService {
     @Inject
     public LastOpenedService(MongoCollections mongoCollections,
                              EventBus eventBus) {
-        this.db = mongoCollections.get(COLLECTION_NAME, LastOpenedForUserDTO.class);
+        this.db = mongoCollections.collection(COLLECTION_NAME, LastOpenedForUserDTO.class);
         eventBus.register(this);
 
         db.createIndex(Indexes.ascending(LastOpenedForUserDTO.FIELD_USER_ID));

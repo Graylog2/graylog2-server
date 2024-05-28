@@ -29,7 +29,7 @@ class DashboardsService {
 
     @Inject
     DashboardsService(MongoCollections mongoCollections) {
-        this.db = mongoCollections.get(COLLECTION_NAME, Dashboard.class);
+        this.db = mongoCollections.collection(COLLECTION_NAME, Dashboard.class);
     }
 
     Stream<Dashboard> streamAll() {

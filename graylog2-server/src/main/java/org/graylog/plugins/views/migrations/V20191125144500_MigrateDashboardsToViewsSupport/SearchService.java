@@ -29,7 +29,7 @@ class SearchService {
 
     @Inject
     SearchService(MongoCollections mongoCollections, MongoJackObjectMapperProvider mapper) {
-        db = mongoCollections.get("searches", Search.class);
+        db = mongoCollections.collection("searches", Search.class);
         this.mongoUtils = new MongoUtils<>(db, mapper.get());
     }
 

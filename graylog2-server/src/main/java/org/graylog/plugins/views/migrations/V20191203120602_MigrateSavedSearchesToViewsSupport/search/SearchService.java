@@ -27,7 +27,7 @@ public class SearchService {
 
     @Inject
     SearchService(MongoCollections mongoCollections) {
-        this.db = mongoCollections.get("searches", Search.class);
+        this.db = mongoCollections.collection("searches", Search.class);
     }
 
     public ObjectId save(Search search) {

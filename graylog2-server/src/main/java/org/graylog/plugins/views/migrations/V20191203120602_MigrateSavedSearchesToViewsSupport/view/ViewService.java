@@ -19,7 +19,6 @@ package org.graylog.plugins.views.migrations.V20191203120602_MigrateSavedSearche
 import com.mongodb.client.MongoCollection;
 import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.utils.MongoUtils;
 
@@ -27,8 +26,8 @@ public class ViewService {
     protected final MongoCollection<View> db;
 
     @Inject
-    ViewService(MongoCollections mongoCollections, MongoJackObjectMapperProvider mapper) {
-        this.db = mongoCollections.get("views", View.class);
+    ViewService(MongoCollections mongoCollections) {
+        this.db = mongoCollections.collection("views", View.class);
     }
 
     public ObjectId save(View view) {

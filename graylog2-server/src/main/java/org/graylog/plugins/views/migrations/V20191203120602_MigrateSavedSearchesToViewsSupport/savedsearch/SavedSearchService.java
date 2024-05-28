@@ -33,7 +33,7 @@ public class SavedSearchService {
 
     @Inject
     public SavedSearchService(MongoCollections mongoCollections) {
-        this.db = mongoCollections.get(COLLECTION_NAME, SavedSearch.class);
+        this.db = mongoCollections.collection(COLLECTION_NAME, SavedSearch.class);
     }
 
     public Stream<SavedSearch> streamAll() {

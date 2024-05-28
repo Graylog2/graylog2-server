@@ -71,7 +71,7 @@ public class ViewService implements ViewUtils<ViewDTO> {
         this.viewRequirementsFactory = viewRequirementsFactory;
         this.entityOwnerShipService = entityOwnerShipService;
         this.viewSummaryService = viewSummaryService;
-        this.collection = mongoCollections.get(COLLECTION_NAME, ViewDTO.class);
+        this.collection = mongoCollections.collection(COLLECTION_NAME, ViewDTO.class);
         this.pagination = mongoCollections.paginationHelper(this.collection);
         this.mongoUtils = new MongoUtils<>(collection, mongoJackObjectMapperProvider.get());
 

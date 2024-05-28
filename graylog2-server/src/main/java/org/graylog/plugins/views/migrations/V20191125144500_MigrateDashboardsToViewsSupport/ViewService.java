@@ -30,7 +30,7 @@ class ViewService {
 
     @Inject
     ViewService(MongoCollections mongoCollections, MongoJackObjectMapperProvider mapper) {
-        this.db = mongoCollections.get("views", View.class);
+        this.db = mongoCollections.collection("views", View.class);
         this.mongoUtils = new MongoUtils<>(db, mapper.get());
     }
 

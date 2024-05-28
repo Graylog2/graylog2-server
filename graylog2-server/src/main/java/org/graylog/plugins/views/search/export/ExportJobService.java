@@ -34,7 +34,7 @@ public class ExportJobService {
 
     @Inject
     public ExportJobService(MongoCollections mongoCollections, MongoJackObjectMapperProvider mapper) {
-        db = mongoCollections.get("export_jobs", ExportJob.class);
+        db = mongoCollections.collection("export_jobs", ExportJob.class);
 
         db.createIndex(Indexes.ascending(ExportJob.FIELD_CREATED_AT), new IndexOptions().expireAfter(1L, TimeUnit.HOURS));
 

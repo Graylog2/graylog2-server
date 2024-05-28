@@ -55,7 +55,7 @@ public class FavoritesService {
                                final MongoJackObjectMapperProvider mapper,
                                final StartPageItemTitleRetriever startPageItemTitleRetriever,
                                final GRNRegistry grnRegistry) {
-        this.db = mongoCollections.get(COLLECTION_NAME, FavoritesForUserDTO.class);
+        this.db = mongoCollections.collection(COLLECTION_NAME, FavoritesForUserDTO.class);
         eventBus.register(this);
         this.startPageItemTitleRetriever = startPageItemTitleRetriever;
         this.grnRegistry = grnRegistry;

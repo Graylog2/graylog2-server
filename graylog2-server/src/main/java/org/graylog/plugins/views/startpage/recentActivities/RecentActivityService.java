@@ -64,7 +64,7 @@ public class RecentActivityService {
                                     final PermissionAndRoleResolver permissionAndRoleResolver,
                                     final long maximum) {
         mongoConnection.getMongoDatabase().createCollection(COLLECTION_NAME, new CreateCollectionOptions().capped(true).sizeInBytes(maximum * 1024).maxDocuments(maximum));
-        this.db = mongoCollections.get(COLLECTION_NAME, RecentActivityDTO.class);
+        this.db = mongoCollections.collection(COLLECTION_NAME, RecentActivityDTO.class);
         this.grnRegistry = grnRegistry;
         this.permissionAndRoleResolver = permissionAndRoleResolver;
         this.eventBus = eventBus;
