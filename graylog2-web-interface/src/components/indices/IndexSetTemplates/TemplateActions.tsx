@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import { Button, ButtonToolbar, MenuItem } from 'components/bootstrap';
 import Routes from 'routing/Routes';
@@ -72,6 +73,13 @@ const TemplateActions = ({ id, title, built_in, isDefault } : Props) => {
       )}
     </ButtonToolbar>
   );
+};
+
+TemplateActions.propTypes = {
+  id: PropTypes.string.isRequired,
+  title: PropTypes.string.isRequired,
+  built_in: PropTypes.bool.isRequired,
+  isDefault: PropTypes.bool.isRequired,
 };
 
 export default TemplateActions;

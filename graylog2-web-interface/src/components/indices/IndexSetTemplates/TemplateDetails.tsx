@@ -23,6 +23,7 @@ import { Section, Icon } from 'components/common';
 import IndexMaintenanceStrategiesSummary from 'components/indices/IndexMaintenanceStrategiesSummary';
 import { DataTieringSummary, DATA_TIERING_TYPE } from 'components/indices/data-tiering';
 import type { IndexSetTemplate } from 'components/indices/IndexSetTemplates/types';
+import { indexSetTemplatePropType } from 'components/indices/IndexSetTemplates/types';
 
 type Props = {
   template: IndexSetTemplate,
@@ -122,6 +123,10 @@ const TemplateDetails = ({
       </Col>
     </Row>
   );
+};
+
+TemplateDetails.propTypes = {
+  template: indexSetTemplatePropType.isRequired,
 };
 
 export default TemplateDetails;

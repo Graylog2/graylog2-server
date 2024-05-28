@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import styled, { css, useTheme } from 'styled-components';
 
 import { Tooltip } from 'components/bootstrap';
@@ -187,6 +188,14 @@ const DataTieringVisualisation = ({ archiveData, minDays, maxDays, minDaysInHot,
 };
 
 export default DataTieringVisualisation;
+
+DataTieringVisualisation.propTypes = {
+  minDays: PropTypes.number,
+  maxDays: PropTypes.number,
+  minDaysInHot: PropTypes.number,
+  warmTierEnabled: PropTypes.bool,
+  archiveData: PropTypes.bool,
+};
 
 DataTieringVisualisation.defaultProps = {
   minDays: 0,
