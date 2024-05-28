@@ -173,7 +173,7 @@ public class ViewService implements ViewUtils<ViewDTO> {
                                                                         final ViewDTO.Type type,
                                                                         final Bson dbQuery, //query executed on DB level
                                                                         final Predicate<ViewSummaryDTO> predicate, //predicate executed on code level, AFTER data is fetched
-                                                                        final String order,
+                                                                        final SortOrder order,
                                                                         final String sortField,
                                                                         final int page,
                                                                         final int perPage) {
