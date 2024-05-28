@@ -29,7 +29,5 @@ public class DataNodeProvisioningBindings extends AbstractModule {
 
         // this is the generic dependency used by callers
         bind(DataNodeProvisioningService.class).to(DataNodeProvisioningBusEvents.class);
-
-        bind(GraylogCertificateProvisioningHandler.class).asEagerSingleton();
     }
 }

@@ -16,128 +16,62 @@
  */
 package org.graylog2.bootstrap.preflight;
 
-import com.github.rholder.retry.Attempt;
-import com.github.rholder.retry.RetryException;
-import com.github.rholder.retry.RetryListener;
-import com.github.rholder.retry.RetryerBuilder;
-import com.github.rholder.retry.StopStrategies;
-import com.github.rholder.retry.WaitStrategies;
-import com.google.common.base.Suppliers;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 import org.graylog.security.certutil.CaConfiguration;
 import org.graylog.security.certutil.CaService;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog.security.certutil.cert.CertificateChain;
 import org.graylog.security.certutil.csr.CsrSigner;
 import org.graylog2.Configuration;
-import org.graylog2.cluster.nodes.DataNodeDto;
-import org.graylog2.cluster.nodes.NodeService;
-import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
-import org.graylog2.cluster.preflight.DataNodeProvisioningService;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.graylog2.security.CustomCAX509TrustManager;
-import org.graylog2.security.IndexerJwtAuthTokenProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
-import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
 
 import static org.graylog.security.certutil.CertConstants.CA_KEY_ALIAS;
 
-@Singleton
+/**
+ * This is the graylog-server handler that reacts to certificate signing requests and returns signed certificates.
+ */
 public class GraylogCertificateProvisioningHandler {
     private static final Logger LOG = LoggerFactory.getLogger(GraylogCertificateProvisioningHandler.class);
-    private static final int THREADPOOL_THREADS = 5;
-    private static final int CONNECTION_ATTEMPTS = 40;
-    private static final int WAIT_BETWEEN_CONNECTION_ATTEMPTS = 3;
-    private static final Duration DELAY_BEFORE_SHOWING_EXCEPTIONS = Duration.ofMinutes(1);
-    private static final String ERROR_MESSAGE_PREFIX = "Error trying to connect to data node ";
-
-    @Deprecated
-    private final DataNodeProvisioningService dataNodeProvisioningService;
-    private final NodeService<DataNodeDto> nodeService;
-
     private final CaConfiguration configuration;
     private final CaService caService;
     private final CsrSigner csrSigner;
     private final ClusterConfigService clusterConfigService;
     private final String passwordSecret;
-    private final Supplier<OkHttpClient> okHttpClient;
     private final ClusterEventBus clusterEventBus;
-    private final ExecutorService executor;
 
     @Inject
-    public GraylogCertificateProvisioningHandler(final DataNodeProvisioningService dataNodeProvisioningService,
-                                                 final CaService caService,
+    public GraylogCertificateProvisioningHandler(final CaService caService,
                                                  final Configuration configuration,
-                                                 final NodeService<DataNodeDto> nodeService,
                                                  final CsrSigner csrSigner,
                                                  final ClusterConfigService clusterConfigService,
                                                  final @Named("password_secret") String passwordSecret,
-                                                 final IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider,
-                                                 final CustomCAX509TrustManager trustManager,
                                                  final EventBus eventBus,
-                                                 final ClusterEventBus clusterEventBus) {
-        this.dataNodeProvisioningService = dataNodeProvisioningService;
+                                                 final ClusterEventBus clusterEventBus
+    ) {
         this.caService = caService;
         this.passwordSecret = passwordSecret;
         this.configuration = configuration;
-        this.nodeService = nodeService;
         this.csrSigner = csrSigner;
         this.clusterConfigService = clusterConfigService;
         this.clusterEventBus = clusterEventBus;
-        this.executor = Executors.newFixedThreadPool(THREADPOOL_THREADS, new ThreadFactoryBuilder().setNameFormat("provisioning-connectivity-check-task").build());
-        this.okHttpClient = Suppliers.memoize(() -> buildConnectivityCheckOkHttpClient(trustManager, indexerJwtAuthTokenProvider));
         eventBus.register(this);
-    }
-
-    // building a httpclient to check the connectivity to OpenSearch - TODO: maybe replace it with a VersionProbe already?
-    private static OkHttpClient buildConnectivityCheckOkHttpClient(final X509TrustManager trustManager, IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider) {
-        try {
-            final var clientBuilder = new OkHttpClient.Builder();
-            final var sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(null, new TrustManager[]{trustManager}, new SecureRandom());
-            clientBuilder.sslSocketFactory(sslContext.getSocketFactory(), trustManager);
-
-            clientBuilder.authenticator((route, response) -> response.request()
-                    .newBuilder()
-                    .header("Authorization", indexerJwtAuthTokenProvider.get())
-                    .build());
-
-            return clientBuilder.build();
-        } catch (NoSuchAlgorithmException | KeyManagementException ex) {
-            LOG.error("Could not set Graylog CA trust manager: {}", ex.getMessage(), ex);
-            throw new RuntimeException(ex);
-        }
     }
 
     private Optional<RenewalPolicy> getRenewalPolicy() {
@@ -157,12 +91,6 @@ public class GraylogCertificateProvisioningHandler {
 
                     LOG.info("Posted CertificateSignedEvent for node " + event.nodeId());
                     clusterEventBus.post(CertificateSignedEvent.fromCertChain(event.nodeId(), certChain));
-
-                    dataNodeProvisioningService.getPreflightConfigFor(event.nodeId())
-                            .ifPresent(cfg -> {
-                                dataNodeProvisioningService.save(cfg.asConnecting());
-                                executor.submit(() -> checkConnectivity(cfg));
-                            });
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -184,68 +112,4 @@ public class GraylogCertificateProvisioningHandler {
             throw new RuntimeException(e);
         }
     }
-
-    private void checkConnectivity(final DataNodeProvisioningConfig config) {
-        LOG.info("Starting connectivity check with node {}, silencing error messages for {} seconds.", config.nodeId(), DELAY_BEFORE_SHOWING_EXCEPTIONS.getSeconds());
-        final var nodeId = config.nodeId();
-        final var retryer = RetryerBuilder.<ConnectionResponse>newBuilder()
-                .withWaitStrategy(WaitStrategies.fixedWait(WAIT_BETWEEN_CONNECTION_ATTEMPTS, TimeUnit.SECONDS))
-                .withStopStrategy(StopStrategies.stopAfterAttempt(CONNECTION_ATTEMPTS))
-                .withRetryListener(new RetryListener() {
-                    @Override
-                    public <V> void onRetry(Attempt<V> attempt) {
-                        if (attempt.getDelaySinceFirstAttempt() > DELAY_BEFORE_SHOWING_EXCEPTIONS.toMillis()) {
-                            if (attempt.hasException()) {
-                                var e = attempt.getExceptionCause();
-                                LOG.warn(ERROR_MESSAGE_PREFIX + " {}: {}, retrying (attempt #{})", config.nodeId(), e.getMessage(), attempt.getAttemptNumber());
-                            } else {
-                                LOG.warn(ERROR_MESSAGE_PREFIX + " {}, retrying (attempt #{})", config.nodeId(), attempt.getAttemptNumber());
-                            }
-                        }
-                    }
-                })
-                .retryIfResult(response -> !response.success())
-                .retryIfException()
-                .build();
-
-        final Callable<ConnectionResponse> callable = () -> {
-            final var node = nodeService.byNodeId(nodeId);
-            final var request = new Request.Builder().url(node.getTransportAddress()).build();
-            final var call = okHttpClient.get().newCall(request);
-            try (Response response = call.execute()) { // always close the response here
-                final boolean success = response.isSuccessful();
-                final String message = response.message();
-                return new ConnectionResponse(success, message); // and deliver only necessary information, without holding the original response
-            }
-        };
-
-        try {
-            final ConnectionResponse response = retryer.call(callable);
-            if (response.success()) {
-                dataNodeProvisioningService.save(config.asConnected());
-                LOG.info("Connectivity check successful with node {}", nodeId);
-            } else {
-                var errorMessage = response.message();
-                dataNodeProvisioningService.save(config.asError("Data Node not reachable: " + errorMessage));
-            }
-        } catch (ExecutionException e) {
-            LOG.error(ERROR_MESSAGE_PREFIX + " {}: {}", config.nodeId(), e.getMessage());
-            dataNodeProvisioningService.save(config.asError(e.getMessage()));
-        } catch (RetryException e) {
-            LOG.error(ERROR_MESSAGE_PREFIX + " {}: {}", config.nodeId(), e.getMessage());
-            var exceptionCause = Optional.ofNullable(e.getLastFailedAttempt().getExceptionCause()).orElse(e);
-            var errorMsg = exceptionCause.getMessage();
-            dataNodeProvisioningService.save(config.asError(errorMsg));
-        }
-    }
-
-    /**
-     * This record serves as a DTO for retry logic. We can't use the original Response, as we are having problems
-     * closing the response between repeats and failure recoveries. Rather close the response ASAP and provide
-     * only necessary information to the retryer.
-     *
-     * @param success Could we connect to the datanode URL?
-     * @param message What was the error message if not?
-     */
-    private record ConnectionResponse(boolean success, String message) {}
 }

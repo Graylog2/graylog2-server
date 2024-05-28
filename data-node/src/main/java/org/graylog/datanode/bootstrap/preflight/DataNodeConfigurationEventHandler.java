@@ -52,7 +52,6 @@ import java.util.stream.Stream;
 public class DataNodeConfigurationEventHandler {
     private static final Logger LOG = LoggerFactory.getLogger(DataNodeConfigurationEventHandler.class);
 
-    private final DataNodeProvisioningService dataNodeProvisioningService;
     private final NodeService<DataNodeDto> nodeService;
     private final NodeId nodeId;
 
@@ -60,34 +59,22 @@ public class DataNodeConfigurationEventHandler {
     private final ClusterEventBus clusterEventBus;
 
     @Inject
-    public DataNodeConfigurationEventHandler(final DataNodeProvisioningService dataNodeProvisioningService,
-                                             final NodeService<DataNodeDto> nodeService,
+    public DataNodeConfigurationEventHandler(final NodeService<DataNodeDto> nodeService,
                                              final NodeId nodeId,
                                              final DatanodeKeystore datanodeKeystore,
                                              final ClusterEventBus clusterEventBus,
                                              final EventBus eventBus
-
     ) {
-        this.dataNodeProvisioningService = dataNodeProvisioningService;
         this.nodeService = nodeService;
         this.nodeId = nodeId;
         this.datanodeKeystore = datanodeKeystore;
         this.clusterEventBus = clusterEventBus;
         eventBus.register(this);
-        writeInitialConfig(dataNodeProvisioningService, nodeId);
-    }
-
-    private void writeInitialConfig(DataNodeProvisioningService dataNodeProvisioningService, NodeId nodeId) {
-        final Optional<DataNodeProvisioningConfig> existingConfig = dataNodeProvisioningService.getPreflightConfigFor(nodeId.getNodeId());
-        if (existingConfig.isEmpty()) {
-            writeInitialProvisioningConfig();
-        }
     }
 
 
     @Subscribe
     public void doRun(DataNodeLifecycleEvent event) {
-
         if (nodeId.getNodeId().equals(event.nodeId())) {
             LOG.info("Received DataNodeLifecycleEvent with trigger " + event.trigger());
             switch (event.trigger()) {
@@ -98,7 +85,6 @@ public class DataNodeConfigurationEventHandler {
 
     @Subscribe
     public void certificateSignedListener(CertificateSignedEvent event) {
-
         if (!nodeId.getNodeId().equals(event.nodeId())) {
             // not for this datanode, ignoring
             return;
@@ -106,14 +92,6 @@ public class DataNodeConfigurationEventHandler {
         LOG.info("Received CertificateSignedEvent for node " + event.nodeId());
         try {
             datanodeKeystore.replaceCertificatesInKeystore(event.readCertChain());
-            // Following state change will trigger an DataNodeProvisioningStateChangeEvent which will notify
-            // OpensearchProcessService and it will rebuild opensearch configuration and start the opensearch
-            // process with the just received certificate
-
-            // TODO: what about directly triggering stateMachine.fire(OpensearchEvent.PROCESS_PREPARED) and skip the
-            // middleman OpensearchProcessService ? Or trigger generic datanode configuration change event and
-            // let the opensearch process handle it?
-            dataNodeProvisioningService.changeState(nodeId.getNodeId(), DataNodeProvisioningConfig.State.STORED);
         } catch (Exception ex) {
             LOG.error("Config entry in signed state, but wrong certificate data present in Mongo", ex);
         }
@@ -141,14 +119,6 @@ public class DataNodeConfigurationEventHandler {
     private void postCsrEvent(PKCS10CertificationRequest csr) throws IOException {
         clusterEventBus.post(CertificateSigningRequestEvent.fromCsr(nodeId.getNodeId(), csr));
         LOG.info("Posted CertificateSigningRequestEvent for node " + nodeId.getNodeId());
-    }
-
-    private DataNodeProvisioningConfig writeInitialProvisioningConfig() {
-        LOG.info("Writing initial provisioning config for datanode " + nodeId.getNodeId());
-        return dataNodeProvisioningService.save(DataNodeProvisioningConfig.builder()
-                .nodeId(nodeId.getNodeId())
-                .state(DataNodeProvisioningConfig.State.UNCONFIGURED)
-                .build());
     }
 
     private Iterable<String> determineAltNames() {

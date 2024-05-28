@@ -52,6 +52,7 @@ import org.graylog2.datanode.DataNodeCommandService;
 import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.rest.ApiError;
+import org.graylog2.storage.SearchVersion;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -61,6 +62,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Path(PreflightConstants.API_PREFIX)
@@ -75,17 +77,20 @@ public class PreflightResource {
     private final ClusterConfigService clusterConfigService;
     private final String passwordSecret;
 
+    private final PreflightConnectionChecker preflightConnectionChecker;
+
     @Inject
     public PreflightResource(final NodeService<DataNodeDto> nodesInformationService,
                              DataNodeCommandService datanodesCommandService,
                              final CaService caService,
                              final ClusterConfigService clusterConfigService,
-                             final @Named("password_secret") String passwordSecret) {
+                             final @Named("password_secret") String passwordSecret, PreflightConnectionChecker preflightConnectionChecker) {
         this.nodesInformationService = nodesInformationService;
         this.datanodesCommandService = datanodesCommandService;
         this.caService = caService;
         this.clusterConfigService = clusterConfigService;
         this.passwordSecret = passwordSecret;
+        this.preflightConnectionChecker = preflightConnectionChecker;
     }
 
     public record DataNode(String nodeId, String transportAddress, DataNodeProvisioningConfig.State status, String errorMsg,
@@ -111,9 +116,22 @@ public class PreflightResource {
         return switch (node.getDataNodeStatus()) {
             case STARTING -> DataNodeProvisioningConfig.State.CONNECTING;
             case PREPARED -> DataNodeProvisioningConfig.State.CONFIGURED;
-            case AVAILABLE -> DataNodeProvisioningConfig.State.CONNECTED;
+            case AVAILABLE -> verifyActualConnectionAvailability(node);
             default -> DataNodeProvisioningConfig.State.UNCONFIGURED;
         };
+    }
+
+    private DataNodeProvisioningConfig.State verifyActualConnectionAvailability(DataNodeDto node) {
+        try {
+            final Optional<SearchVersion> version = preflightConnectionChecker.checkConnection(node);
+            if (version.isPresent()) {
+                return DataNodeProvisioningConfig.State.CONNECTED;
+            } else {
+                return DataNodeProvisioningConfig.State.CONNECTING;
+            }
+        } catch (Exception e) {
+            return DataNodeProvisioningConfig.State.ERROR;
+        }
     }
 
     private String getErrorMessage(DataNodeDto n) {

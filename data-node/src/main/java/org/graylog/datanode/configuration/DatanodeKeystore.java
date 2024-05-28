@@ -66,22 +66,20 @@ public class DatanodeKeystore {
         this.eventBus = eventBus;
     }
 
-    public boolean exists() {
+    public synchronized boolean exists() {
         return Files.exists(keystorePath());
     }
 
-    public boolean hasSignedCertificate() throws DatanodeKeystoreException {
+    public synchronized boolean hasSignedCertificate() throws DatanodeKeystoreException {
+        return isSignedCertificateChain(loadKeystore());
+    }
+
+    public synchronized static boolean isSignedCertificateChain(KeyStore keystore) throws DatanodeKeystoreException {
         try {
-            final KeyStore keystore = loadKeystore();
-            return isSignedCertificateChain(keystore);
+            return keystore.getCertificateChain(DATANODE_KEY_ALIAS).length > 1;  // TODO: proper certificates check!!!
         } catch (KeyStoreException e) {
             throw new DatanodeKeystoreException(e);
         }
-
-    }
-
-    public static boolean isSignedCertificateChain(KeyStore keystore) throws KeyStoreException {
-        return keystore.getCertificateChain(DATANODE_KEY_ALIAS).length > 1;  // TODO: proper certificates check!!!
     }
 
     @Nonnull
@@ -89,7 +87,7 @@ public class DatanodeKeystore {
         return datanodeDirectories.getConfigurationTargetDir().resolve(DATANODE_KEYSTORE_FILE);
     }
 
-    public KeyStore create(KeyPair keyPair) throws DatanodeKeystoreException {
+    public synchronized KeyStore create(KeyPair keyPair) throws DatanodeKeystoreException {
         try {
             return persistKeystore(keyPair.toKeystore(DATANODE_KEY_ALIAS, passwordSecret.toCharArray()));
         } catch (Exception e) {
@@ -97,11 +95,11 @@ public class DatanodeKeystore {
         }
     }
 
-    public KeyStore create(KeyStore keystore) throws DatanodeKeystoreException {
+    public synchronized KeyStore create(KeyStore keystore) throws DatanodeKeystoreException {
         return persistKeystore(keystore);
     }
 
-    public void replaceCertificatesInKeystore(CertificateChain certificateChain) throws DatanodeKeystoreException {
+    public synchronized void replaceCertificatesInKeystore(CertificateChain certificateChain) throws DatanodeKeystoreException {
         try {
             final KeyStore keystore = loadKeystore();
             Key privateKey = keystore.getKey(DATANODE_KEY_ALIAS, passwordSecret.toCharArray());
@@ -117,14 +115,20 @@ public class DatanodeKeystore {
     private KeyStore persistKeystore(KeyStore keystore) throws DatanodeKeystoreException {
         try (FileOutputStream fos = new FileOutputStream(keystorePath().toFile())) {
             keystore.store(fos, passwordSecret.toCharArray());
-            eventBus.post(new DatanodeKeystoreChangedEvent());
         } catch (IOException | CertificateException | KeyStoreException | NoSuchAlgorithmException e) {
             throw new DatanodeKeystoreException(e);
         }
+        triggerChangeEvent(keystore);
         return keystore;
     }
 
-    public KeyStore loadKeystore() throws DatanodeKeystoreException {
+    private void triggerChangeEvent(KeyStore keystore) throws DatanodeKeystoreException {
+        if (isSignedCertificateChain(keystore)) {
+            eventBus.post(new DatanodeKeystoreChangedEvent());
+        }
+    }
+
+    public synchronized KeyStore loadKeystore() throws DatanodeKeystoreException {
         try (FileInputStream fis = new FileInputStream(keystorePath().toFile())) {
             KeyStore keystore = KeyStore.getInstance(PKCS12);
             keystore.load(fis, passwordSecret.toCharArray());
@@ -134,7 +138,7 @@ public class DatanodeKeystore {
         }
     }
 
-    public PKCS10CertificationRequest createCertificateSigningRequest(String hostname, List<String> altNames) throws DatanodeKeystoreException, CSRGenerationException {
+    public synchronized PKCS10CertificationRequest createCertificateSigningRequest(String hostname, List<String> altNames) throws DatanodeKeystoreException, CSRGenerationException {
         final InMemoryKeystoreInformation keystore = new InMemoryKeystoreInformation(loadKeystore(), passwordSecret.toCharArray());
         return CsrGenerator.generateCSR(keystore, CertConstants.DATANODE_KEY_ALIAS, hostname, altNames);
     }

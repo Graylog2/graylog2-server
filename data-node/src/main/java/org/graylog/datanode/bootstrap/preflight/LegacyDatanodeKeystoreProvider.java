@@ -19,6 +19,7 @@ package org.graylog.datanode.bootstrap.preflight;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.graylog.datanode.configuration.DatanodeKeystore;
+import org.graylog.datanode.configuration.DatanodeKeystoreException;
 import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog.security.certutil.keystore.storage.location.KeystoreMongoLocation;
@@ -65,7 +66,7 @@ public class LegacyDatanodeKeystoreProvider {
     private boolean isValidKeyAndCert(KeyStore keystore) {
         try {
             return hasPrivateKey(keystore) && DatanodeKeystore.isSignedCertificateChain(keystore);
-        } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException e) {
+        } catch (KeyStoreException | NoSuchAlgorithmException | UnrecoverableKeyException | DatanodeKeystoreException e) {
             LOG.warn("Failed to obtain legacy keystore, ignoring it", e);
             return false;
         }
