@@ -82,6 +82,7 @@ public class PreflightWebModule extends Graylog2Module {
         bind(PreflightConfigService.class).to(PreflightConfigServiceImpl.class);
         bind(PreflightBoot.class).asEagerSingleton();
         bind(NotificationService.class).to(NullNotificationService.class);
+        bind(GraylogCertificateProvisioningHandler.class).asEagerSingleton();
 
         addPreflightRestResource(PreflightResource.class);
         addPreflightRestResource(CertificateRenewalPolicyResource.class);
@@ -89,7 +90,6 @@ public class PreflightWebModule extends Graylog2Module {
         addPreflightRestResource(PreflightAssetsResource.class);
 
         Multibinder<Periodical> periodicalBinder = Multibinder.newSetBinder(binder(), Periodical.class);
-        periodicalBinder.addBinding().to(GraylogCertificateProvisioningPeriodical.class);
         periodicalBinder.addBinding().to(ClusterEventPeriodical.class);
         periodicalBinder.addBinding().to(ClusterEventCleanupPeriodical.class);
 

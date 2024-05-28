@@ -37,7 +37,6 @@ import org.graylog.security.certutil.CaConfiguration;
 import org.graylog.security.certutil.CaService;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog.security.certutil.cert.CertificateChain;
-import org.graylog.security.certutil.cert.storage.CertChainMongoStorage;
 import org.graylog.security.certutil.csr.CsrSigner;
 import org.graylog2.Configuration;
 import org.graylog2.cluster.nodes.DataNodeDto;
@@ -45,11 +44,8 @@ import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.cluster.preflight.DataNodeProvisioningService;
 import org.graylog2.events.ClusterEventBus;
-import org.graylog2.notifications.Notification;
-import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.security.CustomCAX509TrustManager;
 import org.graylog2.security.IndexerJwtAuthTokenProvider;
 import org.slf4j.Logger;
@@ -74,19 +70,19 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import static org.graylog.security.certutil.CertConstants.CA_KEY_ALIAS;
 
 @Singleton
-public class GraylogCertificateProvisioningPeriodical extends Periodical {
-    private static final Logger LOG = LoggerFactory.getLogger(GraylogCertificateProvisioningPeriodical.class);
+public class GraylogCertificateProvisioningHandler {
+    private static final Logger LOG = LoggerFactory.getLogger(GraylogCertificateProvisioningHandler.class);
     private static final int THREADPOOL_THREADS = 5;
     private static final int CONNECTION_ATTEMPTS = 40;
     private static final int WAIT_BETWEEN_CONNECTION_ATTEMPTS = 3;
     private static final Duration DELAY_BEFORE_SHOWING_EXCEPTIONS = Duration.ofMinutes(1);
     private static final String ERROR_MESSAGE_PREFIX = "Error trying to connect to data node ";
 
+    @Deprecated
     private final DataNodeProvisioningService dataNodeProvisioningService;
     private final NodeService<DataNodeDto> nodeService;
 
@@ -96,26 +92,21 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
     private final ClusterConfigService clusterConfigService;
     private final String passwordSecret;
     private final Supplier<OkHttpClient> okHttpClient;
-    private final PreflightConfigService preflightConfigService;
-    private final NotificationService notificationService;
     private final ClusterEventBus clusterEventBus;
     private final ExecutorService executor;
 
     @Inject
-    public GraylogCertificateProvisioningPeriodical(final DataNodeProvisioningService dataNodeProvisioningService,
-                                                    final CertChainMongoStorage certMongoStorage,
-                                                    final CaService caService,
-                                                    final Configuration configuration,
-                                                    final NodeService<DataNodeDto> nodeService,
-                                                    final CsrSigner csrSigner,
-                                                    final ClusterConfigService clusterConfigService,
-                                                    final @Named("password_secret") String passwordSecret,
-                                                    final IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider,
-                                                    final PreflightConfigService preflightConfigService,
-                                                    final NotificationService notificationService,
-                                                    final CustomCAX509TrustManager trustManager,
-                                                    final EventBus eventBus,
-                                                    final ClusterEventBus clusterEventBus) {
+    public GraylogCertificateProvisioningHandler(final DataNodeProvisioningService dataNodeProvisioningService,
+                                                 final CaService caService,
+                                                 final Configuration configuration,
+                                                 final NodeService<DataNodeDto> nodeService,
+                                                 final CsrSigner csrSigner,
+                                                 final ClusterConfigService clusterConfigService,
+                                                 final @Named("password_secret") String passwordSecret,
+                                                 final IndexerJwtAuthTokenProvider indexerJwtAuthTokenProvider,
+                                                 final CustomCAX509TrustManager trustManager,
+                                                 final EventBus eventBus,
+                                                 final ClusterEventBus clusterEventBus) {
         this.dataNodeProvisioningService = dataNodeProvisioningService;
         this.caService = caService;
         this.passwordSecret = passwordSecret;
@@ -123,8 +114,6 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
         this.nodeService = nodeService;
         this.csrSigner = csrSigner;
         this.clusterConfigService = clusterConfigService;
-        this.preflightConfigService = preflightConfigService;
-        this.notificationService = notificationService;
         this.clusterEventBus = clusterEventBus;
         this.executor = Executors.newFixedThreadPool(THREADPOOL_THREADS, new ThreadFactoryBuilder().setNameFormat("provisioning-connectivity-check-task").build());
         this.okHttpClient = Suppliers.memoize(() -> buildConnectivityCheckOkHttpClient(trustManager, indexerJwtAuthTokenProvider));
@@ -153,59 +142,6 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
 
     private Optional<RenewalPolicy> getRenewalPolicy() {
         return Optional.ofNullable(this.clusterConfigService.get(RenewalPolicy.class));
-    }
-
-    @Override
-    public void doRun() {
-        LOG.debug("checking if there are configuration steps to take care of");
-        // only load nodes that are in a state that need sth done
-        final var nodes = dataNodeProvisioningService.findAllNodesThatNeedAttention();
-        if (!nodes.isEmpty()) {
-            getKeyStore().ifPresentOrElse(
-                    caKeystore -> runWithCA(nodes, caKeystore),
-                    () -> LOG.debug("No CA keystore available, skipping provisioning.")
-            );
-        }
-
-    }
-
-    private void runWithCA(List<DataNodeProvisioningConfig> nodes, KeyStore caKeystore) {
-        getRenewalPolicy().ifPresentOrElse(
-                renewalPolicy -> runProvisioning(nodes, caKeystore, renewalPolicy),
-                () -> LOG.debug("No renewal policy available, skipping provisioning.")
-        );
-    }
-
-    private void runProvisioning(List<DataNodeProvisioningConfig> nodes, KeyStore caKeystore, RenewalPolicy renewalPolicy) {
-        var nodesByState = nodes.stream().collect(Collectors.groupingBy(node -> Optional.ofNullable(node.state())
-                .orElse(DataNodeProvisioningConfig.State.UNCONFIGURED)));
-
-        // if we're running in post-preflight and new datanodes arrive, they should configure themselves automatically
-        var cfg = preflightConfigService.getPreflightConfigResult();
-        if (cfg.equals(PreflightConfigResult.FINISHED) || cfg.equals(PreflightConfigResult.PREPARED)) {
-            var unconfiguredNodes = nodesByState.getOrDefault(DataNodeProvisioningConfig.State.UNCONFIGURED, List.of());
-            if (renewalPolicy.mode().equals(RenewalPolicy.Mode.AUTOMATIC)) {
-                unconfiguredNodes.forEach(c -> dataNodeProvisioningService.save(c.asConfigured()));
-            } else {
-                var hasUnconfiguredNodes = !unconfiguredNodes.isEmpty();
-                if (hasUnconfiguredNodes) {
-                    var notification = notificationService.buildNow()
-                            .addType(Notification.Type.DATA_NODE_NEEDS_PROVISIONING)
-                            .addSeverity(Notification.Severity.URGENT);
-                    notificationService.publishIfFirst(notification);
-                } else {
-                    notificationService.fixed(Notification.Type.DATA_NODE_NEEDS_PROVISIONING);
-                }
-            }
-        }
-        if (!cfg.equals(PreflightConfigResult.PREPARED)) {
-            // if we're running through preflight and reach "STARTUP_PREPARED", we want to request STARTUP of OpenSearch
-            var preparedNodes = nodesByState.getOrDefault(DataNodeProvisioningConfig.State.STARTUP_PREPARED, List.of());
-            if (!preparedNodes.isEmpty()) {
-                preparedNodes.forEach(c -> dataNodeProvisioningService.save(c.asStartupTrigger()));
-                // waiting one iteration after writing the new state, so we return from execution here and skip the rest of the periodical
-            }
-        }
     }
 
     @Subscribe
@@ -301,47 +237,6 @@ public class GraylogCertificateProvisioningPeriodical extends Periodical {
             var errorMsg = exceptionCause.getMessage();
             dataNodeProvisioningService.save(config.asError(errorMsg));
         }
-    }
-
-    @Nonnull
-    @Override
-    protected Logger getLogger() {
-        return LOG;
-    }
-
-    @Override
-    public boolean runsForever() {
-        return false;
-    }
-
-    @Override
-    public boolean stopOnGracefulShutdown() {
-        return true;
-    }
-
-    @Override
-    public boolean leaderOnly() {
-        return true;
-    }
-
-    @Override
-    public boolean startOnThisNode() {
-        return true;
-    }
-
-    @Override
-    public boolean isDaemon() {
-        return true;
-    }
-
-    @Override
-    public int getInitialDelaySeconds() {
-        return 2;
-    }
-
-    @Override
-    public int getPeriodSeconds() {
-        return 2;
     }
 
     /**
