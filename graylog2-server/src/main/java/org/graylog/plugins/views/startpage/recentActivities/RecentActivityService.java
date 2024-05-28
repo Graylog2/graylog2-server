@@ -35,6 +35,8 @@ import org.graylog2.database.pagination.MongoPaginationHelper;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.models.SortOrder;
 
+import java.util.HashSet;
+
 public class RecentActivityService {
     public static final String COLLECTION_NAME = "recent_activity";
     private final EventBus eventBus;
@@ -63,7 +65,10 @@ public class RecentActivityService {
                                     final GRNRegistry grnRegistry,
                                     final PermissionAndRoleResolver permissionAndRoleResolver,
                                     final long maximum) {
-        mongoConnection.getMongoDatabase().createCollection(COLLECTION_NAME, new CreateCollectionOptions().capped(true).sizeInBytes(maximum * 1024).maxDocuments(maximum));
+        final var mongodb = mongoConnection.getMongoDatabase();
+        if (!mongodb.listCollectionNames().into(new HashSet<>()).contains(COLLECTION_NAME)) {
+            mongodb.createCollection(COLLECTION_NAME, new CreateCollectionOptions().capped(true).sizeInBytes(maximum * 1024).maxDocuments(maximum));
+        }
         this.db = mongoCollections.collection(COLLECTION_NAME, RecentActivityDTO.class);
         this.grnRegistry = grnRegistry;
         this.permissionAndRoleResolver = permissionAndRoleResolver;

@@ -66,7 +66,6 @@ public class RecentActivityServiceTest {
                MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
                GRNRegistry grnRegistry,
                TestUserService testUserService) {
-
         admin = TestUser.builder().withId("637748db06e1d74da0a54331").withUsername("local:admin").isLocalAdmin(true).build();
         user = TestUser.builder().withId("637748db06e1d74da0a54330").withUsername("test").isLocalAdmin(false).build();
         searchUser = TestSearchUser.builder().withUser(user).build();
