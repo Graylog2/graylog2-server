@@ -28,7 +28,7 @@ import { MIGRATION_STATE } from 'components/datanode/Constants';
 import ResetMigrationButton from 'components/datanode/migrations/common/ResetMigrationButton';
 
 const WizardContainer = styled(Col)`
-  .nav > li > a  {
+  .nav-pills > li > a  {
     pointer-events: none;
   }
 `;
