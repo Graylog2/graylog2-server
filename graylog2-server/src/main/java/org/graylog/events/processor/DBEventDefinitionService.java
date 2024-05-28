@@ -17,13 +17,12 @@
 package org.graylog.events.processor;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
-import jakarta.ws.rs.BadRequestException;
 import org.bson.types.ObjectId;
 import org.graylog.events.notifications.EventNotificationConfig;
 import org.graylog.events.processor.systemnotification.SystemNotificationEventEntityScope;
+import org.graylog.plugins.views.search.searchfilters.db.SearchFiltersReFetcher;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -33,8 +32,6 @@ import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.database.entities.ScopedDbService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.search.SearchQuery;
-import org.graylog2.search.SearchQueryField;
-import org.graylog2.search.SearchQueryParser;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.mongojack.DBQuery;
@@ -45,48 +42,45 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class DBEventDefinitionService extends ScopedDbService<EventDefinitionDto> {
     private static final Logger LOG = LoggerFactory.getLogger(DBEventDefinitionService.class);
 
     public static final String COLLECTION_NAME = "event_definitions";
 
-    public static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
-            .put("id", SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
-            .put("title", SearchQueryField.create(EventDefinitionDto.FIELD_TITLE))
-            .put("description", SearchQueryField.create(EventDefinitionDto.FIELD_DESCRIPTION))
-            .build();
-
     private final DBEventProcessorStateService stateService;
     private final EntityOwnershipService entityOwnerShipService;
-    private final SearchQueryParser searchQueryParser;
+    private final SearchFiltersReFetcher searchFiltersRefetcher;
 
     @Inject
     public DBEventDefinitionService(MongoConnection mongoConnection,
                                     MongoJackObjectMapperProvider mapper,
                                     DBEventProcessorStateService stateService,
-                                    EntityOwnershipService entityOwnerShipService,
-                                    EntityScopeService entityScopeService) {
+                                    EntityOwnershipService entityOwnerShipService, EntityScopeService entityScopeService, SearchFiltersReFetcher searchFiltersRefetcher) {
         super(mongoConnection, mapper, EventDefinitionDto.class, COLLECTION_NAME, entityScopeService);
         this.stateService = stateService;
         this.entityOwnerShipService = entityOwnerShipService;
-        this.searchQueryParser = new SearchQueryParser(EventDefinitionDto.FIELD_TITLE, SEARCH_FIELD_MAPPING);
+        this.searchFiltersRefetcher = searchFiltersRefetcher;
     }
 
-    public PaginatedList<EventDefinitionDto> searchPaginated(String query, Predicate<EventDefinitionDto> filter,
+    public PaginatedList<EventDefinitionDto> searchPaginated(SearchQuery query, Predicate<EventDefinitionDto> filter,
                                                              String sortByField, String sortOrder, int page, int perPage) {
-        final SearchQuery searchQuery;
-        try {
-            searchQuery = searchQueryParser.parse(query);
-        } catch (IllegalArgumentException e) {
-            throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
-        }
-        final DBQuery.Query dbQuery = searchQuery.toDBQuery();
+        final DBQuery.Query dbQuery = query.toDBQuery();
         final DBSort.SortBuilder sortBuilder = getSortBuilder(sortOrder, sortByField);
-        return findPaginatedWithQueryFilterAndSort(dbQuery, filter,
+        final PaginatedList<EventDefinitionDto> list = findPaginatedWithQueryFilterAndSort(dbQuery, filter,
                 sortBuilder, page, perPage);
+        return new PaginatedList<>(
+                list.stream()
+                        .map(this::getEventDefinitionWithRefetchedFilters)
+                        .collect(Collectors.toList()),
+                list.pagination().total(),
+                page,
+                perPage
+        );
     }
 
     public EventDefinitionDto saveWithOwnership(EventDefinitionDto eventDefinitionDto, User user) {
@@ -101,7 +95,25 @@ public class DBEventDefinitionService extends ScopedDbService<EventDefinitionDto
                 .toBuilder()
                 .updatedAt(DateTime.now(DateTimeZone.UTC))
                 .build();
-        return super.save(enrichedWithUpdateDate);
+        return getEventDefinitionWithRefetchedFilters(super.save(enrichedWithUpdateDate));
+    }
+
+    @Override
+    public Optional<EventDefinitionDto> get(String id) {
+        return super.get(id).map(this::getEventDefinitionWithRefetchedFilters);
+    }
+
+    private EventDefinitionDto getEventDefinitionWithRefetchedFilters(final EventDefinitionDto eventDefinition) {
+        final EventProcessorConfig config = eventDefinition.config();
+        if (searchFiltersRefetcher.turnedOn() && config instanceof SearchFilterableConfig) {
+            final List<UsedSearchFilter> filters = ((SearchFilterableConfig) config).filters();
+            final EventProcessorConfig updatedConfig = config.updateFilters(searchFiltersRefetcher.reFetch(filters));
+            if (updatedConfig == null) {
+                return eventDefinition;
+            }
+            return eventDefinition.toBuilder().config(updatedConfig).build();
+        }
+        return eventDefinition;
     }
 
     public void updateMatchedAt(String id, DateTime timeStamp) {
@@ -165,43 +177,5 @@ public class DBEventDefinitionService extends ScopedDbService<EventDefinitionDto
     @NotNull
     public List<EventDefinitionDto> getByArrayValue(String arrayField, String field, String value) {
         return ImmutableList.copyOf((db.find(DBQuery.elemMatch(arrayField, DBQuery.is(field, value))).iterator()));
-    }
-
-    /**
-     * Returns the list of event definitions that is using the given search filter ID and filter by query.
-     *
-     * @param searchFilterId the search filter ID
-     * @param query the search query
-     * @return the event definitions with the given notification ID
-     */
-    public List<EventDefinitionDto> searchBySearchFilterId(String searchFilterId, String query) {
-        return ImmutableList.copyOf((db.find(searchFilterSearchQuery(searchFilterId, query)).iterator()));
-    }
-
-    public PaginatedList<EventDefinitionDto> searchPaginatedBySearchFilterId(final String searchFilterId,
-                                                                             final int page,
-                                                                             final int perPage,
-                                                                             final String query,
-                                                                             final String sortByField,
-                                                                             final String sortOrder) {
-        final DBSort.SortBuilder sortBuilder = getSortBuilder(sortOrder, sortByField);
-        return findPaginatedWithQueryFilterAndSort(searchFilterSearchQuery(searchFilterId, query), null,
-                sortBuilder, page, perPage);
-    }
-
-    private DBQuery.Query searchFilterSearchQuery(String searchFilterId, String query) {
-        final SearchQuery searchQuery;
-        try {
-            searchQuery = searchQueryParser.parse(query);
-        } catch (IllegalArgumentException e) {
-            throw new BadRequestException("Invalid argument in search query: " + e.getMessage());
-        }
-
-        final String field = String.format(Locale.US, "%s.%s.%s",
-                EventDefinitionDto.FIELD_CONFIG,
-                SearchFilterableConfig.FIELD_FILTERS,
-                UsedSearchFilter.ID_FIELD);
-
-        return DBQuery.and(DBQuery.in(field, searchFilterId), searchQuery.toDBQuery());
     }
 }
