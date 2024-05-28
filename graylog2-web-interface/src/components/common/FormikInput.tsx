@@ -53,7 +53,7 @@ type TextareaProps = BaseProps & {
 };
 type Props = BaseProps | TextareaProps;
 
-const checkboxProps = (value) => ({ defaultChecked: value ?? false, checked: value ?? false });
+const checkboxProps = (value) => ({ checked: value ?? false });
 
 const inputProps = (value) => ({ value: value ?? '' });
 
