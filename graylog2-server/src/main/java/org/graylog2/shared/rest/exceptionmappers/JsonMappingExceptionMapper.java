@@ -59,7 +59,12 @@ public class JsonMappingExceptionMapper implements ExceptionMapper<JsonMappingEx
 
 
         if (e instanceof MismatchedInputException mismatchedInputException) {
-            return messagePrefix + ": Must be of type " + mismatchedInputException.getTargetType().getSimpleName();
+            final var targetType = mismatchedInputException.getTargetType();
+            if (targetType != null) {
+                return messagePrefix + ": Must be of type " + mismatchedInputException.getTargetType().getSimpleName();
+            } else {
+                return messagePrefix + ": " + mismatchedInputException.getMessage();
+            }
         } else {
             final var cause = e.getCause();
             final String problemMessage = firstNonNull(cause, e).getMessage();
