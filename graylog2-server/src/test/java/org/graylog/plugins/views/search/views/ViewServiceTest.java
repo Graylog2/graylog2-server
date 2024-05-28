@@ -53,7 +53,6 @@ public class ViewServiceTest {
     public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private ViewService dbService;
-    private ClusterConfigServiceImpl clusterConfigService;
 
     private SearchUser searchUser;
 
@@ -63,7 +62,7 @@ public class ViewServiceTest {
         final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProvider(mapper.get());
         final MongoCollections mongoCollections = new MongoCollections(new CommonMongoJackObjectMapperProvider(mapper),
                 mongodb.mongoConnection());
-        this.clusterConfigService = new ClusterConfigServiceImpl(
+        ClusterConfigServiceImpl clusterConfigService = new ClusterConfigServiceImpl(
                 objectMapperProvider,
                 mongodb.mongoConnection(),
                 new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000"),
