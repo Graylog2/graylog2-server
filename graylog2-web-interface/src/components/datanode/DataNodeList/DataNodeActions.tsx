@@ -21,7 +21,7 @@ import styled from 'styled-components';
 import { ConfirmDialog } from 'components/common';
 import { Button, MenuItem } from 'components/bootstrap';
 import type { DataNode } from 'preflight/types';
-import MoreActions from 'components/common/EntityDataTable/MoreActions';
+import { MoreActions } from 'components/common/EntityDataTable';
 
 import DataNodeLogsDialog from './DataNodeLogsDialog';
 
