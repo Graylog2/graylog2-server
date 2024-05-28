@@ -39,7 +39,10 @@ const ButtonWrapper = styled.div`
 const StyledCard = styled(Card)<{ $selected: boolean }>(({ $selected, theme }) => css`
   display: flex;
   gap: ${theme.spacings.sm};
-  ${$selected && `border-color: ${theme.colors.contrast.default};`}
+  ${$selected && (`
+    background-color: ${theme.colors.global.background};
+    border: 2px solid ${theme.colors.contrast.default};
+  `)}
 `);
 
 const Description = styled.p`
