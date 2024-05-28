@@ -28,5 +28,5 @@ public interface DataTieringOrchestrator {
 
     void retain(IndexSet indexSet);
 
-    Optional<IndexSetValidator.Violation> validate(@NotNull DataTieringConfig config);
+    Optional<IndexSetValidator.Violation> validate(@NotNull DataTieringConfig config, boolean isTemplate);
 }

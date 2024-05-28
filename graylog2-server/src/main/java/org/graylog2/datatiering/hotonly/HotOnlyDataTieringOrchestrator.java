@@ -78,11 +78,10 @@ public class HotOnlyDataTieringOrchestrator implements DataTieringOrchestrator {
     }
 
     @Override
-    public Optional<IndexSetValidator.Violation> validate(@NotNull DataTieringConfig config) {
+    public Optional<IndexSetValidator.Violation> validate(@NotNull DataTieringConfig config, boolean isTemplate) {
         Preconditions.checkNotNull(config);
         return TimeSizeOptimizingValidator.validate(
                 elasticsearchConfiguration,
                 toIndexLifetimeConfig(config));
-
     }
 }

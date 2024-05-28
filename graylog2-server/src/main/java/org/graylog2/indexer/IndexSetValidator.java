@@ -65,6 +65,10 @@ public class IndexSetValidator {
     }
 
     public Optional<Violation> validate(IndexSetConfig newConfig) {
+        return validate(newConfig, false);
+    }
+
+    public Optional<Violation> validate(IndexSetConfig newConfig, boolean isTemplate) {
 
         // Don't validate prefix conflicts in case of an update
         if (Strings.isNullOrEmpty(newConfig.id())) {
@@ -79,20 +83,20 @@ public class IndexSetValidator {
             return Optional.of(fieldMappingViolation);
         }
 
-        Violation refreshIntervalViolation = validateSimpleIndexSetConfig(newConfig);
+        Violation refreshIntervalViolation = validateSimpleIndexSetConfig(newConfig, isTemplate);
         if (refreshIntervalViolation != null){
             return Optional.of(refreshIntervalViolation);
         }
         return Optional.empty();
     }
 
-    private Violation validateSimpleIndexSetConfig(SimpleIndexSetConfig newConfig) {
+    private Violation validateSimpleIndexSetConfig(SimpleIndexSetConfig newConfig, boolean isTemplate) {
         final Violation refreshIntervalViolation = validateRefreshInterval(newConfig.fieldTypeRefreshInterval());
         if (refreshIntervalViolation != null) {
             return refreshIntervalViolation;
         }
         if (newConfig.dataTieringConfig() != null) {
-            return validateDataTieringConfig(newConfig.dataTieringConfig());
+            return validateDataTieringConfig(newConfig.dataTieringConfig(), isTemplate);
         } else {
             return validateStrategyFields(newConfig);
         }
@@ -129,7 +133,6 @@ public class IndexSetValidator {
         return validateRetentionPeriod(newConfig.rotationStrategyConfig(),
                 newConfig.retentionStrategyConfig());
     }
-
 
     public Violation validateMappingChangesAreLegal(final IndexSetConfig config) {
         if (!config.canHaveProfile() && config.fieldTypeProfile() != null && !config.fieldTypeProfile().isEmpty()) {
@@ -201,11 +204,11 @@ public class IndexSetValidator {
 
 
     @Nullable
-    public Violation validateDataTieringConfig(DataTieringConfig dataTieringConfig) {
+    public Violation validateDataTieringConfig(DataTieringConfig dataTieringConfig, boolean isTemplate) {
         if (!dataTieringChecker.isEnabled()) {
             return Violation.create("data tiering feature is disabled!");
         }
-        return dataTieringOrchestrator.validate(dataTieringConfig).orElse(null);
+        return dataTieringOrchestrator.validate(dataTieringConfig, isTemplate).orElse(null);
     }
 
     @Nullable

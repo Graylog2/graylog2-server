@@ -25,6 +25,7 @@ import TemplateForm from 'components/indices/IndexSetTemplates/TemplateForm';
 import type {
   IndexSetTemplate,
 } from 'components/indices/IndexSetTemplates/types';
+import { indexSetTemplatePropType } from 'components/indices/IndexSetTemplates/types';
 import useTemplateMutation from 'components/indices/IndexSetTemplates/hooks/useTemplateMutation';
 import Routes from 'routing/Routes';
 
@@ -38,11 +39,11 @@ const EditTemplate = ({
   const sendTelemetry = useSendTelemetry();
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const { editTemplate } = useTemplateMutation();
+  const { updateTemplate } = useTemplateMutation();
   const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
 
   const onSubmit = useCallback((newTemplate: IndexSetTemplate) => {
-    editTemplate({ template: newTemplate, id: template.id }).then(() => {
+    updateTemplate({ template: newTemplate, id: template.id }).then(() => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_TEMPLATE.EDIT, {
         app_pathname: telemetryPathName,
         app_action_value: 'edit-index-set-template-edited',
@@ -50,7 +51,7 @@ const EditTemplate = ({
 
       navigate(Routes.SYSTEM.INDICES.TEMPLATES.OVERVIEW);
     });
-  }, [editTemplate, navigate, template.id, sendTelemetry, telemetryPathName]);
+  }, [updateTemplate, navigate, template.id, sendTelemetry, telemetryPathName]);
 
   useEffect(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_TEMPLATE.EDIT_OPENED, { app_pathname: telemetryPathName, app_action_value: 'edit-index-set-template-opened' });
@@ -66,6 +67,10 @@ const EditTemplate = ({
   return (
     <TemplateForm onCancel={onCancel} submitButtonText="Update template" submitLoadingText="Updating template..." onSubmit={onSubmit} initialValues={initialValues} />
   );
+};
+
+EditTemplate.propTypes = {
+  template: indexSetTemplatePropType.isRequired,
 };
 
 export default EditTemplate;

@@ -114,7 +114,7 @@ const useTemplate = () => {
   });
 
   return ({
-    editTemplate: put.mutateAsync,
+    updateTemplate: put.mutateAsync,
     isEditLoading: put.isLoading,
     createTemplate: post.mutateAsync,
     isCreateLoading: post.isLoading,

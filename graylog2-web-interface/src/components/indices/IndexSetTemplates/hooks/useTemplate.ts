@@ -44,9 +44,11 @@ const useTemplate = (id: string): {
   data: IndexSetTemplate,
   isFetched: boolean,
   isFetching: boolean,
+  isSuccess: boolean,
+  isError: boolean,
   refetch: () => void,
 } => {
-  const { data, isFetched, isFetching, refetch } = useQuery(
+  const { data, isFetched, isFetching, isSuccess, isError, refetch } = useQuery(
     ['indexSetTemplate', id],
     () => fetchIndexSetTemplate(id),
     {
@@ -63,6 +65,8 @@ const useTemplate = (id: string): {
     data: data ?? INITIAL_DATA,
     isFetched,
     isFetching,
+    isSuccess,
+    isError,
     refetch,
   });
 };

@@ -27,9 +27,10 @@ import useTemplate from 'components/indices/IndexSetTemplates/hooks/useTemplate'
 
 const IndexSetTemplatePage = () => {
   const { templateId } = useParams();
-  const { data, isFetching } = useTemplate(templateId);
+  const { data, isFetching, isSuccess, isError } = useTemplate(templateId);
 
   const title = !isFetching ? data.title : 'Index Set Template';
+  const description = !isFetching ? data.description : 'Viewing Index Set Template Details';
 
   return (
     <DocumentTitle title={title}>
@@ -39,15 +40,17 @@ const IndexSetTemplatePage = () => {
                     <LinkContainer to={Routes.SYSTEM.INDICES.TEMPLATES.OVERVIEW}>
                       <Button>Overview</Button>
                     </LinkContainer>
-)}>
+                  )}>
         <span>
-          {!isFetching && data.description ? data.description : 'Viewing Index Set Template Details'}
+          {description}
         </span>
 
       </PageHeader>
       <Row className="content">
         <Col md={12}>
-          {!isFetching ? <TemplateDetails template={data} /> : <Spinner />}
+          {isFetching && <Spinner />}
+          {isSuccess && <TemplateDetails template={data} />}
+          {isError && <p>There was an error when loading the template.</p>}
         </Col>
       </Row>
     </DocumentTitle>
