@@ -29,7 +29,6 @@ import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.startpage.recentActivities.ActivityType;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityEvent;
 import org.graylog.plugins.views.startpage.title.StartPageItemTitleRetriever;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedDbService;
 import org.graylog2.database.PaginatedList;
@@ -51,15 +50,14 @@ public class FavoritesService {
 
     @Inject
     protected FavoritesService(final MongoCollections mongoCollections,
-                               EventBus eventBus,
-                               final MongoJackObjectMapperProvider mapper,
+                               final EventBus eventBus,
                                final StartPageItemTitleRetriever startPageItemTitleRetriever,
                                final GRNRegistry grnRegistry) {
         this.db = mongoCollections.collection(COLLECTION_NAME, FavoritesForUserDTO.class);
         eventBus.register(this);
         this.startPageItemTitleRetriever = startPageItemTitleRetriever;
         this.grnRegistry = grnRegistry;
-        this.mongoUtils = new MongoUtils<>(db, mapper.get());
+        this.mongoUtils = mongoCollections.utils(this.db);
 
         db.createIndex(Indexes.ascending(FavoritesForUserDTO.FIELD_USER_ID));
         db.createIndex(Indexes.ascending(FavoritesForUserDTO.FIELD_ITEMS));
