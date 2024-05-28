@@ -15,24 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { BrowserRouter as Router, Route, Navigate, Routes } from 'react-router-dom';
+import { Route, Navigate, Routes } from 'react-router-dom';
 
 import PreflightLogin from './PreflightLogin';
 import PreflightApp from './PreflightApp';
-import useAuthStatus from './hooks/useAuthStatus';
 
-const App = () => {
-  const isAuthenticated = useAuthStatus();
-
-  return (
-    <Router>
-      <Routes>
-        <Route path="/login" element={isAuthenticated ? <Navigate to="/" /> : <PreflightLogin />} />
-        <Route path="/" element={isAuthenticated ? <PreflightApp /> : <Navigate to="/login" />} />
-        <Route path="*" element={<Navigate to={isAuthenticated ? '/' : '/login'} />} />
-      </Routes>
-    </Router>
-  );
-};
+const App = () => (
+  <Routes>
+    <Route path="/login" element={<PreflightLogin />} />
+    <Route path="/" element={<PreflightApp />} />
+    <Route path="*" element={<Navigate to="/" />} />
+  </Routes>
+);
 
 export default App;

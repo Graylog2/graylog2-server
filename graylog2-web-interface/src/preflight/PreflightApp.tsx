@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { AppShell } from '@mantine/core';
+
 import Navigation from 'preflight/navigation/Navigation';
 import Setup from 'preflight/components/Setup';
 import WaitingForStartup from 'preflight/components/WaitingForStartup';

@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { Notifications } from '@mantine/notifications';
 
 import PreflightThemeProvider from 'preflight/theme/PreflightThemeProvider';
@@ -36,7 +37,11 @@ ReactDOM.render((
       <ThemeWrapper>
         <>
           <Notifications />
-          <App />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<App />} />
+            </Routes>
+          </BrowserRouter>
         </>
       </ThemeWrapper>
     </DefaultQueryClientProvider>
