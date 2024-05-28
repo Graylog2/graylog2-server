@@ -15,6 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+// Please note, each project has its own collection of telemetry event types.
+// Only maintain event types related to core features in this file.
+
+// eslint-disable-next-line import/prefer-default-export
 export const TELEMETRY_EVENT_TYPE = {
   SEARCH_TIMERANGE_PRESET_SELECTED: 'Search TimeRange Preset Selected',
   SEARCH_TIMERANGE_PICKER_TOGGLED: 'Search TimeRange Picker Toggled',
@@ -124,16 +128,6 @@ export const TELEMETRY_EVENT_TYPE = {
     FILTER_EVENT_LIMIT_CHANGED: 'EventDefinition Condition Filter Event Limit Changed',
     AGGREGATION_TOGGLED: 'EventDefinition Aggregation Toggled',
     AGGREGATION_GROUP_BY_FIELD_SELECTED: 'EventDefinition Aggregation Group By Field Selected',
-    CORRELATION_WITHIN_THE_LAST_UNIT_CHANGED: 'EventDefinition Condition Correlation Within The Last Unit Changed',
-    CORRELATION_EXECUTE_EVERY_UNIT_CHANGED: 'EventDefinition Condition Correlation Execute Every Unit Changed',
-    CORRELATION_EXECUTED_AUTOMATICALLY_TOGGLED: 'EventDefinition Condition Correlation Executed Automatically Toggled',
-    CORRELATION_EVENT_SELECTED: 'EventDefinition Condition Correlation Event Selected',
-    CORRELATION_ADD_EVENT_CLICKED: 'EventDefinition Condition Correlation Add Event Clicked',
-    CORRELATION_REMOVE_EVENT_CLICKED: 'EventDefinition Condition Correlation Remove Event Clicked',
-    CORRELATION_OCCURRENCE_TIME_CHANGED: 'EventDefinition Condition Correlation Occurrence Time Changed',
-    CORRELATION_NO_OCCURRENCE_FOLLOWED_BY_EVENT_SELECTED: 'EventDefinition Condition Correlation No Occurrence Followed By Event Selected',
-    CORRELATION_NO_OCCURRENCE_IN_THE_NEXT_SELECTED: 'EventDefinition Condition Correlation No Occurrence In The Next Selected',
-    CORRELATION_NO_OCCURRENCE_IN_THE_NEXT_UNIT_CHANGED: 'EventDefinition Condition Correlation No Occurrence In The Next Unit Changed',
   },
   EVENTDEFINITION_FIELDS: {
     STEP_CLICKED: 'EventDefinition Fields Step Clicked',
@@ -300,18 +294,14 @@ export const TELEMETRY_EVENT_TYPE = {
     USER_UNASSIGNED: 'Roles User Unassigned',
   },
   AUTHENTICATION: {
+    DIRECTORY_GROUP_SYNC_SAVE_CLICKED: 'Authentication Directory Group Sync Save Clicked',
     CONFIG_UPDATED: 'Authentication Config Updated',
     SERVICE_CREATED: 'Authentication Service Created',
     SERVICE_SELECTED: 'Authentication Service Selected',
     DIRECTORY_SERVER_CONFIG_SAVE_CLICKED: 'Authentication Directory Server Config Save Clicked',
     DIRECTORY_USER_SYNC_SAVE_CLICKED: 'Authentication Directory User Sync Save Clicked',
-    DIRECTORY_GROUP_SYNC_SAVE_CLICKED: 'Authentication Directory Group Sync Save Clicked',
     DIRECTORY_NEXT_USER_SYNC_CLICKED: 'Authentication Directory Next User Sync Clicked',
     DIRECTORY_NEXT_GROUP_SYNC_CLICKED: 'Authentication Directory Next Group Sync Clicked',
-    OIDC_SERVER_CONFIG_SAVE_CLICKED: 'Authentication OIDC Server Config Save Clicked',
-    OIDC_NEXT_GROUP_SYNC_CLICKED: 'Authentication OIDC Next Group Sync Clicked',
-    OIDC_PREVIOUS_SERVER_CONFIG_CLICKED: 'Authentication OIDC Previous Server Config Clicked',
-    OIDC_GROUP_SYNC_SAVE_CLICKED: 'Authentication OIDC Group Sync Save Clicked',
   },
   SIDECARS: {
     CONFIGURATION_CREATED: 'Sidecar Configuration Created',
@@ -348,9 +338,3 @@ export const TELEMETRY_EVENT_TYPE = {
     CREATE_PROFILE_FROM_SELECTED_RAN: 'Index Set Field Type Profile Create From Selected Ran',
   },
 } as const;
-
-type ExtractObjectValues<T extends object> = {
-  [K in keyof T]: T[K] extends object ? ExtractObjectValues<T[K]> : T[K];
-}[keyof T];
-
-export type EventType = ExtractObjectValues<typeof TELEMETRY_EVENT_TYPE>;
