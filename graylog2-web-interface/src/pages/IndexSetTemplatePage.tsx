@@ -39,7 +39,7 @@ const IndexSetTemplatePage = () => {
                     <LinkContainer to={Routes.SYSTEM.INDICES.TEMPLATES.OVERVIEW}>
                       <Button>Overview</Button>
                     </LinkContainer>
-)}>
+                  )}>
         <span>
           {!isFetching && data.description ? data.description : 'Viewing Index Set Template Details'}
         </span>
